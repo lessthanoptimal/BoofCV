@@ -58,6 +58,7 @@ public class FactoryShapeDetector {
 		detector.setMaximumContour(config.maximumContour);
 		detector.setMinimumContour(config.minimumContour);
 		detector.setInternalContour(config.processInternal);
+		detector.setMaxMajorToMinorRatio(config.maxMajorToMinorRatio);
 
 		SnapToEllipseEdge<T> refine = new SnapToEllipseEdge<>(config.numSampleContour, config.refineRadialSamples, imageType);
 		refine.setConvergenceTol(config.convergenceTol);

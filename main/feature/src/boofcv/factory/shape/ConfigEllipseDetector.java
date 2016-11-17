@@ -84,10 +84,9 @@ public class ConfigEllipseDetector implements Configuration {
 	public double checkRadialDistance = 1.5;
 
 	/**
-	 * Check:<br>
-	 * Number of points along the contour it samples when performing edge intensity check.
+	 * The maximum ratio between the major to minor ratio
 	 */
-	public int checkSamplePoints = 20;
+	public double maxMajorToMinorRatio = 20.0;
 
 	@Override
 	public void checkValidity() {
