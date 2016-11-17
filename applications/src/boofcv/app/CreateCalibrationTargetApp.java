@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -30,7 +31,7 @@ import org.kohsuke.args4j.Option;
 public class CreateCalibrationTargetApp {
 	@Option(name="-t",aliases = {"--Type"}, usage="Type of calibration target.")
 	String _type=null;
-	PatternType type;
+	CalibrationPatterns type;
 
 	@Option(name="-r",aliases = {"--Rows"}, usage="Number of rows")
 	int rows=-1;
@@ -66,7 +67,7 @@ public class CreateCalibrationTargetApp {
 		parser.printUsage(System.out);
 		System.out.println();
 		System.out.println("Target Types");
-		for( PatternType p : PatternType.values() ) {
+		for( CalibrationPatterns p : CalibrationPatterns.values() ) {
 			System.out.println("  "+p);
 		}
 		System.out.println();
@@ -91,7 +92,7 @@ public class CreateCalibrationTargetApp {
 	private void finishParsing(CmdLineParser parser) {
 		if( rows <= 0 || columns <= 0 || _type == null )
 			printHelpExit(parser);
-		for( PatternType p : PatternType.values() ) {
+		for( CalibrationPatterns p : CalibrationPatterns.values() ) {
 			if( _type.compareToIgnoreCase(p.name() ) == 0 ) {
 				type = p;
 				break;
@@ -160,14 +161,6 @@ public class CreateCalibrationTargetApp {
 		}
 
 	}
-
-	private enum PatternType {
-		CHESSBOARD,
-		SQUARE_GRID,
-		BINARY_GRID,
-		CIRCLE_ASYMMETRIC_GRID
-	}
-
 	public static void main(String[] args) {
 		CreateCalibrationTargetApp generator = new CreateCalibrationTargetApp();
 		CmdLineParser parser = new CmdLineParser(generator);
