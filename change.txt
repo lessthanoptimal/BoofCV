@@ -70,8 +70,7 @@ Version : 0.25
 
 - TODO dual fisheye to equirectangular image
 - TODO Regression: asymmetric circular grid fiducial
-- TODO             orientation, distance, outdoors, motion blur, stationary
-- TODO Regression: asymmetric circular grid calibration
+- TODO             orientation, distance, outdoors, always visible
 - TODO Regression: Scene Classification
 
 ---------------------------------------------

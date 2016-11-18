@@ -317,6 +317,9 @@ public class EllipseClustersIntoAsymmetricGrid {
 			Edge edge = currentSeed.edges.get(i);
 
 			double angleDiff = UtilAngle.dist(edge.angle, angleTarget);
+			if( angleDiff > MAX_LINE_ANGLE_CHANGE*1.5 )
+				continue;
+
 			double score = (angleDiff+0.001)*c.distance(edge.target.ellipse.center);
 
 			if( score < bestScore ) {

@@ -50,8 +50,8 @@ public class TestDetectAsymmetricCircleGrid {
 
 		Affine2D_F64 affine = new Affine2D_F64(1,0,0,1,100,100);
 
-//		performDetectionCheck(5, 6, 5, 6, affine);
-//		performDetectionCheck(5, 4, 5, 4, affine);
+		performDetectionCheck(5, 6, 5, 6, affine);
+		performDetectionCheck(5, 4, 5, 4, affine);
 		performDetectionCheck(3, 3, 3, 3, affine);
 		performDetectionCheck(3, 4, 3, 4, affine);
 		performDetectionCheck(4, 3, 4, 3, affine);
@@ -78,8 +78,7 @@ public class TestDetectAsymmetricCircleGrid {
 		int centerDistances = 80;
 
 		DetectAsymmetricCircleGrid<GrayU8> alg = createAlg(expectedRows,expectedCols,radius,centerDistances);
-
-		alg.setVerbose(true);
+//		alg.setVerbose(true);
 
 		List<Point2D_F64> locations = new ArrayList<>();
 		GrayU8 image = new GrayU8(400,450);
