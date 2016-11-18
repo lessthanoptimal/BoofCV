@@ -57,7 +57,7 @@ public class ExampleImageClassification {
 		classifier.loadModel(path);
 		List<String> categories = classifier.getCategories();
 
-		String regex = UtilIO.pathExample("recognition/vacation")+"/^\\w*.jpg";
+		String regex = UtilIO.pathExample("recognition/pixabay")+"/^\\w*.jpg";
 		List<File> images = Arrays.asList(BoofMiscOps.findMatches(regex));
 		Collections.sort(images);
 

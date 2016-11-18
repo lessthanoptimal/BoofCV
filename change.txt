@@ -65,8 +65,6 @@ Version : 0.25
   * A printing company was having issues correcting sizing the document until this change was made.
 - Refactored FactoryCalibrationTarget -> FactoryFiducialCalibration
 
-- TODO Data set for CNN classifiers
-- TODO Example equirectangular to pinhole example
 - TODO dual fisheye to equirectangular image
 - TODO Regression: asymmetric circular grid fiducial
 - TODO             orientation, distance, outdoors, motion blur, stationary
