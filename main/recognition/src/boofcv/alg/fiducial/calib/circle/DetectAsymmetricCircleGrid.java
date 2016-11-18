@@ -78,6 +78,9 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 	private List<List<EllipsesIntoClusters.Node>> clusters = new ArrayList<>();
 	private List<List<EllipsesIntoClusters.Node>> clustersPruned = new ArrayList<>();
 
+	// verbose printing to standard  out
+	private boolean verbose = false;
+
 	/**
 	 * Creates and configures the detector
 	 *
@@ -105,6 +108,8 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 	 * @param gray Input image
 	 */
 	public void process(T gray) {
+		if( verbose) System.out.println("ENTER DetectAsymmetricCircleGrid.process()");
+
 		this.binary.reshape(gray.width,gray.height);
 
 		inputToBinary.process(gray, binary);
@@ -112,18 +117,24 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 		ellipseDetector.process(gray, binary);
 		List<EllipseRotated_F64> found = ellipseDetector.getFoundEllipses().toList();
 
+		if( verbose) System.out.println("  Found "+found.size()+" ellpises");
+
 		clusters.clear();
 		clustering.process(found, clusters);
 		clustersPruned.clear();
 		clustersPruned.addAll(clusters);
 
+		if( verbose) System.out.println("  Found "+clusters.size()+" clusters");
 		pruneIncorrectSize(clustersPruned, totalEllipses(numRows,numCols) );
+		if( verbose) System.out.println("  Remaining clusters after pruning "+clustersPruned.size());
 
 		grider.process(found, clustersPruned);
 
 		FastQueue<Grid> grids = grider.getGrids();
 
+		if( verbose) System.out.println("  Found "+grids.size()+" grids");
 		pruneIncorrectShape(grids,numRows,numCols);
+		if( verbose) System.out.println("  Remaining grids after pruning "+grids.size());
 
 		validGrids.clear();
 		for (int i = 0; i < grids.size(); i++) {
@@ -131,6 +142,8 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 			putGridIntoCanonical(g);
 			validGrids.add( g );
 		}
+
+		if( verbose) System.out.println("EXIT DetectAsymmetricCircleGrid.process()");
 	}
 
 	/**
@@ -357,5 +370,15 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 
 	public int getRows() {
 		return numRows;
+	}
+
+	public boolean isVerbose() {
+		return verbose;
+	}
+
+	public void setVerbose(boolean verbose) {
+		this.ellipseDetector.setVerbose(verbose);
+		this.grider.setVerbose(verbose);
+		this.verbose = verbose;
 	}
 }

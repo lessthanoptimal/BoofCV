@@ -178,14 +178,22 @@ public class TestBinaryEllipseDetectorPixel {
 				if( Math.abs(f.a-e.a) <= tol && Math.abs(f.b-e.b) <= tol) {
 					boolean angleMatch = true;
 					// if it's a circle ignore the angle
-					if( Math.abs(e.a - e.b) > 1e-8 ) {
-						angleMatch = UtilAngle.dist(f.phi,e.phi) <= tolPhi;
+					if( Math.abs(e.a - e.b)/Math.max(e.a,e.b) > 0.01 ) {
+						angleMatch = UtilAngle.distHalf(f.phi,e.phi) <= tolPhi;
 					}
 					if( angleMatch && e.center.distance(f.center) <= tol ) {
 						foundMatch = matched[i] = true;
 					}
 				}
 
+			}
+			if( !foundMatch ) {
+				System.out.println("Found");
+				System.out.println(f);
+				System.out.println("\nExpected");
+				for (int i = 0; i < expected.size(); i++) {
+					System.out.println(expected.get(i));
+				}
 			}
 			assertTrue(foundMatch);
 		}

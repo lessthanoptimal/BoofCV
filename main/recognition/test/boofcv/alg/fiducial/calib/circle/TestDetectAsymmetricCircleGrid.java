@@ -50,8 +50,8 @@ public class TestDetectAsymmetricCircleGrid {
 
 		Affine2D_F64 affine = new Affine2D_F64(1,0,0,1,100,100);
 
-		performDetectionCheck(5, 6, 5, 6, affine);
-		performDetectionCheck(5, 4, 5, 4, affine);
+//		performDetectionCheck(5, 6, 5, 6, affine);
+//		performDetectionCheck(5, 4, 5, 4, affine);
 		performDetectionCheck(3, 3, 3, 3, affine);
 		performDetectionCheck(3, 4, 3, 4, affine);
 		performDetectionCheck(4, 3, 4, 3, affine);
@@ -74,11 +74,16 @@ public class TestDetectAsymmetricCircleGrid {
 	}
 
 	private void performDetectionCheck(int expectedRows, int expectedCols, int actualRows, int actualCols, Affine2D_F64 affine) {
-		DetectAsymmetricCircleGrid<GrayU8> alg = createAlg(expectedRows,expectedCols);
+		int radius = 20;
+		int centerDistances = 80;
+
+		DetectAsymmetricCircleGrid<GrayU8> alg = createAlg(expectedRows,expectedCols,radius,centerDistances);
+
+		alg.setVerbose(true);
 
 		List<Point2D_F64> locations = new ArrayList<>();
 		GrayU8 image = new GrayU8(400,450);
-		render(actualRows,actualCols, 20, 80, affine, locations,image);
+		render(actualRows,actualCols, radius, centerDistances, affine, locations,image);
 
 		alg.process(image);
 
@@ -117,9 +122,10 @@ public class TestDetectAsymmetricCircleGrid {
 		}
 	}
 
-	private DetectAsymmetricCircleGrid<GrayU8> createAlg( int numRows , int numCols ) {
+	private DetectAsymmetricCircleGrid<GrayU8> createAlg( int numRows , int numCols ,
+														  double radius , double centerDistance ) {
 
-		double spaceRatio = 4.0*1.15;
+		double spaceRatio = 1.2*centerDistance/radius;
 
 		InputToBinary<GrayU8> threshold = FactoryThresholdBinary.globalFixed(100,true,GrayU8.class);
 		BinaryEllipseDetector<GrayU8> detector = FactoryShapeDetector.ellipse(null, GrayU8.class);
@@ -426,5 +432,8 @@ public class TestDetectAsymmetricCircleGrid {
 		}
 
 		ConvertBufferedImage.convertFrom(buffered, image);
+
+//		ShowImages.showWindow(buffered,"Rendered",true);
+//		try { Thread.sleep(10000); } catch (InterruptedException ignore) {}
 	}
 }
