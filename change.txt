@@ -64,6 +64,8 @@ Version : 0.25
   * The post script format has been tweaked so that the page size is specified with the /PageSize command also
   * A printing company was having issues correcting sizing the document until this change was made.
 - Refactored FactoryCalibrationTarget -> FactoryFiducialCalibration
+- FactoryMotion2D
+  * Removed image type specific functions and updated code for more recent API
 
 - TODO dual fisheye to equirectangular image
 - TODO Regression: asymmetric circular grid fiducial

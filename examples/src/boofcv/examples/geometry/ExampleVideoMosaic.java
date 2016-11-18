@@ -75,7 +75,7 @@ public class ExampleVideoMosaic {
 
 		// This fuses the images together
 		StitchingFromMotion2D<Planar<GrayF32>,Homography2D_F64>
-				stitch = FactoryMotion2D.createVideoStitchMS(0.5, motion2DColor, GrayF32.class);
+				stitch = FactoryMotion2D.createVideoStitch(0.5, motion2DColor, ImageType.pl(3,GrayF32.class));
 
 		// Load an image sequence
 		MediaManager media = DefaultMediaManager.INSTANCE;

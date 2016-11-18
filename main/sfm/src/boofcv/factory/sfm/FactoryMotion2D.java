@@ -23,7 +23,7 @@ import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.sfm.d2.WrapImageMotionPtkSmartRespawn;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.robust.*;
-import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.sfm.d2.*;
 import boofcv.core.image.border.BorderType;
@@ -31,8 +31,7 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.Planar;
+import boofcv.struct.image.ImageType;
 import georegression.fitting.MotionTransformPoint;
 import georegression.fitting.affine.ModelManagerAffine2D_F64;
 import georegression.fitting.homography.ModelManagerHomography2D_F64;
@@ -132,50 +131,28 @@ public class FactoryMotion2D {
 	 * @param <IT> Model model
 	 * @return StitchingFromMotion2D
 	 */
-	public static <I extends ImageGray, IT extends InvertibleTransform>
-	StitchingFromMotion2D<I, IT> createVideoStitch( double maxJumpFraction ,
-													ImageMotion2D<I,IT> motion2D , Class<I> imageType ) {
-		StitchingTransform transform;
+	@SuppressWarnings("unchecked")
+	public static <I extends ImageBase, IT extends InvertibleTransform>
+	StitchingFromMotion2D<I, IT>
+	createVideoStitch( double maxJumpFraction , ImageMotion2D<I,IT> motion2D , ImageType<I> imageType ) {
+		StitchingTransform<IT> transform;
 
 		if( motion2D.getTransformType() == Affine2D_F64.class ) {
-			transform = FactoryStitchingTransform.createAffine_F64();
+			transform = (StitchingTransform)FactoryStitchingTransform.createAffine_F64();
 		} else {
-			transform = FactoryStitchingTransform.createHomography_F64();
+			transform = (StitchingTransform)FactoryStitchingTransform.createHomography_F64();
 		}
 
-		InterpolatePixelS<I> interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, BorderType.EXTENDED, imageType);
-		ImageDistort<I,I> distorter = FactoryDistort.distortSB(false, interp, imageType);
-		distorter.setRenderAll(false);
+		InterpolatePixel<I> interp;
 
-		return new StitchingFromMotion2D<>(motion2D, distorter, transform, maxJumpFraction);
-	}
-
-	/**
-	 * Estimates the image motion from planar images and then combines images together.
-	 * Typically used for mosaics and stabilization.
-	 *
-	 * @param maxJumpFraction If the area changes by this much between two consecuative frames then the transform
-	 *                        is reset.
-	 * @param motion2D Estimates the image motion.
-	 * @param imageType Type of image processed
-	 * @param <I> Image input type.
-	 * @param <IT> Model model
-	 * @return StitchingFromMotion2D
-	 */
-	public static <I extends ImageGray, IT extends InvertibleTransform>
-	StitchingFromMotion2D<Planar<I>, IT> createVideoStitchMS(double maxJumpFraction ,
-															 ImageMotion2D<Planar<I>,IT> motion2D , Class<I> imageType ) {
-		StitchingTransform transform;
-
-		if( motion2D.getTransformType() == Affine2D_F64.class ) {
-			transform = FactoryStitchingTransform.createAffine_F64();
+		if( imageType.getFamily() == ImageType.Family.GRAY || imageType.getFamily() == ImageType.Family.PLANAR ) {
+			interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, BorderType.EXTENDED,
+					imageType.getImageClass());
 		} else {
-			transform = FactoryStitchingTransform.createHomography_F64();
+			throw new IllegalArgumentException("Unsupported image type");
 		}
 
-		InterpolatePixelS<I> interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, BorderType.EXTENDED, imageType);
-		ImageDistort<Planar<I>,Planar<I>> distorter =
-				FactoryDistort.distortPL(false,interp, imageType);
+		ImageDistort<I,I> distorter = FactoryDistort.distort(false, interp, imageType);
 		distorter.setRenderAll(false);
 
 		return new StitchingFromMotion2D<>(motion2D, distorter, transform, maxJumpFraction);

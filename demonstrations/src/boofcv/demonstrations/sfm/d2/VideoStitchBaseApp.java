@@ -115,19 +115,19 @@ public abstract class VideoStitchBaseApp<I extends ImageBase, IT extends Inverti
 	protected StitchingFromMotion2D createAlgorithm( PointTracker<I> tracker ) {
 
 		if( imageType.getFamily() == ImageType.Family.PLANAR) {
-			Class imageType = this.imageType.getImageClass();
+			Class imageClass = this.imageType.getImageClass();
 
 			ImageMotion2D<I,IT> motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,
 					respawnTrackFraction,respawnCoverageFraction,false,tracker,fitModel);
 
-			ImageMotion2D motion2DColor = new PlToGrayMotion2D(motion,imageType);
+			ImageMotion2D motion2DColor = new PlToGrayMotion2D(motion,imageClass);
 
-			return FactoryMotion2D.createVideoStitchMS(maxJumpFraction,motion2DColor,imageType);
+			return FactoryMotion2D.createVideoStitch(maxJumpFraction,motion2DColor, imageType);
 		} else {
 			ImageMotion2D motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,
 					respawnTrackFraction,respawnCoverageFraction,false,tracker,fitModel);
 
-			return FactoryMotion2D.createVideoStitch(maxJumpFraction,motion, imageType.getImageClass());
+			return FactoryMotion2D.createVideoStitch(maxJumpFraction,motion, imageType);
 		}
 	}
 
