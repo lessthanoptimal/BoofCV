@@ -151,7 +151,8 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 	 * Throws away current results and starts over again
 	 */
 	public void reset() {
-		GImageMiscOps.fill(stitchedImage, 0);
+		if( stitchedImage != null )
+			GImageMiscOps.fill(stitchedImage, 0);
 		motion.reset();
 		worldToCurr.reset();
 		first = true;

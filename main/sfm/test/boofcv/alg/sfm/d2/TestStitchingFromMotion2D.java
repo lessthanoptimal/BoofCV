@@ -257,6 +257,22 @@ public class TestStitchingFromMotion2D {
 		assertEquals(2+h,corners.p3.y,1e-5);
 	}
 
+	/**
+	 * Make sure it doesn't blow up if reset is called before anythign is processed
+	 */
+	@Test
+	public void resetBeforeProcess() {
+		HelperMotion motion = new HelperMotion();
+		HelperDistort distort = new HelperDistort();
+
+		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
+
+		StitchingFromMotion2D<GrayF32,Affine2D_F64> alg =
+				new StitchingFromMotion2D<>(motion, distort, trans, 0.3);
+
+		alg.reset();
+	}
+
 	private class HelperMotion implements ImageMotion2D<GrayF32,Affine2D_F64> {
 
 		int numProcess = 0;
