@@ -20,6 +20,7 @@ package boofcv.gui;
 
 import boofcv.abst.scene.ImageClassifier;
 import boofcv.gui.image.ImagePanel;
+import boofcv.gui.image.ScaleOptions;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -38,7 +39,7 @@ public class ImageClassificationPanel extends JPanel
 		implements ListSelectionListener
 {
 
-	JTextArea textArea = new JTextArea(10,100);
+	JTextArea textArea = new JTextArea();
 
 	JScrollPane listScroll;
 	private JList listPanel;
@@ -56,21 +57,34 @@ public class ImageClassificationPanel extends JPanel
 		listPanel.setSelectedIndex(0);
 		listPanel.addListSelectionListener(this);
 
-		listPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		listPanel.setSelectedIndex(0);
-		listPanel.addListSelectionListener(this);
-
 		listScroll = new JScrollPane(listPanel);
 		listScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		listScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-		centerImage.setPreferredSize(new Dimension(600,600));
+		final JPanel centerPanel = new JPanel();
+		SpringLayout spring = new SpringLayout();
+		centerPanel.setLayout(spring);
+		centerPanel.add( textArea );
+		centerPanel.add( centerImage );
+		centerPanel.setPreferredSize(new Dimension(600,600));
 
-		textArea.setPreferredSize(new Dimension(400,200));
-		textArea.setLineWrap(true);
 
-		add(textArea, BorderLayout.SOUTH);
-		add(centerImage, BorderLayout.CENTER);
+		// add a constraint to make this image be the same size as the window
+		Spring pw = spring.getConstraint(SpringLayout.WIDTH,  centerPanel);
+		Spring ph = spring.getConstraint(SpringLayout.HEIGHT,  centerPanel);
+		SpringLayout.Constraints c = spring.getConstraints(centerImage);
+		c.setWidth(Spring.scale(pw,  1.0f));
+		c.setHeight(Spring.scale(ph,  1.0f));
+		centerImage.setScaling(ScaleOptions.DOWN);
+		centerImage.setOpaque(true);
+
+		textArea.setFont(new Font("Courier New", Font.BOLD, 16));
+		textArea.setLineWrap(false);
+		textArea.setOpaque(true);
+		textArea.setForeground(Color.BLACK);
+		textArea.setBackground(new Color(255,255,255,125));
+
+		add(centerPanel, BorderLayout.CENTER);
 		add(listScroll, BorderLayout.WEST);
 	}
 
@@ -94,7 +108,6 @@ public class ImageClassificationPanel extends JPanel
 					// update the list's size
 					Dimension d = listPanel.getMinimumSize();
 					listPanel.setPreferredSize(new Dimension(d.width + listScroll.getVerticalScrollBar().getWidth(), d.height));
-
 					validate();
 				}
 			});
@@ -109,24 +122,28 @@ public class ImageClassificationPanel extends JPanel
 
 		final int index = listPanel.getSelectedIndex();
 		if( index >= 0 ) {
-			Image selected;
+			final Image selected;
 			synchronized (results) {
 				selected = results.get(index);
 			}
-			centerImage.setBufferedImage(selected.image);
-			centerImage.setPreferredSize(new Dimension(selected.image.getWidth(), selected.image.getHeight()));
-			centerImage.validate();
-			centerImage.repaint();
 
-			final Image fselected = selected;
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
+					centerImage.setBufferedImage(selected.image);
+					centerImage.setPreferredSize(new Dimension(selected.image.getWidth(), selected.image.getHeight()));
+					centerImage.validate();
+					centerImage.repaint();
+
 					String text = "";
-					int N = Math.min(5, fselected.results.size());
-					for (String s : fselected.results.subList(0, N)) {
+					int N = Math.min(5, selected.results.size());
+					for (String s : selected.results.subList(0, N)) {
 						text += s+"\n";
 					}
 					textArea.setText(text);
+//					if( N > 0 ) {
+//						Dimension d = textArea.getPreferredSize();
+//						textArea.setPreferredSize(new Dimension(d.width + 8, d.height * (N - 1) / N + 8));
+//					}
 				}});
 		}
 	}
