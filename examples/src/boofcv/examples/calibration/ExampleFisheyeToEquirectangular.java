@@ -129,7 +129,7 @@ public class ExampleFisheyeToEquirectangular {
 		CommonOps.mult(f2b,adjR,frontToBack.R);
 
 		// add the camera and specify which pixels are valid.  These functions precompute the entire transform
-		// and can be relatively slow, but generating the rectified image should be much faster
+		// and can be relatively slow, but generating the equirectangular image should be much faster
 		alg.addCamera(frontToBack,distort0, mask0 );
 		alg.addCamera(frontToFront,distort1, mask1 );
 
