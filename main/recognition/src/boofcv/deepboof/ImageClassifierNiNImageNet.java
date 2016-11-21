@@ -36,14 +36,15 @@ import java.util.List;
 import static deepboof.misc.TensorOps.WI;
 
 /**
- * TODO comment
+ * <p>Pretrained Network-in-Network (NiN) image classifier using imagenet data.  Trained by szagoruyko [1,2] and
+ * achieves 62.6% top1 center crop accuracy on validation set.</p>
  *
+ * <p>
+ * [1] https://gist.github.com/szagoruyko/0f5b4c5e2d2b18472854<br>
+ * [2] https://github.com/soumith/imagenet-multiGPU.torch/blob/master/models/ninbn.lua
+ * </p>
  * @author Peter Abeles
  */
-// https://gist.github.com/szagoruyko/0f5b4c5e2d2b18472854
-// https://github.com/soumith/imagenet-multiGPU.torch/blob/master/models/ninbn.lua
-// https://github.com/szagoruyko/torch-opencv-demos
-// TODO compare to torch results
 public class ImageClassifierNiNImageNet extends BaseImageClassifier {
 
 	// normalization parameters
@@ -51,8 +52,7 @@ public class ImageClassifierNiNImageNet extends BaseImageClassifier {
 	float stdev[];
 
 //	int imageSize = 256;
-	private static final int imageCrop = 224;
-
+	static final int imageCrop = 224;
 
 	// Input image with the bands in the correct order
 	Planar<GrayF32> imageBgr = new Planar<>(GrayF32.class,imageCrop,imageCrop,3);

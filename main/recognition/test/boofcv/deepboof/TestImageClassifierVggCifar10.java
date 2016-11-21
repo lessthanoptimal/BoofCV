@@ -18,18 +18,41 @@
 
 package boofcv.deepboof;
 
-import org.junit.Test;
-
-import java.io.IOException;
-
-import static org.junit.Assert.fail;
+import boofcv.alg.filter.stat.ImageLocalNormalization;
+import boofcv.core.image.border.BorderType;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
+import deepboof.models.YuvStatistics;
 
 /**
  * @author Peter Abeles
  */
-public class TestImageClassifierVggCifar10 {
-	@Test
-	public void compareToTorch() throws IOException {
-		fail("Implement"); // TODO convert into regression test
+public class TestImageClassifierVggCifar10 extends CheckBaseImageClassifier {
+
+	int width = ImageClassifierVggCifar10.inputSize;
+	int height = width;
+
+
+	@Override
+	public Planar<GrayF32> createImage() {
+		return new Planar<>(GrayF32.class,width,height,3);
+	}
+
+	@Override
+	public BaseImageClassifier createClassifier() {
+		ImageClassifierVggCifar10 alg = new ImageClassifierVggCifar10();
+
+		alg.stats = new YuvStatistics();
+		alg.stats.meanU = 120;
+		alg.stats.stdevU = 25;
+		alg.stats.meanV = 40;
+		alg.stats.stdevV = 10;
+		alg.stats.kernel = new double[]{0.1,0.5,0.1};
+		alg.stats.kernelOffset = 1;
+
+		alg.localNorm = new ImageLocalNormalization<>(GrayF32.class, BorderType.EXTENDED);
+		alg.kernel = DataManipulationOps.create1D_F32(alg.stats.kernel);
+
+		return alg;
 	}
 }

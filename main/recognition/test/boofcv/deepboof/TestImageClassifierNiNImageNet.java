@@ -18,56 +18,35 @@
 
 package boofcv.deepboof;
 
-import boofcv.abst.scene.ImageClassifier;
-import deepboof.io.torch7.ParseBinaryTorch7;
-import deepboof.tensors.Tensor_F32;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assume.assumeTrue;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
 
 /**
  * @author Peter Abeles
  */
-// TODO convert into a regression test
-public class TestImageClassifierNiNImageNet {
+public class TestImageClassifierNiNImageNet extends CheckBaseImageClassifier {
 
-	@Before
-	public void downloadModels() {
-		if( !"true".equals(System.getProperty("runSlowTests")))
-			return;
+	int width = ImageClassifierNiNImageNet.imageCrop;
+	int height = ImageClassifierNiNImageNet.imageCrop;
+
+	@Override
+	public Planar<GrayF32> createImage() {
+		return new Planar<>(GrayF32.class,width,height,3);
 	}
 
-	@Test
-	public void compareToTorch() throws IOException {
-		assumeTrue("true".equals(System.getProperty("runSlowTests")));
+	@Override
+	public BaseImageClassifier createClassifier() {
+		ImageClassifierNiNImageNet nin = new ImageClassifierNiNImageNet();
 
-		File path = new File("test/boofcv/deepboof");
+		// dummy normalization
+		nin.mean = new float[width*height];
+		nin.stdev = new float[width*height];
 
-		Tensor_F32 input = new ParseBinaryTorch7().parseIntoBoof(new File(path,"nin_input"));
-		Tensor_F32 output = new ParseBinaryTorch7().parseIntoBoof(new File(path,"nin_output"));
-
-		ImageClassifierNiNImageNet alg = new ImageClassifierNiNImageNet();
-		alg.loadModel(new File("../../"));
-
-		// Call an inner function which processes the tensor
-		// much easier to compare against the original network this way
-		alg.innerProcess(input);
-
-		List<ImageClassifier.Score> scores = alg.getAllResults();
-
-		for (int i = 0; i < scores.size(); i++) {
-			ImageClassifier.Score score = scores.get(i);
-
-			float expected = output.get(0,score.category);
-
-//			System.out.printf("%6.2f    %6.2f\n",expected,score.score);
-			assertEquals(expected,score.score,1e-4f);
+		for (int i = 0; i < nin.mean.length; i++) {
+			nin.mean[i] = rand.nextFloat()*30+110;
+			nin.stdev[i] = 120;
 		}
+
+		return nin;
 	}
 }
