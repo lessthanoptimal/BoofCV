@@ -22,7 +22,7 @@ import georegression.geometry.ConvertCoordinates3D_F64;
 import georegression.metric.UtilAngle;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Vector3D_F64;
+import georegression.struct.point.Point3D_F64;
 
 /**
  * Contains common operations for handling coordinates in an equirectangular image.
@@ -62,7 +62,7 @@ public class EquirectangularTools_F64 {
 	 * @param y pixel coordinate in equirectangular image
 	 * @param norm Normalized pointing vector
 	 */
-	public void equiToNorm(double x , double y , Vector3D_F64 norm ) {
+	public void equiToNorm(double x , double y , Point3D_F64 norm ) {
 		equiToLonlat(x,y, temp);
 		ConvertCoordinates3D_F64.latlonToUnitVector(temp.y,temp.x, norm);
 	}
@@ -76,7 +76,7 @@ public class EquirectangularTools_F64 {
 		lonlatToEqui( (double) lon, (double) lat,rect);
 	}
 
-	public void equiToNormFV(double x , double y , Vector3D_F64 norm ) {
+	public void equiToNormFV(double x , double y , Point3D_F64 norm ) {
 		equiToLonlatFV(x,y, temp);
 		ConvertCoordinates3D_F64.latlonToUnitVector(temp.y,temp.x, norm);
 	}

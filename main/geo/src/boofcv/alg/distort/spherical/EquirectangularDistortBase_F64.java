@@ -23,6 +23,7 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -48,7 +49,7 @@ public abstract class EquirectangularDistortBase_F64 extends PixelTransform2_F64
 	Point2D_F64 out = new Point2D_F64();
 
 	// storage for precomputed pointing vectors for each pixel in pinhole camera
-	Vector3D_F64[] vectors = new Vector3D_F64[0];
+	Point3D_F64[] vectors = new Point3D_F64[0];
 
 	/**
 	 * Specify the shame of the equirectangular image
@@ -88,11 +89,11 @@ public abstract class EquirectangularDistortBase_F64 extends PixelTransform2_F64
 		this.outWidth = width;
 
 		if( vectors.length < width*height ) {
-			Vector3D_F64[] tmp = new Vector3D_F64[width*height];
+			Point3D_F64[] tmp = new Point3D_F64[width*height];
 
 			System.arraycopy(vectors,0,tmp,0,vectors.length);
 			for (int i = vectors.length; i < tmp.length; i++) {
-				tmp[i] = new Vector3D_F64();
+				tmp[i] = new Point3D_F64();
 			}
 			vectors = tmp;
 		}
@@ -107,7 +108,7 @@ public abstract class EquirectangularDistortBase_F64 extends PixelTransform2_F64
 	@Override
 	public void compute(int x, int y) {
 		// grab precomputed normalized image coordinate at canonical location
-		Vector3D_F64 v = vectors[y*outWidth+x];
+		Point3D_F64 v = vectors[y*outWidth+x];
 		// move to requested orientation
 		GeometryMath_F64.mult(R,v,n); // TODO make faster by not using an array based matrix
 		// compute pixel coordinate

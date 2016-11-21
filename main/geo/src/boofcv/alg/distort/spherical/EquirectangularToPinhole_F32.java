@@ -21,7 +21,7 @@ package boofcv.alg.distort.spherical;
 import boofcv.alg.distort.pinhole.PinholePtoN_F32;
 import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Vector3D_F32;
+import georegression.struct.point.Point3D_F32;
 
 /**
  * Renders a pinhole camera view from an equirectangular image.  When no additional rotation
@@ -55,7 +55,7 @@ public class EquirectangularToPinhole_F32 extends EquirectangularDistortBase_F32
 		for (int pixelY = 0; pixelY < pinhole.height; pixelY++) {
 			for (int pixelX = 0; pixelX < pinhole.width; pixelX++) {
 				pixelToNormalized.compute(pixelX, pixelY, norm);
-				Vector3D_F32 v = vectors[pixelY*pinhole.width+pixelX];
+				Point3D_F32 v = vectors[pixelY*pinhole.width+pixelX];
 
 				v.set(norm.x,norm.y,1);
 			}

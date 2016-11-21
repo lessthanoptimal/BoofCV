@@ -34,10 +34,10 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.GeometryMath_F32;
-import georegression.geometry.UtilPoint2D_F32;
+import georegression.geometry.UtilVector3D_F32;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
-import georegression.struct.point.Vector3D_F32;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 
@@ -51,7 +51,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class MultiCameraToRequirectangular<T extends ImageBase<T>> {
+public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 
 	private EquirectangularTools_F32 tools = new EquirectangularTools_F32();
 	private int equiWidth, equHeight;
@@ -65,10 +65,11 @@ public class MultiCameraToRequirectangular<T extends ImageBase<T>> {
 
 	private ImageDistort<T,T> distort;
 
-	// how close to original pixel does it need to be to not be masked out
-	private float maskTolerancePixels = 2.0f;
+	// how close two spherical coordinates need to be to be considered a match when doing back and forth validation
+	// in radians
+	private float maskToleranceAngle = UtilAngle.radian(0.1f);
 
-	public MultiCameraToRequirectangular(ImageDistort<T,T> distort , int width , int height , ImageType<T> imageType ) {
+	public MultiCameraToEquirectangular(ImageDistort<T,T> distort , int width , int height , ImageType<T> imageType ) {
 
 		if( imageType.getDataType().isInteger() || imageType.getDataType().getNumBits() != 32 )
 			throw new IllegalArgumentException("Must be a 32 bit floating point image");
@@ -101,37 +102,31 @@ public class MultiCameraToRequirectangular<T extends ImageBase<T>> {
 		Point3Transform2_F32 s2p = factory.distortStoP_F32();
 
 		EquiToCamera equiToCamera = new EquiToCamera(cameraToCommon.getR(),s2p);
-		CameraToEqui cameraToEqui = new CameraToEqui(cameraToCommon.getR(),p2s);
-
-		Point2D_F32 equiPixel = new Point2D_F32();
 
 		GrayF32 equiMask = new GrayF32(equiWidth, equHeight);
 
 		PixelTransform2_F32 transformEquiToCam = new PixelTransformCached_F32(equiWidth, equHeight,
 				new PointToPixelTransform_F32(equiToCamera));
 
-		float tol = maskTolerancePixels*maskTolerancePixels;
+		Point3D_F32 p3b = new Point3D_F32();
+		Point2D_F32 p2 = new Point2D_F32();
 
 		for (int row = 0; row < equHeight; row++) {
 			for (int col = 0; col < equiWidth; col++) {
-				transformEquiToCam.compute(col,row);
-				float x = transformEquiToCam.distX;
-				float y = transformEquiToCam.distY;
+				equiToCamera.compute(col,row,p2);
 
-				// make sure it is contained inside the camera image
-				if( x < 0f || y < 0f || x > width-1 || y > height-1 )
+				if( Double.isNaN(p2.x) || Double.isNaN(p2.y) ||
+						p2.x < 0f || p2.y < 0f || p2.x > width-1 || p2.y > height-1 )
 					continue;
 
-				// need to check this case too
-				if( Double.isNaN(x) || Double.isNaN(y))
+				p2s.compute(p2.x,p2.y,p3b);
+
+				if( Double.isNaN(p3b.x) || Double.isNaN(p3b.y) || Double.isNaN(p3b.z))
 					continue;
 
-				// go back to equirectangular and see if it returns the same result
-				cameraToEqui.compute(x,y, equiPixel);
+				double angle = UtilVector3D_F32.acute(equiToCamera.unitCam,p3b);
 
-				float distance2 = UtilPoint2D_F32.distanceSq(equiPixel.x,equiPixel.y,col,row);
-
-				if( distance2 < tol ) {
+				if( angle < UtilAngle.radian(0.1)) {
 					equiMask.set(col,row,1);
 				}
 
@@ -148,43 +143,53 @@ public class MultiCameraToRequirectangular<T extends ImageBase<T>> {
 	 * @param cameraToCommon Rigid body transform from this camera to the common frame the equirectangular image
 	 *                       is in
 	 * @param factory Distortion model
-	 * @param validMask Binary mask with invalid pixels marked as not zero.  Pixels are in camera image frame.
+	 * @param camMask Binary mask with invalid pixels marked as not zero.  Pixels are in camera image frame.
 	 */
-	public void addCamera(Se3_F64 cameraToCommon , LensDistortionWideFOV factory , GrayU8 validMask ) {
+	public void addCamera(Se3_F64 cameraToCommon , LensDistortionWideFOV factory , GrayU8 camMask ) {
 
-		int width = validMask.width;
-		int height = validMask.height;
-
+		Point2Transform3_F32 p2s = factory.undistortPtoS_F32();
 		Point3Transform2_F32 s2p = factory.distortStoP_F32();
 
-		GrayF32 mask = new GrayF32(equiWidth, equHeight);
-
 		EquiToCamera equiToCamera = new EquiToCamera(cameraToCommon.getR(),s2p);
-		PixelTransform2_F32 transform = new PixelTransformCached_F32(equiWidth, equHeight,
+
+		GrayF32 equiMask = new GrayF32(equiWidth, equHeight);
+
+		PixelTransform2_F32 transformEquiToCam = new PixelTransformCached_F32(equiWidth, equHeight,
 				new PointToPixelTransform_F32(equiToCamera));
 
+		int width = camMask.width;
+		int height = camMask.height;
 
+		Point3D_F32 p3b = new Point3D_F32();
+
+		Point2D_F32 p2 = new Point2D_F32();
 		for (int row = 0; row < equHeight; row++) {
 			for (int col = 0; col < equiWidth; col++) {
-				transform.compute(col,row);
+				equiToCamera.compute(col,row,p2);
 
-				float pixelX = transform.distX;
-				float pixelY = transform.distY;
+				int camX = (int)(p2.x+0.5f);
+				int camY = (int)(p2.y+0.5f);
 
-				// see if it is contained inside the image
-				float weight = 0;
-				if( pixelX >= 0 && pixelX < width-1 && pixelY >= 0 && pixelY < height-1) {
-					if( validMask.get((int)pixelX, (int)pixelY) != 0 ) {
-						weight = 1.0f;
+				if( Double.isNaN(p2.x) || Double.isNaN(p2.y) ||
+						camX < 0 || camY < 0 || camX >= width || camY >= height )
+					continue;
+
+				if( camMask.unsafe_get(camX,camY) == 1 ) {
+					p2s.compute(p2.x,p2.y,p3b);
+
+					if( Double.isNaN(p3b.x) || Double.isNaN(p3b.y) || Double.isNaN(p3b.z))
+						continue;
+
+					double angle = UtilVector3D_F32.acute(equiToCamera.unitCam,p3b);
+
+					if( angle < maskToleranceAngle) {
+						equiMask.set(col,row,1);
 					}
-
 				}
-
-				mask.set(col,row,weight);
 			}
 		}
 
-		cameras.add( new Camera(mask, transform));
+		cameras.add( new Camera(equiMask, transformEquiToCam));
 	}
 
 	/**
@@ -195,7 +200,7 @@ public class MultiCameraToRequirectangular<T extends ImageBase<T>> {
 	 */
 	public void render( List<T> cameraImages ) {
 		if( cameraImages.size() != cameras.size())
-			throw new IllegalArgumentException("Image image count doesn't equal camera count");
+			throw new IllegalArgumentException("Input camera image count doesn't equal the expected number");
 
 		// avoid divide by zero errors by initializing it to a small non-zero value
 		GImageMiscOps.fill(weightImage,1e-4);
@@ -236,12 +241,12 @@ public class MultiCameraToRequirectangular<T extends ImageBase<T>> {
 		return cameras.get(which).mask;
 	}
 
-	public float getMaskTolerancePixels() {
-		return maskTolerancePixels;
+	public float getMaskToleranceAngle() {
+		return maskToleranceAngle;
 	}
 
-	public void setMaskTolerancePixels(float maskTolerancePixels) {
-		this.maskTolerancePixels = maskTolerancePixels;
+	public void setMaskToleranceAngle(float maskToleranceAngle) {
+		this.maskToleranceAngle = maskToleranceAngle;
 	}
 
 	private static class Camera {
@@ -265,7 +270,7 @@ public class MultiCameraToRequirectangular<T extends ImageBase<T>> {
 		Point3Transform2_F32 s2p;
 
 		Point3D_F32 unitCam = new Point3D_F32();
-		Vector3D_F32 unitCommon = new Vector3D_F32();
+		Point3D_F32 unitCommon = new Point3D_F32();
 
 		EquiToCamera(DenseMatrix64F cameraToCommon, Point3Transform2_F32 s2p) {
 			this.cameraToCommon = cameraToCommon;

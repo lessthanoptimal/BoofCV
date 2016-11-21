@@ -54,10 +54,10 @@ import java.io.File;
 public class ExampleFisheyeToPinhole {
 	public static void main(String[] args) {
 		// Path to image data and calibration data
-		String fisheyePath = UtilIO.pathExample("fisheye/theta_front/");
+		String fisheyePath = UtilIO.pathExample("fisheye/theta/");
 
 		// load the fisheye camera parameters
-		CameraUniversalOmni fisheyeModel = CalibrationIO.load(new File(fisheyePath,"fisheye.yaml"));
+		CameraUniversalOmni fisheyeModel = CalibrationIO.load(new File(fisheyePath,"front.yaml"));
 
 		// Specify what the pinhole camera should look like
 		CameraPinhole pinholeModel = new CameraPinhole(400,400,0,300,300,600,600);
@@ -68,7 +68,7 @@ public class ExampleFisheyeToPinhole {
 		NarrowToWidePtoP_F32 transform = new NarrowToWidePtoP_F32(pinholeDistort,fisheyeDistort);
 
 		// Load fisheye RGB image
-		BufferedImage bufferedFisheye = UtilImageIO.loadImage(fisheyePath,"dining_room.jpg");
+		BufferedImage bufferedFisheye = UtilImageIO.loadImage(fisheyePath,"front_table.jpg");
 		Planar<GrayU8> fisheyeImage = ConvertBufferedImage.convertFrom(
 				bufferedFisheye, true, ImageType.pl(3,GrayU8.class));
 

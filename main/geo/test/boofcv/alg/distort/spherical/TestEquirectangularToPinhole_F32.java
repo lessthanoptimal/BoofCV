@@ -20,7 +20,7 @@ package boofcv.alg.distort.spherical;
 
 import boofcv.struct.calib.CameraPinhole;
 import georegression.misc.GrlConstants;
-import georegression.struct.point.Vector3D_F32;
+import georegression.struct.point.Point3D_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -74,7 +74,7 @@ public class TestEquirectangularToPinhole_F32 {
 
 		tools.configure(equiWidth,equiHeight);
 
-		Vector3D_F32 n = new Vector3D_F32();
+		Point3D_F32 n = new Point3D_F32();
 
 		alg.compute(x,y);
 		tools.equiToNormFV(alg.distX,alg.distY,n);

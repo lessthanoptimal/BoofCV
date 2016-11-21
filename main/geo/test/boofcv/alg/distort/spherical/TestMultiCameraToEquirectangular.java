@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestMultiCameraToRequirectangular {
+public class TestMultiCameraToEquirectangular {
 
 	@Test
 	public void all() {

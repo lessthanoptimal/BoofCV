@@ -192,7 +192,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 
 	@Override
 	public void openFile(File file) {
-		File intrinsicFile = new File( file.getParent() , "fisheye.yaml");
+		File intrinsicFile = new File( file.getParent() , "front.yaml");
 		CameraUniversalOmni fisheyeModel = CalibrationIO.load(intrinsicFile);
 		fisheyeDistort = new LensDistortionUniversalOmni(fisheyeModel);
 		distorter.configure(new LensDistortionPinhole(cameraModel),fisheyeDistort);
@@ -358,11 +358,8 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 		ImageType type = ImageType.pl(3, GrayU8.class);
 
 		List<PathLabel> examples = new ArrayList<>();
-		examples.add(new PathLabel("Dining Room", UtilIO.pathExample("fisheye/theta_front/dining_room.jpg")));
-		// TODO delete other images before adding to git
-//		examples.add(new PathLabel("Building Side", UtilIO.pathExample("fisheye/theta_back/building_side.jpg")));
-//		examples.add(new PathLabel("Tree Fence", UtilIO.pathExample("fisheye/theta_back/tree_fence.jpg")));
-//		examples.add(new PathLabel("Half Dome", UtilIO.pathExample("fisheye/theta_front/half_dome.jpg")));
+		examples.add(new PathLabel("Dining Room", UtilIO.pathExample("fisheye/theta/front_table.jpg")));
+		examples.add(new PathLabel("Hike", UtilIO.pathExample("fisheye/theta/front_hike.jpg")));
 
 		FisheyePinholeApp app = new FisheyePinholeApp(examples,type);
 

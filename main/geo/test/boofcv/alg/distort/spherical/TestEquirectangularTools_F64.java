@@ -20,7 +20,7 @@ package boofcv.alg.distort.spherical;
 
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Vector3D_F64;
+import georegression.struct.point.Point3D_F64;
 import org.junit.Test;
 
 import java.util.Random;
@@ -99,7 +99,7 @@ public class TestEquirectangularTools_F64 {
 
 		tools.configure(300,250);
 
-		Vector3D_F64 found = new Vector3D_F64();
+		Point3D_F64 found = new Point3D_F64();
 		tools.equiToNorm(300.0/2.0, 250.0/2.0, found);
 
 		assertEquals(1.0,found.x, GrlConstants.DOUBLE_TEST_TOL);
@@ -113,7 +113,7 @@ public class TestEquirectangularTools_F64 {
 
 		tools.configure(300,250);
 
-		Vector3D_F64 found = new Vector3D_F64();
+		Point3D_F64 found = new Point3D_F64();
 		tools.equiToNormFV(300/2, (250-250/2-1), found);
 
 		assertEquals(1.0,found.x, GrlConstants.DOUBLE_TEST_TOL);
@@ -144,7 +144,7 @@ public class TestEquirectangularTools_F64 {
 	}
 
 	private void equiToNorm_reverse(EquirectangularTools_F64 tools, double x , double y) {
-		Vector3D_F64 n = new Vector3D_F64();
+		Point3D_F64 n = new Point3D_F64();
 		Point2D_F64 r = new Point2D_F64();
 
 		tools.equiToNorm(x,y,n);
@@ -177,7 +177,7 @@ public class TestEquirectangularTools_F64 {
 	}
 
 	private void equiToNorm_reverseFV(EquirectangularTools_F64 tools, double x , double y) {
-		Vector3D_F64 n = new Vector3D_F64();
+		Point3D_F64 n = new Point3D_F64();
 		Point2D_F64 r = new Point2D_F64();
 
 		tools.equiToNormFV(x,y,n);
