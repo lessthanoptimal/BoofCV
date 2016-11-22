@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -107,7 +107,7 @@ public abstract class InterleavedI8<T extends InterleavedI8> extends Interleaved
 	}
 
 	@Override
-	public void set_unsafe(int x, int y, int... value) {
+	public void unsafe_set(int x, int y, int... value) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			data[index] = (byte)value[i];

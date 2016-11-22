@@ -64,12 +64,12 @@ public class InterleavedS64 extends ImageInterleaved<InterleavedS64> {
 			storage = new long[numBands];
 		}
 
-		get_unsafe(x,y,storage);
+		unsafe_get(x,y,storage);
 
 		return storage;
 	}
 
-	public void get_unsafe(int x, int y, long[] storage) {
+	public void unsafe_get(int x, int y, long[] storage) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			storage[i] = data[index];
@@ -87,10 +87,10 @@ public class InterleavedS64 extends ImageInterleaved<InterleavedS64> {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
-		set_unsafe(x,y,value);
+		unsafe_set(x,y,value);
 	}
 
-	public void set_unsafe(int x, int y, long... value) {
+	public void unsafe_set(int x, int y, long... value) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			data[index] = value[i];

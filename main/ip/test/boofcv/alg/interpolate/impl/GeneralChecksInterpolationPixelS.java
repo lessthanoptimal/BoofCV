@@ -132,7 +132,7 @@ public abstract class GeneralChecksInterpolationPixelS< T extends ImageGray> {
 
 
 	/**
-	 * Compare get_unsafe against the value returned by get()
+	 * Compare get_fast against the value returned by get()
 	 */
 	@Test
 	public void get_fast() {

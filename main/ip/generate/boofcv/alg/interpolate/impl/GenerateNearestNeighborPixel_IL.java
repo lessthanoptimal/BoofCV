@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -123,7 +123,7 @@ public class GenerateNearestNeighborPixel_IL extends CodeGeneratorBase {
 				"\t\tint xx = (int)x;\n" +
 				"\t\tint yy = (int)y;\n" +
 				"\n" +
-				"\t\torig.get_unsafe(xx,yy,pixel);\n" +
+				"\t\torig.unsafe_get(xx,yy,pixel);\n" +
 				"\t\tfor (int i = 0; i < pixel.length; i++) {\n" +
 				"\t\t\tvalues[i] = "+sumToFloat+"pixel[i];\n" +
 				"\t\t}\n" +

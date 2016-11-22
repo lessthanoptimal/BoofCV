@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,12 +55,12 @@ public abstract class InterleavedInteger<T extends InterleavedInteger> extends I
 			storage = new int[numBands];
 		}
 
-		get_unsafe(x,y,storage);
+		unsafe_get(x,y,storage);
 
 		return storage;
 	}
 
-	public abstract void get_unsafe(int x, int y, int[] storage);
+	public abstract void unsafe_get(int x, int y, int[] storage);
 
 	/**
 	 * Sets the pixel's value for all the bands using an array.
@@ -73,10 +73,10 @@ public abstract class InterleavedInteger<T extends InterleavedInteger> extends I
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
-		set_unsafe(x,y,value);
+		unsafe_set(x,y,value);
 	}
 
-	public abstract void set_unsafe(int x, int y, int... value);
+	public abstract void unsafe_set(int x, int y, int... value);
 
 	/**
 	 * Returns the value of the specified band in the specified pixel.

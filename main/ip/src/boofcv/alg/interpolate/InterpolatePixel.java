@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public interface InterpolatePixel<T extends ImageBase> {
 	 *
 	 * @param x Point's x-coordinate.
 	 * @param y Point's y-coordinate.
-	 * @return  true if get_unsafe() can be called.
+	 * @return  true if get_fast() can be called.
 	 */
 	public boolean isInFastBounds(float x, float y);
 

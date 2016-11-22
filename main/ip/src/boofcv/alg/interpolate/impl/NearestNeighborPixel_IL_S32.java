@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class NearestNeighborPixel_IL_S32 extends NearestNeighborPixelMB<Interlea
 		int xx = (int)x;
 		int yy = (int)y;
 
-		orig.get_unsafe(xx,yy,pixel);
+		orig.unsafe_get(xx,yy,pixel);
 		for (int i = 0; i < pixel.length; i++) {
 			values[i] = pixel[i];
 		}

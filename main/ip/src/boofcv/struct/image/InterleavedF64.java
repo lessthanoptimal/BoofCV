@@ -20,7 +20,7 @@ package boofcv.struct.image;
 
 /**
  * <p>
- * {@link boofcv.struct.image.ImageInterleaved} for data of type float.
+ * {@link boofcv.struct.image.ImageInterleaved} for data of type double.
  * </p>
  *
  * @author Peter Abeles
@@ -64,12 +64,12 @@ public class InterleavedF64 extends ImageInterleaved<InterleavedF64> {
 			storage = new double[numBands];
 		}
 
-		get_unsafe(x,y,storage);
+		unsafe_get(x,y,storage);
 
 		return storage;
 	}
 
-	public void get_unsafe(int x, int y, double[] storage) {
+	public void unsafe_get(int x, int y, double[] storage) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			storage[i] = data[index];
@@ -87,10 +87,10 @@ public class InterleavedF64 extends ImageInterleaved<InterleavedF64> {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
-		set_unsafe(x,y,value);
+		unsafe_set(x,y,value);
 	}
 
-	public void set_unsafe(int x, int y, double... value) {
+	public void unsafe_set(int x, int y, double... value) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			data[index] = value[i];
