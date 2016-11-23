@@ -36,4 +36,9 @@ public class TestMultiCameraToEquirectangular {
 	public void addCamera_implicit_mask() {
 		fail("implement");
 	}
+
+	@Test
+	public void addCamera_explicit_mask() {
+		fail("implement");
+	}
 }

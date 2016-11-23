@@ -289,34 +289,4 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 			s2p.compute(unitCam.x, unitCam.y, unitCam.z , out);
 		}
 	}
-
-	/**
-	 * Transform from camera image to equirectangular image pixels
-	 */
-	private class CameraToEqui implements Point2Transform2_F32 {
-
-		DenseMatrix64F cameraToCommon;
-		Point2Transform3_F32 p2s;
-
-		Point3D_F32 unitCam = new Point3D_F32();
-		Point3D_F32 unitCommon = new Point3D_F32();
-
-		CameraToEqui(DenseMatrix64F cameraToCommon, Point2Transform3_F32 p2s) {
-			this.cameraToCommon = cameraToCommon;
-			this.p2s = p2s;
-		}
-
-		@Override
-		public void compute(float x, float y, Point2D_F32 out) {
-			// camera pixel to unit camera
-			p2s.compute(x,y,unitCam);
-
-			// rotate the point into common frame
-			GeometryMath_F32.mult(cameraToCommon, unitCam, unitCommon);
-
-			// unit sphere common to equirectangular
-			tools.normToEquiFV(unitCommon.x,unitCommon.y,unitCommon.z, out);
-		}
-	}
-
 }

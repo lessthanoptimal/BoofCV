@@ -112,15 +112,17 @@ public class ExampleFisheyeToEquirectangular {
 		//This will create an equirectangular image with 800 x 400 pixels
 		MultiCameraToEquirectangular<Planar<GrayF32>> alg = new MultiCameraToEquirectangular<>(distort,800,400,imageType);
 
-		// this is an important parameter
+		// this is an important parameter and is used to filter out falsely mirrored pixels
 		alg.setMaskToleranceAngle(UtilAngle.radian(0.1f));
 
-		GrayU8 mask0 =  createMask(model0,distort0,UtilAngle.radian(182)); // camera has a known FOV of 182 degrees
-		GrayU8 mask1 =  createMask(model1,distort1,UtilAngle.radian(182));
+		GrayU8 mask0 =  createMask(model0,distort0,UtilAngle.radian(182)); // camera has a known FOV of 185 degrees
+		GrayU8 mask1 =  createMask(model1,distort1,UtilAngle.radian(182)); // the edges are likely to be noisy,
+																		   // so crop it a bit..
 
 		// Rotate camera axis so that +x is forward and not +z and make it visually pleasing
 		DenseMatrix64F adjR = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,Math.PI/2,0,0,null);
-		// We will approximate the transform with a simple rotation of 180 degrees
+		// Rotation from the front camera to the back facing camera.
+		// This is only an approximation.  Should be determined through calibration.
 		DenseMatrix64F f2b = ConvertRotation3D_F64.eulerToMatrix(EulerType.ZYX,Math.PI,0,0,null);
 
 		Se3_F64 frontToFront = new Se3_F64();

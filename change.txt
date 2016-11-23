@@ -68,7 +68,6 @@ Version : 0.25
   * Removed image type specific functions and updated code for more recent API
 - Fixed bug in StitchingFromMotion2D where reset() could cause a null pointer exception
 
-- TODO dual fisheye to equirectangular image
 - TODO Regression: asymmetric circular grid fiducial
 - TODO             orientation, distance, outdoors, always visible
 - TODO Regression: Scene Classification

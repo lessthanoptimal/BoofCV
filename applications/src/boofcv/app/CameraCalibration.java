@@ -19,6 +19,7 @@
 package boofcv.app;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
@@ -92,6 +93,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("Fiducial Types:");
 		System.out.println("   CHESSBOARD");
 		System.out.println("   SQUAREGRID");
+		System.out.println("   CIRCLEASYM");
 		System.out.println();
 		System.out.println("Flags for CHESSBOARD:");
 		System.out.println("  --Grid=<rows>:<columns>            Specifies number of rows and columns in the target");
@@ -101,6 +103,10 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("  --SquareSpace=<square>:<space>     Specifies side of a square and space between square");
 		System.out.println("                                     Only the ratio matters.");
 		System.out.println("                                     Default: 1:1 square = 1 and space = 1");
+		System.out.println("Flags for CIRCLEASYM:");
+		System.out.println("  --Grid=<rows>:<columns>            Specifies number of black square rows and columns in the target");
+		System.out.println("  --CenterDistance=<length>          Specifies how far apart the center of two circles are along an axis");
+		System.out.println("  --Radius=<length>                  Radius of a circle");
 		System.out.println();
 	}
 
@@ -136,6 +142,9 @@ public class CameraCalibration extends BaseStandardInputApp {
 				break;
 			} else if( arg.compareToIgnoreCase("SQUAREGRID") == 0 ) {
 				parseSquareGrid(i + 1, args);
+				break;
+			} else if( arg.compareToIgnoreCase("CIRCLEASYM") == 0 ) {
+				parseCircleAsymmetric(i + 1, args);
 				break;
 			} else if( i == 0 ) {
 				outputFileName = arg;
@@ -216,6 +225,46 @@ public class CameraCalibration extends BaseStandardInputApp {
 		ConfigSquareGrid config = new ConfigSquareGrid(numRows, numColumns, square,space);
 
 		detector = FactoryFiducialCalibration.squareGrid(config);
+	}
+
+	protected void parseCircleAsymmetric( int index , String []args ) {
+		int numRows=0,numColumns=0;
+		double radius=-1,centerDistance=-1;
+
+		for(; index < args.length; index++ ) {
+			String arg = args[index];
+
+			if( !arg.startsWith("--") ) {
+				throw new  RuntimeException("Expected flags for radius grid. Should start with '--'");
+			}
+
+			splitFlag(arg);
+			if( flagName.compareToIgnoreCase("Grid") == 0 ) {
+				String words[] = parameters.split(":");
+				if (words.length != 2) throw new RuntimeException("Expected two values for rows and columns");
+				numRows = Integer.parseInt(words[0]);
+				numColumns = Integer.parseInt(words[1]);
+			} else if( flagName.compareToIgnoreCase("CenterDistance") == 0 ) {
+				centerDistance = Double.parseDouble(parameters);
+			} else if( flagName.compareToIgnoreCase("Radius") == 0 ) {
+				radius = Double.parseDouble(parameters);
+			} else {
+				throw new RuntimeException("Unknown image option "+flagName);
+			}
+		}
+
+		if( numRows <= 0 || numColumns <= 0) {
+			throw new RuntimeException("Rows and columns must be specified and > 0");
+		}
+		if( radius <= 0 || centerDistance <= 0) {
+			throw new RuntimeException("radius and center distance must be specified and > 0");
+		}
+
+		System.out.println("circle asymmetric: "+numRows+" x "+numColumns+" radius = "+radius+" center distance = "+centerDistance);
+
+		ConfigCircleAsymmetricGrid config = new ConfigCircleAsymmetricGrid(numRows, numColumns, radius,centerDistance);
+
+		detector = FactoryFiducialCalibration.circleAsymmGrid(config);
 	}
 
 	public void process() {
