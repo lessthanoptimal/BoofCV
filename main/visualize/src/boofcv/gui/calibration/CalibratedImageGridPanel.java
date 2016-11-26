@@ -40,6 +40,7 @@ import org.ejml.data.DenseMatrix64F;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +76,7 @@ public class CalibratedImageGridPanel extends JPanel {
 	boolean showUndistorted = false;
 	boolean showAll = false;
 	boolean showNumbers = true;
+	boolean showOrder = true;
 
 	ImageDistort<GrayF32,GrayF32> undoRadial;
 	Point2Transform2_F32 remove_p_to_p;
@@ -87,6 +89,7 @@ public class CalibratedImageGridPanel extends JPanel {
 
 	public void setDisplay( boolean showPoints , boolean showErrors ,
 							boolean showUndistorted , boolean showAll , boolean showNumbers ,
+							boolean showOrder,
 							double errorScale )
 	{
 		this.showPoints = showPoints;
@@ -94,6 +97,7 @@ public class CalibratedImageGridPanel extends JPanel {
 		this.showUndistorted = showUndistorted;
 		this.showAll = showAll;
 		this.showNumbers = showNumbers;
+		this.showOrder = showOrder;
 		this.errorScale = errorScale;
 	}
 
@@ -190,8 +194,21 @@ public class CalibratedImageGridPanel extends JPanel {
 
 		Point2D_F32 adj = new Point2D_F32();
 
-		if( showPoints ) {
+		if( showOrder ) {
+			List<Point2D_F64> adjusted;
+			if( showUndistorted ) {
+				adjusted = new ArrayList<>();
+				for( PointIndex2D_F64 p : set.points ) {
+					remove_p_to_p.compute((float)p.x,(float)p.y,adj);
+					adjusted.add(new Point2D_F64(adj.x,adj.y));
+				}
+			} else {
+				adjusted = (List)set.points;
+			}
+			renderOrder(g2,scale, adjusted);
+		}
 
+		if( showPoints ) {
 			g2.setColor(Color.BLACK);
 			g2.setStroke(new BasicStroke(3));
 			for( PointIndex2D_F64 p : set.points ) {
@@ -237,7 +254,6 @@ public class CalibratedImageGridPanel extends JPanel {
 		if( showErrors && results != null && results.size() > selectedImage ) {
 			ImageResults result = results.get(selectedImage);
 
-			Stroke before = g2.getStroke();
 			g2.setStroke(new BasicStroke(4));
 			g2.setColor(Color.BLACK);
 			for( int i = 0; i < set.size(); i++ ) {
@@ -256,7 +272,7 @@ public class CalibratedImageGridPanel extends JPanel {
 				VisualizeFeatures.drawCircle(g2, adj.x * scale, adj.y * scale, r);
 			}
 
-			g2.setStroke(before);
+			g2.setStroke(new BasicStroke(2.5f));
 			g2.setColor(Color.ORANGE);
 			for( int i = 0; i < set.size(); i++ ) {
 				PointIndex2D_F64 p = set.get(i);
@@ -274,6 +290,31 @@ public class CalibratedImageGridPanel extends JPanel {
 
 				VisualizeFeatures.drawCircle(g2, adj.x * scale, adj.y * scale, r);
 			}
+		}
+	}
+
+	public static void renderOrder(Graphics2D g2, double scale , List<Point2D_F64> points ) {
+		g2.setStroke(new BasicStroke(5));
+
+		Line2D.Double l = new Line2D.Double();
+
+		for (int i = 0,j = 1; j < points.size(); i=j,j++) {
+			Point2D_F64 p0 = points.get(i);
+			Point2D_F64 p1 = points.get(j);
+
+			double fraction = i / ((double) points.size() - 2);
+//			fraction = fraction * 0.8 + 0.1;
+
+			int red   = (int)(0xFF*fraction) + (int)(0x00*(1-fraction));
+			int green = 0x00;
+			int blue  = (int)(0x00*fraction) + (int)(0xff*(1-fraction));
+
+			int lineRGB = red << 16 | green << 8 | blue;
+
+			l.setLine(scale * p0.x , scale * p0.y, scale * p1.x, scale * p1.y );
+
+			g2.setColor(new Color(lineRGB));
+			g2.draw(l);
 		}
 	}
 

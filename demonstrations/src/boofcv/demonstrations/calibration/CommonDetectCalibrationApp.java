@@ -48,6 +48,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import static boofcv.gui.calibration.CalibratedImageGridPanel.renderOrder;
 import static boofcv.gui.fiducial.VisualizeFiducial.drawLine;
 
 /**
@@ -212,7 +213,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 
 				if( success ) {
 					if( controlPanel.isShowOrder() ) {
-						renderOrder(g2,scale);
+						renderOrder(g2,scale, getCalibrationPoints());
 					}
 
 					if ( controlPanel.isShowPoints() ) {
@@ -318,32 +319,6 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 
 				drawCornersInside(g2,scale,n.corners);
 			}
-		}
-	}
-
-	private void renderOrder(Graphics2D g2, double scale ) {
-		List<Point2D_F64> points = getCalibrationPoints();
-		g2.setStroke(new BasicStroke(5));
-
-		Line2D.Double l = new Line2D.Double();
-
-		for (int i = 0,j = 1; j < points.size(); i=j,j++) {
-			Point2D_F64 p0 = points.get(i);
-			Point2D_F64 p1 = points.get(j);
-
-			double fraction = i / ((double) points.size() - 2);
-//			fraction = fraction * 0.8 + 0.1;
-
-			int red   = (int)(0xFF*fraction) + (int)(0x00*(1-fraction));
-			int green = 0x00;
-			int blue  = (int)(0x00*fraction) + (int)(0xff*(1-fraction));
-
-			int lineRGB = red << 16 | green << 8 | blue;
-
-			l.setLine(scale * p0.x , scale * p0.y, scale * p1.x, scale * p1.y );
-
-			g2.setColor(new Color(lineRGB));
-			g2.draw(l);
 		}
 	}
 

@@ -54,6 +54,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 	JCheckBox checkUndistorted;
 	JCheckBox checkAll;
 	JCheckBox checkNumbers;
+	JCheckBox checkOrder;
 	JSpinner selectErrorScale;
 	
 	JList imageList;
@@ -67,11 +68,12 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 	JTextArea paramB;
 	JTextArea paramC;
 
-	boolean showPoints = true;
+	boolean showPoints = false;
 	boolean showErrors = true;
 	boolean showUndistorted = false;
 	boolean showAll = false;
-	boolean showNumbers = true;
+	boolean showNumbers = false;
+	boolean showOrder = true;
 
 	int selectedImage = 0;
 
@@ -101,7 +103,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 		mainView.setImages(images);
 		mainView.setResults(features,results);
-		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
+		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
 
 		add(toolBar, BorderLayout.PAGE_START);
 		add(mainView, BorderLayout.CENTER);
@@ -132,6 +134,10 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		checkNumbers.setSelected(showNumbers);
 		checkNumbers.addItemListener(this);
 
+		checkOrder = new JCheckBox("Order");
+		checkOrder.setSelected(showNumbers);
+		checkOrder.addItemListener(this);
+
 		selectErrorScale = new JSpinner(new SpinnerNumberModel(errorScale, 1, 100, 5));
 		selectErrorScale.addChangeListener(this);
 		selectErrorScale.setMaximumSize(selectErrorScale.getPreferredSize());
@@ -141,6 +147,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		toolBar.add(checkAll);
 		toolBar.add(checkUndistorted);
 		toolBar.add(checkNumbers);
+		toolBar.add(checkOrder);
 		toolBar.add(new JLabel("| Error Scale"));
 		toolBar.add(selectErrorScale);
 		return toolBar;
@@ -214,8 +221,10 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 			showUndistorted = checkUndistorted.isSelected();
 		} else if( e.getSource() == checkNumbers ) {
 			showNumbers = checkNumbers.isSelected();
+		} else if( e.getSource() == checkOrder ) {
+			showOrder = checkOrder.isSelected();
 		}
-		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
+		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
 		mainView.repaint();
 	}
 
@@ -255,7 +264,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 			errorScale = ((Number) selectErrorScale.getValue()).intValue();
 		}
 
-		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
+		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
 		mainView.repaint();
 	}
 

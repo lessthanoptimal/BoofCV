@@ -82,6 +82,7 @@ public class StereoPlanarPanel extends JPanel
 	boolean showUndistorted = false;
 	boolean showAll = false;
 	boolean showNumbers = true;
+	boolean showOrder = true;
 	double errorScale = 20;
 
 	public StereoPlanarPanel() {
@@ -194,8 +195,8 @@ public class StereoPlanarPanel extends JPanel
 		this.rightResults = rightResults;
 
 		// synchronize configurations
-		leftView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
-		rightView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
+		leftView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
+		rightView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
 
 		updateResultsGUI();
 	}
@@ -237,8 +238,8 @@ public class StereoPlanarPanel extends JPanel
 		} else if( e.getSource() == checkNumbers ) {
 			showNumbers = checkNumbers.isSelected();
 		}
-		leftView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
-		rightView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
+		leftView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
+		rightView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
 		leftView.repaint();
 		rightView.repaint();
 	}
@@ -261,8 +262,8 @@ public class StereoPlanarPanel extends JPanel
 			errorScale = ((Number) selectErrorScale.getValue()).intValue();
 		}
 
-		leftView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
-		rightView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
+		leftView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
+		rightView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
 		leftView.repaint();
 		rightView.repaint();
 	}
