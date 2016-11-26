@@ -71,7 +71,7 @@ public class UtilWebcamCapture {
 	public static void adjustResolution( Webcam webcam , int desiredWidth , int desiredHeight ) {
 		Dimension[] sizes = webcam.getViewSizes();
 		int bestError = Integer.MAX_VALUE;
-		Dimension best = null;
+		Dimension best = sizes[0]; // to get rid of null warning
 		for( Dimension d : sizes ) {
 			int error = (d.width-desiredWidth)*(d.height-desiredHeight);
 			if( error < bestError ) {

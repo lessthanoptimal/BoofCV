@@ -385,6 +385,12 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		GrayF32 gray = new GrayF32(webcam.getViewSize().width,webcam.getViewSize().height);
 
+		if( desiredWidth > 0 && desiredHeight > 0 ) {
+			if (gray.width != desiredWidth || gray.height != desiredHeight )
+				System.err.println("Actual camera resolution does not match desired.  Actual: "+gray.width+" "+gray.height+
+				"  Desired: "+desiredWidth+" "+desiredHeight);
+		}
+
 		AssistedCalibration assisted = new AssistedCalibration(detector,quality,gui,OUTPUT_DIRECTORY, IMAGE_DIRECTORY);
 		assisted.init(gray.width,gray.height);
 

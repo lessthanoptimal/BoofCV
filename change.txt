@@ -68,8 +68,6 @@ Version : 0.25
   * Removed image type specific functions and updated code for more recent API
 - Fixed bug in StitchingFromMotion2D where reset() could cause a null pointer exception
 
-- TODO Regression: Scene Classification
-
 ---------------------------------------------
 Date    : 2016/06/13
 Version : 0.24.1

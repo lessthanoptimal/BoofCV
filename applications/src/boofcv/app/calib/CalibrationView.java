@@ -24,7 +24,8 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.geo.PointIndex2D_F64;
-import georegression.geometry.algs.AndrewMonotoneConvexHull_F64;
+import georegression.geometry.UtilPolygons2D_F64;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
@@ -141,9 +142,8 @@ public interface CalibrationView {
 
 		double spaceToRadius;
 
-		AndrewMonotoneConvexHull_F64 alg = new AndrewMonotoneConvexHull_F64();
-		Point2D_F64 []pts = new Point2D_F64[0];
-		Polygon2D_F64 poly = new Polygon2D_F64();
+		// indexes of corners in convex hull
+		int indexes[];
 
 		public void initialize( DetectorFiducialCalibration detector ) {
 			CalibrationDetectorCircleAsymmGrid target = (CalibrationDetectorCircleAsymmGrid)detector;
@@ -151,31 +151,39 @@ public interface CalibrationView {
 			gridCols = target.getColumns();
 
 			spaceToRadius = target.getSpaceToRadius();
+
+			// find the convex hull and use that as the collision region
+			List<Point2D_F64> layout = detector.getLayout();
+			Polygon2D_F64 poly = new Polygon2D_F64(layout.size());
+			UtilPolygons2D_F64.convexHull(layout,poly);
+
+			if( !poly.isCCW() )
+				poly.flip();
+
+			UtilPolygons2D_F64.removeAlmostParallel(poly, UtilAngle.radian(5));
+
+			// save the indexes of these points
+			indexes = new int[layout.size()];
+			for (int i = 0; i < poly.size(); i++) {
+				int match = -1;
+				for (int j = 0; j < layout.size(); j++) {
+					if( layout.get(j).distance(poly.get(i)) <= 1e-8 ) {
+						match = j;
+						break;
+					}
+				}
+				indexes[i] = match;
+			}
 		}
 
 		@Override
 		public void getSidesCollision(CalibrationObservation detections, List<Point2D_F64> sides) {
-			if( pts.length != detections.size() ) {
-				pts = new Point2D_F64[detections.size()];
-			}
-			for (int i = 0; i < pts.length; i++) {
-				pts[i] = detections.get(i);
-			}
-
 			sides.clear();
-
-			alg.process(pts,pts.length,poly);
-
-			for (int i = 0; i < poly.size(); i++) {
-				sides.add( poly.get(i));
+			for( int i = 0; i < indexes.length; i++ ) {
+				sides.add( detections.get(indexes[i]));
 			}
-
-			// TODO remove a point if it's almost a line
-			for (int i = 0; i < sides.size(); i++) {
-
-			}
-
 		}
+
 
 		@Override
 		public void getQuadFocus(CalibrationObservation detections, List<Point2D_F64> sides) {
