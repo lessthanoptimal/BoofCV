@@ -1113,6 +1113,8 @@ Version : Alpha 0.6
 - Added lens distortion app
 - Found subtle bug in Harris corner detector.
   * Surprisingly doesn't seem to change output that much.
+- Interleaved image
+  * get_unsafe and set_unsafe changed to unsafe_get and unsafe_set respectively.  For consistency.
 
 ---------------------------------------------
 Date    : 2012/02/01

@@ -59,11 +59,11 @@ public class ImageBorder1D_IL_S32<T extends InterleavedInteger> extends ImageBor
 
 	@Override
 	public void getOutside(int x, int y, int pixel[] ) {
-		image.get_unsafe(colWrap.getIndex(x), rowWrap.getIndex(y), pixel);
+		image.unsafe_get(colWrap.getIndex(x), rowWrap.getIndex(y), pixel);
 	}
 
 	@Override
 	public void setOutside(int x, int y, int[] pixel) {
-		image.set_unsafe(colWrap.getIndex(x), rowWrap.getIndex(y), pixel);
+		image.unsafe_set(colWrap.getIndex(x), rowWrap.getIndex(y), pixel);
 	}
 }

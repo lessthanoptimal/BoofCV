@@ -72,7 +72,7 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 		return storage;
 	}
 
-	public void get_unsafe( int x, int y, float[] storage ) {
+	public void unsafe_get(int x, int y, float[] storage ) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			storage[i] = data[index];
@@ -96,7 +96,7 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 		}
 	}
 
-	public void set_unsafe(int x, int y, float[] value) {
+	public void unsafe_set(int x, int y, float[] value) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			data[index] = value[i];

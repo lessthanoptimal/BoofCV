@@ -65,7 +65,7 @@ public class InterleavedU8 extends InterleavedI8<InterleavedU8> {
 	}
 
 	@Override
-	public void get_unsafe(int x, int y, int[] storage) {
+	public void unsafe_get(int x, int y, int[] storage) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			storage[i] = data[index] & 0xFF;

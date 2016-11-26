@@ -59,11 +59,11 @@ public class ImageBorder1D_IL_F64 extends ImageBorder_IL_F64 {
 
 	@Override
 	public void getOutside(int x, int y, double pixel[] ) {
-		image.get_unsafe(colWrap.getIndex(x), rowWrap.getIndex(y), pixel);
+		image.unsafe_get(colWrap.getIndex(x), rowWrap.getIndex(y), pixel);
 	}
 
 	@Override
 	public void setOutside(int x, int y, double[] pixel) {
-		image.set_unsafe(colWrap.getIndex(x) , rowWrap.getIndex(y),pixel);
+		image.unsafe_set(colWrap.getIndex(x) , rowWrap.getIndex(y),pixel);
 	}
 }

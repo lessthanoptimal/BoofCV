@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public abstract class ImageBorder_IL_S64 extends ImageBorder<InterleavedS64> {
 
 	public void set( int x , int y , long[] pixel ) {
 		if (image.isInBounds(x, y)) {
-			image.set_unsafe(x, y, pixel);
+			image.unsafe_set(x, y, pixel);
 		} else {
 			setOutside(x, y, pixel);
 		}
@@ -45,7 +45,7 @@ public abstract class ImageBorder_IL_S64 extends ImageBorder<InterleavedS64> {
 
 	public void get( int x , int y , long[] pixel ) {
 		if( image.isInBounds(x,y) ) {
-			image.get_unsafe(x, y, pixel);
+			image.unsafe_get(x, y, pixel);
 		} else {
 			getOutside(x, y, pixel);
 		}
