@@ -55,6 +55,8 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 
 	private CalibrationObservation results;
 
+	double spaceToRadius;
+
 	/**
 	 * Configures the detector based on the pass in configuration class
 	 * @param config Configuration for detector and target description
@@ -67,11 +69,10 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 		BinaryEllipseDetector<GrayF32> ellipseDetector =
 				FactoryShapeDetector.ellipse(config.ellipse,GrayF32.class);
 
-		// the is a maximum distance away.  add a bit of fudge
-		double spaceToRadius = (config.centerDistance/config.circleRadius)*1.25;
+		spaceToRadius = (config.centerDistance/config.circleRadius);
 
 		detector = new DetectAsymmetricCircleGrid<>(config.numRows,config.numCols,inputToBinary,
-				ellipseDetector,new EllipsesIntoClusters(spaceToRadius,config.ellipseSizeSimilarity));
+				ellipseDetector,new EllipsesIntoClusters(spaceToRadius*1.25,config.ellipseSizeSimilarity));
 
 
 		layout = createLayout(detector.getRows(),detector.getColumns(), config.centerDistance);
@@ -147,5 +148,20 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 
 	public AsymmetricGridKeyPointDetections getKeypointFinder() {
 		return keypoint;
+	}
+
+	public int getRows() {
+		return detector.getRows();
+	}
+
+	public int getColumns() {
+		return detector.getColumns();
+	}
+
+	/**
+	 * Distance between centers to circle radius ratio
+	 */
+	public double getSpaceToRadius() {
+		return spaceToRadius;
 	}
 }

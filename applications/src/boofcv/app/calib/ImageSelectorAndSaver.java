@@ -81,7 +81,7 @@ public class ImageSelectorAndSaver {
 	 */
 	public void setTemplate(GrayF32 image, List<Point2D_F64> sides) {
 		if( sides.size() != 4 )
-			throw new IllegalArgumentException("Expected 4 sides");
+			throw new IllegalArgumentException("Expected 4 sidesCollision");
 
 		removePerspective.apply(image,sides.get(0),sides.get(1),sides.get(2),sides.get(3));
 
@@ -124,7 +124,7 @@ public class ImageSelectorAndSaver {
 	 */
 	public synchronized void process(GrayF32 image, List<Point2D_F64> sides) {
 		if( sides.size() != 4 )
-			throw new IllegalArgumentException("Expected 4 sides");
+			throw new IllegalArgumentException("Expected 4 sidesCollision");
 
 		updateScore(image,sides);
 

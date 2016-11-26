@@ -19,6 +19,7 @@
 package boofcv.app.calib;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
+import boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -104,7 +105,8 @@ public class AssistedCalibration {
 
 	CalibrationView view;
 
-	List<Point2D_F64> sides = new ArrayList<>();
+	List<Point2D_F64> sidesCollision = new ArrayList<>();
+	List<Point2D_F64> focusQuad = new ArrayList<>();
 
 	Graphics2D g2;
 	Ellipse2D.Double ellipse = new Ellipse2D.Double();
@@ -156,8 +158,10 @@ public class AssistedCalibration {
 			view = new CalibrationView.Chessboard();
 		} else if( detector instanceof CalibrationDetectorSquareGrid) {
 			view = new CalibrationView.SquareGrid();
+		} else if( detector instanceof CalibrationDetectorCircleAsymmGrid) {
+			view = new CalibrationView.CircleAsymmGrid();
 		} else {
-			throw new RuntimeException("Unknown calibration detector type");
+			throw new RuntimeException("Unknown calibration detector type: "+detector.getClass().getSimpleName());
 		}
 		view.initialize(detector);
 	}
@@ -216,12 +220,12 @@ public class AssistedCalibration {
 			double stationaryTime = actions.getStationaryTime();
 
 			CalibrationObservation points = detector.getDetectedPoints();
-			view.getSides(points, sides);
+			view.getQuadFocus(points, focusQuad);
 
-			double top = sides.get(0).distance(sides.get(1));
-			double right = sides.get(1).distance(sides.get(2));
-			double bottom = sides.get(2).distance(sides.get(3));
-			double left = sides.get(3).distance(sides.get(0));
+			double top = focusQuad.get(0).distance(focusQuad.get(1));
+			double right = focusQuad.get(1).distance(focusQuad.get(2));
+			double bottom = focusQuad.get(2).distance(focusQuad.get(3));
+			double left = focusQuad.get(3).distance(focusQuad.get(0));
 
 			double ratioHorizontal = Math.min(top,bottom)/Math.max(top,bottom);
 			double ratioVertical = Math.min(left,right)/Math.max(left,right);
@@ -237,7 +241,7 @@ public class AssistedCalibration {
 			} else {
 				if (stationaryTime > STILL_THRESHOLD) {
 					actions.resetStationary();
-					saver.setTemplate(input,sides);
+					saver.setTemplate(input, focusQuad);
 					gui.getInfoPanel().updateTemplate(saver.getTemplate());
 					actions.resetStationary();
 					state = State.REMOVE_DOTS;
@@ -300,7 +304,8 @@ public class AssistedCalibration {
 
 			double stationaryTime = actions.getStationaryTime();
 			CalibrationObservation points = detector.getDetectedPoints();
-			view.getSides(points, sides);
+			view.getSidesCollision(points, sidesCollision);
+			view.getQuadFocus(points, focusQuad);
 
 			boolean closeToMagnet = false;
 			for (int i = 0; i < magnets.size(); i++) {
@@ -339,9 +344,9 @@ public class AssistedCalibration {
 			// save the images if the fiducial is being held still prior to capture
 			if( resetImageSelector ) {
 				saver.clearHistory();
-				saver.updateScore(input, sides);
+				saver.updateScore(input, focusQuad);
 			} else {
-				saver.process( input, sides);
+				saver.process( input, focusQuad);
 			}
 
 			drawPadding();
@@ -367,13 +372,15 @@ public class AssistedCalibration {
 		drawPadding();
 
 		if( detected ) {
-			saver.process(input, sides);
 			gui.getInfoPanel().updateView(saver.getCurrentView());
 			gui.getInfoPanel().updateFocusScore(saver.getFocusScore());
 
 			double stationaryTime = actions.getStationaryTime();
 			CalibrationObservation points = detector.getDetectedPoints();
-			view.getSides(points, sides);
+			view.getSidesCollision(points, sidesCollision);
+			view.getQuadFocus(points, focusQuad);
+
+			saver.process(input, focusQuad);
 
 			boolean resetImageSelector = true;
 			if( pictureTaken ) {
@@ -396,7 +403,7 @@ public class AssistedCalibration {
 			if( resetImageSelector ) {
 				saver.clearHistory();
 			} else {
-				saver.process( input, sides);
+				saver.process( input, focusQuad);
 			}
 
 			renderCalibrationPoints(stationaryTime, points.points);
@@ -415,7 +422,7 @@ public class AssistedCalibration {
 		}
 
 		int r = 6;
-		int w = 2 * r + 1;
+		int w = 2 * r;
 		for (int i = 0; i < points.size(); i++) {
 			PointIndex2D_F64 p = points.get(i);
 			ellipse.setFrame(p.x - r, p.y - r, w, w);
@@ -425,17 +432,17 @@ public class AssistedCalibration {
 
 	private void renderFillPolygons() {
 		g2.setColor(new Color(0, 255, 255, 50));
-		int polyX[] = new int[4];
-		int polyY[] = new int[4];
+		int polyX[] = new int[20];
+		int polyY[] = new int[20];
 
 		for (int i = 0; i < regions.size(); i++) {
 			Polygon2D_F64 poly = regions.get(i);
-			for (int j = 0; j < 4; j++) {
+			for (int j = 0; j < poly.size(); j++) {
 				Point2D_F64 p = poly.get(j);
 				polyX[j] = (int)(p.x+0.5);
 				polyY[j] = (int)(p.y+0.5);
 			}
-			g2.fillPolygon(polyX,polyY,4);
+			g2.fillPolygon(polyX,polyY,poly.size());
 		}
 	}
 
@@ -457,8 +464,9 @@ public class AssistedCalibration {
 	 */
 	private void captureFiducialPoints() {
 		Polygon2D_F64 p = regions.grow();
-		for (int i = 0; i < 4; i++) {
-			p.get(i).set( sides.get(i) );
+		p.vertexes.resize(sidesCollision.size());
+		for (int i = 0; i < sidesCollision.size(); i++) {
+			p.get(i).set( sidesCollision.get(i) );
 		}
 		quality.addObservations(detector.getDetectedPoints());
 		gui.getInfoPanel().updateGeometry(quality.getScore());
@@ -534,8 +542,8 @@ public class AssistedCalibration {
 
 		double bestDistanceSq = Double.MAX_VALUE;
 
-		for (int i = 0, j = sides.size()-1; i < sides.size(); j=i,i++) {
-			UtilPoint2D_F64.mean(sides.get(i),sides.get(j),center);
+		for (int i = 0, j = sidesCollision.size()-1; i < sidesCollision.size(); j=i,i++) {
+			UtilPoint2D_F64.mean(sidesCollision.get(i), sidesCollision.get(j),center);
 
 			double d = center.distance2(target);
 
@@ -553,12 +561,12 @@ public class AssistedCalibration {
 
 		double bestDistanceSq = Double.MAX_VALUE;
 
-		for (int i = 0; i < sides.size(); i++) {
-			double d = sides.get(i).distance2(target);
+		for (int i = 0; i < sidesCollision.size(); i++) {
+			double d = sidesCollision.get(i).distance2(target);
 
 			if( d < bestDistanceSq ) {
 				bestDistanceSq = d;
-				result.set(sides.get(i));
+				result.set(sidesCollision.get(i));
 			}
 		}
 

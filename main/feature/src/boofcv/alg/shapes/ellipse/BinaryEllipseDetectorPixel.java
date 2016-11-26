@@ -138,6 +138,10 @@ public class BinaryEllipseDetectorPixel {
 			return;
 		}
 
+		// discard shapes which touch the image border
+		if( touchesBorder(contour) )
+			return;
+
 		pointsF.reset();
 		undistortContour(contour,pointsF);
 
@@ -166,6 +170,21 @@ public class BinaryEllipseDetectorPixel {
 			System.out.println("Success!  size = "+pointsF.size());
 
 		f.contour = contour;
+	}
+
+	protected final boolean touchesBorder( List<Point2D_I32> contour ) {
+		int endX = labeled.width-1;
+		int endY = labeled.height-1;
+
+		for (int j = 0; j < contour.size(); j++) {
+			Point2D_I32 p = contour.get(j);
+			if( p.x == 0 || p.y == 0 || p.x == endX || p.y == endY )
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
