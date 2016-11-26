@@ -28,15 +28,16 @@ import java.lang.reflect.Method;
  */
 public class Help {
 
-	public static void printHelp() {
-		Class []options = new Class[]{
-				CreateFiducialSquareImage.class,
-				CreateFiducialSquareBinary.class,
-				BatchRemoveLensDistortion.class,
-				BatchDownSizeImage.class,
-				FiducialDetection.class,
-				CameraCalibration.class};
+	static Class []options = new Class[]{
+			CreateFiducialSquareImage.class,
+			CreateFiducialSquareBinary.class,
+			BatchRemoveLensDistortion.class,
+			BatchDownSizeImage.class,
+			FiducialDetection.class,
+			CameraCalibration.class,
+			CreateCalibrationTarget.class};
 
+	public static void printHelp() {
 		System.out.println("Trying to run a command-line application?  Here are your options!");
 		System.out.println();
 
@@ -66,14 +67,6 @@ public class Help {
 				throw new RuntimeException(e);
 			}
 		} else {
-			Class[] options = new Class[]{
-					CreateFiducialSquareImage.class,
-					CreateFiducialSquareBinary.class,
-					BatchRemoveLensDistortion.class,
-					BatchDownSizeImage.class,
-					FiducialDetection.class,
-					CameraCalibration.class};
-
 			System.out.println("Trying to run a command-line application?  Here are your options!");
 			System.out.println();
 

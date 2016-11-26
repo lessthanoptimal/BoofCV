@@ -54,7 +54,7 @@ Version : 0.25
   * 7% improvement in regression test.  Idea taken from ArUco
 - Commandline Fiducial Generator
   * Can specify custom document size
-- Added command line application for calibration fiducials TODO
+- Added command line application for calibration fiducials
   * Supports chessboard, square grid, square binary grid, circle asymmetric grid
 - OpenCV Integration
   * can read and write camera calibration for pinhole cameras with radial + tangential distortion
@@ -67,6 +67,14 @@ Version : 0.25
 - FactoryMotion2D
   * Removed image type specific functions and updated code for more recent API
 - Fixed bug in StitchingFromMotion2D where reset() could cause a null pointer exception
+
+- TODO Test android integration
+- TODO Test open kinect integration
+- TODO Update processing library
+- TODO Video calibration circles
+- TODO Video equirectangular / fisheye images
+- TODO Run regression
+- TODO test examples
 
 ---------------------------------------------
 Date    : 2016/06/13

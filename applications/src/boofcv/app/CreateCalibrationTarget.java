@@ -28,7 +28,7 @@ import org.kohsuke.args4j.Option;
  *
  * @author Peter Abeles
  */
-public class CreateCalibrationTargetApp {
+public class CreateCalibrationTarget {
 	@Option(name="-t",aliases = {"--Type"}, usage="Type of calibration target.")
 	String _type=null;
 	CalibrationPatterns type;
@@ -46,7 +46,7 @@ public class CreateCalibrationTargetApp {
 	@Option(name="-p",aliases = {"--PaperSize"}, usage="Size of paper used.  See below for predefined document sizes.  "
 	+"You can manually specify any size using the following notation. W:H  where W is the width and H is the height.  "
 	+"Values of W and H is specified with <number><unit abbreviation>, e.g. 6cm or 6, the unit is optional.  If no unit"
-	+"is specified the default document units are used.")
+	+" are specified the default document units are used.")
 	String _paperSize = PaperSize.LETTER.name;
 	PaperSize paperSize;
 
@@ -61,6 +61,9 @@ public class CreateCalibrationTargetApp {
 
 	@Option(name="-o",aliases = {"--OutputName"}, usage="Name of output file.  E.g. chessboard for chessboard.ps")
 	String fileName = "target";
+
+	@Option(name="-i",aliases = {"--DisablePrintInfo"}, usage="Disable printing information about the calibration target")
+	boolean disablePrintInfo = false;
 
 	private static void printHelpExit( CmdLineParser parser ) {
 		parser.getProperties().withUsageWidth(120);
@@ -129,7 +132,7 @@ public class CreateCalibrationTargetApp {
 				if( centerDistance > 0 )
 					failExit("Don't specify center distance for square type targets, use shape space instead");
 				if( shapeSpace <= 0 )
-					failExit("Must specify a space greater than zero");
+					shapeSpace = shapeWidth;
 				break;
 
 			case CHESSBOARD:
@@ -143,26 +146,37 @@ public class CreateCalibrationTargetApp {
 				if( shapeSpace > 0 )
 					failExit("Don't specify space for circle type targets, use center distance instead");
 				if( centerDistance <= 0 )
-					failExit("Must specify a center distance greater than zero");
+					centerDistance = shapeWidth*2;
 				break;
 		}
 	}
 
 	public void run() {
+		String suffix = ".ps";
+		System.out.println("Saving to "+fileName+suffix);
 		CreateCalibrationTargetGenerator generator =
-				new CreateCalibrationTargetGenerator(fileName,paperSize,rows,columns,unit);
+				new CreateCalibrationTargetGenerator(fileName+suffix,paperSize,rows,columns,unit);
+
+		generator.setShowInfo(!disablePrintInfo);
+
+		System.out.println("   paper     : "+paperSize);
+		System.out.println("   type      : "+type);
+		System.out.println("   rows      : "+rows);
+		System.out.println("   columns   : "+columns);
+		System.out.println("   info      : "+(!disablePrintInfo));
+
 
 		switch( type ) {
 			case CHESSBOARD:generator.chessboard(shapeWidth);break;
 			case SQUARE_GRID:generator.squareGrid(shapeWidth,shapeSpace);break;
 			case BINARY_GRID:generator.binaryGrid(shapeWidth,shapeSpace);break;
-			case CIRCLE_ASYMMETRIC_GRID:generator.circleAsymmetric(shapeWidth,shapeSpace);break;
+			case CIRCLE_ASYMMETRIC_GRID:generator.circleAsymmetric(shapeWidth,centerDistance);break;
 			default: throw new RuntimeException("Unknown target type");
 		}
 
 	}
 	public static void main(String[] args) {
-		CreateCalibrationTargetApp generator = new CreateCalibrationTargetApp();
+		CreateCalibrationTarget generator = new CreateCalibrationTarget();
 		CmdLineParser parser = new CmdLineParser(generator);
 		try {
 			parser.parseArgument(args);
