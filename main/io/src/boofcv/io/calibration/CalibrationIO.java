@@ -47,15 +47,10 @@ public class CalibrationIO {
 	 * Saves intrinsic camera model to disk
 	 *
 	 * @param parameters Camera parameters
-	 * @param filePath Path to where it should be saved
+	 * @param outputWriter Path to where it should be saved
 	 */
-	public static <T extends CameraPinhole> void save(T parameters , String filePath ) {
-		PrintStream out;
-		try {
-			out = new PrintStream(filePath);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
+	public static <T extends CameraPinhole> void save(T parameters , Writer outputWriter ) {
+		PrintWriter out = new PrintWriter(outputWriter);
 
 		Yaml yaml = createYmlObject();
 
@@ -84,10 +79,19 @@ public class CalibrationIO {
 			putModelPinhole(parameters,data);
 		}
 
-		yaml.dump(data,new OutputStreamWriter(out));
+		yaml.dump(data,out);
 
 		out.close();
 	}
+
+	public static <T extends CameraPinhole> void save(T parameters , String filePath ) {
+		try {
+			save(parameters, new FileWriter(filePath));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public static <T extends CameraPinhole> void save(T parameters , File filePath ) {
 		save(parameters, filePath.getPath());
 	}
@@ -102,9 +106,9 @@ public class CalibrationIO {
 	 * Saves stereo camera model to disk
 	 *
 	 * @param parameters Camera parameters
-	 * @param filePath Path to where it should be saved
+	 * @param outputWriter Stream to save the parameters to
 	 */
-	public static void save(StereoParameters parameters , String filePath ) {
+	public static void save(StereoParameters parameters , Writer outputWriter ) {
 
 		Map<String, Object> data = new HashMap<>();
 		data.put("model",MODEL_STEREO);
@@ -112,15 +116,19 @@ public class CalibrationIO {
 		data.put("right",putModelRadial(parameters.right,null));
 		data.put("rightToLeft",putSe3(parameters.rightToLeft));
 
+		PrintWriter out = new PrintWriter(outputWriter);
+		out.println("# Intrinsic and extrinsic parameters for a stereo camera pair");
+		Yaml yaml = createYmlObject();
+		yaml.dump(data,out);
+
+	}
+
+	public static void save(StereoParameters parameters , String outputPath ) {
 		try {
-			PrintStream out = new PrintStream(filePath);
-			out.println("# Intrinsic and extrinsic parameters for a stereo camera pair");
-			Yaml yaml = createYmlObject();
-			yaml.dump(data,new OutputStreamWriter(out));
-		} catch (FileNotFoundException e) {
+			save(parameters,new FileWriter(outputPath));
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-
 	}
 
 	public static void save(StereoParameters parameters , File filePath ) {
