@@ -51,6 +51,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -277,6 +278,16 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 		BasicStroke stroke1 = new BasicStroke(6);
 		Ellipse2D.Double circle = new Ellipse2D.Double();
 
+		int pointsPerEdge = 12;
+		Point2D_F32 corners[] = new Point2D_F32[pointsPerEdge*4];
+		Line2D.Double line0 = new Line2D.Double();
+
+		public EquiViewPanel() {
+			for (int i = 0; i < corners.length; i++) {
+				corners[i] = new Point2D_F32();
+			}
+		}
+
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
@@ -284,13 +295,13 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+			// center the center cicle
 			DenseMatrix64F R = distorter.getRotation();
 
 			v.set(0,0,1); // canonical view is +z for pinhole cvamera
 			GeometryMath_F64.mult(R,v,v);
 
 			distorter.getTools().normToEquiFV((float)v.x,(float)v.y,(float)v.z,p);
-
 			circle.setFrame(p.x*scale-10,p.y*scale-10,20,20);
 
 			g2.setStroke(stroke1);
@@ -300,6 +311,41 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 			g2.setStroke(stroke0);
 			g2.setColor(Color.RED);
 			g2.draw(circle);
+
+			// render the pinhole's frame in equirectangular image
+			renderLine(0         ,0          ,camWidth-1,0          ,pointsPerEdge,0);
+			renderLine(camWidth-1,0          ,camWidth-1,camHeight-1,pointsPerEdge,pointsPerEdge);
+			renderLine(camWidth-1,camHeight-1,0         ,camHeight-1,pointsPerEdge,pointsPerEdge*2);
+			renderLine(0         ,camHeight-1,0         ,0          ,pointsPerEdge,pointsPerEdge*3);
+
+			g2.setStroke(stroke0);
+			for (int i = 0; i < corners.length; i++) {
+				int j = (i+1)%corners.length;
+				if( i < pointsPerEdge)
+					g2.setColor(Color.BLUE);
+				else if( i < pointsPerEdge*2 )
+					g2.setColor(Color.GREEN);
+				else if( i < pointsPerEdge*3 )
+					g2.setColor(Color.cyan);
+				else
+					g2.setColor(Color.RED);
+				// handle screen wrapping by skipping lines while go from one end to the other
+				if( corners[j].distance(corners[i]) < equi.width/2) {
+					line0.setLine(corners[j].x * scale, corners[j].y * scale, corners[i].x * scale, corners[i].y * scale);
+					g2.draw(line0);
+				}
+			}
+		}
+
+
+		private void renderLine( int x0 , int y0 , int x1 , int y1 , int segments , int offset ) {
+			for (int i = 0; i < segments; i++) {
+				int x = (x1-x0)*i/segments + x0;
+				int y = (y1-y0)*i/segments + y0;
+
+				distorter.compute(x,y);
+				corners[i+offset].set(distorter.distX,distorter.distY);
+			}
 		}
 	}
 
