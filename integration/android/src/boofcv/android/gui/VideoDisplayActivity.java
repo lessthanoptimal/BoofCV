@@ -273,7 +273,13 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 			}
 			meanFps /= history.length;
 
-			canvas.restore();
+			// work around an issue in marshmallow
+			try {
+				canvas.restore();
+			} catch( IllegalStateException e ) {
+				if( !e.getMessage().contains("Underflow in restore - more restores than saves"))
+					throw e;
+			}
 			if( showFPS )
 				canvas.drawText(String.format("FPS = %5.2f",meanFps), 50, 50, textPaint);
 		}

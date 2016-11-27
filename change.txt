@@ -67,6 +67,8 @@ Version : 0.25
 - FactoryMotion2D
   * Removed image type specific functions and updated code for more recent API
 - Fixed bug in StitchingFromMotion2D where reset() could cause a null pointer exception
+- Android
+  * work around for a crash bug in Marshmallow
 
 - TODO Test android integration
 - TODO Test open kinect integration
