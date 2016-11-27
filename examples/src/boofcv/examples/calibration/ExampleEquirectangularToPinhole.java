@@ -55,21 +55,21 @@ public class ExampleEquirectangularToPinhole {
 		// Load equirectangular RGB image
 		BufferedImage bufferedEqui =
 				UtilImageIO.loadImage(UtilIO.pathExample("spherical/equirectangular_half_dome_01.jpg"));
-		Planar<GrayU8> equitImage =
+		Planar<GrayU8> equiImage =
 				ConvertBufferedImage.convertFrom(bufferedEqui, true, ImageType.pl(3,GrayU8.class));
 
 		// Declare storage for pinhole camera image
-		Planar<GrayU8> pinholeImage = equitImage.createNew(pinholeModel.width, pinholeModel.height);
+		Planar<GrayU8> pinholeImage = equiImage.createNew(pinholeModel.width, pinholeModel.height);
 
 		// Create the image distorter which will render the image
 		InterpolatePixel<Planar<GrayU8>> interp = FactoryInterpolation.
-				createPixel(0, 255, TypeInterpolate.BILINEAR, BorderType.EXTENDED, equitImage.getImageType());
+				createPixel(0, 255, TypeInterpolate.BILINEAR, BorderType.EXTENDED, equiImage.getImageType());
 		ImageDistort<Planar<GrayU8>,Planar<GrayU8>> distorter =
-				FactoryDistort.distort(false,interp,equitImage.getImageType());
+				FactoryDistort.distort(false,interp,equiImage.getImageType());
 
 		// This is where the magic is done.  It defines the transform rfom equirectangular to pinhole
 		EquirectangularToPinhole_F32 equiToPinhole = new EquirectangularToPinhole_F32();
-		equiToPinhole.setEquirectangularShape(equitImage.width,equitImage.height);
+		equiToPinhole.setEquirectangularShape(equiImage.width,equiImage.height);
 		equiToPinhole.setPinhole(pinholeModel);
 
 		// Pass in the transform to the image distorter
@@ -79,13 +79,13 @@ public class ExampleEquirectangularToPinhole {
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.YXZ,0, 1.45, 2.2,equiToPinhole.getRotation());
 
 		// Render the image
-		distorter.apply(equitImage,pinholeImage);
+		distorter.apply(equiImage,pinholeImage);
 		BufferedImage bufferedPinhole0 = ConvertBufferedImage.convertTo(pinholeImage,null,true);
 
 		// Let's look at another view
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.YXZ,0, 1.25, -1.25,equiToPinhole.getRotation());
 
-		distorter.apply(equitImage,pinholeImage);
+		distorter.apply(equiImage,pinholeImage);
 		BufferedImage bufferedPinhole1 = ConvertBufferedImage.convertTo(pinholeImage,null,true);
 
 		// Display the results
@@ -93,7 +93,7 @@ public class ExampleEquirectangularToPinhole {
 		panel.addImage(bufferedPinhole0,"Pinehole View 0");
 		panel.addImage(bufferedPinhole1,"Pinehole View 1");
 		panel.addImage(bufferedEqui,"Equirectangular");
-		panel.setPreferredSize(new Dimension(equitImage.width,equitImage.height));
+		panel.setPreferredSize(new Dimension(equiImage.width,equiImage.height));
 
 		ShowImages.showWindow(panel, "Equirectangular to Pinhole", true);
 	}
