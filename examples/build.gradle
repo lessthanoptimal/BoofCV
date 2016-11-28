@@ -13,6 +13,8 @@ dependencies {
 
     ['io'].each {String a ->
         compile('org.deepboof:'+a+':0.2-SNAPSHOT')}
+
+    compile 'org.reflections:reflections:0.9.10'
 }
 
 idea {
@@ -21,21 +23,20 @@ idea {
     }
 }
 
-task exampleJar(type: Jar, dependsOn:jar) {
-    from files(sourceSets.main.output.classesDir)
-    from files(sourceSets.main.output.resourcesDir)
-    from {configurations.compile.collect {zipTree(it)}}
-}
+// Create a jar which contains all the applications
+task examples(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'BoofCV Examples Jar',
+                'Implementation-Version': version,
+                'Main-Class': 'boofcv.examples.ExampleLauncherApp'
+    }
 
-// Runs an application from the examples directory
-// gradle exampleRun -Pwhich=boofcv.examples.imageprocessing.ExampleBinaryOps
-task exampleRun(dependsOn: 'classes' )<< {
-    if (project.hasProperty('which')) {
-        javaexec {
-            main = "$which"
-            classpath = sourceSets.main.runtimeClasspath
-        }
-    } else {
-        print 'Which not specified!!!!!'
+    outputs.upToDateWhen { false }
+
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+
+    doLast {
+        archivePath.renameTo(file('examples.jar'))
     }
 }

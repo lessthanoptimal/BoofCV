@@ -30,15 +30,20 @@ idea {
     }
 }
 
-// Runs an application from the examples directory
-// gradle demonstrationRun -Pwhich=boofcv.demonstrations.fiducial.FiducialTrackerApp
-task demonstrationRun(dependsOn: 'classes' )<< {
-    if (project.hasProperty('which')) {
-        javaexec {
-            main = "$which"
-            classpath = sourceSets.main.runtimeClasspath
-        }
-    } else {
-        print 'Which not specified!!!!!'
+// Create a jar which contains all the applications
+task demonstrations(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'BoofCV Demonstrations Jar',
+                'Implementation-Version': version,
+                'Main-Class': 'boofcv.DemonstrationLauncherApp'
+    }
+
+    outputs.upToDateWhen { false }
+
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+
+    doLast {
+        archivePath.renameTo(file('demonstrations.jar'))
     }
 }

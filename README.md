@@ -6,8 +6,8 @@ Table of Contents
 
 * [Introduction]                       (#introduction)
   * [Cloning Repository]               (#cloning-git-repository)
-  * [Downloading]                      (#where-to-download)
-  * [Gradle and Maven]                 (#include-in-gradle-and-maven-projects)
+  * [Quick Start]                      (#quick-start-examples-and-demonstrations)
+  * [Gradle and Maven]                 (#adding-to-gradle-and-maven-projects)
 * [Building from Source]               (#building-from-source)
 * [Running Example Code]               (#running-example-code)
 * [Dependencies]                       (#dependencies)
@@ -37,13 +37,19 @@ cd boofcv
 git submodule update --init --recursive
 ```
 
-## Where to Download
+## Quick Start Examples and Demonstrations
 
-You can download complete jars, use Maven, or checkout from Github.  See the website for instructions.
+Know what you're doing and you just want to see something running?  This will run example/demonstration application launcher.  Just double click on a name to run the application.
 
-http://boofcv.org/index.php?title=Download:BoofCV
+```bash
+cd boofcv
+gradle examples
+java -jar examples/examples.jar
+gradle demonstrations
+java -jar demonstrations/demonstrations.jar
+```
 
-## Include in Gradle and Maven Projects
+## Adding to Gradle and Maven Projects
 
 BoofCV is divided up into many modules.  The easiest way to include the critical ones make your project dependent on 'core'.
 
@@ -65,6 +71,7 @@ There are also several integration modules which help BoofCV interact with exter
 
     Name      |                 Description
 --------------|---------------------------------------------------------------------
+all           | Absolutely everything
 android       | Useful functions for working inside of Android devices.
 applet        | Code for using BoofCV inside a Java applet.
 javacv        | [JavaCV](https://github.com/bytedeco/javacv) is a wrapper around OpenCV and FFMPEG for reading video files.

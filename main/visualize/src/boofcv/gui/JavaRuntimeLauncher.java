@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv;
+package boofcv.gui;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -185,6 +185,11 @@ public class JavaRuntimeLauncher {
                 }
             }
         }
+
+        if( input.ready() ) {
+            printInputBuffer(input);
+        }
+
         durationMilli = System.currentTimeMillis()-startTime;
         return !frozen && !killRequested;
     }
@@ -198,14 +203,20 @@ public class JavaRuntimeLauncher {
         }
     }
 
+    char buffInput[] = new char[1024];
     protected void printInputBuffer(BufferedReader input) throws IOException {
-
+        int length = 0;
         while( input.ready() ) {
             int val = input.read();
             if( val < 0 ) break;
+            buffInput[length++] = (char)val;
 
-            System.out.print(Character.toChars(val));
+            if( length == buffInput.length ) {
+                System.out.print(new String(buffInput,0,length));
+                length = 0;
+            }
         }
+        System.out.print(new String(buffInput,0,length));
     }
 
     private String[] configureArguments( Class mainClass , String ...args ) {
@@ -244,6 +255,10 @@ public class JavaRuntimeLauncher {
 
     public void requestKill() {
         killRequested = true;
+    }
+
+    public boolean isKillRequested() {
+        return killRequested;
     }
 
     public enum Exit
