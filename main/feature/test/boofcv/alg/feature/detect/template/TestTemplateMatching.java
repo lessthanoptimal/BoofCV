@@ -56,8 +56,9 @@ public class TestTemplateMatching {
 
 		TemplateMatching alg = new TemplateMatching(intensity);
 
+		alg.setImage(input);
 		alg.setTemplate(template,null, 10);
-		alg.process(input);
+		alg.process();
 
 		expected.remove(2);
 		checkResults(alg.getResults().toList(), expected, 4, 5);
@@ -77,8 +78,9 @@ public class TestTemplateMatching {
 
 		TemplateMatching alg = new TemplateMatching(intensity);
 
+		alg.setImage(input);
 		alg.setTemplate(template,null, 10);
-		alg.process(input);
+		alg.process();
 
 		checkResults(alg.getResults().toList(), expected, 4, 5);
 	}
@@ -98,8 +100,9 @@ public class TestTemplateMatching {
 
 		TemplateMatching alg = new TemplateMatching(intensity);
 
+		alg.setImage(input);
 		alg.setTemplate(template,null, 2);
-		alg.process(input);
+		alg.process();
 
 		// remove the lowest scores
 		expected.remove(3);
@@ -115,8 +118,9 @@ public class TestTemplateMatching {
 
 		TemplateMatching alg = new TemplateMatching(intensity);
 
+		alg.setImage(input);
 		alg.setTemplate(template, new GrayF32(5,5), 10);
-		alg.process(input);
+		alg.process();
 
 		assertTrue(intensity.maskedCalled);
 	}
@@ -138,7 +142,7 @@ public class TestTemplateMatching {
 		}
 	}
 
-	private class  DummyIntensity implements TemplateMatchingIntensity {
+	private class DummyIntensity implements TemplateMatchingIntensity {
 
 		GrayF32 intensity = new GrayF32(width, height);
 		boolean border;
@@ -152,8 +156,12 @@ public class TestTemplateMatching {
 		}
 
 		@Override
-		public void process(ImageBase image, ImageBase template) {
+		public void setInputImage(ImageBase image) {
 			assertTrue(image!=null);
+		}
+
+		@Override
+		public void process(ImageBase template) {
 			assertTrue(template!=null);
 			GImageMiscOps.fill(intensity, 0);
 
@@ -163,10 +171,10 @@ public class TestTemplateMatching {
 		}
 
 		@Override
-		public void process(ImageBase image, ImageBase template, ImageBase mask) {
+		public void process(ImageBase template, ImageBase mask) {
 			assertTrue(mask!=null);
 			maskedCalled = true;
-			process(image,template);
+			process(template);
 		}
 
 		@Override

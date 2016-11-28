@@ -18,10 +18,7 @@
 
 package boofcv.factory.feature.detect.template;
 
-import boofcv.alg.feature.detect.template.TemplateDiffSquared;
-import boofcv.alg.feature.detect.template.TemplateMatching;
-import boofcv.alg.feature.detect.template.TemplateMatchingIntensity;
-import boofcv.alg.feature.detect.template.TemplateNCC;
+import boofcv.alg.feature.detect.template.*;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -59,6 +56,13 @@ public class FactoryTemplateMatching {
 					return (TemplateMatchingIntensity<T>) new TemplateNCC.U8();
 				} else if (imageType == GrayF32.class) {
 					return (TemplateMatchingIntensity<T>) new TemplateNCC.F32();
+				} else {
+					throw new IllegalArgumentException("Image type not supported. " + imageType.getSimpleName());
+				}
+
+			case CORRELATION:
+				if (imageType == GrayF32.class) {
+					return (TemplateMatchingIntensity<T>) new TemplateCorrelationFFT();
 				} else {
 					throw new IllegalArgumentException("Image type not supported. " + imageType.getSimpleName());
 				}

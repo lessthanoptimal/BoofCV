@@ -41,8 +41,12 @@ public abstract class BaseTemplateIntensity<T extends ImageBase>
 	private int borderX1,borderY1;
 
 	@Override
-	public void process(T image, T template) {
+	public void setInputImage(T image) {
 		this.image = image;
+	}
+
+	@Override
+	public void process(T template) {
 		this.template = template;
 		intensity.reshape(image.width, image.height);
 
@@ -62,18 +66,17 @@ public abstract class BaseTemplateIntensity<T extends ImageBase>
 		}
 
 		// deference to avoid causing a memory leak
-		this.image = null;
 		this.template = null;
+		this.mask = null;
 	}
 
 	@Override
-	public void process(T image, T template, T mask ) {
+	public void process(T template, T mask ) {
 		if( mask == null ) {
-			process(image,template);
+			process(template);
 			return;
 		}
 
-		this.image = image;
 		this.template = template;
 		this.mask = mask;
 		intensity.reshape(image.width, image.height);
@@ -92,7 +95,6 @@ public abstract class BaseTemplateIntensity<T extends ImageBase>
 		}
 
 		// deference to avoid causing a memory leak
-		this.image = null;
 		this.template = null;
 		this.mask = null;
 	}

@@ -61,8 +61,9 @@ public class ExampleTemplateMatching {
 				FactoryTemplateMatching.createMatcher(TemplateScoreType.SUM_DIFF_SQ, GrayF32.class);
 
 		// Find the points which match the template the best
+		matcher.setImage(image);
 		matcher.setTemplate(template, mask,expectedMatches);
-		matcher.process(image);
+		matcher.process();
 
 		return matcher.getResults().toList();
 
@@ -79,7 +80,8 @@ public class ExampleTemplateMatching {
 				FactoryTemplateMatching.createIntensity(TemplateScoreType.SUM_DIFF_SQ, GrayF32.class);
 
 		// apply the template to the image
-		matchIntensity.process(image, template, mask);
+		matchIntensity.setInputImage(image);
+		matchIntensity.process(template, mask);
 
 		// get the results
 		GrayF32 intensity = matchIntensity.getIntensity();
@@ -143,6 +145,12 @@ public class ExampleTemplateMatching {
 		int h = template.height + 2 * r;
 
 		for (Match m : found) {
+			System.out.println("Match "+m.x+" "+m.y+"    score "+m.score);
+			// this demonstrates how to filter out false positives
+			// the meaning of score will depend on the template technique
+//			if( m.score < -1000 )  // This line is commented out for demonstration purposes
+//				continue;
+
 			// the return point is the template's top left corner
 			int x0 = m.x - r;
 			int y0 = m.y - r;

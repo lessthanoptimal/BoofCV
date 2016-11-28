@@ -70,6 +70,9 @@ Version : 0.25
 - Android
   * work around for a crash bug in Marshmallow
 - Removed applet module in integration
+- Template Matching
+  * Added correlation using FFT
+  * Tweaked API so that preprocessing of image can be performed
 
 - TODO Test android integration
 - TODO Test open kinect integration

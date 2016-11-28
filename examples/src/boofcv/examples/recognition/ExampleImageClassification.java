@@ -44,7 +44,6 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO visualize results.  Show image and the class labels
 public class ExampleImageClassification {
 
 	public static void main(String[] args) throws IOException {

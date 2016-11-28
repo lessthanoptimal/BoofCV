@@ -2196,8 +2196,8 @@ public class ImageStatistics {
 	 * @param img Input image.  Not modified.
 	 * @return Mean pixel intensity value
 	 */
-	public static double mean( GrayF32 img ) {
-		return sum(img)/(double)(img.width*img.height);
+	public static float mean( GrayF32 img ) {
+		return sum(img)/(float)(img.width*img.height);
 	}
 
 	/**

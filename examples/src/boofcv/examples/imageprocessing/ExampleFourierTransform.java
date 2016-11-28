@@ -75,6 +75,7 @@ public class ExampleFourierTransform {
 				boxImage.set(xx,yy,1.0f/(15*15));
 			}
 		}
+
 		// compute the DFT for the box filter
 		dft.forward(boxImage,boxTransform);
 

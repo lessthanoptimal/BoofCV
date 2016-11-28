@@ -46,23 +46,29 @@ import boofcv.struct.image.ImageBase;
 public interface TemplateMatchingIntensity<T extends ImageBase> {
 
 	/**
-	 * Matches the template to the image and computes an intensity image.
-	 *
-	 * @param image    Input image. Not modified.
-	 * @param template Template image.  Must be equal to or smaller than the input image. Not modified.
+	 * Specifies the input image which the template is going ot be matched against
+	 * @param image  Input image. Not modified.
 	 */
-	public void process(T image, T template);
+	void setInputImage( T image );
 
 	/**
-	 * Matches the template with a mask to the image and computes an intensity image.
+	 * Matches the template to the image and computes an intensity image.  Must call
+	 * {@link #setInputImage(ImageBase)} first
 	 *
-	 * @param image    Input image. Not modified.
+	 * @param template Template image.  Must be equal to or smaller than the input image. Not modified.
+	 */
+	void process(T template);
+
+	/**
+	 * Matches the template with a mask to the image and computes an intensity image.  Must call
+	 * {@link #setInputImage(ImageBase)} first
+	 *
 	 * @param mask     Mask that identifies how translucent pixels. 0 = 100% transparent and all values above
 	 *                 increase its importance.  Typical values are 0 to 255 for integer images and 0.0 to 1.0 for
 	 *                 floating point.
 	 * @param template Template image.  Must be equal to or smaller than the input image. Not modified.
 	 */
-	public void process(T image, T template, T mask );
+	void process( T template, T mask );
 
 	/**
 	 * Contains results of template matching.  Higher intensity values correspond to a better match.

@@ -31,9 +31,9 @@ public abstract class TemplateNCC <T extends ImageBase>
 		extends BaseTemplateIntensity<T>
 {
 	@Override
-	public void process(T image, T template) {
+	public void process(T template) {
 		setupTemplate(template);
-		super.process(image,template);
+		super.process(template);
 	}
 
 	/**

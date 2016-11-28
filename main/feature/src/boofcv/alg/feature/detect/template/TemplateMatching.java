@@ -58,6 +58,9 @@ public class TemplateMatching<T extends ImageBase> {
 	// storage for final points
 	private FastQueue<Match> results = new FastQueue<>(10, Match.class, true);
 
+	// shape of input image
+	int imageWidth,imageHeight;
+
 	/**
 	 * Specifies internal algorithm
 	 *
@@ -93,17 +96,26 @@ public class TemplateMatching<T extends ImageBase> {
 	}
 
 	/**
-	 * Performs template matching.
+	 * Specifies the input image which the template is to be found inside.
 	 *
 	 * @param image Image being processed
 	 */
-	public void process(T image) {
+	public void setImage(T image ) {
+		match.setInputImage(image);
+		this.imageWidth = image.width;
+		this.imageHeight = image.height;
+	}
+
+	/**
+	 * Performs template matching.
+	 */
+	public void process() {
 
 		// compute match intensities
 		if( mask == null )
-			match.process(image, template);
+			match.process(template);
 		else
-			match.process(image,template,mask);
+			match.process(template,mask);
 
 		GrayF32 intensity = match.getIntensity();
 		int offsetX = 0;
@@ -112,9 +124,9 @@ public class TemplateMatching<T extends ImageBase> {
 		// adjust intensity image size depending on if there is a border or not
 		if (!match.isBorderProcessed()) {
 			int x0 = match.getBorderX0();
-			int x1 = image.width - (template.width - x0);
+			int x1 = imageWidth - (template.width - x0);
 			int y0 = match.getBorderY0();
-			int y1 = image.height - (template.height - y0);
+			int y1 = imageHeight - (template.height - y0);
 			intensity = intensity.subimage(x0, y0, x1, y1, null);
 		} else {
 			offsetX = match.getBorderX0();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,5 +40,14 @@ public enum TemplateScoreType {
 	 *
 	 * @see boofcv.alg.feature.detect.template.TemplateNCC
 	 */
-	NCC
+	NCC,
+
+	/**
+	 * <p>
+	 * Correlation error metric.  On large images this can be much faster than the other techniques.
+	 * </p>
+	 *
+	 * @see boofcv.alg.feature.detect.template.TemplateCorrelationFFT
+	 */
+	CORRELATION
 }
