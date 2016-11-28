@@ -288,6 +288,10 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 	 * be stopped.
 	 */
 	public void openFile(File file) {
+		// maybe it's an example file
+		if( !file.exists() ) {
+			file = new File(UtilIO.pathExample(file.getPath()));
+		}
 		if( !file.exists() ) {
 			System.err.println("Can't find file "+file.getPath());
 			return;
@@ -303,7 +307,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 
 		stopPreviousInput();
 
-		String filePath = UtilIO.pathExample(file.getPath());
+		String filePath = file.getPath();
 		inputFilePath = filePath;
 		// mjpegs can be opened up as images.  so override the default behavior
 		BufferedImage buffered = filePath.endsWith("mjpeg") ? null : UtilImageIO.loadImage(filePath);
