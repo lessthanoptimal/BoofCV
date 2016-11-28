@@ -32,6 +32,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.learning.Confusion;
+import deepboof.io.DeepBoofDataBaseOps;
 import org.ddogleg.clustering.AssignCluster;
 import org.ddogleg.clustering.ComputeClusters;
 import org.ddogleg.clustering.FactoryClustering;
@@ -250,10 +251,15 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		File testingDir = new File(UtilIO.pathExample("learning/scene/test"));
 
 		if( !trainingDir.exists() || !testingDir.exists() ) {
-			String path = UtilIO.pathExample("learning/scene/");
-			System.err.println("Please follow instructions in "+path+" and download the");
-			System.err.println("required files");
-			System.exit(1);
+			String addressSrc = "http://jaist.dl.sourceforge.net/project/boofcv/datasets/bow_data_v001.zip";
+			File dst = trainingDir.getParentFile();
+			DeepBoofDataBaseOps.download(addressSrc,dst);
+			DeepBoofDataBaseOps.decompressZip(new File(dst, "bow_data_v001.zip"), dst, true);
+			System.out.println("Download complete!");
+		} else {
+			System.out.println("Delete and download again if there are file not found errors");
+			System.out.println("   "+trainingDir);
+			System.out.println("   "+testingDir);
 		}
 
 		example.loadSets(trainingDir, null, testingDir);

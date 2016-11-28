@@ -69,6 +69,7 @@ Version : 0.25
 - Fixed bug in StitchingFromMotion2D where reset() could cause a null pointer exception
 - Android
   * work around for a crash bug in Marshmallow
+- Removed applet module in integration
 
 - TODO Test android integration
 - TODO Test open kinect integration

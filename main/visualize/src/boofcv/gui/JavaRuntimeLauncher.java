@@ -21,12 +21,13 @@ package boofcv.gui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.Date;
 import java.util.List;
 
 /**
  * Class for launching JVMs.  Monitors the status and kills frozen threads.  Keeps track of execution time and
- * sets up class path.  Uses the existing one and the list of libraries in external/<library>/runtimeLibs
+ * sets up class path.
  *
  * @author Peter Abeles
  */
@@ -45,6 +46,10 @@ public class JavaRuntimeLauncher {
 
     // save for future debugging
     String[] jvmArgs;
+
+    // Default to standard printOut and printErr
+    PrintStream printOut = System.out;
+    PrintStream printErr = System.err;
 
     /**
      * Constructor.  Configures which library it is to be launching a class from/related to
@@ -88,7 +93,8 @@ public class JavaRuntimeLauncher {
     }
 
     /**
-     * Launches the class with the provided arguments.
+     * Launches the class with the provided arguments.  Blocks until the process stops.
+     *
      * @param mainClass Class
      * @param args it's arguments
      * @return true if successful or false if it ended on error
@@ -127,7 +133,7 @@ public class JavaRuntimeLauncher {
     }
 
     /**
-     * Prints out the standard out and error from the slave and checks its health.  Exits if
+     * Prints printOut the standard printOut and error from the slave and checks its health.  Exits if
      * the slave has finished or is declared frozen.
      *
      * @return true if successful or false if it was forced to kill the slave because it was frozen
@@ -154,10 +160,10 @@ public class JavaRuntimeLauncher {
                 }
             }
 
-            printError(error);
+            printBuffer(error, printErr);
 
             if( input.ready() ) {
-                printInputBuffer(input);
+                printBuffer(input, printOut);
             } else {
                 Thread.sleep(500);
             }
@@ -186,25 +192,15 @@ public class JavaRuntimeLauncher {
             }
         }
 
-        if( input.ready() ) {
-            printInputBuffer(input);
-        }
+        printBuffer(error, printErr);
+        printBuffer(input, printOut);
 
         durationMilli = System.currentTimeMillis()-startTime;
         return !frozen && !killRequested;
     }
 
-    protected void printError(BufferedReader error) throws IOException {
-        while( error.ready() ) {
-            int val = error.read();
-            if( val < 0 ) break;
-
-            System.out.print(Character.toChars(val));
-        }
-    }
-
     char buffInput[] = new char[1024];
-    protected void printInputBuffer(BufferedReader input) throws IOException {
+    protected void printBuffer(BufferedReader input , PrintStream output ) throws IOException {
         int length = 0;
         while( input.ready() ) {
             int val = input.read();
@@ -212,11 +208,11 @@ public class JavaRuntimeLauncher {
             buffInput[length++] = (char)val;
 
             if( length == buffInput.length ) {
-                System.out.print(new String(buffInput,0,length));
+                output.print(new String(buffInput,0,length));
                 length = 0;
             }
         }
-        System.out.print(new String(buffInput,0,length));
+        output.print(new String(buffInput,0,length));
     }
 
     private String[] configureArguments( Class mainClass , String ...args ) {
@@ -259,6 +255,22 @@ public class JavaRuntimeLauncher {
 
     public boolean isKillRequested() {
         return killRequested;
+    }
+
+    public PrintStream getPrintOut() {
+        return printOut;
+    }
+
+    public void setPrintOut(PrintStream out) {
+        this.printOut = out;
+    }
+
+    public PrintStream getPrintErr() {
+        return printErr;
+    }
+
+    public void setPrintErr(PrintStream err) {
+        this.printErr = err;
     }
 
     public enum Exit

@@ -30,7 +30,7 @@ The bleeding edge source code can be obtained by cloning the git repository.
 git clone --recursive https://github.com/lessthanoptimal/BoofCV.git boofcv
 ```
 
-Is the data directory empty?  That's because you didn't follow instructions and skipped --recursive!  Fix that by doing the following.
+Is the data directory empty?  That's because you didn't follow instructions and skipped --recursive.  Fix that by doing the following.
 ```
 cd boofcv
 git submodule update --init --recursive
@@ -38,7 +38,7 @@ git submodule update --init --recursive
 
 ## Quick Start Examples and Demonstrations
 
-Know what you're doing and you just want to see something running?  This will run example/demonstration application launcher.  Just double click on a name to run the application.
+Know what you're doing and you just want to see something running?  Then run the commands below!  Each jar will open a window, then to run an application just double click on its name.
 
 ```bash
 cd boofcv
@@ -48,9 +48,11 @@ gradle demonstrations
 java -jar demonstrations/demonstrations.jar
 ```
 
+All the code for what you see is in boofcv/examples and boofcv/demonstrations.  Example code is designed to be easy to understand so look there first.
+
 ## Adding to Gradle and Maven Projects
 
-BoofCV is divided up into many modules.  The easiest way to include the critical ones make your project dependent on 'core'.
+BoofCV is divided up into many modules.  The easiest way to include the critical modules is to have your project dependent on 'core'.
 
 For Gradle projects:
 ```groovy
@@ -72,12 +74,10 @@ There are also several integration modules which help BoofCV interact with exter
 --------------|---------------------------------------------------------------------
 all           | Absolutely everything
 android       | Useful functions for working inside of Android devices.
-applet        | Code for using BoofCV inside a Java applet.
 javacv        | [JavaCV](https://github.com/bytedeco/javacv) is a wrapper around OpenCV and FFMPEG for reading video files.
 jcodec        | [JCodec](http://jcodec.org/) is a pure Java video reader/writer.
 openkinect    | Used the [Kinect](http://openkinect.org) RGB-D sensor with BoofCV.
 WebcamCapture | A few functions that make [WebcamCapture](http://webcam-capture.sarxos.pl/) even easier to use.
-
 
 ## New to Java?
 
