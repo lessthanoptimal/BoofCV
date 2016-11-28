@@ -157,6 +157,6 @@ public class WaveletVisualizeApp
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app,"Wavelet Transforms");
+		ShowImages.showWindow(app,"Wavelet Transforms", true);
 	}
 }

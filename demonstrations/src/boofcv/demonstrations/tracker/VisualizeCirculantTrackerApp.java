@@ -61,7 +61,7 @@ public class VisualizeCirculantTrackerApp<T extends ImageGray>
 
 		image = sequence.next();
 		gui.setFrame((BufferedImage) sequence.getGuiImage());
-		ShowImages.showWindow(gui, "Circulant Tracker");
+		ShowImages.showWindow(gui, "Circulant Tracker", true);
 
 //		tracker.initialize(image,273,156,358-273,293-156);
 

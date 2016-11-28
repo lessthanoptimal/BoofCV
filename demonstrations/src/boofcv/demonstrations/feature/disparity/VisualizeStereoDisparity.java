@@ -35,6 +35,7 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -216,7 +217,7 @@ public class VisualizeStereoDisparity <T extends ImageGray, D extends ImageGray>
 
 	@Override
 	public synchronized void changeInput(String name, int index) {
-		origCalib = UtilIO.loadXML(media.openFile(inputRefs.get(index).getPath(0)));
+		origCalib = CalibrationIO.load(media.openFile(inputRefs.get(index).getPath(0)));
 
 		origLeft = media.openImage(inputRefs.get(index).getPath(1) );
 		origRight = media.openImage(inputRefs.get(index).getPath(2) );
