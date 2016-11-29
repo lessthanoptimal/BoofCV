@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,18 +23,20 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.UtilImageIO;
-import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -45,19 +47,17 @@ import java.io.IOException;
 public class DisplayKinectPointCloudApp {
 
 	public static void main( String args[] ) throws IOException {
-		String baseDir = UtilIO.pathExample("kinect/");
+		String baseDir = UtilIO.pathExample("kinect/basket");
 
-		String nameRgb = baseDir+"basket.ppm";
-		String nameDepth = baseDir+"basket.depth";
-		String nameCalib = baseDir+"intrinsic.yaml";
+		String nameRgb = "basket_rgb.png";
+		String nameDepth = "basket_depth.png";
+		String nameCalib = "intrinsic.yaml";
 
-		IntrinsicParameters param = CalibrationIO.load(nameCalib);
+		CameraPinholeRadial param = CalibrationIO.load(new File(baseDir,nameCalib));
 
-		GrayU16 depth = new GrayU16(1,1);
-		Planar<GrayU8> rgb = new Planar<>(GrayU8.class,1,1,3);
+		GrayU16 depth = UtilImageIO.loadImage(new File(baseDir,nameDepth),false, ImageType.single(GrayU16.class));
+		Planar<GrayU8> rgb = UtilImageIO.loadImage(new File(baseDir,nameRgb),true, ImageType.pl(3, GrayU8.class));
 
-		UtilImageIO.loadPPM_U8(nameRgb, rgb, null);
-		UtilOpenKinect.parseDepth(nameDepth,depth,null);
 
 		FastQueue<Point3D_F64> cloud = new FastQueue<Point3D_F64>(Point3D_F64.class,true);
 		FastQueueArray_I32 cloudColor = new FastQueueArray_I32(3);
