@@ -19,7 +19,7 @@
 package boofcv.demonstrations.interpolate;
 
 import boofcv.abst.distort.FDistort;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.core.image.border.BorderType;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
@@ -61,10 +61,10 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
 		color = imageType.createImage(1,1);
 		scaledImage = imageType.createImage(1,1);
 
-		addAlgorithm(0, "Nearest Neighbor", TypeInterpolate.NEAREST_NEIGHBOR);
-		addAlgorithm(0, "Bilinear",TypeInterpolate.BILINEAR);
-		addAlgorithm(0, "Bicubic Kernel",TypeInterpolate.BICUBIC);
-		addAlgorithm(0, "Polynomial 4",TypeInterpolate.POLYNOMIAL4);
+		addAlgorithm(0, "Nearest Neighbor", InterpolateType.NEAREST_NEIGHBOR);
+		addAlgorithm(0, "Bilinear", InterpolateType.BILINEAR);
+		addAlgorithm(0, "Bicubic Kernel", InterpolateType.BICUBIC);
+		addAlgorithm(0, "Polynomial 4", InterpolateType.POLYNOMIAL4);
 
 		setPreferredSize(new Dimension(300,300));
 		addComponentListener(this);
@@ -94,10 +94,10 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
 			return;
 		}
 
-		TypeInterpolate typeInterpolate = (TypeInterpolate)cookie;
+		InterpolateType interpolateType = (InterpolateType)cookie;
 
 		scaledImage.reshape(panel.getWidth(),panel.getHeight());
-		new FDistort(color,scaledImage).interp(typeInterpolate).border(BorderType.EXTENDED).scale().apply();
+		new FDistort(color,scaledImage).interp(interpolateType).border(BorderType.EXTENDED).scale().apply();
 
 		BufferedImage out = ConvertBufferedImage.convertTo(scaledImage,null,true);
 		panel.setBufferedImage(out);

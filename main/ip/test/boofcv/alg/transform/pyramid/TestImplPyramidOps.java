@@ -19,7 +19,7 @@
 package boofcv.alg.transform.pyramid;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.pyramid.impl.ImplPyramidOps;
 import boofcv.core.image.GeneralizedImageOps;
@@ -64,7 +64,7 @@ public class TestImplPyramidOps {
 		GImageMiscOps.fillUniform(input, rand, -10, 10);
 
 		InterpolatePixelS<T> interp = FactoryInterpolation.
-				createPixelS(0,255, TypeInterpolate.BILINEAR, BorderType.EXTENDED,imageType);
+				createPixelS(0,255, InterpolateType.BILINEAR, BorderType.EXTENDED,imageType);
 
 		try {
 			m.invoke(null,input,output,2,interp);

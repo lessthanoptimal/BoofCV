@@ -24,7 +24,7 @@ import boofcv.abst.sfm.d2.WrapImageMotionPtkSmartRespawn;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.robust.*;
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.alg.sfm.d2.*;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
@@ -146,7 +146,7 @@ public class FactoryMotion2D {
 		InterpolatePixel<I> interp;
 
 		if( imageType.getFamily() == ImageType.Family.GRAY || imageType.getFamily() == ImageType.Family.PLANAR ) {
-			interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, BorderType.EXTENDED,
+			interp = FactoryInterpolation.createPixelS(0, 255, InterpolateType.BILINEAR, BorderType.EXTENDED,
 					imageType.getImageClass());
 		} else {
 			throw new IllegalArgumentException("Unsupported image type");

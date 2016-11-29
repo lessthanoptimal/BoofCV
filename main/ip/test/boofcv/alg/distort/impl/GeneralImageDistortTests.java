@@ -20,7 +20,7 @@ package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
@@ -54,7 +54,7 @@ public abstract class GeneralImageDistortTests<T extends ImageBase> {
 
 	public GeneralImageDistortTests( ImageType<T> imageType ) {
 		this.imageType = imageType;
-		interp = FactoryInterpolation.createPixel(0,255, TypeInterpolate.NEAREST_NEIGHBOR,BorderType.ZERO,imageType);
+		interp = FactoryInterpolation.createPixel(0,255, InterpolateType.NEAREST_NEIGHBOR,BorderType.ZERO,imageType);
 
 	}
 

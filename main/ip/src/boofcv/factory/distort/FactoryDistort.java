@@ -23,6 +23,9 @@ import boofcv.alg.distort.impl.*;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.interpolate.InterpolateType;
+import boofcv.core.image.border.BorderType;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.*;
 
 /**
@@ -32,11 +35,32 @@ public class FactoryDistort {
 
 	/**
 	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the specified image type, transformation
+	 * and interpolation instance.  Min and max pixel values are assumed to be 0 and 255, respectively.
+	 *
+	 * @param cached If true the distortion is only computed one.  False for recomputed each time, but less memory.
+	 * @param interpolateType  Which interpolation method it should use
+	 * @param borderType How pixels outside the image border are handled
+	 * @param inputType Type of input image
+	 * @param outputType Type of output image
+	 * @return ImageDistort
+	 */
+	public static <Input extends ImageBase, Output extends ImageBase>
+	ImageDistort<Input, Output> distort(boolean cached, InterpolateType interpolateType, BorderType borderType,
+										ImageType<Input> inputType, ImageType<Output> outputType) {
+		InterpolatePixel<Input> interp =
+				FactoryInterpolation.createPixel(0,255, interpolateType,borderType,inputType);
+
+		return distort(cached, interp,outputType);
+	}
+
+	/**
+	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the specified image type, transformation
 	 * and interpolation instance.
 	 *
 	 * @param cached If true the distortion is only computed one.  False for recomputed each time, but less memory.
 	 * @param interp Which interpolation algorithm should be used.
 	 * @param outputType Type of output image.
+	 * @return ImageDistort
 	 */
 	public static <Input extends ImageBase, Output extends ImageBase>
 	ImageDistort<Input, Output> distort(boolean cached, InterpolatePixel<Input> interp, ImageType<Output> outputType) {

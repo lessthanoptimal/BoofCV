@@ -25,7 +25,7 @@ import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.distort.PointTransformHomography_F64;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.geo.FactoryMultiView;
@@ -181,7 +181,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 		ImageMiscOps.fill(distorted, 0xff);
 		DistortImageOps.distortSingle(original, distorted, pixelTransform,
-				TypeInterpolate.BILINEAR, BorderType.EXTENDED);
+				InterpolateType.BILINEAR, BorderType.EXTENDED);
 
 //		display(distorted);
 

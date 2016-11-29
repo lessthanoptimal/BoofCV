@@ -21,7 +21,7 @@ package boofcv.demonstrations.distort;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.spherical.EquirectangularToPinhole_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -97,7 +97,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 
 		BorderType borderType = BorderType.EXTENDED;
 		InterpolatePixel<T> interp =
-				FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR,borderType, imageType);
+				FactoryInterpolation.createPixel(0, 255, InterpolateType.BILINEAR,borderType, imageType);
 		distortImage = FactoryDistort.distort(true, interp, imageType);
 		distortImage.setRenderAll(true);
 

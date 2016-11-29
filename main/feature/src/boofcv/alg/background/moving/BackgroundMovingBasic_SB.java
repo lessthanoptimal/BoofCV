@@ -19,7 +19,7 @@
 package boofcv.alg.background.moving;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GImageGray;
@@ -53,7 +53,7 @@ public class BackgroundMovingBasic_SB<T extends ImageGray, Motion extends Invert
 
 	public BackgroundMovingBasic_SB(float learnRate, float threshold,
 									Point2Transform2Model_F32<Motion> transform,
-									TypeInterpolate interpType,
+									InterpolateType interpType,
 									Class<T> imageType) {
 		super(learnRate, threshold, transform, ImageType.single(imageType));
 

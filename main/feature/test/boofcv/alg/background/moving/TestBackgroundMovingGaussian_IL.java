@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.background.moving;
 
 import boofcv.alg.background.BackgroundModelMoving;
 import boofcv.alg.distort.PointTransformHomography_F32;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedF32;
@@ -43,7 +43,7 @@ public class TestBackgroundMovingGaussian_IL extends GenericBackgroundMovingGaus
 	create(ImageType<T> imageType) {
 		PointTransformHomography_F32 transform = new PointTransformHomography_F32();
 		BackgroundMovingGaussian_IL alg =
-				new BackgroundMovingGaussian_IL(0.05f,16,transform, TypeInterpolate.BILINEAR,imageType);
+				new BackgroundMovingGaussian_IL(0.05f,16,transform, InterpolateType.BILINEAR,imageType);
 		alg.setInitialVariance(12);
 		return alg;
 	}

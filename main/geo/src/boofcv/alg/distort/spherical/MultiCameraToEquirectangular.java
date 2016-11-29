@@ -56,7 +56,7 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 	private EquirectangularTools_F32 tools = new EquirectangularTools_F32();
 	private int equiWidth, equHeight;
 
-	private List<Camera> cameras = new ArrayList<>();
+	List<Camera> cameras = new ArrayList<>();
 
 	private T averageImage;
 	private T workImage;
@@ -69,19 +69,26 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 	// in radians
 	private float maskToleranceAngle = UtilAngle.radian(0.1f);
 
-	public MultiCameraToEquirectangular(ImageDistort<T,T> distort , int width , int height , ImageType<T> imageType ) {
+	/**
+	 * Configuration constructor
+	 * @param distort Used to apply image distortion from different input images
+	 * @param equiWidth Width of output equirectangular image
+	 * @param equiHeight Height of output equirectangular image
+	 * @param imageType Type of image it processes and outputs.  Must be floating point.  Hmm why isn't this fixed?
+	 */
+	public MultiCameraToEquirectangular(ImageDistort<T,T> distort , int equiWidth , int equiHeight , ImageType<T> imageType ) {
 
 		if( imageType.getDataType().isInteger() || imageType.getDataType().getNumBits() != 32 )
 			throw new IllegalArgumentException("Must be a 32 bit floating point image");
 
 		this.distort = distort;
-		this.equiWidth = width;
-		this.equHeight = height;
+		this.equiWidth = equiWidth;
+		this.equHeight = equiHeight;
 
-		tools.configure(width, height);
+		tools.configure(equiWidth, equiHeight);
 
-		weightImage = new GrayF32(width,height);
-		averageImage = imageType.createImage(width, height);
+		weightImage = new GrayF32(equiWidth,equiHeight);
+		averageImage = imageType.createImage(equiWidth, equiHeight);
 		workImage = averageImage.createSameShape();
 		cameraRendered = averageImage.createSameShape();
 	}
@@ -115,8 +122,11 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 			for (int col = 0; col < equiWidth; col++) {
 				equiToCamera.compute(col,row,p2);
 
+				int camX = (int)(p2.x+0.5f);
+				int camY = (int)(p2.y+0.5f);
+
 				if( Double.isNaN(p2.x) || Double.isNaN(p2.y) ||
-						p2.x < 0f || p2.y < 0f || p2.x > width-1 || p2.y > height-1 )
+						camX < 0 || camY < 0 || camX >= width || camY >= height )
 					continue;
 
 				p2s.compute(p2.x,p2.y,p3b);
@@ -126,10 +136,9 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 
 				double angle = UtilVector3D_F32.acute(equiToCamera.unitCam,p3b);
 
-				if( angle < UtilAngle.radian(0.1)) {
+				if( angle < maskToleranceAngle) {
 					equiMask.set(col,row,1);
 				}
-
 			}
 		}
 		cameras.add( new Camera(equiMask, transformEquiToCam));
@@ -161,7 +170,6 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 		int height = camMask.height;
 
 		Point3D_F32 p3b = new Point3D_F32();
-
 		Point2D_F32 p2 = new Point2D_F32();
 		for (int row = 0; row < equHeight; row++) {
 			for (int col = 0; col < equiWidth; col++) {
@@ -245,11 +253,16 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 		return maskToleranceAngle;
 	}
 
+	/**
+	 * Specify the tolerance that the circle normal angle must be invertible in radians
+	 *
+	 * @param maskToleranceAngle tolerance in radians
+	 */
 	public void setMaskToleranceAngle(float maskToleranceAngle) {
 		this.maskToleranceAngle = maskToleranceAngle;
 	}
 
-	private static class Camera {
+	static class Camera {
 		// weighted pixel mask in equi image.  0 = ignore pixel.  1 = 100% contribution
 		GrayF32 mask;
 

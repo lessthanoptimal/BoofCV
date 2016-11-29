@@ -20,7 +20,7 @@ package boofcv.alg.background.moving;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GImageGray;
@@ -63,7 +63,7 @@ public class BackgroundMovingGaussian_SB <T extends ImageGray, Motion extends In
 	 */
 	public BackgroundMovingGaussian_SB(float learnRate, float threshold,
 									   Point2Transform2Model_F32<Motion> transform,
-									   TypeInterpolate interpType,
+									   InterpolateType interpType,
 									   Class<T> imageType)
 	{
 		super(learnRate, threshold, transform, ImageType.single(imageType));

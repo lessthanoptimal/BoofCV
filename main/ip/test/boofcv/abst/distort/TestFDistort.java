@@ -22,7 +22,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
@@ -139,7 +139,7 @@ public class TestFDistort {
 	public void setRefs() {
 		ImageMiscOps.fillUniform(input, rand, 0, 200);
 		FDistort alg = new FDistort();
-		alg.setRefs(input,output).interp(TypeInterpolate.BILINEAR).scaleExt().apply();
+		alg.setRefs(input,output).interp(InterpolateType.BILINEAR).scaleExt().apply();
 
 		ImageDistort distorter = alg.distorter;
 		InterpolatePixel interp = alg.interp;;

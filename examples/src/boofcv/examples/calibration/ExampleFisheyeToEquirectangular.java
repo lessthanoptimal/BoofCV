@@ -23,7 +23,7 @@ import boofcv.alg.distort.LensDistortionWideFOV;
 import boofcv.alg.distort.spherical.MultiCameraToEquirectangular;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -104,7 +104,7 @@ public class ExampleFisheyeToEquirectangular {
 
 		ImageType<Planar<GrayF32>> imageType = ImageType.pl(3,GrayF32.class);
 
-		InterpolatePixel<Planar<GrayF32>> interp = FactoryInterpolation.createPixel(0,255,TypeInterpolate.BILINEAR,
+		InterpolatePixel<Planar<GrayF32>> interp = FactoryInterpolation.createPixel(0,255, InterpolateType.BILINEAR,
 				BorderType.ZERO, imageType);
 		ImageDistort<Planar<GrayF32>,Planar<GrayF32>> distort =
 				FactoryDistort.distort(false,interp, imageType);

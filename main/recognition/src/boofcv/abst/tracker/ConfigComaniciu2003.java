@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.tracker;
 
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 
 /**
  * Configuration for {@link Comaniciu2003_to_TrackerObjectQuad}.
@@ -79,7 +79,7 @@ public class ConfigComaniciu2003 {
 	/**
 	 * Which interpolation method should it use.
 	 */
-	public TypeInterpolate interpolation = TypeInterpolate.BILINEAR;
+	public InterpolateType interpolation = InterpolateType.BILINEAR;
 
 	public ConfigComaniciu2003(int numSamples, int numHistogramBins, float scaleWeight ) {
 		this.numSamples = numSamples;

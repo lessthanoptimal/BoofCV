@@ -73,6 +73,7 @@ Version : 0.25
 - Template Matching
   * Added correlation using FFT
   * Tweaked API so that preprocessing of image can be performed
+- TypeInterpolation renamed to InterpolationType for consistency
 
 - TODO Test android integration
 - TODO Test open kinect integration

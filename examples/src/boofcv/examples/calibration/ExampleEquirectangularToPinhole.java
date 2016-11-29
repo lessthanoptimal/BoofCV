@@ -21,7 +21,7 @@ package boofcv.examples.calibration;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.spherical.EquirectangularToPinhole_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -63,7 +63,7 @@ public class ExampleEquirectangularToPinhole {
 
 		// Create the image distorter which will render the image
 		InterpolatePixel<Planar<GrayU8>> interp = FactoryInterpolation.
-				createPixel(0, 255, TypeInterpolate.BILINEAR, BorderType.EXTENDED, equiImage.getImageType());
+				createPixel(0, 255, InterpolateType.BILINEAR, BorderType.EXTENDED, equiImage.getImageType());
 		ImageDistort<Planar<GrayU8>,Planar<GrayU8>> distorter =
 				FactoryDistort.distort(false,interp,equiImage.getImageType());
 

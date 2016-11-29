@@ -19,7 +19,7 @@
 package boofcv.alg.background.moving;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.FactoryGImageMultiBand;
 import boofcv.core.image.GImageMultiBand;
@@ -52,7 +52,7 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved, Motion extends
 
 	public BackgroundMovingBasic_IL(float learnRate, float threshold,
 									Point2Transform2Model_F32<Motion> transform,
-									TypeInterpolate interpType,
+									InterpolateType interpType,
 									ImageType<T> imageType) {
 		super(learnRate, threshold,transform, imageType);
 

@@ -25,7 +25,7 @@ import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
@@ -98,7 +98,7 @@ public class FDistort
 		this.output = output;
 
 		inputType = input.getImageType();
-		interp(TypeInterpolate.BILINEAR);
+		interp(InterpolateType.BILINEAR);
 		border(0);
 
 		cached = false;
@@ -211,7 +211,7 @@ public class FDistort
 	/**
 	 * Specifies the interpolation used by type.
 	 */
-	public FDistort interp(TypeInterpolate type) {
+	public FDistort interp(InterpolateType type) {
 		distorter = null;
 		this.interp = FactoryInterpolation.createPixel(0, 255, type, BorderType.EXTENDED, inputType);
 
@@ -222,7 +222,7 @@ public class FDistort
 	 * Sets interpolation to use nearest-neighbor
 	 */
 	public FDistort interpNN() {
-		return interp(TypeInterpolate.NEAREST_NEIGHBOR);
+		return interp(InterpolateType.NEAREST_NEIGHBOR);
 	}
 
 	/**

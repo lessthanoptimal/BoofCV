@@ -30,10 +30,22 @@ import georegression.struct.point.Point3D_F32;
  * Images have 0 on the top and increase downwards.  To compensate for this the y-axis can be flipped.  This
  * is indicated by functions with FV (flip vertical) on the end of their name.
  *
- * <p>
- * longtitude is along the x-axis and goes from -pi to pi<br>
- * latitude is along the y-axis and goes from -pi/2 to pi/2
- * </p>
+ * Coordinate System:
+ * <ul>
+ * <li>longtitude is along the x-axis and goes from -pi to pi</li>
+ * <li>latitude is along the y-axis and goes from -pi/2 to pi/2</li>
+ * <li>image center (width/2, (height-1)/2.0f) or (lat=0, lon=0) corresponds to a unit sphere of (1,0,0)</li>
+ * <li>unit sphere of (0,0,1) is pixel (width/2,0) and (0,0,-1) is (width/2,height-1)</li>
+ * <li>unit sphere of (0,1,0) is pixel (3*width/4,(height-1)/2) and (0,0,-1) is (width/4,(height-1)/2)</li>
+ * </ul>
+ * Coordinate System with y-flipped:
+ * <ul>
+ * <li>longtitude is along the x-axis and goes from -pi to pi</li>
+ * <li>latitude is along the y-axis and goes from pi/2 to -pi/2</li>
+ * <li>image center (width/2, height/2) or (lat=0, lon=0) corresponds to a unit sphere of (1,0,0)</li>
+ * <li>unit sphere of (0,0,1) is pixel (width/2,height-1) and (0,0,-1) is (width/2,0)</li>
+ * <li>unit sphere of (0,1,0) is pixel (3*width/4,(height-1)/2) and (0,0,-1) is (width/4,(height-1)/2)</li>
+ * </ul>
  *
  * @author Peter Abeles
  */
@@ -98,7 +110,7 @@ public class EquirectangularTools_F32 {
 	 */
 	public void equiToLonlat(float x , float y , Point2D_F32 lonlat ) {
 		lonlat.x = (x/width - 0.5f)*GrlConstants.F_PI2; // longitude
-		lonlat.y = (y/height - 0.5f)*GrlConstants.F_PI; // latitude
+		lonlat.y = (y/(height-1) - 0.5f)*GrlConstants.F_PI; // latitude
 	}
 
 	/**
@@ -114,7 +126,7 @@ public class EquirectangularTools_F32 {
 	 */
 	public void equiToLonlatFV(float x , float y , Point2D_F32 lonlat ) {
 		lonlat.x = (x/width - 0.5f)*GrlConstants.F_PI2; // longitude
-		lonlat.y = ((height-y-1.0f)/height - 0.5f)*GrlConstants.F_PI; // latitude
+		lonlat.y = ((height-y-1.0f)/(height-1) - 0.5f)*GrlConstants.F_PI; // latitude
 	}
 
 	/**

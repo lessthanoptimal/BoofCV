@@ -21,7 +21,7 @@ package boofcv.alg.sfm.d2;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
@@ -189,7 +189,7 @@ public class TestStitchingFromMotion2D {
 	public void resizeStitchImage_Transform() {
 		HelperMotion motion = new HelperMotion();
 		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255,
-				TypeInterpolate.BILINEAR, BorderType.EXTENDED, GrayF32.class);
+				InterpolateType.BILINEAR, BorderType.EXTENDED, GrayF32.class);
 		ImageDistort distorter = FactoryDistort.distortSB(false, interp, GrayF32.class);
 
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();

@@ -22,7 +22,7 @@ import boofcv.alg.distort.*;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -74,7 +74,7 @@ public class ExampleFisheyeToPinhole {
 
 		// Create the image distorter which will render the image
 		InterpolatePixel<Planar<GrayU8>> interp = FactoryInterpolation.
-				createPixel(0, 255, TypeInterpolate.BILINEAR, BorderType.ZERO, fisheyeImage.getImageType());
+				createPixel(0, 255, InterpolateType.BILINEAR, BorderType.ZERO, fisheyeImage.getImageType());
 		ImageDistort<Planar<GrayU8>,Planar<GrayU8>> distorter =
 				FactoryDistort.distort(false,interp,fisheyeImage.getImageType());
 

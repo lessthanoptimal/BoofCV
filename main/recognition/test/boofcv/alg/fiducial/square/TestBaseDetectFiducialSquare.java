@@ -22,7 +22,7 @@ import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.alg.distort.*;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
@@ -151,7 +151,7 @@ public class TestBaseDetectFiducialSquare {
 		Point2Transform2_F32 distToUndistort = LensDistortionOps.transformPoint(intrinsic).undistort_F32(true, true);
 		Point2Transform2_F64 undistTodist = LensDistortionOps.transformPoint(intrinsic).distort_F64(true, true);
 		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255,
-				TypeInterpolate.BILINEAR, BorderType.ZERO, GrayU8.class);
+				InterpolateType.BILINEAR, BorderType.ZERO, GrayU8.class);
 		ImageDistort<GrayU8,GrayU8> distorter = FactoryDistort.distortSB(false, interp, GrayU8.class);
 		distorter.setModel(new PointToPixelTransform_F32(distToUndistort));
 		GrayU8 distorted = new GrayU8(width,height);
@@ -320,7 +320,7 @@ public class TestBaseDetectFiducialSquare {
 		PixelTransform2_F32 pixelTransform = new PointToPixelTransform_F32(homography);
 
 		// Apply distortion and show the results
-		DistortImageOps.distortSingle(pattern, output, pixelTransform, TypeInterpolate.BILINEAR, BorderType.SKIP);
+		DistortImageOps.distortSingle(pattern, output, pixelTransform, InterpolateType.BILINEAR, BorderType.SKIP);
 
 //		ShowImages.showWindow(output, "Rendered");
 //		try {Thread.sleep(10000);} catch (InterruptedException e) {}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.factory.background;
 
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.struct.Configuration;
 
 /**
@@ -53,12 +53,12 @@ public class ConfigBackgroundGaussian implements Configuration {
 	public float minimumDifference = 0;
 
 	/**
-	 * Specifies which interpolation it will use.  {@link TypeInterpolate#BILINEAR} or
-	 * {@link TypeInterpolate#NEAREST_NEIGHBOR} recommended.
+	 * Specifies which interpolation it will use.  {@link InterpolateType#BILINEAR} or
+	 * {@link InterpolateType#NEAREST_NEIGHBOR} recommended.
 	 *
 	 * <p>ONLY USED FOR MOVING BACKGROUNDS!</p>
 	 */
-	public TypeInterpolate interpolation = TypeInterpolate.BILINEAR;
+	public InterpolateType interpolation = InterpolateType.BILINEAR;
 
 	public ConfigBackgroundGaussian(float threshold) {
 		this.threshold = threshold;

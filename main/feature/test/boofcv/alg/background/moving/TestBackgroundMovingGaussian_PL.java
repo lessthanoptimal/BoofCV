@@ -20,7 +20,7 @@ package boofcv.alg.background.moving;
 
 import boofcv.alg.background.BackgroundModelMoving;
 import boofcv.alg.distort.PointTransformHomography_F32;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -43,7 +43,7 @@ public class TestBackgroundMovingGaussian_PL extends GenericBackgroundMovingGaus
 	create(ImageType<T> imageType) {
 		PointTransformHomography_F32 transform = new PointTransformHomography_F32();
 		BackgroundMovingGaussian_PL alg =
-				new BackgroundMovingGaussian_PL(0.05f,16,transform, TypeInterpolate.BILINEAR,imageType);
+				new BackgroundMovingGaussian_PL(0.05f,16,transform, InterpolateType.BILINEAR,imageType);
 		alg.setInitialVariance(12);
 		return alg;
 	}

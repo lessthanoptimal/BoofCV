@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.factory.flow;
 
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolateType;
 import boofcv.struct.Configuration;
 
 /**
@@ -65,7 +65,7 @@ public class ConfigHornSchunckPyramid implements Configuration {
 	/**
 	 * Type of interpolation used.  Bilinear recommended
 	 */
-	public TypeInterpolate interpolation = TypeInterpolate.BILINEAR;
+	public InterpolateType interpolation = InterpolateType.BILINEAR;
 
 
 	@Override
