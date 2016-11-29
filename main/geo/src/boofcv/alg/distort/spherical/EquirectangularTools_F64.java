@@ -137,7 +137,7 @@ public class EquirectangularTools_F64 {
 	 */
 	public void lonlatToEqui(double lon , double lat , Point2D_F64 rect ) {
 		rect.x = UtilAngle.wrapZeroToOne(lon / GrlConstants.PI2 + 0.5)*width;
-		rect.y = UtilAngle.wrapZeroToOne(lat / GrlConstants.PI + 0.5)*height;
+		rect.y = UtilAngle.reflectZeroToOne(lat / GrlConstants.PI + 0.5)*(height-1);
 	}
 
 	/**
@@ -149,7 +149,7 @@ public class EquirectangularTools_F64 {
 	 */
 	public void lonlatToEquiFV(double lon , double lat , Point2D_F64 rect ) {
 		rect.x = UtilAngle.wrapZeroToOne(lon / GrlConstants.PI2 + 0.5)*width;
-		rect.y = UtilAngle.wrapZeroToOne(lat / GrlConstants.PI + 0.5)*(height-1);
+		rect.y = UtilAngle.reflectZeroToOne(lat / GrlConstants.PI + 0.5)*(height-1);
 		rect.y = height - rect.y - 1;
 	}
 }

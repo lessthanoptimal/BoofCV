@@ -8,6 +8,10 @@ Next Release
 
 Less High Priority Next Release
 
+- Example/Demonstration App
+  * Right click to copy name or path to source code
+  * Pipe std out/err into window
+
 - Stereo Rectification
   * Make it easier.  Single class like in pyboof
 - Stereo Disparity

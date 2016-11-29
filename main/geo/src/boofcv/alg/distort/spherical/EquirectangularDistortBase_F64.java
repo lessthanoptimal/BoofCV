@@ -111,6 +111,7 @@ public abstract class EquirectangularDistortBase_F64 extends PixelTransform2_F64
 		Point3D_F64 v = vectors[y*outWidth+x];
 		// move to requested orientation
 		GeometryMath_F64.mult(R,v,n); // TODO make faster by not using an array based matrix
+
 		// compute pixel coordinate
 		tools.normToEquiFV(n.x,n.y,n.z,out);
 

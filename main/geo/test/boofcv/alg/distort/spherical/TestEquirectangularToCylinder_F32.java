@@ -38,7 +38,7 @@ public class TestEquirectangularToCylinder_F32 {
 	public void pointingAtZero() {
 
 		EquirectangularToCylinder_F32 alg = new EquirectangularToCylinder_F32();
-		alg.setEquirectangularShape(400,500);
+		alg.setEquirectangularShape(400,501); // even division to make sure math works out nicely
 
 		// height has an odd number to make it evenly divisible, e.g. (301-1)/2
 		alg.configure(200,301, UtilAngle.radian(100));
@@ -48,7 +48,7 @@ public class TestEquirectangularToCylinder_F32 {
 
 		// center of output image with y-axis inverted
 		assertEquals(200,alg.distX, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(500-250-1,alg.distY, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(501-250-1,alg.distY, GrlConstants.FLOAT_TEST_TOL);
 	}
 
 	/**
