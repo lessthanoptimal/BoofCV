@@ -37,7 +37,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 /**
- * TODO write
+ * Example of how to detect black ellipses with a white background inside of images.  These ellipses will have a
+ * high level of accuracy and are used in camera calibration else where.
  *
  * @author Peter Abeles
  */
@@ -46,9 +47,8 @@ public class ExampleDetectBlackEllipse {
 		String images[] = new String[]{
 				"shapes/polygons01.jpg",
 				"shapes/shapes02.png",
-				"shapes/concave01.jpg",
-				"fiducial/image/examples/image01.jpg"};
-				// TODO add ellipse fiducial
+				"fiducial/circle_asymmetric/image00.jpg",
+				"fiducial/circle_asymmetric/image01.jpg"};
 
 		ListDisplayPanel panel = new ListDisplayPanel();
 

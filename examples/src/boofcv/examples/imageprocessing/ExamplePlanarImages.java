@@ -18,6 +18,7 @@
 
 package boofcv.examples.imageprocessing;
 
+import boofcv.alg.color.ColorRgb;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.gui.ListDisplayPanel;
@@ -116,10 +117,15 @@ public class ExamplePlanarImages {
 		GPixelMath.averageBand(image, gray);
 		BufferedImage outputAve = ConvertBufferedImage.convertTo(gray,null);
 
+		// convert to gray scale but weigh each color band based on how human vision works
+		ColorRgb.rgbToGray_Weighted(image, gray);
+		BufferedImage outputWeighted = ConvertBufferedImage.convertTo(gray,null);
+
 		// create an output image just from the first band
 		BufferedImage outputBand0 = ConvertBufferedImage.convertTo(image.getBand(0),null);
 
 		gui.addImage(outputAve,"Gray Averaged");
+		gui.addImage(outputWeighted,"Gray Weighted");
 		gui.addImage(outputBand0,"Band 0");
 	}
 	
