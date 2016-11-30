@@ -135,7 +135,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		checkNumbers.addItemListener(this);
 
 		checkOrder = new JCheckBox("Order");
-		checkOrder.setSelected(showNumbers);
+		checkOrder.setSelected(showOrder);
 		checkOrder.addItemListener(this);
 
 		selectErrorScale = new JSpinner(new SpinnerNumberModel(errorScale, 1, 100, 5));

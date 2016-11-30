@@ -47,7 +47,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectFeaturePointSOApp<T extends ImageGray, D extends ImageGray>
+public class DetectPointScaleOriWithNoiseApp<T extends ImageGray, D extends ImageGray>
 		extends SelectAlgorithmAndInputPanel implements ImageCorruptPanel.Listener {
 
 	static int maxFeatures = 400;
@@ -67,7 +67,7 @@ public class DetectFeaturePointSOApp<T extends ImageGray, D extends ImageGray>
 	ImagePanel panel;
 	ImageCorruptPanel corruptPanel;
 
-	public DetectFeaturePointSOApp(Class<T> imageType, Class<D> derivType) {
+	public DetectPointScaleOriWithNoiseApp(Class<T> imageType, Class<D> derivType) {
 		super(1);
 		this.imageType = imageType;
 
@@ -165,8 +165,8 @@ public class DetectFeaturePointSOApp<T extends ImageGray, D extends ImageGray>
 	}
 
 	public static void main(String args[]) {
-		DetectFeaturePointSOApp app = new DetectFeaturePointSOApp(GrayF32.class, GrayF32.class);
-//		DetectFeaturePointApp app = new DetectFeaturePointApp(GrayU8.class,GrayS16.class);
+		DetectPointScaleOriWithNoiseApp app = new DetectPointScaleOriWithNoiseApp(GrayF32.class, GrayF32.class);
+//		DetectPointsWithNoiseApp app = new DetectPointsWithNoiseApp(GrayU8.class,GrayS16.class);
 
 		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));

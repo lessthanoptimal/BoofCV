@@ -182,7 +182,7 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 
 		app.waitUntilDoneProcessing();
 
-		ShowImages.showWindow(app, "Equirectanglar Image Rotator",true);
+		ShowImages.showWindow(app, "Equirectanglar Rotator",true);
 
 	}
 

@@ -49,7 +49,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectFeaturePointApp<T extends ImageGray, D extends ImageGray>
+public class DetectPointsWithNoiseApp<T extends ImageGray, D extends ImageGray>
 		extends SelectAlgorithmAndInputPanel implements ImageCorruptPanel.Listener {
 
 	static int maxFeatures = 400;
@@ -69,7 +69,7 @@ public class DetectFeaturePointApp<T extends ImageGray, D extends ImageGray>
 	ImagePanel panel;
 	ImageCorruptPanel corruptPanel;
 
-	public DetectFeaturePointApp(Class<T> imageType, Class<D> derivType) {
+	public DetectPointsWithNoiseApp(Class<T> imageType, Class<D> derivType) {
 		super(1);
 		this.imageType = imageType;
 
@@ -195,8 +195,8 @@ public class DetectFeaturePointApp<T extends ImageGray, D extends ImageGray>
 	}
 
 	public static void main(String args[]) {
-		DetectFeaturePointApp app = new DetectFeaturePointApp(GrayF32.class, GrayF32.class);
-//		DetectFeaturePointApp app = new DetectFeaturePointApp(GrayU8.class,GrayS16.class);
+		DetectPointsWithNoiseApp app = new DetectPointsWithNoiseApp(GrayF32.class, GrayF32.class);
+//		DetectPointsWithNoiseApp app = new DetectPointsWithNoiseApp(GrayU8.class,GrayS16.class);
 
 		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
@@ -211,6 +211,7 @@ public class DetectFeaturePointApp<T extends ImageGray, D extends ImageGray>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Point Feature",true);
+		ShowImages.showWindow(app, "Detect Scale Point" +
+				" with Noise",true);
 	}
 }

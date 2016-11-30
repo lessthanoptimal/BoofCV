@@ -28,16 +28,15 @@ import boofcv.demonstrations.enhance.ImageEnhanceApp;
 import boofcv.demonstrations.feature.associate.VisualizeAssociationAlgorithmsApp;
 import boofcv.demonstrations.feature.associate.VisualizeAssociationMatchesApp;
 import boofcv.demonstrations.feature.associate.VisualizeAssociationScoreApp;
-import boofcv.demonstrations.feature.describe.CompareConvertedDescriptionsApp;
 import boofcv.demonstrations.feature.describe.VisualizeHogDescriptorApp;
 import boofcv.demonstrations.feature.describe.VisualizeImageHogCellApp;
 import boofcv.demonstrations.feature.describe.VisualizeRegionDescriptionApp;
 import boofcv.demonstrations.feature.detect.edge.ShowEdgeContourApp;
 import boofcv.demonstrations.feature.detect.extract.CompareFeatureExtractorApp;
 import boofcv.demonstrations.feature.detect.intensity.IntensityFeaturePyramidApp;
-import boofcv.demonstrations.feature.detect.interest.DetectFeaturePointApp;
-import boofcv.demonstrations.feature.detect.interest.DetectFeaturePointSOApp;
-import boofcv.demonstrations.feature.detect.interest.DetectFeaturePyramidApp;
+import boofcv.demonstrations.feature.detect.interest.DetectPointScaleOriWithNoiseApp;
+import boofcv.demonstrations.feature.detect.interest.DetectPointsInsidePyramidApp;
+import boofcv.demonstrations.feature.detect.interest.DetectPointsWithNoiseApp;
 import boofcv.demonstrations.feature.detect.line.DetectLineApp;
 import boofcv.demonstrations.feature.detect.line.VisualizeHoughFoot;
 import boofcv.demonstrations.feature.detect.line.VisualizeHoughPolar;
@@ -118,16 +117,16 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				VisualizeAssociationAlgorithmsApp.class,
 				VisualizeAssociationMatchesApp.class,
 				VisualizeAssociationScoreApp.class,
-				CompareConvertedDescriptionsApp.class,
+//				CompareConvertedDescriptionsApp.class,
 				VisualizeHogDescriptorApp.class,
 				VisualizeImageHogCellApp.class,
 				VisualizeRegionDescriptionApp.class,
 				ShowEdgeContourApp.class,
 				CompareFeatureExtractorApp.class,
 				IntensityFeaturePyramidApp.class,
-				DetectFeaturePointApp.class,
-				DetectFeaturePointSOApp.class,
-				DetectFeaturePyramidApp.class,
+				DetectPointsWithNoiseApp.class,
+				DetectPointScaleOriWithNoiseApp.class,
+				DetectPointsInsidePyramidApp.class,
 				DetectLineApp.class,
 				VisualizeHoughFoot.class,
 				VisualizeHoughPolar.class,

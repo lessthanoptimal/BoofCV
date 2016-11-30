@@ -40,7 +40,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class DetectFeaturePyramidApp <T extends ImageGray, D extends ImageGray>
+public class DetectPointsInsidePyramidApp<T extends ImageGray, D extends ImageGray>
 		extends SelectAlgorithmAndInputPanel
 {
 	static int NUM_FEATURES = 100;
@@ -53,7 +53,7 @@ public class DetectFeaturePyramidApp <T extends ImageGray, D extends ImageGray>
 	T workImage;
 	InterestPointScaleSpacePyramid<T> det = null;
 
-	public DetectFeaturePyramidApp( Class<T> imageType , Class<D> derivType ) {
+	public DetectPointsInsidePyramidApp(Class<T> imageType , Class<D> derivType ) {
 		super(2);
 		this.imageType = imageType;
 
@@ -143,7 +143,7 @@ public class DetectFeaturePyramidApp <T extends ImageGray, D extends ImageGray>
 
 	public static void main( String args[] ) {
 
-		DetectFeaturePyramidApp app = new DetectFeaturePyramidApp(GrayF32.class,GrayF32.class);
+		DetectPointsInsidePyramidApp app = new DetectPointsInsidePyramidApp(GrayF32.class,GrayF32.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 
@@ -159,6 +159,6 @@ public class DetectFeaturePyramidApp <T extends ImageGray, D extends ImageGray>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Feature Pyramid", true);
+		ShowImages.showWindow(app, "Pyramid Point Detection", true);
 	}
 }
