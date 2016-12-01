@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2016
+Date    : 2016/12/01
 Version : 0.25
 
 - Black Circle Detector
@@ -76,11 +76,6 @@ Version : 0.25
 - TypeInterpolation renamed to InterpolationType for consistency
 - Changed behavior of AssociateSurfBasic
   * no longer throws an exception if src or dst features are empty
-
-- TODO Video calibration circles
-- TODO Video equirectangular / fisheye images
-- TODO Run regression
-- TODO Test examples and demonstrations
 
 ---------------------------------------------
 Date    : 2016/06/13
