@@ -5,7 +5,7 @@ dependencies {
     compile project(':main:sfm')
 
     ['main','models'].each {String a ->
-        compile group: 'org.deepboof', name: a, version: '0.2-SNAPSHOT'}
+        compile group: 'org.deepboof', name: a, version: '0.2'}
 
     testCompile project(':main:io')
     testCompile project(':main:visualize')
