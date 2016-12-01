@@ -53,6 +53,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Demonstrates how to combine multiple images together into a single view.  A 360 camera was used to generate
+ * the two input fisheye images.  Each camera has been calibrated independently and the extrinsics between the two
+ * cameras is assume to be known.  Because of how the fisheye image is modeled a mask is required to label pixels
+ * outside the FOV that should not be considered.
+ *
  * @author Peter Abeles
  */
 public class ExampleFisheyeToEquirectangular {
