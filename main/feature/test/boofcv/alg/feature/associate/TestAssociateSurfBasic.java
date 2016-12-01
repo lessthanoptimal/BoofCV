@@ -148,4 +148,47 @@ public class TestAssociateSurfBasic {
 		alg.associate();
 		FastQueue<AssociatedIndex> matches = alg.getMatches();
 	}
+
+	/**
+	 * Shouldn't crash in this case.  just do nothing and clear previous results
+	 */
+	@Test
+	public void handleEmptyLists() {
+		// Initialize it with a successful association
+		FastQueue<BrightFeature> src = new FastQueue<>(10, BrightFeature.class, false);
+		FastQueue<BrightFeature> dst = new FastQueue<>(10, BrightFeature.class, false);
+
+		src.add( createDesc(true,10));
+		src.add( createDesc(true,12));
+		src.add( createDesc(false,5));
+		dst.add( createDesc(true,10));
+		dst.add( createDesc(true,12));
+		dst.add( createDesc(false,5));
+
+		AssociateSurfBasic alg = createAlg();
+
+		alg.setSrc(src);
+		alg.setDst(dst);
+		alg.associate();
+		assertTrue( alg.getMatches().size() > 0 );
+
+		// now have the src list be empty
+		alg.setSrc(new FastQueue<>(BrightFeature.class,false));
+		alg.setDst(dst);
+		alg.associate();
+		assertTrue( alg.getMatches().size() == 0 );
+
+		// match stuff up again
+		alg.setSrc(src);
+		alg.setDst(dst);
+		alg.associate();
+		assertTrue( alg.getMatches().size() > 0 );
+
+		// dst list is empty now
+		alg.setSrc(src);
+		alg.setDst(new FastQueue<>(BrightFeature.class,false));
+		alg.associate();
+		assertTrue( alg.getMatches().size() == 0 );
+
+	}
 }

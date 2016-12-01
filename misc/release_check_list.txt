@@ -19,7 +19,6 @@
 - Tag git
 - Upload to sourceforge
 - Update version on website
-- Post new Processing jar
 
 ----
 Gradle
@@ -30,9 +29,3 @@ gradle uploadArchives
 A SNAPSHOT is created if SNAPSHOT is in its name.
 
 log onto http://oss.sonatype.org
-
-
-----
-jar signing
-
-jarsigner -storetype pkcs12 -keystore Abeles_Comodo_CA.p12 BoofCV_Applet.jar "peter abeles's comodo ca limited id"

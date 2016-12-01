@@ -1,10 +1,11 @@
 Next Release
 
+- TODO Fisheye calibration using omni model
 - TODO make sure RANSAC is using the faster method for selecting points.  swapping selected with one at the end
 - TODO Regression: Chessboard image border to fiducial regression
-- TODO Unit test for getScaleAtRadius
-  * Implement universally
-  * Create unit test for it
+- TODO why does large circle asym grid fail to detect?
+- TODO grid of circle calibration target
+
 
 Less High Priority Next Release
 

@@ -74,9 +74,9 @@ Version : 0.25
   * Added correlation using FFT
   * Tweaked API so that preprocessing of image can be performed
 - TypeInterpolation renamed to InterpolationType for consistency
+- Changed behavior of AssociateSurfBasic
+  * no longer throws an exception if src or dst features are empty
 
-- TODO Test android integration
-- TODO Test open kinect integration
 - TODO Video calibration circles
 - TODO Video equirectangular / fisheye images
 - TODO Run regression
