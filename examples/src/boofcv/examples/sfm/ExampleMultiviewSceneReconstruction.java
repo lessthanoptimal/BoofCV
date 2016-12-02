@@ -29,6 +29,7 @@ import boofcv.factory.geo.*;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -50,6 +51,7 @@ import org.ddogleg.struct.GrowQueue_I32;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -614,7 +616,8 @@ public class ExampleMultiviewSceneReconstruction {
 
 		String directory = UtilIO.pathExample("sfm/chair");
 
-		CameraPinholeRadial intrinsic = UtilIO.loadXML(directory,"/intrinsic_DSC-HX5_3648x2736_to_640x480.xml");
+		CameraPinholeRadial intrinsic = CalibrationIO.load(
+				new File(directory,"/intrinsic_DSC-HX5_3648x2736_to_640x480.yaml"));
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 
