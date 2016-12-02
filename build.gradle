@@ -7,7 +7,7 @@ allprojects {
     apply plugin: 'eclipse'
 
     group = 'org.boofcv'
-    version = '0.25-SNAPSHOT'
+    version = '0.26-SNAPSHOT'
 }
 
 subprojects {
@@ -236,8 +236,8 @@ task testReport(type: TestReport) {
 
 idea {
     project {
-        jdkName = '1.6 (64bit)'
-        languageLevel = '1.6'
+        jdkName = '1.7 (64bit)'
+        languageLevel = '1.7'
     }
 
     module {

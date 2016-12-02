@@ -19,6 +19,7 @@
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D;
@@ -33,8 +34,7 @@ import java.lang.reflect.Method;
 import java.util.Random;
 
 import static boofcv.core.image.GeneralizedImageOps.get;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * To reduce the amount of code reflects are heavily used.  If any more functions are added reflections should be
@@ -51,6 +51,9 @@ public class TestConvolveImageStandard {
 	int height = 5;
 	int kernelWidth = 3;
 	int kernelRadius = kernelWidth/2;
+
+	int maxKernelValue = 20;
+	int maxPixelValue = 10;
 
 	/**
 	 * Using reflections get a list of all the functions and test each of them
@@ -96,7 +99,7 @@ public class TestConvolveImageStandard {
 		ImageGray input = GeneralizedImageOps.createSingleBand(param[1], width, height);
 		ImageGray output = GeneralizedImageOps.createSingleBand(param[2], width, height);
 
-		GImageMiscOps.fillUniform(input, rand, 1, 10);
+		GImageMiscOps.fillUniform(input, rand, 1, maxPixelValue);
 
 		if( m.getName().contentEquals("horizontal")) {
 			if( param.length == 3 ) {
@@ -129,21 +132,22 @@ public class TestConvolveImageStandard {
 		Kernel1D ker = FactoryKernel.createKernelForImage(kernelWidth, kernelRadius, 1, img.getClass());
 
 		// standard symmetric odd kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,kernelRadius,0,100,rand);
+		ker = FactoryKernel.random(ker.getClass(),kernelWidth,kernelRadius,0,maxKernelValue,rand);
 		checkHorizontal(ker, img, dest);
 
 		// odd non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,100,rand);
+		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,maxKernelValue,rand);
 		checkHorizontal(ker,img,dest);
 
 		// even non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),2,1,0,100,rand);
+		ker = FactoryKernel.random(ker.getClass(),2,1,0,maxKernelValue,rand);
 		checkHorizontal(ker, img, dest);
 	}
 
 	private void checkHorizontal(Kernel1D ker , ImageGray img, ImageGray dest ) {
 		GImageMiscOps.fill(dest, 0);
 		invokeMethod("horizontal", ker, img, dest);
+		assertTrue(GImageStatistics.sum(dest) != 0); // making sure it's a good test and not trivial
 		int y = 1;
 
 		double tol = toleranceByImageType(img);
@@ -185,22 +189,23 @@ public class TestConvolveImageStandard {
 		Kernel1D ker = FactoryKernel.createKernelForImage(kernelWidth, kernelRadius, 1, img.getClass());
 
 		// standard symmetric odd kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,kernelRadius,0,100,rand);
+		ker = FactoryKernel.random(ker.getClass(),kernelWidth,kernelRadius,0,maxKernelValue,rand);
 		checkHorizontalDiv(ker, img, dest);
 
 		// odd non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,100,rand);
+		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,maxKernelValue,rand);
 		checkHorizontalDiv(ker, img, dest);
 
 		// even non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),2,1,0,100,rand);
+		ker = FactoryKernel.random(ker.getClass(),2,1,0,maxKernelValue,rand);
 		checkHorizontalDiv(ker, img, dest);
 	}
 
 	private void checkHorizontalDiv(Kernel1D ker , ImageGray img, ImageGray dest ) {
-		int divisor = 11;
+		int divisor = kernelWidth;
 		GImageMiscOps.fill(dest, 0);
 		invokeMethod("horizontal", ker, img, dest, divisor);
+		assertTrue(GImageStatistics.sum(dest) != 0); // making sure it's a good test and not trivial
 		int y = 1;
 
 		double tol = toleranceByImageType(img);
@@ -242,21 +247,22 @@ public class TestConvolveImageStandard {
 		Kernel1D ker = FactoryKernel.createKernelForImage(kernelWidth, kernelRadius, 1, img.getClass());
 
 		// standard symmetric odd kernel shape
-		ker = FactoryKernel.random(ker.getClass(), kernelWidth, kernelRadius, 0, 100, rand);
+		ker = FactoryKernel.random(ker.getClass(), kernelWidth, kernelRadius, 0, maxKernelValue, rand);
 		checkVertical(ker, img, dest);
 
 		// odd non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,100,rand);
+		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,maxKernelValue,rand);
 		checkVertical(ker, img, dest);
 
 		// even non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),2,1,0,100,rand);
+		ker = FactoryKernel.random(ker.getClass(),2,1,0,maxKernelValue,rand);
 		checkVertical(ker, img, dest);
 	}
 
 	private void checkVertical(Kernel1D ker , ImageGray img, ImageGray dest ) {
 		GImageMiscOps.fill(dest, 0);
 		invokeMethod("vertical", ker, img, dest);
+		assertTrue(GImageStatistics.sum(dest) != 0); // making sure it's a good test and not trivial
 		int x = 1;
 
 		double tol = toleranceByImageType(img);
@@ -297,23 +303,24 @@ public class TestConvolveImageStandard {
 		Kernel1D ker = FactoryKernel.createKernelForImage(kernelWidth, kernelRadius, 1, img.getClass());
 
 		// standard symmetric odd kernel shape
-		ker = FactoryKernel.random(ker.getClass(), kernelWidth, kernelRadius, 0, 100, rand);
+		ker = FactoryKernel.random(ker.getClass(), kernelWidth, kernelRadius, 0, maxKernelValue, rand);
 		checkVerticalDiv(ker, img, dest);
 
 		// odd non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,100,rand);
+		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,maxKernelValue,rand);
 		checkVerticalDiv(ker, img, dest);
 
 		// even non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),2,1,0,100,rand);
+		ker = FactoryKernel.random(ker.getClass(),2,1,0,maxKernelValue,rand);
 		checkVerticalDiv(ker, img, dest);
 	}
 
 	private void checkVerticalDiv(Kernel1D ker , ImageGray img, ImageGray dest ) {
-		int divisor = 11;
+		int divisor = kernelWidth;
 
 		GImageMiscOps.fill(dest, 0);
 		invokeMethod("vertical", ker, img, dest, divisor);
+		assertTrue(GImageStatistics.sum(dest) != 0); // making sure it's a good test and not trivial
 		int x = 1;
 
 		double tol = toleranceByImageType(img);
@@ -354,15 +361,15 @@ public class TestConvolveImageStandard {
 		Kernel2D ker = FactoryKernel.createKernelForImage(kernelWidth, kernelRadius, 2, img.getClass());
 
 		// standard symmetric odd kernel shape
-		ker = FactoryKernel.random(ker.getClass(), kernelWidth, kernelRadius, 0, 100, rand);
+		ker = FactoryKernel.random(ker.getClass(), kernelWidth, kernelRadius, 0, maxKernelValue, rand);
 		convolve(ker, img, dest);
 
 		// odd non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,100,rand);
+		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,maxKernelValue,rand);
 		convolve(ker, img, dest);
 
 		// even non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),2,1,0,100,rand);
+		ker = FactoryKernel.random(ker.getClass(),2,1,0,maxKernelValue,rand);
 		convolve(ker, img, dest);
 	}
 
@@ -371,6 +378,7 @@ public class TestConvolveImageStandard {
 		GImageMiscOps.fill(dest,0);
 
 		invokeMethod("convolve", kernel, img, dest);
+		assertTrue(GImageStatistics.sum(dest) != 0); // making sure it's a good test and not trivial
 
 		// the border should be zero and everything else should be the expected value
 		double tol = toleranceByImageType(img);
@@ -407,24 +415,26 @@ public class TestConvolveImageStandard {
 		Kernel2D ker = FactoryKernel.createKernelForImage(kernelWidth, kernelRadius, 2, img.getClass());
 
 		// standard symmetric odd kernel shape
-		ker = FactoryKernel.random(ker.getClass(), kernelWidth, kernelRadius, 0, 100, rand);
+		ker = FactoryKernel.random(ker.getClass(), kernelWidth, kernelRadius, 0, maxKernelValue, rand);
 		convolveDiv(ker, img, dest);
 
 		// odd non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,100,rand);
+		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,maxKernelValue,rand);
 		convolveDiv(ker, img, dest);
 
 		// even non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),2,1,0,100,rand);
+		ker = FactoryKernel.random(ker.getClass(),2,1,0,maxKernelValue,rand);
 		convolveDiv(ker, img, dest);
 	}
 
 	private void convolveDiv(Kernel2D kernel , ImageGray img, ImageGray dest) {
 		// manually perform a convolution
 		GImageMiscOps.fill(dest,0);
-		int divisor = 11;
+		int divisor = kernelWidth*kernelWidth;
 
 		invokeMethod("convolve", kernel, img, dest,divisor);
+
+		assertTrue(GImageStatistics.sum(dest) != 0); // making sure it's a good test and not trivial
 
 		// the border should be zero and everything else should be the expected value
 

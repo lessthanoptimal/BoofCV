@@ -3,6 +3,14 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2017
+Version : 0.26
+
+- Fixed a long standing unit test issue where convolve would some times on some systems erratically fail
+  * Appears that sometimes the random numbers caused a buffer overflow for U8 images
+  * Now why it didn't have the exact same numbers every time with a fixed seed is disturbing...
+
+---------------------------------------------
 Date    : 2016/12/01
 Version : 0.25
 
