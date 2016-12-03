@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestEquirectangularToCylinder_F64 {
+public class TestCylinderToEquirectangular_F64 {
 
 	/**
 	 * The latitude and longitude should be zero when sampling the middle of the cylindrical image
@@ -37,7 +37,7 @@ public class TestEquirectangularToCylinder_F64 {
 	@Test
 	public void pointingAtZero() {
 
-		EquirectangularToCylinder_F64 alg = new EquirectangularToCylinder_F64();
+		CylinderToEquirectangular_F64 alg = new CylinderToEquirectangular_F64();
 		alg.setEquirectangularShape(400,501); // even division to make sure math works out nicely
 
 		// height has an odd number to make it evenly divisible, e.g. (301-1)/2
@@ -56,7 +56,7 @@ public class TestEquirectangularToCylinder_F64 {
 	 */
 	@Test
 	public void checkFOV() {
-		EquirectangularToCylinder_F64 alg = new EquirectangularToCylinder_F64();
+		CylinderToEquirectangular_F64 alg = new CylinderToEquirectangular_F64();
 		alg.setEquirectangularShape(400,500);
 
 		alg.configure(200,300, UtilAngle.radian(100));
@@ -79,7 +79,7 @@ public class TestEquirectangularToCylinder_F64 {
 	 */
 	@Test
 	public void checkVectors() {
-		EquirectangularToCylinder_F64 alg = new EquirectangularToCylinder_F64();
+		CylinderToEquirectangular_F64 alg = new CylinderToEquirectangular_F64();
 		alg.setEquirectangularShape(400, 500);
 		alg.configure(200, 300, UtilAngle.radian(100));
 

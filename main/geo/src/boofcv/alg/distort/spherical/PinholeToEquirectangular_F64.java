@@ -18,10 +18,10 @@
 
 package boofcv.alg.distort.spherical;
 
-import boofcv.alg.distort.pinhole.PinholePtoN_F32;
+import boofcv.alg.distort.pinhole.PinholePtoN_F64;
 import boofcv.struct.calib.CameraPinhole;
-import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Point3D_F32;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 
 /**
  * Renders a pinhole camera view from an equirectangular image.  When no additional rotation
@@ -33,7 +33,7 @@ import georegression.struct.point.Point3D_F32;
  *
  * @author Peter Abeles
  */
-public class EquirectangularToPinhole_F32 extends EquirectangularDistortBase_F32 {
+public class PinholeToEquirectangular_F64 extends EquirectangularDistortBase_F64 {
 
 	// camera model without distortion
 	CameraPinhole pinhole;
@@ -48,14 +48,14 @@ public class EquirectangularToPinhole_F32 extends EquirectangularDistortBase_F32
 
 		// computing the 3D ray through each pixel in the pinhole camera at it's canonical
 		// location
-		PinholePtoN_F32 pixelToNormalized = new PinholePtoN_F32();
+		PinholePtoN_F64 pixelToNormalized = new PinholePtoN_F64();
 		pixelToNormalized.set(pinhole.fx,pinhole.fy,pinhole.skew,pinhole.cx,pinhole.cy);
 
-		Point2D_F32 norm = new Point2D_F32();
+		Point2D_F64 norm = new Point2D_F64();
 		for (int pixelY = 0; pixelY < pinhole.height; pixelY++) {
 			for (int pixelX = 0; pixelX < pinhole.width; pixelX++) {
 				pixelToNormalized.compute(pixelX, pixelY, norm);
-				Point3D_F32 v = vectors[pixelY*pinhole.width+pixelX];
+				Point3D_F64 v = vectors[pixelY*pinhole.width+pixelX];
 
 				v.set(norm.x,norm.y,1);
 			}

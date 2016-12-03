@@ -19,7 +19,7 @@
 package boofcv.examples.calibration;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.spherical.EquirectangularToPinhole_F32;
+import boofcv.alg.distort.spherical.PinholeToEquirectangular_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolateType;
 import boofcv.core.image.border.BorderType;
@@ -50,7 +50,7 @@ public class ExampleEquirectangularToPinhole {
 	public static void main(String[] args) {
 
 		// Specify what the pinhole camera should look like
-		CameraPinhole pinholeModel = new CameraPinhole(250,250,0,250,250,500,500);
+		CameraPinhole pinholeModel = new CameraPinhole(200,200,0,250,250,500,500);
 
 		// Load equirectangular RGB image
 		BufferedImage bufferedEqui =
@@ -68,22 +68,22 @@ public class ExampleEquirectangularToPinhole {
 				FactoryDistort.distort(false,interp,equiImage.getImageType());
 
 		// This is where the magic is done.  It defines the transform rfom equirectangular to pinhole
-		EquirectangularToPinhole_F32 equiToPinhole = new EquirectangularToPinhole_F32();
-		equiToPinhole.setEquirectangularShape(equiImage.width,equiImage.height);
-		equiToPinhole.setPinhole(pinholeModel);
+		PinholeToEquirectangular_F32 pinholeToEqui = new PinholeToEquirectangular_F32();
+		pinholeToEqui.setEquirectangularShape(equiImage.width,equiImage.height);
+		pinholeToEqui.setPinhole(pinholeModel);
 
 		// Pass in the transform to the image distorter
-		distorter.setModel(equiToPinhole);
+		distorter.setModel(pinholeToEqui);
 
 		// change the orientation of the camera to make the view better
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.YXZ,0, 1.45, 2.2,equiToPinhole.getRotation());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.YXZ,0, 1.45, 2.2,pinholeToEqui.getRotation());
 
 		// Render the image
 		distorter.apply(equiImage,pinholeImage);
 		BufferedImage bufferedPinhole0 = ConvertBufferedImage.convertTo(pinholeImage,null,true);
 
 		// Let's look at another view
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.YXZ,0, 1.25, -1.25,equiToPinhole.getRotation());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.YXZ,0, 1.25, -1.25,pinholeToEqui.getRotation());
 
 		distorter.apply(equiImage,pinholeImage);
 		BufferedImage bufferedPinhole1 = ConvertBufferedImage.convertTo(pinholeImage,null,true);

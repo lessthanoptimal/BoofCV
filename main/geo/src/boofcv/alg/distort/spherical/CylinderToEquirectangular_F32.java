@@ -35,7 +35,7 @@ import georegression.misc.GrlConstants;
  *
  * @author Peter Abeles
  */
-public class EquirectangularToCylinder_F32 extends EquirectangularDistortBase_F32 {
+public class CylinderToEquirectangular_F32 extends EquirectangularDistortBase_F32 {
 
 	/**
 	 * Configures the rendered cylinder

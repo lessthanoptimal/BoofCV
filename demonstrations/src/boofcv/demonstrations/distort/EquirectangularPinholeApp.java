@@ -19,7 +19,7 @@
 package boofcv.demonstrations.distort;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.spherical.EquirectangularToPinhole_F32;
+import boofcv.alg.distort.spherical.PinholeToEquirectangular_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolateType;
 import boofcv.core.image.border.BorderType;
@@ -66,7 +66,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 	implements PinholePanel.Listener
 {
 
-	EquirectangularToPinhole_F32 distorter = new EquirectangularToPinhole_F32();
+	PinholeToEquirectangular_F32 distorter = new PinholeToEquirectangular_F32();
 	ImageDistort<T,T> distortImage;
 
 	// output image fort pinhole and equirectangular image

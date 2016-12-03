@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestEquirectangularToPinhole_F32 {
+public class TestPinholeToEquirectangular_F32 {
 
 	private int equiWidth = 600;
 	private int equiHeight = 400;
@@ -44,7 +44,7 @@ public class TestEquirectangularToPinhole_F32 {
 	public void canonicalIsPointedPositiveZ() {
 		CameraPinhole intrinsic = new CameraPinhole(400,400,0,imgWidth/2,imgHeight/2,imgWidth,imgHeight);
 
-		EquirectangularToPinhole_F32 alg = new EquirectangularToPinhole_F32();
+		PinholeToEquirectangular_F32 alg = new PinholeToEquirectangular_F32();
 
 		alg.setPinhole(intrinsic);
 		alg.setEquirectangularShape(equiWidth,equiHeight);
@@ -59,7 +59,7 @@ public class TestEquirectangularToPinhole_F32 {
 	public void setDirection() {
 		CameraPinhole intrinsic = new CameraPinhole(400,400,0,imgWidth/2,imgHeight/2,imgWidth,imgHeight);
 
-		EquirectangularToPinhole_F32 alg = new EquirectangularToPinhole_F32();
+		PinholeToEquirectangular_F32 alg = new PinholeToEquirectangular_F32();
 
 		alg.setPinhole(intrinsic);
 		alg.setEquirectangularShape(equiWidth,equiHeight);
@@ -68,7 +68,7 @@ public class TestEquirectangularToPinhole_F32 {
 		assertPointing(alg,imgWidth/2,imgHeight/2,1,0,0);
 	}
 
-	private void assertPointing( EquirectangularToPinhole_F32 alg , int x , int y , float nx , float ny , float nz )
+	private void assertPointing(PinholeToEquirectangular_F32 alg , int x , int y , float nx , float ny , float nz )
 	{
 		EquirectangularTools_F32 tools = new EquirectangularTools_F32();
 

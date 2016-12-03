@@ -19,7 +19,7 @@
 package boofcv.demonstrations.distort;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.spherical.EquirectangularToCylinder_F32;
+import boofcv.alg.distort.spherical.CylinderToEquirectangular_F32;
 import boofcv.alg.distort.spherical.EquirectangularTools_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolateType;
@@ -57,7 +57,7 @@ import java.util.List;
 public class EquirectangularCylinderApp<T extends ImageBase> extends DemonstrationBase<T>
 		implements RotationPanel.Listener, CylinderPanel.Listener
 {
-	final EquirectangularToCylinder_F32 distorter = new EquirectangularToCylinder_F32();
+	final CylinderToEquirectangular_F32 distorter = new CylinderToEquirectangular_F32();
 	ImageDistort<T,T> distortImage;
 
 	BufferedImage rendered = new BufferedImage(1,1,BufferedImage.TYPE_INT_BGR);
