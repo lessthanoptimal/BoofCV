@@ -29,6 +29,7 @@ The bleeding edge source code can be obtained by cloning the git repository.
 
 ```
 git clone --recursive https://github.com/lessthanoptimal/BoofCV.git boofcv
+git checkout SNAPSHOT
 ```
 
 Is the data directory empty?  That's because you didn't follow instructions and skipped --recursive.  Fix that by doing the following.
@@ -43,9 +44,9 @@ Know what you're doing and you just want to see something running?  Then run the
 
 ```bash
 cd boofcv
-gradle examples
+./gradlew examples
 java -jar examples/examples.jar
-gradle demonstrations
+./gradlew demonstrations
 java -jar demonstrations/demonstrations.jar
 ```
 
@@ -54,11 +55,6 @@ All the code for what you see is in boofcv/examples and boofcv/demonstrations.  
 ## Adding to Gradle and Maven Projects
 
 BoofCV is divided up into many modules.  The easiest way to include the critical modules is to have your project dependent on 'core'.
-
-For Gradle projects:
-```groovy
-compile group: 'org.boofcv', name: 'core', version: '0.25'
-```
 
 For Maven projects:
 ```
@@ -80,10 +76,6 @@ jcodec        | [JCodec](http://jcodec.org/) is a pure Java video reader/writer.
 openkinect    | Used the [Kinect](http://openkinect.org) RGB-D sensor with BoofCV.
 WebcamCapture | A few functions that make [WebcamCapture](http://webcam-capture.sarxos.pl/) even easier to use.
 
-## New to Java?
-
-If you are new to Java, then using BoofCV will be a challenge.  With just a little bit of knowledge it is possible to build and run examples using the instructions below.  Integrating BoofCV into your own project is another issue.  If you don't know what a jar file is or how to import classes, it is highly recommend that you learn the basics first before attempting to use BoofCV.
-
 ## Directories
 
 Directory       | Description
@@ -98,77 +90,43 @@ main/           | Contains the source code for BoofCV
 # Building from Source
 ------------------------------------
 
-BoofCV is a java library and can be compiled on any platform with Java installed. Gradle is now the preferred way to build BoofCV.  There are still Ant build scripts laying around but those will be removed in the near future and their use is not officially supported any more.
+Building and installing BoofCV into your local Maven repository is easy[1] using the [gradlew](https://docs.gradle.org/current/userguide/gradle_wrapper.html) script:
+```bash
+cd boofcv
+./gradlew install
+```
+If you wish to have jars instead, the following commands are provided.
+```bash
+./gradlew oneJarBin               # Builds a single jar with all of BoofCV in it
+./gradlew createLibraryDirectory  # Puts all jars and dependencies into boofcv/library
+./gradlew alljavadoc              # Combines all JavaDoc from all sub-porjects into a single set
+```
 
-BEFORE trying to compile BoofCV make sure you have the following installed and that the paths are setup correctly:
 
-- [ Java Developers Kit (JDK) version 1.6 or later    ]
-  ( http://www.oracle.com/technetwork/java/index.html )
-- [ Gradle                                            ]
-  ( http://www.gradle.org/                            )
-
-BoofCV is very easy to build on just about any system with Gradle and Java support.  Gradle will download all of the dependencies for you.  Well that's not totally true, there are a couple of optional packages which require manual downloading since they lack jars on Maven central. More on that later.
-
-*NOTE* As an alternative to installing Gradle directly there are shell scripts "boofcv/gradlew" and "boofcv/gradlew.bat".  They will download gradle and execute the commands the same as invoking "gradle" would.
-
-Below are a few useful custom Gradle scripts that can be invoked:
-
-* _oneJarBin_ : Creates a single jar that contains all of BoofCV main and integration
-* _createLibraryDirectory_ : Will gather all the BoofCV jars (main and integration) and jars that BoofCV depends on and place them in the "boofcv/library" directory.
-* _alljavadoc_ : Combines JavaDoc from all the sub-projects into one set.
-
-_createLibraryDirectory_ unless all dependencies are meet, not all projects in 'boofcv/integration' will produce jars.  See the "Integration Modules" section below for the details.
-
-## Compilation Error
-
-A stable build should always compile out of the box with no problem.  All of the examples should run without any problems, as long as you don't modify anything, even slightly.  Before you complain about a problem on a stable build make sure you are absolutely certain that you're doing everything right.  If after a few 
-attempts you still can't figure out post a message.  Maybe these instructions are lacking in clarity.
-
-If you checked out the code from Github then you don't have a stable build and like to live dangerously.  There is a chance the code won't compile or one of the libraries it depends on has changed.  If you get a compilation error feel free to post a polite message with a copy of the error asking for someone to fix it.
+[1] A couple of the integration submodules have a custom build process that can't be performed by Gradle.  The script is smart enough to ignore modules and tell you that it is doing so if you haven't configured it yet.
 
 ## IntelliJ
 
-You will need to import the Gradle project into IntelliJ.  Verified to work in IntelliJ IDEA 13 and beyond.
+IntelliJ is the recommended IDE for use with BoofCV.  With IntelliJ you can directly import the Gradle project.  
 
-### Install IntelliJ Gradle Plug-In
-1. File -> Settings -> Plugins
-2. Search for Gradle. Install if it isn't already
-
-### Opening the Project
-1. File->Import Project
-2. Select boofcv/build.gradle
+1. File->Project From Existing Sources
+2. Select your local "boofcv" directory
+3. Confirm that you wish to import the Gradle project
 
 ## Eclipse
 
-Eclipse has a Gradle plugin available which allow it to open a Gradle project directly.  The following was
- tested with Kepler.
+The easiest way to import the project is to use Gradle to generate an Eclipse project.
 
-### Install Eclipse Gradle Plug-In
-1. Help -> Eclipse Marketplace
-2. Search for "Gradle IDE Pack" and install
-3. Restart Eclipse
-
-### Configure Gradle
-1. Window -> Preference -> Gradle EnIDE
-2. Specify Gradle Home.  On my system this is /opt/gradle/gradle-1.12
-3. Click OK
-
-### Opening the Project
-1. File -> Import -> SelectGradle
-2. Click "Browse" button and browse to boofcv/ directory
-3. Click "Build Model" button
-4. Click "Select All" to import all sub-projects 
-5. Click finish
-
-## Integration Modules
-
-Most of the modules in the integration package should automatically with everything else.  Some require you to manually download and place files in certain locations.  Until you do so Gradle will ignore those modules.
-Specific instructions are contained in the readme file in each of the module directories.
+```bash
+cd boofcv
+./gradlew eclipse
+```
+Then in Eclipse; 1) "import existing projects", 2) Select your BoofCV directory, 3) Click Finish.  You can also install a Gradle plugin to Eclipse and import the project directory.  That's left as an exercise for the reader.
 
 # Dependencies
 -----------------------------------------
 
-The main BoofCV modules depends on the following libraries
+Core BoofCV modules depends on the following libraries
 
 - [ EJML          ]  ( http://code.google.com/p/efficient-java-matrix-library )
 - [ GeoRegression ]  ( http://georegression.org                               )
