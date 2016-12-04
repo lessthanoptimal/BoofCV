@@ -4,3 +4,4 @@
 *.jar
 **/*.iml
 **/*.ipr
+.DS_Store
