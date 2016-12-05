@@ -219,6 +219,16 @@ task oneJarBin(type: Jar, dependsOn: javadocProjects.collect { it + ":compileJav
     from files(javadocProjects.collect { project(it).sourceSets.main.output })
 }
 
+task checkDependsOnSNAPSHOT( dependsOn: javadocProjects.collect {[ it+':jar',it+':sourcesJar']}.flatten()) << {
+    javadocProjects.each {
+        project(it).configurations.compile.each {
+            println it
+            if (it.toString().contains("SNAPSHOT"))
+                throw new Exception("Release build contains snapshot dependencies: " + it)
+        }
+    }
+}
+
 task alljavadoc(type: Javadoc) {
     // only include source code in src directory to avoid including 3rd party code which some projects do as a hack
     source = javadocProjects.collect { project(it).fileTree('src').include('**/*.java') }
