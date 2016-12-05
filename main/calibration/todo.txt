@@ -1,5 +1,0 @@
-- Square Grid
- * Try Hough transform for edge detection
-
-- Chessboard:  Calibration grids with even lengths are cropped in the polygon, making some corners impossible to detect
-               need to extend those corners out
