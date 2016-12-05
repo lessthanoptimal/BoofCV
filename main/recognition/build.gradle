@@ -5,7 +5,9 @@ dependencies {
     compile project(':main:sfm')
 
     ['main','models'].each {String a ->
-        compile group: 'org.deepboof', name: a, version: '0.2'}
+        compile( group: 'org.deepboof', name: a, version: project.deepboof_version) {
+            exclude group: 'com.thoughtworks.xstream'
+        }}
 
     testCompile project(':main:io')
     testCompile project(':main:visualize')

@@ -11,9 +11,6 @@ dependencies {
     compile project(':integration:javacv')
     compile project(':integration:WebcamCapture')
 
-    ['io'].each {String a ->
-        compile('org.deepboof:'+a+':0.2-SNAPSHOT')}
-
     compile 'org.reflections:reflections:0.9.10'
 }
 

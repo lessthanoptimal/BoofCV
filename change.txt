@@ -12,12 +12,15 @@ Version : 0.26
 - Renamed EquirectangularTo* to *ToEquirectangular
   * Those classes convert pixels in * coordinates into their location in the equirectangular image
   * They are used to generate a * image from equirectangular
-- 32bit auto coding switched over to using auto64fto32f library
+- Float 32bit auto coding switched over to using auto64fto32f library
 - TypeInterpolate is now InterpolationType for consistency
 - Examples
   * InterpolatePixel example added
 - Demonstrations
   * Improved DemonstrationInterpolateScaleApp (renamed also)
+- Gradle
+  * Will fail on dependency version conflict now
+  * Removed xstream version conflict
 
 ---------------------------------------------
 Date    : 2016/12/01

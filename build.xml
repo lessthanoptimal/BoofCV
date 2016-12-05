@@ -12,10 +12,10 @@
         <pathelement path="main/sfm/src"/>
         <pathelement path="main/visualize/src"/>
         <pathelement path="integration/android/src"/>
+        <pathelement path="integration/javacv/src"/>
         <pathelement path="integration/jcodec/src"/>
         <pathelement path="integration/openkinect/src"/>
         <pathelement path="integration/WebcamCapture/src"/>
-        <pathelement path="integration/xuggler/src"/>
     </path>
 
     <target name="javadocWeb">

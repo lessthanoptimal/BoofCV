@@ -37,6 +37,9 @@ import static org.junit.Assert.*;
 /**
  * Tests which check to see if specific objects can be serialized or not
  *
+ * WARNING: This will fail if the android module is loaded into memory at the same time.  It has a version of xmlstream
+ * which isn't compatible and can't be excluded since Android is a massive jar.
+ *
  * @author Peter Abeles
  */
 public class TestObjectSerialization {

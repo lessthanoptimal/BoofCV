@@ -10,6 +10,8 @@ allprojects {
     version = '0.26-SNAPSHOT'
 }
 
+project.ext.set("deepboof_version", '0.2')
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'osgi'
@@ -18,6 +20,12 @@ subprojects {
 
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
+
+    configurations.all {
+        resolutionStrategy {
+            failOnVersionConflict()
+        }
+    }
 
     repositories {
         mavenCentral()
