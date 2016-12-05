@@ -4,8 +4,6 @@
    * README.md
    * BoofDefaults.version
    * Gradle
-- Make sure there are no SNAPSHOT dependencies
-  * gradle checkDependsOnSNAPSHOT
 - Set release data in change.txt
 - Make sure all examples work
 - Make sure all applications in evaluation work

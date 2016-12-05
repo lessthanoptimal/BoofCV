@@ -20,7 +20,8 @@ Version : 0.26
   * Improved DemonstrationInterpolateScaleApp (renamed also)
 - Gradle
   * Will fail on dependency version conflict now
-  * Removed xstream version conflict
+  * Will fail when building release with SNAPSHOT dependencies
+  * Resolved xstream version conflict
 
 ---------------------------------------------
 Date    : 2016/12/01
