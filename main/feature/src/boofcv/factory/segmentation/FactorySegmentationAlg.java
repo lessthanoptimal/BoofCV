@@ -20,7 +20,7 @@ package boofcv.factory.segmentation;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.alg.segmentation.fh04.FhEdgeWeights;
 import boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04;
@@ -97,7 +97,7 @@ public class FactorySegmentationAlg {
 					spacialRadius,spacialRadius,colorRadius,config.fast);
 		} else {
 			InterpolatePixelMB interp = FactoryInterpolation.createPixelMB(0,255,
-					InterpolateType.BILINEAR, BorderType.EXTENDED,(ImageType)imageType);
+					InterpolationType.BILINEAR, BorderType.EXTENDED,(ImageType)imageType);
 			search = new SegmentMeanShiftSearchColor(maxIterations,convergenceTol,interp,
 					spacialRadius,spacialRadius,colorRadius,config.fast,imageType);
 		}

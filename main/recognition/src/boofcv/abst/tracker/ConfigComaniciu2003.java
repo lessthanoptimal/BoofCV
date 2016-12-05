@@ -18,7 +18,7 @@
 
 package boofcv.abst.tracker;
 
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 
 /**
  * Configuration for {@link Comaniciu2003_to_TrackerObjectQuad}.
@@ -79,7 +79,7 @@ public class ConfigComaniciu2003 {
 	/**
 	 * Which interpolation method should it use.
 	 */
-	public InterpolateType interpolation = InterpolateType.BILINEAR;
+	public InterpolationType interpolation = InterpolationType.BILINEAR;
 
 	public ConfigComaniciu2003(int numSamples, int numHistogramBins, float scaleWeight ) {
 		this.numSamples = numSamples;

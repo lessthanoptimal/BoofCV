@@ -20,7 +20,7 @@ package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -47,7 +47,7 @@ public class TestSegmentMeanShiftSearchColor {
 
 	ImageType<Planar<GrayF32>> imageType = ImageType.pl(2,GrayF32.class);
 	InterpolatePixelMB<Planar<GrayF32>> interp =
-			FactoryInterpolation.createPixelMB(0,255, InterpolateType.BILINEAR, BorderType.EXTENDED,imageType);
+			FactoryInterpolation.createPixelMB(0,255, InterpolationType.BILINEAR, BorderType.EXTENDED,imageType);
 
 	/**
 	 * Process a random image and do a basic sanity check on the output
@@ -154,7 +154,7 @@ public class TestSegmentMeanShiftSearchColor {
 
 		ImageType<Planar<GrayF32>> imageType = ImageType.pl(1,GrayF32.class);
 		InterpolatePixelMB<Planar<GrayF32>> interpMB =
-				FactoryInterpolation.createPixelMB(0,255, InterpolateType.BILINEAR, BorderType.EXTENDED,imageType);
+				FactoryInterpolation.createPixelMB(0,255, InterpolationType.BILINEAR, BorderType.EXTENDED,imageType);
 		InterpolatePixelS<GrayF32> interpSB = FactoryInterpolation.bilinearPixelS(
 				GrayF32.class, BorderType.EXTENDED);
 

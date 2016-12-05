@@ -23,7 +23,7 @@ import boofcv.alg.distort.impl.*;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.*;
@@ -38,17 +38,17 @@ public class FactoryDistort {
 	 * and interpolation instance.  Min and max pixel values are assumed to be 0 and 255, respectively.
 	 *
 	 * @param cached If true the distortion is only computed one.  False for recomputed each time, but less memory.
-	 * @param interpolateType  Which interpolation method it should use
+	 * @param interpolationType  Which interpolation method it should use
 	 * @param borderType How pixels outside the image border are handled
 	 * @param inputType Type of input image
 	 * @param outputType Type of output image
 	 * @return ImageDistort
 	 */
 	public static <Input extends ImageBase, Output extends ImageBase>
-	ImageDistort<Input, Output> distort(boolean cached, InterpolateType interpolateType, BorderType borderType,
+	ImageDistort<Input, Output> distort(boolean cached, InterpolationType interpolationType, BorderType borderType,
 										ImageType<Input> inputType, ImageType<Output> outputType) {
 		InterpolatePixel<Input> interp =
-				FactoryInterpolation.createPixel(0,255, interpolateType,borderType,inputType);
+				FactoryInterpolation.createPixel(0,255, interpolationType,borderType,inputType);
 
 		return distort(cached, interp,outputType);
 	}

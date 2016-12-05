@@ -18,7 +18,7 @@
 
 package boofcv.abst.tracker;
 
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.tracker.tld.TldParameters;
 import boofcv.struct.Configuration;
 
@@ -38,7 +38,7 @@ public class ConfigTld implements Configuration {
 	 * Specifies the type of interpolation.  More stable with bilinear, but nearest-neighbor can be
 	 * used to maximize speed.
 	 */
-	public InterpolateType interpolate = InterpolateType.BILINEAR;
+	public InterpolationType interpolate = InterpolationType.BILINEAR;
 
 	@Override
 	public void checkValidity() {
@@ -47,7 +47,7 @@ public class ConfigTld implements Configuration {
 
 	public ConfigTld( boolean stable ) {
 		if( !stable ) {
-			interpolate = InterpolateType.NEAREST_NEIGHBOR;
+			interpolate = InterpolationType.NEAREST_NEIGHBOR;
 			parameters.scaleSpread = 0; // turns off a good chunk of scale invariance
 			parameters.maximumCascadeConsider = 25;
 			parameters.numNegativeFerns = 400;

@@ -20,7 +20,7 @@ package boofcv.alg.distort.spherical;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionWideFOV;
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
@@ -162,7 +162,7 @@ public class TestMultiCameraToEquirectangular {
 	private MultiCameraToEquirectangular<GrayF32> createAlgorithm() {
 		ImageType<GrayF32> imageType = ImageType.single(GrayF32.class);
 		ImageDistort<GrayF32,GrayF32> distort = FactoryDistort.
-				distort(false, InterpolateType.BILINEAR, BorderType.ZERO,imageType,imageType);
+				distort(false, InterpolationType.BILINEAR, BorderType.ZERO,imageType,imageType);
 		MultiCameraToEquirectangular<GrayF32> alg = new MultiCameraToEquirectangular<>(distort,
 				equiWidth, equiHeight, imageType);
 		alg.setMaskToleranceAngle(UtilAngle.radian(2)); // increase tolerance due to resolution

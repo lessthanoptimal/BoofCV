@@ -51,7 +51,7 @@ import boofcv.demonstrations.filter.DisplayGaussianKernelApp;
 import boofcv.demonstrations.filter.DisplaySteerableGaussianApp;
 import boofcv.demonstrations.filter.ShowImageBlurApp;
 import boofcv.demonstrations.filter.ShowImageDerivative;
-import boofcv.demonstrations.interpolate.EvaluateInterpolateEnlargeApp;
+import boofcv.demonstrations.ip.DemonstrationInterpolateScaleApp;
 import boofcv.demonstrations.ip.VisualizeFlipRotate;
 import boofcv.demonstrations.segmentation.VisualizeImageSegmentationApp;
 import boofcv.demonstrations.segmentation.VisualizeWatershedApp;
@@ -155,7 +155,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				DisplaySteerableGaussianApp.class,
 				ShowImageBlurApp.class,
 				ShowImageDerivative.class,
-				EvaluateInterpolateEnlargeApp.class,
+				DemonstrationInterpolateScaleApp.class,
 				VisualizeFlipRotate.class,
 				VisualizeImageSegmentationApp.class,
 				VisualizeWatershedApp.class);

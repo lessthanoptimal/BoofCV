@@ -20,7 +20,7 @@ package boofcv.alg.distort;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
@@ -69,7 +69,7 @@ public class RemovePerspectiveDistortion<T extends ImageBase> {
 		distort = new FDistort(imageType);
 		distort.output(output);
 
-		distort.interp(InterpolateType.BILINEAR).transform(homography);
+		distort.interp(InterpolationType.BILINEAR).transform(homography);
 
 		for (int i = 0; i < 4; i++) {
 			associatedPairs.add( new AssociatedPair());

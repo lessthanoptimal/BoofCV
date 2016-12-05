@@ -19,7 +19,7 @@
 package boofcv.alg.sfm.overhead;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GImageGray;
 import boofcv.core.image.border.BorderType;
@@ -60,7 +60,7 @@ public class CreateSyntheticOverheadViewPL<T extends ImageGray>
 	 * @param numBands Number of bands in the image.
 	 * @param imageType Image of each band
 	 */
-	public CreateSyntheticOverheadViewPL(InterpolateType type , int numBands , Class<T> imageType ) {
+	public CreateSyntheticOverheadViewPL(InterpolationType type , int numBands , Class<T> imageType ) {
 		this.interp = new InterpolatePixelS[numBands];
 		for( int i = 0; i < numBands; i++ ) {
 			interp[i] = FactoryInterpolation.createPixelS(0, 255, type, BorderType.EXTENDED, imageType);

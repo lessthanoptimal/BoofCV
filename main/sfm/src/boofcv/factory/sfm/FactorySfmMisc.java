@@ -19,7 +19,7 @@
 package boofcv.factory.sfm;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.sfm.overhead.CreateSyntheticOverheadView;
 import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewPL;
 import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewS;
@@ -47,7 +47,7 @@ public class FactorySfmMisc {
 			}
 
 			case PLANAR:
-				return new CreateSyntheticOverheadViewPL(InterpolateType.BILINEAR,imageType.getNumBands(),classType);
+				return new CreateSyntheticOverheadViewPL(InterpolationType.BILINEAR,imageType.getNumBands(),classType);
 
 			default:
 				throw new IllegalArgumentException(imageType.getFamily()+" is not supported");

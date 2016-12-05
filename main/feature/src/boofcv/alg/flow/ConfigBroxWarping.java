@@ -18,7 +18,7 @@
 
 package boofcv.alg.flow;
 
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.struct.Configuration;
 
 /**
@@ -77,7 +77,7 @@ public class ConfigBroxWarping implements Configuration {
 	/**
 	 * Type of interpolation used.  Bilinear recommended
 	 */
-	public InterpolateType interpolation = InterpolateType.BILINEAR;
+	public InterpolationType interpolation = InterpolationType.BILINEAR;
 
 	@Override
 	public void checkValidity() {}

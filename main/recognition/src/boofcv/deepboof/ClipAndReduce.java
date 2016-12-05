@@ -21,7 +21,7 @@ package boofcv.deepboof;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -58,7 +58,7 @@ public class ClipAndReduce<T extends ImageBase<T>> {
 	public ClipAndReduce( boolean clip , ImageType<T> imageType ) {
 		this.clip = clip;
 		InterpolatePixel<T> interp =
-				FactoryInterpolation.createPixel(0,255, InterpolateType.BILINEAR, BorderType.EXTENDED,imageType);
+				FactoryInterpolation.createPixel(0,255, InterpolationType.BILINEAR, BorderType.EXTENDED,imageType);
 		distort = FactoryDistort.distort(false,interp,imageType);
 		distort.setModel(new PixelTransformAffine_F32(transform));
 	}

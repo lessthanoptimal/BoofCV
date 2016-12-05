@@ -20,7 +20,7 @@ package boofcv.alg.background.moving;
 
 import boofcv.alg.background.BackgroundModelMoving;
 import boofcv.alg.distort.PointTransformHomography_F32;
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -41,6 +41,6 @@ public class TestBackgroundMovingBasic_SB extends GenericBackgroundMovingBasicCh
 	public <T extends ImageBase> BackgroundModelMoving<T, Homography2D_F32>
 	create(ImageType<T> imageType) {
 		PointTransformHomography_F32 transform = new PointTransformHomography_F32();
-		return new BackgroundMovingBasic_SB(0.05f,10f,transform, InterpolateType.BILINEAR,imageType.getImageClass());
+		return new BackgroundMovingBasic_SB(0.05f,10f,transform, InterpolationType.BILINEAR,imageType.getImageClass());
 	}
 }

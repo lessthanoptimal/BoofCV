@@ -19,7 +19,7 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -57,7 +57,7 @@ public class TestDistortImageOps {
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		DistortImageOps.scale(input,output, BorderType.ZERO, InterpolateType.BILINEAR);
+		DistortImageOps.scale(input,output, BorderType.ZERO, InterpolationType.BILINEAR);
 
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(input, BorderType.EXTENDED);
 		interp.setImage(input);
@@ -92,7 +92,7 @@ public class TestDistortImageOps {
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		DistortImageOps.rotate(input, output,BorderType.ZERO, InterpolateType.BILINEAR, (float) Math.PI / 2f);
+		DistortImageOps.rotate(input, output,BorderType.ZERO, InterpolationType.BILINEAR, (float) Math.PI / 2f);
 
 		double error = 0;
 		// the outside pixels are ignored because numerical round off can cause those to be skipped

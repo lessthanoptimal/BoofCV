@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.overhead;
 
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
@@ -56,7 +56,7 @@ public class TestCreateSyntheticOverheadViewPL {
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
 
 		CreateSyntheticOverheadViewPL<GrayF32> alg =
-				new CreateSyntheticOverheadViewPL<>(InterpolateType.BILINEAR,3,GrayF32.class);
+				new CreateSyntheticOverheadViewPL<>(InterpolationType.BILINEAR,3,GrayF32.class);
 
 		alg.configure(param,planeToCamera,centerX,centerY,cellSize,overheadW,overheadH);
 

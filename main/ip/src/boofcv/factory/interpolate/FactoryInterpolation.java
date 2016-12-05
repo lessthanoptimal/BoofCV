@@ -44,7 +44,7 @@ public class FactoryInterpolation {
 	 * @return Interpolation for single band image
 	 */
 	public static <T extends ImageGray> InterpolatePixelS<T>
-	createPixelS(double min, double max, InterpolateType type, BorderType borderType , ImageDataType dataType )
+	createPixelS(double min, double max, InterpolationType type, BorderType borderType , ImageDataType dataType )
 	{
 
 		Class t = ImageDataType.typeToSingleClass(dataType);
@@ -53,7 +53,7 @@ public class FactoryInterpolation {
 	}
 
 	public static <T extends ImageBase> InterpolatePixel<T>
-	createPixel(double min, double max, InterpolateType type, BorderType borderType, ImageType<T> imageType) {
+	createPixel(double min, double max, InterpolationType type, BorderType borderType, ImageType<T> imageType) {
 		switch( imageType.getFamily() ) {
 			case GRAY:
 			case PLANAR:
@@ -78,7 +78,7 @@ public class FactoryInterpolation {
 	 * @return Interpolation
 	 */
 	public static <T extends ImageGray> InterpolatePixelS<T>
-	createPixelS(double min, double max, InterpolateType type, BorderType borderType, Class<T> imageType)
+	createPixelS(double min, double max, InterpolationType type, BorderType borderType, Class<T> imageType)
 	{
 		InterpolatePixelS<T> alg;
 
@@ -116,7 +116,7 @@ public class FactoryInterpolation {
 	 * @param imageType Type of input image
 	 */
 	public static <T extends ImageBase> InterpolatePixelMB<T>
-	createPixelMB(double min, double max, InterpolateType type, BorderType borderType, ImageType<T> imageType )
+	createPixelMB(double min, double max, InterpolationType type, BorderType borderType, ImageType<T> imageType )
 	{
 		switch (imageType.getFamily()) {
 

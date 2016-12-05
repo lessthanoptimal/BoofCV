@@ -22,7 +22,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.spherical.CylinderToEquirectangular_F32;
 import boofcv.alg.distort.spherical.EquirectangularTools_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -78,7 +78,7 @@ public class EquirectangularCylinderApp<T extends ImageBase> extends Demonstrati
 
 		BorderType borderType = BorderType.EXTENDED;
 		InterpolatePixel<T> interp =
-				FactoryInterpolation.createPixel(0, 255, InterpolateType.BILINEAR,borderType, imageType);
+				FactoryInterpolation.createPixel(0, 255, InterpolationType.BILINEAR,borderType, imageType);
 		distortImage = FactoryDistort.distort(true, interp, imageType);
 		distortImage.setRenderAll(true);
 

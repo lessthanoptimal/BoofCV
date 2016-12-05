@@ -22,7 +22,7 @@ import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -74,7 +74,7 @@ public class LensDistortionOps {
 		if( skip )
 			borderType = BorderType.EXTENDED;
 
-		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255, InterpolateType.BILINEAR,borderType, bandType);
+		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255, InterpolationType.BILINEAR,borderType, bandType);
 
 		Point2Transform2_F32 undistToDist = null;
 		switch( type ) {

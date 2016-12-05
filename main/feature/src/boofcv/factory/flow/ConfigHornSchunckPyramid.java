@@ -18,7 +18,7 @@
 
 package boofcv.factory.flow;
 
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.struct.Configuration;
 
 /**
@@ -65,7 +65,7 @@ public class ConfigHornSchunckPyramid implements Configuration {
 	/**
 	 * Type of interpolation used.  Bilinear recommended
 	 */
-	public InterpolateType interpolation = InterpolateType.BILINEAR;
+	public InterpolationType interpolation = InterpolationType.BILINEAR;
 
 
 	@Override

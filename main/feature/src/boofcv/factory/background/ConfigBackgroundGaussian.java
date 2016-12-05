@@ -18,7 +18,7 @@
 
 package boofcv.factory.background;
 
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.struct.Configuration;
 
 /**
@@ -53,12 +53,12 @@ public class ConfigBackgroundGaussian implements Configuration {
 	public float minimumDifference = 0;
 
 	/**
-	 * Specifies which interpolation it will use.  {@link InterpolateType#BILINEAR} or
-	 * {@link InterpolateType#NEAREST_NEIGHBOR} recommended.
+	 * Specifies which interpolation it will use.  {@link InterpolationType#BILINEAR} or
+	 * {@link InterpolationType#NEAREST_NEIGHBOR} recommended.
 	 *
 	 * <p>ONLY USED FOR MOVING BACKGROUNDS!</p>
 	 */
-	public InterpolateType interpolation = InterpolateType.BILINEAR;
+	public InterpolationType interpolation = InterpolationType.BILINEAR;
 
 	public ConfigBackgroundGaussian(float threshold) {
 		this.threshold = threshold;

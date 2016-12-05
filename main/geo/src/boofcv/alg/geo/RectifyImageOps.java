@@ -24,7 +24,7 @@ import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.rectify.RectifyFundamental;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -439,7 +439,7 @@ public class RectifyImageOps {
 			borderType = BorderType.EXTENDED;
 		}
 		InterpolatePixel<T> interp =
-				FactoryInterpolation.createPixel(0,255, InterpolateType.BILINEAR,borderType,imageType);
+				FactoryInterpolation.createPixel(0,255, InterpolationType.BILINEAR,borderType,imageType);
 
 		// only compute the transform once
 		ImageDistort<T,T> ret = FactoryDistort.distort(true, interp, imageType);

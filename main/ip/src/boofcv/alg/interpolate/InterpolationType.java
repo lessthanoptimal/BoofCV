@@ -24,7 +24,7 @@ package boofcv.alg.interpolate;
  *
  * @author Peter Abeles
  */
-public enum InterpolateType {
+public enum InterpolationType {
 	NEAREST_NEIGHBOR,
 	BILINEAR,
 	BICUBIC,

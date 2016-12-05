@@ -21,7 +21,7 @@ package boofcv.alg.distort;
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -67,7 +67,7 @@ public class DistortImageOps {
 	 */
 	@Deprecated
 	public static <T extends ImageBase>
-	void affine(T input, T output, BorderType borderType, InterpolateType interpType,
+	void affine(T input, T output, BorderType borderType, InterpolationType interpType,
 				double a11, double a12, double a21, double a22,
 				double dx, double dy)
 	{
@@ -104,7 +104,7 @@ public class DistortImageOps {
 	public static <Input extends ImageGray,Output extends ImageGray>
 	void distortSingle(Input input, Output output,
 					   PixelTransform2_F32 transform,
-					   InterpolateType interpType, BorderType borderType)
+					   InterpolationType interpType, BorderType borderType)
 	{
 		boolean skip = borderType == BorderType.SKIP;
 		if( skip )
@@ -158,7 +158,7 @@ public class DistortImageOps {
 			M extends Planar<Input>,N extends Planar<Output>>
 	void distortPL(M input, N output,
 				   PixelTransform2_F32 transform,
-				   BorderType borderType, InterpolateType interpType)
+				   BorderType borderType, InterpolationType interpType)
 	{
 		Class<Input> inputBandType = input.getBandType();
 		Class<Output> outputBandType = output.getBandType();
@@ -186,7 +186,7 @@ public class DistortImageOps {
 	 */
 	public static <Input extends ImageGray,Output extends ImageGray>
 	ImageDistort<Input,Output> createImageDistort(Point2Transform2_F32 transform,
-												  InterpolateType interpType, BorderType borderType,
+												  InterpolationType interpType, BorderType borderType,
 												  Class<Input> inputType, Class<Output> outputType)
 	{
 		InterpolatePixelS<Input> interp = FactoryInterpolation.createPixelS(0, 255, interpType,borderType, inputType);
@@ -207,7 +207,7 @@ public class DistortImageOps {
 	 */
 	@Deprecated
 	public static <T extends ImageBase>
-	void scale(T input, T output, BorderType borderType, InterpolateType interpType) {
+	void scale(T input, T output, BorderType borderType, InterpolationType interpType) {
 
 		PixelTransformAffine_F32 model = DistortSupport.transformScale(output, input, null);
 
@@ -240,7 +240,7 @@ public class DistortImageOps {
 	 */
 	@Deprecated
 	public static <T extends ImageBase>
-	void rotate(T input, T output, BorderType borderType, InterpolateType interpType, float angleInputToOutput) {
+	void rotate(T input, T output, BorderType borderType, InterpolationType interpType, float angleInputToOutput) {
 
 		float offX = 0;//(output.width+1)%2;
 		float offY = 0;//(output.height+1)%2;

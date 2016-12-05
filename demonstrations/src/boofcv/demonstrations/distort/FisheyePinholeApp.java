@@ -25,7 +25,7 @@ import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.InterpolateType;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -108,7 +108,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 
 		BorderType borderType = BorderType.EXTENDED;
 		InterpolatePixel<T> interp =
-				FactoryInterpolation.createPixel(0, 255, InterpolateType.BILINEAR,borderType, imageType);
+				FactoryInterpolation.createPixel(0, 255, InterpolationType.BILINEAR,borderType, imageType);
 		distortImage = FactoryDistort.distort(true, interp, imageType);
 		distortImage.setRenderAll(true);
 
