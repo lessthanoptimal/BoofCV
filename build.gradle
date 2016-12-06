@@ -10,7 +10,7 @@ allprojects {
     version = '0.26-SNAPSHOT'
 }
 
-project.ext.set("deepboof_version", '0.2')
+project.ext.set("deepboof_version", '0.3-SNAPSHOT')
 
 subprojects {
     apply plugin: 'java'

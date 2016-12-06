@@ -41,6 +41,7 @@ public class FactoryImageClassifier {
 	public static ClassifierAndSource vgg_cifar10() {
 		List<String> sources = new ArrayList<>();
 		sources.add( "http://heanet.dl.sourceforge.net/project/deepboof/networks/v1/likevgg_cifar10.zip" );
+		sources.add( "http://pilotfiber.dl.sourceforge.net/project/deepboof/networks/v1/likevgg_cifar10.zip" );
 
 		ClassifierAndSource ret = new ClassifierAndSource();
 
@@ -60,6 +61,7 @@ public class FactoryImageClassifier {
 	public static ClassifierAndSource nin_imagenet() {
 		List<String> sources = new ArrayList<>();
 		sources.add( "http://heanet.dl.sourceforge.net/project/boofcv/datasets/nin_imagenet.zip" );
+		sources.add( "http://pilotfiber.dl.sourceforge.net/project/boofcv/datasets/nin_imagenet.zip" );
 
 		ClassifierAndSource ret = new ClassifierAndSource();
 

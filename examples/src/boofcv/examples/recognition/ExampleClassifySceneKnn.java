@@ -40,6 +40,7 @@ import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -253,9 +254,13 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		if( !trainingDir.exists() || !testingDir.exists() ) {
 			String addressSrc = "http://jaist.dl.sourceforge.net/project/boofcv/datasets/bow_data_v001.zip";
 			File dst = trainingDir.getParentFile();
-			DeepBoofDataBaseOps.download(addressSrc,dst);
-			DeepBoofDataBaseOps.decompressZip(new File(dst, "bow_data_v001.zip"), dst, true);
-			System.out.println("Download complete!");
+			try {
+				DeepBoofDataBaseOps.download(addressSrc, dst);
+				DeepBoofDataBaseOps.decompressZip(new File(dst, "bow_data_v001.zip"), dst, true);
+				System.out.println("Download complete!");
+			} catch( IOException e ) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			System.out.println("Delete and download again if there are file not found errors");
 			System.out.println("   "+trainingDir);
