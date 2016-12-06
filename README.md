@@ -16,7 +16,7 @@ Table of Contents
 # Introduction
 ------------------------------------
 
-BoofCV is an open source computer vision library written entirely in Java by Peter Abeles.  It is released under the Apache License 2.0.  Source code, examples, and other utilties are included in this package.  This document contains only a brief summary of the directory structure and how to build the source code.  For more detailed and update information please visible the web pages below.
+BoofCV is an open source real-time computer vision library written entirely in Java and released under the Apache License 2.0.  Functionality includes low-level image processing, camera calibration, feature detection/tracking, structure-from-motion, classification, and recognition.
 
 - [ Project Webpage ] ( http://boofcv.org                                  )
 - [ Message Board   ] ( https://groups.google.com/group/boofcv             )
