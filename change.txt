@@ -15,7 +15,8 @@ Version : 0.26
 - Float 32bit auto coding switched over to using auto64fto32f library
 - TypeInterpolate is now InterpolationType for consistency
 - Examples
-  * InterpolatePixel example added
+  * InterpolatePixel added
+  * Image blur added
 - Demonstrations
   * Improved DemonstrationInterpolateScaleApp (renamed also)
 - Gradle
