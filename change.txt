@@ -6,9 +6,9 @@ Date Format: year/month/day
 Date    : 2017
 Version : 0.26
 
-- Fixed a long standing unit test issue where convolve would some times on some systems erratically fail
+- Fixed a long standing unit test issue where convolve unit test would some times on some systems erratically fail
   * Appears that sometimes the random numbers caused a buffer overflow for U8 images
-  * Now why it didn't have the exact same numbers every time with a fixed seed is disturbing...
+  * Now why it didn't have the exact same numbers every time when it has a fixed seed is disturbing...
 - Renamed EquirectangularTo* to *ToEquirectangular
   * Those classes convert pixels in * coordinates into their location in the equirectangular image
   * They are used to generate a * image from equirectangular
@@ -23,6 +23,9 @@ Version : 0.26
   * Will fail on dependency version conflict now
   * Will fail when building release with SNAPSHOT dependencies
   * Resolved xstream version conflict
+- Updated DeepBoof
+  * This is to get around an issue with a java wget library where it would hang instead of giving up
+  * New code is also much more informative and prints out size info and download status
 
 ---------------------------------------------
 Date    : 2016/12/01

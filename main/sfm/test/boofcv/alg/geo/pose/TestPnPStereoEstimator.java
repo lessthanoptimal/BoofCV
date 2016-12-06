@@ -60,8 +60,8 @@ public class TestPnPStereoEstimator extends CommonStereoMotionNPoint {
 		alg.setLeftToRight(leftToRight);
 		assertTrue(alg.process(pointPose, found));
 
-		found.print();
-		expected.print();
+//		found.print();
+//		expected.print();
 
 		assertTrue(MatrixFeatures.isIdentical(expected.getR(), found.getR(), 1e-8));
 		assertTrue(found.getT().isIdentical(expected.getT(), 1e-8));
