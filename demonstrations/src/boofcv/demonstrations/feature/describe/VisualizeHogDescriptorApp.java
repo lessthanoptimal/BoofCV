@@ -259,10 +259,10 @@ public class VisualizeHogDescriptorApp<T extends ImageBase> extends Demonstratio
 	public static void main(String[] args) {
 		List<String> examples = new ArrayList<>();
 
-		examples.add(UtilIO.pathExample("shapes/shapes01.png"));
-		examples.add(UtilIO.pathExample("shapes/shapes02.png"));
 		examples.add(UtilIO.pathExample("segment/berkeley_horses.jpg"));
 		examples.add(UtilIO.pathExample("segment/berkeley_man.jpg"));
+		examples.add(UtilIO.pathExample("shapes/shapes01.png"));
+		examples.add(UtilIO.pathExample("shapes/shapes02.png"));
 		ImageType imageType = ImageType.single(GrayF32.class);
 
 		VisualizeHogDescriptorApp app = new VisualizeHogDescriptorApp(examples, imageType);

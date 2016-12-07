@@ -1,5 +1,5 @@
 dependencies {
-    compile group: 'com.peterabeles', name: 'auto64fto32f', version: '1.0'
+    compile group: 'com.peterabeles', name: 'auto64fto32f', version: '1.0.1'
 }
 
 idea {
