@@ -17,6 +17,7 @@ Version : 0.26
 - Examples
   * InterpolatePixel added
   * Image blur added
+  * Non-Maximum Suppression added
 - Demonstrations
   * Improved DemonstrationInterpolateScaleApp (renamed also)
 - Gradle
