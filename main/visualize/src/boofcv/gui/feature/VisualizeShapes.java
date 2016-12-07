@@ -266,7 +266,7 @@ public class VisualizeShapes {
 	public static void drawEllipse( EllipseRotated_F64 ellipse , double scale , Graphics2D g2 ) {
 
 		AffineTransform rotate = new AffineTransform();
-		rotate.rotate(ellipse.phi+Math.PI/2.0);
+		rotate.rotate(ellipse.phi);
 
 		double w = scale*ellipse.a*2;
 		double h = scale*ellipse.b*2;

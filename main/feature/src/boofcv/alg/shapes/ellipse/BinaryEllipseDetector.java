@@ -18,6 +18,7 @@
 
 package boofcv.alg.shapes.ellipse;
 
+import boofcv.alg.filter.binary.Contour;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -164,6 +165,10 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 
 	public Class<T> getInputType() {
 		return inputType;
+	}
+
+	public List<Contour> getAllContours() {
+		return ellipseDetector.getContourFinder().getContours().toList();
 	}
 
 	/**

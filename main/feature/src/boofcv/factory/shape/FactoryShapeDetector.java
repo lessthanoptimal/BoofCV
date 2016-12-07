@@ -71,7 +71,7 @@ public class FactoryShapeDetector {
 		EdgeIntensityEllipse<T> check = new EdgeIntensityEllipse<>(
 				config.checkRadialDistance,
 				config.numSampleContour,
-				config.checkIntensityThreshold, imageType);
+				config.minimumEdgeIntensity, imageType);
 
 		return new BinaryEllipseDetector<>(detector, refine, check, imageType);
 	}

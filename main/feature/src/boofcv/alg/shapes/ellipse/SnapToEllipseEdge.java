@@ -100,8 +100,11 @@ public class SnapToEllipseEdge<T extends ImageGray> extends BaseIntegralEdge<T> 
 				return false;
 			}
 
+			// stop once the change between two iterations is insignificant
 			if( change(previous,refined) <= convergenceTol) {
 				return true;
+			} else {
+				previous.set(refined);
 			}
 		}
 		return true;
@@ -117,9 +120,12 @@ public class SnapToEllipseEdge<T extends ImageGray> extends BaseIntegralEdge<T> 
 		total += Math.abs(a.center.y - b.center.y);
 		total += Math.abs(a.a - b.a);
 		total += Math.abs(a.b - b.b);
-		total += UtilAngle.distHalf(a.phi , b.phi);
 
-		return total / 3.0;
+		// only care about the change of angle when it is not a circle
+		double weight = Math.min(4,2.0*(a.a/a.b-1.0));
+		total += weight*UtilAngle.distHalf(a.phi , b.phi);
+
+		return total;
 	}
 
 	/**

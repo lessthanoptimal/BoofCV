@@ -20,13 +20,17 @@ Version : 0.26
   * Non-Maximum Suppression added
 - Demonstrations
   * Improved DemonstrationInterpolateScaleApp (renamed also)
+  * Added DetectBlackEllipseApp
 - Gradle
   * Will fail on dependency version conflict now
   * Will fail when building release with SNAPSHOT dependencies
   * Resolved xstream version conflict
 - Updated DeepBoof
   * This is to get around an issue with a java wget library where it would hang instead of giving up
-  * New code is also much more informative and prints out size info and download status
+  * New code is also much more informative and prints out size info and download status\
+- Visualization
+  * Removed a bad +PI/2 from ellipse rendering.
+- SnapToEllipseEdge - Fixed bug where it was only performing one iteration no matter what
 
 ---------------------------------------------
 Date    : 2016/12/01

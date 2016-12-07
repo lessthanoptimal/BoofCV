@@ -54,7 +54,7 @@ public class ConfigEllipseDetector implements Configuration {
 	/**
 	 * Refinement: when the difference between two ellipses is less than this amount stop iterating
 	 */
-	public double convergenceTol = 1e-6;
+	public double convergenceTol = 0.01;
 
 	/**
 	 * Refinement: how many points along the contour it will sample.  Set to &le; 0 to disable refinement
@@ -74,12 +74,11 @@ public class ConfigEllipseDetector implements Configuration {
 	 * Threshold for minimum edge intensity.  This should be a value which is 0 to (max-min pixel value)
 	 * Set to &le; 0 to disable check.
 	 */
-	public double checkIntensityThreshold = 20;
+	public double minimumEdgeIntensity = 20;
 
 	/**
 	 * Check:<br>
-	 * Tangential distance away from contour the image is sampled when performing edge
-	 * intensity check.
+	 * Tangential distance away from contour the image is sampled when performing edge intensity check.
 	 */
 	public double checkRadialDistance = 1.5;
 

@@ -60,6 +60,7 @@ import boofcv.demonstrations.sfm.d2.VideoStabilizeSequentialPointApp;
 import boofcv.demonstrations.sfm.d3.VisualizeDepthVisualOdometryApp;
 import boofcv.demonstrations.sfm.d3.VisualizeMonocularPlaneVisualOdometryApp;
 import boofcv.demonstrations.sfm.d3.VisualizeStereoVisualOdometryApp;
+import boofcv.demonstrations.shapes.DetectBlackEllipseApp;
 import boofcv.demonstrations.shapes.DetectBlackPolygonApp;
 import boofcv.demonstrations.shapes.ShapeFitContourApp;
 import boofcv.demonstrations.tracker.VideoTrackerObjectQuadApp;
@@ -162,6 +163,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 
 		createNodes(root, "Shapes",
 				DetectBlackPolygonApp.class,
+				DetectBlackEllipseApp.class,
 				ShapeFitContourApp.class);
 
 		createNodes(root, "Trackers",
