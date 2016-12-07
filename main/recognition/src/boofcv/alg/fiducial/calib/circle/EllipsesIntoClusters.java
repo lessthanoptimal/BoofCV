@@ -37,8 +37,6 @@ import java.util.List;
  */
 public class EllipsesIntoClusters {
 
-	// maximum number of neighbors it will consider
-	private int neighborsConsidered = 10;
 	// ratio between center distance and major axis
 	private double maxDistanceToMajorAxisRatio;
 
@@ -121,8 +119,7 @@ public class EllipsesIntoClusters {
 			maxDistance *= maxDistance;
 
 			searchResults.reset();
-			// + 1 on max neighbors because this ellipse is returned
-			search.findNearest( searchPoints.get(i), maxDistance, neighborsConsidered+1, searchResults );
+			search.findNearest( searchPoints.get(i), maxDistance, Integer.MAX_VALUE, searchResults );
 
 			// if this node already has a cluster look it up, otherwise create a new one
 			List<Node> cluster1;
@@ -217,14 +214,6 @@ public class EllipsesIntoClusters {
 
 		// zero food members
 		listFood.clear();
-	}
-
-	public int getNeighborsConsidered() {
-		return neighborsConsidered;
-	}
-
-	public void setNeighborsConsidered(int neighborsConsidered) {
-		this.neighborsConsidered = neighborsConsidered;
 	}
 
 	public double getMaxDistanceToMajorAxisRatio() {

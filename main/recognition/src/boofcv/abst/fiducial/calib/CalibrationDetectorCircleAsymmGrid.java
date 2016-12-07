@@ -71,8 +71,10 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 
 		spaceToRadius = (config.centerDistance/config.circleRadius);
 
+		EllipsesIntoClusters e2c = new EllipsesIntoClusters(spaceToRadius*1.25,config.ellipseSizeSimilarity);
+
 		detector = new DetectAsymmetricCircleGrid<>(config.numRows,config.numCols,inputToBinary,
-				ellipseDetector,new EllipsesIntoClusters(spaceToRadius*1.25,config.ellipseSizeSimilarity));
+				ellipseDetector,e2c);
 
 
 		layout = createLayout(detector.getRows(),detector.getColumns(), config.centerDistance);

@@ -31,6 +31,8 @@ Version : 0.26
 - Visualization
   * Removed a bad +PI/2 from ellipse rendering.
 - SnapToEllipseEdge - Fixed bug where it was only performing one iteration no matter what
+- Circle Asymmetric Grid Target
+  * Fixed issue which was causing clusters not to form by not limiting number of neighbors within X distance
 
 ---------------------------------------------
 Date    : 2016/12/01
