@@ -168,8 +168,7 @@ public class DetectBlackEllipseApp<T extends ImageGray> extends DemonstrationBas
 				if (controls.bShowContour) {
 					List<Contour> contours = detector.getAllContours();
 					g2.setStroke(new BasicStroke(1));
-					g2.setColor(Color.RED);
-					VisualizeBinaryData.renderExternal(contours, false,true, scale, g2);
+					VisualizeBinaryData.render(contours, null,Color.CYAN, scale, g2);
 				}
 
 				if (controls.bShowEllipses) {

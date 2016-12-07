@@ -70,7 +70,7 @@ public class ExampleCannyEdge {
 		BufferedImage visualCannyContour = VisualizeBinaryData.renderContours(edgeContours,null,
 				gray.width,gray.height,null);
 		BufferedImage visualEdgeContour = new BufferedImage(gray.width, gray.height,BufferedImage.TYPE_INT_RGB);
-		VisualizeBinaryData.renderExternal(contours, (int[]) null, visualEdgeContour);
+		VisualizeBinaryData.render(contours, (int[]) null, visualEdgeContour);
 
 		ListDisplayPanel panel = new ListDisplayPanel();
 		panel.addImage(visualBinary,"Binary Edges from Canny");

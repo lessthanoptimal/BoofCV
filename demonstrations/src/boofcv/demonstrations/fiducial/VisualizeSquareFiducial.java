@@ -124,7 +124,7 @@ public class VisualizeSquareFiducial {
 			// add back in lens distortion
 			Quadrilateral_F64 q = fiducials.get(i).distortedPixels;
 //			g2.setStroke(new BasicStroke(2));
-//			VisualizeBinaryData.renderExternal(detector.getSquareDetector().getUsedContours(),Color.BLUE,outputGray);
+//			VisualizeBinaryData.render(detector.getSquareDetector().getUsedContours(),Color.BLUE,outputGray);
 			VisualizeShapes.drawArrowSubPixel(q,3,g2);
 		}
 

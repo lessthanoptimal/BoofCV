@@ -155,8 +155,7 @@ public class VisualizeBinaryContourApp <T extends ImageGray> extends Demonstrati
 
 				List<Contour> contours = contourAlg.getContours().toList();
 				g2.setStroke(new BasicStroke(1));
-				g2.setColor(Color.RED);
-				VisualizeBinaryData.renderExternal(contours,true,true, scale, g2);
+				VisualizeBinaryData.render(contours,Color.BLUE, Color.RED, scale, g2);
 			}
 		}
 	}

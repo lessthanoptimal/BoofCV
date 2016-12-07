@@ -148,7 +148,7 @@ public class VisualizeBinaryData {
 	 * @param colors List of RGB colors for each element in contours.  If null then random colors will be used.
 	 * @param out (Optional) Storage for output
 	 */
-	public static void renderExternal( List<Contour> contours , int colors[] , BufferedImage out) {
+	public static void render(List<Contour> contours , int colors[] , BufferedImage out) {
 
 		colors = checkColors(colors,contours.size());
 
@@ -172,7 +172,7 @@ public class VisualizeBinaryData {
 		return colors;
 	}
 
-	public static BufferedImage renderExternal( List<Contour> contours , Color color , BufferedImage out) {
+	public static BufferedImage render(List<Contour> contours , Color color , BufferedImage out) {
 		for( Contour c : contours ) {
 			for(Point2D_I32 p : c.external ) {
 				out.setRGB(p.x,p.y,color.getRGB());
@@ -182,7 +182,7 @@ public class VisualizeBinaryData {
 		return out;
 	}
 
-	public static void renderExternal( List<Contour> contours , boolean internal , boolean external , double scale , Graphics2D g2 ) {
+	public static void render(List<Contour> contours , Color internal , Color external , double scale , Graphics2D g2 ) {
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -191,13 +191,13 @@ public class VisualizeBinaryData {
 		g2.setStroke(new BasicStroke(Math.max(1, (float) scale)));
 		for( Contour c : contours ) {
 
-			if( external ) {
-				g2.setColor(Color.RED);
+			if( external != null) {
+				g2.setColor(external);
 				renderContour(scale, g2, l, c.external);
 			}
 
-			if( internal ) {
-				g2.setColor(Color.BLUE);
+			if( internal != null) {
+				g2.setColor(internal);
 				for (List<Point2D_I32> inner : c.internal) {
 					renderContour(scale, g2, l, inner);
 				}
@@ -210,11 +210,11 @@ public class VisualizeBinaryData {
 			g2.setColor(Color.LIGHT_GRAY);
 
 			for( Contour c : contours ) {
-				if( external ) {
+				if( external != null ) {
 					renderContour(scale, g2, l, c.external);
 				}
 
-				if( internal ) {
+				if( internal != null) {
 					for (List<Point2D_I32> inner : c.internal) {
 						renderContour(scale, g2, l, inner);
 					}
