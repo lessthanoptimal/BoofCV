@@ -3,7 +3,6 @@ Next Release
 - TODO Fisheye calibration using omni model
 - TODO make sure RANSAC is using the faster method for selecting points.  swapping selected with one at the end
 - TODO Regression: Chessboard image border to fiducial regression
-- TODO why does large circle asym grid fail to detect?
 - TODO grid of circle calibration target
 
 
@@ -72,6 +71,7 @@ Future
   * Consider alternative algorithm for small (or all) squares.  Contour -> gradient -> cluster/hough
   * When optimizing the edges don't sample points tangent to the line sample points parallel to the adjacent sides
     that way it will sample inside the square more often.  Maybe interpolate between slope of both sides?
+  * Look at alternative methods for generatng interpolated inner image.  bilinear is probably exagerating.  surface integral?
 
 - Multi camera calibration using square binary patterns.
 
@@ -90,4 +90,4 @@ Future
   * Handle the border.  Currently is is just skipped
   * If the image is resized that will cause problems since the border can affect the location of local
     maximums
-  * Createa generic function for handling borders?  Give it a function and it returns a solution?
+  * Create a generic function for handling borders?  Give it a function and it returns a solution?

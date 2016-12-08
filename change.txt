@@ -11,6 +11,13 @@ Version : 0.27
   * Added to ImageZoomPanel
   * Opens a dialog letting the user know what just happened with option to be silient
 
+- TODO Fisheye calibration using omni model
+- TODO grid of circle calibration target
+- TODO make sure RANSAC is using the faster method for selecting points.  swapping selected with one at the end
+- TODO Regression: Chessboard image border to fiducial regression
+- TODO Example showing how you can save intrinsic parameters in OpenCV format?
+- TODO Tutorial on image features?  Sparse and dense?
+
 ---------------------------------------------
 Date    : 2016/12/07
 Version : 0.26
@@ -36,7 +43,7 @@ Version : 0.26
   * Resolved xstream version conflict
 - Updated DeepBoof
   * This is to get around an issue with a java wget library where it would hang instead of giving up
-  * New code is also much more informative and prints out size info and download status\
+  * New code is also much more informative and prints out size info and download status
 - Visualization
   * Removed a bad +PI/2 from ellipse rendering.
 - SnapToEllipseEdge - Fixed bug where it was only performing one iteration no matter what

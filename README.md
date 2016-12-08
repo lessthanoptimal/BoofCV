@@ -52,9 +52,9 @@ java -jar demonstrations/demonstrations.jar
 
 All the code for what you see is in boofcv/examples and boofcv/demonstrations.  Example code is designed to be easy to understand so look there first.
 
-## Adding to Gradle and Maven Projects
+## Maven Central Repository
 
-BoofCV is divided up into many modules.  The easiest way to include the critical modules is to have your project dependent on 'core'.
+BoofCV is on [Maven Central](http://search.maven.org/) and can be easily added to your Maven, Gradle, ...etc projects.  It's divided up into many modules.  The easiest way to include the critical modules is to have your project dependent on 'core'.
 
 For Maven projects:
 ```
