@@ -179,10 +179,11 @@ public class EllipsesIntoClusters {
 	}
 
 	/**
-	 * Compute a new distance that two ellipses are apart using major/minor axis size.  This should better judge
-	 * distance taking in account perspective distortion.
+	 * Compute a new distance that two ellipses are apart using major/minor axis size.  If the axises are the
+	 * same size then there is no change.  If the minor axis is much smaller and ellipse b lies along that
+	 * axis then the returned distance will be greater.
 	 */
-	private double axisAdjustedDistance( EllipseRotated_F64 a , EllipseRotated_F64 b ) {
+	static double axisAdjustedDistance( EllipseRotated_F64 a , EllipseRotated_F64 b ) {
 		double dx = b.center.x - a.center.x;
 		double dy = b.center.y - a.center.y;
 
