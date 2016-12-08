@@ -69,6 +69,4 @@ public class ExampleImageBlur {
 
 		ShowImages.showWindow(panel,"Image Blur Examples",true);
 	}
-
-
 }
