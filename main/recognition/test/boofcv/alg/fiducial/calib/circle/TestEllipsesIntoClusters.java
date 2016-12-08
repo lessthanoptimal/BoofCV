@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -213,5 +214,10 @@ public class TestEllipsesIntoClusters {
 		assertEquals(6,mouth.size());
 		assertEquals(0,food.size());
 
+	}
+
+	@Test
+	public void axisAdjustedDistance() {
+		fail("implement");
 	}
 }

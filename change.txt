@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2017
+Date    : 2016/12/07
 Version : 0.26
 
 - Fixed a long standing unit test issue where convolve unit test would some times on some systems erratically fail
@@ -33,6 +33,8 @@ Version : 0.26
 - SnapToEllipseEdge - Fixed bug where it was only performing one iteration no matter what
 - Circle Asymmetric Grid Target
   * Fixed issue which was causing clusters not to form by not limiting number of neighbors within X distance
+  * When clustering ellipses orientation and major/minor axis size is now taken in account.
+  * Significant net improvement in regression tests, only drop in performance in blurred images
 
 ---------------------------------------------
 Date    : 2016/12/01

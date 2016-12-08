@@ -34,7 +34,7 @@ public class ConfigEllipseDetector implements Configuration {
 	/**
 	 * Detector: minimum number of pixels in the contour
 	 */
-	public int minimumContour = 20;
+	public int minimumContour = 10;
 
 	/**
 	 * Detector: maximum number of pixels in the contour. 0 == no limit
@@ -49,7 +49,7 @@ public class ConfigEllipseDetector implements Configuration {
 	/**
 	 * Refinement: maximum number of refinement iterations it will performance.  Set to zero to disable
  	 */
-	public int maxIterations = 10;
+	public int maxIterations = 5;
 
 	/**
 	 * Refinement: when the difference between two ellipses is less than this amount stop iterating

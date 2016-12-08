@@ -140,6 +140,11 @@ public class EllipsesIntoClusters {
 				if( e2 == e1 )
 					continue;
 
+				// the initial search was based on size of major axis.  Now prune and take in account the distance
+				// from the minor axis
+				if( axisAdjustedDistance(e1,e2) > maxDistance )
+					continue;
+
 				// smallest shape divided by largest shape
 				double ratioA = e1.a > e2.a ? e2.a / e1.a : e1.a / e2.a;
 				double ratioB = e1.b > e2.b ? e2.b / e1.b : e1.b / e2.b;
@@ -171,6 +176,25 @@ public class EllipsesIntoClusters {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Compute a new distance that two ellipses are apart using major/minor axis size.  This should better judge
+	 * distance taking in account perspective distortion.
+	 */
+	private double axisAdjustedDistance( EllipseRotated_F64 a , EllipseRotated_F64 b ) {
+		double dx = b.center.x - a.center.x;
+		double dy = b.center.y - a.center.y;
+
+		double c = Math.cos(a.phi);
+		double s = Math.sin(a.phi);
+
+		// rotate into ellipse's coordinate frame
+		// scale by ratio of major/minor axis
+		double x = (dx*c + dy*s);
+		double y = (-dx*s + dy*c)*a.a/a.b;
+
+		return x*x + y*y;
 	}
 
 	/**

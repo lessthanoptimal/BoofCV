@@ -7,7 +7,6 @@ dependencies {
 
     compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
     compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
-//    compile group: 'org.openkinect', name: 'freenect', version: '0.0.1-SNAPSHOT'
 }
 
 sourceSets {
