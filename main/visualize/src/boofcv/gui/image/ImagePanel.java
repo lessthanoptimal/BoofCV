@@ -18,8 +18,12 @@
 
 package boofcv.gui.image;
 
+import boofcv.io.image.UtilImageIO;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
@@ -37,6 +41,8 @@ public class ImagePanel extends JPanel {
 
 	public double scale = 1;
 
+	public static int saveCounter = 0;
+
 	public ImagePanel(BufferedImage img) {
 		this(img,ScaleOptions.NONE);
 	}
@@ -52,6 +58,25 @@ public class ImagePanel extends JPanel {
 	}
 
 	public ImagePanel() {
+	}
+
+	{
+		addMouseSaveImage();
+	}
+
+	/**
+	 * Adds the ability to save an image using the right mouse button
+	 */
+	public void addMouseSaveImage() {
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if( e.getButton() == 2 ) {
+					System.out.println("Image saved "+saveCounter);
+					UtilImageIO.saveImage(img, String.format("saved_image%03d.png",saveCounter++));
+				}
+			}
+		});
 	}
 
 	@Override
