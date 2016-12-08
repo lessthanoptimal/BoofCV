@@ -59,7 +59,7 @@ public class SaveImageOnClick extends MouseAdapter {
 			Object[] options = {"Hide in Future","OK"};
 			int n = JOptionPane.showOptionDialog(parent,
 					"Saved image to "+fileName,
-					"Saved Image",
+					"Middle Mouse Click Image Saving",
 					JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE,
 					null,
