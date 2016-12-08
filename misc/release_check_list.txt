@@ -18,6 +18,8 @@
   * source code + data
 - Tag git
 - Upload to sourceforge
+  scp boofcv-vXXX-src.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv/vXXX/
+  scp boofcv-vXXX-libs.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv/vXXX/
 - Update version on website
 
 ----
