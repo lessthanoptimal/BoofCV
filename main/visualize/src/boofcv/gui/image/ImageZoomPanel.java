@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -118,6 +118,10 @@ public class ImageZoomPanel extends JScrollPane {
 
 	protected class ImagePanel extends JPanel
 	{
+		public ImagePanel() {
+			addMouseListener(new SaveImageOnClick(this));
+		}
+
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
