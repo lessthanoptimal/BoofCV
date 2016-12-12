@@ -7,8 +7,16 @@ dependencies {
     compile project(':main:recognition')
 }
 
+sourceSets {
+    test {
+        java {
+            srcDir 'examples/src'
+        }
+    }
+}
+
 idea {
     module {
-        name = "BoofCV Visualize"
+        name = "BoofCV JavaFX"
     }
 }

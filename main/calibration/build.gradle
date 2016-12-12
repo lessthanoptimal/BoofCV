@@ -4,7 +4,7 @@ dependencies {
     compile project(':main:geo')
 
     testCompile project(':main:io')
-    testCompile project(':main:visualize')
+    testCompile project(':main:visualize-swing')
 }
 
 idea {

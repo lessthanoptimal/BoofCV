@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,16 +16,23 @@
  * limitations under the License.
  */
 
-package boofcv.gui.d3;
+package boofcv.gui;
 
-import georegression.struct.point.Point3D_F64;
+import boofcv.io.MediaManager;
+
 
 /**
- * 3D point with a color associated with it
+ * Common interface for visualization applications that process a single input image.
  *
  * @author Peter Abeles
  */
-public class ColorPoint3D extends Point3D_F64 {
-	// pixel's color as an RGB value
-	public int rgb;
+public interface VisualizeApp {
+
+	public void setMediaManager( MediaManager manager );
+
+	public void loadConfigurationFile(String fileName);
+	
+	public void loadInputData(String fileName);
+
+	public boolean getHasProcessedImage();
 }

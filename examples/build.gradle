@@ -7,7 +7,7 @@ dependencies {
     compile project(':main:sfm')
     compile project(':main:learning')
     compile project(':main:recognition')
-    compile project(':main:visualize')
+    compile project(':main:visualize-swing')
     compile project(':integration:javacv')
     compile project(':integration:WebcamCapture')
 

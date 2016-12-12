@@ -1,8 +1,17 @@
 include 'examples','demonstrations','applications',
         'main:ip','main:io','main:feature','main:geo','main:calibration','main:sfm','main:recognition',
-        'main:visualize','main:checks','main:autocode','main:learning','integration:all','main:core',
+        'main:visualize-swing',
+        'main:checks','main:autocode','main:learning','integration:all','main:core',
         'integration:javacv',"integration:WebcamCapture",
         'integration:jcodec'
+
+// JavaFX isn't installed universally yet.  If it exists on the system it will be built
+try {
+    Class.forName("javafx.scene.image.Image");
+    include 'integration:javafx'
+} catch(Exception ignore) {
+    logger.warn('Skipping integration/javafx because JavaFX is not installed in this JDK')
+}
 
 // these are packages which require external files that must be manually downloaded or configured to compile
 if (System.getenv()['ANDROID_HOME']) {

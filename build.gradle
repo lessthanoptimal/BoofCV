@@ -176,7 +176,7 @@ def mainProjects = [
         ':main:sfm',
         ':main:recognition',
         ':main:learning',
-        ':main:visualize',
+        ':main:visualize-swing'
 ]
 
 def integrationProjects = [
@@ -184,6 +184,12 @@ def integrationProjects = [
         ':integration:WebcamCapture',
         ':integration:javacv',
 ]
+
+try {
+    project(':integration:javafx')
+    integrationProjects.add(':integration:javafx')
+} catch( UnknownProjectException ignore ) {}
+
 try {
     project(':integration:android')
     integrationProjects.add(':integration:android')

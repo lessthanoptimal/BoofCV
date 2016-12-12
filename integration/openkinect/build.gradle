@@ -1,6 +1,6 @@
 dependencies {
     compile project(':main:ip')
-    compile project(':main:visualize')
+    compile project(':main:visualize-swing')
     compile project(':main:geo')
     compile project(':main:io')
     compile project(':main:sfm')
