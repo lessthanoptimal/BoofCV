@@ -10,8 +10,7 @@ try {
     Class.forName("javafx.scene.image.Image");
     include 'integration:javafx'
 } catch(Exception ignore) {
-    logger.warn('Skipping integration/javafx because it\'s not installed in this JDK')
-
+    logger.warn('Skipping integration/javafx because JavaFX is not installed in this JDK')
 }
 
 // these are packages which require external files that must be manually downloaded or configured to compile
