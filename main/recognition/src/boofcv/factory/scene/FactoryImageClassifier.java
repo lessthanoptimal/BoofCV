@@ -54,7 +54,7 @@ public class FactoryImageClassifier {
 	/**
 	 * NIN trained on ImageNet data
 	 *
-	 * @see ImageClassifierVggCifar10
+	 * @see ImageClassifierNiNImageNet
 	 *
 	 * @return The classifier and where to download the model
 	 */
