@@ -2,7 +2,7 @@ dependencies {
     compile project(':main:ip')
     compile project(':main:feature')
 
-    testCompile project(':main:visualize')
+    testCompile project(':main:visualize-swing')
 }
 
 idea {

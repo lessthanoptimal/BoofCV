@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,23 +16,24 @@
  * limitations under the License.
  */
 
-package boofcv.gui;
-
-import boofcv.io.MediaManager;
-
+package boofcv.gui.image;
 
 /**
- * Common interface for visualization applications that process a single input image.
+ * Specifies different behaviors for automatically scaling an image in a GUI
  *
  * @author Peter Abeles
  */
-public interface VisualizeApp {
-
-	public void setMediaManager( MediaManager manager );
-
-	public void loadConfigurationFile(String fileName);
-	
-	public void loadInputData(String fileName);
-
-	public boolean getHasProcessedImage();
+public enum ScaleOptions {
+	/**
+	 * No scaling
+	 */
+	NONE,
+	/**
+	 * Scale down only but not up
+	 */
+	DOWN,
+	/**
+	 * Freely scale up and down to fill the space
+	 */
+	ALL
 }

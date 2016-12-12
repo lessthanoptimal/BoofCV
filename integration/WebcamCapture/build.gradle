@@ -2,7 +2,7 @@
 dependencies {
     compile project(':main:ip')
     compile project(':main:io')
-    compile project(':main:visualize')
+    compile project(':main:visualize-swing')
 
     compile group: 'com.github.sarxos', name: 'webcam-capture', version: '0.3.11'
 }

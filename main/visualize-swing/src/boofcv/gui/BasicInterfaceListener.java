@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,24 +16,25 @@
  * limitations under the License.
  */
 
-package boofcv.gui.image;
+package boofcv.gui;
 
 /**
- * Specifies different behaviors for automatically scaling an image in a GUI
+ * Simple interface for a GUI to tell the main processing that it needs to render the display
+ * or reprocess that data.  Settings are accessed else where and more fine control over what
+ * has changed is not provided.
  *
  * @author Peter Abeles
  */
-public enum ScaleOptions {
+public interface BasicInterfaceListener {
+
 	/**
-	 * No scaling
+	 * The data does not need to be reprocessed but the user has requested that different
+	 * information be displayed.
 	 */
-	NONE,
+	public void eventUpdateGui();
+
 	/**
-	 * Scale down only but not up
+	 * Data needs to be reprocessed using the new settings
 	 */
-	DOWN,
-	/**
-	 * Freely scale up and down to fill the space
-	 */
-	ALL
+	public void eventReprocess();
 }

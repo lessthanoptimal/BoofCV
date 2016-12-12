@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,23 +18,33 @@
 
 package boofcv.gui;
 
+import boofcv.gui.image.ImagePanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
 /**
- * Simple interface for a GUI to tell the main processing that it needs to render the display
- * or reprocess that data.  Settings are accessed else where and more fine control over what
- * has changed is not provided.
- *
  * @author Peter Abeles
  */
-public interface BasicInterfaceListener {
+public class PanelGridPanel extends JPanel {
+	public PanelGridPanel( int numColumns , JPanel ...panels ) {
 
-	/**
-	 * The data does not need to be reprocessed but the user has requested that different
-	 * information be displayed.
-	 */
-	public void eventUpdateGui();
+		int numRows = panels.length/numColumns;
 
-	/**
-	 * Data needs to be reprocessed using the new settings
-	 */
-	public void eventReprocess();
+		GridLayout experimentLayout = new GridLayout(numRows,numColumns);
+
+		setLayout(experimentLayout);
+
+		for( JPanel p : panels )
+			add(p);
+	}
+
+	public PanelGridPanel( int numRows , int numColumns ) {
+		setLayout( new GridLayout(numRows,numColumns));
+	}
+
+	public void add( BufferedImage image ) {
+		add(new ImagePanel(image));
+	}
 }
