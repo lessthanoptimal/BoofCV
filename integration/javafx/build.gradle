@@ -17,6 +17,6 @@ sourceSets {
 
 idea {
     module {
-        name = "BoofCV Visualize-JavaFX"
+        name = "BoofCV JavaFX"
     }
 }

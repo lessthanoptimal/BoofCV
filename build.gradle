@@ -186,8 +186,8 @@ def integrationProjects = [
 ]
 
 try {
-    project(':integration:visualize-javafx')
-    integrationProjects.add(':integration:visualize-javafx')
+    project(':integration:javafx')
+    integrationProjects.add(':integration:javafx')
 } catch( UnknownProjectException ignore ) {}
 
 try {

@@ -8,9 +8,9 @@ include 'examples','demonstrations','applications',
 // JavaFX isn't installed universally yet.  If it exists on the system it will be built
 try {
     Class.forName("javafx.scene.image.Image");
-    include 'integration:visualize-javafx'
+    include 'integration:javafx'
 } catch(Exception ignore) {
-    logger.warn('Skipping integration/visualize-javafx because it\'s not installed in this JDK')
+    logger.warn('Skipping integration/javafx because it\'s not installed in this JDK')
 
 }
 
