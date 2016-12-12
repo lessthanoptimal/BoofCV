@@ -12,6 +12,8 @@ Version : 0.27
   * Opens a dialog letting the user know what just happened with option to be silent
 - Renamed module visualize to visualize-swing
 - Added integration/visualize-javafx
+- camera distortion models
+  * Unrolled matrix inverse in pinhole and radtan
 
 - TODO Fisheye calibration using omni model
 - TODO grid of circle calibration target

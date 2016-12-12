@@ -30,7 +30,8 @@ import georegression.struct.point.Point2D_F64;
 public class PinholePtoN_F64 implements Point2Transform2_F64 {
 
 	// inverse of camera calibration matrix
-	private double a11,a12,a13,a22,a23; // elements in upper triangular maitrx
+	// These are the upper triangular elements in a 3x3 matrix
+	private double a11,a12,a13,a22,a23;
 
 	public void set(/**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
 
