@@ -29,7 +29,7 @@ import georegression.struct.point.Point2D_F64;
 public class PinholeNtoP_F64 implements Point2Transform2_F64 {
 
 	// camera calibration matrix
-	double fx, fy, skew, cx, cy;
+	private double fx, fy, skew, cx, cy;
 
 	public PinholeNtoP_F64 set( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy) {
 		this.fx = (double)fx;
