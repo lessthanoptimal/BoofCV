@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -146,5 +146,15 @@ public class DistanceSe3SymmetricSq implements DistanceModelStereoPixels<Se3_F64
 			AssociatedPair obs = associatedPairs.get(i);
 			distance[i] = computeDistance(obs);
 		}
+	}
+
+	@Override
+	public Class<AssociatedPair> getPointType() {
+		return AssociatedPair.class;
+	}
+
+	@Override
+	public Class<Se3_F64> getModelType() {
+		return Se3_F64.class;
 	}
 }

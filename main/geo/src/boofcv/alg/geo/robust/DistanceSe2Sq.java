@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,5 +63,15 @@ public class DistanceSe2Sq implements DistanceFromModel<Se2_F64,AssociatedPair> 
 		for( int i = 0; i < samples.size(); i++ ) {
 			distance[i] = computeDistance(samples.get(i));
 		}
+	}
+
+	@Override
+	public Class<AssociatedPair> getPointType() {
+		return AssociatedPair.class;
+	}
+
+	@Override
+	public Class<Se2_F64> getModelType() {
+		return Se2_F64.class;
 	}
 }

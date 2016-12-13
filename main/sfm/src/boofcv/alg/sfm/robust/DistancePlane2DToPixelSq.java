@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,5 +94,15 @@ public class DistancePlane2DToPixelSq implements DistanceFromModel<Se2_F64,Plane
 		for( int i = 0; i < samples.size(); i++ ) {
 			distance[i] = computeDistance(samples.get(i));
 		}
+	}
+
+	@Override
+	public Class<PlanePtPixel> getPointType() {
+		return PlanePtPixel.class;
+	}
+
+	@Override
+	public Class<Se2_F64> getModelType() {
+		return Se2_F64.class;
 	}
 }

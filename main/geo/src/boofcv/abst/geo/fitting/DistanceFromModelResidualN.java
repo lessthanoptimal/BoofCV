@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,5 +71,15 @@ public class DistanceFromModelResidualN<Model, Point>
 			}
 			distance[i] = dist;
 		}
+	}
+
+	@Override
+	public Class<Point> getPointType() {
+		return null;
+	}
+
+	@Override
+	public Class<Model> getModelType() {
+		return null;
 	}
 }

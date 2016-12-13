@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,5 +55,15 @@ public class DistanceScaleTranslate2DSq implements DistanceFromModel<ScaleTransl
 		for( int i = 0; i < N; i++ ) {
 			distance[i] = computeDistance(obs.get(i));
 		}
+	}
+
+	@Override
+	public Class<AssociatedPair> getPointType() {
+		return AssociatedPair.class;
+	}
+
+	@Override
+	public Class<ScaleTranslate2D> getModelType() {
+		return ScaleTranslate2D.class;
 	}
 }

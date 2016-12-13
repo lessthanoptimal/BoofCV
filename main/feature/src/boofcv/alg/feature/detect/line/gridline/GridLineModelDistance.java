@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,5 +64,15 @@ public class GridLineModelDistance implements DistanceFromModel<LinePolar2D_F32,
 		for( int i = 0; i < edgels.size(); i++ ) {
 			distance[i] = computeDistance(edgels.get(i));
 		}
+	}
+
+	@Override
+	public Class<Edgel> getPointType() {
+		return Edgel.class;
+	}
+
+	@Override
+	public Class<LinePolar2D_F32> getModelType() {
+		return LinePolar2D_F32.class;
 	}
 }

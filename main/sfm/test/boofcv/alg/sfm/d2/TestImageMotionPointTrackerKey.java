@@ -263,6 +263,16 @@ public class TestImageMotionPointTrackerKey {
 			return matchSetSize;
 		}
 
+		@Override
+		public Class<AssociatedPair> getPointType() {
+			return AssociatedPair.class;
+		}
+
+		@Override
+		public Class<T> getModelType() {
+			return null;
+		}
+
 		public void setMotion(T se) {
 			found = se;
 		}
