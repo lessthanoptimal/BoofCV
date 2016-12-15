@@ -45,6 +45,8 @@ import org.ejml.interfaces.linsol.LinearSolver;
  *
  * @author Peter Abeles
  */
+// TODO Handle pathological situations that will basically never happen in real life
+	// anything that makes the A matrix singular.  dx or dy being zero will do the trick
 public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D>>
 {
 	// Type of input images
@@ -97,6 +99,11 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 
 	private TwistCoordinate_F32 twist = new TwistCoordinate_F32();
 
+	/**
+	 * Declares internal data structures and specifies the type of input images to expect
+	 * @param imageType Input image type
+	 * @param derivType Type of image to store the derivative in
+	 */
 	public VisOdomDirectRgbDepth(ImageType<I> imageType , ImageType<D> derivType ) {
 
 		this.imageType = imageType;
@@ -124,6 +131,15 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 		computeD = FactoryDerivative.gradient(DerivativeType.THREE, imageType, derivType);
 	}
 
+	/**
+	 * Specifies intrinsic camera parameters.  Must be called.
+	 * @param fx focal length x (pixels)
+	 * @param fy focal length y (pixels)
+	 * @param cx principle point x (pixels)
+	 * @param cy principle point y (pixels)
+	 * @param width Width of the image
+	 * @param height Height of the image
+	 */
 	public void setCameraParameters( float fx , float fy , float cx , float cy ,
 									 int width , int height ) {
 		this.fx = fx;
@@ -140,6 +156,14 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 		y.reshape(N,1);
 	}
 
+	/**
+	 * Used to change interpolation method.  Probably don't want to do this.
+	 * @param inputMin min value for input pixels. 0 is typical
+	 * @param inputMax max value for input pixels. 255 is typical
+	 * @param derivMin min value for the derivative of input pixels
+	 * @param derivMax max value for the derivative of input pixels
+	 * @param type Type of interpolation method to use
+	 */
 	public void setInterpolation( double inputMin , double inputMax, double derivMin , double derivMax ,
 								  InterpolationType type) {
 		interpI = FactoryInterpolation.createPixelMB(inputMin,inputMax,type, BorderType.EXTENDED, imageType);
@@ -147,11 +171,24 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 		interpDY = FactoryInterpolation.createPixelMB(derivMin,derivMax,type, BorderType.EXTENDED, derivType);
 	}
 
+	/**
+	 * Specifies convergence parameters
+	 *
+	 * @param convergenceTol When change in error is less than this fraction stop.  Try 1e-6
+	 * @param maxIterations When this number of iterations has been exceeded stop.  Try 10
+	 */
 	public void setConvergence( float convergenceTol , int maxIterations ) {
 		this.convergeTol = convergenceTol;
 		this.maxIterations = maxIterations;
 	}
 
+	/**
+	 * Set's the keyframe.  This is the image which motion is estimated relative to.  The 3D location of points in
+	 * the keyframe must be known.
+	 *
+	 * @param input Image which is to be used as the key frame
+	 * @param pixelTo3D Used to compute 3D points from pixels in key frame
+	 */
 	void setKeyFrame(I input, ImagePixelTo3D pixelTo3D) {
 		wrapI.wrap(input);
 		keypixels.reset();
@@ -183,6 +220,12 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 		}
 	}
 
+	/**
+	 * Estimates the motion relative to the key frame.
+	 * @param input Next image in the sequence
+	 * @param hintKeyToInput estimated transform from keyframe to the current input image
+	 * @return true if it was successful at estimating the motion or false if it failed for some reason
+	 */
 	public boolean estimateMotion(I input , Se3_F32 hintKeyToInput ) {
 		initMotion(input);
 
@@ -210,7 +253,6 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 
 	/**
 	 * Initialize motion related data structures
-	 * @param input
 	 */
 	void initMotion(I input) {
 		if( solver == null ) {
@@ -254,8 +296,9 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 				continue;
 			validPixels++;
 
-			// pi matrix derivative relative to S
+			// pi matrix derivative relative to t at S
 			float ZZ   = S.z*S.z;
+
 			float dP11 = fx/S.z;
 			float dP13 = -S.x*fx/ZZ;
 			float dP22 = fy/S.z;
@@ -277,7 +320,7 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 
 				// C * A(S'(x)) = shape(1,6)
 				int indexA = row*6;
-				A.data[indexA++] = -b2*S.z + b2*S.y;
+				A.data[indexA++] = -b2*S.z + b3*S.y;
 				A.data[indexA++] =  b1*S.z - b3*S.x;
 				A.data[indexA++] = -b1*S.y + b2*S.x;
 				A.data[indexA++] = b1;
@@ -292,27 +335,37 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 		}
 		errorOptical /= row;
 
-
 		A.numRows = row;
 		y.numRows = row;
 	}
 
 	boolean solveSystem() {
+//		A.print();
 		if( !solver.setA(A))
 			return false;
 
 		solver.solve(y,twistMatrix);
+		twistMatrix.print();
 
 		twist.set((float)twistMatrix.data[0], (float)twistMatrix.data[1], (float)twistMatrix.data[2],
 				(float)twistMatrix.data[3], (float)twistMatrix.data[4], (float)twistMatrix.data[5]);
 
 		// TODO see how close to norm of 1 it is
 		twist.normalize();
+//		twist.print();
 
 		// theta is 1 because of how this solution was formulated.  See derivation
 		TwistOps_F32.exponential(twist,1.0f, motionTwist );
 
 		return true;
+	}
+
+	public float getErrorOptical() {
+		return errorOptical;
+	}
+
+	public int getValidPixels() {
+		return validPixels;
 	}
 
 	static class Pixel {

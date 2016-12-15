@@ -62,8 +62,8 @@ public class TestVisOdomDirectRgbDepth {
 		GrayF32 input = new GrayF32(width,height);
 		ImageMiscOps.fill(input,colorAfter);
 		alg.initMotion(input);
-		ImageMiscOps.fill(alg.derivX,20);
-		ImageMiscOps.fill(alg.derivY,1e-5f);
+		ImageMiscOps.fill(alg.derivX,100);
+		ImageMiscOps.fill(alg.derivY,1f);
 
 		// generate some synthetic data.  This will be composed of random points in front of the camera
 		for (int i = 0; i < 100; i++) {
@@ -75,7 +75,9 @@ public class TestVisOdomDirectRgbDepth {
 
 			float nx = (p.x-cx)/fx;
 			float ny = (p.y-cy)/fy;
-			float z = rand.nextFloat()*4+2;
+			// z needs to fixed value for it to generate a purely translational motion given fixed  gradient and
+			// and fixed delta in color
+			float z = 2;
 			p.p3.x = nx*z;
 			p.p3.y = ny*z;
 			p.p3.z = z;
