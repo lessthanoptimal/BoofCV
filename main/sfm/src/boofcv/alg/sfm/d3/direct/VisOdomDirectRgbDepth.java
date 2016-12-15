@@ -20,11 +20,13 @@ package boofcv.alg.sfm.d3.direct;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.sfm.ImagePixelTo3D;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.FactoryGImageMultiBand;
 import boofcv.core.image.GImageMultiBand;
 import boofcv.core.image.border.BorderType;
+import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -50,7 +52,7 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 	private ImageType<D> derivType;
 
 	private LinearSolver<DenseMatrix64F> solver;
-	private DenseMatrix64F A = new DenseMatrix64F(1,1);
+	private DenseMatrix64F A = new DenseMatrix64F(1,6);
 	private DenseMatrix64F y = new DenseMatrix64F(1,1);
 	private DenseMatrix64F twistMatrix = new DenseMatrix64F(6,1);
 
@@ -62,37 +64,38 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 
 	private GImageMultiBand wrapI;
 
+	// storage for pixel value at current location and it's gradient
 	private float current[];
 	private float dx[];
 	private float dy[];
 
+	// gradient of the current frame
+	D derivX, derivY;
 
-	// gradient of key-frame
-	private D derivX, derivY;
-
-	private FastQueue<Pixel> keypixels;
+	// storage for pixel information in the key frame
+	FastQueue<Pixel> keypixels;
 
 	// Estimated motion from key frame to current frame
 	private Se3_F32 keyToCurrent = new Se3_F32();
 
 	// estimated motion from twist parameters for current iterations
 	Se3_F32 motionTwist = new Se3_F32();
-	Se3_F32 tmp = new Se3_F32(); // work space
+	private Se3_F32 tmp = new Se3_F32(); // work space
 
 	/** focal length along x and y axis (units: pixels) */
-	float fx,fy;
+	private float fx,fy;
 	/** image center (units: pixels) */
-	float cx,cy;
+	private float cx,cy;
 
-	float convergeTol = 1e-6f;
-	int maxIterations = 10;
+	private float convergeTol = 1e-6f;
+	private int maxIterations = 10;
 
 	// average optical error per pixel and band
-	float errorOptical;
+	private float errorOptical;
 	// number of valid pixels used to compute error
-	int validPixels = 0;
+	private int validPixels = 0;
 
-	TwistCoordinate_F32 twist = new TwistCoordinate_F32();
+	private TwistCoordinate_F32 twist = new TwistCoordinate_F32();
 
 	public VisOdomDirectRgbDepth(ImageType<I> imageType , ImageType<D> derivType ) {
 
@@ -109,19 +112,32 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 		dx = new float[ numBands ];
 		dy = new float[ numBands ];
 
-		keypixels = new FastQueue<Pixel>() {
+		derivX = derivType.createImage(1,1);
+		derivY = derivType.createImage(1,1);
+
+		keypixels = new FastQueue<Pixel>(Pixel.class,true) {
 			@Override
 			protected Pixel createInstance() {
 				return new Pixel(numBands);
 			}
 		};
+		computeD = FactoryDerivative.gradient(DerivativeType.THREE, imageType, derivType);
 	}
 
-	public void setCameraParameters( float fx , float fy , float cx , float cy ) {
+	public void setCameraParameters( float fx , float fy , float cx , float cy ,
+									 int width , int height ) {
 		this.fx = fx;
 		this.fy = fy;
 		this.cx = cx;
 		this.cy = cy;
+
+		derivX.reshape(width, height);
+		derivY.reshape(width, height);
+
+		// set these to the maximum possible size
+		int N = width*height*imageType.getNumBands();
+		A.reshape(N,6);
+		y.reshape(N,1);
 	}
 
 	public void setInterpolation( double inputMin , double inputMax, double derivMin , double derivMax ,
@@ -136,7 +152,7 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 		this.maxIterations = maxIterations;
 	}
 
-	private void setKeyFrame(I input, ImagePixelTo3D pixelTo3D) {
+	void setKeyFrame(I input, ImagePixelTo3D pixelTo3D) {
 		wrapI.wrap(input);
 		keypixels.reset();
 
@@ -162,21 +178,13 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 
 				p.x = x;
 				p.y = y;
-				p.X.set(P_x/P_w,P_y/P_w,P_z/P_w);
+				p.p3.set(P_x/P_w,P_y/P_w,P_z/P_w);
 			}
 		}
 	}
 
 	public boolean estimateMotion(I input , Se3_F32 hintKeyToInput ) {
-		if( solver == null ) {
-			solver = LinearSolverFactory.qr(input.width*input.height,6);
-		}
-
-		// compute image derivative and setup interpolation functions
-		computeD.process(input,derivX,derivY);
-		interpDX.setImage(derivX);
-		interpDY.setImage(derivY);
-		interpI.setImage(input);
+		initMotion(input);
 
 		keyToCurrent.set(hintKeyToInput);
 
@@ -200,12 +208,31 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 		return foundSolution;
 	}
 
-	private void constructLinearSystem(int width , int height , Se3_F32 g ) {
+	/**
+	 * Initialize motion related data structures
+	 * @param input
+	 */
+	void initMotion(I input) {
+		if( solver == null ) {
+			solver = LinearSolverFactory.qr(input.width*input.height,6);
+		}
 
-		int N = width*height;
+		// compute image derivative and setup interpolation functions
+		computeD.process(input,derivX,derivY);
+		interpDX.setImage(derivX);
+		interpDY.setImage(derivY);
+		interpI.setImage(input);
+	}
+
+	/**
+	 * Given the set of points in the key frame and their current observations
+	 * @param width image width
+	 * @param height image height
+	 * @param g initial transform applied to pixel locations
+	 */
+	void constructLinearSystem(int width , int height , Se3_F32 g ) {
+
 		int numBands = imageType.getNumBands();
-		A.reshape(N*numBands,6);
-		y.reshape(N*numBands,1);
 
 		Point3D_F32 S = new Point3D_F32();
 
@@ -216,7 +243,7 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 			Pixel p = keypixels.data[i];
 
 			// Apply the known warp
-			SePointOps_F32.transform(g,p.X,S);
+			SePointOps_F32.transform(g,p.p3,S);
 
 			// Compute projected warped pixel coordinate on image I_1
 			float x1 = (S.x*fx)/S.z + cx;
@@ -264,9 +291,13 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 			}
 		}
 		errorOptical /= row;
+
+
+		A.numRows = row;
+		y.numRows = row;
 	}
 
-	private boolean solveSystem() {
+	boolean solveSystem() {
 		if( !solver.setA(A))
 			return false;
 
@@ -284,10 +315,10 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 		return true;
 	}
 
-	private static class Pixel {
+	static class Pixel {
 		float bands[]; // pixel intensity in each band
 		int x,y; // pixel coordinate
-		Point3D_F32 X = new Point3D_F32(); // world coordinate
+		Point3D_F32 p3 = new Point3D_F32(); // world coordinate
 
 		public Pixel( int numBands ) {
 			bands = new float[numBands];

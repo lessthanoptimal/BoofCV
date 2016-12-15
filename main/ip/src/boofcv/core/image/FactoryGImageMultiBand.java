@@ -45,7 +45,9 @@ public class FactoryGImageMultiBand {
 	}
 
 	public static GImageMultiBand create( ImageType imageType ) {
-		if( imageType.getFamily() == ImageType.Family.PLANAR) {
+		if( imageType.getFamily() == ImageType.Family.GRAY ) {
+			return new GSingleToMB(FactoryGImageGray.create(imageType.getImageClass()));
+		} if( imageType.getFamily() == ImageType.Family.PLANAR) {
 			return new PL();
 		} else if( imageType.getFamily() == ImageType.Family.INTERLEAVED ) {
 			switch( imageType.getDataType() ) {
