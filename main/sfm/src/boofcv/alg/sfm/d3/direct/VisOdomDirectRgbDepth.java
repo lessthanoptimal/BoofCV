@@ -20,6 +20,7 @@ package boofcv.alg.sfm.d3.direct;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.sfm.ImagePixelTo3D;
+import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolationType;
@@ -190,6 +191,7 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 	 * @param pixelTo3D Used to compute 3D points from pixels in key frame
 	 */
 	void setKeyFrame(I input, ImagePixelTo3D pixelTo3D) {
+		InputSanityCheck.checkSameShape(derivX,input);
 		wrapI.wrap(input);
 		keypixels.reset();
 
@@ -227,6 +229,7 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 	 * @return true if it was successful at estimating the motion or false if it failed for some reason
 	 */
 	public boolean estimateMotion(I input , Se3_F32 hintKeyToInput ) {
+		InputSanityCheck.checkSameShape(derivX,input);
 		initMotion(input);
 
 		keyToCurrent.set(hintKeyToInput);
@@ -288,12 +291,13 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 			SePointOps_F32.transform(g,p.p3,S);
 
 			// Compute projected warped pixel coordinate on image I_1
-			float x1 = (S.x*fx)/S.z + cx;
-			float y1 = (S.y*fy)/S.z + cy;
+			float projX = (S.x/S.z)*fx + cx;
+			float projY = (S.y/S.z)*fy + cy;
 
 			// make sure it's in the bounds
-			if( x1 < 0 || x1 > width-1 || y1 < 0 || y1 > height-1 )
+			if( projX < 0 || projX > width-1 || projY < 0 || projY > height-1 ) {
 				continue;
+			}
 			validPixels++;
 
 			// pi matrix derivative relative to t at S
@@ -305,9 +309,9 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 			float dP23 = -S.y*fy/ZZ;
 
 			// sample pixel values at warped location in I_1
-			interpI.get(x1,y1, current);
-			interpDX.get(x1,y1, dx);
-			interpDY.get(x1,y1, dy);
+			interpI.get( projX,projY, current);
+			interpDX.get(projX,projY, dx);
+			interpDY.get(projX,projY, dy);
 
 			for (int band = 0; band < numBands; band++, row++) {
 				float bandDx = dx[band];
@@ -340,19 +344,13 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 	}
 
 	boolean solveSystem() {
-//		A.print();
 		if( !solver.setA(A))
 			return false;
 
 		solver.solve(y,twistMatrix);
-		twistMatrix.print();
 
 		twist.set((float)twistMatrix.data[0], (float)twistMatrix.data[1], (float)twistMatrix.data[2],
 				(float)twistMatrix.data[3], (float)twistMatrix.data[4], (float)twistMatrix.data[5]);
-
-		// TODO see how close to norm of 1 it is
-		twist.normalize();
-//		twist.print();
 
 		// theta is 1 because of how this solution was formulated.  See derivation
 		TwistOps_F32.exponential(twist,1.0f, motionTwist );

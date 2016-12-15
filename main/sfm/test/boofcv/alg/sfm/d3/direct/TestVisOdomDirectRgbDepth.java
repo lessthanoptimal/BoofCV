@@ -21,15 +21,16 @@ package boofcv.alg.sfm.d3.direct;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
-import georegression.geometry.ConvertRotation3D_F64;
-import georegression.struct.EulerType;
+import georegression.geometry.ConvertRotation3D_F32;
+import georegression.misc.GrlConstants;
 import georegression.struct.se.Se3_F32;
+import georegression.struct.so.Rodrigues_F32;
 import org.junit.Test;
 
 import java.util.Random;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -48,22 +49,53 @@ public class TestVisOdomDirectRgbDepth {
 	float cy = height/2;
 
 	/**
-	 * Generate synthetic data that should simulate a translation along one axis.
+	 * Generate low level synthetic data that should simulate a translation along one axis.  Then check to see if
+	 * has the expected behavior at a high level
 	 */
 	@Test
-	public void injectedMotion() {
-		// the color before and after + the image gradient needs to be carefully chosen
-		float colorBefore = 20;
-		float colorAfter = 10;
+	public void singleStepArtificialTranslation() {
+		// it wants to declares the color of each pixel, the gradient says it increases to the right
+		// so it will move in the negative x direction
+		Se3_F32 a = computeMotion(10,20,6,0);
+		assertTrue(a.T.x < -0.02);
+		assertEquals( 0 , a.T.y , 1e-2f);
+		assertEquals( 0 , a.T.z , 1e-2f);
+		assertTrue(rotationMag(a) < GrlConstants.DOUBLE_TEST_TOL_SQRT);
 
+		// reverse the direction
+		Se3_F32 b = computeMotion(20,10,6,0);
+		assertTrue(b.T.x > 0.02);
+		assertEquals( 0 , b.T.y , 1e-2f);
+		assertEquals( 0 , b.T.z , 1e-2f);
+		assertTrue(rotationMag(b) < GrlConstants.DOUBLE_TEST_TOL_SQRT);
+
+		assertEquals( a.T.x , -b.T.x , 1e-4f);
+
+		// make it move along the y-axis
+		Se3_F32 c = computeMotion(10,20,0,6);
+		assertEquals( 0 , c.T.x , 1e-2f);
+		assertTrue(c.T.y < -0.02);
+		assertEquals( 0 , c.T.z , 1e-2f);
+		assertTrue(rotationMag(c) < GrlConstants.DOUBLE_TEST_TOL_SQRT);
+		assertEquals( a.T.x , c.T.y , 0.01);
+
+		// increase the magnitude of the motion by making the gradient smaller
+		Se3_F32 d = computeMotion(10,20,3,0);
+		assertTrue( 1.5f*Math.abs(a.T.x) < Math.abs(d.T.x) );
+	}
+
+	public Se3_F32 computeMotion( float colorBefore , float colorAfter , float dx , float dy ) {
 		VisOdomDirectRgbDepth<GrayF32,GrayF32> alg = new VisOdomDirectRgbDepth<>(imageType,imageType);
 		alg.setCameraParameters(fx,fy,cx,cy,width,height);
 
 		GrayF32 input = new GrayF32(width,height);
 		ImageMiscOps.fill(input,colorAfter);
 		alg.initMotion(input);
-		ImageMiscOps.fill(alg.derivX,100);
-		ImageMiscOps.fill(alg.derivY,1f);
+		ImageMiscOps.fill(alg.derivX,dx);
+		ImageMiscOps.fill(alg.derivY,dy);
+		// need to add noise to avoid pathological stuff
+		ImageMiscOps.addUniform(alg.derivX, rand, 0f,0.1f);
+		ImageMiscOps.addUniform(alg.derivY, rand, 0f,0.1f);
 
 		// generate some synthetic data.  This will be composed of random points in front of the camera
 		for (int i = 0; i < 100; i++) {
@@ -87,11 +119,14 @@ public class TestVisOdomDirectRgbDepth {
 		alg.constructLinearSystem(width,height, new Se3_F32());
 		assertTrue(alg.solveSystem());
 
-		alg.motionTwist.print();
+		assertEquals(Math.abs(colorAfter-colorBefore), alg.getErrorOptical(), 1e-4f);
+		assertTrue(alg.getValidPixels() > 95 ); // counting error can cause a drop
 
-		double[] euler = ConvertRotation3D_F64.matrixToEuler(alg.motionTwist.getR(), EulerType.XYZ, null);
-		System.out.println(euler[0]+"  "+euler[1]+"  "+euler[2]);
+		return alg.motionTwist;
+	}
 
-		fail("Finish");
+	public float rotationMag(Se3_F32 motion ) {
+		Rodrigues_F32 rod = ConvertRotation3D_F32.matrixToRodrigues(motion.R,null);
+		return rod.theta;
 	}
 }
