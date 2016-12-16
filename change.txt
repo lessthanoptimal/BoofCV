@@ -28,7 +28,7 @@ Version : 0.27
 - ConvolveDownNormalized
   * Added interleaved image support TODO
 - AverageDownSample
-  * Added support for planar images TODO
+  * Made image generic
   * Added support for interleaved images TODO
 
 

@@ -61,6 +61,22 @@ public class AverageDownSampleOps {
 		image.reshape(w,h);
 	}
 
+	public static void down(ImageBase input , int sampleWidth , ImageBase output ) {
+		switch( input.getImageType().getFamily()  ) {
+			case GRAY:
+				down((ImageGray)input, sampleWidth, (ImageGray)output );
+				return;
+
+			case PLANAR:
+				down((Planar) input, sampleWidth, (Planar)output );
+				return;
+
+			case INTERLEAVED:
+				throw new IllegalArgumentException("Interleaved images are not yet supported");
+		}
+		throw new IllegalArgumentException("Unknown image type");
+	}
+
 	/**
 	 * Down samples image.  Type checking is done at runtime.
 	 *
