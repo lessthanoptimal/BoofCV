@@ -20,16 +20,13 @@ Version : 0.27
 - ConvolveDown
   * Added an interface
   * Added planar image support
-  * Added interleaved image support TODO
-- ConvolveStandard
-  * Added interleaved image support TODO
-- ConvolveNormalized
-  * Added interleaved image support TODO
-- ConvolveDownNormalized
-  * Added interleaved image support TODO
+- Support for Interleaved Images Added to
+  * ConvolveWithBorder
+  * ConvolveNormalized TODO
+  * ConvolveDownNormalized TODO
+  * AverageDownSample TODO
 - AverageDownSample
   * Made image generic
-  * Added support for interleaved images TODO
 - Renamed for consistency
   * Kernel2D_I32 -> Kernel2D_S32
   * Kernel2D_I32 -> Kernel2D_S32
