@@ -49,7 +49,7 @@ public abstract class GeneralBilinearPixelMultiChecks<T extends ImageInterleaved
 
 	@Override
 	protected void compute(T _img, float x, float y, float pixel[] ) {
-		ImageBorder<T> imgB = FactoryImageBorder.interleaved(_img, BorderType.EXTENDED);
+		ImageBorder<T> imgB = FactoryImageBorder.wrap(BorderType.EXTENDED, _img);
 		GImageMultiBand img = FactoryGImageMultiBand.wrap(imgB);
 
 		float []X0Y0 = new float[ _img.getNumBands() ];

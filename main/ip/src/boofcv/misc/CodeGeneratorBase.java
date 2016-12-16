@@ -74,6 +74,8 @@ public abstract class CodeGeneratorBase {
 	}
 
 	public void setOutputFile( String className ) throws FileNotFoundException {
+		if( this.className != null )
+			throw new IllegalArgumentException("ClassName already set.  Out of date code?");
 		this.className = className;
 		initFile();
 	}

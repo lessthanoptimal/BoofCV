@@ -29,18 +29,6 @@ import boofcv.struct.image.*;
 @SuppressWarnings({"unchecked"})
 public class FactoryImageBorder {
 
-	public static <T extends ImageGray<T>> ImageBorder<T> single(T image, BorderType borderType) {
-		ImageBorder<T> ret = single((Class) image.getClass(), borderType);
-		ret.setImage(image);
-		return ret;
-	}
-
-	public static <T extends ImageInterleaved<T>> ImageBorder<T> interleaved(T image, BorderType borderType) {
-		ImageBorder<T> ret = interleaved((Class) image.getClass(), borderType);
-		ret.setImage(image);
-		return ret;
-	}
-
 	/**
 	 * Given an image type return the appropriate {@link ImageBorder} class type.
 	 *
@@ -58,6 +46,12 @@ public class FactoryImageBorder {
 			return (Class)ImageBorder1D_S64.class;
 		else
 			throw new IllegalArgumentException("Unknown image type");
+	}
+
+	public static <T extends ImageBase<T>> ImageBorder<T> wrap(BorderType borderType, T image) {
+		ImageBorder<T> ret = generic(borderType, image.getImageType());
+		ret.setImage(image);
+		return ret;
 	}
 
 	public static <T extends ImageBase<T>> ImageBorder<T>

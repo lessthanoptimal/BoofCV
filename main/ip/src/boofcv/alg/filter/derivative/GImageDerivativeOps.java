@@ -99,7 +99,7 @@ public class GImageDerivativeOps {
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	void gradient( DerivativeType type , I input , D derivX , D derivY , BorderType borderType ) {
 
-		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.single(input, borderType);
+		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.wrap(borderType, input);
 
 		switch( type ) {
 			case PREWITT:
@@ -177,7 +177,7 @@ public class GImageDerivativeOps {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	void hessian( DerivativeType type , I input , D derivXX , D derivYY , D derivXY , BorderType borderType ) {
-		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.single(input, borderType);
+		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.wrap(borderType, input);
 
 		switch( type ) {
 			case SOBEL:
@@ -218,7 +218,7 @@ public class GImageDerivativeOps {
 	 */
 	public static <D extends ImageGray<D>>
 	void hessian( DerivativeType type , D derivX , D derivY , D derivXX , D derivYY , D derivXY , BorderType borderType ) {
-		ImageBorder<D> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.single(derivX, borderType);
+		ImageBorder<D> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.wrap(borderType, derivX);
 
 		switch( type ) {
 			case PREWITT:

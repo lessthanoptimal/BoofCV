@@ -199,7 +199,7 @@ public class FactoryGImageMultiBand {
 
 		@Override
 		public void get(int x, int y, float[] value) {
-			value[0]=sb.getF(y*sb.getWidth()+x);
+			value[0]=sb.unsafe_getF(x,y);
 		}
 
 		@Override

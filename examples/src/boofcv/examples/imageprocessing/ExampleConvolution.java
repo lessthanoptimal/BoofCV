@@ -61,7 +61,7 @@ public class ExampleConvolution {
 	 * Convolves a 1D kernel horizontally and vertically
 	 */
 	private static void convolve1D(GrayU8 gray) {
-		ImageBorder<GrayU8> border = FactoryImageBorder.single(gray, BorderType.EXTENDED);
+		ImageBorder<GrayU8> border = FactoryImageBorder.wrap(BorderType.EXTENDED, gray);
 		Kernel1D_S32 kernel = new Kernel1D_S32(2);
 		kernel.offset = 1; // specify the kernel's origin
 		kernel.data[0] = 1;
@@ -89,7 +89,7 @@ public class ExampleConvolution {
 
 		// Output needs to handle the increased domain after convolution.  Can't be 8bit
 		GrayS16 output = new GrayS16(gray.width,gray.height);
-		ImageBorder<GrayU8> border = FactoryImageBorder.single(gray, BorderType.EXTENDED);
+		ImageBorder<GrayU8> border = FactoryImageBorder.wrap( BorderType.EXTENDED,gray);
 
 		GConvolveImageOps.convolve(kernel, gray, output, border);
 		panel.addImage(VisualizeImageData.standard(output, null), "2D Kernel");

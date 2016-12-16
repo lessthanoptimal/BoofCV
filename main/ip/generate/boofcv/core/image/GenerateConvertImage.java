@@ -29,12 +29,6 @@ import java.io.FileNotFoundException;
  */
 public class GenerateConvertImage extends CodeGeneratorBase {
 
-	String className = "ConvertImage";
-
-	public GenerateConvertImage() throws FileNotFoundException {
-		setOutputFile(className);
-	}
-
 	@Override
 	public void generate() throws FileNotFoundException {
 		printPreamble();

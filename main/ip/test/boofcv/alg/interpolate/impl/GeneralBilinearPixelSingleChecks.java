@@ -42,7 +42,7 @@ public abstract class GeneralBilinearPixelSingleChecks<T extends ImageGray<T>> e
 
 	@Override
 	protected float compute(T _img, float x, float y) {
-		ImageBorder<?> imgB = FactoryImageBorder.single(_img, BorderType.EXTENDED);
+		ImageBorder<?> imgB = FactoryImageBorder.wrap(BorderType.EXTENDED, _img);
 		GImageGray img = FactoryGImageGray.wrap(imgB);
 
 		int gX = (int) x;

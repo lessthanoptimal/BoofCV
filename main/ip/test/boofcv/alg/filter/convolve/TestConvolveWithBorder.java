@@ -20,13 +20,14 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.alg.filter.convolve.border.CompareImageBorder;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.FactoryGImageGray;
-import boofcv.core.image.GImageGray;
+import boofcv.core.image.FactoryGImageMultiBand;
+import boofcv.core.image.GImageMultiBand;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageInterleaved;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -56,6 +57,8 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 		for( Class<?> c : e ) {
 			if( ImageGray.class.isAssignableFrom(c))
 				return true;
+			if( ImageInterleaved.class.isAssignableFrom(c))
+				return true;
 		}
 		return false;
 	}
@@ -63,28 +66,30 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 	@Test
 	public void compareToNoBorder() {
 		kernelWidth = 5; kernelOffset = 2;
-		performTests(12);
+		performTests(30);
 		kernelWidth = 5; kernelOffset = 0;
-		performTests(12);
+		performTests(30);
 		kernelWidth = 5; kernelOffset = 4;
-		performTests(12);
+		performTests(30);
 		kernelWidth = 4; kernelOffset = 1;
-		performTests(12);
+		performTests(30);
 	}
 
 	/**
 	 * Fillers the border in the larger image with an extended version of the smaller image.  A duplicate
 	 * of the smaller image is contained in the center of the larger image.
 	 */
-	protected void fillTestImage(ImageGray smaller, ImageGray larger,
+	protected void fillTestImage(ImageBase smaller, ImageBase larger,
 								 KernelBase kernel , String functionName ) {
 
 		computeBorder(kernel,functionName);
 
 		stripBorder(larger,borderX0,borderY0,borderX1,borderY1).setTo(smaller);
 
-		GImageGray s = FactoryGImageGray.wrap(smaller);
-		GImageGray l = FactoryGImageGray.wrap(larger);
+		GImageMultiBand s = FactoryGImageMultiBand.wrap(smaller);
+		GImageMultiBand l = FactoryGImageMultiBand.wrap(larger);
+
+		float pixel[] = new float[ s.getNumberOfBands() ];
 
 		for( int y = 0; y < larger.height; y++ ) {
 			for( int x = 0; x < larger.width; x++ ) {
@@ -101,7 +106,8 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 				else if( sy >= smaller.height  )
 					sy = smaller.height-1;
 
-				l.set(x,y,s.get(sx,sy));
+				s.get(sx,sy, pixel);
+				l.set(x,y,   pixel);
 			}
 		}
 
@@ -145,7 +151,7 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 		ret[0][0] = createKernel(paramTypes[0], kernelWidth, kernelOffset);
 		ret[0][1] = src;
 		ret[0][2] = dst;
-		ret[0][3] = FactoryImageBorder.single((ImageGray)src, BorderType.EXTENDED);
+		ret[0][3] = FactoryImageBorder.wrap(BorderType.EXTENDED, src);
 
 		return ret;
 	}
@@ -154,7 +160,7 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
 		Object[] ret =  new Object[]{targetParam[0],targetParam[1],targetParam[2]};
 
-		ImageGray inputImage = (ImageGray)targetParam[1];
+		ImageBase inputImage = (ImageBase)targetParam[1];
 
 		KernelBase kernel = (KernelBase)targetParam[0];
 
@@ -164,28 +170,36 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 		int h = borderY0+borderY1;
 
 		ret[1] = inputImage.createNew(width+w,height+h);
-		ret[2] = ((ImageGray)targetParam[2]).createNew(width+w,height+h);
+		ret[2] = ((ImageBase)targetParam[2]).createNew(width+w,height+h);
 
-		fillTestImage(inputImage,(ImageGray)ret[1],kernel,m.getName());
+		fillTestImage(inputImage,(ImageBase)ret[1],kernel,m.getName());
 
 		return ret;
 	}
 
 	@Override
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
-		ImageGray targetOut = (ImageGray)targetParam[2];
-		ImageGray validationOut = (ImageGray)validationParam[2];
+		ImageBase targetOut = (ImageBase)targetParam[2];
+		ImageBase validationOut = (ImageBase)validationParam[2];
 
 		// remove the border
 		computeBorder((KernelBase)targetParam[0],methodTest.getName());
 		validationOut = stripBorder(validationOut,borderX0,borderY0,borderX1,borderY1);
 
-		GImageGray t = FactoryGImageGray.wrap(targetOut);
-		GImageGray v = FactoryGImageGray.wrap(validationOut);
+		GImageMultiBand t = FactoryGImageMultiBand.wrap(targetOut);
+		GImageMultiBand v = FactoryGImageMultiBand.wrap(validationOut);
+
+		float valueT[] = new float[ t.getNumberOfBands() ];
+		float valueV[] = new float[ v.getNumberOfBands() ];
 
 		for( int y = 0; y < targetOut.height; y++ ) {
 			for( int x = 0; x < targetOut.width; x++ ) {
-				assertEquals("Failed at "+x+" "+y,v.get(x,y).doubleValue(),t.get(x,y).doubleValue(),1e-4f);
+				t.get(x,y, valueT);
+				v.get(x,y, valueV);
+
+				for (int band = 0; band < valueT.length; band++) {
+					assertEquals("Failed at "+x+" "+y+" band "+band,valueV[band],valueT[band],1e-4f);
+				}
 			}
 		}
 	}
