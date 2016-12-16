@@ -45,6 +45,10 @@ public class BoofTesting {
 			return (T) GrayI8.class;
 		if (type == GrayS16.class || type == GrayU16.class)
 			return (T) GrayI16.class;
+		if (type == InterleavedS8.class || type == InterleavedU8.class)
+			return (T) InterleavedI8.class;
+		if (type == InterleavedS16.class || type == InterleavedU16.class)
+			return (T) InterleavedI16.class;
 		return (T) type;
 	}
 

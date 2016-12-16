@@ -44,7 +44,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 	static int kernelRadius = 2;
 
 	public TestImplConvolveMean() {
-		super(ImplConvolveMean.class, ConvolveImageStandard.class);
+		super(ImplConvolveMean.class, ConvolveImageStandard_SB.class);
 	}
 
 	@Test

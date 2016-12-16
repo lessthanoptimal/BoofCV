@@ -139,16 +139,16 @@ public class FactoryConvolveDown {
 		try {
 			switch( border ) {
 				case SKIP:
-					m = ConvolveDownNoBorder.class.
-							getMethod("convolve",kernel.getClass(),inputType,outputType,int.class);
+					m = ConvolveDownNoBorder.class.getMethod(
+							"convolve",kernel.getClass(),inputType,outputType,int.class);
 					break;
 
 				case EXTENDED:
 					throw new IllegalArgumentException("Extended border is currently not supported.");
 
 				case NORMALIZED:
-					m = ConvolveDownNormalized.class.
-							getMethod("convolve",kernel.getClass(),inputType,outputType,int.class);
+					m = ConvolveDownNormalized.class.getMethod(
+							"convolve",kernel.getClass(),inputType,outputType,int.class);
 					break;
 
 				default:
@@ -164,7 +164,8 @@ public class FactoryConvolveDown {
 
 	public static <Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 	ConvolveDown<Planar<Input>,Planar<Output>>
-	convolvePL(Kernel1D kernel, BorderType border, boolean isHorizontal, int skip, int numBands, Class<Input> inputType, Class<Output> outputType)
+	convolvePL(Kernel1D kernel, BorderType border, boolean isHorizontal, int skip,
+			   int numBands, Class<Input> inputType, Class<Output> outputType)
 	{
 		ConvolveDown<Input,Output> grayDown = convolveG(kernel, border, isHorizontal, skip, inputType, outputType);
 		return new PlanarConvolveDown<>(grayDown, numBands);
@@ -172,7 +173,8 @@ public class FactoryConvolveDown {
 
 	public static <Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 	ConvolveDown<Planar<Input>,Planar<Output>>
-	convolvePL(Kernel2D kernel, BorderType border, int skip, int numBands, Class<Input> inputType, Class<Output> outputType)
+	convolvePL(Kernel2D kernel, BorderType border, int skip,
+			   int numBands, Class<Input> inputType, Class<Output> outputType)
 	{
 		ConvolveDown<Input,Output> grayDown = convolveG(kernel, border, skip, inputType, outputType);
 		return new PlanarConvolveDown<>(grayDown, numBands);

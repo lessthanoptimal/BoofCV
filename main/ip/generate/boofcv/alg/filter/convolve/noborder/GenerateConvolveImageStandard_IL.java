@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,12 +24,12 @@ import boofcv.misc.CodeGeneratorBase;
 import java.io.FileNotFoundException;
 
 /**
- * Code generator for {@link ConvolveImageStandard}.
+ * Code generator for {@link ConvolveImageStandard_SB}.
  *
  * @author Peter Abeles
  */
-public class GenerateConvolveImageStandard extends CodeGeneratorBase {
-	String className = "ConvolveImageStandard";
+public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
+	String className = "ConvolveImageStandard_IL";
 
 	String kernelType;
 	String inputType;
@@ -75,7 +75,7 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 				" * </p>\n" +
 				" * \n" +
 				" * <p>\n" +
-				" * NOTE: This code was automatically generated using {@link "+getClass().getName()+"}.\n" +
+				" * NOTE: This code was automatically generated using "+getClass().getSimpleName()+".\n" +
 				" * </p>\n" +
 				" * \n" +
 				" * @author Peter Abeles\n" +
@@ -97,8 +97,8 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 
 		typeCast = output.getTypeCastFromSum();
 		kernelType = isInteger ? "I32" : is64 ? "F64" : "F32";
-		inputType = input.getSingleBandName();
-		outputType = output.getSingleBandName();
+		inputType = input.getInterleavedName();
+		outputType = output.getInterleavedName();
 		kernelData = isInteger ? "int" : is64 ? "double" : "float";
 		inputData = input.getDataType();
 		outputData = output.getDataType();
@@ -122,31 +122,33 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 		String paramDiv = hasDivide ? " , int divisor" : "";
 		String totalDiv = hasDivide ? "((total+halfDivisor)/divisor)" : "total";
 
-		out.print("\tpublic static void horizontal( Kernel1D_" + kernelType + " kernel ,\n");
-		out.print("\t\t\t\t\t\t\t\t  " + inputType + " image, " + outputType + " dest" + paramDiv + " ) {\n" +
-				"\t\tfinal " + inputData + "[] dataSrc = image.data;\n" +
-				"\t\tfinal " + outputData + "[] dataDst = dest.data;\n" +
-				"\t\tfinal " + kernelData + "[] dataKer = kernel.data;\n" +
+		out.print("\tpublic static void horizontal( Kernel1D_"+kernelType+" kernel ,\n" +
+				"\t\t\t\t\t\t\t\t   "+inputType+" src, "+outputType+" dst"+paramDiv+" ) {\n" +
+				"\t\tfinal "+inputData+"[] dataSrc = src.data;\n" +
+				"\t\tfinal "+outputData+"[] dataDst = dst.data;\n" +
+				"\t\tfinal "+kernelData+"[] dataKer = kernel.data;\n" +
 				"\n" +
 				"\t\tfinal int offset = kernel.getOffset();\n" +
-				"\t\tfinal int kernelWidth = kernel.getWidth();\n");
+				"\t\tfinal int kernelWidth = kernel.getWidth();\n" +
+				"\t\tfinal int numBands = src.getNumBands();\n");
 		if( hasDivide )
 			out.print("\t\tfinal int halfDivisor = divisor/2;\n");
 		out.print("\n" +
-				"\t\tfinal int width = image.getWidth();\n" +
+				"\t\tfinal int endJ = src.width - (kernelWidth - 1);\n" +
 				"\n" +
-				"\t\tfor( int i = 0; i < image.height; i++ ) {\n" +
-				"\t\t\tint indexDst = dest.startIndex + i*dest.stride+offset;\n" +
-				"\t\t\tint j = image.startIndex + i*image.stride;\n" +
-				"\t\t\tfinal int jEnd = j+width-(kernelWidth-1);\n" +
+				"\t\tfor( int i = 0; i < src.height; i++ ) {\n" +
+				"\t\t\tint indexDst = dst.startIndex + i*dst.stride+offset*numBands;\n" +
 				"\n" +
-				"\t\t\tfor( ; j < jEnd; j++ ) {\n" +
-				"\t\t\t\t" + sumType + " total = 0;\n" +
-				"\t\t\t\tint indexSrc = j;\n" +
-				"\t\t\t\tfor( int k = 0; k < kernelWidth; k++ ) {\n" +
-				"\t\t\t\t\ttotal += (dataSrc[indexSrc++] " + bitWise + ") * dataKer[k];\n" +
+				"\t\t\tfor (int j = 0; j < endJ; j++) {\n" +
+				"\t\t\t\tint indexSrcStart = src.startIndex + i*src.stride + j*numBands;\n" +
+				"\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
+				"\t\t\t\t\tint indexSrc = indexSrcStart + band;\n" +
+				"\t\t\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\t\t\tfor (int k = 0; k < kernelWidth; k++, indexSrc += numBands) {\n" +
+				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc] "+bitWise+") * dataKer[k];\n" +
+				"\t\t\t\t\t}\n" +
+				"\t\t\t\t\tdataDst[indexDst++] = "+typeCast+totalDiv+";\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDst++] = " + typeCast + totalDiv + ";\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -156,36 +158,40 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 		String paramDiv = hasDivide ? " , int divisor" : "";
 		String totalDiv = hasDivide ? "((total+halfDivisor)/divisor)" : "total";
 
-		out.print("\tpublic static void vertical( Kernel1D_" + kernelType + " kernel,\n" +
-				"\t\t\t\t\t\t\t\t " + inputType + " image, " + outputType + " dest" + paramDiv +" )\n" +
+		out.print("\tpublic static void vertical( Kernel1D_"+kernelType+" kernel,\n" +
+				"\t\t\t\t\t\t\t\t "+inputType+" src, "+outputType+" dst"+paramDiv+" )\n" +
 				"\t{\n" +
-				"\t\tfinal " + inputData + "[] dataSrc = image.data;\n" +
-				"\t\tfinal " + outputData + "[] dataDst = dest.data;\n" +
-				"\t\tfinal " + kernelData + "[] dataKer = kernel.data;\n" +
+				"\t\tfinal "+inputData+"[] dataSrc = src.data;\n" +
+				"\t\tfinal "+outputData+"[] dataDst = dst.data;\n" +
+				"\t\tfinal "+kernelData+"[] dataKer = kernel.data;\n" +
 				"\n" +
 				"\t\tfinal int offset = kernel.getOffset();\n" +
-				"\t\tfinal int kernelWidth = kernel.getWidth();\n");
+				"\t\tfinal int kernelWidth = kernel.getWidth();\n" +
+				"\t\tfinal int numBands = src.getNumBands();\n");
 		if( hasDivide )
 			out.print("\t\tfinal int halfDivisor = divisor/2;\n");
 		out.print("\n" +
-				"\t\tfinal int imgWidth = dest.getWidth();\n" +
-				"\t\tfinal int imgHeight = dest.getHeight();\n" +
+				"\t\tfinal int imgWidth = dst.getWidth();\n" +
+				"\t\tfinal int imgHeight = dst.getHeight();\n" +
 				"\n" +
 				"\t\tfinal int yEnd = imgHeight-(kernelWidth-offset-1);\n" +
 				"\n" +
 				"\t\tfor( int y = offset; y < yEnd; y++ ) {\n" +
-				"\t\t\tint indexDst = dest.startIndex+y*dest.stride;\n" +
-				"\t\t\tint i = image.startIndex + (y-offset)*image.stride;\n" +
-				"\t\t\tfinal int iEnd = i+imgWidth;\n" +
+				"\t\t\tint indexDst = dst.startIndex+y*dst.stride;\n" +
+				"\t\t\tint indexSrcStart = src.startIndex+(y-offset)*src.stride;\n" +
 				"\n" +
-				"\t\t\tfor( ; i < iEnd; i++ ) {\n" +
-				"\t\t\t\t" + sumType + " total = 0;\n" +
-				"\t\t\t\tint indexSrc = i;\n" +
-				"\t\t\t\tfor( int k = 0; k < kernelWidth; k++ ) {\n" +
-				"\t\t\t\t\ttotal += (dataSrc[indexSrc] " + bitWise + ")* dataKer[k];\n" +
-				"\t\t\t\t\tindexSrc += image.stride;\n" +
+				"\t\t\tfor (int x = 0; x < imgWidth; x++) {\n" +
+				"\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
+				"\t\t\t\t\tint indexSrc = indexSrcStart + band;\n" +
+				"\n" +
+				"\t\t\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\t\t\tfor (int k = 0; k < kernelWidth; k++) {\n" +
+				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc] "+bitWise+")* dataKer[k];\n" +
+				"\t\t\t\t\t\tindexSrc += src.stride;\n" +
+				"\t\t\t\t\t}\n" +
+				"\t\t\t\t\tdataDst[indexDst++] = "+ typeCast + totalDiv +";\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDst++] = " + typeCast + totalDiv + ";\n" +
+				"\t\t\t\tindexSrcStart += numBands;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -207,14 +213,15 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 					"\n";
 		}
 
-		out.print("\tpublic static void convolve( Kernel2D_" + kernelType + " kernel , " + inputType + " src , " + outputType + " dest " + paramDiv + paramBound + ")\n" +
+		out.print("\tpublic static void convolve( Kernel2D_"+kernelType+" kernel , "+inputType+" src , "+outputType+" dst "+paramDiv+paramBound+")\n" +
 				"\t{\n" +
-				"\t\tfinal " + kernelData + "[] dataKernel = kernel.data;\n" +
-				"\t\tfinal " + inputData + "[] dataSrc = src.data;\n" +
-				"\t\tfinal " + outputData + "[] dataDst = dest.data;\n" +
+				"\t\tfinal "+kernelData+"[] dataKernel = kernel.data;\n" +
+				"\t\tfinal "+inputData+"[] dataSrc = src.data;\n" +
+				"\t\tfinal "+outputData+"[] dataDst = dst.data;\n" +
 				"\n" +
 				"\t\tfinal int width = src.getWidth();\n" +
-				"\t\tfinal int height = src.getHeight();\n");
+				"\t\tfinal int height = src.getHeight();\n" +
+				"\t\tfinal int numBands = src.getNumBands();\n");
 		if( hasDivide )
 			out.print("\t\tfinal int halfDivisor = divisor/2;\n");
 		out.print("\n" +
@@ -222,25 +229,30 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 				"\t\tint offsetR = kernel.width-kernel.offset-1;\n" +
 				"\n" +
 				"\t\tfor( int y = offsetL; y < height-offsetR; y++ ) {\n" +
-				"\t\t\tint indexDst = dest.startIndex + y*dest.stride+offsetL;\n" +
+				"\t\t\tint indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;\n" +
 				"\t\t\tfor( int x = offsetL; x < width-offsetR; x++ ) {\n" +
-				"\t\t\t\t" + sumType + " total = 0;\n" +
-				"\t\t\t\tint indexKer = 0;\n" +
-				"\t\t\t\tfor( int ki = 0; ki < kernel.width; ki++ ) {\n" +
-				"\t\t\t\t\tint indexSrc = src.startIndex + (y+ki-offsetL)*src.stride + x-offsetL;\n" +
-				"\t\t\t\t\tfor( int kj = 0; kj <  kernel.width; kj++ ) {\n" +
-				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc+kj] " + bitWise + " )* dataKernel[indexKer++];\n" +
+				"\t\t\t\tint indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;\n" +
+				"\n" +
+				"\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
+				"\t\t\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\t\t\tint indexKer = 0;\n" +
+				"\t\t\t\t\tfor( int ki = 0; ki < kernel.width; ki++ ) {\n" +
+				"\t\t\t\t\t\tint indexSrc = indexSrcStart+ki*src.stride + band;\n" +
+				"\t\t\t\t\t\tfor( int kj = 0; kj <  kernel.width; kj++ ) {\n" +
+				"\t\t\t\t\t\t\ttotal += (dataSrc[indexSrc] "+bitWise+")* dataKernel[indexKer++];\n" +
+				"\t\t\t\t\t\t\tindexSrc += numBands;\n" +
+				"\t\t\t\t\t\t}\n" +
 				"\t\t\t\t\t}\n" +
-				"\t\t\t\t}\n" +
 				performBound +
-				"\t\t\t\tdataDst[indexDst++] = " + typeCast + totalDiv + ";\n" +
+				"\t\t\t\t\tdataDst[indexDst++] = "+ typeCast + totalDiv +";\n" +
+				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {
-		GenerateConvolveImageStandard gen = new GenerateConvolveImageStandard();
+		GenerateConvolveImageStandard_IL gen = new GenerateConvolveImageStandard_IL();
 		gen.generate();
 	}
 }

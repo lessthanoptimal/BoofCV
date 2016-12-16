@@ -19,7 +19,7 @@
 package boofcv.alg.enhance.impl;
 
 import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General;
-import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard;
+import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard_SB;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.GeneralizedImageOps;
@@ -82,13 +82,13 @@ public class TestImplEnhanceFilter {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenInner4",input,output,0,255);
 
 			expected = new GrayS16(input.width,input.height);
-			ConvolveImageStandard.convolve(ImplEnhanceFilter.kernelEnhance4_I32,(GrayU8)input,(GrayS16)expected);
+			ConvolveImageStandard_SB.convolve(ImplEnhanceFilter.kernelEnhance4_I32,(GrayU8)input,(GrayS16)expected);
 			GPixelMath.boundImage(expected, 0, 255);
 		} else {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenInner4",input,output,0f,255f);
 
 			expected = new GrayF32(input.width,input.height);
-			ConvolveImageStandard.convolve(ImplEnhanceFilter.kernelEnhance4_F32,(GrayF32)input,(GrayF32)expected);
+			ConvolveImageStandard_SB.convolve(ImplEnhanceFilter.kernelEnhance4_F32,(GrayF32)input,(GrayF32)expected);
 			GPixelMath.boundImage(expected, 0, 255);
 		}
 
@@ -183,13 +183,13 @@ public class TestImplEnhanceFilter {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenInner8",input,output,0,255);
 
 			expected = new GrayS16(input.width,input.height);
-			ConvolveImageStandard.convolve(ImplEnhanceFilter.kernelEnhance8_I32,(GrayU8)input,(GrayS16)expected);
+			ConvolveImageStandard_SB.convolve(ImplEnhanceFilter.kernelEnhance8_I32,(GrayU8)input,(GrayS16)expected);
 			GPixelMath.boundImage(expected, 0, 255);
 		} else {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenInner8",input,output,0f,255f);
 
 			expected = new GrayF32(input.width,input.height);
-			ConvolveImageStandard.convolve(ImplEnhanceFilter.kernelEnhance8_F32,(GrayF32)input,(GrayF32)expected);
+			ConvolveImageStandard_SB.convolve(ImplEnhanceFilter.kernelEnhance8_F32,(GrayF32)input,(GrayF32)expected);
 			GPixelMath.boundImage(expected, 0, 255);
 		}
 

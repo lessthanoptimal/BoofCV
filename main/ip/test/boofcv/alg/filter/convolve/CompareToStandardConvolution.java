@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard;
+import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard_SB;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.*;
@@ -44,7 +44,7 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 	protected int offset = 2;
 
 	public CompareToStandardConvolution( Class<?> targetClass ) {
-		super(targetClass, ConvolveImageStandard.class);
+		super(targetClass, ConvolveImageStandard_SB.class);
 	}
 
 	public void compareMethod( Method target , String validationName , int radius ) {
