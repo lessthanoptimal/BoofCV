@@ -135,6 +135,6 @@ public class FactoryIntensityPoint {
 	 */
 	public static <I extends ImageGray<I>>
 	GeneralFeatureIntensity<I,?> laplacian() {
-		return new WrapperLaplacianBlobIntensity<>();
+		return new WrapperLaplacianBlobIntensity();
 	}
 }
