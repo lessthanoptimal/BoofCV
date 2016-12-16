@@ -49,6 +49,17 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 		super(ConvolveWithBorder.class);
 	}
 
+	@Override
+	protected boolean isTestMethod(Method m) {
+		Class<?> e[] = m.getParameterTypes();
+
+		for( Class<?> c : e ) {
+			if( ImageGray.class.isAssignableFrom(c))
+				return true;
+		}
+		return false;
+	}
+
 	@Test
 	public void compareToNoBorder() {
 		kernelWidth = 5; kernelOffset = 2;

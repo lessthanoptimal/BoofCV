@@ -20,7 +20,7 @@ package boofcv.alg.filter.derivative;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -57,7 +57,7 @@ import boofcv.struct.image.GrayU8;
 // TODO process image borders
 // TODO create a generator for these functions
 public class LaplacianEdge {
-	public static Kernel2D_I32 kernel_I32 = new Kernel2D_I32(3, new int[]{0,1,0,1,-4,1,0,1,0});
+	public static Kernel2D_S32 kernel_I32 = new Kernel2D_S32(3, new int[]{0,1,0,1,-4,1,0,1,0});
 	public static Kernel2D_F32 kernel_F32 = new Kernel2D_F32(3, new float[]{0,1,0,1,-4,1,0,1,0});
 
 	/**

@@ -19,7 +19,7 @@
 package boofcv.alg.filter.convolve.normalized;
 
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -83,7 +83,7 @@ public class ConvolveNormalizedStandardSparse {
 		return total/div;
 	}
 
-	public static int convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+	public static int convolve(Kernel1D_S32 horizontal, Kernel1D_S32 vertical,
 							   GrayU8 input, int c_x , int c_y, int storage[] )
 	{
 		// convolve horizontally first
@@ -128,7 +128,7 @@ public class ConvolveNormalizedStandardSparse {
 		return (total+div/2)/div;
 	}
 
-	public static int convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+	public static int convolve(Kernel1D_S32 horizontal, Kernel1D_S32 vertical,
 							   GrayS16 input, int c_x , int c_y, int storage[] )
 	{
 		// convolve horizontally first

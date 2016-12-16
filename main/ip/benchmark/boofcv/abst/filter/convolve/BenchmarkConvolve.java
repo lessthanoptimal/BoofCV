@@ -27,9 +27,9 @@ import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.ImageBorder1D_S32;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
@@ -50,8 +50,8 @@ public class BenchmarkConvolve  {
 
 	static Kernel2D_F32 kernel2D_F32;
 	static Kernel1D_F32 kernelF32;
-	static Kernel1D_I32 kernelI32;
-	static Kernel2D_I32 kernel2D_I32;
+	static Kernel1D_S32 kernelI32;
+	static Kernel2D_S32 kernel2D_I32;
 	static GrayF32 input_F32 = new GrayF32(width,height);
 	static GrayF32 out_F32 = new GrayF32(width,height);
 	static GrayU8 input_U8 = new GrayU8(width,height);
@@ -72,9 +72,9 @@ public class BenchmarkConvolve  {
 
 	protected void setUp() throws Exception {
 		kernelF32 = FactoryKernelGaussian.gaussian(Kernel1D_F32.class, -1, radius);
-		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,radius);
+		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,-1,radius);
 		kernel2D_F32 = FactoryKernelGaussian.gaussian(Kernel2D_F32.class,-1,radius);
-		kernel2D_I32 = FactoryKernelGaussian.gaussian(Kernel2D_I32.class, -1, radius);
+		kernel2D_I32 = FactoryKernelGaussian.gaussian(Kernel2D_S32.class, -1, radius);
 	}
 
 	public int timeHorizontal_F32(int reps) {

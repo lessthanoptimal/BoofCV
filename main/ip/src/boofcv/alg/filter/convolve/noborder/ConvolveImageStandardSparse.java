@@ -15,10 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -65,7 +66,7 @@ public class ConvolveImageStandardSparse {
 		return total;
 	}
 
-	public static int convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+	public static int convolve(Kernel1D_S32 horizontal, Kernel1D_S32 vertical,
 							   GrayU8 input, int c_x , int c_y, int storage[] )
 	{
 		int widthH = horizontal.getWidth();
@@ -93,7 +94,7 @@ public class ConvolveImageStandardSparse {
 		return total;
 	}
 
-	public static int convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+	public static int convolve(Kernel1D_S32 horizontal, Kernel1D_S32 vertical,
 							   GrayU8 input, int c_x , int c_y, int storage[] ,
 							   int divisorHorizontal ,
 							   int divisorVertical )
@@ -124,7 +125,7 @@ public class ConvolveImageStandardSparse {
 		return (total + divisorVertical/2)/divisorVertical;
 	}
 
-	public static int convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+	public static int convolve(Kernel1D_S32 horizontal, Kernel1D_S32 vertical,
 							   GrayS16 input, int c_x , int c_y, int storage[] )
 	{
 		int widthH = horizontal.getWidth();
@@ -152,7 +153,7 @@ public class ConvolveImageStandardSparse {
 		return total;
 	}
 
-	public static int convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+	public static int convolve(Kernel1D_S32 horizontal, Kernel1D_S32 vertical,
 							   GrayS16 input, int c_x , int c_y, int storage[] ,
 							   int divisorHorizontal ,
 							   int divisorVertical )

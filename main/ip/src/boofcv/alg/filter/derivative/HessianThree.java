@@ -19,14 +19,14 @@
 package boofcv.alg.filter.derivative;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General;
+import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
 import boofcv.alg.filter.derivative.impl.HessianThree_Standard;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -57,8 +57,8 @@ import boofcv.struct.image.GrayU8;
  */
 public class HessianThree {
 
-	public static Kernel1D_I32 kernelXXYY_I32 = new Kernel1D_I32(new int[]{1,0,-2,0,1},5);
-	public static Kernel2D_I32 kernelCross_I32 = new Kernel2D_I32(3, new int[]{1,0,-1,0,0,0,-1,0,1});
+	public static Kernel1D_S32 kernelXXYY_I32 = new Kernel1D_S32(new int[]{1,0,-2,0,1},5);
+	public static Kernel2D_S32 kernelCross_I32 = new Kernel2D_S32(3, new int[]{1,0,-1,0,0,0,-1,0,1});
 
 	public static Kernel1D_F32 kernelXXYY_F32 = new Kernel1D_F32(new float[]{0.5f,0,-1,0,0.5f},5);
 	public static Kernel2D_F32 kernelCross_F32 = new Kernel2D_F32(3, new float[]{0.5f,0,-0.5f,0,0,0,-0.5f,0,0.5f});
@@ -83,7 +83,7 @@ public class HessianThree {
 		if( border != null ) {
 			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_I32, border );
 			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_I32, border );
-			ConvolveJustBorder_General.convolve(kernelCross_I32, border,derivXY);
+			ConvolveJustBorder_General_SB.convolve(kernelCross_I32, border,derivXY);
 		}
 	}
 
@@ -105,7 +105,7 @@ public class HessianThree {
 		if( border != null ) {
 			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_F32, border );
 			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_F32, border );
-			ConvolveJustBorder_General.convolve(kernelCross_F32,border,derivXY);
+			ConvolveJustBorder_General_SB.convolve(kernelCross_F32,border,derivXY);
 		}
 	}
 }

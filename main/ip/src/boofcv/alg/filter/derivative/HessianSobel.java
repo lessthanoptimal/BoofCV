@@ -19,12 +19,12 @@
 package boofcv.alg.filter.derivative;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General;
+import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
 import boofcv.alg.filter.derivative.impl.HessianSobel_Shared;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -65,19 +65,19 @@ import boofcv.struct.image.GrayU8;
  */
 public class HessianSobel {
 
-	public static Kernel2D_I32 kernelYY_I32 = new Kernel2D_I32(5, new int[]
+	public static Kernel2D_S32 kernelYY_I32 = new Kernel2D_S32(5, new int[]
 			{1, 4, 6 , 4, 1,
 			 0, 0, 0 , 0, 0,
 			-2,-8,-12,-8,-2,
 		     0, 0, 0 , 0, 0,
 		     1, 4, 6 , 4, 1});
-	public static Kernel2D_I32 kernelXX_I32 = new Kernel2D_I32(5, new int[]
+	public static Kernel2D_S32 kernelXX_I32 = new Kernel2D_S32(5, new int[]
 			{1, 0,-2 , 0, 1,
 			 4, 0,-8 , 0, 4,
 		     6, 0,-12, 0, 6,
 		     4, 0,-8 , 0, 4,
 			 1, 0,-2 , 0, 1});
-	public static Kernel2D_I32 kernelXY_I32 = new Kernel2D_I32(5, new int[]
+	public static Kernel2D_S32 kernelXY_I32 = new Kernel2D_S32(5, new int[]
 			{1, 2,0,-2,-1,
 			 2, 4,0,-4,-2,
 		     0, 0,0, 0, 0,
@@ -119,9 +119,9 @@ public class HessianSobel {
 
 		if( border != null ) {
 			border.setImage(orig);
-			ConvolveJustBorder_General.convolve(kernelXX_I32, border,derivXX);
-			ConvolveJustBorder_General.convolve(kernelYY_I32, border,derivYY);
-			ConvolveJustBorder_General.convolve(kernelXY_I32, border,derivXY);
+			ConvolveJustBorder_General_SB.convolve(kernelXX_I32, border,derivXX);
+			ConvolveJustBorder_General_SB.convolve(kernelYY_I32, border,derivYY);
+			ConvolveJustBorder_General_SB.convolve(kernelXY_I32, border,derivXY);
 		}
 	}
 
@@ -142,9 +142,9 @@ public class HessianSobel {
 
 		if( border != null ) {
 			border.setImage(orig);
-			ConvolveJustBorder_General.convolve(kernelXX_F32, border , derivXX);
-			ConvolveJustBorder_General.convolve(kernelYY_F32, border , derivYY);
-			ConvolveJustBorder_General.convolve(kernelXY_F32, border , derivXY);
+			ConvolveJustBorder_General_SB.convolve(kernelXX_F32, border , derivXX);
+			ConvolveJustBorder_General_SB.convolve(kernelYY_F32, border , derivYY);
+			ConvolveJustBorder_General_SB.convolve(kernelXY_F32, border , derivXY);
 		}
 	}
 }

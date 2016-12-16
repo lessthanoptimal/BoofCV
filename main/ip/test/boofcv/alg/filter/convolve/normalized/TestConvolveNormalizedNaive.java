@@ -21,8 +21,8 @@ package boofcv.alg.filter.convolve.normalized;
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
-import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import org.junit.Test;
@@ -53,7 +53,7 @@ public class TestConvolveNormalizedNaive {
 	 */
 	@Test
 	public void horizontal() {
-		Kernel1D_I32 kernel = new Kernel1D_I32(new int[]{1,2,3,4,5,6}, 6, 4);
+		Kernel1D_S32 kernel = new Kernel1D_S32(new int[]{1,2,3,4,5,6}, 6, 4);
 
 		GrayU8 input = new GrayU8(15,16);
 		ImageMiscOps.fillUniform(input, rand, 0, 50);
@@ -70,7 +70,7 @@ public class TestConvolveNormalizedNaive {
 		}
 	}
 
-	private int horizontal( int x , int y , Kernel1D_I32 kernel , GrayU8 image )
+	private int horizontal(int x , int y , Kernel1D_S32 kernel , GrayU8 image )
 	{
 		int total = 0;
 		int weight = 0;
@@ -93,7 +93,7 @@ public class TestConvolveNormalizedNaive {
 	 */
 	@Test
 	public void vertical() {
-		Kernel1D_I32 kernel = new Kernel1D_I32(new int[]{1,2,3,4,5,6}, 6, 4);
+		Kernel1D_S32 kernel = new Kernel1D_S32(new int[]{1,2,3,4,5,6}, 6, 4);
 
 		GrayU8 input = new GrayU8(15,16);
 		ImageMiscOps.fillUniform(input, rand, 0, 50);
@@ -110,7 +110,7 @@ public class TestConvolveNormalizedNaive {
 		}
 	}
 
-	private int vertical( int x , int y , Kernel1D_I32 kernel , GrayU8 image )
+	private int vertical(int x , int y , Kernel1D_S32 kernel , GrayU8 image )
 	{
 		int total = 0;
 		int weight = 0;
@@ -133,8 +133,8 @@ public class TestConvolveNormalizedNaive {
 	 */
 	@Test
 	public void vertical2_U16_U8() {
-		Kernel1D_I32 kernelY = new Kernel1D_I32(new int[]{1,2,3,4,5,6}, 6, 4);
-		Kernel1D_I32 kernelX = new Kernel1D_I32(new int[]{4,2,1,4,3,6}, 5, 2);
+		Kernel1D_S32 kernelY = new Kernel1D_S32(new int[]{1,2,3,4,5,6}, 6, 4);
+		Kernel1D_S32 kernelX = new Kernel1D_S32(new int[]{4,2,1,4,3,6}, 5, 2);
 
 		GrayU16 input = new GrayU16(15,16);
 		ImageMiscOps.fillUniform(input, rand, 0, 80);
@@ -155,7 +155,7 @@ public class TestConvolveNormalizedNaive {
 	}
 
 	private int vertical2(int x, int y,
-						  Kernel1D_I32 kernelX, Kernel1D_I32 kernelY,
+						  Kernel1D_S32 kernelX, Kernel1D_S32 kernelY,
 						  GrayU16 image)
 	{
 		int total = 0;
@@ -189,7 +189,7 @@ public class TestConvolveNormalizedNaive {
 	 */
 	@Test
 	public void convolve() {
-		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(7,3,0,20,rand);
+		Kernel2D_S32 kernel = FactoryKernel.random2D_I32(7,3,0,20,rand);
 		kernel.offset = 1;
 
 		GrayU8 input = new GrayU8(15,16);
@@ -207,7 +207,7 @@ public class TestConvolveNormalizedNaive {
 		}
 	}
 
-	private int convolve( int cx , int cy , Kernel2D_I32 kernel , GrayU8 image )
+	private int convolve(int cx , int cy , Kernel2D_S32 kernel , GrayU8 image )
 	{
 		int total = 0;
 		int weight = 0;

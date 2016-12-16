@@ -18,8 +18,8 @@
 
 package boofcv.alg.filter.convolve.down;
 
-import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayI16;
 import boofcv.struct.image.GrayU8;
 
@@ -32,7 +32,7 @@ public class TestConvolveDownNoBorderUnrolled_U8_S16 extends StandardConvolveUnr
 	public TestConvolveDownNoBorderUnrolled_U8_S16() {
 		this.numUnrolled = GenerateConvolveDownNoBorderUnrolled.numUnrolled;
 		this.target = ConvolveDownNoBorderUnrolled_U8_I16.class;
-		this.param1D = new Class<?>[]{Kernel1D_I32.class, GrayU8.class, GrayI16.class , int.class };
-		this.param2D = new Class<?>[]{Kernel2D_I32.class, GrayU8.class, GrayI16.class , int.class };
+		this.param1D = new Class<?>[]{Kernel1D_S32.class, GrayU8.class, GrayI16.class , int.class };
+		this.param2D = new Class<?>[]{Kernel2D_S32.class, GrayU8.class, GrayI16.class , int.class };
 	}
 }

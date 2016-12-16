@@ -74,7 +74,7 @@ public class KernelMath {
 		}
 	}
 
-	public static void fill( Kernel2D_I32 kernel , int value ) {
+	public static void fill(Kernel2D_S32 kernel , int value ) {
 		int N = kernel.width*kernel.width;
 		for( int i = 0; i < N; i++ ) {
 			kernel.data[i] = value;
@@ -92,8 +92,8 @@ public class KernelMath {
 		return b;
 	}
 
-	public static Kernel2D_I32 transpose( Kernel2D_I32 a ) {
-		Kernel2D_I32 b = new Kernel2D_I32( a.width );
+	public static Kernel2D_S32 transpose(Kernel2D_S32 a ) {
+		Kernel2D_S32 b = new Kernel2D_S32( a.width );
 
 		for( int i = 0; i < a.width; i++ ) {
 			for( int j = 0; j < a.width; j++ ) {
@@ -104,8 +104,8 @@ public class KernelMath {
 	}
 
 	public static Kernel1D convolve1D( Kernel1D a , Kernel1D b ) {
-		if( a instanceof Kernel1D_I32 ) {
-			return convolve1D_I32((Kernel1D_I32)a,(Kernel1D_I32)b);
+		if( a instanceof Kernel1D_S32) {
+			return convolve1D_I32((Kernel1D_S32)a,(Kernel1D_S32)b);
 		} else if( a instanceof Kernel1D_F32 ) {
 			return convolve1D_F32((Kernel1D_F32)a,(Kernel1D_F32)b);
 		} else {
@@ -113,10 +113,10 @@ public class KernelMath {
 		}
 	}
 
-	public static Kernel1D_I32 convolve1D_I32(Kernel1D_I32 a , Kernel1D_I32 b ) {
+	public static Kernel1D_S32 convolve1D_I32(Kernel1D_S32 a , Kernel1D_S32 b ) {
 		int w = a.width+b.width-1;
 
-		Kernel1D_I32 ret = new Kernel1D_I32(w);
+		Kernel1D_S32 ret = new Kernel1D_S32(w);
 
 		int end = w-(b.getWidth()-1);
 		int N = b.width-1;
@@ -166,8 +166,8 @@ public class KernelMath {
 	}
 
 	public static Kernel2D convolve2D( Kernel2D a , Kernel2D b ) {
-		if( a instanceof Kernel2D_I32 ) {
-			return convolve2D((Kernel2D_I32)a,(Kernel2D_I32)b);
+		if( a instanceof Kernel2D_S32) {
+			return convolve2D((Kernel2D_S32)a,(Kernel2D_S32)b);
 		} else if( a instanceof Kernel2D_F32 ) {
 			return convolve2D((Kernel2D_F32)a,(Kernel2D_F32)b);
 		} else {
@@ -175,11 +175,11 @@ public class KernelMath {
 		}
 	}
 
-	public static Kernel2D_I32 convolve2D( Kernel2D_I32 a , Kernel2D_I32 b ) {
+	public static Kernel2D_S32 convolve2D(Kernel2D_S32 a , Kernel2D_S32 b ) {
 		int w = a.width+b.width-1;
 		int r = w/2;
 
-		Kernel2D_I32 ret = new Kernel2D_I32(w);
+		Kernel2D_S32 ret = new Kernel2D_S32(w);
 
 		int aR = a.width/2;
 		int bR = b.width/2;
@@ -267,8 +267,8 @@ public class KernelMath {
 	 * @return Resulting 2D kernel
 	 */
 	public static Kernel2D convolve2D(Kernel1D a, Kernel1D b) {
-		if( a instanceof Kernel1D_I32 ) {
-			return convolve2D((Kernel1D_I32)a,(Kernel1D_I32)b);
+		if( a instanceof Kernel1D_S32) {
+			return convolve2D((Kernel1D_S32)a,(Kernel1D_S32)b);
 		} else if( a instanceof Kernel1D_F32 ) {
 			return convolve2D((Kernel1D_F32)a,(Kernel1D_F32)b);
 		} else if( a instanceof Kernel1D_F64 ) {
@@ -338,7 +338,7 @@ public class KernelMath {
 	 * @param b Input horizontal 1D kernel
 	 * @return Resulting 2D kernel
 	 */
-	public static Kernel2D_I32 convolve2D(Kernel1D_I32 a, Kernel1D_I32 b) {
+	public static Kernel2D_S32 convolve2D(Kernel1D_S32 a, Kernel1D_S32 b) {
 		if( a.width != b.width )
 			throw new IllegalArgumentException("Only kernels with the same width supported");
 		if( a.offset != b.width/2 )
@@ -346,7 +346,7 @@ public class KernelMath {
 
 		int w = a.width;
 
-		Kernel2D_I32 ret = new Kernel2D_I32(w);
+		Kernel2D_S32 ret = new Kernel2D_S32(w);
 
 		int index = 0;
 		for( int i = 0; i < w; i++ ) {
@@ -457,7 +457,7 @@ public class KernelMath {
 		return ret;
 	}
 
-	public static GrayS32 convertToImage(Kernel2D_I32 kernel ) {
+	public static GrayS32 convertToImage(Kernel2D_S32 kernel ) {
 		int w = kernel.getWidth();
 		GrayS32 ret = new GrayS32(w,w);
 
@@ -483,9 +483,9 @@ public class KernelMath {
 		return ret;
 	}
 
-	public static Kernel2D_I32 convertToKernel( GrayI image ) {
+	public static Kernel2D_S32 convertToKernel(GrayI image ) {
 		int w = image.getWidth();
-		Kernel2D_I32 ret = new Kernel2D_I32(w);
+		Kernel2D_S32 ret = new Kernel2D_S32(w);
 
 		for( int i = 0; i < w; i++ ) {
 			for( int j = 0; j < w; j++ ) {
@@ -496,23 +496,23 @@ public class KernelMath {
 		return ret;
 	}
 
-	public static Kernel2D_I32 convert( Kernel2D_F32 original , float minFrac ) {
-		Kernel2D_I32 ret = new Kernel2D_I32(original.width);
+	public static Kernel2D_S32 convert(Kernel2D_F32 original , float minFrac ) {
+		Kernel2D_S32 ret = new Kernel2D_S32(original.width);
 		convert( original.data,ret.data,original.width*original.width,minFrac);
 		return ret;
 	}
 
-	public static Kernel1D_I32 convert( Kernel1D_F32 original , float minFrac ) {
+	public static Kernel1D_S32 convert(Kernel1D_F32 original , float minFrac ) {
 
-		Kernel1D_I32 ret = new Kernel1D_I32(original.width, original.offset);
+		Kernel1D_S32 ret = new Kernel1D_S32(original.width, original.offset);
 		convert( original.data,ret.data,original.width,minFrac);
 
 		return ret;
 	}
 
-	public static Kernel1D_I32 convert( Kernel1D_F64 original , double minFrac ) {
+	public static Kernel1D_S32 convert(Kernel1D_F64 original , double minFrac ) {
 
-		Kernel1D_I32 ret = new Kernel1D_I32(original.width, original.offset);
+		Kernel1D_S32 ret = new Kernel1D_S32(original.width, original.offset);
 		convert( original.data,ret.data,original.width,minFrac);
 
 		return ret;

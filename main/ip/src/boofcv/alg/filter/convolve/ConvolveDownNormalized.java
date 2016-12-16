@@ -21,9 +21,9 @@ package boofcv.alg.filter.convolve;
 import boofcv.alg.filter.convolve.down.ConvolveDownNormalizedNaive;
 import boofcv.alg.filter.convolve.down.ConvolveDownNormalized_JustBorder;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.*;
 
 import static boofcv.alg.filter.convolve.ConvolveDownNoBorder.checkParameters;
@@ -106,7 +106,7 @@ public class ConvolveDownNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_I32 kernel, GrayU8 image, GrayI8 dest , int skip ) {
+	public static void horizontal(Kernel1D_S32 kernel, GrayU8 image, GrayI8 dest , int skip ) {
 		checkParameters(image, dest, skip);
 
 		if( kernel.width >= image.width ) {
@@ -125,7 +125,7 @@ public class ConvolveDownNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_I32 kernel, GrayU8 image, GrayI8 dest , int skip ) {
+	public static void vertical(Kernel1D_S32 kernel, GrayU8 image, GrayI8 dest , int skip ) {
 		checkParameters(image, dest, skip);
 
 		if( kernel.width >= image.width ) {
@@ -144,7 +144,7 @@ public class ConvolveDownNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_I32 kernel, GrayU8 image, GrayI8 dest , int skip ) {
+	public static void convolve(Kernel2D_S32 kernel, GrayU8 image, GrayI8 dest , int skip ) {
 		checkParameters(image, dest, skip);
 
 		if( kernel.width >= image.width ) {
@@ -163,7 +163,7 @@ public class ConvolveDownNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_I32 kernel, GrayS16 image, GrayI16 dest , int skip ) {
+	public static void horizontal(Kernel1D_S32 kernel, GrayS16 image, GrayI16 dest , int skip ) {
 		checkParameters(image, dest, skip);
 
 		if( kernel.width >= image.width ) {
@@ -182,7 +182,7 @@ public class ConvolveDownNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_I32 kernel, GrayS16 image, GrayI16 dest , int skip ) {
+	public static void vertical(Kernel1D_S32 kernel, GrayS16 image, GrayI16 dest , int skip ) {
 		checkParameters(image, dest, skip);
 
 		if( kernel.width >= image.width ) {
@@ -201,7 +201,7 @@ public class ConvolveDownNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_I32 kernel, GrayS16 image, GrayI16 dest , int skip ) {
+	public static void convolve(Kernel2D_S32 kernel, GrayS16 image, GrayI16 dest , int skip ) {
 		checkParameters(image, dest, skip);
 
 		if( kernel.width >= image.width ) {

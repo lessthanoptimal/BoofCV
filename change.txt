@@ -30,7 +30,9 @@ Version : 0.27
 - AverageDownSample
   * Made image generic
   * Added support for interleaved images TODO
-
+- Renamed for consistency
+  * Kernel2D_I32 -> Kernel2D_S32
+  * Kernel2D_I32 -> Kernel2D_S32
 
 - TODO Fisheye calibration using omni model
 - TODO grid of circle calibration target

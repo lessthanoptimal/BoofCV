@@ -23,7 +23,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -50,7 +50,7 @@ public class TestConvolveNormalizedStandardSparse {
 	static int targetY = 5;
 
 	static Kernel1D_F32 kernelF32;
-	static Kernel1D_I32 kernelI32;
+	static Kernel1D_S32 kernelI32;
 	static float expectedOutput;
 
 	/**
@@ -104,7 +104,7 @@ public class TestConvolveNormalizedStandardSparse {
 		GrayS16 shortImage = new GrayS16(width,height);
 		ConvertImage.convert(seedImage,shortImage);
 
-		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,kernelRadius);
+		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,-1,kernelRadius);
 		kernelF32 = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,kernelRadius);
 
 		boolean isFloatingKernel = method.getParameterTypes()[0] == Kernel1D_F32.class;

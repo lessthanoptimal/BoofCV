@@ -41,7 +41,7 @@ public class FactoryConvolveSparse {
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
 			return (ImageConvolveSparse<T,K>)new Convolve2D_F32((Kernel2D_F32)kernel);
 		} else {
-			return (ImageConvolveSparse<T,K>)new Convolve2D_I32((Kernel2D_I32)kernel);
+			return (ImageConvolveSparse<T,K>)new Convolve2D_I32((Kernel2D_S32)kernel);
 		}
 	}
 
@@ -50,7 +50,7 @@ public class FactoryConvolveSparse {
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
 			return (ImageConvolveSparse<T,K>)new Vertical1D_F32((Kernel1D_F32)kernel);
 		} else {
-			return (ImageConvolveSparse<T,K>)new Vertical1D_I32((Kernel1D_I32)kernel);
+			return (ImageConvolveSparse<T,K>)new Vertical1D_I32((Kernel1D_S32)kernel);
 		}
 	}
 
@@ -59,7 +59,7 @@ public class FactoryConvolveSparse {
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
 			return (ImageConvolveSparse<T,K>)new Horizontal1D_F32((Kernel1D_F32)kernel);
 		} else {
-			return (ImageConvolveSparse<T,K>)new Horizontal1D_I32((Kernel1D_I32)kernel);
+			return (ImageConvolveSparse<T,K>)new Horizontal1D_I32((Kernel1D_S32)kernel);
 		}
 	}
 
@@ -75,9 +75,9 @@ public class FactoryConvolveSparse {
 		}
 	}
 
-	public static class Convolve2D_I32<T extends GrayI<T>> extends ImageConvolveSparse<T, Kernel2D_I32> {
+	public static class Convolve2D_I32<T extends GrayI<T>> extends ImageConvolveSparse<T, Kernel2D_S32> {
 
-		public Convolve2D_I32(Kernel2D_I32 kernel) {
+		public Convolve2D_I32(Kernel2D_S32 kernel) {
 			super(kernel);
 		}
 
@@ -99,9 +99,9 @@ public class FactoryConvolveSparse {
 		}
 	}
 
-	public static class Horizontal1D_I32 extends ImageConvolveSparse<GrayF32, Kernel1D_I32> {
+	public static class Horizontal1D_I32 extends ImageConvolveSparse<GrayF32, Kernel1D_S32> {
 
-		public Horizontal1D_I32(Kernel1D_I32 kernel) {
+		public Horizontal1D_I32(Kernel1D_S32 kernel) {
 			super(kernel);
 		}
 
@@ -123,9 +123,9 @@ public class FactoryConvolveSparse {
 		}
 	}
 
-	public static class Vertical1D_I32 extends ImageConvolveSparse<GrayF32, Kernel1D_I32> {
+	public static class Vertical1D_I32 extends ImageConvolveSparse<GrayF32, Kernel1D_S32> {
 
-		public Vertical1D_I32(Kernel1D_I32 kernel) {
+		public Vertical1D_I32(Kernel1D_S32 kernel) {
 			super(kernel);
 		}
 

@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 
@@ -38,14 +38,14 @@ public class ImplSsdCornerNaive<T extends ImageGray<T>> implements ShiTomasiCorn
 	// feature's radius
 	private int radius;
 
-	private Kernel2D_I32 weights;
+	private Kernel2D_S32 weights;
 
 	public ImplSsdCornerNaive(int imageWidth, int imageHeight,
 							  int windowRadius, boolean weighted) {
 		this.radius = windowRadius;
 
 		if( weighted )
-			weights = FactoryKernelGaussian.gaussian(Kernel2D_I32.class,-1,radius);
+			weights = FactoryKernelGaussian.gaussian(Kernel2D_S32.class,-1,radius);
 	}
 
 	@Override

@@ -157,7 +157,7 @@ public enum AutoTypeImage {
 	}
 
 	public String getKernelType() {
-		return isInteger() ? "I32" : getNumBits()==64 ? "F64" : "F32";
+		return isInteger() ? "S32" : getNumBits()==64 ? "F64" : "F32";
 	}
 
 	public String getKernelDataType() {

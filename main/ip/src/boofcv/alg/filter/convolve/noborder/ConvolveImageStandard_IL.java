@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.convolve.*;
@@ -233,7 +234,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void horizontal( Kernel1D_I32 kernel ,
+	public static void horizontal( Kernel1D_S32 kernel ,
 								   InterleavedU8 src, InterleavedI16 dst ) {
 		final byte[] dataSrc = src.data;
 		final short[] dataDst = dst.data;
@@ -262,7 +263,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void vertical( Kernel1D_I32 kernel,
+	public static void vertical( Kernel1D_S32 kernel,
 								 InterleavedU8 src, InterleavedI16 dst )
 	{
 		final byte[] dataSrc = src.data;
@@ -298,7 +299,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void convolve( Kernel2D_I32 kernel , InterleavedU8 src , InterleavedI16 dst )
+	public static void convolve(Kernel2D_S32 kernel , InterleavedU8 src , InterleavedI16 dst )
 	{
 		final int[] dataKernel = kernel.data;
 		final byte[] dataSrc = src.data;
@@ -332,7 +333,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void horizontal( Kernel1D_I32 kernel ,
+	public static void horizontal( Kernel1D_S32 kernel ,
 								   InterleavedU8 src, InterleavedS32 dst ) {
 		final byte[] dataSrc = src.data;
 		final int[] dataDst = dst.data;
@@ -361,7 +362,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void vertical( Kernel1D_I32 kernel,
+	public static void vertical( Kernel1D_S32 kernel,
 								 InterleavedU8 src, InterleavedS32 dst )
 	{
 		final byte[] dataSrc = src.data;
@@ -397,7 +398,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void convolve( Kernel2D_I32 kernel , InterleavedU8 src , InterleavedS32 dst )
+	public static void convolve(Kernel2D_S32 kernel , InterleavedU8 src , InterleavedS32 dst )
 	{
 		final int[] dataKernel = kernel.data;
 		final byte[] dataSrc = src.data;
@@ -431,7 +432,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void vertical( Kernel1D_I32 kernel,
+	public static void vertical( Kernel1D_S32 kernel,
 								 InterleavedU16 src, InterleavedI8 dst , int divisor )
 	{
 		final short[] dataSrc = src.data;
@@ -468,7 +469,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void horizontal( Kernel1D_I32 kernel ,
+	public static void horizontal( Kernel1D_S32 kernel ,
 								   InterleavedS16 src, InterleavedI16 dst ) {
 		final short[] dataSrc = src.data;
 		final short[] dataDst = dst.data;
@@ -497,7 +498,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void vertical( Kernel1D_I32 kernel,
+	public static void vertical( Kernel1D_S32 kernel,
 								 InterleavedS16 src, InterleavedI16 dst )
 	{
 		final short[] dataSrc = src.data;
@@ -533,7 +534,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void convolve( Kernel2D_I32 kernel , InterleavedS16 src , InterleavedI16 dst )
+	public static void convolve(Kernel2D_S32 kernel , InterleavedS16 src , InterleavedI16 dst )
 	{
 		final int[] dataKernel = kernel.data;
 		final short[] dataSrc = src.data;
@@ -567,7 +568,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void horizontal( Kernel1D_I32 kernel ,
+	public static void horizontal( Kernel1D_S32 kernel ,
 								   InterleavedU8 src, InterleavedI8 dst , int divisor ) {
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dst.data;
@@ -597,7 +598,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void vertical( Kernel1D_I32 kernel,
+	public static void vertical( Kernel1D_S32 kernel,
 								 InterleavedU8 src, InterleavedI8 dst , int divisor )
 	{
 		final byte[] dataSrc = src.data;
@@ -634,7 +635,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void convolve( Kernel2D_I32 kernel , InterleavedU8 src , InterleavedI8 dst , int divisor )
+	public static void convolve(Kernel2D_S32 kernel , InterleavedU8 src , InterleavedI8 dst , int divisor )
 	{
 		final int[] dataKernel = kernel.data;
 		final byte[] dataSrc = src.data;
@@ -669,7 +670,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void horizontal( Kernel1D_I32 kernel ,
+	public static void horizontal( Kernel1D_S32 kernel ,
 								   InterleavedS16 src, InterleavedI16 dst , int divisor ) {
 		final short[] dataSrc = src.data;
 		final short[] dataDst = dst.data;
@@ -699,7 +700,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void vertical( Kernel1D_I32 kernel,
+	public static void vertical( Kernel1D_S32 kernel,
 								 InterleavedS16 src, InterleavedI16 dst , int divisor )
 	{
 		final short[] dataSrc = src.data;
@@ -736,7 +737,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void convolve( Kernel2D_I32 kernel , InterleavedS16 src , InterleavedI16 dst , int divisor )
+	public static void convolve(Kernel2D_S32 kernel , InterleavedS16 src , InterleavedI16 dst , int divisor )
 	{
 		final int[] dataKernel = kernel.data;
 		final short[] dataSrc = src.data;
@@ -771,7 +772,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void vertical( Kernel1D_I32 kernel,
+	public static void vertical( Kernel1D_S32 kernel,
 								 InterleavedS32 src, InterleavedI16 dst , int divisor )
 	{
 		final int[] dataSrc = src.data;
@@ -808,7 +809,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void horizontal( Kernel1D_I32 kernel ,
+	public static void horizontal( Kernel1D_S32 kernel ,
 								   InterleavedS32 src, InterleavedS32 dst ) {
 		final int[] dataSrc = src.data;
 		final int[] dataDst = dst.data;
@@ -837,7 +838,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void vertical( Kernel1D_I32 kernel,
+	public static void vertical( Kernel1D_S32 kernel,
 								 InterleavedS32 src, InterleavedS32 dst )
 	{
 		final int[] dataSrc = src.data;
@@ -873,7 +874,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void convolve( Kernel2D_I32 kernel , InterleavedS32 src , InterleavedS32 dst )
+	public static void convolve(Kernel2D_S32 kernel , InterleavedS32 src , InterleavedS32 dst )
 	{
 		final int[] dataKernel = kernel.data;
 		final int[] dataSrc = src.data;
@@ -907,7 +908,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void horizontal( Kernel1D_I32 kernel ,
+	public static void horizontal( Kernel1D_S32 kernel ,
 								   InterleavedS32 src, InterleavedS32 dst , int divisor ) {
 		final int[] dataSrc = src.data;
 		final int[] dataDst = dst.data;
@@ -937,7 +938,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void vertical( Kernel1D_I32 kernel,
+	public static void vertical( Kernel1D_S32 kernel,
 								 InterleavedS32 src, InterleavedS32 dst , int divisor )
 	{
 		final int[] dataSrc = src.data;
@@ -974,7 +975,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void convolve( Kernel2D_I32 kernel , InterleavedS32 src , InterleavedS32 dst , int divisor )
+	public static void convolve(Kernel2D_S32 kernel , InterleavedS32 src , InterleavedS32 dst , int divisor )
 	{
 		final int[] dataKernel = kernel.data;
 		final int[] dataSrc = src.data;

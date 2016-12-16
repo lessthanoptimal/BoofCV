@@ -139,7 +139,7 @@ public class TestKernelMath {
 
 	@Test
 	public void fill_I32() {
-		Kernel2D_I32 a = FactoryKernel.random2D_I32(5,2, -2, 2, rand);
+		Kernel2D_S32 a = FactoryKernel.random2D_I32(5,2, -2, 2, rand);
 		KernelMath.fill(a,1);
 
 		for( int i = 0; i < a.width; i++ ) {
@@ -163,8 +163,8 @@ public class TestKernelMath {
 
 	@Test
 	public void transpose_I32() {
-		Kernel2D_I32 a = FactoryKernel.random2D_I32(5,2, -2, 2, rand);
-		Kernel2D_I32 b = KernelMath.transpose(a);
+		Kernel2D_S32 a = FactoryKernel.random2D_I32(5,2, -2, 2, rand);
+		Kernel2D_S32 b = KernelMath.transpose(a);
 
 		for( int i = 0; i < a.width; i++ ) {
 			for( int j = 0; j < a.width; j++ ) {
@@ -226,10 +226,10 @@ public class TestKernelMath {
 
 	@Test
 	public void convolve_1D_I32() {
-		Kernel1D_I32 k1 = new Kernel1D_I32(new int[]{4,3,2},3,1);
-		Kernel1D_I32 k2 = new Kernel1D_I32(new int[]{9,5,1},3,1);
+		Kernel1D_S32 k1 = new Kernel1D_S32(new int[]{4,3,2},3,1);
+		Kernel1D_S32 k2 = new Kernel1D_S32(new int[]{9,5,1},3,1);
 
-		Kernel2D_I32 c = KernelMath.convolve2D(k1, k2);
+		Kernel2D_S32 c = KernelMath.convolve2D(k1, k2);
 		assertEquals(3,c.width);
 		assertEquals(1,c.offset);
 
@@ -353,7 +353,7 @@ public class TestKernelMath {
 
 	@Test
 	public void convertToImage_I32() {
-		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(7,3,-10,10,rand);
+		Kernel2D_S32 kernel = FactoryKernel.random2D_I32(7,3,-10,10,rand);
 		GrayS32 image = KernelMath.convertToImage(kernel);
 
 		assertEquals(kernel.width,image.width);
@@ -386,7 +386,7 @@ public class TestKernelMath {
 	public void convertToKernel_I32() {
 		GrayS32 image = new GrayS32(7,7);
 		ImageMiscOps.fillUniform(image,rand,-10,10);
-		Kernel2D_I32 kernel = KernelMath.convertToKernel(image);
+		Kernel2D_S32 kernel = KernelMath.convertToKernel(image);
 
 		assertEquals(kernel.width,image.width);
 		assertEquals(kernel.width,image.height);
@@ -401,7 +401,7 @@ public class TestKernelMath {
 	@Test
 	public void convert_1D_F32_to_I32() {
 		Kernel1D_F32 orig = new Kernel1D_F32(new float[]{0.1f,1,1e-8f,-1,-0.1f}, 5, 1);
-		Kernel1D_I32 found = KernelMath.convert(orig,1f/60f);
+		Kernel1D_S32 found = KernelMath.convert(orig,1f/60f);
 
 		assertEquals(orig.offset,found.offset);
 		assertEquals(orig.width,found.width);
@@ -415,7 +415,7 @@ public class TestKernelMath {
 	@Test
 	public void convert_1D_F64_to_I32() {
 		Kernel1D_F64 orig = new Kernel1D_F64(new double[]{0.1,1,1e-8,-1,-0.1}, 5, 1);
-		Kernel1D_I32 found = KernelMath.convert(orig,1f/60f);
+		Kernel1D_S32 found = KernelMath.convert(orig,1f/60f);
 
 		assertEquals(orig.offset,found.offset);
 		assertEquals(orig.width,found.width);
@@ -429,7 +429,7 @@ public class TestKernelMath {
 	@Test
 	public void convert_2D_F32_to_I32() {
 		Kernel2D_F32 orig = new Kernel2D_F32(3,new float[]{0.1f,1,0.1f,1,1e-6f,-1,-0.1f,-1,-0.1f});
-		Kernel2D_I32 found = KernelMath.convert(orig,1f/60f);
+		Kernel2D_S32 found = KernelMath.convert(orig,1f/60f);
 
 		assertEquals(orig.width,found.width);
 		assertEquals(found.data[0],1);

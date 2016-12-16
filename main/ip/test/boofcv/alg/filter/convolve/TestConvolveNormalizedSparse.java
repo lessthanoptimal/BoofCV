@@ -22,7 +22,7 @@ import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedStandardSparse;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.ImageBase;
 import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.Test;
@@ -83,7 +83,7 @@ public class TestConvolveNormalizedSparse {
 			kernel = FactoryKernelGaussian.gaussian((Class)paramTypes[0],-1,kernelRadius);
 			if (Kernel1D_F32.class == paramTypes[0]) {
 				storage = new float[ kernelRadius*2+1];
-			} else if (Kernel1D_I32.class == paramTypes[0]) {
+			} else if (Kernel1D_S32.class == paramTypes[0]) {
 				storage = new int[ kernelRadius*2+1];
 			} else {
 				throw new RuntimeException("Unknown kernel type");

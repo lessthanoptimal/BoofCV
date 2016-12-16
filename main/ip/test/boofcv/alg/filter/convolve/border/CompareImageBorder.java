@@ -22,10 +22,9 @@ import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.KernelBase;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
 import boofcv.testing.CompareEquivalentFunctions;
 
-import java.lang.reflect.Method;
 import java.util.Random;
 
 /**
@@ -48,17 +47,6 @@ public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 		super(targetClass, ConvolveImageNoBorder.class);
 	}
 
-	@Override
-	protected boolean isTestMethod(Method m) {
-		Class<?> e[] = m.getParameterTypes();
-
-		for( Class<?> c : e ) {
-			if( ImageGray.class.isAssignableFrom(c))
-				return true;
-		}
-		return false;
-	}
-
 	protected void computeBorder( KernelBase kernel , String functionName ) {
 		borderX0=borderY0=0;
 		borderX1=borderY1=0;
@@ -77,9 +65,9 @@ public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 		}
 	}
 
-	protected ImageGray stripBorder(ImageGray a ,
-									int borderX0 , int borderY0,
-									int borderX1 , int borderY1 ) {
+	protected <T extends ImageBase<T>>T stripBorder(T a ,
+												 int borderX0 , int borderY0,
+												 int borderX1 , int borderY1 ) {
 		return a.subimage(borderX0,borderY0,a.width-borderX1,a.height-borderY1, null);
 	}
 

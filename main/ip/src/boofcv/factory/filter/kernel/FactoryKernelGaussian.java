@@ -52,9 +52,9 @@ public class FactoryKernelGaussian {
 			return gaussian(1, true, 32, sigma, radius);
 		} else if (Kernel1D_F64.class == kernelType) {
 			return gaussian(1,true, 64, sigma,radius);
-		} else if (Kernel1D_I32.class == kernelType) {
+		} else if (Kernel1D_S32.class == kernelType) {
 			return gaussian(1,false, 32, sigma,radius);
-		} else if (Kernel2D_I32.class == kernelType) {
+		} else if (Kernel2D_S32.class == kernelType) {
 			return gaussian(2,false, 32, sigma,radius);
 		} else if (Kernel2D_F32.class == kernelType) {
 			return gaussian(2,true, 32, sigma,radius);

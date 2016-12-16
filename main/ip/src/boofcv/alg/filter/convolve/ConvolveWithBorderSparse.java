@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.filter.convolve;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 
 /**
  * <p>
@@ -79,7 +79,7 @@ public class ConvolveWithBorderSparse {
 		return total;
 	}
 
-	public static int horizontal( Kernel1D_I32 kernel, ImageBorder_S32 input , int x , int y ) {
+	public static int horizontal(Kernel1D_S32 kernel, ImageBorder_S32 input , int x , int y ) {
 		final int r = kernel.getRadius();
 		final int w = kernel.getWidth();
 
@@ -92,7 +92,7 @@ public class ConvolveWithBorderSparse {
 		return total;
 	}
 
-	public static int vertical( Kernel1D_I32 kernel, ImageBorder_S32 input , int x , int y ) {
+	public static int vertical(Kernel1D_S32 kernel, ImageBorder_S32 input , int x , int y ) {
 		final int r = kernel.getRadius();
 		final int w = kernel.getWidth();
 
@@ -105,7 +105,7 @@ public class ConvolveWithBorderSparse {
 		return total;
 	}
 
-	public static int convolve( Kernel2D_I32 kernel, ImageBorder_S32 input , int x , int y ) {
+	public static int convolve(Kernel2D_S32 kernel, ImageBorder_S32 input , int x , int y ) {
 		final int r = kernel.getRadius();
 		final int w = kernel.getWidth();
 

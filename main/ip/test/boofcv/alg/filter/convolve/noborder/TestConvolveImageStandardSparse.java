@@ -24,7 +24,7 @@ import boofcv.core.image.ConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -50,7 +50,7 @@ public class TestConvolveImageStandardSparse {
 	static int targetY = 6;
 
 	static Kernel1D_F32 kernelF32;
-	static Kernel1D_I32 kernelI32;
+	static Kernel1D_S32 kernelI32;
 	static int sumKernel;
 	static float expectedOutput;
 
@@ -88,7 +88,7 @@ public class TestConvolveImageStandardSparse {
 		ConvertImage.convert(seedImage,floatImage);
 
 		sumKernel = 0;
-		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,kernelWidth/2);
+		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,-1,kernelWidth/2);
 		kernelF32 = new Kernel1D_F32(kernelI32.width);
 		for( int i = 0; i < kernelI32.width; i++ ) {
 			sumKernel += kernelF32.data[i] = kernelI32.data[i];

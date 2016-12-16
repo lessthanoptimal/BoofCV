@@ -20,9 +20,9 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.alg.filter.convolve.down.*;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.*;
 
 
@@ -62,7 +62,7 @@ public class ConvolveDownNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel , GrayU8 input, GrayI16 output , int skip ) {
+	public static void horizontal(Kernel1D_S32 kernel , GrayU8 input, GrayI16 output , int skip ) {
 		checkParametersH(input,output,skip);
 
 		if( !ConvolveDownNoBorderUnrolled_U8_I16.horizontal(kernel,input,output,skip)) {
@@ -70,7 +70,7 @@ public class ConvolveDownNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel , GrayU8 input, GrayI16 output , int skip ) {
+	public static void vertical(Kernel1D_S32 kernel , GrayU8 input, GrayI16 output , int skip ) {
 		checkParametersV(input,output,skip);
 
 		if( !ConvolveDownNoBorderUnrolled_U8_I16.vertical(kernel,input,output,skip)) {
@@ -78,7 +78,7 @@ public class ConvolveDownNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel , GrayU8 input, GrayI16 output , int skip ) {
+	public static void convolve(Kernel2D_S32 kernel , GrayU8 input, GrayI16 output , int skip ) {
 		checkParameters(input,output,skip);
 
 		if( !ConvolveDownNoBorderUnrolled_U8_I16.convolve(kernel,input,output,skip)) {
@@ -86,7 +86,7 @@ public class ConvolveDownNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel , GrayS16 input, GrayI16 output , int skip ) {
+	public static void horizontal(Kernel1D_S32 kernel , GrayS16 input, GrayI16 output , int skip ) {
 		checkParametersH(input,output,skip);
 
 		if( !ConvolveDownNoBorderUnrolled_S16_I16.horizontal(kernel,input,output,skip)) {
@@ -94,7 +94,7 @@ public class ConvolveDownNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel , GrayS16 input, GrayI16 output , int skip ) {
+	public static void vertical(Kernel1D_S32 kernel , GrayS16 input, GrayI16 output , int skip ) {
 		checkParametersV(input,output,skip);
 
 		if( !ConvolveDownNoBorderUnrolled_S16_I16.vertical(kernel,input,output,skip)) {
@@ -102,7 +102,7 @@ public class ConvolveDownNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel , GrayS16 input, GrayI16 output , int skip ) {
+	public static void convolve(Kernel2D_S32 kernel , GrayS16 input, GrayI16 output , int skip ) {
 		checkParameters(input,output,skip);
 
 		if( !ConvolveDownNoBorderUnrolled_S16_I16.convolve(kernel,input,output,skip)) {
@@ -110,7 +110,7 @@ public class ConvolveDownNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel , GrayU8 input, GrayI8 output , int skip , int divisor ) {
+	public static void horizontal(Kernel1D_S32 kernel , GrayU8 input, GrayI8 output , int skip , int divisor ) {
 		checkParametersH(input,output,skip);
 
 		if( !ConvolveDownNoBorderUnrolled_U8_I8_Div.horizontal(kernel,input,output,skip,divisor)) {
@@ -118,7 +118,7 @@ public class ConvolveDownNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel , GrayU8 input, GrayI8 output , int skip , int divisor ) {
+	public static void vertical(Kernel1D_S32 kernel , GrayU8 input, GrayI8 output , int skip , int divisor ) {
 		checkParametersV(input,output,skip);
 
 		if( !ConvolveDownNoBorderUnrolled_U8_I8_Div.vertical(kernel,input,output,skip,divisor)) {
@@ -126,7 +126,7 @@ public class ConvolveDownNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel , GrayU8 input, GrayI8 output , int skip , int divisor ) {
+	public static void convolve(Kernel2D_S32 kernel , GrayU8 input, GrayI8 output , int skip , int divisor ) {
 		checkParameters(input,output,skip);
 
 		if( !ConvolveDownNoBorderUnrolled_U8_I8_Div.convolve(kernel,input,output,skip,divisor)) {
@@ -134,7 +134,7 @@ public class ConvolveDownNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel , GrayS16 input, GrayI16 output , int skip , int divisor ) {
+	public static void horizontal(Kernel1D_S32 kernel , GrayS16 input, GrayI16 output , int skip , int divisor ) {
 		checkParametersH(input,output,skip);
 
 		if( !ConvolveDownNoBorderUnrolled_S16_I16_Div.horizontal(kernel,input,output,skip,divisor)) {
@@ -142,7 +142,7 @@ public class ConvolveDownNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel , GrayS16 input, GrayI16 output , int skip , int divisor ) {
+	public static void vertical(Kernel1D_S32 kernel , GrayS16 input, GrayI16 output , int skip , int divisor ) {
 		checkParametersV(input,output,skip);
 
 		if( !ConvolveDownNoBorderUnrolled_S16_I16_Div.vertical(kernel,input,output,skip,divisor)) {
@@ -150,7 +150,7 @@ public class ConvolveDownNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel , GrayS16 input, GrayI16 output , int skip , int divisor ) {
+	public static void convolve(Kernel2D_S32 kernel , GrayS16 input, GrayI16 output , int skip , int divisor ) {
 		checkParameters(input,output,skip);
 
 		if( !ConvolveDownNoBorderUnrolled_S16_I16_Div.convolve(kernel,input,output,skip,divisor)) {

@@ -15,12 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.filter.convolve.down;
 
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.*;
 
 
@@ -136,7 +137,7 @@ public class ConvolveDownNoBorderStandard {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel ,
+	public static void horizontal(Kernel1D_S32 kernel ,
 								  GrayU8 input, GrayI16 output ,
 								  int skip ) {
 		final byte[] dataSrc = input.data;
@@ -168,7 +169,7 @@ public class ConvolveDownNoBorderStandard {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel,
+	public static void vertical(Kernel1D_S32 kernel,
 								GrayU8 input, GrayI16 output,
 								int skip ) {
 		final byte[] dataSrc = input.data;
@@ -201,7 +202,7 @@ public class ConvolveDownNoBorderStandard {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel ,
+	public static void convolve(Kernel2D_S32 kernel ,
 								GrayU8 input , GrayI16 output , int skip )
 	{
 		final byte[] dataSrc = input.data;
@@ -230,7 +231,7 @@ public class ConvolveDownNoBorderStandard {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel ,
+	public static void horizontal(Kernel1D_S32 kernel ,
 								  GrayS16 input, GrayI16 output ,
 								  int skip ) {
 		final short[] dataSrc = input.data;
@@ -262,7 +263,7 @@ public class ConvolveDownNoBorderStandard {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel,
+	public static void vertical(Kernel1D_S32 kernel,
 								GrayS16 input, GrayI16 output,
 								int skip ) {
 		final short[] dataSrc = input.data;
@@ -295,7 +296,7 @@ public class ConvolveDownNoBorderStandard {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel ,
+	public static void convolve(Kernel2D_S32 kernel ,
 								GrayS16 input , GrayI16 output , int skip )
 	{
 		final short[] dataSrc = input.data;
@@ -324,7 +325,7 @@ public class ConvolveDownNoBorderStandard {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel ,
+	public static void horizontal(Kernel1D_S32 kernel ,
 								  GrayU8 input, GrayI8 output ,
 								  int skip , int divisor) {
 		final byte[] dataSrc = input.data;
@@ -357,7 +358,7 @@ public class ConvolveDownNoBorderStandard {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel,
+	public static void vertical(Kernel1D_S32 kernel,
 								GrayU8 input, GrayI8 output,
 								int skip , int divisor ) {
 		final byte[] dataSrc = input.data;
@@ -391,7 +392,7 @@ public class ConvolveDownNoBorderStandard {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel ,
+	public static void convolve(Kernel2D_S32 kernel ,
 								GrayU8 input , GrayI8 output , int skip , int divisor )
 	{
 		final byte[] dataSrc = input.data;
@@ -421,7 +422,7 @@ public class ConvolveDownNoBorderStandard {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel ,
+	public static void horizontal(Kernel1D_S32 kernel ,
 								  GrayS16 input, GrayI16 output ,
 								  int skip , int divisor) {
 		final short[] dataSrc = input.data;
@@ -454,7 +455,7 @@ public class ConvolveDownNoBorderStandard {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel,
+	public static void vertical(Kernel1D_S32 kernel,
 								GrayS16 input, GrayI16 output,
 								int skip , int divisor ) {
 		final short[] dataSrc = input.data;
@@ -488,7 +489,7 @@ public class ConvolveDownNoBorderStandard {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel ,
+	public static void convolve(Kernel2D_S32 kernel ,
 								GrayS16 input , GrayI16 output , int skip , int divisor )
 	{
 		final short[] dataSrc = input.data;

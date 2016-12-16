@@ -71,6 +71,7 @@ public abstract class CompareEquivalentFunctions {
 			if (!foundMatch) {
 				System.out.println("Can't find an equivalent function in validation class. " + m.getName());
 			} else {
+//				System.out.println("success with "+m.getName());
 				numFound++;
 			}
 		}

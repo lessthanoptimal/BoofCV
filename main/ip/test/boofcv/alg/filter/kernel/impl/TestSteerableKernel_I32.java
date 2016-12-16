@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.filter.kernel.impl;
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import org.junit.Test;
 
 import java.util.Random;
@@ -49,13 +49,13 @@ public class TestSteerableKernel_I32 {
 		basis[1] = FactoryKernel.random2D_I32(width,width/2,0,30,rand);
 		basis[2] = FactoryKernel.random2D_I32(width,width/2,0,30,rand);
 
-		Kernel2D_I32 expected = new Kernel2D_I32(width);
+		Kernel2D_S32 expected = new Kernel2D_S32(width);
 
 		for( int y = 0; y < width; y++ ) {
 			for( int x = 0; x < width; x++ ) {
 				int total = 0;
 				for( int i = 0; i < c.length;i++ ) {
-					total += c[i]*((Kernel2D_I32)basis[i]).get(x,y);
+					total += c[i]*((Kernel2D_S32)basis[i]).get(x,y);
 				}
 				expected.set(x,y,total);
 			}
@@ -63,7 +63,7 @@ public class TestSteerableKernel_I32 {
 
 		SteerableKernel_I32 alg = new SteerableKernel_I32();
 		alg.setBasis(coef,basis);
-		Kernel2D_I32 found = alg.compute(60.0);
+		Kernel2D_S32 found = alg.compute(60.0);
 
 		assertTrue(KernelMath.isEquals(expected.data,found.data,width*width));
 	}

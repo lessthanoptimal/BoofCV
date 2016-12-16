@@ -25,10 +25,10 @@ import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_F64;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.GrayU8;
@@ -62,7 +62,7 @@ public class TestBlurImageOps {
 
 			int w = radius*2+1;
 
-			Kernel2D_I32 kernel = new Kernel2D_I32(w);
+			Kernel2D_S32 kernel = new Kernel2D_S32(w);
 			Arrays.fill(kernel.data,1);
 
 			ConvolveNormalizedNaive.convolve(kernel, input, expected);
@@ -167,8 +167,8 @@ public class TestBlurImageOps {
 			ImageMiscOps.fill(found,0);
 
 			// make sure the kernels are equivalent
-			Kernel1D_I32 ker1 = FactoryKernelGaussian.gaussian(1, false, 32, -1, radius);
-			Kernel2D_I32 kernel = KernelMath.convolve2D(ker1, ker1);
+			Kernel1D_S32 ker1 = FactoryKernelGaussian.gaussian(1, false, 32, -1, radius);
+			Kernel2D_S32 kernel = KernelMath.convolve2D(ker1, ker1);
 			ConvolveNormalizedNaive.convolve(kernel, input, expected);
 
 			BlurImageOps.gaussian(input,found,-1,radius,null);

@@ -19,9 +19,9 @@
 package boofcv.alg.filter.convolve.down;
 
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.*;
 
 /**
@@ -259,7 +259,7 @@ public class ConvolveDownNormalized_JustBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel, GrayU8 input, GrayI8 output , int skip ) {
+	public static void horizontal(Kernel1D_S32 kernel, GrayU8 input, GrayI8 output , int skip ) {
 		final byte[] dataSrc = input.data;
 		final byte[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
@@ -308,7 +308,7 @@ public class ConvolveDownNormalized_JustBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel, GrayU8 input, GrayI8 output , int skip ) {
+	public static void vertical(Kernel1D_S32 kernel, GrayU8 input, GrayI8 output , int skip ) {
 		final byte[] dataSrc = input.data;
 		final byte[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
@@ -357,7 +357,7 @@ public class ConvolveDownNormalized_JustBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel, GrayU8 input, GrayI8 output , int skip ) {
+	public static void convolve(Kernel2D_S32 kernel, GrayU8 input, GrayI8 output , int skip ) {
 		final byte[] dataSrc = input.data;
 		final byte[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
@@ -478,7 +478,7 @@ public class ConvolveDownNormalized_JustBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel, GrayS16 input, GrayI16 output , int skip ) {
+	public static void horizontal(Kernel1D_S32 kernel, GrayS16 input, GrayI16 output , int skip ) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
@@ -527,7 +527,7 @@ public class ConvolveDownNormalized_JustBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel, GrayS16 input, GrayI16 output , int skip ) {
+	public static void vertical(Kernel1D_S32 kernel, GrayS16 input, GrayI16 output , int skip ) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
@@ -576,7 +576,7 @@ public class ConvolveDownNormalized_JustBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel, GrayS16 input, GrayI16 output , int skip ) {
+	public static void convolve(Kernel2D_S32 kernel, GrayS16 input, GrayI16 output , int skip ) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;

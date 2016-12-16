@@ -18,7 +18,7 @@
 
 package boofcv.alg.enhance.impl;
 
-import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General;
+import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
 import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard_SB;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;
@@ -133,7 +133,7 @@ public class TestImplEnhanceFilter {
 			expected = new GrayS16(input.width,input.height);
 			ImageBorder_S32 border = BoofDefaults.borderDerivative_I32();
 			border.setImage(input);
-			ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance4_I32,border,(GrayS16)expected);
+			ConvolveJustBorder_General_SB.convolve(ImplEnhanceFilter.kernelEnhance4_I32,border,(GrayS16)expected);
 			GPixelMath.boundImage(expected, 0, 255);
 		} else {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenBorder4",input,output,0f,255f);
@@ -141,7 +141,7 @@ public class TestImplEnhanceFilter {
 			expected = new GrayF32(input.width,input.height);
 			ImageBorder_F32 border = BoofDefaults.borderDerivative_F32();
 			border.setImage((GrayF32)input);
-			ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance4_F32, border, (GrayF32) expected);
+			ConvolveJustBorder_General_SB.convolve(ImplEnhanceFilter.kernelEnhance4_F32, border, (GrayF32) expected);
 			GPixelMath.boundImage(expected, 0, 255);
 		}
 
@@ -234,7 +234,7 @@ public class TestImplEnhanceFilter {
 			expected = new GrayS16(input.width,input.height);
 			ImageBorder_S32 border = BoofDefaults.borderDerivative_I32();
 			border.setImage(input);
-			ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance8_I32,border,(GrayS16)expected);
+			ConvolveJustBorder_General_SB.convolve(ImplEnhanceFilter.kernelEnhance8_I32,border,(GrayS16)expected);
 			GPixelMath.boundImage(expected, 0, 255);
 		} else {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenBorder8",input,output,0f,255f);
@@ -242,7 +242,7 @@ public class TestImplEnhanceFilter {
 			expected = new GrayF32(input.width,input.height);
 			ImageBorder_F32 border = BoofDefaults.borderDerivative_F32();
 			border.setImage((GrayF32)input);
-			ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance8_F32, border, (GrayF32) expected);
+			ConvolveJustBorder_General_SB.convolve(ImplEnhanceFilter.kernelEnhance8_F32, border, (GrayF32) expected);
 			GPixelMath.boundImage(expected, 0, 255);
 		}
 

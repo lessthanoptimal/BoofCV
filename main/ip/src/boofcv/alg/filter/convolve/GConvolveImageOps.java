@@ -44,11 +44,11 @@ public class GConvolveImageOps {
 			ConvolveWithBorder.horizontal((Kernel1D_F32)kernel,(GrayF32)input,(GrayF32)output,(ImageBorder_F32)border);
 		} else if( input instanceof GrayU8) {
 			if( GrayI16.class.isAssignableFrom(output.getClass()) )
-				ConvolveWithBorder.horizontal((Kernel1D_I32)kernel,(GrayU8)input,(GrayI16)output,(ImageBorder_S32)border);
+				ConvolveWithBorder.horizontal((Kernel1D_S32)kernel,(GrayU8)input,(GrayI16)output,(ImageBorder_S32)border);
 			else
-				ConvolveWithBorder.horizontal((Kernel1D_I32)kernel,(GrayU8)input,(GrayS32)output,(ImageBorder_S32)border);
+				ConvolveWithBorder.horizontal((Kernel1D_S32)kernel,(GrayU8)input,(GrayS32)output,(ImageBorder_S32)border);
 		} else if( input instanceof GrayS16) {
-			ConvolveWithBorder.horizontal((Kernel1D_I32)kernel,(GrayS16)input,(GrayI16)output,(ImageBorder_S32)border);
+			ConvolveWithBorder.horizontal((Kernel1D_S32)kernel,(GrayS16)input,(GrayI16)output,(ImageBorder_S32)border);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
 		}
@@ -69,11 +69,11 @@ public class GConvolveImageOps {
 			ConvolveWithBorder.vertical((Kernel1D_F32) kernel, (GrayF32) input, (GrayF32) output, (ImageBorder_F32) border);
 		} else if( input instanceof GrayU8) {
 			if( GrayI16.class.isAssignableFrom(output.getClass()) )
-				ConvolveWithBorder.vertical((Kernel1D_I32) kernel, (GrayU8) input, (GrayI16) output, (ImageBorder_S32) border);
+				ConvolveWithBorder.vertical((Kernel1D_S32) kernel, (GrayU8) input, (GrayI16) output, (ImageBorder_S32) border);
 			else
-				ConvolveWithBorder.vertical((Kernel1D_I32) kernel, (GrayU8) input, (GrayS32) output, (ImageBorder_S32) border);
+				ConvolveWithBorder.vertical((Kernel1D_S32) kernel, (GrayU8) input, (GrayS32) output, (ImageBorder_S32) border);
 		} else if( input instanceof GrayS16) {
-			ConvolveWithBorder.vertical((Kernel1D_I32) kernel, (GrayS16) input, (GrayI16) output, (ImageBorder_S32) border);
+			ConvolveWithBorder.vertical((Kernel1D_S32) kernel, (GrayS16) input, (GrayI16) output, (ImageBorder_S32) border);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
 		}
@@ -94,11 +94,11 @@ public class GConvolveImageOps {
 			ConvolveWithBorder.convolve((Kernel2D_F32) kernel, (GrayF32) input, (GrayF32) output, (ImageBorder_F32) border);
 		} else if( input instanceof GrayU8) {
 			if( GrayI16.class.isAssignableFrom(output.getClass()) )
-				ConvolveWithBorder.convolve((Kernel2D_I32) kernel, (GrayU8) input, (GrayI16) output, (ImageBorder_S32) border);
+				ConvolveWithBorder.convolve((Kernel2D_S32) kernel, (GrayU8) input, (GrayI16) output, (ImageBorder_S32) border);
 			else
-				ConvolveWithBorder.convolve((Kernel2D_I32) kernel, (GrayU8) input, (GrayS32) output, (ImageBorder_S32) border);
+				ConvolveWithBorder.convolve((Kernel2D_S32) kernel, (GrayU8) input, (GrayS32) output, (ImageBorder_S32) border);
 		} else if( input instanceof GrayS16) {
-			ConvolveWithBorder.convolve((Kernel2D_I32) kernel, (GrayS16) input, (GrayI16) output, (ImageBorder_S32) border);
+			ConvolveWithBorder.convolve((Kernel2D_S32) kernel, (GrayS16) input, (GrayI16) output, (ImageBorder_S32) border);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
 		}
@@ -117,11 +117,11 @@ public class GConvolveImageOps {
 			ConvolveImageNoBorder.horizontal((Kernel1D_F32)kernel,(GrayF32)input,(GrayF32)output);
 		} else if( input instanceof GrayU8) {
 			if( GrayI16.class.isAssignableFrom(output.getClass()) )
-				ConvolveImageNoBorder.horizontal((Kernel1D_I32)kernel,(GrayU8)input,(GrayI16)output);
+				ConvolveImageNoBorder.horizontal((Kernel1D_S32)kernel,(GrayU8)input,(GrayI16)output);
 			else
-				ConvolveImageNoBorder.horizontal((Kernel1D_I32)kernel,(GrayU8)input,(GrayS32)output);
+				ConvolveImageNoBorder.horizontal((Kernel1D_S32)kernel,(GrayU8)input,(GrayS32)output);
 		} else if( input instanceof GrayS16) {
-			ConvolveImageNoBorder.horizontal((Kernel1D_I32)kernel,(GrayS16)input,(GrayI16)output);
+			ConvolveImageNoBorder.horizontal((Kernel1D_S32)kernel,(GrayS16)input,(GrayI16)output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
 		}
@@ -140,11 +140,11 @@ public class GConvolveImageOps {
 			ConvolveImageNoBorder.vertical((Kernel1D_F32) kernel, (GrayF32) input, (GrayF32) output);
 		} else if( input instanceof GrayU8) {
 			if( GrayI16.class.isAssignableFrom(output.getClass()) )
-				ConvolveImageNoBorder.vertical((Kernel1D_I32) kernel, (GrayU8) input, (GrayI16) output);
+				ConvolveImageNoBorder.vertical((Kernel1D_S32) kernel, (GrayU8) input, (GrayI16) output);
 			else
-				ConvolveImageNoBorder.vertical((Kernel1D_I32) kernel, (GrayU8) input, (GrayS32) output);
+				ConvolveImageNoBorder.vertical((Kernel1D_S32) kernel, (GrayU8) input, (GrayS32) output);
 		} else if( input instanceof GrayS16) {
-			ConvolveImageNoBorder.vertical((Kernel1D_I32) kernel, (GrayS16) input, (GrayI16) output);
+			ConvolveImageNoBorder.vertical((Kernel1D_S32) kernel, (GrayS16) input, (GrayI16) output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
 		}
@@ -163,11 +163,11 @@ public class GConvolveImageOps {
 			ConvolveImageNoBorder.convolve((Kernel2D_F32) kernel, (GrayF32) input, (GrayF32) output);
 		} else if( input instanceof GrayU8) {
 			if( GrayI16.class.isAssignableFrom(output.getClass()) )
-				ConvolveImageNoBorder.convolve((Kernel2D_I32) kernel, (GrayU8) input, (GrayI16) output);
+				ConvolveImageNoBorder.convolve((Kernel2D_S32) kernel, (GrayU8) input, (GrayI16) output);
 			else
-				ConvolveImageNoBorder.convolve((Kernel2D_I32) kernel, (GrayU8) input, (GrayS32) output);
+				ConvolveImageNoBorder.convolve((Kernel2D_S32) kernel, (GrayU8) input, (GrayS32) output);
 		} else if( input instanceof GrayS16) {
-			ConvolveImageNoBorder.convolve((Kernel2D_I32) kernel, (GrayS16) input, (GrayI16) output);
+			ConvolveImageNoBorder.convolve((Kernel2D_S32) kernel, (GrayS16) input, (GrayI16) output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
 		}
@@ -188,9 +188,9 @@ public class GConvolveImageOps {
 		} else if( input instanceof GrayF64) {
 			ConvolveNormalized.horizontal((Kernel1D_F64)kernel,(GrayF64)input,(GrayF64)output);
 		} else if( input instanceof GrayU8) {
-			ConvolveNormalized.horizontal((Kernel1D_I32)kernel,(GrayU8)input,(GrayI8)output);
+			ConvolveNormalized.horizontal((Kernel1D_S32)kernel,(GrayU8)input,(GrayI8)output);
 		} else if( input instanceof GrayS16) {
-			ConvolveNormalized.horizontal((Kernel1D_I32)kernel,(GrayS16)input,(GrayI16)output);
+			ConvolveNormalized.horizontal((Kernel1D_S32)kernel,(GrayS16)input,(GrayI16)output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
 		}
@@ -211,9 +211,9 @@ public class GConvolveImageOps {
 		} else if( input instanceof GrayF64) {
 			ConvolveNormalized.vertical((Kernel1D_F64) kernel, (GrayF64) input, (GrayF64) output);
 		} else if( input instanceof GrayU8) {
-			ConvolveNormalized.vertical((Kernel1D_I32) kernel, (GrayU8) input, (GrayI8) output);
+			ConvolveNormalized.vertical((Kernel1D_S32) kernel, (GrayU8) input, (GrayI8) output);
 		} else if( input instanceof GrayS16) {
-			ConvolveNormalized.vertical((Kernel1D_I32) kernel, (GrayS16) input, (GrayI16) output);
+			ConvolveNormalized.vertical((Kernel1D_S32) kernel, (GrayS16) input, (GrayI16) output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
 		}
@@ -234,9 +234,9 @@ public class GConvolveImageOps {
 		} else if( input instanceof GrayF64) {
 			ConvolveNormalized.convolve((Kernel2D_F64) kernel, (GrayF64) input, (GrayF64) output);
 		} else if( input instanceof GrayU8) {
-			ConvolveNormalized.convolve((Kernel2D_I32) kernel, (GrayU8) input, (GrayI8) output);
+			ConvolveNormalized.convolve((Kernel2D_S32) kernel, (GrayU8) input, (GrayI8) output);
 		} else if( input instanceof GrayS16) {
-			ConvolveNormalized.convolve((Kernel2D_I32) kernel, (GrayS16) input, (GrayI16) output);
+			ConvolveNormalized.convolve((Kernel2D_S32) kernel, (GrayS16) input, (GrayI16) output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
 		}

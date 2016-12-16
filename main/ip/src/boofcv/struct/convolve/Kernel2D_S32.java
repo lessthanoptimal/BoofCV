@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ package boofcv.struct.convolve;
  * 
  * @author Peter Abeles
  */
-public class Kernel2D_I32 extends Kernel2D {
+public class Kernel2D_S32 extends Kernel2D {
 
 	public int data[];
 
@@ -42,7 +42,7 @@ public class Kernel2D_I32 extends Kernel2D {
 	 * @param width The kernels width.  Must be odd.
 	 * @param data  The value of the kernel. Not modified.  Reference is not saved.
 	 */
-	public Kernel2D_I32(int width, int []data) {
+	public Kernel2D_S32(int width, int []data) {
 		super(width);
 
 		this.data = new int[width * width];
@@ -55,7 +55,7 @@ public class Kernel2D_I32 extends Kernel2D {
 	 *
 	 * @param width How wide the kernel is.
 	 */
-	public Kernel2D_I32(int width) {
+	public Kernel2D_S32(int width) {
 		super(width);
 
 		data = new int[width * width];
@@ -66,13 +66,13 @@ public class Kernel2D_I32 extends Kernel2D {
 	 *
 	 * @param width How wide the kernel is.
 	 */
-	public Kernel2D_I32(int width, int offset) {
+	public Kernel2D_S32(int width, int offset) {
 		super(width,offset);
 
 		data = new int[width * width];
 	}
 
-	protected Kernel2D_I32() {
+	protected Kernel2D_S32() {
 	}
 
 	/**
@@ -84,11 +84,11 @@ public class Kernel2D_I32 extends Kernel2D {
 	 * @param offset Kernel origin's offset from element 0.
 	 * @return A new kernel.
 	 */
-	public static Kernel2D_I32 wrap(int data[], int width, int offset) {
+	public static Kernel2D_S32 wrap(int data[], int width, int offset) {
 		if (width % 2 == 0 && width <= 0 && width * width > data.length)
 			throw new IllegalArgumentException("invalid width");
 
-		Kernel2D_I32 ret = new Kernel2D_I32();
+		Kernel2D_S32 ret = new Kernel2D_S32();
 		ret.data = data;
 		ret.width = width;
 		ret.offset = offset;
@@ -133,8 +133,8 @@ public class Kernel2D_I32 extends Kernel2D {
 	}
 
 	@Override
-	public Kernel2D_I32 copy() {
-		Kernel2D_I32 ret = new Kernel2D_I32(width);
+	public Kernel2D_S32 copy() {
+		Kernel2D_S32 ret = new Kernel2D_S32(width);
 		ret.offset = this.offset;
 		System.arraycopy(data,0,ret.data,0,data.length);
 		return ret;

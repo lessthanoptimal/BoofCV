@@ -23,7 +23,7 @@ import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactorySteerable;
 import boofcv.gui.image.ShowImages;
 import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageGray;
 
@@ -49,7 +49,7 @@ public class DisplaySteerableGaussianApp <T extends ImageGray<T>, K extends Kern
 //		DisplaySteerableGaussianApp<GrayF32,Kernel2D_F32> app =
 //				new DisplaySteerableGaussianApp<GrayF32,Kernel2D_F32>(GrayF32.class);
 
-		DisplaySteerableGaussianApp<GrayS32, Kernel2D_I32> app =
+		DisplaySteerableGaussianApp<GrayS32, Kernel2D_S32> app =
 				new DisplaySteerableGaussianApp<>(GrayS32.class);
 
 		app.setPreferredSize(new Dimension(1000,480));

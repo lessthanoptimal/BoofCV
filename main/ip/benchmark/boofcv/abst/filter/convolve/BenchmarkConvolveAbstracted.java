@@ -26,7 +26,7 @@ import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
 
 /**
@@ -42,7 +42,7 @@ public class BenchmarkConvolveAbstracted {
 	static Kernel1D_F32 kernelF32;
 	static GrayF32 imgFloat32;
 	static GrayF32 out_F32;
-	static Kernel1D_I32 kernelI32;
+	static Kernel1D_S32 kernelI32;
 	static GrayU8 imgInt8;
 	static GrayS16 imgInt16;
 	static GrayU8 out_I8;

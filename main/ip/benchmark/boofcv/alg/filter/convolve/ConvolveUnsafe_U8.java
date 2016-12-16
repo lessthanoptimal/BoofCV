@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayI8;
 import boofcv.struct.image.GrayU8;
 import sun.misc.Unsafe;
@@ -51,7 +51,7 @@ public class ConvolveUnsafe_U8 {
 		}
 	}
 
-	public static boolean convolve(Kernel2D_I32 kernel ,
+	public static boolean convolve(Kernel2D_S32 kernel ,
 								   GrayU8 image, GrayI8 dest , int divisor ) {
 		switch( kernel.width ) {
 			case 3:
@@ -69,7 +69,7 @@ public class ConvolveUnsafe_U8 {
 	}
 
 
-	public static void convolve3(Kernel2D_I32 kernel, GrayU8 src,
+	public static void convolve3(Kernel2D_S32 kernel, GrayU8 src,
 								 GrayI8 dest, int divisor) {
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dest.data;
@@ -156,7 +156,7 @@ public class ConvolveUnsafe_U8 {
 		}
 	}
 
-	public static void convolve5(Kernel2D_I32 kernel, GrayU8 src,
+	public static void convolve5(Kernel2D_S32 kernel, GrayU8 src,
 								 GrayI8 dest, int divisor) {
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dest.data;

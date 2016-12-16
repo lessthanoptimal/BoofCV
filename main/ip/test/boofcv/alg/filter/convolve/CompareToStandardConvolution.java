@@ -98,9 +98,9 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 			kernel = FactoryKernel.random1D_F32(kernelWidth,offset, -1, 1, rand);
 		} else if (Kernel1D_F64.class == paramType) {
 			kernel = FactoryKernel.random1D_F64(kernelWidth,offset, 0, 5, rand);
-		} else if (Kernel1D_I32.class == paramType) {
+		} else if (Kernel1D_S32.class == paramType) {
 			kernel = FactoryKernel.random1D_I32(kernelWidth,offset, 0, 5, rand);
-		} else if (Kernel2D_I32.class == paramType) {
+		} else if (Kernel2D_S32.class == paramType) {
 			kernel = FactoryKernel.random2D_I32(kernelWidth,offset, -1, 1, rand);
 		} else if (Kernel2D_F32.class == paramType) {
 			kernel = FactoryKernel.random2D_F32(kernelWidth,offset, 0, 5, rand);

@@ -20,7 +20,7 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
 
 /**
@@ -34,7 +34,7 @@ public class ConvolutionTestHelper {
 		if( imageType == GrayF32.class ) {
 			return Kernel1D_F32.class;
 		} else {
-			return Kernel1D_I32.class;
+			return Kernel1D_S32.class;
 		}
 	}
 
