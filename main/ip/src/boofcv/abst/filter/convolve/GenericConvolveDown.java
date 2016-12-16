@@ -35,7 +35,7 @@ import java.lang.reflect.Method;
  * @author Peter Abeles
  */
 public class GenericConvolveDown<Input extends ImageBase<Input>, Output extends ImageBase<Output>>
-	implements ConvolveInterface<Input,Output>
+	implements ConvolveDown<Input,Output>
 {
 	Method m;
 	KernelBase kernel;

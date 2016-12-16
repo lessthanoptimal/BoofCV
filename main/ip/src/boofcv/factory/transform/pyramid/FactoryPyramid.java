@@ -53,12 +53,11 @@ public class FactoryPyramid {
 	PyramidDiscrete<T> discreteGaussian( int[] scaleFactors , double sigma , int radius ,
 										 boolean saveOriginalReference, ImageType<T> imageType )
 	{
-		Class<Kernel1D> kernelType = FactoryKernel.getKernelType(imageType.getImageClass(),1);
+		Class<Kernel1D> kernelType = FactoryKernel.getKernelType(imageType.getDataType(),1);
 
 		Kernel1D kernel = FactoryKernelGaussian.gaussian(kernelType,sigma,radius);
 
-		return new PyramidDiscreteSampleBlur<>(
-				kernel, sigma, imageType.getImageClass(), saveOriginalReference, scaleFactors);
+		return new PyramidDiscreteSampleBlur<>(kernel, sigma, imageType, saveOriginalReference, scaleFactors);
 	}
 
 	/**

@@ -25,6 +25,7 @@ import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidFloat;
 
@@ -69,7 +70,7 @@ public class BenchmarkImagePyramids {
 
 	private static void createUpdate() {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1.0,2);
-		pyramidD = new PyramidDiscreteSampleBlur<>(kernel,2,GrayF32.class,true,scalesD);
+		pyramidD = new PyramidDiscreteSampleBlur<>(kernel,2, ImageType.single(GrayF32.class),true,scalesD);
 
 		pyramidF = FactoryPyramid.scaleSpacePyramid(scalesF, GrayF32.class);
 

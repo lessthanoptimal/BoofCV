@@ -18,11 +18,11 @@
 
 package boofcv.alg.transform.pyramid;
 
-import boofcv.abst.filter.convolve.GenericConvolveDown;
+import boofcv.abst.filter.convolve.ConvolveDown;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.convolve.FactoryConvolveDown;
 import boofcv.struct.convolve.Kernel1D;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
@@ -45,12 +45,12 @@ import boofcv.struct.pyramid.PyramidDiscrete;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidDiscreteSampleBlur<T extends ImageGray<T>> extends PyramidDiscrete<T> {
+public class PyramidDiscreteSampleBlur<T extends ImageBase<T>> extends PyramidDiscrete<T> {
 
 	// stores the results from the first convolution
 	private T temp;
-	GenericConvolveDown<T,T> horizontal;
-	GenericConvolveDown<T,T> vertical;
+	ConvolveDown<T,T> horizontal;
+	ConvolveDown<T,T> vertical;
 
 	// amount of blur applied to each layer
 	double sigmas[];
@@ -64,15 +64,13 @@ public class PyramidDiscreteSampleBlur<T extends ImageGray<T>> extends PyramidDi
 	 *                              Set to false if you don't know what you are doing.
 	 * @param scaleFactors Scale factor for each layer in the pyramid relative to the input layer
 	 */
-	public PyramidDiscreteSampleBlur(Kernel1D kernel, double sigma, Class<T> imageType,
+	public PyramidDiscreteSampleBlur(Kernel1D kernel, double sigma, ImageType<T> imageType,
 									 boolean saveOriginalReference, int... scaleFactors)
 	{
-		super(ImageType.single(imageType),saveOriginalReference,scaleFactors);
+		super(imageType,saveOriginalReference,scaleFactors);
 
-		horizontal = FactoryConvolveDown.convolve(kernel,imageType,imageType,
-				BorderType.NORMALIZED,true,1);
-		vertical = FactoryConvolveDown.convolve(kernel,imageType,imageType,
-				BorderType.NORMALIZED,false,1);
+		horizontal = FactoryConvolveDown.convolve(kernel, BorderType.NORMALIZED, true, 1, imageType,imageType);
+		vertical = FactoryConvolveDown.convolve(kernel, BorderType.NORMALIZED, false, 1, imageType,imageType);
 
 		sigmas = new double[ scaleFactors.length ];
 		sigmas[0] = 0;

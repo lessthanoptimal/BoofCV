@@ -15,10 +15,21 @@ Version : 0.27
 - camera distortion models
   * Unrolled matrix inverse in pinhole and radtan
 - Updated generics to take advantage of Java 7 more
-- Image Pyramids are no longer just gray images TODO
-- Convolution for interleaved images TODO
-- Average down sample for interleaved images TODO
-- Average down sample for planar images TODO
+- Image Pyramids
+  * PyramidDiscreteSampleBlur supports generic images
+- ConvolveDown
+  * Added an interface
+  * Added planar image support
+  * Added interleaved image support TODO
+- ConvolveStandard
+  * Added interleaved image support TODO
+- ConvolveNormalized
+  * Added interleaved image support TODO
+- ConvolveDownNormalized
+  * Added interleaved image support TODO
+- AverageDownSample
+  * Added support for planar images TODO
+  * Added support for interleaved images TODO
 
 
 - TODO Fisheye calibration using omni model
