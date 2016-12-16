@@ -29,8 +29,6 @@ import java.io.FileNotFoundException;
  * @author Peter Abeles
  */
 public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
-	String className = "ConvolveImageStandard_IL";
-
 	String kernelType;
 	String inputType;
 	String outputType;
@@ -41,10 +39,9 @@ public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
 	String typeCast;
 	String bitWise;
 	boolean hasDivide;
-	boolean hasBound = false; // should delete this code if it's never needed
 
 	@Override
-	public void generate()throws FileNotFoundException {
+	public void generate() {
 		printPreamble();
 		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false);
 //		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false, true);
@@ -63,8 +60,7 @@ public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
 		out.println("}");
 	}
 
-	private void printPreamble() throws FileNotFoundException {
-		setOutputFile(className);
+	private void printPreamble() {
 		out.print("import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n");
 		out.println();
@@ -92,28 +88,22 @@ public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
 	private void printAllOps(AutoTypeImage input, AutoTypeImage output, boolean hasDivide,
 							 boolean justVertical )
 	{
-		boolean isInteger = input.isInteger();
-		boolean is64 = input.getNumBits()==64;
-
 		typeCast = output.getTypeCastFromSum();
-		kernelType = isInteger ? "I32" : is64 ? "F64" : "F32";
+		kernelType = input.getKernelType();
+		kernelData = input.getKernelDataType();
 		inputType = input.getInterleavedName();
 		outputType = output.getInterleavedName();
-		kernelData = isInteger ? "int" : is64 ? "double" : "float";
 		inputData = input.getDataType();
 		outputData = output.getDataType();
-		sumType = isInteger ? "int" : is64 ? "double" : "float";
+		sumType = input.getSumType();
 		bitWise = input.getBitWise();
 		this.hasDivide = hasDivide;
-		this.hasBound = hasBound;
 
 		if( justVertical ) {
 			printVertical();
 		} else {
-			if (!hasBound) {
-				printHorizontal();
-				printVertical();
-			}
+			printHorizontal();
+			printVertical();
 			printConvolve2D();
 		}
 	}
@@ -201,19 +191,9 @@ public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
 
 		String paramDiv = hasDivide ? ", int divisor " : "";
 		String totalDiv = hasDivide ? "((total+halfDivisor)/divisor)" : "total";
-		String paramBound = hasBound ? ", "+sumType+" minValue , "+sumType+" maxValue " : "";
 		String performBound = "";
 
-		if( hasBound ) {
-			performBound = "\n" +
-					"\t\t\t\tif( total < minValue )\n" +
-					"\t\t\t\t\ttotal = minValue;\n" +
-					"\t\t\t\telse if( total > maxValue )\n" +
-					"\t\t\t\t\ttotal = maxValue;\n" +
-					"\n";
-		}
-
-		out.print("\tpublic static void convolve( Kernel2D_"+kernelType+" kernel , "+inputType+" src , "+outputType+" dst "+paramDiv+paramBound+")\n" +
+		out.print("\tpublic static void convolve( Kernel2D_"+kernelType+" kernel , "+inputType+" src , "+outputType+" dst "+paramDiv+")\n" +
 				"\t{\n" +
 				"\t\tfinal "+kernelData+"[] dataKernel = kernel.data;\n" +
 				"\t\tfinal "+inputData+"[] dataSrc = src.data;\n" +

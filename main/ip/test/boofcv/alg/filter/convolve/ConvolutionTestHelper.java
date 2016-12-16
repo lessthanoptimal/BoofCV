@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.convolve;
 
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.image.*;
@@ -40,19 +41,24 @@ public class ConvolutionTestHelper {
 	/**
 	 * Creates an image of the specified type
 	 */
-	public static ImageGray createImage(Class<?> imageType, int width, int height) {
+	public static ImageBase createImage(Class<?> imageType, int width, int height) {
 
-		// swap generic types with an arbitrary specific one
-		if( imageType == GrayI8.class )
-			imageType = GrayU8.class;
-		else if( imageType == GrayI16.class )
-			imageType = GrayS16.class;
+		if( ImageGray.class.isAssignableFrom(imageType)) {
+			if( imageType == GrayI8.class )
+				imageType = GrayU8.class;
+			else if( imageType == GrayI16.class )
+				imageType = GrayS16.class;
 
-		try {
-			ImageGray img = (ImageGray) imageType.newInstance();
-			return (ImageGray)img.createNew(width, height);
-		} catch (InstantiationException | IllegalAccessException e) {
-			throw new RuntimeException(e);
+			return GeneralizedImageOps.createSingleBand((Class)imageType, width, height);
+		} else if( ImageInterleaved.class.isAssignableFrom(imageType)) {
+			if( imageType == InterleavedI8.class )
+				imageType = InterleavedU8.class;
+			else if( imageType == InterleavedI16.class )
+				imageType = InterleavedS16.class;
+
+			return GeneralizedImageOps.createInterleaved((Class)imageType, width, height, 2);
+		}  else {
+			throw new RuntimeException("Unknown image class");
 		}
 	}
 

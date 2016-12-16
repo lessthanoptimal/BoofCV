@@ -18,11 +18,12 @@
 
 package boofcv.alg.filter.convolve;
 
+import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard_IL;
 import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard_SB;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.*;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
 import boofcv.testing.CompareIdenticalFunctions;
 
 import java.lang.reflect.Method;
@@ -44,7 +45,7 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 	protected int offset = 2;
 
 	public CompareToStandardConvolution( Class<?> targetClass ) {
-		super(targetClass, ConvolveImageStandard_SB.class);
+		super(targetClass, ConvolveImageStandard_SB.class, ConvolveImageStandard_IL.class);
 	}
 
 	public void compareMethod( Method target , String validationName , int radius ) {
@@ -61,9 +62,9 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class<?> paramTypes[] = candidate.getParameterTypes();
 
-		ImageGray src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
+		ImageBase src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
 		GImageMiscOps.fillUniform(src, rand, 0, 130);
-		ImageGray dst = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
+		ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
 
 		if( candidate.getName().compareTo("convolve") != 0 ) {
 			Object[][] ret = new Object[1][paramTypes.length];

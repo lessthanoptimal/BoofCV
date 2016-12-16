@@ -32,16 +32,16 @@ public abstract class CompareEquivalentFunctions {
 	// the class being tested
 	Class<?> testClass;
 	// class being validated
-	Class<?> validationClass;
+	Class<?> validationClasses[];
 
 	// the method being tested
 	protected Method methodTest;
 	// the method being used to validate the test
 	protected Method methodValidation;
 
-	protected CompareEquivalentFunctions(Class<?> testClass, Class<?> validationClass) {
+	protected CompareEquivalentFunctions(Class<?> testClass, Class<?> ...validationClass) {
 		this.testClass = testClass;
-		this.validationClass = validationClass;
+		this.validationClasses = validationClass;
 	}
 
 	public void performTests( int numMethods) {
@@ -53,19 +53,23 @@ public abstract class CompareEquivalentFunctions {
 			if( !isTestMethod(m))
 				continue;
 
-			// check for equivalence for each match
-			Method candidates[] = validationClass.getMethods();
 			boolean foundMatch = false;
-			for( Method c : candidates ) {
-				if( isEquivalent(c, m)) {
+
+			escape:
+			for( Class<?> vc : validationClasses ) {
+				// check for equivalence for each match
+				Method candidates[] = vc.getMethods();
+				for (Method c : candidates) {
+					if (isEquivalent(c, m)) {
 //					System.out.println("Examining: "+m.getName());
-					foundMatch = true;
-					compareMethods(m, c);
+						foundMatch = true;
+						compareMethods(m, c);
+						break escape;
+					}
 				}
 			}
-
-			if( !foundMatch ) {
-				System.out.println("Can't find an equivalent function in validation class. "+m.getName());
+			if (!foundMatch) {
+				System.out.println("Can't find an equivalent function in validation class. " + m.getName());
 			} else {
 				numFound++;
 			}
@@ -73,7 +77,7 @@ public abstract class CompareEquivalentFunctions {
 
 		// update this as needed when new functions are added
 		if(numMethods != numFound)
-			throw new RuntimeException("Unexpected number of methods: Found "+numFound+"  expected "+numMethods);
+			throw new RuntimeException("Unexpected number of methods: Found "+numFound+"  expected "+numMethods+" possible "+methods.length);
 	}
 
 	/**
@@ -82,13 +86,17 @@ public abstract class CompareEquivalentFunctions {
 	 * @param target The method being compared
 	 * @param validationName Name of the method in the validation class
 	 */
-	public void compareMethod( Method target , String validationName ) {
+	public void compareMethod( Class<?> validationClass, Method target , String validationName ) {
 		try {
 			Method evaluation = validationClass.getMethod(validationName,target.getParameterTypes());
 			compareMethods(target,evaluation);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void compareMethod( Method target , String validationName ) {
+		compareMethod(validationClasses[0], target, validationName);
 	}
 
 	private void compareMethods( Method target , Method validation ) {

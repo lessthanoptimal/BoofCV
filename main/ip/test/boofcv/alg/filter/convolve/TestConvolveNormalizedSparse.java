@@ -23,7 +23,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
 import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.Test;
 
@@ -89,7 +89,7 @@ public class TestConvolveNormalizedSparse {
 				throw new RuntimeException("Unknown kernel type");
 			}
 
-			ImageGray src = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
+			ImageBase src = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
 			GImageMiscOps.fillUniform(src, rand, 0, 5);
 
 

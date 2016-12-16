@@ -25,6 +25,7 @@ import boofcv.core.image.GImageGray;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.convolve.KernelBase;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
@@ -125,15 +126,15 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class<?> paramTypes[] = candidate.getParameterTypes();
 
-		ImageGray src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
+		ImageBase src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
 		GImageMiscOps.fillUniform(src, rand, 0, 5);
-		ImageGray dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
+		ImageBase dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
 
 		Object[][] ret = new Object[1][paramTypes.length];
 		ret[0][0] = createKernel(paramTypes[0], kernelWidth, kernelOffset);
 		ret[0][1] = src;
 		ret[0][2] = dst;
-		ret[0][3] = FactoryImageBorder.single(src, BorderType.EXTENDED);
+		ret[0][3] = FactoryImageBorder.single((ImageGray)src, BorderType.EXTENDED);
 
 		return ret;
 	}

@@ -29,8 +29,6 @@ import java.io.FileNotFoundException;
  * @author Peter Abeles
  */
 public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
-	String className = "ConvolveNormalizedNaive";
-
 	String divide;
 
 	public GenerateConvolveNormalizedNaive() throws FileNotFoundException {

@@ -19,6 +19,7 @@
 package boofcv.testing;
 
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageInterleaved;
 
 import java.lang.reflect.Method;
 
@@ -30,7 +31,7 @@ import java.lang.reflect.Method;
  */
 public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctions {
 
-	protected CompareIdenticalFunctions(Class<?> testClass, Class<?> validationClass) {
+	protected CompareIdenticalFunctions(Class<?> testClass, Class<?>... validationClass) {
 		super(testClass, validationClass);
 	}
 
@@ -40,6 +41,8 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 
 		for( Class<?> c : e ) {
 			if( ImageGray.class.isAssignableFrom(c))
+				return true;
+			if( ImageInterleaved.class.isAssignableFrom(c))
 				return true;
 		}
 		return false;

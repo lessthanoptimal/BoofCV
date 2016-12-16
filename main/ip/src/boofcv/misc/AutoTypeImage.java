@@ -156,6 +156,14 @@ public enum AutoTypeImage {
 		}
 	}
 
+	public String getKernelType() {
+		return isInteger() ? "I32" : getNumBits()==64 ? "F64" : "F32";
+	}
+
+	public String getKernelDataType() {
+		return isInteger() ? "int" : getNumBits()==64 ? "double" : "float";
+	}
+
 	public String getInterleavedName() {
 		return "Interleaved"+toString();
 	}

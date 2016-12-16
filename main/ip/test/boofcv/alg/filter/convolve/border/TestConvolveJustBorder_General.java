@@ -27,6 +27,7 @@ import boofcv.core.image.border.ImageBorderValue;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
@@ -113,9 +114,9 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 
 		KernelBase kernel = createKernel(paramTypes[0], kernelWidth, kernelWidth/2);
 
-		ImageGray src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
+		ImageBase src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
 		GImageMiscOps.fillUniform(src, rand, 0, 5);
-		ImageGray dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
+		ImageBase dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
 
 		Object[][] ret = new Object[2][paramTypes.length];
 		// normal symmetric odd kernel

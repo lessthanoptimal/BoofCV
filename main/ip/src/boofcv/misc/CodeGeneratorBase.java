@@ -33,6 +33,31 @@ public abstract class CodeGeneratorBase {
 	protected PrintStream out;
 	protected String className;
 
+	public CodeGeneratorBase(boolean useDefaultName) {
+		if( useDefaultName ) {
+			autoSelectName();
+		}
+	}
+
+	public CodeGeneratorBase() {
+		autoSelectName();
+	}
+
+	public void autoSelectName() {
+		className = getClass().getSimpleName();
+		if( className.startsWith("Generate") ) {
+			int l = new String("Generate").length();
+			className = className.substring(l, className.length());
+			try {
+				initFile();
+			} catch( FileNotFoundException e ) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			System.out.println("Class name doesn't start with Generate");
+		}
+	}
+
 	/**
 	 * Creates 
 	 *
@@ -40,13 +65,17 @@ public abstract class CodeGeneratorBase {
 	 */
 	public abstract void generate() throws FileNotFoundException;
 
-	public void setOutputFile( String className ) throws FileNotFoundException {
-		this.className = className;
+	public void initFile() throws FileNotFoundException {
 		out = new PrintStream(new FileOutputStream(className + ".java"));
 		out.print(CodeGeneratorUtil.copyright);
 		out.println();
 		out.println("package " + getPackage() + ";");
 		out.println();
+	}
+
+	public void setOutputFile( String className ) throws FileNotFoundException {
+		this.className = className;
+		initFile();
 	}
 
 	public String generatedString() {
