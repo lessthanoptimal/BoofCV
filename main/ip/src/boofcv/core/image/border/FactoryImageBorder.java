@@ -29,13 +29,13 @@ import boofcv.struct.image.*;
 @SuppressWarnings({"unchecked"})
 public class FactoryImageBorder {
 
-	public static <T extends ImageGray> ImageBorder<T> single(T image, BorderType borderType) {
+	public static <T extends ImageGray<T>> ImageBorder<T> single(T image, BorderType borderType) {
 		ImageBorder<T> ret = single((Class) image.getClass(), borderType);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static <T extends ImageInterleaved> ImageBorder<T> interleaved(T image, BorderType borderType) {
+	public static <T extends ImageInterleaved<T>> ImageBorder<T> interleaved(T image, BorderType borderType) {
 		ImageBorder<T> ret = interleaved((Class) image.getClass(), borderType);
 		ret.setImage(image);
 		return ret;
@@ -60,7 +60,7 @@ public class FactoryImageBorder {
 			throw new IllegalArgumentException("Unknown image type");
 	}
 
-	public static <T extends ImageBase> ImageBorder<T>
+	public static <T extends ImageBase<T>> ImageBorder<T>
 	generic( BorderType borderType, ImageType<T> imageType ) {
 		switch( imageType.getFamily() ) {
 			case GRAY:
@@ -77,7 +77,7 @@ public class FactoryImageBorder {
 		}
 	}
 
-	public static <T extends ImageBase> ImageBorder<T>
+	public static <T extends ImageBase<T>> ImageBorder<T>
 	genericValue( double value, ImageType<T> imageType ) {
 		switch( imageType.getFamily() ) {
 			case GRAY:
@@ -103,7 +103,7 @@ public class FactoryImageBorder {
 	 * @param borderType Which border algorithm should it use.
 	 * @return The requested {@link ImageBorder}.
 	 */
-	public static <T extends ImageGray> ImageBorder<T>
+	public static <T extends ImageGray<T>> ImageBorder<T>
 	single(Class<T> imageType, BorderType borderType)
 	{
 		Class<?> borderClass;
@@ -158,7 +158,7 @@ public class FactoryImageBorder {
 	 * @param borderType Which border algorithm should it use.
 	 * @return The requested {@link ImageBorder}.
 	 */
-	public static <T extends ImageInterleaved> ImageBorder<T>
+	public static <T extends ImageInterleaved<T>> ImageBorder<T>
 	interleaved(Class<T> imageType, BorderType borderType)
 	{
 		Class<?> borderClass;
@@ -213,7 +213,7 @@ public class FactoryImageBorder {
 	 * @param value The value which will be returned.
 	 * @return An {@link ImageBorder}
 	 */
-	public static <T extends ImageGray> ImageBorder<T> singleValue(T image, double value) {
+	public static <T extends ImageGray<T>> ImageBorder<T> singleValue(T image, double value) {
 		ImageBorder border = singleValue(image.getClass(), value);
 		border.setImage(image);
 		return border;
@@ -228,7 +228,7 @@ public class FactoryImageBorder {
 	 * @param value The value which will be returned.
 	 * @return An {@link ImageBorder}
 	 */
-	public static <T extends ImageGray> ImageBorder<T> singleValue(Class<T> imageType, double value) {
+	public static <T extends ImageGray<T>> ImageBorder<T> singleValue(Class<T> imageType, double value) {
 		if( imageType == GrayF32.class ) {
 			return (ImageBorder<T>)new ImageBorderValue.Value_F32((float)value);
 		} else if( imageType == GrayF64.class ) {
@@ -249,7 +249,7 @@ public class FactoryImageBorder {
 	 * @param value The value which will be returned.
 	 * @return An {@link ImageBorder}
 	 */
-	public static <T extends ImageInterleaved> ImageBorder<T> interleavedValue(T image, double value) {
+	public static <T extends ImageInterleaved<T>> ImageBorder<T> interleavedValue(T image, double value) {
 		ImageBorder border = interleavedValue(image.getClass(), value);
 		border.setImage(image);
 		return border;
@@ -264,7 +264,7 @@ public class FactoryImageBorder {
 	 * @param value The value which will be returned.
 	 * @return An {@link ImageBorder}
 	 */
-	public static <T extends ImageInterleaved> ImageBorder<T> interleavedValue(Class<T> imageType, double value) {
+	public static <T extends ImageInterleaved<T>> ImageBorder<T> interleavedValue(Class<T> imageType, double value) {
 		if( imageType == InterleavedF32.class ) {
 			return (ImageBorder<T>) new ImageBorderValue.Value_IL_F32((float) value);
 		} else if( imageType == InterleavedF64.class ) {

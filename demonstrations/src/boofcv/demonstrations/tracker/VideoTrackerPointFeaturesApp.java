@@ -46,7 +46,7 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 // todo extract out base class for handling videos
-public class VideoTrackerPointFeaturesApp<I extends ImageGray, D extends ImageGray>
+public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>, D extends ImageGray<D>>
 		extends VideoProcessAppBase<I> implements MouseListener
 {
 

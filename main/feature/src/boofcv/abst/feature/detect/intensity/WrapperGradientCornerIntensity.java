@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
  * 
  * @author Peter Abeles
  */
-public class WrapperGradientCornerIntensity<I extends ImageGray,D extends ImageGray>
+public class WrapperGradientCornerIntensity<I extends ImageGray<I>,D extends ImageGray<D>>
 		extends BaseGeneralFeatureIntensity<I,D>
 {
 	GradientCornerIntensity<D> alg;

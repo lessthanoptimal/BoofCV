@@ -44,7 +44,7 @@ public class FactoryOrientation {
 	 * @param imageType Type of input image it will process
 	 * @return Wrapped version which can process images as its raw input.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	OrientationImage<T> convertImage( RegionOrientation algorithm , Class<T> imageType ) {
 		if( algorithm instanceof OrientationGradient ) {
 			Class derivType = ((OrientationGradient) algorithm).getImageType();
@@ -66,7 +66,7 @@ public class FactoryOrientation {
 	 * @param imageType Type of input image
 	 * @return SIFT orientation image
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	OrientationImage<T> sift(ConfigSiftScaleSpace configSS , ConfigSiftOrientation configOri, Class<T> imageType ) {
 		if( configSS == null )
 			configSS = new ConfigSiftScaleSpace();

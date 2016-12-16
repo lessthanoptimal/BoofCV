@@ -39,7 +39,7 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public abstract class DisparityScoreRowFormat
-		<Input extends ImageGray, Disparity extends ImageGray>
+		<Input extends ImageGray<Input>, Disparity extends ImageGray<Disparity>>
 {
 	// the minimum disparity that it will check
 	protected int minDisparity;

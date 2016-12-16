@@ -20,6 +20,7 @@ package boofcv.alg.transform.pyramid;
 
 import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 /**
@@ -28,7 +29,7 @@ import boofcv.struct.pyramid.PyramidDiscrete;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidDiscreteAverage<T extends ImageGray> extends PyramidDiscrete<T> {
+public class PyramidDiscreteAverage<T extends ImageGray<T>> extends PyramidDiscrete<T> {
 
 	/**
 	 *
@@ -40,7 +41,7 @@ public class PyramidDiscreteAverage<T extends ImageGray> extends PyramidDiscrete
 	public PyramidDiscreteAverage(Class<T> imageType,
 								  boolean saveOriginalReference, int... scaleFactors)
 	{
-		super(imageType,saveOriginalReference,scaleFactors);
+		super(ImageType.single(imageType),saveOriginalReference,scaleFactors);
 	}
 
 	@Override

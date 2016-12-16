@@ -46,7 +46,7 @@ import georegression.struct.point.Vector2D_F64;
  *
  * @author Peter Abeles
  */
-public class RefineCornerLinesToImage<T extends ImageGray> {
+public class RefineCornerLinesToImage<T extends ImageGray<T>> {
 
 	// How far away from a corner will it sample the line
 	double cornerOffset;

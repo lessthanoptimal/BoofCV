@@ -212,7 +212,7 @@ public class ConvertBufferedImage {
 	 * @param dst The image which it is being converted into
 	 * @param orderRgb If applicable, should it adjust the ordering of each color band to maintain color consistency
 	 */
-	public static <T extends ImageBase> void convertFrom(BufferedImage src, T dst , boolean orderRgb) {
+	public static <T extends ImageBase<T>> void convertFrom(BufferedImage src, T dst , boolean orderRgb) {
 		if( dst instanceof ImageGray) {
 			ImageGray sb = (ImageGray)dst;
 			convertFromSingle(src, sb, (Class<ImageGray>) sb.getClass());
@@ -234,7 +234,7 @@ public class ConvertBufferedImage {
 	 * @param imageType Type of image it is to be converted into
 	 * @return The image
 	 */
-	public static <T extends ImageBase> T convertFrom(BufferedImage src , boolean orderRgb , ImageType<T> imageType) {
+	public static <T extends ImageBase<T>> T convertFrom(BufferedImage src , boolean orderRgb , ImageType<T> imageType) {
 
 		T out = imageType.createImage(src.getWidth(),src.getHeight());
 
@@ -258,7 +258,7 @@ public class ConvertBufferedImage {
 		return out;
 	}
 
-	public static <T extends ImageBase> T convertFrom(BufferedImage src , boolean orderRgb , T output ) {
+	public static <T extends ImageBase<T>> T convertFrom(BufferedImage src , boolean orderRgb , T output ) {
 
 		ImageType<T> imageType = output.getImageType();
 
@@ -286,7 +286,7 @@ public class ConvertBufferedImage {
 	 * Converts a buffered image into an image of the specified type.  In a 'dst' image is provided
 	 * it will be used for output, otherwise a new image will be created.
 	 */
-	public static <T extends ImageGray> T convertFromSingle(BufferedImage src, T dst, Class<T> type) {
+	public static <T extends ImageGray<T>> T convertFromSingle(BufferedImage src, T dst, Class<T> type) {
 		if (type == GrayU8.class) {
 			return (T) convertFrom(src, (GrayU8) dst);
 		} else if( GrayI16.class.isAssignableFrom(type) ) {
@@ -345,7 +345,7 @@ public class ConvertBufferedImage {
 	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
 	 * @return Converted image.
 	 */
-	public static <T extends GrayI16>T convertFrom(BufferedImage src, T dst , Class<T> type ) {
+	public static <T extends GrayI16<T>>T convertFrom(BufferedImage src, T dst , Class<T> type ) {
 		if (dst != null) {
 			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
 				throw new IllegalArgumentException("image dimension are different");
@@ -418,7 +418,7 @@ public class ConvertBufferedImage {
 	 * @param type Which type of data structure is each band. (GrayU8 or GrayF32)
 	 * @return Converted image.
 	 */
-	public static <T extends ImageGray> Planar<T>
+	public static <T extends ImageGray<T>> Planar<T>
 	convertFromMulti(BufferedImage src, Planar<T> dst , boolean orderRgb , Class<T> type )
 	{
 		if( src == null )
@@ -982,7 +982,7 @@ public class ConvertBufferedImage {
 	 * Invoking this function ensures that the image will have the expected ordering.  For images with
 	 * 3 bands it will be RGB and for 4 bands it will be ARGB.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	void orderBandsIntoRGB(Planar<T> image , BufferedImage input ) {
 
 		boolean swap = swapBandOrder(input);
@@ -1023,7 +1023,7 @@ public class ConvertBufferedImage {
 		}
 	}
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	void orderBandsBufferedFromRgb(Planar<T> image, BufferedImage input) {
 
 		boolean swap = swapBandOrder(input);

@@ -44,7 +44,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class ShowImageBlurApp<T extends ImageGray>
+public class ShowImageBlurApp<T extends ImageGray<T>>
 	extends SelectAlgorithmAndInputPanel implements ChangeListener
 {
 	int radius = 2;

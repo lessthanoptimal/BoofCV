@@ -12,7 +12,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public abstract class VideoImageProcessing<T extends ImageBase> extends VideoRenderProcessing<T> {
+public abstract class VideoImageProcessing<T extends ImageBase<T>> extends VideoRenderProcessing<T> {
 
 	// output image which is modified by processing thread
 	private Bitmap output;

@@ -35,7 +35,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public class DdaManagerGeneralPoint<I extends ImageGray, D extends ImageGray, Desc extends TupleDesc>
+public class DdaManagerGeneralPoint<I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
 		implements DdaFeatureManager<I, Desc> {
 
 	// feature detector

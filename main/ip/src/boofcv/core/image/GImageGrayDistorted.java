@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageGray;
 /**
  * @author Peter Abeles
  */
-public class GImageGrayDistorted<T extends ImageGray> implements GImageGray {
+public class GImageGrayDistorted<T extends ImageGray<T>> implements GImageGray {
 
 	PixelTransform2_F32 transform;
 	InterpolatePixelS<T> interpolate;

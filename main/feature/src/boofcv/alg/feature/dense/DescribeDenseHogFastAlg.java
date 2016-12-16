@@ -47,7 +47,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DescribeDenseHogFastAlg<Input extends ImageBase> extends BaseDenseHog<Input> {
+public class DescribeDenseHogFastAlg<Input extends ImageBase<Input>> extends BaseDenseHog<Input> {
 
 
 	// storage for histograms in each cell

@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface FeatureIntensity<T extends ImageGray> {
+public interface FeatureIntensity<T extends ImageGray<T>> {
 
 	/**
 	 * Returns the radius of the feature being computed.  Features are square in shape with a width = 2*radius+1.

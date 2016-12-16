@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DescribeImageDenseHoG<T extends ImageBase> implements DescribeImageDense<T,TupleDesc_F64> {
+public class DescribeImageDenseHoG<T extends ImageBase<T>> implements DescribeImageDense<T,TupleDesc_F64> {
 
 	BaseDenseHog<T> hog;
 

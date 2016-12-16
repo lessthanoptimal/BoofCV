@@ -41,7 +41,7 @@ import java.util.*;
  *
  * @author
  */
-public class VideoSequenceSimulator<I extends ImageGray> {
+public class VideoSequenceSimulator<I extends ImageGray<I>> {
 
 	protected int width,height;
 

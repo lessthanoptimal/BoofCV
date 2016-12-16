@@ -38,7 +38,7 @@ import georegression.struct.point.Point2D_I32;
  *
  * @author Peter Abeles
  */
-public abstract class DescribePointBinaryCompare<T extends ImageGray> {
+public abstract class DescribePointBinaryCompare<T extends ImageGray<T>> {
 	// describes where points are sampled and how they are compared
 	protected BinaryCompareDefinition_I32 definition;
 

@@ -39,7 +39,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public abstract class DisplaySteerableBase<T extends ImageGray, K extends Kernel2D>
+public abstract class DisplaySteerableBase<T extends ImageGray<T>, K extends Kernel2D>
 		extends SelectAlgorithmPanel
 {
 	protected static int imageSize = 400;

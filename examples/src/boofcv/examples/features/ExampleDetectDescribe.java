@@ -58,7 +58,7 @@ public class ExampleDetectDescribe {
 	 * For some features, there are pre-made implementations of DetectDescribePoint.  This has only been done
 	 * in situations where there was a performance advantage or that it was a very common combination.
 	 */
-	public static <T extends ImageGray, TD extends TupleDesc>
+	public static <T extends ImageGray<T>, TD extends TupleDesc>
 	DetectDescribePoint<T, TD> createFromPremade( Class<T> imageType ) {
 		return (DetectDescribePoint)FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
@@ -70,7 +70,7 @@ public class ExampleDetectDescribe {
 	 * can be combined into DetectDescribePoint.  The syntax is more complex, but the end result is more flexible.
 	 * This should only be done if there isn't a pre-made DetectDescribePoint.
 	 */
-	public static <T extends ImageGray, TD extends TupleDesc>
+	public static <T extends ImageGray<T>, TD extends TupleDesc>
 	DetectDescribePoint<T, TD> createFromComponents( Class<T> imageType ) {
 		// create a corner detector
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);

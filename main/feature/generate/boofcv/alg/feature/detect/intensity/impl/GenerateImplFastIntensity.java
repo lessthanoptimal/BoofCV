@@ -95,7 +95,7 @@ public class GenerateImplFastIntensity extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public class "+className+"<T extends ImageGray> extends FastCornerIntensity<T>\n" +
+				"public class "+className+"<T extends ImageGray<T>> extends FastCornerIntensity<T>\n" +
 				"{\n" +
 				"\n" +
 				"\t/**\n" +

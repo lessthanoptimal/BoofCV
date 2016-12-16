@@ -53,7 +53,7 @@ public class FactoryFiducial {
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	SquareBinary_to_FiducialDetector<T> squareBinary( ConfigFiducialBinary configFiducial,
 													  ConfigThreshold configThreshold,
 													  Class<T> imageType ) {
@@ -91,7 +91,7 @@ public class FactoryFiducial {
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
-	public static  <T extends ImageGray>
+	public static  <T extends ImageGray<T>>
 	SquareImage_to_FiducialDetector<T> squareImage( ConfigFiducialImage configFiducial,
 													ConfigThreshold configThreshold,
 													Class<T> imageType ) {
@@ -120,7 +120,7 @@ public class FactoryFiducial {
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	CalibrationFiducialDetector<T> calibChessboard( ConfigChessboard config, Class<T> imageType) {
 
 		config.refineWithCorners = false;
@@ -136,7 +136,7 @@ public class FactoryFiducial {
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	CalibrationFiducialDetector<T> calibSquareGrid( ConfigSquareGrid config, Class<T> imageType) {
 
 		config.refineWithCorners = false;
@@ -144,13 +144,13 @@ public class FactoryFiducial {
 		return new CalibrationFiducialDetector<>(config, imageType);
 	}
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	CalibrationFiducialDetector<T> calibSquareGridBinary( ConfigSquareGridBinary config, Class<T> imageType) {
 
 		return new CalibrationFiducialDetector<>(config, imageType);
 	}
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	CalibrationFiducialDetector<T> calibCircleAsymGrid(ConfigCircleAsymmetricGrid config, Class<T> imageType) {
 
 		return new CalibrationFiducialDetector<>(config, imageType);

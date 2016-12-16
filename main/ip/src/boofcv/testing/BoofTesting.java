@@ -83,7 +83,7 @@ public class BoofTesting {
 	 * </p>
 	 */
 	@SuppressWarnings({"unchecked"})
-	public static <T extends ImageBase> T createSubImageOf(T input) {
+	public static <T extends ImageBase<T>> T createSubImageOf(T input) {
 		if( input instanceof ImageGray) {
 			return (T)createSubImageOf_S((ImageGray)input);
 		} else if( input instanceof Planar) {
@@ -95,7 +95,7 @@ public class BoofTesting {
 		}
 	}
 
-	public static <T extends ImageGray> T createSubImageOf_S(T input) {
+	public static <T extends ImageGray<T>> T createSubImageOf_S(T input) {
 		// create the larger image
 		T ret = (T) input.createNew(input.width + 10, input.height + 12);
 		// create a sub-image of the inner portion
@@ -106,7 +106,7 @@ public class BoofTesting {
 		return ret;
 	}
 
-	public static <T extends ImageInterleaved> T createSubImageOf_I(T input) {
+	public static <T extends ImageInterleaved<T>> T createSubImageOf_I(T input) {
 		// create the larger image
 		T ret = (T) input.createNew(input.width + 10, input.height + 12);
 		// create a sub-image of the inner portion

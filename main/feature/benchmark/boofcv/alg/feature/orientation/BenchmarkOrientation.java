@@ -40,7 +40,7 @@ import static boofcv.factory.feature.orientation.FactoryOrientationAlgs.*;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkOrientation<I extends ImageGray, D extends ImageGray> {
+public class BenchmarkOrientation<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 	static final long TEST_TIME = 1000;
 	static Random rand = new Random(234234);

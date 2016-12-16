@@ -78,7 +78,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeStereoVisualOdometryApp <I extends ImageGray>
+public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 		extends StereoVideoAppBase<I> implements VisualizeApp, VisualOdometryPanel.Listener
 {
 

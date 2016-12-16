@@ -54,7 +54,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RefinePolygonLineToImage<T extends ImageGray> implements RefineBinaryPolygon<T> {
+public class RefinePolygonLineToImage<T extends ImageGray<T>> implements RefineBinaryPolygon<T> {
 
 	// How far away from a corner will it sample the line
 	private double cornerOffset = 2.0;

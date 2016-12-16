@@ -97,7 +97,7 @@ public class DistortSupport {
 	 * @param dstToSrc Transform from dst to src image.
 	 * @param interp Which interpolation algorithm should be used.
 	 */
-	public static <Input extends ImageGray,Output extends ImageGray>
+	public static <Input extends ImageGray<Input>,Output extends ImageGray<Output>>
 	ImageDistort<Planar<Input>,Planar<Output>>
 	createDistortPL(Class<Output> outputType, PixelTransform2_F32 dstToSrc,
 					InterpolatePixelS<Input> interp, boolean cached )

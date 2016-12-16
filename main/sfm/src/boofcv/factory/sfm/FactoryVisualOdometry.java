@@ -86,7 +86,7 @@ public class FactoryVisualOdometry {
 	 * @param <T>
 	 * @return New instance of
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	MonocularPlaneVisualOdometry<T> monoPlaneInfinity(int thresholdAdd,
 													  int thresholdRetire,
 
@@ -137,7 +137,7 @@ public class FactoryVisualOdometry {
 	 * @param imageType Type of image being processed
 	 * @return MonocularPlaneVisualOdometry
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	MonocularPlaneVisualOdometry<T> monoPlaneOverhead(double cellSize,
 													  double maxCellsPerPixel,
 													  double mapHeightFraction ,
@@ -177,7 +177,7 @@ public class FactoryVisualOdometry {
 	 * @param imageType Type of image being processed.
 	 * @return StereoVisualOdometry
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	StereoVisualOdometry<T> stereoDepth(double inlierPixelTol,
 										int thresholdAdd,
 										int thresholdRetire ,
@@ -230,7 +230,7 @@ public class FactoryVisualOdometry {
 	 * @param depthType Type of depth image being processed.
 	 * @return StereoVisualOdometry
 	 */
-	public static <Vis extends ImageGray, Depth extends ImageGray>
+	public static <Vis extends ImageGray<Vis>, Depth extends ImageGray<Depth>>
 	DepthVisualOdometry<Vis,Depth> depthDepthPnP(double inlierPixelTol,
 												 int thresholdAdd,
 												 int thresholdRetire ,
@@ -285,7 +285,7 @@ public class FactoryVisualOdometry {
 	 * @param imageType Type of image being processed
 	 * @return Stereo visual odometry algorithm.
 	 */
-	public static <T extends ImageGray, Desc extends TupleDesc>
+	public static <T extends ImageGray<T>, Desc extends TupleDesc>
 	StereoVisualOdometry<T> stereoDualTrackerPnP(int thresholdAdd, int thresholdRetire,
 												 double inlierPixelTol,
 												 double epipolarPixelTol,
@@ -339,7 +339,7 @@ public class FactoryVisualOdometry {
 	 *
 	 * @see VisOdomQuadPnP
 	 */
-	public static <T extends ImageGray,Desc extends TupleDesc>
+	public static <T extends ImageGray<T>,Desc extends TupleDesc>
 	StereoVisualOdometry<T> stereoQuadPnP( double inlierPixelTol ,
 										   double epipolarPixelTol ,
 										   double maxDistanceF2F,
@@ -399,7 +399,7 @@ public class FactoryVisualOdometry {
 	 * @param <T> Image type
 	 * @return StereoVisualOdometry
 	 */
-	public static <T extends ImageBase> StereoVisualOdometry<T> scaleInput( StereoVisualOdometry<T> vo , double scaleFactor )
+	public static <T extends ImageBase<T>> StereoVisualOdometry<T> scaleInput( StereoVisualOdometry<T> vo , double scaleFactor )
 	{
 		return new StereoVisualOdometryScaleInput<>(vo, scaleFactor);
 	}
@@ -414,7 +414,7 @@ public class FactoryVisualOdometry {
 	 * @param <T> Image type
 	 * @return StereoVisualOdometry
 	 */
-	public static <T extends ImageBase> MonocularPlaneVisualOdometry<T> scaleInput( MonocularPlaneVisualOdometry<T> vo , double scaleFactor )
+	public static <T extends ImageBase<T>> MonocularPlaneVisualOdometry<T> scaleInput( MonocularPlaneVisualOdometry<T> vo , double scaleFactor )
 	{
 		return new MonocularPlaneVisualOdometryScaleInput<>(vo, scaleFactor);
 	}

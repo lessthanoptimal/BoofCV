@@ -30,13 +30,13 @@ import org.junit.Test;
  * @author Peter Abeles
  */
 public class TestSparseIntegralHaar_NoBorder_I32
-		extends GeneralSparseGradientIntegralTests<GrayS32,GrayS32,GradientValue_I32>
+		extends GeneralSparseGradientIntegralTests<GrayS32,GradientValue_I32>
 {
 	final static int size = 4;
 	final static int radius = size/2;
 
 	public TestSparseIntegralHaar_NoBorder_I32() {
-		super(GrayS32.class, GrayS32.class,-radius,-radius,radius,radius);
+		super(GrayS32.class, -radius,-radius,radius,radius);
 
 		alg = new SparseIntegralHaar_NoBorder_I32();
 		((SparseIntegralHaar_NoBorder_I32)alg).setWidth(size);

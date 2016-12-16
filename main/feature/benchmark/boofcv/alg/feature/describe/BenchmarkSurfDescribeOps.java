@@ -30,7 +30,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkSurfDescribeOps<T extends ImageGray>
+public class BenchmarkSurfDescribeOps<T extends ImageGray<T>>
 {
 	static int imgWidth = 640;
 	static int imgHeight = 480;

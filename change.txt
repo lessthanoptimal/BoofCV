@@ -14,6 +14,12 @@ Version : 0.27
 - Added integration/visualize-javafx
 - camera distortion models
   * Unrolled matrix inverse in pinhole and radtan
+- Updated generics to take advantage of Java 7 more
+- Image Pyramids are no longer just gray images TODO
+- Convolution for interleaved images TODO
+- Average down sample for interleaved images TODO
+- Average down sample for planar images TODO
+
 
 - TODO Fisheye calibration using omni model
 - TODO grid of circle calibration target

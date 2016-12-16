@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class StandardPointTrackerTwoPass<T extends ImageGray>
+public abstract class StandardPointTrackerTwoPass<T extends ImageGray<T>>
 		extends StandardPointTracker<T>
 {
 

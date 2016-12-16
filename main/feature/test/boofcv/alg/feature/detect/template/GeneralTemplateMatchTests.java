@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public abstract class GeneralTemplateMatchTests<T extends ImageGray> {
+public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> {
 
 	Random rand = new Random(344);
 

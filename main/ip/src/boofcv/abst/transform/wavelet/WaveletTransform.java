@@ -36,7 +36,7 @@ import boofcv.struct.wavelet.WlCoef;
  * @author Peter Abeles
  */
 public interface WaveletTransform
-		<O extends ImageGray, T extends ImageGray, C extends WlCoef >
+		<O extends ImageGray<O>, T extends ImageGray<T>, C extends WlCoef >
 {
 	/**
 	 * Computes the wavelet transform of the input image.  If no output/transform image is provided a new image is

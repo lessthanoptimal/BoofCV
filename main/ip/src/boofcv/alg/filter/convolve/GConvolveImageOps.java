@@ -38,7 +38,7 @@ public class GConvolveImageOps {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static <In extends ImageGray, Out extends ImageGray, K extends Kernel1D, B extends ImageBorder<In>>
+	public static <In extends ImageGray<In>, Out extends ImageGray<Out>, K extends Kernel1D, B extends ImageBorder<In>>
 	void horizontal(K kernel, In input, Out output , B border ) {
 		if( input instanceof GrayF32) {
 			ConvolveWithBorder.horizontal((Kernel1D_F32)kernel,(GrayF32)input,(GrayF32)output,(ImageBorder_F32)border);
@@ -63,7 +63,7 @@ public class GConvolveImageOps {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static <In extends ImageGray, Out extends ImageGray, K extends Kernel1D, B extends ImageBorder<In>>
+	public static <In extends ImageGray<In>, Out extends ImageGray<Out>, K extends Kernel1D, B extends ImageBorder<In>>
 	void vertical(K kernel, In input, Out output , B border ) {
 		if( input instanceof GrayF32) {
 			ConvolveWithBorder.vertical((Kernel1D_F32) kernel, (GrayF32) input, (GrayF32) output, (ImageBorder_F32) border);
@@ -88,7 +88,7 @@ public class GConvolveImageOps {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static <In extends ImageGray, Out extends ImageGray, K extends Kernel2D, B extends ImageBorder<In>>
+	public static <In extends ImageGray<In>, Out extends ImageGray<Out>, K extends Kernel2D, B extends ImageBorder<In>>
 	void convolve(K kernel, In input, Out output , B border ) {
 		if( input instanceof GrayF32) {
 			ConvolveWithBorder.convolve((Kernel2D_F32) kernel, (GrayF32) input, (GrayF32) output, (ImageBorder_F32) border);
@@ -204,7 +204,7 @@ public class GConvolveImageOps {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static <T extends ImageGray, K extends Kernel1D>
+	public static <T extends ImageGray<T>, K extends Kernel1D>
 	void verticalNormalized(K kernel, T input, T output ) {
 		if( input instanceof GrayF32) {
 			ConvolveNormalized.vertical((Kernel1D_F32) kernel, (GrayF32) input, (GrayF32) output);
@@ -227,7 +227,7 @@ public class GConvolveImageOps {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static <T extends ImageGray, K extends Kernel2D>
+	public static <T extends ImageGray<T>, K extends Kernel2D>
 	void convolveNormalized(K kernel, T input, T output ) {
 		if( input instanceof GrayF32) {
 			ConvolveNormalized.convolve((Kernel2D_F32) kernel, (GrayF32) input, (GrayF32) output);

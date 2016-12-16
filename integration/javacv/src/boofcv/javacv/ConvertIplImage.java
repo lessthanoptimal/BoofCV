@@ -40,7 +40,7 @@ public class ConvertIplImage {
 		}
 	}
 
-	public static <T extends ImageGray>T convertFrom( IplImage input , T output ) {
+	public static <T extends ImageGray<T>>T convertFrom( IplImage input , T output ) {
 		if( input.nChannels() != 1 )
 			throw new IllegalArgumentException("Expected 1 channel for gray scale images");
 
@@ -57,7 +57,7 @@ public class ConvertIplImage {
 						+dataType+" found "+output.getDataType()+" instead");
 			output.reshape(width,height);
 		} else {
-			output = GeneralizedImageOps.createSingleBand(dataType,width,height);
+			output = (T)GeneralizedImageOps.createSingleBand(dataType,width,height);
 		}
 
 		switch( dataType ) {
@@ -77,7 +77,7 @@ public class ConvertIplImage {
 		return output;
 	}
 
-	public static <T extends ImageInterleaved>T convertFrom( IplImage input , T output ) {
+	public static <T extends ImageInterleaved<T>>T convertFrom( IplImage input , T output ) {
 		ImageDataType dataType = depthToBoofType(input.depth());
 
 		int numBands = input.nChannels();
@@ -93,7 +93,7 @@ public class ConvertIplImage {
 			output.numBands = numBands;
 			output.reshape(width,height);
 		} else {
-			output = GeneralizedImageOps.createInterleaved(dataType,width,height,numBands);
+			output = (T)GeneralizedImageOps.createInterleaved(dataType,width,height,numBands);
 		}
 
 		switch( dataType ) {

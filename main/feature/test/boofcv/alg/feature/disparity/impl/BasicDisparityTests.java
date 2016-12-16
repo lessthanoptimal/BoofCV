@@ -31,9 +31,9 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public abstract class BasicDisparityTests<Image extends ImageGray, Disparity extends ImageGray> {
-	Image left;
-	Image right;
+public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends ImageGray<DI>> {
+	I left;
+	I right;
 
 	// image size
 	int w = 50;
@@ -43,7 +43,7 @@ public abstract class BasicDisparityTests<Image extends ImageGray, Disparity ext
 
 	Random rand = new Random();
 
-	public BasicDisparityTests( Class<Image> imageType ) {
+	public BasicDisparityTests( Class<I> imageType ) {
 		left = GeneralizedImageOps.createSingleBand(imageType,w,h);
 		right = GeneralizedImageOps.createSingleBand(imageType,w,h);
 	}
@@ -54,7 +54,7 @@ public abstract class BasicDisparityTests<Image extends ImageGray, Disparity ext
 
 	public abstract int getBorderY();
 
-	public abstract Disparity computeDisparity( Image left , Image right );
+	public abstract DI computeDisparity(I left , I right );
 
 	public void allChecks() {
 		checkGradient();
@@ -77,7 +77,7 @@ public abstract class BasicDisparityTests<Image extends ImageGray, Disparity ext
 			}
 		}
 
-		Disparity output = computeDisparity(left,right);
+		DI output = computeDisparity(left,right);
 
 		int borderX = getBorderX();
 		int borderY = getBorderY();
@@ -116,7 +116,7 @@ public abstract class BasicDisparityTests<Image extends ImageGray, Disparity ext
 			}
 		}
 
-		Disparity output = computeDisparity(left,right);
+		DI output = computeDisparity(left,right);
 
 		int borderX = getBorderX();
 		int borderY = getBorderY();

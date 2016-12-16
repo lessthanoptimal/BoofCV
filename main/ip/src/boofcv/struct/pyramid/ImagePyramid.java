@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.struct.pyramid;
 
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 /**
  * <p>
@@ -39,7 +40,7 @@ import boofcv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public interface ImagePyramid<T extends ImageBase> {
+public interface ImagePyramid<T extends ImageBase<T>> {
 
 	/**
 	 * Constructs the image pyramid given the input image.
@@ -106,7 +107,7 @@ public interface ImagePyramid<T extends ImageBase> {
 	 *
 	 * @return Image type.
 	 */
-	public Class<T> getImageType();
+	public ImageType<T> getImageType();
 
 	/**
 	 * Set's this pyramid to be the same as input.  The two pyramids must have the same structure or else an

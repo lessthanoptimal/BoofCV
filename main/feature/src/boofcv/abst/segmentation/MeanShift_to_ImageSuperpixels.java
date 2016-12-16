@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageType;
 /**
  * @author Peter Abeles
  */
-public class MeanShift_to_ImageSuperpixels<T extends ImageBase>
+public class MeanShift_to_ImageSuperpixels<T extends ImageBase<T>>
 		implements ImageSuperpixels<T>
 {
 	SegmentMeanShift<T> ms;

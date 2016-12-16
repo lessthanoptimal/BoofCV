@@ -51,7 +51,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 
 	protected List<ImageType> imageTypes = new ArrayList<>();
 
-	public abstract<T extends ImageBase>
+	public abstract<T extends ImageBase<T>>
 	BackgroundModelMoving<T,Homography2D_F32> create( ImageType<T> imageType );
 
 	/**
@@ -65,7 +65,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 		}
 	}
 
-	private <T extends ImageBase> void basicCheck( ImageType<T> imageType ) {
+	private <T extends ImageBase<T>> void basicCheck( ImageType<T> imageType ) {
 
 		BackgroundModelMoving<T,Homography2D_F32> alg = create(imageType);
 		T frame = imageType.createImage(width,height);
@@ -118,7 +118,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 		}
 	}
 
-	private <T extends ImageBase>
+	private <T extends ImageBase<T>>
 	void currentOutsideBackground( ImageType<T> imageType ) {
 		T frame = imageType.createImage(width, height);
 		GrayU8 segmented = new GrayU8(width,height);
@@ -150,7 +150,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 		checkTransform(frame, segmented, alg, homeToCurrent, backgroundOutsideTol);
 	}
 
-	private <T extends ImageBase> void checkTransform(T frame, GrayU8 segmented,
+	private <T extends ImageBase<T>> void checkTransform(T frame, GrayU8 segmented,
 													  BackgroundModelMoving<T, Homography2D_F32> alg,
 													  Homography2D_F32 homeToCurrent , double tol ) {
 
@@ -201,7 +201,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 		}
 	}
 
-	private <T extends ImageBase>
+	private <T extends ImageBase<T>>
 	void markNoBackgroundAsBackground( ImageType<T> imageType ) {
 		T frame = imageType.createImage(width, height);
 		GrayU8 segmented = new GrayU8(width,height);
@@ -236,7 +236,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 		}
 	}
 
-	private <T extends ImageBase>
+	private <T extends ImageBase<T>>
 	void markUnobservedAsUnknown( ImageType<T> imageType ) {
 		T frame = imageType.createImage(width, height);
 		GrayU8 segmented = new GrayU8(width,height);
@@ -267,7 +267,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 		}
 	}
 
-	private <T extends ImageBase>
+	private <T extends ImageBase<T>>
 	void reset( ImageType<T> imageType ) {
 		T frame = imageType.createImage(width, height);
 
@@ -305,7 +305,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 		}
 	}
 
-	private <T extends ImageBase>
+	private <T extends ImageBase<T>>
 	void checkSubImage( ImageType<T> imageType ) {
 		T frame = imageType.createImage(width, height);
 		GrayU8 segmented = new GrayU8(width,height);
@@ -325,7 +325,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 		BoofTesting.assertEquals(expected,found,1e-8);
 	}
 
-	private <T extends ImageBase>
+	private <T extends ImageBase<T>>
 	void checkSubImage_process( T frame, GrayU8 segmented)
 	{
 		rand = new Random(2345);

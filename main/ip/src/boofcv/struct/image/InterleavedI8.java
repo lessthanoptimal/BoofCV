@@ -25,7 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public abstract class InterleavedI8<T extends InterleavedI8> extends InterleavedInteger<T> {
+public abstract class InterleavedI8<T extends InterleavedI8<T>> extends InterleavedInteger<T> {
 
 	public byte data[];
 

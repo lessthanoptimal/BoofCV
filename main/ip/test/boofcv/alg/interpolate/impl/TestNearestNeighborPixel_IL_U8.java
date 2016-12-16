@@ -40,7 +40,7 @@ public class TestNearestNeighborPixel_IL_U8 extends GeneralChecksInterpolationPi
 	}
 
 	@Override
-	protected <SB extends ImageGray> InterpolatePixelS<SB>
+	protected <SB extends ImageGray<SB>> InterpolatePixelS<SB>
 	wrapSingle(SB image, int minValue, int maxValue) {
 		return (InterpolatePixelS)new NearestNeighborPixel_U8((GrayU8)image);
 	}

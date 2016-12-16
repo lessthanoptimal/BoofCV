@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class TldDetection<T extends ImageGray> {
+public class TldDetection<T extends ImageGray<T>> {
 
 	// Detects rectangles: Removes candidates don't match the fern descriptors
 	private TldFernClassifier<T> fern;

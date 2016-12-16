@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase> {
+public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase<T>> {
 
 	Random rand = new Random(234);
 

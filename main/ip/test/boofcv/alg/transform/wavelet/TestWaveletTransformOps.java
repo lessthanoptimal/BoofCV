@@ -58,7 +58,7 @@ public class TestWaveletTransformOps {
 		}
 	}
 
-	public <T extends ImageGray> void checkOverflow1(Class<T> typeInput ) {
+	public <T extends ImageGray<T>> void checkOverflow1(Class<T> typeInput ) {
 		this.typeInput = typeInput;
 		WaveletDescription<?> desc = createDesc(typeInput);
 
@@ -85,7 +85,7 @@ public class TestWaveletTransformOps {
 		}
 	}
 
-	public <T extends ImageGray> void testSmallImage1(Class<T> typeInput ) {
+	public <T extends ImageGray<T>> void testSmallImage1(Class<T> typeInput ) {
 		this.typeInput = typeInput;
 		WaveletDescription<?> desc = createDesc(typeInput);
 
@@ -161,7 +161,7 @@ public class TestWaveletTransformOps {
 		}
 	}
 
-	public <T extends ImageGray> void checkOverflowN(Class<T> typeInput ) {
+	public <T extends ImageGray<T>> void checkOverflowN(Class<T> typeInput ) {
 		this.typeInput = typeInput;
 		WaveletDescription<?> desc = createDesc(typeInput);
 

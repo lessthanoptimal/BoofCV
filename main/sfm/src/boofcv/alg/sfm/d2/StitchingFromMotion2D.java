@@ -46,7 +46,7 @@ import georegression.struct.shapes.RectangleLength2D_I32;
  * @author Peter Abeles
  */
 
-public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTransform>
+public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends InvertibleTransform>
 {
 	// REFERENCE FRAME NOTES:
 	//

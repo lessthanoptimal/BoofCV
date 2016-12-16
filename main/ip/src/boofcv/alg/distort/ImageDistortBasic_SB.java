@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class ImageDistortBasic_SB<Input extends ImageGray,Output extends ImageGray>
+public abstract class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output extends ImageGray<Output>>
 		extends ImageDistortBasic<Input,Output,InterpolatePixelS<Input>> {
 
 	/**

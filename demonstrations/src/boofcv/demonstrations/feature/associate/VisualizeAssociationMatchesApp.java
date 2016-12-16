@@ -68,7 +68,7 @@ import java.util.List;
  */
 // todo add waiting tool bar
 // todo show partial results
-public class VisualizeAssociationMatchesApp<T extends ImageGray, D extends ImageGray>
+public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel {
 
 	InterestPointDetector<T> detector;

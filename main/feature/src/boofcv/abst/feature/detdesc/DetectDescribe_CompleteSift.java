@@ -30,8 +30,8 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class DetectDescribe_CompleteSift<In extends ImageGray>
-		implements DetectDescribePoint<In,BrightFeature> {
+public class DetectDescribe_CompleteSift<I extends ImageGray<I>>
+		implements DetectDescribePoint<I,BrightFeature> {
 
 	CompleteSift alg;
 	GrayF32 imageFloat = new GrayF32(1,1);
@@ -56,7 +56,7 @@ public class DetectDescribe_CompleteSift<In extends ImageGray>
 	}
 
 	@Override
-	public void detect(In input) {
+	public void detect(I input) {
 		if( input instanceof GrayF32)
 			alg.process((GrayF32)input);
 		else {

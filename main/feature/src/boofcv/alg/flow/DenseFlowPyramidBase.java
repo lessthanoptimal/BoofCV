@@ -34,7 +34,7 @@ import boofcv.struct.pyramid.PyramidFloat;
  *
  * @author Peter Abeles
  */
-public abstract class DenseFlowPyramidBase<T extends ImageGray> {
+public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 
 	// storage for normalized image
 	private GrayF32 norm1 = new GrayF32(1,1);
@@ -149,7 +149,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageGray> {
 	/**
 	 * Function to normalize the images between 0 and 255.
 	 **/
-	protected static<T extends ImageGray>
+	protected static<T extends ImageGray<T>>
 	void imageNormalization(T image1, T image2, GrayF32 normalized1, GrayF32 normalized2 )
 	{
 		// find the max and min of both images

@@ -20,7 +20,7 @@ package boofcv.abst.filter.convolve;
 
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.convolve.KernelBase;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 import java.lang.reflect.InvocationTargetException;
@@ -34,20 +34,20 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class GenericConvolveDown<Input extends ImageGray, Output extends ImageGray>
+public class GenericConvolveDown<Input extends ImageBase<Input>, Output extends ImageBase<Output>>
 	implements ConvolveInterface<Input,Output>
 {
 	Method m;
 	KernelBase kernel;
 	BorderType type;
 	int skip;
-	Class<Input> inputType;
-	Class<Output> outputType;
+	ImageType<Input> inputType;
+	ImageType<Output> outputType;
 
 	public GenericConvolveDown(Method m, KernelBase kernel,
 							   BorderType type, int skip ,
-							   Class<Input> inputType,
-							   Class<Output> outputType) {
+							   ImageType<Input> inputType,
+							   ImageType<Output> outputType) {
 		this.m = m;
 		this.kernel = kernel;
 		this.type = type;
@@ -93,11 +93,11 @@ public class GenericConvolveDown<Input extends ImageGray, Output extends ImageGr
 
 	@Override
 	public ImageType<Input> getInputType() {
-		return ImageType.single(inputType);
+		return inputType;
 	}
 
 	@Override
 	public ImageType<Output> getOutputType() {
-		return ImageType.single(outputType);
+		return outputType;
 	}
 }

@@ -29,11 +29,11 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class WrapperLaplacianBlobIntensity<I extends ImageGray>
-		extends BaseGeneralFeatureIntensity<I,ImageGray> {
+public class WrapperLaplacianBlobIntensity<I extends ImageGray<I>,D extends ImageGray<D>>
+		extends BaseGeneralFeatureIntensity<I,D> {
 
 	@Override
-	public void process(I image, ImageGray derivX, ImageGray derivY, ImageGray derivXX, ImageGray derivYY, ImageGray derivXY) {
+	public void process(I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY) {
 		init(image.width,image.height);
 		if( image instanceof GrayU8) {
 			LaplacianEdge.process((GrayU8)image,intensity);

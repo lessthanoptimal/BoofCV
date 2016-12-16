@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class BaseTestDescribePointBinaryCompare<T extends ImageGray> {
+public abstract class BaseTestDescribePointBinaryCompare<T extends ImageGray<T>> {
 
 	Random rand = new Random(234);
 	int width = 30;

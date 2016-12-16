@@ -43,7 +43,7 @@ import java.util.ArrayList;
  * Demonstrates the affects of different binary operations on an image.
  */
 // todo clean up appearance
-public class DemoBinaryImageOpsApp<T extends ImageGray> extends SelectAlgorithmAndInputPanel
+public class DemoBinaryImageOpsApp<T extends ImageGray<T>> extends SelectAlgorithmAndInputPanel
 		implements SelectHistogramThresholdPanel.Listener
 {
 	Class<T> imageType;

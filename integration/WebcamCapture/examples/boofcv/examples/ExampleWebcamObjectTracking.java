@@ -45,7 +45,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class ExampleWebcamObjectTracking<T extends ImageBase> extends JPanel
+public class ExampleWebcamObjectTracking<T extends ImageBase<T>> extends JPanel
 		implements MouseListener, MouseMotionListener {
 
 	TrackerObjectQuad<T> tracker;

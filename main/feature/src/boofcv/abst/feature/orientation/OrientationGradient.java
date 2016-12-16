@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface OrientationGradient<D extends ImageGray> extends RegionOrientation {
+public interface OrientationGradient<D extends ImageGray<D>> extends RegionOrientation {
 
 	/**
 	 * Specifies input image data for estimating orientation.

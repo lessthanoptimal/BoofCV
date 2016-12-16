@@ -45,7 +45,7 @@ public class GGrayImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static <T extends ImageGray> T stretch(T input, double gamma, double beta, double max , T output) {
+	public static <T extends ImageGray<T>> T stretch(T input, double gamma, double beta, double max , T output) {
 		if( input instanceof GrayF32) {
 			return (T)GrayImageOps.stretch((GrayF32)input,gamma,(float)beta,(float)max,(GrayF32)output);
 		} else if( input instanceof GrayU8) {
@@ -71,7 +71,7 @@ public class GGrayImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static <T extends ImageGray> T brighten(T input , double beta, double max , T output )
+	public static <T extends ImageGray<T>> T brighten(T input , double beta, double max , T output )
 	{
 		if( input instanceof GrayF32) {
 			return (T)GrayImageOps.brighten((GrayF32) input, (float) beta, (float) max, (GrayF32) output);

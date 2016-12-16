@@ -54,7 +54,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectAsymmetricCircleGrid<T extends ImageGray> {
+public class DetectAsymmetricCircleGrid<T extends ImageGray<T>> {
 
 	private BinaryEllipseDetector<T> ellipseDetector;
 	private InputToBinary<T> inputToBinary;

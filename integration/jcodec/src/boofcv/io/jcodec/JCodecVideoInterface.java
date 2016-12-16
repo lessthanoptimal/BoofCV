@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageType;
  */
 public class JCodecVideoInterface implements VideoInterface {
 	@Override
-	public <T extends ImageBase> SimpleImageSequence<T> load(String fileName, ImageType<T> imageType) {
+	public <T extends ImageBase<T>> SimpleImageSequence<T> load(String fileName, ImageType<T> imageType) {
 		return new JCodecSimplified<>(fileName, imageType);
 	}
 }

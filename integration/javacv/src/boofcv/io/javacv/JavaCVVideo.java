@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageType;
  */
 public class JavaCVVideo implements VideoInterface {
 	@Override
-	public <T extends ImageBase> SimpleImageSequence<T>
+	public <T extends ImageBase<T>> SimpleImageSequence<T>
 	load(String fileName, ImageType<T> imageType) {
 		return new JavaCVVideoImageSequence<>(fileName, imageType);
 	}

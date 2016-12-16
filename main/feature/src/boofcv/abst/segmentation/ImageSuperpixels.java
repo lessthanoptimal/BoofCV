@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public interface ImageSuperpixels<T extends ImageBase> {
+public interface ImageSuperpixels<T extends ImageBase<T>> {
 
 	/**
 	 * Segments the input image into superpixels and puts the output in labeled image.

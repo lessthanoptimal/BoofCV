@@ -31,7 +31,7 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public interface FiducialDetector<T extends ImageBase>
+public interface FiducialDetector<T extends ImageBase<T>>
 {
 	/**
 	 * Detects fiducials inside the image

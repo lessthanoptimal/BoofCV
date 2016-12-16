@@ -112,7 +112,7 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 		BoofTesting.checkSubImage(this, "inner", true, m, input, derivX, derivY, output, false);
 	}
 
-	public static <D extends ImageGray>
+	public static <D extends ImageGray<D>>
 	void inner(Method m , GrayF32 input , D derivX , D derivY , GrayF32 output , Boolean suppressed )
 	{
 		try {
@@ -144,7 +144,7 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 		BoofTesting.checkSubImage(this, "border", true, m, input, derivX, derivY, output );
 	}
 
-	public static <D extends ImageGray>
+	public static <D extends ImageGray<D>>
 	void border(Method m , GrayF32 input , D derivX , D derivY , GrayF32 output )
 	{
 		Random rand = new Random(123);

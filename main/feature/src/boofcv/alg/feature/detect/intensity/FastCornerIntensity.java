@@ -64,7 +64,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class FastCornerIntensity<T extends ImageGray> implements FeatureIntensity<T> {
+public abstract class FastCornerIntensity<T extends ImageGray<T>> implements FeatureIntensity<T> {
 
 	// radius of the circle being sampled
 	protected static final int radius = 3;

@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class Slic_to_ImageSuperpixels<T extends ImageBase> implements ImageSuperpixels<T> {
+public class Slic_to_ImageSuperpixels<T extends ImageBase<T>> implements ImageSuperpixels<T> {
 
 	SegmentSlic<T> slic;
 

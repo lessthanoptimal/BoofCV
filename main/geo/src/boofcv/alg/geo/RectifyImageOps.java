@@ -400,7 +400,7 @@ public class RectifyImageOps {
 	 * @param imageType Type of single band image the transform is to be applied to.
 	 * @return ImageDistort for rectifying the image.
 	 */
-	public static <T extends ImageGray> ImageDistort<T,T>
+	public static <T extends ImageGray<T>> ImageDistort<T,T>
 	rectifyImage( DenseMatrix64F rectify , BorderType borderType, Class<T> imageType)
 	{
 		boolean skip = borderType == BorderType.SKIP;
@@ -431,7 +431,7 @@ public class RectifyImageOps {
 	 * @param imageType Type of single band image the transform is to be applied to.
 	 * @return ImageDistort for rectifying the image.
 	 */
-	public static <T extends ImageBase> ImageDistort<T,T>
+	public static <T extends ImageBase<T>> ImageDistort<T,T>
 	rectifyImage(CameraPinholeRadial param, DenseMatrix64F rectify , BorderType borderType, ImageType<T> imageType)
 	{
 		boolean skip = borderType == BorderType.SKIP;

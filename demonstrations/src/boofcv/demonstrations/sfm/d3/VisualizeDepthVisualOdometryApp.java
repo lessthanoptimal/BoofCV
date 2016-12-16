@@ -70,7 +70,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeDepthVisualOdometryApp<I extends ImageGray>
+public class VisualizeDepthVisualOdometryApp<I extends ImageGray<I>>
 		extends DepthVideoAppBase<I,GrayU16> implements VisualizeApp, VisualOdometryPanel.Listener
 {
 

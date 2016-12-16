@@ -57,7 +57,7 @@ public class TestImplPyramidOps {
 		assertEquals(2,numFound);
 	}
 
-	private <T extends ImageGray>
+	private <T extends ImageGray<T>>
 	void scaleImageUp(Class<T> imageType , Method m ) {
 		T input = GeneralizedImageOps.createSingleBand(imageType,15, 8);
 		T output = GeneralizedImageOps.createSingleBand(imageType,1, 1);
@@ -107,7 +107,7 @@ public class TestImplPyramidOps {
 		assertEquals(2,numFound);
 	}
 
-	private <T extends ImageGray>
+	private <T extends ImageGray<T>>
 	void scaleDown2(Class<T> imageType , Method m ) {
 
 		int sizes [] = new int[]{30,31};

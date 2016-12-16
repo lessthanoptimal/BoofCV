@@ -30,7 +30,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class StereoDisparityWtoNaiveFive<I extends ImageGray> {
+public class StereoDisparityWtoNaiveFive<I extends ImageGray<I>> {
 	// left and right camera images
 	I imageLeft;
 	I imageRight;

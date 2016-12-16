@@ -31,7 +31,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class GradientMultiToSingleBand_Reflection<Input extends ImageMultiBand, Output extends ImageGray>
+public class GradientMultiToSingleBand_Reflection<Input extends ImageMultiBand<Input>, Output extends ImageGray<Output>>
 	implements GradientMultiToSingleBand<Input,Output>
 {
 	private Method m;

@@ -32,9 +32,9 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public abstract class BaseDenseHog<Input extends ImageBase> {
+public abstract class BaseDenseHog<I extends ImageBase<I>> {
 
-	ImageGradient<Input, GrayF32> gradient;
+	ImageGradient<I, GrayF32> gradient;
 
 	// gradient of each pixel
 	protected GrayF32 derivX = new GrayF32(1,1);
@@ -53,7 +53,7 @@ public abstract class BaseDenseHog<Input extends ImageBase> {
 	int stepBlock; // how many cells are skipped between a block
 
 	// type of input image
-	ImageType<Input> imageType;
+	ImageType<I> imageType;
 
 	/**
 	 * Configures HOG descriptor computation
@@ -67,7 +67,7 @@ public abstract class BaseDenseHog<Input extends ImageBase> {
 	public BaseDenseHog(int orientationBins , int pixelsPerCell ,
 						int cellsPerBlockX , int cellsPerBlockY,
 						int stepBlock ,
-						ImageType<Input> imageType )
+						ImageType<I> imageType )
 	{
 		if( stepBlock <= 0 )
 			throw new IllegalArgumentException("stepBlock must be >= 1");
@@ -96,7 +96,7 @@ public abstract class BaseDenseHog<Input extends ImageBase> {
 	 * Given different types input images it creates the correct algorithm for computing the image gradient.  The
 	 * actualy calulcation is always done using {@link DerivativeType#THREE}
 	 */
-	static <Input extends ImageBase>
+	static <Input extends ImageBase<Input>>
 	ImageGradient<Input,GrayF32> createGradient( ImageType<Input> imageType ) {
 		ImageGradient<Input,GrayF32> gradient;
 		ImageType<GrayF32> typeF32 = ImageType.single(GrayF32.class);
@@ -122,7 +122,7 @@ public abstract class BaseDenseHog<Input extends ImageBase> {
 	 * Specifies input image.  Gradient is computed immediately
 	 * @param input input image
 	 */
-	public void setInput( Input input ) {
+	public void setInput( I input ) {
 		derivX.reshape(input.width,input.height);
 		derivY.reshape(input.width,input.height);
 
@@ -186,7 +186,7 @@ public abstract class BaseDenseHog<Input extends ImageBase> {
 		return orientationBins;
 	}
 
-	public ImageType<Input> getImageType() {
+	public ImageType<I> getImageType() {
 		return imageType;
 	}
 

@@ -58,7 +58,7 @@ import java.util.Vector;
  *
  * @author Peter Abeles
  */
-public class DenoiseVisualizeApp<T extends ImageGray,D extends ImageGray,W extends WlCoef>
+public class DenoiseVisualizeApp<T extends ImageGray<T>,D extends ImageGray<D>,W extends WlCoef>
 	extends SelectAlgorithmAndInputPanel implements DenoiseInfoPanel.Listener
 {
 

@@ -39,7 +39,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public class DetectDescribeMultiFusion<T extends ImageGray, TD extends TupleDesc>
+public class DetectDescribeMultiFusion<T extends ImageGray<T>, TD extends TupleDesc>
 		implements DetectDescribeMulti<T,TD> {
 
 	// feature detector

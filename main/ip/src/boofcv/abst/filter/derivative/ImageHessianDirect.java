@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface ImageHessianDirect<Input extends ImageGray, Output extends ImageGray>
+public interface ImageHessianDirect<Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 		extends ImageDerivative<Input,Output> 
 {
 

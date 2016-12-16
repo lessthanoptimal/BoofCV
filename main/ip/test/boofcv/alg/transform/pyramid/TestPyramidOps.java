@@ -26,6 +26,7 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.testing.BoofTesting;
@@ -146,7 +147,7 @@ public class TestPyramidOps {
 
 	}
 
-	public static <I extends ImageGray>
+	public static <I extends ImageGray<I>>
 	void randomize( ImagePyramid<I> pyramid , Random rand , int min , int max ) {
 
 		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
@@ -155,10 +156,10 @@ public class TestPyramidOps {
 		}
 	}
 
-	private static class DummyDiscrete<T extends ImageGray> extends PyramidDiscrete<T> {
+	private static class DummyDiscrete<T extends ImageGray<T>> extends PyramidDiscrete<T> {
 
 		public DummyDiscrete(Class<T> imageType, boolean saveOriginalReference, int scales[] ) {
-			super(imageType, saveOriginalReference,scales);
+			super(ImageType.single(imageType), saveOriginalReference,scales);
 		}
 
 		@Override

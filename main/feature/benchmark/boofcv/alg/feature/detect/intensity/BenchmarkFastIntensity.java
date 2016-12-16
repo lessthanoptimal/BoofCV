@@ -34,7 +34,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkFastIntensity< T extends ImageGray> {
+public class BenchmarkFastIntensity<T extends ImageGray<T>> {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;

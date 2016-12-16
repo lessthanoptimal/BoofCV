@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface ShrinkThresholdRule<T extends ImageGray> {
+public interface ShrinkThresholdRule<T extends ImageGray<T>> {
 
 	/**
 	 * Applies shrinkage to entire image.  If the rule should only be applied to part

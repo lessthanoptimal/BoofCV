@@ -46,7 +46,7 @@ import java.util.Random;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public class BenchmarkDescribe<I extends ImageGray, D extends ImageGray, II extends ImageGray> {
+public class BenchmarkDescribe<I extends ImageGray<I>, D extends ImageGray<D>, II extends ImageGray<II>> {
 
 	static final long TEST_TIME = 1000;
 	static Random rand = new Random(234234);

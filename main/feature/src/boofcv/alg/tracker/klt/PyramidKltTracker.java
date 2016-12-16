@@ -34,7 +34,7 @@ import boofcv.struct.pyramid.ImagePyramid;
  *
  * @author Peter Abeles
  */
-public class PyramidKltTracker<InputImage extends ImageGray, DerivativeImage extends ImageGray> {
+public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, DerivativeImage extends ImageGray<DerivativeImage>> {
 
 	// basic KLT tracker which works on a single image
 	protected KltTracker<InputImage, DerivativeImage> tracker;

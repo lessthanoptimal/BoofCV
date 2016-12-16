@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public class TestBackgroundStationaryBasic_IL extends GenericBackgroundStationar
 	}
 
 	@Override
-	public <T extends ImageBase> BackgroundModelStationary<T>
+	public <T extends ImageBase<T>> BackgroundModelStationary<T>
 	create(ImageType<T> imageType) {
 		return new BackgroundStationaryBasic_IL(0.05f,10f,imageType);
 	}

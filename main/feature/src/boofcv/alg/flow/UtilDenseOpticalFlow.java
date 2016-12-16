@@ -57,7 +57,7 @@ public class UtilDenseOpticalFlow {
 	 * @param <T> Image type
 	 * @return The image pyramid.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	PyramidFloat<T> standardPyramid( int width , int height ,
 									 double scale, double sigma ,
 									 int minSize, int maxLayers , Class<T> imageType ) {

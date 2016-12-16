@@ -31,15 +31,15 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DescribeImageDense_Convert<T extends ImageBase, Desc extends TupleDesc>
+public class DescribeImageDense_Convert<T extends ImageBase<T>, Desc extends TupleDesc>
 		implements DescribeImageDense<T,Desc>
 {
-	DescribeImageDense<ImageBase,Desc> describer;
+	DescribeImageDense describer;
 	ImageBase workspace;
 
 	ImageType<T> inputType;
 
-	public DescribeImageDense_Convert(DescribeImageDense<ImageBase,Desc> describer , ImageType<T> inputType )
+	public DescribeImageDense_Convert(DescribeImageDense describer , ImageType<T> inputType )
 	{
 		ImageType describerType = describer.getImageType();
 
@@ -56,7 +56,7 @@ public class DescribeImageDense_Convert<T extends ImageBase, Desc extends TupleD
 
 	@Override
 	public Desc createDescription() {
-		return describer.createDescription();
+		return (Desc)describer.createDescription();
 	}
 
 	@Override

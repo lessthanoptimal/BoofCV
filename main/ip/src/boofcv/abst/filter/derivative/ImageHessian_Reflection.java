@@ -34,7 +34,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class ImageHessian_Reflection<Output extends ImageGray>
+public class ImageHessian_Reflection<Output extends ImageGray<Output>>
 		implements ImageHessian<Output>
 {
 	// How the image border should be handled

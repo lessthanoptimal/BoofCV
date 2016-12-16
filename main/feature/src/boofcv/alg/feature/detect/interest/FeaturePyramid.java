@@ -54,7 +54,7 @@ import java.util.List;
  * @see boofcv.factory.feature.detect.interest.FactoryInterestPoint
  */
 @SuppressWarnings({"unchecked"})
-public class FeaturePyramid<T extends ImageGray, D extends ImageGray>
+public class FeaturePyramid<T extends ImageGray<T>, D extends ImageGray<D>>
 		implements InterestPointScaleSpacePyramid<T> {
 
 	// generalized feature detector.  Used to find candidate features in each scale's image

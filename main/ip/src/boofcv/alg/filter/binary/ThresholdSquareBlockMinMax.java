@@ -52,7 +52,7 @@ import boofcv.struct.image.ImageInterleaved;
  * @author Peter Abeles
  */
 public abstract class ThresholdSquareBlockMinMax
-		<T extends ImageGray, I extends ImageInterleaved>
+		<T extends ImageGray<T>, I extends ImageInterleaved>
 {
 	// interleaved image which stores min and max values inside each block
 	protected I minmax;

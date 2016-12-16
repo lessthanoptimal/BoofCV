@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class BlurStorageFilter<T extends ImageGray> implements BlurFilter<T> {
+public class BlurStorageFilter<T extends ImageGray<T>> implements BlurFilter<T> {
 
 	// Wrapper around performed operation
 	private BlurOperation operation;

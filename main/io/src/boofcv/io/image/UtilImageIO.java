@@ -114,7 +114,7 @@ public class UtilImageIO {
 	 * @param imageType Type of image that should be returned.
 	 * @return The image or null if the image could not be loaded.
 	 */
-	public static <T extends ImageGray> T loadImage(String fileName, Class<T> imageType ) {
+	public static <T extends ImageGray<T>> T loadImage(String fileName, Class<T> imageType ) {
 		BufferedImage img = loadImage(fileName);
 		if( img == null )
 			return null;
@@ -122,11 +122,11 @@ public class UtilImageIO {
 		return ConvertBufferedImage.convertFromSingle(img, (T) null, imageType);
 	}
 
-	public static <T extends ImageGray> T loadImage(String directory , String fileName, Class<T> imageType ) {
+	public static <T extends ImageGray<T>> T loadImage(String directory , String fileName, Class<T> imageType ) {
 		return loadImage(new File(directory,fileName).getPath(),imageType);
 	}
 
-	public static <T extends ImageBase> T loadImage( File image, boolean orderRgb, ImageType<T> imageType ) {
+	public static <T extends ImageBase<T>> T loadImage( File image, boolean orderRgb, ImageType<T> imageType ) {
 		BufferedImage img = loadImage(image.getAbsolutePath());
 		if( img == null )
 			return null;

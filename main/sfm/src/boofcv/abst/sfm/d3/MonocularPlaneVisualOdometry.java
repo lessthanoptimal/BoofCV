@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public interface MonocularPlaneVisualOdometry<T extends ImageBase> extends VisualOdometry<Se3_F64> {
+public interface MonocularPlaneVisualOdometry<T extends ImageBase<T>> extends VisualOdometry<Se3_F64> {
 
 	/**
 	 * Specifies the camera's intrinsic and extrinsic parameters.  Can be changed at any time.

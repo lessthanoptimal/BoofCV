@@ -114,7 +114,7 @@ public class AverageDownSampleOps {
 	 * @param input Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	void down( T input , T output ) {
 		if( ImageGray.class.isAssignableFrom(input.getClass())  ) {
 			if (input instanceof GrayU8) {
@@ -155,7 +155,7 @@ public class AverageDownSampleOps {
 	 * @param sampleWidth Width of square region.
 	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageGray> void down(Planar<T> input ,
+	public static <T extends ImageGray<T>> void down(Planar<T> input ,
 												  int sampleWidth , Planar<T> output )
 	{
 		for( int band = 0; band < input.getNumBands(); band++ ) {
@@ -169,7 +169,7 @@ public class AverageDownSampleOps {
 	 * @param input Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageGray> void down(Planar<T> input , Planar<T> output )
+	public static <T extends ImageGray<T>> void down(Planar<T> input , Planar<T> output )
 	{
 		for( int band = 0; band < input.getNumBands(); band++ ) {
 			down(input.getBand(band), output.getBand(band));

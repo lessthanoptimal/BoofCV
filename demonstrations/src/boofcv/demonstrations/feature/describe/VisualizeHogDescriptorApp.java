@@ -48,7 +48,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeHogDescriptorApp<T extends ImageBase> extends DemonstrationBase<T>
+public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends DemonstrationBase<T>
 {
 	ControlHogDescriptorPanel controlPanel = new ControlHogDescriptorPanel(this);
 	VisualizePanel imagePanel = new VisualizePanel();

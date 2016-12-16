@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class GenericDenseDescribeImageDense<T extends ImageBase, Desc extends TupleDesc>
+public class GenericDenseDescribeImageDense<T extends ImageBase<T>, Desc extends TupleDesc>
 	implements DescribeImageDense<T,Desc>
 {
 	// Computes the image feature

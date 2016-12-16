@@ -37,7 +37,7 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
-public class SubpixelGridTargetDisplay<T extends ImageGray>
+public class SubpixelGridTargetDisplay<T extends ImageGray<T>>
 		extends JPanel {
 
 	Class<T> imageType;

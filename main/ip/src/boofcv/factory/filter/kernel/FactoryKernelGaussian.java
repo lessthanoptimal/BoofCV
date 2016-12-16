@@ -73,7 +73,7 @@ public class FactoryKernelGaussian {
 	 * @param radius Number of pixels in the kernel's radius.  If &le; 0 then the sigma will be computed from the sigma.
 	 * @return The computed Gaussian kernel.
 	 */
-	public static <T extends ImageGray, K extends Kernel1D>
+	public static <T extends ImageGray<T>, K extends Kernel1D>
 	K gaussian1D(Class<T> imageType, double sigma, int radius )
 	{
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
@@ -91,7 +91,7 @@ public class FactoryKernelGaussian {
 	 * @param radius Number of pixels in the kernel's radius.  If &le; 0 then the sigma will be computed from the sigma.
 	 * @return The computed Gaussian kernel.
 	 */
-	public static <T extends ImageGray, K extends Kernel2D>
+	public static <T extends ImageGray<T>, K extends Kernel2D>
 	K gaussian2D(Class<T> imageType, double sigma, int radius )
 	{
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
@@ -149,7 +149,7 @@ public class FactoryKernelGaussian {
 		}
 	}
 
-	public static <T extends ImageGray, K extends Kernel1D>
+	public static <T extends ImageGray<T>, K extends Kernel1D>
 	K derivativeI( Class<T> imageType , int order,
 				   double sigma, int radius )
 	{

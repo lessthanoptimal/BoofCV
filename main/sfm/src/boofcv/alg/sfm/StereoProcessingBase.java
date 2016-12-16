@@ -39,7 +39,7 @@ import org.ejml.data.DenseMatrix64F;
  *
  * @author Peter Abeles
  */
-public class StereoProcessingBase<T extends ImageGray> {
+public class StereoProcessingBase<T extends ImageGray<T>> {
 
 	// applied rectification to input images
 	private ImageDistort<T,T> distortLeftRect;

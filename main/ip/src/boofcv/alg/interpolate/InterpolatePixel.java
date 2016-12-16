@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public interface InterpolatePixel<T extends ImageBase> {
+public interface InterpolatePixel<T extends ImageBase<T>> {
 
 	/**
 	 * Set's the class used to "read" pixels outside the image border.

@@ -58,7 +58,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-public class Planar<T extends ImageGray> extends ImageMultiBand<Planar<T>>{
+public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 
 	/**
 	 * Type of image in each band

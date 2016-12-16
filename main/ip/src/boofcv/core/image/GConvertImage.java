@@ -154,7 +154,7 @@ public class GConvertImage {
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static <T extends ImageGray>T average(Planar<T> input , T output ) {
+	public static <T extends ImageGray<T>>T average(Planar<T> input , T output ) {
 		Class type = input.getBandType();
 		if( type == GrayU8.class ) {
 			return (T)ConvertImage.average((Planar<GrayU8>)input,(GrayU8)output);
@@ -185,7 +185,7 @@ public class GConvertImage {
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static <T extends ImageGray>T average(ImageInterleaved input , T output ) {
+	public static <T extends ImageGray<T>>T average(ImageInterleaved input , T output ) {
 		ImageDataType type = input.getImageType().getDataType();
 		if( type == ImageDataType.U8) {
 			return (T)ConvertImage.average((InterleavedU8)input,(GrayU8)output);

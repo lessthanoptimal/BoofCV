@@ -39,7 +39,7 @@ public class FactoryTemplateMatching {
 	 * @param imageType Image type being processed
 	 * @return {@link TemplateMatchingIntensity} of the specified type.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	TemplateMatchingIntensity<T> createIntensity(TemplateScoreType type, Class<T> imageType) {
 		switch (type) {
 			case SUM_DIFF_SQ:
@@ -77,7 +77,7 @@ public class FactoryTemplateMatching {
 	 * @param imageType Image type being processed
 	 * @return {@link TemplateMatching} of the specified type.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	TemplateMatching<T> createMatcher(TemplateScoreType type, Class<T> imageType) {
 		TemplateMatchingIntensity<T> intensity = createIntensity(type, imageType);
 

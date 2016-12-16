@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericFhEdgeWeightsChecks<T extends ImageBase> {
+public abstract class GenericFhEdgeWeightsChecks<T extends ImageBase<T>> {
 	ImageType<T> imageType;
 	ConnectRule rule;
 

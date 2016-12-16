@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class DescribeRegionPoint_SIFT <T extends ImageGray>
+public class DescribeRegionPoint_SIFT <T extends ImageGray<T>>
 	implements DescribeRegionPoint<T,TupleDesc_F64>
 {
 	// expected type of input image.  All image types are converted to floats since that's what

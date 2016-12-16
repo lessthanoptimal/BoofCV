@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class ImplImageDistortCache_I8<Input extends ImageGray, Output extends GrayI8>
+public class ImplImageDistortCache_I8<Input extends ImageGray<Input>, Output extends GrayI8<Output>>
 		extends ImageDistortCache_SB<Input,Output> {
 	public ImplImageDistortCache_I8( InterpolatePixelS<Input> interp)
 	{

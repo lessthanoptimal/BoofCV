@@ -42,21 +42,21 @@ import boofcv.struct.image.*;
  */
 public class FactoryTrackerObjectAlgs {
 
-	public static <T extends ImageGray,D extends ImageGray>
+	public static <T extends ImageGray<T>,D extends ImageGray<D>>
 	TldTracker<T,D> createTLD( TldParameters config ,
 							   InterpolatePixelS<T> interpolate , ImageGradient<T,D> gradient ,
 							   Class<T> imageType , Class<D> derivType ) {
 		return new TldTracker<>(config, interpolate, gradient, imageType, derivType);
 	}
 
-	public static <T extends ImageGray,D extends ImageGray>
+	public static <T extends ImageGray<T>,D extends ImageGray<D>>
 	SparseFlowObjectTracker<T,D> createSparseFlow( SfotConfig config ,
 												   Class<T> imageType , Class<D> derivType ,
 												   ImageGradient<T, D> gradient) {
 		return new SparseFlowObjectTracker<>(config, imageType, derivType, gradient);
 	}
 
-	public static <T extends ImageMultiBand>
+	public static <T extends ImageMultiBand<T>>
 	PixelLikelihood<T> likelihoodHueSatHistIndependent(
 			double maxPixelValue , int numHistogramBins , ImageType<T> imageType )
 	{
@@ -72,7 +72,7 @@ public class FactoryTrackerObjectAlgs {
 		}
 	}
 
-	public static <T extends ImageMultiBand>
+	public static <T extends ImageMultiBand<T>>
 	PixelLikelihood<T> likelihoodHueSatHistCoupled(
 			double maxPixelValue , int numHistogramBins , ImageType<T> imageType )
 	{
@@ -88,7 +88,7 @@ public class FactoryTrackerObjectAlgs {
 		}
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	PixelLikelihood<T> likelihoodHistogramCoupled( double maxPixelValue , int numHistogramBins , ImageType<T> imageType )
 	{
 		switch( imageType.getFamily() ) {
@@ -109,7 +109,7 @@ public class FactoryTrackerObjectAlgs {
 		}
 	}
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	CirculantTracker<T> circulant( ConfigCirculantTracker config , Class<T> imageType) {
 		if( config == null )
 			config = new ConfigCirculantTracker();
@@ -123,7 +123,7 @@ public class FactoryTrackerObjectAlgs {
 				config.maxPixelValue,interp);
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	TrackerMeanShiftComaniciu2003<T> meanShiftComaniciu2003(ConfigComaniciu2003 config, ImageType<T> imageType ) {
 
 		if( config == null )

@@ -52,7 +52,7 @@ import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.poly
  * @see boofcv.factory.feature.detect.interest.FactoryInterestPoint
  */
 @SuppressWarnings({"unchecked"})
-public class FeatureLaplacePyramid<T extends ImageGray, D extends ImageGray>
+public class FeatureLaplacePyramid<T extends ImageGray<T>, D extends ImageGray<D>>
 		implements InterestPointScaleSpacePyramid<T> {
 
 	// used to compute feature intensity across scale space

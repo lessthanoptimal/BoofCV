@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageType;
 @SuppressWarnings("unchecked")
 public class FactoryDescribeImageDenseAlg {
 
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	DescribeDenseHogAlg<T> hog(ConfigDenseHoG config , ImageType<T> imageType ) {
 		config.checkValidity();
 
@@ -41,7 +41,7 @@ public class FactoryDescribeImageDenseAlg {
 
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	DescribeDenseHogFastAlg<T> hogFast(ConfigDenseHoG config , ImageType<T> imageType ) {
 		config.checkValidity();
 

@@ -28,7 +28,7 @@ import boofcv.struct.image.Planar;
  * 
  * @author Peter Abeles
  */
-public class ImplImageDistort_PL<Input extends ImageGray,Output extends ImageGray>
+public class ImplImageDistort_PL<Input extends ImageGray<Input>,Output extends ImageGray<Output>>
 		implements ImageDistort<Planar<Input>,Planar<Output>> {
 
 	ImageDistort<Input,Output> layerDistort;

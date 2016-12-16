@@ -35,16 +35,16 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class WaveletDenoiseFilter<T extends ImageGray> implements FilterImageInterface<T, T> {
+public class WaveletDenoiseFilter<T extends ImageGray<T>> implements FilterImageInterface<T, T> {
 
 	// performs the wavelet transform
-	private WaveletTransform<T,ImageGray,?> wavelet;
+	private WaveletTransform<T,T,?> wavelet;
 
 	// algorithm used to denoise the image
 	private DenoiseWavelet alg;
 
 	// where the wavelet transform is stored
-	private ImageGray transform;
+	private T transform;
 
 	/**
 	 * Specifies which wavelet and algorithm is used for removing image noise.
@@ -54,7 +54,7 @@ public class WaveletDenoiseFilter<T extends ImageGray> implements FilterImageInt
 	 */
 	public WaveletDenoiseFilter(WaveletTransform<T, ?, ?> wavelet,
 								DenoiseWavelet denoiser) {
-		this.wavelet = (WaveletTransform<T,ImageGray,?>)wavelet;
+		this.wavelet = (WaveletTransform<T,T,?>)wavelet;
 		this.alg = denoiser;
 	}
 

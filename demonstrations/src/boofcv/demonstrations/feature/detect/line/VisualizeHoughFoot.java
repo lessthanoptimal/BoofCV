@@ -42,7 +42,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VisualizeHoughFoot<I extends ImageGray, D extends ImageGray> {
+public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 	Class<I> imageType;
 	Class<D> derivType;

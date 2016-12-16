@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageType;
  * 
  * @author Peter Abeles
  */
-public class ImplPolynomialPixel_I extends PolynomialPixel<GrayI> {
+public class ImplPolynomialPixel_I<T extends GrayI<T>> extends PolynomialPixel<T> {
 
 	public ImplPolynomialPixel_I(int maxDegree, float min, float max) {
 		super(maxDegree, min, max);
@@ -141,8 +141,8 @@ public class ImplPolynomialPixel_I extends PolynomialPixel<GrayI> {
 		return ret;
 	}
 	@Override
-	public ImageType<GrayI> getImageType() {
-		return ImageType.single(GrayI.class);
+	public ImageType<T> getImageType() {
+		return ImageType.<T>single((Class)GrayI.class);
 	}
 
 }

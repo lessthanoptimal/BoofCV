@@ -46,7 +46,7 @@ public abstract class GenericBackgroundStationaryGaussianChecks extends GenericB
 		}
 	}
 
-	private <T extends ImageBase> void initialVariance( ImageType<T> imageType ) {
+	private <T extends ImageBase<T>> void initialVariance( ImageType<T> imageType ) {
 		this.initialVariance = Float.NaN; // turn off setting it
 		BackgroundStationaryGaussian<T> alg = (BackgroundStationaryGaussian)create(imageType);
 		alg.setThreshold(10);
@@ -93,7 +93,7 @@ public abstract class GenericBackgroundStationaryGaussianChecks extends GenericB
 		}
 	}
 
-	private <T extends ImageBase> void checkLearnRate_slow(ImageType<T> imageType) {
+	private <T extends ImageBase<T>> void checkLearnRate_slow(ImageType<T> imageType) {
 		BackgroundStationaryGaussian<T> alg = (BackgroundStationaryGaussian)create(imageType);
 		alg.setThreshold(10);
 		alg.setInitialVariance(64);
@@ -119,7 +119,7 @@ public abstract class GenericBackgroundStationaryGaussianChecks extends GenericB
 		BoofTesting.assertEquals(expected,segmented,1e-5f);
 	}
 
-	private <T extends ImageBase> void checkLearnRate_fast(ImageType<T> imageType) {
+	private <T extends ImageBase<T>> void checkLearnRate_fast(ImageType<T> imageType) {
 		BackgroundStationaryGaussian<T> alg = (BackgroundStationaryGaussian)create(imageType);
 		alg.setThreshold(10);
 		alg.setInitialVariance(64);
@@ -152,7 +152,7 @@ public abstract class GenericBackgroundStationaryGaussianChecks extends GenericB
 		}
 	}
 
-	private <T extends ImageBase> void minimumDifference( ImageType<T> imageType ) {
+	private <T extends ImageBase<T>> void minimumDifference( ImageType<T> imageType ) {
 		BackgroundStationaryGaussian<T> alg = (BackgroundStationaryGaussian)create(imageType);
 		alg.setThreshold(10);
 		alg.setInitialVariance(0);

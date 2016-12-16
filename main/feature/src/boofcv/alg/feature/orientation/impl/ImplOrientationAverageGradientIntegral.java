@@ -34,7 +34,7 @@ import boofcv.struct.sparse.SparseImageGradient;
  *
  * @author Peter Abeles
  */
-public class ImplOrientationAverageGradientIntegral<T extends ImageGray,G extends GradientValue>
+public class ImplOrientationAverageGradientIntegral<T extends ImageGray<T>,G extends GradientValue>
 		extends OrientationIntegralBase<T,G>
 {
 	/**

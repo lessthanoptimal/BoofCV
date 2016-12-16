@@ -42,7 +42,7 @@ import boofcv.struct.wavelet.WlCoef_I32;
  * </p>
  * @author Peter Abeles
  */
-public class WaveletTransformInt<T extends GrayI> implements WaveletTransform<T,GrayS32, WlCoef_I32> {
+public class WaveletTransformInt<T extends GrayI<T>> implements WaveletTransform<T,GrayS32, WlCoef_I32> {
 
 	// is either a copy of the transformed image or the input image
 	GrayS32 copyInput = new GrayS32(1,1);

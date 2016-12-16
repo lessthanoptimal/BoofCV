@@ -122,7 +122,7 @@ public class SelectOverheadParameters {
 	/**
 	 * Creates a new instance of the overhead view
 	 */
-	public <T extends ImageBase> OverheadView createOverhead( ImageType<T> imageType ) {
+	public <T extends ImageBase<T>> OverheadView createOverhead( ImageType<T> imageType ) {
 		OverheadView ret = new OverheadView();
 		ret.image = imageType.createImage(overheadWidth,overheadHeight);
 		ret.cellSize = cellSize;

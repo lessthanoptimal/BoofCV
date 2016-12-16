@@ -598,7 +598,7 @@ public class FactoryGImageGray {
 		}
 	}
 
-	public static abstract class GSingleBaseInt<T extends ImageGray> extends GSingleBase<T>
+	public static abstract class GSingleBaseInt<T extends ImageGray<T>> extends GSingleBase<T>
 	{
 		public GSingleBaseInt(T image) {
 			super(image);
@@ -610,7 +610,7 @@ public class FactoryGImageGray {
 		}
 	}
 
-	public static abstract class GSingleBase<T extends ImageGray> implements GImageGray {
+	public static abstract class GSingleBase<T extends ImageGray<T>> implements GImageGray {
 
 		protected T image;
 

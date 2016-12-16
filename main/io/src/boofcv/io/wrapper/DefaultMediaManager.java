@@ -76,13 +76,13 @@ public class DefaultMediaManager implements MediaManager {
 	}
 
 	@Override
-	public <T extends ImageBase> SimpleImageSequence<T>
+	public <T extends ImageBase<T>> SimpleImageSequence<T>
 	openVideo(String fileName, ImageType<T> type) {
 		return videoInterface.load(fileName, type);
 	}
 
 	@Override
-	public <T extends ImageBase> SimpleImageSequence<T> openCamera(String device, int width, int height, ImageType<T> imageType) {
+	public <T extends ImageBase<T>> SimpleImageSequence<T> openCamera(String device, int width, int height, ImageType<T> imageType) {
 		return webcamInterface.open(device,width,height,imageType);
 	}
 }

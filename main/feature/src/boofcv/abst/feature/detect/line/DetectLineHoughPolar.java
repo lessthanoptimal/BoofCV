@@ -51,7 +51,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectLineHoughPolar<I extends ImageGray, D extends ImageGray> implements DetectLine<I> {
+public class DetectLineHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>> implements DetectLine<I> {
 
 	// transform algorithm
 	HoughTransformLinePolar alg;

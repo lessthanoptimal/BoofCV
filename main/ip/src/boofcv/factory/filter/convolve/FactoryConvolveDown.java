@@ -25,6 +25,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.Method;
@@ -47,7 +48,7 @@ public class FactoryConvolveDown {
 	 * @param border How the image border is handled.
 	 * @return FilterInterface which will perform the specified convolution.
 	 */
-	public static <Input extends ImageGray, Output extends ImageGray>
+	public static <Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 	GenericConvolveDown<Input,Output>
 	convolve( Kernel1D kernel, Class<Input> inputType, Class<Output> outputType , BorderType border ,
 			  boolean isHorizontal , int skip )
@@ -79,7 +80,7 @@ public class FactoryConvolveDown {
 			throw new IllegalArgumentException("The specified convolution cannot be found");
 		}
 
-		return new GenericConvolveDown<>(m, kernel, border, skip, inputType, outputType);
+		return new GenericConvolveDown<>(m, kernel, border, skip, ImageType.single(inputType), ImageType.single(outputType));
 	}
 
 	/**
@@ -91,7 +92,7 @@ public class FactoryConvolveDown {
 	 * @param border How the image border is handled.
 	 * @return FilterInterface which will perform the specified convolution.
 	 */
-	public static <Input extends ImageGray, Output extends ImageGray>
+	public static <Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 	GenericConvolveDown<Input,Output>
 	convolve( Kernel2D kernel, Class<Input> inputType, Class<Output> outputType , BorderType border , int skip )
 	{
@@ -121,6 +122,6 @@ public class FactoryConvolveDown {
 			throw new IllegalArgumentException("The specified convolution cannot be found");
 		}
 
-		return new GenericConvolveDown<>(m, kernel, border, skip, inputType, outputType);
+		return new GenericConvolveDown<>(m, kernel, border, skip, ImageType.single(inputType), ImageType.single(outputType));
 	}
 }

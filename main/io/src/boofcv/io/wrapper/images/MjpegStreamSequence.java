@@ -34,7 +34,7 @@ import java.io.*;
  *
  * @author Peter Abeles
  */
-public class MjpegStreamSequence<T extends ImageBase>
+public class MjpegStreamSequence<T extends ImageBase<T>>
 		implements SimpleImageSequence<T>
 {
 	VideoMjpegCodec codec = new VideoMjpegCodec();

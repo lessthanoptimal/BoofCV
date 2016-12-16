@@ -30,7 +30,7 @@ import boofcv.struct.sparse.SparseScaleGradient;
  *
  * @author Peter Abeles
  */
-public abstract class SparseIntegralGradient_NoBorder <T extends ImageGray, G extends GradientValue>
+public abstract class SparseIntegralGradient_NoBorder <T extends ImageGray<T>, G extends GradientValue>
 		extends SparseScaleGradient<T, G>
 {
 	// radius of the kernel

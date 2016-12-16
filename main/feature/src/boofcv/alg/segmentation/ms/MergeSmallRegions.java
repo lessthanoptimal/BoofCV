@@ -34,7 +34,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-public class MergeSmallRegions<T extends ImageBase> extends RegionMergeTree {
+public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 
 	// minimum allowed size of a region, inclusive
 	protected int minimumSize;

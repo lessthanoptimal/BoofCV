@@ -27,7 +27,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class DetectDescribeSingleToMulti<T extends ImageGray, TD extends TupleDesc>
+public class DetectDescribeSingleToMulti<T extends ImageGray<T>, TD extends TupleDesc>
 	implements DetectDescribeMulti<T,TD>
 {
 	DetectDescribePoint<T,TD> alg;

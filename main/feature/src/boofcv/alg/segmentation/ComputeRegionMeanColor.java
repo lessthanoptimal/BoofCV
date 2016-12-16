@@ -28,7 +28,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-public abstract class ComputeRegionMeanColor<T extends ImageBase> {
+public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 
 	// Input image
 	T image;

@@ -41,7 +41,7 @@ public class InputSanityCheck {
 	 * @param <T>
 	 * @return
 	 */
-	public static <T extends ImageGray> T checkReshape(T target , ImageGray testImage , Class<T> targetType )
+	public static <T extends ImageGray<T>> T checkReshape(T target , ImageGray testImage , Class<T> targetType )
 	{
 		if( target == null ) {
 			return GeneralizedImageOps.createSingleBand(targetType, testImage.width, testImage.height);
@@ -55,7 +55,7 @@ public class InputSanityCheck {
 	 * If the output has not been declared a new instance is declared.  If an instance of the output
 	 * is provided its bounds are checked.
 	 */
-	public static <T extends ImageGray> T checkDeclare(T input, T output) {
+	public static <T extends ImageGray<T>> T checkDeclare(T input, T output) {
 		if (output == null) {
 			output = (T) input.createNew(input.width, input.height);
 		} else if (output.width != input.width || output.height != input.height)

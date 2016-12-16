@@ -161,7 +161,7 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
-		public <T extends ImageBase> T getImage() {
+		public <T extends ImageBase<T>> T getImage() {
 			return (T)image;
 		}
 	}
@@ -218,7 +218,7 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
-		public <T extends ImageBase> T getImage() {
+		public <T extends ImageBase<T>> T getImage() {
 			return (T)sb.getImage();
 		}
 	}
@@ -241,7 +241,7 @@ public class FactoryGImageMultiBand {
 		public int getNumberOfBands() {return image.getNumBands();}
 
 		@Override
-		public <T extends ImageBase> T getImage() {
+		public <T extends ImageBase<T>> T getImage() {
 			return (T)image;
 		}
 	}

@@ -35,7 +35,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray, II extends ImageGray>
+public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray<T>, II extends ImageGray<II>>
 		implements DetectDescribePoint<Planar<T>,BrightFeature>
 {
 	DetectDescribeSurfPlanar<II> alg;

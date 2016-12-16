@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public abstract class HornSchunck<T extends ImageBase, D extends ImageBase> {
+public abstract class HornSchunck<T extends ImageBase<T>, D extends ImageBase<D>> {
 
 	// used to weight the error of image brightness and smoothness of velocity flow
 	protected float alpha2;
@@ -64,7 +64,7 @@ public abstract class HornSchunck<T extends ImageBase, D extends ImageBase> {
 	 * @param alpha Larger values place more importance on flow smoothness consistency over brightness consistency.  Try 20
 	 * @param numIterations Number of iterations.  Try 1000
 	 */
-	public HornSchunck(float alpha, int numIterations, ImageType<D> derivType ) {
+	public HornSchunck(float alpha, int numIterations, ImageType<D> derivType) {
 		this.alpha2 = alpha*alpha;
 		this.numIterations = numIterations;
 

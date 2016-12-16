@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBase>
+public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>>
 		implements MonocularPlaneVisualOdometry<T> , AccessPointTracks3D
 {
 	VisOdomMonoPlaneInfinity<T> alg;

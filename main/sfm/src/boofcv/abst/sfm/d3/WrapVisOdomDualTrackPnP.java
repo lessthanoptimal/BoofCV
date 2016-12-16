@@ -43,7 +43,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapVisOdomDualTrackPnP<T extends ImageGray>
+public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 		implements StereoVisualOdometry<T>, AccessPointTracks3D
 {
 	RefinePnPStereo refine;

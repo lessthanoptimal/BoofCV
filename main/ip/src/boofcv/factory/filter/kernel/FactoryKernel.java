@@ -20,8 +20,7 @@ package boofcv.factory.filter.kernel;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.convolve.*;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayI;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageGray;
 
 import java.util.Random;
@@ -316,18 +315,23 @@ public class FactoryKernel {
 	}
 
 	public static <K extends KernelBase, T extends ImageGray>
-	Class<K> getKernelType( Class<T> imageType , int DOF ) {
-		if( imageType == GrayF32.class ) {
+	Class<K> getKernelType(ImageDataType type , int DOF ) {
+		if( type == ImageDataType.F32 ) {
 			if( DOF == 1 )
 				return (Class)Kernel1D_F32.class;
 			else
 				return (Class)Kernel2D_F32.class;
-		} else if( GrayI.class.isAssignableFrom(imageType) ) {
+		} else if( type.isInteger() ) {
 			if( DOF == 1 )
 				return (Class)Kernel1D_I32.class;
 			else
 				return (Class)Kernel2D_I32.class;
 		}
-		throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
+		throw new IllegalArgumentException("Unknown image type: "+type);
+	}
+
+	public static <K extends KernelBase, T extends ImageGray>
+	Class<K> getKernelType( Class<T> imageType , int DOF ) {
+		return getKernelType( ImageDataType.classToType(imageType), DOF);
 	}
 }

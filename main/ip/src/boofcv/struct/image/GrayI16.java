@@ -25,7 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public abstract class GrayI16<T extends GrayI16> extends GrayI<T> {
+public abstract class GrayI16<T extends GrayI16<T>> extends GrayI<T> {
 
 	public short data[];
 

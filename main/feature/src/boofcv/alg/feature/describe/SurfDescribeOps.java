@@ -55,7 +55,7 @@ public class SurfDescribeOps {
 	 * @param derivX Derivative x wavelet output. length = radiusRegions*radiusRegions
 	 * @param derivY Derivative y wavelet output. length = radiusRegions*radiusRegions
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	void gradient(T ii, double tl_x, double tl_y, double samplePeriod ,
 				  int regionSize, double kernelWidth,
 				  boolean useHaar, double[] derivX, double derivY[])
@@ -95,7 +95,7 @@ public class SurfDescribeOps {
 	 * @param imageType Type of image being processed.
 	 * @return Sparse gradient algorithm
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	SparseScaleGradient<T,?> createGradient( boolean useHaar , Class<T> imageType )
 	{
 		if( useHaar )
@@ -116,7 +116,7 @@ public class SurfDescribeOps {
 	 * @param c Cosine of the orientation
 	 * @param s Sine of the orientation   
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	boolean isInside( T ii , double X , double Y , int radiusRegions , int kernelSize ,
 					  double scale, double c , double s )
 	{

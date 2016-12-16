@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ImageMotionPtkSmartRespawn<I extends ImageBase, IT extends InvertibleTransform> {
+public class ImageMotionPtkSmartRespawn<I extends ImageBase<I>, IT extends InvertibleTransform> {
 
 	// estimate image motion
 	private ImageMotionPointTrackerKey<I,IT> motion;

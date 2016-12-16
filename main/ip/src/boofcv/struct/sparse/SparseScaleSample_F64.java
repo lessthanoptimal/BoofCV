@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class SparseScaleSample_F64<T extends ImageGray>
+public abstract class SparseScaleSample_F64<T extends ImageGray<T>>
 		implements SparseImageSample_F64<T>
 {
 	protected T input;

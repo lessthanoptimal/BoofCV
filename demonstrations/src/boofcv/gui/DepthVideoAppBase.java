@@ -40,7 +40,7 @@ import java.io.Reader;
  *
  * @author Peter Abeles
  */
-public abstract class DepthVideoAppBase<I extends ImageGray, Depth extends ImageGray>
+public abstract class DepthVideoAppBase<I extends ImageGray<I>, Depth extends ImageGray<Depth>>
 		extends SelectAlgorithmAndInputPanel implements VisualizeApp, MouseListener, ChangeListener
 {
 	protected VisualDepthParameters config;

@@ -62,7 +62,7 @@ public class LensDistortionOps {
 	 * @param imageType Type of image it will undistort
 	 * @return ImageDistort which removes lens distortion
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	ImageDistort<T,T> imageRemoveDistortion(AdjustmentType type, BorderType borderType,
 											CameraPinholeRadial param, CameraPinholeRadial paramAdj,
 											ImageType<T> imageType)

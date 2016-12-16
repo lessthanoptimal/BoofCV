@@ -45,7 +45,7 @@ public class FactoryIntensityPointAlg {
 	 * @param imageType Type of input image it is computed form.
 	 * @return Fast corner
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	FastCornerIntensity<T> fast(int pixelTol, int minCont, Class<T> imageType)
 	{
 		FastHelper<T> helper;
@@ -79,7 +79,7 @@ public class FactoryIntensityPointAlg {
 	 * @param weighted Is the gradient weighted using a Gaussian distribution?  Weighted is much slower than unweighted.
 	 * @param derivType Image derivative type it is computed from.  @return Harris corner
 	 */
-	public static <D extends ImageGray>
+	public static <D extends ImageGray<D>>
 	HarrisCornerIntensity<D> harris(int windowRadius, float kappa, boolean weighted, Class<D> derivType)
 	{
 		if( derivType == GrayF32.class ) {
@@ -107,7 +107,7 @@ public class FactoryIntensityPointAlg {
 	 * @param derivType Image derivative type it is computed from.
 	 * @return KLT corner
 	 */
-	public static <D extends ImageGray>
+	public static <D extends ImageGray<D>>
 	ShiTomasiCornerIntensity<D> shiTomasi(int windowRadius, boolean weighted, Class<D> derivType)
 	{
 		if( derivType == GrayF32.class ) {

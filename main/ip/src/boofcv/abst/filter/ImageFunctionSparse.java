@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface ImageFunctionSparse< T extends ImageGray> {
+public interface ImageFunctionSparse<T extends ImageGray<T>> {
 
 	/**
 	 * Specify which image is to provide the input.

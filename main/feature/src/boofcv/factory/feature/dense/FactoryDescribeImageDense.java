@@ -55,7 +55,7 @@ public class FactoryDescribeImageDense {
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
-	public static <T extends ImageGray, II extends ImageGray>
+	public static <T extends ImageGray<T>, II extends ImageGray<II>>
 	DescribeImageDense<T,TupleDesc_F64> surfFast(ConfigDenseSurfFast config , Class<T> imageType)
 	{
 		if( config == null )
@@ -81,7 +81,7 @@ public class FactoryDescribeImageDense {
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
-	public static <T extends ImageGray, II extends ImageGray>
+	public static <T extends ImageGray<T>, II extends ImageGray<II>>
 	DescribeImageDense<T,TupleDesc_F64> surfStable( ConfigDenseSurfStable config,
 												   Class<T> imageType) {
 
@@ -106,7 +106,7 @@ public class FactoryDescribeImageDense {
 	 * @param imageType Type of input image
 	 * @return Dense SIFT
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	DescribeImageDense<T,TupleDesc_F64> sift(ConfigDenseSift config , Class<T> imageType ) {
 		if( config == null )
 			config = new ConfigDenseSift();
@@ -134,7 +134,7 @@ public class FactoryDescribeImageDense {
 	 * @param imageType Type of input image.  Can be single band or planar
 	 * @return Dense HOG extractor
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	DescribeImageDense<T,TupleDesc_F64> hog(ConfigDenseHoG config , ImageType<T> imageType ) {
 		if( config == null )
 			config = new ConfigDenseHoG();

@@ -31,7 +31,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Peter Abeles
  */
-public abstract class BasicDisparitySelectRectTests <ArrayData , D extends ImageGray> {
+public abstract class BasicDisparitySelectRectTests <ArrayData , D extends ImageGray<D>> {
 
 	Class<ArrayData> arrayType;
 

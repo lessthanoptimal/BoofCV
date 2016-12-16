@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class LocalSquareBlockMinMaxBinaryFilter<T extends ImageGray>
+public class LocalSquareBlockMinMaxBinaryFilter<T extends ImageGray<T>>
 		implements InputToBinary<T>
 {
 	ThresholdSquareBlockMinMax alg;

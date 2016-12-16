@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectDescribeAssociate<I extends ImageGray, Desc extends TupleDesc>
+public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleDesc>
 		implements PointTracker<I> {
 
 	// associates features between two images together

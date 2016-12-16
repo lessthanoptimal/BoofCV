@@ -53,7 +53,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisOdomPixelDepthPnP<T extends ImageBase> {
+public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 
 	// when the inlier set is less than this number new features are detected
 	private int thresholdAdd;

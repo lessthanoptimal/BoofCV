@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 @SuppressWarnings({"UnnecessaryLocalVariable"})
-public class ImplImageDistort_S32<Input extends ImageGray>
+public class ImplImageDistort_S32<Input extends ImageGray<Input>>
 		extends ImageDistortBasic_SB<Input,GrayS32> {
 
 	public ImplImageDistort_S32( InterpolatePixelS<Input> interp) {

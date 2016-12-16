@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface DiscreteFourierTransform<I extends ImageBase, T extends ImageBase> {
+public interface DiscreteFourierTransform<I extends ImageBase<I>, T extends ImageBase> {
 
 	/**
 	 * Applies forward transform to the input image.

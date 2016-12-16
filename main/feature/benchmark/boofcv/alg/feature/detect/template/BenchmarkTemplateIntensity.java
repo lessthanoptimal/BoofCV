@@ -33,7 +33,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkTemplateIntensity<T extends ImageGray> {
+public class BenchmarkTemplateIntensity<T extends ImageGray<T>> {
 
 	Random rand = new Random(234);
 	long TEST_TIME = 2000;

@@ -28,6 +28,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import javax.swing.*;
@@ -40,7 +41,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizePyramidDiscreteApp <T extends ImageGray>
+public class VisualizePyramidDiscreteApp <T extends ImageGray<T>>
 	extends SelectInputPanel implements VisualizeApp
 {
 	int scales[] = new int[]{1,2,4,8,16};
@@ -54,7 +55,7 @@ public class VisualizePyramidDiscreteApp <T extends ImageGray>
 	public VisualizePyramidDiscreteApp(Class<T> imageType) {
 		this.imageType = imageType;
 
-		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,true,imageType);
+		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,true, ImageType.single(imageType));
 		gui = new DiscretePyramidPanel();
 
 		setMainGUI(gui);

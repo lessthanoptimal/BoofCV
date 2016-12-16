@@ -47,7 +47,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DemonstrationInterpolateScaleApp<T extends ImageBase>
+public class DemonstrationInterpolateScaleApp<T extends ImageBase<T>>
 	extends DemonstrationBase<T> implements ItemListener, ComponentListener
 {
 	private final ImageType<T> imageType;

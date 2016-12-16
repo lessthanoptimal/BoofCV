@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeImageHogCellApp<T extends ImageBase> extends DemonstrationBase<T> {
+public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends DemonstrationBase<T> {
 
 	// use the fast variant since it confidently computes each cell individually and doesn't normalize it
 	DescribeDenseHogFastAlg<T> hog;

@@ -26,6 +26,7 @@ import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.InvocationTargetException;
@@ -60,8 +61,10 @@ public class CompareDerivativeToConvolution {
 	}
 
 	public void setKernel( int which , Kernel1D horizontal , Kernel1D vertical ) {
-		FilterImageInterface<?,?> f1 = FactoryConvolve.convolve(horizontal,inputType,outputType, BorderType.EXTENDED,true);
-		FilterImageInterface<?,?> f2 = FactoryConvolve.convolve(vertical,outputType,outputType, BorderType.EXTENDED,false);
+		FilterImageInterface<?,?> f1 = FactoryConvolve.convolve(horizontal,
+				ImageType.single(inputType),ImageType.single(outputType), BorderType.EXTENDED,true);
+		FilterImageInterface<?,?> f2 = FactoryConvolve.convolve(vertical,
+				ImageType.single(inputType),ImageType.single(outputType), BorderType.EXTENDED,false);
 
 		outputFilters[which] = new FilterSequence(f1,f2);
 		borders[which] = setBorder(horizontal,vertical);
@@ -69,8 +72,8 @@ public class CompareDerivativeToConvolution {
 	}
 
 	public void setKernel( int which , Kernel1D kernel , boolean isHorizontal) {
-		outputFilters[which] =
-				FactoryConvolve.convolve(kernel,inputType,outputType, BorderType.EXTENDED,isHorizontal);
+		outputFilters[which] = FactoryConvolve.convolve(kernel,
+						ImageType.single(inputType),ImageType.single(outputType), BorderType.EXTENDED,isHorizontal);
 		borders[which] = setBorder(kernel,isHorizontal);
 	}
 

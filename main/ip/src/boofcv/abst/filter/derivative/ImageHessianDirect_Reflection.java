@@ -34,7 +34,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class ImageHessianDirect_Reflection<Input extends ImageGray, Output extends ImageGray>
+public class ImageHessianDirect_Reflection<Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 		implements ImageHessianDirect<Input, Output>
 {
 	// How the image border should be handled

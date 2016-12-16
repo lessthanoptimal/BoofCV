@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class FilterSequence<Input extends ImageGray, Output extends ImageGray>
+public class FilterSequence<Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 		implements FilterImageInterface<Input,Output> {
 
 	FilterImageInterface<Input,Output> firstFilter;

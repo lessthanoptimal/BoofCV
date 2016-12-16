@@ -20,6 +20,7 @@ package boofcv.struct.pyramid;
 
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -72,10 +73,10 @@ public class TestPyramidDiscrete {
 		} catch( RuntimeException e ){}
 	}
 
-	private static class DummyDiscrete<T extends ImageGray> extends PyramidDiscrete<T> {
+	private static class DummyDiscrete<T extends ImageGray<T>> extends PyramidDiscrete<T> {
 
 		public DummyDiscrete(Class<T> imageType, boolean saveOriginalReference) {
-			super(imageType, saveOriginalReference);
+			super(ImageType.single(imageType), saveOriginalReference);
 		}
 
 		@Override

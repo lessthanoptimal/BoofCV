@@ -35,7 +35,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkImageDistort<T extends ImageGray> {
+public class BenchmarkImageDistort<T extends ImageGray<T>> {
 	public static final int imgWidth = 640;
 	public static final int imgHeight = 480;
 

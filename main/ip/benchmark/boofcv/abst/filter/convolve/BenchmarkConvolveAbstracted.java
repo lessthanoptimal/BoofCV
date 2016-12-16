@@ -27,10 +27,7 @@ import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
-import boofcv.struct.image.GrayS32;
-import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.*;
 
 /**
  * Benchmark for different convolution operations.
@@ -65,7 +62,8 @@ public class BenchmarkConvolveAbstracted {
 		@Override
 		public void process() {
 			FilterImageInterface<GrayU8,GrayS16> filter =
-			FactoryConvolve.convolve(kernelI32,GrayU8.class,GrayS16.class, BorderType.SKIP,false);
+			FactoryConvolve.convolve(kernelI32,
+					ImageType.single(GrayU8.class),ImageType.single(GrayS16.class), BorderType.SKIP,false);
 			filter.process(imgInt8,out_I16);
 		}
 	}
@@ -73,7 +71,8 @@ public class BenchmarkConvolveAbstracted {
 	public static class Pre_Vertical_I8_I16 extends PerformerBase
 	{
 		FilterImageInterface<GrayU8,GrayS16> filter =
-					FactoryConvolve.convolve(kernelI32,GrayU8.class,GrayS16.class,BorderType.SKIP,false);
+					FactoryConvolve.convolve(kernelI32,
+							ImageType.single(GrayU8.class),ImageType.single(GrayS16.class),BorderType.SKIP,false);
 
 		@Override
 		public void process() {

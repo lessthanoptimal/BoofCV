@@ -38,7 +38,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public abstract class CommonImageDistortCacheTests<T extends ImageGray> {
+public abstract class CommonImageDistortCacheTests<T extends ImageGray<T>> {
 
 	Class<T> imageType;
 	

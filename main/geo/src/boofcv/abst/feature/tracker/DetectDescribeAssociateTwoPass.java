@@ -33,7 +33,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public class DetectDescribeAssociateTwoPass<I extends ImageGray, Desc extends TupleDesc>
+public class DetectDescribeAssociateTwoPass<I extends ImageGray<I>, Desc extends TupleDesc>
 	extends DetectDescribeAssociate<I,Desc> implements PointTrackerTwoPass<I>
 {
 	// associate used in the second pass

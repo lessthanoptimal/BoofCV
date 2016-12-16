@@ -60,7 +60,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeAssociationScoreApp<T extends ImageGray, D extends ImageGray>
+public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel implements VisualizeScorePanel.Listener {
 	// These classes process the input images and compute association score
 	InterestPointDetector<T> detector;

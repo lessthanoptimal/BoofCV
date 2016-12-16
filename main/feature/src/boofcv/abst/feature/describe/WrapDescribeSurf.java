@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageType;
 /**
  * @author Peter Abeles
  */
-public class WrapDescribeSurf<T extends ImageGray, II extends ImageGray>
+public class WrapDescribeSurf<T extends ImageGray<T>, II extends ImageGray<II>>
 		implements DescribeRegionPoint<T,BrightFeature> {
 
 	// computes SURF feature descriptor

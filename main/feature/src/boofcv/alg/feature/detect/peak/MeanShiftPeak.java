@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class MeanShiftPeak<T extends ImageGray> {
+public class MeanShiftPeak<T extends ImageGray<T>> {
 
 	// Input image and interpolation function
 	protected T image;

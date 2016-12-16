@@ -210,7 +210,7 @@ public class GThresholdImageOps {
 	 * @param down If true then the inequality &le; is used, otherwise if false then &gt; is used.
 	 * @return binary image.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	GrayU8 threshold(T input , GrayU8 output ,
 					 double threshold , boolean down )
 	{
@@ -253,7 +253,7 @@ public class GThresholdImageOps {
 	 * @param work2 (Optional) Internal workspace.  Can be null
 	 * @return binary image.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	GrayU8 localSquare(T input, GrayU8 output,
 					   int radius, double scale, boolean down, T work1, T work2)
 	{
@@ -290,7 +290,7 @@ public class GThresholdImageOps {
 	 * @param work2 (Optional) Internal workspace.  Can be null
 	 * @return binary image.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	GrayU8 localGaussian(T input, GrayU8 output,
 						 int radius, double scale, boolean down,
 						 T work1, ImageGray work2)
@@ -319,7 +319,7 @@ public class GThresholdImageOps {
 	 * @param down Should it threshold up or down.
 	 * @return binary image
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	GrayU8 localSauvola(T input, GrayU8 output, int radius, float k, boolean down)
 	{
 		ThresholdSauvola alg = new ThresholdSauvola(radius,k, down);
@@ -350,7 +350,7 @@ public class GThresholdImageOps {
 	 * @param textureThreshold If the min and max values are within this threshold the pixel will be set to 1.
 	 * @return Binary image
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	GrayU8 localBlockMinMax(T input, GrayU8 output, int radius, double scale , boolean down, double textureThreshold)
 	{
 		LocalSquareBlockMinMaxBinaryFilter<T> alg = new LocalSquareBlockMinMaxBinaryFilter<>(textureThreshold, radius * 2 + 1, scale, down,

@@ -52,7 +52,7 @@ import java.io.FileNotFoundException;
  *
  * @author Peter Abeles
  */
-public class ExamplePointFeatureTracker< T extends ImageGray, D extends ImageGray>
+public class ExamplePointFeatureTracker< T extends ImageGray<T>, D extends ImageGray<D>>
 {
 	// type of input image
 	Class<T> imageType;

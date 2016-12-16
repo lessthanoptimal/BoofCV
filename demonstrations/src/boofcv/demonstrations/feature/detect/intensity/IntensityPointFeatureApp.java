@@ -48,7 +48,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class IntensityPointFeatureApp<T extends ImageGray, D extends ImageGray>
+public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel
 {
 	// displays intensity image

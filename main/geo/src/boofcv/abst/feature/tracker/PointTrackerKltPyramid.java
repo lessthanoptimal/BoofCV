@@ -38,7 +38,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PointTrackerKltPyramid<I extends ImageGray,D extends ImageGray>
+public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D>>
 		implements PointTracker<I>
 {
 	// reference to input image

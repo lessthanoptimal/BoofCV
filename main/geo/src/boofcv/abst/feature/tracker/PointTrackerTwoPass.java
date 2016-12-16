@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface PointTrackerTwoPass<T extends ImageBase> extends PointTracker<T> {
+public interface PointTrackerTwoPass<T extends ImageBase<T>> extends PointTracker<T> {
 
 	/**
 	 * Changes behavior of {@link PointTracker#process(boofcv.struct.image.ImageBase)} in that it will only

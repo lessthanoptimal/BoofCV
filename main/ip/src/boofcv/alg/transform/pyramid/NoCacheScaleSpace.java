@@ -29,6 +29,7 @@ import boofcv.struct.BoofDefaults;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
 
 /**
@@ -40,7 +41,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class NoCacheScaleSpace<I extends ImageGray, D extends ImageGray>
+public class NoCacheScaleSpace<I extends ImageGray<I>, D extends ImageGray<D>>
 		implements GaussianScaleSpace<I,D>
 {
 	// reference to the original input image
@@ -104,8 +105,10 @@ public class NoCacheScaleSpace<I extends ImageGray, D extends ImageGray>
 
 		Kernel1D kernel = FactoryKernelGaussian.gaussian1D(inputType,sigma,radius);
 
-		ConvolveInterface<I, I> blurX = FactoryConvolve.convolve(kernel,inputType,inputType, borderBlur ,true);
-		ConvolveInterface<I, I> blurY = FactoryConvolve.convolve(kernel,inputType,inputType, borderBlur ,false);
+		ImageType<I> _imageType = ImageType.single(inputType);
+
+		ConvolveInterface<I, I> blurX = FactoryConvolve.convolve(kernel,_imageType,_imageType, borderBlur ,true);
+		ConvolveInterface<I, I> blurY = FactoryConvolve.convolve(kernel,_imageType,_imageType, borderBlur ,false);
 
 		// compute the scale image
 		blurX.process(originalImage,workImage);

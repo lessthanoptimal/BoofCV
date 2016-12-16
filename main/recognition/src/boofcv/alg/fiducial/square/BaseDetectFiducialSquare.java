@@ -66,7 +66,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO create unit test for bright object
-public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
+public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 
 	// Storage for the found fiducials
 	private FastQueue<FoundFiducial> found = new FastQueue<>(FoundFiducial.class, true);

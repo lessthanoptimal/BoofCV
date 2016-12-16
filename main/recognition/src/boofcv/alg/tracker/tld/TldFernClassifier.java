@@ -30,7 +30,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class TldFernClassifier<T extends ImageGray> {
+public class TldFernClassifier<T extends ImageGray<T>> {
 
 	// maximum value of a fern for P and N.  Used for re-normalization
 	protected int maxP = 0;

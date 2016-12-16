@@ -27,7 +27,6 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.*;
 import boofcv.factory.filter.convolve.FactoryConvolveSparse;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.GrayU8;
@@ -52,7 +51,7 @@ public class FactoryDerivativeSparse {
 	 * @param border How the border should be handled.  If null {@link BorderType#EXTENDED} will be used.
 	 * @return Filter for performing a sparse laplacian.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	ImageFunctionSparse<T> createLaplacian( Class<T> imageType , ImageBorder<T> border )
 	{
 		if( border == null ) {
@@ -66,9 +65,9 @@ public class FactoryDerivativeSparse {
 
 			return (ImageFunctionSparse<T>)r;
 		} else {
-			ImageConvolveSparse<GrayI, Kernel2D_I32> r = FactoryConvolveSparse.convolve2D(GrayI.class, LaplacianEdge.kernel_I32);
+			ImageConvolveSparse r = FactoryConvolveSparse.convolve2D(GrayI.class, LaplacianEdge.kernel_I32);
 
-			r.setImageBorder((ImageBorder_S32)border);
+			r.setImageBorder(border);
 
 			return (ImageFunctionSparse<T>)r;
 		}
@@ -83,7 +82,7 @@ public class FactoryDerivativeSparse {
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient
 	 */
-	public static <T extends ImageGray, G extends GradientValue>
+	public static <T extends ImageGray<T>, G extends GradientValue>
 	SparseImageGradient<T,G> createSobel( Class<T> imageType , ImageBorder<T> border )
 	{
 		if( imageType == GrayF32.class) {
@@ -104,7 +103,7 @@ public class FactoryDerivativeSparse {
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient.
 	 */
-	public static <T extends ImageGray, G extends GradientValue>
+	public static <T extends ImageGray<T>, G extends GradientValue>
 	SparseImageGradient<T,G> createPrewitt( Class<T> imageType , ImageBorder<T> border )
 	{
 		if( imageType == GrayF32.class) {
@@ -125,7 +124,7 @@ public class FactoryDerivativeSparse {
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient.
 	 */
-	public static <T extends ImageGray, G extends GradientValue>
+	public static <T extends ImageGray<T>, G extends GradientValue>
 	SparseImageGradient<T,G> createThree( Class<T> imageType , ImageBorder<T> border )
 	{
 		if( imageType == GrayF32.class) {
@@ -146,7 +145,7 @@ public class FactoryDerivativeSparse {
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient.
 	 */
-	public static <T extends ImageGray, G extends GradientValue>
+	public static <T extends ImageGray<T>, G extends GradientValue>
 	SparseImageGradient<T,G> createTwo0( Class<T> imageType , ImageBorder<T> border )
 	{
 		if( imageType == GrayF32.class) {
@@ -167,7 +166,7 @@ public class FactoryDerivativeSparse {
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient.
 	 */
-	public static <T extends ImageGray, G extends GradientValue>
+	public static <T extends ImageGray<T>, G extends GradientValue>
 	SparseImageGradient<T,G> createTwo1( Class<T> imageType , ImageBorder<T> border )
 	{
 		if( imageType == GrayF32.class) {

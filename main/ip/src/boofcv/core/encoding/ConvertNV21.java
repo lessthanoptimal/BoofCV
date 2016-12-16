@@ -81,7 +81,7 @@ public class ConvertNV21 {
 	 * @param <T> Output image type
 	 * @return Gray scale image
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	T nv21ToGray( byte[] data , int width , int height ,
 				  T output , Class<T> outputType ) {
 
@@ -148,7 +148,7 @@ public class ConvertNV21 {
 	 * @param outputType  Output: Type of output image
 	 * @param <T> Output image type
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	Planar<T> nv21ToMsYuv(byte[] data , int width , int height ,
 						  Planar<T> output , Class<T> outputType ) {
 

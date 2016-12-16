@@ -43,7 +43,7 @@ public class FactoryImageSegmentation {
 	 * @param <T> Image type
 	 * @return new instance of {@link ImageSuperpixels}
 	 */
-	public static <T extends ImageBase>ImageSuperpixels<T>
+	public static <T extends ImageBase<T>>ImageSuperpixels<T>
 	meanShift( ConfigSegmentMeanShift config ,  ImageType<T> imageType )
 	{
 		if( config == null )
@@ -64,7 +64,7 @@ public class FactoryImageSegmentation {
 	 * @param <T> Image type
 	 * @return new instance of {@link ImageSuperpixels}
 	 */
-	public static <T extends ImageBase>ImageSuperpixels<T>
+	public static <T extends ImageBase<T>>ImageSuperpixels<T>
 	slic( ConfigSlic config , ImageType<T> imageType )
 	{
 		SegmentSlic<T> ms = FactorySegmentationAlg.slic(config, imageType);
@@ -82,7 +82,7 @@ public class FactoryImageSegmentation {
 	 * @param <T> Image type
 	 * @return new instance of {@link ImageSuperpixels}
 	 */
-	public static <T extends ImageBase>ImageSuperpixels<T>
+	public static <T extends ImageBase<T>>ImageSuperpixels<T>
 	fh04( ConfigFh04 config , ImageType<T> imageType )
 	{
 		if( config == null )
@@ -105,7 +105,7 @@ public class FactoryImageSegmentation {
 	 * @param <T> Image type
 	 * @return new instance of {@link ImageSuperpixels}
 	 */
-	public static <T extends ImageBase>ImageSuperpixels<T>
+	public static <T extends ImageBase<T>>ImageSuperpixels<T>
 	watershed( ConfigWatershed config , ImageType<T> imageType )
 	{
 		if( config == null )

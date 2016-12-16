@@ -44,7 +44,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectFiducialSquareGrid<T extends ImageGray> {
+public class DetectFiducialSquareGrid<T extends ImageGray<T>> {
 
 	// dimension of grid.  This only refers to black squares and not the white space between
 	int numRows;

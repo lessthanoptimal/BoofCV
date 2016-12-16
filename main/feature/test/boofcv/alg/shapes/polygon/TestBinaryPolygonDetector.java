@@ -199,7 +199,7 @@ public class TestBinaryPolygonDetector {
 		}
 	}
 
-	private <T extends ImageGray> BinaryPolygonDetector<T> createDetector(Class<T> imageType, boolean useLines, int minSides, int maxSides) {
+	private <T extends ImageGray<T>> BinaryPolygonDetector<T> createDetector(Class<T> imageType, boolean useLines, int minSides, int maxSides) {
 		ConfigPolygonDetector config = new ConfigPolygonDetector(minSides,maxSides);
 
 		if( useLines ) {

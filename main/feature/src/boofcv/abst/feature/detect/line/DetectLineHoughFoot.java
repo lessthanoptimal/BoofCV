@@ -52,7 +52,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectLineHoughFoot <I extends ImageGray, D extends ImageGray> implements DetectLine<I> {
+public class DetectLineHoughFoot <I extends ImageGray<I>, D extends ImageGray<D>> implements DetectLine<I> {
 
 	// transform algorithm
 	HoughTransformLineFootOfNorm alg;

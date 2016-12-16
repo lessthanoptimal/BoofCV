@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public abstract class BackgroundModelStationary<T extends ImageBase> extends BackgroundModel<T> {
+public abstract class BackgroundModelStationary<T extends ImageBase<T>> extends BackgroundModel<T> {
 
 	public BackgroundModelStationary(ImageType<T> imageType) {
 		super(imageType);

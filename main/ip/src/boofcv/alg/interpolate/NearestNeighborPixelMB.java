@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public abstract class NearestNeighborPixelMB<T extends ImageMultiBand> implements InterpolatePixelMB<T> {
+public abstract class NearestNeighborPixelMB<T extends ImageMultiBand<T>> implements InterpolatePixelMB<T> {
 	protected ImageBorder<T> border;
 	protected T orig;
 	protected int stride;

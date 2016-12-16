@@ -33,7 +33,7 @@ import java.awt.*;
 /**
  * @author Peter Abeles
  */
-public class DisplaySteerableGaussianApp <T extends ImageGray, K extends Kernel2D>
+public class DisplaySteerableGaussianApp <T extends ImageGray<T>, K extends Kernel2D>
 	extends DisplaySteerableBase<T,K>
 {
 	public DisplaySteerableGaussianApp(Class<T> imageType) {

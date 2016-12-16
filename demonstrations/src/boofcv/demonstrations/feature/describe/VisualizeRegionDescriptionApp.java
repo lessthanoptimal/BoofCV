@@ -47,7 +47,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class VisualizeRegionDescriptionApp <T extends ImageGray, D extends ImageGray>
+public class VisualizeRegionDescriptionApp <T extends ImageGray<T>, D extends ImageGray<D>>
 	extends SelectAlgorithmAndInputPanel implements SelectRegionDescriptionPanel.Listener
 {
 	boolean processedImage = false;

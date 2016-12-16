@@ -24,7 +24,7 @@ import boofcv.struct.image.GrayI;
 /**
  * @author Peter Abeles
  */
-public class ImageBorder1D_S32<T extends GrayI> extends ImageBorder_S32<T> {
+public class ImageBorder1D_S32<T extends GrayI<T>> extends ImageBorder_S32<T> {
 	BorderIndex1D rowWrap;
 	BorderIndex1D colWrap;
 

@@ -47,7 +47,7 @@ public class FactoryEdgeDetectors {
 	 * @param derivType Type of image derivative.
 	 * @return Canny edge detector
 	 */
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	CannyEdge<T,D> canny( int blurRadius , boolean saveTrace , boolean dynamicThreshold, Class<T> imageType , Class<D> derivType )
 	{
 		BlurFilter<T> blur = FactoryBlurFilter.gaussian(imageType, -1, blurRadius);

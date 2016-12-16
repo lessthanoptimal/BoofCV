@@ -28,7 +28,7 @@ import boofcv.struct.sparse.SparseImageGradient;
  *
  * @author Peter Abeles
  */
-public class SparseIntegralGradientKernel<T extends ImageGray>
+public class SparseIntegralGradientKernel<T extends ImageGray<T>>
 		implements SparseImageGradient<T, GradientValue_F64>
 {
 	// input integral image

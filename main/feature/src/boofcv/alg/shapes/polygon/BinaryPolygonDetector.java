@@ -70,7 +70,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BinaryPolygonDetector<T extends ImageGray> {
+public class BinaryPolygonDetector<T extends ImageGray<T>> {
 
 	// minimum size of a shape's contour as a fraction of the image width
 	private double minContourFraction;

@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BufferedFileImageSequence<T extends ImageBase> implements SimpleImageSequence<T> {
+public class BufferedFileImageSequence<T extends ImageBase<T>> implements SimpleImageSequence<T> {
 
 	BufferedImage orig[];
 	T[] images;

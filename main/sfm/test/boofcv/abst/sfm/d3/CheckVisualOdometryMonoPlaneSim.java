@@ -39,7 +39,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray>
+public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 	extends VideoSequenceSimulator<I>
 {
 	CameraPinholeRadial param = new CameraPinholeRadial(150,155,0,width/2,height/2,width,height).fsetRadial(0,0);

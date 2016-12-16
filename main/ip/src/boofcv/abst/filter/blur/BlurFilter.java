@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface BlurFilter<T extends ImageGray> extends FilterImageInterface<T,T> {
+public interface BlurFilter<T extends ImageGray<T>> extends FilterImageInterface<T,T> {
 
 	/**
 	 * Radius of the square region.  The width is defined as the radius*2 + 1.

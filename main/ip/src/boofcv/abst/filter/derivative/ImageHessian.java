@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface ImageHessian<Output extends ImageGray> extends ImageDerivative<Output,Output> {
+public interface ImageHessian<Output extends ImageGray<Output>> extends ImageDerivative<Output,Output> {
 
 	/**
 	 * Computes all the second derivative terms in the image.

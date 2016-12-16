@@ -34,7 +34,7 @@ import boofcv.struct.image.*;
  */
 public class GImageDerivativeOps {
 
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	void laplace( I input , D output ) {
 		if( input instanceof GrayF32) {
 			LaplacianEdge.process((GrayF32)input,(GrayF32)output);
@@ -51,7 +51,7 @@ public class GImageDerivativeOps {
 	 * @param imageType Input image type.
 	 * @return Appropriate output image type.
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 		Class<D> getDerivativeType( Class<I> imageType ) {
 		if( imageType == GrayF32.class ) {
 			return (Class<D>) GrayF32.class;
@@ -62,6 +62,27 @@ public class GImageDerivativeOps {
 		} else {
 			throw new IllegalArgumentException("Unknown input image type: "+imageType.getSimpleName());
 		}
+	}
+
+	public static <I extends ImageBase<I>, D extends ImageBase<D>>
+	ImageType<D> getDerivativeType( ImageType<I> imageType ) {
+		switch( imageType.getFamily() ) {
+			case GRAY:
+				return ImageType.single(getDerivativeType(imageType.getImageClass()));
+			case PLANAR: {
+				int numBands = imageType.getNumBands();
+				return ImageType.pl(numBands, getDerivativeType(imageType.getImageClass()));
+			}
+			case INTERLEAVED:
+				int numBands = imageType.getNumBands();
+				switch ( imageType.getDataType() ) {
+					case F32: return (ImageType)ImageType.il(numBands, ImageDataType.F32);
+					case F64: return (ImageType)ImageType.il(numBands, ImageDataType.F64);
+					case U8: return (ImageType)ImageType.il(numBands, ImageDataType.S16);
+					case U16: return (ImageType)ImageType.il(numBands, ImageDataType.S32);
+				}
+		}
+		throw new IllegalArgumentException("Unknown image type");
 	}
 
 	/**
@@ -75,7 +96,7 @@ public class GImageDerivativeOps {
 	 * @param <I> Input image type
 	 * @param <D> Output image type
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	void gradient( DerivativeType type , I input , D derivX , D derivY , BorderType borderType ) {
 
 		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.single(input, borderType);
@@ -154,7 +175,7 @@ public class GImageDerivativeOps {
 	 * @param <I> Input image type
 	 * @param <D> Output image type
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	void hessian( DerivativeType type , I input , D derivXX , D derivYY , D derivXY , BorderType borderType ) {
 		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.single(input, borderType);
 
@@ -195,7 +216,7 @@ public class GImageDerivativeOps {
 	 * @param derivXY Output. Derivative XY
 	 * @param borderType How it should handle borders.  null == skip border
 	 */
-	public static <D extends ImageGray>
+	public static <D extends ImageGray<D>>
 	void hessian( DerivativeType type , D derivX , D derivY , D derivXX , D derivYY , D derivXY , BorderType borderType ) {
 		ImageBorder<D> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.single(derivX, borderType);
 
@@ -276,7 +297,7 @@ public class GImageDerivativeOps {
 	 * @param <D> Image derivative type.
 	 * @return AnyImageDerivative
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	AnyImageDerivative<I,D> createAnyDerivatives( DerivativeType type , Class<I> inputType , Class<D> derivType ) {
 
 		boolean isInteger = !GeneralizedImageOps.isFloatingPoint(inputType);
@@ -299,7 +320,7 @@ public class GImageDerivativeOps {
 	 * @param <D> Image derivative type.
 	 * @return AnyImageDerivative
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	AnyImageDerivative<I,D> derivativeForScaleSpace( Class<I> inputType , Class<D> derivType ) {
 		return createAnyDerivatives(DerivativeType.THREE,inputType,derivType);
 	}

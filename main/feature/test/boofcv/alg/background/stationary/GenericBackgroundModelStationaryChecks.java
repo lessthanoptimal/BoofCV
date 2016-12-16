@@ -46,7 +46,7 @@ public abstract class GenericBackgroundModelStationaryChecks {
 
 	protected List<ImageType> imageTypes = new ArrayList<>();
 
-	public abstract<T extends ImageBase>
+	public abstract<T extends ImageBase<T>>
 	BackgroundModelStationary<T> create( ImageType<T> imageType );
 
 	/**
@@ -60,7 +60,7 @@ public abstract class GenericBackgroundModelStationaryChecks {
 		}
 	}
 
-	private <T extends ImageBase> void basicCheck( ImageType<T> imageType ) {
+	private <T extends ImageBase<T>> void basicCheck( ImageType<T> imageType ) {
 
 		BackgroundModelStationary<T> alg = create(imageType);
 		T frame = imageType.createImage(width,height);
@@ -101,7 +101,7 @@ public abstract class GenericBackgroundModelStationaryChecks {
 		}
 	}
 
-	private <T extends ImageBase>
+	private <T extends ImageBase<T>>
 	void reset( ImageType<T> imageType ) {
 		T frame = imageType.createImage(width, height);
 
@@ -139,7 +139,7 @@ public abstract class GenericBackgroundModelStationaryChecks {
 		}
 	}
 
-	private <T extends ImageBase>
+	private <T extends ImageBase<T>>
 	void segmentBeforeUpdateBackGround( ImageType<T> imageType ) {
 		T frame = imageType.createImage(width, height);
 
@@ -162,7 +162,7 @@ public abstract class GenericBackgroundModelStationaryChecks {
 		}
 	}
 
-	private <T extends ImageBase>
+	private <T extends ImageBase<T>>
 	void checkSubImage( ImageType<T> imageType ) {
 		T frame = imageType.createImage(width, height);
 		GrayU8 segmented = new GrayU8(width,height);
@@ -182,7 +182,7 @@ public abstract class GenericBackgroundModelStationaryChecks {
 		BoofTesting.assertEquals(expected,found,1e-8);
 	}
 
-	private <T extends ImageBase>
+	private <T extends ImageBase<T>>
 	void checkSubImage_process( T frame, GrayU8 segmented)
 	{
 		rand = new Random(2345);
@@ -209,7 +209,7 @@ public abstract class GenericBackgroundModelStationaryChecks {
 		}
 	}
 
-	private <T extends ImageBase> void checkBandsUsed( ImageType<T> imageType ) {
+	private <T extends ImageBase<T>> void checkBandsUsed( ImageType<T> imageType ) {
 
 		BackgroundModelStationary<T> alg = create(imageType);
 		T frame = imageType.createImage(width,height);

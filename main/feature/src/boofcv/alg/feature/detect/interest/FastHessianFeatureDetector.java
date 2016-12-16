@@ -82,7 +82,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FastHessianFeatureDetector<II extends ImageGray> {
+public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 
 	// finds features from 2D intensity image
 	private NonMaxSuppression extractor;

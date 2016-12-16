@@ -51,7 +51,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ShowLensDistortion<T extends ImageGray>
+public class ShowLensDistortion<T extends ImageGray<T>>
 		extends SelectInputPanel implements ChangeListener, ItemListener
 {
 	double radial1 = 0;

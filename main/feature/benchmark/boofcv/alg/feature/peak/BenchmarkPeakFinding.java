@@ -37,7 +37,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkPeakFinding<T extends ImageGray> {
+public class BenchmarkPeakFinding<T extends ImageGray<T>> {
 
 	Random rand = new Random(234);
 	long TEST_TIME = 2000;

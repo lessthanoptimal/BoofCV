@@ -56,7 +56,7 @@ import org.ddogleg.struct.FastQueue;
 
  * @author Peter Abeles
  */
-public abstract class CreateSyntheticOverheadView<T extends ImageBase>
+public abstract class CreateSyntheticOverheadView<T extends ImageBase<T>>
 {
 	// size of overhead image;
 	protected int overheadWidth;

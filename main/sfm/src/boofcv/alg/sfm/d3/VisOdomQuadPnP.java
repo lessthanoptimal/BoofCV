@@ -59,7 +59,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-public class VisOdomQuadPnP<T extends ImageGray,TD extends TupleDesc> {
+public class VisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc> {
 
 	// used to estimate each feature's 3D location using a stereo pair
 	private TriangulateTwoViewsCalibrated triangulate;

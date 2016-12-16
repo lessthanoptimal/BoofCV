@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
  *
  * @author Peter Abeles
  */
-public abstract class StandardImageInterleavedTests<T extends ImageInterleaved> {
+public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T>> {
 
 	public Random rand = new Random(234);
 

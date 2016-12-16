@@ -18,7 +18,8 @@
 
 package boofcv.struct.pyramid;
 
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 
 /**
@@ -35,7 +36,7 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class PyramidFloat<T extends ImageGray> extends ImagePyramidBase<T> {
+public abstract class PyramidFloat<T extends ImageBase<T>> extends ImagePyramidBase<T> {
 
 	// scale of each layer relative to the previous layer
 	public double scale[];
@@ -47,7 +48,7 @@ public abstract class PyramidFloat<T extends ImageGray> extends ImagePyramidBase
 	 * @param scaleFactors (optional) Specifies the scale of each layer in the pyramid.  See restrictions
 	 * on scaleFactor in {@link #setScaleFactors(double...)}.
 	 */
-	public PyramidFloat( Class<T> imageType , double ...scaleFactors ) {
+	public PyramidFloat(ImageType<T> imageType , double ...scaleFactors ) {
 		super(imageType,false);
 		if( scaleFactors.length > 0 )
 			setScaleFactors(scaleFactors);

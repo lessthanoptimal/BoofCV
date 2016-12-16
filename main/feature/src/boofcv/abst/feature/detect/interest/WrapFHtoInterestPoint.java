@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapFHtoInterestPoint<T extends ImageGray, II extends ImageGray> implements InterestPointDetector<T> {
+public class WrapFHtoInterestPoint<T extends ImageGray<T>, II extends ImageGray<II>> implements InterestPointDetector<T> {
 
 	// detects the feature's location and scale
 	FastHessianFeatureDetector<II> detector;

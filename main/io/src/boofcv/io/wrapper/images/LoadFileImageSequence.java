@@ -40,7 +40,7 @@ import java.util.Collections;
  *
  * @author Peter Abeles
  */
-public class LoadFileImageSequence<T extends ImageBase> implements SimpleImageSequence<T> {
+public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImageSequence<T> {
 
 	String directoryName;
 	String suffix;

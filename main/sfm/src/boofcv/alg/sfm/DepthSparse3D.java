@@ -39,7 +39,7 @@ import georegression.struct.point.Point3D_F64;
  *
  * @author Peter Abeles
  */
-public abstract class DepthSparse3D<T extends ImageGray> {
+public abstract class DepthSparse3D<T extends ImageGray<T>> {
 
 	// Storage for the depth image
 	protected T depthImage;
@@ -148,7 +148,7 @@ public abstract class DepthSparse3D<T extends ImageGray> {
 	/**
 	 * Implementation for {@link GrayI}.
 	 */
-	public static class I<T extends GrayI> extends DepthSparse3D<T> {
+	public static class I<T extends GrayI<T>> extends DepthSparse3D<T> {
 
 		public I(double depthScale) {
 			super(depthScale);

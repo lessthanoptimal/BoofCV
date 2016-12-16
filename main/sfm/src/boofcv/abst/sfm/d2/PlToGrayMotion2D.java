@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PlToGrayMotion2D<T extends ImageGray,IT extends InvertibleTransform>
+public class PlToGrayMotion2D<T extends ImageGray<T>,IT extends InvertibleTransform>
 	implements ImageMotion2D<Planar<T>,IT>, AccessPointTracks
 {
 	// motion estimation algorithm for a single band image

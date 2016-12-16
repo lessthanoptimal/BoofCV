@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class DescribePointPixelRegionNCC<T extends ImageGray>
+public abstract class DescribePointPixelRegionNCC<T extends ImageGray<T>>
 		extends DescribePointRectangleRegion<T>
 {
 	protected DescribePointPixelRegionNCC(int regionWidth, int regionHeight) {

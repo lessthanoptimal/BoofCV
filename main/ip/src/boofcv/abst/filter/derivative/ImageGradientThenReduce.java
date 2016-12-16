@@ -29,9 +29,9 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class ImageGradientThenReduce<Input extends ImageMultiBand,
-		Middle extends ImageMultiBand,
-		Output extends ImageGray>
+public class ImageGradientThenReduce<Input extends ImageMultiBand<Input>,
+		Middle extends ImageMultiBand<Middle>,
+		Output extends ImageGray<Output>>
 		implements ImageGradient<Input,Output>
 {
 	// used to compute multi-band image gradient

@@ -34,7 +34,7 @@ import georegression.struct.InvertibleTransform;
  *
  * @author Peter Abeles
  */
-public class BackgroundMovingBasic_PL<T extends ImageGray, Motion extends InvertibleTransform<Motion>>
+public class BackgroundMovingBasic_PL<T extends ImageGray<T>, Motion extends InvertibleTransform<Motion>>
 	extends BackgroundMovingBasic<Planar<T>,Motion>
 {
 	// where the background image is stored

@@ -23,7 +23,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public abstract class InterleavedInteger<T extends InterleavedInteger> extends ImageInterleaved<T> {
+public abstract class InterleavedInteger<T extends InterleavedInteger<T>> extends ImageInterleaved<T> {
 
 	/**
 	 * Creates a new image with an arbitrary number of bands/colors.

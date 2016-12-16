@@ -25,6 +25,7 @@ import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -59,9 +60,10 @@ public class TestFilterSequence {
 		GrayF32 found = new GrayF32(width,height);
 		GrayF32 expected = new GrayF32(width,height);
 
-		FilterImageInterface f1 = FactoryConvolve.convolve(ker1,GrayF32.class,GrayF32.class, BorderType.SKIP, true);
-		FilterImageInterface f2 = FactoryConvolve.convolve(ker2,GrayF32.class,GrayF32.class, BorderType.SKIP, true);
-		FilterImageInterface f3 = FactoryConvolve.convolve(ker3,GrayF32.class,GrayF32.class, BorderType.SKIP, true);
+		ImageType<GrayF32> imageType = ImageType.single(GrayF32.class);
+		FilterImageInterface f1 = FactoryConvolve.convolve(ker1,imageType,imageType, BorderType.SKIP, true);
+		FilterImageInterface f2 = FactoryConvolve.convolve(ker2,imageType,imageType, BorderType.SKIP, true);
+		FilterImageInterface f3 = FactoryConvolve.convolve(ker3,imageType,imageType, BorderType.SKIP, true);
 
 		FilterSequence sequence = new FilterSequence(f1,f2,f3);
 		sequence.process(input,found);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import georegression.struct.shapes.RectangleLength2D_I32;
  *
  * @author Peter Abeles
  */
-public interface PixelLikelihood<T extends ImageBase> extends SparseImageSample_F32<T> {
+public interface PixelLikelihood<T extends ImageBase<T>> extends SparseImageSample_F32<T> {
 
 	/**
 	 * Sets the input image

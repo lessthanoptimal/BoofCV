@@ -52,7 +52,7 @@ public class FactoryImageDenoise {
 	 * @param maxPixelValue Maximum allowed pixel intensity value
 	 * @return filter for image noise removal.
 	 */
-	public static <T extends ImageGray> WaveletDenoiseFilter<T>
+	public static <T extends ImageGray<T>> WaveletDenoiseFilter<T>
 	waveletVisu( Class<T> imageType , int numLevels , double minPixelValue , double maxPixelValue )
 	{
 		ImageDataType info = ImageDataType.classToType(imageType);
@@ -71,7 +71,7 @@ public class FactoryImageDenoise {
 	 * @param maxPixelValue Maximum allowed pixel intensity value
 	 * @return filter for image noise removal.
 	 */
-	public static <T extends ImageGray> WaveletDenoiseFilter<T>
+	public static <T extends ImageGray<T>> WaveletDenoiseFilter<T>
 	waveletBayes( Class<T> imageType , int numLevels , double minPixelValue , double maxPixelValue )
 	{
 		ImageDataType info = ImageDataType.classToType(imageType);
@@ -90,7 +90,7 @@ public class FactoryImageDenoise {
 	 * @param maxPixelValue Maximum allowed pixel intensity value
 	 * @return filter for image noise removal.
 	 */
-	public static <T extends ImageGray> WaveletDenoiseFilter<T>
+	public static <T extends ImageGray<T>> WaveletDenoiseFilter<T>
 	waveletSure( Class<T> imageType , int numLevels , double minPixelValue , double maxPixelValue )
 	{
 		ImageDataType info = ImageDataType.classToType(imageType);

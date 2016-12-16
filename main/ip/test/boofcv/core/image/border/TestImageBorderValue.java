@@ -48,7 +48,7 @@ public class TestImageBorderValue extends GenericImageBorderTests {
 	}
 
 	@Override
-	public ImageBorder<ImageBase> wrap(ImageBase image) {
+	public ImageBorder wrap(ImageBase image) {
 		if( image instanceof ImageGray)
 			return ImageBorderValue.wrap((ImageGray)image,value);
 		else if( image instanceof ImageInterleaved )

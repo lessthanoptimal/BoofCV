@@ -29,7 +29,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class LocalSauvolaBinaryFilter<T extends ImageGray> implements InputToBinary<T> {
+public class LocalSauvolaBinaryFilter<T extends ImageGray<T>> implements InputToBinary<T> {
 
 	ImageType<T> inputType;
 

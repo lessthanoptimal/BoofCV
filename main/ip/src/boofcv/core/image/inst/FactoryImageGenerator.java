@@ -32,17 +32,17 @@ import java.lang.reflect.Array;
 @SuppressWarnings({"unchecked"})
 public class FactoryImageGenerator {
 
-	public static <T extends ImageGray> ImageGenerator<T> create(Class<T> type )
+	public static <T extends ImageGray<T>> ImageGenerator<T> create(Class<T> type )
 	{
 		return new SingleBandGenerator(type);
 	}
 
-	public static <T extends ImageGray> ImageGenerator<T> create(T original )
+	public static <T extends ImageGray<T>> ImageGenerator<T> create(T original )
 	{
 		return new WrapImage(original);
 	}
 
-	public static class WrapImage<T extends ImageGray> implements ImageGenerator<T>
+	public static class WrapImage<T extends ImageGray<T>> implements ImageGenerator<T>
 	{
 		T original;
 

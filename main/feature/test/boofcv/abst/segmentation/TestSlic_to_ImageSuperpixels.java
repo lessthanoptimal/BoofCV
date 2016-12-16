@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageType;
 /**
  * @author Peter Abeles
  */
-public class TestSlic_to_ImageSuperpixels<T extends ImageBase> extends GeneralImageSuperpixelsChecks<T> {
+public class TestSlic_to_ImageSuperpixels<T extends ImageBase<T>> extends GeneralImageSuperpixelsChecks<T> {
 	public TestSlic_to_ImageSuperpixels() {
 		super(ImageType.single(GrayU8.class),
 				ImageType.single(GrayF32.class),

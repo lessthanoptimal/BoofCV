@@ -29,7 +29,7 @@ import boofcv.struct.pyramid.ImagePyramid;
  *
  * @author Peter Abeles
  */
-public class PyramidKltForCombined<I extends ImageGray, D extends ImageGray> {
+public class PyramidKltForCombined<I extends ImageGray<I>, D extends ImageGray<D>> {
 	/** configuration for low level KLT tracker */
 	public KltConfig config;
 

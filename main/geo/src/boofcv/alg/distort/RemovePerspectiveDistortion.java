@@ -37,7 +37,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class RemovePerspectiveDistortion<T extends ImageBase> {
+public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 	FDistort distort;
 
 	// computes the homography

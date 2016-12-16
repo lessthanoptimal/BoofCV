@@ -37,7 +37,7 @@ import boofcv.struct.image.Planar;
  *
  * @author Peter Abeles
  */
-public class DescribePointSurfPlanar<II extends ImageGray>
+public class DescribePointSurfPlanar<II extends ImageGray<II>>
 {
 	// SURF algorithms
 	private DescribePointSurf<II> describe;

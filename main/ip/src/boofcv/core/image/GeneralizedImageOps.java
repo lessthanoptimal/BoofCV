@@ -42,7 +42,7 @@ public class GeneralizedImageOps {
 	 * @param typeDst The type of output image.
 	 * @return Converted image.
 	 */
-	public static <T extends ImageGray> T convert(ImageGray<?> src , T dst , Class<T> typeDst  )
+	public static <T extends ImageGray<T>> T convert(ImageGray<?> src , T dst , Class<T> typeDst  )
 	{
 		if (dst == null) {
 			dst =(T) createSingleBand(typeDst, src.width, src.height);
@@ -116,11 +116,11 @@ public class GeneralizedImageOps {
 
 	public static <T extends ImageGray> T createSingleBand(ImageDataType type, int width, int height) {
 		Class<T> typeClass = ImageType.getImageClass(ImageType.Family.GRAY, type);
-		return createSingleBand(typeClass, width, height);
+		return (T)createSingleBand(typeClass, width, height);
 	}
 
 	public static <T extends ImageBase> T createImage(Class<T> type, int width, int height, int numBands ) {
-		if( type == Planar.class )
+		if( (Class)type == Planar.class )
 			throw new IllegalArgumentException("Can't use this function with planar because the data type needs to be specified too");
 
 		if( ImageGray.class.isAssignableFrom(type))
@@ -130,7 +130,7 @@ public class GeneralizedImageOps {
 		else
 			throw new RuntimeException("Unknown");
 	}
-	public static <T extends ImageGray> T createSingleBand(Class<T> type, int width, int height) {
+	public static <T extends ImageGray<T>> T createSingleBand(Class<T> type, int width, int height) {
 		type = BoofTesting.convertGenericToSpecificType(type);
 
 		if (type == GrayU8.class) {
@@ -149,7 +149,7 @@ public class GeneralizedImageOps {
 			return (T)new GrayF32(width, height);
 		} else if (type == GrayF64.class) {
 			return (T)new GrayF64(width, height);
-		} else if( type == GrayI.class ) {
+		} else if( (Class)type == GrayI.class ) {
 			// ImageInteger is a generic type, so just create something
 			return (T)new GrayS32(width,height);
 		}
@@ -158,10 +158,10 @@ public class GeneralizedImageOps {
 
 	public static <T extends ImageInterleaved> T createInterleaved(ImageDataType type, int width, int height , int numBands) {
 		Class<T> typeClass = ImageType.getImageClass(ImageType.Family.INTERLEAVED, type);
-		return createInterleaved(typeClass,width,height,numBands);
+		return (T)createInterleaved(typeClass,width,height,numBands);
 	}
 
-	public static <T extends ImageInterleaved> T createInterleaved(Class<T> type, int width, int height , int numBands) {
+	public static <T extends ImageInterleaved<T>> T createInterleaved(Class<T> type, int width, int height , int numBands) {
 		type = BoofTesting.convertGenericToSpecificType(type);
 
 		if (type == InterleavedU8.class) {
@@ -180,7 +180,7 @@ public class GeneralizedImageOps {
 			return (T)new InterleavedF32(width, height,numBands);
 		} else if (type == InterleavedF64.class) {
 			return (T)new InterleavedF64(width, height,numBands);
-		} else if( type == ImageInterleaved.class ) {
+		} else if( (Class)type == ImageInterleaved.class ) {
 			// ImageInteger is a generic type, so just create something
 			return (T)new InterleavedS32(width,height,numBands);
 		}
@@ -273,7 +273,7 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static <T extends ImageGray> int getNumBits(Class<T> type) {
+	public static <T extends ImageGray<T>> int getNumBits(Class<T> type) {
 		if (type == GrayU8.class) {
 			return 8;
 		} else if (type == GrayS8.class) {

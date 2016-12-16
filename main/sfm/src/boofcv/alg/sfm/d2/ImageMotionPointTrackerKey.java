@@ -39,7 +39,7 @@ import java.util.List;
  * @param <IT> Motion model data type
  */
 @SuppressWarnings("unchecked")
-public class ImageMotionPointTrackerKey<I extends ImageBase, IT extends InvertibleTransform>
+public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends InvertibleTransform>
 {
 	// total number of frames processed
 	protected int totalFramesProcessed = 0;

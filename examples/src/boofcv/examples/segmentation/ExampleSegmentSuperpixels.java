@@ -50,7 +50,7 @@ public class ExampleSegmentSuperpixels {
 	/**
 	 * Segments and visualizes the image
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	void performSegmentation( ImageSuperpixels<T> alg , T color )
 	{
 		// Segmentation often works better after blurring the image.  Reduces high frequency image components which
@@ -73,7 +73,7 @@ public class ExampleSegmentSuperpixels {
 	 * 2) Each pixel is assigned the mean color through out the region. 3) Black pixels represent the border
 	 * between regions.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	void visualize(GrayS32 pixelToRegion , T color , int numSegments  )
 	{
 		// Computes the mean color inside each region

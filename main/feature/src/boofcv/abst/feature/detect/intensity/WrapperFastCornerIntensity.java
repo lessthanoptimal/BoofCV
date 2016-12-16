@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
  * 
  * @author Peter Abeles
  */
-public class WrapperFastCornerIntensity<I extends ImageGray, D extends ImageGray>
+public class WrapperFastCornerIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
 		extends BaseGeneralFeatureIntensity<I,D>
 {
 	FastCornerIntensity<I> alg;

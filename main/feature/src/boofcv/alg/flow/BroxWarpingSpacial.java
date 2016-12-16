@@ -51,7 +51,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class BroxWarpingSpacial<T extends ImageGray> extends DenseFlowPyramidBase<T> {
+public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramidBase<T> {
 
 	// regularization term
 	private static final double EPSILON = 0.001;

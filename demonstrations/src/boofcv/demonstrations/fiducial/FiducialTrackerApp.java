@@ -66,7 +66,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FiducialTrackerApp<I extends ImageGray>
+public class FiducialTrackerApp<I extends ImageGray<I>>
 		extends VideoProcessAppBase<Planar<I>>
 {
 	private static final String SQUARE_NUMBER = "Square Number";

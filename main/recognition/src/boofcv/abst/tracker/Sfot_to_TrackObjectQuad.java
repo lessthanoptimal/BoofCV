@@ -32,7 +32,7 @@ import georegression.struct.shapes.Quadrilateral_F64;
  *
  * @author Peter Abeles
  */
-public class Sfot_to_TrackObjectQuad<T extends ImageGray, D extends ImageGray>
+public class Sfot_to_TrackObjectQuad<T extends ImageGray<T>, D extends ImageGray<D>>
 		implements TrackerObjectQuad<T>
 {
 	SparseFlowObjectTracker<T,D> alg;

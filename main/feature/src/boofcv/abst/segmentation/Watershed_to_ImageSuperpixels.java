@@ -40,7 +40,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-public class Watershed_to_ImageSuperpixels<T extends ImageBase> implements ImageSuperpixels<T> {
+public class Watershed_to_ImageSuperpixels<T extends ImageBase<T>> implements ImageSuperpixels<T> {
 
 	private WatershedVincentSoille1991 alg;
 	private ConnectRule rule;

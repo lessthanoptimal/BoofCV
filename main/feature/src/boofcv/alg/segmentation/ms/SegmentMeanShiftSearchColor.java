@@ -36,7 +36,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends SegmentMeanShiftSearch<T> {
+public class SegmentMeanShiftSearchColor<T extends ImageMultiBand<T>> extends SegmentMeanShiftSearch<T> {
 
 	// Interpolation routine used to get sub-pixel samples
 	protected InterpolatePixelMB<T> interpolate;

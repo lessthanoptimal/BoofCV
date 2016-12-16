@@ -46,7 +46,7 @@ import georegression.struct.shapes.RectangleLength2D_I32;
  *
  * @author Peter Abeles
  */
-public class TrackerMeanShiftLikelihood<T extends ImageBase> {
+public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 
 	// likelihood model for the target being tracked
 	private SparseImageSample_F32<T> targetModel;

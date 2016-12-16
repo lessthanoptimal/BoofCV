@@ -30,7 +30,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public interface DdaFeatureManager<I extends ImageGray, Desc extends TupleDesc>
+public interface DdaFeatureManager<I extends ImageGray<I>, Desc extends TupleDesc>
 		extends DescriptorInfo<Desc>
 {
 	/**

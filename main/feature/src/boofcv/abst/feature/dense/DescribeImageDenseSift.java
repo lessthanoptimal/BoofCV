@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DescribeImageDenseSift<T extends ImageGray, D extends ImageGray>
+public class DescribeImageDenseSift<T extends ImageGray<T>, D extends ImageGray<D>>
 		implements DescribeImageDense<T,TupleDesc_F64>
 {
 	// dense SIFT implementation

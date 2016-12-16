@@ -43,7 +43,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface TemplateMatchingIntensity<T extends ImageBase> {
+public interface TemplateMatchingIntensity<T extends ImageBase<T>> {
 
 	/**
 	 * Specifies the input image which the template is going ot be matched against

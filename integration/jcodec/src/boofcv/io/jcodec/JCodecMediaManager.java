@@ -77,7 +77,7 @@ public class JCodecMediaManager implements MediaManager {
 	}
 
 	@Override
-	public <T extends ImageBase> SimpleImageSequence<T>
+	public <T extends ImageBase<T>> SimpleImageSequence<T>
 	openVideo(String fileName, ImageType<T> type) {
 
 		if( fileName.endsWith("mjpeg") || fileName.endsWith("MJPEG") ) {
@@ -100,7 +100,7 @@ public class JCodecMediaManager implements MediaManager {
 	}
 
 	@Override
-	public <T extends ImageBase> SimpleImageSequence<T>
+	public <T extends ImageBase<T>> SimpleImageSequence<T>
 	openCamera(String device, int width, int height, ImageType<T> imageType) {
 		throw new RuntimeException("Not supported");
 	}

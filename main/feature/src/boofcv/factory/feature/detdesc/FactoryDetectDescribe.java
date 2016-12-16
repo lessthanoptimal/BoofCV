@@ -65,7 +65,7 @@ public class FactoryDetectDescribe {
 	 * @param config Configuration for the SIFT detector and descriptor.
 	 * @return SIFT
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	DetectDescribePoint<T,BrightFeature> sift(ConfigCompleteSift config )
 	{
 		if( config == null )
@@ -111,7 +111,7 @@ public class FactoryDetectDescribe {
 	 * @param configOrientation		Configuration for orientation
 	 * @return SURF detector and descriptor
 	 */
-	public static <T extends ImageGray, II extends ImageGray>
+	public static <T extends ImageGray<T>, II extends ImageGray<II>>
 	DetectDescribePoint<T,BrightFeature> surfFast(ConfigFastHessian configDetector ,
 												  ConfigSurfDescribe.Speed configDesc,
 												  ConfigAverageIntegral configOrientation,
@@ -142,7 +142,7 @@ public class FactoryDetectDescribe {
 	 * @param configOrientation		Configuration for orientation
 	 * @return SURF detector and descriptor
 	 */
-	public static <T extends ImageGray, II extends ImageGray>
+	public static <T extends ImageGray<T>, II extends ImageGray<II>>
 	DetectDescribePoint<T,BrightFeature> surfColorFast(ConfigFastHessian configDetector ,
 													   ConfigSurfDescribe.Speed configDesc,
 													   ConfigAverageIntegral configOrientation,
@@ -189,7 +189,7 @@ public class FactoryDetectDescribe {
 	 * @param imageType Specify type of input image.
 	 * @return SURF detector and descriptor
 	 */
-	public static <T extends ImageGray, II extends ImageGray>
+	public static <T extends ImageGray<T>, II extends ImageGray<II>>
 	DetectDescribePoint<T,BrightFeature> surfStable(ConfigFastHessian configDetector,
 													ConfigSurfDescribe.Stability configDescribe,
 													ConfigSlidingIntegral configOrientation,
@@ -221,7 +221,7 @@ public class FactoryDetectDescribe {
 	 * @param imageType Specify type of color input image.
 	 * @return SURF detector and descriptor
 	 */
-	public static <T extends ImageMultiBand, II extends ImageGray>
+	public static <T extends ImageMultiBand<T>, II extends ImageGray<II>>
 	DetectDescribePoint<T,BrightFeature> surfColorStable(ConfigFastHessian configDetector,
 														 ConfigSurfDescribe.Stability configDescribe,
 														 ConfigSlidingIntegral configOrientation,
@@ -256,7 +256,7 @@ public class FactoryDetectDescribe {
 	 * @param describe Feature descriptor
 	 * @return {@link DetectDescribePoint}.
 	 */
-	public static <T extends ImageGray, D extends TupleDesc>
+	public static <T extends ImageGray<T>, D extends TupleDesc>
 	DetectDescribePoint<T,D> fuseTogether( InterestPointDetector<T> detector,
 										   OrientationImage<T> orientation,
 										   DescribeRegionPoint<T, D> describe) {

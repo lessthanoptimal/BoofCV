@@ -37,7 +37,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface HarrisCornerIntensity<T extends ImageGray> extends GradientCornerIntensity<T> {
+public interface HarrisCornerIntensity<T extends ImageGray<T>> extends GradientCornerIntensity<T> {
 
 	/**
 	 * Returns the value of the tuning parameter.

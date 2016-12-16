@@ -158,7 +158,7 @@ public class TestUtilWavelet {
 		adjustForDisplay(GrayS32.class);
 	}
 
-	public <T extends ImageGray>
+	public <T extends ImageGray<T>>
 	void adjustForDisplay( Class<T> imageType ) {
 		ImageDimension d = UtilWavelet.transformDimension(320, 240, 3);
 		T b = GeneralizedImageOps.createSingleBand(imageType,d.width,d.height);

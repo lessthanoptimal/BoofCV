@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface InterestPointScaleSpacePyramid<T extends ImageGray> {
+public interface InterestPointScaleSpacePyramid<T extends ImageGray<T>> {
 
 	/**
 	 * Detect features in the scale space image

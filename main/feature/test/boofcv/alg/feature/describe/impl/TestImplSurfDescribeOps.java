@@ -157,7 +157,7 @@ public class TestImplSurfDescribeOps {
 	/**
 	 * Creates an image with a constant gradient in the specified direction
 	 */
-	public static <I extends ImageGray>
+	public static <I extends ImageGray<I>>
 	void createGradient( double theta , I image ) {
 		GImageGray ret = FactoryGImageGray.wrap(image);
 
@@ -173,7 +173,7 @@ public class TestImplSurfDescribeOps {
 		}
 	}
 
-	public static < II extends ImageGray>
+	public static < II extends ImageGray<II>>
 	SparseScaleGradient<II,?> createGradient( II ii , double scale) {
 		SparseScaleGradient<II,?> ret =
 				SurfDescribeOps.createGradient(false,(Class<II>)ii.getClass());

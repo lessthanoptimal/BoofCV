@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralDenseOpticalFlowChecks<T extends ImageGray>
+public abstract class GeneralDenseOpticalFlowChecks<T extends ImageGray<T>>
 {
 	Random rand = new Random(234);
 	Class<T> imageType;

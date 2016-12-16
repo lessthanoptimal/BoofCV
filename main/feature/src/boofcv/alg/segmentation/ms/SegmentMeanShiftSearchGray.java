@@ -34,7 +34,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public class SegmentMeanShiftSearchGray<T extends ImageGray> extends SegmentMeanShiftSearch<T> {
+public class SegmentMeanShiftSearchGray<T extends ImageGray<T>> extends SegmentMeanShiftSearch<T> {
 
 	// Interpolation routine used to get sub-pixel samples
 	protected InterpolatePixelS<T> interpolate;

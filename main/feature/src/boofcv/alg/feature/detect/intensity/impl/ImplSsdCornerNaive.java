@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class ImplSsdCornerNaive<T extends ImageGray> implements ShiTomasiCornerIntensity<T> {
+public class ImplSsdCornerNaive<T extends ImageGray<T>> implements ShiTomasiCornerIntensity<T> {
 
 	// feature's radius
 	private int radius;

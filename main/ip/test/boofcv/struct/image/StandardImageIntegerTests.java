@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings({"PointlessBooleanExpression"})
-public abstract class StandardImageIntegerTests<T extends GrayI> extends StandardSingleBandTests<T> {
+public abstract class StandardImageIntegerTests<T extends GrayI<T>> extends StandardSingleBandTests<T> {
 	boolean expectedSign;
 
 	protected StandardImageIntegerTests(boolean expectedSign) {

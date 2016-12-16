@@ -33,7 +33,7 @@ import boofcv.struct.sparse.SparseScaleSample_F64;
  */
 public class FactorySparseIntegralFilters {
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	SparseScaleSample_F64<T> sample( Class<T> imageType ) {
 		if( imageType == GrayF32.class )
 			return (SparseScaleSample_F64<T>)new SparseIntegralSample_F32();
@@ -43,7 +43,7 @@ public class FactorySparseIntegralFilters {
 			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());
 	}
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	SparseScaleGradient<T,?> gradient( Class<T> imageType ) {
 		if( imageType == GrayF32.class )
 			return (SparseScaleGradient<T,?>)new SparseIntegralGradient_NoBorder_F32();
@@ -53,7 +53,7 @@ public class FactorySparseIntegralFilters {
 			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());
 	}
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	SparseScaleGradient<T,?> haar( Class<T> imageType ) {
 		if( imageType == GrayF32.class )
 			return (SparseScaleGradient<T,?>)new SparseIntegralHaar_NoBorder_F32();

@@ -33,6 +33,7 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import static boofcv.factory.feature.tracker.FactoryPointTracker.createShiTomasi;
@@ -49,7 +50,7 @@ public class FactoryPointTrackerTwoPass {
 	 * @param configExtract Configuration for extracting features
 	 * @return KLT based tracker.
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTrackerTwoPass<I> klt(PkltConfig config, ConfigGeneralDetector configExtract,
 							   Class<I> imageType, Class<D> derivType) {
 
@@ -60,13 +61,14 @@ public class FactoryPointTrackerTwoPass {
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType, derivType);
 
-		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidScaling,-1,2,true,imageType);
+		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(
+				config.pyramidScaling,-1,2,true, ImageType.single(imageType));
 
 		return new PointTrackerTwoPassKltPyramid<>(config.config, config.templateRadius, pyramid, detector,
 				gradient, interpInput, interpDeriv);
 	}
 
-	public static <I extends ImageGray, D extends ImageGray, Desc extends TupleDesc>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
 	PointTrackerTwoPass<I> dda(GeneralFeatureDetector<I, D> detector,
 							   DescribeRegionPoint<I, Desc> describe,
 							   AssociateDescription2D<Desc> associate1,
@@ -84,7 +86,7 @@ public class FactoryPointTrackerTwoPass {
 		return new DetectDescribeAssociateTwoPass<>(manager, associate1, associate2, false);
 	}
 
-	public static <I extends ImageGray, Desc extends TupleDesc>
+	public static <I extends ImageGray<I>, Desc extends TupleDesc>
 	PointTrackerTwoPass<I> dda(DetectDescribePoint<I,Desc> detectDescribe,
 							   AssociateDescription2D<Desc> associate1 ,
 							   AssociateDescription2D<Desc> associate2 ,

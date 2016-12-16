@@ -38,7 +38,7 @@ import java.io.*;
  *
  * @author Peter Abeles
  */
-public class ImageStreamSequence<T extends ImageBase>
+public class ImageStreamSequence<T extends ImageBase<T>>
 		implements SimpleImageSequence<T>
 {
 	// If the data set was read from a file it can then be restarted

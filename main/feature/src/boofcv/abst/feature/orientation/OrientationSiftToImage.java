@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class OrientationSiftToImage<T extends ImageGray>
+public class OrientationSiftToImage<T extends ImageGray<T>>
 		implements OrientationImage<T>
 {
 	UnrollSiftScaleSpaceGradient scaleSpace;

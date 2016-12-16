@@ -35,7 +35,7 @@ public class TestBackgroundStationaryBasic_SB extends GenericBackgroundStationar
 	}
 
 	@Override
-	public <T extends ImageBase> BackgroundModelStationary<T>
+	public <T extends ImageBase<T>> BackgroundModelStationary<T>
 	create(ImageType<T> imageType) {
 		return new BackgroundStationaryBasic_SB(0.05f,10f,imageType.getImageClass());
 	}

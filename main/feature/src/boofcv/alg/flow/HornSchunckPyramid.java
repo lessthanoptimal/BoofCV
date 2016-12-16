@@ -44,7 +44,7 @@ import boofcv.struct.pyramid.ImagePyramid;
  *
  * @author Peter Abeles
  */
-public class HornSchunckPyramid< T extends ImageGray>
+public class HornSchunckPyramid<T extends ImageGray<T>>
 		extends DenseFlowPyramidBase<T>
 {
 	// used to weight the error of image brightness and smoothness of velocity flow

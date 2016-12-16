@@ -20,7 +20,7 @@ package boofcv.abst.filter.convolve;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
 
 
 /**
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface ConvolveInterface <Input extends ImageGray, Output extends ImageGray>
+public interface ConvolveInterface <Input extends ImageBase<Input>, Output extends ImageBase<Output>>
 		extends FilterImageInterface<Input,Output>
 {
 	/**

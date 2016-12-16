@@ -44,7 +44,7 @@ public class FactoryDistort {
 	 * @param outputType Type of output image
 	 * @return ImageDistort
 	 */
-	public static <Input extends ImageBase, Output extends ImageBase>
+	public static <Input extends ImageBase<Input>, Output extends ImageBase<Output>>
 	ImageDistort<Input, Output> distort(boolean cached, InterpolationType interpolationType, BorderType borderType,
 										ImageType<Input> inputType, ImageType<Output> outputType) {
 		InterpolatePixel<Input> interp =
@@ -62,7 +62,7 @@ public class FactoryDistort {
 	 * @param outputType Type of output image.
 	 * @return ImageDistort
 	 */
-	public static <Input extends ImageBase, Output extends ImageBase>
+	public static <Input extends ImageBase<Input>, Output extends ImageBase<Output>>
 	ImageDistort<Input, Output> distort(boolean cached, InterpolatePixel<Input> interp, ImageType<Output> outputType) {
 		switch( outputType.getFamily() ) {
 			case GRAY:
@@ -87,7 +87,7 @@ public class FactoryDistort {
 	 * @param interp Which interpolation algorithm should be used.
 	 * @param outputType Type of output image.
 	 */
-	public static <Input extends ImageGray, Output extends ImageGray>
+	public static <Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 	ImageDistort<Input, Output> distortSB(boolean cached, InterpolatePixelS<Input> interp, Class<Output> outputType)
 	{
 		if( cached ) {
@@ -125,7 +125,7 @@ public class FactoryDistort {
 	 * @param interp Which interpolation algorithm should be used.
 	 * @param outputType Type of output image.
 	 */
-	public static <Input extends ImageGray,Output extends ImageGray>
+	public static <Input extends ImageGray<Input>,Output extends ImageGray<Output>>
 	ImageDistort<Planar<Input>,Planar<Output>>
 	distortPL(boolean cached , InterpolatePixelS<Input> interp, Class<Output> outputType)
 	{
@@ -133,7 +133,7 @@ public class FactoryDistort {
 		return new ImplImageDistort_PL<>(distortSingle);
 	}
 
-	public static <Input extends ImageInterleaved, Output extends ImageInterleaved>
+	public static <Input extends ImageInterleaved<Input>, Output extends ImageInterleaved<Output>>
 	ImageDistort<Input, Output>
 	distortIL(boolean cached, InterpolatePixelMB<Input> interp, ImageType<Output> outputType)
 	{

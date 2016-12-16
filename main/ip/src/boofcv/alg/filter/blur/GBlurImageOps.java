@@ -40,7 +40,7 @@ public class GBlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	T mean(T input, T output, int radius, ImageBase storage ) {
 		if( input instanceof GrayU8) {
 			return (T)BlurImageOps.mean((GrayU8)input,(GrayU8)output,radius,(GrayU8)storage);
@@ -64,7 +64,7 @@ public class GBlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	T median(T input, T output, int radius ) {
 		if( input instanceof GrayU8) {
 			return (T)BlurImageOps.median((GrayU8) input, (GrayU8) output, radius);
@@ -88,7 +88,7 @@ public class GBlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	T gaussian(T input, T output, double sigma , int radius, T storage ) {
 		if( input instanceof GrayU8) {
 			return (T)BlurImageOps.gaussian((GrayU8)input,(GrayU8)output,sigma,radius,(GrayU8)storage);

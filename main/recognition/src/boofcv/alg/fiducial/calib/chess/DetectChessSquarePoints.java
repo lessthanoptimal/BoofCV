@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectChessSquarePoints<T extends ImageGray> {
+public class DetectChessSquarePoints<T extends ImageGray<T>> {
 
 	// detector for squares
 	BinaryPolygonDetector<T> detectorSquare;

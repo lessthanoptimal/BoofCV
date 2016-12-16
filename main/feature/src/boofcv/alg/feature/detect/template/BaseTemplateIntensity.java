@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class BaseTemplateIntensity<T extends ImageBase>
+public abstract class BaseTemplateIntensity<T extends ImageBase<T>>
 		implements TemplateMatchingIntensity<T> {
 	// Match intensity image
 	private GrayF32 intensity = new GrayF32(1, 1);

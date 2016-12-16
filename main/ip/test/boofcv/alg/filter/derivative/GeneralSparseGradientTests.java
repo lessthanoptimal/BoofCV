@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 public abstract class GeneralSparseGradientTests
-<T extends ImageGray, D extends ImageGray,G extends GradientValue>
+<T extends ImageGray<T>, D extends ImageGray<D>,G extends GradientValue>
 	extends GeneralSparseOperatorTests<T>
 {
 

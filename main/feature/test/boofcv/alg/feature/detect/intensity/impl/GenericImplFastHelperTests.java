@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericImplFastHelperTests<T extends ImageGray> {
+public abstract class GenericImplFastHelperTests<T extends ImageGray<T>> {
 
 	Class<T> imageType;
 	FastHelper<T> alg;

@@ -34,7 +34,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class JavaCVVideoImageSequence<T extends ImageBase> implements SimpleImageSequence<T>
+public class JavaCVVideoImageSequence<T extends ImageBase<T>> implements SimpleImageSequence<T>
 {
 	String filename;
 	FFmpegFrameGrabber frameGrabber;

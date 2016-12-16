@@ -53,7 +53,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public abstract class DenseOpticalFlowBlockPyramid<T extends ImageGray> {
+public abstract class DenseOpticalFlowBlockPyramid<T extends ImageGray<T>> {
 
 	// the maximum displacement it will search
 	protected int searchRadius;

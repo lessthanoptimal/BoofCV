@@ -23,6 +23,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.convolve.FactoryConvolveDown;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 /**
@@ -44,7 +45,7 @@ import boofcv.struct.pyramid.PyramidDiscrete;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidDiscreteSampleBlur<T extends ImageGray> extends PyramidDiscrete<T> {
+public class PyramidDiscreteSampleBlur<T extends ImageGray<T>> extends PyramidDiscrete<T> {
 
 	// stores the results from the first convolution
 	private T temp;
@@ -66,7 +67,7 @@ public class PyramidDiscreteSampleBlur<T extends ImageGray> extends PyramidDiscr
 	public PyramidDiscreteSampleBlur(Kernel1D kernel, double sigma, Class<T> imageType,
 									 boolean saveOriginalReference, int... scaleFactors)
 	{
-		super(imageType,saveOriginalReference,scaleFactors);
+		super(ImageType.single(imageType),saveOriginalReference,scaleFactors);
 
 		horizontal = FactoryConvolveDown.convolve(kernel,imageType,imageType,
 				BorderType.NORMALIZED,true,1);

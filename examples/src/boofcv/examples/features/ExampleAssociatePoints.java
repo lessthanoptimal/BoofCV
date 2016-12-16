@@ -49,7 +49,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ExampleAssociatePoints<T extends ImageGray, TD extends TupleDesc> {
+public class ExampleAssociatePoints<T extends ImageGray<T>, TD extends TupleDesc> {
 
 	// algorithm used to detect and describe interest points
 	DetectDescribePoint<T, TD> detDesc;

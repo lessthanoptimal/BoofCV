@@ -35,7 +35,7 @@ import java.util.Stack;
  *
  * @author Peter Abeles
  */
-public class TldTemplateMatching<T extends ImageGray> {
+public class TldTemplateMatching<T extends ImageGray<T>> {
 
 	// set of features for positive and negative examples
 	private List<NccFeature> templatePositive = new ArrayList<>();

@@ -39,7 +39,7 @@ public class TestBackgroundMovingGaussian_IL extends GenericBackgroundMovingGaus
 	}
 
 	@Override
-	public <T extends ImageBase> BackgroundModelMoving<T, Homography2D_F32>
+	public <T extends ImageBase<T>> BackgroundModelMoving<T, Homography2D_F32>
 	create(ImageType<T> imageType) {
 		PointTransformHomography_F32 transform = new PointTransformHomography_F32();
 		BackgroundMovingGaussian_IL alg =

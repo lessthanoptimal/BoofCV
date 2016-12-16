@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkFiducialDetector<T extends ImageGray> {
+public class BenchmarkFiducialDetector<T extends ImageGray<T>> {
 
 	FiducialDetector<T> detector;
 	List<T> images = new ArrayList<>();

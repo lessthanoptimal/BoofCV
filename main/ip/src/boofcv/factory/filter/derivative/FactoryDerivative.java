@@ -49,7 +49,7 @@ public class FactoryDerivative {
 	 * @param <D> Output type
 	 * @return Gradient
 	 */
-	public static <I extends ImageMultiBand, M extends ImageMultiBand, D extends ImageGray>
+	public static <I extends ImageMultiBand<I>, M extends ImageMultiBand<M>, D extends ImageGray<D>>
 	ImageGradient<I,D> gradientReduce( ImageGradient<I,M> gradient ,
 									   DerivativeReduceType type,
 									   Class<D> outputType )
@@ -93,7 +93,7 @@ public class FactoryDerivative {
 	 * @param <D> Derivative image
 	 * @return gradient filter
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	ImageGradient<I,D> gradientSB( DerivativeType type , Class<I> inputType , Class<D> derivType )
 	{
 		if( derivType == null )
@@ -141,7 +141,7 @@ public class FactoryDerivative {
 	 * @param <D> Derivative type
 	 * @return the filter
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	ImageGradient<Planar<I>,Planar<D>>
 	gradientPL(DerivativeType type , int numBands , Class<I> inputType , Class<D> derivType )
 	{
@@ -150,7 +150,7 @@ public class FactoryDerivative {
 	}
 
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageBase<I>, D extends ImageBase<D>>
 	ImageGradient<I,D>
 	gradient(DerivativeType type , ImageType<I> inputType , ImageType<D> derivType )
 	{
@@ -179,7 +179,7 @@ public class FactoryDerivative {
 		}
 	}
 
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	ImageGradient<I,D> prewitt( Class<I> inputType , Class<D> derivType)
 	{
 		if( derivType == null )
@@ -189,7 +189,7 @@ public class FactoryDerivative {
 		return new ImageGradient_Reflection<>(m);
 	}
 
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	ImageGradient<I,D> sobel( Class<I> inputType , Class<D> derivType)
 	{
 		if( derivType == null )
@@ -199,7 +199,7 @@ public class FactoryDerivative {
 		return new ImageGradient_Reflection<>(m);
 	}
 
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	ImageGradient<I,D> three( Class<I> inputType , Class<D> derivType)
 	{
 		if( derivType == null )
@@ -208,7 +208,7 @@ public class FactoryDerivative {
 		return new ImageGradient_Reflection<>(m);
 	}
 
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	ImageGradient<I,D> two0(Class<I> inputType, Class<D> derivType)
 	{
 		if( derivType == null )
@@ -217,7 +217,7 @@ public class FactoryDerivative {
 		return new ImageGradient_Reflection<>(m);
 	}
 
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	ImageGradient<I,D> two1(Class<I> inputType, Class<D> derivType)
 	{
 		if( derivType == null )
@@ -226,7 +226,7 @@ public class FactoryDerivative {
 		return new ImageGradient_Reflection<>(m);
 	}
 
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	ImageHessianDirect<I,D> hessianDirectThree( Class<I> inputType , Class<D> derivType)
 	{
 		if( derivType == null )
@@ -235,7 +235,7 @@ public class FactoryDerivative {
 		return new ImageHessianDirect_Reflection<>(m);
 	}
 
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	ImageHessianDirect<I,D> hessianDirectSobel( Class<I> inputType , Class<D> derivType)
 	{
 		if( derivType == null )
@@ -244,20 +244,20 @@ public class FactoryDerivative {
 		return new ImageHessianDirect_Reflection<>(m);
 	}
 
-	public static <D extends ImageGray>
+	public static <D extends ImageGray<D>>
 	ImageHessian<D> hessian( Class<?> gradientType , Class<D> derivType ) {
 		Method m = findHessianFromGradient(gradientType,derivType);
 		return new ImageHessian_Reflection<>(m);
 	}
 
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	ImageGradient<I,D> gaussian( double sigma , int radius , Class<I> inputType , Class<D> derivType) {
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 		return new ImageGradient_Gaussian<>(sigma, radius, inputType, derivType);
 	}
 
-	public static <D extends ImageGray> ImageHessian<D> hessianSobel(Class<D> derivType ) {
+	public static <D extends ImageGray<D>> ImageHessian<D> hessianSobel(Class<D> derivType ) {
 		if( derivType == GrayF32.class )
 			return (ImageHessian<D>)hessian(GradientSobel.class,GrayF32.class);
 		else if( derivType == GrayS16.class )
@@ -266,7 +266,7 @@ public class FactoryDerivative {
 			throw new IllegalArgumentException("Not supported yet");
 	}
 
-	public static <D extends ImageGray> ImageHessian<D> hessianPrewitt(Class<D> derivType ) {
+	public static <D extends ImageGray<D>> ImageHessian<D> hessianPrewitt(Class<D> derivType ) {
 		if( derivType == GrayF32.class )
 			return (ImageHessian<D>)hessian(GradientPrewitt.class,GrayF32.class);
 		else if( derivType == GrayS16.class )
@@ -275,7 +275,7 @@ public class FactoryDerivative {
 			throw new IllegalArgumentException("Not supported yet");
 	}
 
-	public static <D extends ImageGray> ImageHessian<D> hessianThree(Class<D> derivType ) {
+	public static <D extends ImageGray<D>> ImageHessian<D> hessianThree(Class<D> derivType ) {
 		if( derivType == GrayF32.class )
 			return (ImageHessian<D>)hessian(GradientThree.class,GrayF32.class);
 		else if( derivType == GrayS16.class )

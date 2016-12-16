@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class ImagePyramidPanel<T extends ImageGray> extends ListDisplayPanel {
+public class ImagePyramidPanel<T extends ImageGray<T>> extends ListDisplayPanel {
 
 	// the image pyramid.
 	ImagePyramid<T> pyramid;

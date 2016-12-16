@@ -32,7 +32,7 @@ import georegression.struct.se.Se3_F64;
  * @author Peter Abeles
  */
 // TODO more efficient scaling algorithm
-public class MonocularPlaneVisualOdometryScaleInput <T extends ImageBase> implements MonocularPlaneVisualOdometry<T>{
+public class MonocularPlaneVisualOdometryScaleInput <T extends ImageBase<T>> implements MonocularPlaneVisualOdometry<T>{
 
 	double scaleFactor;
 

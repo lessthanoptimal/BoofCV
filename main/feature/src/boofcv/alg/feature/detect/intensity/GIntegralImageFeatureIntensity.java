@@ -35,7 +35,7 @@ public class GIntegralImageFeatureIntensity {
 	 * @param size Hessian kernel's size.
 	 * @param intensity Output intensity image.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	void hessian( T integral, int skip , int size ,
 				  GrayF32 intensity) {
 

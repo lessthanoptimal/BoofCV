@@ -33,6 +33,7 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
 
 /**
@@ -40,7 +41,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class EdgeIntensitiesApp<T extends ImageGray> {
+public class EdgeIntensitiesApp<T extends ImageGray<T>> {
 
 	Class<T> imageType;
 
@@ -166,7 +167,8 @@ public class EdgeIntensitiesApp<T extends ImageGray> {
 			Kernel1D g = FactoryKernelGaussian.gaussian1D(GrayF32.class,sigma,-1);
 			Kernel1D d = GradientThree.getKernelX(false);
 			Kernel1D god = GKernelMath.convolve1D(d,g);
-			ConvolveInterface<T,T> f = FactoryConvolve.convolve(god,imageType,imageType, BorderType.EXTENDED,true);
+			ConvolveInterface<T,T> f = FactoryConvolve.convolve(god,
+					ImageType.single(imageType), ImageType.single(imageType), BorderType.EXTENDED,true);
 			f.process(input,blur);
 
 			printIntensity("Sigma "+sigma,blur);

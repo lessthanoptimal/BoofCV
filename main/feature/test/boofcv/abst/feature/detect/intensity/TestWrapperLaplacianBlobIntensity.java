@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
 /**
  * @author Peter Abeles
  */
-public class TestWrapperLaplacianBlobIntensity<I extends ImageGray, D extends ImageGray>
+public class TestWrapperLaplacianBlobIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
 		extends ChecksGeneralFeatureIntensity<I,D>
 {
 	public TestWrapperLaplacianBlobIntensity() {

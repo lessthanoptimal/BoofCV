@@ -54,7 +54,7 @@ public class FactoryInterestPoint {
 	 * @param derivType Image type for gradient.
 	 * @return The interest point detector.
 	 */
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	InterestPointDetector<T> wrapPoint(GeneralFeatureDetector<T, D> feature, double scale , Class<T> inputType, Class<D> derivType) {
 
 		ImageGradient<T, D> gradient = null;
@@ -77,7 +77,7 @@ public class FactoryInterestPoint {
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	InterestPointDetector<T> wrapDetector(FeatureLaplacePyramid<T, D> feature,
 										  double[] scales, boolean pyramid,
 										  Class<T> inputType) {
@@ -101,7 +101,7 @@ public class FactoryInterestPoint {
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	InterestPointDetector<T> wrapDetector(FeaturePyramid<T, D> feature,
 										  double[] scales, boolean pyramid,
 										  Class<T> inputType) {
@@ -124,12 +124,12 @@ public class FactoryInterestPoint {
 	 * @return The interest point detector.
 	 * @see FastHessianFeatureDetector
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	InterestPointDetector<T> fastHessian( ConfigFastHessian config ) {
 		return new WrapFHtoInterestPoint(FactoryInterestPointAlgs.fastHessian(config));
 	}
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	InterestPointDetector<T> sift(ConfigSiftScaleSpace configSS ,
 								  ConfigSiftDetector configDet , Class<T> imageType ) {
 

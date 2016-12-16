@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 
-public interface GeneralFeatureIntensity<I extends ImageGray,D extends ImageGray> {
+public interface GeneralFeatureIntensity<I extends ImageGray<I>,D extends ImageGray<D>> {
 
 	/**
 	 * Computes the corner's intensity.  Before computing the various image derivatives call

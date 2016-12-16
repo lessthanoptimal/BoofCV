@@ -29,7 +29,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class ScoreLineSegmentEdge<T extends ImageGray> extends BaseIntegralEdge<T> {
+public class ScoreLineSegmentEdge<T extends ImageGray<T>> extends BaseIntegralEdge<T> {
 
 	// how many points along the line it will sample
 	int numSamples;

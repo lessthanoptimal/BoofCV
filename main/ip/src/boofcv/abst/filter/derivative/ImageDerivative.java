@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public interface ImageDerivative<T extends ImageBase, D extends ImageBase> {
+public interface ImageDerivative<T extends ImageBase<T>, D extends ImageBase<D>> {
 
 	/**
 	 * Overrides using {@link BorderType#EXTENDED} along the image border.  Don't change this behavior unless

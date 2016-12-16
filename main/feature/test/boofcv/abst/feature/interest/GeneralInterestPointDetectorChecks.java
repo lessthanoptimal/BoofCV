@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray> {
+public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray<T>> {
 
 	private Random rand = new Random(234);
 

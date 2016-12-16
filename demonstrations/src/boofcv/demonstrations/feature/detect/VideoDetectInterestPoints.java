@@ -43,7 +43,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VideoDetectInterestPoints<T extends ImageGray>
+public class VideoDetectInterestPoints<T extends ImageGray<T>>
 		extends ProcessImageSequence<T> {
 
 	InterestPointDetector<T> detector;
@@ -99,7 +99,7 @@ public class VideoDetectInterestPoints<T extends ImageGray>
 		}
 	}
 
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	void perform( String fileName , Class<T> imageType , Class<D> derivType )
 	{
 		SimpleImageSequence<T> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageType.single(imageType));

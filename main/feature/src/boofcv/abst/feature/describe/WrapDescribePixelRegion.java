@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class WrapDescribePixelRegion<T extends ImageGray, D extends TupleDesc>
+public class WrapDescribePixelRegion<T extends ImageGray<T>, D extends TupleDesc>
 		implements DescribeRegionPoint<T,D>
 {
 	DescribePointPixelRegion<T,D> alg;

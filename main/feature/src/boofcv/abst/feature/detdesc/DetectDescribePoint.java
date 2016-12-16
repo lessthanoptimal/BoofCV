@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface DetectDescribePoint<T extends ImageBase, Desc extends TupleDesc>
+public interface DetectDescribePoint<T extends ImageBase<T>, Desc extends TupleDesc>
 		extends InterestPointDetector<T>, DescriptorInfo<Desc>
 {
 	/**

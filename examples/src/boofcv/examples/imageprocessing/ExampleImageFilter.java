@@ -74,7 +74,7 @@ public class ExampleImageFilter {
 		panel.addImage(outputImage,"Procedural Fixed Type");
 	}
 
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	void generalized( T input )
 	{
 		Class<T> inputType = (Class<T>)input.getClass();
@@ -95,7 +95,7 @@ public class ExampleImageFilter {
 		panel.addImage(outputImage,"Generalized "+inputType.getSimpleName());
 	}
 
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	void filter( T input )
 	{
 		Class<T> inputType = (Class<T>)input.getClass();

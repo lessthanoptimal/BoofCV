@@ -35,14 +35,14 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class ChecksImplDisparitySparseScoreSadRect<Image extends ImageGray,ArrayData> {
+public abstract class ChecksImplDisparitySparseScoreSadRect<I extends ImageGray<I>,ArrayData> {
 	Random rand = new Random(234);
 
 	DisparitySparseSelect<ArrayData> selectAlg;
 
-	Class<Image> imageType;
+	Class<I> imageType;
 
-	public ChecksImplDisparitySparseScoreSadRect(Class<Image> imageType) {
+	public ChecksImplDisparitySparseScoreSadRect(Class<I> imageType) {
 		this.imageType = imageType;
 
 		if( imageType == GrayF32.class ) {
@@ -52,11 +52,11 @@ public abstract class ChecksImplDisparitySparseScoreSadRect<Image extends ImageG
 		}
 	}
 
-	public abstract DisparityScoreSadRect<Image,GrayU8> createDense(int minDisparity , int maxDisparity,
-																	int radiusX, int radiusY );
+	public abstract DisparityScoreSadRect<I,GrayU8> createDense(int minDisparity , int maxDisparity,
+																int radiusX, int radiusY );
 
-	public abstract DisparitySparseScoreSadRect<ArrayData,Image> createSparse(int minDisparity , int maxDisparity,
-																			  int radiusX, int radiusY );
+	public abstract DisparitySparseScoreSadRect<ArrayData, I> createSparse(int minDisparity , int maxDisparity,
+																		   int radiusX, int radiusY );
 
 	/**
 	 * Compute disparity using the equivalent dense algorithm and see if the sparse one produces the
@@ -65,8 +65,8 @@ public abstract class ChecksImplDisparitySparseScoreSadRect<Image extends ImageG
 	@Test
 	public void compareToDense() {
 		int w = 20, h = 25;
-		Image left = GeneralizedImageOps.createSingleBand(imageType, w, h);
-		Image right = GeneralizedImageOps.createSingleBand(imageType,w, h);
+		I left = GeneralizedImageOps.createSingleBand(imageType, w, h);
+		I right = GeneralizedImageOps.createSingleBand(imageType,w, h);
 
 		if( left.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(left, rand, -20, 20);
@@ -80,14 +80,14 @@ public abstract class ChecksImplDisparitySparseScoreSadRect<Image extends ImageG
 		compareToDense(left, right, 2);
 	}
 
-	private void compareToDense(Image left, Image right, int minDisparity) {
+	private void compareToDense(I left, I right, int minDisparity) {
 		int w = left.width; int h = left.height;
 		int maxDisparity = 10;
 		int radiusX = 3;
 		int radiusY = 2;
 
-		DisparityScoreSadRect<Image,GrayU8> denseAlg = createDense(minDisparity,maxDisparity,radiusX,radiusY);
-		DisparitySparseScoreSadRect<ArrayData,Image> alg = createSparse(minDisparity,maxDisparity,radiusX,radiusY);
+		DisparityScoreSadRect<I,GrayU8> denseAlg = createDense(minDisparity,maxDisparity,radiusX,radiusY);
+		DisparitySparseScoreSadRect<ArrayData, I> alg = createSparse(minDisparity,maxDisparity,radiusX,radiusY);
 
 		GrayU8 expected = new GrayU8(w,h);
 		denseAlg.process(left, right, expected);

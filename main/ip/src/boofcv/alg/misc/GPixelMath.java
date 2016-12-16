@@ -34,7 +34,7 @@ public class GPixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static <T extends ImageBase> void abs( T input , T output )
+	public static <T extends ImageBase<T>> void abs( T input , T output )
 	{
 		if( input instanceof ImageGray) {
 			if (GrayS8.class == input.getClass()) {
@@ -82,7 +82,7 @@ public class GPixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the inverted image is written to. Modified.
 	 */
-	public static <T extends ImageBase> void invert( T input , T output )
+	public static <T extends ImageBase<T>> void invert( T input , T output )
 	{
 		if( input instanceof ImageGray) {
 			if (GrayS8.class == input.getClass()) {
@@ -129,7 +129,7 @@ public class GPixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static <T extends ImageBase> void divide(T input, double denominator, T output) {
+	public static <T extends ImageBase<T>> void divide(T input, double denominator, T output) {
 
 		if( input instanceof ImageGray) {
 			if (GrayU8.class == input.getClass()) {
@@ -190,7 +190,7 @@ public class GPixelMath {
 	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
-	public static <T extends ImageBase> void divide(T input, double denominator,
+	public static <T extends ImageBase<T>> void divide(T input, double denominator,
 													double lower , double upper  , T output)
 	{
 		if( input instanceof ImageGray) {
@@ -255,7 +255,7 @@ public class GPixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static <N extends ImageBase,D extends ImageBase> void divide(N imgA, D imgB , N output)
+	public static <N extends ImageBase,D extends ImageBase<D>> void divide(N imgA, D imgB , N output)
 	{
 		if( imgA instanceof ImageGray && imgB instanceof ImageGray ) {
 			if (GrayF32.class == imgA.getClass()) {
@@ -295,7 +295,7 @@ public class GPixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static <T extends ImageBase> void multiply(T input, double value, T output) {
+	public static <T extends ImageBase<T>> void multiply(T input, double value, T output) {
 
 		if( input instanceof ImageGray) {
 			if (GrayU8.class == input.getClass()) {
@@ -357,7 +357,7 @@ public class GPixelMath {
 	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
-	public static <T extends ImageBase> void multiply(T input, double value,
+	public static <T extends ImageBase<T>> void multiply(T input, double value,
 														  double lower , double upper , T output)
 	{
 		if( input instanceof ImageGray) {
@@ -422,7 +422,7 @@ public class GPixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static <N extends ImageBase,D extends ImageBase> void multiply(N imgA, D imgB , N output)
+	public static <N extends ImageBase,D extends ImageBase<D>> void multiply(N imgA, D imgB , N output)
 	{
 		if( imgA instanceof ImageGray && imgB instanceof ImageGray ) {
 			if (GrayF32.class == imgA.getClass()) {
@@ -470,7 +470,7 @@ public class GPixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the log image is written to. Modified.
 	 */
-	public static <T extends ImageBase> void log(T input , T output ) {
+	public static <T extends ImageBase<T>> void log(T input , T output ) {
 		if( input instanceof ImageGray ) {
 			if (GrayF32.class == input.getClass()) {
 				PixelMath.log((GrayF32) input, (GrayF32) output);
@@ -496,7 +496,7 @@ public class GPixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the pow2 image is written to. Modified.
 	 */
-	public static <T extends ImageBase> void pow2(T input , T output ) {
+	public static <T extends ImageBase<T>> void pow2(T input , T output ) {
 		if( input instanceof ImageGray ) {
 			if (GrayF32.class == input.getClass()) {
 				PixelMath.pow2((GrayF32) input, (GrayF32) output);
@@ -522,7 +522,7 @@ public class GPixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the sqrt() image is written to. Modified.
 	 */
-	public static <T extends ImageBase> void sqrt(T input , T output ) {
+	public static <T extends ImageBase<T>> void sqrt(T input , T output ) {
 		if( input instanceof ImageGray ) {
 			if( GrayF32.class == input.getClass() ) {
 				PixelMath.sqrt((GrayF32) input, (GrayF32) output);
@@ -549,7 +549,7 @@ public class GPixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static <T extends ImageBase> void plus(T input, double value, T output) {
+	public static <T extends ImageBase<T>> void plus(T input, double value, T output) {
 		if( input instanceof ImageGray) {
 			if (GrayU8.class == input.getClass()) {
 				PixelMath.plus((GrayU8) input, (int) value, (GrayU8) output);
@@ -609,7 +609,7 @@ public class GPixelMath {
 	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
-	public static <T extends ImageBase> void plus(T input, double value, double lower , double upper , T output)
+	public static <T extends ImageBase<T>> void plus(T input, double value, double lower , double upper , T output)
 	{
 		if( input instanceof ImageGray) {
 			if (GrayU8.class == input.getClass()) {
@@ -672,7 +672,7 @@ public class GPixelMath {
 	 * @param value What is subtracted from each element in input.
 	 * @param output The output image. Modified.
 	 */
-	public static <T extends ImageBase> void minus(T input, double value, T output) {
+	public static <T extends ImageBase<T>> void minus(T input, double value, T output) {
 		if( input instanceof ImageGray) {
 			if (GrayU8.class == input.getClass()) {
 				PixelMath.minus((GrayU8) input, (int) value, (GrayU8) output);
@@ -734,7 +734,7 @@ public class GPixelMath {
 	 * @param input The input image, elements subtracted from value. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static <T extends ImageBase> void minus( double value, T input, T output) {
+	public static <T extends ImageBase<T>> void minus( double value, T input, T output) {
 		if( input instanceof ImageGray) {
 			if( GrayU8.class == input.getClass() ) {
 				PixelMath.minus((int) value, (GrayU8) input, (GrayU8) output);
@@ -798,7 +798,7 @@ public class GPixelMath {
 	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
-	public static <T extends ImageBase> void minus(T input, double value,
+	public static <T extends ImageBase<T>> void minus(T input, double value,
 												   double lower , double upper , T output)
 	{
 		if( input instanceof ImageGray) {
@@ -864,7 +864,7 @@ public class GPixelMath {
 	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
-	public static <T extends ImageBase> void minus(double value, T input,
+	public static <T extends ImageBase<T>> void minus(double value, T input,
 														 double lower , double upper , T output)
 	{
 		if( input instanceof ImageGray) {
@@ -926,7 +926,7 @@ public class GPixelMath {
 	 * @param inputB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageBase, O extends ImageBase>
+	public static <T extends ImageBase<T>, O extends ImageBase>
 	void add(T inputA, T inputB, O output) {
 		if( inputA instanceof ImageGray) {
 			if (GrayU8.class == inputA.getClass()) {
@@ -968,7 +968,7 @@ public class GPixelMath {
 	 * @param inputB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageBase, O extends ImageBase>
+	public static <T extends ImageBase<T>, O extends ImageBase>
 	void subtract(T inputA, T inputB, O output) {
 		if( inputA instanceof ImageGray){
 			if( GrayU8.class == inputA.getClass() ) {
@@ -1010,7 +1010,7 @@ public class GPixelMath {
 	 * @param min minimum value. Inclusive.
 	 * @param max maximum value. Inclusive.
 	 */
-	public static <T extends ImageBase> void boundImage(T input , double min , double max ) {
+	public static <T extends ImageBase<T>> void boundImage(T input , double min , double max ) {
 		if( input instanceof ImageGray ) {
 			if (GrayU8.class == input.getClass()) {
 				PixelMath.boundImage((GrayU8) input, (int) min, (int) max);
@@ -1049,7 +1049,7 @@ public class GPixelMath {
 	 * @param inputB Input image. Not modified.
 	 * @param output Absolute value of difference image. Modified.
 	 */
-	public static <T extends ImageBase> void diffAbs(T inputA , T inputB , T output) {
+	public static <T extends ImageBase<T>> void diffAbs(T inputA , T inputB , T output) {
 		if( inputA instanceof ImageGray ) {
 			if (GrayU8.class == inputA.getClass()) {
 				PixelMath.diffAbs((GrayU8) inputA, (GrayU8) inputB, (GrayU8) output);
@@ -1087,7 +1087,7 @@ public class GPixelMath {
 	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static <T extends ImageGray> void averageBand(Planar<T> input, T output) {
+	public static <T extends ImageGray<T>> void averageBand(Planar<T> input, T output) {
 
 		if( GrayU8.class == input.getBandType() ) {
 			PixelMath.averageBand((Planar<GrayU8>) input, (GrayU8) output);

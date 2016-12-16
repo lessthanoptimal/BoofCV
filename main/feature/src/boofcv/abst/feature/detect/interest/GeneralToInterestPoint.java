@@ -36,7 +36,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public class GeneralToInterestPoint<T extends ImageGray, D extends ImageGray>
+public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends EasyGeneralFeatureDetector<T,D>
 		implements InterestPointDetector<T>
 {

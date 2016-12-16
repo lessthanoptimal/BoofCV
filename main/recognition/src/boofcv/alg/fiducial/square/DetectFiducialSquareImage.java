@@ -57,7 +57,7 @@ import java.util.List;
  * </p>
  * @author Peter Abeles
  */
-public class DetectFiducialSquareImage<T extends ImageGray>
+public class DetectFiducialSquareImage<T extends ImageGray<T>>
 		extends BaseDetectFiducialSquare<T> {
 
 	// Width of black border (units = pixels)

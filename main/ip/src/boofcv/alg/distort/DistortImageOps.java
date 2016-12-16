@@ -66,7 +66,7 @@ public class DistortImageOps {
 	 * @deprecated As of v0.19.  Use {@link FDistort} instead
 	 */
 	@Deprecated
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	void affine(T input, T output, BorderType borderType, InterpolationType interpType,
 				double a11, double a12, double a21, double a22,
 				double dx, double dy)
@@ -101,7 +101,7 @@ public class DistortImageOps {
 	 * @param interpType Which type of pixel interpolation should be used. BILINEAR is in general recommended
 	 * @param borderType Specifies how to handle image borders.
 	 */
-	public static <Input extends ImageGray,Output extends ImageGray>
+	public static <Input extends ImageGray<Input>,Output extends ImageGray<Output>>
 	void distortSingle(Input input, Output output,
 					   PixelTransform2_F32 transform,
 					   InterpolationType interpType, BorderType borderType)
@@ -131,7 +131,7 @@ public class DistortImageOps {
 	 * @param transform The transform that is being applied to the image
 	 * @param interp Interpolation algorithm.
 	 */
-	public static <Input extends ImageGray,Output extends ImageGray>
+	public static <Input extends ImageGray<Input>,Output extends ImageGray<Output>>
 	void distortSingle(Input input, Output output,
 					   boolean renderAll, PixelTransform2_F32 transform,
 					   InterpolatePixelS<Input> interp)
@@ -154,7 +154,7 @@ public class DistortImageOps {
 	 * @param borderType Describes how pixels outside the image border should be handled.
 	 * @param interpType Which type of pixel interpolation should be used.
 	 */
-	public static <Input extends ImageGray,Output extends ImageGray,
+	public static <Input extends ImageGray<Input>,Output extends ImageGray<Output>,
 			M extends Planar<Input>,N extends Planar<Output>>
 	void distortPL(M input, N output,
 				   PixelTransform2_F32 transform,
@@ -184,7 +184,7 @@ public class DistortImageOps {
 	 * @param inputType Image of single band image it will process.
 	 * @return The {@link ImageDistort}
 	 */
-	public static <Input extends ImageGray,Output extends ImageGray>
+	public static <Input extends ImageGray<Input>,Output extends ImageGray<Output>>
 	ImageDistort<Input,Output> createImageDistort(Point2Transform2_F32 transform,
 												  InterpolationType interpType, BorderType borderType,
 												  Class<Input> inputType, Class<Output> outputType)
@@ -206,7 +206,7 @@ public class DistortImageOps {
 	 * @param interpType Which interpolation algorithm should be used.
 	 */
 	@Deprecated
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	void scale(T input, T output, BorderType borderType, InterpolationType interpType) {
 
 		PixelTransformAffine_F32 model = DistortSupport.transformScale(output, input, null);
@@ -239,7 +239,7 @@ public class DistortImageOps {
 	 * @param angleInputToOutput Angle of rotation in radians. From input to output, CCW rotation.
 	 */
 	@Deprecated
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	void rotate(T input, T output, BorderType borderType, InterpolationType interpType, float angleInputToOutput) {
 
 		float offX = 0;//(output.width+1)%2;
@@ -265,7 +265,7 @@ public class DistortImageOps {
 	 * @param distortion The distortion model
 	 * @param <Input> Band type.
 	 */
-	public static <Input extends ImageGray,Output extends ImageGray>
+	public static <Input extends ImageGray<Input>,Output extends ImageGray<Output>>
 	void distortPL(Planar<Input> input , Planar<Output> output ,
 				   ImageDistort<Input,Output> distortion )
 	{

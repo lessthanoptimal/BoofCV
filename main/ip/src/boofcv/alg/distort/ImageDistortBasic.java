@@ -28,7 +28,8 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class ImageDistortBasic<Input extends ImageBase,Output extends ImageBase,Interpolate extends InterpolatePixel<Input>>
+public abstract class ImageDistortBasic
+		<Input extends ImageBase<Input>,Output extends ImageBase<Output>,Interpolate extends InterpolatePixel<Input>>
 		implements ImageDistort<Input,Output> {
 
 	// distortion model from the dst to src image

@@ -34,7 +34,7 @@ import org.ddogleg.struct.GrowQueue_F64;
  *
  * @author Peter Abeles
  */
-public class SnapToEllipseEdge<T extends ImageGray> extends BaseIntegralEdge<T> {
+public class SnapToEllipseEdge<T extends ImageGray<T>> extends BaseIntegralEdge<T> {
 
 	// maximum number of iterations it will performance
 	protected int maxIterations = 10;

@@ -233,7 +233,7 @@ public class BlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	Planar<T> mean(Planar<T> input, Planar<T> output, int radius , T storage ) {
 
 		if( storage == null )
@@ -256,7 +256,7 @@ public class BlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	Planar<T> median(Planar<T> input, Planar<T> output, int radius ) {
 
 		if( output == null )
@@ -279,7 +279,7 @@ public class BlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	Planar<T> gaussian(Planar<T> input, Planar<T> output, double sigma , int radius, T storage ) {
 
 		if( storage == null )

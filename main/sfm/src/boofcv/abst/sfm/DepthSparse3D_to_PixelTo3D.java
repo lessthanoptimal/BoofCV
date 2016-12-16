@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class DepthSparse3D_to_PixelTo3D<T extends ImageGray>
+public class DepthSparse3D_to_PixelTo3D<T extends ImageGray<T>>
 	implements ImagePixelTo3D
 {
 	DepthSparse3D<T> alg;

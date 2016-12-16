@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class CheckVisualOdometryDepthSim<I extends ImageGray,Depth extends ImageGray>
+public abstract class CheckVisualOdometryDepthSim<I extends ImageGray<I>,Depth extends ImageGray<Depth>>
 	extends VideoSequenceSimulator<I>
 {
 	CameraPinholeRadial param = new CameraPinholeRadial(200,201,0,width/2,height/2,width,height).fsetRadial(0,0);

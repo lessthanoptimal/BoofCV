@@ -38,7 +38,7 @@ import org.ddogleg.struct.GrowQueue_F64;
  *
  * @author Peter Abeles
  */
-public class DetectDescribeFusion<T extends ImageGray, TD extends TupleDesc>
+public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc>
 	implements DetectDescribePoint<T, TD>
 {
 	// detects interest points

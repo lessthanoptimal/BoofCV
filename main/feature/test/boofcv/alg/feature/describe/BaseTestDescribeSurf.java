@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public abstract class BaseTestDescribeSurf<I extends ImageGray,II extends ImageGray> {
+public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends ImageGray<II>> {
 	Random rand = new Random(234);
 	int width = 50;
 	int height = 60;

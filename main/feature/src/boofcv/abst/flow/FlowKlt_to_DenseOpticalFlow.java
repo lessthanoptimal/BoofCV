@@ -34,7 +34,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-public class FlowKlt_to_DenseOpticalFlow<I extends ImageGray, D extends ImageGray>
+public class FlowKlt_to_DenseOpticalFlow<I extends ImageGray<I>, D extends ImageGray<D>>
 	implements DenseOpticalFlow<I>
 {
 	DenseOpticalFlowKlt<I,D> flowKlt;
