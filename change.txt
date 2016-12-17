@@ -30,6 +30,7 @@ Version : 0.27
 - Renamed for consistency
   * Kernel2D_I32 -> Kernel2D_S32
   * Kernel2D_I32 -> Kernel2D_S32
+- GConvolveImageOps actual works for all image types now not just gray TODO
 
 - TODO Fisheye calibration using omni model
 - TODO grid of circle calibration target
