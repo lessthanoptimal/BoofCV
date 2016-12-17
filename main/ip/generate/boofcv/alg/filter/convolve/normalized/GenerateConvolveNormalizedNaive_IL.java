@@ -28,12 +28,8 @@ import java.io.FileNotFoundException;
  *
  * @author Peter Abeles
  */
-public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
+public class GenerateConvolveNormalizedNaive_IL extends CodeGeneratorBase {
 	String divide;
-
-	public GenerateConvolveNormalizedNaive() throws FileNotFoundException {
-		setOutputFile(className);
-	}
 
 	public void generate() {
 		printPreamble();
@@ -52,7 +48,8 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 	private void printPreamble() {
 		out.print("import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n" +
-				"import javax.annotation.Generated;\n"+
+				"import javax.annotation.Generated;\n" +
+				"import java.util.Arrays;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -71,11 +68,11 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 	private void printAllOps( AutoTypeImage input , AutoTypeImage output )
 	{
 		boolean isInteger = input.isInteger();
-		divide = isInteger ? "(total+weight/2)/weight" : "total/weight";
+		divide = isInteger ? "= (total[band]+weight/2)/weight" : "/= weight";
 
-		String kernelType = isInteger ? "I32" : "F"+input.getNumBits();
-		String inputType = input.getSingleBandName();
-		String outputType = output.getSingleBandName();
+		String kernelType = input.getKernelType();
+		String inputType = input.getInterleavedName();
+		String outputType = output.getInterleavedName();
 		String kernelData = input.getSumType();
 		String sumType = input.getSumType();
 
@@ -85,11 +82,11 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 	}
 
 	private void printVertical2Int( AutoTypeImage input , AutoTypeImage output ) {
-		divide = "(total+weight/2)/weight";
+		divide = "= (total[band]+weight/2)/weight";
 
-		String kernelType = "I32";
-		String inputType = input.getSingleBandName();
-		String outputType = output.getSingleBandName();
+		String kernelType = input.getKernelType();
+		String inputType = input.getInterleavedName();
+		String outputType = output.getInterleavedName();
 		String kernelData = input.getSumType();
 		String sumType = input.getSumType();
 
@@ -98,16 +95,21 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 
 	private void printHorizontal( String kernelType , String inputType , String outputType ,
 								  String kernelData, String sumType ) {
+
 		out.print("\tpublic static void horizontal(Kernel1D_"+kernelType+" kernel, "+inputType+" input, "+outputType+" output ) {\n" +
 				"\n" +
 				"\t\tfinal int offset = kernel.getOffset();\n" +
 				"\n" +
 				"\t\tfinal int width = input.getWidth();\n" +
 				"\t\tfinal int height = input.getHeight();\n" +
+				"\t\tfinal int numBands = input.getNumBands();\n" +
+				"\t\t\n" +
+				"\t\tfinal "+sumType+"[] pixel = new "+sumType+"[ numBands ];\n" +
+				"\t\tfinal "+sumType+"[] total = new "+sumType+"[ numBands ];\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < height; y++) {\n" +
 				"\t\t\tfor( int x = 0; x < width; x++ ) {\n" +
-				"\t\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\t\tArrays.fill(total,0);\n" +
 				"\t\t\t\t"+sumType+" weight = 0;\n" +
 				"\n" +
 				"\t\t\t\tint startX = x - offset;\n" +
@@ -118,10 +120,17 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\t\tfor( int j = startX; j < endX; j++ ) {\n" +
 				"\t\t\t\t\t"+kernelData+" v = kernel.get(j-x+offset);\n" +
-				"\t\t\t\t\ttotal += input.get(j,y)*v;\n" +
+				"\t\t\t\t\tinput.get(j,y, pixel);\n" +
+				"\t\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
+				"\t\t\t\t\t\ttotal[band] += pixel[band]*v;\n" +
+				"\t\t\t\t\t}\n" +
+				"\t\t\t\t\t\n" +
 				"\t\t\t\t\tweight += v;\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\toutput.set(x,y, "+divide+" );\n" +
+				"\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
+				"\t\t\t\t\ttotal[band] "+divide+";\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t\toutput.set(x,y, total );\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -136,13 +145,17 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 				"\n" +
 				"\t\tfinal int width = input.getWidth();\n" +
 				"\t\tfinal int height = input.getHeight();\n" +
+				"\t\tfinal int numBands = input.getNumBands();\n" +
+				"\n" +
+				"\t\tfinal "+sumType+"[] pixel = new "+sumType+"[ numBands ];\n" +
+				"\t\tfinal "+sumType+"[] total = new "+sumType+"[ numBands ];\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < height; y++) {\n" +
 				"\t\t\tfor( int x = 0; x < width; x++ ) {\n" +
-				"\t\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\t\tArrays.fill(total,0);\n" +
 				"\t\t\t\t"+sumType+" weight = 0;\n" +
 				"\n" +
-				"\t\t\t\tint startY = y - offset;\n"  +
+				"\t\t\t\tint startY = y - offset;\n" +
 				"\t\t\t\tint endY = startY + kernel.getWidth();\n" +
 				"\n" +
 				"\t\t\t\tif( startY < 0 ) startY = 0;\n" +
@@ -150,18 +163,26 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\t\tfor( int i = startY; i < endY; i++ ) {\n" +
 				"\t\t\t\t\t"+kernelData+" v = kernel.get(i-y+offset);\n" +
-				"\t\t\t\t\ttotal += input.get(x,i)*v;\n" +
+				"\t\t\t\t\tinput.get(x,i, pixel);\n" +
+				"\t\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
+				"\t\t\t\t\t\ttotal[band] += pixel[band]*v;\n" +
+				"\t\t\t\t\t}\n" +
 				"\t\t\t\t\tweight += v;\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\toutput.set(x,y, "+divide+" );\n" +
+				"\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
+				"\t\t\t\t\ttotal[band] "+divide+";\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t\toutput.set(x,y, total);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
 
+
 	private void printVertical2( String kernelType , String inputType , String outputType ,
 								 String kernelData, String sumType ) {
-		out.println("public static void vertical(Kernel1D_"+kernelType+" kernelX, Kernel1D_"+kernelType+" kernelY,\n" +
+
+		out.print("\tpublic static void vertical(Kernel1D_"+kernelType+" kernelX, Kernel1D_"+kernelType+" kernelY,\n" +
 				"\t\t\t\t\t\t\t\t"+inputType+" input, "+outputType+" output ) {\n" +
 				"\n" +
 				"\t\tfinal int offsetX = kernelX.getOffset();\n" +
@@ -169,10 +190,14 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 				"\n" +
 				"\t\tfinal int width = input.getWidth();\n" +
 				"\t\tfinal int height = input.getHeight();\n" +
+				"\t\tfinal int numBands = input.getNumBands();\n" +
+				"\n" +
+				"\t\tfinal "+sumType+"[] pixel = new "+sumType+"[ numBands ];\n" +
+				"\t\tfinal "+sumType+"[] total = new "+sumType+"[ numBands ];\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < height; y++) {\n" +
 				"\t\t\tfor (int x = 0; x < width; x++) {\n" +
-				"\t\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\t\tArrays.fill(total,0);\n" +
 				"\t\t\t\t"+sumType+" weightY = 0;\n" +
 				"\n" +
 				"\t\t\t\tint startY = y - offsetY;\n" +
@@ -182,22 +207,29 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 				"\t\t\t\tif (endY > height) endY = height;\n" +
 				"\n" +
 				"\t\t\t\tfor (int i = startY; i < endY; i++) {\n" +
-				"\t\t\t\t\t"+kernelData+" v = kernelY.get(i - y + offsetY);\n" +
-				"\t\t\t\t\ttotal += input.get(x, i) * v;\n" +
+				"\t\t\t\t\t"+sumType+" v = kernelY.get(i - y + offsetY);\n" +
+				"\t\t\t\t\tinput.get(x, i, pixel);\n" +
+				"\t\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
+				"\t\t\t\t\t\ttotal[band] += pixel[band]*v;\n" +
+				"\t\t\t\t\t}\n" +
 				"\t\t\t\t\tweightY += v;\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
 				"\t\t\t\tint kerX0 = Math.max(0, offsetX - x);\n" +
 				"\t\t\t\tint kerX1 = Math.min(kernelX.getWidth(), width - x + offsetX);\n" +
 				"\n" +
-				"\t\t\t\tint weightX = 0;\n" +
+				"\t\t\t\t"+sumType+" weightX = 0;\n" +
 				"\t\t\t\tfor (int i = kerX0; i < kerX1; i++) {\n" +
 				"\t\t\t\t\tweightX += kernelX.get(i);\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
-				"\t\t\t\tint weight = weightX * weightY;\n" +
+				"\t\t\t\t"+sumType+" weight = weightX * weightY;\n" +
 				"\n" +
-				"\t\t\t\toutput.set(x,y, "+divide+" );\n" +
+				"\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
+				"\t\t\t\t\ttotal[band] "+divide+";\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t\t\n" +
+				"\t\t\t\toutput.set(x,y, total);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -212,6 +244,10 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 				"\n" +
 				"\t\tfinal int width = input.getWidth();\n" +
 				"\t\tfinal int height = input.getHeight();\n" +
+				"\t\tfinal int numBands = input.getNumBands();\n" +
+				"\n" +
+				"\t\tfinal "+sumType+"[] pixel = new "+sumType+"[ numBands ];\n" +
+				"\t\tfinal "+sumType+"[] total = new "+sumType+"[ numBands ];\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < height; y++) {\n" +
 				"\t\t\tfor( int x = 0; x < width; x++ ) {\n" +
@@ -228,24 +264,30 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 				"\t\t\t\tif( startY < 0 ) startY = 0;\n" +
 				"\t\t\t\tif( endY > height ) endY = height;\n" +
 				"\n" +
-				"\t\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\t\tArrays.fill(total,0);\n" +
 				"\t\t\t\t"+sumType+" weight = 0;\n" +
 				"\n" +
 				"\t\t\t\tfor( int i = startY; i < endY; i++ ) {\n" +
 				"\t\t\t\t\tfor( int j = startX; j < endX; j++ ) {\n" +
+				"\t\t\t\t\t\tinput.get(j,i, pixel);\n" +
 				"\t\t\t\t\t\t"+kernelData+" v = kernel.get(j-x+offset,i-y+offset);\n" +
-				"\t\t\t\t\t\ttotal += input.get(j,i)*v;\n" +
+				"\t\t\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
+				"\t\t\t\t\t\t\ttotal[band] += pixel[band]*v;\n" +
+				"\t\t\t\t\t\t}\n" +
 				"\t\t\t\t\t\tweight += v;\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\toutput.set(x,y, "+divide+" );\n" +
+				"\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
+				"\t\t\t\t\ttotal[band] "+divide+";\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t\toutput.set(x,y, total);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {
-		GenerateConvolveNormalizedNaive gen = new GenerateConvolveNormalizedNaive();
+		GenerateConvolveNormalizedNaive_IL gen = new GenerateConvolveNormalizedNaive_IL();
 		gen.generate();
 	}
 }

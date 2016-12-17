@@ -20,7 +20,7 @@ package boofcv.alg.filter.blur;
 
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.filter.convolve.ConvolveNormalized;
-import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
+import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive_SB;
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
@@ -65,7 +65,7 @@ public class TestBlurImageOps {
 			Kernel2D_S32 kernel = new Kernel2D_S32(w);
 			Arrays.fill(kernel.data,1);
 
-			ConvolveNormalizedNaive.convolve(kernel, input, expected);
+			ConvolveNormalizedNaive_SB.convolve(kernel, input, expected);
 
 			BlurImageOps.mean(input,found, radius, null);
 
@@ -169,7 +169,7 @@ public class TestBlurImageOps {
 			// make sure the kernels are equivalent
 			Kernel1D_S32 ker1 = FactoryKernelGaussian.gaussian(1, false, 32, -1, radius);
 			Kernel2D_S32 kernel = KernelMath.convolve2D(ker1, ker1);
-			ConvolveNormalizedNaive.convolve(kernel, input, expected);
+			ConvolveNormalizedNaive_SB.convolve(kernel, input, expected);
 
 			BlurImageOps.gaussian(input,found,-1,radius,null);
 			BoofTesting.assertEquals(expected,found,2);

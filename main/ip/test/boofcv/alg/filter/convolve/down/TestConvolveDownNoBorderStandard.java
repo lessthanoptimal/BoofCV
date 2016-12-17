@@ -58,7 +58,7 @@ public class TestConvolveDownNoBorderStandard {
 			height = 10 + plus;
 			// try different edges in the image as test points
 			for( skip = 1; skip <= 4; skip++ ) {
-				System.out.println(width+" "+height+" skip "+skip);
+//				System.out.println(width+" "+height+" skip "+skip);
 				CompareToFull tests = new CompareToFull(ConvolveDownNoBorderStandard.class);
 
 				tests.performTests(15);

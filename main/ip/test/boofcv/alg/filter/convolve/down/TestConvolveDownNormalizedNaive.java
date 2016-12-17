@@ -19,7 +19,7 @@
 package boofcv.alg.filter.convolve.down;
 
 import boofcv.alg.filter.convolve.ConvolutionTestHelper;
-import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
+import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive_SB;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GImageGray;
@@ -68,7 +68,7 @@ Random rand = new Random(0xFF);
 		int DIV = 10;
 
 		protected CompareToFull(Class<?> testClass ) {
-			super(testClass, ConvolveNormalizedNaive.class );
+			super(testClass, ConvolveNormalizedNaive_SB.class );
 		}
 
 		@Override

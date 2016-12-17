@@ -84,7 +84,7 @@ public class TestConvolveNormalizedStandardSparse {
 			if (paramTypes.length < 3) {
 				continue;
 			}
-			System.out.println("Checking "+m.getName()+"  type "+paramTypes[2].getSimpleName());
+//			System.out.println("Checking "+m.getName()+"  type "+paramTypes[2].getSimpleName());
 
 			checkMethod(m, width, height, kernelRadius, rand);
 			numFound++;

@@ -19,7 +19,7 @@
 package boofcv.alg.filter.convolve;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
+import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive_SB;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder;
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.struct.convolve.*;
@@ -44,7 +44,7 @@ public class ConvolveNormalized {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width ) {
-			ConvolveNormalizedNaive.horizontal(kernel,image,dest);
+			ConvolveNormalizedNaive_SB.horizontal(kernel,image,dest);
 		} else {
 			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
 				Kernel1D_F32 k = kernel.copy();
@@ -68,7 +68,7 @@ public class ConvolveNormalized {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width ) {
-			ConvolveNormalizedNaive.horizontal(kernel,image,dest);
+			ConvolveNormalizedNaive_SB.horizontal(kernel,image,dest);
 		} else {
 			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-8f ) {
 				Kernel1D_F64 k = kernel.copy();
@@ -92,7 +92,7 @@ public class ConvolveNormalized {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.height ) {
-			ConvolveNormalizedNaive.vertical(kernel,image,dest);
+			ConvolveNormalizedNaive_SB.vertical(kernel,image,dest);
 		} else {
 			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
 				Kernel1D_F32 k = kernel.copy();
@@ -116,7 +116,7 @@ public class ConvolveNormalized {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.height ) {
-			ConvolveNormalizedNaive.vertical(kernel,image,dest);
+			ConvolveNormalizedNaive_SB.vertical(kernel,image,dest);
 		} else {
 			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-8f ) {
 				Kernel1D_F64 k = kernel.copy();
@@ -140,7 +140,7 @@ public class ConvolveNormalized {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width || kernel.width >= image.height ) {
-			ConvolveNormalizedNaive.convolve(kernel, image, dest);
+			ConvolveNormalizedNaive_SB.convolve(kernel, image, dest);
 		} else {
 			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
 				Kernel2D_F32 k = kernel.copy();
@@ -164,7 +164,7 @@ public class ConvolveNormalized {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width || kernel.width >= image.height ) {
-			ConvolveNormalizedNaive.convolve(kernel, image, dest);
+			ConvolveNormalizedNaive_SB.convolve(kernel, image, dest);
 		} else {
 			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-8f ) {
 				Kernel2D_F64 k = kernel.copy();
@@ -188,7 +188,7 @@ public class ConvolveNormalized {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width ) {
-			ConvolveNormalizedNaive.horizontal(kernel, image, dest);
+			ConvolveNormalizedNaive_SB.horizontal(kernel, image, dest);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, image, dest, kernel.computeSum());
 			ConvolveNormalized_JustBorder.horizontal(kernel, image, dest);
@@ -207,7 +207,7 @@ public class ConvolveNormalized {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.height ) {
-			ConvolveNormalizedNaive.vertical(kernel, image, dest);
+			ConvolveNormalizedNaive_SB.vertical(kernel, image, dest);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, image, dest, kernel.computeSum());
 			ConvolveNormalized_JustBorder.vertical(kernel, image, dest);
@@ -226,7 +226,7 @@ public class ConvolveNormalized {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width || kernel.width >= image.height ) {
-			ConvolveNormalizedNaive.convolve(kernel, image, dest);
+			ConvolveNormalizedNaive_SB.convolve(kernel, image, dest);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, image, dest, kernel.computeSum());
 			ConvolveNormalized_JustBorder.convolve(kernel, image, dest);
@@ -245,7 +245,7 @@ public class ConvolveNormalized {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width ) {
-			ConvolveNormalizedNaive.horizontal(kernel, image, dest);
+			ConvolveNormalizedNaive_SB.horizontal(kernel, image, dest);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, image, dest, kernel.computeSum());
 			ConvolveNormalized_JustBorder.horizontal(kernel, image, dest);
@@ -264,7 +264,7 @@ public class ConvolveNormalized {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width ) {
-			ConvolveNormalizedNaive.horizontal(kernel, image, dest);
+			ConvolveNormalizedNaive_SB.horizontal(kernel, image, dest);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, image, dest, kernel.computeSum());
 			ConvolveNormalized_JustBorder.horizontal(kernel, image, dest);
@@ -283,7 +283,7 @@ public class ConvolveNormalized {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.height ) {
-			ConvolveNormalizedNaive.vertical(kernel,image,dest);
+			ConvolveNormalizedNaive_SB.vertical(kernel,image,dest);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel,image,dest,kernel.computeSum());
 			ConvolveNormalized_JustBorder.vertical(kernel,image,dest);
@@ -302,7 +302,7 @@ public class ConvolveNormalized {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.height ) {
-			ConvolveNormalizedNaive.vertical(kernel,image,dest);
+			ConvolveNormalizedNaive_SB.vertical(kernel,image,dest);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel,image,dest,kernel.computeSum());
 			ConvolveNormalized_JustBorder.vertical(kernel,image,dest);
@@ -321,7 +321,7 @@ public class ConvolveNormalized {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width || kernel.width >= image.height ) {
-			ConvolveNormalizedNaive.convolve(kernel,image,dest);
+			ConvolveNormalizedNaive_SB.convolve(kernel,image,dest);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel,image,dest,kernel.computeSum());
 			ConvolveNormalized_JustBorder.convolve(kernel,image,dest);

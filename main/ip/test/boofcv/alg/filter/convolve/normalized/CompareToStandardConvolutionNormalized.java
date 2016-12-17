@@ -43,7 +43,7 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 	protected int offset = 1;
 
 	public CompareToStandardConvolutionNormalized( Class<?> targetClass ) {
-		super(targetClass, ConvolveNormalizedNaive.class);
+		super(targetClass, ConvolveNormalizedNaive_SB.class);
 	}
 
 	public void setImageDimension( int width , int height ) {

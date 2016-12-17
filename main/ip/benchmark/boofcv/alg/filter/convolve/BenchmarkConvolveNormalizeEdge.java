@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
+import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive_SB;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -82,7 +82,7 @@ public class BenchmarkConvolveNormalizeEdge {
 
 	public int timeHorizontal_Naive_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveNormalizedNaive.horizontal(kernelF32, imgFloat32, out_F32);
+			ConvolveNormalizedNaive_SB.horizontal(kernelF32, imgFloat32, out_F32);
 		return 0;
 	}
 
