@@ -20,8 +20,9 @@ package boofcv.alg.sfm.d3.direct;
 
 import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.struct.image.ImageMultiBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.Planar;
 import boofcv.struct.pyramid.ImagePyramid;
 import georegression.struct.se.Se3_F32;
 
@@ -30,11 +31,11 @@ import georegression.struct.se.Se3_F32;
  *
  * @author Peter Abeles
  */
-public class PyramidDirectRgbDepth<T extends ImageMultiBand<T>> {
+public class PyramidDirectRgbDepth<T extends ImageGray<T>> {
 
-	ImageType<T> imageType;
+	ImageType<Planar<T>> imageType;
 
-	ImagePyramid<T> pyramid;
+	ImagePyramid<Planar<T>> pyramid;
 	VisOdomDirectRgbDepth<T,?>[] layersOdom;
 
 	LayerTo3D layerTo3D;
@@ -42,14 +43,14 @@ public class PyramidDirectRgbDepth<T extends ImageMultiBand<T>> {
 	Se3_F32 keyToCurrent = new Se3_F32();
 	Se3_F32 work = new Se3_F32();
 
-	public PyramidDirectRgbDepth(ImagePyramid<T> pyramid) {
+	public PyramidDirectRgbDepth(ImagePyramid<Planar<T>> pyramid) {
 		this.pyramid = pyramid;
 		imageType = this.pyramid.getImageType();
 
 		layersOdom = new VisOdomDirectRgbDepth[pyramid.getNumLayers()];
 		for (int i = 0; i < layersOdom.length; i++) {
 			ImageType derivType = GImageDerivativeOps.getDerivativeType( imageType );
-			layersOdom[i] = new VisOdomDirectRgbDepth(pyramid.getImageType(),derivType );
+			layersOdom[i] = new VisOdomDirectRgbDepth(imageType.getNumBands(),imageType.getImageClass(), derivType.getImageClass());
 		}
 	}
 
@@ -68,24 +69,24 @@ public class PyramidDirectRgbDepth<T extends ImageMultiBand<T>> {
 		}
 	}
 
-	public void setKeyFrame( T input , ImagePixelTo3D inputDepth) {
+	public void setKeyFrame( Planar<T> input , ImagePixelTo3D inputDepth) {
 		pyramid.process(input);
 		layerTo3D.wrap(inputDepth);
 
 		for (int layer = 0; layer < layersOdom.length; layer++) {
-			T layerImage = pyramid.getLayer(layer);
+			Planar<T> layerImage = pyramid.getLayer(layer);
 			layerTo3D.scale = pyramid.getScale(layer);
 			layersOdom[layer].setKeyFrame(layerImage,layerTo3D);
 		}
 
 	}
 
-	public boolean estimateMotion( T input ) {
+	public boolean estimateMotion( Planar<T> input ) {
 		pyramid.process(input);
 		work.set(keyToCurrent);
 
 		for (int layer = layersOdom.length-1; layer >= 0; layer--) {
-			T layerImage = pyramid.getLayer(layer);
+			Planar<T> layerImage = pyramid.getLayer(layer);
 			VisOdomDirectRgbDepth<T,?> o = layersOdom[layer];
 			if( o.estimateMotion(layerImage, work) ) {
 				work.set( o.getKeyToCurrent() );

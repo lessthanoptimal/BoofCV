@@ -18,9 +18,9 @@
 
 package boofcv.alg.sfm.d3.direct;
 
-import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.Planar;
 import georegression.geometry.ConvertRotation3D_F32;
 import georegression.misc.GrlConstants;
 import georegression.struct.se.Se3_F32;
@@ -39,10 +39,11 @@ public class TestVisOdomDirectRgbDepth {
 
 	Random rand = new Random(234);
 
-	ImageType<GrayF32> imageType = ImageType.single(GrayF32.class);
+	Class<GrayF32> imageType = GrayF32.class;
 
 	int width = 320;
 	int height = 240;
+	int numBands = 1;
 	float fx = 120;
 	float fy = 100;
 	float cx = width/2;
@@ -85,23 +86,25 @@ public class TestVisOdomDirectRgbDepth {
 	}
 
 	public Se3_F32 computeMotion( float colorBefore , float colorAfter , float dx , float dy ) {
-		VisOdomDirectRgbDepth<GrayF32,GrayF32> alg = new VisOdomDirectRgbDepth<>(imageType,imageType);
+		VisOdomDirectRgbDepth<GrayF32,GrayF32> alg = new VisOdomDirectRgbDepth<>(numBands,imageType,imageType);
 		alg.setCameraParameters(fx,fy,cx,cy,width,height);
 
-		GrayF32 input = new GrayF32(width,height);
-		ImageMiscOps.fill(input,colorAfter);
+		Planar<GrayF32> input = new Planar<>(GrayF32.class,width,height,numBands);
+		GImageMiscOps.fill(input,colorAfter);
 		alg.initMotion(input);
-		ImageMiscOps.fill(alg.derivX,dx);
-		ImageMiscOps.fill(alg.derivY,dy);
+		GImageMiscOps.fill(alg.derivX,dx);
+		GImageMiscOps.fill(alg.derivY,dy);
 		// need to add noise to avoid pathological stuff
-		ImageMiscOps.addUniform(alg.derivX, rand, 0f,0.1f);
-		ImageMiscOps.addUniform(alg.derivY, rand, 0f,0.1f);
+		GImageMiscOps.addUniform(alg.derivX, rand, 0f,0.1f);
+		GImageMiscOps.addUniform(alg.derivY, rand, 0f,0.1f);
 
 		// generate some synthetic data.  This will be composed of random points in front of the camera
 		for (int i = 0; i < 100; i++) {
 			VisOdomDirectRgbDepth.Pixel p = alg.keypixels.grow();
 
-			p.bands[0] = colorBefore;
+			for (int band = 0; band < numBands; band++) {
+				p.bands[band] = colorBefore;
+			}
 			p.x = rand.nextInt(width);
 			p.y = rand.nextInt(height);
 
@@ -116,7 +119,7 @@ public class TestVisOdomDirectRgbDepth {
 		}
 
 		// estimate the motion
-		alg.constructLinearSystem(width,height, new Se3_F32());
+		alg.constructLinearSystem(input, new Se3_F32());
 		assertTrue(alg.solveSystem());
 
 		assertEquals(Math.abs(colorAfter-colorBefore), alg.getErrorOptical(), 1e-4f);

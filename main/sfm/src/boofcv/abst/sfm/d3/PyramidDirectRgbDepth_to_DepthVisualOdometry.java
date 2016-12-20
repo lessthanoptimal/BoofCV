@@ -22,15 +22,15 @@ import boofcv.alg.sfm.d3.direct.PyramidDirectRgbDepth;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.Planar;
 import georegression.struct.se.Se3_F64;
 
 /**
  * @author Peter Abeles
  */
-public class PyramidDirectRgbDepth_to_DepthVisualOdometry<T extends ImageMultiBand<T>, Depth extends ImageGray<Depth>>
-	implements DepthVisualOdometry<T,Depth>
+public class PyramidDirectRgbDepth_to_DepthVisualOdometry<T extends ImageGray<T>, Depth extends ImageGray<Depth>>
+	implements DepthVisualOdometry<Planar<T>,Depth>
 {
 	PyramidDirectRgbDepth<T> alg;
 
@@ -59,12 +59,12 @@ public class PyramidDirectRgbDepth_to_DepthVisualOdometry<T extends ImageMultiBa
 	}
 
 	@Override
-	public boolean process(T visual, Depth depth) {
+	public boolean process(Planar<T> visual, Depth depth) {
 		return false;
 	}
 
 	@Override
-	public ImageType<T> getVisualType() {
+	public ImageType<Planar<T>> getVisualType() {
 		return null;
 	}
 
