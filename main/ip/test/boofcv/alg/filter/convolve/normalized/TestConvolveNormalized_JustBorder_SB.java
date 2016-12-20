@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestConvolveNormalized_JustBorder {
+public class TestConvolveNormalized_JustBorder_SB {
 	@Test
 	public void compareToNaive() {
 		CompareToNaive test = new CompareToNaive();
@@ -60,7 +60,7 @@ public class TestConvolveNormalized_JustBorder {
 	public static class CompareToNaive extends CompareToStandardConvolutionNormalized {
 
 		public CompareToNaive() {
-			super(ConvolveNormalized_JustBorder.class);
+			super(ConvolveNormalized_JustBorder_SB.class);
 		}
 
 		/**
