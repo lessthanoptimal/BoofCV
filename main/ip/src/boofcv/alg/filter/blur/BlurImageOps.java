@@ -109,6 +109,45 @@ public class BlurImageOps {
 		return output;
 	}
 
+	public static InterleavedU8 gaussian(InterleavedU8 input, InterleavedU8 output, double sigma , int radius,
+								  InterleavedU8 storage ) {
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,sigma,radius);
+
+		ConvolveNormalized.horizontal(kernel, input, storage);
+		ConvolveNormalized.vertical(kernel,storage,output);
+
+		return output;
+	}
+
+	public static InterleavedF32 gaussian(InterleavedF32 input, InterleavedF32 output, double sigma , int radius,
+										  InterleavedF32 storage ) {
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,sigma,radius);
+
+		ConvolveNormalized.horizontal(kernel, input, storage);
+		ConvolveNormalized.vertical(kernel,storage,output);
+
+		return output;
+	}
+
+	public static InterleavedF64 gaussian(InterleavedF64 input, InterleavedF64 output, double sigma , int radius,
+										  InterleavedF64 storage ) {
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		Kernel1D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F64.class,sigma,radius);
+
+		ConvolveNormalized.horizontal(kernel, input, storage);
+		ConvolveNormalized.vertical(kernel,storage,output);
+
+		return output;
+	}
+
 	/**
 	 * Applies a mean box filter.
 	 *

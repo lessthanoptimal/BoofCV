@@ -496,14 +496,25 @@ public class ConvertBufferedImage {
 		return dst;
 	}
 
+	public static <T extends ImageBase>T convertFrom(BufferedImage src, Class type, boolean orderRgb) {
+		T dst;
+		if( ImageGray.class.isAssignableFrom(type)) {
+			dst = (T)convertFromSingle(src, null, type);
+		} else if ( ImageInterleaved.class.isAssignableFrom(type) ){
+			dst = (T) GeneralizedImageOps.createInterleaved(type, 1, 1, 3);
+			convertFromInterleaved(src,(ImageInterleaved)dst,orderRgb);
+		} else {
+			dst = (T)new Planar<>(GrayU8.class,1,1,3);
+			convertFrom(src,dst, orderRgb);
+		}
+
+		return dst;
+	}
+
 	public static void convertFromInterleaved(BufferedImage src, ImageInterleaved dst, boolean orderRgb)
 	{
 		if (src == null)
 			throw new IllegalArgumentException("src is null!");
-
-		if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
-			throw new IllegalArgumentException("image dimension are different");
-		}
 
 		try {
 			WritableRaster raster = src.getRaster();
@@ -514,8 +525,8 @@ public class ConvertBufferedImage {
 			else
 				numBands = raster.getNumBands();
 
-			if( dst.getNumBands() != numBands )
-				throw new IllegalArgumentException("Expected "+numBands+" bands in dst not "+dst.getNumBands());
+			dst.setNumBands(numBands);
+			dst.reshape(src.getWidth(), src.getHeight());
 
 			if( dst instanceof InterleavedU8 ) {
 				if (src.getRaster() instanceof ByteInterleavedRaster ){
@@ -558,6 +569,12 @@ public class ConvertBufferedImage {
 			}
 
 		} catch( java.security.AccessControlException e) {
+			// force the number of bands to be something valid
+			if( dst.getNumBands() != 3 || dst.getNumBands() != 1 ) {
+				dst.setNumBands(3);
+			}
+			dst.reshape(src.getWidth(), src.getHeight());
+
 			// Applets don't allow access to the raster()
 			if( dst instanceof InterleavedU8 ) {
 				ConvertRaster.bufferedToInterleaved(src, (InterleavedU8) dst);

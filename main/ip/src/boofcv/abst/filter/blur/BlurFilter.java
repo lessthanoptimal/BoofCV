@@ -19,7 +19,7 @@
 package boofcv.abst.filter.blur;
 
 import boofcv.abst.filter.FilterImageInterface;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
 
 
 /**
@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface BlurFilter<T extends ImageGray<T>> extends FilterImageInterface<T,T> {
+public interface BlurFilter<T extends ImageBase<T>> extends FilterImageInterface<T,T> {
 
 	/**
 	 * Radius of the square region.  The width is defined as the radius*2 + 1.
