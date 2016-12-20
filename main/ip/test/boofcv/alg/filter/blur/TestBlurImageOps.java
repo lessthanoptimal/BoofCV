@@ -38,6 +38,8 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Random;
 
+import static org.junit.Assert.fail;
+
 /**
  * @author Peter Abeles
  */
@@ -220,5 +222,12 @@ public class TestBlurImageOps {
 
 			BoofTesting.assertEquals(expected,found,1e-8);
 		}
+	}
+
+	@Test
+	public void automate() {
+		// TODO single band and planar images
+		// todo automate across all image types
+		fail("Implement");
 	}
 }

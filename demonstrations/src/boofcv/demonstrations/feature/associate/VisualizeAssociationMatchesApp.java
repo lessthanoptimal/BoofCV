@@ -133,8 +133,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		grayLeft.reshape(buffLeft.getWidth(), buffLeft.getHeight());
 		grayRight.reshape(buffRight.getWidth(), buffRight.getHeight());
 
-		ConvertBufferedImage.convertFromMulti(buffLeft, imageLeft, true, imageType);
-		ConvertBufferedImage.convertFromMulti(buffRight, imageRight, true, imageType);
+		ConvertBufferedImage.convertFromPlanar(buffLeft, imageLeft, true, imageType);
+		ConvertBufferedImage.convertFromPlanar(buffRight, imageRight, true, imageType);
 		GConvertImage.average(imageLeft, grayLeft);
 		GConvertImage.average(imageRight, grayRight);
 

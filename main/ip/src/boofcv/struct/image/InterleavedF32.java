@@ -44,6 +44,11 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 	}
 
 	@Override
+	public String toString_element(int index) {
+		return String.format("%5f",data[index]);
+	}
+
+	@Override
 	public ImageDataType getDataType() {
 		return ImageDataType.F32;
 	}

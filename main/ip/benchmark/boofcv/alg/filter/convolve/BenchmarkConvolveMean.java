@@ -29,6 +29,7 @@ import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 
 import java.util.Random;
 
@@ -64,7 +65,7 @@ public class BenchmarkConvolveMean {
 	}
 
 	protected void setUp() throws Exception {
-		filter = FactoryBlurFilter.mean(GrayF32.class,radius);
+		filter = FactoryBlurFilter.mean(ImageType.single(GrayF32.class),radius);
 		kernelF32 = FactoryKernel.table1D_F32(radius, true);
 		kernelI32 = FactoryKernel.table1D_I32(radius);
 	}

@@ -105,6 +105,11 @@ public class TestConvolveNormalized_JustBorder_IL {
 			final float pixelT[] = new float[ t.getNumberOfBands() ];
 			final float pixelV[] = new float[ t.getNumberOfBands() ];
 
+//			System.out.println("   t");
+//			System.out.println(t.getImage());
+//			System.out.println("   v");
+//			System.out.println(v.getImage());
+
 			for( int y = 0; y < height; y++ ) {
 				for( int x = 0; x < width; x++ ) {
 					if( x < borderX0 || y < borderY0 || x >= width - borderX1 || y >= height - borderY1 )
@@ -115,6 +120,11 @@ public class TestConvolveNormalized_JustBorder_IL {
 
 						for (int band = 0; band < t.getNumberOfBands(); band++) {
 							assertEquals( x+" "+y,pixelV[band] , pixelT[band] , 1e-4 );
+						}
+					} else {
+						t.get(x,y,pixelT);
+						for (int band = 0; band < t.getNumberOfBands(); band++) {
+							assertEquals( x+" "+y,0 , pixelT[band] , 1e-4 );
 						}
 					}
 				}

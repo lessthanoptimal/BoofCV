@@ -281,7 +281,7 @@ public class BlurImageOps {
 			output = input.createNew(input.width,input.height);
 
 		for( int band = 0; band < input.getNumBands(); band++ ) {
-			GBlurImageOps.median(input.getBand(band),output.getBand(band),radius);
+			GBlurImageOps.mean(input.getBand(band),output.getBand(band),radius, storage);
 		}
 		return output;
 	}

@@ -189,7 +189,7 @@ public class FactoryDescribeRegionPoint {
 			config = new ConfigBrief();
 		config.checkValidity();
 
-		BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,config.blurSigma,config.blurRadius);
+		BlurFilter<T> filter = FactoryBlurFilter.gaussian(ImageType.single(imageType),config.blurSigma,config.blurRadius);
 		BinaryCompareDefinition_I32 definition =
 				FactoryBriefDefinition.gaussian2(new Random(123), config.radius, config.numPoints);
 

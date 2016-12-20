@@ -24,6 +24,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 import org.junit.Test;
 
 import java.util.Random;
@@ -45,7 +46,7 @@ public class TestDescribePointBrief {
 		GrayU8 input = new GrayU8(30,40);
 		GImageMiscOps.fillUniform(input,rand,0,100);
 
-		BlurFilter<GrayU8> filterBlur = FactoryBlurFilter.gaussian(GrayU8.class, -1, 1);
+		BlurFilter<GrayU8> filterBlur = FactoryBlurFilter.gaussian(ImageType.single(GrayU8.class), -1, 1);
 		Helper helper = new Helper();
 		DescribePointBrief<GrayU8> alg = new DescribePointBrief<>(helper,filterBlur);
 

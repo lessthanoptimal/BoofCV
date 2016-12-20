@@ -107,7 +107,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray<T>, D extends Im
 				T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
 				describe.setImage(input);
 			} else {
-				Planar<T> input = ConvertBufferedImage.convertFromMulti(image, null, true, imageType);
+				Planar<T> input = ConvertBufferedImage.convertFromPlanar(image, null, true, imageType);
 				describe.setImage(input);
 			}
 		}

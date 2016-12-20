@@ -131,7 +131,7 @@ public class BatchRemoveLensDistortion {
 				System.exit(-1);
 			}
 
-			ConvertBufferedImage.convertFromMulti(orig, distoredImg, true, GrayF32.class);
+			ConvertBufferedImage.convertFromPlanar(orig, distoredImg, true, GrayF32.class);
 			distort.apply(distoredImg,undistoredImg);
 			ConvertBufferedImage.convertTo(undistoredImg,out,true);
 

@@ -26,6 +26,7 @@ import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
 /**
  * Provides intensity feature intensity algorithms which conform to the {@link GeneralFeatureIntensity} interface.
@@ -110,7 +111,7 @@ public class FactoryIntensityPoint {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureIntensity<I,D>  median( int radius , Class<I> imageType ) {
-		BlurStorageFilter<I> filter = FactoryBlurFilter.median(imageType,radius);
+		BlurStorageFilter<I> filter = FactoryBlurFilter.median(ImageType.single(imageType),radius);
 		return new WrapperMedianCornerIntensity<>(filter, imageType);
 	}
 

@@ -104,7 +104,7 @@ public class PyramidFloatGaussianScale< T extends ImageGray<T>> extends PyramidF
 			T layer = getLayer(i);
 
 			// Apply the requested blur to the previous layer
-			BlurStorageFilter<T> blur = (BlurStorageFilter<T>) FactoryBlurFilter.gaussian(layer.getClass(), sigmaLayers[i],-1);
+			BlurStorageFilter<T> blur = (BlurStorageFilter<T>) FactoryBlurFilter.gaussian(layer.getImageType(), sigmaLayers[i],-1);
 			tempImage.reshape(prev.width,prev.height);
 			blur.process(prev,tempImage);
 

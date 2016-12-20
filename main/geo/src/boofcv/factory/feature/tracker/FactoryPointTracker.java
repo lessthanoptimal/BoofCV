@@ -234,7 +234,7 @@ public class FactoryPointTracker {
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
-				FactoryBlurFilter.gaussian(imageType, 0, 4));
+				FactoryBlurFilter.gaussian(ImageType.single(imageType), 0, 4));
 
 		GeneralFeatureDetector<I, D> detectPoint = createShiTomasi(configExtract, derivType);
 		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<>(detectPoint, imageType, derivType);
@@ -269,7 +269,7 @@ public class FactoryPointTracker {
 								   Class<I> imageType )
 	{
 		DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
-				FactoryBlurFilter.gaussian(imageType, 0, 4));
+				FactoryBlurFilter.gaussian(ImageType.single(imageType), 0, 4));
 
 		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createFast(configFast, configExtract, imageType);
 		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<>(corner, imageType, null);

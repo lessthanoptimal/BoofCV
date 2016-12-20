@@ -54,12 +54,12 @@ public class ConvolveNormalized_JustBorder_IL {
 		final float[] total = new float[ numBands ];
 
 		for (int i = 0; i < height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride;
 			for (int j = 0; j < offsetL; j++) {
-				int indexDst = dst.startIndex + i*dst.stride;
 				int indexSrc = src.startIndex + i*src.stride;
 				Arrays.fill(total,0);
 				float weight = 0;
-				for (int k = offsetL-j-1; k < kernelWidth; k++) {
+				for (int k = offsetL-j; k < kernelWidth; k++) {
 					double w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
@@ -71,12 +71,12 @@ public class ConvolveNormalized_JustBorder_IL {
 				}
 			}
 
-			for (int j = offsetR; j < kernelWidth; j++) {
-				int indexDst = dst.startIndex + i*dst.stride + (width-j-1)*numBands;
-				int indexSrc = src.startIndex + i*src.stride + (width-j-1)*numBands;
+			indexDst = dst.startIndex + i*dst.stride + (width-offsetR)*numBands;
+			for (int j = offsetR-1; j >= 0; j--) {
+				int indexSrc = src.startIndex + i*src.stride + (width-offsetL-j-1)*numBands;
 				Arrays.fill(total,0);
 				float weight = 0;
-				for (int k = 0; k <= j; k++) {
+				for (int k = 0; k <= offsetL+j; k++) {
 					double w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
@@ -106,9 +106,9 @@ public class ConvolveNormalized_JustBorder_IL {
 		final int yEnd = imgHeight - offsetR;
 
 		for (int y = 0; y < offsetL; y++) {
-			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
-			final int iEnd = i + imgWidth;
+			int indexDst = output.startIndex + y*output.stride;
+			int i = input.startIndex + y*input.stride;
+			final int iEnd = i + imgWidth*numBands;
 
 			int kStart = offsetL - y;
 
@@ -117,7 +117,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				weight += kernel.data[k];
 			}
 
-			for ( ; i < iEnd; i++) {
+			for ( ; i < iEnd; i += numBands) {
 				Arrays.fill(total,0);
 				int indexSrc = i - y * input.stride;
 				for (int k = kStart; k < kernelWidth; k++, indexSrc += input.stride) {
@@ -134,8 +134,8 @@ public class ConvolveNormalized_JustBorder_IL {
 
 		for (int y = yEnd; y < imgHeight; y++) {
 			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
-			final int iEnd = i + imgWidth;
+			int i = input.startIndex + y*input.stride;
+			final int iEnd = i + imgWidth*numBands;
 
 			int kEnd = imgHeight - (y - offsetL);
 
@@ -144,9 +144,9 @@ public class ConvolveNormalized_JustBorder_IL {
 				weight += kernel.data[k];
 			}
 
-			for ( ; i < iEnd; i++) {
+			for ( ; i < iEnd; i+=numBands ) {
 				Arrays.fill(total,0);
-				int indexSrc = i - offsetL * input.stride;
+				int indexSrc = i - offsetL*input.stride;
 				for (int k = 0; k < kEnd; k++, indexSrc += input.stride) {
 					float w = kernel.data[k];
 					for (int band = 0; band < numBands; band++) {
@@ -304,12 +304,12 @@ public class ConvolveNormalized_JustBorder_IL {
 		final double[] total = new double[ numBands ];
 
 		for (int i = 0; i < height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride;
 			for (int j = 0; j < offsetL; j++) {
-				int indexDst = dst.startIndex + i*dst.stride;
 				int indexSrc = src.startIndex + i*src.stride;
 				Arrays.fill(total,0);
 				double weight = 0;
-				for (int k = offsetL-j-1; k < kernelWidth; k++) {
+				for (int k = offsetL-j; k < kernelWidth; k++) {
 					double w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
@@ -321,12 +321,12 @@ public class ConvolveNormalized_JustBorder_IL {
 				}
 			}
 
-			for (int j = offsetR; j < kernelWidth; j++) {
-				int indexDst = dst.startIndex + i*dst.stride + (width-j-1)*numBands;
-				int indexSrc = src.startIndex + i*src.stride + (width-j-1)*numBands;
+			indexDst = dst.startIndex + i*dst.stride + (width-offsetR)*numBands;
+			for (int j = offsetR-1; j >= 0; j--) {
+				int indexSrc = src.startIndex + i*src.stride + (width-offsetL-j-1)*numBands;
 				Arrays.fill(total,0);
 				double weight = 0;
-				for (int k = 0; k <= j; k++) {
+				for (int k = 0; k <= offsetL+j; k++) {
 					double w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
@@ -356,9 +356,9 @@ public class ConvolveNormalized_JustBorder_IL {
 		final int yEnd = imgHeight - offsetR;
 
 		for (int y = 0; y < offsetL; y++) {
-			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
-			final int iEnd = i + imgWidth;
+			int indexDst = output.startIndex + y*output.stride;
+			int i = input.startIndex + y*input.stride;
+			final int iEnd = i + imgWidth*numBands;
 
 			int kStart = offsetL - y;
 
@@ -367,7 +367,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				weight += kernel.data[k];
 			}
 
-			for ( ; i < iEnd; i++) {
+			for ( ; i < iEnd; i += numBands) {
 				Arrays.fill(total,0);
 				int indexSrc = i - y * input.stride;
 				for (int k = kStart; k < kernelWidth; k++, indexSrc += input.stride) {
@@ -384,8 +384,8 @@ public class ConvolveNormalized_JustBorder_IL {
 
 		for (int y = yEnd; y < imgHeight; y++) {
 			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
-			final int iEnd = i + imgWidth;
+			int i = input.startIndex + y*input.stride;
+			final int iEnd = i + imgWidth*numBands;
 
 			int kEnd = imgHeight - (y - offsetL);
 
@@ -394,9 +394,9 @@ public class ConvolveNormalized_JustBorder_IL {
 				weight += kernel.data[k];
 			}
 
-			for ( ; i < iEnd; i++) {
+			for ( ; i < iEnd; i+=numBands ) {
 				Arrays.fill(total,0);
-				int indexSrc = i - offsetL * input.stride;
+				int indexSrc = i - offsetL*input.stride;
 				for (int k = 0; k < kEnd; k++, indexSrc += input.stride) {
 					double w = kernel.data[k];
 					for (int band = 0; band < numBands; band++) {
@@ -554,12 +554,12 @@ public class ConvolveNormalized_JustBorder_IL {
 		final int[] total = new int[ numBands ];
 
 		for (int i = 0; i < height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride;
 			for (int j = 0; j < offsetL; j++) {
-				int indexDst = dst.startIndex + i*dst.stride;
 				int indexSrc = src.startIndex + i*src.stride;
 				Arrays.fill(total,0);
 				int weight = 0;
-				for (int k = offsetL-j-1; k < kernelWidth; k++) {
+				for (int k = offsetL-j; k < kernelWidth; k++) {
 					double w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
@@ -571,12 +571,12 @@ public class ConvolveNormalized_JustBorder_IL {
 				}
 			}
 
-			for (int j = offsetR; j < kernelWidth; j++) {
-				int indexDst = dst.startIndex + i*dst.stride + (width-j-1)*numBands;
-				int indexSrc = src.startIndex + i*src.stride + (width-j-1)*numBands;
+			indexDst = dst.startIndex + i*dst.stride + (width-offsetR)*numBands;
+			for (int j = offsetR-1; j >= 0; j--) {
+				int indexSrc = src.startIndex + i*src.stride + (width-offsetL-j-1)*numBands;
 				Arrays.fill(total,0);
 				int weight = 0;
-				for (int k = 0; k <= j; k++) {
+				for (int k = 0; k <= offsetL+j; k++) {
 					double w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
@@ -606,9 +606,9 @@ public class ConvolveNormalized_JustBorder_IL {
 		final int yEnd = imgHeight - offsetR;
 
 		for (int y = 0; y < offsetL; y++) {
-			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
-			final int iEnd = i + imgWidth;
+			int indexDst = output.startIndex + y*output.stride;
+			int i = input.startIndex + y*input.stride;
+			final int iEnd = i + imgWidth*numBands;
 
 			int kStart = offsetL - y;
 
@@ -617,7 +617,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				weight += kernel.data[k];
 			}
 
-			for ( ; i < iEnd; i++) {
+			for ( ; i < iEnd; i += numBands) {
 				Arrays.fill(total,0);
 				int indexSrc = i - y * input.stride;
 				for (int k = kStart; k < kernelWidth; k++, indexSrc += input.stride) {
@@ -634,8 +634,8 @@ public class ConvolveNormalized_JustBorder_IL {
 
 		for (int y = yEnd; y < imgHeight; y++) {
 			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
-			final int iEnd = i + imgWidth;
+			int i = input.startIndex + y*input.stride;
+			final int iEnd = i + imgWidth*numBands;
 
 			int kEnd = imgHeight - (y - offsetL);
 
@@ -644,9 +644,9 @@ public class ConvolveNormalized_JustBorder_IL {
 				weight += kernel.data[k];
 			}
 
-			for ( ; i < iEnd; i++) {
+			for ( ; i < iEnd; i+=numBands ) {
 				Arrays.fill(total,0);
-				int indexSrc = i - offsetL * input.stride;
+				int indexSrc = i - offsetL*input.stride;
 				for (int k = 0; k < kEnd; k++, indexSrc += input.stride) {
 					int w = kernel.data[k];
 					for (int band = 0; band < numBands; band++) {
@@ -804,12 +804,12 @@ public class ConvolveNormalized_JustBorder_IL {
 		final int[] total = new int[ numBands ];
 
 		for (int i = 0; i < height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride;
 			for (int j = 0; j < offsetL; j++) {
-				int indexDst = dst.startIndex + i*dst.stride;
 				int indexSrc = src.startIndex + i*src.stride;
 				Arrays.fill(total,0);
 				int weight = 0;
-				for (int k = offsetL-j-1; k < kernelWidth; k++) {
+				for (int k = offsetL-j; k < kernelWidth; k++) {
 					double w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
@@ -821,12 +821,12 @@ public class ConvolveNormalized_JustBorder_IL {
 				}
 			}
 
-			for (int j = offsetR; j < kernelWidth; j++) {
-				int indexDst = dst.startIndex + i*dst.stride + (width-j-1)*numBands;
-				int indexSrc = src.startIndex + i*src.stride + (width-j-1)*numBands;
+			indexDst = dst.startIndex + i*dst.stride + (width-offsetR)*numBands;
+			for (int j = offsetR-1; j >= 0; j--) {
+				int indexSrc = src.startIndex + i*src.stride + (width-offsetL-j-1)*numBands;
 				Arrays.fill(total,0);
 				int weight = 0;
-				for (int k = 0; k <= j; k++) {
+				for (int k = 0; k <= offsetL+j; k++) {
 					double w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
@@ -856,9 +856,9 @@ public class ConvolveNormalized_JustBorder_IL {
 		final int yEnd = imgHeight - offsetR;
 
 		for (int y = 0; y < offsetL; y++) {
-			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
-			final int iEnd = i + imgWidth;
+			int indexDst = output.startIndex + y*output.stride;
+			int i = input.startIndex + y*input.stride;
+			final int iEnd = i + imgWidth*numBands;
 
 			int kStart = offsetL - y;
 
@@ -867,7 +867,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				weight += kernel.data[k];
 			}
 
-			for ( ; i < iEnd; i++) {
+			for ( ; i < iEnd; i += numBands) {
 				Arrays.fill(total,0);
 				int indexSrc = i - y * input.stride;
 				for (int k = kStart; k < kernelWidth; k++, indexSrc += input.stride) {
@@ -884,8 +884,8 @@ public class ConvolveNormalized_JustBorder_IL {
 
 		for (int y = yEnd; y < imgHeight; y++) {
 			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
-			final int iEnd = i + imgWidth;
+			int i = input.startIndex + y*input.stride;
+			final int iEnd = i + imgWidth*numBands;
 
 			int kEnd = imgHeight - (y - offsetL);
 
@@ -894,9 +894,9 @@ public class ConvolveNormalized_JustBorder_IL {
 				weight += kernel.data[k];
 			}
 
-			for ( ; i < iEnd; i++) {
+			for ( ; i < iEnd; i+=numBands ) {
 				Arrays.fill(total,0);
-				int indexSrc = i - offsetL * input.stride;
+				int indexSrc = i - offsetL*input.stride;
 				for (int k = 0; k < kEnd; k++, indexSrc += input.stride) {
 					int w = kernel.data[k];
 					for (int band = 0; band < numBands; band++) {
@@ -1054,12 +1054,12 @@ public class ConvolveNormalized_JustBorder_IL {
 		final int[] total = new int[ numBands ];
 
 		for (int i = 0; i < height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride;
 			for (int j = 0; j < offsetL; j++) {
-				int indexDst = dst.startIndex + i*dst.stride;
 				int indexSrc = src.startIndex + i*src.stride;
 				Arrays.fill(total,0);
 				int weight = 0;
-				for (int k = offsetL-j-1; k < kernelWidth; k++) {
+				for (int k = offsetL-j; k < kernelWidth; k++) {
 					double w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
@@ -1071,12 +1071,12 @@ public class ConvolveNormalized_JustBorder_IL {
 				}
 			}
 
-			for (int j = offsetR; j < kernelWidth; j++) {
-				int indexDst = dst.startIndex + i*dst.stride + (width-j-1)*numBands;
-				int indexSrc = src.startIndex + i*src.stride + (width-j-1)*numBands;
+			indexDst = dst.startIndex + i*dst.stride + (width-offsetR)*numBands;
+			for (int j = offsetR-1; j >= 0; j--) {
+				int indexSrc = src.startIndex + i*src.stride + (width-offsetL-j-1)*numBands;
 				Arrays.fill(total,0);
 				int weight = 0;
-				for (int k = 0; k <= j; k++) {
+				for (int k = 0; k <= offsetL+j; k++) {
 					double w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
@@ -1106,9 +1106,9 @@ public class ConvolveNormalized_JustBorder_IL {
 		final int yEnd = imgHeight - offsetR;
 
 		for (int y = 0; y < offsetL; y++) {
-			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
-			final int iEnd = i + imgWidth;
+			int indexDst = output.startIndex + y*output.stride;
+			int i = input.startIndex + y*input.stride;
+			final int iEnd = i + imgWidth*numBands;
 
 			int kStart = offsetL - y;
 
@@ -1117,7 +1117,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				weight += kernel.data[k];
 			}
 
-			for ( ; i < iEnd; i++) {
+			for ( ; i < iEnd; i += numBands) {
 				Arrays.fill(total,0);
 				int indexSrc = i - y * input.stride;
 				for (int k = kStart; k < kernelWidth; k++, indexSrc += input.stride) {
@@ -1134,8 +1134,8 @@ public class ConvolveNormalized_JustBorder_IL {
 
 		for (int y = yEnd; y < imgHeight; y++) {
 			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
-			final int iEnd = i + imgWidth;
+			int i = input.startIndex + y*input.stride;
+			final int iEnd = i + imgWidth*numBands;
 
 			int kEnd = imgHeight - (y - offsetL);
 
@@ -1144,9 +1144,9 @@ public class ConvolveNormalized_JustBorder_IL {
 				weight += kernel.data[k];
 			}
 
-			for ( ; i < iEnd; i++) {
+			for ( ; i < iEnd; i+=numBands ) {
 				Arrays.fill(total,0);
-				int indexSrc = i - offsetL * input.stride;
+				int indexSrc = i - offsetL*input.stride;
 				for (int k = 0; k < kEnd; k++, indexSrc += input.stride) {
 					int w = kernel.data[k];
 					for (int band = 0; band < numBands; band++) {
@@ -1411,7 +1411,7 @@ public class ConvolveNormalized_JustBorder_IL {
 			int startX = src.width-offsetX1;
 			indexDst = dst.startIndex + y*dst.stride + startX*numBands;
 			i = src.startIndex + y*src.stride + startX*numBands;
-			iEnd = src.startIndex + y * src.stride + src.width;
+			iEnd = src.startIndex + y * src.stride + src.width*numBands;
 			for ( int x = startX; i < iEnd; i += numBands, x++ ) {
 				weightX -= kernelX.data[src.width-x+offsetX];
 				int weight = weightX*weightY;
@@ -1420,7 +1420,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				for (int k = 0; k < kernelWidthY; k++, indexSrc += src.stride) {
 					int w = kernelY.data[k];
 					for (int band = 0; band < numBands; band++) {
-						total[band] += (dataSrc[indexSrc++]& 0xFFFF)*w;
+						total[band] += (dataSrc[indexSrc+band]& 0xFFFF)*w;
 					}
 				}
 				for (int band = 0; band < numBands; band++) {
@@ -1551,7 +1551,7 @@ public class ConvolveNormalized_JustBorder_IL {
 			int startX = src.width-offsetX1;
 			indexDst = dst.startIndex + y*dst.stride + startX*numBands;
 			i = src.startIndex + y*src.stride + startX*numBands;
-			iEnd = src.startIndex + y * src.stride + src.width;
+			iEnd = src.startIndex + y * src.stride + src.width*numBands;
 			for ( int x = startX; i < iEnd; i += numBands, x++ ) {
 				weightX -= kernelX.data[src.width-x+offsetX];
 				int weight = weightX*weightY;
@@ -1560,7 +1560,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				for (int k = 0; k < kernelWidthY; k++, indexSrc += src.stride) {
 					int w = kernelY.data[k];
 					for (int band = 0; band < numBands; band++) {
-						total[band] += (dataSrc[indexSrc++])*w;
+						total[band] += (dataSrc[indexSrc+band])*w;
 					}
 				}
 				for (int band = 0; band < numBands; band++) {

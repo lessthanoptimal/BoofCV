@@ -110,8 +110,8 @@ public class CalibratedImageGridPanel extends JPanel {
 
 			// the number of bands can be difficult to ascertain without digging deep into the data structure
 			// so just declare a new one using convert
-			origMS = ConvertBufferedImage.convertFromMulti(image,null,true,GrayF32.class);
-			correctedMS = ConvertBufferedImage.convertFromMulti(image,null,true,GrayF32.class);
+			origMS = ConvertBufferedImage.convertFromPlanar(image,null,true,GrayF32.class);
+			correctedMS = ConvertBufferedImage.convertFromPlanar(image,null,true,GrayF32.class);
 			undistorted = new BufferedImage(image.getWidth(),image.getHeight(),image.getType());
 		}
 	}
@@ -169,7 +169,7 @@ public class CalibratedImageGridPanel extends JPanel {
 	}
 
 	private void undoRadialDistortion(BufferedImage image) {
-		ConvertBufferedImage.convertFromMulti(image, origMS,true, GrayF32.class);
+		ConvertBufferedImage.convertFromPlanar(image, origMS,true, GrayF32.class);
 
 		for( int i = 0; i < origMS.getNumBands(); i++ ) {
 			GrayF32 in = origMS.getBand(i);

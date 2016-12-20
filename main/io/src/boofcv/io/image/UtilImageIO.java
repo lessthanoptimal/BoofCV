@@ -156,7 +156,7 @@ public class UtilImageIO {
 
 			if( !ImageIO.write(img, type, new File(fileName)) ) {
 				if( fileName.endsWith("ppm") || fileName.endsWith("PPM") ) {
-					Planar<GrayU8> color = ConvertBufferedImage.convertFromMulti(img,null,true,GrayU8.class);
+					Planar<GrayU8> color = ConvertBufferedImage.convertFromPlanar(img,null,true,GrayU8.class);
 					savePPM(color, fileName, null);
 				} else if( fileName.endsWith("pgm") || fileName.endsWith("PGM") ) {
 					GrayU8 gray = ConvertBufferedImage.convertFrom(img, (GrayU8) null);

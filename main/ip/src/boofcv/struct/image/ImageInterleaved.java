@@ -40,7 +40,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	public int numBands;
 
 	{
-		this.imageType = (ImageType<T>)ImageType.il(0, getClass());
+		this.imageType = ImageType.il(0, getClass());
 	}
 
 	/**
@@ -94,6 +94,9 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 
 	@Override
 	public void reshape(int width, int height) {
+		if( this.width == width && this.height == height )
+			return;
+
 		if( isSubimage() )
 			throw new IllegalArgumentException("Can't reshape sub-images");
 
@@ -176,4 +179,26 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	 * @param data data array
 	 */
 	protected abstract void _setData(Object data);
+
+	@Override
+	public String toString() {
+		String out = getClass().getSimpleName()+" : w="+width+", h="+height+", c="+numBands+"\n";
+		for (int y = 0; y < height; y++) {
+			int index = startIndex + y*stride;
+			for (int x = 0; x < width; x++) {
+				for (int band = 0; band < numBands; band++) {
+					out += toString_element(index++)+" ";
+				}
+				if( x < width-1)
+					out += ", ";
+			}
+			out += "\n";
+		}
+		return out;
+	}
+
+	/**
+	 * Convert an individual data element into a string
+	 */
+	public abstract String toString_element( int index );
 }

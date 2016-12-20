@@ -332,12 +332,12 @@ public class TestConvertBufferedImage {
 				if( j == 1 ) {
 					origImg = origImg.getSubimage(1,2,imgWidth-1,imgHeight-2);
 				}
-				Planar<GrayU8> imgInt8 = ConvertBufferedImage.convertFromMulti(origImg, null, false, GrayU8.class);
+				Planar<GrayU8> imgInt8 = ConvertBufferedImage.convertFromPlanar(origImg, null, false, GrayU8.class);
 				assertEquals(origImg.getWidth(), imgInt8.width);
 				assertEquals(origImg.getHeight(), imgInt8.height);
 				BoofTesting.checkEquals(origImg, imgInt8, false, 1);
 
-				Planar<GrayF32> imgF32 = ConvertBufferedImage.convertFromMulti(origImg, null, false,GrayF32.class);
+				Planar<GrayF32> imgF32 = ConvertBufferedImage.convertFromPlanar(origImg, null, false,GrayF32.class);
 				assertEquals(origImg.getWidth(), imgF32.width);
 				assertEquals(origImg.getHeight(), imgF32.height);
 				BoofTesting.checkEquals(origImg, imgF32,false,  1);

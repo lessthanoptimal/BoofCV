@@ -70,7 +70,7 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		this.param = param;
 
 		// distorted image
-		dist = ConvertBufferedImage.convertFromMulti(orig, null,true, GrayF32.class);
+		dist = ConvertBufferedImage.convertFromPlanar(orig, null,true, GrayF32.class);
 
 		// storage for undistorted image
 		undist = new Planar<>(GrayF32.class,

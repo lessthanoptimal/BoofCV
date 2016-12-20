@@ -44,7 +44,7 @@ public class ExampleOverheadView {
 	public static void main( String args[] ) {
 		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("road/left01.png"));
 
-		Planar<GrayU8> imageRGB = ConvertBufferedImage.convertFromMulti(input, null,true, GrayU8.class);
+		Planar<GrayU8> imageRGB = ConvertBufferedImage.convertFromPlanar(input, null,true, GrayU8.class);
 
 		StereoParameters stereoParam = UtilIO.loadXML(UtilIO.pathExample("road/stereo01.xml"));
 		Se3_F64 groundToLeft = UtilIO.loadXML(UtilIO.pathExample("road/ground_to_left_01.xml"));

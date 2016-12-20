@@ -173,9 +173,9 @@ public class ExampleImageStitching {
 
 		// Convert into a BoofCV color format
 		Planar<GrayF32> colorA =
-				ConvertBufferedImage.convertFromMulti(imageA, null, true, GrayF32.class);
+				ConvertBufferedImage.convertFromPlanar(imageA, null, true, GrayF32.class);
 		Planar<GrayF32> colorB =
-				ConvertBufferedImage.convertFromMulti(imageB, null,true, GrayF32.class);
+				ConvertBufferedImage.convertFromPlanar(imageB, null,true, GrayF32.class);
 
 		// Where the output images are rendered into
 		Planar<GrayF32> work = colorA.createSameShape();

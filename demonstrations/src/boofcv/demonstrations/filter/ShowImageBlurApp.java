@@ -115,7 +115,7 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 		output.reshape(image.getWidth(),image.getHeight());
 		storage.reshape(image.getWidth(),image.getHeight());
 
-		ConvertBufferedImage.convertFromMulti(image, input, true, imageType);
+		ConvertBufferedImage.convertFromPlanar(image, input, true, imageType);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

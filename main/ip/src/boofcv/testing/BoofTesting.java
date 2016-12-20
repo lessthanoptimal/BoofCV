@@ -576,20 +576,45 @@ public class BoofTesting {
 
 		// if no specialized check exists, use a slower generalized approach
 		if( imgA instanceof ImageGray) {
-			GImageGray a = FactoryGImageGray.wrap((ImageGray)imgA);
-			GImageGray b = FactoryGImageGray.wrap((ImageGray)imgB);
+			GImageGray a = FactoryGImageGray.wrap((ImageGray) imgA);
+			GImageGray b = FactoryGImageGray.wrap((ImageGray) imgB);
 
-			for( int y = 0; y < imgA.height; y++ ) {
-				for( int x = 0; x < imgA.width; x++ ) {
-					double valA = a.get(x,y).doubleValue();
-					double valB = b.get(x,y).doubleValue();
+			for (int y = 0; y < imgA.height; y++) {
+				for (int x = 0; x < imgA.width; x++) {
+					double valA = a.get(x, y).doubleValue();
+					double valB = b.get(x, y).doubleValue();
 
 					double difference = valA - valB;
-					double max = Math.max( Math.abs(valA), Math.abs(valB));
-					if( max == 0 )
+					double max = Math.max(Math.abs(valA), Math.abs(valB));
+					if (max == 0)
 						max = 1;
-					if( Math.abs(difference)/max > tolFrac )
-						throw new RuntimeException("Values not equal at ("+x+","+y+") "+valA+"  "+valB);
+					if (Math.abs(difference) / max > tolFrac)
+						throw new RuntimeException("Values not equal at (" + x + "," + y + ") " + valA + "  " + valB);
+				}
+			}
+		} else if( imgA instanceof ImageInterleaved) {
+			GImageMultiBand a = FactoryGImageMultiBand.wrap(imgA);
+			GImageMultiBand b = FactoryGImageMultiBand.wrap(imgB);
+
+			float valueA[] = new float[ a.getNumberOfBands() ];
+			float valueB[] = new float[ b.getNumberOfBands() ];
+
+			for (int y = 0; y < imgA.height; y++) {
+				for (int x = 0; x < imgA.width; x++) {
+					a.get(x,y, valueA);
+					b.get(x,y, valueB);
+
+					for (int i = 0; i < a.getNumberOfBands(); i++) {
+						double valA = valueA[i];
+						double valB = valueB[i];
+
+						double difference = valA - valB;
+						double max = Math.max(Math.abs(valA), Math.abs(valB));
+						if (max == 0)
+							max = 1;
+						if (Math.abs(difference) / max > tolFrac)
+							throw new RuntimeException("Values not equal at (" + x + "," + y + ") " + valA + "  " + valB);
+					}
 				}
 			}
 		} else if( imgA instanceof Planar){

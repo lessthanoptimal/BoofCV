@@ -158,7 +158,7 @@ public class ShowLensDistortion<T extends ImageGray<T>>
 		input.reshape(image.getWidth(),image.getHeight());
 		output.reshape(image.getWidth(),image.getHeight());
 
-		ConvertBufferedImage.convertFromMulti(image, input, true, imageType);
+		ConvertBufferedImage.convertFromPlanar(image, input, true, imageType);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

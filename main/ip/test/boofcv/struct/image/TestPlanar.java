@@ -187,4 +187,9 @@ public class TestPlanar {
 		assertTrue( band1 == img.getBand(2));
 		assertTrue( band2 == img.getBand(0));
 	}
+
+	@Test
+	public void setNumberOfBands() {
+		fail("Implement");
+	}
 }

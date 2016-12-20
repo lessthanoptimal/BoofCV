@@ -83,7 +83,7 @@ public class EdgeIntensitiesApp<T extends ImageGray<T>> {
 		T deriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 		T derivBlur = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
-		BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,radius);
+		BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(ImageType.single(imageType),sigma,radius);
 		ImageGradient<T,T> funcDeriv = FactoryDerivative.three(imageType,imageType);
 
 		funcBlur.process(input,blur);
@@ -104,7 +104,7 @@ public class EdgeIntensitiesApp<T extends ImageGray<T>> {
 		T blurDeriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 		T gaussDeriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
-		BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,radius);
+		BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(ImageType.single(imageType),sigma,radius);
 		ImageGradient<T,T> funcDeriv = FactoryDerivative.three(imageType,imageType);
 		ImageGradient<T,T> funcGaussDeriv = FactoryDerivative.gaussian(sigma,radius,imageType,imageType);
 
@@ -136,7 +136,7 @@ public class EdgeIntensitiesApp<T extends ImageGray<T>> {
 		T blurDeriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		for( int sigma = 1; sigma <= 3; sigma++ ) {
-			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,-1);
+			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(ImageType.single(imageType),sigma,-1);
 			funcBlur.process(input,blur);
 			funcDeriv.process(blur,blurDeriv,derivY);
 
@@ -151,7 +151,7 @@ public class EdgeIntensitiesApp<T extends ImageGray<T>> {
 		T deriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		for( int sigma = 1; sigma <= 3; sigma++ ) {
-			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,-1);
+			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(ImageType.single(imageType),sigma,-1);
 			funcDeriv.process(input,deriv,derivY);
 			funcBlur.process(deriv,blur);
 
@@ -182,7 +182,7 @@ public class EdgeIntensitiesApp<T extends ImageGray<T>> {
 
 		for( int sigma = 1; sigma <= 3; sigma++ ) {
 			ImageGradient<T,T> funcGaussDeriv = FactoryDerivative.gaussian(sigma,-1,imageType,imageType);
-			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,-1);
+			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(ImageType.single(imageType),sigma,-1);
 			funcBlur.process(input,blur);
 			funcGaussDeriv.process(blur,blurDeriv,derivY);
 
@@ -198,7 +198,7 @@ public class EdgeIntensitiesApp<T extends ImageGray<T>> {
 		T blurDeriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		for( int sigma = 1; sigma <= 3; sigma++ ) {
-			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,-1);
+			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(ImageType.single(imageType),sigma,-1);
 
 			funcBlur.process(input,blur);
 			funcBlur.process(blur,blur2);

@@ -130,12 +130,12 @@ public class GenerateConvolveNormalized_JustBorder_IL extends CodeGeneratorBase 
 				"\t\tfinal "+sumType+"[] total = new "+sumType+"[ numBands ];\n" +
 				"\n" +
 				"\t\tfor (int i = 0; i < height; i++) {\n" +
+				"\t\t\tint indexDst = dst.startIndex + i*dst.stride;\n" +
 				"\t\t\tfor (int j = 0; j < offsetL; j++) {\n" +
-				"\t\t\t\tint indexDst = dst.startIndex + i*dst.stride;\n" +
 				"\t\t\t\tint indexSrc = src.startIndex + i*src.stride;\n" +
 				"\t\t\t\tArrays.fill(total,0);\n" +
 				"\t\t\t\t"+sumType+" weight = 0;\n" +
-				"\t\t\t\tfor (int k = offsetL-j-1; k < kernelWidth; k++) {\n" +
+				"\t\t\t\tfor (int k = offsetL-j; k < kernelWidth; k++) {\n" +
 				"\t\t\t\t\tdouble w = kernel.data[k];\n" +
 				"\t\t\t\t\tweight += w;\n" +
 				"\t\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
@@ -147,12 +147,12 @@ public class GenerateConvolveNormalized_JustBorder_IL extends CodeGeneratorBase 
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tfor (int j = offsetR; j < kernelWidth; j++) {\n" +
-				"\t\t\t\tint indexDst = dst.startIndex + i*dst.stride + (width-j-1)*numBands;\n" +
-				"\t\t\t\tint indexSrc = src.startIndex + i*src.stride + (width-j-1)*numBands;\n" +
+				"\t\t\tindexDst = dst.startIndex + i*dst.stride + (width-offsetR)*numBands;\n" +
+				"\t\t\tfor (int j = offsetR-1; j >= 0; j--) {\n" +
+				"\t\t\t\tint indexSrc = src.startIndex + i*src.stride + (width-offsetL-j-1)*numBands;\n" +
 				"\t\t\t\tArrays.fill(total,0);\n" +
 				"\t\t\t\t"+sumType+" weight = 0;\n" +
-				"\t\t\t\tfor (int k = 0; k <= j; k++) {\n" +
+				"\t\t\t\tfor (int k = 0; k <= offsetL+j; k++) {\n" +
 				"\t\t\t\t\tdouble w = kernel.data[k];\n" +
 				"\t\t\t\t\tweight += w;\n" +
 				"\t\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
@@ -187,9 +187,9 @@ public class GenerateConvolveNormalized_JustBorder_IL extends CodeGeneratorBase 
 				"\t\tfinal int yEnd = imgHeight - offsetR;\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < offsetL; y++) {\n" +
-				"\t\t\tint indexDst = output.startIndex + y * output.stride;\n" +
-				"\t\t\tint i = input.startIndex + y * input.stride;\n" +
-				"\t\t\tfinal int iEnd = i + imgWidth;\n" +
+				"\t\t\tint indexDst = output.startIndex + y*output.stride;\n" +
+				"\t\t\tint i = input.startIndex + y*input.stride;\n" +
+				"\t\t\tfinal int iEnd = i + imgWidth*numBands;\n" +
 				"\n" +
 				"\t\t\tint kStart = offsetL - y;\n" +
 				"\n" +
@@ -198,7 +198,7 @@ public class GenerateConvolveNormalized_JustBorder_IL extends CodeGeneratorBase 
 				"\t\t\t\tweight += kernel.data[k];\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tfor ( ; i < iEnd; i++) {\n" +
+				"\t\t\tfor ( ; i < iEnd; i += numBands) {\n" +
 				"\t\t\t\tArrays.fill(total,0);\n" +
 				"\t\t\t\tint indexSrc = i - y * input.stride;\n" +
 				"\t\t\t\tfor (int k = kStart; k < kernelWidth; k++, indexSrc += input.stride) {\n" +
@@ -215,8 +215,8 @@ public class GenerateConvolveNormalized_JustBorder_IL extends CodeGeneratorBase 
 				"\n" +
 				"\t\tfor (int y = yEnd; y < imgHeight; y++) {\n" +
 				"\t\t\tint indexDst = output.startIndex + y * output.stride;\n" +
-				"\t\t\tint i = input.startIndex + y * input.stride;\n" +
-				"\t\t\tfinal int iEnd = i + imgWidth;\n" +
+				"\t\t\tint i = input.startIndex + y*input.stride;\n" +
+				"\t\t\tfinal int iEnd = i + imgWidth*numBands;\n" +
 				"\n" +
 				"\t\t\tint kEnd = imgHeight - (y - offsetL);\n" +
 				"\n" +
@@ -225,9 +225,9 @@ public class GenerateConvolveNormalized_JustBorder_IL extends CodeGeneratorBase 
 				"\t\t\t\tweight += kernel.data[k];\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tfor ( ; i < iEnd; i++) {\n" +
+				"\t\t\tfor ( ; i < iEnd; i+=numBands ) {\n" +
 				"\t\t\t\tArrays.fill(total,0);\n" +
-				"\t\t\t\tint indexSrc = i - offsetL * input.stride;\n" +
+				"\t\t\t\tint indexSrc = i - offsetL*input.stride;\n" +
 				"\t\t\t\tfor (int k = 0; k < kEnd; k++, indexSrc += input.stride) {\n" +
 				"\t\t\t\t\t"+sumType+" w = kernel.data[k];\n" +
 				"\t\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
@@ -367,7 +367,7 @@ public class GenerateConvolveNormalized_JustBorder_IL extends CodeGeneratorBase 
 				"\t\t\tint startX = src.width-offsetX1;\n" +
 				"\t\t\tindexDst = dst.startIndex + y*dst.stride + startX*numBands;\n" +
 				"\t\t\ti = src.startIndex + y*src.stride + startX*numBands;\n" +
-				"\t\t\tiEnd = src.startIndex + y * src.stride + src.width;\n" +
+				"\t\t\tiEnd = src.startIndex + y * src.stride + src.width*numBands;\n" +
 				"\t\t\tfor ( int x = startX; i < iEnd; i += numBands, x++ ) {\n" +
 				"\t\t\t\tweightX -= kernelX.data[src.width-x+offsetX];\n" +
 				"\t\t\t\t"+sumType+" weight = weightX*weightY;\n" +
@@ -376,7 +376,7 @@ public class GenerateConvolveNormalized_JustBorder_IL extends CodeGeneratorBase 
 				"\t\t\t\tfor (int k = 0; k < kernelWidthY; k++, indexSrc += src.stride) {\n" +
 				"\t\t\t\t\t"+sumType+" w = kernelY.data[k];\n" +
 				"\t\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
-				"\t\t\t\t\t\ttotal[band] += (dataSrc[indexSrc++]"+bitWiseOp+")*w;\n" +
+				"\t\t\t\t\t\ttotal[band] += (dataSrc[indexSrc+band]"+bitWiseOp+")*w;\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +

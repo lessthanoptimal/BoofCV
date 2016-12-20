@@ -19,7 +19,9 @@
 package boofcv.factory.filter.blur;
 
 import boofcv.abst.filter.blur.BlurStorageFilter;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
 /**
  * Factory for creating different blur image filters.
@@ -35,8 +37,12 @@ public class FactoryBlurFilter {
 	 * @param radius Size of the filter.
 	 * @return Median image filter.
 	 */
-	public static <T extends ImageGray<T>> BlurStorageFilter<T> median(Class<T> type , int radius ) {
+	public static <T extends ImageBase<T>> BlurStorageFilter<T> median(ImageType<T> type , int radius ) {
 		return new BlurStorageFilter<>("median", type, radius);
+	}
+
+	public static <T extends ImageGray<T>> BlurStorageFilter<T> median(Class<T> type , int radius ) {
+		return median(ImageType.single(type), radius);
 	}
 
 	/**
@@ -46,8 +52,12 @@ public class FactoryBlurFilter {
 	 * @param radius Size of the filter.
 	 * @return mean image filter.
 	 */
-	public static <T extends ImageGray<T>> BlurStorageFilter<T> mean(Class<T> type , int radius ) {
+	public static <T extends ImageBase<T>> BlurStorageFilter<T> mean(ImageType<T> type , int radius ) {
 		return new BlurStorageFilter<>("mean", type, radius);
+	}
+
+	public static <T extends ImageGray<T>> BlurStorageFilter<T> mean(Class<T> type , int radius ) {
+		return mean(ImageType.single(type), radius);
 	}
 
 	/**
@@ -57,7 +67,11 @@ public class FactoryBlurFilter {
 	 * @param radius Size of the filter.
 	 * @return mean image filter.
 	 */
-	public static <T extends ImageGray<T>> BlurStorageFilter<T> gaussian(Class<T> type , double sigma , int radius ) {
+	public static <T extends ImageBase<T>> BlurStorageFilter<T> gaussian(ImageType<T> type , double sigma , int radius ) {
 		return new BlurStorageFilter<>("gaussian", type, sigma, radius);
+	}
+
+	public static <T extends ImageGray<T>> BlurStorageFilter<T> gaussian(Class<T> type , double sigma , int radius ) {
+		return gaussian(ImageType.single(type), sigma, radius);
 	}
 }

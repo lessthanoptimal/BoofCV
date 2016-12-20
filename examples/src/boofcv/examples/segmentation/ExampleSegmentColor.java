@@ -69,7 +69,7 @@ public class ExampleSegmentColor {
 	 * can use Gaussian models instead of a uniform distribution, as is done below.
 	 */
 	public static void showSelectedColor( String name , BufferedImage image , float hue , float saturation ) {
-		Planar<GrayF32> input = ConvertBufferedImage.convertFromMulti(image,null,true,GrayF32.class);
+		Planar<GrayF32> input = ConvertBufferedImage.convertFromPlanar(image,null,true,GrayF32.class);
 		Planar<GrayF32> hsv = input.createSameShape();
 
 		// Convert into HSV

@@ -44,7 +44,7 @@ public class ExampleRemovePerspectiveDistortion {
 
 		// load a color image
 		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("goals_and_stuff.jpg"));
-		Planar<GrayF32> input = ConvertBufferedImage.convertFromMulti(buffered, null, true, GrayF32.class);
+		Planar<GrayF32> input = ConvertBufferedImage.convertFromPlanar(buffered, null, true, GrayF32.class);
 
 		RemovePerspectiveDistortion<Planar<GrayF32>> removePerspective =
 				new RemovePerspectiveDistortion<>(400, 500, ImageType.pl(3, GrayF32.class));

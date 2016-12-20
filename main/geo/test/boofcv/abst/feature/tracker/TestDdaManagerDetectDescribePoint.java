@@ -35,6 +35,7 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 
 import java.util.Random;
 
@@ -51,7 +52,7 @@ public class TestDdaManagerDetectDescribePoint extends StandardPointTracker<Gray
 	public PointTracker<GrayF32> createTracker() {
 		DescribePointBrief<GrayF32> brief =
 				FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
-				FactoryBlurFilter.gaussian(GrayF32.class, 0, 4));
+				FactoryBlurFilter.gaussian(ImageType.single(GrayF32.class), 0, 4));
 
 		GeneralFeatureDetector<GrayF32,GrayF32> corner =
 				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(100,2,0,0,true), false, GrayF32.class);

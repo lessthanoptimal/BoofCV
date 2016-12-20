@@ -20,10 +20,10 @@ package boofcv.abst.filter.blur;
 
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -38,15 +38,15 @@ public class TestBlurStorageFilter {
 	int height = 25;
 	Random rand = new Random(234);
 
-	Class[] imageTypes = new Class[]{GrayU8.class, GrayF32.class};
+	ImageType[] imageTypes = new ImageType[]{ImageType.single(GrayU8.class), ImageType.single(GrayF32.class)};
 
 	@Test
 	public void gaussian() {
-		for( Class c : imageTypes ) {
-			ImageGray input = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageGray found = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageGray expected = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageGray storage = GeneralizedImageOps.createSingleBand(c,width,height);
+		for( ImageType c : imageTypes ) {
+			ImageBase input = c.createImage(width,height);
+			ImageBase found = c.createImage(width,height);
+			ImageBase expected = c.createImage(width,height);
+			ImageBase storage = c.createImage(width,height);
 
 			GImageMiscOps.fillUniform(input,rand,0,100);
 
@@ -62,11 +62,11 @@ public class TestBlurStorageFilter {
 
 	@Test
 	public void mean() {
-		for( Class c : imageTypes ) {
-			ImageGray input = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageGray found = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageGray expected = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageGray storage = GeneralizedImageOps.createSingleBand(c,width,height);
+		for( ImageType c : imageTypes ) {
+			ImageBase input = c.createImage(width,height);
+			ImageBase found = c.createImage(width,height);
+			ImageBase expected = c.createImage(width,height);
+			ImageBase storage = c.createImage(width,height);
 
 			GImageMiscOps.fillUniform(input,rand,0,100);
 
@@ -82,10 +82,10 @@ public class TestBlurStorageFilter {
 
 	@Test
 	public void median() {
-		for( Class c : imageTypes ) {
-			ImageGray input = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageGray found = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageGray expected = GeneralizedImageOps.createSingleBand(c,width,height);
+		for( ImageType c : imageTypes ) {
+			ImageBase input = c.createImage(width,height);
+			ImageBase found = c.createImage(width,height);
+			ImageBase expected = c.createImage(width,height);
 
 			GImageMiscOps.fillUniform(input,rand,0,100);
 

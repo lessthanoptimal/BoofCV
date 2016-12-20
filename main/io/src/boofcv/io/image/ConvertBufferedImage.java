@@ -218,7 +218,7 @@ public class ConvertBufferedImage {
 			convertFromSingle(src, sb, (Class<ImageGray>) sb.getClass());
 		} else if( dst instanceof Planar) {
 			Planar ms = (Planar)dst;
-			convertFromMulti(src,ms,orderRgb,ms.getBandType());
+			convertFromPlanar(src,ms,orderRgb,ms.getBandType());
 		} else if( dst instanceof ImageInterleaved ) {
 			convertFromInterleaved(src, (ImageInterleaved) dst, orderRgb);
 		} else {
@@ -244,7 +244,7 @@ public class ConvertBufferedImage {
 				break;
 
 			case PLANAR:
-				convertFromMulti(src, (Planar) out, orderRgb, imageType.getImageClass());
+				convertFromPlanar(src, (Planar) out, orderRgb, imageType.getImageClass());
 				break;
 
 			case INTERLEAVED:
@@ -268,7 +268,7 @@ public class ConvertBufferedImage {
 				break;
 
 			case PLANAR:
-				convertFromMulti(src, (Planar) output, orderRgb, imageType.getImageClass());
+				convertFromPlanar(src, (Planar) output, orderRgb, imageType.getImageClass());
 				break;
 
 			case INTERLEAVED:
@@ -308,9 +308,7 @@ public class ConvertBufferedImage {
 	 */
 	public static GrayU8 convertFrom(BufferedImage src, GrayU8 dst) {
 		if (dst != null) {
-			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
-				throw new IllegalArgumentException("image dimension are different");
-			}
+			dst.reshape(src.getWidth(), src.getHeight());
 		} else {
 			dst = new GrayU8(src.getWidth(), src.getHeight());
 		}
@@ -347,9 +345,7 @@ public class ConvertBufferedImage {
 	 */
 	public static <T extends GrayI16<T>>T convertFrom(BufferedImage src, T dst , Class<T> type ) {
 		if (dst != null) {
-			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
-				throw new IllegalArgumentException("image dimension are different");
-			}
+			dst.reshape(src.getWidth(), src.getHeight());
 		} else {
 			dst = GeneralizedImageOps.createSingleBand(type, src.getWidth(), src.getHeight());
 		}
@@ -377,12 +373,9 @@ public class ConvertBufferedImage {
 	 */
 	public static GrayF32 convertFrom(BufferedImage src, GrayF32 dst) {
 		if (dst != null) {
-			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
-				String difference = "src = "+src.getWidth()+"x"+src.getHeight()+"  dst = "+dst.getWidth()+"x"+dst.getHeight();
-				throw new IllegalArgumentException("image dimension are different. "+difference);
-			}
+			dst.reshape(src.getWidth(), src.getHeight());
 		} else {
-			dst = new GrayF32(src.getWidth(), src.getHeight());
+			dst = new GrayF32( src.getWidth(), src.getHeight());
 		}
 
 		try {
@@ -408,8 +401,7 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts the buffered image into an {@link Planar} image of the specified
-	 * type. 
+	 * Converts the buffered image into an {@link Planar} image of the specified ype.
 	 *
 	 * @param src Input image. Not modified.
 	 * @param dst Output. The converted image is written to.  If null a new unsigned image is created.
@@ -419,15 +411,13 @@ public class ConvertBufferedImage {
 	 * @return Converted image.
 	 */
 	public static <T extends ImageGray<T>> Planar<T>
-	convertFromMulti(BufferedImage src, Planar<T> dst , boolean orderRgb , Class<T> type )
+	convertFromPlanar(BufferedImage src, Planar<T> dst , boolean orderRgb , Class<T> type )
 	{
 		if( src == null )
 			throw new IllegalArgumentException("src is null!");
 
 		if (dst != null) {
-			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
-				throw new IllegalArgumentException("image dimension are different");
-			}
+			dst.reshape(src.getWidth(), dst.getHeight());
 		}
 
 		try {
@@ -442,7 +432,7 @@ public class ConvertBufferedImage {
 			if( dst == null)
 				dst = new Planar<>(type, src.getWidth(), src.getHeight(), numBands);
 			else if( dst.getNumBands() != numBands )
-				throw new IllegalArgumentException("Expected "+numBands+" bands in dst not "+dst.getNumBands());
+				dst.setNumberOfBands(numBands);
 
 			if( type == GrayU8.class ) {
 				if (src.getRaster() instanceof ByteInterleavedRaster &&
@@ -480,6 +470,9 @@ public class ConvertBufferedImage {
 			// Applets don't allow access to the raster()
 			if( dst == null )
 				dst = new Planar<>(type, src.getWidth(), src.getHeight(), 3);
+			else {
+				dst.setNumberOfBands(3);
+			}
 
 			if( type == GrayU8.class ) {
 				ConvertRaster.bufferedToMulti_U8(src, (Planar<GrayU8>) dst);

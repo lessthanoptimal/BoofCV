@@ -44,6 +44,11 @@ public abstract class InterleavedI16<T extends InterleavedI16<T>> extends Interl
 	}
 
 	@Override
+	public String toString_element(int index) {
+		return String.format("%04x",data[index]&0xFFFF);
+	}
+
+	@Override
 	public ImageDataType getDataType() {
 		return ImageDataType.I16;
 	}

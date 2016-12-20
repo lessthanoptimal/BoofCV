@@ -201,6 +201,9 @@ public class TestImageInterleaved {
 		}
 
 		@Override
+		public String toString_element(int index) {return null;}
+
+		@Override
 		public DummyImage createNew(int imgWidth, int imgHeight) {
 			return new DummyImage(imgWidth,imgHeight,numBands);
 		}

@@ -26,6 +26,7 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -65,7 +66,7 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<GrayF32> 
 		alg.process(img);
 
 		// test the first layer
-		BlurFilter<GrayF32> blur = FactoryBlurFilter.gaussian(GrayF32.class,3,-1);
+		BlurFilter<GrayF32> blur = FactoryBlurFilter.gaussian(ImageType.single(GrayF32.class),3,-1);
 		GrayF32 blurrImg = new GrayF32(width, height);
 		blur.process(img, blurrImg);
 		GrayF32 expected = new GrayF32((int)Math.ceil(width/3.0),(int)Math.ceil(height/3.0));
@@ -75,7 +76,7 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<GrayF32> 
 		BoofTesting.assertEquals(expected,found,1e-4);
 
 		// test the second layer
-		blur = FactoryBlurFilter.gaussian(GrayF32.class,sigmas[0],-1);
+		blur = FactoryBlurFilter.gaussian(ImageType.single(GrayF32.class),sigmas[0],-1);
 		blurrImg = new GrayF32(expected.width,expected.height);
 		blur.process(expected,blurrImg);
 		expected = new GrayF32((int)Math.ceil(width/5.0),(int)Math.ceil(height/5.0));

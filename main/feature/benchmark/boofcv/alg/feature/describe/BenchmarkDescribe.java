@@ -95,7 +95,7 @@ public class BenchmarkDescribe<I extends ImageGray<I>, D extends ImageGray<D>, I
 	public class Brief512 extends PerformerBase {
 
 		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
-				FactoryBlurFilter.gaussian(imageType, 0, 4));
+				FactoryBlurFilter.gaussian(ImageType.single(imageType), 0, 4));
 
 		@Override
 		public void process() {
@@ -113,7 +113,7 @@ public class BenchmarkDescribe<I extends ImageGray<I>, D extends ImageGray<D>, I
 		int briefRadius = 16;
 		DescribePointBriefSO<I> alg = FactoryDescribePointAlgs.
 				briefso(FactoryBriefDefinition.gaussian2(new Random(123), briefRadius, 512),
-				FactoryBlurFilter.gaussian(imageType, 0, 4));
+				FactoryBlurFilter.gaussian(ImageType.single(imageType), 0, 4));
 
 		@Override
 		public void process() {

@@ -22,15 +22,20 @@ Version : 0.27
   * Added planar image support
 - Support for Interleaved Images Added to
   * ConvolveWithBorder
-  * ConvolveNormalized TODO
-  * ConvolveDownNormalized TODO
-  * AverageDownSample TODO
+  * ConvolveNormalized
 - AverageDownSample
   * Made image generic
 - Renamed for consistency
   * Kernel2D_I32 -> Kernel2D_S32
   * Kernel2D_I32 -> Kernel2D_S32
 - GConvolveImageOps actual works for all image types now not just gray TODO
+- Changed behavior of ConvertBuffered image
+  * When converting to interleaved and planar images the number of bands is adjusted to match the buffered image
+  * Buffered -> BoofCV: output images are reshaped to match input
+- ImageInterleaved
+  * Added a nicely formatted toString()
+- BlurImageOps - Fixed bug where for planar imges it was apply a median instead of mean filter
+- FactoryBlurFilter - Can now handle image types other than gray scale images
 
 - TODO Fisheye calibration using omni model
 - TODO grid of circle calibration target

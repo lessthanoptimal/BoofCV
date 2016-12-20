@@ -44,6 +44,11 @@ public abstract class InterleavedI8<T extends InterleavedI8<T>> extends Interlea
 	}
 
 	@Override
+	public String toString_element(int index) {
+		return String.format("%02x",data[index]&0xFF);
+	}
+
+	@Override
 	public ImageDataType getDataType() {
 		return ImageDataType.I8;
 	}

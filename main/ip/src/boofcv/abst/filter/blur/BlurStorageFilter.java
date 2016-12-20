@@ -21,7 +21,6 @@ package boofcv.abst.filter.blur;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -30,7 +29,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class BlurStorageFilter<T extends ImageGray<T>> implements BlurFilter<T> {
+public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> {
 
 	// Wrapper around performed operation
 	private BlurOperation operation;
@@ -40,32 +39,39 @@ public class BlurStorageFilter<T extends ImageGray<T>> implements BlurFilter<T> 
 	// size of the blur region
 	private int radius;
 	// stores intermediate results
-	private ImageGray storage;
+	private T storage;
 
 	// type of image it processes
-	Class<T> inputType;
+	ImageType<T> inputType;
 
-	public BlurStorageFilter( String functionName , Class<T> inputType, int radius) {
+	public BlurStorageFilter( String functionName , ImageType<T> inputType, int radius) {
 		this(functionName,inputType,-1,radius);
 	}
 
-	public BlurStorageFilter( String functionName , Class<T> inputType, double sigma , int radius) {
+	public BlurStorageFilter( String functionName , ImageType<T> inputType, double sigma , int radius) {
 		this.radius = radius;
 		this.sigma = sigma;
 		this.inputType = inputType;
 
 		if( functionName.equals("mean")) {
 			operation = new MeanOperation();
-			storage = GeneralizedImageOps.createSingleBand(inputType,1,1);
+			createStorage();
 		} else if( functionName.equals("gaussian")) {
 			operation = new GaussianOperation();
-			storage = GeneralizedImageOps.createSingleBand(inputType,1,1);
+			createStorage();
 		} else if( functionName.equals("median")) {
 			operation = new MedianOperator();
 		} else {
 			throw new IllegalArgumentException("Unknown function "+functionName);
 		}
+	}
 
+	private void createStorage() {
+		if( inputType.getFamily() == ImageType.Family.PLANAR ) {
+			storage = (T)GeneralizedImageOps.createSingleBand(inputType.getImageClass(),1,1);
+		} else {
+			storage = inputType.createImage(1,1);
+		}
 	}
 
 	/**
@@ -102,12 +108,12 @@ public class BlurStorageFilter<T extends ImageGray<T>> implements BlurFilter<T> 
 
 	@Override
 	public ImageType<T> getInputType() {
-		return ImageType.single(inputType);
+		return inputType;
 	}
 
 	@Override
 	public ImageType<T> getOutputType() {
-		return ImageType.single(inputType);
+		return inputType;
 	}
 
 	private interface BlurOperation {

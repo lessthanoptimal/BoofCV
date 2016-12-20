@@ -25,6 +25,7 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
@@ -212,7 +213,7 @@ public class TestCannyEdge {
 	}
 
 	private CannyEdge<GrayU8,GrayS16> createCanny(boolean saveTrace ) {
-		BlurFilter<GrayU8> blur = FactoryBlurFilter.gaussian(GrayU8.class, -1, 1);
+		BlurFilter<GrayU8> blur = FactoryBlurFilter.gaussian(ImageType.single(GrayU8.class), -1, 1);
 		ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.three(GrayU8.class, GrayS16.class);
 
 		return new CannyEdge<>(blur, gradient, saveTrace);
