@@ -18,10 +18,10 @@
 
 package boofcv.alg.distort.mls;
 
-import boofcv.struct.distort.Point2Transform2_F64;
-import georegression.struct.point.Point2D_F64;
+import boofcv.struct.distort.Point2Transform2_F32;
+import georegression.struct.point.Point2D_F32;
 import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.GrowQueue_F32;
 
 /**
  * <p>Implementation of 'Moving Least Squares' control point based image deformation models described in [1].</p>
@@ -48,7 +48,7 @@ import org.ddogleg.struct.GrowQueue_F64;
  */
 // TODO add similar
 // TODO add rigid
-public class ImageDeformPointMLS_F64 implements Point2Transform2_F64 {
+public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 
 	// control points that specifiy the distortion
 	FastQueue<Control> controls = new FastQueue<>(Control.class,true);
@@ -59,10 +59,10 @@ public class ImageDeformPointMLS_F64 implements Point2Transform2_F64 {
 	FastQueue<AffineCache> grid = new FastQueue<>(AffineCache.class, true);
 
 	// parameter used to adjust how distance between control points is weighted
-	double alpha = 3.0/2.0;
+	float alpha = 3.0f/2.0f;
 
 	// scale between image and grid
-	double scaleX,scaleY;
+	float scaleX,scaleY;
 
 	/**
 	 * Specifies the input image size and the size of the grid it will use to approximate the idea solution
@@ -72,11 +72,11 @@ public class ImageDeformPointMLS_F64 implements Point2Transform2_F64 {
 	 * @param gridCols grid columns
 	 */
 	public void configure( int width , int height , int gridRows , int gridCols ) {
-		scaleX = width/(double)gridCols;
-		scaleY = height/(double)gridRows;
+		scaleX = width/(float)gridCols;
+		scaleY = height/(float)gridRows;
 	}
 
-	public int addControl( double x , double y ) {
+	public int addControl( float x , float y ) {
 		Control c = controls.grow();
 		c.p.set(x,y);
 		c.q.set(x,y);
@@ -96,8 +96,8 @@ public class ImageDeformPointMLS_F64 implements Point2Transform2_F64 {
 				cache.weights.resize(controls.size);
 				cache.A.resize(controls.size);
 
-				double v_x = col;
-				double v_y = row;
+				float v_x = col;
+				float v_y = row;
 
 				computeWeights(cache.weights.data, v_x, v_y);
 				computeAverageP( cache);
@@ -117,29 +117,29 @@ public class ImageDeformPointMLS_F64 implements Point2Transform2_F64 {
 	}
 
 	private void computeDeformed( AffineCache cache ) {
-		Point2D_F64 deformed = cache.deformed;
+		Point2D_F32 deformed = cache.deformed;
 		deformed.set(0,0);
 
 		int N = cache.A.size;
 		for (int i = 0; i < N; i++) {
 			Control c = controls.get(i);
-			double a = cache.A.data[i];
+			float a = cache.A.data[i];
 			deformed.x += a*c.q.x + cache.aveQ.x;
 			deformed.y += a*c.q.y + cache.aveQ.y;
 		}
 	}
 
 
-	private void computeAffineCache(AffineCache cache, double v_x, double v_y) {
-		double[] weights = cache.weights.data;
+	private void computeAffineCache(AffineCache cache, float v_x, float v_y) {
+		float[] weights = cache.weights.data;
 
 		// compute the inner 2x2 matrix
 		// sum p[i]'*w[i]*p[i]
-		double inner00 = 0, inner01 = 0, inner11 = 0;
+		float inner00 = 0, inner01 = 0, inner11 = 0;
 
 		for (int i = 0; i < controls.size(); i++) {
 			Control c = controls.get(i);
-			double w = weights[i];
+			float w = weights[i];
 
 			inner00 += c.p.x*c.p.x*w;
 			inner01 += c.p.y*c.p.x*w;
@@ -147,66 +147,66 @@ public class ImageDeformPointMLS_F64 implements Point2Transform2_F64 {
 		}
 
 		// invert it using minors equation
-		double det = (inner00*inner00 - inner01*inner01);
+		float det = (inner00*inner00 - inner01*inner01);
 
-		double inv00 =  inner00 / det;
-		double inv01 = -inner01 / det;
-		double inv11 =  inner11 / det;
+		float inv00 =  inner00 / det;
+		float inv01 = -inner01 / det;
+		float inv11 =  inner11 / det;
 
 		// Finally compute A[i] for each control point
 		for (int i = 0; i < controls.size(); i++) {
 			Control c = controls.get(i);
 
-			double v_m_ap_x = v_x - cache.aveP.x;
-			double v_m_ap_y = v_y - cache.aveP.y;
+			float v_m_ap_x = v_x - cache.aveP.x;
+			float v_m_ap_y = v_y - cache.aveP.y;
 
-			double tmp0 = v_m_ap_x * inv00 + v_m_ap_y * inv01;
-			double tmp1 = v_m_ap_x * inv01 + v_m_ap_y * inv11;
+			float tmp0 = v_m_ap_x * inv00 + v_m_ap_y * inv01;
+			float tmp1 = v_m_ap_x * inv01 + v_m_ap_y * inv11;
 
 			cache.A.data[i] = tmp0 * c.p.x + tmp1 * c.p.y;
 		}
 	}
 
 	private void computeAverageP(AffineCache cache) {
-		double[] weights = cache.weights.data;
+		float[] weights = cache.weights.data;
 		cache.aveP.set(0,0);
 
 		for (int i = 0; i < controls.size(); i++) {
 			Control c = controls.get(i);
-			double w = weights[i];
+			float w = weights[i];
 			cache.aveP.x = c.p.x * w;
 			cache.aveP.y = c.p.y * w;
 		}
 	}
 
 	private void computeAverageQ(AffineCache cache) {
-		double[] weights = cache.weights.data;
+		float[] weights = cache.weights.data;
 		cache.aveQ.set(0,0);
 
 		for (int i = 0; i < controls.size(); i++) {
 			Control c = controls.get(i);
-			double w = weights[i];
+			float w = weights[i];
 			cache.aveQ.x = c.q.x * w;
 			cache.aveQ.y = c.q.y * w;
 		}
 	}
 
-	private void computeWeights(double[] weights, double v_x, double v_y) {
+	private void computeWeights(float[] weights, float v_x, float v_y) {
 		// first compute the weights
-		double totalWeight = 0.0;
+		float totalWeight = 0.0f;
 		for (int i = 0; i < controls.size(); i++) {
 			Control c = controls.get(i);
 
-			double d2 = c.p.distance2(v_x, v_y);
+			float d2 = c.p.distance2(v_x, v_y);
 			// check for the special case
 			if( d2 == 0 ) {
 				for (int j = 0; j < controls.size(); j++) {
-					weights[j] = i==j ? 1.0f : 0.0;
+					weights[j] = i==j ? 1.0f : 0.0f;
 				}
-				totalWeight = 1.0;
+				totalWeight = 1.0f;
 				break;
 			} else {
-				totalWeight += weights[i] = 1.0/Math.pow(d2,alpha);
+				totalWeight += weights[i] = 1.0f/(float)Math.pow(d2,alpha);
 			}
 		}
 
@@ -217,7 +217,7 @@ public class ImageDeformPointMLS_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
+	public void compute(float x, float y, Point2D_F32 out) {
 		computeGridCoordinate(x/scaleX, y/scaleY, out);
 		out.x *= scaleX;
 		out.y *= scaleY;
@@ -229,7 +229,7 @@ public class ImageDeformPointMLS_F64 implements Point2Transform2_F64 {
 	 * @param v_y Grid coordinate y-axis, undistorted
 	 * @param distorted Distorted grid coordinate
 	 */
-	private void computeGridCoordinate( double v_x , double v_y , Point2D_F64 distorted ) {
+	private void computeGridCoordinate( float v_x , float v_y , Point2D_F32 distorted ) {
 
 		// sample the closest point and x+1,y+1
 		int x0 = (int)v_x;
@@ -244,20 +244,20 @@ public class ImageDeformPointMLS_F64 implements Point2Transform2_F64 {
 			y1 = gridCols-1;
 
 		// weight along each axis
-		double ax = v_x - x0;
-		double ay = v_y - y0;
+		float ax = v_x - x0;
+		float ay = v_y - y0;
 
 		// bilinear weight for each sample point
-		double w00 = (1.0 - ax) * (1.0 - ay);
-		double w01 = ax * (1.0 - ay);
-		double w11 = ax * ay;
-		double w10 = (1.0 - ax) * ay;
+		float w00 = (1.0f - ax) * (1.0f - ay);
+		float w01 = ax * (1.0f - ay);
+		float w11 = ax * ay;
+		float w10 = (1.0f - ax) * ay;
 
 		// apply weights to each sample point
-		Point2D_F64 d00 = getGrid(y0,x0).deformed;
-		Point2D_F64 d01 = getGrid(y0,x1).deformed;
-		Point2D_F64 d10 = getGrid(y1,x0).deformed;
-		Point2D_F64 d11 = getGrid(y1,x1).deformed;
+		Point2D_F32 d00 = getGrid(y0,x0).deformed;
+		Point2D_F32 d01 = getGrid(y0,x1).deformed;
+		Point2D_F32 d10 = getGrid(y1,x0).deformed;
+		Point2D_F32 d11 = getGrid(y1,x1).deformed;
 
 		distorted.set(0,0);
 		distorted.x += w00 * d00.x;
@@ -277,21 +277,21 @@ public class ImageDeformPointMLS_F64 implements Point2Transform2_F64 {
 
 	private static class Cache {
 		// location of the final deformed point
-		public Point2D_F64 deformed = new Point2D_F64();
+		public Point2D_F32 deformed = new Point2D_F32();
 	}
 
 	private static class AffineCache extends Cache {
-		public GrowQueue_F64 weights = new GrowQueue_F64();
-		public GrowQueue_F64 A = new GrowQueue_F64();
-		public Point2D_F64 aveP = new Point2D_F64();
-		public Point2D_F64 aveQ = new Point2D_F64();
+		public GrowQueue_F32 weights = new GrowQueue_F32();
+		public GrowQueue_F32 A = new GrowQueue_F32();
+		public Point2D_F32 aveP = new Point2D_F32();
+		public Point2D_F32 aveQ = new Point2D_F32();
 	}
 
-	public double getAlpha() {
+	public float getAlpha() {
 		return alpha;
 	}
 
-	public void setAlpha(double alpha) {
+	public void setAlpha(float alpha) {
 		this.alpha = alpha;
 	}
 
@@ -299,10 +299,10 @@ public class ImageDeformPointMLS_F64 implements Point2Transform2_F64 {
 		/**
 		 * Control point location
 		 */
-		Point2D_F64 p = new Point2D_F64();
+		Point2D_F32 p = new Point2D_F32();
 		/**
 		 * Deformed control point location
 		 */
-		Point2D_F64 q = new Point2D_F64();
+		Point2D_F32 q = new Point2D_F32();
 	}
 }
