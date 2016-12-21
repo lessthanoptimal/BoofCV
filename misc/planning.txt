@@ -77,8 +77,6 @@ Future
 
 - Sparse Bundle Adjustment?
 
-- Look at Sandreas's NewWarp?
-
 - Look at OpenCV's watershed example.  It's actually a useful technique!
 
 - Background Model

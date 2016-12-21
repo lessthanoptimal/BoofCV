@@ -36,6 +36,8 @@ Version : 0.27
   * Added a nicely formatted toString()
 - BlurImageOps - Fixed bug where for planar imges it was apply a median instead of mean filter
 - FactoryBlurFilter - Can now handle image types other than gray scale images
+- Added image distortion based on "Image Deformation Using Moving Least Squares" paper TODO
+  * See ImageDeformPointMLS
 
 - TODO Fisheye calibration using omni model
 - TODO grid of circle calibration target
