@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestPyramidDirectRgbDepth {
+public class TestPyramidDirectColorDepth {
 	@Test
 	public void stuff() {
 		fail("implement");

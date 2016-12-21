@@ -48,17 +48,11 @@ public class LensDistortionOps {
 	 * can select how the view is adjusted.
 	 * </p>
 	 *
-	 * <p>
-	 * If BorderType.VALUE then pixels outside the image will be filled in with a
-	 * value of 0.  For viewing purposes it is recommended that BorderType.VALUE be used and BorderType.EXTENDED
-	 * in computer vision applications.  VALUE creates harsh edges which can cause false positives
-	 * when detecting features, which EXTENDED minimizes.
-	 * </p>
-	 *
 	 * @param type The type of adjustment it will do
-	 * @param borderType Specifies how the image border is handled. Null means borders are ignored.
+	 * @param borderType Specifies how the image border is handled. Null means borders are ignored.  Border of {@link BorderType#ZERO}
+	 *                   is recommended.
 	 * @param param Original intrinsic parameters.
-	 * @param paramAdj (output) Intrinsic parameters which reflect the undistorted image.  Can be null.
+	 * @param paramAdj (output) Intrinsic parameters which reflect the undistorted image. Can be null.
 	 * @param imageType Type of image it will undistort
 	 * @return ImageDistort which removes lens distortion
 	 */
@@ -84,6 +78,12 @@ public class LensDistortionOps {
 				break;
 
 			case NONE:
+				if( paramAdj != null ) {
+					// remove lens distortion
+					paramAdj.set(param);
+					paramAdj.radial = null;
+					paramAdj.t1 = param.t1 = 0;
+				}
 				undistToDist = transformPoint(param).distort_F32(true, true);
 				break;
 		}

@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestVisOdomDirectRgbDepth {
+public class TestVisOdomDirectColorDepth {
 
 	Random rand = new Random(234);
 
@@ -43,7 +43,7 @@ public class TestVisOdomDirectRgbDepth {
 
 	int width = 320;
 	int height = 240;
-	int numBands = 1;
+	int numBands = 2;
 	float fx = 120;
 	float fy = 100;
 	float cx = width/2;
@@ -86,7 +86,7 @@ public class TestVisOdomDirectRgbDepth {
 	}
 
 	public Se3_F32 computeMotion( float colorBefore , float colorAfter , float dx , float dy ) {
-		VisOdomDirectRgbDepth<GrayF32,GrayF32> alg = new VisOdomDirectRgbDepth<>(numBands,imageType,imageType);
+		VisOdomDirectColorDepth<GrayF32,GrayF32> alg = new VisOdomDirectColorDepth<>(numBands,imageType,imageType);
 		alg.setCameraParameters(fx,fy,cx,cy,width,height);
 
 		Planar<GrayF32> input = new Planar<>(GrayF32.class,width,height,numBands);
@@ -100,7 +100,7 @@ public class TestVisOdomDirectRgbDepth {
 
 		// generate some synthetic data.  This will be composed of random points in front of the camera
 		for (int i = 0; i < 100; i++) {
-			VisOdomDirectRgbDepth.Pixel p = alg.keypixels.grow();
+			VisOdomDirectColorDepth.Pixel p = alg.keypixels.grow();
 
 			for (int band = 0; band < numBands; band++) {
 				p.bands[band] = colorBefore;

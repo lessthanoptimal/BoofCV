@@ -120,6 +120,11 @@ public class CameraUniversalOmni extends CameraPinhole {
 		this.t2 = original.t2;
 	}
 
+	@Override
+	public <T extends CameraModel> T createLike() {
+		return (T)new CameraUniversalOmni(radial.length);
+	}
+
 	public double[] getRadial() {
 		return radial;
 	}

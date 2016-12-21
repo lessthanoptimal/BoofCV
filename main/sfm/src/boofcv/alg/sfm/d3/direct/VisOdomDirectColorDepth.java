@@ -51,7 +51,7 @@ import org.ejml.interfaces.linsol.LinearSolver;
 // TODO Handle pathological situations that will basically never happen in real life
 	// anything that makes the A matrix singular.  dx or dy being zero will do the trick
 @SuppressWarnings("unchecked")
-public class VisOdomDirectRgbDepth<I extends ImageGray<I>, D extends ImageGray<D>>
+public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray<D>>
 {
 	// Type of input images
 	private ImageType<Planar<I>> imageType;
@@ -103,7 +103,7 @@ public class VisOdomDirectRgbDepth<I extends ImageGray<I>, D extends ImageGray<D
 	 * @param imageType Input image type
 	 * @param derivType Type of image to store the derivative in
 	 */
-	public VisOdomDirectRgbDepth( final int numBands , Class<I> imageType , Class<D> derivType ) {
+	public VisOdomDirectColorDepth(final int numBands , Class<I> imageType , Class<D> derivType ) {
 
 		this.imageType = ImageType.pl(numBands,imageType);
 		this.derivType = ImageType.pl(numBands,derivType);

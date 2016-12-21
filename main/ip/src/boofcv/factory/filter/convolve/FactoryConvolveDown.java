@@ -52,7 +52,7 @@ public class FactoryConvolveDown {
 				return convolvePL(kernel, border, isHorizontal, skip, inputType.getNumBands(),
 						inputType.getImageClass(), outputType.getImageClass());
 			case GRAY:
-				return convolveG(kernel, border, isHorizontal, skip, inputType.getImageClass(), outputType.getImageClass());
+				return convolveSB(kernel, border, isHorizontal, skip, inputType.getImageClass(), outputType.getImageClass());
 
 			case INTERLEAVED:
 				throw new IllegalArgumentException("Interleaved images are not yet supported");
@@ -69,7 +69,7 @@ public class FactoryConvolveDown {
 				return convolvePL(kernel, border, skip, inputType.getNumBands(),
 						inputType.getImageClass(), outputType.getImageClass());
 			case GRAY:
-				return convolveG(kernel, border, skip, inputType.getImageClass(), outputType.getImageClass());
+				return convolveSB(kernel, border, skip, inputType.getImageClass(), outputType.getImageClass());
 
 			case INTERLEAVED:
 				throw new IllegalArgumentException("Interleaved images are not yet supported");
@@ -88,7 +88,7 @@ public class FactoryConvolveDown {
 	 */
 	public static <Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 	GenericConvolveDown<Input,Output>
-	convolveG(Kernel1D kernel, BorderType border, boolean isHorizontal, int skip, Class<Input> inputType, Class<Output> outputType)
+	convolveSB(Kernel1D kernel, BorderType border, boolean isHorizontal, int skip, Class<Input> inputType, Class<Output> outputType)
 	{
 		outputType = BoofTesting.convertToGenericType(outputType);
 
@@ -131,7 +131,7 @@ public class FactoryConvolveDown {
 	 */
 	public static <Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 	GenericConvolveDown<Input,Output>
-	convolveG(Kernel2D kernel, BorderType border, int skip, Class<Input> inputType, Class<Output> outputType)
+	convolveSB(Kernel2D kernel, BorderType border, int skip, Class<Input> inputType, Class<Output> outputType)
 	{
 		outputType = BoofTesting.convertToGenericType(outputType);
 
@@ -167,7 +167,7 @@ public class FactoryConvolveDown {
 	convolvePL(Kernel1D kernel, BorderType border, boolean isHorizontal, int skip,
 			   int numBands, Class<Input> inputType, Class<Output> outputType)
 	{
-		ConvolveDown<Input,Output> grayDown = convolveG(kernel, border, isHorizontal, skip, inputType, outputType);
+		ConvolveDown<Input,Output> grayDown = convolveSB(kernel, border, isHorizontal, skip, inputType, outputType);
 		return new PlanarConvolveDown<>(grayDown, numBands);
 	}
 
@@ -176,7 +176,7 @@ public class FactoryConvolveDown {
 	convolvePL(Kernel2D kernel, BorderType border, int skip,
 			   int numBands, Class<Input> inputType, Class<Output> outputType)
 	{
-		ConvolveDown<Input,Output> grayDown = convolveG(kernel, border, skip, inputType, outputType);
+		ConvolveDown<Input,Output> grayDown = convolveSB(kernel, border, skip, inputType, outputType);
 		return new PlanarConvolveDown<>(grayDown, numBands);
 	}
 }
