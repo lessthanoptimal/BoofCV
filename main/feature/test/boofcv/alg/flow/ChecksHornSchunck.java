@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class ChecksHornSchunck<T extends ImageGray, D extends ImageGray> {
+public abstract class ChecksHornSchunck<T extends ImageGray<T>, D extends ImageGray<D>> {
 	Class<T> imageType;
 	Class<D> derivType;
 

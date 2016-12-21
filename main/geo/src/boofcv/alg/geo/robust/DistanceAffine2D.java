@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,5 +58,15 @@ public class DistanceAffine2D implements DistanceFromModel<Affine2D_F64,Associat
 
 			distance[i] = expected.distance(p.p2);
 		}
+	}
+
+	@Override
+	public Class<AssociatedPair> getPointType() {
+		return AssociatedPair.class;
+	}
+
+	@Override
+	public Class<Affine2D_F64> getModelType() {
+		return Affine2D_F64.class;
 	}
 }

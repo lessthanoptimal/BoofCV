@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class TemplateDiffSquared<T extends ImageBase>
+public abstract class TemplateDiffSquared<T extends ImageBase<T>>
 		extends BaseTemplateIntensity<T> {
 	// IF MORE IMAGE TYPES ARE ADDED CREATE A GENERATOR FOR THIS CLASS
 

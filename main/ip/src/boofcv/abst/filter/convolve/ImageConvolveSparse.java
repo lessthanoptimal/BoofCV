@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class ImageConvolveSparse< T extends ImageGray, K extends KernelBase>
+public abstract class ImageConvolveSparse< T extends ImageGray<T>, K extends KernelBase>
 		implements ImageFunctionSparse<T>
 {
 	// kernel being convolved

@@ -27,7 +27,9 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.Method;
@@ -48,35 +50,41 @@ public class FactoryConvolve {
 	 * @param border How the image border is handled.
 	 * @return FilterInterface which will perform the specified convolution.
 	 */
-	public static <Input extends ImageGray, Output extends ImageGray>
+	public static <Input extends ImageBase<Input>, Output extends ImageBase<Output>>
 	ConvolveInterface<Input,Output>
-	convolve( Kernel1D kernel, Class<Input> inputType, Class<Output> outputType , BorderType border , boolean isHorizontal )
+	convolve(Kernel1D kernel, ImageType<Input> inputType, ImageType<Output> outputType , BorderType border , boolean isHorizontal )
 	{
-		outputType = BoofTesting.convertToGenericType(outputType);
+		if( inputType.getFamily() != ImageType.Family.GRAY )
+			throw new IllegalArgumentException("Currently only gray scale image supported");
 
-		Class<?> borderClassType = FactoryImageBorder.lookupBorderClassType((Class)inputType);
+		Class _inputType = inputType.getImageClass();
+		Class _outputType = outputType == null ? null : outputType.getImageClass();
+
+		_outputType = BoofTesting.convertToGenericType(_outputType);
+
+		Class<?> borderClassType = FactoryImageBorder.lookupBorderClassType(_inputType);
 		String direction = isHorizontal ? "horizontal" : "vertical";
 		Method m;
 		try {
 			switch( border ) {
 				case SKIP:
-					m = ConvolveImageNoBorder.class.getMethod(direction, kernel.getClass(), inputType, outputType);
+					m = ConvolveImageNoBorder.class.getMethod(direction, kernel.getClass(), _inputType, _outputType);
 					break;
 
 				case EXTENDED:
-					m = BoofTesting.findMethod(ConvolveWithBorder.class,direction,kernel.getClass(),inputType,outputType,borderClassType);
+					m = BoofTesting.findMethod(ConvolveWithBorder.class,direction,kernel.getClass(),_inputType,_outputType,borderClassType);
 					break;
 
 				case REFLECT:
-					m = BoofTesting.findMethod(ConvolveWithBorder.class,direction,kernel.getClass(),inputType,outputType,borderClassType);
+					m = BoofTesting.findMethod(ConvolveWithBorder.class,direction,kernel.getClass(),_inputType,_outputType,borderClassType);
 					break;
 
 				case WRAP:
-					m = BoofTesting.findMethod(ConvolveWithBorder.class,direction,kernel.getClass(),inputType,outputType,borderClassType);
+					m = BoofTesting.findMethod(ConvolveWithBorder.class,direction,kernel.getClass(),_inputType,_outputType,borderClassType);
 					break;
 
 				case NORMALIZED:
-					m = ConvolveNormalized.class.getMethod(direction,kernel.getClass(),inputType,outputType);
+					m = ConvolveNormalized.class.getMethod(direction,kernel.getClass(),_inputType,_outputType);
 					break;
 
 				default:
@@ -99,7 +107,7 @@ public class FactoryConvolve {
 	 * @param borderType How the image border is handled.
 	 * @return FilterInterface which will perform the specified convolution.
 	 */
-	public static <Input extends ImageGray, Output extends ImageGray>
+	public static <Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 	ConvolveInterface<Input,Output>
 	convolve( Kernel2D kernel, Class<Input> inputType, Class<Output> outputType , BorderType borderType)
 	{
@@ -139,6 +147,6 @@ public class FactoryConvolve {
 			throw new IllegalArgumentException("The specified convolution cannot be found");
 		}
 
-		return new GenericConvolve<>(m, kernel, borderType, inputType, outputType);
+		return new GenericConvolve<>(m, kernel, borderType, ImageType.single(inputType), ImageType.single(outputType));
 	}
 }

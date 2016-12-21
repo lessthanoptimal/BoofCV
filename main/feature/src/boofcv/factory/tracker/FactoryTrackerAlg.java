@@ -51,7 +51,7 @@ public class FactoryTrackerAlg {
 	 * @param <D> Derivative image type.
 	 * @return Tracker
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	KltTracker<I, D> klt( KltConfig config, Class<I> imageType , Class<D> derivType )
 	{
 		if( config == null )
@@ -77,7 +77,7 @@ public class FactoryTrackerAlg {
 	 * @param <D> Derivative image type.
 	 * @return Tracker
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PyramidKltTracker<I, D> kltPyramid( KltConfig config,
 										Class<I> imageType ,
 										Class<D> derivType )
@@ -104,7 +104,7 @@ public class FactoryTrackerAlg {
 	 * @param kltConfig Configuration for KLT
 	 * @param imageType Input image type.    @return Feature tracker
 	 */
-	public static <I extends ImageGray, D extends ImageGray, Desc extends TupleDesc>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
 	CombinedTrackerScalePoint<I,D,Desc> combined(DetectDescribePoint<I, Desc> detector,
 												 AssociateDescription<Desc> associate,
 												 PkltConfig kltConfig ,

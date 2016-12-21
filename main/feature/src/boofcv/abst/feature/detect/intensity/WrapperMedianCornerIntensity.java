@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
  * 
  * @author Peter Abeles
  */
-public class WrapperMedianCornerIntensity<I extends ImageGray, D extends ImageGray>
+public class WrapperMedianCornerIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
 		extends BaseGeneralFeatureIntensity<I,D>  {
 
 	Method m;

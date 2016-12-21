@@ -28,7 +28,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class PlaybackImageSequence<T extends ImageGray> extends ProcessImageSequence<T> {
+public class PlaybackImageSequence<T extends ImageGray<T>> extends ProcessImageSequence<T> {
 
 	ImagePanel panel;
 

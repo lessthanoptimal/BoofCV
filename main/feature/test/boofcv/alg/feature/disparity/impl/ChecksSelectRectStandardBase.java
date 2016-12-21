@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Peter Abeles
  */
-public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray> {
+public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray<T>> {
 
 	Class<ArrayData> arrayType;
 

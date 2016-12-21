@@ -25,10 +25,11 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 
 import java.util.Random;
 
@@ -46,7 +47,7 @@ public class BenchmarkConvolveMean {
 	static private GrayF32 input_F32 = new GrayF32(width,height);
 	static private GrayF32 out_F32 = new GrayF32(width,height);
 	static private GrayF32 storageF32 = new GrayF32(width,height);
-	static private Kernel1D_I32 kernelI32;
+	static private Kernel1D_S32 kernelI32;
 	static private GrayU8 input_I8 = new GrayU8(width,height);
 	static private GrayS16 input_I16 = new GrayS16(width,height);
 	static private GrayU8 out_I8 = new GrayU8(width,height);
@@ -64,7 +65,7 @@ public class BenchmarkConvolveMean {
 	}
 
 	protected void setUp() throws Exception {
-		filter = FactoryBlurFilter.mean(GrayF32.class,radius);
+		filter = FactoryBlurFilter.mean(ImageType.single(GrayF32.class),radius);
 		kernelF32 = FactoryKernel.table1D_F32(radius, true);
 		kernelI32 = FactoryKernel.table1D_I32(radius);
 	}

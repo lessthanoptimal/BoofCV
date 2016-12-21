@@ -48,7 +48,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectBlackEllipseApp<T extends ImageGray> extends DemonstrationBase<T>
+public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DemonstrationBase<T>
 		implements ThresholdControlPanel.Listener
 {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,5 +74,15 @@ public class DistanceHomographyPixelSq implements DistanceFromModel<Homography2D
 
 			distance[i] = errorCam2.errorSq(expected,p.p2);
 		}
+	}
+
+	@Override
+	public Class<AssociatedPair> getPointType() {
+		return AssociatedPair.class;
+	}
+
+	@Override
+	public Class<Homography2D_F64> getModelType() {
+		return Homography2D_F64.class;
 	}
 }

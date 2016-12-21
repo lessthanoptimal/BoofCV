@@ -24,6 +24,7 @@ import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import java.util.Random;
@@ -58,7 +59,7 @@ public class PyramidKltTestBase {
 
 	public void setup( int ...scales ) {
 
-		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,false,GrayF32.class);
+		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,false, ImageType.single(GrayF32.class));
 		ImageMiscOps.fillUniform(image,rand,0,10);
 		ImageMiscOps.fillRectangle(image,100,cornerX,cornerY,20,20);
 		pyramid.process(image);

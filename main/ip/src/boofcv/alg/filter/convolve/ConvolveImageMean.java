@@ -20,11 +20,11 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
-import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder;
+import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder_SB;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_F64;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
 
 
@@ -52,7 +52,7 @@ public class ConvolveImageMean {
 			ConvolveNormalized.horizontal(kernel,input,output);
 		} else {
 			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder.horizontal(kernel, input ,output );
+			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input ,output );
 			ImplConvolveMean.horizontal(input, output, radius);
 		}
 	}
@@ -72,7 +72,7 @@ public class ConvolveImageMean {
 			ConvolveNormalized.vertical(kernel, input, output);
 		} else {
 			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder.vertical(kernel, input, output);
+			ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 			ImplConvolveMean.vertical(input, output, radius);
 		}
 	}
@@ -92,7 +92,7 @@ public class ConvolveImageMean {
 			ConvolveNormalized.horizontal(kernel,input,output);
 		} else {
 			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder.horizontal(kernel, input ,output );
+			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input ,output );
 			ImplConvolveMean.horizontal(input, output, radius);
 		}
 	}
@@ -112,7 +112,7 @@ public class ConvolveImageMean {
 			ConvolveNormalized.vertical(kernel, input, output);
 		} else {
 			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder.vertical(kernel, input, output);
+			ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 			ImplConvolveMean.vertical(input, output, radius);
 		}
 	}
@@ -126,12 +126,12 @@ public class ConvolveImageMean {
 	 * @param radius Kernel size.
 	 */
 	public static void horizontal(GrayU8 input, GrayU8 output, int radius) {
-		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 		if( kernel.width > input.width ) {
 			ConvolveNormalized.horizontal(kernel,input,output);
 		} else {
 			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder.horizontal(kernel, input ,output );
+			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input ,output );
 			ImplConvolveMean.horizontal(input, output, radius);
 		}
 	}
@@ -146,12 +146,12 @@ public class ConvolveImageMean {
 	 */
 	public static void vertical(GrayU8 input, GrayI8 output, int radius) {
 
-		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 		if( kernel.width > input.height ) {
 			ConvolveNormalized.vertical(kernel,input,output);
 		} else {
 			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder.vertical(kernel, input ,output );
+			ConvolveNormalized_JustBorder_SB.vertical(kernel, input ,output );
 			ImplConvolveMean.vertical(input, output, radius);
 		}
 	}
@@ -165,12 +165,12 @@ public class ConvolveImageMean {
 	 * @param radius Kernel size.
 	 */
 	public static void horizontal(GrayS16 input, GrayI16 output, int radius) {
-		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 		if( kernel.width > input.width ) {
 			ConvolveNormalized.horizontal(kernel,input,output);
 		} else {
 			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder.horizontal(kernel, input ,output );
+			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input ,output );
 			ImplConvolveMean.horizontal(input, output, radius);
 		}
 	}
@@ -185,12 +185,12 @@ public class ConvolveImageMean {
 	 */
 	public static void vertical(GrayS16 input, GrayI16 output, int radius ) {
 
-		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 		if( kernel.width > input.height ) {
 			ConvolveNormalized.vertical(kernel,input,output);
 		} else {
 			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder.vertical(kernel, input ,output );
+			ConvolveNormalized_JustBorder_SB.vertical(kernel, input ,output );
 			ImplConvolveMean.vertical(input, output, radius);
 		}
 	}

@@ -37,7 +37,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class OrientationHistogram <D extends ImageGray>
+public abstract class OrientationHistogram <D extends ImageGray<D>>
 		implements OrientationGradient<D>
 {
 	// the region's radius

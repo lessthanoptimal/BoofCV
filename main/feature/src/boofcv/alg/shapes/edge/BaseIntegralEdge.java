@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class BaseIntegralEdge<T extends ImageGray> {
+public class BaseIntegralEdge<T extends ImageGray<T>> {
 	Class<T> imageType;
 
 	// used when computing the fit for a line at specific points

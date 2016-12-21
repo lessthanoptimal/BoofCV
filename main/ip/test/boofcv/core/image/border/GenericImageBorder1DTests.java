@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericImageBorder1DTests<T extends ImageBase> extends GenericImageBorderTests<T> {
+public abstract class GenericImageBorder1DTests<T extends ImageBase<T>> extends GenericImageBorderTests<T> {
 
 	BorderIndex1D_Wrap wrap = new BorderIndex1D_Wrap();
 

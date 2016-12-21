@@ -31,7 +31,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class WrapperHessianBlobIntensity<I extends ImageGray, D extends ImageGray>
+public class WrapperHessianBlobIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
 		extends BaseGeneralFeatureIntensity<I,D>
 {
 

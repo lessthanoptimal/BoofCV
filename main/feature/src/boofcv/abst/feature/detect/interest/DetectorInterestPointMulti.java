@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageBase;
 // Development Note:  If MSER is added then it might make sense to abstract out this class so that different
 //                    types of detected features can be returned using generics
 // rename to DetectorMulti<T,Type> ?
-public interface DetectorInterestPointMulti<T extends ImageBase> {
+public interface DetectorInterestPointMulti<T extends ImageBase<T>> {
 
 	/**
 	 * Detects interest points inside the provided image.

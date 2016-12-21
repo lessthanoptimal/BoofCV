@@ -28,7 +28,7 @@ import boofcv.struct.image.Planar;
  *
  * @author Peter Abeles
  */
-public class ImageGradient_PL<T extends ImageGray, D extends ImageGray>
+public class ImageGradient_PL<T extends ImageGray<T>, D extends ImageGray<D>>
 		implements ImageGradient<Planar<T>,Planar<D>>
 {
 	ImageGradient<T,D> bandGradient;

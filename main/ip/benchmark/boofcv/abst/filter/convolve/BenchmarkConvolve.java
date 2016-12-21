@@ -27,9 +27,9 @@ import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.ImageBorder1D_S32;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
@@ -50,8 +50,8 @@ public class BenchmarkConvolve  {
 
 	static Kernel2D_F32 kernel2D_F32;
 	static Kernel1D_F32 kernelF32;
-	static Kernel1D_I32 kernelI32;
-	static Kernel2D_I32 kernel2D_I32;
+	static Kernel1D_S32 kernelI32;
+	static Kernel2D_S32 kernel2D_I32;
 	static GrayF32 input_F32 = new GrayF32(width,height);
 	static GrayF32 out_F32 = new GrayF32(width,height);
 	static GrayU8 input_U8 = new GrayU8(width,height);
@@ -72,20 +72,20 @@ public class BenchmarkConvolve  {
 
 	protected void setUp() throws Exception {
 		kernelF32 = FactoryKernelGaussian.gaussian(Kernel1D_F32.class, -1, radius);
-		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,radius);
+		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,-1,radius);
 		kernel2D_F32 = FactoryKernelGaussian.gaussian(Kernel2D_F32.class,-1,radius);
-		kernel2D_I32 = FactoryKernelGaussian.gaussian(Kernel2D_I32.class, -1, radius);
+		kernel2D_I32 = FactoryKernelGaussian.gaussian(Kernel2D_S32.class, -1, radius);
 	}
 
 	public int timeHorizontal_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageStandard.horizontal(kernelF32, input_F32,out_F32);
+			ConvolveImageStandard_SB.horizontal(kernelF32, input_F32,out_F32);
 		return 0;
 	}
 
 	public int timeHorizontal_I8_I8_div2(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageStandard.horizontal(kernelI32, input_U8, out_U8, 10);
+			ConvolveImageStandard_SB.horizontal(kernelI32, input_U8, out_U8, 10);
 		return 0;
 	}
 
@@ -98,25 +98,25 @@ public class BenchmarkConvolve  {
 
 	public int timeHorizontal_I8_I16(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageStandard.horizontal(kernelI32, input_U8, out_S16);
+			ConvolveImageStandard_SB.horizontal(kernelI32, input_U8, out_S16);
 		return 0;
 	}
 
 	public int timeHorizontal_I16_I16(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageStandard.horizontal(kernelI32, input_S16, out_S16);
+			ConvolveImageStandard_SB.horizontal(kernelI32, input_S16, out_S16);
 		return 0;
 	}
 
 	public int timeVertical_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageStandard.vertical(kernelF32, input_F32, out_F32);
+			ConvolveImageStandard_SB.vertical(kernelF32, input_F32, out_F32);
 		return 0;
 	}
 
 	public int timeVertical_I8_I8_div(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageStandard.vertical(kernelI32, input_U8, out_U8,10);
+			ConvolveImageStandard_SB.vertical(kernelI32, input_U8, out_U8,10);
 		return 0;
 	}
 
@@ -129,13 +129,13 @@ public class BenchmarkConvolve  {
 
 	public int timeVertical_I8_I16(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageStandard.vertical(kernelI32, input_U8, out_S16);
+			ConvolveImageStandard_SB.vertical(kernelI32, input_U8, out_S16);
 		return 0;
 	}
 
 	public int timeVertical_I16_I16(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageStandard.vertical(kernelI32, input_S16, out_S16);
+			ConvolveImageStandard_SB.vertical(kernelI32, input_S16, out_S16);
 		return 0;
 	}
 
@@ -147,7 +147,7 @@ public class BenchmarkConvolve  {
 
 	public int timeConvolve2D_Std_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageStandard.convolve(kernel2D_F32, input_F32,out_F32);
+			ConvolveImageStandard_SB.convolve(kernel2D_F32, input_F32,out_F32);
 		return 0;
 	}
 
@@ -172,7 +172,7 @@ public class BenchmarkConvolve  {
 
 	public int timeConvolve2D_Std_I8_I8_DIV(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageStandard.convolve(kernel2D_I32, input_U8, out_U8,10);
+			ConvolveImageStandard_SB.convolve(kernel2D_I32, input_U8, out_U8,10);
 		return 0;
 	}
 

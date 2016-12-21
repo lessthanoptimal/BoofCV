@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ import georegression.struct.shapes.Quadrilateral_F64;
  * @author Peter Abeles
  */
 // TODO add binary image for background model?
-public interface TrackerObjectQuad<T extends ImageBase> {
+public interface TrackerObjectQuad<T extends ImageBase<T>> {
 
 	/**
 	 * Initializes tracking by specifying the object's location using a quadrilateral. Some implementations can

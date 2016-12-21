@@ -49,7 +49,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class ShowFeatureOrientationApp<T extends ImageGray, D extends ImageGray>
+public class ShowFeatureOrientationApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel {
 	ImagePanel panel;
 

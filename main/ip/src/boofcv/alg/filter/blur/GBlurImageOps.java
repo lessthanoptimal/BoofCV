@@ -40,7 +40,7 @@ public class GBlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	T mean(T input, T output, int radius, ImageBase storage ) {
 		if( input instanceof GrayU8) {
 			return (T)BlurImageOps.mean((GrayU8)input,(GrayU8)output,radius,(GrayU8)storage);
@@ -64,7 +64,7 @@ public class GBlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	T median(T input, T output, int radius ) {
 		if( input instanceof GrayU8) {
 			return (T)BlurImageOps.median((GrayU8) input, (GrayU8) output, radius);
@@ -88,18 +88,39 @@ public class GBlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	T gaussian(T input, T output, double sigma , int radius, T storage ) {
-		if( input instanceof GrayU8) {
-			return (T)BlurImageOps.gaussian((GrayU8)input,(GrayU8)output,sigma,radius,(GrayU8)storage);
-		} else if( input instanceof GrayF32) {
-			return (T)BlurImageOps.gaussian((GrayF32)input,(GrayF32)output,sigma,radius,(GrayF32)storage);
-		} else if( input instanceof GrayF64) {
-			return (T)BlurImageOps.gaussian((GrayF64)input,(GrayF64)output,sigma,radius,(GrayF64)storage);
-		} else if( input instanceof Planar) {
-			return (T)BlurImageOps.gaussian((Planar)input,(Planar)output,sigma,radius,(ImageGray)storage);
-		} else  {
-			throw new IllegalArgumentException("Unsupported image type: "+input.getClass().getSimpleName());
+		switch( input.getImageType().getFamily() ) {
+			case GRAY: {
+				if (input instanceof GrayU8) {
+					return (T) BlurImageOps.gaussian((GrayU8) input, (GrayU8) output, sigma, radius, (GrayU8) storage);
+				} else if (input instanceof GrayF32) {
+					return (T) BlurImageOps.gaussian((GrayF32) input, (GrayF32) output, sigma, radius, (GrayF32) storage);
+				} else if (input instanceof GrayF64) {
+					return (T) BlurImageOps.gaussian((GrayF64) input, (GrayF64) output, sigma, radius, (GrayF64) storage);
+				} else {
+					throw new IllegalArgumentException("Unsupported image type: " + input.getClass().getSimpleName());
+				}
+			}
+
+			case INTERLEAVED:{
+				if (input instanceof InterleavedU8) {
+					return (T) BlurImageOps.gaussian((InterleavedU8) input, (InterleavedU8) output, sigma, radius, (InterleavedU8) storage);
+				} else if (input instanceof InterleavedF32) {
+					return (T) BlurImageOps.gaussian((InterleavedF32) input, (InterleavedF32) output, sigma, radius, (InterleavedF32) storage);
+				} else if (input instanceof InterleavedF64) {
+					return (T) BlurImageOps.gaussian((InterleavedF64) input, (InterleavedF64) output, sigma, radius, (InterleavedF64) storage);
+				} else {
+					throw new IllegalArgumentException("Unsupported image type: " + input.getClass().getSimpleName());
+				}
+			}
+
+			case PLANAR:{
+				return (T) BlurImageOps.gaussian((Planar) input, (Planar) output, sigma, radius, (ImageGray) storage);
+			}
+
+			default:
+				throw new IllegalArgumentException("Unknown image family");
 		}
 	}
 }

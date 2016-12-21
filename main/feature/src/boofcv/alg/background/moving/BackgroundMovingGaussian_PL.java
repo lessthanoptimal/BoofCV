@@ -34,7 +34,7 @@ import georegression.struct.InvertibleTransform;
  *
  * @author Peter Abeles
  */
-public class BackgroundMovingGaussian_PL<T extends ImageGray, Motion extends InvertibleTransform<Motion>>
+public class BackgroundMovingGaussian_PL<T extends ImageGray<T>, Motion extends InvertibleTransform<Motion>>
 		extends BackgroundMovingGaussian<Planar<T>,Motion>
 {
 

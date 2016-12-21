@@ -43,7 +43,6 @@ public class RemoveRadialPtoN_F32 implements Point2Transform2_F32 {
 	// These are the upper triangular elements in a 3x3 matrix
 	private float a11,a12,a13,a22,a23;
 
-
 	private float tol = GrlConstants.FCONV_TOL_A;
 
 	public RemoveRadialPtoN_F32() {

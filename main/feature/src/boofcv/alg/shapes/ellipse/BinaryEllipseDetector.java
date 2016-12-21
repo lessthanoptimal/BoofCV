@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BinaryEllipseDetector<T extends ImageGray> {
+public class BinaryEllipseDetector<T extends ImageGray<T>> {
 
 	BinaryEllipseDetectorPixel ellipseDetector;
 	SnapToEllipseEdge<T> ellipseRefiner;

@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class ChecksGeneralFeatureIntensity<I extends ImageGray, D extends ImageGray>
+public abstract class ChecksGeneralFeatureIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
 {
 	public List<Class> listInputTypes = new ArrayList<>();
 	public List<Class> listDerivTypes = new ArrayList<>();

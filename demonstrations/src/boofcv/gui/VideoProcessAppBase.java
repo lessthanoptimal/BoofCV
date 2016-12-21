@@ -35,7 +35,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public abstract class VideoProcessAppBase<I extends ImageBase>
+public abstract class VideoProcessAppBase<I extends ImageBase<I>>
 		extends SelectAlgorithmAndInputPanel implements VisualizeApp, MouseListener , ChangeListener
 {
 	protected SimpleImageSequence<I> sequence;

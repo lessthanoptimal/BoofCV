@@ -61,7 +61,7 @@ import static boofcv.alg.geo.RectifyImageOps.transformRectToPixel_F64;
  *
  * @author Peter Abeles
  */
-public class VisualizeStereoDisparity <T extends ImageGray, D extends ImageGray>
+public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel
 	implements DisparityDisplayPanel.Listener
 {

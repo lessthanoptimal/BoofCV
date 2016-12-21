@@ -30,7 +30,7 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public abstract class ImageDistortCache_SB<Input extends ImageGray,Output extends ImageGray>
+public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends ImageGray<Output>>
 		implements ImageDistort<Input,Output> {
 
 	// size of output image

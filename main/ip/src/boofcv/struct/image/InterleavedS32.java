@@ -44,6 +44,11 @@ public class InterleavedS32 extends InterleavedInteger<InterleavedS32> {
 	}
 
 	@Override
+	public String toString_element(int index) {
+		return String.format("%08x",data[index]);
+	}
+
+	@Override
 	public ImageDataType getDataType() {
 		return ImageDataType.S32;
 	}

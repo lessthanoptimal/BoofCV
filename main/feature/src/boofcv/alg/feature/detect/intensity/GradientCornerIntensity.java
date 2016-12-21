@@ -50,7 +50,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface GradientCornerIntensity<T extends ImageGray> extends FeatureIntensity<T> {
+public interface GradientCornerIntensity<T extends ImageGray<T>> extends FeatureIntensity<T> {
 
 	/**
 	 * Computes feature intensity image.

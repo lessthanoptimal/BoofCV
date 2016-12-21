@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface ImageGenerator<T extends ImageGray> {
+public interface ImageGenerator<T extends ImageGray<T>> {
 
 	public T[] createArray( int number );
 

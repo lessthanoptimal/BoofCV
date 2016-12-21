@@ -24,7 +24,7 @@ import boofcv.struct.image.InterleavedInteger;
 /**
  * @author Peter Abeles
  */
-public class ImageBorder1D_IL_S32<T extends InterleavedInteger> extends ImageBorder_IL_S32<T> {
+public class ImageBorder1D_IL_S32<T extends InterleavedInteger<T>> extends ImageBorder_IL_S32<T> {
 	BorderIndex1D rowWrap;
 	BorderIndex1D colWrap;
 

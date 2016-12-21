@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class GenericTestsDetectDescribePoint<T extends ImageBase,D extends TupleDesc> {
+public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D extends TupleDesc> {
 	int width = 100;
 	int height = 120;
 

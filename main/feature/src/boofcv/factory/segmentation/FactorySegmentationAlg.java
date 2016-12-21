@@ -47,7 +47,7 @@ public class FactorySegmentationAlg {
 	 * @param imageType image type
 	 * @return ComputeRegionMeanColor
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	ComputeRegionMeanColor<T> regionMeanColor(ImageType<T> imageType) {
 		if( imageType.getFamily() == ImageType.Family.GRAY) {
 			switch( imageType.getDataType() ) {
@@ -77,7 +77,7 @@ public class FactorySegmentationAlg {
 	 * @param imageType Type of input image
 	 * @return SegmentMeanShift
 	 */
-	public static<T extends ImageBase>
+	public static<T extends ImageBase<T>>
 	SegmentMeanShift<T> meanShift( ConfigSegmentMeanShift config,  ImageType<T> imageType )
 	{
 		if( config == null )
@@ -111,7 +111,7 @@ public class FactorySegmentationAlg {
 		return new SegmentMeanShift<>(search, merge, prune, config.connectRule);
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	FhEdgeWeights<T> weightsFelzenszwalb04( ConnectRule rule , ImageType<T> imageType) {
 		if( imageType.getFamily() == ImageType.Family.GRAY) {
 			if( rule == ConnectRule.FOUR ) {
@@ -151,7 +151,7 @@ public class FactorySegmentationAlg {
 		throw new IllegalArgumentException("Unknown imageType or connect rule");
 	}
 
-	public static<T extends ImageBase>
+	public static<T extends ImageBase<T>>
 	SegmentFelzenszwalbHuttenlocher04<T> fh04(ConfigFh04 config, ImageType<T> imageType)
 	{
 
@@ -170,7 +170,7 @@ public class FactorySegmentationAlg {
 		return alg;
 	}
 
-	public static<T extends ImageBase>
+	public static<T extends ImageBase<T>>
 	SegmentSlic<T> slic( ConfigSlic config , ImageType<T> imageType )
 	{
 		if( config == null )

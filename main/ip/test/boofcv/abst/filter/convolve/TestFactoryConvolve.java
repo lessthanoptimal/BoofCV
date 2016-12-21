@@ -29,9 +29,9 @@ import boofcv.core.image.border.ImageBorder1D_S32;
 import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -65,19 +65,19 @@ public class TestFactoryConvolve {
 		ImageMiscOps.fillUniform(input,rand,0,5);
 
 		// CHECK NO BORDER
-		conv = FactoryConvolve.convolve( kernel,GrayF32.class,GrayF32.class,BorderType.SKIP,true);
+		conv = FactoryConvolve.convolve( kernel,input.imageType,found.imageType,BorderType.SKIP,true);
 		conv.process(input,found);
 		ConvolveImageNoBorder.horizontal(kernel,input,expected);
 		BoofTesting.assertEquals(expected,found,1e-4f);
 
 		// CHECK EXTENDED
-		conv = FactoryConvolve.convolve( kernel,GrayF32.class,GrayF32.class,BorderType.EXTENDED,true);
+		conv = FactoryConvolve.convolve( kernel,input.imageType,found.imageType,BorderType.EXTENDED,true);
 		conv.process(input,found);
 		ConvolveWithBorder.horizontal(kernel,input,expected,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 		BoofTesting.assertEquals(expected,found,1e-4f);
 
 		// CHECK NORMALIZED
-		conv = FactoryConvolve.convolve( kernel,GrayF32.class,GrayF32.class,BorderType.NORMALIZED,true);
+		conv = FactoryConvolve.convolve( kernel,input.imageType,found.imageType,BorderType.NORMALIZED,true);
 		conv.process(input,found);
 		ConvolveNormalized.horizontal(kernel,input,expected);
 		BoofTesting.assertEquals(expected,found,1e-4f);
@@ -86,7 +86,7 @@ public class TestFactoryConvolve {
 	@Test
 	public void convolve1D_I32() {
 
-		Kernel1D_I32 kernel = FactoryKernel.random1D_I32(kernelWidth,radius,1,6,rand);
+		Kernel1D_S32 kernel = FactoryKernel.random1D_I32(kernelWidth,radius,1,6,rand);
 
 		ConvolveInterface conv;
 
@@ -97,13 +97,13 @@ public class TestFactoryConvolve {
 		ImageMiscOps.fillUniform(input,rand,0,5);
 
 		// CHECK NO BORDER
-		conv = FactoryConvolve.convolve( kernel,GrayU8.class,GrayI16.class, BorderType.SKIP,true);
+		conv = FactoryConvolve.convolve( kernel,input.imageType,found.imageType, BorderType.SKIP,true);
 		conv.process(input,found);
 		ConvolveImageNoBorder.horizontal(kernel,input,expected);
 		BoofTesting.assertEquals(expected,found,0);
 
 		// CHECK EXTENDED
-		conv = FactoryConvolve.convolve( kernel,GrayU8.class, GrayI16.class,BorderType.EXTENDED,true);
+		conv = FactoryConvolve.convolve( kernel,input.imageType,found.imageType,BorderType.EXTENDED,true);
 		conv.process(input,found);
 		ConvolveWithBorder.horizontal(kernel,input,expected,new ImageBorder1D_S32(BorderIndex1D_Extend.class));
 		BoofTesting.assertEquals(expected,found,0);
@@ -111,7 +111,7 @@ public class TestFactoryConvolve {
 		// CHECK NORMALIZED
 		GrayU8 found8 = new GrayU8(width,height);
 		GrayU8 expected8 = new GrayU8(width,height);
-		conv = FactoryConvolve.convolve( kernel,GrayU8.class, GrayI8.class,BorderType.NORMALIZED,true);
+		conv = FactoryConvolve.convolve( kernel,input.imageType,ImageType.single(GrayI8.class),BorderType.NORMALIZED,true);
 		conv.process(input,found8);
 		ConvolveNormalized.horizontal(kernel,input,expected8);
 		BoofTesting.assertEquals(expected8,found8,0);
@@ -151,7 +151,7 @@ public class TestFactoryConvolve {
 	@Test
 	public void convolve2D_I32() {
 
-		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(kernelWidth,radius,1,6,rand);
+		Kernel2D_S32 kernel = FactoryKernel.random2D_I32(kernelWidth,radius,1,6,rand);
 
 		ConvolveInterface conv;
 

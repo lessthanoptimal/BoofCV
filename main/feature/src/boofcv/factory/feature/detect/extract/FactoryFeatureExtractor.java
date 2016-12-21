@@ -41,7 +41,7 @@ public class FactoryFeatureExtractor {
 	 * @param maxFeatures Maximum number of features it should return. -1 to return them all.
 	 * @return General feature detector
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureDetector<I, D> general(GeneralFeatureIntensity<I, D> intensity,
 										 NonMaxSuppression extractor,
 										 int maxFeatures ) {

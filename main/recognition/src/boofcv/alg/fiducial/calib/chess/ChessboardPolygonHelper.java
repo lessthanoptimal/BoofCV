@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ChessboardPolygonHelper<T extends ImageGray> implements PolygonHelper {
+public class ChessboardPolygonHelper<T extends ImageGray<T>> implements PolygonHelper {
 	BinaryPolygonDetector<T> detectorSquare;
 	RefineBinaryPolygon<T> refineLine;
 	RefineBinaryPolygon<T> refineCorner;

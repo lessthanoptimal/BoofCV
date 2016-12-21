@@ -71,19 +71,19 @@ public class FactoryImageBorderAlgs {
 		return ImageBorderValue.wrap(image,value);
 	}
 
-	public static <T extends GrayI> ImageBorder1D_S32<T> extend(T image ) {
+	public static <T extends GrayI<T>> ImageBorder1D_S32<T> extend(T image ) {
 		ImageBorder1D_S32<T> ret = new ImageBorder1D_S32<>((Class) BorderIndex1D_Extend.class);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static <T extends GrayI> ImageBorder1D_S32<T> reflect(T image ) {
+	public static <T extends GrayI<T>> ImageBorder1D_S32<T> reflect(T image ) {
 		ImageBorder1D_S32<T> ret = new ImageBorder1D_S32<>((Class) BorderIndex1D_Reflect.class);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static <T extends GrayI> ImageBorder1D_S32<T> wrap(T image ) {
+	public static <T extends GrayI<T>> ImageBorder1D_S32<T> wrap(T image ) {
 		ImageBorder1D_S32<T> ret = new ImageBorder1D_S32<>((Class) BorderIndex1D_Wrap.class);
 		ret.setImage(image);
 		return ret;

@@ -76,8 +76,8 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		this.param = param;
 
 		// distorted images
-		distLeft = ConvertBufferedImage.convertFromMulti(origLeft, null, true, GrayF32.class);
-		distRight = ConvertBufferedImage.convertFromMulti(origRight, null, true, GrayF32.class);
+		distLeft = ConvertBufferedImage.convertFromPlanar(origLeft, null, true, GrayF32.class);
+		distRight = ConvertBufferedImage.convertFromPlanar(origRight, null, true, GrayF32.class);
 
 		// storage for undistorted + rectified images
 		rectLeft = new Planar<>(GrayF32.class,

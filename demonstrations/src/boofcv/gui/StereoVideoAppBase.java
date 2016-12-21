@@ -40,7 +40,7 @@ import java.io.Reader;
  *
  * @author Peter Abeles
  */
-public abstract class StereoVideoAppBase <I extends ImageGray>
+public abstract class StereoVideoAppBase <I extends ImageGray<I>>
 		extends SelectAlgorithmAndInputPanel implements VisualizeApp, MouseListener, ChangeListener
 {
 	protected StereoParameters config;

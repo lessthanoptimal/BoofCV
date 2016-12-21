@@ -56,7 +56,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectLineHoughFootSubimage<I extends ImageGray, D extends ImageGray>
+public class DetectLineHoughFootSubimage<I extends ImageGray<I>, D extends ImageGray<D>>
 		implements DetectLine<I>
 {
 	int totalHorizontalDivisions;

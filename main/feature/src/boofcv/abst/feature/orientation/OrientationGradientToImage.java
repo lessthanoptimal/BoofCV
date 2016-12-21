@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class OrientationGradientToImage<T extends ImageGray, D extends ImageGray>
+public class OrientationGradientToImage<T extends ImageGray<T>, D extends ImageGray<D>>
 	implements OrientationImage<T>
 {
 	ImageGradient<T,D> gradient;

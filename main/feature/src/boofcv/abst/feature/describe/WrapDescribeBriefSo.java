@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageType;
 /**
  * @author Peter Abeles
  */
-public class WrapDescribeBriefSo<T extends ImageGray> implements DescribeRegionPoint<T,TupleDesc_B> {
+public class WrapDescribeBriefSo<T extends ImageGray<T>> implements DescribeRegionPoint<T,TupleDesc_B> {
 
 	int length;
 	DescribePointBriefSO<T> alg;

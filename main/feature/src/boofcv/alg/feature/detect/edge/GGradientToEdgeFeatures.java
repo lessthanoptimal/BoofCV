@@ -38,7 +38,7 @@ public class GGradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public <D extends ImageGray>
+	static public <D extends ImageGray<D>>
 	void intensityE( D derivX , D derivY , GrayF32 intensity )
 	{
 		if( derivX instanceof GrayF32) {
@@ -59,7 +59,7 @@ public class GGradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public <D extends ImageGray>
+	static public <D extends ImageGray<D>>
 	void intensityAbs( D derivX , D derivY , GrayF32 intensity )
 	{
 		if( derivX instanceof GrayF32) {
@@ -80,7 +80,7 @@ public class GGradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi/2 to pi/2).
 	 */
-	static public <D extends ImageGray>
+	static public <D extends ImageGray<D>>
 	void direction( D derivX , D derivY , GrayF32 angle )
 	{
 		if( derivX instanceof GrayF32) {
@@ -101,7 +101,7 @@ public class GGradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi to pi).
 	 */
-	static public <D extends ImageGray>
+	static public <D extends ImageGray<D>>
 	void direction2( D derivX , D derivY , GrayF32 angle )
 	{
 		if( derivX instanceof GrayF32) {
@@ -127,7 +127,7 @@ public class GGradientToEdgeFeatures {
 	 * @param derivY Image derivative along y-axis.
 	 * @param output Filtered intensity. Modified.
 	 */
-	static public <D extends ImageGray>
+	static public <D extends ImageGray<D>>
 	void nonMaxSuppressionCrude4(GrayF32 intensity , D derivX , D derivY , GrayF32 output )
 	{
 		if( derivX instanceof GrayF32) {

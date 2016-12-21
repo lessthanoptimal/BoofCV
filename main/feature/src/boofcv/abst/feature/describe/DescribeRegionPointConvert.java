@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class DescribeRegionPointConvert<T extends ImageGray,In extends TupleDesc,Out extends TupleDesc>
+public class DescribeRegionPointConvert<T extends ImageGray<T>,In extends TupleDesc,Out extends TupleDesc>
 	implements DescribeRegionPoint<T,Out>
 {
 	// Computers the description

@@ -47,7 +47,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VideoTrackerObjectQuadApp<I extends ImageGray>
+public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 		extends DemonstrationBase<Planar<I>>
 		implements TrackerObjectQuadPanel.Listener  , TrackerQuadInfoPanel.Listener, ActionListener
 {

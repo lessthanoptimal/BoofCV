@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface SearchLocalPeak<T extends ImageGray> {
+public interface SearchLocalPeak<T extends ImageGray<T>> {
 
 	/**
 	 * Specifies the image which is to be searched

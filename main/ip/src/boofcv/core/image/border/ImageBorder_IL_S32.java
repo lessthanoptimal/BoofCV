@@ -25,7 +25,7 @@ import boofcv.struct.image.InterleavedInteger;
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder_IL_S32<T extends InterleavedInteger> extends ImageBorder<T> {
+public abstract class ImageBorder_IL_S32<T extends InterleavedInteger<T>> extends ImageBorder<T> {
 
 	public ImageBorder_IL_S32(T image) {
 		super(image);

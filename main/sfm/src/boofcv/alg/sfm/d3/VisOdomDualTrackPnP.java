@@ -54,7 +54,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisOdomDualTrackPnP<T extends ImageBase,Desc extends TupleDesc> {
+public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> {
 
 	// Left and right input images
 	private T inputLeft;

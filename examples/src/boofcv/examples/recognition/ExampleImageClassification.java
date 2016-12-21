@@ -69,7 +69,7 @@ public class ExampleImageClassification {
 				throw new RuntimeException("Couldn't find input image");
 
 			Planar<GrayF32> image = new Planar<>(GrayF32.class,buffered.getWidth(), buffered.getHeight(), 3);
-			ConvertBufferedImage.convertFromMulti(buffered,image,true,GrayF32.class);
+			ConvertBufferedImage.convertFromPlanar(buffered,image,true,GrayF32.class);
 
 			classifier.classify(image);
 

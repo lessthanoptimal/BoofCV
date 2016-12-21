@@ -23,6 +23,7 @@ import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidFloat;
 
 
@@ -35,14 +36,14 @@ import boofcv.struct.pyramid.PyramidFloat;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidFloatScale< T extends ImageGray>
+public class PyramidFloatScale< T extends ImageGray<T>>
 		extends PyramidFloat<T> {
 
 	// interpolation algorithm
 	protected InterpolatePixelS<T> interpolate;
 
 	public PyramidFloatScale(InterpolatePixelS<T> interpolate, double scaleFactors[] , Class<T> imageType) {
-		super(imageType,scaleFactors);
+		super(ImageType.single(imageType),scaleFactors);
 		this.interpolate = interpolate;
 	}
 

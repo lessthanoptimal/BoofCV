@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class CheckVisualOdometryStereoSim<I extends ImageGray>
+public abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 	extends VideoSequenceSimulator<I>
 {
 	StereoParameters param = createStereoParam();

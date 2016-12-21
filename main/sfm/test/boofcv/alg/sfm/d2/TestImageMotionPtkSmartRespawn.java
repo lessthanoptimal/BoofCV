@@ -252,7 +252,6 @@ public class TestImageMotionPtkSmartRespawn {
 
 	private class Matcher implements ModelMatcher<Affine2D_F64, AssociatedPair>
 	{
-
 		@Override
 		public boolean process(List<AssociatedPair> dataSet) {return false;}
 
@@ -272,6 +271,16 @@ public class TestImageMotionPtkSmartRespawn {
 
 		@Override
 		public int getMinimumSize() {return 0;}
+
+		@Override
+		public Class<AssociatedPair> getPointType() {
+			return AssociatedPair.class;
+		}
+
+		@Override
+		public Class<Affine2D_F64> getModelType() {
+			return Affine2D_F64.class;
+		}
 	}
 
 	private class Tracker implements PointTracker<GrayF32>

@@ -19,7 +19,7 @@
 package boofcv.alg.enhance.impl;
 
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.GrayU8;
@@ -37,9 +37,9 @@ import boofcv.struct.image.GrayU8;
  */
 public class ImplEnhanceFilter {
 
-	public static Kernel2D_I32 kernelEnhance4_I32 = new Kernel2D_I32(3, new int[]{0,-1,0,-1,5,-1,0,-1,0});
+	public static Kernel2D_S32 kernelEnhance4_I32 = new Kernel2D_S32(3, new int[]{0,-1,0,-1,5,-1,0,-1,0});
 	public static Kernel2D_F32 kernelEnhance4_F32 = new Kernel2D_F32(3, new float[]{0,-1,0,-1,5,-1,0,-1,0});
-	public static Kernel2D_I32 kernelEnhance8_I32 = new Kernel2D_I32(3, new int[]{-1,-1,-1,-1,9,-1,-1,-1,-1});
+	public static Kernel2D_S32 kernelEnhance8_I32 = new Kernel2D_S32(3, new int[]{-1,-1,-1,-1,9,-1,-1,-1,-1});
 	public static Kernel2D_F32 kernelEnhance8_F32 = new Kernel2D_F32(3, new float[]{-1,-1,-1,-1,9,-1,-1,-1,-1});
 
 	public static void sharpenInner4(GrayU8 input , GrayU8 output , int minValue , int maxValue ) {

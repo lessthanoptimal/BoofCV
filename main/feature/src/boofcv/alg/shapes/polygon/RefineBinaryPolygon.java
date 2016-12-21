@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface RefineBinaryPolygon<T extends ImageGray> {
+public interface RefineBinaryPolygon<T extends ImageGray<T>> {
 
 	/**
 	 * Sets the input image

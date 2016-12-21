@@ -31,7 +31,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryGaussian_PL<T extends ImageGray>
+public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>>
 		extends BackgroundStationaryGaussian<Planar<T>>
 {
 

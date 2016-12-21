@@ -26,6 +26,7 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 import org.junit.Test;
 
 import java.util.List;
@@ -83,7 +84,7 @@ public class TestCannyEdgeDynamic {
 
 		ImageMiscOps.fillRectangle(input, 50, 20, 30, 40, 50);
 
-		BlurFilter<GrayU8> blur = FactoryBlurFilter.gaussian(GrayU8.class, -1, 1);
+		BlurFilter<GrayU8> blur = FactoryBlurFilter.gaussian(ImageType.single(GrayU8.class), -1, 1);
 		ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.sobel(GrayU8.class, GrayS16.class);
 
 		CannyEdgeDynamic<GrayU8,GrayS16> alg = new CannyEdgeDynamic<>(blur, gradient, true);

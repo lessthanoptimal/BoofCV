@@ -54,7 +54,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	/**
 	 * Description of the image data structure
 	 */
-	public ImageType<T> imageType;
+	public ImageType imageType;
 
 	/**
 	 * <p>
@@ -214,7 +214,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	public T clone() {
 		T ret = createSameShape();
 
-		ret.setTo(this);
+		ret.setTo((T)this);
 
 		return ret;
 	}

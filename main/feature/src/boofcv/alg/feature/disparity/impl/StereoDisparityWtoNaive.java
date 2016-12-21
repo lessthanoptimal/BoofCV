@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class StereoDisparityWtoNaive<I extends ImageGray> {
+public class StereoDisparityWtoNaive<I extends ImageGray<I>> {
 	// left and right camera images
 	I imageLeft;
 	I imageRight;

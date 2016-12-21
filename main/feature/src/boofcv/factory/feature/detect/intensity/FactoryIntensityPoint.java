@@ -26,6 +26,7 @@ import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
 /**
  * Provides intensity feature intensity algorithms which conform to the {@link GeneralFeatureIntensity} interface.
@@ -47,7 +48,7 @@ public class FactoryIntensityPoint {
 	 * @param <D> Derivative type.
 	 * @return Fast feature intensity
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureIntensity<I,D>  fast( int pixelTol, int minCont, Class<I> imageType ) {
 		FastCornerIntensity<I> alg =  FactoryIntensityPointAlg.fast(pixelTol, minCont, imageType);
 		return new WrapperFastCornerIntensity<>(alg);
@@ -64,7 +65,7 @@ public class FactoryIntensityPoint {
 	 * @param <D> Derivative type.
 	 * @return Harris feature intensity
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureIntensity<I,D>  harris(int windowRadius, float kappa,
 										 boolean weighted, Class<D> derivType)
 	{
@@ -82,7 +83,7 @@ public class FactoryIntensityPoint {
 	 * @param <D> Derivative type.
 	 * @return KLT feature intensity
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureIntensity<I,D> shiTomasi(int windowRadius, boolean weighted, Class<D> derivType) {
 		ShiTomasiCornerIntensity<D> alg =  FactoryIntensityPointAlg.shiTomasi(windowRadius, weighted, derivType);
 		return new WrapperGradientCornerIntensity<>(alg);
@@ -96,7 +97,7 @@ public class FactoryIntensityPoint {
 	 * @param <D> Derivative type.
 	 * @return Kitchen and Rosenfeld feature intensity
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureIntensity<I,D>  kitros( Class<D> derivType ) {
 		return new WrapperKitRosCornerIntensity<>(derivType);
 	}
@@ -108,9 +109,9 @@ public class FactoryIntensityPoint {
 	 * @param <I> Input image type.
 	 * @return Median feature intensity
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureIntensity<I,D>  median( int radius , Class<I> imageType ) {
-		BlurStorageFilter<I> filter = FactoryBlurFilter.median(imageType,radius);
+		BlurStorageFilter<I> filter = FactoryBlurFilter.median(ImageType.single(imageType),radius);
 		return new WrapperMedianCornerIntensity<>(filter, imageType);
 	}
 
@@ -124,7 +125,7 @@ public class FactoryIntensityPoint {
 	 * @param <D> Derivative type.
 	 * @return Hessian based blob intensity
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureIntensity<I,D> hessian(HessianBlobIntensity.Type type, Class<D> derivType) {
 		return new WrapperHessianBlobIntensity<>(type, derivType);
 	}
@@ -133,8 +134,8 @@ public class FactoryIntensityPoint {
 	 * Blob detector which uses a 3x3 kernel to approximate the second order derivatives and compute a Laplacian
 	 * blob.
 	 */
-	public static <I extends ImageGray>
+	public static <I extends ImageGray<I>>
 	GeneralFeatureIntensity<I,?> laplacian() {
-		return new WrapperLaplacianBlobIntensity<>();
+		return new WrapperLaplacianBlobIntensity();
 	}
 }

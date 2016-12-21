@@ -44,7 +44,7 @@ import georegression.struct.point.Point2D_I16;
  *
  * @author Peter Abeles
  */
-public class GeneralFeatureDetector<I extends ImageGray, D extends ImageGray>
+public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<D>>
 {
 	// list of feature locations found by the extractor
 	protected QueueCorner foundMaximum = new QueueCorner(10);

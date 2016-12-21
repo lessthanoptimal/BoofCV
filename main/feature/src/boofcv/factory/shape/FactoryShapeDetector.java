@@ -45,7 +45,7 @@ public class FactoryShapeDetector {
 	 * @param imageType Input image type
 	 * @return Detecto
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	BinaryEllipseDetector<T> ellipse(ConfigEllipseDetector config , Class<T> imageType )
 	{
 		if( config == null )
@@ -84,7 +84,7 @@ public class FactoryShapeDetector {
 	 * @param imageType Input image type
 	 * @return Detector
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	BinaryPolygonDetector<T> polygon( ConfigPolygonDetector config, Class<T> imageType)
 	{
 		config.checkValidity();
@@ -111,7 +111,7 @@ public class FactoryShapeDetector {
 				config.minimumEdgeIntensity, imageType);
 	}
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	RefineBinaryPolygon<T> refinePolygon( ConfigRefinePolygonLineToImage config , Class<T> imageType ) {
 		return new RefinePolygonLineToImage<>(
 				config.cornerOffset, config.lineSamples,
@@ -120,7 +120,7 @@ public class FactoryShapeDetector {
 				imageType);
 	}
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	RefineBinaryPolygon<T> refinePolygon( ConfigRefinePolygonCornersToImage config , Class<T> imageType ) {
 		return new RefinePolygonCornersToImage<>(
 				config.endPointDistance,

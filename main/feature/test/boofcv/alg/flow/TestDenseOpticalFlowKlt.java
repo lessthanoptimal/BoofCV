@@ -28,6 +28,7 @@ import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ImagePyramid;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,8 +58,8 @@ public class TestDenseOpticalFlowKlt {
 		config.pyramidScaling = new int[]{1,2};
 		config.config.maxPerPixelError = 15;
 
-		prev = FactoryPyramid.discreteGaussian(config.pyramidScaling, -1, 2, true, GrayF32.class);
-		curr = FactoryPyramid.discreteGaussian(config.pyramidScaling, -1, 2, true, GrayF32.class);
+		prev = FactoryPyramid.discreteGaussian(config.pyramidScaling, -1, 2, true, ImageType.single(GrayF32.class));
+		curr = FactoryPyramid.discreteGaussian(config.pyramidScaling, -1, 2, true, ImageType.single(GrayF32.class));
 
 		prev.process(image0);
 		curr.process(image0);

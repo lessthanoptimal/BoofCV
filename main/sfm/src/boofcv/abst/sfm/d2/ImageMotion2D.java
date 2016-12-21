@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import georegression.struct.homography.Homography2D_F64;
  *
  * @author Peter Abeles
  */
-public interface ImageMotion2D<I extends ImageBase, IT extends InvertibleTransform>
+public interface ImageMotion2D<I extends ImageBase<I>, IT extends InvertibleTransform>
 {
 	/**
 	 * Processes and updates the image transform.  The very first image processed will always return

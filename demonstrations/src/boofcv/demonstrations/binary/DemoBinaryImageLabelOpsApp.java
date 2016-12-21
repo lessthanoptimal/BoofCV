@@ -48,7 +48,7 @@ import java.util.Random;
 /**
  * Demonstrates the affects of different binary operations on an image.
  */
-public class DemoBinaryImageLabelOpsApp<T extends ImageGray> extends SelectAlgorithmAndInputPanel
+public class DemoBinaryImageLabelOpsApp<T extends ImageGray<T>> extends SelectAlgorithmAndInputPanel
 		implements SelectHistogramThresholdPanel.Listener {
 
 	Random rand = new Random(234234);

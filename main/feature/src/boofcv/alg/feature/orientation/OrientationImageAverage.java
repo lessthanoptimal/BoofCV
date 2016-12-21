@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class OrientationImageAverage<T extends ImageGray> implements OrientationImage<T> {
+public abstract class OrientationImageAverage<T extends ImageGray<T>> implements OrientationImage<T> {
 
 	// input image
 	protected T image;

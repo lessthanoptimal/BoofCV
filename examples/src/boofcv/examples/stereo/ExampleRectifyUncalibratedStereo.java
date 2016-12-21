@@ -68,9 +68,9 @@ public class ExampleRectifyUncalibratedStereo {
 								BufferedImage origLeft , BufferedImage origRight ) {
 		// Unrectified images
 		Planar<GrayF32> unrectLeft =
-				ConvertBufferedImage.convertFromMulti(origLeft, null,true, GrayF32.class);
+				ConvertBufferedImage.convertFromPlanar(origLeft, null,true, GrayF32.class);
 		Planar<GrayF32> unrectRight =
-				ConvertBufferedImage.convertFromMulti(origRight, null,true, GrayF32.class);
+				ConvertBufferedImage.convertFromPlanar(origRight, null,true, GrayF32.class);
 
 		// storage for rectified images
 		Planar<GrayF32> rectLeft = unrectLeft.createSameShape();

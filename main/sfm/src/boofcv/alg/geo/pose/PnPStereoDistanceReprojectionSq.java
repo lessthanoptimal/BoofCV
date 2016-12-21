@@ -103,4 +103,14 @@ public class PnPStereoDistanceReprojectionSq implements DistanceFromModel<Se3_F6
 		for( int i = 0; i < observations.size(); i++ )
 			distance[i] = computeDistance(observations.get(i));
 	}
+
+	@Override
+	public Class<Stereo2D3D> getPointType() {
+		return Stereo2D3D.class;
+	}
+
+	@Override
+	public Class<Se3_F64> getModelType() {
+		return Se3_F64.class;
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageBase;
  */
 // TODO experiment with adding an offset to the "values" array.  That way it can potentially write directly into
 //      the output image
-public interface InterpolatePixelMB<T extends ImageBase> extends InterpolatePixel<T>{
+public interface InterpolatePixelMB<T extends ImageBase<T>> extends InterpolatePixel<T>{
 
 	/**
 	 * Returns the interpolated pixel values at the specified location while taking in account

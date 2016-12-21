@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class WrapDescribePixelRegionNCC<T extends ImageGray>
+public class WrapDescribePixelRegionNCC<T extends ImageGray<T>>
 		implements DescribeRegionPoint<T,NccFeature>
 {
 	DescribePointPixelRegionNCC<T> alg;

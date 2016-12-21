@@ -27,5 +27,5 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface InputToBinary<Input extends ImageBase> extends FilterImageInterface<Input,GrayU8> {
+public interface InputToBinary<Input extends ImageBase<Input>> extends FilterImageInterface<Input,GrayU8> {
 }

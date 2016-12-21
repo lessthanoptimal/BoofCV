@@ -44,7 +44,7 @@ import static boofcv.alg.distort.LensDistortionOps.transformPoint;
  */
 // TODO WARNING! active list has been modified by dropping and adding tracks
 // this is probably true of other SFM algorithms
-public class WrapVisOdomPixelDepthPnP<T extends ImageGray>
+public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
 		implements StereoVisualOdometry<T>, AccessPointTracks3D {
 
 	// low level algorithm

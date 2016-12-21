@@ -59,7 +59,7 @@ import java.util.Arrays;
  * @author Peter Abeles Original author/maintainer
  * @author Nathan Pahucki  Added the ability to use more than 4x4 grid for Capta360, <a href="mailto:npahucki@gmail.com"> npahucki@gmail.com</a>
  */
-public class DetectFiducialSquareBinary<T extends ImageGray>
+public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 		extends BaseDetectFiducialSquare<T> {
 
 	// helper data structures for computing the value of each grid element

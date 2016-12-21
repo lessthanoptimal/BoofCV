@@ -37,7 +37,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralBilinearRectangleChecks<T extends ImageGray> {
+public abstract class GeneralBilinearRectangleChecks<T extends ImageGray<T>> {
 	Class<T> imageType;
 
 	Random rand = new Random(0xff34);

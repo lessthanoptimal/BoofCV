@@ -28,6 +28,7 @@ import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.InvocationTargetException;
@@ -59,8 +60,9 @@ public class CompareHessianToConvolution {
 	}
 
 	public void setKernel( int which , Kernel1D horizontal , Kernel1D vertical ) {
-		FilterImageInterface<?,?> f1 = FactoryConvolve.convolve(horizontal,inputType,inputType, BorderType.EXTENDED,true);
-		FilterImageInterface<?,?> f2 = FactoryConvolve.convolve(vertical,inputType,inputType, BorderType.EXTENDED,false);
+		ImageType _inputType = ImageType.single(inputType);
+		FilterImageInterface<?,?> f1 = FactoryConvolve.convolve(horizontal,_inputType,_inputType, BorderType.EXTENDED,true);
+		FilterImageInterface<?,?> f2 = FactoryConvolve.convolve(vertical,_inputType,_inputType, BorderType.EXTENDED,false);
 
 		outputFilters[which] = new FilterSequence(f1,f2);
 
@@ -71,8 +73,9 @@ public class CompareHessianToConvolution {
 	}
 
 	public void setKernel( int which , Kernel1D kernel , boolean isHorizontal) {
+		ImageType _inputType = ImageType.single(inputType);
 		outputFilters[which] =
-				FactoryConvolve.convolve(kernel,inputType,inputType, BorderType.EXTENDED,isHorizontal);
+				FactoryConvolve.convolve(kernel,_inputType,_inputType, BorderType.EXTENDED,isHorizontal);
 		if( borderSize < kernel.getRadius() )
 			borderSize = kernel.getRadius();
 	}

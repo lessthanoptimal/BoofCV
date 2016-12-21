@@ -45,6 +45,10 @@ public class BoofTesting {
 			return (T) GrayI8.class;
 		if (type == GrayS16.class || type == GrayU16.class)
 			return (T) GrayI16.class;
+		if (type == InterleavedS8.class || type == InterleavedU8.class)
+			return (T) InterleavedI8.class;
+		if (type == InterleavedS16.class || type == InterleavedU16.class)
+			return (T) InterleavedI16.class;
 		return (T) type;
 	}
 
@@ -83,7 +87,7 @@ public class BoofTesting {
 	 * </p>
 	 */
 	@SuppressWarnings({"unchecked"})
-	public static <T extends ImageBase> T createSubImageOf(T input) {
+	public static <T extends ImageBase<T>> T createSubImageOf(T input) {
 		if( input instanceof ImageGray) {
 			return (T)createSubImageOf_S((ImageGray)input);
 		} else if( input instanceof Planar) {
@@ -95,7 +99,7 @@ public class BoofTesting {
 		}
 	}
 
-	public static <T extends ImageGray> T createSubImageOf_S(T input) {
+	public static <T extends ImageGray<T>> T createSubImageOf_S(T input) {
 		// create the larger image
 		T ret = (T) input.createNew(input.width + 10, input.height + 12);
 		// create a sub-image of the inner portion
@@ -106,7 +110,7 @@ public class BoofTesting {
 		return ret;
 	}
 
-	public static <T extends ImageInterleaved> T createSubImageOf_I(T input) {
+	public static <T extends ImageInterleaved<T>> T createSubImageOf_I(T input) {
 		// create the larger image
 		T ret = (T) input.createNew(input.width + 10, input.height + 12);
 		// create a sub-image of the inner portion
@@ -572,20 +576,45 @@ public class BoofTesting {
 
 		// if no specialized check exists, use a slower generalized approach
 		if( imgA instanceof ImageGray) {
-			GImageGray a = FactoryGImageGray.wrap((ImageGray)imgA);
-			GImageGray b = FactoryGImageGray.wrap((ImageGray)imgB);
+			GImageGray a = FactoryGImageGray.wrap((ImageGray) imgA);
+			GImageGray b = FactoryGImageGray.wrap((ImageGray) imgB);
 
-			for( int y = 0; y < imgA.height; y++ ) {
-				for( int x = 0; x < imgA.width; x++ ) {
-					double valA = a.get(x,y).doubleValue();
-					double valB = b.get(x,y).doubleValue();
+			for (int y = 0; y < imgA.height; y++) {
+				for (int x = 0; x < imgA.width; x++) {
+					double valA = a.get(x, y).doubleValue();
+					double valB = b.get(x, y).doubleValue();
 
 					double difference = valA - valB;
-					double max = Math.max( Math.abs(valA), Math.abs(valB));
-					if( max == 0 )
+					double max = Math.max(Math.abs(valA), Math.abs(valB));
+					if (max == 0)
 						max = 1;
-					if( Math.abs(difference)/max > tolFrac )
-						throw new RuntimeException("Values not equal at ("+x+","+y+") "+valA+"  "+valB);
+					if (Math.abs(difference) / max > tolFrac)
+						throw new RuntimeException("Values not equal at (" + x + "," + y + ") " + valA + "  " + valB);
+				}
+			}
+		} else if( imgA instanceof ImageInterleaved) {
+			GImageMultiBand a = FactoryGImageMultiBand.wrap(imgA);
+			GImageMultiBand b = FactoryGImageMultiBand.wrap(imgB);
+
+			float valueA[] = new float[ a.getNumberOfBands() ];
+			float valueB[] = new float[ b.getNumberOfBands() ];
+
+			for (int y = 0; y < imgA.height; y++) {
+				for (int x = 0; x < imgA.width; x++) {
+					a.get(x,y, valueA);
+					b.get(x,y, valueB);
+
+					for (int i = 0; i < a.getNumberOfBands(); i++) {
+						double valA = valueA[i];
+						double valB = valueB[i];
+
+						double difference = valA - valB;
+						double max = Math.max(Math.abs(valA), Math.abs(valB));
+						if (max == 0)
+							max = 1;
+						if (Math.abs(difference) / max > tolFrac)
+							throw new RuntimeException("Values not equal at (" + x + "," + y + ") " + valA + "  " + valB);
+					}
 				}
 			}
 		} else if( imgA instanceof Planar){

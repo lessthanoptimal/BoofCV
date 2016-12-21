@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class Fh04_to_ImageSuperpixels<T extends ImageBase> implements ImageSuperpixels<T> {
+public class Fh04_to_ImageSuperpixels<T extends ImageBase<T>> implements ImageSuperpixels<T> {
 
 	SegmentFelzenszwalbHuttenlocher04<T> alg;
 	ConnectRule rule;

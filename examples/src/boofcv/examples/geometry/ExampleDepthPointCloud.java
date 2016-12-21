@@ -56,7 +56,7 @@ public class ExampleDepthPointCloud {
 		VisualDepthParameters param = UtilIO.loadXML(nameCalib);
 
 		BufferedImage buffered = UtilImageIO.loadImage(nameRgb);
-		Planar<GrayU8> rgb = ConvertBufferedImage.convertFromMulti(buffered,null,true,GrayU8.class);
+		Planar<GrayU8> rgb = ConvertBufferedImage.convertFromPlanar(buffered,null,true,GrayU8.class);
 		GrayU16 depth =
 				ConvertBufferedImage.convertFrom(UtilImageIO.loadImage(nameDepth),null,GrayU16.class);
 

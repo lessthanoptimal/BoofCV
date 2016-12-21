@@ -48,7 +48,7 @@ public class PyramidOps {
 	 * @param <O> Output image type
 	 * @return An array of images
 	 */
-	public static <O extends ImageGray>
+	public static <O extends ImageGray<O>>
 	O[] declareOutput( ImagePyramid<?> pyramid , Class<O> outputType ) {
 		O[] ret = (O[])Array.newInstance(outputType,pyramid.getNumLayers());
 
@@ -67,7 +67,7 @@ public class PyramidOps {
 	 * @param output (Output) List of images which is to be resized
 	 * @param <O> Image type
 	 */
-	public static <O extends ImageGray>
+	public static <O extends ImageGray<O>>
 	void reshapeOutput( ImagePyramid<?> pyramid , O[] output ) {
 
 		for( int i = 0; i < output.length; i++ ) {
@@ -92,7 +92,7 @@ public class PyramidOps {
 	 * @param filter Filter being applied to the pyramid.
 	 * @param output Output pyramid where filter results are saved.
 	 */
-	public static <I extends ImageGray, O extends ImageGray>
+	public static <I extends ImageGray<I>, O extends ImageGray<O>>
 	void filter(ImagePyramid<I> input, FilterImageInterface<I, O> filter, O[] output )
 	{
 		for( int i = 0; i < input.getNumLayers(); i++ ) {
@@ -117,7 +117,7 @@ public class PyramidOps {
 	 * @param derivX Pyramid where x-derivative is stored.
 	 * @param derivY Pyramid where y-derivative is stored.
 	 */
-	public static <I extends ImageGray, O extends ImageGray>
+	public static <I extends ImageGray<I>, O extends ImageGray<O>>
 	void gradient(ImagePyramid<I> input, ImageGradient<I, O> gradient, O[] derivX, O[] derivY )
 	{
 		for( int i = 0; i < input.getNumLayers(); i++ ) {
@@ -138,7 +138,7 @@ public class PyramidOps {
 	 * @param derivYY (Output) Second derivative YY
 	 * @param derivXY (Output) Second derivative XY
 	 */
-	public static <I extends ImageGray, O extends ImageGray>
+	public static <I extends ImageGray<I>, O extends ImageGray<O>>
 	void hessian(O[] derivX, O[] derivY , ImageHessian<O> hessian , O[] derivXX, O[] derivYY , O[] derivXY )
 	{
 		for( int i = 0; i < derivX.length; i++ ) {
@@ -149,7 +149,7 @@ public class PyramidOps {
 	/**
 	 * Scales down the input by a factor of 2.  Every other pixel along both axises is skipped.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	void scaleDown2(T input , T output ) {
 		if( input instanceof GrayF32) {
 			ImplPyramidOps.scaleDown2((GrayF32)input,(GrayF32)output);
@@ -165,7 +165,7 @@ public class PyramidOps {
 	 *
 	 * @param scale How much larger the output image will be.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	void scaleImageUp(T input , T output , int scale, InterpolatePixelS<T> interp ) {
 		if( scale <= 1 )
 			throw new IllegalArgumentException("Scale must be >= 2");

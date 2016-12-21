@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageGray;
  * <TD> Type of feature descriptor
  * @author Peter Abeles
  */
-public interface DetectDescribeMulti<T extends ImageGray, Desc extends TupleDesc>
+public interface DetectDescribeMulti<T extends ImageGray<T>, Desc extends TupleDesc>
 	extends DescriptorInfo<Desc>
 {
 

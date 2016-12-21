@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageGray;
  * 
  * @author Peter Abeles
  */
-public class SparseGradientSafe<T extends ImageGray, G extends GradientValue>
+public class SparseGradientSafe<T extends ImageGray<T>, G extends GradientValue>
 	implements SparseImageGradient<T,G>
 {
 	SparseImageGradient<T,G> wrap;

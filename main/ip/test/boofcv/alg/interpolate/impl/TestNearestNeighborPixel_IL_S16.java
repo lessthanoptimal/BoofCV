@@ -40,8 +40,8 @@ public class TestNearestNeighborPixel_IL_S16 extends GeneralChecksInterpolationP
 	}
 
 	@Override
-	protected <SB extends ImageGray> InterpolatePixelS<SB>
-	wrapSingle(SB image, int minValue, int maxValue) {
+	protected <T extends ImageGray<T>> InterpolatePixelS<T>
+	wrapSingle(T image, int minValue, int maxValue) {
 		return (InterpolatePixelS)new NearestNeighborPixel_S16((GrayS16)image);
 	}
 

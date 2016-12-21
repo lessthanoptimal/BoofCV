@@ -42,7 +42,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkDetectLines<T extends ImageGray, D extends ImageGray> {
+public class BenchmarkDetectLines<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 	static final long TEST_TIME = 1000;
 	static Random rand = new Random(234234);

@@ -39,7 +39,7 @@ import boofcv.struct.sparse.SparseImageGradient;
  *
  * @author Peter Abeles
  */
-public class DescribePointSurfMod<II extends ImageGray> extends DescribePointSurf<II> {
+public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePointSurf<II> {
 
 	// how many sample points sub-regions overlap.
 	private int overLap;

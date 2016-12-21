@@ -40,7 +40,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase>
+public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>>
 		implements MonocularPlaneVisualOdometry<T> , AccessPointTracks3D
 {
 	// motion estimation algorithm

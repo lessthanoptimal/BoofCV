@@ -58,7 +58,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-public class Planar<T extends ImageGray> extends ImageMultiBand<Planar<T>>{
+public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 
 	/**
 	 * Type of image in each band
@@ -254,6 +254,26 @@ public class Planar<T extends ImageGray> extends ImageMultiBand<Planar<T>>{
 
 		for (int i = 0; i < order.length; i++) {
 			bands[i] = this.bands[order[i]];
+		}
+		this.bands = bands;
+	}
+
+	/**
+	 * Changes the number of bands in the image.  A new array is declared and individual bands are recycled
+	 * if possible
+	 * @param numberOfBands New number of bands in the image.
+	 */
+	public void setNumberOfBands( int numberOfBands ) {
+		if( numberOfBands == this.bands.length )
+			return;
+
+		T[] bands = (T[]) Array.newInstance(type, numberOfBands);
+		int N = Math.min(numberOfBands, this.bands.length );
+		for (int i = 0; i < N; i++) {
+			bands[i] = this.bands[i];
+		}
+		for (int i = N; i < bands.length; i++) {
+			bands[i] = GeneralizedImageOps.createSingleBand(type, width, height);
 		}
 		this.bands = bands;
 	}

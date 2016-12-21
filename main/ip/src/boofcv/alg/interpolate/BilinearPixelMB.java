@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageInterleaved;
  *
  * @author Peter Abeles
  */
-public abstract class BilinearPixelMB<T extends ImageInterleaved> implements InterpolatePixelMB<T> {
+public abstract class BilinearPixelMB<T extends ImageInterleaved<T>> implements InterpolatePixelMB<T> {
 
 	protected ImageBorder<T> border;
 	protected T orig;

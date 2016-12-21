@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class TemplateNCC <T extends ImageBase>
+public abstract class TemplateNCC <T extends ImageBase<T>>
 		extends BaseTemplateIntensity<T>
 {
 	@Override

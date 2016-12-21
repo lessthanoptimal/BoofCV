@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class OrientationIntegralToImage<T extends ImageGray, II extends ImageGray>
+public class OrientationIntegralToImage<T extends ImageGray<T>, II extends ImageGray<II>>
 	implements OrientationImage<T>
 {
 	// algorithm which is being wrapped around

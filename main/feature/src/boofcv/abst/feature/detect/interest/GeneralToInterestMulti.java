@@ -32,7 +32,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public class GeneralToInterestMulti<T extends ImageGray, D extends ImageGray>
+public class GeneralToInterestMulti<T extends ImageGray<T>, D extends ImageGray<D>>
 		implements DetectorInterestPointMulti<T>
 {
 	// point detector configured to detect minimums and maximums

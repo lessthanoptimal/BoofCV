@@ -18,7 +18,9 @@
 
 package boofcv.testing;
 
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageInterleaved;
 
 import java.lang.reflect.Method;
 
@@ -30,7 +32,7 @@ import java.lang.reflect.Method;
  */
 public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctions {
 
-	protected CompareIdenticalFunctions(Class<?> testClass, Class<?> validationClass) {
+	protected CompareIdenticalFunctions(Class<?> testClass, Class<?>... validationClass) {
 		super(testClass, validationClass);
 	}
 
@@ -40,6 +42,8 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 
 		for( Class<?> c : e ) {
 			if( ImageGray.class.isAssignableFrom(c))
+				return true;
+			if( ImageInterleaved.class.isAssignableFrom(c))
 				return true;
 		}
 		return false;
@@ -70,8 +74,8 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 		Object[] ret = new Object[ targetParam.length ];
 
 		for( int i = 0; i < targetParam.length; i++ ) {
-			if( ImageGray.class.isAssignableFrom(targetParam[i].getClass()) ) {
-				ret[i] = ((ImageGray)targetParam[i]).clone();
+			if( ImageBase.class.isAssignableFrom(targetParam[i].getClass()) ) {
+				ret[i] = ((ImageBase)targetParam[i]).clone();
 			} else {
 				ret[i] = targetParam[i];
 			}
@@ -84,11 +88,11 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 
 		for( int i = 0; i < targetParam.length; i++ ) {
-			if( !ImageGray.class.isAssignableFrom(targetParam[i].getClass()) )
+			if( !ImageBase.class.isAssignableFrom(targetParam[i].getClass()) )
 				continue;
 
-			ImageGray t = (ImageGray)targetParam[i];
-			ImageGray v = (ImageGray)validationParam[i];
+			ImageBase t = (ImageBase)targetParam[i];
+			ImageBase v = (ImageBase)validationParam[i];
 
 			BoofTesting.assertEqualsRelative(v, t, 1e-4);// todo is this tolerance too big?  some operations with a slightly different ordering seem to require it
 		}

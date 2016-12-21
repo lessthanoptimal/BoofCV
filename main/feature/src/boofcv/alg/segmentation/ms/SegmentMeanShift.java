@@ -54,7 +54,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  * </p>
  * @author Peter Abeles
  */
-public class SegmentMeanShift<T extends ImageBase> {
+public class SegmentMeanShift<T extends ImageBase<T>> {
 	// finds mean shift modes
 	SegmentMeanShiftSearch<T> search;
 	// Combines similar regions together

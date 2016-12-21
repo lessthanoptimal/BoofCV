@@ -53,7 +53,7 @@ public class FactoryTrackerObjectQuad {
 	 * @param <D> Image derivative type
 	 * @return TrackerObjectQuad
 	 */
-	public static <T extends ImageGray,D extends ImageGray>
+	public static <T extends ImageGray<T>,D extends ImageGray<D>>
 	TrackerObjectQuad<T> tld(ConfigTld config , Class<T> imageType ) {
 		if( config == null )
 			config = new ConfigTld();
@@ -76,7 +76,7 @@ public class FactoryTrackerObjectQuad {
 	 * @param <D> Image derivative type.  Null for default.
 	 * @return TrackerObjectQuad
 	 */
-	public static <T extends ImageGray,D extends ImageGray>
+	public static <T extends ImageGray<T>,D extends ImageGray<D>>
 	TrackerObjectQuad<T> sparseFlow(SfotConfig config, Class<T> imageType , Class<D> derivType ) {
 
 		if( derivType == null )
@@ -105,7 +105,7 @@ public class FactoryTrackerObjectQuad {
 	 * @param imageType Type of image
 	 * @return TrackerObjectQuad based on {@link TrackerMeanShiftLikelihood}.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	TrackerObjectQuad<T> meanShiftLikelihood(int maxIterations,
 											 int numBins,
 											 double maxPixelValue,
@@ -152,7 +152,7 @@ public class FactoryTrackerObjectQuad {
 	 * @param <T> Image type
 	 * @return TrackerObjectQuad based on Comaniciu2003
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	TrackerObjectQuad<T> meanShiftComaniciu2003(ConfigComaniciu2003 config, ImageType<T> imageType ) {
 
 		TrackerMeanShiftComaniciu2003<T> alg = FactoryTrackerObjectAlgs.meanShiftComaniciu2003(config,imageType);
@@ -170,7 +170,7 @@ public class FactoryTrackerObjectQuad {
 	 * @param config Configuration
 	 * @return CirculantTracker
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	TrackerObjectQuad<T> circulant( ConfigCirculantTracker config , Class<T> imageType ) {
 
 		CirculantTracker<T> alg = FactoryTrackerObjectAlgs.circulant(config,imageType);

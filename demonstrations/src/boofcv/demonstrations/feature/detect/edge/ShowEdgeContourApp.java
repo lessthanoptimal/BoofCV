@@ -49,7 +49,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ShowEdgeContourApp<T extends ImageGray, D extends ImageGray>
+public class ShowEdgeContourApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel implements CannyControlBar.Listener , SelectHistogramThresholdPanel.Listener
 {
 	// shows panel for displaying input image

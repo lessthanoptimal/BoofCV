@@ -47,7 +47,7 @@ import java.util.List;
  */
 // TODO add support for color again
 // TODO comment and clean up code
-public class VideoMosaicSequentialPointApp<I extends ImageGray, D extends ImageGray,
+public class VideoMosaicSequentialPointApp<I extends ImageGray<I>, D extends ImageGray<D>,
 		IT extends InvertibleTransform>
 		extends VideoStitchBaseApp<I,IT>
 {

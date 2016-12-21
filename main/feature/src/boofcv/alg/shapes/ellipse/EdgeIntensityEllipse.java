@@ -30,7 +30,7 @@ import georegression.struct.shapes.EllipseRotated_F64;
  *
  * @author Peter Abeles
  */
-public class EdgeIntensityEllipse<T extends ImageGray> extends BaseIntegralEdge<T> {
+public class EdgeIntensityEllipse<T extends ImageGray<T>> extends BaseIntegralEdge<T> {
 
 	// distance away from line in tangent direction it will sample
 	private double tangentDistance;

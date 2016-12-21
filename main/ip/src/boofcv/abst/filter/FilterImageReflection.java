@@ -28,7 +28,7 @@ import java.lang.reflect.Method;
 /**
  * Turns functions into implementations of {@link FilterImageInterface} Wraps around any function which has two images as input and output.
  */
-public class FilterImageReflection<Input extends ImageGray, Output extends ImageGray>
+public class FilterImageReflection<Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 		implements FilterImageInterface<Input, Output> {
 
 	// method being invoke for the filter

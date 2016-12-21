@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapFPtoInterestPoint<T extends ImageGray, D extends ImageGray> implements InterestPointDetector<T>{
+public class WrapFPtoInterestPoint<T extends ImageGray<T>, D extends ImageGray<D>> implements InterestPointDetector<T>{
 
 	FeaturePyramid<T,D> detector;
 	List<ScalePoint> location;

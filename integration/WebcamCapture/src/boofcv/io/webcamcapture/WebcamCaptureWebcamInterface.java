@@ -35,7 +35,7 @@ import java.awt.image.BufferedImage;
  */
 public class WebcamCaptureWebcamInterface implements WebcamInterface {
 	@Override
-	public <T extends ImageBase> SimpleImageSequence<T>
+	public <T extends ImageBase<T>> SimpleImageSequence<T>
 	open(String device, int width, int height, ImageType<T> imageType) {
 
 		if( device != null ) {
@@ -62,7 +62,7 @@ public class WebcamCaptureWebcamInterface implements WebcamInterface {
 		return new SimpleSequence<>(device, width, height, imageType);
 	}
 
-	public static class SimpleSequence<T extends ImageBase> implements SimpleImageSequence<T> {
+	public static class SimpleSequence<T extends ImageBase<T>> implements SimpleImageSequence<T> {
 
 		Webcam webcam;
 		int width,height;

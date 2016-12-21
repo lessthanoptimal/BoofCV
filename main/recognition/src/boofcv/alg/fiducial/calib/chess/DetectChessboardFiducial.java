@@ -48,7 +48,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectChessboardFiducial<T extends ImageGray> {
+public class DetectChessboardFiducial<T extends ImageGray<T>> {
 
 	// detects the chess board
 	private DetectChessSquarePoints<T> findSeeds;

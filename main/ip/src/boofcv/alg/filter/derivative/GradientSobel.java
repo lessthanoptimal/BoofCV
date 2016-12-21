@@ -19,14 +19,14 @@
 package boofcv.alg.filter.derivative;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General;
+import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
 import boofcv.alg.filter.derivative.impl.GradientSobel_Outer;
 import boofcv.alg.filter.derivative.impl.GradientSobel_UnrolledOuter;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -63,8 +63,8 @@ import boofcv.struct.image.GrayU8;
  */
 public class GradientSobel {
 
-	public static Kernel2D_I32 kernelDerivX_I32 = new Kernel2D_I32(3, new int[]{-1,0,1,-2,0,2,-1,0,1});
-	public static Kernel2D_I32 kernelDerivY_I32 = new Kernel2D_I32(3, new int[]{-1,-2,-1,0,0,0,1,2,1});
+	public static Kernel2D_S32 kernelDerivX_I32 = new Kernel2D_S32(3, new int[]{-1,0,1,-2,0,2,-1,0,1});
+	public static Kernel2D_S32 kernelDerivY_I32 = new Kernel2D_S32(3, new int[]{-1,-2,-1,0,0,0,1,2,1});
 	public static Kernel2D_F32 kernelDerivX_F32 = new Kernel2D_F32(
 			3, new float[]{-0.25f,0,0.25f,-0.5f,0,0.5f,-0.25f,0,0.25f});
 	public static Kernel2D_F32 kernelDerivY_F32 = new Kernel2D_F32(
@@ -94,8 +94,8 @@ public class GradientSobel {
 
 		if( border != null ) {
 			border.setImage(orig);
-			ConvolveJustBorder_General.convolve(kernelDerivX_I32, border,derivX);
-			ConvolveJustBorder_General.convolve(kernelDerivY_I32, border,derivY);
+			ConvolveJustBorder_General_SB.convolve(kernelDerivX_I32, border,derivX);
+			ConvolveJustBorder_General_SB.convolve(kernelDerivY_I32, border,derivY);
 		}
 	}
 
@@ -113,8 +113,8 @@ public class GradientSobel {
 
 		if( border != null ) {
 			border.setImage(orig);
-			ConvolveJustBorder_General.convolve(kernelDerivX_I32, border,derivX);
-			ConvolveJustBorder_General.convolve(kernelDerivY_I32, border,derivY);
+			ConvolveJustBorder_General_SB.convolve(kernelDerivX_I32, border,derivX);
+			ConvolveJustBorder_General_SB.convolve(kernelDerivY_I32, border,derivY);
 		}
 	}
 
@@ -134,8 +134,8 @@ public class GradientSobel {
 
 		if( border != null ) {
 			border.setImage(orig);
-			ConvolveJustBorder_General.convolve(kernelDerivX_F32, border,derivX);
-			ConvolveJustBorder_General.convolve(kernelDerivY_F32, border,derivY);
+			ConvolveJustBorder_General_SB.convolve(kernelDerivX_F32, border,derivX);
+			ConvolveJustBorder_General_SB.convolve(kernelDerivY_F32, border,derivY);
 		}
 	}
 }

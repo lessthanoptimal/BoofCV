@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageType;
  */
 public class FactorySfmMisc {
 
-	public static <T extends ImageBase> CreateSyntheticOverheadView<T> createOverhead( ImageType<T> imageType ) {
+	public static <T extends ImageBase<T>> CreateSyntheticOverheadView<T> createOverhead( ImageType<T> imageType ) {
 
 		Class classType = imageType.getImageClass();
 

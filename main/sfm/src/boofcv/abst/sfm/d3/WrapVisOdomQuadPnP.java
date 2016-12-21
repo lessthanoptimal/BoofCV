@@ -45,7 +45,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapVisOdomQuadPnP<T extends ImageGray,TD extends TupleDesc>
+public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		implements StereoVisualOdometry<T>, AccessPointTracks3D
 {
 	VisOdomQuadPnP<T,TD> alg;

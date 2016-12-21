@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class BaseGeneralFeatureIntensity <I extends ImageGray, D extends ImageGray>
+public abstract class BaseGeneralFeatureIntensity <I extends ImageGray<I>, D extends ImageGray<D>>
 		implements GeneralFeatureIntensity<I,D>
 {
 	GrayF32 intensity = new GrayF32(1,1);

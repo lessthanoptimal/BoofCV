@@ -45,7 +45,9 @@ public class FactoryGImageMultiBand {
 	}
 
 	public static GImageMultiBand create( ImageType imageType ) {
-		if( imageType.getFamily() == ImageType.Family.PLANAR) {
+		if( imageType.getFamily() == ImageType.Family.GRAY ) {
+			return new GSingleToMB(FactoryGImageGray.create(imageType.getImageClass()));
+		} if( imageType.getFamily() == ImageType.Family.PLANAR) {
 			return new PL();
 		} else if( imageType.getFamily() == ImageType.Family.INTERLEAVED ) {
 			switch( imageType.getDataType() ) {
@@ -159,7 +161,7 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
-		public <T extends ImageBase> T getImage() {
+		public <T extends ImageBase<T>> T getImage() {
 			return (T)image;
 		}
 	}
@@ -197,7 +199,7 @@ public class FactoryGImageMultiBand {
 
 		@Override
 		public void get(int x, int y, float[] value) {
-			value[0]=sb.getF(y*sb.getWidth()+x);
+			value[0]=sb.unsafe_getF(x,y);
 		}
 
 		@Override
@@ -216,7 +218,7 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
-		public <T extends ImageBase> T getImage() {
+		public <T extends ImageBase<T>> T getImage() {
 			return (T)sb.getImage();
 		}
 	}
@@ -239,7 +241,7 @@ public class FactoryGImageMultiBand {
 		public int getNumberOfBands() {return image.getNumBands();}
 
 		@Override
-		public <T extends ImageBase> T getImage() {
+		public <T extends ImageBase<T>> T getImage() {
 			return (T)image;
 		}
 	}

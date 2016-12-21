@@ -25,6 +25,7 @@ import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidFloat;
 
 
@@ -44,7 +45,7 @@ import boofcv.struct.pyramid.PyramidFloat;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidFloatGaussianScale< T extends ImageGray> extends PyramidFloat<T> {
+public class PyramidFloatGaussianScale< T extends ImageGray<T>> extends PyramidFloat<T> {
 
 	// interpolation algorithm
 	protected InterpolatePixelS<T> interpolate;
@@ -68,7 +69,7 @@ public class PyramidFloatGaussianScale< T extends ImageGray> extends PyramidFloa
 	 */
 	public PyramidFloatGaussianScale(InterpolatePixelS<T> interpolate, double scales[], double sigmaLayers[],
 									 Class<T> imageType) {
-		super(imageType, scales);
+		super(ImageType.single(imageType), scales);
 		if( scales.length != sigmaLayers.length )
 			throw new IllegalArgumentException("Number of scales and sigmas must be the same");
 
@@ -103,7 +104,7 @@ public class PyramidFloatGaussianScale< T extends ImageGray> extends PyramidFloa
 			T layer = getLayer(i);
 
 			// Apply the requested blur to the previous layer
-			BlurStorageFilter<T> blur = (BlurStorageFilter<T>) FactoryBlurFilter.gaussian(layer.getClass(), sigmaLayers[i],-1);
+			BlurStorageFilter<T> blur = (BlurStorageFilter<T>) FactoryBlurFilter.gaussian(layer.getImageType(), sigmaLayers[i],-1);
 			tempImage.reshape(prev.width,prev.height);
 			blur.process(prev,tempImage);
 

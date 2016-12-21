@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class MeanShiftPeak_to_SearchLocalPeak<T extends ImageGray> implements SearchLocalPeak<T> {
+public class MeanShiftPeak_to_SearchLocalPeak<T extends ImageGray<T>> implements SearchLocalPeak<T> {
 
 	MeanShiftPeak<T> search;
 

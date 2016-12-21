@@ -51,7 +51,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ShowLensDistortion<T extends ImageGray>
+public class ShowLensDistortion<T extends ImageGray<T>>
 		extends SelectInputPanel implements ChangeListener, ItemListener
 {
 	double radial1 = 0;
@@ -158,7 +158,7 @@ public class ShowLensDistortion<T extends ImageGray>
 		input.reshape(image.getWidth(),image.getHeight());
 		output.reshape(image.getWidth(),image.getHeight());
 
-		ConvertBufferedImage.convertFromMulti(image, input, true, imageType);
+		ConvertBufferedImage.convertFromPlanar(image, input, true, imageType);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

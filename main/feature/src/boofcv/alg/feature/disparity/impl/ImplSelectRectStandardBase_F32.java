@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class ImplSelectRectStandardBase_F32<T extends ImageGray>
+public abstract class ImplSelectRectStandardBase_F32<T extends ImageGray<T>>
 		extends SelectRectStandard<float[],T>
 {
 	// scores organized for more efficient processing

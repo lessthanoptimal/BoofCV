@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class GeneralBilinearPixelSingleChecks<T extends ImageGray> extends GeneralChecksInterpolationPixelS<T> {
+public abstract class GeneralBilinearPixelSingleChecks<T extends ImageGray<T>> extends GeneralChecksInterpolationPixelS<T> {
 
 	@Override
 	protected InterpolatePixelS<T> wrap(T image, int minValue, int maxValue) {
@@ -42,7 +42,7 @@ public abstract class GeneralBilinearPixelSingleChecks<T extends ImageGray> exte
 
 	@Override
 	protected float compute(T _img, float x, float y) {
-		ImageBorder<?> imgB = FactoryImageBorder.single(_img, BorderType.EXTENDED);
+		ImageBorder<?> imgB = FactoryImageBorder.wrap(BorderType.EXTENDED, _img);
 		GImageGray img = FactoryGImageGray.wrap(imgB);
 
 		int gX = (int) x;

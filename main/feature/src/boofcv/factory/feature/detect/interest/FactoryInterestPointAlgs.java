@@ -55,7 +55,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType       Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	FeaturePyramid<T, D> hessianPyramid(int extractRadius,
 										float detectThreshold,
 										int maxFeatures,
@@ -82,7 +82,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType       Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	FeaturePyramid<T, D> harrisPyramid(int extractRadius,
 									   float detectThreshold,
 									   int maxFeatures,
@@ -110,7 +110,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType       Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	FeatureLaplacePyramid<T, D> hessianLaplace(int extractRadius,
 											   float detectThreshold,
 											   int maxFeatures,
@@ -139,7 +139,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType       Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	FeatureLaplacePyramid<T, D> harrisLaplace(int extractRadius,
 											  float detectThreshold,
 											  int maxFeatures,
@@ -165,7 +165,7 @@ public class FactoryInterestPointAlgs {
 	 * @param <II> Integral Image
 	 * @return The feature detector
 	 */
-	public static <II extends ImageGray>
+	public static <II extends ImageGray<II>>
 	FastHessianFeatureDetector<II> fastHessian( ConfigFastHessian config ) {
 
 		if( config == null )

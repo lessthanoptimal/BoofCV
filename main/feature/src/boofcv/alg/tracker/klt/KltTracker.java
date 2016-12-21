@@ -52,16 +52,16 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 @SuppressWarnings({"SuspiciousNameCombination"})
-public class KltTracker<InputImage extends ImageGray, DerivativeImage extends ImageGray> {
+public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 	// input image
-	protected InputImage image;
+	protected I image;
 	// image gradient
-	protected DerivativeImage derivX, derivY;
+	protected D derivX, derivY;
 
 	// Used to interpolate the image and gradient
-	protected InterpolateRectangle<InputImage> interpInput;
-	protected InterpolateRectangle<DerivativeImage> interpDeriv;
+	protected InterpolateRectangle<I> interpInput;
+	protected InterpolateRectangle<D> interpDeriv;
 
 	// tracker configuration
 	protected KltConfig config;
@@ -101,8 +101,8 @@ public class KltTracker<InputImage extends ImageGray, DerivativeImage extends Im
 	// error between template and the current track position in the image
 	float error;
 
-	public KltTracker(InterpolateRectangle<InputImage> interpInput,
-					  InterpolateRectangle<DerivativeImage> interpDeriv,
+	public KltTracker(InterpolateRectangle<I> interpInput,
+					  InterpolateRectangle<D> interpDeriv,
 					  KltConfig config) {
 		this.interpInput = interpInput;
 		this.interpDeriv = interpDeriv;
@@ -116,7 +116,7 @@ public class KltTracker<InputImage extends ImageGray, DerivativeImage extends Im
 	 * @param derivX Image derivative along the x-axis
 	 * @param derivY Image derivative along the y-axis
 	 */
-	public void setImage(InputImage image, DerivativeImage derivX, DerivativeImage derivY) {
+	public void setImage(I image, D derivX, D derivY) {
 		InputSanityCheck.checkSameShape(image, derivX, derivY);
 
 		this.image = image;
@@ -129,7 +129,7 @@ public class KltTracker<InputImage extends ImageGray, DerivativeImage extends Im
 	/**
 	 * Same as {@link #setImage}, but it doesn't check to see if the images are the same size each time
 	 */
-	public void unsafe_setImage(InputImage image, DerivativeImage derivX, DerivativeImage derivY) {
+	public void unsafe_setImage(I image, D derivX, D derivY) {
 		this.image = image;
 		this.interpInput.setImage(image);
 

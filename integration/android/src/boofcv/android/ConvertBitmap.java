@@ -57,7 +57,7 @@ public class ConvertBitmap {
 	 * @param output Output image
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	void bitmapToBoof( Bitmap input , T output , byte[] storage) {
 		switch( output.getImageType().getFamily() ) {
 			case GRAY: {
@@ -90,7 +90,7 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally. 
 	 * @return The converted gray scale image.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	T bitmapToGray( Bitmap input , T output , Class<T> imageType , byte[] storage) {
 		if( imageType == GrayF32.class )
 			return (T)bitmapToGray(input,(GrayF32)output,storage);
@@ -162,7 +162,7 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 * @return The converted Planar image.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	Planar<T> bitmapToMS( Bitmap input , Planar<T> output , Class<T> type , byte[] storage ) {
 		if( output == null ) {
 			output = new Planar<>(type, input.getWidth(), input.getHeight(), 4);
@@ -274,7 +274,7 @@ public class ConvertBitmap {
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	void multiToBitmap(  Planar<T> input , Bitmap output , byte[] storage ) {
 		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");
@@ -301,7 +301,7 @@ public class ConvertBitmap {
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
-	public static <T extends ImageInterleaved>
+	public static <T extends ImageInterleaved<T>>
 	void interleavedToBitmap(T input, Bitmap output, byte[] storage) {
 		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");

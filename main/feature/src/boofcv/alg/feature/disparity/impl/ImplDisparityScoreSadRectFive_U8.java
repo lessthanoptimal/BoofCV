@@ -35,12 +35,12 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class ImplDisparityScoreSadRectFive_U8<Disparity extends ImageGray>
-		extends DisparityScoreWindowFive<GrayU8,Disparity>
+public class ImplDisparityScoreSadRectFive_U8<DI extends ImageGray<DI>>
+		extends DisparityScoreWindowFive<GrayU8, DI>
 {
 
 	// Computes disparity from scores
-	DisparitySelect<int[],Disparity> computeDisparity;
+	DisparitySelect<int[], DI> computeDisparity;
 
 	// stores the local scores for the width of the region
 	int elementScore[];
@@ -56,13 +56,13 @@ public class ImplDisparityScoreSadRectFive_U8<Disparity extends ImageGray>
 
 	public ImplDisparityScoreSadRectFive_U8(int minDisparity, int maxDisparity,
 											int regionRadiusX, int regionRadiusY,
-											DisparitySelect<int[], Disparity> computeDisparity) {
+											DisparitySelect<int[], DI> computeDisparity) {
 		super(minDisparity,maxDisparity,regionRadiusX,regionRadiusY);
 		this.computeDisparity = computeDisparity;
 	}
 
 	@Override
-	public void _process(GrayU8 left , GrayU8 right , Disparity disparity ) {
+	public void _process(GrayU8 left , GrayU8 right , DI disparity ) {
 		if( horizontalScore == null || verticalScore.length < lengthHorizontal ) {
 			horizontalScore = new int[regionHeight][lengthHorizontal];
 			verticalScore = new int[regionHeight][lengthHorizontal];
@@ -199,7 +199,7 @@ public class ImplDisparityScoreSadRectFive_U8<Disparity extends ImageGray>
 	}
 
 	@Override
-	public Class<Disparity> getDisparityType() {
+	public Class<DI> getDisparityType() {
 		return computeDisparity.getDisparityType();
 	}
 

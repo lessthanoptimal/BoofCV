@@ -32,7 +32,7 @@ import boofcv.struct.image.InterleavedF32;
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved>
+public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>>
 		extends BackgroundStationaryGaussian<T>
 {
 

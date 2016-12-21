@@ -41,7 +41,7 @@ public class TestShrinkThresholdSoft_I32 {
 		performBasicSoftTest(new GrayS32(width,height),new ShrinkThresholdSoft_I32());
 	}
 
-	public static <T extends ImageGray> void performBasicSoftTest(T image , ShrinkThresholdRule<T> rule ) {
+	public static <T extends ImageGray<T>> void performBasicSoftTest(T image , ShrinkThresholdRule<T> rule ) {
 		final int height = image.height;
 		final int width = image.width;
 

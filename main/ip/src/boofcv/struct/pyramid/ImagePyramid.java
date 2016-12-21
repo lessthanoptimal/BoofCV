@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.struct.pyramid;
 
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 /**
  * <p>
@@ -39,19 +40,19 @@ import boofcv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public interface ImagePyramid<T extends ImageBase> {
+public interface ImagePyramid<T extends ImageBase<T>> {
 
 	/**
 	 * Constructs the image pyramid given the input image.
 	 */
-	public void process( T input );
+	void process( T input );
 
 	/**
 	 * Declares internal data structures for an image with the specified dimensions
 	 * @param width image width
 	 * @param height image height
 	 */
-	public void initialize( int width , int height );
+	void initialize( int width , int height );
 
 	/**
 	 * Returns the scale of the specified layer in the pyramid.  Larger the scale
@@ -60,7 +61,7 @@ public interface ImagePyramid<T extends ImageBase> {
 	 * @param layer Which layer is being inspected.
 	 * @return The layer's scale.
 	 */
-	public double getScale( int layer );
+	double getScale( int layer );
 
 	/**
 	 * Returns a layer in the pyramid.
@@ -68,12 +69,12 @@ public interface ImagePyramid<T extends ImageBase> {
 	 * @param layerNum which image is to be returned.
 	 * @return The image in the pyramid.
 	 */
-	public T getLayer(int layerNum);
+	T getLayer(int layerNum);
 
 	/**
 	 * Returns the number of layers in the pyramid.
 	 */
-	public int getNumLayers();
+	int getNumLayers();
 
 	/**
 	 * Returns the width of an image at ths specified layer.
@@ -81,7 +82,7 @@ public interface ImagePyramid<T extends ImageBase> {
 	 * @param layer The layer being requested.
 	 * @return The layer's width.
 	 */
-	public int getWidth(int layer);
+	int getWidth(int layer);
 
 	/**
 	 * Returns the height of an image at ths specified layer.
@@ -89,31 +90,31 @@ public interface ImagePyramid<T extends ImageBase> {
 	 * @param layer The layer being requested.
 	 * @return The layer's height.
 	 */
-	public int getHeight(int layer);
+	int getHeight(int layer);
 
 	/**
 	 * Width of input image.
 	 */
-	public int getInputWidth();
+	int getInputWidth();
 
 	/**
 	 * Height of input image.
 	 */
-	public int getInputHeight();
+	int getInputHeight();
 
 	/**
 	 * The type of image.
 	 *
 	 * @return Image type.
 	 */
-	public Class<T> getImageType();
+	ImageType<T> getImageType();
 
 	/**
 	 * Set's this pyramid to be the same as input.  The two pyramids must have the same structure or else an
 	 * exception will be thrown.
 	 * @param input Input pyramid.  Not modified.
 	 */
-	public void setTo( ImagePyramid<T> input );
+	void setTo( ImagePyramid<T> input );
 
 	/**
 	 * Returns the sampling offset.  Both x and y axises are assumed to have the same offset.
@@ -122,7 +123,7 @@ public interface ImagePyramid<T extends ImageBase> {
 	 * @param layer Layer in the pyramid
 	 * @return Sampling offset in pixels.
 	 */
-	public double getSampleOffset( int layer );
+	double getSampleOffset( int layer );
 
 	/**
 	 * Returns the scale-space scale for the specified layer.  This scale is equivalent amount of Gaussian blur
@@ -133,5 +134,5 @@ public interface ImagePyramid<T extends ImageBase> {
 	 * @param layer Layer in the pyramid
 	 * @return Equivalent sigma for Gaussian blur.
 	 */
-	public double getSigma( int layer );
+	double getSigma( int layer );
 }

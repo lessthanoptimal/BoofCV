@@ -38,7 +38,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RefinePolygonCornersToImage<T extends ImageGray> implements RefineBinaryPolygon<T> {
+public class RefinePolygonCornersToImage<T extends ImageGray<T>> implements RefineBinaryPolygon<T> {
 
 	// number of pixels along the contour away should the end point be from the corner
 	private int pixelsAway;

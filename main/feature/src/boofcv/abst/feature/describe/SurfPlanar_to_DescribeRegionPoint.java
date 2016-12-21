@@ -36,7 +36,7 @@ import boofcv.struct.image.Planar;
  *
  * @author Peter Abeles
  */
-public class SurfPlanar_to_DescribeRegionPoint<T extends ImageGray, II extends ImageGray>
+public class SurfPlanar_to_DescribeRegionPoint<T extends ImageGray<T>, II extends ImageGray<II>>
 	implements DescribeRegionPoint<Planar<T>,BrightFeature>
 {
 	DescribePointSurfPlanar<II> alg;

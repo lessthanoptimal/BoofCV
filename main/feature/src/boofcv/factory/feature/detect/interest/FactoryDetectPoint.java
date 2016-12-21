@@ -32,6 +32,7 @@ import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
 /**
  * <p>
@@ -57,7 +58,7 @@ public class FactoryDetectPoint {
 	 * @param derivType       Type of derivative image.
 	 * @see boofcv.alg.feature.detect.intensity.HarrisCornerIntensity
 	 */
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createHarris(ConfigGeneralDetector configDetector,
 											  boolean weighted, Class<D> derivType) {
 		if( configDetector == null)
@@ -76,7 +77,7 @@ public class FactoryDetectPoint {
 	 * @param derivType       Type of derivative image.
 	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
 	 */
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createShiTomasi(ConfigGeneralDetector configDetector,
 												 boolean weighted, Class<D> derivType) {
 		if( configDetector == null)
@@ -94,7 +95,7 @@ public class FactoryDetectPoint {
 	 * @param derivType       Type of derivative image.
 	 * @see boofcv.alg.feature.detect.intensity.KitRosCornerIntensity
 	 */
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createKitRos(ConfigGeneralDetector configDetector, Class<D> derivType) {
 		if( configDetector == null)
 			configDetector = new ConfigGeneralDetector();
@@ -112,7 +113,7 @@ public class FactoryDetectPoint {
 	 * @see FastCornerIntensity
 	 */
 	@SuppressWarnings("UnnecessaryLocalVariable")
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createFast( ConfigFast configFast ,
 											 ConfigGeneralDetector configDetector , Class<T> imageType) {
 
@@ -136,13 +137,13 @@ public class FactoryDetectPoint {
 	 * @param imageType       Type of input image.
 	 * @see boofcv.alg.feature.detect.intensity.MedianCornerIntensity
 	 */
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createMedian(ConfigGeneralDetector configDetector, Class<T> imageType) {
 
 		if( configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
-		BlurStorageFilter<T> medianFilter = FactoryBlurFilter.median(imageType, configDetector.radius);
+		BlurStorageFilter<T> medianFilter = FactoryBlurFilter.median(ImageType.single(imageType), configDetector.radius);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperMedianCornerIntensity<>(medianFilter, imageType);
 		return createGeneral(intensity, configDetector);
 	}
@@ -155,7 +156,7 @@ public class FactoryDetectPoint {
 	 * @param derivType       Type of derivative image.
 	 * @see HessianBlobIntensity
 	 */
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createHessian(HessianBlobIntensity.Type type,
 											   ConfigGeneralDetector configDetector, Class<D> derivType) {
 		if( configDetector == null)
@@ -165,14 +166,14 @@ public class FactoryDetectPoint {
 		return createGeneral(intensity, configDetector);
 	}
 
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createGeneral(GradientCornerIntensity<D> cornerIntensity,
 											   ConfigGeneralDetector config) {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<>(cornerIntensity);
 		return createGeneral(intensity, config);
 	}
 
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createGeneral(GeneralFeatureIntensity<T, D> intensity,
 											   ConfigGeneralDetector config ) {
 		config.ignoreBorder += config.radius;

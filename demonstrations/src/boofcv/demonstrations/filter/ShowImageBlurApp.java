@@ -44,7 +44,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class ShowImageBlurApp<T extends ImageGray>
+public class ShowImageBlurApp<T extends ImageGray<T>>
 	extends SelectAlgorithmAndInputPanel implements ChangeListener
 {
 	int radius = 2;
@@ -115,7 +115,7 @@ public class ShowImageBlurApp<T extends ImageGray>
 		output.reshape(image.getWidth(),image.getHeight());
 		storage.reshape(image.getWidth(),image.getHeight());
 
-		ConvertBufferedImage.convertFromMulti(image, input, true, imageType);
+		ConvertBufferedImage.convertFromPlanar(image, input, true, imageType);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

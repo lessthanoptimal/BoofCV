@@ -32,7 +32,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-public abstract class DescribePlanar<T extends ImageGray, Desc extends TupleDesc>
+public abstract class DescribePlanar<T extends ImageGray<T>, Desc extends TupleDesc>
 		implements DescribeRegionPoint<Planar<T>,Desc>
 {
 

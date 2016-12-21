@@ -36,7 +36,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class PolynomialPixel<T extends ImageGray> implements InterpolatePixelS<T> {
+public abstract class PolynomialPixel<T extends ImageGray<T>> implements InterpolatePixelS<T> {
 	// for reading pixels outside the image border
 	protected ImageBorder<T> border;
 	// the image that is being interpolated

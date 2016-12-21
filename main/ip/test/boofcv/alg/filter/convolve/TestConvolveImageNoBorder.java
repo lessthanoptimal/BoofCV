@@ -30,7 +30,7 @@ public class TestConvolveImageNoBorder {
 		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImageNoBorder.class);
 		a.setKernelWidth(5);
 		a.setOffset(2);
-		a.performTests(25);
+		a.performTests(58);
 	}
 
 	@Test
@@ -38,7 +38,7 @@ public class TestConvolveImageNoBorder {
 		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImageNoBorder.class);
 		a.setKernelWidth(5);
 		a.setOffset(1);
-		a.performTests(25);
+		a.performTests(58);
 	}
 
 	@Test
@@ -46,6 +46,6 @@ public class TestConvolveImageNoBorder {
 		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImageNoBorder.class);
 		a.setKernelWidth(4);
 		a.setOffset(3);
-		a.performTests(25);
+		a.performTests(58);
 	}
 }

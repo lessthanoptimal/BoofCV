@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class GenericDenoiseTests<T extends ImageGray> {
+public abstract class GenericDenoiseTests<T extends ImageGray<T>> {
 
 	Random rand = new Random(10);
 	int width = 20;

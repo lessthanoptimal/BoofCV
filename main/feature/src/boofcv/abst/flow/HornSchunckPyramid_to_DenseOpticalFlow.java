@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class HornSchunckPyramid_to_DenseOpticalFlow<T extends ImageGray>
+public class HornSchunckPyramid_to_DenseOpticalFlow<T extends ImageGray<T>>
 	implements DenseOpticalFlow<T>
 {
 	HornSchunckPyramid<T> hornSchunck;

@@ -61,7 +61,7 @@ public class ExampleRemoveLensDistortion {
 		// load images and convert the image into a color BoofCV format
 		BufferedImage orig = UtilImageIO.loadImage(imageDir , "dist_cyto_01.jpg");
 		Planar<GrayF32> distortedImg =
-				ConvertBufferedImage.convertFromMulti(orig, null,true, GrayF32.class);
+				ConvertBufferedImage.convertFromPlanar(orig, null,true, GrayF32.class);
 
 		int numBands = distortedImg.getNumBands();
 

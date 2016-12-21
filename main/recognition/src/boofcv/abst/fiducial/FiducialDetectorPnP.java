@@ -44,7 +44,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class FiducialDetectorPnP<T extends ImageBase>
+public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 		implements FiducialDetector<T> {
 
 	private LensDistortionNarrowFOV lensDistortion;

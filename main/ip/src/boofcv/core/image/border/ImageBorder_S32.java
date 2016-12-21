@@ -25,7 +25,7 @@ import boofcv.struct.image.GrayI;
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder_S32<T extends GrayI> extends ImageBorder<T> {
+public abstract class ImageBorder_S32<T extends GrayI<T>> extends ImageBorder<T> {
 
 	public ImageBorder_S32(T image) {
 		super(image);

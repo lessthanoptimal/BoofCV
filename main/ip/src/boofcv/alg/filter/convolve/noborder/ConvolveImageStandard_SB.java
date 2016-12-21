@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.convolve.*;
@@ -27,15 +28,15 @@ import boofcv.struct.image.*;
  * </p>
  * 
  * <p>
- * NOTE: This code was automatically generated using {@link boofcv.alg.filter.convolve.noborder.GenerateConvolveImageStandard}.
+ * NOTE: This code was automatically generated using GenerateConvolveImageStandard_SB.
  * </p>
  * 
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class ConvolveImageStandard {
+public class ConvolveImageStandard_SB {
 
-	public static void horizontal(Kernel1D_F32 kernel ,
+	public static void horizontal( Kernel1D_F32 kernel ,
 								  GrayF32 image, GrayF32 dest ) {
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
@@ -62,8 +63,8 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void vertical(Kernel1D_F32 kernel,
-								GrayF32 image, GrayF32 dest )
+	public static void vertical( Kernel1D_F32 kernel,
+								 GrayF32 image, GrayF32 dest )
 	{
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
@@ -94,7 +95,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void convolve(Kernel2D_F32 kernel , GrayF32 src , GrayF32 dest )
+	public static void convolve( Kernel2D_F32 kernel , GrayF32 src , GrayF32 dest )
 	{
 		final float[] dataKernel = kernel.data;
 		final float[] dataSrc = src.data;
@@ -122,7 +123,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void horizontal(Kernel1D_F64 kernel ,
+	public static void horizontal( Kernel1D_F64 kernel ,
 								  GrayF64 image, GrayF64 dest ) {
 		final double[] dataSrc = image.data;
 		final double[] dataDst = dest.data;
@@ -149,8 +150,8 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void vertical(Kernel1D_F64 kernel,
-								GrayF64 image, GrayF64 dest )
+	public static void vertical( Kernel1D_F64 kernel,
+								 GrayF64 image, GrayF64 dest )
 	{
 		final double[] dataSrc = image.data;
 		final double[] dataDst = dest.data;
@@ -181,7 +182,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void convolve(Kernel2D_F64 kernel , GrayF64 src , GrayF64 dest )
+	public static void convolve( Kernel2D_F64 kernel , GrayF64 src , GrayF64 dest )
 	{
 		final double[] dataKernel = kernel.data;
 		final double[] dataSrc = src.data;
@@ -209,7 +210,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel ,
+	public static void horizontal( Kernel1D_S32 kernel ,
 								  GrayU8 image, GrayI16 dest ) {
 		final byte[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -236,8 +237,8 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel,
-								GrayU8 image, GrayI16 dest )
+	public static void vertical( Kernel1D_S32 kernel,
+								 GrayU8 image, GrayI16 dest )
 	{
 		final byte[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -268,7 +269,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel , GrayU8 src , GrayI16 dest )
+	public static void convolve(Kernel2D_S32 kernel , GrayU8 src , GrayI16 dest )
 	{
 		final int[] dataKernel = kernel.data;
 		final byte[] dataSrc = src.data;
@@ -296,7 +297,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel ,
+	public static void horizontal( Kernel1D_S32 kernel ,
 								  GrayU8 image, GrayS32 dest ) {
 		final byte[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -323,8 +324,8 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel,
-								GrayU8 image, GrayS32 dest )
+	public static void vertical( Kernel1D_S32 kernel,
+								 GrayU8 image, GrayS32 dest )
 	{
 		final byte[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -355,7 +356,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel , GrayU8 src , GrayS32 dest )
+	public static void convolve(Kernel2D_S32 kernel , GrayU8 src , GrayS32 dest )
 	{
 		final int[] dataKernel = kernel.data;
 		final byte[] dataSrc = src.data;
@@ -383,8 +384,8 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel,
-								GrayU16 image, GrayI8 dest , int divisor )
+	public static void vertical( Kernel1D_S32 kernel,
+								 GrayU16 image, GrayI8 dest , int divisor )
 	{
 		final short[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -416,7 +417,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel ,
+	public static void horizontal( Kernel1D_S32 kernel ,
 								  GrayS16 image, GrayI16 dest ) {
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -443,8 +444,8 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel,
-								GrayS16 image, GrayI16 dest )
+	public static void vertical( Kernel1D_S32 kernel,
+								 GrayS16 image, GrayI16 dest )
 	{
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -475,7 +476,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel , GrayS16 src , GrayI16 dest )
+	public static void convolve(Kernel2D_S32 kernel , GrayS16 src , GrayI16 dest )
 	{
 		final int[] dataKernel = kernel.data;
 		final short[] dataSrc = src.data;
@@ -503,7 +504,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel ,
+	public static void horizontal( Kernel1D_S32 kernel ,
 								  GrayU8 image, GrayI8 dest , int divisor ) {
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -531,8 +532,8 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel,
-								GrayU8 image, GrayI8 dest , int divisor )
+	public static void vertical( Kernel1D_S32 kernel,
+								 GrayU8 image, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -564,7 +565,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel , GrayU8 src , GrayI8 dest , int divisor )
+	public static void convolve(Kernel2D_S32 kernel , GrayU8 src , GrayI8 dest , int divisor )
 	{
 		final int[] dataKernel = kernel.data;
 		final byte[] dataSrc = src.data;
@@ -593,7 +594,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel ,
+	public static void horizontal( Kernel1D_S32 kernel ,
 								  GrayS16 image, GrayI16 dest , int divisor ) {
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -621,8 +622,8 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel,
-								GrayS16 image, GrayI16 dest , int divisor )
+	public static void vertical( Kernel1D_S32 kernel,
+								 GrayS16 image, GrayI16 dest , int divisor )
 	{
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -654,7 +655,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel , GrayS16 src , GrayI16 dest , int divisor )
+	public static void convolve(Kernel2D_S32 kernel , GrayS16 src , GrayI16 dest , int divisor )
 	{
 		final int[] dataKernel = kernel.data;
 		final short[] dataSrc = src.data;
@@ -683,8 +684,8 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel,
-								GrayS32 image, GrayI16 dest , int divisor )
+	public static void vertical( Kernel1D_S32 kernel,
+								 GrayS32 image, GrayI16 dest , int divisor )
 	{
 		final int[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -716,7 +717,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel ,
+	public static void horizontal( Kernel1D_S32 kernel ,
 								  GrayS32 image, GrayS32 dest ) {
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -743,8 +744,8 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel,
-								GrayS32 image, GrayS32 dest )
+	public static void vertical( Kernel1D_S32 kernel,
+								 GrayS32 image, GrayS32 dest )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -775,7 +776,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel , GrayS32 src , GrayS32 dest )
+	public static void convolve(Kernel2D_S32 kernel , GrayS32 src , GrayS32 dest )
 	{
 		final int[] dataKernel = kernel.data;
 		final int[] dataSrc = src.data;
@@ -803,7 +804,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel ,
+	public static void horizontal( Kernel1D_S32 kernel ,
 								  GrayS32 image, GrayS32 dest , int divisor ) {
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -831,8 +832,8 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel,
-								GrayS32 image, GrayS32 dest , int divisor )
+	public static void vertical( Kernel1D_S32 kernel,
+								 GrayS32 image, GrayS32 dest , int divisor )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -864,7 +865,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel , GrayS32 src , GrayS32 dest , int divisor )
+	public static void convolve(Kernel2D_S32 kernel , GrayS32 src , GrayS32 dest , int divisor )
 	{
 		final int[] dataKernel = kernel.data;
 		final int[] dataSrc = src.data;

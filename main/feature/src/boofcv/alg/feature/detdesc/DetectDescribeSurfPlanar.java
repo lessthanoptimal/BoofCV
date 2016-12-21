@@ -44,7 +44,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectDescribeSurfPlanar<II extends ImageGray>
+public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 {
 	// SURF algorithms
 	private FastHessianFeatureDetector<II> detector;

@@ -40,7 +40,7 @@ import georegression.struct.se.Se3_F64;
  * 
  * @author Peter Abeles
  */
-public interface MonocularVisualOdometry<T extends ImageBase> extends VisualOdometry<Se3_F64> {
+public interface MonocularVisualOdometry<T extends ImageBase<T>> extends VisualOdometry<Se3_F64> {
 
 	/**
 	 * Specifies the intrinsic parameters for the camera.

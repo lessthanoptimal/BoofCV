@@ -23,7 +23,7 @@ package boofcv.struct.calib;
  *
  * @author Peter Abeles
  */
-public class CameraModel {
+public abstract class CameraModel {
 	/** image shape (units: pixels) */
 	public int width,height;
 
@@ -42,4 +42,9 @@ public class CameraModel {
 	public void setHeight(int height) {
 		this.height = height;
 	}
+
+	/**
+	 * Creates a new camera model with zero values of the same type os this one
+	 */
+	public abstract <T extends CameraModel>T createLike();
 }

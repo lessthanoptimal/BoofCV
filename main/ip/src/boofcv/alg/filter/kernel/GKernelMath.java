@@ -35,7 +35,7 @@ public class GKernelMath {
 		if( a instanceof Kernel2D_F32)
 			return KernelMath.transpose((Kernel2D_F32)a);
 		else
-			return KernelMath.transpose((Kernel2D_I32)a);
+			return KernelMath.transpose((Kernel2D_S32)a);
 	}
 
 	public static Kernel1D convolve1D( Kernel1D a , Kernel1D b ) {
@@ -54,7 +54,7 @@ public class GKernelMath {
 			throw new IllegalArgumentException("But input kernels must be of the same type.");
 
 		if( a.isInteger() ) {
-			return KernelMath.convolve2D((Kernel1D_I32) a, (Kernel1D_I32) b);
+			return KernelMath.convolve2D((Kernel1D_S32) a, (Kernel1D_S32) b);
 		} else {
 			return KernelMath.convolve2D((Kernel1D_F32) a, (Kernel1D_F32) b);
 		}
@@ -62,7 +62,7 @@ public class GKernelMath {
 
 	public static <T extends ImageGray> T convertToImage(Kernel2D kernel ) {
 		if( kernel.isInteger() ) {
-			return (T)KernelMath.convertToImage((Kernel2D_I32)kernel);
+			return (T)KernelMath.convertToImage((Kernel2D_S32)kernel);
 		} else {
 			return (T)KernelMath.convertToImage((Kernel2D_F32)kernel);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,5 +94,15 @@ public class PnPDistanceReprojectionSq implements DistanceModelMonoPixels<Se3_F6
 	public void computeDistance(List<Point2D3D> observations, double[] distance) {
 		for( int i = 0; i < observations.size(); i++ )
 			distance[i] = computeDistance(observations.get(i));
+	}
+
+	@Override
+	public Class<Point2D3D> getPointType() {
+		return Point2D3D.class;
+	}
+
+	@Override
+	public Class<Se3_F64> getModelType() {
+		return Se3_F64.class;
 	}
 }

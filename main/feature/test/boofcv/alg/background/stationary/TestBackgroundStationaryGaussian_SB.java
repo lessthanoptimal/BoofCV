@@ -35,7 +35,7 @@ public class TestBackgroundStationaryGaussian_SB extends GenericBackgroundStatio
 	}
 
 	@Override
-	public <T extends ImageBase> BackgroundModelStationary<T>
+	public <T extends ImageBase<T>> BackgroundModelStationary<T>
 	create(ImageType<T> imageType) {
 		BackgroundStationaryGaussian alg = new BackgroundStationaryGaussian_SB(0.05f,10f,imageType.getImageClass());
 		if( !Float.isNaN(initialVariance))

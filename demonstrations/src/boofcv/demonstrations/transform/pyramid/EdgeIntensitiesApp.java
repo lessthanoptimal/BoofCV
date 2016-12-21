@@ -33,6 +33,7 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
 
 /**
@@ -40,7 +41,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class EdgeIntensitiesApp<T extends ImageGray> {
+public class EdgeIntensitiesApp<T extends ImageGray<T>> {
 
 	Class<T> imageType;
 
@@ -82,7 +83,7 @@ public class EdgeIntensitiesApp<T extends ImageGray> {
 		T deriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 		T derivBlur = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
-		BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,radius);
+		BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(ImageType.single(imageType),sigma,radius);
 		ImageGradient<T,T> funcDeriv = FactoryDerivative.three(imageType,imageType);
 
 		funcBlur.process(input,blur);
@@ -103,7 +104,7 @@ public class EdgeIntensitiesApp<T extends ImageGray> {
 		T blurDeriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 		T gaussDeriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
-		BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,radius);
+		BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(ImageType.single(imageType),sigma,radius);
 		ImageGradient<T,T> funcDeriv = FactoryDerivative.three(imageType,imageType);
 		ImageGradient<T,T> funcGaussDeriv = FactoryDerivative.gaussian(sigma,radius,imageType,imageType);
 
@@ -135,7 +136,7 @@ public class EdgeIntensitiesApp<T extends ImageGray> {
 		T blurDeriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		for( int sigma = 1; sigma <= 3; sigma++ ) {
-			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,-1);
+			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(ImageType.single(imageType),sigma,-1);
 			funcBlur.process(input,blur);
 			funcDeriv.process(blur,blurDeriv,derivY);
 
@@ -150,7 +151,7 @@ public class EdgeIntensitiesApp<T extends ImageGray> {
 		T deriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		for( int sigma = 1; sigma <= 3; sigma++ ) {
-			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,-1);
+			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(ImageType.single(imageType),sigma,-1);
 			funcDeriv.process(input,deriv,derivY);
 			funcBlur.process(deriv,blur);
 
@@ -166,7 +167,8 @@ public class EdgeIntensitiesApp<T extends ImageGray> {
 			Kernel1D g = FactoryKernelGaussian.gaussian1D(GrayF32.class,sigma,-1);
 			Kernel1D d = GradientThree.getKernelX(false);
 			Kernel1D god = GKernelMath.convolve1D(d,g);
-			ConvolveInterface<T,T> f = FactoryConvolve.convolve(god,imageType,imageType, BorderType.EXTENDED,true);
+			ConvolveInterface<T,T> f = FactoryConvolve.convolve(god,
+					ImageType.single(imageType), ImageType.single(imageType), BorderType.EXTENDED,true);
 			f.process(input,blur);
 
 			printIntensity("Sigma "+sigma,blur);
@@ -180,7 +182,7 @@ public class EdgeIntensitiesApp<T extends ImageGray> {
 
 		for( int sigma = 1; sigma <= 3; sigma++ ) {
 			ImageGradient<T,T> funcGaussDeriv = FactoryDerivative.gaussian(sigma,-1,imageType,imageType);
-			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,-1);
+			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(ImageType.single(imageType),sigma,-1);
 			funcBlur.process(input,blur);
 			funcGaussDeriv.process(blur,blurDeriv,derivY);
 
@@ -196,7 +198,7 @@ public class EdgeIntensitiesApp<T extends ImageGray> {
 		T blurDeriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		for( int sigma = 1; sigma <= 3; sigma++ ) {
-			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,-1);
+			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(ImageType.single(imageType),sigma,-1);
 
 			funcBlur.process(input,blur);
 			funcBlur.process(blur,blur2);

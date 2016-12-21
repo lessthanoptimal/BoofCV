@@ -62,7 +62,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public abstract class SegmentSlic<T extends ImageBase> {
+public abstract class SegmentSlic<T extends ImageBase<T>> {
 	// border which ensures there is a 3x3 neighborhood around the initial clusters and that there are pixels
 	// which can be sampled when computing the gradient
 	public static final int BORDER = 2;

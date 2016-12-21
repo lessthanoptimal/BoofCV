@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageGray;
 /**
  * @author Peter Abeles
  */
-public class WrapDisparitySadRect <T extends ImageGray, D extends ImageGray>
+public class WrapDisparitySadRect <T extends ImageGray<T>, D extends ImageGray<D>>
 		implements StereoDisparity<T,D>
 {
 	DisparityScoreRowFormat<T,D> alg;

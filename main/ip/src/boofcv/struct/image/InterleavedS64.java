@@ -44,6 +44,11 @@ public class InterleavedS64 extends ImageInterleaved<InterleavedS64> {
 	}
 
 	@Override
+	public String toString_element(int index) {
+		return String.format("%016x",data[index]);
+	}
+
+	@Override
 	public ImageDataType getDataType() {
 		return ImageDataType.S64;
 	}

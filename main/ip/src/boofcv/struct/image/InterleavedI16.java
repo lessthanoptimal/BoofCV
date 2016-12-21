@@ -25,7 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public abstract class InterleavedI16<T extends InterleavedI16> extends InterleavedInteger<T> {
+public abstract class InterleavedI16<T extends InterleavedI16<T>> extends InterleavedInteger<T> {
 
 	public short data[];
 
@@ -41,6 +41,11 @@ public abstract class InterleavedI16<T extends InterleavedI16> extends Interleav
 	}
 
 	public InterleavedI16() {
+	}
+
+	@Override
+	public String toString_element(int index) {
+		return String.format("%04x",data[index]&0xFFFF);
 	}
 
 	@Override

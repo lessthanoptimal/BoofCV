@@ -36,7 +36,7 @@ import static boofcv.factory.filter.kernel.FactoryKernelGaussian.sigmaForRadius;
  *
  * @author Peter Abeles
  */
-public class ImageGradient_Gaussian<I extends ImageGray, D extends ImageGray>
+public class ImageGradient_Gaussian<I extends ImageGray<I>, D extends ImageGray<D>>
 		implements ImageGradient<I, D> {
 
 	// default border.

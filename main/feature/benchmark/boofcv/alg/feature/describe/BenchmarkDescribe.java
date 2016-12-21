@@ -46,7 +46,7 @@ import java.util.Random;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public class BenchmarkDescribe<I extends ImageGray, D extends ImageGray, II extends ImageGray> {
+public class BenchmarkDescribe<I extends ImageGray<I>, D extends ImageGray<D>, II extends ImageGray<II>> {
 
 	static final long TEST_TIME = 1000;
 	static Random rand = new Random(234234);
@@ -95,7 +95,7 @@ public class BenchmarkDescribe<I extends ImageGray, D extends ImageGray, II exte
 	public class Brief512 extends PerformerBase {
 
 		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
-				FactoryBlurFilter.gaussian(imageType, 0, 4));
+				FactoryBlurFilter.gaussian(ImageType.single(imageType), 0, 4));
 
 		@Override
 		public void process() {
@@ -113,7 +113,7 @@ public class BenchmarkDescribe<I extends ImageGray, D extends ImageGray, II exte
 		int briefRadius = 16;
 		DescribePointBriefSO<I> alg = FactoryDescribePointAlgs.
 				briefso(FactoryBriefDefinition.gaussian2(new Random(123), briefRadius, 512),
-				FactoryBlurFilter.gaussian(imageType, 0, 4));
+				FactoryBlurFilter.gaussian(ImageType.single(imageType), 0, 4));
 
 		@Override
 		public void process() {

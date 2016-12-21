@@ -38,7 +38,7 @@ public class GHistogramFeatureOps {
 	 * @param maxPixelValue Maximum possible value for a pixel.
 	 * @param histogram The output histogram.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	void histogram( T image ,  double minPixelValue , double maxPixelValue , TupleDesc_F64 histogram ) {
 		if( image.getClass() == GrayU8.class ) {
 			HistogramFeatureOps.histogram((GrayU8) image, (int) maxPixelValue, histogram);
@@ -59,7 +59,7 @@ public class GHistogramFeatureOps {
 	 * @param image Input image. Not modified.
 	 * @param histogram Output for the histogram.  Must be correctly configured first.
 	 */
-	public static<T extends ImageGray>
+	public static<T extends ImageGray<T>>
 	void histogram(Planar<T> image , Histogram_F64 histogram ) {
 		if (image.getNumBands() != histogram.getDimensions())
 			throw new IllegalArgumentException("Number of bands in the image and histogram must be the same");

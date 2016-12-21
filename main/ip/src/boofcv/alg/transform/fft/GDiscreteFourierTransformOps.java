@@ -38,7 +38,7 @@ public class GDiscreteFourierTransformOps {
 	 * @param type Image data type
 	 * @return {@link boofcv.abst.transform.fft.DiscreteFourierTransform}
 	 */
-	public static <T extends GrayF, W extends ImageInterleaved>
+	public static <T extends GrayF<T>, W extends ImageInterleaved>
 	DiscreteFourierTransform<T,W> createTransform( ImageDataType type ) {
 		switch( type ) {
 			case F32: return (DiscreteFourierTransform)createTransformF32();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,12 +24,11 @@ import boofcv.misc.CodeGeneratorBase;
 import java.io.FileNotFoundException;
 
 /**
- * Code generator for {@link ConvolveImageStandard}.
+ * Code generator for {@link ConvolveImageStandard_SB}.
  *
  * @author Peter Abeles
  */
-public class GenerateConvolveImageStandard extends CodeGeneratorBase {
-	String className = "ConvolveImageStandard";
+public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 
 	String kernelType;
 	String inputType;
@@ -41,7 +40,6 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 	String typeCast;
 	String bitWise;
 	boolean hasDivide;
-	boolean hasBound = false; // should delete this code if it's never needed
 
 	@Override
 	public void generate()throws FileNotFoundException {
@@ -63,8 +61,7 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 		out.println("}");
 	}
 
-	private void printPreamble() throws FileNotFoundException {
-		setOutputFile(className);
+	private void printPreamble() {
 		out.print("import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n");
 		out.println();
@@ -75,7 +72,7 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 				" * </p>\n" +
 				" * \n" +
 				" * <p>\n" +
-				" * NOTE: This code was automatically generated using {@link "+getClass().getName()+"}.\n" +
+				" * NOTE: This code was automatically generated using "+getClass().getSimpleName()+".\n" +
 				" * </p>\n" +
 				" * \n" +
 				" * @author Peter Abeles\n" +
@@ -92,28 +89,22 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 	private void printAllOps(AutoTypeImage input, AutoTypeImage output, boolean hasDivide,
 							 boolean justVertical )
 	{
-		boolean isInteger = input.isInteger();
-		boolean is64 = input.getNumBits()==64;
-
 		typeCast = output.getTypeCastFromSum();
-		kernelType = isInteger ? "I32" : is64 ? "F64" : "F32";
-		inputType = input.getSingleBandName();
-		outputType = output.getSingleBandName();
-		kernelData = isInteger ? "int" : is64 ? "double" : "float";
+		kernelType = input.getKernelType();
+		inputType = input.getInterleavedName();
+		outputType = output.getInterleavedName();
+		kernelData = input.getKernelDataType();
 		inputData = input.getDataType();
 		outputData = output.getDataType();
-		sumType = isInteger ? "int" : is64 ? "double" : "float";
+		sumType = input.getSumType();
 		bitWise = input.getBitWise();
 		this.hasDivide = hasDivide;
-		this.hasBound = hasBound;
 
 		if( justVertical ) {
 			printVertical();
 		} else {
-			if (!hasBound) {
-				printHorizontal();
-				printVertical();
-			}
+			printHorizontal();
+			printVertical();
 			printConvolve2D();
 		}
 	}
@@ -195,19 +186,9 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 
 		String paramDiv = hasDivide ? ", int divisor " : "";
 		String totalDiv = hasDivide ? "((total+halfDivisor)/divisor)" : "total";
-		String paramBound = hasBound ? ", "+sumType+" minValue , "+sumType+" maxValue " : "";
 		String performBound = "";
 
-		if( hasBound ) {
-			performBound = "\n" +
-					"\t\t\t\tif( total < minValue )\n" +
-					"\t\t\t\t\ttotal = minValue;\n" +
-					"\t\t\t\telse if( total > maxValue )\n" +
-					"\t\t\t\t\ttotal = maxValue;\n" +
-					"\n";
-		}
-
-		out.print("\tpublic static void convolve( Kernel2D_" + kernelType + " kernel , " + inputType + " src , " + outputType + " dest " + paramDiv + paramBound + ")\n" +
+		out.print("\tpublic static void convolve( Kernel2D_" + kernelType + " kernel , " + inputType + " src , " + outputType + " dest " + paramDiv + ")\n" +
 				"\t{\n" +
 				"\t\tfinal " + kernelData + "[] dataKernel = kernel.data;\n" +
 				"\t\tfinal " + inputData + "[] dataSrc = src.data;\n" +
@@ -240,7 +221,7 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {
-		GenerateConvolveImageStandard gen = new GenerateConvolveImageStandard();
+		GenerateConvolveImageStandard_SB gen = new GenerateConvolveImageStandard_SB();
 		gen.generate();
 	}
 }

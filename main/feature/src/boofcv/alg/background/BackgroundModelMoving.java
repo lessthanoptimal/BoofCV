@@ -54,7 +54,7 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public abstract class BackgroundModelMoving<T extends ImageBase,MotionModel extends InvertibleTransform<MotionModel>>
+public abstract class BackgroundModelMoving<T extends ImageBase<T>,MotionModel extends InvertibleTransform<MotionModel>>
 	extends BackgroundModel<T>
 {
 

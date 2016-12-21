@@ -38,7 +38,7 @@ public class TestBackgroundMovingBasic_IL extends GenericBackgroundMovingBasicCh
 	}
 
 	@Override
-	public <T extends ImageBase> BackgroundModelMoving<T, Homography2D_F32>
+	public <T extends ImageBase<T>> BackgroundModelMoving<T, Homography2D_F32>
 	create(ImageType<T> imageType) {
 		PointTransformHomography_F32 transform = new PointTransformHomography_F32();
 		return new BackgroundMovingBasic_IL(0.05f, 10f, transform, InterpolationType.BILINEAR, imageType);

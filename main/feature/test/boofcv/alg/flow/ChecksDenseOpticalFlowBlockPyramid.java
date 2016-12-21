@@ -23,6 +23,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ImagePyramid;
 import org.junit.Test;
 
@@ -36,7 +37,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class ChecksDenseOpticalFlowBlockPyramid<T extends ImageGray> {
+public abstract class ChecksDenseOpticalFlowBlockPyramid<T extends ImageGray<T>> {
 
 	Class<T> imageType;
 	Random rand = new Random(234);
@@ -54,7 +55,8 @@ public abstract class ChecksDenseOpticalFlowBlockPyramid<T extends ImageGray> {
 	public void processImageDontBlowUp() {
 		DenseOpticalFlowBlockPyramid<T> alg = createAlg(2,3,10);
 
-		ImagePyramid<T> pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4},0,2,false,imageType);
+		ImagePyramid<T> pyramid = FactoryPyramid.discreteGaussian(
+				new int[]{1,2,4},0,2,false, ImageType.single(imageType));
 		GImageMiscOps.fillUniform(image,rand,0,200);
 		pyramid.process(image);
 

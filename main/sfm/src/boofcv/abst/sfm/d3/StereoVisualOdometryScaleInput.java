@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import georegression.struct.se.Se3_F64;
  * @author Peter Abeles
  */
 // TODO more efficient scaling algorithm
-public class StereoVisualOdometryScaleInput<T extends ImageBase> implements StereoVisualOdometry<T>{
+public class StereoVisualOdometryScaleInput<T extends ImageBase<T>> implements StereoVisualOdometry<T>{
 
 	double scaleFactor;
 

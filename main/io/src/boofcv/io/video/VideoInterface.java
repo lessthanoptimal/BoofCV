@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,5 +30,5 @@ import boofcv.struct.image.ImageType;
  */
 public interface VideoInterface {
 
-	public <T extends ImageBase> SimpleImageSequence<T> load( String fileName , ImageType<T> imageType );
+	public <T extends ImageBase<T>> SimpleImageSequence<T> load( String fileName , ImageType<T> imageType );
 }

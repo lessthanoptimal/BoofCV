@@ -31,7 +31,7 @@ import java.lang.reflect.InvocationTargetException;
  *
  * @author Peter Abeles
  */
-public class SingleBandGenerator<T extends ImageGray> implements ImageGenerator<T> {
+public class SingleBandGenerator<T extends ImageGray<T>> implements ImageGenerator<T> {
 
 	Class<T> type;
 

@@ -32,7 +32,7 @@ import boofcv.testing.BoofTesting;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class GenericWaveletDenoiseTests<T extends ImageGray> extends GenericDenoiseTests<T> {
+public abstract class GenericWaveletDenoiseTests<T extends ImageGray<T>> extends GenericDenoiseTests<T> {
 
 
 	WaveletTransform transform;

@@ -54,7 +54,7 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
-	public static <T extends ImageGray, II extends ImageGray>
+	public static <T extends ImageGray<T>, II extends ImageGray<II>>
 	DescribeRegionPoint<T,BrightFeature> surfFast(ConfigSurfDescribe.Speed config , Class<T> imageType) {
 
 
@@ -74,7 +74,7 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of input image.
 	 * @return SURF color description extractor
 	 */
-	public static <T extends ImageMultiBand, II extends ImageGray>
+	public static <T extends ImageMultiBand<T>, II extends ImageGray<II>>
 	DescribeRegionPoint<T,BrightFeature> surfColorFast(ConfigSurfDescribe.Speed config , ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
@@ -104,7 +104,7 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
-	public static <T extends ImageGray, II extends ImageGray>
+	public static <T extends ImageGray<T>, II extends ImageGray<II>>
 	DescribeRegionPoint<T,BrightFeature> surfStable(ConfigSurfDescribe.Stability config, Class<T> imageType) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -123,7 +123,7 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of input image.
 	 * @return SURF color description extractor
 	 */
-	public static <T extends ImageBase, II extends ImageGray>
+	public static <T extends ImageBase<T>, II extends ImageGray<II>>
 	DescribeRegionPoint<T,BrightFeature> surfColorStable(ConfigSurfDescribe.Stability config, ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
@@ -154,7 +154,7 @@ public class FactoryDescribeRegionPoint {
 	 * @param configDescribe SIFT descriptor configuration.  Pass in null for default options.
 	 * @return SIFT descriptor
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	DescribeRegionPoint<T,TupleDesc_F64> sift(
 			ConfigSiftScaleSpace configSS, ConfigSiftDescribe configDescribe, Class<T> imageType)
 	{
@@ -182,14 +182,14 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of gray scale image it processes.
 	 * @return BRIEF descriptor
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	DescribeRegionPoint<T,TupleDesc_B> brief( ConfigBrief config , Class<T> imageType)
 	{
 		if( config == null )
 			config = new ConfigBrief();
 		config.checkValidity();
 
-		BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,config.blurSigma,config.blurRadius);
+		BlurFilter<T> filter = FactoryBlurFilter.gaussian(ImageType.single(imageType),config.blurSigma,config.blurRadius);
 		BinaryCompareDefinition_I32 definition =
 				FactoryBriefDefinition.gaussian2(new Random(123), config.radius, config.numPoints);
 
@@ -212,7 +212,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return Pixel region descriptor
 	 */
 	@SuppressWarnings({"unchecked"})
-	public static <T extends ImageGray, D extends TupleDesc>
+	public static <T extends ImageGray<T>, D extends TupleDesc>
 	DescribeRegionPoint<T,D> pixel( int regionWidth , int regionHeight , Class<T> imageType ) {
 		return new WrapDescribePixelRegion(
 				FactoryDescribePointAlgs.pixelRegion(regionWidth,regionHeight,imageType),imageType);
@@ -230,7 +230,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return Pixel region descriptor
 	 */
 	@SuppressWarnings({"unchecked"})
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	DescribeRegionPoint<T,NccFeature> pixelNCC( int regionWidth , int regionHeight , Class<T> imageType ) {
 		return new WrapDescribePixelRegionNCC(
 				FactoryDescribePointAlgs.pixelRegionNCC(regionWidth,regionHeight,imageType),imageType);

@@ -14,7 +14,31 @@ Version : 0.27
 - Added integration/visualize-javafx
 - camera distortion models
   * Unrolled matrix inverse in pinhole and radtan
+- Updated generics to take advantage of Java 7 more
+- Image Pyramids
+  * PyramidDiscreteSampleBlur supports generic images
+- ConvolveDown
+  * Added an interface
+  * Added planar image support
+- Support for Interleaved Images Added to
+  * ConvolveWithBorder
+  * ConvolveNormalized
+- AverageDownSample
+  * Made image generic
+- Renamed for consistency
+  * Kernel2D_I32 -> Kernel2D_S32
+  * Kernel2D_I32 -> Kernel2D_S32
+- GConvolveImageOps actual works for all image types now not just gray
+- Changed behavior of ConvertBuffered image
+  * When converting to interleaved and planar images the number of bands is adjusted to match the buffered image
+  * Buffered -> BoofCV: output images are reshaped to match input
+- ImageInterleaved
+  * Added a nicely formatted toString()
+- BlurImageOps - Fixed bug where for planar imges it was apply a median instead of mean filter
+- FactoryBlurFilter - Can now handle image types other than gray scale images
 
+- TODO remove skew from camera calibration and radial distortion
+- TODO image distortion demonstration should use a rendered pattern
 - TODO Fisheye calibration using omni model
 - TODO grid of circle calibration target
 - TODO make sure RANSAC is using the faster method for selecting points.  swapping selected with one at the end

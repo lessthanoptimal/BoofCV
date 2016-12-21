@@ -35,7 +35,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public abstract class ProcessImageSequence<T extends ImageGray> implements MouseListener, KeyListener {
+public abstract class ProcessImageSequence<T extends ImageGray<T>> implements MouseListener, KeyListener {
 	private SimpleImageSequence<T> sequence;
 
 	private T image;

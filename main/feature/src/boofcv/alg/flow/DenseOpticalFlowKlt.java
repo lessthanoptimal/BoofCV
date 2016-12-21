@@ -36,7 +36,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class DenseOpticalFlowKlt<I extends ImageGray, D extends ImageGray> {
+public class DenseOpticalFlowKlt<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 	// Amount it adjusts the score for the center of a region.
 	// Visually this looks better, but only makes a small difference in benchmark performance

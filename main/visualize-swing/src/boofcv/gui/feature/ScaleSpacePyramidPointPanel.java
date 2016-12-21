@@ -84,7 +84,7 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 //		System.out.println("level "+level);
 		if( level > 0 && ss != null ) {
 
-			ImageGray small = ss.getLayer(level-1);
+			ImageGray small = (ImageGray)ss.getLayer(level-1);
 			ImageGray enlarge = GeneralizedImageOps.createSingleBand(small.getClass(), ss.getInputWidth(), ss.getInputHeight());
 			new FDistort(small,enlarge).interpNN().apply();
 

@@ -18,9 +18,8 @@
 
 package boofcv.struct.pyramid;
 
-import boofcv.core.image.ImageGenerator;
-import boofcv.core.image.inst.FactoryImageGenerator;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 /**
  * <p>
@@ -38,7 +37,7 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class ImagePyramidBase<T extends ImageGray>
+public abstract class ImagePyramidBase<T extends ImageBase<T>>
 	implements ImagePyramid<T>
 {
 	// shape of full resolution input image
@@ -51,8 +50,7 @@ public abstract class ImagePyramidBase<T extends ImageGray>
 	// if the top layer is full resolution, should a copy be made or a reference to the original be saved?i
 	protected boolean saveOriginalReference;
 
-	// creates new images
-	protected ImageGenerator<T> generator;
+	ImageType<T> imageType;
 
 	/**
 	 * Specifies input image size and behavior of top most layer.
@@ -60,8 +58,8 @@ public abstract class ImagePyramidBase<T extends ImageGray>
 	 * @param imageType Type of image which is processed
 	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of copied.
 	 */
-	public ImagePyramidBase( Class<T> imageType , boolean saveOriginalReference ) {
-		this.generator = FactoryImageGenerator.create(imageType);
+	public ImagePyramidBase( ImageType<T> imageType , boolean saveOriginalReference ) {
+		this.imageType = imageType;
 		this.saveOriginalReference = saveOriginalReference;
 	}
 
@@ -79,20 +77,20 @@ public abstract class ImagePyramidBase<T extends ImageGray>
 
 		this.bottomWidth = width;
 		this.bottomHeight = height;
-		layers = generator.createArray(getNumLayers());
+		layers = imageType.createArray(getNumLayers());
 		double scaleFactor = getScale(0);
 
 		if (scaleFactor == 1) {
 			if (!saveOriginalReference) {
-				layers[0] = generator.createInstance(bottomWidth, bottomHeight);
+				layers[0] = imageType.createImage(bottomWidth, bottomHeight);
 			}
 		} else {
-			layers[0] = generator.createInstance((int)Math.ceil(bottomWidth / scaleFactor), (int)Math.ceil(bottomHeight / scaleFactor));
+			layers[0] = imageType.createImage((int)Math.ceil(bottomWidth / scaleFactor), (int)Math.ceil(bottomHeight / scaleFactor));
 		}
 
 		for (int i = 1; i < layers.length; i++) {
 			scaleFactor = getScale(i);
-			layers[i] = generator.createInstance((int)Math.ceil(bottomWidth / scaleFactor), (int)Math.ceil(bottomHeight / scaleFactor));
+			layers[i] = imageType.createImage((int)Math.ceil(bottomWidth / scaleFactor), (int)Math.ceil(bottomHeight / scaleFactor));
 		}
 	}
 
@@ -144,8 +142,8 @@ public abstract class ImagePyramidBase<T extends ImageGray>
 	}
 
 	@Override
-	public Class<T> getImageType() {
-		return generator.getType();
+	public ImageType<T> getImageType() {
+		return imageType;
 	}
 
 	@Override

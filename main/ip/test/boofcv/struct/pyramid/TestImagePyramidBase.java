@@ -21,6 +21,7 @@ package boofcv.struct.pyramid;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -148,7 +149,7 @@ public class TestImagePyramidBase {
 		int scales[];
 
 		public Dummy(Class imageType, boolean saveOriginalReference) {
-			super(imageType, saveOriginalReference);
+			super(ImageType.single(imageType), saveOriginalReference);
 		}
 
 		public void setScaleFactors(int... scales) {

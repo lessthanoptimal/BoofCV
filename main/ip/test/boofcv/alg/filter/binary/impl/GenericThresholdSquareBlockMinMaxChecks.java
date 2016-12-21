@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public abstract class GenericThresholdSquareBlockMinMaxChecks
-		<T extends ImageGray>
+		<T extends ImageGray<T>>
 {
 
 	Class<T> imageType;

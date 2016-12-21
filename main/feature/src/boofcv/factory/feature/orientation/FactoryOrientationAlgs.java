@@ -33,7 +33,7 @@ import boofcv.struct.image.*;
 @SuppressWarnings({"unchecked"})
 public class FactoryOrientationAlgs {
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	OrientationHistogram<T> histogram( double objectToSample, int numAngles , int radius , boolean weighted ,
 									   Class<T> derivType )
 	{
@@ -54,7 +54,7 @@ public class FactoryOrientationAlgs {
 		return ret;
 	}
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	OrientationImageAverage<T> nogradient( double objectToSample , int radius , Class<T> imageType )
 	{
 		OrientationImageAverage<T> ret;
@@ -72,7 +72,7 @@ public class FactoryOrientationAlgs {
 		return ret;
 	}
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	OrientationAverage<T> average( double objectToSample, int radius , boolean weighted , Class<T> derivType )
 	{
 		OrientationAverage<T> ret;
@@ -92,7 +92,7 @@ public class FactoryOrientationAlgs {
 		return ret;
 	}
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	OrientationSlidingWindow<T> sliding( double objectRadiusToScale, int numAngles, double windowSize ,
 										 int radius , boolean weighted , Class<T> derivType )
 	{
@@ -121,7 +121,7 @@ public class FactoryOrientationAlgs {
 	 * @param integralType Type of image being processed.
 	 * @return OrientationIntegral
 	 */
-	public static <II extends ImageGray>
+	public static <II extends ImageGray<II>>
 	OrientationIntegral<II> average_ii( ConfigAverageIntegral config , Class<II> integralType)
 	{
 		if( config == null )
@@ -145,7 +145,7 @@ public class FactoryOrientationAlgs {
 	 * @param integralImage Type of image being processed.
 	 * @return OrientationIntegral
 	 */
-	public static <II extends ImageGray>
+	public static <II extends ImageGray<II>>
 	OrientationIntegral<II> image_ii( double objectRadiusToScale,
 									  int sampleRadius , double samplePeriod , int sampleWidth,
 									 double weightSigma , Class<II> integralImage)
@@ -165,7 +165,7 @@ public class FactoryOrientationAlgs {
 	 * @param integralType Type of integral image being processed.
 	 * @return OrientationIntegral
 	 */
-	public static <II extends ImageGray>
+	public static <II extends ImageGray<II>>
 	OrientationIntegral<II> sliding_ii( ConfigSlidingIntegral config , Class<II> integralType)
 	{
 		if( config == null )
@@ -184,7 +184,7 @@ public class FactoryOrientationAlgs {
 	 * @param derivType Type of derivative image it takes as input
 	 * @return OrientationHistogramSift
 	 */
-	public static <D extends ImageGray>
+	public static <D extends ImageGray<D>>
 	OrientationHistogramSift<D> sift(ConfigSiftOrientation config , Class<D> derivType ) {
 		if( config == null )
 			config = new ConfigSiftOrientation();

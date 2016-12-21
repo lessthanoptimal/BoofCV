@@ -140,4 +140,12 @@ public class CameraPinholeRadial extends CameraPinhole implements Serializable {
 			System.out.println("No tangential");
 		}
 	}
+
+	@Override
+	public <T extends CameraModel> T createLike() {
+		CameraPinholeRadial model = new CameraPinholeRadial();
+		if( radial != null )
+			model.radial = new double[ radial.length ];
+		return (T)model;
+	}
 }

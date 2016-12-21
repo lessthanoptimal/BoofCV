@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ import java.util.List;
  * </p>
  * @author Peter Abeles
  */
-public class TrackerMeanShiftComaniciu2003<T extends ImageBase> {
+public class TrackerMeanShiftComaniciu2003<T extends ImageBase<T>> {
 
 	// computes the histogram inside a rotated rectangle
 	private LocalWeightedHistogramRotRect<T> calcHistogram;

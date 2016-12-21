@@ -49,7 +49,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectPointsWithNoiseApp<T extends ImageGray, D extends ImageGray>
+public class DetectPointsWithNoiseApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel implements ImageCorruptPanel.Listener {
 
 	static int maxFeatures = 400;

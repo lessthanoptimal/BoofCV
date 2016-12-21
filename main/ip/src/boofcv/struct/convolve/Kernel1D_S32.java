@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ package boofcv.struct.convolve;
  *
  * @author Peter Abeles
  */
-public class Kernel1D_I32 extends Kernel1D {
+public class Kernel1D_S32 extends Kernel1D {
 
 	public int data[];
 
@@ -38,7 +38,7 @@ public class Kernel1D_I32 extends Kernel1D {
 	 * @param data  The value of the kernel. Not modified.  Reference is not saved.
 	 * @param width The kernels width.
 	 */
-	public Kernel1D_I32(int data[], int width) {
+	public Kernel1D_S32(int data[], int width) {
 		this(data,width,width/2);
 	}
 
@@ -49,7 +49,7 @@ public class Kernel1D_I32 extends Kernel1D {
 	 * @param width The kernels width.
 	 * @param offset Location of the origin in the array
 	 */
-	public Kernel1D_I32(int data[], int width , int offset) {
+	public Kernel1D_S32(int data[], int width , int offset) {
 		super(width,offset);
 
 		this.data = new int[width];
@@ -62,7 +62,7 @@ public class Kernel1D_I32 extends Kernel1D {
 	 *
 	 * @param width How wide the kernel is. 
 	 */
-	public Kernel1D_I32(int width) {
+	public Kernel1D_S32(int width) {
 		this(width,width/2);
 	}
 
@@ -72,12 +72,12 @@ public class Kernel1D_I32 extends Kernel1D {
 	 * @param width How wide the kernel is.
 	 * @param offset Location of the origin in the array
 	 */
-	public Kernel1D_I32(int width , int offset) {
+	public Kernel1D_S32(int width , int offset) {
 		super(width,offset);
 		data = new int[width];
 	}
 
-	protected Kernel1D_I32() {
+	protected Kernel1D_S32() {
 	}
 
 	@Override
@@ -100,8 +100,8 @@ public class Kernel1D_I32 extends Kernel1D {
 	 * @param offset Location of the origin in the array
 	 * @return A new kernel.
 	 */
-	public static Kernel1D_I32 wrap(int data[], int width, int offset ) {
-		Kernel1D_I32 ret = new Kernel1D_I32();
+	public static Kernel1D_S32 wrap(int data[], int width, int offset ) {
+		Kernel1D_S32 ret = new Kernel1D_S32();
 		ret.data = data;
 		ret.width = width;
 		ret.offset = offset;
@@ -110,8 +110,8 @@ public class Kernel1D_I32 extends Kernel1D {
 	}
 
 	@Override
-	public Kernel1D_I32 copy() {
-		Kernel1D_I32 ret = new Kernel1D_I32(width,offset);
+	public Kernel1D_S32 copy() {
+		Kernel1D_S32 ret = new Kernel1D_S32(width,offset);
 		System.arraycopy(data,0,ret.data,0,ret.width);
 		return ret;
 	}

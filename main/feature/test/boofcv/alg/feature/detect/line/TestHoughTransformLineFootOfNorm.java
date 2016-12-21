@@ -47,7 +47,7 @@ public class TestHoughTransformLineFootOfNorm {
 		obviousLines(GrayS32.class);
 	}
 
-	private <D extends ImageGray> void obviousLines(Class<D> derivType ) {
+	private <D extends ImageGray<D>> void obviousLines(Class<D> derivType ) {
 		GrayU8 binary = new GrayU8(width,height);
 		D derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
 		D derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);

@@ -83,7 +83,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class DescribeDenseHogAlg<Input extends ImageBase> extends BaseDenseHog<Input> {
+public class DescribeDenseHogAlg<Input extends ImageBase<Input>> extends BaseDenseHog<Input> {
 
 	// orientation and magnitude of each pixel
 	protected GrayF32 orientation = new GrayF32(1,1);

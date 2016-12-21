@@ -32,7 +32,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryGaussian_SB<T extends ImageGray>
+public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>>
 		extends BackgroundStationaryGaussian<T>
 {
 	// wrappers which provide abstraction across image types

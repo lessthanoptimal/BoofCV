@@ -76,7 +76,7 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public abstract class "+className+"<T extends ImageGray>\n" +
+				"public abstract class "+className+"<T extends ImageGray<T>>\n" +
 				"\t\textends SelectRectStandard<"+sumType+"[],T>\n" +
 				"{\n" +
 				"\t// scores organized for more efficient processing\n" +

@@ -49,27 +49,27 @@ public class ImageType<T extends ImageBase> implements Serializable {
 		this.numBands = numBands;
 	}
 
-	public static <I extends ImageGray> ImageType<I> single(Class<I> imageType ) {
+	public static <I extends ImageGray<I>> ImageType<I> single(Class<I> imageType ) {
 		return new ImageType<>(Family.GRAY, ImageDataType.classToType(imageType), 1);
 	}
 
-	public static <I extends ImageGray> ImageType<I> single(ImageDataType type ) {
+	public static <I extends ImageGray<I>> ImageType<I> single(ImageDataType type ) {
 		return new ImageType<>(Family.GRAY, type, 1);
 	}
 
-	public static <I extends ImageGray> ImageType<Planar<I>> pl(int numBands , Class<I> imageType ) {
+	public static <I extends ImageGray<I>> ImageType<Planar<I>> pl(int numBands , Class<I> imageType ) {
 		return new ImageType<>(Family.PLANAR, ImageDataType.classToType(imageType), numBands);
 	}
 
-	public static <I extends ImageGray> ImageType<Planar<I>> pl(int numBands , ImageDataType type ) {
+	public static <I extends ImageGray<I>> ImageType<Planar<I>> pl(int numBands , ImageDataType type ) {
 		return new ImageType<>(Family.PLANAR, type, numBands);
 	}
 
-	public static <I extends ImageInterleaved> ImageType<I> il(int numBands, Class<I> imageType) {
+	public static <I extends ImageInterleaved<I>> ImageType<I> il(int numBands, Class<I> imageType) {
 		return new ImageType<>(Family.INTERLEAVED, ImageDataType.classToType(imageType), numBands);
 	}
 
-	public static <I extends ImageInterleaved> ImageType<I> il(int numBands, ImageDataType type) {
+	public static <I extends ImageInterleaved<I>> ImageType<I> il(int numBands, ImageDataType type) {
 		return new ImageType<>(Family.INTERLEAVED, type, numBands);
 	}
 

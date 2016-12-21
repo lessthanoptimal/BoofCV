@@ -40,7 +40,7 @@ public class FactorySearchLocalPeak {
 	 * @param imageType Type of input image
 	 * @return mean-shift search
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	SearchLocalPeak<T> meanShiftUniform( int maxIterations, float convergenceTol , Class<T> imageType ) {
 		WeightPixel_F32 weights = new WeightPixelUniform_F32();
 		MeanShiftPeak<T> alg = new MeanShiftPeak<>(maxIterations, convergenceTol, weights, imageType);
@@ -54,7 +54,7 @@ public class FactorySearchLocalPeak {
 	 * @param imageType Type of input image
 	 * @return mean-shift search
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	SearchLocalPeak<T> meanShiftGaussian( int maxIterations, float convergenceTol , Class<T> imageType) {
 		WeightPixel_F32 weights = new WeightPixelGaussian_F32();
 		MeanShiftPeak<T> alg = new MeanShiftPeak<>(maxIterations, convergenceTol, weights, imageType);

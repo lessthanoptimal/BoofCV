@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public interface GradientMultiToSingleBand<Input extends ImageMultiBand, Output extends ImageGray>
+public interface GradientMultiToSingleBand<Input extends ImageMultiBand<Input>, Output extends ImageGray<Output>>
 {
 	void process( Input inDerivX , Input inDerivY , Output  outDerivX , Output outDerivY );
 

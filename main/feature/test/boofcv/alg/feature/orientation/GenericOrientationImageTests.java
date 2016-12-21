@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public class GenericOrientationImageTests<T extends ImageGray> {
+public class GenericOrientationImageTests<T extends ImageGray<T>> {
 
 	int width = 30;
 	int height = 40;

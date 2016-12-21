@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class CannyEdgeDynamic<T extends ImageGray, D extends ImageGray> extends CannyEdge<T,D>
+public class CannyEdgeDynamic<T extends ImageGray<T>, D extends ImageGray<D>> extends CannyEdge<T,D>
 {
 	/**
 	 * Constructor and configures algorithm

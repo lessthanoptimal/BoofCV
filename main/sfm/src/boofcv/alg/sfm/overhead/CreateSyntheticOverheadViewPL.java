@@ -33,7 +33,7 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public class CreateSyntheticOverheadViewPL<T extends ImageGray>
+public class CreateSyntheticOverheadViewPL<T extends ImageGray<T>>
 		extends CreateSyntheticOverheadView<Planar<T>>
 {
 	// computes interpolated pixel value.

@@ -29,7 +29,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -101,7 +101,7 @@ public class TestImplIntegralImageOps {
 	}
 
 	public void convolve( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Kernel2D_I32 kernel = new Kernel2D_I32(3, new int[]{1,1,1,2,2,2,1,1,1});
+		Kernel2D_S32 kernel = new Kernel2D_S32(3, new int[]{1,1,1,2,2,2,1,1,1});
 		GrayU8 input = new GrayU8(width,height);
 		GrayS32 expected = new GrayS32(width,height);
 		GImageMiscOps.fillUniform(input, rand, 0, 10);
@@ -140,7 +140,7 @@ public class TestImplIntegralImageOps {
 	}
 
 	public void convolveBorder( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Kernel2D_I32 kernel = new Kernel2D_I32(3, new int[]{1,1,1,2,2,2,1,1,1});
+		Kernel2D_S32 kernel = new Kernel2D_S32(3, new int[]{1,1,1,2,2,2,1,1,1});
 		GrayU8 input = new GrayU8(width,height);
 		GrayS32 expected = new GrayS32(width,height);
 		GImageMiscOps.fillUniform(input, rand, 0, 10);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.alg.filter.kernel.SteerableCoefficients;
 import boofcv.alg.filter.kernel.SteerableKernel;
 import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 
 
 /**
@@ -33,10 +33,10 @@ import boofcv.struct.convolve.Kernel2D_I32;
  *
  * @author Peter Abeles
  */
-public class SteerableKernel_I32 implements SteerableKernel<Kernel2D_I32> {
+public class SteerableKernel_I32 implements SteerableKernel<Kernel2D_S32> {
 
 	// stores the output kernel
-	private Kernel2D_I32 output;
+	private Kernel2D_S32 output;
 
 	// definition of steerable function
 	private SteerableCoefficients coef;
@@ -50,11 +50,11 @@ public class SteerableKernel_I32 implements SteerableKernel<Kernel2D_I32> {
 		this.basis = basis;
 
 		int width = basis[0].width;
-		output = new Kernel2D_I32(width);
+		output = new Kernel2D_S32(width);
 	}
 
 	@Override
-	public Kernel2D_I32 compute( double angle ) {
+	public Kernel2D_S32 compute(double angle ) {
 		// set the output to zero
 		KernelMath.fill(output,0);
 
@@ -63,7 +63,7 @@ public class SteerableKernel_I32 implements SteerableKernel<Kernel2D_I32> {
 		for( int i = 0; i < basis.length; i++ ) {
 			double c = coef.compute(angle,i);
 
-			Kernel2D_I32 k = (Kernel2D_I32)basis[i];
+			Kernel2D_S32 k = (Kernel2D_S32)basis[i];
 
 			for( int j = 0; j < N; j++ ) {
 				output.data[j] += k.data[j]*c;
@@ -79,7 +79,7 @@ public class SteerableKernel_I32 implements SteerableKernel<Kernel2D_I32> {
 	}
 
 	@Override
-	public Kernel2D_I32 getBasis( int index ) {
-		return (Kernel2D_I32)basis[index];
+	public Kernel2D_S32 getBasis(int index ) {
+		return (Kernel2D_S32)basis[index];
 	}
 }

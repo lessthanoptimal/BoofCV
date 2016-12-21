@@ -34,7 +34,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class DiscretePyramidPanel<T extends ImageGray> extends JPanel {
+public class DiscretePyramidPanel<T extends ImageGray<T>> extends JPanel {
 
 	BufferedImage img;
 	ImagePyramid<T> pyramid;

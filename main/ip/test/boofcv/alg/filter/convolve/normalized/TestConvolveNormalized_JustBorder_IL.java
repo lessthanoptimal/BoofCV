@@ -18,9 +18,9 @@
 
 package boofcv.alg.filter.convolve.normalized;
 
-import boofcv.core.image.FactoryGImageGray;
-import boofcv.core.image.GImageGray;
-import boofcv.struct.image.ImageGray;
+import boofcv.core.image.FactoryGImageMultiBand;
+import boofcv.core.image.GImageMultiBand;
+import boofcv.struct.image.ImageMultiBand;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestConvolveNormalized_JustBorder {
+public class TestConvolveNormalized_JustBorder_IL {
 	@Test
 	public void compareToNaive() {
 		CompareToNaive test = new CompareToNaive();
@@ -60,7 +60,7 @@ public class TestConvolveNormalized_JustBorder {
 	public static class CompareToNaive extends CompareToStandardConvolutionNormalized {
 
 		public CompareToNaive() {
-			super(ConvolveNormalized_JustBorder.class);
+			super(ConvolveNormalized_JustBorder_IL.class);
 		}
 
 		/**
@@ -69,30 +69,30 @@ public class TestConvolveNormalized_JustBorder {
 		@Override
 		protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 
-			GImageGray t,v;
+			GImageMultiBand t,v;
 
 			int borderX0=0,borderX1=0;
 			int borderY0=0,borderY1=0;
 
 			if( methodTest.getName().contentEquals("convolve")) {
-				t = FactoryGImageGray.wrap((ImageGray) targetParam[2]);
-				v = FactoryGImageGray.wrap((ImageGray) validationParam[2]);
+				t = FactoryGImageMultiBand.wrap((ImageMultiBand) targetParam[2]);
+				v = FactoryGImageMultiBand.wrap((ImageMultiBand) validationParam[2]);
 				borderX0=borderY0 = offset;
 				borderX1=borderY1 = kernelRadius*2-offset;
 			} else if( methodTest.getName().contentEquals("horizontal") ) {
-				t = FactoryGImageGray.wrap((ImageGray) targetParam[2]);
-				v = FactoryGImageGray.wrap((ImageGray) validationParam[2]);
+				t = FactoryGImageMultiBand.wrap((ImageMultiBand) targetParam[2]);
+				v = FactoryGImageMultiBand.wrap((ImageMultiBand) validationParam[2]);
 				borderX0 = offset;
 				borderX1 = kernelRadius*2-offset;
 			} else if( methodTest.getName().contentEquals("vertical")) {
 				if( methodTest.getParameterTypes().length == 3 ) {
-					t = FactoryGImageGray.wrap((ImageGray) targetParam[2]);
-					v = FactoryGImageGray.wrap((ImageGray) validationParam[2]);
+					t = FactoryGImageMultiBand.wrap((ImageMultiBand) targetParam[2]);
+					v = FactoryGImageMultiBand.wrap((ImageMultiBand) validationParam[2]);
 					borderY0 = offset;
 					borderY1 = kernelRadius * 2 - offset;
 				} else {
-					t = FactoryGImageGray.wrap((ImageGray) targetParam[3]);
-					v = FactoryGImageGray.wrap((ImageGray) validationParam[3]);
+					t = FactoryGImageMultiBand.wrap((ImageMultiBand) targetParam[3]);
+					v = FactoryGImageMultiBand.wrap((ImageMultiBand) validationParam[3]);
 					borderX0=borderY0 = offset;
 					borderX1=borderY1 = kernelRadius*2-offset;
 				}
@@ -102,15 +102,30 @@ public class TestConvolveNormalized_JustBorder {
 
 			final int width = t.getWidth();
 			final int height = t.getHeight();
+			final float pixelT[] = new float[ t.getNumberOfBands() ];
+			final float pixelV[] = new float[ t.getNumberOfBands() ];
+
+//			System.out.println("   t");
+//			System.out.println(t.getImage());
+//			System.out.println("   v");
+//			System.out.println(v.getImage());
 
 			for( int y = 0; y < height; y++ ) {
 				for( int x = 0; x < width; x++ ) {
 					if( x < borderX0 || y < borderY0 || x >= width - borderX1 || y >= height - borderY1 )
 					{
-						Number numT = t.get(x,y);
-						Number numV = v.get(x,y);
 
-						assertEquals( x+" "+y,numV.doubleValue() , numT.doubleValue() , 1e-4 );
+						t.get(x,y,pixelT);
+						v.get(x,y,pixelV);
+
+						for (int band = 0; band < t.getNumberOfBands(); band++) {
+							assertEquals( x+" "+y,pixelV[band] , pixelT[band] , 1e-4 );
+						}
+					} else {
+						t.get(x,y,pixelT);
+						for (int band = 0; band < t.getNumberOfBands(); band++) {
+							assertEquals( x+" "+y,0 , pixelT[band] , 1e-4 );
+						}
 					}
 				}
 			}

@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class DescribePointRectangleRegion<T extends ImageGray>
+public abstract class DescribePointRectangleRegion<T extends ImageGray<T>>
 {
 	// image that descriptors are being extracted from
 	protected T image;

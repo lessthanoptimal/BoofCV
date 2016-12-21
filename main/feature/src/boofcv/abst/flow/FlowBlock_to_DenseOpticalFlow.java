@@ -30,7 +30,7 @@ import boofcv.struct.pyramid.ImagePyramid;
  *
  * @author Peter Abeles
  */
-public class FlowBlock_to_DenseOpticalFlow<T extends ImageGray>
+public class FlowBlock_to_DenseOpticalFlow<T extends ImageGray<T>>
 	implements DenseOpticalFlow<T>
 {
 	DenseOpticalFlowBlockPyramid<T> flowAlg;

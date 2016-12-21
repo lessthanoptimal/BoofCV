@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class GenericTestsDetectDescribeMulti<T extends ImageGray, TD extends TupleDesc> {
+public abstract class GenericTestsDetectDescribeMulti<T extends ImageGray<T>, TD extends TupleDesc> {
 	int width = 100;
 	int height = 120;
 

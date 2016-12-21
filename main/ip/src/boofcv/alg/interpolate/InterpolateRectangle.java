@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface InterpolateRectangle<T extends ImageGray> {
+public interface InterpolateRectangle<T extends ImageGray<T>> {
 
 	/**
 	 * Change the image that is being interpolated.

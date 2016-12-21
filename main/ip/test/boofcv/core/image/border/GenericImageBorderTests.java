@@ -33,7 +33,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public abstract class GenericImageBorderTests<T extends ImageBase> {
+public abstract class GenericImageBorderTests<T extends ImageBase<T>> {
 
 	Random rand = new Random(234);
 	List<ImageType<T>> imageTypes = new ArrayList<>();

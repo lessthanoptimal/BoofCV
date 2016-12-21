@@ -19,7 +19,8 @@
 package boofcv.alg.transform.pyramid;
 
 import boofcv.alg.filter.misc.AverageDownSampleOps;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 /**
@@ -28,7 +29,7 @@ import boofcv.struct.pyramid.PyramidDiscrete;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidDiscreteAverage<T extends ImageGray> extends PyramidDiscrete<T> {
+public class PyramidDiscreteAverage<T extends ImageBase<T>> extends PyramidDiscrete<T> {
 
 	/**
 	 *
@@ -37,7 +38,7 @@ public class PyramidDiscreteAverage<T extends ImageGray> extends PyramidDiscrete
 	 *                              Set to false if you don't know what you are doing.
 	 * @param scaleFactors Scale factor for each layer in the pyramid relative to the input layer
 	 */
-	public PyramidDiscreteAverage(Class<T> imageType,
+	public PyramidDiscreteAverage(ImageType<T> imageType,
 								  boolean saveOriginalReference, int... scaleFactors)
 	{
 		super(imageType,saveOriginalReference,scaleFactors);
@@ -46,7 +47,6 @@ public class PyramidDiscreteAverage<T extends ImageGray> extends PyramidDiscrete
 	@Override
 	public void process(T input) {
 		super.initialize(input.width,input.height);
-
 
 		if (scale[0] == 1) {
 			if (isSaveOriginalReference()) {

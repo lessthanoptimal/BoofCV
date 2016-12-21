@@ -22,8 +22,8 @@ import boofcv.alg.filter.convolve.noborder.ConvolveImageStandardSparse;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.convolve.Kernel1D_S32;
+import boofcv.struct.image.ImageBase;
 import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.Test;
 
@@ -75,14 +75,14 @@ public class TestConvolveImageNoBorderSparse {
 			if (Kernel1D_F32.class == paramTypes[0]) {
 				kernel = FactoryKernel.random1D_F32(kernelWidth,kernelRadius, -1, 1, rand);
 				storage = new float[ kernelRadius*2+1];
-			} else if (Kernel1D_I32.class == paramTypes[0]) {
+			} else if (Kernel1D_S32.class == paramTypes[0]) {
 				kernel = FactoryKernel.random1D_I32(kernelWidth,kernelRadius, 0, 5, rand);
 				storage = new int[ kernelRadius*2+1];
 			} else {
 				throw new RuntimeException("Unknown kernel type");
 			}
 
-			ImageGray src = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
+			ImageBase src = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
 			GImageMiscOps.fillUniform(src, rand, 0, 5);
 
 

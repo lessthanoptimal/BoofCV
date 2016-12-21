@@ -23,7 +23,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_F64;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import boofcv.testing.CompareEquivalentFunctions;
@@ -127,7 +127,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 			kernel = FactoryKernel.table1D_F32(kernelRadius, true);
 		} else if (Kernel1D_F64.class == kernelType) {
 			kernel = FactoryKernel.table1D_F64(kernelRadius,true);
-		} else if (Kernel1D_I32.class == kernelType) {
+		} else if (Kernel1D_S32.class == kernelType) {
 			kernel = FactoryKernel.table1D_I32(kernelRadius);
 		} else {
 			throw new RuntimeException("Unknown kernel type");

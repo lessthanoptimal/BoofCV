@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public abstract class GeneralSparseOperatorTests
-<T extends ImageGray>
+<T extends ImageGray<T>>
 {
 	protected Random rand = new Random(12342);
 	protected int width = 30;

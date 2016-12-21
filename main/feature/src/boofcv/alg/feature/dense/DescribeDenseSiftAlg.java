@@ -44,7 +44,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public class DescribeDenseSiftAlg<D extends ImageGray> extends DescribeSiftCommon {
+public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCommon {
 
 	// sampling period along the image's rows an columns
 	double periodRows;

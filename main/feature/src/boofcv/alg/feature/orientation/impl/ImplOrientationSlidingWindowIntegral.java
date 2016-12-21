@@ -34,7 +34,7 @@ import org.ddogleg.sorting.QuickSort_F64;
  * @author Peter Abeles
  */
 public class ImplOrientationSlidingWindowIntegral
-		<T extends ImageGray,G extends GradientValue>
+		<T extends ImageGray<T>,G extends GradientValue>
 		extends OrientationIntegralBase<T,G>
 {
 	// where the output from the derivative is stored

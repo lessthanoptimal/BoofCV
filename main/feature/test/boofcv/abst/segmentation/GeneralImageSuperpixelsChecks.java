@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase> {
+public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase<T>> {
 
 	ImageType imageTypes[];
 

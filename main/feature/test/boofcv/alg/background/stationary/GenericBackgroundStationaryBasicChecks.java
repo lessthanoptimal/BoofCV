@@ -43,7 +43,7 @@ public abstract class GenericBackgroundStationaryBasicChecks extends GenericBack
 		}
 	}
 
-	private <T extends ImageBase> void checkLearnRate_slow(ImageType<T> imageType) {
+	private <T extends ImageBase<T>> void checkLearnRate_slow(ImageType<T> imageType) {
 		BackgroundStationaryBasic<T> alg = (BackgroundStationaryBasic)create(imageType);
 		alg.setThreshold(10);
 
@@ -68,7 +68,7 @@ public abstract class GenericBackgroundStationaryBasicChecks extends GenericBack
 		BoofTesting.assertEquals(expected,segmented,1e-5f);
 	}
 
-	private <T extends ImageBase> void checkLearnRate_fast(ImageType<T> imageType) {
+	private <T extends ImageBase<T>> void checkLearnRate_fast(ImageType<T> imageType) {
 		BackgroundStationaryBasic<T> alg = (BackgroundStationaryBasic)create(imageType);
 		alg.setThreshold(10);
 
@@ -100,7 +100,7 @@ public abstract class GenericBackgroundStationaryBasicChecks extends GenericBack
 		}
 	}
 
-	private <T extends ImageBase> void checkThreshold( ImageType<T> imageType ) {
+	private <T extends ImageBase<T>> void checkThreshold( ImageType<T> imageType ) {
 		BackgroundStationaryBasic<T> alg = (BackgroundStationaryBasic)create(imageType);
 		alg.setLearnRate(0.05f);
 

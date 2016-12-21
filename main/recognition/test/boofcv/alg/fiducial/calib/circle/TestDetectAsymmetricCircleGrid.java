@@ -178,7 +178,7 @@ public class TestDetectAsymmetricCircleGrid {
 		putGridIntoCanonical_vertical(5,6);
 	}
 	private void putGridIntoCanonical_vertical( int numRows , int numCols ) {
-		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid<>(numRows,numCols,null,null,null);
+		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid(numRows,numCols,null,null,null);
 
 		Grid g = createGrid(numRows,numCols);
 		List<EllipseRotated_F64> original = new ArrayList<>();
@@ -207,7 +207,7 @@ public class TestDetectAsymmetricCircleGrid {
 
 	}
 	private void putGridIntoCanonical_horizontal( int numRows , int numCols) {
-		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid<>(numRows,numCols,null,null,null);
+		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid(numRows,numCols,null,null,null);
 
 		Grid g = createGrid(numRows,numCols);
 		List<EllipseRotated_F64> original = new ArrayList<>();
@@ -236,7 +236,7 @@ public class TestDetectAsymmetricCircleGrid {
 		putGridIntoCanonical_rotate(5,3);
 	}
 	public void putGridIntoCanonical_rotate(int numRows , int numCols ) {
-		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid<>(numRows,numCols,null,null,null);
+		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid(numRows,numCols,null,null,null);
 
 		Grid g = createGrid(numRows,numCols);
 		List<EllipseRotated_F64> original = new ArrayList<>();
@@ -359,7 +359,7 @@ public class TestDetectAsymmetricCircleGrid {
 		List<EllipseRotated_F64> original = new ArrayList<>();
 		original.addAll(g.ellipses);
 
-		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid<>(3,3,null,null,null);
+		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid(3,3,null,null,null);
 
 		alg.rotateGridCCW(g);
 		assertEquals(9,g.ellipses.size());

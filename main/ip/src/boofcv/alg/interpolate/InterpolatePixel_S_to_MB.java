@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class InterpolatePixel_S_to_MB<T extends ImageGray> implements InterpolatePixelMB<T>
+public class InterpolatePixel_S_to_MB<T extends ImageGray<T>> implements InterpolatePixelMB<T>
 {
 	InterpolatePixelS<T> interp;
 

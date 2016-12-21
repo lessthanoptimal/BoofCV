@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import georegression.struct.shapes.Quadrilateral_F64;
  *
  * @author Peter Abeles
  */
-public class Comaniciu2003_to_TrackerObjectQuad<T extends ImageBase>
+public class Comaniciu2003_to_TrackerObjectQuad<T extends ImageBase<T>>
 		implements TrackerObjectQuad<T>
 {
 	TrackerMeanShiftComaniciu2003<T> alg;

@@ -41,7 +41,7 @@ public class FactoryBackgroundModel {
 	 * @param imageType Type of input image
 	 * @return new instance of the background model
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	BackgroundStationaryBasic<T> stationaryBasic( ConfigBackgroundBasic config , ImageType<T> imageType ) {
 
 		config.checkValidity();
@@ -67,7 +67,7 @@ public class FactoryBackgroundModel {
 	 * @param imageType Type of input image
 	 * @return new instance of the background model
 	 */
-	public static <T extends ImageBase, Motion extends InvertibleTransform<Motion>>
+	public static <T extends ImageBase<T>, Motion extends InvertibleTransform<Motion>>
 	BackgroundMovingBasic<T,Motion> movingBasic(ConfigBackgroundBasic config ,
 												Point2Transform2Model_F32<Motion> transform, ImageType<T> imageType ) {
 
@@ -97,7 +97,7 @@ public class FactoryBackgroundModel {
 	 * @param imageType Type of input image
 	 * @return new instance of the background model
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	BackgroundStationaryGaussian<T> stationaryGaussian( ConfigBackgroundGaussian config , ImageType<T> imageType ) {
 
 		config.checkValidity();
@@ -134,7 +134,7 @@ public class FactoryBackgroundModel {
 	 * @param imageType Type of input image
 	 * @return new instance of the background model
 	 */
-	public static <T extends ImageBase,Motion extends InvertibleTransform<Motion>>
+	public static <T extends ImageBase<T>,Motion extends InvertibleTransform<Motion>>
 	BackgroundMovingGaussian<T,Motion> movingGaussian( ConfigBackgroundGaussian config ,
 													   Point2Transform2Model_F32<Motion> transform,
 													   ImageType<T> imageType ) {

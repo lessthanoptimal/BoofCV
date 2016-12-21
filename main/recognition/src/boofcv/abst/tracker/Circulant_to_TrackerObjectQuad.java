@@ -31,7 +31,7 @@ import georegression.struct.shapes.RectangleLength2D_F32;
  *
  * @author Peter Abeles
  */
-public class Circulant_to_TrackerObjectQuad<T extends ImageGray> implements TrackerObjectQuad<T> {
+public class Circulant_to_TrackerObjectQuad<T extends ImageGray<T>> implements TrackerObjectQuad<T> {
 
 	CirculantTracker<T> tracker;
 	Rectangle2D_F64 rect = new Rectangle2D_F64();

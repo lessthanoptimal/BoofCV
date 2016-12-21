@@ -43,7 +43,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class SquareBase_to_FiducialDetector<T extends ImageGray,Detector extends BaseDetectFiducialSquare<T>>
+public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Detector extends BaseDetectFiducialSquare<T>>
 	extends FiducialDetectorPnP<T>
 {
 	Detector alg;

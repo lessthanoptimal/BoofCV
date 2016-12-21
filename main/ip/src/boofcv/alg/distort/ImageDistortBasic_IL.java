@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,8 @@ import boofcv.struct.image.ImageInterleaved;
  *
  * @author Peter Abeles
  */
-public abstract class ImageDistortBasic_IL<Input extends ImageInterleaved,Output extends ImageInterleaved>
+public abstract class ImageDistortBasic_IL
+		<Input extends ImageInterleaved<Input>,Output extends ImageInterleaved<Output>>
 		extends ImageDistortBasic<Input,Output,InterpolatePixelMB<Input>> {
 
 	// storage for interpolated pixel values

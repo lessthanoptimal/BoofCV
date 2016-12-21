@@ -43,7 +43,7 @@ public class FactoryDenoiseWaveletAlg {
 	 * @param imageType Type of image it will process.
 	 * @return Bayes Shrink
 	 */
-	public static <T extends ImageGray> DenoiseWavelet<T> bayes(ShrinkThresholdRule<T> rule , Class<T> imageType )
+	public static <T extends ImageGray<T>> DenoiseWavelet<T> bayes(ShrinkThresholdRule<T> rule , Class<T> imageType )
 	{
 		if( rule == null ) {
 			rule = (ShrinkThresholdRule<T>)new ShrinkThresholdSoft_F32();
@@ -62,7 +62,7 @@ public class FactoryDenoiseWaveletAlg {
 	 * @param imageType Type of image it will process.
 	 * @return Bayes Shrink
 	 */
-	public static <T extends ImageGray> DenoiseWavelet<T> sure(Class<T> imageType )
+	public static <T extends ImageGray<T>> DenoiseWavelet<T> sure(Class<T> imageType )
 	{
 		if( imageType == GrayF32.class ) {
 			return (DenoiseWavelet<T>)new DenoiseSureShrink_F32();
@@ -77,7 +77,7 @@ public class FactoryDenoiseWaveletAlg {
 	 * @param imageType Type of image it will process.
 	 * @return Bayes Shrink
 	 */
-	public static <T extends ImageGray> DenoiseWavelet<T> visu(Class<T> imageType )
+	public static <T extends ImageGray<T>> DenoiseWavelet<T> visu(Class<T> imageType )
 	{
 		if( imageType == GrayF32.class ) {
 			return (DenoiseWavelet<T>)new DenoiseVisuShrink_F32();

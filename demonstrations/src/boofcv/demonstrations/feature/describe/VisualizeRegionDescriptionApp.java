@@ -47,7 +47,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class VisualizeRegionDescriptionApp <T extends ImageGray, D extends ImageGray>
+public class VisualizeRegionDescriptionApp <T extends ImageGray<T>, D extends ImageGray<D>>
 	extends SelectAlgorithmAndInputPanel implements SelectRegionDescriptionPanel.Listener
 {
 	boolean processedImage = false;
@@ -107,7 +107,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray, D extends Image
 				T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
 				describe.setImage(input);
 			} else {
-				Planar<T> input = ConvertBufferedImage.convertFromMulti(image, null, true, imageType);
+				Planar<T> input = ConvertBufferedImage.convertFromPlanar(image, null, true, imageType);
 				describe.setImage(input);
 			}
 		}

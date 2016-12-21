@@ -20,14 +20,15 @@ package boofcv.alg.filter.convolve.border;
 
 import boofcv.alg.filter.convolve.ConvolutionTestHelper;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.FactoryGImageGray;
-import boofcv.core.image.GImageGray;
+import boofcv.core.image.FactoryGImageMultiBand;
+import boofcv.core.image.GImageMultiBand;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorderValue;
 import boofcv.struct.convolve.KernelBase;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayI;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageInterleaved;
+import boofcv.struct.image.InterleavedF32;
+import boofcv.struct.image.InterleavedInteger;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -38,13 +39,24 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class TestConvolveJustBorder_General extends CompareImageBorder {
+public class TestConvolveJustBorder_General_IL extends CompareImageBorder {
 
 	int kernelWidth = 5;
 	int fillValue = 1;
 
-	public TestConvolveJustBorder_General() {
-		super(ConvolveJustBorder_General.class);
+	public TestConvolveJustBorder_General_IL() {
+		super(ConvolveJustBorder_General_IL.class);
+	}
+
+	@Override
+	protected boolean isTestMethod(Method m) {
+		Class<?> e[] = m.getParameterTypes();
+
+		for( Class<?> c : e ) {
+			if( ImageInterleaved.class.isAssignableFrom(c))
+				return true;
+		}
+		return false;
 	}
 
 	/**
@@ -56,7 +68,7 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 		performTests(9);
 	}
 
-	protected void fillTestImage(ImageGray smaller, ImageGray larger ,
+	protected void fillTestImage(ImageInterleaved smaller, ImageInterleaved larger ,
 								 int borderX0 , int borderY0 ,
 								 int borderX1 , int borderY1 )
 	{
@@ -90,7 +102,7 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
 		Object[] ret =  new Object[]{targetParam[0],targetParam[1],targetParam[2]};
 
-		ImageGray inputImage = (ImageGray)((ImageBorder) targetParam[1]).getImage();
+		ImageInterleaved inputImage = (ImageInterleaved)((ImageBorder) targetParam[1]).getImage();
 
 		KernelBase kernel = (KernelBase)targetParam[0];
 
@@ -100,9 +112,9 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 		int borderH = borderY0 + borderY1;
 
 		ret[1] = inputImage.createNew(width+borderW,height+borderH);
-		ret[2] = ((ImageGray)targetParam[2]).createNew(width+borderW,height+borderH);
+		ret[2] = ((ImageInterleaved)targetParam[2]).createNew(width+borderW,height+borderH);
 
-		fillTestImage(inputImage,(ImageGray)ret[1],borderX0,borderY0,borderX1,borderY1);
+		fillTestImage(inputImage,(ImageInterleaved)ret[1],borderX0,borderY0,borderX1,borderY1);
 
 		return ret;
 	}
@@ -113,22 +125,22 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 
 		KernelBase kernel = createKernel(paramTypes[0], kernelWidth, kernelWidth/2);
 
-		ImageGray src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
+		ImageBase src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
 		GImageMiscOps.fillUniform(src, rand, 0, 5);
-		ImageGray dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
+		ImageBase dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
 
 		Object[][] ret = new Object[2][paramTypes.length];
 		// normal symmetric odd kernel
 		ret[0][0] = kernel;
-		ret[0][1] = GrayF32.class == src.getClass() ?
-				ImageBorderValue.wrap((GrayF32)src,fillValue) : ImageBorderValue.wrap((GrayI)src,fillValue);
+		ret[0][1] = InterleavedF32.class == src.getClass() ?
+				ImageBorderValue.wrap((InterleavedF32)src,fillValue) : ImageBorderValue.wrap((InterleavedInteger)src,fillValue);
 		ret[0][2] = dst;
 
 		// change the offset
 		kernel = createKernel(paramTypes[0], kernelWidth, kernelWidth/2-1);
 		ret[1][0] = kernel;
-		ret[1][1] = GrayF32.class == src.getClass() ?
-				ImageBorderValue.wrap((GrayF32)src,fillValue) : ImageBorderValue.wrap((GrayI)src,fillValue);
+		ret[1][1] = InterleavedF32.class == src.getClass() ?
+				ImageBorderValue.wrap((InterleavedF32)src,fillValue) : ImageBorderValue.wrap((InterleavedInteger)src,fillValue);
 		ret[1][2] = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
 
 		return ret;
@@ -136,15 +148,18 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 
 	@Override
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
-		ImageGray targetOut = (ImageGray)targetParam[2];
-		ImageGray validationOut = (ImageGray)validationParam[2];
+		ImageInterleaved targetOut = (ImageInterleaved)targetParam[2];
+		ImageInterleaved validationOut = (ImageInterleaved)validationParam[2];
 
 		// remove the border
 		computeBorder((KernelBase)targetParam[0],methodTest.getName());
 		validationOut = stripBorder(validationOut,borderX0,borderY0,borderX1,borderY1);
 
-		GImageGray t = FactoryGImageGray.wrap(targetOut);
-		GImageGray v = FactoryGImageGray.wrap(validationOut);
+		GImageMultiBand t = FactoryGImageMultiBand.wrap(targetOut);
+		GImageMultiBand v = FactoryGImageMultiBand.wrap(validationOut);
+
+		float pixelT[] = new float[ t.getNumberOfBands() ];
+		float pixelV[] = new float[ t.getNumberOfBands() ];
 
 		for( int y = 0; y < targetOut.height; y++ ) {
 			if( y >= borderX0 &&  y < targetOut.height-borderX1 )
@@ -152,8 +167,12 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 			for( int x = 0; x < targetOut.width; x++ ) {
 				if( x >= borderX0 &&  x < targetOut.width-borderY1 )
 					continue;
+				t.get(x,y,pixelT);
+				v.get(x,y,pixelV);
 
-				assertEquals(x+" "+y,v.get(x,y).doubleValue(),t.get(x,y).doubleValue(),1e-4f);
+				for (int band = 0; band < t.getNumberOfBands(); band++) {
+					assertEquals(x+" "+y,pixelV[band],pixelT[band],1e-4f);
+				}
 			}
 		}
 	}

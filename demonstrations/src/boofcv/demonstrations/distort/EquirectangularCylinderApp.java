@@ -54,7 +54,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class EquirectangularCylinderApp<T extends ImageBase> extends DemonstrationBase<T>
+public class EquirectangularCylinderApp<T extends ImageBase<T>> extends DemonstrationBase<T>
 		implements RotationPanel.Listener, CylinderPanel.Listener
 {
 	final CylinderToEquirectangular_F32 distorter = new CylinderToEquirectangular_F32();

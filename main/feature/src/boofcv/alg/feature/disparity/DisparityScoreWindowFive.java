@@ -47,9 +47,8 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class DisparityScoreWindowFive
-		<Input extends ImageGray, Disparity extends ImageGray>
-		extends DisparityScoreRowFormat<Input,Disparity>
+public abstract class DisparityScoreWindowFive<I extends ImageGray<I>, DI extends ImageGray<DI>>
+		extends DisparityScoreRowFormat<I, DI>
 {
 	public DisparityScoreWindowFive(int minDisparity, int maxDisparity,
 									int regionRadiusX, int regionRadiusY) {

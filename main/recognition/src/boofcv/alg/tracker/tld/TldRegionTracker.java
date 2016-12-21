@@ -26,6 +26,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.geometry.UtilPoint2D_F32;
@@ -45,31 +46,31 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-public class TldRegionTracker< Image extends ImageGray, Derivative extends ImageGray> {
+public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 	// maximum allowed median forwards-backwards error in pixels squared
 	private double maxErrorFB;
 
 	// for the current image
-	private ImagePyramid<Image> currentImage;
-	private Derivative[] currentDerivX;
-	private Derivative[] currentDerivY;
+	private ImagePyramid<I> currentImage;
+	private D[] currentDerivX;
+	private D[] currentDerivY;
 
 	// previous image
-	private ImagePyramid<Image> previousImage;
-	private Derivative[] previousDerivX;
-	private Derivative[] previousDerivY;
+	private ImagePyramid<I> previousImage;
+	private D[] previousDerivX;
+	private D[] previousDerivY;
 
 	// Derivative image type
-	private Class<Derivative> derivType;
+	private Class<D> derivType;
 
 	// computes the gradient in each layer
-	private ImageGradient<Image,Derivative> gradient;
+	private ImageGradient<I, D> gradient;
 	// number of layers in the input image pyramid
 	private int numPyramidLayers;
 
 	// tracks features from frame-to-frame
-	private PyramidKltTracker<Image, Derivative> tracker;
+	private PyramidKltTracker<I, D> tracker;
 
 	// Storage for feature tracks
 	private Track[] tracks;
@@ -100,8 +101,8 @@ public class TldRegionTracker< Image extends ImageGray, Derivative extends Image
 	 * @param derivType Type of derivative image
 	 */
 	public TldRegionTracker(int gridWidth, int featureRadius, double maxErrorFB,
-							ImageGradient<Image, Derivative> gradient, PyramidKltTracker<Image, Derivative> tracker,
-							Class<Image> imageType, Class<Derivative> derivType) {
+							ImageGradient<I, D> gradient, PyramidKltTracker<I, D> tracker,
+							Class<I> imageType, Class<D> derivType) {
 		this.gridWidth = gridWidth;
 		this.featureRadius = featureRadius;
 		this.maxErrorFB = maxErrorFB;
@@ -120,7 +121,7 @@ public class TldRegionTracker< Image extends ImageGray, Derivative extends Image
 	 *
 	 * @param image Most recent video image.
 	 */
-	public void initialize(PyramidDiscrete<Image> image ) {
+	public void initialize(PyramidDiscrete<I> image ) {
 		if( previousDerivX == null || previousDerivX.length != image.getNumLayers()
 				|| previousImage.getInputWidth() != image.getInputWidth() || previousImage.getInputHeight() != image.getInputHeight() ) {
 			declareDataStructures(image);
@@ -136,13 +137,13 @@ public class TldRegionTracker< Image extends ImageGray, Derivative extends Image
 	/**
 	 * Declares internal data structures based on the input image pyramid
 	 */
-	protected void declareDataStructures(PyramidDiscrete<Image> image) {
+	protected void declareDataStructures(PyramidDiscrete<I> image) {
 		numPyramidLayers = image.getNumLayers();
 
-		previousDerivX = (Derivative[])Array.newInstance(derivType,image.getNumLayers());
-		previousDerivY = (Derivative[])Array.newInstance(derivType,image.getNumLayers());
-		currentDerivX = (Derivative[])Array.newInstance(derivType,image.getNumLayers());
-		currentDerivY = (Derivative[])Array.newInstance(derivType,image.getNumLayers());
+		previousDerivX = (D[])Array.newInstance(derivType,image.getNumLayers());
+		previousDerivY = (D[])Array.newInstance(derivType,image.getNumLayers());
+		currentDerivX = (D[])Array.newInstance(derivType,image.getNumLayers());
+		currentDerivY = (D[])Array.newInstance(derivType,image.getNumLayers());
 
 		for( int i = 0; i < image.getNumLayers(); i++ ) {
 			int w = image.getWidth(i);
@@ -154,7 +155,8 @@ public class TldRegionTracker< Image extends ImageGray, Derivative extends Image
 			currentDerivY[i] = GeneralizedImageOps.createSingleBand(derivType, w, h);
 		}
 
-		previousImage = FactoryPyramid.discreteGaussian(image.getScales(), -1, 1, false,image.getImageType());
+		Class imageClass = image.getImageType().getImageClass();
+		previousImage = FactoryPyramid.discreteGaussian(image.getScales(), -1, 1, false, ImageType.single(imageClass));
 		previousImage.initialize(image.getInputWidth(), image.getInputHeight());
 
 		for( int i = 0; i < tracks.length; i++ ) {
@@ -171,7 +173,7 @@ public class TldRegionTracker< Image extends ImageGray, Derivative extends Image
 	 * @param targetRectangle Location of target in previous frame. Not modified.
 	 * @return true if tracking was successful or false if not
 	 */
-	public boolean process( ImagePyramid<Image> image , Rectangle2D_F64 targetRectangle ) {
+	public boolean process(ImagePyramid<I> image , Rectangle2D_F64 targetRectangle ) {
 
 		boolean success = true;
 		updateCurrent(image);
@@ -192,7 +194,7 @@ public class TldRegionTracker< Image extends ImageGray, Derivative extends Image
 	/**
 	 * Computes the gradient and changes the reference to the current pyramid
 	 */
-	protected void updateCurrent(ImagePyramid<Image> image) {
+	protected void updateCurrent(ImagePyramid<I> image) {
 		this.currentImage = image;
 		for( int i = 0; i < image.getNumLayers(); i++ ) {
 			gradient.process(image.getLayer(i), currentDerivX[i], currentDerivY[i]);
@@ -204,7 +206,7 @@ public class TldRegionTracker< Image extends ImageGray, Derivative extends Image
 		previousImage.setTo(currentImage);
 
 		// swap gradient images
-		Derivative[] tmp = previousDerivX;
+		D[] tmp = previousDerivX;
 		previousDerivX = currentDerivX;
 		currentDerivX = tmp;
 		tmp = previousDerivY;

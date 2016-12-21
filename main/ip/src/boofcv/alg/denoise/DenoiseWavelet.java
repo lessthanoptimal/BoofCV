@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface DenoiseWavelet <T extends ImageGray>  {
+public interface DenoiseWavelet <T extends ImageGray<T>>  {
 
 	/**
 	 * Removes noise from the multi-level wavelet transform.

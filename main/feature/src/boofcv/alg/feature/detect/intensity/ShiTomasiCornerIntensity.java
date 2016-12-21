@@ -44,6 +44,6 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface ShiTomasiCornerIntensity<T extends ImageGray> extends GradientCornerIntensity<T> {
+public interface ShiTomasiCornerIntensity<T extends ImageGray<T>> extends GradientCornerIntensity<T> {
 
 }

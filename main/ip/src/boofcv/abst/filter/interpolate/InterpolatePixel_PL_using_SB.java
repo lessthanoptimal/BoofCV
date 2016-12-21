@@ -31,7 +31,7 @@ import boofcv.struct.image.Planar;
  *
  * @author Peter Abeles
  */
-public class InterpolatePixel_PL_using_SB<T extends ImageGray>
+public class InterpolatePixel_PL_using_SB<T extends ImageGray<T>>
 		implements InterpolatePixelMB<Planar<T>>
 {
 	InterpolatePixelS<T> alg;

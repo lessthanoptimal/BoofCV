@@ -45,7 +45,7 @@ import java.util.ArrayList;
 // select algorithm
 // configure universal threshold
 // configure adaptive threshold
-public class DemoImageThresholdingApp<T extends ImageGray> extends SelectInputPanel
+public class DemoImageThresholdingApp<T extends ImageGray<T>> extends SelectInputPanel
 	implements DemoThresholdingPanel.Listener
 {
 

@@ -15,10 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.filter.convolve.noborder;
 
-import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayS32;
 
 import javax.annotation.Generated;
@@ -42,7 +43,7 @@ import javax.annotation.Generated;
  */
 @Generated({"boofcv.alg.filter.convolve.noborder.GenerateConvolvedUnrolled"})
 public class ConvolveImageUnrolled_S32_S32 {
-	public static boolean horizontal( Kernel1D_I32 kernel ,
+	public static boolean horizontal( Kernel1D_S32 kernel ,
 								   GrayS32 image, GrayS32 dest) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
@@ -76,7 +77,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		return true;
 	}
 
-	public static boolean vertical( Kernel1D_I32 kernel ,
+	public static boolean vertical( Kernel1D_S32 kernel ,
 								   GrayS32 image, GrayS32 dest) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
@@ -110,7 +111,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		return true;
 	}
 
-	public static boolean convolve( Kernel2D_I32 kernel ,
+	public static boolean convolve( Kernel2D_S32 kernel ,
 								   GrayS32 image, GrayS32 dest) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
@@ -144,7 +145,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		return true;
 	}
 
-	public static void horizontal3( Kernel1D_I32 kernel , GrayS32 image, GrayS32 dest )
+	public static void horizontal3(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -173,7 +174,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		}
 	}
 
-	public static void horizontal5( Kernel1D_I32 kernel , GrayS32 image, GrayS32 dest )
+	public static void horizontal5(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -206,7 +207,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		}
 	}
 
-	public static void horizontal7( Kernel1D_I32 kernel , GrayS32 image, GrayS32 dest )
+	public static void horizontal7(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -243,7 +244,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		}
 	}
 
-	public static void horizontal9( Kernel1D_I32 kernel , GrayS32 image, GrayS32 dest )
+	public static void horizontal9(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -284,7 +285,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		}
 	}
 
-	public static void horizontal11( Kernel1D_I32 kernel , GrayS32 image, GrayS32 dest )
+	public static void horizontal11(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -329,7 +330,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		}
 	}
 
-	public static void vertical3( Kernel1D_I32 kernel , GrayS32 image, GrayS32 dest )
+	public static void vertical3(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -364,7 +365,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		}
 	}
 
-	public static void vertical5( Kernel1D_I32 kernel , GrayS32 image, GrayS32 dest )
+	public static void vertical5(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -405,7 +406,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		}
 	}
 
-	public static void vertical7( Kernel1D_I32 kernel , GrayS32 image, GrayS32 dest )
+	public static void vertical7(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -452,7 +453,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		}
 	}
 
-	public static void vertical9( Kernel1D_I32 kernel , GrayS32 image, GrayS32 dest )
+	public static void vertical9(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -505,7 +506,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		}
 	}
 
-	public static void vertical11( Kernel1D_I32 kernel , GrayS32 image, GrayS32 dest )
+	public static void vertical11(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -564,7 +565,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		}
 	}
 
-	public static void convolve3( Kernel2D_I32 kernel, GrayS32 src, GrayS32 dest)
+	public static void convolve3(Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest)
 	{
 		final int[] dataSrc = src.data;
 		final int[] dataDst = dest.data;
@@ -617,7 +618,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		}
 	}
 
-	public static void convolve5( Kernel2D_I32 kernel, GrayS32 src, GrayS32 dest)
+	public static void convolve5(Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest)
 	{
 		final int[] dataSrc = src.data;
 		final int[] dataDst = dest.data;
@@ -678,7 +679,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		}
 	}
 
-	public static void convolve7( Kernel2D_I32 kernel, GrayS32 src, GrayS32 dest)
+	public static void convolve7(Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest)
 	{
 		final int[] dataSrc = src.data;
 		final int[] dataDst = dest.data;
@@ -747,7 +748,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		}
 	}
 
-	public static void convolve9( Kernel2D_I32 kernel, GrayS32 src, GrayS32 dest)
+	public static void convolve9(Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest)
 	{
 		final int[] dataSrc = src.data;
 		final int[] dataDst = dest.data;
@@ -824,7 +825,7 @@ public class ConvolveImageUnrolled_S32_S32 {
 		}
 	}
 
-	public static void convolve11( Kernel2D_I32 kernel, GrayS32 src, GrayS32 dest)
+	public static void convolve11(Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest)
 	{
 		final int[] dataSrc = src.data;
 		final int[] dataDst = dest.data;

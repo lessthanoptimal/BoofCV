@@ -22,6 +22,7 @@ import boofcv.alg.filter.convolve.ConvolveNormalized;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -58,7 +59,7 @@ public class TestPyramidDiscreteSampleBlur extends GenericPyramidTests<GrayF32> 
 		ConvolveNormalized.vertical(kernel,storage,convImg);
 
 		PyramidDiscreteSampleBlur<GrayF32> alg =
-				new PyramidDiscreteSampleBlur<>(kernel,3,GrayF32.class,true,new int[]{1,2,4});
+				new PyramidDiscreteSampleBlur<>(kernel,3, ImageType.single(GrayF32.class),true,new int[]{1,2,4});
 
 		alg.process(input);
 
@@ -97,13 +98,13 @@ public class TestPyramidDiscreteSampleBlur extends GenericPyramidTests<GrayF32> 
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,3);
 
 		PyramidDiscreteSampleBlur<GrayF32> alg =
-				new PyramidDiscreteSampleBlur<>(kernel,3,GrayF32.class,true,new int[]{1,2,4});
+				new PyramidDiscreteSampleBlur<>(kernel,3, ImageType.single(GrayF32.class),true,new int[]{1,2,4});
 
 		assertEquals(0,alg.getSigma(0),1e-8);
 		assertEquals(3,alg.getSigma(1),1e-8);
 		assertEquals(6.7082,alg.getSigma(2),1e-3);
 
-		alg = new PyramidDiscreteSampleBlur<>(kernel,3,GrayF32.class,true,new int[]{2,4,8});
+		alg = new PyramidDiscreteSampleBlur<>(kernel,3, ImageType.single(GrayF32.class),true,new int[]{2,4,8});
 		assertEquals(0,alg.getSigma(0),1e-8);
 		assertEquals(6,alg.getSigma(1),1e-8);
 	}
@@ -111,6 +112,6 @@ public class TestPyramidDiscreteSampleBlur extends GenericPyramidTests<GrayF32> 
 	@Override
 	protected ImagePyramid<GrayF32> createPyramid(int... scales) {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,3);
-		return new PyramidDiscreteSampleBlur<>(kernel,3,GrayF32.class,true,new int[]{1,2,4});
+		return new PyramidDiscreteSampleBlur<>(kernel,3, ImageType.single(GrayF32.class),true,new int[]{1,2,4});
 	}
 }

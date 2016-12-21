@@ -47,7 +47,7 @@ import org.ejml.data.DenseMatrix64F;
  *
  * @author Peter Abeles
  */
-public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
+public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>>
 {
 	// creates the overhead image
 	private CreateSyntheticOverheadView<T> createOverhead;

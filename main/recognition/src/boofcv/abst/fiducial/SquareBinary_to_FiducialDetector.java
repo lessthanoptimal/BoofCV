@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class SquareBinary_to_FiducialDetector<T extends ImageGray>
+public class SquareBinary_to_FiducialDetector<T extends ImageGray<T>>
 	extends SquareBase_to_FiducialDetector<T,DetectFiducialSquareBinary<T>>
 {
 	private double targetWidth;

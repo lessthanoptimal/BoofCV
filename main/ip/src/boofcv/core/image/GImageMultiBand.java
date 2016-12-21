@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,5 +43,5 @@ public interface GImageMultiBand {
 	void getF( int index , float[] value );
 	float getF( int index );
 
-	<T extends ImageBase>T getImage();
+	<T extends ImageBase<T>>T getImage();
 }

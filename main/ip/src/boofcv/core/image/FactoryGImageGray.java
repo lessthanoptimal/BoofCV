@@ -101,7 +101,7 @@ public class FactoryGImageGray {
 
 	public static GImageGray wrap( ImageBorder image ) {
 		if( GrayI.class.isAssignableFrom(image.getImage().getClass()) )
-			return new Border_I32( (ImageBorder_S32)image );
+			return new Border_S32( (ImageBorder_S32)image );
 		else if( image.getImage().getClass() == GrayF32.class )
 			return new Border_F32( (ImageBorder_F32)image );
 		else if( image.getImage().getClass() == GrayF64.class )
@@ -110,9 +110,9 @@ public class FactoryGImageGray {
 			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
 	}
 
-	public static class Border_I32 extends GSingleBorder<ImageBorder_S32>
+	public static class Border_S32 extends GSingleBorder<ImageBorder_S32>
 	{
-		public Border_I32(ImageBorder_S32 image) {
+		public Border_S32(ImageBorder_S32 image) {
 			super(image);
 		}
 
@@ -598,7 +598,7 @@ public class FactoryGImageGray {
 		}
 	}
 
-	public static abstract class GSingleBaseInt<T extends ImageGray> extends GSingleBase<T>
+	public static abstract class GSingleBaseInt<T extends ImageGray<T>> extends GSingleBase<T>
 	{
 		public GSingleBaseInt(T image) {
 			super(image);
@@ -610,7 +610,7 @@ public class FactoryGImageGray {
 		}
 	}
 
-	public static abstract class GSingleBase<T extends ImageGray> implements GImageGray {
+	public static abstract class GSingleBase<T extends ImageGray<T>> implements GImageGray {
 
 		protected T image;
 

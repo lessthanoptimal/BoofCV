@@ -43,7 +43,7 @@ import java.util.Stack;
  */
 // TODO Two versions.  One for InterestPointDetector and one for corners
 public class CombinedTrackerScalePoint
-		<I extends ImageGray, D extends ImageGray, TD extends TupleDesc> {
+		<I extends ImageGray<I>, D extends ImageGray<D>, TD extends TupleDesc> {
 
 	// current image in sequence
 	private I input;

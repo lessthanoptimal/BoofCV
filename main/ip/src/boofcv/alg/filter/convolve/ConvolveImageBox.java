@@ -19,12 +19,12 @@
 package boofcv.alg.filter.convolve;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General;
+import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveBox;
 import boofcv.core.image.border.ImageBorderValue;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
 
 /**
@@ -46,7 +46,7 @@ public class ConvolveImageBox {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,false);
-		ConvolveJustBorder_General.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
+		ConvolveJustBorder_General_SB.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
 		ImplConvolveBox.horizontal(input, output, radius);
 	}
 
@@ -60,8 +60,8 @@ public class ConvolveImageBox {
 	public static void horizontal(GrayU8 input, GrayI16 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
-		ConvolveJustBorder_General.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+		ConvolveJustBorder_General_SB.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
 		ImplConvolveBox.horizontal(input, output, radius);
 	}
 
@@ -75,8 +75,8 @@ public class ConvolveImageBox {
 	public static void horizontal(GrayU8 input, GrayS32 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
-		ConvolveJustBorder_General.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+		ConvolveJustBorder_General_SB.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
 		ImplConvolveBox.horizontal(input, output, radius);
 	}
 
@@ -90,8 +90,8 @@ public class ConvolveImageBox {
 	public static void horizontal(GrayS16 input, GrayI16 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
-		ConvolveJustBorder_General.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+		ConvolveJustBorder_General_SB.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
 		ImplConvolveBox.horizontal(input, output, radius);
 	}
 
@@ -106,7 +106,7 @@ public class ConvolveImageBox {
 		InputSanityCheck.checkSameShape(input , output );
 
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,false);
-		ConvolveJustBorder_General.vertical(kernel,ImageBorderValue.wrap(input,0),output);
+		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
 		ImplConvolveBox.vertical(input, output, radius);
 	}
 
@@ -120,8 +120,8 @@ public class ConvolveImageBox {
 	public static void vertical(GrayU8 input, GrayI16 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
-		ConvolveJustBorder_General.vertical(kernel,ImageBorderValue.wrap(input,0),output);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
 		ImplConvolveBox.vertical(input, output, radius);
 	}
 
@@ -135,8 +135,8 @@ public class ConvolveImageBox {
 	public static void vertical(GrayU8 input, GrayS32 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
-		ConvolveJustBorder_General.vertical(kernel,ImageBorderValue.wrap(input,0),output);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
 		ImplConvolveBox.vertical(input, output, radius);
 	}
 
@@ -150,8 +150,8 @@ public class ConvolveImageBox {
 	public static void vertical(GrayS16 input, GrayI16 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
-		ConvolveJustBorder_General.vertical(kernel,ImageBorderValue.wrap(input,0),output);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
 		ImplConvolveBox.vertical(input, output, radius);
 	}
 }

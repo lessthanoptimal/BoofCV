@@ -32,7 +32,7 @@ public class GIntegralImageOps {
 	/**
 	 * Given the input image, return the type of image the integral image should be.
 	 */
-	public static <I extends ImageGray, II extends ImageGray>
+	public static <I extends ImageGray<I>, II extends ImageGray<II>>
 	Class<II> getIntegralType( Class<I> inputType ) {
 		if( inputType == GrayF32.class ) {
 			return (Class<II>)GrayF32.class;
@@ -52,7 +52,7 @@ public class GIntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
-	public static <I extends ImageGray, T extends ImageGray>
+	public static <I extends ImageGray<I>, T extends ImageGray>
 	T transform( I input , T transformed ) {
 		if( input instanceof GrayF32) {
 			return (T)IntegralImageOps.transform((GrayF32)input,(GrayF32)transformed);
@@ -77,7 +77,7 @@ public class GIntegralImageOps {
 	 * @param output The convolved image. If null a new image will be declared and returned. Modified.
 	 * @return Convolved image.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	T convolve( T integral ,
 				IntegralKernel kernel,
 				T output ) {
@@ -103,7 +103,7 @@ public class GIntegralImageOps {
 	 * @param borderX Size of the image border along the horizontal axis.
 	 * @param borderY size of the image border along the vertical axis.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	T convolveBorder( T integral ,
 					  IntegralKernel kernel,
 					  T output , int borderX , int borderY ) {
@@ -129,7 +129,7 @@ public class GIntegralImageOps {
 	 * @param y Pixel the convolution is performed at.
 	 * @return Value of the convolution
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	double convolveSparse( T integral ,
 						   IntegralKernel kernel ,
 						   int x , int y ) {
@@ -159,7 +159,7 @@ public class GIntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	double block_zero( T integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		if( integral instanceof GrayF32) {
@@ -188,7 +188,7 @@ public class GIntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	double block_unsafe( T integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		if( integral instanceof GrayF32) {

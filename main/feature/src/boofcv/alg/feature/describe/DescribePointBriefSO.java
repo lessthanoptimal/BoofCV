@@ -43,7 +43,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class DescribePointBriefSO<T extends ImageGray> {
+public class DescribePointBriefSO<T extends ImageGray<T>> {
 	// describes the BRIEF feature
 	protected BinaryCompareDefinition_I32 definition;
 

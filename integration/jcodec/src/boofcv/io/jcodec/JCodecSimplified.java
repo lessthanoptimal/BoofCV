@@ -38,7 +38,7 @@ import java.io.IOException;
  *
  * @author Peter Abeles
  */
-public class JCodecSimplified<T extends ImageBase> implements SimpleImageSequence<T> {
+public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequence<T> {
 
 	FrameGrab grabber;
 

@@ -57,7 +57,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray>
+public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 		extends VideoProcessAppBase<I> implements VisualizeApp, VisualOdometryPanel.Listener
 {
 

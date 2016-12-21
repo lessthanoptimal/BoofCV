@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSequence<T> {
+public class JpegByteImageSequence<T extends ImageBase<T>> implements SimpleImageSequence<T> {
 
 	int index;
 	List<byte[]> jpegData = new ArrayList<>();

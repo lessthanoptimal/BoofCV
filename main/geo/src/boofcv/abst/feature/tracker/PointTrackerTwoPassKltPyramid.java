@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PointTrackerTwoPassKltPyramid<I extends ImageGray,D extends ImageGray>
+public class PointTrackerTwoPassKltPyramid<I extends ImageGray<I>,D extends ImageGray<D>>
 	extends PointTrackerKltPyramid<I,D> implements PointTrackerTwoPass<I>
 {
 	// list of active tracks before the current image is processed

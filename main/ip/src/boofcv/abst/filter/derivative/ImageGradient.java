@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,8 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface ImageGradient<Input extends ImageBase, Output extends ImageBase> extends ImageDerivative<Input,Output> {
+public interface ImageGradient<Input extends ImageBase<Input>, Output extends ImageBase<Output>>
+		extends ImageDerivative<Input,Output> {
 
 	/**
 	 * Computes the image gradient from the input image and stores the results into

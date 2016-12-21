@@ -20,7 +20,7 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.alg.filter.convolve.noborder.ConvolveImageStandardSparse;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -61,7 +61,7 @@ public class ConvolveImageNoBorderSparse {
 	 * @param storage Must be as long as the kernel's width.
 	 * @return The pixel's value after the convolution
 	 */
-	public static float convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+	public static float convolve(Kernel1D_S32 horizontal, Kernel1D_S32 vertical,
 								 GrayU8 input, int c_x , int c_y, int storage[] )
 	{
 		return ConvolveImageStandardSparse.convolve(horizontal,vertical,input,c_x,c_y,storage);
@@ -78,7 +78,7 @@ public class ConvolveImageNoBorderSparse {
 	 * @param storage Must be as long as the kernel's width.
 	 * @return The pixel's value after the convolution
 	 */
-	public static float convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+	public static float convolve(Kernel1D_S32 horizontal, Kernel1D_S32 vertical,
 								 GrayS16 input, int c_x , int c_y, int storage[] )
 	{
 		return ConvolveImageStandardSparse.convolve(horizontal,vertical,input,c_x,c_y,storage);
@@ -98,7 +98,7 @@ public class ConvolveImageNoBorderSparse {
 	 * @param divisorVertical Divisor for vertical convolution.
 	 * @return The pixel's value after the convolution
 	 */
-	public static float convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+	public static float convolve(Kernel1D_S32 horizontal, Kernel1D_S32 vertical,
 								 GrayU8 input, int c_x , int c_y, int storage[] ,
 								 int divisorHorizontal, int divisorVertical)
 	{
@@ -119,7 +119,7 @@ public class ConvolveImageNoBorderSparse {
 	 * @param divisorVertical Divisor for vertical convolution.
 	 * @return The pixel's value after the convolution
 	 */
-	public static float convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+	public static float convolve(Kernel1D_S32 horizontal, Kernel1D_S32 vertical,
 								 GrayS16 input, int c_x , int c_y, int storage[] ,
 								 int divisorHorizontal, int divisorVertical)
 	{

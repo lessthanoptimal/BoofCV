@@ -59,7 +59,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class GridRansacLineDetector<D extends ImageGray> {
+public abstract class GridRansacLineDetector<D extends ImageGray<D>> {
 
 	// size of a region's width/height in pixels
 	protected int regionSize;

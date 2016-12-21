@@ -23,6 +23,7 @@ import boofcv.alg.feature.detect.intensity.MedianCornerIntensity;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 import org.junit.Test;
 
 /**
@@ -44,6 +45,6 @@ public class TestImplMedianCorner_U8 extends GenericCornerIntensityTests {
 
 	@Override
 	protected void computeDerivatives() {
-		FactoryBlurFilter.median(GrayU8.class,2).process(imageI,median);
+		FactoryBlurFilter.median(ImageType.single(GrayU8.class),2).process(imageI,median);
 	}
 }

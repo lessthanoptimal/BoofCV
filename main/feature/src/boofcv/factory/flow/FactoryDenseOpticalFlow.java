@@ -56,7 +56,7 @@ public class FactoryDenseOpticalFlow {
 	 * @param <D> Derivative image type.
 	 * @return DenseOpticalFlow
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	DenseOpticalFlow<I> flowKlt( PkltConfig configKlt, int radius , Class<I> inputType , Class<D> derivType ) {
 
 		if( configKlt == null )
@@ -68,8 +68,9 @@ public class FactoryDenseOpticalFlow {
 
 		int numLayers = configKlt.pyramidScaling.length;
 
-		PyramidDiscrete<I> pyramidA = FactoryPyramid.discreteGaussian(configKlt.pyramidScaling, -1, 2, true, inputType);
-		PyramidDiscrete<I> pyramidB = FactoryPyramid.discreteGaussian(configKlt.pyramidScaling, -1, 2, true, inputType);
+		ImageType<I> imagetype = ImageType.single(inputType);
+		PyramidDiscrete<I> pyramidA = FactoryPyramid.discreteGaussian(configKlt.pyramidScaling, -1, 2, true, imagetype);
+		PyramidDiscrete<I> pyramidB = FactoryPyramid.discreteGaussian(configKlt.pyramidScaling, -1, 2, true, imagetype);
 
 		PyramidKltTracker<I, D> tracker = FactoryTrackerAlg.kltPyramid(configKlt.config, inputType, derivType);
 		DenseOpticalFlowKlt<I, D> flowKlt = new DenseOpticalFlowKlt<>(tracker, numLayers, radius);
@@ -88,7 +89,7 @@ public class FactoryDenseOpticalFlow {
 	 * @param <T>
 	 * @return
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	DenseOpticalFlow<T> region( ConfigOpticalFlowBlockPyramid config , Class<T> imageType )
 	{
 		if( config == null )
@@ -116,7 +117,7 @@ public class FactoryDenseOpticalFlow {
 	 * @param imageType Type of input gray scale image
 	 * @return dense optical flow
 	 */
-	public static <T extends ImageGray,D extends ImageGray>
+	public static <T extends ImageGray<T>,D extends ImageGray<D>>
 	DenseOpticalFlow<T> hornSchunck( ConfigHornSchunck config , Class<T> imageType )
 	{
 		if( config == null )
@@ -142,7 +143,7 @@ public class FactoryDenseOpticalFlow {
 	 * @param config Configuration parameters.  If null defaults will be used.
 	 * @return Dense optical flow implementation of HornSchunckPyramid
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	DenseOpticalFlow<T> hornSchunckPyramid( ConfigHornSchunckPyramid config , Class<T> imageType )
 	{
 		if( config == null )
@@ -156,7 +157,7 @@ public class FactoryDenseOpticalFlow {
 		return new HornSchunckPyramid_to_DenseOpticalFlow<>(alg, imageType);
 	}
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	DenseOpticalFlow<T> broxWarping( ConfigBroxWarping config , Class<T> imageType )
 	{
 		if( config == null )

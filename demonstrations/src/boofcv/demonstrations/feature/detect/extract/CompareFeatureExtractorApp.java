@@ -52,7 +52,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class CompareFeatureExtractorApp<T extends ImageGray, D extends ImageGray>
+public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel implements GeneralExtractConfigPanel.Listener {
 	T grayImage;
 

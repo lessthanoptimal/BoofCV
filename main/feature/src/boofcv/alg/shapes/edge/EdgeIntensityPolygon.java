@@ -30,7 +30,7 @@ import georegression.struct.shapes.Polygon2D_F64;
  *
  * @author Peter Abeles
  */
-public class EdgeIntensityPolygon<T extends ImageGray>  {
+public class EdgeIntensityPolygon<T extends ImageGray<T>>  {
 
 	// distance away from corner that sampling will start and end
 	private double cornerOffset;

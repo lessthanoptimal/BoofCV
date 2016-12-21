@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class HornSchunck_to_DenseOpticalFlow<T extends ImageBase,D extends ImageBase>
+public class HornSchunck_to_DenseOpticalFlow<T extends ImageBase<T>,D extends ImageBase<D>>
 	implements DenseOpticalFlow<T>
 {
 	HornSchunck<T,D> hornSchunck;

@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class DescribePointPixelRegion<T extends ImageGray, D extends TupleDesc>
+public abstract class DescribePointPixelRegion<T extends ImageGray<T>, D extends TupleDesc>
 		extends DescribePointRectangleRegion<T>
 {
 

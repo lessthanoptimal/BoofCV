@@ -37,7 +37,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public abstract class GrayI<T extends GrayI> extends ImageGray<T> {
+public abstract class GrayI<T extends GrayI<T>> extends ImageGray<T> {
 
 	protected GrayI(int width, int height ) {
 		super(width, height);

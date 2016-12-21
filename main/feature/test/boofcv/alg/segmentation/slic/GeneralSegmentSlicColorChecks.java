@@ -38,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralSegmentSlicColorChecks<T extends ImageBase> {
+public abstract class GeneralSegmentSlicColorChecks<T extends ImageBase<T>> {
 	ImageType<T> imageType;
 
 	Random rand = new Random(234);

@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface SparseImageGradient<T extends ImageGray, G extends GradientValue>
+public interface SparseImageGradient<T extends ImageGray<T>, G extends GradientValue>
 	extends SparseImageOperator<T>
 {
 	/**

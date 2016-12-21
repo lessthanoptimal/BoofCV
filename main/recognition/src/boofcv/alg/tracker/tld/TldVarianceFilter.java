@@ -31,7 +31,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class TldVarianceFilter<T extends ImageGray> {
+public class TldVarianceFilter<T extends ImageGray<T>> {
 
 	// threshold for selecting candidate regions
 	private double thresholdLower;

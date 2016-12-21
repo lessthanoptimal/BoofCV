@@ -29,6 +29,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import java.awt.image.BufferedImage;
@@ -40,7 +41,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class ExamplePyramidDiscrete<T extends ImageGray> {
+public class ExamplePyramidDiscrete<T extends ImageGray<T>> {
 
 	// specifies the image type
 	Class<T> imageType;
@@ -56,7 +57,7 @@ public class ExamplePyramidDiscrete<T extends ImageGray> {
 	 */
 	public void standard() {
 		// Each level in the pyramid must have a ratio with the previously layer that is an integer value
-		pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4,8},-1,2,true,imageType);
+		pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4,8},-1,2,true, ImageType.single(imageType));
 	}
 
 	/**
@@ -64,7 +65,7 @@ public class ExamplePyramidDiscrete<T extends ImageGray> {
 	 */
 	public void unusual() {
 		// Note that the first level does not have to be one
-		pyramid = FactoryPyramid.discreteGaussian(new int[]{2,6},-1,2,true,imageType);
+		pyramid = FactoryPyramid.discreteGaussian(new int[]{2,6},-1,2,true, ImageType.single(imageType));
 
 		// Other kernels can also be used besides Gaussian
 		Kernel1D kernel;

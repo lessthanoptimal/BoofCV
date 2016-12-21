@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class GeneralImageDistortTests<T extends ImageBase> {
+public abstract class GeneralImageDistortTests<T extends ImageBase<T>> {
 
 	Random rand = new Random(123);
 

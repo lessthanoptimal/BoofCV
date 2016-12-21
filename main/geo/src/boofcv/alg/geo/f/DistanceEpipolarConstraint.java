@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,5 +54,15 @@ public class DistanceEpipolarConstraint implements DistanceFromModel<DenseMatrix
 		for( int i = 0; i < associatedPairs.size(); i++ ) {
 			distance[i] = computeDistance(associatedPairs.get(i));
 		}
+	}
+
+	@Override
+	public Class<AssociatedPair> getPointType() {
+		return AssociatedPair.class;
+	}
+
+	@Override
+	public Class<DenseMatrix64F> getModelType() {
+		return DenseMatrix64F.class;
 	}
 }

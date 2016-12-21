@@ -39,7 +39,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class ExamplePyramidFloat<T extends ImageGray> {
+public class ExamplePyramidFloat<T extends ImageGray<T>> {
 
 	// specifies the image type
 	Class<T> imageType;

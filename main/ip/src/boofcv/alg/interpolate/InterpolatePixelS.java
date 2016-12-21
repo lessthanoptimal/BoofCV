@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface InterpolatePixelS<T extends ImageGray> extends InterpolatePixel<T> {
+public interface InterpolatePixelS<T extends ImageGray<T>> extends InterpolatePixel<T> {
 
 	/**
 	 * Returns the interpolated pixel value at the specified location while checking to see if

@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class PointTrackerTwoPassCombined<I extends ImageGray, D extends ImageGray, Desc extends TupleDesc>
+public class PointTrackerTwoPassCombined<I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
 	extends PointTrackerCombined<I,D,Desc> implements PointTrackerTwoPass<I>
 {
 	public PointTrackerTwoPassCombined(CombinedTrackerScalePoint<I, D, Desc> tracker,

@@ -23,7 +23,7 @@ package boofcv.abst.sfm.d3;
  */
 
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -61,7 +61,7 @@ import georegression.struct.se.Se3_F64;
 // DEVELOPMENT NOTE: This right now assumes that the depth image contains depth.  A transform could be added which
 //                   would convert it from the internal value into depth. This would allow a sparse depth calculation
 //                   right now the depth of the whole image must be computed.
-public interface DepthVisualOdometry<Vis extends ImageBase, Depth extends ImageGray>
+public interface DepthVisualOdometry<Vis extends ImageBase<Vis>, Depth extends ImageGray<Depth>>
 		extends VisualOdometry<Se3_F64>
 {
 	/**
@@ -70,7 +70,7 @@ public interface DepthVisualOdometry<Vis extends ImageBase, Depth extends ImageG
 	 * @param paramVisual Intrinsic parameters for visual camera
 	 * @param visToDepth Transform from visual camera pixels into depth camera pixels
 	 */
-	public void setCalibration(CameraPinholeRadial paramVisual , PixelTransform2_F32 visToDepth );
+	void setCalibration(CameraPinholeRadial paramVisual , Point2Transform2_F32 visToDepth );
 
 	/**
 	 * Process the new image and update the motion estimate.  The return value must be checked
@@ -81,20 +81,20 @@ public interface DepthVisualOdometry<Vis extends ImageBase, Depth extends ImageG
 	 * @param depth Image from depth sensor
 	 * @return true if the motion estimate has been updated and false if not
 	 */
-	public boolean process(Vis visual , Depth depth );
+	boolean process(Vis visual , Depth depth );
 
 	/**
 	 * Type of visual images it can process.
 	 *
 	 * @return The image type
 	 */
-	public ImageType<Vis> getVisualType();
+	ImageType<Vis> getVisualType();
 
 	/**
 	 * Type of depth images it can process.
 	 *
 	 * @return The image type
 	 */
-	public Class<Depth> getDepthType();
+	Class<Depth> getDepthType();
 
 }

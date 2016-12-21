@@ -30,14 +30,14 @@ import org.junit.Test;
  * @author Peter Abeles
  */
 public class TestSparseIntegralGradient_NoBorder_F32
-		extends GeneralSparseGradientIntegralTests<GrayF32,GrayF32,GradientValue_F32>
+		extends GeneralSparseGradientIntegralTests<GrayF32,GradientValue_F32>
 {
 
 	final static int size = 5;
 	final static int radius = size/2;
 
 	public TestSparseIntegralGradient_NoBorder_F32() {
-		super(GrayF32.class, GrayF32.class,-radius-1,-radius-1,radius,radius);
+		super(GrayF32.class,-radius-1,-radius-1,radius,radius);
 
 		alg = new SparseIntegralGradient_NoBorder_F32();
 		((SparseIntegralGradient_NoBorder_F32)alg).setWidth(size);

@@ -53,7 +53,7 @@ public abstract class GeneralDetectLineTests {
 		this.imageTypes = imageTypes;
 	}
 
-	public abstract <T extends ImageGray> DetectLine<T> createAlg(Class<T> imageType );
+	public abstract <T extends ImageGray<T>> DetectLine<T> createAlg(Class<T> imageType );
 
 	/**
 	 * See if it can detect an obvious line in an image.
@@ -75,7 +75,7 @@ public abstract class GeneralDetectLineTests {
 		}
 	}
 
-	private <T extends ImageGray> void obviousLine(Class<T> imageType ) {
+	private <T extends ImageGray<T>> void obviousLine(Class<T> imageType ) {
 		T input = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		GImageMiscOps.fillRectangle(input, 30, 0, 0, lineLocation, height);
@@ -104,7 +104,7 @@ public abstract class GeneralDetectLineTests {
 		assertTrue(foundMatch);
 	}
 
-	private <T extends ImageGray> void subImages(Class<T> imageType ) {
+	private <T extends ImageGray<T>> void subImages(Class<T> imageType ) {
 		T input = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		GImageMiscOps.fillRectangle(input,30,0,0,lineLocation,height);

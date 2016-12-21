@@ -61,7 +61,7 @@ import java.util.Random;
  * </p>
  * @author Peter Abeles
  */
-public class TldTracker<T extends ImageGray, D extends ImageGray> {
+public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 	// specified configuration parameters for the tracker
 	private TldParameters config;
@@ -151,7 +151,7 @@ public class TldTracker<T extends ImageGray, D extends ImageGray> {
 				imagePyramid.getInputWidth() != image.width || imagePyramid.getInputHeight() != image.height ) {
 			int minSize = (config.trackerFeatureRadius*2+1)*5;
 			int scales[] = selectPyramidScale(image.width,image.height,minSize);
-			imagePyramid = FactoryPyramid.discreteGaussian(scales,-1,1,true,(Class<T>)image.getClass());
+			imagePyramid = FactoryPyramid.discreteGaussian(scales,-1,1,true,image.getImageType());
 		}
 		imagePyramid.process(image);
 

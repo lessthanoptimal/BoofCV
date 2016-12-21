@@ -27,6 +27,7 @@ import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,7 +64,7 @@ public class TestPyramidKltForCombined {
 	@Before
 	public void init() {
 
-		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,false,GrayF32.class);
+		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,false, ImageType.single(GrayF32.class));
 
 		GrayF32 input = new GrayF32(width,height);
 		ImageMiscOps.fillUniform(input,rand,0,100);

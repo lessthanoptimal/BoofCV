@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CalibrationFiducialDetector<T extends ImageGray>
+public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		extends FiducialDetectorPnP<T>
 {
 	// detects the calibration target

@@ -32,7 +32,7 @@ import georegression.struct.point.Point3D_F64;
  *
  * @author Peter Abeles
  */
-public class StereoSparse3D<T extends ImageGray>
+public class StereoSparse3D<T extends ImageGray<T>>
 		extends StereoProcessingBase<T> implements ImagePixelTo3D {
 
 	// computes spare disparity

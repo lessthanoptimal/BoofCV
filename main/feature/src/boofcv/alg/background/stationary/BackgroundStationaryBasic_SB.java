@@ -30,7 +30,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryBasic_SB<T extends ImageGray>
+public class BackgroundStationaryBasic_SB<T extends ImageGray<T>>
 	extends BackgroundStationaryBasic<T>
 {
 	// storage for background image

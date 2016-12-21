@@ -41,7 +41,7 @@ public class TestImplConvolveBox extends CompareEquivalentFunctions {
 	static int kernelRadius = 2;
 
 	public TestImplConvolveBox() {
-		super(ImplConvolveBox.class, ConvolveImageStandard.class);
+		super(ImplConvolveBox.class, ConvolveImageStandard_SB.class);
 	}
 
 	@Test

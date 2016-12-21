@@ -47,7 +47,7 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleInterestPoint {
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	void detect( BufferedImage image , Class<T> imageType ) {
 		T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
 
@@ -63,7 +63,7 @@ public class ExampleInterestPoint {
 		displayResults(image, detector);
 	}
 
-	private static <T extends ImageGray>
+	private static <T extends ImageGray<T>>
 	void displayResults(BufferedImage image, InterestPointDetector<T> detector)
 	{
 		Graphics2D g2 = image.createGraphics();

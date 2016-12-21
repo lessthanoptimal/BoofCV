@@ -49,7 +49,7 @@ import java.awt.image.BufferedImage;
 /**
  * @author Peter Abeles
  */
-public class VisualizeTldDetectionApp<T extends ImageGray,D extends ImageGray>
+public class VisualizeTldDetectionApp<T extends ImageGray<T>,D extends ImageGray<D>>
 		extends JPanel implements MouseListener {
 
 	BufferedImage input;

@@ -43,7 +43,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public abstract class VideoRenderProcessing<T extends ImageBase> extends Thread implements VideoProcessing {
+public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thread implements VideoProcessing {
 
 	// Type of BoofCV iamge
 	ImageType<T> imageType;

@@ -77,7 +77,7 @@ public class FactoryStereoDisparity {
 	 * @param imageType Type of input image.
 	 * @return Rectangular region based WTA disparity.algorithm.
 	 */
-	public static <T extends ImageGray> StereoDisparity<T,GrayU8>
+	public static <T extends ImageGray<T>> StereoDisparity<T,GrayU8>
 	regionWta( DisparityAlgorithms whichAlg ,
 			   int minDisparity , int maxDisparity,
 			   int regionRadiusX, int regionRadiusY ,
@@ -160,7 +160,7 @@ public class FactoryStereoDisparity {
 	 * @param imageType Type of input image.
 	 * @return Rectangular region based WTA disparity.algorithm.
 	 */
-	public static <T extends ImageGray> StereoDisparity<T,GrayF32>
+	public static <T extends ImageGray<T>> StereoDisparity<T,GrayF32>
 	regionSubpixelWta( DisparityAlgorithms whichAlg ,
 					   int minDisparity , int maxDisparity,
 					   int regionRadiusX, int regionRadiusY ,
@@ -238,7 +238,7 @@ public class FactoryStereoDisparity {
 	 * @param <T> Image type
 	 * @return Sparse disparity algorithm
 	 */
-	public static <T extends ImageGray> StereoDisparitySparse<T>
+	public static <T extends ImageGray<T>> StereoDisparitySparse<T>
 	regionSparseWta( int minDisparity , int maxDisparity,
 					 int regionRadiusX, int regionRadiusY ,
 					 double maxPerPixelError ,

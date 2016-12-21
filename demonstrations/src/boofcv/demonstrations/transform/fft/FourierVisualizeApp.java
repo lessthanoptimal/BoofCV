@@ -43,7 +43,7 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 public class FourierVisualizeApp
-		<T extends GrayF, W extends ImageInterleaved>
+		<T extends GrayF<T>, W extends ImageInterleaved<W>>
 		extends SelectInputPanel
 {
 	DiscreteFourierTransform<T,W> fft;

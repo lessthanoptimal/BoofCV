@@ -29,7 +29,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class WrapSiftDetector<T extends ImageBase>
+public class WrapSiftDetector<T extends ImageBase<T>>
 		implements InterestPointDetector<T>
 {
 	SiftDetector detector;

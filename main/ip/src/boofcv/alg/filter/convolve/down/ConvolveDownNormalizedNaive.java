@@ -19,9 +19,9 @@
 package boofcv.alg.filter.convolve.down;
 
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.*;
 
 /**
@@ -130,7 +130,7 @@ public class ConvolveDownNormalizedNaive {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel, GrayU8 input, GrayI8 output , int skip ) {
+	public static void horizontal(Kernel1D_S32 kernel, GrayU8 input, GrayI8 output , int skip ) {
 
 		final int radius = kernel.getRadius();
 
@@ -158,7 +158,7 @@ public class ConvolveDownNormalizedNaive {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel, GrayU8 input, GrayI8 output , int skip ) {
+	public static void vertical(Kernel1D_S32 kernel, GrayU8 input, GrayI8 output , int skip ) {
 
 		final int radius = kernel.getRadius();
 
@@ -186,7 +186,7 @@ public class ConvolveDownNormalizedNaive {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel, GrayU8 input, GrayI8 output , int skip ) {
+	public static void convolve(Kernel2D_S32 kernel, GrayU8 input, GrayI8 output , int skip ) {
 
 		final int radius = kernel.getRadius();
 
@@ -223,7 +223,7 @@ public class ConvolveDownNormalizedNaive {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel, GrayS16 input, GrayI16 output , int skip ) {
+	public static void horizontal(Kernel1D_S32 kernel, GrayS16 input, GrayI16 output , int skip ) {
 
 		final int radius = kernel.getRadius();
 
@@ -251,7 +251,7 @@ public class ConvolveDownNormalizedNaive {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel, GrayS16 input, GrayI16 output , int skip ) {
+	public static void vertical(Kernel1D_S32 kernel, GrayS16 input, GrayI16 output , int skip ) {
 
 		final int radius = kernel.getRadius();
 
@@ -279,7 +279,7 @@ public class ConvolveDownNormalizedNaive {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel, GrayS16 input, GrayI16 output , int skip ) {
+	public static void convolve(Kernel2D_S32 kernel, GrayS16 input, GrayI16 output , int skip ) {
 
 		final int radius = kernel.getRadius();
 

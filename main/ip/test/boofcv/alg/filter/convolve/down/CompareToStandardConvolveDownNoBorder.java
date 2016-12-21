@@ -22,7 +22,7 @@ import boofcv.alg.filter.convolve.ConvolutionTestHelper;
 import boofcv.alg.filter.convolve.ConvolveDownNoBorder;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
 import boofcv.testing.CompareIdenticalFunctions;
 
 import java.lang.reflect.Method;
@@ -79,9 +79,9 @@ public class CompareToStandardConvolveDownNoBorder extends CompareIdenticalFunct
 			divW = divH = skip;
 		}
 
-		ImageGray src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
+		ImageBase src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
 		GImageMiscOps.fillUniform(src, rand, 0, 130);
-		ImageGray dst = ConvolutionTestHelper.createImage(paramTypes[2], width/divW, height/divH);
+		ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[2], width/divW, height/divH);
 
 		Object[][] ret = new Object[1][paramTypes.length];
 		ret[0][0] = kernel;

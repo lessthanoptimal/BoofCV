@@ -35,7 +35,7 @@ import java.awt.image.BufferedImage;
 /**
  * @author Peter Abeles
  */
-public class VisualizeCirculantTrackerApp<T extends ImageGray>
+public class VisualizeCirculantTrackerApp<T extends ImageGray<T>>
 	implements CirculantVisualizationPanel.Listener
 {
 

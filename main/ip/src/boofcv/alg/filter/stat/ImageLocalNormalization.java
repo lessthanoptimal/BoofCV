@@ -38,7 +38,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class ImageLocalNormalization<T extends GrayF> {
+public class ImageLocalNormalization<T extends GrayF<T>> {
 
 	// storage for the adjusted input which has a max pixel value of 1
 	protected T adjusted;

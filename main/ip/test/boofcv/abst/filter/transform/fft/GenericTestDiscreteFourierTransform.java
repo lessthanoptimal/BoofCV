@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericTestDiscreteFourierTransform<T extends ImageGray, I extends ImageInterleaved> {
+public abstract class GenericTestDiscreteFourierTransform<T extends ImageGray<T>, I extends ImageInterleaved<I>> {
 
 	protected Random rand = new Random(234);
 

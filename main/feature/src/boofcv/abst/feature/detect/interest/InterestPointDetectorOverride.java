@@ -27,7 +27,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class InterestPointDetectorOverride< T extends ImageGray>
+public class InterestPointDetectorOverride<T extends ImageGray<T>>
 		implements InterestPointDetector<T>
 {
 	InterestPointDetector<T> detector;

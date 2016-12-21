@@ -22,7 +22,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.filter.convolve.ConvolveNormalized;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
@@ -33,7 +33,7 @@ import boofcv.struct.image.GrayS32;
 public abstract class ImplSsdCornerWeighted_S16 implements GradientCornerIntensity<GrayS16> {
 
 	int radius;
-	Kernel1D_I32 kernel;
+	Kernel1D_S32 kernel;
 	GrayS32 imgXX = new GrayS32(1,1);
 	GrayS32 imgYY = new GrayS32(1,1);
 	GrayS32 imgXY = new GrayS32(1,1);
@@ -44,7 +44,7 @@ public abstract class ImplSsdCornerWeighted_S16 implements GradientCornerIntensi
 
 	public ImplSsdCornerWeighted_S16(int radius) {
 		this.radius = radius;
-		kernel = FactoryKernelGaussian.gaussian(Kernel1D_I32.class, -1, radius);
+		kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class, -1, radius);
 	}
 
 	@Override

@@ -27,6 +27,7 @@ import boofcv.struct.BoofDefaults;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
 /**
  * <p>
@@ -38,7 +39,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class AnyImageDerivative<I extends ImageGray, D extends ImageGray> {
+public class AnyImageDerivative<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 	// filters for computing image derivatives
 	private ConvolveInterface<I, D> derivX;
@@ -71,11 +72,14 @@ public class AnyImageDerivative<I extends ImageGray, D extends ImageGray> {
 	{
 		this.derivType = derivType;
 
-		derivX = FactoryConvolve.convolve(deriv,inputType,derivType, borderDeriv,true);
-		derivY = FactoryConvolve.convolve(deriv,inputType,derivType, borderDeriv,false);
+		ImageType<I> _inputType = ImageType.single(inputType);
+		ImageType<D> _derivType = ImageType.single(derivType);
 
-		derivDerivX = FactoryConvolve.convolve(deriv,derivType,derivType, borderDeriv,true);
-		derivDerivY = FactoryConvolve.convolve(deriv,derivType,derivType, borderDeriv,false);
+		derivX = FactoryConvolve.convolve(deriv,_inputType,_derivType, borderDeriv,true);
+		derivY = FactoryConvolve.convolve(deriv,_inputType,_derivType, borderDeriv,false);
+
+		derivDerivX = FactoryConvolve.convolve(deriv,_derivType,_derivType, borderDeriv,true);
+		derivDerivY = FactoryConvolve.convolve(deriv,_derivType,_derivType, borderDeriv,false);
 	}
 
 	/**

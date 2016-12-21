@@ -61,6 +61,22 @@ public class AverageDownSampleOps {
 		image.reshape(w,h);
 	}
 
+	public static void down(ImageBase input , int sampleWidth , ImageBase output ) {
+		switch( input.getImageType().getFamily()  ) {
+			case GRAY:
+				down((ImageGray)input, sampleWidth, (ImageGray)output );
+				return;
+
+			case PLANAR:
+				down((Planar) input, sampleWidth, (Planar)output );
+				return;
+
+			case INTERLEAVED:
+				throw new IllegalArgumentException("Interleaved images are not yet supported");
+		}
+		throw new IllegalArgumentException("Unknown image type");
+	}
+
 	/**
 	 * Down samples image.  Type checking is done at runtime.
 	 *
@@ -114,7 +130,7 @@ public class AverageDownSampleOps {
 	 * @param input Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageBase<T>>
 	void down( T input , T output ) {
 		if( ImageGray.class.isAssignableFrom(input.getClass())  ) {
 			if (input instanceof GrayU8) {
@@ -155,7 +171,7 @@ public class AverageDownSampleOps {
 	 * @param sampleWidth Width of square region.
 	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageGray> void down(Planar<T> input ,
+	public static <T extends ImageGray<T>> void down(Planar<T> input ,
 												  int sampleWidth , Planar<T> output )
 	{
 		for( int band = 0; band < input.getNumBands(); band++ ) {
@@ -169,7 +185,7 @@ public class AverageDownSampleOps {
 	 * @param input Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageGray> void down(Planar<T> input , Planar<T> output )
+	public static <T extends ImageGray<T>> void down(Planar<T> input , Planar<T> output )
 	{
 		for( int band = 0; band < input.getNumBands(); band++ ) {
 			down(input.getBand(band), output.getBand(band));

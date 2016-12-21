@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,9 +36,9 @@ public class TestFactoryKernelGaussian {
 	public void gaussian() {
 		// basic test to see if its creating kernels of the correct type
 		assertTrue( FactoryKernelGaussian.gaussian(1,true, 32, 1,2) instanceof Kernel1D_F32 );
-		assertTrue( FactoryKernelGaussian.gaussian(1,false, 32, 1,2) instanceof Kernel1D_I32 );
+		assertTrue( FactoryKernelGaussian.gaussian(1,false, 32, 1,2) instanceof Kernel1D_S32);
 		assertTrue( FactoryKernelGaussian.gaussian(2,true, 32, 1,2) instanceof Kernel2D_F32 );
-		assertTrue( FactoryKernelGaussian.gaussian(2,false, 32, 1,2) instanceof Kernel2D_I32);
+		assertTrue( FactoryKernelGaussian.gaussian(2,false, 32, 1,2) instanceof Kernel2D_S32);
 	}
 
 	@Test

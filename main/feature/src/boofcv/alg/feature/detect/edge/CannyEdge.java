@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CannyEdge<T extends ImageGray, D extends ImageGray> {
+public class CannyEdge<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 	// blurs the input image
 	private BlurFilter<T> blur;

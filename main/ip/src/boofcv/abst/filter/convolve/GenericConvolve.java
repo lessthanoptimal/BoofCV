@@ -22,7 +22,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.convolve.KernelBase;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 import java.lang.reflect.InvocationTargetException;
@@ -35,7 +35,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class GenericConvolve<Input extends ImageGray, Output extends ImageGray>
+public class GenericConvolve<Input extends ImageBase<Input>, Output extends ImageBase<Output>>
 	implements ConvolveInterface<Input,Output>
 {
 	Method m;
@@ -43,11 +43,11 @@ public class GenericConvolve<Input extends ImageGray, Output extends ImageGray>
 	BorderType type;
 	ImageBorder borderRule;
 
-	Class<Input> inputType;
-	Class<Output> outputType;
+	ImageType<Input> inputType;
+	ImageType<Output> outputType;
 
 	public GenericConvolve(Method m, KernelBase kernel, BorderType type ,
-						   Class<Input> inputType, Class<Output> outputType) {
+						   ImageType<Input> inputType, ImageType<Output> outputType) {
 		this.m = m;
 		this.kernel = kernel;
 		this.type = type;
@@ -114,11 +114,11 @@ public class GenericConvolve<Input extends ImageGray, Output extends ImageGray>
 
 	@Override
 	public ImageType<Input> getInputType() {
-		return ImageType.single(inputType);
+		return inputType;
 	}
 
 	@Override
 	public ImageType<Output> getOutputType() {
-		return ImageType.single(outputType);
+		return outputType;
 	}
 }

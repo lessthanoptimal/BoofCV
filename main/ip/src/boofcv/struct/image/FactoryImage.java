@@ -27,7 +27,7 @@ package boofcv.struct.image;
 @SuppressWarnings({"unchecked"})
 public class FactoryImage {
 
-	public static <T extends ImageGray> T create(Class<T> type , int width , int height )
+	public static <T extends ImageGray<T>> T create(Class<T> type , int width , int height )
 	{
 		if( type == GrayU8.class) {
 			return (T)new GrayU8(width,height);

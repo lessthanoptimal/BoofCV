@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
+public abstract class DemonstrationBase<T extends ImageBase<T>> extends JPanel {
 	protected JMenuBar menuBar;
 	JMenuItem menuFile, menuWebcam, menuQuit;
 	final JFileChooser fc = new JFileChooser();

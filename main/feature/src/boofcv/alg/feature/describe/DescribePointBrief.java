@@ -39,7 +39,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class DescribePointBrief<T extends ImageGray> {
+public class DescribePointBrief<T extends ImageGray<T>> {
 	// blurs the image prior to sampling
 	protected BlurFilter<T> filterBlur;
 	// blurred image

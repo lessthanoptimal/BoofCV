@@ -49,7 +49,7 @@ import java.util.ArrayList;
  */
 // todo configure: blur, edge threshold, non-max radius,  min counts
 // todo show binary image, transform
-public class DetectLineApp<T extends ImageGray, D extends ImageGray>
+public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel implements ImageCorruptPanel.Listener
 {
 	Class<T> imageType;

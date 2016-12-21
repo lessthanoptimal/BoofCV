@@ -41,7 +41,7 @@ public class FactoryWaveletTransform {
 
 
 	@SuppressWarnings({"unchecked"})
-	public static <T extends ImageGray, W extends ImageGray, C extends WlCoef>
+	public static <T extends ImageGray<T>, W extends ImageGray<W>, C extends WlCoef>
 	WaveletTransform<T,W,C> create( Class<T> imageType , WaveletDescription<C> waveletDesc , int numLevels ,
 									double minPixelValue , double maxPixelValue)
 	{
@@ -65,7 +65,7 @@ public class FactoryWaveletTransform {
 	 * @param maxPixelValue Maximum pixel intensity value
 	 * @return The transform class.
 	 */
-	public static <T extends GrayI>
+	public static <T extends GrayI<T>>
 	WaveletTransform<T, GrayS32,WlCoef_I32>
 	create_I( WaveletDescription<WlCoef_I32> waveletDesc ,
 			  int numLevels , int minPixelValue , int maxPixelValue ,

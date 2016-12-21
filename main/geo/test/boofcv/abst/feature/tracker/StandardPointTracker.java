@@ -37,7 +37,7 @@ import static org.junit.Assert.*;
  *
  * @author Peter Abeles
  */
-public abstract class StandardPointTracker<T extends ImageGray> {
+public abstract class StandardPointTracker<T extends ImageGray<T>> {
 
 	public PointTracker<T> tracker;
 	Random rand = new Random(234);

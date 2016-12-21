@@ -41,7 +41,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeBinaryContourApp <T extends ImageGray> extends DemonstrationBase<T>
+public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends DemonstrationBase<T>
 	implements ThresholdControlPanel.Listener
 {
 	VisualizePanel guiImage;

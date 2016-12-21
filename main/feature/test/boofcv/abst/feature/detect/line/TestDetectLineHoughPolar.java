@@ -37,7 +37,7 @@ public class TestDetectLineHoughPolar extends GeneralDetectLineTests {
 	}
 
 	@Override
-	public <T extends ImageGray>
+	public <T extends ImageGray<T>>
 	DetectLine<T> createAlg(Class<T> imageType) {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);

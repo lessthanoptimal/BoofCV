@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class GeneralSparseSampleTests <T extends ImageGray>
+public class GeneralSparseSampleTests <T extends ImageGray<T>>
 	extends GeneralSparseOperatorTests<T>
 {
 	protected SparseImageSample_F64<T> alg;

@@ -38,7 +38,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO update description in FactoryDetectLineAlgs
-public class DetectLineSegmentsGridRansac<T extends ImageGray, D extends ImageGray>
+public class DetectLineSegmentsGridRansac<T extends ImageGray<T>, D extends ImageGray<D>>
 		implements DetectLineSegment<T>
 {
 	GridRansacLineDetector<D> detectorGrid;

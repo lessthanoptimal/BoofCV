@@ -28,7 +28,6 @@ import boofcv.abst.feature.tracker.PointTrackerToTwoPass;
 import boofcv.abst.feature.tracker.PointTrackerTwoPass;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.DepthVisualOdometry;
-import boofcv.alg.distort.DoNothingPixelTransform_F32;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.PerspectiveOps;
@@ -49,6 +48,7 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.struct.distort.DoNothing2Transform2_F32;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU16;
@@ -70,7 +70,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeDepthVisualOdometryApp<I extends ImageGray>
+public class VisualizeDepthVisualOdometryApp<I extends ImageGray<I>>
 		extends DepthVideoAppBase<I,GrayU16> implements VisualizeApp, VisualOdometryPanel.Listener
 {
 
@@ -266,7 +266,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageGray>
 		if( cookies != null )
 			whichAlg = (Integer)cookies[0];
 		alg = createVisualOdometry(whichAlg);
-		alg.setCalibration(config.visualParam,new DoNothingPixelTransform_F32());
+		alg.setCalibration(config.visualParam,new DoNothing2Transform2_F32());
 
 		guiInfo.reset();
 

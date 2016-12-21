@@ -129,7 +129,7 @@ public class AreGenericsSlower {
 		}
 	}
 
-	private static abstract class BaseGeneric <T extends ImageGray>
+	private static abstract class BaseGeneric <T extends ImageGray<T>>
 	{
 		protected T image;
 

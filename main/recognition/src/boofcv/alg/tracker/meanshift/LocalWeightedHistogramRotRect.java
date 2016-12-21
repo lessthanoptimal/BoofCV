@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
 **/
-public class LocalWeightedHistogramRotRect<T extends ImageBase> {
+public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 
 	// Interpolation function
 	private InterpolatePixelMB<T> interpolate;

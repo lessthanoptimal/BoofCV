@@ -46,7 +46,7 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 // TODO Show image size on left panel
-public class VisualizeImageSegmentationApp <T extends ImageBase>
+public class VisualizeImageSegmentationApp <T extends ImageBase<T>>
 		extends SelectAlgorithmAndInputPanel
 {
 	ImageType<T> imageType;

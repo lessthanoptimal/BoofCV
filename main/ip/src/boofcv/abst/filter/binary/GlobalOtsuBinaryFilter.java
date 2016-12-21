@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class GlobalOtsuBinaryFilter<T extends ImageGray> implements InputToBinary<T> {
+public class GlobalOtsuBinaryFilter<T extends ImageGray<T>> implements InputToBinary<T> {
 
 	ImageType<T> inputType;
 

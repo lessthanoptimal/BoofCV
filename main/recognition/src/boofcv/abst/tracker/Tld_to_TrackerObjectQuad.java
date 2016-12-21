@@ -30,7 +30,7 @@ import georegression.struct.shapes.Rectangle2D_F64;
  *
  * @author Peter Abeles
  */
-public class Tld_to_TrackerObjectQuad<T extends ImageGray, D extends ImageGray>
+public class Tld_to_TrackerObjectQuad<T extends ImageGray<T>, D extends ImageGray<D>>
 		implements TrackerObjectQuad<T>
 {
 	Rectangle2D_F64 rect = new Rectangle2D_F64();

@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface DescribeImageDense<T extends ImageBase, Desc extends TupleDesc>
+public interface DescribeImageDense<T extends ImageBase<T>, Desc extends TupleDesc>
 	extends DescriptorInfo<Desc>
 {
 	/**

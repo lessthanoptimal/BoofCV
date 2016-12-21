@@ -53,7 +53,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class EquirectangularRotatingApp<T extends ImageBase> extends DemonstrationBase<T>
+public class EquirectangularRotatingApp<T extends ImageBase<T>> extends DemonstrationBase<T>
 		implements RotationPanel.Listener
 {
 

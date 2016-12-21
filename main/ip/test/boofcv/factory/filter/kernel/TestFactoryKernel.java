@@ -39,7 +39,7 @@ public class TestFactoryKernel {
 
 	@Test
 	public void table1D_I32() {
-		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(3);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(3);
 
 		assertEquals(7,kernel.width);
 
@@ -74,7 +74,7 @@ public class TestFactoryKernel {
 
 	@Test
 	public void random1D_I32() {
-		Kernel1D_I32 kernel = FactoryKernel.random1D_I32(5,2, -2, 2, rand);
+		Kernel1D_S32 kernel = FactoryKernel.random1D_I32(5,2, -2, 2, rand);
 		int nonZero = 0;
 		for (int i = 0; i < kernel.width; i++) {
 			assertTrue(kernel.get(i) <= 2);
@@ -113,7 +113,7 @@ public class TestFactoryKernel {
 
 	@Test
 	public void random2D_I32() {
-		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(5,2, -2, 2, rand);
+		Kernel2D_S32 kernel = FactoryKernel.random2D_I32(5,2, -2, 2, rand);
 		int nonZero = 0;
 		for (int i = 0; i < kernel.width; i++) {
 			for (int j = 0; j < kernel.width; j++) {
@@ -144,19 +144,19 @@ public class TestFactoryKernel {
 	@Test
 	public void get1DType() {
 		assertTrue((Class)Kernel1D_F32.class == FactoryKernel.get1DType(Kernel2D_F32.class));
-		assertTrue((Class)Kernel1D_I32.class == FactoryKernel.get1DType(Kernel2D_I32.class));
+		assertTrue((Class)Kernel1D_S32.class == FactoryKernel.get1DType(Kernel2D_S32.class));
 	}
 
 	@Test
 	public void getKernelType() {
 		assertTrue((Class)Kernel1D_F32.class == FactoryKernel.getKernelType(GrayF32.class,1));
-		assertTrue((Class)Kernel1D_I32.class == FactoryKernel.getKernelType(GrayS32.class,1));
-		assertTrue((Class)Kernel1D_I32.class == FactoryKernel.getKernelType(GrayS16.class,1));
-		assertTrue((Class)Kernel1D_I32.class == FactoryKernel.getKernelType(GrayU8.class,1));
+		assertTrue((Class)Kernel1D_S32.class == FactoryKernel.getKernelType(GrayS32.class,1));
+		assertTrue((Class)Kernel1D_S32.class == FactoryKernel.getKernelType(GrayS16.class,1));
+		assertTrue((Class)Kernel1D_S32.class == FactoryKernel.getKernelType(GrayU8.class,1));
 
 		assertTrue((Class)Kernel2D_F32.class == FactoryKernel.getKernelType(GrayF32.class,2));
-		assertTrue((Class)Kernel2D_I32.class == FactoryKernel.getKernelType(GrayS32.class,2));
-		assertTrue((Class)Kernel2D_I32.class == FactoryKernel.getKernelType(GrayS16.class,2));
-		assertTrue((Class)Kernel2D_I32.class == FactoryKernel.getKernelType(GrayU8.class,2));
+		assertTrue((Class)Kernel2D_S32.class == FactoryKernel.getKernelType(GrayS32.class,2));
+		assertTrue((Class)Kernel2D_S32.class == FactoryKernel.getKernelType(GrayS16.class,2));
+		assertTrue((Class)Kernel2D_S32.class == FactoryKernel.getKernelType(GrayU8.class,2));
 	}
 }

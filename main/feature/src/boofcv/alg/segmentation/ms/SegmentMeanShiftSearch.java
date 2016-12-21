@@ -71,7 +71,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-public abstract class SegmentMeanShiftSearch<T extends ImageBase> {
+public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>> {
 
 	// used to detect convergence of mean-shift
 	protected int maxIterations;

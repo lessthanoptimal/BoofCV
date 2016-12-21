@@ -36,7 +36,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface GaussianScaleSpace<T extends ImageGray, D extends ImageGray> {
+public interface GaussianScaleSpace<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 	/**
 	 * Sets the scales/blur magnitudes for which the scale-space should be computed over.

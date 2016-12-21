@@ -62,7 +62,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class CirculantTracker<T extends ImageGray> {
+public class CirculantTracker<T extends ImageGray<T>> {
 
 	// --- Tuning parameters
 	// spatial bandwidth (proportional to target)

@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
  *
  * @author Peter Abeles
  */
-public abstract class GeneralChecksInterpolationPixelS< T extends ImageGray> {
+public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 	protected Random rand = new Random(0xff34);
 
 	protected int width = 320;

@@ -42,7 +42,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class CommonGridRansacLineDetectorChecks< D extends ImageGray> {
+public abstract class CommonGridRansacLineDetectorChecks< D extends ImageGray<D>> {
 	int width = 40;
 	int height = 30;
 

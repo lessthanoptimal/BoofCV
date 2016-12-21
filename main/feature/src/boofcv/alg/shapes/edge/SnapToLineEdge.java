@@ -52,7 +52,7 @@ import org.ddogleg.struct.GrowQueue_F64;
  * @author Peter Abeles
  */
 // TODO specify weight function.  close to A, close to B, even
-public class SnapToLineEdge<T extends ImageGray>extends BaseIntegralEdge<T> {
+public class SnapToLineEdge<T extends ImageGray<T>>extends BaseIntegralEdge<T> {
 
 	// maximum number of times it will sample along the line
 	protected int lineSamples;

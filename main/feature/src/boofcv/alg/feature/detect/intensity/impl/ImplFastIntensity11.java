@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class ImplFastIntensity11<T extends ImageGray> extends FastCornerIntensity<T>
+public class ImplFastIntensity11<T extends ImageGray<T>> extends FastCornerIntensity<T>
 {
 
 	/**

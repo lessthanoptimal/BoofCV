@@ -40,7 +40,7 @@ import static org.junit.Assert.*;
  *
  * @author Peter Abeles
  */
-public abstract class GeneralChecksInterpolationPixelMB< T extends ImageMultiBand> {
+public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand<T>> {
 	protected Random rand = new Random(0xff34);
 
 	protected int width = 320;
@@ -60,7 +60,7 @@ public abstract class GeneralChecksInterpolationPixelMB< T extends ImageMultiBan
 	/**
 	 * Creates the equivalent single band interpolation algorithm. If none exist then return null
 	 */
-	protected abstract<SB extends ImageGray>
+	protected abstract<SB extends ImageGray<SB>>
 	InterpolatePixelS<SB> wrapSingle(SB image, int minValue, int maxValue);
 
 	/**

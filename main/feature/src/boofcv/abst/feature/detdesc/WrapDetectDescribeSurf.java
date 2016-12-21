@@ -45,7 +45,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class WrapDetectDescribeSurf
-		<T extends ImageGray, II extends ImageGray>
+		<T extends ImageGray<T>, II extends ImageGray<II>>
 	implements DetectDescribePoint<T,BrightFeature>
 {
 	// SURF algorithms

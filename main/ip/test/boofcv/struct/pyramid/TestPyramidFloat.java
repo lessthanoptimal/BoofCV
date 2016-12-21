@@ -20,6 +20,7 @@ package boofcv.struct.pyramid;
 
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -58,10 +59,10 @@ public class TestPyramidFloat {
 		assertEquals(height / 4, pyramid.getLayer(1).height);
 	}
 
-	private static class DummyFloat<T extends ImageGray> extends PyramidFloat<T> {
+	private static class DummyFloat<T extends ImageGray<T>> extends PyramidFloat<T> {
 
 		public DummyFloat(Class<T> imageType) {
-			super(imageType);
+			super(ImageType.single(imageType));
 		}
 
 		@Override

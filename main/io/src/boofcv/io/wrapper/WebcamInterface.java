@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,5 +26,5 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public interface WebcamInterface {
-	<T extends ImageBase> SimpleImageSequence<T> open( String device , int width , int height , ImageType<T> imageType );
+	<T extends ImageBase<T>> SimpleImageSequence<T> open( String device , int width , int height , ImageType<T> imageType );
 }

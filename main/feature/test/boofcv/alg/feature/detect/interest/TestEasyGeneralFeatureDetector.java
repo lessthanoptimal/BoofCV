@@ -84,7 +84,7 @@ public class TestEasyGeneralFeatureDetector {
 		assertFalse(detector.excludeIsNull);
 	}
 
-	private static class Helper<I extends ImageGray, D extends ImageGray>
+	private static class Helper<I extends ImageGray<I>, D extends ImageGray<D>>
 			extends GeneralFeatureDetector<I,D> {
 
 		boolean gradient;

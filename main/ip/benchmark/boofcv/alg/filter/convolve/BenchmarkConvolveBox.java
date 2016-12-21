@@ -22,7 +22,7 @@ import boofcv.alg.filter.convolve.noborder.ImplConvolveBox;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
@@ -42,7 +42,7 @@ public class BenchmarkConvolveBox {
 	static long TEST_TIME = 1000;
 	static Random rand = new Random(234);
 
-	static Kernel1D_I32 kernelI32;
+	static Kernel1D_S32 kernelI32;
 	static Kernel1D_F32 kernelF32;
 	static GrayF32 input_F32 = new GrayF32(width,height);
 	static GrayF32 out_F32 = new GrayF32(width,height);

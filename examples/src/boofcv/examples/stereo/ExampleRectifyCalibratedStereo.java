@@ -70,9 +70,9 @@ public class ExampleRectifyCalibratedStereo {
 
 		// distorted images
 		Planar<GrayF32> distLeft =
-				ConvertBufferedImage.convertFromMulti(origLeft, null,true, GrayF32.class);
+				ConvertBufferedImage.convertFromPlanar(origLeft, null,true, GrayF32.class);
 		Planar<GrayF32> distRight =
-				ConvertBufferedImage.convertFromMulti(origRight, null,true, GrayF32.class);
+				ConvertBufferedImage.convertFromPlanar(origRight, null,true, GrayF32.class);
 
 		// storage for undistorted + rectified images
 		Planar<GrayF32> rectLeft = distLeft.createSameShape();

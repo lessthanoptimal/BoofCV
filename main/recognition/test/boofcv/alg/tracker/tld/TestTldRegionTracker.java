@@ -27,6 +27,7 @@ import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.shapes.Rectangle2D_F64;
 import org.junit.Test;
@@ -53,7 +54,7 @@ public class TestTldRegionTracker {
 	public TestTldRegionTracker() {
 		GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-		pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4},-1,1,true,GrayU8.class);
+		pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4},-1,1,true, ImageType.single(GrayU8.class));
 		pyramid.process(input);
 	}
 
@@ -103,7 +104,8 @@ public class TestTldRegionTracker {
 	 */
 	@Test
 	public void spawnGrid_fail() {
-		PyramidDiscrete<GrayU8> pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4},-1,1,true,GrayU8.class);
+		PyramidDiscrete<GrayU8> pyramid = FactoryPyramid.discreteGaussian(
+				new int[]{1,2,4},-1,1,true,ImageType.single(GrayU8.class));
 		pyramid.process(new GrayU8(width,height));
 
 		TldRegionTracker alg = createAlg();

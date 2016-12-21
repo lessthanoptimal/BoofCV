@@ -35,7 +35,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public class TemplateMatching<T extends ImageBase> {
+public class TemplateMatching<T extends ImageBase<T>> {
 
 	// computes an intensity image identifying matches
 	private TemplateMatchingIntensity<T> match;

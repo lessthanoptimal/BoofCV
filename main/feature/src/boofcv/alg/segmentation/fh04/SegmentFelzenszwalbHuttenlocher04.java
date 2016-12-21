@@ -78,7 +78,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase> {
+public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 
 	// tuning parameter.  Determines the number of segments.  Larger number means larger regions
 	private float K;

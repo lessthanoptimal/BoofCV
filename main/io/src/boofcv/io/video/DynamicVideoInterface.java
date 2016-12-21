@@ -56,7 +56,7 @@ public class DynamicVideoInterface implements VideoInterface {
 	}
 
 	@Override
-	public <T extends ImageBase> SimpleImageSequence<T> load(String fileName, ImageType<T> imageType) {
+	public <T extends ImageBase<T>> SimpleImageSequence<T> load(String fileName, ImageType<T> imageType) {
 
 		// Use built in movie readers for these file types
 		if( fileName.endsWith("mjpeg") || fileName.endsWith("MJPEG") ||

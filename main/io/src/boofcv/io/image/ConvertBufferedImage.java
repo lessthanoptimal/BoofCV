@@ -212,13 +212,13 @@ public class ConvertBufferedImage {
 	 * @param dst The image which it is being converted into
 	 * @param orderRgb If applicable, should it adjust the ordering of each color band to maintain color consistency
 	 */
-	public static <T extends ImageBase> void convertFrom(BufferedImage src, T dst , boolean orderRgb) {
+	public static <T extends ImageBase<T>> void convertFrom(BufferedImage src, T dst , boolean orderRgb) {
 		if( dst instanceof ImageGray) {
 			ImageGray sb = (ImageGray)dst;
 			convertFromSingle(src, sb, (Class<ImageGray>) sb.getClass());
 		} else if( dst instanceof Planar) {
 			Planar ms = (Planar)dst;
-			convertFromMulti(src,ms,orderRgb,ms.getBandType());
+			convertFromPlanar(src,ms,orderRgb,ms.getBandType());
 		} else if( dst instanceof ImageInterleaved ) {
 			convertFromInterleaved(src, (ImageInterleaved) dst, orderRgb);
 		} else {
@@ -234,7 +234,7 @@ public class ConvertBufferedImage {
 	 * @param imageType Type of image it is to be converted into
 	 * @return The image
 	 */
-	public static <T extends ImageBase> T convertFrom(BufferedImage src , boolean orderRgb , ImageType<T> imageType) {
+	public static <T extends ImageBase<T>> T convertFrom(BufferedImage src , boolean orderRgb , ImageType<T> imageType) {
 
 		T out = imageType.createImage(src.getWidth(),src.getHeight());
 
@@ -244,7 +244,7 @@ public class ConvertBufferedImage {
 				break;
 
 			case PLANAR:
-				convertFromMulti(src, (Planar) out, orderRgb, imageType.getImageClass());
+				convertFromPlanar(src, (Planar) out, orderRgb, imageType.getImageClass());
 				break;
 
 			case INTERLEAVED:
@@ -258,7 +258,7 @@ public class ConvertBufferedImage {
 		return out;
 	}
 
-	public static <T extends ImageBase> T convertFrom(BufferedImage src , boolean orderRgb , T output ) {
+	public static <T extends ImageBase<T>> T convertFrom(BufferedImage src , boolean orderRgb , T output ) {
 
 		ImageType<T> imageType = output.getImageType();
 
@@ -268,7 +268,7 @@ public class ConvertBufferedImage {
 				break;
 
 			case PLANAR:
-				convertFromMulti(src, (Planar) output, orderRgb, imageType.getImageClass());
+				convertFromPlanar(src, (Planar) output, orderRgb, imageType.getImageClass());
 				break;
 
 			case INTERLEAVED:
@@ -286,7 +286,7 @@ public class ConvertBufferedImage {
 	 * Converts a buffered image into an image of the specified type.  In a 'dst' image is provided
 	 * it will be used for output, otherwise a new image will be created.
 	 */
-	public static <T extends ImageGray> T convertFromSingle(BufferedImage src, T dst, Class<T> type) {
+	public static <T extends ImageGray<T>> T convertFromSingle(BufferedImage src, T dst, Class<T> type) {
 		if (type == GrayU8.class) {
 			return (T) convertFrom(src, (GrayU8) dst);
 		} else if( GrayI16.class.isAssignableFrom(type) ) {
@@ -308,9 +308,7 @@ public class ConvertBufferedImage {
 	 */
 	public static GrayU8 convertFrom(BufferedImage src, GrayU8 dst) {
 		if (dst != null) {
-			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
-				throw new IllegalArgumentException("image dimension are different");
-			}
+			dst.reshape(src.getWidth(), src.getHeight());
 		} else {
 			dst = new GrayU8(src.getWidth(), src.getHeight());
 		}
@@ -345,11 +343,9 @@ public class ConvertBufferedImage {
 	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
 	 * @return Converted image.
 	 */
-	public static <T extends GrayI16>T convertFrom(BufferedImage src, T dst , Class<T> type ) {
+	public static <T extends GrayI16<T>>T convertFrom(BufferedImage src, T dst , Class<T> type ) {
 		if (dst != null) {
-			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
-				throw new IllegalArgumentException("image dimension are different");
-			}
+			dst.reshape(src.getWidth(), src.getHeight());
 		} else {
 			dst = GeneralizedImageOps.createSingleBand(type, src.getWidth(), src.getHeight());
 		}
@@ -377,12 +373,9 @@ public class ConvertBufferedImage {
 	 */
 	public static GrayF32 convertFrom(BufferedImage src, GrayF32 dst) {
 		if (dst != null) {
-			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
-				String difference = "src = "+src.getWidth()+"x"+src.getHeight()+"  dst = "+dst.getWidth()+"x"+dst.getHeight();
-				throw new IllegalArgumentException("image dimension are different. "+difference);
-			}
+			dst.reshape(src.getWidth(), src.getHeight());
 		} else {
-			dst = new GrayF32(src.getWidth(), src.getHeight());
+			dst = new GrayF32( src.getWidth(), src.getHeight());
 		}
 
 		try {
@@ -408,8 +401,7 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts the buffered image into an {@link Planar} image of the specified
-	 * type. 
+	 * Converts the buffered image into an {@link Planar} image of the specified ype.
 	 *
 	 * @param src Input image. Not modified.
 	 * @param dst Output. The converted image is written to.  If null a new unsigned image is created.
@@ -418,16 +410,14 @@ public class ConvertBufferedImage {
 	 * @param type Which type of data structure is each band. (GrayU8 or GrayF32)
 	 * @return Converted image.
 	 */
-	public static <T extends ImageGray> Planar<T>
-	convertFromMulti(BufferedImage src, Planar<T> dst , boolean orderRgb , Class<T> type )
+	public static <T extends ImageGray<T>> Planar<T>
+	convertFromPlanar(BufferedImage src, Planar<T> dst , boolean orderRgb , Class<T> type )
 	{
 		if( src == null )
 			throw new IllegalArgumentException("src is null!");
 
 		if (dst != null) {
-			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
-				throw new IllegalArgumentException("image dimension are different");
-			}
+			dst.reshape(src.getWidth(), dst.getHeight());
 		}
 
 		try {
@@ -442,7 +432,7 @@ public class ConvertBufferedImage {
 			if( dst == null)
 				dst = new Planar<>(type, src.getWidth(), src.getHeight(), numBands);
 			else if( dst.getNumBands() != numBands )
-				throw new IllegalArgumentException("Expected "+numBands+" bands in dst not "+dst.getNumBands());
+				dst.setNumberOfBands(numBands);
 
 			if( type == GrayU8.class ) {
 				if (src.getRaster() instanceof ByteInterleavedRaster &&
@@ -480,6 +470,9 @@ public class ConvertBufferedImage {
 			// Applets don't allow access to the raster()
 			if( dst == null )
 				dst = new Planar<>(type, src.getWidth(), src.getHeight(), 3);
+			else {
+				dst.setNumberOfBands(3);
+			}
 
 			if( type == GrayU8.class ) {
 				ConvertRaster.bufferedToMulti_U8(src, (Planar<GrayU8>) dst);
@@ -496,14 +489,25 @@ public class ConvertBufferedImage {
 		return dst;
 	}
 
+	public static <T extends ImageBase>T convertFrom(BufferedImage src, Class type, boolean orderRgb) {
+		T dst;
+		if( ImageGray.class.isAssignableFrom(type)) {
+			dst = (T)convertFromSingle(src, null, type);
+		} else if ( ImageInterleaved.class.isAssignableFrom(type) ){
+			dst = (T) GeneralizedImageOps.createInterleaved(type, 1, 1, 3);
+			convertFromInterleaved(src,(ImageInterleaved)dst,orderRgb);
+		} else {
+			dst = (T)new Planar<>(GrayU8.class,1,1,3);
+			convertFrom(src,dst, orderRgb);
+		}
+
+		return dst;
+	}
+
 	public static void convertFromInterleaved(BufferedImage src, ImageInterleaved dst, boolean orderRgb)
 	{
 		if (src == null)
 			throw new IllegalArgumentException("src is null!");
-
-		if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
-			throw new IllegalArgumentException("image dimension are different");
-		}
 
 		try {
 			WritableRaster raster = src.getRaster();
@@ -514,8 +518,8 @@ public class ConvertBufferedImage {
 			else
 				numBands = raster.getNumBands();
 
-			if( dst.getNumBands() != numBands )
-				throw new IllegalArgumentException("Expected "+numBands+" bands in dst not "+dst.getNumBands());
+			dst.setNumBands(numBands);
+			dst.reshape(src.getWidth(), src.getHeight());
 
 			if( dst instanceof InterleavedU8 ) {
 				if (src.getRaster() instanceof ByteInterleavedRaster ){
@@ -558,6 +562,12 @@ public class ConvertBufferedImage {
 			}
 
 		} catch( java.security.AccessControlException e) {
+			// force the number of bands to be something valid
+			if( dst.getNumBands() != 3 || dst.getNumBands() != 1 ) {
+				dst.setNumBands(3);
+			}
+			dst.reshape(src.getWidth(), src.getHeight());
+
 			// Applets don't allow access to the raster()
 			if( dst instanceof InterleavedU8 ) {
 				ConvertRaster.bufferedToInterleaved(src, (InterleavedU8) dst);
@@ -982,7 +992,7 @@ public class ConvertBufferedImage {
 	 * Invoking this function ensures that the image will have the expected ordering.  For images with
 	 * 3 bands it will be RGB and for 4 bands it will be ARGB.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	void orderBandsIntoRGB(Planar<T> image , BufferedImage input ) {
 
 		boolean swap = swapBandOrder(input);
@@ -1023,7 +1033,7 @@ public class ConvertBufferedImage {
 		}
 	}
 
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	void orderBandsBufferedFromRgb(Planar<T> image, BufferedImage input) {
 
 		boolean swap = swapBandOrder(input);

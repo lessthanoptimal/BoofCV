@@ -304,7 +304,7 @@ public class GImageStatistics {
 	 * @param mean Mean pixel intensity value.
 	 * @return Pixel variance
 	 */
-	public static <T extends ImageGray> double variance(T input , double mean ) {
+	public static <T extends ImageGray<T>> double variance(T input , double mean ) {
 
 		if( GrayU8.class == input.getClass() ) {
 			return ImageStatistics.variance((GrayU8)input,mean);
@@ -334,7 +334,7 @@ public class GImageStatistics {
 	 * @param inputB Input image. Not modified.
 	 * @return Mean difference squared
 	 */
-	public static <T extends ImageBase> double meanDiffSq( T inputA , T inputB ) {
+	public static <T extends ImageBase<T>> double meanDiffSq( T inputA , T inputB ) {
 
 		if( inputA instanceof ImageGray) {
 			if (GrayU8.class == inputA.getClass()) {
@@ -388,7 +388,7 @@ public class GImageStatistics {
 	 * @param inputB Input image. Not modified.
 	 * @return Mean absolute difference
 	 */
-	public static <T extends ImageBase> double meanDiffAbs( T inputA , T inputB ) {
+	public static <T extends ImageBase<T>> double meanDiffAbs( T inputA , T inputB ) {
 
 		if( inputA instanceof ImageGray) {
 			if (GrayU8.class == inputA.getClass()) {

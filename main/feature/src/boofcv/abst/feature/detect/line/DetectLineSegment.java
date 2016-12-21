@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface DetectLineSegment<T extends ImageGray> {
+public interface DetectLineSegment<T extends ImageGray<T>> {
 
 	/**
 	 * Detect lines inside the image.

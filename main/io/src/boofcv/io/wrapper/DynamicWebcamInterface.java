@@ -37,7 +37,7 @@ public class DynamicWebcamInterface implements WebcamInterface {
 	}
 
 	@Override
-	public <T extends ImageBase> SimpleImageSequence<T>
+	public <T extends ImageBase<T>> SimpleImageSequence<T>
 	open(String device, int width, int height, ImageType<T> imageType) {
 		if( webcam == null ) {
 			throw new RuntimeException("No webcam libraries loaded");

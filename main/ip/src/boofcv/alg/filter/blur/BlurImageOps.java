@@ -28,7 +28,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_F64;
-import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
 
 /**
@@ -101,7 +101,46 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage,GrayU8.class);
 
-		Kernel1D_I32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,sigma,radius);
+		Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,sigma,radius);
+
+		ConvolveNormalized.horizontal(kernel, input, storage);
+		ConvolveNormalized.vertical(kernel,storage,output);
+
+		return output;
+	}
+
+	public static InterleavedU8 gaussian(InterleavedU8 input, InterleavedU8 output, double sigma , int radius,
+								  InterleavedU8 storage ) {
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,sigma,radius);
+
+		ConvolveNormalized.horizontal(kernel, input, storage);
+		ConvolveNormalized.vertical(kernel,storage,output);
+
+		return output;
+	}
+
+	public static InterleavedF32 gaussian(InterleavedF32 input, InterleavedF32 output, double sigma , int radius,
+										  InterleavedF32 storage ) {
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,sigma,radius);
+
+		ConvolveNormalized.horizontal(kernel, input, storage);
+		ConvolveNormalized.vertical(kernel,storage,output);
+
+		return output;
+	}
+
+	public static InterleavedF64 gaussian(InterleavedF64 input, InterleavedF64 output, double sigma , int radius,
+										  InterleavedF64 storage ) {
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		Kernel1D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F64.class,sigma,radius);
 
 		ConvolveNormalized.horizontal(kernel, input, storage);
 		ConvolveNormalized.vertical(kernel,storage,output);
@@ -233,7 +272,7 @@ public class BlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	Planar<T> mean(Planar<T> input, Planar<T> output, int radius , T storage ) {
 
 		if( storage == null )
@@ -242,7 +281,7 @@ public class BlurImageOps {
 			output = input.createNew(input.width,input.height);
 
 		for( int band = 0; band < input.getNumBands(); band++ ) {
-			GBlurImageOps.median(input.getBand(band),output.getBand(band),radius);
+			GBlurImageOps.mean(input.getBand(band),output.getBand(band),radius, storage);
 		}
 		return output;
 	}
@@ -256,7 +295,7 @@ public class BlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	Planar<T> median(Planar<T> input, Planar<T> output, int radius ) {
 
 		if( output == null )
@@ -279,7 +318,7 @@ public class BlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	Planar<T> gaussian(Planar<T> input, Planar<T> output, double sigma , int radius, T storage ) {
 
 		if( storage == null )

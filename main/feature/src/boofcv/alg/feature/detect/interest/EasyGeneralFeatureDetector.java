@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public class EasyGeneralFeatureDetector<T extends ImageGray, D extends ImageGray> {
+public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 	// Feature detector
 	protected GeneralFeatureDetector<T, D> detector;

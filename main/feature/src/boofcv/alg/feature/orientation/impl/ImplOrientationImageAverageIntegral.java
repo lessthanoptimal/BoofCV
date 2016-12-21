@@ -34,7 +34,7 @@ import boofcv.struct.sparse.SparseScaleSample_F64;
  *
  * @author Peter Abeles
  */
-public class ImplOrientationImageAverageIntegral<T extends ImageGray,G extends GradientValue>
+public class ImplOrientationImageAverageIntegral<T extends ImageGray<T>,G extends GradientValue>
 		extends OrientationIntegralBase<T,G>
 {
 	// cosine values for each pixel

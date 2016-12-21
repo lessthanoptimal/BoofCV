@@ -40,7 +40,7 @@ public class ExampleColorSpace {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
 
 		// Convert input image into a BoofCV RGB image
-		Planar<GrayF32> rgb = ConvertBufferedImage.convertFromMulti(image, null,true, GrayF32.class);
+		Planar<GrayF32> rgb = ConvertBufferedImage.convertFromPlanar(image, null,true, GrayF32.class);
 
 		//---- convert RGB image into different color formats
 		Planar<GrayF32> hsv = rgb.createSameShape();

@@ -56,7 +56,7 @@ public class FactoryDetectLineAlgs {
 	 * @param derivType Image derivative type.
 	 * @return Line segment detector
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	DetectLineSegmentsGridRansac<I,D> lineRansac(int regionSize ,
 												 double thresholdEdge ,
 												 double thresholdAngle ,
@@ -102,7 +102,7 @@ public class FactoryDetectLineAlgs {
 	 * @param <D> Image derivative type.
 	 * @return Line detector.
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	DetectLineHoughFoot<I,D> houghFoot(ConfigHoughFoot config ,
 									   Class<I> imageType ,
 									   Class<D> derivType ) {
@@ -129,7 +129,7 @@ public class FactoryDetectLineAlgs {
 	 * @param <D> Image derivative type.
 	 * @return Line detector.
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	DetectLineHoughFootSubimage<I,D> houghFootSub(ConfigHoughFootSubimage config ,
 												  Class<I> imageType ,
 												  Class<D> derivType ) {
@@ -156,7 +156,7 @@ public class FactoryDetectLineAlgs {
 	 * @param <D> Image derivative type.
 	 * @return Line detector.
 	 */
-	public static <I extends ImageGray, D extends ImageGray>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	DetectLineHoughPolar<I,D> houghPolar(ConfigHoughPolar config ,
 										 Class<I> imageType ,
 										 Class<D> derivType ) {

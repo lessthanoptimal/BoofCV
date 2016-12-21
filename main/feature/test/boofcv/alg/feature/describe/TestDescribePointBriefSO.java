@@ -30,6 +30,7 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
@@ -53,7 +54,7 @@ public class TestDescribePointBriefSO {
 	BlurFilter<GrayF32> filterBlur;
 
 	public TestDescribePointBriefSO() {
-		filterBlur = FactoryBlurFilter.gaussian(imageType, -1, 1);
+		filterBlur = FactoryBlurFilter.gaussian(ImageType.single(imageType), -1, 1);
 	}
 
 	protected GrayF32 createImage(int width , int height ) {

@@ -34,15 +34,15 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public abstract class ChecksImplDisparityScoreSadRect<Image extends ImageGray,Disparity extends ImageGray> {
+public abstract class ChecksImplDisparityScoreSadRect<I extends ImageGray<I>, DI extends ImageGray<DI>> {
 
 	Random rand = new Random(234);
 
 	DisparitySelect compDisp;
-	Class<Image> imageType;
-	Class<Disparity> disparityType;
+	Class<I> imageType;
+	Class<DI> disparityType;
 
-	public ChecksImplDisparityScoreSadRect( Class<Image> imageType , Class<Disparity> disparityType ) {
+	public ChecksImplDisparityScoreSadRect(Class<I> imageType , Class<DI> disparityType ) {
 		this.imageType = imageType;
 		this.disparityType = disparityType;
 
@@ -53,7 +53,7 @@ public abstract class ChecksImplDisparityScoreSadRect<Image extends ImageGray,Di
 		}
 	}
 
-	protected abstract DisparityScoreSadRect<Image,Disparity>
+	protected abstract DisparityScoreSadRect<I, DI>
 	createAlg( int minDisparity , int maxDisparity , int radiusX, int radiusY, DisparitySelect compDisp);
 
 	/**
@@ -61,14 +61,14 @@ public abstract class ChecksImplDisparityScoreSadRect<Image extends ImageGray,Di
 	 */
 	@Test
 	public void basicTest() {
-		BasicDisparityTests<Image,Disparity> alg =
-				new BasicDisparityTests<Image,Disparity>(imageType) {
+		BasicDisparityTests<I, DI> alg =
+				new BasicDisparityTests<I, DI>(imageType) {
 
-					DisparityScoreSadRect<Image,Disparity> alg;
+					DisparityScoreSadRect<I, DI> alg;
 
 					@Override
-					public Disparity computeDisparity(Image left, Image right ) {
-						Disparity ret = GeneralizedImageOps.createSingleBand(disparityType, left.width, left.height);
+					public DI computeDisparity(I left, I right ) {
+						DI ret = GeneralizedImageOps.createSingleBand(disparityType, left.width, left.height);
 
 						alg.process(left,right,ret);
 
@@ -95,8 +95,8 @@ public abstract class ChecksImplDisparityScoreSadRect<Image extends ImageGray,Di
 	@Test
 	public void compareToNaive() {
 		int w = 20, h = 25;
-		Image left = GeneralizedImageOps.createSingleBand(imageType,w, h);
-		Image right = GeneralizedImageOps.createSingleBand(imageType,w, h);
+		I left = GeneralizedImageOps.createSingleBand(imageType,w, h);
+		I right = GeneralizedImageOps.createSingleBand(imageType,w, h);
 
 		if( left.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(left, rand, -20, 20);
@@ -114,18 +114,18 @@ public abstract class ChecksImplDisparityScoreSadRect<Image extends ImageGray,Di
 		compareToNaive(left, right, 4, 10, radiusX, radiusY);
 	}
 
-	private void compareToNaive(Image left, Image right,
+	private void compareToNaive(I left, I right,
 								int minDisparity, int maxDisparity,
 								int radiusX, int radiusY)
 	{
 		int w = left.width;
 		int h = left.height;
 
-		DisparityScoreSadRect<Image,Disparity> alg = createAlg(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
-		StereoDisparityWtoNaive<Image> naive =
+		DisparityScoreSadRect<I, DI> alg = createAlg(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
+		StereoDisparityWtoNaive<I> naive =
 				new StereoDisparityWtoNaive<>(minDisparity, maxDisparity, radiusX, radiusY);
 
-		Disparity found = GeneralizedImageOps.createSingleBand(disparityType,w,h);
+		DI found = GeneralizedImageOps.createSingleBand(disparityType,w,h);
 		GrayF32 expected = new GrayF32(w,h);
 
 		alg.process(left,right,found);

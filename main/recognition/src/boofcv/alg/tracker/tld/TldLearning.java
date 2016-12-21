@@ -34,7 +34,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class TldLearning<T extends ImageGray> {
+public class TldLearning<T extends ImageGray<T>> {
 
 	// Random number generator
 	private Random rand;
