@@ -29,7 +29,7 @@ Version : 0.27
   * Kernel2D_I32 -> Kernel2D_S32
   * Kernel2D_I32 -> Kernel2D_S32
 - GConvolveImageOps actual works for all image types now not just gray
-- Changed behavior of ConvertBuffered image
+- ConvertBuffered: Behavior Changes
   * When converting to interleaved and planar images the number of bands is adjusted to match the buffered image
   * Buffered -> BoofCV: output images are reshaped to match input
 - ImageInterleaved
@@ -41,9 +41,8 @@ Version : 0.27
 - TODO image distortion demonstration should use a rendered pattern
 - TODO Fisheye calibration using omni model
 - TODO grid of circle calibration target
-- TODO make sure RANSAC is using the faster method for selecting points.  swapping selected with one at the end
 - TODO Regression: Chessboard image border to fiducial regression
-- TODO Example showing how you can save intrinsic parameters in OpenCV format?
+- TODO Calibration application.  Select output format: BoofCV, OpenCV
 - TODO Tutorial on image features?  Sparse and dense?
 
 ---------------------------------------------
