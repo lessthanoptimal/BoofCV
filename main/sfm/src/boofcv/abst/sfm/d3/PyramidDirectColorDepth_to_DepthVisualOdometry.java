@@ -79,12 +79,15 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageGray<
 		if( paramVisual.skew != 0 )
 			throw new RuntimeException("Removing skew is not yet supported");
 
-		// todo undistortedToDepth transform
 
 		paramAdjusted = paramVisual.createLike();
 
 		adjustImage = LensDistortionOps.imageRemoveDistortion(
 				AdjustmentType.EXPAND, BorderType.ZERO, paramVisual,paramAdjusted,visType);
+
+		// create a transform from undistorted pixels to distorted
+		// TODO transform from pixel in one image into pixel in another
+
 
 		undistorted.reshape(paramVisual.width, paramVisual.height);
 
@@ -98,6 +101,7 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageGray<
 	public boolean process(Planar<T> visual, Depth depth) {
 		sparse3D.setDepthImage(depth);
 		adjustImage.apply(visual, undistorted);
+		// TODO sparsed3D to that depth thingy
 		return alg.process(visual, null);
 	}
 
