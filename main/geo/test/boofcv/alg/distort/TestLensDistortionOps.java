@@ -30,8 +30,7 @@ import georegression.struct.shapes.RectangleLength2D_F32;
 import georegression.struct.shapes.RectangleLength2D_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -42,6 +41,11 @@ public class TestLensDistortionOps {
 	Point2D_F64 pd = new Point2D_F64();
 	int width = 300;
 	int height = 350;
+
+	@Test
+	public void transformChangeModel_F32() {
+		fail("Implement");
+	}
 
 	/**
 	 * Checks the border of the returned transform.  Makes sure that the entire original image is visible.

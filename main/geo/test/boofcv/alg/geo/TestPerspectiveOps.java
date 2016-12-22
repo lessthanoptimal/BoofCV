@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo;
 
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
@@ -59,7 +60,7 @@ public class TestPerspectiveOps {
 		double hfov = 30;
 		double vfov = 35;
 
-		CameraPinholeRadial found = PerspectiveOps.createIntrinsic(640, 480, hfov, vfov);
+		CameraPinhole found = PerspectiveOps.createIntrinsic(640, 480, hfov, vfov);
 
 		assertEquals(UtilAngle.degreeToRadian(hfov),2.0*Math.atan(found.cx/found.fx),1e-6);
 		assertEquals(UtilAngle.degreeToRadian(vfov),2.0*Math.atan(found.cy/found.fy),1e-6);

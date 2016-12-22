@@ -24,6 +24,7 @@ import boofcv.alg.distort.pinhole.PinholeNtoP_F32;
 import boofcv.alg.distort.pinhole.PinholeNtoP_F64;
 import boofcv.alg.distort.pinhole.PinholePtoN_F32;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -58,8 +59,8 @@ public class PerspectiveOps {
 	 * @param vfov Vertical FOV in degrees
 	 * @return guess camera parameters
 	 */
-	public static CameraPinholeRadial createIntrinsic(int width, int height, double hfov, double vfov) {
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial();
+	public static CameraPinhole createIntrinsic(int width, int height, double hfov, double vfov) {
+		CameraPinhole intrinsic = new CameraPinhole();
 		intrinsic.width = width;
 		intrinsic.height = height;
 		intrinsic.cx = width / 2;
@@ -124,12 +125,12 @@ public class PerspectiveOps {
 	 * @param adjustedParam (Output) Optional storage for adjusted intrinsic parameters. Can be null.
 	 * @return Adjusted intrinsic parameters.
 	 */
-	public static CameraPinholeRadial adjustIntrinsic(CameraPinholeRadial parameters,
-													  DenseMatrix64F adjustMatrix,
-													  CameraPinholeRadial adjustedParam)
+	public static <C extends CameraPinhole>C adjustIntrinsic(C parameters,
+															 DenseMatrix64F adjustMatrix,
+															 C adjustedParam)
 	{
 		if( adjustedParam == null )
-			adjustedParam = new CameraPinholeRadial();
+			adjustedParam = parameters.createLike();
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(parameters, null);
 		DenseMatrix64F K_adj = new DenseMatrix64F(3,3);
@@ -162,7 +163,7 @@ public class PerspectiveOps {
 	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
-	public static DenseMatrix64F calibrationMatrix(CameraPinholeRadial param , DenseMatrix64F K ) {
+	public static DenseMatrix64F calibrationMatrix(CameraPinhole param , DenseMatrix64F K ) {
 
 		if( K == null ) {
 			K = new DenseMatrix64F(3,3);
@@ -186,13 +187,12 @@ public class PerspectiveOps {
 	 * @param width Image width in pixels
 	 * @param height Image height in pixels
 	 * @param param Where the intrinsic parameter are written to.  If null then a new instance is declared.
-	 * @return IntrinsicParameters structure.
+	 * @return camera parameters
 	 */
-	public static CameraPinholeRadial matrixToParam(DenseMatrix64F K , int width , int height ,
-													CameraPinholeRadial param ) {
+	public static <C extends CameraPinhole>C matrixToParam(DenseMatrix64F K , int width , int height , C param ) {
 
 		if( param == null )
-			param = new CameraPinholeRadial();
+			param = (C)new CameraPinhole();
 
 		param.fx = K.get(0,0);
 		param.fy = K.get(1,1);

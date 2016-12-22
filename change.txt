@@ -36,6 +36,12 @@ Version : 0.27
   * Added a nicely formatted toString()
 - BlurImageOps - Fixed bug where for planar imges it was apply a median instead of mean filter
 - FactoryBlurFilter - Can now handle image types other than gray scale images
+- LensDistortionOps
+  * New function which lets you re-render an image with an arbitrary camera model
+  * Removed the imageRemoveDistortion() and relation functions since the new function is better.  TODO
+- Demonstrations
+  * Added RenderSyntheticCamerModelApp which shows you the effects of re-rendering the camera model
+  * Removed ShowLensDistoriton since it is now redundant
 
 - TODO remove skew from camera calibration and radial distortion
 - TODO image distortion demonstration should use a rendered pattern

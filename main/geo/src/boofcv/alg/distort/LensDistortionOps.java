@@ -26,6 +26,8 @@ import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.calib.CameraModel;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.*;
 import boofcv.struct.image.ImageBase;
@@ -41,6 +43,44 @@ import org.ejml.ops.CommonOps;
  * @author Peter Abeles
  */
 public class LensDistortionOps {
+
+	/**
+	 * Creates a distortion for modifying the input image from one camera model into another camera model.  If
+	 * requested the camera model can be further modified to ensure certain visibility requirements are meet
+	 * and the adjusted camera model will be returned.
+	 * @param type How it should modify the image model to ensure visibility of pixels.
+	 * @param borderType How the image border is handled
+	 * @param original The original camera model
+	 * @param desired The desired camera model
+	 * @param modified (Optional) The desired camera model after being rescaled.  Can be null.
+	 * @param imageType Type of image.
+	 * @return Image distortion from original camera model to the modified one.
+	 */
+	public static <T extends ImageBase<T>,O extends CameraPinhole, D extends CameraPinhole>
+	ImageDistort<T,T> changeCameraModel(AdjustmentType type, BorderType borderType,
+										O original,
+										D desired,
+										D modified,
+										ImageType<T> imageType)
+	{
+		Class bandType = imageType.getImageClass();
+		boolean skip = borderType == BorderType.SKIP;
+
+		// it has to process the border at some point, so if skip is requested just skip stuff truly outside the image
+		if( skip )
+			borderType = BorderType.EXTENDED;
+
+		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255, InterpolationType.BILINEAR,borderType, bandType);
+
+		Point2Transform2_F32 undistToDist = transformChangeModel_F32(type, original, desired, true, modified);
+
+		ImageDistort<T,T> distort = FactoryDistort.distort(true, interp, imageType);
+
+		distort.setModel(new PointToPixelTransform_F32(undistToDist));
+		distort.setRenderAll(!skip );
+
+		return distort;
+	}
 
 	/**
 	 * <p>
@@ -149,11 +189,91 @@ public class LensDistortionOps {
 	}
 
 	/**
+	 * Creates a {@link Point2Transform2_F32} for converting pixels from original camera model into a new synthetic
+	 * model.  The scaling of the image can be adjusted to ensure certain visibility requirements.
+	 *
+	 * @param type The type of adjustment it will apply to the transform
+	 * @param paramOriginal Camera model for the current image
+	 * @param paramDesired Desired camera model for the distorted image
+	 * @param desiredToOriginal If true then the transform's input is assumed to be pixels in the desired
+	 *                       image and the output will be in original image, if false then the reverse transform
+	 *                       is returned.
+	 * @param paramMod The modified camera model to meet the requested visibility requirements.  Null if you don't want it.
+	 * @return The requested transform
+	 */
+	public static <O extends CameraPinhole, D extends CameraPinhole>
+	Point2Transform2_F32 transformChangeModel_F32(AdjustmentType type,
+												  O paramOriginal,
+												  D paramDesired,
+												  boolean desiredToOriginal,
+												  D paramMod)
+	{
+		LensDistortionNarrowFOV original = LensDistortionOps.transformPoint(paramOriginal);
+		LensDistortionNarrowFOV desired = LensDistortionOps.transformPoint(paramDesired);
+
+		Point2Transform2_F32 ori_p_to_n = original.undistort_F32(true, false);
+		Point2Transform2_F32 des_n_to_p = desired.distort_F32(false, true);
+
+		Point2Transform2_F32 ori_to_des = new SequencePoint2Transform2_F32(ori_p_to_n,des_n_to_p);
+
+		RectangleLength2D_F32 bound;
+		if( type == AdjustmentType.FULL_VIEW ) {
+			bound = DistortImageOps.boundBox_F32(paramOriginal.width, paramOriginal.height, new PointToPixelTransform_F32(ori_to_des));
+		} else if( type == AdjustmentType.EXPAND) {
+			bound = LensDistortionOps.boundBoxInside(paramOriginal.width, paramOriginal.height, new PointToPixelTransform_F32(ori_to_des));
+
+			// ensure there are no strips of black
+			LensDistortionOps.roundInside(bound);
+		} else if( type == AdjustmentType.NONE ) {
+			bound = new RectangleLength2D_F32(0,0,paramDesired.width, paramDesired.height);
+		} else {
+			throw new IllegalArgumentException("Unsupported type "+type);
+		}
+
+		double scaleX = bound.width/paramDesired.width;
+		double scaleY = bound.height/paramDesired.height;
+
+		double scale;
+
+		if( type == AdjustmentType.FULL_VIEW ) {
+			scale = Math.max(scaleX, scaleY);
+		} else if( type == AdjustmentType.EXPAND) {
+			scale = Math.min(scaleX, scaleY);
+		} else {
+			scale = 1.0;
+		}
+
+		double deltaX = bound.x0 + (scaleX-scale)*paramDesired.width/2.0;
+		double deltaY = bound.y0 + (scaleY-scale)*paramDesired.height/2.0;
+
+		// adjustment matrix
+		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
+		DenseMatrix64F A_inv = new DenseMatrix64F(3, 3);
+		if (!CommonOps.invert(A, A_inv)) {
+			throw new RuntimeException("Failed to invert adjustment matrix.  Probably bad.");
+		}
+
+		if( paramMod != null ) {
+			PerspectiveOps.adjustIntrinsic(paramDesired, A_inv, paramMod);
+		}
+
+		if( desiredToOriginal ) {
+			Point2Transform2_F32 des_p_to_n = desired.undistort_F32(true, false);
+			Point2Transform2_F32 ori_n_to_p = original.distort_F32(false, true);
+			PointTransformHomography_F32 adjust = new PointTransformHomography_F32(A);
+			return new SequencePoint2Transform2_F32(adjust,des_p_to_n,ori_n_to_p);
+		} else {
+			PointTransformHomography_F32 adjust = new PointTransformHomography_F32(A_inv);
+			return new SequencePoint2Transform2_F32(ori_to_des, adjust);
+		}
+	}
+
+	/**
 	 * Given the lens distortion and the intrinsic adjustment matrix compute the new intrinsic parameters
 	 * and {@link Point2Transform2_F32}
 	 */
 	private static Point2Transform2_F32 adjustmentTransform_F32(CameraPinholeRadial param,
-																CameraPinholeRadial paramAdj,
+																CameraPinhole paramAdj,
 																boolean undistToDist,
 																Point2Transform2_F32 remove_p_to_p,
 																DenseMatrix64F A) {
@@ -282,11 +402,21 @@ public class LensDistortionOps {
 	 * </p>
 	 *
 	 */
-	public static LensDistortionNarrowFOV transformPoint(CameraPinholeRadial param) {
-		if( param.isDistorted())
-			return new LensDistortionRadialTangential(param);
-		else
-			return new LensDistortionPinhole(param);
+	public static LensDistortionNarrowFOV transformPoint(CameraModel param) {
+		if( param instanceof CameraPinholeRadial ) {
+			CameraPinholeRadial c = (CameraPinholeRadial)param;
+
+			if (c.isDistorted())
+				return new LensDistortionRadialTangential(c);
+			else
+				return new LensDistortionPinhole(c);
+		} else if( param instanceof CameraPinhole ) {
+			CameraPinhole c = (CameraPinhole)param;
+
+			return new LensDistortionPinhole(c);
+		} else {
+			throw new IllegalArgumentException("Unknown camera model "+param.getClass().getSimpleName());
+		}
 	}
 
 	/**

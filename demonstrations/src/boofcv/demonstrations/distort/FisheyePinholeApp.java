@@ -72,7 +72,7 @@ import java.util.List;
 // TODO Show which calibration file is being used
 	// TODO when a file is opened look for a calibration file
 public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase<T>
-	implements PinholePanel.Listener
+	implements PinholeSimplifiedPanel.Listener
 {
 
 	NarrowToWidePtoP_F32 distorter = new NarrowToWidePtoP_F32();
@@ -117,7 +117,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 		buffPinhole = new BufferedImage(camWidth,camHeight,BufferedImage.TYPE_INT_BGR);
 		panelPinhole.setPreferredSize( new Dimension(camWidth,camHeight));
 		panelPinhole.setBufferedImage(buffFisheye);
-		final PinholePanel controlPinhole = new PinholePanel(camWidth,camHeight,hfov,this);
+		final PinholeSimplifiedPanel controlPinhole = new PinholeSimplifiedPanel(camWidth,camHeight,hfov,this);
 
 		MouseAdapter adapter = new MouseAdapter() {
 			@Override

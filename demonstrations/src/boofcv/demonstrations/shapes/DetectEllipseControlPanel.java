@@ -24,10 +24,8 @@ import boofcv.gui.StandardAlgConfigPanel;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
 
 /**
  * @author Peter Abeles
@@ -89,28 +87,16 @@ public class DetectEllipseControlPanel extends StandardAlgConfigPanel
 		threshold = new ThresholdControlPanel(owner);
 
 
-		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(config.minimumContour,0,50000,20));
-		spinnerMinContourSize.addChangeListener(this);
-		spinnerMinContourSize.setMaximumSize(spinnerMinContourSize.getPreferredSize());
-		spinnerMaxContourSize = new JSpinner(new SpinnerNumberModel(config.maximumContour,0,50000,20));
-		spinnerMaxContourSize.addChangeListener(this);
-		spinnerMaxContourSize.setMaximumSize(spinnerMaxContourSize.getPreferredSize());
+		spinnerMinContourSize = spinner(config.minimumContour,0,50000,20);
+		spinnerMaxContourSize = spinner(config.maximumContour,0,50000,20);
 
-		spinnerMinEdge = new JSpinner(new SpinnerNumberModel(config.minimumEdgeIntensity,0.0,255.0,1.0));
-		spinnerMinEdge.setMaximumSize(spinnerMinEdge.getPreferredSize());
-		spinnerMinEdge.addChangeListener(this);
+		spinnerMinEdge = spinner(config.minimumEdgeIntensity,0.0,255.0,1.0);
 
-		spinnerConvergeTol = new JSpinner(new SpinnerNumberModel(config.convergenceTol,0.0,1.0,0.001));
-		configureSpinnerFloat(spinnerConvergeTol);
-		spinnerMaxIterations = new JSpinner(new SpinnerNumberModel(config.maxIterations,0,200,2));
-		spinnerMaxIterations.addChangeListener(this);
-		spinnerMaxIterations.setMaximumSize(spinnerMaxIterations.getPreferredSize());
-		spinnerNumSample = new JSpinner(new SpinnerNumberModel(config.numSampleContour,1,200,2));
-		spinnerNumSample.addChangeListener(this);
-		spinnerNumSample.setMaximumSize(spinnerNumSample.getPreferredSize());
-		spinnerRadiusSample = new JSpinner(new SpinnerNumberModel(config.refineRadialSamples, 1, 5, 1));
-		spinnerRadiusSample.addChangeListener(this);
-		spinnerRadiusSample.setMaximumSize(spinnerRadiusSample.getPreferredSize());
+		spinnerConvergeTol = spinner(config.convergenceTol,0.0,1.0,0.001);
+		configureSpinnerFloat(spinnerConvergeTol, 1, 3);
+		spinnerMaxIterations = spinner(config.maxIterations,0,200,2);
+		spinnerNumSample = spinner(config.numSampleContour,1,200,2);
+		spinnerRadiusSample = spinner(config.refineRadialSamples, 1, 5, 1);
 
 		addLabeled(imageView, "View: ", this);
 		addLabeled(selectZoom,"Zoom",this);
@@ -127,19 +113,6 @@ public class DetectEllipseControlPanel extends StandardAlgConfigPanel
 		addLabeled(spinnerNumSample, "Contour Samples: ", this);
 		addLabeled(spinnerRadiusSample, "Radius Samples: ", this);
 		addVerticalGlue(this);
-	}
-
-	private void configureSpinnerFloat( JSpinner spinner ) {
-		JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinner.getEditor();
-		DecimalFormat format = editor.getFormat();
-		format.setMinimumFractionDigits(3);
-		format.setMinimumIntegerDigits(1);
-		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
-		Dimension d = spinner.getPreferredSize();
-		d.width = 60;
-		spinner.setPreferredSize(d);
-		spinner.addChangeListener(this);
-		spinner.setMaximumSize(d);
 	}
 
 	@Override

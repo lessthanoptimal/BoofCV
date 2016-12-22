@@ -116,6 +116,8 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 
 		Dimension panelD = panel.getPreferredSize();
 
+		final boolean sizeChanged = bodyWidth != panelD.width || bodyHeight != panelD.height;
+
 		// make the preferred size large enough to hold all the images
 		bodyWidth = (int)Math.max(bodyWidth, panelD.getWidth());
 		bodyHeight = (int)Math.max(bodyHeight,panelD.getHeight());
@@ -132,10 +134,12 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 				listPanel.setPreferredSize(new Dimension(d.width + scroll.getVerticalScrollBar().getWidth(), d.height));
 
 				// make sure it's preferred size is up to date
-				Component old = ((BorderLayout) bodyPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
-				if (old != null)
-					old.setPreferredSize(new Dimension(bodyWidth, bodyHeight));
-
+				if( sizeChanged ) {
+					Component old = ((BorderLayout) bodyPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
+					if (old != null) {
+						old.setPreferredSize(new Dimension(bodyWidth, bodyHeight));
+					}
+				}
 				validate();
 			}
 		});

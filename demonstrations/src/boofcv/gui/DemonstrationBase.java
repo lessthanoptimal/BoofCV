@@ -81,6 +81,16 @@ public abstract class DemonstrationBase<T extends ImageBase<T>> extends JPanel {
 	protected boolean allowVideos = true;
 	protected boolean allowWebcameras = true;
 
+	public DemonstrationBase(boolean allowWebcameras, List<?> exampleInputs, ImageType<T> imageType) {
+		super(new BorderLayout());
+		this.allowWebcameras = allowWebcameras;
+		createMenuBar(exampleInputs);
+
+		this.input = imageType.createImage(1,1);
+		this.imageType = imageType;
+		this.boofCopy1 = imageType.createImage(1,1);
+	}
+
 	/**
 	 * Constructor that specifies examples and input image type
 	 *
@@ -88,12 +98,7 @@ public abstract class DemonstrationBase<T extends ImageBase<T>> extends JPanel {
 	 * @param imageType Type of image it's processing
 	 */
 	public DemonstrationBase(List<?> exampleInputs, ImageType<T> imageType) {
-		super(new BorderLayout());
-		createMenuBar(exampleInputs);
-
-		this.input = imageType.createImage(1,1);
-		this.imageType = imageType;
-		this.boofCopy1 = imageType.createImage(1,1);
+		this(true,exampleInputs,imageType);
 	}
 
 	private void createMenuBar(List<?> exampleInputs) {
@@ -108,17 +113,20 @@ public abstract class DemonstrationBase<T extends ImageBase<T>> extends JPanel {
 		menuFile.addActionListener(listener);
 		menuFile.setAccelerator(KeyStroke.getKeyStroke(
 				KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-		menuWebcam = new JMenuItem("Open Webcam", KeyEvent.VK_W);
-		menuWebcam.addActionListener(listener);
-		menuWebcam.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_W, ActionEvent.CTRL_MASK));
+		if( allowWebcameras ) {
+			menuWebcam = new JMenuItem("Open Webcam", KeyEvent.VK_W);
+			menuWebcam.addActionListener(listener);
+			menuWebcam.setAccelerator(KeyStroke.getKeyStroke(
+					KeyEvent.VK_W, ActionEvent.CTRL_MASK));
+		}
 		menuQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
 		menuQuit.addActionListener(listener);
 		menuQuit.setAccelerator(KeyStroke.getKeyStroke(
 				KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
 
 		menu.add(menuFile);
-		menu.add(menuWebcam);
+		if( allowWebcameras )
+			menu.add(menuWebcam);
 		menu.addSeparator();
 		menu.add(menuQuit);
 

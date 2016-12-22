@@ -49,6 +49,10 @@ public class CameraPinholeRadial extends CameraPinhole implements Serializable {
 	public CameraPinholeRadial() {
 	}
 
+	public CameraPinholeRadial( int numRadial ) {
+		radial = new double[numRadial];
+	}
+
 	public CameraPinholeRadial(CameraPinholeRadial param ) {
 		set(param);
 	}

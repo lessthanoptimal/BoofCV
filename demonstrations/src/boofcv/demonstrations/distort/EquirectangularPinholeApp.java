@@ -63,7 +63,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class EquirectangularPinholeApp<T extends ImageBase<T>> extends DemonstrationBase<T>
-	implements PinholePanel.Listener
+	implements PinholeSimplifiedPanel.Listener
 {
 
 	PinholeToEquirectangular_F32 distorter = new PinholeToEquirectangular_F32();
@@ -183,7 +183,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 
 		JPanel controlPanel = new JPanel();
 		controlPanel.setLayout(new BoxLayout(controlPanel,BoxLayout.Y_AXIS));
-		PinholePanel controlPinhole = new PinholePanel(camWidth,camHeight,hfov,this);
+		PinholeSimplifiedPanel controlPinhole = new PinholeSimplifiedPanel(camWidth,camHeight,hfov,this);
 		controlPanel.add( controlPinhole );
 
 		add(controlPanel, BorderLayout.WEST );
