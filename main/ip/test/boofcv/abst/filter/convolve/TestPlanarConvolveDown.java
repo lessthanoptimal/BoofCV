@@ -18,16 +18,48 @@
 
 package boofcv.abst.filter.convolve;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.border.BorderType;
+import boofcv.factory.filter.convolve.FactoryConvolveDown;
+import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.struct.convolve.Kernel1D_S32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
 public class TestPlanarConvolveDown {
+
+	Random rand = new Random(234);
+
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void compareToSingleBand() {
+		Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian1D(GrayU8.class, -1, 3);
+		ConvolveDown<GrayU8,GrayU8> downU8 = FactoryConvolveDown.convolveSB(
+				kernel, BorderType.NORMALIZED, true,2, GrayU8.class, GrayU8.class);
+
+		Planar<GrayU8> original = new Planar<>(GrayU8.class,20,30,3);
+		Planar<GrayU8> found = new Planar<>(GrayU8.class,10,30,3);
+
+		GImageMiscOps.fillUniform(original, rand, 0, 100);
+
+		GrayU8[] expected = new GrayU8[original.getNumBands()];
+		for (int i = 0; i < expected.length; i++) {
+			expected[i] = new GrayU8(found.width, found.height);
+
+			downU8.process(original.getBand(i), expected[i]);
+		}
+
+		PlanarConvolveDown<GrayU8,GrayU8> alg = new PlanarConvolveDown<>(downU8, original.getNumBands());
+
+		alg.process(original,found);
+		for (int i = 0; i < expected.length; i++) {
+			BoofTesting.assertEquals(expected[i], found.getBand(i), 1e-4);
+		}
 	}
 }
