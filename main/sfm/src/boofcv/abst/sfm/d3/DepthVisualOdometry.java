@@ -23,7 +23,7 @@ package boofcv.abst.sfm.d3;
  */
 
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -70,7 +70,7 @@ public interface DepthVisualOdometry<Vis extends ImageBase<Vis>, Depth extends I
 	 * @param paramVisual Intrinsic parameters for visual camera
 	 * @param visToDepth Transform from visual camera pixels into depth camera pixels
 	 */
-	public void setCalibration(CameraPinholeRadial paramVisual , PixelTransform2_F32 visToDepth );
+	void setCalibration(CameraPinholeRadial paramVisual , Point2Transform2_F32 visToDepth );
 
 	/**
 	 * Process the new image and update the motion estimate.  The return value must be checked
@@ -81,20 +81,20 @@ public interface DepthVisualOdometry<Vis extends ImageBase<Vis>, Depth extends I
 	 * @param depth Image from depth sensor
 	 * @return true if the motion estimate has been updated and false if not
 	 */
-	public boolean process(Vis visual , Depth depth );
+	boolean process(Vis visual , Depth depth );
 
 	/**
 	 * Type of visual images it can process.
 	 *
 	 * @return The image type
 	 */
-	public ImageType<Vis> getVisualType();
+	ImageType<Vis> getVisualType();
 
 	/**
 	 * Type of depth images it can process.
 	 *
 	 * @return The image type
 	 */
-	public Class<Depth> getDepthType();
+	Class<Depth> getDepthType();
 
 }

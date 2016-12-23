@@ -19,6 +19,7 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -43,42 +44,146 @@ public class TestLensDistortionOps {
 	int width = 300;
 	int height = 350;
 
+	@Test
+	public void transformChangeModel_F32_NONE_modified() {
+		// distorted pixel in original image
+		float pixelX = 12.5f,pixelY = height-3;
+
+		CameraPinholeRadial orig = new CameraPinholeRadial().
+				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
+		CameraPinhole desired = new CameraPinhole(orig);
+
+		Point2Transform2_F32 distToNorm = LensDistortionOps.narrow(orig).undistort_F32(true, false);
+
+		Point2D_F32 norm = new Point2D_F32();
+		distToNorm.compute(pixelX, pixelY, norm);
+
+		CameraPinholeRadial adjusted = new CameraPinholeRadial();
+		Point2Transform2_F32 distToAdj = LensDistortionOps.
+				transformChangeModel_F32(AdjustmentType.NONE, orig, desired, false, adjusted);
+
+		Point2D_F32 adjPixel = new Point2D_F32();
+		Point2D_F32 normFound = new Point2D_F32();
+		distToAdj.compute(pixelX,pixelY,adjPixel);
+
+		PerspectiveOps.convertPixelToNorm(adjusted, adjPixel, normFound);
+
+		// see if the normalized image coordinates are the same
+		assertEquals(norm.x, normFound.x,1e-3);
+		assertEquals(norm.y, normFound.y, 1e-3);
+	}
+
 	/**
 	 * Checks the border of the returned transform.  Makes sure that the entire original image is visible.
 	 * Also makes sure that the requested inverse transform is actually the inverse.
 	 */
 	@Test
-	public void transform_F32_fullView() {
+	public void transformChangeModel_F32_FULLVIEW() {
 		CameraPinholeRadial param = new CameraPinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
+		CameraPinhole desired = new CameraPinhole(param);
 
-		Point2Transform2_F32 adjToDist = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, true);
-		Point2Transform2_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, false);
+		Point2Transform2_F32 adjToDist = LensDistortionOps.transformChangeModel_F32(
+				AdjustmentType.FULL_VIEW, param, desired, true, null);
+		Point2Transform2_F32 distToAdj = LensDistortionOps.transformChangeModel_F32(
+				AdjustmentType.FULL_VIEW, param, desired, false, null);
 
 		checkBorderOutside(adjToDist,distToAdj);
 
 		param = new CameraPinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-0.05);
-		adjToDist = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, true);
-		distToAdj = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, false);
+		desired = new CameraPinhole(param);
+		adjToDist = LensDistortionOps.transformChangeModel_F32(AdjustmentType.FULL_VIEW, param,desired, true, null);
+		distToAdj = LensDistortionOps.transformChangeModel_F32(AdjustmentType.FULL_VIEW, param,desired, false, null);
 		checkBorderOutside(adjToDist,distToAdj);
 	}
 
+	/**
+	 * Checks to see if the returned modified model is correct
+	 */
 	@Test
-	public void transform_F64_fullView() {
-		CameraPinholeRadial param = new CameraPinholeRadial().
+	public void transformChangeModel_F32_FULLVIEW_modified() {
+		// distorted pixel in original image
+		float pixelX = 12.5f,pixelY = height-3;
+
+		CameraPinholeRadial orig = new CameraPinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
+		CameraPinhole desired = new CameraPinhole(orig);
 
-		Point2Transform2_F64 adjToDist = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, param, null, true);
-		Point2Transform2_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, param, null, false);
+		Point2Transform2_F32 distToNorm = LensDistortionOps.narrow(orig).undistort_F32(true, false);
 
-		checkBorderOutside(adjToDist,distToAdj);
+		Point2D_F32 norm = new Point2D_F32();
+		distToNorm.compute(pixelX, pixelY, norm);
 
-		param = new CameraPinholeRadial().
-				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-0.05);
-		adjToDist = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, param, null, true);
-		distToAdj = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, param, null, false);
-		checkBorderOutside(adjToDist,distToAdj);
+		CameraPinholeRadial adjusted = new CameraPinholeRadial();
+		Point2Transform2_F32 distToAdj = LensDistortionOps.
+				transformChangeModel_F32(AdjustmentType.FULL_VIEW, orig, desired, false, adjusted);
+
+		Point2D_F32 adjPixel = new Point2D_F32();
+		Point2D_F32 normFound = new Point2D_F32();
+		distToAdj.compute(pixelX,pixelY,adjPixel);
+
+		PerspectiveOps.convertPixelToNorm(adjusted, adjPixel, normFound);
+
+		// see if the normalized image coordinates are the same
+		assertEquals(norm.x, normFound.x,1e-3);
+		assertEquals(norm.y, normFound.y, 1e-3);
+	}
+
+	/**
+	 * Checks the border of the returned transform.  Makes sure that no none-visible portion is visible.
+	 * Also makes sure that the requested inverse transform is actually the inverse.
+	 */
+	@Test
+	public void transformChangeModel_F32_EXPAND() {
+		CameraPinholeRadial param =
+				new CameraPinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 1e-4);
+		CameraPinhole desired = new CameraPinhole(param);
+
+		Point2Transform2_F32 adjToDist = LensDistortionOps.transformChangeModel_F32(AdjustmentType.EXPAND, param,desired, true, null);
+		Point2Transform2_F32 distToAdj = LensDistortionOps.transformChangeModel_F32(AdjustmentType.EXPAND, param,desired, false, null);
+		checkInside(adjToDist, distToAdj);
+
+		// distort it in the other direction
+		param = new CameraPinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-1e-4);
+
+		adjToDist = LensDistortionOps.transformChangeModel_F32(AdjustmentType.EXPAND, param, desired, true, null);
+		distToAdj = LensDistortionOps.transformChangeModel_F32(AdjustmentType.EXPAND, param, desired, false, null);
+
+		checkInside(adjToDist, distToAdj);
+	}
+
+	/**
+	 * Sees if the adjusted intrinsic parameters is correct but computing normalized image coordinates first
+	 * with the original distorted image and then with the adjusted undistorted image.
+	 */
+	@Test
+	public void transformChangeModel_F32_EXPAND_modified() {
+
+		// distorted pixel in original image
+		float pixelX = 12.5f,pixelY = height-3;
+
+		CameraPinholeRadial orig = new CameraPinholeRadial().
+				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
+		CameraPinhole desired = new CameraPinhole(orig);
+
+		Point2Transform2_F32 distToNorm = LensDistortionOps.narrow(orig).undistort_F32(true, false);
+
+		Point2D_F32 norm = new Point2D_F32();
+		distToNorm.compute(pixelX, pixelY, norm);
+
+		CameraPinholeRadial adjusted = new CameraPinholeRadial();
+		Point2Transform2_F32 distToAdj = LensDistortionOps.transformChangeModel_F32(AdjustmentType.EXPAND, orig, desired, false, adjusted);
+
+		Point2D_F32 adjPixel = new Point2D_F32();
+		Point2D_F32 normFound = new Point2D_F32();
+		distToAdj.compute(pixelX,pixelY,adjPixel);
+
+		PerspectiveOps.convertPixelToNorm(adjusted, adjPixel, normFound);
+
+		// see if the normalized image coordinates are the same
+		assertEquals(norm.x, normFound.x, 1e-3);
+		assertEquals(norm.y, normFound.y, 1e-3);
 	}
 
 	private void checkBorderOutside(Point2Transform2_F32 tran, Point2Transform2_F32 tranInv) {
@@ -135,106 +240,6 @@ public class TestLensDistortionOps {
 
 		assertEquals(pd.x,x, 0.001);
 		assertEquals(pd.y,y, 0.001);
-	}
-
-	/**
-	 * Sees if the adjusted intrinsic parameters is correct
-	 */
-	@Test
-	public void transform_F32_fullView_intrinsic() {
-
-		// distorted pixel in original image
-		float pixelX = 12.5f,pixelY = height-3;
-
-		CameraPinholeRadial orig = new CameraPinholeRadial().
-				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
-
-		Point2Transform2_F32 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F32(true, false);
-
-		Point2D_F32 norm = new Point2D_F32();
-		distToNorm.compute(pixelX, pixelY, norm);
-
-		CameraPinholeRadial adjusted = new CameraPinholeRadial();
-		Point2Transform2_F32 distToAdj = LensDistortionOps.
-				transform_F32(AdjustmentType.FULL_VIEW, orig, adjusted, false);
-
-		Point2D_F32 adjPixel = new Point2D_F32();
-		Point2D_F32 normFound = new Point2D_F32();
-		distToAdj.compute(pixelX,pixelY,adjPixel);
-
-		PerspectiveOps.convertPixelToNorm(adjusted, adjPixel, normFound);
-
-		// see if the normalized image coordinates are the same
-		assertEquals(norm.x, normFound.x,1e-3);
-		assertEquals(norm.y, normFound.y, 1e-3);
-	}
-
-	@Test
-	public void transform_F64_fullView_intrinsic() {
-
-		// distorted pixel in original image
-		double pixelX = 12.5,pixelY = height-3;
-
-		CameraPinholeRadial orig = new CameraPinholeRadial().
-				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
-
-		Point2Transform2_F64 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F64(true, false);
-
-		Point2D_F64 norm = new Point2D_F64();
-		distToNorm.compute(pixelX, pixelY, norm);
-
-		CameraPinholeRadial adjusted = new CameraPinholeRadial();
-		Point2Transform2_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, orig, adjusted, false);
-
-		Point2D_F64 adjPixel = new Point2D_F64();
-		Point2D_F64 normFound = new Point2D_F64();
-		distToAdj.compute(pixelX,pixelY,adjPixel);
-
-		PerspectiveOps.convertPixelToNorm(adjusted, adjPixel, normFound);
-
-		// see if the normalized image coordinates are the same
-		assertEquals(norm.x, normFound.x, 1e-6);
-		assertEquals(norm.y, normFound.y, 1e-6);
-	}
-
-	/**
-	 * Checks the border of the returned transform.  Makes sure that no none-visible portion is visible.
-	 * Also makes sure that the requested inverse transform is actually the inverse.
-	 */
-	@Test
-	public void transform_F32_shrink() {
-		CameraPinholeRadial param =
-				new CameraPinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 1e-4);
-
-		Point2Transform2_F32 adjToDist = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, true);
-		Point2Transform2_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, false);
-		checkInside(adjToDist, distToAdj);
-
-		// distort it in the other direction
-		param = new CameraPinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-1e-4);
-
-		adjToDist = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, true);
-		distToAdj = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, false);
-
-		checkInside(adjToDist, distToAdj);
-	}
-
-	@Test
-	public void transform_F64_shrink() {
-		CameraPinholeRadial param =
-				new CameraPinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 1e-4);
-
-		Point2Transform2_F64 adjToDist = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, true);
-		Point2Transform2_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, false);
-		checkInside(adjToDist, distToAdj);
-
-		// distort it in the other direction
-		param = new CameraPinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-1e-4);
-
-		adjToDist = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, true);
-		distToAdj = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, false);
-
-		checkInside(adjToDist, distToAdj);
 	}
 
 	private void checkInside(Point2Transform2_F32 tran, Point2Transform2_F32 tranInv ) {
@@ -354,71 +359,6 @@ public class TestLensDistortionOps {
 
 		return min;
 	}
-
-	/**
-	 * Sees if the adjusted intrinsic parameters is correct but computing normalized image coordinates first
-	 * with the original distorted image and then with the adjusted undistorted image.
-	 */
-	@Test
-	public void transform_F32_shrink_intrinsic() {
-
-		// distorted pixel in original image
-		float pixelX = 12.5f,pixelY = height-3;
-
-		CameraPinholeRadial orig = new CameraPinholeRadial().
-				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
-
-		Point2Transform2_F32 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F32(true, false);
-
-		Point2D_F32 norm = new Point2D_F32();
-		distToNorm.compute(pixelX, pixelY, norm);
-
-		CameraPinholeRadial adjusted = new CameraPinholeRadial();
-		Point2Transform2_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, orig, adjusted, false);
-
-		Point2D_F32 adjPixel = new Point2D_F32();
-		Point2D_F32 normFound = new Point2D_F32();
-		distToAdj.compute(pixelX,pixelY,adjPixel);
-
-		PerspectiveOps.convertPixelToNorm(adjusted, adjPixel, normFound);
-
-		// see if the normalized image coordinates are the same
-		assertEquals(norm.x, normFound.x, 1e-3);
-		assertEquals(norm.y, normFound.y, 1e-3);
-	}
-
-	/**
-	 * Sees if the adjusted intrinsic parameters is correct but computing normalized image coordinates first
-	 * with the original distorted image and then with the adjusted undistorted image.
-	 */
-	@Test
-	public void transform_F64_shrink_intrinsic() {
-
-		// distorted pixel in original image
-		double pixelX = 12.5,pixelY = height-3;
-
-		CameraPinholeRadial orig = new CameraPinholeRadial().
-				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
-
-		Point2Transform2_F64 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F64(true, false);
-
-		Point2D_F64 norm = new Point2D_F64();
-		distToNorm.compute(pixelX, pixelY, norm);
-
-		CameraPinholeRadial adjusted = new CameraPinholeRadial();
-		Point2Transform2_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, orig, adjusted, false);
-
-		Point2D_F64 adjPixel = new Point2D_F64();
-		Point2D_F64 normFound = new Point2D_F64();
-		distToAdj.compute(pixelX,pixelY,adjPixel);
-
-		PerspectiveOps.convertPixelToNorm(adjusted, adjPixel, normFound);
-
-		// see if the normalized image coordinates are the same
-		assertEquals(norm.x, normFound.x, 1e-6);
-		assertEquals(norm.y, normFound.y, 1e-6);
-	}
-
 
 	@Test
 	public void boundBoxInside_F32() {

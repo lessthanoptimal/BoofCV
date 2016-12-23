@@ -20,7 +20,9 @@ package boofcv.gui;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.text.DecimalFormat;
 
 /**
  * Common base class for panels used for configuring the algorithms.
@@ -32,6 +34,32 @@ public class StandardAlgConfigPanel extends JPanel {
 	public StandardAlgConfigPanel() {
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+	}
+
+	protected JSpinner spinner(int initial , int minimum , int maximum, int stepSize ) {
+		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
+		spinner.setMaximumSize(spinner.getPreferredSize());
+		spinner.addChangeListener((ChangeListener)this);
+		return spinner;
+	}
+
+	protected JSpinner spinner( double initial , double minimum , double maximum, double stepSize ) {
+		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
+		spinner.setMaximumSize(spinner.getPreferredSize());
+		spinner.addChangeListener((ChangeListener)this);
+		return spinner;
+	}
+
+	protected void configureSpinnerFloat(JSpinner spinner, int integerDigits, int fractionDigits) {
+		JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinner.getEditor();
+		DecimalFormat format = editor.getFormat();
+		format.setMinimumFractionDigits(fractionDigits);
+		format.setMinimumIntegerDigits(integerDigits);
+		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
+		Dimension d = spinner.getPreferredSize();
+		d.width = 60;
+		spinner.setPreferredSize(d);
+		spinner.setMaximumSize(d);
 	}
 
 	public void addAlignLeft( JComponent target, JPanel owner ) {

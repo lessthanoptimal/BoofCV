@@ -22,15 +22,17 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.derivative.DerivativeType;
-import boofcv.alg.interpolate.InterpolatePixelMB;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.FactoryGImageMultiBand;
 import boofcv.core.image.GImageMultiBand;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.Planar;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.se.Se3_F32;
 import georegression.transform.se.SePointOps_F32;
@@ -48,32 +50,28 @@ import org.ejml.interfaces.linsol.LinearSolver;
  */
 // TODO Handle pathological situations that will basically never happen in real life
 	// anything that makes the A matrix singular.  dx or dy being zero will do the trick
-public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D>>
+@SuppressWarnings("unchecked")
+public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray<D>>
 {
 	// Type of input images
-	private ImageType<I> imageType;
-	private ImageType<D> derivType;
+	private ImageType<Planar<I>> imageType;
+	private ImageType<Planar<D>> derivType;
 
 	private LinearSolver<DenseMatrix64F> solver;
 	private DenseMatrix64F A = new DenseMatrix64F(1,6);
 	private DenseMatrix64F y = new DenseMatrix64F(1,1);
 	private DenseMatrix64F twistMatrix = new DenseMatrix64F(6,1);
 
-	private ImageGradient<I,D> computeD;
+	private ImageGradient<Planar<I>,Planar<D>> computeD;
 
-	private InterpolatePixelMB<I> interpI;
-	private InterpolatePixelMB<D> interpDX;
-	private InterpolatePixelMB<D> interpDY;
+	private InterpolatePixelS<I> interpI;
+	private InterpolatePixelS<D> interpDX;
+	private InterpolatePixelS<D> interpDY;
 
 	private GImageMultiBand wrapI;
 
-	// storage for pixel value at current location and it's gradient
-	private float current[];
-	private float dx[];
-	private float dy[];
-
 	// gradient of the current frame
-	D derivX, derivY;
+	Planar<D> derivX, derivY;
 
 	// storage for pixel information in the key frame
 	FastQueue<Pixel> keypixels;
@@ -105,23 +103,17 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 	 * @param imageType Input image type
 	 * @param derivType Type of image to store the derivative in
 	 */
-	public VisOdomDirectRgbDepth(ImageType<I> imageType , ImageType<D> derivType ) {
+	public VisOdomDirectColorDepth(final int numBands , Class<I> imageType , Class<D> derivType ) {
 
-		this.imageType = imageType;
-		this.derivType = derivType;
+		this.imageType = ImageType.pl(numBands,imageType);
+		this.derivType = ImageType.pl(numBands,derivType);
 
-		wrapI = FactoryGImageMultiBand.create(imageType);
+		wrapI = FactoryGImageMultiBand.create(this.imageType);
 		// min/max doesn't matter for bilinear interpolation
 		setInterpolation(0,0,0,0, InterpolationType.BILINEAR);
 
-		final int numBands = imageType.getNumBands();
-
-		current = new float[ numBands ];
-		dx = new float[ numBands ];
-		dy = new float[ numBands ];
-
-		derivX = derivType.createImage(1,1);
-		derivY = derivType.createImage(1,1);
+		derivX = this.derivType.createImage(1,1);
+		derivY = this.derivType.createImage(1,1);
 
 		keypixels = new FastQueue<Pixel>(Pixel.class,true) {
 			@Override
@@ -129,7 +121,7 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 				return new Pixel(numBands);
 			}
 		};
-		computeD = FactoryDerivative.gradient(DerivativeType.THREE, imageType, derivType);
+		computeD = FactoryDerivative.gradient(DerivativeType.THREE, this.imageType, this.derivType);
 	}
 
 	/**
@@ -167,9 +159,9 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 	 */
 	public void setInterpolation( double inputMin , double inputMax, double derivMin , double derivMax ,
 								  InterpolationType type) {
-		interpI = FactoryInterpolation.createPixelMB(inputMin,inputMax,type, BorderType.EXTENDED, imageType);
-		interpDX = FactoryInterpolation.createPixelMB(derivMin,derivMax,type, BorderType.EXTENDED, derivType);
-		interpDY = FactoryInterpolation.createPixelMB(derivMin,derivMax,type, BorderType.EXTENDED, derivType);
+		interpI = FactoryInterpolation.createPixelS(inputMin,inputMax,type, BorderType.EXTENDED, imageType.getImageClass());
+		interpDX = FactoryInterpolation.createPixelS(derivMin,derivMax,type, BorderType.EXTENDED, derivType.getImageClass());
+		interpDY = FactoryInterpolation.createPixelS(derivMin,derivMax,type, BorderType.EXTENDED, derivType.getImageClass());
 	}
 
 	/**
@@ -190,7 +182,7 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 	 * @param input Image which is to be used as the key frame
 	 * @param pixelTo3D Used to compute 3D points from pixels in key frame
 	 */
-	void setKeyFrame(I input, ImagePixelTo3D pixelTo3D) {
+	void setKeyFrame(Planar<I> input, ImagePixelTo3D pixelTo3D) {
 		InputSanityCheck.checkSameShape(derivX,input);
 		wrapI.wrap(input);
 		keypixels.reset();
@@ -228,7 +220,7 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 	 * @param hintKeyToInput estimated transform from keyframe to the current input image
 	 * @return true if it was successful at estimating the motion or false if it failed for some reason
 	 */
-	public boolean estimateMotion(I input , Se3_F32 hintKeyToInput ) {
+	public boolean estimateMotion(Planar<I> input , Se3_F32 hintKeyToInput ) {
 		InputSanityCheck.checkSameShape(derivX,input);
 		initMotion(input);
 
@@ -237,7 +229,7 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 		boolean foundSolution = false;
 		float previousError = Float.MAX_VALUE;
 		for (int i = 0; i < maxIterations; i++) {
-			constructLinearSystem(input.width, input.height, keyToCurrent);
+			constructLinearSystem(input, keyToCurrent);
 			if (!solveSystem())
 				break;
 
@@ -257,84 +249,100 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 	/**
 	 * Initialize motion related data structures
 	 */
-	void initMotion(I input) {
+	void initMotion(Planar<I> input) {
 		if( solver == null ) {
-			solver = LinearSolverFactory.qr(input.width*input.height,6);
+			solver = LinearSolverFactory.qr(input.width*input.height*input.getNumBands(),6);
 		}
 
 		// compute image derivative and setup interpolation functions
 		computeD.process(input,derivX,derivY);
-		interpDX.setImage(derivX);
-		interpDY.setImage(derivY);
-		interpI.setImage(input);
 	}
 
 	/**
 	 * Given the set of points in the key frame and their current observations
-	 * @param width image width
-	 * @param height image height
 	 * @param g initial transform applied to pixel locations
 	 */
-	void constructLinearSystem(int width , int height , Se3_F32 g ) {
+	void constructLinearSystem(Planar<I> input , Se3_F32 g ) {
 
 		int numBands = imageType.getNumBands();
 
 		Point3D_F32 S = new Point3D_F32();
 
-		errorOptical = 0;
+		// first precompute everything that does not depend on pixel values
 		validPixels = 0;
-		int row = 0;
 		for (int i = 0; i < keypixels.size(); i++) {
 			Pixel p = keypixels.data[i];
 
 			// Apply the known warp
-			SePointOps_F32.transform(g,p.p3,S);
+			SePointOps_F32.transform(g, p.p3, S);
 
 			// Compute projected warped pixel coordinate on image I_1
-			float projX = (S.x/S.z)*fx + cx;
-			float projY = (S.y/S.z)*fy + cy;
+			p.proj.x = (S.x / S.z) * fx + cx;
+			p.proj.y = (S.y / S.z) * fy + cy;
 
 			// make sure it's in the bounds
-			if( projX < 0 || projX > width-1 || projY < 0 || projY > height-1 ) {
+			if (p.proj.x < 0 || p.proj.x > input.width - 1 || p.proj.y < 0 || p.proj.y > input.height - 1) {
+				p.valid = false;
 				continue;
+			} else {
+				p.valid = true;
 			}
 			validPixels++;
 
 			// pi matrix derivative relative to t at S
-			float ZZ   = S.z*S.z;
+			float ZZ = S.z * S.z;
 
-			float dP11 = fx/S.z;
-			float dP13 = -S.x*fx/ZZ;
-			float dP22 = fy/S.z;
-			float dP23 = -S.y*fy/ZZ;
+			p.dP11 = fx / S.z;
+			p.dP13 = -S.x * fx / ZZ;
+			p.dP22 = fy / S.z;
+			p.dP23 = -S.y * fy / ZZ;
+		}
 
-			// sample pixel values at warped location in I_1
-			interpI.get( projX,projY, current);
-			interpDX.get(projX,projY, dx);
-			interpDY.get(projX,projY, dy);
+		// how compute the components which require
+		errorOptical = 0;
+		int row = 0;
+		for (int band = 0; band < numBands; band++) {
+			interpDX.setImage(derivX.getBand(band));
+			interpDY.setImage(derivY.getBand(band));
+			interpI.setImage(input.getBand(band));
 
-			for (int band = 0; band < numBands; band++, row++) {
-				float bandDx = dx[band];
-				float bandDy = dy[band];
+			for (int i = 0; i < keypixels.size(); i++) {
+				Pixel p = keypixels.data[i];
+
+				if( !p.valid )
+					continue;
+
+				// Apply the known warp
+				// TODO precompute?
+				SePointOps_F32.transform(g, p.p3, S);
+
+				// sample pixel values at warped location in I_1
+				// NOTE: This could be highly optimized.  Compute and save interpolation weights once per input
+				//       instead of for each band and image (current,dx,dy)
+				// TODO create a special bilinear class for this?
+				float current = interpI.get( p.proj.x, p.proj.y);
+				float dx      = interpDX.get(p.proj.x, p.proj.y);
+				float dy      = interpDY.get(p.proj.x, p.proj.y);
 
 				// B = grad^T * dPI/dt = shape(1,3)
-				float b1 = bandDx*dP11;
-				float b2 = bandDy*dP22;
-				float b3 = bandDx*dP13 + bandDy*dP23;
+				float b1 = dx*p.dP11;
+				float b2 = dy*p.dP22;
+				float b3 = dx*p.dP13 + dy*p.dP23;
 
 				// C * A(S'(x)) = shape(1,6)
-				int indexA = row*6;
+				int indexA = row * 6;
 				A.data[indexA++] = -b2*S.z + b3*S.y;
 				A.data[indexA++] =  b1*S.z - b3*S.x;
 				A.data[indexA++] = -b1*S.y + b2*S.x;
 				A.data[indexA++] = b1;
 				A.data[indexA++] = b2;
-				A.data[indexA  ] = b3;
+				A.data[indexA]   = b3;
 
-				float error = -(current[band] - p.bands[band]);
+				float error = -(current - p.bands[band]);
 				y.data[row] = error;
 
 				errorOptical += Math.abs(error);
+				row += 1;
 			}
 		}
 		errorOptical /= row;
@@ -370,6 +378,11 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 		float bands[]; // pixel intensity in each band
 		int x,y; // pixel coordinate
 		Point3D_F32 p3 = new Point3D_F32(); // world coordinate
+		Point2D_F32 proj = new Point2D_F32(); // projected location of point
+		boolean valid; // if this is visible after apply the estimated warp
+
+		// the pi matrix
+		float dP11,dP13,dP22,dP23;
 
 		public Pixel( int numBands ) {
 			bands = new float[numBands];
@@ -380,11 +393,11 @@ public class VisOdomDirectRgbDepth<I extends ImageBase<I>, D extends ImageBase<D
 		return keyToCurrent;
 	}
 
-	public ImageType<I> getImageType() {
+	public ImageType<Planar<I>> getImageType() {
 		return imageType;
 	}
 
-	public ImageType<D> getDerivType() {
+	public ImageType<Planar<D>> getDerivType() {
 		return derivType;
 	}
 }

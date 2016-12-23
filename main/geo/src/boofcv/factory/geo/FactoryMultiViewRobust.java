@@ -155,6 +155,7 @@ public class FactoryMultiViewRobust {
 																   ConfigRansac ransac ) {
 
 		essential.checkValidity();
+		ransac.checkValidity();
 
 		Estimate1ofEpipolar essentialAlg = FactoryMultiView.
 				computeFundamental_1(essential.which, essential.numResolve);

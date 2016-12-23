@@ -37,6 +37,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -63,8 +64,8 @@ public class VisualizeSquareBinaryFiducial {
 		GrayF32 undistorted = new GrayF32(input.width,input.height);
 
 		CameraPinholeRadial paramUndist = new CameraPinholeRadial();
-		ImageDistort<GrayF32,GrayF32> undistorter = LensDistortionOps.imageRemoveDistortion(
-				AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, paramUndist,
+		ImageDistort<GrayF32,GrayF32> undistorter = LensDistortionOps.changeCameraModel(
+				AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic,new CameraPinhole(intrinsic), paramUndist,
 				ImageType.single(GrayF32.class));
 
 		InputToBinary<GrayF32> inputToBinary = FactoryThresholdBinary.globalOtsu(0,255, true,GrayF32.class);

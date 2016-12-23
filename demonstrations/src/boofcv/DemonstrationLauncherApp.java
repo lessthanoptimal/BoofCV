@@ -109,7 +109,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				EquirectangularRotatingApp.class,
 				FisheyePinholeApp.class,
 				RemoveLensDistortionApp.class,
-				ShowLensDistortion.class);
+				RenderSyntheticCamerModelApp.class);
 
 		createNodes(root,"Enhance",
 				ImageEnhanceApp.class);

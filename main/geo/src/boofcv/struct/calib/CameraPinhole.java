@@ -135,4 +135,9 @@ public class CameraPinhole extends CameraModel implements Serializable {
 		System.out.println("fy = "+fy);
 		System.out.println("skew = "+skew);
 	}
+
+	@Override
+	public <T extends CameraModel> T createLike() {
+		return (T)new CameraPinhole();
+	}
 }

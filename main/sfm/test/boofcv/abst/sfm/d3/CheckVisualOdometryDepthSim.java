@@ -18,9 +18,9 @@
 
 package boofcv.abst.sfm.d3;
 
-import boofcv.alg.distort.DoNothingPixelTransform_F32;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.distort.DoNothing2Transform2_F32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.se.Se3_F64;
 import org.ejml.ops.MatrixFeatures;
@@ -68,7 +68,7 @@ public abstract class CheckVisualOdometryDepthSim<I extends ImageGray<I>,Depth e
 	@Test
 	public void moveForward() {
 		algorithm.reset();
-		algorithm.setCalibration(param, new DoNothingPixelTransform_F32());
+		algorithm.setCalibration(param, new DoNothing2Transform2_F32());
 
 		Se3_F64 worldToLeft = new Se3_F64();
 

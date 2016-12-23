@@ -38,7 +38,10 @@ import java.io.IOException;
 import static deepboof.misc.TensorOps.WI;
 
 /**
- * TODO comment
+ * Image classification using VGG network trained in CIFAR 10 data.  On the CIFAR 10 training set it get has
+ * 89.9% accuracy.  This dataset contains images in 10 categories and 32x32 images.
+ *
+ * @see <a href="https://github.com/szagoruyko/cifar.torch">szagoruyko/cifar.torch</a>
  *
  * @author Peter Abeles
  */
@@ -59,12 +62,12 @@ public class ImageClassifierVggCifar10 extends BaseImageClassifier {
 	}
 
 	/**
-	 * Expects there to be two files in the provided directory:
-	 * YuvStatistics.txt
-	 * model.net
+	 * Expects there to be two files in the provided directory:<br>
+	 * YuvStatistics.txt<br>
+	 * model.net<br>
 	 *
-	 * @param directory
-	 * @throws IOException
+	 * @param directory Directory containing model files
+	 * @throws IOException Throw if anything goes wrong while reading data
 	 */
 	@Override
 	public void loadModel(File directory)  throws IOException {

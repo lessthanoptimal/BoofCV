@@ -20,36 +20,38 @@ package boofcv.alg.sfm.d3.direct;
 
 import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.struct.image.ImageMultiBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.Planar;
 import boofcv.struct.pyramid.ImagePyramid;
 import georegression.struct.se.Se3_F32;
+import georegression.struct.se.Se3_F64;
 
 /**
  * TODO write
  *
  * @author Peter Abeles
  */
-public class PyramidDirectRgbDepth<T extends ImageMultiBand<T>> {
+public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 
-	ImageType<T> imageType;
+	ImageType<Planar<T>> imageType;
 
-	ImagePyramid<T> pyramid;
-	VisOdomDirectRgbDepth<T,?>[] layersOdom;
+	ImagePyramid<Planar<T>> pyramid;
+	VisOdomDirectColorDepth<T,?>[] layersOdom;
 
 	LayerTo3D layerTo3D;
 
 	Se3_F32 keyToCurrent = new Se3_F32();
 	Se3_F32 work = new Se3_F32();
 
-	public PyramidDirectRgbDepth(ImagePyramid<T> pyramid) {
+	public PyramidDirectColorDepth(ImagePyramid<Planar<T>> pyramid) {
 		this.pyramid = pyramid;
 		imageType = this.pyramid.getImageType();
 
-		layersOdom = new VisOdomDirectRgbDepth[pyramid.getNumLayers()];
+		layersOdom = new VisOdomDirectColorDepth[pyramid.getNumLayers()];
 		for (int i = 0; i < layersOdom.length; i++) {
 			ImageType derivType = GImageDerivativeOps.getDerivativeType( imageType );
-			layersOdom[i] = new VisOdomDirectRgbDepth(pyramid.getImageType(),derivType );
+			layersOdom[i] = new VisOdomDirectColorDepth(imageType.getNumBands(),imageType.getImageClass(), derivType.getImageClass());
 		}
 	}
 
@@ -59,7 +61,7 @@ public class PyramidDirectRgbDepth<T extends ImageMultiBand<T>> {
 	{
 		pyramid.initialize(width, height);
 		for (int layer = 0; layer < layersOdom.length; layer++) {
-			VisOdomDirectRgbDepth o = layersOdom[layer];
+			VisOdomDirectColorDepth o = layersOdom[layer];
 
 			float scale = (float)pyramid.getScale(layer);
 
@@ -68,25 +70,32 @@ public class PyramidDirectRgbDepth<T extends ImageMultiBand<T>> {
 		}
 	}
 
-	public void setKeyFrame( T input , ImagePixelTo3D inputDepth) {
+	public boolean process( Planar<T> input , ImagePixelTo3D inputDepth ) {
+
+		// TODO implement basic keyframe selector
+
+		return true;
+	}
+
+	protected void setKeyFrame( Planar<T> input , ImagePixelTo3D inputDepth) {
 		pyramid.process(input);
 		layerTo3D.wrap(inputDepth);
 
 		for (int layer = 0; layer < layersOdom.length; layer++) {
-			T layerImage = pyramid.getLayer(layer);
+			Planar<T> layerImage = pyramid.getLayer(layer);
 			layerTo3D.scale = pyramid.getScale(layer);
 			layersOdom[layer].setKeyFrame(layerImage,layerTo3D);
 		}
 
 	}
 
-	public boolean estimateMotion( T input ) {
+	protected boolean estimateMotion( Planar<T> input ) {
 		pyramid.process(input);
 		work.set(keyToCurrent);
 
 		for (int layer = layersOdom.length-1; layer >= 0; layer--) {
-			T layerImage = pyramid.getLayer(layer);
-			VisOdomDirectRgbDepth<T,?> o = layersOdom[layer];
+			Planar<T> layerImage = pyramid.getLayer(layer);
+			VisOdomDirectColorDepth<T,?> o = layersOdom[layer];
 			if( o.estimateMotion(layerImage, work) ) {
 				work.set( o.getKeyToCurrent() );
 			} else {
@@ -95,6 +104,18 @@ public class PyramidDirectRgbDepth<T extends ImageMultiBand<T>> {
 
 		}
 		return true;
+	}
+
+	public boolean isFatalError() {
+		return false;
+	}
+
+	public Se3_F64 getCurrentToWorld() {
+		return null;
+	}
+
+	public ImageType<Planar<T>> getInputType() {
+		return imageType;
 	}
 
 	public static class LayerTo3D implements ImagePixelTo3D {

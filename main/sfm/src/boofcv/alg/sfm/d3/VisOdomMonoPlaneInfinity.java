@@ -173,8 +173,8 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	 */
 	public void setIntrinsic(CameraPinholeRadial intrinsic) {
 		planeProjection.setIntrinsic(intrinsic);
-		normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false,true);
-		pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
+		normToPixel = LensDistortionOps.narrow(intrinsic).distort_F64(false,true);
+		pixelToNorm = LensDistortionOps.narrow(intrinsic).undistort_F64(true,false);
 
 		// Find the change in angle caused by a pixel error in the image center.  The same angle error will induce a
 		// larger change in pixel values towards the outside of the image edge.  For fish-eyes lenses this could

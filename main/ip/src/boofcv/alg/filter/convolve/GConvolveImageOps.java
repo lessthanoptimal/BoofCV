@@ -352,18 +352,51 @@ public class GConvolveImageOps {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static <In extends ImageGray, Out extends ImageGray, K extends Kernel1D>
+	public static <In extends ImageBase, Out extends ImageBase, K extends Kernel1D>
 	void horizontalNormalized(K kernel, In input, Out output ) {
-		if( input instanceof GrayF32) {
-			ConvolveNormalized.horizontal((Kernel1D_F32) kernel, (GrayF32) input, (GrayF32) output);
-		} else if( input instanceof GrayF64) {
-			ConvolveNormalized.horizontal((Kernel1D_F64)kernel,(GrayF64)input,(GrayF64)output);
-		} else if( input instanceof GrayU8) {
-			ConvolveNormalized.horizontal((Kernel1D_S32)kernel,(GrayU8)input,(GrayI8)output);
-		} else if( input instanceof GrayS16) {
-			ConvolveNormalized.horizontal((Kernel1D_S32)kernel,(GrayS16)input,(GrayI16)output);
-		} else {
-			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
+		switch (input.getImageType().getFamily()) {
+			case GRAY: {
+				if (input instanceof GrayF32) {
+					ConvolveNormalized.horizontal((Kernel1D_F32) kernel, (GrayF32) input, (GrayF32) output);
+				} else if (input instanceof GrayF64) {
+					ConvolveNormalized.horizontal((Kernel1D_F64) kernel, (GrayF64) input, (GrayF64) output);
+				} else if (input instanceof GrayU8) {
+					ConvolveNormalized.horizontal((Kernel1D_S32) kernel, (GrayU8) input, (GrayI8) output);
+				} else if (input instanceof GrayS16) {
+					ConvolveNormalized.horizontal((Kernel1D_S32) kernel, (GrayS16) input, (GrayI16) output);
+				} else {
+					throw new IllegalArgumentException("Unknown image type: " + input.getClass().getName());
+				}
+			}
+			break;
+
+			case INTERLEAVED: {
+				if (input instanceof InterleavedF32) {
+					ConvolveNormalized.horizontal((Kernel1D_F32) kernel, (InterleavedF32) input, (InterleavedF32) output);
+				} else if (input instanceof InterleavedF64) {
+					ConvolveNormalized.horizontal((Kernel1D_F64) kernel, (InterleavedF64) input, (InterleavedF64) output);
+				} else if (input instanceof InterleavedU8) {
+					ConvolveNormalized.horizontal((Kernel1D_S32) kernel, (InterleavedU8) input, (InterleavedI8) output);
+				} else if (input instanceof InterleavedS16) {
+					ConvolveNormalized.horizontal((Kernel1D_S32) kernel, (InterleavedS16) input, (InterleavedI16) output);
+				} else {
+					throw new IllegalArgumentException("Unknown image type: " + input.getClass().getName());
+				}
+			}
+			break;
+
+			case PLANAR: {
+				Planar inp = (Planar)input;
+				Planar outp = (Planar)output;
+
+				for (int i = 0; i < inp.getNumBands(); i++) {
+					horizontalNormalized(kernel, inp.getBand(i), outp.getBand(i));
+				}
+			}
+			break;
+
+			default:
+				throw new IllegalArgumentException("Unknown image family");
 		}
 	}
 
@@ -375,18 +408,49 @@ public class GConvolveImageOps {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static <T extends ImageGray<T>, K extends Kernel1D>
+	public static <T extends ImageBase<T>, K extends Kernel1D>
 	void verticalNormalized(K kernel, T input, T output ) {
-		if( input instanceof GrayF32) {
-			ConvolveNormalized.vertical((Kernel1D_F32) kernel, (GrayF32) input, (GrayF32) output);
-		} else if( input instanceof GrayF64) {
-			ConvolveNormalized.vertical((Kernel1D_F64) kernel, (GrayF64) input, (GrayF64) output);
-		} else if( input instanceof GrayU8) {
-			ConvolveNormalized.vertical((Kernel1D_S32) kernel, (GrayU8) input, (GrayI8) output);
-		} else if( input instanceof GrayS16) {
-			ConvolveNormalized.vertical((Kernel1D_S32) kernel, (GrayS16) input, (GrayI16) output);
-		} else {
-			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
+		switch (input.getImageType().getFamily()) {
+			case GRAY: {
+				if (input instanceof GrayF32) {
+					ConvolveNormalized.vertical((Kernel1D_F32) kernel, (GrayF32) input, (GrayF32) output);
+				} else if (input instanceof GrayF64) {
+					ConvolveNormalized.vertical((Kernel1D_F64) kernel, (GrayF64) input, (GrayF64) output);
+				} else if (input instanceof GrayU8) {
+					ConvolveNormalized.vertical((Kernel1D_S32) kernel, (GrayU8) input, (GrayI8) output);
+				} else if (input instanceof GrayS16) {
+					ConvolveNormalized.vertical((Kernel1D_S32) kernel, (GrayS16) input, (GrayI16) output);
+				} else {
+					throw new IllegalArgumentException("Unknown image type: " + input.getClass().getName());
+				}
+			} break;
+
+			case INTERLEAVED: {
+				if (input instanceof InterleavedF32) {
+					ConvolveNormalized.vertical((Kernel1D_F32) kernel, (InterleavedF32) input, (InterleavedF32) output);
+				} else if (input instanceof InterleavedF64) {
+					ConvolveNormalized.vertical((Kernel1D_F64) kernel, (InterleavedF64) input, (InterleavedF64) output);
+				} else if (input instanceof InterleavedU8) {
+					ConvolveNormalized.vertical((Kernel1D_S32) kernel, (InterleavedU8) input, (InterleavedI8) output);
+				} else if (input instanceof InterleavedS16) {
+					ConvolveNormalized.vertical((Kernel1D_S32) kernel, (InterleavedS16) input, (InterleavedI16) output);
+				} else {
+					throw new IllegalArgumentException("Unknown image type: " + input.getClass().getName());
+				}
+			} break;
+
+			case PLANAR: {
+				Planar inp = (Planar)input;
+				Planar outp = (Planar)output;
+
+				for (int i = 0; i < inp.getNumBands(); i++) {
+					verticalNormalized(kernel, inp.getBand(i), outp.getBand(i));
+				}
+			}
+			break;
+
+			default:
+				throw new IllegalArgumentException("Unknown image family");
 		}
 	}
 
@@ -398,18 +462,48 @@ public class GConvolveImageOps {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static <T extends ImageGray<T>, K extends Kernel2D>
+	public static <T extends ImageBase<T>, K extends Kernel2D>
 	void convolveNormalized(K kernel, T input, T output ) {
-		if( input instanceof GrayF32) {
-			ConvolveNormalized.convolve((Kernel2D_F32) kernel, (GrayF32) input, (GrayF32) output);
-		} else if( input instanceof GrayF64) {
-			ConvolveNormalized.convolve((Kernel2D_F64) kernel, (GrayF64) input, (GrayF64) output);
-		} else if( input instanceof GrayU8) {
-			ConvolveNormalized.convolve((Kernel2D_S32) kernel, (GrayU8) input, (GrayI8) output);
-		} else if( input instanceof GrayS16) {
-			ConvolveNormalized.convolve((Kernel2D_S32) kernel, (GrayS16) input, (GrayI16) output);
-		} else {
-			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
+		switch (input.getImageType().getFamily()) {
+			case GRAY: {
+				if (input instanceof GrayF32) {
+					ConvolveNormalized.convolve((Kernel2D_F32) kernel, (GrayF32) input, (GrayF32) output);
+				} else if (input instanceof GrayF64) {
+					ConvolveNormalized.convolve((Kernel2D_F64) kernel, (GrayF64) input, (GrayF64) output);
+				} else if (input instanceof GrayU8) {
+					ConvolveNormalized.convolve((Kernel2D_S32) kernel, (GrayU8) input, (GrayI8) output);
+				} else if (input instanceof GrayS16) {
+					ConvolveNormalized.convolve((Kernel2D_S32) kernel, (GrayS16) input, (GrayI16) output);
+				} else {
+					throw new IllegalArgumentException("Unknown image type: " + input.getClass().getName());
+				}
+			} break;
+
+			case INTERLEAVED: {
+				if (input instanceof InterleavedF32) {
+					ConvolveNormalized.convolve((Kernel2D_F32) kernel, (InterleavedF32) input, (InterleavedF32) output);
+				} else if (input instanceof InterleavedF64) {
+					ConvolveNormalized.convolve((Kernel2D_F64) kernel, (InterleavedF64) input, (InterleavedF64) output);
+				} else if (input instanceof InterleavedU8) {
+					ConvolveNormalized.convolve((Kernel2D_S32) kernel, (InterleavedU8) input, (InterleavedI8) output);
+				} else if (input instanceof InterleavedS16) {
+					ConvolveNormalized.convolve((Kernel2D_S32) kernel, (InterleavedS16) input, (InterleavedI16) output);
+				} else {
+					throw new IllegalArgumentException("Unknown image type: " + input.getClass().getName());
+				}
+			} break;
+
+			case PLANAR: {
+				Planar inp = (Planar) input;
+				Planar outp = (Planar) output;
+
+				for (int i = 0; i < inp.getNumBands(); i++) {
+					convolveNormalized(kernel, inp.getBand(i), outp.getBand(i));
+				}
+			} break;
+
+			default:
+				throw new IllegalArgumentException("Unknown image family");
 		}
 	}
 }

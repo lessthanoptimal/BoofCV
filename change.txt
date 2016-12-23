@@ -36,14 +36,21 @@ Version : 0.27
   * Added a nicely formatted toString()
 - BlurImageOps - Fixed bug where for planar imges it was apply a median instead of mean filter
 - FactoryBlurFilter - Can now handle image types other than gray scale images
+- LensDistortionOps
+  * New function which lets you re-render an image with an arbitrary camera model
+  * Removed the imageRemoveDistortion() and relation functions since the new function is better.  TODO
+- Demonstrations
+  * Added RenderSyntheticCamerModelApp which shows you the effects of re-rendering the camera model
+  * Removed ShowLensDistoriton since it is now redundant
 - Added image distortion based on "Image Deformation Using Moving Least Squares" paper TODO
   * See ImageDeformPointMLS
 
+- TODO remove skew from camera calibration and radial distortion
+- TODO image distortion demonstration should use a rendered pattern
 - TODO Fisheye calibration using omni model
 - TODO grid of circle calibration target
-- TODO make sure RANSAC is using the faster method for selecting points.  swapping selected with one at the end
 - TODO Regression: Chessboard image border to fiducial regression
-- TODO Example showing how you can save intrinsic parameters in OpenCV format?
+- TODO Calibration application.  Select output format: BoofCV, OpenCV
 - TODO Tutorial on image features?  Sparse and dense?
 
 ---------------------------------------------

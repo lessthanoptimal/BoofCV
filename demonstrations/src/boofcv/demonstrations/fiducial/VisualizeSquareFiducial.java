@@ -39,6 +39,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
@@ -71,8 +72,8 @@ public class VisualizeSquareFiducial {
 
 		if( intrinsic != null ) {
 			CameraPinholeRadial paramUndist = new CameraPinholeRadial();
-			ImageDistort<GrayF32, GrayF32> undistorter = LensDistortionOps.imageRemoveDistortion(
-					AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, paramUndist,
+			ImageDistort<GrayF32, GrayF32> undistorter = LensDistortionOps.changeCameraModel(
+					AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, new CameraPinhole(intrinsic), paramUndist,
 					ImageType.single(GrayF32.class));
 
 			detector.configure(new LensDistortionRadialTangential(paramUndist),
@@ -101,7 +102,7 @@ public class VisualizeSquareFiducial {
 		g2.setStroke(new BasicStroke(2));
 
 		if( intrinsic != null ) {
-			Point2Transform2_F64 add_p_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(true, true);
+			Point2Transform2_F64 add_p_to_p = LensDistortionOps.narrow(intrinsic).distort_F64(true, true);
 
 			for (int i = 0; i < N; i++) {
 				// add back in lens distortion

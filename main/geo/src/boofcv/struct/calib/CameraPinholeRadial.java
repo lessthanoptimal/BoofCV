@@ -49,6 +49,10 @@ public class CameraPinholeRadial extends CameraPinhole implements Serializable {
 	public CameraPinholeRadial() {
 	}
 
+	public CameraPinholeRadial( int numRadial ) {
+		radial = new double[numRadial];
+	}
+
 	public CameraPinholeRadial(CameraPinholeRadial param ) {
 		set(param);
 	}
@@ -78,14 +82,24 @@ public class CameraPinholeRadial extends CameraPinhole implements Serializable {
 		return this;
 	}
 
-	public void set( CameraPinholeRadial param ) {
+	@Override
+	public void set( CameraPinhole param ) {
+		if( param instanceof CameraPinholeRadial ) {
+			CameraPinholeRadial p = (CameraPinholeRadial)param;
+
+			if( p.radial != null )
+				radial = p.radial.clone();
+			else
+				radial = null;
+
+			this.t1 = p.t1;
+			this.t2 = p.t2;
+		} else {
+			this.radial = null;
+			this.t1 = 0;
+			this.t2 = 0;
+		}
 		super.set(param);
-
-		if( param.radial != null )
-			radial = param.radial.clone();
-
-		this.t1 = param.t1;
-		this.t2 = param.t2;
 	}
 
 	/**
@@ -139,5 +153,13 @@ public class CameraPinholeRadial extends CameraPinhole implements Serializable {
 		else {
 			System.out.println("No tangential");
 		}
+	}
+
+	@Override
+	public <T extends CameraModel> T createLike() {
+		CameraPinholeRadial model = new CameraPinholeRadial();
+		if( radial != null )
+			model.radial = new double[ radial.length ];
+		return (T)model;
 	}
 }

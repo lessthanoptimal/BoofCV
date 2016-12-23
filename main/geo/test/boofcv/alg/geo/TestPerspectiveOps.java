@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo;
 
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
@@ -43,8 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -59,7 +59,7 @@ public class TestPerspectiveOps {
 		double hfov = 30;
 		double vfov = 35;
 
-		CameraPinholeRadial found = PerspectiveOps.createIntrinsic(640, 480, hfov, vfov);
+		CameraPinhole found = PerspectiveOps.createIntrinsic(640, 480, hfov, vfov);
 
 		assertEquals(UtilAngle.degreeToRadian(hfov),2.0*Math.atan(found.cx/found.fx),1e-6);
 		assertEquals(UtilAngle.degreeToRadian(vfov),2.0*Math.atan(found.cy/found.fy),1e-6);
@@ -109,7 +109,7 @@ public class TestPerspectiveOps {
 		DenseMatrix64F expected = new DenseMatrix64F(3,3);
 		CommonOps.mult(B, A, expected);
 
-		assertTrue(found.radial == null);
+		assertArrayEquals(param.radial, found.radial, 1e-8);
 		DenseMatrix64F foundM = PerspectiveOps.calibrationMatrix(found,null);
 
 		assertTrue(MatrixFeatures.isIdentical(expected,foundM,1e-8));
@@ -136,7 +136,7 @@ public class TestPerspectiveOps {
 		double cy = 5;
 
 		DenseMatrix64F K = new DenseMatrix64F(3,3,true,fx,skew,cx,0,fy,cy,0,0,1);
-		CameraPinholeRadial ret = PerspectiveOps.matrixToParam(K, 100, 200, null);
+		CameraPinhole ret = PerspectiveOps.matrixToParam(K, 100, 200, null);
 
 		assertTrue(ret.fx == fx);
 		assertTrue(ret.fy == fy);

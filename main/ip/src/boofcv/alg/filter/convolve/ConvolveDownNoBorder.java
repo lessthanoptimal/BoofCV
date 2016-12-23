@@ -161,27 +161,27 @@ public class ConvolveDownNoBorder {
 		if( skip <= 0  )
 			throw new IllegalArgumentException("Skip must be >= 1");
 		if( output.width < input.width/skip )
-			throw new IllegalArgumentException("Output width is too small: output.width = "+output.width+" input.widht/skip "+ input.width/skip);
+			throw new IllegalArgumentException("Output width is too small: output.width = "+output.width+" input.width/skip "+ input.width/skip);
 		if( output.height < input.height )
-			throw new IllegalArgumentException("Output height is too small");
+			throw new IllegalArgumentException("Output height is too small: output.height = "+output.height+" input.height "+input.height);
 	}
 
 	public static void checkParametersV(ImageGray input , ImageGray output , int skip ) {
 		if( skip <= 0  )
 			throw new IllegalArgumentException("Skip must be >= 1");
 		if( output.width < input.width )
-			throw new IllegalArgumentException("Output width is too small: output.width = "+output.width+" input.widht/skip "+ input.width/skip);
+			throw new IllegalArgumentException("Output width is too small: output.width = "+output.width+" input.width "+ input.width);
 		if( output.height < input.height/skip )
-			throw new IllegalArgumentException("Output height is too small");
+			throw new IllegalArgumentException("Output height is too small: output.height = "+output.height+" input.height/skip "+input.height/skip);;
 	}
 
 	public static void checkParameters(ImageGray input , ImageGray output , int skip ) {
 		if( skip <= 0  )
 			throw new IllegalArgumentException("Skip must be >= 1");
 		if( output.width < input.width/skip )
-			throw new IllegalArgumentException("Output width is too small: output.width = "+output.width+" input.widht/skip "+ input.width/skip);
+			throw new IllegalArgumentException("Output width is too small: output.width = "+output.width+" input.width/skip "+ input.width/skip);
 		if( output.height < input.height/skip )
-			throw new IllegalArgumentException("Output height is too small");
+			throw new IllegalArgumentException("Output height is too small: output.height = "+output.height+" input.height/skip "+input.height/skip);
 
 	}
 

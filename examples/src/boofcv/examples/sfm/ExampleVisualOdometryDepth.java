@@ -23,7 +23,6 @@ import boofcv.abst.feature.tracker.PointTrackerTwoPass;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.DepthVisualOdometry;
 import boofcv.abst.sfm.d3.VisualOdometry;
-import boofcv.alg.distort.DoNothingPixelTransform_F32;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
@@ -33,6 +32,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.calib.VisualDepthParameters;
+import boofcv.struct.distort.DoNothing2Transform2_F32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
@@ -76,7 +76,7 @@ public class ExampleVisualOdometryDepth {
 				sparseDepth, tracker, GrayU8.class, GrayU16.class);
 
 		// Pass in intrinsic/extrinsic calibration.  This can be changed in the future.
-		visualOdometry.setCalibration(param.visualParam,new DoNothingPixelTransform_F32());
+		visualOdometry.setCalibration(param.visualParam,new DoNothing2Transform2_F32());
 
 		// Process the video sequence and output the location plus number of inliers
 		SimpleImageSequence<GrayU8> videoVisual = media.openVideo(directory+"rgb.mjpeg", ImageType.single(GrayU8.class));

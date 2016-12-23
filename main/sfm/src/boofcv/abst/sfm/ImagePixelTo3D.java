@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,27 +44,27 @@ public interface ImagePixelTo3D {
 	 * @param y y-coordinate of the pixel
 	 * @return true if a position could be estimated and false if not.
 	 */
-	public boolean process( double x , double y );
+	boolean process( double x , double y );
 
 	/**
 	 * Found x-coordinate of point in camera coordinate system.
 	 *
 	 * @return x-coordinate
 	 */
-	public double getX();
+	double getX();
 
 	/**
 	 * Found y-coordinate of point in camera coordinate system.
 	 *
 	 * @return y-coordinate
 	 */
-	public double getY();
+	double getY();
 	/**
 	 * Found z-coordinate of point in camera coordinate system.
 	 *
 	 * @return z-coordinate
 	 */
-	public double getZ();
+	double getZ();
 
 	/**
 	 * Found w-coordinate of point in camera coordinate system.  If a point
@@ -72,5 +72,5 @@ public interface ImagePixelTo3D {
 	 *
 	 * @return w-coordinate
 	 */
-	public double getW();
+	double getW();
 }

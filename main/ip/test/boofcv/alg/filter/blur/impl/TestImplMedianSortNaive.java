@@ -53,6 +53,8 @@ public class TestImplMedianSortNaive {
 		for( Method m : methods ) {
 			if( !m.getName().equals("process"))
 				continue;
+			if( m.getParameterTypes().length != 4 )
+				continue;
 
 			Class params[] = m.getParameterTypes();
 

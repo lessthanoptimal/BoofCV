@@ -37,7 +37,7 @@ import georegression.struct.se.Se3_F64;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.alg.distort.LensDistortionOps.transformPoint;
+import static boofcv.alg.distort.LensDistortionOps.narrow;
 
 /**
  * @author Peter Abeles
@@ -101,8 +101,8 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
 
 		CameraPinholeRadial l = parameters.left;
 
-		Point2Transform2_F64 leftPixelToNorm = transformPoint(l).undistort_F64(true, false);
-		Point2Transform2_F64 leftNormToPixel = transformPoint(l).distort_F64(false, true);
+		Point2Transform2_F64 leftPixelToNorm = narrow(l).undistort_F64(true, false);
+		Point2Transform2_F64 leftNormToPixel = narrow(l).distort_F64(false, true);
 
 		alg.setPixelToNorm(leftPixelToNorm);
 		alg.setNormToPixel(leftNormToPixel);

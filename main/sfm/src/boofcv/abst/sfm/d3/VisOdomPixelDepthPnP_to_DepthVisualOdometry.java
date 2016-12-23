@@ -20,11 +20,13 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.sfm.AccessPointTracks3D;
+import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
@@ -38,7 +40,7 @@ import georegression.struct.se.Se3_F64;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.alg.distort.LensDistortionOps.transformPoint;
+import static boofcv.alg.distort.LensDistortionOps.narrow;
 
 /**
  * Wrapper around {@link VisOdomPixelDepthPnP} for {@link DepthVisualOdometry}.
@@ -104,11 +106,12 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	}
 
 	@Override
-	public void setCalibration(CameraPinholeRadial paramVisual, PixelTransform2_F32 visToDepth) {
-		sparse3D.configure(paramVisual,visToDepth);
+	public void setCalibration(CameraPinholeRadial paramVisual, Point2Transform2_F32 visToDepth) {
+		PointToPixelTransform_F32 visToDepth_pixel = new PointToPixelTransform_F32(visToDepth);
+		sparse3D.configure(LensDistortionOps.narrow(paramVisual),visToDepth_pixel);
 
-		Point2Transform2_F64 leftPixelToNorm = transformPoint(paramVisual).undistort_F64(true,false);
-		Point2Transform2_F64 leftNormToPixel = transformPoint(paramVisual).distort_F64(false,true);
+		Point2Transform2_F64 leftPixelToNorm = narrow(paramVisual).undistort_F64(true,false);
+		Point2Transform2_F64 leftNormToPixel = narrow(paramVisual).distort_F64(false,true);
 
 		alg.setPixelToNorm(leftPixelToNorm);
 		alg.setNormToPixel(leftNormToPixel);

@@ -118,7 +118,7 @@ public class ExampleMultiviewSceneReconstruction {
 	 */
 	public void process(CameraPinholeRadial intrinsic , List<BufferedImage> colorImages ) {
 
-		pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
+		pixelToNorm = LensDistortionOps.narrow(intrinsic).undistort_F64(true,false);
 
 		estimateEssential = FactoryMultiViewRobust.essentialRansac(
 				new ConfigEssential(intrinsic),new ConfigRansac(4000,inlierTol));

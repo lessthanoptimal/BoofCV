@@ -47,6 +47,9 @@ public class ConfigEssential implements Configuration {
 		this.intrinsic = intrinsic;
 	}
 
+	public ConfigEssential() {
+	}
+
 	@Override
 	public void checkValidity() {
 		switch (which) {

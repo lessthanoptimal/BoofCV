@@ -16,35 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.struct.calib;
+package boofcv.abst.sfm.d3;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Common class for camera models
- *
  * @author Peter Abeles
  */
-public abstract class CameraModel {
-	/** image shape (units: pixels) */
-	public int width,height;
-
-	public int getWidth() {
-		return width;
+public class TestPyramidDirectColorDepth_to_DepthVisualOdometry {
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
-	/**
-	 * Creates a new camera model with zero values of the same type os this one
-	 */
-	public abstract <T extends CameraModel>T createLike();
 }
