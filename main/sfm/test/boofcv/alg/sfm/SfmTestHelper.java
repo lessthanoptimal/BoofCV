@@ -58,8 +58,8 @@ public class SfmTestHelper {
 		Point2D_F64 pixelRight =  PerspectiveOps.convertNormToPixel(param.right, normRight.x, normRight.y, null);
 
 		// take in account lens distortion
-		Point2Transform2_F32 distLeft = LensDistortionOps.transformPoint(param.left).distort_F32(true,true);
-		Point2Transform2_F32 distRight = LensDistortionOps.transformPoint(param.right).distort_F32(true,true);
+		Point2Transform2_F32 distLeft = LensDistortionOps.createNarrowLensDistortion(param.left).distort_F32(true,true);
+		Point2Transform2_F32 distRight = LensDistortionOps.createNarrowLensDistortion(param.right).distort_F32(true,true);
 
 		Point2D_F32 lensLeft = new Point2D_F32();
 		Point2D_F32 lensRight = new Point2D_F32();

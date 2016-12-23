@@ -24,6 +24,7 @@ import boofcv.alg.distort.pinhole.PinholeNtoP_F32;
 import boofcv.alg.distort.pinhole.PinholeNtoP_F64;
 import boofcv.alg.distort.pinhole.PinholePtoN_F32;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
+import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F32;
@@ -219,12 +220,12 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F64 convertNormToPixel(CameraPinholeRadial param , double x , double y , Point2D_F64 pixel ) {
+	public static Point2D_F64 convertNormToPixel(CameraModel param , double x , double y , Point2D_F64 pixel ) {
 
 		if( pixel == null )
 			pixel = new Point2D_F64();
 
-		Point2Transform2_F64 normToPixel = LensDistortionOps.transformPoint(param).distort_F64(false,true);
+		Point2Transform2_F64 normToPixel = LensDistortionOps.createNarrowLensDistortion(param).distort_F64(false,true);
 
 		normToPixel.compute(x,y,pixel);
 
@@ -243,11 +244,11 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F32 convertNormToPixel(CameraPinholeRadial param , float x , float y , Point2D_F32 pixel ) {
+	public static Point2D_F32 convertNormToPixel(CameraModel param , float x , float y , Point2D_F32 pixel ) {
 		if( pixel == null )
 			pixel = new Point2D_F32();
 
-		Point2Transform2_F32 normToPixel = LensDistortionOps.transformPoint(param).distort_F32(false, true);
+		Point2Transform2_F32 normToPixel = LensDistortionOps.createNarrowLensDistortion(param).distort_F32(false, true);
 
 		normToPixel.compute(x,y,pixel);
 
@@ -267,7 +268,7 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F64 convertNormToPixel(CameraPinholeRadial param , Point2D_F64 norm , Point2D_F64 pixel ) {
+	public static Point2D_F64 convertNormToPixel(CameraModel param , Point2D_F64 norm , Point2D_F64 pixel ) {
 		return convertNormToPixel(param,norm.x,norm.y,pixel);
 	}
 
@@ -309,11 +310,11 @@ public class PerspectiveOps {
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F64 convertPixelToNorm(CameraPinholeRadial param , Point2D_F64 pixel , Point2D_F64 norm ) {
+	public static Point2D_F64 convertPixelToNorm(CameraModel param , Point2D_F64 pixel , Point2D_F64 norm ) {
 		if( norm == null )
 			norm = new Point2D_F64();
 
-		Point2Transform2_F64 pixelToNorm = LensDistortionOps.transformPoint(param).distort_F64(true, false);
+		Point2Transform2_F64 pixelToNorm = LensDistortionOps.createNarrowLensDistortion(param).distort_F64(true, false);
 
 		pixelToNorm.compute(pixel.x,pixel.y,norm);
 
@@ -333,11 +334,11 @@ public class PerspectiveOps {
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F32 convertPixelToNorm(CameraPinholeRadial param , Point2D_F32 pixel , Point2D_F32 norm ) {
+	public static Point2D_F32 convertPixelToNorm(CameraModel param , Point2D_F32 pixel , Point2D_F32 norm ) {
 		if( norm == null )
 			norm = new Point2D_F32();
 
-		Point2Transform2_F32 pixelToNorm = LensDistortionOps.transformPoint(param).distort_F32(true, false);
+		Point2Transform2_F32 pixelToNorm = LensDistortionOps.createNarrowLensDistortion(param).distort_F32(true, false);
 
 		pixelToNorm.compute(pixel.x,pixel.y,norm);
 

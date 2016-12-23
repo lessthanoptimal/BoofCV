@@ -154,8 +154,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 	public void setCalibration(StereoParameters param) {
 
 		param.rightToLeft.invert(leftToRight);
-		leftImageToNorm = LensDistortionOps.transformPoint(param.left).undistort_F64(true,false);
-		rightImageToNorm = LensDistortionOps.transformPoint(param.right).undistort_F64(true,false);
+		leftImageToNorm = LensDistortionOps.createNarrowLensDistortion(param.left).undistort_F64(true,false);
+		rightImageToNorm = LensDistortionOps.createNarrowLensDistortion(param.right).undistort_F64(true,false);
 		stereoCheck.setCalibration(param);
 	}
 

@@ -24,6 +24,7 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.d3.direct.PyramidDirectColorDepth;
 import boofcv.core.image.border.BorderType;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.ImageGray;
@@ -46,7 +47,7 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageGray<
 	ImageDistort<Planar<T>,Planar<T>> adjustImage;
 	Planar<T> undistorted;
 
-	CameraPinholeRadial paramAdjusted;
+	CameraPinhole paramAdjusted = new CameraPinhole();
 
 	public PyramidDirectColorDepth_to_DepthVisualOdometry(DepthSparse3D<Depth> sparse3D,
 														  PyramidDirectColorDepth<T> alg,
@@ -76,14 +77,13 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageGray<
 
 	@Override
 	public void setCalibration(CameraPinholeRadial paramVisual, Point2Transform2_F32 visToDepth) {
-		if( paramVisual.skew != 0 )
-			throw new RuntimeException("Removing skew is not yet supported");
 
+		// the algorithms camera model assumes no lens distortion and that skew = 0
+		CameraPinhole desired = new CameraPinhole(paramVisual);
+		desired.skew = 0;
 
-		paramAdjusted = paramVisual.createLike();
-
-		adjustImage = LensDistortionOps.imageRemoveDistortion(
-				AdjustmentType.EXPAND, BorderType.ZERO, paramVisual,paramAdjusted,visType);
+		adjustImage = LensDistortionOps.changeCameraModel(
+				AdjustmentType.EXPAND, BorderType.ZERO, paramVisual,desired,paramAdjusted,visType);
 
 		// create a transform from undistorted pixels to distorted
 		// TODO transform from pixel in one image into pixel in another

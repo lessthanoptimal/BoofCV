@@ -39,7 +39,7 @@ import georegression.struct.se.Se3_F64;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.alg.distort.LensDistortionOps.transformPoint;
+import static boofcv.alg.distort.LensDistortionOps.createNarrowLensDistortion;
 
 /**
  * Wrapper around {@link VisOdomPixelDepthPnP} for {@link DepthVisualOdometry}.
@@ -109,8 +109,8 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 		PointToPixelTransform_F32 visToDepth_pixel = new PointToPixelTransform_F32(visToDepth);
 		sparse3D.configure(paramVisual,visToDepth_pixel);
 
-		Point2Transform2_F64 leftPixelToNorm = transformPoint(paramVisual).undistort_F64(true,false);
-		Point2Transform2_F64 leftNormToPixel = transformPoint(paramVisual).distort_F64(false,true);
+		Point2Transform2_F64 leftPixelToNorm = createNarrowLensDistortion(paramVisual).undistort_F64(true,false);
+		Point2Transform2_F64 leftNormToPixel = createNarrowLensDistortion(paramVisual).distort_F64(false,true);
 
 		alg.setPixelToNorm(leftPixelToNorm);
 		alg.setNormToPixel(leftNormToPixel);

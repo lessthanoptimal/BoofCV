@@ -29,6 +29,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
@@ -57,6 +58,8 @@ public class ExampleRemoveLensDistortion {
 
 		// load calibration parameters from the previously calibrated camera
 		CameraPinholeRadial param = CalibrationIO.load(new File(calibDir , "intrinsic.yaml"));
+		// Specify a transform that has no lens distortion that you wish to re-render the image as having
+		CameraPinhole desired = new CameraPinhole(param);
 
 		// load images and convert the image into a color BoofCV format
 		BufferedImage orig = UtilImageIO.loadImage(imageDir , "dist_cyto_01.jpg");
@@ -66,13 +69,13 @@ public class ExampleRemoveLensDistortion {
 		int numBands = distortedImg.getNumBands();
 
 		// create new transforms which optimize view area in different ways.
-		// shrink makes sure there are no dead zones inside the image
-		// fullView will include the entire original image
+		// EXPAND makes sure there are no black outside of image pixels inside the image
+		// FULL_VIEW will include the entire original image
 		// The border is VALUE, which defaults to black, just so you can see it
-		ImageDistort allInside = LensDistortionOps.imageRemoveDistortion(AdjustmentType.EXPAND, BorderType.ZERO, param, null,
-				ImageType.pl(numBands, GrayF32.class));
-		ImageDistort fullView = LensDistortionOps.imageRemoveDistortion(AdjustmentType.FULL_VIEW, BorderType.ZERO, param, null,
-				ImageType.pl(numBands, GrayF32.class));
+		ImageDistort allInside = LensDistortionOps.changeCameraModel(AdjustmentType.EXPAND, BorderType.ZERO,
+				param, desired,null, ImageType.pl(numBands, GrayF32.class));
+		ImageDistort fullView = LensDistortionOps.changeCameraModel(AdjustmentType.FULL_VIEW, BorderType.ZERO,
+				param, desired, null, ImageType.pl(numBands, GrayF32.class));
 
 		// NOTE: After lens distortion has been removed the intrinsic parameters is changed.  If you pass
 		//       in  a set of IntrinsicParameters to the 4th variable it will save it there.

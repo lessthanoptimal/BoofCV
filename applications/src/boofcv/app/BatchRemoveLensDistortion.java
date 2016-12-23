@@ -26,6 +26,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
@@ -112,8 +113,8 @@ public class BatchRemoveLensDistortion {
 		Planar<GrayF32> distoredImg = new Planar<>(GrayF32.class,param.width,param.height,3);
 		Planar<GrayF32> undistoredImg = new Planar<>(GrayF32.class,param.width,param.height,3);
 
-		ImageDistort distort = LensDistortionOps.imageRemoveDistortion(adjustmentType, BorderType.ZERO, param, paramAdj,
-				(ImageType) distoredImg.getImageType());
+		ImageDistort distort = LensDistortionOps.changeCameraModel(adjustmentType, BorderType.ZERO, param,
+				new CameraPinhole(param), paramAdj, (ImageType) distoredImg.getImageType());
 		UtilIO.saveXML(paramAdj,new File(outputDir,"intrinsicUndistorted.xml").getAbsolutePath());
 
 		BufferedImage out = new BufferedImage(param.width,param.height,BufferedImage.TYPE_INT_RGB);

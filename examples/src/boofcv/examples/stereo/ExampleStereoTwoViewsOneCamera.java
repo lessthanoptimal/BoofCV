@@ -165,7 +165,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	 */
 	public static List<AssociatedPair> convertToNormalizedCoordinates(List<AssociatedPair> matchedFeatures, CameraPinholeRadial intrinsic) {
 
-		Point2Transform2_F64 p_to_n = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true, false);
+		Point2Transform2_F64 p_to_n = LensDistortionOps.createNarrowLensDistortion(intrinsic).undistort_F64(true, false);
 
 		List<AssociatedPair> calibratedFeatures = new ArrayList<>();
 
@@ -231,7 +231,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	 */
 	public static void drawInliers(BufferedImage left, BufferedImage right, CameraPinholeRadial intrinsic,
 								   List<AssociatedPair> normalized) {
-		Point2Transform2_F64 n_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(false,true);
+		Point2Transform2_F64 n_to_p = LensDistortionOps.createNarrowLensDistortion(intrinsic).distort_F64(false,true);
 
 		List<AssociatedPair> pixels = new ArrayList<>();
 
