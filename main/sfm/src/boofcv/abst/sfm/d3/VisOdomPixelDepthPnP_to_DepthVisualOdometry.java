@@ -20,6 +20,7 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.sfm.AccessPointTracks3D;
+import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.sfm.DepthSparse3D;
@@ -107,7 +108,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	@Override
 	public void setCalibration(CameraPinholeRadial paramVisual, Point2Transform2_F32 visToDepth) {
 		PointToPixelTransform_F32 visToDepth_pixel = new PointToPixelTransform_F32(visToDepth);
-		sparse3D.configure(paramVisual,visToDepth_pixel);
+		sparse3D.configure(LensDistortionOps.narrow(paramVisual),visToDepth_pixel);
 
 		Point2Transform2_F64 leftPixelToNorm = narrow(paramVisual).undistort_F64(true,false);
 		Point2Transform2_F64 leftNormToPixel = narrow(paramVisual).distort_F64(false,true);

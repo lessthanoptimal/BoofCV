@@ -30,7 +30,6 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.distort.Point2Transform2_F32;
-import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.SequencePoint2Transform2_F32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -105,9 +104,7 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageGray<
 				paramAdjusted.width, paramAdjusted.height,adjustedToDepth);
 
 		// adjusted pixels to normalized image coordinates in RGB frame
-		Point2Transform2_F64 pixelAdjToNorm = LensDistortionOps.narrow(paramAdjusted).undistort_F64(true,false);
-
-		sparse3D.configure(pixelAdjToNorm, pixelAdjToDepth);
+		sparse3D.configure(LensDistortionOps.narrow(paramAdjusted), pixelAdjToDepth);
 
 		undistorted.reshape(paramAdjusted.width, paramAdjusted.height);
 

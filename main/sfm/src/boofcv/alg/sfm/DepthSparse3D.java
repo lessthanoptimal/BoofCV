@@ -18,6 +18,7 @@
 
 package boofcv.alg.sfm;
 
+import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
@@ -70,12 +71,12 @@ public abstract class DepthSparse3D<T extends ImageGray<T>> {
 	/**
 	 * Configures intrinsic camera parameters
 	 *
-	 * @param pixelToNorm Transform from pixel to undistorted normalized image coordinates
+	 * @param model Model for narrow FOV cameras
 	 * @param visualToDepth Transform from visual to depth camera pixel coordinate systems.
 	 */
-	public void configure( Point2Transform2_F64 pixelToNorm , PixelTransform2_F32 visualToDepth ) {
+	public void configure(LensDistortionNarrowFOV model , PixelTransform2_F32 visualToDepth ) {
 		this.visualToDepth = visualToDepth;
-		this.p2n = pixelToNorm;
+		this.p2n = model.undistort_F64(true,false);
 	}
 
 
