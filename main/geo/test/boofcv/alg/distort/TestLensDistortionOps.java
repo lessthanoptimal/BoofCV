@@ -53,7 +53,7 @@ public class TestLensDistortionOps {
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 		CameraPinhole desired = new CameraPinhole(orig);
 
-		Point2Transform2_F32 distToNorm = LensDistortionOps.createNarrowLensDistortion(orig).undistort_F32(true, false);
+		Point2Transform2_F32 distToNorm = LensDistortionOps.narrow(orig).undistort_F32(true, false);
 
 		Point2D_F32 norm = new Point2D_F32();
 		distToNorm.compute(pixelX, pixelY, norm);
@@ -110,7 +110,7 @@ public class TestLensDistortionOps {
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 		CameraPinhole desired = new CameraPinhole(orig);
 
-		Point2Transform2_F32 distToNorm = LensDistortionOps.createNarrowLensDistortion(orig).undistort_F32(true, false);
+		Point2Transform2_F32 distToNorm = LensDistortionOps.narrow(orig).undistort_F32(true, false);
 
 		Point2D_F32 norm = new Point2D_F32();
 		distToNorm.compute(pixelX, pixelY, norm);
@@ -167,7 +167,7 @@ public class TestLensDistortionOps {
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 		CameraPinhole desired = new CameraPinhole(orig);
 
-		Point2Transform2_F32 distToNorm = LensDistortionOps.createNarrowLensDistortion(orig).undistort_F32(true, false);
+		Point2Transform2_F32 distToNorm = LensDistortionOps.narrow(orig).undistort_F32(true, false);
 
 		Point2D_F32 norm = new Point2D_F32();
 		distToNorm.compute(pixelX, pixelY, norm);

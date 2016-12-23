@@ -145,7 +145,7 @@ public class ExamplePnP {
 		Se3_F64 cameraToWorld = worldToCamera.invert(null);
 
 		// transform from pixel coordinates to normalized pixel coordinates, which removes lens distortion
-		Point2Transform2_F64 pixelToNorm = LensDistortionOps.createNarrowLensDistortion(intrinsic).undistort_F64(true,false);
+		Point2Transform2_F64 pixelToNorm = LensDistortionOps.narrow(intrinsic).undistort_F64(true,false);
 
 		List<Point2D3D> observations = new ArrayList<>();
 

@@ -45,7 +45,7 @@ public class VisualDepthOps {
 	public static void depthTo3D(CameraPinholeRadial param , GrayU16 depth , FastQueue<Point3D_F64> cloud ) {
 		cloud.reset();
 
-		Point2Transform2_F64 p2n = LensDistortionOps.createNarrowLensDistortion(param).undistort_F64(true,false);
+		Point2Transform2_F64 p2n = LensDistortionOps.narrow(param).undistort_F64(true,false);
 
 		Point2D_F64 n = new Point2D_F64();
 

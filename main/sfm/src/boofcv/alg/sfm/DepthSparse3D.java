@@ -18,9 +18,8 @@
 
 package boofcv.alg.sfm;
 
-import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
-import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.ImageGray;
@@ -45,7 +44,7 @@ public abstract class DepthSparse3D<T extends ImageGray<T>> {
 	protected T depthImage;
 
 	// transform from visual camera pixels to normalized image coordinates
-	private RemoveRadialPtoN_F64 p2n = new RemoveRadialPtoN_F64();
+	private Point2Transform2_F64 p2n;
 
 	// location of point in visual camera coordinate system
 	private Point3D_F64 worldPt = new Point3D_F64();
@@ -71,13 +70,12 @@ public abstract class DepthSparse3D<T extends ImageGray<T>> {
 	/**
 	 * Configures intrinsic camera parameters
 	 *
-	 * @param paramVisual Intrinsic parameters of visual camera.
+	 * @param pixelToNorm Transform from pixel to undistorted normalized image coordinates
 	 * @param visualToDepth Transform from visual to depth camera pixel coordinate systems.
 	 */
-	public void configure(CameraPinholeRadial paramVisual , PixelTransform2_F32 visualToDepth ) {
+	public void configure( Point2Transform2_F64 pixelToNorm , PixelTransform2_F32 visualToDepth ) {
 		this.visualToDepth = visualToDepth;
-		p2n.setK(paramVisual.fx,paramVisual.fy,paramVisual.skew,paramVisual.cx,paramVisual.cy).
-				setDistortion(paramVisual.radial, paramVisual.t1,paramVisual.t2);
+		this.p2n = pixelToNorm;
 	}
 
 

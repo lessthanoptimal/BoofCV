@@ -47,7 +47,7 @@ import static org.junit.Assert.assertTrue;
 public class TestCalibrateStereoPlanar {
 	CameraPinholeRadial intrinsic = new CameraPinholeRadial(200,210,0,320,240,640,480).
 			fsetRadial(0.01, -0.02).fsetTangental(0.03,0.03);
-	Point2Transform2_F64 normToPixel = LensDistortionOps.createNarrowLensDistortion(intrinsic).distort_F64(false, true);
+	Point2Transform2_F64 normToPixel = LensDistortionOps.narrow(intrinsic).distort_F64(false, true);
 
 	GrayF32 blank = new GrayF32(intrinsic.width,intrinsic.height);
 

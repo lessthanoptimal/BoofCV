@@ -51,7 +51,7 @@ public class TestDistancePlane2DToPixelSq {
 	Point2D_F64 pixelPtA = new Point2D_F64(150,75);
 	Point2D_F64 pixelPtB = new Point2D_F64();
 
-	Point2Transform2_F64 pixelToNorm = LensDistortionOps.createNarrowLensDistortion(intrinsic).undistort_F64(true,false);
+	Point2Transform2_F64 pixelToNorm = LensDistortionOps.narrow(intrinsic).undistort_F64(true,false);
 	Point2D_F64 normPt = new Point2D_F64();
 
 	public TestDistancePlane2DToPixelSq() {

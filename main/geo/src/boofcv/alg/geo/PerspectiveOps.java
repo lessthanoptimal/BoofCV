@@ -225,7 +225,7 @@ public class PerspectiveOps {
 		if( pixel == null )
 			pixel = new Point2D_F64();
 
-		Point2Transform2_F64 normToPixel = LensDistortionOps.createNarrowLensDistortion(param).distort_F64(false,true);
+		Point2Transform2_F64 normToPixel = LensDistortionOps.narrow(param).distort_F64(false,true);
 
 		normToPixel.compute(x,y,pixel);
 
@@ -248,7 +248,7 @@ public class PerspectiveOps {
 		if( pixel == null )
 			pixel = new Point2D_F32();
 
-		Point2Transform2_F32 normToPixel = LensDistortionOps.createNarrowLensDistortion(param).distort_F32(false, true);
+		Point2Transform2_F32 normToPixel = LensDistortionOps.narrow(param).distort_F32(false, true);
 
 		normToPixel.compute(x,y,pixel);
 
@@ -314,7 +314,7 @@ public class PerspectiveOps {
 		if( norm == null )
 			norm = new Point2D_F64();
 
-		Point2Transform2_F64 pixelToNorm = LensDistortionOps.createNarrowLensDistortion(param).distort_F64(true, false);
+		Point2Transform2_F64 pixelToNorm = LensDistortionOps.narrow(param).distort_F64(true, false);
 
 		pixelToNorm.compute(pixel.x,pixel.y,norm);
 
@@ -338,7 +338,7 @@ public class PerspectiveOps {
 		if( norm == null )
 			norm = new Point2D_F32();
 
-		Point2Transform2_F32 pixelToNorm = LensDistortionOps.createNarrowLensDistortion(param).distort_F32(true, false);
+		Point2Transform2_F32 pixelToNorm = LensDistortionOps.narrow(param).distort_F32(true, false);
 
 		pixelToNorm.compute(pixel.x,pixel.y,norm);
 

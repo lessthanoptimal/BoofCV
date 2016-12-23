@@ -20,6 +20,7 @@ package boofcv.alg.distort;
 
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
+import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolationType;
@@ -29,6 +30,7 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.distort.PixelTransform2_F64;
 import boofcv.struct.distort.Point2Transform2_F32;
@@ -105,8 +107,8 @@ public class LensDistortionOps {
 												  boolean desiredToOriginal,
 												  D paramMod)
 	{
-		LensDistortionNarrowFOV original = LensDistortionOps.createNarrowLensDistortion(paramOriginal);
-		LensDistortionNarrowFOV desired = LensDistortionOps.createNarrowLensDistortion(paramDesired);
+		LensDistortionNarrowFOV original = LensDistortionOps.narrow(paramOriginal);
+		LensDistortionNarrowFOV desired = LensDistortionOps.narrow(paramDesired);
 
 		Point2Transform2_F32 ori_p_to_n = original.undistort_F32(true, false);
 		Point2Transform2_F32 des_n_to_p = desired.distort_F32(false, true);
@@ -168,18 +170,9 @@ public class LensDistortionOps {
 	/**
 	 * <p>
 	 * Creates the {@link LensDistortionNarrowFOV lens distortion} for the specified camera parameters.
-	 * Call this to create transforms to and from pixel and normalized image coordinates with and without
-	 * lens distortion.  Automatically switches algorithm depending on the type of distortion or lack thereof.
 	 * </p>
-	 *
-	 * <p>
-	 * Example:<br>
-	 * <pre>PointTransform_F64 normToPixel = LensDistortionOps.distortTransform(param).distort_F64(false,true);</pre>
-	 * Creates a transform from normalized image coordinates into pixel coordinates.
-	 * </p>
-	 *
 	 */
-	public static LensDistortionNarrowFOV createNarrowLensDistortion(CameraModel param) {
+	public static LensDistortionNarrowFOV narrow(CameraModel param) {
 		if( param instanceof CameraPinholeRadial ) {
 			CameraPinholeRadial c = (CameraPinholeRadial)param;
 
@@ -191,6 +184,20 @@ public class LensDistortionOps {
 			CameraPinhole c = (CameraPinhole)param;
 
 			return new LensDistortionPinhole(c);
+		} else {
+			throw new IllegalArgumentException("Unknown camera model "+param.getClass().getSimpleName());
+		}
+	}
+
+
+	/**
+	 * <p>
+	 * Creates the {@link LensDistortionWideFOV lens distortion} for the specified camera parameters.
+	 * </p>
+	 */
+	public static LensDistortionWideFOV wide(CameraModel param ) {
+		if( param instanceof CameraUniversalOmni ) {
+			return new LensDistortionUniversalOmni((CameraUniversalOmni)param);
 		} else {
 			throw new IllegalArgumentException("Unknown camera model "+param.getClass().getSimpleName());
 		}

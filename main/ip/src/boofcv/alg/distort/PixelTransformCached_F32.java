@@ -19,6 +19,7 @@
 package boofcv.alg.distort;
 
 import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import georegression.struct.point.Point2D_F32;
 
 /**
@@ -32,10 +33,13 @@ public class PixelTransformCached_F32 extends PixelTransform2_F32 {
 	Point2D_F32 map[];
 	int width,height;
 
+	public PixelTransformCached_F32(int width, int height, Point2Transform2_F32 transform ) {
+		this(width,height, new PointToPixelTransform_F32(transform));
+	}
+
 	public PixelTransformCached_F32(int width, int height, PixelTransform2_F32 transform ) {
 		this.width = width+1; // add one to the width since some stuff checks the outside border
 		this.height = height+1;
-
 
 		map = new Point2D_F32[this.width*this.height];
 		int index = 0;

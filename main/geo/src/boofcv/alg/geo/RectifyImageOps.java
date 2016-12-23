@@ -41,7 +41,7 @@ import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.simple.SimpleMatrix;
 
-import static boofcv.alg.distort.LensDistortionOps.createNarrowLensDistortion;
+import static boofcv.alg.distort.LensDistortionOps.narrow;
 
 /**
  * <p>
@@ -294,7 +294,7 @@ public class RectifyImageOps {
 	public static Point2Transform2_F32 transformRectToPixel_F32(CameraPinholeRadial param,
 																DenseMatrix64F rectify)
 	{
-		Point2Transform2_F32 add_p_to_p = createNarrowLensDistortion(param).distort_F32(true, true);
+		Point2Transform2_F32 add_p_to_p = narrow(param).distort_F32(true, true);
 
 		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
 		CommonOps.invert(rectify,rectifyInv);
@@ -316,7 +316,7 @@ public class RectifyImageOps {
 	public static Point2Transform2_F64 transformRectToPixel_F64(CameraPinholeRadial param,
 																DenseMatrix64F rectify)
 	{
-		Point2Transform2_F64 add_p_to_p = createNarrowLensDistortion(param).distort_F64(true, true);
+		Point2Transform2_F64 add_p_to_p = narrow(param).distort_F64(true, true);
 
 		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
 		CommonOps.invert(rectify,rectifyInv);
@@ -337,7 +337,7 @@ public class RectifyImageOps {
 	public static Point2Transform2_F32 transformPixelToRect_F32(CameraPinholeRadial param,
 																DenseMatrix64F rectify)
 	{
-		Point2Transform2_F32 remove_p_to_p = createNarrowLensDistortion(param).undistort_F32(true, true);
+		Point2Transform2_F32 remove_p_to_p = narrow(param).undistort_F32(true, true);
 
 		PointTransformHomography_F32 rectifyPixel = new PointTransformHomography_F32(rectify);
 
@@ -356,7 +356,7 @@ public class RectifyImageOps {
 	public static Point2Transform2_F64 transformPixelToRect_F64(CameraPinholeRadial param,
 																DenseMatrix64F rectify)
 	{
-		Point2Transform2_F64 remove_p_to_p = createNarrowLensDistortion(param).undistort_F64(true, true);
+		Point2Transform2_F64 remove_p_to_p = narrow(param).undistort_F64(true, true);
 
 		PointTransformHomography_F64 rectifyDistort = new PointTransformHomography_F64(rectify);
 
@@ -380,7 +380,7 @@ public class RectifyImageOps {
 		if (rectifyK.get(0, 1) != 0)
 			throw new IllegalArgumentException("Skew should be zero in rectified images");
 
-		Point2Transform2_F64 remove_p_to_p = createNarrowLensDistortion(param).undistort_F64(true, true);
+		Point2Transform2_F64 remove_p_to_p = narrow(param).undistort_F64(true, true);
 
 		PointTransformHomography_F64 rectifyDistort = new PointTransformHomography_F64(rectify);
 

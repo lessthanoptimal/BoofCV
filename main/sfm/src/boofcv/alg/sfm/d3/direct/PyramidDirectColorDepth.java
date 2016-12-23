@@ -25,6 +25,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import boofcv.struct.pyramid.ImagePyramid;
 import georegression.struct.se.Se3_F32;
+import georegression.struct.se.Se3_F64;
 
 /**
  * TODO write
@@ -71,6 +72,8 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 
 	public boolean process( Planar<T> input , ImagePixelTo3D inputDepth ) {
 
+		// TODO implement basic keyframe selector
+
 		return true;
 	}
 
@@ -101,6 +104,14 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 
 		}
 		return true;
+	}
+
+	public boolean isFatalError() {
+		return false;
+	}
+
+	public Se3_F64 getCurrentToWorld() {
+		return null;
 	}
 
 	public ImageType<Planar<T>> getInputType() {

@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestWorldToCameraToPixel {
 	CameraPinholeRadial intrinsic = new CameraPinholeRadial(500,500,0,320,240,640,480).fsetRadial(-0.1,-0.05);
-	Point2Transform2_F64 normToPixel = LensDistortionOps.createNarrowLensDistortion(intrinsic).distort_F64(false,true);
+	Point2Transform2_F64 normToPixel = LensDistortionOps.narrow(intrinsic).distort_F64(false,true);
 
 	Se3_F64 worldToCamera = new Se3_F64();
 
