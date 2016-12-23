@@ -190,6 +190,22 @@ public class TestPlanar {
 
 	@Test
 	public void setNumberOfBands() {
-		fail("Implement");
+		Planar<GrayU8> img = new Planar<>(GrayU8.class,5, 10, 2);
+
+		assertEquals(2, img.getNumBands());
+
+		img.setNumberOfBands(3);
+		assertEquals(3, img.getNumBands());
+		for (int i = 0; i < img.getNumBands(); i++) {
+			assertEquals(5, img.getBand(i).width);
+			assertEquals(10, img.getBand(i).height);
+		}
+
+		img.setNumberOfBands(1);
+		assertEquals(1, img.getNumBands());
+		for (int i = 0; i < img.getNumBands(); i++) {
+			assertEquals(5, img.getBand(i).width);
+			assertEquals(10, img.getBand(i).height);
+		}
 	}
 }

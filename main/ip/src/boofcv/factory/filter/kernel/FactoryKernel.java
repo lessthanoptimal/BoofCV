@@ -23,6 +23,7 @@ import boofcv.struct.convolve.*;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageGray;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -98,6 +99,19 @@ public class FactoryKernel {
 		}
 
 		return out;
+	}
+
+	public static void setTable( KernelBase kernel ) {
+		if( kernel instanceof Kernel2D_F32 ) {
+			Kernel2D_F32 k = (Kernel2D_F32)kernel;
+			Arrays.fill(k.data, 1.0f/(k.width*k.width));
+		} else if( kernel instanceof Kernel2D_F64 ) {
+			Kernel2D_F64 k = (Kernel2D_F64)kernel;
+			Arrays.fill(k.data, 1.0/(k.width*k.width));
+		} else if( kernel instanceof Kernel2D_S32 ) {
+			Kernel2D_S32 k = (Kernel2D_S32)kernel;
+			Arrays.fill(k.data, 1);
+		}
 	}
 
 	/**

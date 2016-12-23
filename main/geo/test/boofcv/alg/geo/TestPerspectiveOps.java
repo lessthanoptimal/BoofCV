@@ -44,8 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -110,7 +109,7 @@ public class TestPerspectiveOps {
 		DenseMatrix64F expected = new DenseMatrix64F(3,3);
 		CommonOps.mult(B, A, expected);
 
-		assertTrue(found.radial == null);
+		assertArrayEquals(param.radial, found.radial, 1e-8);
 		DenseMatrix64F foundM = PerspectiveOps.calibrationMatrix(found,null);
 
 		assertTrue(MatrixFeatures.isIdentical(expected,foundM,1e-8));
@@ -137,7 +136,7 @@ public class TestPerspectiveOps {
 		double cy = 5;
 
 		DenseMatrix64F K = new DenseMatrix64F(3,3,true,fx,skew,cx,0,fy,cy,0,0,1);
-		CameraPinholeRadial ret = PerspectiveOps.matrixToParam(K, 100, 200, null);
+		CameraPinhole ret = PerspectiveOps.matrixToParam(K, 100, 200, null);
 
 		assertTrue(ret.fx == fx);
 		assertTrue(ret.fy == fy);

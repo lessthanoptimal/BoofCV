@@ -20,6 +20,8 @@ package boofcv.alg.filter.blur.impl;
 
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 import org.ddogleg.sorting.QuickSelect;
 
 /**
@@ -129,6 +131,20 @@ public class ImplMedianSortNaive {
 				float median = QuickSelect.select(storage,index/2,index);
 				output.set(x,y, median );
 			}
+		}
+	}
+
+	public static void process(ImageGray input , ImageGray output, int radius ) {
+		if( input.getDataType().isInteger() ) {
+			process((GrayI)input, (GrayI)output, radius, null);
+		} else {
+			process((GrayF32)input, (GrayF32)output, radius, null);
+		}
+	}
+
+	public static void process(Planar input , Planar output, int radius ) {
+		for (int i = 0; i < input.getNumBands(); i++) {
+			process(input.getBand(i), output.getBand(i), radius);
 		}
 	}
 }

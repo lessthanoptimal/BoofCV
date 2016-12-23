@@ -131,6 +131,7 @@ public class PerspectiveOps {
 	{
 		if( adjustedParam == null )
 			adjustedParam = parameters.createLike();
+		adjustedParam.set(parameters);
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(parameters, null);
 		DenseMatrix64F K_adj = new DenseMatrix64F(3,3);

@@ -19,26 +19,18 @@
 package boofcv.alg.filter.blur;
 
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
-import boofcv.alg.filter.convolve.ConvolveNormalized;
-import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive_SB;
-import boofcv.alg.filter.kernel.KernelMath;
+import boofcv.alg.filter.convolve.GConvolveImageOps;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.alg.misc.ImageMiscOps;
+import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.struct.convolve.Kernel1D_S32;
-import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_F64;
-import boofcv.struct.convolve.Kernel2D_S32;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayF64;
-import boofcv.struct.image.GrayU8;
+import boofcv.struct.convolve.Kernel2D;
+import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Random;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -50,184 +42,102 @@ public class TestBlurImageOps {
 	int width = 15;
 	int height = 20;
 
+	ImageType imageTypes[] = new ImageType[]{
+			ImageType.single(GrayU8.class),ImageType.single(GrayF32.class),
+			ImageType.pl(2,GrayU8.class),ImageType.pl(2,GrayF32.class)};
+//			ImageType.il(2,InterleavedU8.class),ImageType.il(2,InterleavedF32.class)}; TODO add in future
+
 	@Test
-	public void mean_U8() {
-		GrayU8 input = new GrayU8(width,height);
-		GrayU8 found = new GrayU8(width,height);
-		GrayU8 expected = new GrayU8(width,height);
+	public void mean() {
+		for( ImageType type : imageTypes ) {
+			ImageBase input = type.createImage(width,height);
+			ImageBase found = type.createImage(width,height);
+			ImageBase expected = type.createImage(width,height);
 
-		GImageMiscOps.fillUniform(input, rand, 0, 20);
+			GImageMiscOps.fillUniform(input, rand, 0, 20);
 
-		for( int radius = 1; radius <= 4; radius++ ) {
-			ImageMiscOps.fill(expected,0);
-			ImageMiscOps.fill(found,0);
+			for( int radius = 1; radius <= 4; radius++ ) {
+				GImageMiscOps.fill(expected,0);
+				GImageMiscOps.fill(found,0);
 
-			int w = radius*2+1;
+				int w = radius*2+1;
 
-			Kernel2D_S32 kernel = new Kernel2D_S32(w);
-			Arrays.fill(kernel.data,1);
+				// convolve with a kernel to compute the expected value
+				Kernel2D kernel = FactoryKernel.createKernelForImage(w,w/2,2,type.getDataType());
+				FactoryKernel.setTable(kernel);
+				GConvolveImageOps.convolveNormalized(kernel, input, expected);
+				try {
+					Class storage = type.getFamily() == ImageType.Family.PLANAR ?
+							ImageGray.class : input.getClass();
 
-			ConvolveNormalizedNaive_SB.convolve(kernel, input, expected);
+					Method m = BlurImageOps.class.getMethod(
+							"mean",input.getClass(), found.getClass(), int.class, storage);
 
-			BlurImageOps.mean(input,found, radius, null);
-
-			BoofTesting.assertEquals(expected,found,2);
+					m.invoke(null,input,found, radius, null);
+					BoofTesting.assertEquals(expected,found,2);
+				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
 	}
 
 	@Test
-	public void mean_F32() {
-		GrayF32 input = new GrayF32(width,height);
-		GrayF32 found = new GrayF32(width,height);
-		GrayF32 expected = new GrayF32(width,height);
+	public void gaussian() {
+		for( ImageType type : imageTypes ) {
+			ImageBase input = type.createImage(width,height);
+			ImageBase found = type.createImage(width,height);
+			ImageBase expected = type.createImage(width,height);
 
-		GImageMiscOps.fillUniform(input, rand, 0, 20);
+			GImageMiscOps.fillUniform(input, rand, 0, 20);
 
-		for( int radius = 1; radius <= 4; radius++ ) {
-			ImageMiscOps.fill(expected,0);
-			ImageMiscOps.fill(found,0);
+			for( int radius = 1; radius <= 4; radius++ ) {
+				GImageMiscOps.fill(expected,0);
+				GImageMiscOps.fill(found,0);
 
-			int w = radius*2+1;
+				// convolve with a kernel to compute the expected value
+				Kernel2D kernel = FactoryKernelGaussian.gaussian2D(type.getDataType(),-1,radius);
+				GConvolveImageOps.convolveNormalized(kernel, input, expected);
+				try {
+					Class storage = type.getFamily() == ImageType.Family.PLANAR ?
+							ImageGray.class : input.getClass();
 
-			Kernel2D_F32 kernel = new Kernel2D_F32(w);
-			Arrays.fill(kernel.data,1f/(w*w));
+					Method m = BlurImageOps.class.getMethod(
+							"gaussian",input.getClass(), found.getClass(), double.class , int.class, storage);
 
-			ConvolveNormalized.convolve(kernel,input,expected);
-			BlurImageOps.mean(input,found, radius, null);
-
-			BoofTesting.assertEquals(expected,found,1e-4);
+					m.invoke(null,input,found, -1, radius, null);
+					BoofTesting.assertEquals(expected,found,2);
+				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
 	}
 
 	@Test
-	public void mean_F64() {
-		GrayF64 input = new GrayF64(width,height);
-		GrayF64 found = new GrayF64(width,height);
-		GrayF64 expected = new GrayF64(width,height);
+	public void median() {
+		for( ImageType type : imageTypes ) {
+			ImageBase input = type.createImage(width, height);
+			ImageBase found = type.createImage(width, height);
+			ImageBase expected = type.createImage(width, height);
 
-		GImageMiscOps.fillUniform(input, rand, 0, 20);
+			GImageMiscOps.fillUniform(input, rand, 0, 20);
 
-		for( int radius = 1; radius <= 4; radius++ ) {
-			ImageMiscOps.fill(expected,0);
-			ImageMiscOps.fill(found,0);
+			for( int radius = 1; radius <= 4; radius++ ) {
+				try {
+					Method m = BlurImageOps.class.getMethod("median",input.getClass(), found.getClass(), int.class);
+					m.invoke(null,input,found, radius);
 
-			int w = radius*2+1;
+					Class image = type.getFamily() == ImageType.Family.PLANAR ? Planar.class : ImageGray.class;
 
-			Kernel2D_F64 kernel = new Kernel2D_F64(w);
-			Arrays.fill(kernel.data,1.0/(w*w));
+					m = ImplMedianSortNaive.class.getMethod("process",image,image, int.class);
+					m.invoke(null,input,expected, radius);
 
-			ConvolveNormalized.convolve(kernel,input,expected);
-			BlurImageOps.mean(input,found, radius, null);
-
-			BoofTesting.assertEquals(expected,found,1e-8);
+					BoofTesting.assertEquals(expected,found,2);
+				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
-	}
-
-	@Test
-	public void median_U8() {
-
-		GrayU8 input = new GrayU8(width,height);
-		GrayU8 found = new GrayU8(width,height);
-		GrayU8 expected = new GrayU8(width,height);
-
-		GImageMiscOps.fillUniform(input, rand, 0, 20);
-
-		for( int radius = 1; radius <= 4; radius++ ) {
-			ImplMedianSortNaive.process(input,expected,radius,null);
-			BlurImageOps.median(input,found,radius);
-
-			BoofTesting.assertEquals(expected,found,0);
-		}
-	}
-
-	@Test
-	public void median_F32() {
-		GrayF32 input = new GrayF32(width,height);
-		GrayF32 found = new GrayF32(width,height);
-		GrayF32 expected = new GrayF32(width,height);
-
-		GImageMiscOps.fillUniform(input, rand, 0, 20);
-
-		for( int radius = 1; radius <= 4; radius++ ) {
-			ImplMedianSortNaive.process(input,expected,radius,null);
-			BlurImageOps.median(input,found,radius);
-
-			BoofTesting.assertEquals(expected,found,1e-4);
-		}
-	}
-
-	@Test
-	public void gaussian_U8() {
-		GrayU8 input = new GrayU8(width,height);
-		GrayU8 found = new GrayU8(width,height);
-		GrayU8 expected = new GrayU8(width,height);
-
-		GImageMiscOps.fillUniform(input, rand, 0, 200);
-
-		for( int radius = 1; radius <= 4; radius++ ) {
-			ImageMiscOps.fill(expected,0);
-			ImageMiscOps.fill(found,0);
-
-			// make sure the kernels are equivalent
-			Kernel1D_S32 ker1 = FactoryKernelGaussian.gaussian(1, false, 32, -1, radius);
-			Kernel2D_S32 kernel = KernelMath.convolve2D(ker1, ker1);
-			ConvolveNormalizedNaive_SB.convolve(kernel, input, expected);
-
-			BlurImageOps.gaussian(input,found,-1,radius,null);
-			BoofTesting.assertEquals(expected,found,2);
-		}
-	}
-
-	@Test
-	public void gaussian_F32() {
-		GrayF32 input = new GrayF32(width,height);
-		GrayF32 found = new GrayF32(width,height);
-		GrayF32 expected = new GrayF32(width,height);
-
-		GImageMiscOps.fillUniform(input, rand, 0, 20);
-
-		for( int radius = 1; radius <= 4; radius++ ) {
-			ImageMiscOps.fill(expected,0);
-			ImageMiscOps.fill(found,0);
-
-			Kernel2D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel2D_F32.class,-1,radius);
-			ConvolveNormalized.convolve(kernel,input,expected);
-
-			double sigma = FactoryKernelGaussian.sigmaForRadius(radius,0);
-
-			BlurImageOps.gaussian(input,found,sigma,radius,null);
-
-			BoofTesting.assertEquals(expected,found,1e-4);
-		}
-	}
-
-	@Test
-	public void gaussian_F64() {
-		GrayF64 input = new GrayF64(width,height);
-		GrayF64 found = new GrayF64(width,height);
-		GrayF64 expected = new GrayF64(width,height);
-
-		GImageMiscOps.fillUniform(input, rand, 0, 20);
-
-		for( int radius = 1; radius <= 4; radius++ ) {
-			ImageMiscOps.fill(expected,0);
-			ImageMiscOps.fill(found,0);
-
-			Kernel2D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel2D_F64.class,-1,radius);
-			ConvolveNormalized.convolve(kernel,input,expected);
-
-			double sigma = FactoryKernelGaussian.sigmaForRadius(radius,0);
-
-			BlurImageOps.gaussian(input,found,sigma,radius,null);
-
-			BoofTesting.assertEquals(expected,found,1e-8);
-		}
-	}
-
-	@Test
-	public void automate() {
-		// TODO single band and planar images
-		// todo automate across all image types
-		fail("Implement");
 	}
 }

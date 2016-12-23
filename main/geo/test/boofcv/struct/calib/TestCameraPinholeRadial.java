@@ -28,6 +28,56 @@ import static org.junit.Assert.*;
 public class TestCameraPinholeRadial {
 
 	@Test
+	public void set_radial() {
+		CameraPinholeRadial p = new CameraPinholeRadial(200,210,1,320,240,640,380);
+		p.fsetRadial(1,2);
+		p.fsetTangental(2,3);
+
+		CameraPinholeRadial f = new CameraPinholeRadial();
+		f.set(p);
+
+		equalsR(p,f);
+	}
+
+	@Test
+	public void set_pinhole() {
+		CameraPinhole p = new CameraPinhole(2020,2210,2,2,56,5,234);
+
+		CameraPinholeRadial f = new CameraPinholeRadial(200,210,1,320,240,640,380);
+		f.fsetRadial(1,2);
+		f.fsetTangental(2,3);
+
+		f.set(p);
+
+		equalsP(p,f);
+
+		assertTrue(f.radial == null);
+		assertEquals(0, f.t1, 1e-8);
+		assertEquals(0, f.t2, 1e-8);
+	}
+
+	private void equalsP( CameraPinhole expected, CameraPinhole found ) {
+		assertEquals(expected.fx, found.fx, 1e-8);
+		assertEquals(expected.fy, found.fy, 1e-8);
+		assertEquals(expected.cx, found.cx, 1e-8);
+		assertEquals(expected.cy, found.cy, 1e-8);
+		assertEquals(expected.skew, found.skew, 1e-8);
+	}
+
+	private void equalsR( CameraPinholeRadial expected, CameraPinholeRadial found ) {
+		equalsP((CameraPinhole)expected, (CameraPinhole)found );
+
+		assertEquals(expected.t1, found.t1, 1e-8);
+		assertEquals(expected.t2, found.t2, 1e-8);
+
+		if( expected.radial == null ) {
+			assertTrue(found.radial==null);
+		} else {
+			assertArrayEquals(expected.radial, found.radial, 1e-8);
+		}
+	}
+
+	@Test
 	public void fsetRadial() {
 		CameraPinholeRadial p = new CameraPinholeRadial(200,210,1,320,240,640,380);
 

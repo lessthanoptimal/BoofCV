@@ -21,6 +21,7 @@ package boofcv.factory.filter.kernel;
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.convolve.*;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageGray;
 import org.ddogleg.stats.UtilGaussian;
 
@@ -97,6 +98,14 @@ public class FactoryKernelGaussian {
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
 		int numBits = Math.max(32, GeneralizedImageOps.getNumBits(imageType));
 		return gaussian(2,isFloat, numBits, sigma,radius);
+	}
+
+	public static <T extends ImageGray<T>, K extends Kernel2D>
+	K gaussian2D(ImageDataType imageType, double sigma, int radius )
+	{
+		int numBits =  imageType.getNumBits() <= 32 ? 32 :  imageType.getNumBits();
+
+		return gaussian(2,!imageType.isInteger(), numBits, sigma,radius);
 	}
 
 	/**

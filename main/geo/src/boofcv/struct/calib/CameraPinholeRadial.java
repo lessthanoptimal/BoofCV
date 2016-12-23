@@ -82,14 +82,24 @@ public class CameraPinholeRadial extends CameraPinhole implements Serializable {
 		return this;
 	}
 
-	public void set( CameraPinholeRadial param ) {
+	@Override
+	public void set( CameraPinhole param ) {
+		if( param instanceof CameraPinholeRadial ) {
+			CameraPinholeRadial p = (CameraPinholeRadial)param;
+
+			if( p.radial != null )
+				radial = p.radial.clone();
+			else
+				radial = null;
+
+			this.t1 = p.t1;
+			this.t2 = p.t2;
+		} else {
+			this.radial = null;
+			this.t1 = 0;
+			this.t2 = 0;
+		}
 		super.set(param);
-
-		if( param.radial != null )
-			radial = param.radial.clone();
-
-		this.t1 = param.t1;
-		this.t2 = param.t2;
 	}
 
 	/**
