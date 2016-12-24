@@ -43,8 +43,6 @@ Version : 0.27
   * Added RenderSyntheticCamerModelApp which shows you the effects of re-rendering the camera model
   * Removed ShowLensDistoriton since it is now redundant
 
-- TODO remove skew from camera calibration and radial distortion
-- TODO image distortion demonstration should use a rendered pattern
 - TODO Fisheye calibration using omni model
 - TODO grid of circle calibration target
 - TODO Regression: Chessboard image border to fiducial regression
