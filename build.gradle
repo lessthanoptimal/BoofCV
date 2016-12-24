@@ -253,7 +253,24 @@ task alljavadoc(type: Javadoc) {
                   'http://ejml.org/javadoc/',
                   'http://georegression.org/javadoc/',
                   'http://ddogleg.org/javadoc/']
-//        bottom = file('misc/bottom.txt').text
+    }
+}
+
+task WebJavaDoc(type: Javadoc) {
+    // only include source code in src directory to avoid including 3rd party code which some projects do as a hack
+    source = javadocProjects.collect { project(it).fileTree('src').include('**/*.java') }
+//    source = javadocProjects.collect { project(it).sourceSets.main.allJava }
+    classpath = files(javadocProjects.collect { project(it).sourceSets.main.compileClasspath })
+
+    destinationDir = file("${buildDir}/docs/javadoc")
+    configure(options) {
+        failOnError = false
+        docTitle = "BoofCV JavaDoc ($project.version)"
+        links = [ 'http://docs.oracle.com/javase/7/docs/api/',
+                  'http://ejml.org/javadoc/',
+                  'http://georegression.org/javadoc/',
+                  'http://ddogleg.org/javadoc/']
+        bottom = file('misc/bottom.txt').text
     }
 }
 

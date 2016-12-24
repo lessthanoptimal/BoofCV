@@ -45,8 +45,6 @@ Version : 0.27
 - Added image distortion based on "Image Deformation Using Moving Least Squares" paper TODO
   * See ImageDeformPointMLS
 
-- TODO remove skew from camera calibration and radial distortion
-- TODO image distortion demonstration should use a rendered pattern
 - TODO Fisheye calibration using omni model
 - TODO grid of circle calibration target
 - TODO Regression: Chessboard image border to fiducial regression

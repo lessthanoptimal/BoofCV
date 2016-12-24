@@ -50,7 +50,7 @@ public class ConvolveImageNoBorder {
 								  GrayF32 input, GrayF32 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_F32_F32.horizontal(kernel, input, output))
+		if (!ConvolveImageUnrolled_SB_F32_F32.horizontal(kernel, input, output))
 			ConvolveImageStandard_SB.horizontal(kernel, input, output);
 	}
 
@@ -58,7 +58,7 @@ public class ConvolveImageNoBorder {
 								  GrayF32 input, GrayF32 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_F32_F32.vertical(kernel, input, output))
+		if (!ConvolveImageUnrolled_SB_F32_F32.vertical(kernel, input, output))
 			ConvolveImageStandard_SB.vertical(kernel, input, output);
 	}
 
@@ -66,7 +66,7 @@ public class ConvolveImageNoBorder {
 								  GrayF32 input, GrayF32 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_F32_F32.convolve(kernel, input, output))
+		if (!ConvolveImageUnrolled_SB_F32_F32.convolve(kernel, input, output))
 			ConvolveImageStandard_SB.convolve(kernel, input, output);
 	}
 
@@ -95,7 +95,7 @@ public class ConvolveImageNoBorder {
 								  GrayF64 input, GrayF64 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_F64_F64.horizontal(kernel, input, output))
+		if (!ConvolveImageUnrolled_SB_F64_F64.horizontal(kernel, input, output))
 			ConvolveImageStandard_SB.horizontal(kernel, input, output);
 	}
 
@@ -103,7 +103,7 @@ public class ConvolveImageNoBorder {
 								  GrayF64 input, GrayF64 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_F64_F64.vertical(kernel, input, output))
+		if (!ConvolveImageUnrolled_SB_F64_F64.vertical(kernel, input, output))
 			ConvolveImageStandard_SB.vertical(kernel, input, output);
 	}
 
@@ -111,7 +111,7 @@ public class ConvolveImageNoBorder {
 								  GrayF64 input, GrayF64 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_F64_F64.convolve(kernel, input, output))
+		if (!ConvolveImageUnrolled_SB_F64_F64.convolve(kernel, input, output))
 			ConvolveImageStandard_SB.convolve(kernel, input, output);
 	}
 
@@ -140,7 +140,7 @@ public class ConvolveImageNoBorder {
 								  GrayU8 input, GrayI16 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_U8_I16.horizontal(kernel, input, output))
+		if (!ConvolveImageUnrolled_SB_U8_I16.horizontal(kernel, input, output))
 			ConvolveImageStandard_SB.horizontal(kernel, input, output);
 	}
 
@@ -148,7 +148,7 @@ public class ConvolveImageNoBorder {
 								  GrayU8 input, GrayI16 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_U8_I16.vertical(kernel, input, output))
+		if (!ConvolveImageUnrolled_SB_U8_I16.vertical(kernel, input, output))
 			ConvolveImageStandard_SB.vertical(kernel, input, output);
 	}
 
@@ -156,7 +156,7 @@ public class ConvolveImageNoBorder {
 								  GrayU8 input, GrayI16 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_U8_I16.convolve(kernel, input, output))
+		if (!ConvolveImageUnrolled_SB_U8_I16.convolve(kernel, input, output))
 			ConvolveImageStandard_SB.convolve(kernel, input, output);
 	}
 
@@ -245,7 +245,7 @@ public class ConvolveImageNoBorder {
 								  GrayS16 input, GrayI16 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S16_I16.horizontal(kernel, input, output))
+		if (!ConvolveImageUnrolled_SB_S16_I16.horizontal(kernel, input, output))
 			ConvolveImageStandard_SB.horizontal(kernel, input, output);
 	}
 
@@ -253,7 +253,7 @@ public class ConvolveImageNoBorder {
 								  GrayS16 input, GrayI16 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S16_I16.vertical(kernel, input, output))
+		if (!ConvolveImageUnrolled_SB_S16_I16.vertical(kernel, input, output))
 			ConvolveImageStandard_SB.vertical(kernel, input, output);
 	}
 
@@ -261,7 +261,7 @@ public class ConvolveImageNoBorder {
 								  GrayS16 input, GrayI16 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S16_I16.convolve(kernel, input, output))
+		if (!ConvolveImageUnrolled_SB_S16_I16.convolve(kernel, input, output))
 			ConvolveImageStandard_SB.convolve(kernel, input, output);
 	}
 
@@ -290,7 +290,7 @@ public class ConvolveImageNoBorder {
 								  GrayU8 input, GrayI8 output, int divisor) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_U8_I8_Div.horizontal(kernel, input, output, divisor))
+		if (!ConvolveImageUnrolled_SB_U8_I8_Div.horizontal(kernel, input, output, divisor))
 			ConvolveImageStandard_SB.horizontal(kernel, input, output, divisor);
 	}
 
@@ -298,7 +298,7 @@ public class ConvolveImageNoBorder {
 								  GrayU8 input, GrayI8 output, int divisor) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_U8_I8_Div.vertical(kernel, input, output, divisor))
+		if (!ConvolveImageUnrolled_SB_U8_I8_Div.vertical(kernel, input, output, divisor))
 			ConvolveImageStandard_SB.vertical(kernel, input, output, divisor);
 	}
 
@@ -306,7 +306,7 @@ public class ConvolveImageNoBorder {
 								  GrayU8 input, GrayI8 output, int divisor) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_U8_I8_Div.convolve(kernel, input, output, divisor))
+		if (!ConvolveImageUnrolled_SB_U8_I8_Div.convolve(kernel, input, output, divisor))
 			ConvolveImageStandard_SB.convolve(kernel, input, output, divisor);
 	}
 
@@ -335,7 +335,7 @@ public class ConvolveImageNoBorder {
 								  GrayS16 input, GrayI16 output, int divisor) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S16_I16_Div.horizontal(kernel, input, output, divisor))
+		if (!ConvolveImageUnrolled_SB_S16_I16_Div.horizontal(kernel, input, output, divisor))
 			ConvolveImageStandard_SB.horizontal(kernel, input, output, divisor);
 	}
 
@@ -343,7 +343,7 @@ public class ConvolveImageNoBorder {
 								  GrayS16 input, GrayI16 output, int divisor) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S16_I16_Div.vertical(kernel, input, output, divisor))
+		if (!ConvolveImageUnrolled_SB_S16_I16_Div.vertical(kernel, input, output, divisor))
 			ConvolveImageStandard_SB.vertical(kernel, input, output, divisor);
 	}
 
@@ -351,7 +351,7 @@ public class ConvolveImageNoBorder {
 								  GrayS16 input, GrayI16 output, int divisor) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S16_I16_Div.convolve(kernel, input, output, divisor))
+		if (!ConvolveImageUnrolled_SB_S16_I16_Div.convolve(kernel, input, output, divisor))
 			ConvolveImageStandard_SB.convolve(kernel, input, output, divisor);
 	}
 
@@ -395,7 +395,7 @@ public class ConvolveImageNoBorder {
 								  GrayS32 input, GrayS32 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S32_S32.horizontal(kernel, input, output))
+		if (!ConvolveImageUnrolled_SB_S32_S32.horizontal(kernel, input, output))
 			ConvolveImageStandard_SB.horizontal(kernel, input, output);
 	}
 
@@ -403,7 +403,7 @@ public class ConvolveImageNoBorder {
 								  GrayS32 input, GrayS32 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S32_S32.vertical(kernel, input, output))
+		if (!ConvolveImageUnrolled_SB_S32_S32.vertical(kernel, input, output))
 			ConvolveImageStandard_SB.vertical(kernel, input, output);
 	}
 
@@ -411,7 +411,7 @@ public class ConvolveImageNoBorder {
 								  GrayS32 input, GrayS32 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S32_S32.convolve(kernel, input, output))
+		if (!ConvolveImageUnrolled_SB_S32_S32.convolve(kernel, input, output))
 			ConvolveImageStandard_SB.convolve(kernel, input, output);
 	}
 
@@ -440,7 +440,7 @@ public class ConvolveImageNoBorder {
 								  GrayS32 input, GrayS32 output, int divisor) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S32_S32_Div.horizontal(kernel, input, output, divisor))
+		if (!ConvolveImageUnrolled_SB_S32_S32_Div.horizontal(kernel, input, output, divisor))
 			ConvolveImageStandard_SB.horizontal(kernel, input, output, divisor);
 	}
 
@@ -448,7 +448,7 @@ public class ConvolveImageNoBorder {
 								  GrayS32 input, GrayS32 output, int divisor) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S32_S32_Div.vertical(kernel, input, output, divisor))
+		if (!ConvolveImageUnrolled_SB_S32_S32_Div.vertical(kernel, input, output, divisor))
 			ConvolveImageStandard_SB.vertical(kernel, input, output, divisor);
 	}
 
@@ -456,7 +456,7 @@ public class ConvolveImageNoBorder {
 								  GrayS32 input, GrayS32 output, int divisor) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S32_S32_Div.convolve(kernel, input, output, divisor))
+		if (!ConvolveImageUnrolled_SB_S32_S32_Div.convolve(kernel, input, output, divisor))
 			ConvolveImageStandard_SB.convolve(kernel, input, output, divisor);
 	}
 

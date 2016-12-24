@@ -30,12 +30,12 @@ import java.lang.reflect.Method;
  * @author Peter Abeles
  */
 public class TestConvolveImageUnrolled_F64_F64 {
-	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_F64_F64.class);
+	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_SB_F64_F64.class);
 
 	@Test
 	public void convolve() throws NoSuchMethodException {
-		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_F64_F64.class.getMethod("convolve",
+		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
+			Method m = ConvolveImageUnrolled_SB_F64_F64.class.getMethod("convolve",
 					Kernel2D_F64.class, GrayF64.class, GrayF64.class );
 
 			compareToStandard.compareMethod(m, "convolve", i + 1);
@@ -44,8 +44,8 @@ public class TestConvolveImageUnrolled_F64_F64 {
 
 	@Test
 	public void horizontal() throws NoSuchMethodException {
-		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_F64_F64.class.getMethod("horizontal",
+		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
+			Method m = ConvolveImageUnrolled_SB_F64_F64.class.getMethod("horizontal",
 					Kernel1D_F64.class, GrayF64.class, GrayF64.class);
 
 			compareToStandard.compareMethod(m, "horizontal", i + 1);
@@ -54,8 +54,8 @@ public class TestConvolveImageUnrolled_F64_F64 {
 
 	@Test
 	public void vertical() throws NoSuchMethodException {
-		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_F64_F64.class.getMethod("vertical",
+		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
+			Method m = ConvolveImageUnrolled_SB_F64_F64.class.getMethod("vertical",
 					Kernel1D_F64.class, GrayF64.class, GrayF64.class);
 
 			compareToStandard.compareMethod(m, "vertical", i + 1);

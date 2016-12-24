@@ -91,7 +91,7 @@ public class BenchmarkConvolve  {
 
 	public int timeHorizontalUnroll_I8_I8_div(int reps) {
 		for( int i = 0; i < reps; i++ )
-			if( !ConvolveImageUnrolled_U8_I8_Div.horizontal(kernelI32, input_U8, out_U8,10) )
+			if( !ConvolveImageUnrolled_SB_U8_I8_Div.horizontal(kernelI32, input_U8, out_U8,10) )
 				throw new RuntimeException();
 		return 0;
 	}
@@ -122,7 +122,7 @@ public class BenchmarkConvolve  {
 
 	public int timeVerticalUnrolled_U8_I8_div(int reps) {
 		for( int i = 0; i < reps; i++ )
-			if( !ConvolveImageUnrolled_U8_I8_Div.vertical(kernelI32, input_U8, out_U8,10) )
+			if( !ConvolveImageUnrolled_SB_U8_I8_Div.vertical(kernelI32, input_U8, out_U8,10) )
 				throw new RuntimeException();
 		return 0;
 	}
@@ -153,7 +153,7 @@ public class BenchmarkConvolve  {
 
 	public int timeConvolve2D_Unrolled_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			if( !ConvolveImageUnrolled_F32_F32.convolve(kernel2D_F32, input_F32,out_F32) )
+			if( !ConvolveImageUnrolled_SB_F32_F32.convolve(kernel2D_F32, input_F32,out_F32) )
 				throw new RuntimeException();
 		return 0;
 	}
@@ -196,42 +196,42 @@ public class BenchmarkConvolve  {
 
 	public int timeHorizontalUnrolled_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			if( !ConvolveImageUnrolled_F32_F32.horizontal(kernelF32, input_F32,out_F32) )
+			if( !ConvolveImageUnrolled_SB_F32_F32.horizontal(kernelF32, input_F32,out_F32) )
 				throw new RuntimeException();
 		return 0;
 	}
 
 	public int timeVerticalUnrolled_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			if( !ConvolveImageUnrolled_F32_F32.vertical(kernelF32, input_F32, out_F32) )
+			if( !ConvolveImageUnrolled_SB_F32_F32.vertical(kernelF32, input_F32, out_F32) )
 				throw new RuntimeException();
 		return 0;
 	}
 
 	public int timeHorizontalUnrolled_U8(int reps) {
 		for( int i = 0; i < reps; i++ )
-			if( !ConvolveImageUnrolled_U8_I16.horizontal(kernelI32, input_U8, out_S16) )
+			if( !ConvolveImageUnrolled_SB_U8_I16.horizontal(kernelI32, input_U8, out_S16) )
 				throw new RuntimeException();
 		return 0;
 	}
 
 	public int timeVerticalUnrolled_U8(int reps) {
 		for( int i = 0; i < reps; i++ )
-			if( !ConvolveImageUnrolled_U8_I16.vertical(kernelI32, input_U8, out_S16) )
+			if( !ConvolveImageUnrolled_SB_U8_I16.vertical(kernelI32, input_U8, out_S16) )
 				throw new RuntimeException();
 		return 0;
 	}
 
 	public int timeHorizontalUnrolled_I16(int reps) {
 		for( int i = 0; i < reps; i++ )
-			if( !ConvolveImageUnrolled_S16_I16.horizontal(kernelI32, input_S16, out_S16) )
+			if( !ConvolveImageUnrolled_SB_S16_I16.horizontal(kernelI32, input_S16, out_S16) )
 				throw new RuntimeException();
 		return 0;
 	}
 
 	public int timeVerticalUnrolled_I16(int reps) {
 		for( int i = 0; i < reps; i++ )
-			if( !ConvolveImageUnrolled_S16_I16.vertical(kernelI32, input_S16, out_S16) )
+			if( !ConvolveImageUnrolled_SB_S16_I16.vertical(kernelI32, input_S16, out_S16) )
 				throw new RuntimeException();
 		return 0;
 	}
