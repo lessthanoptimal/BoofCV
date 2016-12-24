@@ -26,7 +26,7 @@ import java.io.FileNotFoundException;
 /**
  * @author Peter Abeles
  */
-public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
+public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 
 	final static int numUnrolled = 5;
 
@@ -59,7 +59,7 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 	protected void create( AutoTypeImage inputImg , AutoTypeImage outputImg , boolean divided ) throws FileNotFoundException {
 		isInteger = inputImg.isInteger();
 
-		String name = "ConvolveImageUnrolled_"+inputImg.getAbbreviatedType()+"_"+outputImg.getAbbreviatedType();
+		String name = "ConvolveImageUnrolled_SB_"+inputImg.getAbbreviatedType()+"_"+outputImg.getAbbreviatedType();
 		if( divided )
 			name += "_Div";
 
@@ -396,7 +396,7 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {
-		GenerateConvolvedUnrolled a = new GenerateConvolvedUnrolled();
+		GenerateConvolvedUnrolled_SB a = new GenerateConvolvedUnrolled_SB();
 
 		a.generate();
 	}

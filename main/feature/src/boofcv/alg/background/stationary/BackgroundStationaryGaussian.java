@@ -19,16 +19,15 @@
 package boofcv.alg.background.stationary;
 
 import boofcv.alg.background.BackgroundAlgorithmGaussian;
-import boofcv.alg.background.BackgroundModelMoving;
 import boofcv.alg.background.BackgroundModelStationary;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
- * <p>Implementation of {@link BackgroundAlgorithmGaussian} for moving images.</p>
+ * <p>Implementation of {@link BackgroundAlgorithmGaussian} for stationary images.</p>
  *
  * @see BackgroundAlgorithmGaussian
- * @see BackgroundModelMoving
+ * @see BackgroundModelStationary
  *
  * @author Peter Abeles
  */

@@ -31,12 +31,12 @@ import java.lang.reflect.Method;
  * @author Peter Abeles
  */
 public class TestConvolveImageUnrolled_U8_I16 {
-	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_U8_I16.class);
+	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_SB_U8_I16.class);
 
 	@Test
 	public void convolve() throws NoSuchMethodException {
-		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_U8_I16.class.getMethod("convolve",
+		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
+			Method m = ConvolveImageUnrolled_SB_U8_I16.class.getMethod("convolve",
 					Kernel2D_S32.class, GrayU8.class, GrayI16.class );
 
 			compareToStandard.compareMethod(m, "convolve", i + 1);
@@ -46,8 +46,8 @@ public class TestConvolveImageUnrolled_U8_I16 {
 	@Test
 	public void horizontal() throws NoSuchMethodException {
 
-		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_U8_I16.class.getMethod("horizontal",
+		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
+			Method m = ConvolveImageUnrolled_SB_U8_I16.class.getMethod("horizontal",
 					Kernel1D_S32.class, GrayU8.class, GrayI16.class);
 
 			compareToStandard.compareMethod(m, "horizontal", i + 1);
@@ -57,8 +57,8 @@ public class TestConvolveImageUnrolled_U8_I16 {
 	@Test
 	public void vertical() throws NoSuchMethodException {
 
-		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_U8_I16.class.getMethod("vertical",
+		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
+			Method m = ConvolveImageUnrolled_SB_U8_I16.class.getMethod("vertical",
 					Kernel1D_S32.class, GrayU8.class, GrayI16.class);
 
 			compareToStandard.compareMethod(m, "vertical", i + 1);

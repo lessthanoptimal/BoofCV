@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.convolve.Kernel1D_F64;
@@ -41,7 +42,7 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated({"boofcv.alg.filter.convolve.noborder.GenerateConvolvedUnrolled"})
-public class ConvolveImageUnrolled_F64_F64 {
+public class ConvolveImageUnrolled_SB_F64_F64 {
 	public static boolean horizontal( Kernel1D_F64 kernel ,
 								   GrayF64 image, GrayF64 dest) {
 

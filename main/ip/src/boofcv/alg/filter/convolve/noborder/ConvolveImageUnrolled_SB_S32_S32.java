@@ -20,8 +20,7 @@ package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_S32;
-import boofcv.struct.image.GrayI16;
-import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayS32;
 
 import javax.annotation.Generated;
 
@@ -43,9 +42,9 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated({"boofcv.alg.filter.convolve.noborder.GenerateConvolvedUnrolled"})
-public class ConvolveImageUnrolled_S16_I16 {
+public class ConvolveImageUnrolled_SB_S32_S32 {
 	public static boolean horizontal( Kernel1D_S32 kernel ,
-								   GrayS16 image, GrayI16 dest) {
+								   GrayS32 image, GrayS32 dest) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -79,7 +78,7 @@ public class ConvolveImageUnrolled_S16_I16 {
 	}
 
 	public static boolean vertical( Kernel1D_S32 kernel ,
-								   GrayS16 image, GrayI16 dest) {
+								   GrayS32 image, GrayS32 dest) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -113,7 +112,7 @@ public class ConvolveImageUnrolled_S16_I16 {
 	}
 
 	public static boolean convolve( Kernel2D_S32 kernel ,
-								   GrayS16 image, GrayI16 dest) {
+								   GrayS32 image, GrayS32 dest) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -146,10 +145,10 @@ public class ConvolveImageUnrolled_S16_I16 {
 		return true;
 	}
 
-	public static void horizontal3(Kernel1D_S32 kernel , GrayS16 image, GrayI16 dest )
+	public static void horizontal3(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -170,15 +169,15 @@ public class ConvolveImageUnrolled_S16_I16 {
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc])*k3;
 
-				dataDst[indexDst++] = ( short )total;
+				dataDst[indexDst++] = total;
 			}
 		}
 	}
 
-	public static void horizontal5(Kernel1D_S32 kernel , GrayS16 image, GrayI16 dest )
+	public static void horizontal5(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -203,15 +202,15 @@ public class ConvolveImageUnrolled_S16_I16 {
 				total += (dataSrc[indexSrc++])*k4;
 				total += (dataSrc[indexSrc])*k5;
 
-				dataDst[indexDst++] = ( short )total;
+				dataDst[indexDst++] = total;
 			}
 		}
 	}
 
-	public static void horizontal7(Kernel1D_S32 kernel , GrayS16 image, GrayI16 dest )
+	public static void horizontal7(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -240,15 +239,15 @@ public class ConvolveImageUnrolled_S16_I16 {
 				total += (dataSrc[indexSrc++])*k6;
 				total += (dataSrc[indexSrc])*k7;
 
-				dataDst[indexDst++] = ( short )total;
+				dataDst[indexDst++] = total;
 			}
 		}
 	}
 
-	public static void horizontal9(Kernel1D_S32 kernel , GrayS16 image, GrayI16 dest )
+	public static void horizontal9(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -281,15 +280,15 @@ public class ConvolveImageUnrolled_S16_I16 {
 				total += (dataSrc[indexSrc++])*k8;
 				total += (dataSrc[indexSrc])*k9;
 
-				dataDst[indexDst++] = ( short )total;
+				dataDst[indexDst++] = total;
 			}
 		}
 	}
 
-	public static void horizontal11(Kernel1D_S32 kernel , GrayS16 image, GrayI16 dest )
+	public static void horizontal11(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -326,15 +325,15 @@ public class ConvolveImageUnrolled_S16_I16 {
 				total += (dataSrc[indexSrc++])*k10;
 				total += (dataSrc[indexSrc])*k11;
 
-				dataDst[indexDst++] = ( short )total;
+				dataDst[indexDst++] = total;
 			}
 		}
 	}
 
-	public static void vertical3(Kernel1D_S32 kernel , GrayS16 image, GrayI16 dest )
+	public static void vertical3(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -361,15 +360,15 @@ public class ConvolveImageUnrolled_S16_I16 {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k3;
 
-				dataDst[indexDst++] = ( short )total;
+				dataDst[indexDst++] = total;
 			}
 		}
 	}
 
-	public static void vertical5(Kernel1D_S32 kernel , GrayS16 image, GrayI16 dest )
+	public static void vertical5(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -402,15 +401,15 @@ public class ConvolveImageUnrolled_S16_I16 {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k5;
 
-				dataDst[indexDst++] = ( short )total;
+				dataDst[indexDst++] = total;
 			}
 		}
 	}
 
-	public static void vertical7(Kernel1D_S32 kernel , GrayS16 image, GrayI16 dest )
+	public static void vertical7(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -449,15 +448,15 @@ public class ConvolveImageUnrolled_S16_I16 {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k7;
 
-				dataDst[indexDst++] = ( short )total;
+				dataDst[indexDst++] = total;
 			}
 		}
 	}
 
-	public static void vertical9(Kernel1D_S32 kernel , GrayS16 image, GrayI16 dest )
+	public static void vertical9(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -502,15 +501,15 @@ public class ConvolveImageUnrolled_S16_I16 {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k9;
 
-				dataDst[indexDst++] = ( short )total;
+				dataDst[indexDst++] = total;
 			}
 		}
 	}
 
-	public static void vertical11(Kernel1D_S32 kernel , GrayS16 image, GrayI16 dest )
+	public static void vertical11(Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest )
 	{
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -561,15 +560,15 @@ public class ConvolveImageUnrolled_S16_I16 {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k11;
 
-				dataDst[indexDst++] = ( short )total;
+				dataDst[indexDst++] = total;
 			}
 		}
 	}
 
-	public static void convolve3(Kernel2D_S32 kernel, GrayS16 src, GrayI16 dest)
+	public static void convolve3(Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest)
 	{
-		final short[] dataSrc = src.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = src.data;
+		final int[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -593,7 +592,7 @@ public class ConvolveImageUnrolled_S16_I16 {
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc] )* k3;
 
-				dataDst[indexDst++] = ( short )total;
+				dataDst[indexDst++] = total;
 			}
 
 			// rest of the convolution rows are an addition
@@ -613,16 +612,16 @@ public class ConvolveImageUnrolled_S16_I16 {
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc] )* k3;
 
-					dataDst[indexDst++] += ( short )total;
+					dataDst[indexDst++] += total;
 				}
 			}
 		}
 	}
 
-	public static void convolve5(Kernel2D_S32 kernel, GrayS16 src, GrayI16 dest)
+	public static void convolve5(Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest)
 	{
-		final short[] dataSrc = src.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = src.data;
+		final int[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -650,7 +649,7 @@ public class ConvolveImageUnrolled_S16_I16 {
 				total += (dataSrc[indexSrc++] )* k4;
 				total += (dataSrc[indexSrc] )* k5;
 
-				dataDst[indexDst++] = ( short )total;
+				dataDst[indexDst++] = total;
 			}
 
 			// rest of the convolution rows are an addition
@@ -674,16 +673,16 @@ public class ConvolveImageUnrolled_S16_I16 {
 					total += (dataSrc[indexSrc++] )* k4;
 					total += (dataSrc[indexSrc] )* k5;
 
-					dataDst[indexDst++] += ( short )total;
+					dataDst[indexDst++] += total;
 				}
 			}
 		}
 	}
 
-	public static void convolve7(Kernel2D_S32 kernel, GrayS16 src, GrayI16 dest)
+	public static void convolve7(Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest)
 	{
-		final short[] dataSrc = src.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = src.data;
+		final int[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -715,7 +714,7 @@ public class ConvolveImageUnrolled_S16_I16 {
 				total += (dataSrc[indexSrc++] )* k6;
 				total += (dataSrc[indexSrc] )* k7;
 
-				dataDst[indexDst++] = ( short )total;
+				dataDst[indexDst++] = total;
 			}
 
 			// rest of the convolution rows are an addition
@@ -743,16 +742,16 @@ public class ConvolveImageUnrolled_S16_I16 {
 					total += (dataSrc[indexSrc++] )* k6;
 					total += (dataSrc[indexSrc] )* k7;
 
-					dataDst[indexDst++] += ( short )total;
+					dataDst[indexDst++] += total;
 				}
 			}
 		}
 	}
 
-	public static void convolve9(Kernel2D_S32 kernel, GrayS16 src, GrayI16 dest)
+	public static void convolve9(Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest)
 	{
-		final short[] dataSrc = src.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = src.data;
+		final int[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -788,7 +787,7 @@ public class ConvolveImageUnrolled_S16_I16 {
 				total += (dataSrc[indexSrc++] )* k8;
 				total += (dataSrc[indexSrc] )* k9;
 
-				dataDst[indexDst++] = ( short )total;
+				dataDst[indexDst++] = total;
 			}
 
 			// rest of the convolution rows are an addition
@@ -820,16 +819,16 @@ public class ConvolveImageUnrolled_S16_I16 {
 					total += (dataSrc[indexSrc++] )* k8;
 					total += (dataSrc[indexSrc] )* k9;
 
-					dataDst[indexDst++] += ( short )total;
+					dataDst[indexDst++] += total;
 				}
 			}
 		}
 	}
 
-	public static void convolve11(Kernel2D_S32 kernel, GrayS16 src, GrayI16 dest)
+	public static void convolve11(Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest)
 	{
-		final short[] dataSrc = src.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = src.data;
+		final int[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -869,7 +868,7 @@ public class ConvolveImageUnrolled_S16_I16 {
 				total += (dataSrc[indexSrc++] )* k10;
 				total += (dataSrc[indexSrc] )* k11;
 
-				dataDst[indexDst++] = ( short )total;
+				dataDst[indexDst++] = total;
 			}
 
 			// rest of the convolution rows are an addition
@@ -905,7 +904,7 @@ public class ConvolveImageUnrolled_S16_I16 {
 					total += (dataSrc[indexSrc++] )* k10;
 					total += (dataSrc[indexSrc] )* k11;
 
-					dataDst[indexDst++] += ( short )total;
+					dataDst[indexDst++] += total;
 				}
 			}
 		}

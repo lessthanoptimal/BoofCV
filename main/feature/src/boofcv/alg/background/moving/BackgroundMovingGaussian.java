@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.InvertibleTransform;
 
 /**
- * <p>Implementation of {@link BackgroundAlgorithmGaussian} for stationary images.</p>
+ * <p>Implementation of {@link BackgroundAlgorithmGaussian} for moving images.</p>
  *
  * @see BackgroundAlgorithmGaussian
  * @see BackgroundModelMoving
