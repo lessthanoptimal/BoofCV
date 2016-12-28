@@ -47,12 +47,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Re-renders the image with a new camera model
+ * Lets the user manually add control points for a distortion and shows the results
  *
  * @author Peter Abeles
  */
-// todo key point location with lines
-// todo let use click to add and drag distorted line
+// TODO select mode clean up
+// TODO dual view mode
+// TODO option to clear all control points
+// TODO option to hide control points
+// TODO provide way to delete a point
+// TODO support similar and rigid
 public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends DemonstrationBase<T>
 	implements DeformKeypointPanel.Listener
 {
@@ -109,7 +113,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 				validTransform = false;
 				pointsUndistorted.clear();
 				pointsDistorted.clear();
-				alg.setKeyPoints(pointsUndistorted);
+				alg.setSource(pointsDistorted);
 			}
 		}
 
@@ -143,22 +147,23 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 
 	@Override
 	public void handleAlgorithmChange() {
+		System.out.println("Algorithm changed");
 		alg = FactoryDistort.deformMls(control.getConfigMLS());
 		p2p.setTransform(alg);
-		controlPointsModified(false);
+		alg.setImageShape(undistorted.width,undistorted.height);
+		controlPointsModified();
 	}
 
-	private void controlPointsModified(boolean justDistorted ) {
+	private void controlPointsModified() {
 		synchronized (pointsUndistorted){
 			try {
-				if (!justDistorted) {
-					alg.setKeyPoints(pointsUndistorted);
-					validTransform = true;
-				}
-				System.out.println("Set distorted");
-				alg.setDistorted(pointsDistorted);
+				// transform needs to go from distorted image to undistorted image
+				alg.setSource(pointsDistorted);
+				alg.setDestination(pointsUndistorted);
+				validTransform = true;
 			} catch( RuntimeException e ) {
-				System.out.println("   FAILED!!");
+				System.out.println("Failed because of "+e.getMessage());
+				System.out.println("   total points "+pointsDistorted.size());
 				validTransform = false;
 			}
 		}
@@ -196,6 +201,8 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 				g2.setStroke(strokeThin);
 				g2.setColor(Color.GRAY);
 				for (int i = 0; i < pointsUndistorted.size(); i++) {
+					if( active != -1 && i != active ) continue;
+
 					Point2D_F32 u = pointsUndistorted.get(i);
 					Point2D_F32 d = pointsDistorted.get(i);
 					line.setLine(u.x*scale,u.y*scale,d.x*scale,d.y*scale);
@@ -207,12 +214,16 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 				g2.setStroke(strokeThick);
 				g2.setColor(Color.RED);
 				for (int i = 0; i < pointsUndistorted.size(); i++) {
+					if( active != -1 && i != active ) continue;
+
 					Point2D_F32 p = pointsUndistorted.get(i);
 					c.setFrame(p.x*scale - r, p.y*scale - r, 2 * r, 2 * r);
 					g2.draw(c);
 				}
 				g2.setColor(Color.BLUE);
 				for (int i = 0; i < pointsDistorted.size(); i++) {
+					if( active != -1 && i != active ) continue;
+
 					Point2D_F32 p = pointsDistorted.get(i);
 					c.setFrame(p.x*scale - r, p.y*scale - r, 2 * r, 2 * r);
 					g2.draw(c);
@@ -231,11 +242,21 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 
 			active = -1;
 			synchronized (pointsUndistorted) {
-				for (int i = 0; i < pointsUndistorted.size(); i++) {
-					Point2D_F32 p = pointsUndistorted.get(i);
+				for (int i = 0; i < pointsDistorted.size(); i++) {
+					Point2D_F32 p = pointsDistorted.get(i);
 					if( p.distance(x,y) <= clickTol ) {
 						active = i;
-						selectedUndist = true;
+						selectedUndist = false;
+					}
+				}
+
+				if( active < 0 ) {
+					for (int i = 0; i < pointsUndistorted.size(); i++) {
+						Point2D_F32 p = pointsUndistorted.get(i);
+						if( p.distance(x,y) <= clickTol ) {
+							active = i;
+							selectedUndist = true;
+						}
 					}
 				}
 
@@ -244,7 +265,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 					selectedUndist = false;
 					pointsUndistorted.add( new Point2D_F32(x,y));
 					pointsDistorted.add( new Point2D_F32(x,y));
-					controlPointsModified(false );
+					controlPointsModified();
 				}
 			}
 		}
@@ -255,6 +276,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 				return;
 
 			active = -1;
+			repaint();
 		}
 
 		@Override
@@ -272,10 +294,15 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 			float y = (float)(e.getY()/scale);
 
 			synchronized (pointsUndistorted) {
-				Point2D_F32 u = pointsDistorted.get(active);
-				u.set(x,y);
+				Point2D_F32 u;
+				if( selectedUndist ) {
+					u = pointsUndistorted.get(active);
+				} else {
+					u = pointsDistorted.get(active);
+				}
+				u.set(x, y);
 			}
-			controlPointsModified(true);
+			controlPointsModified();
 		}
 
 		@Override
@@ -287,6 +314,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 
 		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Mona Lisa", UtilIO.pathExample("standard/mona_lisa.jpg")));
+		inputs.add(new PathLabel("Drawing Face", UtilIO.pathExample("drawings/drawing_face.png")));
 
 		DeformImageKeyPointsApp app = new DeformImageKeyPointsApp(inputs,type);
 

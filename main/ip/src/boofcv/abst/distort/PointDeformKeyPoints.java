@@ -46,20 +46,29 @@ public interface PointDeformKeyPoints extends Point2Transform2_F32 {
 	 * the same location.
 	 * @param locations Location of key points in undistorted image.  Local copy of points is saved.
 	 */
-	void setKeyPoints(List<Point2D_F32> locations );
+	void setSource(List<Point2D_F32> locations );
 
 	/**
 	 * Specifies the distorted location of all the key points.
 	 *
 	 * @param locations location of key points in distorted image.   Local copy of points is saved.
 	 */
-	void setDistorted(List<Point2D_F32> locations );
+	void setDestination(List<Point2D_F32> locations );
 
 	/**
-	 * Changes the distorted location of a single key point
+	 * Changes the source location of a single key point
+	 * 
 	 * @param which Index of key point to change
 	 * @param x distorted x-coordinate
 	 * @param y distorted y-coordinate
 	 */
-	void setDistorted( int which , float x , float y );
+	void setSource(int which , float x , float y );
+
+	/**
+	 * Changes the destination location of a single key point
+	 * @param which Index of key point to change
+	 * @param x distorted x-coordinate
+	 * @param y distorted y-coordinate
+	 */
+	void setDestination(int which , float x , float y );
 }

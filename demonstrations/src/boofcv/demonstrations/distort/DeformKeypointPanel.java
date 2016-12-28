@@ -83,7 +83,7 @@ public class DeformKeypointPanel extends StandardAlgConfigPanel implements Chang
 		} else if( e.getSource() == selectGridCols ) {
 			configMLS.cols = ((SpinnerNumberModel)selectGridCols.getModel()).getNumber().intValue();
 		} else if( e.getSource() == selectAlpha ) {
-			configMLS.alpha = ((SpinnerNumberModel)selectGridCols.getModel()).getNumber().floatValue();
+			configMLS.alpha = ((SpinnerNumberModel)selectAlpha.getModel()).getNumber().floatValue();
 		} else {
 			return;
 		}

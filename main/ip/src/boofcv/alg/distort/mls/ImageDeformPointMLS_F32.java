@@ -95,20 +95,30 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	}
 
 	/**
-	 * Sets the location of a control point.  Initially the distorted and undistorted location will be set to
-	 * be the same.
+	 * Adds a new control point at the specified location.  Initially the distorted and undistorted location will be
+	 * set to the same
+	 *
 	 * @param x coordinate x-axis in image pixels
 	 * @param y coordinate y-axis in image pixels
 	 * @return Index of control point
 	 */
 	public int addControl( float x , float y ) {
+		Control c = controls.grow();
+		c.q.set(x,y);
+		setUndistorted(controls.size()-1,x,y);
+		return controls.size()-1;
+	}
+
+	/**
+	 * Sets the location of a control point.
+	 * @param x coordinate x-axis in image pixels
+	 * @param y coordinate y-axis in image pixels
+	 */
+	public void setUndistorted(int which, float x, float y) {
 		if( scaleX <= 0 || scaleY <= 0 )
 			throw new IllegalArgumentException("Must call configure first");
-		Control c = controls.grow();
-		c.p.set(x/scaleX,y/scaleY);
-		c.q.set(x,y);
 
-		return controls.size()-1;
+		controls.get(which).p.set(x/scaleX,y/scaleY);
 	}
 
 	/**
@@ -118,9 +128,6 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	 * @param y distorted coordinate y-axis in image pixels
 	 */
 	public void setDistorted( int which , float x , float y ) {
-		if( controls.get(which).q.distance(x,y) > 0.0001 ) {
-			System.out.println("q changed "+which);
-		}
 		controls.get(which).q.set(x,y);
 	}
 
@@ -129,7 +136,6 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	 * grid even the current undistorted location of each control point.
 	 */
 	public void fixateUndistorted() {
-
 		for (int row = 0; row < gridRows; row++) {
 			for (int col = 0; col < gridCols; col++) {
 				AffineCache cache = getGrid(row,col);
@@ -156,10 +162,6 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 				AffineCache cache = getGrid(row,col);
 				computeAverageQ( cache );
 				computeAffineDeformed( cache );
-				if( row == 0 && col == 1 ) {
-					System.out.println("average q " + cache.aveQ);
-					System.out.println("deformed " + cache.deformed);
-				}
 			}
 		}
 	}

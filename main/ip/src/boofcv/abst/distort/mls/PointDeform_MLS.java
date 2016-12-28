@@ -52,7 +52,7 @@ public class PointDeform_MLS implements PointDeformKeyPoints
 	}
 
 	@Override
-	public void setKeyPoints(List<Point2D_F32> locations) {
+	public void setSource(List<Point2D_F32> locations) {
 		alg.reset();
 		for (int i = 0; i < locations.size(); i++) {
 			Point2D_F32 p = locations.get(i);
@@ -62,7 +62,7 @@ public class PointDeform_MLS implements PointDeformKeyPoints
 	}
 
 	@Override
-	public void setDistorted(List<Point2D_F32> locations) {
+	public void setDestination(List<Point2D_F32> locations) {
 		for (int i = 0; i < locations.size(); i++) {
 			Point2D_F32 p = locations.get(i);
 			alg.setDistorted(i, p.x, p.y);
@@ -71,8 +71,15 @@ public class PointDeform_MLS implements PointDeformKeyPoints
 	}
 
 	@Override
-	public void setDistorted(int which, float x, float y) {
+	public void setSource(int which, float x, float y) {
+		alg.setUndistorted(which, x , y );
+		alg.fixateUndistorted();
+	}
+
+	@Override
+	public void setDestination(int which, float x, float y) {
 		alg.setDistorted(which, x , y );
+		alg.fixateDistorted();
 	}
 
 	public ImageDeformPointMLS_F32 getAlgorithm() {
