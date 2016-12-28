@@ -39,7 +39,7 @@ public class TestImageDeformPointMLS_F32 {
 	 */
 	@Test
 	public void testAllAtOnce_noChange() {
-		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32();
+		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
 		alg.configure(width,height, rows, cols);
 
 		alg.addControl(5,5);
@@ -70,7 +70,7 @@ public class TestImageDeformPointMLS_F32 {
 	 */
 	@Test
 	public void testAllAtOnce_OnControlPoints() {
-		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32();
+		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
 		alg.configure(width,height, rows, cols);
 
 		// carefully place control points on grid points to minimze the affect of the bilinear interpolation step
@@ -106,7 +106,7 @@ public class TestImageDeformPointMLS_F32 {
 	 */
 	@Test
 	public void testAllAtOnce_CloserToCloser() {
-		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32();
+		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
 		alg.configure(width,height, rows, cols);
 
 		alg.addControl(5,5);
@@ -139,7 +139,7 @@ public class TestImageDeformPointMLS_F32 {
 	 */
 	@Test
 	public void multipleCallsToFixate() {
-		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32();
+		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
 		alg.configure(width,height, rows, cols);
 
 		alg.addControl(5,5);
@@ -173,7 +173,7 @@ public class TestImageDeformPointMLS_F32 {
 
 	@Test
 	public void computeAverageP() {
-		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32();
+		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
 		alg.configure(width,height, rows, cols);
 
 		alg.addControl(10,15);
@@ -203,7 +203,7 @@ public class TestImageDeformPointMLS_F32 {
 
 	@Test
 	public void computeAverageQ() {
-		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32();
+		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
 		alg.configure(width,height, rows, cols);
 
 		alg.addControl(10,15);
@@ -227,7 +227,7 @@ public class TestImageDeformPointMLS_F32 {
 
 	@Test
 	public void computeWeights() {
-		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32();
+		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
 		alg.configure(width,height, rows, cols);
 
 		alg.addControl(10,15);
@@ -271,7 +271,7 @@ public class TestImageDeformPointMLS_F32 {
 
 	@Test
 	public void interpolateDeformedPoint() {
-		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32();
+		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
 		alg.configure(width,height, rows, cols);
 
 		float x0 = 4, x1 = 6;
