@@ -45,14 +45,19 @@ public class TestImageDeformPointMLS_F32 {
 		alg.addControl(5,5);
 		alg.addControl(10,20);
 		alg.addControl(30,50);
+		alg.addControl(16,0);
 
+		checkNoTransform(alg);
+	}
+
+	private void checkNoTransform(ImageDeformPointMLS_F32 alg) {
 		alg.fixateUndistorted();
 		alg.fixateDistorted();
 
 		// should be no change now
 		Point2D_F32 found = new Point2D_F32();
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
 				alg.compute(j,i, found);
 				assertEquals(j, found.x, GrlConstants.FLOAT_TEST_TOL);
 				assertEquals(i, found.y, GrlConstants.FLOAT_TEST_TOL);
@@ -61,19 +66,107 @@ public class TestImageDeformPointMLS_F32 {
 	}
 
 	/**
-	 * See how it handles distorted points
+	 * When sampled exactly on a control point the distortion should be the distortion for that point
 	 */
 	@Test
-	public void testAllAtOnce() {
+	public void testAllAtOnce_OnControlPoints() {
+		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32();
+		alg.configure(width,height, rows, cols);
+
+		// carefully place control points on grid points to minimze the affect of the bilinear interpolation step
+		alg.addControl(5,5.45455f);
+		alg.addControl(10,21.818182f);
+		alg.addControl(30,49.090908f);
+		alg.addControl(15,5.4545455f);
+
+		alg.setDistorted(0, 10, 12);
+		alg.setDistorted(1, 14, 30);
+		alg.setDistorted(2, 25, 45);
+		alg.setDistorted(3, 20, 8);
+
+		alg.fixateUndistorted();
+		alg.fixateDistorted();
+
+		checkCompute(5,5.45455f, 10, 12, alg);
+		checkCompute(10,21.818182f, 14, 30, alg);
+		checkCompute(30,49.090908f, 25, 45, alg);
+		checkCompute(15,5.4545455f, 20, 8, alg);
+	}
+
+	private void checkCompute( float x , float y , float expectedX , float expectedY , ImageDeformPointMLS_F32 alg ) {
+		Point2D_F32 found = new Point2D_F32();
+		alg.compute(x,y, found);
+
+		assertEquals(expectedX, found.x, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(expectedY, found.y, GrlConstants.FLOAT_TEST_TOL);
+	}
+
+	/**
+	 * See if the distorted point is closer to the closest control point
+	 */
+	@Test
+	public void testAllAtOnce_CloserToCloser() {
 		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32();
 		alg.configure(width,height, rows, cols);
 
 		alg.addControl(5,5);
 		alg.addControl(10,20);
 		alg.addControl(30,50);
+		alg.addControl(16,0);
+
+		alg.setDistorted(0, 10, 12);
+		alg.setDistorted(1, 14, 30);
+		alg.setDistorted(2, 25, 45);
+		alg.setDistorted(3, 20, 8);
 
 		alg.fixateUndistorted();
 		alg.fixateDistorted();
+
+		Point2D_F32 a = new Point2D_F32();
+		Point2D_F32 b = new Point2D_F32();
+
+		alg.compute(4,4, a);
+		alg.compute(1,4, b);
+
+		float distA = a.distance(10,12);
+		float distB = b.distance(10,12);
+
+		assertTrue(distA<distB);
+	}
+
+	/**
+	 * Should produce identical results when fixate is called multiple times
+	 */
+	@Test
+	public void multipleCallsToFixate() {
+		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32();
+		alg.configure(width,height, rows, cols);
+
+		alg.addControl(5,5);
+		alg.addControl(10,20);
+		alg.addControl(30,50);
+		alg.addControl(16,0);
+
+		alg.setDistorted(0, 10, 12);
+		alg.setDistorted(1, 14, 30);
+		alg.setDistorted(2, 25, 45);
+		alg.setDistorted(3, 20, 8);
+
+		alg.fixateUndistorted();
+		alg.fixateDistorted();
+
+		Point2D_F32 expected = new Point2D_F32();
+		alg.compute(4,4, expected);
+
+		Point2D_F32 found = new Point2D_F32();
+		alg.fixateDistorted();
+		alg.compute(4,4, found);
+		assertTrue( found.distance(expected) <= GrlConstants.FLOAT_TEST_TOL);
+
+		alg.fixateUndistorted();
+		alg.fixateDistorted();
+		alg.compute(4,4, found);
+		assertTrue( found.distance(expected) <= GrlConstants.FLOAT_TEST_TOL);
 
 	}
 
@@ -96,6 +189,7 @@ public class TestImageDeformPointMLS_F32 {
 		ImageDeformPointMLS_F32.AffineCache c = new ImageDeformPointMLS_F32.AffineCache();
 		c.weights.data = new float[]{0.1f,0.6f,0.3f};
 		c.weights.size = 3;
+		c.totalWeight = 1;
 		c.aveP.set(1,2);
 
 		alg.computeAverageP(c);
@@ -119,6 +213,7 @@ public class TestImageDeformPointMLS_F32 {
 		ImageDeformPointMLS_F32.AffineCache c = new ImageDeformPointMLS_F32.AffineCache();
 		c.weights.data = new float[]{0.1f,0.6f,0.3f};
 		c.weights.size = 3;
+		c.totalWeight = 1;
 		c.aveQ.set(1,2);
 
 		alg.computeAverageQ(c);
@@ -139,19 +234,20 @@ public class TestImageDeformPointMLS_F32 {
 		alg.addControl(5,4);
 		alg.addControl(20,24);
 
-		float weights[] = new float[3];
+		ImageDeformPointMLS_F32.AffineCache cache = alg.grid.get(0);
+		cache.weights.data = new float[3];
 
 		// test an edge case
-		alg.computeWeights(weights, 5/alg.scaleX, 4/alg.scaleY);
-		checkWeights(weights,0,1,0);
-		alg.computeWeights(weights, 20/alg.scaleX, 24/alg.scaleY);
-		checkWeights(weights,0,0,1);
+		alg.computeWeights(cache, 5/alg.scaleX, 4/alg.scaleY);
+		checkWeights(cache,0,1,0);
+		alg.computeWeights(cache, 20/alg.scaleX, 24/alg.scaleY);
+		checkWeights(cache,0,0,1);
 
 		// this should be a bit fuzzier
-		alg.computeWeights(weights, 14/alg.scaleX, 17/alg.scaleY);
-		assertTrue( weights[0] > weights[1]);
-		assertTrue( weights[0] > weights[2]);
-		assertTrue( weights[2] > weights[1]);
+		alg.computeWeights(cache, 14/alg.scaleX, 17/alg.scaleY);
+		assertTrue( cache.weights.data[0] > cache.weights.data[1]);
+		assertTrue( cache.weights.data[0] > cache.weights.data[2]);
+		assertTrue( cache.weights.data[2] > cache.weights.data[1]);
 
 		// do a manual computation of the weight
 		float alpha = 2.1f;
@@ -159,21 +255,22 @@ public class TestImageDeformPointMLS_F32 {
 		double y2 = alg.scaleY*alg.scaleY;
 
 		double expected0 = Math.pow(2*2/x2 + 1/y2,-alpha);
-		double expected1 = Math.pow(7*7/x2 + 12*12/y2,-alpha);
-		double expected2 = Math.pow(8*8/x2 + 8*8/y2,-alpha);
 
 		alg.setAlpha(alpha);
-		alg.computeWeights(weights,12/alg.scaleX,16/alg.scaleY);
-		assertEquals(expected0/((expected0+expected1+expected2)), weights[0], GrlConstants.FLOAT_TEST_TOL);
+		alg.computeWeights(cache,12/alg.scaleX,16/alg.scaleY);
+		assertEquals(expected0, cache.weights.data[0], GrlConstants.FLOAT_TEST_TOL);
 
 	}
 
-	private void checkWeights(float weights[], float... expected) {
-		assertArrayEquals(weights, expected, GrlConstants.FLOAT_TEST_TOL);
+	private void checkWeights(ImageDeformPointMLS_F32.AffineCache cache, float... expected) {
+		for (int i = 0; i < cache.weights.size(); i++) {
+			expected[i] *= cache.totalWeight;
+		}
+		assertArrayEquals(cache.weights.data, expected, GrlConstants.FLOAT_TEST_TOL);
 	}
 
 	@Test
-	public void computeGridCoordinate() {
+	public void interpolateDeformedPoint() {
 		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32();
 		alg.configure(width,height, rows, cols);
 
@@ -186,23 +283,23 @@ public class TestImageDeformPointMLS_F32 {
 		alg.getGrid(2,4).deformed.set(x1,y0);
 
 		// when sampled exactly on the coordinate it should be the distored value at that coordinate
-		checkGridCoordinate( 3,2,x0,y0, alg );
-		checkGridCoordinate( 3,3,x0,y1, alg );
-		checkGridCoordinate( 4,3,x1,y1, alg );
-		checkGridCoordinate( 4,2,x1,y0, alg );
+		CheckInterpolated( 3,2,x0,y0, alg );
+		CheckInterpolated( 3,3,x0,y1, alg );
+		CheckInterpolated( 4,3,x1,y1, alg );
+		CheckInterpolated( 4,2,x1,y0, alg );
 
 		// try values exactly between
-		checkGridCoordinate( 3.5f,2,0.5f*x0+0.5f*x1,y0, alg );
-		checkGridCoordinate( 3.7f,2,0.3f*x0+0.7f*x1,y0, alg );
-		checkGridCoordinate( 3f,2.5f,x0,0.5f*y0+0.5f*y1, alg );
-		checkGridCoordinate( 3f,2.7f,x0,0.3f*y0+0.7f*y1, alg );
+		CheckInterpolated( 3.5f,2,0.5f*x0+0.5f*x1,y0, alg );
+		CheckInterpolated( 3.7f,2,0.3f*x0+0.7f*x1,y0, alg );
+		CheckInterpolated( 3f,2.5f,x0,0.5f*y0+0.5f*y1, alg );
+		CheckInterpolated( 3f,2.7f,x0,0.3f*y0+0.7f*y1, alg );
 
 	}
 
-	private void checkGridCoordinate( float x , float y , float expectedX , float expectedY , ImageDeformPointMLS_F32 alg ) {
+	private void CheckInterpolated(float x , float y , float expectedX , float expectedY , ImageDeformPointMLS_F32 alg ) {
 
 		Point2D_F32 p = new Point2D_F32();
-		alg.computeGridCoordinate(x,y, p);
+		alg.interpolateDeformedPoint(x,y, p);
 
 		assertEquals(expectedX, p.x, GrlConstants.FLOAT_TEST_TOL);
 		assertEquals(expectedY, p.y, GrlConstants.FLOAT_TEST_TOL);
