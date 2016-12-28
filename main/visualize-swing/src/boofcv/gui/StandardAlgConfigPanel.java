@@ -36,6 +36,14 @@ public class StandardAlgConfigPanel extends JPanel {
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 	}
 
+	protected JSpinner spinner(Object initial , Object[] items ) {
+		JSpinner spinner = new JSpinner(new SpinnerListModel(items));
+		spinner.setValue(initial);
+		spinner.setMaximumSize(spinner.getPreferredSize());
+		spinner.addChangeListener((ChangeListener)this);
+		return spinner;
+	}
+
 	protected JSpinner spinner(int initial , int minimum , int maximum, int stepSize ) {
 		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
 		spinner.setMaximumSize(spinner.getPreferredSize());

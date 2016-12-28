@@ -64,8 +64,20 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	// scale between image and grid
 	float scaleX,scaleY;
 
+	public ImageDeformPointMLS_F32( TypeDeformMLS type ) {
+	}
+
 	/**
-	 * Specifies the input image size and the size of the grid it will use to approximate the idea solution
+	 * Discards all existing control points
+	 */
+	public void reset() {
+		controls.reset();
+	}
+
+	/**
+	 * Specifies the input image size and the size of the grid it will use to approximate the idea solution. All
+	 * control points are discarded
+	 *
 	 * @param width Image width
 	 * @param height Image height
 	 * @param gridRows grid rows
@@ -79,6 +91,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 		this.gridCols = gridCols;
 
 		grid.resize(gridCols*gridRows);
+		reset();
 	}
 
 	/**
@@ -89,6 +102,8 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	 * @return Index of control point
 	 */
 	public int addControl( float x , float y ) {
+		if( scaleX <= 0 || scaleY <= 0 )
+			throw new IllegalArgumentException("Must call configure first");
 		Control c = controls.grow();
 		c.p.set(x/scaleX,y/scaleY);
 		c.q.set(x,y);
@@ -103,6 +118,9 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	 * @param y distorted coordinate y-axis in image pixels
 	 */
 	public void setDistorted( int which , float x , float y ) {
+		if( controls.get(which).q.distance(x,y) > 0.0001 ) {
+			System.out.println("q changed "+which);
+		}
 		controls.get(which).q.set(x,y);
 	}
 
@@ -138,6 +156,10 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 				AffineCache cache = getGrid(row,col);
 				computeAverageQ( cache );
 				computeAffineDeformed( cache );
+				if( row == 0 && col == 1 ) {
+					System.out.println("average q " + cache.aveQ);
+					System.out.println("deformed " + cache.deformed);
+				}
 			}
 		}
 	}
@@ -186,12 +208,6 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 			inner01 += hat_p_y*hat_p_x*w;
 			inner11 += hat_p_y*hat_p_y*w;
 		}
-
-		// TODO delete
-//		// improve numerical stability during inverse.
-//		// shouldn't blow up now even with just a single control point
-//		inner00 += GrlConstants.F_EPS;
-//		inner11 += GrlConstants.F_EPS;
 
 		// invert it using minors equation
 		float det = (inner00*inner11 - inner01*inner01);
@@ -293,8 +309,6 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	@Override
 	public void compute(float x, float y, Point2D_F32 out) {
 		interpolateDeformedPoint(x/scaleX, y/scaleY, out);
-//		out.x *= scaleX;
-//		out.y *= scaleY;
 	}
 
 	/**

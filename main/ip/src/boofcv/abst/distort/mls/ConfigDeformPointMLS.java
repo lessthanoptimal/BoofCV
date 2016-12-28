@@ -16,37 +16,41 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort;
+package boofcv.abst.distort.mls;
 
-import boofcv.struct.distort.PixelTransform2_F64;
-import boofcv.struct.distort.Point2Transform2_F64;
-import georegression.struct.point.Point2D_F64;
+import boofcv.alg.distort.mls.ImageDeformPointMLS_F32;
+import boofcv.alg.distort.mls.TypeDeformMLS;
+import boofcv.struct.Configuration;
 
 /**
- * Allows a {@link PointToPixelTransform_F64} to be invoked as a {@link PixelTransform2_F64}.
+ * Configuration for {@link ImageDeformPointMLS_F32}
  *
  * @author Peter Abeles
  */
-public class PointToPixelTransform_F64 extends PixelTransform2_F64 {
-	Point2Transform2_F64 alg;
+public class ConfigDeformPointMLS implements Configuration {
 
-	Point2D_F64 point = new Point2D_F64();
+	/**
+	 * Deformation model it should use
+	 */
+	public TypeDeformMLS type = TypeDeformMLS.RIGID;
 
-	public PointToPixelTransform_F64(Point2Transform2_F64 alg) {
-		this.alg = alg;
-	}
+	/**
+	 * Number of columns in precomputed distortion grd
+	 */
+	public int cols = 50;
 
-	public PointToPixelTransform_F64() {
-	}
+	/**
+	 * Number of rows in precomputed distortion grd
+	 */
+	public int rows = 50;
 
-	public void setTransform(Point2Transform2_F64 transform) {
-		this.alg = transform;
-	}
+	/**
+	 * Used to tune distance function
+	 */
+	public float alpha = 3.0f/2.0f;
 
 	@Override
-	public void compute(int x, int y) {
-		alg.compute(x,y,point);
-		distX = point.x;
-		distY = point.y;
+	public void checkValidity() {
+
 	}
 }

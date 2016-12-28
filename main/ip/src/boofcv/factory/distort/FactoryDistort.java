@@ -18,8 +18,12 @@
 
 package boofcv.factory.distort;
 
+import boofcv.abst.distort.PointDeformKeyPoints;
+import boofcv.abst.distort.mls.ConfigDeformPointMLS;
+import boofcv.abst.distort.mls.PointDeform_MLS;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.impl.*;
+import boofcv.alg.distort.mls.ImageDeformPointMLS_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
@@ -151,5 +155,15 @@ public class FactoryDistort {
 					throw new IllegalArgumentException("Not supported yet");
 			}
 		}
+	}
+
+	public static PointDeformKeyPoints deformMls(ConfigDeformPointMLS config ) {
+		if( config == null )
+			config = new ConfigDeformPointMLS();
+
+		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(config.type);
+		alg.setAlpha(config.alpha);
+
+		return new PointDeform_MLS(alg, config.rows, config.cols);
 	}
 }
