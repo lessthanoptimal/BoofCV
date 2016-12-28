@@ -30,7 +30,7 @@ import org.ddogleg.struct.GrowQueue_F32;
  * <ol>
  *     <li>Invoke {@link #configure}</li>
  *     <li>Invoke {@link #addControl} for each control point</li>
- *     <li>Invoke {@link #fixateControlPoints()} when all control points have been added</li>
+ *     <li>Invoke {@link #fixateUndistorted()} ()} when all control points have been added</li>
  *     <li>Invoke {@link #setDistorted} to change the distorted location of a control point</li>
  *     <li>Invoke {@link #fixateDistorted()} after you are done changing distorted locations</li>
  * </ol>
@@ -74,21 +74,43 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	public void configure( int width , int height , int gridRows , int gridCols ) {
 		scaleX = width/(float)gridCols;
 		scaleY = height/(float)gridRows;
+
+		this.gridRows = gridRows;
+		this.gridCols = gridCols;
+
+		grid.resize(gridCols*gridRows);
 	}
 
+	/**
+	 * Sets the location of a control point.  Initially the distorted and undistorted location will be set to
+	 * be the same.
+	 * @param x coordinate x-axis in image pixels
+	 * @param y coordinate y-axis in image pixels
+	 * @return Index of control point
+	 */
 	public int addControl( float x , float y ) {
 		Control c = controls.grow();
-		c.p.set(x,y);
+		c.p.set(x/scaleX,y/scaleY);
 		c.q.set(x,y);
 
 		return controls.size()-1;
 	}
 
+	/**
+	 * Sets the distorted location of a specific control point
+	 * @param which Which control point
+	 * @param x distorted coordinate x-axis in image pixels
+	 * @param y distorted coordinate y-axis in image pixels
+	 */
 	public void setDistorted( int which , float x , float y ) {
 		controls.get(which).q.set(x,y);
 	}
 
-	public void fixateControlPoints() {
+	/**
+	 * Precompute the portion of the equation which only concerns the undistorted location of each point on the
+	 * grid even the current undistorted location of each control point.
+	 */
+	public void fixateUndistorted() {
 
 		for (int row = 0; row < gridRows; row++) {
 			for (int col = 0; col < gridCols; col++) {
@@ -106,17 +128,24 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 		}
 	}
 
+	/**
+	 * Recompute the deformation of each point in the internal grid now that the location of control points is
+	 * not changing any more.
+	 */
 	public void fixateDistorted() {
 		for (int row = 0; row < gridRows; row++) {
 			for (int col = 0; col < gridCols; col++) {
 				AffineCache cache = getGrid(row,col);
 				computeAverageQ( cache );
-				computeDeformed( cache );
+				computeAffineDeformed( cache );
 			}
 		}
 	}
 
-	private void computeDeformed( AffineCache cache ) {
+	/**
+	 * Compute deformed location for a given grid point given it's cached data
+	 */
+	void computeAffineDeformed(AffineCache cache ) {
 		Point2D_F32 deformed = cache.deformed;
 		deformed.set(0,0);
 
@@ -130,7 +159,14 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	}
 
 
-	private void computeAffineCache(AffineCache cache, float v_x, float v_y) {
+	/**
+	 * Precompute as much as possible for each control point for affine distortion.  This takes advantage of 'p'
+	 * not changing.
+	 * @param cache Cache for a particular point in the grid
+	 * @param v_x grid coordinate for the cached point
+	 * @param v_y grid coordinate for the cached point
+	 */
+	void computeAffineCache(AffineCache cache, float v_x, float v_y) {
 		float[] weights = cache.weights.data;
 
 		// compute the inner 2x2 matrix
@@ -167,31 +203,43 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 		}
 	}
 
-	private void computeAverageP(AffineCache cache) {
+	/**
+	 * Computes the average P given the weights at this cached point
+	 */
+	void computeAverageP(AffineCache cache) {
 		float[] weights = cache.weights.data;
 		cache.aveP.set(0,0);
 
 		for (int i = 0; i < controls.size(); i++) {
 			Control c = controls.get(i);
 			float w = weights[i];
-			cache.aveP.x = c.p.x * w;
-			cache.aveP.y = c.p.y * w;
+			cache.aveP.x += c.p.x * w;
+			cache.aveP.y += c.p.y * w;
 		}
 	}
 
-	private void computeAverageQ(AffineCache cache) {
+	/**
+	 * Computes the average Q given the weights at this cached point
+	 */
+	void computeAverageQ(AffineCache cache) {
 		float[] weights = cache.weights.data;
 		cache.aveQ.set(0,0);
 
 		for (int i = 0; i < controls.size(); i++) {
 			Control c = controls.get(i);
 			float w = weights[i];
-			cache.aveQ.x = c.q.x * w;
-			cache.aveQ.y = c.q.y * w;
+			cache.aveQ.x += c.q.x * w;
+			cache.aveQ.y += c.q.y * w;
 		}
 	}
 
-	private void computeWeights(float[] weights, float v_x, float v_y) {
+	/**
+	 * Computes the weight/influence of each control point when distorting point v.
+	 * @param weights weight of each control point
+	 * @param v_x undistorted grid coordinate of cached point.
+	 * @param v_y undistorted grid coordinate of cached point.
+	 */
+	void computeWeights(float[] weights, float v_x, float v_y) {
 		// first compute the weights
 		float totalWeight = 0.0f;
 		for (int i = 0; i < controls.size(); i++) {
@@ -219,17 +267,15 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	@Override
 	public void compute(float x, float y, Point2D_F32 out) {
 		computeGridCoordinate(x/scaleX, y/scaleY, out);
-		out.x *= scaleX;
-		out.y *= scaleY;
 	}
 
 	/**
 	 * Samples the 4 grid points around v and performs bilinear interpolation
-	 * @param v_x Grid coordinate x-axis, undistored
+	 * @param v_x Grid coordinate x-axis, undistorted
 	 * @param v_y Grid coordinate y-axis, undistorted
-	 * @param distorted Distorted grid coordinate
+	 * @param distorted Distorted grid coordinate in image pixels
 	 */
-	private void computeGridCoordinate( float v_x , float v_y , Point2D_F32 distorted ) {
+	void computeGridCoordinate( float v_x , float v_y , Point2D_F32 distorted ) {
 
 		// sample the closest point and x+1,y+1
 		int x0 = (int)v_x;
@@ -271,20 +317,20 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 		distorted.y += w10 * d10.y;
 	}
 
-	private AffineCache getGrid( int row , int col ) {
+	AffineCache getGrid( int row , int col ) {
 		return grid.data[row*gridCols + col];
 	}
 
-	private static class Cache {
+	public static class Cache {
 		// location of the final deformed point
 		public Point2D_F32 deformed = new Point2D_F32();
 	}
 
-	private static class AffineCache extends Cache {
-		public GrowQueue_F32 weights = new GrowQueue_F32();
-		public GrowQueue_F32 A = new GrowQueue_F32();
-		public Point2D_F32 aveP = new Point2D_F32();
-		public Point2D_F32 aveQ = new Point2D_F32();
+	public static class AffineCache extends Cache {
+		public GrowQueue_F32 weights = new GrowQueue_F32(); // weight of each control point
+		public GrowQueue_F32 A = new GrowQueue_F32(); // As as the variable 'A' in the paper
+		public Point2D_F32 aveP = new Point2D_F32(); // average control point for given weights
+		public Point2D_F32 aveQ = new Point2D_F32(); // average distorted point for given weights
 	}
 
 	public float getAlpha() {
@@ -297,11 +343,11 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 
 	public static class Control {
 		/**
-		 * Control point location
+		 * Control point location in grid coordinates
 		 */
 		Point2D_F32 p = new Point2D_F32();
 		/**
-		 * Deformed control point location
+		 * Deformed control point location in image pixels
 		 */
 		Point2D_F32 q = new Point2D_F32();
 	}
