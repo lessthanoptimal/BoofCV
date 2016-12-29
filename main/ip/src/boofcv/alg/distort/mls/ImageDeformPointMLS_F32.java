@@ -136,6 +136,8 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	 * grid even the current undistorted location of each control point.
 	 */
 	public void fixateUndistorted() {
+		if( controls.size() < 3 )
+			throw new RuntimeException("Not enough control points specified.  Found "+controls.size());
 		for (int row = 0; row < gridRows; row++) {
 			for (int col = 0; col < gridCols; col++) {
 				AffineCache cache = getGrid(row,col);

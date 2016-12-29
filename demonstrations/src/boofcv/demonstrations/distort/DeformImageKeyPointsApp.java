@@ -51,10 +51,6 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO select mode clean up
-// TODO dual view mode
-// TODO option to clear all control points
-// TODO option to hide control points
 // TODO provide way to delete a point
 // TODO support similar and rigid
 public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends DemonstrationBase<T>
@@ -113,7 +109,6 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 				validTransform = false;
 				pointsUndistorted.clear();
 				pointsDistorted.clear();
-				alg.setSource(pointsDistorted);
 			}
 		}
 
@@ -125,32 +120,41 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 
 	private void renderDistorted(BufferedImage buffered, T undistorted) {
 		// if not enough points have been set it can blow up
-		if( validTransform ) {
-//			Point2D_F32 point = new Point2D_F32();
-//			alg.compute(0,0,point);
-//			System.out.println("(0,0) = "+point);
-//			alg.compute(undistorted.width-1,undistorted.height-1,point);
-//			System.out.println("(w,h) = "+point);
+		if( !control.isShowOriginal() && validTransform ) {
 			distortImage.apply(undistorted, distorted);
 			ConvertBufferedImage.convertTo(distorted, distortedBuff, true);
 		} else {
-			if( distortedBuff != buffered )
+			if( buffered != null )
 				distortedBuff.createGraphics().drawImage(buffered,0,0,undistorted.width,undistorted.height,null);
+			else {
+				ConvertBufferedImage.convertTo(undistorted, distortedBuff, true);
+			}
 		}
 		gui.setBufferedImageSafe(distortedBuff);
 	}
 
 	@Override
 	public void handleVisualizationChange() {
-
+		if( inputMethod == InputMethod.IMAGE ) {
+			renderDistorted(null, undistorted);
+		}
+		gui.repaint();
 	}
 
 	@Override
 	public void handleAlgorithmChange() {
-		System.out.println("Algorithm changed");
 		alg = FactoryDistort.deformMls(control.getConfigMLS());
 		p2p.setTransform(alg);
 		alg.setImageShape(undistorted.width,undistorted.height);
+		controlPointsModified();
+	}
+
+	@Override
+	public void handleClearPoints() {
+		synchronized (pointsUndistorted){
+			pointsDistorted.clear();
+			pointsUndistorted.clear();
+		}
 		controlPointsModified();
 	}
 
@@ -169,7 +173,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		}
 		distortImage.setModel(p2p);
 		if( inputMethod == InputMethod.IMAGE ) {
-			renderDistorted(distortedBuff, undistorted);
+			renderDistorted(null, undistorted);
 		}
 		gui.repaint();
 	}
@@ -196,6 +200,9 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 			Graphics2D g2 = (Graphics2D)g;
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+			if( active == -1 && !control.showPoints)
+				return;
 
 			synchronized (pointsUndistorted) {
 				g2.setStroke(strokeThin);
@@ -313,7 +320,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		ImageType type = ImageType.pl(3, GrayU8.class);
 
 		List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("Mona Lisa", UtilIO.pathExample("standard/mona_lisa.jpg")));
+//		inputs.add(new PathLabel("Mona Lisa", UtilIO.pathExample("standard/mona_lisa.jpg")));
 		inputs.add(new PathLabel("Drawing Face", UtilIO.pathExample("drawings/drawing_face.png")));
 
 		DeformImageKeyPointsApp app = new DeformImageKeyPointsApp(inputs,type);

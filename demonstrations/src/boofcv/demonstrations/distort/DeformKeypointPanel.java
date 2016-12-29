@@ -25,22 +25,27 @@ import boofcv.gui.StandardAlgConfigPanel;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * @author Peter Abeles
  */
-public class DeformKeypointPanel extends StandardAlgConfigPanel implements ChangeListener {
+public class DeformKeypointPanel extends StandardAlgConfigPanel
+		implements ChangeListener, ActionListener
+{
 //	JSpinner selectAlgorithm;
 
-	JCheckBox checkDualView;
+	JCheckBox checkShowOriginal;
 	JCheckBox checkShowPoints;
+	JButton buttonClear;
 
-	JSpinner selectModel;
+	JComboBox selectModel;
 	JSpinner selectGridRows;
 	JSpinner selectGridCols;
 	JSpinner selectAlpha;
 
-	boolean dualView = false;
+	boolean showOriginal = false;
 	boolean showPoints = true;
 
 	ConfigDeformPointMLS configMLS = new ConfigDeformPointMLS();
@@ -50,20 +55,38 @@ public class DeformKeypointPanel extends StandardAlgConfigPanel implements Chang
 	public DeformKeypointPanel( Listener listener ) {
 		this.listener = listener;
 
+		checkShowOriginal = new JCheckBox("Original");
+		checkShowOriginal.setSelected(showOriginal);
+		checkShowOriginal.addActionListener(this);
 
-		selectModel = spinner(configMLS.type, TypeDeformMLS.values());
+		checkShowPoints = new JCheckBox("Show Points");
+		checkShowPoints.setSelected(showPoints);
+		checkShowPoints.addActionListener(this);
+
+		buttonClear = new JButton("Clear");
+		buttonClear.addActionListener(this);
+
+		selectModel = new JComboBox(TypeDeformMLS.values());
+		selectModel.setSelectedIndex(configMLS.type.ordinal());
+		selectModel.addActionListener(this);
+		selectModel.setMaximumSize(selectModel.getPreferredSize());
 		selectGridRows = spinner(configMLS.rows, 5, 600, 5);
 		selectGridCols = spinner(configMLS.cols, 5, 600, 5);
 		selectAlpha = spinner(configMLS.alpha, 0.5f, 20.f, 0.5f);
 
+		addAlignLeft(checkShowOriginal,this);
+		addAlignLeft(checkShowPoints,this);
+		addAlignCenter(buttonClear,this);
+		addSeparator();
 		addLabeled(selectModel, "Model", this);
 		addLabeled(selectGridRows, "Grid Rows", this);
 		addLabeled(selectGridCols, "Grid Cols", this);
 		addLabeled(selectAlpha, "Alpha", this);
+		addVerticalGlue(this);
 	}
 
-	public boolean isDualView() {
-		return dualView;
+	public boolean isShowOriginal() {
+		return showOriginal;
 	}
 
 	public boolean isShowPoints() {
@@ -76,9 +99,7 @@ public class DeformKeypointPanel extends StandardAlgConfigPanel implements Chang
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == selectModel ) {
-			configMLS.type = (TypeDeformMLS)selectModel.getValue();
-		} else if( e.getSource() == selectGridRows ) {
+		if( e.getSource() == selectGridRows ) {
 			configMLS.rows = ((SpinnerNumberModel)selectGridRows.getModel()).getNumber().intValue();
 		} else if( e.getSource() == selectGridCols ) {
 			configMLS.cols = ((SpinnerNumberModel)selectGridCols.getModel()).getNumber().intValue();
@@ -90,10 +111,28 @@ public class DeformKeypointPanel extends StandardAlgConfigPanel implements Chang
 		listener.handleAlgorithmChange();
 	}
 
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if( e.getSource() == selectModel ) {
+			configMLS.type = TypeDeformMLS.values()[selectModel.getSelectedIndex()];
+			listener.handleAlgorithmChange();
+		} else if( e.getSource() == checkShowOriginal) {
+			showOriginal = checkShowOriginal.isSelected();
+			listener.handleVisualizationChange();
+		} else if( e.getSource() == checkShowPoints ) {
+			showPoints = checkShowPoints.isSelected();
+			listener.handleVisualizationChange();
+		} else if( e.getSource() == buttonClear ) {
+			listener.handleClearPoints();
+		}
+	}
+
 	public interface Listener {
 		void handleVisualizationChange();
 
 		void handleAlgorithmChange();
+
+		void handleClearPoints();
 	}
 }
 
