@@ -182,12 +182,14 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	public void setTo( Planar<T> orig) {
 		if (orig.width != width || orig.height != height)
 			reshape(orig.width,orig.height);
-		if( orig.getNumBands() != getNumBands() )
-			throw new IllegalArgumentException("The number of bands must be the same");
 		if( orig.getBandType() != getBandType() )
 			throw new IllegalArgumentException("The band type must be the same");
 
 		int N = orig.getNumBands();
+		if( N != getNumBands() ) {
+			setNumberOfBands(orig.getNumBands());
+		}
+
 		for( int i = 0; i < N; i++ ) {
 			bands[i].setTo(orig.getBand(i));
 		}

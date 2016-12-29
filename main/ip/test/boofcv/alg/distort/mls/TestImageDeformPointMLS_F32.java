@@ -186,7 +186,7 @@ public class TestImageDeformPointMLS_F32 {
 		alg.controls.get(2).p.set(18,30);
 
 
-		ImageDeformPointMLS_F32.AffineCache c = new ImageDeformPointMLS_F32.AffineCache();
+		ImageDeformPointMLS_F32.Cache c = new ImageDeformPointMLS_F32.Cache();
 		c.weights.data = new float[]{0.1f,0.6f,0.3f};
 		c.weights.size = 3;
 		c.totalWeight = 1;
@@ -210,7 +210,7 @@ public class TestImageDeformPointMLS_F32 {
 		alg.addControl(5,4);
 		alg.addControl(20,24);
 
-		ImageDeformPointMLS_F32.AffineCache c = new ImageDeformPointMLS_F32.AffineCache();
+		ImageDeformPointMLS_F32.Cache c = new ImageDeformPointMLS_F32.Cache();
 		c.weights.data = new float[]{0.1f,0.6f,0.3f};
 		c.weights.size = 3;
 		c.totalWeight = 1;
@@ -234,7 +234,7 @@ public class TestImageDeformPointMLS_F32 {
 		alg.addControl(5,4);
 		alg.addControl(20,24);
 
-		ImageDeformPointMLS_F32.AffineCache cache = alg.grid.get(0);
+		ImageDeformPointMLS_F32.Cache cache = alg.grid.get(0);
 		cache.weights.data = new float[3];
 
 		// test an edge case
@@ -262,7 +262,7 @@ public class TestImageDeformPointMLS_F32 {
 
 	}
 
-	private void checkWeights(ImageDeformPointMLS_F32.AffineCache cache, float... expected) {
+	private void checkWeights(ImageDeformPointMLS_F32.Cache cache, float... expected) {
 		for (int i = 0; i < cache.weights.size(); i++) {
 			expected[i] *= cache.totalWeight;
 		}

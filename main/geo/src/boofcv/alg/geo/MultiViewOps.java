@@ -754,7 +754,7 @@ public class MultiViewOps {
 	 */
 	public static void extractEpipoles( DenseMatrix64F F , Point3D_F64 e1 , Point3D_F64 e2 ) {
 		SimpleMatrix f = SimpleMatrix.wrap(F);
-		SimpleSVD svd = f.svd();
+		SimpleSVD<SimpleMatrix> svd = f.svd();
 
 		SimpleMatrix U = svd.getU();
 		SimpleMatrix V = svd.getV();
