@@ -47,7 +47,6 @@ import org.ejml.data.FixedMatrix2x2_32F;
  *
  * @author Peter Abeles
  */
-// TODO Why does it get distorted when rows/cols don't match?
 public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 
 	// control points that specifiy the distortion
@@ -58,10 +57,14 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	// points inside interpolation grid
 	FastQueue<Cache> grid = new FastQueue<>(Cache.class, true);
 
+	// DESIGN NOTE:  Because the aspect ratio is maintained it's likely that some points in the grid are unreachable
+	//               a small speed boost could be brought about by adjusting the grid size so that the minimum number
+	//               of cells are used
+
 	// parameter used to adjust how distance between control points is weighted
 	float alpha = 3.0f/2.0f;
 
-	// scale between image and grid
+	// scale between image and grid, adjusted to ensure aspect ratio doesn't change
 	float scaleX,scaleY;
 
 	// Pixel distortion model
@@ -96,6 +99,18 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	public void configure( int width , int height , int gridRows , int gridCols ) {
 		scaleX = width/(float)(gridCols-1);
 		scaleY = height/(float)(gridRows-1);
+		// need to maintain the same ratio of pixels in the grid as in the regular image for similarity and rigid
+		// to work correctly
+		float ratioX,ratioY;
+		if( gridRows > gridCols ) {
+			ratioX = 1.0f;
+			ratioY = gridCols / (float) gridRows;
+		} else {
+			ratioX = gridRows / (float) gridCols;
+			ratioY = 1.0f;
+		}
+		scaleX /= ratioX;
+		scaleY /= ratioY;
 
 		this.gridRows = gridRows;
 		this.gridCols = gridCols;

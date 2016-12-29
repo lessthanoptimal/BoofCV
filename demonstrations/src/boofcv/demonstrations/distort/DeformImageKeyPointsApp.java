@@ -35,6 +35,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F32;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -243,6 +244,8 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 
 		@Override
 		public void mousePressed(MouseEvent e) {
+			if( !SwingUtilities.isLeftMouseButton(e) )
+				return;
 
 			float x = (float)(e.getX()/scale);
 			float y = (float)(e.getY()/scale);
@@ -279,6 +282,8 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
+			if( !SwingUtilities.isLeftMouseButton(e) )
+				return;
 			if( active < 0 )
 				return;
 
@@ -294,6 +299,8 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
+			if( !SwingUtilities.isLeftMouseButton(e) )
+				return;
 			if( active < 0 )
 				return;
 

@@ -35,6 +35,15 @@ public class TestImageDeformPointMLS_F32 {
 	int rows = 12;
 
 	/**
+	 * Makes sure the output is approximately independent of the number of rows/columns in interpolation grid.
+	 * There was a problem where different scales were provided to each axis messing up similarity and rigid
+	 */
+	@Test
+	public void test_RowsCol_independent() {
+		fail("Implement");
+	}
+
+	/**
 	 * The distorted control points are at the same location
 	 */
 	@Test
@@ -48,6 +57,8 @@ public class TestImageDeformPointMLS_F32 {
 		alg.addControl(16,0);
 
 		checkNoTransform(alg);
+
+		fail("cycle through all models");
 	}
 
 	private void checkNoTransform(ImageDeformPointMLS_F32 alg) {
@@ -91,6 +102,8 @@ public class TestImageDeformPointMLS_F32 {
 		checkCompute(10,21.818182f, 14, 30, alg);
 		checkCompute(30,49.090908f, 25, 45, alg);
 		checkCompute(15,5.4545455f, 20, 8, alg);
+
+		fail("cycle through all models");
 	}
 
 	private void checkCompute( float x , float y , float expectedX , float expectedY , ImageDeformPointMLS_F32 alg ) {
@@ -132,6 +145,8 @@ public class TestImageDeformPointMLS_F32 {
 		float distB = b.distance(10,12);
 
 		assertTrue(distA<distB);
+
+		fail("cycle through all models");
 	}
 
 	/**
