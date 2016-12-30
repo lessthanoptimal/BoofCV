@@ -42,10 +42,15 @@ import org.ejml.data.FixedMatrix2x2_32F;
  * using bilinear interpolation.
  * </p>
  *
- * <p>This should be a faithful implementation of MLS.  There is one aspect that it might deviate from the original
- * source.  The scaling of pixels should be adjusted when converting to grid coordinates to maintain the same
- * aspect ratio.  This way the results is "independent" of the internal grids shape/size.  [1] does not mention
- * this issue</p>
+ * <p>This should be a faithful implementation of MLS.  Potential deviations listed below:</p>
+ * <ol>
+ * <li>Pixels should be adjusted when converting to grid coordinates to maintain the same
+ * aspect ratio as the input image.  This way the results is "independent" of the internal grids shape/size.
+ * [1] does not mention this issue.</li>
+ * <li>When compared against images published in [1] the rigid transform appears slightly different.  However,
+ * when compared against other implementations those appear to produce nearly identical results to this
+ * implementation.</li>
+ * </ol>
  *
  * <p>[1] Schaefer, Scott, Travis McPhail, and Joe Warren. "Image deformation using moving least squares."
  * ACM transactions on graphics (TOG). Vol. 25. No. 3. ACM, 2006.</p>
@@ -102,20 +107,17 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	 * @param gridCols grid columns
 	 */
 	public void configure( int width , int height , int gridRows , int gridCols ) {
-		scaleX = width/(float)(gridCols-1);
-		scaleY = height/(float)(gridRows-1);
+
 		// need to maintain the same ratio of pixels in the grid as in the regular image for similarity and rigid
 		// to work correctly
-		float ratioX,ratioY;
+		int s = Math.max(width,height);
+		scaleX = s/(float)(gridCols-1);
+		scaleY = s/(float)(gridRows-1);
 		if( gridRows > gridCols ) {
-			ratioX = 1.0f;
-			ratioY = gridCols / (float) gridRows;
+			scaleY /= gridCols / (float) gridRows;
 		} else {
-			ratioX = gridRows / (float) gridCols;
-			ratioY = 1.0f;
+			scaleX /= gridRows / (float) gridCols;
 		}
-		scaleX /= ratioX;
-		scaleY /= ratioY;
 
 		this.gridRows = gridRows;
 		this.gridCols = gridCols;
