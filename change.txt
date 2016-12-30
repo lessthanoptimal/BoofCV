@@ -28,7 +28,7 @@ Version : 0.27
 - Renamed for consistency
   * Kernel2D_I32 -> Kernel2D_S32
   * Kernel2D_I32 -> Kernel2D_S32
-- GConvolveImageOps actual works for all image types now not just gray TODO
+- GConvolveImageOps actual works for all image types now not just gray
 - Changed behavior of ConvertBuffered image
   * When converting to interleaved and planar images the number of bands is adjusted to match the buffered image
   * Buffered -> BoofCV: output images are reshaped to match input
@@ -38,7 +38,7 @@ Version : 0.27
 - FactoryBlurFilter - Can now handle image types other than gray scale images
 - LensDistortionOps
   * New function which lets you re-render an image with an arbitrary camera model
-  * Removed the imageRemoveDistortion() and relation functions since the new function is better.  TODO
+  * Removed the imageRemoveDistortion() and relation functions since the new function is better.
 - Demonstrations
   * Added RenderSyntheticCamerModelApp which shows you the effects of re-rendering the camera model
   * Removed ShowLensDistoriton since it is now redundant

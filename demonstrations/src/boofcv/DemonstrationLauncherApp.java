@@ -108,6 +108,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				EquirectangularPinholeApp.class,
 				EquirectangularRotatingApp.class,
 				FisheyePinholeApp.class,
+				DeformImageKeyPointsApp.class,
 				RemoveLensDistortionApp.class,
 				RenderSyntheticCamerModelApp.class);
 

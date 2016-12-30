@@ -165,8 +165,8 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 				alg.setDestination(pointsUndistorted);
 				validTransform = true;
 			} catch( RuntimeException e ) {
-				System.out.println("Failed because of "+e.getMessage());
-				System.out.println("   total points "+pointsDistorted.size());
+//				System.out.println("Failed because of "+e.getMessage());
+//				System.out.println("   total points "+pointsDistorted.size());
 				validTransform = false;
 			}
 		}

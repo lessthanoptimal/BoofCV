@@ -27,6 +27,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("unchecked")
 public class ConvertNV21 {
 
 	/**
