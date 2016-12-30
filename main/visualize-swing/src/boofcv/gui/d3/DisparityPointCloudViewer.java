@@ -111,8 +111,6 @@ public class DisparityPointCloudViewer extends JPanel {
 		this.minDisparity = minDisparity;
 
 		this.rangeDisparity = maxDisparity-minDisparity;
-
-
 	}
 
 	/**

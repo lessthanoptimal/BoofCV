@@ -38,6 +38,16 @@ import java.lang.reflect.Array;
  */
 public class ConvertBufferedImage {
 
+	public static BufferedImage checkDeclare( int width , int height , BufferedImage image , int type ) {
+		if( image == null )
+			return new BufferedImage(width,height,type);
+		if( image.getType() != type )
+			return new BufferedImage(width,height,type);
+		if( image.getWidth() != width || image.getHeight() != height )
+			return new BufferedImage(width,height,type);
+		return image;
+	}
+
 	/**
 	 * Returns an image which doesn't have an alpha channel.  If the input image doesn't have an alpha
 	 * channel to start then its returned as is.  Otherwise a new image is created and the RGB channels are

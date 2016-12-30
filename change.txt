@@ -28,8 +28,8 @@ Version : 0.27
 - Renamed for consistency
   * Kernel2D_I32 -> Kernel2D_S32
   * Kernel2D_I32 -> Kernel2D_S32
-- GConvolveImageOps actual works for all image types now not just gray
-- ConvertBuffered: Behavior Changes
+- GConvolveImageOps actual works for all image types now not just gray TODO
+- Changed behavior of ConvertBuffered image
   * When converting to interleaved and planar images the number of bands is adjusted to match the buffered image
   * Buffered -> BoofCV: output images are reshaped to match input
 - ImageInterleaved
@@ -42,6 +42,10 @@ Version : 0.27
 - Demonstrations
   * Added RenderSyntheticCamerModelApp which shows you the effects of re-rendering the camera model
   * Removed ShowLensDistoriton since it is now redundant
+- Added image distortion based on "Image Deformation Using Moving Least Squares"
+  * See ImageDeformPointMLS
+- Planar Images
+  * setTo will adjust the number of bands
 
 - TODO Fisheye calibration using omni model
 - TODO grid of circle calibration target

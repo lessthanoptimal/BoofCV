@@ -16,37 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort;
+package boofcv.abst.distort;
 
-import boofcv.struct.distort.PixelTransform2_F64;
-import boofcv.struct.distort.Point2Transform2_F64;
-import georegression.struct.point.Point2D_F64;
+import boofcv.factory.distort.FactoryDistort;
 
 /**
- * Allows a {@link PointToPixelTransform_F64} to be invoked as a {@link PixelTransform2_F64}.
- *
  * @author Peter Abeles
  */
-public class PointToPixelTransform_F64 extends PixelTransform2_F64 {
-	Point2Transform2_F64 alg;
-
-	Point2D_F64 point = new Point2D_F64();
-
-	public PointToPixelTransform_F64(Point2Transform2_F64 alg) {
-		this.alg = alg;
-	}
-
-	public PointToPixelTransform_F64() {
-	}
-
-	public void setTransform(Point2Transform2_F64 transform) {
-		this.alg = transform;
-	}
-
+public class TestPointDeform_MLS extends ChecksPointDeformKeyPoints {
 	@Override
-	public void compute(int x, int y) {
-		alg.compute(x,y,point);
-		distX = point.x;
-		distY = point.y;
+	public PointDeformKeyPoints createAlgorithm() {
+		return FactoryDistort.deformMls(null);
 	}
 }

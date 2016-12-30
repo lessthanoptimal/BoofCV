@@ -36,6 +36,13 @@ public class PointToPixelTransform_F32 extends PixelTransform2_F32 {
 		this.alg = alg;
 	}
 
+	public PointToPixelTransform_F32() {
+	}
+
+	public void setTransform(Point2Transform2_F32 transform) {
+		this.alg = transform;
+	}
+
 	@Override
 	public void compute(int x, int y) {
 		alg.compute(x,y,point);
