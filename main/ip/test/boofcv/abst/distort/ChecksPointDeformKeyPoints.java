@@ -18,20 +18,59 @@
 
 package boofcv.abst.distort;
 
+import georegression.misc.GrlConstants;
+import georegression.struct.point.Point2D_F32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class ChecksPointDeformKeyPoints {
+public abstract class ChecksPointDeformKeyPoints {
+
+	public abstract PointDeformKeyPoints createAlgorithm();
+
 	/**
 	 * Sees if a local copy of inputs points is not made
 	 */
 	@Test
 	public void checkPointsCopied() {
-		fail("Implement");
+		List<Point2D_F32> src = createTestPoints();
+		List<Point2D_F32> dst = createTestPoints();
+
+		PointDeformKeyPoints alg = createAlgorithm();
+
+		alg.setImageShape(80,100);
+		alg.setSource(src);
+		alg.setSource(dst);
+
+		Point2D_F32 expected = new Point2D_F32();
+		alg.compute(12,19.5f, expected);
+
+		for (int i = 0; i < src.size(); i++) {
+			src.get(i).x += 2.5;
+			dst.get(i).x += 2.5;
+		}
+
+		// see if the results change after modifying the input points
+		Point2D_F32 found = new Point2D_F32();
+		alg.compute(12,19.5f, found);
+
+		assertEquals(expected.x, found.x, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(expected.y, found.y, GrlConstants.FLOAT_TEST_TOL);
+	}
+
+	private List<Point2D_F32> createTestPoints() {
+		List<Point2D_F32> src = new ArrayList<>();
+		src.add( new Point2D_F32(10,20));
+		src.add( new Point2D_F32(15,10));
+		src.add( new Point2D_F32(20,30));
+		src.add( new Point2D_F32(25,60));
+		return src;
 	}
 
 	/**
@@ -39,7 +78,24 @@ public class ChecksPointDeformKeyPoints {
 	 */
 	@Test
 	public void individualSrcSameAsAll() {
-		fail("Implement");
+		List<Point2D_F32> src = createTestPoints();
+		List<Point2D_F32> dst = createTestPoints();
+
+		PointDeformKeyPoints alg = createAlgorithm();
+		alg.setImageShape(80,100);
+		alg.setSource(src);
+		alg.setSource(dst);
+
+		alg.setSource(1,20,25);
+		Point2D_F32 expected = new Point2D_F32();
+		alg.compute(12,19.5f, expected);
+
+		src.get(1).set(20,25);
+		Point2D_F32 found = new Point2D_F32();
+		alg.compute(12,19.5f, found);
+
+		assertEquals(expected.x, found.x, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(expected.y, found.y, GrlConstants.FLOAT_TEST_TOL);
 	}
 
 	/**
@@ -47,7 +103,24 @@ public class ChecksPointDeformKeyPoints {
 	 */
 	@Test
 	public void individualDstSameAsAll() {
-		fail("Implement");
+		List<Point2D_F32> src = createTestPoints();
+		List<Point2D_F32> dst = createTestPoints();
+
+		PointDeformKeyPoints alg = createAlgorithm();
+		alg.setImageShape(80,100);
+		alg.setSource(src);
+		alg.setSource(dst);
+
+		alg.setDestination(1,20,25);
+		Point2D_F32 expected = new Point2D_F32();
+		alg.compute(12,19.5f, expected);
+
+		dst.get(1).set(20,25);
+		Point2D_F32 found = new Point2D_F32();
+		alg.compute(12,19.5f, found);
+
+		assertEquals(expected.x, found.x, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(expected.y, found.y, GrlConstants.FLOAT_TEST_TOL);
 	}
 
 }

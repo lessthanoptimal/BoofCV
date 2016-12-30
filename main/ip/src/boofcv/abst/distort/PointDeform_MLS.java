@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.abst.distort.mls;
+package boofcv.abst.distort;
 
-import boofcv.abst.distort.PointDeformKeyPoints;
 import boofcv.alg.distort.mls.ImageDeformPointMLS_F32;
 import georegression.struct.point.Point2D_F32;
 

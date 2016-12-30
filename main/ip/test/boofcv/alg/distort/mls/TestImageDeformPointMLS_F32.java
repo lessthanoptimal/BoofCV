@@ -39,26 +39,26 @@ public class TestImageDeformPointMLS_F32 {
 	 * There was a problem where different scales were provided to each axis messing up similarity and rigid
 	 */
 	@Test
-	public void test_RowsCol_independent() {
-		fail("Implement");
+	public void test_shape_independent() {
+		for( TypeDeformMLS type : TypeDeformMLS.values() ) {
+			ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(type);
+
+			// try different shapes of image and grid and see if anything breaks
+			check_shape_independent(60, 60, 30, 30, alg );
+			check_shape_independent(60, 80, 30, 30, alg );
+			check_shape_independent(80, 60, 30, 30, alg );
+			check_shape_independent(60, 60, 30, 35, alg );
+			check_shape_independent(60, 60, 35, 30, alg );
+		}
 	}
 
-	/**
-	 * The distorted control points are at the same location
-	 */
-	@Test
-	public void testAllAtOnce_noChange() {
-		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
-		alg.configure(width,height, rows, cols);
-
-		alg.addControl(5,5);
-		alg.addControl(10,20);
-		alg.addControl(30,50);
-		alg.addControl(16,0);
-
+	private void check_shape_independent( int width , int height , int rows , int cols , ImageDeformPointMLS_F32 alg ) {
+		alg.configure(width, height, rows, cols);
+		alg.addControl(5, 5);
+		alg.addControl(10, 20);
+		alg.addControl(30, 50);
+		alg.addControl(16, 0);
 		checkNoTransform(alg);
-
-		fail("cycle through all models");
 	}
 
 	private void checkNoTransform(ImageDeformPointMLS_F32 alg) {
@@ -81,29 +81,30 @@ public class TestImageDeformPointMLS_F32 {
 	 */
 	@Test
 	public void testAllAtOnce_OnControlPoints() {
-		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
-		alg.configure(width,height, rows, cols);
+		for( TypeDeformMLS type : TypeDeformMLS.values() ) {
+//			System.out.println("type "+type);
+			ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(type);
+			alg.configure(100, 100, 11, 11);
 
-		// carefully place control points on grid points to minimze the affect of the bilinear interpolation step
-		alg.addControl(5,5.45455f);
-		alg.addControl(10,21.818182f);
-		alg.addControl(30,49.090908f);
-		alg.addControl(15,5.4545455f);
+			// carefully place control points on grid points to minimze the affect of the bilinear interpolation step
+			alg.addControl(10, 0);
+			alg.addControl(10, 20);
+			alg.addControl(30, 40);
+			alg.addControl(80, 30);
 
-		alg.setDistorted(0, 10, 12);
-		alg.setDistorted(1, 14, 30);
-		alg.setDistorted(2, 25, 45);
-		alg.setDistorted(3, 20, 8);
+			alg.setDistorted(0, 10, 5);
+			alg.setDistorted(1, 14, 30);
+			alg.setDistorted(2, 25, 45);
+			alg.setDistorted(3, 20, 8);
 
-		alg.fixateUndistorted();
-		alg.fixateDistorted();
+			alg.fixateUndistorted();
+			alg.fixateDistorted();
 
-		checkCompute(5,5.45455f, 10, 12, alg);
-		checkCompute(10,21.818182f, 14, 30, alg);
-		checkCompute(30,49.090908f, 25, 45, alg);
-		checkCompute(15,5.4545455f, 20, 8, alg);
-
-		fail("cycle through all models");
+			checkCompute(10, 0, 10, 5, alg);
+			checkCompute(10, 20, 14, 30, alg);
+			checkCompute(30, 40, 25, 45, alg);
+			checkCompute(80, 30, 20, 8, alg);
+		}
 	}
 
 	private void checkCompute( float x , float y , float expectedX , float expectedY , ImageDeformPointMLS_F32 alg ) {
@@ -119,34 +120,34 @@ public class TestImageDeformPointMLS_F32 {
 	 */
 	@Test
 	public void testAllAtOnce_CloserToCloser() {
-		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
-		alg.configure(width,height, rows, cols);
+		for( TypeDeformMLS type : TypeDeformMLS.values() ) {
+			ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(type);
+			alg.configure(width, height, rows, cols);
 
-		alg.addControl(5,5);
-		alg.addControl(10,20);
-		alg.addControl(30,50);
-		alg.addControl(16,0);
+			alg.addControl(5, 5);
+			alg.addControl(10, 20);
+			alg.addControl(30, 50);
+			alg.addControl(16, 0);
 
-		alg.setDistorted(0, 10, 12);
-		alg.setDistorted(1, 14, 30);
-		alg.setDistorted(2, 25, 45);
-		alg.setDistorted(3, 20, 8);
+			alg.setDistorted(0, 10, 12);
+			alg.setDistorted(1, 14, 30);
+			alg.setDistorted(2, 25, 45);
+			alg.setDistorted(3, 20, 8);
 
-		alg.fixateUndistorted();
-		alg.fixateDistorted();
+			alg.fixateUndistorted();
+			alg.fixateDistorted();
 
-		Point2D_F32 a = new Point2D_F32();
-		Point2D_F32 b = new Point2D_F32();
+			Point2D_F32 a = new Point2D_F32();
+			Point2D_F32 b = new Point2D_F32();
 
-		alg.compute(4,4, a);
-		alg.compute(1,4, b);
+			alg.compute(4, 4, a);
+			alg.compute(1, 4, b);
 
-		float distA = a.distance(10,12);
-		float distB = b.distance(10,12);
+			float distA = a.distance(10, 12);
+			float distB = b.distance(10, 12);
 
-		assertTrue(distA<distB);
-
-		fail("cycle through all models");
+			assertTrue(distA < distB);
+		}
 	}
 
 	/**
@@ -154,35 +155,36 @@ public class TestImageDeformPointMLS_F32 {
 	 */
 	@Test
 	public void multipleCallsToFixate() {
-		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
-		alg.configure(width,height, rows, cols);
+		for( TypeDeformMLS type : TypeDeformMLS.values() ) {
+			ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(type);
+			alg.configure(width, height, rows, cols);
 
-		alg.addControl(5,5);
-		alg.addControl(10,20);
-		alg.addControl(30,50);
-		alg.addControl(16,0);
+			alg.addControl(5, 5);
+			alg.addControl(10, 20);
+			alg.addControl(30, 50);
+			alg.addControl(16, 0);
 
-		alg.setDistorted(0, 10, 12);
-		alg.setDistorted(1, 14, 30);
-		alg.setDistorted(2, 25, 45);
-		alg.setDistorted(3, 20, 8);
+			alg.setDistorted(0, 10, 12);
+			alg.setDistorted(1, 14, 30);
+			alg.setDistorted(2, 25, 45);
+			alg.setDistorted(3, 20, 8);
 
-		alg.fixateUndistorted();
-		alg.fixateDistorted();
+			alg.fixateUndistorted();
+			alg.fixateDistorted();
 
-		Point2D_F32 expected = new Point2D_F32();
-		alg.compute(4,4, expected);
+			Point2D_F32 expected = new Point2D_F32();
+			alg.compute(4, 4, expected);
 
-		Point2D_F32 found = new Point2D_F32();
-		alg.fixateDistorted();
-		alg.compute(4,4, found);
-		assertTrue( found.distance(expected) <= GrlConstants.FLOAT_TEST_TOL);
+			Point2D_F32 found = new Point2D_F32();
+			alg.fixateDistorted();
+			alg.compute(4, 4, found);
+			assertTrue(found.distance(expected) <= GrlConstants.FLOAT_TEST_TOL);
 
-		alg.fixateUndistorted();
-		alg.fixateDistorted();
-		alg.compute(4,4, found);
-		assertTrue( found.distance(expected) <= GrlConstants.FLOAT_TEST_TOL);
-
+			alg.fixateUndistorted();
+			alg.fixateDistorted();
+			alg.compute(4, 4, found);
+			assertTrue(found.distance(expected) <= GrlConstants.FLOAT_TEST_TOL);
+		}
 	}
 
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.abst.distort.mls;
+package boofcv.abst.distort;
 
 import boofcv.alg.distort.mls.ImageDeformPointMLS_F32;
 import boofcv.alg.distort.mls.TypeDeformMLS;

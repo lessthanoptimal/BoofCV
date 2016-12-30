@@ -18,9 +18,9 @@
 
 package boofcv.factory.distort;
 
+import boofcv.abst.distort.ConfigDeformPointMLS;
 import boofcv.abst.distort.PointDeformKeyPoints;
-import boofcv.abst.distort.mls.ConfigDeformPointMLS;
-import boofcv.abst.distort.mls.PointDeform_MLS;
+import boofcv.abst.distort.PointDeform_MLS;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.impl.*;
 import boofcv.alg.distort.mls.ImageDeformPointMLS_F32;

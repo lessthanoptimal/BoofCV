@@ -114,9 +114,9 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 		scaleX = s/(float)(gridCols-1);
 		scaleY = s/(float)(gridRows-1);
 		if( gridRows > gridCols ) {
-			scaleY /= gridCols / (float) gridRows;
+			scaleY /= (gridCols-1)/ (float) (gridRows-1);
 		} else {
-			scaleX /= gridRows / (float) gridCols;
+			scaleX /= (gridRows-1)/ (float) (gridCols-1);
 		}
 
 		this.gridRows = gridRows;
@@ -431,6 +431,9 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 				A.a21 = -A.a12;
 				A.a22 = A.a11;
 			}
+			// point being sampled and the key point are exactly the same
+			if( cache.mu == 0.0f )
+				cache.mu = 1.0f;
 		}
 
 		@Override
@@ -482,10 +485,16 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 			float norm_fr = (float)Math.sqrt(fr_x*fr_x + fr_y*fr_y);
 			float norm_vp = (float)Math.sqrt(v_avep_x*v_avep_x + v_avep_y*v_avep_y);
 
-			float scale = norm_vp/norm_fr;
+			// point being sampled and the key point are exactly the same
+			if( norm_fr == 0.0f && norm_vp == 0.0f ) {
+				cache.deformed.x = cache.aveQ.x;
+				cache.deformed.y = cache.aveQ.y;
+			} else {
+				float scale = norm_vp / norm_fr;
 
-			cache.deformed.x = scaleX*fr_x*scale + cache.aveQ.x;
-			cache.deformed.y = scaleY*fr_y*scale + cache.aveQ.y;
+				cache.deformed.x = scaleX * fr_x * scale + cache.aveQ.x;
+				cache.deformed.y = scaleY * fr_y * scale + cache.aveQ.y;
+			}
 		}
 	}
 

@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.distort;
 
-import boofcv.abst.distort.mls.ConfigDeformPointMLS;
+import boofcv.abst.distort.ConfigDeformPointMLS;
 import boofcv.alg.distort.mls.TypeDeformMLS;
 import boofcv.gui.StandardAlgConfigPanel;
 
