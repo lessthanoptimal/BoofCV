@@ -126,6 +126,34 @@ public class VisualizeShapes {
 		g2.drawLine(x2 - tanX, y2 - tanY, x1, y1);
 	}
 
+	public static void drawArrow( double x0 , double y0 , double x1 , double y1 , double length ,
+								  Line2D.Double line , Graphics2D g2 ) {
+
+		line.setLine(x0,y0,x1,y1); g2.draw(line);
+
+		double x2,y2;
+
+		if( length > 0 ) {
+			double dx = x1-x0;
+			double dy = y1-y0;
+			double r = Math.sqrt(dx*dx + dy*dy);
+			dx /= r;
+			dy /= r;
+
+			x2 = x1 - dx*length;
+			y2 = y1 - dy*length;
+		} else {
+			x2 = x0 + ((x1 - x0) * 0.9);
+			y2 = y0 + ((y1 - y0) * 0.9);
+		}
+		double tanX = (y1-y2);
+		double tanY = (x2-x1);
+
+		line.setLine(x2+tanX,y2+tanY,x1,y1); g2.draw(line);
+		line.setLine(x2-tanX,y2-tanY,x1,y1); g2.draw(line);
+	}
+
+
 	/**
 	 * Draws a polygon
 	 *

@@ -161,7 +161,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	 * grid even the current undistorted location of each control point.
 	 */
 	public void fixateUndistorted() {
-		if( controls.size() < 3 )
+		if( controls.size() < 2 )
 			throw new RuntimeException("Not enough control points specified.  Found "+controls.size());
 		for (int row = 0; row < gridRows; row++) {
 			for (int col = 0; col < gridCols; col++) {
@@ -263,6 +263,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 
 	/**
 	 * Samples the 4 grid points around v and performs bilinear interpolation
+	 *
 	 * @param v_x Grid coordinate x-axis, undistorted
 	 * @param v_y Grid coordinate y-axis, undistorted
 	 * @param deformed Distorted grid coordinate in image pixels
@@ -313,6 +314,9 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 		return grid.data[row*gridCols + col];
 	}
 
+	/**
+	 * See paper section 2.1
+	 */
 	public class AffineModel implements Model {
 
 		@Override
@@ -320,6 +324,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 			float[] weights = cache.weights.data;
 
 			// compute the weighted covariance 2x2 matrix
+			// Two below equation 5
 			// sum hat(p[i])'*w[i]*hat(p[i])
 			float inner00 = 0, inner01 = 0, inner11 = 0;
 
@@ -335,7 +340,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 				inner11 += hat_p_y*hat_p_y*w;
 			}
 
-			// invert it using minors equation
+			// invert it using minor equation
 			float det = (inner00*inner11 - inner01*inner01);
 
 			if( det == 0.0 ) {
@@ -365,7 +370,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 				float hat_p_x = c.p.x-cache.aveP.x;
 				float hat_p_y = c.p.y-cache.aveP.y;
 
-				// mistake in paper that w[i] was ommitted?
+				// mistake in paper that w[i] was omitted?
 				cache.A.data[i] = (tmp0 * hat_p_x + tmp1 * hat_p_y)*weights[i];
 			}
 		}
@@ -387,6 +392,9 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 		}
 	}
 
+	/**
+	 * See paper section 2.2
+	 */
 	public class SimilarityModel implements Model {
 
 		@Override
@@ -431,14 +439,17 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 				float hat_q_x = c.q.x-cache.aveQ.x;
 				float hat_q_y = c.q.y-cache.aveQ.y;
 
-				deformed.x += (hat_q_x*A.a11 + hat_q_y*A.a21)/cache.mu;
-				deformed.y += (hat_q_x*A.a12 + hat_q_y*A.a22)/cache.mu;
+				deformed.x += hat_q_x*A.a11 + hat_q_y*A.a21;
+				deformed.y += hat_q_x*A.a12 + hat_q_y*A.a22;
 			}
-			deformed.x += cache.aveQ.x;
-			deformed.y += cache.aveQ.y;
+			deformed.x = deformed.x/cache.mu + cache.aveQ.x;
+			deformed.y = deformed.y/cache.mu + cache.aveQ.y;
 		}
 	}
 
+	/**
+	 * Paper section 2.3
+	 */
 	public class RigidModel extends SimilarityModel {
 
 		@Override
@@ -473,17 +484,17 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 
 	public static class Cache {
 		// location of the final deformed point
-		public Point2D_F32 deformed = new Point2D_F32();
-		public GrowQueue_F32 weights = new GrowQueue_F32(); // weight of each control point
+		Point2D_F32 deformed = new Point2D_F32();
+		GrowQueue_F32 weights = new GrowQueue_F32(); // weight of each control point
 		float totalWeight;
-		public GrowQueue_F32 A = new GrowQueue_F32(); // As as the variable 'A' in the paper
-		public Point2D_F32 aveP = new Point2D_F32(); // average control point for given weights
-		public Point2D_F32 aveQ = new Point2D_F32(); // average distorted point for given weights
+		GrowQueue_F32 A = new GrowQueue_F32(); // As as the variable 'A' in the paper
+		Point2D_F32 aveP = new Point2D_F32(); // average control point for given weights
+		Point2D_F32 aveQ = new Point2D_F32(); // average distorted point for given weights
 
-		public FastQueue<FixedMatrix2x2_32F> A_s = new FastQueue<>(FixedMatrix2x2_32F.class,true);
+		FastQueue<FixedMatrix2x2_32F> A_s = new FastQueue<>(FixedMatrix2x2_32F.class,true);
 
 		// mu for simularity
-		public float mu;
+		float mu;
 	}
 
 	public float getAlpha() {

@@ -25,6 +25,7 @@ import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.gui.DemonstrationBase;
+import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
@@ -52,8 +53,6 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO provide way to delete a point
-// TODO support similar and rigid
 public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends DemonstrationBase<T>
 	implements DeformKeypointPanel.Listener
 {
@@ -63,7 +62,6 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 	CustomImagePanel gui = new CustomImagePanel();
 	DeformKeypointPanel control;
 	PointToPixelTransform_F32 p2p = new PointToPixelTransform_F32();
-
 
 	PointDeformKeyPoints alg;
 
@@ -185,8 +183,8 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		boolean selectedUndist;
 		Ellipse2D.Double c = new Ellipse2D.Double();
 		Line2D.Double line = new Line2D.Double();
-		BasicStroke strokeThick = new BasicStroke(3);
-		BasicStroke strokeThin = new BasicStroke(1);
+		BasicStroke strokeThick = new BasicStroke(4);
+		BasicStroke strokeThin = new BasicStroke(2);
 
 		CustomImagePanel() {
 			addMouseListener(this);
@@ -208,33 +206,36 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 			synchronized (pointsUndistorted) {
 				g2.setStroke(strokeThin);
 				g2.setColor(Color.GRAY);
-				for (int i = 0; i < pointsUndistorted.size(); i++) {
+
+				double r = clickTol/2.0;
+
+				for (int i = 0; i < pointsDistorted.size(); i++) {
 					if( active != -1 && i != active ) continue;
 
 					Point2D_F32 u = pointsUndistorted.get(i);
 					Point2D_F32 d = pointsDistorted.get(i);
-					line.setLine(u.x*scale,u.y*scale,d.x*scale,d.y*scale);
-					g2.draw(line);
+					float x0 = (float)(u.x*scale);
+					float y0 = (float)(u.y*scale);
+
+					float x1 = (float)(d.x*scale);
+					float y1 = (float)(d.y*scale);
+
+					g2.setStroke(strokeThick);
+					g2.setColor(Color.BLUE);
+					VisualizeShapes.drawArrow(x0,y0,x1,y1,r,line,g2);
+					g2.setStroke(strokeThin);
+					g2.setColor(Color.LIGHT_GRAY);
+					VisualizeShapes.drawArrow(x0,y0,x1,y1,r,line,g2);
 				}
 
-				double r = clickTol/2.0;
-
-				g2.setStroke(strokeThick);
-				g2.setColor(Color.RED);
 				for (int i = 0; i < pointsUndistorted.size(); i++) {
 					if( active != -1 && i != active ) continue;
 
 					Point2D_F32 p = pointsUndistorted.get(i);
 					c.setFrame(p.x*scale - r, p.y*scale - r, 2 * r, 2 * r);
-					g2.draw(c);
-				}
-				g2.setColor(Color.BLUE);
-				for (int i = 0; i < pointsDistorted.size(); i++) {
-					if( active != -1 && i != active ) continue;
 
-					Point2D_F32 p = pointsDistorted.get(i);
-					c.setFrame(p.x*scale - r, p.y*scale - r, 2 * r, 2 * r);
-					g2.draw(c);
+					g2.setColor(Color.RED);
+					g2.fill(c);
 				}
 			}
 		}
@@ -247,26 +248,31 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 			if( !SwingUtilities.isLeftMouseButton(e) )
 				return;
 
+			boolean delete = e.isControlDown();
+
 			float x = (float)(e.getX()/scale);
 			float y = (float)(e.getY()/scale);
 
 			active = -1;
 			synchronized (pointsUndistorted) {
+				float bestDistance = clickTol;
 				for (int i = 0; i < pointsDistorted.size(); i++) {
 					Point2D_F32 p = pointsDistorted.get(i);
-					if( p.distance(x,y) <= clickTol ) {
+					float d = p.distance(x,y);
+					if( d < bestDistance ) {
 						active = i;
+						bestDistance = d;
 						selectedUndist = false;
 					}
 				}
 
-				if( active < 0 ) {
-					for (int i = 0; i < pointsUndistorted.size(); i++) {
-						Point2D_F32 p = pointsUndistorted.get(i);
-						if( p.distance(x,y) <= clickTol ) {
-							active = i;
-							selectedUndist = true;
-						}
+				for (int i = 0; i < pointsUndistorted.size(); i++) {
+					Point2D_F32 p = pointsUndistorted.get(i);
+					float d = p.distance(x,y);
+					if( d < bestDistance ) {
+						active = i;
+						bestDistance = d;
+						selectedUndist = true;
 					}
 				}
 
@@ -275,6 +281,11 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 					selectedUndist = false;
 					pointsUndistorted.add( new Point2D_F32(x,y));
 					pointsDistorted.add( new Point2D_F32(x,y));
+					controlPointsModified();
+				} else if( delete ) {
+					pointsUndistorted.remove(active);
+					pointsDistorted.remove(active);
+					active = -1;
 					controlPointsModified();
 				}
 			}
