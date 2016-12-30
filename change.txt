@@ -42,7 +42,7 @@ Version : 0.27
 - Demonstrations
   * Added RenderSyntheticCamerModelApp which shows you the effects of re-rendering the camera model
   * Removed ShowLensDistoriton since it is now redundant
-- Added image distortion based on "Image Deformation Using Moving Least Squares" paper TODO
+- Added image distortion based on "Image Deformation Using Moving Least Squares"
   * See ImageDeformPointMLS
 - Planar Images
   * setTo will adjust the number of bands

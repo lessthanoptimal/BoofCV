@@ -25,13 +25,13 @@ import org.ddogleg.struct.GrowQueue_F32;
 import org.ejml.data.FixedMatrix2x2_32F;
 
 /**
- * <p>Implementation of 'Moving Least Squares' control point based image deformation models described in [1].</p>
+ * <p>Implementation of 'Moving Least Squares' (MLS) control point based image deformation models described in [1].</p>
  *
  * Usage Procedure:
  * <ol>
  *     <li>Invoke {@link #configure}</li>
  *     <li>Invoke {@link #addControl} for each control point</li>
- *     <li>Invoke {@link #fixateUndistorted()} ()} when all control points have been added</li>
+ *     <li>Invoke {@link #fixateUndistorted()} when all control points have been added</li>
  *     <li>Invoke {@link #setDistorted} to change the distorted location of a control point</li>
  *     <li>Invoke {@link #fixateDistorted()} after you are done changing distorted locations</li>
  * </ol>
@@ -41,6 +41,11 @@ import org.ejml.data.FixedMatrix2x2_32F;
  * a distortion for each pixel a regular grid is used instead.  Pixel points are interpolated between grid points
  * using bilinear interpolation.
  * </p>
+ *
+ * <p>This should be a faithful implementation of MLS.  There is one aspect that it might deviate from the original
+ * source.  The scaling of pixels should be adjusted when converting to grid coordinates to maintain the same
+ * aspect ratio.  This way the results is "independent" of the internal grids shape/size.  [1] does not mention
+ * this issue</p>
  *
  * <p>[1] Schaefer, Scott, Travis McPhail, and Joe Warren. "Image deformation using moving least squares."
  * ACM transactions on graphics (TOG). Vol. 25. No. 3. ACM, 2006.</p>

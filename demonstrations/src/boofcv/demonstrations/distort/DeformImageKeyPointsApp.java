@@ -338,7 +338,8 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		ImageType type = ImageType.pl(3, GrayU8.class);
 
 		List<PathLabel> inputs = new ArrayList<>();
-//		inputs.add(new PathLabel("Mona Lisa", UtilIO.pathExample("standard/mona_lisa.jpg")));
+		inputs.add(new PathLabel("Man MLS", UtilIO.pathExample("standard/man_mls.jpg")));
+		inputs.add(new PathLabel("Mona Lisa", UtilIO.pathExample("standard/mona_lisa.jpg")));
 		inputs.add(new PathLabel("Drawing Face", UtilIO.pathExample("drawings/drawing_face.png")));
 
 		DeformImageKeyPointsApp app = new DeformImageKeyPointsApp(inputs,type);
