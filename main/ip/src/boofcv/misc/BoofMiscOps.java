@@ -456,4 +456,12 @@ public class BoofMiscOps {
 
 		return output;
 	}
+
+	public static void sleep( long milli ) {
+		try {
+			Thread.sleep(milli);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 }

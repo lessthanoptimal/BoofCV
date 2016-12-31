@@ -18,12 +18,14 @@
 
 package boofcv.abst.sfm.d3;
 
+import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageGray;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -75,10 +77,19 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> {
 
 		double t = 0.1;
 
+		Point2D_F64 n = new Point2D_F64();
+		Point2Transform2_F64 tranNorm = LensDistortionOps.narrow(intrinsic).undistort_F64(true,false);
+
 		for( int i = 0; i < total; i++ ) {
+
+			// generate the squares uniformally inside the FOV
+			tranNorm.compute(
+					rand.nextDouble()*(intrinsic.width-1),
+					rand.nextDouble()*(intrinsic.height-1),n);
+
 			double z = rand.nextDouble()*(maxZ-minZ)+minZ;
-			double x = rand.nextDouble()*2-0.5;
-			double y = rand.nextDouble()*2-0.5;
+			double x = n.x*z;
+			double y = n.y*z;
 
 			Square s = new Square();
 			s.a.set(x  ,y  ,z);
@@ -86,7 +97,7 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> {
 			s.c.set(x + t, y + t, z);
 			s.d.set(x, y + t, z);
 
-		    s.gray = rand.nextInt(255);
+		    s.gray = rand.nextInt(200)+55;
 
 			squares.add(s);
 		}

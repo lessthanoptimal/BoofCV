@@ -123,7 +123,7 @@ public class TestVisOdomDirectColorDepth {
 		assertTrue(alg.solveSystem());
 
 		assertEquals(Math.abs(colorAfter-colorBefore), alg.getErrorOptical(), 1e-4f);
-		assertTrue(alg.getValidPixels() > 95 ); // counting error can cause a drop
+		assertTrue(alg.getInboundsPixels() > 95 ); // counting error can cause a drop
 
 		return alg.motionTwist;
 	}

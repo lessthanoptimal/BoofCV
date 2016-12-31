@@ -5,6 +5,7 @@ dependencies {
     compile project(':main:calibration')
 
     testCompile project(':main:geo').sourceSets.test.output
+    testCompile project(':main:visualize-swing')
 }
 
 idea {

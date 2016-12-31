@@ -25,15 +25,19 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.PixelTransformCached_F32;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.d3.direct.PyramidDirectColorDepth;
+import boofcv.core.image.ConvertImageFilter;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.SequencePoint2Transform2_F32;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
+import georegression.struct.ConvertFloatType;
+import georegression.struct.se.Se3_F32;
 import georegression.struct.se.Se3_F64;
 
 /**
@@ -41,36 +45,60 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageGray<T>, Depth extends ImageGray<Depth>>
-	implements DepthVisualOdometry<Planar<T>,Depth>
+public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageBase<T>, Depth extends ImageGray<Depth>>
+	implements DepthVisualOdometry<T,Depth>
 {
-	ImageType<Planar<T>> visType;
+	ImageType<T> inputType;
 	Class<Depth> depthType;
+	ImageType<Planar> algType;
 	DepthSparse3D<Depth> sparse3D;
 	DepthSparse3D_to_PixelTo3D<Depth> wrapSparse3D;
 
-	PyramidDirectColorDepth<T> alg;
+	ConvertImageFilter convertInput;
+	Planar inputConverted;
 
-	ImageDistort<Planar<T>,Planar<T>> adjustImage;
-	Planar<T> undistorted;
+	PyramidDirectColorDepth alg;
+
+	ImageDistort<Planar,Planar> adjustImage;
+	Planar undistorted;
 
 	CameraPinhole paramAdjusted = new CameraPinhole();
 
+	Se3_F32 worldToCurrent = new Se3_F32();
+	Se3_F64 w2c_64 = new Se3_F64();
+
 	public PyramidDirectColorDepth_to_DepthVisualOdometry(DepthSparse3D<Depth> sparse3D,
-														  PyramidDirectColorDepth<T> alg,
+														  PyramidDirectColorDepth alg,
 														  Class<Depth> depthType ) {
 		this.sparse3D = sparse3D;
 		this.alg = alg;
-		this.visType = alg.getInputType();
+		this.inputType = alg.getInputType();
 		this.depthType = depthType;
+		this.algType = alg.getInputType();
 
-		undistorted = visType.createImage(1,1);
+		undistorted = algType.createImage(1,1);
+		wrapSparse3D = new DepthSparse3D_to_PixelTo3D<>(sparse3D);
+	}
+
+	public PyramidDirectColorDepth_to_DepthVisualOdometry(DepthSparse3D<Depth> sparse3D,
+														  ConvertImageFilter<T,?> convertImage,
+														  PyramidDirectColorDepth alg,
+														  Class<Depth> depthType ) {
+		this.sparse3D = sparse3D;
+		this.alg = alg;
+		this.inputType = convertImage.getInputType();
+		this.algType = (ImageType<Planar>) convertImage.getOutputType();
+		this.depthType = depthType;
+		this.convertInput = convertImage;
+
+		inputConverted = algType.createImage(1,1);
+		undistorted = algType.createImage(1,1);
 		wrapSparse3D = new DepthSparse3D_to_PixelTo3D<>(sparse3D);
 	}
 
 	@Override
 	public void reset() {
-		// TODO implement
+		alg.reset();
 	}
 
 	@Override
@@ -80,7 +108,9 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageGray<
 
 	@Override
 	public Se3_F64 getCameraToWorld() {
-		return alg.getCurrentToWorld();
+		alg.worldToCurrent().invert(worldToCurrent);
+		ConvertFloatType.convert(worldToCurrent, w2c_64);
+		return w2c_64;
 	}
 
 	@Override
@@ -91,7 +121,7 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageGray<
 		desired.skew = 0;
 
 		adjustImage = LensDistortionOps.changeCameraModel(
-				AdjustmentType.EXPAND, BorderType.ZERO, paramVisual,desired,paramAdjusted,visType);
+				AdjustmentType.EXPAND, BorderType.ZERO, paramVisual,desired,paramAdjusted, algType);
 
 		Point2Transform2_F32 desiredToOriginal = LensDistortionOps.transformChangeModel_F32(
 				AdjustmentType.EXPAND, paramVisual, desired, false, null);
@@ -107,23 +137,33 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageGray<
 		sparse3D.configure(LensDistortionOps.narrow(paramAdjusted), pixelAdjToDepth);
 
 		undistorted.reshape(paramAdjusted.width, paramAdjusted.height);
+		if( convertInput != null ) {
+			inputConverted.reshape(paramAdjusted.width, paramAdjusted.height);
+		}
 
 		alg.setCameraParameters(
 				(float)paramAdjusted.fx, (float)paramAdjusted.fy,
-				(float)paramAdjusted.cy, (float)paramAdjusted.cy,
+				(float)paramAdjusted.cx, (float)paramAdjusted.cy,
 				paramAdjusted.width, paramAdjusted.height);
 	}
 
 	@Override
-	public boolean process(Planar<T> visual, Depth depth) {
+	public boolean process(T visual, Depth depth) {
+		if( convertInput != null ) {
+			convertInput.process(visual,inputConverted);
+			adjustImage.apply(inputConverted, undistorted);
+
+		} else {
+			adjustImage.apply((Planar)visual, undistorted);
+		}
+
 		sparse3D.setDepthImage(depth);
-		adjustImage.apply(visual, undistorted);
 		return alg.process(undistorted, wrapSparse3D);
 	}
 
 	@Override
-	public ImageType<Planar<T>> getVisualType() {
-		return visType;
+	public ImageType<T> getVisualType() {
+		return inputType;
 	}
 
 	@Override
@@ -131,7 +171,7 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageGray<
 		return depthType;
 	}
 
-	public Planar<T> getUndistorted() {
+	public Planar getUndistorted() {
 		return undistorted;
 	}
 }

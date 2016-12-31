@@ -53,6 +53,7 @@ public abstract class CheckVisualOdometryDepthSim<I extends ImageGray<I>,Depth e
 		left = GeneralizedImageOps.createSingleBand(inputType,width,height);
 		depth = GeneralizedImageOps.createSingleBand(depthType,width,height);
 
+		setIntrinsic(param);
 		createSquares(numSquares,1,2);
 	}
 
@@ -73,12 +74,16 @@ public abstract class CheckVisualOdometryDepthSim<I extends ImageGray<I>,Depth e
 		Se3_F64 worldToLeft = new Se3_F64();
 
 		for( int i = 0; i < 10; i++ ) {
+//			System.out.println("------------------------- Sim tick = "+i);
 			worldToLeft.getT().z = i*0.05;
 
 			// render the images
 			setIntrinsic(param);
 			left.setTo(render(worldToLeft));
 			renderDepth(worldToLeft,depth,depthUnits);
+
+//			ShowImages.showWindow(left,"Rendered Left", true);
+//			BoofMiscOps.sleep(5000);
 
 			// process the images
 			assertTrue(algorithm.process(left,depth));

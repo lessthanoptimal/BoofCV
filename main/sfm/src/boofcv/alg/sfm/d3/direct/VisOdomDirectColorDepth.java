@@ -93,8 +93,9 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 
 	// average optical error per pixel and band
 	private float errorOptical;
+	
 	// number of valid pixels used to compute error
-	private int validPixels = 0;
+	private int inboundsPixels = 0;
 
 	private TwistCoordinate_F32 twist = new TwistCoordinate_F32();
 
@@ -269,7 +270,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 		Point3D_F32 S = new Point3D_F32();
 
 		// first precompute everything that does not depend on pixel values
-		validPixels = 0;
+		inboundsPixels = 0;
 		for (int i = 0; i < keypixels.size(); i++) {
 			Pixel p = keypixels.data[i];
 
@@ -287,7 +288,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 			} else {
 				p.valid = true;
 			}
-			validPixels++;
+			inboundsPixels++;
 
 			// pi matrix derivative relative to t at S
 			float ZZ = S.z * S.z;
@@ -370,8 +371,12 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 		return errorOptical;
 	}
 
-	public int getValidPixels() {
-		return validPixels;
+	public int getInboundsPixels() {
+		return inboundsPixels;
+	}
+
+	public int getKeyframePixels() {
+		return keypixels.size;
 	}
 
 	static class Pixel {

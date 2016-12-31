@@ -54,6 +54,7 @@ public abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 		left = GeneralizedImageOps.createSingleBand(inputType,width,height);
 		right = GeneralizedImageOps.createSingleBand(inputType,width,height);
 
+		setIntrinsic(param.getLeft());
 		createSquares(numSquares,1,2);
 	}
 

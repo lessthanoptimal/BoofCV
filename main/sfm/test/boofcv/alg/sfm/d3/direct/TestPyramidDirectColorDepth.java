@@ -27,7 +27,7 @@ import static org.junit.Assert.fail;
  */
 public class TestPyramidDirectColorDepth {
 	@Test
-	public void stuff() {
+	public void checkKeyFrameLogic() {
 		fail("implement");
 	}
 }
