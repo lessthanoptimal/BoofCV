@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,9 +64,9 @@ public class DisplayKinectPointCloudApp {
 
 		VisualDepthOps.depthTo3D(param, rgb, depth, cloud, cloudColor);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param,null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param, (DenseMatrix64F)null);
 
-		PointCloudViewer viewer = new PointCloudViewer(K, 0.05);
+		PointCloudViewer viewer = new PointCloudViewer(K, 10.0);
 		viewer.setPreferredSize(new Dimension(rgb.width,rgb.height));
 
 		for( int i = 0; i < cloud.size; i++ ) {
@@ -76,10 +76,10 @@ public class DisplayKinectPointCloudApp {
 			viewer.addPoint(p.x,p.y,p.z,c);
 		}
 
-		ShowImages.showWindow(viewer,"Point Cloud");
+		ShowImages.showWindow(viewer,"Point Cloud", true);
 		System.out.println("Total points = "+cloud.size);
 
 //		BufferedImage depthOut = VisualizeImageData.disparity(depth, null, 0, UtilOpenKinect.FREENECT_DEPTH_MM_MAX_VALUE, 0);
-//		ShowImages.showWindow(depthOut,"Depth Image");
+//		ShowImages.showWindow(depthOut,"Depth Image", true);
 	}
 }
