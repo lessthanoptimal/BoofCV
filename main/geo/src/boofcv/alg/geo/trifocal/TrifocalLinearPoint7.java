@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,12 +23,12 @@ import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.alg.dense.decomposition.svd.SafeSvd;
+import org.ejml.alg.dense.decomposition.svd.SafeSvd_D64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.SingularOps;
+import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
+import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.SingularOps_D64;
 
 import java.util.List;
 
@@ -65,7 +65,7 @@ public class TrifocalLinearPoint7 {
 	protected DenseMatrix64F A = new DenseMatrix64F(7,27);
 
 	// svd used to extract the null space
-	protected SingularValueDecomposition<DenseMatrix64F> svdNull;
+	protected SingularValueDecomposition_F64<DenseMatrix64F> svdNull;
 
 	// Solution in vector format
 	protected DenseMatrix64F vectorizedSolution = new DenseMatrix64F(27,1);
@@ -83,8 +83,8 @@ public class TrifocalLinearPoint7 {
 	protected Point3D_F64 e3 = new Point3D_F64();
 
 	public TrifocalLinearPoint7() {
-		svdNull = DecompositionFactory.svd(24, 27, false, true, false);
-		svdNull = new SafeSvd(svdNull);
+		svdNull = DecompositionFactory_D64.svd(24, 27, false, true, false);
+		svdNull = new SafeSvd_D64(svdNull);
 	}
 
 	/**
@@ -219,7 +219,7 @@ public class TrifocalLinearPoint7 {
 		if( !svdNull.decompose(A) )
 			return false;
 
-		SingularOps.nullVector(svdNull,true,vectorizedSolution);
+		SingularOps_D64.nullVector(svdNull,true,vectorizedSolution);
 
 		solutionN.convertFrom(vectorizedSolution);
 
@@ -233,8 +233,8 @@ public class TrifocalLinearPoint7 {
 		DenseMatrix64F N2_inv = new DenseMatrix64F(3,3);
 		DenseMatrix64F N3_inv = new DenseMatrix64F(3,3);
 
-		CommonOps.invert(N2,N2_inv);
-		CommonOps.invert(N3,N3_inv);
+		CommonOps_D64.invert(N2,N2_inv);
+		CommonOps_D64.invert(N3,N3_inv);
 
 		for( int i = 0; i < 3; i++ ) {
 			DenseMatrix64F T = solution.getT(i);

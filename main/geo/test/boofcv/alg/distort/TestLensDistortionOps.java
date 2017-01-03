@@ -58,7 +58,7 @@ public class TestLensDistortionOps {
 		Point2D_F32 norm = new Point2D_F32();
 		distToNorm.compute(pixelX, pixelY, norm);
 
-		CameraPinholeRadial adjusted = new CameraPinholeRadial();
+		CameraPinhole adjusted = new CameraPinhole();
 		Point2Transform2_F32 distToAdj = LensDistortionOps.
 				transformChangeModel_F32(AdjustmentType.NONE, orig, desired, false, adjusted);
 

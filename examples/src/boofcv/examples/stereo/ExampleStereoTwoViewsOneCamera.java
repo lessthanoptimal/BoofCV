@@ -50,7 +50,9 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ejml.data.DenseMatrix32F;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.ConvertMatrixData;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -202,7 +204,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 		// original camera calibration matrices
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, (DenseMatrix64F)null);
 
 		rectifyAlg.process(K, new Se3_F64(), K, leftToRight);
 
@@ -217,10 +219,15 @@ public class ExampleStereoTwoViewsOneCamera {
 		RectifyImageOps.allInsideLeft(intrinsic, rect1, rect2, rectifiedK);
 
 		// undistorted and rectify images
+		DenseMatrix32F rect1_F32 = new DenseMatrix32F(3,3);
+		DenseMatrix32F rect2_F32 = new DenseMatrix32F(3,3);
+		ConvertMatrixData.convert(rect1, rect1_F32);
+		ConvertMatrixData.convert(rect2, rect2_F32);
+
 		ImageDistort<GrayU8,GrayU8> distortLeft =
-				RectifyImageOps.rectifyImage(intrinsic, rect1, BorderType.SKIP, distortedLeft.getImageType());
+				RectifyImageOps.rectifyImage(intrinsic, rect1_F32, BorderType.SKIP, distortedLeft.getImageType());
 		ImageDistort<GrayU8,GrayU8> distortRight =
-				RectifyImageOps.rectifyImage(intrinsic, rect2, BorderType.SKIP, distortedRight.getImageType());
+				RectifyImageOps.rectifyImage(intrinsic, rect2_F32, BorderType.SKIP, distortedRight.getImageType());
 
 		distortLeft.apply(distortedLeft, rectifiedLeft);
 		distortRight.apply(distortedRight, rectifiedRight);

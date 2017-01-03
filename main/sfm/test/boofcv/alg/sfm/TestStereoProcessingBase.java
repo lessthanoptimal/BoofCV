@@ -93,7 +93,7 @@ public class TestStereoProcessingBase {
 
 		StereoParameters param = createStereoParam(width,height);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param.left,null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param.left,(DenseMatrix64F)null);
 
 		// compute the view in pixels of the point in the left and right cameras
 		Point2D_F64 lensLeft = new Point2D_F64();
@@ -104,8 +104,8 @@ public class TestStereoProcessingBase {
 		alg.setCalibration(param);
 
 		// Rectify the points
-		Point2Transform2_F64 rectLeft = RectifyImageOps.transformPixelToRect_F64(param.left,alg.getRect1());
-		Point2Transform2_F64 rectRight = RectifyImageOps.transformPixelToRect_F64(param.right,alg.getRect2());
+		Point2Transform2_F64 rectLeft = RectifyImageOps.transformPixelToRect(param.left,alg.getRect1());
+		Point2Transform2_F64 rectRight = RectifyImageOps.transformPixelToRect(param.right,alg.getRect2());
 
 		Point2D_F64 l = new Point2D_F64();
 		Point2D_F64 r = new Point2D_F64();

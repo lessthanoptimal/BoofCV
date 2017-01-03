@@ -161,7 +161,7 @@ public class TestEllipsesIntoClusters {
 			assertEquals( 3 , output.get(i).size());
 			double expected = input.get(output.get(i).get(0).which).a;
 			for (int j = 0; j < 3; j++) {
-				assertEquals(expected, input.get( output.get(i).get(j).which).a, GrlConstants.DOUBLE_TEST_TOL);
+				assertEquals(expected, input.get( output.get(i).get(j).which).a, GrlConstants.TEST_F64);
 			}
 		}
 	}

@@ -52,7 +52,7 @@ public class AsymmetricGridKeyPointDetections {
 	FastQueue<Point2D_F64> keypoints = new FastQueue<>(Point2D_F64.class,true);
 
 	// used to compute tangent lines between two ellipses
-	private TangentLinesTwoEllipses_F64 tangentFinder = new TangentLinesTwoEllipses_F64(GrlConstants.DOUBLE_TEST_TOL,10);
+	private TangentLinesTwoEllipses_F64 tangentFinder = new TangentLinesTwoEllipses_F64(GrlConstants.TEST_F64,10);
 
 	// storage for tangent points on ellipses
 	private Point2D_F64 A0 = new Point2D_F64(); private Point2D_F64 A1 = new Point2D_F64();

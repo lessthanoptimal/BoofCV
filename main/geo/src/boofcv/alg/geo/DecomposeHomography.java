@@ -21,12 +21,12 @@ package boofcv.alg.geo;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.alg.dense.decomposition.svd.SafeSvd;
+import org.ejml.alg.dense.decomposition.svd.SafeSvd_D64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.SingularOps;
+import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.SingularOps_D64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DecomposeHomography {
-	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(3, 3, false, true, false);
+	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory_D64.svd(3, 3, false, true, false);
 
 	// storage for the four possible solutions
 	// Camera motion part of the solution
@@ -86,7 +86,7 @@ public class DecomposeHomography {
 		}
 
 		// insure that the inputs are not modified
-		svd = new SafeSvd(DecompositionFactory.svd(3, 3, false, true, false));
+		svd = new SafeSvd_D64(DecompositionFactory_D64.svd(3, 3, false, true, false));
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class DecomposeHomography {
 		DenseMatrix64F V = svd.getV(null,false);
 		DenseMatrix64F S = svd.getW(null);
 
-		SingularOps.descendingOrder(null,false,S, V,false);
+		SingularOps_D64.descendingOrder(null,false,S, V,false);
 
 		// COMMENT: The smallest singular value should be zero so I'm not sure why
 		// that is not assumed here.  Seen the same strategy done in a few papers
@@ -186,7 +186,7 @@ public class DecomposeHomography {
 		setColumn(W,0, tempV);
 
 		GeometryMath_F64.crossMatrix(tempV,Hv2);
-		CommonOps.mult(Hv2,H,tempM);
+		CommonOps_D64.mult(Hv2,H,tempM);
 		GeometryMath_F64.mult(tempM,b, tempV);
 		setColumn(W,2, tempV);
 	}
@@ -206,10 +206,10 @@ public class DecomposeHomography {
 								 DenseMatrix64F H ,
 								 Se3_F64 se , Vector3D_F64 N )
 	{
-		CommonOps.multTransB(W,U,se.getR());
+		CommonOps_D64.multTransB(W,U,se.getR());
 		GeometryMath_F64.cross(v2,u,N);
 
-		CommonOps.subtract(H, se.getR(), tempM);
+		CommonOps_D64.subtract(H, se.getR(), tempM);
 		GeometryMath_F64.mult(tempM,N,se.getT());
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,9 @@ import boofcv.struct.sfm.ScaleTranslateRotate2D;
 import georegression.struct.affine.Affine2D_F64;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.CommonOps;
+import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
+import org.ejml.ops.CommonOps_D64;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class GenerateScaleTranslateRotate2D
 	private DenseMatrix64F U = new DenseMatrix64F(2,2);
 	private DenseMatrix64F V = new DenseMatrix64F(2,2);
 
-	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(2,2,true,true,true);
+	private SingularValueDecomposition_F64<DenseMatrix64F> svd = DecompositionFactory_D64.svd(2,2,true,true,true);
 
 	@Override
 	public boolean generate(List<AssociatedPair> dataSet, ScaleTranslateRotate2D output) {
@@ -76,14 +76,14 @@ public class GenerateScaleTranslateRotate2D
 		svd.getU(U, false);
 		svd.getV(V, false);
 
-		CommonOps.multTransB(U, V, R);
+		CommonOps_D64.multTransB(U, V, R);
 
-		if( CommonOps.det(R) < 0 ) {
+		if( CommonOps_D64.det(R) < 0 ) {
 			// There are situations where R might not have a determinant of one and is instead
 			// a reflection is returned
 			for( int i = 0; i < 2; i++ )
 				V.set( i, 1, -V.get( i, 1 ) );
-			CommonOps.mult(U, V, R);
+			CommonOps_D64.mult(U, V, R);
 		}
 
 		// theta = atan2( sin(theta) , cos(theta) )

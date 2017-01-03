@@ -20,15 +20,14 @@ package boofcv.alg.distort;
 
 import boofcv.struct.distort.Point2Transform2Model_F32;
 import georegression.struct.homography.Homography2D_F32;
-import georegression.struct.homography.Homography2D_F64;
-import georegression.struct.homography.UtilHomography;
+import georegression.struct.homography.UtilHomography_F32;
 import georegression.struct.point.Point2D_F32;
 import georegression.transform.homography.HomographyPointOps_F32;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DenseMatrix32F;
 
 
 /**
- * {@link Point2Transform2Model_F32} using {@link georegression.struct.homography.Homography2D_F32}.
+ * {@link Point2Transform2Model_F32} using {@link Homography2D_F32}.
  *
  * @author Peter Abeles
  */
@@ -39,27 +38,20 @@ public class PointTransformHomography_F32 implements Point2Transform2Model_F32<H
 	public PointTransformHomography_F32() {
 	}
 
-	public PointTransformHomography_F32(DenseMatrix64F homo) {
+	public PointTransformHomography_F32(DenseMatrix32F homo) {
 		set(homo);
 	}
 
 	public PointTransformHomography_F32(Homography2D_F32 homo) {
-		this.homo = homo;
-	}
-	public PointTransformHomography_F32(Homography2D_F64 homo) {
 		set(homo);
-	}
-
-	public void set( DenseMatrix64F transform ) {
-		UtilHomography.convert(transform,homo);
 	}
 
 	public void set(Homography2D_F32 transform ) {
 		this.homo.set(transform);
 	}
 
-	public void set( Homography2D_F64 transform ) {
-		UtilHomography.convert(transform,homo);
+	public void set(DenseMatrix32F transform ) {
+		UtilHomography_F32.convert(transform, this.homo);
 	}
 
 	@Override
@@ -69,7 +61,7 @@ public class PointTransformHomography_F32 implements Point2Transform2Model_F32<H
 
 	@Override
 	public void setModel(Homography2D_F32 o) {
-		this.homo.set(o);
+		homo.set(o);
 	}
 
 	@Override

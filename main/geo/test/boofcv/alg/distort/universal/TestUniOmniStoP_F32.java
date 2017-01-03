@@ -43,7 +43,7 @@ public class TestUniOmniStoP_F32 {
 		Point2D_F32 found = new Point2D_F32(10,10);
 		alg.compute(0,0,1, found);  // directly forward on unit sphere
 
-		assertEquals(320,found.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(240,found.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(320,found.x, GrlConstants.TEST_F32);
+		assertEquals(240,found.y, GrlConstants.TEST_F32);
 	}
 }

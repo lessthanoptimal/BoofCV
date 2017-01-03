@@ -23,7 +23,7 @@ import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -124,8 +124,8 @@ public class TestLowLevelMultiViewOps {
 
 		LowLevelMultiViewOps.computeNormalization(list, found1, found2);
 
-		assertTrue(MatrixFeatures.isIdentical(expected1, found1, 1e-8));
-		assertTrue(MatrixFeatures.isIdentical(expected2,found2,1e-8));
+		assertTrue(MatrixFeatures_D64.isIdentical(expected1, found1, 1e-8));
+		assertTrue(MatrixFeatures_D64.isIdentical(expected2,found2,1e-8));
 	}
 
 	/**
@@ -165,9 +165,9 @@ public class TestLowLevelMultiViewOps {
 
 		LowLevelMultiViewOps.computeNormalization(list, found1, found2, found3);
 
-		assertTrue(MatrixFeatures.isIdentical(expected1,found1,1e-8));
-		assertTrue(MatrixFeatures.isIdentical(expected2,found2,1e-8));
-		assertTrue(MatrixFeatures.isIdentical(expected3,found3,1e-8));
+		assertTrue(MatrixFeatures_D64.isIdentical(expected1,found1,1e-8));
+		assertTrue(MatrixFeatures_D64.isIdentical(expected2,found2,1e-8));
+		assertTrue(MatrixFeatures_D64.isIdentical(expected3,found3,1e-8));
 	}
 
 	/**

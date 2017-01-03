@@ -25,7 +25,7 @@ import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.homography.Homography2D_F64;
-import georegression.struct.homography.UtilHomography;
+import georegression.struct.homography.UtilHomography_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
@@ -69,7 +69,7 @@ public class TestDistanceHomographyPixelSq extends StandardDistanceTest<Homograp
 		H_pixel = MultiViewOps.createHomography(R,T,1.0,N,K);
 
 		Homography2D_F64 h = new Homography2D_F64();
-		UtilHomography.convert(H, h);
+		UtilHomography_F64.convert(H, h);
 
 		return h;
 	}
@@ -96,7 +96,7 @@ public class TestDistanceHomographyPixelSq extends StandardDistanceTest<Homograp
 
 		// compute error in pixels, which is what it should be in
 		Homography2D_F64 h_pixel = new Homography2D_F64();
-		UtilHomography.convert(H_pixel,h_pixel);
+		UtilHomography_F64.convert(H_pixel,h_pixel);
 
 		HomographyPointOps_F64.transform(h_pixel, pixel1, result);
 		return result.distance2(pixel2);

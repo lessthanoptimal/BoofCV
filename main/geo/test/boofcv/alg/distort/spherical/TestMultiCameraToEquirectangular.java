@@ -31,12 +31,13 @@ import boofcv.struct.distort.Point3Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import georegression.geometry.ConvertRotation3D_F64;
+import georegression.geometry.ConvertRotation3D_F32;
 import georegression.metric.UtilAngle;
+import georegression.misc.GrlConstants;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
-import georegression.struct.se.Se3_F64;
+import georegression.struct.se.Se3_F32;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -67,10 +68,10 @@ public class TestMultiCameraToEquirectangular {
 	public void all() {
 		MultiCameraToEquirectangular<GrayF32> alg = createAlgorithm();
 
-		alg.addCamera(new Se3_F64(),new HelperDistortion(),inputWidth,inputHeight);
+		alg.addCamera(new Se3_F32(),new HelperDistortion(),inputWidth,inputHeight);
 
-		Se3_F64 cam2_to_1 = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,Math.PI,0,0,cam2_to_1.R);
+		Se3_F32 cam2_to_1 = new Se3_F32();
+		ConvertRotation3D_F32.eulerToMatrix(EulerType.XYZ, GrlConstants.F_PI, 0,0,cam2_to_1.R);
 		alg.addCamera(cam2_to_1,new HelperDistortion(),inputWidth,inputHeight);
 
 		GrayF32 image0 = new GrayF32(inputWidth,inputHeight);
@@ -106,7 +107,7 @@ public class TestMultiCameraToEquirectangular {
 	public void addCamera_implicit_mask() {
 		MultiCameraToEquirectangular<GrayF32> alg = createAlgorithm();
 
-		alg.addCamera(new Se3_F64(),new HelperDistortion(),inputWidth,inputHeight);
+		alg.addCamera(new Se3_F32(),new HelperDistortion(),inputWidth,inputHeight);
 
 		MultiCameraToEquirectangular.Camera c = alg.cameras.get(0);
 
@@ -138,7 +139,7 @@ public class TestMultiCameraToEquirectangular {
 			}
 		}
 
-		alg.addCamera(new Se3_F64(),new HelperDistortion(),mask);
+		alg.addCamera(new Se3_F32(),new HelperDistortion(),mask);
 
 		MultiCameraToEquirectangular.Camera c = alg.cameras.get(0);
 

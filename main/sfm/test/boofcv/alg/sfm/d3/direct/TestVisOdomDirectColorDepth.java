@@ -61,14 +61,14 @@ public class TestVisOdomDirectColorDepth {
 		assertTrue(a.T.x < -0.02);
 		assertEquals( 0 , a.T.y , 1e-2f);
 		assertEquals( 0 , a.T.z , 1e-2f);
-		assertTrue(rotationMag(a) < GrlConstants.DOUBLE_TEST_TOL_SQRT);
+		assertTrue(rotationMag(a) < GrlConstants.TEST_SQ_F64);
 
 		// reverse the direction
 		Se3_F32 b = computeMotion(20,10,6,0);
 		assertTrue(b.T.x > 0.02);
 		assertEquals( 0 , b.T.y , 1e-2f);
 		assertEquals( 0 , b.T.z , 1e-2f);
-		assertTrue(rotationMag(b) < GrlConstants.DOUBLE_TEST_TOL_SQRT);
+		assertTrue(rotationMag(b) < GrlConstants.TEST_SQ_F64);
 
 		assertEquals( a.T.x , -b.T.x , 1e-4f);
 
@@ -77,7 +77,7 @@ public class TestVisOdomDirectColorDepth {
 		assertEquals( 0 , c.T.x , 1e-2f);
 		assertTrue(c.T.y < -0.02);
 		assertEquals( 0 , c.T.z , 1e-2f);
-		assertTrue(rotationMag(c) < GrlConstants.DOUBLE_TEST_TOL_SQRT);
+		assertTrue(rotationMag(c) < GrlConstants.TEST_SQ_F64);
 		assertEquals( a.T.x , c.T.y , 0.01);
 
 		// increase the magnitude of the motion by making the gradient smaller

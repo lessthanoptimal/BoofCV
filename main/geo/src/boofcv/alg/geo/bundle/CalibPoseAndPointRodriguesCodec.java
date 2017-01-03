@@ -25,9 +25,9 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 
 /**
  * Parametrization for Bundle Adjustment with known calibration where the
@@ -53,7 +53,7 @@ public class CalibPoseAndPointRodriguesCodec
 	DenseMatrix64F R = new DenseMatrix64F(3,3);
 
 	// used to make sure the rotation matrix is in SO(3)
-	SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(3, 3, true, true, false);
+	SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory_D64.svd(3, 3, true, true, false);
 
 	/**
 	 * Specify the number of views and points it can expected
@@ -120,7 +120,7 @@ public class CalibPoseAndPointRodriguesCodec
 			DenseMatrix64F U = svd.getU(null,false);
 			DenseMatrix64F V = svd.getV(null,false);
 
-			CommonOps.multTransB(U,V,R);
+			CommonOps_D64.multTransB(U,V,R);
 
 			// extract Rodrigues coordinates
 			ConvertRotation3D_F64.matrixToRodrigues(R,rotation);

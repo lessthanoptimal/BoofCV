@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,11 +19,11 @@
 package boofcv.alg.geo.calibration;
 
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.SingularOps;
-import org.ejml.ops.SpecializedOps;
+import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
+import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.SingularOps_D64;
+import org.ejml.ops.SpecializedOps_D64;
 
 import java.util.List;
 
@@ -60,7 +60,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	// system of equations
 	private DenseMatrix64F A = new DenseMatrix64F(1,1);
 	// computes the SVD of the A matrix
-	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(0, 0,true,true,false);
+	private SingularValueDecomposition_F64<DenseMatrix64F> svd = DecompositionFactory_D64.svd(0, 0,true,true,false);
 
 	// a vectorized description of the B = A^-T * A^-1 matrix.
 	private DenseMatrix64F b;
@@ -106,16 +106,16 @@ public class Zhang99CalibrationMatrixFromHomographies {
 				throw new RuntimeException("SVD failed");
 			if( homographies.size() == 2 ) {
 				DenseMatrix64F V = svd.getV(null,false);
-				SpecializedOps.subvector(V, 0, 4, V.numRows, false, 0, b);
+				SpecializedOps_D64.subvector(V, 0, 4, V.numRows, false, 0, b);
 			} else {
-				SingularOps.nullVector(svd,true,b);
+				SingularOps_D64.nullVector(svd,true,b);
 			}
 			computeParam_ZeroSkew();
 		} else {
 			setupA(homographies);
 			if( !svd.decompose(A) )
 				throw new RuntimeException("SVD failed");
-			SingularOps.nullVector(svd,true,b);
+			SingularOps_D64.nullVector(svd,true,b);
 			computeParam();
 		}
 	}
@@ -141,27 +141,27 @@ public class Zhang99CalibrationMatrixFromHomographies {
 		for( int i = 0; i < homographies.size(); i++ ) {
 			DenseMatrix64F H = homographies.get(i);
 
-			CommonOps.extract(H,0,3,0,1,h1,0,0);
-			CommonOps.extract(H,0,3,1,2,h2,0,0);
+			CommonOps_D64.extract(H,0,3,0,1,h1,0,0);
+			CommonOps_D64.extract(H,0,3,1,2,h2,0,0);
 
 			// normalize H by the max value to reduce numerical error when computing A
 			// several numbers are multiplied against each other and could become quite large/small
-			double max1 = CommonOps.elementMaxAbs(h1);
-			double max2 = CommonOps.elementMaxAbs(h2);
+			double max1 = CommonOps_D64.elementMaxAbs(h1);
+			double max2 = CommonOps_D64.elementMaxAbs(h2);
 			double max = Math.max(max1,max2);
 
-			CommonOps.divide(h1,max);
-			CommonOps.divide(h2,max);
+			CommonOps_D64.divide(h1,max);
+			CommonOps_D64.divide(h2,max);
 
 			// compute elements of A
 			computeV(h1, h2, v12);
 			computeV(h1, h1, v11);
 			computeV(h2, h2, v22);
 
-			CommonOps.subtract(v11, v22, v11m22);
+			CommonOps_D64.subtract(v11, v22, v11m22);
 
-			CommonOps.insert( v12    , A, i*2   , 0);
-			CommonOps.insert( v11m22 , A, i*2+1 , 0);
+			CommonOps_D64.insert( v12    , A, i*2   , 0);
+			CommonOps_D64.insert( v11m22 , A, i*2+1 , 0);
 		}
 	}
 
@@ -186,27 +186,27 @@ public class Zhang99CalibrationMatrixFromHomographies {
 		for( int i = 0; i < homographies.size(); i++ ) {
 			DenseMatrix64F H = homographies.get(i);
 
-			CommonOps.extract(H,0,3,0,1,h1,0,0);
-			CommonOps.extract(H,0,3,1,2,h2,0,0);
+			CommonOps_D64.extract(H,0,3,0,1,h1,0,0);
+			CommonOps_D64.extract(H,0,3,1,2,h2,0,0);
 
 			// normalize H by the max value to reduce numerical error when computing A
 			// several numbers are multiplied against each other and could become quite large/small
-			double max1 = CommonOps.elementMaxAbs(h1);
-			double max2 = CommonOps.elementMaxAbs(h2);
+			double max1 = CommonOps_D64.elementMaxAbs(h1);
+			double max2 = CommonOps_D64.elementMaxAbs(h2);
 			double max = Math.max(max1,max2);
 
-			CommonOps.divide(h1,max);
-			CommonOps.divide(h2,max);
+			CommonOps_D64.divide(h1,max);
+			CommonOps_D64.divide(h2,max);
 
 			// compute elements of A
 			computeV_NoSkew(h1, h2, v12);
 			computeV_NoSkew(h1, h1, v11);
 			computeV_NoSkew(h2, h2, v22);
 
-			CommonOps.subtract(v11, v22, v11m22);
+			CommonOps_D64.subtract(v11, v22, v11m22);
 
-			CommonOps.insert( v12    , A, i*2   , 0);
-			CommonOps.insert( v11m22 , A, i*2+1 , 0);
+			CommonOps_D64.insert( v12    , A, i*2   , 0);
+			CommonOps_D64.insert( v11m22 , A, i*2+1 , 0);
 		}
 	}
 
@@ -257,7 +257,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 */
 	private void computeParam() {
 		// reduce overflow/underflow
-		CommonOps.divide(b,CommonOps.elementMaxAbs(b));
+		CommonOps_D64.divide(b,CommonOps_D64.elementMaxAbs(b));
 
 		double B11 = b.get(0,0);
 		double B12 = b.get(1,0);
@@ -292,7 +292,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 */
 	private void computeParam_ZeroSkew() {
 		// reduce overflow/underflow
-		CommonOps.divide(b,CommonOps.elementMaxAbs(b));
+		CommonOps_D64.divide(b,CommonOps_D64.elementMaxAbs(b));
 
 		double B11 = b.get(0,0);
 		double B22 = b.get(1,0);
@@ -330,7 +330,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 		return K;
 	}
 
-	public SingularValueDecomposition<DenseMatrix64F> getSvd() {
+	public SingularValueDecomposition_F64<DenseMatrix64F> getSvd() {
 		return svd;
 	}
 }

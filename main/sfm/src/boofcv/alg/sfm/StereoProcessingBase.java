@@ -31,7 +31,9 @@ import boofcv.struct.image.ImageType;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ejml.data.DenseMatrix32F;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.ConvertMatrixData;
 
 /**
  * Base class that configures stereo processing.  Created distortion for converting image from its input image
@@ -103,8 +105,8 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 		Se3_F64 leftToRight = stereoParam.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(left, null);
-		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(right, null);
+		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(left, (DenseMatrix64F)null);
+		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(right, (DenseMatrix64F)null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 
@@ -115,9 +117,15 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 		rectK = rectifyAlg.getCalibrationMatrix();
 		rectR = rectifyAlg.getRectifiedRotation();
 
+		DenseMatrix32F rect1_F32 = new DenseMatrix32F(3,3);
+		DenseMatrix32F rect2_F32 = new DenseMatrix32F(3,3);
+
+		ConvertMatrixData.convert(rect1,rect1_F32);
+		ConvertMatrixData.convert(rect2,rect2_F32);
+
 		ImageType<T> imageType = imageLeftRect.getImageType();
-		distortLeftRect = RectifyImageOps.rectifyImage(stereoParam.left, rect1, BorderType.SKIP, imageType);
-		distortRightRect = RectifyImageOps.rectifyImage(stereoParam.right, rect2, BorderType.SKIP, imageType);
+		distortLeftRect = RectifyImageOps.rectifyImage(stereoParam.left, rect1_F32, BorderType.SKIP, imageType);
+		distortRightRect = RectifyImageOps.rectifyImage(stereoParam.right, rect2_F32, BorderType.SKIP, imageType);
 
 		// Compute parameters that are needed when converting to 3D
 		baseline = stereoParam.getBaseline();

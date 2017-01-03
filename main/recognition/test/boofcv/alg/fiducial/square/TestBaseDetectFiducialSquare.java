@@ -43,7 +43,9 @@ import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
+import org.ejml.data.DenseMatrix32F;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.ConvertMatrixData;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -316,7 +318,9 @@ public class TestBaseDetectFiducialSquare {
 		computeHomography.process(associatedPairs, H);
 
 		// Create the transform for distorting the image
-		PointTransformHomography_F32 homography = new PointTransformHomography_F32(H);
+		DenseMatrix32F H32 = new DenseMatrix32F(3,3);
+		ConvertMatrixData.convert(H,H32);
+		PointTransformHomography_F32 homography = new PointTransformHomography_F32(H32);
 		PixelTransform2_F32 pixelTransform = new PointToPixelTransform_F32(homography);
 
 		// Apply distortion and show the results

@@ -27,7 +27,7 @@ import georegression.struct.so.Rodrigues_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 
 import java.util.List;
 
@@ -124,11 +124,11 @@ public class PnPStereoJacobianRodrigues implements FunctionNtoMxN {
 			indexX = indexY;
 			indexY = indexY + 6;
 
-			CommonOps.mult(leftToRight.getR(), rodJacobian.Rx, rotR);
+			CommonOps_D64.mult(leftToRight.getR(), rodJacobian.Rx, rotR);
 			addRodriguesJacobian(rotR,o.location,cameraPt);
-			CommonOps.mult(leftToRight.getR(), rodJacobian.Ry, rotR);
+			CommonOps_D64.mult(leftToRight.getR(), rodJacobian.Ry, rotR);
 			addRodriguesJacobian(rotR,o.location,cameraPt);
-			CommonOps.mult(leftToRight.getR(), rodJacobian.Rz, rotR);
+			CommonOps_D64.mult(leftToRight.getR(), rodJacobian.Rz, rotR);
 			addRodriguesJacobian(rotR,o.location,cameraPt);
 
 			addTranslationJacobian(leftToRight.getR(),cameraPt);

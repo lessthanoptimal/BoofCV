@@ -49,11 +49,11 @@ public class TestEquirectangularRotate_F32 {
 
 		alg.setDirection(0, (float)Math.PI/2,0);
 		alg.compute((int)(300.0f*0.5f), 250/2);
-		assertEquals( 0 , alg.distY, GrlConstants.FLOAT_TEST_TOL); //pathological.  only check y
+		assertEquals( 0 , alg.distY, GrlConstants.TEST_F32); //pathological.  only check y
 
 		alg.setDirection(0, (float)-Math.PI/2,0);
 		alg.compute((int)(300.0f*0.5f), 250/2);
-		assertEquals( 250 , alg.distY, GrlConstants.FLOAT_TEST_TOL); //pathological.  only check y
+		assertEquals( 250 , alg.distY, GrlConstants.TEST_F32); //pathological.  only check y
 
 		alg.setDirection(0, (float)Math.PI/4.0f,0);
 		alg.compute((int)(300.0f*0.5f), 250/2);
@@ -62,7 +62,7 @@ public class TestEquirectangularRotate_F32 {
 	}
 
 	private void assertMatch(PixelTransform2_F32 tran , float x , float y ) {
-		assertEquals( x , tran.distX, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals( y , tran.distY, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals( x , tran.distX, GrlConstants.TEST_F32);
+		assertEquals( y , tran.distY, GrlConstants.TEST_F32);
 	}
 }

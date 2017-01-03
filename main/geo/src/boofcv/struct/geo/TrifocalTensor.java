@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.struct.geo;
 
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.SpecializedOps;
+import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.SpecializedOps_D64;
 
 /**
  * The trifocal tensor describes the projective relationship between three different camera views and is
@@ -114,15 +114,15 @@ public class TrifocalTensor {
 	public void normalizeScale() {
 		double sum = 0;
 
-		sum += SpecializedOps.elementSumSq(T1);
-		sum += SpecializedOps.elementSumSq(T2);
-		sum += SpecializedOps.elementSumSq(T3);
+		sum += SpecializedOps_D64.elementSumSq(T1);
+		sum += SpecializedOps_D64.elementSumSq(T2);
+		sum += SpecializedOps_D64.elementSumSq(T3);
 
 		double n = Math.sqrt(sum);
 
-		CommonOps.scale(1.0/n,T1);
-		CommonOps.scale(1.0/n,T2);
-		CommonOps.scale(1.0/n,T3);
+		CommonOps_D64.scale(1.0/n,T1);
+		CommonOps_D64.scale(1.0/n,T2);
+		CommonOps_D64.scale(1.0/n,T3);
 	}
 
 	@Override

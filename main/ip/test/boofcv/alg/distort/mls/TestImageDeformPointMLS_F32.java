@@ -70,8 +70,8 @@ public class TestImageDeformPointMLS_F32 {
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
 				alg.compute(j,i, found);
-				assertEquals(j, found.x, GrlConstants.FLOAT_TEST_TOL);
-				assertEquals(i, found.y, GrlConstants.FLOAT_TEST_TOL);
+				assertEquals(j, found.x, GrlConstants.TEST_F32);
+				assertEquals(i, found.y, GrlConstants.TEST_F32);
 			}
 		}
 	}
@@ -111,8 +111,8 @@ public class TestImageDeformPointMLS_F32 {
 		Point2D_F32 found = new Point2D_F32();
 		alg.compute(x,y, found);
 
-		assertEquals(expectedX, found.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(expectedY, found.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(expectedX, found.x, GrlConstants.TEST_F32);
+		assertEquals(expectedY, found.y, GrlConstants.TEST_F32);
 	}
 
 	/**
@@ -178,12 +178,12 @@ public class TestImageDeformPointMLS_F32 {
 			Point2D_F32 found = new Point2D_F32();
 			alg.fixateDistorted();
 			alg.compute(4, 4, found);
-			assertTrue(found.distance(expected) <= GrlConstants.FLOAT_TEST_TOL);
+			assertTrue(found.distance(expected) <= GrlConstants.TEST_F32);
 
 			alg.fixateUndistorted();
 			alg.fixateDistorted();
 			alg.compute(4, 4, found);
-			assertTrue(found.distance(expected) <= GrlConstants.FLOAT_TEST_TOL);
+			assertTrue(found.distance(expected) <= GrlConstants.TEST_F32);
 		}
 	}
 
@@ -214,8 +214,8 @@ public class TestImageDeformPointMLS_F32 {
 		float expectedX = 12*0.1f + 2*0.6f + 18*0.3f;
 		float expectedY = 17*0.1f + 7*0.6f + 30*0.3f;
 
-		assertEquals(expectedX, c.aveP.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(expectedY, c.aveP.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(expectedX, c.aveP.x, GrlConstants.TEST_F32);
+		assertEquals(expectedY, c.aveP.y, GrlConstants.TEST_F32);
 	}
 
 	@Test
@@ -238,8 +238,8 @@ public class TestImageDeformPointMLS_F32 {
 		float expectedX = 10*0.1f + 5*0.6f + 20*0.3f;
 		float expectedY = 15*0.1f + 4*0.6f + 24*0.3f;
 
-		assertEquals(expectedX, c.aveQ.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(expectedY, c.aveQ.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(expectedX, c.aveQ.x, GrlConstants.TEST_F32);
+		assertEquals(expectedY, c.aveQ.y, GrlConstants.TEST_F32);
 	}
 
 	@Test
@@ -275,7 +275,7 @@ public class TestImageDeformPointMLS_F32 {
 
 		alg.setAlpha(alpha);
 		alg.computeWeights(cache,12/alg.scaleX,16/alg.scaleY);
-		assertEquals(expected0, cache.weights.data[0], GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(expected0, cache.weights.data[0], GrlConstants.TEST_F32);
 
 	}
 
@@ -283,7 +283,7 @@ public class TestImageDeformPointMLS_F32 {
 		for (int i = 0; i < cache.weights.size(); i++) {
 			expected[i] *= cache.totalWeight;
 		}
-		assertArrayEquals(cache.weights.data, expected, GrlConstants.FLOAT_TEST_TOL);
+		assertArrayEquals(cache.weights.data, expected, GrlConstants.TEST_F32);
 	}
 
 	@Test
@@ -318,7 +318,7 @@ public class TestImageDeformPointMLS_F32 {
 		Point2D_F32 p = new Point2D_F32();
 		alg.interpolateDeformedPoint(x,y, p);
 
-		assertEquals(expectedX, p.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(expectedY, p.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(expectedX, p.x, GrlConstants.TEST_F32);
+		assertEquals(expectedY, p.y, GrlConstants.TEST_F32);
 	}
 }

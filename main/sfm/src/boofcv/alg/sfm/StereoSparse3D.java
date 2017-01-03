@@ -63,7 +63,7 @@ public class StereoSparse3D<T extends ImageGray<T>>
 	public void setCalibration(StereoParameters stereoParam) {
 		super.setCalibration(stereoParam);
 
-		leftPixelToRect = RectifyImageOps.transformPixelToRect_F64(stereoParam.left,rect1);
+		leftPixelToRect = RectifyImageOps.transformPixelToRect(stereoParam.left,rect1);
 	}
 
 	@Override

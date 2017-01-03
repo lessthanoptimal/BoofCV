@@ -26,7 +26,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 
 /**
  * Base class for all distortions from an equirectangular image.  The output image precomputes pointing vectors from
@@ -42,7 +42,7 @@ public abstract class EquirectangularDistortBase_F64 extends PixelTransform2_F64
 	int outWidth;
 
 	// rotation matrix
-	DenseMatrix64F R = CommonOps.identity(3,3);
+	DenseMatrix64F R = CommonOps_D64.identity(3,3);
 
 	// storage for intermediate variables
 	Vector3D_F64 n = new Vector3D_F64();

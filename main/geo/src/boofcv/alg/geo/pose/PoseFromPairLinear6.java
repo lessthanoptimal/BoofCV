@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,10 +25,10 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.SingularOps;
+import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
+import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.SingularOps_D64;
 
 import java.util.List;
 
@@ -68,7 +68,7 @@ public class PoseFromPairLinear6 {
 	private DenseMatrix64F A = new DenseMatrix64F(1,12);
 
 	// used to decompose and compute the null space of A
-	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(0, 0, true, true, false);
+	private SingularValueDecomposition_F64<DenseMatrix64F> svd = DecompositionFactory_D64.svd(0, 0, true, true, false);
 
 	// parameterized rotation and translation
 	private DenseMatrix64F x = new DenseMatrix64F(12,1);
@@ -161,7 +161,7 @@ public class PoseFromPairLinear6 {
 		if( !svd.decompose(A) )
 			throw new RuntimeException("SVD failed?");
 
-		SingularOps.nullVector(svd,true,x);
+		SingularOps_D64.nullVector(svd,true,x);
 
 		DenseMatrix64F R = motion.getR();
 		Vector3D_F64 T = motion.getT();
@@ -189,13 +189,13 @@ public class PoseFromPairLinear6 {
 		if( !svd.decompose(R))
 			throw new RuntimeException("SVD Failed");
 
-		CommonOps.multTransB(svd.getU(null,false),svd.getV(null,false),R);
+		CommonOps_D64.multTransB(svd.getU(null,false),svd.getV(null,false),R);
 
 		// determinant should be +1
-		double det = CommonOps.det(R);
+		double det = CommonOps_D64.det(R);
 
 		if( det < 0 )
-			CommonOps.scale(-1,R);
+			CommonOps_D64.scale(-1,R);
 
 		// compute the determinant of the singular matrix
 		double b = 1.0;

@@ -23,8 +23,8 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -50,9 +50,9 @@ public class TestParamFundamentalEpipolar {
 		alg.decode(param, found);
 
 		// normalize to take in account scale different when testing
-		CommonOps.divide(E.get(2,2),E);
-		CommonOps.divide(found.get(2, 2), found);
+		CommonOps_D64.divide(E.get(2,2),E);
+		CommonOps_D64.divide(found.get(2, 2), found);
 		
-		assertTrue(MatrixFeatures.isEquals(E, found, 1e-8));
+		assertTrue(MatrixFeatures_D64.isEquals(E, found, 1e-8));
 	}
 }

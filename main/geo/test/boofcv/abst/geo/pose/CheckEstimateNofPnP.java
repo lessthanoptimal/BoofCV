@@ -22,7 +22,7 @@ import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.struct.geo.Point2D3D;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -82,7 +82,7 @@ public abstract class CheckEstimateNofPnP extends BaseChecksPnP {
 
 		int numMatched = 0;
 		for( Se3_F64 found : solutions.toList() ) {
-			if(!MatrixFeatures.isIdentical(worldToCamera.getR(), found.getR(), 1e-8))
+			if(!MatrixFeatures_D64.isIdentical(worldToCamera.getR(), found.getR(), 1e-8))
 				continue;
 
 			if( !found.getT().isIdentical(worldToCamera.getT(), 1e-8))
@@ -126,7 +126,7 @@ public abstract class CheckEstimateNofPnP extends BaseChecksPnP {
 				Se3_F64 o = orig.get(j);
 				Se3_F64 f = solutions.get(j);
 
-				assertTrue(MatrixFeatures.isIdentical(o.getR(), f.getR(), 1e-8));
+				assertTrue(MatrixFeatures_D64.isIdentical(o.getR(), f.getR(), 1e-8));
 				assertTrue(f.getT().isIdentical(o.getT(), 1e-8));
 			}
 		}

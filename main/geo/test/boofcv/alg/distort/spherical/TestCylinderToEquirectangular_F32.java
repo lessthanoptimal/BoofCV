@@ -47,8 +47,8 @@ public class TestCylinderToEquirectangular_F32 {
 		alg.compute(100,150);
 
 		// center of output image with y-axis inverted
-		assertEquals(200,alg.distX, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(501-250-1,alg.distY, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(200,alg.distX, GrlConstants.TEST_F32);
+		assertEquals(501-250-1,alg.distY, GrlConstants.TEST_F32);
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class TestCylinderToEquirectangular_F32 {
 		float lat1 = ll.y;
 
 
-		assertEquals(UtilAngle.radian(100),lat1-lat0, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(UtilAngle.radian(100),lat1-lat0, GrlConstants.TEST_F32);
 	}
 
 	/**

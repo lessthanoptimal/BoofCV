@@ -42,7 +42,6 @@ public class PixelTransformAffine_F32 extends PixelTransform2_F32 {
 		
 		this.affine = affine;
 	}
-
 	public void set( Affine2D_F32 affine ) {
 		this.affine.set(affine);
 	}

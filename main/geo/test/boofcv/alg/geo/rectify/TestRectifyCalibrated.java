@@ -26,7 +26,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -62,20 +62,20 @@ public class TestRectifyCalibrated {
 
 		// apply rectification transform
 		DenseMatrix64F temp = new DenseMatrix64F(3,4);
-		CommonOps.mult(alg.getRect1(),foundP1,temp);
+		CommonOps_D64.mult(alg.getRect1(),foundP1,temp);
 		foundP1.set(temp);
-		CommonOps.mult(alg.getRect2(),foundP2,temp);
+		CommonOps_D64.mult(alg.getRect2(),foundP2,temp);
 		foundP2.set(temp);
 
-		CommonOps.scale(0.1/Math.abs(foundP1.get(2,3)),foundP1);
+		CommonOps_D64.scale(0.1/Math.abs(foundP1.get(2,3)),foundP1);
 
 		Point3D_F64 X = new Point3D_F64(0,0,3);
 
 		// compare results, both should match because of rotation only being around y-axis
-		assertEquals(PerspectiveOps.renderPixel(poseR1,K,X).x,PerspectiveOps.renderPixel(foundP1,X).x,1e-5);
-		assertEquals(PerspectiveOps.renderPixel(poseR1,K,X).y,PerspectiveOps.renderPixel(foundP1,X).y,1e-5);
-		assertEquals(PerspectiveOps.renderPixel(poseR2,K,X).x,PerspectiveOps.renderPixel(foundP2,X).x,1e-5);
-		assertEquals(PerspectiveOps.renderPixel(poseR2,K,X).y,PerspectiveOps.renderPixel(foundP2,X).y,1e-5);
+		assertEquals(PerspectiveOps.renderPixel(poseR1,K,X).x, PerspectiveOps.renderPixel(foundP1,X).x,1e-5);
+		assertEquals(PerspectiveOps.renderPixel(poseR1,K,X).y, PerspectiveOps.renderPixel(foundP1,X).y,1e-5);
+		assertEquals(PerspectiveOps.renderPixel(poseR2,K,X).x, PerspectiveOps.renderPixel(foundP2,X).x,1e-5);
+		assertEquals(PerspectiveOps.renderPixel(poseR2,K,X).y, PerspectiveOps.renderPixel(foundP2,X).y,1e-5);
 	}
 
 	/**

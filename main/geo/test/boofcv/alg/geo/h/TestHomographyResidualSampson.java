@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo.h;
 import boofcv.alg.geo.ModelObservationResidualN;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -63,7 +63,7 @@ public class TestHomographyResidualSampson extends HomographyResidualTests {
 
 		alg.computeJacobian(x1,x2);
 		
-		assertTrue(MatrixFeatures.isEquals(J, alg.J, 1e-8));
+		assertTrue(MatrixFeatures_D64.isEquals(J, alg.J, 1e-8));
 
 	}
 }

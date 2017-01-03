@@ -20,7 +20,7 @@ package boofcv.alg.distort;
 
 import boofcv.struct.distort.Point2Transform2Model_F64;
 import georegression.struct.homography.Homography2D_F64;
-import georegression.struct.homography.UtilHomography;
+import georegression.struct.homography.UtilHomography_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -39,7 +39,7 @@ public class PointTransformHomography_F64 implements Point2Transform2Model_F64<H
 	}
 
 	public PointTransformHomography_F64(DenseMatrix64F homo) {
-		UtilHomography.convert(homo, this.homo);
+		UtilHomography_F64.convert(homo, this.homo);
 	}
 
 	public PointTransformHomography_F64(Homography2D_F64 homo) {

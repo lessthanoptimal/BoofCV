@@ -58,8 +58,8 @@ public class TestAsymmetricGridKeyPointDetections {
 
 				Point2D_F64 p = alg.getKeyPoints().get(idx++);
 
-				assertEquals(col*s, p.x, GrlConstants.DOUBLE_TEST_TOL);
-				assertEquals(row*s, p.y, GrlConstants.DOUBLE_TEST_TOL);
+				assertEquals(col*s, p.x, GrlConstants.TEST_F64);
+				assertEquals(row*s, p.y, GrlConstants.TEST_F64);
 			}
 		}
 	}
@@ -231,8 +231,8 @@ public class TestAsymmetricGridKeyPointDetections {
 		alg.computeEllipseCenters();
 
 		assertEquals(1,alg.keypoints.size);
-		assertEquals(cx,alg.keypoints.get(0).x, GrlConstants.DOUBLE_TEST_TOL);
-		assertEquals(cy,alg.keypoints.get(0).y, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(cx,alg.keypoints.get(0).x, GrlConstants.TEST_F64);
+		assertEquals(cy,alg.keypoints.get(0).y, GrlConstants.TEST_F64);
 	}
 
 	public static Grid createGrid(int numRows , int numCols , double space , double radius ) {

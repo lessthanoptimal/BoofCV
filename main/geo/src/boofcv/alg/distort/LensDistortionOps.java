@@ -39,8 +39,8 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.RectangleLength2D_F32;
 import georegression.struct.shapes.RectangleLength2D_F64;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DenseMatrix32F;
+import org.ejml.ops.CommonOps_D32;
 
 /**
  * Operations related to manipulating lens distortion in images
@@ -129,26 +129,26 @@ public class LensDistortionOps {
 			throw new IllegalArgumentException("Unsupported type "+type);
 		}
 
-		double scaleX = bound.width/paramDesired.width;
-		double scaleY = bound.height/paramDesired.height;
+		float scaleX = bound.width/paramDesired.width;
+		float scaleY = bound.height/paramDesired.height;
 
-		double scale;
+		float scale;
 
 		if( type == AdjustmentType.FULL_VIEW ) {
 			scale = Math.max(scaleX, scaleY);
 		} else if( type == AdjustmentType.EXPAND) {
 			scale = Math.min(scaleX, scaleY);
 		} else {
-			scale = 1.0;
+			scale = 1.0f;
 		}
 
-		double deltaX = bound.x0 + (scaleX-scale)*paramDesired.width/2.0;
-		double deltaY = bound.y0 + (scaleY-scale)*paramDesired.height/2.0;
+		float deltaX = (float)(bound.x0 + (scaleX-scale)*paramDesired.width/2.0);
+		float deltaY = (float)(bound.y0 + (scaleY-scale)*paramDesired.height/2.0);
 
 		// adjustment matrix
-		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
-		DenseMatrix64F A_inv = new DenseMatrix64F(3, 3);
-		if (!CommonOps.invert(A, A_inv)) {
+		DenseMatrix32F A = new DenseMatrix32F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
+		DenseMatrix32F A_inv = new DenseMatrix32F(3, 3);
+		if (!CommonOps_D32.invert(A, A_inv)) {
 			throw new RuntimeException("Failed to invert adjustment matrix.  Probably bad.");
 		}
 

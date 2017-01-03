@@ -28,7 +28,9 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.data.DenseMatrix32F;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.ConvertMatrixData;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -83,6 +85,9 @@ public class TestRemovePerspectiveDistortion {
 		DenseMatrix64F H = new DenseMatrix64F(3,3);
 		computeHomography.process(associatedPairs,H);
 
-		new FDistort(expected,input).transform(new PointTransformHomography_F32(H)).apply();
+		DenseMatrix32F H32 = new DenseMatrix32F(3,3);
+		ConvertMatrixData.convert(H,H32);
+
+		new FDistort(expected,input).transform(new PointTransformHomography_F32(H32)).apply();
 	}
 }

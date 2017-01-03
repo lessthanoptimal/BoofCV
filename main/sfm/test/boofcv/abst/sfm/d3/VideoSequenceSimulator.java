@@ -69,7 +69,7 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> {
 
 	public void setIntrinsic( CameraPinholeRadial param ) {
 		this.intrinsic = param;
-		K = PerspectiveOps.calibrationMatrix(param,null);
+		K = PerspectiveOps.calibrationMatrix(param,(DenseMatrix64F)null);
 	}
 
 	protected void createSquares( int total , double minZ, double maxZ ) {

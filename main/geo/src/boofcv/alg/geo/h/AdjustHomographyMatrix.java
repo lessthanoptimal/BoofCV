@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,11 +21,11 @@ package boofcv.alg.geo.h;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.PairLineNorm;
 import georegression.geometry.GeometryMath_F64;
-import org.ejml.alg.dense.decomposition.svd.SafeSvd;
+import org.ejml.alg.dense.decomposition.svd.SafeSvd_D64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.CommonOps;
+import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
+import org.ejml.ops.CommonOps_D64;
 
 import java.util.Arrays;
 
@@ -38,7 +38,7 @@ import java.util.Arrays;
  */
 public class AdjustHomographyMatrix {
 
-	protected SingularValueDecomposition<DenseMatrix64F> svd = new SafeSvd(DecompositionFactory.svd(0, 0, true, true, false));
+	protected SingularValueDecomposition_F64<DenseMatrix64F> svd = new SafeSvd_D64(DecompositionFactory_D64.svd(0, 0, true, true, false));
 
 	DenseMatrix64F H_t = new DenseMatrix64F(3,3);
 
@@ -70,7 +70,7 @@ public class AdjustHomographyMatrix {
 		Arrays.sort(svd.getSingularValues(), 0, 3);
 
 		double scale = svd.getSingularValues()[1];
-		CommonOps.divide(H,scale);
+		CommonOps_D64.divide(H,scale);
 
 		return true;
 	}
@@ -85,7 +85,7 @@ public class AdjustHomographyMatrix {
 		double val = GeometryMath_F64.innerProd(p.p2, H, p.p1);
 
 		if( val < 0 )
-			CommonOps.scale(-1, H);
+			CommonOps_D64.scale(-1, H);
 	}
 
 	/**
@@ -96,11 +96,11 @@ public class AdjustHomographyMatrix {
 	 */
 	protected void adjustHomographSign( PairLineNorm p , DenseMatrix64F H ) {
 
-		CommonOps.transpose(H,H_t);
+		CommonOps_D64.transpose(H,H_t);
 
 		double val = GeometryMath_F64.innerProd(p.l1, H_t, p.l2);
 
 		if( val < 0 )
-			CommonOps.scale(-1, H);
+			CommonOps_D64.scale(-1, H);
 	}
 }

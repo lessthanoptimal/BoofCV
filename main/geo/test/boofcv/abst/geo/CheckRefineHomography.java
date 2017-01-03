@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -53,10 +53,10 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		assertTrue(alg.fitModel(pairs, H, found));
 
 		// normalize so that they are the same
-		CommonOps.divide(H,H.get(2, 2));
-		CommonOps.divide(found,found.get(2, 2));
+		CommonOps_D64.divide(H,H.get(2, 2));
+		CommonOps_D64.divide(found,found.get(2, 2));
 
-		assertTrue(MatrixFeatures.isEquals(H, found, 1e-8));
+		assertTrue(MatrixFeatures_D64.isEquals(H, found, 1e-8));
 	}
 
 	@Test
@@ -76,9 +76,9 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		assertTrue(alg.fitModel(pairs, Hmod, found));
 
 		// normalize to allow comparison
-		CommonOps.divide(H,H.get(2,2));
-		CommonOps.divide(Hmod,Hmod.get(2,2));
-		CommonOps.divide(found,found.get(2,2));
+		CommonOps_D64.divide(H,H.get(2,2));
+		CommonOps_D64.divide(Hmod,Hmod.get(2,2));
+		CommonOps_D64.divide(found,found.get(2,2));
 
 		double error0 = 0;
 		double error1 = 0;

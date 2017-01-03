@@ -38,11 +38,16 @@ public class Autocode64to32App extends RecursiveConvert {
     public static void main(String args[] ) {
         String directories[] = new String[]{
                 "main/geo/src/boofcv/alg/distort",
-                "main/ip/src/boofcv/struct/distort"};
+                "main/geo/src/boofcv/alg/geo",
+                "main/ip/src/boofcv/alg/distort",
+                "main/ip/src/boofcv/struct/distort",
+                };
 
         ConvertFile32From64 converter = new ConvertFile32From64(true);
 
-        converter.replacePattern("DOUBLE_TEST_TOL", "FLOAT_TEST_TOL");
+        converter.replacePattern("64-bit", "32-bit");
+        converter.replacePattern("D64", "D32");
+        converter.replacePattern("64F", "32F");
         converter.replacePattern("DCONV_TOL_", "FCONV_TOL_");
         converter.replacePattern("GrlConstants.PI", "GrlConstants.F_PI");
         converter.replacePattern("GrlConstants.EPS", "GrlConstants.F_EPS");

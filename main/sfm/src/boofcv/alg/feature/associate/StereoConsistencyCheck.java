@@ -63,8 +63,8 @@ public class StereoConsistencyCheck {
 		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(left, null);
-		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(right, null);
+		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(left, (DenseMatrix64F)null);
+		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(right, (DenseMatrix64F)null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 
@@ -72,8 +72,8 @@ public class StereoConsistencyCheck {
 		DenseMatrix64F rect1 = rectifyAlg.getRect1();
 		DenseMatrix64F rect2 = rectifyAlg.getRect2();
 
-		leftImageToRect = RectifyImageOps.transformPixelToRect_F64(param.left, rect1);
-		rightImageToRect = RectifyImageOps.transformPixelToRect_F64(param.right, rect2);
+		leftImageToRect = RectifyImageOps.transformPixelToRect(param.left, rect1);
+		rightImageToRect = RectifyImageOps.transformPixelToRect(param.right, rect2);
 	}
 
 	/**

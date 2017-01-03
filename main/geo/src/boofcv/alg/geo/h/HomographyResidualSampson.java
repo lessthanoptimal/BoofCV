@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,9 @@ import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.LinearSolverFactory;
+import org.ejml.factory.LinearSolverFactory_D64;
 import org.ejml.interfaces.linsol.LinearSolver;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 
 /**
  * <p>
@@ -54,7 +54,7 @@ public class HomographyResidualSampson
 	DenseMatrix64F x = new DenseMatrix64F(2,1);
 	DenseMatrix64F error = new DenseMatrix64F(4,1);
 
-	LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.linear(2);
+	LinearSolver<DenseMatrix64F> solver = LinearSolverFactory_D64.linear(2);
 
 	@Override
 	public void setModel(DenseMatrix64F H) {
@@ -71,7 +71,7 @@ public class HomographyResidualSampson
 
 		computeJacobian(p.p1,p.p2);
 		// JJ = J*J'
-		CommonOps.multTransB(J, J, JJ);
+		CommonOps_D64.multTransB(J, J, JJ);
 
 		// solve JJ'*x = -e
 		e.data[0] = -top1;
@@ -80,7 +80,7 @@ public class HomographyResidualSampson
 		if( solver.setA(JJ) ) {
 			solver.solve(e,x);
 			// -J'(J*J')^-1*e
-			CommonOps.multTransA(J,x,error);
+			CommonOps_D64.multTransA(J,x,error);
 			residuals[index++] = error.data[0];
 			residuals[index++] = error.data[1];
 			residuals[index++] = error.data[2];

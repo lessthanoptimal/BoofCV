@@ -28,7 +28,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -86,7 +86,7 @@ public class TestSe3FromEssentialGenerator {
 		// account for scale difference
 		double scale = found.getT().norm()/motion.getT().norm();
 
-		assertTrue(MatrixFeatures.isIdentical(motion.getR(),found.getR(),1e-6));
+		assertTrue(MatrixFeatures_D64.isIdentical(motion.getR(),found.getR(),1e-6));
 
 		assertEquals(motion.getT().x*scale,found.getT().x,1e-8);
 		assertEquals(motion.getT().y*scale,found.getT().y,1e-8);

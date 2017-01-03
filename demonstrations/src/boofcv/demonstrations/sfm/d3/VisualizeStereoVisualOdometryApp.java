@@ -267,7 +267,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 		handleRunningStatus(2);
 
 		CameraPinholeRadial right = config.right;
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.left,null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.left, (DenseMatrix64F)null);
 		guiCam3D.init();
 		guiCam3D.setK(K);
 		guiCam3D.setStepSize(config.getBaseline());

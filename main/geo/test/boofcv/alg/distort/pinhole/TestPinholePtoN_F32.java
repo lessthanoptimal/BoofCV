@@ -20,8 +20,8 @@ package boofcv.alg.distort.pinhole;
 
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F32;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DenseMatrix32F;
+import org.ejml.ops.CommonOps_D32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -50,8 +50,8 @@ public class TestPinholePtoN_F32 {
 		alg.compute(in.x,in.y,out);
 
 		Point2D_F32 expected = new Point2D_F32();
-		DenseMatrix64F K_inv = new DenseMatrix64F(3,3,true,fx,skew,x_c,0,fy,y_c,0,0,1);
-		CommonOps.invert(K_inv);
+		DenseMatrix32F K_inv = new DenseMatrix32F(3,3,true,fx,skew,x_c,0,fy,y_c,0,0,1);
+		CommonOps_D32.invert(K_inv);
 
 		GeometryMath_F32.mult(K_inv, in, expected);
 

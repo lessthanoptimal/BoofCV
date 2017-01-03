@@ -19,28 +19,23 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.distort.pinhole.PinholeNtoP_F32;
 import boofcv.alg.distort.pinhole.PinholeNtoP_F64;
-import boofcv.alg.distort.pinhole.PinholePtoN_F32;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
+import boofcv.alg.geo.impl.ImplPerspectiveOps_F32;
+import boofcv.alg.geo.impl.ImplPerspectiveOps_F64;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.Point2Transform2_F32;
-import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
-import georegression.geometry.GeometryMath_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.transform.se.SePointOps_F64;
+import org.ejml.data.DenseMatrix32F;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
 
 import java.util.List;
 
@@ -130,17 +125,30 @@ public class PerspectiveOps {
 															 DenseMatrix64F adjustMatrix,
 															 C adjustedParam)
 	{
-		if( adjustedParam == null )
-			adjustedParam = parameters.createLike();
-		adjustedParam.set(parameters);
+		return ImplPerspectiveOps_F64.adjustIntrinsic(parameters, adjustMatrix, adjustedParam);
+	}
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(parameters, null);
-		DenseMatrix64F K_adj = new DenseMatrix64F(3,3);
-		CommonOps.mult(adjustMatrix, K, K_adj);
-
-		PerspectiveOps.matrixToParam(K_adj, parameters.width, parameters.height, adjustedParam);
-
-		return adjustedParam;
+	/**
+	 *
+	 * <p>Recomputes the {@link CameraPinholeRadial} given an adjustment matrix.</p>
+	 * K<sub>A</sub> = A*K<br>
+	 * Where K<sub>A</sub> is the returned adjusted intrinsic matrix, A is the adjustment matrix and K is the
+	 * original intrinsic calibration matrix.
+	 *
+	 * <p>
+	 * NOTE: Distortion parameters are ignored in the provided {@link CameraPinholeRadial} class.
+	 * </p>
+	 *
+	 * @param parameters (Input) Original intrinsic parameters. Not modified.
+	 * @param adjustMatrix (Input) Adjustment matrix. Not modified.
+	 * @param adjustedParam (Output) Optional storage for adjusted intrinsic parameters. Can be null.
+	 * @return Adjusted intrinsic parameters.
+	 */
+	public static <C extends CameraPinhole>C adjustIntrinsic(C parameters,
+															 DenseMatrix32F adjustMatrix,
+															 C adjustedParam)
+	{
+		return ImplPerspectiveOps_F32.adjustIntrinsic(parameters, adjustMatrix, adjustedParam);
 	}
 
 	/**
@@ -155,7 +163,22 @@ public class PerspectiveOps {
 	 */
 	public static DenseMatrix64F calibrationMatrix(double fx, double fy, double skew,
 												   double xc, double yc) {
-		return new DenseMatrix64F(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
+		return ImplPerspectiveOps_F64.calibrationMatrix(fx, fy, skew, xc, yc);
+	}
+
+	/**
+	 * Given the intrinsic parameters create a calibration matrix
+	 *
+	 * @param fx Focal length x-axis in pixels
+	 * @param fy Focal length y-axis in pixels
+	 * @param skew skew in pixels
+	 * @param xc camera center x-axis in pixels
+	 * @param yc center center y-axis in pixels
+	 * @return Calibration matrix 3x3
+	 */
+	public static DenseMatrix32F calibrationMatrix(float fx, float fy, float skew,
+												   float xc, float yc) {
+		return ImplPerspectiveOps_F32.calibrationMatrix(fx, fy, skew, xc, yc);
 	}
 
 	/**
@@ -165,21 +188,21 @@ public class PerspectiveOps {
 	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
-	public static DenseMatrix64F calibrationMatrix(CameraPinhole param , DenseMatrix64F K ) {
+	public static DenseMatrix64F calibrationMatrix(CameraPinhole param , DenseMatrix64F K )
+	{
+		return ImplPerspectiveOps_F64.calibrationMatrix(param, K);
+	}
 
-		if( K == null ) {
-			K = new DenseMatrix64F(3,3);
-		}
-		CommonOps.fill(K, 0);
-
-		K.data[0] = param.fx;
-		K.data[1] = param.skew;
-		K.data[2] = param.cx;
-		K.data[4] = param.fy;
-		K.data[5] = param.cy;
-		K.data[8] = 1;
-
-		return K;
+	/**
+	 * Given the intrinsic parameters create a calibration matrix
+	 *
+	 * @param param Intrinsic parameters structure that is to be converted into a matrix
+	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
+	 * @return Calibration matrix 3x3
+	 */
+	public static DenseMatrix32F calibrationMatrix(CameraPinhole param , DenseMatrix32F K )
+	{
+		return ImplPerspectiveOps_F32.calibrationMatrix(param, K);
 	}
 
 	/**
@@ -191,21 +214,23 @@ public class PerspectiveOps {
 	 * @param param Where the intrinsic parameter are written to.  If null then a new instance is declared.
 	 * @return camera parameters
 	 */
-	public static <C extends CameraPinhole>C matrixToParam(DenseMatrix64F K , int width , int height , C param ) {
+	public static <C extends CameraPinhole>C matrixToParam(DenseMatrix64F K , int width , int height , C param )
+	{
+		return ImplPerspectiveOps_F64.matrixToParam(K, width, height, param);
+	}
 
-		if( param == null )
-			param = (C)new CameraPinhole();
-
-		param.fx = K.get(0,0);
-		param.fy = K.get(1,1);
-		param.skew = K.get(0,1);
-		param.cx = K.get(0,2);
-		param.cy = K.get(1,2);
-
-		param.width = width;
-		param.height = height;
-
-		return param;
+	/**
+	 * Converts a calibration matrix into intrinsic parameters
+	 *
+	 * @param K Camera calibration matrix.
+	 * @param width Image width in pixels
+	 * @param height Image height in pixels
+	 * @param param Where the intrinsic parameter are written to.  If null then a new instance is declared.
+	 * @return camera parameters
+	 */
+	public static <C extends CameraPinhole>C matrixToParam(DenseMatrix32F K , int width , int height , C param )
+	{
+		return ImplPerspectiveOps_F32.matrixToParam(K, width, height, param);
 	}
 
 	/**
@@ -221,21 +246,13 @@ public class PerspectiveOps {
 	 * @return pixel image coordinate
 	 */
 	public static Point2D_F64 convertNormToPixel(CameraModel param , double x , double y , Point2D_F64 pixel ) {
-
-		if( pixel == null )
-			pixel = new Point2D_F64();
-
-		Point2Transform2_F64 normToPixel = LensDistortionOps.narrow(param).distort_F64(false,true);
-
-		normToPixel.compute(x,y,pixel);
-
-		return pixel;
+		return ImplPerspectiveOps_F64.convertNormToPixel(param, x, y, pixel);
 	}
 
 	/**
 	 * <p>
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
-	 * If speed is a concern then {@link PinholeNtoP_F32} should be used instead.
+	 * If speed is a concern then {@link PinholeNtoP_F64} should be used instead.
 	 * </p>
 	 *
 	 * @param param Intrinsic camera parameters
@@ -245,14 +262,7 @@ public class PerspectiveOps {
 	 * @return pixel image coordinate
 	 */
 	public static Point2D_F32 convertNormToPixel(CameraModel param , float x , float y , Point2D_F32 pixel ) {
-		if( pixel == null )
-			pixel = new Point2D_F32();
-
-		Point2Transform2_F32 normToPixel = LensDistortionOps.narrow(param).distort_F32(false, true);
-
-		normToPixel.compute(x,y,pixel);
-
-		return pixel;
+		return ImplPerspectiveOps_F32.convertNormToPixel(param, x, y, pixel);
 	}
 
 	/**
@@ -285,16 +295,9 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F64 convertNormToPixel( DenseMatrix64F K, Point2D_F64 norm , Point2D_F64 pixel ) {
-		if( pixel == null )
-			pixel = new Point2D_F64();
-
-		PinholeNtoP_F64 alg = new PinholeNtoP_F64();
-		alg.set(K.get(0,0),K.get(1,1),K.get(0,1),K.get(0,2),K.get(1,2));
-
-		alg.compute(norm.x,norm.y,pixel);
-
-		return pixel;
+	public static Point2D_F64 convertNormToPixel( DenseMatrix64F K, Point2D_F64 norm , Point2D_F64 pixel )
+	{
+		return ImplPerspectiveOps_F64.convertNormToPixel(K, norm, pixel);
 	}
 
 	/**
@@ -311,20 +314,13 @@ public class PerspectiveOps {
 	 * @return normalized image coordinate
 	 */
 	public static Point2D_F64 convertPixelToNorm(CameraModel param , Point2D_F64 pixel , Point2D_F64 norm ) {
-		if( norm == null )
-			norm = new Point2D_F64();
-
-		Point2Transform2_F64 pixelToNorm = LensDistortionOps.narrow(param).distort_F64(true, false);
-
-		pixelToNorm.compute(pixel.x,pixel.y,norm);
-
-		return norm;
+		return ImplPerspectiveOps_F64.convertPixelToNorm(param, pixel, norm);
 	}
 
 	/**
 	 * <p>
 	 * Convenient function for converting from original image pixel coordinate to normalized< image coordinates.
-	 * If speed is a concern then {@link PinholePtoN_F32} should be used instead.
+	 * If speed is a concern then {@link PinholePtoN_F64} should be used instead.
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
@@ -335,14 +331,7 @@ public class PerspectiveOps {
 	 * @return normalized image coordinate
 	 */
 	public static Point2D_F32 convertPixelToNorm(CameraModel param , Point2D_F32 pixel , Point2D_F32 norm ) {
-		if( norm == null )
-			norm = new Point2D_F32();
-
-		Point2Transform2_F32 pixelToNorm = LensDistortionOps.narrow(param).distort_F32(true, false);
-
-		pixelToNorm.compute(pixel.x,pixel.y,norm);
-
-		return norm;
+		return ImplPerspectiveOps_F32.convertPixelToNorm(param, pixel, norm);
 	}
 
 	/**
@@ -359,15 +348,24 @@ public class PerspectiveOps {
 	 * @return normalized image coordinate
 	 */
 	public static Point2D_F64 convertPixelToNorm( DenseMatrix64F K , Point2D_F64 pixel , Point2D_F64 norm ) {
-		if( norm == null )
-			norm = new Point2D_F64();
+		return ImplPerspectiveOps_F64.convertPixelToNorm(K, pixel, norm);
+	}
 
-		PinholePtoN_F64 alg = new PinholePtoN_F64();
-		alg.set(K.get(0,0),K.get(1,1),K.get(0,1),K.get(0,2),K.get(1,2));
-
-		alg.compute(pixel.x,pixel.y,norm);
-
-		return norm;
+	/**
+	 * <p>
+	 * Convenient function for converting from original image pixel coordinate to normalized< image coordinates.
+	 * If speed is a concern then {@link PinholePtoN_F64} should be used instead.
+	 * </p>
+	 *
+	 * NOTE: norm and pixel can be the same instance.
+	 *
+	 * @param K Intrinsic camera calibration matrix
+	 * @param pixel Pixel coordinate.
+	 * @param norm Optional storage for output.  If null a new instance will be declared.
+	 * @return normalized image coordinate
+	 */
+	public static Point2D_F32 convertPixelToNorm( DenseMatrix32F K , Point2D_F32 pixel , Point2D_F32 norm ) {
+		return ImplPerspectiveOps_F32.convertPixelToNorm(K, pixel, norm);
 	}
 
 	/**
@@ -380,21 +378,7 @@ public class PerspectiveOps {
 	 * @return 2D Render point on image plane or null if it's behind the camera
 	 */
 	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , DenseMatrix64F K , Point3D_F64 X ) {
-		Point3D_F64 X_cam = new Point3D_F64();
-
-		SePointOps_F64.transform(worldToCamera, X, X_cam);
-
-		// see if it's behind the camera
-		if( X_cam.z <= 0 )
-			return null;
-
-		Point2D_F64 norm = new Point2D_F64(X_cam.x/X_cam.z,X_cam.y/X_cam.z);
-
-		if( K == null )
-			return norm;
-
-		// convert into pixel coordinates
-		return GeometryMath_F64.mult(K, norm, norm);
+		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, K, X);
 	}
 
 	/**
@@ -404,9 +388,9 @@ public class PerspectiveOps {
 	 * @param X 3D Point in world reference frame..
 	 * @return 2D Render point on image plane or null if it's behind the camera
 	 */
-	public static Point2D_F64 renderPixel(CameraPinholeRadial intrinsic , Point3D_F64 X ) {
+	public static Point2D_F64 renderPixel(CameraPinhole intrinsic , Point3D_F64 X ) {
 		Point2D_F64 norm = new Point2D_F64(X.x/X.z,X.y/X.z);
-		return PerspectiveOps.convertNormToPixel(intrinsic, norm, norm);
+		return convertNormToPixel(intrinsic, norm, norm);
 	}
 
 	/**
@@ -417,18 +401,7 @@ public class PerspectiveOps {
 	 * @return 2D Render point on image plane.
 	 */
 	public static Point2D_F64 renderPixel( DenseMatrix64F worldToCamera , Point3D_F64 X ) {
-		DenseMatrix64F P = worldToCamera;
-
-		double x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3];
-		double y = P.data[4]*X.x + P.data[5]*X.y + P.data[6]*X.z + P.data[7];
-		double z = P.data[8]*X.x + P.data[9]*X.y + P.data[10]*X.z + P.data[11];
-
-		Point2D_F64 pixel = new Point2D_F64();
-
-		pixel.x = x/z;
-		pixel.y = y/z;
-
-		return pixel;
+		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, X);
 	}
 
 	/**
@@ -474,24 +447,7 @@ public class PerspectiveOps {
 	 */
 	public static DenseMatrix64F createCameraMatrix( DenseMatrix64F R , Vector3D_F64 T , DenseMatrix64F K ,
 													 DenseMatrix64F ret ) {
-		if( ret == null )
-			ret = new DenseMatrix64F(3,4);
-
-		CommonOps.insert(R,ret,0,0);
-
-		ret.data[3] = T.x;
-		ret.data[7] = T.y;
-		ret.data[11] = T.z;
-
-		if( K == null )
-			return ret;
-
-		DenseMatrix64F temp = new DenseMatrix64F(3,4);
-		CommonOps.mult(K,ret,temp);
-
-		ret.set(temp);
-
-		return ret;
+		return ImplPerspectiveOps_F64.createCameraMatrix(R, T, K, ret);
 	}
 
 	/**

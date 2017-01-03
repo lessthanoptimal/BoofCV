@@ -26,7 +26,9 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.data.DenseMatrix32F;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.ConvertMatrixData;
 
 import java.util.ArrayList;
 
@@ -47,6 +49,7 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 
 	// storage for computed homography
 	DenseMatrix64F H = new DenseMatrix64F(3,3);
+	DenseMatrix32F H32 = new DenseMatrix32F(3,3);
 //	DenseMatrix64F Hrefined = new DenseMatrix64F(3,3);
 	// transform which applies the homography
 	PointTransformHomography_F32 homography = new PointTransformHomography_F32();
@@ -107,7 +110,8 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 //		}
 //		homography.set(Hrefined);
 
-		homography.set(H);
+		ConvertMatrixData.convert(H,H32);
+		homography.set(H32);
 		distort.input(input).apply();
 
 		return true;

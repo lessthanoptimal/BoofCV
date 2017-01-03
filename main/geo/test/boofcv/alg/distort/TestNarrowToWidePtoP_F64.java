@@ -50,8 +50,8 @@ public class TestNarrowToWidePtoP_F64 {
 		Point2D_F64 found = new Point2D_F64();
 		alg.compute(250,250,found);
 
-		assertEquals(480,found.x, GrlConstants.DOUBLE_TEST_TOL_SQRT);
-		assertEquals(480,found.y, GrlConstants.DOUBLE_TEST_TOL_SQRT);
+		assertEquals(480,found.x, GrlConstants.TEST_SQ_F64);
+		assertEquals(480,found.y, GrlConstants.TEST_SQ_F64);
 	}
 
 	/**

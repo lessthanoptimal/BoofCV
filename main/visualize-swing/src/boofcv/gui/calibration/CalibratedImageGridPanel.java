@@ -36,7 +36,9 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.data.DenseMatrix32F;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.ConvertMatrixData;
 
 import javax.swing.*;
 import java.awt.*;
@@ -326,9 +328,12 @@ public class CalibratedImageGridPanel extends JPanel {
 					AdjustmentType.FULL_VIEW, BorderType.ZERO, param, undistorted,null, ImageType.single(GrayF32.class));
 			this.remove_p_to_p = LensDistortionOps.transformChangeModel_F32(AdjustmentType.FULL_VIEW, param, undistorted, false,null);
 		} else {
-			this.undoRadial =
-					RectifyImageOps.rectifyImage(param, rect, BorderType.ZERO, ImageType.single(GrayF32.class));
-			this.remove_p_to_p = RectifyImageOps.transformPixelToRect_F32(param, rect);
+			DenseMatrix32F rect_f32 = new DenseMatrix32F(3,3);
+			ConvertMatrixData.convert(rect,rect_f32);
+
+			this.undoRadial = RectifyImageOps.rectifyImage(
+					param, rect_f32, BorderType.ZERO, ImageType.single(GrayF32.class));
+			this.remove_p_to_p = RectifyImageOps.transformPixelToRect(param, rect_f32);
 		}
 	}
 

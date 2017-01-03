@@ -54,9 +54,9 @@ public class TestUniOmniPtoS_F32 {
 		Point3D_F32 found = new Point3D_F32(10,10, 10);
 		alg.compute(320,240, found);  // directly forward on unit sphere
 
-		assertEquals(0,found.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(0,found.y, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(1,found.z, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(0,found.x, GrlConstants.TEST_F32);
+		assertEquals(0,found.y, GrlConstants.TEST_F32);
+		assertEquals(1,found.z, GrlConstants.TEST_F32);
 	}
 
 	@Test
@@ -89,13 +89,13 @@ public class TestUniOmniPtoS_F32 {
 			pixelToUnit.compute(pixel.x,pixel.y, circle);  // directly forward on unit sphere
 
 			// it should be on the unit circle
-			assertEquals(1.0f, circle.norm(), GrlConstants.FLOAT_TEST_TOL);
+			assertEquals(1.0f, circle.norm(), GrlConstants.TEST_F32);
 
 			Point2D_F32 found = new Point2D_F32();
 			unitToPixel.compute(circle.x, circle.y, circle.z, found);
 
-			assertEquals(pixel.x, found.x, GrlConstants.FLOAT_TEST_TOL_SQRT);
-			assertEquals(pixel.y, found.y, GrlConstants.FLOAT_TEST_TOL_SQRT);
+			assertEquals(pixel.x, found.x, GrlConstants.TEST_SQ_F32);
+			assertEquals(pixel.y, found.y, GrlConstants.TEST_SQ_F32);
 		}
 	}
 

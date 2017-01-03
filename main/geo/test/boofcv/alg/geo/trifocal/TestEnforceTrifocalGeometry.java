@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -60,14 +60,14 @@ public class TestEnforceTrifocalGeometry extends CommonTrifocalChecks {
 		}
 
 		DenseMatrix64F vectorT = new DenseMatrix64F(27,1);
-		CommonOps.mult(alg.E,X,vectorT);
+		CommonOps_D64.mult(alg.E,X,vectorT);
 
 		TrifocalTensor foundT = new TrifocalTensor();
 		foundT.convertFrom(vectorT);
 
 		// the two tensors should be identical
 		for( int i = 0; i < 3; i++ ) {
-			assertTrue(MatrixFeatures.isIdentical(tensor.getT(i),foundT.getT(i),1e-8));
+			assertTrue(MatrixFeatures_D64.isIdentical(tensor.getT(i),foundT.getT(i),1e-8));
 		}
 	}
 
@@ -80,9 +80,9 @@ public class TestEnforceTrifocalGeometry extends CommonTrifocalChecks {
 		// create linear constraint matrix
 		TrifocalLinearPoint7 constructA = new TrifocalLinearPoint7();
 		// Make things easier by working in pixel coordinates
-		constructA.N1 = CommonOps.identity(3);
-		constructA.N2 = CommonOps.identity(3);
-		constructA.N3 = CommonOps.identity(3);
+		constructA.N1 = CommonOps_D64.identity(3);
+		constructA.N2 = CommonOps_D64.identity(3);
+		constructA.N3 = CommonOps_D64.identity(3);
 
 		constructA.createLinearSystem(observations);
 

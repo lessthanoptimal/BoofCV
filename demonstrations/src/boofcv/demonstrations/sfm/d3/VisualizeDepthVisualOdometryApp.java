@@ -272,7 +272,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageGray<I>>
 
 		handleRunningStatus(2);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.visualParam,null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.visualParam,(DenseMatrix64F)null);
 		guiCam3D.init();
 		guiCam3D.setK(K);
 		guiCam3D.setStepSize(0.05);

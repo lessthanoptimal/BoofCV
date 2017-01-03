@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,11 +20,11 @@ package boofcv.alg.geo.trifocal;
 
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.alg.dense.decomposition.svd.SafeSvd;
+import org.ejml.alg.dense.decomposition.svd.SafeSvd_D64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.SingularOps;
+import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
+import org.ejml.ops.SingularOps_D64;
 
 /**
  * <p>
@@ -50,7 +50,7 @@ import org.ejml.ops.SingularOps;
 public class TrifocalExtractEpipoles {
 
 	// used to extract the null space
-	private SingularValueDecomposition<DenseMatrix64F> svd;
+	private SingularValueDecomposition_F64<DenseMatrix64F> svd;
 
 	// storage for left and right null space of the trifocal matrices
 	private DenseMatrix64F u1 = new DenseMatrix64F(3,1);
@@ -67,8 +67,8 @@ public class TrifocalExtractEpipoles {
 	private DenseMatrix64F tempE = new DenseMatrix64F(3,1);
 
 	public TrifocalExtractEpipoles() {
-		svd = DecompositionFactory.svd(3, 3, true, true, true);
-		svd = new SafeSvd(svd);
+		svd = DecompositionFactory_D64.svd(3, 3, true, true, true);
+		svd = new SafeSvd_D64(svd);
 	}
 
 	/**
@@ -81,16 +81,16 @@ public class TrifocalExtractEpipoles {
 	 */
 	public void process( TrifocalTensor tensor , Point3D_F64 e2 , Point3D_F64 e3 ) {
 		svd.decompose(tensor.T1);
-		SingularOps.nullVector(svd, true, v1);
-		SingularOps.nullVector(svd, false,u1);
+		SingularOps_D64.nullVector(svd, true, v1);
+		SingularOps_D64.nullVector(svd, false,u1);
 
 		svd.decompose(tensor.T2);
-		SingularOps.nullVector(svd,true,v2);
-		SingularOps.nullVector(svd,false,u2);
+		SingularOps_D64.nullVector(svd,true,v2);
+		SingularOps_D64.nullVector(svd,false,u2);
 
 		svd.decompose(tensor.T3);
-		SingularOps.nullVector(svd,true,v3);
-		SingularOps.nullVector(svd,false,u3);
+		SingularOps_D64.nullVector(svd,true,v3);
+		SingularOps_D64.nullVector(svd,false,u3);
 
 		for( int i = 0; i < 3; i++ ) {
 			U.set(i,0,u1.get(i));
@@ -103,11 +103,11 @@ public class TrifocalExtractEpipoles {
 		}
 
 		svd.decompose(U);
-		SingularOps.nullVector(svd, false, tempE);
+		SingularOps_D64.nullVector(svd, false, tempE);
 		e2.set(tempE.get(0), tempE.get(1), tempE.get(2));
 
 		svd.decompose(V);
-		SingularOps.nullVector(svd, false, tempE);
+		SingularOps_D64.nullVector(svd, false, tempE);
 		e3.set(tempE.get(0), tempE.get(1), tempE.get(2));
 	}
 }

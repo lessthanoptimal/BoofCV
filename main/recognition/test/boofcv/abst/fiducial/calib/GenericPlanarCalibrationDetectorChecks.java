@@ -37,8 +37,10 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.data.DenseMatrix32F;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.ConvertMatrixData;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -268,8 +270,10 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		computeHomography.process(associatedPairs, H);
 
 		// Create the transform for distorting the image
-		d2o = new PointTransformHomography_F32(H);
-		CommonOps.invert(H);
+		DenseMatrix32F H32 = new DenseMatrix32F(3,3);
+		ConvertMatrixData.convert(H,H32);
+		d2o = new PointTransformHomography_F32(H32);
+		CommonOps_D64.invert(H);
 		o2d = new PointTransformHomography_F64(H);
 	}
 

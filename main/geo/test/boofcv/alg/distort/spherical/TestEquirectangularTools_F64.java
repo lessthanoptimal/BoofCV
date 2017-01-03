@@ -62,8 +62,8 @@ public class TestEquirectangularTools_F64 {
 		tools.equiToLonlat(x,y,ll);
 		tools.lonlatToEqui(ll.x,ll.y,r);
 
-		assertEquals(x,r.x, GrlConstants.DOUBLE_TEST_TOL);
-		assertEquals(y,r.y, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(x,r.x, GrlConstants.TEST_F64);
+		assertEquals(y,r.y, GrlConstants.TEST_F64);
 	}
 
 	@Test
@@ -86,8 +86,8 @@ public class TestEquirectangularTools_F64 {
 		tools.equiToLonlatFV(x,y,ll);
 		tools.lonlatToEquiFV(ll.x,ll.y,r);
 
-		assertEquals(x,r.x, GrlConstants.DOUBLE_TEST_TOL);
-		assertEquals(y,r.y, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(x,r.x, GrlConstants.TEST_F64);
+		assertEquals(y,r.y, GrlConstants.TEST_F64);
 	}
 
 	/**
@@ -102,24 +102,24 @@ public class TestEquirectangularTools_F64 {
 		Point3D_F64 found = new Point3D_F64();
 		tools.equiToNorm(300.0/2.0, 249.0/2.0, found);
 
-		assertEquals(1.0,found.x, GrlConstants.DOUBLE_TEST_TOL);
-		assertEquals(0.0,found.y, GrlConstants.DOUBLE_TEST_TOL);
-		assertEquals(0.0,found.z, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(1.0,found.x, GrlConstants.TEST_F64);
+		assertEquals(0.0,found.y, GrlConstants.TEST_F64);
+		assertEquals(0.0,found.z, GrlConstants.TEST_F64);
 
 		tools.equiToNorm(0, 249/2.0, found);
-		assertTrue(found.distance(new Point3D_F64(-1,0,0)) <= GrlConstants.DOUBLE_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F64(-1,0,0)) <= GrlConstants.TEST_F64);
 		tools.equiToNorm(300, 249/2.0, found);
-		assertTrue(found.distance(new Point3D_F64(-1,0,0)) <= GrlConstants.DOUBLE_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F64(-1,0,0)) <= GrlConstants.TEST_F64);
 
 		tools.equiToNorm(300/4, 249/2.0, found);
-		assertTrue(found.distance(new Point3D_F64(0,-1,0)) <= GrlConstants.DOUBLE_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F64(0,-1,0)) <= GrlConstants.TEST_F64);
 		tools.equiToNorm(3*300/4, 249/2.0, found);
-		assertTrue(found.distance(new Point3D_F64(0, 1,0)) <= GrlConstants.DOUBLE_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F64(0, 1,0)) <= GrlConstants.TEST_F64);
 
 		tools.equiToNorm(300/2, 0, found);
-		assertTrue(found.distance(new Point3D_F64(0,0, 1)) <= GrlConstants.DOUBLE_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F64(0,0, 1)) <= GrlConstants.TEST_F64);
 		tools.equiToNorm(300/2, 249, found);
-		assertTrue(found.distance(new Point3D_F64(0,0, -1)) <= GrlConstants.DOUBLE_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F64(0,0, -1)) <= GrlConstants.TEST_F64);
 	}
 
 	@Test
@@ -131,24 +131,24 @@ public class TestEquirectangularTools_F64 {
 		Point3D_F64 found = new Point3D_F64();
 		tools.equiToNormFV(300/2, 249/2.0, found);
 
-		assertEquals(1.0,found.x, GrlConstants.DOUBLE_TEST_TOL);
-		assertEquals(0.0,found.y, GrlConstants.DOUBLE_TEST_TOL);
-		assertEquals(0.0,found.z, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(1.0,found.x, GrlConstants.TEST_F64);
+		assertEquals(0.0,found.y, GrlConstants.TEST_F64);
+		assertEquals(0.0,found.z, GrlConstants.TEST_F64);
 
 		tools.equiToNormFV(0, 249/2.0, found);
-		assertTrue(found.distance(new Point3D_F64(-1,0,0)) <= GrlConstants.DOUBLE_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F64(-1,0,0)) <= GrlConstants.TEST_F64);
 		tools.equiToNormFV(300, 249/2.0, found);
-		assertTrue(found.distance(new Point3D_F64(-1,0,0)) <= GrlConstants.DOUBLE_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F64(-1,0,0)) <= GrlConstants.TEST_F64);
 
 		tools.equiToNormFV(300/4, 249/2.0, found);
-		assertTrue(found.distance(new Point3D_F64(0,-1,0)) <= GrlConstants.DOUBLE_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F64(0,-1,0)) <= GrlConstants.TEST_F64);
 		tools.equiToNormFV(3*300/4, 249/2.0, found);
-		assertTrue(found.distance(new Point3D_F64(0, 1,0)) <= GrlConstants.DOUBLE_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F64(0, 1,0)) <= GrlConstants.TEST_F64);
 
 		tools.equiToNormFV(300/2, 0, found);
-		assertTrue(found.distance(new Point3D_F64(0,0, -1)) <= GrlConstants.DOUBLE_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F64(0,0, -1)) <= GrlConstants.TEST_F64);
 		tools.equiToNormFV(300/2, 249, found);
-		assertTrue(found.distance(new Point3D_F64(0,0, 1)) <= GrlConstants.DOUBLE_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F64(0,0, 1)) <= GrlConstants.TEST_F64);
 	}
 
 	@Test
@@ -179,8 +179,8 @@ public class TestEquirectangularTools_F64 {
 		tools.equiToNorm(x,y,n);
 		tools.normToEqui(n.x,n.y,n.z,r);
 
-		assertEquals(x,r.x, GrlConstants.DOUBLE_TEST_TOL);
-		assertEquals(y,r.y, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(x,r.x, GrlConstants.TEST_F64);
+		assertEquals(y,r.y, GrlConstants.TEST_F64);
 	}
 
 	@Test
@@ -211,8 +211,8 @@ public class TestEquirectangularTools_F64 {
 		tools.equiToNormFV(x,y,n);
 		tools.normToEquiFV(n.x,n.y,n.z,r);
 
-		assertEquals(x,r.x, GrlConstants.DOUBLE_TEST_TOL);
-		assertEquals(y,r.y, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(x,r.x, GrlConstants.TEST_F64);
+		assertEquals(y,r.y, GrlConstants.TEST_F64);
 	}
 
 	@Test
@@ -222,12 +222,12 @@ public class TestEquirectangularTools_F64 {
 
 		Point2D_F64 found = new Point2D_F64();
 		tools.lonlatToEqui(0,GrlConstants.PId2, found);
-		assertEquals(width/2,found.x, GrlConstants.DOUBLE_TEST_TOL);
-		assertEquals(height-1,found.y, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(width/2,found.x, GrlConstants.TEST_F64);
+		assertEquals(height-1,found.y, GrlConstants.TEST_F64);
 
 		tools.lonlatToEqui(0,-GrlConstants.PId2, found);
-		assertEquals(width/2,found.x, GrlConstants.DOUBLE_TEST_TOL);
-		assertEquals(0,found.y, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(width/2,found.x, GrlConstants.TEST_F64);
+		assertEquals(0,found.y, GrlConstants.TEST_F64);
 	}
 
 	@Test
@@ -237,11 +237,11 @@ public class TestEquirectangularTools_F64 {
 
 		Point2D_F64 found = new Point2D_F64();
 		tools.lonlatToEquiFV(0,-GrlConstants.PId2, found);
-		assertEquals(width/2,found.x, GrlConstants.DOUBLE_TEST_TOL);
-		assertEquals(height-1,found.y, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(width/2,found.x, GrlConstants.TEST_F64);
+		assertEquals(height-1,found.y, GrlConstants.TEST_F64);
 
 		tools.lonlatToEquiFV(0,GrlConstants.PId2, found);
-		assertEquals(width/2,found.x, GrlConstants.DOUBLE_TEST_TOL);
-		assertEquals(0,found.y, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(width/2,found.x, GrlConstants.TEST_F64);
+		assertEquals(0,found.y, GrlConstants.TEST_F64);
 	}
 }

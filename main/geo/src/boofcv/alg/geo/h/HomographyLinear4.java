@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,10 @@ import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.SingularOps;
-import org.ejml.ops.SpecializedOps;
+import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
+import org.ejml.ops.SingularOps_D64;
+import org.ejml.ops.SpecializedOps_D64;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.List;
@@ -55,7 +55,7 @@ public class HomographyLinear4 {
 
 	// contains the set of equations that are solved
 	protected DenseMatrix64F A = new DenseMatrix64F(1,9);
-	protected SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(0, 0, true, true, false);
+	protected SingularValueDecomposition_F64<DenseMatrix64F> svd = DecompositionFactory_D64.svd(0, 0, true, true, false);
 
 	// matrix used to normalize results
 	protected DenseMatrix64F N1 = new DenseMatrix64F(3,3);
@@ -122,12 +122,12 @@ public class HomographyLinear4 {
 			return true;
 
 		if( A.numRows > 8 )
-			SingularOps.nullVector(svd,true,H);
+			SingularOps_D64.nullVector(svd,true,H);
 		else {
 			// handle a special case since the matrix only has 8 singular values and won't select
 			// the correct column
 			DenseMatrix64F V = svd.getV(null,false);
-			SpecializedOps.subvector(V, 0, 8, V.numCols, false, 0, H);
+			SpecializedOps_D64.subvector(V, 0, 8, V.numCols, false, 0, H);
 		}
 
 		return false;
@@ -143,7 +143,7 @@ public class HomographyLinear4 {
 
 		SimpleMatrix result = c.invert().mult(a).mult(b);
 
-		M.set(result.getMatrix());
+		M.set(result.matrix_F64());
 	}
 
 	/**

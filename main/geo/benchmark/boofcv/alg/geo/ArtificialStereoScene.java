@@ -27,7 +27,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class ArtificialStereoScene {
 	protected boolean isPixels;
 
 	public ArtificialStereoScene() {
-		CommonOps.invert(K,K_inv);
+		CommonOps_D64.invert(K,K_inv);
 	}
 
 	public void init( int N , boolean isPixels , boolean planar ) {

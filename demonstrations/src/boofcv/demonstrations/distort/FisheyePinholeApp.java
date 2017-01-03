@@ -42,15 +42,15 @@ import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import georegression.geometry.ConvertRotation3D_F64;
-import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.UtilVector3D_F64;
+import georegression.geometry.ConvertRotation3D_F32;
+import georegression.geometry.GeometryMath_F32;
+import georegression.geometry.UtilVector3D_F32;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.point.Vector3D_F64;
-import georegression.struct.so.Rodrigues_F64;
-import org.ejml.data.DenseMatrix64F;
+import georegression.struct.point.Point3D_F32;
+import georegression.struct.point.Vector3D_F32;
+import georegression.struct.so.Rodrigues_F32;
+import org.ejml.data.DenseMatrix32F;
 
 import javax.swing.*;
 import java.awt.*;
@@ -142,17 +142,17 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 					return;
 				panelPinhole.grabFocus();
 				synchronized (imageLock) {
-					Point3D_F64 norm = new Point3D_F64();
-					fisheyeDistort.undistortPtoS_F64().compute(omniX, omniY, norm);
+					Point3D_F32 norm = new Point3D_F32();
+					fisheyeDistort.undistortPtoS_F32().compute((float)omniX, (float)omniY, norm);
 
-					Rodrigues_F64 rotation = new Rodrigues_F64();
+					Rodrigues_F32 rotation = new Rodrigues_F32();
 
-					Vector3D_F64 canonical = new Vector3D_F64(0,0,1);
-					rotation.theta = UtilVector3D_F64.acute(new Vector3D_F64(norm),canonical);
-					GeometryMath_F64.cross(canonical,norm,rotation.unitAxisRotation);
+					Vector3D_F32 canonical = new Vector3D_F32(0,0,1);
+					rotation.theta = UtilVector3D_F32.acute(new Vector3D_F32(norm),canonical);
+					GeometryMath_F32.cross(canonical,norm,rotation.unitAxisRotation);
 					rotation.unitAxisRotation.normalize();
 
-					DenseMatrix64F R = ConvertRotation3D_F64.rodriguesToMatrix(rotation,null);
+					DenseMatrix32F R = ConvertRotation3D_F32.rodriguesToMatrix(rotation,null);
 					distorter.setRotationWideToNarrow(R);
 
 					distortImage.setModel(new PointToPixelTransform_F32(distorter));

@@ -35,7 +35,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import georegression.geometry.ConvertRotation3D_F64;
+import georegression.geometry.ConvertRotation3D_F32;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F32;
@@ -161,10 +161,10 @@ public class EquirectangularCylinderApp<T extends ImageBase<T>> extends Demonstr
 	@Override
 	public void updatedOrientation(double pitch, double yaw, double roll) {
 		synchronized (distorter) {
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.ZYX,
-					UtilAngle.degreeToRadian(yaw),
-					UtilAngle.degreeToRadian(pitch),
-					UtilAngle.degreeToRadian(roll),
+			ConvertRotation3D_F32.eulerToMatrix(EulerType.ZYX,
+					(float)UtilAngle.degreeToRadian(yaw),
+					(float)UtilAngle.degreeToRadian(pitch),
+					(float)UtilAngle.degreeToRadian(roll),
 					distorter.getRotation());
 			distortImage.setModel(distorter); // let it know the transform has changed
 

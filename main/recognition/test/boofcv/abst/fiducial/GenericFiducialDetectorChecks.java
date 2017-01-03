@@ -28,7 +28,7 @@ import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -87,7 +87,7 @@ public abstract class GenericFiducialDetectorChecks {
 					detector.getFiducialToCamera(i, pose);
 					detector.getImageLocation(i, pixel);
 					assertTrue(pose.getT().distance(results.pose.get(i).T) > 1e-4);
-					assertFalse(MatrixFeatures.isIdentical(pose.getR(), results.pose.get(i).R, 1e-4));
+					assertFalse(MatrixFeatures_D64.isIdentical(pose.getR(), results.pose.get(i).R, 1e-4));
 					// pixel location is based on the observed location, thus changing the intrinsics should not
 					// affect it
 					assertTrue(results.pixel.get(i).distance(pixel) <= 2.0 );
@@ -107,7 +107,7 @@ public abstract class GenericFiducialDetectorChecks {
 				Se3_F64 pose = new Se3_F64();
 				detector.getFiducialToCamera(i, pose);
 				assertEquals(0,pose.getT().distance(results.pose.get(i).T),1e-8);
-				assertTrue(MatrixFeatures.isIdentical(pose.getR(),results.pose.get(i).R,1e-8));
+				assertTrue(MatrixFeatures_D64.isIdentical(pose.getR(),results.pose.get(i).R,1e-8));
 			}
 		}
 	}
@@ -144,7 +144,7 @@ public abstract class GenericFiducialDetectorChecks {
 			for (int i = 0; i < expected.id.length; i++) {
 				assertEquals(expected.id[i],found.id[i]);
 				assertTrue(expected.pose.get(i).T.distance(found.pose.get(i).T) <= 1e-4);
-				assertTrue(MatrixFeatures.isIdentical(expected.pose.get(i).getR(), found.pose.get(i).R, 1e-4));
+				assertTrue(MatrixFeatures_D64.isIdentical(expected.pose.get(i).getR(), found.pose.get(i).R, 1e-4));
 				assertTrue(found.pixel.get(i).distance(expected.pixel.get(i)) <= 1e-4 );
 			}
 		}
@@ -195,7 +195,7 @@ public abstract class GenericFiducialDetectorChecks {
 				Se3_F64 pose = new Se3_F64();
 				detector.getFiducialToCamera(i, pose);
 				assertEquals(0,pose.getT().distance(results.pose.get(i).T),1e-8);
-				assertTrue(MatrixFeatures.isIdentical(pose.getR(),results.pose.get(i).R,1e-8));
+				assertTrue(MatrixFeatures_D64.isIdentical(pose.getR(),results.pose.get(i).R,1e-8));
 			}
 		}
 	}
@@ -234,7 +234,7 @@ public abstract class GenericFiducialDetectorChecks {
 				Se3_F64 pose = new Se3_F64();
 				detector.getFiducialToCamera(i, pose);
 				assertEquals(0,pose.getT().distance(foundPose.get(i).T),1e-8);
-				assertTrue(MatrixFeatures.isIdentical(pose.getR(),foundPose.get(i).R,1e-8));
+				assertTrue(MatrixFeatures_D64.isIdentical(pose.getR(),foundPose.get(i).R,1e-8));
 			}
 		}
 	}
@@ -368,7 +368,7 @@ public abstract class GenericFiducialDetectorChecks {
 			for (int i = 0; i < after.id.length; i++) {
 				assertEquals(before.id[i], after.id[i]);
 				assertEquals(0,before.pose.get(i).T.distance(after.pose.get(i).T),1e-8);
-				assertTrue(MatrixFeatures.isIdentical(before.pose.get(i).R,after.pose.get(i).R,1e-8));
+				assertTrue(MatrixFeatures_D64.isIdentical(before.pose.get(i).R,after.pose.get(i).R,1e-8));
 				assertEquals(0,before.pixel.get(i).distance(after.pixel.get(i)),1e-8);
 			}
 		}

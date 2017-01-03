@@ -24,7 +24,7 @@ import georegression.struct.point.Point2D_F32;
 
 /**
  * Allows a {@link PointToPixelTransform_F32} to be invoked as a {@link PixelTransform2_F32}.
- * 
+ *
  * @author Peter Abeles
  */
 public class PointToPixelTransform_F32 extends PixelTransform2_F32 {

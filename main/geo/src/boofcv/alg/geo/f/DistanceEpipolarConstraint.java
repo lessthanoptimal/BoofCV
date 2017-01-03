@@ -22,7 +22,7 @@ import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 
 import java.util.List;
 
@@ -40,8 +40,8 @@ public class DistanceEpipolarConstraint implements DistanceFromModel<DenseMatrix
 	public void setModel(DenseMatrix64F F )
 	{
 		// assume that each element in the matrix has equal weight
-		double v = CommonOps.elementSumAbs(F);
-		CommonOps.scale(1.0/v,F,M);
+		double v = CommonOps_D64.elementSumAbs(F);
+		CommonOps_D64.scale(1.0/v,F,M);
 	}
 
 	@Override

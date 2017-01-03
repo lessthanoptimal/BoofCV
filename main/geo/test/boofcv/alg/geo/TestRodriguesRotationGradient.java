@@ -24,7 +24,7 @@ import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 import org.junit.Test;
 
 import java.util.Random;
@@ -112,7 +112,7 @@ public class TestRodriguesRotationGradient {
 			System.arraycopy(g.Ry.data,0,output,9,9);
 			System.arraycopy(g.Rz.data,0,output,18,9);
 
-			CommonOps.transpose(J);
+			CommonOps_D64.transpose(J);
 		}
 	}
 }

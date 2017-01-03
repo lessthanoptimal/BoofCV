@@ -60,8 +60,8 @@ public abstract class ChecksPointDeformKeyPoints {
 		Point2D_F32 found = new Point2D_F32();
 		alg.compute(12,19.5f, found);
 
-		assertEquals(expected.x, found.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(expected.y, found.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(expected.x, found.x, GrlConstants.TEST_F32);
+		assertEquals(expected.y, found.y, GrlConstants.TEST_F32);
 	}
 
 	private List<Point2D_F32> createTestPoints() {
@@ -94,8 +94,8 @@ public abstract class ChecksPointDeformKeyPoints {
 		Point2D_F32 found = new Point2D_F32();
 		alg.compute(12,19.5f, found);
 
-		assertEquals(expected.x, found.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(expected.y, found.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(expected.x, found.x, GrlConstants.TEST_F32);
+		assertEquals(expected.y, found.y, GrlConstants.TEST_F32);
 	}
 
 	/**
@@ -119,8 +119,8 @@ public abstract class ChecksPointDeformKeyPoints {
 		Point2D_F32 found = new Point2D_F32();
 		alg.compute(12,19.5f, found);
 
-		assertEquals(expected.x, found.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(expected.y, found.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(expected.x, found.x, GrlConstants.TEST_F32);
+		assertEquals(expected.y, found.y, GrlConstants.TEST_F32);
 	}
 
 }

@@ -79,8 +79,8 @@ public class TestPinholeToEquirectangular_F32 {
 		alg.compute(x,y);
 		tools.equiToNormFV(alg.distX,alg.distY,n);
 
-		assertEquals( nx, n.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals( ny, n.y, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals( nz, n.z, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals( nx, n.x, GrlConstants.TEST_F32);
+		assertEquals( ny, n.y, GrlConstants.TEST_F32);
+		assertEquals( nz, n.z, GrlConstants.TEST_F32);
 	}
 }

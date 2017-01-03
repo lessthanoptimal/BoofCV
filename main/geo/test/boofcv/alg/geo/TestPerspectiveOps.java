@@ -23,20 +23,18 @@ import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.ConvertRotation3D_F64;
-import georegression.geometry.GeometryMath_F32;
 import georegression.geometry.GeometryMath_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
-import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.MatrixFeatures;
-import org.ejml.ops.RandomMatrices;
+import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.MatrixFeatures_D64;
+import org.ejml.ops.RandomMatrices_D64;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
@@ -81,13 +79,13 @@ public class TestPerspectiveOps {
 		Point3D_F64 X = new Point3D_F64(0.1,0.3,2);
 
 		CameraPinholeRadial param = new CameraPinholeRadial(200,300,2,250,260,200,300);
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param,null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param, (DenseMatrix64F)null);
 
 		// find the pixel location in the unscaled image
 		Point2D_F64 a = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
 
 		PerspectiveOps.scaleIntrinsic(param,0.5);
-		K = PerspectiveOps.calibrationMatrix(param,null);
+		K = PerspectiveOps.calibrationMatrix(param,(DenseMatrix64F)null);
 
 		// find the pixel location in the scaled image
 		Point2D_F64 b = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
@@ -104,20 +102,20 @@ public class TestPerspectiveOps {
 		CameraPinholeRadial param = new CameraPinholeRadial(200,300,2,250,260,200,300).fsetRadial(0.1,0.3);
 		CameraPinholeRadial found = PerspectiveOps.adjustIntrinsic(param, B, null);
 
-		DenseMatrix64F A = PerspectiveOps.calibrationMatrix(param, null);
+		DenseMatrix64F A = PerspectiveOps.calibrationMatrix(param, (DenseMatrix64F)null);
 
 		DenseMatrix64F expected = new DenseMatrix64F(3,3);
-		CommonOps.mult(B, A, expected);
+		CommonOps_D64.mult(B, A, expected);
 
 		assertArrayEquals(param.radial, found.radial, 1e-8);
-		DenseMatrix64F foundM = PerspectiveOps.calibrationMatrix(found,null);
+		DenseMatrix64F foundM = PerspectiveOps.calibrationMatrix(found,(DenseMatrix64F)null);
 
-		assertTrue(MatrixFeatures.isIdentical(expected,foundM,1e-8));
+		assertTrue(MatrixFeatures_D64.isIdentical(expected,foundM,1e-8));
 	}
 
 	@Test
 	public void calibrationMatrix() {
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(1, 2, 3, 4, 5);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(1.0, 2, 3, 4, 5);
 
 		assertEquals(1,K.get(0,0),1e-3);
 		assertEquals(2,K.get(1,1),1e-3);
@@ -151,7 +149,7 @@ public class TestPerspectiveOps {
 	public void convertNormToPixel_intrinsic_F64() {
 		CameraPinholeRadial intrinsic = new CameraPinholeRadial(100,150,0.1,120,209,500,600);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, (DenseMatrix64F)null);
 
 		Point2D_F64 norm = new Point2D_F64(-0.1,0.25);
 		Point2D_F64 expected = new Point2D_F64();
@@ -162,23 +160,6 @@ public class TestPerspectiveOps {
 
 		assertEquals(expected.x, found.x, 1e-8);
 		assertEquals(expected.y, found.y, 1e-8);
-	}
-
-	@Test
-	public void convertNormToPixel_intrinsic_F32() {
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(100,150,0.1,120,209,500,600);
-
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
-
-		Point2D_F32 norm = new Point2D_F32(-0.1f,0.25f);
-		Point2D_F32 expected = new Point2D_F32();
-
-		GeometryMath_F32.mult(K, norm, expected);
-
-		Point2D_F32 found = PerspectiveOps.convertNormToPixel(intrinsic,norm.x,norm.y,(Point2D_F32)null);
-
-		assertEquals(expected.x, found.x, 1e-4);
-		assertEquals(expected.y, found.y, 1e-4);
 	}
 
 	@Test
@@ -200,9 +181,9 @@ public class TestPerspectiveOps {
 	public void convertPixelToNorm_intrinsic_F64() {
 		CameraPinholeRadial intrinsic = new CameraPinholeRadial(100,150,0.1,120,209,500,600);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, (DenseMatrix64F)null);
 		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
-		CommonOps.invert(K,K_inv);
+		CommonOps_D64.invert(K,K_inv);
 
 		Point2D_F64 pixel = new Point2D_F64(100,120);
 		Point2D_F64 expected = new Point2D_F64();
@@ -216,29 +197,10 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void convertPixelToNorm_intrinsic_F32() {
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(100,150,0.1,120,209,500,600);
-
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
-		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
-		CommonOps.invert(K,K_inv);
-
-		Point2D_F32 pixel = new Point2D_F32(100,120);
-		Point2D_F32 expected = new Point2D_F32();
-
-		GeometryMath_F32.mult(K_inv,pixel,expected);
-
-		Point2D_F32 found = PerspectiveOps.convertPixelToNorm(intrinsic, pixel, null);
-
-		assertEquals(expected.x, found.x, 1e-4);
-		assertEquals(expected.y, found.y, 1e-4);
-	}
-
-	@Test
 	public void convertPixelToNorm_matrix() {
 		DenseMatrix64F K = new DenseMatrix64F(3,3,true,100,0.1,120,0,150,209,0,0,1);
 		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
-		CommonOps.invert(K,K_inv);
+		CommonOps_D64.invert(K,K_inv);
 
 		Point2D_F64 pixel = new Point2D_F64(100,120);
 		Point2D_F64 expected = new Point2D_F64();
@@ -259,7 +221,7 @@ public class TestPerspectiveOps {
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, -0.05, 0.03, worldToCamera.getR());
 		worldToCamera.getT().set(0.2,0.01,-0.03);
 
-		DenseMatrix64F K = RandomMatrices.createUpperTriangle(3, 0, -1, 1, rand);
+		DenseMatrix64F K = RandomMatrices_D64.createUpperTriangle(3, 0, -1, 1, rand);
 
 		Point3D_F64 X_cam = SePointOps_F64.transform(worldToCamera,X,null);
 		Point2D_F64 found;
@@ -306,7 +268,7 @@ public class TestPerspectiveOps {
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.05,0.03,worldToCamera.getR());
 		worldToCamera.getT().set(0.2,0.01,-0.03);
 
-		DenseMatrix64F K = RandomMatrices.createUpperTriangle(3, 0, -1, 1, rand);
+		DenseMatrix64F K = RandomMatrices_D64.createUpperTriangle(3, 0, -1, 1, rand);
 
 		Point3D_F64 X_cam = SePointOps_F64.transform(worldToCamera,X,null);
 		Point2D_F64 found;
@@ -381,14 +343,14 @@ public class TestPerspectiveOps {
 
 	@Test
 	public void createCameraMatrix() {
-		SimpleMatrix R = SimpleMatrix.random(3, 3, -1, 1, rand);
+		SimpleMatrix R = SimpleMatrix.random_F64(3, 3, -1, 1, rand);
 		Vector3D_F64 T = new Vector3D_F64(2,3,-4);
-		SimpleMatrix K = SimpleMatrix.wrap(RandomMatrices.createUpperTriangle(3, 0, -1, 1, rand));
+		SimpleMatrix K = SimpleMatrix.wrap(RandomMatrices_D64.createUpperTriangle(3, 0, -1, 1, rand));
 
 		SimpleMatrix T_ = new SimpleMatrix(3,1,true,T.x,T.y,T.z);
 
 		// test calibrated camera
-		DenseMatrix64F found = PerspectiveOps.createCameraMatrix(R.getMatrix(), T, null, null);
+		DenseMatrix64F found = PerspectiveOps.createCameraMatrix(R.matrix_F64(), T, null, null);
 		for( int i = 0; i < 3; i++ ) {
 			assertEquals(found.get(i,3),T_.get(i),1e-8);
 			for( int j = 0; j < 3; j++ ) {
@@ -397,7 +359,7 @@ public class TestPerspectiveOps {
 		}
 
 		// test uncalibrated camera
-		found = PerspectiveOps.createCameraMatrix(R.getMatrix(), T, K.getMatrix(), null);
+		found = PerspectiveOps.createCameraMatrix(R.matrix_F64(), T, K.matrix_F64(), null);
 
 		SimpleMatrix expectedR = K.mult(R);
 		SimpleMatrix expectedT = K.mult(T_);

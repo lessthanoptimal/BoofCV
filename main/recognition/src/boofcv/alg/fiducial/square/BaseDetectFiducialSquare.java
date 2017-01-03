@@ -36,12 +36,14 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
-import georegression.struct.homography.UtilHomography;
+import georegression.struct.ConvertFloatType;
+import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.ConvertMatrixStruct_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +89,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	private RefineEpipolar refineHomography = FactoryMultiView.refineHomography(1e-4,100, EpipolarError.SAMPSON);
 	private DenseMatrix64F H = new DenseMatrix64F(3,3);
 	private DenseMatrix64F H_refined = new DenseMatrix64F(3,3);
+	private Homography2D_F64 H_fixed = new Homography2D_F64();
 	private List<AssociatedPair> pairsRemovePerspective = new ArrayList<>();
 	private ImageDistort<T,GrayF32> removePerspective;
 	private PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
@@ -246,7 +249,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			}
 
 			// pass the found homography onto the image transform
-			UtilHomography.convert(H_refined, transformHomography.getModel());
+			ConvertMatrixStruct_F64.convert(H_refined,H_fixed);
+			ConvertFloatType.convert(H_fixed, transformHomography.getModel());
 
 			// TODO Improve how perspective is removed
 			// The current method introduces artifacts.  If the "square" is larger

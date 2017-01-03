@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,11 +19,11 @@
 package boofcv.alg.geo.pose;
 
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.factory.LinearSolverFactory;
+import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.factory.LinearSolverFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
 import org.ejml.interfaces.linsol.LinearSolver;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 
 /**
  * <p>
@@ -56,7 +56,7 @@ public class Relinearlize {
 	// lookup table for indices
 	int table[] = new int[10*10];
 
-	SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(3, 3, false, true, false);
+	SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory_D64.svd(3, 3, false, true, false);
 
 	// used inside of solveConstraintMatrix
 	DenseMatrix64F AA = new DenseMatrix64F(1,1);
@@ -64,7 +64,7 @@ public class Relinearlize {
 	DenseMatrix64F xx = new DenseMatrix64F(1,1);
 
 	// used to compute one possible solution
-	LinearSolver<DenseMatrix64F> pseudo = LinearSolverFactory.pseudoInverse(true);
+	LinearSolver<DenseMatrix64F> pseudo = LinearSolverFactory_D64.pseudoInverse(true);
 
 	// stores constraints
 	double XiiXjk[] = new double[10];
@@ -167,7 +167,7 @@ public class Relinearlize {
 			}
 		}
 //		AA.print();
-		CommonOps.solve(AA, yy, xx);
+		CommonOps_D64.solve(AA, yy, xx);
 
 		return xx;
 	}

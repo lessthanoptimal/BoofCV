@@ -95,7 +95,7 @@ public class PointCloudViewer extends JPanel
 
 	public PointCloudViewer(CameraPinholeRadial intrinsic, double keyStepSize) {
 		this(keyStepSize);
-		configure(PerspectiveOps.calibrationMatrix(intrinsic,null));
+		configure(PerspectiveOps.calibrationMatrix(intrinsic,(DenseMatrix64F)null));
 		setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));
 	}
 

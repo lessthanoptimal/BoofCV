@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import org.ddogleg.solver.RootFinderType;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.Complex64F;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.SpecializedOps;
+import org.ejml.ops.SpecializedOps_D64;
 
 import java.util.Arrays;
 import java.util.List;
@@ -124,8 +124,8 @@ public class FundamentalLinear7 extends FundamentalLinear {
 		// extract the two singular vectors
 		// no need to sort by singular values because the two automatic null spaces are being sampled
 		svdNull.getV(V,false);
-		SpecializedOps.subvector(V, 0, 7, 9, false, 0, F1);
-		SpecializedOps.subvector(V, 0, 8, 9, false, 0, F2);
+		SpecializedOps_D64.subvector(V, 0, 7, 9, false, 0, F1);
+		SpecializedOps_D64.subvector(V, 0, 8, 9, false, 0, F2);
 
 		return true;
 	}

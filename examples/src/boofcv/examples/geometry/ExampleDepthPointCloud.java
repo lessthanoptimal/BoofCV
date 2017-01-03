@@ -65,7 +65,7 @@ public class ExampleDepthPointCloud {
 
 		VisualDepthOps.depthTo3D(param.visualParam, rgb, depth, cloud, cloudColor);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param.visualParam,null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param.visualParam, (DenseMatrix64F)null);
 
 		PointCloudViewer viewer = new PointCloudViewer(K, 15);
 		viewer.setPreferredSize(new Dimension(rgb.width,rgb.height));

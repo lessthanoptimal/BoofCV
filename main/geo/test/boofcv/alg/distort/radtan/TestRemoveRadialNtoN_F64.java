@@ -56,7 +56,7 @@ public class TestRemoveRadialNtoN_F64 {
 		Point2D_F64 found = new Point2D_F64();
 		alg.compute(distX, distY, found);
 
-		assertEquals(undistorted.x,found.x, GrlConstants.DOUBLE_TEST_TOL_SQRT);
-		assertEquals(undistorted.y,found.y, GrlConstants.DOUBLE_TEST_TOL_SQRT);
+		assertEquals(undistorted.x,found.x, GrlConstants.TEST_SQ_F64);
+		assertEquals(undistorted.y,found.y, GrlConstants.TEST_SQ_F64);
 	}
 }

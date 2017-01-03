@@ -30,7 +30,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -117,7 +117,7 @@ public class TestAssociateStereo2D {
 	@Test
 	public void constraintX() {
 		// zap the rotation so that no adjustment should need to be done
-		CommonOps.setIdentity(param.rightToLeft.getR());
+		CommonOps_D64.setIdentity(param.rightToLeft.getR());
 		Point3D_F64 X = new Point3D_F64(0.02,-0.5,3);
 
 		SfmTestHelper.renderPointPixel(param,X,leftP,rightP);

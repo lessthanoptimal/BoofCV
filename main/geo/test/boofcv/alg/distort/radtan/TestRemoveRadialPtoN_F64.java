@@ -68,7 +68,7 @@ public class TestRemoveRadialPtoN_F64 {
 
 		GeometryMath_F64.mult(K,point,point);
 
-		assertEquals(undistX,point.x, GrlConstants.DOUBLE_TEST_TOL_SQRT);
-		assertEquals(undistY,point.y, GrlConstants.DOUBLE_TEST_TOL_SQRT);
+		assertEquals(undistX,point.x, GrlConstants.TEST_SQ_F64);
+		assertEquals(undistY,point.y, GrlConstants.TEST_SQ_F64);
 	}
 }

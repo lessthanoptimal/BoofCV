@@ -26,8 +26,8 @@ import boofcv.struct.geo.QueueMatrix;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.MatrixFeatures;
-import org.ejml.ops.RandomMatrices;
+import org.ejml.ops.MatrixFeatures_D64;
+import org.ejml.ops.RandomMatrices_D64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -97,7 +97,7 @@ public class TestGeoModelEstimatorNto1 {
 		assertTrue(alg.process(obs,found));
 
 		// See if it selected the correct matrix
-		assertTrue(MatrixFeatures.isIdentical(found, correct, 1e-8));
+		assertTrue(MatrixFeatures_D64.isIdentical(found, correct, 1e-8));
 	}
 
 	private DenseMatrix64F createSolution() {
@@ -135,7 +135,7 @@ public class TestGeoModelEstimatorNto1 {
 			Random rand = new Random(324);
 
 			for (int i = 0; i < numberOfSolutions; i++) {
-				solutions.grow().set(RandomMatrices.createRandom(3, 3, rand));
+				solutions.grow().set(RandomMatrices_D64.createRandom(3, 3, rand));
 			}
 
 			if (correct != null)

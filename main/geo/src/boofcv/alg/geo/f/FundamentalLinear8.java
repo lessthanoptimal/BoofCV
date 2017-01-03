@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ package boofcv.alg.geo.f;
 import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.SingularOps;
-import org.ejml.ops.SpecializedOps;
+import org.ejml.ops.SingularOps_D64;
+import org.ejml.ops.SpecializedOps_D64;
 
 import java.util.List;
 
@@ -96,12 +96,12 @@ public class FundamentalLinear8 extends FundamentalLinear {
 			return true;
 
 		if( A.numRows > 8 )
-			SingularOps.nullVector(svdNull,true,F);
+			SingularOps_D64.nullVector(svdNull,true,F);
 		else {
 			// handle a special case since the matrix only has 8 singular values and won't select
 			// the correct column
 			DenseMatrix64F V = svdNull.getV(null,false);
-			SpecializedOps.subvector(V, 0, 8, V.numCols, false, 0, F);
+			SpecializedOps_D64.subvector(V, 0, 8, V.numCols, false, 0, F);
 		}
 
 		return false;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,12 +60,12 @@ public class TestFundamentalLinear7 {
 
 	@Test
 	public void computeCoefficients() {
-		SimpleMatrix F1 = SimpleMatrix.random(3, 3, 0.1, 2, rand);
-		SimpleMatrix F2 = SimpleMatrix.random(3, 3, 0.1, 2, rand);
+		SimpleMatrix F1 = SimpleMatrix.random_F64(3, 3, 0.1, 2, rand);
+		SimpleMatrix F2 = SimpleMatrix.random_F64(3, 3, 0.1, 2, rand);
 
 		double coefs[] = new double[4];
 
-		FundamentalLinear7.computeCoefficients(F1.getMatrix(), F2.getMatrix(), coefs);
+		FundamentalLinear7.computeCoefficients(F1.matrix_F64(), F2.matrix_F64(), coefs);
 
 		double alpha = 0.4;
 

@@ -23,8 +23,8 @@ import boofcv.struct.distort.Point3Transform2_F32;
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DenseMatrix32F;
+import org.ejml.ops.CommonOps_D32;
 
 /**
  * Projects a synthetic view of a narrow FOV camera from a wide FOV camera.  The synthetic camera
@@ -35,7 +35,7 @@ import org.ejml.ops.CommonOps;
 public class NarrowToWidePtoP_F32 implements Point2Transform2_F32 {
 
 	// rotation matrix
-	DenseMatrix64F rotateWideToNarrow = CommonOps.identity(3,3);
+	DenseMatrix32F rotateWideToNarrow = CommonOps_D32.identity(3,3);
 	Point2Transform2_F32 narrowToNorm;
 	Point3Transform2_F32 unitToWide;
 
@@ -60,7 +60,7 @@ public class NarrowToWidePtoP_F32 implements Point2Transform2_F32 {
 	 * Specifies rotation matrix which determines the pointing direction of the camera
 	 * @param R rotation matrix
 	 */
-	public void setRotationWideToNarrow(DenseMatrix64F R ) {
+	public void setRotationWideToNarrow(DenseMatrix32F R ) {
 		this.rotateWideToNarrow.set(R);
 	}
 

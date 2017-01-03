@@ -46,7 +46,10 @@ Version : 0.27
   * See ImageDeformPointMLS
 - Planar Images
   * setTo will adjust the number of bands
+- Updated for full support of F32 data type in dependent libraries
+  * EJML -> ddoglog -> GeoRegression
 
+- TODO ExampleRectifyUncalibratedStereo is upside down.  Have the math be performed to avoid that
 - TODO Fisheye calibration using omni model
 - TODO grid of circle calibration target
 - TODO Regression: Chessboard image border to fiducial regression

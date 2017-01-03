@@ -627,7 +627,7 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 
 			double expected = UtilAngle.distanceCCW(angle0, angle1);
 
-			assertEquals(expected, info.angleBetween, GrlConstants.DOUBLE_TEST_TOL);
+			assertEquals(expected, info.angleBetween, GrlConstants.TEST_F64);
 		}
 	}
 

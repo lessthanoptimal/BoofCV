@@ -26,7 +26,7 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
 
 import java.util.List;
@@ -110,7 +110,7 @@ public class TestDecomposeEssential {
 
 		int numMatches = 0;
 		for( Se3_F64 se : solutions ) {
-			if(MatrixFeatures.isIdentical(R,se.getR(),1e-4)) {
+			if(MatrixFeatures_D64.isIdentical(R,se.getR(),1e-4)) {
 				if( T.distance(se.getT()) < 1e-4 )
 					numMatches++;
 			}

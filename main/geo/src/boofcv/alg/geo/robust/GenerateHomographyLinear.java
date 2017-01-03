@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ package boofcv.alg.geo.robust;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.homography.Homography2D_F64;
-import georegression.struct.homography.UtilHomography;
+import georegression.struct.homography.UtilHomography_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ejml.data.DenseMatrix64F;
@@ -51,7 +51,7 @@ public class GenerateHomographyLinear implements
 		if( !alg.process(dataSet,H) )
 			return false;
 
-		UtilHomography.convert(H,found);
+		UtilHomography_F64.convert(H,found);
 		return true;
 	}
 
@@ -61,7 +61,7 @@ public class GenerateHomographyLinear implements
 		if( !alg.process(dataSet,H) )
 			return false;
 
-		UtilHomography.convert(H,model);
+		UtilHomography_F64.convert(H,model);
 
 		return true;
 	}

@@ -40,7 +40,7 @@ import georegression.transform.twist.TwistCoordinate_F32;
 import georegression.transform.twist.TwistOps_F32;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.LinearSolverFactory;
+import org.ejml.factory.LinearSolverFactory_D64;
 import org.ejml.interfaces.linsol.LinearSolver;
 
 /**
@@ -252,7 +252,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 	 */
 	void initMotion(Planar<I> input) {
 		if( solver == null ) {
-			solver = LinearSolverFactory.qr(input.width*input.height*input.getNumBands(),6);
+			solver = LinearSolverFactory_D64.qr(input.width*input.height*input.getNumBands(),6);
 		}
 
 		// compute image derivative and setup interpolation functions

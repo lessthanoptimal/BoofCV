@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -89,10 +89,10 @@ public class RectifyFundamental {
 		//Find the two matching transforms
 		SimpleMatrix Hzero = computeHZero(F,epipole2,H);
 
-		SimpleMatrix Ha = computeAffineH(observations,H.getMatrix(),Hzero.getMatrix());
+		SimpleMatrix Ha = computeAffineH(observations,H.matrix_F64(),Hzero.matrix_F64());
 
-		rect1.set(Ha.mult(Hzero).getMatrix());
-		rect2.set(H.getMatrix());
+		rect1.set(Ha.mult(Hzero).matrix_F64());
+		rect2.set(H.matrix_F64());
 	}
 
 	/**
@@ -188,7 +188,7 @@ public class RectifyFundamental {
 		SimpleMatrix x = A.solve(b);
 
 		SimpleMatrix Ha = SimpleMatrix.identity(3);
-		Ha.setRow(0,0,x.getMatrix().data);
+		Ha.setRow(0,0,x.matrix_F64().data);
 
 		return Ha;
 	}

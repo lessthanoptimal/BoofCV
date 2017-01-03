@@ -144,8 +144,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	private void setRectification(final StereoParameters param) {
 
 		// calibration matrix for left and right camera
-		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), null);
-		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(param.getRight(), null);
+		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), (DenseMatrix64F)null);
+		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(param.getRight(), (DenseMatrix64F)null);
 
 		RectifyCalibrated rectify = RectifyImageOps.createCalibrated();
 		rectify.process(K1,new Se3_F64(),K2,param.getRightToLeft().invert(null));

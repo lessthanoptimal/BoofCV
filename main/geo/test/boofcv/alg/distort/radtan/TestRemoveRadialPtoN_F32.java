@@ -23,7 +23,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import georegression.geometry.GeometryMath_F32;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F32;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DenseMatrix32F;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -64,11 +64,11 @@ public class TestRemoveRadialPtoN_F32 {
 		alg.compute(distX, distY, point);
 
 		/// go from calibrated coordinates to pixel
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(fx, fy, skew, xc, yc);
+		DenseMatrix32F K = PerspectiveOps.calibrationMatrix(fx, fy, skew, xc, yc);
 
 		GeometryMath_F32.mult(K,point,point);
 
-		assertEquals(undistX,point.x, GrlConstants.FLOAT_TEST_TOL_SQRT);
-		assertEquals(undistY,point.y, GrlConstants.FLOAT_TEST_TOL_SQRT);
+		assertEquals(undistX,point.x, GrlConstants.TEST_SQ_F32);
+		assertEquals(undistY,point.y, GrlConstants.TEST_SQ_F32);
 	}
 }

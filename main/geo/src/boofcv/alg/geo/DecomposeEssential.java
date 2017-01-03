@@ -21,10 +21,10 @@ package boofcv.alg.geo;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.SingularOps;
+import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.SingularOps_D64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ import java.util.List;
  */
 public class DecomposeEssential {
 
-	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(3, 3, true, true, false);
+	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory_D64.svd(3, 3, true, true, false);
 
 	// storage for SVD
 	DenseMatrix64F U,S,V;
@@ -92,7 +92,7 @@ public class DecomposeEssential {
 		V = svd.getV(V,false);
 		S = svd.getW(S);
 
-		SingularOps.descendingOrder(U,false,S,V,false);
+		SingularOps_D64.descendingOrder(U,false,S,V,false);
 
 		decompose(U, S, V);
 	}
@@ -106,14 +106,14 @@ public class DecomposeEssential {
 	 */
 	public void decompose( DenseMatrix64F U , DenseMatrix64F S , DenseMatrix64F V ) {
 		// this ensures the resulting rotation matrix will have a determinant of +1 and thus be a real rotation matrix
-		if( CommonOps.det(U) < 0 ) {
-			CommonOps.scale(-1,U);
-			CommonOps.scale(-1,S);
+		if( CommonOps_D64.det(U) < 0 ) {
+			CommonOps_D64.scale(-1,U);
+			CommonOps_D64.scale(-1,S);
 		}
 
-		if( CommonOps.det(V) < 0 ) {
-			CommonOps.scale(-1,V);
-			CommonOps.scale(-1,S);
+		if( CommonOps_D64.det(V) < 0 ) {
+			CommonOps_D64.scale(-1,V);
+			CommonOps_D64.scale(-1,S);
 		}
 
 		// for possible solutions due to ambiguity in the sign of T and rotation
@@ -152,18 +152,18 @@ public class DecomposeEssential {
 
 		// extract rotation
 		if( optionA )
-			CommonOps.mult(U,Rz,temp);
+			CommonOps_D64.mult(U,Rz,temp);
 		else
-			CommonOps.multTransB(U,Rz,temp);
-		CommonOps.multTransB(temp,V,R);
+			CommonOps_D64.multTransB(U,Rz,temp);
+		CommonOps_D64.multTransB(temp,V,R);
 
 		// extract screw symmetric translation matrix
 		if( optionB )
-			CommonOps.multTransB(U,Rz,temp);
+			CommonOps_D64.multTransB(U,Rz,temp);
 		else
-			CommonOps.mult(U,Rz,temp);
-		CommonOps.mult(temp,S,temp2);
-		CommonOps.multTransB(temp2,U,temp);
+			CommonOps_D64.mult(U,Rz,temp);
+		CommonOps_D64.mult(temp,S,temp2);
+		CommonOps_D64.multTransB(temp2,U,temp);
 
 		T.x = temp.get(2,1);
 		T.y = temp.get(0,2);

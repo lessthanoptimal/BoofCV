@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -89,7 +89,7 @@ public class TestDistanceEpipolarConstraint {
 		double orig = alg.computeDistance(new AssociatedPair(p1,p2));
 
 		// rescale the matrix and see if that changes the results
-		CommonOps.scale(5,F);
+		CommonOps_D64.scale(5,F);
 		alg.setModel(F);
 
 		double after = alg.computeDistance(new AssociatedPair(p1,p2));

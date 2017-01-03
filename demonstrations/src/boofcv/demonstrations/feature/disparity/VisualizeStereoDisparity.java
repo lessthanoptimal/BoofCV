@@ -43,7 +43,9 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
+import org.ejml.data.DenseMatrix32F;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.ConvertMatrixData;
 
 import javax.swing.*;
 import java.awt.*;
@@ -52,7 +54,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.alg.geo.RectifyImageOps.transformRectToPixel_F64;
+import static boofcv.alg.geo.RectifyImageOps.transformRectToPixel;
 
 /**
  * Computes and displays disparity from still disparity images.  The disparity can be viewed
@@ -231,8 +233,8 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	 */
 	private void rectifyInputImages() {
 		// get intrinsic camera calibration matrices
-		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(calib.left, null);
-		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(calib.right, null);
+		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(calib.left, (DenseMatrix64F)null);
+		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(calib.right, (DenseMatrix64F)null);
 
 		// compute rectification matrices
 		rectifyAlg.process(K1,new Se3_F64(),K2,calib.getRightToLeft().invert(null));
@@ -245,14 +247,19 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		RectifyImageOps.allInsideLeft(calib.left, rect1, rect2, rectK);
 
 		// compute transforms to apply rectify the images
-		leftRectToPixel = transformRectToPixel_F64(calib.left, rect1);
+		leftRectToPixel = transformRectToPixel(calib.left, rect1);
 
 		ImageType<T> imageType = ImageType.single(activeAlg.getInputType());
 
+		DenseMatrix32F rect1_F32 = new DenseMatrix32F(3,3); // TODO simplify code some how
+		DenseMatrix32F rect2_F32 = new DenseMatrix32F(3,3);
+		ConvertMatrixData.convert(rect1, rect1_F32);
+		ConvertMatrixData.convert(rect2, rect2_F32);
+
 		ImageDistort<T,T> distortRect1 = RectifyImageOps.rectifyImage(
-				calib.left, rect1, BorderType.SKIP,imageType);
+				calib.left, rect1_F32, BorderType.SKIP,imageType);
 		ImageDistort<T,T> distortRect2 = RectifyImageOps.rectifyImage(
-				calib.right, rect2, BorderType.SKIP, imageType);
+				calib.right, rect2_F32, BorderType.SKIP, imageType);
 
 		// rectify and undo distortion
 		distortRect1.apply(inputLeft, rectLeft);

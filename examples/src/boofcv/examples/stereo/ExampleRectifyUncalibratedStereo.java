@@ -32,7 +32,9 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
+import org.ejml.data.DenseMatrix32F;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.ConvertMatrixData;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -53,6 +55,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// TODO this is upside down to remind me to make this algorithm more stable
 public class ExampleRectifyUncalibratedStereo {
 
 	/**
@@ -90,10 +93,15 @@ public class ExampleRectifyUncalibratedStereo {
 //		RectifyImageOps.allInsideLeft(origLeft.getWidth(),origLeft.getHeight(), rect1, rect2 );
 
 		// undistorted and rectify images
+		DenseMatrix32F rect1_F32 = new DenseMatrix32F(3,3); // TODO simplify code some how
+		DenseMatrix32F rect2_F32 = new DenseMatrix32F(3,3);
+		ConvertMatrixData.convert(rect1, rect1_F32);
+		ConvertMatrixData.convert(rect2, rect2_F32);
+
 		ImageDistort<GrayF32,GrayF32> imageDistortLeft =
-				RectifyImageOps.rectifyImage(rect1, BorderType.SKIP, GrayF32.class);
+				RectifyImageOps.rectifyImage(rect1_F32, BorderType.SKIP, GrayF32.class);
 		ImageDistort<GrayF32,GrayF32> imageDistortRight =
-				RectifyImageOps.rectifyImage(rect2, BorderType.SKIP, GrayF32.class);
+				RectifyImageOps.rectifyImage(rect2_F32, BorderType.SKIP, GrayF32.class);
 
 		DistortImageOps.distortPL(unrectLeft, rectLeft, imageDistortLeft);
 		DistortImageOps.distortPL(unrectRight, rectRight, imageDistortRight);

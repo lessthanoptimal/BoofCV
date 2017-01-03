@@ -31,7 +31,7 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,14 +119,14 @@ public class GenericCalibrationGrid {
 	public static DenseMatrix64F computeHomography(DenseMatrix64F K, DenseMatrix64F R, Vector3D_F64 T)
 	{
 		DenseMatrix64F M = new DenseMatrix64F(3,3);
-		CommonOps.extract(R, 0, 3, 0, 1, M, 0, 0);
-		CommonOps.extract(R, 0, 3, 1, 2, M, 0, 1);
+		CommonOps_D64.extract(R, 0, 3, 0, 1, M, 0, 0);
+		CommonOps_D64.extract(R, 0, 3, 1, 2, M, 0, 1);
 		M.set(0, 2, T.x);
 		M.set(1, 2, T.y);
 		M.set(2, 2, T.z);
 
 		DenseMatrix64F H = new DenseMatrix64F(3,3);
-		CommonOps.mult(K,M,H);
+		CommonOps_D64.mult(K,M,H);
 
 		return H;
 	}

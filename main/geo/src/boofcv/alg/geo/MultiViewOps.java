@@ -33,9 +33,9 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.Tuple2;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.QRDecomposition;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 import org.ejml.simple.SimpleMatrix;
 import org.ejml.simple.SimpleSVD;
 
@@ -178,9 +178,9 @@ public class MultiViewOps {
 	{
 		DenseMatrix64F sum = new DenseMatrix64F(3,3);
 
-		CommonOps.add(p1.x,tensor.T1,sum,sum);
-		CommonOps.add(p1.y,tensor.T2,sum,sum);
-		CommonOps.add(tensor.T3, sum, sum);
+		CommonOps_D64.add(p1.x,tensor.T1,sum,sum);
+		CommonOps_D64.add(p1.y,tensor.T2,sum,sum);
+		CommonOps_D64.add(tensor.T3, sum, sum);
 
 		return GeometryMath_F64.innerProd(l2,sum,l3);
 	}
@@ -206,9 +206,9 @@ public class MultiViewOps {
 
 		DenseMatrix64F sum = new DenseMatrix64F(3,3);
 
-		CommonOps.add(p1.x,tensor.T1,sum,sum);
-		CommonOps.add(p1.y,tensor.T2,sum,sum);
-		CommonOps.add(tensor.T3,sum,sum);
+		CommonOps_D64.add(p1.x,tensor.T1,sum,sum);
+		CommonOps_D64.add(p1.y,tensor.T2,sum,sum);
+		CommonOps_D64.add(tensor.T3,sum,sum);
 
 		Vector3D_F64 tempV = new Vector3D_F64();
 		GeometryMath_F64.multTran(sum, l2, tempV);
@@ -239,15 +239,15 @@ public class MultiViewOps {
 
 		DenseMatrix64F sum = new DenseMatrix64F(3,3);
 
-		CommonOps.add(p1.x,tensor.T1,sum,sum);
-		CommonOps.add(p1.y,tensor.T2,sum,sum);
-		CommonOps.add(tensor.T3,sum,sum);
+		CommonOps_D64.add(p1.x,tensor.T1,sum,sum);
+		CommonOps_D64.add(p1.y,tensor.T2,sum,sum);
+		CommonOps_D64.add(tensor.T3,sum,sum);
 
 		DenseMatrix64F cross2 = GeometryMath_F64.crossMatrix(p2.x,p2.y,1,null);
 
 		DenseMatrix64F temp = new DenseMatrix64F(3,3);
 
-		CommonOps.mult(cross2,sum,temp);
+		CommonOps_D64.mult(cross2,sum,temp);
 		GeometryMath_F64.mult(temp, l3, ret);
 
 		return ret;
@@ -275,16 +275,16 @@ public class MultiViewOps {
 
 		DenseMatrix64F sum = new DenseMatrix64F(3,3);
 
-		CommonOps.add(p1.x,tensor.T1,p1.y,tensor.T2,sum);
-		CommonOps.add(sum,tensor.T3,sum);
+		CommonOps_D64.add(p1.x,tensor.T1,p1.y,tensor.T2,sum);
+		CommonOps_D64.add(sum,tensor.T3,sum);
 
 		DenseMatrix64F cross2 = GeometryMath_F64.crossMatrix(p2.x,p2.y,1,null);
 		DenseMatrix64F cross3 = GeometryMath_F64.crossMatrix(p3.x,p3.y,1,null);
 
 		DenseMatrix64F temp = new DenseMatrix64F(3,3);
 
-		CommonOps.mult(cross2,sum,temp);
-		CommonOps.mult(temp, cross3, ret);
+		CommonOps_D64.mult(cross2,sum,temp);
+		CommonOps_D64.mult(temp, cross3, ret);
 
 		return ret;
 	}
@@ -627,7 +627,7 @@ public class MultiViewOps {
 		DenseMatrix64F E = new DenseMatrix64F(3,3);
 
 		DenseMatrix64F T_hat = GeometryMath_F64.crossMatrix(T, null);
-		CommonOps.mult(T_hat, R, E);
+		CommonOps_D64.mult(T_hat, R, E);
 
 		return E;
 	}
@@ -643,13 +643,13 @@ public class MultiViewOps {
 	 */
 	public static DenseMatrix64F createFundamental(DenseMatrix64F E, DenseMatrix64F K) {
 		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
-		CommonOps.invert(K,K_inv);
+		CommonOps_D64.invert(K,K_inv);
 
 		DenseMatrix64F F = new DenseMatrix64F(3,3);
 		DenseMatrix64F temp = new DenseMatrix64F(3,3);
 
-		CommonOps.multTransA(K_inv,E,temp);
-		CommonOps.mult(temp,K_inv,F);
+		CommonOps_D64.multTransA(K_inv,E,temp);
+		CommonOps_D64.mult(temp,K_inv,F);
 
 		return F;
 	}
@@ -667,15 +667,15 @@ public class MultiViewOps {
 	public static DenseMatrix64F createFundamental(DenseMatrix64F E,
 												   DenseMatrix64F K1,  DenseMatrix64F K2) {
 		DenseMatrix64F K1_inv = new DenseMatrix64F(3,3);
-		CommonOps.invert(K1,K1_inv);
+		CommonOps_D64.invert(K1,K1_inv);
 		DenseMatrix64F K2_inv = new DenseMatrix64F(3,3);
-		CommonOps.invert(K2,K2_inv);
+		CommonOps_D64.invert(K2,K2_inv);
 
 		DenseMatrix64F F = new DenseMatrix64F(3,3);
 		DenseMatrix64F temp = new DenseMatrix64F(3,3);
 
-		CommonOps.multTransA(K2_inv,E,temp);
-		CommonOps.mult(temp,K1_inv,F);
+		CommonOps_D64.multTransA(K2_inv,E,temp);
+		CommonOps_D64.mult(temp,K1_inv,F);
 
 		return F;
 	}
@@ -698,8 +698,8 @@ public class MultiViewOps {
 		DenseMatrix64F H = new DenseMatrix64F(3,3);
 
 		GeometryMath_F64.outerProd(T,N,H);
-		CommonOps.divide(H,d);
-		CommonOps.addEquals(H, R);
+		CommonOps_D64.divide(H,d);
+		CommonOps_D64.addEquals(H, R);
 
 		return H;
 	}
@@ -728,10 +728,10 @@ public class MultiViewOps {
 		DenseMatrix64F H = createHomography(R, T, d, N);
 
 		// apply calibration matrix to R
-		CommonOps.mult(K,H,temp);
+		CommonOps_D64.mult(K,H,temp);
 
-		CommonOps.invert(K,K_inv);
-		CommonOps.mult(temp,K_inv,H);
+		CommonOps_D64.invert(K,K_inv);
+		CommonOps_D64.mult(temp,K_inv,H);
 
 		return H;
 	}
@@ -797,11 +797,11 @@ public class MultiViewOps {
 		GeometryMath_F64.outerProd(e2,v,outer);
 
 		DenseMatrix64F KR = new DenseMatrix64F(3,3);
-		CommonOps.mult(crossMatrix, F, KR);
-		CommonOps.add(KR, outer, KR);
+		CommonOps_D64.mult(crossMatrix, F, KR);
+		CommonOps_D64.add(KR, outer, KR);
 
 		DenseMatrix64F P = new DenseMatrix64F(3,4);
-		CommonOps.insert(KR,P,0,0);
+		CommonOps_D64.insert(KR,P,0,0);
 
 		P.set(0,3,lambda*e2.x);
 		P.set(1,3,lambda*e2.y);
@@ -827,11 +827,11 @@ public class MultiViewOps {
 	 */
 	public static void decomposeCameraMatrix(DenseMatrix64F P, DenseMatrix64F K, Se3_F64 pose) {
 		DenseMatrix64F KR = new DenseMatrix64F(3,3);
-		CommonOps.extract(P, 0, 3, 0, 3, KR, 0, 0);
+		CommonOps_D64.extract(P, 0, 3, 0, 3, KR, 0, 0);
 
-		QRDecomposition<DenseMatrix64F> qr = DecompositionFactory.qr(3, 3);
+		QRDecomposition<DenseMatrix64F> qr = DecompositionFactory_D64.qr(3, 3);
 
-		if( !CommonOps.invert(KR) )
+		if( !CommonOps_D64.invert(KR) )
 			throw new RuntimeException("Inverse failed!  Bad input?");
 
 		if( !qr.decompose(KR) )
@@ -840,16 +840,16 @@ public class MultiViewOps {
 		DenseMatrix64F U = qr.getQ(null,false);
 		DenseMatrix64F B = qr.getR(null, false);
 
-		if( !CommonOps.invert(U,pose.getR()) )
+		if( !CommonOps_D64.invert(U,pose.getR()) )
 			throw new RuntimeException("Inverse failed!  Bad input?");
 
 		Point3D_F64 KT = new Point3D_F64(P.get(0,3),P.get(1,3),P.get(2,3));
 		GeometryMath_F64.mult(B, KT, pose.getT());
 
-		if( !CommonOps.invert(B,K) )
+		if( !CommonOps_D64.invert(B,K) )
 			throw new RuntimeException("Inverse failed!  Bad input?");
 
-		CommonOps.scale(1.0/K.get(2,2),K);
+		CommonOps_D64.scale(1.0/K.get(2,2),K);
 	}
 
 	/**

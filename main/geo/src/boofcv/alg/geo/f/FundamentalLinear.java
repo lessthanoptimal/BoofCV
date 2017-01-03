@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,10 @@ import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.SingularOps;
+import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
+import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.SingularOps_D64;
 
 import java.util.List;
 
@@ -47,9 +47,9 @@ public abstract class FundamentalLinear {
 	// contains the set of equations that are solved
 	protected DenseMatrix64F A = new DenseMatrix64F(1,9);
 	// svd used to extract the null space
-	protected SingularValueDecomposition<DenseMatrix64F> svdNull = DecompositionFactory.svd(9, 9, false, true, false);
+	protected SingularValueDecomposition_F64<DenseMatrix64F> svdNull = DecompositionFactory_D64.svd(9, 9, false, true, false);
 	// svd used to enforce constraings on 3x3 matrix
-	protected SingularValueDecomposition<DenseMatrix64F> svdConstraints = DecompositionFactory.svd(3, 3, true, true, false);
+	protected SingularValueDecomposition_F64<DenseMatrix64F> svdConstraints = DecompositionFactory_D64.svd(3, 3, true, true, false);
 
 	// SVD decomposition of F = U*S*V^T
 	protected DenseMatrix64F svdU;
@@ -87,7 +87,7 @@ public abstract class FundamentalLinear {
 		svdU = svdConstraints.getU(svdU,false);
 		svdS = svdConstraints.getW(svdS);
 
-		SingularOps.descendingOrder(svdU, false, svdS, svdV, false);
+		SingularOps_D64.descendingOrder(svdU, false, svdS, svdV, false);
 
 		// project it into essential space
 		// the scale factor is arbitrary, but the first two singular values need
@@ -97,8 +97,8 @@ public abstract class FundamentalLinear {
 		svdS.unsafe_set(2, 2, 0);
 
 		// recompute F
-		CommonOps.mult(svdU, svdS, temp0);
-		CommonOps.multTransB(temp0,svdV, E);
+		CommonOps_D64.mult(svdU, svdS, temp0);
+		CommonOps_D64.multTransB(temp0,svdV, E);
 
 		return true;
 	}
@@ -116,14 +116,14 @@ public abstract class FundamentalLinear {
 		svdU = svdConstraints.getU(svdU,false);
 		svdS = svdConstraints.getW(svdS);
 
-		SingularOps.descendingOrder(svdU, false, svdS, svdV, false);
+		SingularOps_D64.descendingOrder(svdU, false, svdS, svdV, false);
 
 		// the smallest singular value needs to be set to zero, unlike
 		svdS.set(2, 2, 0);
 
 		// recompute F
-		CommonOps.mult(svdU, svdS, temp0);
-		CommonOps.multTransB(temp0,svdV, F);
+		CommonOps_D64.mult(svdU, svdS, temp0);
+		CommonOps_D64.multTransB(temp0,svdV, F);
 
 		return true;
 	}
@@ -139,8 +139,8 @@ public abstract class FundamentalLinear {
 	 */
 	protected void undoNormalizationF(DenseMatrix64F M, DenseMatrix64F N1, DenseMatrix64F N2) {
 		// M = N2^T * M * N1
-		CommonOps.multTransA(N2,M,temp0);
-		CommonOps.mult(temp0,N1,M);
+		CommonOps_D64.multTransA(N2,M,temp0);
+		CommonOps_D64.mult(temp0,N1,M);
 	}
 
 	/**

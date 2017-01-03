@@ -20,7 +20,7 @@ package boofcv.gui.learning;
 
 import boofcv.gui.image.ShowImages;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.RandomMatrices;
+import org.ejml.ops.RandomMatrices_D64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -327,7 +327,7 @@ public class ConfusionMatrixPanel extends JPanel {
 	}
 
 	public static void main(String[] args) {
-		DenseMatrix64F m = RandomMatrices.createRandom(5,5,0,1,new Random(234));
+		DenseMatrix64F m = RandomMatrices_D64.createRandom(5,5,0,1,new Random(234));
 
 		List<String> labels = new ArrayList<>();
 		for (int i = 0; i < m.numRows; i++) {

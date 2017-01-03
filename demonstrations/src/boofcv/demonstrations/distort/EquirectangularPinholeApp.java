@@ -35,14 +35,15 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import georegression.geometry.ConvertRotation3D_F64;
-import georegression.geometry.GeometryMath_F64;
+import georegression.geometry.ConvertRotation3D_F32;
+import georegression.geometry.GeometryMath_F32;
 import georegression.metric.UtilAngle;
+import georegression.misc.GrlConstants;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Vector3D_F64;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import georegression.struct.point.Vector3D_F32;
+import org.ejml.data.DenseMatrix32F;
+import org.ejml.ops.CommonOps_D32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -109,25 +110,25 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 		panelPinhole.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				double pitch=0;
-				double yaw=0;
-				double roll=0;
+				float pitch=0;
+				float yaw=0;
+				float roll=0;
 
 				switch( e.getKeyCode() ) {
-					case KeyEvent.VK_W: pitch += 0.01; break;
-					case KeyEvent.VK_S: pitch -= 0.01; break;
-					case KeyEvent.VK_A: yaw -= 0.01; break;
-					case KeyEvent.VK_D: yaw += 0.01; break;
-					case KeyEvent.VK_Q: roll -= 0.01; break;
-					case KeyEvent.VK_E: roll += 0.01; break;
+					case KeyEvent.VK_W: pitch += 0.01f; break;
+					case KeyEvent.VK_S: pitch -= 0.01f; break;
+					case KeyEvent.VK_A: yaw -= 0.01f; break;
+					case KeyEvent.VK_D: yaw += 0.01f; break;
+					case KeyEvent.VK_Q: roll -= 0.01f; break;
+					case KeyEvent.VK_E: roll += 0.01f; break;
 					default:
 						return;
 				}
 
 				synchronized (imageLock) {
-					DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,null);
-					DenseMatrix64F tmp = distorter.getRotation().copy();
-					CommonOps.mult(tmp,R,distorter.getRotation());
+					DenseMatrix32F R = ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,null);
+					DenseMatrix32F tmp = distorter.getRotation().copy();
+					CommonOps_D32.mult(tmp,R,distorter.getRotation());
 					distortImage.setModel(distorter); // dirty the transform
 					if (inputMethod == InputMethod.IMAGE) {
 						rerenderPinhole();
@@ -157,9 +158,9 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 					// equirectangular lon-lat uses +x
 					// this compensates for that
 					// roll rotation is to make the view appear "up"
-					DenseMatrix64F A = ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,Math.PI/2,0,Math.PI/2,null);
-					DenseMatrix64F tmp = distorter.getRotation().copy();
-					CommonOps.mult(tmp,A,distorter.getRotation());
+					DenseMatrix32F A = ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX, GrlConstants.F_PI/2,0,GrlConstants.F_PI/2,null);
+					DenseMatrix32F tmp = distorter.getRotation().copy();
+					CommonOps_D32.mult(tmp,A,distorter.getRotation());
 
 					distortImage.setModel(distorter); // let it know the transform has changed
 
@@ -272,7 +273,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 	 * Draws a circle around the current view's center
 	 */
 	private class EquiViewPanel extends ImagePanel {
-		Vector3D_F64 v = new Vector3D_F64();
+		Vector3D_F32 v = new Vector3D_F32();
 		Point2D_F32 p = new Point2D_F32();
 		BasicStroke stroke0 = new BasicStroke(3);
 		BasicStroke stroke1 = new BasicStroke(6);
@@ -296,10 +297,10 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 			// center the center cicle
-			DenseMatrix64F R = distorter.getRotation();
+			DenseMatrix32F R = distorter.getRotation();
 
 			v.set(0,0,1); // canonical view is +z for pinhole cvamera
-			GeometryMath_F64.mult(R,v,v);
+			GeometryMath_F32.mult(R,v,v);
 
 			distorter.getTools().normToEquiFV((float)v.x,(float)v.y,(float)v.z,p);
 			circle.setFrame(p.x*scale-10,p.y*scale-10,20,20);

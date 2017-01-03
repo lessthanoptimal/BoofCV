@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 
 /**
  *
@@ -150,7 +150,7 @@ public class HomographyInducedStereo2Line {
 
 		// H = A - e2*v^T
 		GeometryMath_F64.outerProd(e2,v,av);
-		CommonOps.subtract(A, av, H);
+		CommonOps_D64.subtract(A, av, H);
 
 		// pick a good scale and sign for H
 		adjust.adjust(H, line0);

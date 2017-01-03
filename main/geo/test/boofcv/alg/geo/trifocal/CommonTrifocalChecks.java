@@ -27,7 +27,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.NormOps;
+import org.ejml.ops.NormOps_D64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +82,7 @@ public abstract class CommonTrifocalChecks {
 
 			DenseMatrix64F c = MultiViewOps.constraint(tensor,o.p1,o.p2,o.p3,null);
 
-			double v = NormOps.normF(c)/(c.numCols*c.numRows);
+			double v = NormOps_D64.normF(c)/(c.numCols*c.numRows);
 
 			assertEquals(0,v,tol);
 		}

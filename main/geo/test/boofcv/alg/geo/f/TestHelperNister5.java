@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.geo.f;
 
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.RandomMatrices;
+import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.RandomMatrices_D64;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
@@ -69,18 +69,18 @@ public class TestHelperNister5 {
 		DenseMatrix64F Y1 = new DenseMatrix64F(10,1);
 		DenseMatrix64F Y2 = new DenseMatrix64F(10,1);
 
-		CommonOps.mult(A,createCoefsA(x,y,z),Y1);
-		CommonOps.mult(B,createCoefsB(x, y, z),Y2);
+		CommonOps_D64.mult(A,createCoefsA(x,y,z),Y1);
+		CommonOps_D64.mult(B,createCoefsB(x, y, z),Y2);
 
 		DenseMatrix64F Y = new DenseMatrix64F(10,1);
 
-		CommonOps.add(Y1,Y2,Y);
+		CommonOps_D64.add(Y1,Y2,Y);
 
 		// compute the constraints equations
 		SimpleMatrix EEt = E.mult(E.transpose());
 		SimpleMatrix EEtE = EEt.mult(E);
 		SimpleMatrix aE = E.scale(-0.5*EEt.trace());
-		DenseMatrix64F eq2 = EEtE.plus(aE).getMatrix();
+		DenseMatrix64F eq2 = EEtE.plus(aE).matrix_F64();
 
 		// check the solution
 		assertEquals(E.determinant(),Y.data[0],1e-8);
@@ -97,7 +97,7 @@ public class TestHelperNister5 {
 
 	@Test
 	public void setDeterminantVectors() {
-		DenseMatrix64F A = RandomMatrices.createRandom(10,10,-1,1,rand);
+		DenseMatrix64F A = RandomMatrices_D64.createRandom(10,10,-1,1,rand);
 
 		HelperNister5 alg = new HelperNister5();
 		alg.setDeterminantVectors(A);
@@ -147,7 +147,7 @@ public class TestHelperNister5 {
 
 	@Test
 	public void extractPolynomial() {
-		DenseMatrix64F A = RandomMatrices.createRandom(10,10,-1,1,rand);
+		DenseMatrix64F A = RandomMatrices_D64.createRandom(10,10,-1,1,rand);
 
 		HelperNister5 alg = new HelperNister5();
 		alg.setDeterminantVectors(A);
@@ -168,7 +168,7 @@ public class TestHelperNister5 {
 		B.data[7] = alg.M04*z*z*z + alg.M05*z*z + alg.M06*z + alg.M07;
 		B.data[8] = alg.M08*z*z*z*z + alg.M09*z*z*z + alg.M10*z*z + alg.M11*z + alg.M12;
 
-		double expected = CommonOps.det(B);
+		double expected = CommonOps_D64.det(B);
 
 		double coefs[] = new double[11];
 

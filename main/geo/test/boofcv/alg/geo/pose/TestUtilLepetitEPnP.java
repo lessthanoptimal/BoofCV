@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.RandomMatrices;
+import org.ejml.ops.RandomMatrices_D64;
 import org.junit.Test;
 
 import java.util.Random;
@@ -39,8 +39,8 @@ public class TestUtilLepetitEPnP {
 	@Test
 	public void jacobian4() {
 
-		DenseMatrix64F L_full = RandomMatrices.createRandom(6, 10, rand);
-		DenseMatrix64F y = RandomMatrices.createRandom(6,1,rand);
+		DenseMatrix64F L_full = RandomMatrices_D64.createRandom(6, 10, rand);
+		DenseMatrix64F y = RandomMatrices_D64.createRandom(6,1,rand);
 
 		JacobianEPnP jacobian = new JacobianEPnP();
 		ResidualsEPnP residuals = new ResidualsEPnP();
@@ -55,8 +55,8 @@ public class TestUtilLepetitEPnP {
 	@Test
 	public void jacobian3() {
 
-		DenseMatrix64F L_full = RandomMatrices.createRandom(3,6,rand);
-		DenseMatrix64F y = RandomMatrices.createRandom(3,1,rand);
+		DenseMatrix64F L_full = RandomMatrices_D64.createRandom(3,6,rand);
+		DenseMatrix64F y = RandomMatrices_D64.createRandom(3,1,rand);
 
 		JacobianEPnP jacobian = new JacobianEPnP();
 		ResidualsEPnP residuals = new ResidualsEPnP();

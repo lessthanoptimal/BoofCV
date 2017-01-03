@@ -23,7 +23,7 @@ import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.DoNothing2Transform2_F32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.se.Se3_F64;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -94,7 +94,7 @@ public abstract class CheckVisualOdometryDepthSim<I extends ImageGray<I>,Depth e
 //			worldToLeft.getT().print();
 //			foundWorldToLeft.getT().print();
 
-			assertTrue(MatrixFeatures.isIdentical(foundWorldToLeft.getR(),worldToLeft.getR(),0.1));
+			assertTrue(MatrixFeatures_D64.isIdentical(foundWorldToLeft.getR(),worldToLeft.getR(),0.1));
 			assertTrue(foundWorldToLeft.getT().distance(worldToLeft.getT()) < tolerance );
 		}
 	}

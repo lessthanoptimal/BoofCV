@@ -38,8 +38,8 @@ import georegression.geometry.UtilVector3D_F32;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
-import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import georegression.struct.se.Se3_F32;
+import org.ejml.data.DenseMatrix32F;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,7 +104,7 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 	 * @param width Input image width
 	 * @param height Input image height
 	 */
-	public void addCamera(Se3_F64 cameraToCommon , LensDistortionWideFOV factory , int width , int height ) {
+	public void addCamera(Se3_F32 cameraToCommon , LensDistortionWideFOV factory , int width , int height ) {
 		Point2Transform3_F32 p2s = factory.undistortPtoS_F32();
 		Point3Transform2_F32 s2p = factory.distortStoP_F32();
 
@@ -154,7 +154,7 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 	 * @param factory Distortion model
 	 * @param camMask Binary mask with invalid pixels marked as not zero.  Pixels are in camera image frame.
 	 */
-	public void addCamera(Se3_F64 cameraToCommon , LensDistortionWideFOV factory , GrayU8 camMask ) {
+	public void addCamera(Se3_F32 cameraToCommon , LensDistortionWideFOV factory , GrayU8 camMask ) {
 
 		Point2Transform3_F32 p2s = factory.undistortPtoS_F32();
 		Point3Transform2_F32 s2p = factory.distortStoP_F32();
@@ -279,13 +279,13 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 	 */
 	private class EquiToCamera implements Point2Transform2_F32 {
 
-		DenseMatrix64F cameraToCommon;
+		DenseMatrix32F cameraToCommon;
 		Point3Transform2_F32 s2p;
 
 		Point3D_F32 unitCam = new Point3D_F32();
 		Point3D_F32 unitCommon = new Point3D_F32();
 
-		EquiToCamera(DenseMatrix64F cameraToCommon, Point3Transform2_F32 s2p) {
+		EquiToCamera(DenseMatrix32F cameraToCommon, Point3Transform2_F32 s2p) {
 			this.cameraToCommon = cameraToCommon;
 			this.s2p = s2p;
 		}

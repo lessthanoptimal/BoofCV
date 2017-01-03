@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -115,10 +115,10 @@ public class RectifyCalibrated {
 		SimpleMatrix KRR = K.mult(RR);
 
 		// rectification transforms
-		rect1.set(KRR.mult(KR1.invert()).getMatrix());
-		rect2.set(KRR.mult(KR2.invert()).getMatrix());
+		rect1.set(KRR.mult(KR1.invert()).matrix_F64());
+		rect2.set(KRR.mult(KR2.invert()).matrix_F64());
 
-		rectifiedR = RR.getMatrix();
+		rectifiedR = RR.matrix_F64();
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class RectifyCalibrated {
 	 * @return Calibration matrix for both cameras
 	 */
 	public DenseMatrix64F getCalibrationMatrix() {
-		return K.getMatrix();
+		return K.matrix_F64();
 	}
 
 	/**

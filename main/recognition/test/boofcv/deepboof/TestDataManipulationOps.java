@@ -54,7 +54,7 @@ public class TestDataManipulationOps {
 
 		DataManipulationOps.normalize(found,mean,stdev);
 
-		BoofTesting.assertEquals(expected,found, GrlConstants.DOUBLE_TEST_TOL);
+		BoofTesting.assertEquals(expected,found, GrlConstants.TEST_F64);
 	}
 
 	@Test

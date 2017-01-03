@@ -26,7 +26,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.RandomMatrices;
+import org.ejml.ops.RandomMatrices_D64;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
@@ -188,8 +188,8 @@ public class TestPnPLepetitEPnP {
 	@Test
 	public void constructM() {
 		List<Point2D_F64> obsPts = GeoTestingOps.randomPoints_F64(-1, 2, -5, 20, 30, rand);
-		DenseMatrix64F M = RandomMatrices.createRandom(2 * obsPts.size(), 12,rand);
-		DenseMatrix64F alpha = RandomMatrices.createRandom(obsPts.size(),4,rand);
+		DenseMatrix64F M = RandomMatrices_D64.createRandom(2 * obsPts.size(), 12,rand);
+		DenseMatrix64F alpha = RandomMatrices_D64.createRandom(obsPts.size(),4,rand);
 
 		PnPLepetitEPnP.constructM(obsPts, alpha, M);
 
@@ -205,11 +205,11 @@ public class TestPnPLepetitEPnP {
 	@Test
 	public void extractNullPoints() {
 		// create a singular matrix
-		SimpleMatrix M = SimpleMatrix.wrap(RandomMatrices.createSingularValues(12, 40, rand, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0));
+		SimpleMatrix M = SimpleMatrix.wrap(RandomMatrices_D64.createSingularValues(12, 40, rand, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0));
 
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 		alg.numControl = 4;
-		alg.extractNullPoints(M.getMatrix());
+		alg.extractNullPoints(M.matrix_F64());
 
 		// see if the first set of null points is the null space pf M*M
 		List<Point3D_F64> l = alg.nullPts[0];

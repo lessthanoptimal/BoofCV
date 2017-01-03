@@ -62,8 +62,8 @@ public class TestEquirectangularTools_F32 {
 		tools.equiToLonlat(x,y,ll);
 		tools.lonlatToEqui(ll.x,ll.y,r);
 
-		assertEquals(x,r.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(y,r.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(x,r.x, GrlConstants.TEST_F32);
+		assertEquals(y,r.y, GrlConstants.TEST_F32);
 	}
 
 	@Test
@@ -86,8 +86,8 @@ public class TestEquirectangularTools_F32 {
 		tools.equiToLonlatFV(x,y,ll);
 		tools.lonlatToEquiFV(ll.x,ll.y,r);
 
-		assertEquals(x,r.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(y,r.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(x,r.x, GrlConstants.TEST_F32);
+		assertEquals(y,r.y, GrlConstants.TEST_F32);
 	}
 
 	/**
@@ -102,24 +102,24 @@ public class TestEquirectangularTools_F32 {
 		Point3D_F32 found = new Point3D_F32();
 		tools.equiToNorm(300.0f/2.0f, 249.0f/2.0f, found);
 
-		assertEquals(1.0f,found.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(0.0f,found.y, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(0.0f,found.z, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(1.0f,found.x, GrlConstants.TEST_F32);
+		assertEquals(0.0f,found.y, GrlConstants.TEST_F32);
+		assertEquals(0.0f,found.z, GrlConstants.TEST_F32);
 
 		tools.equiToNorm(0, 249/2.0f, found);
-		assertTrue(found.distance(new Point3D_F32(-1,0,0)) <= GrlConstants.FLOAT_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F32(-1,0,0)) <= GrlConstants.TEST_F32);
 		tools.equiToNorm(300, 249/2.0f, found);
-		assertTrue(found.distance(new Point3D_F32(-1,0,0)) <= GrlConstants.FLOAT_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F32(-1,0,0)) <= GrlConstants.TEST_F32);
 
 		tools.equiToNorm(300/4, 249/2.0f, found);
-		assertTrue(found.distance(new Point3D_F32(0,-1,0)) <= GrlConstants.FLOAT_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F32(0,-1,0)) <= GrlConstants.TEST_F32);
 		tools.equiToNorm(3*300/4, 249/2.0f, found);
-		assertTrue(found.distance(new Point3D_F32(0, 1,0)) <= GrlConstants.FLOAT_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F32(0, 1,0)) <= GrlConstants.TEST_F32);
 
 		tools.equiToNorm(300/2, 0, found);
-		assertTrue(found.distance(new Point3D_F32(0,0, 1)) <= GrlConstants.FLOAT_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F32(0,0, 1)) <= GrlConstants.TEST_F32);
 		tools.equiToNorm(300/2, 249, found);
-		assertTrue(found.distance(new Point3D_F32(0,0, -1)) <= GrlConstants.FLOAT_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F32(0,0, -1)) <= GrlConstants.TEST_F32);
 	}
 
 	@Test
@@ -131,24 +131,24 @@ public class TestEquirectangularTools_F32 {
 		Point3D_F32 found = new Point3D_F32();
 		tools.equiToNormFV(300/2, 249/2.0f, found);
 
-		assertEquals(1.0f,found.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(0.0f,found.y, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(0.0f,found.z, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(1.0f,found.x, GrlConstants.TEST_F32);
+		assertEquals(0.0f,found.y, GrlConstants.TEST_F32);
+		assertEquals(0.0f,found.z, GrlConstants.TEST_F32);
 
 		tools.equiToNormFV(0, 249/2.0f, found);
-		assertTrue(found.distance(new Point3D_F32(-1,0,0)) <= GrlConstants.FLOAT_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F32(-1,0,0)) <= GrlConstants.TEST_F32);
 		tools.equiToNormFV(300, 249/2.0f, found);
-		assertTrue(found.distance(new Point3D_F32(-1,0,0)) <= GrlConstants.FLOAT_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F32(-1,0,0)) <= GrlConstants.TEST_F32);
 
 		tools.equiToNormFV(300/4, 249/2.0f, found);
-		assertTrue(found.distance(new Point3D_F32(0,-1,0)) <= GrlConstants.FLOAT_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F32(0,-1,0)) <= GrlConstants.TEST_F32);
 		tools.equiToNormFV(3*300/4, 249/2.0f, found);
-		assertTrue(found.distance(new Point3D_F32(0, 1,0)) <= GrlConstants.FLOAT_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F32(0, 1,0)) <= GrlConstants.TEST_F32);
 
 		tools.equiToNormFV(300/2, 0, found);
-		assertTrue(found.distance(new Point3D_F32(0,0, -1)) <= GrlConstants.FLOAT_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F32(0,0, -1)) <= GrlConstants.TEST_F32);
 		tools.equiToNormFV(300/2, 249, found);
-		assertTrue(found.distance(new Point3D_F32(0,0, 1)) <= GrlConstants.FLOAT_TEST_TOL);
+		assertTrue(found.distance(new Point3D_F32(0,0, 1)) <= GrlConstants.TEST_F32);
 	}
 
 	@Test
@@ -179,8 +179,8 @@ public class TestEquirectangularTools_F32 {
 		tools.equiToNorm(x,y,n);
 		tools.normToEqui(n.x,n.y,n.z,r);
 
-		assertEquals(x,r.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(y,r.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(x,r.x, GrlConstants.TEST_F32);
+		assertEquals(y,r.y, GrlConstants.TEST_F32);
 	}
 
 	@Test
@@ -211,8 +211,8 @@ public class TestEquirectangularTools_F32 {
 		tools.equiToNormFV(x,y,n);
 		tools.normToEquiFV(n.x,n.y,n.z,r);
 
-		assertEquals(x,r.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(y,r.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(x,r.x, GrlConstants.TEST_F32);
+		assertEquals(y,r.y, GrlConstants.TEST_F32);
 	}
 
 	@Test
@@ -222,12 +222,12 @@ public class TestEquirectangularTools_F32 {
 
 		Point2D_F32 found = new Point2D_F32();
 		tools.lonlatToEqui(0,GrlConstants.F_PId2, found);
-		assertEquals(width/2,found.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(height-1,found.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(width/2,found.x, GrlConstants.TEST_F32);
+		assertEquals(height-1,found.y, GrlConstants.TEST_F32);
 
 		tools.lonlatToEqui(0,-GrlConstants.F_PId2, found);
-		assertEquals(width/2,found.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(0,found.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(width/2,found.x, GrlConstants.TEST_F32);
+		assertEquals(0,found.y, GrlConstants.TEST_F32);
 	}
 
 	@Test
@@ -237,11 +237,11 @@ public class TestEquirectangularTools_F32 {
 
 		Point2D_F32 found = new Point2D_F32();
 		tools.lonlatToEquiFV(0,-GrlConstants.F_PId2, found);
-		assertEquals(width/2,found.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(height-1,found.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(width/2,found.x, GrlConstants.TEST_F32);
+		assertEquals(height-1,found.y, GrlConstants.TEST_F32);
 
 		tools.lonlatToEquiFV(0,GrlConstants.F_PId2, found);
-		assertEquals(width/2,found.x, GrlConstants.FLOAT_TEST_TOL);
-		assertEquals(0,found.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(width/2,found.x, GrlConstants.TEST_F32);
+		assertEquals(0,found.y, GrlConstants.TEST_F32);
 	}
 }

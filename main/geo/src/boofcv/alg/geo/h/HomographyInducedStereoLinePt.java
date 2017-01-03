@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.geo.PairLineNorm;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 
 /**
  *
@@ -108,7 +108,7 @@ public class HomographyInducedStereoLinePt {
 		// cross(l')*F
 		GeometryMath_F64.multCrossA(line.l2, F, lf);
 
-		CommonOps.add(lf,top/bottom,el,H);
+		CommonOps_D64.add(lf,top/bottom,el,H);
 
 		// pick a good scale and sign for H
 		adjust.adjust(H, point);

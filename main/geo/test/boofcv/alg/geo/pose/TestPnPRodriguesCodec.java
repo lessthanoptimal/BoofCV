@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.geo.pose;
 
 import georegression.struct.se.Se3_F64;
 import org.ejml.UtilEjml;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -47,14 +47,14 @@ public class TestPnPRodriguesCodec {
 
 		// multiple parameterization can represent the same model, so test using the model
 		assertTrue(storage.T.isIdentical(storage2.T,1e-8));
-		assertTrue(MatrixFeatures.isIdentical(storage.R,storage2.R,1e-8));
+		assertTrue(MatrixFeatures_D64.isIdentical(storage.R,storage2.R,1e-8));
 	}
 
 	@Test
 	public void testCase0() {
 		Se3_F64 a = new Se3_F64();
 
-		a.R = UtilEjml.parseMatrix(
+		a.R = UtilEjml.parseD64(
 						"1.000000e+00        -5.423439e-14        -3.165003e-13 \n" +
 						"5.420664e-14         1.000000e+00         2.461642e-13 \n" +
 						"3.162678e-13        -2.464418e-13         1.000000e+00",3);
@@ -68,7 +68,7 @@ public class TestPnPRodriguesCodec {
 		alg.decode(param,found);
 
 		assertTrue(a.T.isIdentical(found.T,1e-8));
-		assertTrue(MatrixFeatures.isIdentical(a.R,found.R,1e-8));
+		assertTrue(MatrixFeatures_D64.isIdentical(a.R,found.R,1e-8));
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class TestPnPRodriguesCodec {
 	@Test
 	public void testCase1() {
 		Se3_F64 input = new Se3_F64();
-		CommonOps.diag(input.getR(),3,1,-1,-1);
+		CommonOps_D64.diag(input.getR(),3,1,-1,-1);
 
 		Se3_F64 output = new Se3_F64();
 		PnPRodriguesCodec alg = new PnPRodriguesCodec();
@@ -89,6 +89,6 @@ public class TestPnPRodriguesCodec {
 //		output.print();
 
 		assertTrue(input.T.isIdentical(output.T, 1e-8));
-		assertTrue(MatrixFeatures.isIdentical(input.R,output.R,1e-8));
+		assertTrue(MatrixFeatures_D64.isIdentical(input.R,output.R,1e-8));
 	}
 }

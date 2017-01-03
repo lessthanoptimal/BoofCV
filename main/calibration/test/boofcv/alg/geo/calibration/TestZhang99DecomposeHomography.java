@@ -23,7 +23,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -48,7 +48,7 @@ public class TestZhang99DecomposeHomography {
 		alg.setCalibrationMatrix(K);
 		Se3_F64 motion = alg.decompose(H);
 
-		assertTrue(MatrixFeatures.isIdentical(R, motion.getR(), 1e-5));
+		assertTrue(MatrixFeatures_D64.isIdentical(R, motion.getR(), 1e-5));
 		assertEquals(T.x,motion.getX(), 1e-5);
 	}
 }

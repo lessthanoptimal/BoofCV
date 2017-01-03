@@ -30,7 +30,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Vector3D_F32;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DenseMatrix32F;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -50,8 +50,8 @@ public class TestNarrowToWidePtoP_F32 {
 		Point2D_F32 found = new Point2D_F32();
 		alg.compute(250,250,found);
 
-		assertEquals(480,found.x, GrlConstants.FLOAT_TEST_TOL_SQRT);
-		assertEquals(480,found.y, GrlConstants.FLOAT_TEST_TOL_SQRT);
+		assertEquals(480,found.x, GrlConstants.TEST_SQ_F32);
+		assertEquals(480,found.y, GrlConstants.TEST_SQ_F32);
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class TestNarrowToWidePtoP_F32 {
 		NarrowToWidePtoP_F32 alg = createAlg();
 		Point2D_F32 found = new Point2D_F32();
 
-		DenseMatrix64F R = ConvertRotation3D_F32.eulerToMatrix(EulerType.YXZ,0.1f,0,0,null);
+		DenseMatrix32F R = ConvertRotation3D_F32.eulerToMatrix(EulerType.YXZ,0.1f,0,0,null);
 		alg.setRotationWideToNarrow(R);
 		alg.compute(250,250,found);
 		assertTrue(480<found.x - 5);

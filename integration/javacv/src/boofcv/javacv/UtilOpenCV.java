@@ -78,7 +78,7 @@ public class UtilOpenCV {
 	public static void save( CameraPinholeRadial model , String fileName ) {
 		FileStorage fs = new FileStorage(fileName, FileStorage.WRITE);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(model,null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(model, (DenseMatrix64F)null);
 
 		write(fs,"image_width", model.width);
 		write(fs,"image_height", model.height);

@@ -36,7 +36,7 @@ public class TestPinholeN2toP_F64 {
 	public void basicTest() {
 		CameraPinholeRadial p = new CameraPinholeRadial().fsetK(1, 2, 3, 4, 5, 200, 300);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(p, null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(p, (DenseMatrix64F)null);
 
 		Point2D_F64 pixel = new Point2D_F64(150, 200);
 		Point2D_F64 expected = new Point2D_F64();

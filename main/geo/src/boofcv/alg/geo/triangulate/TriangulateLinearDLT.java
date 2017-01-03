@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,9 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.SingularOps;
+import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
+import org.ejml.ops.SingularOps_D64;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ import java.util.List;
  */
 public class TriangulateLinearDLT {
 
-	SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(4, 4,true,true,false);
+	SingularValueDecomposition_F64<DenseMatrix64F> svd = DecompositionFactory_D64.svd(4, 4,true,true,false);
 	DenseMatrix64F v = new DenseMatrix64F(4,1);
 	DenseMatrix64F A = new DenseMatrix64F(4,4);
 
@@ -79,7 +79,7 @@ public class TriangulateLinearDLT {
 		if( !svd.decompose(A) )
 			throw new RuntimeException("SVD failed!?!?");
 
-		SingularOps.nullVector(svd,true,v);
+		SingularOps_D64.nullVector(svd,true,v);
 
 		double w = v.get(3);
 		found.x = v.get(0)/w;
@@ -123,7 +123,7 @@ public class TriangulateLinearDLT {
 		if( !svd.decompose(A) )
 			throw new RuntimeException("SVD failed!?!?");
 
-		SingularOps.nullVector(svd,true,v);
+		SingularOps_D64.nullVector(svd,true,v);
 		
 		double w = v.get(3);
 		foundInA.x = v.get(0)/w;

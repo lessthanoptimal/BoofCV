@@ -276,7 +276,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 
 		handleRunningStatus(2);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.intrinsic,null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.intrinsic, (DenseMatrix64F)null);
 		guiCam3D.init();
 		guiCam3D.setK(K);
 		guiCam3D.setStepSize(1);

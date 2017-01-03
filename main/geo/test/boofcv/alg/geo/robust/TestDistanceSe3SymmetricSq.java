@@ -30,7 +30,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.ops.CommonOps_D64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -125,8 +125,8 @@ public class TestDistanceSe3SymmetricSq {
 		DenseMatrix64F K2 = new DenseMatrix64F(3,3,true,105,0.021,180,0,155,210,0,0,1);
 		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 		DenseMatrix64F K2_inv = new DenseMatrix64F(3,3);
-		CommonOps.invert(K,K_inv);
-		CommonOps.invert(K2,K2_inv);
+		CommonOps_D64.invert(K,K_inv);
+		CommonOps_D64.invert(K2,K2_inv);
 
 		Se3_F64 keyToCurr = new Se3_F64();
 		keyToCurr.getT().set(0.1,-0.1,0.01);

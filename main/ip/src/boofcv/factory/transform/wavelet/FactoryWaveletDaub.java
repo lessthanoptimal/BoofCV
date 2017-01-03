@@ -25,7 +25,7 @@ import boofcv.core.image.border.BorderIndex1D_Wrap;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.wavelet.*;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.LinearSolverFactory;
+import org.ejml.factory.LinearSolverFactory_D64;
 import org.ejml.interfaces.linsol.LinearSolver;
 
 
@@ -204,7 +204,7 @@ public class FactoryWaveletDaub {
 			}
 		}
 
-		LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.linear(N);
+		LinearSolver<DenseMatrix64F> solver = LinearSolverFactory_D64.linear(N);
 		if( !solver.setA(A) || solver.quality() < 1e-5) {
 			throw new IllegalArgumentException("Can't invert matrix");
 		}
