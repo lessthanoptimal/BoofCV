@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,11 +33,11 @@ import java.io.Reader;
  */
 public interface MediaManager {
 	
-	public Reader openFile( String fileName );
+	Reader openFile( String fileName );
 	
-	public BufferedImage openImage( String fileName );
+	BufferedImage openImage( String fileName );
 	
-	public <T extends ImageBase<T>>
+	<T extends ImageBase<T>>
 	SimpleImageSequence<T> openVideo( String fileName , ImageType<T> imageInfo );
 
 	/**
@@ -48,6 +48,6 @@ public interface MediaManager {
 	 * @param imageType Type of input image
 	 * @return The image sequence.
 	 */
-	public <T extends ImageBase<T>>
+	<T extends ImageBase<T>>
 	SimpleImageSequence<T> openCamera(String device, int width, int height, ImageType<T> imageType);
 }

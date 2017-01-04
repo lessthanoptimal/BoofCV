@@ -49,6 +49,8 @@ Version : 0.27
 - Updated for full support of F32 data type in dependent libraries
   * EJML -> ddoglog -> GeoRegression
 
+- TODO Visualization tools for Direct VO
+-      Show warped image
 - TODO ExampleRectifyUncalibratedStereo is upside down.  Have the math be performed to avoid that
 - TODO Fisheye calibration using omni model
 - TODO grid of circle calibration target

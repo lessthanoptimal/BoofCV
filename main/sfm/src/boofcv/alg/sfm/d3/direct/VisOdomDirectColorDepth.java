@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,7 +97,13 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 	// number of valid pixels used to compute error
 	private int inboundsPixels = 0;
 
+	// work space
+	Point3D_F32 S = new Point3D_F32();
+
 	private TwistCoordinate_F32 twist = new TwistCoordinate_F32();
+
+	// used to compute spatial diveresity of tracked features
+	FeatureSpatialDiversity_F32 diversity = new FeatureSpatialDiversity_F32();
 
 	/**
 	 * Declares internal data structures and specifies the type of input images to expect
@@ -206,6 +212,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 
 				// save the results
 				Pixel p = keypixels.grow();
+				p.valid = true;
 				wrapI.get(x,y,p.bands);
 
 				p.x = x;
@@ -213,6 +220,27 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 				p.p3.set(P_x/P_w,P_y/P_w,P_z/P_w);
 			}
 		}
+	}
+
+	/**
+	 * Computes the diversity of valid pixels in keyframe to the location in the current frame.
+	 * @return Angular spread along the smallest axis in radians
+	 */
+	public double computeFeatureDiversity(Se3_F32 keyToCurrent ) {
+
+		diversity.reset();
+		for (int i = 0; i < keypixels.size(); i++) {
+			Pixel p = keypixels.data[i];
+
+			if( !p.valid )
+				continue;
+
+			SePointOps_F32.transform(keyToCurrent, p.p3, S);
+			diversity.addPoint(S.x, S.y, S.z);
+		}
+
+		diversity.process();
+		return diversity.getSpread();
 	}
 
 	/**
@@ -261,13 +289,10 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 
 	/**
 	 * Given the set of points in the key frame and their current observations
-	 * @param g initial transform applied to pixel locations
+	 * @param g initial transform applied to pixel locations.  keyframe to current frame
 	 */
 	void constructLinearSystem(Planar<I> input , Se3_F32 g ) {
-
 		int numBands = imageType.getNumBands();
-
-		Point3D_F32 S = new Point3D_F32();
 
 		// first precompute everything that does not depend on pixel values
 		inboundsPixels = 0;
@@ -276,6 +301,11 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 
 			// Apply the known warp
 			SePointOps_F32.transform(g, p.p3, S);
+
+			if( S.z <= 0 ) {
+				p.valid = false;
+				continue;
+			}
 
 			// Compute projected warped pixel coordinate on image I_1
 			p.proj.x = (S.x / S.z) * fx + cx;

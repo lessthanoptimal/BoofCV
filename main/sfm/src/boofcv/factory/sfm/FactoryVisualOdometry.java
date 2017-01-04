@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,17 +42,21 @@ import boofcv.alg.geo.pose.*;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.d3.*;
+import boofcv.alg.sfm.d3.direct.PyramidDirectColorDepth;
 import boofcv.alg.sfm.robust.DistancePlane2DToPixelSq;
 import boofcv.alg.sfm.robust.GenerateSe2_PlanePtPixel;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.EstimatorToGenerator;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.Planar;
+import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.sfm.PlanePtPixel;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.fitting.se.ModelManagerSe2_F64;
@@ -417,5 +421,17 @@ public class FactoryVisualOdometry {
 	public static <T extends ImageBase<T>> MonocularPlaneVisualOdometry<T> scaleInput( MonocularPlaneVisualOdometry<T> vo , double scaleFactor )
 	{
 		return new MonocularPlaneVisualOdometryScaleInput<>(vo, scaleFactor);
+	}
+
+	public static <Vis extends ImageGray<Vis>, Depth extends ImageGray<Depth>>
+	DepthVisualOdometry<Planar<Vis>,Depth> depthDirect( DepthSparse3D<Depth> sparse3D,
+														ImageType<Planar<Vis>> visualType , Class<Depth> depthType)
+	{
+		ImagePyramid<Planar<Vis>> pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4},
+				-1,2,false, visualType);
+
+		PyramidDirectColorDepth<Vis> alg = new PyramidDirectColorDepth<>(pyramid);
+
+		return new PyramidDirectColorDepth_to_DepthVisualOdometry<>(sparse3D,alg,depthType);
 	}
 }

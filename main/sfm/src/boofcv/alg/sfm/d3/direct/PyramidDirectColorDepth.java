@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import boofcv.struct.pyramid.ImagePyramid;
+import georegression.metric.UtilAngle;
 import georegression.struct.se.Se3_F32;
 
 /**
@@ -38,7 +39,6 @@ import georegression.struct.se.Se3_F32;
  *
  * @author Peter Abeles
  */
-// TODO test to see if key frame selection
 public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 
 	private ImageType<Planar<T>> imageType;
@@ -46,7 +46,10 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 	private ImagePyramid<Planar<T>> pyramid;
 	private VisOdomDirectColorDepth<T,?>[] layersOdom;
 
-	private double keyframeFraction = 0.25;
+	// When the diversity of the image drops below this fraction of the key frame create a new keyframe
+	private double diversityThreshold = 0.75;
+	private double keyframeDiversity; // diversity of the keyframe
+	private double diversity; // diveresity of the current frame
 
 	// number of pixels which were valid in the last layer processed
 	private double fractionInBounds = 0;
@@ -96,7 +99,22 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 			fractionInBounds = 1.0;
 		} else {
 			if( estimateMotion( input ) ) {
-				if( fractionInBounds < keyframeFraction ) {
+				boolean keyframeTriggered = false;
+
+				System.out.printf("   d %6.2f  f %6.2f\n",UtilAngle.degree(diversity),fractionInBounds);
+
+//				System.out.println("  spartial density "+(diversity*fractionInBounds));
+				if( diversity < keyframeDiversity*diversityThreshold) {
+//					System.out.println("  triggerd by diversity "+ UtilAngle.degree(diversity)+" deg");
+					keyframeTriggered = true;
+				}
+
+				if( fractionInBounds < 0.5 ) {
+//					System.out.println("  triggerd by fraction "+ fractionInBounds);
+					keyframeTriggered = true;
+				}
+
+				if( keyframeTriggered ) {
 					setKeyFrame( input, inputDepth );
 				}
 			} else {
@@ -119,6 +137,8 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 		worldToKey.concat(keyToCurrent,work);
 		worldToKey.set(work);
 		keyToCurrent.reset();
+
+		keyframeDiversity = layersOdom[layersOdom.length-1].computeFeatureDiversity(keyToCurrent);
 	}
 
 	protected boolean estimateMotion( Planar<T> input ) {
@@ -133,7 +153,7 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 			if( o.estimateMotion(layerImage, work) ) {
 				oneLayerWorked = true;
 				work.set( o.getKeyToCurrent() );
-				work.print();
+//				work.print();
 
 				fractionInBounds = o.getInboundsPixels()/(double)o.getKeyframePixels();
 //				System.out.println("   fraction in bounds "+fractionInBounds);
@@ -146,6 +166,9 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 		if( oneLayerWorked ) {
 			keyToCurrent.set(work);
 			worldToKey.concat(keyToCurrent,worldToCurrent);
+
+			// compute diversity in the smallest image.  Should be about the same in all the layers
+			diversity = layersOdom[layersOdom.length-1].computeFeatureDiversity(keyToCurrent);
 		}
 
 		return oneLayerWorked;
@@ -169,8 +192,8 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 		worldToCurrent.reset();
 	}
 
-	public void setKeyframeFraction(double keyframeFraction) {
-		this.keyframeFraction = keyframeFraction;
+	public void setDiversityThreshold(double diversityThreshold) {
+		this.diversityThreshold = diversityThreshold;
 	}
 
 	public static class LayerTo3D implements ImagePixelTo3D {
