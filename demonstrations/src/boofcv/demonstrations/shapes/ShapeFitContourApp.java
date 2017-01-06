@@ -93,7 +93,7 @@ public class ShapeFitContourApp
 	public synchronized void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
 		if( buffered != null ) {
 			original = ConvertBufferedImage.checkCopy(buffered,original);
-			work = ConvertBufferedImage.checkDeclare(buffered.getWidth(),buffered.getHeight(),work,buffered.getType());
+			work = ConvertBufferedImage.checkDeclare(buffered,work);
 
 			binary.reshape(input.getWidth(), input.getHeight());
 			filtered.reshape(input.getWidth(),input.getHeight());

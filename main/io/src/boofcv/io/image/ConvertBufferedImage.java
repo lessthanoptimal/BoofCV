@@ -51,6 +51,26 @@ public class ConvertBufferedImage {
 		return image;
 	}
 
+	public static BufferedImage checkDeclare( BufferedImage template , BufferedImage target ) {
+		int width = template.getWidth();
+		int height = template.getHeight();
+		int type = template.getType();
+		if( type == 0 ) {
+			if( target != null )
+				type = target.getType();
+			else
+				type = BufferedImage.TYPE_INT_RGB;
+		}
+
+		if( target == null )
+			return new BufferedImage(width,height,type);
+		if( target.getType() != type )
+			return new BufferedImage(width,height,type);
+		if( target.getWidth() != width || target.getHeight() != height )
+			return new BufferedImage(width,height,type);
+		return target;
+	}
+
 	/**
 	 * Copies the original image into the output image.  If it can't do a copy a new image is created and returned
 	 * @param original Original image

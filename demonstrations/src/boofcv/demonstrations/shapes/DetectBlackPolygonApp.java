@@ -101,7 +101,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>> extends Demonstration
 	public synchronized void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
 		if( buffered != null ) {
 			original = ConvertBufferedImage.checkCopy(buffered,original);
-			work = ConvertBufferedImage.checkDeclare(buffered.getWidth(),buffered.getHeight(),work,buffered.getType());
+			work = ConvertBufferedImage.checkDeclare(buffered,work);
 
 			binary.reshape(work.getWidth(), work.getHeight());
 			inputPrev.setTo((T)input);

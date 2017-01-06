@@ -88,9 +88,7 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends Demonstration
 	public synchronized void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
 		if( buffered != null ) {
 			original = ConvertBufferedImage.checkCopy(buffered,original);
-			work = ConvertBufferedImage.checkCopy(buffered,work);
-
-			this.original.createGraphics().drawImage(buffered,0,0,null);
+			work = ConvertBufferedImage.checkDeclare(buffered,work);
 
 			binary.reshape(work.getWidth(), work.getHeight());
 			inputPrev.setTo((T)input);

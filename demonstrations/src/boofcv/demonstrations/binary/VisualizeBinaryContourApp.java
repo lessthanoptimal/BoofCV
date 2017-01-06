@@ -76,7 +76,7 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 		if( buffered != null ) {
 
 			original = ConvertBufferedImage.checkCopy(buffered,original);
-			work = ConvertBufferedImage.checkDeclare(buffered.getWidth(),buffered.getHeight(),work,buffered.getType());
+			work = ConvertBufferedImage.checkDeclare(buffered,work);
 
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
