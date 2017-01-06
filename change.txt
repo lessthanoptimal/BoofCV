@@ -48,9 +48,11 @@ Version : 0.27
   * setTo will adjust the number of bands
 - Updated for full support of F32 data type in dependent libraries
   * EJML -> ddoglog -> GeoRegression
+- Fixed calibration target generator app from printing out the wrong target type for asymmetric circles
 
 - TODO Visualization tools for Direct VO
 -      Show warped image
+- TODO ExampleDenseImageFeatures needs to be written
 - TODO ExampleRectifyUncalibratedStereo is upside down.  Have the math be performed to avoid that
 - TODO Fisheye calibration using omni model
 - TODO grid of circle calibration target

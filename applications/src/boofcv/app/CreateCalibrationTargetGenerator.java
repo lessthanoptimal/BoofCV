@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -122,7 +122,7 @@ public class CreateCalibrationTargetGenerator {
 		patternWidth = (cols-1)*(separationPoints/2.0) + diameterPoints;
 		patternHeight = (rows-1)*(separationPoints/2.0) + diameterPoints;
 
-		printHeader("Square Grid "+rows+"x"+cols+", diameter "+diameter+", separation "+centerDistance+" "+units.abbreviation);
+		printHeader("Asymmetric Circle "+rows+"x"+cols+", diameter "+diameter+", separation "+centerDistance+" "+units.abbreviation);
 
 		out.println(
 				"  /w "+separationPoints+" def\n"+
