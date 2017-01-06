@@ -21,18 +21,20 @@ android {
     lintOptions {
         abortOnError false
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 }
 
 // conflicts with a Android stuff
 configurations {
     all*.exclude group: "xmlpull", module: "xmlpull"
+    all*.exclude group: "org.apache.commons", module: "commons-compress"
 }
 
 dependencies {
-    ['android','core'].each { String a -> compile group: 'org.boofcv', name: a, version: '0.25'}
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    ['android', 'core'].each { String a -> compile group: 'org.boofcv', name: a, version: '0.26' }
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:25.0.1'
-
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
 }

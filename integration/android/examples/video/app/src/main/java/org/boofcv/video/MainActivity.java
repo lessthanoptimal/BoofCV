@@ -18,9 +18,15 @@
 
 package org.boofcv.video;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 
 /**
@@ -29,13 +35,58 @@ import android.view.View;
  * @author Peter Abeles
  */
 public class MainActivity extends Activity {
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+
+		requestCameraPermission();
 	}
 
 	public void clickedVideo( View view ) {
 		Intent intent = new Intent(this, VideoActivity.class);
 		startActivity(intent);
 	}
+
+	/**
+	 * Newer versions of Android require explicit permission from the user
+	 */
+	private void requestCameraPermission() {
+		int permissionCheck = ContextCompat.checkSelfPermission(this,
+				Manifest.permission.CAMERA);
+
+		if( permissionCheck != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+			ActivityCompat.requestPermissions(this,
+					new String[]{Manifest.permission.CAMERA},
+					0);
+			// a dialog should open and this dialog will resume when a decision has been made
+		}
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode,
+										   String permissions[], int[] grantResults) {
+		switch (requestCode) {
+			case 0: {
+				// If request is cancelled, the result arrays are empty.
+				if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+					dialogNoCameraPermission();
+				}
+			}
+		}
+	}
+
+	private void dialogNoCameraPermission() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Denied access to the camera! Exiting.")
+				.setCancelable(false)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						System.exit(0);
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+
 }
