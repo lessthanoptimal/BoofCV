@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -193,7 +193,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 	}
 
 	@Override
-	public void processImage(BufferedImage buffered, T input) {
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 		synchronized (imageLock) {
 			// create a copy of the input image for output purposes
 			if (buffEqui.getWidth() != buffered.getWidth() || buffEqui.getHeight() != buffered.getHeight()) {
@@ -205,7 +205,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 				distortImage.setModel(distorter);
 			}
 			buffEqui.createGraphics().drawImage(buffered, 0, 0, null);
-			equi.setTo(input);
+			equi.setTo((T)input);
 
 			rerenderPinhole();
 		}

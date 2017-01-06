@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,14 +44,14 @@ public interface SimpleImageSequence<T extends ImageBase<T>> {
 	 *
 	 * @return true if a new image is available.
 	 */
-	public boolean hasNext();
+	boolean hasNext();
 
 	/**
 	 * Returns the next image available in the sequence.
 	 *
 	 * @return Next image in the sequence.
 	 */
-	public T next();
+	T next();
 
 	/**
 	 * Returns the image in the original format that it was read in as.  When dealing with swing or any standard
@@ -60,34 +60,34 @@ public interface SimpleImageSequence<T extends ImageBase<T>> {
 	 *
 	 * @return
 	 */
-	public <InternalImage> InternalImage getGuiImage();
+	<InternalImage> InternalImage getGuiImage();
 
 	/**
 	 * Call when done reading the image sequence.
 	 */
-	public void close();
+	void close();
 
 	/**
 	 * Returns the number of the current frame in the sequence.
 	 *
 	 * @return Frame ID number.
 	 */
-	public int getFrameNumber();
+	int getFrameNumber();
 
 	/**
 	 * Sets if the video should loop or not
 	 *
 	 * @param loop true for looping forever, false for once
 	 */
-	public void setLoop( boolean loop );
+	void setLoop( boolean loop );
 
 	/**
 	 * Returns the type of class used to store the output image
 	 */
-	public ImageType<T> getImageType();
+	ImageType<T> getImageType();
 
 	/**
 	 * Start reading the sequence from the start
 	 */
-	public void reset();
+	void reset();
 }

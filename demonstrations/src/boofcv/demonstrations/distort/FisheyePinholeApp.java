@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -201,7 +201,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 	}
 
 	@Override
-	public void processImage(BufferedImage buffered, T input) {
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 		synchronized (imageLock) {
 			// create a copy of the input image for output purposes
 			if (buffFisheye.getWidth() != buffered.getWidth() || buffFisheye.getHeight() != buffered.getHeight()) {
@@ -213,7 +213,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 				distortImage.setModel(new PointToPixelTransform_F32(distorter));
 			}
 			buffFisheye.createGraphics().drawImage(buffered, 0, 0, null);
-			fisheye.setTo(input);
+			fisheye.setTo((T)input);
 
 			rerenderPinhole();
 		}

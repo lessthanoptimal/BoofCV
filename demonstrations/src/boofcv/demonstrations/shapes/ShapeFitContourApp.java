@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,11 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.EllipseRotated_F64;
@@ -88,16 +90,14 @@ public class ShapeFitContourApp
 	}
 
 	@Override
-	public synchronized void processImage(final BufferedImage buffered, GrayU8 input ) {
+	public synchronized void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
 		if( buffered != null ) {
-			original = conditionalDeclare(buffered,original);
-			work = conditionalDeclare(buffered,work);
-
-			this.original.createGraphics().drawImage(buffered,0,0,null);
+			original = ConvertBufferedImage.checkCopy(buffered,original);
+			work = ConvertBufferedImage.checkDeclare(buffered.getWidth(),buffered.getHeight(),work,buffered.getType());
 
 			binary.reshape(input.getWidth(), input.getHeight());
 			filtered.reshape(input.getWidth(),input.getHeight());
-			inputPrev.setTo(input);
+			inputPrev.setTo((GrayU8)input);
 
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
@@ -111,7 +111,7 @@ public class ShapeFitContourApp
 			input = inputPrev;
 		}
 
-		process(input);
+		process((GrayU8)input);
 	}
 
 	public synchronized void viewUpdated() {
@@ -161,7 +161,7 @@ public class ShapeFitContourApp
 	public void imageThresholdUpdated() {
 		ConfigThreshold config = controlPanel.getThreshold().createConfig();
 		inputToBinary = FactoryThresholdBinary.threshold(config,GrayU8.class);
-		processImageThread(null,null);
+		processImageThread(0,0,null,null);
 	}
 
 	protected void renderVisuals( Graphics2D g2 , double scale ) {

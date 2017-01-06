@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -109,9 +109,9 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 	}
 
 	@Override
-	public void processImage(BufferedImage buffered, T input) {
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 		synchronized (lock) {
-			hog.setInput(input);
+			hog.setInput((T)input);
 			hog.process();
 
 			work = visualizers.createOutputBuffered(work);
@@ -133,7 +133,7 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 
 	public void setCellWidth( int width ) {
 		synchronized (lock) {
-			createHoG(imageType);
+			createHoG(defaultType);
 			visualizers.setHoG(hog);
 			reprocessSingleImage();
 		}
@@ -141,7 +141,7 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 
 	public void setOrientationBins(int histogram) {
 		synchronized (lock) {
-			createHoG(imageType);
+			createHoG(defaultType);
 			visualizers.setHoG(hog);
 			reprocessSingleImage();
 		}

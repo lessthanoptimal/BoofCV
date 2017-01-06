@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,9 +103,9 @@ public class RenderSyntheticCamerModelApp<T extends ImageBase<T>> extends Demons
 
 
 	@Override
-	public synchronized void processImage(final BufferedImage buffered, final T input)
+	public synchronized void processImage(int sourceID, long frameID, final BufferedImage buffered, final ImageBase input)
 	{
-		dist.setTo(input);
+		dist.setTo((T)input);
 
 		if( origModel.width != input.width || origModel.height != input.height ) {
 			configureDefaultModel(input.width, input.height);

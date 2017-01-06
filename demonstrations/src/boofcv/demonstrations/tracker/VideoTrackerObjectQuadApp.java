@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,10 +27,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.tracker.TrackerObjectQuadPanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.Planar;
+import boofcv.struct.image.*;
 import georegression.struct.shapes.Quadrilateral_F64;
 
 import javax.swing.*;
@@ -145,7 +142,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 	}
 
 	@Override
-	public void processImage(final BufferedImage buffered, Planar<I> frame) {
+	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase frame) {
 
 		if( trackerChanged ) {
 			trackerChanged = false;
@@ -157,7 +154,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 
 		if( tracker.getImageType().getFamily() == ImageType.Family.GRAY) {
 			gray.reshape(frame.width,frame.height);
-			GConvertImage.average(frame, gray);
+			GConvertImage.average((Planar<I>)frame, gray);
 			grayScale = true;
 		}
 
@@ -203,13 +200,13 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 		else if( whichAlg == 2 ) {
 			ConfigComaniciu2003 config = new ConfigComaniciu2003();
 			config.scaleChange = 0;
-			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config,imageType);
+			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config, defaultType);
 		} else if( whichAlg == 3 ) {
 			ConfigComaniciu2003 config = new ConfigComaniciu2003();
 			config.scaleChange = 0.05f;
-			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config,imageType);
+			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config, defaultType);
 		} else if( whichAlg == 4 ) {
-			tracker = FactoryTrackerObjectQuad.meanShiftLikelihood(30, 5, 256, MeanShiftLikelihoodType.HISTOGRAM, imageType);
+			tracker = FactoryTrackerObjectQuad.meanShiftLikelihood(30, 5, 256, MeanShiftLikelihoodType.HISTOGRAM, defaultType);
 		} else if( whichAlg == 5 ) {
 			tracker = FactoryTrackerObjectQuad.sparseFlow(null,imageClass,null);
 		} else

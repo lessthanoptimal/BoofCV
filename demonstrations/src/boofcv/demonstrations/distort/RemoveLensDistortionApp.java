@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -96,16 +96,16 @@ public class RemoveLensDistortionApp<T extends ImageBase<T>> extends Demonstrati
 	}
 
 	@Override
-	public void processImage(final BufferedImage buffered, T input)
+	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input)
 	{
 		// strip away distortion parameters
 		CameraPinhole desired = new CameraPinhole(param);
 
 		// distorted image
-		dist = input.clone();
+		dist = (T)input.clone();
 
 		// storage for undistorted image
-		undist = input.createSameShape();
+		undist = (T)input.createSameShape();
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier
 		SwingUtilities.invokeLater(new Runnable() {

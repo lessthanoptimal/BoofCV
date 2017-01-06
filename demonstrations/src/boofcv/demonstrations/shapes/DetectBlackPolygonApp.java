@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,11 +30,9 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.Configuration;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
@@ -79,7 +77,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>> extends Demonstration
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, guiImage);
 
-		inputPrev = super.imageType.createImage(1,1);
+		inputPrev = super.defaultType.createImage(1,1);
 
 		createDetector();
 	}
@@ -100,15 +98,13 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>> extends Demonstration
 	}
 
 	@Override
-	public synchronized void processImage(final BufferedImage buffered, T input ) {
+	public synchronized void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
 		if( buffered != null ) {
-			original = conditionalDeclare(buffered,original);
-			work = conditionalDeclare(buffered,work);
-
-			this.original.createGraphics().drawImage(buffered,0,0,null);
+			original = ConvertBufferedImage.checkCopy(buffered,original);
+			work = ConvertBufferedImage.checkDeclare(buffered.getWidth(),buffered.getHeight(),work,buffered.getType());
 
 			binary.reshape(work.getWidth(), work.getHeight());
-			inputPrev.setTo(input);
+			inputPrev.setTo((T)input);
 
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
@@ -122,8 +118,8 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>> extends Demonstration
 			input = inputPrev;
 		}
 
-		inputToBinary.process(input, binary);
-		detector.process(input, binary);
+		inputToBinary.process((T)input, binary);
+		detector.process((T)input, binary);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -168,7 +164,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>> extends Demonstration
 		ConfigThreshold config = controls.getThreshold().createConfig();
 
 		inputToBinary = FactoryThresholdBinary.threshold(config, imageClass);
-		processImageThread(null,null);
+		processImageThread(0,0,null,null);
 	}
 
 	class VisualizePanel extends ImageZoomPanel {

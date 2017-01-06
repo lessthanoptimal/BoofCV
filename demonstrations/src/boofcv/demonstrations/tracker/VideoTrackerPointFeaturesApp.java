@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -177,7 +177,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>, D extends Imag
 		Class imageType = GrayF32.class;
 		Class derivType = GrayF32.class;
 
-//		Class imageType = GrayU8.class;
+//		Class defaultType = GrayU8.class;
 //		Class derivType = GrayS16.class;
 
 		VideoTrackerPointFeaturesApp app = new VideoTrackerPointFeaturesApp(imageType, derivType);

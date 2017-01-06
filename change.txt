@@ -49,6 +49,7 @@ Version : 0.27
 - Updated for full support of F32 data type in dependent libraries
   * EJML -> ddoglog -> GeoRegression
 - Fixed calibration target generator app from printing out the wrong target type for asymmetric circles
+- Fixed and updated Android example
 
 - TODO Visualization tools for Direct VO
 -      Show warped image
@@ -59,6 +60,7 @@ Version : 0.27
 - TODO Regression: Chessboard image border to fiducial regression
 - TODO Calibration application.  Select output format: BoofCV, OpenCV
 - TODO Tutorial on image features?  Sparse and dense?
+- TODO Don't forget to change BoofCV version referenced in Android example
 
 ---------------------------------------------
 Date    : 2016/12/07
@@ -243,9 +245,9 @@ Version : Alpha 0.22
   * Removed configure() since it couldn't be generalized to HOG
   * Created config classes for all dense descriptors
 - No argument constructor in most image types
-  * Fixed bug where imageType was not being set.  Thanks pcmoen for reporting the bug
+  * Fixed bug where defaultType was not being set.  Thanks pcmoen for reporting the bug
 - Fixed bug in ConvertBufferedImage.extract where number of bands in interleaved images was not being set in ImageType
-  * Fixed bug where imageType was not being set.  Thanks pcmoen for reporting the bug
+  * Fixed bug where defaultType was not being set.  Thanks pcmoen for reporting the bug
 - PixelMath
   * Added partial support for Interleaved images
   * GPixelMath supports more than just single band images

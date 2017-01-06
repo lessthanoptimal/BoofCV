@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,9 @@ import java.lang.reflect.Array;
  */
 public class ConvertBufferedImage {
 
+	/**
+	 * If the provided image does not have the same shape and same type a new one is declared and returned.
+	 */
 	public static BufferedImage checkDeclare( int width , int height , BufferedImage image , int type ) {
 		if( image == null )
 			return new BufferedImage(width,height,type);
@@ -46,6 +49,26 @@ public class ConvertBufferedImage {
 		if( image.getWidth() != width || image.getHeight() != height )
 			return new BufferedImage(width,height,type);
 		return image;
+	}
+
+	/**
+	 * Copies the original image into the output image.  If it can't do a copy a new image is created and returned
+	 * @param original Original image
+	 * @param output (Optional) Storage for copy.
+	 * @return The copied image.  May be a new instance
+	 */
+	public static BufferedImage checkCopy( BufferedImage original , BufferedImage output ) {
+		ColorModel cm = original.getColorModel();
+		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+
+		if( output == null || original.getWidth() != output.getWidth() || original.getHeight() != output.getHeight() ||
+				original.getType() != output.getType() ) {
+			WritableRaster raster = original.copyData(original.getRaster().createCompatibleWritableRaster());
+			return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+		}
+
+		original.copyData(output.getRaster());
+		return output;
 	}
 
 	/**

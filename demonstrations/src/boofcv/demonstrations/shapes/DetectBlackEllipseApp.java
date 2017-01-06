@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,10 +29,8 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageType;
+import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.image.*;
 import georegression.struct.shapes.EllipseRotated_F64;
 
 import javax.swing.*;
@@ -76,7 +74,7 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends Demonstration
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, guiImage);
 
-		inputPrev = super.imageType.createImage(1,1);
+		inputPrev = super.defaultType.createImage(1,1);
 
 		createDetector();
 	}
@@ -87,15 +85,15 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends Demonstration
 	}
 
 	@Override
-	public synchronized void processImage(final BufferedImage buffered, T input ) {
+	public synchronized void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
 		if( buffered != null ) {
-			original = conditionalDeclare(buffered,original);
-			work = conditionalDeclare(buffered,work);
+			original = ConvertBufferedImage.checkCopy(buffered,original);
+			work = ConvertBufferedImage.checkCopy(buffered,work);
 
 			this.original.createGraphics().drawImage(buffered,0,0,null);
 
 			binary.reshape(work.getWidth(), work.getHeight());
-			inputPrev.setTo(input);
+			inputPrev.setTo((T)input);
 
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
@@ -109,8 +107,8 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends Demonstration
 			input = inputPrev;
 		}
 
-		inputToBinary.process(input, binary);
-		detector.process(input, binary);
+		inputToBinary.process((T)input, binary);
+		detector.process((T)input, binary);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -155,7 +153,7 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends Demonstration
 		ConfigThreshold config = controls.getThreshold().createConfig();
 
 		inputToBinary = FactoryThresholdBinary.threshold(config, imageClass);
-		processImageThread(null,null);
+		processImageThread(0,0,null,null);
 	}
 
 	class VisualizePanel extends ImageZoomPanel {

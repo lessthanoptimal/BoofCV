@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,6 +42,18 @@ public class TestConvertBufferedImage {
 
 	int imgWidth = 10;
 	int imgHeight = 20;
+
+	@Test
+	public void checkCopy() {
+		BufferedImage a = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 3, rand);
+		BufferedImage b = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 3, rand);
+
+		assertTrue( b == ConvertBufferedImage.checkCopy(a,b));
+		BoofTesting.checkIdentical(a,b);
+
+		BufferedImage c = ConvertBufferedImage.checkCopy(a,null);
+		BoofTesting.checkIdentical(a,c);
+	}
 
 	@Test
 	public void checkInputs() {

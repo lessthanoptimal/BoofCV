@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -119,7 +119,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 
 	private void updateDescriptor() {
 		synchronized (hogLock) {
-			hog = (DescribeImageDenseHoG<T>) FactoryDescribeImageDense.hog(config, imageType);
+			hog = (DescribeImageDenseHoG<T>) FactoryDescribeImageDense.hog(config, defaultType);
 		}
 
 		int numAngles = config.orientationBins;
@@ -135,13 +135,13 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 	}
 
 	@Override
-	public void processImage(BufferedImage buffered, T input) {
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 		boolean inputSizeChanged = false;
 		synchronized (hogLock) {
 			inputSizeChanged =
 					this.input == null || this.input.width != input.width || this.input.height != input.height;
-			this.input = input;
-			hog.process(input);
+			this.input = (T)input;
+			hog.process((T)input);
 
 			if( inputSizeChanged ) {
 				targetDesc = null;

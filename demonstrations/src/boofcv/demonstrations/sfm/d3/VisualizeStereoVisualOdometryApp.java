@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -329,15 +329,15 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 					trackerLeft, trackerRight,describe, imageType);
 		} else if( whichAlg == 4 ) {
 //			GeneralFeatureIntensity intensity =
-//					FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,imageType);
+//					FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,defaultType);
 			GeneralFeatureIntensity intensity =
 					FactoryIntensityPoint.shiTomasi(1,false,imageType);
 			NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(2,50,0,true,false,true));
 			GeneralFeatureDetector general = new GeneralFeatureDetector(intensity,nonmax);
 			general.setMaxFeatures(600);
 			DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,2,imageType,derivType);
-//			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true),imageType);
-//			DescribeRegionPoint describe = FactoryDescribeRegionPoint.pixelNCC(5,5,imageType);
+//			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true),defaultType);
+//			DescribeRegionPoint describe = FactoryDescribeRegionPoint.pixelNCC(5,5,defaultType);
 			DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, imageType);
 			DetectDescribeMulti detDescMulti =  new DetectDescribeMultiFusion(detector,null,describe);
 

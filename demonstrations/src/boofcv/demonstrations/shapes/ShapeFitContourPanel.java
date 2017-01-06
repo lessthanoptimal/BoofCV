@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -123,7 +123,7 @@ public class ShapeFitContourPanel extends StandardAlgConfigPanel
 			owner.viewUpdated();
 			return;
 		}
-		owner.processImage(null,null);
+		owner.processImage(0,0 , null, null);
 	}
 
 	@Override
@@ -145,7 +145,7 @@ public class ShapeFitContourPanel extends StandardAlgConfigPanel
 			owner.viewUpdated();
 			return;
 		}
-		owner.processImage(null,null);
+		owner.processImage(0,0 , null, null);
 	}
 
 	private void updateEnabledByAlgorithm() {

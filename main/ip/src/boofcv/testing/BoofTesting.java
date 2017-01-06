@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -669,6 +669,19 @@ public class BoofTesting {
 		if (normalizer < 1.0) normalizer = 1.0;
 		if (Math.abs(a.get(x, y).doubleValue() - b.get(x, y).doubleValue()) / normalizer > tol)
 			throw new RuntimeException("values not equal at (" + x + " " + y + ") " + a.get(x, y) + "  " + b.get(x, y));
+	}
+
+	public static void checkIdentical(BufferedImage imgA, BufferedImage imgB ) {
+		if(imgA.getWidth() != imgB.getWidth()) throw new IllegalArgumentException("Widths not equal");
+		if(imgA.getHeight() != imgB.getHeight()) throw new IllegalArgumentException("Heights not equal");
+		if(imgA.getType() != imgB.getType()) throw new IllegalArgumentException("Types not equal");
+
+		for (int y = 0; y < imgA.getHeight(); y++) {
+			for (int x = 0; x < imgB.getWidth(); x++) {
+				if( imgA.getRGB(x,y) != imgB.getRGB(x,y) )
+					throw new IllegalArgumentException("RGB values not identical at "+x+" "+y);
+			}
+		}
 	}
 
 	public static void checkEquals(BufferedImage imgA, ImageBase imgB, boolean boofcvBandOrder,double tol ) {

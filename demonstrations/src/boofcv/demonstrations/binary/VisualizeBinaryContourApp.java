@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,7 @@ import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.*;
 
 import javax.swing.*;
@@ -70,14 +71,12 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 	}
 
 	@Override
-	public void processImage(final BufferedImage buffered, T input) {
+	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
 
 		if( buffered != null ) {
 
-			original = conditionalDeclare(buffered,original);
-			work = conditionalDeclare(buffered,work);
-
-			this.original.createGraphics().drawImage(buffered,0,0,null);
+			original = ConvertBufferedImage.checkCopy(buffered,original);
+			work = ConvertBufferedImage.checkDeclare(buffered.getWidth(),buffered.getHeight(),work,buffered.getType());
 
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
@@ -92,7 +91,7 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 		binary.reshape(input.width,input.height);
 		labeled.reshape(input.width,input.height);
 
-		inputToBinary.process(input,binary);
+		inputToBinary.process((T)input,binary);
 
 		synchronized (this) {
 			contourAlg.process(binary,labeled);
@@ -110,7 +109,7 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 	public void imageThresholdUpdated() {
 		synchronized (this) {
 			ConfigThreshold config = controls.getThreshold().createConfig();
-			inputToBinary = FactoryThresholdBinary.threshold(config,imageType.getImageClass());
+			inputToBinary = FactoryThresholdBinary.threshold(config, defaultType.getImageClass());
 			reprocessSingleImage();
 		}
 	}

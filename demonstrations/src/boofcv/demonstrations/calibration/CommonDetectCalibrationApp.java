@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,11 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F32;
@@ -106,12 +108,12 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 	protected abstract List<SquareGrid> getGrids();
 
 	@Override
-	public void processImage( final BufferedImage buffered , GrayF32 gray ) {
+	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase gray) {
 		this.input = buffered;
 
 		synchronized ( this ) {
-			binary = conditionalDeclare(buffered, binary, BufferedImage.TYPE_INT_RGB);
-			grayPrev.setTo(gray);
+			binary = ConvertBufferedImage.checkDeclare(gray.getWidth(), gray.getHeight(), binary, BufferedImage.TYPE_INT_RGB);
+			grayPrev.setTo((GrayF32)gray);
 		}
 
 		processFrame();

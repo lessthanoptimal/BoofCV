@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,7 +93,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 	}
 
 	@Override
-	public void processImage(final BufferedImage buffered, final T undistorted)
+	public void processImage(int sourceID, long frameID, final BufferedImage buffered, final ImageBase undistorted)
 	{
 		BufferedImage tmp = distortedBuff;
 		distortedBuff = ConvertBufferedImage.checkDeclare(
@@ -112,9 +112,9 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		}
 
 		if( inputMethod == InputMethod.IMAGE ) {
-			this.undistorted.setTo(undistorted);
+			this.undistorted.setTo((T)undistorted);
 		}
-		renderDistorted(buffered, undistorted);
+		renderDistorted(buffered, (T)undistorted);
 	}
 
 	private void renderDistorted(BufferedImage buffered, T undistorted) {

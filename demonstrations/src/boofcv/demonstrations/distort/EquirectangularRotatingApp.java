@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -130,14 +130,14 @@ public class EquirectangularRotatingApp<T extends ImageBase<T>> extends Demonstr
 	}
 
 	@Override
-	public void processImage(BufferedImage buffered, T input) {
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 
 		T in;
 		if( inputMethod == InputMethod.IMAGE ) {
-			inputCopy.setTo(input);
+			inputCopy.setTo((T)input);
 			in = inputCopy;
 		} else {
-			in = input;
+			in = (T)input;
 		}
 
 		synchronized (distorter) {

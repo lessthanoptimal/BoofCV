@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,9 +78,9 @@ public class DemonstrationInterpolateScaleApp<T extends ImageBase<T>>
 	}
 
 	@Override
-	public void processImage(BufferedImage buffered, T input) {
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 		synchronized (latestImage) {
-			latestImage.setTo(input);
+			latestImage.setTo((T)input);
 			applyScaling();
 		}
 	}

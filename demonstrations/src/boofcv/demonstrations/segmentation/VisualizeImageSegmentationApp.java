@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -237,9 +237,9 @@ public class VisualizeImageSegmentationApp <T extends ImageBase<T>>
 
 	public static void main(String[] args) {
 		ImageType<Planar<GrayF32>> imageType = ImageType.pl(3,GrayF32.class);
-//		ImageType<Planar<GrayU8>> imageType = ImageType.pl(3,GrayU8.class);
-//		ImageType<GrayF32> imageType = ImageType.single(GrayF32.class);
-//		ImageType<GrayU8> imageType = ImageType.single(GrayU8.class);
+//		ImageType<Planar<GrayU8>> defaultType = ImageType.pl(3,GrayU8.class);
+//		ImageType<GrayF32> defaultType = ImageType.single(GrayF32.class);
+//		ImageType<GrayU8> defaultType = ImageType.single(GrayU8.class);
 
 		VisualizeImageSegmentationApp app = new VisualizeImageSegmentationApp(imageType);
 

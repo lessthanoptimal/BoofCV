@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -134,7 +134,7 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>>
 
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<>(FactoryIntensityPointAlg.shiTomasi(radius, false, derivType));
 //		GeneralFeatureIntensity<T, D> intensity =
-//				new WrapperFastCornerIntensity<T, D>(FactoryIntensityPointAlg.createFast12(imageType, 8 , 12));
+//				new WrapperFastCornerIntensity<T, D>(FactoryIntensityPointAlg.createFast12(defaultType, 8 , 12));
 
 		NonMaxSuppression extractor = new WrapperNonMaximumBlock(new NonMaxBlockStrict.Max());
 //		FeatureExtractor extractor = new WrapperNonMaximumBlock( new NonMaxExtractorNaive(radius+10,10f));
