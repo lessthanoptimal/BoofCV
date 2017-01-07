@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,12 @@
 package boofcv.alg.shapes;
 
 import boofcv.struct.PointIndex_I32;
+import georegression.geometry.UtilEllipse_F32;
 import georegression.geometry.UtilEllipse_F64;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.EllipseRotated_F32;
 import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.struct.trig.Circle2D_F64;
 import org.ddogleg.struct.GrowQueue_F64;
@@ -290,6 +293,10 @@ public class TestShapeFittingOps {
 		return ShapeFittingOps.convert_I32_F64(createRectangle_I32(width,height,numPoints));
 	}
 
+	public static List<Point2D_F32> createRectangle_F32(int width , int height , int numPoints ) {
+		return ShapeFittingOps.convert_I32_F32(createRectangle_I32(width,height,numPoints));
+	}
+
 	public static List<Point2D_F64> createEllipse_F64( EllipseRotated_F64 ellipse , int numPoints ) {
 
 		List<Point2D_F64> sequence = new ArrayList<>();
@@ -299,6 +306,21 @@ public class TestShapeFittingOps {
 			Point2D_F64 p = new Point2D_F64();
 
 			UtilEllipse_F64.computePoint(theta,ellipse,p);
+			sequence.add( p );
+		}
+
+		return sequence;
+	}
+
+	public static List<Point2D_F32> createEllipse_F32(EllipseRotated_F32 ellipse , int numPoints ) {
+
+		List<Point2D_F32> sequence = new ArrayList<>();
+
+		for (int i = 0; i < numPoints; i++) {
+			double theta = 2.0*Math.PI*i/numPoints;
+			Point2D_F32 p = new Point2D_F32();
+
+			UtilEllipse_F32.computePoint((float)theta,ellipse,p);
 			sequence.add( p );
 		}
 

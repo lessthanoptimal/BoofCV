@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,10 @@ import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import georegression.fitting.ellipse.ClosestPointEllipseAngle_F64;
-import georegression.fitting.ellipse.FitEllipseAlgebraic;
-import georegression.fitting.ellipse.RefineEllipseEuclideanLeastSquares;
+import georegression.fitting.ellipse.FitEllipseAlgebraic_F64;
+import georegression.fitting.ellipse.RefineEllipseEuclideanLeastSquares_F64;
 import georegression.geometry.UtilEllipse_F64;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.EllipseRotated_F64;
@@ -118,7 +119,7 @@ public class ShapeFittingOps {
 		}
 
 		// Compute the optimal algebraic error
-		FitEllipseAlgebraic algebraic = new FitEllipseAlgebraic();
+		FitEllipseAlgebraic_F64 algebraic = new FitEllipseAlgebraic_F64();
 
 		if( !algebraic.process(points)) {
 			// could be a line or some other weird case. Create a crude estimate instead
@@ -131,7 +132,7 @@ public class ShapeFittingOps {
 
 		// Improve the solution from algebraic into Euclidean
 		if( iterations > 0 ) {
-			RefineEllipseEuclideanLeastSquares leastSquares = new RefineEllipseEuclideanLeastSquares();
+			RefineEllipseEuclideanLeastSquares_F64 leastSquares = new RefineEllipseEuclideanLeastSquares_F64();
 			leastSquares.setMaxIterations(iterations);
 			leastSquares.refine(outputStorage.shape,points);
 			outputStorage.shape.set( leastSquares.getFound() );
@@ -184,6 +185,15 @@ public class ShapeFittingOps {
 		for( int i = 0; i < points.size(); i++ ) {
 			Point2D_I32 p = points.get(i);
 			pointsF.add( new Point2D_F64(p.x,p.y));
+		}
+		return pointsF;
+	}
+
+	public static List<Point2D_F32> convert_I32_F32(List<Point2D_I32> points) {
+		List<Point2D_F32> pointsF = new ArrayList<>();
+		for( int i = 0; i < points.size(); i++ ) {
+			Point2D_I32 p = points.get(i);
+			pointsF.add( new Point2D_F32(p.x,p.y));
 		}
 		return pointsF;
 	}

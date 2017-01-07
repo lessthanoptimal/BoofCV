@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,7 @@ public class TestBinaryEllipseDetector {
 		expected.add( new EllipseRotated_F64(50,65,20,10,0.5));
 		expected.add( new EllipseRotated_F64(90,100,25,25,0));
 
-		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,210, expected, 0);
+		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses_F64(200,210, expected, 0);
 		GrayU8 binary = image.createSameShape();
 		ThresholdImageOps.threshold(image,binary,30,true);
 
@@ -60,7 +60,7 @@ public class TestBinaryEllipseDetector {
 
 		List<EllipseRotated_F64> found = alg.getFoundEllipses().toList();
 
-		TestBinaryEllipseDetectorPixel.checkEquals(expected,found, 1.0, 0.1);
+		TestBinaryEllipseDetectorPixel.checkEquals_F64(expected,found, 1.0, 0.1);
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class TestBinaryEllipseDetector {
 
 		expected.add( new EllipseRotated_F64(50,65,20,10,0.5));
 
-		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,210, expected, 0);
+		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses_F64(200,210, expected, 0);
 		GrayU8 binary = image.createSameShape();
 		ThresholdImageOps.threshold(image,binary,30,true);
 
@@ -81,10 +81,10 @@ public class TestBinaryEllipseDetector {
 		// pass once with it being a clear edge
 		alg.process(image, binary);
 		List<EllipseRotated_F64> found = alg.getFoundEllipses().toList();
-		TestBinaryEllipseDetectorPixel.checkEquals(expected,found, 1.0, 0.1);
+		TestBinaryEllipseDetectorPixel.checkEquals_F64(expected,found, 1.0, 0.1);
 
 		// now make the ellipse more dim so it shouldn't pass
-		image = TestBinaryEllipseDetectorPixel.renderEllipses(200,210, expected, 255-THRESHOLD+5);
+		image = TestBinaryEllipseDetectorPixel.renderEllipses_F64(200,210, expected, 255-THRESHOLD+5);
 		alg.process(image, binary);
 		assertEquals(0,alg.getFoundEllipses().size());
 	}
@@ -100,7 +100,7 @@ public class TestBinaryEllipseDetector {
 		original.add( new EllipseRotated_F64(90,100,25,25,0));
 
 
-		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,210, original, 0);
+		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses_F64(200,210, original, 0);
 		GrayU8 binary = image.createSameShape();
 		ThresholdImageOps.threshold(image,binary,30,true);
 
@@ -120,7 +120,7 @@ public class TestBinaryEllipseDetector {
 		}
 
 		List<EllipseRotated_F64> found = alg.getFoundEllipses().toList();
-		TestBinaryEllipseDetectorPixel.checkEquals(expected,found, 1.0, 0.1);
+		TestBinaryEllipseDetectorPixel.checkEquals_F64(expected,found, 1.0, 0.1);
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class TestBinaryEllipseDetector {
 		expected.add( new EllipseRotated_F64(50,65,20,10,0.5));
 		expected.add( new EllipseRotated_F64(90,100,25,25,0));
 
-		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,210, expected, 0);
+		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses_F64(200,210, expected, 0);
 		GrayU8 binary = image.createSameShape();
 		ThresholdImageOps.threshold(image,binary,30,true);
 
@@ -156,7 +156,7 @@ public class TestBinaryEllipseDetector {
 			refined.add( r );
 		}
 
-		TestBinaryEllipseDetectorPixel.checkEquals(refined,found, 1.0, 0.1);
+		TestBinaryEllipseDetectorPixel.checkEquals_F64(refined,found, 1.0, 0.1);
 	}
 
 

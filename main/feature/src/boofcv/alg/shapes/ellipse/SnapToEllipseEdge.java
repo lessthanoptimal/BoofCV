@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.shapes.ellipse;
 
 import boofcv.alg.shapes.edge.BaseIntegralEdge;
 import boofcv.struct.image.ImageGray;
-import georegression.fitting.ellipse.FitEllipseWeightedAlgebraic;
+import georegression.fitting.ellipse.FitEllipseWeightedAlgebraic_F64;
 import georegression.geometry.UtilEllipse_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
@@ -53,7 +53,7 @@ public class SnapToEllipseEdge<T extends ImageGray<T>> extends BaseIntegralEdge<
 	// storage for where the points that are sampled along the line
 	protected FastQueue<Point2D_F64> samplePts = new FastQueue<>(Point2D_F64.class, true);
 
-	protected FitEllipseWeightedAlgebraic fitter = new FitEllipseWeightedAlgebraic();
+	protected FitEllipseWeightedAlgebraic_F64 fitter = new FitEllipseWeightedAlgebraic_F64();
 
 	protected EllipseRotated_F64 previous = new EllipseRotated_F64();
 

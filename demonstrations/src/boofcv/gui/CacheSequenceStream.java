@@ -27,7 +27,7 @@ import java.awt.image.BufferedImage;
 
 /**
  * Circular cache for output from {@link SimpleImageSequence}.  Stores both the boofcv image and the associated
- * BufferedImage.
+ * BufferedImage.  NOT thread safe and each call must be invoked from the same thread.
  *
  * @author Peter Abeles
  */

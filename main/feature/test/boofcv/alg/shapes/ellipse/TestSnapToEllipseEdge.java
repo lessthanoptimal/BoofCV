@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class TestSnapToEllipseEdge {
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 		ellipses.add( target);
 
-		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,300,ellipses, 0);
+		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses_F64(200,300,ellipses, 0);
 
 		SnapToEllipseEdge<GrayU8> alg = new SnapToEllipseEdge<>(30,1,GrayU8.class);
 
@@ -69,7 +69,7 @@ public class TestSnapToEllipseEdge {
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 		ellipses.add( target);
 
-		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,300,ellipses, 0);
+		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses_F64(200,300,ellipses, 0);
 
 		SnapToEllipseEdge<GrayU8> alg = new SnapToEllipseEdge<>(30,1,GrayU8.class);
 
@@ -97,7 +97,7 @@ public class TestSnapToEllipseEdge {
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 		ellipses.add( target);
 
-		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,300,ellipses, 0);
+		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses_F64(200,300,ellipses, 0);
 
 		SnapToEllipseEdge<GrayU8> alg = new SnapToEllipseEdge<>(30,1,GrayU8.class);
 
@@ -138,7 +138,7 @@ public class TestSnapToEllipseEdge {
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 		ellipses.add( target);
 
-		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,300,ellipses, 0);
+		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses_F64(200,300,ellipses, 0);
 		// add a little bit of noise to prevent perfect zeros from appearing in weights
 		PixelMath.plus(image,10,0,255,image);
 		PixelMath.multiply(image,0.95,0,255,image);

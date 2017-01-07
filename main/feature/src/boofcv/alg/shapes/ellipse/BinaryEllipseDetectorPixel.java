@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import georegression.fitting.ellipse.ClosestPointEllipseAngle_F64;
-import georegression.fitting.ellipse.FitEllipseAlgebraic;
+import georegression.fitting.ellipse.FitEllipseAlgebraic_F64;
 import georegression.geometry.UtilEllipse_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -41,7 +41,7 @@ import java.util.List;
  * and improve the fit's accuracy.  Optionally, lens distortion can be removed from the contour points prior
  * to processing.</p>
  *
- * After the contour has been found an ellipse is fit to them using the {@link FitEllipseAlgebraic algebraic}
+ * After the contour has been found an ellipse is fit to them using the {@link FitEllipseAlgebraic_F64 algebraic}
  * formulation.  Points which are not approximately ellipsoidal are removed.
  * Approximately ellipsoidal is defined by the distance of the farthest contour point away from the ellipse. For
  * computational efficiency reasons a maximum of 20 points are sampled.  If there are more than 20 points in
@@ -79,9 +79,9 @@ public class BinaryEllipseDetectorPixel {
 	private LinearContourLabelChang2004 contourFinder = new LinearContourLabelChang2004(ConnectRule.FOUR);
 	private GrayS32 labeled = new GrayS32(1,1);
 
-	private FitEllipseAlgebraic algebraic = new FitEllipseAlgebraic();
+	private FitEllipseAlgebraic_F64 algebraic = new FitEllipseAlgebraic_F64();
 
-	private ClosestPointEllipseAngle_F64 closestPoint = new ClosestPointEllipseAngle_F64(1e-8,100);
+	private ClosestPointEllipseAngle_F64 closestPoint = new ClosestPointEllipseAngle_F64(1e-4f,15);
 
 	// transforms which can be used to handle lens distortion
 	protected PixelTransform2_F32 distToUndist;

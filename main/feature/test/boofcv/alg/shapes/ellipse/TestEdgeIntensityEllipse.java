@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public class TestEdgeIntensityEllipse {
 		List<EllipseRotated_F64> list = new ArrayList<>();
 		list.add( ellipse );
 
-		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,210, list, 0);
+		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses_F64(200,210, list, 0);
 
 		EdgeIntensityEllipse<GrayU8> alg = new EdgeIntensityEllipse<>(1.5,20,10.0,GrayU8.class);
 		alg.setImage(image);
@@ -77,7 +77,7 @@ public class TestEdgeIntensityEllipse {
 		List<EllipseRotated_F64> list = new ArrayList<>();
 		list.add( ellipse );
 
-		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,210, list, 0);
+		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses_F64(200,210, list, 0);
 
 		EdgeIntensityEllipse<GrayU8> alg = new EdgeIntensityEllipse<>(1.5,20,10.0,GrayU8.class);
 		alg.setImage(image);
@@ -87,7 +87,7 @@ public class TestEdgeIntensityEllipse {
 
 		// Move it outside the image and render again
 		ellipse.center.x = 5;
-		image = TestBinaryEllipseDetectorPixel.renderEllipses(200,210, list, 0);
+		image = TestBinaryEllipseDetectorPixel.renderEllipses_F64(200,210, list, 0);
 		alg.setImage(image);
 		assertTrue(alg.process(ellipse));
 
