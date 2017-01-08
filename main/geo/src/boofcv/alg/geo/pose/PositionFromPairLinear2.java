@@ -23,7 +23,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.LinearSolverFactory_D64;
+import org.ejml.factory.LinearSolverFactory_R64;
 import org.ejml.interfaces.linsol.LinearSolver;
 
 import java.util.List;
@@ -55,7 +55,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PositionFromPairLinear2 {
-	LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_D64.leastSquares(300, 3);
+	LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_R64.leastSquares(300, 3);
 	
 	// storage for system of equations
 	RowMatrix_F64 A = new RowMatrix_F64(3,3);

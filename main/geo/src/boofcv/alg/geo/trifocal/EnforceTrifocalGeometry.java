@@ -20,12 +20,12 @@ package boofcv.alg.geo.trifocal;
 
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.alg.dense.decomposition.svd.SafeSvd_D64;
+import org.ejml.alg.dense.decomposition.svd.SafeSvd_R64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.factory.DecompositionFactory_R64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.SingularOps_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.SingularOps_R64;
 
 /**
  * <p>
@@ -68,9 +68,9 @@ public class EnforceTrifocalGeometry {
 	protected RowMatrix_F64 E = new RowMatrix_F64(27,18);
 
 	public EnforceTrifocalGeometry() {
-		svdU = DecompositionFactory_D64.svd(10,10,true,false,true);
-		svdV = DecompositionFactory_D64.svd(10,10,false,true,false);
-		svdV = new SafeSvd_D64(svdV); // can't modify the input in this case
+		svdU = DecompositionFactory_R64.svd(10,10,true,false,true);
+		svdV = DecompositionFactory_R64.svd(10,10,false,true,false);
+		svdV = new SafeSvd_R64(svdV); // can't modify the input in this case
 	}
 
 	/**
@@ -93,27 +93,27 @@ public class EnforceTrifocalGeometry {
 
 		// Copy the parts of U which correspond to the non singular parts if the SVD
 		// since there are only really 18-nullity unknowns due to linear dependencies
-		SingularOps_D64.descendingOrder(U,false,svdU.getSingularValues(),svdU.numberOfSingularValues(),null,false);
-		int rank = SingularOps_D64.rank(svdU, 1e-13);
+		SingularOps_R64.descendingOrder(U,false,svdU.getSingularValues(),svdU.numberOfSingularValues(),null,false);
+		int rank = SingularOps_R64.rank(svdU, 1e-13);
 		Up.reshape(U.numRows,rank);
-		CommonOps_D64.extract(U,0,U.numRows,0,Up.numCols,Up,0,0);
+		CommonOps_R64.extract(U,0,U.numRows,0,Up.numCols,Up,0,0);
 
 		// project the linear constraint matrix into this subspace
 		AU.reshape(A.numRows,Up.numCols);
-		CommonOps_D64.mult(A,Up,AU);
+		CommonOps_R64.mult(A,Up,AU);
 
 		// Extract the solution of ||A*U*x|| = 0 from the null space
 		svdV.decompose(AU);
 
 		xp.reshape(rank,1);
-		SingularOps_D64.nullVector(svdV,true,xp);
+		SingularOps_R64.nullVector(svdV,true,xp);
 
 		// Translate the solution from the subspace and into a valid trifocal tensor
-		CommonOps_D64.mult(Up,xp,vectorT);
+		CommonOps_R64.mult(Up,xp,vectorT);
 
 		// the sign of vectorT is arbitrary, but make it positive for consistency
 		if( vectorT.data[0] > 0 )
-			CommonOps_D64.changeSign(vectorT);
+			CommonOps_R64.changeSign(vectorT);
 	}
 
 	/**
@@ -122,7 +122,7 @@ public class EnforceTrifocalGeometry {
 	 */
 	public void computeErrorVector( RowMatrix_F64 A , RowMatrix_F64 errors ) {
 		errors.reshape(A.numRows,1);
-		CommonOps_D64.mult(A,vectorT,errors);
+		CommonOps_R64.mult(A,vectorT,errors);
 	}
 
 	/**

@@ -21,7 +21,7 @@ package boofcv.alg.geo.h;
 import boofcv.alg.geo.ModelObservationResidualN;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.MatrixFeatures_D64;
+import org.ejml.ops.MatrixFeatures_R64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -63,7 +63,7 @@ public class TestHomographyResidualSampson extends HomographyResidualTests {
 
 		alg.computeJacobian(x1,x2);
 		
-		assertTrue(MatrixFeatures_D64.isEquals(J, alg.J, 1e-8));
+		assertTrue(MatrixFeatures_R64.isEquals(J, alg.J, 1e-8));
 
 	}
 }

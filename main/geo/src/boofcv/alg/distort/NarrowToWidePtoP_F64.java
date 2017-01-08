@@ -24,7 +24,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.CommonOps_R64;
 
 /**
  * Projects a synthetic view of a narrow FOV camera from a wide FOV camera.  The synthetic camera
@@ -35,7 +35,7 @@ import org.ejml.ops.CommonOps_D64;
 public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 
 	// rotation matrix
-	RowMatrix_F64 rotateWideToNarrow = CommonOps_D64.identity(3,3);
+	RowMatrix_F64 rotateWideToNarrow = CommonOps_R64.identity(3,3);
 	Point2Transform2_F64 narrowToNorm;
 	Point3Transform2_F64 unitToWide;
 

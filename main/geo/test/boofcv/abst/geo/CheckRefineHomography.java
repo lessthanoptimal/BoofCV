@@ -23,8 +23,8 @@ import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.MatrixFeatures_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.MatrixFeatures_R64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -53,10 +53,10 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		assertTrue(alg.fitModel(pairs, H, found));
 
 		// normalize so that they are the same
-		CommonOps_D64.divide(H,H.get(2, 2));
-		CommonOps_D64.divide(found,found.get(2, 2));
+		CommonOps_R64.divide(H,H.get(2, 2));
+		CommonOps_R64.divide(found,found.get(2, 2));
 
-		assertTrue(MatrixFeatures_D64.isEquals(H, found, 1e-8));
+		assertTrue(MatrixFeatures_R64.isEquals(H, found, 1e-8));
 	}
 
 	@Test
@@ -76,9 +76,9 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		assertTrue(alg.fitModel(pairs, Hmod, found));
 
 		// normalize to allow comparison
-		CommonOps_D64.divide(H,H.get(2,2));
-		CommonOps_D64.divide(Hmod,Hmod.get(2,2));
-		CommonOps_D64.divide(found,found.get(2,2));
+		CommonOps_R64.divide(H,H.get(2,2));
+		CommonOps_R64.divide(Hmod,Hmod.get(2,2));
+		CommonOps_R64.divide(found,found.get(2,2));
 
 		double error0 = 0;
 		double error1 = 0;

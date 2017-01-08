@@ -23,12 +23,12 @@ import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.alg.dense.decomposition.svd.SafeSvd_D64;
+import org.ejml.alg.dense.decomposition.svd.SafeSvd_R64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.factory.DecompositionFactory_R64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.SingularOps_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.SingularOps_R64;
 
 import java.util.List;
 
@@ -83,8 +83,8 @@ public class TrifocalLinearPoint7 {
 	protected Point3D_F64 e3 = new Point3D_F64();
 
 	public TrifocalLinearPoint7() {
-		svdNull = DecompositionFactory_D64.svd(24, 27, false, true, false);
-		svdNull = new SafeSvd_D64(svdNull);
+		svdNull = DecompositionFactory_R64.svd(24, 27, false, true, false);
+		svdNull = new SafeSvd_R64(svdNull);
 	}
 
 	/**
@@ -219,7 +219,7 @@ public class TrifocalLinearPoint7 {
 		if( !svdNull.decompose(A) )
 			return false;
 
-		SingularOps_D64.nullVector(svdNull,true,vectorizedSolution);
+		SingularOps_R64.nullVector(svdNull,true,vectorizedSolution);
 
 		solutionN.convertFrom(vectorizedSolution);
 
@@ -233,8 +233,8 @@ public class TrifocalLinearPoint7 {
 		RowMatrix_F64 N2_inv = new RowMatrix_F64(3,3);
 		RowMatrix_F64 N3_inv = new RowMatrix_F64(3,3);
 
-		CommonOps_D64.invert(N2,N2_inv);
-		CommonOps_D64.invert(N3,N3_inv);
+		CommonOps_R64.invert(N2,N2_inv);
+		CommonOps_R64.invert(N3,N3_inv);
 
 		for( int i = 0; i < 3; i++ ) {
 			RowMatrix_F64 T = solution.getT(i);

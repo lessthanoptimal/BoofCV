@@ -27,11 +27,11 @@ import org.ddogleg.solver.impl.WrapRealRootsSturm;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.Complex_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_D64;
-import org.ejml.factory.LinearSolverFactory_D64;
+import org.ejml.factory.DecompositionFactory_R64;
+import org.ejml.factory.LinearSolverFactory_R64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
 import org.ejml.interfaces.linsol.LinearSolver;
-import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.CommonOps_R64;
 
 import java.util.List;
 
@@ -66,7 +66,7 @@ public class EssentialNister5 {
 	// contains the span of A
 	private RowMatrix_F64 V = new RowMatrix_F64(9,9);
 	// TODO Try using QR-Factorization as in the paper
-	private SingularValueDecomposition<RowMatrix_F64> svd = DecompositionFactory_D64.svd(5,9,false,true,false);
+	private SingularValueDecomposition<RowMatrix_F64> svd = DecompositionFactory_R64.svd(5,9,false,true,false);
 
 	// where all the ugly equations go
 	private HelperNister5 helper = new HelperNister5();
@@ -81,7 +81,7 @@ public class EssentialNister5 {
 	private double x,y,z;
 
 	// Solver for the linear system below
-	LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_D64.linear(10);
+	LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_R64.linear(10);
 
 	// Storage for linear systems
 	private RowMatrix_F64 A1 = new RowMatrix_F64(10,10);
@@ -207,11 +207,11 @@ public class EssentialNister5 {
 		A.data[5] = ((helper.M04*z + helper.M05)*z + helper.M06)*z + helper.M07;
 		Y.data[2] = (((helper.M08*z + helper.M09)*z + helper.M10)*z + helper.M11)*z + helper.M12;
 
-		CommonOps_D64.scale(-1,Y);
+		CommonOps_R64.scale(-1,Y);
 
 		RowMatrix_F64 x = new RowMatrix_F64(2,1);
 
-		CommonOps_D64.solve(A,Y,x);
+		CommonOps_R64.solve(A,Y,x);
 
 		this.x = x.get(0,0);
 		this.y = x.get(1,0);

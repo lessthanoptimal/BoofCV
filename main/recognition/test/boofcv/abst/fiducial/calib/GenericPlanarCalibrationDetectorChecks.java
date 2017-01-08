@@ -39,7 +39,7 @@ import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.RowMatrix_F32;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.CommonOps_R64;
 import org.ejml.ops.ConvertMatrixData;
 import org.junit.Before;
 import org.junit.Test;
@@ -273,7 +273,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		RowMatrix_F32 H32 = new RowMatrix_F32(3,3);
 		ConvertMatrixData.convert(H,H32);
 		d2o = new PointTransformHomography_F32(H32);
-		CommonOps_D64.invert(H);
+		CommonOps_R64.invert(H);
 		o2d = new PointTransformHomography_F64(H);
 	}
 

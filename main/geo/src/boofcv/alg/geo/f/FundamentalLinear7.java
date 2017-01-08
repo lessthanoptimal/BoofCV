@@ -27,7 +27,7 @@ import org.ddogleg.solver.RootFinderType;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.Complex_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.SpecializedOps_D64;
+import org.ejml.ops.SpecializedOps_R64;
 
 import java.util.Arrays;
 import java.util.List;
@@ -124,8 +124,8 @@ public class FundamentalLinear7 extends FundamentalLinear {
 		// extract the two singular vectors
 		// no need to sort by singular values because the two automatic null spaces are being sampled
 		svdNull.getV(V,false);
-		SpecializedOps_D64.subvector(V, 0, 7, 9, false, 0, F1);
-		SpecializedOps_D64.subvector(V, 0, 8, 9, false, 0, F2);
+		SpecializedOps_R64.subvector(V, 0, 7, 9, false, 0, F1);
+		SpecializedOps_R64.subvector(V, 0, 8, 9, false, 0, F2);
 
 		return true;
 	}

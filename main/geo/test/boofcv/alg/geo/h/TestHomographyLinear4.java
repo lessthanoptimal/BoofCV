@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo.h;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.ops.NormOps_D64;
+import org.ejml.ops.NormOps_R64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -63,7 +63,7 @@ public class TestHomographyLinear4 extends CommonHomographyChecks{
 		// validate by testing essential properties
 
 		// sanity check, F is not zero
-		assertTrue(NormOps_D64.normF(solution) > 0.001 );
+		assertTrue(NormOps_R64.normF(solution) > 0.001 );
 
 		// see if it follows the epipolar constraint
 		for( AssociatedPair p : pairs ) {

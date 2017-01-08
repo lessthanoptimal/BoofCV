@@ -23,7 +23,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.MatrixFeatures_D64;
+import org.ejml.ops.MatrixFeatures_R64;
 import org.junit.Test;
 
 import java.util.List;
@@ -93,7 +93,7 @@ public class TestDecomposeHomography {
 			Se3_F64 foundSE = solutionsSE.get(i);
 			Vector3D_F64 foundN = solutionsN.get(i);
 
-			if(!MatrixFeatures_D64.isIdentical(foundSE.getR(), R, 1e-4)) break;
+			if(!MatrixFeatures_R64.isIdentical(foundSE.getR(), R, 1e-4)) break;
 
 			if( Math.abs(T.x/d - foundSE.getT().x) > 1e-8 ) break;
 			if( Math.abs(T.y/d - foundSE.getT().y) > 1e-8 ) break;

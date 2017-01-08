@@ -20,7 +20,7 @@ package boofcv.alg.sfm.d3.direct;
 
 import georegression.struct.point.Point2D_F32;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.alg.fixed.FixedOps2_D32;
+import org.ejml.alg.fixed.FixedOps2_R32;
 import org.ejml.data.FixedMatrix2x2_F32;
 
 /**
@@ -100,7 +100,7 @@ public class FeatureSpatialDiversity_F32 {
 			var.a22 += dy*dy;
 		}
 
-		FixedOps2_D32.divide(var, norm.size-1);
+		FixedOps2_R32.divide(var, norm.size-1);
 
 //		System.out.printf("  covar  %5.2f %5.2f %5.4f\n",var.a11,var.a22, var.a12);
 	}

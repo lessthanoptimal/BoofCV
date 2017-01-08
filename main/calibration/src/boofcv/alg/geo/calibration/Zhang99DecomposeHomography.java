@@ -23,9 +23,9 @@ import georegression.geometry.UtilVector3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.NormOps_D64;
-import org.ejml.ops.SpecializedOps_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.NormOps_R64;
+import org.ejml.ops.SpecializedOps_R64;
 
 /**
  * <p>
@@ -75,7 +75,7 @@ public class Zhang99DecomposeHomography {
 	 */
 	public void setCalibrationMatrix( RowMatrix_F64 K ) {
 		this.K = K;
-		CommonOps_D64.invert(K,K_inv);
+		CommonOps_R64.invert(K,K_inv);
 	}
 
 	/**
@@ -88,20 +88,20 @@ public class Zhang99DecomposeHomography {
 	public Se3_F64 decompose( RowMatrix_F64 H )
 	{
 		// step through each calibration grid and compute its parameters
-		RowMatrix_F64 h[] = SpecializedOps_D64.splitIntoVectors(H, true);
+		RowMatrix_F64 h[] = SpecializedOps_R64.splitIntoVectors(H, true);
 
 		// lambda = 1/norm(inv(K)*h1) or 1/norm(inv(K)*h2)
 		// use the average to attempt to reduce error
-		CommonOps_D64.mult(K_inv,h[0],temp);
-		double lambda = NormOps_D64.normF(temp);
-		CommonOps_D64.mult(K_inv,h[1],temp);
-		lambda += NormOps_D64.normF(temp);
+		CommonOps_R64.mult(K_inv,h[0],temp);
+		double lambda = NormOps_R64.normF(temp);
+		CommonOps_R64.mult(K_inv,h[1],temp);
+		lambda += NormOps_R64.normF(temp);
 		lambda = 2.0/lambda;
 
 		// compute the column in the rotation matrix
-		CommonOps_D64.mult(lambda,K_inv,h[0],r1);
-		CommonOps_D64.mult(lambda,K_inv,h[1],r2);
-		CommonOps_D64.mult(lambda,K_inv,h[2],t);
+		CommonOps_R64.mult(lambda,K_inv,h[0],r1);
+		CommonOps_R64.mult(lambda,K_inv,h[1],r2);
+		CommonOps_R64.mult(lambda,K_inv,h[2],t);
 
 		Vector3D_F64 v1 = UtilVector3D_F64.convert(r1);
 		Vector3D_F64 v2 = UtilVector3D_F64.convert(r2);

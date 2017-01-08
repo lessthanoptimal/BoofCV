@@ -24,9 +24,9 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.factory.DecompositionFactory_R64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.CommonOps_R64;
 
 /**
  * Encoding an decoding a rotation and translation where the rotation is encoded as a 3-vector
@@ -37,7 +37,7 @@ import org.ejml.ops.CommonOps_D64;
 public class PnPRodriguesCodec implements ModelCodec<Se3_F64> {
 
 	// used to make sure the rotation matrix is in SO(3)
-	SingularValueDecomposition<RowMatrix_F64> svd = DecompositionFactory_D64.svd(3, 3, true, true, false);
+	SingularValueDecomposition<RowMatrix_F64> svd = DecompositionFactory_R64.svd(3, 3, true, true, false);
 
 	// storage for rotation matrix
 	RowMatrix_F64 R = new RowMatrix_F64(3,3);
@@ -67,7 +67,7 @@ public class PnPRodriguesCodec implements ModelCodec<Se3_F64> {
 		RowMatrix_F64 U = svd.getU(null,false);
 		RowMatrix_F64 V = svd.getV(null,false);
 
-		CommonOps_D64.multTransB(U, V, R);
+		CommonOps_R64.multTransB(U, V, R);
 
 		// extract Rodrigues coordinates
 		ConvertRotation3D_F64.matrixToRodrigues(R,rotation);

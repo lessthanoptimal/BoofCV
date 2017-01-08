@@ -21,8 +21,8 @@ package boofcv.alg.geo.trifocal;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.struct.geo.AssociatedTriple;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.NormOps_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.NormOps_R64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -42,9 +42,9 @@ public class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 		TrifocalLinearPoint7 alg = new TrifocalLinearPoint7();
 
 		// construct in pixel coordinates for ease
-		alg.N1 = CommonOps_D64.identity(3);
-		alg.N2 = CommonOps_D64.identity(3);
-		alg.N3 = CommonOps_D64.identity(3);
+		alg.N1 = CommonOps_R64.identity(3);
+		alg.N2 = CommonOps_R64.identity(3);
+		alg.N3 = CommonOps_R64.identity(3);
 
 		alg.createLinearSystem(observationsSpecial);  // TOOO change back
 
@@ -59,7 +59,7 @@ public class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 
 		RowMatrix_F64 Y = new RowMatrix_F64(A.numRows,1);
 
-		CommonOps_D64.mult(A,X,Y);
+		CommonOps_R64.mult(A,X,Y);
 
 		for( int i = 0; i < Y.numRows; i++ ) {
 			assertEquals(0,Y.get(i),1e-7);
@@ -76,7 +76,7 @@ public class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 		for( AssociatedTriple a : observations ) {
 			RowMatrix_F64 A = MultiViewOps.constraint(found,a.p1,a.p2,a.p3,null);
 
-			assertEquals(0,NormOps_D64.normF(A),1e-7);
+			assertEquals(0,NormOps_R64.normF(A),1e-7);
 		}
 	}
 }

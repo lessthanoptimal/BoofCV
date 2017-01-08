@@ -22,8 +22,8 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.MatrixFeatures_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.MatrixFeatures_R64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -48,7 +48,7 @@ public class TestPnPStereoRefineRodrigues extends CommonStereoMotionNPoint {
 		assertTrue(alg.fitModel(pointPose, worldToLeft.copy(), found));
 		assertTrue(alg.minimizer.getFunctionValue() < 1e-10);
 
-		assertTrue(MatrixFeatures_D64.isIdentical(worldToLeft.getR(), found.getR(), 1e-8));
+		assertTrue(MatrixFeatures_R64.isIdentical(worldToLeft.getR(), found.getR(), 1e-8));
 		assertTrue(found.getT().isIdentical(worldToLeft.getT(), 1e-8));
 	}
 
@@ -66,7 +66,7 @@ public class TestPnPStereoRefineRodrigues extends CommonStereoMotionNPoint {
 		Se3_F64 input = worldToLeft.copy();
 		// noise up the initial guess
 		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, -0.04, -0.2, null);
-		CommonOps_D64.mult(R,input.getR().copy(),input.getR());
+		CommonOps_R64.mult(R,input.getR().copy(),input.getR());
 		input.T.x += 0.2;
 		input.T.x -= 0.05;
 		input.T.z += 0.03;
@@ -75,7 +75,7 @@ public class TestPnPStereoRefineRodrigues extends CommonStereoMotionNPoint {
 		assertTrue(alg.fitModel(pointPose, input, found));
 		assertTrue(alg.minimizer.getFunctionValue()<1e-12);
 
-		assertTrue(MatrixFeatures_D64.isIdentical(worldToLeft.getR(), found.getR(), 1e-8));
+		assertTrue(MatrixFeatures_R64.isIdentical(worldToLeft.getR(), found.getR(), 1e-8));
 		assertTrue(found.getT().isIdentical(worldToLeft.getT(), 1e-8));
 	}
 }

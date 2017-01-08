@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.ops.MatrixFeatures_D64;
+import org.ejml.ops.MatrixFeatures_R64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -73,7 +73,7 @@ public class TestQuadPoseEstimator {
 		Se3_F64 found = alg.getWorldToCamera();
 
 		assertTrue(found.T.distance(expectedW2C.T)<1e-6);
-		assertTrue(MatrixFeatures_D64.isIdentical(found.R, expectedW2C.R,1e-6));
+		assertTrue(MatrixFeatures_R64.isIdentical(found.R, expectedW2C.R,1e-6));
 	}
 
 	private void project( Se3_F64 worldToCamera, Point2D_F64 p , Point2D_F64 v ) {
@@ -117,7 +117,7 @@ public class TestQuadPoseEstimator {
 			assertEquals(0,alg.bestError,1e-6);
 
 			assertTrue(alg.bestPose.T.distance(fiducialToCamera.T)<1e-6);
-			assertTrue(MatrixFeatures_D64.isIdentical(alg.bestPose.R, fiducialToCamera.R,1e-6));
+			assertTrue(MatrixFeatures_R64.isIdentical(alg.bestPose.R, fiducialToCamera.R,1e-6));
 		}
 	}
 

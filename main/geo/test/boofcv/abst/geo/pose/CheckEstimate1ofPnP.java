@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.geo.pose;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.struct.geo.Point2D3D;
 import georegression.struct.se.Se3_F64;
-import org.ejml.ops.MatrixFeatures_D64;
+import org.ejml.ops.MatrixFeatures_R64;
 import org.junit.Test;
 
 import java.util.List;
@@ -74,7 +74,7 @@ public abstract class CheckEstimate1ofPnP extends BaseChecksPnP {
 		assertTrue(alg.process(inputs,found));
 
 
-		assertTrue(MatrixFeatures_D64.isIdentical(worldToCamera.getR(), found.getR(), 1e-8));
+		assertTrue(MatrixFeatures_R64.isIdentical(worldToCamera.getR(), found.getR(), 1e-8));
 		assertTrue(found.getT().isIdentical(worldToCamera.getT(), 1e-8));
 	}
 

@@ -32,7 +32,7 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.CommonOps_R64;
 
 /**
  * Implementation of {@link PerspectiveOps} functions for 64-bit floats
@@ -51,7 +51,7 @@ public class ImplPerspectiveOps_F64 {
 
 		RowMatrix_F64 K = ImplPerspectiveOps_F64.calibrationMatrix(parameters, null);
 		RowMatrix_F64 K_adj = new RowMatrix_F64(3,3);
-		CommonOps_D64.mult(adjustMatrix, K, K_adj);
+		CommonOps_R64.mult(adjustMatrix, K, K_adj);
 
 		ImplPerspectiveOps_F64.matrixToParam(K_adj, parameters.width, parameters.height, adjustedParam);
 
@@ -68,7 +68,7 @@ public class ImplPerspectiveOps_F64 {
 		if( K == null ) {
 			K = new RowMatrix_F64(3,3);
 		}
-		CommonOps_D64.fill(K, 0);
+		CommonOps_R64.fill(K, 0);
 
 		K.data[0] = (double)param.fx;
 		K.data[1] = (double)param.skew;
@@ -183,7 +183,7 @@ public class ImplPerspectiveOps_F64 {
 		if( ret == null )
 			ret = new RowMatrix_F64(3,4);
 
-		CommonOps_D64.insert(R,ret,0,0);
+		CommonOps_R64.insert(R,ret,0,0);
 
 		ret.data[3] = T.x;
 		ret.data[7] = T.y;
@@ -193,7 +193,7 @@ public class ImplPerspectiveOps_F64 {
 			return ret;
 
 		RowMatrix_F64 temp = new RowMatrix_F64(3,4);
-		CommonOps_D64.mult(K,ret,temp);
+		CommonOps_R64.mult(K,ret,temp);
 
 		ret.set(temp);
 

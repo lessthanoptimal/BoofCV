@@ -43,7 +43,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Vector3D_F32;
 import org.ejml.data.RowMatrix_F32;
-import org.ejml.ops.CommonOps_D32;
+import org.ejml.ops.CommonOps_R32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -128,7 +128,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 				synchronized (imageLock) {
 					RowMatrix_F32 R = ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,null);
 					RowMatrix_F32 tmp = distorter.getRotation().copy();
-					CommonOps_D32.mult(tmp,R,distorter.getRotation());
+					CommonOps_R32.mult(tmp,R,distorter.getRotation());
 					distortImage.setModel(distorter); // dirty the transform
 					if (inputMethod == InputMethod.IMAGE) {
 						rerenderPinhole();
@@ -160,7 +160,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 					// roll rotation is to make the view appear "up"
 					RowMatrix_F32 A = ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX, GrlConstants.F_PI/2,0,GrlConstants.F_PI/2,null);
 					RowMatrix_F32 tmp = distorter.getRotation().copy();
-					CommonOps_D32.mult(tmp,A,distorter.getRotation());
+					CommonOps_R32.mult(tmp,A,distorter.getRotation());
 
 					distortImage.setModel(distorter); // let it know the transform has changed
 

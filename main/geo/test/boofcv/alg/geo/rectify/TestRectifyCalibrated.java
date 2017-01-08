@@ -26,7 +26,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.CommonOps_R64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -62,12 +62,12 @@ public class TestRectifyCalibrated {
 
 		// apply rectification transform
 		RowMatrix_F64 temp = new RowMatrix_F64(3,4);
-		CommonOps_D64.mult(alg.getRect1(),foundP1,temp);
+		CommonOps_R64.mult(alg.getRect1(),foundP1,temp);
 		foundP1.set(temp);
-		CommonOps_D64.mult(alg.getRect2(),foundP2,temp);
+		CommonOps_R64.mult(alg.getRect2(),foundP2,temp);
 		foundP2.set(temp);
 
-		CommonOps_D64.scale(0.1/Math.abs(foundP1.get(2,3)),foundP1);
+		CommonOps_R64.scale(0.1/Math.abs(foundP1.get(2,3)),foundP1);
 
 		Point3D_F64 X = new Point3D_F64(0,0,3);
 

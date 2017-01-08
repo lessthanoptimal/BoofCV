@@ -32,7 +32,7 @@ import georegression.struct.point.Vector3D_F32;
 import georegression.struct.se.Se3_F32;
 import georegression.transform.se.SePointOps_F32;
 import org.ejml.data.RowMatrix_F32;
-import org.ejml.ops.CommonOps_D32;
+import org.ejml.ops.CommonOps_R32;
 
 /**
  * Implementation of {@link PerspectiveOps} functions for 32-bit floats
@@ -51,7 +51,7 @@ public class ImplPerspectiveOps_F32 {
 
 		RowMatrix_F32 K = ImplPerspectiveOps_F32.calibrationMatrix(parameters, null);
 		RowMatrix_F32 K_adj = new RowMatrix_F32(3,3);
-		CommonOps_D32.mult(adjustMatrix, K, K_adj);
+		CommonOps_R32.mult(adjustMatrix, K, K_adj);
 
 		ImplPerspectiveOps_F32.matrixToParam(K_adj, parameters.width, parameters.height, adjustedParam);
 
@@ -68,7 +68,7 @@ public class ImplPerspectiveOps_F32 {
 		if( K == null ) {
 			K = new RowMatrix_F32(3,3);
 		}
-		CommonOps_D32.fill(K, 0);
+		CommonOps_R32.fill(K, 0);
 
 		K.data[0] = (float)param.fx;
 		K.data[1] = (float)param.skew;
@@ -183,7 +183,7 @@ public class ImplPerspectiveOps_F32 {
 		if( ret == null )
 			ret = new RowMatrix_F32(3,4);
 
-		CommonOps_D32.insert(R,ret,0,0);
+		CommonOps_R32.insert(R,ret,0,0);
 
 		ret.data[3] = T.x;
 		ret.data[7] = T.y;
@@ -193,7 +193,7 @@ public class ImplPerspectiveOps_F32 {
 			return ret;
 
 		RowMatrix_F32 temp = new RowMatrix_F32(3,4);
-		CommonOps_D32.mult(K,ret,temp);
+		CommonOps_R32.mult(K,ret,temp);
 
 		ret.set(temp);
 

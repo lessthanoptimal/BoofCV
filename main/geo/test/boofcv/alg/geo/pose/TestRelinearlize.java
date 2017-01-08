@@ -22,8 +22,8 @@ import boofcv.alg.geo.GeoTestingOps;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.MatrixFeatures_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.MatrixFeatures_R64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -76,13 +76,13 @@ public class TestRelinearlize {
 			}
 		}
 
-		CommonOps_D64.mult(L_full, x, foundDistance);
+		CommonOps_R64.mult(L_full, x, foundDistance);
 
-//		System.out.println("error = "+SpecializedOps_D64.diffNormF(foundDistance,y));
+//		System.out.println("error = "+SpecializedOps_R64.diffNormF(foundDistance,y));
 
 		// NOTE: This test can pass and the result still be bad because L_full is
 		// an undetermined system.  But at least there is some sort of test here
-		assertTrue(MatrixFeatures_D64.isEquals(foundDistance, y, 2));
+		assertTrue(MatrixFeatures_R64.isEquals(foundDistance, y, 2));
 
 		// WARNING!!! the error margin was made to be huge to make sure it passed
 	}

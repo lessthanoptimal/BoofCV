@@ -25,7 +25,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.CommonOps_R64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -89,7 +89,7 @@ public class TestDistanceEpipolarConstraint {
 		double orig = alg.computeDistance(new AssociatedPair(p1,p2));
 
 		// rescale the matrix and see if that changes the results
-		CommonOps_D64.scale(5,F);
+		CommonOps_R64.scale(5,F);
 		alg.setModel(F);
 
 		double after = alg.computeDistance(new AssociatedPair(p1,p2));

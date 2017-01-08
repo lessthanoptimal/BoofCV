@@ -22,7 +22,7 @@ import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.RandomMatrices_D64;
+import org.ejml.ops.RandomMatrices_R64;
 import org.junit.Test;
 
 import java.util.Random;
@@ -39,8 +39,8 @@ public class TestUtilLepetitEPnP {
 	@Test
 	public void jacobian4() {
 
-		RowMatrix_F64 L_full = RandomMatrices_D64.createRandom(6, 10, rand);
-		RowMatrix_F64 y = RandomMatrices_D64.createRandom(6,1,rand);
+		RowMatrix_F64 L_full = RandomMatrices_R64.createRandom(6, 10, rand);
+		RowMatrix_F64 y = RandomMatrices_R64.createRandom(6,1,rand);
 
 		JacobianEPnP jacobian = new JacobianEPnP();
 		ResidualsEPnP residuals = new ResidualsEPnP();
@@ -55,8 +55,8 @@ public class TestUtilLepetitEPnP {
 	@Test
 	public void jacobian3() {
 
-		RowMatrix_F64 L_full = RandomMatrices_D64.createRandom(3,6,rand);
-		RowMatrix_F64 y = RandomMatrices_D64.createRandom(3,1,rand);
+		RowMatrix_F64 L_full = RandomMatrices_R64.createRandom(3,6,rand);
+		RowMatrix_F64 y = RandomMatrices_R64.createRandom(3,1,rand);
 
 		JacobianEPnP jacobian = new JacobianEPnP();
 		ResidualsEPnP residuals = new ResidualsEPnP();

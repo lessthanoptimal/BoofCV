@@ -39,7 +39,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import org.ejml.data.RowMatrix_F32;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D32;
+import org.ejml.ops.CommonOps_R32;
 
 /**
  * <p>
@@ -385,7 +385,7 @@ public class RectifyImageOps {
 		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, borderType);
 
 		RowMatrix_F32 rectifyInv = new RowMatrix_F32(3,3);
-		CommonOps_D32.invert(rectify,rectifyInv);
+		CommonOps_R32.invert(rectify,rectifyInv);
 		PointTransformHomography_F32 rectifyTran = new PointTransformHomography_F32(rectifyInv);
 
 		// don't bother caching the results since it is likely to only be applied once and is cheap to compute

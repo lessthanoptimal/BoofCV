@@ -19,8 +19,8 @@
 package boofcv.struct.geo;
 
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.SpecializedOps_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.SpecializedOps_R64;
 
 /**
  * The trifocal tensor describes the projective relationship between three different camera views and is
@@ -114,15 +114,15 @@ public class TrifocalTensor {
 	public void normalizeScale() {
 		double sum = 0;
 
-		sum += SpecializedOps_D64.elementSumSq(T1);
-		sum += SpecializedOps_D64.elementSumSq(T2);
-		sum += SpecializedOps_D64.elementSumSq(T3);
+		sum += SpecializedOps_R64.elementSumSq(T1);
+		sum += SpecializedOps_R64.elementSumSq(T2);
+		sum += SpecializedOps_R64.elementSumSq(T3);
 
 		double n = Math.sqrt(sum);
 
-		CommonOps_D64.scale(1.0/n,T1);
-		CommonOps_D64.scale(1.0/n,T2);
-		CommonOps_D64.scale(1.0/n,T3);
+		CommonOps_R64.scale(1.0/n,T1);
+		CommonOps_R64.scale(1.0/n,T2);
+		CommonOps_R64.scale(1.0/n,T3);
 	}
 
 	@Override

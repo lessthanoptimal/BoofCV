@@ -26,7 +26,7 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Vector3D_F32;
 import org.ejml.data.RowMatrix_F32;
-import org.ejml.ops.CommonOps_D32;
+import org.ejml.ops.CommonOps_R32;
 
 /**
  * Base class for all distortions from an equirectangular image.  The output image precomputes pointing vectors from
@@ -42,7 +42,7 @@ public abstract class EquirectangularDistortBase_F32 extends PixelTransform2_F32
 	int outWidth;
 
 	// rotation matrix
-	RowMatrix_F32 R = CommonOps_D32.identity(3,3);
+	RowMatrix_F32 R = CommonOps_R32.identity(3,3);
 
 	// storage for intermediate variables
 	Vector3D_F32 n = new Vector3D_F32();

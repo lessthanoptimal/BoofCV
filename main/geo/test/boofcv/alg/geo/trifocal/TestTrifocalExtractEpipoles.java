@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo.trifocal;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.ops.MatrixFeatures_D64;
+import org.ejml.ops.MatrixFeatures_R64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -52,7 +52,7 @@ public class TestTrifocalExtractEpipoles extends CommonTrifocalChecks {
 
 			// make sure the input was not modified
 			for( int j = 0; j < 3; j++ )
-				assertTrue(MatrixFeatures_D64.isIdentical(tensor.getT(j), input.getT(j), 1e-8));
+				assertTrue(MatrixFeatures_R64.isIdentical(tensor.getT(j), input.getT(j), 1e-8));
 
 			Point3D_F64 space = new Point3D_F64();
 

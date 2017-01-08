@@ -24,8 +24,8 @@ import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.MatrixFeatures_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.MatrixFeatures_R64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -58,10 +58,10 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 		assertTrue(alg.fitModel(pairs, E, found));
 
 		// normalize so that they are the same
-		CommonOps_D64.divide(E,E.get(2, 2));
-		CommonOps_D64.divide(found,found.get(2,2));
+		CommonOps_R64.divide(E,E.get(2, 2));
+		CommonOps_R64.divide(found,found.get(2,2));
 
-		assertTrue(MatrixFeatures_D64.isEquals(E, found, 1e-8));
+		assertTrue(MatrixFeatures_R64.isEquals(E, found, 1e-8));
 	}
 
 	@Test
@@ -82,9 +82,9 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 		assertTrue(alg.fitModel(pairs, Emod, found));
 
 		// normalize to allow comparison
-		CommonOps_D64.divide(E,E.get(2,2));
-		CommonOps_D64.divide(Emod,Emod.get(2,2));
-		CommonOps_D64.divide(found,found.get(2,2));
+		CommonOps_R64.divide(E,E.get(2,2));
+		CommonOps_R64.divide(Emod,Emod.get(2,2));
+		CommonOps_R64.divide(found,found.get(2,2));
 
 		double error0 = 0;
 		double error1 = 0;

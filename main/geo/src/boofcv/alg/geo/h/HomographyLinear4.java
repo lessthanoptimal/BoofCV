@@ -23,10 +23,10 @@ import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.factory.DecompositionFactory_R64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
-import org.ejml.ops.SingularOps_D64;
-import org.ejml.ops.SpecializedOps_D64;
+import org.ejml.ops.SingularOps_R64;
+import org.ejml.ops.SpecializedOps_R64;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.List;
@@ -55,7 +55,7 @@ public class HomographyLinear4 {
 
 	// contains the set of equations that are solved
 	protected RowMatrix_F64 A = new RowMatrix_F64(1,9);
-	protected SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_D64.svd(0, 0, true, true, false);
+	protected SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_R64.svd(0, 0, true, true, false);
 
 	// matrix used to normalize results
 	protected RowMatrix_F64 N1 = new RowMatrix_F64(3,3);
@@ -122,12 +122,12 @@ public class HomographyLinear4 {
 			return true;
 
 		if( A.numRows > 8 )
-			SingularOps_D64.nullVector(svd,true,H);
+			SingularOps_R64.nullVector(svd,true,H);
 		else {
 			// handle a special case since the matrix only has 8 singular values and won't select
 			// the correct column
 			RowMatrix_F64 V = svd.getV(null,false);
-			SpecializedOps_D64.subvector(V, 0, 8, V.numCols, false, 0, H);
+			SpecializedOps_R64.subvector(V, 0, 8, V.numCols, false, 0, H);
 		}
 
 		return false;

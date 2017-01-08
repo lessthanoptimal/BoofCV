@@ -26,7 +26,7 @@ import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.CommonOps_R64;
 
 import static boofcv.alg.distort.radtan.RemoveRadialNtoN_F64.removeRadial;
 
@@ -74,7 +74,7 @@ public class UniOmniPtoS_F64 implements Point2Transform3_F64 {
 		K_inv.set(1,2, (double)model.cy);
 		K_inv.set(2,2,1);
 
-		CommonOps_D64.invert(K_inv);
+		CommonOps_R64.invert(K_inv);
 	}
 
 	@Override

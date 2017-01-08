@@ -25,14 +25,14 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.alg.dense.mult.MatrixVectorMult_D64;
+import org.ejml.alg.dense.mult.MatrixVectorMult_R64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_D64;
-import org.ejml.factory.LinearSolverFactory_D64;
+import org.ejml.factory.DecompositionFactory_R64;
+import org.ejml.factory.LinearSolverFactory_R64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 import org.ejml.interfaces.linsol.LinearSolver;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.SingularOps_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.SingularOps_R64;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -102,9 +102,9 @@ import java.util.List;
 public class PnPLepetitEPnP {
 
 	// used to solve various linear problems
-	private SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_D64.svd(12, 12, false, true, false);
-	private LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_D64.leastSquares(6, 4);
-	private LinearSolver<RowMatrix_F64> solverPinv = LinearSolverFactory_D64.pseudoInverse(true);
+	private SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_R64.svd(12, 12, false, true, false);
+	private LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_R64.leastSquares(6, 4);
+	private LinearSolver<RowMatrix_F64> solverPinv = LinearSolverFactory_R64.pseudoInverse(true);
 
 	// weighting factor to go from control point into world coordinate
 	protected RowMatrix_F64 alphas = new RowMatrix_F64(1,1);
@@ -333,7 +333,7 @@ public class PnPLepetitEPnP {
 		double []singularValues = svd.getSingularValues();
 		RowMatrix_F64 V = svd.getV(null,false);
 
-		SingularOps_D64.descendingOrder(null,false,singularValues,3,V,false);
+		SingularOps_R64.descendingOrder(null,false,singularValues,3,V,false);
 
 		// planar check
 		if( singularValues[0]<singularValues[2]*1e13 ) {
@@ -397,7 +397,7 @@ public class PnPLepetitEPnP {
 			v_temp.data[1] = p.y- meanWorldPts.y;
 			v_temp.data[2] = p.z- meanWorldPts.z;
 
-			MatrixVectorMult_D64.mult(A_temp, v_temp, w_temp);
+			MatrixVectorMult_R64.mult(A_temp, v_temp, w_temp);
 
 			int rowIndex = alphas.numCols*i;
 			for( int j = 0; j < numControl-1; j++ )
@@ -453,7 +453,7 @@ public class PnPLepetitEPnP {
 	{
 		// compute MM and find its null space
 		MM.reshape(M.numRows,M.numRows,false);
-		CommonOps_D64.multTransB(M, M, MM);
+		CommonOps_R64.multTransB(M, M, MM);
 
 		if( !svd.decompose(MM) )
 			throw new IllegalArgumentException("SVD failed?!?!");
@@ -461,7 +461,7 @@ public class PnPLepetitEPnP {
 		double []singularValues = svd.getSingularValues();
 		RowMatrix_F64 V = svd.getV(null,false);
 
-		SingularOps_D64.descendingOrder(null,false,singularValues,3,V,false);
+		SingularOps_R64.descendingOrder(null,false,singularValues,3,V,false);
 
 		// extract null points from the null space
 		for( int i = 0; i < numControl; i++ ) {

@@ -22,8 +22,8 @@ package boofcv.alg.geo.f;
 import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.SingularOps_D64;
-import org.ejml.ops.SpecializedOps_D64;
+import org.ejml.ops.SingularOps_R64;
+import org.ejml.ops.SpecializedOps_R64;
 
 import java.util.List;
 
@@ -96,12 +96,12 @@ public class FundamentalLinear8 extends FundamentalLinear {
 			return true;
 
 		if( A.numRows > 8 )
-			SingularOps_D64.nullVector(svdNull,true,F);
+			SingularOps_R64.nullVector(svdNull,true,F);
 		else {
 			// handle a special case since the matrix only has 8 singular values and won't select
 			// the correct column
 			RowMatrix_F64 V = svdNull.getV(null,false);
-			SpecializedOps_D64.subvector(V, 0, 8, V.numCols, false, 0, F);
+			SpecializedOps_R64.subvector(V, 0, 8, V.numCols, false, 0, F);
 		}
 
 		return false;

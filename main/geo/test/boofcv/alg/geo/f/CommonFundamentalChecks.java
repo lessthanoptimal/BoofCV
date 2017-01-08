@@ -23,8 +23,8 @@ import boofcv.struct.geo.QueueMatrix;
 import georegression.geometry.GeometryMath_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.NormOps_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.NormOps_R64;
 
 import java.util.List;
 
@@ -61,14 +61,14 @@ public abstract class CommonFundamentalChecks extends EpipolarTestSimulation {
 
 			for (RowMatrix_F64 F : solutions.toList()) {
 				// normalize F to ensure a consistent scale
-				CommonOps_D64.scale(1.0/CommonOps_D64.elementMaxAbs(F),F);
+				CommonOps_R64.scale(1.0/CommonOps_R64.elementMaxAbs(F),F);
 
 				// sanity check, F is not zero
-				if (NormOps_D64.normF(F) <= 0.1)
+				if (NormOps_R64.normF(F) <= 0.1)
 					continue;
 
 				// the determinant should be zero
-				if (Math.abs(CommonOps_D64.det(F)) > zeroTol)
+				if (Math.abs(CommonOps_R64.det(F)) > zeroTol)
 					continue;
 
 				totalPassedMatrix++;

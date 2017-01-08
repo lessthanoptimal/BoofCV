@@ -25,7 +25,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.alg.dense.linsol.LinearSolverSafe;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.LinearSolverFactory_D64;
+import org.ejml.factory.LinearSolverFactory_R64;
 import org.ejml.interfaces.linsol.LinearSolver;
 
 /**
@@ -74,7 +74,7 @@ public class HomographyInducedStereo3Pts {
 	public HomographyInducedStereo3Pts()
 	{
 		// ensure that the inputs are not modified
-		solver = new LinearSolverSafe<>(LinearSolverFactory_D64.linear(3));
+		solver = new LinearSolverSafe<>(LinearSolverFactory_R64.linear(3));
 	}
 
    /**

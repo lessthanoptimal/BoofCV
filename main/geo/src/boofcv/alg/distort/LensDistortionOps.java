@@ -40,7 +40,7 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.RectangleLength2D_F32;
 import georegression.struct.shapes.RectangleLength2D_F64;
 import org.ejml.data.RowMatrix_F32;
-import org.ejml.ops.CommonOps_D32;
+import org.ejml.ops.CommonOps_R32;
 
 /**
  * Operations related to manipulating lens distortion in images
@@ -148,7 +148,7 @@ public class LensDistortionOps {
 		// adjustment matrix
 		RowMatrix_F32 A = new RowMatrix_F32(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 		RowMatrix_F32 A_inv = new RowMatrix_F32(3, 3);
-		if (!CommonOps_D32.invert(A, A_inv)) {
+		if (!CommonOps_R32.invert(A, A_inv)) {
 			throw new RuntimeException("Failed to invert adjustment matrix.  Probably bad.");
 		}
 

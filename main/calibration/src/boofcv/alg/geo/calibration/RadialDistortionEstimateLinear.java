@@ -21,7 +21,7 @@ package boofcv.alg.geo.calibration;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.LinearSolverFactory_D64;
+import org.ejml.factory.LinearSolverFactory_R64;
 import org.ejml.interfaces.linsol.LinearSolver;
 
 import java.util.List;
@@ -66,7 +66,7 @@ public class RadialDistortionEstimateLinear {
 	private RowMatrix_F64 X;
 
 	// linear solver
-	private LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_D64.leastSquares(0, 0);
+	private LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_R64.leastSquares(0, 0);
 
 	// location of grid coordinates in the world frame.
 	// the z-axis is assumed to be zero

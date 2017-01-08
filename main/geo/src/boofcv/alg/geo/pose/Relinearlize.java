@@ -19,11 +19,11 @@
 package boofcv.alg.geo.pose;
 
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_D64;
-import org.ejml.factory.LinearSolverFactory_D64;
+import org.ejml.factory.DecompositionFactory_R64;
+import org.ejml.factory.LinearSolverFactory_R64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
 import org.ejml.interfaces.linsol.LinearSolver;
-import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.CommonOps_R64;
 
 /**
  * <p>
@@ -56,7 +56,7 @@ public class Relinearlize {
 	// lookup table for indices
 	int table[] = new int[10*10];
 
-	SingularValueDecomposition<RowMatrix_F64> svd = DecompositionFactory_D64.svd(3, 3, false, true, false);
+	SingularValueDecomposition<RowMatrix_F64> svd = DecompositionFactory_R64.svd(3, 3, false, true, false);
 
 	// used inside of solveConstraintMatrix
 	RowMatrix_F64 AA = new RowMatrix_F64(1,1);
@@ -64,7 +64,7 @@ public class Relinearlize {
 	RowMatrix_F64 xx = new RowMatrix_F64(1,1);
 
 	// used to compute one possible solution
-	LinearSolver<RowMatrix_F64> pseudo = LinearSolverFactory_D64.pseudoInverse(true);
+	LinearSolver<RowMatrix_F64> pseudo = LinearSolverFactory_R64.pseudoInverse(true);
 
 	// stores constraints
 	double XiiXjk[] = new double[10];
@@ -167,7 +167,7 @@ public class Relinearlize {
 			}
 		}
 //		AA.print();
-		CommonOps_D64.solve(AA, yy, xx);
+		CommonOps_R64.solve(AA, yy, xx);
 
 		return xx;
 	}

@@ -23,9 +23,9 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.factory.DecompositionFactory_R64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
-import org.ejml.ops.SingularOps_D64;
+import org.ejml.ops.SingularOps_R64;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ import java.util.List;
  */
 public class TriangulateLinearDLT {
 
-	SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_D64.svd(4, 4,true,true,false);
+	SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_R64.svd(4, 4,true,true,false);
 	RowMatrix_F64 v = new RowMatrix_F64(4,1);
 	RowMatrix_F64 A = new RowMatrix_F64(4,4);
 
@@ -79,7 +79,7 @@ public class TriangulateLinearDLT {
 		if( !svd.decompose(A) )
 			throw new RuntimeException("SVD failed!?!?");
 
-		SingularOps_D64.nullVector(svd,true,v);
+		SingularOps_R64.nullVector(svd,true,v);
 
 		double w = v.get(3);
 		found.x = v.get(0)/w;
@@ -123,7 +123,7 @@ public class TriangulateLinearDLT {
 		if( !svd.decompose(A) )
 			throw new RuntimeException("SVD failed!?!?");
 
-		SingularOps_D64.nullVector(svd,true,v);
+		SingularOps_R64.nullVector(svd,true,v);
 		
 		double w = v.get(3);
 		foundInA.x = v.get(0)/w;

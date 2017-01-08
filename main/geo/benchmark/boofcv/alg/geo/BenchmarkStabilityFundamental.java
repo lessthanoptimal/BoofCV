@@ -33,7 +33,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.CommonOps_R64;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,7 +68,7 @@ public class BenchmarkStabilityFundamental {
 	List<Double> scores;
 
 	public BenchmarkStabilityFundamental() {
-		CommonOps_D64.invert(K, K_inv);
+		CommonOps_R64.invert(K, K_inv);
 	}
 
 	public void createSceneCube() {
@@ -176,7 +176,7 @@ public class BenchmarkStabilityFundamental {
 			}
 
 			// normalize the scale of F
-			CommonOps_D64.scale(1.0/CommonOps_D64.elementMaxAbs(F),F);
+			CommonOps_R64.scale(1.0/CommonOps_R64.elementMaxAbs(F),F);
 
 			double totalScore = 0;
 			// score against all observations
@@ -209,7 +209,7 @@ public class BenchmarkStabilityFundamental {
 			}
 
 			// normalize the scale of F
-			CommonOps_D64.scale(1.0/CommonOps_D64.elementMaxAbs(F),F);
+			CommonOps_R64.scale(1.0/CommonOps_R64.elementMaxAbs(F),F);
 
 			// score against all observations
 			for( AssociatedPair p : observations ) {

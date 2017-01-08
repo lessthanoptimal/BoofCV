@@ -25,10 +25,10 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.factory.DecompositionFactory_R64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.SingularOps_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.SingularOps_R64;
 
 import java.util.List;
 
@@ -68,7 +68,7 @@ public class PoseFromPairLinear6 {
 	private RowMatrix_F64 A = new RowMatrix_F64(1,12);
 
 	// used to decompose and compute the null space of A
-	private SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_D64.svd(0, 0, true, true, false);
+	private SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_R64.svd(0, 0, true, true, false);
 
 	// parameterized rotation and translation
 	private RowMatrix_F64 x = new RowMatrix_F64(12,1);
@@ -161,7 +161,7 @@ public class PoseFromPairLinear6 {
 		if( !svd.decompose(A) )
 			throw new RuntimeException("SVD failed?");
 
-		SingularOps_D64.nullVector(svd,true,x);
+		SingularOps_R64.nullVector(svd,true,x);
 
 		RowMatrix_F64 R = motion.getR();
 		Vector3D_F64 T = motion.getT();
@@ -189,13 +189,13 @@ public class PoseFromPairLinear6 {
 		if( !svd.decompose(R))
 			throw new RuntimeException("SVD Failed");
 
-		CommonOps_D64.multTransB(svd.getU(null,false),svd.getV(null,false),R);
+		CommonOps_R64.multTransB(svd.getU(null,false),svd.getV(null,false),R);
 
 		// determinant should be +1
-		double det = CommonOps_D64.det(R);
+		double det = CommonOps_R64.det(R);
 
 		if( det < 0 )
-			CommonOps_D64.scale(-1,R);
+			CommonOps_R64.scale(-1,R);
 
 		// compute the determinant of the singular matrix
 		double b = 1.0;

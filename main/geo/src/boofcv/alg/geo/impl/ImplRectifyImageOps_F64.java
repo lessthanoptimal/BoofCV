@@ -28,7 +28,7 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.SequencePoint2Transform2_F64;
 import georegression.struct.shapes.RectangleLength2D_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.CommonOps_R64;
 import org.ejml.simple.SimpleMatrix;
 
 import static boofcv.alg.distort.LensDistortionOps.narrow;
@@ -169,7 +169,7 @@ public class ImplRectifyImageOps_F64 {
 		Point2Transform2_F64 add_p_to_p = narrow(param).distort_F64(true, true);
 
 		RowMatrix_F64 rectifyInv = new RowMatrix_F64(3,3);
-		CommonOps_D64.invert(rectify,rectifyInv);
+		CommonOps_R64.invert(rectify,rectifyInv);
 		PointTransformHomography_F64 removeRect = new PointTransformHomography_F64(rectifyInv);
 
 		return new SequencePoint2Transform2_F64(removeRect,add_p_to_p);

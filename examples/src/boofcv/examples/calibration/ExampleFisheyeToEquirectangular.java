@@ -46,7 +46,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F32;
 import org.ejml.data.RowMatrix_F32;
-import org.ejml.ops.CommonOps_D32;
+import org.ejml.ops.CommonOps_R32;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -134,7 +134,7 @@ public class ExampleFisheyeToEquirectangular {
 		Se3_F32 frontToFront = new Se3_F32();
 		frontToFront.setRotation(adjR);
 		Se3_F32 frontToBack = new Se3_F32();
-		CommonOps_D32.mult(f2b,adjR,frontToBack.R);
+		CommonOps_R32.mult(f2b,adjR,frontToBack.R);
 
 		// add the camera and specify which pixels are valid.  These functions precompute the entire transform
 		// and can be relatively slow, but generating the equirectangular image should be much faster

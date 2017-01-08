@@ -28,8 +28,8 @@ import boofcv.struct.wavelet.WlCoef_F32;
 import boofcv.struct.wavelet.WlCoef_I32;
 import boofcv.testing.BoofTesting;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.MatrixFeatures_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.MatrixFeatures_R64;
 
 import java.util.Random;
 
@@ -176,13 +176,13 @@ public class CommonFactoryWavelet {
 
 		RowMatrix_F64 C = new RowMatrix_F64(N,N);
 
-		CommonOps_D64.mult(A,B,C);
+		CommonOps_R64.mult(A,B,C);
 
 //		A.print();
 //		B.print();
 //		C.print();
 
-		assertTrue(MatrixFeatures_D64.isIdentity(C,1e-4));
+		assertTrue(MatrixFeatures_R64.isIdentity(C,1e-4));
 	}
 
 	public static void checkBiorthogonal_I32( WaveletDescription<WlCoef_I32> desc )
@@ -237,9 +237,9 @@ public class CommonFactoryWavelet {
 
 		RowMatrix_F64 C = new RowMatrix_F64(N,N);
 
-		CommonOps_D64.mult(A,B,C);
+		CommonOps_R64.mult(A,B,C);
 
-		assertTrue(MatrixFeatures_D64.isIdentity(C,1e-4));
+		assertTrue(MatrixFeatures_R64.isIdentity(C,1e-4));
 	}
 
 	public static void checkPolySumToZero(float support[], int polyOrder, int offset ) {

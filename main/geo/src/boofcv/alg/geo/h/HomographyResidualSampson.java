@@ -23,9 +23,9 @@ import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.LinearSolverFactory_D64;
+import org.ejml.factory.LinearSolverFactory_R64;
 import org.ejml.interfaces.linsol.LinearSolver;
-import org.ejml.ops.CommonOps_D64;
+import org.ejml.ops.CommonOps_R64;
 
 /**
  * <p>
@@ -54,7 +54,7 @@ public class HomographyResidualSampson
 	RowMatrix_F64 x = new RowMatrix_F64(2,1);
 	RowMatrix_F64 error = new RowMatrix_F64(4,1);
 
-	LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_D64.linear(2);
+	LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_R64.linear(2);
 
 	@Override
 	public void setModel(RowMatrix_F64 H) {
@@ -71,7 +71,7 @@ public class HomographyResidualSampson
 
 		computeJacobian(p.p1,p.p2);
 		// JJ = J*J'
-		CommonOps_D64.multTransB(J, J, JJ);
+		CommonOps_R64.multTransB(J, J, JJ);
 
 		// solve JJ'*x = -e
 		e.data[0] = -top1;
@@ -80,7 +80,7 @@ public class HomographyResidualSampson
 		if( solver.setA(JJ) ) {
 			solver.solve(e,x);
 			// -J'(J*J')^-1*e
-			CommonOps_D64.multTransA(J,x,error);
+			CommonOps_R64.multTransA(J,x,error);
 			residuals[index++] = error.data[0];
 			residuals[index++] = error.data[1];
 			residuals[index++] = error.data[2];

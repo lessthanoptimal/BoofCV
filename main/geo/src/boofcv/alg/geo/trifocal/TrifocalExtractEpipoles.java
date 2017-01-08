@@ -20,11 +20,11 @@ package boofcv.alg.geo.trifocal;
 
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.alg.dense.decomposition.svd.SafeSvd_D64;
+import org.ejml.alg.dense.decomposition.svd.SafeSvd_R64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_D64;
+import org.ejml.factory.DecompositionFactory_R64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
-import org.ejml.ops.SingularOps_D64;
+import org.ejml.ops.SingularOps_R64;
 
 /**
  * <p>
@@ -67,8 +67,8 @@ public class TrifocalExtractEpipoles {
 	private RowMatrix_F64 tempE = new RowMatrix_F64(3,1);
 
 	public TrifocalExtractEpipoles() {
-		svd = DecompositionFactory_D64.svd(3, 3, true, true, true);
-		svd = new SafeSvd_D64(svd);
+		svd = DecompositionFactory_R64.svd(3, 3, true, true, true);
+		svd = new SafeSvd_R64(svd);
 	}
 
 	/**
@@ -81,16 +81,16 @@ public class TrifocalExtractEpipoles {
 	 */
 	public void process( TrifocalTensor tensor , Point3D_F64 e2 , Point3D_F64 e3 ) {
 		svd.decompose(tensor.T1);
-		SingularOps_D64.nullVector(svd, true, v1);
-		SingularOps_D64.nullVector(svd, false,u1);
+		SingularOps_R64.nullVector(svd, true, v1);
+		SingularOps_R64.nullVector(svd, false,u1);
 
 		svd.decompose(tensor.T2);
-		SingularOps_D64.nullVector(svd,true,v2);
-		SingularOps_D64.nullVector(svd,false,u2);
+		SingularOps_R64.nullVector(svd,true,v2);
+		SingularOps_R64.nullVector(svd,false,u2);
 
 		svd.decompose(tensor.T3);
-		SingularOps_D64.nullVector(svd,true,v3);
-		SingularOps_D64.nullVector(svd,false,u3);
+		SingularOps_R64.nullVector(svd,true,v3);
+		SingularOps_R64.nullVector(svd,false,u3);
 
 		for( int i = 0; i < 3; i++ ) {
 			U.set(i,0,u1.get(i));
@@ -103,11 +103,11 @@ public class TrifocalExtractEpipoles {
 		}
 
 		svd.decompose(U);
-		SingularOps_D64.nullVector(svd, false, tempE);
+		SingularOps_R64.nullVector(svd, false, tempE);
 		e2.set(tempE.get(0), tempE.get(1), tempE.get(2));
 
 		svd.decompose(V);
-		SingularOps_D64.nullVector(svd, false, tempE);
+		SingularOps_R64.nullVector(svd, false, tempE);
 		e3.set(tempE.get(0), tempE.get(1), tempE.get(2));
 	}
 }

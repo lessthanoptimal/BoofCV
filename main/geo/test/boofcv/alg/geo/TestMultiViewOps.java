@@ -31,9 +31,9 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.Tuple2;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.MatrixFeatures_D64;
-import org.ejml.ops.NormOps_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.ops.NormOps_R64;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
@@ -113,7 +113,7 @@ public class TestMultiViewOps {
 
 			SimpleMatrix expected = ai.mult(b4.transpose()).minus(a4.mult(bi.transpose()));
 
-			assertTrue(MatrixFeatures_D64.isIdentical(expected.matrix_F64(),found.getT(i),1e-8));
+			assertTrue(MatrixFeatures_R64.isIdentical(expected.matrix_F64(),found.getT(i),1e-8));
 		}
 	}
 
@@ -144,7 +144,7 @@ public class TestMultiViewOps {
 
 			SimpleMatrix expected = ai.mult(b4.transpose()).minus(a4.mult(bi.transpose()));
 
-			assertTrue(MatrixFeatures_D64.isIdentical(expected.matrix_F64(),found.getT(i),1e-8));
+			assertTrue(MatrixFeatures_R64.isIdentical(expected.matrix_F64(),found.getT(i),1e-8));
 		}
 	}
 
@@ -385,7 +385,7 @@ public class TestMultiViewOps {
 
 		// make sure the input was not modified
 		for( int i = 0; i < 3; i++ )
-			assertTrue(MatrixFeatures_D64.isIdentical(tensor.getT(i),input.getT(i),1e-8));
+			assertTrue(MatrixFeatures_R64.isIdentical(tensor.getT(i),input.getT(i),1e-8));
 
 		Point3D_F64 space = new Point3D_F64();
 
@@ -407,10 +407,10 @@ public class TestMultiViewOps {
 
 		// make sure the input was not modified
 		for( int i = 0; i < 3; i++ )
-			assertTrue(MatrixFeatures_D64.isIdentical(tensor.getT(i),input.getT(i),1e-8));
+			assertTrue(MatrixFeatures_R64.isIdentical(tensor.getT(i),input.getT(i),1e-8));
 
-		CommonOps_D64.scale(1.0/CommonOps_D64.elementMaxAbs(found2),found2);
-		CommonOps_D64.scale(1.0/CommonOps_D64.elementMaxAbs(found3),found3);
+		CommonOps_R64.scale(1.0/CommonOps_R64.elementMaxAbs(found2),found2);
+		CommonOps_R64.scale(1.0/CommonOps_R64.elementMaxAbs(found3),found3);
 
 		Point3D_F64 X = new Point3D_F64(0.1,0.05,2);
 
@@ -433,7 +433,7 @@ public class TestMultiViewOps {
 
 		// make sure the input was not modified
 		for( int i = 0; i < 3; i++ )
-			assertTrue(MatrixFeatures_D64.isIdentical(tensor.getT(i),input.getT(i),1e-8));
+			assertTrue(MatrixFeatures_R64.isIdentical(tensor.getT(i),input.getT(i),1e-8));
 
 		// Using found camera matrices render the point's location
 		Point3D_F64 X = new Point3D_F64(0.1,0.05,2);
@@ -553,7 +553,7 @@ public class TestMultiViewOps {
 
 		RowMatrix_F64 E = MultiViewOps.createEssential(R, T);
 
-		assertTrue(NormOps_D64.normF(E)!=0);
+		assertTrue(NormOps_R64.normF(E)!=0);
 
 		Point3D_F64 e1 = new Point3D_F64();
 		Point3D_F64 e2 = new Point3D_F64();
@@ -581,7 +581,7 @@ public class TestMultiViewOps {
 		Point3D_F64 e1 = new Point3D_F64();
 		Point3D_F64 e2 = new Point3D_F64();
 
-		CommonOps_D64.scale(-2.0/F.get(0,1),F);
+		CommonOps_R64.scale(-2.0/F.get(0,1),F);
 		MultiViewOps.extractEpipoles(F, e1, e2);
 
 		RowMatrix_F64 P = MultiViewOps.canonicalCamera(F, e2, new Vector3D_F64(1, 1, 1), 2);
@@ -593,14 +593,14 @@ public class TestMultiViewOps {
 		GeometryMath_F64.crossMatrix(e2, crossEpi);
 
 		RowMatrix_F64 M = new RowMatrix_F64(3,3);
-		CommonOps_D64.extract(P,0,3,0,3,M,0,0);
-		CommonOps_D64.mult(crossEpi,M,foundF);
+		CommonOps_R64.extract(P,0,3,0,3,M,0,0);
+		CommonOps_R64.mult(crossEpi,M,foundF);
 
 		// see if they are equal up to a scale factor
-		CommonOps_D64.scale(1.0 / foundF.get(0, 1), foundF);
-		CommonOps_D64.scale(1.0 / F.get(0, 1), F);
+		CommonOps_R64.scale(1.0 / foundF.get(0, 1), foundF);
+		CommonOps_R64.scale(1.0 / F.get(0, 1), F);
 
-		assertTrue(MatrixFeatures_D64.isIdentical(F,foundF,1e-8));
+		assertTrue(MatrixFeatures_R64.isIdentical(F,foundF,1e-8));
 	}
 
 	@Test
@@ -612,12 +612,12 @@ public class TestMultiViewOps {
 
 		RowMatrix_F64 P = new RowMatrix_F64(3,4);
 		RowMatrix_F64 KP = new RowMatrix_F64(3,4);
-		CommonOps_D64.insert(R,P,0,0);
+		CommonOps_R64.insert(R,P,0,0);
 		P.set(0,3,T.x);
 		P.set(1,3,T.y);
 		P.set(2,3,T.z);
 
-		CommonOps_D64.mult(K,P,KP);
+		CommonOps_R64.mult(K,P,KP);
 
 		// decompose the projection matrix
 		RowMatrix_F64 foundK = new RowMatrix_F64(3,3);
@@ -626,14 +626,14 @@ public class TestMultiViewOps {
 
 		// recompute the projection matrix found the found results
 		RowMatrix_F64 foundKP = new RowMatrix_F64(3,4);
-		CommonOps_D64.insert(foundPose.getR(),P,0,0);
+		CommonOps_R64.insert(foundPose.getR(),P,0,0);
 		P.set(0,3,foundPose.T.x);
 		P.set(1,3,foundPose.T.y);
 		P.set(2,3,foundPose.T.z);
-		CommonOps_D64.mult(foundK,P,foundKP);
+		CommonOps_R64.mult(foundK,P,foundKP);
 
 		// see if the two projection matrices are the same
-		assertTrue(MatrixFeatures_D64.isEquals(foundKP,KP,1e-8));
+		assertTrue(MatrixFeatures_R64.isEquals(foundKP,KP,1e-8));
 	}
 
 	@Test
@@ -653,9 +653,9 @@ public class TestMultiViewOps {
 		for( Se3_F64 m : found ) {
 			RowMatrix_F64 A = new RowMatrix_F64(3,3);
 
-			CommonOps_D64.multTransA(R,m.getR(),A);
+			CommonOps_R64.multTransA(R,m.getR(),A);
 
-			if( !MatrixFeatures_D64.isIdentity(A,1e-8) ) {
+			if( !MatrixFeatures_R64.isIdentity(A,1e-8) ) {
 				continue;
 			}
 

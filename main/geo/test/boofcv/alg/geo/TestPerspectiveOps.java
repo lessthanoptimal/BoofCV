@@ -32,9 +32,9 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.MatrixFeatures_D64;
-import org.ejml.ops.RandomMatrices_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.ops.RandomMatrices_R64;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
@@ -105,12 +105,12 @@ public class TestPerspectiveOps {
 		RowMatrix_F64 A = PerspectiveOps.calibrationMatrix(param, (RowMatrix_F64)null);
 
 		RowMatrix_F64 expected = new RowMatrix_F64(3,3);
-		CommonOps_D64.mult(B, A, expected);
+		CommonOps_R64.mult(B, A, expected);
 
 		assertArrayEquals(param.radial, found.radial, 1e-8);
 		RowMatrix_F64 foundM = PerspectiveOps.calibrationMatrix(found,(RowMatrix_F64)null);
 
-		assertTrue(MatrixFeatures_D64.isIdentical(expected,foundM,1e-8));
+		assertTrue(MatrixFeatures_R64.isIdentical(expected,foundM,1e-8));
 	}
 
 	@Test
@@ -183,7 +183,7 @@ public class TestPerspectiveOps {
 
 		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(intrinsic, (RowMatrix_F64)null);
 		RowMatrix_F64 K_inv = new RowMatrix_F64(3,3);
-		CommonOps_D64.invert(K,K_inv);
+		CommonOps_R64.invert(K,K_inv);
 
 		Point2D_F64 pixel = new Point2D_F64(100,120);
 		Point2D_F64 expected = new Point2D_F64();
@@ -200,7 +200,7 @@ public class TestPerspectiveOps {
 	public void convertPixelToNorm_matrix() {
 		RowMatrix_F64 K = new RowMatrix_F64(3,3,true,100,0.1,120,0,150,209,0,0,1);
 		RowMatrix_F64 K_inv = new RowMatrix_F64(3,3);
-		CommonOps_D64.invert(K,K_inv);
+		CommonOps_R64.invert(K,K_inv);
 
 		Point2D_F64 pixel = new Point2D_F64(100,120);
 		Point2D_F64 expected = new Point2D_F64();
@@ -221,7 +221,7 @@ public class TestPerspectiveOps {
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, -0.05, 0.03, worldToCamera.getR());
 		worldToCamera.getT().set(0.2,0.01,-0.03);
 
-		RowMatrix_F64 K = RandomMatrices_D64.createUpperTriangle(3, 0, -1, 1, rand);
+		RowMatrix_F64 K = RandomMatrices_R64.createUpperTriangle(3, 0, -1, 1, rand);
 
 		Point3D_F64 X_cam = SePointOps_F64.transform(worldToCamera,X,null);
 		Point2D_F64 found;
@@ -268,7 +268,7 @@ public class TestPerspectiveOps {
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.05,0.03,worldToCamera.getR());
 		worldToCamera.getT().set(0.2,0.01,-0.03);
 
-		RowMatrix_F64 K = RandomMatrices_D64.createUpperTriangle(3, 0, -1, 1, rand);
+		RowMatrix_F64 K = RandomMatrices_R64.createUpperTriangle(3, 0, -1, 1, rand);
 
 		Point3D_F64 X_cam = SePointOps_F64.transform(worldToCamera,X,null);
 		Point2D_F64 found;
@@ -345,7 +345,7 @@ public class TestPerspectiveOps {
 	public void createCameraMatrix() {
 		SimpleMatrix R = SimpleMatrix.random_F64(3, 3, -1, 1, rand);
 		Vector3D_F64 T = new Vector3D_F64(2,3,-4);
-		SimpleMatrix K = SimpleMatrix.wrap(RandomMatrices_D64.createUpperTriangle(3, 0, -1, 1, rand));
+		SimpleMatrix K = SimpleMatrix.wrap(RandomMatrices_R64.createUpperTriangle(3, 0, -1, 1, rand));
 
 		SimpleMatrix T_ = new SimpleMatrix(3,1,true,T.x,T.y,T.z);
 

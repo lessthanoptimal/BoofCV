@@ -19,8 +19,8 @@
 package boofcv.alg.geo.f;
 
 import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_D64;
-import org.ejml.ops.RandomMatrices_D64;
+import org.ejml.ops.CommonOps_R64;
+import org.ejml.ops.RandomMatrices_R64;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
@@ -69,12 +69,12 @@ public class TestHelperNister5 {
 		RowMatrix_F64 Y1 = new RowMatrix_F64(10,1);
 		RowMatrix_F64 Y2 = new RowMatrix_F64(10,1);
 
-		CommonOps_D64.mult(A,createCoefsA(x,y,z),Y1);
-		CommonOps_D64.mult(B,createCoefsB(x, y, z),Y2);
+		CommonOps_R64.mult(A,createCoefsA(x,y,z),Y1);
+		CommonOps_R64.mult(B,createCoefsB(x, y, z),Y2);
 
 		RowMatrix_F64 Y = new RowMatrix_F64(10,1);
 
-		CommonOps_D64.add(Y1,Y2,Y);
+		CommonOps_R64.add(Y1,Y2,Y);
 
 		// compute the constraints equations
 		SimpleMatrix EEt = E.mult(E.transpose());
@@ -97,7 +97,7 @@ public class TestHelperNister5 {
 
 	@Test
 	public void setDeterminantVectors() {
-		RowMatrix_F64 A = RandomMatrices_D64.createRandom(10,10,-1,1,rand);
+		RowMatrix_F64 A = RandomMatrices_R64.createRandom(10,10,-1,1,rand);
 
 		HelperNister5 alg = new HelperNister5();
 		alg.setDeterminantVectors(A);
@@ -147,7 +147,7 @@ public class TestHelperNister5 {
 
 	@Test
 	public void extractPolynomial() {
-		RowMatrix_F64 A = RandomMatrices_D64.createRandom(10,10,-1,1,rand);
+		RowMatrix_F64 A = RandomMatrices_R64.createRandom(10,10,-1,1,rand);
 
 		HelperNister5 alg = new HelperNister5();
 		alg.setDeterminantVectors(A);
@@ -168,7 +168,7 @@ public class TestHelperNister5 {
 		B.data[7] = alg.M04*z*z*z + alg.M05*z*z + alg.M06*z + alg.M07;
 		B.data[8] = alg.M08*z*z*z*z + alg.M09*z*z*z + alg.M10*z*z + alg.M11*z + alg.M12;
 
-		double expected = CommonOps_D64.det(B);
+		double expected = CommonOps_R64.det(B);
 
 		double coefs[] = new double[11];
 
