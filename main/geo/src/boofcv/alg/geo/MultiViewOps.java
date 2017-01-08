@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.Tuple2;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.QRDecomposition;
 import org.ejml.ops.CommonOps_D64;
@@ -71,12 +71,12 @@ public class MultiViewOps {
 	 * @param ret Storage for trifocal tensor.  If null a new instance will be created.
 	 * @return The trifocal tensor
 	 */
-	public static TrifocalTensor createTrifocal( DenseMatrix64F P2 , DenseMatrix64F P3 , TrifocalTensor ret ) {
+	public static TrifocalTensor createTrifocal( RowMatrix_F64 P2 , RowMatrix_F64 P3 , TrifocalTensor ret ) {
 		if( ret == null )
 			ret = new TrifocalTensor();
 
 		for( int col = 0; col < 3; col++ ) {
-			DenseMatrix64F T = ret.getT(col);
+			RowMatrix_F64 T = ret.getT(col);
 
 			int index = 0;
 			for( int i = 0; i < 3; i++ ) {
@@ -110,13 +110,13 @@ public class MultiViewOps {
 		if( ret == null )
 			ret = new TrifocalTensor();
 
-		DenseMatrix64F R2 = P2.getR();
-		DenseMatrix64F R3 = P3.getR();
+		RowMatrix_F64 R2 = P2.getR();
+		RowMatrix_F64 R3 = P3.getR();
 		Vector3D_F64 T2 = P2.getT();
 		Vector3D_F64 T3 = P3.getT();
 
 		for( int col = 0; col < 3; col++ ) {
-			DenseMatrix64F T = ret.getT(col);
+			RowMatrix_F64 T = ret.getT(col);
 
 			int index = 0;
 			for( int i = 0; i < 3; i++ ) {
@@ -176,7 +176,7 @@ public class MultiViewOps {
 	public static double constraint(TrifocalTensor tensor,
 									Point2D_F64 p1, Vector3D_F64 l2, Vector3D_F64 l3)
 	{
-		DenseMatrix64F sum = new DenseMatrix64F(3,3);
+		RowMatrix_F64 sum = new RowMatrix_F64(3,3);
 
 		CommonOps_D64.add(p1.x,tensor.T1,sum,sum);
 		CommonOps_D64.add(p1.y,tensor.T2,sum,sum);
@@ -204,7 +204,7 @@ public class MultiViewOps {
 		if( ret == null )
 			ret = new Vector3D_F64();
 
-		DenseMatrix64F sum = new DenseMatrix64F(3,3);
+		RowMatrix_F64 sum = new RowMatrix_F64(3,3);
 
 		CommonOps_D64.add(p1.x,tensor.T1,sum,sum);
 		CommonOps_D64.add(p1.y,tensor.T2,sum,sum);
@@ -237,15 +237,15 @@ public class MultiViewOps {
 		if( ret == null )
 			ret = new Vector3D_F64();
 
-		DenseMatrix64F sum = new DenseMatrix64F(3,3);
+		RowMatrix_F64 sum = new RowMatrix_F64(3,3);
 
 		CommonOps_D64.add(p1.x,tensor.T1,sum,sum);
 		CommonOps_D64.add(p1.y,tensor.T2,sum,sum);
 		CommonOps_D64.add(tensor.T3,sum,sum);
 
-		DenseMatrix64F cross2 = GeometryMath_F64.crossMatrix(p2.x,p2.y,1,null);
+		RowMatrix_F64 cross2 = GeometryMath_F64.crossMatrix(p2.x,p2.y,1,null);
 
-		DenseMatrix64F temp = new DenseMatrix64F(3,3);
+		RowMatrix_F64 temp = new RowMatrix_F64(3,3);
 
 		CommonOps_D64.mult(cross2,sum,temp);
 		GeometryMath_F64.mult(temp, l3, ret);
@@ -266,22 +266,22 @@ public class MultiViewOps {
 	 * @param ret Optional storage for output. 3x3 matrix.  Modified.
 	 * @return Result of applying the constraint.  With perfect inputs will be zero.
 	 */
-	public static DenseMatrix64F constraint(TrifocalTensor tensor,
+	public static RowMatrix_F64 constraint(TrifocalTensor tensor,
 											Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3,
-											DenseMatrix64F ret)
+											RowMatrix_F64 ret)
 	{
 		if( ret == null )
-			ret = new DenseMatrix64F(3,3);
+			ret = new RowMatrix_F64(3,3);
 
-		DenseMatrix64F sum = new DenseMatrix64F(3,3);
+		RowMatrix_F64 sum = new RowMatrix_F64(3,3);
 
 		CommonOps_D64.add(p1.x,tensor.T1,p1.y,tensor.T2,sum);
 		CommonOps_D64.add(sum,tensor.T3,sum);
 
-		DenseMatrix64F cross2 = GeometryMath_F64.crossMatrix(p2.x,p2.y,1,null);
-		DenseMatrix64F cross3 = GeometryMath_F64.crossMatrix(p3.x,p3.y,1,null);
+		RowMatrix_F64 cross2 = GeometryMath_F64.crossMatrix(p2.x,p2.y,1,null);
+		RowMatrix_F64 cross3 = GeometryMath_F64.crossMatrix(p3.x,p3.y,1,null);
 
-		DenseMatrix64F temp = new DenseMatrix64F(3,3);
+		RowMatrix_F64 temp = new RowMatrix_F64(3,3);
 
 		CommonOps_D64.mult(cross2,sum,temp);
 		CommonOps_D64.mult(temp, cross3, ret);
@@ -302,7 +302,7 @@ public class MultiViewOps {
 	 * @param p2 Point in view 2.
 	 * @return  Constraint value.
 	 */
-	public static double constraint( DenseMatrix64F F , Point2D_F64 p1, Point2D_F64 p2 ) {
+	public static double constraint( RowMatrix_F64 F , Point2D_F64 p1, Point2D_F64 p2 ) {
 		return GeometryMath_F64.innerProd(p2,F,p1);
 	}
 
@@ -319,7 +319,7 @@ public class MultiViewOps {
 	 * @param outputP2 Output: storage for point in view 2.
 	 * @return Predicted point in view 2
 	 */
-	public static Point2D_F64 constraintHomography( DenseMatrix64F H , Point2D_F64 p1 , Point2D_F64 outputP2 ) {
+	public static Point2D_F64 constraintHomography( RowMatrix_F64 H , Point2D_F64 p1 , Point2D_F64 outputP2 ) {
 		if( outputP2 == null )
 			outputP2 = new Point2D_F64();
 
@@ -340,13 +340,13 @@ public class MultiViewOps {
 	 * @param output Output: Optional storage for homography. 3x3 matrix
 	 * @return Homography from view 1 to 3
 	 */
-	public static DenseMatrix64F inducedHomography13( TrifocalTensor tensor ,
+	public static RowMatrix_F64 inducedHomography13( TrifocalTensor tensor ,
 													  Vector3D_F64 line2 ,
-													  DenseMatrix64F output ) {
+													  RowMatrix_F64 output ) {
 		if( output == null )
-			output = new DenseMatrix64F(3,3);
+			output = new RowMatrix_F64(3,3);
 
-		DenseMatrix64F T = tensor.T1;
+		RowMatrix_F64 T = tensor.T1;
 
 		// H(:,0) = transpose(T1)*line
 		output.data[0] = T.data[0]*line2.x + T.data[3]*line2.y + T.data[6]*line2.z;
@@ -388,14 +388,14 @@ public class MultiViewOps {
 	 * @param output Output: Optional storage for homography. 3x3 matrix
 	 * @return Homography from view 1 to 2
 	 */
-	public static DenseMatrix64F inducedHomography12( TrifocalTensor tensor ,
+	public static RowMatrix_F64 inducedHomography12( TrifocalTensor tensor ,
 													  Vector3D_F64 line3 ,
-													  DenseMatrix64F output ) {
+													  RowMatrix_F64 output ) {
 		if( output == null )
-			output = new DenseMatrix64F(3,3);
+			output = new RowMatrix_F64(3,3);
 
 		// H(:,0) = T1*line
-		DenseMatrix64F T = tensor.T1;
+		RowMatrix_F64 T = tensor.T1;
 		output.data[0] = T.data[0]*line3.x + T.data[1]*line3.y + T.data[2]*line3.z;
 		output.data[3] = T.data[3]*line3.x + T.data[4]*line3.y + T.data[5]*line3.z;
 		output.data[6] = T.data[6]*line3.x + T.data[7]*line3.y + T.data[8]*line3.z;
@@ -436,7 +436,7 @@ public class MultiViewOps {
 	 * @param p3 Associated point observation
 	 * @return The homography from view 1 to view 2 or null if it fails
 	 */
-	public static DenseMatrix64F homographyStereo3Pts( DenseMatrix64F F , AssociatedPair p1, AssociatedPair p2, AssociatedPair p3) {
+	public static RowMatrix_F64 homographyStereo3Pts( RowMatrix_F64 F , AssociatedPair p1, AssociatedPair p2, AssociatedPair p3) {
 		HomographyInducedStereo3Pts alg = new HomographyInducedStereo3Pts();
 
 		alg.setFundamental(F,null);
@@ -456,7 +456,7 @@ public class MultiViewOps {
 	 * @param point Point on the plane
 	 * @return The homography from view 1 to view 2 or null if it fails
 	 */
-	public static DenseMatrix64F homographyStereoLinePt( DenseMatrix64F F , PairLineNorm line, AssociatedPair point) {
+	public static RowMatrix_F64 homographyStereoLinePt( RowMatrix_F64 F , PairLineNorm line, AssociatedPair point) {
 		HomographyInducedStereoLinePt alg = new HomographyInducedStereoLinePt();
 
 		alg.setFundamental(F,null);
@@ -475,7 +475,7 @@ public class MultiViewOps {
 	 * @param line1 Line on the plane
 	 * @return The homography from view 1 to view 2 or null if it fails
 	 */
-	public static DenseMatrix64F homographyStereo2Lines( DenseMatrix64F F , PairLineNorm line0, PairLineNorm line1) {
+	public static RowMatrix_F64 homographyStereo2Lines( RowMatrix_F64 F , PairLineNorm line0, PairLineNorm line1) {
 		HomographyInducedStereo2Line alg = new HomographyInducedStereo2Line();
 
 		alg.setFundamental(F,null);
@@ -526,7 +526,7 @@ public class MultiViewOps {
 	 * @param F2 Output: Fundamental matrix for views 1 and 2. Modified.
 	 * @param F3 Output: Fundamental matrix for views 1 and 3. Modified.
 	 */
-	public static void extractFundamental( TrifocalTensor tensor , DenseMatrix64F F2 , DenseMatrix64F F3 ) {
+	public static void extractFundamental( TrifocalTensor tensor , RowMatrix_F64 F2 , RowMatrix_F64 F3 ) {
 		// extract the epipoles
 		Point3D_F64 e2 = new Point3D_F64();
 		Point3D_F64 e3 = new Point3D_F64();
@@ -539,7 +539,7 @@ public class MultiViewOps {
 
 		// compute the Fundamental matrices one column at a time
 		for( int i = 0; i < 3; i++ ) {
-			DenseMatrix64F T = tensor.getT(i);
+			RowMatrix_F64 T = tensor.getT(i);
 
 			GeometryMath_F64.mult(T,e3,temp0);
 			GeometryMath_F64.cross(e2,temp0,column);
@@ -570,7 +570,7 @@ public class MultiViewOps {
 	 * @param P2 Output: 3x4 camera matrix for views 1 to 2. Modified.
 	 * @param P3 Output: 3x4 camera matrix for views 1 to 3. Modified.
 	 */
-	public static void extractCameraMatrices( TrifocalTensor tensor , DenseMatrix64F P2 , DenseMatrix64F P3 ) {
+	public static void extractCameraMatrices( TrifocalTensor tensor , RowMatrix_F64 P2 , RowMatrix_F64 P3 ) {
 		// extract the epipoles
 		Point3D_F64 e2 = new Point3D_F64();
 		Point3D_F64 e3 = new Point3D_F64();
@@ -581,7 +581,7 @@ public class MultiViewOps {
 		Point3D_F64 temp0 = new Point3D_F64();
 		Point3D_F64 column = new Point3D_F64();
 		// temp1 = [e3*e3^T -I]
-		DenseMatrix64F temp1 = new DenseMatrix64F(3,3);
+		RowMatrix_F64 temp1 = new RowMatrix_F64(3,3);
 		for( int i = 0; i < 3; i++ ) {
 			for( int j = 0; j < 3; j++ ) {
 				temp1.set(i,j,e3.getIndex(i)*e3.getIndex(j));
@@ -591,7 +591,7 @@ public class MultiViewOps {
 
 		// compute the camera matrices one column at a time
 		for( int i = 0; i < 3; i++ ) {
-			DenseMatrix64F T = tensor.getT(i);
+			RowMatrix_F64 T = tensor.getT(i);
 
 			GeometryMath_F64.mult(T, e3, column);
 			P2.set(0,i,column.x);
@@ -622,11 +622,11 @@ public class MultiViewOps {
 	 * @param T Translation vector.
 	 * @return Essential matrix
 	 */
-	public static DenseMatrix64F createEssential(DenseMatrix64F R, Vector3D_F64 T)
+	public static RowMatrix_F64 createEssential(RowMatrix_F64 R, Vector3D_F64 T)
 	{
-		DenseMatrix64F E = new DenseMatrix64F(3,3);
+		RowMatrix_F64 E = new RowMatrix_F64(3,3);
 
-		DenseMatrix64F T_hat = GeometryMath_F64.crossMatrix(T, null);
+		RowMatrix_F64 T_hat = GeometryMath_F64.crossMatrix(T, null);
 		CommonOps_D64.mult(T_hat, R, E);
 
 		return E;
@@ -641,12 +641,12 @@ public class MultiViewOps {
 	 * @param K Intrinsic camera calibration matrix
 	 * @return Fundamental matrix
 	 */
-	public static DenseMatrix64F createFundamental(DenseMatrix64F E, DenseMatrix64F K) {
-		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+	public static RowMatrix_F64 createFundamental(RowMatrix_F64 E, RowMatrix_F64 K) {
+		RowMatrix_F64 K_inv = new RowMatrix_F64(3,3);
 		CommonOps_D64.invert(K,K_inv);
 
-		DenseMatrix64F F = new DenseMatrix64F(3,3);
-		DenseMatrix64F temp = new DenseMatrix64F(3,3);
+		RowMatrix_F64 F = new RowMatrix_F64(3,3);
+		RowMatrix_F64 temp = new RowMatrix_F64(3,3);
 
 		CommonOps_D64.multTransA(K_inv,E,temp);
 		CommonOps_D64.mult(temp,K_inv,F);
@@ -664,15 +664,15 @@ public class MultiViewOps {
 	 * @param K2 Intrinsic camera calibration matrix for camera 2
 	 * @return Fundamental matrix
 	 */
-	public static DenseMatrix64F createFundamental(DenseMatrix64F E,
-												   DenseMatrix64F K1,  DenseMatrix64F K2) {
-		DenseMatrix64F K1_inv = new DenseMatrix64F(3,3);
+	public static RowMatrix_F64 createFundamental(RowMatrix_F64 E,
+												   RowMatrix_F64 K1,  RowMatrix_F64 K2) {
+		RowMatrix_F64 K1_inv = new RowMatrix_F64(3,3);
 		CommonOps_D64.invert(K1,K1_inv);
-		DenseMatrix64F K2_inv = new DenseMatrix64F(3,3);
+		RowMatrix_F64 K2_inv = new RowMatrix_F64(3,3);
 		CommonOps_D64.invert(K2,K2_inv);
 
-		DenseMatrix64F F = new DenseMatrix64F(3,3);
-		DenseMatrix64F temp = new DenseMatrix64F(3,3);
+		RowMatrix_F64 F = new RowMatrix_F64(3,3);
+		RowMatrix_F64 temp = new RowMatrix_F64(3,3);
 
 		CommonOps_D64.multTransA(K2_inv,E,temp);
 		CommonOps_D64.mult(temp,K1_inv,F);
@@ -692,10 +692,10 @@ public class MultiViewOps {
 	 * @param N Normal of plane
 	 * @return Calibrated homography matrix
 	 */
-	public static DenseMatrix64F createHomography(DenseMatrix64F R, Vector3D_F64 T,
+	public static RowMatrix_F64 createHomography(RowMatrix_F64 R, Vector3D_F64 T,
 												  double d, Vector3D_F64 N)
 	{
-		DenseMatrix64F H = new DenseMatrix64F(3,3);
+		RowMatrix_F64 H = new RowMatrix_F64(3,3);
 
 		GeometryMath_F64.outerProd(T,N,H);
 		CommonOps_D64.divide(H,d);
@@ -718,14 +718,14 @@ public class MultiViewOps {
 	 * @param K Intrinsic calibration matrix
 	 * @return Uncalibrated homography matrix
 	 */
-	public static DenseMatrix64F createHomography(DenseMatrix64F R, Vector3D_F64 T,
+	public static RowMatrix_F64 createHomography(RowMatrix_F64 R, Vector3D_F64 T,
 												  double d, Vector3D_F64 N,
-												  DenseMatrix64F K)
+												  RowMatrix_F64 K)
 	{
-		DenseMatrix64F temp = new DenseMatrix64F(3,3);
-		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+		RowMatrix_F64 temp = new RowMatrix_F64(3,3);
+		RowMatrix_F64 K_inv = new RowMatrix_F64(3,3);
 
-		DenseMatrix64F H = createHomography(R, T, d, N);
+		RowMatrix_F64 H = createHomography(R, T, d, N);
 
 		// apply calibration matrix to R
 		CommonOps_D64.mult(K,H,temp);
@@ -752,7 +752,7 @@ public class MultiViewOps {
 	 * @param e1 Output: Right epipole in homogeneous coordinates. Can be null. Modified.
 	 * @param e2 Output: Left epipole in homogeneous coordinates. Can be null. Modified.
 	 */
-	public static void extractEpipoles( DenseMatrix64F F , Point3D_F64 e1 , Point3D_F64 e2 ) {
+	public static void extractEpipoles( RowMatrix_F64 F , Point3D_F64 e1 , Point3D_F64 e2 ) {
 		SimpleMatrix f = SimpleMatrix.wrap(F);
 		SimpleSVD<SimpleMatrix> svd = f.svd();
 
@@ -788,19 +788,19 @@ public class MultiViewOps {
 	 * @param e2 Left epipole of fundamental matrix, F<sup>T</sup>*e2 = 0.
 	 * @return The canonical camera matrix P'
 	 */
-	public static DenseMatrix64F canonicalCamera( DenseMatrix64F F , Point3D_F64 e2, Vector3D_F64 v , double lambda ) {
+	public static RowMatrix_F64 canonicalCamera( RowMatrix_F64 F , Point3D_F64 e2, Vector3D_F64 v , double lambda ) {
 
-		DenseMatrix64F crossMatrix = new DenseMatrix64F(3,3);
+		RowMatrix_F64 crossMatrix = new RowMatrix_F64(3,3);
 		GeometryMath_F64.crossMatrix(e2, crossMatrix);
 
-		DenseMatrix64F outer = new DenseMatrix64F(3,3);
+		RowMatrix_F64 outer = new RowMatrix_F64(3,3);
 		GeometryMath_F64.outerProd(e2,v,outer);
 
-		DenseMatrix64F KR = new DenseMatrix64F(3,3);
+		RowMatrix_F64 KR = new RowMatrix_F64(3,3);
 		CommonOps_D64.mult(crossMatrix, F, KR);
 		CommonOps_D64.add(KR, outer, KR);
 
-		DenseMatrix64F P = new DenseMatrix64F(3,4);
+		RowMatrix_F64 P = new RowMatrix_F64(3,4);
 		CommonOps_D64.insert(KR,P,0,0);
 
 		P.set(0,3,lambda*e2.x);
@@ -825,11 +825,11 @@ public class MultiViewOps {
 	 * @param K Output: Camera calibration matrix, 3 by 3.
 	 * @param pose Output: The rotation and translation.
 	 */
-	public static void decomposeCameraMatrix(DenseMatrix64F P, DenseMatrix64F K, Se3_F64 pose) {
-		DenseMatrix64F KR = new DenseMatrix64F(3,3);
+	public static void decomposeCameraMatrix(RowMatrix_F64 P, RowMatrix_F64 K, Se3_F64 pose) {
+		RowMatrix_F64 KR = new RowMatrix_F64(3,3);
 		CommonOps_D64.extract(P, 0, 3, 0, 3, KR, 0, 0);
 
-		QRDecomposition<DenseMatrix64F> qr = DecompositionFactory_D64.qr(3, 3);
+		QRDecomposition<RowMatrix_F64> qr = DecompositionFactory_D64.qr(3, 3);
 
 		if( !CommonOps_D64.invert(KR) )
 			throw new RuntimeException("Inverse failed!  Bad input?");
@@ -837,8 +837,8 @@ public class MultiViewOps {
 		if( !qr.decompose(KR) )
 			throw new RuntimeException("QR decomposition failed!  Bad input?");
 
-		DenseMatrix64F U = qr.getQ(null,false);
-		DenseMatrix64F B = qr.getR(null, false);
+		RowMatrix_F64 U = qr.getQ(null,false);
+		RowMatrix_F64 B = qr.getR(null, false);
 
 		if( !CommonOps_D64.invert(U,pose.getR()) )
 			throw new RuntimeException("Inverse failed!  Bad input?");
@@ -863,7 +863,7 @@ public class MultiViewOps {
 	 * @param E An essential matrix.
 	 * @return Four possible motions
 	 */
-	public static List<Se3_F64> decomposeEssential( DenseMatrix64F E ) {
+	public static List<Se3_F64> decomposeEssential( RowMatrix_F64 E ) {
 		DecomposeEssential d = new DecomposeEssential();
 
 		d.decompose(E);
@@ -883,7 +883,7 @@ public class MultiViewOps {
 	 * @param H Homography in Euclidean space
 	 * @return The set of four possible solutions. First param: motion (R,T).  Second param: plane normal vector.
 	 */
-	public static List<Tuple2<Se3_F64,Vector3D_F64>> decomposeHomography( DenseMatrix64F H ) {
+	public static List<Tuple2<Se3_F64,Vector3D_F64>> decomposeHomography( RowMatrix_F64 H ) {
 		DecomposeHomography d = new DecomposeHomography();
 
 		d.decompose(H);

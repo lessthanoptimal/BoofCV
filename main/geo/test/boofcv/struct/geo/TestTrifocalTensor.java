@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.struct.geo;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.NormOps_D64;
 import org.junit.Test;
 
@@ -55,7 +55,7 @@ public class TestTrifocalTensor {
 
 	@Test
 	public void convertFrom() {
-		DenseMatrix64F A = new DenseMatrix64F(27,1);
+		RowMatrix_F64 A = new RowMatrix_F64(27,1);
 		for( int i = 0; i < 27; i++ )
 			A.set(i,i);
 
@@ -73,7 +73,7 @@ public class TestTrifocalTensor {
 		for( int i = 0; i < 27; i++ )
 			t.getT( i/9 ).set(i % 9, i);
 
-		DenseMatrix64F A = new DenseMatrix64F(27,1);
+		RowMatrix_F64 A = new RowMatrix_F64(27,1);
 		t.convertTo(A);
 		for( int i = 0; i < 27; i++ )
 			assertTrue(i==A.get(i));
@@ -87,7 +87,7 @@ public class TestTrifocalTensor {
 		for( int i = 0; i < 27; i++ )
 			t.getT( i/9 ).set(i%9,i);
 
-		DenseMatrix64F A = new DenseMatrix64F(27,1);
+		RowMatrix_F64 A = new RowMatrix_F64(27,1);
 		t.convertTo(A);
 
 		double N = NormOps_D64.normF(A);

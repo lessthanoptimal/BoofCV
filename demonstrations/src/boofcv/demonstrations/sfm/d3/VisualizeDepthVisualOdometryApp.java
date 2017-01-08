@@ -57,7 +57,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -272,7 +272,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageGray<I>>
 
 		handleRunningStatus(2);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.visualParam,(DenseMatrix64F)null);
+		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(config.visualParam,(RowMatrix_F64)null);
 		guiCam3D.init();
 		guiCam3D.setK(K);
 		guiCam3D.setStepSize(0.05);

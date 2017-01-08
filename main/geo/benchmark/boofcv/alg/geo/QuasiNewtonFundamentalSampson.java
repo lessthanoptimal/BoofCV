@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedMinimization;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class QuasiNewtonFundamentalSampson implements RefineEpipolar {
-	ModelCodec<DenseMatrix64F> paramModel;
+	ModelCodec<RowMatrix_F64> paramModel;
 	FunctionSampsonFundamental func = new FunctionSampsonFundamental();
 	double param[];
 
@@ -49,7 +49,7 @@ public class QuasiNewtonFundamentalSampson implements RefineEpipolar {
 		this( new ParamFundamentalEpipolar() , convergenceTol, maxIterations);
 	}
 
-	public QuasiNewtonFundamentalSampson(ModelCodec<DenseMatrix64F> paramModel,
+	public QuasiNewtonFundamentalSampson(ModelCodec<RowMatrix_F64> paramModel,
 										 double convergenceTol, int maxIterations) {
 		this.paramModel = paramModel;
 		this.maxIterations = maxIterations;
@@ -61,7 +61,7 @@ public class QuasiNewtonFundamentalSampson implements RefineEpipolar {
 	}
 
 	@Override
-	public boolean fitModel(List<AssociatedPair> obs, DenseMatrix64F F, DenseMatrix64F refinedF) {
+	public boolean fitModel(List<AssociatedPair> obs, RowMatrix_F64 F, RowMatrix_F64 refinedF) {
 		func.set(paramModel, obs);
 		
 		paramModel.encode(F, param);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import georegression.geometry.UtilTrig_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.optimization.functions.FunctionNtoM;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.List;
 
@@ -44,7 +44,7 @@ public class ResidualsTriangulateSampson implements FunctionNtoM {
 	// observations of the same feature in normalized coordinates
 	private List<Point2D_F64> observations;
 	// Essential matrix associated with motion
-	private List<DenseMatrix64F> essential;
+	private List<RowMatrix_F64> essential;
 
 	private Point3D_F64 point = new Point3D_F64();
 
@@ -58,7 +58,7 @@ public class ResidualsTriangulateSampson implements FunctionNtoM {
 	 * @param essential Essential matrices associated with camera motion (world to camera)
 	 */
 	public void setObservations( List<Point2D_F64> observations,
-								 List<DenseMatrix64F> essential ) {
+								 List<RowMatrix_F64> essential ) {
 		this.observations = observations;
 		this.essential = essential;
 	}
@@ -83,7 +83,7 @@ public class ResidualsTriangulateSampson implements FunctionNtoM {
 		int index = 0;
 		for( int i = 0; i < observations.size(); i++ ) {
 			Point2D_F64 p = observations.get(i);
-			DenseMatrix64F F = essential.get(i);
+			RowMatrix_F64 F = essential.get(i);
 
 			// F^T*x'
 			GeometryMath_F64.multTran(F, p, left);

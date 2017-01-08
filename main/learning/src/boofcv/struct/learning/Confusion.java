@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.struct.learning;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 /**
  * Storage for a confusion matrix.  Rows represent the actual type and the columns the predicted type.  All the rows
@@ -27,15 +27,15 @@ import org.ejml.data.DenseMatrix64F;
  * @author Peter Abeles
  */
 public class Confusion {
-	DenseMatrix64F matrix;
+	RowMatrix_F64 matrix;
 	int actualCounts[];
 
 	public Confusion( int numTypes) {
-		matrix = new DenseMatrix64F(numTypes,numTypes);
+		matrix = new RowMatrix_F64(numTypes,numTypes);
 		actualCounts = new int[numTypes];
 	}
 
-	public DenseMatrix64F getMatrix() {
+	public RowMatrix_F64 getMatrix() {
 		return matrix;
 	}
 

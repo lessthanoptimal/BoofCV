@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.QueueMatrix;
 import georegression.geometry.GeometryMath_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.junit.Test;
 
@@ -70,7 +70,7 @@ public abstract class CheckEstimateNofEpipolar extends EpipolarTestSimulation {
 
 		boolean workedOnce = false;
 
-		FastQueue<DenseMatrix64F> solutions = new QueueMatrix(3, 3);
+		FastQueue<RowMatrix_F64> solutions = new QueueMatrix(3, 3);
 
 		for( int i = 0; i < 10; i++ ) {
 			List<AssociatedPair> pairs = randomPairs(alg.getMinimumPoints());
@@ -84,7 +84,7 @@ public abstract class CheckEstimateNofEpipolar extends EpipolarTestSimulation {
 
 			workedOnce = true;
 
-			for( DenseMatrix64F F : solutions.toList() ) {
+			for( RowMatrix_F64 F : solutions.toList() ) {
 				// normalize to ensure proper scaling
 				double n = CommonOps_D64.elementMaxAbs(F);
 				CommonOps_D64.scale(1.0/n,F);

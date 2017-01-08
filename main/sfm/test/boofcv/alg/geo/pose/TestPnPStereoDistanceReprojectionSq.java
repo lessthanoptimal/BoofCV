@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -43,8 +43,8 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 		// Point location in world frame
 		Point3D_F64 X = new Point3D_F64(0.1,-0.04,2.3);
 
-		DenseMatrix64F K_left = PerspectiveOps.calibrationMatrix(param.left,(DenseMatrix64F)null);
-		DenseMatrix64F K_right = PerspectiveOps.calibrationMatrix(param.right,(DenseMatrix64F)null);
+		RowMatrix_F64 K_left = PerspectiveOps.calibrationMatrix(param.left,(RowMatrix_F64)null);
+		RowMatrix_F64 K_right = PerspectiveOps.calibrationMatrix(param.right,(RowMatrix_F64)null);
 
 		// errors
 		double deltaX0 = 0.1;
@@ -94,8 +94,8 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 			// Point location in world frame
 			Point3D_F64 X = new Point3D_F64(0.1,-0.04,Pz);
 
-			DenseMatrix64F K_left = PerspectiveOps.calibrationMatrix(param.left, (DenseMatrix64F)null);
-			DenseMatrix64F K_right = PerspectiveOps.calibrationMatrix(param.right, (DenseMatrix64F)null);
+			RowMatrix_F64 K_left = PerspectiveOps.calibrationMatrix(param.left, (RowMatrix_F64)null);
+			RowMatrix_F64 K_right = PerspectiveOps.calibrationMatrix(param.right, (RowMatrix_F64)null);
 
 			// create a noisy observed
 			Point2D_F64 obsLeft = PerspectiveOps.renderPixel(worldToLeft, K_left, X);
@@ -119,8 +119,8 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 
 	@Test
 	public void checkErrorArray() {
-		DenseMatrix64F K_left = PerspectiveOps.calibrationMatrix(param.left, (DenseMatrix64F)null);
-		DenseMatrix64F K_right = PerspectiveOps.calibrationMatrix(param.right, (DenseMatrix64F)null);
+		RowMatrix_F64 K_left = PerspectiveOps.calibrationMatrix(param.left, (RowMatrix_F64)null);
+		RowMatrix_F64 K_right = PerspectiveOps.calibrationMatrix(param.right, (RowMatrix_F64)null);
 
 		PnPStereoDistanceReprojectionSq alg = new PnPStereoDistanceReprojectionSq();
 		alg.setStereoParameters(param);

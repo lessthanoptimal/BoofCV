@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -40,7 +40,7 @@ public class TestFundamentalResidualSimple extends EpipolarTestSimulation {
 		init(30,false);
 
 		// compute true essential matrix
-		DenseMatrix64F E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
+		RowMatrix_F64 E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
 
 
 		FundamentalResidualSimple alg = new FundamentalResidualSimple();

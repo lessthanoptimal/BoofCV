@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import georegression.struct.point.Point3D_F64;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
 import org.ddogleg.optimization.UtilOptimize;
 import org.ddogleg.optimization.functions.FunctionNtoM;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.List;
 
@@ -138,7 +138,7 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 		Point3D_F64 e2 = new Point3D_F64();
 		Point3D_F64 e3 = new Point3D_F64();
 
-		DenseMatrix64F errors = new DenseMatrix64F(1,1);
+		RowMatrix_F64 errors = new RowMatrix_F64(1,1);
 
 		public void init() {
 			errors.numRows = A.numRows;

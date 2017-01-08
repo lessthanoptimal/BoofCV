@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import georegression.struct.point.Point2D_F64;
 import org.ddogleg.solver.Polynomial;
 import org.ddogleg.solver.PolynomialRoots;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.Complex64F;
+import org.ejml.data.Complex_F64;
 
 import java.util.List;
 
@@ -93,9 +93,9 @@ public class P3PGrunert implements P3PLineDistance {
 		if( !rootFinder.process(poly) )
 			return false;
 
-		List<Complex64F> roots = rootFinder.getRoots();
+		List<Complex_F64> roots = rootFinder.getRoots();
 
-		for( Complex64F r : roots ) {
+		for( Complex_F64 r : roots ) {
 			if( !r.isReal() ) {
 				continue;
 			}

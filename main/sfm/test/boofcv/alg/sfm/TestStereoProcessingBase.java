@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -93,7 +93,7 @@ public class TestStereoProcessingBase {
 
 		StereoParameters param = createStereoParam(width,height);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param.left,(DenseMatrix64F)null);
+		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(param.left,(RowMatrix_F64)null);
 
 		// compute the view in pixels of the point in the left and right cameras
 		Point2D_F64 lensLeft = new Point2D_F64();

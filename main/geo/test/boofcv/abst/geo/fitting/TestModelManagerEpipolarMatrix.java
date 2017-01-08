@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.fitting;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -32,7 +32,7 @@ public class TestModelManagerEpipolarMatrix {
 	@Test
 	public void createModelInstance() {
 		ModelManagerEpipolarMatrix alg = new ModelManagerEpipolarMatrix();
-		DenseMatrix64F found = alg.createModelInstance();
+		RowMatrix_F64 found = alg.createModelInstance();
 
 		assertTrue( found != null );
 		assertEquals(3, found.getNumRows());
@@ -43,10 +43,10 @@ public class TestModelManagerEpipolarMatrix {
 	public void copyModel() {
 		ModelManagerEpipolarMatrix alg = new ModelManagerEpipolarMatrix();
 
-		DenseMatrix64F m = new DenseMatrix64F(3,3);
+		RowMatrix_F64 m = new RowMatrix_F64(3,3);
 		for( int i = 0; i < 9; i++ )
 			m.data[i] = i+1;
-		DenseMatrix64F copy = new DenseMatrix64F(3,3);
+		RowMatrix_F64 copy = new RowMatrix_F64(3,3);
 
 		alg.copyModel(m,copy);
 		for( int i = 0; i < 9; i++ )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
 
@@ -51,7 +51,7 @@ public class TestLowLevelMultiViewOps {
 			list.add(p);
 		}
 
-		DenseMatrix64F N = new DenseMatrix64F(3,3);
+		RowMatrix_F64 N = new RowMatrix_F64(3,3);
 		LowLevelMultiViewOps.computeNormalization(list, N);
 
 		List<Point2D_F64> transformed = new ArrayList<>();
@@ -113,14 +113,14 @@ public class TestLowLevelMultiViewOps {
 
 		PerspectiveOps.splitAssociated(list,list1,list2);
 
-		DenseMatrix64F expected1 = new DenseMatrix64F(3,3);
-		DenseMatrix64F expected2 = new DenseMatrix64F(3,3);
+		RowMatrix_F64 expected1 = new RowMatrix_F64(3,3);
+		RowMatrix_F64 expected2 = new RowMatrix_F64(3,3);
 
 		LowLevelMultiViewOps.computeNormalization(list1, expected1);
 		LowLevelMultiViewOps.computeNormalization(list2, expected2);
 
-		DenseMatrix64F found1 = new DenseMatrix64F(3,3);
-		DenseMatrix64F found2 = new DenseMatrix64F(3,3);
+		RowMatrix_F64 found1 = new RowMatrix_F64(3,3);
+		RowMatrix_F64 found2 = new RowMatrix_F64(3,3);
 
 		LowLevelMultiViewOps.computeNormalization(list, found1, found2);
 
@@ -151,17 +151,17 @@ public class TestLowLevelMultiViewOps {
 
 		PerspectiveOps.splitAssociated(list,list1,list2,list3);
 
-		DenseMatrix64F expected1 = new DenseMatrix64F(3,3);
-		DenseMatrix64F expected2 = new DenseMatrix64F(3,3);
-		DenseMatrix64F expected3 = new DenseMatrix64F(3,3);
+		RowMatrix_F64 expected1 = new RowMatrix_F64(3,3);
+		RowMatrix_F64 expected2 = new RowMatrix_F64(3,3);
+		RowMatrix_F64 expected3 = new RowMatrix_F64(3,3);
 
 		LowLevelMultiViewOps.computeNormalization(list1, expected1);
 		LowLevelMultiViewOps.computeNormalization(list2, expected2);
 		LowLevelMultiViewOps.computeNormalization(list3, expected3);
 
-		DenseMatrix64F found1 = new DenseMatrix64F(3,3);
-		DenseMatrix64F found2 = new DenseMatrix64F(3,3);
-		DenseMatrix64F found3 = new DenseMatrix64F(3,3);
+		RowMatrix_F64 found1 = new RowMatrix_F64(3,3);
+		RowMatrix_F64 found2 = new RowMatrix_F64(3,3);
+		RowMatrix_F64 found3 = new RowMatrix_F64(3,3);
 
 		LowLevelMultiViewOps.computeNormalization(list, found1, found2, found3);
 
@@ -175,7 +175,7 @@ public class TestLowLevelMultiViewOps {
 	 */
 	@Test
 	public void applyPixelNormalization() {
-		DenseMatrix64F N = new DenseMatrix64F(3,3,true,1,2,3,4,5,6,7,8,9);
+		RowMatrix_F64 N = new RowMatrix_F64(3,3,true,1,2,3,4,5,6,7,8,9);
 
 		Point2D_F64 a = new Point2D_F64(3,4);
 		Point2D_F64 found = new Point2D_F64(3,4);

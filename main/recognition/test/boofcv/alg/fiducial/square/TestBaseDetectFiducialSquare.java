@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,8 +43,8 @@ import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
-import org.ejml.data.DenseMatrix32F;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F32;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.ConvertMatrixData;
 import org.junit.Test;
 
@@ -314,11 +314,11 @@ public class TestBaseDetectFiducialSquare {
 
 		Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomography(true);
 
-		DenseMatrix64F H = new DenseMatrix64F(3,3);
+		RowMatrix_F64 H = new RowMatrix_F64(3,3);
 		computeHomography.process(associatedPairs, H);
 
 		// Create the transform for distorting the image
-		DenseMatrix32F H32 = new DenseMatrix32F(3,3);
+		RowMatrix_F32 H32 = new RowMatrix_F32(3,3);
 		ConvertMatrixData.convert(H,H32);
 		PointTransformHomography_F32 homography = new PointTransformHomography_F32(H32);
 		PixelTransform2_F32 pixelTransform = new PointToPixelTransform_F32(homography);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class DistanceTranGivenRotSq implements DistanceFromModel<Vector3D_F64,Po
 
 	Point3D_F64 localX = new Point3D_F64();
 
-	public void setRotation( DenseMatrix64F R ) {
+	public void setRotation( RowMatrix_F64 R ) {
 		motion.getR().set(R);
 	}
 

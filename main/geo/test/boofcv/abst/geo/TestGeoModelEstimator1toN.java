@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.geo.QueueMatrix;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -36,11 +36,11 @@ import static org.junit.Assert.*;
 public class TestGeoModelEstimator1toN {
 
 	List<AssociatedPair> points = new ArrayList<>();
-	FastQueue<DenseMatrix64F> solutions = new QueueMatrix(3, 3);
+	FastQueue<RowMatrix_F64> solutions = new QueueMatrix(3, 3);
 
 	@Test
 	public void basicTest() {
-		GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair> alg =
+		GeoModelEstimator1toN<RowMatrix_F64,AssociatedPair> alg =
 				new GeoModelEstimator1toN<>(new Dummy(true));
 
 		assertTrue(alg.process(points,solutions));
@@ -58,7 +58,7 @@ public class TestGeoModelEstimator1toN {
 	 */
 	@Test
 	public void multipleCalls() {
-		GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair> alg =
+		GeoModelEstimator1toN<RowMatrix_F64,AssociatedPair> alg =
 				new GeoModelEstimator1toN<>(new Dummy(true));
 
 		assertTrue(alg.process(points,solutions));
@@ -71,7 +71,7 @@ public class TestGeoModelEstimator1toN {
 		assertFalse(alg.process(points,solutions));
 	}
 
-	private static class Dummy implements GeoModelEstimator1<DenseMatrix64F,AssociatedPair> {
+	private static class Dummy implements GeoModelEstimator1<RowMatrix_F64,AssociatedPair> {
 		boolean hasSolution;
 
 		private Dummy(boolean hasSolution) {
@@ -79,7 +79,7 @@ public class TestGeoModelEstimator1toN {
 		}
 
 		@Override
-		public boolean process(List<AssociatedPair> points, DenseMatrix64F solution ) {
+		public boolean process(List<AssociatedPair> points, RowMatrix_F64 solution ) {
 			return hasSolution;
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Polygon2D_I32;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.awt.image.BufferedImage;
 import java.util.*;
@@ -50,7 +50,7 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> {
 	Random rand = new Random(1234);
 
 	CameraPinholeRadial intrinsic;
-	DenseMatrix64F K;
+	RowMatrix_F64 K;
 
 	BufferedImage workImage;
 	I outputImage;
@@ -69,7 +69,7 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> {
 
 	public void setIntrinsic( CameraPinholeRadial param ) {
 		this.intrinsic = param;
-		K = PerspectiveOps.calibrationMatrix(param,(DenseMatrix64F)null);
+		K = PerspectiveOps.calibrationMatrix(param,(RowMatrix_F64)null);
 	}
 
 	protected void createSquares( int total , double minZ, double maxZ ) {

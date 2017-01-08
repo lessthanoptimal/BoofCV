@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.geo.MultiViewOps;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ejml.UtilEjml;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -42,7 +42,7 @@ import org.ejml.simple.SimpleMatrix;
  * 
  * @author Peter Abeles
  */
-public class ParamFundamentalEpipolar implements ModelCodec<DenseMatrix64F> {
+public class ParamFundamentalEpipolar implements ModelCodec<RowMatrix_F64> {
 
 	// order of columns
 	int col0,col1,col2;
@@ -59,7 +59,7 @@ public class ParamFundamentalEpipolar implements ModelCodec<DenseMatrix64F> {
 	 * Examines the matrix structure to determine how to parameterize F.  
 	 */
 	@Override
-	public void encode(DenseMatrix64F F, double[] param) {
+	public void encode(RowMatrix_F64 F, double[] param) {
 		// see if which columns are to be used
 		selectColumns(F);
 		
@@ -124,7 +124,7 @@ public class ParamFundamentalEpipolar implements ModelCodec<DenseMatrix64F> {
 		return divisor;
 	}
 
-	private void selectColumns(DenseMatrix64F F) {
+	private void selectColumns(RowMatrix_F64 F) {
 		Point3D_F64 e1 = new Point3D_F64();
 		Point3D_F64 e2 = new Point3D_F64();
 
@@ -139,7 +139,7 @@ public class ParamFundamentalEpipolar implements ModelCodec<DenseMatrix64F> {
 	}
 
 	@Override
-	public void decode(double[] input, DenseMatrix64F F) {
+	public void decode(double[] input, RowMatrix_F64 F) {
 		F.data[indexes[0]] = input[0];
 		F.data[indexes[1]] = input[1];
 		F.data[indexes[2]] = input[2];

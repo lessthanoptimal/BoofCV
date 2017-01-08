@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.f;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 /**
  * Helper class for {@link EssentialNister5}.  Contains ugly unrolled linear systems.  See generate/python/nister5.py
@@ -53,7 +53,7 @@ public class HelperNister5 {
 	 *
 	 * @param A a 10 by 10 matrix
 	 */
-	public void setupA1(DenseMatrix64F A) {
+	public void setupA1(RowMatrix_F64 A) {
 		A.data[0] = X20*( X01*X12 - X02*X11 ) + X10*( -X01*X22 + X02*X21 ) + X00*( X11*X22 - X12*X21 );
 		A.data[1] = Y02*( Y10*Y21 - Y11*Y20 ) + Y00*( Y11*Y22 - Y12*Y21 ) + Y01*( -Y10*Y22 + Y12*Y20 );
 		A.data[2] = X22*( X00*Y11 - X01*Y10 - X10*Y01 + X11*Y00 ) + X20*( X01*Y12 - X02*Y11 - X11*Y02 + X12*Y01 ) + X21*( -X00*Y12 + X02*Y10 + X10*Y02 - X12*Y00 ) + X01*( -X10*Y22 + X12*Y20 ) + Y21*( -X00*X12 + X02*X10 ) + X11*( X00*Y22 - X02*Y20 );
@@ -163,7 +163,7 @@ public class HelperNister5 {
 	 *
 	 * @param B a 10 by 10 matrix
 	 */
-	public void setupA2(DenseMatrix64F B) {
+	public void setupA2(RowMatrix_F64 B) {
 		B.data[0] = Z22*( X00*Z11 - X01*Z10 - X10*Z01 + X11*Z00 ) + Z21*( -X00*Z12 + X02*Z10 + X10*Z02 - X12*Z00 ) + Z20*( X01*Z12 - X02*Z11 - X11*Z02 + X12*Z01 ) + Z01*( X20*Z12 - X22*Z10 ) + Z00*( -X21*Z12 + X22*Z11 ) + Z02*( -X20*Z11 + X21*Z10 );
 		B.data[1] = Z22*( W00*X11 - W01*X10 - W10*X01 + W11*X00 ) + Z21*( -W00*X12 + W02*X10 + W10*X02 - W12*X00 ) + Z20*( W01*X12 - W02*X11 - W11*X02 + W12*X01 ) + Z01*( -W10*X22 + W12*X20 + W20*X12 - W22*X10 ) + Z00*( W11*X22 - W12*X21 - W21*X12 + W22*X11 ) + Z02*( W10*X21 - W11*X20 - W20*X11 + W21*X10 ) + Z12*( -W00*X21 + W01*X20 + W20*X01 - W21*X00 ) + Z11*( W00*X22 - W02*X20 - W20*X02 + W22*X00 ) + Z10*( -W01*X22 + W02*X21 + W21*X02 - W22*X01 );
 		B.data[2] = W00*( W11*X22 - W12*X21 - W21*X12 + W22*X11 ) + W01*( -W10*X22 + W12*X20 + W20*X12 - W22*X10 ) + W02*( W10*X21 - W11*X20 - W20*X11 + W21*X10 ) + W12*( W20*X01 - W21*X00 ) + W11*( -W20*X02 + W22*X00 ) + W10*( W21*X02 - W22*X01 );
@@ -277,7 +277,7 @@ public class HelperNister5 {
 	 *
 	 * @param A Solution to linear system
 	 */
-	public void setDeterminantVectors( DenseMatrix64F A ) {
+	public void setDeterminantVectors( RowMatrix_F64 A ) {
 		int r = A.numCols*4;
 		int t = A.numCols*5;
 

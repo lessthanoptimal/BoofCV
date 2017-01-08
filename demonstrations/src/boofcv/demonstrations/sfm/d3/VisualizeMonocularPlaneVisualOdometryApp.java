@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -276,7 +276,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 
 		handleRunningStatus(2);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.intrinsic, (DenseMatrix64F)null);
+		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(config.intrinsic, (RowMatrix_F64)null);
 		guiCam3D.init();
 		guiCam3D.setK(K);
 		guiCam3D.setStepSize(1);

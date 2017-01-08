@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.junit.Test;
 
@@ -36,14 +36,14 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestDistanceEpipolarConstraint {
 
-	DenseMatrix64F K = new DenseMatrix64F(3,3,true,100,0.01,200,0,150,200,0,0,1);
+	RowMatrix_F64 K = new RowMatrix_F64(3,3,true,100,0.01,200,0,150,200,0,0,1);
 
 	Se3_F64 worldToCamera = new Se3_F64();
 
 	Point3D_F64 X = new Point3D_F64(0.1,-0.04,2.3);
 
 	Point2D_F64 p1,p2;
-	DenseMatrix64F E,F;
+	RowMatrix_F64 E,F;
 
 	public TestDistanceEpipolarConstraint() {
 		worldToCamera.getT().set(0.1,-0.1,0.2);

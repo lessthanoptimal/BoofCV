@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ package boofcv.alg.geo.h;
 import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 import org.ejml.ops.SingularOps_D64;
@@ -54,12 +54,12 @@ import java.util.List;
 public class HomographyLinear4 {
 
 	// contains the set of equations that are solved
-	protected DenseMatrix64F A = new DenseMatrix64F(1,9);
-	protected SingularValueDecomposition_F64<DenseMatrix64F> svd = DecompositionFactory_D64.svd(0, 0, true, true, false);
+	protected RowMatrix_F64 A = new RowMatrix_F64(1,9);
+	protected SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_D64.svd(0, 0, true, true, false);
 
 	// matrix used to normalize results
-	protected DenseMatrix64F N1 = new DenseMatrix64F(3,3);
-	protected DenseMatrix64F N2 = new DenseMatrix64F(3,3);
+	protected RowMatrix_F64 N1 = new RowMatrix_F64(3,3);
+	protected RowMatrix_F64 N2 = new RowMatrix_F64(3,3);
 
 	// pick a reasonable scale and sign
 	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
@@ -88,7 +88,7 @@ public class HomographyLinear4 {
 	 * @param foundH Output: Storage for the found solution. 3x3 matrix.
 	 * @return true if the calculation was a success.
 	 */
-	public boolean process( List<AssociatedPair> points , DenseMatrix64F foundH ) {
+	public boolean process( List<AssociatedPair> points , RowMatrix_F64 foundH ) {
 		if( points.size() < 4 )
 			throw new IllegalArgumentException("Must be at least 4 points.");
 
@@ -117,7 +117,7 @@ public class HomographyLinear4 {
 	/**
 	 * Computes the SVD of A and extracts the homography matrix from its null space
 	 */
-	protected boolean computeH(DenseMatrix64F A, DenseMatrix64F H) {
+	protected boolean computeH(RowMatrix_F64 A, RowMatrix_F64 H) {
 		if( !svd.decompose(A) )
 			return true;
 
@@ -126,7 +126,7 @@ public class HomographyLinear4 {
 		else {
 			// handle a special case since the matrix only has 8 singular values and won't select
 			// the correct column
-			DenseMatrix64F V = svd.getV(null,false);
+			RowMatrix_F64 V = svd.getV(null,false);
 			SpecializedOps_D64.subvector(V, 0, 8, V.numCols, false, 0, H);
 		}
 
@@ -136,7 +136,7 @@ public class HomographyLinear4 {
 	/**
 	 * Undoes normalization for a homography matrix.
 	 */
-	protected void undoNormalizationH(DenseMatrix64F M, DenseMatrix64F N1, DenseMatrix64F N2) {
+	protected void undoNormalizationH(RowMatrix_F64 M, RowMatrix_F64 N1, RowMatrix_F64 N2) {
 		SimpleMatrix a = SimpleMatrix.wrap(M);
 		SimpleMatrix b = SimpleMatrix.wrap(N1);
 		SimpleMatrix c = SimpleMatrix.wrap(N2);
@@ -149,7 +149,7 @@ public class HomographyLinear4 {
 	/**
 	 * Compute the 'A' matrix used to solve for H from normalized points.
 	 */
-	protected void createANormalized(List<AssociatedPair> points, DenseMatrix64F A) {
+	protected void createANormalized(List<AssociatedPair> points, RowMatrix_F64 A) {
 		A.reshape(points.size()*2,9, false);
 		A.zero();
 
@@ -187,7 +187,7 @@ public class HomographyLinear4 {
 /**
 	 * Compute the 'A' matrix used to solve for H from un-normalized points.
 	 */
-	protected void createA(List<AssociatedPair> points, DenseMatrix64F A) {
+	protected void createA(List<AssociatedPair> points, RowMatrix_F64 A) {
 		A.reshape(points.size()*2,9, false);
 		A.zero();
 

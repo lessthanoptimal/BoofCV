@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.PairLineNorm;
 import georegression.geometry.GeometryMath_F64;
 import org.ejml.alg.dense.decomposition.svd.SafeSvd_D64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 import org.ejml.ops.CommonOps_D64;
@@ -38,11 +38,11 @@ import java.util.Arrays;
  */
 public class AdjustHomographyMatrix {
 
-	protected SingularValueDecomposition_F64<DenseMatrix64F> svd = new SafeSvd_D64(DecompositionFactory_D64.svd(0, 0, true, true, false));
+	protected SingularValueDecomposition_F64<RowMatrix_F64> svd = new SafeSvd_D64(DecompositionFactory_D64.svd(0, 0, true, true, false));
 
-	DenseMatrix64F H_t = new DenseMatrix64F(3,3);
+	RowMatrix_F64 H_t = new RowMatrix_F64(3,3);
 
-	public boolean adjust( DenseMatrix64F H , AssociatedPair p ) {
+	public boolean adjust( RowMatrix_F64 H , AssociatedPair p ) {
 		if( !findScaleH(H) )
 			return false;
 
@@ -51,7 +51,7 @@ public class AdjustHomographyMatrix {
 		return true;
 	}
 
-	public boolean adjust( DenseMatrix64F H , PairLineNorm p ) {
+	public boolean adjust( RowMatrix_F64 H , PairLineNorm p ) {
 		if( !findScaleH(H) )
 			return false;
 
@@ -63,7 +63,7 @@ public class AdjustHomographyMatrix {
 	/**
 	 * The scale of H is found by computing the second smallest singular value.
 	 */
-	protected boolean findScaleH( DenseMatrix64F H ) {
+	protected boolean findScaleH( RowMatrix_F64 H ) {
 		if( !svd.decompose(H) )
 			return false;
 
@@ -81,7 +81,7 @@ public class AdjustHomographyMatrix {
 	 *
 	 * @param p test point, used to determine the sign of the matrix.
 	 */
-	protected void adjustHomographSign( AssociatedPair p , DenseMatrix64F H ) {
+	protected void adjustHomographSign( AssociatedPair p , RowMatrix_F64 H ) {
 		double val = GeometryMath_F64.innerProd(p.p2, H, p.p1);
 
 		if( val < 0 )
@@ -94,7 +94,7 @@ public class AdjustHomographyMatrix {
 	 *
 	 * @param p test point, used to determine the sign of the matrix.
 	 */
-	protected void adjustHomographSign( PairLineNorm p , DenseMatrix64F H ) {
+	protected void adjustHomographSign( PairLineNorm p , RowMatrix_F64 H ) {
 
 		CommonOps_D64.transpose(H,H_t);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -48,14 +48,14 @@ public class TestRadialDistortionEstimateLinear {
 	public void perfect( boolean partial ) {
 
 		double distort[] = new double[]{0.01,-0.002};
-		DenseMatrix64F K = GenericCalibrationGrid.createStandardCalibration();
-		List<DenseMatrix64F> homographies = GenericCalibrationGrid.createHomographies(K, 2, rand);
+		RowMatrix_F64 K = GenericCalibrationGrid.createStandardCalibration();
+		List<RowMatrix_F64> homographies = GenericCalibrationGrid.createHomographies(K, 2, rand);
 
 		List<Point2D_F64> layout = GenericCalibrationGrid.standardLayout();
 
 		List<CalibrationObservation> observations = new ArrayList<>();
 
-		for( DenseMatrix64F H : homographies ) {
+		for( RowMatrix_F64 H : homographies ) {
 			// in calibrated image coordinates
 			List<Point2D_F64> pixels = GenericCalibrationGrid.observations(H, layout);
 			// apply distortion

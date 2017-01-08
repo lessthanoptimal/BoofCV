@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo.h;
 
 import boofcv.alg.geo.ModelObservationResidualN;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
 
@@ -41,11 +41,11 @@ public class TestHomographyResidualSampson extends HomographyResidualTests {
 	public void checkJacobian() {
 		HomographyResidualSampson alg = new HomographyResidualSampson();
 
-		DenseMatrix64F H = new DenseMatrix64F(3,3,true,1,2,3,4,5,6,7,8,9);
+		RowMatrix_F64 H = new RowMatrix_F64(3,3,true,1,2,3,4,5,6,7,8,9);
 		Point2D_F64 x1 = new Point2D_F64(10,20);
 		Point2D_F64 x2 = new Point2D_F64(30,40);
 
-		DenseMatrix64F J = new DenseMatrix64F(2,4);
+		RowMatrix_F64 J = new RowMatrix_F64(2,4);
 		alg.H = H;
 
 		// see page 130,  the cost function is multilinear and the jacobian can be computed this way

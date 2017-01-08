@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.struct.calib.CameraPinholeRadial;
 import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.javacpp.indexer.DoubleBufferIndexer;
 import org.bytedeco.javacpp.opencv_core.*;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import static org.bytedeco.javacpp.opencv_core.*;
 
@@ -78,13 +78,13 @@ public class UtilOpenCV {
 	public static void save( CameraPinholeRadial model , String fileName ) {
 		FileStorage fs = new FileStorage(fileName, FileStorage.WRITE);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(model, (DenseMatrix64F)null);
+		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(model, (RowMatrix_F64)null);
 
 		write(fs,"image_width", model.width);
 		write(fs,"image_height", model.height);
 		write(fs,"camera_matrix", toMat(K));
 
-		DenseMatrix64F D = new DenseMatrix64F(2+model.radial.length,1);
+		RowMatrix_F64 D = new RowMatrix_F64(2+model.radial.length,1);
 		D.set(0,0,model.radial[0]);
 		D.set(1,0,model.radial[1]);
 		D.set(4,0,model.radial[2]);
@@ -97,7 +97,7 @@ public class UtilOpenCV {
 
 	}
 
-	public static Mat toMat(DenseMatrix64F in ) {
+	public static Mat toMat(RowMatrix_F64 in ) {
 		Mat out = new Mat(in.numRows,in.numCols,CV_64F);
 
 		DoubleBufferIndexer indexer = out.createIndexer();

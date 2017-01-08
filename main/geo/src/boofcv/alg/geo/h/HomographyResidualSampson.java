@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.LinearSolverFactory_D64;
 import org.ejml.interfaces.linsol.LinearSolver;
 import org.ejml.ops.CommonOps_D64;
@@ -42,22 +42,22 @@ import org.ejml.ops.CommonOps_D64;
  * @author Peter Abeles
  */
 public class HomographyResidualSampson
-		implements ModelObservationResidualN<DenseMatrix64F,AssociatedPair>
+		implements ModelObservationResidualN<RowMatrix_F64,AssociatedPair>
 {
 
-	DenseMatrix64F H;
+	RowMatrix_F64 H;
 	Point2D_F64 temp = new Point2D_F64();
 
-	DenseMatrix64F J = new DenseMatrix64F(2,4);
-	DenseMatrix64F JJ = new DenseMatrix64F(2,2);
-	DenseMatrix64F e = new DenseMatrix64F(2,1);
-	DenseMatrix64F x = new DenseMatrix64F(2,1);
-	DenseMatrix64F error = new DenseMatrix64F(4,1);
+	RowMatrix_F64 J = new RowMatrix_F64(2,4);
+	RowMatrix_F64 JJ = new RowMatrix_F64(2,2);
+	RowMatrix_F64 e = new RowMatrix_F64(2,1);
+	RowMatrix_F64 x = new RowMatrix_F64(2,1);
+	RowMatrix_F64 error = new RowMatrix_F64(4,1);
 
-	LinearSolver<DenseMatrix64F> solver = LinearSolverFactory_D64.linear(2);
+	LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_D64.linear(2);
 
 	@Override
-	public void setModel(DenseMatrix64F H) {
+	public void setModel(RowMatrix_F64 H) {
 		this.H = H;
 	}
 

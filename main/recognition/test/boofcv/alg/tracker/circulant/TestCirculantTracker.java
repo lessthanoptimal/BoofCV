@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,8 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.InterleavedF64;
 import georegression.struct.shapes.RectangleLength2D_F32;
-import org.ejml.data.Complex64F;
-import org.ejml.ops.ComplexMath64F;
+import org.ejml.data.Complex_F64;
+import org.ejml.ops.ComplexMath_F64;
 import org.junit.Test;
 
 import java.util.Random;
@@ -342,12 +342,12 @@ public class TestCirculantTracker {
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
-				Complex64F aa = new Complex64F(a.getBand(x,y,0),a.getBand(x,y,1));
-				Complex64F bb = new Complex64F(b.getBand(x,y,0),b.getBand(x,y,1));
+				Complex_F64 aa = new Complex_F64(a.getBand(x,y,0),a.getBand(x,y,1));
+				Complex_F64 bb = new Complex_F64(b.getBand(x,y,0),b.getBand(x,y,1));
 
-				Complex64F cc = new Complex64F();
-				ComplexMath64F.conj(bb, bb);
-				ComplexMath64F.multiply(aa, bb, cc);
+				Complex_F64 cc = new Complex_F64();
+				ComplexMath_F64.conj(bb, bb);
+				ComplexMath_F64.multiply(aa, bb, cc);
 
 				double foundReal = c.getBand(x,y,0);
 				double foundImg = c.getBand(x,y,1);
@@ -373,11 +373,11 @@ public class TestCirculantTracker {
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
-				Complex64F a = new Complex64F(yf.getBand(x,y,0),yf.getBand(x,y,1));
-				Complex64F b = new Complex64F(kf.getBand(x,y,0)+lambda,kf.getBand(x,y,1));
+				Complex_F64 a = new Complex_F64(yf.getBand(x,y,0),yf.getBand(x,y,1));
+				Complex_F64 b = new Complex_F64(kf.getBand(x,y,0)+lambda,kf.getBand(x,y,1));
 
-				Complex64F c = new Complex64F();
-				ComplexMath64F.divide(a, b, c);
+				Complex_F64 c = new Complex_F64();
+				ComplexMath_F64.divide(a, b, c);
 
 				double foundReal = alphaf.getBand(x,y,0);
 				double foundImg = alphaf.getBand(x,y,1);

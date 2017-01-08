@@ -42,7 +42,7 @@ import georegression.misc.GrlConstants;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Vector3D_F32;
-import org.ejml.data.DenseMatrix32F;
+import org.ejml.data.RowMatrix_F32;
 import org.ejml.ops.CommonOps_D32;
 
 import javax.swing.*;
@@ -126,8 +126,8 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 				}
 
 				synchronized (imageLock) {
-					DenseMatrix32F R = ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,null);
-					DenseMatrix32F tmp = distorter.getRotation().copy();
+					RowMatrix_F32 R = ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,null);
+					RowMatrix_F32 tmp = distorter.getRotation().copy();
 					CommonOps_D32.mult(tmp,R,distorter.getRotation());
 					distortImage.setModel(distorter); // dirty the transform
 					if (inputMethod == InputMethod.IMAGE) {
@@ -158,8 +158,8 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 					// equirectangular lon-lat uses +x
 					// this compensates for that
 					// roll rotation is to make the view appear "up"
-					DenseMatrix32F A = ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX, GrlConstants.F_PI/2,0,GrlConstants.F_PI/2,null);
-					DenseMatrix32F tmp = distorter.getRotation().copy();
+					RowMatrix_F32 A = ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX, GrlConstants.F_PI/2,0,GrlConstants.F_PI/2,null);
+					RowMatrix_F32 tmp = distorter.getRotation().copy();
 					CommonOps_D32.mult(tmp,A,distorter.getRotation());
 
 					distortImage.setModel(distorter); // let it know the transform has changed
@@ -297,7 +297,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 			// center the center cicle
-			DenseMatrix32F R = distorter.getRotation();
+			RowMatrix_F32 R = distorter.getRotation();
 
 			v.set(0,0,1); // canonical view is +z for pinhole cvamera
 			GeometryMath_F32.mult(R,v,v);

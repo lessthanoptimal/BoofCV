@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo;
 
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
 import org.ejml.ops.CommonOps_D64;
@@ -47,21 +47,21 @@ import java.util.List;
  */
 public class DecomposeEssential {
 
-	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory_D64.svd(3, 3, true, true, false);
+	private SingularValueDecomposition<RowMatrix_F64> svd = DecompositionFactory_D64.svd(3, 3, true, true, false);
 
 	// storage for SVD
-	DenseMatrix64F U,S,V;
+	RowMatrix_F64 U,S,V;
 
 	// storage for the four possible solutions
 	List<Se3_F64> solutions = new ArrayList<>();
 
 	// working copy of E
-	DenseMatrix64F E_copy = new DenseMatrix64F(3,3);
+	RowMatrix_F64 E_copy = new RowMatrix_F64(3,3);
 
 	// local storage used when computing a hypothesis
-	DenseMatrix64F temp = new DenseMatrix64F(3,3);
-	DenseMatrix64F temp2 = new DenseMatrix64F(3,3);
-	DenseMatrix64F Rz = new DenseMatrix64F(3,3);
+	RowMatrix_F64 temp = new RowMatrix_F64(3,3);
+	RowMatrix_F64 temp2 = new RowMatrix_F64(3,3);
+	RowMatrix_F64 Rz = new RowMatrix_F64(3,3);
 
 	public DecomposeEssential() {
 		solutions.add( new Se3_F64());
@@ -79,7 +79,7 @@ public class DecomposeEssential {
 	 *
 	 * @param E essential matrix
 	 */
-	public void decompose( DenseMatrix64F E ) {
+	public void decompose( RowMatrix_F64 E ) {
 		if( svd.inputModified() ) {
 			E_copy.set(E);
 			E = E_copy;
@@ -104,7 +104,7 @@ public class DecomposeEssential {
 	 * @param S Diagonal matrix containing singular values from SVD.
 	 * @param V Orthogonal matrix from SVD.
 	 */
-	public void decompose( DenseMatrix64F U , DenseMatrix64F S , DenseMatrix64F V ) {
+	public void decompose( RowMatrix_F64 U , RowMatrix_F64 S , RowMatrix_F64 V ) {
 		// this ensures the resulting rotation matrix will have a determinant of +1 and thus be a real rotation matrix
 		if( CommonOps_D64.det(U) < 0 ) {
 			CommonOps_D64.scale(-1,U);
@@ -144,10 +144,10 @@ public class DecomposeEssential {
 	 * There are four possible reconstructions from an essential matrix.  This function will compute different
 	 * permutations depending on optionA and optionB being true or false.
 	 */
-	private void extractTransform( DenseMatrix64F U , DenseMatrix64F V , DenseMatrix64F S ,
+	private void extractTransform( RowMatrix_F64 U , RowMatrix_F64 V , RowMatrix_F64 S ,
 								   Se3_F64 se , boolean optionA , boolean optionB )
 	{
-		DenseMatrix64F R = se.getR();
+		RowMatrix_F64 R = se.getR();
 		Vector3D_F64 T = se.getT();
 
 		// extract rotation

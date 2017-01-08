@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 import org.ejml.ops.SingularOps_D64;
@@ -43,9 +43,9 @@ import java.util.List;
  */
 public class TriangulateLinearDLT {
 
-	SingularValueDecomposition_F64<DenseMatrix64F> svd = DecompositionFactory_D64.svd(4, 4,true,true,false);
-	DenseMatrix64F v = new DenseMatrix64F(4,1);
-	DenseMatrix64F A = new DenseMatrix64F(4,4);
+	SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_D64.svd(4, 4,true,true,false);
+	RowMatrix_F64 v = new RowMatrix_F64(4,1);
+	RowMatrix_F64 A = new RowMatrix_F64(4,4);
 
 	/**
 	 * <p>
@@ -133,7 +133,7 @@ public class TriangulateLinearDLT {
 	
 	private int addView( Se3_F64 motion , Point2D_F64 a , int index ) {
 
-		DenseMatrix64F R = motion.getR();
+		RowMatrix_F64 R = motion.getR();
 		Vector3D_F64 T = motion.getT();
 		
 		double r11 = R.data[0], r12 = R.data[1], r13 = R.data[2];

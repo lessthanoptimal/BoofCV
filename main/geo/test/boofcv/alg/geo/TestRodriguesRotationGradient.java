@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.junit.Test;
 
@@ -82,7 +82,7 @@ public class TestRodriguesRotationGradient {
 			Rodrigues_F64 r = new Rodrigues_F64();
 
 			r.setParamVector(input[0],input[1],input[2]);
-			DenseMatrix64F M = DenseMatrix64F.wrap(3,3,output);
+			RowMatrix_F64 M = RowMatrix_F64.wrap(3,3,output);
 
 			ConvertRotation3D_F64.rodriguesToMatrix(r,M);
 		}
@@ -106,7 +106,7 @@ public class TestRodriguesRotationGradient {
 			
 			g.process(input[0],input[1],input[2]);
 
-			DenseMatrix64F J = DenseMatrix64F.wrap(3,9,output);
+			RowMatrix_F64 J = RowMatrix_F64.wrap(3,9,output);
 			
 			System.arraycopy(g.Rx.data,0,output,0,9);
 			System.arraycopy(g.Ry.data,0,output,9,9);

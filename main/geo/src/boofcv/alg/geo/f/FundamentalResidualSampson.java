@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.UtilEjml;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 /**
  * <p>
@@ -38,12 +38,12 @@ import org.ejml.data.DenseMatrix64F;
  * @author Peter Abeles
  */
 public class FundamentalResidualSampson
-		implements ModelObservationResidual<DenseMatrix64F,AssociatedPair> {
-	DenseMatrix64F F;
+		implements ModelObservationResidual<RowMatrix_F64,AssociatedPair> {
+	RowMatrix_F64 F;
 	Point3D_F64 temp = new Point3D_F64();
 
 	@Override
-	public void setModel(DenseMatrix64F F) {
+	public void setModel(RowMatrix_F64 F) {
 		this.F = F;
 	}
 

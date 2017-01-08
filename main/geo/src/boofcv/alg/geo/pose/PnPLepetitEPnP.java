@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.alg.dense.mult.MatrixVectorMult_D64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.factory.LinearSolverFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
@@ -102,22 +102,22 @@ import java.util.List;
 public class PnPLepetitEPnP {
 
 	// used to solve various linear problems
-	private SingularValueDecomposition_F64<DenseMatrix64F> svd = DecompositionFactory_D64.svd(12, 12, false, true, false);
-	private LinearSolver<DenseMatrix64F> solver = LinearSolverFactory_D64.leastSquares(6, 4);
-	private LinearSolver<DenseMatrix64F> solverPinv = LinearSolverFactory_D64.pseudoInverse(true);
+	private SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_D64.svd(12, 12, false, true, false);
+	private LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_D64.leastSquares(6, 4);
+	private LinearSolver<RowMatrix_F64> solverPinv = LinearSolverFactory_D64.pseudoInverse(true);
 
 	// weighting factor to go from control point into world coordinate
-	protected DenseMatrix64F alphas = new DenseMatrix64F(1,1);
-	private DenseMatrix64F M = new DenseMatrix64F(12,12);
-	private DenseMatrix64F MM = new DenseMatrix64F(12,12);
+	protected RowMatrix_F64 alphas = new RowMatrix_F64(1,1);
+	private RowMatrix_F64 M = new RowMatrix_F64(12,12);
+	private RowMatrix_F64 MM = new RowMatrix_F64(12,12);
 
 	// linear constraint matrix
-	protected DenseMatrix64F L_full = new DenseMatrix64F(6,10);
-	private DenseMatrix64F L = new DenseMatrix64F(6,6);
+	protected RowMatrix_F64 L_full = new RowMatrix_F64(6,10);
+	private RowMatrix_F64 L = new RowMatrix_F64(6,6);
 	// distance of world control points from each other
-	protected DenseMatrix64F y = new DenseMatrix64F(6,1);
+	protected RowMatrix_F64 y = new RowMatrix_F64(6,1);
 	// solution for betas
-	private DenseMatrix64F x = new DenseMatrix64F(6,1);
+	private RowMatrix_F64 x = new RowMatrix_F64(6,1);
 
 	// how many controls points 4 for general case and 3 for planar
 	protected int numControl;
@@ -151,9 +151,9 @@ public class PnPLepetitEPnP {
 	// in general its good to avoid declaring and destroying massive amounts of data in Java
 	// this is probably going too far though
 	private List<Point3D_F64> tempPts0 = new ArrayList<>(); // 4 points stored in it
-	DenseMatrix64F A_temp = new DenseMatrix64F(1,1);
-	DenseMatrix64F v_temp = new DenseMatrix64F(3,1);
-	DenseMatrix64F w_temp = new DenseMatrix64F(1,1);
+	RowMatrix_F64 A_temp = new RowMatrix_F64(1,1);
+	RowMatrix_F64 v_temp = new RowMatrix_F64(3,1);
+	RowMatrix_F64 w_temp = new RowMatrix_F64(1,1);
 
 	/**
 	 * Constructor which uses the default magic number
@@ -326,12 +326,12 @@ public class PnPLepetitEPnP {
 		}
 		c11/=N;c12/=N;c13/=N;c22/=N;c23/=N;c33/=N;
 
-		DenseMatrix64F covar = new DenseMatrix64F(3,3,true,c11,c12,c13,c12,c22,c23,c13,c23,c33);
+		RowMatrix_F64 covar = new RowMatrix_F64(3,3,true,c11,c12,c13,c12,c22,c23,c13,c23,c33);
 
 		// find the data's orientation and check to see if it is planar
 		svd.decompose(covar);
 		double []singularValues = svd.getSingularValues();
-		DenseMatrix64F V = svd.getV(null,false);
+		RowMatrix_F64 V = svd.getV(null,false);
 
 		SingularOps_D64.descendingOrder(null,false,singularValues,3,V,false);
 
@@ -370,7 +370,7 @@ public class PnPLepetitEPnP {
 	 * </p>
 	 */
 	protected void computeBarycentricCoordinates(FastQueue<Point3D_F64> controlWorldPts,
-												 DenseMatrix64F alphas,
+												 RowMatrix_F64 alphas,
 												 List<Point3D_F64> worldPts )
 	{
 		alphas.reshape(worldPts.size(),numControl,false);
@@ -421,7 +421,7 @@ public class PnPLepetitEPnP {
 	 *
 	 */
 	protected static void constructM(List<Point2D_F64> obsPts,
-									 DenseMatrix64F alphas, DenseMatrix64F M)
+									 RowMatrix_F64 alphas, RowMatrix_F64 M)
 	{
 		int N = obsPts.size();
 		M.reshape(3*alphas.numCols,2*N,false);
@@ -449,7 +449,7 @@ public class PnPLepetitEPnP {
 	 * Computes M'*M and finds the null space.  The 4 eigenvectors with the smallest eigenvalues are found
 	 * and the null points extracted from them.
 	 */
-	protected void extractNullPoints( DenseMatrix64F M )
+	protected void extractNullPoints( RowMatrix_F64 M )
 	{
 		// compute MM and find its null space
 		MM.reshape(M.numRows,M.numRows,false);
@@ -459,7 +459,7 @@ public class PnPLepetitEPnP {
 			throw new IllegalArgumentException("SVD failed?!?!");
 
 		double []singularValues = svd.getSingularValues();
-		DenseMatrix64F V = svd.getV(null,false);
+		RowMatrix_F64 V = svd.getV(null,false);
 
 		SingularOps_D64.descendingOrder(null,false,singularValues,3,V,false);
 

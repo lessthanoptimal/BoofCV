@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.RandomMatrices_D64;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
@@ -158,7 +158,7 @@ public class TestPnPLepetitEPnP {
 
 		alg.selectWorldControlPoints(worldPoints, worldControlPts);
 
-		DenseMatrix64F alpha = new DenseMatrix64F(1,1);
+		RowMatrix_F64 alpha = new RowMatrix_F64(1,1);
 
 		alg.computeBarycentricCoordinates(worldControlPts, alpha, worldPoints);
 
@@ -188,8 +188,8 @@ public class TestPnPLepetitEPnP {
 	@Test
 	public void constructM() {
 		List<Point2D_F64> obsPts = GeoTestingOps.randomPoints_F64(-1, 2, -5, 20, 30, rand);
-		DenseMatrix64F M = RandomMatrices_D64.createRandom(2 * obsPts.size(), 12,rand);
-		DenseMatrix64F alpha = RandomMatrices_D64.createRandom(obsPts.size(),4,rand);
+		RowMatrix_F64 M = RandomMatrices_D64.createRandom(2 * obsPts.size(), 12,rand);
+		RowMatrix_F64 alpha = RandomMatrices_D64.createRandom(obsPts.size(),4,rand);
 
 		PnPLepetitEPnP.constructM(obsPts, alpha, M);
 
@@ -240,7 +240,7 @@ public class TestPnPLepetitEPnP {
 
 		// skip the adjust step
 		alg.numControl = 4;
-		alg.alphas = new DenseMatrix64F(0,0);
+		alg.alphas = new RowMatrix_F64(0,0);
 		alg.nullPts[0] = GeoTestingOps.randomPoints_F64(5,10,-1, 2, -5, 20, 4, rand);
 		double beta = 10;
 		for( int i = 0; i < alg.numControl; i++ ) {

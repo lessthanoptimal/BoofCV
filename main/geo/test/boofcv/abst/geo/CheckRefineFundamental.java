@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.geo.f.EpipolarTestSimulation;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
@@ -38,11 +38,11 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 
 	public abstract RefineEpipolar createAlgorithm();
 
-	DenseMatrix64F found = new DenseMatrix64F(3,3);
+	RowMatrix_F64 found = new RowMatrix_F64(3,3);
 
 	@Test
 	public void checkMarkerInterface() {
-		ModelFitter<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
+		ModelFitter<RowMatrix_F64,AssociatedPair> alg = createAlgorithm();
 	}
 
 	@Test
@@ -50,9 +50,9 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 		init(30,false);
 
 		// compute true essential matrix
-		DenseMatrix64F E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
+		RowMatrix_F64 E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
 
-		ModelFitter<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
+		ModelFitter<RowMatrix_F64,AssociatedPair> alg = createAlgorithm();
 
 		//give it the perfect matrix and see if it screwed it up
 		assertTrue(alg.fitModel(pairs, E, found));
@@ -69,14 +69,14 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 		init(30,false);
 
 		// compute true essential matrix
-		DenseMatrix64F E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
+		RowMatrix_F64 E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
 
 		// create an alternative incorrect matrix
 		Vector3D_F64 T = worldToCamera.getT().copy();
 		T.x += 0.1;
-		DenseMatrix64F Emod = MultiViewOps.createEssential(worldToCamera.getR(), T);
+		RowMatrix_F64 Emod = MultiViewOps.createEssential(worldToCamera.getR(), T);
 
-		ModelFitter<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
+		ModelFitter<RowMatrix_F64,AssociatedPair> alg = createAlgorithm();
 
 		// compute and compare results
 		assertTrue(alg.fitModel(pairs, Emod, found));

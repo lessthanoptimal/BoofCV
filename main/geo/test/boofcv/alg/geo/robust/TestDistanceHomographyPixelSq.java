@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.Random;
 
@@ -41,9 +41,9 @@ public class TestDistanceHomographyPixelSq extends StandardDistanceTest<Homograp
 
 	Random rand = new Random(234);
 
-	DenseMatrix64F K = new DenseMatrix64F(3,3,true,200,1,120,0,250,150,0,0,1);
+	RowMatrix_F64 K = new RowMatrix_F64(3,3,true,200,1,120,0,250,150,0,0,1);
 
-	DenseMatrix64F H,H_pixel;
+	RowMatrix_F64 H,H_pixel;
 
 	@Override
 	public DistanceFromModel<Homography2D_F64, AssociatedPair> create() {
@@ -60,7 +60,7 @@ public class TestDistanceHomographyPixelSq extends StandardDistanceTest<Homograp
 		double rotZ = rand.nextGaussian();
 
 
-		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ, null);
+		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ, null);
 		Vector3D_F64 T = new Vector3D_F64(0.2,-0.5,3);
 		Vector3D_F64 N = new Vector3D_F64(-0.5,1,3);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.struct.geo;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -35,7 +35,7 @@ public class TestQueueMatrix {
 		assertEquals(0,alg.size);
 		assertEquals(5,alg.data.length);
 
-		DenseMatrix64F M = alg.grow();
+		RowMatrix_F64 M = alg.grow();
 
 		assertEquals(3,M.numRows);
 		assertEquals(4,M.numCols);
@@ -47,7 +47,7 @@ public class TestQueueMatrix {
 
 		assertEquals(0,alg.size);
 
-		DenseMatrix64F M = alg.grow();
+		RowMatrix_F64 M = alg.grow();
 
 		assertEquals(3,M.numRows);
 		assertEquals(4, M.numCols);

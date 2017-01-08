@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.junit.After;
 import org.junit.Test;
 
@@ -134,12 +134,12 @@ public class TestObjectSerialization {
 	}
 
 	@Test
-	public void testDenseMatrix64F() {
-		DenseMatrix64F orig = new DenseMatrix64F(2,3,true,new double[]{1,2,3,4,5,6});
+	public void testRowMatrix_F64() {
+		RowMatrix_F64 orig = new RowMatrix_F64(2,3,true,new double[]{1,2,3,4,5,6});
 
 		UtilIO.saveXML(orig, "temp.txt");
 
-		DenseMatrix64F found = UtilIO.loadXML("temp.txt");
+		RowMatrix_F64 found = UtilIO.loadXML("temp.txt");
 
 		assertEquals(orig.numRows, found.numRows);
 		assertEquals(orig.numCols, found.numCols);

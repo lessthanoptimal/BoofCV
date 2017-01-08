@@ -34,7 +34,7 @@ import java.awt.image.BufferedImage;
 public class CacheSequenceStream<T extends ImageBase<T>> {
 
 	SimpleImageSequence<T> sequence;
-
+	ImageType<T> imageType;
 	T queueBoof[];
 	BufferedImage queueBuff[];
 
@@ -49,6 +49,7 @@ public class CacheSequenceStream<T extends ImageBase<T>> {
 			queueBoof[i] = imageType.createImage(1,1);
 			queueBuff[i] = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
 		}
+		this.imageType = imageType;
 	}
 
 	public void setSequence(SimpleImageSequence<T> sequence) {
@@ -97,4 +98,15 @@ public class CacheSequenceStream<T extends ImageBase<T>> {
 		offset = (offset+1) % queueBoof.length;
 	}
 
+	public int getWidth() {
+		return sequence.getNextWidth();
+	}
+
+	public int getHeight() {
+		return sequence.getNextHeight();
+	}
+
+	public ImageType<T> getImageType() {
+		return imageType;
+	}
 }

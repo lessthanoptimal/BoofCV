@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import georegression.struct.line.LineParametric3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.junit.Test;
 
@@ -121,10 +121,10 @@ public class TestDistanceSe3SymmetricSq {
 	@Test
 	public void testIntrinsicParameters() {
 		// intrinsic camera calibration matrix
-		DenseMatrix64F K = new DenseMatrix64F(3,3,true,100,0.01,200,0,150,200,0,0,1);
-		DenseMatrix64F K2 = new DenseMatrix64F(3,3,true,105,0.021,180,0,155,210,0,0,1);
-		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
-		DenseMatrix64F K2_inv = new DenseMatrix64F(3,3);
+		RowMatrix_F64 K = new RowMatrix_F64(3,3,true,100,0.01,200,0,150,200,0,0,1);
+		RowMatrix_F64 K2 = new RowMatrix_F64(3,3,true,105,0.021,180,0,155,210,0,0,1);
+		RowMatrix_F64 K_inv = new RowMatrix_F64(3,3);
+		RowMatrix_F64 K2_inv = new RowMatrix_F64(3,3);
 		CommonOps_D64.invert(K,K_inv);
 		CommonOps_D64.invert(K2,K2_inv);
 

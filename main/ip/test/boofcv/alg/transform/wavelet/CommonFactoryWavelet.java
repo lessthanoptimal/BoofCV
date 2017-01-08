@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
 import boofcv.struct.wavelet.WlCoef_I32;
 import boofcv.testing.BoofTesting;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.ejml.ops.MatrixFeatures_D64;
 
@@ -134,8 +134,8 @@ public class CommonFactoryWavelet {
 		N *= 2;
 		border.setLength(N);
 
-		DenseMatrix64F A = new DenseMatrix64F(N,N);
-		DenseMatrix64F B = new DenseMatrix64F(N,N);
+		RowMatrix_F64 A = new RowMatrix_F64(N,N);
+		RowMatrix_F64 B = new RowMatrix_F64(N,N);
 
 		// using the provided wrapping rule to construct a matrix with the coefficients
 		for( int i = 0; i < N; i += 2 ) {
@@ -174,7 +174,7 @@ public class CommonFactoryWavelet {
 			}
 		}
 
-		DenseMatrix64F C = new DenseMatrix64F(N,N);
+		RowMatrix_F64 C = new RowMatrix_F64(N,N);
 
 		CommonOps_D64.mult(A,B,C);
 
@@ -195,8 +195,8 @@ public class CommonFactoryWavelet {
 		N *= 2;
 		border.setLength(N);
 
-		DenseMatrix64F A = new DenseMatrix64F(N,N);
-		DenseMatrix64F B = new DenseMatrix64F(N,N);
+		RowMatrix_F64 A = new RowMatrix_F64(N,N);
+		RowMatrix_F64 B = new RowMatrix_F64(N,N);
 
 		// using the wrapping rule construct a matrix with the coefficients
 		for( int i = 0; i < N; i += 2 ) {
@@ -235,7 +235,7 @@ public class CommonFactoryWavelet {
 			}
 		}
 
-		DenseMatrix64F C = new DenseMatrix64F(N,N);
+		RowMatrix_F64 C = new RowMatrix_F64(N,N);
 
 		CommonOps_D64.mult(A,B,C);
 

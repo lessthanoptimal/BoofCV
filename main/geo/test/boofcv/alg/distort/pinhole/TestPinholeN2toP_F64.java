@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -36,7 +36,7 @@ public class TestPinholeN2toP_F64 {
 	public void basicTest() {
 		CameraPinholeRadial p = new CameraPinholeRadial().fsetK(1, 2, 3, 4, 5, 200, 300);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(p, (DenseMatrix64F)null);
+		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(p, (RowMatrix_F64)null);
 
 		Point2D_F64 pixel = new Point2D_F64(150, 200);
 		Point2D_F64 expected = new Point2D_F64();

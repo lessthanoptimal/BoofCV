@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import static org.junit.Assert.assertTrue;
 
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class CommonHomographyInducedPlane {
 
-	public DenseMatrix64F K = PerspectiveOps.calibrationMatrix(500, 520, 0.1, 400, 450);
+	public RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(500, 520, 0.1, 400, 450);
 
 	public Se3_F64 rightToLeft = new Se3_F64();
 	public Se3_F64 leftToRight;
@@ -47,7 +47,7 @@ public class CommonHomographyInducedPlane {
 
 	public AssociatedPair p1,p2,p3,p4;
 
-	public DenseMatrix64F E,F;
+	public RowMatrix_F64 E,F;
 
 	// epipole in second image
 	public Point3D_F64 e2 = new Point3D_F64();
@@ -69,14 +69,14 @@ public class CommonHomographyInducedPlane {
 		MultiViewOps.extractEpipoles(F,new Point3D_F64(),e2);
 	}
 
-	public void checkHomography( DenseMatrix64F H ) {
+	public void checkHomography( RowMatrix_F64 H ) {
 		Point2D_F64 found = new Point2D_F64();
 		GeometryMath_F64.mult(H,p4.p1,found);
 
 		assertTrue(found.isIdentical(p4.p2, 1e-8));
 	}
 
-	public static AssociatedPair render( Se3_F64 leftToRight , DenseMatrix64F K , Point3D_F64 X1 ) {
+	public static AssociatedPair render( Se3_F64 leftToRight , RowMatrix_F64 K , Point3D_F64 X1 ) {
 		AssociatedPair ret = new AssociatedPair();
 
 		ret.p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X1);

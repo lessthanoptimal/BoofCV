@@ -39,7 +39,7 @@ import georegression.transform.se.SePointOps_F32;
 import georegression.transform.twist.TwistCoordinate_F32;
 import georegression.transform.twist.TwistOps_F32;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.LinearSolverFactory_D64;
 import org.ejml.interfaces.linsol.LinearSolver;
 
@@ -57,10 +57,10 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 	private ImageType<Planar<I>> imageType;
 	private ImageType<Planar<D>> derivType;
 
-	private LinearSolver<DenseMatrix64F> solver;
-	private DenseMatrix64F A = new DenseMatrix64F(1,6);
-	private DenseMatrix64F y = new DenseMatrix64F(1,1);
-	private DenseMatrix64F twistMatrix = new DenseMatrix64F(6,1);
+	private LinearSolver<RowMatrix_F64> solver;
+	private RowMatrix_F64 A = new RowMatrix_F64(1,6);
+	private RowMatrix_F64 y = new RowMatrix_F64(1,1);
+	private RowMatrix_F64 twistMatrix = new RowMatrix_F64(6,1);
 
 	private ImageGradient<Planar<I>,Planar<D>> computeD;
 

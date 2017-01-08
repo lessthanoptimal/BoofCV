@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.alg.dense.decomposition.svd.SafeSvd_D64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
 import org.ejml.ops.CommonOps_D64;
@@ -56,7 +56,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DecomposeHomography {
-	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory_D64.svd(3, 3, false, true, false);
+	private SingularValueDecomposition<RowMatrix_F64> svd = DecompositionFactory_D64.svd(3, 3, false, true, false);
 
 	// storage for the four possible solutions
 	// Camera motion part of the solution
@@ -71,13 +71,13 @@ public class DecomposeHomography {
 
 	Vector3D_F64 tempV = new Vector3D_F64();
 
-	DenseMatrix64F W1 = new DenseMatrix64F(3,3);
-	DenseMatrix64F W2 = new DenseMatrix64F(3,3);
-	DenseMatrix64F U1 = new DenseMatrix64F(3,3);
-	DenseMatrix64F U2 = new DenseMatrix64F(3,3);
+	RowMatrix_F64 W1 = new RowMatrix_F64(3,3);
+	RowMatrix_F64 W2 = new RowMatrix_F64(3,3);
+	RowMatrix_F64 U1 = new RowMatrix_F64(3,3);
+	RowMatrix_F64 U2 = new RowMatrix_F64(3,3);
 
-	DenseMatrix64F Hv2 = new DenseMatrix64F(3,3);
-	DenseMatrix64F tempM = new DenseMatrix64F(3,3);
+	RowMatrix_F64 Hv2 = new RowMatrix_F64(3,3);
+	RowMatrix_F64 tempM = new RowMatrix_F64(3,3);
 
 	public DecomposeHomography() {
 		for( int i = 0; i < 4; i++ ) {
@@ -96,12 +96,12 @@ public class DecomposeHomography {
 	 *
 	 * @param H Homography matrix.  Not modified.
 	 */
-	public void decompose( DenseMatrix64F H ) {
+	public void decompose( RowMatrix_F64 H ) {
 		if( !svd.decompose(H) )
 			throw new RuntimeException("SVD failed somehow");
 
-		DenseMatrix64F V = svd.getV(null,false);
-		DenseMatrix64F S = svd.getW(null);
+		RowMatrix_F64 V = svd.getV(null,false);
+		RowMatrix_F64 S = svd.getW(null);
 
 		SingularOps_D64.descendingOrder(null,false,S, V,false);
 
@@ -167,7 +167,7 @@ public class DecomposeHomography {
 	/**
 	 * U=[a,b,hat(a)*b]
 	 */
-	private void setU( DenseMatrix64F U, Vector3D_F64 a , Vector3D_F64 b ) {
+	private void setU( RowMatrix_F64 U, Vector3D_F64 a , Vector3D_F64 b ) {
 		setColumn(U, 0, a);
 		setColumn(U, 1, b);
 
@@ -178,7 +178,7 @@ public class DecomposeHomography {
 	/**
 	 * W=[H*a,H*b,hat(H*a)*H*b]
 	 */
-	private void setW( DenseMatrix64F W, DenseMatrix64F H , Vector3D_F64 a , Vector3D_F64 b ) {
+	private void setW( RowMatrix_F64 W, RowMatrix_F64 H , Vector3D_F64 a , Vector3D_F64 b ) {
 		GeometryMath_F64.mult(H,b, tempV);
 		setColumn(W,1, tempV);
 
@@ -191,7 +191,7 @@ public class DecomposeHomography {
 		setColumn(W,2, tempV);
 	}
 
-	private void setColumn( DenseMatrix64F U , int column , Vector3D_F64 a ) {
+	private void setColumn( RowMatrix_F64 U , int column , Vector3D_F64 a ) {
 		U.set(0, column, a.x);
 		U.set(1, column, a.y);
 		U.set(2, column, a.z);
@@ -202,8 +202,8 @@ public class DecomposeHomography {
 	 * N = v2 cross u
 	 * (1/d)*T = (H-R)*N
 	 */
-	private void createSolution( DenseMatrix64F W , DenseMatrix64F U , Vector3D_F64 u ,
-								 DenseMatrix64F H ,
+	private void createSolution( RowMatrix_F64 W , RowMatrix_F64 U , Vector3D_F64 u ,
+								 RowMatrix_F64 H ,
 								 Se3_F64 se , Vector3D_F64 N )
 	{
 		CommonOps_D64.multTransB(W,U,se.getR());

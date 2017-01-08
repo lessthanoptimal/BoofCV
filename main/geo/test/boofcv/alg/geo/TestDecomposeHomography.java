@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
 
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestDecomposeHomography {
 
-	DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, -0.04, 0.08, null);
+	RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, -0.04, 0.08, null);
 	Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 
 	double d = 2;
@@ -47,7 +47,7 @@ public class TestDecomposeHomography {
 
 	@Test
 	public void checkAgainstKnown() {
-		DenseMatrix64F H = MultiViewOps.createHomography(R, T, d, N);
+		RowMatrix_F64 H = MultiViewOps.createHomography(R, T, d, N);
 
 		DecomposeHomography alg = new DecomposeHomography();
 
@@ -68,7 +68,7 @@ public class TestDecomposeHomography {
 	 */
 	@Test
 	public void multipleCalls() {
-		DenseMatrix64F H = MultiViewOps.createHomography(R, T, d, N);
+		RowMatrix_F64 H = MultiViewOps.createHomography(R, T, d, N);
 
 		DecomposeHomography alg = new DecomposeHomography();
 		// call it twice and see if things break
@@ -86,7 +86,7 @@ public class TestDecomposeHomography {
 	 * See if an equivalent to the input matrix exists
 	 */
 	public static void checkHasOriginal( List<Se3_F64> solutionsSE , List<Vector3D_F64> solutionsN ,
-										 DenseMatrix64F R, Vector3D_F64 T, double d , Vector3D_F64 N ) {
+										 RowMatrix_F64 R, Vector3D_F64 T, double d , Vector3D_F64 N ) {
 
 		int numMatches = 0;
 		for( int i = 0; i < 4; i++ ) {

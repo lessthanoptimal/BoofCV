@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.homography.UtilHomography_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.List;
 
@@ -40,7 +40,7 @@ public class GenerateHomographyLinear implements
 {
 
 	HomographyLinear4 alg;
-	DenseMatrix64F H = new DenseMatrix64F(3,3);
+	RowMatrix_F64 H = new RowMatrix_F64(3,3);
 
 	public GenerateHomographyLinear( boolean normalizeInput ) {
 		alg = new HomographyLinear4(normalizeInput);

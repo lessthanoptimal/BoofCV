@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.UtilVector3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.ejml.ops.NormOps_D64;
 import org.ejml.ops.SpecializedOps_D64;
@@ -56,24 +56,24 @@ import org.ejml.ops.SpecializedOps_D64;
 public class Zhang99DecomposeHomography {
 
 	// Rows in rotation matrix
-	DenseMatrix64F r1 = new DenseMatrix64F(3,1);
-	DenseMatrix64F r2 = new DenseMatrix64F(3,1);
+	RowMatrix_F64 r1 = new RowMatrix_F64(3,1);
+	RowMatrix_F64 r2 = new RowMatrix_F64(3,1);
 	// storage for translation vector
-	DenseMatrix64F t = new DenseMatrix64F(3,1);
-	DenseMatrix64F temp = new DenseMatrix64F(3,1);
+	RowMatrix_F64 t = new RowMatrix_F64(3,1);
+	RowMatrix_F64 temp = new RowMatrix_F64(3,1);
 	// storage for rotation matrix
-	DenseMatrix64F R = new DenseMatrix64F(3,3);
+	RowMatrix_F64 R = new RowMatrix_F64(3,3);
 
 	// calibration matrix and its inverse
-	DenseMatrix64F K;
-	DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+	RowMatrix_F64 K;
+	RowMatrix_F64 K_inv = new RowMatrix_F64(3,3);
 
 	/**
 	 * Specifies the calibration matrix.
 	 *
 	 * @param K upper triangular calibration matrix.
 	 */
-	public void setCalibrationMatrix( DenseMatrix64F K ) {
+	public void setCalibrationMatrix( RowMatrix_F64 K ) {
 		this.K = K;
 		CommonOps_D64.invert(K,K_inv);
 	}
@@ -85,10 +85,10 @@ public class Zhang99DecomposeHomography {
 	 * @param H homography matrix.
 	 * @return Found camera motion.
 	 */
-	public Se3_F64 decompose( DenseMatrix64F H )
+	public Se3_F64 decompose( RowMatrix_F64 H )
 	{
 		// step through each calibration grid and compute its parameters
-		DenseMatrix64F h[] = SpecializedOps_D64.splitIntoVectors(H, true);
+		RowMatrix_F64 h[] = SpecializedOps_D64.splitIntoVectors(H, true);
 
 		// lambda = 1/norm(inv(K)*h1) or 1/norm(inv(K)*h2)
 		// use the average to attempt to reduce error

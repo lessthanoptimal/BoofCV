@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.geo.MultiViewOps;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
@@ -36,16 +36,16 @@ public class TestParamFundamentalEpipolar {
 
 	@Test
 	public void backAndForth() {
-		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1, 2, -0.5, null);
+		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1, 2, -0.5, null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
-		DenseMatrix64F E = MultiViewOps.createEssential(R, T);
+		RowMatrix_F64 E = MultiViewOps.createEssential(R, T);
 		
 		double param[] = new double[7];
 		
 		ParamFundamentalEpipolar alg = new ParamFundamentalEpipolar();
 		
-		DenseMatrix64F found = new DenseMatrix64F(3,3);
+		RowMatrix_F64 found = new RowMatrix_F64(3,3);
 		alg.encode(E, param);
 		alg.decode(param, found);
 

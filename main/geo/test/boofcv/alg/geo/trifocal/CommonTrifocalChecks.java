@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.NormOps_D64;
 
 import java.util.ArrayList;
@@ -44,15 +44,15 @@ public abstract class CommonTrifocalChecks {
 	Random rand = new Random(234);
 
 	// camera calibration matrix
-	DenseMatrix64F K = new DenseMatrix64F(3,3,true,60,0.01,200,0,80,150,0,0,1);
+	RowMatrix_F64 K = new RowMatrix_F64(3,3,true,60,0.01,200,0,80,150,0,0,1);
 
 	Se3_F64 se2,se3;
-	DenseMatrix64F P2,P3;
+	RowMatrix_F64 P2,P3;
 	TrifocalTensor tensor;
 	// storage for the found solution
 	TrifocalTensor found = new TrifocalTensor();
 
-	DenseMatrix64F F2,F3;
+	RowMatrix_F64 F2,F3;
 
 	List<Point3D_F64> worldPts = new ArrayList<>();
 	// observation in pixels for all views
@@ -80,7 +80,7 @@ public abstract class CommonTrifocalChecks {
 		for( int i = 0; i < observations.size(); i++ ) {
 			AssociatedTriple o = observations.get(i);
 
-			DenseMatrix64F c = MultiViewOps.constraint(tensor,o.p1,o.p2,o.p3,null);
+			RowMatrix_F64 c = MultiViewOps.constraint(tensor,o.p1,o.p2,o.p3,null);
 
 			double v = NormOps_D64.normF(c)/(c.numCols*c.numRows);
 

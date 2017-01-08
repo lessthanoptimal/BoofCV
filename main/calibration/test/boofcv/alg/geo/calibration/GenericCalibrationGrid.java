@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 
 import java.util.ArrayList;
@@ -50,8 +50,8 @@ public class GenericCalibrationGrid {
 		return FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(3, 2, 30, 30));
 	}
 
-	public static DenseMatrix64F createStandardCalibration() {
-		DenseMatrix64F K = new DenseMatrix64F(3,3);
+	public static RowMatrix_F64 createStandardCalibration() {
+		RowMatrix_F64 K = new RowMatrix_F64(3,3);
 
 		double c_x = 255;
 		double c_y = 260;
@@ -96,7 +96,7 @@ public class GenericCalibrationGrid {
 		return ret;
 	}
 
-	public static List<Point2D_F64> observations( DenseMatrix64F H, List<Point2D_F64> obs2D )
+	public static List<Point2D_F64> observations( RowMatrix_F64 H, List<Point2D_F64> obs2D )
 	{
 		List<Point2D_F64> ret = new ArrayList<>();
 
@@ -116,16 +116,16 @@ public class GenericCalibrationGrid {
 	 *
 	 * H = K*[r1 r2 t]
 	 */
-	public static DenseMatrix64F computeHomography(DenseMatrix64F K, DenseMatrix64F R, Vector3D_F64 T)
+	public static RowMatrix_F64 computeHomography(RowMatrix_F64 K, RowMatrix_F64 R, Vector3D_F64 T)
 	{
-		DenseMatrix64F M = new DenseMatrix64F(3,3);
+		RowMatrix_F64 M = new RowMatrix_F64(3,3);
 		CommonOps_D64.extract(R, 0, 3, 0, 1, M, 0, 0);
 		CommonOps_D64.extract(R, 0, 3, 1, 2, M, 0, 1);
 		M.set(0, 2, T.x);
 		M.set(1, 2, T.y);
 		M.set(2, 2, T.z);
 
-		DenseMatrix64F H = new DenseMatrix64F(3,3);
+		RowMatrix_F64 H = new RowMatrix_F64(3,3);
 		CommonOps_D64.mult(K,M,H);
 
 		return H;
@@ -136,8 +136,8 @@ public class GenericCalibrationGrid {
 	 * @param K Calibration matrix
 	 * @param N Number of homographies
 	 */
-	public static List<DenseMatrix64F> createHomographies( DenseMatrix64F K , int N , Random rand ) {
-		List<DenseMatrix64F> homographies = new ArrayList<>();
+	public static List<RowMatrix_F64> createHomographies( RowMatrix_F64 K , int N , Random rand ) {
+		List<RowMatrix_F64> homographies = new ArrayList<>();
 
 		for( int i = 0; i < N; i++ ) {
 			Vector3D_F64 T = new Vector3D_F64();
@@ -149,9 +149,9 @@ public class GenericCalibrationGrid {
 			double rotY = (rand.nextDouble()-0.5)*0.1;
 			double rotZ = (rand.nextDouble()-0.5)*0.1;
 
-			DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX, rotY, rotZ, null);
+			RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX, rotY, rotZ, null);
 
-			DenseMatrix64F H = computeHomography(K, R, T);
+			RowMatrix_F64 H = computeHomography(K, R, T);
 			homographies.add(H);
 		}
 
@@ -163,7 +163,7 @@ public class GenericCalibrationGrid {
 													  int numView, Random rand) {
 		Zhang99ParamAll ret = new Zhang99ParamAll(zeroSkew,numRadial,includeTangential,numView);
 
-		DenseMatrix64F K = createStandardCalibration();
+		RowMatrix_F64 K = createStandardCalibration();
 		ret.a = K.get(0,0);
 		ret.b = K.get(1,1);
 		ret.c = K.get(0,1);
@@ -185,7 +185,7 @@ public class GenericCalibrationGrid {
 			double rotX = (rand.nextDouble()-0.5)*0.05;
 			double rotY = (rand.nextDouble()-0.5)*0.05;
 			double rotZ = (rand.nextDouble()-0.5)*0.05;
-			DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,null);
+			RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,null);
 			ConvertRotation3D_F64.matrixToRodrigues(R,v.rotation);
 
 			double x = rand.nextGaussian()*5;
@@ -202,7 +202,7 @@ public class GenericCalibrationGrid {
 													  int numView, Random rand) {
 		Zhang99ParamAll ret = new Zhang99ParamAll(zeroSkew,numRadial,includeTangential,numView);
 
-		DenseMatrix64F K = createStandardCalibration();
+		RowMatrix_F64 K = createStandardCalibration();
 		ret.a = K.get(0,0);
 		ret.b = K.get(1,1);
 		ret.c = K.get(0,1);
@@ -224,7 +224,7 @@ public class GenericCalibrationGrid {
 			double rotX = (rand.nextDouble()-0.5)*0.1;
 			double rotY = (rand.nextDouble()-0.5)*0.1;
 			double rotZ = (rand.nextDouble()-0.5)*0.1;
-			DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,null);
+			RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,null);
 			ConvertRotation3D_F64.matrixToRodrigues(R,v.rotation);
 
 			double x = rand.nextGaussian()*5;

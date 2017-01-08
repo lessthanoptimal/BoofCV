@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.QueueMatrix;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.MatrixFeatures_D64;
 import org.ejml.ops.RandomMatrices_D64;
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class TestGeoModelEstimatorNto1 {
 
 	DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
 
-	DenseMatrix64F found = new DenseMatrix64F(3,3);
+	RowMatrix_F64 found = new RowMatrix_F64(3,3);
 
 	public TestGeoModelEstimatorNto1() {
 		for (int i = 0; i < 5; i++) {
@@ -61,7 +61,7 @@ public class TestGeoModelEstimatorNto1 {
 
 	@Test
 	public void successButNoSolutions() {
-		GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair> alg =
+		GeoModelEstimatorNto1<RowMatrix_F64,AssociatedPair> alg =
 				new DummyEstimator(new Dummy(0, true),distance,2);
 
 		assertFalse(alg.process(obs,found));
@@ -69,7 +69,7 @@ public class TestGeoModelEstimatorNto1 {
 
 	@Test
 	public void checkFailed() {
-		GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>  alg =
+		GeoModelEstimatorNto1<RowMatrix_F64,AssociatedPair>  alg =
 				new DummyEstimator(new Dummy(0, false), distance,2);
 
 		assertFalse(alg.process(obs,found));
@@ -77,7 +77,7 @@ public class TestGeoModelEstimatorNto1 {
 
 	@Test
 	public void checkOneSolution() {
-		GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>  alg =
+		GeoModelEstimatorNto1<RowMatrix_F64,AssociatedPair>  alg =
 				new DummyEstimator(new Dummy(1, true), distance,2);
 
 		assertTrue(alg.process(obs,found));
@@ -89,9 +89,9 @@ public class TestGeoModelEstimatorNto1 {
 	 */
 	@Test
 	public void checkSelectBestSolution() {
-		DenseMatrix64F correct = createSolution();
+		RowMatrix_F64 correct = createSolution();
 
-		GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>  alg =
+		GeoModelEstimatorNto1<RowMatrix_F64,AssociatedPair>  alg =
 				new DummyEstimator(new Dummy(correct, 7), distance,2);
 
 		assertTrue(alg.process(obs,found));
@@ -100,35 +100,35 @@ public class TestGeoModelEstimatorNto1 {
 		assertTrue(MatrixFeatures_D64.isIdentical(found, correct, 1e-8));
 	}
 
-	private DenseMatrix64F createSolution() {
+	private RowMatrix_F64 createSolution() {
 		EssentialNister5 nister = new EssentialNister5();
 
 
-		FastQueue<DenseMatrix64F> solutions = new QueueMatrix(3, 3);
+		FastQueue<RowMatrix_F64> solutions = new QueueMatrix(3, 3);
 		assertTrue(nister.process(obs,solutions));
 
 		return solutions.get(0);
 	}
 
-	private static class Dummy implements GeoModelEstimatorN<DenseMatrix64F,AssociatedPair> {
+	private static class Dummy implements GeoModelEstimatorN<RowMatrix_F64,AssociatedPair> {
 		int numberOfSolutions;
 		boolean success;
 
-		DenseMatrix64F correct;
+		RowMatrix_F64 correct;
 
 		private Dummy(int numberOfSolutions, boolean success) {
 			this.numberOfSolutions = numberOfSolutions;
 			this.success = success;
 		}
 
-		private Dummy(DenseMatrix64F correct, int numberOfSolutions) {
+		private Dummy(RowMatrix_F64 correct, int numberOfSolutions) {
 			this.correct = correct;
 			this.numberOfSolutions = numberOfSolutions;
 			success = true;
 		}
 
 		@Override
-		public boolean process(List<AssociatedPair> points , FastQueue<DenseMatrix64F> solutions ) {
+		public boolean process(List<AssociatedPair> points , FastQueue<RowMatrix_F64> solutions ) {
 			assertEquals(3, points.size());
 
 			solutions.reset();
@@ -150,16 +150,16 @@ public class TestGeoModelEstimatorNto1 {
 		}
 	}
 
-	private class DummyEstimator extends GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair> {
+	private class DummyEstimator extends GeoModelEstimatorNto1<RowMatrix_F64,AssociatedPair> {
 
-		public DummyEstimator(GeoModelEstimatorN<DenseMatrix64F, AssociatedPair> alg,
-							  DistanceFromModel<DenseMatrix64F, AssociatedPair> distance,
+		public DummyEstimator(GeoModelEstimatorN<RowMatrix_F64, AssociatedPair> alg,
+							  DistanceFromModel<RowMatrix_F64, AssociatedPair> distance,
 							  int numTest) {
 			super(alg, distance, new QueueMatrix(3,3), numTest);
 		}
 
 		@Override
-		protected void copy(DenseMatrix64F src, DenseMatrix64F dst) {
+		protected void copy(RowMatrix_F64 src, RowMatrix_F64 dst) {
 			dst.set(src);
 		}
 	}

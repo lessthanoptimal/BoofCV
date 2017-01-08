@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.alg.geo.PositiveDepthConstraintCheck;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 	// used to select best hypothesis
 	PositiveDepthConstraintCheck depthCheck;
 
-	DenseMatrix64F E = new DenseMatrix64F(3,3);
+	RowMatrix_F64 E = new RowMatrix_F64(3,3);
 
 	/**
 	 * Specifies how the essential matrix is computed

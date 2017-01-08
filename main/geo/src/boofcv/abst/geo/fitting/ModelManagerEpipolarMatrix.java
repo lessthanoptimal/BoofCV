@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,21 +19,21 @@
 package boofcv.abst.geo.fitting;
 
 import org.ddogleg.fitting.modelset.ModelManager;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 /**
- * {@link ModelManager} for 3x3 {@link DenseMatrix64F}.
+ * {@link ModelManager} for 3x3 {@link RowMatrix_F64}.
  *
  * @author Peter Abeles
  */
-public class ModelManagerEpipolarMatrix implements ModelManager<DenseMatrix64F> {
+public class ModelManagerEpipolarMatrix implements ModelManager<RowMatrix_F64> {
 	@Override
-	public DenseMatrix64F createModelInstance() {
-		return new DenseMatrix64F(3,3);
+	public RowMatrix_F64 createModelInstance() {
+		return new RowMatrix_F64(3,3);
 	}
 
 	@Override
-	public void copyModel(DenseMatrix64F src, DenseMatrix64F dst) {
+	public void copyModel(RowMatrix_F64 src, RowMatrix_F64 dst) {
 		dst.set(src);
 	}
 }

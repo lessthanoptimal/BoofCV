@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.sfm.ScaleTranslateRotate2D;
 import georegression.struct.affine.Affine2D_F64;
 import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 import org.ejml.ops.CommonOps_D64;
@@ -45,11 +45,11 @@ public class GenerateScaleTranslateRotate2D
 	private Affine2D_F64 affine = new Affine2D_F64();
 	private GenerateAffine2D generateAffine = new GenerateAffine2D();
 
-	private DenseMatrix64F R = new DenseMatrix64F(2,2);
-	private DenseMatrix64F U = new DenseMatrix64F(2,2);
-	private DenseMatrix64F V = new DenseMatrix64F(2,2);
+	private RowMatrix_F64 R = new RowMatrix_F64(2,2);
+	private RowMatrix_F64 U = new RowMatrix_F64(2,2);
+	private RowMatrix_F64 V = new RowMatrix_F64(2,2);
 
-	private SingularValueDecomposition_F64<DenseMatrix64F> svd = DecompositionFactory_D64.svd(2,2,true,true,true);
+	private SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_D64.svd(2,2,true,true,true);
 
 	@Override
 	public boolean generate(List<AssociatedPair> dataSet, ScaleTranslateRotate2D output) {

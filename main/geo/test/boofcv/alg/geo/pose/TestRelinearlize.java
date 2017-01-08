@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo.pose;
 import boofcv.alg.geo.GeoTestingOps;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
@@ -44,8 +44,8 @@ public class TestRelinearlize {
 
 	Random rand = new Random(234);
 
-	DenseMatrix64F L_full;
-	DenseMatrix64F y;
+	RowMatrix_F64 L_full;
+	RowMatrix_F64 y;
 
 	@Test
 	public void numControl4() {
@@ -67,8 +67,8 @@ public class TestRelinearlize {
 		alg.process(L_full,y,foundBeta);
 
 		// check to see if its a valid solution
-		DenseMatrix64F x = new DenseMatrix64F(L_full.numCols,1);
-		DenseMatrix64F foundDistance = new DenseMatrix64F(L_full.numRows,1);
+		RowMatrix_F64 x = new RowMatrix_F64(L_full.numCols,1);
+		RowMatrix_F64 foundDistance = new RowMatrix_F64(L_full.numRows,1);
 		int index = 0;
 		for( int i = 0; i < numControl; i++ ) {
 			for( int j = i; j < numControl; j++ ) {
@@ -89,11 +89,11 @@ public class TestRelinearlize {
 
 	private void createInputs( int numControl ) {
 		if( numControl == 4 ) {
-			L_full = new DenseMatrix64F(6,10);
-			y = new DenseMatrix64F(6,1);
+			L_full = new RowMatrix_F64(6,10);
+			y = new RowMatrix_F64(6,1);
 		} else {
-			L_full = new DenseMatrix64F(3,6);
-			y = new DenseMatrix64F(3,1);
+			L_full = new RowMatrix_F64(3,6);
+			y = new RowMatrix_F64(3,1);
 		}
 
 		// randomly select null points,

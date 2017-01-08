@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.LinearSolverFactory_D64;
 import org.ejml.interfaces.linsol.LinearSolver;
 
@@ -59,14 +59,14 @@ import java.util.List;
  */
 public class RadialDistortionEstimateLinear {
 	// matrices in the linear equations
-	private DenseMatrix64F A = new DenseMatrix64F(1,1);
-	private DenseMatrix64F B = new DenseMatrix64F(1,1);
+	private RowMatrix_F64 A = new RowMatrix_F64(1,1);
+	private RowMatrix_F64 B = new RowMatrix_F64(1,1);
 
 	// where the results are stored
-	private DenseMatrix64F X;
+	private RowMatrix_F64 X;
 
 	// linear solver
-	private LinearSolver<DenseMatrix64F> solver = LinearSolverFactory_D64.leastSquares(0, 0);
+	private LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_D64.leastSquares(0, 0);
 
 	// location of grid coordinates in the world frame.
 	// the z-axis is assumed to be zero
@@ -81,7 +81,7 @@ public class RadialDistortionEstimateLinear {
 	 */
 	public RadialDistortionEstimateLinear(List<Point2D_F64> layout, int numParam) {
 		worldPoints = layout;
-		X = new DenseMatrix64F(numParam,1);
+		X = new RowMatrix_F64(numParam,1);
 	}
 
 	/**
@@ -90,8 +90,8 @@ public class RadialDistortionEstimateLinear {
 	 * @param cameraCalibration Camera calibration matrix.  Not modified.
 	 * @param observations Observations of calibration grid. Not modified.
 	 */
-	public void process( DenseMatrix64F cameraCalibration ,
-						 List<DenseMatrix64F> homographies ,
+	public void process( RowMatrix_F64 cameraCalibration ,
+						 List<RowMatrix_F64> homographies ,
 						 List<CalibrationObservation> observations )
 	{
 		init( observations );
@@ -118,8 +118,8 @@ public class RadialDistortionEstimateLinear {
 		B.reshape(A.numRows,1,false);
 	}
 
-	private void setupA_and_B( DenseMatrix64F K ,
-							   List<DenseMatrix64F> homographies ,
+	private void setupA_and_B( RowMatrix_F64 K ,
+							   List<RowMatrix_F64> homographies ,
 							   List<CalibrationObservation> observations) {
 
 		final int N = observations.size();
@@ -134,7 +134,7 @@ public class RadialDistortionEstimateLinear {
 
 		int pointIndex = 0;
 		for( int indexObs = 0; indexObs < N; indexObs++ ) {
-			DenseMatrix64F H = homographies.get(indexObs);
+			RowMatrix_F64 H = homographies.get(indexObs);
 			CalibrationObservation set = observations.get(indexObs);
 
 			for( int i = 0; i < set.size(); i++ ) {

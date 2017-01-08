@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.junit.Test;
 
@@ -42,7 +42,7 @@ public class TestRectifyCalibrated {
 	 */
 	@Test
 	public void compareWithKnown() {
-		DenseMatrix64F K = new DenseMatrix64F(3,3,true,300,0,200,0,400,205,0,0,1);
+		RowMatrix_F64 K = new RowMatrix_F64(3,3,true,300,0,200,0,400,205,0,0,1);
 
 		// transforms are world to camera, but I'm thinking camera to world, which is why invert
 		Se3_F64 poseR1 = createPose(0,0,0,  0.1,0,0.1).invert(null);
@@ -57,11 +57,11 @@ public class TestRectifyCalibrated {
 		alg.process(K,poseA1,K,poseA2);
 
 		// original camera matrix
-		DenseMatrix64F foundP1 = PerspectiveOps.createCameraMatrix(poseA1.getR(),poseA1.getT(),K,null);
-		DenseMatrix64F foundP2 = PerspectiveOps.createCameraMatrix(poseA2.getR(),poseA2.getT(),K,null);
+		RowMatrix_F64 foundP1 = PerspectiveOps.createCameraMatrix(poseA1.getR(),poseA1.getT(),K,null);
+		RowMatrix_F64 foundP2 = PerspectiveOps.createCameraMatrix(poseA2.getR(),poseA2.getT(),K,null);
 
 		// apply rectification transform
-		DenseMatrix64F temp = new DenseMatrix64F(3,4);
+		RowMatrix_F64 temp = new RowMatrix_F64(3,4);
 		CommonOps_D64.mult(alg.getRect1(),foundP1,temp);
 		foundP1.set(temp);
 		CommonOps_D64.mult(alg.getRect2(),foundP2,temp);
@@ -83,7 +83,7 @@ public class TestRectifyCalibrated {
 	 */
 	@Test
 	public void checkEpipolarGeometry() {
-		DenseMatrix64F K = new DenseMatrix64F(3,3,true,300,0,200,0,400,205,0,0,1);
+		RowMatrix_F64 K = new RowMatrix_F64(3,3,true,300,0,200,0,400,205,0,0,1);
 
 		// only rotate around the y-axis so that the rectified coordinate system will have to be
 		// the same as the global
@@ -115,8 +115,8 @@ public class TestRectifyCalibrated {
 	@Test
 	public void alignY() {
 		// different calibration matrices
-		DenseMatrix64F K1 = new DenseMatrix64F(3,3,true,300,0,200,0,400,205,0,0,1);
-		DenseMatrix64F K2 = new DenseMatrix64F(3,3,true,180,0,195,0,370,210,0,0,1);
+		RowMatrix_F64 K1 = new RowMatrix_F64(3,3,true,300,0,200,0,400,205,0,0,1);
+		RowMatrix_F64 K2 = new RowMatrix_F64(3,3,true,180,0,195,0,370,210,0,0,1);
 
 		// only rotate around the y-axis so that the rectified coordinate system will have to be
 		// the same as the global
@@ -134,7 +134,7 @@ public class TestRectifyCalibrated {
 		alignY(K1, poseA1, K2, poseA2);
 	}
 
-	private void alignY(DenseMatrix64F K1, Se3_F64 poseA1, DenseMatrix64F K2 , Se3_F64 poseA2) {
+	private void alignY(RowMatrix_F64 K1, Se3_F64 poseA1, RowMatrix_F64 K2 , Se3_F64 poseA2) {
 		// point being observed
 		Point3D_F64 X = new Point3D_F64(0,0,4);
 

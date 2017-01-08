@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.alg.dense.linsol.LinearSolverSafe;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.LinearSolverFactory_D64;
 import org.ejml.interfaces.linsol.LinearSolver;
 
@@ -49,15 +49,15 @@ public class HomographyInducedStereo3Pts {
 	private Point3D_F64 e2 = new Point3D_F64();
 
 	// The found homography from view 1 to view 2
-	private DenseMatrix64F H = new DenseMatrix64F(3,3);
+	private RowMatrix_F64 H = new RowMatrix_F64(3,3);
 
 	// A = cross(e2)*F
-	private DenseMatrix64F A = new DenseMatrix64F(3,3);
+	private RowMatrix_F64 A = new RowMatrix_F64(3,3);
 	// Rows filled with x from image 1
-	private DenseMatrix64F M = new DenseMatrix64F(3,3);
+	private RowMatrix_F64 M = new RowMatrix_F64(3,3);
 
-	private DenseMatrix64F temp0 = new DenseMatrix64F(3,1);
-	private DenseMatrix64F temp1 = new DenseMatrix64F(3,1);
+	private RowMatrix_F64 temp0 = new RowMatrix_F64(3,1);
+	private RowMatrix_F64 temp1 = new RowMatrix_F64(3,1);
 
 	private Point3D_F64 A_inv_b = new Point3D_F64();
 	private Point3D_F64 Ax = new Point3D_F64();
@@ -66,7 +66,7 @@ public class HomographyInducedStereo3Pts {
 	private Point3D_F64 t0 = new Point3D_F64();
 	private Point3D_F64 t1 = new Point3D_F64();
 
-	private LinearSolver<DenseMatrix64F> solver;
+	private LinearSolver<RowMatrix_F64> solver;
 
 	// pick a reasonable scale and sign
 	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
@@ -83,7 +83,7 @@ public class HomographyInducedStereo3Pts {
 	 * @param F Fundamental matrix.
 	 * @param e2 Epipole for camera 2.  If null it will be computed internally.
 	 */
-	public void setFundamental( DenseMatrix64F F , Point3D_F64 e2 ) {
+	public void setFundamental( RowMatrix_F64 F , Point3D_F64 e2 ) {
 		if( e2 != null )
 			this.e2.set(e2);
 		else {
@@ -155,7 +155,7 @@ public class HomographyInducedStereo3Pts {
 	 * The found homography from view 1 to view 2
 	 * @return homography
 	 */
-	public DenseMatrix64F getHomography() {
+	public RowMatrix_F64 getHomography() {
 		return H;
 	}
 }

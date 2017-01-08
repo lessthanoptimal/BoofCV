@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.List;
 
@@ -117,7 +117,7 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN {
 	 * @param worldPt Location of point in world coordinates
 	 * @param cameraPt Location of point in camera coordinates
 	 */
-	private void addRodriguesJacobian( DenseMatrix64F Rj , Point3D_F64 worldPt , Point3D_F64 cameraPt )
+	private void addRodriguesJacobian( RowMatrix_F64 Rj , Point3D_F64 worldPt , Point3D_F64 cameraPt )
 	{
 		// (1/z)*dot(R)*X
 		double Rx = (Rj.data[0]*worldPt.x + Rj.data[1]*worldPt.y + Rj.data[2]*worldPt.z)/cameraPt.z;

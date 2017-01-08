@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -96,8 +96,8 @@ public class ExampleStereoDisparity3D {
 		// ------------- Convert disparity image into a 3D point cloud
 
 		// The point cloud will be in the left cameras reference frame
-		DenseMatrix64F rectK = rectAlg.getCalibrationMatrix();
-		DenseMatrix64F rectR = rectAlg.getRectifiedRotation();
+		RowMatrix_F64 rectK = rectAlg.getCalibrationMatrix();
+		RowMatrix_F64 rectR = rectAlg.getRectifiedRotation();
 
 		// used to display the point cloud
 		PointCloudViewer viewer = new PointCloudViewer(rectK, 10);

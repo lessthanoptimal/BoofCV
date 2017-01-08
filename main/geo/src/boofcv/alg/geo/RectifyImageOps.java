@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,8 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import org.ejml.data.DenseMatrix32F;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F32;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D32;
 
 /**
@@ -86,8 +86,8 @@ public class RectifyImageOps {
 	 *
 	 <p>
 	 * After the rectification has been found it might still need to be adjusted
-	 * for maximum viewing area.  See {@link #fullViewLeft(int, int, org.ejml.data.DenseMatrix64F, org.ejml.data.DenseMatrix64F)}
-	 * and {@link #allInsideLeft(int, int, org.ejml.data.DenseMatrix64F, org.ejml.data.DenseMatrix64F)}.
+	 * for maximum viewing area.  See {@link #fullViewLeft(int, int, org.ejml.data.RowMatrix_F64, org.ejml.data.RowMatrix_F64)}
+	 * and {@link #allInsideLeft(int, int, org.ejml.data.RowMatrix_F64, org.ejml.data.RowMatrix_F64)}.
 	 * </p>
 	 *
 	 * @return {@link RectifyFundamental}
@@ -116,8 +116,8 @@ public class RectifyImageOps {
 	 */
 	// TODO Delete this function?  It should reasonably fill the old view in most non-pathological cases
 	public static void fullViewLeft(CameraPinholeRadial paramLeft,
-									DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight,
-									DenseMatrix64F rectifyK)
+									RowMatrix_F64 rectifyLeft, RowMatrix_F64 rectifyRight,
+									RowMatrix_F64 rectifyK)
 	{
 		ImplRectifyImageOps_F64.fullViewLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK);
 	}
@@ -142,8 +142,8 @@ public class RectifyImageOps {
 	 */
 	// TODO Delete this function?  It should reasonably fill the old view in most non-pathological cases
 	public static void fullViewLeft(CameraPinholeRadial paramLeft,
-									DenseMatrix32F rectifyLeft, DenseMatrix32F rectifyRight,
-									DenseMatrix32F rectifyK)
+									RowMatrix_F32 rectifyLeft, RowMatrix_F32 rectifyRight,
+									RowMatrix_F32 rectifyK)
 	{
 		ImplRectifyImageOps_F32.fullViewLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK);
 	}
@@ -165,7 +165,7 @@ public class RectifyImageOps {
 	 */
 	// TODO Delete this function?  It should reasonably fill the old view in most non-pathological cases
 	public static void fullViewLeft(int imageWidth,int imageHeight,
-									DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight )
+									RowMatrix_F64 rectifyLeft, RowMatrix_F64 rectifyRight )
 	{
 		ImplRectifyImageOps_F64.fullViewLeft(imageWidth, imageHeight, rectifyLeft, rectifyRight);
 	}
@@ -187,7 +187,7 @@ public class RectifyImageOps {
 	 */
 	// TODO Delete this function?  It should reasonably fill the old view in most non-pathological cases
 	public static void fullViewLeft(int imageWidth,int imageHeight,
-									DenseMatrix32F rectifyLeft, DenseMatrix32F rectifyRight )
+									RowMatrix_F32 rectifyLeft, RowMatrix_F32 rectifyRight )
 	{
 		ImplRectifyImageOps_F32.fullViewLeft(imageWidth, imageHeight, rectifyLeft, rectifyRight);
 	}
@@ -206,8 +206,8 @@ public class RectifyImageOps {
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 */
 	public static void allInsideLeft(CameraPinholeRadial paramLeft,
-									 DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight,
-									 DenseMatrix64F rectifyK)
+									 RowMatrix_F64 rectifyLeft, RowMatrix_F64 rectifyRight,
+									 RowMatrix_F64 rectifyK)
 	{
 		ImplRectifyImageOps_F64.allInsideLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK);
 	}
@@ -226,8 +226,8 @@ public class RectifyImageOps {
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 */
 	public static void allInsideLeft(CameraPinholeRadial paramLeft,
-									 DenseMatrix32F rectifyLeft, DenseMatrix32F rectifyRight,
-									 DenseMatrix32F rectifyK)
+									 RowMatrix_F32 rectifyLeft, RowMatrix_F32 rectifyRight,
+									 RowMatrix_F32 rectifyK)
 	{
 		ImplRectifyImageOps_F32.allInsideLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK);
 	}
@@ -246,7 +246,7 @@ public class RectifyImageOps {
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 */
 	public static void allInsideLeft( int imageWidth,int imageHeight,
-									  DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight )
+									  RowMatrix_F64 rectifyLeft, RowMatrix_F64 rectifyRight )
 	{
 		ImplRectifyImageOps_F64.allInsideLeft(imageWidth, imageHeight, rectifyLeft, rectifyRight);
 	}
@@ -265,7 +265,7 @@ public class RectifyImageOps {
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 */
 	public static void allInsideLeft( int imageWidth,int imageHeight,
-									  DenseMatrix32F rectifyLeft, DenseMatrix32F rectifyRight )
+									  RowMatrix_F32 rectifyLeft, RowMatrix_F32 rectifyRight )
 	{
 		ImplRectifyImageOps_F32.allInsideLeft(imageWidth, imageHeight, rectifyLeft, rectifyRight);
 	}
@@ -281,7 +281,7 @@ public class RectifyImageOps {
 	 * @return Transform from rectified to unrectified pixels
 	 */
 	public static Point2Transform2_F64 transformRectToPixel(CameraPinholeRadial param,
-															DenseMatrix64F rectify)
+															RowMatrix_F64 rectify)
 	{
 		return ImplRectifyImageOps_F64.transformRectToPixel(param, rectify);
 	}
@@ -297,7 +297,7 @@ public class RectifyImageOps {
 	 * @return Transform from rectified to unrectified pixels
 	 */
 	public static Point2Transform2_F32 transformRectToPixel(CameraPinholeRadial param,
-															DenseMatrix32F rectify)
+															RowMatrix_F32 rectify)
 	{
 		return ImplRectifyImageOps_F32.transformRectToPixel(param, rectify);
 	}
@@ -312,7 +312,7 @@ public class RectifyImageOps {
 	 * @return Transform from distorted pixel to rectified pixels
 	 */
 	public static Point2Transform2_F64 transformPixelToRect(CameraPinholeRadial param,
-															DenseMatrix64F rectify)
+															RowMatrix_F64 rectify)
 	{
 		return ImplRectifyImageOps_F64.transformPixelToRect(param, rectify);
 	}
@@ -327,7 +327,7 @@ public class RectifyImageOps {
 	 * @return Transform from distorted pixel to rectified pixels
 	 */
 	public static Point2Transform2_F32 transformPixelToRect(CameraPinholeRadial param,
-															DenseMatrix32F rectify)
+															RowMatrix_F32 rectify)
 	{
 		return ImplRectifyImageOps_F32.transformPixelToRect(param, rectify);
 	}
@@ -344,8 +344,8 @@ public class RectifyImageOps {
 	 * @return Transform from unrectified to rectified normalized pixels
 	 */
 	public static Point2Transform2_F64 transformPixelToRectNorm(CameraPinholeRadial param,
-																DenseMatrix64F rectify,
-																DenseMatrix64F rectifyK) {
+																RowMatrix_F64 rectify,
+																RowMatrix_F64 rectifyK) {
 		return ImplRectifyImageOps_F64.transformPixelToRectNorm(param, rectify, rectifyK);
 	}
 
@@ -361,8 +361,8 @@ public class RectifyImageOps {
 	 * @return Transform from unrectified to rectified normalized pixels
 	 */
 	public static Point2Transform2_F32 transformPixelToRectNorm(CameraPinholeRadial param,
-																DenseMatrix32F rectify,
-																DenseMatrix32F rectifyK) {
+																RowMatrix_F32 rectify,
+																RowMatrix_F32 rectifyK) {
 		return ImplRectifyImageOps_F32.transformPixelToRectNorm(param, rectify, rectifyK);
 	}
 
@@ -376,7 +376,7 @@ public class RectifyImageOps {
 	 * @return ImageDistort for rectifying the image.
 	 */
 	public static <T extends ImageGray<T>> ImageDistort<T,T>
-	rectifyImage( DenseMatrix32F rectify , BorderType borderType, Class<T> imageType)
+	rectifyImage( RowMatrix_F32 rectify , BorderType borderType, Class<T> imageType)
 	{
 		boolean skip = borderType == BorderType.SKIP;
 		if( skip ) {
@@ -384,7 +384,7 @@ public class RectifyImageOps {
 		}
 		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, borderType);
 
-		DenseMatrix32F rectifyInv = new DenseMatrix32F(3,3);
+		RowMatrix_F32 rectifyInv = new RowMatrix_F32(3,3);
 		CommonOps_D32.invert(rectify,rectifyInv);
 		PointTransformHomography_F32 rectifyTran = new PointTransformHomography_F32(rectifyInv);
 
@@ -407,7 +407,7 @@ public class RectifyImageOps {
 	 * @return ImageDistort for rectifying the image.
 	 */
 	public static <T extends ImageBase<T>> ImageDistort<T,T>
-	rectifyImage(CameraPinholeRadial param, DenseMatrix32F rectify , BorderType borderType, ImageType<T> imageType)
+	rectifyImage(CameraPinholeRadial param, RowMatrix_F32 rectify , BorderType borderType, ImageType<T> imageType)
 	{
 		boolean skip = borderType == BorderType.SKIP;
 		if( skip ) {

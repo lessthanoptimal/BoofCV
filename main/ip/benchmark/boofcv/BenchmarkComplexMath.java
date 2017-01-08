@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv;
 
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import org.ejml.data.Complex64F;
+import org.ejml.data.Complex_F64;
 
 import java.util.Random;
 
@@ -35,18 +35,18 @@ public class BenchmarkComplexMath {
 
 	Random rand = new Random(234);
 
-	Complex64F number = new Complex64F(1.5,0.3);
+	Complex_F64 number = new Complex_F64(1.5,0.3);
 
-	Complex64F objectInput[] = new Complex64F[N];
-	Complex64F objectOutput[] = new Complex64F[N];
+	Complex_F64 objectInput[] = new Complex_F64[N];
+	Complex_F64 objectOutput[] = new Complex_F64[N];
 
 	double arrayInput[] = new double[2*N];
 	double arrayOutput[] = new double[2*N];
 
 	public BenchmarkComplexMath() {
 		for( int i = 0; i < N; i++ ) {
-			objectInput[i] = new Complex64F();
-			objectOutput[i] = new Complex64F();
+			objectInput[i] = new Complex_F64();
+			objectOutput[i] = new Complex_F64();
 		}
 	}
 
@@ -56,11 +56,11 @@ public class BenchmarkComplexMath {
 		@Override
 		public void process() {
 
-			Complex64F a = number;
+			Complex_F64 a = number;
 
 			for( int i = 0; i < N; i++ ) {
-				Complex64F b = objectInput[i];
-				Complex64F o = objectOutput[i];
+				Complex_F64 b = objectInput[i];
+				Complex_F64 o = objectOutput[i];
 
 				o.real = a.real * b.real - a.imaginary*b.imaginary;
 				o.imaginary = a.real*b.imaginary + a.imaginary*b.real;

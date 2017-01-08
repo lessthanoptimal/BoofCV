@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 
 import static boofcv.alg.distort.radtan.RemoveRadialNtoN_F64.removeRadial;
@@ -45,7 +45,7 @@ public class UniOmniPtoS_F64 implements Point2Transform3_F64 {
 	private double tol = GrlConstants.DCONV_TOL_A;
 
 		// inverse of camera calibration matrix
-	protected DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+	protected RowMatrix_F64 K_inv = new RowMatrix_F64(3,3);
 
 	public UniOmniPtoS_F64(CameraUniversalOmni model) {
 		this.setModel(model);

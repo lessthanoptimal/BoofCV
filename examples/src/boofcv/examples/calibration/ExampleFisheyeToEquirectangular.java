@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ import georegression.misc.GrlConstants;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F32;
-import org.ejml.data.DenseMatrix32F;
+import org.ejml.data.RowMatrix_F32;
 import org.ejml.ops.CommonOps_D32;
 
 import java.awt.image.BufferedImage;
@@ -126,10 +126,10 @@ public class ExampleFisheyeToEquirectangular {
 																		   // so crop it a bit..
 
 		// Rotate camera axis so that +x is forward and not +z and make it visually pleasing
-		DenseMatrix32F adjR = ConvertRotation3D_F32.eulerToMatrix(EulerType.XYZ, GrlConstants.F_PI/2,0,0,null);
+		RowMatrix_F32 adjR = ConvertRotation3D_F32.eulerToMatrix(EulerType.XYZ, GrlConstants.F_PI/2,0,0,null);
 		// Rotation from the front camera to the back facing camera.
 		// This is only an approximation.  Should be determined through calibration.
-		DenseMatrix32F f2b = ConvertRotation3D_F32.eulerToMatrix(EulerType.ZYX,GrlConstants.F_PI,0,0,null);
+		RowMatrix_F32 f2b = ConvertRotation3D_F32.eulerToMatrix(EulerType.ZYX,GrlConstants.F_PI,0,0,null);
 
 		Se3_F32 frontToFront = new Se3_F32();
 		frontToFront.setRotation(adjR);

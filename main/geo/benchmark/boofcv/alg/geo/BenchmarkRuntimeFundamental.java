@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.geo.AssociatedPair;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ public class BenchmarkRuntimeFundamental extends ArtificialStereoScene{
 	List<AssociatedPair> pairs6 = new ArrayList<>();
 	List<AssociatedPair> pairs5 = new ArrayList<>();
 
-	DenseMatrix64F found = new DenseMatrix64F(3,3);
+	RowMatrix_F64 found = new RowMatrix_F64(3,3);
 
 	public class Estimate implements Performer {
 

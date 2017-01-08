@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.geo.h.CommonHomographyChecks;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelFitter;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
@@ -36,8 +36,8 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 
 	public abstract RefineEpipolar createAlgorithm();
 
-	DenseMatrix64F H = new DenseMatrix64F(3,3);
-	DenseMatrix64F found = new DenseMatrix64F(3,3);
+	RowMatrix_F64 H = new RowMatrix_F64(3,3);
+	RowMatrix_F64 found = new RowMatrix_F64(3,3);
 
 	@Test
 	public void perfectInput() {
@@ -47,7 +47,7 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		HomographyLinear4 estimator = new HomographyLinear4(true);
 		estimator.process(pairs,H);
 
-		ModelFitter<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
+		ModelFitter<RowMatrix_F64,AssociatedPair> alg = createAlgorithm();
 
 		//give it the perfect matrix and see if it screwed it up
 		assertTrue(alg.fitModel(pairs, H, found));
@@ -67,10 +67,10 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		HomographyLinear4 estimator = new HomographyLinear4(true);
 		estimator.process(pairs,H);
 
-		ModelFitter<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
+		ModelFitter<RowMatrix_F64,AssociatedPair> alg = createAlgorithm();
 
 		//give it the perfect matrix and see if it screwed it up
-		DenseMatrix64F Hmod = H.copy();
+		RowMatrix_F64 Hmod = H.copy();
 		Hmod.data[0] += 0.1;
 		Hmod.data[5] += 0.1;
 		assertTrue(alg.fitModel(pairs, Hmod, found));

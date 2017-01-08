@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.gui.d3;
 
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageGray;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -105,7 +105,7 @@ public class PointCloudTiltPanel extends JPanel
 	 * @param K rectified camera calibration matrix
 	 */
 	public void configure(double baseline,
-						  DenseMatrix64F K,
+						  RowMatrix_F64 K,
 						  Point2Transform2_F64 rectifiedToColor,
 						  int minDisparity, int maxDisparity) {
 		view.configure(baseline, K, rectifiedToColor, minDisparity, maxDisparity);

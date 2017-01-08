@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,14 +19,14 @@
 package boofcv.struct.geo;
 
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 /**
- * {@link FastQueue} which will internally declare {@link DenseMatrix64F} of a specific shape.
+ * {@link FastQueue} which will internally declare {@link RowMatrix_F64} of a specific shape.
  *
  * @author Peter Abeles
  */
-public class QueueMatrix extends FastQueue<DenseMatrix64F> {
+public class QueueMatrix extends FastQueue<RowMatrix_F64> {
 
 	// matrix shape
 	private int numRows,numCols;
@@ -42,7 +42,7 @@ public class QueueMatrix extends FastQueue<DenseMatrix64F> {
 		this.numRows = numRows;
 		this.numCols = numCols;
 
-		init(initialMaxSize,DenseMatrix64F.class,true);
+		init(initialMaxSize,RowMatrix_F64.class,true);
 	}
 
 	/**
@@ -55,11 +55,11 @@ public class QueueMatrix extends FastQueue<DenseMatrix64F> {
 		this.numRows = numRows;
 		this.numCols = numCols;
 
-		init(10,DenseMatrix64F.class,true);
+		init(10,RowMatrix_F64.class,true);
 	}
 
 	@Override
-	protected DenseMatrix64F createInstance() {
-		return new DenseMatrix64F(numRows,numCols);
+	protected RowMatrix_F64 createInstance() {
+		return new RowMatrix_F64(numRows,numCols);
 	}
 }

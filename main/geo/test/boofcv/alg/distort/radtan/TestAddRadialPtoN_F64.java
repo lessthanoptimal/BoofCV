@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.distort.radtan;
 
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.junit.Test;
 
@@ -52,8 +52,8 @@ public class TestAddRadialPtoN_F64 {
 
 		Point2D_F64 normPt = new Point2D_F64();
 
-		DenseMatrix64F K = new DenseMatrix64F(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
-		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+		RowMatrix_F64 K = new RowMatrix_F64(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
+		RowMatrix_F64 K_inv = new RowMatrix_F64(3,3);
 		CommonOps_D64.invert(K, K_inv);
 
 		// compute normalized image coordinate

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.RectangleLength2D_F32;
 import georegression.struct.shapes.RectangleLength2D_F64;
-import org.ejml.data.DenseMatrix32F;
+import org.ejml.data.RowMatrix_F32;
 import org.ejml.ops.CommonOps_D32;
 
 /**
@@ -146,8 +146,8 @@ public class LensDistortionOps {
 		float deltaY = (float)(bound.y0 + (scaleY-scale)*paramDesired.height/2.0);
 
 		// adjustment matrix
-		DenseMatrix32F A = new DenseMatrix32F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
-		DenseMatrix32F A_inv = new DenseMatrix32F(3, 3);
+		RowMatrix_F32 A = new RowMatrix_F32(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
+		RowMatrix_F32 A_inv = new RowMatrix_F32(3, 3);
 		if (!CommonOps_D32.invert(A, A_inv)) {
 			throw new RuntimeException("Failed to invert adjustment matrix.  Probably bad.");
 		}

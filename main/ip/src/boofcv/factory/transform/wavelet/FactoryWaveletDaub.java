@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.core.image.border.BorderIndex1D_Reflect;
 import boofcv.core.image.border.BorderIndex1D_Wrap;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.wavelet.*;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.LinearSolverFactory_D64;
 import org.ejml.interfaces.linsol.LinearSolver;
 
@@ -190,7 +190,7 @@ public class FactoryWaveletDaub {
 		// Because the wavelet transform is a linear invertible system the inverse coefficients
 		// can be found by creating a matrix and inverting the matrix.  Boundary conditions are then
 		// extracted from this inverted matrix.
-		DenseMatrix64F A = new DenseMatrix64F(N,N);
+		RowMatrix_F64 A = new RowMatrix_F64(N,N);
 		for( int i = 0; i < N; i += 2 ) {
 			
 			for( int j = 0; j < forward.scaling.length; j++ ) {
@@ -204,12 +204,12 @@ public class FactoryWaveletDaub {
 			}
 		}
 
-		LinearSolver<DenseMatrix64F> solver = LinearSolverFactory_D64.linear(N);
+		LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_D64.linear(N);
 		if( !solver.setA(A) || solver.quality() < 1e-5) {
 			throw new IllegalArgumentException("Can't invert matrix");
 		}
 
-		DenseMatrix64F A_inv = new DenseMatrix64F(N,N);
+		RowMatrix_F64 A_inv = new RowMatrix_F64(N,N);
 		solver.invert(A_inv);
 
 		int numBorder = UtilWavelet.borderForwardLower(inverse)/2;
@@ -230,7 +230,7 @@ public class FactoryWaveletDaub {
 		return ret;
 	}
 
-	private static void computeLowerCoef(WlCoef_F32 inverse, DenseMatrix64F a_inv, WlBorderCoefFixed ret, int col) {
+	private static void computeLowerCoef(WlCoef_F32 inverse, RowMatrix_F64 a_inv, WlBorderCoefFixed ret, int col) {
 		int lengthWavelet = inverse.wavelet.length + inverse.offsetWavelet + col;
 		int lengthScaling = inverse.scaling.length + inverse.offsetScaling + col;
 		lengthWavelet = Math.min(lengthWavelet,inverse.wavelet.length);
@@ -248,7 +248,7 @@ public class FactoryWaveletDaub {
 		ret.lowerCoef[col] = new WlCoef_F32(coefScaling,0,coefWavelet,0);
 	}
 
-	private static void computeUpperCoef(WlCoef_F32 inverse, int n, DenseMatrix64F a_inv, WlBorderCoefFixed ret, int col) {
+	private static void computeUpperCoef(WlCoef_F32 inverse, int n, RowMatrix_F64 a_inv, WlBorderCoefFixed ret, int col) {
 		int indexEnd = n - col - 2;
 		int lengthWavelet = indexEnd+inverse.offsetWavelet+inverse.wavelet.length;
 		int lengthScaling = indexEnd+inverse.offsetScaling+inverse.scaling.length;

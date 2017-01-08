@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,7 +49,7 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 	Se3_F64 worldToCamera = new Se3_F64();
 
 	// intrinsic camera calibration
-	DenseMatrix64F K;
+	RowMatrix_F64 K;
 
 	// how far it moves in the world frame for each key press
 	double stepSize;
@@ -64,11 +64,11 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 		addMouseMotionListener(this);
 	}
 
-	public DenseMatrix64F getK() {
+	public RowMatrix_F64 getK() {
 		return K;
 	}
 
-	public void setK(DenseMatrix64F k) {
+	public void setK(RowMatrix_F64 k) {
 		K = k;
 	}
 

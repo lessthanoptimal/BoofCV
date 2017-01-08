@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class TestRectifyFundamental {
 	List<AssociatedPair> pairs;
 
 	Se3_F64 motion;
-	DenseMatrix64F F;
+	RowMatrix_F64 F;
 
 	/**
 	 * Checks to see that the epipoles go to infinity after applying the transforms
@@ -67,8 +67,8 @@ public class TestRectifyFundamental {
 		RectifyFundamental alg = new RectifyFundamental();
 		alg.process(F,pairs,500,520);
 
-		DenseMatrix64F R1 = alg.getRect1();
-		DenseMatrix64F R2 = alg.getRect2();
+		RowMatrix_F64 R1 = alg.getRect1();
+		RowMatrix_F64 R2 = alg.getRect2();
 
 		// sanity check
 
@@ -108,14 +108,14 @@ public class TestRectifyFundamental {
 
 	public void createScene() {
 
-		DenseMatrix64F K = new DenseMatrix64F(3,3,true,500,0,250,0,520,270,0,0,1);
+		RowMatrix_F64 K = new RowMatrix_F64(3,3,true,500,0,250,0,520,270,0,0,1);
 
 		// define the camera's motion
 		motion = new Se3_F64();
 		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,-0.01, 0.1, 0.05, null));
 		motion.getT().set(-0.5,0.1,-0.05);
 
-		DenseMatrix64F E = MultiViewOps.createEssential(motion.getR(), motion.getT());
+		RowMatrix_F64 E = MultiViewOps.createEssential(motion.getR(), motion.getT());
 		F = MultiViewOps.createFundamental(E, K);
 
 		// randomly generate points in space

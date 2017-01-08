@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 /**
  * Computes the rotation matrix derivative for Rodrigues coordinates
@@ -29,11 +29,11 @@ import org.ejml.data.DenseMatrix64F;
  */
 public class RodriguesRotationJacobian {
 	// partial for vector x component
-	public DenseMatrix64F Rx = new DenseMatrix64F(3,3);
+	public RowMatrix_F64 Rx = new RowMatrix_F64(3,3);
 	// partial for vector x component
-	public DenseMatrix64F Ry = new DenseMatrix64F(3,3);
+	public RowMatrix_F64 Ry = new RowMatrix_F64(3,3);
 	// partial for vector y component
-	public DenseMatrix64F Rz = new DenseMatrix64F(3,3);
+	public RowMatrix_F64 Rz = new RowMatrix_F64(3,3);
 
 	/**
 	 * Computes the Rodrigues coordinate Jacobian

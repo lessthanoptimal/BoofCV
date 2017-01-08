@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
-import org.ejml.data.Complex64F;
-import org.ejml.ops.ComplexMath64F;
+import org.ejml.data.Complex_F64;
+import org.ejml.ops.ComplexMath_F64;
 import org.junit.Test;
 
 import java.util.Random;
@@ -259,14 +259,14 @@ public class TestDiscreteFourierTransformOps {
 		else
 			DiscreteFourierTransformOps.multiplyRealComplex((GrayF64)realA, (InterleavedF64)complexB, (InterleavedF64)complexC);
 
-		Complex64F expected = new Complex64F();
+		Complex_F64 expected = new Complex_F64();
 
 		for( int y = 0; y < realA.height; y++ ) {
 			for( int x = 0; x < realA.width; x++ ) {
-				Complex64F a = new Complex64F(get(realA,x, y),0);
-				Complex64F b = new Complex64F(get(complexB,x,y,0),get(complexB, x, y, 1));
+				Complex_F64 a = new Complex_F64(get(realA,x, y),0);
+				Complex_F64 b = new Complex_F64(get(complexB,x,y,0),get(complexB, x, y, 1));
 
-				ComplexMath64F.multiply(a, b, expected);
+				ComplexMath_F64.multiply(a, b, expected);
 
 				assertEquals(expected.getReal(),get(complexC, x, y, 0),1e-4);
 				assertEquals(expected.getImaginary(),get(complexC, x, y, 1),1e-4);
@@ -296,14 +296,14 @@ public class TestDiscreteFourierTransformOps {
 		else
 			DiscreteFourierTransformOps.multiplyComplex((InterleavedF64) complexA, (InterleavedF64) complexB, (InterleavedF64) complexC);
 
-		Complex64F expected = new Complex64F();
+		Complex_F64 expected = new Complex_F64();
 
 		for( int y = 0; y < complexA.height; y++ ) {
 			for( int x = 0; x < complexA.width; x++ ) {
-				Complex64F a = new Complex64F(get(complexA, x, y, 0),get(complexA, x, y, 1));
-				Complex64F b = new Complex64F(get(complexB, x, y, 0),get(complexB,x,y,1));
+				Complex_F64 a = new Complex_F64(get(complexA, x, y, 0),get(complexA, x, y, 1));
+				Complex_F64 b = new Complex_F64(get(complexB, x, y, 0),get(complexB,x,y,1));
 
-				ComplexMath64F.multiply(a, b, expected);
+				ComplexMath_F64.multiply(a, b, expected);
 
 				assertEquals(expected.getReal(),get(complexC, x, y, 0),1e-4);
 				assertEquals(expected.getImaginary(),get(complexC, x, y, 1),1e-4);

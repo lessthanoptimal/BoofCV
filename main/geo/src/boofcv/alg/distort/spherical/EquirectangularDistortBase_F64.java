@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 
 /**
@@ -42,7 +42,7 @@ public abstract class EquirectangularDistortBase_F64 extends PixelTransform2_F64
 	int outWidth;
 
 	// rotation matrix
-	DenseMatrix64F R = CommonOps_D64.identity(3,3);
+	RowMatrix_F64 R = CommonOps_D64.identity(3,3);
 
 	// storage for intermediate variables
 	Vector3D_F64 n = new Vector3D_F64();
@@ -75,7 +75,7 @@ public abstract class EquirectangularDistortBase_F64 extends PixelTransform2_F64
 	 * Specifies direction using a rotation matrix
 	 * @param R rotation matrix
 	 */
-	public void setDirection( DenseMatrix64F R ) {
+	public void setDirection( RowMatrix_F64 R ) {
 		this.R.set(R);
 	}
 
@@ -123,7 +123,7 @@ public abstract class EquirectangularDistortBase_F64 extends PixelTransform2_F64
 		return tools;
 	}
 
-	public DenseMatrix64F getRotation() {
+	public RowMatrix_F64 getRotation() {
 		return R;
 	}
 }

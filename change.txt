@@ -61,6 +61,8 @@ Version : 0.27
 - TODO Calibration application.  Select output format: BoofCV, OpenCV
 - TODO Tutorial on image features?  Sparse and dense?
 - TODO Don't forget to change BoofCV version referenced in Android example
+- TODO split EnumEpipolar into fundamental and essential
+- TODO Add a fundamental to FactoryMultiViewRobust
 
 ---------------------------------------------
 Date    : 2016/12/07

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.struct.geo;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.ejml.ops.SpecializedOps_D64;
 
@@ -30,11 +30,11 @@ import org.ejml.ops.SpecializedOps_D64;
  * @author Peter Abeles
  */
 public class TrifocalTensor {
-	public DenseMatrix64F T1 = new DenseMatrix64F(3,3);
-	public DenseMatrix64F T2 = new DenseMatrix64F(3,3);
-	public DenseMatrix64F T3 = new DenseMatrix64F(3,3);
+	public RowMatrix_F64 T1 = new RowMatrix_F64(3,3);
+	public RowMatrix_F64 T2 = new RowMatrix_F64(3,3);
+	public RowMatrix_F64 T3 = new RowMatrix_F64(3,3);
 
-	public DenseMatrix64F getT( int index ) {
+	public RowMatrix_F64 getT( int index ) {
 		switch( index ) {
 			case 0:
 				return T1;
@@ -63,7 +63,7 @@ public class TrifocalTensor {
 	 *
 	 * @param m Input: Trifocal tensor encoded in a vector
 	 */
-	public void convertFrom( DenseMatrix64F m ) {
+	public void convertFrom( RowMatrix_F64 m ) {
 		if( m.getNumElements() != 27 )
 			throw new IllegalArgumentException("Input matrix/vector must have 27 elements");
 
@@ -82,7 +82,7 @@ public class TrifocalTensor {
 	 *
 	 * @param m Output: Trifocal tensor encoded in a vector
 	 */
-	public void convertTo( DenseMatrix64F m ) {
+	public void convertTo( RowMatrix_F64 m ) {
 		if( m.getNumElements() != 27 )
 			throw new IllegalArgumentException("Input matrix/vector must have 27 elements");
 

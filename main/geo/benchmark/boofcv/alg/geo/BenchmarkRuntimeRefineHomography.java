@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelFitter;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import static boofcv.factory.geo.FactoryMultiView.refineHomography;
 
@@ -39,15 +39,15 @@ public class BenchmarkRuntimeRefineHomography extends ArtificialStereoScene{
 	static final int NUM_POINTS = 500;
 	static final boolean PIXELS = false;
 	
-	protected DenseMatrix64F initialF;
-	DenseMatrix64F refinedF = new DenseMatrix64F(3,3);
+	protected RowMatrix_F64 initialF;
+	RowMatrix_F64 refinedF = new RowMatrix_F64(3,3);
 
 	public class Refine implements Performer {
 
-		ModelFitter<DenseMatrix64F,AssociatedPair> alg;
+		ModelFitter<RowMatrix_F64,AssociatedPair> alg;
 		String name;
 
-		public Refine(String name , ModelFitter<DenseMatrix64F,AssociatedPair> alg) {
+		public Refine(String name , ModelFitter<RowMatrix_F64,AssociatedPair> alg) {
 			this.name = name;
 			this.alg = alg;
 		}

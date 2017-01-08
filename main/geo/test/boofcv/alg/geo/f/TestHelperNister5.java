@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.f;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.ejml.ops.RandomMatrices_D64;
 import org.ejml.simple.SimpleMatrix;
@@ -58,21 +58,21 @@ public class TestHelperNister5 {
 
 		SimpleMatrix E = SimpleMatrix.wrap(constructE(x,y,z,w));
 
-		DenseMatrix64F A = new DenseMatrix64F(10,10);
-		DenseMatrix64F B = new DenseMatrix64F(10,10);
+		RowMatrix_F64 A = new RowMatrix_F64(10,10);
+		RowMatrix_F64 B = new RowMatrix_F64(10,10);
 
 		HelperNister5 alg = new HelperNister5();
 		alg.setNullSpace(X,Y,Z,W);
 		alg.setupA1(A);
 		alg.setupA2(B);
 
-		DenseMatrix64F Y1 = new DenseMatrix64F(10,1);
-		DenseMatrix64F Y2 = new DenseMatrix64F(10,1);
+		RowMatrix_F64 Y1 = new RowMatrix_F64(10,1);
+		RowMatrix_F64 Y2 = new RowMatrix_F64(10,1);
 
 		CommonOps_D64.mult(A,createCoefsA(x,y,z),Y1);
 		CommonOps_D64.mult(B,createCoefsB(x, y, z),Y2);
 
-		DenseMatrix64F Y = new DenseMatrix64F(10,1);
+		RowMatrix_F64 Y = new RowMatrix_F64(10,1);
 
 		CommonOps_D64.add(Y1,Y2,Y);
 
@@ -80,7 +80,7 @@ public class TestHelperNister5 {
 		SimpleMatrix EEt = E.mult(E.transpose());
 		SimpleMatrix EEtE = EEt.mult(E);
 		SimpleMatrix aE = E.scale(-0.5*EEt.trace());
-		DenseMatrix64F eq2 = EEtE.plus(aE).matrix_F64();
+		RowMatrix_F64 eq2 = EEtE.plus(aE).matrix_F64();
 
 		// check the solution
 		assertEquals(E.determinant(),Y.data[0],1e-8);
@@ -97,7 +97,7 @@ public class TestHelperNister5 {
 
 	@Test
 	public void setDeterminantVectors() {
-		DenseMatrix64F A = RandomMatrices_D64.createRandom(10,10,-1,1,rand);
+		RowMatrix_F64 A = RandomMatrices_D64.createRandom(10,10,-1,1,rand);
 
 		HelperNister5 alg = new HelperNister5();
 		alg.setDeterminantVectors(A);
@@ -147,14 +147,14 @@ public class TestHelperNister5 {
 
 	@Test
 	public void extractPolynomial() {
-		DenseMatrix64F A = RandomMatrices_D64.createRandom(10,10,-1,1,rand);
+		RowMatrix_F64 A = RandomMatrices_D64.createRandom(10,10,-1,1,rand);
 
 		HelperNister5 alg = new HelperNister5();
 		alg.setDeterminantVectors(A);
 
 		double z = 2.3;
 
-		DenseMatrix64F B = new DenseMatrix64F(3,3);
+		RowMatrix_F64 B = new RowMatrix_F64(3,3);
 
 		B.data[0] = alg.K00*z*z*z + alg.K01*z*z + alg.K02*z + alg.K03;
 		B.data[1] = alg.K04*z*z*z + alg.K05*z*z + alg.K06*z + alg.K07;
@@ -183,8 +183,8 @@ public class TestHelperNister5 {
 	}
 
 
-	public DenseMatrix64F constructE( double x , double y , double z , double w ) {
-		DenseMatrix64F E = new DenseMatrix64F(3,3);
+	public RowMatrix_F64 constructE( double x , double y , double z , double w ) {
+		RowMatrix_F64 E = new RowMatrix_F64(3,3);
 
 		for( int i = 0; i < 9; i++)  {
 			E.data[i] = x*X[i] + y*Y[i] + z*Z[i] + w*W[i];
@@ -193,9 +193,9 @@ public class TestHelperNister5 {
 		return E;
 	}
 
-	public DenseMatrix64F createCoefsA( double x , double y , double z ) {
+	public RowMatrix_F64 createCoefsA( double x , double y , double z ) {
 
-		DenseMatrix64F X = new DenseMatrix64F(10,1);
+		RowMatrix_F64 X = new RowMatrix_F64(10,1);
 
 		X.data[0] = x*x*x;
 		X.data[1] = y*y*y;
@@ -211,9 +211,9 @@ public class TestHelperNister5 {
 		return X;
 	}
 
-	public DenseMatrix64F createCoefsB( double x , double y , double z ) {
+	public RowMatrix_F64 createCoefsB( double x , double y , double z ) {
 
-		DenseMatrix64F X = new DenseMatrix64F(10,1);
+		RowMatrix_F64 X = new RowMatrix_F64(10,1);
 
 //		'x*z^2','x*z','x','y*z^2','y*z','y','z^3','z^2','z',''
 
@@ -231,7 +231,7 @@ public class TestHelperNister5 {
 		return X;
 	}
 
-	public double sumRow( int row , DenseMatrix64F A , DenseMatrix64F B ) {
+	public double sumRow( int row , RowMatrix_F64 A , RowMatrix_F64 B ) {
 		double total = 0;
 
 		for( int i = 0; i < 10; i++ ) {

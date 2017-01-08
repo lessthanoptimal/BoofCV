@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,8 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix32F;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F32;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.ConvertMatrixData;
 
 import javax.swing.*;
@@ -321,14 +321,14 @@ public class CalibratedImageGridPanel extends JPanel {
 		}
 	}
 
-	public void setDistorted (CameraPinholeRadial param , DenseMatrix64F rect ) {
+	public void setDistorted (CameraPinholeRadial param , RowMatrix_F64 rect ) {
 		if( rect == null ) {
 			CameraPinhole undistorted = new CameraPinhole(param);
 			this.undoRadial = LensDistortionOps.changeCameraModel(
 					AdjustmentType.FULL_VIEW, BorderType.ZERO, param, undistorted,null, ImageType.single(GrayF32.class));
 			this.remove_p_to_p = LensDistortionOps.transformChangeModel_F32(AdjustmentType.FULL_VIEW, param, undistorted, false,null);
 		} else {
-			DenseMatrix32F rect_f32 = new DenseMatrix32F(3,3);
+			RowMatrix_F32 rect_f32 = new RowMatrix_F32(3,3);
 			ConvertMatrixData.convert(rect,rect_f32);
 
 			this.undoRadial = RectifyImageOps.rectifyImage(

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import georegression.geometry.GeometryMath_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -64,7 +64,7 @@ public class TestRemoveRadialPtoN_F64 {
 		alg.compute(distX, distY, point);
 
 		/// go from calibrated coordinates to pixel
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(fx, fy, skew, xc, yc);
+		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(fx, fy, skew, xc, yc);
 
 		GeometryMath_F64.mult(K,point,point);
 

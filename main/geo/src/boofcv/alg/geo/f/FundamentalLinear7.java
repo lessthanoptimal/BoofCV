@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,8 @@ import org.ddogleg.solver.PolynomialRoots;
 import org.ddogleg.solver.PolynomialSolver;
 import org.ddogleg.solver.RootFinderType;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.Complex64F;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.Complex_F64;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.SpecializedOps_D64;
 
 import java.util.Arrays;
@@ -56,15 +56,15 @@ import java.util.List;
  */
 public class FundamentalLinear7 extends FundamentalLinear {
 	// extracted from the null space of A
-	protected DenseMatrix64F F1 = new DenseMatrix64F(3,3);
-	protected DenseMatrix64F F2 = new DenseMatrix64F(3,3);
+	protected RowMatrix_F64 F1 = new RowMatrix_F64(3,3);
+	protected RowMatrix_F64 F2 = new RowMatrix_F64(3,3);
 
 	// temporary storage for cubic coefficients
 	private Polynomial poly = new Polynomial(4);
 	private PolynomialRoots rootFinder = PolynomialSolver.createRootFinder(RootFinderType.EVD,4);
 
 	// Matrix from SVD
-	private DenseMatrix64F V = new DenseMatrix64F(9,9);
+	private RowMatrix_F64 V = new RowMatrix_F64(9,9);
 
 	/**
 	 * When computing the essential matrix normalization is optional because pixel coordinates
@@ -85,7 +85,7 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 * @param solutions Output: Storage for the found solutions.
 	 * @return true If successful or false if it failed
 	 */
-	public boolean process( List<AssociatedPair> points , FastQueue<DenseMatrix64F> solutions ) {
+	public boolean process( List<AssociatedPair> points , FastQueue<RowMatrix_F64> solutions ) {
 		if( points.size() != 7 )
 			throw new IllegalArgumentException("Must be exactly 7 points. Not "+points.size()+" you gelatinous piece of pond scum.");
 
@@ -117,7 +117,7 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	/**
 	 * Computes the SVD of A and extracts the essential/fundamental matrix from its null space
 	 */
-	private boolean process(DenseMatrix64F A) {
+	private boolean process(RowMatrix_F64 A) {
 		if( !svdNull.decompose(A) )
 			return false;
 
@@ -139,18 +139,18 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 * </p>
 
 	 */
-	public void computeSolutions( FastQueue<DenseMatrix64F> solutions )
+	public void computeSolutions( FastQueue<RowMatrix_F64> solutions )
 	{
 		if( !rootFinder.process(poly))
 			return;
 
-		List<Complex64F> zeros = rootFinder.getRoots();
+		List<Complex_F64> zeros = rootFinder.getRoots();
 
-		for( Complex64F c : zeros ) {
+		for( Complex_F64 c : zeros ) {
 			if( !c.isReal() && Math.abs(c.imaginary) > 1e-10 )
 				continue;
 
-			DenseMatrix64F F = solutions.grow();
+			RowMatrix_F64 F = solutions.grow();
 
 			double a = c.real;
 			double b = 1-c.real;
@@ -178,8 +178,8 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 * @param F2 a fundamental matrix
 	 * @param coefs Where results are returned.
 	 */
-	public static void computeCoefficients( DenseMatrix64F F1 ,
-											DenseMatrix64F F2 ,
+	public static void computeCoefficients( RowMatrix_F64 F1 ,
+											RowMatrix_F64 F2 ,
 											double coefs[] )
 	{
 		Arrays.fill(coefs, 0);
@@ -192,8 +192,8 @@ public class FundamentalLinear7 extends FundamentalLinear {
 		computeCoefficients(F1,F2,0,5,7,coefs,true);
 	}
 
-	public static void computeCoefficients( DenseMatrix64F F1 ,
-											DenseMatrix64F F2 ,
+	public static void computeCoefficients( RowMatrix_F64 F1 ,
+											RowMatrix_F64 F2 ,
 											int i , int j , int k ,
 											double coefs[] , boolean minus )
 	{

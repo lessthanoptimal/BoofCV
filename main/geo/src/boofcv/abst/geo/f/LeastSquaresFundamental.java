@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class LeastSquaresFundamental implements RefineEpipolar {
-	ModelCodec<DenseMatrix64F> paramModel;
+	ModelCodec<RowMatrix_F64> paramModel;
 	ResidualsEpipolarMatrix func;
 	double param[];
 
@@ -53,7 +53,7 @@ public class LeastSquaresFundamental implements RefineEpipolar {
 		this( new ParamFundamentalEpipolar() , convergenceTol, maxIterations,useSampson);
 	}
 
-	public LeastSquaresFundamental(ModelCodec<DenseMatrix64F> paramModel,
+	public LeastSquaresFundamental(ModelCodec<RowMatrix_F64> paramModel,
 								   double convergenceTol,
 								   int maxIterations,
 								   boolean useSampson) {
@@ -63,7 +63,7 @@ public class LeastSquaresFundamental implements RefineEpipolar {
 
 		param = new double[paramModel.getParamLength()];
 
-		ModelObservationResidual<DenseMatrix64F,AssociatedPair> residual;
+		ModelObservationResidual<RowMatrix_F64,AssociatedPair> residual;
 		if( useSampson )
 			residual = new FundamentalResidualSampson();
 		else
@@ -75,7 +75,7 @@ public class LeastSquaresFundamental implements RefineEpipolar {
 	}
 
 	@Override
-	public boolean fitModel(List<AssociatedPair> obs, DenseMatrix64F F, DenseMatrix64F refinedF) {
+	public boolean fitModel(List<AssociatedPair> obs, RowMatrix_F64 F, RowMatrix_F64 refinedF) {
 		func.setObservations(obs);
 		
 		paramModel.encode(F, param);

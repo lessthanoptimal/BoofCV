@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.QueueMatrix;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 /**
  * Implementation of {@link GeoModelEstimatorNto1} for epipolar matrices.
@@ -32,17 +32,17 @@ import org.ejml.data.DenseMatrix64F;
  * @author Peter Abeles
  */
 public class EstimateNto1ofEpipolar
-		extends GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>
+		extends GeoModelEstimatorNto1<RowMatrix_F64,AssociatedPair>
 		implements Estimate1ofEpipolar
 {
-	public EstimateNto1ofEpipolar(GeoModelEstimatorN<DenseMatrix64F, AssociatedPair> alg,
-								  DistanceFromModel<DenseMatrix64F, AssociatedPair> distance,
+	public EstimateNto1ofEpipolar(GeoModelEstimatorN<RowMatrix_F64, AssociatedPair> alg,
+								  DistanceFromModel<RowMatrix_F64, AssociatedPair> distance,
 								  int numTest) {
 		super(alg, distance, new QueueMatrix(3,3), numTest);
 	}
 
 	@Override
-	protected void copy(DenseMatrix64F src, DenseMatrix64F dst) {
+	protected void copy(RowMatrix_F64 src, RowMatrix_F64 dst) {
 		dst.set(src);
 	}
 }

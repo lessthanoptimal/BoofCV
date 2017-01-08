@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 import org.ejml.ops.CommonOps_D64;
@@ -65,13 +65,13 @@ import java.util.List;
 public class PoseFromPairLinear6 {
 
 	// The rank 11 linear system
-	private DenseMatrix64F A = new DenseMatrix64F(1,12);
+	private RowMatrix_F64 A = new RowMatrix_F64(1,12);
 
 	// used to decompose and compute the null space of A
-	private SingularValueDecomposition_F64<DenseMatrix64F> svd = DecompositionFactory_D64.svd(0, 0, true, true, false);
+	private SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_D64.svd(0, 0, true, true, false);
 
 	// parameterized rotation and translation
-	private DenseMatrix64F x = new DenseMatrix64F(12,1);
+	private RowMatrix_F64 x = new RowMatrix_F64(12,1);
 
 	// the found motion
 	private Se3_F64 motion = new Se3_F64();
@@ -111,7 +111,7 @@ public class PoseFromPairLinear6 {
 	/**
 	 * Matrix used internally.
 	 */
-	protected DenseMatrix64F getA() {
+	protected RowMatrix_F64 getA() {
 		return A;
 	}
 
@@ -157,13 +157,13 @@ public class PoseFromPairLinear6 {
 	/**
 	 * Computes the null space of A and extracts the transform.
 	 */
-	private void computeTransform( DenseMatrix64F A ) {
+	private void computeTransform( RowMatrix_F64 A ) {
 		if( !svd.decompose(A) )
 			throw new RuntimeException("SVD failed?");
 
 		SingularOps_D64.nullVector(svd,true,x);
 
-		DenseMatrix64F R = motion.getR();
+		RowMatrix_F64 R = motion.getR();
 		Vector3D_F64 T = motion.getT();
 
 		// extract the results
@@ -183,7 +183,7 @@ public class PoseFromPairLinear6 {
 	 * See page 280 of [1]
 	 */
 	private void massageResults() {
-		DenseMatrix64F R = motion.getR();
+		RowMatrix_F64 R = motion.getR();
 		Vector3D_F64 T = motion.getT();
 
 		if( !svd.decompose(R))

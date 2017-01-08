@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import boofcv.struct.image.ImageType;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix32F;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F32;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.ConvertMatrixData;
 
 /**
@@ -56,14 +56,14 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 	protected T imageRightRect;
 
 	// rectification matrices for left and right image
-	protected DenseMatrix64F rect1;
-	protected DenseMatrix64F rect2;
+	protected RowMatrix_F64 rect1;
+	protected RowMatrix_F64 rect2;
 
 	// calibration matrix for both cameras after rectification
-	protected DenseMatrix64F rectK;
+	protected RowMatrix_F64 rectK;
 
 	// rotation matrix for both rectified cameras
-	protected DenseMatrix64F rectR;
+	protected RowMatrix_F64 rectR;
 
 	// storage for 3D coordinate of point in rectified reference frame
 	protected Point3D_F64 pointRect = new Point3D_F64();
@@ -105,8 +105,8 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 		Se3_F64 leftToRight = stereoParam.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(left, (DenseMatrix64F)null);
-		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(right, (DenseMatrix64F)null);
+		RowMatrix_F64 K1 = PerspectiveOps.calibrationMatrix(left, (RowMatrix_F64)null);
+		RowMatrix_F64 K2 = PerspectiveOps.calibrationMatrix(right, (RowMatrix_F64)null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 
@@ -117,8 +117,8 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 		rectK = rectifyAlg.getCalibrationMatrix();
 		rectR = rectifyAlg.getRectifiedRotation();
 
-		DenseMatrix32F rect1_F32 = new DenseMatrix32F(3,3);
-		DenseMatrix32F rect2_F32 = new DenseMatrix32F(3,3);
+		RowMatrix_F32 rect1_F32 = new RowMatrix_F32(3,3);
+		RowMatrix_F32 rect2_F32 = new RowMatrix_F32(3,3);
 
 		ConvertMatrixData.convert(rect1,rect1_F32);
 		ConvertMatrixData.convert(rect2,rect2_F32);
@@ -195,15 +195,15 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 	 *
 	 * @return camera calibration matrix
 	 */
-	public DenseMatrix64F getRectK() {
+	public RowMatrix_F64 getRectK() {
 		return rectK;
 	}
 
-	public DenseMatrix64F getRect1() {
+	public RowMatrix_F64 getRect1() {
 		return rect1;
 	}
 
-	public DenseMatrix64F getRect2() {
+	public RowMatrix_F64 getRect2() {
 		return rect2;
 	}
 }

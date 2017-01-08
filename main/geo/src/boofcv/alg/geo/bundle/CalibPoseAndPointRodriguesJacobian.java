@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.Arrays;
 import java.util.List;
@@ -60,7 +60,7 @@ public class CalibPoseAndPointRodriguesJacobian implements FunctionNtoMxN {
 	// local variable which stores the predicted location of the feature in the camera frame
 	Rodrigues_F64 rodrigues = new Rodrigues_F64();
 	// rotation matrix
-	DenseMatrix64F R = new DenseMatrix64F(3,3);
+	RowMatrix_F64 R = new RowMatrix_F64(3,3);
 	// translation vector
 	Vector3D_F64 T = new Vector3D_F64();
 	// feature location in world coordinates
@@ -225,7 +225,7 @@ public class CalibPoseAndPointRodriguesJacobian implements FunctionNtoMxN {
 	 * @param Rj Jacobian for Rodrigues
 	 * @param worldPt Location of point in world coordinates
 	 */
-	private void addRodriguesJacobian( DenseMatrix64F Rj , Point3D_F64 worldPt )
+	private void addRodriguesJacobian( RowMatrix_F64 Rj , Point3D_F64 worldPt )
 	{
 		// (1/z)*dot(R)*X
 		double Rx = (Rj.data[0]*worldPt.x + Rj.data[1]*worldPt.y + Rj.data[2]*worldPt.z)/cameraPt.z;
@@ -269,7 +269,7 @@ public class CalibPoseAndPointRodriguesJacobian implements FunctionNtoMxN {
 	 *
 	 * @param R rotation matrix
 	 */
-	private void addWorldPointGradient( DenseMatrix64F R ) {
+	private void addWorldPointGradient( RowMatrix_F64 R ) {
 		double divZ2 = 1.0/(cameraPt.z*cameraPt.z);
 
 		// partial P.x

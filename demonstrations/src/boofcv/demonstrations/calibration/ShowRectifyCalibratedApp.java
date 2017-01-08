@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,8 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix32F;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F32;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.ConvertMatrixData;
 
 import javax.swing.*;
@@ -93,15 +93,15 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), (DenseMatrix64F)null);
-		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(param.getRight(),(DenseMatrix64F) null);
+		RowMatrix_F64 K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), (RowMatrix_F64)null);
+		RowMatrix_F64 K2 = PerspectiveOps.calibrationMatrix(param.getRight(),(RowMatrix_F64) null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 
 		// rectification matrix for each image
-		DenseMatrix64F rect1 = rectifyAlg.getRect1();
-		DenseMatrix64F rect2 = rectifyAlg.getRect2();
-		DenseMatrix64F rectK = rectifyAlg.getCalibrationMatrix();
+		RowMatrix_F64 rect1 = rectifyAlg.getRect1();
+		RowMatrix_F64 rect2 = rectifyAlg.getRect2();
+		RowMatrix_F64 rectK = rectifyAlg.getCalibrationMatrix();
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier
 		SwingUtilities.invokeLater(new Runnable() {
@@ -121,9 +121,9 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		hasProcessed = true;
 	}
 
-	private void addRectified( final String name , final DenseMatrix64F rect1 , final DenseMatrix64F rect2 ) {
-		DenseMatrix32F rect1_F32 = new DenseMatrix32F(3,3); // TODO simplify code some how
-		DenseMatrix32F rect2_F32 = new DenseMatrix32F(3,3);
+	private void addRectified( final String name , final RowMatrix_F64 rect1 , final RowMatrix_F64 rect2 ) {
+		RowMatrix_F32 rect1_F32 = new RowMatrix_F32(3,3); // TODO simplify code some how
+		RowMatrix_F32 rect2_F32 = new RowMatrix_F32(3,3);
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 

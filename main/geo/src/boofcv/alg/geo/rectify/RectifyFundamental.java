@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.List;
@@ -54,8 +54,8 @@ import java.util.List;
 public class RectifyFundamental {
 
 	// rectifying transform for left and right images
-	private DenseMatrix64F rect1 = new DenseMatrix64F(3,3);
-	private DenseMatrix64F rect2 = new DenseMatrix64F(3,3);
+	private RowMatrix_F64 rect1 = new RowMatrix_F64(3,3);
+	private RowMatrix_F64 rect2 = new RowMatrix_F64(3,3);
 
 	// storage for epipoles
 	private Point3D_F64 epipole1 = new Point3D_F64();
@@ -69,7 +69,7 @@ public class RectifyFundamental {
 	 * @param width Width of first image.
 	 * @param height Height of first image.
 	 */
-	public void process( DenseMatrix64F F , List<AssociatedPair> observations ,
+	public void process( RowMatrix_F64 F , List<AssociatedPair> observations ,
 						 int width , int height ) {
 
 		int centerX = width/2;
@@ -168,7 +168,7 @@ public class RectifyFundamental {
 	 * @return Affine transform
 	 */
 	private SimpleMatrix computeAffineH( List<AssociatedPair> observations ,
-										 DenseMatrix64F H , DenseMatrix64F Hzero ) {
+										 RowMatrix_F64 H , RowMatrix_F64 Hzero ) {
 		SimpleMatrix A = new SimpleMatrix(observations.size(),3);
 		SimpleMatrix b = new SimpleMatrix(A.numRows(),1);
 
@@ -197,7 +197,7 @@ public class RectifyFundamental {
 	 * H0 = H*M
 	 * P=[M|m] from canonical camera
 	 */
-	private SimpleMatrix computeHZero( DenseMatrix64F F , Point3D_F64 e2 ,
+	private SimpleMatrix computeHZero( RowMatrix_F64 F , Point3D_F64 e2 ,
 									   SimpleMatrix H ) {
 
 		Vector3D_F64 v = new Vector3D_F64(.1,0.5,.2);
@@ -213,14 +213,14 @@ public class RectifyFundamental {
 	/**
 	 * Rectification transform for first camera
 	 */
-	public DenseMatrix64F getRect1() {
+	public RowMatrix_F64 getRect1() {
 		return rect1;
 	}
 
 	/**
 	 * Rectification transform for second camera
 	 */
-	public DenseMatrix64F getRect2() {
+	public RowMatrix_F64 getRect2() {
 		return rect2;
 	}
 }

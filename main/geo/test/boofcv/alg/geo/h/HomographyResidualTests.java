@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo.h;
 
 import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.struct.geo.AssociatedPair;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class HomographyResidualTests extends CommonHomographyChecks {
 
-	public abstract ModelObservationResidualN<DenseMatrix64F,AssociatedPair> createAlg();
+	public abstract ModelObservationResidualN<RowMatrix_F64,AssociatedPair> createAlg();
 
 	@Test
 	public void basicTest() {
@@ -41,7 +41,7 @@ public abstract class HomographyResidualTests extends CommonHomographyChecks {
 		HomographyLinear4 estimator = new HomographyLinear4(true);
 		estimator.process(pairs,solution);
 
-		ModelObservationResidualN<DenseMatrix64F,AssociatedPair> alg = createAlg();
+		ModelObservationResidualN<RowMatrix_F64,AssociatedPair> alg = createAlg();
 
 		double residuals[] = new double[alg.getN()];
 		

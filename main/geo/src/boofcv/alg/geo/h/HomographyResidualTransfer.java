@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 /**
  * <p>
@@ -33,14 +33,14 @@ import org.ejml.data.DenseMatrix64F;
  * @author Peter Abeles
  */
 public class HomographyResidualTransfer
-		implements ModelObservationResidualN<DenseMatrix64F,AssociatedPair> {
+		implements ModelObservationResidualN<RowMatrix_F64,AssociatedPair> {
 
-	DenseMatrix64F H;
+	RowMatrix_F64 H;
 
 	Point2D_F64 temp = new Point2D_F64();
 
 	@Override
-	public void setModel(DenseMatrix64F F) {
+	public void setModel(RowMatrix_F64 F) {
 		this.H = F;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.SingularOps_D64;
 import org.ejml.ops.SpecializedOps_D64;
 
@@ -68,7 +68,7 @@ public class FundamentalLinear8 extends FundamentalLinear {
 	 *               normalized coordinates for essential matrix.
 	 * @return true If successful or false if it failed
 	 */
-	public boolean process( List<AssociatedPair> points , DenseMatrix64F solution ) {
+	public boolean process( List<AssociatedPair> points , RowMatrix_F64 solution ) {
 		if( points.size() < 8 )
 			throw new IllegalArgumentException("Must be at least 8 points. Was only "+points.size());
 
@@ -91,7 +91,7 @@ public class FundamentalLinear8 extends FundamentalLinear {
 	/**
 	 * Computes the SVD of A and extracts the essential/fundamental matrix from its null space
 	 */
-	protected boolean process(DenseMatrix64F A, DenseMatrix64F F ) {
+	protected boolean process(RowMatrix_F64 A, RowMatrix_F64 F ) {
 		if( !svdNull.decompose(A) )
 			return true;
 
@@ -100,7 +100,7 @@ public class FundamentalLinear8 extends FundamentalLinear {
 		else {
 			// handle a special case since the matrix only has 8 singular values and won't select
 			// the correct column
-			DenseMatrix64F V = svdNull.getV(null,false);
+			RowMatrix_F64 V = svdNull.getV(null,false);
 			SpecializedOps_D64.subvector(V, 0, 8, V.numCols, false, 0, F);
 		}
 

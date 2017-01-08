@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,17 +22,17 @@ import boofcv.abst.geo.EstimateNofEpipolar;
 import boofcv.abst.geo.GeoModelEstimator1toN;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimator1;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 /**
  * Implementation of {@link GeoModelEstimator1toN} for epipolar matrices.
  *
  * @author Peter Abeles
  */
-public class Estimate1toNofEpipolar extends GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair>
+public class Estimate1toNofEpipolar extends GeoModelEstimator1toN<RowMatrix_F64,AssociatedPair>
 	implements EstimateNofEpipolar
 {
-	public Estimate1toNofEpipolar(GeoModelEstimator1<DenseMatrix64F, AssociatedPair> alg) {
+	public Estimate1toNofEpipolar(GeoModelEstimator1<RowMatrix_F64, AssociatedPair> alg) {
 		super(alg);
 	}
 }

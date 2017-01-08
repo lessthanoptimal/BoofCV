@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo.pose;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.RandomMatrices_D64;
 import org.junit.Test;
 
@@ -39,8 +39,8 @@ public class TestUtilLepetitEPnP {
 	@Test
 	public void jacobian4() {
 
-		DenseMatrix64F L_full = RandomMatrices_D64.createRandom(6, 10, rand);
-		DenseMatrix64F y = RandomMatrices_D64.createRandom(6,1,rand);
+		RowMatrix_F64 L_full = RandomMatrices_D64.createRandom(6, 10, rand);
+		RowMatrix_F64 y = RandomMatrices_D64.createRandom(6,1,rand);
 
 		JacobianEPnP jacobian = new JacobianEPnP();
 		ResidualsEPnP residuals = new ResidualsEPnP();
@@ -55,8 +55,8 @@ public class TestUtilLepetitEPnP {
 	@Test
 	public void jacobian3() {
 
-		DenseMatrix64F L_full = RandomMatrices_D64.createRandom(3,6,rand);
-		DenseMatrix64F y = RandomMatrices_D64.createRandom(3,1,rand);
+		RowMatrix_F64 L_full = RandomMatrices_D64.createRandom(3,6,rand);
+		RowMatrix_F64 y = RandomMatrices_D64.createRandom(3,1,rand);
 
 		JacobianEPnP jacobian = new JacobianEPnP();
 		ResidualsEPnP residuals = new ResidualsEPnP();
@@ -77,11 +77,11 @@ public class TestUtilLepetitEPnP {
 		protected int numControl;
 
 		// linear constraint matrix
-		protected DenseMatrix64F L_full;
+		protected RowMatrix_F64 L_full;
 
-		protected DenseMatrix64F jacobian = new DenseMatrix64F(1,1);
+		protected RowMatrix_F64 jacobian = new RowMatrix_F64(1,1);
 
-		public void setParameters( DenseMatrix64F L_full ) {
+		public void setParameters( RowMatrix_F64 L_full ) {
 			if( L_full.numRows == 6 )
 				numControl = 4;
 			else
@@ -123,11 +123,11 @@ public class TestUtilLepetitEPnP {
 		protected int numControl;
 
 		// linear constraint matrix
-		protected DenseMatrix64F L_full;
+		protected RowMatrix_F64 L_full;
 		// distance between control points
-		protected DenseMatrix64F y;
+		protected RowMatrix_F64 y;
 
-		public void setParameters( DenseMatrix64F L_full , DenseMatrix64F y ) {
+		public void setParameters( RowMatrix_F64 L_full , RowMatrix_F64 y ) {
 			if( L_full.numRows == 6 )
 				numControl = 4;
 			else

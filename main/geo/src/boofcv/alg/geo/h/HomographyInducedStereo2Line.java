@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 
 /**
@@ -60,10 +60,10 @@ public class HomographyInducedStereo2Line {
 	// Epipole in camera 2
 	private Point3D_F64 e2 = new Point3D_F64();
 	// A = cross(e2)*F
-	private DenseMatrix64F A = new DenseMatrix64F(3,3);
+	private RowMatrix_F64 A = new RowMatrix_F64(3,3);
 
 	// The found homography from view 1 to view 2
-	private DenseMatrix64F H = new DenseMatrix64F(3,3);
+	private RowMatrix_F64 H = new RowMatrix_F64(3,3);
 
 	// pick a reasonable scale and sign
 	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
@@ -73,7 +73,7 @@ public class HomographyInducedStereo2Line {
 	private Point3D_F64 Al1 = new Point3D_F64();
 
 	private Point3D_F64 v = new Point3D_F64();
-	private DenseMatrix64F av = new DenseMatrix64F(3,3);
+	private RowMatrix_F64 av = new RowMatrix_F64(3,3);
 
 	private PlaneGeneral3D_F64 planeA = new PlaneGeneral3D_F64();
 	private PlaneGeneral3D_F64 planeB = new PlaneGeneral3D_F64();
@@ -92,7 +92,7 @@ public class HomographyInducedStereo2Line {
 	 * @param F Fundamental matrix.
 	 * @param e2 Epipole for camera 2.  If null it will be computed internally.
 	 */
-	public void setFundamental( DenseMatrix64F F , Point3D_F64 e2 ) {
+	public void setFundamental( RowMatrix_F64 F , Point3D_F64 e2 ) {
 		if( e2 != null )
 			this.e2.set(e2);
 		else {
@@ -158,7 +158,7 @@ public class HomographyInducedStereo2Line {
 		return true;
 	}
 
-	public DenseMatrix64F getHomography() {
+	public RowMatrix_F64 getHomography() {
 		return H;
 	}
 }

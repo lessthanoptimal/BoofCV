@@ -21,7 +21,7 @@ package boofcv.alg.sfm.d3.direct;
 import georegression.struct.point.Point2D_F32;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.alg.fixed.FixedOps2_D32;
-import org.ejml.data.FixedMatrix2x2_32F;
+import org.ejml.data.FixedMatrix2x2_F32;
 
 /**
  * Checks to see if the features being tracked form
@@ -30,7 +30,7 @@ import org.ejml.data.FixedMatrix2x2_32F;
  */
 public class FeatureSpatialDiversity_F32 {
 
-	FixedMatrix2x2_32F var = new FixedMatrix2x2_32F();
+	FixedMatrix2x2_F32 var = new FixedMatrix2x2_F32();
 	float meanX,meanY;
 
 	FastQueue<Point2D_F32> norm = new FastQueue<>(Point2D_F32.class, true);

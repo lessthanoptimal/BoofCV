@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.junit.Test;
 
 import java.util.List;
@@ -50,7 +50,7 @@ public class TestZhang99ComputeTargetHomography {
 		// create a grid an apply an arbitrary transform to it
 		List<Point2D_F64> layout = GenericCalibrationGrid.standardLayout();
 
-		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.02,-0.05,0.01,null);
+		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.02,-0.05,0.01,null);
 		Vector3D_F64 T = new Vector3D_F64(0,0,-1000);
 		Se3_F64 motion = new Se3_F64(R,T);
 
@@ -67,7 +67,7 @@ public class TestZhang99ComputeTargetHomography {
 
 		assertTrue(alg.computeHomography(observations));
 
-		DenseMatrix64F H = alg.getHomography();
+		RowMatrix_F64 H = alg.getHomography();
 
 		// test this homography property: x2 = H*x1
 		for( int i = 0; i < observations.size(); i++ ) {

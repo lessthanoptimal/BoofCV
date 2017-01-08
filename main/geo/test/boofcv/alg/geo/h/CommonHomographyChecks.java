@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,14 +41,14 @@ public class CommonHomographyChecks {
 	protected Random rand = new Random(234234);
 
 	// create a reasonable calibration matrix
-	protected DenseMatrix64F K = new DenseMatrix64F(3,3,true,60,0.01,-200,0,80,-150,0,0,1);
+	protected RowMatrix_F64 K = new RowMatrix_F64(3,3,true,60,0.01,-200,0,80,-150,0,0,1);
 
 	protected Se3_F64 motion;
 	protected List<Point3D_F64> pts;
 	protected List<AssociatedPair> pairs;
 	protected double d=3; // distance plane is from camera
 
-	protected DenseMatrix64F solution = new DenseMatrix64F(3,3);
+	protected RowMatrix_F64 solution = new RowMatrix_F64(3,3);
 
 	public void createScene( int numPoints , boolean isPixels ) {
 		// define the camera's motion

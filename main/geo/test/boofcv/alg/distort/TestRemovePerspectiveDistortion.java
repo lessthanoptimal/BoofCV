@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,8 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix32F;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F32;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.ConvertMatrixData;
 import org.junit.Test;
 
@@ -82,10 +82,10 @@ public class TestRemovePerspectiveDistortion {
 		associatedPairs.add( new AssociatedPair(bottomRight,new Point2D_F64(expected.width-1,expected.height-1)));
 		associatedPairs.add( new AssociatedPair(bottomLeft,new Point2D_F64(0,expected.height-1)));
 
-		DenseMatrix64F H = new DenseMatrix64F(3,3);
+		RowMatrix_F64 H = new RowMatrix_F64(3,3);
 		computeHomography.process(associatedPairs,H);
 
-		DenseMatrix32F H32 = new DenseMatrix32F(3,3);
+		RowMatrix_F32 H32 = new RowMatrix_F32(3,3);
 		ConvertMatrixData.convert(H,H32);
 
 		new FDistort(expected,input).transform(new PointTransformHomography_F32(H32)).apply();

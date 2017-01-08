@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo.trifocal;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.alg.dense.decomposition.svd.SafeSvd_D64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 import org.ejml.ops.CommonOps_D64;
@@ -42,30 +42,30 @@ import org.ejml.ops.SingularOps_D64;
 public class EnforceTrifocalGeometry {
 
 	// SVD which computes U and not V
-	private SingularValueDecomposition_F64<DenseMatrix64F> svdU;
+	private SingularValueDecomposition_F64<RowMatrix_F64> svdU;
 	// SVD which computes V and not U
-	private SingularValueDecomposition_F64<DenseMatrix64F> svdV;
+	private SingularValueDecomposition_F64<RowMatrix_F64> svdV;
 
 	// Storage for SVD
-	private DenseMatrix64F U = new DenseMatrix64F(27,18);
+	private RowMatrix_F64 U = new RowMatrix_F64(27,18);
 	// Contains the linear mapping from TODO
-	private DenseMatrix64F Up = new DenseMatrix64F(1,1);
+	private RowMatrix_F64 Up = new RowMatrix_F64(1,1);
 
 	// Storage for solution as a function of the 18-nullity unknowns
-	private DenseMatrix64F xp = new DenseMatrix64F(1,1);
+	private RowMatrix_F64 xp = new RowMatrix_F64(1,1);
 
 	// Storage for the A*U, where A is the linear constraint matrix and U is the solution's subspace
-	private DenseMatrix64F AU = new DenseMatrix64F(1,1);
+	private RowMatrix_F64 AU = new RowMatrix_F64(1,1);
 
 	// The adjusted trifocal tensor in vector format
-	private DenseMatrix64F vectorT = new DenseMatrix64F(27,1);
+	private RowMatrix_F64 vectorT = new RowMatrix_F64(27,1);
 
 
 	// From the definition of the trifocal tensor: T_i = a_i*b_4^T + a_4*b_i^T
 	// Columns of E are multiplied by the following unknowns:
 	// [a(0,0) , a(0,1) , a(0,2) , a(1,0) ....  b(0,0) , b(0,1) , b(0,2) , b(1,0) ]
 	// Where a and b are elements of 3x3 matrices A and B in the P2 = [A|e2] P3=[B|e3]
-	protected DenseMatrix64F E = new DenseMatrix64F(27,18);
+	protected RowMatrix_F64 E = new RowMatrix_F64(27,18);
 
 	public EnforceTrifocalGeometry() {
 		svdU = DecompositionFactory_D64.svd(10,10,true,false,true);
@@ -82,7 +82,7 @@ public class EnforceTrifocalGeometry {
 	 * @param e3 Epipole of first image in the third image
 	 * @param A Linear constraint matrix for trifocal tensor created from image observations.
 	 */
-	public void process( Point3D_F64 e2 , Point3D_F64 e3 , DenseMatrix64F A ) {
+	public void process( Point3D_F64 e2 , Point3D_F64 e3 , RowMatrix_F64 A ) {
 		// construct the linear system that the solution which solves the unknown square
 		// matrices in the camera matrices
 		constructE(e2, e3);
@@ -120,7 +120,7 @@ public class EnforceTrifocalGeometry {
 	 * Returns the algebraic error vector. error = A*U*x.  length = number
 	 * of observations
 	 */
-	public void computeErrorVector( DenseMatrix64F A , DenseMatrix64F errors ) {
+	public void computeErrorVector( RowMatrix_F64 A , RowMatrix_F64 errors ) {
 		errors.reshape(A.numRows,1);
 		CommonOps_D64.mult(A,vectorT,errors);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -52,7 +52,7 @@ public class PointCloudViewer extends JPanel
 	FastQueue<ColorPoint3D> cloud = new FastQueue<>(200, ColorPoint3D.class, true);
 
 	// intrinsic camera parameters
-	DenseMatrix64F K;
+	RowMatrix_F64 K;
 
 	// transform from world frame to camera frame
 	Se3_F64 worldToCamera = new Se3_F64();
@@ -88,14 +88,14 @@ public class PointCloudViewer extends JPanel
 		this.stepSize = keyStepSize;
 	}
 
-   public PointCloudViewer(DenseMatrix64F K, double keyStepSize) {
+   public PointCloudViewer(RowMatrix_F64 K, double keyStepSize) {
 		this(keyStepSize);
 		configure(K);
 	}
 
 	public PointCloudViewer(CameraPinholeRadial intrinsic, double keyStepSize) {
 		this(keyStepSize);
-		configure(PerspectiveOps.calibrationMatrix(intrinsic,(DenseMatrix64F)null));
+		configure(PerspectiveOps.calibrationMatrix(intrinsic,(RowMatrix_F64)null));
 		setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));
 	}
 
@@ -108,7 +108,7 @@ public class PointCloudViewer extends JPanel
 	 *
 	 * @param K Intrinsic camera calibration matrix of rectified camera
 	 */
-	public void configure(DenseMatrix64F K) {
+	public void configure(RowMatrix_F64 K) {
 		this.K = K;
 		this.focalLengthX = K.get(0,0);
 		this.focalLengthY = K.get(1,1);

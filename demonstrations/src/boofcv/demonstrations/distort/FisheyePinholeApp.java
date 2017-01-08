@@ -50,7 +50,7 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Vector3D_F32;
 import georegression.struct.so.Rodrigues_F32;
-import org.ejml.data.DenseMatrix32F;
+import org.ejml.data.RowMatrix_F32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -152,7 +152,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 					GeometryMath_F32.cross(canonical,norm,rotation.unitAxisRotation);
 					rotation.unitAxisRotation.normalize();
 
-					DenseMatrix32F R = ConvertRotation3D_F32.rodriguesToMatrix(rotation,null);
+					RowMatrix_F32 R = ConvertRotation3D_F32.rodriguesToMatrix(rotation,null);
 					distorter.setRotationWideToNarrow(R);
 
 					distortImage.setModel(new PointToPixelTransform_F32(distorter));

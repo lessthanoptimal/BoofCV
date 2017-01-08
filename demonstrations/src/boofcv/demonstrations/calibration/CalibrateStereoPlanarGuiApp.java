@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -144,14 +144,14 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	private void setRectification(final StereoParameters param) {
 
 		// calibration matrix for left and right camera
-		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), (DenseMatrix64F)null);
-		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(param.getRight(), (DenseMatrix64F)null);
+		RowMatrix_F64 K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), (RowMatrix_F64)null);
+		RowMatrix_F64 K2 = PerspectiveOps.calibrationMatrix(param.getRight(), (RowMatrix_F64)null);
 
 		RectifyCalibrated rectify = RectifyImageOps.createCalibrated();
 		rectify.process(K1,new Se3_F64(),K2,param.getRightToLeft().invert(null));
 
-		final DenseMatrix64F rect1 = rectify.getRect1();
-		final DenseMatrix64F rect2 = rectify.getRect2();
+		final RowMatrix_F64 rect1 = rectify.getRect1();
+		final RowMatrix_F64 rect2 = rectify.getRect2();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

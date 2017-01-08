@@ -65,7 +65,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -267,7 +267,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 		handleRunningStatus(2);
 
 		CameraPinholeRadial right = config.right;
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.left, (DenseMatrix64F)null);
+		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(config.left, (RowMatrix_F64)null);
 		guiCam3D.init();
 		guiCam3D.setK(K);
 		guiCam3D.setStepSize(config.getBaseline());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo.calibration;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ import java.util.List;
 public class Zhang99ComputeTargetHomography {
 
 	HomographyLinear4 linear = new HomographyLinear4(true);
-	DenseMatrix64F found = new DenseMatrix64F(3,3);
+	RowMatrix_F64 found = new RowMatrix_F64(3,3);
 
 	// location of calibration points in the target frame's in world units.
 	// the z-axis is assumed to be zero
@@ -87,7 +87,7 @@ public class Zhang99ComputeTargetHomography {
 	 * Returns a copy of the found homography matrix.
 	 * @return Homography matrix.
 	 */
-	public DenseMatrix64F getHomography() {
+	public RowMatrix_F64 getHomography() {
 		return found.copy();
 	}
 }

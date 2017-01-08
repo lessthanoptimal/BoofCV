@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.QueueMatrix;
 import georegression.geometry.GeometryMath_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.ejml.ops.NormOps_D64;
 
@@ -39,9 +39,9 @@ public abstract class CommonFundamentalChecks extends EpipolarTestSimulation {
 
 	double zeroTol = 1e-8;
 
-	FastQueue<DenseMatrix64F> solutions = new QueueMatrix(3, 3);
+	FastQueue<RowMatrix_F64> solutions = new QueueMatrix(3, 3);
 
-	public abstract void computeFundamental(List<AssociatedPair> pairs , FastQueue<DenseMatrix64F> solutions );
+	public abstract void computeFundamental(List<AssociatedPair> pairs , FastQueue<RowMatrix_F64> solutions );
 
 
 	public void checkEpipolarMatrix(int N, boolean isFundamental) {
@@ -59,7 +59,7 @@ public abstract class CommonFundamentalChecks extends EpipolarTestSimulation {
 			int totalMatchedAll = 0;
 			int totalPassedMatrix = 0;
 
-			for (DenseMatrix64F F : solutions.toList()) {
+			for (RowMatrix_F64 F : solutions.toList()) {
 				// normalize F to ensure a consistent scale
 				CommonOps_D64.scale(1.0/CommonOps_D64.elementMaxAbs(F),F);
 

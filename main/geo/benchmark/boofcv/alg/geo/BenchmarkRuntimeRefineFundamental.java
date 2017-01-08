@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo;
 
 import boofcv.abst.geo.RefineEpipolar;
 import boofcv.misc.Performer;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 /**
  * @author Peter Abeles
@@ -30,13 +30,13 @@ public class BenchmarkRuntimeRefineFundamental extends ArtificialStereoScene{
 	static final int NUM_POINTS = 500;
 	static final boolean FUNDAMENTAL = false;
 	
-	protected DenseMatrix64F initialF;
+	protected RowMatrix_F64 initialF;
 
 	public class Refine implements Performer {
 
 		RefineEpipolar alg;
 		String name;
-		DenseMatrix64F refinement = new DenseMatrix64F(3,3);
+		RowMatrix_F64 refinement = new RowMatrix_F64(3,3);
 
 		public Refine( String name , RefineEpipolar alg) {
 			this.alg = alg;

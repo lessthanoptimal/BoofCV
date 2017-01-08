@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -65,7 +65,7 @@ public class ExampleDepthPointCloud {
 
 		VisualDepthOps.depthTo3D(param.visualParam, rgb, depth, cloud, cloudColor);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param.visualParam, (DenseMatrix64F)null);
+		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(param.visualParam, (RowMatrix_F64)null);
 
 		PointCloudViewer viewer = new PointCloudViewer(K, 15);
 		viewer.setPreferredSize(new Dimension(rgb.width,rgb.height));

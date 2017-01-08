@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.geo.ModelObservationResidual;
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ddogleg.optimization.functions.FunctionNtoM;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.List;
 
@@ -34,14 +34,14 @@ import java.util.List;
  */
 public class ResidualsEpipolarMatrix implements FunctionNtoM {
 	// converts parameters to and from the fundamental matrix
-	protected ModelCodec<DenseMatrix64F> param;
+	protected ModelCodec<RowMatrix_F64> param;
 	// list of observations
 	protected List<AssociatedPair> obs;
 	// error function
-	protected ModelObservationResidual<DenseMatrix64F,AssociatedPair> residual;
+	protected ModelObservationResidual<RowMatrix_F64,AssociatedPair> residual;
 
 	// pre-declare temporary storage
-	protected DenseMatrix64F F = new DenseMatrix64F(3,3);
+	protected RowMatrix_F64 F = new RowMatrix_F64(3,3);
 
 	/**
 	 * Configures algorithm
@@ -49,8 +49,8 @@ public class ResidualsEpipolarMatrix implements FunctionNtoM {
 	 * @param param Converts parameters into epipolar matrix
 	 * @param residual Function for computing the residuals
 	 */
-	public ResidualsEpipolarMatrix(ModelCodec<DenseMatrix64F> param,
-								   ModelObservationResidual<DenseMatrix64F,AssociatedPair> residual)
+	public ResidualsEpipolarMatrix(ModelCodec<RowMatrix_F64> param,
+								   ModelObservationResidual<RowMatrix_F64,AssociatedPair> residual)
 	{
 		this.param = param == null ? new ModelCodecSwapData(9) : param;
 		this.residual = residual;

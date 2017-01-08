@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 /**
  * Checks to see if two observations from a left to right stereo camera are consistent.  Observations are converted
@@ -63,14 +63,14 @@ public class StereoConsistencyCheck {
 		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(left, (DenseMatrix64F)null);
-		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(right, (DenseMatrix64F)null);
+		RowMatrix_F64 K1 = PerspectiveOps.calibrationMatrix(left, (RowMatrix_F64)null);
+		RowMatrix_F64 K2 = PerspectiveOps.calibrationMatrix(right, (RowMatrix_F64)null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 
 		// rectification matrix for each image
-		DenseMatrix64F rect1 = rectifyAlg.getRect1();
-		DenseMatrix64F rect2 = rectifyAlg.getRect2();
+		RowMatrix_F64 rect1 = rectifyAlg.getRect1();
+		RowMatrix_F64 rect2 = rectifyAlg.getRect2();
 
 		leftImageToRect = RectifyImageOps.transformPixelToRect(param.left, rect1);
 		rightImageToRect = RectifyImageOps.transformPixelToRect(param.right, rect2);

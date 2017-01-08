@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.struct.distort.Point2Transform2_F32;
 import georegression.struct.point.Point2D_F32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F32;
-import org.ejml.data.FixedMatrix2x2_32F;
+import org.ejml.data.FixedMatrix2x2_F32;
 
 /**
  * <p>Implementation of 'Moving Least Squares' (MLS) control point based image deformation models described in [1].</p>
@@ -424,7 +424,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 				float v_ps_x = v_x - cache.aveP.x;
 				float v_ps_y = v_y - cache.aveP.y;
 
-				FixedMatrix2x2_32F A = cache.A_s.get(i);
+				FixedMatrix2x2_F32 A = cache.A_s.get(i);
 
 				A.a11 = w*(hat_p_x*v_ps_x + hat_p_y*v_ps_y);
 				A.a12 = w*(hat_p_x*v_ps_y - hat_p_y*v_ps_x);
@@ -445,7 +445,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 			for (int i = 0; i < N; i++) {
 				Control c = controls.get(i);
 
-				FixedMatrix2x2_32F A = cache.A_s.get(i);
+				FixedMatrix2x2_F32 A = cache.A_s.get(i);
 				float hat_q_x = c.q.x-cache.aveQ.x;
 				float hat_q_y = c.q.y-cache.aveQ.y;
 
@@ -473,7 +473,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 				float hat_q_x = c.q.x - cache.aveQ.x;
 				float hat_q_y = c.q.y - cache.aveQ.y;
 
-				FixedMatrix2x2_32F A = cache.A_s.get(i);
+				FixedMatrix2x2_F32 A = cache.A_s.get(i);
 				fr_x += (hat_q_x*A.a11 + hat_q_y*A.a21);
 				fr_y += (hat_q_x*A.a12 + hat_q_y*A.a22);
 			}
@@ -507,7 +507,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 		Point2D_F32 aveP = new Point2D_F32(); // average control point for given weights
 		Point2D_F32 aveQ = new Point2D_F32(); // average distorted point for given weights
 
-		FastQueue<FixedMatrix2x2_32F> A_s = new FastQueue<>(FixedMatrix2x2_32F.class,true);
+		FastQueue<FixedMatrix2x2_F32> A_s = new FastQueue<>(FixedMatrix2x2_F32.class,true);
 
 		// mu for simularity
 		float mu;

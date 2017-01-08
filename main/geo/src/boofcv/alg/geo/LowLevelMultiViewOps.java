@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.List;
 
@@ -51,7 +51,7 @@ public class LowLevelMultiViewOps {
 	 * @param points Input: List of observed points. Not modified.
 	 * @param N Output: 3x3 normalization matrix for first set of points. Modified.
 	 */
-	public static void computeNormalization(List<Point2D_F64> points, DenseMatrix64F N )
+	public static void computeNormalization(List<Point2D_F64> points, RowMatrix_F64 N )
 	{
 		double meanX1 = 0;
 		double meanY1 = 0;
@@ -88,7 +88,7 @@ public class LowLevelMultiViewOps {
 	/**
 	 * <p>
 	 * Computes two normalization matrices for each set of point correspondences in the list of
-	 * {@link boofcv.struct.geo.AssociatedPair}.  Same as {@link #computeNormalization(java.util.List, org.ejml.data.DenseMatrix64F)},
+	 * {@link boofcv.struct.geo.AssociatedPair}.  Same as {@link #computeNormalization(java.util.List, org.ejml.data.RowMatrix_F64)},
 	 * but for two views.
 	 * </p>
 	 *
@@ -96,7 +96,7 @@ public class LowLevelMultiViewOps {
 	 * @param N1 Output: 3x3 normalization matrix for first set of points. Modified.
 	 * @param N2 Output: 3x3 normalization matrix for second set of points. Modified.
 	 */
-	public static void computeNormalization(List<AssociatedPair> points, DenseMatrix64F N1, DenseMatrix64F N2)
+	public static void computeNormalization(List<AssociatedPair> points, RowMatrix_F64 N1, RowMatrix_F64 N2)
 	{
 		double meanX1 = 0; double meanY1 = 0;
 		double meanX2 = 0; double meanY2 = 0;
@@ -145,7 +145,7 @@ public class LowLevelMultiViewOps {
 	/**
 	 * <p>
 	 * Computes three normalization matrices for each set of point correspondences in the list of
-	 * {@link boofcv.struct.geo.AssociatedTriple}.  Same as {@link #computeNormalization(java.util.List, org.ejml.data.DenseMatrix64F)},
+	 * {@link boofcv.struct.geo.AssociatedTriple}.  Same as {@link #computeNormalization(java.util.List, org.ejml.data.RowMatrix_F64)},
 	 * but for three views.
 	 * </p>
 	 *
@@ -155,7 +155,7 @@ public class LowLevelMultiViewOps {
 	 * @param N3 Output: 3x3 normalization matrix for third set of points. Modified.
 	 */
 	public static void computeNormalization( List<AssociatedTriple> points,
-											 DenseMatrix64F N1, DenseMatrix64F N2, DenseMatrix64F N3 )
+											 RowMatrix_F64 N1, RowMatrix_F64 N2, RowMatrix_F64 N3 )
 	{
 		double meanX1 = 0; double meanY1 = 0;
 		double meanX2 = 0; double meanY2 = 0;
@@ -212,14 +212,14 @@ public class LowLevelMultiViewOps {
 	}
 
 	/**
-	 * Given the normalization matrix computed from {@link #computeNormalization(java.util.List, org.ejml.data.DenseMatrix64F)}
+	 * Given the normalization matrix computed from {@link #computeNormalization(java.util.List, org.ejml.data.RowMatrix_F64)}
 	 * normalize the point.
 	 *
 	 * @param N Normalization matrix.
 	 * @param orig Unnormalized coordinate in pixels.
 	 * @param normed Normalized coordinate.
 	 */
-	public static void applyPixelNormalization(DenseMatrix64F N, Point2D_F64 orig, Point2D_F64 normed) {
+	public static void applyPixelNormalization(RowMatrix_F64 N, Point2D_F64 orig, Point2D_F64 normed) {
 		normed.x = orig.x * N.data[0] + N.data[2];
 		normed.y = orig.y * N.data[4] + N.data[5];
 	}

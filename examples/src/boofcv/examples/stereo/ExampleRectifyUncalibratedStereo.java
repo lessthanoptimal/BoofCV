@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,8 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
-import org.ejml.data.DenseMatrix32F;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F32;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.ConvertMatrixData;
 
 import java.awt.image.BufferedImage;
@@ -67,7 +67,7 @@ public class ExampleRectifyUncalibratedStereo {
 	 * @param origLeft Original input image.  Used for output purposes.
 	 * @param origRight Original input image.  Used for output purposes.
 	 */
-	public static void rectify( DenseMatrix64F F , List<AssociatedPair> inliers ,
+	public static void rectify( RowMatrix_F64 F , List<AssociatedPair> inliers ,
 								BufferedImage origLeft , BufferedImage origRight ) {
 		// Unrectified images
 		Planar<GrayF32> unrectLeft =
@@ -85,16 +85,16 @@ public class ExampleRectifyUncalibratedStereo {
 		rectifyAlg.process(F,inliers,origLeft.getWidth(),origLeft.getHeight());
 
 		// rectification matrix for each image
-		DenseMatrix64F rect1 = rectifyAlg.getRect1();
-		DenseMatrix64F rect2 = rectifyAlg.getRect2();
+		RowMatrix_F64 rect1 = rectifyAlg.getRect1();
+		RowMatrix_F64 rect2 = rectifyAlg.getRect2();
 
 		// Adjust the rectification to make the view area more useful
 		RectifyImageOps.fullViewLeft(origLeft.getWidth(),origLeft.getHeight(), rect1, rect2 );
 //		RectifyImageOps.allInsideLeft(origLeft.getWidth(),origLeft.getHeight(), rect1, rect2 );
 
 		// undistorted and rectify images
-		DenseMatrix32F rect1_F32 = new DenseMatrix32F(3,3); // TODO simplify code some how
-		DenseMatrix32F rect2_F32 = new DenseMatrix32F(3,3);
+		RowMatrix_F32 rect1_F32 = new RowMatrix_F32(3,3); // TODO simplify code some how
+		RowMatrix_F32 rect2_F32 = new RowMatrix_F32(3,3);
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
@@ -128,7 +128,7 @@ public class ExampleRectifyUncalibratedStereo {
 
 		// Prune matches using the epipolar constraint
 		List<AssociatedPair> inliers = new ArrayList<>();
-		DenseMatrix64F F = ExampleFundamentalMatrix.robustFundamental(matches, inliers);
+		RowMatrix_F64 F = ExampleFundamentalMatrix.robustFundamental(matches, inliers);
 
 		// display the inlier matches found using the robust estimator
 		AssociationPanel panel = new AssociationPanel(20);

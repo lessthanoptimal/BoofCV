@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo.trifocal;
 
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.struct.geo.AssociatedTriple;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.ejml.ops.NormOps_D64;
 import org.junit.Test;
@@ -48,16 +48,16 @@ public class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 
 		alg.createLinearSystem(observationsSpecial);  // TOOO change back
 
-		DenseMatrix64F A = alg.A;
+		RowMatrix_F64 A = alg.A;
 
-		DenseMatrix64F X = new DenseMatrix64F(27,1);
+		RowMatrix_F64 X = new RowMatrix_F64(27,1);
 		for( int i = 0; i < 9; i++ ) {
 			X.data[i] = tensor.T1.get(i);
 			X.data[i+9] = tensor.T2.get(i);
 			X.data[i+18] = tensor.T3.get(i);
 		}
 
-		DenseMatrix64F Y = new DenseMatrix64F(A.numRows,1);
+		RowMatrix_F64 Y = new RowMatrix_F64(A.numRows,1);
 
 		CommonOps_D64.mult(A,X,Y);
 
@@ -74,7 +74,7 @@ public class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 
 		// validate the solution by using a constraint
 		for( AssociatedTriple a : observations ) {
-			DenseMatrix64F A = MultiViewOps.constraint(found,a.p1,a.p2,a.p3,null);
+			RowMatrix_F64 A = MultiViewOps.constraint(found,a.p1,a.p2,a.p3,null);
 
 			assertEquals(0,NormOps_D64.normF(A),1e-7);
 		}

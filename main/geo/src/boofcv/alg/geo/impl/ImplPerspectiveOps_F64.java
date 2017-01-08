@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 
 /**
@@ -42,15 +42,15 @@ import org.ejml.ops.CommonOps_D64;
 public class ImplPerspectiveOps_F64 {
 
 	public static <C extends CameraPinhole>C adjustIntrinsic(C parameters,
-															 DenseMatrix64F adjustMatrix,
+															 RowMatrix_F64 adjustMatrix,
 															 C adjustedParam)
 	{
 		if( adjustedParam == null )
 			adjustedParam = parameters.createLike();
 		adjustedParam.set(parameters);
 
-		DenseMatrix64F K = ImplPerspectiveOps_F64.calibrationMatrix(parameters, null);
-		DenseMatrix64F K_adj = new DenseMatrix64F(3,3);
+		RowMatrix_F64 K = ImplPerspectiveOps_F64.calibrationMatrix(parameters, null);
+		RowMatrix_F64 K_adj = new RowMatrix_F64(3,3);
 		CommonOps_D64.mult(adjustMatrix, K, K_adj);
 
 		ImplPerspectiveOps_F64.matrixToParam(K_adj, parameters.width, parameters.height, adjustedParam);
@@ -58,15 +58,15 @@ public class ImplPerspectiveOps_F64 {
 		return adjustedParam;
 	}
 
-	public static DenseMatrix64F calibrationMatrix(double fx, double fy, double skew,
+	public static RowMatrix_F64 calibrationMatrix(double fx, double fy, double skew,
 												   double xc, double yc) {
-		return new DenseMatrix64F(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
+		return new RowMatrix_F64(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
 	}
 
-	public static DenseMatrix64F calibrationMatrix(CameraPinhole param , DenseMatrix64F K ) {
+	public static RowMatrix_F64 calibrationMatrix(CameraPinhole param , RowMatrix_F64 K ) {
 
 		if( K == null ) {
-			K = new DenseMatrix64F(3,3);
+			K = new RowMatrix_F64(3,3);
 		}
 		CommonOps_D64.fill(K, 0);
 
@@ -80,7 +80,7 @@ public class ImplPerspectiveOps_F64 {
 		return K;
 	}
 
-	public static <C extends CameraPinhole>C matrixToParam(DenseMatrix64F K , int width , int height , C param ) {
+	public static <C extends CameraPinhole>C matrixToParam(RowMatrix_F64 K , int width , int height , C param ) {
 
 		if( param == null )
 			param = (C)new CameraPinhole();
@@ -109,7 +109,7 @@ public class ImplPerspectiveOps_F64 {
 		return pixel;
 	}
 
-	public static Point2D_F64 convertNormToPixel( DenseMatrix64F K, Point2D_F64 norm , Point2D_F64 pixel ) {
+	public static Point2D_F64 convertNormToPixel( RowMatrix_F64 K, Point2D_F64 norm , Point2D_F64 pixel ) {
 		if( pixel == null )
 			pixel = new Point2D_F64();
 
@@ -132,7 +132,7 @@ public class ImplPerspectiveOps_F64 {
 		return norm;
 	}
 
-	public static Point2D_F64 convertPixelToNorm( DenseMatrix64F K , Point2D_F64 pixel , Point2D_F64 norm ) {
+	public static Point2D_F64 convertPixelToNorm( RowMatrix_F64 K , Point2D_F64 pixel , Point2D_F64 norm ) {
 		if( norm == null )
 			norm = new Point2D_F64();
 
@@ -145,7 +145,7 @@ public class ImplPerspectiveOps_F64 {
 	}
 
 
-	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , DenseMatrix64F K , Point3D_F64 X ) {
+	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , RowMatrix_F64 K , Point3D_F64 X ) {
 		Point3D_F64 X_cam = new Point3D_F64();
 
 		SePointOps_F64.transform(worldToCamera, X, X_cam);
@@ -163,8 +163,8 @@ public class ImplPerspectiveOps_F64 {
 		return GeometryMath_F64.mult(K, norm, norm);
 	}
 
-	public static Point2D_F64 renderPixel( DenseMatrix64F worldToCamera , Point3D_F64 X ) {
-		DenseMatrix64F P = worldToCamera;
+	public static Point2D_F64 renderPixel( RowMatrix_F64 worldToCamera , Point3D_F64 X ) {
+		RowMatrix_F64 P = worldToCamera;
 
 		double x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3];
 		double y = P.data[4]*X.x + P.data[5]*X.y + P.data[6]*X.z + P.data[7];
@@ -178,10 +178,10 @@ public class ImplPerspectiveOps_F64 {
 		return pixel;
 	}
 
-	public static DenseMatrix64F createCameraMatrix( DenseMatrix64F R , Vector3D_F64 T , DenseMatrix64F K ,
-													 DenseMatrix64F ret ) {
+	public static RowMatrix_F64 createCameraMatrix( RowMatrix_F64 R , Vector3D_F64 T , RowMatrix_F64 K ,
+													 RowMatrix_F64 ret ) {
 		if( ret == null )
-			ret = new DenseMatrix64F(3,4);
+			ret = new RowMatrix_F64(3,4);
 
 		CommonOps_D64.insert(R,ret,0,0);
 
@@ -192,7 +192,7 @@ public class ImplPerspectiveOps_F64 {
 		if( K == null )
 			return ret;
 
-		DenseMatrix64F temp = new DenseMatrix64F(3,4);
+		RowMatrix_F64 temp = new RowMatrix_F64(3,4);
 		CommonOps_D64.mult(K,ret,temp);
 
 		ret.set(temp);

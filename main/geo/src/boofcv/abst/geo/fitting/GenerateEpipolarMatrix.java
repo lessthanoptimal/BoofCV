@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.geo.fitting;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
-public class GenerateEpipolarMatrix implements ModelGenerator<DenseMatrix64F,AssociatedPair> {
+public class GenerateEpipolarMatrix implements ModelGenerator<RowMatrix_F64,AssociatedPair> {
 
 	Estimate1ofEpipolar alg;
 
@@ -40,7 +40,7 @@ public class GenerateEpipolarMatrix implements ModelGenerator<DenseMatrix64F,Ass
 	}
 
 	@Override
-	public boolean generate(List<AssociatedPair> dataSet, DenseMatrix64F model ) {
+	public boolean generate(List<AssociatedPair> dataSet, RowMatrix_F64 model ) {
 		if( alg.process(dataSet,model) ) {
 			return true;
 		}

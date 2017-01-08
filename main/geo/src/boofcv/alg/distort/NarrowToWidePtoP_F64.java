@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.struct.distort.Point3Transform2_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 
 /**
@@ -35,7 +35,7 @@ import org.ejml.ops.CommonOps_D64;
 public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 
 	// rotation matrix
-	DenseMatrix64F rotateWideToNarrow = CommonOps_D64.identity(3,3);
+	RowMatrix_F64 rotateWideToNarrow = CommonOps_D64.identity(3,3);
 	Point2Transform2_F64 narrowToNorm;
 	Point3Transform2_F64 unitToWide;
 
@@ -60,7 +60,7 @@ public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 	 * Specifies rotation matrix which determines the pointing direction of the camera
 	 * @param R rotation matrix
 	 */
-	public void setRotationWideToNarrow(DenseMatrix64F R ) {
+	public void setRotationWideToNarrow(RowMatrix_F64 R ) {
 		this.rotateWideToNarrow.set(R);
 	}
 

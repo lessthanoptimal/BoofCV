@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo.trifocal;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.alg.dense.decomposition.svd.SafeSvd_D64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 import org.ejml.ops.SingularOps_D64;
@@ -50,21 +50,21 @@ import org.ejml.ops.SingularOps_D64;
 public class TrifocalExtractEpipoles {
 
 	// used to extract the null space
-	private SingularValueDecomposition_F64<DenseMatrix64F> svd;
+	private SingularValueDecomposition_F64<RowMatrix_F64> svd;
 
 	// storage for left and right null space of the trifocal matrices
-	private DenseMatrix64F u1 = new DenseMatrix64F(3,1);
-	private DenseMatrix64F u2 = new DenseMatrix64F(3,1);
-	private DenseMatrix64F u3 = new DenseMatrix64F(3,1);
-	private DenseMatrix64F v1 = new DenseMatrix64F(3,1);
-	private DenseMatrix64F v2 = new DenseMatrix64F(3,1);
-	private DenseMatrix64F v3 = new DenseMatrix64F(3,1);
+	private RowMatrix_F64 u1 = new RowMatrix_F64(3,1);
+	private RowMatrix_F64 u2 = new RowMatrix_F64(3,1);
+	private RowMatrix_F64 u3 = new RowMatrix_F64(3,1);
+	private RowMatrix_F64 v1 = new RowMatrix_F64(3,1);
+	private RowMatrix_F64 v2 = new RowMatrix_F64(3,1);
+	private RowMatrix_F64 v3 = new RowMatrix_F64(3,1);
 
-	private DenseMatrix64F U = new DenseMatrix64F(3,3);
-	private DenseMatrix64F V = new DenseMatrix64F(3,3);
+	private RowMatrix_F64 U = new RowMatrix_F64(3,3);
+	private RowMatrix_F64 V = new RowMatrix_F64(3,3);
 
 	// temporary storage for computed epipole
-	private DenseMatrix64F tempE = new DenseMatrix64F(3,1);
+	private RowMatrix_F64 tempE = new RowMatrix_F64(3,1);
 
 	public TrifocalExtractEpipoles() {
 		svd = DecompositionFactory_D64.svd(3, 3, true, true, true);

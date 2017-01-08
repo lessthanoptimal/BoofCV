@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo.rectify;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -53,8 +53,8 @@ import org.ejml.simple.SimpleMatrix;
 public class RectifyCalibrated {
 
 	// rectifying transform for left and right images
-	DenseMatrix64F rect1 = new DenseMatrix64F(3,3);
-	DenseMatrix64F rect2 = new DenseMatrix64F(3,3);
+	RowMatrix_F64 rect1 = new RowMatrix_F64(3,3);
+	RowMatrix_F64 rect2 = new RowMatrix_F64(3,3);
 
 	// direction of new coordinate system axises
 	Vector3D_F64 v1 = new Vector3D_F64();
@@ -65,7 +65,7 @@ public class RectifyCalibrated {
 	SimpleMatrix K = new SimpleMatrix(3,3);
 
 	// rotation matrix of rectified cameras
-	DenseMatrix64F rectifiedR;
+	RowMatrix_F64 rectifiedR;
 
 	/**
 	 * Computes rectification transforms for both cameras and optionally a single calibration
@@ -76,8 +76,8 @@ public class RectifyCalibrated {
 	 * @param K2 Calibration matrix for second camera.
 	 * @param worldToCamera2 Location of the second camera.
 	 */
-	public void process( DenseMatrix64F K1 , Se3_F64 worldToCamera1 ,
-						 DenseMatrix64F K2 , Se3_F64 worldToCamera2 )
+	public void process( RowMatrix_F64 K1 , Se3_F64 worldToCamera1 ,
+						 RowMatrix_F64 K2 , Se3_F64 worldToCamera2 )
 	{
 		SimpleMatrix sK1 = SimpleMatrix.wrap(K1);
 		SimpleMatrix sK2 = SimpleMatrix.wrap(K2);
@@ -149,14 +149,14 @@ public class RectifyCalibrated {
 	/**
 	 * Rectification transform for first camera
 	 */
-	public DenseMatrix64F getRect1() {
+	public RowMatrix_F64 getRect1() {
 		return rect1;
 	}
 
 	/**
 	 * Rectification transform for second camera
 	 */
-	public DenseMatrix64F getRect2() {
+	public RowMatrix_F64 getRect2() {
 		return rect2;
 	}
 
@@ -165,7 +165,7 @@ public class RectifyCalibrated {
 	 *
 	 * @return Calibration matrix for both cameras
 	 */
-	public DenseMatrix64F getCalibrationMatrix() {
+	public RowMatrix_F64 getCalibrationMatrix() {
 		return K.matrix_F64();
 	}
 
@@ -174,7 +174,7 @@ public class RectifyCalibrated {
 	 *
 	 * @return Rotation matrix
 	 */
-	public DenseMatrix64F getRectifiedRotation() {
+	public RowMatrix_F64 getRectifiedRotation() {
 		return rectifiedR;
 	}
 }

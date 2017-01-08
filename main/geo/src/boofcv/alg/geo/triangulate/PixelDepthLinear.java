@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.List;
 
@@ -56,7 +56,7 @@ import java.util.List;
 public class PixelDepthLinear {
 
 	// local variables used for temporary storage
-	private DenseMatrix64F temp0 = new DenseMatrix64F(3,3);
+	private RowMatrix_F64 temp0 = new RowMatrix_F64(3,3);
 	private Vector3D_F64 temp1 = new Vector3D_F64();
 	private Vector3D_F64 temp2 = new Vector3D_F64();
 
@@ -100,7 +100,7 @@ public class PixelDepthLinear {
 	 */
 	public double depth2View( Point2D_F64 a , Point2D_F64 b , Se3_F64 fromAtoB )
 	{
-		DenseMatrix64F R = fromAtoB.getR();
+		RowMatrix_F64 R = fromAtoB.getR();
 		Vector3D_F64 T = fromAtoB.getT();
 
 		GeometryMath_F64.multCrossA(b, R, temp0);

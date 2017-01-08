@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.homography.UtilHomography_F32;
 import georegression.struct.point.Point2D_F32;
 import georegression.transform.homography.HomographyPointOps_F32;
-import org.ejml.data.DenseMatrix32F;
+import org.ejml.data.RowMatrix_F32;
 
 
 /**
@@ -38,7 +38,7 @@ public class PointTransformHomography_F32 implements Point2Transform2Model_F32<H
 	public PointTransformHomography_F32() {
 	}
 
-	public PointTransformHomography_F32(DenseMatrix32F homo) {
+	public PointTransformHomography_F32(RowMatrix_F32 homo) {
 		set(homo);
 	}
 
@@ -50,7 +50,7 @@ public class PointTransformHomography_F32 implements Point2Transform2Model_F32<H
 		this.homo.set(transform);
 	}
 
-	public void set(DenseMatrix32F transform ) {
+	public void set(RowMatrix_F32 transform ) {
 		UtilHomography_F32.convert(transform, this.homo);
 	}
 

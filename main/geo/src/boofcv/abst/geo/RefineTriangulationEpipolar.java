@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.geo;
 
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.List;
 
@@ -45,6 +45,6 @@ public interface RefineTriangulationEpipolar {
 	 * @return if successful or not
 	 */
 	public boolean process(List<Point2D_F64> observations,
-						   List<DenseMatrix64F> fundamentalWorldToCam ,
+						   List<RowMatrix_F64> fundamentalWorldToCam ,
 						   Point3D_F64 worldPt, Point3D_F64 refinedPt);
 }

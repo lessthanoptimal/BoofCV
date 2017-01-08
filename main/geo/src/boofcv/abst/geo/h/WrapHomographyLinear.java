@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.geo.h;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.struct.geo.AssociatedPair;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class WrapHomographyLinear implements Estimate1ofEpipolar
 	}
 
 	@Override
-	public boolean process(List<AssociatedPair> points, DenseMatrix64F estimatedModel) {
+	public boolean process(List<AssociatedPair> points, RowMatrix_F64 estimatedModel) {
 		return alg.process(points,estimatedModel);
 	}
 

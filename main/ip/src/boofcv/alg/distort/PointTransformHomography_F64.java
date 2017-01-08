@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.homography.UtilHomography_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 
 /**
@@ -38,7 +38,7 @@ public class PointTransformHomography_F64 implements Point2Transform2Model_F64<H
 	public PointTransformHomography_F64() {
 	}
 
-	public PointTransformHomography_F64(DenseMatrix64F homo) {
+	public PointTransformHomography_F64(RowMatrix_F64 homo) {
 		UtilHomography_F64.convert(homo, this.homo);
 	}
 

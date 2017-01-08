@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo.f;
 import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 import org.ejml.ops.CommonOps_D64;
@@ -45,22 +45,22 @@ import java.util.List;
 public abstract class FundamentalLinear {
 
 	// contains the set of equations that are solved
-	protected DenseMatrix64F A = new DenseMatrix64F(1,9);
+	protected RowMatrix_F64 A = new RowMatrix_F64(1,9);
 	// svd used to extract the null space
-	protected SingularValueDecomposition_F64<DenseMatrix64F> svdNull = DecompositionFactory_D64.svd(9, 9, false, true, false);
+	protected SingularValueDecomposition_F64<RowMatrix_F64> svdNull = DecompositionFactory_D64.svd(9, 9, false, true, false);
 	// svd used to enforce constraings on 3x3 matrix
-	protected SingularValueDecomposition_F64<DenseMatrix64F> svdConstraints = DecompositionFactory_D64.svd(3, 3, true, true, false);
+	protected SingularValueDecomposition_F64<RowMatrix_F64> svdConstraints = DecompositionFactory_D64.svd(3, 3, true, true, false);
 
 	// SVD decomposition of F = U*S*V^T
-	protected DenseMatrix64F svdU;
-	protected DenseMatrix64F svdS;
-	protected DenseMatrix64F svdV;
+	protected RowMatrix_F64 svdU;
+	protected RowMatrix_F64 svdS;
+	protected RowMatrix_F64 svdV;
 
-	protected DenseMatrix64F temp0 = new DenseMatrix64F(3,3);
+	protected RowMatrix_F64 temp0 = new RowMatrix_F64(3,3);
 
 	// matrix used to normalize results
-	protected DenseMatrix64F N1 = new DenseMatrix64F(3,3);
-	protected DenseMatrix64F N2 = new DenseMatrix64F(3,3);
+	protected RowMatrix_F64 N1 = new RowMatrix_F64(3,3);
+	protected RowMatrix_F64 N2 = new RowMatrix_F64(3,3);
 
 	// should it compute a fundamental (true) or essential (false) matrix?
 	boolean computeFundamental;
@@ -79,7 +79,7 @@ public abstract class FundamentalLinear {
 	 *
 	 * @return true if svd returned true.
 	 */
-	protected boolean projectOntoEssential( DenseMatrix64F E ) {
+	protected boolean projectOntoEssential( RowMatrix_F64 E ) {
 		if( !svdConstraints.decompose(E) ) {
 			return false;
 		}
@@ -108,7 +108,7 @@ public abstract class FundamentalLinear {
 	 *
 	 * @return true if svd returned true.
 	 */
-	protected boolean projectOntoFundamentalSpace( DenseMatrix64F F ) {
+	protected boolean projectOntoFundamentalSpace( RowMatrix_F64 F ) {
 		if( !svdConstraints.decompose(F) ) {
 			return false;
 		}
@@ -137,7 +137,7 @@ public abstract class FundamentalLinear {
 	 * @param N1 normalization matrix.
 	 * @param N2 normalization matrix.
 	 */
-	protected void undoNormalizationF(DenseMatrix64F M, DenseMatrix64F N1, DenseMatrix64F N2) {
+	protected void undoNormalizationF(RowMatrix_F64 M, RowMatrix_F64 N1, RowMatrix_F64 N2) {
 		// M = N2^T * M * N1
 		CommonOps_D64.multTransA(N2,M,temp0);
 		CommonOps_D64.mult(temp0,N1,M);
@@ -151,7 +151,7 @@ public abstract class FundamentalLinear {
 	 * @param points Set of associated points in left and right images.
 	 * @param A Matrix where the reformatted points are written to.
 	 */
-	protected void createA(List<AssociatedPair> points, DenseMatrix64F A ) {
+	protected void createA(List<AssociatedPair> points, RowMatrix_F64 A ) {
 		A.reshape(points.size(),9, false);
 		A.zero();
 
@@ -188,7 +188,7 @@ public abstract class FundamentalLinear {
 	 *
 	 * @return U matrix.
 	 */
-	public DenseMatrix64F getSvdU() {
+	public RowMatrix_F64 getSvdU() {
 		return svdU;
 	}
 
@@ -197,7 +197,7 @@ public abstract class FundamentalLinear {
 	 *
 	 * @return S matrix.
 	 */
-	public DenseMatrix64F getSvdS() {
+	public RowMatrix_F64 getSvdS() {
 		return svdS;
 	}
 
@@ -206,7 +206,7 @@ public abstract class FundamentalLinear {
 	 *
 	 * @return V matrix.
 	 */
-	public DenseMatrix64F getSvdV() {
+	public RowMatrix_F64 getSvdV() {
 		return svdV;
 	}
 

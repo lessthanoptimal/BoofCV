@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 import org.ejml.ops.CommonOps_D64;
@@ -58,14 +58,14 @@ import java.util.List;
 public class Zhang99CalibrationMatrixFromHomographies {
 
 	// system of equations
-	private DenseMatrix64F A = new DenseMatrix64F(1,1);
+	private RowMatrix_F64 A = new RowMatrix_F64(1,1);
 	// computes the SVD of the A matrix
-	private SingularValueDecomposition_F64<DenseMatrix64F> svd = DecompositionFactory_D64.svd(0, 0,true,true,false);
+	private SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_D64.svd(0, 0,true,true,false);
 
 	// a vectorized description of the B = A^-T * A^-1 matrix.
-	private DenseMatrix64F b;
+	private RowMatrix_F64 b;
 	// the found calibration matrix
-	private DenseMatrix64F K = new DenseMatrix64F(3,3);
+	private RowMatrix_F64 K = new RowMatrix_F64(3,3);
 
 	// if it should assume the skew is zero or not
 	private boolean assumeZeroSkew;
@@ -80,9 +80,9 @@ public class Zhang99CalibrationMatrixFromHomographies {
 		this.assumeZeroSkew = assumeZeroSkew;
 
 		if( assumeZeroSkew )
-			b = new DenseMatrix64F(5,1);
+			b = new RowMatrix_F64(5,1);
 		else
-			b = new DenseMatrix64F(6,1);
+			b = new RowMatrix_F64(6,1);
 
 	}
 
@@ -92,7 +92,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 *
 	 * @param homographies Homographies computed from observations of the calibration grid.
 	 */
-	public void process( List<DenseMatrix64F> homographies ) {
+	public void process( List<RowMatrix_F64> homographies ) {
 		if( assumeZeroSkew ) {
 			if( homographies.size() < 2 )
 				throw new IllegalArgumentException("At least two homographies are required");
@@ -105,7 +105,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 			if( !svd.decompose(A) )
 				throw new RuntimeException("SVD failed");
 			if( homographies.size() == 2 ) {
-				DenseMatrix64F V = svd.getV(null,false);
+				RowMatrix_F64 V = svd.getV(null,false);
 				SpecializedOps_D64.subvector(V, 0, 4, V.numRows, false, 0, b);
 			} else {
 				SingularOps_D64.nullVector(svd,true,b);
@@ -126,20 +126,20 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 *
 	 * @param homographies set of observed homographies.
 	 */
-	private void setupA( List<DenseMatrix64F> homographies ) {
+	private void setupA( List<RowMatrix_F64> homographies ) {
 		A.reshape(2*homographies.size(),6, false);
 
-		DenseMatrix64F h1 = new DenseMatrix64F(3,1);
-		DenseMatrix64F h2 = new DenseMatrix64F(3,1);
+		RowMatrix_F64 h1 = new RowMatrix_F64(3,1);
+		RowMatrix_F64 h2 = new RowMatrix_F64(3,1);
 
-		DenseMatrix64F v12 = new DenseMatrix64F(1,6);
-		DenseMatrix64F v11 = new DenseMatrix64F(1,6);
-		DenseMatrix64F v22 = new DenseMatrix64F(1,6);
+		RowMatrix_F64 v12 = new RowMatrix_F64(1,6);
+		RowMatrix_F64 v11 = new RowMatrix_F64(1,6);
+		RowMatrix_F64 v22 = new RowMatrix_F64(1,6);
 
-		DenseMatrix64F v11m22 = new DenseMatrix64F(1,6);
+		RowMatrix_F64 v11m22 = new RowMatrix_F64(1,6);
 
 		for( int i = 0; i < homographies.size(); i++ ) {
-			DenseMatrix64F H = homographies.get(i);
+			RowMatrix_F64 H = homographies.get(i);
 
 			CommonOps_D64.extract(H,0,3,0,1,h1,0,0);
 			CommonOps_D64.extract(H,0,3,1,2,h2,0,0);
@@ -171,20 +171,20 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 *
 	 * @param homographies set of observed homographies.
 	 */
-	private void setupA_NoSkew( List<DenseMatrix64F> homographies ) {
+	private void setupA_NoSkew( List<RowMatrix_F64> homographies ) {
 		A.reshape(2*homographies.size(),5, false);
 
-		DenseMatrix64F h1 = new DenseMatrix64F(3,1);
-		DenseMatrix64F h2 = new DenseMatrix64F(3,1);
+		RowMatrix_F64 h1 = new RowMatrix_F64(3,1);
+		RowMatrix_F64 h2 = new RowMatrix_F64(3,1);
 
-		DenseMatrix64F v12 = new DenseMatrix64F(1,5);
-		DenseMatrix64F v11 = new DenseMatrix64F(1,5);
-		DenseMatrix64F v22 = new DenseMatrix64F(1,5);
+		RowMatrix_F64 v12 = new RowMatrix_F64(1,5);
+		RowMatrix_F64 v11 = new RowMatrix_F64(1,5);
+		RowMatrix_F64 v22 = new RowMatrix_F64(1,5);
 
-		DenseMatrix64F v11m22 = new DenseMatrix64F(1,5);
+		RowMatrix_F64 v11m22 = new RowMatrix_F64(1,5);
 
 		for( int i = 0; i < homographies.size(); i++ ) {
-			DenseMatrix64F H = homographies.get(i);
+			RowMatrix_F64 H = homographies.get(i);
 
 			CommonOps_D64.extract(H,0,3,0,1,h1,0,0);
 			CommonOps_D64.extract(H,0,3,1,2,h2,0,0);
@@ -213,7 +213,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	/**
 	 * This computes the v_ij vector found in the paper.
 	 */
-	private void computeV( DenseMatrix64F h1 ,DenseMatrix64F h2 , DenseMatrix64F v )
+	private void computeV( RowMatrix_F64 h1 ,RowMatrix_F64 h2 , RowMatrix_F64 v )
 	{
 		double h1x = h1.get(0,0);
 		double h1y = h1.get(1,0);
@@ -235,7 +235,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 * This computes the v_ij vector found in the paper.  Leaving out components that would
 	 * interact with B12, since that is known to be zero.
 	 */
-	private void computeV_NoSkew( DenseMatrix64F h1 ,DenseMatrix64F h2 , DenseMatrix64F v )
+	private void computeV_NoSkew( RowMatrix_F64 h1 ,RowMatrix_F64 h2 , RowMatrix_F64 v )
 	{
 		double h1x = h1.get(0,0);
 		double h1y = h1.get(1,0);
@@ -326,11 +326,11 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 *
 	 * @return Calibration matrix.
 	 */
-	public DenseMatrix64F getCalibrationMatrix() {
+	public RowMatrix_F64 getCalibrationMatrix() {
 		return K;
 	}
 
-	public SingularValueDecomposition_F64<DenseMatrix64F> getSvd() {
+	public SingularValueDecomposition_F64<RowMatrix_F64> getSvd() {
 		return svd;
 	}
 }

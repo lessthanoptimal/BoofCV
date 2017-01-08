@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.pose;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.factory.DecompositionFactory_D64;
 import org.ejml.factory.LinearSolverFactory_D64;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
@@ -50,21 +50,21 @@ public class Relinearlize {
 	int numNull;
 
 	// contains the null space
-	DenseMatrix64F V;
+	RowMatrix_F64 V;
 	// contains one possible solution
-	DenseMatrix64F x0 = new DenseMatrix64F(1,1);
+	RowMatrix_F64 x0 = new RowMatrix_F64(1,1);
 	// lookup table for indices
 	int table[] = new int[10*10];
 
-	SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory_D64.svd(3, 3, false, true, false);
+	SingularValueDecomposition<RowMatrix_F64> svd = DecompositionFactory_D64.svd(3, 3, false, true, false);
 
 	// used inside of solveConstraintMatrix
-	DenseMatrix64F AA = new DenseMatrix64F(1,1);
-	DenseMatrix64F yy = new DenseMatrix64F(1,1);
-	DenseMatrix64F xx = new DenseMatrix64F(1,1);
+	RowMatrix_F64 AA = new RowMatrix_F64(1,1);
+	RowMatrix_F64 yy = new RowMatrix_F64(1,1);
+	RowMatrix_F64 xx = new RowMatrix_F64(1,1);
 
 	// used to compute one possible solution
-	LinearSolver<DenseMatrix64F> pseudo = LinearSolverFactory_D64.pseudoInverse(true);
+	LinearSolver<RowMatrix_F64> pseudo = LinearSolverFactory_D64.pseudoInverse(true);
 
 	// stores constraints
 	double XiiXjk[] = new double[10];
@@ -107,7 +107,7 @@ public class Relinearlize {
 	 * @param y distances between world control points
 	 * @param betas Estimated betas.  Output.
 	 */
-	public void process( DenseMatrix64F L_full , DenseMatrix64F y , double betas[] ) {
+	public void process( RowMatrix_F64 L_full , RowMatrix_F64 y , double betas[] ) {
 
 		svd.decompose(L_full);
 
@@ -119,7 +119,7 @@ public class Relinearlize {
 		pseudo.solve(y,x0);
 
 		// add additional constraints to reduce the number of possible solutions
-		DenseMatrix64F alphas = solveConstraintMatrix();
+		RowMatrix_F64 alphas = solveConstraintMatrix();
 
 		// compute the final solution
 		for( int i = 0; i < x0.numRows; i++ ) {
@@ -149,7 +149,7 @@ public class Relinearlize {
 	 * x_{ii}*x_{jk} = x_{ik}*x_{ji}
 	 *
 	 */
-	protected DenseMatrix64F solveConstraintMatrix() {
+	protected RowMatrix_F64 solveConstraintMatrix() {
 
 		int rowAA = 0;
 		for( int i = 0; i < numControl; i++ ) {

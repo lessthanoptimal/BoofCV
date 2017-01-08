@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.geo.f.EpipolarTestSimulation;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimator1;
 import georegression.geometry.GeometryMath_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.junit.Test;
 
@@ -68,7 +68,7 @@ public abstract class CheckEstimate1ofEpipolar extends EpipolarTestSimulation {
 
 		boolean workedOnce = false;
 
-		DenseMatrix64F F = new DenseMatrix64F(3,3);
+		RowMatrix_F64 F = new RowMatrix_F64(3,3);
 
 		for( int i = 0; i < 10; i++ ) {
 			List<AssociatedPair> pairs = randomPairs(alg.getMinimumPoints());

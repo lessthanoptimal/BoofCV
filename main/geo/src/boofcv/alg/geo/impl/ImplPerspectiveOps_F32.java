@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Vector3D_F32;
 import georegression.struct.se.Se3_F32;
 import georegression.transform.se.SePointOps_F32;
-import org.ejml.data.DenseMatrix32F;
+import org.ejml.data.RowMatrix_F32;
 import org.ejml.ops.CommonOps_D32;
 
 /**
@@ -42,15 +42,15 @@ import org.ejml.ops.CommonOps_D32;
 public class ImplPerspectiveOps_F32 {
 
 	public static <C extends CameraPinhole>C adjustIntrinsic(C parameters,
-															 DenseMatrix32F adjustMatrix,
+															 RowMatrix_F32 adjustMatrix,
 															 C adjustedParam)
 	{
 		if( adjustedParam == null )
 			adjustedParam = parameters.createLike();
 		adjustedParam.set(parameters);
 
-		DenseMatrix32F K = ImplPerspectiveOps_F32.calibrationMatrix(parameters, null);
-		DenseMatrix32F K_adj = new DenseMatrix32F(3,3);
+		RowMatrix_F32 K = ImplPerspectiveOps_F32.calibrationMatrix(parameters, null);
+		RowMatrix_F32 K_adj = new RowMatrix_F32(3,3);
 		CommonOps_D32.mult(adjustMatrix, K, K_adj);
 
 		ImplPerspectiveOps_F32.matrixToParam(K_adj, parameters.width, parameters.height, adjustedParam);
@@ -58,15 +58,15 @@ public class ImplPerspectiveOps_F32 {
 		return adjustedParam;
 	}
 
-	public static DenseMatrix32F calibrationMatrix(float fx, float fy, float skew,
+	public static RowMatrix_F32 calibrationMatrix(float fx, float fy, float skew,
 												   float xc, float yc) {
-		return new DenseMatrix32F(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
+		return new RowMatrix_F32(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
 	}
 
-	public static DenseMatrix32F calibrationMatrix(CameraPinhole param , DenseMatrix32F K ) {
+	public static RowMatrix_F32 calibrationMatrix(CameraPinhole param , RowMatrix_F32 K ) {
 
 		if( K == null ) {
-			K = new DenseMatrix32F(3,3);
+			K = new RowMatrix_F32(3,3);
 		}
 		CommonOps_D32.fill(K, 0);
 
@@ -80,7 +80,7 @@ public class ImplPerspectiveOps_F32 {
 		return K;
 	}
 
-	public static <C extends CameraPinhole>C matrixToParam(DenseMatrix32F K , int width , int height , C param ) {
+	public static <C extends CameraPinhole>C matrixToParam(RowMatrix_F32 K , int width , int height , C param ) {
 
 		if( param == null )
 			param = (C)new CameraPinhole();
@@ -109,7 +109,7 @@ public class ImplPerspectiveOps_F32 {
 		return pixel;
 	}
 
-	public static Point2D_F32 convertNormToPixel( DenseMatrix32F K, Point2D_F32 norm , Point2D_F32 pixel ) {
+	public static Point2D_F32 convertNormToPixel( RowMatrix_F32 K, Point2D_F32 norm , Point2D_F32 pixel ) {
 		if( pixel == null )
 			pixel = new Point2D_F32();
 
@@ -132,7 +132,7 @@ public class ImplPerspectiveOps_F32 {
 		return norm;
 	}
 
-	public static Point2D_F32 convertPixelToNorm( DenseMatrix32F K , Point2D_F32 pixel , Point2D_F32 norm ) {
+	public static Point2D_F32 convertPixelToNorm( RowMatrix_F32 K , Point2D_F32 pixel , Point2D_F32 norm ) {
 		if( norm == null )
 			norm = new Point2D_F32();
 
@@ -145,7 +145,7 @@ public class ImplPerspectiveOps_F32 {
 	}
 
 
-	public static Point2D_F32 renderPixel( Se3_F32 worldToCamera , DenseMatrix32F K , Point3D_F32 X ) {
+	public static Point2D_F32 renderPixel( Se3_F32 worldToCamera , RowMatrix_F32 K , Point3D_F32 X ) {
 		Point3D_F32 X_cam = new Point3D_F32();
 
 		SePointOps_F32.transform(worldToCamera, X, X_cam);
@@ -163,8 +163,8 @@ public class ImplPerspectiveOps_F32 {
 		return GeometryMath_F32.mult(K, norm, norm);
 	}
 
-	public static Point2D_F32 renderPixel( DenseMatrix32F worldToCamera , Point3D_F32 X ) {
-		DenseMatrix32F P = worldToCamera;
+	public static Point2D_F32 renderPixel( RowMatrix_F32 worldToCamera , Point3D_F32 X ) {
+		RowMatrix_F32 P = worldToCamera;
 
 		float x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3];
 		float y = P.data[4]*X.x + P.data[5]*X.y + P.data[6]*X.z + P.data[7];
@@ -178,10 +178,10 @@ public class ImplPerspectiveOps_F32 {
 		return pixel;
 	}
 
-	public static DenseMatrix32F createCameraMatrix( DenseMatrix32F R , Vector3D_F32 T , DenseMatrix32F K ,
-													 DenseMatrix32F ret ) {
+	public static RowMatrix_F32 createCameraMatrix( RowMatrix_F32 R , Vector3D_F32 T , RowMatrix_F32 K ,
+													 RowMatrix_F32 ret ) {
 		if( ret == null )
-			ret = new DenseMatrix32F(3,4);
+			ret = new RowMatrix_F32(3,4);
 
 		CommonOps_D32.insert(R,ret,0,0);
 
@@ -192,7 +192,7 @@ public class ImplPerspectiveOps_F32 {
 		if( K == null )
 			return ret;
 
-		DenseMatrix32F temp = new DenseMatrix32F(3,4);
+		RowMatrix_F32 temp = new RowMatrix_F32(3,4);
 		CommonOps_D32.mult(K,ret,temp);
 
 		ret.set(temp);

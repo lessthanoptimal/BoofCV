@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.gui.learning;
 
 import boofcv.gui.image.ShowImages;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.RandomMatrices_D64;
 
 import javax.swing.*;
@@ -37,8 +37,8 @@ import java.util.Random;
  */
 public class ConfusionMatrixPanel extends JPanel {
 
-	DenseMatrix64F temp = new DenseMatrix64F(1,1);
-	DenseMatrix64F confusion = new DenseMatrix64F(1,1);
+	RowMatrix_F64 temp = new RowMatrix_F64(1,1);
+	RowMatrix_F64 confusion = new RowMatrix_F64(1,1);
 	boolean dirty = false;
 
 	boolean gray = false;
@@ -65,7 +65,7 @@ public class ConfusionMatrixPanel extends JPanel {
 	 * @param widthPixels preferred width and height of the panel in pixels
 	 * @param gray Render gray scale or color image
 	 */
-	public ConfusionMatrixPanel( DenseMatrix64F M , List<String> labels, int widthPixels , boolean gray ) {
+	public ConfusionMatrixPanel( RowMatrix_F64 M , List<String> labels, int widthPixels , boolean gray ) {
 		this(widthPixels,labels!=null);
 
 		setLabels(labels);
@@ -87,7 +87,7 @@ public class ConfusionMatrixPanel extends JPanel {
 		setPreferredSize(new Dimension(widthPixels,heightPixels));
 	}
 
-	public void setMatrix( DenseMatrix64F A ) {
+	public void setMatrix( RowMatrix_F64 A ) {
 		synchronized ( this ) {
 			temp.set(A);
 			dirty = true;
@@ -327,7 +327,7 @@ public class ConfusionMatrixPanel extends JPanel {
 	}
 
 	public static void main(String[] args) {
-		DenseMatrix64F m = RandomMatrices_D64.createRandom(5,5,0,1,new Random(234));
+		RowMatrix_F64 m = RandomMatrices_D64.createRandom(5,5,0,1,new Random(234));
 
 		List<String> labels = new ArrayList<>();
 		for (int i = 0; i < m.numRows; i++) {

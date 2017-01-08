@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 import java.awt.*;
 import java.io.File;
@@ -64,7 +64,7 @@ public class DisplayKinectPointCloudApp {
 
 		VisualDepthOps.depthTo3D(param, rgb, depth, cloud, cloudColor);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param, (DenseMatrix64F)null);
+		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(param, (RowMatrix_F64)null);
 
 		PointCloudViewer viewer = new PointCloudViewer(K, 10.0);
 		viewer.setPreferredSize(new Dimension(rgb.width,rgb.height));

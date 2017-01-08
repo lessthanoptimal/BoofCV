@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo.trifocal;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 import org.ejml.ops.CommonOps_D64;
 import org.ejml.ops.MatrixFeatures_D64;
 import org.junit.Test;
@@ -40,8 +40,8 @@ public class TestEnforceTrifocalGeometry extends CommonTrifocalChecks {
 	 */
 	@Test
 	public void checkMatrixE() {
-		DenseMatrix64F P2 = new DenseMatrix64F(3,4,true,1,2,3,4,5,6,7,8,9,10,11,12);
-		DenseMatrix64F P3 = new DenseMatrix64F(3,4,true,10,20,30,40,50,60,70,80,90,100,110,120);
+		RowMatrix_F64 P2 = new RowMatrix_F64(3,4,true,1,2,3,4,5,6,7,8,9,10,11,12);
+		RowMatrix_F64 P3 = new RowMatrix_F64(3,4,true,10,20,30,40,50,60,70,80,90,100,110,120);
 
 		Point3D_F64 e2 = new Point3D_F64(P2.get(0,3),P2.get(1,3),P2.get(2,3));
 		Point3D_F64 e3 = new Point3D_F64(P3.get(0,3),P3.get(1,3),P3.get(2,3));
@@ -52,14 +52,14 @@ public class TestEnforceTrifocalGeometry extends CommonTrifocalChecks {
 
 		alg.constructE(e2,e3);
 
-		DenseMatrix64F X = new DenseMatrix64F(18,1);
+		RowMatrix_F64 X = new RowMatrix_F64(18,1);
 
 		for( int i = 0; i < 9; i++ ) {
 			X.data[i] = P2.get(i/3,i%3);
 			X.data[i+9] = P3.get(i/3,i%3);
 		}
 
-		DenseMatrix64F vectorT = new DenseMatrix64F(27,1);
+		RowMatrix_F64 vectorT = new RowMatrix_F64(27,1);
 		CommonOps_D64.mult(alg.E,X,vectorT);
 
 		TrifocalTensor foundT = new TrifocalTensor();
@@ -86,7 +86,7 @@ public class TestEnforceTrifocalGeometry extends CommonTrifocalChecks {
 
 		constructA.createLinearSystem(observations);
 
-		DenseMatrix64F A = constructA.A;
+		RowMatrix_F64 A = constructA.A;
 
 		// extract epipoles
 		Point3D_F64 e2 = new Point3D_F64();
@@ -104,7 +104,7 @@ public class TestEnforceTrifocalGeometry extends CommonTrifocalChecks {
 		checkTrifocalWithConstraint(found,1e-6);
 
 		// make sure the errors are zero too
-		DenseMatrix64F errors = new DenseMatrix64F(observations.size(),1);
+		RowMatrix_F64 errors = new RowMatrix_F64(observations.size(),1);
 		alg.computeErrorVector(A,errors);
 
 		for( int i = 0; i < errors.numRows; i++ )

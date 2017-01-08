@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.geo.optimization;
 
 import org.ddogleg.fitting.modelset.ModelCodec;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.RowMatrix_F64;
 
 /**
  * For use in cases where the model is a matrix and there is a 1-to-1 relationship with model
@@ -28,7 +28,7 @@ import org.ejml.data.DenseMatrix64F;
  * 
  * @author Peter Abeles
  */
-public class ModelCodecSwapData implements ModelCodec<DenseMatrix64F> {
+public class ModelCodecSwapData implements ModelCodec<RowMatrix_F64> {
 	int paramLength;
 
 	public ModelCodecSwapData(int paramLength) {
@@ -36,12 +36,12 @@ public class ModelCodecSwapData implements ModelCodec<DenseMatrix64F> {
 	}
 
 	@Override
-	public void decode(double[] input, DenseMatrix64F outputModel) {
+	public void decode(double[] input, RowMatrix_F64 outputModel) {
 		outputModel.data = input;
 	}
 
 	@Override
-	public void encode(DenseMatrix64F model, double[] param) {
+	public void encode(RowMatrix_F64 model, double[] param) {
 		System.arraycopy(model.data,0,param,0,paramLength);
 	}
 
