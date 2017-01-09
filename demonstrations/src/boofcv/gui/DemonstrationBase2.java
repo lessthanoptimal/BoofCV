@@ -254,8 +254,9 @@ public abstract class DemonstrationBase2 extends JPanel {
 			return;
 		}
 
+
 		// mjpegs can be opened up as images.  so override the default behavior
-		String inputFilePath = file.getPath();
+		inputFilePath = file.getPath();
 		BufferedImage buffered = inputFilePath.endsWith("mjpeg") ? null : UtilImageIO.loadImage(inputFilePath);
 		if( buffered == null ) {
 			openVideo(inputFilePath);
@@ -267,7 +268,7 @@ public abstract class DemonstrationBase2 extends JPanel {
 	/**
 	 * Before invoking this function make sure waitingToOpenImage is false AND that the previous input has beens topped
 	 */
-	protected void openVideo(String filePath) {
+	protected void openVideo(String ...filePaths) {
 		synchronized (lockStartingProcess) {
 			if( startingProcess ) {
 				System.out.println("Ignoring video request.  Detected spamming");
@@ -277,22 +278,33 @@ public abstract class DemonstrationBase2 extends JPanel {
 		}
 
 		synchronized (inputStreams) {
-			if (inputStreams.size() != 1)
-				throw new IllegalArgumentException("Input streams not equal to 1.  Override openVideo()");
+			if (inputStreams.size() != filePaths.length)
+				throw new IllegalArgumentException("Input streams not equal to "+filePaths.length+".  Override openVideo()");
 		}
 
 		stopAllInputProcessing();
 
-		CacheSequenceStream cache = inputStreams.get(0);
-		SimpleImageSequence sequence = media.openVideo(filePath, cache.getImageType());
+		boolean failed = false;
+		for( int which = 0; which < filePaths.length; which++ ) {
+			CacheSequenceStream cache = inputStreams.get(which);
 
-		if (sequence != null) {
+			SimpleImageSequence sequence = media.openVideo(filePaths[which], cache.getImageType());
+
+			if( sequence == null ) {
+				failed = true;
+				break;
+			} else {
+				synchronized (inputStreams) {
+					cache.reset();
+					cache.setSequence(sequence);
+				}
+			}
+		}
+
+		if (!failed) {
 			synchronized (inputStreams) {
-				inputFilePath = filePath;
 				inputMethod = InputMethod.VIDEO;
 				streamPeriod = 33; // default to 33 FPS for a video
-				cache.reset();
-				cache.setSequence(sequence);
 				if( threadProcess != null )
 					throw new RuntimeException("There was still an active stream thread!");
 				threadProcess = new SynchronizedStreamsThread();
@@ -328,7 +340,6 @@ public abstract class DemonstrationBase2 extends JPanel {
 
 		synchronized (inputStreams) {
 			inputMethod = InputMethod.IMAGE;
-			inputFilePath = filePath;
 
 			// copy the image into the cache
 			CacheSequenceStream cache = inputStreams.get(0);

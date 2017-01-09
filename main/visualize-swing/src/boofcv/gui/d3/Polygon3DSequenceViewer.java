@@ -31,6 +31,7 @@ import org.ejml.data.RowMatrix_F64;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +58,14 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 	// previous cursor location
 	int prevX;
 	int prevY;
+
+	Line2D.Double line = new Line2D.Double();
+
+	Point3D_F64 p1 = new Point3D_F64();
+	Point3D_F64 p2 = new Point3D_F64();
+
+	Point2D_F64 x1 = new Point2D_F64();
+	Point2D_F64 x2 = new Point2D_F64();
 
 	public Polygon3DSequenceViewer( ) {
 		addKeyListener(this);
@@ -139,12 +148,8 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 
 		Graphics2D g2 = (Graphics2D)g;
 
-		Point3D_F64 p1 = new Point3D_F64();
-		Point3D_F64 p2 = new Point3D_F64();
-
-		Point2D_F64 x1 = new Point2D_F64();
-		Point2D_F64 x2 = new Point2D_F64();
-
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		for( Poly poly : polygons ) {
 			SePointOps_F64.transform(worldToCamera, poly.pts[0], p1);
@@ -166,7 +171,8 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 					break;
 				}
 
-				g2.drawLine((int)x1.x,(int)x1.y,(int)x2.x,(int)x2.y);
+				line.setLine(x1.x,x1.y,x2.x,x2.y);
+				g2.draw(line);
 
 				Point3D_F64 tempP = p1;
 				Point2D_F64 tempX = x1;
@@ -177,7 +183,8 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 			if( !skip ) {
 				SePointOps_F64.transform(worldToCamera, poly.pts[0], p2);
 				GeometryMath_F64.mult(K,p2,x2);
-				g2.drawLine((int)x1.x,(int)x1.y,(int)x2.x,(int)x2.y);
+				line.setLine(x1.x,x1.y,x2.x,x2.y);
+				g2.draw(line);
 			}
 		}
 	}

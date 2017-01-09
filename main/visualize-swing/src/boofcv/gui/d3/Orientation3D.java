@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import georegression.struct.point.Vector3D_F64;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Line2D;
 
 /**
  * Graphically displays the orientation
@@ -36,6 +37,8 @@ public class Orientation3D extends JPanel {
 
 	int a = 6;
 	int b = 40;
+
+	Line2D.Double line = new Line2D.Double();
 
 	public Orientation3D() {
 		setPreferredSize(new Dimension(a+b+a+25,a+b+a));
@@ -61,6 +64,9 @@ public class Orientation3D extends JPanel {
 		super.paintComponent(g);
 
 		Graphics2D g2 = (Graphics2D)g;
+
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		g2.setColor(Color.BLACK);
 		g2.setStroke(new BasicStroke(5));
@@ -90,18 +96,21 @@ public class Orientation3D extends JPanel {
 		g2.drawLine(xc-4,y,xc+4,y);
 	}
 
-	private void drawNeedle( int xc , int yc , int r , double yaw , Graphics2D g2  ) {
+	private void drawNeedle( double xc , double yc , int r , double yaw , Graphics2D g2  ) {
 		g2.setColor(Color.RED);
 		double lx = r*Math.cos(yaw);
 		double ly = r*Math.sin(yaw);
 
-		g2.drawLine(xc,yc,(int)(xc+lx),(int)(yc+ly));
+		line.setLine(xc,yc,xc+lx,yc+ly);
+		g2.draw(line);
 	}
 
-	private void drawMark( int xc , int yc , int r , boolean vertical , Graphics2D g2 ) {
-		if( vertical )
-			g2.drawLine(xc,yc-r,xc,yc+r);
-		else
-			g2.drawLine(xc-r,yc,xc+r,yc);
+	private void drawMark( double xc , double yc , double r , boolean vertical , Graphics2D g2 ) {
+		if( vertical ) {
+			line.setLine(xc, yc - r, xc, yc + r);
+		} else {
+			line.setLine(xc - r, yc, xc + r, yc);
+		}
+		g2.draw(line);
 	}
 }
