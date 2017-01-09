@@ -50,6 +50,9 @@ Version : 0.27
   * EJML -> ddoglog -> GeoRegression
 - Fixed calibration target generator app from printing out the wrong target type for asymmetric circles
 - Fixed and updated Android example
+- Android
+  * ConvertBitmap will reshape BoofCV images to match the input Bitmap when converting
+  * TODO rename multi to planar and other references to old naming
 
 - TODO Visualization tools for Direct VO
 -      Show warped image

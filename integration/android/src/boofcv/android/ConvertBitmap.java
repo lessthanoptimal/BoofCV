@@ -54,11 +54,12 @@ public class ConvertBitmap {
 	/**
 	 * Converts a {@link Bitmap} into a BoofCV image.  Type is determined at runtime.
 	 * @param input Bitmap image.
-	 * @param output Output image
+	 * @param output Output image.  Automatically resized to match input shape.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static <T extends ImageBase<T>>
 	void bitmapToBoof( Bitmap input , T output , byte[] storage) {
+
 		switch( output.getImageType().getFamily() ) {
 			case GRAY: {
 				if( output.getClass() == GrayF32.class )
@@ -112,9 +113,10 @@ public class ConvertBitmap {
 	public static GrayU8 bitmapToGray( Bitmap input , GrayU8 output , byte[] storage ) {
 		if( output == null ) {
 			output = new GrayU8( input.getWidth() , input.getHeight() );
-		} else if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
-			throw new IllegalArgumentException("Image shapes are not the same");
+		} else {
+			output.reshape(input.getWidth(), input.getHeight());
 		}
+
 		
 		if( storage == null )
 			storage = declareStorage(input,null);
@@ -138,8 +140,8 @@ public class ConvertBitmap {
 	public static GrayF32 bitmapToGray( Bitmap input , GrayF32 output , byte[] storage) {
 		if( output == null ) {
 			output = new GrayF32( input.getWidth() , input.getHeight() );
-		} else if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
-			throw new IllegalArgumentException("Image shapes are not the same");
+		} else {
+			output.reshape(input.getWidth(), input.getHeight());
 		}
 		
 		if( storage == null )
@@ -166,8 +168,9 @@ public class ConvertBitmap {
 	Planar<T> bitmapToMS( Bitmap input , Planar<T> output , Class<T> type , byte[] storage ) {
 		if( output == null ) {
 			output = new Planar<>(type, input.getWidth(), input.getHeight(), 4);
-		} else if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
-			throw new IllegalArgumentException("Image shapes are not the same");
+		} else {
+			output.reshape(input.getWidth(), input.getHeight());
+			output.setNumberOfBands(4);
 		}
 
 		if( storage == null )
