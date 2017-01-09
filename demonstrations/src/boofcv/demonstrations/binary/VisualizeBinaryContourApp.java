@@ -24,7 +24,7 @@ import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
-import boofcv.gui.DemonstrationBase;
+import boofcv.gui.DemonstrationBase2;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
@@ -42,7 +42,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends DemonstrationBase<T>
+public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends DemonstrationBase2
 	implements ThresholdControlPanel.Listener
 {
 	VisualizePanel guiImage;
@@ -73,27 +73,24 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 	@Override
 	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
 
-		if( buffered != null ) {
-
-			original = ConvertBufferedImage.checkCopy(buffered,original);
-			work = ConvertBufferedImage.checkDeclare(buffered,work);
-
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					Dimension d = guiImage.getPreferredSize();
-					if( d.getWidth() < buffered.getWidth() || d.getHeight() < buffered.getHeight() ) {
-						guiImage.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
-					}
-				}});
+		synchronized (this) {
+			original = ConvertBufferedImage.checkCopy(buffered, original);
+			work = ConvertBufferedImage.checkDeclare(buffered, work);
+			binary.reshape(input.width,input.height);
+			labeled.reshape(input.width,input.height);
 		}
 
-		binary.reshape(input.width,input.height);
-		labeled.reshape(input.width,input.height);
-
-		inputToBinary.process((T)input,binary);
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				Dimension d = guiImage.getPreferredSize();
+				if( d.getWidth() < buffered.getWidth() || d.getHeight() < buffered.getHeight() ) {
+					guiImage.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
+				}
+			}});
 
 		synchronized (this) {
+			inputToBinary.process((T)input,binary);
 			contourAlg.process(binary,labeled);
 		}
 
@@ -109,16 +106,16 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 	public void imageThresholdUpdated() {
 		synchronized (this) {
 			ConfigThreshold config = controls.getThreshold().createConfig();
-			inputToBinary = FactoryThresholdBinary.threshold(config, defaultType.getImageClass());
-			reprocessSingleImage();
+			inputToBinary = FactoryThresholdBinary.threshold(config, getImageType(0).getImageClass());
 		}
+		reprocessImageOnly();
 	}
 
 	public void contourAlgUpdated() {
 		synchronized (this) {
 			contourAlg = new LinearContourLabelChang2004(controls.getConnectRule());
-			reprocessSingleImage();
 		}
+		reprocessImageOnly();
 	}
 
 	/**
@@ -140,7 +137,6 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 		}
 
 		guiImage.setScale(controls.zoom);
-
 		guiImage.setBufferedImage(active);
 		guiImage.repaint();
 	}
@@ -170,7 +166,7 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 
 		app.openFile(new File(examples.get(0)));
 
-		app.waitUntilDoneProcessing();
+		app.waitUntilInputSizeIsKnown();
 
 		ShowImages.showWindow(app,"Contour Visualization",true);
 	}

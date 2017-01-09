@@ -167,8 +167,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>> extends Demonstration
 		synchronized (this) {
 			inputToBinary = FactoryThresholdBinary.threshold(config, imageClass);
 		}
-		if( inputMethod == InputMethod.IMAGE)
-			reprocessInput();
+		reprocessImageOnly();
 	}
 
 	class VisualizePanel extends ImageZoomPanel {

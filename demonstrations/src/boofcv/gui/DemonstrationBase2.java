@@ -541,6 +541,15 @@ public abstract class DemonstrationBase2 extends JPanel {
 		}
 	}
 
+	/**
+	 * Invokes {@link #reprocessInput()} only if the input is an IMAGE
+	 */
+	public void reprocessImageOnly() {
+		if( inputMethod == InputMethod.IMAGE ) {
+			reprocessInput();
+		}
+	}
+
 	protected enum InputMethod {
 		NONE,
 		IMAGE,

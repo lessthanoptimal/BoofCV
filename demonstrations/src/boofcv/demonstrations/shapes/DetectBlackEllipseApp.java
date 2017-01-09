@@ -24,7 +24,7 @@ import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.gui.DemonstrationBase;
+import boofcv.gui.DemonstrationBase2;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
@@ -46,7 +46,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DemonstrationBase<T>
+public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DemonstrationBase2
 		implements ThresholdControlPanel.Listener
 {
 
@@ -61,7 +61,7 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends Demonstration
 
 	BufferedImage original;
 	BufferedImage work;
-	T inputPrev;
+	T input;
 	GrayU8 binary = new GrayU8(1,1);
 
 
@@ -74,40 +74,38 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends Demonstration
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, guiImage);
 
-		inputPrev = super.defaultType.createImage(1,1);
 
 		createDetector();
 	}
 
-	private synchronized void createDetector() {
-		detector = FactoryShapeDetector.ellipse(controls.getConfigEllipse(), imageClass);
+	private void createDetector() {
+		synchronized (this) {
+			detector = FactoryShapeDetector.ellipse(controls.getConfigEllipse(), imageClass);
+		}
 		imageThresholdUpdated();
 	}
 
 	@Override
-	public synchronized void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
-		if( buffered != null ) {
-			original = ConvertBufferedImage.checkCopy(buffered,original);
-			work = ConvertBufferedImage.checkDeclare(buffered,work);
+	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
+		original = ConvertBufferedImage.checkCopy(buffered,original);
+		work = ConvertBufferedImage.checkDeclare(buffered,work);
 
-			binary.reshape(work.getWidth(), work.getHeight());
-			inputPrev.setTo((T)input);
+		binary.reshape(work.getWidth(), work.getHeight());
+		this.input = (T)input;
 
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					Dimension d = guiImage.getPreferredSize();
-					if( d.getWidth() < buffered.getWidth() || d.getHeight() < buffered.getHeight() ) {
-						guiImage.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
-					}
-				}});
-		} else {
-			input = inputPrev;
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				Dimension d = guiImage.getPreferredSize();
+				if( d.getWidth() < buffered.getWidth() || d.getHeight() < buffered.getHeight() ) {
+					guiImage.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
+				}
+			}});
+
+		synchronized (this) {
+			inputToBinary.process((T) input, binary);
+			detector.process((T) input, binary);
 		}
-
-		inputToBinary.process((T)input, binary);
-		detector.process((T)input, binary);
-
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -146,12 +144,14 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends Demonstration
 	}
 
 	@Override
-	public synchronized void imageThresholdUpdated() {
+	public void imageThresholdUpdated() {
 
 		ConfigThreshold config = controls.getThreshold().createConfig();
 
-		inputToBinary = FactoryThresholdBinary.threshold(config, imageClass);
-		processImageThread(0,0,null,null);
+		synchronized (this) {
+			inputToBinary = FactoryThresholdBinary.threshold(config, imageClass);
+		}
+		reprocessImageOnly();
 	}
 
 	class VisualizePanel extends ImageZoomPanel {
@@ -195,7 +195,7 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends Demonstration
 
 		app.openFile(new File(examples.get(0)));
 
-		app.waitUntilDoneProcessing();
+		app.waitUntilInputSizeIsKnown();
 
 		ShowImages.showWindow(app,"Detect Black Ellipses",true);
 	}
