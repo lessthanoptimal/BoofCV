@@ -26,8 +26,10 @@ import boofcv.struct.image.ImageType;
 import java.awt.image.BufferedImage;
 
 /**
- * Circular cache for output from {@link SimpleImageSequence}.  Stores both the boofcv image and the associated
- * BufferedImage.  NOT thread safe and each call must be invoked from the same thread.
+ * Cache for output from {@link SimpleImageSequence}.  Stores both the boofcv image and the associated
+ * BufferedImage.  Storage for two sets of images are stored.  One for the IO thread and one for the algorithm.
+ *
+ *
  *
  * @author Peter Abeles
  */
@@ -38,14 +40,14 @@ public class CacheSequenceStream<T extends ImageBase<T>> {
 	T queueBoof[];
 	BufferedImage queueBuff[];
 
-	int offset;
-	int size;
+	int selected;
 
-	public CacheSequenceStream( int length , ImageType<T> imageType ) {
-		queueBoof = imageType.createArray(length);
-		queueBuff = new BufferedImage[length];
+	public CacheSequenceStream( ImageType<T> imageType ) {
 
-		for (int i = 0; i < length; i++) {
+		queueBoof = imageType.createArray(2);
+		queueBuff = new BufferedImage[2];
+
+		for (int i = 0; i < 2; i++) {
 			queueBoof[i] = imageType.createImage(1,1);
 			queueBuff[i] = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
 		}
@@ -57,52 +59,44 @@ public class CacheSequenceStream<T extends ImageBase<T>> {
 	}
 
 	public void reset() {
-		offset = 0;
-		size = 0;
+		selected = 0;
 		sequence = null;
 	}
-
-	public boolean isCacheFull() {
-		return( size >= queueBoof.length );
-	}
-
 	public boolean hasNext() {
 		return sequence.hasNext();
 	}
 
 	public void cacheNext() {
-		if( isCacheFull() )
-			throw new IllegalArgumentException("Cache is already full.  Should have checked first");
-		int index = (offset+size)%queueBoof.length;
+		selected = (selected+1)%queueBoof.length;
 
 		T sBoof = sequence.next();
 		BufferedImage sBuff = sequence.getGuiImage();
 
-		queueBoof[index].setTo(sBoof);
-		queueBuff[index] = ConvertBufferedImage.checkCopy(sBuff,queueBuff[index]);
-
-		size++;
+		queueBoof[selected].setTo(sBoof);
+		queueBuff[selected] = ConvertBufferedImage.checkCopy(sBuff,queueBuff[selected]);
 	}
 
 	public T getBoofImage() {
-		int index = (offset+size)%queueBoof.length;
-		return queueBoof[index];
+		return queueBoof[selected];
 	}
 
 	public BufferedImage getBufferedImage() {
-		int index = (offset+size)%queueBoof.length;
-		return queueBuff[index];
+		return queueBuff[selected];
 	}
 
-	public void release() {
-		offset = (offset+1) % queueBoof.length;
+	public void setBufferedImage( BufferedImage buff ) {
+		queueBuff[selected] = ConvertBufferedImage.checkCopy(buff,queueBuff[selected]);
 	}
 
 	public int getWidth() {
+		if( sequence == null )
+			return queueBoof[selected].getWidth();
 		return sequence.getNextWidth();
 	}
 
 	public int getHeight() {
+		if( sequence == null )
+			return queueBoof[selected].getHeight();
 		return sequence.getNextHeight();
 	}
 

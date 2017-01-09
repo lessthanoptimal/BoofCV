@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -136,7 +136,6 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		configureSpinnerFloat(spinnerContourSplit);
 		spinnerContourMinSplit = new JSpinner(new SpinnerNumberModel(config.contour2Poly_minimumSideFraction, 0.0, 1.0, 0.001));
 		configureSpinnerFloat(spinnerContourMinSplit);
-		spinnerContourSplit.addChangeListener(this);
 		spinnerContourIterations = new JSpinner(new SpinnerNumberModel(config.contour2Poly_iterations, 1, 200, 1));
 		spinnerContourIterations.setMaximumSize(spinnerContourIterations.getPreferredSize());
 		spinnerContourIterations.addChangeListener(this);
