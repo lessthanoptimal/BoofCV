@@ -93,7 +93,9 @@ public abstract class DemonstrationBase2 extends JPanel {
 	}
 
 	public void setImageTypes( ImageType ...defaultTypes ) {
+		System.out.println("Set Image type");
 		synchronized ( inputStreams ) {
+			inputStreams.clear();
 			for (ImageType type : defaultTypes) {
 				inputStreams.add(new CacheSequenceStream(type));
 			}
@@ -234,6 +236,14 @@ public abstract class DemonstrationBase2 extends JPanel {
 	}
 
 	/**
+	 * A streaming source of images has closed.
+	 * @param source
+	 */
+	protected void handleInputClose( int source ) {
+
+	}
+
+	/**
 	 * Process the image.  Will be called in its own thread, but doesn't need to be re-entrant.  If image
 	 * is null then reprocess the previous image.
 	 */
@@ -245,6 +255,7 @@ public abstract class DemonstrationBase2 extends JPanel {
 	 * be stopped.
 	 */
 	public void openFile(File file) {
+		System.out.println("Open File");
 		// maybe it's an example file
 		if( !file.exists() ) {
 			file = new File(UtilIO.pathExample(file.getPath()));
@@ -269,6 +280,7 @@ public abstract class DemonstrationBase2 extends JPanel {
 	 * Before invoking this function make sure waitingToOpenImage is false AND that the previous input has beens topped
 	 */
 	protected void openVideo(String ...filePaths) {
+		System.out.println("Open Video");
 		synchronized (lockStartingProcess) {
 			if( startingProcess ) {
 				System.out.println("Ignoring video request.  Detected spamming");
@@ -533,6 +545,7 @@ public abstract class DemonstrationBase2 extends JPanel {
 			// clean up
 			for (int i = 0; i < inputStreams.size() ; i++) {
 				inputStreams.get(i).sequence.close();
+				handleInputClose(i);
 			}
 
 			running = false;
@@ -561,7 +574,8 @@ public abstract class DemonstrationBase2 extends JPanel {
 		}
 	}
 
-	protected enum InputMethod {
+	protected enum InputMethod
+	{
 		NONE,
 		IMAGE,
 		VIDEO,

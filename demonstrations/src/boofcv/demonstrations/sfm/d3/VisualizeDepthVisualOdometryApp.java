@@ -58,6 +58,8 @@ import org.ejml.data.RowMatrix_F64;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
@@ -67,29 +69,56 @@ import java.util.List;
 /**
  * Visualizes data from
  *
+ * GUI changes:
+ *
+ * ---------------------
+ * View [select]  -> Warp view added for direct
+ * Frame #
+ * FPS / MAX FPS
+ * Faults
+ * ----------------
+ * Pause/Resume
+ * Stop At Frame
+ * ----------------
+ * integral
+ * origin
+ * Angle
+ * ----------------
+ *
+ *
+ * Status bar above graphics
+ * -----------------
+ * Algorithm specific
+ * Tracks, Inliers, # key frames
+ * --
+ * Fraction Pixels, Fraction In View, # key frames
+ *
+ *
  * @author Peter Abeles
  */
-// TODO add ability to select algorithm
-	// TODO switch between depth and 3D view
-	// TODO compute FPS and show it
-	// TODO display status correctly
-	// TODO add direct method
-	// TODO custom visualization for direct method
-	// TODO add algorithm specific tuning parameters?
-public class VisualizeDepthVisualOdometryApp<I extends ImageGray<I>>
-		extends DemonstrationBase2 implements VisualOdometryPanel.Listener
+// TODO Add step
+// TODO Show keyframe counter
+// TODO custom visualization for direct method
+// TODO   - Show image unwarping
+// TODO   - Show depth of pixel that is in view
+// TODO add algorithm specific tuning parameters?
+	// TODO Split panel
+public class VisualizeDepthVisualOdometryApp
+		extends DemonstrationBase2 implements VisualOdometryPanel2.Listener, ActionListener
 {
+	VisualOdometryPanel2 statusPanel;
+	VisualOdometryAlgorithmPanel algorithmPanel;
+	VisualOdometryFeatureTrackerPanel featurePanel;
 
-	VisualOdometryPanel guiInfo;
-
-	JPanel dataPanels = new JPanel();
+	JPanel mainPanel = new JPanel();
+	JPanel imagePanel = new JPanel();
 	ImagePanel guiLeft;
 	ImagePanel guiDepth;
 	Polygon3DSequenceViewer guiCam3D;
 
 	BufferedImage renderedDepth;
 
-	DepthVisualOdometry<I,GrayU16> alg;
+	DepthVisualOdometry alg;
 
 	boolean noFault;
 
@@ -99,38 +128,59 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageGray<I>>
 	int numFaults;
 	int numTracks;
 	int numInliers;
-	int whichAlg;
+	int whichAlg=-1;
 
-	I imageRGB;
+	AlgType algType = AlgType.UNKNOWN;
+
+	double fps;
+	int frameNumber;
+
+	ImageBase imageRGB;
 	GrayU16 imageDepth;
 
 	BufferedImage bufferedRGB;
 
 	protected VisualDepthParameters config;
+	JComboBox selectAlgorithm;
 
-	public VisualizeDepthVisualOdometryApp(List<PathLabel> examples , Class<I> imageType) {
-		super(true,false,examples, ImageType.single(imageType), ImageType.single(GrayU16.class));
+	public VisualizeDepthVisualOdometryApp(List<PathLabel> examples ) {
+		super(true,false,examples);
 
-//		addAlgorithm(0, "Single P3P : KLT", 0);
-//		addAlgorithm(0, "Single P3P : ST-BRIEF", 1);
-//		addAlgorithm(0, "Single P3P : ST-SURF-KLT", 2);
 
-		alg = createVisualOdometry(whichAlg);
+		selectAlgorithm = new JComboBox();
+		selectAlgorithm.addItem( "Single P3P : KLT" );
+		selectAlgorithm.addItem( "Single P3P : ST-BRIEF" );
+		selectAlgorithm.addItem( "Single P3P : ST-SURF-KLT" );
+		selectAlgorithm.addItem( "Direct" );
 
-		guiInfo = new VisualOdometryPanel(VisualOdometryPanel.Type.DEPTH);
+		selectAlgorithm.addActionListener(this);
+		selectAlgorithm.setMaximumSize(selectAlgorithm.getPreferredSize());
+		menuBar.add(selectAlgorithm);
+
+		statusPanel = new VisualOdometryPanel2(VisualOdometryPanel2.Type.DEPTH);
 		guiLeft = new ImagePanel();
 		guiDepth = new ImagePanel();
 		guiCam3D = new Polygon3DSequenceViewer();
 
-		dataPanels.setLayout(new BoxLayout(dataPanels,BoxLayout.X_AXIS));
-		dataPanels.add(guiLeft);
-		dataPanels.add(guiDepth);
+		imagePanel.setLayout(new BoxLayout(imagePanel,BoxLayout.X_AXIS));
+		imagePanel.add(guiLeft);
+		imagePanel.add(guiDepth);
 
-		add(guiInfo, BorderLayout.WEST);
-		add(dataPanels, BorderLayout.CENTER);
+		algorithmPanel = new VisualOdometryAlgorithmPanel();
+		featurePanel = new VisualOdometryFeatureTrackerPanel();
+
+		mainPanel.setLayout(new BorderLayout());
+		mainPanel.add(imagePanel, BorderLayout.CENTER);
+		mainPanel.add(algorithmPanel, BorderLayout.NORTH);
+
+		add(statusPanel, BorderLayout.WEST);
+		add(mainPanel, BorderLayout.CENTER);
 
 //		guiLeft.addMouseListener(this);
-		guiInfo.setListener(this);
+		statusPanel.setListener(this);
+
+		changeSelectedAlgortihm(0);
+		System.out.println("-------------------- EXIT CONSTRUCTOR ");
 	}
 
 	@Override
@@ -170,24 +220,33 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageGray<I>>
 	protected void handleInputChange(int source, InputMethod method, int width, int height) {
 		if( source != 0 )
 			return;
+		System.out.println("----------------- Handle Input Change");
 
+		fps = -1;
 		numFaults = 0;
-		alg = createVisualOdometry(whichAlg);
+		frameNumber = 0;
 		alg.setCalibration(config.visualParam,new DoNothing2Transform2_F32());
 
-		guiInfo.reset();
+		statusPanel.reset();
 
-//		handleRunningStatus(2);
+		handleRunningStatus(Status.RUNNING);
 
 		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(config.visualParam,(RowMatrix_F64)null);
 		guiCam3D.init();
 		guiCam3D.setK(K);
 		guiCam3D.setStepSize(0.05);
 		guiCam3D.setPreferredSize(new Dimension(config.visualParam.width, config.visualParam.height));
-		guiCam3D.setMaximumSize(guiCam3D.getPreferredSize());
+//		guiCam3D.setMaximumSize(guiCam3D.getPreferredSize());
 
-		dataPanels.setPreferredSize(new Dimension(width*2+10, height));
-		dataPanels.setMaximumSize(dataPanels.getPreferredSize());
+		imagePanel.setPreferredSize(new Dimension(width*2+10, height));
+		imagePanel.setMaximumSize(imagePanel.getPreferredSize());
+	}
+
+	@Override
+	protected void handleInputClose(int source) {
+		if( source != 0 )
+			return;
+		handleRunningStatus(Status.FINISHED);
 	}
 
 	private void drawFeatures(AccessPointTracks3D tracker , BufferedImage image )  {
@@ -250,15 +309,31 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageGray<I>>
 	@Override
 	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 		if( sourceID == 0 ) {
-			imageRGB = (I)input;
+			imageRGB = input;
 			bufferedRGB = buffered;
 		} else if( sourceID == 1 ) {
 			imageDepth = (GrayU16)input;
+			frameNumber++;
 
+			long before = System.nanoTime();
 			noFault = alg.process(imageRGB,imageDepth);
+			long after = System.nanoTime();
+			double elapsed = (after-before)/1e9;
+
+			if( fps < 0 ) {
+				fps = 1.0/elapsed;
+			} else {
+				double lambda = 0.95;
+				fps = lambda*fps + (1.0-lambda)*(1.0/elapsed);
+			}
+
 			if( !noFault ) {
 				alg.reset();
 				guiCam3D.init();
+			}
+
+			if( frameNumber == statusPanel.getStopFrame()) {
+				streamPaused = true;
 			}
 
 			updateGUI();
@@ -266,22 +341,25 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageGray<I>>
 	}
 
 	protected void updateGUI() {
-		final double fps = 10; // TODO write thsi for real
 		if( !noFault) {
 			numFaults++;
 			return;
 		}
 
-		showTracks = guiInfo.isShowAll();
-		showInliers = guiInfo.isShowInliers();
+		showTracks = statusPanel.isShowAll();
+		showInliers = statusPanel.isShowInliers();
 
 		if( renderedDepth == null ) {
 			renderedDepth = new BufferedImage(imageDepth.width,imageDepth.height,BufferedImage.TYPE_INT_RGB);
 		}
 
-		drawFeatures((AccessPointTracks3D)alg,bufferedRGB);
+		switch( algType) {
+			case FEATURE:
+				drawFeatures((AccessPointTracks3D)alg,bufferedRGB);
+			break;
+		}
 
-		final Se3_F64 leftToWorld = alg.getCameraToWorld().copy();
+		final Se3_F64 leftToWorld = ((Se3_F64)alg.getCameraToWorld()).copy();
 
 		// TODO magic value from kinect.  Add to config file?
 		VisualizeImageData.disparity(imageDepth, renderedDepth, 0, 10000, 0);
@@ -295,14 +373,22 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageGray<I>>
 				guiLeft.repaint();
 				guiDepth.repaint();
 
-				guiInfo.setCameraToWorld(leftToWorld);
-				guiInfo.setNumFaults(numFaults);
-				guiInfo.setNumTracks(numTracks);
-				guiInfo.setNumInliers(numInliers);
-				guiInfo.setFps(fps);
+				statusPanel.setCameraToWorld(leftToWorld);
+				statusPanel.setNumFaults(numFaults);
+
+				statusPanel.setFps(fps);
+				statusPanel.setFrameNumber(frameNumber);
+
+				statusPanel.setPaused(streamPaused);
+
+				switch( algType ) {
+					case FEATURE: {
+						featurePanel.setNumTracks(numTracks);
+						featurePanel.setNumInliers(numInliers);
+					} break;
+				}
 			}
 		});
-
 
 		double r = 0.15;
 
@@ -321,31 +407,40 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageGray<I>>
 	}
 
 
-	private DepthVisualOdometry<I,GrayU16> createVisualOdometry(int whichAlg ) {
+	private void changeSelectedAlgortihm(int whichAlg ) {
+		System.out.println("Change Selected Alg "+whichAlg);
 
-		Class imageType = getImageType(0).getImageClass();
+		this.whichAlg = whichAlg;
+		AlgType prevAlgType = this.algType;
+
+
+		Class imageType = GrayU8.class;
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		DepthSparse3D<GrayU16> sparseDepth = new DepthSparse3D.I<>(1e-3);
 
 		PkltConfig pkltConfig = new PkltConfig();
 		pkltConfig.templateRadius = 3;
-		pkltConfig.pyramidScaling = new int[]{1,2,4,8};
+		pkltConfig.pyramidScaling = new int[]{1, 2, 4, 8};
 
-		if( whichAlg == 0 ) {
-			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
+		algType = AlgType.UNKNOWN;
+		if (whichAlg == 0) {
+			algType = AlgType.FEATURE;
 
-			PointTrackerTwoPass<I> tracker = FactoryPointTrackerTwoPass.klt(pkltConfig, configDetector,
+			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600, 3, 1);
+
+			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.klt(pkltConfig, configDetector,
 					imageType, derivType);
 
-			return FactoryVisualOdometry.
+			alg = FactoryVisualOdometry.
 					depthDepthPnP(1.5, 120, 2, 200, 50, false, sparseDepth, tracker, imageType, GrayU16.class);
-		} else if( whichAlg == 1 ) {
+		} else if (whichAlg == 1) {
+			algType = AlgType.FEATURE;
 
-			ConfigGeneralDetector configExtract = new ConfigGeneralDetector(600,3,1);
+			ConfigGeneralDetector configExtract = new ConfigGeneralDetector(600, 3, 1);
 
 			GeneralFeatureDetector detector = FactoryPointTracker.createShiTomasi(configExtract, derivType);
-			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(null,imageType);
+			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(null, imageType);
 
 			ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
@@ -354,80 +449,146 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageGray<I>>
 
 			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.dda(detector, describe, associate, null, 1, imageType);
 
-			return FactoryVisualOdometry.
+			alg = FactoryVisualOdometry.
 					depthDepthPnP(1.5, 80, 3, 200, 50, false, sparseDepth, tracker, imageType, GrayU16.class);
-		} else if( whichAlg == 2 ) {
-			PointTracker<I> tracker = FactoryPointTracker.
+		} else if (whichAlg == 2) {
+			algType = AlgType.FEATURE;
+
+			PointTracker tracker = FactoryPointTracker.
 					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 1),
 							pkltConfig, 50, null, null, imageType, derivType);
 
-			PointTrackerTwoPass<I> twopass = new PointTrackerToTwoPass<>(tracker);
+			PointTrackerTwoPass twopass = new PointTrackerToTwoPass<>(tracker);
 
-			return FactoryVisualOdometry.
+			alg = FactoryVisualOdometry.
 					depthDepthPnP(1.5, 120, 3, 200, 50, false, sparseDepth, twopass, imageType, GrayU16.class);
+		} else if (whichAlg == 3) {
+			algType = AlgType.DIRECT;
+			alg = FactoryVisualOdometry.
+					depthDirect(sparseDepth, ImageType.pl(3,GrayF32.class), GrayU16.class);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}
+
+		if (algType != prevAlgType) {
+			switch( prevAlgType ) {
+				case FEATURE:
+					mainPanel.remove(featurePanel);
+					break;
+				default:
+					mainPanel.remove(algorithmPanel);
+					break;
+			}
+
+			switch (algType) {
+				case FEATURE:
+					mainPanel.add(featurePanel, BorderLayout.NORTH);
+					break;
+				default:
+					mainPanel.add(algorithmPanel, BorderLayout.NORTH);
+					break;
+			}
+			mainPanel.invalidate();
+		}
+
+		setImageTypes(alg.getVisualType(),ImageType.single(alg.getDepthType()));
 	}
 
-//	@Override
-//	protected void handleRunningStatus(int status) {
-//		final String text;
-//		final Color color;
-//
-//		switch( status ) {
-//			case 0:
-//				text = "RUNNING";
-//				color = Color.BLACK;
-//				break;
-//
-//			case 1:
-//				text = "PAUSED";
-//				color = Color.RED;
-//				break;
-//
-//			case 2:
-//				text = "FINISHED";
-//				color = Color.RED;
-//				break;
-//
-//			default:
-//				text = "UNKNOWN";
-//				color = Color.BLUE;
-//		}
-//
-//		SwingUtilities.invokeLater(new Runnable() {
-//			public void run() {
-//				guiInfo.setStatus(text,color);
-//			}});
-//	}
+	protected void handleRunningStatus(Status status) {
+		final String text;
+		final Color color;
+
+		switch( status ) {
+			case RUNNING:
+				color = Color.BLACK;
+				break;
+
+			case PAUSED:
+				color = Color.RED;
+				break;
+
+			case FINISHED:
+				color = Color.RED;
+				break;
+
+			default:
+				color = Color.BLUE;
+		}
+
+		text = status.name();
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				switch( algType ) {
+					case FEATURE:
+						featurePanel.setStatus(text,color);
+						break;
+
+					default:
+						algorithmPanel.setStatus(text,color);
+						break;
+				}
+			}});
+	}
 
 	@Override
 	public void eventVoPanel(final int view) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				if( view == 0 ) {
-					remove(guiCam3D);
-					add(guiDepth, BorderLayout.EAST);
+					imagePanel.remove(guiCam3D);
+					imagePanel.add(guiDepth);
 				} else {
-					remove(guiDepth);
-					add(guiCam3D,BorderLayout.EAST);
+					imagePanel.remove(guiDepth);
+					imagePanel.add(guiCam3D);
 				}
-				revalidate();
-				repaint();
+				imagePanel.revalidate();
+				imagePanel.repaint();
 			}});
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	@Override
+	public void handlePausedToggle() {
+		streamPaused = statusPanel.paused;
+	}
 
-		Class type = GrayF32.class;
-//		Class type = GrayU8.class;
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if( e.getSource() != selectAlgorithm )
+			return;
+
+		int which = selectAlgorithm.getSelectedIndex();
+
+		if( which == whichAlg )
+			return;
+
+		stopAllInputProcessing();
+		changeSelectedAlgortihm(which);
+		reprocessInput();
+	}
+
+	enum Status
+	{
+		RUNNING,
+		PAUSED,
+		FINISHED,
+		UNKNOWN
+	}
+
+	enum AlgType
+	{
+		UNKNOWN,
+		FEATURE,
+		DIRECT
+	}
+
+	public static void main( String args[] ) throws FileNotFoundException {
 
 		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Circle", UtilIO.pathExample("kinect/circle/config.txt")));
 		inputs.add(new PathLabel("Hallway", UtilIO.pathExample("kinect/straight/config.txt")));
 
-		VisualizeDepthVisualOdometryApp app = new VisualizeDepthVisualOdometryApp(inputs,type);
+		VisualizeDepthVisualOdometryApp app = new VisualizeDepthVisualOdometryApp(inputs);
 
 		app.openFile(new File(inputs.get(0).getPath()));
 		app.waitUntilInputSizeIsKnown();

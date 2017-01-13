@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,9 +37,6 @@ public class ImagePanel extends JPanel {
 	protected ScaleOptions scaling = ScaleOptions.DOWN;
 
 	public double scale = 1;
-
-	public static int saveCounter = 0;
-	public boolean hideSaveDialog = false;
 
 	MouseListener mouseListener;
 

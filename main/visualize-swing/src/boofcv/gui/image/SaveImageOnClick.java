@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,8 @@ import java.awt.image.BufferedImage;
  */
 public class SaveImageOnClick extends MouseAdapter {
 
-	int saveCounter = 0;
-	boolean hideSaveDialog = false;
+	private static int saveCounter = 0;
+	private static boolean hideSaveDialog = false;
 
 	Component parent;
 
