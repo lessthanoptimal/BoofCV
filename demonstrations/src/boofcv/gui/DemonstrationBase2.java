@@ -72,6 +72,9 @@ public abstract class DemonstrationBase2 extends JPanel {
 	// if a video it will stop processing the input
 	protected volatile boolean streamPaused = false;
 
+	// specifies how many frames it should move before pausing
+	protected volatile int streamStepCounter = 0;
+
 	// minimum elapsed time between the each stream frame being processed, in milliseconds
 	protected volatile long streamPeriod = 30;
 
@@ -93,7 +96,6 @@ public abstract class DemonstrationBase2 extends JPanel {
 	}
 
 	public void setImageTypes( ImageType ...defaultTypes ) {
-		System.out.println("Set Image type");
 		synchronized ( inputStreams ) {
 			inputStreams.clear();
 			for (ImageType type : defaultTypes) {
@@ -255,7 +257,6 @@ public abstract class DemonstrationBase2 extends JPanel {
 	 * be stopped.
 	 */
 	public void openFile(File file) {
-		System.out.println("Open File");
 		// maybe it's an example file
 		if( !file.exists() ) {
 			file = new File(UtilIO.pathExample(file.getPath()));
@@ -280,7 +281,6 @@ public abstract class DemonstrationBase2 extends JPanel {
 	 * Before invoking this function make sure waitingToOpenImage is false AND that the previous input has beens topped
 	 */
 	protected void openVideo(String ...filePaths) {
-		System.out.println("Open Video");
 		synchronized (lockStartingProcess) {
 			if( startingProcess ) {
 				System.out.println("Ignoring video request.  Detected spamming");
@@ -534,8 +534,14 @@ public abstract class DemonstrationBase2 extends JPanel {
 				}
 				before = System.currentTimeMillis();
 
+				if( streamStepCounter > 0 ) {
+					if( --streamStepCounter == 0 )
+						streamPaused = true;
+				}
+
 				// Check to see if paused and wait
 				if( streamPaused && inputMethod == InputMethod.VIDEO ) {
+					enterPausedState();
 					while( streamPaused && !requestStop ) {
 						try {Thread.sleep(5);} catch (InterruptedException ignore) {}
 					}
@@ -551,6 +557,8 @@ public abstract class DemonstrationBase2 extends JPanel {
 			running = false;
 		}
 	}
+
+	protected void enterPausedState() {}
 
 	/**
 	 * If just a single image was processed it will process it again.  If it's a stream

@@ -55,15 +55,14 @@ public class CacheSequenceStream<T extends ImageBase<T>> {
 	}
 
 	public void setSequence(SimpleImageSequence<T> sequence) {
-		System.out.println("Set Sequence");
 		this.sequence = sequence;
 	}
 
 	public void reset() {
-		System.out.println("Reset");
 		selected = 0;
 		sequence = null;
 	}
+
 	public boolean hasNext() {
 		return sequence.hasNext();
 	}

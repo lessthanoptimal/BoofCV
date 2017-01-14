@@ -30,7 +30,6 @@ import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.DepthVisualOdometry;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.associate.FactoryAssociation;
@@ -54,7 +53,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.RowMatrix_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -69,40 +67,15 @@ import java.util.List;
 /**
  * Visualizes data from
  *
- * GUI changes:
- *
- * ---------------------
- * View [select]  -> Warp view added for direct
- * Frame #
- * FPS / MAX FPS
- * Faults
- * ----------------
- * Pause/Resume
- * Stop At Frame
- * ----------------
- * integral
- * origin
- * Angle
- * ----------------
- *
- *
- * Status bar above graphics
- * -----------------
- * Algorithm specific
- * Tracks, Inliers, # key frames
- * --
- * Fraction Pixels, Fraction In View, # key frames
- *
  *
  * @author Peter Abeles
  */
-// TODO Add step
+
 // TODO Show keyframe counter
 // TODO custom visualization for direct method
 // TODO   - Show image unwarping
 // TODO   - Show depth of pixel that is in view
 // TODO add algorithm specific tuning parameters?
-	// TODO Split panel
 public class VisualizeDepthVisualOdometryApp
 		extends DemonstrationBase2 implements VisualOdometryPanel2.Listener, ActionListener
 {
@@ -111,7 +84,7 @@ public class VisualizeDepthVisualOdometryApp
 	VisualOdometryFeatureTrackerPanel featurePanel;
 
 	JPanel mainPanel = new JPanel();
-	JPanel imagePanel = new JPanel();
+	JSplitPane viewPanel;
 	ImagePanel guiLeft;
 	ImagePanel guiDepth;
 	Polygon3DSequenceViewer guiCam3D;
@@ -162,15 +135,14 @@ public class VisualizeDepthVisualOdometryApp
 		guiDepth = new ImagePanel();
 		guiCam3D = new Polygon3DSequenceViewer();
 
-		imagePanel.setLayout(new BoxLayout(imagePanel,BoxLayout.X_AXIS));
-		imagePanel.add(guiLeft);
-		imagePanel.add(guiDepth);
+		viewPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+				guiLeft, guiDepth);
 
 		algorithmPanel = new VisualOdometryAlgorithmPanel();
 		featurePanel = new VisualOdometryFeatureTrackerPanel();
 
 		mainPanel.setLayout(new BorderLayout());
-		mainPanel.add(imagePanel, BorderLayout.CENTER);
+		mainPanel.add(viewPanel, BorderLayout.CENTER);
 		mainPanel.add(algorithmPanel, BorderLayout.NORTH);
 
 		add(statusPanel, BorderLayout.WEST);
@@ -180,7 +152,6 @@ public class VisualizeDepthVisualOdometryApp
 		statusPanel.setListener(this);
 
 		changeSelectedAlgortihm(0);
-		System.out.println("-------------------- EXIT CONSTRUCTOR ");
 	}
 
 	@Override
@@ -220,26 +191,26 @@ public class VisualizeDepthVisualOdometryApp
 	protected void handleInputChange(int source, InputMethod method, int width, int height) {
 		if( source != 0 )
 			return;
-		System.out.println("----------------- Handle Input Change");
 
 		fps = -1;
 		numFaults = 0;
 		frameNumber = 0;
+		alg.reset();
 		alg.setCalibration(config.visualParam,new DoNothing2Transform2_F32());
 
 		statusPanel.reset();
 
 		handleRunningStatus(Status.RUNNING);
 
-		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(config.visualParam,(RowMatrix_F64)null);
 		guiCam3D.init();
-		guiCam3D.setK(K);
+		guiCam3D.setFocalLength(300);
 		guiCam3D.setStepSize(0.05);
 		guiCam3D.setPreferredSize(new Dimension(config.visualParam.width, config.visualParam.height));
 //		guiCam3D.setMaximumSize(guiCam3D.getPreferredSize());
 
-		imagePanel.setPreferredSize(new Dimension(width*2+10, height));
-		imagePanel.setMaximumSize(imagePanel.getPreferredSize());
+		viewPanel.setPreferredSize(new Dimension(width*2+20, height));
+		viewPanel.setDividerLocation(width);
+		viewPanel.setMaximumSize(viewPanel.getPreferredSize());
 	}
 
 	@Override
@@ -299,6 +270,8 @@ public class VisualizeDepthVisualOdometryApp
 
 		numTracks = points.size();
 
+
+
 //		g2.setColor(Color.BLACK);
 //		g2.fillRect(25,15,80,45);
 //		g2.setColor(Color.CYAN);
@@ -332,7 +305,7 @@ public class VisualizeDepthVisualOdometryApp
 				guiCam3D.init();
 			}
 
-			if( frameNumber == statusPanel.getStopFrame()) {
+			if( frameNumber-1 == statusPanel.getStopFrame()) {
 				streamPaused = true;
 			}
 
@@ -377,7 +350,7 @@ public class VisualizeDepthVisualOdometryApp
 				statusPanel.setNumFaults(numFaults);
 
 				statusPanel.setFps(fps);
-				statusPanel.setFrameNumber(frameNumber);
+				statusPanel.setFrameNumber(frameNumber-1);
 
 				statusPanel.setPaused(streamPaused);
 
@@ -408,7 +381,6 @@ public class VisualizeDepthVisualOdometryApp
 
 
 	private void changeSelectedAlgortihm(int whichAlg ) {
-		System.out.println("Change Selected Alg "+whichAlg);
 
 		this.whichAlg = whichAlg;
 		AlgType prevAlgType = this.algType;
@@ -536,20 +508,36 @@ public class VisualizeDepthVisualOdometryApp
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				if( view == 0 ) {
-					imagePanel.remove(guiCam3D);
-					imagePanel.add(guiDepth);
+					viewPanel.setRightComponent(guiDepth);
 				} else {
-					imagePanel.remove(guiDepth);
-					imagePanel.add(guiCam3D);
+					viewPanel.setRightComponent(guiCam3D);
 				}
-				imagePanel.revalidate();
-				imagePanel.repaint();
+				viewPanel.revalidate();
+				viewPanel.repaint();
 			}});
 	}
 
 	@Override
 	public void handlePausedToggle() {
 		streamPaused = statusPanel.paused;
+	}
+
+	@Override
+	public void handleStep() {
+		if( streamPaused ) {
+			streamPaused = false;
+		}
+		streamStepCounter = 1;
+	}
+
+	@Override
+	protected void enterPausedState() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				statusPanel.setPaused(true);
+			}
+		});
 	}
 
 	@Override

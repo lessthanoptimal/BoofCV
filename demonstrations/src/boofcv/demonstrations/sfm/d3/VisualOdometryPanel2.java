@@ -55,6 +55,7 @@ public class VisualOdometryPanel2
 
 	JSpinner spinnerStopFrame;
 	JButton buttonPause = new JButton("Pause");
+	JButton buttonStep = new JButton("Step");
 
 	boolean setShowAll = true;
 	boolean setShowInliers = false;
@@ -96,9 +97,11 @@ public class VisualOdometryPanel2
 		spinnerStopFrame.addChangeListener(this);
 		spinnerStopFrame.setMaximumSize(spinnerStopFrame.getPreferredSize());
 		buttonPause.addActionListener(this);
+		buttonStep.addActionListener(this);
 
 		addLabeled(selectView,  "View", this);
 		addAlignCenter(buttonPause, this);
+		addAlignCenter(buttonStep, this);
 		addSeparator(150);
 		addLabeled(displayFrameNumber, "Frame", this);
 		addLabeled(displayFps, "FPS", this);
@@ -201,6 +204,8 @@ public class VisualOdometryPanel2
 		} else if( e.getSource() == buttonPause ) {
 			setPaused( !paused );
 			listener.handlePausedToggle();
+		} else if( e.getSource() == buttonStep ) {
+			listener.handleStep();
 		}
 	}
 
@@ -226,6 +231,8 @@ public class VisualOdometryPanel2
 		void eventVoPanel(int view);
 
 		void handlePausedToggle();
+
+		void handleStep();
 	}
 
 	public static enum Type {

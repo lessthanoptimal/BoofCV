@@ -36,7 +36,8 @@ public class VisualOdometryAlgorithmPanel extends StandardAlgConfigPanel
 		displayStatus = new JLabel("Default Label");
 		displayStatus.setFont(new Font("Dialog",Font.BOLD,16));
 
-		addAlignLeft(displayStatus, this);
+		add(displayStatus);
+		add(Box.createRigidArea(new Dimension(10,8)));
 	}
 
 	public void setStatus( String text , Color color ) {

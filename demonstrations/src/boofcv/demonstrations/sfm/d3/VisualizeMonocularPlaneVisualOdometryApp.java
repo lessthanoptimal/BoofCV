@@ -23,7 +23,6 @@ import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.MonocularPlaneVisualOdometry;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
@@ -44,7 +43,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.RowMatrix_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -276,9 +274,8 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 
 		handleRunningStatus(2);
 
-		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(config.intrinsic, (RowMatrix_F64)null);
 		guiCam3D.init();
-		guiCam3D.setK(K);
+		guiCam3D.setFocalLength(300);
 		guiCam3D.setStepSize(1);
 		guiCam3D.setPreferredSize(new Dimension(config.intrinsic.width, config.intrinsic.height));
 		guiCam3D.setMaximumSize(guiCam3D.getPreferredSize());
@@ -290,7 +287,6 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 	private MonocularPlaneVisualOdometry<I> createVisualOdometry( int whichAlg ) {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageClass);
-
 
 		if( whichAlg == 0 ) {
 			PkltConfig config = new PkltConfig();

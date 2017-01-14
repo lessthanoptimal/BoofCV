@@ -38,7 +38,6 @@ import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -65,7 +64,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.RowMatrix_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -267,9 +265,8 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 		handleRunningStatus(2);
 
 		CameraPinholeRadial right = config.right;
-		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(config.left, (RowMatrix_F64)null);
 		guiCam3D.init();
-		guiCam3D.setK(K);
+		guiCam3D.setFocalLength(300);
 		guiCam3D.setStepSize(config.getBaseline());
 		guiCam3D.setPreferredSize(new Dimension(right.width, right.height));
 		guiCam3D.setMaximumSize(guiCam3D.getPreferredSize());

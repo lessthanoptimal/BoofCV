@@ -53,6 +53,7 @@ Version : 0.27
 - Android
   * ConvertBitmap will reshape BoofCV images to match the input Bitmap when converting
   * TODO rename multi to planar and other references to old naming
+- Fixed visual odometry path viewer so that the camera behaves in a same fashion when the window is resized
 
 - TODO Visualization tools for Direct VO
 -      Show warped image

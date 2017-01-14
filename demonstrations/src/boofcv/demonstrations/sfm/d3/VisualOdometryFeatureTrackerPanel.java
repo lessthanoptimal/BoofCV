@@ -28,12 +28,11 @@ public class VisualOdometryFeatureTrackerPanel extends VisualOdometryAlgorithmPa
 	JTextArea displayInliers;
 
 	public VisualOdometryFeatureTrackerPanel() {
-		super();
 		displayTracks = createTextInfo();
 		displayInliers = createTextInfo();
 
-		addLabeled(displayTracks,  "Tracks", this);
-		addLabeled(displayInliers, "Inliers", this);
+		addLabeledV(displayTracks,  "Tracks", this);
+		addLabeledV(displayInliers, "Inliers", this);
 		addHorizontalGlue(this);
 	}
 
