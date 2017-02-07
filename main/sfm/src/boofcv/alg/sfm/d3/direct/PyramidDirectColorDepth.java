@@ -49,7 +49,7 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 	// When the diversity of the image drops below this fraction of the key frame create a new keyframe
 	private double diversityThreshold = 0.75;
 	private double keyframeDiversity; // diversity of the keyframe
-	private double diversity; // diveresity of the current frame
+	private double diversity; // diversity of the current frame
 
 	// number of pixels which were valid in the last layer processed
 	private double fractionInBounds = 0;
@@ -194,6 +194,10 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 
 	public void setDiversityThreshold(double diversityThreshold) {
 		this.diversityThreshold = diversityThreshold;
+	}
+
+	public double getFractionInBounds() {
+		return fractionInBounds;
 	}
 
 	public static class LayerTo3D implements ImagePixelTo3D {

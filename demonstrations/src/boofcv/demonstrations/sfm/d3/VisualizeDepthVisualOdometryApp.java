@@ -28,6 +28,7 @@ import boofcv.abst.feature.tracker.PointTrackerToTwoPass;
 import boofcv.abst.feature.tracker.PointTrackerTwoPass;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.DepthVisualOdometry;
+import boofcv.abst.sfm.d3.PyramidDirectColorDepth_to_DepthVisualOdometry;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.sfm.DepthSparse3D;
@@ -71,17 +72,21 @@ import java.util.List;
  * @author Peter Abeles
  */
 
-// TODO Show keyframe counter
 // TODO custom visualization for direct method
+// TODO   - Key Fraction - Diversity - Key Frames
 // TODO   - Show image unwarping
 // TODO   - Show depth of pixel that is in view
 // TODO add algorithm specific tuning parameters?
+// TODO Add feature point cloud to VO view?
+// TODO Click on polygon to get the frame it was generated from?
+// TODO Add log to file option for location and 3D cloud
 public class VisualizeDepthVisualOdometryApp
 		extends DemonstrationBase2 implements VisualOdometryPanel2.Listener, ActionListener
 {
 	VisualOdometryPanel2 statusPanel;
 	VisualOdometryAlgorithmPanel algorithmPanel;
 	VisualOdometryFeatureTrackerPanel featurePanel;
+	VisualOdometryDirectPanel directPanel;
 
 	JPanel mainPanel = new JPanel();
 	JSplitPane viewPanel;
@@ -101,6 +106,7 @@ public class VisualizeDepthVisualOdometryApp
 	int numFaults;
 	int numTracks;
 	int numInliers;
+	double fractionInBounds;
 	int whichAlg=-1;
 
 	AlgType algType = AlgType.UNKNOWN;
@@ -140,6 +146,7 @@ public class VisualizeDepthVisualOdometryApp
 
 		algorithmPanel = new VisualOdometryAlgorithmPanel();
 		featurePanel = new VisualOdometryFeatureTrackerPanel();
+		directPanel = new VisualOdometryDirectPanel();
 
 		mainPanel.setLayout(new BorderLayout());
 		mainPanel.add(viewPanel, BorderLayout.CENTER);
@@ -206,7 +213,6 @@ public class VisualizeDepthVisualOdometryApp
 		guiCam3D.setFocalLength(300);
 		guiCam3D.setStepSize(0.05);
 		guiCam3D.setPreferredSize(new Dimension(config.visualParam.width, config.visualParam.height));
-//		guiCam3D.setMaximumSize(guiCam3D.getPreferredSize());
 
 		viewPanel.setPreferredSize(new Dimension(width*2+20, height));
 		viewPanel.setDividerLocation(width);
@@ -330,6 +336,10 @@ public class VisualizeDepthVisualOdometryApp
 			case FEATURE:
 				drawFeatures((AccessPointTracks3D)alg,bufferedRGB);
 			break;
+
+			case DIRECT:
+				fractionInBounds = ((PyramidDirectColorDepth_to_DepthVisualOdometry)alg).getFractionInBounds();
+				break;
 		}
 
 		final Se3_F64 leftToWorld = ((Se3_F64)alg.getCameraToWorld()).copy();
@@ -358,6 +368,10 @@ public class VisualizeDepthVisualOdometryApp
 					case FEATURE: {
 						featurePanel.setNumTracks(numTracks);
 						featurePanel.setNumInliers(numInliers);
+					} break;
+
+					case DIRECT: {
+						directPanel.setInBounds(fractionInBounds);
 					} break;
 				}
 			}
@@ -447,6 +461,11 @@ public class VisualizeDepthVisualOdometryApp
 				case FEATURE:
 					mainPanel.remove(featurePanel);
 					break;
+
+				case DIRECT:
+					mainPanel.remove(directPanel);
+					break;
+
 				default:
 					mainPanel.remove(algorithmPanel);
 					break;
@@ -455,6 +474,9 @@ public class VisualizeDepthVisualOdometryApp
 			switch (algType) {
 				case FEATURE:
 					mainPanel.add(featurePanel, BorderLayout.NORTH);
+					break;
+				case DIRECT:
+					mainPanel.add(directPanel, BorderLayout.NORTH);
 					break;
 				default:
 					mainPanel.add(algorithmPanel, BorderLayout.NORTH);
@@ -494,6 +516,10 @@ public class VisualizeDepthVisualOdometryApp
 				switch( algType ) {
 					case FEATURE:
 						featurePanel.setStatus(text,color);
+						break;
+
+					case DIRECT:
+						directPanel.setStatus(text,color);
 						break;
 
 					default:
