@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -146,22 +146,29 @@ public class FactoryMultiView {
 	 * @param which Specifies which algorithm is to be created
 	 * @return Fundamental or essential estimation algorithm that returns multiple hypotheses.
 	 */
-	public static EstimateNofEpipolar computeFundamental_N( EnumEpipolar which )
+	public static EstimateNofEpipolar computeFundamental_N( EnumFundamental which )
 	{
 		switch( which ) {
-			case FUNDAMENTAL_8_LINEAR:
+			case LINEAR_8:
 				return new Estimate1toNofEpipolar(new WrapFundamentalLinear8(true));
 
-			case ESSENTIAL_8_LINEAR:
+			case LINEAR_7:
+				return new WrapFundamentalLinear7(true);
+		}
+
+		throw new IllegalArgumentException("Unknown algorithm "+which);
+	}
+
+	public static EstimateNofEpipolar computeEssential_N( EnumEssential which )
+	{
+		switch( which ) {
+			case LINEAR_8:
 				return new Estimate1toNofEpipolar(new WrapFundamentalLinear8(false));
 
-			case FUNDAMENTAL_7_LINEAR:
-				return new WrapFundamentalLinear7(true);
-
-			case ESSENTIAL_7_LINEAR:
+			case LINEAR_7:
 				return new WrapFundamentalLinear7(false);
 
-			case ESSENTIAL_5_NISTER:
+			case NISTER_5:
 				return new WrapEssentialNister5();
 		}
 
@@ -200,20 +207,33 @@ public class FactoryMultiView {
 	 * @param numRemoveAmbiguity Number of sample points used to prune hypotheses. Ignored if only a single solution.
 	 * @return Fundamental or essential estimation algorithm that returns a single hypothesis.
 	 */
-	public static Estimate1ofEpipolar computeFundamental_1( EnumEpipolar which, int numRemoveAmbiguity)
+	public static Estimate1ofEpipolar computeFundamental_1( EnumFundamental which, int numRemoveAmbiguity)
 	{
 		switch( which ) {
-			case FUNDAMENTAL_8_LINEAR:
+			case LINEAR_8:
 				return new WrapFundamentalLinear8(true);
-
-			case ESSENTIAL_8_LINEAR:
-				return new WrapFundamentalLinear8(false);
 		}
 
 		if( numRemoveAmbiguity <= 0 )
 			throw new IllegalArgumentException("numRemoveAmbiguity must be greater than zero");
 
 		EstimateNofEpipolar alg = computeFundamental_N(which);
+		DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
+
+		return new EstimateNto1ofEpipolar(alg,distance,numRemoveAmbiguity);
+	}
+
+	public static Estimate1ofEpipolar computeEssential_1( EnumEssential which, int numRemoveAmbiguity)
+	{
+		switch( which ) {
+			case LINEAR_8:
+				return new WrapFundamentalLinear8(false);
+		}
+
+		if( numRemoveAmbiguity <= 0 )
+			throw new IllegalArgumentException("numRemoveAmbiguity must be greater than zero");
+
+		EstimateNofEpipolar alg = computeEssential_N(which);
 		DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
 
 		return new EstimateNto1ofEpipolar(alg,distance,numRemoveAmbiguity);

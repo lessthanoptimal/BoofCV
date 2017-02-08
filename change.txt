@@ -54,6 +54,9 @@ Version : 0.27
   * ConvertBitmap will reshape BoofCV images to match the input Bitmap when converting
   * TODO rename multi to planar and other references to old naming
 - Fixed visual odometry path viewer so that the camera behaves in a same fashion when the window is resized
+- Multi View
+  * Split EnumEpiloar into EnumFundamental and EnumEssential to make it clearer
+  * Updated functions in FactoryMultiViewRobust for change
 
 - TODO Visualization tools for Direct VO
 -      Show warped image
@@ -65,8 +68,6 @@ Version : 0.27
 - TODO Calibration application.  Select output format: BoofCV, OpenCV
 - TODO Tutorial on image features?  Sparse and dense?
 - TODO Don't forget to change BoofCV version referenced in Android example
-- TODO split EnumEpipolar into fundamental and essential
-- TODO Add a fundamental to FactoryMultiViewRobust
 - TODO Look at AKAZE feature
 ---------------------------------------------
 Date    : 2016/12/07

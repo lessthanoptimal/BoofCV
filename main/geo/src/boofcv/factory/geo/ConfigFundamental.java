@@ -22,16 +22,16 @@ import boofcv.struct.Configuration;
 import boofcv.struct.calib.CameraPinholeRadial;
 
 /**
- * Configuration parameters for estimating an essential matrix robustly.
+ * Configuration parameters for estimating a fundamental matrix robustly.
  *
  * @author Peter Abeles
  */
-public class ConfigEssential implements Configuration {
+public class ConfigFundamental implements Configuration {
 
 	/**
-	 * Which algorithm should it use.  Only use essential matrix ones.
+	 * Which algorithm should it use.
 	 */
-	public EnumEssential which = EnumEssential.NISTER_5;
+	public EnumFundamental which = EnumFundamental.LINEAR_7;
 
 	/**
 	 * How many points should be used to resolve ambiguity in the solutions?
@@ -43,15 +43,14 @@ public class ConfigEssential implements Configuration {
 	 */
 	public CameraPinholeRadial intrinsic;
 
-	public ConfigEssential(CameraPinholeRadial intrinsic) {
+	public ConfigFundamental(CameraPinholeRadial intrinsic) {
 		this.intrinsic = intrinsic;
 	}
 
-	public ConfigEssential() {
+	public ConfigFundamental() {
 	}
 
 	@Override
 	public void checkValidity() {
-
 	}
 }

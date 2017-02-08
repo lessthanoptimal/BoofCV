@@ -20,7 +20,7 @@ package boofcv.alg.geo.robust;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.factory.geo.EnumEpipolar;
+import boofcv.factory.geo.EnumFundamental;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -73,7 +73,7 @@ public class TestSe3FromEssentialGenerator {
 		}
 
 		// create alg
-		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeFundamental_1(EnumEpipolar.FUNDAMENTAL_8_LINEAR, 0);
+		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeFundamental_1(EnumFundamental.LINEAR_8, 0);
 		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 
 		Se3FromEssentialGenerator alg = new Se3FromEssentialGenerator(essentialAlg,triangulate);

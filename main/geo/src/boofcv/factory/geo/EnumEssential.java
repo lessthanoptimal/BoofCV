@@ -18,40 +18,40 @@
 
 package boofcv.factory.geo;
 
-import boofcv.struct.Configuration;
-import boofcv.struct.calib.CameraPinholeRadial;
-
 /**
- * Configuration parameters for estimating an essential matrix robustly.
+ * List of different algorithms for estimating Essential matrices
  *
  * @author Peter Abeles
  */
-public class ConfigEssential implements Configuration {
-
+public enum EnumEssential {
 	/**
-	 * Which algorithm should it use.  Only use essential matrix ones.
+	 * <ul>
+	 *     <li> 8 or more points
+	 *     <li> Single solution
+	 *     <li> Calibrated camera
+	 * </ul>
+	 *
+	 * @see boofcv.alg.geo.f.FundamentalLinear8
 	 */
-	public EnumEssential which = EnumEssential.NISTER_5;
-
+	LINEAR_8,
 	/**
-	 * How many points should be used to resolve ambiguity in the solutions?
+	 * <ul>
+	 *     <li> Exactly 7 points
+	 *     <li> Multiple solutions
+	 *     <li> Calibrated camera
+	 * </ul>
+	 *
+	 * @see boofcv.alg.geo.f.FundamentalLinear7
 	 */
-	public int numResolve = 2;
-
+	LINEAR_7,
 	/**
-	 * Intrinsic camera parameters.  Used to compute error in pixels.
+	 * <ul>
+	 *     <li> Exactly 5 points (minimal solution)
+	 *     <li> Multiple solutions
+	 *     <li> Calibrated camera
+	 * </ul>
+	 *
+	 * @see boofcv.alg.geo.f.EssentialNister5
 	 */
-	public CameraPinholeRadial intrinsic;
-
-	public ConfigEssential(CameraPinholeRadial intrinsic) {
-		this.intrinsic = intrinsic;
-	}
-
-	public ConfigEssential() {
-	}
-
-	@Override
-	public void checkValidity() {
-
-	}
+	NISTER_5
 }

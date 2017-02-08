@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -122,13 +122,30 @@ public class FactoryMultiViewRobust {
 		essential.checkValidity();
 
 		Estimate1ofEpipolar essentialAlg = FactoryMultiView.
-				computeFundamental_1(essential.which, essential.numResolve);
+				computeEssential_1(essential.which, essential.numResolve);
+
+		return epipolarLMedS(essentialAlg, essential.intrinsic, lmeds);
+
+	}
+
+	public static LeastMedianOfSquares<Se3_F64, AssociatedPair> fundamentalLMedS( ConfigEssential fundamental,
+																				  ConfigLMedS lmeds ) {
+
+		fundamental.checkValidity();
+
+		Estimate1ofEpipolar essentialAlg = FactoryMultiView.
+				computeEssential_1(fundamental.which, fundamental.numResolve);
+
+		return epipolarLMedS(essentialAlg, fundamental.intrinsic, lmeds);
+	}
+
+	private static LeastMedianOfSquares<Se3_F64, AssociatedPair> epipolarLMedS( Estimate1ofEpipolar epipolar,
+																				CameraPinholeRadial intrinsic,
+																				ConfigLMedS lmeds ) {
 		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
-				new Se3FromEssentialGenerator(essentialAlg, triangulate);
-
-		CameraPinholeRadial intrinsic = essential.intrinsic;
+				new Se3FromEssentialGenerator(epipolar, triangulate);
 
 		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
 				new DistanceSe3SymmetricSq(triangulate,
@@ -138,7 +155,6 @@ public class FactoryMultiViewRobust {
 
 		return new LeastMedianOfSquares<>
 				(lmeds.randSeed, lmeds.totalCycles, manager, generateEpipolarMotion, distanceSe3);
-
 	}
 
 	/**
@@ -158,13 +174,31 @@ public class FactoryMultiViewRobust {
 		ransac.checkValidity();
 
 		Estimate1ofEpipolar essentialAlg = FactoryMultiView.
+				computeEssential_1(essential.which, essential.numResolve);
+
+		return epipolarRansac(essentialAlg, essential.intrinsic, ransac);
+	}
+
+	public static Ransac<Se3_F64, AssociatedPair> fundamentalRansac( ConfigFundamental essential,
+																	 ConfigRansac ransac ) {
+
+		essential.checkValidity();
+		ransac.checkValidity();
+
+		Estimate1ofEpipolar essentialAlg = FactoryMultiView.
 				computeFundamental_1(essential.which, essential.numResolve);
+
+		return epipolarRansac(essentialAlg, essential.intrinsic, ransac);
+	}
+
+	private static Ransac<Se3_F64, AssociatedPair> epipolarRansac(Estimate1ofEpipolar epipolar,
+																 CameraPinholeRadial intrinsic,
+																 ConfigRansac ransac ) {
+
 		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
-				new Se3FromEssentialGenerator(essentialAlg, triangulate);
-
-		CameraPinholeRadial intrinsic = essential.intrinsic;
+				new Se3FromEssentialGenerator(epipolar, triangulate);
 
 		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
 				new DistanceSe3SymmetricSq(triangulate,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ package boofcv.factory.geo;
  *
  * @author Peter Abeles
  */
-public enum EnumEpipolar {
+public enum EnumFundamental {
 
 	/**
 	 * <ul>
@@ -34,7 +34,7 @@ public enum EnumEpipolar {
 	 *
 	 * @see boofcv.alg.geo.f.FundamentalLinear8
 	 */
-	FUNDAMENTAL_8_LINEAR,
+	LINEAR_8,
 	/**
 	 * <ul>
 	 *     <li> Exactly 7 points
@@ -44,36 +44,6 @@ public enum EnumEpipolar {
 	 *
 	 * @see boofcv.alg.geo.f.FundamentalLinear7
 	 */
-	FUNDAMENTAL_7_LINEAR,
-	/**
-	 * <ul>
-	 *     <li> 8 or more points
-	 *     <li> Single solution
-	 *     <li> Calibrated camera
-	 * </ul>
-	 *
-	 * @see boofcv.alg.geo.f.FundamentalLinear8
-	 */
-	ESSENTIAL_8_LINEAR,
-	/**
-	 * <ul>
-	 *     <li> Exactly 7 points
-	 *     <li> Multiple solutions
-	 *     <li> Calibrated camera
-	 * </ul>
-	 *
-	 * @see boofcv.alg.geo.f.FundamentalLinear7
-	 */
-	ESSENTIAL_7_LINEAR,
-	/**
-	 * <ul>
-	 *     <li> Exactly 5 points (minimal solution)
-	 *     <li> Multiple solutions
-	 *     <li> Calibrated camera
-	 * </ul>
-	 *
-	 * @see boofcv.alg.geo.f.EssentialNister5
-	 */
-	ESSENTIAL_5_NISTER
+	LINEAR_7,
 
 }
