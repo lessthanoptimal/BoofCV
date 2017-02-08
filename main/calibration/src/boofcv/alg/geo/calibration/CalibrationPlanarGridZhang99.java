@@ -23,7 +23,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,14 +133,14 @@ public class CalibrationPlanarGridZhang99 {
 	protected Zhang99ParamAll initialParam( List<CalibrationObservation> observations )
 	{
 		status("Estimating Homographies");
-		List<RowMatrix_F64> homographies = new ArrayList<>();
+		List<DMatrixRMaj> homographies = new ArrayList<>();
 		List<Se3_F64> motions = new ArrayList<>();
 
 		for( CalibrationObservation obs : observations ) {
 			if( !computeHomography.computeHomography(obs) )
 				return null;
 
-			RowMatrix_F64 H = computeHomography.getHomography();
+			DMatrixRMaj H = computeHomography.getHomography();
 
 			homographies.add(H);
 		}
@@ -148,10 +148,10 @@ public class CalibrationPlanarGridZhang99 {
 		status("Estimating Calibration Matrix");
 		computeK.process(homographies);
 
-		RowMatrix_F64 K = computeK.getCalibrationMatrix();
+		DMatrixRMaj K = computeK.getCalibrationMatrix();
 
 		decomposeH.setCalibrationMatrix(K);
-		for( RowMatrix_F64 H : homographies ) {
+		for( DMatrixRMaj H : homographies ) {
 			motions.add(decomposeH.decompose(H));
 		}
 
@@ -225,7 +225,7 @@ public class CalibrationPlanarGridZhang99 {
 	 * Converts results fond in the linear algorithms into {@link Zhang99ParamAll}
 	 */
 	public static Zhang99ParamAll convertIntoZhangParam(List<Se3_F64> motions,
-														  RowMatrix_F64 K,
+														  DMatrixRMaj K,
 														  boolean assumeZeroSkew,
 														  double[] distort,
 														  boolean includeTangential ) {

@@ -20,7 +20,7 @@ package boofcv.alg.geo.pose;
 
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
@@ -65,7 +65,7 @@ public class UtilLepetitEPnP {
 	/**
 	 * Extracts the linear constraint matrix for case 1 from the full 6x10 constraint matrix.
 	 */
-	public static void constraintMatrix6x4( RowMatrix_F64 L_6x10 , RowMatrix_F64 L_6x4 ) {
+	public static void constraintMatrix6x4( DMatrixRMaj L_6x10 , DMatrixRMaj L_6x4 ) {
 
 		int index = 0;
 		for( int i = 0; i < 6; i++ ) {
@@ -79,7 +79,7 @@ public class UtilLepetitEPnP {
 	/**
 	 * Extracts the linear constraint matrix for case 2 from the full 6x10 constraint matrix.
 	 */
-	public static void constraintMatrix6x3( RowMatrix_F64 L_6x10 , RowMatrix_F64 L_6x3 ) {
+	public static void constraintMatrix6x3( DMatrixRMaj L_6x10 , DMatrixRMaj L_6x3 ) {
 
 		int index = 0;
 		for( int i = 0; i < 6; i++ ) {
@@ -92,7 +92,7 @@ public class UtilLepetitEPnP {
 	/**
 	 * Extracts the linear constraint matrix for case 3 from the full 6x10 constraint matrix.
 	 */
-	public static void constraintMatrix6x6( RowMatrix_F64 L_6x10 , RowMatrix_F64 L_6x6 ) {
+	public static void constraintMatrix6x6( DMatrixRMaj L_6x10 , DMatrixRMaj L_6x6 ) {
 
 		int index = 0;
 		for( int i = 0; i < 6; i++ ) {
@@ -113,7 +113,7 @@ public class UtilLepetitEPnP {
 	 * @param controlWorldPts List of world control points
 	 * @param nullPts Null points
 	 */
-	public static void constraintMatrix6x10( RowMatrix_F64 L , RowMatrix_F64 y ,
+	public static void constraintMatrix6x10( DMatrixRMaj L , DMatrixRMaj y ,
 											 FastQueue<Point3D_F64> controlWorldPts ,
 											 List<Point3D_F64> nullPts[] ) {
 		int row = 0;
@@ -178,7 +178,7 @@ public class UtilLepetitEPnP {
 	/**
 	 * Extracts the linear constraint matrix for case 1 from the full 6x10 constraint matrix.
 	 */
-	public static void constraintMatrix3x3a( RowMatrix_F64 L_3x6 , RowMatrix_F64 L_3x3 ) {
+	public static void constraintMatrix3x3a( DMatrixRMaj L_3x6 , DMatrixRMaj L_3x3 ) {
 
 		int index = 0;
 		for( int i = 0; i < 3; i++ ) {
@@ -191,8 +191,8 @@ public class UtilLepetitEPnP {
 	/**
 	 * Extracts the linear constraint matrix for planar case 2 from the full 4x6 constraint matrix.
 	 */
-	public static void constraintMatrix3x3( RowMatrix_F64 L_3x6 ,
-											RowMatrix_F64 L_6x3 ) {
+	public static void constraintMatrix3x3( DMatrixRMaj L_3x6 ,
+											DMatrixRMaj L_6x3 ) {
 
 		int index = 0;
 		for( int i = 0; i < 3; i++ ) {
@@ -210,7 +210,7 @@ public class UtilLepetitEPnP {
 	 * @param controlWorldPts List of world control points
 	 * @param nullPts Null points
 	 */
-	public static void constraintMatrix3x6( RowMatrix_F64 L , RowMatrix_F64 y ,
+	public static void constraintMatrix3x6( DMatrixRMaj L , DMatrixRMaj y ,
 											FastQueue<Point3D_F64> controlWorldPts ,
 											List<Point3D_F64> nullPts[] ) {
 		int row = 0;
@@ -261,7 +261,7 @@ public class UtilLepetitEPnP {
 	/**
 	 * Computes the residuals (difference between observed and predicted) given 4 control points.
 	 */
-	public static void residuals_Control4( RowMatrix_F64 L_full , RowMatrix_F64 y ,
+	public static void residuals_Control4( DMatrixRMaj L_full , DMatrixRMaj y ,
 										   double beta[] , double r[] )
 	{
 		double b0 = beta[0]; double b1 = beta[1]; double b2 = beta[2]; double b3 = beta[3];
@@ -289,7 +289,7 @@ public class UtilLepetitEPnP {
 	/**
 	 * Computes the residuals (difference between observed and predicted given 3 control points.
 	 */
-	public static void residuals_Control3( RowMatrix_F64 L_full , RowMatrix_F64 y ,
+	public static void residuals_Control3( DMatrixRMaj L_full , DMatrixRMaj y ,
 										   double beta[] , double r[] )
 	{
 		double b0 = beta[0]; double b1 = beta[1]; double b2 = beta[2];
@@ -313,8 +313,8 @@ public class UtilLepetitEPnP {
 	/**
 	 * Computes the Jacobian given 4 control points.
 	 */
-	public static void jacobian_Control4( RowMatrix_F64 L_full ,
-										  double beta[] , RowMatrix_F64 A )
+	public static void jacobian_Control4( DMatrixRMaj L_full ,
+										  double beta[] , DMatrixRMaj A )
 	{
 		int indexA = 0;
 
@@ -334,8 +334,8 @@ public class UtilLepetitEPnP {
 	/**
 	 * Computes the Jacobian given 3 control points.
 	 */
-	public static void jacobian_Control3( RowMatrix_F64 L_full ,
-										  double beta[] ,  RowMatrix_F64 A)
+	public static void jacobian_Control3( DMatrixRMaj L_full ,
+										  double beta[] ,  DMatrixRMaj A)
 	{
 		int indexA = 0;
 

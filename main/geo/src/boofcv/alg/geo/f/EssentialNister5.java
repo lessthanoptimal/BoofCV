@@ -26,12 +26,12 @@ import org.ddogleg.solver.impl.FindRealRootsSturm;
 import org.ddogleg.solver.impl.WrapRealRootsSturm;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.Complex_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_R64;
-import org.ejml.factory.LinearSolverFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
+import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
 import org.ejml.interfaces.linsol.LinearSolver;
-import org.ejml.ops.CommonOps_R64;
 
 import java.util.List;
 
@@ -62,11 +62,11 @@ import java.util.List;
 public class EssentialNister5 {
 
 	// Linear system describing p'*E*q = 0
-	private RowMatrix_F64 Q = new RowMatrix_F64(5,9);
+	private DMatrixRMaj Q = new DMatrixRMaj(5,9);
 	// contains the span of A
-	private RowMatrix_F64 V = new RowMatrix_F64(9,9);
+	private DMatrixRMaj V = new DMatrixRMaj(9,9);
 	// TODO Try using QR-Factorization as in the paper
-	private SingularValueDecomposition<RowMatrix_F64> svd = DecompositionFactory_R64.svd(5,9,false,true,false);
+	private SingularValueDecomposition<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(5,9,false,true,false);
 
 	// where all the ugly equations go
 	private HelperNister5 helper = new HelperNister5();
@@ -81,12 +81,12 @@ public class EssentialNister5 {
 	private double x,y,z;
 
 	// Solver for the linear system below
-	LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_R64.linear(10);
+	LinearSolver<DMatrixRMaj> solver = LinearSolverFactory_DDRM.linear(10);
 
 	// Storage for linear systems
-	private RowMatrix_F64 A1 = new RowMatrix_F64(10,10);
-	private RowMatrix_F64 A2 = new RowMatrix_F64(10,10);
-	private RowMatrix_F64 C = new RowMatrix_F64(10,10);
+	private DMatrixRMaj A1 = new DMatrixRMaj(10,10);
+	private DMatrixRMaj A2 = new DMatrixRMaj(10,10);
+	private DMatrixRMaj C = new DMatrixRMaj(10,10);
 
 	// Used for finding polynomial roots
 	private FindRealRootsSturm sturm = new FindRealRootsSturm(11,-1,1e-10,20,20);
@@ -102,7 +102,7 @@ public class EssentialNister5 {
 	 * @param solutions Output: Storage for the found solutions.   .
 	 * @return true for success or false if a fault has been detected
 	 */
-	public boolean process( List<AssociatedPair> points , FastQueue<RowMatrix_F64> solutions ) {
+	public boolean process( List<AssociatedPair> points , FastQueue<DMatrixRMaj> solutions ) {
 		if( points.size() != 5 )
 			throw new IllegalArgumentException("Exactly 5 points are required, not "+points.size());
 		solutions.reset();
@@ -132,7 +132,7 @@ public class EssentialNister5 {
 
 			solveForXandY(c.real);
 
-			RowMatrix_F64 E = solutions.grow();
+			DMatrixRMaj E = solutions.grow();
 
 			for( int i = 0; i < 9; i++ ) {
 				E.data[i] = x*X[i] + y*Y[i] + z*Z[i] + W[i];
@@ -191,8 +191,8 @@ public class EssentialNister5 {
 	private void solveForXandY( double z ) {
 		this.z = z;
 
-		RowMatrix_F64 A = new RowMatrix_F64(3,2);
-		RowMatrix_F64 Y = new RowMatrix_F64(3,1);
+		DMatrixRMaj A = new DMatrixRMaj(3,2);
+		DMatrixRMaj Y = new DMatrixRMaj(3,1);
 
 		// solve for x and y using the first two rows of B
 		A.data[0] = ((helper.K00*z + helper.K01)*z + helper.K02)*z + helper.K03;
@@ -207,11 +207,11 @@ public class EssentialNister5 {
 		A.data[5] = ((helper.M04*z + helper.M05)*z + helper.M06)*z + helper.M07;
 		Y.data[2] = (((helper.M08*z + helper.M09)*z + helper.M10)*z + helper.M11)*z + helper.M12;
 
-		CommonOps_R64.scale(-1,Y);
+		CommonOps_DDRM.scale(-1,Y);
 
-		RowMatrix_F64 x = new RowMatrix_F64(2,1);
+		DMatrixRMaj x = new DMatrixRMaj(2,1);
 
-		CommonOps_R64.solve(A,Y,x);
+		CommonOps_DDRM.solve(A,Y,x);
 
 		this.x = x.get(0,0);
 		this.y = x.get(1,0);

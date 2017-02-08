@@ -25,8 +25,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.RandomMatrices_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.RandomMatrices_DDRM;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
@@ -158,7 +158,7 @@ public class TestPnPLepetitEPnP {
 
 		alg.selectWorldControlPoints(worldPoints, worldControlPts);
 
-		RowMatrix_F64 alpha = new RowMatrix_F64(1,1);
+		DMatrixRMaj alpha = new DMatrixRMaj(1,1);
 
 		alg.computeBarycentricCoordinates(worldControlPts, alpha, worldPoints);
 
@@ -188,8 +188,8 @@ public class TestPnPLepetitEPnP {
 	@Test
 	public void constructM() {
 		List<Point2D_F64> obsPts = GeoTestingOps.randomPoints_F64(-1, 2, -5, 20, 30, rand);
-		RowMatrix_F64 M = RandomMatrices_R64.createRandom(2 * obsPts.size(), 12,rand);
-		RowMatrix_F64 alpha = RandomMatrices_R64.createRandom(obsPts.size(),4,rand);
+		DMatrixRMaj M = RandomMatrices_DDRM.rectangle(2 * obsPts.size(), 12,rand);
+		DMatrixRMaj alpha = RandomMatrices_DDRM.rectangle(obsPts.size(),4,rand);
 
 		PnPLepetitEPnP.constructM(obsPts, alpha, M);
 
@@ -205,7 +205,7 @@ public class TestPnPLepetitEPnP {
 	@Test
 	public void extractNullPoints() {
 		// create a singular matrix
-		SimpleMatrix M = SimpleMatrix.wrap(RandomMatrices_R64.createSingularValues(12, 40, rand, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0));
+		SimpleMatrix M = SimpleMatrix.wrap(RandomMatrices_DDRM.singleValues(12, 40, rand, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0));
 
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 		alg.numControl = 4;
@@ -240,7 +240,7 @@ public class TestPnPLepetitEPnP {
 
 		// skip the adjust step
 		alg.numControl = 4;
-		alg.alphas = new RowMatrix_F64(0,0);
+		alg.alphas = new DMatrixRMaj(0,0);
 		alg.nullPts[0] = GeoTestingOps.randomPoints_F64(5,10,-1, 2, -5, 20, 4, rand);
 		double beta = 10;
 		for( int i = 0; i < alg.numControl; i++ ) {

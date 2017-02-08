@@ -21,8 +21,8 @@ package boofcv.alg.geo.f;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.util.List;
 
@@ -32,16 +32,16 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistanceEpipolarConstraint implements DistanceFromModel<RowMatrix_F64,AssociatedPair> {
+public class DistanceEpipolarConstraint implements DistanceFromModel<DMatrixRMaj,AssociatedPair> {
 
-	RowMatrix_F64 M = new RowMatrix_F64(3,3);
+	DMatrixRMaj M = new DMatrixRMaj(3,3);
 
 	@Override
-	public void setModel(RowMatrix_F64 F )
+	public void setModel(DMatrixRMaj F )
 	{
 		// assume that each element in the matrix has equal weight
-		double v = CommonOps_R64.elementSumAbs(F);
-		CommonOps_R64.scale(1.0/v,F,M);
+		double v = CommonOps_DDRM.elementSumAbs(F);
+		CommonOps_DDRM.scale(1.0/v,F,M);
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class DistanceEpipolarConstraint implements DistanceFromModel<RowMatrix_F
 	}
 
 	@Override
-	public Class<RowMatrix_F64> getModelType() {
-		return RowMatrix_F64.class;
+	public Class<DMatrixRMaj> getModelType() {
+		return DMatrixRMaj.class;
 	}
 }

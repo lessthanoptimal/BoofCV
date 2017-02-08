@@ -20,7 +20,7 @@ package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -40,7 +40,7 @@ public class TestFundamentalResidualSimple extends EpipolarTestSimulation {
 		init(30,false);
 
 		// compute true essential matrix
-		RowMatrix_F64 E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
+		DMatrixRMaj E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
 
 
 		FundamentalResidualSimple alg = new FundamentalResidualSimple();

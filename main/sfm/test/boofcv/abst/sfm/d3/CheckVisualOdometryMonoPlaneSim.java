@@ -26,7 +26,7 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -184,7 +184,7 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 //			worldToCurr.getR().print();
 //			foundWorldToCurr.getR().print();
 
-			assertTrue(MatrixFeatures_R64.isIdentical(foundWorldToCurr.getR(), worldToCurr.getR(), 0.1));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(foundWorldToCurr.getR(), worldToCurr.getR(), 0.1));
 			assertTrue(foundWorldToCurr.getT().distance(worldToCurr.getT()) < tolerance );
 		}
 	}

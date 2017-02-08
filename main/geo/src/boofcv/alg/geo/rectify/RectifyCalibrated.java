@@ -21,7 +21,7 @@ package boofcv.alg.geo.rectify;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -53,8 +53,8 @@ import org.ejml.simple.SimpleMatrix;
 public class RectifyCalibrated {
 
 	// rectifying transform for left and right images
-	RowMatrix_F64 rect1 = new RowMatrix_F64(3,3);
-	RowMatrix_F64 rect2 = new RowMatrix_F64(3,3);
+	DMatrixRMaj rect1 = new DMatrixRMaj(3,3);
+	DMatrixRMaj rect2 = new DMatrixRMaj(3,3);
 
 	// direction of new coordinate system axises
 	Vector3D_F64 v1 = new Vector3D_F64();
@@ -65,7 +65,7 @@ public class RectifyCalibrated {
 	SimpleMatrix K = new SimpleMatrix(3,3);
 
 	// rotation matrix of rectified cameras
-	RowMatrix_F64 rectifiedR;
+	DMatrixRMaj rectifiedR;
 
 	/**
 	 * Computes rectification transforms for both cameras and optionally a single calibration
@@ -76,8 +76,8 @@ public class RectifyCalibrated {
 	 * @param K2 Calibration matrix for second camera.
 	 * @param worldToCamera2 Location of the second camera.
 	 */
-	public void process( RowMatrix_F64 K1 , Se3_F64 worldToCamera1 ,
-						 RowMatrix_F64 K2 , Se3_F64 worldToCamera2 )
+	public void process( DMatrixRMaj K1 , Se3_F64 worldToCamera1 ,
+						 DMatrixRMaj K2 , Se3_F64 worldToCamera2 )
 	{
 		SimpleMatrix sK1 = SimpleMatrix.wrap(K1);
 		SimpleMatrix sK2 = SimpleMatrix.wrap(K2);
@@ -149,14 +149,14 @@ public class RectifyCalibrated {
 	/**
 	 * Rectification transform for first camera
 	 */
-	public RowMatrix_F64 getRect1() {
+	public DMatrixRMaj getRect1() {
 		return rect1;
 	}
 
 	/**
 	 * Rectification transform for second camera
 	 */
-	public RowMatrix_F64 getRect2() {
+	public DMatrixRMaj getRect2() {
 		return rect2;
 	}
 
@@ -165,7 +165,7 @@ public class RectifyCalibrated {
 	 *
 	 * @return Calibration matrix for both cameras
 	 */
-	public RowMatrix_F64 getCalibrationMatrix() {
+	public DMatrixRMaj getCalibrationMatrix() {
 		return K.matrix_F64();
 	}
 
@@ -174,7 +174,7 @@ public class RectifyCalibrated {
 	 *
 	 * @return Rotation matrix
 	 */
-	public RowMatrix_F64 getRectifiedRotation() {
+	public DMatrixRMaj getRectifiedRotation() {
 		return rectifiedR;
 	}
 }

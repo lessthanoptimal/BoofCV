@@ -36,7 +36,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import javax.swing.*;
 import java.awt.*;
@@ -144,14 +144,14 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	private void setRectification(final StereoParameters param) {
 
 		// calibration matrix for left and right camera
-		RowMatrix_F64 K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), (RowMatrix_F64)null);
-		RowMatrix_F64 K2 = PerspectiveOps.calibrationMatrix(param.getRight(), (RowMatrix_F64)null);
+		DMatrixRMaj K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), (DMatrixRMaj)null);
+		DMatrixRMaj K2 = PerspectiveOps.calibrationMatrix(param.getRight(), (DMatrixRMaj)null);
 
 		RectifyCalibrated rectify = RectifyImageOps.createCalibrated();
 		rectify.process(K1,new Se3_F64(),K2,param.getRightToLeft().invert(null));
 
-		final RowMatrix_F64 rect1 = rectify.getRect1();
-		final RowMatrix_F64 rect2 = rectify.getRect2();
+		final DMatrixRMaj rect1 = rectify.getRect1();
+		final DMatrixRMaj rect2 = rectify.getRect2();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

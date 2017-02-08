@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * Estimates the motion of a monocular camera using the known transform between the camera and the ground plane.  The
@@ -172,7 +172,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>>
 	public Se3_F64 getWorldToCurr3D() {
 		// 2D to 3D coordinates
 		worldToCurr3D.getT().set(-worldToCurr2D.T.y,0,worldToCurr2D.T.x);
-		RowMatrix_F64 R = worldToCurr3D.getR();
+		DMatrixRMaj R = worldToCurr3D.getR();
 
 		// set rotation around Y axis.
 		// Transpose the 2D transform since the rotation are pointing in opposite directions

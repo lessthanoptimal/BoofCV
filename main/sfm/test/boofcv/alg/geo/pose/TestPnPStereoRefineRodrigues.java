@@ -21,9 +21,9 @@ package boofcv.alg.geo.pose;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -48,7 +48,7 @@ public class TestPnPStereoRefineRodrigues extends CommonStereoMotionNPoint {
 		assertTrue(alg.fitModel(pointPose, worldToLeft.copy(), found));
 		assertTrue(alg.minimizer.getFunctionValue() < 1e-10);
 
-		assertTrue(MatrixFeatures_R64.isIdentical(worldToLeft.getR(), found.getR(), 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(worldToLeft.getR(), found.getR(), 1e-8));
 		assertTrue(found.getT().isIdentical(worldToLeft.getT(), 1e-8));
 	}
 
@@ -65,8 +65,8 @@ public class TestPnPStereoRefineRodrigues extends CommonStereoMotionNPoint {
 
 		Se3_F64 input = worldToLeft.copy();
 		// noise up the initial guess
-		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, -0.04, -0.2, null);
-		CommonOps_R64.mult(R,input.getR().copy(),input.getR());
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, -0.04, -0.2, null);
+		CommonOps_DDRM.mult(R,input.getR().copy(),input.getR());
 		input.T.x += 0.2;
 		input.T.x -= 0.05;
 		input.T.z += 0.03;
@@ -75,7 +75,7 @@ public class TestPnPStereoRefineRodrigues extends CommonStereoMotionNPoint {
 		assertTrue(alg.fitModel(pointPose, input, found));
 		assertTrue(alg.minimizer.getFunctionValue()<1e-12);
 
-		assertTrue(MatrixFeatures_R64.isIdentical(worldToLeft.getR(), found.getR(), 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(worldToLeft.getR(), found.getR(), 1e-8));
 		assertTrue(found.getT().isIdentical(worldToLeft.getT(), 1e-8));
 	}
 }

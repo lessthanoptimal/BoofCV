@@ -24,7 +24,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.QueueMatrix;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * Implementation of {@link GeoModelEstimatorNto1} for epipolar matrices.
@@ -32,17 +32,17 @@ import org.ejml.data.RowMatrix_F64;
  * @author Peter Abeles
  */
 public class EstimateNto1ofEpipolar
-		extends GeoModelEstimatorNto1<RowMatrix_F64,AssociatedPair>
+		extends GeoModelEstimatorNto1<DMatrixRMaj,AssociatedPair>
 		implements Estimate1ofEpipolar
 {
-	public EstimateNto1ofEpipolar(GeoModelEstimatorN<RowMatrix_F64, AssociatedPair> alg,
-								  DistanceFromModel<RowMatrix_F64, AssociatedPair> distance,
+	public EstimateNto1ofEpipolar(GeoModelEstimatorN<DMatrixRMaj, AssociatedPair> alg,
+								  DistanceFromModel<DMatrixRMaj, AssociatedPair> distance,
 								  int numTest) {
 		super(alg, distance, new QueueMatrix(3,3), numTest);
 	}
 
 	@Override
-	protected void copy(RowMatrix_F64 src, RowMatrix_F64 dst) {
+	protected void copy(DMatrixRMaj src, DMatrixRMaj dst) {
 		dst.set(src);
 	}
 }

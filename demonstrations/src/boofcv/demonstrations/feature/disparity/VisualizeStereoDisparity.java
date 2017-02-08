@@ -43,8 +43,8 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F32;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
 
 import javax.swing.*;
@@ -105,7 +105,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	private StereoDisparity<T,D> activeAlg;
 
 	// camera calibration matrix of rectified images
-	private RowMatrix_F64 rectK;
+	private DMatrixRMaj rectK;
 
 	// makes sure process has been called before render disparity is done
 	// There was a threading issue where disparitySettingChange() created a new alg() but render was called before
@@ -233,14 +233,14 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	 */
 	private void rectifyInputImages() {
 		// get intrinsic camera calibration matrices
-		RowMatrix_F64 K1 = PerspectiveOps.calibrationMatrix(calib.left, (RowMatrix_F64)null);
-		RowMatrix_F64 K2 = PerspectiveOps.calibrationMatrix(calib.right, (RowMatrix_F64)null);
+		DMatrixRMaj K1 = PerspectiveOps.calibrationMatrix(calib.left, (DMatrixRMaj)null);
+		DMatrixRMaj K2 = PerspectiveOps.calibrationMatrix(calib.right, (DMatrixRMaj)null);
 
 		// compute rectification matrices
 		rectifyAlg.process(K1,new Se3_F64(),K2,calib.getRightToLeft().invert(null));
 
-		RowMatrix_F64 rect1 = rectifyAlg.getRect1();
-		RowMatrix_F64 rect2 = rectifyAlg.getRect2();
+		DMatrixRMaj rect1 = rectifyAlg.getRect1();
+		DMatrixRMaj rect2 = rectifyAlg.getRect2();
 		rectK = rectifyAlg.getCalibrationMatrix();
 
 		// adjust view to maximize viewing area while not including black regions
@@ -251,8 +251,8 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 		ImageType<T> imageType = ImageType.single(activeAlg.getInputType());
 
-		RowMatrix_F32 rect1_F32 = new RowMatrix_F32(3,3); // TODO simplify code some how
-		RowMatrix_F32 rect2_F32 = new RowMatrix_F32(3,3);
+		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3); // TODO simplify code some how
+		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 

@@ -23,7 +23,7 @@ import boofcv.struct.calib.CameraPinholeRadial;
 import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.javacpp.indexer.DoubleBufferIndexer;
 import org.bytedeco.javacpp.opencv_core.*;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import static org.bytedeco.javacpp.opencv_core.*;
 
@@ -78,13 +78,13 @@ public class UtilOpenCV {
 	public static void save( CameraPinholeRadial model , String fileName ) {
 		FileStorage fs = new FileStorage(fileName, FileStorage.WRITE);
 
-		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(model, (RowMatrix_F64)null);
+		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(model, (DMatrixRMaj)null);
 
 		write(fs,"image_width", model.width);
 		write(fs,"image_height", model.height);
 		write(fs,"camera_matrix", toMat(K));
 
-		RowMatrix_F64 D = new RowMatrix_F64(2+model.radial.length,1);
+		DMatrixRMaj D = new DMatrixRMaj(2+model.radial.length,1);
 		D.set(0,0,model.radial[0]);
 		D.set(1,0,model.radial[1]);
 		D.set(4,0,model.radial[2]);
@@ -97,7 +97,7 @@ public class UtilOpenCV {
 
 	}
 
-	public static Mat toMat(RowMatrix_F64 in ) {
+	public static Mat toMat(DMatrixRMaj in ) {
 		Mat out = new Mat(in.numRows,in.numCols,CV_64F);
 
 		DoubleBufferIndexer indexer = out.createIndexer();

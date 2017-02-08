@@ -20,11 +20,11 @@ package boofcv.alg.geo.trifocal;
 
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.alg.dense.decomposition.svd.SafeSvd_R64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.SingularOps_DDRM;
+import org.ejml.dense.row.decomposition.svd.SafeSvd_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
-import org.ejml.ops.SingularOps_R64;
 
 /**
  * <p>
@@ -50,25 +50,25 @@ import org.ejml.ops.SingularOps_R64;
 public class TrifocalExtractEpipoles {
 
 	// used to extract the null space
-	private SingularValueDecomposition_F64<RowMatrix_F64> svd;
+	private SingularValueDecomposition_F64<DMatrixRMaj> svd;
 
 	// storage for left and right null space of the trifocal matrices
-	private RowMatrix_F64 u1 = new RowMatrix_F64(3,1);
-	private RowMatrix_F64 u2 = new RowMatrix_F64(3,1);
-	private RowMatrix_F64 u3 = new RowMatrix_F64(3,1);
-	private RowMatrix_F64 v1 = new RowMatrix_F64(3,1);
-	private RowMatrix_F64 v2 = new RowMatrix_F64(3,1);
-	private RowMatrix_F64 v3 = new RowMatrix_F64(3,1);
+	private DMatrixRMaj u1 = new DMatrixRMaj(3,1);
+	private DMatrixRMaj u2 = new DMatrixRMaj(3,1);
+	private DMatrixRMaj u3 = new DMatrixRMaj(3,1);
+	private DMatrixRMaj v1 = new DMatrixRMaj(3,1);
+	private DMatrixRMaj v2 = new DMatrixRMaj(3,1);
+	private DMatrixRMaj v3 = new DMatrixRMaj(3,1);
 
-	private RowMatrix_F64 U = new RowMatrix_F64(3,3);
-	private RowMatrix_F64 V = new RowMatrix_F64(3,3);
+	private DMatrixRMaj U = new DMatrixRMaj(3,3);
+	private DMatrixRMaj V = new DMatrixRMaj(3,3);
 
 	// temporary storage for computed epipole
-	private RowMatrix_F64 tempE = new RowMatrix_F64(3,1);
+	private DMatrixRMaj tempE = new DMatrixRMaj(3,1);
 
 	public TrifocalExtractEpipoles() {
-		svd = DecompositionFactory_R64.svd(3, 3, true, true, true);
-		svd = new SafeSvd_R64(svd);
+		svd = DecompositionFactory_DDRM.svd(3, 3, true, true, true);
+		svd = new SafeSvd_DDRM(svd);
 	}
 
 	/**
@@ -81,16 +81,16 @@ public class TrifocalExtractEpipoles {
 	 */
 	public void process( TrifocalTensor tensor , Point3D_F64 e2 , Point3D_F64 e3 ) {
 		svd.decompose(tensor.T1);
-		SingularOps_R64.nullVector(svd, true, v1);
-		SingularOps_R64.nullVector(svd, false,u1);
+		SingularOps_DDRM.nullVector(svd, true, v1);
+		SingularOps_DDRM.nullVector(svd, false,u1);
 
 		svd.decompose(tensor.T2);
-		SingularOps_R64.nullVector(svd,true,v2);
-		SingularOps_R64.nullVector(svd,false,u2);
+		SingularOps_DDRM.nullVector(svd,true,v2);
+		SingularOps_DDRM.nullVector(svd,false,u2);
 
 		svd.decompose(tensor.T3);
-		SingularOps_R64.nullVector(svd,true,v3);
-		SingularOps_R64.nullVector(svd,false,u3);
+		SingularOps_DDRM.nullVector(svd,true,v3);
+		SingularOps_DDRM.nullVector(svd,false,u3);
 
 		for( int i = 0; i < 3; i++ ) {
 			U.set(i,0,u1.get(i));
@@ -103,11 +103,11 @@ public class TrifocalExtractEpipoles {
 		}
 
 		svd.decompose(U);
-		SingularOps_R64.nullVector(svd, false, tempE);
+		SingularOps_DDRM.nullVector(svd, false, tempE);
 		e2.set(tempE.get(0), tempE.get(1), tempE.get(2));
 
 		svd.decompose(V);
-		SingularOps_R64.nullVector(svd, false, tempE);
+		SingularOps_DDRM.nullVector(svd, false, tempE);
 		e3.set(tempE.get(0), tempE.get(1), tempE.get(2));
 	}
 }

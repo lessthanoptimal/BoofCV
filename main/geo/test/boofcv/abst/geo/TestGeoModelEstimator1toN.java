@@ -22,7 +22,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.geo.QueueMatrix;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -36,11 +36,11 @@ import static org.junit.Assert.*;
 public class TestGeoModelEstimator1toN {
 
 	List<AssociatedPair> points = new ArrayList<>();
-	FastQueue<RowMatrix_F64> solutions = new QueueMatrix(3, 3);
+	FastQueue<DMatrixRMaj> solutions = new QueueMatrix(3, 3);
 
 	@Test
 	public void basicTest() {
-		GeoModelEstimator1toN<RowMatrix_F64,AssociatedPair> alg =
+		GeoModelEstimator1toN<DMatrixRMaj,AssociatedPair> alg =
 				new GeoModelEstimator1toN<>(new Dummy(true));
 
 		assertTrue(alg.process(points,solutions));
@@ -58,7 +58,7 @@ public class TestGeoModelEstimator1toN {
 	 */
 	@Test
 	public void multipleCalls() {
-		GeoModelEstimator1toN<RowMatrix_F64,AssociatedPair> alg =
+		GeoModelEstimator1toN<DMatrixRMaj,AssociatedPair> alg =
 				new GeoModelEstimator1toN<>(new Dummy(true));
 
 		assertTrue(alg.process(points,solutions));
@@ -71,7 +71,7 @@ public class TestGeoModelEstimator1toN {
 		assertFalse(alg.process(points,solutions));
 	}
 
-	private static class Dummy implements GeoModelEstimator1<RowMatrix_F64,AssociatedPair> {
+	private static class Dummy implements GeoModelEstimator1<DMatrixRMaj,AssociatedPair> {
 		boolean hasSolution;
 
 		private Dummy(boolean hasSolution) {
@@ -79,7 +79,7 @@ public class TestGeoModelEstimator1toN {
 		}
 
 		@Override
-		public boolean process(List<AssociatedPair> points, RowMatrix_F64 solution ) {
+		public boolean process(List<AssociatedPair> points, DMatrixRMaj solution ) {
 			return hasSolution;
 		}
 

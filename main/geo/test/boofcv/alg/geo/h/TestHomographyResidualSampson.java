@@ -20,8 +20,8 @@ package boofcv.alg.geo.h;
 
 import boofcv.alg.geo.ModelObservationResidualN;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -41,11 +41,11 @@ public class TestHomographyResidualSampson extends HomographyResidualTests {
 	public void checkJacobian() {
 		HomographyResidualSampson alg = new HomographyResidualSampson();
 
-		RowMatrix_F64 H = new RowMatrix_F64(3,3,true,1,2,3,4,5,6,7,8,9);
+		DMatrixRMaj H = new DMatrixRMaj(3,3,true,1,2,3,4,5,6,7,8,9);
 		Point2D_F64 x1 = new Point2D_F64(10,20);
 		Point2D_F64 x2 = new Point2D_F64(30,40);
 
-		RowMatrix_F64 J = new RowMatrix_F64(2,4);
+		DMatrixRMaj J = new DMatrixRMaj(2,4);
 		alg.H = H;
 
 		// see page 130,  the cost function is multilinear and the jacobian can be computed this way
@@ -63,7 +63,7 @@ public class TestHomographyResidualSampson extends HomographyResidualTests {
 
 		alg.computeJacobian(x1,x2);
 		
-		assertTrue(MatrixFeatures_R64.isEquals(J, alg.J, 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isEquals(J, alg.J, 1e-8));
 
 	}
 }

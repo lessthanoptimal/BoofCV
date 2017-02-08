@@ -25,14 +25,14 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.alg.dense.mult.MatrixVectorMult_R64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_R64;
-import org.ejml.factory.LinearSolverFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.SingularOps_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
+import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
+import org.ejml.dense.row.mult.MatrixVectorMult_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 import org.ejml.interfaces.linsol.LinearSolver;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.SingularOps_R64;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -102,22 +102,22 @@ import java.util.List;
 public class PnPLepetitEPnP {
 
 	// used to solve various linear problems
-	private SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_R64.svd(12, 12, false, true, false);
-	private LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_R64.leastSquares(6, 4);
-	private LinearSolver<RowMatrix_F64> solverPinv = LinearSolverFactory_R64.pseudoInverse(true);
+	private SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(12, 12, false, true, false);
+	private LinearSolver<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(6, 4);
+	private LinearSolver<DMatrixRMaj> solverPinv = LinearSolverFactory_DDRM.pseudoInverse(true);
 
 	// weighting factor to go from control point into world coordinate
-	protected RowMatrix_F64 alphas = new RowMatrix_F64(1,1);
-	private RowMatrix_F64 M = new RowMatrix_F64(12,12);
-	private RowMatrix_F64 MM = new RowMatrix_F64(12,12);
+	protected DMatrixRMaj alphas = new DMatrixRMaj(1,1);
+	private DMatrixRMaj M = new DMatrixRMaj(12,12);
+	private DMatrixRMaj MM = new DMatrixRMaj(12,12);
 
 	// linear constraint matrix
-	protected RowMatrix_F64 L_full = new RowMatrix_F64(6,10);
-	private RowMatrix_F64 L = new RowMatrix_F64(6,6);
+	protected DMatrixRMaj L_full = new DMatrixRMaj(6,10);
+	private DMatrixRMaj L = new DMatrixRMaj(6,6);
 	// distance of world control points from each other
-	protected RowMatrix_F64 y = new RowMatrix_F64(6,1);
+	protected DMatrixRMaj y = new DMatrixRMaj(6,1);
 	// solution for betas
-	private RowMatrix_F64 x = new RowMatrix_F64(6,1);
+	private DMatrixRMaj x = new DMatrixRMaj(6,1);
 
 	// how many controls points 4 for general case and 3 for planar
 	protected int numControl;
@@ -151,9 +151,9 @@ public class PnPLepetitEPnP {
 	// in general its good to avoid declaring and destroying massive amounts of data in Java
 	// this is probably going too far though
 	private List<Point3D_F64> tempPts0 = new ArrayList<>(); // 4 points stored in it
-	RowMatrix_F64 A_temp = new RowMatrix_F64(1,1);
-	RowMatrix_F64 v_temp = new RowMatrix_F64(3,1);
-	RowMatrix_F64 w_temp = new RowMatrix_F64(1,1);
+	DMatrixRMaj A_temp = new DMatrixRMaj(1,1);
+	DMatrixRMaj v_temp = new DMatrixRMaj(3,1);
+	DMatrixRMaj w_temp = new DMatrixRMaj(1,1);
 
 	/**
 	 * Constructor which uses the default magic number
@@ -326,14 +326,14 @@ public class PnPLepetitEPnP {
 		}
 		c11/=N;c12/=N;c13/=N;c22/=N;c23/=N;c33/=N;
 
-		RowMatrix_F64 covar = new RowMatrix_F64(3,3,true,c11,c12,c13,c12,c22,c23,c13,c23,c33);
+		DMatrixRMaj covar = new DMatrixRMaj(3,3,true,c11,c12,c13,c12,c22,c23,c13,c23,c33);
 
 		// find the data's orientation and check to see if it is planar
 		svd.decompose(covar);
 		double []singularValues = svd.getSingularValues();
-		RowMatrix_F64 V = svd.getV(null,false);
+		DMatrixRMaj V = svd.getV(null,false);
 
-		SingularOps_R64.descendingOrder(null,false,singularValues,3,V,false);
+		SingularOps_DDRM.descendingOrder(null,false,singularValues,3,V,false);
 
 		// planar check
 		if( singularValues[0]<singularValues[2]*1e13 ) {
@@ -370,7 +370,7 @@ public class PnPLepetitEPnP {
 	 * </p>
 	 */
 	protected void computeBarycentricCoordinates(FastQueue<Point3D_F64> controlWorldPts,
-												 RowMatrix_F64 alphas,
+												 DMatrixRMaj alphas,
 												 List<Point3D_F64> worldPts )
 	{
 		alphas.reshape(worldPts.size(),numControl,false);
@@ -397,7 +397,7 @@ public class PnPLepetitEPnP {
 			v_temp.data[1] = p.y- meanWorldPts.y;
 			v_temp.data[2] = p.z- meanWorldPts.z;
 
-			MatrixVectorMult_R64.mult(A_temp, v_temp, w_temp);
+			MatrixVectorMult_DDRM.mult(A_temp, v_temp, w_temp);
 
 			int rowIndex = alphas.numCols*i;
 			for( int j = 0; j < numControl-1; j++ )
@@ -421,7 +421,7 @@ public class PnPLepetitEPnP {
 	 *
 	 */
 	protected static void constructM(List<Point2D_F64> obsPts,
-									 RowMatrix_F64 alphas, RowMatrix_F64 M)
+									 DMatrixRMaj alphas, DMatrixRMaj M)
 	{
 		int N = obsPts.size();
 		M.reshape(3*alphas.numCols,2*N,false);
@@ -449,19 +449,19 @@ public class PnPLepetitEPnP {
 	 * Computes M'*M and finds the null space.  The 4 eigenvectors with the smallest eigenvalues are found
 	 * and the null points extracted from them.
 	 */
-	protected void extractNullPoints( RowMatrix_F64 M )
+	protected void extractNullPoints( DMatrixRMaj M )
 	{
 		// compute MM and find its null space
 		MM.reshape(M.numRows,M.numRows,false);
-		CommonOps_R64.multTransB(M, M, MM);
+		CommonOps_DDRM.multTransB(M, M, MM);
 
 		if( !svd.decompose(MM) )
 			throw new IllegalArgumentException("SVD failed?!?!");
 
 		double []singularValues = svd.getSingularValues();
-		RowMatrix_F64 V = svd.getV(null,false);
+		DMatrixRMaj V = svd.getV(null,false);
 
-		SingularOps_R64.descendingOrder(null,false,singularValues,3,V,false);
+		SingularOps_DDRM.descendingOrder(null,false,singularValues,3,V,false);
 
 		// extract null points from the null space
 		for( int i = 0; i < numControl; i++ ) {

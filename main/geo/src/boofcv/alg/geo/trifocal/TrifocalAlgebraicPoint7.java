@@ -25,7 +25,7 @@ import georegression.struct.point.Point3D_F64;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
 import org.ddogleg.optimization.UtilOptimize;
 import org.ddogleg.optimization.functions.FunctionNtoM;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
@@ -138,7 +138,7 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 		Point3D_F64 e2 = new Point3D_F64();
 		Point3D_F64 e3 = new Point3D_F64();
 
-		RowMatrix_F64 errors = new RowMatrix_F64(1,1);
+		DMatrixRMaj errors = new DMatrixRMaj(1,1);
 
 		public void init() {
 			errors.numRows = A.numRows;

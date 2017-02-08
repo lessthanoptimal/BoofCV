@@ -32,10 +32,10 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.Tuple2;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.QRDecomposition;
-import org.ejml.ops.CommonOps_R64;
 import org.ejml.simple.SimpleMatrix;
 import org.ejml.simple.SimpleSVD;
 
@@ -71,12 +71,12 @@ public class MultiViewOps {
 	 * @param ret Storage for trifocal tensor.  If null a new instance will be created.
 	 * @return The trifocal tensor
 	 */
-	public static TrifocalTensor createTrifocal( RowMatrix_F64 P2 , RowMatrix_F64 P3 , TrifocalTensor ret ) {
+	public static TrifocalTensor createTrifocal( DMatrixRMaj P2 , DMatrixRMaj P3 , TrifocalTensor ret ) {
 		if( ret == null )
 			ret = new TrifocalTensor();
 
 		for( int col = 0; col < 3; col++ ) {
-			RowMatrix_F64 T = ret.getT(col);
+			DMatrixRMaj T = ret.getT(col);
 
 			int index = 0;
 			for( int i = 0; i < 3; i++ ) {
@@ -110,13 +110,13 @@ public class MultiViewOps {
 		if( ret == null )
 			ret = new TrifocalTensor();
 
-		RowMatrix_F64 R2 = P2.getR();
-		RowMatrix_F64 R3 = P3.getR();
+		DMatrixRMaj R2 = P2.getR();
+		DMatrixRMaj R3 = P3.getR();
 		Vector3D_F64 T2 = P2.getT();
 		Vector3D_F64 T3 = P3.getT();
 
 		for( int col = 0; col < 3; col++ ) {
-			RowMatrix_F64 T = ret.getT(col);
+			DMatrixRMaj T = ret.getT(col);
 
 			int index = 0;
 			for( int i = 0; i < 3; i++ ) {
@@ -176,11 +176,11 @@ public class MultiViewOps {
 	public static double constraint(TrifocalTensor tensor,
 									Point2D_F64 p1, Vector3D_F64 l2, Vector3D_F64 l3)
 	{
-		RowMatrix_F64 sum = new RowMatrix_F64(3,3);
+		DMatrixRMaj sum = new DMatrixRMaj(3,3);
 
-		CommonOps_R64.add(p1.x,tensor.T1,sum,sum);
-		CommonOps_R64.add(p1.y,tensor.T2,sum,sum);
-		CommonOps_R64.add(tensor.T3, sum, sum);
+		CommonOps_DDRM.add(p1.x,tensor.T1,sum,sum);
+		CommonOps_DDRM.add(p1.y,tensor.T2,sum,sum);
+		CommonOps_DDRM.add(tensor.T3, sum, sum);
 
 		return GeometryMath_F64.innerProd(l2,sum,l3);
 	}
@@ -204,11 +204,11 @@ public class MultiViewOps {
 		if( ret == null )
 			ret = new Vector3D_F64();
 
-		RowMatrix_F64 sum = new RowMatrix_F64(3,3);
+		DMatrixRMaj sum = new DMatrixRMaj(3,3);
 
-		CommonOps_R64.add(p1.x,tensor.T1,sum,sum);
-		CommonOps_R64.add(p1.y,tensor.T2,sum,sum);
-		CommonOps_R64.add(tensor.T3,sum,sum);
+		CommonOps_DDRM.add(p1.x,tensor.T1,sum,sum);
+		CommonOps_DDRM.add(p1.y,tensor.T2,sum,sum);
+		CommonOps_DDRM.add(tensor.T3,sum,sum);
 
 		Vector3D_F64 tempV = new Vector3D_F64();
 		GeometryMath_F64.multTran(sum, l2, tempV);
@@ -237,17 +237,17 @@ public class MultiViewOps {
 		if( ret == null )
 			ret = new Vector3D_F64();
 
-		RowMatrix_F64 sum = new RowMatrix_F64(3,3);
+		DMatrixRMaj sum = new DMatrixRMaj(3,3);
 
-		CommonOps_R64.add(p1.x,tensor.T1,sum,sum);
-		CommonOps_R64.add(p1.y,tensor.T2,sum,sum);
-		CommonOps_R64.add(tensor.T3,sum,sum);
+		CommonOps_DDRM.add(p1.x,tensor.T1,sum,sum);
+		CommonOps_DDRM.add(p1.y,tensor.T2,sum,sum);
+		CommonOps_DDRM.add(tensor.T3,sum,sum);
 
-		RowMatrix_F64 cross2 = GeometryMath_F64.crossMatrix(p2.x,p2.y,1,null);
+		DMatrixRMaj cross2 = GeometryMath_F64.crossMatrix(p2.x,p2.y,1,null);
 
-		RowMatrix_F64 temp = new RowMatrix_F64(3,3);
+		DMatrixRMaj temp = new DMatrixRMaj(3,3);
 
-		CommonOps_R64.mult(cross2,sum,temp);
+		CommonOps_DDRM.mult(cross2,sum,temp);
 		GeometryMath_F64.mult(temp, l3, ret);
 
 		return ret;
@@ -266,25 +266,25 @@ public class MultiViewOps {
 	 * @param ret Optional storage for output. 3x3 matrix.  Modified.
 	 * @return Result of applying the constraint.  With perfect inputs will be zero.
 	 */
-	public static RowMatrix_F64 constraint(TrifocalTensor tensor,
+	public static DMatrixRMaj constraint(TrifocalTensor tensor,
 											Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3,
-											RowMatrix_F64 ret)
+											DMatrixRMaj ret)
 	{
 		if( ret == null )
-			ret = new RowMatrix_F64(3,3);
+			ret = new DMatrixRMaj(3,3);
 
-		RowMatrix_F64 sum = new RowMatrix_F64(3,3);
+		DMatrixRMaj sum = new DMatrixRMaj(3,3);
 
-		CommonOps_R64.add(p1.x,tensor.T1,p1.y,tensor.T2,sum);
-		CommonOps_R64.add(sum,tensor.T3,sum);
+		CommonOps_DDRM.add(p1.x,tensor.T1,p1.y,tensor.T2,sum);
+		CommonOps_DDRM.add(sum,tensor.T3,sum);
 
-		RowMatrix_F64 cross2 = GeometryMath_F64.crossMatrix(p2.x,p2.y,1,null);
-		RowMatrix_F64 cross3 = GeometryMath_F64.crossMatrix(p3.x,p3.y,1,null);
+		DMatrixRMaj cross2 = GeometryMath_F64.crossMatrix(p2.x,p2.y,1,null);
+		DMatrixRMaj cross3 = GeometryMath_F64.crossMatrix(p3.x,p3.y,1,null);
 
-		RowMatrix_F64 temp = new RowMatrix_F64(3,3);
+		DMatrixRMaj temp = new DMatrixRMaj(3,3);
 
-		CommonOps_R64.mult(cross2,sum,temp);
-		CommonOps_R64.mult(temp, cross3, ret);
+		CommonOps_DDRM.mult(cross2,sum,temp);
+		CommonOps_DDRM.mult(temp, cross3, ret);
 
 		return ret;
 	}
@@ -302,7 +302,7 @@ public class MultiViewOps {
 	 * @param p2 Point in view 2.
 	 * @return  Constraint value.
 	 */
-	public static double constraint( RowMatrix_F64 F , Point2D_F64 p1, Point2D_F64 p2 ) {
+	public static double constraint( DMatrixRMaj F , Point2D_F64 p1, Point2D_F64 p2 ) {
 		return GeometryMath_F64.innerProd(p2,F,p1);
 	}
 
@@ -319,7 +319,7 @@ public class MultiViewOps {
 	 * @param outputP2 Output: storage for point in view 2.
 	 * @return Predicted point in view 2
 	 */
-	public static Point2D_F64 constraintHomography( RowMatrix_F64 H , Point2D_F64 p1 , Point2D_F64 outputP2 ) {
+	public static Point2D_F64 constraintHomography( DMatrixRMaj H , Point2D_F64 p1 , Point2D_F64 outputP2 ) {
 		if( outputP2 == null )
 			outputP2 = new Point2D_F64();
 
@@ -340,13 +340,13 @@ public class MultiViewOps {
 	 * @param output Output: Optional storage for homography. 3x3 matrix
 	 * @return Homography from view 1 to 3
 	 */
-	public static RowMatrix_F64 inducedHomography13( TrifocalTensor tensor ,
+	public static DMatrixRMaj inducedHomography13( TrifocalTensor tensor ,
 													  Vector3D_F64 line2 ,
-													  RowMatrix_F64 output ) {
+													  DMatrixRMaj output ) {
 		if( output == null )
-			output = new RowMatrix_F64(3,3);
+			output = new DMatrixRMaj(3,3);
 
-		RowMatrix_F64 T = tensor.T1;
+		DMatrixRMaj T = tensor.T1;
 
 		// H(:,0) = transpose(T1)*line
 		output.data[0] = T.data[0]*line2.x + T.data[3]*line2.y + T.data[6]*line2.z;
@@ -388,14 +388,14 @@ public class MultiViewOps {
 	 * @param output Output: Optional storage for homography. 3x3 matrix
 	 * @return Homography from view 1 to 2
 	 */
-	public static RowMatrix_F64 inducedHomography12( TrifocalTensor tensor ,
+	public static DMatrixRMaj inducedHomography12( TrifocalTensor tensor ,
 													  Vector3D_F64 line3 ,
-													  RowMatrix_F64 output ) {
+													  DMatrixRMaj output ) {
 		if( output == null )
-			output = new RowMatrix_F64(3,3);
+			output = new DMatrixRMaj(3,3);
 
 		// H(:,0) = T1*line
-		RowMatrix_F64 T = tensor.T1;
+		DMatrixRMaj T = tensor.T1;
 		output.data[0] = T.data[0]*line3.x + T.data[1]*line3.y + T.data[2]*line3.z;
 		output.data[3] = T.data[3]*line3.x + T.data[4]*line3.y + T.data[5]*line3.z;
 		output.data[6] = T.data[6]*line3.x + T.data[7]*line3.y + T.data[8]*line3.z;
@@ -436,7 +436,7 @@ public class MultiViewOps {
 	 * @param p3 Associated point observation
 	 * @return The homography from view 1 to view 2 or null if it fails
 	 */
-	public static RowMatrix_F64 homographyStereo3Pts( RowMatrix_F64 F , AssociatedPair p1, AssociatedPair p2, AssociatedPair p3) {
+	public static DMatrixRMaj homographyStereo3Pts( DMatrixRMaj F , AssociatedPair p1, AssociatedPair p2, AssociatedPair p3) {
 		HomographyInducedStereo3Pts alg = new HomographyInducedStereo3Pts();
 
 		alg.setFundamental(F,null);
@@ -456,7 +456,7 @@ public class MultiViewOps {
 	 * @param point Point on the plane
 	 * @return The homography from view 1 to view 2 or null if it fails
 	 */
-	public static RowMatrix_F64 homographyStereoLinePt( RowMatrix_F64 F , PairLineNorm line, AssociatedPair point) {
+	public static DMatrixRMaj homographyStereoLinePt( DMatrixRMaj F , PairLineNorm line, AssociatedPair point) {
 		HomographyInducedStereoLinePt alg = new HomographyInducedStereoLinePt();
 
 		alg.setFundamental(F,null);
@@ -475,7 +475,7 @@ public class MultiViewOps {
 	 * @param line1 Line on the plane
 	 * @return The homography from view 1 to view 2 or null if it fails
 	 */
-	public static RowMatrix_F64 homographyStereo2Lines( RowMatrix_F64 F , PairLineNorm line0, PairLineNorm line1) {
+	public static DMatrixRMaj homographyStereo2Lines( DMatrixRMaj F , PairLineNorm line0, PairLineNorm line1) {
 		HomographyInducedStereo2Line alg = new HomographyInducedStereo2Line();
 
 		alg.setFundamental(F,null);
@@ -526,7 +526,7 @@ public class MultiViewOps {
 	 * @param F2 Output: Fundamental matrix for views 1 and 2. Modified.
 	 * @param F3 Output: Fundamental matrix for views 1 and 3. Modified.
 	 */
-	public static void extractFundamental( TrifocalTensor tensor , RowMatrix_F64 F2 , RowMatrix_F64 F3 ) {
+	public static void extractFundamental( TrifocalTensor tensor , DMatrixRMaj F2 , DMatrixRMaj F3 ) {
 		// extract the epipoles
 		Point3D_F64 e2 = new Point3D_F64();
 		Point3D_F64 e3 = new Point3D_F64();
@@ -539,7 +539,7 @@ public class MultiViewOps {
 
 		// compute the Fundamental matrices one column at a time
 		for( int i = 0; i < 3; i++ ) {
-			RowMatrix_F64 T = tensor.getT(i);
+			DMatrixRMaj T = tensor.getT(i);
 
 			GeometryMath_F64.mult(T,e3,temp0);
 			GeometryMath_F64.cross(e2,temp0,column);
@@ -570,7 +570,7 @@ public class MultiViewOps {
 	 * @param P2 Output: 3x4 camera matrix for views 1 to 2. Modified.
 	 * @param P3 Output: 3x4 camera matrix for views 1 to 3. Modified.
 	 */
-	public static void extractCameraMatrices( TrifocalTensor tensor , RowMatrix_F64 P2 , RowMatrix_F64 P3 ) {
+	public static void extractCameraMatrices( TrifocalTensor tensor , DMatrixRMaj P2 , DMatrixRMaj P3 ) {
 		// extract the epipoles
 		Point3D_F64 e2 = new Point3D_F64();
 		Point3D_F64 e3 = new Point3D_F64();
@@ -581,7 +581,7 @@ public class MultiViewOps {
 		Point3D_F64 temp0 = new Point3D_F64();
 		Point3D_F64 column = new Point3D_F64();
 		// temp1 = [e3*e3^T -I]
-		RowMatrix_F64 temp1 = new RowMatrix_F64(3,3);
+		DMatrixRMaj temp1 = new DMatrixRMaj(3,3);
 		for( int i = 0; i < 3; i++ ) {
 			for( int j = 0; j < 3; j++ ) {
 				temp1.set(i,j,e3.getIndex(i)*e3.getIndex(j));
@@ -591,7 +591,7 @@ public class MultiViewOps {
 
 		// compute the camera matrices one column at a time
 		for( int i = 0; i < 3; i++ ) {
-			RowMatrix_F64 T = tensor.getT(i);
+			DMatrixRMaj T = tensor.getT(i);
 
 			GeometryMath_F64.mult(T, e3, column);
 			P2.set(0,i,column.x);
@@ -622,12 +622,12 @@ public class MultiViewOps {
 	 * @param T Translation vector.
 	 * @return Essential matrix
 	 */
-	public static RowMatrix_F64 createEssential(RowMatrix_F64 R, Vector3D_F64 T)
+	public static DMatrixRMaj createEssential(DMatrixRMaj R, Vector3D_F64 T)
 	{
-		RowMatrix_F64 E = new RowMatrix_F64(3,3);
+		DMatrixRMaj E = new DMatrixRMaj(3,3);
 
-		RowMatrix_F64 T_hat = GeometryMath_F64.crossMatrix(T, null);
-		CommonOps_R64.mult(T_hat, R, E);
+		DMatrixRMaj T_hat = GeometryMath_F64.crossMatrix(T, null);
+		CommonOps_DDRM.mult(T_hat, R, E);
 
 		return E;
 	}
@@ -641,15 +641,15 @@ public class MultiViewOps {
 	 * @param K Intrinsic camera calibration matrix
 	 * @return Fundamental matrix
 	 */
-	public static RowMatrix_F64 createFundamental(RowMatrix_F64 E, RowMatrix_F64 K) {
-		RowMatrix_F64 K_inv = new RowMatrix_F64(3,3);
-		CommonOps_R64.invert(K,K_inv);
+	public static DMatrixRMaj createFundamental(DMatrixRMaj E, DMatrixRMaj K) {
+		DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.invert(K,K_inv);
 
-		RowMatrix_F64 F = new RowMatrix_F64(3,3);
-		RowMatrix_F64 temp = new RowMatrix_F64(3,3);
+		DMatrixRMaj F = new DMatrixRMaj(3,3);
+		DMatrixRMaj temp = new DMatrixRMaj(3,3);
 
-		CommonOps_R64.multTransA(K_inv,E,temp);
-		CommonOps_R64.mult(temp,K_inv,F);
+		CommonOps_DDRM.multTransA(K_inv,E,temp);
+		CommonOps_DDRM.mult(temp,K_inv,F);
 
 		return F;
 	}
@@ -664,18 +664,18 @@ public class MultiViewOps {
 	 * @param K2 Intrinsic camera calibration matrix for camera 2
 	 * @return Fundamental matrix
 	 */
-	public static RowMatrix_F64 createFundamental(RowMatrix_F64 E,
-												   RowMatrix_F64 K1,  RowMatrix_F64 K2) {
-		RowMatrix_F64 K1_inv = new RowMatrix_F64(3,3);
-		CommonOps_R64.invert(K1,K1_inv);
-		RowMatrix_F64 K2_inv = new RowMatrix_F64(3,3);
-		CommonOps_R64.invert(K2,K2_inv);
+	public static DMatrixRMaj createFundamental(DMatrixRMaj E,
+												   DMatrixRMaj K1,  DMatrixRMaj K2) {
+		DMatrixRMaj K1_inv = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.invert(K1,K1_inv);
+		DMatrixRMaj K2_inv = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.invert(K2,K2_inv);
 
-		RowMatrix_F64 F = new RowMatrix_F64(3,3);
-		RowMatrix_F64 temp = new RowMatrix_F64(3,3);
+		DMatrixRMaj F = new DMatrixRMaj(3,3);
+		DMatrixRMaj temp = new DMatrixRMaj(3,3);
 
-		CommonOps_R64.multTransA(K2_inv,E,temp);
-		CommonOps_R64.mult(temp,K1_inv,F);
+		CommonOps_DDRM.multTransA(K2_inv,E,temp);
+		CommonOps_DDRM.mult(temp,K1_inv,F);
 
 		return F;
 	}
@@ -692,14 +692,14 @@ public class MultiViewOps {
 	 * @param N Normal of plane
 	 * @return Calibrated homography matrix
 	 */
-	public static RowMatrix_F64 createHomography(RowMatrix_F64 R, Vector3D_F64 T,
+	public static DMatrixRMaj createHomography(DMatrixRMaj R, Vector3D_F64 T,
 												  double d, Vector3D_F64 N)
 	{
-		RowMatrix_F64 H = new RowMatrix_F64(3,3);
+		DMatrixRMaj H = new DMatrixRMaj(3,3);
 
 		GeometryMath_F64.outerProd(T,N,H);
-		CommonOps_R64.divide(H,d);
-		CommonOps_R64.addEquals(H, R);
+		CommonOps_DDRM.divide(H,d);
+		CommonOps_DDRM.addEquals(H, R);
 
 		return H;
 	}
@@ -718,20 +718,20 @@ public class MultiViewOps {
 	 * @param K Intrinsic calibration matrix
 	 * @return Uncalibrated homography matrix
 	 */
-	public static RowMatrix_F64 createHomography(RowMatrix_F64 R, Vector3D_F64 T,
+	public static DMatrixRMaj createHomography(DMatrixRMaj R, Vector3D_F64 T,
 												  double d, Vector3D_F64 N,
-												  RowMatrix_F64 K)
+												  DMatrixRMaj K)
 	{
-		RowMatrix_F64 temp = new RowMatrix_F64(3,3);
-		RowMatrix_F64 K_inv = new RowMatrix_F64(3,3);
+		DMatrixRMaj temp = new DMatrixRMaj(3,3);
+		DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
 
-		RowMatrix_F64 H = createHomography(R, T, d, N);
+		DMatrixRMaj H = createHomography(R, T, d, N);
 
 		// apply calibration matrix to R
-		CommonOps_R64.mult(K,H,temp);
+		CommonOps_DDRM.mult(K,H,temp);
 
-		CommonOps_R64.invert(K,K_inv);
-		CommonOps_R64.mult(temp,K_inv,H);
+		CommonOps_DDRM.invert(K,K_inv);
+		CommonOps_DDRM.mult(temp,K_inv,H);
 
 		return H;
 	}
@@ -752,7 +752,7 @@ public class MultiViewOps {
 	 * @param e1 Output: Right epipole in homogeneous coordinates. Can be null. Modified.
 	 * @param e2 Output: Left epipole in homogeneous coordinates. Can be null. Modified.
 	 */
-	public static void extractEpipoles( RowMatrix_F64 F , Point3D_F64 e1 , Point3D_F64 e2 ) {
+	public static void extractEpipoles( DMatrixRMaj F , Point3D_F64 e1 , Point3D_F64 e2 ) {
 		SimpleMatrix f = SimpleMatrix.wrap(F);
 		SimpleSVD<SimpleMatrix> svd = f.svd();
 
@@ -788,20 +788,20 @@ public class MultiViewOps {
 	 * @param e2 Left epipole of fundamental matrix, F<sup>T</sup>*e2 = 0.
 	 * @return The canonical camera matrix P'
 	 */
-	public static RowMatrix_F64 canonicalCamera( RowMatrix_F64 F , Point3D_F64 e2, Vector3D_F64 v , double lambda ) {
+	public static DMatrixRMaj canonicalCamera( DMatrixRMaj F , Point3D_F64 e2, Vector3D_F64 v , double lambda ) {
 
-		RowMatrix_F64 crossMatrix = new RowMatrix_F64(3,3);
+		DMatrixRMaj crossMatrix = new DMatrixRMaj(3,3);
 		GeometryMath_F64.crossMatrix(e2, crossMatrix);
 
-		RowMatrix_F64 outer = new RowMatrix_F64(3,3);
+		DMatrixRMaj outer = new DMatrixRMaj(3,3);
 		GeometryMath_F64.outerProd(e2,v,outer);
 
-		RowMatrix_F64 KR = new RowMatrix_F64(3,3);
-		CommonOps_R64.mult(crossMatrix, F, KR);
-		CommonOps_R64.add(KR, outer, KR);
+		DMatrixRMaj KR = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.mult(crossMatrix, F, KR);
+		CommonOps_DDRM.add(KR, outer, KR);
 
-		RowMatrix_F64 P = new RowMatrix_F64(3,4);
-		CommonOps_R64.insert(KR,P,0,0);
+		DMatrixRMaj P = new DMatrixRMaj(3,4);
+		CommonOps_DDRM.insert(KR,P,0,0);
 
 		P.set(0,3,lambda*e2.x);
 		P.set(1,3,lambda*e2.y);
@@ -825,31 +825,31 @@ public class MultiViewOps {
 	 * @param K Output: Camera calibration matrix, 3 by 3.
 	 * @param pose Output: The rotation and translation.
 	 */
-	public static void decomposeCameraMatrix(RowMatrix_F64 P, RowMatrix_F64 K, Se3_F64 pose) {
-		RowMatrix_F64 KR = new RowMatrix_F64(3,3);
-		CommonOps_R64.extract(P, 0, 3, 0, 3, KR, 0, 0);
+	public static void decomposeCameraMatrix(DMatrixRMaj P, DMatrixRMaj K, Se3_F64 pose) {
+		DMatrixRMaj KR = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.extract(P, 0, 3, 0, 3, KR, 0, 0);
 
-		QRDecomposition<RowMatrix_F64> qr = DecompositionFactory_R64.qr(3, 3);
+		QRDecomposition<DMatrixRMaj> qr = DecompositionFactory_DDRM.qr(3, 3);
 
-		if( !CommonOps_R64.invert(KR) )
+		if( !CommonOps_DDRM.invert(KR) )
 			throw new RuntimeException("Inverse failed!  Bad input?");
 
 		if( !qr.decompose(KR) )
 			throw new RuntimeException("QR decomposition failed!  Bad input?");
 
-		RowMatrix_F64 U = qr.getQ(null,false);
-		RowMatrix_F64 B = qr.getR(null, false);
+		DMatrixRMaj U = qr.getQ(null,false);
+		DMatrixRMaj B = qr.getR(null, false);
 
-		if( !CommonOps_R64.invert(U,pose.getR()) )
+		if( !CommonOps_DDRM.invert(U,pose.getR()) )
 			throw new RuntimeException("Inverse failed!  Bad input?");
 
 		Point3D_F64 KT = new Point3D_F64(P.get(0,3),P.get(1,3),P.get(2,3));
 		GeometryMath_F64.mult(B, KT, pose.getT());
 
-		if( !CommonOps_R64.invert(B,K) )
+		if( !CommonOps_DDRM.invert(B,K) )
 			throw new RuntimeException("Inverse failed!  Bad input?");
 
-		CommonOps_R64.scale(1.0/K.get(2,2),K);
+		CommonOps_DDRM.scale(1.0/K.get(2,2),K);
 	}
 
 	/**
@@ -863,7 +863,7 @@ public class MultiViewOps {
 	 * @param E An essential matrix.
 	 * @return Four possible motions
 	 */
-	public static List<Se3_F64> decomposeEssential( RowMatrix_F64 E ) {
+	public static List<Se3_F64> decomposeEssential( DMatrixRMaj E ) {
 		DecomposeEssential d = new DecomposeEssential();
 
 		d.decompose(E);
@@ -883,7 +883,7 @@ public class MultiViewOps {
 	 * @param H Homography in Euclidean space
 	 * @return The set of four possible solutions. First param: motion (R,T).  Second param: plane normal vector.
 	 */
-	public static List<Tuple2<Se3_F64,Vector3D_F64>> decomposeHomography( RowMatrix_F64 H ) {
+	public static List<Tuple2<Se3_F64,Vector3D_F64>> decomposeHomography( DMatrixRMaj H ) {
 		DecomposeHomography d = new DecomposeHomography();
 
 		d.decompose(H);

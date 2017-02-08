@@ -26,8 +26,8 @@ import org.ddogleg.solver.PolynomialSolver;
 import org.ddogleg.solver.RootFinderType;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.Complex_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.SpecializedOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.SpecializedOps_DDRM;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,15 +56,15 @@ import java.util.List;
  */
 public class FundamentalLinear7 extends FundamentalLinear {
 	// extracted from the null space of A
-	protected RowMatrix_F64 F1 = new RowMatrix_F64(3,3);
-	protected RowMatrix_F64 F2 = new RowMatrix_F64(3,3);
+	protected DMatrixRMaj F1 = new DMatrixRMaj(3,3);
+	protected DMatrixRMaj F2 = new DMatrixRMaj(3,3);
 
 	// temporary storage for cubic coefficients
 	private Polynomial poly = new Polynomial(4);
 	private PolynomialRoots rootFinder = PolynomialSolver.createRootFinder(RootFinderType.EVD,4);
 
 	// Matrix from SVD
-	private RowMatrix_F64 V = new RowMatrix_F64(9,9);
+	private DMatrixRMaj V = new DMatrixRMaj(9,9);
 
 	/**
 	 * When computing the essential matrix normalization is optional because pixel coordinates
@@ -85,7 +85,7 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 * @param solutions Output: Storage for the found solutions.
 	 * @return true If successful or false if it failed
 	 */
-	public boolean process( List<AssociatedPair> points , FastQueue<RowMatrix_F64> solutions ) {
+	public boolean process( List<AssociatedPair> points , FastQueue<DMatrixRMaj> solutions ) {
 		if( points.size() != 7 )
 			throw new IllegalArgumentException("Must be exactly 7 points. Not "+points.size()+" you gelatinous piece of pond scum.");
 
@@ -117,15 +117,15 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	/**
 	 * Computes the SVD of A and extracts the essential/fundamental matrix from its null space
 	 */
-	private boolean process(RowMatrix_F64 A) {
+	private boolean process(DMatrixRMaj A) {
 		if( !svdNull.decompose(A) )
 			return false;
 
 		// extract the two singular vectors
 		// no need to sort by singular values because the two automatic null spaces are being sampled
 		svdNull.getV(V,false);
-		SpecializedOps_R64.subvector(V, 0, 7, 9, false, 0, F1);
-		SpecializedOps_R64.subvector(V, 0, 8, 9, false, 0, F2);
+		SpecializedOps_DDRM.subvector(V, 0, 7, 9, false, 0, F1);
+		SpecializedOps_DDRM.subvector(V, 0, 8, 9, false, 0, F2);
 
 		return true;
 	}
@@ -139,7 +139,7 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 * </p>
 
 	 */
-	public void computeSolutions( FastQueue<RowMatrix_F64> solutions )
+	public void computeSolutions( FastQueue<DMatrixRMaj> solutions )
 	{
 		if( !rootFinder.process(poly))
 			return;
@@ -150,7 +150,7 @@ public class FundamentalLinear7 extends FundamentalLinear {
 			if( !c.isReal() && Math.abs(c.imaginary) > 1e-10 )
 				continue;
 
-			RowMatrix_F64 F = solutions.grow();
+			DMatrixRMaj F = solutions.grow();
 
 			double a = c.real;
 			double b = 1-c.real;
@@ -178,8 +178,8 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 * @param F2 a fundamental matrix
 	 * @param coefs Where results are returned.
 	 */
-	public static void computeCoefficients( RowMatrix_F64 F1 ,
-											RowMatrix_F64 F2 ,
+	public static void computeCoefficients( DMatrixRMaj F1 ,
+											DMatrixRMaj F2 ,
 											double coefs[] )
 	{
 		Arrays.fill(coefs, 0);
@@ -192,8 +192,8 @@ public class FundamentalLinear7 extends FundamentalLinear {
 		computeCoefficients(F1,F2,0,5,7,coefs,true);
 	}
 
-	public static void computeCoefficients( RowMatrix_F64 F1 ,
-											RowMatrix_F64 F2 ,
+	public static void computeCoefficients( DMatrixRMaj F1 ,
+											DMatrixRMaj F2 ,
 											int i , int j , int k ,
 											double coefs[] , boolean minus )
 	{

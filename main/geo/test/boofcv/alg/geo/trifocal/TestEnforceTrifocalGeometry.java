@@ -21,9 +21,9 @@ package boofcv.alg.geo.trifocal;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -40,8 +40,8 @@ public class TestEnforceTrifocalGeometry extends CommonTrifocalChecks {
 	 */
 	@Test
 	public void checkMatrixE() {
-		RowMatrix_F64 P2 = new RowMatrix_F64(3,4,true,1,2,3,4,5,6,7,8,9,10,11,12);
-		RowMatrix_F64 P3 = new RowMatrix_F64(3,4,true,10,20,30,40,50,60,70,80,90,100,110,120);
+		DMatrixRMaj P2 = new DMatrixRMaj(3,4,true,1,2,3,4,5,6,7,8,9,10,11,12);
+		DMatrixRMaj P3 = new DMatrixRMaj(3,4,true,10,20,30,40,50,60,70,80,90,100,110,120);
 
 		Point3D_F64 e2 = new Point3D_F64(P2.get(0,3),P2.get(1,3),P2.get(2,3));
 		Point3D_F64 e3 = new Point3D_F64(P3.get(0,3),P3.get(1,3),P3.get(2,3));
@@ -52,22 +52,22 @@ public class TestEnforceTrifocalGeometry extends CommonTrifocalChecks {
 
 		alg.constructE(e2,e3);
 
-		RowMatrix_F64 X = new RowMatrix_F64(18,1);
+		DMatrixRMaj X = new DMatrixRMaj(18,1);
 
 		for( int i = 0; i < 9; i++ ) {
 			X.data[i] = P2.get(i/3,i%3);
 			X.data[i+9] = P3.get(i/3,i%3);
 		}
 
-		RowMatrix_F64 vectorT = new RowMatrix_F64(27,1);
-		CommonOps_R64.mult(alg.E,X,vectorT);
+		DMatrixRMaj vectorT = new DMatrixRMaj(27,1);
+		CommonOps_DDRM.mult(alg.E,X,vectorT);
 
 		TrifocalTensor foundT = new TrifocalTensor();
 		foundT.convertFrom(vectorT);
 
 		// the two tensors should be identical
 		for( int i = 0; i < 3; i++ ) {
-			assertTrue(MatrixFeatures_R64.isIdentical(tensor.getT(i),foundT.getT(i),1e-8));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(tensor.getT(i),foundT.getT(i),1e-8));
 		}
 	}
 
@@ -80,13 +80,13 @@ public class TestEnforceTrifocalGeometry extends CommonTrifocalChecks {
 		// create linear constraint matrix
 		TrifocalLinearPoint7 constructA = new TrifocalLinearPoint7();
 		// Make things easier by working in pixel coordinates
-		constructA.N1 = CommonOps_R64.identity(3);
-		constructA.N2 = CommonOps_R64.identity(3);
-		constructA.N3 = CommonOps_R64.identity(3);
+		constructA.N1 = CommonOps_DDRM.identity(3);
+		constructA.N2 = CommonOps_DDRM.identity(3);
+		constructA.N3 = CommonOps_DDRM.identity(3);
 
 		constructA.createLinearSystem(observations);
 
-		RowMatrix_F64 A = constructA.A;
+		DMatrixRMaj A = constructA.A;
 
 		// extract epipoles
 		Point3D_F64 e2 = new Point3D_F64();
@@ -104,7 +104,7 @@ public class TestEnforceTrifocalGeometry extends CommonTrifocalChecks {
 		checkTrifocalWithConstraint(found,1e-6);
 
 		// make sure the errors are zero too
-		RowMatrix_F64 errors = new RowMatrix_F64(observations.size(),1);
+		DMatrixRMaj errors = new DMatrixRMaj(observations.size(),1);
 		alg.computeErrorVector(A,errors);
 
 		for( int i = 0; i < errors.numRows; i++ )

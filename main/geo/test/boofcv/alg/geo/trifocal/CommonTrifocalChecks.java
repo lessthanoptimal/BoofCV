@@ -26,8 +26,8 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.NormOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.NormOps_DDRM;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,15 +44,15 @@ public abstract class CommonTrifocalChecks {
 	Random rand = new Random(234);
 
 	// camera calibration matrix
-	RowMatrix_F64 K = new RowMatrix_F64(3,3,true,60,0.01,200,0,80,150,0,0,1);
+	DMatrixRMaj K = new DMatrixRMaj(3,3,true,60,0.01,200,0,80,150,0,0,1);
 
 	Se3_F64 se2,se3;
-	RowMatrix_F64 P2,P3;
+	DMatrixRMaj P2,P3;
 	TrifocalTensor tensor;
 	// storage for the found solution
 	TrifocalTensor found = new TrifocalTensor();
 
-	RowMatrix_F64 F2,F3;
+	DMatrixRMaj F2,F3;
 
 	List<Point3D_F64> worldPts = new ArrayList<>();
 	// observation in pixels for all views
@@ -80,9 +80,9 @@ public abstract class CommonTrifocalChecks {
 		for( int i = 0; i < observations.size(); i++ ) {
 			AssociatedTriple o = observations.get(i);
 
-			RowMatrix_F64 c = MultiViewOps.constraint(tensor,o.p1,o.p2,o.p3,null);
+			DMatrixRMaj c = MultiViewOps.constraint(tensor,o.p1,o.p2,o.p3,null);
 
-			double v = NormOps_R64.normF(c)/(c.numCols*c.numRows);
+			double v = NormOps_DDRM.normF(c)/(c.numCols*c.numRows);
 
 			assertEquals(0,v,tol);
 		}

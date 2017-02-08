@@ -42,8 +42,8 @@ import georegression.misc.GrlConstants;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Vector3D_F32;
-import org.ejml.data.RowMatrix_F32;
-import org.ejml.ops.CommonOps_R32;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.dense.row.CommonOps_FDRM;
 
 import javax.swing.*;
 import java.awt.*;
@@ -126,9 +126,9 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 				}
 
 				synchronized (imageLock) {
-					RowMatrix_F32 R = ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,null);
-					RowMatrix_F32 tmp = distorter.getRotation().copy();
-					CommonOps_R32.mult(tmp,R,distorter.getRotation());
+					FMatrixRMaj R = ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,null);
+					FMatrixRMaj tmp = distorter.getRotation().copy();
+					CommonOps_FDRM.mult(tmp,R,distorter.getRotation());
 					distortImage.setModel(distorter); // dirty the transform
 					if (inputMethod == InputMethod.IMAGE) {
 						rerenderPinhole();
@@ -158,9 +158,9 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 					// equirectangular lon-lat uses +x
 					// this compensates for that
 					// roll rotation is to make the view appear "up"
-					RowMatrix_F32 A = ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX, GrlConstants.F_PI/2,0,GrlConstants.F_PI/2,null);
-					RowMatrix_F32 tmp = distorter.getRotation().copy();
-					CommonOps_R32.mult(tmp,A,distorter.getRotation());
+					FMatrixRMaj A = ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX, GrlConstants.F_PI/2,0,GrlConstants.F_PI/2,null);
+					FMatrixRMaj tmp = distorter.getRotation().copy();
+					CommonOps_FDRM.mult(tmp,A,distorter.getRotation());
 
 					distortImage.setModel(distorter); // let it know the transform has changed
 
@@ -297,7 +297,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 			// center the center cicle
-			RowMatrix_F32 R = distorter.getRotation();
+			FMatrixRMaj R = distorter.getRotation();
 
 			v.set(0,0,1); // canonical view is +z for pinhole cvamera
 			GeometryMath_F32.mult(R,v,v);

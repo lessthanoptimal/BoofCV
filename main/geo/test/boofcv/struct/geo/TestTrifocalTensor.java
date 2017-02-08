@@ -18,8 +18,8 @@
 
 package boofcv.struct.geo;
 
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.NormOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.NormOps_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -55,7 +55,7 @@ public class TestTrifocalTensor {
 
 	@Test
 	public void convertFrom() {
-		RowMatrix_F64 A = new RowMatrix_F64(27,1);
+		DMatrixRMaj A = new DMatrixRMaj(27,1);
 		for( int i = 0; i < 27; i++ )
 			A.set(i,i);
 
@@ -73,7 +73,7 @@ public class TestTrifocalTensor {
 		for( int i = 0; i < 27; i++ )
 			t.getT( i/9 ).set(i % 9, i);
 
-		RowMatrix_F64 A = new RowMatrix_F64(27,1);
+		DMatrixRMaj A = new DMatrixRMaj(27,1);
 		t.convertTo(A);
 		for( int i = 0; i < 27; i++ )
 			assertTrue(i==A.get(i));
@@ -87,10 +87,10 @@ public class TestTrifocalTensor {
 		for( int i = 0; i < 27; i++ )
 			t.getT( i/9 ).set(i%9,i);
 
-		RowMatrix_F64 A = new RowMatrix_F64(27,1);
+		DMatrixRMaj A = new DMatrixRMaj(27,1);
 		t.convertTo(A);
 
-		double N = NormOps_R64.normF(A);
+		double N = NormOps_DDRM.normF(A);
 
 		t.normalizeScale();
 		for( int i = 0; i < 27; i++ )

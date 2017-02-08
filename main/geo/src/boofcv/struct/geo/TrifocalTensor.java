@@ -18,9 +18,9 @@
 
 package boofcv.struct.geo;
 
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.SpecializedOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.SpecializedOps_DDRM;
 
 /**
  * The trifocal tensor describes the projective relationship between three different camera views and is
@@ -30,11 +30,11 @@ import org.ejml.ops.SpecializedOps_R64;
  * @author Peter Abeles
  */
 public class TrifocalTensor {
-	public RowMatrix_F64 T1 = new RowMatrix_F64(3,3);
-	public RowMatrix_F64 T2 = new RowMatrix_F64(3,3);
-	public RowMatrix_F64 T3 = new RowMatrix_F64(3,3);
+	public DMatrixRMaj T1 = new DMatrixRMaj(3,3);
+	public DMatrixRMaj T2 = new DMatrixRMaj(3,3);
+	public DMatrixRMaj T3 = new DMatrixRMaj(3,3);
 
-	public RowMatrix_F64 getT( int index ) {
+	public DMatrixRMaj getT( int index ) {
 		switch( index ) {
 			case 0:
 				return T1;
@@ -63,7 +63,7 @@ public class TrifocalTensor {
 	 *
 	 * @param m Input: Trifocal tensor encoded in a vector
 	 */
-	public void convertFrom( RowMatrix_F64 m ) {
+	public void convertFrom( DMatrixRMaj m ) {
 		if( m.getNumElements() != 27 )
 			throw new IllegalArgumentException("Input matrix/vector must have 27 elements");
 
@@ -82,7 +82,7 @@ public class TrifocalTensor {
 	 *
 	 * @param m Output: Trifocal tensor encoded in a vector
 	 */
-	public void convertTo( RowMatrix_F64 m ) {
+	public void convertTo( DMatrixRMaj m ) {
 		if( m.getNumElements() != 27 )
 			throw new IllegalArgumentException("Input matrix/vector must have 27 elements");
 
@@ -114,15 +114,15 @@ public class TrifocalTensor {
 	public void normalizeScale() {
 		double sum = 0;
 
-		sum += SpecializedOps_R64.elementSumSq(T1);
-		sum += SpecializedOps_R64.elementSumSq(T2);
-		sum += SpecializedOps_R64.elementSumSq(T3);
+		sum += SpecializedOps_DDRM.elementSumSq(T1);
+		sum += SpecializedOps_DDRM.elementSumSq(T2);
+		sum += SpecializedOps_DDRM.elementSumSq(T3);
 
 		double n = Math.sqrt(sum);
 
-		CommonOps_R64.scale(1.0/n,T1);
-		CommonOps_R64.scale(1.0/n,T2);
-		CommonOps_R64.scale(1.0/n,T3);
+		CommonOps_DDRM.scale(1.0/n,T1);
+		CommonOps_DDRM.scale(1.0/n,T2);
+		CommonOps_DDRM.scale(1.0/n,T3);
 	}
 
 	@Override

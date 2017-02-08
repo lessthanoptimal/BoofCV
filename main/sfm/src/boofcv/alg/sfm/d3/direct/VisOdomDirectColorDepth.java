@@ -39,8 +39,8 @@ import georegression.transform.se.SePointOps_F32;
 import georegression.transform.twist.TwistCoordinate_F32;
 import georegression.transform.twist.TwistOps_F32;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.LinearSolverFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.interfaces.linsol.LinearSolver;
 
 /**
@@ -57,10 +57,10 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 	private ImageType<Planar<I>> imageType;
 	private ImageType<Planar<D>> derivType;
 
-	private LinearSolver<RowMatrix_F64> solver;
-	private RowMatrix_F64 A = new RowMatrix_F64(1,6);
-	private RowMatrix_F64 y = new RowMatrix_F64(1,1);
-	private RowMatrix_F64 twistMatrix = new RowMatrix_F64(6,1);
+	private LinearSolver<DMatrixRMaj> solver;
+	private DMatrixRMaj A = new DMatrixRMaj(1,6);
+	private DMatrixRMaj y = new DMatrixRMaj(1,1);
+	private DMatrixRMaj twistMatrix = new DMatrixRMaj(6,1);
 
 	private ImageGradient<Planar<I>,Planar<D>> computeD;
 
@@ -280,7 +280,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 	 */
 	void initMotion(Planar<I> input) {
 		if( solver == null ) {
-			solver = LinearSolverFactory_R64.qr(input.width*input.height*input.getNumBands(),6);
+			solver = LinearSolverFactory_DDRM.qr(input.width*input.height*input.getNumBands(),6);
 		}
 
 		// compute image derivative and setup interpolation functions

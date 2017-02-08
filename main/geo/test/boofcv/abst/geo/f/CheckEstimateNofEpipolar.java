@@ -25,8 +25,8 @@ import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.QueueMatrix;
 import georegression.geometry.GeometryMath_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.Test;
 
 import java.util.List;
@@ -70,7 +70,7 @@ public abstract class CheckEstimateNofEpipolar extends EpipolarTestSimulation {
 
 		boolean workedOnce = false;
 
-		FastQueue<RowMatrix_F64> solutions = new QueueMatrix(3, 3);
+		FastQueue<DMatrixRMaj> solutions = new QueueMatrix(3, 3);
 
 		for( int i = 0; i < 10; i++ ) {
 			List<AssociatedPair> pairs = randomPairs(alg.getMinimumPoints());
@@ -84,10 +84,10 @@ public abstract class CheckEstimateNofEpipolar extends EpipolarTestSimulation {
 
 			workedOnce = true;
 
-			for( RowMatrix_F64 F : solutions.toList() ) {
+			for( DMatrixRMaj F : solutions.toList() ) {
 				// normalize to ensure proper scaling
-				double n = CommonOps_R64.elementMaxAbs(F);
-				CommonOps_R64.scale(1.0/n,F);
+				double n = CommonOps_DDRM.elementMaxAbs(F);
+				CommonOps_DDRM.scale(1.0/n,F);
 
 				for( AssociatedPair p : pairs ) {
 					double correct = Math.abs(GeometryMath_F64.innerProd(p.p2, F, p.p1));

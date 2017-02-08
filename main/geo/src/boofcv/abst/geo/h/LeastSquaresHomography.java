@@ -24,7 +24,7 @@ import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class LeastSquaresHomography implements RefineEpipolar {
 	}
 
 	@Override
-	public boolean fitModel(List<AssociatedPair> obs, RowMatrix_F64 F, RowMatrix_F64 refinedF) {
+	public boolean fitModel(List<AssociatedPair> obs, DMatrixRMaj F, DMatrixRMaj refinedF) {
 
 		func.setObservations(obs);
 		minimizer.setFunction(func,null);

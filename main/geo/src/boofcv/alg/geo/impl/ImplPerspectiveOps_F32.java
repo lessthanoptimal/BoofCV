@@ -31,8 +31,8 @@ import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Vector3D_F32;
 import georegression.struct.se.Se3_F32;
 import georegression.transform.se.SePointOps_F32;
-import org.ejml.data.RowMatrix_F32;
-import org.ejml.ops.CommonOps_R32;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.dense.row.CommonOps_FDRM;
 
 /**
  * Implementation of {@link PerspectiveOps} functions for 32-bit floats
@@ -42,33 +42,33 @@ import org.ejml.ops.CommonOps_R32;
 public class ImplPerspectiveOps_F32 {
 
 	public static <C extends CameraPinhole>C adjustIntrinsic(C parameters,
-															 RowMatrix_F32 adjustMatrix,
+															 FMatrixRMaj adjustMatrix,
 															 C adjustedParam)
 	{
 		if( adjustedParam == null )
 			adjustedParam = parameters.createLike();
 		adjustedParam.set(parameters);
 
-		RowMatrix_F32 K = ImplPerspectiveOps_F32.calibrationMatrix(parameters, null);
-		RowMatrix_F32 K_adj = new RowMatrix_F32(3,3);
-		CommonOps_R32.mult(adjustMatrix, K, K_adj);
+		FMatrixRMaj K = ImplPerspectiveOps_F32.calibrationMatrix(parameters, null);
+		FMatrixRMaj K_adj = new FMatrixRMaj(3,3);
+		CommonOps_FDRM.mult(adjustMatrix, K, K_adj);
 
 		ImplPerspectiveOps_F32.matrixToParam(K_adj, parameters.width, parameters.height, adjustedParam);
 
 		return adjustedParam;
 	}
 
-	public static RowMatrix_F32 calibrationMatrix(float fx, float fy, float skew,
+	public static FMatrixRMaj calibrationMatrix(float fx, float fy, float skew,
 												   float xc, float yc) {
-		return new RowMatrix_F32(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
+		return new FMatrixRMaj(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
 	}
 
-	public static RowMatrix_F32 calibrationMatrix(CameraPinhole param , RowMatrix_F32 K ) {
+	public static FMatrixRMaj calibrationMatrix(CameraPinhole param , FMatrixRMaj K ) {
 
 		if( K == null ) {
-			K = new RowMatrix_F32(3,3);
+			K = new FMatrixRMaj(3,3);
 		}
-		CommonOps_R32.fill(K, 0);
+		CommonOps_FDRM.fill(K, 0);
 
 		K.data[0] = (float)param.fx;
 		K.data[1] = (float)param.skew;
@@ -80,7 +80,7 @@ public class ImplPerspectiveOps_F32 {
 		return K;
 	}
 
-	public static <C extends CameraPinhole>C matrixToParam(RowMatrix_F32 K , int width , int height , C param ) {
+	public static <C extends CameraPinhole>C matrixToParam(FMatrixRMaj K , int width , int height , C param ) {
 
 		if( param == null )
 			param = (C)new CameraPinhole();
@@ -109,7 +109,7 @@ public class ImplPerspectiveOps_F32 {
 		return pixel;
 	}
 
-	public static Point2D_F32 convertNormToPixel( RowMatrix_F32 K, Point2D_F32 norm , Point2D_F32 pixel ) {
+	public static Point2D_F32 convertNormToPixel( FMatrixRMaj K, Point2D_F32 norm , Point2D_F32 pixel ) {
 		if( pixel == null )
 			pixel = new Point2D_F32();
 
@@ -132,7 +132,7 @@ public class ImplPerspectiveOps_F32 {
 		return norm;
 	}
 
-	public static Point2D_F32 convertPixelToNorm( RowMatrix_F32 K , Point2D_F32 pixel , Point2D_F32 norm ) {
+	public static Point2D_F32 convertPixelToNorm( FMatrixRMaj K , Point2D_F32 pixel , Point2D_F32 norm ) {
 		if( norm == null )
 			norm = new Point2D_F32();
 
@@ -145,7 +145,7 @@ public class ImplPerspectiveOps_F32 {
 	}
 
 
-	public static Point2D_F32 renderPixel( Se3_F32 worldToCamera , RowMatrix_F32 K , Point3D_F32 X ) {
+	public static Point2D_F32 renderPixel( Se3_F32 worldToCamera , FMatrixRMaj K , Point3D_F32 X ) {
 		Point3D_F32 X_cam = new Point3D_F32();
 
 		SePointOps_F32.transform(worldToCamera, X, X_cam);
@@ -163,8 +163,8 @@ public class ImplPerspectiveOps_F32 {
 		return GeometryMath_F32.mult(K, norm, norm);
 	}
 
-	public static Point2D_F32 renderPixel( RowMatrix_F32 worldToCamera , Point3D_F32 X ) {
-		RowMatrix_F32 P = worldToCamera;
+	public static Point2D_F32 renderPixel( FMatrixRMaj worldToCamera , Point3D_F32 X ) {
+		FMatrixRMaj P = worldToCamera;
 
 		float x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3];
 		float y = P.data[4]*X.x + P.data[5]*X.y + P.data[6]*X.z + P.data[7];
@@ -178,12 +178,12 @@ public class ImplPerspectiveOps_F32 {
 		return pixel;
 	}
 
-	public static RowMatrix_F32 createCameraMatrix( RowMatrix_F32 R , Vector3D_F32 T , RowMatrix_F32 K ,
-													 RowMatrix_F32 ret ) {
+	public static FMatrixRMaj createCameraMatrix( FMatrixRMaj R , Vector3D_F32 T , FMatrixRMaj K ,
+													 FMatrixRMaj ret ) {
 		if( ret == null )
-			ret = new RowMatrix_F32(3,4);
+			ret = new FMatrixRMaj(3,4);
 
-		CommonOps_R32.insert(R,ret,0,0);
+		CommonOps_FDRM.insert(R,ret,0,0);
 
 		ret.data[3] = T.x;
 		ret.data[7] = T.y;
@@ -192,8 +192,8 @@ public class ImplPerspectiveOps_F32 {
 		if( K == null )
 			return ret;
 
-		RowMatrix_F32 temp = new RowMatrix_F32(3,4);
-		CommonOps_R32.mult(K,ret,temp);
+		FMatrixRMaj temp = new FMatrixRMaj(3,4);
+		CommonOps_FDRM.mult(K,ret,temp);
 
 		ret.set(temp);
 

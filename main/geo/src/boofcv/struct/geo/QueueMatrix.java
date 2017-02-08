@@ -19,14 +19,14 @@
 package boofcv.struct.geo;
 
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
- * {@link FastQueue} which will internally declare {@link RowMatrix_F64} of a specific shape.
+ * {@link FastQueue} which will internally declare {@link DMatrixRMaj} of a specific shape.
  *
  * @author Peter Abeles
  */
-public class QueueMatrix extends FastQueue<RowMatrix_F64> {
+public class QueueMatrix extends FastQueue<DMatrixRMaj> {
 
 	// matrix shape
 	private int numRows,numCols;
@@ -42,7 +42,7 @@ public class QueueMatrix extends FastQueue<RowMatrix_F64> {
 		this.numRows = numRows;
 		this.numCols = numCols;
 
-		init(initialMaxSize,RowMatrix_F64.class,true);
+		init(initialMaxSize,DMatrixRMaj.class,true);
 	}
 
 	/**
@@ -55,11 +55,11 @@ public class QueueMatrix extends FastQueue<RowMatrix_F64> {
 		this.numRows = numRows;
 		this.numCols = numCols;
 
-		init(10,RowMatrix_F64.class,true);
+		init(10,DMatrixRMaj.class,true);
 	}
 
 	@Override
-	protected RowMatrix_F64 createInstance() {
-		return new RowMatrix_F64(numRows,numCols);
+	protected DMatrixRMaj createInstance() {
+		return new DMatrixRMaj(numRows,numCols);
 	}
 }

@@ -22,8 +22,8 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.LinearSolverFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.interfaces.linsol.LinearSolver;
 
 import java.util.List;
@@ -55,12 +55,12 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PositionFromPairLinear2 {
-	LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_R64.leastSquares(300, 3);
+	LinearSolver<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(300, 3);
 	
 	// storage for system of equations
-	RowMatrix_F64 A = new RowMatrix_F64(3,3);
-	RowMatrix_F64 x = new RowMatrix_F64(3,1);
-	RowMatrix_F64 b = new RowMatrix_F64(3,1);
+	DMatrixRMaj A = new DMatrixRMaj(3,3);
+	DMatrixRMaj x = new DMatrixRMaj(3,1);
+	DMatrixRMaj b = new DMatrixRMaj(3,1);
 
 	Point3D_F64 RX = new Point3D_F64();
 	
@@ -75,7 +75,7 @@ public class PositionFromPairLinear2 {
 	 * @param observed Observations of point in current view.  Normalized coordinates.
 	 * @return true if it succeeded.
 	 */
-	public boolean process( RowMatrix_F64 R , List<Point3D_F64> worldPts , List<Point2D_F64> observed )
+	public boolean process( DMatrixRMaj R , List<Point3D_F64> worldPts , List<Point2D_F64> observed )
 	{
 		if( worldPts.size() != observed.size() )
 			throw new IllegalArgumentException("Number of worldPts and observed must be the same");

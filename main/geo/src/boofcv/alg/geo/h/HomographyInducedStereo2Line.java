@@ -28,8 +28,8 @@ import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  *
@@ -60,10 +60,10 @@ public class HomographyInducedStereo2Line {
 	// Epipole in camera 2
 	private Point3D_F64 e2 = new Point3D_F64();
 	// A = cross(e2)*F
-	private RowMatrix_F64 A = new RowMatrix_F64(3,3);
+	private DMatrixRMaj A = new DMatrixRMaj(3,3);
 
 	// The found homography from view 1 to view 2
-	private RowMatrix_F64 H = new RowMatrix_F64(3,3);
+	private DMatrixRMaj H = new DMatrixRMaj(3,3);
 
 	// pick a reasonable scale and sign
 	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
@@ -73,7 +73,7 @@ public class HomographyInducedStereo2Line {
 	private Point3D_F64 Al1 = new Point3D_F64();
 
 	private Point3D_F64 v = new Point3D_F64();
-	private RowMatrix_F64 av = new RowMatrix_F64(3,3);
+	private DMatrixRMaj av = new DMatrixRMaj(3,3);
 
 	private PlaneGeneral3D_F64 planeA = new PlaneGeneral3D_F64();
 	private PlaneGeneral3D_F64 planeB = new PlaneGeneral3D_F64();
@@ -92,7 +92,7 @@ public class HomographyInducedStereo2Line {
 	 * @param F Fundamental matrix.
 	 * @param e2 Epipole for camera 2.  If null it will be computed internally.
 	 */
-	public void setFundamental( RowMatrix_F64 F , Point3D_F64 e2 ) {
+	public void setFundamental( DMatrixRMaj F , Point3D_F64 e2 ) {
 		if( e2 != null )
 			this.e2.set(e2);
 		else {
@@ -150,7 +150,7 @@ public class HomographyInducedStereo2Line {
 
 		// H = A - e2*v^T
 		GeometryMath_F64.outerProd(e2,v,av);
-		CommonOps_R64.subtract(A, av, H);
+		CommonOps_DDRM.subtract(A, av, H);
 
 		// pick a good scale and sign for H
 		adjust.adjust(H, line0);
@@ -158,7 +158,7 @@ public class HomographyInducedStereo2Line {
 		return true;
 	}
 
-	public RowMatrix_F64 getHomography() {
+	public DMatrixRMaj getHomography() {
 		return H;
 	}
 }

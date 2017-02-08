@@ -32,8 +32,8 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
-import org.ejml.data.RowMatrix_F32;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
 
 import java.awt.image.BufferedImage;
@@ -67,7 +67,7 @@ public class ExampleRectifyUncalibratedStereo {
 	 * @param origLeft Original input image.  Used for output purposes.
 	 * @param origRight Original input image.  Used for output purposes.
 	 */
-	public static void rectify( RowMatrix_F64 F , List<AssociatedPair> inliers ,
+	public static void rectify( DMatrixRMaj F , List<AssociatedPair> inliers ,
 								BufferedImage origLeft , BufferedImage origRight ) {
 		// Unrectified images
 		Planar<GrayF32> unrectLeft =
@@ -85,16 +85,16 @@ public class ExampleRectifyUncalibratedStereo {
 		rectifyAlg.process(F,inliers,origLeft.getWidth(),origLeft.getHeight());
 
 		// rectification matrix for each image
-		RowMatrix_F64 rect1 = rectifyAlg.getRect1();
-		RowMatrix_F64 rect2 = rectifyAlg.getRect2();
+		DMatrixRMaj rect1 = rectifyAlg.getRect1();
+		DMatrixRMaj rect2 = rectifyAlg.getRect2();
 
 		// Adjust the rectification to make the view area more useful
 		RectifyImageOps.fullViewLeft(origLeft.getWidth(),origLeft.getHeight(), rect1, rect2 );
 //		RectifyImageOps.allInsideLeft(origLeft.getWidth(),origLeft.getHeight(), rect1, rect2 );
 
 		// undistorted and rectify images
-		RowMatrix_F32 rect1_F32 = new RowMatrix_F32(3,3); // TODO simplify code some how
-		RowMatrix_F32 rect2_F32 = new RowMatrix_F32(3,3);
+		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3); // TODO simplify code some how
+		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
@@ -128,7 +128,7 @@ public class ExampleRectifyUncalibratedStereo {
 
 		// Prune matches using the epipolar constraint
 		List<AssociatedPair> inliers = new ArrayList<>();
-		RowMatrix_F64 F = ExampleFundamentalMatrix.robustFundamental(matches, inliers);
+		DMatrixRMaj F = ExampleFundamentalMatrix.robustFundamental(matches, inliers);
 
 		// display the inlier matches found using the robust estimator
 		AssociationPanel panel = new AssociationPanel(20);

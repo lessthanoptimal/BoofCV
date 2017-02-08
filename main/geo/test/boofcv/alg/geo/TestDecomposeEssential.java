@@ -25,8 +25,8 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import java.util.List;
@@ -44,10 +44,10 @@ public class TestDecomposeEssential {
 	 */
 	@Test
 	public void checkAgainstKnown() {
-		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.4,0.5,null);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.4,0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 
-		RowMatrix_F64 E = MultiViewOps.createEssential(R, T);
+		DMatrixRMaj E = MultiViewOps.createEssential(R, T);
 
 		DecomposeEssential alg = new DecomposeEssential();
 		alg.decompose(E);
@@ -66,10 +66,10 @@ public class TestDecomposeEssential {
 	 */
 	@Test
 	public void multipleCalls() {
-		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.4,0.5,null);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.4,0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 
-		RowMatrix_F64 E = MultiViewOps.createEssential(R, T);
+		DMatrixRMaj E = MultiViewOps.createEssential(R, T);
 
 		DecomposeEssential alg = new DecomposeEssential();
 		// call it twice and see if it breaks
@@ -106,11 +106,11 @@ public class TestDecomposeEssential {
 	/**
 	 * See if an equivalent to the input matrix exists
 	 */
-	private void checkHasOriginal( List<Se3_F64> solutions , RowMatrix_F64 R ,Vector3D_F64 T  ) {
+	private void checkHasOriginal( List<Se3_F64> solutions , DMatrixRMaj R ,Vector3D_F64 T  ) {
 
 		int numMatches = 0;
 		for( Se3_F64 se : solutions ) {
-			if(MatrixFeatures_R64.isIdentical(R,se.getR(),1e-4)) {
+			if(MatrixFeatures_DDRM.isIdentical(R,se.getR(),1e-4)) {
 				if( T.distance(se.getT()) < 1e-4 )
 					numMatches++;
 			}

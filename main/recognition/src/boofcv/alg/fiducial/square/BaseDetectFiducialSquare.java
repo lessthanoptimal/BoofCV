@@ -42,8 +42,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.ConvertMatrixStruct_F64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.ops.ConvertDMatrixStruct;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,8 +87,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	// Used to compute/remove perspective distortion
 	private HomographyLinear4 computeHomography = new HomographyLinear4(true);
 	private RefineEpipolar refineHomography = FactoryMultiView.refineHomography(1e-4,100, EpipolarError.SAMPSON);
-	private RowMatrix_F64 H = new RowMatrix_F64(3,3);
-	private RowMatrix_F64 H_refined = new RowMatrix_F64(3,3);
+	private DMatrixRMaj H = new DMatrixRMaj(3,3);
+	private DMatrixRMaj H_refined = new DMatrixRMaj(3,3);
 	private Homography2D_F64 H_fixed = new Homography2D_F64();
 	private List<AssociatedPair> pairsRemovePerspective = new ArrayList<>();
 	private ImageDistort<T,GrayF32> removePerspective;
@@ -249,7 +249,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			}
 
 			// pass the found homography onto the image transform
-			ConvertMatrixStruct_F64.convert(H_refined,H_fixed);
+			ConvertDMatrixStruct.convert(H_refined,H_fixed);
 			ConvertFloatType.convert(H_fixed, transformHomography.getModel());
 
 			// TODO Improve how perspective is removed

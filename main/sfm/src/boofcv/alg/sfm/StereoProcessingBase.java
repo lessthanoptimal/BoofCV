@@ -31,8 +31,8 @@ import boofcv.struct.image.ImageType;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F32;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
 
 /**
@@ -56,14 +56,14 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 	protected T imageRightRect;
 
 	// rectification matrices for left and right image
-	protected RowMatrix_F64 rect1;
-	protected RowMatrix_F64 rect2;
+	protected DMatrixRMaj rect1;
+	protected DMatrixRMaj rect2;
 
 	// calibration matrix for both cameras after rectification
-	protected RowMatrix_F64 rectK;
+	protected DMatrixRMaj rectK;
 
 	// rotation matrix for both rectified cameras
-	protected RowMatrix_F64 rectR;
+	protected DMatrixRMaj rectR;
 
 	// storage for 3D coordinate of point in rectified reference frame
 	protected Point3D_F64 pointRect = new Point3D_F64();
@@ -105,8 +105,8 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 		Se3_F64 leftToRight = stereoParam.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		RowMatrix_F64 K1 = PerspectiveOps.calibrationMatrix(left, (RowMatrix_F64)null);
-		RowMatrix_F64 K2 = PerspectiveOps.calibrationMatrix(right, (RowMatrix_F64)null);
+		DMatrixRMaj K1 = PerspectiveOps.calibrationMatrix(left, (DMatrixRMaj)null);
+		DMatrixRMaj K2 = PerspectiveOps.calibrationMatrix(right, (DMatrixRMaj)null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 
@@ -117,8 +117,8 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 		rectK = rectifyAlg.getCalibrationMatrix();
 		rectR = rectifyAlg.getRectifiedRotation();
 
-		RowMatrix_F32 rect1_F32 = new RowMatrix_F32(3,3);
-		RowMatrix_F32 rect2_F32 = new RowMatrix_F32(3,3);
+		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3);
+		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
 
 		ConvertMatrixData.convert(rect1,rect1_F32);
 		ConvertMatrixData.convert(rect2,rect2_F32);
@@ -195,15 +195,15 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 	 *
 	 * @return camera calibration matrix
 	 */
-	public RowMatrix_F64 getRectK() {
+	public DMatrixRMaj getRectK() {
 		return rectK;
 	}
 
-	public RowMatrix_F64 getRect1() {
+	public DMatrixRMaj getRect1() {
 		return rect1;
 	}
 
-	public RowMatrix_F64 getRect2() {
+	public DMatrixRMaj getRect2() {
 		return rect2;
 	}
 }

@@ -26,7 +26,7 @@ import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * Checks to see if two observations from a left to right stereo camera are consistent.  Observations are converted
@@ -63,14 +63,14 @@ public class StereoConsistencyCheck {
 		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		RowMatrix_F64 K1 = PerspectiveOps.calibrationMatrix(left, (RowMatrix_F64)null);
-		RowMatrix_F64 K2 = PerspectiveOps.calibrationMatrix(right, (RowMatrix_F64)null);
+		DMatrixRMaj K1 = PerspectiveOps.calibrationMatrix(left, (DMatrixRMaj)null);
+		DMatrixRMaj K2 = PerspectiveOps.calibrationMatrix(right, (DMatrixRMaj)null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 
 		// rectification matrix for each image
-		RowMatrix_F64 rect1 = rectifyAlg.getRect1();
-		RowMatrix_F64 rect2 = rectifyAlg.getRect2();
+		DMatrixRMaj rect1 = rectifyAlg.getRect1();
+		DMatrixRMaj rect2 = rectifyAlg.getRect2();
 
 		leftImageToRect = RectifyImageOps.transformPixelToRect(param.left, rect1);
 		rightImageToRect = RectifyImageOps.transformPixelToRect(param.right, rect2);

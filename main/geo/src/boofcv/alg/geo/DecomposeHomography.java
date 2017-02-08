@@ -21,12 +21,12 @@ package boofcv.alg.geo;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.alg.dense.decomposition.svd.SafeSvd_R64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.SingularOps_DDRM;
+import org.ejml.dense.row.decomposition.svd.SafeSvd_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.SingularOps_R64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DecomposeHomography {
-	private SingularValueDecomposition<RowMatrix_F64> svd = DecompositionFactory_R64.svd(3, 3, false, true, false);
+	private SingularValueDecomposition<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(3, 3, false, true, false);
 
 	// storage for the four possible solutions
 	// Camera motion part of the solution
@@ -71,13 +71,13 @@ public class DecomposeHomography {
 
 	Vector3D_F64 tempV = new Vector3D_F64();
 
-	RowMatrix_F64 W1 = new RowMatrix_F64(3,3);
-	RowMatrix_F64 W2 = new RowMatrix_F64(3,3);
-	RowMatrix_F64 U1 = new RowMatrix_F64(3,3);
-	RowMatrix_F64 U2 = new RowMatrix_F64(3,3);
+	DMatrixRMaj W1 = new DMatrixRMaj(3,3);
+	DMatrixRMaj W2 = new DMatrixRMaj(3,3);
+	DMatrixRMaj U1 = new DMatrixRMaj(3,3);
+	DMatrixRMaj U2 = new DMatrixRMaj(3,3);
 
-	RowMatrix_F64 Hv2 = new RowMatrix_F64(3,3);
-	RowMatrix_F64 tempM = new RowMatrix_F64(3,3);
+	DMatrixRMaj Hv2 = new DMatrixRMaj(3,3);
+	DMatrixRMaj tempM = new DMatrixRMaj(3,3);
 
 	public DecomposeHomography() {
 		for( int i = 0; i < 4; i++ ) {
@@ -86,7 +86,7 @@ public class DecomposeHomography {
 		}
 
 		// insure that the inputs are not modified
-		svd = new SafeSvd_R64(DecompositionFactory_R64.svd(3, 3, false, true, false));
+		svd = new SafeSvd_DDRM(DecompositionFactory_DDRM.svd(3, 3, false, true, false));
 	}
 
 	/**
@@ -96,14 +96,14 @@ public class DecomposeHomography {
 	 *
 	 * @param H Homography matrix.  Not modified.
 	 */
-	public void decompose( RowMatrix_F64 H ) {
+	public void decompose( DMatrixRMaj H ) {
 		if( !svd.decompose(H) )
 			throw new RuntimeException("SVD failed somehow");
 
-		RowMatrix_F64 V = svd.getV(null,false);
-		RowMatrix_F64 S = svd.getW(null);
+		DMatrixRMaj V = svd.getV(null,false);
+		DMatrixRMaj S = svd.getW(null);
 
-		SingularOps_R64.descendingOrder(null,false,S, V,false);
+		SingularOps_DDRM.descendingOrder(null,false,S, V,false);
 
 		// COMMENT: The smallest singular value should be zero so I'm not sure why
 		// that is not assumed here.  Seen the same strategy done in a few papers
@@ -167,7 +167,7 @@ public class DecomposeHomography {
 	/**
 	 * U=[a,b,hat(a)*b]
 	 */
-	private void setU( RowMatrix_F64 U, Vector3D_F64 a , Vector3D_F64 b ) {
+	private void setU( DMatrixRMaj U, Vector3D_F64 a , Vector3D_F64 b ) {
 		setColumn(U, 0, a);
 		setColumn(U, 1, b);
 
@@ -178,7 +178,7 @@ public class DecomposeHomography {
 	/**
 	 * W=[H*a,H*b,hat(H*a)*H*b]
 	 */
-	private void setW( RowMatrix_F64 W, RowMatrix_F64 H , Vector3D_F64 a , Vector3D_F64 b ) {
+	private void setW( DMatrixRMaj W, DMatrixRMaj H , Vector3D_F64 a , Vector3D_F64 b ) {
 		GeometryMath_F64.mult(H,b, tempV);
 		setColumn(W,1, tempV);
 
@@ -186,12 +186,12 @@ public class DecomposeHomography {
 		setColumn(W,0, tempV);
 
 		GeometryMath_F64.crossMatrix(tempV,Hv2);
-		CommonOps_R64.mult(Hv2,H,tempM);
+		CommonOps_DDRM.mult(Hv2,H,tempM);
 		GeometryMath_F64.mult(tempM,b, tempV);
 		setColumn(W,2, tempV);
 	}
 
-	private void setColumn( RowMatrix_F64 U , int column , Vector3D_F64 a ) {
+	private void setColumn( DMatrixRMaj U , int column , Vector3D_F64 a ) {
 		U.set(0, column, a.x);
 		U.set(1, column, a.y);
 		U.set(2, column, a.z);
@@ -202,14 +202,14 @@ public class DecomposeHomography {
 	 * N = v2 cross u
 	 * (1/d)*T = (H-R)*N
 	 */
-	private void createSolution( RowMatrix_F64 W , RowMatrix_F64 U , Vector3D_F64 u ,
-								 RowMatrix_F64 H ,
+	private void createSolution( DMatrixRMaj W , DMatrixRMaj U , Vector3D_F64 u ,
+								 DMatrixRMaj H ,
 								 Se3_F64 se , Vector3D_F64 N )
 	{
-		CommonOps_R64.multTransB(W,U,se.getR());
+		CommonOps_DDRM.multTransB(W,U,se.getR());
 		GeometryMath_F64.cross(v2,u,N);
 
-		CommonOps_R64.subtract(H, se.getR(), tempM);
+		CommonOps_DDRM.subtract(H, se.getR(), tempM);
 		GeometryMath_F64.mult(tempM,N,se.getT());
 	}
 

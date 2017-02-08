@@ -20,7 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -48,14 +48,14 @@ public class TestRadialDistortionEstimateLinear {
 	public void perfect( boolean partial ) {
 
 		double distort[] = new double[]{0.01,-0.002};
-		RowMatrix_F64 K = GenericCalibrationGrid.createStandardCalibration();
-		List<RowMatrix_F64> homographies = GenericCalibrationGrid.createHomographies(K, 2, rand);
+		DMatrixRMaj K = GenericCalibrationGrid.createStandardCalibration();
+		List<DMatrixRMaj> homographies = GenericCalibrationGrid.createHomographies(K, 2, rand);
 
 		List<Point2D_F64> layout = GenericCalibrationGrid.standardLayout();
 
 		List<CalibrationObservation> observations = new ArrayList<>();
 
-		for( RowMatrix_F64 H : homographies ) {
+		for( DMatrixRMaj H : homographies ) {
 			// in calibrated image coordinates
 			List<Point2D_F64> pixels = GenericCalibrationGrid.observations(H, layout);
 			// apply distortion

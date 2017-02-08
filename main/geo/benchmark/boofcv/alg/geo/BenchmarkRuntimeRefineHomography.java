@@ -27,7 +27,7 @@ import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelFitter;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import static boofcv.factory.geo.FactoryMultiView.refineHomography;
 
@@ -39,15 +39,15 @@ public class BenchmarkRuntimeRefineHomography extends ArtificialStereoScene{
 	static final int NUM_POINTS = 500;
 	static final boolean PIXELS = false;
 	
-	protected RowMatrix_F64 initialF;
-	RowMatrix_F64 refinedF = new RowMatrix_F64(3,3);
+	protected DMatrixRMaj initialF;
+	DMatrixRMaj refinedF = new DMatrixRMaj(3,3);
 
 	public class Refine implements Performer {
 
-		ModelFitter<RowMatrix_F64,AssociatedPair> alg;
+		ModelFitter<DMatrixRMaj,AssociatedPair> alg;
 		String name;
 
-		public Refine(String name , ModelFitter<RowMatrix_F64,AssociatedPair> alg) {
+		public Refine(String name , ModelFitter<DMatrixRMaj,AssociatedPair> alg) {
 			this.name = name;
 			this.alg = alg;
 		}

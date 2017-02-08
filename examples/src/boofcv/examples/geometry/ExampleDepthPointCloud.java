@@ -34,7 +34,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -65,7 +65,7 @@ public class ExampleDepthPointCloud {
 
 		VisualDepthOps.depthTo3D(param.visualParam, rgb, depth, cloud, cloudColor);
 
-		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(param.visualParam, (RowMatrix_F64)null);
+		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(param.visualParam, (DMatrixRMaj)null);
 
 		PointCloudViewer viewer = new PointCloudViewer(K, 15);
 		viewer.setPreferredSize(new Dimension(rgb.width,rgb.height));

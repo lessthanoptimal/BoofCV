@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -43,12 +43,12 @@ public class TestStereoSparse3D {
 
 	StereoParameters param = new StereoParameters();
 
-	RowMatrix_F64 K1,K2;
+	DMatrixRMaj K1,K2;
 
 	public TestStereoSparse3D() {
 
-		K1 = new RowMatrix_F64(3,3,true,150,0,310,0,180,245,0,0,1);
-		K2 = new RowMatrix_F64(3,3,true,120,0,330,0,160,220,0,0,1);
+		K1 = new DMatrixRMaj(3,3,true,150,0,310,0,180,245,0,0,1);
+		K2 = new DMatrixRMaj(3,3,true,120,0,330,0,160,220,0,0,1);
 
 		param.rightToLeft = new Se3_F64();
 		param.rightToLeft.getT().set(0.2, 0, 0.1);

@@ -26,8 +26,8 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.util.List;
 
@@ -64,7 +64,7 @@ public class PnPStereoJacobianRodrigues implements FunctionNtoMxN {
 	private int indexY;
 
 	// storage for intermediate results
-	private RowMatrix_F64 rotR = new RowMatrix_F64(3,3);
+	private DMatrixRMaj rotR = new DMatrixRMaj(3,3);
 
 	public void setObservations(List<Stereo2D3D> observations) {
 		this.observations = observations;
@@ -124,11 +124,11 @@ public class PnPStereoJacobianRodrigues implements FunctionNtoMxN {
 			indexX = indexY;
 			indexY = indexY + 6;
 
-			CommonOps_R64.mult(leftToRight.getR(), rodJacobian.Rx, rotR);
+			CommonOps_DDRM.mult(leftToRight.getR(), rodJacobian.Rx, rotR);
 			addRodriguesJacobian(rotR,o.location,cameraPt);
-			CommonOps_R64.mult(leftToRight.getR(), rodJacobian.Ry, rotR);
+			CommonOps_DDRM.mult(leftToRight.getR(), rodJacobian.Ry, rotR);
 			addRodriguesJacobian(rotR,o.location,cameraPt);
-			CommonOps_R64.mult(leftToRight.getR(), rodJacobian.Rz, rotR);
+			CommonOps_DDRM.mult(leftToRight.getR(), rodJacobian.Rz, rotR);
 			addRodriguesJacobian(rotR,o.location,cameraPt);
 
 			addTranslationJacobian(leftToRight.getR(),cameraPt);
@@ -146,7 +146,7 @@ public class PnPStereoJacobianRodrigues implements FunctionNtoMxN {
 	 * @param worldPt Location of point in world coordinates
 	 * @param cameraPt Location of point in camera coordinates
 	 */
-	private void addRodriguesJacobian( RowMatrix_F64 Rj , Point3D_F64 worldPt , Point3D_F64 cameraPt )
+	private void addRodriguesJacobian( DMatrixRMaj Rj , Point3D_F64 worldPt , Point3D_F64 cameraPt )
 	{
 		// (1/z)*dot(R)*X
 		double Rx = (Rj.data[0]*worldPt.x + Rj.data[1]*worldPt.y + Rj.data[2]*worldPt.z)/cameraPt.z;
@@ -191,7 +191,7 @@ public class PnPStereoJacobianRodrigues implements FunctionNtoMxN {
 	 * @param R
 	 * @param cameraPt
 	 */
-	private void addTranslationJacobian( RowMatrix_F64 R ,
+	private void addTranslationJacobian( DMatrixRMaj R ,
 										 Point3D_F64 cameraPt )
 	{
 		double z = cameraPt.z;

@@ -25,8 +25,8 @@ import georegression.geometry.GeometryMath_F32;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
-import org.ejml.data.RowMatrix_F32;
-import org.ejml.ops.CommonOps_R32;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.dense.row.CommonOps_FDRM;
 
 import static boofcv.alg.distort.radtan.RemoveRadialNtoN_F32.removeRadial;
 
@@ -45,7 +45,7 @@ public class UniOmniPtoS_F32 implements Point2Transform3_F32 {
 	private float tol = GrlConstants.FCONV_TOL_A;
 
 		// inverse of camera calibration matrix
-	protected RowMatrix_F32 K_inv = new RowMatrix_F32(3,3);
+	protected FMatrixRMaj K_inv = new FMatrixRMaj(3,3);
 
 	public UniOmniPtoS_F32(CameraUniversalOmni model) {
 		this.setModel(model);
@@ -74,7 +74,7 @@ public class UniOmniPtoS_F32 implements Point2Transform3_F32 {
 		K_inv.set(1,2, (float)model.cy);
 		K_inv.set(2,2,1);
 
-		CommonOps_R32.invert(K_inv);
+		CommonOps_FDRM.invert(K_inv);
 	}
 
 	@Override

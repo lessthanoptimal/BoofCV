@@ -18,12 +18,12 @@
 
 package boofcv.alg.geo.pose;
 
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_R64;
-import org.ejml.factory.LinearSolverFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
+import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
 import org.ejml.interfaces.linsol.LinearSolver;
-import org.ejml.ops.CommonOps_R64;
 
 /**
  * <p>
@@ -50,21 +50,21 @@ public class Relinearlize {
 	int numNull;
 
 	// contains the null space
-	RowMatrix_F64 V;
+	DMatrixRMaj V;
 	// contains one possible solution
-	RowMatrix_F64 x0 = new RowMatrix_F64(1,1);
+	DMatrixRMaj x0 = new DMatrixRMaj(1,1);
 	// lookup table for indices
 	int table[] = new int[10*10];
 
-	SingularValueDecomposition<RowMatrix_F64> svd = DecompositionFactory_R64.svd(3, 3, false, true, false);
+	SingularValueDecomposition<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(3, 3, false, true, false);
 
 	// used inside of solveConstraintMatrix
-	RowMatrix_F64 AA = new RowMatrix_F64(1,1);
-	RowMatrix_F64 yy = new RowMatrix_F64(1,1);
-	RowMatrix_F64 xx = new RowMatrix_F64(1,1);
+	DMatrixRMaj AA = new DMatrixRMaj(1,1);
+	DMatrixRMaj yy = new DMatrixRMaj(1,1);
+	DMatrixRMaj xx = new DMatrixRMaj(1,1);
 
 	// used to compute one possible solution
-	LinearSolver<RowMatrix_F64> pseudo = LinearSolverFactory_R64.pseudoInverse(true);
+	LinearSolver<DMatrixRMaj> pseudo = LinearSolverFactory_DDRM.pseudoInverse(true);
 
 	// stores constraints
 	double XiiXjk[] = new double[10];
@@ -107,7 +107,7 @@ public class Relinearlize {
 	 * @param y distances between world control points
 	 * @param betas Estimated betas.  Output.
 	 */
-	public void process( RowMatrix_F64 L_full , RowMatrix_F64 y , double betas[] ) {
+	public void process( DMatrixRMaj L_full , DMatrixRMaj y , double betas[] ) {
 
 		svd.decompose(L_full);
 
@@ -119,7 +119,7 @@ public class Relinearlize {
 		pseudo.solve(y,x0);
 
 		// add additional constraints to reduce the number of possible solutions
-		RowMatrix_F64 alphas = solveConstraintMatrix();
+		DMatrixRMaj alphas = solveConstraintMatrix();
 
 		// compute the final solution
 		for( int i = 0; i < x0.numRows; i++ ) {
@@ -149,7 +149,7 @@ public class Relinearlize {
 	 * x_{ii}*x_{jk} = x_{ik}*x_{ji}
 	 *
 	 */
-	protected RowMatrix_F64 solveConstraintMatrix() {
+	protected DMatrixRMaj solveConstraintMatrix() {
 
 		int rowAA = 0;
 		for( int i = 0; i < numControl; i++ ) {
@@ -167,7 +167,7 @@ public class Relinearlize {
 			}
 		}
 //		AA.print();
-		CommonOps_R64.solve(AA, yy, xx);
+		CommonOps_DDRM.solve(AA, yy, xx);
 
 		return xx;
 	}

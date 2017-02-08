@@ -22,7 +22,7 @@ import boofcv.alg.geo.ModelObservationResidual;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * <p>
@@ -32,12 +32,12 @@ import org.ejml.data.RowMatrix_F64;
  * @author Peter Abeles
  */
 public class FundamentalResidualSimple
-		implements ModelObservationResidual<RowMatrix_F64,AssociatedPair> {
-	RowMatrix_F64 F;
+		implements ModelObservationResidual<DMatrixRMaj,AssociatedPair> {
+	DMatrixRMaj F;
 	Point3D_F64 temp = new Point3D_F64();
 
 	@Override
-	public void setModel(RowMatrix_F64 F) {
+	public void setModel(DMatrixRMaj F) {
 		this.F = F;
 	}
 

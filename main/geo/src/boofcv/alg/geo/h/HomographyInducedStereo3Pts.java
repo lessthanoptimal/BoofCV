@@ -23,9 +23,9 @@ import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.alg.dense.linsol.LinearSolverSafe;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.LinearSolverFactory_R64;
+import org.ejml.LinearSolverSafe;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.interfaces.linsol.LinearSolver;
 
 /**
@@ -49,15 +49,15 @@ public class HomographyInducedStereo3Pts {
 	private Point3D_F64 e2 = new Point3D_F64();
 
 	// The found homography from view 1 to view 2
-	private RowMatrix_F64 H = new RowMatrix_F64(3,3);
+	private DMatrixRMaj H = new DMatrixRMaj(3,3);
 
 	// A = cross(e2)*F
-	private RowMatrix_F64 A = new RowMatrix_F64(3,3);
+	private DMatrixRMaj A = new DMatrixRMaj(3,3);
 	// Rows filled with x from image 1
-	private RowMatrix_F64 M = new RowMatrix_F64(3,3);
+	private DMatrixRMaj M = new DMatrixRMaj(3,3);
 
-	private RowMatrix_F64 temp0 = new RowMatrix_F64(3,1);
-	private RowMatrix_F64 temp1 = new RowMatrix_F64(3,1);
+	private DMatrixRMaj temp0 = new DMatrixRMaj(3,1);
+	private DMatrixRMaj temp1 = new DMatrixRMaj(3,1);
 
 	private Point3D_F64 A_inv_b = new Point3D_F64();
 	private Point3D_F64 Ax = new Point3D_F64();
@@ -66,7 +66,7 @@ public class HomographyInducedStereo3Pts {
 	private Point3D_F64 t0 = new Point3D_F64();
 	private Point3D_F64 t1 = new Point3D_F64();
 
-	private LinearSolver<RowMatrix_F64> solver;
+	private LinearSolver<DMatrixRMaj> solver;
 
 	// pick a reasonable scale and sign
 	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
@@ -74,7 +74,7 @@ public class HomographyInducedStereo3Pts {
 	public HomographyInducedStereo3Pts()
 	{
 		// ensure that the inputs are not modified
-		solver = new LinearSolverSafe<>(LinearSolverFactory_R64.linear(3));
+		solver = new LinearSolverSafe<>(LinearSolverFactory_DDRM.linear(3));
 	}
 
    /**
@@ -83,7 +83,7 @@ public class HomographyInducedStereo3Pts {
 	 * @param F Fundamental matrix.
 	 * @param e2 Epipole for camera 2.  If null it will be computed internally.
 	 */
-	public void setFundamental( RowMatrix_F64 F , Point3D_F64 e2 ) {
+	public void setFundamental( DMatrixRMaj F , Point3D_F64 e2 ) {
 		if( e2 != null )
 			this.e2.set(e2);
 		else {
@@ -155,7 +155,7 @@ public class HomographyInducedStereo3Pts {
 	 * The found homography from view 1 to view 2
 	 * @return homography
 	 */
-	public RowMatrix_F64 getHomography() {
+	public DMatrixRMaj getHomography() {
 		return H;
 	}
 }

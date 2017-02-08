@@ -33,7 +33,7 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,7 +58,7 @@ public class DisparityPointCloudViewer extends JPanel {
 	double baseline;
 
 	// intrinsic camera parameters
-	RowMatrix_F64 K;
+	DMatrixRMaj K;
 	double focalLengthX;
 	double focalLengthY;
 	double centerX;
@@ -98,7 +98,7 @@ public class DisparityPointCloudViewer extends JPanel {
 	 * @param maxDisparity Maximum disparity that's computed (pixels)
 	 */
 	public void configure(double baseline,
-						  RowMatrix_F64 K,
+						  DMatrixRMaj K,
 						  Point2Transform2_F64 rectifiedToColor,
 						  int minDisparity, int maxDisparity) {
 		this.K = K;
@@ -274,7 +274,7 @@ public class DisparityPointCloudViewer extends JPanel {
 		Vector3D_F64 rotPt = new Vector3D_F64(offsetX*adjust,offsetY*adjust,z* range);
 
 		double radians = tiltAngle*Math.PI/180.0;
-		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,radians,0,0,null);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,radians,0,0,null);
 
 		Se3_F64 a = new Se3_F64(R,rotPt);
 

@@ -18,9 +18,9 @@
 
 package boofcv.alg.geo.f;
 
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.RandomMatrices_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.RandomMatrices_DDRM;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
@@ -58,29 +58,29 @@ public class TestHelperNister5 {
 
 		SimpleMatrix E = SimpleMatrix.wrap(constructE(x,y,z,w));
 
-		RowMatrix_F64 A = new RowMatrix_F64(10,10);
-		RowMatrix_F64 B = new RowMatrix_F64(10,10);
+		DMatrixRMaj A = new DMatrixRMaj(10,10);
+		DMatrixRMaj B = new DMatrixRMaj(10,10);
 
 		HelperNister5 alg = new HelperNister5();
 		alg.setNullSpace(X,Y,Z,W);
 		alg.setupA1(A);
 		alg.setupA2(B);
 
-		RowMatrix_F64 Y1 = new RowMatrix_F64(10,1);
-		RowMatrix_F64 Y2 = new RowMatrix_F64(10,1);
+		DMatrixRMaj Y1 = new DMatrixRMaj(10,1);
+		DMatrixRMaj Y2 = new DMatrixRMaj(10,1);
 
-		CommonOps_R64.mult(A,createCoefsA(x,y,z),Y1);
-		CommonOps_R64.mult(B,createCoefsB(x, y, z),Y2);
+		CommonOps_DDRM.mult(A,createCoefsA(x,y,z),Y1);
+		CommonOps_DDRM.mult(B,createCoefsB(x, y, z),Y2);
 
-		RowMatrix_F64 Y = new RowMatrix_F64(10,1);
+		DMatrixRMaj Y = new DMatrixRMaj(10,1);
 
-		CommonOps_R64.add(Y1,Y2,Y);
+		CommonOps_DDRM.add(Y1,Y2,Y);
 
 		// compute the constraints equations
 		SimpleMatrix EEt = E.mult(E.transpose());
 		SimpleMatrix EEtE = EEt.mult(E);
 		SimpleMatrix aE = E.scale(-0.5*EEt.trace());
-		RowMatrix_F64 eq2 = EEtE.plus(aE).matrix_F64();
+		DMatrixRMaj eq2 = EEtE.plus(aE).matrix_F64();
 
 		// check the solution
 		assertEquals(E.determinant(),Y.data[0],1e-8);
@@ -97,7 +97,7 @@ public class TestHelperNister5 {
 
 	@Test
 	public void setDeterminantVectors() {
-		RowMatrix_F64 A = RandomMatrices_R64.createRandom(10,10,-1,1,rand);
+		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(10,10,-1,1,rand);
 
 		HelperNister5 alg = new HelperNister5();
 		alg.setDeterminantVectors(A);
@@ -147,14 +147,14 @@ public class TestHelperNister5 {
 
 	@Test
 	public void extractPolynomial() {
-		RowMatrix_F64 A = RandomMatrices_R64.createRandom(10,10,-1,1,rand);
+		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(10,10,-1,1,rand);
 
 		HelperNister5 alg = new HelperNister5();
 		alg.setDeterminantVectors(A);
 
 		double z = 2.3;
 
-		RowMatrix_F64 B = new RowMatrix_F64(3,3);
+		DMatrixRMaj B = new DMatrixRMaj(3,3);
 
 		B.data[0] = alg.K00*z*z*z + alg.K01*z*z + alg.K02*z + alg.K03;
 		B.data[1] = alg.K04*z*z*z + alg.K05*z*z + alg.K06*z + alg.K07;
@@ -168,7 +168,7 @@ public class TestHelperNister5 {
 		B.data[7] = alg.M04*z*z*z + alg.M05*z*z + alg.M06*z + alg.M07;
 		B.data[8] = alg.M08*z*z*z*z + alg.M09*z*z*z + alg.M10*z*z + alg.M11*z + alg.M12;
 
-		double expected = CommonOps_R64.det(B);
+		double expected = CommonOps_DDRM.det(B);
 
 		double coefs[] = new double[11];
 
@@ -183,8 +183,8 @@ public class TestHelperNister5 {
 	}
 
 
-	public RowMatrix_F64 constructE( double x , double y , double z , double w ) {
-		RowMatrix_F64 E = new RowMatrix_F64(3,3);
+	public DMatrixRMaj constructE( double x , double y , double z , double w ) {
+		DMatrixRMaj E = new DMatrixRMaj(3,3);
 
 		for( int i = 0; i < 9; i++)  {
 			E.data[i] = x*X[i] + y*Y[i] + z*Z[i] + w*W[i];
@@ -193,9 +193,9 @@ public class TestHelperNister5 {
 		return E;
 	}
 
-	public RowMatrix_F64 createCoefsA( double x , double y , double z ) {
+	public DMatrixRMaj createCoefsA( double x , double y , double z ) {
 
-		RowMatrix_F64 X = new RowMatrix_F64(10,1);
+		DMatrixRMaj X = new DMatrixRMaj(10,1);
 
 		X.data[0] = x*x*x;
 		X.data[1] = y*y*y;
@@ -211,9 +211,9 @@ public class TestHelperNister5 {
 		return X;
 	}
 
-	public RowMatrix_F64 createCoefsB( double x , double y , double z ) {
+	public DMatrixRMaj createCoefsB( double x , double y , double z ) {
 
-		RowMatrix_F64 X = new RowMatrix_F64(10,1);
+		DMatrixRMaj X = new DMatrixRMaj(10,1);
 
 //		'x*z^2','x*z','x','y*z^2','y*z','y','z^3','z^2','z',''
 
@@ -231,7 +231,7 @@ public class TestHelperNister5 {
 		return X;
 	}
 
-	public double sumRow( int row , RowMatrix_F64 A , RowMatrix_F64 B ) {
+	public double sumRow( int row , DMatrixRMaj A , DMatrixRMaj B ) {
 		double total = 0;
 
 		for( int i = 0; i < 10; i++ ) {

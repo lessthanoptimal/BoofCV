@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,13 +43,7 @@ public class PixelTransformAffine_F64 extends PixelTransform2_F64 {
 	}
 
 	public void set( Affine2D_F64 affine ) {
-		this.affine.a11 = (float)affine.a11;
-		this.affine.a12 = (float)affine.a12;
-		this.affine.a21 = (float)affine.a21;
-		this.affine.a22 = (float)affine.a22;
-
-		this.affine.tx = (float)affine.tx;
-		this.affine.ty = (float)affine.ty;
+		this.affine.set(affine);
 	}
 
 	@Override

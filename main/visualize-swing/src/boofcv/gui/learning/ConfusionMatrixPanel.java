@@ -19,8 +19,8 @@
 package boofcv.gui.learning;
 
 import boofcv.gui.image.ShowImages;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.RandomMatrices_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.RandomMatrices_DDRM;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,8 +37,8 @@ import java.util.Random;
  */
 public class ConfusionMatrixPanel extends JPanel {
 
-	RowMatrix_F64 temp = new RowMatrix_F64(1,1);
-	RowMatrix_F64 confusion = new RowMatrix_F64(1,1);
+	DMatrixRMaj temp = new DMatrixRMaj(1,1);
+	DMatrixRMaj confusion = new DMatrixRMaj(1,1);
 	boolean dirty = false;
 
 	boolean gray = false;
@@ -65,7 +65,7 @@ public class ConfusionMatrixPanel extends JPanel {
 	 * @param widthPixels preferred width and height of the panel in pixels
 	 * @param gray Render gray scale or color image
 	 */
-	public ConfusionMatrixPanel( RowMatrix_F64 M , List<String> labels, int widthPixels , boolean gray ) {
+	public ConfusionMatrixPanel( DMatrixRMaj M , List<String> labels, int widthPixels , boolean gray ) {
 		this(widthPixels,labels!=null);
 
 		setLabels(labels);
@@ -87,7 +87,7 @@ public class ConfusionMatrixPanel extends JPanel {
 		setPreferredSize(new Dimension(widthPixels,heightPixels));
 	}
 
-	public void setMatrix( RowMatrix_F64 A ) {
+	public void setMatrix( DMatrixRMaj A ) {
 		synchronized ( this ) {
 			temp.set(A);
 			dirty = true;
@@ -327,7 +327,7 @@ public class ConfusionMatrixPanel extends JPanel {
 	}
 
 	public static void main(String[] args) {
-		RowMatrix_F64 m = RandomMatrices_R64.createRandom(5,5,0,1,new Random(234));
+		DMatrixRMaj m = RandomMatrices_DDRM.rectangle(5,5,0,1,new Random(234));
 
 		List<String> labels = new ArrayList<>();
 		for (int i = 0; i < m.numRows; i++) {

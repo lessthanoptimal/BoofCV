@@ -26,8 +26,8 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.RowMatrix_F32;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
 
 import java.util.ArrayList;
@@ -48,9 +48,9 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 //	RefineEpipolar refineHomography = FactoryMultiView.refineHomography(1e-8,20, EpipolarError.SIMPLE);
 
 	// storage for computed homography
-	RowMatrix_F64 H = new RowMatrix_F64(3,3);
-	RowMatrix_F32 H32 = new RowMatrix_F32(3,3);
-//	RowMatrix_F64 Hrefined = new RowMatrix_F64(3,3);
+	DMatrixRMaj H = new DMatrixRMaj(3,3);
+	FMatrixRMaj H32 = new FMatrixRMaj(3,3);
+//	DMatrixRMaj Hrefined = new DMatrixRMaj(3,3);
 	// transform which applies the homography
 	PointTransformHomography_F32 homography = new PointTransformHomography_F32();
 

@@ -21,7 +21,7 @@ package boofcv.abst.geo.pose;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.struct.geo.Point2D3D;
 import georegression.struct.se.Se3_F64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import java.util.List;
@@ -74,7 +74,7 @@ public abstract class CheckEstimate1ofPnP extends BaseChecksPnP {
 		assertTrue(alg.process(inputs,found));
 
 
-		assertTrue(MatrixFeatures_R64.isIdentical(worldToCamera.getR(), found.getR(), 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(worldToCamera.getR(), found.getR(), 1e-8));
 		assertTrue(found.getT().isIdentical(worldToCamera.getT(), 1e-8));
 	}
 

@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo;
 
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * Computes the rotation matrix derivative for Rodrigues coordinates
@@ -29,11 +29,11 @@ import org.ejml.data.RowMatrix_F64;
  */
 public class RodriguesRotationJacobian {
 	// partial for vector x component
-	public RowMatrix_F64 Rx = new RowMatrix_F64(3,3);
+	public DMatrixRMaj Rx = new DMatrixRMaj(3,3);
 	// partial for vector x component
-	public RowMatrix_F64 Ry = new RowMatrix_F64(3,3);
+	public DMatrixRMaj Ry = new DMatrixRMaj(3,3);
 	// partial for vector y component
-	public RowMatrix_F64 Rz = new RowMatrix_F64(3,3);
+	public DMatrixRMaj Rz = new DMatrixRMaj(3,3);
 
 	/**
 	 * Computes the Rodrigues coordinate Jacobian

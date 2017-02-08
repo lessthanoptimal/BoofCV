@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import java.util.List;
@@ -32,12 +32,12 @@ import static org.junit.Assert.assertEquals;
 public class TestZhang99CalibrationMatrixFromHomography {
 
 	Random rand = new Random(123);
-	List<RowMatrix_F64> homographies;
+	List<DMatrixRMaj> homographies;
 
 	@Test
 	public void withSkew() {
 
-		RowMatrix_F64 K = GenericCalibrationGrid.createStandardCalibration();
+		DMatrixRMaj K = GenericCalibrationGrid.createStandardCalibration();
 
 		// try different numbers of observations
 		for( int N = 3; N <= 6; N++ ) {
@@ -48,7 +48,7 @@ public class TestZhang99CalibrationMatrixFromHomography {
 
 			alg.process(homographies);
 
-			RowMatrix_F64 K_found = alg.getCalibrationMatrix();
+			DMatrixRMaj K_found = alg.getCalibrationMatrix();
 
 			checkK(K,K_found);
 		}
@@ -59,7 +59,7 @@ public class TestZhang99CalibrationMatrixFromHomography {
 
 		// try different sizes
 		for( int N = 2; N <= 5; N++ ) {
-			RowMatrix_F64 K = GenericCalibrationGrid.createStandardCalibration();
+			DMatrixRMaj K = GenericCalibrationGrid.createStandardCalibration();
 			// force skew to zero
 			K.set(0,1,0);
 
@@ -70,7 +70,7 @@ public class TestZhang99CalibrationMatrixFromHomography {
 
 			alg.process(homographies);
 
-			RowMatrix_F64 K_found = alg.getCalibrationMatrix();
+			DMatrixRMaj K_found = alg.getCalibrationMatrix();
 
 			checkK(K, K_found);
 		}
@@ -80,7 +80,7 @@ public class TestZhang99CalibrationMatrixFromHomography {
 	 * compare two calibration matrices against each other taking in account the differences in tolerance
 	 * for different elements
 	 */
-	private void checkK( RowMatrix_F64 a , RowMatrix_F64 b ) {
+	private void checkK( DMatrixRMaj a , DMatrixRMaj b ) {
 		assertEquals(a.get(0,0),b.get(0,0),0.05);
 		assertEquals(a.get(1,1),b.get(1,1),0.05);
 		assertEquals(a.get(0,1),b.get(0,1),0.01);

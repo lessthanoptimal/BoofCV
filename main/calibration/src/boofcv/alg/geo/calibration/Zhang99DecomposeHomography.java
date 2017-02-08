@@ -22,10 +22,10 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.UtilVector3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.NormOps_R64;
-import org.ejml.ops.SpecializedOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.NormOps_DDRM;
+import org.ejml.dense.row.SpecializedOps_DDRM;
 
 /**
  * <p>
@@ -56,26 +56,26 @@ import org.ejml.ops.SpecializedOps_R64;
 public class Zhang99DecomposeHomography {
 
 	// Rows in rotation matrix
-	RowMatrix_F64 r1 = new RowMatrix_F64(3,1);
-	RowMatrix_F64 r2 = new RowMatrix_F64(3,1);
+	DMatrixRMaj r1 = new DMatrixRMaj(3,1);
+	DMatrixRMaj r2 = new DMatrixRMaj(3,1);
 	// storage for translation vector
-	RowMatrix_F64 t = new RowMatrix_F64(3,1);
-	RowMatrix_F64 temp = new RowMatrix_F64(3,1);
+	DMatrixRMaj t = new DMatrixRMaj(3,1);
+	DMatrixRMaj temp = new DMatrixRMaj(3,1);
 	// storage for rotation matrix
-	RowMatrix_F64 R = new RowMatrix_F64(3,3);
+	DMatrixRMaj R = new DMatrixRMaj(3,3);
 
 	// calibration matrix and its inverse
-	RowMatrix_F64 K;
-	RowMatrix_F64 K_inv = new RowMatrix_F64(3,3);
+	DMatrixRMaj K;
+	DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
 
 	/**
 	 * Specifies the calibration matrix.
 	 *
 	 * @param K upper triangular calibration matrix.
 	 */
-	public void setCalibrationMatrix( RowMatrix_F64 K ) {
+	public void setCalibrationMatrix( DMatrixRMaj K ) {
 		this.K = K;
-		CommonOps_R64.invert(K,K_inv);
+		CommonOps_DDRM.invert(K,K_inv);
 	}
 
 	/**
@@ -85,23 +85,23 @@ public class Zhang99DecomposeHomography {
 	 * @param H homography matrix.
 	 * @return Found camera motion.
 	 */
-	public Se3_F64 decompose( RowMatrix_F64 H )
+	public Se3_F64 decompose( DMatrixRMaj H )
 	{
 		// step through each calibration grid and compute its parameters
-		RowMatrix_F64 h[] = SpecializedOps_R64.splitIntoVectors(H, true);
+		DMatrixRMaj h[] = SpecializedOps_DDRM.splitIntoVectors(H, true);
 
 		// lambda = 1/norm(inv(K)*h1) or 1/norm(inv(K)*h2)
 		// use the average to attempt to reduce error
-		CommonOps_R64.mult(K_inv,h[0],temp);
-		double lambda = NormOps_R64.normF(temp);
-		CommonOps_R64.mult(K_inv,h[1],temp);
-		lambda += NormOps_R64.normF(temp);
+		CommonOps_DDRM.mult(K_inv,h[0],temp);
+		double lambda = NormOps_DDRM.normF(temp);
+		CommonOps_DDRM.mult(K_inv,h[1],temp);
+		lambda += NormOps_DDRM.normF(temp);
 		lambda = 2.0/lambda;
 
 		// compute the column in the rotation matrix
-		CommonOps_R64.mult(lambda,K_inv,h[0],r1);
-		CommonOps_R64.mult(lambda,K_inv,h[1],r2);
-		CommonOps_R64.mult(lambda,K_inv,h[2],t);
+		CommonOps_DDRM.mult(lambda,K_inv,h[0],r1);
+		CommonOps_DDRM.mult(lambda,K_inv,h[1],r2);
+		CommonOps_DDRM.mult(lambda,K_inv,h[2],t);
 
 		Vector3D_F64 v1 = UtilVector3D_F64.convert(r1);
 		Vector3D_F64 v2 = UtilVector3D_F64.convert(r2);

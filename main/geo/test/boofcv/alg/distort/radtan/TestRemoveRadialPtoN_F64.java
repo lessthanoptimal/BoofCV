@@ -23,7 +23,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import georegression.geometry.GeometryMath_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -64,7 +64,7 @@ public class TestRemoveRadialPtoN_F64 {
 		alg.compute(distX, distY, point);
 
 		/// go from calibrated coordinates to pixel
-		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(fx, fy, skew, xc, yc);
+		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(fx, fy, skew, xc, yc);
 
 		GeometryMath_F64.mult(K,point,point);
 

@@ -19,21 +19,21 @@
 package boofcv.abst.geo.fitting;
 
 import org.ddogleg.fitting.modelset.ModelManager;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
- * {@link ModelManager} for 3x3 {@link RowMatrix_F64}.
+ * {@link ModelManager} for 3x3 {@link DMatrixRMaj}.
  *
  * @author Peter Abeles
  */
-public class ModelManagerEpipolarMatrix implements ModelManager<RowMatrix_F64> {
+public class ModelManagerEpipolarMatrix implements ModelManager<DMatrixRMaj> {
 	@Override
-	public RowMatrix_F64 createModelInstance() {
-		return new RowMatrix_F64(3,3);
+	public DMatrixRMaj createModelInstance() {
+		return new DMatrixRMaj(3,3);
 	}
 
 	@Override
-	public void copyModel(RowMatrix_F64 src, RowMatrix_F64 dst) {
+	public void copyModel(DMatrixRMaj src, DMatrixRMaj dst) {
 		dst.set(src);
 	}
 }

@@ -22,8 +22,8 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import java.util.List;
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestDecomposeHomography {
 
-	RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, -0.04, 0.08, null);
+	DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, -0.04, 0.08, null);
 	Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 
 	double d = 2;
@@ -47,7 +47,7 @@ public class TestDecomposeHomography {
 
 	@Test
 	public void checkAgainstKnown() {
-		RowMatrix_F64 H = MultiViewOps.createHomography(R, T, d, N);
+		DMatrixRMaj H = MultiViewOps.createHomography(R, T, d, N);
 
 		DecomposeHomography alg = new DecomposeHomography();
 
@@ -68,7 +68,7 @@ public class TestDecomposeHomography {
 	 */
 	@Test
 	public void multipleCalls() {
-		RowMatrix_F64 H = MultiViewOps.createHomography(R, T, d, N);
+		DMatrixRMaj H = MultiViewOps.createHomography(R, T, d, N);
 
 		DecomposeHomography alg = new DecomposeHomography();
 		// call it twice and see if things break
@@ -86,14 +86,14 @@ public class TestDecomposeHomography {
 	 * See if an equivalent to the input matrix exists
 	 */
 	public static void checkHasOriginal( List<Se3_F64> solutionsSE , List<Vector3D_F64> solutionsN ,
-										 RowMatrix_F64 R, Vector3D_F64 T, double d , Vector3D_F64 N ) {
+										 DMatrixRMaj R, Vector3D_F64 T, double d , Vector3D_F64 N ) {
 
 		int numMatches = 0;
 		for( int i = 0; i < 4; i++ ) {
 			Se3_F64 foundSE = solutionsSE.get(i);
 			Vector3D_F64 foundN = solutionsN.get(i);
 
-			if(!MatrixFeatures_R64.isIdentical(foundSE.getR(), R, 1e-4)) break;
+			if(!MatrixFeatures_DDRM.isIdentical(foundSE.getR(), R, 1e-4)) break;
 
 			if( Math.abs(T.x/d - foundSE.getT().x) > 1e-8 ) break;
 			if( Math.abs(T.y/d - foundSE.getT().y) > 1e-8 ) break;

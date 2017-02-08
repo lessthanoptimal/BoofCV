@@ -27,7 +27,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -230,7 +230,7 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	 * @param Rdot Jacobian for Rodrigues
 	 * @param X Location of point in world coordinates
 	 */
-	private void rodriguesGradient( RowMatrix_F64 Rdot ,
+	private void rodriguesGradient( DMatrixRMaj Rdot ,
 									Point3D_F64 X ,
 									Point3D_F64 cameraPt ,
 									Point2D_F64 normPt ,

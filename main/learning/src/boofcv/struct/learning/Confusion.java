@@ -18,7 +18,7 @@
 
 package boofcv.struct.learning;
 
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * Storage for a confusion matrix.  Rows represent the actual type and the columns the predicted type.  All the rows
@@ -27,15 +27,15 @@ import org.ejml.data.RowMatrix_F64;
  * @author Peter Abeles
  */
 public class Confusion {
-	RowMatrix_F64 matrix;
+	DMatrixRMaj matrix;
 	int actualCounts[];
 
 	public Confusion( int numTypes) {
-		matrix = new RowMatrix_F64(numTypes,numTypes);
+		matrix = new DMatrixRMaj(numTypes,numTypes);
 		actualCounts = new int[numTypes];
 	}
 
-	public RowMatrix_F64 getMatrix() {
+	public DMatrixRMaj getMatrix() {
 		return matrix;
 	}
 

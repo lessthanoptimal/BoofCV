@@ -34,8 +34,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F32;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
 
 import java.util.List;
 
@@ -122,7 +122,7 @@ public class PerspectiveOps {
 	 * @return Adjusted intrinsic parameters.
 	 */
 	public static <C extends CameraPinhole>C adjustIntrinsic(C parameters,
-															 RowMatrix_F64 adjustMatrix,
+															 DMatrixRMaj adjustMatrix,
 															 C adjustedParam)
 	{
 		return ImplPerspectiveOps_F64.adjustIntrinsic(parameters, adjustMatrix, adjustedParam);
@@ -145,7 +145,7 @@ public class PerspectiveOps {
 	 * @return Adjusted intrinsic parameters.
 	 */
 	public static <C extends CameraPinhole>C adjustIntrinsic(C parameters,
-															 RowMatrix_F32 adjustMatrix,
+															 FMatrixRMaj adjustMatrix,
 															 C adjustedParam)
 	{
 		return ImplPerspectiveOps_F32.adjustIntrinsic(parameters, adjustMatrix, adjustedParam);
@@ -161,7 +161,7 @@ public class PerspectiveOps {
 	 * @param yc center center y-axis in pixels
 	 * @return Calibration matrix 3x3
 	 */
-	public static RowMatrix_F64 calibrationMatrix(double fx, double fy, double skew,
+	public static DMatrixRMaj calibrationMatrix(double fx, double fy, double skew,
 												   double xc, double yc) {
 		return ImplPerspectiveOps_F64.calibrationMatrix(fx, fy, skew, xc, yc);
 	}
@@ -176,7 +176,7 @@ public class PerspectiveOps {
 	 * @param yc center center y-axis in pixels
 	 * @return Calibration matrix 3x3
 	 */
-	public static RowMatrix_F32 calibrationMatrix(float fx, float fy, float skew,
+	public static FMatrixRMaj calibrationMatrix(float fx, float fy, float skew,
 												   float xc, float yc) {
 		return ImplPerspectiveOps_F32.calibrationMatrix(fx, fy, skew, xc, yc);
 	}
@@ -188,7 +188,7 @@ public class PerspectiveOps {
 	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
-	public static RowMatrix_F64 calibrationMatrix(CameraPinhole param , RowMatrix_F64 K )
+	public static DMatrixRMaj calibrationMatrix(CameraPinhole param , DMatrixRMaj K )
 	{
 		return ImplPerspectiveOps_F64.calibrationMatrix(param, K);
 	}
@@ -200,7 +200,7 @@ public class PerspectiveOps {
 	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
-	public static RowMatrix_F32 calibrationMatrix(CameraPinhole param , RowMatrix_F32 K )
+	public static FMatrixRMaj calibrationMatrix(CameraPinhole param , FMatrixRMaj K )
 	{
 		return ImplPerspectiveOps_F32.calibrationMatrix(param, K);
 	}
@@ -214,7 +214,7 @@ public class PerspectiveOps {
 	 * @param param Where the intrinsic parameter are written to.  If null then a new instance is declared.
 	 * @return camera parameters
 	 */
-	public static <C extends CameraPinhole>C matrixToParam(RowMatrix_F64 K , int width , int height , C param )
+	public static <C extends CameraPinhole>C matrixToParam(DMatrixRMaj K , int width , int height , C param )
 	{
 		return ImplPerspectiveOps_F64.matrixToParam(K, width, height, param);
 	}
@@ -228,7 +228,7 @@ public class PerspectiveOps {
 	 * @param param Where the intrinsic parameter are written to.  If null then a new instance is declared.
 	 * @return camera parameters
 	 */
-	public static <C extends CameraPinhole>C matrixToParam(RowMatrix_F32 K , int width , int height , C param )
+	public static <C extends CameraPinhole>C matrixToParam(FMatrixRMaj K , int width , int height , C param )
 	{
 		return ImplPerspectiveOps_F32.matrixToParam(K, width, height, param);
 	}
@@ -295,7 +295,7 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F64 convertNormToPixel( RowMatrix_F64 K, Point2D_F64 norm , Point2D_F64 pixel )
+	public static Point2D_F64 convertNormToPixel( DMatrixRMaj K, Point2D_F64 norm , Point2D_F64 pixel )
 	{
 		return ImplPerspectiveOps_F64.convertNormToPixel(K, norm, pixel);
 	}
@@ -347,7 +347,7 @@ public class PerspectiveOps {
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F64 convertPixelToNorm( RowMatrix_F64 K , Point2D_F64 pixel , Point2D_F64 norm ) {
+	public static Point2D_F64 convertPixelToNorm( DMatrixRMaj K , Point2D_F64 pixel , Point2D_F64 norm ) {
 		return ImplPerspectiveOps_F64.convertPixelToNorm(K, pixel, norm);
 	}
 
@@ -364,7 +364,7 @@ public class PerspectiveOps {
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F32 convertPixelToNorm( RowMatrix_F32 K , Point2D_F32 pixel , Point2D_F32 norm ) {
+	public static Point2D_F32 convertPixelToNorm( FMatrixRMaj K , Point2D_F32 pixel , Point2D_F32 norm ) {
 		return ImplPerspectiveOps_F32.convertPixelToNorm(K, pixel, norm);
 	}
 
@@ -377,7 +377,7 @@ public class PerspectiveOps {
 	 * @param X 3D Point in world reference frame..
 	 * @return 2D Render point on image plane or null if it's behind the camera
 	 */
-	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , RowMatrix_F64 K , Point3D_F64 X ) {
+	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , DMatrixRMaj K , Point3D_F64 X ) {
 		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, K, X);
 	}
 
@@ -400,7 +400,7 @@ public class PerspectiveOps {
 	 * @param X 3D Point in world reference frame..
 	 * @return 2D Render point on image plane.
 	 */
-	public static Point2D_F64 renderPixel( RowMatrix_F64 worldToCamera , Point3D_F64 X ) {
+	public static Point2D_F64 renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X ) {
 		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, X);
 	}
 
@@ -445,8 +445,8 @@ public class PerspectiveOps {
 	 * @param ret Storage for camera calibration matrix. If null a new instance will be created.
 	 * @return Camera calibration matrix.
 	 */
-	public static RowMatrix_F64 createCameraMatrix( RowMatrix_F64 R , Vector3D_F64 T , RowMatrix_F64 K ,
-													 RowMatrix_F64 ret ) {
+	public static DMatrixRMaj createCameraMatrix( DMatrixRMaj R , Vector3D_F64 T , DMatrixRMaj K ,
+													 DMatrixRMaj ret ) {
 		return ImplPerspectiveOps_F64.createCameraMatrix(R, T, K, ret);
 	}
 

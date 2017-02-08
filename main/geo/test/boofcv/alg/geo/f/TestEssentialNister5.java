@@ -20,7 +20,7 @@ package boofcv.alg.geo.f;
 
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import java.util.List;
@@ -50,7 +50,7 @@ public class TestEssentialNister5 extends EpipolarTestSimulation {
 			}
 
 			@Override
-			public void computeFundamental(List<AssociatedPair> pairs , FastQueue<RowMatrix_F64> solutions ) {
+			public void computeFundamental(List<AssociatedPair> pairs , FastQueue<DMatrixRMaj> solutions ) {
 				assertTrue(alg.process(pairs,solutions));
 			}
 		};

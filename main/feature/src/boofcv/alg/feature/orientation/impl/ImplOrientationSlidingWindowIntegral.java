@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,7 +100,7 @@ public class ImplOrientationSlidingWindowIntegral
 		}
 
 		// order points from lowest to highest
-		sorter.sort(angles, angles.length, order);
+		sorter.sort(angles,0, angles.length, order);
 
 		return estimateAngle();
 	}

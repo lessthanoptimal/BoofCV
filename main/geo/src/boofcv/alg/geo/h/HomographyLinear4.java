@@ -22,11 +22,11 @@ package boofcv.alg.geo.h;
 import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.SingularOps_DDRM;
+import org.ejml.dense.row.SpecializedOps_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
-import org.ejml.ops.SingularOps_R64;
-import org.ejml.ops.SpecializedOps_R64;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.List;
@@ -54,12 +54,12 @@ import java.util.List;
 public class HomographyLinear4 {
 
 	// contains the set of equations that are solved
-	protected RowMatrix_F64 A = new RowMatrix_F64(1,9);
-	protected SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_R64.svd(0, 0, true, true, false);
+	protected DMatrixRMaj A = new DMatrixRMaj(1,9);
+	protected SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(0, 0, true, true, false);
 
 	// matrix used to normalize results
-	protected RowMatrix_F64 N1 = new RowMatrix_F64(3,3);
-	protected RowMatrix_F64 N2 = new RowMatrix_F64(3,3);
+	protected DMatrixRMaj N1 = new DMatrixRMaj(3,3);
+	protected DMatrixRMaj N2 = new DMatrixRMaj(3,3);
 
 	// pick a reasonable scale and sign
 	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
@@ -88,7 +88,7 @@ public class HomographyLinear4 {
 	 * @param foundH Output: Storage for the found solution. 3x3 matrix.
 	 * @return true if the calculation was a success.
 	 */
-	public boolean process( List<AssociatedPair> points , RowMatrix_F64 foundH ) {
+	public boolean process( List<AssociatedPair> points , DMatrixRMaj foundH ) {
 		if( points.size() < 4 )
 			throw new IllegalArgumentException("Must be at least 4 points.");
 
@@ -117,17 +117,17 @@ public class HomographyLinear4 {
 	/**
 	 * Computes the SVD of A and extracts the homography matrix from its null space
 	 */
-	protected boolean computeH(RowMatrix_F64 A, RowMatrix_F64 H) {
+	protected boolean computeH(DMatrixRMaj A, DMatrixRMaj H) {
 		if( !svd.decompose(A) )
 			return true;
 
 		if( A.numRows > 8 )
-			SingularOps_R64.nullVector(svd,true,H);
+			SingularOps_DDRM.nullVector(svd,true,H);
 		else {
 			// handle a special case since the matrix only has 8 singular values and won't select
 			// the correct column
-			RowMatrix_F64 V = svd.getV(null,false);
-			SpecializedOps_R64.subvector(V, 0, 8, V.numCols, false, 0, H);
+			DMatrixRMaj V = svd.getV(null,false);
+			SpecializedOps_DDRM.subvector(V, 0, 8, V.numCols, false, 0, H);
 		}
 
 		return false;
@@ -136,7 +136,7 @@ public class HomographyLinear4 {
 	/**
 	 * Undoes normalization for a homography matrix.
 	 */
-	protected void undoNormalizationH(RowMatrix_F64 M, RowMatrix_F64 N1, RowMatrix_F64 N2) {
+	protected void undoNormalizationH(DMatrixRMaj M, DMatrixRMaj N1, DMatrixRMaj N2) {
 		SimpleMatrix a = SimpleMatrix.wrap(M);
 		SimpleMatrix b = SimpleMatrix.wrap(N1);
 		SimpleMatrix c = SimpleMatrix.wrap(N2);
@@ -149,7 +149,7 @@ public class HomographyLinear4 {
 	/**
 	 * Compute the 'A' matrix used to solve for H from normalized points.
 	 */
-	protected void createANormalized(List<AssociatedPair> points, RowMatrix_F64 A) {
+	protected void createANormalized(List<AssociatedPair> points, DMatrixRMaj A) {
 		A.reshape(points.size()*2,9, false);
 		A.zero();
 
@@ -187,7 +187,7 @@ public class HomographyLinear4 {
 /**
 	 * Compute the 'A' matrix used to solve for H from un-normalized points.
 	 */
-	protected void createA(List<AssociatedPair> points, RowMatrix_F64 A) {
+	protected void createA(List<AssociatedPair> points, DMatrixRMaj A) {
 		A.reshape(points.size()*2,9, false);
 		A.zero();
 

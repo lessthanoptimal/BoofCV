@@ -23,12 +23,12 @@ import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.alg.dense.decomposition.svd.SafeSvd_R64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.SingularOps_DDRM;
+import org.ejml.dense.row.decomposition.svd.SafeSvd_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.SingularOps_R64;
 
 import java.util.List;
 
@@ -57,18 +57,18 @@ public class TrifocalLinearPoint7 {
 	protected TrifocalTensor solutionN = new TrifocalTensor();
 
 	// normalization matrices for points
-	protected RowMatrix_F64 N1 = new RowMatrix_F64(3,3);
-	protected RowMatrix_F64 N2 = new RowMatrix_F64(3,3);
-	protected RowMatrix_F64 N3 = new RowMatrix_F64(3,3);
+	protected DMatrixRMaj N1 = new DMatrixRMaj(3,3);
+	protected DMatrixRMaj N2 = new DMatrixRMaj(3,3);
+	protected DMatrixRMaj N3 = new DMatrixRMaj(3,3);
 
 	// the linear system which is solved for
-	protected RowMatrix_F64 A = new RowMatrix_F64(7,27);
+	protected DMatrixRMaj A = new DMatrixRMaj(7,27);
 
 	// svd used to extract the null space
-	protected SingularValueDecomposition_F64<RowMatrix_F64> svdNull;
+	protected SingularValueDecomposition_F64<DMatrixRMaj> svdNull;
 
 	// Solution in vector format
-	protected RowMatrix_F64 vectorizedSolution = new RowMatrix_F64(27,1);
+	protected DMatrixRMaj vectorizedSolution = new DMatrixRMaj(27,1);
 
 	// triple of points after normalization
 	protected Point2D_F64 p1_norm = new Point2D_F64();
@@ -83,8 +83,8 @@ public class TrifocalLinearPoint7 {
 	protected Point3D_F64 e3 = new Point3D_F64();
 
 	public TrifocalLinearPoint7() {
-		svdNull = DecompositionFactory_R64.svd(24, 27, false, true, false);
-		svdNull = new SafeSvd_R64(svdNull);
+		svdNull = DecompositionFactory_DDRM.svd(24, 27, false, true, false);
+		svdNull = new SafeSvd_DDRM(svdNull);
 	}
 
 	/**
@@ -219,7 +219,7 @@ public class TrifocalLinearPoint7 {
 		if( !svdNull.decompose(A) )
 			return false;
 
-		SingularOps_R64.nullVector(svdNull,true,vectorizedSolution);
+		SingularOps_DDRM.nullVector(svdNull,true,vectorizedSolution);
 
 		solutionN.convertFrom(vectorizedSolution);
 
@@ -230,14 +230,14 @@ public class TrifocalLinearPoint7 {
 	 * Translates the trifocal tensor back into regular coordinate system
 	 */
 	protected void removeNormalization( TrifocalTensor solution ) {
-		RowMatrix_F64 N2_inv = new RowMatrix_F64(3,3);
-		RowMatrix_F64 N3_inv = new RowMatrix_F64(3,3);
+		DMatrixRMaj N2_inv = new DMatrixRMaj(3,3);
+		DMatrixRMaj N3_inv = new DMatrixRMaj(3,3);
 
-		CommonOps_R64.invert(N2,N2_inv);
-		CommonOps_R64.invert(N3,N3_inv);
+		CommonOps_DDRM.invert(N2,N2_inv);
+		CommonOps_DDRM.invert(N3,N3_inv);
 
 		for( int i = 0; i < 3; i++ ) {
-			RowMatrix_F64 T = solution.getT(i);
+			DMatrixRMaj T = solution.getT(i);
 			for( int j = 0; j < 3; j++ ) {
 				for( int k = 0; k < 3; k++ ) {
 
@@ -245,7 +245,7 @@ public class TrifocalLinearPoint7 {
 
 					for( int r = 0; r < 3; r++ ) {
 						double n1 = N1.get(r,i);
-						RowMatrix_F64 TN = solutionN.getT(r);
+						DMatrixRMaj TN = solutionN.getT(r);
 	                    for( int s = 0; s < 3; s++ ) {
 							double n2 = N2_inv.get(j,s);
 							for( int t = 0; t < 3; t++ ) {

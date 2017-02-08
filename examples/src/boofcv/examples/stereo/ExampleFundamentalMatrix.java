@@ -46,7 +46,7 @@ import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -77,22 +77,22 @@ public class ExampleFundamentalMatrix {
 	 * @param inliers List of feature pairs that were determined to not be noise.
 	 * @return The found fundamental matrix.
 	 */
-	public static RowMatrix_F64 robustFundamental( List<AssociatedPair> matches ,
+	public static DMatrixRMaj robustFundamental( List<AssociatedPair> matches ,
 													List<AssociatedPair> inliers ) {
 
 		// used to create and copy new instances of the fit model
-		ModelManager<RowMatrix_F64> managerF = new ModelManagerEpipolarMatrix();
+		ModelManager<DMatrixRMaj> managerF = new ModelManagerEpipolarMatrix();
 		// Select which linear algorithm is to be used.  Try playing with the number of remove ambiguity points
 		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(EnumEpipolar.FUNDAMENTAL_7_LINEAR, 2);
 		// Wrapper so that this estimator can be used by the robust estimator
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
 
 		// How the error is measured
-		DistanceFromModelResidual<RowMatrix_F64,AssociatedPair> errorMetric =
+		DistanceFromModelResidual<DMatrixRMaj,AssociatedPair> errorMetric =
 				new DistanceFromModelResidual<>(new FundamentalResidualSampson());
 
 		// Use RANSAC to estimate the Fundamental matrix
-		ModelMatcher<RowMatrix_F64,AssociatedPair> robustF =
+		ModelMatcher<DMatrixRMaj,AssociatedPair> robustF =
 				new Ransac<>(123123, managerF, generateF, errorMetric, 6000, 0.1);
 
 		// Estimate the fundamental matrix while removing outliers
@@ -103,8 +103,8 @@ public class ExampleFundamentalMatrix {
 		inliers.addAll(robustF.getMatchSet());
 
 		// Improve the estimate of the fundamental matrix using non-linear optimization
-		RowMatrix_F64 F = new RowMatrix_F64(3,3);
-		ModelFitter<RowMatrix_F64,AssociatedPair> refine =
+		DMatrixRMaj F = new DMatrixRMaj(3,3);
+		ModelFitter<DMatrixRMaj,AssociatedPair> refine =
 				FactoryMultiView.refineFundamental(1e-8, 400, EpipolarError.SAMPSON);
 		if( !refine.fitModel(inliers, robustF.getModelParameters(), F) )
 			throw new IllegalArgumentException("Failed");
@@ -118,11 +118,11 @@ public class ExampleFundamentalMatrix {
 	 * be computed directly with a lot less code.  The down side is that this technique is very
 	 * sensitive to noise.
 	 */
-	public static RowMatrix_F64 simpleFundamental( List<AssociatedPair> matches ) {
+	public static DMatrixRMaj simpleFundamental( List<AssociatedPair> matches ) {
 		// Use the 8-point algorithm since it will work with an arbitrary number of points
 		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(EnumEpipolar.FUNDAMENTAL_8_LINEAR, 0);
 
-		RowMatrix_F64 F = new RowMatrix_F64(3,3);
+		DMatrixRMaj F = new DMatrixRMaj(3,3);
 		if( !estimateF.process(matches,F) )
 			throw new IllegalArgumentException("Failed");
 
@@ -170,7 +170,7 @@ public class ExampleFundamentalMatrix {
 		List<AssociatedPair> matches = computeMatches(imageA,imageB);
 
 		// Where the fundamental matrix is stored
-		RowMatrix_F64 F;
+		DMatrixRMaj F;
 		// List of matches that matched the model
 		List<AssociatedPair> inliers = new ArrayList<>();
 

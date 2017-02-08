@@ -36,8 +36,8 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.RowMatrix_F32;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
 
 import javax.swing.*;
@@ -321,14 +321,14 @@ public class CalibratedImageGridPanel extends JPanel {
 		}
 	}
 
-	public void setDistorted (CameraPinholeRadial param , RowMatrix_F64 rect ) {
+	public void setDistorted (CameraPinholeRadial param , DMatrixRMaj rect ) {
 		if( rect == null ) {
 			CameraPinhole undistorted = new CameraPinhole(param);
 			this.undoRadial = LensDistortionOps.changeCameraModel(
 					AdjustmentType.FULL_VIEW, BorderType.ZERO, param, undistorted,null, ImageType.single(GrayF32.class));
 			this.remove_p_to_p = LensDistortionOps.transformChangeModel_F32(AdjustmentType.FULL_VIEW, param, undistorted, false,null);
 		} else {
-			RowMatrix_F32 rect_f32 = new RowMatrix_F32(3,3);
+			FMatrixRMaj rect_f32 = new FMatrixRMaj(3,3);
 			ConvertMatrixData.convert(rect,rect_f32);
 
 			this.undoRadial = RectifyImageOps.rectifyImage(

@@ -28,7 +28,7 @@ import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class LeastSquaresFundamental implements RefineEpipolar {
-	ModelCodec<RowMatrix_F64> paramModel;
+	ModelCodec<DMatrixRMaj> paramModel;
 	ResidualsEpipolarMatrix func;
 	double param[];
 
@@ -53,7 +53,7 @@ public class LeastSquaresFundamental implements RefineEpipolar {
 		this( new ParamFundamentalEpipolar() , convergenceTol, maxIterations,useSampson);
 	}
 
-	public LeastSquaresFundamental(ModelCodec<RowMatrix_F64> paramModel,
+	public LeastSquaresFundamental(ModelCodec<DMatrixRMaj> paramModel,
 								   double convergenceTol,
 								   int maxIterations,
 								   boolean useSampson) {
@@ -63,7 +63,7 @@ public class LeastSquaresFundamental implements RefineEpipolar {
 
 		param = new double[paramModel.getParamLength()];
 
-		ModelObservationResidual<RowMatrix_F64,AssociatedPair> residual;
+		ModelObservationResidual<DMatrixRMaj,AssociatedPair> residual;
 		if( useSampson )
 			residual = new FundamentalResidualSampson();
 		else
@@ -75,7 +75,7 @@ public class LeastSquaresFundamental implements RefineEpipolar {
 	}
 
 	@Override
-	public boolean fitModel(List<AssociatedPair> obs, RowMatrix_F64 F, RowMatrix_F64 refinedF) {
+	public boolean fitModel(List<AssociatedPair> obs, DMatrixRMaj F, DMatrixRMaj refinedF) {
 		func.setObservations(obs);
 		
 		paramModel.encode(F, param);

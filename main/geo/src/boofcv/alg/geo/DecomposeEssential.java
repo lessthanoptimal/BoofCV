@@ -20,11 +20,11 @@ package boofcv.alg.geo;
 
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.SingularOps_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.SingularOps_R64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,21 +47,21 @@ import java.util.List;
  */
 public class DecomposeEssential {
 
-	private SingularValueDecomposition<RowMatrix_F64> svd = DecompositionFactory_R64.svd(3, 3, true, true, false);
+	private SingularValueDecomposition<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(3, 3, true, true, false);
 
 	// storage for SVD
-	RowMatrix_F64 U,S,V;
+	DMatrixRMaj U,S,V;
 
 	// storage for the four possible solutions
 	List<Se3_F64> solutions = new ArrayList<>();
 
 	// working copy of E
-	RowMatrix_F64 E_copy = new RowMatrix_F64(3,3);
+	DMatrixRMaj E_copy = new DMatrixRMaj(3,3);
 
 	// local storage used when computing a hypothesis
-	RowMatrix_F64 temp = new RowMatrix_F64(3,3);
-	RowMatrix_F64 temp2 = new RowMatrix_F64(3,3);
-	RowMatrix_F64 Rz = new RowMatrix_F64(3,3);
+	DMatrixRMaj temp = new DMatrixRMaj(3,3);
+	DMatrixRMaj temp2 = new DMatrixRMaj(3,3);
+	DMatrixRMaj Rz = new DMatrixRMaj(3,3);
 
 	public DecomposeEssential() {
 		solutions.add( new Se3_F64());
@@ -79,7 +79,7 @@ public class DecomposeEssential {
 	 *
 	 * @param E essential matrix
 	 */
-	public void decompose( RowMatrix_F64 E ) {
+	public void decompose( DMatrixRMaj E ) {
 		if( svd.inputModified() ) {
 			E_copy.set(E);
 			E = E_copy;
@@ -92,7 +92,7 @@ public class DecomposeEssential {
 		V = svd.getV(V,false);
 		S = svd.getW(S);
 
-		SingularOps_R64.descendingOrder(U,false,S,V,false);
+		SingularOps_DDRM.descendingOrder(U,false,S,V,false);
 
 		decompose(U, S, V);
 	}
@@ -104,16 +104,16 @@ public class DecomposeEssential {
 	 * @param S Diagonal matrix containing singular values from SVD.
 	 * @param V Orthogonal matrix from SVD.
 	 */
-	public void decompose( RowMatrix_F64 U , RowMatrix_F64 S , RowMatrix_F64 V ) {
+	public void decompose( DMatrixRMaj U , DMatrixRMaj S , DMatrixRMaj V ) {
 		// this ensures the resulting rotation matrix will have a determinant of +1 and thus be a real rotation matrix
-		if( CommonOps_R64.det(U) < 0 ) {
-			CommonOps_R64.scale(-1,U);
-			CommonOps_R64.scale(-1,S);
+		if( CommonOps_DDRM.det(U) < 0 ) {
+			CommonOps_DDRM.scale(-1,U);
+			CommonOps_DDRM.scale(-1,S);
 		}
 
-		if( CommonOps_R64.det(V) < 0 ) {
-			CommonOps_R64.scale(-1,V);
-			CommonOps_R64.scale(-1,S);
+		if( CommonOps_DDRM.det(V) < 0 ) {
+			CommonOps_DDRM.scale(-1,V);
+			CommonOps_DDRM.scale(-1,S);
 		}
 
 		// for possible solutions due to ambiguity in the sign of T and rotation
@@ -144,26 +144,26 @@ public class DecomposeEssential {
 	 * There are four possible reconstructions from an essential matrix.  This function will compute different
 	 * permutations depending on optionA and optionB being true or false.
 	 */
-	private void extractTransform( RowMatrix_F64 U , RowMatrix_F64 V , RowMatrix_F64 S ,
+	private void extractTransform( DMatrixRMaj U , DMatrixRMaj V , DMatrixRMaj S ,
 								   Se3_F64 se , boolean optionA , boolean optionB )
 	{
-		RowMatrix_F64 R = se.getR();
+		DMatrixRMaj R = se.getR();
 		Vector3D_F64 T = se.getT();
 
 		// extract rotation
 		if( optionA )
-			CommonOps_R64.mult(U,Rz,temp);
+			CommonOps_DDRM.mult(U,Rz,temp);
 		else
-			CommonOps_R64.multTransB(U,Rz,temp);
-		CommonOps_R64.multTransB(temp,V,R);
+			CommonOps_DDRM.multTransB(U,Rz,temp);
+		CommonOps_DDRM.multTransB(temp,V,R);
 
 		// extract screw symmetric translation matrix
 		if( optionB )
-			CommonOps_R64.multTransB(U,Rz,temp);
+			CommonOps_DDRM.multTransB(U,Rz,temp);
 		else
-			CommonOps_R64.mult(U,Rz,temp);
-		CommonOps_R64.mult(temp,S,temp2);
-		CommonOps_R64.multTransB(temp2,U,temp);
+			CommonOps_DDRM.mult(U,Rz,temp);
+		CommonOps_DDRM.mult(temp,S,temp2);
+		CommonOps_DDRM.multTransB(temp2,U,temp);
 
 		T.x = temp.get(2,1);
 		T.y = temp.get(0,2);

@@ -23,7 +23,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -38,7 +38,7 @@ public class TestNormalizedToPixelError {
 	double skew = 0.01;
 	double fy = 80;
 
-	RowMatrix_F64 K = new RowMatrix_F64(3,3,true,fx,skew,200,0,fy,150,0,0,1);
+	DMatrixRMaj K = new DMatrixRMaj(3,3,true,fx,skew,200,0,fy,150,0,0,1);
 	Se3_F64 worldToCamera;
 
 	// normalized image coordinates

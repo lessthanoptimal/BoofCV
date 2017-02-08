@@ -22,7 +22,7 @@ import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * <p>
@@ -33,14 +33,14 @@ import org.ejml.data.RowMatrix_F64;
  * @author Peter Abeles
  */
 public class HomographyResidualTransfer
-		implements ModelObservationResidualN<RowMatrix_F64,AssociatedPair> {
+		implements ModelObservationResidualN<DMatrixRMaj,AssociatedPair> {
 
-	RowMatrix_F64 H;
+	DMatrixRMaj H;
 
 	Point2D_F64 temp = new Point2D_F64();
 
 	@Override
-	public void setModel(RowMatrix_F64 F) {
+	public void setModel(DMatrixRMaj F) {
 		this.H = F;
 	}
 

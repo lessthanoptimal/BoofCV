@@ -22,7 +22,7 @@ import boofcv.abst.geo.EstimateNofEpipolar;
 import boofcv.alg.geo.f.FundamentalLinear7;
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class WrapFundamentalLinear7 implements EstimateNofEpipolar {
 	}
 
 	@Override
-	public boolean process(List<AssociatedPair> points, FastQueue<RowMatrix_F64> estimatedModels) {
+	public boolean process(List<AssociatedPair> points, FastQueue<DMatrixRMaj> estimatedModels) {
 		return alg.process(points,estimatedModels);
 	}
 

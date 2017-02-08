@@ -25,7 +25,7 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.homography.UtilHomography_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
@@ -40,7 +40,7 @@ public class GenerateHomographyLinear implements
 {
 
 	HomographyLinear4 alg;
-	RowMatrix_F64 H = new RowMatrix_F64(3,3);
+	DMatrixRMaj H = new DMatrixRMaj(3,3);
 
 	public GenerateHomographyLinear( boolean normalizeInput ) {
 		alg = new HomographyLinear4(normalizeInput);

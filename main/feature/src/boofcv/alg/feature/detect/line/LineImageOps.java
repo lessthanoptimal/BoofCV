@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class LineImageOps {
 	{
 		int indexSort[] = new int[ intensity.length ];
 		QuickSort_F32 sort = new QuickSort_F32();
-		sort.sort(intensity, lines.size(), indexSort);
+		sort.sort(intensity,0, lines.size(), indexSort);
 
 		float threshold = intensity[ indexSort[ lines.size()-1] ]*fraction;
 
@@ -81,7 +81,7 @@ public class LineImageOps {
 
 		int indexSort[] = new int[ intensity.length ];
 		QuickSort_F32 sort = new QuickSort_F32();
-		sort.sort(intensity, lines.size(), indexSort);
+		sort.sort(intensity,0, lines.size(), indexSort);
 
 		float theta[] = new float[ lines.size() ];
 		List<LineSegment2D_F32> segments = new ArrayList<>(lines.size());

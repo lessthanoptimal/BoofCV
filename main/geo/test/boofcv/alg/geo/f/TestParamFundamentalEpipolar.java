@@ -22,9 +22,9 @@ import boofcv.alg.geo.MultiViewOps;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -36,23 +36,23 @@ public class TestParamFundamentalEpipolar {
 
 	@Test
 	public void backAndForth() {
-		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1, 2, -0.5, null);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1, 2, -0.5, null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
-		RowMatrix_F64 E = MultiViewOps.createEssential(R, T);
+		DMatrixRMaj E = MultiViewOps.createEssential(R, T);
 		
 		double param[] = new double[7];
 		
 		ParamFundamentalEpipolar alg = new ParamFundamentalEpipolar();
 		
-		RowMatrix_F64 found = new RowMatrix_F64(3,3);
+		DMatrixRMaj found = new DMatrixRMaj(3,3);
 		alg.encode(E, param);
 		alg.decode(param, found);
 
 		// normalize to take in account scale different when testing
-		CommonOps_R64.divide(E.get(2,2),E);
-		CommonOps_R64.divide(found.get(2, 2), found);
+		CommonOps_DDRM.divide(E.get(2,2),E);
+		CommonOps_DDRM.divide(found.get(2, 2), found);
 		
-		assertTrue(MatrixFeatures_R64.isEquals(E, found, 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isEquals(E, found, 1e-8));
 	}
 }

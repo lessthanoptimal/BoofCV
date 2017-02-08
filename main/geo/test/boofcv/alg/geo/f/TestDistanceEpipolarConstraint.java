@@ -24,8 +24,8 @@ import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -36,14 +36,14 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestDistanceEpipolarConstraint {
 
-	RowMatrix_F64 K = new RowMatrix_F64(3,3,true,100,0.01,200,0,150,200,0,0,1);
+	DMatrixRMaj K = new DMatrixRMaj(3,3,true,100,0.01,200,0,150,200,0,0,1);
 
 	Se3_F64 worldToCamera = new Se3_F64();
 
 	Point3D_F64 X = new Point3D_F64(0.1,-0.04,2.3);
 
 	Point2D_F64 p1,p2;
-	RowMatrix_F64 E,F;
+	DMatrixRMaj E,F;
 
 	public TestDistanceEpipolarConstraint() {
 		worldToCamera.getT().set(0.1,-0.1,0.2);
@@ -89,7 +89,7 @@ public class TestDistanceEpipolarConstraint {
 		double orig = alg.computeDistance(new AssociatedPair(p1,p2));
 
 		// rescale the matrix and see if that changes the results
-		CommonOps_R64.scale(5,F);
+		CommonOps_DDRM.scale(5,F);
 		alg.setModel(F);
 
 		double after = alg.computeDistance(new AssociatedPair(p1,p2));

@@ -22,8 +22,8 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -39,16 +39,16 @@ public class TestZhang99DecomposeHomography {
 	 */
 	@Test
 	public void knownCase() {
-		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.02, -0.05, 0.01, null);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.02, -0.05, 0.01, null);
 		Vector3D_F64 T = new Vector3D_F64(100,50,-1000);
-		RowMatrix_F64 K = GenericCalibrationGrid.createStandardCalibration();
-		RowMatrix_F64 H = GenericCalibrationGrid.computeHomography(K,R,T);
+		DMatrixRMaj K = GenericCalibrationGrid.createStandardCalibration();
+		DMatrixRMaj H = GenericCalibrationGrid.computeHomography(K,R,T);
 
 		Zhang99DecomposeHomography alg = new Zhang99DecomposeHomography();
 		alg.setCalibrationMatrix(K);
 		Se3_F64 motion = alg.decompose(H);
 
-		assertTrue(MatrixFeatures_R64.isIdentical(R, motion.getR(), 1e-5));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(R, motion.getR(), 1e-5));
 		assertEquals(T.x,motion.getX(), 1e-5);
 	}
 }

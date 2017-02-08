@@ -26,7 +26,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -108,8 +108,8 @@ public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 			GeometryMath_F64.cross(obs3,axisY,line3);
 
 			// compute induced homographies
-			RowMatrix_F64 H12 = MultiViewOps.inducedHomography12(tensor,line3,null);
-			RowMatrix_F64 H13 = MultiViewOps.inducedHomography13(tensor, line2, null);
+			DMatrixRMaj H12 = MultiViewOps.inducedHomography12(tensor,line3,null);
+			DMatrixRMaj H13 = MultiViewOps.inducedHomography13(tensor, line2, null);
 
 			Point2D_F64 induced2 = new Point2D_F64();
 			Point2D_F64 induced3 = new Point2D_F64();

@@ -21,8 +21,8 @@ package boofcv.alg.geo.pose;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.RandomMatrices_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.RandomMatrices_DDRM;
 import org.junit.Test;
 
 import java.util.Random;
@@ -39,8 +39,8 @@ public class TestUtilLepetitEPnP {
 	@Test
 	public void jacobian4() {
 
-		RowMatrix_F64 L_full = RandomMatrices_R64.createRandom(6, 10, rand);
-		RowMatrix_F64 y = RandomMatrices_R64.createRandom(6,1,rand);
+		DMatrixRMaj L_full = RandomMatrices_DDRM.rectangle(6, 10, rand);
+		DMatrixRMaj y = RandomMatrices_DDRM.rectangle(6,1,rand);
 
 		JacobianEPnP jacobian = new JacobianEPnP();
 		ResidualsEPnP residuals = new ResidualsEPnP();
@@ -55,8 +55,8 @@ public class TestUtilLepetitEPnP {
 	@Test
 	public void jacobian3() {
 
-		RowMatrix_F64 L_full = RandomMatrices_R64.createRandom(3,6,rand);
-		RowMatrix_F64 y = RandomMatrices_R64.createRandom(3,1,rand);
+		DMatrixRMaj L_full = RandomMatrices_DDRM.rectangle(3,6,rand);
+		DMatrixRMaj y = RandomMatrices_DDRM.rectangle(3,1,rand);
 
 		JacobianEPnP jacobian = new JacobianEPnP();
 		ResidualsEPnP residuals = new ResidualsEPnP();
@@ -77,11 +77,11 @@ public class TestUtilLepetitEPnP {
 		protected int numControl;
 
 		// linear constraint matrix
-		protected RowMatrix_F64 L_full;
+		protected DMatrixRMaj L_full;
 
-		protected RowMatrix_F64 jacobian = new RowMatrix_F64(1,1);
+		protected DMatrixRMaj jacobian = new DMatrixRMaj(1,1);
 
-		public void setParameters( RowMatrix_F64 L_full ) {
+		public void setParameters( DMatrixRMaj L_full ) {
 			if( L_full.numRows == 6 )
 				numControl = 4;
 			else
@@ -123,11 +123,11 @@ public class TestUtilLepetitEPnP {
 		protected int numControl;
 
 		// linear constraint matrix
-		protected RowMatrix_F64 L_full;
+		protected DMatrixRMaj L_full;
 		// distance between control points
-		protected RowMatrix_F64 y;
+		protected DMatrixRMaj y;
 
-		public void setParameters( RowMatrix_F64 L_full , RowMatrix_F64 y ) {
+		public void setParameters( DMatrixRMaj L_full , DMatrixRMaj y ) {
 			if( L_full.numRows == 6 )
 				numControl = 4;
 			else

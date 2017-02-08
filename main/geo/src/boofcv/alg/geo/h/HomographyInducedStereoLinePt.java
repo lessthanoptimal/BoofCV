@@ -23,8 +23,8 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.PairLineNorm;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  *
@@ -51,19 +51,19 @@ import org.ejml.ops.CommonOps_R64;
 public class HomographyInducedStereoLinePt {
 
 	// Fundamental matrix
-	private RowMatrix_F64 F;
+	private DMatrixRMaj F;
 	// Epipole in camera 2
 	private Point3D_F64 e2 = new Point3D_F64();
 
 	// The found homography from view 1 to view 2
-	private RowMatrix_F64 H = new RowMatrix_F64(3,3);
+	private DMatrixRMaj H = new DMatrixRMaj(3,3);
 
 	// pick a reasonable scale and sign
 	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
 
 	// storage for intermediate results
-	private RowMatrix_F64 el = new RowMatrix_F64(3,3);
-	private RowMatrix_F64 lf = new RowMatrix_F64(3,3);
+	private DMatrixRMaj el = new DMatrixRMaj(3,3);
+	private DMatrixRMaj lf = new DMatrixRMaj(3,3);
 
 	private Point3D_F64 Fx = new Point3D_F64();
 
@@ -76,7 +76,7 @@ public class HomographyInducedStereoLinePt {
 	 * @param F Fundamental matrix.
 	 * @param e2 Epipole for camera 2.  If null it will be computed internally.
 	 */
-	public void setFundamental( RowMatrix_F64 F , Point3D_F64 e2 ) {
+	public void setFundamental( DMatrixRMaj F , Point3D_F64 e2 ) {
 		this.F = F;
 		if( e2 != null )
 			this.e2.set(e2);
@@ -108,13 +108,13 @@ public class HomographyInducedStereoLinePt {
 		// cross(l')*F
 		GeometryMath_F64.multCrossA(line.l2, F, lf);
 
-		CommonOps_R64.add(lf,top/bottom,el,H);
+		CommonOps_DDRM.add(lf,top/bottom,el,H);
 
 		// pick a good scale and sign for H
 		adjust.adjust(H, point);
 	}
 
-	public RowMatrix_F64 getHomography() {
+	public DMatrixRMaj getHomography() {
 		return H;
 	}
 }

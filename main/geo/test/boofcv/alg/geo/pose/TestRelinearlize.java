@@ -21,9 +21,9 @@ package boofcv.alg.geo.pose;
 import boofcv.alg.geo.GeoTestingOps;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -44,8 +44,8 @@ public class TestRelinearlize {
 
 	Random rand = new Random(234);
 
-	RowMatrix_F64 L_full;
-	RowMatrix_F64 y;
+	DMatrixRMaj L_full;
+	DMatrixRMaj y;
 
 	@Test
 	public void numControl4() {
@@ -67,8 +67,8 @@ public class TestRelinearlize {
 		alg.process(L_full,y,foundBeta);
 
 		// check to see if its a valid solution
-		RowMatrix_F64 x = new RowMatrix_F64(L_full.numCols,1);
-		RowMatrix_F64 foundDistance = new RowMatrix_F64(L_full.numRows,1);
+		DMatrixRMaj x = new DMatrixRMaj(L_full.numCols,1);
+		DMatrixRMaj foundDistance = new DMatrixRMaj(L_full.numRows,1);
 		int index = 0;
 		for( int i = 0; i < numControl; i++ ) {
 			for( int j = i; j < numControl; j++ ) {
@@ -76,24 +76,24 @@ public class TestRelinearlize {
 			}
 		}
 
-		CommonOps_R64.mult(L_full, x, foundDistance);
+		CommonOps_DDRM.mult(L_full, x, foundDistance);
 
-//		System.out.println("error = "+SpecializedOps_R64.diffNormF(foundDistance,y));
+//		System.out.println("error = "+SpecializedOps_DDRM.diffNormF(foundDistance,y));
 
 		// NOTE: This test can pass and the result still be bad because L_full is
 		// an undetermined system.  But at least there is some sort of test here
-		assertTrue(MatrixFeatures_R64.isEquals(foundDistance, y, 2));
+		assertTrue(MatrixFeatures_DDRM.isEquals(foundDistance, y, 2));
 
 		// WARNING!!! the error margin was made to be huge to make sure it passed
 	}
 
 	private void createInputs( int numControl ) {
 		if( numControl == 4 ) {
-			L_full = new RowMatrix_F64(6,10);
-			y = new RowMatrix_F64(6,1);
+			L_full = new DMatrixRMaj(6,10);
+			y = new DMatrixRMaj(6,1);
 		} else {
-			L_full = new RowMatrix_F64(3,6);
-			y = new RowMatrix_F64(3,1);
+			L_full = new DMatrixRMaj(3,6);
+			y = new DMatrixRMaj(3,1);
 		}
 
 		// randomly select null points,

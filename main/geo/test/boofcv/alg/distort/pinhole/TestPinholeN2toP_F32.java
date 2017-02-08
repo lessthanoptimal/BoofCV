@@ -22,7 +22,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F32;
-import org.ejml.data.RowMatrix_F32;
+import org.ejml.data.FMatrixRMaj;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -36,7 +36,7 @@ public class TestPinholeN2toP_F32 {
 	public void basicTest() {
 		CameraPinholeRadial p = new CameraPinholeRadial().fsetK(1, 2, 3, 4, 5, 200, 300);
 
-		RowMatrix_F32 K = PerspectiveOps.calibrationMatrix(p, (RowMatrix_F32)null);
+		FMatrixRMaj K = PerspectiveOps.calibrationMatrix(p, (FMatrixRMaj)null);
 
 		Point2D_F32 pixel = new Point2D_F32(150, 200);
 		Point2D_F32 expected = new Point2D_F32();

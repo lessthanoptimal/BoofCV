@@ -20,19 +20,19 @@ package boofcv.abst.geo;
 
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelFitter;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * <p>
  * Refines a Fundamental, Essential, or Homography matrix such that it is a better fit to the provided
  * observations.  Input and output matrices are assumed to follow the constraint conventions defined in
- * {@link boofcv.alg.geo.MultiViewOps#constraint(org.ejml.data.RowMatrix_F64,
+ * {@link boofcv.alg.geo.MultiViewOps#constraint(org.ejml.data.DMatrixRMaj,
  * georegression.struct.point.Point2D_F64, georegression.struct.point.Point2D_F64) constraint Fundamental}
- * and {@link boofcv.alg.geo.MultiViewOps#constraintHomography(org.ejml.data.RowMatrix_F64,
+ * and {@link boofcv.alg.geo.MultiViewOps#constraintHomography(org.ejml.data.DMatrixRMaj,
  * georegression.struct.point.Point2D_F64, georegression.struct.point.Point2D_F64) constraint Homography}.
  * </p>
  *
  * @author Peter Abeles
  */
-public interface RefineEpipolar extends ModelFitter<RowMatrix_F64,AssociatedPair> {
+public interface RefineEpipolar extends ModelFitter<DMatrixRMaj,AssociatedPair> {
 }

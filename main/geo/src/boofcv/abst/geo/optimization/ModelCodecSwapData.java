@@ -19,7 +19,7 @@
 package boofcv.abst.geo.optimization;
 
 import org.ddogleg.fitting.modelset.ModelCodec;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * For use in cases where the model is a matrix and there is a 1-to-1 relationship with model
@@ -28,7 +28,7 @@ import org.ejml.data.RowMatrix_F64;
  * 
  * @author Peter Abeles
  */
-public class ModelCodecSwapData implements ModelCodec<RowMatrix_F64> {
+public class ModelCodecSwapData implements ModelCodec<DMatrixRMaj> {
 	int paramLength;
 
 	public ModelCodecSwapData(int paramLength) {
@@ -36,12 +36,12 @@ public class ModelCodecSwapData implements ModelCodec<RowMatrix_F64> {
 	}
 
 	@Override
-	public void decode(double[] input, RowMatrix_F64 outputModel) {
+	public void decode(double[] input, DMatrixRMaj outputModel) {
 		outputModel.data = input;
 	}
 
 	@Override
-	public void encode(RowMatrix_F64 model, double[] param) {
+	public void encode(DMatrixRMaj model, double[] param) {
 		System.arraycopy(model.data,0,param,0,paramLength);
 	}
 

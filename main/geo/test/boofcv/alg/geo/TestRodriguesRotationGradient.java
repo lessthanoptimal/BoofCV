@@ -23,8 +23,8 @@ import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.Test;
 
 import java.util.Random;
@@ -82,7 +82,7 @@ public class TestRodriguesRotationGradient {
 			Rodrigues_F64 r = new Rodrigues_F64();
 
 			r.setParamVector(input[0],input[1],input[2]);
-			RowMatrix_F64 M = RowMatrix_F64.wrap(3,3,output);
+			DMatrixRMaj M = DMatrixRMaj.wrap(3,3,output);
 
 			ConvertRotation3D_F64.rodriguesToMatrix(r,M);
 		}
@@ -106,13 +106,13 @@ public class TestRodriguesRotationGradient {
 			
 			g.process(input[0],input[1],input[2]);
 
-			RowMatrix_F64 J = RowMatrix_F64.wrap(3,9,output);
+			DMatrixRMaj J = DMatrixRMaj.wrap(3,9,output);
 			
 			System.arraycopy(g.Rx.data,0,output,0,9);
 			System.arraycopy(g.Ry.data,0,output,9,9);
 			System.arraycopy(g.Rz.data,0,output,18,9);
 
-			CommonOps_R64.transpose(J);
+			CommonOps_DDRM.transpose(J);
 		}
 	}
 }

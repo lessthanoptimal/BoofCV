@@ -24,7 +24,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.List;
@@ -54,8 +54,8 @@ import java.util.List;
 public class RectifyFundamental {
 
 	// rectifying transform for left and right images
-	private RowMatrix_F64 rect1 = new RowMatrix_F64(3,3);
-	private RowMatrix_F64 rect2 = new RowMatrix_F64(3,3);
+	private DMatrixRMaj rect1 = new DMatrixRMaj(3,3);
+	private DMatrixRMaj rect2 = new DMatrixRMaj(3,3);
 
 	// storage for epipoles
 	private Point3D_F64 epipole1 = new Point3D_F64();
@@ -69,7 +69,7 @@ public class RectifyFundamental {
 	 * @param width Width of first image.
 	 * @param height Height of first image.
 	 */
-	public void process( RowMatrix_F64 F , List<AssociatedPair> observations ,
+	public void process( DMatrixRMaj F , List<AssociatedPair> observations ,
 						 int width , int height ) {
 
 		int centerX = width/2;
@@ -168,7 +168,7 @@ public class RectifyFundamental {
 	 * @return Affine transform
 	 */
 	private SimpleMatrix computeAffineH( List<AssociatedPair> observations ,
-										 RowMatrix_F64 H , RowMatrix_F64 Hzero ) {
+										 DMatrixRMaj H , DMatrixRMaj Hzero ) {
 		SimpleMatrix A = new SimpleMatrix(observations.size(),3);
 		SimpleMatrix b = new SimpleMatrix(A.numRows(),1);
 
@@ -197,7 +197,7 @@ public class RectifyFundamental {
 	 * H0 = H*M
 	 * P=[M|m] from canonical camera
 	 */
-	private SimpleMatrix computeHZero( RowMatrix_F64 F , Point3D_F64 e2 ,
+	private SimpleMatrix computeHZero( DMatrixRMaj F , Point3D_F64 e2 ,
 									   SimpleMatrix H ) {
 
 		Vector3D_F64 v = new Vector3D_F64(.1,0.5,.2);
@@ -213,14 +213,14 @@ public class RectifyFundamental {
 	/**
 	 * Rectification transform for first camera
 	 */
-	public RowMatrix_F64 getRect1() {
+	public DMatrixRMaj getRect1() {
 		return rect1;
 	}
 
 	/**
 	 * Rectification transform for second camera
 	 */
-	public RowMatrix_F64 getRect2() {
+	public DMatrixRMaj getRect2() {
 		return rect2;
 	}
 }

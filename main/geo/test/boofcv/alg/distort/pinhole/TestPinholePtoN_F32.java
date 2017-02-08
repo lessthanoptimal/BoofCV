@@ -20,8 +20,8 @@ package boofcv.alg.distort.pinhole;
 
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F32;
-import org.ejml.data.RowMatrix_F32;
-import org.ejml.ops.CommonOps_R32;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.dense.row.CommonOps_FDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -50,8 +50,8 @@ public class TestPinholePtoN_F32 {
 		alg.compute(in.x,in.y,out);
 
 		Point2D_F32 expected = new Point2D_F32();
-		RowMatrix_F32 K_inv = new RowMatrix_F32(3,3,true,fx,skew,x_c,0,fy,y_c,0,0,1);
-		CommonOps_R32.invert(K_inv);
+		FMatrixRMaj K_inv = new FMatrixRMaj(3,3,true,fx,skew,x_c,0,fy,y_c,0,0,1);
+		CommonOps_FDRM.invert(K_inv);
 
 		GeometryMath_F32.mult(K_inv, in, expected);
 

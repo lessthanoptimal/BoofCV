@@ -26,8 +26,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +40,8 @@ public class ArtificialStereoScene {
 	Random rand = new Random(234234);
 
 	// create a reasonable calibration matrix
-	RowMatrix_F64 K = new RowMatrix_F64(3,3,true,705,0.001,326,0,704,224,0,0,1);
-	RowMatrix_F64 K_inv = new RowMatrix_F64(3,3);
+	DMatrixRMaj K = new DMatrixRMaj(3,3,true,705,0.001,326,0,704,224,0,0,1);
+	DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
 
 	protected Se3_F64 motion;
 	protected List<AssociatedPair> pairs;
@@ -51,7 +51,7 @@ public class ArtificialStereoScene {
 	protected boolean isPixels;
 
 	public ArtificialStereoScene() {
-		CommonOps_R64.invert(K,K_inv);
+		CommonOps_DDRM.invert(K,K_inv);
 	}
 
 	public void init( int N , boolean isPixels , boolean planar ) {

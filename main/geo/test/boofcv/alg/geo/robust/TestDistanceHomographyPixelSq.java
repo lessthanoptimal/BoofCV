@@ -30,7 +30,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.Random;
 
@@ -41,9 +41,9 @@ public class TestDistanceHomographyPixelSq extends StandardDistanceTest<Homograp
 
 	Random rand = new Random(234);
 
-	RowMatrix_F64 K = new RowMatrix_F64(3,3,true,200,1,120,0,250,150,0,0,1);
+	DMatrixRMaj K = new DMatrixRMaj(3,3,true,200,1,120,0,250,150,0,0,1);
 
-	RowMatrix_F64 H,H_pixel;
+	DMatrixRMaj H,H_pixel;
 
 	@Override
 	public DistanceFromModel<Homography2D_F64, AssociatedPair> create() {
@@ -60,7 +60,7 @@ public class TestDistanceHomographyPixelSq extends StandardDistanceTest<Homograp
 		double rotZ = rand.nextGaussian();
 
 
-		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ, null);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ, null);
 		Vector3D_F64 T = new Vector3D_F64(0.2,-0.5,3);
 		Vector3D_F64 N = new Vector3D_F64(-0.5,1,3);
 

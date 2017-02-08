@@ -24,10 +24,10 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.fitting.modelset.ModelCodec;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.CommonOps_R64;
 
 /**
  * Parametrization for Bundle Adjustment with known calibration where the
@@ -50,10 +50,10 @@ public class CalibPoseAndPointRodriguesCodec
 
 	// storage
 	Rodrigues_F64 rotation = new Rodrigues_F64();
-	RowMatrix_F64 R = new RowMatrix_F64(3,3);
+	DMatrixRMaj R = new DMatrixRMaj(3,3);
 
 	// used to make sure the rotation matrix is in SO(3)
-	SingularValueDecomposition<RowMatrix_F64> svd = DecompositionFactory_R64.svd(3, 3, true, true, false);
+	SingularValueDecomposition<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(3, 3, true, true, false);
 
 	/**
 	 * Specify the number of views and points it can expected
@@ -117,10 +117,10 @@ public class CalibPoseAndPointRodriguesCodec
 			if( !svd.decompose(se.getR()) )
 				throw new RuntimeException("SVD failed");
 
-			RowMatrix_F64 U = svd.getU(null,false);
-			RowMatrix_F64 V = svd.getV(null,false);
+			DMatrixRMaj U = svd.getU(null,false);
+			DMatrixRMaj V = svd.getV(null,false);
 
-			CommonOps_R64.multTransB(U,V,R);
+			CommonOps_DDRM.multTransB(U,V,R);
 
 			// extract Rodrigues coordinates
 			ConvertRotation3D_F64.matrixToRodrigues(R,rotation);

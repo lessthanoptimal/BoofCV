@@ -20,7 +20,7 @@ package boofcv.alg.geo.f;
 
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
@@ -52,7 +52,7 @@ public class TestFundamentalLinear7 {
 			FundamentalLinear7 alg = new FundamentalLinear7(isFundamental);
 
 			@Override
-			public void computeFundamental(List<AssociatedPair> pairs, FastQueue<RowMatrix_F64> solutions) {
+			public void computeFundamental(List<AssociatedPair> pairs, FastQueue<DMatrixRMaj> solutions) {
 				assertTrue(alg.process(pairs,solutions));
 			}
 		};
@@ -60,8 +60,8 @@ public class TestFundamentalLinear7 {
 
 	@Test
 	public void computeCoefficients() {
-		SimpleMatrix F1 = SimpleMatrix.random_F64(3, 3, 0.1, 2, rand);
-		SimpleMatrix F2 = SimpleMatrix.random_F64(3, 3, 0.1, 2, rand);
+		SimpleMatrix F1 = SimpleMatrix.random64(3, 3, 0.1, 2, rand);
+		SimpleMatrix F2 = SimpleMatrix.random64(3, 3, 0.1, 2, rand);
 
 		double coefs[] = new double[4];
 

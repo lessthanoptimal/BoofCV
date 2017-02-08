@@ -27,9 +27,9 @@ import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
 import boofcv.struct.wavelet.WlCoef_I32;
 import boofcv.testing.BoofTesting;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 
 import java.util.Random;
 
@@ -134,8 +134,8 @@ public class CommonFactoryWavelet {
 		N *= 2;
 		border.setLength(N);
 
-		RowMatrix_F64 A = new RowMatrix_F64(N,N);
-		RowMatrix_F64 B = new RowMatrix_F64(N,N);
+		DMatrixRMaj A = new DMatrixRMaj(N,N);
+		DMatrixRMaj B = new DMatrixRMaj(N,N);
 
 		// using the provided wrapping rule to construct a matrix with the coefficients
 		for( int i = 0; i < N; i += 2 ) {
@@ -174,15 +174,15 @@ public class CommonFactoryWavelet {
 			}
 		}
 
-		RowMatrix_F64 C = new RowMatrix_F64(N,N);
+		DMatrixRMaj C = new DMatrixRMaj(N,N);
 
-		CommonOps_R64.mult(A,B,C);
+		CommonOps_DDRM.mult(A,B,C);
 
 //		A.print();
 //		B.print();
 //		C.print();
 
-		assertTrue(MatrixFeatures_R64.isIdentity(C,1e-4));
+		assertTrue(MatrixFeatures_DDRM.isIdentity(C,1e-4));
 	}
 
 	public static void checkBiorthogonal_I32( WaveletDescription<WlCoef_I32> desc )
@@ -195,8 +195,8 @@ public class CommonFactoryWavelet {
 		N *= 2;
 		border.setLength(N);
 
-		RowMatrix_F64 A = new RowMatrix_F64(N,N);
-		RowMatrix_F64 B = new RowMatrix_F64(N,N);
+		DMatrixRMaj A = new DMatrixRMaj(N,N);
+		DMatrixRMaj B = new DMatrixRMaj(N,N);
 
 		// using the wrapping rule construct a matrix with the coefficients
 		for( int i = 0; i < N; i += 2 ) {
@@ -235,11 +235,11 @@ public class CommonFactoryWavelet {
 			}
 		}
 
-		RowMatrix_F64 C = new RowMatrix_F64(N,N);
+		DMatrixRMaj C = new DMatrixRMaj(N,N);
 
-		CommonOps_R64.mult(A,B,C);
+		CommonOps_DDRM.mult(A,B,C);
 
-		assertTrue(MatrixFeatures_R64.isIdentity(C,1e-4));
+		assertTrue(MatrixFeatures_DDRM.isIdentity(C,1e-4));
 	}
 
 	public static void checkPolySumToZero(float support[], int polyOrder, int offset ) {

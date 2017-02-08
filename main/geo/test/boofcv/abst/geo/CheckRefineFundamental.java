@@ -23,9 +23,9 @@ import boofcv.alg.geo.f.EpipolarTestSimulation;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -38,11 +38,11 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 
 	public abstract RefineEpipolar createAlgorithm();
 
-	RowMatrix_F64 found = new RowMatrix_F64(3,3);
+	DMatrixRMaj found = new DMatrixRMaj(3,3);
 
 	@Test
 	public void checkMarkerInterface() {
-		ModelFitter<RowMatrix_F64,AssociatedPair> alg = createAlgorithm();
+		ModelFitter<DMatrixRMaj,AssociatedPair> alg = createAlgorithm();
 	}
 
 	@Test
@@ -50,18 +50,18 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 		init(30,false);
 
 		// compute true essential matrix
-		RowMatrix_F64 E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
+		DMatrixRMaj E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
 
-		ModelFitter<RowMatrix_F64,AssociatedPair> alg = createAlgorithm();
+		ModelFitter<DMatrixRMaj,AssociatedPair> alg = createAlgorithm();
 
 		//give it the perfect matrix and see if it screwed it up
 		assertTrue(alg.fitModel(pairs, E, found));
 
 		// normalize so that they are the same
-		CommonOps_R64.divide(E,E.get(2, 2));
-		CommonOps_R64.divide(found,found.get(2,2));
+		CommonOps_DDRM.divide(E,E.get(2, 2));
+		CommonOps_DDRM.divide(found,found.get(2,2));
 
-		assertTrue(MatrixFeatures_R64.isEquals(E, found, 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isEquals(E, found, 1e-8));
 	}
 
 	@Test
@@ -69,22 +69,22 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 		init(30,false);
 
 		// compute true essential matrix
-		RowMatrix_F64 E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
+		DMatrixRMaj E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
 
 		// create an alternative incorrect matrix
 		Vector3D_F64 T = worldToCamera.getT().copy();
 		T.x += 0.1;
-		RowMatrix_F64 Emod = MultiViewOps.createEssential(worldToCamera.getR(), T);
+		DMatrixRMaj Emod = MultiViewOps.createEssential(worldToCamera.getR(), T);
 
-		ModelFitter<RowMatrix_F64,AssociatedPair> alg = createAlgorithm();
+		ModelFitter<DMatrixRMaj,AssociatedPair> alg = createAlgorithm();
 
 		// compute and compare results
 		assertTrue(alg.fitModel(pairs, Emod, found));
 
 		// normalize to allow comparison
-		CommonOps_R64.divide(E,E.get(2,2));
-		CommonOps_R64.divide(Emod,Emod.get(2,2));
-		CommonOps_R64.divide(found,found.get(2,2));
+		CommonOps_DDRM.divide(E,E.get(2,2));
+		CommonOps_DDRM.divide(Emod,Emod.get(2,2));
+		CommonOps_DDRM.divide(found,found.get(2,2));
 
 		double error0 = 0;
 		double error1 = 0;

@@ -18,12 +18,12 @@
 
 package boofcv.alg.geo.calibration;
 
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.SingularOps_DDRM;
+import org.ejml.dense.row.SpecializedOps_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.SingularOps_R64;
-import org.ejml.ops.SpecializedOps_R64;
 
 import java.util.List;
 
@@ -58,14 +58,14 @@ import java.util.List;
 public class Zhang99CalibrationMatrixFromHomographies {
 
 	// system of equations
-	private RowMatrix_F64 A = new RowMatrix_F64(1,1);
+	private DMatrixRMaj A = new DMatrixRMaj(1,1);
 	// computes the SVD of the A matrix
-	private SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_R64.svd(0, 0,true,true,false);
+	private SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(0, 0,true,true,false);
 
 	// a vectorized description of the B = A^-T * A^-1 matrix.
-	private RowMatrix_F64 b;
+	private DMatrixRMaj b;
 	// the found calibration matrix
-	private RowMatrix_F64 K = new RowMatrix_F64(3,3);
+	private DMatrixRMaj K = new DMatrixRMaj(3,3);
 
 	// if it should assume the skew is zero or not
 	private boolean assumeZeroSkew;
@@ -80,9 +80,9 @@ public class Zhang99CalibrationMatrixFromHomographies {
 		this.assumeZeroSkew = assumeZeroSkew;
 
 		if( assumeZeroSkew )
-			b = new RowMatrix_F64(5,1);
+			b = new DMatrixRMaj(5,1);
 		else
-			b = new RowMatrix_F64(6,1);
+			b = new DMatrixRMaj(6,1);
 
 	}
 
@@ -92,7 +92,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 *
 	 * @param homographies Homographies computed from observations of the calibration grid.
 	 */
-	public void process( List<RowMatrix_F64> homographies ) {
+	public void process( List<DMatrixRMaj> homographies ) {
 		if( assumeZeroSkew ) {
 			if( homographies.size() < 2 )
 				throw new IllegalArgumentException("At least two homographies are required");
@@ -105,17 +105,17 @@ public class Zhang99CalibrationMatrixFromHomographies {
 			if( !svd.decompose(A) )
 				throw new RuntimeException("SVD failed");
 			if( homographies.size() == 2 ) {
-				RowMatrix_F64 V = svd.getV(null,false);
-				SpecializedOps_R64.subvector(V, 0, 4, V.numRows, false, 0, b);
+				DMatrixRMaj V = svd.getV(null,false);
+				SpecializedOps_DDRM.subvector(V, 0, 4, V.numRows, false, 0, b);
 			} else {
-				SingularOps_R64.nullVector(svd,true,b);
+				SingularOps_DDRM.nullVector(svd,true,b);
 			}
 			computeParam_ZeroSkew();
 		} else {
 			setupA(homographies);
 			if( !svd.decompose(A) )
 				throw new RuntimeException("SVD failed");
-			SingularOps_R64.nullVector(svd,true,b);
+			SingularOps_DDRM.nullVector(svd,true,b);
 			computeParam();
 		}
 	}
@@ -126,42 +126,42 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 *
 	 * @param homographies set of observed homographies.
 	 */
-	private void setupA( List<RowMatrix_F64> homographies ) {
+	private void setupA( List<DMatrixRMaj> homographies ) {
 		A.reshape(2*homographies.size(),6, false);
 
-		RowMatrix_F64 h1 = new RowMatrix_F64(3,1);
-		RowMatrix_F64 h2 = new RowMatrix_F64(3,1);
+		DMatrixRMaj h1 = new DMatrixRMaj(3,1);
+		DMatrixRMaj h2 = new DMatrixRMaj(3,1);
 
-		RowMatrix_F64 v12 = new RowMatrix_F64(1,6);
-		RowMatrix_F64 v11 = new RowMatrix_F64(1,6);
-		RowMatrix_F64 v22 = new RowMatrix_F64(1,6);
+		DMatrixRMaj v12 = new DMatrixRMaj(1,6);
+		DMatrixRMaj v11 = new DMatrixRMaj(1,6);
+		DMatrixRMaj v22 = new DMatrixRMaj(1,6);
 
-		RowMatrix_F64 v11m22 = new RowMatrix_F64(1,6);
+		DMatrixRMaj v11m22 = new DMatrixRMaj(1,6);
 
 		for( int i = 0; i < homographies.size(); i++ ) {
-			RowMatrix_F64 H = homographies.get(i);
+			DMatrixRMaj H = homographies.get(i);
 
-			CommonOps_R64.extract(H,0,3,0,1,h1,0,0);
-			CommonOps_R64.extract(H,0,3,1,2,h2,0,0);
+			CommonOps_DDRM.extract(H,0,3,0,1,h1,0,0);
+			CommonOps_DDRM.extract(H,0,3,1,2,h2,0,0);
 
 			// normalize H by the max value to reduce numerical error when computing A
 			// several numbers are multiplied against each other and could become quite large/small
-			double max1 = CommonOps_R64.elementMaxAbs(h1);
-			double max2 = CommonOps_R64.elementMaxAbs(h2);
+			double max1 = CommonOps_DDRM.elementMaxAbs(h1);
+			double max2 = CommonOps_DDRM.elementMaxAbs(h2);
 			double max = Math.max(max1,max2);
 
-			CommonOps_R64.divide(h1,max);
-			CommonOps_R64.divide(h2,max);
+			CommonOps_DDRM.divide(h1,max);
+			CommonOps_DDRM.divide(h2,max);
 
 			// compute elements of A
 			computeV(h1, h2, v12);
 			computeV(h1, h1, v11);
 			computeV(h2, h2, v22);
 
-			CommonOps_R64.subtract(v11, v22, v11m22);
+			CommonOps_DDRM.subtract(v11, v22, v11m22);
 
-			CommonOps_R64.insert( v12    , A, i*2   , 0);
-			CommonOps_R64.insert( v11m22 , A, i*2+1 , 0);
+			CommonOps_DDRM.insert( v12    , A, i*2   , 0);
+			CommonOps_DDRM.insert( v11m22 , A, i*2+1 , 0);
 		}
 	}
 
@@ -171,49 +171,49 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 *
 	 * @param homographies set of observed homographies.
 	 */
-	private void setupA_NoSkew( List<RowMatrix_F64> homographies ) {
+	private void setupA_NoSkew( List<DMatrixRMaj> homographies ) {
 		A.reshape(2*homographies.size(),5, false);
 
-		RowMatrix_F64 h1 = new RowMatrix_F64(3,1);
-		RowMatrix_F64 h2 = new RowMatrix_F64(3,1);
+		DMatrixRMaj h1 = new DMatrixRMaj(3,1);
+		DMatrixRMaj h2 = new DMatrixRMaj(3,1);
 
-		RowMatrix_F64 v12 = new RowMatrix_F64(1,5);
-		RowMatrix_F64 v11 = new RowMatrix_F64(1,5);
-		RowMatrix_F64 v22 = new RowMatrix_F64(1,5);
+		DMatrixRMaj v12 = new DMatrixRMaj(1,5);
+		DMatrixRMaj v11 = new DMatrixRMaj(1,5);
+		DMatrixRMaj v22 = new DMatrixRMaj(1,5);
 
-		RowMatrix_F64 v11m22 = new RowMatrix_F64(1,5);
+		DMatrixRMaj v11m22 = new DMatrixRMaj(1,5);
 
 		for( int i = 0; i < homographies.size(); i++ ) {
-			RowMatrix_F64 H = homographies.get(i);
+			DMatrixRMaj H = homographies.get(i);
 
-			CommonOps_R64.extract(H,0,3,0,1,h1,0,0);
-			CommonOps_R64.extract(H,0,3,1,2,h2,0,0);
+			CommonOps_DDRM.extract(H,0,3,0,1,h1,0,0);
+			CommonOps_DDRM.extract(H,0,3,1,2,h2,0,0);
 
 			// normalize H by the max value to reduce numerical error when computing A
 			// several numbers are multiplied against each other and could become quite large/small
-			double max1 = CommonOps_R64.elementMaxAbs(h1);
-			double max2 = CommonOps_R64.elementMaxAbs(h2);
+			double max1 = CommonOps_DDRM.elementMaxAbs(h1);
+			double max2 = CommonOps_DDRM.elementMaxAbs(h2);
 			double max = Math.max(max1,max2);
 
-			CommonOps_R64.divide(h1,max);
-			CommonOps_R64.divide(h2,max);
+			CommonOps_DDRM.divide(h1,max);
+			CommonOps_DDRM.divide(h2,max);
 
 			// compute elements of A
 			computeV_NoSkew(h1, h2, v12);
 			computeV_NoSkew(h1, h1, v11);
 			computeV_NoSkew(h2, h2, v22);
 
-			CommonOps_R64.subtract(v11, v22, v11m22);
+			CommonOps_DDRM.subtract(v11, v22, v11m22);
 
-			CommonOps_R64.insert( v12    , A, i*2   , 0);
-			CommonOps_R64.insert( v11m22 , A, i*2+1 , 0);
+			CommonOps_DDRM.insert( v12    , A, i*2   , 0);
+			CommonOps_DDRM.insert( v11m22 , A, i*2+1 , 0);
 		}
 	}
 
 	/**
 	 * This computes the v_ij vector found in the paper.
 	 */
-	private void computeV( RowMatrix_F64 h1 ,RowMatrix_F64 h2 , RowMatrix_F64 v )
+	private void computeV( DMatrixRMaj h1 ,DMatrixRMaj h2 , DMatrixRMaj v )
 	{
 		double h1x = h1.get(0,0);
 		double h1y = h1.get(1,0);
@@ -235,7 +235,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 * This computes the v_ij vector found in the paper.  Leaving out components that would
 	 * interact with B12, since that is known to be zero.
 	 */
-	private void computeV_NoSkew( RowMatrix_F64 h1 ,RowMatrix_F64 h2 , RowMatrix_F64 v )
+	private void computeV_NoSkew( DMatrixRMaj h1 ,DMatrixRMaj h2 , DMatrixRMaj v )
 	{
 		double h1x = h1.get(0,0);
 		double h1y = h1.get(1,0);
@@ -257,7 +257,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 */
 	private void computeParam() {
 		// reduce overflow/underflow
-		CommonOps_R64.divide(b,CommonOps_R64.elementMaxAbs(b));
+		CommonOps_DDRM.divide(b,CommonOps_DDRM.elementMaxAbs(b));
 
 		double B11 = b.get(0,0);
 		double B12 = b.get(1,0);
@@ -292,7 +292,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 */
 	private void computeParam_ZeroSkew() {
 		// reduce overflow/underflow
-		CommonOps_R64.divide(b,CommonOps_R64.elementMaxAbs(b));
+		CommonOps_DDRM.divide(b,CommonOps_DDRM.elementMaxAbs(b));
 
 		double B11 = b.get(0,0);
 		double B22 = b.get(1,0);
@@ -326,11 +326,11 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 *
 	 * @return Calibration matrix.
 	 */
-	public RowMatrix_F64 getCalibrationMatrix() {
+	public DMatrixRMaj getCalibrationMatrix() {
 		return K;
 	}
 
-	public SingularValueDecomposition_F64<RowMatrix_F64> getSvd() {
+	public SingularValueDecomposition_F64<DMatrixRMaj> getSvd() {
 		return svd;
 	}
 }

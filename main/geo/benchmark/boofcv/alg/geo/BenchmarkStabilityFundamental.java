@@ -32,8 +32,8 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,8 +57,8 @@ public class BenchmarkStabilityFundamental {
 	List<AssociatedPair> observations;
 
 	// create a reasonable calibration matrix
-	RowMatrix_F64 K = new RowMatrix_F64(3,3,true,60,0.01,-200,0,80,-150,0,0,1);
-	RowMatrix_F64 K_inv = new RowMatrix_F64(3,3);
+	DMatrixRMaj K = new DMatrixRMaj(3,3,true,60,0.01,-200,0,80,-150,0,0,1);
+	DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
 	// relationship between both camera
 	protected Se3_F64 motion;
 
@@ -68,7 +68,7 @@ public class BenchmarkStabilityFundamental {
 	List<Double> scores;
 
 	public BenchmarkStabilityFundamental() {
-		CommonOps_R64.invert(K, K_inv);
+		CommonOps_DDRM.invert(K, K_inv);
 	}
 
 	public void createSceneCube() {
@@ -142,7 +142,7 @@ public class BenchmarkStabilityFundamental {
 		}
 	}
 
-	public void evaluateMinimal( GeoModelEstimatorN<RowMatrix_F64,AssociatedPair> estimatorN ) {
+	public void evaluateMinimal( GeoModelEstimatorN<DMatrixRMaj,AssociatedPair> estimatorN ) {
 
 		DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
 
@@ -156,7 +156,7 @@ public class BenchmarkStabilityFundamental {
 
 		Random rand = new Random(234);
 
-		RowMatrix_F64 F = new RowMatrix_F64(3,3);
+		DMatrixRMaj F = new DMatrixRMaj(3,3);
 
 		for( int i = 0; i < 50; i++ ) {
 			List<AssociatedPair> pairs = new ArrayList<>();
@@ -176,7 +176,7 @@ public class BenchmarkStabilityFundamental {
 			}
 
 			// normalize the scale of F
-			CommonOps_R64.scale(1.0/CommonOps_R64.elementMaxAbs(F),F);
+			CommonOps_DDRM.scale(1.0/CommonOps_DDRM.elementMaxAbs(F),F);
 
 			double totalScore = 0;
 			// score against all observations
@@ -195,11 +195,11 @@ public class BenchmarkStabilityFundamental {
 		System.out.printf(" Failures %3d  Score:  50%% = %6.3e  95%% = %6.3e\n", failed, scores.get(scores.size() / 2), scores.get((int) (scores.size() * 0.95)));
 	}
 
-	public void evaluateAll( GeoModelEstimator1<RowMatrix_F64,AssociatedPair> estimator ) {
+	public void evaluateAll( GeoModelEstimator1<DMatrixRMaj,AssociatedPair> estimator ) {
 		scores = new ArrayList<>();
 		int failed = 0;
 
-		RowMatrix_F64 F = new RowMatrix_F64(3,3);
+		DMatrixRMaj F = new DMatrixRMaj(3,3);
 
 		for( int i = 0; i < 50; i++ ) {
 
@@ -209,7 +209,7 @@ public class BenchmarkStabilityFundamental {
 			}
 
 			// normalize the scale of F
-			CommonOps_R64.scale(1.0/CommonOps_R64.elementMaxAbs(F),F);
+			CommonOps_DDRM.scale(1.0/CommonOps_DDRM.elementMaxAbs(F),F);
 
 			// score against all observations
 			for( AssociatedPair p : observations ) {

@@ -23,10 +23,10 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.sfm.ScaleTranslateRotate2D;
 import georegression.struct.affine.Affine2D_F64;
 import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
-import org.ejml.ops.CommonOps_R64;
 
 import java.util.List;
 
@@ -45,11 +45,11 @@ public class GenerateScaleTranslateRotate2D
 	private Affine2D_F64 affine = new Affine2D_F64();
 	private GenerateAffine2D generateAffine = new GenerateAffine2D();
 
-	private RowMatrix_F64 R = new RowMatrix_F64(2,2);
-	private RowMatrix_F64 U = new RowMatrix_F64(2,2);
-	private RowMatrix_F64 V = new RowMatrix_F64(2,2);
+	private DMatrixRMaj R = new DMatrixRMaj(2,2);
+	private DMatrixRMaj U = new DMatrixRMaj(2,2);
+	private DMatrixRMaj V = new DMatrixRMaj(2,2);
 
-	private SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_R64.svd(2,2,true,true,true);
+	private SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(2,2,true,true,true);
 
 	@Override
 	public boolean generate(List<AssociatedPair> dataSet, ScaleTranslateRotate2D output) {
@@ -76,14 +76,14 @@ public class GenerateScaleTranslateRotate2D
 		svd.getU(U, false);
 		svd.getV(V, false);
 
-		CommonOps_R64.multTransB(U, V, R);
+		CommonOps_DDRM.multTransB(U, V, R);
 
-		if( CommonOps_R64.det(R) < 0 ) {
+		if( CommonOps_DDRM.det(R) < 0 ) {
 			// There are situations where R might not have a determinant of one and is instead
 			// a reflection is returned
 			for( int i = 0; i < 2; i++ )
 				V.set( i, 1, -V.get( i, 1 ) );
-			CommonOps_R64.mult(U, V, R);
+			CommonOps_DDRM.mult(U, V, R);
 		}
 
 		// theta = atan2( sin(theta) , cos(theta) )

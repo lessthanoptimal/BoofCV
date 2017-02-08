@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.sfm.d2;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.PixelTransformHomography_F32;
 import boofcv.struct.distort.PixelTransform2_F32;
+import georegression.struct.ConvertFloatType;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F32;
@@ -36,13 +37,18 @@ public class FactoryStitchingTransform {
 	public static StitchingTransform<Affine2D_F64> createAffine_F64() {
 
 		return new StitchingTransform<Affine2D_F64>() {
+			Affine2D_F32 input_F32 = new Affine2D_F32();
+
 			@Override
 			public PixelTransform2_F32 convertPixel(Affine2D_F64 input, PixelTransform2_F32 output) {
+
+				ConvertFloatType.convert(input,input_F32);
+
 				if( output != null ) {
-					((PixelTransformAffine_F32)output).set(input);
+					((PixelTransformAffine_F32)output).set(input_F32);
 				} else {
 					PixelTransformAffine_F32 a = new PixelTransformAffine_F32();
-					a.set(input);
+					a.set(input_F32);
 					output = a;
 
 				}

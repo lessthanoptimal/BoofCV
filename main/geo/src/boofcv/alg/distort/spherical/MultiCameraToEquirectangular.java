@@ -39,7 +39,7 @@ import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.se.Se3_F32;
-import org.ejml.data.RowMatrix_F32;
+import org.ejml.data.FMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -279,13 +279,13 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 	 */
 	private class EquiToCamera implements Point2Transform2_F32 {
 
-		RowMatrix_F32 cameraToCommon;
+		FMatrixRMaj cameraToCommon;
 		Point3Transform2_F32 s2p;
 
 		Point3D_F32 unitCam = new Point3D_F32();
 		Point3D_F32 unitCommon = new Point3D_F32();
 
-		EquiToCamera(RowMatrix_F32 cameraToCommon, Point3Transform2_F32 s2p) {
+		EquiToCamera(FMatrixRMaj cameraToCommon, Point3Transform2_F32 s2p) {
 			this.cameraToCommon = cameraToCommon;
 			this.s2p = s2p;
 		}

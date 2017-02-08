@@ -24,7 +24,7 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.geo.AssociatedPair;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ public class BenchmarkRuntimeFundamental extends ArtificialStereoScene{
 	List<AssociatedPair> pairs6 = new ArrayList<>();
 	List<AssociatedPair> pairs5 = new ArrayList<>();
 
-	RowMatrix_F64 found = new RowMatrix_F64(3,3);
+	DMatrixRMaj found = new DMatrixRMaj(3,3);
 
 	public class Estimate implements Performer {
 

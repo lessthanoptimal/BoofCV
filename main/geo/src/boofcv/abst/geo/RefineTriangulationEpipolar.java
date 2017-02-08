@@ -20,7 +20,7 @@ package boofcv.abst.geo;
 
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
@@ -45,6 +45,6 @@ public interface RefineTriangulationEpipolar {
 	 * @return if successful or not
 	 */
 	public boolean process(List<Point2D_F64> observations,
-						   List<RowMatrix_F64> fundamentalWorldToCam ,
+						   List<DMatrixRMaj> fundamentalWorldToCam ,
 						   Point3D_F64 worldPt, Point3D_F64 refinedPt);
 }

@@ -23,7 +23,8 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.homography.UtilHomography_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrix;
+import org.ejml.data.DMatrixRMaj;
 
 
 /**
@@ -38,7 +39,7 @@ public class PointTransformHomography_F64 implements Point2Transform2Model_F64<H
 	public PointTransformHomography_F64() {
 	}
 
-	public PointTransformHomography_F64(RowMatrix_F64 homo) {
+	public PointTransformHomography_F64(DMatrixRMaj homo) {
 		UtilHomography_F64.convert(homo, this.homo);
 	}
 
@@ -46,7 +47,7 @@ public class PointTransformHomography_F64 implements Point2Transform2Model_F64<H
 		set(homo);
 	}
 
-	public void set(Homography2D_F64 transform ) {
+	public void set(DMatrix transform ) {
 		this.homo.set(transform);
 	}
 

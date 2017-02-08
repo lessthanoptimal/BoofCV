@@ -37,8 +37,8 @@ import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F32;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
 
 import java.awt.image.BufferedImage;
@@ -119,23 +119,23 @@ public class ExampleStereoDisparity {
 		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		RowMatrix_F64 K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), (RowMatrix_F64)null);
-		RowMatrix_F64 K2 = PerspectiveOps.calibrationMatrix(param.getRight(), (RowMatrix_F64)null);
+		DMatrixRMaj K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), (DMatrixRMaj)null);
+		DMatrixRMaj K2 = PerspectiveOps.calibrationMatrix(param.getRight(), (DMatrixRMaj)null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 
 		// rectification matrix for each image
-		RowMatrix_F64 rect1 = rectifyAlg.getRect1();
-		RowMatrix_F64 rect2 = rectifyAlg.getRect2();
+		DMatrixRMaj rect1 = rectifyAlg.getRect1();
+		DMatrixRMaj rect2 = rectifyAlg.getRect2();
 		// New calibration matrix,
-		RowMatrix_F64 rectK = rectifyAlg.getCalibrationMatrix();
+		DMatrixRMaj rectK = rectifyAlg.getCalibrationMatrix();
 
 		// Adjust the rectification to make the view area more useful
 		RectifyImageOps.allInsideLeft(param.left, rect1, rect2, rectK);
 
 		// undistorted and rectify images
-		RowMatrix_F32 rect1_F32 = new RowMatrix_F32(3,3);
-		RowMatrix_F32 rect2_F32 = new RowMatrix_F32(3,3);
+		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3);
+		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 

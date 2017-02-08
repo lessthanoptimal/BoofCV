@@ -32,7 +32,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -91,7 +91,7 @@ public class TestCalibrateStereoPlanar {
 		Se3_F64 expected = leftToRight.invert(null);
 
 		assertEquals(0,expected.getT().distance(rightToLeft.T),1.01e-3);
-		assertTrue(MatrixFeatures_R64.isIdentity(rightToLeft.getR(), 1e-3));
+		assertTrue(MatrixFeatures_DDRM.isIdentity(rightToLeft.getR(), 1e-3));
 	}
 
 	private void checkIntrinsic(CameraPinholeRadial found) {

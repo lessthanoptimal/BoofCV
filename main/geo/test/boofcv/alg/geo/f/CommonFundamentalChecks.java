@@ -22,9 +22,9 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.QueueMatrix;
 import georegression.geometry.GeometryMath_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.NormOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.NormOps_DDRM;
 
 import java.util.List;
 
@@ -39,9 +39,9 @@ public abstract class CommonFundamentalChecks extends EpipolarTestSimulation {
 
 	double zeroTol = 1e-8;
 
-	FastQueue<RowMatrix_F64> solutions = new QueueMatrix(3, 3);
+	FastQueue<DMatrixRMaj> solutions = new QueueMatrix(3, 3);
 
-	public abstract void computeFundamental(List<AssociatedPair> pairs , FastQueue<RowMatrix_F64> solutions );
+	public abstract void computeFundamental(List<AssociatedPair> pairs , FastQueue<DMatrixRMaj> solutions );
 
 
 	public void checkEpipolarMatrix(int N, boolean isFundamental) {
@@ -59,16 +59,16 @@ public abstract class CommonFundamentalChecks extends EpipolarTestSimulation {
 			int totalMatchedAll = 0;
 			int totalPassedMatrix = 0;
 
-			for (RowMatrix_F64 F : solutions.toList()) {
+			for (DMatrixRMaj F : solutions.toList()) {
 				// normalize F to ensure a consistent scale
-				CommonOps_R64.scale(1.0/CommonOps_R64.elementMaxAbs(F),F);
+				CommonOps_DDRM.scale(1.0/CommonOps_DDRM.elementMaxAbs(F),F);
 
 				// sanity check, F is not zero
-				if (NormOps_R64.normF(F) <= 0.1)
+				if (NormOps_DDRM.normF(F) <= 0.1)
 					continue;
 
 				// the determinant should be zero
-				if (Math.abs(CommonOps_R64.det(F)) > zeroTol)
+				if (Math.abs(CommonOps_DDRM.det(F)) > zeroTol)
 					continue;
 
 				totalPassedMatrix++;

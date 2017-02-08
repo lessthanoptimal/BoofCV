@@ -18,7 +18,7 @@
 
 package boofcv.struct.geo;
 
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -35,7 +35,7 @@ public class TestQueueMatrix {
 		assertEquals(0,alg.size);
 		assertEquals(5,alg.data.length);
 
-		RowMatrix_F64 M = alg.grow();
+		DMatrixRMaj M = alg.grow();
 
 		assertEquals(3,M.numRows);
 		assertEquals(4,M.numCols);
@@ -47,7 +47,7 @@ public class TestQueueMatrix {
 
 		assertEquals(0,alg.size);
 
-		RowMatrix_F64 M = alg.grow();
+		DMatrixRMaj M = alg.grow();
 
 		assertEquals(3,M.numRows);
 		assertEquals(4, M.numCols);

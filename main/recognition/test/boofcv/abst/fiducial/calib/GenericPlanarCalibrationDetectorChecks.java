@@ -37,9 +37,9 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.RowMatrix_F32;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.ops.ConvertMatrixData;
 import org.junit.Before;
 import org.junit.Test;
@@ -266,14 +266,14 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		associatedPairs.add(new AssociatedPair(x3, y3, 0, height - 1));
 
 		// Compute the homography
-		RowMatrix_F64 H = new RowMatrix_F64(3, 3);
+		DMatrixRMaj H = new DMatrixRMaj(3, 3);
 		computeHomography.process(associatedPairs, H);
 
 		// Create the transform for distorting the image
-		RowMatrix_F32 H32 = new RowMatrix_F32(3,3);
+		FMatrixRMaj H32 = new FMatrixRMaj(3,3);
 		ConvertMatrixData.convert(H,H32);
 		d2o = new PointTransformHomography_F32(H32);
-		CommonOps_R64.invert(H);
+		CommonOps_DDRM.invert(H);
 		o2d = new PointTransformHomography_F64(H);
 	}
 

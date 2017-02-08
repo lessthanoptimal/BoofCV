@@ -20,7 +20,7 @@ package boofcv.abst.geo;
 
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimatorN;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * <p>
@@ -30,13 +30,13 @@ import org.ejml.data.RowMatrix_F64;
  *
  * <p>
  * The found output matrices will follow the epipolar constraints conventions as defined in functions
- * {@link boofcv.alg.geo.MultiViewOps#constraint(org.ejml.data.RowMatrix_F64,
+ * {@link boofcv.alg.geo.MultiViewOps#constraint(org.ejml.data.DMatrixRMaj,
  * georegression.struct.point.Point2D_F64, georegression.struct.point.Point2D_F64) constraint Fundamental}
- * and {@link boofcv.alg.geo.MultiViewOps#constraintHomography(org.ejml.data.RowMatrix_F64,
+ * and {@link boofcv.alg.geo.MultiViewOps#constraintHomography(org.ejml.data.DMatrixRMaj,
  * georegression.struct.point.Point2D_F64, georegression.struct.point.Point2D_F64) constraint Homography}.
  * </p>
  *
  * @author Peter Abeles
  */
-public interface EstimateNofEpipolar extends GeoModelEstimatorN<RowMatrix_F64,AssociatedPair> {
+public interface EstimateNofEpipolar extends GeoModelEstimatorN<DMatrixRMaj,AssociatedPair> {
 }

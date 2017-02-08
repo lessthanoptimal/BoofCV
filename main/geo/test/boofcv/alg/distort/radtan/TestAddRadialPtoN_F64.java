@@ -20,8 +20,8 @@ package boofcv.alg.distort.radtan;
 
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -52,9 +52,9 @@ public class TestAddRadialPtoN_F64 {
 
 		Point2D_F64 normPt = new Point2D_F64();
 
-		RowMatrix_F64 K = new RowMatrix_F64(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
-		RowMatrix_F64 K_inv = new RowMatrix_F64(3,3);
-		CommonOps_R64.invert(K, K_inv);
+		DMatrixRMaj K = new DMatrixRMaj(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
+		DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.invert(K, K_inv);
 
 		// compute normalized image coordinate
 		GeometryMath_F64.mult(K_inv, orig, normPt);

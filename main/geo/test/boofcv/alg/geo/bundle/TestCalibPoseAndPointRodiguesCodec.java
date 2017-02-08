@@ -22,7 +22,7 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import java.util.Random;
@@ -92,7 +92,7 @@ public class TestCalibPoseAndPointRodiguesCodec {
 			Se3_F64 f = found.getWorldToCamera(i);
 			
 			assertEquals(0,o.getT().distance(f.getT()),1e-8);
-			assertTrue(MatrixFeatures_R64.isIdentical(o.getR(),f.getR(),1e-8));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(o.getR(),f.getR(),1e-8));
 		}
 
 		for( int i = 0; i < numPoints; i++ ) {
@@ -136,7 +136,7 @@ public class TestCalibPoseAndPointRodiguesCodec {
 			Se3_F64 f = found.getWorldToCamera(i);
 
 			assertEquals(0,o.getT().distance(f.getT()),1e-8);
-			assertTrue(MatrixFeatures_R64.isIdentical(o.getR(),f.getR(),1e-8));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(o.getR(),f.getR(),1e-8));
 		}
 	}
 	

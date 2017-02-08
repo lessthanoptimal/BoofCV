@@ -22,10 +22,10 @@ import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.LinearSolverFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.interfaces.linsol.LinearSolver;
-import org.ejml.ops.CommonOps_R64;
 
 /**
  * <p>
@@ -42,22 +42,22 @@ import org.ejml.ops.CommonOps_R64;
  * @author Peter Abeles
  */
 public class HomographyResidualSampson
-		implements ModelObservationResidualN<RowMatrix_F64,AssociatedPair>
+		implements ModelObservationResidualN<DMatrixRMaj,AssociatedPair>
 {
 
-	RowMatrix_F64 H;
+	DMatrixRMaj H;
 	Point2D_F64 temp = new Point2D_F64();
 
-	RowMatrix_F64 J = new RowMatrix_F64(2,4);
-	RowMatrix_F64 JJ = new RowMatrix_F64(2,2);
-	RowMatrix_F64 e = new RowMatrix_F64(2,1);
-	RowMatrix_F64 x = new RowMatrix_F64(2,1);
-	RowMatrix_F64 error = new RowMatrix_F64(4,1);
+	DMatrixRMaj J = new DMatrixRMaj(2,4);
+	DMatrixRMaj JJ = new DMatrixRMaj(2,2);
+	DMatrixRMaj e = new DMatrixRMaj(2,1);
+	DMatrixRMaj x = new DMatrixRMaj(2,1);
+	DMatrixRMaj error = new DMatrixRMaj(4,1);
 
-	LinearSolver<RowMatrix_F64> solver = LinearSolverFactory_R64.linear(2);
+	LinearSolver<DMatrixRMaj> solver = LinearSolverFactory_DDRM.linear(2);
 
 	@Override
-	public void setModel(RowMatrix_F64 H) {
+	public void setModel(DMatrixRMaj H) {
 		this.H = H;
 	}
 
@@ -71,7 +71,7 @@ public class HomographyResidualSampson
 
 		computeJacobian(p.p1,p.p2);
 		// JJ = J*J'
-		CommonOps_R64.multTransB(J, J, JJ);
+		CommonOps_DDRM.multTransB(J, J, JJ);
 
 		// solve JJ'*x = -e
 		e.data[0] = -top1;
@@ -80,7 +80,7 @@ public class HomographyResidualSampson
 		if( solver.setA(JJ) ) {
 			solver.solve(e,x);
 			// -J'(J*J')^-1*e
-			CommonOps_R64.multTransA(J,x,error);
+			CommonOps_DDRM.multTransA(J,x,error);
 			residuals[index++] = error.data[0];
 			residuals[index++] = error.data[1];
 			residuals[index++] = error.data[2];

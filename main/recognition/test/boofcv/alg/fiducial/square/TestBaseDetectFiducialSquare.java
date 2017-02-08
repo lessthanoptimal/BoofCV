@@ -43,8 +43,8 @@ import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
-import org.ejml.data.RowMatrix_F32;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
 import org.junit.Test;
 
@@ -314,11 +314,11 @@ public class TestBaseDetectFiducialSquare {
 
 		Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomography(true);
 
-		RowMatrix_F64 H = new RowMatrix_F64(3,3);
+		DMatrixRMaj H = new DMatrixRMaj(3,3);
 		computeHomography.process(associatedPairs, H);
 
 		// Create the transform for distorting the image
-		RowMatrix_F32 H32 = new RowMatrix_F32(3,3);
+		FMatrixRMaj H32 = new FMatrixRMaj(3,3);
 		ConvertMatrixData.convert(H,H32);
 		PointTransformHomography_F32 homography = new PointTransformHomography_F32(H32);
 		PixelTransform2_F32 pixelTransform = new PointToPixelTransform_F32(homography);

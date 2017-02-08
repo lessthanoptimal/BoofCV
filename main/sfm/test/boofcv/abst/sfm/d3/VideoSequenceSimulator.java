@@ -34,7 +34,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Polygon2D_I32;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.awt.image.BufferedImage;
 import java.util.*;
@@ -50,7 +50,7 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> {
 	Random rand = new Random(1234);
 
 	CameraPinholeRadial intrinsic;
-	RowMatrix_F64 K;
+	DMatrixRMaj K;
 
 	BufferedImage workImage;
 	I outputImage;
@@ -69,7 +69,7 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> {
 
 	public void setIntrinsic( CameraPinholeRadial param ) {
 		this.intrinsic = param;
-		K = PerspectiveOps.calibrationMatrix(param,(RowMatrix_F64)null);
+		K = PerspectiveOps.calibrationMatrix(param,(DMatrixRMaj)null);
 	}
 
 	protected void createSquares( int total , double minZ, double maxZ ) {

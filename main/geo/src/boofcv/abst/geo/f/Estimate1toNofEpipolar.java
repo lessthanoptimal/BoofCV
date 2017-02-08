@@ -22,17 +22,17 @@ import boofcv.abst.geo.EstimateNofEpipolar;
 import boofcv.abst.geo.GeoModelEstimator1toN;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimator1;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * Implementation of {@link GeoModelEstimator1toN} for epipolar matrices.
  *
  * @author Peter Abeles
  */
-public class Estimate1toNofEpipolar extends GeoModelEstimator1toN<RowMatrix_F64,AssociatedPair>
+public class Estimate1toNofEpipolar extends GeoModelEstimator1toN<DMatrixRMaj,AssociatedPair>
 	implements EstimateNofEpipolar
 {
-	public Estimate1toNofEpipolar(GeoModelEstimator1<RowMatrix_F64, AssociatedPair> alg) {
+	public Estimate1toNofEpipolar(GeoModelEstimator1<DMatrixRMaj, AssociatedPair> alg) {
 		super(alg);
 	}
 }

@@ -23,7 +23,7 @@ import boofcv.struct.geo.Point2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class TestPnPDistanceReprojectionSq {
 	 */
 	@Test
 	public void checkErrorSingle() {
-		RowMatrix_F64 K = new RowMatrix_F64(3,3,true,100,0.01,200,0,150,200,0,0,1);
+		DMatrixRMaj K = new DMatrixRMaj(3,3,true,100,0.01,200,0,150,200,0,0,1);
 
 		Se3_F64 worldToCamera = new Se3_F64();
 		worldToCamera.getT().set(0.1,-0.1,0.2);
@@ -79,7 +79,7 @@ public class TestPnPDistanceReprojectionSq {
 	 */
 	@Test
 	public void checkBehindCamera() {
-		RowMatrix_F64 K = new RowMatrix_F64(3,3,true,100,0.01,200,0,150,200,0,0,1);
+		DMatrixRMaj K = new DMatrixRMaj(3,3,true,100,0.01,200,0,150,200,0,0,1);
 
 		Se3_F64 worldToCamera = new Se3_F64();
 		worldToCamera.getT().set(0.1,-0.1,-2.5);
@@ -104,7 +104,7 @@ public class TestPnPDistanceReprojectionSq {
 	public void checkErrorArray() {
 		double expected[] = new double[5];
 
-		RowMatrix_F64 K = new RowMatrix_F64(3,3,true,100,0.01,200,0,150,200,0,0,1);
+		DMatrixRMaj K = new DMatrixRMaj(3,3,true,100,0.01,200,0,150,200,0,0,1);
 
 		Se3_F64 worldToCamera = new Se3_F64();
 		worldToCamera.getT().set(0.1,-0.1,0.2);

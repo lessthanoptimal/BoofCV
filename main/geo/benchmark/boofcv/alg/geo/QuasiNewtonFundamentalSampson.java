@@ -24,7 +24,7 @@ import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedMinimization;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class QuasiNewtonFundamentalSampson implements RefineEpipolar {
-	ModelCodec<RowMatrix_F64> paramModel;
+	ModelCodec<DMatrixRMaj> paramModel;
 	FunctionSampsonFundamental func = new FunctionSampsonFundamental();
 	double param[];
 
@@ -49,7 +49,7 @@ public class QuasiNewtonFundamentalSampson implements RefineEpipolar {
 		this( new ParamFundamentalEpipolar() , convergenceTol, maxIterations);
 	}
 
-	public QuasiNewtonFundamentalSampson(ModelCodec<RowMatrix_F64> paramModel,
+	public QuasiNewtonFundamentalSampson(ModelCodec<DMatrixRMaj> paramModel,
 										 double convergenceTol, int maxIterations) {
 		this.paramModel = paramModel;
 		this.maxIterations = maxIterations;
@@ -61,7 +61,7 @@ public class QuasiNewtonFundamentalSampson implements RefineEpipolar {
 	}
 
 	@Override
-	public boolean fitModel(List<AssociatedPair> obs, RowMatrix_F64 F, RowMatrix_F64 refinedF) {
+	public boolean fitModel(List<AssociatedPair> obs, DMatrixRMaj F, DMatrixRMaj refinedF) {
 		func.set(paramModel, obs);
 		
 		paramModel.encode(F, param);

@@ -22,9 +22,9 @@ import boofcv.alg.geo.h.CommonHomographyChecks;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelFitter;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -36,8 +36,8 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 
 	public abstract RefineEpipolar createAlgorithm();
 
-	RowMatrix_F64 H = new RowMatrix_F64(3,3);
-	RowMatrix_F64 found = new RowMatrix_F64(3,3);
+	DMatrixRMaj H = new DMatrixRMaj(3,3);
+	DMatrixRMaj found = new DMatrixRMaj(3,3);
 
 	@Test
 	public void perfectInput() {
@@ -47,16 +47,16 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		HomographyLinear4 estimator = new HomographyLinear4(true);
 		estimator.process(pairs,H);
 
-		ModelFitter<RowMatrix_F64,AssociatedPair> alg = createAlgorithm();
+		ModelFitter<DMatrixRMaj,AssociatedPair> alg = createAlgorithm();
 
 		//give it the perfect matrix and see if it screwed it up
 		assertTrue(alg.fitModel(pairs, H, found));
 
 		// normalize so that they are the same
-		CommonOps_R64.divide(H,H.get(2, 2));
-		CommonOps_R64.divide(found,found.get(2, 2));
+		CommonOps_DDRM.divide(H,H.get(2, 2));
+		CommonOps_DDRM.divide(found,found.get(2, 2));
 
-		assertTrue(MatrixFeatures_R64.isEquals(H, found, 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isEquals(H, found, 1e-8));
 	}
 
 	@Test
@@ -67,18 +67,18 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		HomographyLinear4 estimator = new HomographyLinear4(true);
 		estimator.process(pairs,H);
 
-		ModelFitter<RowMatrix_F64,AssociatedPair> alg = createAlgorithm();
+		ModelFitter<DMatrixRMaj,AssociatedPair> alg = createAlgorithm();
 
 		//give it the perfect matrix and see if it screwed it up
-		RowMatrix_F64 Hmod = H.copy();
+		DMatrixRMaj Hmod = H.copy();
 		Hmod.data[0] += 0.1;
 		Hmod.data[5] += 0.1;
 		assertTrue(alg.fitModel(pairs, Hmod, found));
 
 		// normalize to allow comparison
-		CommonOps_R64.divide(H,H.get(2,2));
-		CommonOps_R64.divide(Hmod,Hmod.get(2,2));
-		CommonOps_R64.divide(found,found.get(2,2));
+		CommonOps_DDRM.divide(H,H.get(2,2));
+		CommonOps_DDRM.divide(Hmod,Hmod.get(2,2));
+		CommonOps_DDRM.divide(found,found.get(2,2));
 
 		double error0 = 0;
 		double error1 = 0;

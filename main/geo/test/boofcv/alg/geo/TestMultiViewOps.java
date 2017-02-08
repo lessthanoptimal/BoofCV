@@ -30,10 +30,10 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.Tuple2;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.MatrixFeatures_R64;
-import org.ejml.ops.NormOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
+import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
@@ -52,16 +52,16 @@ public class TestMultiViewOps {
 	Random rand = new Random(234);
 
 	// camera calibration matrix
-	RowMatrix_F64 K = new RowMatrix_F64(3,3,true,60,0.01,200,0,80,150,0,0,1);
+	DMatrixRMaj K = new DMatrixRMaj(3,3,true,60,0.01,200,0,80,150,0,0,1);
 
 	// camera locations
 	Se3_F64 worldToCam2, worldToCam3;
 
 	// camera matrix for views 2 and 3
-	RowMatrix_F64 P2,P3;
+	DMatrixRMaj P2,P3;
 
 	// Fundamental matrix for views 2 and 3
-	RowMatrix_F64 F2,F3;
+	DMatrixRMaj F2,F3;
 
 	// trifocal tensor for these views
 	TrifocalTensor tensor;
@@ -113,7 +113,7 @@ public class TestMultiViewOps {
 
 			SimpleMatrix expected = ai.mult(b4.transpose()).minus(a4.mult(bi.transpose()));
 
-			assertTrue(MatrixFeatures_R64.isIdentical(expected.matrix_F64(),found.getT(i),1e-8));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(expected.matrix_F64(),found.getT(i),1e-8));
 		}
 	}
 
@@ -144,7 +144,7 @@ public class TestMultiViewOps {
 
 			SimpleMatrix expected = ai.mult(b4.transpose()).minus(a4.mult(bi.transpose()));
 
-			assertTrue(MatrixFeatures_R64.isIdentical(expected.matrix_F64(),found.getT(i),1e-8));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(expected.matrix_F64(),found.getT(i),1e-8));
 		}
 	}
 
@@ -224,7 +224,7 @@ public class TestMultiViewOps {
 		Point2D_F64 p3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
 
 		// check the constraint
-		RowMatrix_F64 A = MultiViewOps.constraint(tensor, p1, p2, p3, null);
+		DMatrixRMaj A = MultiViewOps.constraint(tensor, p1, p2, p3, null);
 
 		for( int i = 0; i < 3; i++ ) {
 			for( int j = 0; j < 3; j++ ) {
@@ -240,8 +240,8 @@ public class TestMultiViewOps {
 		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
 		Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 
-		RowMatrix_F64 E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T);
-		RowMatrix_F64 F = MultiViewOps.createFundamental(E, K);
+		DMatrixRMaj E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T);
+		DMatrixRMaj F = MultiViewOps.createFundamental(E, K);
 
 		assertEquals(0,MultiViewOps.constraint(F,p1,p2),1e-8);
 	}
@@ -254,7 +254,7 @@ public class TestMultiViewOps {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.4,d);
 
 
-		RowMatrix_F64 H = MultiViewOps.createHomography(worldToCam2.getR(),worldToCam2.getT(),d,N);
+		DMatrixRMaj H = MultiViewOps.createHomography(worldToCam2.getR(),worldToCam2.getT(),d,N);
 
 		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
 		Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCam2,null,X);
@@ -276,7 +276,7 @@ public class TestMultiViewOps {
 		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
 		Point2D_F64 p3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
 
-		RowMatrix_F64 H13 = MultiViewOps.inducedHomography13(tensor,line2,null);
+		DMatrixRMaj H13 = MultiViewOps.inducedHomography13(tensor,line2,null);
 
 		Point2D_F64 found = new Point2D_F64();
 
@@ -297,7 +297,7 @@ public class TestMultiViewOps {
 		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
 		Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 
-		RowMatrix_F64 H12 = MultiViewOps.inducedHomography12(tensor, line3, null);
+		DMatrixRMaj H12 = MultiViewOps.inducedHomography12(tensor, line3, null);
 
 		Point2D_F64 found = new Point2D_F64();
 
@@ -311,7 +311,7 @@ public class TestMultiViewOps {
 	public void homographyStereo3Pts() {
 		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
 
-		RowMatrix_F64 H = MultiViewOps.homographyStereo3Pts(common.F, common.p1, common.p2, common.p3);
+		DMatrixRMaj H = MultiViewOps.homographyStereo3Pts(common.F, common.p1, common.p2, common.p3);
 
 		common.checkHomography(H);
 	}
@@ -322,7 +322,7 @@ public class TestMultiViewOps {
 
 		PairLineNorm l1 = CommonHomographyInducedPlane.convert(common.p1,common.p2);
 
-		RowMatrix_F64 H = MultiViewOps.homographyStereoLinePt(common.F, l1, common.p3);
+		DMatrixRMaj H = MultiViewOps.homographyStereoLinePt(common.F, l1, common.p3);
 
 		common.checkHomography(H);
 	}
@@ -334,7 +334,7 @@ public class TestMultiViewOps {
 		PairLineNorm l1 = CommonHomographyInducedPlane.convert(common.p1,common.p2);
 		PairLineNorm l2 = CommonHomographyInducedPlane.convert(common.p1,common.p3);
 
-		RowMatrix_F64 H = MultiViewOps.homographyStereo2Lines(common.F,l1,l2);
+		DMatrixRMaj H = MultiViewOps.homographyStereo2Lines(common.F,l1,l2);
 
 		common.checkHomography(H);
 	}
@@ -354,7 +354,7 @@ public class TestMultiViewOps {
 		line3.set(computeLine(X,X2,worldToCam3,K));
 	}
 
-	private Vector3D_F64 computeLine( Point3D_F64 X1, Point3D_F64 X2 , Se3_F64 worldToCam , RowMatrix_F64 K ) {
+	private Vector3D_F64 computeLine( Point3D_F64 X1, Point3D_F64 X2 , Se3_F64 worldToCam , DMatrixRMaj K ) {
 		Point2D_F64 a = PerspectiveOps.renderPixel(worldToCam,K,X1);
 		Point2D_F64 b = PerspectiveOps.renderPixel(worldToCam,K,X2);
 
@@ -385,7 +385,7 @@ public class TestMultiViewOps {
 
 		// make sure the input was not modified
 		for( int i = 0; i < 3; i++ )
-			assertTrue(MatrixFeatures_R64.isIdentical(tensor.getT(i),input.getT(i),1e-8));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(tensor.getT(i),input.getT(i),1e-8));
 
 		Point3D_F64 space = new Point3D_F64();
 
@@ -399,18 +399,18 @@ public class TestMultiViewOps {
 
 	@Test
 	public void extractFundamental_threeview() {
-		RowMatrix_F64 found2 = new RowMatrix_F64(3,3);
-		RowMatrix_F64 found3 = new RowMatrix_F64(3,3);
+		DMatrixRMaj found2 = new DMatrixRMaj(3,3);
+		DMatrixRMaj found3 = new DMatrixRMaj(3,3);
 
 		TrifocalTensor input = tensor.copy();
 		MultiViewOps.extractFundamental(input, found2, found3);
 
 		// make sure the input was not modified
 		for( int i = 0; i < 3; i++ )
-			assertTrue(MatrixFeatures_R64.isIdentical(tensor.getT(i),input.getT(i),1e-8));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(tensor.getT(i),input.getT(i),1e-8));
 
-		CommonOps_R64.scale(1.0/CommonOps_R64.elementMaxAbs(found2),found2);
-		CommonOps_R64.scale(1.0/CommonOps_R64.elementMaxAbs(found3),found3);
+		CommonOps_DDRM.scale(1.0/CommonOps_DDRM.elementMaxAbs(found2),found2);
+		CommonOps_DDRM.scale(1.0/CommonOps_DDRM.elementMaxAbs(found3),found3);
 
 		Point3D_F64 X = new Point3D_F64(0.1,0.05,2);
 
@@ -425,15 +425,15 @@ public class TestMultiViewOps {
 
 	@Test
 	public void extractCameraMatrices() {
-		RowMatrix_F64 P2 = new RowMatrix_F64(3,4);
-		RowMatrix_F64 P3 = new RowMatrix_F64(3,4);
+		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
+		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
 
 		TrifocalTensor input = tensor.copy();
 		MultiViewOps.extractCameraMatrices(input, P2, P3);
 
 		// make sure the input was not modified
 		for( int i = 0; i < 3; i++ )
-			assertTrue(MatrixFeatures_R64.isIdentical(tensor.getT(i),input.getT(i),1e-8));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(tensor.getT(i),input.getT(i),1e-8));
 
 		// Using found camera matrices render the point's location
 		Point3D_F64 X = new Point3D_F64(0.1,0.05,2);
@@ -443,7 +443,7 @@ public class TestMultiViewOps {
 		Point2D_F64 x3 = PerspectiveOps.renderPixel(P3, X);
 
 		// validate correctness by testing a constraint on the points
-		RowMatrix_F64 A = new RowMatrix_F64(3,3);
+		DMatrixRMaj A = new DMatrixRMaj(3,3);
 		MultiViewOps.constraint(tensor, x1, x2, x3, A);
 
 		for( int i = 0; i < 3; i++ ) {
@@ -455,11 +455,11 @@ public class TestMultiViewOps {
 
 	@Test
 	public void createEssential() {
-		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.05, -0.04, 0.1, null);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.05, -0.04, 0.1, null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 		T.normalize();
 
-		RowMatrix_F64 E = MultiViewOps.createEssential(R, T);
+		DMatrixRMaj E = MultiViewOps.createEssential(R, T);
 
 		// Test using the following theorem:  x2^T*E*x1 = 0
 		Point3D_F64 X = new Point3D_F64(0.1,0.1,2);
@@ -473,8 +473,8 @@ public class TestMultiViewOps {
 
 	@Test
 	public void computeFundamental() {
-		RowMatrix_F64 E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T);
-		RowMatrix_F64 F = MultiViewOps.createFundamental(E, K);
+		DMatrixRMaj E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T);
+		DMatrixRMaj F = MultiViewOps.createFundamental(E, K);
 
 		Point3D_F64 X = new Point3D_F64(0.1,-0.1,2.5);
 		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
@@ -485,10 +485,10 @@ public class TestMultiViewOps {
 
 	@Test
 	public void computeFundamental2() {
-		RowMatrix_F64 K2 = new RowMatrix_F64(3,3,true,80,0.02,190,0,30,170,0,0,1);
+		DMatrixRMaj K2 = new DMatrixRMaj(3,3,true,80,0.02,190,0,30,170,0,0,1);
 
-		RowMatrix_F64 E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T);
-		RowMatrix_F64 F = MultiViewOps.createFundamental(E, K,K2);
+		DMatrixRMaj E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T);
+		DMatrixRMaj F = MultiViewOps.createFundamental(E, K,K2);
 
 		Point3D_F64 X = new Point3D_F64(0.1,-0.1,2.5);
 		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
@@ -499,13 +499,13 @@ public class TestMultiViewOps {
 
 	@Test
 	public void createHomography_calibrated() {
-		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.01,0.2, null);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.01,0.2, null);
 		Vector3D_F64 T = new Vector3D_F64(1,1,0.1);
 		T.normalize();
 		double d = 2;
 		Vector3D_F64 N = new Vector3D_F64(0,0,1);
 
-		RowMatrix_F64 H = MultiViewOps.createHomography(R, T, d, N);
+		DMatrixRMaj H = MultiViewOps.createHomography(R, T, d, N);
 
 		// Test using the following theorem:  x2 = H*x1
 		Point3D_F64 P = new Point3D_F64(0.1,0.1,d); // a point on the plane
@@ -522,14 +522,14 @@ public class TestMultiViewOps {
 
 	@Test
 	public void createHomography_uncalibrated() {
-		RowMatrix_F64 K = new RowMatrix_F64(3,3,true,0.1,0.001,200,0,0.2,250,0,0,1);
-		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.01,0.2, null);
+		DMatrixRMaj K = new DMatrixRMaj(3,3,true,0.1,0.001,200,0,0.2,250,0,0,1);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.01,0.2, null);
 		Vector3D_F64 T = new Vector3D_F64(1,1,0.1);
 		T.normalize();
 		double d = 2;
 		Vector3D_F64 N = new Vector3D_F64(0,0,1);
 
-		RowMatrix_F64 H = MultiViewOps.createHomography(R, T, d, N, K);
+		DMatrixRMaj H = MultiViewOps.createHomography(R, T, d, N, K);
 
 		// Test using the following theorem:  x2 = H*x1
 		Point3D_F64 P = new Point3D_F64(0.1,0.1,d); // a point on the plane
@@ -548,12 +548,12 @@ public class TestMultiViewOps {
 
 	@Test
 	public void extractEpipoles_stereo() {
-		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
-		RowMatrix_F64 E = MultiViewOps.createEssential(R, T);
+		DMatrixRMaj E = MultiViewOps.createEssential(R, T);
 
-		assertTrue(NormOps_R64.normF(E)!=0);
+		assertTrue(NormOps_DDRM.normF(E)!=0);
 
 		Point3D_F64 e1 = new Point3D_F64();
 		Point3D_F64 e2 = new Point3D_F64();
@@ -571,77 +571,77 @@ public class TestMultiViewOps {
 
 	@Test
 	public void canonicalCamera() {
-		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(200, 250, 0.0, 100, 110);
-		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
+		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(200, 250, 0.0, 100, 110);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
-		RowMatrix_F64 E = MultiViewOps.createEssential(R, T);
-		RowMatrix_F64 F = MultiViewOps.createFundamental(E, K);
+		DMatrixRMaj E = MultiViewOps.createEssential(R, T);
+		DMatrixRMaj F = MultiViewOps.createFundamental(E, K);
 
 		Point3D_F64 e1 = new Point3D_F64();
 		Point3D_F64 e2 = new Point3D_F64();
 
-		CommonOps_R64.scale(-2.0/F.get(0,1),F);
+		CommonOps_DDRM.scale(-2.0/F.get(0,1),F);
 		MultiViewOps.extractEpipoles(F, e1, e2);
 
-		RowMatrix_F64 P = MultiViewOps.canonicalCamera(F, e2, new Vector3D_F64(1, 1, 1), 2);
+		DMatrixRMaj P = MultiViewOps.canonicalCamera(F, e2, new Vector3D_F64(1, 1, 1), 2);
 
 		// recompose the fundamental matrix using the special equation for canonical cameras
-		RowMatrix_F64 foundF = new RowMatrix_F64(3,3);
-		RowMatrix_F64 crossEpi = new RowMatrix_F64(3,3);
+		DMatrixRMaj foundF = new DMatrixRMaj(3,3);
+		DMatrixRMaj crossEpi = new DMatrixRMaj(3,3);
 
 		GeometryMath_F64.crossMatrix(e2, crossEpi);
 
-		RowMatrix_F64 M = new RowMatrix_F64(3,3);
-		CommonOps_R64.extract(P,0,3,0,3,M,0,0);
-		CommonOps_R64.mult(crossEpi,M,foundF);
+		DMatrixRMaj M = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.extract(P,0,3,0,3,M,0,0);
+		CommonOps_DDRM.mult(crossEpi,M,foundF);
 
 		// see if they are equal up to a scale factor
-		CommonOps_R64.scale(1.0 / foundF.get(0, 1), foundF);
-		CommonOps_R64.scale(1.0 / F.get(0, 1), F);
+		CommonOps_DDRM.scale(1.0 / foundF.get(0, 1), foundF);
+		CommonOps_DDRM.scale(1.0 / F.get(0, 1), F);
 
-		assertTrue(MatrixFeatures_R64.isIdentical(F,foundF,1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(F,foundF,1e-8));
 	}
 
 	@Test
 	public void decomposeCameraMatrix() {
 		// compute an arbitrary projection matrix from known values
-		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(200, 250, 0.0, 100, 110);
-		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
+		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(200, 250, 0.0, 100, 110);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
-		RowMatrix_F64 P = new RowMatrix_F64(3,4);
-		RowMatrix_F64 KP = new RowMatrix_F64(3,4);
-		CommonOps_R64.insert(R,P,0,0);
+		DMatrixRMaj P = new DMatrixRMaj(3,4);
+		DMatrixRMaj KP = new DMatrixRMaj(3,4);
+		CommonOps_DDRM.insert(R,P,0,0);
 		P.set(0,3,T.x);
 		P.set(1,3,T.y);
 		P.set(2,3,T.z);
 
-		CommonOps_R64.mult(K,P,KP);
+		CommonOps_DDRM.mult(K,P,KP);
 
 		// decompose the projection matrix
-		RowMatrix_F64 foundK = new RowMatrix_F64(3,3);
+		DMatrixRMaj foundK = new DMatrixRMaj(3,3);
 		Se3_F64 foundPose = new Se3_F64();
 		MultiViewOps.decomposeCameraMatrix(KP, foundK, foundPose);
 
 		// recompute the projection matrix found the found results
-		RowMatrix_F64 foundKP = new RowMatrix_F64(3,4);
-		CommonOps_R64.insert(foundPose.getR(),P,0,0);
+		DMatrixRMaj foundKP = new DMatrixRMaj(3,4);
+		CommonOps_DDRM.insert(foundPose.getR(),P,0,0);
 		P.set(0,3,foundPose.T.x);
 		P.set(1,3,foundPose.T.y);
 		P.set(2,3,foundPose.T.z);
-		CommonOps_R64.mult(foundK,P,foundKP);
+		CommonOps_DDRM.mult(foundK,P,foundKP);
 
 		// see if the two projection matrices are the same
-		assertTrue(MatrixFeatures_R64.isEquals(foundKP,KP,1e-8));
+		assertTrue(MatrixFeatures_DDRM.isEquals(foundKP,KP,1e-8));
 	}
 
 	@Test
 	public void decomposeEssential() {
-		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
-		RowMatrix_F64 E = MultiViewOps.createEssential(R,T);
+		DMatrixRMaj E = MultiViewOps.createEssential(R,T);
 
 		List<Se3_F64> found = MultiViewOps.decomposeEssential(E);
 
@@ -651,11 +651,11 @@ public class TestMultiViewOps {
 		int numMatched = 0;
 
 		for( Se3_F64 m : found ) {
-			RowMatrix_F64 A = new RowMatrix_F64(3,3);
+			DMatrixRMaj A = new DMatrixRMaj(3,3);
 
-			CommonOps_R64.multTransA(R,m.getR(),A);
+			CommonOps_DDRM.multTransA(R,m.getR(),A);
 
-			if( !MatrixFeatures_R64.isIdentity(A,1e-8) ) {
+			if( !MatrixFeatures_DDRM.isIdentity(A,1e-8) ) {
 				continue;
 			}
 
@@ -671,14 +671,14 @@ public class TestMultiViewOps {
 
 	@Test
 	public void decomposeHomography() {
-		RowMatrix_F64 R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.2, -0.06, -0.05, null);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.2, -0.06, -0.05, null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 
 		double d = 2.5;
 		Vector3D_F64 N = new Vector3D_F64(0.68,0.2,-0.06);
 		N.normalize();
 
-		RowMatrix_F64 H = MultiViewOps.createHomography(R, T, d, N);
+		DMatrixRMaj H = MultiViewOps.createHomography(R, T, d, N);
 
 		List<Tuple2<Se3_F64,Vector3D_F64>> found = MultiViewOps.decomposeHomography(H);
 

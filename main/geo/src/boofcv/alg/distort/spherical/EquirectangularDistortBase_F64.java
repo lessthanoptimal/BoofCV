@@ -25,8 +25,8 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * Base class for all distortions from an equirectangular image.  The output image precomputes pointing vectors from
@@ -42,7 +42,7 @@ public abstract class EquirectangularDistortBase_F64 extends PixelTransform2_F64
 	int outWidth;
 
 	// rotation matrix
-	RowMatrix_F64 R = CommonOps_R64.identity(3,3);
+	DMatrixRMaj R = CommonOps_DDRM.identity(3,3);
 
 	// storage for intermediate variables
 	Vector3D_F64 n = new Vector3D_F64();
@@ -75,7 +75,7 @@ public abstract class EquirectangularDistortBase_F64 extends PixelTransform2_F64
 	 * Specifies direction using a rotation matrix
 	 * @param R rotation matrix
 	 */
-	public void setDirection( RowMatrix_F64 R ) {
+	public void setDirection( DMatrixRMaj R ) {
 		this.R.set(R);
 	}
 
@@ -123,7 +123,7 @@ public abstract class EquirectangularDistortBase_F64 extends PixelTransform2_F64
 		return tools;
 	}
 
-	public RowMatrix_F64 getRotation() {
+	public DMatrixRMaj getRotation() {
 		return R;
 	}
 }

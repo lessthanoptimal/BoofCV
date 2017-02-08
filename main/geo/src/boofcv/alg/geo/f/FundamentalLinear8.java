@@ -21,9 +21,9 @@ package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.SingularOps_R64;
-import org.ejml.ops.SpecializedOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.SingularOps_DDRM;
+import org.ejml.dense.row.SpecializedOps_DDRM;
 
 import java.util.List;
 
@@ -68,7 +68,7 @@ public class FundamentalLinear8 extends FundamentalLinear {
 	 *               normalized coordinates for essential matrix.
 	 * @return true If successful or false if it failed
 	 */
-	public boolean process( List<AssociatedPair> points , RowMatrix_F64 solution ) {
+	public boolean process( List<AssociatedPair> points , DMatrixRMaj solution ) {
 		if( points.size() < 8 )
 			throw new IllegalArgumentException("Must be at least 8 points. Was only "+points.size());
 
@@ -91,17 +91,17 @@ public class FundamentalLinear8 extends FundamentalLinear {
 	/**
 	 * Computes the SVD of A and extracts the essential/fundamental matrix from its null space
 	 */
-	protected boolean process(RowMatrix_F64 A, RowMatrix_F64 F ) {
+	protected boolean process(DMatrixRMaj A, DMatrixRMaj F ) {
 		if( !svdNull.decompose(A) )
 			return true;
 
 		if( A.numRows > 8 )
-			SingularOps_R64.nullVector(svdNull,true,F);
+			SingularOps_DDRM.nullVector(svdNull,true,F);
 		else {
 			// handle a special case since the matrix only has 8 singular values and won't select
 			// the correct column
-			RowMatrix_F64 V = svdNull.getV(null,false);
-			SpecializedOps_R64.subvector(V, 0, 8, V.numCols, false, 0, F);
+			DMatrixRMaj V = svdNull.getV(null,false);
+			SpecializedOps_DDRM.subvector(V, 0, 8, V.numCols, false, 0, F);
 		}
 
 		return false;

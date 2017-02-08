@@ -20,9 +20,9 @@ package boofcv.alg.geo.trifocal;
 
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.struct.geo.AssociatedTriple;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.NormOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.NormOps_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -42,24 +42,24 @@ public class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 		TrifocalLinearPoint7 alg = new TrifocalLinearPoint7();
 
 		// construct in pixel coordinates for ease
-		alg.N1 = CommonOps_R64.identity(3);
-		alg.N2 = CommonOps_R64.identity(3);
-		alg.N3 = CommonOps_R64.identity(3);
+		alg.N1 = CommonOps_DDRM.identity(3);
+		alg.N2 = CommonOps_DDRM.identity(3);
+		alg.N3 = CommonOps_DDRM.identity(3);
 
 		alg.createLinearSystem(observationsSpecial);  // TOOO change back
 
-		RowMatrix_F64 A = alg.A;
+		DMatrixRMaj A = alg.A;
 
-		RowMatrix_F64 X = new RowMatrix_F64(27,1);
+		DMatrixRMaj X = new DMatrixRMaj(27,1);
 		for( int i = 0; i < 9; i++ ) {
 			X.data[i] = tensor.T1.get(i);
 			X.data[i+9] = tensor.T2.get(i);
 			X.data[i+18] = tensor.T3.get(i);
 		}
 
-		RowMatrix_F64 Y = new RowMatrix_F64(A.numRows,1);
+		DMatrixRMaj Y = new DMatrixRMaj(A.numRows,1);
 
-		CommonOps_R64.mult(A,X,Y);
+		CommonOps_DDRM.mult(A,X,Y);
 
 		for( int i = 0; i < Y.numRows; i++ ) {
 			assertEquals(0,Y.get(i),1e-7);
@@ -74,9 +74,9 @@ public class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 
 		// validate the solution by using a constraint
 		for( AssociatedTriple a : observations ) {
-			RowMatrix_F64 A = MultiViewOps.constraint(found,a.p1,a.p2,a.p3,null);
+			DMatrixRMaj A = MultiViewOps.constraint(found,a.p1,a.p2,a.p3,null);
 
-			assertEquals(0,NormOps_R64.normF(A),1e-7);
+			assertEquals(0,NormOps_DDRM.normF(A),1e-7);
 		}
 	}
 }

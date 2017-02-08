@@ -25,10 +25,10 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.RowMatrix_F32;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R32;
-import org.ejml.ops.CommonOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.CommonOps_FDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -54,9 +54,9 @@ public class TestRectifyImageOps {
 				new CameraPinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		// do nothing rectification
-		RowMatrix_F32 rect1 = CommonOps_R32.identity(3);
-		RowMatrix_F32 rect2 = CommonOps_R32.identity(3);
-		RowMatrix_F32 rectK = PerspectiveOps.calibrationMatrix(param, (RowMatrix_F32)null);
+		FMatrixRMaj rect1 = CommonOps_FDRM.identity(3);
+		FMatrixRMaj rect2 = CommonOps_FDRM.identity(3);
+		FMatrixRMaj rectK = PerspectiveOps.calibrationMatrix(param, (FMatrixRMaj)null);
 
 		RectifyImageOps.fullViewLeft(param,rect1,rect2,rectK);
 
@@ -95,9 +95,9 @@ public class TestRectifyImageOps {
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		// do nothing rectification
-		RowMatrix_F32 rect1 = CommonOps_R32.identity(3);
-		RowMatrix_F32 rect2 = CommonOps_R32.identity(3);
-		RowMatrix_F32 rectK = PerspectiveOps.calibrationMatrix(param, (RowMatrix_F32)null);
+		FMatrixRMaj rect1 = CommonOps_FDRM.identity(3);
+		FMatrixRMaj rect2 = CommonOps_FDRM.identity(3);
+		FMatrixRMaj rectK = PerspectiveOps.calibrationMatrix(param, (FMatrixRMaj)null);
 
 		RectifyImageOps.allInsideLeft(param, rect1, rect2, rectK);
 
@@ -110,8 +110,8 @@ public class TestRectifyImageOps {
 	@Test
 	public void fullViewLeft_uncalibrated() {
 		// do nothing rectification
-		RowMatrix_F32 rect1 = CommonOps_R32.diag(2, 3, 1);
-		RowMatrix_F32 rect2 = CommonOps_R32.diag(0.5f, 2, 1);
+		FMatrixRMaj rect1 = CommonOps_FDRM.diag(2, 3, 1);
+		FMatrixRMaj rect2 = CommonOps_FDRM.diag(0.5f, 2, 1);
 
 		RectifyImageOps.fullViewLeft(300, 250, rect1, rect2);
 
@@ -124,14 +124,14 @@ public class TestRectifyImageOps {
 	@Test
 	public void allInsideLeft_uncalibrated() {
 		// do nothing rectification
-		RowMatrix_F32 rect1 = CommonOps_R32.diag(2, 3, 1);
-		RowMatrix_F32 rect2 = CommonOps_R32.diag(0.5f, 2, 1);
+		FMatrixRMaj rect1 = CommonOps_FDRM.diag(2, 3, 1);
+		FMatrixRMaj rect2 = CommonOps_FDRM.diag(0.5f, 2, 1);
 
 		RectifyImageOps.allInsideLeft(300, 250, rect1, rect2);
 
 		// check left image
-		RowMatrix_F32 inv = new RowMatrix_F32(3,3);
-		CommonOps_R32.invert(rect1, inv);
+		FMatrixRMaj inv = new FMatrixRMaj(3,3);
+		CommonOps_FDRM.invert(rect1, inv);
 		PointTransformHomography_F32 tran = new PointTransformHomography_F32(inv);
 		checkInside(tran);
 		// the right view is not checked since it is not part of the contract
@@ -146,7 +146,7 @@ public class TestRectifyImageOps {
 		CameraPinholeRadial param = new CameraPinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
-		RowMatrix_F32 rect = new RowMatrix_F32(3,3,true,1.1f,0,0,0,2,0,0.1f,0,3);
+		FMatrixRMaj rect = new FMatrixRMaj(3,3,true,1.1f,0,0,0,2,0,0.1f,0,3);
 
 		Point2Transform2_F32 forward = RectifyImageOps.transformPixelToRect(param, rect);
 		Point2Transform2_F32 inverse = RectifyImageOps.transformRectToPixel(param, rect);
@@ -172,7 +172,7 @@ public class TestRectifyImageOps {
 		CameraPinholeRadial param = new CameraPinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
-		RowMatrix_F64 rect = new RowMatrix_F64(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
+		DMatrixRMaj rect = new DMatrixRMaj(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
 
 		Point2Transform2_F64 forward = RectifyImageOps.transformPixelToRect(param, rect);
 		Point2Transform2_F64 inverse = RectifyImageOps.transformRectToPixel(param, rect);
@@ -200,11 +200,11 @@ public class TestRectifyImageOps {
 		CameraPinholeRadial param = new CameraPinholeRadial().
 						fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
-		RowMatrix_F64 rect = new RowMatrix_F64(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
-		RowMatrix_F64 rectK = PerspectiveOps.calibrationMatrix(param, (RowMatrix_F64)null);
+		DMatrixRMaj rect = new DMatrixRMaj(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
+		DMatrixRMaj rectK = PerspectiveOps.calibrationMatrix(param, (DMatrixRMaj)null);
 
-		RowMatrix_F64 rectK_inv = new RowMatrix_F64(3,3);
-		CommonOps_R64.invert(rectK,rectK_inv);
+		DMatrixRMaj rectK_inv = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.invert(rectK,rectK_inv);
 
 		Point2Transform2_F64 tranRect = RectifyImageOps.transformPixelToRect(param, rect);
 		Point2Transform2_F64 alg = RectifyImageOps.transformPixelToRectNorm(param, rect, rectK);

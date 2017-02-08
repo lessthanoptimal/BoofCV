@@ -20,7 +20,7 @@ package boofcv.gui.d3;
 
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageGray;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -105,7 +105,7 @@ public class PointCloudTiltPanel extends JPanel
 	 * @param K rectified camera calibration matrix
 	 */
 	public void configure(double baseline,
-						  RowMatrix_F64 K,
+						  DMatrixRMaj K,
 						  Point2Transform2_F64 rectifiedToColor,
 						  int minDisparity, int maxDisparity) {
 		view.configure(baseline, K, rectifiedToColor, minDisparity, maxDisparity);

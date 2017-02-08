@@ -23,7 +23,7 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.geo.AssociatedPair;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class BenchmarkRuntimeHomography extends ArtificialStereoScene {
 
 	List<AssociatedPair> pairs4 = new ArrayList<>();
 
-	RowMatrix_F64 H = new RowMatrix_F64(3,3);
+	DMatrixRMaj H = new DMatrixRMaj(3,3);
 
 	public class Estimate implements Performer {
 

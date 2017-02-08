@@ -23,7 +23,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ddogleg.optimization.functions.FunctionNtoS;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
@@ -41,15 +41,15 @@ import java.util.List;
  */
 public class FunctionSampsonFundamental implements FunctionNtoS {
 	// converts parameters to and from the fundamental matrix
-	ModelCodec<RowMatrix_F64> param;
+	ModelCodec<DMatrixRMaj> param;
 	// list of observations
 	List<AssociatedPair> obs;
 
 	// pre-declare temporary storage
 	Point3D_F64 temp = new Point3D_F64();
-	RowMatrix_F64 F = new RowMatrix_F64(3,3);
+	DMatrixRMaj F = new DMatrixRMaj(3,3);
 
-	public FunctionSampsonFundamental(ModelCodec<RowMatrix_F64> param,
+	public FunctionSampsonFundamental(ModelCodec<DMatrixRMaj> param,
 									  List<AssociatedPair> obs) {
 		set(param,obs);
 	}
@@ -57,7 +57,7 @@ public class FunctionSampsonFundamental implements FunctionNtoS {
 	public FunctionSampsonFundamental() {
 	}
 
-	public void set( ModelCodec<RowMatrix_F64> param , List<AssociatedPair> obs ) {
+	public void set( ModelCodec<DMatrixRMaj> param , List<AssociatedPair> obs ) {
 		this.param = param;
 		this.obs = obs;
 	}

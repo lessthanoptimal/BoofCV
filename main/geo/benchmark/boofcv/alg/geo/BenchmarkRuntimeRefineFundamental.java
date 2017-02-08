@@ -20,7 +20,7 @@ package boofcv.alg.geo;
 
 import boofcv.abst.geo.RefineEpipolar;
 import boofcv.misc.Performer;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * @author Peter Abeles
@@ -30,13 +30,13 @@ public class BenchmarkRuntimeRefineFundamental extends ArtificialStereoScene{
 	static final int NUM_POINTS = 500;
 	static final boolean FUNDAMENTAL = false;
 	
-	protected RowMatrix_F64 initialF;
+	protected DMatrixRMaj initialF;
 
 	public class Refine implements Performer {
 
 		RefineEpipolar alg;
 		String name;
-		RowMatrix_F64 refinement = new RowMatrix_F64(3,3);
+		DMatrixRMaj refinement = new DMatrixRMaj(3,3);
 
 		public Refine( String name , RefineEpipolar alg) {
 			this.alg = alg;

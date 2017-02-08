@@ -31,8 +31,8 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * Implementation of {@link PerspectiveOps} functions for 64-bit floats
@@ -42,33 +42,33 @@ import org.ejml.ops.CommonOps_R64;
 public class ImplPerspectiveOps_F64 {
 
 	public static <C extends CameraPinhole>C adjustIntrinsic(C parameters,
-															 RowMatrix_F64 adjustMatrix,
+															 DMatrixRMaj adjustMatrix,
 															 C adjustedParam)
 	{
 		if( adjustedParam == null )
 			adjustedParam = parameters.createLike();
 		adjustedParam.set(parameters);
 
-		RowMatrix_F64 K = ImplPerspectiveOps_F64.calibrationMatrix(parameters, null);
-		RowMatrix_F64 K_adj = new RowMatrix_F64(3,3);
-		CommonOps_R64.mult(adjustMatrix, K, K_adj);
+		DMatrixRMaj K = ImplPerspectiveOps_F64.calibrationMatrix(parameters, null);
+		DMatrixRMaj K_adj = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.mult(adjustMatrix, K, K_adj);
 
 		ImplPerspectiveOps_F64.matrixToParam(K_adj, parameters.width, parameters.height, adjustedParam);
 
 		return adjustedParam;
 	}
 
-	public static RowMatrix_F64 calibrationMatrix(double fx, double fy, double skew,
+	public static DMatrixRMaj calibrationMatrix(double fx, double fy, double skew,
 												   double xc, double yc) {
-		return new RowMatrix_F64(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
+		return new DMatrixRMaj(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
 	}
 
-	public static RowMatrix_F64 calibrationMatrix(CameraPinhole param , RowMatrix_F64 K ) {
+	public static DMatrixRMaj calibrationMatrix(CameraPinhole param , DMatrixRMaj K ) {
 
 		if( K == null ) {
-			K = new RowMatrix_F64(3,3);
+			K = new DMatrixRMaj(3,3);
 		}
-		CommonOps_R64.fill(K, 0);
+		CommonOps_DDRM.fill(K, 0);
 
 		K.data[0] = (double)param.fx;
 		K.data[1] = (double)param.skew;
@@ -80,7 +80,7 @@ public class ImplPerspectiveOps_F64 {
 		return K;
 	}
 
-	public static <C extends CameraPinhole>C matrixToParam(RowMatrix_F64 K , int width , int height , C param ) {
+	public static <C extends CameraPinhole>C matrixToParam(DMatrixRMaj K , int width , int height , C param ) {
 
 		if( param == null )
 			param = (C)new CameraPinhole();
@@ -109,7 +109,7 @@ public class ImplPerspectiveOps_F64 {
 		return pixel;
 	}
 
-	public static Point2D_F64 convertNormToPixel( RowMatrix_F64 K, Point2D_F64 norm , Point2D_F64 pixel ) {
+	public static Point2D_F64 convertNormToPixel( DMatrixRMaj K, Point2D_F64 norm , Point2D_F64 pixel ) {
 		if( pixel == null )
 			pixel = new Point2D_F64();
 
@@ -132,7 +132,7 @@ public class ImplPerspectiveOps_F64 {
 		return norm;
 	}
 
-	public static Point2D_F64 convertPixelToNorm( RowMatrix_F64 K , Point2D_F64 pixel , Point2D_F64 norm ) {
+	public static Point2D_F64 convertPixelToNorm( DMatrixRMaj K , Point2D_F64 pixel , Point2D_F64 norm ) {
 		if( norm == null )
 			norm = new Point2D_F64();
 
@@ -145,7 +145,7 @@ public class ImplPerspectiveOps_F64 {
 	}
 
 
-	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , RowMatrix_F64 K , Point3D_F64 X ) {
+	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , DMatrixRMaj K , Point3D_F64 X ) {
 		Point3D_F64 X_cam = new Point3D_F64();
 
 		SePointOps_F64.transform(worldToCamera, X, X_cam);
@@ -163,8 +163,8 @@ public class ImplPerspectiveOps_F64 {
 		return GeometryMath_F64.mult(K, norm, norm);
 	}
 
-	public static Point2D_F64 renderPixel( RowMatrix_F64 worldToCamera , Point3D_F64 X ) {
-		RowMatrix_F64 P = worldToCamera;
+	public static Point2D_F64 renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X ) {
+		DMatrixRMaj P = worldToCamera;
 
 		double x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3];
 		double y = P.data[4]*X.x + P.data[5]*X.y + P.data[6]*X.z + P.data[7];
@@ -178,12 +178,12 @@ public class ImplPerspectiveOps_F64 {
 		return pixel;
 	}
 
-	public static RowMatrix_F64 createCameraMatrix( RowMatrix_F64 R , Vector3D_F64 T , RowMatrix_F64 K ,
-													 RowMatrix_F64 ret ) {
+	public static DMatrixRMaj createCameraMatrix( DMatrixRMaj R , Vector3D_F64 T , DMatrixRMaj K ,
+													 DMatrixRMaj ret ) {
 		if( ret == null )
-			ret = new RowMatrix_F64(3,4);
+			ret = new DMatrixRMaj(3,4);
 
-		CommonOps_R64.insert(R,ret,0,0);
+		CommonOps_DDRM.insert(R,ret,0,0);
 
 		ret.data[3] = T.x;
 		ret.data[7] = T.y;
@@ -192,8 +192,8 @@ public class ImplPerspectiveOps_F64 {
 		if( K == null )
 			return ret;
 
-		RowMatrix_F64 temp = new RowMatrix_F64(3,4);
-		CommonOps_R64.mult(K,ret,temp);
+		DMatrixRMaj temp = new DMatrixRMaj(3,4);
+		CommonOps_DDRM.mult(K,ret,temp);
 
 		ret.set(temp);
 

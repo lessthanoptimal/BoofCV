@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,8 @@ import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.testing.BoofTesting;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Distance2D_F64;
+import georegression.struct.ConvertFloatType;
+import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -227,7 +229,9 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 
 		// work when the transform is applied
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32();
-		transform.set(regToDist);
+		Affine2D_F32 regToDist_F32 = new Affine2D_F32();
+		ConvertFloatType.convert(regToDist, regToDist_F32);
+		transform.set(regToDist_F32);
 		alg.setTransform(transform);
 		alg.setImage(image);
 		assertTrue(alg.refine(input,null,null, found));

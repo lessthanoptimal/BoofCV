@@ -22,8 +22,8 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class TestLowLevelMultiViewOps {
 			list.add(p);
 		}
 
-		RowMatrix_F64 N = new RowMatrix_F64(3,3);
+		DMatrixRMaj N = new DMatrixRMaj(3,3);
 		LowLevelMultiViewOps.computeNormalization(list, N);
 
 		List<Point2D_F64> transformed = new ArrayList<>();
@@ -113,19 +113,19 @@ public class TestLowLevelMultiViewOps {
 
 		PerspectiveOps.splitAssociated(list,list1,list2);
 
-		RowMatrix_F64 expected1 = new RowMatrix_F64(3,3);
-		RowMatrix_F64 expected2 = new RowMatrix_F64(3,3);
+		DMatrixRMaj expected1 = new DMatrixRMaj(3,3);
+		DMatrixRMaj expected2 = new DMatrixRMaj(3,3);
 
 		LowLevelMultiViewOps.computeNormalization(list1, expected1);
 		LowLevelMultiViewOps.computeNormalization(list2, expected2);
 
-		RowMatrix_F64 found1 = new RowMatrix_F64(3,3);
-		RowMatrix_F64 found2 = new RowMatrix_F64(3,3);
+		DMatrixRMaj found1 = new DMatrixRMaj(3,3);
+		DMatrixRMaj found2 = new DMatrixRMaj(3,3);
 
 		LowLevelMultiViewOps.computeNormalization(list, found1, found2);
 
-		assertTrue(MatrixFeatures_R64.isIdentical(expected1, found1, 1e-8));
-		assertTrue(MatrixFeatures_R64.isIdentical(expected2,found2,1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(expected1, found1, 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(expected2,found2,1e-8));
 	}
 
 	/**
@@ -151,23 +151,23 @@ public class TestLowLevelMultiViewOps {
 
 		PerspectiveOps.splitAssociated(list,list1,list2,list3);
 
-		RowMatrix_F64 expected1 = new RowMatrix_F64(3,3);
-		RowMatrix_F64 expected2 = new RowMatrix_F64(3,3);
-		RowMatrix_F64 expected3 = new RowMatrix_F64(3,3);
+		DMatrixRMaj expected1 = new DMatrixRMaj(3,3);
+		DMatrixRMaj expected2 = new DMatrixRMaj(3,3);
+		DMatrixRMaj expected3 = new DMatrixRMaj(3,3);
 
 		LowLevelMultiViewOps.computeNormalization(list1, expected1);
 		LowLevelMultiViewOps.computeNormalization(list2, expected2);
 		LowLevelMultiViewOps.computeNormalization(list3, expected3);
 
-		RowMatrix_F64 found1 = new RowMatrix_F64(3,3);
-		RowMatrix_F64 found2 = new RowMatrix_F64(3,3);
-		RowMatrix_F64 found3 = new RowMatrix_F64(3,3);
+		DMatrixRMaj found1 = new DMatrixRMaj(3,3);
+		DMatrixRMaj found2 = new DMatrixRMaj(3,3);
+		DMatrixRMaj found3 = new DMatrixRMaj(3,3);
 
 		LowLevelMultiViewOps.computeNormalization(list, found1, found2, found3);
 
-		assertTrue(MatrixFeatures_R64.isIdentical(expected1,found1,1e-8));
-		assertTrue(MatrixFeatures_R64.isIdentical(expected2,found2,1e-8));
-		assertTrue(MatrixFeatures_R64.isIdentical(expected3,found3,1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(expected1,found1,1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(expected2,found2,1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(expected3,found3,1e-8));
 	}
 
 	/**
@@ -175,7 +175,7 @@ public class TestLowLevelMultiViewOps {
 	 */
 	@Test
 	public void applyPixelNormalization() {
-		RowMatrix_F64 N = new RowMatrix_F64(3,3,true,1,2,3,4,5,6,7,8,9);
+		DMatrixRMaj N = new DMatrixRMaj(3,3,true,1,2,3,4,5,6,7,8,9);
 
 		Point2D_F64 a = new Point2D_F64(3,4);
 		Point2D_F64 found = new Point2D_F64(3,4);

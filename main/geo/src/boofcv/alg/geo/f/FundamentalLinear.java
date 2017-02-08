@@ -21,11 +21,11 @@ package boofcv.alg.geo.f;
 import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.SingularOps_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.SingularOps_R64;
 
 import java.util.List;
 
@@ -45,22 +45,22 @@ import java.util.List;
 public abstract class FundamentalLinear {
 
 	// contains the set of equations that are solved
-	protected RowMatrix_F64 A = new RowMatrix_F64(1,9);
+	protected DMatrixRMaj A = new DMatrixRMaj(1,9);
 	// svd used to extract the null space
-	protected SingularValueDecomposition_F64<RowMatrix_F64> svdNull = DecompositionFactory_R64.svd(9, 9, false, true, false);
+	protected SingularValueDecomposition_F64<DMatrixRMaj> svdNull = DecompositionFactory_DDRM.svd(9, 9, false, true, false);
 	// svd used to enforce constraings on 3x3 matrix
-	protected SingularValueDecomposition_F64<RowMatrix_F64> svdConstraints = DecompositionFactory_R64.svd(3, 3, true, true, false);
+	protected SingularValueDecomposition_F64<DMatrixRMaj> svdConstraints = DecompositionFactory_DDRM.svd(3, 3, true, true, false);
 
 	// SVD decomposition of F = U*S*V^T
-	protected RowMatrix_F64 svdU;
-	protected RowMatrix_F64 svdS;
-	protected RowMatrix_F64 svdV;
+	protected DMatrixRMaj svdU;
+	protected DMatrixRMaj svdS;
+	protected DMatrixRMaj svdV;
 
-	protected RowMatrix_F64 temp0 = new RowMatrix_F64(3,3);
+	protected DMatrixRMaj temp0 = new DMatrixRMaj(3,3);
 
 	// matrix used to normalize results
-	protected RowMatrix_F64 N1 = new RowMatrix_F64(3,3);
-	protected RowMatrix_F64 N2 = new RowMatrix_F64(3,3);
+	protected DMatrixRMaj N1 = new DMatrixRMaj(3,3);
+	protected DMatrixRMaj N2 = new DMatrixRMaj(3,3);
 
 	// should it compute a fundamental (true) or essential (false) matrix?
 	boolean computeFundamental;
@@ -79,7 +79,7 @@ public abstract class FundamentalLinear {
 	 *
 	 * @return true if svd returned true.
 	 */
-	protected boolean projectOntoEssential( RowMatrix_F64 E ) {
+	protected boolean projectOntoEssential( DMatrixRMaj E ) {
 		if( !svdConstraints.decompose(E) ) {
 			return false;
 		}
@@ -87,7 +87,7 @@ public abstract class FundamentalLinear {
 		svdU = svdConstraints.getU(svdU,false);
 		svdS = svdConstraints.getW(svdS);
 
-		SingularOps_R64.descendingOrder(svdU, false, svdS, svdV, false);
+		SingularOps_DDRM.descendingOrder(svdU, false, svdS, svdV, false);
 
 		// project it into essential space
 		// the scale factor is arbitrary, but the first two singular values need
@@ -97,8 +97,8 @@ public abstract class FundamentalLinear {
 		svdS.unsafe_set(2, 2, 0);
 
 		// recompute F
-		CommonOps_R64.mult(svdU, svdS, temp0);
-		CommonOps_R64.multTransB(temp0,svdV, E);
+		CommonOps_DDRM.mult(svdU, svdS, temp0);
+		CommonOps_DDRM.multTransB(temp0,svdV, E);
 
 		return true;
 	}
@@ -108,7 +108,7 @@ public abstract class FundamentalLinear {
 	 *
 	 * @return true if svd returned true.
 	 */
-	protected boolean projectOntoFundamentalSpace( RowMatrix_F64 F ) {
+	protected boolean projectOntoFundamentalSpace( DMatrixRMaj F ) {
 		if( !svdConstraints.decompose(F) ) {
 			return false;
 		}
@@ -116,14 +116,14 @@ public abstract class FundamentalLinear {
 		svdU = svdConstraints.getU(svdU,false);
 		svdS = svdConstraints.getW(svdS);
 
-		SingularOps_R64.descendingOrder(svdU, false, svdS, svdV, false);
+		SingularOps_DDRM.descendingOrder(svdU, false, svdS, svdV, false);
 
 		// the smallest singular value needs to be set to zero, unlike
 		svdS.set(2, 2, 0);
 
 		// recompute F
-		CommonOps_R64.mult(svdU, svdS, temp0);
-		CommonOps_R64.multTransB(temp0,svdV, F);
+		CommonOps_DDRM.mult(svdU, svdS, temp0);
+		CommonOps_DDRM.multTransB(temp0,svdV, F);
 
 		return true;
 	}
@@ -137,10 +137,10 @@ public abstract class FundamentalLinear {
 	 * @param N1 normalization matrix.
 	 * @param N2 normalization matrix.
 	 */
-	protected void undoNormalizationF(RowMatrix_F64 M, RowMatrix_F64 N1, RowMatrix_F64 N2) {
+	protected void undoNormalizationF(DMatrixRMaj M, DMatrixRMaj N1, DMatrixRMaj N2) {
 		// M = N2^T * M * N1
-		CommonOps_R64.multTransA(N2,M,temp0);
-		CommonOps_R64.mult(temp0,N1,M);
+		CommonOps_DDRM.multTransA(N2,M,temp0);
+		CommonOps_DDRM.mult(temp0,N1,M);
 	}
 
 	/**
@@ -151,7 +151,7 @@ public abstract class FundamentalLinear {
 	 * @param points Set of associated points in left and right images.
 	 * @param A Matrix where the reformatted points are written to.
 	 */
-	protected void createA(List<AssociatedPair> points, RowMatrix_F64 A ) {
+	protected void createA(List<AssociatedPair> points, DMatrixRMaj A ) {
 		A.reshape(points.size(),9, false);
 		A.zero();
 
@@ -188,7 +188,7 @@ public abstract class FundamentalLinear {
 	 *
 	 * @return U matrix.
 	 */
-	public RowMatrix_F64 getSvdU() {
+	public DMatrixRMaj getSvdU() {
 		return svdU;
 	}
 
@@ -197,7 +197,7 @@ public abstract class FundamentalLinear {
 	 *
 	 * @return S matrix.
 	 */
-	public RowMatrix_F64 getSvdS() {
+	public DMatrixRMaj getSvdS() {
 		return svdS;
 	}
 
@@ -206,7 +206,7 @@ public abstract class FundamentalLinear {
 	 *
 	 * @return V matrix.
 	 */
-	public RowMatrix_F64 getSvdV() {
+	public DMatrixRMaj getSvdV() {
 		return svdV;
 	}
 

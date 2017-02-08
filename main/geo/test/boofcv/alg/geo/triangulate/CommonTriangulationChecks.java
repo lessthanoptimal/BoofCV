@@ -25,7 +25,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ public class CommonTriangulationChecks {
 	protected Point3D_F64 worldPoint;
 	protected List<Point2D_F64> obsPts;
 	protected List<Se3_F64> motionWorldToCamera;
-	protected List<RowMatrix_F64> essential;
+	protected List<DMatrixRMaj> essential;
 	
 	public void createScene() {
 		worldPoint = new Point3D_F64(0.1,-0.2,4);
@@ -62,7 +62,7 @@ public class CommonTriangulationChecks {
 				tranWtoI.getT().set(0.2+rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, rand.nextGaussian()*0.01);
 			}
 
-			RowMatrix_F64 E = MultiViewOps.createEssential(tranWtoI.getR(), tranWtoI.getT());
+			DMatrixRMaj E = MultiViewOps.createEssential(tranWtoI.getR(), tranWtoI.getT());
 
 			SePointOps_F64.transform(tranWtoI, worldPoint,cameraPoint);
 			

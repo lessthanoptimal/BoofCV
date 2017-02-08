@@ -26,7 +26,7 @@ import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -63,7 +63,7 @@ public class TestPnPStereoEstimator extends CommonStereoMotionNPoint {
 //		found.print();
 //		expected.print();
 
-		assertTrue(MatrixFeatures_R64.isIdentical(expected.getR(), found.getR(), 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(expected.getR(), found.getR(), 1e-8));
 		assertTrue(found.getT().isIdentical(expected.getT(), 1e-8));
 	}
 }

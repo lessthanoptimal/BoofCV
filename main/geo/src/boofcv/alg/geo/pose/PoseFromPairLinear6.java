@@ -24,11 +24,11 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.factory.DecompositionFactory_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.SingularOps_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.SingularOps_R64;
 
 import java.util.List;
 
@@ -65,13 +65,13 @@ import java.util.List;
 public class PoseFromPairLinear6 {
 
 	// The rank 11 linear system
-	private RowMatrix_F64 A = new RowMatrix_F64(1,12);
+	private DMatrixRMaj A = new DMatrixRMaj(1,12);
 
 	// used to decompose and compute the null space of A
-	private SingularValueDecomposition_F64<RowMatrix_F64> svd = DecompositionFactory_R64.svd(0, 0, true, true, false);
+	private SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(0, 0, true, true, false);
 
 	// parameterized rotation and translation
-	private RowMatrix_F64 x = new RowMatrix_F64(12,1);
+	private DMatrixRMaj x = new DMatrixRMaj(12,1);
 
 	// the found motion
 	private Se3_F64 motion = new Se3_F64();
@@ -111,7 +111,7 @@ public class PoseFromPairLinear6 {
 	/**
 	 * Matrix used internally.
 	 */
-	protected RowMatrix_F64 getA() {
+	protected DMatrixRMaj getA() {
 		return A;
 	}
 
@@ -157,13 +157,13 @@ public class PoseFromPairLinear6 {
 	/**
 	 * Computes the null space of A and extracts the transform.
 	 */
-	private void computeTransform( RowMatrix_F64 A ) {
+	private void computeTransform( DMatrixRMaj A ) {
 		if( !svd.decompose(A) )
 			throw new RuntimeException("SVD failed?");
 
-		SingularOps_R64.nullVector(svd,true,x);
+		SingularOps_DDRM.nullVector(svd,true,x);
 
-		RowMatrix_F64 R = motion.getR();
+		DMatrixRMaj R = motion.getR();
 		Vector3D_F64 T = motion.getT();
 
 		// extract the results
@@ -183,19 +183,19 @@ public class PoseFromPairLinear6 {
 	 * See page 280 of [1]
 	 */
 	private void massageResults() {
-		RowMatrix_F64 R = motion.getR();
+		DMatrixRMaj R = motion.getR();
 		Vector3D_F64 T = motion.getT();
 
 		if( !svd.decompose(R))
 			throw new RuntimeException("SVD Failed");
 
-		CommonOps_R64.multTransB(svd.getU(null,false),svd.getV(null,false),R);
+		CommonOps_DDRM.multTransB(svd.getU(null,false),svd.getV(null,false),R);
 
 		// determinant should be +1
-		double det = CommonOps_R64.det(R);
+		double det = CommonOps_DDRM.det(R);
 
 		if( det < 0 )
-			CommonOps_R64.scale(-1,R);
+			CommonOps_DDRM.scale(-1,R);
 
 		// compute the determinant of the singular matrix
 		double b = 1.0;

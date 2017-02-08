@@ -36,7 +36,7 @@ import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -570,7 +570,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 
 		// 2D to 3D coordinates
 		currPlaneToWorld3D.getT().set(-currToWorld.T.y, 0, currToWorld.T.x);
-		RowMatrix_F64 R = currPlaneToWorld3D.getR();
+		DMatrixRMaj R = currPlaneToWorld3D.getR();
 
 		// set rotation around Y axis.
 		// Transpose the 2D transform since the rotation are pointing in opposite directions

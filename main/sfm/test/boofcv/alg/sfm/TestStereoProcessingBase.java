@@ -30,7 +30,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -93,7 +93,7 @@ public class TestStereoProcessingBase {
 
 		StereoParameters param = createStereoParam(width,height);
 
-		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(param.left,(RowMatrix_F64)null);
+		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(param.left,(DMatrixRMaj)null);
 
 		// compute the view in pixels of the point in the left and right cameras
 		Point2D_F64 lensLeft = new Point2D_F64();

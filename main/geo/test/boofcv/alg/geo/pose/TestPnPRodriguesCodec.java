@@ -20,8 +20,8 @@ package boofcv.alg.geo.pose;
 
 import georegression.struct.se.Se3_F64;
 import org.ejml.UtilEjml;
-import org.ejml.ops.CommonOps_R64;
-import org.ejml.ops.MatrixFeatures_R64;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -47,14 +47,14 @@ public class TestPnPRodriguesCodec {
 
 		// multiple parameterization can represent the same model, so test using the model
 		assertTrue(storage.T.isIdentical(storage2.T,1e-8));
-		assertTrue(MatrixFeatures_R64.isIdentical(storage.R,storage2.R,1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(storage.R,storage2.R,1e-8));
 	}
 
 	@Test
 	public void testCase0() {
 		Se3_F64 a = new Se3_F64();
 
-		a.R = UtilEjml.parse_R64(
+		a.R = UtilEjml.parse_DDRM(
 						"1.000000e+00        -5.423439e-14        -3.165003e-13 \n" +
 						"5.420664e-14         1.000000e+00         2.461642e-13 \n" +
 						"3.162678e-13        -2.464418e-13         1.000000e+00",3);
@@ -68,7 +68,7 @@ public class TestPnPRodriguesCodec {
 		alg.decode(param,found);
 
 		assertTrue(a.T.isIdentical(found.T,1e-8));
-		assertTrue(MatrixFeatures_R64.isIdentical(a.R,found.R,1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(a.R,found.R,1e-8));
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class TestPnPRodriguesCodec {
 	@Test
 	public void testCase1() {
 		Se3_F64 input = new Se3_F64();
-		CommonOps_R64.diag(input.getR(),3,1,-1,-1);
+		CommonOps_DDRM.diag(input.getR(),3,1,-1,-1);
 
 		Se3_F64 output = new Se3_F64();
 		PnPRodriguesCodec alg = new PnPRodriguesCodec();
@@ -89,6 +89,6 @@ public class TestPnPRodriguesCodec {
 //		output.print();
 
 		assertTrue(input.T.isIdentical(output.T, 1e-8));
-		assertTrue(MatrixFeatures_R64.isIdentical(input.R,output.R,1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(input.R,output.R,1e-8));
 	}
 }

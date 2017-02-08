@@ -21,7 +21,7 @@ package boofcv.alg.geo.calibration;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ import java.util.List;
 public class Zhang99ComputeTargetHomography {
 
 	HomographyLinear4 linear = new HomographyLinear4(true);
-	RowMatrix_F64 found = new RowMatrix_F64(3,3);
+	DMatrixRMaj found = new DMatrixRMaj(3,3);
 
 	// location of calibration points in the target frame's in world units.
 	// the z-axis is assumed to be zero
@@ -87,7 +87,7 @@ public class Zhang99ComputeTargetHomography {
 	 * Returns a copy of the found homography matrix.
 	 * @return Homography matrix.
 	 */
-	public RowMatrix_F64 getHomography() {
+	public DMatrixRMaj getHomography() {
 		return found.copy();
 	}
 }

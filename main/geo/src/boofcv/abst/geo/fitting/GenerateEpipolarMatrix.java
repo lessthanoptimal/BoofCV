@@ -21,7 +21,7 @@ package boofcv.abst.geo.fitting;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
-public class GenerateEpipolarMatrix implements ModelGenerator<RowMatrix_F64,AssociatedPair> {
+public class GenerateEpipolarMatrix implements ModelGenerator<DMatrixRMaj,AssociatedPair> {
 
 	Estimate1ofEpipolar alg;
 
@@ -40,7 +40,7 @@ public class GenerateEpipolarMatrix implements ModelGenerator<RowMatrix_F64,Asso
 	}
 
 	@Override
-	public boolean generate(List<AssociatedPair> dataSet, RowMatrix_F64 model ) {
+	public boolean generate(List<AssociatedPair> dataSet, DMatrixRMaj model ) {
 		if( alg.process(dataSet,model) ) {
 			return true;
 		}

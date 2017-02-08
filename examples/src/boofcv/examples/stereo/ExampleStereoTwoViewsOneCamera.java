@@ -50,8 +50,8 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ejml.data.RowMatrix_F32;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
 
 import java.awt.*;
@@ -103,7 +103,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		drawInliers(origLeft, origRight, intrinsic, inliers);
 
 		// Rectify and remove lens distortion for stereo processing
-		RowMatrix_F64 rectifiedK = new RowMatrix_F64(3, 3);
+		DMatrixRMaj rectifiedK = new DMatrixRMaj(3, 3);
 		GrayU8 rectifiedLeft = distortedLeft.createSameShape();
 		GrayU8 rectifiedRight = distortedRight.createSameShape();
 
@@ -200,17 +200,17 @@ public class ExampleStereoTwoViewsOneCamera {
 									 CameraPinholeRadial intrinsic,
 									 GrayU8 rectifiedLeft,
 									 GrayU8 rectifiedRight,
-									 RowMatrix_F64 rectifiedK) {
+									 DMatrixRMaj rectifiedK) {
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 		// original camera calibration matrices
-		RowMatrix_F64 K = PerspectiveOps.calibrationMatrix(intrinsic, (RowMatrix_F64)null);
+		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(intrinsic, (DMatrixRMaj)null);
 
 		rectifyAlg.process(K, new Se3_F64(), K, leftToRight);
 
 		// rectification matrix for each image
-		RowMatrix_F64 rect1 = rectifyAlg.getRect1();
-		RowMatrix_F64 rect2 = rectifyAlg.getRect2();
+		DMatrixRMaj rect1 = rectifyAlg.getRect1();
+		DMatrixRMaj rect2 = rectifyAlg.getRect2();
 
 		// New calibration matrix,
 		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
@@ -219,8 +219,8 @@ public class ExampleStereoTwoViewsOneCamera {
 		RectifyImageOps.allInsideLeft(intrinsic, rect1, rect2, rectifiedK);
 
 		// undistorted and rectify images
-		RowMatrix_F32 rect1_F32 = new RowMatrix_F32(3,3);
-		RowMatrix_F32 rect2_F32 = new RowMatrix_F32(3,3);
+		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3);
+		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
@@ -263,7 +263,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	 * Show results as a point cloud
 	 */
 	public static void showPointCloud(ImageGray disparity, BufferedImage left,
-									  Se3_F64 motion, RowMatrix_F64 rectifiedK ,
+									  Se3_F64 motion, DMatrixRMaj rectifiedK ,
 									  int minDisparity, int maxDisparity) {
 		PointCloudTiltPanel gui = new PointCloudTiltPanel();
 

@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.fitting;
 
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -32,7 +32,7 @@ public class TestModelManagerEpipolarMatrix {
 	@Test
 	public void createModelInstance() {
 		ModelManagerEpipolarMatrix alg = new ModelManagerEpipolarMatrix();
-		RowMatrix_F64 found = alg.createModelInstance();
+		DMatrixRMaj found = alg.createModelInstance();
 
 		assertTrue( found != null );
 		assertEquals(3, found.getNumRows());
@@ -43,10 +43,10 @@ public class TestModelManagerEpipolarMatrix {
 	public void copyModel() {
 		ModelManagerEpipolarMatrix alg = new ModelManagerEpipolarMatrix();
 
-		RowMatrix_F64 m = new RowMatrix_F64(3,3);
+		DMatrixRMaj m = new DMatrixRMaj(3,3);
 		for( int i = 0; i < 9; i++ )
 			m.data[i] = i+1;
-		RowMatrix_F64 copy = new RowMatrix_F64(3,3);
+		DMatrixRMaj copy = new DMatrixRMaj(3,3);
 
 		alg.copyModel(m,copy);
 		for( int i = 0; i < 9; i++ )

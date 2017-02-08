@@ -25,7 +25,7 @@ import boofcv.alg.geo.PositiveDepthConstraintCheck;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 	// used to select best hypothesis
 	PositiveDepthConstraintCheck depthCheck;
 
-	RowMatrix_F64 E = new RowMatrix_F64(3,3);
+	DMatrixRMaj E = new DMatrixRMaj(3,3);
 
 	/**
 	 * Specifies how the essential matrix is computed

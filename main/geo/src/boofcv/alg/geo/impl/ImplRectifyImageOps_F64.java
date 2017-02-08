@@ -27,8 +27,8 @@ import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.SequencePoint2Transform2_F64;
 import georegression.struct.shapes.RectangleLength2D_F64;
-import org.ejml.data.RowMatrix_F64;
-import org.ejml.ops.CommonOps_R64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
 
 import static boofcv.alg.distort.LensDistortionOps.narrow;
@@ -43,8 +43,8 @@ import static boofcv.alg.distort.LensDistortionOps.narrow;
 public class ImplRectifyImageOps_F64 {
 
 	public static void fullViewLeft(CameraPinholeRadial paramLeft,
-									RowMatrix_F64 rectifyLeft, RowMatrix_F64 rectifyRight,
-									RowMatrix_F64 rectifyK)
+									DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
+									DMatrixRMaj rectifyK)
 	{
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new CameraPinholeRadial(paramLeft);
@@ -63,7 +63,7 @@ public class ImplRectifyImageOps_F64 {
 	}
 
 	public static void fullViewLeft(int imageWidth,int imageHeight,
-									RowMatrix_F64 rectifyLeft, RowMatrix_F64 rectifyRight )
+									DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight )
 	{
 		Point2Transform2_F64 tranLeft = new PointTransformHomography_F64(rectifyLeft);
 
@@ -79,8 +79,8 @@ public class ImplRectifyImageOps_F64 {
 	}
 
 	public static void allInsideLeft(CameraPinholeRadial paramLeft,
-									 RowMatrix_F64 rectifyLeft, RowMatrix_F64 rectifyRight,
-									 RowMatrix_F64 rectifyK)
+									 DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
+									 DMatrixRMaj rectifyK)
 	{
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new CameraPinholeRadial(paramLeft);
@@ -101,7 +101,7 @@ public class ImplRectifyImageOps_F64 {
 	}
 
 	public static void allInsideLeft( int imageWidth,int imageHeight,
-									  RowMatrix_F64 rectifyLeft, RowMatrix_F64 rectifyRight )
+									  DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight )
 	{
 		PointTransformHomography_F64 tranLeft = new PointTransformHomography_F64(rectifyLeft);
 
@@ -119,8 +119,8 @@ public class ImplRectifyImageOps_F64 {
 	/**
 	 * Internal function which applies the rectification adjustment to a calibrated stereo pair
 	 */
-	private static void adjustCalibrated(RowMatrix_F64 rectifyLeft, RowMatrix_F64 rectifyRight,
-										 RowMatrix_F64 rectifyK,
+	private static void adjustCalibrated(DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
+										 DMatrixRMaj rectifyK,
 										 RectangleLength2D_F64 bound, double scale) {
 		// translation
 		double deltaX = -bound.x0*scale;
@@ -148,7 +148,7 @@ public class ImplRectifyImageOps_F64 {
 	/**
 	 * Internal function which applies the rectification adjustment to an uncalibrated stereo pair
 	 */
-	private static void adjustUncalibrated(RowMatrix_F64 rectifyLeft, RowMatrix_F64 rectifyRight,
+	private static void adjustUncalibrated(DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
 										   RectangleLength2D_F64 bound, double scale) {
 		// translation
 		double deltaX = -bound.x0*scale;
@@ -164,19 +164,19 @@ public class ImplRectifyImageOps_F64 {
 	}
 
 	public static Point2Transform2_F64 transformRectToPixel(CameraPinholeRadial param,
-															RowMatrix_F64 rectify)
+															DMatrixRMaj rectify)
 	{
 		Point2Transform2_F64 add_p_to_p = narrow(param).distort_F64(true, true);
 
-		RowMatrix_F64 rectifyInv = new RowMatrix_F64(3,3);
-		CommonOps_R64.invert(rectify,rectifyInv);
+		DMatrixRMaj rectifyInv = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.invert(rectify,rectifyInv);
 		PointTransformHomography_F64 removeRect = new PointTransformHomography_F64(rectifyInv);
 
 		return new SequencePoint2Transform2_F64(removeRect,add_p_to_p);
 	}
 
 	public static Point2Transform2_F64 transformPixelToRect(CameraPinholeRadial param,
-															RowMatrix_F64 rectify)
+															DMatrixRMaj rectify)
 	{
 		Point2Transform2_F64 remove_p_to_p = narrow(param).undistort_F64(true, true);
 
@@ -186,8 +186,8 @@ public class ImplRectifyImageOps_F64 {
 	}
 
 	public static Point2Transform2_F64 transformPixelToRectNorm(CameraPinholeRadial param,
-																RowMatrix_F64 rectify,
-																RowMatrix_F64 rectifyK) {
+																DMatrixRMaj rectify,
+																DMatrixRMaj rectifyK) {
 		if (rectifyK.get(0, 1) != 0)
 			throw new IllegalArgumentException("Skew should be zero in rectified images");
 

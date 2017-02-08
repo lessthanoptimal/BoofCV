@@ -20,7 +20,7 @@ package boofcv.alg.geo.h;
 
 import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.struct.geo.AssociatedPair;
-import org.ejml.data.RowMatrix_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class HomographyResidualTests extends CommonHomographyChecks {
 
-	public abstract ModelObservationResidualN<RowMatrix_F64,AssociatedPair> createAlg();
+	public abstract ModelObservationResidualN<DMatrixRMaj,AssociatedPair> createAlg();
 
 	@Test
 	public void basicTest() {
@@ -41,7 +41,7 @@ public abstract class HomographyResidualTests extends CommonHomographyChecks {
 		HomographyLinear4 estimator = new HomographyLinear4(true);
 		estimator.process(pairs,solution);
 
-		ModelObservationResidualN<RowMatrix_F64,AssociatedPair> alg = createAlg();
+		ModelObservationResidualN<DMatrixRMaj,AssociatedPair> alg = createAlg();
 
 		double residuals[] = new double[alg.getN()];
 		
