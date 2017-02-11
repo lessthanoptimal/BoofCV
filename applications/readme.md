@@ -4,7 +4,7 @@ Usage:
 
 ```bash
 gradle applicationsJar
-java -jar applicationsJar
+java -jar applications.jar
 ```
 
 Then follow printed instructions.
