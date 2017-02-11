@@ -7,6 +7,7 @@
 - Set release data in change.txt
 - Make sure all examples work
 - Make sure all applications in evaluation work
+- Make sure android still works
 - Update examples on website
   * See what needs to be updated since TAG_NAME "git diff --name-status TAG_NAME path/to/examples"
 - Fresh checkout from repository then do the following

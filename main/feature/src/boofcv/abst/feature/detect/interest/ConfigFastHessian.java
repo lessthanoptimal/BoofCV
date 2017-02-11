@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,26 +31,33 @@ public class ConfigFastHessian implements Configuration {
 	 * Minimum feature intensity. Image dependent.  Start tuning at 1.
 	 */
 	public float detectThreshold = 1;
+
 	/**
 	 * Radius used for non-max-suppression.  Typically 1 or 2.
 	 */
 	public int extractRadius = 2;
+
 	/**
-	 * Number of features it will find or if &le; 0 it will return all features it finds.
+	 * Maximum number of features that non-maximum suppression (NMS) can return from each scale. Features with higher
+	 * intensity scores are given preference.  If &le; 0 NMS will return all features it finds.
 	 */
 	public int maxFeaturesPerScale = -1;
+
 	/**
 	 * How often pixels are sampled in the first octave.  Typically 1 or 2.
 	 */
 	public int initialSampleSize = 1;
+
 	/**
 	 * Typically 9.
 	 */
 	public int initialSize = 9;
+
 	/**
 	 * Typically 4.
 	 */
 	public int numberScalesPerOctave = 4;
+
 	/**
 	 * Typically 4.
 	 */

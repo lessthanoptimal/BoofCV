@@ -470,7 +470,7 @@ public class ConvertBufferedImage {
 			throw new IllegalArgumentException("src is null!");
 
 		if (dst != null) {
-			dst.reshape(src.getWidth(), dst.getHeight());
+			dst.reshape(src.getWidth(), src.getHeight());
 		}
 
 		try {
