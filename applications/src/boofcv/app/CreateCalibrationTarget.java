@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -160,6 +160,13 @@ public class CreateCalibrationTarget {
 				if( centerDistance <= 0 )
 					centerDistance = shapeWidth*2;
 				break;
+
+			case CIRCLE_GRID:
+				if( shapeSpace > 0 )
+					failExit("Don't specify space for circle type targets, use center distance instead");
+				if( centerDistance <= 0 )
+					centerDistance = shapeWidth*2;
+				break;
 		}
 	}
 
@@ -183,6 +190,7 @@ public class CreateCalibrationTarget {
 			case SQUARE_GRID:generator.squareGrid(shapeWidth,shapeSpace);break;
 			case BINARY_GRID:generator.binaryGrid(shapeWidth,shapeSpace);break;
 			case CIRCLE_ASYMMETRIC_GRID:generator.circleAsymmetric(shapeWidth,centerDistance);break;
+			case CIRCLE_GRID:generator.circleGrid(shapeWidth,centerDistance);break;
 			default: throw new RuntimeException("Unknown target type");
 		}
 

@@ -144,6 +144,32 @@ public class CreateCalibrationTargetGenerator {
 		printTrailer();
 	}
 
+	public void circleGrid( double diameter , double centerDistance ) {
+		double diameterPoints = diameter*UNIT_TO_POINTS;
+		double separationPoints = centerDistance*UNIT_TO_POINTS;
+		patternWidth = (cols-1)*separationPoints+diameterPoints;
+		patternHeight = (rows-1)*separationPoints+diameterPoints;
+
+		printHeader("Grid Circle "+rows+"x"+cols+", diameter "+diameter+", separation "+centerDistance+" "+units.abbreviation);
+
+		out.println(
+				"  /w "+separationPoints+" def\n"+
+				"  /r "+(diameterPoints/2)+" def\n"+
+				"  /patternWidth "+(patternWidth)+" def\n" +
+				"  /patternHeight "+(patternHeight)+" def\n" +
+				"\n" +
+				"  % ----- Define procedure for drawing a circle\n" +
+				"  /circle  {r 0 360 arc closepath} def\n" +
+				"\n" +
+				"  % draw all the circles it can across a single row\n"+
+				"  /rowcircles {r w patternWidth {y circle fill} for} def\n" +
+				"\n" +
+				"  % increments the y variable and draws all the rows\n"+
+				"  r w patternHeight { /y exch def rowcircles } for\n");
+
+		printTrailer();
+	}
+
 	private void printHeader( String documentTitle ) {
 		double pageWidth = paper.convertWidth(units)*UNIT_TO_POINTS;
 		double pageHeight = paper.convertHeight(units)*UNIT_TO_POINTS;

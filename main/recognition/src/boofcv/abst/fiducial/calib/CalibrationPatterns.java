@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,5 +27,6 @@ public enum CalibrationPatterns {
 	CHESSBOARD,
 	SQUARE_GRID,
 	BINARY_GRID,
-	CIRCLE_ASYMMETRIC_GRID
+	CIRCLE_ASYMMETRIC_GRID,
+	CIRCLE_GRID
 }
