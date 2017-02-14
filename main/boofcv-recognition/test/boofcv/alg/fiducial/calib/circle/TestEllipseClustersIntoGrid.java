@@ -35,6 +35,7 @@ import static boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.findClose
 import static org.junit.Assert.*;
 
 /**
+/**
  * @author Peter Abeles
  */
 public class TestEllipseClustersIntoGrid {
@@ -46,7 +47,7 @@ public class TestEllipseClustersIntoGrid {
 		int cols = 3;
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows, cols);
 
-		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+		EllipseClustersIntoGrid alg = new EllipseClustersIntoGrid();
 		alg.computeNodeInfo(grid.data1,grid.data0);
 
 		List<List<NodeInfo>> gridLists = convertIntoGridOfLists(0, rows, cols, alg);
@@ -61,7 +62,7 @@ public class TestEllipseClustersIntoGrid {
 
 	public static List<List<NodeInfo>> convertIntoGridOfLists( int startIndex ,
 															   int rows, int cols,
-															   EllipseClustersIntoAsymmetricGrid alg) {
+															   EllipseClustersIntoGrid alg) {
 		List<List<NodeInfo>> gridLists = new ArrayList<>();
 		for (int row = 0; row < rows; row++) {
 			List<NodeInfo> l = new ArrayList<>();
@@ -91,11 +92,11 @@ public class TestEllipseClustersIntoGrid {
 		int rows = 5; int cols = 4;
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows,cols);
 
-		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+		EllipseClustersIntoGrid alg = new EllipseClustersIntoGrid();
 		alg.computeNodeInfo(grid.data1,grid.data0);
 
 
-		NodeInfo found = EllipseClustersIntoAsymmetricGrid.selectSeedNext(
+		NodeInfo found = EllipseClustersIntoGrid.selectSeedNext(
 				alg.listInfo.get(0),alg.listInfo.get(1),alg.listInfo.get(cols));
 
 		assertTrue( found == alg.listInfo.get(cols+1));
@@ -107,11 +108,11 @@ public class TestEllipseClustersIntoGrid {
 		int rows = 5; int cols = 4;
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows,cols);
 
-		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+		EllipseClustersIntoGrid alg = new EllipseClustersIntoGrid();
 		alg.computeNodeInfo(grid.data1,grid.data0);
 
 		List<NodeInfo> line;
-		line = EllipseClustersIntoAsymmetricGrid.findLine(alg.listInfo.get(0),alg.listInfo.get(1),5*4);
+		line = EllipseClustersIntoGrid.findLine(alg.listInfo.get(0),alg.listInfo.get(1),5*4);
 
 		assertEquals(4, line.size());
 		for (int i = 0; i < cols; i++) {
@@ -122,7 +123,7 @@ public class TestEllipseClustersIntoGrid {
 
 	@Test
 	public void selectSeedCorner() {
-		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+		EllipseClustersIntoGrid alg = new EllipseClustersIntoGrid();
 
 		NodeInfo best = new NodeInfo();
 		best.angleBetween = 3.0*Math.PI/2.0;
@@ -148,14 +149,14 @@ public class TestEllipseClustersIntoGrid {
 		int cols = 4;
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows,cols);
 
-		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+		EllipseClustersIntoGrid alg = new EllipseClustersIntoGrid();
 
 		// use internal algorithm to set up its data structure.  Correct of this function is
 		// directly tested elsewhere
 		alg.computeNodeInfo(grid.data1,grid.data0);
 
 		// now find the contour
-		assertTrue(alg.findContour());
+		assertTrue(alg.findContour(true));
 
 		assertEquals(cols*2+(rows-2)*2, alg.contour.size);
 	}
@@ -219,7 +220,7 @@ public class TestEllipseClustersIntoGrid {
 			ellipses.add( new EllipseRotated_F64());
 		}
 
-		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+		EllipseClustersIntoGrid alg = new EllipseClustersIntoGrid();
 
 		alg.computeNodeInfo(ellipses,nodes);
 
@@ -235,7 +236,7 @@ public class TestEllipseClustersIntoGrid {
 	 */
 	@Test
 	public void addEdgesToInfo_AND_findLargestAnglesForAllNodes() {
-		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+		EllipseClustersIntoGrid alg = new EllipseClustersIntoGrid();
 
 		setNodeInfo(alg.listInfo.grow(), 0 , 0);
 		setNodeInfo(alg.listInfo.grow(),-1 , 0);
@@ -346,8 +347,8 @@ public class TestEllipseClustersIntoGrid {
 
 		// should be ordered in increasing CCW direction
 		for (int i = 1, j = 0; i < numEdges; j=i,i++) {
-			EllipseClustersIntoAsymmetricGrid.Edge e0 = info.edges.get(j);
-			EllipseClustersIntoAsymmetricGrid.Edge e1 = info.edges.get(i);
+			EllipseClustersIntoGrid.Edge e0 = info.edges.get(j);
+			EllipseClustersIntoGrid.Edge e1 = info.edges.get(i);
 
 			assertTrue( e0.angle <= e1.angle);
 		}

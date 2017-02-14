@@ -8,5 +8,4 @@ dependencies {
     compile project(':main:boofcv-learning')
     compile project(':main:boofcv-recognition')
     compile project(':main:boofcv-sfm')
-    compile project(':integration:boofcv-swing')
 }

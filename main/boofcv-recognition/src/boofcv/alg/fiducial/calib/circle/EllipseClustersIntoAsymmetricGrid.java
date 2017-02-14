@@ -74,7 +74,7 @@ public class EllipseClustersIntoAsymmetricGrid extends EllipseClustersIntoGrid {
 			computeNodeInfo(ellipses, cluster);
 
 			// finds all the nodes in the outside of the cluster
-			if( !findContour() ) {
+			if( !findContour(true) ) {
 				if( verbose ) System.out.println("Contour find failed");
 				continue;
 			}

@@ -314,7 +314,7 @@ public class EllipseClustersIntoGrid {
 	 *
 	 * @return true if valid and false if invalid
 	 */
-	boolean findContour() {
+	boolean findContour( boolean mustHaveInner ) {
 		// find the node with the largest angleBetween
 		NodeInfo seed = listInfo.get(0);
 		for (int i = 1; i < listInfo.size(); i++) {
@@ -341,7 +341,7 @@ public class EllipseClustersIntoGrid {
 		}
 
 		// fail if it is too small or was cycling
-		return !(contour.size < 4 || contour.size >= listInfo.size());
+		return !(contour.size < 4 || (mustHaveInner && contour.size >= listInfo.size()));
 	}
 
 	/**

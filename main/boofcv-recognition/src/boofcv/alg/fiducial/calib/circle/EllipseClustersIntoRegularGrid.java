@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * <p>Given a cluster of ellipses (created with {@link EllipsesIntoClusters}) order the ellipses into an regular
- * grid.</p>
+ * grid.  Must be a proper grid too.  That means number of rows and columns both need to be 2 or more.</p>
  * 
  * <p>Unlike the {@link EllipseClustersIntoAsymmetricGrid asymmetric} grid the return grid object will be dense
  * with every element filled as expected.</p>
@@ -47,10 +47,12 @@ public class EllipseClustersIntoRegularGrid extends EllipseClustersIntoGrid {
 		for (int i = 0; i < clusters.size(); i++) {
 			List<EllipsesIntoClusters.Node> cluster = clusters.get(i);
 			int clusterSize = cluster.size();
+			if( clusterSize < 2 )
+				continue;
 			computeNodeInfo(ellipses, cluster);
 
 			// finds all the nodes in the outside of the cluster
-			if( !findContour() ) {
+			if( !findContour(false) ) {
 				if( verbose ) System.out.println("Contour find failed");
 				continue;
 			}
