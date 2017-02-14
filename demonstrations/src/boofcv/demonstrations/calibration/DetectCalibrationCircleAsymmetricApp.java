@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.demonstrations.calibration;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid;
 import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
 import boofcv.alg.fiducial.calib.circle.AsymmetricGridKeyPointDetections.Tangents;
-import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoAsymmetricGrid.Grid;
+import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
@@ -116,7 +116,7 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 		}
 	}
 
-	private void drawGraph(Graphics2D g2, Grid g, int row0 , int col0 ,  double scale) {
+	private void drawGraph(Graphics2D g2, Grid g, int row0 , int col0 , double scale) {
 		for (int row = row0; row < g.rows; row += 2) {
 			for (int col = col0; col < g.columns; col += 2) {
 				EllipseRotated_F64 a = g.get(row,col);

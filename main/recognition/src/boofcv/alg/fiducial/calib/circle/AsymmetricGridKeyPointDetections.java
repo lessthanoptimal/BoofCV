@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.calib.circle;
 
-import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoAsymmetricGrid.Grid;
+import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.geometry.UtilVector2D_F64;
 import georegression.geometry.algs.TangentLinesTwoEllipses_F64;
