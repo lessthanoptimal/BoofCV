@@ -1,9 +1,3 @@
 dependencies {
-    compile project(':main:core')
-}
-
-idea {
-    module {
-        name = "BoofCV Checks"
-    }
+    compile project(':main:boofcv-core')
 }

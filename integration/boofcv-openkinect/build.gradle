@@ -1,0 +1,32 @@
+dependencies {
+    compile project(':main:boofcv-ip')
+    compile project(':integration:boofcv-swing')
+    compile project(':main:boofcv-geo')
+    compile project(':main:boofcv-io')
+    compile project(':main:boofcv-sfm')
+
+    compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
+    compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+            srcDir 'libfreenect/wrappers/java/src/main/java'
+        }
+        resources {
+            srcDir 'resources/src'
+        }
+    }
+
+    test {
+        java {
+            srcDir 'test'
+            srcDir 'examples/src'
+        }
+        resources {
+            srcDir 'resources/test'
+        }
+    }
+}

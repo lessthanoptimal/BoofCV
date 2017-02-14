@@ -1,0 +1,16 @@
+dependencies {
+    compile project(':main:boofcv-ip')
+    compile project(':main:boofcv-io')
+    compile project(':main:boofcv-feature')
+    compile project(':main:boofcv-geo')
+    compile project(':main:boofcv-sfm')
+    compile project(':main:boofcv-recognition')
+}
+
+sourceSets {
+    test {
+        java {
+            srcDir 'examples/src'
+        }
+    }
+}

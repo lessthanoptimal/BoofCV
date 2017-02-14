@@ -168,35 +168,35 @@ subprojects {
 
 // list of projects for creating javadoc and jars
 def mainProjects = [
-        ':main:ip',
-        ':main:io',
-        ':main:feature',
-        ':main:geo',
-        ':main:calibration',
-        ':main:sfm',
-        ':main:recognition',
-        ':main:learning',
-        ':main:visualize-swing'
+        ':main:boofcv-ip',
+        ':main:boofcv-io',
+        ':main:boofcv-feature',
+        ':main:boofcv-geo',
+        ':main:boofcv-calibration',
+        ':main:boofcv-sfm',
+        ':main:boofcv-recognition',
+        ':main:boofcv-learning',
+        ':integration:boofcv-swing'
 ]
 
 def integrationProjects = [
-        ':integration:jcodec',
-        ':integration:WebcamCapture',
-        ':integration:javacv',
+        ':integration:boofcv-jcodec',
+        ':integration:boofcv-WebcamCapture',
+        ':integration:boofcv-javacv',
 ]
 
 try {
-    project(':integration:javafx')
-    integrationProjects.add(':integration:javafx')
+    project(':integration:boofcv-javafx')
+    integrationProjects.add(':integration:boofcv-javafx')
 } catch( UnknownProjectException ignore ) {}
 
 try {
-    project(':integration:android')
-    integrationProjects.add(':integration:android')
+    project(':integration:boofcv-android')
+    integrationProjects.add(':integration:boofcv-android')
 } catch( UnknownProjectException ignore ) {}
 try {
-    project(':integration:openkinect')
-    integrationProjects.add(':integration:openkinect')
+    project(':integration:boofcv-openkinect')
+    integrationProjects.add(':integration:boofcv-openkinect')
 } catch( UnknownProjectException ignore ) {}
 
 def javadocProjects = mainProjects + integrationProjects

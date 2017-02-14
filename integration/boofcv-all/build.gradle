@@ -1,0 +1,22 @@
+
+dependencies {
+    compile project(':main:boofcv-calibration')
+    compile project(':main:boofcv-feature')
+    compile project(':main:boofcv-geo')
+    compile project(':main:boofcv-io')
+    compile project(':main:boofcv-ip')
+    compile project(':main:boofcv-learning')
+    compile project(':main:boofcv-recognition')
+    compile project(':main:boofcv-sfm')
+    compile project(':integration:boofcv-swing')
+
+    try {
+        compile project(':integration:boofcv-android')
+    } catch( UnknownProjectException ignore){}
+    try {
+        compile project(':integration:boofcv-openkinect')
+    } catch( UnknownProjectException ignore){}
+    compile project(':integration:boofcv-jcodec')
+    compile project(':integration:boofcv-WebcamCapture')
+    compile project(':integration:boofcv-javacv')
+}

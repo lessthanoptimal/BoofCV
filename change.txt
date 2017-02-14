@@ -60,6 +60,8 @@ Version : 0.27
 - Calibration Targets
   * Added support for circle grid pattern in generator app
   * Added support for detection of circle grid patterns TODO
+- Gradle
+  * Change directory structure to avoid jar naming conflict on maven central.  Idiot that this is even possible...
 
 - TODO Visualization tools for Direct VO
 -      Show warped image

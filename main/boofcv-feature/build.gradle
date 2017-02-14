@@ -1,0 +1,5 @@
+dependencies {
+    compile project(':main:boofcv-ip')
+    testCompile project(':main:boofcv-io')
+    testCompile project(':integration:boofcv-swing')
+}
