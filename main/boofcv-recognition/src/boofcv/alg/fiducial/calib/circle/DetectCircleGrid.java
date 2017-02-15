@@ -31,30 +31,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <p>Detects asymmetric grids of circles.  The grid is composed of two regular grids which are offset by half a period.
- * See image below for an example.  Rows and columns are counted by counting every row even if they are offset
- * from each other.  The returned grid will be put into canonical orientation, see below.</p>
- *
- * <p>
- * For each circle there is one control point.  The control point is first found by detecting all the ellipses, which
- * is what a circle appears to be under perspective distortion.  The center the ellipse might not match the physical
- * center of the circle.  The intersection of lines does not change under perspective distortion.  The outer common
- * tangent lines between neighboring ellipses are found.  Then the intersection of two such lines is found.  This
- * intersection will be the physical center of the circle.
- * </p>
- *
- * <center>
- * <img src="doc-files/asymcirclegrid.jpg"/>
- * </center>
- * Example of a 8 by 5 grid; row, column.
- *
- * <p>Canonical orientation is defined as having the rows/columns matched, element (0,0) being occupied.
- * If there are multiple solution a solution will be selected which is in counter-clockwise order (image coordinates)
- * and if there is still ambiguity the ellipse closest to the image origin will be selected as (0,0).</p>
+ * TODO UPDATE
  *
  * @author Peter Abeles
  */
-public class DetectAsymmetricCircleGrid<T extends ImageGray<T>> {
+public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 
 	private BinaryEllipseDetector<T> ellipseDetector;
 	private InputToBinary<T> inputToBinary;
@@ -62,11 +43,11 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray<T>> {
 	private GrayU8 binary = new GrayU8(1,1);
 
 	// description of the calibration target
-	private int numRows, numCols;
+	protected int numRows, numCols;
 
 	// converts ellipses into clusters
 	private EllipsesIntoClusters clustering;
-	private EllipseClustersIntoAsymmetricGrid grider;
+	private EllipseClustersIntoGrid grider;
 
 	// List of all the found valid grids in the image
 	private List<Grid> validGrids = new ArrayList<>();
@@ -90,17 +71,18 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray<T>> {
 	 * @param ellipseDetector Detects ellipses inside the image
 	 * @param clustering Finds clusters of ellipses
 	 */
-	public DetectAsymmetricCircleGrid(int numRows, int numCols,
-									  InputToBinary<T> inputToBinary,
-									  BinaryEllipseDetector<T> ellipseDetector,
-									  EllipsesIntoClusters clustering) {
+	public DetectCircleGrid(int numRows, int numCols,
+							InputToBinary<T> inputToBinary,
+							BinaryEllipseDetector<T> ellipseDetector,
+							EllipsesIntoClusters clustering,
+							EllipseClustersIntoGrid grider ) {
 		this.ellipseDetector = ellipseDetector;
 		this.inputToBinary = inputToBinary;
 		this.numRows = numRows;
 		this.numCols = numCols;
 
 		this.clustering = clustering;
-		this.grider = new EllipseClustersIntoAsymmetricGrid();
+		this.grider = grider;
 	}
 
 	/**
@@ -156,50 +138,12 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray<T>> {
 	/**
 	 * Puts the grid into a canonical orientation
 	 */
-	void putGridIntoCanonical(Grid g ) {
-		// first put it into a plausible solution
-		if( g.columns != numCols ) {
-			rotateGridCCW(g);
-		}
-
-		if( g.get(0,0) == null ) {
-			reverse(g);
-		}
-
-		// select the best corner for canonical
-		if( g.columns%2 == 1 && g.rows%2 == 1) {
-			// first make sure orientation constraint is maintained
-			if( isClockWise(g)) {
-				flipHorizontal(g);
-			}
-
-			int numRotationsCCW = closestCorner4(g);
-			if( g.columns == g.rows ) {
-				for (int i = 0; i < numRotationsCCW; i++) {
-					rotateGridCCW(g);
-				}
-			} else if( numRotationsCCW == 2 ){
-				// only two valid solutions.  rotate only if the other valid solution is better
-				rotateGridCCW(g);
-				rotateGridCCW(g);
-			}
-		} else if( g.columns%2 == 1 ) {
-			// only two solutions.  Go with the one which maintains orientation constraint
-			if( isClockWise(g)) {
-				flipHorizontal(g);
-			}
-		} else if( g.rows%2 == 1 ) {
-			// only two solutions.  Go with the one which maintains orientation constraint
-			if( isClockWise(g)) {
-				flipVertical(g);
-			}
-		}
-	}
+	protected abstract void putGridIntoCanonical(Grid g );
 
 	/**
 	 * Uses the cross product to determine if the grid is in clockwise order
 	 */
-	private static boolean isClockWise( Grid g ) {
+	static boolean isClockWise( Grid g ) {
 		EllipseRotated_F64 v00 = g.get(0,0);
 		EllipseRotated_F64 v02 = g.columns<3?g.get(1,1):g.get(0,2);
 		EllipseRotated_F64 v20 = g.rows<3?g.get(1,1):g.get(2,0);
@@ -333,7 +277,7 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray<T>> {
 		return ellipseDetector;
 	}
 
-	public EllipseClustersIntoAsymmetricGrid getGrider() {
+	public EllipseClustersIntoGrid getGrider() {
 		return grider;
 	}
 

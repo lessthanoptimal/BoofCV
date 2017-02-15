@@ -35,11 +35,9 @@ import java.util.List;
 public class EllipseClustersIntoRegularGrid extends EllipseClustersIntoGrid {
 
 	/**
-	 * Computes grids from the clusters.  Call {@link #getGrids()} to retrieve the results.
-	 *
-	 * @param ellipses (input) List of all the ellipses
-	 * @param clusters (Input) Description of all the clusters
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void process(List<EllipseRotated_F64> ellipses , List<List<EllipsesIntoClusters.Node>> clusters ) {
 
 		foundGrids.reset();

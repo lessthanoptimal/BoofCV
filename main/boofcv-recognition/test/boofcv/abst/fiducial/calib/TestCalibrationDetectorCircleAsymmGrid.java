@@ -19,7 +19,7 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
-import boofcv.alg.fiducial.calib.circle.TestDetectAsymmetricCircleGrid;
+import boofcv.alg.fiducial.calib.circle.TestDetectCircleAsymmetricGrid;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
@@ -54,7 +54,7 @@ public class TestCalibrationDetectorCircleAsymmGrid extends GenericPlanarCalibra
 		int radiusPixels = 20;
 
 		GrayU8 imageU8 = new GrayU8(original.width,original.height);
-		TestDetectAsymmetricCircleGrid.render(config.numRows,config.numCols,radiusPixels,
+		TestDetectCircleAsymmetricGrid.render(config.numRows,config.numCols,radiusPixels,
 				(int)(radiusToDistance*radiusPixels),
 				affine,pixels,imageU8);
 		ConvertImage.convert(imageU8,original);

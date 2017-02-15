@@ -29,17 +29,17 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static boofcv.alg.fiducial.calib.circle.DetectAsymmetricCircleGrid.totalEllipses;
+import static boofcv.alg.fiducial.calib.circle.DetectCircleAsymmetricGrid.totalEllipses;
 
 /**
  * <p>Base class for ordering clusters of ellipses into grids</p>
  *
  * <p>See {@link Grid} for a description of how the output grids are described.  It uses a sparse format.</p>
- * <p>See {@link DetectAsymmetricCircleGrid} for an example of an asymmetric grid</p>
+ * <p>See {@link DetectCircleAsymmetricGrid} for an example of an asymmetric grid</p>
  *
  * @author Peter Abeles
  */
-public class EllipseClustersIntoGrid {
+public abstract class EllipseClustersIntoGrid {
 
 	protected FastQueue<Grid> foundGrids = new FastQueue<>(Grid.class,true);
 
@@ -71,6 +71,14 @@ public class EllipseClustersIntoGrid {
 			}
 		});
 	}
+
+	/**
+	 * Computes grids from the clusters.  Call {@link #getGrids()} to retrieve the results.
+	 *
+	 * @param ellipses (input) List of all the ellipses
+	 * @param clusters (Input) Description of all the clusters
+	 */
+	public abstract void process(List<EllipseRotated_F64> ellipses , List<List<Node>> clusters );
 
 	/**
 	 * Finds all the nodes which form an approximate line

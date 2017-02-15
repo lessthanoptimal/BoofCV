@@ -47,7 +47,7 @@ import java.util.List;
  * </pre>
  *
  * <p>See {@link Grid} for a description of how the output grids are described.  It uses a sparse format.</p>
- * <p>See {@link DetectAsymmetricCircleGrid} for an example of an asymmetric grid</p>
+ * <p>See {@link DetectCircleAsymmetricGrid} for an example of an asymmetric grid</p>
  *
  * @author Peter Abeles
  */
@@ -59,11 +59,9 @@ public class EllipseClustersIntoAsymmetricGrid extends EllipseClustersIntoGrid {
 	private Point2D_F64 intersection = new Point2D_F64();
 
 	/**
-	 * Computes grids from the clusters.  Call {@link #getGrids()} to retrieve the results.
-	 *
-	 * @param ellipses (input) List of all the ellipses
-	 * @param clusters (Input) Description of all the clusters
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void process(List<EllipseRotated_F64> ellipses , List<List<Node>> clusters ) {
 
 		foundGrids.reset();

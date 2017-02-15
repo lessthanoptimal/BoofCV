@@ -29,7 +29,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.struct.FastQueue;
 
-import static boofcv.alg.fiducial.calib.circle.DetectAsymmetricCircleGrid.totalEllipses;
+import static boofcv.alg.fiducial.calib.circle.DetectCircleAsymmetricGrid.totalEllipses;
 
 /**
  * <p>Computes key points from an observed asymmetric circular grid.  Each key point is defined as the center's true

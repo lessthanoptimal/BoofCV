@@ -21,7 +21,7 @@ package boofcv.abst.fiducial.calib;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.fiducial.calib.circle.AsymmetricGridKeyPointDetections;
-import boofcv.alg.fiducial.calib.circle.DetectAsymmetricCircleGrid;
+import boofcv.alg.fiducial.calib.circle.DetectCircleAsymmetricGrid;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * Calibration implementation of circle asymmetric grid fiducial.
  *
- * @see DetectAsymmetricCircleGrid
+ * @see DetectCircleAsymmetricGrid
  * @see AsymmetricGridKeyPointDetections
  *
  * @author Peter Abeles
@@ -46,7 +46,7 @@ import java.util.List;
 public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalibration {
 
 	// Detectors the grids
-	private DetectAsymmetricCircleGrid<GrayF32> detector;
+	private DetectCircleAsymmetricGrid<GrayF32> detector;
 	// extracts key points from detected grid
 	private AsymmetricGridKeyPointDetections keypoint = new AsymmetricGridKeyPointDetections();
 
@@ -73,7 +73,7 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 
 		EllipsesIntoClusters e2c = new EllipsesIntoClusters(spaceToRadius*1.25,config.ellipseSizeSimilarity);
 
-		detector = new DetectAsymmetricCircleGrid<>(config.numRows,config.numCols,inputToBinary,
+		detector = new DetectCircleAsymmetricGrid<>(config.numRows,config.numCols,inputToBinary,
 				ellipseDetector,e2c);
 
 
@@ -144,7 +144,7 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 		return ret;
 	}
 
-	public DetectAsymmetricCircleGrid<GrayF32> getDetector() {
+	public DetectCircleAsymmetricGrid<GrayF32> getDetector() {
 		return detector;
 	}
 

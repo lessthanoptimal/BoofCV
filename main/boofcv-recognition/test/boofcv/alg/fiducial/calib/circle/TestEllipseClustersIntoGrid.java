@@ -47,7 +47,7 @@ public class TestEllipseClustersIntoGrid {
 		int cols = 3;
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows, cols);
 
-		EllipseClustersIntoGrid alg = new EllipseClustersIntoGrid();
+		EllipseClustersIntoGrid alg = new HelperAlg();
 		alg.computeNodeInfo(grid.data1,grid.data0);
 
 		List<List<NodeInfo>> gridLists = convertIntoGridOfLists(0, rows, cols, alg);
@@ -92,7 +92,7 @@ public class TestEllipseClustersIntoGrid {
 		int rows = 5; int cols = 4;
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows,cols);
 
-		EllipseClustersIntoGrid alg = new EllipseClustersIntoGrid();
+		EllipseClustersIntoGrid alg = new HelperAlg();
 		alg.computeNodeInfo(grid.data1,grid.data0);
 
 
@@ -108,7 +108,7 @@ public class TestEllipseClustersIntoGrid {
 		int rows = 5; int cols = 4;
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows,cols);
 
-		EllipseClustersIntoGrid alg = new EllipseClustersIntoGrid();
+		EllipseClustersIntoGrid alg = new HelperAlg();
 		alg.computeNodeInfo(grid.data1,grid.data0);
 
 		List<NodeInfo> line;
@@ -123,7 +123,7 @@ public class TestEllipseClustersIntoGrid {
 
 	@Test
 	public void selectSeedCorner() {
-		EllipseClustersIntoGrid alg = new EllipseClustersIntoGrid();
+		EllipseClustersIntoGrid alg = new HelperAlg();
 
 		NodeInfo best = new NodeInfo();
 		best.angleBetween = 3.0*Math.PI/2.0;
@@ -149,7 +149,7 @@ public class TestEllipseClustersIntoGrid {
 		int cols = 4;
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows,cols);
 
-		EllipseClustersIntoGrid alg = new EllipseClustersIntoGrid();
+		EllipseClustersIntoGrid alg = new HelperAlg();
 
 		// use internal algorithm to set up its data structure.  Correct of this function is
 		// directly tested elsewhere
@@ -220,7 +220,7 @@ public class TestEllipseClustersIntoGrid {
 			ellipses.add( new EllipseRotated_F64());
 		}
 
-		EllipseClustersIntoGrid alg = new EllipseClustersIntoGrid();
+		EllipseClustersIntoGrid alg = new HelperAlg();
 
 		alg.computeNodeInfo(ellipses,nodes);
 
@@ -236,7 +236,7 @@ public class TestEllipseClustersIntoGrid {
 	 */
 	@Test
 	public void addEdgesToInfo_AND_findLargestAnglesForAllNodes() {
-		EllipseClustersIntoGrid alg = new EllipseClustersIntoGrid();
+		EllipseClustersIntoGrid alg = new HelperAlg();
 
 		setNodeInfo(alg.listInfo.grow(), 0 , 0);
 		setNodeInfo(alg.listInfo.grow(),-1 , 0);
@@ -366,5 +366,13 @@ public class TestEllipseClustersIntoGrid {
 		n.which = which;
 		n.connections.addAll(connections,0,connections.length);
 		return n;
+	}
+
+	private static class HelperAlg extends EllipseClustersIntoGrid {
+
+		@Override
+		public void process(List<EllipseRotated_F64> ellipses, List<List<Node>> clusters) {
+
+		}
 	}
 }

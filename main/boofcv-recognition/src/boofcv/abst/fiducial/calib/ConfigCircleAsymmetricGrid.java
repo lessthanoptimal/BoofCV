@@ -18,6 +18,7 @@
 
 package boofcv.abst.fiducial.calib;
 
+import boofcv.alg.fiducial.calib.circle.DetectCircleAsymmetricGrid;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.ConfigEllipseDetector;
@@ -26,7 +27,7 @@ import boofcv.struct.Configuration;
 /**
  * Calibration parameters for square-grid style calibration grid.
  *
- * @see boofcv.alg.fiducial.calib.circle.DetectAsymmetricCircleGrid
+ * @see DetectCircleAsymmetricGrid
  *
  * @author Peter Abeles
  */

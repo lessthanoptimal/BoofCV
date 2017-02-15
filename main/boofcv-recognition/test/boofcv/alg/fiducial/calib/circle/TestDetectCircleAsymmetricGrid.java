@@ -30,7 +30,6 @@ import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.shapes.EllipseRotated_F64;
-import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
 import java.awt.*;
@@ -44,7 +43,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDetectAsymmetricCircleGrid {
+public class TestDetectCircleAsymmetricGrid {
 	@Test
 	public void process_easy() {
 
@@ -77,7 +76,7 @@ public class TestDetectAsymmetricCircleGrid {
 		int radius = 20;
 		int centerDistances = 80;
 
-		DetectAsymmetricCircleGrid<GrayU8> alg = createAlg(expectedRows,expectedCols,radius,centerDistances);
+		DetectCircleAsymmetricGrid<GrayU8> alg = createAlg(expectedRows,expectedCols,radius,centerDistances);
 //		alg.setVerbose(true);
 
 		List<Point2D_F64> locations = new ArrayList<>();
@@ -121,52 +120,15 @@ public class TestDetectAsymmetricCircleGrid {
 		}
 	}
 
-	private DetectAsymmetricCircleGrid<GrayU8> createAlg( int numRows , int numCols ,
-														  double radius , double centerDistance ) {
+	private DetectCircleAsymmetricGrid<GrayU8> createAlg(int numRows , int numCols ,
+														 double radius , double centerDistance ) {
 
 		double spaceRatio = 1.2*centerDistance/radius;
 
 		InputToBinary<GrayU8> threshold = FactoryThresholdBinary.globalFixed(100,true,GrayU8.class);
 		BinaryEllipseDetector<GrayU8> detector = FactoryShapeDetector.ellipse(null, GrayU8.class);
 		EllipsesIntoClusters cluster = new EllipsesIntoClusters(spaceRatio,0.8);
-		return new DetectAsymmetricCircleGrid<>( numRows, numCols,threshold, detector,  cluster);
-	}
-
-	@Test
-	public void pruneIncorrectSize() {
-		List<List<EllipsesIntoClusters.Node>> clusters = new ArrayList<>();
-		clusters.add( createListNodes(4));
-		clusters.add( createListNodes(10));
-		clusters.add( createListNodes(11));
-
-
-		DetectAsymmetricCircleGrid.pruneIncorrectSize(clusters, 10);
-
-		assertEquals(1,clusters.size());
-		assertEquals(10,clusters.get(0).size());
-	}
-
-	private static List<EllipsesIntoClusters.Node> createListNodes( int N ) {
-		List<EllipsesIntoClusters.Node> list = new ArrayList<>();
-
-		for (int i = 0; i < N; i++) {
-			list.add( new EllipsesIntoClusters.Node() );
-		}
-
-		return list;
-	}
-
-	@Test
-	public void pruneIncorrectShape() {
-		FastQueue<Grid> grids = new FastQueue<>(Grid.class,true);
-		grids.grow().setShape(4,5);
-		grids.grow().setShape(5,4);
-		grids.grow().setShape(4,3);
-		grids.grow().setShape(5,5);
-
-		DetectAsymmetricCircleGrid.pruneIncorrectShape(grids, 4, 5);
-
-		assertEquals( 2 , grids.size );
+		return new DetectCircleAsymmetricGrid<>( numRows, numCols,threshold, detector,  cluster);
 	}
 
 	/**
@@ -178,7 +140,7 @@ public class TestDetectAsymmetricCircleGrid {
 		putGridIntoCanonical_vertical(5,6);
 	}
 	private void putGridIntoCanonical_vertical( int numRows , int numCols ) {
-		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid(numRows,numCols,null,null,null);
+		DetectCircleAsymmetricGrid<?> alg = new DetectCircleAsymmetricGrid(numRows,numCols,null,null,null);
 
 		Grid g = createGrid(numRows,numCols);
 		List<EllipseRotated_F64> original = new ArrayList<>();
@@ -207,7 +169,7 @@ public class TestDetectAsymmetricCircleGrid {
 
 	}
 	private void putGridIntoCanonical_horizontal( int numRows , int numCols) {
-		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid(numRows,numCols,null,null,null);
+		DetectCircleAsymmetricGrid<?> alg = new DetectCircleAsymmetricGrid(numRows,numCols,null,null,null);
 
 		Grid g = createGrid(numRows,numCols);
 		List<EllipseRotated_F64> original = new ArrayList<>();
@@ -236,7 +198,7 @@ public class TestDetectAsymmetricCircleGrid {
 		putGridIntoCanonical_rotate(5,3);
 	}
 	public void putGridIntoCanonical_rotate(int numRows , int numCols ) {
-		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid(numRows,numCols,null,null,null);
+		DetectCircleAsymmetricGrid<?> alg = new DetectCircleAsymmetricGrid(numRows,numCols,null,null,null);
 
 		Grid g = createGrid(numRows,numCols);
 		List<EllipseRotated_F64> original = new ArrayList<>();
@@ -288,47 +250,7 @@ public class TestDetectAsymmetricCircleGrid {
 		assertTrue(v.z>0);
 	}
 
-	@Test
-	public void closestCorner4() {
-		Grid g = new Grid();
-
-		g.rows = 3;
-		g.columns = 3;
-
-		g.ellipses.add(new EllipseRotated_F64(20,20, 0,0,0));
-		g.ellipses.add(null);
-		g.ellipses.add(new EllipseRotated_F64(20,100, 0,0,0));
-
-		g.ellipses.add(null);
-		g.ellipses.add(new EllipseRotated_F64());
-		g.ellipses.add(null);
-
-		g.ellipses.add(new EllipseRotated_F64(100,20, 0,0,0));
-		g.ellipses.add(null);
-		g.ellipses.add(new EllipseRotated_F64(100,100, 0,0,0));
-
-		assertEquals(0, DetectAsymmetricCircleGrid.closestCorner4(g));
-
-		g.ellipses.get(0).center.set(20,100);
-		g.ellipses.get(2).center.set(100,20);
-		g.ellipses.get(6).center.set(100,100);
-		g.ellipses.get(8).center.set(20,20);
-		assertEquals(2, DetectAsymmetricCircleGrid.closestCorner4(g));
-
-		g.ellipses.get(0).center.set(100,20);
-		g.ellipses.get(2).center.set(100,100);
-		g.ellipses.get(6).center.set(20,20);
-		g.ellipses.get(8).center.set(20,100);
-		assertEquals(1, DetectAsymmetricCircleGrid.closestCorner4(g));
-
-		g.ellipses.get(0).center.set(100,100);
-		g.ellipses.get(2).center.set(20,20);
-		g.ellipses.get(6).center.set(20,100);
-		g.ellipses.get(8).center.set(100,20);
-		assertEquals(3, DetectAsymmetricCircleGrid.closestCorner4(g));
-	}
-
-	private Grid createGrid(int numRows, int numCols) {
+	static Grid createGrid(int numRows, int numCols) {
 		Grid g = new Grid();
 
 		g.rows = numRows;
@@ -351,23 +273,6 @@ public class TestDetectAsymmetricCircleGrid {
 		}
 
 		return g;
-	}
-
-	@Test
-	public void rotateGridCCW() {
-		Grid g = createGrid(3,3);
-		List<EllipseRotated_F64> original = new ArrayList<>();
-		original.addAll(g.ellipses);
-
-		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid(3,3,null,null,null);
-
-		alg.rotateGridCCW(g);
-		assertEquals(9,g.ellipses.size());
-		assertTrue( original.get(6) == g.get(0,0));
-		assertTrue( original.get(0) == g.get(0,2));
-		assertTrue( original.get(2) == g.get(2,2));
-		assertTrue( original.get(8) == g.get(2,0));
-
 	}
 
 	private Grid flipHorizontal( Grid g ) {
