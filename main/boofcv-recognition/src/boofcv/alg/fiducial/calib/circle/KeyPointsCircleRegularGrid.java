@@ -29,7 +29,8 @@ import org.ddogleg.struct.FastQueue;
  * <p>Computes key points from an observed regular circular grid.  Each circle has 4 key points at the grid aligned
  * top, bottom, left, and right side of the circle.  These key points are found using tangent points between
  * adjacent circles.  Tangent points are the same under perspective
- * distortion and the same can be said for the intersection of their lines.</p>
+ * distortion and the same can be said for the intersection of their lines.  When more than one intersection
+ * is at the same location the average is found</p>
  *
  * <center>
  * <img src="doc-files/regcircle_tangent_intersections.png"/>
@@ -91,7 +92,7 @@ public class KeyPointsCircleRegularGrid {
 		for (int i = 0; i < grid.rows; i++) {
 			for (int j = 0; j < grid.columns-1; j++) {
 
-				if (!addTangents(grid, i, j, i, j+2))
+				if (!addTangents(grid, i, j, i, j+1))
 					return false;
 			}
 		}
@@ -120,20 +121,20 @@ public class KeyPointsCircleRegularGrid {
 		if( !tangentFinder.process(a,b, A0, A1, A2, A3, B0, B1, B2, B3) ) {
 			return false;
 		}
-		Tangents ta = tangents.get(grid.getIndexOfAsymEllipse(rowA,colA));
-		Tangents tb = tangents.get(grid.getIndexOfAsymEllipse(rowB,colB));
+		Tangents ta = tangents.get(grid.getIndexOfRegEllipse(rowA,colA));
+		Tangents tb = tangents.get(grid.getIndexOfRegEllipse(rowB,colB));
 
 		// add tangent points from the two lines which do not cross the center line
 		if( rowA == rowB ) {
-			ta.l[ta.countL++].set(A0);
-			ta.r[ta.countR++].set(B0);
-			tb.l[tb.countL++].set(A3);
-			tb.r[tb.countR++].set(B3);
-		} else {
 			ta.t[ta.countT++].set(A0);
-			ta.b[ta.countB++].set(B0);
-			tb.t[tb.countT++].set(A3);
+			ta.b[ta.countB++].set(A3);
+			tb.t[tb.countT++].set(B0);
 			tb.b[tb.countB++].set(B3);
+		} else {
+			ta.r[ta.countL++].set(A0);
+			ta.l[ta.countR++].set(A3);
+			tb.r[tb.countL++].set(B0);
+			tb.l[tb.countR++].set(B3);
 		}
 		return true;
 	}
@@ -176,9 +177,7 @@ public class KeyPointsCircleRegularGrid {
 			countT = countB = countL = countR = 0;
 		}
 
-		public void getTop( Point2D_F64 top ) {
-			assign(t,countT,top);
-		}
+		public void getTop( Point2D_F64 top ) {assign(t,countT,top);}
 
 		public void getBottom( Point2D_F64 p ) {
 			assign(b,countB,p);

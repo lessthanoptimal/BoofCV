@@ -464,6 +464,10 @@ public abstract class EllipseClustersIntoGrid {
 			index += (row/2)*this.columns + (row%2)*(this.columns/2+this.columns%2);
 			return index + col/2;
 		}
+
+		public int getIndexOfRegEllipse(int row, int col) {
+			return row*this.columns+col;
+		}
 	}
 
 }
