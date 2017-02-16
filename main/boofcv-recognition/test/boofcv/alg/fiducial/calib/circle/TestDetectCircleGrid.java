@@ -35,6 +35,36 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestDetectCircleGrid {
 
+	static Grid flipHorizontal( Grid g ) {
+		Grid out = new Grid();
+
+		for (int i = 0; i < g.rows; i++) {
+			for (int j = 0; j < g.columns; j++) {
+				out.ellipses.add( g.get(i,g.columns-j-1) );
+			}
+		}
+
+		out.columns = g.columns;
+		out.rows = g.rows;
+
+		return out;
+	}
+
+	static  Grid flipVertical(Grid g ) {
+		Grid out = new Grid();
+
+		for (int i = 0; i < g.rows; i++) {
+			for (int j = 0; j < g.columns; j++) {
+				out.ellipses.add( g.get(g.rows-i-1,j) );
+			}
+		}
+
+		out.columns = g.columns;
+		out.rows = g.rows;
+
+		return out;
+	}
+
 	@Test
 	public void closestCorner4() {
 		Grid g = new Grid();
@@ -131,6 +161,11 @@ public class TestDetectCircleGrid {
 	private static class HelperAlg extends DetectCircleGrid {
 		public HelperAlg(int numRows, int numCols) {
 			super(numRows, numCols, null, null, null, null);
+		}
+
+		@Override
+		protected int totalEllipses(int numRows, int numCols) {
+			return 0;
 		}
 
 		@Override

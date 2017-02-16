@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO UPDATE
+ * Base class for grid based circle fiducials.
  *
  * @author Peter Abeles
  */
@@ -108,7 +108,7 @@ public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 
 		if( verbose) System.out.println("  Found "+clusters.size()+" clusters");
 		pruneIncorrectSize(clustersPruned, totalEllipses(numRows,numCols) );
-		if( verbose) System.out.println("  Remaining clusters after pruning "+clustersPruned.size());
+		if( verbose) System.out.println("  Remaining clusters after pruning by size "+clustersPruned.size());
 
 		grider.process(found, clustersPruned);
 
@@ -116,7 +116,7 @@ public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 
 		if( verbose) System.out.println("  Found "+grids.size()+" grids");
 		pruneIncorrectShape(grids,numRows,numCols);
-		if( verbose) System.out.println("  Remaining grids after pruning "+grids.size());
+		if( verbose) System.out.println("  Remaining grids after pruning by shape "+grids.size());
 
 		validGrids.clear();
 		for (int i = 0; i < grids.size(); i++) {
@@ -131,31 +131,12 @@ public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 	/**
 	 * Computes the number of ellipses on the grid
 	 */
-	public static int totalEllipses( int numRows , int numCols ) {
-		return (numRows/2)*(numCols/2) + ((numRows+1)/2)*((numCols+1)/2);
-	}
+	protected abstract int totalEllipses( int numRows , int numCols );
 
 	/**
 	 * Puts the grid into a canonical orientation
 	 */
 	protected abstract void putGridIntoCanonical(Grid g );
-
-	/**
-	 * Uses the cross product to determine if the grid is in clockwise order
-	 */
-	static boolean isClockWise( Grid g ) {
-		EllipseRotated_F64 v00 = g.get(0,0);
-		EllipseRotated_F64 v02 = g.columns<3?g.get(1,1):g.get(0,2);
-		EllipseRotated_F64 v20 = g.rows<3?g.get(1,1):g.get(2,0);
-
-		double a_x = v02.center.x - v00.center.x;
-		double a_y = v02.center.y - v00.center.y;
-
-		double b_x = v20.center.x - v00.center.x;
-		double b_y = v20.center.y - v00.center.y;
-
-		return a_x * b_y - a_y * b_x < 0;
-	}
 
 	/**
 	 * Number of CCW rotations to put selected corner into the canonical location.  Only works

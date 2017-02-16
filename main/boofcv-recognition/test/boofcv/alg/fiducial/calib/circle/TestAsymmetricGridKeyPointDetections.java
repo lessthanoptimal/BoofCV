@@ -82,7 +82,7 @@ public class TestAsymmetricGridKeyPointDetections {
 
 		for (int row = 0; row < grid.rows; row++) {
 			for (int col = 0; col < grid.columns; col++) {
-				int index = grid.getIndexOfEllipse(row,col);
+				int index = grid.getIndexOfAsymEllipse(row,col);
 
 				if( row%2==0 && col%2==0) {
 					if( col == 0 || col == grid.columns-1-(1-grid.columns%2))
@@ -117,7 +117,7 @@ public class TestAsymmetricGridKeyPointDetections {
 
 		for (int row = 0; row < grid.rows; row++) {
 			for (int col = 0; col < grid.columns; col++) {
-				int index = grid.getIndexOfEllipse(row,col);
+				int index = grid.getIndexOfAsymEllipse(row,col);
 
 				if( row%2==0 && col%2==0) {
 					if( row == 0 || row == grid.rows-1-(1-grid.rows%2))
@@ -157,7 +157,7 @@ public class TestAsymmetricGridKeyPointDetections {
 				if( row%2 == 1 && col%2 == 0)
 					continue;
 
-				int index = grid.getIndexOfEllipse(row,col);
+				int index = grid.getIndexOfAsymEllipse(row,col);
 
 				int expectedNumber = 0;
 
@@ -194,7 +194,7 @@ public class TestAsymmetricGridKeyPointDetections {
 				if( row%2 == 1 && col%2 == 0)
 					continue;
 
-				int index = grid.getIndexOfEllipse(row,col);
+				int index = grid.getIndexOfAsymEllipse(row,col);
 
 				int expectedNumber = 0;
 

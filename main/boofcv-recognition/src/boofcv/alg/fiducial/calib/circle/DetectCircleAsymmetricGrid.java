@@ -22,6 +22,7 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.shapes.EllipseRotated_F64;
 
 /**
  * <p>Detects asymmetric grids of circles.  The grid is composed of two regular grids which are offset by half a period.
@@ -66,6 +67,11 @@ public class DetectCircleAsymmetricGrid<T extends ImageGray<T>> extends DetectCi
 				new EllipseClustersIntoAsymmetricGrid());
 	}
 
+	@Override
+	public int totalEllipses( int numRows , int numCols ) {
+		return (numRows/2)*(numCols/2) + ((numRows+1)/2)*((numCols+1)/2);
+	}
+
 	/**
 	 * Puts the grid into a canonical orientation
 	 */
@@ -108,5 +114,22 @@ public class DetectCircleAsymmetricGrid<T extends ImageGray<T>> extends DetectCi
 				flipVertical(g);
 			}
 		}
+	}
+
+	/**
+	 * Uses the cross product to determine if the grid is in clockwise order
+	 */
+	private static boolean isClockWise( Grid g ) {
+		EllipseRotated_F64 v00 = g.get(0,0);
+		EllipseRotated_F64 v02 = g.columns<3?g.get(1,1):g.get(0,2);
+		EllipseRotated_F64 v20 = g.rows<3?g.get(1,1):g.get(2,0);
+
+		double a_x = v02.center.x - v00.center.x;
+		double a_y = v02.center.y - v00.center.y;
+
+		double b_x = v20.center.x - v00.center.x;
+		double b_y = v20.center.y - v00.center.y;
+
+		return a_x * b_y - a_y * b_x < 0;
 	}
 }

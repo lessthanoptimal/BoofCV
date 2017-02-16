@@ -96,7 +96,7 @@ public class TestDetectCircleAsymmetricGrid {
 		Grid g = found.get(0);
 		assertEquals(actualRows , g.rows );
 		assertEquals(actualCols , g.columns );
-		checkCounterClockWise(g);
+		TestDetectCircleAsymmetricGrid.checkCounterClockWise(g);
 
 		int index = 0;
 		for (int row = 0; row < g.rows; row++) {
@@ -152,7 +152,7 @@ public class TestDetectCircleAsymmetricGrid {
 		assertTrue(original.get(0) == g.get(0,0));
 		checkCounterClockWise(g);
 
-		alg.putGridIntoCanonical(flipVertical(g));
+		alg.putGridIntoCanonical(TestDetectCircleGrid.flipVertical(g));
 		assertEquals(numRows,g.rows);
 		assertEquals(numCols,g.columns);
 		assertTrue(original.get(0) == g.get(0,0));
@@ -181,7 +181,7 @@ public class TestDetectCircleAsymmetricGrid {
 		assertTrue(original.get(0) == g.get(0,0));
 		checkCounterClockWise(g);
 
-		g = flipHorizontal(g);
+		g = TestDetectCircleGrid.flipHorizontal(g);
 		alg.putGridIntoCanonical(g);
 		assertEquals(numRows,g.rows);
 		assertEquals(numCols,g.columns);
@@ -234,22 +234,6 @@ public class TestDetectCircleAsymmetricGrid {
 		checkCounterClockWise(g);
 	}
 
-	private void checkCounterClockWise(Grid g ) {
-		EllipseRotated_F64 a = g.get(0,0);
-		EllipseRotated_F64 b = g.columns>=3 ? g.get(0,2) : g.get(1,1);
-		EllipseRotated_F64 c = g.rows>=3 ? g.get(2,0) : g.get(1,1);
-
-		double dx0 = b.center.x - a.center.x;
-		double dy0 = b.center.y - a.center.y;
-
-		double dx1 = c.center.x - a.center.x;
-		double dy1 = c.center.y - a.center.y;
-
-		Vector3D_F64 v = new Vector3D_F64();
-		GeometryMath_F64.cross(dx0,dy0,0, dx1,dy1,0, v);
-		assertTrue(v.z>0);
-	}
-
 	static Grid createGrid(int numRows, int numCols) {
 		Grid g = new Grid();
 
@@ -273,36 +257,6 @@ public class TestDetectCircleAsymmetricGrid {
 		}
 
 		return g;
-	}
-
-	private Grid flipHorizontal( Grid g ) {
-		Grid out = new Grid();
-
-		for (int i = 0; i < g.rows; i++) {
-			for (int j = 0; j < g.columns; j++) {
-				out.ellipses.add( g.get(i,g.columns-j-1) );
-			}
-		}
-
-		out.columns = g.columns;
-		out.rows = g.rows;
-
-		return out;
-	}
-
-	private Grid flipVertical(Grid g ) {
-		Grid out = new Grid();
-
-		for (int i = 0; i < g.rows; i++) {
-			for (int j = 0; j < g.columns; j++) {
-				out.ellipses.add( g.get(g.rows-i-1,j) );
-			}
-		}
-
-		out.columns = g.columns;
-		out.rows = g.rows;
-
-		return out;
 	}
 
 	public static void render(int rows , int cols , double radius , double centerDistance, Affine2D_F64 affine,
@@ -339,5 +293,21 @@ public class TestDetectCircleAsymmetricGrid {
 
 //		ShowImages.showWindow(buffered,"Rendered",true);
 //		try { Thread.sleep(10000); } catch (InterruptedException ignore) {}
+	}
+
+	static void checkCounterClockWise(Grid g ) {
+		EllipseRotated_F64 a = g.get(0,0);
+		EllipseRotated_F64 b = g.columns>=3 ? g.get(0,2) : g.get(1,1);
+		EllipseRotated_F64 c = g.rows>=3 ? g.get(2,0) : g.get(1,1);
+
+		double dx0 = b.center.x - a.center.x;
+		double dy0 = b.center.y - a.center.y;
+
+		double dx1 = c.center.x - a.center.x;
+		double dy1 = c.center.y - a.center.y;
+
+		Vector3D_F64 v = new Vector3D_F64();
+		GeometryMath_F64.cross(dx0,dy0,0, dx1,dy1,0, v);
+		assertTrue(v.z>0);
 	}
 }

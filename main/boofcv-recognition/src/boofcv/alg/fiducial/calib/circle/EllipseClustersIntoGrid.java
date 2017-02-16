@@ -29,8 +29,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static boofcv.alg.fiducial.calib.circle.DetectCircleAsymmetricGrid.totalEllipses;
-
 /**
  * <p>Base class for ordering clusters of ellipses into grids</p>
  *
@@ -461,11 +459,7 @@ public abstract class EllipseClustersIntoGrid {
 			this.columns = columns;
 		}
 
-		public int getNumberOfEllipses() {
-			return totalEllipses(rows,columns);
-		}
-
-		public int getIndexOfEllipse( int row , int col ) {
+		public int getIndexOfAsymEllipse( int row , int col ) {
 			int index = 0;
 			index += (row/2)*this.columns + (row%2)*(this.columns/2+this.columns%2);
 			return index + col/2;

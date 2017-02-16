@@ -29,8 +29,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.struct.FastQueue;
 
-import static boofcv.alg.fiducial.calib.circle.DetectCircleAsymmetricGrid.totalEllipses;
-
 /**
  * <p>Computes key points from an observed asymmetric circular grid.  Each key point is defined as the center's true
  * geometric center.  The center is found by detecting tangent points between two neighboring circles (red dots) and
@@ -88,7 +86,13 @@ public class AsymmetricGridKeyPointDetections {
 	}
 
 	void init(Grid grid) {
-		tangents.resize(totalEllipses(grid.rows,grid.columns));
+		int totalEllipses = 0;
+		for (int i = 0; i < grid.ellipses.size(); i++) {
+			if( grid.ellipses.get(i) != null )
+				totalEllipses++;
+		}
+
+		tangents.resize(totalEllipses);
 		for (int i = 0; i < tangents.size(); i++) {
 			tangents.get(i).reset();
 		}
@@ -160,8 +164,8 @@ public class AsymmetricGridKeyPointDetections {
 		if( !tangentFinder.process(a,b, A0, A1, A2, A3, B0, B1, B2, B3) ) {
 			return false;
 		}
-		Tangents ta = tangents.get(grid.getIndexOfEllipse(rowA,colA));
-		Tangents tb = tangents.get(grid.getIndexOfEllipse(rowB,colB));
+		Tangents ta = tangents.get(grid.getIndexOfAsymEllipse(rowA,colA));
+		Tangents tb = tangents.get(grid.getIndexOfAsymEllipse(rowB,colB));
 
 		// add tangent points from the two lines which do not cross the center line
 		ta.grow().set(A0);

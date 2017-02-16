@@ -22,35 +22,29 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.shapes.EllipseRotated_F64;
 
 /**
- * TODO UPDATE
- *
- * <p>Detects asymmetric grids of circles.  The grid is composed of two regular grids which are offset by half a period.
- * See image below for an example.  Rows and columns are counted by counting every row even if they are offset
- * from each other.  The returned grid will be put into canonical orientation, see below.</p>
+ * <p>Detects regular grids of circles, see below.  A valid grid is in counter-clockwise order and if there are
+ * multiple possible solution the solution with corner (0,0) closest to the pixel coordinate (0,0) is selected</p>
  *
  * <p>
- * For each circle there is one control point.  The control point is first found by detecting all the ellipses, which
- * is what a circle appears to be under perspective distortion.  The center the ellipse might not match the physical
- * center of the circle.  The intersection of lines does not change under perspective distortion.  The outer common
- * tangent lines between neighboring ellipses are found.  Then the intersection of two such lines is found.  This
- * intersection will be the physical center of the circle.
+ * For each circle there is are four control points.  Each control point corresponds to the tangent line connecting
+ * the vertical and horizontal neigbors.  Tangent points are used since they are invariant under
+ * perspective distortion.
  * </p>
  *
  * <center>
- * <img src="doc-files/asymcirclegrid.jpg"/>
+ * <img src="doc-files/regularcirclegrid.jpg"/>
  * </center>
- * Example of a 8 by 5 grid; row, column.
- *
- * <p>Canonical orientation is defined as having the rows/columns matched, element (0,0) being occupied.
- * If there are multiple solution a solution will be selected which is in counter-clockwise order (image coordinates)
- * and if there is still ambiguity the ellipse closest to the image origin will be selected as (0,0).</p>
+ * Example of a 6 by 4 grid; row, column.
  *
  * @author Peter Abeles
  */
 public class DetectCircleRegularGrid<T extends ImageGray<T>> extends DetectCircleGrid<T> {
 
+	// storage for the distance of each corner
+	private double closestCorner[] = new double[4];
 
 	/**
 	 * Creates and configures the detector
@@ -69,6 +63,11 @@ public class DetectCircleRegularGrid<T extends ImageGray<T>> extends DetectCircl
 				new EllipseClustersIntoRegularGrid());
 	}
 
+	@Override
+	public int totalEllipses( int numRows , int numCols ) {
+		return numRows*numCols;
+	}
+
 	/**
 	 * Puts the grid into a canonical orientation
 	 */
@@ -82,5 +81,49 @@ public class DetectCircleRegularGrid<T extends ImageGray<T>> extends DetectCircl
 		if( isClockWise(g)) {
 			flipHorizontal(g);
 		}
+
+		// pick the solutin which puts (0,0) coordinate the closest to the top left corner to resolve ambiguity
+		if( g.columns == g.rows ) {
+			closestCorner[0] = g.get(0,0).center.normSq();
+			closestCorner[1] = g.get(numRows-1,0).center.normSq();
+			closestCorner[2] = g.get(numRows-1,numCols-1).center.normSq();
+			closestCorner[3] = g.get(0,numCols-1).center.normSq();
+
+			int best = 0;
+			for (int i = 0; i < 4; i++) {
+				if( closestCorner[i] < closestCorner[best]) {
+					best = i;
+				}
+			}
+
+			for (int i = 0; i < best; i++) {
+				rotateGridCCW(g);
+			}
+		} else {
+			double d00 = g.get(0,0).center.normSq();
+			double d11 = g.get(numRows-1,numCols-1).center.normSq();
+
+			if( d11 < d00 ) {
+				rotateGridCCW(g);
+				rotateGridCCW(g);
+			}
+		}
+	}
+
+	/**
+	 * Uses the cross product to determine if the grid is in clockwise order
+	 */
+	private static boolean isClockWise( Grid g ) {
+		EllipseRotated_F64 v00 = g.get(0,0);
+		EllipseRotated_F64 v02 = g.get(0,1);
+		EllipseRotated_F64 v20 = g.get(1,0);
+
+		double a_x = v02.center.x - v00.center.x;
+		double a_y = v02.center.y - v00.center.y;
+
+		double b_x = v20.center.x - v00.center.x;
+		double b_y = v20.center.y - v00.center.y;
+
+		return a_x * b_y - a_y * b_x < 0;
 	}
 }
