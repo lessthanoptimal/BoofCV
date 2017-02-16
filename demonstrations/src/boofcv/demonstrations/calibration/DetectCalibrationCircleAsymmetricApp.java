@@ -20,9 +20,9 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid;
 import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
-import boofcv.alg.fiducial.calib.circle.AsymmetricGridKeyPointDetections.Tangents;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
+import boofcv.alg.fiducial.calib.circle.KeyPointsCircleAsymmetricGrid.Tangents;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;

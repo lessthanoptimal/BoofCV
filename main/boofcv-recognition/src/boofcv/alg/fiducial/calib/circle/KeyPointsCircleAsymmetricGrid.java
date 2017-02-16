@@ -41,7 +41,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public class AsymmetricGridKeyPointDetections {
+public class KeyPointsCircleAsymmetricGrid {
 
 	// tangent points on each ellipse
 	FastQueue<Tangents> tangents = new FastQueue<>(Tangents.class,true);

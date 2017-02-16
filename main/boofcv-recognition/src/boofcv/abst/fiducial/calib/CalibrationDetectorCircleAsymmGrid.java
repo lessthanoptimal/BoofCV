@@ -20,10 +20,10 @@ package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
-import boofcv.alg.fiducial.calib.circle.AsymmetricGridKeyPointDetections;
 import boofcv.alg.fiducial.calib.circle.DetectCircleAsymmetricGrid;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
+import boofcv.alg.fiducial.calib.circle.KeyPointsCircleAsymmetricGrid;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
@@ -39,7 +39,7 @@ import java.util.List;
  * Calibration implementation of circle asymmetric grid fiducial.
  *
  * @see DetectCircleAsymmetricGrid
- * @see AsymmetricGridKeyPointDetections
+ * @see KeyPointsCircleAsymmetricGrid
  *
  * @author Peter Abeles
  */
@@ -48,7 +48,7 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 	// Detectors the grids
 	private DetectCircleAsymmetricGrid<GrayF32> detector;
 	// extracts key points from detected grid
-	private AsymmetricGridKeyPointDetections keypoint = new AsymmetricGridKeyPointDetections();
+	private KeyPointsCircleAsymmetricGrid keypoint = new KeyPointsCircleAsymmetricGrid();
 
 	// Storage for 2D location of points on fiducial
 	private List<Point2D_F64> layout;
@@ -148,7 +148,7 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 		return detector;
 	}
 
-	public AsymmetricGridKeyPointDetections getKeypointFinder() {
+	public KeyPointsCircleAsymmetricGrid getKeypointFinder() {
 		return keypoint;
 	}
 
