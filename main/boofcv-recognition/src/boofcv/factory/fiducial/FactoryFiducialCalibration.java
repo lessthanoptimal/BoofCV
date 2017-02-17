@@ -84,4 +84,16 @@ public class FactoryFiducialCalibration {
 
 		return new CalibrationDetectorCircleAsymmGrid(config);
 	}
+
+	/**
+	 * Detector for regular grid of circles.  All circles must be entirely inside of the image.
+	 *
+	 * @param config Configuration for target
+	 * @return The detector
+	 */
+	public static CalibrationDetectorCircleRegularGrid circleRegularGrid( ConfigCircleRegularGrid config ) {
+		config.checkValidity();
+
+		return new CalibrationDetectorCircleRegularGrid(config);
+	}
 }

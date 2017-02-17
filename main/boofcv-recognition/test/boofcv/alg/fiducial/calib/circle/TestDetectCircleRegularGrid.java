@@ -214,7 +214,11 @@ public class TestDetectCircleRegularGrid {
 
 				g2.fillOval((int)(xx-radius+0.5),(int)(yy-radius+0.5),(int)(radius*2),(int)(radius*2));
 
-				locations.add( new Point2D_F64(xx,yy));
+				// take in account y-axis being fliped
+				locations.add( new Point2D_F64(xx,yy-radius));
+				locations.add( new Point2D_F64(xx+radius,yy));
+				locations.add( new Point2D_F64(xx,yy+radius));
+				locations.add( new Point2D_F64(xx-radius,yy));
 			}
 		}
 

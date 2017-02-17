@@ -25,13 +25,13 @@ import boofcv.factory.shape.ConfigEllipseDetector;
 import boofcv.struct.Configuration;
 
 /**
- * Calibration parameters for an asymmetric grid of circle calibration target.
+ * Calibration parameters for a regular grid of circle calibration target.
  *
  * @see DetectCircleAsymmetricGrid
  *
  * @author Peter Abeles
  */
-public class ConfigCircleAsymmetricGrid implements Configuration {
+public class ConfigCircleRegularGrid implements Configuration {
 
 	/**
 	 * Number of black circles tall the grid is. Target dependent.
@@ -75,8 +75,8 @@ public class ConfigCircleAsymmetricGrid implements Configuration {
 		thresholding.scale = 0.85;
 	}
 
-	public ConfigCircleAsymmetricGrid(int numRows, int numCols,
-									  double circleRadius, double centerDistance )
+	public ConfigCircleRegularGrid(int numRows, int numCols,
+								   double circleRadius, double centerDistance )
 	{
 		this.numRows = numRows;
 		this.numCols = numCols;
