@@ -57,11 +57,11 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 	Color colorId[];
 
 	public DetectCalibrationCircleAsymmetricApp(int numRows , int numColumns ,
-												double circleRadius, double centerDistance,
+												double circleDiameter, double centerDistance,
 												List<String> exampleInputs) {
-		super(new DetectCalibrationCirclePanel(numRows,numColumns,circleRadius,centerDistance,true),exampleInputs);
+		super(new DetectCalibrationCirclePanel(numRows,numColumns,circleDiameter,centerDistance,true),exampleInputs);
 
-		config = new ConfigCircleAsymmetricGrid(numRows, numColumns, circleRadius, centerDistance);
+		config = new ConfigCircleAsymmetricGrid(numRows, numColumns, circleDiameter, centerDistance);
 
 		declareDetector();
 
@@ -248,7 +248,7 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 			examples.add(UtilIO.pathExample(String.format("calibration/mono/Sony_DSC-HX5V_CircleAsym/image%02d.jpg", i)));
 		}
 
-		DetectCalibrationCircleAsymmetricApp app = new DetectCalibrationCircleAsymmetricApp(5, 8, 1,6,examples);
+		DetectCalibrationCircleAsymmetricApp app = new DetectCalibrationCircleAsymmetricApp(5, 8, 2,6,examples);
 
 		app.openFile(new File(examples.get(0)));
 		app.waitUntilDoneProcessing();

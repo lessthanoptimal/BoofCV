@@ -253,7 +253,7 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 			examples.add(UtilIO.pathExample(String.format("calibration/mono/Sony_DSC-HX5V_CircleRegular/image%05d.jpg", i)));
 		}
 
-		DetectCalibrationCircleRegularApp app = new DetectCalibrationCircleRegularApp(10, 8, 0.75,2.5,examples);
+		DetectCalibrationCircleRegularApp app = new DetectCalibrationCircleRegularApp(10, 8, 1.5,2.5,examples);
 
 		app.openFile(new File(examples.get(0)));
 		app.waitUntilDoneProcessing();

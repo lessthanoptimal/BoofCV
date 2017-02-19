@@ -434,9 +434,13 @@ public class AssistedCalibration {
 	}
 
 	private void renderFillPolygons() {
+		if( regions.size() == 0)
+			return;
+
 		g2.setColor(new Color(0, 255, 255, 50));
-		int polyX[] = new int[20];
-		int polyY[] = new int[20];
+		int N = regions.get(0).size();
+		int polyX[] = new int[N];
+		int polyY[] = new int[N];
 
 		for (int i = 0; i < regions.size(); i++) {
 			Polygon2D_F64 poly = regions.get(i);

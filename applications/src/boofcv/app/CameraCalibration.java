@@ -94,8 +94,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("Fiducial Types:");
 		System.out.println("   CHESSBOARD");
 		System.out.println("   SQUAREGRID");
-		System.out.println("   CIRCLEASYM");
-		System.out.println("   CIRCLEAREG");
+		System.out.println("   CIRCLE_ASYM");
+		System.out.println("   CIRCLE_REG");
 		System.out.println();
 		System.out.println("Flags for CHESSBOARD:");
 		System.out.println("  --Grid=<rows>:<columns>            Specifies number of rows and columns");
@@ -105,12 +105,12 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("  --SquareSpace=<square>:<space>     Specifies side of a square and space between square");
 		System.out.println("                                     Only the ratio matters.");
 		System.out.println("                                     Default: 1:1 square = 1 and space = 1");
-		System.out.println("Flags for CIRCLEASYM:");
+		System.out.println("Flags for CIRCLE_ASYM:");
 		System.out.println("  --Grid=<rows>:<columns>            Specifies number of rows and columns");
 		System.out.println("  --CenterDistance=<length>          Specifies how far apart the center of two circles are along an axis");
 		System.out.println("  --Diameter=<length>                Diameter of a circle");
 		System.out.println();
-		System.out.println("Flags for CIRCLEAREG:");
+		System.out.println("Flags for CIRCLE_REG:");
 		System.out.println("  --Grid=<rows>:<columns>            Specifies number of rows and columns");
 		System.out.println("  --CenterDistance=<length>          Specifies how far apart the center of two circles are along an axis");
 		System.out.println("  --Diameter=<length>                Diameter of a circle");
@@ -150,10 +150,10 @@ public class CameraCalibration extends BaseStandardInputApp {
 			} else if( arg.compareToIgnoreCase("SQUAREGRID") == 0 ) {
 				parseSquareGrid(i + 1, args);
 				break;
-			} else if( arg.compareToIgnoreCase("CIRCLEASYM") == 0 ) {
+			} else if( arg.compareToIgnoreCase("CIRCLE_ASYM") == 0 ) {
 				parseCircle(i + 1, args, true);
 				break;
-			} else if( arg.compareToIgnoreCase("CIRCLEAREG") == 0 ) {
+			} else if( arg.compareToIgnoreCase("CIRCLE_REG") == 0 ) {
 				parseCircle(i + 1, args, false);
 				break;
 			} else if( i == 0 ) {

@@ -275,15 +275,10 @@ public interface CalibrationView {
 
 			int pointsCols = 4*gridCols;
 
-
-			sides.add( detections.get(0) );
-			sides.add( detections.get(getIndex(0,pointsCols-1)) );
-			sides.add( detections.get(getIndex(gridRows-1,pointsCols-1)) );
-			sides.add( detections.get(getIndex(gridRows-1,0)) );
-		}
-
-		private int getIndex( int row , int col ) {
-			return row*gridCols*3 + col;
+			sides.add( detections.get(3) );
+			sides.add( detections.get(pointsCols-3) );
+			sides.add( detections.get(pointsCols*gridRows-3));
+			sides.add( detections.get(3+pointsCols*(gridRows-1)) );
 		}
 
 		@Override
