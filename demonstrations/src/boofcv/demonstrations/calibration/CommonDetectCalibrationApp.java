@@ -24,6 +24,7 @@ import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
+import boofcv.gui.calibration.CalibratedImageGridPanel;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
@@ -50,7 +51,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.gui.calibration.CalibratedImageGridPanel.renderOrder;
 import static boofcv.gui.fiducial.VisualizeFiducial.drawLine;
 
 /**
@@ -253,6 +253,10 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 				}
 			}
 		}
+	}
+
+	public void renderOrder(Graphics2D g2, double scale , List<Point2D_F64> points ) {
+		CalibratedImageGridPanel.renderOrder(g2,scale,points);
 	}
 
 	protected void renderClusters(Graphics2D g2, double scale) {}

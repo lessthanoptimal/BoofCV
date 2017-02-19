@@ -38,6 +38,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -141,6 +142,66 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 			g2.setColor(Color.ORANGE);
 			g2.setStroke(thin);
 			VisualizeShapes.drawRectangle(r,g2);
+		}
+	}
+
+	@Override
+	public void renderOrder(Graphics2D g2, double scale , List<Point2D_F64> points ) {
+		renderOrderA(g2,scale,points);
+	}
+
+	public static void renderOrderA(Graphics2D g2, double scale , List<Point2D_F64> points ) {
+		g2.setStroke(new BasicStroke(5));
+
+		Color colorsSquare[] = new Color[4];
+		colorsSquare[0] = new Color(0,255,0);
+		colorsSquare[1] = new Color(100,180,0);
+		colorsSquare[2] = new Color(160,140,0);
+		colorsSquare[3] = new Color(0,140,100);
+
+		Line2D.Double l = new Line2D.Double();
+
+		for (int i = 1; i+6 < points.size(); i += 4) {
+			Point2D_F64 p0 = points.get(i);
+			Point2D_F64 p1 = points.get(i+6);
+
+			double fraction = i / ((double) points.size() - 2);
+
+			int red   = (int)(0xFF*fraction) + (int)(0x00*(1-fraction));
+			int green = 0x00;
+			int blue  = (int)(0x00*fraction) + (int)(0xff*(1-fraction));
+
+			int lineRGB = red << 16 | green << 8 | blue;
+
+			l.setLine(scale * p0.x , scale * p0.y, scale * p1.x, scale * p1.y );
+
+			g2.setColor(new Color(lineRGB));
+			g2.draw(l);
+		}
+
+		for (int i = 0; i+3 < points.size(); i += 4) {
+			Point2D_F64 p0 = points.get(i);
+			Point2D_F64 p1 = points.get(i+1);
+			Point2D_F64 p2 = points.get(i+2);
+			Point2D_F64 p3 = points.get(i+3);
+
+			l.setLine(scale * p0.x , scale * p0.y, scale * p1.x, scale * p1.y );
+			g2.setColor(colorsSquare[0]);
+			g2.draw(l);
+
+			l.setLine(scale * p1.x , scale * p1.y, scale * p2.x, scale * p2.y );
+			g2.setColor(colorsSquare[1]);
+			g2.draw(l);
+
+			l.setLine(scale * p2.x , scale * p2.y, scale * p3.x, scale * p3.y );
+			g2.setColor(colorsSquare[2]);
+			g2.draw(l);
+
+			l.setLine(scale * p3.x , scale * p3.y, scale * p0.x, scale * p0.y );
+			g2.setColor(colorsSquare[3]);
+			g2.draw(l);
+
+
 		}
 	}
 

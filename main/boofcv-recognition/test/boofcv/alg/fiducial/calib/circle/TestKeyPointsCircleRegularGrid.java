@@ -21,8 +21,12 @@ package boofcv.alg.fiducial.calib.circle;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.KeyPointsCircleRegularGrid.Tangents;
 import boofcv.struct.BoofDefaults;
+import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se2_F64;
 import georegression.struct.shapes.EllipseRotated_F64;
+import georegression.transform.ConvertTransform_F64;
+import georegression.transform.affine.AffinePointOps_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -34,16 +38,30 @@ import static org.junit.Assert.assertTrue;
 public class TestKeyPointsCircleRegularGrid {
 	@Test
 	public void all() {
+
+		all(new Affine2D_F64());
+
+		for (int i = 1; i < 10; i++) {
+//			System.out.println("i = "+i);
+			double yaw = 2.0*Math.PI*i/10.0;
+			Affine2D_F64 rot = ConvertTransform_F64.convert(new Se2_F64(0,0,yaw),(Affine2D_F64)null);
+			all(rot);
+		}
+	}
+
+	public void all(Affine2D_F64 affine ) {
 		int numRows=3,numCols=4;
 
 		double space = 3,r=1;
 
 		Grid g = createGrid(numRows,numCols,space,r);
+		transform(affine,g);
 
 		KeyPointsCircleRegularGrid alg = new KeyPointsCircleRegularGrid();
 
 		alg.process(g);
 
+		Point2D_F64 p = new Point2D_F64();
 		int index = 0;
 		for (int row = 0; row < numRows; row++) {
 			for (int col = 0; col < numCols; col++) {
@@ -55,11 +73,21 @@ public class TestKeyPointsCircleRegularGrid {
 				Point2D_F64 c = alg.getKeyPoints().get(index++);
 				Point2D_F64 d = alg.getKeyPoints().get(index++);
 
-				assertTrue(a.distance(cx,cy+r) <= BoofDefaults.TEST_DOUBLE_TOL);
-				assertTrue(b.distance(cx+r,cy) <= BoofDefaults.TEST_DOUBLE_TOL);
-				assertTrue(c.distance(cx,cy-r) <= BoofDefaults.TEST_DOUBLE_TOL);
-				assertTrue(d.distance(cx-r,cy) <= BoofDefaults.TEST_DOUBLE_TOL);
+				AffinePointOps_F64.transform(affine,cx,cy+r,p);
+				assertTrue(a.distance(p.x,p.y) <= BoofDefaults.TEST_DOUBLE_TOL);
+				AffinePointOps_F64.transform(affine,cx+r,cy,p);
+				assertTrue(b.distance(p.x,p.y) <= BoofDefaults.TEST_DOUBLE_TOL);
+				AffinePointOps_F64.transform(affine,cx,cy-r,p);
+				assertTrue(c.distance(p.x,p.y) <= BoofDefaults.TEST_DOUBLE_TOL);
+				AffinePointOps_F64.transform(affine,cx-r,cy,p);
+				assertTrue(d.distance(p.x,p.y) <= BoofDefaults.TEST_DOUBLE_TOL);
 			}
+		}
+	}
+
+	public void transform(Affine2D_F64 affine , Grid g ) {
+		for( EllipseRotated_F64 e : g.ellipses ) {
+			AffinePointOps_F64.transform(affine,e.center.x,e.center.y,e.center);
 		}
 	}
 
