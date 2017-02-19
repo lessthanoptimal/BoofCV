@@ -19,6 +19,7 @@
 package boofcv.examples.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigCircleRegularGrid;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
@@ -55,6 +56,10 @@ public class ExampleCalibrateMonocular {
 	public static void main( String args[] ) {
 		DetectorFiducialCalibration detector;
 		List<String> images;
+
+		// Regular Circle Example
+//		detector = FactoryFiducialCalibration.circleRegularGrid(new ConfigCircleRegularGrid(8, 10, 0.75, 2.5));
+//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleRegular"),"image");
 
 		// Asymmetric Circle Example
 //		detector = FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleAsymmetricGrid(5, 8, 1, 6));

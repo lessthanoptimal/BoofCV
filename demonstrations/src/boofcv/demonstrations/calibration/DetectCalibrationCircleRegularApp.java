@@ -18,11 +18,10 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid;
-import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
+import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
+import boofcv.abst.fiducial.calib.ConfigCircleRegularGrid;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
-import boofcv.alg.fiducial.calib.circle.KeyPointsCircleAsymmetricGrid.Tangents;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
@@ -37,7 +36,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
-import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
 import java.io.File;
@@ -45,23 +43,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Displays detected asymmetric circular grid.  Visualizes several of its processing steps making it easier to debug.
+ * Displays detected regular circular grid.  Visualizes several of its processing steps making it easier to debug.
  *
  * @author Peter Abeles
  */
-public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibrationApp
+public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationApp
 {
-	CalibrationDetectorCircleAsymmGrid detector;
-	ConfigCircleAsymmetricGrid config;
+	CalibrationDetectorCircleRegularGrid detector;
+	ConfigCircleRegularGrid config;
 
 	Color colorId[];
 
-	public DetectCalibrationCircleAsymmetricApp(int numRows , int numColumns ,
-												double circleRadius, double centerDistance,
-												List<String> exampleInputs) {
-		super(new DetectCalibrationCirclePanel(numRows,numColumns,circleRadius,centerDistance,true),exampleInputs);
+	public DetectCalibrationCircleRegularApp(int numRows , int numColumns ,
+											 double circleRadius, double centerDistance,
+											 List<String> exampleInputs) {
+		super(new DetectCalibrationCirclePanel(numRows,numColumns,circleRadius,centerDistance,false),exampleInputs);
 
-		config = new ConfigCircleAsymmetricGrid(numRows, numColumns, circleRadius, centerDistance);
+		config = new ConfigCircleRegularGrid(numRows, numColumns, circleRadius, centerDistance);
 
 		declareDetector();
 
@@ -82,7 +80,7 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 		config.circleRadius = ((DetectCalibrationCirclePanel)controlPanel).getCircleRadius();
 		config.centerDistance = ((DetectCalibrationCirclePanel)controlPanel).getCircleSpacing();
 
-		detector = FactoryFiducialCalibration.circleAsymmGrid(config);
+		detector = FactoryFiducialCalibration.circleRegularGrid(config);
 	}
 
 	@Override
@@ -107,33 +105,7 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 
 	@Override
 	protected void renderGraph(Graphics2D g2 , double scale ) {
-		List<Grid> grids = detector.getDetector().getGrids();
-
-		g2.setStroke(new BasicStroke(2));
-		for( Grid g : grids ) {
-			g2.setColor(Color.CYAN);
-			drawGraph(g2, g, 0, 0, scale);
-			g2.setColor(Color.ORANGE);
-			drawGraph(g2, g, 1, 1, scale);
-		}
-	}
-
-	private void drawGraph(Graphics2D g2, Grid g, int row0 , int col0 , double scale) {
-		for (int row = row0; row < g.rows; row += 2) {
-			for (int col = col0; col < g.columns; col += 2) {
-				EllipseRotated_F64 a = g.get(row,col);
-				if( col+2 < g.columns) {
-					EllipseRotated_F64 b = g.get(row, col + 2);
-					g2.drawLine((int)(scale*a.center.x),(int)(scale*a.center.y),
-							(int)(scale*b.center.x),(int)(scale*b.center.y));
-				}
-				if( row+2 < g.rows) {
-					EllipseRotated_F64 b = g.get(row+2, col);
-					g2.drawLine((int)(scale*a.center.x),(int)(scale*a.center.y),
-							(int)(scale*b.center.x),(int)(scale*b.center.y));
-				}
-			}
-		}
+		throw new RuntimeException("Shouldn't be an option");
 	}
 
 	@Override
@@ -169,34 +141,6 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 			g2.setColor(Color.ORANGE);
 			g2.setStroke(thin);
 			VisualizeShapes.drawRectangle(r,g2);
-		}
-
-		renderTangents(g2,scale);
-	}
-
-	protected void renderTangents(Graphics2D g2 , double scale ) {
-		FastQueue<Tangents> tangents = detector.getKeypointFinder().getTangents();
-
-		BasicStroke thick = new BasicStroke(2.0f);
-		BasicStroke thin = new BasicStroke(1.0f);
-
-		int radius = Math.max(1,(int)(3*scale+0.5));
-		int width = radius*2+1;
-
-		for( Tangents l : tangents.toList() ) {
-			for (int i = 0; i < l.size; i++) {
-				Point2D_F64 p = l.get(i);
-
-				int x = (int)(scale*p.x + 0.5);
-				int y = (int)(scale*p.y + 0.5);
-
-				g2.setColor(Color.WHITE);
-				g2.setStroke(thick);
-				g2.drawOval(x-radius,y-radius,width,width);
-				g2.setColor(Color.BLACK);
-				g2.setStroke(thin);
-				g2.drawOval(x-radius,y-radius,width,width);
-			}
 		}
 	}
 
@@ -244,15 +188,15 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 
 		List<String>  examples = new ArrayList<>();
 
-		for (int i = 1; i <= 9; i++) {
-			examples.add(UtilIO.pathExample(String.format("calibration/mono/Sony_DSC-HX5V_CircleAsym/image%02d.jpg", i)));
+		for (int i = 0; i <= 5; i++) {
+			examples.add(UtilIO.pathExample(String.format("calibration/mono/Sony_DSC-HX5V_CircleRegular/image%05d.jpg", i)));
 		}
 
-		DetectCalibrationCircleAsymmetricApp app = new DetectCalibrationCircleAsymmetricApp(5, 8, 1,6,examples);
+		DetectCalibrationCircleRegularApp app = new DetectCalibrationCircleRegularApp(10, 8, 0.75,2.5,examples);
 
 		app.openFile(new File(examples.get(0)));
 		app.waitUntilDoneProcessing();
 
-		ShowImages.showWindow(app,"Circle Asymmetric Grid Detector",true);
+		ShowImages.showWindow(app,"Circle Regular Grid Detector",true);
 	}
 }

@@ -279,6 +279,10 @@ task testReport(type: TestReport) {
     reportOn subprojects*.test
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.14.1'
+}
+
 idea {
     project {
         jdkName = '1.7 (64bit)'

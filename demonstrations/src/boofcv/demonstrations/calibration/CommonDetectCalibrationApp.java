@@ -70,9 +70,9 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 	BufferedImage binary;
 	GrayF32 grayPrev = new GrayF32(1,1);
 
-	public CommonDetectCalibrationApp(int numRows , int numColumns , boolean hasClusters, List<String> exampleInputs ) {
+	public CommonDetectCalibrationApp(DetectCalibrationPanel controlPanel, List<String> exampleInputs ) {
 		super(exampleInputs, ImageType.single(GrayF32.class));
-		controlPanel = new DetectCalibrationPanel(numRows,numColumns,true,hasClusters);
+		this.controlPanel = controlPanel;
 		add(imagePanel,BorderLayout.CENTER);
 		add(controlPanel,BorderLayout.WEST);
 
