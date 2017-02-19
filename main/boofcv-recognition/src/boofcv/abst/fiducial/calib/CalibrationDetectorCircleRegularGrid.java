@@ -122,20 +122,18 @@ public class CalibrationDetectorCircleRegularGrid implements DetectorFiducialCal
 	public static List<Point2D_F64> createLayout( int numRows , int numCols , double centerDistance , double radius ) {
 
 		List<Point2D_F64> ret = new ArrayList<>();
-
-		double widthCell = centerDistance/2;
-
-		double width = (numCols-1)*widthCell;
-		double height = (numRows-1)*widthCell;
+		
+		double width = (numCols-1)*centerDistance;
+		double height = (numRows-1)*centerDistance;
 
 		for (int row = 0; row < numRows; row++) {
-			double y = (numRows-row-1)*widthCell - height/2;
+			double y = (numRows-row-1)*centerDistance - height/2;
 			for (int col = 0; col < numCols; col++) {
-				double x = col*widthCell - width/2;
+				double x = col*centerDistance - width/2;
 
-				ret.add( new Point2D_F64(x,y+radius));
-				ret.add( new Point2D_F64(x+radius,y));
 				ret.add( new Point2D_F64(x,y-radius));
+				ret.add( new Point2D_F64(x+radius,y));
+				ret.add( new Point2D_F64(x,y+radius));
 				ret.add( new Point2D_F64(x-radius,y));
 			}
 		}
