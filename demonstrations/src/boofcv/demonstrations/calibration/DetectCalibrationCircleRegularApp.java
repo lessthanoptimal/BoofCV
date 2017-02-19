@@ -56,11 +56,11 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 	Color colorId[];
 
 	public DetectCalibrationCircleRegularApp(int numRows , int numColumns ,
-											 double circleRadius, double centerDistance,
+											 double circleDiameter, double centerDistance,
 											 List<String> exampleInputs) {
-		super(new DetectCalibrationCirclePanel(numRows,numColumns,circleRadius,centerDistance,false),exampleInputs);
+		super(new DetectCalibrationCirclePanel(numRows,numColumns,circleDiameter,centerDistance,false),exampleInputs);
 
-		config = new ConfigCircleRegularGrid(numRows, numColumns, circleRadius, centerDistance);
+		config = new ConfigCircleRegularGrid(numRows, numColumns, circleDiameter, centerDistance);
 
 		declareDetector();
 
@@ -78,7 +78,7 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 
 		config.numRows = controlPanel.getGridRows();
 		config.numCols = controlPanel.getGridColumns();
-		config.circleRadius = ((DetectCalibrationCirclePanel)controlPanel).getCircleRadius();
+		config.circleDiameter = ((DetectCalibrationCirclePanel)controlPanel).getCircleDiameter();
 		config.centerDistance = ((DetectCalibrationCirclePanel)controlPanel).getCircleSpacing();
 
 		detector = FactoryFiducialCalibration.circleRegularGrid(config);

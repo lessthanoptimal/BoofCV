@@ -109,11 +109,11 @@ public class TestKeyPointsCircleRegularGrid {
 				Tangents t = alg.getTangents().get(row*numCols+col);
 
 				if( col == 0 || col == numCols-1) {
-					assertEquals(1,t.countL);
-					assertEquals(1,t.countR);
+					assertEquals(1,t.countT);
+					assertEquals(1,t.countB);
 				} else {
-					assertEquals(2,t.countL);
-					assertEquals(2,t.countR);
+					assertEquals(2,t.countT);
+					assertEquals(2,t.countB);
 				}
 			}
 		}
@@ -137,11 +137,11 @@ public class TestKeyPointsCircleRegularGrid {
 				Tangents t = alg.getTangents().get(row*numCols+col);
 
 				if( row == 0 || row == numRows-1) {
-					assertEquals(1,t.countT);
-					assertEquals(1,t.countB);
+					assertEquals(1,t.countL);
+					assertEquals(1,t.countR);
 				} else {
-					assertEquals(2,t.countT);
-					assertEquals(2,t.countB);
+					assertEquals(2,t.countL);
+					assertEquals(2,t.countR);
 				}
 			}
 		}

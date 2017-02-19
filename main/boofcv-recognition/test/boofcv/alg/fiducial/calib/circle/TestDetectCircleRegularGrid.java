@@ -74,9 +74,9 @@ public class TestDetectCircleRegularGrid {
 	}
 
 	private DetectCircleRegularGrid<GrayU8> createAlg(int numRows , int numCols ,
-														 double radius , double centerDistance ) {
+													  double diameter , double centerDistance ) {
 
-		double spaceRatio = 1.2*centerDistance/radius;
+		double spaceRatio = 2.0*1.2*centerDistance/diameter;
 
 		InputToBinary<GrayU8> threshold = FactoryThresholdBinary.globalFixed(100,true,GrayU8.class);
 		BinaryEllipseDetector<GrayU8> detector = FactoryShapeDetector.ellipse(null, GrayU8.class);
@@ -85,15 +85,16 @@ public class TestDetectCircleRegularGrid {
 	}
 
 	private void performDetectionCheck(int expectedRows, int expectedCols, int actualRows, int actualCols, Affine2D_F64 affine) {
-		int radius = 20;
+		int diameter = 40;
 		int centerDistances = 120;
 
-		DetectCircleRegularGrid<GrayU8> alg = createAlg(expectedRows,expectedCols,radius,centerDistances);
+		DetectCircleRegularGrid<GrayU8> alg = createAlg(expectedRows,expectedCols,diameter,centerDistances);
 //		alg.setVerbose(true);
 
-		List<Point2D_F64> locations = new ArrayList<>();
+		List<Point2D_F64> keypoints = new ArrayList<>();
+		List<Point2D_F64> centers = new ArrayList<>();
 		GrayU8 image = new GrayU8(500,550);
-		render(actualRows,actualCols, radius, centerDistances, affine, locations,image);
+		render(actualRows,actualCols, diameter/2.0, centerDistances, affine, keypoints,centers,image);
 
 		alg.process(image);
 
@@ -113,7 +114,7 @@ public class TestDetectCircleRegularGrid {
 		for (int row = 0; row < g.rows; row++) {
 			for (int col = 0; col < g.columns; col++) {
 				EllipseRotated_F64 f = g.get(row,col);
-				Point2D_F64 e = locations.get(row*g.columns+col);
+				Point2D_F64 e = centers.get(row*g.columns+col);
 
 				assertEquals( e.x , f.center.x , 1.5 );
 				assertEquals( e.y , f.center.y , 1.5 );
@@ -194,7 +195,7 @@ public class TestDetectCircleRegularGrid {
 	}
 
 	public static void render(int rows , int cols , double radius , double centerDistance, Affine2D_F64 affine,
-							  List<Point2D_F64> locations , GrayU8 image )
+							  List<Point2D_F64> keypoints ,  List<Point2D_F64> centers, GrayU8 image )
 	{
 		BufferedImage buffered = new BufferedImage(image.width,image.height, BufferedImage.TYPE_INT_BGR);
 		Graphics2D g2 = buffered.createGraphics();
@@ -202,7 +203,7 @@ public class TestDetectCircleRegularGrid {
 		g2.fillRect(0,0,buffered.getWidth(),buffered.getHeight());
 		g2.setColor(Color.BLACK);
 
-		locations.clear();
+		keypoints.clear();
 
 		for (int row = 0; row < rows; row++) {
 			double y = row*centerDistance/2.0;
@@ -214,11 +215,13 @@ public class TestDetectCircleRegularGrid {
 
 				g2.fillOval((int)(xx-radius+0.5),(int)(yy-radius+0.5),(int)(radius*2),(int)(radius*2));
 
-				// take in account y-axis being fliped
-				locations.add( new Point2D_F64(xx,yy-radius));
-				locations.add( new Point2D_F64(xx+radius,yy));
-				locations.add( new Point2D_F64(xx,yy+radius));
-				locations.add( new Point2D_F64(xx-radius,yy));
+				centers.add( new Point2D_F64(xx,yy));
+
+				// take in account y-axis being flipped
+				keypoints.add( new Point2D_F64(xx,yy+radius));
+				keypoints.add( new Point2D_F64(xx+radius,yy));
+				keypoints.add( new Point2D_F64(xx,yy-radius));
+				keypoints.add( new Point2D_F64(xx-radius,yy));
 			}
 		}
 

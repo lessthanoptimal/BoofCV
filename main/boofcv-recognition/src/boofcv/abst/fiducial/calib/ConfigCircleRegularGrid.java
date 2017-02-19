@@ -60,9 +60,9 @@ public class ConfigCircleRegularGrid implements Configuration {
 	public double centerDistance;
 
 	/**
-	 * Radius of each circle.
+	 * Diameter of each circle.
 	 */
-	public double circleRadius;
+	public double circleDiameter;
 
 	/**
 	 * How similar two ellipses must be to be connected.  0 to 1.0.  1.0 = perfect match and 0.0 = infinite
@@ -76,11 +76,11 @@ public class ConfigCircleRegularGrid implements Configuration {
 	}
 
 	public ConfigCircleRegularGrid(int numRows, int numCols,
-								   double circleRadius, double centerDistance )
+								   double circleDiameter, double centerDistance )
 	{
 		this.numRows = numRows;
 		this.numCols = numCols;
-		this.circleRadius = circleRadius;
+		this.circleDiameter = circleDiameter;
 		this.centerDistance = centerDistance;
 	}
 

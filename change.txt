@@ -59,7 +59,8 @@ Version : 0.27
   * Updated functions in FactoryMultiViewRobust for change
 - Calibration Targets
   * Added support for circle grid pattern in generator app
-  * Added support for detection of circle grid patterns TODO
+  * Added support for detection of circle grid patterns
+  * Calibration targets with circles now specify circle size with diameter instead of radius
 - Gradle
   * Change directory structure to avoid jar naming conflict on maven central.  Idiot that this is even possible...
 

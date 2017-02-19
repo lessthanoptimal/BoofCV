@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.examples.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigCircleRegularGrid;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
@@ -58,11 +57,11 @@ public class ExampleCalibrateMonocular {
 		List<String> images;
 
 		// Regular Circle Example
-//		detector = FactoryFiducialCalibration.circleRegularGrid(new ConfigCircleRegularGrid(8, 10, 0.75, 2.5));
+//		detector = FactoryFiducialCalibration.circleRegularGrid(new ConfigCircleRegularGrid(8, 10, 1.5, 2.5));
 //		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleRegular"),"image");
 
 		// Asymmetric Circle Example
-//		detector = FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleAsymmetricGrid(5, 8, 1, 6));
+//		detector = FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleAsymmetricGrid(5, 8, 2, 6));
 //		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleAsym"),"image");
 
 		// Square Grid example

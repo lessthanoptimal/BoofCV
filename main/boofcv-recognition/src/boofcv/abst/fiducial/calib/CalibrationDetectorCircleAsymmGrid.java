@@ -55,7 +55,7 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 
 	private CalibrationObservation results;
 
-	double spaceToRadius;
+	double spaceToDiameter;
 
 	/**
 	 * Configures the detector based on the pass in configuration class
@@ -69,7 +69,8 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 		BinaryEllipseDetector<GrayF32> ellipseDetector =
 				FactoryShapeDetector.ellipse(config.ellipse,GrayF32.class);
 
-		spaceToRadius = (config.centerDistance/config.circleRadius);
+		spaceToDiameter = (config.centerDistance/config.circleDiameter);
+		double spaceToRadius = 2.0*spaceToDiameter;
 
 		EllipsesIntoClusters e2c = new EllipsesIntoClusters(spaceToRadius*1.25,config.ellipseSizeSimilarity);
 
@@ -163,7 +164,7 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 	/**
 	 * Distance between centers to circle radius ratio
 	 */
-	public double getSpaceToRadius() {
-		return spaceToRadius;
+	public double getSpaceToDiameter() {
+		return spaceToDiameter;
 	}
 }

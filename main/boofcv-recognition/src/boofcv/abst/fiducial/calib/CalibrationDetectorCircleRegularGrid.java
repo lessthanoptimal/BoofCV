@@ -55,7 +55,7 @@ public class CalibrationDetectorCircleRegularGrid implements DetectorFiducialCal
 
 	private CalibrationObservation results;
 
-	double spaceToRadius;
+	double spaceToDiameter;
 
 	/**
 	 * Configures the detector based on the pass in configuration class
@@ -69,7 +69,8 @@ public class CalibrationDetectorCircleRegularGrid implements DetectorFiducialCal
 		BinaryEllipseDetector<GrayF32> ellipseDetector =
 				FactoryShapeDetector.ellipse(config.ellipse,GrayF32.class);
 
-		spaceToRadius = (config.centerDistance/config.circleRadius);
+		spaceToDiameter = (config.centerDistance/config.circleDiameter);
+		double spaceToRadius = 2.0*spaceToDiameter;
 
 		EllipsesIntoClusters e2c = new EllipsesIntoClusters(spaceToRadius*1.25,config.ellipseSizeSimilarity);
 
@@ -77,7 +78,7 @@ public class CalibrationDetectorCircleRegularGrid implements DetectorFiducialCal
 				ellipseDetector,e2c);
 
 
-		layout = createLayout(detector.getRows(),detector.getColumns(), config.centerDistance, config.circleRadius);
+		layout = createLayout(detector.getRows(),detector.getColumns(), config.centerDistance, config.circleDiameter);
 	}
 
 	@Override
@@ -119,10 +120,11 @@ public class CalibrationDetectorCircleRegularGrid implements DetectorFiducialCal
 	 * @param centerDistance Space between each circle's center along x and y axis
 	 * @return 2D locations
 	 */
-	public static List<Point2D_F64> createLayout( int numRows , int numCols , double centerDistance , double radius ) {
+	public static List<Point2D_F64> createLayout( int numRows , int numCols , double centerDistance , double diameter ) {
 
 		List<Point2D_F64> ret = new ArrayList<>();
-		
+
+		double radius = diameter/2.0;
 		double width = (numCols-1)*centerDistance;
 		double height = (numRows-1)*centerDistance;
 
@@ -160,7 +162,7 @@ public class CalibrationDetectorCircleRegularGrid implements DetectorFiducialCal
 	/**
 	 * Distance between centers to circle radius ratio
 	 */
-	public double getSpaceToRadius() {
-		return spaceToRadius;
+	public double getSpaceToDiameter() {
+		return spaceToDiameter;
 	}
 }

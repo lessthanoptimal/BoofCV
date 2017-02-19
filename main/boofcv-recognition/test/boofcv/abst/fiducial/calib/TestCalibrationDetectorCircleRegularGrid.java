@@ -37,7 +37,7 @@ import java.util.List;
 public class TestCalibrationDetectorCircleRegularGrid extends GenericPlanarCalibrationDetectorChecks {
 
 	private final static ConfigCircleRegularGrid config =
-			new ConfigCircleRegularGrid(5, 4, 8,50);
+			new ConfigCircleRegularGrid(5, 4, 16,50);
 
 	public TestCalibrationDetectorCircleRegularGrid() {
 		width = 500;
@@ -48,27 +48,25 @@ public class TestCalibrationDetectorCircleRegularGrid extends GenericPlanarCalib
 	public void renderTarget(GrayF32 original, List<CalibrationObservation> solutions) {
 		Affine2D_F64 affine = new Affine2D_F64(1,0,0,1,100,100);
 
-		List<Point2D_F64> pixels = new ArrayList<>();
+		List<Point2D_F64> keypoints = new ArrayList<>();
+		List<Point2D_F64> centers = new ArrayList<>();
 
-		double radiusToDistance = config.centerDistance/config.circleRadius;
+		double diameterToDistance = config.centerDistance/config.circleDiameter;
+		double radiusToDistance = diameterToDistance*2.0;
 		int radiusPixels = 20;
 
 		GrayU8 imageU8 = new GrayU8(original.width,original.height);
 		TestDetectCircleRegularGrid.render(config.numRows,config.numCols,radiusPixels,
-				(int)(radiusToDistance*radiusPixels),
-				affine,pixels,imageU8);
+				radiusToDistance*radiusPixels,
+				affine,keypoints,centers,imageU8);
 		ConvertImage.convert(imageU8,original);
 
 //		ShowImages.showWindow(original,"ASdasd");
-//		try {
-//			Thread.sleep(10000);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
+//		BoofMiscOps.sleep(10000);
 
 		CalibrationObservation solution = new CalibrationObservation();
-		for (int i = 0; i < pixels.size(); i++) {
-			solution.add(pixels.get(i),i);
+		for (int i = 0; i < keypoints.size(); i++) {
+			solution.add(keypoints.get(i),i);
 		}
 		solutions.add( solution );
 	}

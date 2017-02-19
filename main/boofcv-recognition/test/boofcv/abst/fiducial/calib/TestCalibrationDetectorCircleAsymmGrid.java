@@ -37,7 +37,7 @@ import java.util.List;
 public class TestCalibrationDetectorCircleAsymmGrid extends GenericPlanarCalibrationDetectorChecks {
 
 	private final static ConfigCircleAsymmetricGrid config =
-			new ConfigCircleAsymmetricGrid(5, 4, 10,50);
+			new ConfigCircleAsymmetricGrid(5, 4, 5,50);
 
 	public TestCalibrationDetectorCircleAsymmGrid() {
 		width = 500;
@@ -50,7 +50,7 @@ public class TestCalibrationDetectorCircleAsymmGrid extends GenericPlanarCalibra
 
 		List<Point2D_F64> pixels = new ArrayList<>();
 
-		double radiusToDistance = config.centerDistance/config.circleRadius;
+		double radiusToDistance = config.centerDistance/config.circleDiameter;
 		int radiusPixels = 20;
 
 		GrayU8 imageU8 = new GrayU8(original.width,original.height);

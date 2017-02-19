@@ -79,7 +79,7 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 
 		config.numRows = controlPanel.getGridRows();
 		config.numCols = controlPanel.getGridColumns();
-		config.circleRadius = ((DetectCalibrationCirclePanel)controlPanel).getCircleRadius();
+		config.circleDiameter = ((DetectCalibrationCirclePanel)controlPanel).getCircleDiameter();
 		config.centerDistance = ((DetectCalibrationCirclePanel)controlPanel).getCircleSpacing();
 
 		detector = FactoryFiducialCalibration.circleAsymmGrid(config);

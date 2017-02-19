@@ -34,24 +34,24 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 
 	JCheckBox showClusters;
 
-	double circleRadius;
+	double circleDiameter;
 	double circleSpacing;
 
 	boolean showGraphs;
 
-	public DetectCalibrationCirclePanel(int gridRows, int gridColumns, double radius , double spacing,
+	public DetectCalibrationCirclePanel(int gridRows, int gridColumns, double diameter , double spacing,
 										boolean showGraphs ) {
 		super(gridRows, gridColumns, true, false);
 
 		this.showGraphs = showGraphs;
-		this.circleRadius = radius;
+		this.circleDiameter = diameter;
 		this.circleSpacing = spacing;
 
 		this.showClusters = new JCheckBox("Show Clusters");
 		this.showClusters.setSelected(doShowClusters);
 		this.showClusters.addItemListener(this);
 		this.showClusters.setMaximumSize(this.showClusters.getPreferredSize());
-		selectDiameter = spinner(radius*2,0.0,1000.0,1.0);
+		selectDiameter = spinner(diameter,0.0,1000.0,1.0);
 		selectSpacing = spinner(spacing,0.0,1000.0,1.0);
 
 		addComponents(true);
@@ -96,7 +96,7 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		if( e.getSource() == selectDiameter) {
-			circleRadius = ((Number) selectDiameter.getValue()).doubleValue()/2.0;
+			circleDiameter = ((Number) selectDiameter.getValue()).doubleValue();
 			listener.calibEventDetectorModified();
 		}  else if( e.getSource() == selectSpacing) {
 			circleSpacing = ((Number) selectSpacing.getValue()).doubleValue();
@@ -106,8 +106,8 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 		}
 	}
 
-	public double getCircleRadius() {
-		return circleRadius;
+	public double getCircleDiameter() {
+		return circleDiameter;
 	}
 
 	public double getCircleSpacing() {
