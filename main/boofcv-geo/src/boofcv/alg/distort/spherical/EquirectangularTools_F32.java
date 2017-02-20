@@ -152,4 +152,12 @@ public class EquirectangularTools_F32 {
 		rect.y = UtilAngle.reflectZeroToOne(lat / GrlConstants.F_PI + 0.5f)*(height-1);
 		rect.y = height - rect.y - 1;
 	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
 }
