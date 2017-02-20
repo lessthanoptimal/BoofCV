@@ -899,7 +899,9 @@ public class ConvertBufferedImage {
 	public static BufferedImage checkInputs(ImageBase src, BufferedImage dst) {
 		if (dst != null) {
 			if (dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight()) {
-				throw new IllegalArgumentException("image dimension are different");
+				throw new IllegalArgumentException("Shapes do not match: "+
+						"src = ( "+src.width+" , "+src.height+" )  " +
+						"dst = ( "+dst.getWidth()+" , "+dst.getHeight()+" )");
 			}
 		} else {
 			if( GrayI8.class.isInstance(src))
