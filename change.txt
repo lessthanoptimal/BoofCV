@@ -74,6 +74,9 @@ Version : 0.27
 - TODO Tutorial on image features?  Sparse and dense?
 - TODO Don't forget to change BoofCV version referenced in Android example
 - TODO Look at AKAZE feature
+- TODO Gradle - look into switching to java-library and changing dependencies to api
+       https://blog.gradle.org/incremental-compiler-avoidance
+
 ---------------------------------------------
 Date    : 2016/12/07
 Version : 0.26
