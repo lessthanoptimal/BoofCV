@@ -118,8 +118,10 @@ public class ImageZoomPanel extends JScrollPane {
 
 	protected class ImagePanel extends JPanel
 	{
+		SaveImageOnClick mouseListener = new SaveImageOnClick(this);
+
 		public ImagePanel() {
-			addMouseListener(new SaveImageOnClick(this));
+			addMouseListener(mouseListener);
 		}
 
 		@Override

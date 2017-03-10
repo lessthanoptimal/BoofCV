@@ -38,32 +38,40 @@ public class ImagePanel extends JPanel {
 
 	public double scale = 1;
 
-	MouseListener mouseListener;
+	protected SaveImageOnClick mouseListener;
 
 	public ImagePanel(BufferedImage img) {
 		this(img,ScaleOptions.NONE);
 	}
 
 	public ImagePanel(final BufferedImage img , ScaleOptions scaling ) {
+		this(true);
 		this.img = img;
 		this.scaling = scaling;
 		autoSetPreferredSize();
 	}
 
 	public ImagePanel( int width , int height ) {
+		this(true);
 		setPreferredSize(new Dimension(width,height));
-	}
-
-	public ImagePanel() {
 	}
 
 	/**
 	 * Adds the ability to save an image using the middle mouse button.  A dialog is shown to the user
 	 * so that they know what has happened.  They can hide it in the future if they wish.
 	 */
-	{
-		mouseListener = new SaveImageOnClick(this);
-		addMouseListener(mouseListener);
+
+	public ImagePanel( boolean addMouseListener ) {
+		if( addMouseListener ) {
+			// Adds the ability to save an image using the middle mouse button.  A dialog is shown to the user
+			// so that they know what has happened.  They can hide it in the future if they wish.
+			mouseListener = new SaveImageOnClick(this);
+			addMouseListener(mouseListener);
+		}
+	}
+
+	public ImagePanel() {
+		this(true);
 	}
 
 	@Override
