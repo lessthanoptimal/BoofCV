@@ -37,8 +37,13 @@ public class ImagePanel extends JPanel {
 	protected ScaleOptions scaling = ScaleOptions.DOWN;
 
 	public double scale = 1;
+	public double offsetX=0;
+	public double offsetY=0;
 
 	protected SaveImageOnClick mouseListener;
+
+	private AffineTransform transform = new AffineTransform();
+	private boolean center = false;
 
 	public ImagePanel(BufferedImage img) {
 		this(img,ScaleOptions.NONE);
@@ -90,18 +95,29 @@ public class ImagePanel extends JPanel {
 				if( scaling == ScaleOptions.DOWN && scale >= 1 )
 					scale = 1;
 
+				if( center ) {
+					offsetX = (img.getWidth()*scale - getWidth())/2;
+					offsetY = (img.getHeight()*scale - getHeight())/2;
+				}
+
 				if( scale == 1 ) {
-					g.drawImage(img, 0, 0, this);
+					offsetX = (int)offsetX;
+					offsetY = (int)offsetY;
+					g.drawImage(img, (int)offsetX, (int)offsetY, this);
 				} else {
-					AffineTransform tran = AffineTransform.getScaleInstance(scale, scale);
+					transform.setTransform(scale,0,0,scale,offsetX,offsetY);
+
 //					g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 //							RenderingHints.VALUE_ANTIALIAS_ON);
-					g2.drawImage(img,tran,null);
+					g2.drawImage(img,transform,null);
 				}
 
 			} else {
+				offsetX = (img.getWidth() - getWidth())/2;
+				offsetY = (img.getHeight() - getHeight())/2;
+
 				scale = 1;
-				g2.drawImage(img, 0, 0, this);
+				g2.drawImage(img, (int)offsetX, (int)offsetY, this);
 			}
 		}
 	}
@@ -130,6 +146,14 @@ public class ImagePanel extends JPanel {
          }
       });
    }
+
+	public boolean isCentered() {
+		return center;
+	}
+
+	public void setCentering(boolean center) {
+		this.center = center;
+	}
 
 	public BufferedImage getImage() {
 		return img;

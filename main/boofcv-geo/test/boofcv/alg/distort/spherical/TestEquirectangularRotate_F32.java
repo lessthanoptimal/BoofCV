@@ -36,7 +36,7 @@ public class TestEquirectangularRotate_F32 {
 	public void simpleTests() {
 
 		EquirectangularRotate_F32 alg = new EquirectangularRotate_F32();
-		alg.setImageShape(300,251);
+		alg.setEquirectangularShape(300,251);
 
 		// this is the standard configuration and there should be no change
 		alg.setDirection(0,0,0);

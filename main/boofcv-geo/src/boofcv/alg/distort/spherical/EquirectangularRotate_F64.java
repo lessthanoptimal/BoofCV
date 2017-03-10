@@ -26,16 +26,15 @@ package boofcv.alg.distort.spherical;
  */
 public class EquirectangularRotate_F64 extends EquirectangularDistortBase_F64 {
 
-
-
 	/**
 	 * Specifies the image's width and height
 	 *
 	 * @param width Image width
 	 * @param height Image height
 	 */
-	public void setImageShape( int width , int height ) {
-		tools.configure(width, height);
+	@Override
+	public void setEquirectangularShape( int width , int height ) {
+		super.setEquirectangularShape(width, height);
 		declareVectors(width, height);
 
 		// precompute vectors for each pixel

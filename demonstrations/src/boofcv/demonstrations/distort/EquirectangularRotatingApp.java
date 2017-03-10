@@ -120,13 +120,13 @@ public class EquirectangularRotatingApp<T extends ImageBase<T>> extends Demonstr
 		if( rendered.getWidth() != width || rendered.getHeight() != height ) {
 			rendered = new BufferedImage(width,height,BufferedImage.TYPE_INT_BGR);
 			panelImage.setPreferredSize(new Dimension(width,height));
-			distorter.setImageShape(width, height);
+			distorter.setEquirectangularShape(width, height);
 			distortImage.setModel(distorter); // let it know the transform has changed
 		}
 
 		centerLon = centerLat = 0;
 		distorted.reshape(width,height);
-		distorter.setImageShape(width,height);
+		distorter.setEquirectangularShape(width,height);
 	}
 
 	@Override
