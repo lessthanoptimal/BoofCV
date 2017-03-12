@@ -96,8 +96,8 @@ public class ImagePanel extends JPanel {
 					scale = 1;
 
 				if( center ) {
-					offsetX = (img.getWidth()*scale - getWidth())/2;
-					offsetY = (img.getHeight()*scale - getHeight())/2;
+					offsetX = (getWidth()-img.getWidth()*scale)/2;
+					offsetY = (getHeight()-img.getHeight()*scale)/2;
 				}
 
 				if( scale == 1 ) {
