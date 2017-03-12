@@ -97,6 +97,7 @@ public class UniOmniPtoS_F32 implements Point2Transform3_F32 {
 		// origin and lying on the sphere's surface, i.e. distance of 1 from the center
 		// X = (u, v , 1)
 		// P = (t*u, t*v, t)  and ||P-C|| = 1
+		// C = (0, 0, xi)
 		// There will be two solutions.  It selects the one farther down the line (top of the
 		// sphere)  If xi is > 1 then it's possible for two pixels to have the same value slope
 		float xi = mirrorOffset;
