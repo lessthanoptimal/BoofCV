@@ -749,10 +749,10 @@ public class BoofTesting {
 	}
 
 	/**
-	 * Checks to see if the BufferedImage has the same intensity values as the GrayU8
+	 * Checks to see if the BufferedImage has the same intensity values as the GrayI16
 	 *
 	 * @param imgA BufferedImage
-	 * @param imgB GrayU8
+	 * @param imgB GrayI16
 	 */
 	public static void checkEquals(BufferedImage imgA, GrayI16 imgB) {
 
@@ -817,10 +817,10 @@ public class BoofTesting {
 	}
 
 	/**
-	 * Checks to see if the BufferedImage has the same intensity values as the GrayU8
+	 * Checks to see if the BufferedImage has the same intensity values as the GrayF32
 	 *
 	 * @param imgA BufferedImage
-	 * @param imgB GrayU8
+	 * @param imgB GrayF32
 	 */
 	public static void checkEquals(BufferedImage imgA, GrayF32 imgB, float tol) {
 
