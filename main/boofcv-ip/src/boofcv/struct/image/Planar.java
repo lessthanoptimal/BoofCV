@@ -34,15 +34,15 @@ import java.lang.reflect.Array;
  * and each color would be stored in its own gray scale image.  To access the image for a particular
  * band call {@link #getBand(int)}. To get the RGB value for a pixel (x,y) one would need to:
  * <pre>
- * int red = image.get(0).get(x,y);
- * int green = image.get(1).get(x,y);
- * int blue = image.get(2).get(x,y);
+ * int red = image.getBand(0).get(x,y);
+ * int green = image.getBand(1).get(x,y);
+ * int blue = image.getBand(2).get(x,y);
  * </pre>
- * Setting the RGB value of pixel (x,y) is done in a similar manor:
+ * Setting the RGB value of pixel (x,y) is done in a similar manner:
  * <pre>
- * image.get(0).get(x,y,red);
- * image.get(1).get(x,y,green);
- * image.get(2).get(x,y,blue);
+ * image.getBand(0).set(x,y,red);
+ * image.getBand(1).set(x,y,green);
+ * image.getBand(2).set(x,y,blue);
  * </pre>
  * </p>
  * 
