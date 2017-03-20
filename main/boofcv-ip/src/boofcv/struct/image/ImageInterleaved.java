@@ -153,6 +153,9 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	}
 
 	public final void setNumBands(int numBands) {
+		if( this.numBands == numBands )
+			return;
+
 		if( isSubimage() )
 			throw new IllegalArgumentException("Can't reshape sub-images");
 
