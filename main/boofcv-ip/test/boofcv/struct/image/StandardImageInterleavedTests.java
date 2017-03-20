@@ -231,6 +231,17 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 
 		assertEquals(2,a.getNumBands());
 		assertEquals(2,a.getImageType().getNumBands());
+		assertEquals(2*10,a.stride);
+
+		assertTrue(Array.getLength(a._getData()) >= 10*20*2 );
+
+		a.setNumBands(4);
+
+		assertEquals(4,a.getNumBands());
+		assertEquals(4,a.getImageType().getNumBands());
+		assertEquals(4*10,a.stride);
+		assertTrue(Array.getLength(a._getData()) >= 10*20*4 );
+
 	}
 
 	@Test
@@ -249,5 +260,4 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 		assertTrue(a.getPrimitiveDataType() != null);
 		assertTrue(a.getImageType() != null);
 	}
-
 }

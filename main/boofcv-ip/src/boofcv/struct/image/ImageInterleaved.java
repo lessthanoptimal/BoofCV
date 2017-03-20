@@ -153,8 +153,19 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	}
 
 	public final void setNumBands(int numBands) {
+		if( isSubimage() )
+			throw new IllegalArgumentException("Can't reshape sub-images");
+
 		this.imageType.numBands = numBands;
 		this.numBands = numBands;
+		this.stride = width*numBands;
+
+		Object data = _getData();
+
+		if( Array.getLength(data) < width*height*numBands ) {
+			ImageInterleaved<?> a = createNew(width,height);
+			_setData(a._getData());
+		}
 	}
 
 	/**

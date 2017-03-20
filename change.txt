@@ -65,6 +65,7 @@ Version : 0.27
   * Calibration targets with circles now specify circle size with diameter instead of radius
 - Gradle
   * Change directory structure to avoid jar naming conflict on maven central.  Idiot that this is even possible...
+- Fixed ImageInterleaved.setNumBands() NOT correctly setting the stride and growing the data array
 
 - TODO Visualization tools for Direct VO
 -      Show warped image
