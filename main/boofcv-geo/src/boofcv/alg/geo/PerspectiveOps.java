@@ -95,7 +95,7 @@ public class PerspectiveOps {
 	 * @param param Intrinsic parameters
 	 * @param scale Scale factor that input image is being scaled by.
 	 */
-	public static void scaleIntrinsic(CameraPinholeRadial param , double scale ) {
+	public static void scaleIntrinsic(CameraPinhole param , double scale ) {
 		param.width = (int)(param.width*scale);
 		param.height = (int)(param.height*scale);
 		param.cx *= scale;
