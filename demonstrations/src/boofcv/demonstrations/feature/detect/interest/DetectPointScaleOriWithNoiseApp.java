@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -95,7 +95,7 @@ public class DetectPointScaleOriWithNoiseApp<T extends ImageGray<T>, D extends I
 		grayImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 		corruptImage = (T) grayImage.createNew(grayImage.width, grayImage.height);
 		workImage = new BufferedImage(input.getWidth(), input.getHeight(), BufferedImage.TYPE_INT_BGR);
-		panel.setBufferedImage(workImage);
+		panel.setImage(workImage);
 		panel.setPreferredSize(new Dimension(workImage.getWidth(), workImage.getHeight()));
 		doRefreshAll();
 

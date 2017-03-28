@@ -216,8 +216,8 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				guiLeft.setBufferedImage(buffImage1);
-				guiRight.setBufferedImage(buffImage2);
+				guiLeft.setImage(buffImage1);
+				guiRight.setImage(buffImage2);
 				guiLeft.autoSetPreferredSize();
 				guiRight.autoSetPreferredSize();
 				guiLeft.repaint();

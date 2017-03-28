@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -85,6 +85,6 @@ public class AssistedCalibrationGui extends JPanel {
 
 	public synchronized void setImage( BufferedImage image ) {
 		workImage.createGraphics().drawImage(image,0,0,image.getWidth(),image.getHeight(),null);
-		imagePanel.setBufferedImage(workImage);
+		imagePanel.setImage(workImage);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -429,7 +429,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 				g2.drawString("Uncalibrated",10,20);
 			}
 
-			gui.setBufferedImage(buffered);
+			gui.setImage(buffered);
 
 			long after = System.currentTimeMillis();
 			long time = Math.max(0,pauseMilli-(after-before));
@@ -476,7 +476,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 			g2.drawString("Uncalibrated",10,20);
 		}
 
-		gui.setBufferedImage(buffered);
+		gui.setImage(buffered);
 	}
 
 	private void saveResults( int frameNumber ) {

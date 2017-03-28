@@ -82,7 +82,7 @@ public class ExampleTrackingKlt {
 				VisualizeFeatures.drawPoint(g2,(int)t.x,(int)t.y,Color.RED);
 			}
 
-			gui.setBufferedImageSafe(image);
+			gui.setImageUI(image);
 		}
 	}
 }

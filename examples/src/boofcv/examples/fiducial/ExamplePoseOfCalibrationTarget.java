@@ -130,7 +130,7 @@ public class ExamplePoseOfCalibrationTarget {
 				}
 			}
 
-			imagePanel.setBufferedImage((BufferedImage) video.getGuiImage());
+			imagePanel.setImage((BufferedImage) video.getGuiImage());
 			viewer.repaint();
 			imagePanel.repaint();
 

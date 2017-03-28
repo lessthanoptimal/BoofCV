@@ -106,7 +106,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 		pinhole = imageType.createImage(camWidth,camHeight);
 		buffPinhole = new BufferedImage(camWidth,camHeight,BufferedImage.TYPE_INT_BGR);
 		panelPinhole.setPreferredSize( new Dimension(camWidth,camHeight));
-		panelPinhole.setBufferedImage(buffEqui);
+		panelPinhole.setImage(buffEqui);
 		panelPinhole.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -199,7 +199,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 			if (buffEqui.getWidth() != buffered.getWidth() || buffEqui.getHeight() != buffered.getHeight()) {
 				buffEqui = new BufferedImage(buffered.getWidth(), buffered.getHeight(), BufferedImage.TYPE_INT_BGR);
 				panelEqui.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
-				panelEqui.setBufferedImageSafe(buffEqui);
+				panelEqui.setImageUI(buffEqui);
 
 				distorter.setEquirectangularShape(input.width, input.height);
 				distortImage.setModel(distorter);
@@ -219,7 +219,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 //		System.out.println("Rendering time "+(after-before)/1e6+" ms");
 
 		ConvertBufferedImage.convertTo(pinhole,buffPinhole,true);
-		panelPinhole.setBufferedImageSafe(buffPinhole);
+		panelPinhole.setImageUI(buffPinhole);
 		panelEqui.repaint();
 	}
 

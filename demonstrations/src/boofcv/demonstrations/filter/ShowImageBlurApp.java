@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -121,7 +121,7 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 			public void run() {
 				setInputImage(image);
 				renderedImage = new BufferedImage(input.width, input.height,BufferedImage.TYPE_INT_BGR);
-				gui.setBufferedImage(renderedImage);
+				gui.setImage(renderedImage);
 				gui.setPreferredSize(new Dimension(input.width,input.height));
 				gui.repaint();
 				processedImage = true;

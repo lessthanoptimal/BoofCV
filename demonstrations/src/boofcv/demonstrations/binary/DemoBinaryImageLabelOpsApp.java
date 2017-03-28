@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -202,7 +202,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageGray<T>> extends SelectAl
 					work = new BufferedImage(imageInput.width, imageInput.height, BufferedImage.TYPE_INT_BGR);
 				}
 				renderVisualizeImage();
-				gui.setBufferedImage(work);
+				gui.setImage(work);
 				gui.setPreferredSize(new Dimension(imageInput.width, imageInput.height));
 				processedImage = true;
 				gui.repaint();

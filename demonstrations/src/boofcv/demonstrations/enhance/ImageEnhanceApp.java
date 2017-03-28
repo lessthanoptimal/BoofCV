@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -112,7 +112,7 @@ public class ImageEnhanceApp
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				gui.setBufferedImage(output);
+				gui.setImage(output);
 				gui.repaint();
 				gui.requestFocusInWindow();
 			}

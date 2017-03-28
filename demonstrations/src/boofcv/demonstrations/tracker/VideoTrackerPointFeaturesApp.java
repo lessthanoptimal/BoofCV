@@ -126,7 +126,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>, D extends Imag
 				I image = sequence.next();
 				gui.setPreferredSize(new Dimension(image.width,image.height));
 				workImage = new BufferedImage(image.width,image.height,BufferedImage.TYPE_INT_BGR);
-				gui.setBufferedImage(workImage);
+				gui.setImage(workImage);
 				revalidate();
 				startWorkerThread();
 			}});

@@ -95,7 +95,7 @@ public class DemonstrationInterpolateScaleApp<T extends ImageBase<T>>
 			new FDistort(latestImage, scaledImage).interp(interpType).border(BorderType.EXTENDED).scale().apply();
 			BufferedImage out = ConvertBufferedImage.convertTo(scaledImage, null, true);
 
-			panel.setBufferedImageSafe(out);
+			panel.setImageUI(out);
 			panel.repaint();
 		}
 	}

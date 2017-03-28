@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -120,7 +120,7 @@ public class DenseFlowApp
 			@Override
 			public void run() {
 				flowPanel.setPreferredSize(new Dimension(input0.width,input0.height));
-				flowPanel.setBufferedImage(visualized);
+				flowPanel.setImage(visualized);
 				animationPanel.setPreferredSize(new Dimension(input0.width,input0.height));
 				animationPanel.setAnimation(converted0,converted1);
 				gui.revalidate();

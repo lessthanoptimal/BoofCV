@@ -129,7 +129,7 @@ public class ImageClassificationPanel extends JPanel
 
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-					centerImage.setBufferedImage(selected.image);
+					centerImage.setImage(selected.image);
 					centerImage.setPreferredSize(new Dimension(selected.image.getWidth(), selected.image.getHeight()));
 					centerImage.validate();
 					centerImage.repaint();

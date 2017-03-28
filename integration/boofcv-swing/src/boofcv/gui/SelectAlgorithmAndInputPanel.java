@@ -186,7 +186,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 					originalCheck.setEnabled(false);
 				} else {
 					originalCheck.setEnabled(true);
-					origPanel.setBufferedImage(inputImage);
+					origPanel.setImage(inputImage);
 					origPanel.setPreferredSize(new Dimension(inputImage.getWidth(),inputImage.getHeight()));
 					origPanel.repaint();
 				}

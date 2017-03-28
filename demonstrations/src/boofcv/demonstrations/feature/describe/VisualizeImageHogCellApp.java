@@ -126,7 +126,7 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 				g2.drawImage(buffered,0,0,buffered.getWidth()/5,buffered.getHeight()/5,null);
 		}
 
-		imagePanel.setBufferedImage(work);
+		imagePanel.setImage(work);
 		imagePanel.setPreferredSize(new Dimension(work.getWidth(),work.getHeight()));
 		imagePanel.setMinimumSize(new Dimension(work.getWidth(),work.getHeight()));
 	}

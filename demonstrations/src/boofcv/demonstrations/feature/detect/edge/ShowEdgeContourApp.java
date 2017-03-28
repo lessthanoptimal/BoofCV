@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -179,7 +179,7 @@ public class ShowEdgeContourApp<T extends ImageGray<T>, D extends ImageGray<D>>
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				panel.setBufferedImage(temp);
+				panel.setImage(temp);
 				panel.repaint();
 			}});
 	}

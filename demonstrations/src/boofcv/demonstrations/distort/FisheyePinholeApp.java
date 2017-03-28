@@ -116,7 +116,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 		pinhole = imageType.createImage(camWidth,camHeight);
 		buffPinhole = new BufferedImage(camWidth,camHeight,BufferedImage.TYPE_INT_BGR);
 		panelPinhole.setPreferredSize( new Dimension(camWidth,camHeight));
-		panelPinhole.setBufferedImage(buffFisheye);
+		panelPinhole.setImage(buffFisheye);
 		final PinholeSimplifiedPanel controlPinhole = new PinholeSimplifiedPanel(camWidth,camHeight,hfov,this);
 
 		MouseAdapter adapter = new MouseAdapter() {
@@ -208,7 +208,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 				buffFisheye = new BufferedImage(buffered.getWidth(), buffered.getHeight(), BufferedImage.TYPE_INT_BGR);
 
 				panelFisheye.setPreferredSize(new Dimension(buffered.getWidth(),buffered.getHeight()));
-				panelFisheye.setBufferedImageSafe(buffFisheye);
+				panelFisheye.setImageUI(buffFisheye);
 
 				distortImage.setModel(new PointToPixelTransform_F32(distorter));
 			}
@@ -226,7 +226,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 //		System.out.println("Rendering time "+(after-before)/1e6+" ms");
 
 		ConvertBufferedImage.convertTo(pinhole,buffPinhole,true);
-		panelPinhole.setBufferedImageSafe(buffPinhole);
+		panelPinhole.setImageUI(buffPinhole);
 		panelFisheye.repaint();
 	}
 

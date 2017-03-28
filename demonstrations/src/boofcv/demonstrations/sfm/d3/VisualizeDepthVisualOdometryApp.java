@@ -349,8 +349,8 @@ public class VisualizeDepthVisualOdometryApp
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				guiLeft.setBufferedImage(bufferedRGB);
-				guiDepth.setBufferedImage(renderedDepth);
+				guiLeft.setImage(bufferedRGB);
+				guiDepth.setImage(renderedDepth);
 				guiLeft.autoSetPreferredSize();
 				guiDepth.autoSetPreferredSize();
 				guiLeft.repaint();

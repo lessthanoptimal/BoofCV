@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -207,15 +207,15 @@ public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageG
 			public void run() {
 				switch (viewImage) {
 					case 0:
-						imagePanel.setBufferedImage(input);
+						imagePanel.setImage(input);
 						break;
 
 					case 1:
-						imagePanel.setBufferedImage(intensityImage);
+						imagePanel.setImage(intensityImage);
 						break;
 
 					case 2:
-						imagePanel.setBufferedImage(workImage);
+						imagePanel.setImage(workImage);
 						break;
 				}
 				BufferedImage b = imagePanel.getImage();

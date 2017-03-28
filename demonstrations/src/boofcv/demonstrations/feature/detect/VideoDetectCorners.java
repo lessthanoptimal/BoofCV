@@ -120,7 +120,7 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>>
 			panel = ShowImages.showWindow(guiImage, "Image Sequence");
 			addComponent(panel);
 		} else {
-			panel.setBufferedImage(guiImage);
+			panel.setImage(guiImage);
 			panel.repaint();
 		}
 	}

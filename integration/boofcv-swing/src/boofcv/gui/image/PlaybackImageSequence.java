@@ -48,7 +48,7 @@ public class PlaybackImageSequence<T extends ImageGray<T>> extends ProcessImageS
 			panel = ShowImages.showWindow(guiImage, "Image Sequence");
 			addComponent(panel);
 		} else {
-			panel.setBufferedImage(guiImage);
+			panel.setImage(guiImage);
 			panel.repaint();
 		}
 	}

@@ -66,7 +66,7 @@ public class ExampleCollectImages {
 				UtilImageIO.saveImage(image,String.format("image%04d.png",(total++)));
 			}
 
-			gui.setBufferedImageSafe(image);
+			gui.setImageUI(image);
 		}
 	}
 }

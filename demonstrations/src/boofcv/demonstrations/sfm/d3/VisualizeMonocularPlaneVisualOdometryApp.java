@@ -225,7 +225,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				guiLeft.setBufferedImage(buffImage1);
+				guiLeft.setImage(buffImage1);
 				guiLeft.autoSetPreferredSize();
 				guiLeft.repaint();
 

@@ -129,7 +129,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 				ConvertBufferedImage.convertTo(undistorted, distortedBuff, true);
 			}
 		}
-		gui.setBufferedImageSafe(distortedBuff);
+		gui.setImageUI(distortedBuff);
 	}
 
 	@Override

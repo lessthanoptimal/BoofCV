@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,7 +100,7 @@ public class CalibrationInfoPanel extends StandardAlgConfigPanel
 			imageTemplate = new BufferedImage(image.width,image.height,BufferedImage.TYPE_INT_BGR);
 		}
 		ConvertBufferedImage.convertTo(image,imageTemplate);
-		undistortedTemplate.setBufferedImageSafe(imageTemplate);
+		undistortedTemplate.setImageUI(imageTemplate);
 	}
 
 	public void updateView( GrayF32 image ) {
@@ -108,7 +108,7 @@ public class CalibrationInfoPanel extends StandardAlgConfigPanel
 			imageView = new BufferedImage(image.width,image.height,BufferedImage.TYPE_INT_BGR);
 		}
 		ConvertBufferedImage.convertTo(image,imageView);
-		undistortedView.setBufferedImageSafe(imageView);
+		undistortedView.setImageUI(imageView);
 	}
 
 	public void updateGeometry( final double process ) {

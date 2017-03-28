@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -122,7 +122,7 @@ public class ExamplePointFeatureTracker< T extends ImageGray<T>, D extends Image
 		}
 
 		// tell the GUI to update
-		gui.setBufferedImage(orig);
+		gui.setImage(orig);
 		gui.repaint();
 	}
 

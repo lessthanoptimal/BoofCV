@@ -65,7 +65,7 @@ public class ExampleWebcamGradient {
 			// visualize and display
 			BufferedImage visualized = VisualizeImageData.colorizeGradient(derivX,derivY,-1);
 
-			gui.setBufferedImageSafe(visualized);
+			gui.setImageUI(visualized);
 		}
 	}
 }

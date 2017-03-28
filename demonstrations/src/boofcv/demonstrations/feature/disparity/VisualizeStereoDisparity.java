@@ -180,7 +180,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 					throw new RuntimeException("Unknown option");
 			}
 
-			gui.setBufferedImage(img);
+			gui.setImage(img);
 			gui.setPreferredSize(new Dimension(origLeft.getWidth(), origLeft.getHeight()));
 			comp = gui;
 		} else {

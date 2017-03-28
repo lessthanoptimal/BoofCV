@@ -155,7 +155,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 			}
 		}
 
-		imagePanel.setBufferedImage(buffered);
+		imagePanel.setImage(buffered);
 		imagePanel.setPreferredSize(new Dimension(buffered.getWidth(),buffered.getHeight()));
 		imagePanel.setMinimumSize(new Dimension(buffered.getWidth(),buffered.getHeight()));
 	}

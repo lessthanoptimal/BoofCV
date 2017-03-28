@@ -111,7 +111,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase<T>>
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				gui.setPreferredSize(new Dimension(color.getWidth(), color.getHeight()));
-				gui.setBufferedImage(input);
+				gui.setImage(input);
 				gui.revalidate();
 				processImage = true;
 			}
@@ -180,11 +180,11 @@ public class VisualizeImageSegmentationApp <T extends ImageBase<T>>
 		Runnable r = new Runnable() {
 			public void run() {
 				if( activeDisplay == 0 ) {
-					gui.setBufferedImage(outColor);
+					gui.setImage(outColor);
 				} else if( activeDisplay == 1 ) {
-					gui.setBufferedImage(outBorder);
+					gui.setImage(outBorder);
 				} else if( activeDisplay == 2 ) {
-					gui.setBufferedImage(outSegments);
+					gui.setImage(outSegments);
 				}
 				gui.repaint();
 			}};

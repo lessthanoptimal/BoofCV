@@ -94,7 +94,7 @@ public class VideoDetectInterestPoints<T extends ImageGray<T>>
 			panel = ShowImages.showWindow(guiImage, "Image Sequence", true);
 			addComponent(panel);
 		} else {
-			panel.setBufferedImage(guiImage);
+			panel.setImage(guiImage);
 			panel.repaint();
 		}
 	}

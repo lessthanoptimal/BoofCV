@@ -163,7 +163,7 @@ public class RenderSyntheticCamerModelApp<T extends ImageBase<T>> extends Demons
 		}
 
 		out = ConvertBufferedImage.convertTo(undist,out,true);
-		gui.setBufferedImageSafe(out);
+		gui.setImageUI(out);
 	}
 
 	@Override
