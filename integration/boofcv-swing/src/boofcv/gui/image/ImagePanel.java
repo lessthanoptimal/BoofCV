@@ -87,38 +87,46 @@ public class ImagePanel extends JPanel {
 		//draw the image
 		BufferedImage img = this.img;
 		if (img != null) {
-			if( scaling != ScaleOptions.NONE ) {
-				double ratioW = (double)getWidth()/(double)img.getWidth();
-				double ratioH = (double)getHeight()/(double)img.getHeight();
-
-				scale = Math.min(ratioW,ratioH);
-				if( scaling == ScaleOptions.DOWN && scale >= 1 )
-					scale = 1;
-
-				if( center ) {
-					offsetX = (getWidth()-img.getWidth()*scale)/2;
-					offsetY = (getHeight()-img.getHeight()*scale)/2;
-				}
-
-				if( scale == 1 ) {
-					offsetX = (int)offsetX;
-					offsetY = (int)offsetY;
-					g.drawImage(img, (int)offsetX, (int)offsetY, this);
-				} else {
-					transform.setTransform(scale,0,0,scale,offsetX,offsetY);
-
-//					g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-//							RenderingHints.VALUE_ANTIALIAS_ON);
+			computeOffsetAndScale();
+			if( scale == 1 ) {
+				if( offsetX == 0 && offsetY == 0 ) {
 					g2.drawImage(img,transform,null);
+				} else {
+					g2.drawImage(img, (int)offsetX, (int)offsetY, this);
 				}
-
 			} else {
-				offsetX = (img.getWidth() - getWidth())/2;
-				offsetY = (img.getHeight() - getHeight())/2;
-
-				scale = 1;
-				g2.drawImage(img, (int)offsetX, (int)offsetY, this);
+				transform.setTransform(scale,0,0,scale,offsetX,offsetY);
+				g2.drawImage(img,transform,null);
 			}
+		}
+	}
+
+	private void computeOffsetAndScale() {
+		if( scaling != ScaleOptions.NONE ) {
+			double ratioW = (double)getWidth()/(double)img.getWidth();
+			double ratioH = (double)getHeight()/(double)img.getHeight();
+
+			scale = Math.min(ratioW,ratioH);
+			if( scaling == ScaleOptions.DOWN && scale >= 1 )
+				scale = 1;
+
+			if( center ) {
+				offsetX = (getWidth()-img.getWidth()*scale)/2;
+				offsetY = (getHeight()-img.getHeight()*scale)/2;
+			} else {
+				offsetX = 0;
+				offsetY = 0;
+			}
+
+			if( scale == 1 ) {
+				offsetX = (int)offsetX;
+				offsetY = (int)offsetY;
+			}
+		} else {
+			offsetX = (img.getWidth() - getWidth())/2;
+			offsetY = (img.getHeight() - getHeight())/2;
+
+			scale = 1;
 		}
 	}
 
@@ -159,6 +167,12 @@ public class ImagePanel extends JPanel {
 	 * Repaints just the region around the image.
 	 */
 	public void repaintJustImage() {
+		if( img == null ) {
+			repaint();
+			return;
+		}
+		computeOffsetAndScale();
+
 		repaint((int)Math.round(offsetX)-1,(int)Math.round(offsetY)-1,
 				(int)(img.getWidth()*scale+0.5)+2,(int)(img.getHeight()*scale+0.5)+2);
 	}
