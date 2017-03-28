@@ -137,8 +137,11 @@ public class ImagePanel extends JPanel {
 	 * @param image The new image which will be displayed.
 	 */
 	public void setBufferedImage(BufferedImage image) {
+		// if image is larger before  than the new image then you need to make sure you repaint
+		// the entire image otherwise a ghost will be left
+		repaintJustImage();
 		this.img = image;
-		this.repaintJustImage();
+		repaintJustImage();
 	}
 
    /**
