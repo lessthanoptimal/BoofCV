@@ -130,7 +130,7 @@ public class ImagePanel extends JPanel {
 	 */
 	public void setBufferedImage(BufferedImage image) {
 		this.img = image;
-		this.repaint();
+		this.repaintJustImage();
 	}
 
    /**
@@ -153,6 +153,14 @@ public class ImagePanel extends JPanel {
 
 	public void setCentering(boolean center) {
 		this.center = center;
+	}
+
+	/**
+	 * Repaints just the region around the image.
+	 */
+	public void repaintJustImage() {
+		repaint((int)Math.round(offsetX)-1,(int)Math.round(offsetY)-1,
+				(int)(img.getWidth()*scale+0.5)+2,(int)(img.getHeight()*scale+0.5)+2);
 	}
 
 	public BufferedImage getImage() {
