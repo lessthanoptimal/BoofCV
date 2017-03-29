@@ -89,7 +89,7 @@ public class GBlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase<T>>
-	T gaussian(T input, T output, double sigma , int radius, T storage ) {
+	T gaussian(T input, T output, double sigma , int radius, ImageBase storage ) {
 		switch( input.getImageType().getFamily() ) {
 			case GRAY: {
 				if (input instanceof GrayU8) {
