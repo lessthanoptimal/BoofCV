@@ -86,6 +86,7 @@ public class ImagePanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
+		configureDrawImageGraphics(g2);
 
 		//draw the image
 		BufferedImage img = this.img;
@@ -103,6 +104,8 @@ public class ImagePanel extends JPanel {
 			}
 		}
 	}
+
+	protected void configureDrawImageGraphics( Graphics2D g2 ) {}
 
 	private void computeOffsetAndScale(BufferedImage img, ScaleOffset so ) {
 		if( scaling != ScaleOptions.NONE ) {
