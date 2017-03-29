@@ -46,6 +46,7 @@ public class ImagePanel extends JPanel {
 	protected SaveImageOnClick mouseListener;
 
 	private AffineTransform transform = new AffineTransform();
+	private AffineTransform original = new AffineTransform();
 	private boolean center = false;
 
 	public ImagePanel(BufferedImage img) {
@@ -86,6 +87,7 @@ public class ImagePanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
+		AffineTransform original = g2.getTransform();
 		configureDrawImageGraphics(g2);
 
 		//draw the image
@@ -103,6 +105,8 @@ public class ImagePanel extends JPanel {
 				g2.drawImage(img,transform,null);
 			}
 		}
+
+		g2.setTransform(original);
 	}
 
 	protected void configureDrawImageGraphics( Graphics2D g2 ) {}
