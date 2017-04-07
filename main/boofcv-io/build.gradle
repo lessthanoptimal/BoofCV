@@ -2,6 +2,5 @@ dependencies {
     compile project(':main:boofcv-ip')
     compile project(':main:boofcv-calibration')
 
-    compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.7'
     compile group: 'org.yaml', name: 'snakeyaml', version: '1.17'
 }

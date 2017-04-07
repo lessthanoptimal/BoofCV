@@ -33,7 +33,7 @@ import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
-import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
@@ -526,7 +526,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
-		CameraPinholeRadial intrinsic = intrinsicPath == null ? null : (CameraPinholeRadial)UtilIO.loadXML(intrinsicPath);
+		CameraPinholeRadial intrinsic = intrinsicPath == null ? null :  (CameraPinholeRadial)CalibrationIO.load(intrinsicPath);
 
 		SimpleImageSequence<GrayU8> sequence = null;
 		long pause = 0;

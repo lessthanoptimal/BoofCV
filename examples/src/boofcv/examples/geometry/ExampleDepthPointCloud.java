@@ -25,6 +25,7 @@ import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.FastQueueArray_I32;
@@ -51,9 +52,9 @@ public class ExampleDepthPointCloud {
 	public static void main( String args[] ) throws IOException {
 		String nameRgb = UtilIO.pathExample("kinect/basket/basket_rgb.png");
 		String nameDepth = UtilIO.pathExample("kinect/basket/basket_depth.png");
-		String nameCalib = UtilIO.pathExample("kinect/basket/visualdepth.xml");
+		String nameCalib = UtilIO.pathExample("kinect/basket/visualdepth.yaml");
 
-		VisualDepthParameters param = UtilIO.loadXML(nameCalib);
+		VisualDepthParameters param = CalibrationIO.load(nameCalib);
 
 		BufferedImage buffered = UtilImageIO.loadImage(nameRgb);
 		Planar<GrayU8> rgb = ConvertBufferedImage.convertFromPlanar(buffered,null,true,GrayU8.class);

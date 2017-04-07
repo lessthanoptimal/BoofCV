@@ -18,10 +18,7 @@
 
 package boofcv.io.calibration;
 
-import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.calib.CameraUniversalOmni;
-import boofcv.struct.calib.StereoParameters;
+import boofcv.struct.calib.*;
 import georegression.struct.se.Se3_F64;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -42,6 +39,11 @@ public class CalibrationIO {
 	public static String MODEL_PINHOLE_RADIAL_TAN = "pinhole_radial_tangential";
 	public static String MODEL_OMNIDIRECTIONAL_UNIVERSAL = "omnidirectional_universal";
 	public static String MODEL_STEREO = "stereo_camera";
+	public static String MODEL_RIGID_BODY = "rigid_body";
+	public static String MODEL_VISUAL_DEPTH = "visual_depth";
+	public static String MODEL_MONO_PLANE = "monocular_plane";
+
+	public static String VERSION = "version";
 
 	/**
 	 * Saves intrinsic camera model to disk
@@ -110,17 +112,18 @@ public class CalibrationIO {
 	 */
 	public static void save(StereoParameters parameters , Writer outputWriter ) {
 
-		Map<String, Object> data = new HashMap<>();
-		data.put("model",MODEL_STEREO);
-		data.put("left",putModelRadial(parameters.left,null));
-		data.put("right",putModelRadial(parameters.right,null));
-		data.put("rightToLeft",putSe3(parameters.rightToLeft));
+		Map<String, Object> map = new HashMap<>();
+		map.put("model",MODEL_STEREO);
+		map.put(VERSION,0);
+		map.put("left",putModelRadial(parameters.left,null));
+		map.put("right",putModelRadial(parameters.right,null));
+		map.put("rightToLeft",putSe3(parameters.rightToLeft));
 
 		PrintWriter out = new PrintWriter(outputWriter);
 		out.println("# Intrinsic and extrinsic parameters for a stereo camera pair");
 		Yaml yaml = createYmlObject();
-		yaml.dump(data,out);
-
+		yaml.dump(map,out);
+		out.close();
 	}
 
 	public static void save(StereoParameters parameters , String outputPath ) {
@@ -133,6 +136,72 @@ public class CalibrationIO {
 
 	public static void save(StereoParameters parameters , File filePath ) {
 		save(parameters, filePath.getPath());
+	}
+
+	public static void save(Se3_F64 rigidBody , File filePath ) {
+		save(rigidBody, filePath.getPath());
+	}
+
+	public static void save( Se3_F64 rigidBody , String outputPath ) {
+		try {
+			save(rigidBody,new FileWriter(outputPath));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static void save( Se3_F64 rigidBody , Writer outputWriter ) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("model",MODEL_RIGID_BODY);
+		map.put(VERSION,0);
+		map.put("parameters",putSe3(rigidBody));
+
+		PrintWriter out = new PrintWriter(outputWriter);
+		out.println("# Rigid Body transformation");
+		Yaml yaml = createYmlObject();
+		yaml.dump(map,out);
+		out.close();
+	}
+
+	public static void save(VisualDepthParameters parameters , File filePath ) {
+		save(parameters, filePath.getPath());
+	}
+
+	public static void save( VisualDepthParameters parameters , String outputPath ) {
+		try {
+			save(parameters,new FileWriter(outputPath));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static void save(VisualDepthParameters parameters , Writer outputWriter ) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("model",MODEL_VISUAL_DEPTH);
+		map.put(VERSION,0);
+		map.put("max_depth",parameters.getMaxDepth());
+		map.put("no_depth",parameters.getPixelNoDepth());
+		map.put("intrinsic",putModelRadial(parameters.getVisualParam(),null));
+
+		PrintWriter out = new PrintWriter(outputWriter);
+		out.println("# RGB Depth Camera Calibration");
+		Yaml yaml = createYmlObject();
+		yaml.dump(map,out);
+		out.close();
+	}
+
+	public static void save(MonoPlaneParameters parameters , Writer outputWriter ) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("model",MODEL_MONO_PLANE);
+		map.put(VERSION,0);
+		map.put("intrinsic",putModelRadial(parameters.getIntrinsic(),null));
+		map.put("plane_to_camera",putSe3(parameters.getPlaneToCamera()));
+
+		PrintWriter out = new PrintWriter(outputWriter);
+		out.println("# Monocular Camera with Known Plane Distance");
+		Yaml yaml = createYmlObject();
+		yaml.dump(map,out);
+		out.close();
 	}
 
 	public static <T> T load(URL path ) {
@@ -179,6 +248,9 @@ public class CalibrationIO {
 	}
 
 	private static <T> T load(Map<String, Object> data) {
+
+		int version = data.containsKey("version") ? (int)data.get("version") : 0;
+
 		String model = (String)data.get("model");
 
 		if( model.equals(MODEL_PINHOLE)) {
@@ -235,6 +307,19 @@ public class CalibrationIO {
 			parameters.right = load((Map<String, Object>)data.get("right"));
 			parameters.rightToLeft = loadSe3((Map<String, Object>)data.get("rightToLeft"),null);
 			return (T) parameters;
+		} else if( model.equals(MODEL_VISUAL_DEPTH) ) {
+			VisualDepthParameters parameters = new VisualDepthParameters();
+			parameters.maxDepth = (Number)data.get("max_depth");
+			parameters.pixelNoDepth = (Number)data.get("no_depth");
+			parameters.visualParam = load((Map<String, Object>)data.get("intrinsic"));
+			return (T)parameters;
+		} else if( model.equals(MODEL_MONO_PLANE) ) {
+			MonoPlaneParameters parameters = new MonoPlaneParameters();
+			parameters.intrinsic = load((Map<String, Object>)data.get("intrinsic"));
+			parameters.planeToCamera = loadSe3((Map<String, Object>)data.get("plane_to_camera"),null);
+			return (T) parameters;
+		} else if( model.equals(MODEL_RIGID_BODY) ) {
+			return (T) loadSe3((Map<String, Object>)data.get("parameters"),null);
 		} else {
 			throw new RuntimeException("Unknown camera model: "+model);
 		}
@@ -244,8 +329,11 @@ public class CalibrationIO {
 	private static Map<String,Object> putModelPinhole( CameraPinhole parameters , Map<String,Object> map ) {
 		if( map == null )
 			map = new HashMap<>();
+
 		map.put("model",MODEL_PINHOLE);
+		map.put(VERSION,0);
 		map.put("pinhole", putParamsPinhole(parameters));
+
 		return map;
 	}
 
@@ -254,6 +342,7 @@ public class CalibrationIO {
 			map = new HashMap<>();
 
 		map.put("model",MODEL_PINHOLE_RADIAL_TAN);
+		map.put(VERSION,0);
 		map.put("pinhole", putParamsPinhole(parameters));
 		map.put("radial_tangential", putParamsRadialTangent(parameters));
 
@@ -265,6 +354,7 @@ public class CalibrationIO {
 			map = new HashMap<>();
 
 		map.put("model",MODEL_OMNIDIRECTIONAL_UNIVERSAL);
+		map.put(VERSION,0);
 		map.put("pinhole", putParamsPinhole(parameters));
 		map.put("mirror_offset",parameters.mirrorOffset);
 

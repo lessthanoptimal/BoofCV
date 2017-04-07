@@ -18,16 +18,8 @@
 
 package boofcv.io;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.javabean.JavaBeanConverter;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import com.thoughtworks.xstream.core.ClassLoaderReference;
-import com.thoughtworks.xstream.io.xml.XppDriver;
-
 import javax.swing.*;
 import java.io.*;
-import java.net.URL;
-
 
 /**
  * @author Peter Abeles
@@ -173,44 +165,6 @@ public class UtilIO {
 		} catch (UnsatisfiedLinkError e) {
 			return false;
 		}
-	}
-
-	public static void saveXML( Object o , String fileName ) {
-		XStream xstream = createXStream();
-
-		try {
-			xstream.toXML(o, new FileOutputStream(fileName));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static <T> T loadXML( URL url ) {
-		return loadXML(url.getPath());
-	}
-
-	public static <T> T loadXML( String directory , String fileName ) {
-		return loadXML(new File(directory,fileName).getPath());
-	}
-	public static <T> T loadXML( String fileName ) {
-		try {
-			return (T)loadXML(new FileReader(fileName));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static <T> T loadXML( Reader r ) {
-		XStream xstream = createXStream();
-
-		return (T)xstream.fromXML(r);
-	}
-
-	private static XStream createXStream() {
-		XStream xstream = new XStream(new PureJavaReflectionProvider(),new XppDriver(),
-				new ClassLoaderReference(Thread.currentThread().getContextClassLoader()));
-		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
-		return xstream;
 	}
 
 	public static void save( Object o , String fileName ) {

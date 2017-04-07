@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.core.image.border.BorderType;
-import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
@@ -102,7 +102,7 @@ public class BatchRemoveLensDistortion {
 			}
 		}
 
-		CameraPinholeRadial param = UtilIO.loadXML(pathIntrinsic);
+		CameraPinholeRadial param = CalibrationIO.load(pathIntrinsic);
 		CameraPinholeRadial paramAdj = new CameraPinholeRadial();
 
 		List<File> files = Arrays.asList(BoofMiscOps.findMatches(regex));
@@ -115,7 +115,7 @@ public class BatchRemoveLensDistortion {
 
 		ImageDistort distort = LensDistortionOps.changeCameraModel(adjustmentType, BorderType.ZERO, param,
 				new CameraPinhole(param), paramAdj, (ImageType) distoredImg.getImageType());
-		UtilIO.saveXML(paramAdj,new File(outputDir,"intrinsicUndistorted.xml").getAbsolutePath());
+		CalibrationIO.save(paramAdj,new File(outputDir,"intrinsicUndistorted.yaml").getAbsolutePath());
 
 		BufferedImage out = new BufferedImage(param.width,param.height,BufferedImage.TYPE_INT_RGB);
 

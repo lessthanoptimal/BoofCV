@@ -35,6 +35,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.GrayF32;
@@ -175,7 +176,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 			if( line1.charAt(0) != '/' )
 				line1 = path+"/"+line1;
 
-			config = UtilIO.loadXML(media.openFile(lineConfig));
+			config = CalibrationIO.load(media.openFile(lineConfig));
 			SimpleImageSequence<I> video = media.openVideo(line1, imageType);
 
 			process(video);

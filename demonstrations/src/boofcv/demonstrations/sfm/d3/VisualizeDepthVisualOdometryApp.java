@@ -46,6 +46,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.struct.calib.VisualDepthParameters;
 import boofcv.struct.distort.DoNothing2Transform2_F32;
 import boofcv.struct.feature.TupleDesc_B;
@@ -182,7 +183,7 @@ public class VisualizeDepthVisualOdometryApp
 			if( line2.charAt(0) != '/' )
 				line2 = path+"/"+line2;
 
-			config = UtilIO.loadXML(media.openFile(lineConfig));
+			config = CalibrationIO.load(media.openFile(lineConfig));
 			openVideo(line1,line2);
 		} catch (IOException e) {
 			throw new RuntimeException(e);

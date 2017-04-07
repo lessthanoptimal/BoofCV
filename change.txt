@@ -67,6 +67,10 @@ Version : 0.27
 - Gradle
   * Change directory structure to avoid jar naming conflict on maven central.  Idiot that this is even possible...
 - Fixed ImageInterleaved.setNumBands() NOT correctly setting the stride and growing the data array
+- Removed XML all serialization
+  * Changed old XML files into YAML files
+- YAML format for camera calibration
+  * Added version parameter.  Assumed to be 0 if not present
 
 - TODO Visualization tools for Direct VO
 -      Show warped image

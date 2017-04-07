@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,7 @@ import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.calib.VisualDepthParameters;
@@ -57,7 +58,7 @@ public class ExampleVisualOdometryDepth {
 		String directory = UtilIO.pathExample("kinect/straight");
 
 		// load camera description and the video sequence
-		VisualDepthParameters param = UtilIO.loadXML(media.openFile(directory + "visualdepth.xml"));
+		VisualDepthParameters param = CalibrationIO.load(media.openFile(directory + "visualdepth.yaml"));
 
 		// specify how the image features are going to be tracked
 		PkltConfig configKlt = new PkltConfig();
