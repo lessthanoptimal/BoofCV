@@ -71,6 +71,9 @@ Version : 0.27
   * Changed old XML files into YAML files
 - YAML format for camera calibration
   * Added version parameter.  Assumed to be 0 if not present
+- Fixed histogram in ImageStatistics
+  * For unsigned data types minimum value was being ignored
+  * Thanks André Ambrósio Boechat for reporting the problem
 
 - TODO Visualization tools for Direct VO
 -      Show warped image

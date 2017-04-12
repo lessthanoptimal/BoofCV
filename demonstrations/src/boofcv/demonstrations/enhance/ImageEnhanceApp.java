@@ -87,7 +87,7 @@ public class ImageEnhanceApp
 
 		int active = (Integer)cookie;
 		if( active == 0 ) {
-			ImageStatistics.histogram(input,histogram);
+			ImageStatistics.histogram(input,0,histogram);
 			EnhanceImageOps.equalize(histogram, transform);
 			EnhanceImageOps.applyTransform(input, transform, enhanced);
 		} else if( active == 1 ) {

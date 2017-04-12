@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.misc;
 
 import boofcv.alg.InputSanityCheck;
@@ -315,7 +314,7 @@ public class ImageStatistics {
 	 * @param mean Mean pixel intensity value.   
 	 * @return Pixel variance   
 	 */
-	public static double variance(GrayU8 img , double mean ) {
+	public static double variance( GrayU8 img , double mean ) {
 
 		double variance = 0;
 
@@ -337,9 +336,10 @@ public class ImageStatistics {
 	 * Computes the histogram of intensity values for the image.
 	 * 
 	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
-	public static void histogram(GrayU8 input , int histogram[] ) {
+	public static void histogram( GrayU8 input , int minValue , int histogram[] ) {
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 		
@@ -348,7 +348,7 @@ public class ImageStatistics {
 			int end = index + input.width;
 
 			for( ; index < end; index++ ) {
-				histogram[input.data[index]& 0xFF]++;
+				histogram[(input.data[index]& 0xFF) - minValue ]++;
 			}
 		}
 	}
@@ -635,7 +635,7 @@ public class ImageStatistics {
 	 * @param mean Mean pixel intensity value.   
 	 * @return Pixel variance   
 	 */
-	public static double variance(GrayS8 img , double mean ) {
+	public static double variance( GrayS8 img , double mean ) {
 
 		double variance = 0;
 
@@ -660,7 +660,7 @@ public class ImageStatistics {
 	 * @param minValue (input) Minimum possible intensity value   
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
-	public static void histogram(GrayS8 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayS8 input , int minValue , int histogram[] ) {
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 		
@@ -669,8 +669,7 @@ public class ImageStatistics {
 			int end = index + input.width;
 
 			for( ; index < end; index++ ) {
-				// floor value. just convert to int rounds towards zero
-				histogram[input.data[index] - minValue ]++;
+				histogram[(input.data[index]) - minValue ]++;
 			}
 		}
 	}
@@ -957,7 +956,7 @@ public class ImageStatistics {
 	 * @param mean Mean pixel intensity value.   
 	 * @return Pixel variance   
 	 */
-	public static double variance(GrayU16 img , double mean ) {
+	public static double variance( GrayU16 img , double mean ) {
 
 		double variance = 0;
 
@@ -979,9 +978,10 @@ public class ImageStatistics {
 	 * Computes the histogram of intensity values for the image.
 	 * 
 	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
-	public static void histogram(GrayU16 input , int histogram[] ) {
+	public static void histogram( GrayU16 input , int minValue , int histogram[] ) {
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 		
@@ -990,7 +990,7 @@ public class ImageStatistics {
 			int end = index + input.width;
 
 			for( ; index < end; index++ ) {
-				histogram[input.data[index]& 0xFFFF]++;
+				histogram[(input.data[index]& 0xFFFF) - minValue ]++;
 			}
 		}
 	}
@@ -1277,7 +1277,7 @@ public class ImageStatistics {
 	 * @param mean Mean pixel intensity value.   
 	 * @return Pixel variance   
 	 */
-	public static double variance(GrayS16 img , double mean ) {
+	public static double variance( GrayS16 img , double mean ) {
 
 		double variance = 0;
 
@@ -1302,7 +1302,7 @@ public class ImageStatistics {
 	 * @param minValue (input) Minimum possible intensity value   
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
-	public static void histogram(GrayS16 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayS16 input , int minValue , int histogram[] ) {
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 		
@@ -1311,8 +1311,7 @@ public class ImageStatistics {
 			int end = index + input.width;
 
 			for( ; index < end; index++ ) {
-				// floor value. just convert to int rounds towards zero
-				histogram[input.data[index] - minValue ]++;
+				histogram[(input.data[index]) - minValue ]++;
 			}
 		}
 	}
@@ -1599,7 +1598,7 @@ public class ImageStatistics {
 	 * @param mean Mean pixel intensity value.   
 	 * @return Pixel variance   
 	 */
-	public static double variance(GrayS32 img , double mean ) {
+	public static double variance( GrayS32 img , double mean ) {
 
 		double variance = 0;
 
@@ -1624,7 +1623,7 @@ public class ImageStatistics {
 	 * @param minValue (input) Minimum possible intensity value   
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
-	public static void histogram(GrayS32 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayS32 input , int minValue , int histogram[] ) {
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 		
@@ -1633,8 +1632,7 @@ public class ImageStatistics {
 			int end = index + input.width;
 
 			for( ; index < end; index++ ) {
-				// floor value. just convert to int rounds towards zero
-				histogram[input.data[index] - minValue ]++;
+				histogram[(input.data[index]) - minValue ]++;
 			}
 		}
 	}
@@ -1921,7 +1919,7 @@ public class ImageStatistics {
 	 * @param mean Mean pixel intensity value.   
 	 * @return Pixel variance   
 	 */
-	public static double variance(GrayS64 img , double mean ) {
+	public static double variance( GrayS64 img , double mean ) {
 
 		double variance = 0;
 
@@ -1946,7 +1944,7 @@ public class ImageStatistics {
 	 * @param minValue (input) Minimum possible intensity value   
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
-	public static void histogram(GrayS64 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayS64 input , long minValue , int histogram[] ) {
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 		
@@ -1955,8 +1953,7 @@ public class ImageStatistics {
 			int end = index + input.width;
 
 			for( ; index < end; index++ ) {
-				// floor value. just convert to int rounds towards zero
-				histogram[(int)input.data[index] - minValue]++;
+				histogram[(int)(input.data[index] - minValue)]++;
 			}
 		}
 	}
@@ -2232,8 +2229,8 @@ public class ImageStatistics {
 	 * @param img Input image.  Not modified.
 	 * @return Mean pixel intensity value
 	 */
-	public static double mean( InterleavedF32 img ) {
-		return sum(img)/(double)(img.width*img.height*img.numBands);
+	public static float mean( InterleavedF32 img ) {
+		return sum(img)/(float)(img.width*img.height*img.numBands);
 	}
 
 	/**
@@ -2243,9 +2240,9 @@ public class ImageStatistics {
 	 * @param mean Mean pixel intensity value.   
 	 * @return Pixel variance   
 	 */
-	public static double variance(GrayF32 img , double mean ) {
+	public static float variance( GrayF32 img , float mean ) {
 
-		double variance = 0;
+		float variance = 0;
 
 		for (int y = 0; y < img.height; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
@@ -2253,7 +2250,7 @@ public class ImageStatistics {
 			int indexEnd = index+img.width;
 			// for(int x = 0; x < img.width; x++ ) {
 			for (; index < indexEnd; index++ ) {
-				double d = (img.data[index]) - mean; 
+				float d = (img.data[index]) - mean; 
 				variance += d*d;
 			}
 		}
@@ -2268,7 +2265,7 @@ public class ImageStatistics {
 	 * @param minValue (input) Minimum possible intensity value   
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
-	public static void histogram(GrayF32 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayF32 input , float minValue , int histogram[] ) {
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 		
@@ -2277,8 +2274,7 @@ public class ImageStatistics {
 			int end = index + input.width;
 
 			for( ; index < end; index++ ) {
-				// floor value. just convert to int rounds towards zero
-				histogram[(int)input.data[index] - minValue ]++;
+				histogram[(int)(input.data[index] - minValue)]++;
 			}
 		}
 	}
@@ -2565,7 +2561,7 @@ public class ImageStatistics {
 	 * @param mean Mean pixel intensity value.   
 	 * @return Pixel variance   
 	 */
-	public static double variance(GrayF64 img , double mean ) {
+	public static double variance( GrayF64 img , double mean ) {
 
 		double variance = 0;
 
@@ -2590,7 +2586,7 @@ public class ImageStatistics {
 	 * @param minValue (input) Minimum possible intensity value   
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
-	public static void histogram(GrayF64 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayF64 input , double minValue , int histogram[] ) {
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 		
@@ -2599,8 +2595,7 @@ public class ImageStatistics {
 			int end = index + input.width;
 
 			for( ; index < end; index++ ) {
-				// floor value. just convert to int rounds towards zero
-				histogram[(int)input.data[index] - minValue ]++;
+				histogram[(int)(input.data[index] - minValue)]++;
 			}
 		}
 	}

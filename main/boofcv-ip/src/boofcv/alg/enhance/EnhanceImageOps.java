@@ -163,7 +163,7 @@ public class EnhanceImageOps {
 
 		} else if( input.width < width && input.height < width ) {
 			// the local region is larger than the image.  just use the full image algorithm
-			ImageStatistics.histogram(input,histogram);
+			ImageStatistics.histogram(input,0,histogram);
 			equalize(histogram,transform);
 			applyTransform(input,transform,output);
 		} else {
@@ -203,7 +203,7 @@ public class EnhanceImageOps {
 
 		} else if( input.width < width && input.height < width ) {
 			// the local region is larger than the image.  just use the full image algorithm
-			ImageStatistics.histogram(input,histogram);
+			ImageStatistics.histogram(input,0,histogram);
 			equalize(histogram,transform);
 			applyTransform(input,transform,output);
 		} else {

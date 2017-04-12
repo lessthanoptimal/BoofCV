@@ -319,7 +319,7 @@ public class GImageStatistics {
 		} else if( GrayS64.class == input.getClass() ) {
 			return ImageStatistics.variance((GrayS64)input,mean);
 		} else if( GrayF32.class == input.getClass() ) {
-			return ImageStatistics.variance((GrayF32)input,mean);
+			return ImageStatistics.variance((GrayF32)input,(float)mean);
 		} else if( GrayF64.class == input.getClass() ) {
 			return ImageStatistics.variance((GrayF64)input,mean);
 		} else {
@@ -445,11 +445,11 @@ public class GImageStatistics {
 	 */
 	public static void histogram(ImageGray input , int minValue , int histogram[] ) {
 		if( GrayU8.class == input.getClass() ) {
-			ImageStatistics.histogram((GrayU8)input,histogram);
+			ImageStatistics.histogram((GrayU8)input,minValue,histogram);
 		} else if( GrayS8.class == input.getClass() ) {
 			ImageStatistics.histogram((GrayS8)input,minValue,histogram);
 		} else if( GrayU16.class == input.getClass() ) {
-			ImageStatistics.histogram((GrayU16)input,histogram);
+			ImageStatistics.histogram((GrayU16)input,minValue,histogram);
 		} else if( GrayS16.class == input.getClass() ) {
 			ImageStatistics.histogram((GrayS16)input,minValue,histogram);
 		} else if( GrayS32.class == input.getClass() ) {

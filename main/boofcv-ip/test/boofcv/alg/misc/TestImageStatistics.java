@@ -49,7 +49,7 @@ public class TestImageStatistics {
 			if( !isTestMethod(m))
 				continue;
 			try {
-//				System.out.println(m.getName());
+//				System.out.println(m);
 
 				if( m.getName().compareTo("min") == 0 ) {
 					testMin(m);
@@ -317,32 +317,32 @@ public class TestImageStatistics {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageGray inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		int histogram[] = new int[ 100 ];
+		int histogram[] = new int[ 40 ];
 		// it should be zeroed
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 100;
 
 		int minValue;
 		if( inputA.getDataType().isSigned() ) {
-			GImageMiscOps.fillUniform(inputA, rand, -20,20);
-			m.invoke(null,inputA,-20,histogram);
 			minValue = -20;
+			GImageMiscOps.fillUniform(inputA, rand, minValue,20);
+			m.invoke(null,inputA,minValue,histogram);
 		} else {
-			GImageMiscOps.fillUniform(inputA, rand, 0,40);
-			m.invoke(null,inputA,histogram);
-			minValue = 0;
+			minValue = 5;
+			GImageMiscOps.fillUniform(inputA, rand, minValue,minValue+histogram.length-1);
+			m.invoke(null,inputA,minValue,histogram);
 		}
 
 		// manually compute the histogram
-		int expected[] = new int[ 100 ];
+		int expected[] = new int[ histogram.length ];
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double a = GeneralizedImageOps.get(inputA,j,i);
-				expected[ -minValue + (int)a ]++;
+				expected[ (int)(-minValue + a) ]++;
 			}
 		}
 
-		for( int i = 0; i < 100; i++ ) {
+		for( int i = 0; i < 40; i++ ) {
 			assertEquals("index "+i,expected[i],histogram[i]);
 		}
 	}

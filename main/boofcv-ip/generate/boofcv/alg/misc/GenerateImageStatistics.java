@@ -34,8 +34,6 @@ import java.util.List;
  */
 public class GenerateImageStatistics extends CodeGeneratorBase {
 
-	String className = "ImageStatistics";
-
 	private AutoTypeImage input;
 
 	public void generate() throws FileNotFoundException {
@@ -45,7 +43,6 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() throws FileNotFoundException {
-		setOutputFile(className);
 		out.print("import boofcv.struct.image.*;\n" +
 				"import javax.annotation.Generated;\n" +
 				"import boofcv.alg.InputSanityCheck;\n" +
@@ -93,56 +90,35 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 	}
 
 	public void printHistogram() {
-		if( input.isSigned() ) {
+		String sumType = input.getSumType();
 
-			out.print("\t/**\n" +
-					"\t * Computes the histogram of intensity values for the image.\n" +
-					"\t * \n" +
-					"\t * @param input (input) Image.\n" +
-					"\t * @param minValue (input) Minimum possible intensity value   \n" +
-					"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
-					"\t */\n" +
-					"\tpublic static void histogram( "+input.getSingleBandName()+" input , int minValue , int histogram[] ) {\n" +
-					"\t\tfor( int i = 0; i < histogram.length; i++ )\n" +
-					"\t\t\thistogram[i] = 0;\n" +
-					"\t\t\n" +
-					"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
-					"\t\t\tint index = input.startIndex + y*input.stride;\n" +
-					"\t\t\tint end = index + input.width;\n" +
-					"\n" +
-					"\t\t\tfor( ; index < end; index++ ) {\n" +
-					"\t\t\t\t// floor value. just convert to int rounds towards zero\n");
-			if( input.isInteger()) {
-				if( input.getNumBits() == 64 )
-					out.print("\t\t\t\thistogram[(int)input.data[index] - minValue]++;\n");
-				else
-					out.print("\t\t\t\thistogram[input.data[index] - minValue ]++;\n");
-			} else
-				out.print("\t\t\t\thistogram[(int)input.data[index] - minValue ]++;\n");
-			out.print("\t\t\t}\n" +
-					"\t\t}\n" +
-					"\t}\n\n");
+		out.print("\t/**\n" +
+				"\t * Computes the histogram of intensity values for the image.\n" +
+				"\t * \n" +
+				"\t * @param input (input) Image.\n" +
+				"\t * @param minValue (input) Minimum possible intensity value   \n" +
+				"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
+				"\t */\n" +
+				"\tpublic static void histogram( "+input.getSingleBandName()+" input , "+sumType+" minValue , int histogram[] ) {\n" +
+				"\t\tfor( int i = 0; i < histogram.length; i++ )\n" +
+				"\t\t\thistogram[i] = 0;\n" +
+				"\t\t\n" +
+				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\tint index = input.startIndex + y*input.stride;\n" +
+				"\t\t\tint end = index + input.width;\n" +
+				"\n" +
+				"\t\t\tfor( ; index < end; index++ ) {\n");
+		if( input.isInteger()) {
+			if( input.getNumBits() == 64 )
+				out.print("\t\t\t\thistogram[(int)(input.data[index] - minValue)]++;\n");
+			else
+				out.print("\t\t\t\thistogram[(input.data[index]"+input.getBitWise()+") - minValue ]++;\n");
 		} else {
-			out.print("\t/**\n" +
-					"\t * Computes the histogram of intensity values for the image.\n" +
-					"\t * \n" +
-					"\t * @param input (input) Image.\n" +
-					"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
-					"\t */\n" +
-					"\tpublic static void histogram( "+input.getSingleBandName()+" input , int histogram[] ) {\n" +
-					"\t\tfor( int i = 0; i < histogram.length; i++ )\n" +
-					"\t\t\thistogram[i] = 0;\n" +
-					"\t\t\n" +
-					"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
-					"\t\t\tint index = input.startIndex + y*input.stride;\n" +
-					"\t\t\tint end = index + input.width;\n" +
-					"\n" +
-					"\t\t\tfor( ; index < end; index++ ) {\n" +
-					"\t\t\t\thistogram[input.data[index]"+input.getBitWise()+"]++;\n" +
-					"\t\t\t}\n" +
-					"\t\t}\n" +
-					"\t}\n\n");
+			out.print("\t\t\t\thistogram[(int)(input.data[index] - minValue)]++;\n");
 		}
+		out.print("\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
 	}
 
 	public void printMaxAbs() {
@@ -258,6 +234,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 
 	public void printMean( ImageType.Family family  ) {
 		String columns = family == ImageType.Family.INTERLEAVED ? "*img.numBands" : "";
+		String sumType = input.isInteger() ? "double" : input.getSumType();
 
 		out.print("\t/**\n" +
 				"\t * Returns the mean pixel intensity value.\n" +
@@ -265,14 +242,15 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * @param img Input image.  Not modified.\n" +
 				"\t * @return Mean pixel intensity value\n" +
 				"\t */\n" +
-				"\tpublic static double mean( "+input.getImageName(family)+" img ) {\n" +
-				"\t\treturn sum(img)/(double)(img.width*img.height"+columns+");\n" +
+				"\tpublic static "+sumType+" mean( "+input.getImageName(family)+" img ) {\n" +
+				"\t\treturn sum(img)/("+sumType+")(img.width*img.height"+columns+");\n" +
 				"\t}\n\n");
 	}
 
 	public void printVariance() {
 
 		String bitWise = input.getBitWise();
+		String sumType = input.isInteger() ? "double" : input.getSumType();
 
 		out.print("\t/**\n" +
 				"\t * Computes the variance of pixel intensity values inside the image.\n" +
@@ -281,9 +259,9 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * @param mean Mean pixel intensity value.   \n" +
 				"\t * @return Pixel variance   \n" +
 				"\t */\n" +
-				"\tpublic static double variance( "+input.getSingleBandName()+" img , double mean ) {\n" +
+				"\tpublic static "+sumType+" variance( "+input.getSingleBandName()+" img , "+sumType+" mean ) {\n" +
 				"\n" +
-				"\t\tdouble variance = 0;\n" +
+				"\t\t"+sumType+" variance = 0;\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < img.height; y++) {\n" +
 				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
@@ -291,7 +269,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t\t\tint indexEnd = index+img.width;\n" +
 				"\t\t\t// for(int x = 0; x < img.width; x++ ) {\n" +
 				"\t\t\tfor (; index < indexEnd; index++ ) {\n" +
-				"\t\t\t\tdouble d = (img.data[index]"+bitWise+") - mean; \n" +
+				"\t\t\t\t"+sumType+" d = (img.data[index]"+bitWise+") - mean; \n" +
 				"\t\t\t\tvariance += d*d;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
