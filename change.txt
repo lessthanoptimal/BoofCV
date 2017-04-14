@@ -87,6 +87,7 @@ Version : 0.27
 - TODO Look at AKAZE feature
 - TODO Gradle - look into switching to java-library and changing dependencies to api
        https://blog.gradle.org/incremental-compiler-avoidance
+- TODO Clarify how you calibrate the camera in Processing
 
 ---------------------------------------------
 Date    : 2016/12/07
