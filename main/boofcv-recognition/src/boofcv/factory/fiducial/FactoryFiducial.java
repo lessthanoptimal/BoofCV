@@ -22,10 +22,7 @@ import boofcv.abst.fiducial.CalibrationFiducialDetector;
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
-import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
-import boofcv.abst.fiducial.calib.ConfigSquareGrid;
-import boofcv.abst.fiducial.calib.ConfigSquareGridBinary;
+import boofcv.abst.fiducial.calib.*;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.square.DetectFiducialSquareImage;
@@ -146,13 +143,16 @@ public class FactoryFiducial {
 
 	public static <T extends ImageGray<T>>
 	CalibrationFiducialDetector<T> calibSquareGridBinary( ConfigSquareGridBinary config, Class<T> imageType) {
-
 		return new CalibrationFiducialDetector<>(config, imageType);
 	}
 
 	public static <T extends ImageGray<T>>
 	CalibrationFiducialDetector<T> calibCircleAsymGrid(ConfigCircleAsymmetricGrid config, Class<T> imageType) {
+		return new CalibrationFiducialDetector<>(config, imageType);
+	}
 
+	public static <T extends ImageGray<T>>
+	CalibrationFiducialDetector<T> calibCircleRegularGrid(ConfigCircleRegularGrid config, Class<T> imageType) {
 		return new CalibrationFiducialDetector<>(config, imageType);
 	}
 }

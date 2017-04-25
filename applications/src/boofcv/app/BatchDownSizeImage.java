@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,8 +62,8 @@ public class BatchDownSizeImage {
 		System.out.println("-rename    Renames the output files to image%05d.png");
 		System.out.println();
 		System.out.println("=== Arguments");
-		System.out.println("First argument is a Java regex for input files.");
-		System.out.println("   /path/to/input/directory/\\\\w*.jpg");
+		System.out.println("First argument is a Java regex for input files. E.g.");
+		System.out.println("   /path/to/input/directory/\\\\S*.jpg");
 		System.out.println("Second argument is a path to the output directory");
 		System.out.println("If there are 4 arguments then last two is the width and height");
 		System.out.println("   either width or height can be zero.  If zero then it will maintain the aspect");

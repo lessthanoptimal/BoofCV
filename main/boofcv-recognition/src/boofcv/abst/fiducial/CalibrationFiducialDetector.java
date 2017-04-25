@@ -18,10 +18,7 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
-import boofcv.abst.fiducial.calib.ConfigSquareGrid;
-import boofcv.abst.fiducial.calib.ConfigSquareGridBinary;
+import boofcv.abst.fiducial.calib.*;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.core.image.GConvertImage;
@@ -116,6 +113,17 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		int squareRows = config.numRows;
 		double sideWidth = squareCols*config.centerDistance/2.0;
 		double sideHeight = squareRows*config.centerDistance/2.0;
+
+		double width = (sideWidth+sideHeight)/2.0;
+
+		init(detector, width, imageType);
+	}
+
+	public CalibrationFiducialDetector(ConfigCircleRegularGrid config,
+									   Class<T> imageType) {
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.circleRegularGrid(config);
+		double sideWidth = (config.numCols-1)*config.centerDistance;
+		double sideHeight = (config.numRows-1)*config.centerDistance;
 
 		double width = (sideWidth+sideHeight)/2.0;
 
