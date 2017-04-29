@@ -238,7 +238,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		copypath.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String path = getPath(info);
+				String path = getPath(info.app);
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 				clipboard.setContents(new StringSelection(path), null);
 			}
@@ -247,10 +247,6 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		submenu.add(copyname);
 		submenu.add(copypath);
 		submenu.show(tree, x, y);
-
-
-
-
 	}
 
 	@Override
@@ -283,9 +279,8 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		DefaultListModel listModel = (DefaultListModel) e.getSource();
 		ActiveProcess process = (ActiveProcess) listModel.get(listModel.getSize()-1);
 
-		String path = getPath(process.info);
 		JTextArea source = (JTextArea) ((JScrollPane) outputPanel.getComponentAt(SOURCE)).getViewport().getView();
-		displaySource(source, path);
+		displaySource(source, process);
 	}
 
 	@Override
@@ -294,16 +289,13 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		DefaultListModel listModel = (DefaultListModel) e.getSource();
 
 		JTextArea source = (JTextArea) ((JScrollPane) outputPanel.getComponentAt(SOURCE)).getViewport().getView();
-
 		if(listModel.isEmpty()) {
 			source.setText("");
 			return;
 		}
 
-
 		ActiveProcess process = (ActiveProcess) listModel.get(listModel.getSize()-1);
-		String path = getPath(process.info);
-		displaySource(source, path);
+		displaySource(source, process);
 	}
 
 	@Override
@@ -388,8 +380,8 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		}
 	}
 
-	//UtilIO.path("demonstrations/src/" + info.app.getName().replace('.','/') + ".java")
-	private void displaySource(JTextArea sourceTextArea, String path) {
+	private void displaySource(JTextArea sourceTextArea, ActiveProcess process) {
+		String path = getPath(process.info.app);
 		File source = new File(path);
 		if( source.exists() && source.canRead() ) {
 			StringBuilder code = new StringBuilder();
@@ -412,15 +404,20 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		else {
 			sourceTextArea.setText("Source not found!");
 		}
+
+		outputPanel.setSelectedIndex(SOURCE);
 	}
 
-	private String getPath(AppInfo info) {
-		Package q = info.app.getPackage();
+	public void displayOutput(JTextArea outputTextArea, ActiveProcess process) {
+
+	}
+	private String getPath(Class app) {
+		Package q = app.getPackage();
 		String path = "";
 		if(q.getName().contains("examples"))
-			path = UtilIO.path("examples/src/" + info.app.getPackage().getName().replace('.','/') + "/" + info.app.getSimpleName() + ".java");
+			path = UtilIO.path("examples/src/" + app.getPackage().getName().replace('.','/') + "/" + app.getSimpleName() + ".java");
 		else if(q.getName().contains("demonstrations"))
-			path = UtilIO.path("demonstrations/src/" + info.app.getPackage().getName().replace('.','/') + "/" + info.app.getSimpleName() + ".java");
+			path = UtilIO.path("demonstrations/src/" + app.getPackage().getName().replace('.','/') + "/" + app.getSimpleName() + ".java");
 
 		return path;
 	}
