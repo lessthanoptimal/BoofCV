@@ -18,12 +18,24 @@
 
 package boofcv.gui;
 
+import boofcv.io.UtilIO;
+
 import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -35,18 +47,22 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class ApplicationLauncherApp extends JPanel implements ActionListener {
+public abstract class ApplicationLauncherApp extends JPanel implements ActionListener, ListDataListener {
 
 	private JTree tree;
+	private final int OUTPUT = 0;
+	private final int SOURCE = 1;
 
 	JButton bKill = new JButton("Kill");
 	JButton bKillAll = new JButton("Kill All");
 
 	JList processList;
-	DefaultListModel listModel = new DefaultListModel();
+	DefaultListModel<ActiveProcess> listModel = new DefaultListModel<>();
+	JTabbedPane outputPanel = new JTabbedPane();
 
 	int memoryMB = 1024;
 	final List<ActiveProcess> processes = new ArrayList<>();
+	String path = "";
 
 	public ApplicationLauncherApp() {
 		setLayout(new BorderLayout());
@@ -57,12 +73,26 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 //		tree.addTreeSelectionListener(this);
 
+		JTextArea sourceTextArea = new JTextArea();
+		JTextArea outputTextArea = new JTextArea();
+
+		outputTextArea.setEditable(false);
+		outputTextArea.setLineWrap(true);
+		outputTextArea.setColumns(180);
+
+		sourceTextArea.setEditable(false);
+		sourceTextArea.setLineWrap(true);
+		sourceTextArea.setColumns(180);
+
 		MouseListener ml = new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				int selRow = tree.getRowForLocation(e.getX(), e.getY());
 				TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
 				if(e.getClickCount() == 2) {
 					handleClick((DefaultMutableTreeNode)tree.getLastSelectedPathComponent());
+				}
+				else if(SwingUtilities.isRightMouseButton(e)) {
+					handlePopup(tree, e.getX(), e.getY());
 				}
 			}
 		};
@@ -84,22 +114,51 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		processList.setLayoutOrientation(JList.VERTICAL);
 		processList.setVisibleRowCount(-1);
 		processList.setPreferredSize(new Dimension(500,600));
+		processList.getModel().addListDataListener(this);
 
 		JPanel processPanel = new JPanel();
 		processPanel.setLayout(new BoxLayout(processPanel, BoxLayout.Y_AXIS));
 		processPanel.add( actionPanel );
 		processPanel.add( processList );
 
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		splitPane.add(treeView);
-		splitPane.add(processPanel);
+		JScrollPane outputContainer = new JScrollPane(outputTextArea);
+		outputContainer.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-		add( splitPane, BorderLayout.CENTER );
+		JScrollPane sourceContainer = new JScrollPane(sourceTextArea);
+		sourceContainer.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+		outputPanel.add(outputContainer, OUTPUT);
+		outputPanel.add(sourceContainer, SOURCE);
+		outputPanel.setTitleAt(OUTPUT, "Output");
+		outputPanel.setTitleAt(SOURCE, "Source");
+
+		JSplitPane verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		verticalSplitPane.setDividerLocation(0.5);
+		verticalSplitPane.setResizeWeight(0.5);
+		verticalSplitPane.setTopComponent(processPanel);
+		verticalSplitPane.setBottomComponent(outputPanel);
+
+		//needed to initialize vertical divider to 0.5 weight
+		verticalSplitPane.setPreferredSize(new Dimension(500,600));
+
+		//horizontal divider won't drag to the right without a minimum size
+		verticalSplitPane.setMinimumSize(new Dimension(1,1));
+
+		JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		horizontalSplitPane.setResizeWeight(0.5);
+		horizontalSplitPane.add(treeView);
+		horizontalSplitPane.add(verticalSplitPane);
+
+		add( horizontalSplitPane, BorderLayout.CENTER );
+
+		OutputStreamCapturer.toDisplayOutput();
 
 //		setPreferredSize(new Dimension(400,600));
 
 		new ProcessStatusThread().start();
 	}
+
+
 
 	protected abstract void createTree( DefaultMutableTreeNode root );
 
@@ -153,6 +212,47 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		launch(info);
 	}
 
+	private void handlePopup(JTree tree, int x, int y) {
+		TreePath path = tree.getPathForLocation(x, y);
+		tree.setSelectionPath(path);
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+
+		if (node == null)
+			return;
+		if (!node.isLeaf()) {
+			tree.setSelectionPath(null);
+			return;
+		}
+		final AppInfo info = (AppInfo)node.getUserObject();
+
+		JPopupMenu submenu = new JPopupMenu();
+		JMenuItem copyname = new JMenuItem("Copy Name");
+		JMenuItem copypath = new JMenuItem("Copy Path");
+		copyname.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				clipboard.setContents(new StringSelection(info.app.getSimpleName()), null);
+			}
+		});
+		copypath.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String path = getPath(info);
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				clipboard.setContents(new StringSelection(path), null);
+			}
+		});
+
+		submenu.add(copyname);
+		submenu.add(copypath);
+		submenu.show(tree, x, y);
+
+
+
+
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if( e.getSource() == bKill ) {
@@ -164,6 +264,8 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 						return;
 
 					selected.kill();
+					outputPanel.setSelectedIndex(0);
+
 				}
 			});
 		} else if( e.getSource() == bKillAll ) {
@@ -173,6 +275,40 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 				}
 			}
 		}
+	}
+
+	@Override
+	public void intervalAdded(ListDataEvent e) {
+		//retrieve the most recently added process and display it
+		DefaultListModel listModel = (DefaultListModel) e.getSource();
+		ActiveProcess process = (ActiveProcess) listModel.get(listModel.getSize()-1);
+
+		String path = getPath(process.info);
+		JTextArea source = (JTextArea) ((JScrollPane) outputPanel.getComponentAt(SOURCE)).getViewport().getView();
+		displaySource(source, path);
+	}
+
+	@Override
+	public void intervalRemoved(ListDataEvent e) {
+		//retrieve the most recently added process and display it
+		DefaultListModel listModel = (DefaultListModel) e.getSource();
+
+		JTextArea source = (JTextArea) ((JScrollPane) outputPanel.getComponentAt(SOURCE)).getViewport().getView();
+
+		if(listModel.isEmpty()) {
+			source.setText("");
+			return;
+		}
+
+
+		ActiveProcess process = (ActiveProcess) listModel.get(listModel.getSize()-1);
+		String path = getPath(process.info);
+		displaySource(source, path);
+	}
+
+	@Override
+	public void contentsChanged(ListDataEvent e) {
+
 	}
 
 	public static class AppInfo {
@@ -250,5 +386,42 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 				}
 			}
 		}
+	}
+
+	//UtilIO.path("demonstrations/src/" + info.app.getName().replace('.','/') + ".java")
+	private void displaySource(JTextArea sourceTextArea, String path) {
+		File source = new File(path);
+		if( source.exists() && source.canRead() ) {
+			StringBuilder code = new StringBuilder();
+			try {
+				BufferedReader reader = new BufferedReader(new FileReader(source));
+				String line;
+				while((line = reader.readLine()) != null)
+					code.append(line + System.lineSeparator());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			sourceTextArea.setText(code.toString());
+
+			int scrollTo = code.toString().indexOf("class");
+			if(scrollTo == -1)
+				scrollTo = 0;
+
+			sourceTextArea.setCaretPosition(scrollTo);
+		}
+		else {
+			sourceTextArea.setText("Source not found!");
+		}
+	}
+
+	private String getPath(AppInfo info) {
+		Package q = info.app.getPackage();
+		String path = "";
+		if(q.getName().contains("examples"))
+			path = UtilIO.path("examples/src/" + info.app.getPackage().getName().replace('.','/') + "/" + info.app.getSimpleName() + ".java");
+		else if(q.getName().contains("demonstrations"))
+			path = UtilIO.path("demonstrations/src/" + info.app.getPackage().getName().replace('.','/') + "/" + info.app.getSimpleName() + ".java");
+
+		return path;
 	}
 }
