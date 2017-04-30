@@ -443,7 +443,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					textArea.setText(textArea.getText() + String.valueOf((char)b));
+					textArea.append(String.valueOf((char) b));
 				}
 			});
 		}
