@@ -33,6 +33,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -109,7 +111,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 					handleClick((DefaultMutableTreeNode)tree.getLastSelectedPathComponent());
 				}
 				else if(SwingUtilities.isRightMouseButton(e)) {
-					handlePopup(tree, e.getX(), e.getY());
+					handleContextMenu(tree, e.getX(), e.getY());
 				}
 			}
 		};
@@ -247,7 +249,14 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		launch(info);
 	}
 
-	private void handlePopup(JTree tree, int x, int y) {
+	/**
+	 * Displays a context menu for a class leaf node
+	 * Allows copying of the name and the path to the source
+	 * @param tree
+	 * @param x
+	 * @param y
+	 */
+	private void handleContextMenu(JTree tree, int x, int y) {
 		TreePath path = tree.getPathForLocation(x, y);
 		tree.setSelectionPath(path);
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
@@ -260,9 +269,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		}
 		final AppInfo info = (AppInfo)node.getUserObject();
 
-		JPopupMenu submenu = new JPopupMenu();
 		JMenuItem copyname = new JMenuItem("Copy Name");
-		JMenuItem copypath = new JMenuItem("Copy Path");
 		copyname.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -270,17 +277,41 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 				clipboard.setContents(new StringSelection(info.app.getSimpleName()), null);
 			}
 		});
+
+		JMenuItem copypath = new JMenuItem("Copy Path");
 		copypath.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String path = getPath(info.app);
+				String path = UtilIO.getSourcePath(info.app.getPackage().getName(), info.app.getSimpleName());
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 				clipboard.setContents(new StringSelection(path), null);
 			}
 		});
 
+		JMenuItem github = new JMenuItem("Go to Github");
+		github.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(Desktop.isDesktopSupported()) {
+					try {
+
+						URI uri = new URI(UtilIO.getGithubURL(info.app.getPackage().getName(), info.app.getSimpleName()));
+						if(!uri.getPath().isEmpty())
+							Desktop.getDesktop().browse(uri);
+						else
+							System.err.println("Bad URL received");
+					} catch (Exception e1) {
+						System.err.println("Something went wrong connecting to github");
+						System.err.println(e1.getMessage());
+					}
+				}
+			}
+		});
+
+		JPopupMenu submenu = new JPopupMenu();
 		submenu.add(copyname);
 		submenu.add(copypath);
+		submenu.add(github);
 		submenu.show(tree, x, y);
 	}
 
@@ -323,6 +354,8 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		DefaultListModel listModel = (DefaultListModel) e.getSource();
 
 		JTextArea source = (JTextArea) ((JScrollPane) outputPanel.getComponentAt(SOURCE)).getViewport().getView();
+
+		//if the last process was just removed, return
 		if(listModel.isEmpty()) {
 			source.setText("");
 			return;
@@ -334,7 +367,31 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 	@Override
 	public void contentsChanged(ListDataEvent e) {
+	}
 
+	private void displaySource(JTextArea sourceTextArea, ActiveProcess process) {
+		String path = UtilIO.getSourcePath(process.info.app.getPackage().getName(), process.info.app.getSimpleName());
+		File source = new File(path);
+		if( source.exists() && source.canRead() ) {
+			StringBuilder code = new StringBuilder();
+			try {
+				BufferedReader reader = new BufferedReader(new FileReader(source));
+				String line;
+				while((line = reader.readLine()) != null)
+					code.append(line + System.lineSeparator());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			sourceTextArea.setText(code.toString());
+
+			int scrollTo = code.toString().indexOf("class");
+			scrollTo = scrollTo == -1 ? 0 : scrollTo;
+
+			sourceTextArea.setCaretPosition(scrollTo);
+		}
+		else {
+			sourceTextArea.setText("Source not found!");
+		}
 	}
 
 	public static class AppInfo {
@@ -413,43 +470,4 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		}
 	}
 
-	private void displaySource(JTextArea sourceTextArea, ActiveProcess process) {
-		String path = getPath(process.info.app);
-		File source = new File(path);
-		if( source.exists() && source.canRead() ) {
-			StringBuilder code = new StringBuilder();
-			try {
-				BufferedReader reader = new BufferedReader(new FileReader(source));
-				String line;
-				while((line = reader.readLine()) != null)
-					code.append(line + System.lineSeparator());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			sourceTextArea.setText(code.toString());
-
-			int scrollTo = code.toString().indexOf("class");
-			scrollTo = scrollTo == -1 ? 0 : scrollTo;
-
-			sourceTextArea.setCaretPosition(scrollTo);
-		}
-		else {
-			sourceTextArea.setText("Source not found!");
-		}
-	}
-
-	public void displayOutput(JTextArea outputTextArea, ActiveProcess process) {
-
-	}
-
-	private String getPath(Class app) {
-		Package q = app.getPackage();
-		String path = "";
-		if(q.getName().contains("examples"))
-			path = UtilIO.path("examples/src/" + app.getPackage().getName().replace('.','/') + "/" + app.getSimpleName() + ".java");
-		else if(q.getName().contains("demonstrations"))
-			path = UtilIO.path("demonstrations/src/" + app.getPackage().getName().replace('.','/') + "/" + app.getSimpleName() + ".java");
-
-		return path;
-	}
 }
