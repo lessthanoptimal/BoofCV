@@ -203,4 +203,43 @@ public class UtilIO {
 		if (!f.delete())
 			throw new RuntimeException("Failed to delete file: " + f);
 	}
+
+	/**
+	 * Constructs the path for a source code file residing in the examples or demonstrations directory
+	 * In the case of the file not being in either directory, an empty string is returned
+	 * The expected parameters are class.getPackage().getName(), class.getSimpleName()
+	 * @param pkg package containing the class
+	 * @param app simple class name
+	 * @return
+	 */
+	public static String getSourcePath(String pkg, String app) {
+		String path = "";
+		if(pkg == null || app == null)
+			return path;
+
+		if(pkg.contains("examples"))
+			path = path("examples/src/" + pkg.replace('.','/') + "/" + app + ".java");
+		else if(pkg.contains("demonstrations"))
+			path = path("demonstrations/src/" + pkg.replace('.','/') + "/" + app + ".java");
+
+		return path;
+	}
+
+	public static String getGithubURL(String pkg, String app) {
+		if(pkg == null || app == null)
+			return "";
+
+		String base = "https://github.com/lessthanoptimal/BoofCV/blob/master/";
+		pkg = pkg.replace('.','/') + "/";
+
+		String dir;
+		if(pkg.contains("demonstrations"))
+			dir = "demonstrations/";
+		else if(pkg.contains("examples"))
+			dir = "examples/";
+		else
+			return "";
+
+		return base + dir + "src/" + pkg + app + ".java";
+	}
 }
