@@ -29,10 +29,7 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -49,9 +46,6 @@ import java.util.List;
 public abstract class ApplicationLauncherApp extends JPanel implements ActionListener, ListDataListener {
 
 	private JTree tree;
-	private final int OUTPUT = 0;
-	private final int SOURCE = 1;
-	private OutputStreamCapturer outputStreamCapturer;
 
 	JButton bKill = new JButton("Kill");
 	JButton bKillAll = new JButton("Kill All");
@@ -62,7 +56,6 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 	int memoryMB = 1024;
 	final List<ActiveProcess> processes = new ArrayList<>();
-	String path = "";
 
 	public ApplicationLauncherApp() {
 		setLayout(new BorderLayout());
@@ -71,46 +64,12 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 		tree = new JTree(root);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-//		tree.addTreeSelectionListener(this);
-
-		final JTextArea sourceTextArea = new JTextArea();
-		JTextArea outputTextArea = new JTextArea();
-
-		outputTextArea.setEditable(false);
-		outputTextArea.setLineWrap(true);
-		outputTextArea.setColumns(180);
-
-		sourceTextArea.setEditable(false);
-		sourceTextArea.setLineWrap(true);
-		sourceTextArea.setColumns(180);
-		sourceTextArea.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mousePressed(MouseEvent e) {
-				super.mousePressed(e);
-				if(SwingUtilities.isRightMouseButton(e) && !sourceTextArea.getText().isEmpty()) {
-					JPopupMenu menu = new JPopupMenu();
-					JMenuItem copy = new JMenuItem("Copy");
-					copy.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-							clipboard.setContents(new StringSelection(sourceTextArea.getText()), null);
-						}
-					});
-					menu.add(copy);
-					menu.show(sourceTextArea, e.getX(), e.getY());
-				}
-			}
-		});
 
 		MouseListener ml = new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				int selRow = tree.getRowForLocation(e.getX(), e.getY());
-				TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-				if(e.getClickCount() == 2) {
-					handleClick((DefaultMutableTreeNode)tree.getLastSelectedPathComponent());
-				}
-				else if(SwingUtilities.isRightMouseButton(e)) {
+				if (e.getClickCount() == 2) {
+					handleClick((DefaultMutableTreeNode) tree.getLastSelectedPathComponent());
+				} else if (SwingUtilities.isRightMouseButton(e)) {
 					handleContextMenu(tree, e.getX(), e.getY());
 				}
 			}
@@ -118,7 +77,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		tree.addMouseListener(ml);
 
 		JScrollPane treeView = new JScrollPane(tree);
-		treeView.setPreferredSize(new Dimension(300,600));
+		treeView.setPreferredSize(new Dimension(300, 600));
 
 		JPanel actionPanel = new JPanel();
 		actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
@@ -132,41 +91,13 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		processList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		processList.setLayoutOrientation(JList.VERTICAL);
 		processList.setVisibleRowCount(-1);
-		processList.setPreferredSize(new Dimension(500,600));
+		processList.setPreferredSize(new Dimension(500, 600));
 		processList.getModel().addListDataListener(this);
 
 		JPanel processPanel = new JPanel();
 		processPanel.setLayout(new BoxLayout(processPanel, BoxLayout.Y_AXIS));
-		processPanel.add( actionPanel );
-		processPanel.add( processList );
-
-		JPanel intermediateOutputContainer = new JPanel();
-		intermediateOutputContainer.setLayout(new BorderLayout());
-		JCheckBox outputCheckbox = new JCheckBox("Display output");
-		intermediateOutputContainer.add(outputCheckbox, BorderLayout.NORTH);
-		intermediateOutputContainer.add(outputTextArea, BorderLayout.CENTER);
-
-		outputCheckbox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if(e.getStateChange() == ItemEvent.DESELECTED)
-					outputStreamCapturer.toStdOutput();
-				else
-					outputStreamCapturer.toDisplayOutput();
-			}
-		});
-
-		JScrollPane outputContainer = new JScrollPane(intermediateOutputContainer);
-		outputContainer.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-
-		JScrollPane sourceContainer = new JScrollPane(sourceTextArea);
-		sourceContainer.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-
-
-		outputPanel.add(outputContainer, OUTPUT);
-		outputPanel.add(sourceContainer, SOURCE);
-		outputPanel.setTitleAt(OUTPUT, "Output");
-		outputPanel.setTitleAt(SOURCE, "Source");
+		processPanel.add(actionPanel);
+		processPanel.add(processList);
 
 		JSplitPane verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		verticalSplitPane.setDividerLocation(0.5);
@@ -175,31 +106,24 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		verticalSplitPane.add(outputPanel);
 
 		//needed to initialize vertical divider to 0.5 weight
-		verticalSplitPane.setPreferredSize(new Dimension(500,600));
+		verticalSplitPane.setPreferredSize(new Dimension(500, 600));
 
 		//horizontal divider won't drag to the right without a minimum size
-		verticalSplitPane.setMinimumSize(new Dimension(1,1));
+		verticalSplitPane.setMinimumSize(new Dimension(1, 1));
 
 		JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		horizontalSplitPane.setResizeWeight(0.5);
 		horizontalSplitPane.add(treeView);
 		horizontalSplitPane.add(verticalSplitPane);
 
-		add( horizontalSplitPane, BorderLayout.CENTER );
-
-		outputStreamCapturer = new OutputStreamCapturer(outputTextArea);
-		outputCheckbox.setSelected(true);
-
-//		setPreferredSize(new Dimension(400,600));
-
+		add(horizontalSplitPane, BorderLayout.CENTER);
 		new ProcessStatusThread().start();
 	}
 
 
+	protected abstract void createTree(DefaultMutableTreeNode root);
 
-	protected abstract void createTree( DefaultMutableTreeNode root );
-
-	protected void createNodes( DefaultMutableTreeNode root, String subjectName, Class ...apps) {
+	protected void createNodes(DefaultMutableTreeNode root, String subjectName, Class... apps) {
 		DefaultMutableTreeNode top = new DefaultMutableTreeNode(subjectName);
 		for (int i = 0; i < apps.length; i++) {
 			DefaultMutableTreeNode node = new DefaultMutableTreeNode(new AppInfo(apps[i]));
@@ -208,14 +132,14 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		root.add(top);
 	}
 
-	private void launch( AppInfo info ) {
+	private void launch(AppInfo info) {
 		List<String> classPath = new ArrayList<>();
 		ClassLoader cl = ClassLoader.getSystemClassLoader();
 
-		URL[] urls = ((URLClassLoader)cl).getURLs();
+		URL[] urls = ((URLClassLoader) cl).getURLs();
 
-		for(URL url: urls){
-			classPath.add( url.getFile());
+		for (URL url : urls) {
+			classPath.add(url.getFile());
 		}
 
 		final ActiveProcess process = new ActiveProcess();
@@ -239,19 +163,20 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		process.start();
 	}
 
-	public void handleClick( DefaultMutableTreeNode node ) {
+	public void handleClick(DefaultMutableTreeNode node) {
 		if (node == null)
 			return;
 		if (!node.isLeaf())
 			return;
-		AppInfo info = (AppInfo)node.getUserObject();
-		System.out.println("clicked "+info);
+		AppInfo info = (AppInfo) node.getUserObject();
 		launch(info);
+		System.out.println("clicked " + info);
 	}
 
 	/**
 	 * Displays a context menu for a class leaf node
 	 * Allows copying of the name and the path to the source
+	 *
 	 * @param tree
 	 * @param x
 	 * @param y
@@ -267,7 +192,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			tree.setSelectionPath(null);
 			return;
 		}
-		final AppInfo info = (AppInfo)node.getUserObject();
+		final AppInfo info = (AppInfo) node.getUserObject();
 
 		JMenuItem copyname = new JMenuItem("Copy Name");
 		copyname.addActionListener(new ActionListener() {
@@ -292,11 +217,11 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		github.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(Desktop.isDesktopSupported()) {
+				if (Desktop.isDesktopSupported()) {
 					try {
 
 						URI uri = new URI(UtilIO.getGithubURL(info.app.getPackage().getName(), info.app.getSimpleName()));
-						if(!uri.getPath().isEmpty())
+						if (!uri.getPath().isEmpty())
 							Desktop.getDesktop().browse(uri);
 						else
 							System.err.println("Bad URL received");
@@ -317,20 +242,20 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == bKill ) {
+		if (e.getSource() == bKill) {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					ActiveProcess selected = (ActiveProcess)processList.getSelectedValue();
-					if( selected == null )
+					ActiveProcess selected = (ActiveProcess) processList.getSelectedValue();
+					if (selected == null)
 						return;
 
 					selected.kill();
 
 				}
 			});
-		} else if( e.getSource() == bKillAll ) {
-			synchronized (processes ) {
+		} else if (e.getSource() == bKillAll) {
+			synchronized (processes) {
 				for (int i = 0; i < processes.size(); i++) {
 					processes.get(i).kill();
 				}
@@ -338,47 +263,40 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		}
 	}
 
+	/**
+	 * Called after a new process is added to the process list
+	 *
+	 * @param e
+	 */
 	@Override
 	public void intervalAdded(ListDataEvent e) {
 		//retrieve the most recently added process and display it
 		DefaultListModel listModel = (DefaultListModel) e.getSource();
-		ActiveProcess process = (ActiveProcess) listModel.get(listModel.getSize()-1);
-
-		JTextArea source = (JTextArea) ((JScrollPane) outputPanel.getComponentAt(SOURCE)).getViewport().getView();
-		displaySource(source, process);
+		ActiveProcess process = (ActiveProcess) listModel.get(listModel.getSize() - 1);
+		addProcessTab(process, outputPanel);
 	}
 
 	@Override
 	public void intervalRemoved(ListDataEvent e) {
-		//retrieve the most recently added process and display it
-		DefaultListModel listModel = (DefaultListModel) e.getSource();
-
-		JTextArea source = (JTextArea) ((JScrollPane) outputPanel.getComponentAt(SOURCE)).getViewport().getView();
-
-		//if the last process was just removed, return
-		if(listModel.isEmpty()) {
-			source.setText("");
-			return;
-		}
-
-		ActiveProcess process = (ActiveProcess) listModel.get(listModel.getSize()-1);
-		displaySource(source, process);
 	}
 
 	@Override
 	public void contentsChanged(ListDataEvent e) {
 	}
 
-	private void displaySource(JTextArea sourceTextArea, ActiveProcess process) {
+	private void displaySource(final JTextArea sourceTextArea, ActiveProcess process) {
+		if (sourceTextArea == null)
+			return;
+
 		String path = UtilIO.getSourcePath(process.info.app.getPackage().getName(), process.info.app.getSimpleName());
 		File source = new File(path);
-		if( source.exists() && source.canRead() ) {
+		if (source.exists() && source.canRead()) {
 			StringBuilder code = new StringBuilder();
 			try {
 				BufferedReader reader = new BufferedReader(new FileReader(source));
 				String line;
-				while((line = reader.readLine()) != null)
-					code.append(line + System.lineSeparator());
+				while ((line = reader.readLine()) != null)
+					code.append(line).append(System.lineSeparator());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -388,9 +306,146 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			scrollTo = scrollTo == -1 ? 0 : scrollTo;
 
 			sourceTextArea.setCaretPosition(scrollTo);
-		}
-		else {
+			sourceTextArea.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mousePressed(MouseEvent e) {
+					super.mousePressed(e);
+					if (SwingUtilities.isRightMouseButton(e) && !sourceTextArea.getText().isEmpty()) {
+						JPopupMenu menu = new JPopupMenu();
+						JMenuItem copy = new JMenuItem("Copy");
+						copy.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+								clipboard.setContents(new StringSelection(sourceTextArea.getText()), null);
+							}
+						});
+						menu.add(copy);
+						menu.show(sourceTextArea, e.getX(), e.getY());
+					}
+				}
+			});
+		} else {
 			sourceTextArea.setText("Source not found!");
+		}
+	}
+
+	private void addProcessTab(final ActiveProcess process, JTabbedPane pane) {
+		String title = process.info.app.getSimpleName();
+
+		final ProcessTabPanel component = new ProcessTabPanel(process.getId());
+		component.setLayout(new BorderLayout());
+
+		String[] optionsList = new String[]{"Source", "Output"};
+		JComboBox<String> options = new JComboBox<>(optionsList);
+		JCheckBox displayInGUI = new JCheckBox("Display output");
+
+		final JTextArea sourceTextArea = new JTextArea();
+		sourceTextArea.setEditable(false);
+		sourceTextArea.setLineWrap(true);
+		sourceTextArea.setWrapStyleWord(true);
+
+		final JTextArea outputTextArea = new JTextArea();
+		outputTextArea.setEditable(false);
+		outputTextArea.setLineWrap(true);
+		outputTextArea.setWrapStyleWord(true);
+
+		final JScrollPane container = new JScrollPane();
+		container.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+		options.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JComboBox source = (JComboBox) e.getSource();
+				if (source.getSelectedIndex() == 0) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							container.getViewport().removeAll();
+							container.getViewport().add(sourceTextArea);
+							displaySource(sourceTextArea, process);
+						}
+					});
+
+				} else if (source.getSelectedIndex() == 1) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							container.getViewport().removeAll();
+							container.getViewport().add(outputTextArea);
+						}
+					});
+				}
+			}
+		});
+
+		displayInGUI.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED) {
+					process.launcher.setPrintOut(new PrintStream(new TextOutputStream(outputTextArea)));
+				}
+				else {
+					process.launcher.setPrintOut(System.out);
+				}
+			}
+		});
+
+		JPanel intermediate = new JPanel();
+		GridBagLayout layout = new GridBagLayout();
+		intermediate.setLayout(layout);
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.weightx = 0.8;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		intermediate.add(options, c);
+
+		c.weightx = 0.2;
+		c.gridx = 1;
+		c.gridy = 0;
+		c.fill = GridBagConstraints.NONE;
+		intermediate.add(displayInGUI, c);
+		component.add(intermediate, BorderLayout.NORTH);
+		component.add(container, BorderLayout.CENTER);
+
+
+		pane.add(title, component);
+
+
+		displayInGUI.setSelected(true);
+		options.setSelectedIndex(1);
+		pane.setSelectedIndex(pane.getComponentCount()-1);
+	}
+
+	private void removeProcessTab(final ActiveProcess process, JTabbedPane pane) {
+		int index = -1;
+		//lookup tab by process, assume one tab per process
+		for (int i = 0; i < pane.getComponents().length; i++) {
+			ProcessTabPanel component = (ProcessTabPanel) pane.getComponent(i);
+			if (component.getProcessId() == process.getId())
+				index = i;
+		}
+
+		if (index == -1)
+			return;
+		pane.remove(index);
+	}
+
+	class TextOutputStream extends OutputStream {
+		private JTextArea textArea;
+		public TextOutputStream(JTextArea textArea) {
+			this.textArea = textArea;
+		}
+		@Override
+		public void write(final int b) throws IOException {
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					textArea.setText(textArea.getText() + String.valueOf((char)b));
+				}
+			});
 		}
 	}
 
@@ -419,7 +474,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			active = true;
 			exit = launcher.launch(info.app);
 			System.out.println();
-			System.out.println("------------------- Exit condition "+exit);
+			System.out.println("------------------- Exit condition " + exit);
 			active = false;
 		}
 
@@ -433,8 +488,8 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 		@Override
 		public String toString() {
-			if( launcher.isKillRequested() && active ) {
-				return "Killing "+info;
+			if (launcher.isKillRequested() && active) {
+				return "Killing " + info;
 			} else {
 				return info.toString();
 			}
@@ -444,15 +499,18 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	class ProcessStatusThread extends Thread {
 		@Override
 		public void run() {
-			while( true ) {
+			while (true) {
 				synchronized (processes) {
-					for (int i = processes.size()-1; i >= 0; i--) {
+					for (int i = processes.size() - 1; i >= 0; i--) {
 						final ActiveProcess p = processes.get(i);
 
-						if( !p.isActive() ) {
+						if (!p.isActive()) {
 							SwingUtilities.invokeLater(new Runnable() {
 								@Override
 								public void run() {
+									//intervalremoved listener is called after element is removed, so the reference
+									//can't be retrieved. we call removeProcessTab() here for that reason.
+									removeProcessTab(p, outputPanel);
 									listModel.removeElement(p);
 									processList.invalidate();
 								}

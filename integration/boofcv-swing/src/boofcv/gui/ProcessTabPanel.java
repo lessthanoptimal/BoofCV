@@ -19,39 +19,29 @@
 package boofcv.gui;
 
 import javax.swing.*;
-import java.io.*;
 
 /**
- * Created by Jalal on 4/29/2017.
+ * A jpanel that keeps track of the process id it is supposed to be displaying information for.
+ * Intended to contain the source code and output.
+ * Created by Jalal on 4/30/2017.
  */
-public class OutputStreamCapturer {
+public class ProcessTabPanel extends JPanel {
 
-	private ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	private PrintStream textStream = new PrintStream(new TextOutputStream());
+	private long processId;
 
-	private PrintStream std;
-	private JTextArea textArea;
-
-	public OutputStreamCapturer(JTextArea textArea) {
-		std = System.out;
-		this.textArea = textArea;
+	public ProcessTabPanel() {
+		super();
 	}
 
-	public void toDisplayOutput() {
-		System.out.flush();
-		System.setOut(textStream);
+	public ProcessTabPanel(long processId) {
+		this.processId = processId;
 	}
 
-	public void toStdOutput() {
-		System.out.flush();
-		System.setOut(std);
+	public void setProcessId(long processId) {
+		this.processId = processId;
 	}
 
-	class TextOutputStream extends OutputStream {
-
-		@Override
-		public void write(int b) throws IOException {
-			textArea.setText(textArea.getText() + String.valueOf((char) b));
-		}
+	public long getProcessId() {
+		return this.processId;
 	}
 }
