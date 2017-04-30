@@ -21,10 +21,7 @@ package boofcv.gui;
 import boofcv.io.UtilIO;
 
 import javax.swing.*;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
@@ -52,6 +49,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	private JTree tree;
 	private final int OUTPUT = 0;
 	private final int SOURCE = 1;
+	private OutputStreamCapturer outputStreamCapturer;
 
 	JButton bKill = new JButton("Kill");
 	JButton bKillAll = new JButton("Kill All");
@@ -73,7 +71,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 //		tree.addTreeSelectionListener(this);
 
-		JTextArea sourceTextArea = new JTextArea();
+		final JTextArea sourceTextArea = new JTextArea();
 		JTextArea outputTextArea = new JTextArea();
 
 		outputTextArea.setEditable(false);
@@ -83,6 +81,25 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		sourceTextArea.setEditable(false);
 		sourceTextArea.setLineWrap(true);
 		sourceTextArea.setColumns(180);
+		sourceTextArea.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				super.mousePressed(e);
+				if(SwingUtilities.isRightMouseButton(e) && !sourceTextArea.getText().isEmpty()) {
+					JPopupMenu menu = new JPopupMenu();
+					JMenuItem copy = new JMenuItem("Copy");
+					copy.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+							clipboard.setContents(new StringSelection(sourceTextArea.getText()), null);
+						}
+					});
+					menu.add(copy);
+					menu.show(sourceTextArea, e.getX(), e.getY());
+				}
+			}
+		});
 
 		MouseListener ml = new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
@@ -121,11 +138,28 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		processPanel.add( actionPanel );
 		processPanel.add( processList );
 
-		JScrollPane outputContainer = new JScrollPane(outputTextArea);
+		JPanel intermediateOutputContainer = new JPanel();
+		intermediateOutputContainer.setLayout(new BorderLayout());
+		JCheckBox outputCheckbox = new JCheckBox("Display output");
+		intermediateOutputContainer.add(outputCheckbox, BorderLayout.NORTH);
+		intermediateOutputContainer.add(outputTextArea, BorderLayout.CENTER);
+
+		outputCheckbox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.DESELECTED)
+					outputStreamCapturer.toStdOutput();
+				else
+					outputStreamCapturer.toDisplayOutput();
+			}
+		});
+
+		JScrollPane outputContainer = new JScrollPane(intermediateOutputContainer);
 		outputContainer.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
 		JScrollPane sourceContainer = new JScrollPane(sourceTextArea);
 		sourceContainer.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
 
 		outputPanel.add(outputContainer, OUTPUT);
 		outputPanel.add(sourceContainer, SOURCE);
@@ -135,8 +169,8 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		JSplitPane verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		verticalSplitPane.setDividerLocation(0.5);
 		verticalSplitPane.setResizeWeight(0.5);
-		verticalSplitPane.setTopComponent(processPanel);
-		verticalSplitPane.setBottomComponent(outputPanel);
+		verticalSplitPane.add(processPanel);
+		verticalSplitPane.add(outputPanel);
 
 		//needed to initialize vertical divider to 0.5 weight
 		verticalSplitPane.setPreferredSize(new Dimension(500,600));
@@ -151,7 +185,8 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 		add( horizontalSplitPane, BorderLayout.CENTER );
 
-		OutputStreamCapturer.toDisplayOutput();
+		outputStreamCapturer = new OutputStreamCapturer(outputTextArea);
+		outputCheckbox.setSelected(true);
 
 //		setPreferredSize(new Dimension(400,600));
 
@@ -260,7 +295,6 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 						return;
 
 					selected.kill();
-					outputPanel.setSelectedIndex(0);
 
 				}
 			});
@@ -370,7 +404,6 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 						}
 					}
 				}
-
 				try {
 					sleep(250);
 				} catch (InterruptedException e) {
@@ -396,21 +429,19 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			sourceTextArea.setText(code.toString());
 
 			int scrollTo = code.toString().indexOf("class");
-			if(scrollTo == -1)
-				scrollTo = 0;
+			scrollTo = scrollTo == -1 ? 0 : scrollTo;
 
 			sourceTextArea.setCaretPosition(scrollTo);
 		}
 		else {
 			sourceTextArea.setText("Source not found!");
 		}
-
-		outputPanel.setSelectedIndex(SOURCE);
 	}
 
 	public void displayOutput(JTextArea outputTextArea, ActiveProcess process) {
 
 	}
+
 	private String getPath(Class app) {
 		Package q = app.getPackage();
 		String path = "";
