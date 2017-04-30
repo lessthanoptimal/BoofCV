@@ -88,6 +88,7 @@ Version : 0.27
 - TODO Gradle - look into switching to java-library and changing dependencies to api
        https://blog.gradle.org/incremental-compiler-avoidance
 - TODO Clarify how you calibrate the camera in Processing
+- TODO Create a stand alone application that people can download to calibrate
 
 ---------------------------------------------
 Date    : 2016/12/07
