@@ -21,7 +21,8 @@ package boofcv.gui;
 import boofcv.io.UtilIO;
 
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
@@ -31,7 +32,6 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -100,19 +100,14 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		processPanel.add(processList);
 
 		JSplitPane verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		verticalSplitPane.setDividerLocation(0.5);
-		verticalSplitPane.setResizeWeight(0.5);
-		verticalSplitPane.add(processPanel);
+		verticalSplitPane.setDividerLocation(150);
+		verticalSplitPane.setResizeWeight(0.0); // divider location won't change when window is resized
+		verticalSplitPane.add(processPanel);    // most of the time you want to increase the view of the text
 		verticalSplitPane.add(outputPanel);
 
-		//needed to initialize vertical divider to 0.5 weight
-		verticalSplitPane.setPreferredSize(new Dimension(500, 600));
-
-		//horizontal divider won't drag to the right without a minimum size
-		verticalSplitPane.setMinimumSize(new Dimension(1, 1));
-
 		JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		horizontalSplitPane.setResizeWeight(0.5);
+		horizontalSplitPane.setDividerLocation(250);
+		horizontalSplitPane.setResizeWeight(0.0);
 		horizontalSplitPane.add(treeView);
 		horizontalSplitPane.add(verticalSplitPane);
 

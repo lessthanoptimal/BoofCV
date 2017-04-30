@@ -18,6 +18,8 @@
 
 package boofcv.io;
 
+import boofcv.struct.BoofDefaults;
+
 import javax.swing.*;
 import java.io.*;
 
@@ -229,7 +231,7 @@ public class UtilIO {
 		if(pkg == null || app == null)
 			return "";
 
-		String base = "https://github.com/lessthanoptimal/BoofCV/blob/master/";
+		String base = "https://github.com/lessthanoptimal/BoofCV/blob/v"+ BoofDefaults.version+"/";
 		pkg = pkg.replace('.','/') + "/";
 
 		String dir;
