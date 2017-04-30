@@ -30,7 +30,10 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -286,21 +289,9 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		String path = UtilIO.getSourcePath(process.info.app.getPackage().getName(), process.info.app.getSimpleName());
 		File source = new File(path);
 		if (source.exists() && source.canRead()) {
-			StringBuilder code = new StringBuilder();
-			try {
-				BufferedReader reader = new BufferedReader(new FileReader(source));
-				String line;
-				while ((line = reader.readLine()) != null)
-					code.append(line).append(System.lineSeparator());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			sourceTextArea.setText(code.toString());
+			String code = UtilIO.readAsString(path);
+			sourceTextArea.setText(code);
 
-			int scrollTo = code.toString().indexOf("class");
-			scrollTo = scrollTo == -1 ? 0 : scrollTo;
-
-			sourceTextArea.setCaretPosition(scrollTo);
 			sourceTextArea.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mousePressed(MouseEvent e) {
@@ -336,11 +327,13 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		JCheckBox displayInGUI = new JCheckBox("Display output");
 
 		final JTextArea sourceTextArea = new JTextArea();
+		sourceTextArea.setFont(new Font("monospaced", Font.PLAIN, 12));
 		sourceTextArea.setEditable(false);
 		sourceTextArea.setLineWrap(true);
 		sourceTextArea.setWrapStyleWord(true);
 
 		final JTextArea outputTextArea = new JTextArea();
+		outputTextArea.setFont(new Font("monospaced", Font.PLAIN, 12));
 		outputTextArea.setEditable(false);
 		outputTextArea.setLineWrap(true);
 		outputTextArea.setWrapStyleWord(true);
@@ -353,23 +346,23 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			public void actionPerformed(ActionEvent e) {
 				JComboBox source = (JComboBox) e.getSource();
 				if (source.getSelectedIndex() == 0) {
+
+					container.getViewport().removeAll();
+					container.getViewport().add(sourceTextArea);
+					displaySource(sourceTextArea, process);
+
+					// after the GUI has figured out the shape of everthing move the view to a location of interest
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {
-							container.getViewport().removeAll();
-							container.getViewport().add(sourceTextArea);
-							displaySource(sourceTextArea, process);
-						}
-					});
+							String code = sourceTextArea.getText();
+							int scrollTo = UtilIO.indexOfSourceStart(code);
+							sourceTextArea.setCaretPosition(scrollTo);
+						}});
 
 				} else if (source.getSelectedIndex() == 1) {
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							container.getViewport().removeAll();
-							container.getViewport().add(outputTextArea);
-						}
-					});
+					container.getViewport().removeAll();
+					container.getViewport().add(outputTextArea);
 				}
 			}
 		});
