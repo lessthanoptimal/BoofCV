@@ -21,6 +21,7 @@ package boofcv.gui;
 import boofcv.io.UtilIO;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -94,28 +95,27 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		processList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		processList.setLayoutOrientation(JList.VERTICAL);
 		processList.setVisibleRowCount(-1);
-		processList.setPreferredSize(new Dimension(500, 600));
 		processList.getModel().addListDataListener(this);
 
 		JPanel processPanel = new JPanel();
-		processPanel.setLayout(new BoxLayout(processPanel, BoxLayout.Y_AXIS));
-		processPanel.add(actionPanel);
-		processPanel.add(processList);
+		processPanel.setLayout(new BorderLayout());
+		processPanel.add(actionPanel, BorderLayout.NORTH);
+		processPanel.add(processList, BorderLayout.CENTER);
 
-		JSplitPane verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		JSplitPane verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,processPanel,outputPanel);
 		verticalSplitPane.setDividerLocation(150);
-		verticalSplitPane.setResizeWeight(0.0); // divider location won't change when window is resized
-		verticalSplitPane.add(processPanel);    // most of the time you want to increase the view of the text
-		verticalSplitPane.add(outputPanel);
+		// divider location won't change when window is resized
+		// most of the time you want to increase the view of the text
+		verticalSplitPane.setResizeWeight(0.0);
 
-		JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,treeView,verticalSplitPane);
 		horizontalSplitPane.setDividerLocation(250);
 		horizontalSplitPane.setResizeWeight(0.0);
-		horizontalSplitPane.add(treeView);
-		horizontalSplitPane.add(verticalSplitPane);
 
 		add(horizontalSplitPane, BorderLayout.CENTER);
 		new ProcessStatusThread().start();
+
+		setPreferredSize(new Dimension(800,600));
 	}
 
 
@@ -215,19 +215,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		github.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (Desktop.isDesktopSupported()) {
-					try {
-
-						URI uri = new URI(UtilIO.getGithubURL(info.app.getPackage().getName(), info.app.getSimpleName()));
-						if (!uri.getPath().isEmpty())
-							Desktop.getDesktop().browse(uri);
-						else
-							System.err.println("Bad URL received");
-					} catch (Exception e1) {
-						System.err.println("Something went wrong connecting to github");
-						System.err.println(e1.getMessage());
-					}
-				}
+				openInGitHub(info);
 			}
 		});
 
@@ -236,6 +224,26 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		submenu.add(copypath);
 		submenu.add(github);
 		submenu.show(tree, x, y);
+	}
+
+	/**
+	 * Opens github page of source code up in a browser window
+	 */
+	private void openInGitHub( AppInfo info ) {
+		if (Desktop.isDesktopSupported()) {
+			try {
+
+				URI uri = new URI(UtilIO.getGithubURL(info.app.getPackage().getName(), info.app.getSimpleName()));
+				if (!uri.getPath().isEmpty())
+					Desktop.getDesktop().browse(uri);
+				else
+					System.err.println("Bad URL received");
+			} catch (Exception e1) {
+				JOptionPane.showMessageDialog(this,"Open GitHub Error",
+						"Error connecting: "+e1.getMessage(),JOptionPane.ERROR_MESSAGE);
+				System.err.println(e1.getMessage());
+			}
+		}
 	}
 
 	@Override
@@ -324,7 +332,15 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 		String[] optionsList = new String[]{"Source", "Output"};
 		JComboBox<String> options = new JComboBox<>(optionsList);
-		JCheckBox displayInGUI = new JCheckBox("Display output");
+		options.setBorder(new EmptyBorder(5,5,5,5));
+		options.setMaximumSize(options.getPreferredSize());
+		JButton bOpenInGitHub = new JButton("GitHub");
+		bOpenInGitHub.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openInGitHub(process.info);
+			}
+		});
 
 		final JTextArea sourceTextArea = new JTextArea();
 		sourceTextArea.setFont(new Font("monospaced", Font.PLAIN, 12));
@@ -367,42 +383,22 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			}
 		});
 
-		displayInGUI.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if(e.getStateChange() == ItemEvent.SELECTED) {
-					process.launcher.setPrintOut(new PrintStream(new TextOutputStream(outputTextArea)));
-				}
-				else {
-					process.launcher.setPrintOut(System.out);
-				}
-			}
-		});
+		// redirect console output to the GUI
+		process.launcher.setPrintOut(new PrintStream(new TextOutputStream(outputTextArea)));
+		process.launcher.setPrintErr(new PrintStream(new TextOutputStream(outputTextArea)));
 
 		JPanel intermediate = new JPanel();
-		GridBagLayout layout = new GridBagLayout();
-		intermediate.setLayout(layout);
+		intermediate.setLayout(new BoxLayout(intermediate,BoxLayout.X_AXIS));
+		intermediate.add(options);
+		intermediate.add(Box.createHorizontalGlue());
+		if( Desktop.isDesktopSupported() ) {
+			intermediate.add(bOpenInGitHub);
+		}
 
-		GridBagConstraints c = new GridBagConstraints();
-		c.weightx = 0.8;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		intermediate.add(options, c);
-
-		c.weightx = 0.2;
-		c.gridx = 1;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.NONE;
-		intermediate.add(displayInGUI, c);
 		component.add(intermediate, BorderLayout.NORTH);
 		component.add(container, BorderLayout.CENTER);
 
-
 		pane.add(title, component);
-
-
-		displayInGUI.setSelected(true);
 		options.setSelectedIndex(1);
 		pane.setSelectedIndex(pane.getComponentCount()-1);
 	}
