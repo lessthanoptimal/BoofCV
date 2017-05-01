@@ -18,7 +18,9 @@
 
 package boofcv.gui;
 
+import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
+import boofcv.misc.BoofMiscOps;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -249,22 +251,43 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == bKill) {
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					ActiveProcess selected = (ActiveProcess) processList.getSelectedValue();
-					if (selected == null)
-						return;
+			ActiveProcess selected = (ActiveProcess) processList.getSelectedValue();
+			if (selected == null)
+				return;
 
-					selected.kill();
-
-				}
-			});
+			selected.requestKill();
 		} else if (e.getSource() == bKillAll) {
-			synchronized (processes) {
-				for (int i = 0; i < processes.size(); i++) {
-					processes.get(i).kill();
+			killAllProcesses(0);
+		}
+	}
+
+	/**
+	 * Requests that all active processes be killed.
+	 * @param blockTimeMS If > 0 then it will block until all processes are killed for the specified number
+	 *                    of milliseconds
+	 */
+	public void killAllProcesses( long blockTimeMS ) {
+		synchronized (processes) {
+			for (int i = 0; i < processes.size(); i++) {
+				processes.get(i).requestKill();
+			}
+		}
+
+		if( blockTimeMS > 0 ) {
+			long abortTime = System.currentTimeMillis()+blockTimeMS;
+			while( abortTime > System.currentTimeMillis() ) {
+				int total = 0;
+				synchronized (processes) {
+					for (int i = 0; i < processes.size(); i++) {
+						if (!processes.get(i).isActive()) {
+							total++;
+						}
+					}
+					if( processes.size() == total ) {
+						break;
+					}
 				}
+				BoofMiscOps.sleep(200);
 			}
 		}
 	}
@@ -462,7 +485,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			active = false;
 		}
 
-		public void kill() {
+		public void requestKill() {
 			launcher.requestKill();
 		}
 
@@ -510,6 +533,16 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 				}
 			}
 		}
+	}
+
+	public void showWindow( String title ) {
+		JFrame frame = ShowImages.showWindow(this,title,true);
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				ApplicationLauncherApp.this.killAllProcesses(2000);
+			}
+		});
 	}
 
 }

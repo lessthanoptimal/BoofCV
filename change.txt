@@ -74,6 +74,9 @@ Version : 0.27
 - Fixed histogram in ImageStatistics
   * For unsigned data types minimum value was being ignored
   * Thanks André Ambrósio Boechat for reporting the problem
+- ApplicationLauncherApp
+  * Thanks Jalal Khan for completing and going beyond what was required in the Bounty!
+  * Displays source code, GitHub button, search (TODO), and various other improvements
 
 - TODO Visualization tools for Direct VO
 -      Show warped image
@@ -89,7 +92,10 @@ Version : 0.27
        https://blog.gradle.org/incremental-compiler-avoidance
 - TODO Clarify how you calibrate the camera in Processing
 - TODO Create a stand alone application that people can download to calibrate
-
+- ApplicationLauncherApp
+  * Search capability
+  * Don't close tab when finished.  Clean up tabs for dead processes when a new one is launched
+- TODO split ffmpeg off from JavaCV
 ---------------------------------------------
 Date    : 2016/12/07
 Version : 0.26
