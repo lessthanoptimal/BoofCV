@@ -18,6 +18,8 @@
 
 package boofcv.io;
 
+import boofcv.struct.BoofDefaults;
+
 import javax.swing.*;
 import java.io.*;
 
@@ -202,5 +204,119 @@ public class UtilIO {
 		}
 		if (!f.delete())
 			throw new RuntimeException("Failed to delete file: " + f);
+	}
+
+	/**
+	 * Reads an entire file and converts it into a text string
+	 */
+	public static String readAsString( String path ) {
+		StringBuilder code = new StringBuilder();
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(path));
+			String line;
+			while ((line = reader.readLine()) != null)
+				code.append(line).append(System.lineSeparator());
+			reader.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return code.toString();
+	}
+
+	/**
+	 * Constructs the path for a source code file residing in the examples or demonstrations directory
+	 * In the case of the file not being in either directory, an empty string is returned
+	 * The expected parameters are class.getPackage().getName(), class.getSimpleName()
+	 * @param pkg package containing the class
+	 * @param app simple class name
+	 * @return
+	 */
+	public static String getSourcePath(String pkg, String app) {
+		String path = "";
+		if(pkg == null || app == null)
+			return path;
+
+		if(pkg.contains("examples"))
+			path = path("examples/src/" + pkg.replace('.','/') + "/" + app + ".java");
+		else if(pkg.contains("demonstrations"))
+			path = path("demonstrations/src/" + pkg.replace('.','/') + "/" + app + ".java");
+
+		return path;
+	}
+
+	public static String getGithubURL(String pkg, String app) {
+		if(pkg == null || app == null)
+			return "";
+
+		String base = "https://github.com/lessthanoptimal/BoofCV/blob/v"+ BoofDefaults.version+"/";
+		pkg = pkg.replace('.','/') + "/";
+
+		String dir;
+		if(pkg.contains("demonstrations"))
+			dir = "demonstrations/";
+		else if(pkg.contains("examples"))
+			dir = "examples/";
+		else
+			return "";
+
+		return base + dir + "src/" + pkg + app + ".java";
+	}
+
+	/**
+	 * Finds the first javadoc OR the start of the class, which ever comes first.
+	 * This does require some thought.  The word class can easily be inside a comment.
+	 * Comments may or may not be there.  Always the potential for stray //
+	 */
+	public static int indexOfSourceStart( String code ) {
+		int state = 0;
+
+		int indexLineStart = 0;
+		char previous = 0;
+		boolean justEntered = false;
+
+		StringBuilder buffer = new StringBuilder(1024);
+
+		for (int i = 0; i < code.length(); i++) {
+			char c = code.charAt(i);
+
+			if( state == 1 ) {
+				if( justEntered ) {
+					justEntered = false;
+					if( c == '*' ) {
+						return indexLineStart;
+					}
+				}
+				if( previous == '*' && c == '/') {
+					state = 0;
+				}
+			} else if( state == 0 ){
+				if( previous == '/' && c == '/' ) {
+					state = 2;
+				} else if( previous == '/' && c == '*') {
+					state = 1;
+					justEntered = true;
+				} else {
+					buffer.append(c);
+				}
+			}
+
+			if( c == '\n' ) {
+				if( buffer.toString().contains("class")) {
+					return indexLineStart;
+				}
+				buffer.delete(0,buffer.length());
+				indexLineStart = i+1;
+				if( state == 2 ) {
+					state = 0;
+				}
+			}
+
+			previous = c;
+		}
+		if( buffer.toString().contains("class")) {
+			return indexLineStart;
+		} else{
+			return 0;
+		}
 	}
 }
