@@ -19,6 +19,7 @@
 package boofcv.gui;
 
 import boofcv.io.UtilIO;
+import com.sun.deploy.panel.JSmartTextArea;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -35,6 +36,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -65,6 +67,57 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		tree = new JTree(root);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
+		final JTextField searchBox = new JTextField();
+		searchBox.setToolTipText("Search");
+		searchBox.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				String text = searchBox.getText();
+				DefaultMutableTreeNode selection = (DefaultMutableTreeNode) tree.getModel().getRoot();
+
+				TreePath path = searchTree(text, selection);
+				if (path != null) {
+					tree.setSelectionPath(path);
+				} else {
+					tree.setSelectionPath(null);
+				}
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				String text = searchBox.getText();
+				DefaultMutableTreeNode selection =  (DefaultMutableTreeNode) tree.getModel().getRoot();
+				TreePath path = searchTree(text, selection);
+				if (path != null) {
+					tree.setSelectionPath(path);
+				} else {
+					tree.setSelectionPath(null);
+				}
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+
+			}
+		});
+		searchBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				DefaultMutableTreeNode currentSelection = tree.getLastSelectedPathComponent() != null
+						? (DefaultMutableTreeNode) tree.getLastSelectedPathComponent()
+						: (DefaultMutableTreeNode) tree.getModel().getRoot();
+				if (currentSelection != null && searchBox.getText() != null) {
+					TreePath path = searchTree(searchBox.getText(), currentSelection);
+					if (path != null) {
+						tree.setSelectionPath(path);
+						tree.scrollPathToVisible(path);
+					} else {
+						tree.setSelectionPath(null);
+					}
+				}
+			}
+		});
+
 		MouseListener ml = new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				if (e.getClickCount() == 2) {
@@ -76,8 +129,14 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		};
 		tree.addMouseListener(ml);
 
+		JPanel leftPanel = new JPanel();
+		leftPanel.setLayout(new BorderLayout());
+		leftPanel.add(searchBox, BorderLayout.NORTH);
 		JScrollPane treeView = new JScrollPane(tree);
 		treeView.setPreferredSize(new Dimension(300, 600));
+		leftPanel.add(treeView, BorderLayout.CENTER);
+
+
 
 		JPanel actionPanel = new JPanel();
 		actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
@@ -113,10 +172,11 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 		JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		horizontalSplitPane.setResizeWeight(0.5);
-		horizontalSplitPane.add(treeView);
+		horizontalSplitPane.add(leftPanel);
 		horizontalSplitPane.add(verticalSplitPane);
 
 		add(horizontalSplitPane, BorderLayout.CENTER);
+
 		new ProcessStatusThread().start();
 	}
 
@@ -161,6 +221,28 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		});
 
 		process.start();
+	}
+
+	private TreePath searchTree(String text, DefaultMutableTreeNode node) {
+		Enumeration e = ((DefaultMutableTreeNode) this.tree.getModel().getRoot()).breadthFirstEnumeration();
+
+		while (e.hasMoreElements()) {
+			DefaultMutableTreeNode n = (DefaultMutableTreeNode) e.nextElement();
+			if(n.equals(node)) {
+				while(e.hasMoreElements()) {
+					DefaultMutableTreeNode candidate = (DefaultMutableTreeNode) e.nextElement();
+					if (candidate.getUserObject() instanceof AppInfo) {
+						AppInfo candidateInfo = (AppInfo) candidate.getUserObject();
+						if (candidateInfo.app.getSimpleName().toLowerCase().contains(text)) {
+							return new TreePath(candidate.getPath());
+						}
+					}
+				}
+			}
+
+		}
+
+		return null;
 	}
 
 	public void handleClick(DefaultMutableTreeNode node) {
@@ -382,10 +464,9 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		displayInGUI.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				if(e.getStateChange() == ItemEvent.SELECTED) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
 					process.launcher.setPrintOut(new PrintStream(new TextOutputStream(outputTextArea)));
-				}
-				else {
+				} else {
 					process.launcher.setPrintOut(System.out);
 				}
 			}
@@ -416,7 +497,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 		displayInGUI.setSelected(true);
 		options.setSelectedIndex(1);
-		pane.setSelectedIndex(pane.getComponentCount()-1);
+		pane.setSelectedIndex(pane.getComponentCount() - 1);
 	}
 
 	private void removeProcessTab(final ActiveProcess process, JTabbedPane pane) {
@@ -435,9 +516,11 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 	class TextOutputStream extends OutputStream {
 		private JTextArea textArea;
+
 		public TextOutputStream(JTextArea textArea) {
 			this.textArea = textArea;
 		}
+
 		@Override
 		public void write(final int b) throws IOException {
 			SwingUtilities.invokeLater(new Runnable() {
