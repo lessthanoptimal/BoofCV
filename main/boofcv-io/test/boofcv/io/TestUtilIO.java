@@ -18,17 +18,21 @@
 
 package boofcv.io;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
- * Created by Jalal on 4/30/2017.
+ * @author Peter Abeles
+ * @author Jalal
  */
 public class TestUtilIO {
 
@@ -36,41 +40,74 @@ public class TestUtilIO {
 	private String validDemoClass = "ShowColorModelApp";
 	private String validExamplePackage = "boofcv.examples.enhance";
 	private String validExampleClass = "ExampleImageEnhancement";
+
+
 	@Test
-	public void testgetSourcePath() throws MalformedURLException, ClassNotFoundException {
-		File f = new File(UtilIO.getSourcePath(validDemoPackage, validDemoClass));
-		Assert.assertTrue(f.exists());
+	public void readAsString() throws IOException {
+		String expected = "This is\na string\n";
+		File tmp = File.createTempFile("readAsString",null);
 
-		File f2 = new File(UtilIO.getSourcePath(validExamplePackage, validExampleClass));
-		Assert.assertTrue(f2.exists());
+		FileWriter writer = new FileWriter(tmp);
+		writer.write(expected);
+		writer.close();
 
-		String invalidPackage = "adfs";
-		String invalidClass = "asdf";
-		Assert.assertEquals(UtilIO.getSourcePath(invalidPackage, invalidClass), "");
+		String found = UtilIO.readAsString(tmp.getAbsolutePath());
+		assertTrue(tmp.delete());
 
-		String nullPackage = null;
-		String nullClass = null;
-		Assert.assertEquals(UtilIO.getSourcePath(nullPackage, nullClass), "");
-
+		assertEquals(expected,found);
 	}
 
 	@Test
-	public void testgetGithubLink() throws IOException {
+	public void getSourcePath() throws MalformedURLException, ClassNotFoundException {
+		File f1 = new File(UtilIO.getSourcePath(validDemoPackage, validDemoClass));
+		assertTrue(f1.exists());
+		assertTrue(f1.isAbsolute());
+
+		File f2 = new File(UtilIO.getSourcePath(validExamplePackage, validExampleClass));
+		assertTrue(f2.exists());
+		assertTrue(f2.isAbsolute());
+
+		String invalidPackage = "adfs";
+		String invalidClass = "asdf";
+		assertEquals(UtilIO.getSourcePath(invalidPackage, invalidClass), "");
+
+		String nullPackage = null;
+		String nullClass = null;
+		assertEquals(UtilIO.getSourcePath(nullPackage, nullClass), "");
+	}
+
+	@Test
+	public void getGithubLink() throws IOException {
 		String url = UtilIO.getGithubURL(validDemoPackage, validDemoClass);
 		HttpURLConnection.setFollowRedirects(false);
 		HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
 		con.setRequestMethod("HEAD");
 		con.setConnectTimeout(2000);
-		Assert.assertEquals(con.getResponseCode(), HttpURLConnection.HTTP_OK);
+		assertEquals(con.getResponseCode(), HttpURLConnection.HTTP_OK);
 
 		String url2 = UtilIO.getGithubURL(validExamplePackage, validExampleClass);
 		HttpURLConnection.setFollowRedirects(false);
 		HttpURLConnection con2 = (HttpURLConnection) new URL(url2).openConnection();
 		con2.setRequestMethod("HEAD");
 		con2.setConnectTimeout(2000);
-		Assert.assertEquals(con2.getResponseCode(), HttpURLConnection.HTTP_OK);
+		assertEquals(con2.getResponseCode(), HttpURLConnection.HTTP_OK);
 
 		String url3 = UtilIO.getGithubURL(null, null);
-		Assert.assertEquals(url3, "");
+		assertEquals(url3, "");
+	}
+
+	@Test
+	public void indexOfSourceStart() {
+		String example0 = "// asdfasdf\n\nimport foo;\npublic class stuff{\n/** Yo Dog*/public void class()}";
+
+		assertEquals(25,UtilIO.indexOfSourceStart(example0));
+
+		String example1 = "public class stuff{\n/** Yo Dog*/public void class()}";
+
+		assertEquals(0,UtilIO.indexOfSourceStart(example1));
+
+		String example2 = "/* copyright*/\nimport stuff;\n/** comments */public class stuff{\n/** Yo Dog*/public void class()}";
+
+		assertEquals(29,UtilIO.indexOfSourceStart(example2));
 	}
 }

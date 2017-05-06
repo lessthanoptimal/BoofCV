@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,6 @@ import boofcv.demonstrations.transform.pyramid.VisualizePyramidFloatApp;
 import boofcv.demonstrations.transform.pyramid.VisualizeScaleSpacePyramidApp;
 import boofcv.demonstrations.transform.wavelet.WaveletVisualizeApp;
 import boofcv.gui.ApplicationLauncherApp;
-import boofcv.gui.image.ShowImages;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -182,8 +181,8 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 	}
 
 	public static void main(String[] args) {
-		DemonstrationLauncherApp app = new DemonstrationLauncherApp();
-		ShowImages.showWindow(app,"Demonstration Launcher",true);
+		final DemonstrationLauncherApp app = new DemonstrationLauncherApp();
+		app.showWindow("Demonstration Launcher");
 	}
 
 

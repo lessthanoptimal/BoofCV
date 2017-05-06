@@ -18,9 +18,11 @@
 
 package boofcv.gui;
 
+import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
@@ -32,7 +34,10 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -149,19 +154,18 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		processList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		processList.setLayoutOrientation(JList.VERTICAL);
 		processList.setVisibleRowCount(-1);
-		processList.setPreferredSize(new Dimension(500, 600));
 		processList.getModel().addListDataListener(this);
 
 		JPanel processPanel = new JPanel();
-		processPanel.setLayout(new BoxLayout(processPanel, BoxLayout.Y_AXIS));
-		processPanel.add(actionPanel);
-		processPanel.add(processList);
+		processPanel.setLayout(new BorderLayout());
+		processPanel.add(actionPanel, BorderLayout.NORTH);
+		processPanel.add(processList, BorderLayout.CENTER);
 
-		JSplitPane verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		verticalSplitPane.setDividerLocation(0.5);
-		verticalSplitPane.setResizeWeight(0.5);
-		verticalSplitPane.add(processPanel);
-		verticalSplitPane.add(outputPanel);
+		JSplitPane verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,processPanel,outputPanel);
+		verticalSplitPane.setDividerLocation(150);
+		// divider location won't change when window is resized
+		// most of the time you want to increase the view of the text
+		verticalSplitPane.setResizeWeight(0.0);
 
 		//needed to initialize vertical divider to 0.5 weight
 		verticalSplitPane.setPreferredSize(new Dimension(500, 600));
@@ -170,13 +174,16 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		verticalSplitPane.setMinimumSize(new Dimension(1, 1));
 
 		JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		horizontalSplitPane.setResizeWeight(0.5);
 		horizontalSplitPane.add(leftPanel);
 		horizontalSplitPane.add(verticalSplitPane);
+		horizontalSplitPane.setDividerLocation(250);
+		horizontalSplitPane.setResizeWeight(0.0);
 
 		add(horizontalSplitPane, BorderLayout.CENTER);
 
 		new ProcessStatusThread().start();
+
+		setPreferredSize(new Dimension(800,600));
 	}
 
 
@@ -238,7 +245,6 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 					}
 				}
 			}
-
 		}
 
 		return null;
@@ -298,19 +304,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		github.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (Desktop.isDesktopSupported()) {
-					try {
-
-						URI uri = new URI(UtilIO.getGithubURL(info.app.getPackage().getName(), info.app.getSimpleName()));
-						if (!uri.getPath().isEmpty())
-							Desktop.getDesktop().browse(uri);
-						else
-							System.err.println("Bad URL received");
-					} catch (Exception e1) {
-						System.err.println("Something went wrong connecting to github");
-						System.err.println(e1.getMessage());
-					}
-				}
+				openInGitHub(info);
 			}
 		});
 
@@ -321,24 +315,64 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		submenu.show(tree, x, y);
 	}
 
+	/**
+	 * Opens github page of source code up in a browser window
+	 */
+	private void openInGitHub( AppInfo info ) {
+		if (Desktop.isDesktopSupported()) {
+			try {
+
+				URI uri = new URI(UtilIO.getGithubURL(info.app.getPackage().getName(), info.app.getSimpleName()));
+				if (!uri.getPath().isEmpty())
+					Desktop.getDesktop().browse(uri);
+				else
+					System.err.println("Bad URL received");
+			} catch (Exception e1) {
+				JOptionPane.showMessageDialog(this,"Open GitHub Error",
+						"Error connecting: "+e1.getMessage(),JOptionPane.ERROR_MESSAGE);
+				System.err.println(e1.getMessage());
+			}
+		}
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == bKill) {
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					ActiveProcess selected = (ActiveProcess) processList.getSelectedValue();
-					if (selected == null)
-						return;
+			ActiveProcess selected = (ActiveProcess) processList.getSelectedValue();
+			if (selected == null)
+				return;
 
-					selected.kill();
-
-				}
-			});
+			selected.requestKill();
 		} else if (e.getSource() == bKillAll) {
-			synchronized (processes) {
-				for (int i = 0; i < processes.size(); i++) {
-					processes.get(i).kill();
+			killAllProcesses(0);
+		}
+	}
+
+	/**
+	 * Requests that all active processes be killed.
+	 * @param blockTimeMS If > 0 then it will block until all processes are killed for the specified number
+	 *                    of milliseconds
+	 */
+	public void killAllProcesses( long blockTimeMS ) {
+		synchronized (processes) {
+			for (int i = 0; i < processes.size(); i++) {
+				processes.get(i).requestKill();
+			}
+		}
+
+		if( blockTimeMS > 0 ) {
+			long abortTime = System.currentTimeMillis()+blockTimeMS;
+			while( abortTime > System.currentTimeMillis() ) {
+				int total = 0;
+				synchronized (processes) {
+					for (int i = 0; i < processes.size(); i++) {
+						if (!processes.get(i).isActive()) {
+							total++;
+						}
+					}
+					if( processes.size() == total ) {
+						break;
+					}
 				}
 			}
 		}
@@ -372,21 +406,9 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		String path = UtilIO.getSourcePath(process.info.app.getPackage().getName(), process.info.app.getSimpleName());
 		File source = new File(path);
 		if (source.exists() && source.canRead()) {
-			StringBuilder code = new StringBuilder();
-			try {
-				BufferedReader reader = new BufferedReader(new FileReader(source));
-				String line;
-				while ((line = reader.readLine()) != null)
-					code.append(line).append(System.lineSeparator());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			sourceTextArea.setText(code.toString());
+			String code = UtilIO.readAsString(path);
+			sourceTextArea.setText(code);
 
-			int scrollTo = code.toString().indexOf("class");
-			scrollTo = scrollTo == -1 ? 0 : scrollTo;
-
-			sourceTextArea.setCaretPosition(scrollTo);
 			sourceTextArea.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mousePressed(MouseEvent e) {
@@ -419,7 +441,15 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 		String[] optionsList = new String[]{"Source", "Output"};
 		JComboBox<String> options = new JComboBox<>(optionsList);
-		JCheckBox displayInGUI = new JCheckBox("Display output");
+		options.setBorder(new EmptyBorder(5,5,5,5));
+		options.setMaximumSize(options.getPreferredSize());
+		JButton bOpenInGitHub = new JButton("GitHub");
+		bOpenInGitHub.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openInGitHub(process.info);
+			}
+		});
 
 		final JTextArea sourceTextArea = new JTextArea();
 		sourceTextArea.setEditable(false);
@@ -439,64 +469,45 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			public void actionPerformed(ActionEvent e) {
 				JComboBox source = (JComboBox) e.getSource();
 				if (source.getSelectedIndex() == 0) {
+
+					container.getViewport().removeAll();
+					container.getViewport().add(sourceTextArea);
+					displaySource(sourceTextArea, process);
+
+					// after the GUI has figured out the shape of everthing move the view to a location of interest
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {
-							container.getViewport().removeAll();
-							container.getViewport().add(sourceTextArea);
-							displaySource(sourceTextArea, process);
-						}
-					});
+							String code = sourceTextArea.getText();
+							int scrollTo = UtilIO.indexOfSourceStart(code);
+							sourceTextArea.setCaretPosition(scrollTo);
+						}});
 
 				} else if (source.getSelectedIndex() == 1) {
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							container.getViewport().removeAll();
-							container.getViewport().add(outputTextArea);
-						}
-					});
+					container.getViewport().removeAll();
+					container.getViewport().add(outputTextArea);
 				}
 			}
 		});
 
-		displayInGUI.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					process.launcher.setPrintOut(new PrintStream(new TextOutputStream(outputTextArea)));
-				} else {
-					process.launcher.setPrintOut(System.out);
-				}
-			}
-		});
+		// redirect console output to the GUI
+		process.launcher.setPrintOut(new PrintStream(new TextOutputStream(outputTextArea)));
+		process.launcher.setPrintErr(new PrintStream(new TextOutputStream(outputTextArea)));
 
 		JPanel intermediate = new JPanel();
-		GridBagLayout layout = new GridBagLayout();
-		intermediate.setLayout(layout);
+		intermediate.setLayout(new BoxLayout(intermediate,BoxLayout.X_AXIS));
+		intermediate.add(options);
+		intermediate.add(Box.createHorizontalGlue());
+		if( Desktop.isDesktopSupported() ) {
+			intermediate.add(bOpenInGitHub);
+		}
 
-		GridBagConstraints c = new GridBagConstraints();
-		c.weightx = 0.8;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		intermediate.add(options, c);
-
-		c.weightx = 0.2;
-		c.gridx = 1;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.NONE;
-		intermediate.add(displayInGUI, c);
 		component.add(intermediate, BorderLayout.NORTH);
 		component.add(container, BorderLayout.CENTER);
 
-
 		pane.add(title, component);
-
-
-		displayInGUI.setSelected(true);
 		options.setSelectedIndex(1);
-		pane.setSelectedIndex(pane.getComponentCount() - 1);
+		pane.setSelectedIndex(pane.getComponentCount()-1);
 	}
 
 	private void removeProcessTab(final ActiveProcess process, JTabbedPane pane) {
@@ -515,11 +526,9 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 	class TextOutputStream extends OutputStream {
 		private JTextArea textArea;
-
 		public TextOutputStream(JTextArea textArea) {
 			this.textArea = textArea;
 		}
-
 		@Override
 		public void write(final int b) throws IOException {
 			SwingUtilities.invokeLater(new Runnable() {
@@ -560,7 +569,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			active = false;
 		}
 
-		public void kill() {
+		public void requestKill() {
 			launcher.requestKill();
 		}
 
@@ -608,6 +617,16 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 				}
 			}
 		}
+	}
+
+	public void showWindow( String title ) {
+		JFrame frame = ShowImages.showWindow(this,title,true);
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				ApplicationLauncherApp.this.killAllProcesses(2000);
+			}
+		});
 	}
 
 }

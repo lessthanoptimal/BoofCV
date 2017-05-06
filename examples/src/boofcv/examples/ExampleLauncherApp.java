@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.examples;
 
 import boofcv.alg.bow.LearnSceneFromFiles;
 import boofcv.gui.ApplicationLauncherApp;
-import boofcv.gui.image.ShowImages;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 
@@ -95,6 +94,6 @@ public class ExampleLauncherApp extends ApplicationLauncherApp {
 
 	public static void main(String[] args) {
 		ExampleLauncherApp app = new ExampleLauncherApp();
-		ShowImages.showWindow(app,"Example Launcher",true);
+		app.showWindow("Example Launcher");
 	}
 }

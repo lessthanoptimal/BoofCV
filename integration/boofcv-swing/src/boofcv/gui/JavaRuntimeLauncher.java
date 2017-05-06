@@ -29,6 +29,8 @@ import java.util.List;
  * Class for launching JVMs.  Monitors the status and kills frozen threads.  Keeps track of execution time and
  * sets up class path.
  *
+ * Output and error stream can be changed at any time and is designed to be thread safe.
+ *
  * @author Peter Abeles
  */
 public class JavaRuntimeLauncher {
@@ -50,6 +52,8 @@ public class JavaRuntimeLauncher {
     // Default to standard printOut and printErr
     PrintStream printOut = System.out;
     PrintStream printErr = System.err;
+
+    private final Object streamLock = new Object();
 
     /**
      * Constructor.  Configures which library it is to be launching a class from/related to
@@ -160,10 +164,14 @@ public class JavaRuntimeLauncher {
                 }
             }
 
-            printBuffer(error, printErr);
+            synchronized (streamLock) {
+                printBuffer(error, printErr);
+            }
 
             if( input.ready() ) {
-                printBuffer(input, printOut);
+                synchronized (streamLock) {
+                    printBuffer(input, printOut);
+                }
             } else {
                 Thread.sleep(500);
             }
@@ -192,8 +200,10 @@ public class JavaRuntimeLauncher {
             }
         }
 
-        printBuffer(error, printErr);
-        printBuffer(input, printOut);
+        synchronized (streamLock) {
+            printBuffer(error, printErr);
+            printBuffer(input, printOut);
+        }
 
         durationMilli = System.currentTimeMillis()-startTime;
         return !frozen && !killRequested;
@@ -262,11 +272,15 @@ public class JavaRuntimeLauncher {
     }
 
     public void setPrintOut(PrintStream out) {
-        this.printOut = out;
+        synchronized (streamLock) {
+            this.printOut = out;
+        }
     }
 
     public PrintStream getPrintErr() {
-        return printErr;
+        synchronized (streamLock) {
+            return printErr;
+        }
     }
 
     public void setPrintErr(PrintStream err) {
