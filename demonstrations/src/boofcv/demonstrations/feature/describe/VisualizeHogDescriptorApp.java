@@ -158,7 +158,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 		imagePanel.setImage(buffered);
 		imagePanel.setPreferredSize(new Dimension(buffered.getWidth(),buffered.getHeight()));
 		imagePanel.setMinimumSize(new Dimension(buffered.getWidth(),buffered.getHeight()));
-      imagePanel.repaint();
+		imagePanel.repaint();
 	}
 
 	private boolean isRegionSelected() {
