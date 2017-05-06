@@ -19,10 +19,12 @@
 package boofcv.gui;
 
 import boofcv.io.UtilIO;
-import com.sun.deploy.panel.JSmartTextArea;
 
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
@@ -32,7 +34,6 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -135,8 +136,6 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		JScrollPane treeView = new JScrollPane(tree);
 		treeView.setPreferredSize(new Dimension(300, 600));
 		leftPanel.add(treeView, BorderLayout.CENTER);
-
-
 
 		JPanel actionPanel = new JPanel();
 		actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
