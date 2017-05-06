@@ -41,8 +41,7 @@ import java.io.PrintStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -81,7 +80,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 				String text = searchBox.getText();
 				DefaultMutableTreeNode selection = (DefaultMutableTreeNode) tree.getModel().getRoot();
 
-				TreePath path = searchTree(text, selection);
+				TreePath path = searchTree(text, selection, true);
 				if (path != null) {
 					tree.setSelectionPath(path);
 				} else {
@@ -93,7 +92,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			public void removeUpdate(DocumentEvent e) {
 				String text = searchBox.getText();
 				DefaultMutableTreeNode selection =  (DefaultMutableTreeNode) tree.getModel().getRoot();
-				TreePath path = searchTree(text, selection);
+				TreePath path = searchTree(text, selection, true);
 				if (path != null) {
 					tree.setSelectionPath(path);
 				} else {
@@ -106,14 +105,33 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 			}
 		});
-		searchBox.addActionListener(new ActionListener() {
+		KeyStroke down = KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, true);
+		KeyStroke up = KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, true);
+			Action nextSearch = new AbstractAction() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					DefaultMutableTreeNode currentSelection = tree.getLastSelectedPathComponent() != null
+							? (DefaultMutableTreeNode) tree.getLastSelectedPathComponent()
+							: (DefaultMutableTreeNode) tree.getModel().getRoot();
+					if (currentSelection != null && searchBox.getText() != null) {
+						TreePath path = searchTree(searchBox.getText(), currentSelection, true);
+						if (path != null) {
+							tree.setSelectionPath(path);
+							tree.scrollPathToVisible(path);
+						} else {
+							tree.setSelectionPath(null);
+						}
+					}
+				}
+		};
+		Action prevSearch = new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				DefaultMutableTreeNode currentSelection = tree.getLastSelectedPathComponent() != null
 						? (DefaultMutableTreeNode) tree.getLastSelectedPathComponent()
 						: (DefaultMutableTreeNode) tree.getModel().getRoot();
 				if (currentSelection != null && searchBox.getText() != null) {
-					TreePath path = searchTree(searchBox.getText(), currentSelection);
+					TreePath path = searchTree(searchBox.getText(), currentSelection, false);
 					if (path != null) {
 						tree.setSelectionPath(path);
 						tree.scrollPathToVisible(path);
@@ -121,6 +139,23 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 						tree.setSelectionPath(null);
 					}
 				}
+			}
+		};
+
+		searchBox.getInputMap().put(down, "nextSearch");
+		searchBox.getActionMap().put("nextSearch", nextSearch);
+		searchBox.getInputMap().put(up, "prevSearch");
+		searchBox.getActionMap().put("prevSearch", prevSearch);
+
+		searchBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//enter key goes to next match
+				DefaultMutableTreeNode selection = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+				if(selection != null) {
+					handleClick(selection);
+				}
+				System.out.println("action");
 			}
 		});
 
@@ -229,8 +264,25 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		process.start();
 	}
 
-	private TreePath searchTree(String text, DefaultMutableTreeNode node) {
+	private TreePath searchTree(String text, DefaultMutableTreeNode node, boolean forward) {
 		Enumeration e = ((DefaultMutableTreeNode) this.tree.getModel().getRoot()).breadthFirstEnumeration();
+		if(!forward) {
+			final Stack tmp = new Stack();
+			while(e.hasMoreElements())
+				tmp.push(e.nextElement());
+
+			e = new Enumeration() {
+				@Override
+				public boolean hasMoreElements() {
+					return !tmp.isEmpty();
+				}
+
+				@Override
+				public Object nextElement() {
+					return tmp.pop();
+				}
+			};
+		}
 
 		while (e.hasMoreElements()) {
 			DefaultMutableTreeNode n = (DefaultMutableTreeNode) e.nextElement();
@@ -628,5 +680,4 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			}
 		});
 	}
-
 }
