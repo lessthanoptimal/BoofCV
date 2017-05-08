@@ -129,6 +129,7 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 		imagePanel.setImage(work);
 		imagePanel.setPreferredSize(new Dimension(work.getWidth(),work.getHeight()));
 		imagePanel.setMinimumSize(new Dimension(work.getWidth(),work.getHeight()));
+		imagePanel.repaint();
 	}
 
 	public void setCellWidth( int width ) {
