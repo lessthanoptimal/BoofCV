@@ -55,7 +55,7 @@ Version : 0.27
 - Fixed and updated Android example
 - Android
   * ConvertBitmap will reshape BoofCV images to match the input Bitmap when converting
-  * TODO rename multi to planar and other references to old naming
+  * Refactored functions names with multi to planar
 - Fixed visual odometry path viewer so that the camera behaves in a same fashion when the window is resized
 - Multi View
   * Split EnumEpiloar into EnumFundamental and EnumEssential to make it clearer
@@ -79,6 +79,7 @@ Version : 0.27
   * Displays source code, GitHub button, search (TODO), and various other improvements
 - ConvertNV21 and ConvertYV12
   * Speed up conversion from NV21 to RGB by about 1.9x by converting if statements into bitwise operations
+  * Refactored functions names with multi to planar
 
 - TODO Visualization tools for Direct VO
 -      Show warped image

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,7 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void bitmapToMultiRGB_U8(Bitmap input, Planar<GrayU8> output) {
+	public static void bitmapToPlanarRGB_U8(Bitmap input, Planar<GrayU8> output) {
 		final int h = output.height;
 		final int w = output.width;
 		
@@ -116,7 +116,7 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void bitmapToMultiRGB_F32(Bitmap input, Planar<GrayF32> output) {
+	public static void bitmapToPlanarRGB_F32(Bitmap input, Planar<GrayF32> output) {
 		final int h = output.height;
 		final int w = output.width;
 		
@@ -184,7 +184,7 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void multiToBitmapRGB_U8(Planar<GrayU8> input, Bitmap output) {
+	public static void planarToBitmapRGB_U8(Planar<GrayU8> input, Bitmap output) {
 		final int h = input.height;
 		final int w = input.width;
 
@@ -202,7 +202,7 @@ public class ImplConvertBitmap {
 		}
 	}
 
-	public static void multiToBitmapRGB_F32(Planar<GrayF32> input, Bitmap output) {
+	public static void planarToBitmapRGB_F32(Planar<GrayF32> input, Bitmap output) {
 		final int h = input.height;
 		final int w = input.width;
 
@@ -278,7 +278,7 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void arrayToMulti_U8(int input[], Bitmap.Config config , Planar<GrayU8> output ) {
+	public static void arrayToPlanar_U8(int input[], Bitmap.Config config , Planar<GrayU8> output ) {
 		final int h = output.height;
 		final int w = output.width;
 
@@ -340,7 +340,7 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void arrayToMulti_F32(int input[], Bitmap.Config config , Planar<GrayF32> output ) {
+	public static void arrayToPlanar_F32(int input[], Bitmap.Config config , Planar<GrayF32> output ) {
 		final int h = output.height;
 		final int w = output.width;
 
@@ -496,7 +496,7 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void arrayToMulti_U8(byte []input, Bitmap.Config config, Planar<GrayU8> output) {
+	public static void arrayToPlanar_U8(byte []input, Bitmap.Config config, Planar<GrayU8> output) {
 		final int h = output.height;
 		final int w = output.width;
 		
@@ -570,7 +570,7 @@ public class ImplConvertBitmap {
 
 	}
 	
-	public static void arrayToMulti_F32(byte []input, Bitmap.Config config, Planar<GrayF32> output) {
+	public static void arrayToPlanar_F32(byte []input, Bitmap.Config config, Planar<GrayF32> output) {
 		final int h = output.height;
 		final int w = output.width;
 		
@@ -733,7 +733,7 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void multiToArray_U8(Planar<GrayU8> input, byte[] output , Bitmap.Config config ) {
+	public static void planarToArray_U8(Planar<GrayU8> input, byte[] output , Bitmap.Config config ) {
 		final int h = input.height;
 		final int w = input.width;
 
@@ -803,7 +803,7 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void multiToArray_F32(Planar<GrayF32> input, byte[] output , Bitmap.Config config ) {
+	public static void planarToArray_F32(Planar<GrayF32> input, byte[] output , Bitmap.Config config ) {
 		final int h = input.height;
 		final int w = input.width;
 
