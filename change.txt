@@ -77,6 +77,8 @@ Version : 0.27
 - ApplicationLauncherApp
   * Thanks Jalal Khan for completing and going beyond what was required in the Bounty!
   * Displays source code, GitHub button, search (TODO), and various other improvements
+- ConvertNV21
+  * Speed up conversion from NV21 to RGB by about 1.9x by converting if statements into bitwise operations
 
 - TODO Visualization tools for Direct VO
 -      Show warped image
@@ -96,6 +98,9 @@ Version : 0.27
   * Search capability
   * Don't close tab when finished.  Clean up tabs for dead processes when a new one is launched
 - TODO split ffmpeg off from JavaCV
+- TODO Rename ConvertNV21.nv21ToMsRgb_U8 functions
+
+
 ---------------------------------------------
 Date    : 2016/12/07
 Version : 0.26
