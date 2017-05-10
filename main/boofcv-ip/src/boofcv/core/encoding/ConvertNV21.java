@@ -44,9 +44,9 @@ public class ConvertNV21 {
 			Planar ms = (Planar) output;
 
 			if (ms.getBandType() == GrayU8.class) {
-				ConvertNV21.nv21ToMsRgb_U8(data, width, height, ms);
+				ConvertNV21.nv21TPlanarRgb_U8(data, width, height, ms);
 			} else if (ms.getBandType() == GrayF32.class) {
-				ConvertNV21.nv21ToMsRgb_F32(data, width, height , ms);
+				ConvertNV21.nv21ToPlanarRgb_F32(data, width, height , ms);
 			} else {
 				throw new IllegalArgumentException("Unsupported output band format");
 			}
@@ -150,13 +150,13 @@ public class ConvertNV21 {
 	 * @param <T> Output image type
 	 */
 	public static <T extends ImageGray<T>>
-	Planar<T> nv21ToMsYuv(byte[] data , int width , int height ,
-						  Planar<T> output , Class<T> outputType ) {
+	Planar<T> nv21ToPlanarYuv(byte[] data , int width , int height ,
+							  Planar<T> output , Class<T> outputType ) {
 
 		if( outputType == GrayU8.class ) {
-			return (Planar)nv21ToMsYuv_U8(data,width,height,(Planar)output);
+			return (Planar) nv21ToPlanarYuv_U8(data,width,height,(Planar)output);
 		} else if( outputType == GrayF32.class ) {
-			return (Planar)nv21ToMsYuv_F32(data,width,height,(Planar)output);
+			return (Planar) nv21TPlanarYuv_F32(data,width,height,(Planar)output);
 		} else {
 			throw new IllegalArgumentException("Unsupported BoofCV Image Type "+outputType.getSimpleName());
 		}
@@ -170,8 +170,8 @@ public class ConvertNV21 {
 	 * @param height Input: NV21 image height
 	 * @param output Output: Optional storage for output image.  Can be null.
 	 */
-	public static Planar<GrayU8> nv21ToMsYuv_U8(byte[] data , int width , int height ,
-												Planar<GrayU8> output ) {
+	public static Planar<GrayU8> nv21ToPlanarYuv_U8(byte[] data , int width , int height ,
+													Planar<GrayU8> output ) {
 		if( output == null ) {
 			output = new Planar<>(GrayU8.class,width,height,3);
 		} else if( output.width != width || output.height != height )
@@ -179,7 +179,7 @@ public class ConvertNV21 {
 		else if( output.getNumBands() != 3 )
 			throw new IllegalArgumentException("three bands expected");
 
-		ImplConvertNV21.nv21ToMultiYuv_U8(data,output);
+		ImplConvertNV21.nv21ToPlanarYuv_U8(data,output);
 
 		return output;
 	}
@@ -192,8 +192,8 @@ public class ConvertNV21 {
 	 * @param height Input: NV21 image height
 	 * @param output Output: Optional storage for output image.  Can be null.
 	 */
-	public static Planar<GrayU8> nv21ToMsRgb_U8(byte[] data , int width , int height ,
-												Planar<GrayU8> output ) {
+	public static Planar<GrayU8> nv21TPlanarRgb_U8(byte[] data , int width , int height ,
+												   Planar<GrayU8> output ) {
 		if( output == null ) {
 			output = new Planar<>(GrayU8.class,width,height,3);
 		} else if( output.width != width || output.height != height )
@@ -201,7 +201,7 @@ public class ConvertNV21 {
 		else if( output.getNumBands() != 3 )
 			throw new IllegalArgumentException("three bands expected");
 
-		ImplConvertNV21.nv21ToMultiRgb_U8(data, output);
+		ImplConvertNV21.nv21ToPlanarRgb_U8(data, output);
 
 		return output;
 	}
@@ -236,8 +236,8 @@ public class ConvertNV21 {
 	 * @param height Input: NV21 image height
 	 * @param output Output: Optional storage for output image.  Can be null.
 	 */
-	public static Planar<GrayF32> nv21ToMsYuv_F32(byte[] data , int width , int height ,
-												  Planar<GrayF32> output ) {
+	public static Planar<GrayF32> nv21TPlanarYuv_F32(byte[] data , int width , int height ,
+													 Planar<GrayF32> output ) {
 		if( output == null ) {
 			output = new Planar<>(GrayF32.class,width,height,3);
 		} else if( output.width != width || output.height != height )
@@ -245,7 +245,7 @@ public class ConvertNV21 {
 		else if( output.getNumBands() != 3 )
 			throw new IllegalArgumentException("three bands expected");
 
-		ImplConvertNV21.nv21ToMultiYuv_F32(data, output);
+		ImplConvertNV21.nv21ToPlanarYuv_F32(data, output);
 
 		return output;
 	}
@@ -258,8 +258,8 @@ public class ConvertNV21 {
 	 * @param height Input: NV21 image height
 	 * @param output Output: Optional storage for output image.  Can be null.
 	 */
-	public static Planar<GrayF32> nv21ToMsRgb_F32(byte[] data , int width , int height ,
-												  Planar<GrayF32> output ) {
+	public static Planar<GrayF32> nv21ToPlanarRgb_F32(byte[] data , int width , int height ,
+													  Planar<GrayF32> output ) {
 		if( output == null ) {
 			output = new Planar<>(GrayF32.class,width,height,3);
 		} else if( output.width != width || output.height != height )
@@ -267,7 +267,7 @@ public class ConvertNV21 {
 		else if( output.getNumBands() != 3 )
 			throw new IllegalArgumentException("three bands expected");
 
-		ImplConvertNV21.nv21ToMultiRgb_F32(data, output);
+		ImplConvertNV21.nv21ToPlanarRgb_F32(data, output);
 
 		return output;
 	}

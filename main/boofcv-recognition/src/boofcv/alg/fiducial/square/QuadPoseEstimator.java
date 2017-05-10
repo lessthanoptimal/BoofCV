@@ -135,7 +135,7 @@ public class QuadPoseEstimator {
 	}
 
 	/**
-	 * Specify the location of points on the 2D fiducial.
+	 * Specify the location of points on the 2D fiducial.  These should be in "world coordinates"
 	 */
 	public void setFiducial( double x0 , double y0 , double x1 , double y1 ,
 							 double x2 , double y2 , double x3 , double y3 ) {

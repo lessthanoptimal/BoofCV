@@ -67,7 +67,7 @@ public class BenchmarkConvertNV21 {
 	{
 		@Override
 		public void process() {
-			ConvertNV21.nv21ToMsRgb_U8(nv21,width,height,planarU8);
+			ConvertNV21.nv21TPlanarRgb_U8(nv21,width,height,planarU8);
 		}
 	}
 
@@ -75,7 +75,7 @@ public class BenchmarkConvertNV21 {
 	{
 		@Override
 		public void process() {
-			ConvertNV21.nv21ToMsRgb_F32(nv21,width,height,planarF32);
+			ConvertNV21.nv21ToPlanarRgb_F32(nv21,width,height,planarF32);
 		}
 	}
 

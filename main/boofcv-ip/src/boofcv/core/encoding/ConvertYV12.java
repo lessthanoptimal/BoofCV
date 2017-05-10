@@ -43,9 +43,9 @@ public class ConvertYV12 {
             Planar ms = (Planar) output;
 
             if (ms.getBandType() == GrayU8.class) {
-                ImplConvertYV12.yv12ToMultiRgb_U8(data, ms);
+                ImplConvertYV12.yv12ToPlanarRgb_U8(data, ms);
             } else if (ms.getBandType() == GrayF32.class) {
-                ImplConvertYV12.yv12ToMultiRgb_F32(data, ms);
+                ImplConvertYV12.yv12ToPlanarRgb_F32(data, ms);
             } else {
                 throw new IllegalArgumentException("Unsupported output band format");
             }
