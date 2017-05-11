@@ -46,9 +46,6 @@ public class FeatureSpatialDiversity_F32 {
 
 	/**
 	 * Adds the estimated 3D location of a feature.
-	 * @param x
-	 * @param y
-	 * @param z
 	 */
 	public void addPoint( float x , float y , float z ) {
 		norm.grow().set(x/z, y/z);

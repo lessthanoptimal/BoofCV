@@ -30,6 +30,24 @@ import static org.junit.Assert.*;
  * @author Peter Abeles
  */
 public class TestBoofMiscOps {
+
+	@Test
+	public void numDigits() {
+		assertEquals(1,BoofMiscOps.numDigits(0));
+		assertEquals(1,BoofMiscOps.numDigits(1));
+		assertEquals(1,BoofMiscOps.numDigits(9));
+		assertEquals(2,BoofMiscOps.numDigits(10));
+		assertEquals(2,BoofMiscOps.numDigits(55));
+		assertEquals(3,BoofMiscOps.numDigits(120));
+		assertEquals(5,BoofMiscOps.numDigits(67890));
+		assertEquals(2,BoofMiscOps.numDigits(-1));
+		assertEquals(2,BoofMiscOps.numDigits(-9));
+		assertEquals(3,BoofMiscOps.numDigits(-10));
+		assertEquals(3,BoofMiscOps.numDigits(-55));
+		assertEquals(4,BoofMiscOps.numDigits(-120));
+		assertEquals(6,BoofMiscOps.numDigits(-67890));
+	}
+
 	@Test
 	public void boundRectangleInside() {
 		GrayU8 image = new GrayU8(20,25);

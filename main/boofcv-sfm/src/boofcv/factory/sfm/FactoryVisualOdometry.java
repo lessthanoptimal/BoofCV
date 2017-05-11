@@ -342,6 +342,15 @@ public class FactoryVisualOdometry {
 	 * motion.
 	 *
 	 * @see VisOdomQuadPnP
+	 *
+	 * @param inlierPixelTol Pixel tolerance for RANSAC inliers - Euclidean distance
+	 * @param epipolarPixelTol Feature association tolerance in pixels.
+	 * @param maxDistanceF2F Maximum allowed distance between two features in pixels
+	 * @param maxAssociationError Maxium error between two features when associating.
+	 * @param ransacIterations Number of iterations RANSAC will perform
+	 * @param refineIterations Number of refinement iterations
+	 * @param detector Which feature detector to use
+	 * @param imageType Type of input image
 	 */
 	public static <T extends ImageGray<T>,Desc extends TupleDesc>
 	StereoVisualOdometry<T> stereoQuadPnP( double inlierPixelTol ,
@@ -361,7 +370,7 @@ public class FactoryVisualOdometry {
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator = new EstimatorToGenerator<>(pnpStereo);
 
-		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
+		// euclidean error squared from left + right images
 		double ransacTOL = 2*inlierPixelTol * inlierPixelTol;
 
 		ModelMatcher<Se3_F64, Stereo2D3D> motion =
