@@ -18,18 +18,20 @@
 
 package boofcv.struct.feature;
 
+import java.io.Serializable;
+
 /**
  * Base class for tuple based feature descriptors
  *
  * @author Peter Abeles
  */
-public interface TupleDesc<T extends TupleDesc> {
+public interface TupleDesc<T extends TupleDesc> extends Serializable {
 
 	/**
 	 * Sets this tuple to be the same as the provided tuple
 	 * @param source The tuple which this one is to become a copy of.
 	 */
-	public void setTo( T source );
+	void setTo( T source );
 
 	/**
 	 * Returns the value of a tuple's element as a double.  In general this function should not be used
@@ -38,19 +40,19 @@ public interface TupleDesc<T extends TupleDesc> {
 	 * @param index Which element
 	 * @return Element's value as a double
 	 */
-	public double getDouble( int index );
+	double getDouble( int index );
 
 	/**
 	 * Number of elements in the tuple.
 	 *
 	 * @return Number of elements in the tuple
 	 */
-	public int size();
+	int size();
 
 	/**
 	 * Creates a copy of this description
 	 *
 	 * @return Copy
 	 */
-	public T copy();
+	T copy();
 }

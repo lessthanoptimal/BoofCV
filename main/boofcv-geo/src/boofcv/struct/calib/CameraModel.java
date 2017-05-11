@@ -18,12 +18,14 @@
 
 package boofcv.struct.calib;
 
+import java.io.Serializable;
+
 /**
  * Common class for camera models
  *
  * @author Peter Abeles
  */
-public abstract class CameraModel {
+public abstract class CameraModel implements Serializable {
 	/** image shape (units: pixels) */
 	public int width,height;
 

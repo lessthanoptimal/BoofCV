@@ -91,6 +91,7 @@ public class TestConvertBufferedImage {
 		assertEquals(imgHeight, found.height);
 		assertEquals(3, found.numBands);
 		assertEquals(3, found.getImageType().getNumBands());
+		assertFalse(found.isSubimage());
 
 		assertTrue(found.data != null);
 		assertEquals(imgWidth * imgHeight * 3, found.data.length);
@@ -105,6 +106,7 @@ public class TestConvertBufferedImage {
 		assertEquals(5, found.width);
 		assertEquals(6, found.height);
 		assertEquals(3, found.numBands);
+		assertTrue(found.isSubimage());
 	}
 
 	@Test(expected=IllegalArgumentException.class)

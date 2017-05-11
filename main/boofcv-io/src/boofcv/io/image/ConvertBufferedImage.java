@@ -130,10 +130,12 @@ public class ConvertBufferedImage {
 
 			ret.width = img.getWidth();
 			ret.height = img.getHeight();
-			ret.stride = raster.getScanlineStride();
 			ret.startIndex = raster.getDataOffset(0)-raster.getPixelStride()+1;
-			ret.setNumBands( raster.getNumBands() );
 			ret.data = raster.getDataStorage();
+			ret.setNumBands(raster.getNumBands()); // this function changes a few things, undo that
+			ret.numBands = raster.getNumBands();
+			ret.stride = raster.getScanlineStride();
+			ret.subImage = ret.startIndex != 0;
 
 			return ret;
 		}
