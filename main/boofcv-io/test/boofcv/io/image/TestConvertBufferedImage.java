@@ -284,6 +284,7 @@ public class TestConvertBufferedImage {
 				origImg = TestConvertRaster.createIntBuff(imgWidth,imgHeight,rand);
 
 			for( int j = 0; j < 2; j++ ) {
+				System.out.println("j = "+j);
 				if( j == 1 ) {
 					origImg = origImg.getSubimage(1,2,imgWidth-1,imgHeight-2);
 				}

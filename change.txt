@@ -100,7 +100,11 @@ Version : 0.27
 - ApplicationLauncherApp
   * Search capability
   * Don't close tab when finished.  Clean up tabs for dead processes when a new one is launched
-
+- TODO Modify ConvertBufferedImage and related code so that it will work in Java 9
+  * Remove references to: ByteInterleavedRaster,
+                          IntegerInterleavedRaster,
+                          ShortInterleavedRaster,
+                          SunWritableRaster
 
 ---------------------------------------------
 Date    : 2016/12/07
