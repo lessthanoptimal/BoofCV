@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.io.javacv;
+package boofcv.io.ffmpeg;
 
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoInterface;
@@ -26,10 +26,10 @@ import boofcv.struct.image.ImageType;
 /**
  * @author Peter Abeles
  */
-public class JavaCVVideo implements VideoInterface {
+public class FfmpegVideo implements VideoInterface {
 	@Override
 	public <T extends ImageBase<T>> SimpleImageSequence<T>
 	load(String fileName, ImageType<T> imageType) {
-		return new JavaCVVideoImageSequence<>(fileName, imageType);
+		return new FfmpegVideoImageSequence<>(fileName, imageType);
 	}
 }

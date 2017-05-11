@@ -8,7 +8,7 @@ dependencies {
     compile project(':main:boofcv-learning')
     compile project(':main:boofcv-recognition')
     compile project(':integration:boofcv-swing')
-    compile project(':integration:boofcv-javacv')
+    compile project(':integration:boofcv-ffmpeg')
     compile project(':integration:boofcv-WebcamCapture')
 
     compile 'org.reflections:reflections:0.9.10'
