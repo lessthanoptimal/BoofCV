@@ -129,6 +129,9 @@ public class BatchDownSizeImage {
 		ImageBase small = null;
 
 		int index = 0;
+		int numDigits = BoofMiscOps.numDigits(images.size()-1);
+		String format = "%"+numDigits+"d";
+		String format0 = "%0"+numDigits+"d";
 		for ( File f : images) {
 			BufferedImage orig = UtilImageIO.loadImage(f.getPath());
 
@@ -181,14 +184,14 @@ public class BatchDownSizeImage {
 				small = input.createNew(smallWidth,smallHeight);
 			}
 
-			System.out.printf(" %4d out of %4d   %s\n",index+1,images.size(),f.getName());
+			System.out.printf(" "+format+" out of "+format+"   %s\n",index+1,images.size(),f.getName());
 
 			ConvertBufferedImage.convertFrom(orig, input, true);
 			AverageDownSampleOps.down(input,small);
 
 			String nout;
 			if( rename ) {
-				nout = String.format("image%05d.png",index);
+				nout = String.format("image"+format0+".png",index);
 			} else {
 				nout = f.getName();
 				nout = nout.substring(0, nout.length() - 3) + "png";
