@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.io.javacv;
+package boofcv.io.ffmpeg;
 
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.bytedeco.javacv.FFmpegFrameGrabber;
-import org.bytedeco.javacv.Frame;
-import org.bytedeco.javacv.FrameGrabber;
-import org.bytedeco.javacv.Java2DFrameConverter;
+import org.bytedeco.copiedstuff.FFmpegFrameGrabber;
+import org.bytedeco.copiedstuff.Frame;
+import org.bytedeco.copiedstuff.FrameGrabber;
+import org.bytedeco.copiedstuff.Java2DFrameConverter;
 
 import java.awt.image.BufferedImage;
 
@@ -34,7 +34,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class JavaCVVideoImageSequence<T extends ImageBase<T>> implements SimpleImageSequence<T>
+public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleImageSequence<T>
 {
 	String filename;
 	FFmpegFrameGrabber frameGrabber;
@@ -49,7 +49,7 @@ public class JavaCVVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 	T currentBoof;
 	int frameNumber;
 
-	public JavaCVVideoImageSequence(String filename, ImageType<T> imageType ) {
+	public FfmpegVideoImageSequence(String filename, ImageType<T> imageType ) {
 		this.filename = filename;
 		this.imageType = imageType;
 		converter = new Java2DFrameConverter();

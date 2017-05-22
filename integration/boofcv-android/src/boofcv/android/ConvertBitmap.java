@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,7 +72,7 @@ public class ConvertBitmap {
 
 			case PLANAR:
 				Planar pl = (Planar)output;
-				bitmapToMS(input,pl,pl.getBandType(),storage);
+				bitmapToPlanar(input,pl,pl.getBandType(),storage);
 			break;
 
 			default:
@@ -165,7 +165,7 @@ public class ConvertBitmap {
 	 * @return The converted Planar image.
 	 */
 	public static <T extends ImageGray<T>>
-	Planar<T> bitmapToMS( Bitmap input , Planar<T> output , Class<T> type , byte[] storage ) {
+	Planar<T> bitmapToPlanar(Bitmap input , Planar<T> output , Class<T> type , byte[] storage ) {
 		if( output == null ) {
 			output = new Planar<>(type, input.getWidth(), input.getHeight(), 4);
 		} else {
@@ -178,9 +178,9 @@ public class ConvertBitmap {
 		input.copyPixelsToBuffer(ByteBuffer.wrap(storage));
 		
 		if( type == GrayU8.class )
-			ImplConvertBitmap.arrayToMulti_U8(storage, input.getConfig(), (Planar)output);
+			ImplConvertBitmap.arrayToPlanar_U8(storage, input.getConfig(), (Planar)output);
 		else if( type == GrayF32.class )
-			ImplConvertBitmap.arrayToMulti_F32(storage, input.getConfig(), (Planar)output);
+			ImplConvertBitmap.arrayToPlanar_F32(storage, input.getConfig(), (Planar)output);
 		else
 			throw new IllegalArgumentException("Unsupported BoofCV Type");
 
@@ -287,9 +287,9 @@ public class ConvertBitmap {
 			storage = declareStorage(output,null);
 		
 		if( input.getBandType() == GrayU8.class )
-			ImplConvertBitmap.multiToArray_U8((Planar)input, storage,output.getConfig());
+			ImplConvertBitmap.planarToArray_U8((Planar)input, storage,output.getConfig());
 		else if( input.getBandType() == GrayF32.class )
-			ImplConvertBitmap.multiToArray_F32((Planar)input, storage,output.getConfig());
+			ImplConvertBitmap.planarToArray_F32((Planar)input, storage,output.getConfig());
 		else
 			throw new IllegalArgumentException("Unsupported BoofCV Type");
 		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));

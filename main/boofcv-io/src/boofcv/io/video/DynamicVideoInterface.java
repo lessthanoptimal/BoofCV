@@ -38,16 +38,12 @@ public class DynamicVideoInterface implements VideoInterface {
 
 	VideoInterface xuggler;
 	VideoInterface jcodec;
-	VideoInterface javacv;
+	VideoInterface ffmpeg;
 	BoofMjpegVideo mjpeg = new BoofMjpegVideo();
 
 	public DynamicVideoInterface() {
 		try {
-			xuggler = loadManager("boofcv.io.wrapper.xuggler.XugglerVideoInterface");
-		} catch( RuntimeException e ) {}
-
-		try {
-			javacv = loadManager("boofcv.io.javacv.JavaCVVideo");
+			ffmpeg = loadManager("boofcv.io.ffmpeg.FfmpegVideo");
 		} catch( RuntimeException e ) {}
 
 		try {
@@ -83,8 +79,8 @@ public class DynamicVideoInterface implements VideoInterface {
 		} catch( RuntimeException ignore ){}
 
 		try {
-			if( javacv != null ) {
-				return javacv.load(fileName, imageType);
+			if( ffmpeg != null ) {
+				return ffmpeg.load(fileName, imageType);
 			}
 		} catch( RuntimeException ignore ){
 			ignore.printStackTrace();

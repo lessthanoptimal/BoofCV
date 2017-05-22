@@ -28,7 +28,7 @@ import boofcv.struct.image.*;
  */
 public class ImplConvertYV12 {
 
-	public static void yv12ToMultiRgb_U8(byte[] dataYV, Planar<GrayU8> output) {
+	public static void yv12ToPlanarRgb_U8(byte[] dataYV, Planar<GrayU8> output) {
 
 		GrayU8 R = output.getBand(0);
 		GrayU8 G = output.getBand(1);
@@ -50,15 +50,29 @@ public class ImplConvertYV12 {
 				int cb = (dataYV[ indexU ] & 0xFF) - 128;
 				int cr = (dataYV[ indexU+offsetV] & 0xFF) - 128;
 
-				if( y < 0 ) y = 0;
+//				if( y < 0 ) y = 0;
+				y = ((y >>> 31)^1)*y;
 
 				int r = (y + 1836*cr) >> 10;
 				int g = (y - 547*cr - 218*cb) >> 10;
 				int b = (y + 2165*cb) >> 10;
 
-				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
-				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
-				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+//				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
+//				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
+//				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+
+				r *= ((r >>> 31)^1);
+				g *= ((g >>> 31)^1);
+				b *= ((b >>> 31)^1);
+
+				// The bitwise code below isn't faster than than the if statement below
+//				r |= (((255-r) >>> 31)*0xFF);
+//				g |= (((255-g) >>> 31)*0xFF);
+//				b |= (((255-b) >>> 31)*0xFF);
+
+				if( r > 255 ) r = 255;
+				if( g > 255 ) g = 255;
+				if( b > 255 ) b = 255;
 
 				R.data[indexOut] = (byte)r;
 				G.data[indexOut] = (byte)g;
@@ -87,15 +101,29 @@ public class ImplConvertYV12 {
 				int cb = (dataYV[ indexU ] & 0xFF) - 128;
 				int cr = (dataYV[ indexU+offsetV] & 0xFF) - 128;
 
-				if( y < 0 ) y = 0;
+//				if( y < 0 ) y = 0;
+				y = ((y >>> 31)^1)*y;
 
 				int r = (y + 1836*cr) >> 10;
 				int g = (y - 547*cr - 218*cb) >> 10;
 				int b = (y + 2165*cb) >> 10;
 
-				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
-				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
-				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+//				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
+//				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
+//				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+
+				r *= ((r >>> 31)^1);
+				g *= ((g >>> 31)^1);
+				b *= ((b >>> 31)^1);
+
+				// The bitwise code below isn't faster than than the if statement below
+//				r |= (((255-r) >>> 31)*0xFF);
+//				g |= (((255-g) >>> 31)*0xFF);
+//				b |= (((255-b) >>> 31)*0xFF);
+
+				if( r > 255 ) r = 255;
+				if( g > 255 ) g = 255;
+				if( b > 255 ) b = 255;
 
 				output.data[indexOut++] = (byte)r;
 				output.data[indexOut++] = (byte)g;
@@ -106,7 +134,7 @@ public class ImplConvertYV12 {
 		}
 	}
 
-	public static void yv12ToMultiRgb_F32(byte[] dataYV, Planar<GrayF32> output) {
+	public static void yv12ToPlanarRgb_F32(byte[] dataYV, Planar<GrayF32> output) {
 
 		GrayF32 R = output.getBand(0);
 		GrayF32 G = output.getBand(1);
@@ -128,15 +156,29 @@ public class ImplConvertYV12 {
 				int cb = (dataYV[ indexU ] & 0xFF) - 128;
 				int cr = (dataYV[ indexU+offsetV] & 0xFF) - 128;
 
-				if( y < 0 ) y = 0;
+//				if( y < 0 ) y = 0;
+				y = ((y >>> 31)^1)*y;
 
 				int r = (y + 1836*cr) >> 10;
 				int g = (y - 547*cr - 218*cb) >> 10;
 				int b = (y + 2165*cb) >> 10;
 
-				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
-				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
-				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+//				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
+//				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
+//				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+
+				r *= ((r >>> 31)^1);
+				g *= ((g >>> 31)^1);
+				b *= ((b >>> 31)^1);
+
+				// The bitwise code below isn't faster than than the if statement below
+//				r |= (((255-r) >>> 31)*0xFF);
+//				g |= (((255-g) >>> 31)*0xFF);
+//				b |= (((255-b) >>> 31)*0xFF);
+
+				if( r > 255 ) r = 255;
+				if( g > 255 ) g = 255;
+				if( b > 255 ) b = 255;
 
 				R.data[indexOut] = r;
 				G.data[indexOut] = g;
@@ -165,15 +207,29 @@ public class ImplConvertYV12 {
 				int cb = (dataYV[ indexU ] & 0xFF) - 128;
 				int cr = (dataYV[ indexU+offsetV] & 0xFF) - 128;
 
-				if( y < 0 ) y = 0;
+//				if( y < 0 ) y = 0;
+				y = ((y >>> 31)^1)*y;
 
 				int r = (y + 1836*cr) >> 10;
 				int g = (y - 547*cr - 218*cb) >> 10;
 				int b = (y + 2165*cb) >> 10;
 
-				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
-				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
-				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+//				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
+//				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
+//				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+
+				r *= ((r >>> 31)^1);
+				g *= ((g >>> 31)^1);
+				b *= ((b >>> 31)^1);
+
+				// The bitwise code below isn't faster than than the if statement below
+//				r |= (((255-r) >>> 31)*0xFF);
+//				g |= (((255-g) >>> 31)*0xFF);
+//				b |= (((255-b) >>> 31)*0xFF);
+
+				if( r > 255 ) r = 255;
+				if( g > 255 ) g = 255;
+				if( b > 255 ) b = 255;
 
 				output.data[indexOut++] = r;
 				output.data[indexOut++] = g;

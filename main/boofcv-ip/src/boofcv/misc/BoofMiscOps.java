@@ -36,6 +36,21 @@ import java.util.regex.Pattern;
  */
 public class BoofMiscOps {
 
+	/**
+	 * Returns the number of digits in a number
+	 */
+	public static int numDigits(int number) {
+		int digits = 1;
+		if (number < 0)
+			digits++;
+
+		while (number > 0) {
+			number /= 10;
+			digits++;
+		}
+		return digits;
+	}
+
 	public static String toString( Reader r ) {
 		char buff[] = new char[1024];
 

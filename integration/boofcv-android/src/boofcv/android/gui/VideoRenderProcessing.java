@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -160,9 +160,9 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 				ConvertNV21.nv21ToGray(bytes, image.width, image.height, (ImageGray) image,(Class) image.getClass());
 			else if( imageType.getFamily() == ImageType.Family.PLANAR ) {
 				if (imageType.getDataType() == ImageDataType.U8)
-					ConvertNV21.nv21ToMsRgb_U8(bytes, image.width, image.height, (Planar) image);
+					ConvertNV21.nv21TPlanarRgb_U8(bytes, image.width, image.height, (Planar) image);
 				else if (imageType.getDataType() == ImageDataType.F32)
-					ConvertNV21.nv21ToMsRgb_F32(bytes, image.width, image.height, (Planar) image);
+					ConvertNV21.nv21ToPlanarRgb_F32(bytes, image.width, image.height, (Planar) image);
 				else
 					throw new RuntimeException("Oh Crap");
 			} else if( imageType.getFamily() == ImageType.Family.INTERLEAVED ) {

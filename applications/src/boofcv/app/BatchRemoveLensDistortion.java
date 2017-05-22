@@ -119,12 +119,14 @@ public class BatchRemoveLensDistortion {
 
 		BufferedImage out = new BufferedImage(param.width,param.height,BufferedImage.TYPE_INT_RGB);
 
+		int numDigits = BoofMiscOps.numDigits(files.size()-1);
+		String format = "%0"+numDigits+"d";
 		for( int i = 0; i < files.size(); i++ ) {
 			File file = files.get(i);
 			System.out.println("processing " + file.getName());
 			BufferedImage orig = UtilImageIO.loadImage(file.getAbsolutePath());
 			if( orig == null ) {
-				throw new RuntimeException("Can't load file");
+				throw new RuntimeException("Can't load file: "+file.getAbsolutePath());
 			}
 
 			if( orig.getWidth() != param.width || orig.getHeight() != param.height ) {
@@ -138,7 +140,7 @@ public class BatchRemoveLensDistortion {
 
 			String nameOut;
 			if( rename ) {
-				nameOut = String.format("image%05d.png",i);
+				nameOut = String.format("image"+format+".png",i);
 			} else {
 				nameOut = file.getName().split("\\.")[0]+"_undistorted.png";
 			}

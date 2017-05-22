@@ -63,7 +63,7 @@ public class ImplConvertNV21 {
 		}
 	}
 
-	public static void nv21ToMultiYuv_U8(byte[] dataNV, Planar<GrayU8> output) {
+	public static void nv21ToPlanarYuv_U8(byte[] dataNV, Planar<GrayU8> output) {
 
 		GrayU8 Y = output.getBand(0);
 		GrayU8 U = output.getBand(1);
@@ -88,7 +88,7 @@ public class ImplConvertNV21 {
 		}
 	}
 
-	public static void nv21ToMultiYuv_F32(byte[] dataNV, Planar<GrayF32> output) {
+	public static void nv21ToPlanarYuv_F32(byte[] dataNV, Planar<GrayF32> output) {
 
 		GrayF32 Y = output.getBand(0);
 		GrayF32 U = output.getBand(1);
@@ -113,7 +113,7 @@ public class ImplConvertNV21 {
 		}
 	}
 
-	public static void nv21ToMultiRgb_U8(byte[] dataNV, Planar<GrayU8> output) {
+	public static void nv21ToPlanarRgb_U8(byte[] dataNV, Planar<GrayU8> output) {
 
 		GrayU8 R = output.getBand(0);
 		GrayU8 G = output.getBand(1);
@@ -134,15 +134,29 @@ public class ImplConvertNV21 {
 				int cr = (dataNV[ indexUV ] & 0xFF) - 128;
 				int cb = (dataNV[ indexUV+1] & 0xFF) - 128;
 
-				if( y < 0 ) y = 0;
+//				if( y < 0 ) y = 0;
+				y = ((y >>> 31)^1)*y;
 
 				int r = (y + 1836*cr) >> 10;
 				int g = (y - 547*cr - 218*cb) >> 10;
 				int b = (y + 2165*cb) >> 10;
 
-				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
-				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
-				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+//				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
+//				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
+//				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+
+				r *= ((r >>> 31)^1);
+				g *= ((g >>> 31)^1);
+				b *= ((b >>> 31)^1);
+
+				// The bitwise code below isn't faster than than the if statement below
+//				r |= (((255-r) >>> 31)*0xFF);
+//				g |= (((255-g) >>> 31)*0xFF);
+//				b |= (((255-b) >>> 31)*0xFF);
+
+				if( r > 255 ) r = 255;
+				if( g > 255 ) g = 255;
+				if( b > 255 ) b = 255;
 
 				R.data[indexOut] = (byte)r;
 				G.data[indexOut] = (byte)g;
@@ -170,15 +184,29 @@ public class ImplConvertNV21 {
 				int cr = (dataNV[ indexUV ] & 0xFF) - 128;
 				int cb = (dataNV[ indexUV+1] & 0xFF) - 128;
 
-				if( y < 0 ) y = 0;
+//				if( y < 0 ) y = 0;
+				y = ((y >>> 31)^1)*y;
 
 				int r = (y + 1836*cr) >> 10;
 				int g = (y - 547*cr - 218*cb) >> 10;
 				int b = (y + 2165*cb) >> 10;
 
-				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
-				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
-				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+//				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
+//				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
+//				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+
+				r *= ((r >>> 31)^1);
+				g *= ((g >>> 31)^1);
+				b *= ((b >>> 31)^1);
+
+				// The bitwise code below isn't faster than than the if statement below
+//				r |= (((255-r) >>> 31)*0xFF);
+//				g |= (((255-g) >>> 31)*0xFF);
+//				b |= (((255-b) >>> 31)*0xFF);
+
+				if( r > 255 ) r = 255;
+				if( g > 255 ) g = 255;
+				if( b > 255 ) b = 255;
 
 				output.data[indexOut++] = (byte)r;
 				output.data[indexOut++] = (byte)g;
@@ -189,7 +217,7 @@ public class ImplConvertNV21 {
 		}
 	}
 
-	public static void nv21ToMultiRgb_F32(byte[] dataNV, Planar<GrayF32> output) {
+	public static void nv21ToPlanarRgb_F32(byte[] dataNV, Planar<GrayF32> output) {
 
 		GrayF32 R = output.getBand(0);
 		GrayF32 G = output.getBand(1);
@@ -210,15 +238,29 @@ public class ImplConvertNV21 {
 				int cr = (dataNV[ indexUV ] & 0xFF) - 128;
 				int cb = (dataNV[ indexUV+1] & 0xFF) - 128;
 
-				if( y < 0 ) y = 0;
+//				if( y < 0 ) y = 0;
+				y = ((y >>> 31)^1)*y;
 
 				int r = (y + 1836*cr) >> 10;
 				int g = (y - 547*cr - 218*cb) >> 10;
 				int b = (y + 2165*cb) >> 10;
 
-				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
-				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
-				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+//				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
+//				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
+//				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+
+				r *= ((r >>> 31)^1);
+				g *= ((g >>> 31)^1);
+				b *= ((b >>> 31)^1);
+
+				// The bitwise code below isn't faster than than the if statement below
+//				r |= (((255-r) >>> 31)*0xFF);
+//				g |= (((255-g) >>> 31)*0xFF);
+//				b |= (((255-b) >>> 31)*0xFF);
+
+				if( r > 255 ) r = 255;
+				if( g > 255 ) g = 255;
+				if( b > 255 ) b = 255;
 
 				R.data[indexOut] = r;
 				G.data[indexOut] = g;
@@ -246,15 +288,29 @@ public class ImplConvertNV21 {
 				int cr = (dataNV[ indexUV ] & 0xFF) - 128;
 				int cb = (dataNV[ indexUV+1] & 0xFF) - 128;
 
-				if( y < 0 ) y = 0;
+//				if( y < 0 ) y = 0;
+				y = ((y >>> 31)^1)*y;
 
 				int r = (y + 1836*cr) >> 10;
 				int g = (y - 547*cr - 218*cb) >> 10;
 				int b = (y + 2165*cb) >> 10;
 
-				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
-				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
-				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+//				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
+//				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
+//				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+
+				r *= ((r >>> 31)^1);
+				g *= ((g >>> 31)^1);
+				b *= ((b >>> 31)^1);
+
+				// The bitwise code below isn't faster than than the if statement below
+//				r |= (((255-r) >>> 31)*0xFF);
+//				g |= (((255-g) >>> 31)*0xFF);
+//				b |= (((255-b) >>> 31)*0xFF);
+
+				if( r > 255 ) r = 255;
+				if( g > 255 ) g = 255;
+				if( b > 255 ) b = 255;
 
 				output.data[indexOut++] = r;
 				output.data[indexOut++] = g;
