@@ -67,7 +67,7 @@ public abstract class EquirectangularDistortBase_F32 extends PixelTransform2_F32
 	 * @param pitch Radian from -pi/2 to pi/2
 	 * @param roll Radian from -pi to pi
 	 */
-	public void setDirection(float yaw, float pitch, float roll ) {
+	public void setDirection(float pitch, float yaw, float roll ) {
 		ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX,pitch,yaw,roll,R);
 	}
 

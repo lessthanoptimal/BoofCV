@@ -93,16 +93,16 @@ public class EquirectangularRotatingApp<T extends ImageBase<T>> extends Demonstr
 		panelImage.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Point2D_F32 latlon = new Point2D_F32();
+				Point2D_F32 lonlat = new Point2D_F32();
 
 				synchronized (distorter) {
 					EquirectangularTools_F32 tools = distorter.getTools();
 
 					double scale = panelImage.scale;
 					distorter.compute((int) (e.getX() / scale), (int) (e.getY() / scale));
-					tools.equiToLonlatFV(distorter.distX, distorter.distY, latlon);
-					panelRotate.setOrientation(UtilAngle.radianToDegree(latlon.y), UtilAngle.radianToDegree(latlon.x),0);
-					distorter.setDirection(latlon.x, latlon.y, 0);
+					tools.equiToLonlatFV(distorter.distX, distorter.distY, lonlat);
+					panelRotate.setOrientation(UtilAngle.radianToDegree(lonlat.y), UtilAngle.radianToDegree(lonlat.x),0);
+					distorter.setDirection(lonlat.x, lonlat.y, 0);
 					distortImage.setModel(distorter); // let it know the transform has changed
 
 					if (inputMethod == InputMethod.IMAGE) {
