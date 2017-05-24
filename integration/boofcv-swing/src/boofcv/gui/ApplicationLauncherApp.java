@@ -20,10 +20,11 @@ package boofcv.gui;
 
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
-import boofcv.misc.BoofMiscOps;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -40,7 +41,7 @@ import java.io.PrintStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -71,6 +72,93 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		tree = new JTree(root);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
+		final JTextField searchBox = new JTextField();
+		searchBox.setToolTipText("Search");
+		searchBox.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				String text = searchBox.getText();
+				DefaultMutableTreeNode selection = (DefaultMutableTreeNode) tree.getModel().getRoot();
+
+				TreePath path = searchTree(text, selection, true);
+				if (path != null) {
+					tree.setSelectionPath(path);
+				} else {
+					tree.setSelectionPath(null);
+				}
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				String text = searchBox.getText();
+				DefaultMutableTreeNode selection =  (DefaultMutableTreeNode) tree.getModel().getRoot();
+				TreePath path = searchTree(text, selection, true);
+				if (path != null) {
+					tree.setSelectionPath(path);
+				} else {
+					tree.setSelectionPath(null);
+				}
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+
+			}
+		});
+		KeyStroke down = KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, true);
+		KeyStroke up = KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, true);
+			Action nextSearch = new AbstractAction() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					DefaultMutableTreeNode currentSelection = tree.getLastSelectedPathComponent() != null
+							? (DefaultMutableTreeNode) tree.getLastSelectedPathComponent()
+							: (DefaultMutableTreeNode) tree.getModel().getRoot();
+					if (currentSelection != null && searchBox.getText() != null) {
+						TreePath path = searchTree(searchBox.getText(), currentSelection, true);
+						if (path != null) {
+							tree.setSelectionPath(path);
+							tree.scrollPathToVisible(path);
+						} else {
+							tree.setSelectionPath(null);
+						}
+					}
+				}
+		};
+		Action prevSearch = new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				DefaultMutableTreeNode currentSelection = tree.getLastSelectedPathComponent() != null
+						? (DefaultMutableTreeNode) tree.getLastSelectedPathComponent()
+						: (DefaultMutableTreeNode) tree.getModel().getRoot();
+				if (currentSelection != null && searchBox.getText() != null) {
+					TreePath path = searchTree(searchBox.getText(), currentSelection, false);
+					if (path != null) {
+						tree.setSelectionPath(path);
+						tree.scrollPathToVisible(path);
+					} else {
+						tree.setSelectionPath(null);
+					}
+				}
+			}
+		};
+
+		searchBox.getInputMap().put(down, "nextSearch");
+		searchBox.getActionMap().put("nextSearch", nextSearch);
+		searchBox.getInputMap().put(up, "prevSearch");
+		searchBox.getActionMap().put("prevSearch", prevSearch);
+
+		searchBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//enter key goes to next match
+				DefaultMutableTreeNode selection = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+				if(selection != null) {
+					handleClick(selection);
+				}
+				System.out.println("action");
+			}
+		});
+
 		MouseListener ml = new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				if (e.getClickCount() == 2) {
@@ -82,8 +170,12 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		};
 		tree.addMouseListener(ml);
 
+		JPanel leftPanel = new JPanel();
+		leftPanel.setLayout(new BorderLayout());
+		leftPanel.add(searchBox, BorderLayout.NORTH);
 		JScrollPane treeView = new JScrollPane(tree);
 		treeView.setPreferredSize(new Dimension(300, 600));
+		leftPanel.add(treeView, BorderLayout.CENTER);
 
 		JPanel actionPanel = new JPanel();
 		actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
@@ -110,11 +202,20 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		// most of the time you want to increase the view of the text
 		verticalSplitPane.setResizeWeight(0.0);
 
-		JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,treeView,verticalSplitPane);
+		//needed to initialize vertical divider to 0.5 weight
+		verticalSplitPane.setPreferredSize(new Dimension(500, 600));
+
+		//horizontal divider won't drag to the right without a minimum size
+		verticalSplitPane.setMinimumSize(new Dimension(1, 1));
+
+		JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		horizontalSplitPane.add(leftPanel);
+		horizontalSplitPane.add(verticalSplitPane);
 		horizontalSplitPane.setDividerLocation(250);
 		horizontalSplitPane.setResizeWeight(0.0);
 
 		add(horizontalSplitPane, BorderLayout.CENTER);
+
 		new ProcessStatusThread().start();
 
 		setPreferredSize(new Dimension(800,600));
@@ -161,6 +262,44 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		});
 
 		process.start();
+	}
+
+	private TreePath searchTree(String text, DefaultMutableTreeNode node, boolean forward) {
+		Enumeration e = ((DefaultMutableTreeNode) this.tree.getModel().getRoot()).breadthFirstEnumeration();
+		if(!forward) {
+			final Stack tmp = new Stack();
+			while(e.hasMoreElements())
+				tmp.push(e.nextElement());
+
+			e = new Enumeration() {
+				@Override
+				public boolean hasMoreElements() {
+					return !tmp.isEmpty();
+				}
+
+				@Override
+				public Object nextElement() {
+					return tmp.pop();
+				}
+			};
+		}
+
+		while (e.hasMoreElements()) {
+			DefaultMutableTreeNode n = (DefaultMutableTreeNode) e.nextElement();
+			if(n.equals(node)) {
+				while(e.hasMoreElements()) {
+					DefaultMutableTreeNode candidate = (DefaultMutableTreeNode) e.nextElement();
+					if (candidate.getUserObject() instanceof AppInfo) {
+						AppInfo candidateInfo = (AppInfo) candidate.getUserObject();
+						if (candidateInfo.app.getSimpleName().toLowerCase().contains(text)) {
+							return new TreePath(candidate.getPath());
+						}
+					}
+				}
+			}
+		}
+
+		return null;
 	}
 
 	public void handleClick(DefaultMutableTreeNode node) {
@@ -287,7 +426,6 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 						break;
 					}
 				}
-				BoofMiscOps.sleep(200);
 			}
 		}
 	}
@@ -366,13 +504,11 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		});
 
 		final JTextArea sourceTextArea = new JTextArea();
-		sourceTextArea.setFont(new Font("monospaced", Font.PLAIN, 12));
 		sourceTextArea.setEditable(false);
 		sourceTextArea.setLineWrap(true);
 		sourceTextArea.setWrapStyleWord(true);
 
 		final JTextArea outputTextArea = new JTextArea();
-		outputTextArea.setFont(new Font("monospaced", Font.PLAIN, 12));
 		outputTextArea.setEditable(false);
 		outputTextArea.setLineWrap(true);
 		outputTextArea.setWrapStyleWord(true);
@@ -544,5 +680,4 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			}
 		});
 	}
-
 }
