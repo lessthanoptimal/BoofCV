@@ -26,26 +26,36 @@ import georegression.struct.point.Point3D_F32;
 
 /**
  * Contains common operations for handling coordinates in an equirectangular image.
- * On most globes, a positive latitude corresponds to the north pole, or up, and negative towards the south pole.
+ * On most globes, a positive longitude corresponds to the north pole, or up, and negative towards the south pole.
  * Images have 0 on the top and increase downwards.  To compensate for this the y-axis can be flipped.  This
  * is indicated by functions with FV (flip vertical) on the end of their name.
  *
  * Coordinate System:
  * <ul>
- * <li>longtitude is along the x-axis and goes from -pi to pi</li>
- * <li>latitude is along the y-axis and goes from -pi/2 to pi/2</li>
- * <li>image center (width/2, (height-1)/2.0f) or (lat=0, lon=0) corresponds to a unit sphere of (1,0,0)</li>
+ * <li>latitude is along the x-axis and goes from -pi to pi</li>
+ * <li>longtitude is along the y-axis and goes from -pi/2 to pi/2</li>
+ * <li>image center (width/2, (height-1)/2.0ff) or (lat=0, lon=0) corresponds to a unit sphere of (1,0,0)</li>
  * <li>unit sphere of (0,0,1) is pixel (width/2,0) and (0,0,-1) is (width/2,height-1)</li>
  * <li>unit sphere of (0,1,0) is pixel (3*width/4,(height-1)/2) and (0,0,-1) is (width/4,(height-1)/2)</li>
  * </ul>
  * Coordinate System with y-flipped:
  * <ul>
- * <li>longtitude is along the x-axis and goes from -pi to pi</li>
- * <li>latitude is along the y-axis and goes from pi/2 to -pi/2</li>
+ * <li>latitude is along the x-axis and goes from -pi to pi</li>
+ * <li>longtitude is along the y-axis and goes from pi/2 to -pi/2</li>
  * <li>image center (width/2, height/2) or (lat=0, lon=0) corresponds to a unit sphere of (1,0,0)</li>
  * <li>unit sphere of (0,0,1) is pixel (width/2,height-1) and (0,0,-1) is (width/2,0)</li>
  * <li>unit sphere of (0,1,0) is pixel (3*width/4,(height-1)/2) and (0,0,-1) is (width/4,(height-1)/2)</li>
  * </ul>
+ *
+ * <p>Latitude and Longitude shown on a hemisphere</p>
+ * <center>
+ * <img src="doc-files/sphere_lat_lon.png"/>
+ * </center>
+ *
+ * <p>Latitude and Longitude shown on a sphere in equirectangular format.  Note that y is NOT flipped.</p>
+ * <center>
+ * <img src="doc-files/equirectangular_lat_lon.png"/>
+ * </center>
  *
  * @author Peter Abeles
  */
@@ -125,8 +135,8 @@ public class EquirectangularTools_F32 {
 	 * @param lonlat  (output) x = longitude, y = latitude
 	 */
 	public void equiToLonlatFV(float x , float y , Point2D_F32 lonlat ) {
-		lonlat.x = ((height-y-1.0f)/(height-1) - 0.5f)*GrlConstants.F_PI; // latitude
-		lonlat.y = (x/width - 0.5f)*GrlConstants.F_PI2; // longitude
+		lonlat.x = (x/width - 0.5f)*GrlConstants.F_PI2; // longitude
+		lonlat.y = ((height-y-1.0f)/(height-1) - 0.5f)*GrlConstants.F_PI; // latitude
 	}
 
 	/**

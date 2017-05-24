@@ -17,6 +17,7 @@ Version : 0.27
   * Unrolled matrix inverse in pinhole and radtan
 - Equirectangular
   * Added PinholeRadialToEquirectangular
+  * Fixed the meaning of latitude and longitude being swapped.  Thanks xzfinet for knowing their definitions.
 - Updated generics to take advantage of Java 7 more
 - Image Pyramids
   * PyramidDiscreteSampleBlur supports generic images
@@ -100,6 +101,8 @@ Version : 0.27
 - ApplicationLauncherApp
   * Search capability
   * Don't close tab when finished.  Clean up tabs for dead processes when a new one is launched
+- TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
+        It is a homogenous coordinate with z=1 being implicit.
 
 
 ---------------------------------------------
