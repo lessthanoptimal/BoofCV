@@ -84,8 +84,11 @@ public class UtilIO {
 		while( true )  {
 			File f = new File(path);
 			if( !f.exists() )
-				throw new RuntimeException("Failed");
+				break;
+
 			String[] files = f.list();
+			if( files == null )
+				break;
 
 			boolean foundMain = false;
 			boolean foundExamples = false;
@@ -105,6 +108,7 @@ public class UtilIO {
 
 			path = "../"+path;
 		}
+		throw new RuntimeException("Can't find path to base of project");
 	}
 
 	/**
@@ -218,7 +222,26 @@ public class UtilIO {
 				code.append(line).append(System.lineSeparator());
 			reader.close();
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			return null;
+//			throw new RuntimeException(e);
+		}
+		return code.toString();
+	}
+
+	/**
+	 * Reads an entire file and converts it into a text string
+	 */
+	public static String readAsString( InputStream stream ) {
+		StringBuilder code = new StringBuilder();
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+			String line;
+			while ((line = reader.readLine()) != null)
+				code.append(line).append(System.lineSeparator());
+			reader.close();
+		} catch (IOException e) {
+			return null;
+//			throw new RuntimeException(e);
 		}
 		return code.toString();
 	}
