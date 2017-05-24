@@ -125,8 +125,8 @@ public class EquirectangularTools_F32 {
 	 * @param lonlat  (output) x = longitude, y = latitude
 	 */
 	public void equiToLonlatFV(float x , float y , Point2D_F32 lonlat ) {
-		lonlat.x = (x/width - 0.5f)*GrlConstants.F_PI2; // longitude
-		lonlat.y = ((height-y-1.0f)/(height-1) - 0.5f)*GrlConstants.F_PI; // latitude
+		lonlat.x = ((height-y-1.0f)/(height-1) - 0.5f)*GrlConstants.F_PI; // latitude
+		lonlat.y = (x/width - 0.5f)*GrlConstants.F_PI2; // longitude
 	}
 
 	/**
