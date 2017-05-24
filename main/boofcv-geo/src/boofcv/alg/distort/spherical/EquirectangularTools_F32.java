@@ -85,42 +85,42 @@ public class EquirectangularTools_F32 {
 	 * @param norm Normalized pointing vector
 	 */
 	public void equiToNorm(float x , float y , Point3D_F32 norm ) {
-		equiToLonlat(x,y, temp);
-		ConvertCoordinates3D_F32.latlonToUnitVector(temp.y,temp.x, norm);
+		equiToLatLon(x,y, temp);
+		ConvertCoordinates3D_F32.latlonToUnitVector(temp.x,temp.y, norm);
 	}
 
 	public void normToEqui( float nx , float ny , float nz , Point2D_F32 rect ) {
 		/**/double r = /**/Math.sqrt(nx*nx + ny*ny);
 
-		/**/double lon = /**/Math.atan2(ny,nx);
-		/**/double lat = UtilAngle.atanSafe(-nz,r);
+		/**/double lat = /**/Math.atan2(ny,nx);
+		/**/double lon = UtilAngle.atanSafe(-nz,r);
 
-		lonlatToEqui( (float) lon, (float) lat,rect);
+		latlonToEqui((float) lat, (float) lon, rect);
 	}
 
 	public void equiToNormFV(float x , float y , Point3D_F32 norm ) {
-		equiToLonlatFV(x,y, temp);
-		ConvertCoordinates3D_F32.latlonToUnitVector(temp.y,temp.x, norm);
+		equiToLatLonFV(x,y, temp);
+		ConvertCoordinates3D_F32.latlonToUnitVector(temp.x,temp.y, norm);
 	}
 
 	public void normToEquiFV( float nx , float ny , float nz , Point2D_F32 rect ) {
 		/**/double r = /**/Math.sqrt(nx*nx + ny*ny);
 
-		/**/double lon = /**/Math.atan2(ny,nx);
-		/**/double lat = UtilAngle.atanSafe(-nz,r);
+		/**/double lat = /**/Math.atan2(ny,nx);
+		/**/double lon = UtilAngle.atanSafe(-nz,r);
 
-		lonlatToEquiFV( (float) lon, (float) lat,rect);
+		latlonToEquiFV((float) lat, (float) lon, rect);
 	}
 
 	/**
 	 * Converts the equirectangular coordinate into a latitude and longitude
 	 * @param x pixel coordinate in equirectangular image
 	 * @param y pixel coordinate in equirectangular image
-	 * @param lonlat  (output) x = longitude, y = latitude
+	 * @param latlon  (output) x = latitude, y = longitude
 	 */
-	public void equiToLonlat(float x , float y , Point2D_F32 lonlat ) {
-		lonlat.x = (x/width - 0.5f)*GrlConstants.F_PI2; // longitude
-		lonlat.y = (y/(height-1) - 0.5f)*GrlConstants.F_PI; // latitude
+	public void equiToLatLon(float x , float y , Point2D_F32 latlon ) {
+		latlon.x = (x/width - 0.5f)*GrlConstants.F_PI2; // latitude
+		latlon.y = (y/(height-1) - 0.5f)*GrlConstants.F_PI; // longitude
 	}
 
 	/**
@@ -132,34 +132,34 @@ public class EquirectangularTools_F32 {
 	 *
 	 * @param x pixel coordinate in equirectangular image
 	 * @param y pixel coordinate in equirectangular image
-	 * @param lonlat  (output) x = longitude, y = latitude
+	 * @param latlon  (output) x = latitude, y = longitude
 	 */
-	public void equiToLonlatFV(float x , float y , Point2D_F32 lonlat ) {
-		lonlat.x = (x/width - 0.5f)*GrlConstants.F_PI2; // longitude
-		lonlat.y = ((height-y-1.0f)/(height-1) - 0.5f)*GrlConstants.F_PI; // latitude
+	public void equiToLatLonFV(float x , float y , Point2D_F32 latlon ) {
+		latlon.x = (x/width - 0.5f)*GrlConstants.F_PI2; // latitude
+		latlon.y = ((height-y-1.0f)/(height-1) - 0.5f)*GrlConstants.F_PI; // longitude
 	}
 
 	/**
 	 * Convert from latitude-longitude coordinates into equirectangular coordinates
-	 * @param lon Longitude
 	 * @param lat Latitude
+	 * @param lon Longitude
 	 * @param rect (Output) equirectangular coordinate
 	 */
-	public void lonlatToEqui(float lon , float lat , Point2D_F32 rect ) {
-		rect.x = UtilAngle.wrapZeroToOne(lon / GrlConstants.F_PI2 + 0.5f)*width;
-		rect.y = UtilAngle.reflectZeroToOne(lat / GrlConstants.F_PI + 0.5f)*(height-1);
+	public void latlonToEqui(float lat, float lon, Point2D_F32 rect) {
+		rect.x = UtilAngle.wrapZeroToOne(lat / GrlConstants.F_PI2 + 0.5f)*width;
+		rect.y = UtilAngle.reflectZeroToOne(lon / GrlConstants.F_PI + 0.5f)*(height-1);
 	}
 
 	/**
 	 * Convert from latitude-longitude coordinates into equirectangular coordinates.
 	 * Vertical equirectangular axis has been flipped
-	 * @param lon Longitude
 	 * @param lat Latitude
+	 * @param lon Longitude
 	 * @param rect (Output) equirectangular coordinate
 	 */
-	public void lonlatToEquiFV(float lon , float lat , Point2D_F32 rect ) {
-		rect.x = UtilAngle.wrapZeroToOne(lon / GrlConstants.F_PI2 + 0.5f)*width;
-		rect.y = UtilAngle.reflectZeroToOne(lat / GrlConstants.F_PI + 0.5f)*(height-1);
+	public void latlonToEquiFV(float lat, float lon, Point2D_F32 rect) {
+		rect.x = UtilAngle.wrapZeroToOne(lat / GrlConstants.F_PI2 + 0.5f)*width;
+		rect.y = UtilAngle.reflectZeroToOne(lon / GrlConstants.F_PI + 0.5f)*(height-1);
 		rect.y = height - rect.y - 1;
 	}
 

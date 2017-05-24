@@ -21,7 +21,7 @@ package boofcv.javacv;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinholeRadial;
 import org.bytedeco.javacpp.IntPointer;
-import org.bytedeco.javacpp.indexer.DoubleBufferIndexer;
+import org.bytedeco.javacpp.indexer.DoubleRawIndexer;
 import org.bytedeco.javacpp.opencv_core.*;
 import org.ejml.data.DMatrixRMaj;
 
@@ -56,14 +56,14 @@ public class UtilOpenCV {
 		boof.width = width.get();
 		boof.height = height.get();
 
-		DoubleBufferIndexer indexerK = K.createIndexer();
+		DoubleRawIndexer indexerK = K.createIndexer();
 		boof.fx = indexerK.get(0,0);
 		boof.skew = indexerK.get(0,1);
 		boof.fy = indexerK.get(1,1);
 		boof.cx = indexerK.get(0,2);
 		boof.cy = indexerK.get(1,2);
 
-		DoubleBufferIndexer indexerD = distortion.createIndexer();
+		DoubleRawIndexer indexerD = distortion.createIndexer();
 
 		if( distortion.rows() == 5 )
 			boof.setRadial(indexerD.get(0,0),indexerD.get(1,0),indexerD.get(4,0));
@@ -100,7 +100,7 @@ public class UtilOpenCV {
 	public static Mat toMat(DMatrixRMaj in ) {
 		Mat out = new Mat(in.numRows,in.numCols,CV_64F);
 
-		DoubleBufferIndexer indexer = out.createIndexer();
+		DoubleRawIndexer indexer = out.createIndexer();
 
 		for (int i = 0; i < in.numRows; i++) {
 			for (int j = 0; j < in.numCols; j++) {

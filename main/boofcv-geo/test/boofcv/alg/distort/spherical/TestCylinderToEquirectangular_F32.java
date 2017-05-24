@@ -64,14 +64,14 @@ public class TestCylinderToEquirectangular_F32 {
 		Point2D_F32 ll = new Point2D_F32();
 
 		alg.compute(100,0);
-		alg.getTools().equiToLonlat(alg.distX,alg.distY,ll);
-		float lat0 = ll.y;
+		alg.getTools().equiToLatLon(alg.distX,alg.distY,ll);
+		float lon0 = ll.y;
 		alg.compute(100,299);
-		alg.getTools().equiToLonlat(alg.distX,alg.distY,ll);
-		float lat1 = ll.y;
+		alg.getTools().equiToLatLon(alg.distX,alg.distY,ll);
+		float lon1 = ll.y;
 
 
-		assertEquals(UtilAngle.radian(100),lat1-lat0, GrlConstants.TEST_F32);
+		assertEquals(UtilAngle.radian(100),lon1-lon0, GrlConstants.TEST_F32);
 	}
 
 	/**

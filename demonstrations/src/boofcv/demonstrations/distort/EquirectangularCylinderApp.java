@@ -112,7 +112,7 @@ public class EquirectangularCylinderApp<T extends ImageBase<T>> extends Demonstr
 
 					double scale = panelImage.scale;
 					distorter.compute((int) (e.getX() / scale), (int) (e.getY() / scale));
-					tools.equiToLonlatFV(distorter.distX, distorter.distY, lonlat);
+					tools.equiToLatLonFV(distorter.distX, distorter.distY, lonlat);
 					panelRotate.setOrientation(UtilAngle.radianToDegree(lonlat.y), UtilAngle.radianToDegree(lonlat.x),0);
 					distorter.setDirection(lonlat.x, lonlat.y, 0);
 					distortImage.setModel(distorter); // let it know the transform has changed

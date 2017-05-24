@@ -88,7 +88,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 	ImagePanel panelPinhole = new ImagePanel();
 	EquiViewPanel panelEqui = new EquiViewPanel();
 
-	Object imageLock = new Object();
+	final Object imageLock = new Object();
 
 	public EquirectangularPinholeApp(List<?> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
@@ -140,7 +140,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 		MouseAdapter mouseAdapter = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Point2D_F32 lonlat = new Point2D_F32();
+				Point2D_F32 latlon = new Point2D_F32();
 
 				double scale = panelEqui.scale;
 
@@ -151,8 +151,8 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 					return;
 				panelPinhole.grabFocus();
 				synchronized (imageLock) {
-					distorter.getTools().equiToLonlatFV(x,y,lonlat);
-					distorter.setDirection(lonlat.x,lonlat.y,0);
+					distorter.getTools().equiToLatLonFV(x,y,latlon);
+					distorter.setDirection(latlon.y,latlon.x,0);
 
 					// pinhole has a canonical view along +z
 					// equirectangular lon-lat uses +x

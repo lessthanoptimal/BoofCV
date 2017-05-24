@@ -59,8 +59,8 @@ public class TestEquirectangularTools_F64 {
 		Point2D_F64 ll = new Point2D_F64();
 		Point2D_F64 r = new Point2D_F64();
 
-		tools.equiToLonlat(x,y,ll);
-		tools.lonlatToEqui(ll.x,ll.y,r);
+		tools.equiToLatLon(x,y,ll);
+		tools.latlonToEqui(ll.x, ll.y, r);
 
 		assertEquals(x,r.x, GrlConstants.TEST_F64);
 		assertEquals(y,r.y, GrlConstants.TEST_F64);
@@ -83,8 +83,8 @@ public class TestEquirectangularTools_F64 {
 		Point2D_F64 ll = new Point2D_F64();
 		Point2D_F64 r = new Point2D_F64();
 
-		tools.equiToLonlatFV(x,y,ll);
-		tools.lonlatToEquiFV(ll.x,ll.y,r);
+		tools.equiToLatLonFV(x,y,ll);
+		tools.latlonToEquiFV(ll.x, ll.y, r);
 
 		assertEquals(x,r.x, GrlConstants.TEST_F64);
 		assertEquals(y,r.y, GrlConstants.TEST_F64);
@@ -221,11 +221,11 @@ public class TestEquirectangularTools_F64 {
 		tools.configure(width,height);
 
 		Point2D_F64 found = new Point2D_F64();
-		tools.lonlatToEqui(0,GrlConstants.PId2, found);
+		tools.latlonToEqui(0, GrlConstants.PId2, found);
 		assertEquals(width/2,found.x, GrlConstants.TEST_F64);
 		assertEquals(height-1,found.y, GrlConstants.TEST_F64);
 
-		tools.lonlatToEqui(0,-GrlConstants.PId2, found);
+		tools.latlonToEqui(0, -GrlConstants.PId2, found);
 		assertEquals(width/2,found.x, GrlConstants.TEST_F64);
 		assertEquals(0,found.y, GrlConstants.TEST_F64);
 	}
@@ -236,11 +236,11 @@ public class TestEquirectangularTools_F64 {
 		tools.configure(width,height);
 
 		Point2D_F64 found = new Point2D_F64();
-		tools.lonlatToEquiFV(0,-GrlConstants.PId2, found);
+		tools.latlonToEquiFV(0, -GrlConstants.PId2, found);
 		assertEquals(width/2,found.x, GrlConstants.TEST_F64);
 		assertEquals(height-1,found.y, GrlConstants.TEST_F64);
 
-		tools.lonlatToEquiFV(0,GrlConstants.PId2, found);
+		tools.latlonToEquiFV(0, GrlConstants.PId2, found);
 		assertEquals(width/2,found.x, GrlConstants.TEST_F64);
 		assertEquals(0,found.y, GrlConstants.TEST_F64);
 	}
