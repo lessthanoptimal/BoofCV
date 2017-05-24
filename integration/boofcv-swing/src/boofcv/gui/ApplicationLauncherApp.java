@@ -41,8 +41,10 @@ import java.io.PrintStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Application which lists most of the demonstration application in a GUI and allows the user to double click
@@ -83,6 +85,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 				TreePath path = searchTree(text, selection, true);
 				if (path != null) {
 					tree.setSelectionPath(path);
+					tree.scrollPathToVisible(path);
 				} else {
 					tree.setSelectionPath(null);
 				}
@@ -95,6 +98,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 				TreePath path = searchTree(text, selection, true);
 				if (path != null) {
 					tree.setSelectionPath(path);
+					tree.scrollPathToVisible(path);
 				} else {
 					tree.setSelectionPath(null);
 				}
@@ -170,9 +174,15 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		};
 		tree.addMouseListener(ml);
 
+		JPanel searchPanel = new JPanel();
+		searchPanel.setLayout(new BoxLayout(searchPanel,BoxLayout.X_AXIS));
+		searchPanel.add( new JLabel("Search"));
+		searchPanel.add(Box.createRigidArea(new Dimension(5,5)));
+		searchPanel.add(searchBox);
+
 		JPanel leftPanel = new JPanel();
 		leftPanel.setLayout(new BorderLayout());
-		leftPanel.add(searchBox, BorderLayout.NORTH);
+		leftPanel.add(searchPanel, BorderLayout.NORTH);
 		JScrollPane treeView = new JScrollPane(tree);
 		treeView.setPreferredSize(new Dimension(300, 600));
 		leftPanel.add(treeView, BorderLayout.CENTER);
@@ -202,20 +212,11 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		// most of the time you want to increase the view of the text
 		verticalSplitPane.setResizeWeight(0.0);
 
-		//needed to initialize vertical divider to 0.5 weight
-		verticalSplitPane.setPreferredSize(new Dimension(500, 600));
-
-		//horizontal divider won't drag to the right without a minimum size
-		verticalSplitPane.setMinimumSize(new Dimension(1, 1));
-
-		JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		horizontalSplitPane.add(leftPanel);
-		horizontalSplitPane.add(verticalSplitPane);
+		JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,leftPanel,verticalSplitPane);
 		horizontalSplitPane.setDividerLocation(250);
 		horizontalSplitPane.setResizeWeight(0.0);
 
 		add(horizontalSplitPane, BorderLayout.CENTER);
-
 		new ProcessStatusThread().start();
 
 		setPreferredSize(new Dimension(800,600));
@@ -504,11 +505,13 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		});
 
 		final JTextArea sourceTextArea = new JTextArea();
+		sourceTextArea.setFont(new Font("monospaced", Font.PLAIN, 12));
 		sourceTextArea.setEditable(false);
 		sourceTextArea.setLineWrap(true);
 		sourceTextArea.setWrapStyleWord(true);
 
 		final JTextArea outputTextArea = new JTextArea();
+		outputTextArea.setFont(new Font("monospaced", Font.PLAIN, 12));
 		outputTextArea.setEditable(false);
 		outputTextArea.setLineWrap(true);
 		outputTextArea.setWrapStyleWord(true);
