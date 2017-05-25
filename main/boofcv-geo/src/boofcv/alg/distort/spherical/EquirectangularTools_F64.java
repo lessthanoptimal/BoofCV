@@ -48,7 +48,8 @@ import georegression.struct.point.Point3D_F64;
  * <li>unit sphere of (0,1,0) is pixel (3*width/4,(height-1)/2) and (0,0,-1) is (width/4,(height-1)/2)</li>
  * </ul>
  *
- * <p>Latitude and Longitude shown on a sphere in equirectangular format.  Note that y is NOT flipped.</p>
+ * <p>Latitude and Longitude shown on a sphere in equirectangular format.  Note that y is NOT flipped and angles
+ * are shown in degrees not radians.</p>
  * <center>
  * <img src="doc-files/equirectangular_lat_lon.png"/>
  * </center>
