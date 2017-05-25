@@ -27,7 +27,7 @@ import georegression.struct.point.Point3D_F32;
 
 /**
  * Contains common operations for handling coordinates in an equirectangular image.
- * On most globes, a positive longitude corresponds to the north pole, or up, and negative towards the south pole.
+ * On most globes, a positive latitude corresponds to the north pole, or up, and negative towards the south pole.
  * Images have 0 on the top and increase downwards.  To compensate for this the y-axis can be flipped.  This
  * is indicated by functions with FV (flip vertical) on the end of their name.
  *
