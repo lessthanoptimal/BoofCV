@@ -65,13 +65,12 @@ public class TestCylinderToEquirectangular_F64 {
 
 		alg.compute(100,0);
 		alg.getTools().equiToLatLon(alg.distX,alg.distY,ll);
-		double lon0 = ll.lon;
+		double lat0 = ll.lat;
 		alg.compute(100,299);
 		alg.getTools().equiToLatLon(alg.distX,alg.distY,ll);
-		double lon1 = ll.lon;
+		double lat1 = ll.lat;
 
-
-		assertEquals(UtilAngle.radian(100),lon1-lon0, GrlConstants.TEST_F64);
+		assertEquals(UtilAngle.radian(100),lat1-lat0, GrlConstants.TEST_F64);
 	}
 
 	/**

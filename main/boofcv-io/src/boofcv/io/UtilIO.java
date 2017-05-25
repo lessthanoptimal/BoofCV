@@ -225,7 +225,16 @@ public class UtilIO {
 			return null;
 //			throw new RuntimeException(e);
 		}
-		return code.toString();
+
+		String output = code.toString();
+
+		// make windows strings appear the same as linux strings
+		String nl = System.getProperty("line.separator");
+		if( nl.compareTo("\n") != 0 ) {
+			output = output.replaceAll(nl,"\n");
+		}
+
+		return output;
 	}
 
 	/**
