@@ -34,10 +34,7 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -316,10 +313,6 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	/**
 	 * Displays a context menu for a class leaf node
 	 * Allows copying of the name and the path to the source
-	 *
-	 * @param tree
-	 * @param x
-	 * @param y
 	 */
 	private void handleContextMenu(JTree tree, int x, int y) {
 		TreePath path = tree.getPathForLocation(x, y);
@@ -456,10 +449,20 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		if (sourceTextArea == null)
 			return;
 
+		// first try loading it as a regular file
 		String path = UtilIO.getSourcePath(process.info.app.getPackage().getName(), process.info.app.getSimpleName());
 		File source = new File(path);
-		if (source.exists() && source.canRead()) {
-			String code = UtilIO.readAsString(path);
+		String code = null;
+		if( source.exists() && source.canRead() ) {
+			code = UtilIO.readAsString(path);
+		} else  {
+			// now try loading it as a resource.  This might be done if the application is created as a
+			// jar in the future
+			InputStream in = process.info.app.getResourceAsStream(process.info.app.getSimpleName()+".java");
+			code = UtilIO.readAsString(in);
+		}
+
+		if ( code != null ) {
 			sourceTextArea.setText(code);
 
 			sourceTextArea.addMouseListener(new MouseAdapter() {
@@ -529,7 +532,8 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 					container.getViewport().add(sourceTextArea);
 					displaySource(sourceTextArea, process);
 
-					// after the GUI has figured out the shape of everthing move the view to a location of interest
+					// after the GUI has figured out the shape of everything move scroll to the start of the
+					// source code and skip over the preamble stuff
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {
@@ -546,8 +550,8 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		});
 
 		// redirect console output to the GUI
-		process.launcher.setPrintOut(new PrintStream(new TextOutputStream(outputTextArea)));
-		process.launcher.setPrintErr(new PrintStream(new TextOutputStream(outputTextArea)));
+		process.launcher.setPrintOut(new PrintStream(new TextOutputStream(outputTextArea,false)));
+		process.launcher.setPrintErr(new PrintStream(new TextOutputStream(outputTextArea, false)));
 
 		JPanel intermediate = new JPanel();
 		intermediate.setLayout(new BoxLayout(intermediate,BoxLayout.X_AXIS));
@@ -581,11 +585,16 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 	class TextOutputStream extends OutputStream {
 		private JTextArea textArea;
-		public TextOutputStream(JTextArea textArea) {
+		private boolean mirror;
+		public TextOutputStream(JTextArea textArea, boolean mirror ) {
 			this.textArea = textArea;
+			this.mirror = mirror;
 		}
+
 		@Override
 		public void write(final int b) throws IOException {
+			if( mirror )
+				System.out.write(b);
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
