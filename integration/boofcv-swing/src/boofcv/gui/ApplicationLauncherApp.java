@@ -420,7 +420,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 				DefaultListModel model = (DefaultListModel)processList.getModel();
 				for (int i = model.size()-1; i >= 0; i--) {
 					ActiveProcess p = (ActiveProcess)model.get(i);
-					removeProcessTab(p,true);
+					removeProcessTab(p,false);
 				}
 			}
 		});
