@@ -17,7 +17,7 @@ Version : 0.27
   * Unrolled matrix inverse in pinhole and radtan
 - Equirectangular
   * Added PinholeRadialToEquirectangular
-  * Fixed the meaning of latitude and longitude being swapped.  Thanks xzfinet for knowing their definitions.
+  * Fixed the meaning of latitude and longitude being swapped.  Thanks xzfinet
 - Updated generics to take advantage of Java 7 more
 - Image Pyramids
   * PyramidDiscreteSampleBlur supports generic images

@@ -18,6 +18,7 @@
 
 package boofcv.alg.distort.spherical;
 
+import boofcv.struct.geo.GeoLL_F32;
 import georegression.geometry.ConvertCoordinates3D_F32;
 import georegression.metric.UtilAngle;
 import georegression.misc.GrlConstants;
@@ -32,25 +33,20 @@ import georegression.struct.point.Point3D_F32;
  *
  * Coordinate System:
  * <ul>
- * <li>latitude is along the x-axis and goes from -pi to pi</li>
- * <li>longtitude is along the y-axis and goes from -pi/2 to pi/2</li>
+ * <li>longitude is along the x-axis and goes from -pi to pi</li>
+ * <li>latitude is along the y-axis and goes from -pi/2 to pi/2</li>
  * <li>image center (width/2, (height-1)/2.0ff) or (lat=0, lon=0) corresponds to a unit sphere of (1,0,0)</li>
  * <li>unit sphere of (0,0,1) is pixel (width/2,0) and (0,0,-1) is (width/2,height-1)</li>
  * <li>unit sphere of (0,1,0) is pixel (3*width/4,(height-1)/2) and (0,0,-1) is (width/4,(height-1)/2)</li>
  * </ul>
  * Coordinate System with y-flipped:
  * <ul>
- * <li>latitude is along the x-axis and goes from -pi to pi</li>
- * <li>longtitude is along the y-axis and goes from pi/2 to -pi/2</li>
+ * <li>longitude is along the x-axis and goes from -pi to pi</li>
+ * <li>latitude is along the y-axis and goes from pi/2 to -pi/2</li>
  * <li>image center (width/2, height/2) or (lat=0, lon=0) corresponds to a unit sphere of (1,0,0)</li>
  * <li>unit sphere of (0,0,1) is pixel (width/2,height-1) and (0,0,-1) is (width/2,0)</li>
  * <li>unit sphere of (0,1,0) is pixel (3*width/4,(height-1)/2) and (0,0,-1) is (width/4,(height-1)/2)</li>
  * </ul>
- *
- * <p>Latitude and Longitude shown on a hemisphere</p>
- * <center>
- * <img src="doc-files/sphere_lat_lon.png"/>
- * </center>
  *
  * <p>Latitude and Longitude shown on a sphere in equirectangular format.  Note that y is NOT flipped.</p>
  * <center>
@@ -65,7 +61,7 @@ public class EquirectangularTools_F32 {
 	int height;
 
 	// internal storage to avoid declaring new memory
-	Point2D_F32 temp = new Point2D_F32();
+	GeoLL_F32 temp = new GeoLL_F32();
 
 	/**
 	 * Specifies the image and which latitude/longtiude will comprise the center axises
@@ -86,28 +82,28 @@ public class EquirectangularTools_F32 {
 	 */
 	public void equiToNorm(float x , float y , Point3D_F32 norm ) {
 		equiToLatLon(x,y, temp);
-		ConvertCoordinates3D_F32.latlonToUnitVector(temp.x,temp.y, norm);
+		ConvertCoordinates3D_F32.latlonToUnitVector(temp.lat,temp.lon, norm);
 	}
 
 	public void normToEqui( float nx , float ny , float nz , Point2D_F32 rect ) {
 		/**/double r = /**/Math.sqrt(nx*nx + ny*ny);
 
-		/**/double lat = /**/Math.atan2(ny,nx);
-		/**/double lon = UtilAngle.atanSafe(-nz,r);
+		/**/double lon = /**/Math.atan2(ny,nx);
+		/**/double lat = UtilAngle.atanSafe(-nz,r);
 
 		latlonToEqui((float) lat, (float) lon, rect);
 	}
 
 	public void equiToNormFV(float x , float y , Point3D_F32 norm ) {
 		equiToLatLonFV(x,y, temp);
-		ConvertCoordinates3D_F32.latlonToUnitVector(temp.x,temp.y, norm);
+		ConvertCoordinates3D_F32.latlonToUnitVector(temp.lat,temp.lon, norm);
 	}
 
 	public void normToEquiFV( float nx , float ny , float nz , Point2D_F32 rect ) {
 		/**/double r = /**/Math.sqrt(nx*nx + ny*ny);
 
-		/**/double lat = /**/Math.atan2(ny,nx);
-		/**/double lon = UtilAngle.atanSafe(-nz,r);
+		/**/double lon = /**/Math.atan2(ny,nx);
+		/**/double lat = UtilAngle.atanSafe(-nz,r);
 
 		latlonToEquiFV((float) lat, (float) lon, rect);
 	}
@@ -116,11 +112,11 @@ public class EquirectangularTools_F32 {
 	 * Converts the equirectangular coordinate into a latitude and longitude
 	 * @param x pixel coordinate in equirectangular image
 	 * @param y pixel coordinate in equirectangular image
-	 * @param latlon  (output) x = latitude, y = longitude
+	 * @param geo  (output)
 	 */
-	public void equiToLatLon(float x , float y , Point2D_F32 latlon ) {
-		latlon.x = (x/width - 0.5f)*GrlConstants.F_PI2; // latitude
-		latlon.y = (y/(height-1) - 0.5f)*GrlConstants.F_PI; // longitude
+	public void equiToLatLon(float x , float y , GeoLL_F32 geo ) {
+		geo.lon = (x/width - 0.5f)*GrlConstants.F_PI2;
+		geo.lat = (y/(height-1) - 0.5f)*GrlConstants.F_PI;
 	}
 
 	/**
@@ -132,11 +128,11 @@ public class EquirectangularTools_F32 {
 	 *
 	 * @param x pixel coordinate in equirectangular image
 	 * @param y pixel coordinate in equirectangular image
-	 * @param latlon  (output) x = latitude, y = longitude
+	 * @param geo  (output)
 	 */
-	public void equiToLatLonFV(float x , float y , Point2D_F32 latlon ) {
-		latlon.x = (x/width - 0.5f)*GrlConstants.F_PI2; // latitude
-		latlon.y = ((height-y-1.0f)/(height-1) - 0.5f)*GrlConstants.F_PI; // longitude
+	public void equiToLatLonFV(float x , float y , GeoLL_F32 geo ) {
+		geo.lon = (x/width - 0.5f)*GrlConstants.F_PI2;
+		geo.lat = ((height-y-1.0f)/(height-1) - 0.5f)*GrlConstants.F_PI;
 	}
 
 	/**
@@ -146,8 +142,8 @@ public class EquirectangularTools_F32 {
 	 * @param rect (Output) equirectangular coordinate
 	 */
 	public void latlonToEqui(float lat, float lon, Point2D_F32 rect) {
-		rect.x = UtilAngle.wrapZeroToOne(lat / GrlConstants.F_PI2 + 0.5f)*width;
-		rect.y = UtilAngle.reflectZeroToOne(lon / GrlConstants.F_PI + 0.5f)*(height-1);
+		rect.x = UtilAngle.wrapZeroToOne(lon / GrlConstants.F_PI2 + 0.5f)*width;
+		rect.y = UtilAngle.reflectZeroToOne(lat / GrlConstants.F_PI + 0.5f)*(height-1);
 	}
 
 	/**
@@ -158,8 +154,8 @@ public class EquirectangularTools_F32 {
 	 * @param rect (Output) equirectangular coordinate
 	 */
 	public void latlonToEquiFV(float lat, float lon, Point2D_F32 rect) {
-		rect.x = UtilAngle.wrapZeroToOne(lat / GrlConstants.F_PI2 + 0.5f)*width;
-		rect.y = UtilAngle.reflectZeroToOne(lon / GrlConstants.F_PI + 0.5f)*(height-1);
+		rect.x = UtilAngle.wrapZeroToOne(lon / GrlConstants.F_PI2 + 0.5f)*width;
+		rect.y = UtilAngle.reflectZeroToOne(lat / GrlConstants.F_PI + 0.5f)*(height-1);
 		rect.y = height - rect.y - 1;
 	}
 

@@ -18,9 +18,9 @@
 
 package boofcv.alg.distort.spherical;
 
+import boofcv.struct.geo.GeoLL_F64;
 import georegression.metric.UtilAngle;
 import georegression.misc.GrlConstants;
-import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -61,14 +61,14 @@ public class TestCylinderToEquirectangular_F64 {
 
 		alg.configure(200,300, UtilAngle.radian(100));
 
-		Point2D_F64 ll = new Point2D_F64();
+		GeoLL_F64 ll = new GeoLL_F64();
 
 		alg.compute(100,0);
 		alg.getTools().equiToLatLon(alg.distX,alg.distY,ll);
-		double lon0 = ll.y;
+		double lon0 = ll.lon;
 		alg.compute(100,299);
 		alg.getTools().equiToLatLon(alg.distX,alg.distY,ll);
-		double lon1 = ll.y;
+		double lon1 = ll.lon;
 
 
 		assertEquals(UtilAngle.radian(100),lon1-lon0, GrlConstants.TEST_F64);

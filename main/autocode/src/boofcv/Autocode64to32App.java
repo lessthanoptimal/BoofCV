@@ -39,6 +39,7 @@ public class Autocode64to32App extends RecursiveConvert {
         String directories[] = new String[]{
                 "main/boofcv-geo/src/boofcv/alg",
                 "main/boofcv-geo/test/boofcv/alg",
+                "main/boofcv-geo/src/boofcv/struct/geo",
                 "main/boofcv-ip/src/boofcv/alg/distort",
                 "main/boofcv-ip/src/boofcv/struct/distort",
                 };
