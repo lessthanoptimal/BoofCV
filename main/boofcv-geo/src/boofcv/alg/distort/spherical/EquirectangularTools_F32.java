@@ -49,7 +49,7 @@ import georegression.struct.point.Point3D_F32;
  * </ul>
  *
  * <p>Latitude and Longitude shown on a sphere in equirectangular format.  Note that y is NOT flipped and angles
- * are shown in degrees not radians.</p>
+ * are shown in degrees not radians git push.</p>
  * <center>
  * <img src="doc-files/equirectangular_lat_lon.png"/>
  * </center>
