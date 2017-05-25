@@ -37,6 +37,10 @@ import java.util.Set;
  */
 public class ExampleLauncherApp extends ApplicationLauncherApp {
 
+	public ExampleLauncherApp() {
+		super(false);
+	}
+
 	@Override
 	protected void createTree(DefaultMutableTreeNode root) {
 		List<String> packages = new ArrayList<>();

@@ -22,7 +22,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
@@ -54,6 +53,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	private JTree tree;
 
 	JButton bKill = new JButton("Kill");
+	JCheckBox checkRemoveOnDeath = new JCheckBox("Auto Remove");
 	JButton bKillAll = new JButton("Kill All");
 
 	JList processList;
@@ -63,8 +63,13 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	int memoryMB = 1024;
 	final List<ActiveProcess> processes = new ArrayList<>();
 
-	public ApplicationLauncherApp() {
+	boolean defaultRemoveTabOnDeath;
+
+	public ApplicationLauncherApp( boolean defaultRemoveTabOnDeath ) {
 		setLayout(new BorderLayout());
+
+		checkRemoveOnDeath.setSelected(defaultRemoveTabOnDeath);
+
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("All Categories");
 		createTree(root);
 
@@ -187,6 +192,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		JPanel actionPanel = new JPanel();
 		actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
 		actionPanel.add(bKill);
+		actionPanel.add(checkRemoveOnDeath);
 		actionPanel.add(Box.createHorizontalGlue());
 		actionPanel.add(bKillAll);
 		bKill.addActionListener(this);
@@ -388,7 +394,11 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			if (selected == null)
 				return;
 
-			selected.requestKill();
+			if( selected.isAlive() )
+				selected.requestKill();
+			else {
+				removeProcessTab(selected,false);
+			}
 		} else if (e.getSource() == bKillAll) {
 			killAllProcesses(0);
 		}
@@ -400,12 +410,26 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	 *                    of milliseconds
 	 */
 	public void killAllProcesses( long blockTimeMS ) {
+		// remove already dead processes from the GUI
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				DefaultListModel model = (DefaultListModel)processList.getModel();
+				for (int i = model.size()-1; i >= 0; i--) {
+					ActiveProcess p = (ActiveProcess)model.get(i);
+					removeProcessTab(p,true);
+				}
+			}
+		});
+
+		// kill processes that are already running
 		synchronized (processes) {
 			for (int i = 0; i < processes.size(); i++) {
 				processes.get(i).requestKill();
 			}
 		}
 
+		// block until everything is dead
 		if( blockTimeMS > 0 ) {
 			long abortTime = System.currentTimeMillis()+blockTimeMS;
 			while( abortTime > System.currentTimeMillis() ) {
@@ -493,19 +517,6 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		String title = process.info.app.getSimpleName();
 
 		final ProcessTabPanel component = new ProcessTabPanel(process.getId());
-		component.setLayout(new BorderLayout());
-
-		String[] optionsList = new String[]{"Source", "Output"};
-		JComboBox<String> options = new JComboBox<>(optionsList);
-		options.setBorder(new EmptyBorder(5,5,5,5));
-		options.setMaximumSize(options.getPreferredSize());
-		JButton bOpenInGitHub = new JButton("GitHub");
-		bOpenInGitHub.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				openInGitHub(process.info);
-			}
-		});
 
 		final JTextArea sourceTextArea = new JTextArea();
 		sourceTextArea.setFont(new Font("monospaced", Font.PLAIN, 12));
@@ -522,7 +533,13 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		final JScrollPane container = new JScrollPane();
 		container.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-		options.addActionListener(new ActionListener() {
+		component.bOpenInGitHub.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openInGitHub(process.info);
+			}
+		});
+		component.options.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JComboBox source = (JComboBox) e.getSource();
@@ -553,34 +570,14 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		process.launcher.setPrintOut(new PrintStream(new TextOutputStream(outputTextArea,false)));
 		process.launcher.setPrintErr(new PrintStream(new TextOutputStream(outputTextArea, false)));
 
-		JPanel intermediate = new JPanel();
-		intermediate.setLayout(new BoxLayout(intermediate,BoxLayout.X_AXIS));
-		intermediate.add(options);
-		intermediate.add(Box.createHorizontalGlue());
-		if( Desktop.isDesktopSupported() ) {
-			intermediate.add(bOpenInGitHub);
-		}
+		// this triggers an event and causes it to be displayed
+		component.options.setSelectedIndex(1);
 
-		component.add(intermediate, BorderLayout.NORTH);
 		component.add(container, BorderLayout.CENTER);
 
 		pane.add(title, component);
-		options.setSelectedIndex(1);
+
 		pane.setSelectedIndex(pane.getComponentCount()-1);
-	}
-
-	private void removeProcessTab(final ActiveProcess process, JTabbedPane pane) {
-		int index = -1;
-		//lookup tab by process, assume one tab per process
-		for (int i = 0; i < pane.getComponents().length; i++) {
-			ProcessTabPanel component = (ProcessTabPanel) pane.getComponent(i);
-			if (component.getProcessId() == process.getId())
-				index = i;
-		}
-
-		if (index == -1)
-			return;
-		pane.remove(index);
 	}
 
 	class TextOutputStream extends OutputStream {
@@ -617,7 +614,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		}
 	}
 
-	public static class ActiveProcess extends Thread {
+	public class ActiveProcess extends Thread {
 		AppInfo info;
 		JavaRuntimeLauncher launcher;
 
@@ -628,6 +625,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		public void run() {
 			active = true;
 			exit = launcher.launch(info.app);
+			launcher.getPrintOut().println("\n\n~~~~~~~~~ Finished ~~~~~~~~~");
 			System.out.println();
 			System.out.println("------------------- Exit condition " + exit);
 			active = false;
@@ -663,11 +661,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 							SwingUtilities.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									//intervalremoved listener is called after element is removed, so the reference
-									//can't be retrieved. we call removeProcessTab() here for that reason.
-									removeProcessTab(p, outputPanel);
-									listModel.removeElement(p);
-									processList.invalidate();
+									removeProcessTab(p,true);
 								}
 							});
 							processes.remove(i);
@@ -681,6 +675,28 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 				}
 			}
 		}
+	}
+
+	private void removeProcessTab(ActiveProcess process, boolean autoClose ) {
+		//interval removed listener is called after element is removed, so the reference
+		//can't be retrieved. we call removeProcessTab() here for that reason.
+		int index = -1;
+		//lookup tab by process, assume one tab per process
+		for (int i = 0; i < outputPanel.getComponents().length; i++) {
+			ProcessTabPanel component = (ProcessTabPanel) outputPanel.getComponent(i);
+			if (component.getProcessId() == process.getId()) {
+				if( autoClose && !checkRemoveOnDeath.isSelected() )
+					return;
+				index = i;
+			}
+		}
+
+		if (index == -1)
+			return;
+		outputPanel.remove(index);
+
+		listModel.removeElement(process);
+		processList.invalidate();
 	}
 
 	public void showWindow( String title ) {

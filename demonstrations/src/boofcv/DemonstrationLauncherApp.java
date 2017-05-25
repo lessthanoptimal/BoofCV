@@ -83,6 +83,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author Peter Abeles
  */
 public class DemonstrationLauncherApp extends ApplicationLauncherApp {
+
+	public DemonstrationLauncherApp() {
+		super(true);
+	}
+
 	@Override
 	protected void createTree( DefaultMutableTreeNode root ) {
 		createNodes(root,"Binary",
