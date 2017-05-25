@@ -222,7 +222,10 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		add(horizontalSplitPane, BorderLayout.CENTER);
 		new ProcessStatusThread().start();
 
-		setPreferredSize(new Dimension(800,600));
+		// get the width of the monitor.  This should work in multi-monitor systems
+		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+
+		setPreferredSize(new Dimension(gd.getDisplayMode().getWidth(),600));
 	}
 
 
