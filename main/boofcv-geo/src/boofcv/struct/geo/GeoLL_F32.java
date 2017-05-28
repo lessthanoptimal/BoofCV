@@ -16,37 +16,22 @@
  * limitations under the License.
  */
 
-package boofcv.struct.calib;
-
-import java.io.Serializable;
+package boofcv.struct.geo;
 
 /**
- * Common class for camera models
- *
- * @author Peter Abeles
+ * Geographic coordinate consisting of latitude (north-south coordinate) and longitude (west-east) .
+
+ * <center>
+ * <img src="doc-files/sphere_lat_lon.png"/>
+ * </center>
  */
-public abstract class CameraModel implements Serializable {
-	/** image shape (units: pixels) */
-	public int width,height;
-
-	public int getWidth() {
-		return width;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
+public class GeoLL_F32 {
 	/**
-	 * Creates a new camera model with zero values of the same type os this one
+	 * latitude
 	 */
-	public abstract <T extends CameraModel>T createLike();
+	public float lat;
+	/**
+	 * longitude
+	 */
+	public float lon;
 }

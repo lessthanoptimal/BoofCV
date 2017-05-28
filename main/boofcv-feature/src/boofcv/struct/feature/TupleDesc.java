@@ -18,12 +18,14 @@
 
 package boofcv.struct.feature;
 
+import java.io.Serializable;
+
 /**
  * Base class for tuple based feature descriptors
  *
  * @author Peter Abeles
  */
-public interface TupleDesc<T extends TupleDesc> {
+public interface TupleDesc<T extends TupleDesc> extends Serializable {
 
 	/**
 	 * Sets this tuple to be the same as the provided tuple

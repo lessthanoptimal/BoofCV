@@ -16,37 +16,45 @@
  * limitations under the License.
  */
 
-package boofcv.struct.calib;
+package boofcv.struct.geo;
 
-import java.io.Serializable;
+import georegression.struct.point.Point2D_F32;
 
 /**
- * Common class for camera models
+ * A 2D point with an index associated with it
  *
  * @author Peter Abeles
  */
-public abstract class CameraModel implements Serializable {
-	/** image shape (units: pixels) */
-	public int width,height;
+public class PointIndex2D_F32 extends Point2D_F32 {
+	public int index;
 
-	public int getWidth() {
-		return width;
+	public PointIndex2D_F32(float x, float y, int index) {
+		super(x, y);
+		this.index = index;
 	}
 
-	public void setWidth(int width) {
-		this.width = width;
+	public PointIndex2D_F32(float x, float y) {
+		super(x, y);
 	}
 
-	public int getHeight() {
-		return height;
+	public PointIndex2D_F32() {
 	}
 
-	public void setHeight(int height) {
-		this.height = height;
+	public PointIndex2D_F32( Point2D_F32 p , int index ) {
+		this.x = p.x;
+		this.y = p.y;
+		this.index = index;
 	}
 
-	/**
-	 * Creates a new camera model with zero values of the same type os this one
-	 */
-	public abstract <T extends CameraModel>T createLike();
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	public PointIndex2D_F32 copy() {
+		return new PointIndex2D_F32(x,y,index);
+	}
 }

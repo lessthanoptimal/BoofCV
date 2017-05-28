@@ -32,6 +32,7 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.geo.GeoLL_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -88,7 +89,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 	ImagePanel panelPinhole = new ImagePanel();
 	EquiViewPanel panelEqui = new EquiViewPanel();
 
-	Object imageLock = new Object();
+	final Object imageLock = new Object();
 
 	public EquirectangularPinholeApp(List<?> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
@@ -140,7 +141,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 		MouseAdapter mouseAdapter = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Point2D_F32 latlon = new Point2D_F32();
+				GeoLL_F32 geo = new GeoLL_F32();
 
 				double scale = panelEqui.scale;
 
@@ -151,8 +152,8 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 					return;
 				panelPinhole.grabFocus();
 				synchronized (imageLock) {
-					distorter.getTools().equiToLonlatFV(x,y,latlon);
-					distorter.setDirection(latlon.x,latlon.y,0);
+					distorter.getTools().equiToLatLonFV(x,y,geo);
+					distorter.setDirection(geo.lon,geo.lat,0);
 
 					// pinhole has a canonical view along +z
 					// equirectangular lon-lat uses +x

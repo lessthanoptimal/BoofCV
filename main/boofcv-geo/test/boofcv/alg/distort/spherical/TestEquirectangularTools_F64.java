@@ -18,6 +18,7 @@
 
 package boofcv.alg.distort.spherical;
 
+import boofcv.struct.geo.GeoLL_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -56,11 +57,11 @@ public class TestEquirectangularTools_F64 {
 	}
 
 	private void equiToLonlat_reverse(EquirectangularTools_F64 tools, double x , double y) {
-		Point2D_F64 ll = new Point2D_F64();
+		GeoLL_F64 ll = new GeoLL_F64();
 		Point2D_F64 r = new Point2D_F64();
 
-		tools.equiToLonlat(x,y,ll);
-		tools.lonlatToEqui(ll.x,ll.y,r);
+		tools.equiToLatLon(x,y,ll);
+		tools.latlonToEqui(ll.lat, ll.lon, r);
 
 		assertEquals(x,r.x, GrlConstants.TEST_F64);
 		assertEquals(y,r.y, GrlConstants.TEST_F64);
@@ -80,11 +81,11 @@ public class TestEquirectangularTools_F64 {
 	}
 
 	private void equiToLonlatFV_reverse(EquirectangularTools_F64 tools, double x , double y) {
-		Point2D_F64 ll = new Point2D_F64();
+		GeoLL_F64 ll = new GeoLL_F64();
 		Point2D_F64 r = new Point2D_F64();
 
-		tools.equiToLonlatFV(x,y,ll);
-		tools.lonlatToEquiFV(ll.x,ll.y,r);
+		tools.equiToLatLonFV(x,y,ll);
+		tools.latlonToEquiFV(ll.lat, ll.lon, r);
 
 		assertEquals(x,r.x, GrlConstants.TEST_F64);
 		assertEquals(y,r.y, GrlConstants.TEST_F64);
@@ -221,11 +222,11 @@ public class TestEquirectangularTools_F64 {
 		tools.configure(width,height);
 
 		Point2D_F64 found = new Point2D_F64();
-		tools.lonlatToEqui(0,GrlConstants.PId2, found);
+		tools.latlonToEqui(GrlConstants.PId2, 0, found);
 		assertEquals(width/2,found.x, GrlConstants.TEST_F64);
 		assertEquals(height-1,found.y, GrlConstants.TEST_F64);
 
-		tools.lonlatToEqui(0,-GrlConstants.PId2, found);
+		tools.latlonToEqui(-GrlConstants.PId2,0, found);
 		assertEquals(width/2,found.x, GrlConstants.TEST_F64);
 		assertEquals(0,found.y, GrlConstants.TEST_F64);
 	}
@@ -236,11 +237,11 @@ public class TestEquirectangularTools_F64 {
 		tools.configure(width,height);
 
 		Point2D_F64 found = new Point2D_F64();
-		tools.lonlatToEquiFV(0,-GrlConstants.PId2, found);
+		tools.latlonToEquiFV(-GrlConstants.PId2,0, found);
 		assertEquals(width/2,found.x, GrlConstants.TEST_F64);
 		assertEquals(height-1,found.y, GrlConstants.TEST_F64);
 
-		tools.lonlatToEquiFV(0,GrlConstants.PId2, found);
+		tools.latlonToEquiFV(GrlConstants.PId2,0, found);
 		assertEquals(width/2,found.x, GrlConstants.TEST_F64);
 		assertEquals(0,found.y, GrlConstants.TEST_F64);
 	}

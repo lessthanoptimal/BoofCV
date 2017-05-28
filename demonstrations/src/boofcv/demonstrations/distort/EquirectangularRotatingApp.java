@@ -32,13 +32,13 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.geo.GeoLL_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.ConvertRotation3D_F32;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
-import georegression.struct.point.Point2D_F32;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -93,16 +93,16 @@ public class EquirectangularRotatingApp<T extends ImageBase<T>> extends Demonstr
 		panelImage.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Point2D_F32 latlon = new Point2D_F32();
+				GeoLL_F32 geo = new GeoLL_F32();
 
 				synchronized (distorter) {
 					EquirectangularTools_F32 tools = distorter.getTools();
 
 					double scale = panelImage.scale;
 					distorter.compute((int) (e.getX() / scale), (int) (e.getY() / scale));
-					tools.equiToLonlatFV(distorter.distX, distorter.distY, latlon);
-					panelRotate.setOrientation(UtilAngle.radianToDegree(latlon.y), UtilAngle.radianToDegree(latlon.x),0);
-					distorter.setDirection(latlon.x, latlon.y, 0);
+					tools.equiToLatLonFV(distorter.distX, distorter.distY, geo);
+					panelRotate.setOrientation(UtilAngle.radianToDegree(geo.lat), UtilAngle.radianToDegree(geo.lon),0);
+					distorter.setDirection(geo.lon, geo.lat, 0);
 					distortImage.setModel(distorter); // let it know the transform has changed
 
 					if (inputMethod == InputMethod.IMAGE) {
