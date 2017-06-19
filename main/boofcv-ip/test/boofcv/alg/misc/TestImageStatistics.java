@@ -231,7 +231,8 @@ public class TestImageStatistics {
 
 		double mean = 2.5;
 
-		Object result = m.invoke(null,inputA,mean);
+		Object result = paramTypes[1] == double.class ? m.invoke(null,inputA,mean) :
+				m.invoke(null,inputA,(float)mean);
 
 		double total = 0;
 		for( int i = 0; i < height; i++ ) {

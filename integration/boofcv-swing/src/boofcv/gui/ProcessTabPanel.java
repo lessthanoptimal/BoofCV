@@ -19,22 +19,40 @@
 package boofcv.gui;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 
 /**
  * A jpanel that keeps track of the process id it is supposed to be displaying information for.
  * Intended to contain the source code and output.
+ *
  * Created by Jalal on 4/30/2017.
  */
 public class ProcessTabPanel extends JPanel {
 
 	private long processId;
 
-	public ProcessTabPanel() {
-		super();
-	}
+	public JComboBox<String> options;
+	public JButton bOpenInGitHub = new JButton("GitHub");
 
 	public ProcessTabPanel(long processId) {
+		setLayout(new BorderLayout());
 		this.processId = processId;
+
+		String[] optionsList = new String[]{"Source", "Output"};
+		options = new JComboBox<>(optionsList);
+		options.setBorder(new EmptyBorder(5,5,5,5));
+		options.setMaximumSize(options.getPreferredSize());
+
+		JPanel intermediate = new JPanel();
+		intermediate.setLayout(new BoxLayout(intermediate,BoxLayout.X_AXIS));
+		intermediate.add(options);
+		intermediate.add(Box.createHorizontalGlue());
+		if( Desktop.isDesktopSupported() ) {
+			intermediate.add(bOpenInGitHub);
+		}
+
+		add(intermediate, BorderLayout.NORTH);
 	}
 
 	public void setProcessId(long processId) {

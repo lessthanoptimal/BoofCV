@@ -17,6 +17,7 @@ Version : 0.27
   * Unrolled matrix inverse in pinhole and radtan
 - Equirectangular
   * Added PinholeRadialToEquirectangular
+  * Fixed the meaning of latitude and longitude being swapped.  Thanks xzfinet
 - Updated generics to take advantage of Java 7 more
 - Image Pyramids
   * PyramidDiscreteSampleBlur supports generic images
@@ -76,7 +77,7 @@ Version : 0.27
   * Thanks André Ambrósio Boechat for reporting the problem
 - ApplicationLauncherApp
   * Thanks Jalal Khan for completing and going beyond what was required in the Bounty!
-  * Displays source code, GitHub button, search (TODO), and various other improvements
+  * Displays source code, GitHub button, search, and various other improvements
 - ConvertNV21 and ConvertYV12
   * Speed up conversion from NV21 to RGB by about 1.9x by converting if statements into bitwise operations
   * Refactored functions names with multi to planar
@@ -88,7 +89,6 @@ Version : 0.27
 - TODO ExampleDenseImageFeatures needs to be written
 - TODO ExampleRectifyUncalibratedStereo is upside down.  Adjust the math to avoid that
 - TODO Fisheye calibration using omni model
-- TODO Regression: Chessboard image border to fiducial regression
 - TODO Calibration application.  Select output format: BoofCV, OpenCV
 - TODO Tutorial on image features?  Sparse and dense?
 - TODO Don't forget to change BoofCV version referenced in Android example
@@ -97,14 +97,17 @@ Version : 0.27
        https://blog.gradle.org/incremental-compiler-avoidance
 - TODO Clarify how you calibrate the camera in Processing
 - TODO Create a stand alone application that people can download to calibrate
-- ApplicationLauncherApp
-  * Search capability
+- TODO ApplicationLauncherApp
   * Don't close tab when finished.  Clean up tabs for dead processes when a new one is launched
+- TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
+        It is a homogenous coordinate with z=1 being implicit.
+- TODO Integrate in Marius Orfgen's image statistics histogram ideas
 - TODO Modify ConvertBufferedImage and related code so that it will work in Java 9
   * Remove references to: ByteInterleavedRaster,
                           IntegerInterleavedRaster,
                           ShortInterleavedRaster,
                           SunWritableRaster
+
 
 ---------------------------------------------
 Date    : 2016/12/07

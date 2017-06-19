@@ -20,10 +20,10 @@ package boofcv.gui;
 
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
-import boofcv.misc.BoofMiscOps;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -33,15 +33,14 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Application which lists most of the demonstration application in a GUI and allows the user to double click
@@ -54,6 +53,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	private JTree tree;
 
 	JButton bKill = new JButton("Kill");
+	JCheckBox checkRemoveOnDeath = new JCheckBox("Auto Remove");
 	JButton bKillAll = new JButton("Kill All");
 
 	JList processList;
@@ -63,13 +63,107 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	int memoryMB = 1024;
 	final List<ActiveProcess> processes = new ArrayList<>();
 
-	public ApplicationLauncherApp() {
+	boolean defaultRemoveTabOnDeath;
+
+	public ApplicationLauncherApp( boolean defaultRemoveTabOnDeath ) {
 		setLayout(new BorderLayout());
+
+		checkRemoveOnDeath.setSelected(defaultRemoveTabOnDeath);
+
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("All Categories");
 		createTree(root);
 
 		tree = new JTree(root);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+
+		final JTextField searchBox = new JTextField();
+		searchBox.setToolTipText("Search");
+		searchBox.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				String text = searchBox.getText();
+				DefaultMutableTreeNode selection = (DefaultMutableTreeNode) tree.getModel().getRoot();
+
+				TreePath path = searchTree(text, selection, true);
+				if (path != null) {
+					tree.setSelectionPath(path);
+					tree.scrollPathToVisible(path);
+				} else {
+					tree.setSelectionPath(null);
+				}
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				String text = searchBox.getText();
+				DefaultMutableTreeNode selection =  (DefaultMutableTreeNode) tree.getModel().getRoot();
+				TreePath path = searchTree(text, selection, true);
+				if (path != null) {
+					tree.setSelectionPath(path);
+					tree.scrollPathToVisible(path);
+				} else {
+					tree.setSelectionPath(null);
+				}
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+
+			}
+		});
+		KeyStroke down = KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, true);
+		KeyStroke up = KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, true);
+			Action nextSearch = new AbstractAction() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					DefaultMutableTreeNode currentSelection = tree.getLastSelectedPathComponent() != null
+							? (DefaultMutableTreeNode) tree.getLastSelectedPathComponent()
+							: (DefaultMutableTreeNode) tree.getModel().getRoot();
+					if (currentSelection != null && searchBox.getText() != null) {
+						TreePath path = searchTree(searchBox.getText(), currentSelection, true);
+						if (path != null) {
+							tree.setSelectionPath(path);
+							tree.scrollPathToVisible(path);
+						} else {
+							tree.setSelectionPath(null);
+						}
+					}
+				}
+		};
+		Action prevSearch = new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				DefaultMutableTreeNode currentSelection = tree.getLastSelectedPathComponent() != null
+						? (DefaultMutableTreeNode) tree.getLastSelectedPathComponent()
+						: (DefaultMutableTreeNode) tree.getModel().getRoot();
+				if (currentSelection != null && searchBox.getText() != null) {
+					TreePath path = searchTree(searchBox.getText(), currentSelection, false);
+					if (path != null) {
+						tree.setSelectionPath(path);
+						tree.scrollPathToVisible(path);
+					} else {
+						tree.setSelectionPath(null);
+					}
+				}
+			}
+		};
+
+		searchBox.getInputMap().put(down, "nextSearch");
+		searchBox.getActionMap().put("nextSearch", nextSearch);
+		searchBox.getInputMap().put(up, "prevSearch");
+		searchBox.getActionMap().put("prevSearch", prevSearch);
+
+		searchBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//enter key goes to next match
+				DefaultMutableTreeNode selection = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+				if(selection != null) {
+					handleClick(selection);
+				}
+				System.out.println("action");
+			}
+		});
 
 		MouseListener ml = new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
@@ -82,12 +176,23 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		};
 		tree.addMouseListener(ml);
 
+		JPanel searchPanel = new JPanel();
+		searchPanel.setLayout(new BoxLayout(searchPanel,BoxLayout.X_AXIS));
+		searchPanel.add( new JLabel("Search"));
+		searchPanel.add(Box.createRigidArea(new Dimension(5,5)));
+		searchPanel.add(searchBox);
+
+		JPanel leftPanel = new JPanel();
+		leftPanel.setLayout(new BorderLayout());
+		leftPanel.add(searchPanel, BorderLayout.NORTH);
 		JScrollPane treeView = new JScrollPane(tree);
 		treeView.setPreferredSize(new Dimension(300, 600));
+		leftPanel.add(treeView, BorderLayout.CENTER);
 
 		JPanel actionPanel = new JPanel();
 		actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
 		actionPanel.add(bKill);
+		actionPanel.add(checkRemoveOnDeath);
 		actionPanel.add(Box.createHorizontalGlue());
 		actionPanel.add(bKillAll);
 		bKill.addActionListener(this);
@@ -110,14 +215,17 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		// most of the time you want to increase the view of the text
 		verticalSplitPane.setResizeWeight(0.0);
 
-		JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,treeView,verticalSplitPane);
+		JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,leftPanel,verticalSplitPane);
 		horizontalSplitPane.setDividerLocation(250);
 		horizontalSplitPane.setResizeWeight(0.0);
 
 		add(horizontalSplitPane, BorderLayout.CENTER);
 		new ProcessStatusThread().start();
 
-		setPreferredSize(new Dimension(800,600));
+		// get the width of the monitor.  This should work in multi-monitor systems
+		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+
+		setPreferredSize(new Dimension(gd.getDisplayMode().getWidth(),600));
 	}
 
 
@@ -163,6 +271,44 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		process.start();
 	}
 
+	private TreePath searchTree(String text, DefaultMutableTreeNode node, boolean forward) {
+		Enumeration e = ((DefaultMutableTreeNode) this.tree.getModel().getRoot()).breadthFirstEnumeration();
+		if(!forward) {
+			final Stack tmp = new Stack();
+			while(e.hasMoreElements())
+				tmp.push(e.nextElement());
+
+			e = new Enumeration() {
+				@Override
+				public boolean hasMoreElements() {
+					return !tmp.isEmpty();
+				}
+
+				@Override
+				public Object nextElement() {
+					return tmp.pop();
+				}
+			};
+		}
+
+		while (e.hasMoreElements()) {
+			DefaultMutableTreeNode n = (DefaultMutableTreeNode) e.nextElement();
+			if(n.equals(node)) {
+				while(e.hasMoreElements()) {
+					DefaultMutableTreeNode candidate = (DefaultMutableTreeNode) e.nextElement();
+					if (candidate.getUserObject() instanceof AppInfo) {
+						AppInfo candidateInfo = (AppInfo) candidate.getUserObject();
+						if (candidateInfo.app.getSimpleName().toLowerCase().contains(text)) {
+							return new TreePath(candidate.getPath());
+						}
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
 	public void handleClick(DefaultMutableTreeNode node) {
 		if (node == null)
 			return;
@@ -176,10 +322,6 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	/**
 	 * Displays a context menu for a class leaf node
 	 * Allows copying of the name and the path to the source
-	 *
-	 * @param tree
-	 * @param x
-	 * @param y
 	 */
 	private void handleContextMenu(JTree tree, int x, int y) {
 		TreePath path = tree.getPathForLocation(x, y);
@@ -255,7 +397,11 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			if (selected == null)
 				return;
 
-			selected.requestKill();
+			if( selected.isAlive() )
+				selected.requestKill();
+			else {
+				removeProcessTab(selected,false);
+			}
 		} else if (e.getSource() == bKillAll) {
 			killAllProcesses(0);
 		}
@@ -267,12 +413,26 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	 *                    of milliseconds
 	 */
 	public void killAllProcesses( long blockTimeMS ) {
+		// remove already dead processes from the GUI
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				DefaultListModel model = (DefaultListModel)processList.getModel();
+				for (int i = model.size()-1; i >= 0; i--) {
+					ActiveProcess p = (ActiveProcess)model.get(i);
+					removeProcessTab(p,false);
+				}
+			}
+		});
+
+		// kill processes that are already running
 		synchronized (processes) {
 			for (int i = 0; i < processes.size(); i++) {
 				processes.get(i).requestKill();
 			}
 		}
 
+		// block until everything is dead
 		if( blockTimeMS > 0 ) {
 			long abortTime = System.currentTimeMillis()+blockTimeMS;
 			while( abortTime > System.currentTimeMillis() ) {
@@ -287,7 +447,6 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 						break;
 					}
 				}
-				BoofMiscOps.sleep(200);
 			}
 		}
 	}
@@ -317,10 +476,20 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		if (sourceTextArea == null)
 			return;
 
+		// first try loading it as a regular file
 		String path = UtilIO.getSourcePath(process.info.app.getPackage().getName(), process.info.app.getSimpleName());
 		File source = new File(path);
-		if (source.exists() && source.canRead()) {
-			String code = UtilIO.readAsString(path);
+		String code = null;
+		if( source.exists() && source.canRead() ) {
+			code = UtilIO.readAsString(path);
+		} else  {
+			// now try loading it as a resource.  This might be done if the application is created as a
+			// jar in the future
+			InputStream in = process.info.app.getResourceAsStream(process.info.app.getSimpleName()+".java");
+			code = UtilIO.readAsString(in);
+		}
+
+		if ( code != null ) {
 			sourceTextArea.setText(code);
 
 			sourceTextArea.addMouseListener(new MouseAdapter() {
@@ -351,19 +520,6 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		String title = process.info.app.getSimpleName();
 
 		final ProcessTabPanel component = new ProcessTabPanel(process.getId());
-		component.setLayout(new BorderLayout());
-
-		String[] optionsList = new String[]{"Source", "Output"};
-		JComboBox<String> options = new JComboBox<>(optionsList);
-		options.setBorder(new EmptyBorder(5,5,5,5));
-		options.setMaximumSize(options.getPreferredSize());
-		JButton bOpenInGitHub = new JButton("GitHub");
-		bOpenInGitHub.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				openInGitHub(process.info);
-			}
-		});
 
 		final JTextArea sourceTextArea = new JTextArea();
 		sourceTextArea.setFont(new Font("monospaced", Font.PLAIN, 12));
@@ -380,7 +536,13 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		final JScrollPane container = new JScrollPane();
 		container.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-		options.addActionListener(new ActionListener() {
+		component.bOpenInGitHub.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openInGitHub(process.info);
+			}
+		});
+		component.options.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JComboBox source = (JComboBox) e.getSource();
@@ -390,7 +552,8 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 					container.getViewport().add(sourceTextArea);
 					displaySource(sourceTextArea, process);
 
-					// after the GUI has figured out the shape of everthing move the view to a location of interest
+					// after the GUI has figured out the shape of everything move scroll to the start of the
+					// source code and skip over the preamble stuff
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {
@@ -407,46 +570,31 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		});
 
 		// redirect console output to the GUI
-		process.launcher.setPrintOut(new PrintStream(new TextOutputStream(outputTextArea)));
-		process.launcher.setPrintErr(new PrintStream(new TextOutputStream(outputTextArea)));
+		process.launcher.setPrintOut(new PrintStream(new TextOutputStream(outputTextArea,false)));
+		process.launcher.setPrintErr(new PrintStream(new TextOutputStream(outputTextArea, false)));
 
-		JPanel intermediate = new JPanel();
-		intermediate.setLayout(new BoxLayout(intermediate,BoxLayout.X_AXIS));
-		intermediate.add(options);
-		intermediate.add(Box.createHorizontalGlue());
-		if( Desktop.isDesktopSupported() ) {
-			intermediate.add(bOpenInGitHub);
-		}
+		// this triggers an event and causes it to be displayed
+		component.options.setSelectedIndex(1);
 
-		component.add(intermediate, BorderLayout.NORTH);
 		component.add(container, BorderLayout.CENTER);
 
 		pane.add(title, component);
-		options.setSelectedIndex(1);
+
 		pane.setSelectedIndex(pane.getComponentCount()-1);
-	}
-
-	private void removeProcessTab(final ActiveProcess process, JTabbedPane pane) {
-		int index = -1;
-		//lookup tab by process, assume one tab per process
-		for (int i = 0; i < pane.getComponents().length; i++) {
-			ProcessTabPanel component = (ProcessTabPanel) pane.getComponent(i);
-			if (component.getProcessId() == process.getId())
-				index = i;
-		}
-
-		if (index == -1)
-			return;
-		pane.remove(index);
 	}
 
 	class TextOutputStream extends OutputStream {
 		private JTextArea textArea;
-		public TextOutputStream(JTextArea textArea) {
+		private boolean mirror;
+		public TextOutputStream(JTextArea textArea, boolean mirror ) {
 			this.textArea = textArea;
+			this.mirror = mirror;
 		}
+
 		@Override
 		public void write(final int b) throws IOException {
+			if( mirror )
+				System.out.write(b);
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
@@ -469,7 +617,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		}
 	}
 
-	public static class ActiveProcess extends Thread {
+	public class ActiveProcess extends Thread {
 		AppInfo info;
 		JavaRuntimeLauncher launcher;
 
@@ -480,6 +628,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		public void run() {
 			active = true;
 			exit = launcher.launch(info.app);
+			launcher.getPrintOut().println("\n\n~~~~~~~~~ Finished ~~~~~~~~~");
 			System.out.println();
 			System.out.println("------------------- Exit condition " + exit);
 			active = false;
@@ -515,11 +664,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 							SwingUtilities.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									//intervalremoved listener is called after element is removed, so the reference
-									//can't be retrieved. we call removeProcessTab() here for that reason.
-									removeProcessTab(p, outputPanel);
-									listModel.removeElement(p);
-									processList.invalidate();
+									removeProcessTab(p,true);
 								}
 							});
 							processes.remove(i);
@@ -535,6 +680,28 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		}
 	}
 
+	private void removeProcessTab(ActiveProcess process, boolean autoClose ) {
+		//interval removed listener is called after element is removed, so the reference
+		//can't be retrieved. we call removeProcessTab() here for that reason.
+		int index = -1;
+		//lookup tab by process, assume one tab per process
+		for (int i = 0; i < outputPanel.getComponents().length; i++) {
+			ProcessTabPanel component = (ProcessTabPanel) outputPanel.getComponent(i);
+			if (component.getProcessId() == process.getId()) {
+				if( autoClose && !checkRemoveOnDeath.isSelected() )
+					return;
+				index = i;
+			}
+		}
+
+		if (index == -1)
+			return;
+		outputPanel.remove(index);
+
+		listModel.removeElement(process);
+		processList.invalidate();
+	}
+
 	public void showWindow( String title ) {
 		JFrame frame = ShowImages.showWindow(this,title,true);
 		frame.addWindowListener(new WindowAdapter() {
@@ -544,5 +711,4 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			}
 		});
 	}
-
 }
