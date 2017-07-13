@@ -19,12 +19,17 @@
 package boofcv.io.image;
 
 import boofcv.struct.image.*;
-import sun.awt.image.*;
+import sun.awt.image.ByteInterleavedRaster;
+import sun.awt.image.IntegerInterleavedRaster;
+import sun.awt.image.ShortInterleavedRaster;
+import sun.awt.image.SunWritableRaster;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Routines for converting to and from {@link BufferedImage} that use its internal
@@ -37,8 +42,8 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToGray(ByteInterleavedRaster src, GrayU8 dst) {
-		byte[] srcData = src.getDataStorage();
+	public static void bufferedToGray(DataBufferByte buffer, WritableRaster src, GrayU8 dst) {
+		byte[] srcData = buffer.getData();
 
 		byte[] data = dst.data;
 
@@ -46,9 +51,9 @@ public class ConvertRaster {
 
 		int size = dst.getWidth() * dst.getHeight();
 
-		int srcStride = src.getScanlineStride();
+		int srcStride = stride(src);
 		int srcOffset = getOffset(src);
-		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+		int srcStrideDiff = srcStride-src.getNumDataElements()*dst.width;
 
 		if (numBands == 3) {
 			from_3BU8_to_U8(dst, srcData, data, srcOffset, srcStrideDiff);
@@ -94,16 +99,16 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToGray(ByteInterleavedRaster src, GrayF32 dst) {
-		byte[] srcData = src.getDataStorage();
+	public static void bufferedToGray(DataBufferByte buffer, WritableRaster src, GrayF32 dst) {
+		byte[] srcData = buffer.getData();
 
 		float[] data = dst.data;
 
 		int numBands = src.getNumBands();
 
-		int srcStride = src.getScanlineStride();
+		int srcStride = stride(src);
 		int srcOffset = getOffset(src);
-		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+		int srcStrideDiff = srcStride-src.getNumDataElements()*dst.width;
 
 		if (numBands == 3) {
 			from_3BU8_to_F32(dst, srcData, data, srcOffset, srcStrideDiff);
@@ -114,6 +119,13 @@ public class ConvertRaster {
 		} else {
 			throw new RuntimeException("Write more code here.");
 		}
+	}
+
+	private static int stride( WritableRaster raster ) {
+		while( raster.getWritableParent() != null ) {
+			raster = raster.getWritableParent();
+		}
+		return raster.getWidth()*raster.getNumDataElements();
 	}
 
 	/**
@@ -1979,27 +1991,45 @@ public class ConvertRaster {
 		}
 	}
 
-	private static int getOffset( ByteComponentRaster raster ) {
-		int min = Integer.MAX_VALUE;
-		for (int i = 0; i < raster.getNumDataElements(); i++) {
-			min = Math.min(raster.getDataOffset(i),min);
+	private static int getOffset( WritableRaster raster ) {
+
+		if( raster.getWritableParent() == null )
+			return 0;
+
+		try {
+			Method m = raster.getClass().getMethod("getDataOffset",int.class);
+			int min = Integer.MAX_VALUE;
+			for (int i = 0; i < raster.getNumDataElements(); i++) {
+				min = Math.min(min,(Integer)m.invoke(raster,i));
+			}
+			return min;
+
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+			throw new IllegalArgumentException("BufferedImage subimages are not supported in Java 9 and beyond");
 		}
-		return min;
 	}
 
-	private static int getOffset( IntegerInterleavedRaster raster ) {
-		int min = Integer.MAX_VALUE;
-		for (int i = 0; i < raster.getNumDataElements(); i++) {
-			min = Math.min(raster.getDataOffset(i),min);
-		}
-		return min;
-	}
-
-	private static int getOffset( ShortInterleavedRaster raster ) {
-		int min = Integer.MAX_VALUE;
-		for (int i = 0; i < raster.getNumDataElements(); i++) {
-			min = Math.min(raster.getDataOffset(i),min);
-		}
-		return min;
-	}
+//	private static int getOffset( ByteComponentRaster raster ) {
+//		int min = Integer.MAX_VALUE;
+//		for (int i = 0; i < raster.getNumDataElements(); i++) {
+//			min = Math.min(raster.getDataOffset(i),min);
+//		}
+//		return min;
+//	}
+//
+//	private static int getOffset( IntegerInterleavedRaster raster ) {
+//		int min = Integer.MAX_VALUE;
+//		for (int i = 0; i < raster.getNumDataElements(); i++) {
+//			min = Math.min(raster.getDataOffset(i),min);
+//		}
+//		return min;
+//	}
+//
+//	private static int getOffset( ShortInterleavedRaster raster ) {
+//		int min = Integer.MAX_VALUE;
+//		for (int i = 0; i < raster.getNumDataElements(); i++) {
+//			min = Math.min(raster.getDataOffset(i),min);
+//		}
+//		return min;
+//	}
 }

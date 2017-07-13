@@ -128,7 +128,6 @@ public class ConvertBufferedImage {
 
 			InterleavedU8 ret = new InterleavedU8();
 
-			ret.subImage = true;
 			ret.width = img.getWidth();
 			ret.height = img.getHeight();
 			ret.startIndex = raster.getDataOffset(0)-raster.getPixelStride()+1;
@@ -136,6 +135,7 @@ public class ConvertBufferedImage {
 			ret.numBands = raster.getNumBands();
 			ret.stride = raster.getScanlineStride();
 			ret.data = raster.getDataStorage();
+			ret.subImage = ret.startIndex != 0;
 
 			return ret;
 		}
@@ -369,9 +369,10 @@ public class ConvertBufferedImage {
 		}
 
 		try {
-			if (src.getRaster() instanceof ByteInterleavedRaster ) {
+			DataBuffer buff = src.getRaster().getDataBuffer();
+			if (buff.getDataType() == DataBuffer.TYPE_BYTE ) {
 				if( src.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
-					ConvertRaster.bufferedToGray((ByteInterleavedRaster) src.getRaster(), dst);
+					ConvertRaster.bufferedToGray((DataBufferByte)buff,src.getRaster(), dst);
 				} else {
 					ConvertRaster.bufferedToGray(src, dst);
 				}
@@ -434,9 +435,11 @@ public class ConvertBufferedImage {
 		}
 
 		try {
-			if (src.getRaster() instanceof ByteInterleavedRaster ) {
+			DataBuffer buff = src.getRaster().getDataBuffer();
+
+			if ( buff.getDataType() == DataBuffer.TYPE_BYTE ) {
 				if( src.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
-					ConvertRaster.bufferedToGray((ByteInterleavedRaster) src.getRaster(), dst);
+					ConvertRaster.bufferedToGray((DataBufferByte)buff,src.getRaster(), dst);
 				} else {
 					ConvertRaster.bufferedToGray(src, dst);
 				}

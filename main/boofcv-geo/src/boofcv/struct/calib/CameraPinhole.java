@@ -18,8 +18,6 @@
 
 package boofcv.struct.calib;
 
-import java.io.Serializable;
-
 /**
  * <p>
  * Intrinsic camera parameters for a pinhole camera.  Specifies the calibration
@@ -34,7 +32,7 @@ import java.io.Serializable;
  *
  * @author Peter Abeles
  */
-public class CameraPinhole extends CameraModel implements Serializable {
+public class CameraPinhole extends CameraModel {
 
 	// serialization version
 	public static final long serialVersionUID = 1L;

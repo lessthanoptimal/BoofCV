@@ -37,15 +37,19 @@ import java.util.regex.Pattern;
 public class BoofMiscOps {
 
 	/**
-	 * Returns the number of digits in a number
+	 * Returns the number of digits in a number. E.g. 345 = 3, -345 = 4, 0 = 1
 	 */
 	public static int numDigits(int number) {
 		int digits = 1;
-		if (number < 0)
+		if (number < 0) {
 			digits++;
+			number *= -1;
+		}
 
+		number -= number%10;
 		while (number > 0) {
 			number /= 10;
+			number -= number%10;
 			digits++;
 		}
 		return digits;

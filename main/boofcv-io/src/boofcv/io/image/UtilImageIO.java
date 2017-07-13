@@ -194,7 +194,7 @@ public class UtilImageIO {
 	 *                Better performance of type BufferedImage.TYPE_INT_RGB.  If null or width/height incorrect a new image
 	 *                will be declared.
 	 * @return The read in image
-	 * @throws IOException
+	 * @throws IOException Thrown if there is a problem reading the image
 	 */
 	public static BufferedImage loadPPM( String fileName , BufferedImage storage ) throws IOException {
 		return loadPPM(new FileInputStream(fileName),storage);
@@ -207,8 +207,8 @@ public class UtilImageIO {
 	 * @param storage (Optional) Storage for output image.  Must be the width and height of the image being read.
 	 *                Better performance of type BufferedImage.TYPE_BYTE_GRAY.  If null or width/height incorrect a new image
 	 *                will be declared.
-	 * @return The read in image
-	 * @throws IOException
+	 * @return The image
+	 * @throws IOException Thrown if there is a problem reading the image
 	 */
 	public static BufferedImage loadPGM( String fileName , BufferedImage storage ) throws IOException {
 		return loadPGM(new FileInputStream(fileName), storage);
@@ -222,7 +222,7 @@ public class UtilImageIO {
 	 *                Better performance of type BufferedImage.TYPE_INT_RGB.  If null or width/height incorrect a new image
 	 *                will be declared.
 	 * @return The read in image
-	 * @throws IOException
+	 * @throws IOException Thrown if there is a problem reading the image
 	 */
 	public static BufferedImage loadPPM( InputStream inputStream , BufferedImage storage ) throws IOException {
 		DataInputStream in = new DataInputStream(inputStream);
@@ -242,7 +242,7 @@ public class UtilImageIO {
 		int length = w*h*3;
 		byte[] data = new byte[length];
 
-		in.read(data,0,length);
+		read(in,data,length);
 
 		boolean useFailSafe = storage.getType() != BufferedImage.TYPE_INT_RGB;
 		// try using the internal array for better performance
@@ -304,7 +304,7 @@ public class UtilImageIO {
 		int length = w*h;
 		byte[] data = new byte[length];
 
-		in.read(data,0,length);
+		read(in,data,length);
 
 		boolean useFailSafe = storage.getType() != BufferedImage.TYPE_BYTE_GRAY;
 		// try using the internal array for better performance
@@ -346,7 +346,7 @@ public class UtilImageIO {
 	 *                   If null or the number of bands isn't 3, a new instance is declared.
 	 * @param temp (Optional) Used internally to store the image.  Can be null.
 	 * @return The image.
-	 * @throws IOException
+	 * @throws IOException Thrown if there is a problem reading the image
 	 */
 	public static Planar<GrayU8> loadPPM_U8(String fileName , Planar<GrayU8> storage , GrowQueue_I8 temp )
 			throws IOException
@@ -363,7 +363,7 @@ public class UtilImageIO {
 	 *                   If null or the number of bands isn't 3, a new instance is declared.
 	 * @param temp (Optional) Used internally to store the image.  Can be null.
 	 * @return The image.
-	 * @throws IOException
+	 * @throws IOException Thrown if there is a problem reading the image
 	 */
 	public static Planar<GrayU8> loadPPM_U8(InputStream inputStream, Planar<GrayU8> storage , GrowQueue_I8 temp )
 			throws IOException
@@ -390,7 +390,7 @@ public class UtilImageIO {
 		temp.resize(length);
 
 		byte data[] = temp.data;
-		in.read(data,0,length);
+		read(in,data,length);
 
 		GrayU8 band0 = storage.getBand(0);
 		GrayU8 band1 = storage.getBand(1);
@@ -416,7 +416,7 @@ public class UtilImageIO {
 	 * @param storage (Optional) Storage for output image.  Must be the width and height of the image being read.
 	 *                If null a new image will be declared.
 	 * @return The read in image
-	 * @throws IOException
+	 * @throws IOException Thrown if there is a problem reading the image
 	 */
 	public static GrayU8 loadPGM_U8(String fileName , GrayU8 storage )
 			throws IOException
@@ -431,7 +431,7 @@ public class UtilImageIO {
 	 * @param storage (Optional) Storage for output image.  Must be the width and height of the image being read.
 	 *                If null a new image will be declared.
 	 * @return The read in image
-	 * @throws IOException
+	 * @throws IOException Thrown if there is a problem reading the image
 	 */
 	public static GrayU8 loadPGM_U8(InputStream inputStream , GrayU8 storage ) throws IOException {
 		DataInputStream in = new DataInputStream(inputStream);
@@ -448,7 +448,7 @@ public class UtilImageIO {
 		if( storage == null )
 			storage = new GrayU8(w,h);
 
-		in.read(storage.data,0,w*h);
+		read(in,storage.data,w*h);
 
 		return storage;
 	}
@@ -459,7 +459,7 @@ public class UtilImageIO {
 	 * @param rgb 3-band RGB image
 	 * @param fileName Location where the image is to be written to.
 	 * @param temp (Optional) Used internally to store the image.  Can be null.
-	 * @throws IOException
+	 * @throws IOException Thrown if there is a problem reading the image
 	 */
 	public static void savePPM(Planar<GrayU8> rgb , String fileName , GrowQueue_I8 temp ) throws IOException {
 		File out = new File(fileName);
@@ -497,7 +497,7 @@ public class UtilImageIO {
 	 *
 	 * @param gray Gray scale image
 	 * @param fileName Location where the image is to be written to.
-	 * @throws IOException
+	 * @throws IOException Thrown if there is a problem reading the image
 	 */
 	public static void savePGM(GrayU8 gray , String fileName ) throws IOException {
 		File out = new File(fileName);
@@ -520,6 +520,13 @@ public class UtilImageIO {
 				return s;
 			else
 				s += (char)b;
+		}
+	}
+
+	private static void read( DataInputStream in , byte data[], int length ) throws IOException {
+		int total = 0;
+		while( total < length ) {
+			total += in.read(data, total, length-total);
 		}
 	}
 

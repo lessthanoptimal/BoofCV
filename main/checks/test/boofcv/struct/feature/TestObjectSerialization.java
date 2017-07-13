@@ -213,7 +213,9 @@ public class TestObjectSerialization {
 			Object o = ois.readObject();
 			ois.close();
 			return (T)o;
-		} catch( IOException | ClassNotFoundException ignore ) {
+		} catch( IOException | ClassNotFoundException e ) {
+			e.printStackTrace();
+			fail("Failed");
 		}
 		return null;
 	}

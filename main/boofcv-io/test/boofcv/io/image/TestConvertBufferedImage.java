@@ -91,6 +91,7 @@ public class TestConvertBufferedImage {
 		assertEquals(imgHeight, found.height);
 		assertEquals(3, found.numBands);
 		assertEquals(3, found.getImageType().getNumBands());
+		assertFalse(found.isSubimage());
 
 		assertTrue(found.data != null);
 		assertEquals(imgWidth * imgHeight * 3, found.data.length);
@@ -105,6 +106,7 @@ public class TestConvertBufferedImage {
 		assertEquals(5, found.width);
 		assertEquals(6, found.height);
 		assertEquals(3, found.numBands);
+		assertTrue(found.isSubimage());
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -282,6 +284,7 @@ public class TestConvertBufferedImage {
 				origImg = TestConvertRaster.createIntBuff(imgWidth,imgHeight,rand);
 
 			for( int j = 0; j < 2; j++ ) {
+				System.out.println("j = "+j);
 				if( j == 1 ) {
 					origImg = origImg.getSubimage(1,2,imgWidth-1,imgHeight-2);
 				}
