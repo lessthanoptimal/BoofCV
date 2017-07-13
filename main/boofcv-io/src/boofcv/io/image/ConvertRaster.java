@@ -291,14 +291,14 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToMulti_U8(ByteInterleavedRaster src, Planar<GrayU8> dst) {
-		byte[] srcData = src.getDataStorage();
+	public static void bufferedToMulti_U8(DataBufferByte buffer , WritableRaster src, Planar<GrayU8> dst) {
+		byte[] srcData = buffer.getData();
 
 		int numBands = src.getNumBands();
 
-		int srcStride = src.getScanlineStride();
+		int srcStride = stride(src);
 		int srcOffset = getOffset(src);
-		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+		int srcStrideDiff = srcStride-src.getNumDataElements()*dst.width;
 
 		if (numBands == 3) {
 			from_3BU8_to_PLU8(dst, srcData, srcOffset, srcStrideDiff);
@@ -314,14 +314,14 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToMulti_F32(ByteInterleavedRaster src, Planar<GrayF32> dst) {
-		byte[] srcData = src.getDataStorage();
+	public static void bufferedToMulti_F32(DataBufferByte buffer, WritableRaster src, Planar<GrayF32> dst) {
+		byte[] srcData = buffer.getData();
 
 		int numBands = src.getNumBands();
 
-		int srcStride = src.getScanlineStride();
+		int srcStride = stride(src);
 		int srcOffset = getOffset(src);
-		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+		int srcStrideDiff = srcStride-src.getNumDataElements()*dst.width;
 
 		if (numBands == 3) {
 			from_3BU8_to_PLF32(dst, srcData, srcOffset, srcStrideDiff);

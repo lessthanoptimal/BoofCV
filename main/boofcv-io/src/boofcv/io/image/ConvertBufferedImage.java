@@ -492,14 +492,15 @@ public class ConvertBufferedImage {
 			else if( dst.getNumBands() != numBands )
 				dst.setNumberOfBands(numBands);
 
+			DataBuffer srcBuff = src.getRaster().getDataBuffer();
 			if( type == GrayU8.class ) {
-				if (src.getRaster() instanceof ByteInterleavedRaster &&
+				if (srcBuff.getDataType() == DataBuffer.TYPE_BYTE &&
 						src.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 					if( src.getType() == BufferedImage.TYPE_BYTE_GRAY)  {
 						for( int i = 0; i < dst.getNumBands(); i++ )
 							ConvertRaster.bufferedToGray(src, ((Planar<GrayU8>) dst).getBand(i));
 					} else {
-						ConvertRaster.bufferedToMulti_U8((ByteInterleavedRaster) src.getRaster(), (Planar<GrayU8>) dst);
+						ConvertRaster.bufferedToMulti_U8((DataBufferByte)srcBuff, src.getRaster(), (Planar<GrayU8>) dst);
 					}
 				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
 					ConvertRaster.bufferedToMulti_U8((IntegerInterleavedRaster) src.getRaster(), (Planar<GrayU8>) dst);
@@ -507,13 +508,13 @@ public class ConvertBufferedImage {
 					ConvertRaster.bufferedToMulti_U8(src, (Planar<GrayU8>) dst);
 				}
 			} else if( type == GrayF32.class ) {
-				if (src.getRaster() instanceof ByteInterleavedRaster &&
+				if (srcBuff.getDataType() == DataBuffer.TYPE_BYTE &&
 						src.getType() != BufferedImage.TYPE_BYTE_INDEXED  ) {
 					if( src.getType() == BufferedImage.TYPE_BYTE_GRAY)  {
 						for( int i = 0; i < dst.getNumBands(); i++ )
 							ConvertRaster.bufferedToGray(src,((Planar<GrayF32>)dst).getBand(i));
 					} else {
-						ConvertRaster.bufferedToMulti_F32((ByteInterleavedRaster) src.getRaster(), (Planar<GrayF32>) dst);
+						ConvertRaster.bufferedToMulti_F32( (DataBufferByte)srcBuff, src.getRaster(), (Planar<GrayF32>) dst);
 					}
 				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
 					ConvertRaster.bufferedToMulti_F32((IntegerInterleavedRaster) src.getRaster(), (Planar<GrayF32>) dst);
