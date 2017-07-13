@@ -29,6 +29,7 @@ import sun.awt.image.ShortInterleavedRaster;
 import sun.awt.image.SunWritableRaster;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -54,7 +55,7 @@ public class TestConvertRaster {
 	 */
 	@Test
 	public void performTests() {
-		Method methods[] = ConvertRaster.class.getMethods();
+		Method methods[] = ConvertRaster.class.getDeclaredMethods();
 
 		// sanity check to make sure the functions are being found
 		int numFound = 0;
@@ -125,12 +126,15 @@ public class TestConvertRaster {
 	private boolean isTestMethod(Method m) {
 		Class<?> types[] = m.getParameterTypes();
 
-		if (types.length != 2)
-			return false;
-
-		if (ImageBase.class.isAssignableFrom(types[0]) ||
-				ImageBase.class.isAssignableFrom(types[1]))
-			return true;
+		if( types.length == 2 ) { // TODO for old methods before conversion for JDK 9 limitations. Remove later
+			if (ImageBase.class.isAssignableFrom(types[0]) ||
+					ImageBase.class.isAssignableFrom(types[1]))
+				return true;
+		} else if( types.length == 3 ) {
+			if (ImageBase.class.isAssignableFrom(types[0]) ||
+					ImageBase.class.isAssignableFrom(types[2]))
+				return true;
+		}
 
 		return false;
 	}
@@ -194,7 +198,7 @@ public class TestConvertRaster {
 	 */
 	private BufferedImage[] createBufferedTestImages(Class<?> paramType) {
 		BufferedImage[] input;
-		if (paramType == ByteInterleavedRaster.class) {
+		if (paramType == ByteInterleavedRaster.class || paramType == DataBufferByte.class) {
 			// the code is handled different when a different number of channels is used
 			input = new BufferedImage[]{
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR, rand),
