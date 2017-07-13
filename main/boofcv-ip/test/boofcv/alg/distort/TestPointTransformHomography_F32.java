@@ -47,6 +47,6 @@ public class TestPointTransformHomography_F32 {
 		alg.compute(input.x,input.y,output);
 
 		assertEquals(expected.x,output.x,1e-4);
-		assertEquals(expected.y,output.y,1e-4);
+		assertEquals(expected.y, output.y, 1e-4);
 	}
 }

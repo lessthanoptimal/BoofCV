@@ -128,11 +128,13 @@ public class ConvertBufferedImage {
 
 			InterleavedU8 ret = new InterleavedU8();
 
+			ret.subImage = true;
 			ret.width = img.getWidth();
 			ret.height = img.getHeight();
-			ret.stride = raster.getScanlineStride();
 			ret.startIndex = raster.getDataOffset(0)-raster.getPixelStride()+1;
-			ret.setNumBands( raster.getNumBands() );
+			ret.imageType.numBands = raster.getNumBands();
+			ret.numBands = raster.getNumBands();
+			ret.stride = raster.getScanlineStride();
 			ret.data = raster.getDataStorage();
 
 			return ret;

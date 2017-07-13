@@ -41,7 +41,7 @@ public class ImageType<T extends ImageBase> implements Serializable {
 	/**
 	 * Number of bands in the image.  Single band images ignore this field.
 	 */
-	int numBands;
+	public int numBands;
 
 	public ImageType(Family family, ImageDataType dataType, int numBands) {
 		this.family = family;

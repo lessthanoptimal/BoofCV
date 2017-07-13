@@ -36,9 +36,9 @@ public class Autocode64to32App extends RecursiveConvert {
     }
 
     public static void main(String args[] ) {
+        // test directories are automatically added
         String directories[] = new String[]{
                 "main/boofcv-geo/src/boofcv/alg",
-                "main/boofcv-geo/test/boofcv/alg",
                 "main/boofcv-geo/src/boofcv/struct/geo",
                 "main/boofcv-ip/src/boofcv/alg/distort",
                 "main/boofcv-ip/src/boofcv/struct/distort",
@@ -69,6 +69,9 @@ public class Autocode64to32App extends RecursiveConvert {
         Autocode64to32App app = new Autocode64to32App(converter);
         for( String dir : directories ) {
             app.process(new File(dir) );
+            if( dir.contains("/src/")) {
+                app.process(new File(dir.replace("/src/","/test/")) );
+            }
         }
     }
 }

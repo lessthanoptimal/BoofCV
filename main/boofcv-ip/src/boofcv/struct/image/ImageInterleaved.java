@@ -165,7 +165,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 
 		Object data = _getData();
 
-		if( Array.getLength(data) < width*height*numBands ) {
+		if( data == null || Array.getLength(data) < width*height*numBands ) {
 			ImageInterleaved<?> a = createNew(width,height);
 			_setData(a._getData());
 		}
