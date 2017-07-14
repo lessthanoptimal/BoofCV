@@ -19,14 +19,10 @@
 package boofcv.io.image;
 
 import boofcv.struct.image.*;
-import sun.awt.image.IntegerInterleavedRaster;
 import sun.awt.image.ShortInterleavedRaster;
 import sun.awt.image.SunWritableRaster;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.WritableRaster;
+import java.awt.image.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -544,14 +540,14 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	static void bufferedToGray(IntegerInterleavedRaster src, GrayU8 dst) {
-		int[] srcData = src.getDataStorage();
+	static void bufferedToGray(DataBufferInt buffer, WritableRaster src, GrayU8 dst) {
+		int[] srcData = buffer.getData();
 
 		byte[] data = dst.data;
 
-		int srcStride = src.getScanlineStride();
+		int srcStride = stride(src);
 		int srcOffset = getOffset(src);
-		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+		int srcStrideDiff = srcStride-src.getNumDataElements()*dst.width;
 
 		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
@@ -575,14 +571,14 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	static void bufferedToGray(IntegerInterleavedRaster src, GrayF32 dst) {
-		int[] srcData = src.getDataStorage();
+	static void bufferedToGray(DataBufferInt buffer, WritableRaster src, GrayF32 dst) {
+		int[] srcData = buffer.getData();
 
 		float[] data = dst.data;
 
-		int srcStride = src.getScanlineStride();
+		int srcStride = stride(src);
 		int srcOffset = getOffset(src);
-		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+		int srcStrideDiff = srcStride-src.getNumDataElements()*dst.width;
 
 		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
@@ -606,12 +602,12 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	static void bufferedToMulti_U8(IntegerInterleavedRaster src, Planar<GrayU8> dst) {
-		int[] srcData = src.getDataStorage();
+	static void bufferedToMulti_U8(DataBufferInt buffer, WritableRaster src, Planar<GrayU8> dst) {
+		int[] srcData = buffer.getData();
 
-		int srcStride = src.getScanlineStride();
+		int srcStride = stride(src);
 		int srcOffset = getOffset(src);
-		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+		int srcStrideDiff = srcStride-src.getNumDataElements()*dst.width;
 
 		int numBands = src.getNumBands();
 		byte[] data1 = dst.getBand(0).data;
@@ -657,12 +653,12 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	static void bufferedToMulti_F32(IntegerInterleavedRaster src, Planar<GrayF32> dst) {
-		int[] srcData = src.getDataStorage();
+	static void bufferedToMulti_F32(DataBufferInt buffer, WritableRaster src, Planar<GrayF32> dst) {
+		int[] srcData = buffer.getData();
 
-		int srcStride = src.getScanlineStride();
+		int srcStride = stride(src);
 		int srcOffset = getOffset(src);
-		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+		int srcStrideDiff = srcStride-src.getNumDataElements()*dst.width;
 
 		float[] data1 = dst.getBand(0).data;
 		float[] data2 = dst.getBand(1).data;
@@ -709,12 +705,12 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	static void bufferedToInterleaved(IntegerInterleavedRaster src, InterleavedU8 dst) {
-		int[] srcData = src.getDataStorage();
+	static void bufferedToInterleaved(DataBufferInt buffer, WritableRaster src, InterleavedU8 dst) {
+		int[] srcData = buffer.getData();
 
-		int srcStride = src.getScanlineStride();
+		int srcStride = stride(src);
 		int srcOffset = getOffset(src);
-		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+		int srcStrideDiff = srcStride-src.getNumDataElements()*dst.width;
 
 		int numBands = src.getNumBands();
 		if( numBands == 3 ) {
@@ -752,12 +748,12 @@ public class ConvertRaster {
 		}
 	}
 
-	static void bufferedToInterleaved(IntegerInterleavedRaster src, InterleavedF32 dst ) {
-		int[] srcData = src.getDataStorage();
+	static void bufferedToInterleaved(DataBufferInt buffer, WritableRaster src, InterleavedF32 dst ) {
+		int[] srcData = buffer.getData();
 
-		int srcStride = src.getScanlineStride();
+		int srcStride = stride(src);
 		int srcOffset = getOffset(src);
-		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+		int srcStrideDiff = srcStride-src.getNumDataElements()*dst.width;
 
 		int indexSrc = srcOffset;
 		int numBands = src.getNumBands();
@@ -1449,10 +1445,10 @@ public class ConvertRaster {
 		}
 	}
 
-	static void grayToBuffered(GrayU8 src, IntegerInterleavedRaster dst) {
+	static void grayToBuffered(GrayU8 src, DataBufferInt buffer, WritableRaster dst) {
 
 		final byte[] srcData = src.data;
-		final int[] dstData = dst.getDataStorage();
+		final int[] dstData = buffer.getData();
 
 		final int numBands = dst.getNumBands();
 
@@ -1483,9 +1479,9 @@ public class ConvertRaster {
 		}
 	}
 
-	static void grayToBuffered(GrayI16 src, IntegerInterleavedRaster dst) {
+	static void grayToBuffered(GrayI16 src, DataBufferInt buffer, WritableRaster dst) {
 		final short[] srcData = src.data;
-		final int[] dstData = dst.getDataStorage();
+		final int[] dstData = buffer.getData();
 
 		final int numBands = dst.getNumBands();
 
@@ -1516,9 +1512,9 @@ public class ConvertRaster {
 		}
 	}
 
-	static void grayToBuffered(GrayF32 src, IntegerInterleavedRaster dst) {
+	static void grayToBuffered(GrayF32 src, DataBufferInt buffer, WritableRaster dst) {
 		final float[] srcData = src.data;
-		final int[] dstData = dst.getDataStorage();
+		final int[] dstData = buffer.getData();
 
 		final int numBands = dst.getNumBands();
 
@@ -1549,12 +1545,12 @@ public class ConvertRaster {
 		}
 	}
 
-	static void multToBuffered_U8(Planar<GrayU8> src, IntegerInterleavedRaster dst) {
+	static void multToBuffered_U8(Planar<GrayU8> src, DataBufferInt buffer, WritableRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
 
-		final int[] dstData = dst.getDataStorage();
+		final int[] dstData = buffer.getData();
 
 		final int numBands = dst.getNumBands();
 
@@ -1596,12 +1592,12 @@ public class ConvertRaster {
 		}
 	}
 
-	static void multToBuffered_F32(Planar<GrayF32> src, IntegerInterleavedRaster dst) {
+	static void multToBuffered_F32(Planar<GrayF32> src, DataBufferInt buffer, WritableRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
 
-		final int[] dstData = dst.getDataStorage();
+		final int[] dstData = buffer.getData();
 
 		final int numBands = dst.getNumBands();
 
@@ -1754,15 +1750,15 @@ public class ConvertRaster {
 		}
 	}
 
-	static void interleavedToBuffered(InterleavedU8 src, IntegerInterleavedRaster dst) {
+	static void interleavedToBuffered(InterleavedU8 src, DataBufferInt buffer, WritableRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
 
-		final int[] dstData = dst.getDataStorage();
+		final int[] dstData = buffer.getData();
 
 		final int numBands = dst.getNumBands();
-		int dstStride = dst.getScanlineStride();
+		int dstStride = stride(dst);
 		int dstOffset = getOffset(dst);
 
 		if (numBands == 3) {
@@ -1843,15 +1839,15 @@ public class ConvertRaster {
 		}
 	}
 
-	static void interleavedToBuffered(InterleavedF32 src, IntegerInterleavedRaster dst) {
+	static void interleavedToBuffered(InterleavedF32 src, DataBufferInt buffer, WritableRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
 
-		final int[] dstData = dst.getDataStorage();
+		final int[] dstData = buffer.getData();
 
 		final int numBands = dst.getNumBands();
-		int dstStride = dst.getScanlineStride();
+		int dstStride = stride(dst);
 		int dstOffset = getOffset(dst);
 
 		if (numBands == 3) {

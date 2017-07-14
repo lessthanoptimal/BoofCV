@@ -23,14 +23,10 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
-import sun.awt.image.IntegerInterleavedRaster;
 import sun.awt.image.ShortInterleavedRaster;
 import sun.awt.image.SunWritableRaster;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.Raster;
+import java.awt.image.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
@@ -208,7 +204,7 @@ public class TestConvertRaster {
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR, rand),
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_4BYTE_ABGR, rand),
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_BYTE_GRAY, rand)};
-		} else if (paramType == IntegerInterleavedRaster.class) {
+		} else if (paramType == DataBufferInt.class) {
 			input = new BufferedImage[]{
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB, rand),
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_BGR, rand),

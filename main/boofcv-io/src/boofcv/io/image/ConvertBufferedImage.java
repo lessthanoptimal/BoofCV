@@ -20,7 +20,6 @@ package boofcv.io.image;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
-import sun.awt.image.IntegerInterleavedRaster;
 import sun.awt.image.ShortInterleavedRaster;
 import sun.awt.image.SunWritableRaster;
 
@@ -378,8 +377,8 @@ public class ConvertBufferedImage {
 				} else {
 					ConvertRaster.bufferedToGray(src, dst);
 				}
-			} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
-				ConvertRaster.bufferedToGray((IntegerInterleavedRaster) src.getRaster(), dst);
+			} else if (buff.getDataType() == DataBuffer.TYPE_INT) {
+				ConvertRaster.bufferedToGray((DataBufferInt)buff,src.getRaster(), dst);
 			} else if( src.getRaster().getClass() == SunWritableRaster.class ) {
 				ConvertRaster.bufferedToGray((SunWritableRaster) src.getRaster(), dst);
 			} else {
@@ -445,8 +444,8 @@ public class ConvertBufferedImage {
 				} else {
 					ConvertRaster.bufferedToGray(src, dst);
 				}
-			} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
-				ConvertRaster.bufferedToGray((IntegerInterleavedRaster) src.getRaster(), dst);
+			} else if (buff.getDataType() == DataBuffer.TYPE_INT) {
+				ConvertRaster.bufferedToGray((DataBufferInt)buff, src.getRaster(), dst);
 			} else if( src.getRaster().getClass() == SunWritableRaster.class ) {
 				ConvertRaster.bufferedToGray((SunWritableRaster) src.getRaster(), dst);
 			} else {
@@ -504,8 +503,8 @@ public class ConvertBufferedImage {
 					} else {
 						ConvertRaster.bufferedToMulti_U8((DataBufferByte)srcBuff, src.getRaster(), (Planar<GrayU8>) dst);
 					}
-				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
-					ConvertRaster.bufferedToMulti_U8((IntegerInterleavedRaster) src.getRaster(), (Planar<GrayU8>) dst);
+				} else if (srcBuff.getDataType() == DataBuffer.TYPE_INT) {
+					ConvertRaster.bufferedToMulti_U8((DataBufferInt)srcBuff, src.getRaster(), (Planar<GrayU8>) dst);
 				} else {
 					ConvertRaster.bufferedToMulti_U8(src, (Planar<GrayU8>) dst);
 				}
@@ -518,8 +517,8 @@ public class ConvertBufferedImage {
 					} else {
 						ConvertRaster.bufferedToMulti_F32( (DataBufferByte)srcBuff, src.getRaster(), (Planar<GrayF32>) dst);
 					}
-				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
-					ConvertRaster.bufferedToMulti_F32((IntegerInterleavedRaster) src.getRaster(), (Planar<GrayF32>) dst);
+				} else if (srcBuff.getDataType() == DataBuffer.TYPE_INT) {
+					ConvertRaster.bufferedToMulti_F32((DataBufferInt)srcBuff, src.getRaster(), (Planar<GrayF32>) dst);
 				} else {
 					ConvertRaster.bufferedToMulti_F32(src, (Planar<GrayF32>) dst);
 				}
@@ -594,8 +593,8 @@ public class ConvertBufferedImage {
 					} else {
 						ConvertRaster.bufferedToInterleaved(src, (InterleavedU8) dst);
 					}
-				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
-					ConvertRaster.bufferedToInterleaved((IntegerInterleavedRaster) src.getRaster(), (InterleavedU8) dst);
+				} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
+					ConvertRaster.bufferedToInterleaved((DataBufferInt)buffer, src.getRaster(), (InterleavedU8) dst);
 				} else if (src.getRaster() instanceof SunWritableRaster) {
 					ConvertRaster.bufferedToInterleaved((SunWritableRaster) src.getRaster(), (InterleavedU8) dst);
 				} else {
@@ -612,8 +611,8 @@ public class ConvertBufferedImage {
 					} else {
 						ConvertRaster.bufferedToInterleaved(src, (InterleavedF32) dst);
 					}
-				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
-					ConvertRaster.bufferedToInterleaved((IntegerInterleavedRaster) src.getRaster(), (InterleavedF32) dst);
+				} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
+					ConvertRaster.bufferedToInterleaved((DataBufferInt)buffer, src.getRaster(), (InterleavedF32) dst);
 				} else if (src.getRaster() instanceof SunWritableRaster) {
 					ConvertRaster.bufferedToInterleaved((SunWritableRaster) src.getRaster(), (InterleavedF32) dst);
 				} else {
@@ -711,7 +710,7 @@ public class ConvertBufferedImage {
 					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 				ConvertRaster.grayToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
 			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-				ConvertRaster.grayToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
+				ConvertRaster.grayToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
 			} else {
 				ConvertRaster.grayToBuffered(src, dst);
 			}
@@ -741,7 +740,7 @@ public class ConvertBufferedImage {
 					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 				ConvertRaster.grayToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
 			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-				ConvertRaster.grayToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
+				ConvertRaster.grayToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
 			} else if( dst.getType() == BufferedImage.TYPE_USHORT_GRAY ) {
 				ConvertRaster.grayToBuffered(src, (ShortInterleavedRaster) dst.getRaster());
 			} else {
@@ -774,7 +773,7 @@ public class ConvertBufferedImage {
 					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 				ConvertRaster.grayToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
 			} else if ( buffer.getDataType() == DataBuffer.TYPE_INT ) {
-				ConvertRaster.grayToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
+				ConvertRaster.grayToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
 			} else {
 				ConvertRaster.grayToBuffered(src, dst);
 			}
@@ -809,7 +808,7 @@ public class ConvertBufferedImage {
 					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 				ConvertRaster.multToBuffered_U8(src, (DataBufferByte)buffer, dst.getRaster());
 			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-				ConvertRaster.multToBuffered_U8(src, (IntegerInterleavedRaster) dst.getRaster());
+				ConvertRaster.multToBuffered_U8(src, (DataBufferInt)buffer, dst.getRaster());
 			} else {
 				ConvertRaster.multToBuffered_U8(src, dst);
 			}
@@ -844,7 +843,7 @@ public class ConvertBufferedImage {
 					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 				ConvertRaster.multToBuffered_F32(src, (DataBufferByte)buffer, dst.getRaster());
 			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-				ConvertRaster.multToBuffered_F32(src, (IntegerInterleavedRaster) dst.getRaster());
+				ConvertRaster.multToBuffered_F32(src, (DataBufferInt)buffer, dst.getRaster());
 			} else {
 				ConvertRaster.multToBuffered_F32(src, dst);
 			}
@@ -868,9 +867,9 @@ public class ConvertBufferedImage {
 				if( orderRgb )
 					orderBandsBufferedFromRGB((DataBufferByte)buffer, dst.getRaster(),dst.getType());
 			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-				ConvertRaster.interleavedToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
+				ConvertRaster.interleavedToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
 				if( orderRgb )
-					orderBandsBufferedFromRGB((IntegerInterleavedRaster) dst.getRaster(), dst.getType());
+					orderBandsBufferedFromRGB((DataBufferInt)buffer, dst.getRaster(), dst.getType());
 			} else {
 				ConvertRaster.interleavedToBuffered(src, dst);
 			}
@@ -894,9 +893,9 @@ public class ConvertBufferedImage {
 				if( orderRgb )
 					orderBandsBufferedFromRGB((DataBufferByte)buffer, dst.getRaster(),dst.getType());
 			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-				ConvertRaster.interleavedToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
+				ConvertRaster.interleavedToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
 				if( orderRgb )
-					orderBandsBufferedFromRGB((IntegerInterleavedRaster) dst.getRaster(), dst.getType());
+					orderBandsBufferedFromRGB((DataBufferInt)buffer, dst.getRaster(), dst.getType());
 			} else {
 				ConvertRaster.interleavedToBuffered(src, dst);
 			}
@@ -1018,15 +1017,15 @@ public class ConvertBufferedImage {
 	 * The image the BufferedImage was created from had RGB or RGBA color order.  This swaps the bytes around
 	 * to put it into the expected local format
 	 */
-	public static void orderBandsBufferedFromRGB( IntegerInterleavedRaster raster , int type ) {
+	public static void orderBandsBufferedFromRGB( DataBufferInt buffer, WritableRaster raster , int type ) {
 		if( BufferedImage.TYPE_INT_RGB == type )
 			return;
 
 		int height = raster.getHeight();
 		int width = raster.getWidth();
-		int stride = raster.getScanlineStride();
-		int offset = raster.getDataOffset(0)-raster.getPixelStride()+1;
-		int data[] = raster.getDataStorage();
+		int stride = ConvertRaster.stride(raster);
+		int offset = ConvertRaster.getOffset(raster);
+		int data[] = buffer.getData();
 
 		if( BufferedImage.TYPE_INT_BGR == type ) {
 			for (int y = 0; y < height; y++) {

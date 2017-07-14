@@ -47,6 +47,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// TODO is there some way to change accessors to go use the image standard col,row instead of matrix row,col?
+	// do this without breaking code silently? deprecate?
 public class DescribeDenseHogFastAlg<Input extends ImageBase<Input>> extends BaseDenseHog<Input> {
 
 
