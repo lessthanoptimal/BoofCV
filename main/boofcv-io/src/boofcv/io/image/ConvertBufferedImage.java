@@ -20,7 +20,6 @@ package boofcv.io.image;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
-import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 import sun.awt.image.ShortInterleavedRaster;
 import sun.awt.image.SunWritableRaster;
@@ -36,7 +35,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("Duplicates")
+@SuppressWarnings({"Duplicates", "unchecked"})
 public class ConvertBufferedImage {
 
 	/**
@@ -123,19 +122,20 @@ public class ConvertBufferedImage {
 	 */
 	public static InterleavedU8 extractInterleavedU8(BufferedImage img) {
 
-		if (img.getRaster() instanceof ByteInterleavedRaster &&
+		DataBuffer buffer = img.getRaster().getDataBuffer();
+		if (buffer.getDataType() == DataBuffer.TYPE_BYTE &&
 				img.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
-			ByteInterleavedRaster raster = (ByteInterleavedRaster) img.getRaster();
+			WritableRaster raster = img.getRaster();
 
 			InterleavedU8 ret = new InterleavedU8();
 
 			ret.width = img.getWidth();
 			ret.height = img.getHeight();
-			ret.startIndex = raster.getDataOffset(0)-raster.getPixelStride()+1;
+			ret.startIndex = ConvertRaster.getOffset(raster);
 			ret.imageType.numBands = raster.getNumBands();
 			ret.numBands = raster.getNumBands();
-			ret.stride = raster.getScanlineStride();
-			ret.data = raster.getDataStorage();
+			ret.stride = ConvertRaster.stride(raster);
+			ret.data = ((DataBufferByte)buffer).getData();
 			ret.subImage = ret.startIndex != 0;
 
 			return ret;
@@ -153,19 +153,20 @@ public class ConvertBufferedImage {
 	 * @return An image whose internal data is the same as the input image.
 	 */
 	public static GrayU8 extractGrayU8(BufferedImage img) {
-		if (img.getRaster() instanceof ByteInterleavedRaster &&
+		WritableRaster raster = img.getRaster();
+		DataBuffer buffer = raster.getDataBuffer();
+		if (buffer.getDataType() == DataBuffer.TYPE_BYTE &&
 				img.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 
-			ByteInterleavedRaster raster = (ByteInterleavedRaster) img.getRaster();
 			if (raster.getNumBands() != 1)
 				throw new IllegalArgumentException("Input image has more than one channel");
 			GrayU8 ret = new GrayU8();
 
 			ret.width = img.getWidth();
 			ret.height = img.getHeight();
-			ret.startIndex = raster.getDataOffset(0);
-			ret.stride = raster.getScanlineStride();
-			ret.data = raster.getDataStorage();
+			ret.startIndex = ConvertRaster.getOffset(img.getRaster());
+			ret.stride = ConvertRaster.stride(img.getRaster());
+			ret.data = ((DataBufferByte)buffer).getData();
 
 			return ret;
 		}
@@ -802,11 +803,12 @@ public class ConvertBufferedImage {
 			src = orderBandsIntoBuffered(src, dst);
 		}
 
+		DataBuffer buffer = dst.getRaster().getDataBuffer();
 		try {
-			if (dst.getRaster() instanceof ByteInterleavedRaster &&
+			if (buffer.getDataType() == DataBuffer.TYPE_BYTE &&
 					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
-				ConvertRaster.multToBuffered_U8(src, (ByteInterleavedRaster) dst.getRaster());
-			} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
+				ConvertRaster.multToBuffered_U8(src, (DataBufferByte)buffer, dst.getRaster());
+			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
 				ConvertRaster.multToBuffered_U8(src, (IntegerInterleavedRaster) dst.getRaster());
 			} else {
 				ConvertRaster.multToBuffered_U8(src, dst);
@@ -836,11 +838,12 @@ public class ConvertBufferedImage {
 			src = orderBandsIntoBuffered(src, dst);
 		}
 
+		DataBuffer buffer = dst.getRaster().getDataBuffer();
 		try {
-			if (dst.getRaster() instanceof ByteInterleavedRaster &&
+			if (buffer.getDataType() == DataBuffer.TYPE_BYTE &&
 					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
-				ConvertRaster.multToBuffered_F32(src, (ByteInterleavedRaster) dst.getRaster());
-			} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
+				ConvertRaster.multToBuffered_F32(src, (DataBufferByte)buffer, dst.getRaster());
+			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
 				ConvertRaster.multToBuffered_F32(src, (IntegerInterleavedRaster) dst.getRaster());
 			} else {
 				ConvertRaster.multToBuffered_F32(src, dst);
@@ -857,13 +860,14 @@ public class ConvertBufferedImage {
 	public static BufferedImage convertTo( InterleavedU8 src, BufferedImage dst, boolean orderRgb ) {
 		dst = checkInputs(src, dst);
 
+		DataBuffer buffer = dst.getRaster().getDataBuffer();
 		try {
-			if (dst.getRaster() instanceof ByteInterleavedRaster &&
+			if (buffer.getDataType() == DataBuffer.TYPE_BYTE &&
 					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
-				ConvertRaster.interleavedToBuffered(src, (ByteInterleavedRaster) dst.getRaster());
+				ConvertRaster.interleavedToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
 				if( orderRgb )
-					orderBandsBufferedFromRGB((ByteInterleavedRaster)dst.getRaster(),dst.getType());
-			} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
+					orderBandsBufferedFromRGB((DataBufferByte)buffer, dst.getRaster(),dst.getType());
+			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
 				ConvertRaster.interleavedToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
 				if( orderRgb )
 					orderBandsBufferedFromRGB((IntegerInterleavedRaster) dst.getRaster(), dst.getType());
@@ -882,13 +886,14 @@ public class ConvertBufferedImage {
 	public static BufferedImage convertTo( InterleavedF32 src, BufferedImage dst, boolean orderRgb ) {
 		dst = checkInputs(src, dst);
 
+		DataBuffer buffer = dst.getRaster().getDataBuffer();
 		try {
-			if (dst.getRaster() instanceof ByteInterleavedRaster &&
+			if (buffer.getDataType() == DataBuffer.TYPE_BYTE &&
 					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
-				ConvertRaster.interleavedToBuffered(src, (ByteInterleavedRaster) dst.getRaster());
+				ConvertRaster.interleavedToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
 				if( orderRgb )
-					orderBandsBufferedFromRGB((ByteInterleavedRaster)dst.getRaster(),dst.getType());
-			} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
+					orderBandsBufferedFromRGB((DataBufferByte)buffer, dst.getRaster(),dst.getType());
+			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
 				ConvertRaster.interleavedToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
 				if( orderRgb )
 					orderBandsBufferedFromRGB((IntegerInterleavedRaster) dst.getRaster(), dst.getType());
@@ -974,12 +979,12 @@ public class ConvertBufferedImage {
 	 * The image the BufferedImage was created from had RGB or RGBA color order.  This swaps the bytes around
 	 * to put it into the expected local format
 	 */
-	public static void orderBandsBufferedFromRGB( ByteInterleavedRaster raster , int type ) {
+	public static void orderBandsBufferedFromRGB( DataBufferByte buffer , WritableRaster raster , int type ) {
 		int height = raster.getHeight();
 		int width = raster.getWidth();
-		int stride = raster.getScanlineStride();
-		int offset = raster.getDataOffset(0)-raster.getPixelStride()+1;
-		byte data[] = raster.getDataStorage();
+		int stride = ConvertRaster.stride(raster);
+		int offset = ConvertRaster.getOffset(raster);
+		byte data[] = buffer.getData();
 
 		if( BufferedImage.TYPE_3BYTE_BGR == type ) {
 			for (int y = 0; y < height; y++) {
@@ -1266,29 +1271,15 @@ public class ConvertBufferedImage {
 	}
 
 	private static boolean swapBandOrder(BufferedImage input) {
-		boolean swap = false;
-
 		// see if access to the raster is restricted or not
-		try {
-			WritableRaster raster = input.getRaster();
-			if( raster instanceof ByteInterleavedRaster) {
-				((ByteInterleavedRaster)raster).getDataStorage();
-			} else if( raster instanceof IntegerInterleavedRaster) {
-				((IntegerInterleavedRaster)raster).getDataStorage();
-			}
-
-			int bufferedImageType = input.getType();
-			if( bufferedImageType == BufferedImage.TYPE_3BYTE_BGR ||
-					bufferedImageType == BufferedImage.TYPE_INT_BGR ||
-					bufferedImageType == BufferedImage.TYPE_INT_ARGB ||
-					bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR ) {
-				swap = true;
-			}
-		} catch( java.security.AccessControlException e) {
-			// its in an applet or something and will need to use getRGB() to read/write from the image
-			// so no need to re-order the bands
+		int bufferedImageType = input.getType();
+		if( bufferedImageType == BufferedImage.TYPE_3BYTE_BGR ||
+				bufferedImageType == BufferedImage.TYPE_INT_BGR ||
+				bufferedImageType == BufferedImage.TYPE_INT_ARGB ||
+				bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR ) {
+			return true;
 		}
-		return swap;
+		return false;
 	}
 
 	/**

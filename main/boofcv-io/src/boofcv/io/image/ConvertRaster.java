@@ -19,7 +19,6 @@
 package boofcv.io.image;
 
 import boofcv.struct.image.*;
-import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 import sun.awt.image.ShortInterleavedRaster;
 import sun.awt.image.SunWritableRaster;
@@ -122,7 +121,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static int stride( WritableRaster raster ) {
+	static int stride( WritableRaster raster ) {
 		while( raster.getWritableParent() != null ) {
 			raster = raster.getWritableParent();
 		}
@@ -1326,12 +1325,12 @@ public class ConvertRaster {
 		}
 	}
 
-	static void multToBuffered_U8(Planar<GrayU8> src, ByteInterleavedRaster dst) {
+	static void multToBuffered_U8(Planar<GrayU8> src, DataBufferByte buffer , WritableRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
 
-		final byte[] dstData = dst.getDataStorage();
+		final byte[] dstData = buffer.getData();
 
 		final int numBands = dst.getNumBands();
 
@@ -1382,18 +1381,18 @@ public class ConvertRaster {
 
 				for (; indexSrc < indexSrcEnd; indexSrc++) {
 					for (int i = 0; i < numBands; i++)
-						dstData[indexDst++] = (byte) bands[i][indexSrc];
+						dstData[indexDst++] = bands[i][indexSrc];
 				}
 			}
 		}
 	}
 
-	static void multToBuffered_F32(Planar<GrayF32> src, ByteInterleavedRaster dst) {
+	static void multToBuffered_F32(Planar<GrayF32> src, DataBufferByte buffer , WritableRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
 
-		final byte[] dstData = dst.getDataStorage();
+		final byte[] dstData = buffer.getData();
 
 		final int numBands = dst.getNumBands();
 
@@ -1800,17 +1799,17 @@ public class ConvertRaster {
 		}
 	}
 
-	static void interleavedToBuffered(InterleavedU8 src, ByteInterleavedRaster dst) {
+	static void interleavedToBuffered(InterleavedU8 src, DataBufferByte buffer , WritableRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
 
-		final byte[] dstData = dst.getDataStorage();
+		final byte[] dstData = buffer.getData();
 
 		final int numBands = dst.getNumBands();
 		final int length = src.width*numBands;
 
-		int dstStride = dst.getScanlineStride();
+		int dstStride = stride(dst);
 		int dstOffset = getOffset(dst);
 
 		for (int y = 0; y < src.height; y++) {
@@ -1889,17 +1888,17 @@ public class ConvertRaster {
 		}
 	}
 
-	static void interleavedToBuffered(InterleavedF32 src, ByteInterleavedRaster dst) {
+	static void interleavedToBuffered(InterleavedF32 src, DataBufferByte buffer , WritableRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
 
-		final byte[] dstData = dst.getDataStorage();
+		final byte[] dstData = buffer.getData();
 
 		final int numBands = dst.getNumBands();
 		final int length = src.width*numBands;
 
-		int dstStride = dst.getScanlineStride();
+		int dstStride = stride(dst);
 		int dstOffset = getOffset(dst);
 
 		for (int y = 0; y < src.height; y++) {
@@ -1936,7 +1935,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static int getOffset( WritableRaster raster ) {
+	public static int getOffset( WritableRaster raster ) {
 
 		if( raster.getWritableParent() == null )
 			return 0;

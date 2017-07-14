@@ -23,12 +23,12 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
-import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 import sun.awt.image.ShortInterleavedRaster;
 import sun.awt.image.SunWritableRaster;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.lang.reflect.InvocationTargetException;
@@ -48,7 +48,7 @@ public class TestConvertRaster {
 	int imgWidth = 10;
 	int imgHeight = 20;
 
-	int numMethods = 50;
+	int numMethods = 48;
 
 	/**
 	 * Use reflections to test all the functions.
@@ -136,6 +136,9 @@ public class TestConvertRaster {
 				return true;
 		}
 
+//		if( m.getName().contains("bufferedTo") || m.getName().contains("ToBuffered"))
+//			throw new RuntimeException("Egads");
+
 		return false;
 	}
 
@@ -153,13 +156,14 @@ public class TestConvertRaster {
 
 		for (int i = 0; i < input.length; i++) {
 			// regular image
-			ImageBase output = createImage(m, paramTypes[1], input[i]);
+			Class imageType = paramTypes.length == 2 ? paramTypes[1] : paramTypes[2];
+			ImageBase output = createImage(m, imageType, input[i]);
 			BoofTesting.checkSubImage(this, "performBufferedTo", true, m, input[i], output);
 
 			if( canSubImage ) {
 				// subimage input
 				BufferedImage subimage = input[i].getSubimage(1, 2, imgWidth - 1, imgHeight - 2);
-				output = createImage(m, paramTypes[1], subimage);
+				output = createImage(m, imageType, subimage);
 				BoofTesting.checkSubImage(this, "performBufferedTo", true, m, subimage, output);
 			}
 		}
@@ -198,7 +202,7 @@ public class TestConvertRaster {
 	 */
 	private BufferedImage[] createBufferedTestImages(Class<?> paramType) {
 		BufferedImage[] input;
-		if (paramType == ByteInterleavedRaster.class || paramType == DataBufferByte.class) {
+		if (paramType == DataBufferByte.class) {
 			// the code is handled different when a different number of channels is used
 			input = new BufferedImage[]{
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR, rand),
@@ -227,7 +231,16 @@ public class TestConvertRaster {
 
 	public void performBufferedTo(Method m, BufferedImage input, ImageBase output) {
 		try {
-			if (Raster.class.isAssignableFrom(m.getParameterTypes()[0])) {
+			if (DataBuffer.class.isAssignableFrom(m.getParameterTypes()[0])) {
+				m.invoke(null, input.getRaster().getDataBuffer(),input.getRaster(), output);
+
+				// read directly from raster if the raster is an input
+				if( ImageMultiBand.class.isAssignableFrom(output.getClass()) )
+					BoofTesting.checkEquals(input.getRaster(),(ImageMultiBand)output,1);
+				else
+					BoofTesting.checkEquals(input, output, false, 1f);
+
+			} else if (Raster.class.isAssignableFrom(m.getParameterTypes()[0])) { // TODO remove eventually
 				m.invoke(null, input.getRaster(), output);
 
 				// read directly from raster if the raster is an input
@@ -239,7 +252,7 @@ public class TestConvertRaster {
 				m.invoke(null, input, output);
 				BoofTesting.checkEquals(input, output, false, 1f);
 			}
-		} catch (IllegalAccessException | InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -260,7 +273,15 @@ public class TestConvertRaster {
 
 	public void performImageTo(Method m, ImageBase input, BufferedImage output) {
 		try {
-			if (Raster.class.isAssignableFrom(m.getParameterTypes()[1])) {
+			if (DataBuffer.class.isAssignableFrom(m.getParameterTypes()[1])) {
+				m.invoke(null, input, output.getRaster().getDataBuffer(), output.getRaster());
+
+				// read directly from raster if the raster is an input
+				if (Planar.class.isAssignableFrom(input.getClass()))
+					BoofTesting.checkEquals(output.getRaster(), (Planar) input, 1);
+				else
+					BoofTesting.checkEquals(output, input, false, 1f);
+			} else if (Raster.class.isAssignableFrom(m.getParameterTypes()[1])) {
 				m.invoke(null, input, output.getRaster());
 
 				// read directly from raster if the raster is an input
