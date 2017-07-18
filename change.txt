@@ -98,8 +98,6 @@ Version : 0.27
 - TODO Gradle - look into switching to java-library and changing dependencies to api
        https://blog.gradle.org/incremental-compiler-avoidance
 - TODO Clarify how you calibrate the camera in Processing
-- TODO ApplicationLauncherApp
-   Indicate of a process is dead or not
 - TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
         It is a homogenous coordinate with z=1 being implicit.
 - TODO Integrate in Marius Orfgen's image statistics histogram ideas
