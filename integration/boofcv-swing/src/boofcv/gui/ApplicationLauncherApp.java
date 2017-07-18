@@ -21,6 +21,7 @@ package boofcv.gui;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -33,14 +34,14 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
+import java.awt.font.TextAttribute;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.*;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Application which lists most of the demonstration application in a GUI and allows the user to double click
@@ -203,6 +204,23 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		processList.setLayoutOrientation(JList.VERTICAL);
 		processList.setVisibleRowCount(-1);
 		processList.getModel().addListDataListener(this);
+		processList.setCellRenderer(new ListCellRenderer() {
+			@Override
+			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+				ActiveProcess process = (ActiveProcess) value;
+				JLabel label = new JLabel();
+				label.setText(process.toString());
+				if(!process.isAlive()) {
+					label.setForeground(Color.RED);
+					try {
+						BufferedImage skull = ImageIO.read(new File(UtilIO.pathExample("../logo/skull.png")));
+						Image img = skull.getScaledInstance(20, 20, BufferedImage.SCALE_SMOOTH);
+						label.setIcon(new ImageIcon(img));
+					} catch(IOException e) {e.printStackTrace();}
+				}
+				return label;
+			}
+		});
 
 		JPanel processPanel = new JPanel();
 		processPanel.setLayout(new BorderLayout());
@@ -688,8 +706,10 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		for (int i = 0; i < outputPanel.getComponents().length; i++) {
 			ProcessTabPanel component = (ProcessTabPanel) outputPanel.getComponent(i);
 			if (component.getProcessId() == process.getId()) {
-				if( autoClose && !checkRemoveOnDeath.isSelected() )
+				if( autoClose && !checkRemoveOnDeath.isSelected() ) {
+					processList.repaint();
 					return;
+				}
 				index = i;
 			}
 		}
