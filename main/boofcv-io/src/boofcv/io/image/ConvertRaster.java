@@ -19,8 +19,6 @@
 package boofcv.io.image;
 
 import boofcv.struct.image.*;
-import sun.awt.image.ShortInterleavedRaster;
-import sun.awt.image.SunWritableRaster;
 
 import java.awt.image.*;
 import java.lang.reflect.InvocationTargetException;
@@ -65,16 +63,16 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	static void bufferedToGray(ShortInterleavedRaster src, GrayI16 dst) {
-		short[] srcData = src.getDataStorage();
+	static void bufferedToGray(DataBufferUShort buffer , WritableRaster src, GrayI16 dst) {
+		short[] srcData = buffer.getData();
 
 		int numBands = src.getNumBands();
 
 		int size = dst.getWidth() * dst.getHeight();
 
-		int srcStride = src.getScanlineStride();
+		int srcStride = stride(src);
 		int srcOffset = getOffset(src);
-		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+		int srcStrideDiff = srcStride-src.getNumDataElements()*dst.width;
 
 		if (numBands == 1) {
 			if (dst.startIndex == 0 && dst.width == dst.stride && srcStrideDiff == 0 && srcOffset == 0 )
@@ -122,67 +120,6 @@ public class ConvertRaster {
 			raster = raster.getWritableParent();
 		}
 		return raster.getWidth()*raster.getNumDataElements();
-	}
-
-	/**
-	 * A faster convert that works directly with a specific raster
-	 */
-	static void bufferedToGray(SunWritableRaster src, GrayU8 dst) {
-		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
-			throw new RuntimeException("Unsupported type");
-
-		DataBufferByte byteBuffer = (DataBufferByte)src.getDataBuffer();
-
-		byte[] srcData = byteBuffer.getData();
-
-		byte[] dstData = dst.data;
-
-		int numBands = src.getNumBands();
-
-		int srcStride = src.getWidth()*numBands;
-		int srcOffset = 0;
-		int srcStrideDiff = 0;
-
-		int size = dst.getWidth() * dst.getHeight();
-
-		if (numBands == 3) {
-			from_3BU8_to_U8(dst, srcData, dstData, srcOffset, srcStrideDiff);
-		} else if (numBands == 1) {
-			from_1BU8_to_U8(dst, srcData, dstData, size, srcStride, srcOffset, srcStrideDiff);
-		} else if (numBands == 4) {
-			from_4BU8_to_U8(dst, srcData, dstData, srcOffset, srcStrideDiff);
-		} else {
-			throw new RuntimeException("Unexpected number of bands found. Bands = "+numBands);
-		}
-	}
-
-	/**
-	 * A faster convert that works directly with a specific raster
-	 */
-	static void bufferedToGray(SunWritableRaster src, GrayF32 dst) {
-		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
-			throw new RuntimeException("Unsupported type");
-
-		DataBufferByte byteBuffer = (DataBufferByte)src.getDataBuffer();
-
-		byte[] srcData = byteBuffer.getData();
-
-		float[] dstData = dst.data;
-
-		int numBands = src.getNumBands();
-
-		int srcOffset = 0;
-		int srcStrideDiff = 0;
-
-		if (numBands == 3) {
-			from_3BU8_to_F32(dst, srcData, dstData, srcOffset, srcStrideDiff);
-		} else if (numBands == 1) {
-			from_1BU8_to_F32(dst, srcData, dstData, srcOffset, srcStrideDiff);
-		} else if (numBands == 4) {
-			from_4BU8_to_F32(dst, srcData, dstData, srcOffset, srcStrideDiff);
-		} else {
-			throw new RuntimeException("Unexpected number of bands found. Bands = "+numBands);
-		}
 	}
 
 	private static void from_4BU8_to_U8(GrayU8 dst, byte[] srcData, byte[] data, int srcOffset, int srcStrideDiff) {
@@ -469,71 +406,6 @@ public class ConvertRaster {
 				band3[indexDst] = srcData[indexSrc++];
 			}
 			indexSrc += srcStrideDiff;
-		}
-	}
-
-	/**
-	 * A faster convert that works directly with a specific raster
-	 */
-	static void bufferedToInterleaved(SunWritableRaster src, InterleavedU8 dst) {
-		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
-			throw new RuntimeException("Unsupported type");
-
-		DataBufferByte byteBuffer = (DataBufferByte)src.getDataBuffer();
-
-		byte[] srcData = byteBuffer.getData();
-
-		int srcOffset = 0;
-		int srcStrideDiff = 0;
-
-		from_NBU8_to_IU8(dst, srcData, srcOffset, srcStrideDiff);
-	}
-
-	/**
-	 * A faster convert that works directly with a specific raster
-	 */
-	static void bufferedToInterleaved(SunWritableRaster src, InterleavedF32 dst) {
-		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
-			throw new RuntimeException("Unsupported type");
-
-		DataBufferByte byteBuffer = (DataBufferByte)src.getDataBuffer();
-
-		byte[] srcData = byteBuffer.getData();
-
-		int srcOffset = 0;
-		int srcStrideDiff = 0;
-
-		from_NBU8_to_IF32(dst, srcData, srcOffset, srcStrideDiff);
-	}
-
-	private static void from_NBU8_to_IU8(InterleavedU8 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
-		int length = dst.width*dst.numBands;
-
-		for (int y = 0; y < dst.height; y++) {
-			int indexDst = dst.startIndex + dst.stride * y;
-			int indexSrc = srcOffset + y*(length + srcStrideDiff);
-
-			try {
-				System.arraycopy(srcData, indexSrc, dst.data, indexDst, length);
-			} catch( ArrayIndexOutOfBoundsException e ) {
-				System.out.println();
-			}
-		}
-	}
-
-	private static void from_NBU8_to_IF32(InterleavedF32 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
-		int length = dst.width*dst.numBands;
-
-		for (int y = 0; y < dst.height; y++) {
-			int indexDst = dst.startIndex + dst.stride * y;
-			int indexSrc = srcOffset + y*(length + srcStrideDiff);
-
-			int indexDstEnd = indexDst+length;
-			while( indexDst < indexDstEnd ) {
-				dst.data[indexDst] = srcData[indexSrc] & 0xFF;
-				indexDst++;
-				indexSrc++;
-			}
 		}
 	}
 
@@ -1270,10 +1142,10 @@ public class ConvertRaster {
 		}
 	}
 
-	static void grayToBuffered(GrayI16 src, ShortInterleavedRaster dst) {
+	static void grayToBuffered(GrayI16 src, DataBufferUShort buffer , WritableRaster dst) {
 
 		final short[] srcData = src.data;
-		final short[] dstData = dst.getDataStorage();
+		final short[] dstData = buffer.getData();
 
 		final int numBands = dst.getNumBands();
 

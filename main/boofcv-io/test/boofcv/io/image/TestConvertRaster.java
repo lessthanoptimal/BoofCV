@@ -23,8 +23,6 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
-import sun.awt.image.ShortInterleavedRaster;
-import sun.awt.image.SunWritableRaster;
 
 import java.awt.image.*;
 import java.lang.reflect.InvocationTargetException;
@@ -44,7 +42,7 @@ public class TestConvertRaster {
 	int imgWidth = 10;
 	int imgHeight = 20;
 
-	int numMethods = 48;
+	int numMethods = 44;
 
 	/**
 	 * Use reflections to test all the functions.
@@ -145,10 +143,7 @@ public class TestConvertRaster {
 
 		input = createBufferedTestImages(paramTypes[0]);
 
-		boolean canSubImage = true;
-		if( paramTypes[0] == SunWritableRaster.class ) {
-			canSubImage = false;
-		}
+		boolean canSubImage = !System.getProperty("java.version").startsWith("1.9");
 
 		for (int i = 0; i < input.length; i++) {
 			// regular image
@@ -209,16 +204,11 @@ public class TestConvertRaster {
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB, rand),
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_BGR, rand),
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB, rand)};
-		} else if( paramType == ShortInterleavedRaster.class ) {
+		} else if( paramType == DataBufferUShort.class ) {
 			input = new BufferedImage[]{createShortBuff(imgWidth, imgHeight, rand)};
 		} else if (paramType == BufferedImage.class) {
 			// just pick an arbitrary image type here
 			input = new BufferedImage[]{createIntBuff(imgWidth, imgHeight, rand)};
-		} else if( paramType == SunWritableRaster.class ) {
-			// ByteInterleavedRaster extends SunWritableRaster
-			input = new BufferedImage[]{
-					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR, rand)};
-
 		} else {
 			throw new RuntimeException("Unknown raster type: " + paramType.getSimpleName());
 		}
@@ -229,15 +219,6 @@ public class TestConvertRaster {
 		try {
 			if (DataBuffer.class.isAssignableFrom(m.getParameterTypes()[0])) {
 				m.invoke(null, input.getRaster().getDataBuffer(),input.getRaster(), output);
-
-				// read directly from raster if the raster is an input
-				if( ImageMultiBand.class.isAssignableFrom(output.getClass()) )
-					BoofTesting.checkEquals(input.getRaster(),(ImageMultiBand)output,1);
-				else
-					BoofTesting.checkEquals(input, output, false, 1f);
-
-			} else if (Raster.class.isAssignableFrom(m.getParameterTypes()[0])) { // TODO remove eventually
-				m.invoke(null, input.getRaster(), output);
 
 				// read directly from raster if the raster is an input
 				if( ImageMultiBand.class.isAssignableFrom(output.getClass()) )

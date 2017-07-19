@@ -20,8 +20,6 @@ package boofcv.io.image;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
-import sun.awt.image.ShortInterleavedRaster;
-import sun.awt.image.SunWritableRaster;
 
 import javax.swing.*;
 import java.awt.*;
@@ -379,8 +377,6 @@ public class ConvertBufferedImage {
 				}
 			} else if (buff.getDataType() == DataBuffer.TYPE_INT) {
 				ConvertRaster.bufferedToGray((DataBufferInt)buff,src.getRaster(), dst);
-			} else if( src.getRaster().getClass() == SunWritableRaster.class ) {
-				ConvertRaster.bufferedToGray((SunWritableRaster) src.getRaster(), dst);
 			} else {
 				ConvertRaster.bufferedToGray(src, dst);
 			}
@@ -407,14 +403,12 @@ public class ConvertBufferedImage {
 			dst = GeneralizedImageOps.createSingleBand(type, src.getWidth(), src.getHeight());
 		}
 
-		try {
-			if (src.getRaster() instanceof ShortInterleavedRaster ) {
-				ConvertRaster.bufferedToGray((ShortInterleavedRaster) src.getRaster(), dst);
-				return dst;
-			}
-		} catch( java.security.AccessControlException e) {}
+		DataBuffer buffer = src.getRaster().getDataBuffer();
+		if (buffer.getDataType() == DataBuffer.TYPE_USHORT ) {
+			ConvertRaster.bufferedToGray((DataBufferUShort)buffer, src.getRaster(), dst);
+			return dst;
+		}
 
-		// Applets don't allow access to the raster() or the image type wasn't supported
 		ConvertRaster.bufferedToGray(src, dst);
 
 		return dst;
@@ -446,8 +440,6 @@ public class ConvertBufferedImage {
 				}
 			} else if (buff.getDataType() == DataBuffer.TYPE_INT) {
 				ConvertRaster.bufferedToGray((DataBufferInt)buff, src.getRaster(), dst);
-			} else if( src.getRaster().getClass() == SunWritableRaster.class ) {
-				ConvertRaster.bufferedToGray((SunWritableRaster) src.getRaster(), dst);
 			} else {
 				ConvertRaster.bufferedToGray(src, dst);
 			}
@@ -595,8 +587,6 @@ public class ConvertBufferedImage {
 					}
 				} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
 					ConvertRaster.bufferedToInterleaved((DataBufferInt)buffer, src.getRaster(), (InterleavedU8) dst);
-				} else if (src.getRaster() instanceof SunWritableRaster) {
-					ConvertRaster.bufferedToInterleaved((SunWritableRaster) src.getRaster(), (InterleavedU8) dst);
 				} else {
 					ConvertRaster.bufferedToInterleaved(src, (InterleavedU8) dst);
 				}
@@ -613,8 +603,6 @@ public class ConvertBufferedImage {
 					}
 				} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
 					ConvertRaster.bufferedToInterleaved((DataBufferInt)buffer, src.getRaster(), (InterleavedF32) dst);
-				} else if (src.getRaster() instanceof SunWritableRaster) {
-					ConvertRaster.bufferedToInterleaved((SunWritableRaster) src.getRaster(), (InterleavedF32) dst);
 				} else {
 					ConvertRaster.bufferedToInterleaved(src, (InterleavedF32) dst);
 				}
@@ -741,8 +729,8 @@ public class ConvertBufferedImage {
 				ConvertRaster.grayToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
 			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
 				ConvertRaster.grayToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
-			} else if( dst.getType() == BufferedImage.TYPE_USHORT_GRAY ) {
-				ConvertRaster.grayToBuffered(src, (ShortInterleavedRaster) dst.getRaster());
+			} else if( buffer.getDataType() == DataBuffer.TYPE_USHORT ) {
+				ConvertRaster.grayToBuffered(src, (DataBufferUShort)buffer, dst.getRaster());
 			} else {
 				ConvertRaster.grayToBuffered(src, dst);
 			}
