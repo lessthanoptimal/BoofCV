@@ -33,9 +33,10 @@ Version : 0.27
   * Kernel2D_I32 -> Kernel2D_S32
   * Kernel2D_I32 -> Kernel2D_S32
 - GConvolveImageOps actual works for all image types now not just gray
-- Changed behavior of ConvertBuffered image
+- Changed behavior of ConvertBufferedImage
   * When converting to interleaved and planar images the number of bands is adjusted to match the buffered image
   * Buffered -> BoofCV: output images are reshaped to match input
+  * Removed references to private sun classes for Java 9 compatibility
 - ImageInterleaved
   * Added a nicely formatted toString()
 - BlurImageOps - Fixed bug where for planar imges it was apply a median instead of mean filter
@@ -103,6 +104,10 @@ Version : 0.27
 - TODO Integrate in Marius Orfgen's image statistics histogram ideas
 - TODO DescribeDenseHogFastAlg naming consistency. See TODO at top
 - TODO Modify ConvertBufferedImage and related code so that it will work in Java 9
+  * Affected files:       BoofTesting
+                          UtilImageIO
+                          VisualizeBinaryData
+
   * Remove references to: ByteInterleavedRaster,
                           IntegerInterleavedRaster,
                           ShortInterleavedRaster,
