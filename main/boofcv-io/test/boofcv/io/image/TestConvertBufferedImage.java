@@ -49,10 +49,10 @@ public class TestConvertBufferedImage {
 		BufferedImage b = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 3, rand);
 
 		assertTrue( b == ConvertBufferedImage.checkCopy(a,b));
-		BoofTesting.checkIdentical(a,b);
+		BufferedImageChecks.checkIdentical(a,b);
 
 		BufferedImage c = ConvertBufferedImage.checkCopy(a,null);
-		BoofTesting.checkIdentical(a,c);
+		BufferedImageChecks.checkIdentical(a,c);
 	}
 
 	@Test
@@ -180,13 +180,13 @@ public class TestConvertBufferedImage {
 
 		BufferedImage img = ConvertBufferedImage.extractBuffered(srcImg);
 
-		BoofTesting.checkEquals(img, srcImg,false,1e-4f);
+		BufferedImageChecks.checkEquals(img, srcImg,false,1e-4f);
 
 		// now test it with a single band
 		srcImg = new InterleavedU8(imgWidth, imgHeight, 1);
 		ImageInterleavedTestingOps.randomize(srcImg, rand);
 		img = ConvertBufferedImage.extractBuffered(srcImg);
-		BoofTesting.checkEquals(img, srcImg,false,1e-4f);
+		BufferedImageChecks.checkEquals(img, srcImg,false,1e-4f);
 
 	}
 
@@ -198,7 +198,7 @@ public class TestConvertBufferedImage {
 
 		BufferedImage img = ConvertBufferedImage.extractBuffered(srcImg);
 
-		BoofTesting.checkEquals(img, srcImg);
+		BufferedImageChecks.checkEquals(img, srcImg);
 	}
 
 	/**
@@ -291,12 +291,12 @@ public class TestConvertBufferedImage {
 				GrayU8 imgInt8 = ConvertBufferedImage.convertFromSingle(origImg, null, GrayU8.class);
 				assertEquals(origImg.getWidth(), imgInt8.width);
 				assertEquals(origImg.getHeight(), imgInt8.height);
-				BoofTesting.checkEquals(origImg, imgInt8, false, 1);
+				BufferedImageChecks.checkEquals(origImg, imgInt8, false, 1);
 
 				GrayF32 imgF32 = ConvertBufferedImage.convertFromSingle(origImg, null, GrayF32.class);
 				assertEquals(origImg.getWidth(), imgF32.width);
 				assertEquals(origImg.getHeight(), imgF32.height);
-				BoofTesting.checkEquals(origImg, imgF32, false, 1);
+				BufferedImageChecks.checkEquals(origImg, imgF32, false, 1);
 			}
 		}
 	}
@@ -316,12 +316,12 @@ public class TestConvertBufferedImage {
 			GrayU16 imgU16 = ConvertBufferedImage.convertFromSingle(origImg, null, GrayU16.class);
 			assertEquals(origImg.getWidth(), imgU16.width);
 			assertEquals(origImg.getHeight(), imgU16.height);
-			BoofTesting.checkEquals(origImg, imgU16, false, 1);
+			BufferedImageChecks.checkEquals(origImg, imgU16, false, 1);
 
 			GrayS16 imgS16 = ConvertBufferedImage.convertFromSingle(origImg, null, GrayS16.class);
 			assertEquals(origImg.getWidth(), imgS16.width);
 			assertEquals(origImg.getHeight(), imgS16.height);
-			BoofTesting.checkEquals(origImg, imgS16, false, 1);
+			BufferedImageChecks.checkEquals(origImg, imgS16, false, 1);
 		}
 	}
 
@@ -349,12 +349,12 @@ public class TestConvertBufferedImage {
 				Planar<GrayU8> imgInt8 = ConvertBufferedImage.convertFromPlanar(origImg, null, false, GrayU8.class);
 				assertEquals(origImg.getWidth(), imgInt8.width);
 				assertEquals(origImg.getHeight(), imgInt8.height);
-				BoofTesting.checkEquals(origImg, imgInt8, false, 1);
+				BufferedImageChecks.checkEquals(origImg, imgInt8, false, 1);
 
 				Planar<GrayF32> imgF32 = ConvertBufferedImage.convertFromPlanar(origImg, null, false,GrayF32.class);
 				assertEquals(origImg.getWidth(), imgF32.width);
 				assertEquals(origImg.getHeight(), imgF32.height);
-				BoofTesting.checkEquals(origImg, imgF32,false,  1);
+				BufferedImageChecks.checkEquals(origImg, imgF32,false,  1);
 			}
 		}
 	}
@@ -394,10 +394,10 @@ public class TestConvertBufferedImage {
 				}
 //				System.out.println(i+" "+j);
 				ConvertBufferedImage.convertFromInterleaved(origImg, imgInt8, false);
-				BoofTesting.checkEquals(origImg, imgInt8, false, 1);
+				BufferedImageChecks.checkEquals(origImg, imgInt8, false, 1);
 
 				ConvertBufferedImage.convertFromInterleaved(origImg, imgF32, false);
-				BoofTesting.checkEquals(origImg, imgF32, false, 1);
+				BufferedImageChecks.checkEquals(origImg, imgF32, false, 1);
 			}
 		}
 	}
@@ -454,7 +454,7 @@ public class TestConvertBufferedImage {
 
 		ConvertBufferedImage.convertTo(input, output, false);
 
-		BoofTesting.checkEquals(output, input, false, 1);
+		BufferedImageChecks.checkEquals(output, input, false, 1);
 	}
 
 	/**

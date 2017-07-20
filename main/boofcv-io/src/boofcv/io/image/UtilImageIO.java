@@ -20,15 +20,11 @@ package boofcv.io.image;
 
 import boofcv.struct.image.*;
 import org.ddogleg.struct.GrowQueue_I8;
-import sun.awt.image.ByteInterleavedRaster;
-import sun.awt.image.IntegerInterleavedRaster;
 
 import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
+import java.awt.image.*;
 import java.io.*;
 import java.net.URL;
-import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -246,8 +242,8 @@ public class UtilImageIO {
 
 		boolean useFailSafe = storage.getType() != BufferedImage.TYPE_INT_RGB;
 		// try using the internal array for better performance
-		try {
-			int rgb[] =  ((IntegerInterleavedRaster)storage.getRaster()).getDataStorage();
+		if( storage.getRaster().getDataBuffer().getDataType() == DataBuffer.TYPE_INT ) {
+			int rgb[] =  ((DataBufferInt)storage.getRaster().getDataBuffer()).getData();
 
 			int indexIn = 0;
 			int indexOut = 0;
@@ -257,9 +253,6 @@ public class UtilImageIO {
 							((data[indexIn++] & 0xFF) << 8) | (data[indexIn++] & 0xFF);
 				}
 			}
-		} catch( AccessControlException e ) {
-			useFailSafe = true;
-
 		}
 
 		if( useFailSafe ) {
@@ -308,8 +301,8 @@ public class UtilImageIO {
 
 		boolean useFailSafe = storage.getType() != BufferedImage.TYPE_BYTE_GRAY;
 		// try using the internal array for better performance
-		try {
-			byte gray[] =  ((ByteInterleavedRaster)storage.getRaster()).getDataStorage();
+		if( storage.getRaster().getDataBuffer().getDataType() == DataBuffer.TYPE_BYTE ) {
+			byte gray[] =  ((DataBufferByte)storage.getRaster().getDataBuffer()).getData();
 
 			int indexIn = 0;
 			int indexOut = 0;
@@ -318,9 +311,6 @@ public class UtilImageIO {
 					gray[indexOut++] =  data[indexIn++];
 				}
 			}
-		} catch( AccessControlException e ) {
-			useFailSafe = true;
-
 		}
 
 		if( useFailSafe ) {

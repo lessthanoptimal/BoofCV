@@ -18,13 +18,16 @@
 
 package boofcv.gui.edge;
 
+import boofcv.io.image.ConvertRaster;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS8;
 import boofcv.struct.image.GrayU8;
-import sun.awt.image.IntegerInterleavedRaster;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferInt;
+import java.awt.image.WritableRaster;
 
 
 /**
@@ -37,25 +40,26 @@ public class VisualizeEdgeFeatures {
 			out = new BufferedImage(direction.getWidth(),direction.getHeight(),BufferedImage.TYPE_INT_RGB);
 		}
 
-		if( out.getRaster() instanceof IntegerInterleavedRaster) {
+		WritableRaster raster = out.getRaster();
+		if( raster.getDataBuffer().getDataType() == DataBuffer.TYPE_INT) {
 			int colors[] = new int[4];
 			colors[0] = Color.RED.getRGB();
 			colors[1] = Color.GREEN.getRGB();
 			colors[2] = Color.BLUE.getRGB();
 			colors[3] = Color.BLACK.getRGB();
 
-			IntegerInterleavedRaster raster = (IntegerInterleavedRaster)out.getRaster();
-
-			int rasterIndex = 0;
-			int data[] = raster.getDataStorage();
+			int dataDst[] = ((DataBufferInt)raster.getDataBuffer()).getData();
+			int strideDst = ConvertRaster.stride(raster);
+			int offsetDst = ConvertRaster.getOffset(raster);
 
 			int w = direction.getWidth();
 			int h = direction.getHeight();
 
 			for( int y = 0; y < h; y++ ) {
+				int indexDst = offsetDst + y*strideDst;
 				int indexSrc = direction.startIndex + y*direction.stride;
 				for( int x = 0; x < w; x++ ) {
-					data[rasterIndex++] = colors[direction.data[indexSrc++]];
+					dataDst[indexDst++] = colors[direction.data[indexSrc++]];
 				}
 			}
 		} else {
@@ -70,7 +74,8 @@ public class VisualizeEdgeFeatures {
 			out = new BufferedImage(direction.getWidth(),direction.getHeight(),BufferedImage.TYPE_INT_RGB);
 		}
 
-		if( out.getRaster() instanceof IntegerInterleavedRaster) {
+		WritableRaster raster = out.getRaster();
+		if( raster.getDataBuffer().getDataType() == DataBuffer.TYPE_INT) {
 			int colors[] = new int[4];
 			colors[0] = Color.RED.getRGB();
 			colors[1] = Color.GREEN.getRGB();
@@ -78,22 +83,22 @@ public class VisualizeEdgeFeatures {
 			colors[3] = Color.BLACK.getRGB();
 			int white = Color.WHITE.getRGB();
 
-			IntegerInterleavedRaster raster = (IntegerInterleavedRaster)out.getRaster();
-
-			int rasterIndex = 0;
-			int data[] = raster.getDataStorage();
+			int dataDst[] = ((DataBufferInt)raster.getDataBuffer()).getData();
+			int strideDst = ConvertRaster.stride(raster);
+			int offsetDst = ConvertRaster.getOffset(raster);
 
 			int w = direction.getWidth();
 			int h = direction.getHeight();
 
 			for( int y = 0; y < h; y++ ) {
+				int indexDst = offsetDst + y*strideDst;
 				int indexSrc = direction.startIndex + y*direction.stride;
 				int indexInten = intensity.startIndex + y*intensity.stride;
-				for( int x = 0; x < w; x++ , indexInten++ , indexSrc++, rasterIndex++) {
+				for( int x = 0; x < w; x++ , indexInten++ , indexSrc++, indexDst++) {
 					if( intensity.data[indexInten] >= threshold ) {
-						data[rasterIndex] = colors[direction.data[indexSrc]+1];
+						dataDst[indexDst] = colors[direction.data[indexSrc]+1];
 					} else {
-						data[rasterIndex] = white;
+						dataDst[indexDst] = white;
 					}
 				}
 			}

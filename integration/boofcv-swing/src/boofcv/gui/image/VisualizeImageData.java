@@ -22,10 +22,12 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.ConvertRaster;
 import boofcv.struct.image.*;
-import sun.awt.image.IntegerInterleavedRaster;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.awt.image.WritableRaster;
 
 /**
  * Renders different primitive image types into a BufferedImage for visualization purposes.
@@ -433,10 +435,10 @@ public class VisualizeImageData {
 
 		BufferedImage output = new BufferedImage(derivX.width,derivX.height,BufferedImage.TYPE_INT_RGB);
 
-		IntegerInterleavedRaster outputRaster = (IntegerInterleavedRaster)output.getRaster();
-		int[] outData = outputRaster.getDataStorage();
-		int outStride = outputRaster.getScanlineStride();
-		int outOffset = outputRaster.getDataOffset(0)-outputRaster.getPixelStride()+1;
+		WritableRaster raster = output.getRaster();
+		DataBufferInt buffer = (DataBufferInt)raster.getDataBuffer();
+		int[] outData = buffer.getData();
+		int outOffset = ConvertRaster.getOffset(raster);
 
 		if( maxAbsValue < 0 ) {
 			maxAbsValue = ImageStatistics.maxAbs(derivX);
@@ -492,11 +494,10 @@ public class VisualizeImageData {
 
 		BufferedImage output = new BufferedImage(derivX.width,derivX.height,BufferedImage.TYPE_INT_RGB);
 
-		IntegerInterleavedRaster outputRaster = (IntegerInterleavedRaster)output.getRaster();
-		int[] outData = outputRaster.getDataStorage();
-		int outStride = outputRaster.getScanlineStride();
-		int outOffset = outputRaster.getDataOffset(0)-outputRaster.getPixelStride()+1;
-
+		WritableRaster raster = output.getRaster();
+		DataBufferInt buffer = (DataBufferInt)raster.getDataBuffer();
+		int[] outData = buffer.getData();
+		int outOffset = ConvertRaster.getOffset(raster);
 
 		if( maxAbsValue < 0 ) {
 			maxAbsValue = ImageStatistics.maxAbs(derivX);

@@ -24,12 +24,10 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
-import sun.awt.image.ByteInterleavedRaster;
-import sun.awt.image.IntegerInterleavedRaster;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
-import java.awt.image.BufferedImage;
+import java.awt.image.*;
 import java.util.List;
 import java.util.Random;
 
@@ -241,9 +239,12 @@ public class VisualizeBinaryData {
 			out = new BufferedImage(labelImage.getWidth(),labelImage.getHeight(),BufferedImage.TYPE_INT_RGB);
 		}
 
+		WritableRaster raster = out.getRaster();
+		DataBuffer buffer = raster.getDataBuffer();
 		try {
-			if( out.getRaster() instanceof IntegerInterleavedRaster) {
-				renderLabeled(labelImage, colors, (IntegerInterleavedRaster)out.getRaster());
+
+			if( buffer.getDataType() == DataBuffer.TYPE_INT) {
+				renderLabeled(labelImage, colors, (DataBufferInt)buffer,raster);
 			} else {
 				_renderLabeled(labelImage, out, colors);
 			}
@@ -310,9 +311,10 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	private static void renderLabeled(GrayS32 labelImage, int[] colors, IntegerInterleavedRaster raster) {
+	private static void renderLabeled(GrayS32 labelImage, int[] colors,
+									  DataBufferInt buffer, WritableRaster raster) {
 		int rasterIndex = 0;
-		int data[] = raster.getDataStorage();
+		int data[] = buffer.getData();
 
 		int w = labelImage.getWidth();
 		int h = labelImage.getHeight();
@@ -341,10 +343,12 @@ public class VisualizeBinaryData {
 		}
 
 		try {
-			if( out.getRaster() instanceof ByteInterleavedRaster ) {
-				renderBinary(binaryImage, invert, (ByteInterleavedRaster) out.getRaster());
-			} else if( out.getRaster() instanceof  IntegerInterleavedRaster ) {
-				renderBinary(binaryImage, invert, (IntegerInterleavedRaster) out.getRaster());
+			WritableRaster raster = out.getRaster();
+			DataBuffer buffer = raster.getDataBuffer();
+			if( buffer.getDataType() == DataBuffer.TYPE_BYTE ) {
+				renderBinary(binaryImage, invert, (DataBufferByte)buffer, raster);
+			} else if( buffer.getDataType() == DataBuffer.TYPE_INT ) {
+				renderBinary(binaryImage, invert, (DataBufferInt)buffer, raster);
 			} else {
 				_renderBinary(binaryImage, invert,  out);
 			}
@@ -379,9 +383,10 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	private static void renderBinary(GrayU8 binaryImage, boolean invert, ByteInterleavedRaster raster) {
+	private static void renderBinary(GrayU8 binaryImage, boolean invert,
+									 DataBufferByte buffer, WritableRaster raster) {
 		int rasterIndex = 0;
-		byte data[] = raster.getDataStorage();
+		byte data[] = buffer.getData();
 
 		int w = binaryImage.getWidth();
 		int h = binaryImage.getHeight();
@@ -428,9 +433,10 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	private static void renderBinary(GrayU8 binaryImage, boolean invert, IntegerInterleavedRaster raster) {
+	private static void renderBinary(GrayU8 binaryImage, boolean invert,
+									 DataBufferInt buffer, WritableRaster raster) {
 		int rasterIndex = 0;
-		int data[] = raster.getDataStorage();
+		int data[] = buffer.getData();
 
 		int w = binaryImage.getWidth();
 		int h = binaryImage.getHeight();

@@ -222,12 +222,12 @@ public class TestConvertRaster {
 
 				// read directly from raster if the raster is an input
 				if( ImageMultiBand.class.isAssignableFrom(output.getClass()) )
-					BoofTesting.checkEquals(input.getRaster(),(ImageMultiBand)output,1);
+					BufferedImageChecks.checkEquals(input.getRaster(),(ImageMultiBand)output,1);
 				else
-					BoofTesting.checkEquals(input, output, false, 1f);
+					BufferedImageChecks.checkEquals(input, output, false, 1f);
 			} else {
 				m.invoke(null, input, output);
-				BoofTesting.checkEquals(input, output, false, 1f);
+				BufferedImageChecks.checkEquals(input, output, false, 1f);
 			}
 		} catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
 			throw new RuntimeException(e);
@@ -255,20 +255,20 @@ public class TestConvertRaster {
 
 				// read directly from raster if the raster is an input
 				if (Planar.class.isAssignableFrom(input.getClass()))
-					BoofTesting.checkEquals(output.getRaster(), (Planar) input, 1);
+					BufferedImageChecks.checkEquals(output.getRaster(), (Planar) input, 1);
 				else
-					BoofTesting.checkEquals(output, input, false, 1f);
+					BufferedImageChecks.checkEquals(output, input, false, 1f);
 			} else if (Raster.class.isAssignableFrom(m.getParameterTypes()[1])) {
 				m.invoke(null, input, output.getRaster());
 
 				// read directly from raster if the raster is an input
 				if( Planar.class.isAssignableFrom(input.getClass()) )
-					BoofTesting.checkEquals(output.getRaster(),(Planar)input,1);
+					BufferedImageChecks.checkEquals(output.getRaster(),(Planar)input,1);
 				else
-					BoofTesting.checkEquals(output, input,false,  1f);
+					BufferedImageChecks.checkEquals(output, input,false,  1f);
 			} else {
 				m.invoke(null, input, output);
-				BoofTesting.checkEquals(output, input, false, 1f);
+				BufferedImageChecks.checkEquals(output, input, false, 1f);
 			}
 
 		} catch (IllegalAccessException | InvocationTargetException e) {

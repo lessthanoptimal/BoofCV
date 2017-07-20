@@ -115,7 +115,7 @@ public class ConvertRaster {
 		}
 	}
 
-	static int stride( WritableRaster raster ) {
+	public static int stride(WritableRaster raster) {
 		while( raster.getWritableParent() != null ) {
 			raster = raster.getWritableParent();
 		}
