@@ -67,8 +67,9 @@ Version : 0.27
   * Added support for detection of circle grid patterns
   * Calibration targets with circles now specify circle size with diameter instead of radius
 - Gradle
-  * Change directory structure to avoid jar naming conflict on maven central.  Idiot that this is even possible...
-- Fixed ImageInterleaved.setNumBands() NOT correctly setting the stride and growing the data array
+  * Change directory structure to avoid jar naming conflict on maven central.  Idiotic that this is even possible...
+- Imaga Data Types
+  * Fixed ImageInterleaved.setNumBands() NOT correctly setting the stride and growing the data array
 - Removed XML all serialization
   * Changed old XML files into YAML files
 - YAML format for camera calibration
@@ -82,8 +83,9 @@ Version : 0.27
 - ConvertNV21 and ConvertYV12
   * Speed up conversion from NV21 to RGB by about 1.9x by converting if statements into bitwise operations
   * Refactored functions names with multi to planar
-- Split FFMPEG and JavaCV into seperate dependencies
+- Split FFMPEG and JavaCV into separate dependencies
 - You can now specify which native architectures you wish to support
+  * See native_arch gradle parameter
 
 - TODO Visualization tools for Direct VO
 -      Show warped image
@@ -94,7 +96,6 @@ Version : 0.27
        Select output format: BoofCV, OpenCV
        Create a stand alone application that people can download to calibrate
 - TODO Tutorial on image features?  Sparse and dense?
-- TODO Don't forget to change BoofCV version referenced in Android example
 - TODO Look at AKAZE feature
 - TODO Gradle - look into switching to java-library and changing dependencies to api
        https://blog.gradle.org/incremental-compiler-avoidance

@@ -3,6 +3,7 @@
 - Update Version
    * README.md
    * BoofDefaults.version
+   * Android example should reference latest BoofCV
    * Gradle
 - Set release data in change.txt
 - Make sure all examples work
