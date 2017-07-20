@@ -104,6 +104,9 @@ Version : 0.27
         It is a homogenous coordinate with z=1 being implicit.
 - TODO Integrate in Marius Orfgen's image statistics histogram ideas
 - TODO DescribeDenseHogFastAlg naming consistency. See TODO at top
+- TODO Removed all references to sourceforge.net in downloaded data
+       ExampleClassifySceneKnn.java
+       FactoryImageClassifier.java
 
 
 ---------------------------------------------

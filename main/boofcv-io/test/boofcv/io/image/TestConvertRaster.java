@@ -311,6 +311,14 @@ public class TestConvertRaster {
 		return ret;
 	}
 
+	public static BufferedImage createByteBinary(int width, int height, Random rand) {
+		BufferedImage ret = new BufferedImage(width,height,BufferedImage.TYPE_BYTE_BINARY);
+
+		randomize(ret, rand);
+
+		return ret;
+	}
+
 	public static BufferedImage createIntBuff(int width, int height, Random rand) {
 		BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		randomize(ret, rand);
@@ -324,9 +332,19 @@ public class TestConvertRaster {
 	}
 
 	public static void randomize(BufferedImage img, Random rand) {
-		for (int i = 0; i < img.getWidth(); i++) {
-			for (int j = 0; j < img.getHeight(); j++) {
-				img.setRGB(i, j, rand.nextInt() & 0xFFFFFF);
+		WritableRaster raster = img.getRaster();
+		DataBuffer buffer = raster.getDataBuffer();
+		if( buffer.getDataType() == DataBuffer.TYPE_BYTE ) {
+			byte[] data = ((DataBufferByte)buffer).getData();
+			for (int i = 0; i < data.length; i++) {
+				data[i] = (byte)rand.nextInt();
+			}
+			img.setRGB(0,0,img.getRGB(0,0));
+		} else {
+			for (int i = 0; i < img.getWidth(); i++) {
+				for (int j = 0; j < img.getHeight(); j++) {
+					img.setRGB(i, j, rand.nextInt() & 0xFFFFFF);
+				}
 			}
 		}
 	}

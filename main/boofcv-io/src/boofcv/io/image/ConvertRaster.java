@@ -39,7 +39,6 @@ public class ConvertRaster {
 	static void bufferedToGray(DataBufferByte buffer, WritableRaster src, GrayU8 dst) {
 		byte[] srcData = buffer.getData();
 
-		byte[] data = dst.data;
 
 		int numBands = src.getNumBands();
 
@@ -50,11 +49,11 @@ public class ConvertRaster {
 		int srcStrideDiff = srcStride-src.getNumDataElements()*dst.width;
 
 		if (numBands == 3) {
-			from_3BU8_to_U8(dst, srcData, data, srcOffset, srcStrideDiff);
+			from_3BU8_to_U8(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 1) {
-			from_1BU8_to_U8(dst, srcData, data, size, srcStride, srcOffset, srcStrideDiff);
+			from_1BU8_to_U8(dst, srcData, size, srcStride, srcOffset, srcStrideDiff);
 		} else if (numBands == 4) {
-			from_4BU8_to_U8(dst, srcData, data, srcOffset, srcStrideDiff);
+			from_4BU8_to_U8(dst, srcData, srcOffset, srcStrideDiff);
 		} else {
 			throw new RuntimeException("Unexpected number of bands found. Bands = "+numBands);
 		}
@@ -96,8 +95,6 @@ public class ConvertRaster {
 	static void bufferedToGray(DataBufferByte buffer, WritableRaster src, GrayF32 dst) {
 		byte[] srcData = buffer.getData();
 
-		float[] data = dst.data;
-
 		int numBands = src.getNumBands();
 
 		int srcStride = stride(src);
@@ -105,11 +102,11 @@ public class ConvertRaster {
 		int srcStrideDiff = srcStride-src.getNumDataElements()*dst.width;
 
 		if (numBands == 3) {
-			from_3BU8_to_F32(dst, srcData, data, srcOffset, srcStrideDiff);
+			from_3BU8_to_F32(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 1) {
-			from_1BU8_to_F32(dst, srcData, data, srcStride, srcOffset);
+			from_1BU8_to_F32(dst, srcData, srcStride, srcOffset);
 		} else if (numBands == 4) {
-			from_4BU8_to_F32(dst, srcData, data, srcOffset, srcStrideDiff);
+			from_4BU8_to_F32(dst, srcData, srcOffset, srcStrideDiff);
 		} else {
 			throw new RuntimeException("Write more code here.");
 		}
@@ -122,7 +119,7 @@ public class ConvertRaster {
 		return raster.getWidth()*raster.getNumDataElements();
 	}
 
-	private static void from_4BU8_to_U8(GrayU8 dst, byte[] srcData, byte[] data, int srcOffset, int srcStrideDiff) {
+	private static void from_4BU8_to_U8(GrayU8 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
@@ -135,15 +132,15 @@ public class ConvertRaster {
 
 				int ave = (r + g + b) / 3;
 
-				data[indexDst] = (byte) ave;
+				dst.data[indexDst] = (byte) ave;
 			}
 			indexSrc += srcStrideDiff;
 		}
 	}
 
-	private static void from_1BU8_to_U8(GrayU8 dst, byte[] srcData, byte[] data, int size, int srcStride, int srcOffset, int srcStrideDiff) {
+	private static void from_1BU8_to_U8(GrayU8 dst, byte[] srcData, int size, int srcStride, int srcOffset, int srcStrideDiff) {
 		if (dst.startIndex == 0 && dst.width == dst.stride && srcStrideDiff == 0 && srcOffset == 0 )
-			System.arraycopy(srcData, 0, data, 0, size);
+			System.arraycopy(srcData, 0, dst.data, 0, size);
 		else {
 			for (int y = 0; y < dst.height; y++) {
 				int indexDst = dst.startIndex + dst.stride * y;
@@ -154,30 +151,30 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_3BU8_to_U8(GrayU8 dst, byte[] srcData, byte[] dstData, int srcOffset, int srcStrideDiff) {
+	private static void from_3BU8_to_U8(GrayU8 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
-			for (; indexDst < indexDstEnd; indexDst++) {
+			while ( indexDst < indexDstEnd ) {
 				int r = srcData[indexSrc++] & 0xFF;
 				int g = srcData[indexSrc++] & 0xFF;
 				int b = srcData[indexSrc++] & 0xFF;
 
 				int ave = (r + g + b) / 3;
 
-				dstData[indexDst] = (byte) ave;
+				dst.data[indexDst++] = (byte) ave;
 			}
 			indexSrc += srcStrideDiff;
 		}
 	}
 
-	private static void from_4BU8_to_F32(GrayF32 dst, byte[] srcData, float[] data, int srcOffset, int srcStrideDiff) {
+	private static void from_4BU8_to_F32(GrayF32 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
-			for (; indexDst < indexDstEnd; indexDst++) {
+			while (indexDst < indexDstEnd) {
 				indexSrc++;
 				int r = srcData[indexSrc++] & 0xFF;
 				int g = srcData[indexSrc++] & 0xFF;
@@ -185,37 +182,37 @@ public class ConvertRaster {
 
 				float ave = (r + g + b) / 3.0f;
 
-				data[indexDst] = ave;
+				dst.data[indexDst++] = ave;
 			}
 			indexSrc += srcStrideDiff;
 		}
 	}
 
-	private static void from_1BU8_to_F32(GrayF32 dst, byte[] srcData, float[] data, int srcStride, int srcOffset) {
+	private static void from_1BU8_to_F32(GrayF32 dst, byte[] srcData, int srcStride, int srcOffset) {
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
 			int indexSrc = srcOffset + srcStride * y;
 
-			for (; indexDst < indexDstEnd; indexDst++) {
-				data[indexDst] = srcData[indexSrc++] & 0xFF;
+			while ( indexDst < indexDstEnd) {
+				dst.data[indexDst++] = srcData[indexSrc++] & 0xFF;
 			}
 		}
 	}
 
-	private static void from_3BU8_to_F32(GrayF32 dst, byte[] srcData, float[] data, int srcOffset, int srcStrideDiff) {
+	private static void from_3BU8_to_F32(GrayF32 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
-			for (; indexDst < indexDstEnd; indexDst++) {
+			while ( indexDst < indexDstEnd) {
 				int r = srcData[indexSrc++] & 0xFF;
 				int g = srcData[indexSrc++] & 0xFF;
 				int b = srcData[indexSrc++] & 0xFF;
 
 				float ave = (r + g + b) / 3.0f;
 
-				data[indexDst] = ave;
+				dst.data[indexDst++] = ave;
 			}
 			indexSrc += srcStrideDiff;
 		}
@@ -1523,9 +1520,9 @@ public class ConvertRaster {
 			for (int x = 0; x < width; x++) {
 				int v = data[indexSrc++] & 0xFF;
 
-				int argb = v << 16 | v << 8 | v;
+				int rgb = v << 16 | v << 8 | v;
 
-				dst.setRGB(x, y, argb);
+				dst.setRGB(x, y, rgb);
 			}
 		}
 

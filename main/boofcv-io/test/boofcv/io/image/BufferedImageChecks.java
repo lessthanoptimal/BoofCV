@@ -68,7 +68,7 @@ public class BufferedImageChecks {
 
 		WritableRaster raster = imgA.getRaster();
 		if (raster.getDataBuffer().getDataType() == DataBuffer.TYPE_BYTE &&
-				imgA.getType() != BufferedImage.TYPE_BYTE_INDEXED) {
+				ConvertBufferedImage.isKnownByteFormat(imgA) ) {
 
 			if (raster.getNumBands() == 1) {
 
@@ -85,13 +85,13 @@ public class BufferedImageChecks {
 			for (int x = 0; x < imgA.getWidth(); x++) {
 				int rgb = imgA.getRGB(x, y);
 
-				int gray = (byte) ((((rgb >>> 16) & 0xFF) + ((rgb >>> 8) & 0xFF) + (rgb & 0xFF)) / 3);
+				int grayA = (byte) ((((rgb >>> 16) & 0xFF) + ((rgb >>> 8) & 0xFF) + (rgb & 0xFF)) / 3);
 				int grayB = imgB.get(x, y);
 				if (!imgB.getDataType().isSigned())
-					gray &= 0xFF;
+					grayA &= 0xFF;
 
-				if (Math.abs(gray - grayB) != 0) {
-					throw new RuntimeException("images are not equal: (" + x + " , " + y + ") A = " + gray + " B = " + grayB);
+				if (Math.abs(grayA - grayB) != 0) {
+					throw new RuntimeException("images are not equal: (" + x + " , " + y + ") A = " + grayA + " B = " + grayB);
 				}
 			}
 		}
@@ -122,7 +122,7 @@ public class BufferedImageChecks {
 
 		WritableRaster raster = imgA.getRaster();
 		if (raster.getDataBuffer().getDataType() == DataBuffer.TYPE_BYTE &&
-				imgA.getType() != BufferedImage.TYPE_BYTE_INDEXED) {
+				ConvertBufferedImage.isKnownByteFormat(imgA) ) {
 
 			if (raster.getNumBands() == 1) {
 				byte []data = ((DataBufferByte)raster.getDataBuffer()).getData();
@@ -191,7 +191,7 @@ public class BufferedImageChecks {
 
 		WritableRaster raster = imgA.getRaster();
 		if (raster.getDataBuffer().getDataType() == DataBuffer.TYPE_BYTE &&
-				imgA.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+				ConvertBufferedImage.isKnownByteFormat(imgA)  ) {
 
 			if (raster.getNumBands() == 1) {
 				byte []data = ((DataBufferByte)raster.getDataBuffer()).getData();
@@ -312,7 +312,7 @@ public class BufferedImageChecks {
 
 		WritableRaster raster = imgA.getRaster();
 		if (raster.getDataBuffer().getDataType() == DataBuffer.TYPE_BYTE &&
-				imgA.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+				ConvertBufferedImage.isKnownByteFormat(imgA)) {
 
 			if (raster.getNumBands() == 1) {
 				byte []dataA = ((DataBufferByte)raster.getDataBuffer()).getData();

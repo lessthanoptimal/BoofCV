@@ -270,7 +270,7 @@ public class TestConvertBufferedImage {
 	public void convertFromSingle() {
 		BufferedImage origImg;
 
-		for( int i = 0; i < 5; i++ ) {
+		for( int i = 0; i < 6; i++ ) {
 
 			if( i == 0 )
 				origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
@@ -280,6 +280,8 @@ public class TestConvertBufferedImage {
 				origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 4, rand);
 			else if( i == 3 )
 				origImg = TestConvertRaster.createByteIndexed(imgWidth, imgHeight, rand );
+			else if( i == 4 )
+				origImg = TestConvertRaster.createByteBinary(imgWidth, imgHeight, rand );
 			else
 				origImg = TestConvertRaster.createIntBuff(imgWidth,imgHeight,rand);
 
@@ -326,10 +328,10 @@ public class TestConvertBufferedImage {
 	}
 
 	@Test
-	public void convertFromMulti() {
+	public void convertFromPlanar() {
 		BufferedImage origImg;
 
-		for( int i = 0; i < 4; i++ ) {
+		for( int i = 0; i < 6; i++ ) {
 
 			if( i == 0 )
 				origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
@@ -339,6 +341,8 @@ public class TestConvertBufferedImage {
 				origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 4, rand);
 			else if( i == 3 )
 				origImg = TestConvertRaster.createByteIndexed(imgWidth, imgHeight, rand );
+			else if( i == 4 )
+				origImg = TestConvertRaster.createByteBinary(imgWidth, imgHeight, rand );
 			else
 				origImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
 
@@ -363,7 +367,7 @@ public class TestConvertBufferedImage {
 	public void convertFromInterleaved() {
 		BufferedImage origImg;
 
-		for( int i = 0; i < 4; i++ ) {
+		for( int i = 0; i < 6; i++ ) {
 
 			int numBands;
 			if (i == 0) {
@@ -377,6 +381,9 @@ public class TestConvertBufferedImage {
 				numBands = 4;
 			} else if( i == 3 ) {
 				origImg = TestConvertRaster.createByteIndexed(imgWidth, imgHeight, rand);
+				numBands = 3;
+			} else if( i == 4 ) {
+				origImg = TestConvertRaster.createByteBinary(imgWidth, imgHeight, rand);
 				numBands = 3;
 			} else {
 				origImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
@@ -445,6 +452,7 @@ public class TestConvertBufferedImage {
 		convertTo(input, BufferedImage.TYPE_3BYTE_BGR);
 //		convertTo(input, BufferedImage.TYPE_4BYTE_ABGR); // commented out 4 band images just to make things easier
 //		convertTo(input, BufferedImage.TYPE_INT_ARGB);
+//		convertTo(input, BufferedImage.TYPE_BYTE_BINARY); // need to put a lot more thought into how to test this type
 		convertTo(input, BufferedImage.TYPE_INT_RGB);
 		convertTo(input, BufferedImage.TYPE_INT_BGR);
 	}

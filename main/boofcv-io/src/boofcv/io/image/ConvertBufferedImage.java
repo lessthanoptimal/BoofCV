@@ -120,8 +120,7 @@ public class ConvertBufferedImage {
 	public static InterleavedU8 extractInterleavedU8(BufferedImage img) {
 
 		DataBuffer buffer = img.getRaster().getDataBuffer();
-		if (buffer.getDataType() == DataBuffer.TYPE_BYTE &&
-				img.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+		if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(img) ) {
 			WritableRaster raster = img.getRaster();
 
 			InterleavedU8 ret = new InterleavedU8();
@@ -152,8 +151,7 @@ public class ConvertBufferedImage {
 	public static GrayU8 extractGrayU8(BufferedImage img) {
 		WritableRaster raster = img.getRaster();
 		DataBuffer buffer = raster.getDataBuffer();
-		if (buffer.getDataType() == DataBuffer.TYPE_BYTE &&
-				img.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+		if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(img) ) {
 
 			if (raster.getNumBands() != 1)
 				throw new IllegalArgumentException("Input image has more than one channel");
@@ -370,7 +368,7 @@ public class ConvertBufferedImage {
 		try {
 			DataBuffer buff = src.getRaster().getDataBuffer();
 			if (buff.getDataType() == DataBuffer.TYPE_BYTE ) {
-				if( src.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+				if( isKnownByteFormat(src) ) {
 					ConvertRaster.bufferedToGray((DataBufferByte)buff,src.getRaster(), dst);
 				} else {
 					ConvertRaster.bufferedToGray(src, dst);
@@ -433,7 +431,7 @@ public class ConvertBufferedImage {
 			DataBuffer buff = src.getRaster().getDataBuffer();
 
 			if ( buff.getDataType() == DataBuffer.TYPE_BYTE ) {
-				if( src.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+				if( isKnownByteFormat(src) ) {
 					ConvertRaster.bufferedToGray((DataBufferByte)buff,src.getRaster(), dst);
 				} else {
 					ConvertRaster.bufferedToGray(src, dst);
@@ -475,7 +473,7 @@ public class ConvertBufferedImage {
 			WritableRaster raster = src.getRaster();
 
 			int numBands;
-			if( src.getType() == BufferedImage.TYPE_BYTE_INDEXED )
+			if( !isKnownByteFormat(src) )
 				numBands = 3;
 			else
 				numBands = raster.getNumBands();
@@ -488,7 +486,7 @@ public class ConvertBufferedImage {
 			DataBuffer srcBuff = src.getRaster().getDataBuffer();
 			if( type == GrayU8.class ) {
 				if (srcBuff.getDataType() == DataBuffer.TYPE_BYTE &&
-						src.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+						isKnownByteFormat(src) ) {
 					if( src.getType() == BufferedImage.TYPE_BYTE_GRAY)  {
 						for( int i = 0; i < dst.getNumBands(); i++ )
 							ConvertRaster.bufferedToGray(src, ((Planar<GrayU8>) dst).getBand(i));
@@ -502,7 +500,7 @@ public class ConvertBufferedImage {
 				}
 			} else if( type == GrayF32.class ) {
 				if (srcBuff.getDataType() == DataBuffer.TYPE_BYTE &&
-						src.getType() != BufferedImage.TYPE_BYTE_INDEXED  ) {
+						isKnownByteFormat(src)  ) {
 					if( src.getType() == BufferedImage.TYPE_BYTE_GRAY)  {
 						for( int i = 0; i < dst.getNumBands(); i++ )
 							ConvertRaster.bufferedToGray(src,((Planar<GrayF32>)dst).getBand(i));
@@ -565,7 +563,7 @@ public class ConvertBufferedImage {
 			WritableRaster raster = src.getRaster();
 
 			int numBands;
-			if( src.getType() == BufferedImage.TYPE_BYTE_INDEXED )
+			if( !isKnownByteFormat(src) )
 				numBands = 3;
 			else
 				numBands = raster.getNumBands();
@@ -576,7 +574,7 @@ public class ConvertBufferedImage {
 			DataBuffer buffer = src.getRaster().getDataBuffer();
 			if( dst instanceof InterleavedU8 ) {
 				if (buffer.getDataType() == DataBuffer.TYPE_BYTE ){
-					if(src.getType() != BufferedImage.TYPE_BYTE_INDEXED) {
+					if(isKnownByteFormat(src)) {
 						if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
 							ConvertRaster.bufferedToGray(src, (InterleavedU8) dst);
 						} else {
@@ -592,7 +590,7 @@ public class ConvertBufferedImage {
 				}
 			} else if( dst instanceof InterleavedF32 ) {
 				if (buffer.getDataType() == DataBuffer.TYPE_BYTE ) {
-					if(src.getType() != BufferedImage.TYPE_BYTE_INDEXED) {
+					if(isKnownByteFormat(src)) {
 						if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
 							ConvertRaster.bufferedToGray(src, (InterleavedF32) dst);
 						} else {
@@ -694,8 +692,7 @@ public class ConvertBufferedImage {
 
 		DataBuffer buffer = dst.getRaster().getDataBuffer();
 		try {
-			if (buffer.getDataType() == DataBuffer.TYPE_BYTE &&
-					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+			if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst) ) {
 				ConvertRaster.grayToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
 			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
 				ConvertRaster.grayToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
@@ -724,8 +721,7 @@ public class ConvertBufferedImage {
 
 		DataBuffer buffer = dst.getRaster().getDataBuffer();
 		try {
-			if (buffer.getDataType() == DataBuffer.TYPE_BYTE &&
-					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+			if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst) ) {
 				ConvertRaster.grayToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
 			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
 				ConvertRaster.grayToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
@@ -757,8 +753,7 @@ public class ConvertBufferedImage {
 
 		DataBuffer buffer = dst.getRaster().getDataBuffer();
 		try {
-			if (buffer.getDataType() == DataBuffer.TYPE_BYTE &&
-					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+			if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst) ) {
 				ConvertRaster.grayToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
 			} else if ( buffer.getDataType() == DataBuffer.TYPE_INT ) {
 				ConvertRaster.grayToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
@@ -792,8 +787,7 @@ public class ConvertBufferedImage {
 
 		DataBuffer buffer = dst.getRaster().getDataBuffer();
 		try {
-			if (buffer.getDataType() == DataBuffer.TYPE_BYTE &&
-					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+			if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst) ) {
 				ConvertRaster.multToBuffered_U8(src, (DataBufferByte)buffer, dst.getRaster());
 			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
 				ConvertRaster.multToBuffered_U8(src, (DataBufferInt)buffer, dst.getRaster());
@@ -827,8 +821,7 @@ public class ConvertBufferedImage {
 
 		DataBuffer buffer = dst.getRaster().getDataBuffer();
 		try {
-			if (buffer.getDataType() == DataBuffer.TYPE_BYTE &&
-					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+			if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)  ) {
 				ConvertRaster.multToBuffered_F32(src, (DataBufferByte)buffer, dst.getRaster());
 			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
 				ConvertRaster.multToBuffered_F32(src, (DataBufferInt)buffer, dst.getRaster());
@@ -849,8 +842,7 @@ public class ConvertBufferedImage {
 
 		DataBuffer buffer = dst.getRaster().getDataBuffer();
 		try {
-			if (buffer.getDataType() == DataBuffer.TYPE_BYTE &&
-					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+			if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)  ) {
 				ConvertRaster.interleavedToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
 				if( orderRgb )
 					orderBandsBufferedFromRGB((DataBufferByte)buffer, dst.getRaster(),dst.getType());
@@ -875,8 +867,7 @@ public class ConvertBufferedImage {
 
 		DataBuffer buffer = dst.getRaster().getDataBuffer();
 		try {
-			if (buffer.getDataType() == DataBuffer.TYPE_BYTE &&
-					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+			if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)  ) {
 				ConvertRaster.interleavedToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
 				if( orderRgb )
 					orderBandsBufferedFromRGB((DataBufferByte)buffer, dst.getRaster(),dst.getType());
@@ -1267,6 +1258,14 @@ public class ConvertBufferedImage {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Checks to see if it is a known byte format
+	 */
+	public static boolean isKnownByteFormat( BufferedImage image ) {
+		int type = image.getType();
+		return type != BufferedImage.TYPE_BYTE_INDEXED && type != BufferedImage.TYPE_BYTE_BINARY;
 	}
 
 	/**
