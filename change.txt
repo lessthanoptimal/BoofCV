@@ -98,17 +98,11 @@ Version : 0.27
        Create a stand alone application that people can download to calibrate
 - TODO Tutorial on image features?  Sparse and dense?
 - TODO Look at AKAZE feature
-- TODO Gradle - look into switching to java-library and changing dependencies to api
-       https://blog.gradle.org/incremental-compiler-avoidance
 - TODO Clarify how you calibrate the camera in Processing
 - TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
         It is a homogenous coordinate with z=1 being implicit.
 - TODO Integrate in Marius Orfgen's image statistics histogram ideas
 - TODO DescribeDenseHogFastAlg naming consistency. See TODO at top
-- TODO Removed all references to sourceforge.net in downloaded data
-       ExampleClassifySceneKnn.java
-       FactoryImageClassifier.java
-
 
 ---------------------------------------------
 Date    : 2016/12/07
