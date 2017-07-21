@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.describe;
 
+import boofcv.alg.InputSanityCheck;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -48,7 +49,7 @@ public class DescribePointSurfPlanar<II extends ImageGray<II>>
 	// integral of gray image
 	private II grayII;
 	// integral of multi-band image
-	private Planar<II> ii;
+	private Planar<II> colorII;
 
 	// storage for feature compute in each band
 	private TupleDesc_F64 bandDesc;
@@ -78,16 +79,26 @@ public class DescribePointSurfPlanar<II extends ImageGray<II>>
 		return BrightFeature.class;
 	}
 
-	public void setImage( II grayII , Planar<II> integralImage ) {
+	/**
+	 * Specifies input image shapes.
+	 * @param grayII integral image of gray scale image
+	 * @param colorII integral image of color image
+	 */
+	public void setImage( II grayII , Planar<II> colorII ) {
+		InputSanityCheck.checkSameShape(grayII,colorII);
+		if( colorII.getNumBands() != numBands )
+			throw new IllegalArgumentException("Expected planar images to have "
+					+numBands+" not "+colorII.getNumBands());
+
 		this.grayII = grayII;
-		ii = integralImage;
+		this.colorII = colorII;
 	}
 
 	public void describe(double x, double y, double angle, double scale, BrightFeature desc)
 	{
 		int featureIndex = 0;
-		for( int band = 0; band < ii.getNumBands(); band++ ) {
-			describe.setImage(ii.getBand(band));
+		for(int band = 0; band < colorII.getNumBands(); band++ ) {
+			describe.setImage(colorII.getBand(band));
 			describe.describe(x,y, angle, scale, bandDesc);
 			System.arraycopy(bandDesc.value,0,desc.value,featureIndex,bandDesc.size());
 			featureIndex += bandDesc.size();

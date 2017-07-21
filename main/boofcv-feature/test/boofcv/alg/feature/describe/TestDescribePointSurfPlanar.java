@@ -90,4 +90,33 @@ public class TestDescribePointSurfPlanar {
 			}
 		}
 	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void failNumBandMissMatch(){
+		Planar<GrayF32> input = new Planar<>(GrayF32.class,width,height,3);
+
+		GImageMiscOps.addUniform(input,rand,0,200);
+
+		DescribePointSurf<GrayF32> desc = new DescribePointSurf<>(GrayF32.class);
+		DescribePointSurfPlanar<GrayF32> alg = new DescribePointSurfPlanar<>(desc,2);
+
+		GrayF32 gray = ConvertImage.average(input,null);
+
+		alg.setImage(gray,input);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void failShape(){
+		Planar<GrayF32> input = new Planar<>(GrayF32.class,width,height,3);
+
+		GImageMiscOps.addUniform(input,rand,0,200);
+
+		DescribePointSurf<GrayF32> desc = new DescribePointSurf<>(GrayF32.class);
+		DescribePointSurfPlanar<GrayF32> alg = new DescribePointSurfPlanar<>(desc,4);
+
+		GrayF32 gray = ConvertImage.average(input,null);
+		gray.reshape(width-1,height);
+
+		alg.setImage(gray,input);
+	}
 }

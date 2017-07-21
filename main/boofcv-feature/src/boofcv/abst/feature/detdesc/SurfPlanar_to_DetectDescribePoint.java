@@ -56,6 +56,9 @@ public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray<T>, II extend
 
 	@Override
 	public void detect(Planar<T> input) {
+		if( input.getNumBands() != bandII.getNumBands() )
+			throw new IllegalArgumentException("Unexpected number of bands. Expected "+
+					bandII.getNumBands()+" found "+input.getNumBands());
 		gray.reshape(input.width,input.height);
 		grayII.reshape(input.width,input.height);
 		bandII.reshape(input.width,input.height);
