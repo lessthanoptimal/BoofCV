@@ -147,6 +147,24 @@ public class GConvertImage {
 	}
 
 	/**
+	 * Converts a {@link ImageMultiBand} into a {@link ImageGray} by computing the average value of each pixel
+	 * across all the bands.
+	 *
+	 * @param input ImageMultiBand that is being converted. Not modified.
+	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static <T extends ImageGray<T>>T average( ImageMultiBand input , T output ) {
+		if( input instanceof Planar ) {
+			return (T)average((Planar)input,output);
+		} else if( input instanceof ImageInterleaved ) {
+			return (T)average((ImageInterleaved)input,output);
+		} else {
+			throw new RuntimeException("Unknown multiband image");
+		}
+	}
+
+	/**
 	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 *
