@@ -36,6 +36,11 @@ subprojects {
         }
     }
 
+    // Enable incremental compile. Should make single file changes faster
+    tasks.withType(JavaCompile) {
+        options.incremental = true
+    }
+
     repositories {
         mavenCentral()
         mavenLocal()
@@ -105,21 +110,25 @@ subprojects {
     }
 
     // Force the release build to fail if it depends on a SNAPSHOT
-    task checkDependsOnSNAPSHOT << {
-        if (version.endsWith("SNAPSHOT"))
-            return;
+    task checkDependsOnSNAPSHOT {
+        doLast {
+            if (version.endsWith("SNAPSHOT"))
+                return
 
-        project.configurations.compile.each {
-            if (it.toString().contains("SNAPSHOT"))
-                throw new Exception("Release build contains snapshot dependencies: " + it)
+            project.configurations.compile.each {
+                if (it.toString().contains("SNAPSHOT"))
+                    throw new Exception("Release build contains snapshot dependencies: " + it)
+            }
         }
     }
     jar.dependsOn checkDependsOnSNAPSHOT
 
 
-    artifacts {
-        archives javadocJar, sourcesJar
-    }
+    // Disabling makes build MUCH faster.
+    // I guess this means install won't install javadoc and source files?
+//    artifacts {
+//        archives javadocJar, sourcesJar
+//    }
 
     // if Maven central isn't setup in gradle.properties skip all of this
     if( project.hasProperty('ossrhUsername') ) {
@@ -211,32 +220,34 @@ try {
 def javadocProjects = mainProjects + integrationProjects
 
 // Creates a directory with all the compiled BoofCV jars and the dependencies for main
-task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+':sourcesJar']}.flatten() ) << {
+task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+':sourcesJar']}.flatten() ) {
 
-    // Compiled jars (bin and src) for all BoofCV modules
-    ext.boofJars = files(javadocProjects.collect{ project(it).tasks.jar.archivePath })
-    ext.boofJars += files(javadocProjects.collect{ project(it).tasks.sourcesJar.archivePath })
+    doLast {
+        // Compiled jars (bin and src) for all BoofCV modules
+        ext.boofJars = files(javadocProjects.collect { project(it).tasks.jar.archivePath })
+        ext.boofJars += files(javadocProjects.collect { project(it).tasks.sourcesJar.archivePath })
 
-    // This will be a list of just external dependencies
-    ext.listExternal = files(javadocProjects.collect{ project(it).configurations.compile })
-    ext.listExternal = ext.listExternal - ext.boofJars
-    ext.listExternal = ext.listExternal.findAll({ !it.getName().contains("android.jar") })
+        // This will be a list of just external dependencies
+        ext.listExternal = files(javadocProjects.collect { project(it).configurations.compile })
+        ext.listExternal = ext.listExternal - ext.boofJars
+        ext.listExternal = ext.listExternal.findAll({ !it.getName().contains("android.jar") })
 
-    file('libraries').deleteDir()
-    file('libraries').mkdir()
+        file('libraries').deleteDir()
+        file('libraries').mkdir()
 
-    copy {
-        from ext.listExternal
-        into 'libraries'
-    }
+        copy {
+            from ext.listExternal
+            into 'libraries'
+        }
 
-    copy {
-        from ext.boofJars
-        into 'libraries'
+        copy {
+            from ext.boofJars
+            into 'libraries'
 
-        // append on BoofCV so it's clear which jars are part of BoofCV and which are not
-        rename { String fileName ->
-            "BoofCV-" + fileName
+            // append on BoofCV so it's clear which jars are part of BoofCV and which are not
+            rename { String fileName ->
+                "BoofCV-" + fileName
+            }
         }
     }
 }
@@ -289,7 +300,7 @@ task testReport(type: TestReport) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.14.1'
+    gradleVersion = '4.0.1'
 }
 
 idea {
