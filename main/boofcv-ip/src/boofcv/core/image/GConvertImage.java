@@ -63,7 +63,8 @@ public class GConvertImage {
 						Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
 						m.invoke(null, input, output);
 					} catch (Exception e) {
-						throw new IllegalArgumentException("Unknown conversion");
+						throw new IllegalArgumentException("Unknown conversion. "+
+								input.getClass().getSimpleName()+" to "+output.getClass().getSimpleName());
 					}
 				}
 			} else if( output instanceof Planar) {
@@ -85,7 +86,8 @@ public class GConvertImage {
 					Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
 					m.invoke(null, input, output);
 				} catch (Exception e) {
-					throw new IllegalArgumentException("Unknown conversion");
+					throw new IllegalArgumentException("Unknown conversion. "+
+							input.getClass().getSimpleName()+" to "+output.getClass().getSimpleName());
 				}
 			}
 		} else if( input instanceof Planar && output instanceof ImageGray)  {
@@ -106,7 +108,8 @@ public class GConvertImage {
 				Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
 				m.invoke(null, input, output);
 			} catch (Exception e) {
-				throw new IllegalArgumentException("Unknown conversion");
+				throw new IllegalArgumentException("Unknown conversion. "+
+						input.getClass().getSimpleName()+" to "+output.getClass().getSimpleName());
 			}
 		} else if( input instanceof Planar && output instanceof Planar) {
 			Planar mi = (Planar) input;
@@ -124,7 +127,8 @@ public class GConvertImage {
 				Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
 				m.invoke(null, input, output);
 			} catch (Exception e) {
-				throw new IllegalArgumentException("Unknown conversion");
+				throw new IllegalArgumentException("Unknown conversion. "+
+						input.getClass().getSimpleName()+" to "+output.getClass().getSimpleName());
 			}
 		} else if( input instanceof ImageInterleaved && output instanceof ImageGray)  {
 			ImageInterleaved mb = (ImageInterleaved)input;
