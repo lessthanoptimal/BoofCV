@@ -31,4 +31,11 @@ public abstract class ImageMultiBand<T extends ImageMultiBand<T>> extends ImageB
 	 * @return Number of bands in the image.
 	 */
 	public abstract int getNumBands();
+
+	/**
+	 * Changes the number of bands in the image while keeping the width and height the same. A simple reshape
+	 * is done if possible, if not then new internal data is defined
+	 * @param bands number of bands
+	 */
+	public abstract void setNumberOfBands( int bands );
 }

@@ -568,7 +568,7 @@ public class ConvertBufferedImage {
 			else
 				numBands = raster.getNumBands();
 
-			dst.setNumBands(numBands);
+			dst.setNumberOfBands(numBands);
 			dst.reshape(src.getWidth(), src.getHeight());
 
 			DataBuffer buffer = src.getRaster().getDataBuffer();
@@ -611,7 +611,7 @@ public class ConvertBufferedImage {
 		} catch( java.security.AccessControlException e) {
 			// force the number of bands to be something valid
 			if( dst.getNumBands() != 3 || dst.getNumBands() != 1 ) {
-				dst.setNumBands(3);
+				dst.setNumberOfBands(3);
 			}
 			dst.reshape(src.getWidth(), src.getHeight());
 

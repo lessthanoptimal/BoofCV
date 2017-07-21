@@ -86,6 +86,7 @@ Version : 0.27
 - Split FFMPEG and JavaCV into separate dependencies
 - You can now specify which native architectures you wish to support
   * See native_arch gradle parameter
+- ImageMultiBand added setNumberOfBands()
 
 - TODO Visualization tools for Direct VO
 -      Show warped image

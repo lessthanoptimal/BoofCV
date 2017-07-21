@@ -224,10 +224,10 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 	}
 
 	@Test
-	public void setNumBands() {
+	public void setNumberOfBands() {
 		T a = createImage(10, 20, 3);
 
-		a.setNumBands(2);
+		a.setNumberOfBands(2);
 
 		assertEquals(2,a.getNumBands());
 		assertEquals(2,a.getImageType().getNumBands());
@@ -235,7 +235,7 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 
 		assertTrue(Array.getLength(a._getData()) >= 10*20*2 );
 
-		a.setNumBands(4);
+		a.setNumberOfBands(4);
 
 		assertEquals(4,a.getNumBands());
 		assertEquals(4,a.getImageType().getNumBands());

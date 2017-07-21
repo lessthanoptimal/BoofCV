@@ -152,7 +152,8 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 		return imageType.getNumBands();
 	}
 
-	public final void setNumBands(int numBands) {
+	@Override
+	public final void setNumberOfBands(int numBands) {
 		if( this.numBands == numBands )
 			return;
 

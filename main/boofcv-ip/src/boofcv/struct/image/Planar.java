@@ -265,6 +265,7 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	 * if possible
 	 * @param numberOfBands New number of bands in the image.
 	 */
+	@Override
 	public void setNumberOfBands( int numberOfBands ) {
 		if( numberOfBands == this.bands.length )
 			return;

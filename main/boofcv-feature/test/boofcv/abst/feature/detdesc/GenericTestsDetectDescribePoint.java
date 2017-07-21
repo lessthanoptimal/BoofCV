@@ -21,6 +21,7 @@ package boofcv.abst.feature.detdesc;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_F64;
@@ -197,5 +198,21 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 				assertTrue(desc1.getDouble(j) == desc2.getDouble(j));
 			}
 		}
+	}
+
+	/**
+	 * See if a sanity check is performed for color images. The bands must match
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void failBandMissMatch() {
+		if( !(image instanceof ImageMultiBand) ) {
+			return;
+		}
+		ImageMultiBand mb = (ImageMultiBand)image;
+		ImageMultiBand bad = (ImageMultiBand)mb.createSameShape();
+		bad.setNumberOfBands(mb.getNumBands()+1);
+
+		DetectDescribePoint<T,D> alg = createDetDesc();
+		alg.detect((T)bad);
 	}
 }
