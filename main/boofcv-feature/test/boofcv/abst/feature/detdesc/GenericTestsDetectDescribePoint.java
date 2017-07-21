@@ -29,8 +29,7 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Very basic tests which check for conformance to {@link DetectDescribePoint}.
@@ -203,7 +202,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 	/**
 	 * See if a sanity check is performed for color images. The bands must match
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void failBandMissMatch() {
 		if( !(image instanceof ImageMultiBand) ) {
 			return;
@@ -213,6 +212,9 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 		bad.setNumberOfBands(mb.getNumBands()+1);
 
 		DetectDescribePoint<T,D> alg = createDetDesc();
-		alg.detect((T)bad);
+		try {
+			alg.detect((T) bad);
+			fail("Should have thrown an exception");
+		} catch( IllegalArgumentException ignore ){}
 	}
 }
