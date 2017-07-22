@@ -19,6 +19,7 @@
 package boofcv.factory.filter.binary;
 
 import boofcv.abst.filter.binary.*;
+import boofcv.alg.filter.binary.ThresholdSquareBlockMinMax;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -72,6 +73,19 @@ public class FactoryThresholdBinary {
 		return new LocalSquareBinaryFilter<>(radius, scale, down, ImageType.single(inputType));
 	}
 
+	/**
+	 * Applies a very fast non-overlapping block thresholding algorithm which uses min/max statistics.
+	 *
+	 * @see ThresholdSquareBlockMinMax
+	 *
+	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
+	 * @param down Should it threshold up or down.
+	 * @param minimumSpread If the difference between min max is less than or equal to this
+	 *                         value then it is considered textureless.  Set to &le; -1 to disable.
+	 * @param regionWidth About how wide and tall you wish a block to be in pixels.
+	 * @param inputType Type of input image
+	 * @return Filter to binary
+	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localSquareBlockMinMax(int regionWidth, double scale , boolean down,
 											double minimumSpread, Class<T> inputType) {

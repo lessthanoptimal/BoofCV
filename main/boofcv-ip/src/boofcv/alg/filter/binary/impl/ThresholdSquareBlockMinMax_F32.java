@@ -24,7 +24,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.InterleavedF32;
 
 /**
- *  * Implementation of {@link ThresholdSquareBlockMinMax} for input images of type {@link GrayF32}
+ * Implementation of {@link ThresholdSquareBlockMinMax} for input images of type {@link GrayF32}
  *
  * @author Peter Abeles
  */

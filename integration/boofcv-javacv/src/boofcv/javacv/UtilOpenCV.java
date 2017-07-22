@@ -25,6 +25,8 @@ import org.bytedeco.javacpp.indexer.DoubleRawIndexer;
 import org.bytedeco.javacpp.opencv_core.*;
 import org.ejml.data.DMatrixRMaj;
 
+import java.io.File;
+
 import static org.bytedeco.javacpp.opencv_core.*;
 
 /**
@@ -40,7 +42,8 @@ public class UtilOpenCV {
 	 * @return CameraPinholeRadial
 	 */
 	public static CameraPinholeRadial loadPinholeRadial( String fileName ) {
-		FileStorage fs = new FileStorage(fileName, FileStorage.READ);
+		FileStorage fs = new FileStorage(
+				new File(fileName).getAbsolutePath(), FileStorage.READ);
 
 		IntPointer width = new IntPointer(1);
 		IntPointer height = new IntPointer(1);
@@ -76,7 +79,8 @@ public class UtilOpenCV {
 	}
 
 	public static void save( CameraPinholeRadial model , String fileName ) {
-		FileStorage fs = new FileStorage(fileName, FileStorage.WRITE);
+		FileStorage fs = new FileStorage(
+				new File(fileName).getAbsolutePath(), FileStorage.WRITE);
 
 		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(model, (DMatrixRMaj)null);
 

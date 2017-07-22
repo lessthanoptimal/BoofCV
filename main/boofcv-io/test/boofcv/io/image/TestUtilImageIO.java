@@ -41,7 +41,7 @@ public class TestUtilImageIO {
 	int height = 30;
 
 	@Test
-	public void loadImage_saveImage() {
+	public void loadImage_saveImage() throws IOException {
 		BufferedImage orig = new BufferedImage(width,height,BufferedImage.TYPE_BYTE_GRAY);
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
@@ -51,7 +51,9 @@ public class TestUtilImageIO {
 			}
 		}
 
-		UtilImageIO.saveImage(orig,"temp.png");
+		File temp = File.createTempFile("temp", ".png");
+
+		UtilImageIO.saveImage(orig,temp.getPath());
 		BufferedImage found = UtilImageIO.loadImage("temp.png");
 
 		for( int i = 0; i < height; i++ ) {
@@ -65,8 +67,7 @@ public class TestUtilImageIO {
 		}
 
 		// clean up
-		File f = new File("temp.png");
-		assertTrue(f.delete());
+		assertTrue(temp.delete());
 	}
 
 	@Test
@@ -75,7 +76,8 @@ public class TestUtilImageIO {
 		Planar<GrayU8> orig = new Planar<>(GrayU8.class,width,height,3);
 		GImageMiscOps.fillUniform(orig,rand,0,256);
 
-		UtilImageIO.savePPM(orig,"temp.ppm",null);
+		File temp = File.createTempFile("temp", ".png");
+		UtilImageIO.savePPM(orig,temp.getPath(),null);
 		Planar<GrayU8> found = UtilImageIO.loadPPM_U8("temp.ppm",null,null);
 
 		for( int y = 0; y < height; y++ ) {
@@ -86,8 +88,7 @@ public class TestUtilImageIO {
 		}
 
 		// clean up
-		File f = new File("temp.ppm");
-		assertTrue(f.delete());
+		assertTrue(temp.delete());
 	}
 
 	@Test
@@ -95,7 +96,8 @@ public class TestUtilImageIO {
 		GrayU8 orig = new GrayU8(width,height);
 		GImageMiscOps.fillUniform(orig,rand,0,256);
 
-		UtilImageIO.savePGM(orig,"temp.pgm");
+		File temp = File.createTempFile("temp", ".png");
+		UtilImageIO.savePGM(orig,temp.getPath());
 		GrayU8 found = UtilImageIO.loadPGM_U8("temp.pgm",null);
 
 		for( int y = 0; y < height; y++ ) {
@@ -105,8 +107,7 @@ public class TestUtilImageIO {
 		}
 
 		// clean up
-		File f = new File("temp.pgm");
-		assertTrue(f.delete());
+		assertTrue(temp.delete());
 	}
 
 	/**

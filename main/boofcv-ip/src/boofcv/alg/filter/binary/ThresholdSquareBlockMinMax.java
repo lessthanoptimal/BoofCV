@@ -70,7 +70,7 @@ public abstract class ThresholdSquareBlockMinMax
 	/**
 	 * Configures the detector
 	 * @param minimumSpread If the difference between min max is less than or equal to this
-	 *                         value then it is considered textureless.  Set to <= -1 to disable.
+	 *                         value then it is considered textureless.  Set to &le; -1 to disable.
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 */
 	public ThresholdSquareBlockMinMax(double minimumSpread, int requestedBlockWidth) {
