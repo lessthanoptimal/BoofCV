@@ -107,6 +107,7 @@ public class ExampleWebcamObjectTracking<T extends ImageBase<T>> extends JPanel
 
 		while( true ) {
 			BufferedImage buffered = webcam.getImage();
+			if( buffered == null ) break;
 			ConvertBufferedImage.convertFrom(webcam.getImage(),input,true);
 
 			// mode is read/written to by the GUI also

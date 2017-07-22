@@ -1265,7 +1265,9 @@ public class ConvertBufferedImage {
 	 */
 	public static boolean isKnownByteFormat( BufferedImage image ) {
 		int type = image.getType();
-		return type != BufferedImage.TYPE_BYTE_INDEXED && type != BufferedImage.TYPE_BYTE_BINARY;
+		return type != BufferedImage.TYPE_BYTE_INDEXED &&
+				type != BufferedImage.TYPE_BYTE_BINARY &&
+				type != BufferedImage.TYPE_CUSTOM;
 	}
 
 	/**

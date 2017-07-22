@@ -214,6 +214,7 @@ public class AssistedCalibration {
 		}
 
 		gui.setImage(image);
+		gui.repaint();
 	}
 
 	private void handleDetermineSize( boolean detected ) {
