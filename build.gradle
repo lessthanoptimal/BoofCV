@@ -85,12 +85,6 @@ subprojects {
         testCompile group: 'junit', name: 'junit', version: '4.12'
     }
 
-    javadoc {
-        configure(options) {
-            failOnError = false
-        }
-    }
-
     jar {
         manifest { // the manifest of the default jar is of type OsgiManifest
             instruction 'Bundle-Vendor', 'BoofCV'
@@ -122,13 +116,6 @@ subprojects {
         }
     }
     jar.dependsOn checkDependsOnSNAPSHOT
-
-
-    // Disabling makes build MUCH faster.
-    // I guess this means install won't install javadoc and source files?
-//    artifacts {
-//        archives javadocJar, sourcesJar
-//    }
 
     // if Maven central isn't setup in gradle.properties skip all of this
     if( project.hasProperty('ossrhUsername') ) {
@@ -265,7 +252,10 @@ task alljavadoc(type: Javadoc) {
 //    source = javadocProjects.collect { project(it).sourceSets.main.allJava }
     classpath = files(javadocProjects.collect { project(it).sourceSets.main.compileClasspath })
 
-    destinationDir = file("${buildDir}/docs/javadoc")
+    destinationDir = file("docs/api")
+
+    // Hack for Java 8u121 and beyond. Comment out if running an earlier version of Java
+    options.addBooleanOption("-allow-script-in-comments", true)
     configure(options) {
         failOnError = false
         docTitle = "BoofCV JavaDoc ($project.version)"
@@ -276,13 +266,16 @@ task alljavadoc(type: Javadoc) {
     }
 }
 
-task WebJavaDoc(type: Javadoc) {
+task alljavadocWeb(type: Javadoc) {
     // only include source code in src directory to avoid including 3rd party code which some projects do as a hack
     source = javadocProjects.collect { project(it).fileTree('src').include('**/*.java') }
 //    source = javadocProjects.collect { project(it).sourceSets.main.allJava }
     classpath = files(javadocProjects.collect { project(it).sourceSets.main.compileClasspath })
 
-    destinationDir = file("${buildDir}/docs/javadoc")
+    destinationDir = file("docs/api-web")
+
+    // Hack for Java 8u121 and beyond. Comment out if running an earlier version of Java
+    options.addBooleanOption("-allow-script-in-comments", true)
     configure(options) {
         failOnError = false
         docTitle = "BoofCV JavaDoc ($project.version)"
