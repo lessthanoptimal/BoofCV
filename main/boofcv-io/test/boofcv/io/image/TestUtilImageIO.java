@@ -54,7 +54,7 @@ public class TestUtilImageIO {
 		File temp = File.createTempFile("temp", ".png");
 
 		UtilImageIO.saveImage(orig,temp.getPath());
-		BufferedImage found = UtilImageIO.loadImage("temp.png");
+		BufferedImage found = UtilImageIO.loadImage(temp.getPath());
 
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
@@ -78,7 +78,7 @@ public class TestUtilImageIO {
 
 		File temp = File.createTempFile("temp", ".png");
 		UtilImageIO.savePPM(orig,temp.getPath(),null);
-		Planar<GrayU8> found = UtilImageIO.loadPPM_U8("temp.ppm",null,null);
+		Planar<GrayU8> found = UtilImageIO.loadPPM_U8(temp.getPath(),null,null);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
@@ -98,7 +98,7 @@ public class TestUtilImageIO {
 
 		File temp = File.createTempFile("temp", ".png");
 		UtilImageIO.savePGM(orig,temp.getPath());
-		GrayU8 found = UtilImageIO.loadPGM_U8("temp.pgm",null);
+		GrayU8 found = UtilImageIO.loadPGM_U8(temp.getPath(),null);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
