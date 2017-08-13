@@ -80,7 +80,7 @@ public class TestHelperNister5 {
 		SimpleMatrix EEt = E.mult(E.transpose());
 		SimpleMatrix EEtE = EEt.mult(E);
 		SimpleMatrix aE = E.scale(-0.5*EEt.trace());
-		DMatrixRMaj eq2 = EEtE.plus(aE).matrix_F64();
+		DMatrixRMaj eq2 = EEtE.plus(aE).getDDRM();
 
 		// check the solution
 		assertEquals(E.determinant(),Y.data[0],1e-8);

@@ -25,7 +25,7 @@ import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
-import org.ejml.interfaces.linsol.LinearSolver;
+import org.ejml.interfaces.linsol.LinearSolverDense;
 
 /**
  * <p>
@@ -54,7 +54,7 @@ public class HomographyResidualSampson
 	DMatrixRMaj x = new DMatrixRMaj(2,1);
 	DMatrixRMaj error = new DMatrixRMaj(4,1);
 
-	LinearSolver<DMatrixRMaj> solver = LinearSolverFactory_DDRM.linear(2);
+	LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.linear(2);
 
 	@Override
 	public void setModel(DMatrixRMaj H) {

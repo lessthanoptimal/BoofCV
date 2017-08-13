@@ -22,7 +22,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
-import org.ejml.interfaces.linsol.LinearSolver;
+import org.ejml.interfaces.linsol.LinearSolverDense;
 
 import java.util.List;
 
@@ -66,7 +66,7 @@ public class RadialDistortionEstimateLinear {
 	private DMatrixRMaj X;
 
 	// linear solver
-	private LinearSolver<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(0, 0);
+	private LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(0, 0);
 
 	// location of grid coordinates in the world frame.
 	// the z-axis is assumed to be zero

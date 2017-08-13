@@ -89,10 +89,10 @@ public class RectifyFundamental {
 		//Find the two matching transforms
 		SimpleMatrix Hzero = computeHZero(F,epipole2,H);
 
-		SimpleMatrix Ha = computeAffineH(observations,H.matrix_F64(),Hzero.matrix_F64());
+		SimpleMatrix Ha = computeAffineH(observations,H.getDDRM(),Hzero.getDDRM());
 
-		rect1.set(Ha.mult(Hzero).matrix_F64());
-		rect2.set(H.matrix_F64());
+		rect1.set(Ha.mult(Hzero).getDDRM());
+		rect2.set(H.getDDRM());
 	}
 
 	/**
@@ -188,7 +188,7 @@ public class RectifyFundamental {
 		SimpleMatrix x = A.solve(b);
 
 		SimpleMatrix Ha = SimpleMatrix.identity(3);
-		Ha.setRow(0,0,x.matrix_F64().data);
+		Ha.setRow(0,0,x.getDDRM().data);
 
 		return Ha;
 	}

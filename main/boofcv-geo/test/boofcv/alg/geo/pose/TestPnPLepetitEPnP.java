@@ -209,7 +209,7 @@ public class TestPnPLepetitEPnP {
 
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 		alg.numControl = 4;
-		alg.extractNullPoints(M.matrix_F64());
+		alg.extractNullPoints(M.getDDRM());
 
 		// see if the first set of null points is the null space pf M*M
 		List<Point3D_F64> l = alg.nullPts[0];
