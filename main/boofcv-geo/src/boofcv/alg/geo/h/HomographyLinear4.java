@@ -143,7 +143,7 @@ public class HomographyLinear4 {
 
 		SimpleMatrix result = c.invert().mult(a).mult(b);
 
-		M.set(result.getDDRM());
+		M.set(result.matrix_F64());
 	}
 
 	/**

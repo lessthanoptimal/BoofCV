@@ -65,7 +65,7 @@ public class TestFundamentalLinear7 {
 
 		double coefs[] = new double[4];
 
-		FundamentalLinear7.computeCoefficients(F1.getDDRM(), F2.getDDRM(), coefs);
+		FundamentalLinear7.computeCoefficients(F1.matrix_F64(), F2.matrix_F64(), coefs);
 
 		double alpha = 0.4;
 

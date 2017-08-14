@@ -41,7 +41,7 @@ import georegression.transform.twist.TwistOps_F32;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
-import org.ejml.interfaces.linsol.LinearSolverDense;
+import org.ejml.interfaces.linsol.LinearSolver;
 
 /**
  * TODO Fill in
@@ -57,7 +57,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 	private ImageType<Planar<I>> imageType;
 	private ImageType<Planar<D>> derivType;
 
-	private LinearSolverDense<DMatrixRMaj> solver;
+	private LinearSolver<DMatrixRMaj> solver;
 	private DMatrixRMaj A = new DMatrixRMaj(1,6);
 	private DMatrixRMaj y = new DMatrixRMaj(1,1);
 	private DMatrixRMaj twistMatrix = new DMatrixRMaj(6,1);

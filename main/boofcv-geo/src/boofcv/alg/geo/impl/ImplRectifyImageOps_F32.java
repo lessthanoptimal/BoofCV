@@ -140,9 +140,9 @@ public class ImplRectifyImageOps_F32 {
 		// compute new calibration matrix and apply it
 		K = A.mult(K);
 
-		rectifyK.set(K.getFDRM());
-		rectifyLeft.set(K.mult(rL).getFDRM());
-		rectifyRight.set(K.mult(rR).getFDRM());
+		rectifyK.set(K.matrix_F32());
+		rectifyLeft.set(K.mult(rL).matrix_F32());
+		rectifyRight.set(K.mult(rR).matrix_F32());
 	}
 
 	/**
@@ -159,8 +159,8 @@ public class ImplRectifyImageOps_F32 {
 		SimpleMatrix rL = SimpleMatrix.wrap(rectifyLeft);
 		SimpleMatrix rR = SimpleMatrix.wrap(rectifyRight);
 
-		rectifyLeft.set(A.mult(rL).getFDRM());
-		rectifyRight.set(A.mult(rR).getFDRM());
+		rectifyLeft.set(A.mult(rL).matrix_F32());
+		rectifyRight.set(A.mult(rR).matrix_F32());
 	}
 
 	public static Point2Transform2_F32 transformRectToPixel(CameraPinholeRadial param,

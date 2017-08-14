@@ -350,7 +350,7 @@ public class TestPerspectiveOps {
 		SimpleMatrix T_ = new SimpleMatrix(3,1,true,T.x,T.y,T.z);
 
 		// test calibrated camera
-		DMatrixRMaj found = PerspectiveOps.createCameraMatrix(R.getDDRM(), T, null, null);
+		DMatrixRMaj found = PerspectiveOps.createCameraMatrix(R.matrix_F64(), T, null, null);
 		for( int i = 0; i < 3; i++ ) {
 			assertEquals(found.get(i,3),T_.get(i),1e-8);
 			for( int j = 0; j < 3; j++ ) {
@@ -359,7 +359,7 @@ public class TestPerspectiveOps {
 		}
 
 		// test uncalibrated camera
-		found = PerspectiveOps.createCameraMatrix(R.getDDRM(), T, K.getDDRM(), null);
+		found = PerspectiveOps.createCameraMatrix(R.matrix_F64(), T, K.matrix_F64(), null);
 
 		SimpleMatrix expectedR = K.mult(R);
 		SimpleMatrix expectedT = K.mult(T_);

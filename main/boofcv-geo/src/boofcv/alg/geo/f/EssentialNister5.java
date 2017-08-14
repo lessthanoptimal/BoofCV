@@ -31,7 +31,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.interfaces.linsol.LinearSolverDense;
+import org.ejml.interfaces.linsol.LinearSolver;
 
 import java.util.List;
 
@@ -81,7 +81,7 @@ public class EssentialNister5 {
 	private double x,y,z;
 
 	// Solver for the linear system below
-	LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.linear(10);
+	LinearSolver<DMatrixRMaj> solver = LinearSolverFactory_DDRM.linear(10);
 
 	// Storage for linear systems
 	private DMatrixRMaj A1 = new DMatrixRMaj(10,10);

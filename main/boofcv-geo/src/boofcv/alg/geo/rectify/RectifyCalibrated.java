@@ -115,10 +115,10 @@ public class RectifyCalibrated {
 		SimpleMatrix KRR = K.mult(RR);
 
 		// rectification transforms
-		rect1.set(KRR.mult(KR1.invert()).getDDRM());
-		rect2.set(KRR.mult(KR2.invert()).getDDRM());
+		rect1.set(KRR.mult(KR1.invert()).matrix_F64());
+		rect2.set(KRR.mult(KR2.invert()).matrix_F64());
 
-		rectifiedR = RR.getDDRM();
+		rectifiedR = RR.matrix_F64();
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class RectifyCalibrated {
 	 * @return Calibration matrix for both cameras
 	 */
 	public DMatrixRMaj getCalibrationMatrix() {
-		return K.getDDRM();
+		return K.matrix_F64();
 	}
 
 	/**

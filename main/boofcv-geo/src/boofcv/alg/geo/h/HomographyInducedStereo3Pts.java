@@ -26,7 +26,7 @@ import georegression.struct.point.Point3D_F64;
 import org.ejml.LinearSolverSafe;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
-import org.ejml.interfaces.linsol.LinearSolverDense;
+import org.ejml.interfaces.linsol.LinearSolver;
 
 /**
  * <p>
@@ -66,7 +66,7 @@ public class HomographyInducedStereo3Pts {
 	private Point3D_F64 t0 = new Point3D_F64();
 	private Point3D_F64 t1 = new Point3D_F64();
 
-	private LinearSolverDense<DMatrixRMaj> solver;
+	private LinearSolver<DMatrixRMaj> solver;
 
 	// pick a reasonable scale and sign
 	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
