@@ -419,7 +419,14 @@ public class UtilIO {
 		File f = new File(pathRegex);
 		String pp = f.getPath();
 		File directory = f.getParentFile();
-		String regex = pp.substring(directory.getPath().length(),pp.length());
+
+		// see if the last character is a directory separator
+		String sep = System.getProperty("file.separator");
+		String pd = directory.getPath();
+		if( !pd.endsWith(sep))
+			pd += sep;
+		String regex = pp.substring(pd.length(),pp.length());
+		// all that hackery is to get around Linux and Windows differences
 
 		final Pattern p = Pattern.compile(regex); // careful: could also throw an exception!
 		return directory.listFiles(new FileFilter(){
