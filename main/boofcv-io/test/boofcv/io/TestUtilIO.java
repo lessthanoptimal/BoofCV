@@ -114,7 +114,7 @@ public class TestUtilIO {
 	@Test
 	public void findMatches() {
 		String f = TestUtilIO.class.getResource(".").getFile();
-		File[] matches = UtilIO.findMatches(f+"\\w*.class");
+		File[] matches = UtilIO.findMatches(new File(f),"\\w*.class");
 		assertTrue(matches.length>=3);
 	}
 }

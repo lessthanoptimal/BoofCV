@@ -406,34 +406,4 @@ public class UtilIO {
 			}
 		});
 	}
-
-	/**
-	 * Looks up all files which are in the specified directory and match the regex.<br>
-	 * Example: path/to/input/image\d*.jpg
-	 *
-	 * @param pathRegex regex
-	 * @return list of matching files
-	 */
-	public static File[] findMatches( String pathRegex ) {
-
-		File f = new File(pathRegex);
-		String pp = f.getPath();
-		File directory = f.getParentFile();
-
-		// see if the last character is a directory separator
-		String sep = System.getProperty("file.separator");
-		String pd = directory.getPath();
-		if( !pd.endsWith(sep))
-			pd += sep;
-		String regex = pp.substring(pd.length(),pp.length());
-		// all that hackery is to get around Linux and Windows differences
-
-		final Pattern p = Pattern.compile(regex); // careful: could also throw an exception!
-		return directory.listFiles(new FileFilter(){
-			@Override
-			public boolean accept(File file) {
-				return p.matcher(file.getName()).matches();
-			}
-		});
-	}
 }

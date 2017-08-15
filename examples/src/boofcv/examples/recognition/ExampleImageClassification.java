@@ -55,8 +55,8 @@ public class ExampleImageClassification {
 		classifier.loadModel(path);
 		List<String> categories = classifier.getCategories();
 
-		String regex = UtilIO.pathExample("recognition/pixabay")+"\\w*.jpg";
-		List<File> images = Arrays.asList(UtilIO.findMatches(regex));
+		String imagePath = UtilIO.pathExample("recognition/pixabay");
+		List<File> images = Arrays.asList(UtilIO.findMatches(new File(imagePath),"\\w*.jpg"));
 		Collections.sort(images);
 
 		ImageClassificationPanel gui = new ImageClassificationPanel();

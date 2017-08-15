@@ -197,8 +197,8 @@ public class ExampleColorHistogramLookup {
 
 	public static void main(String[] args) {
 
-		String regex = UtilIO.pathExample("recognition/vacation")+"\\w*.jpg";
-		List<File> images = Arrays.asList(UtilIO.findMatches(regex));
+		String imagePath = UtilIO.pathExample("recognition/vacation");
+		List<File> images = Arrays.asList(UtilIO.findMatches(new File(imagePath),"\\w*.jpg"));
 		Collections.sort(images);
 
 		// Different color spaces you can try

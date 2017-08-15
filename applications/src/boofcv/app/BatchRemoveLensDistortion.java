@@ -49,7 +49,7 @@ public class BatchRemoveLensDistortion {
 	public static void printHelpAndExit(String[] args) {
 		System.out.println("Expected 1 flag and 3 arguments, had "+args.length+" instead");
 		System.out.println();
-		System.out.println("<file path regex> <path to intrinsic.yaml> <output directory>");
+		System.out.println("<path to directory> <file name regex> <path to intrinsic.yaml> <output directory>");
 		System.out.println("path/to/input/image\\d*.jpg path/to/intrinsic.yaml");
 		System.out.println();
 		System.out.println("Flags:");
@@ -61,12 +61,12 @@ public class BatchRemoveLensDistortion {
 	}
 
 	public static void main(String[] args) {
-		String regex,pathIntrinsic,outputDir;
+		String inputPath,regex,pathIntrinsic,outputDir;
 		AdjustmentType adjustmentType = AdjustmentType.FULL_VIEW;
 		boolean rename = false;
 
-		if( args.length >= 3 ) {
-			int numFlags = args.length-3;
+		if( args.length >= 4 ) {
+			int numFlags = args.length-4;
 			for (int i = 0; i < numFlags; i++) {
 				if( args[i].compareToIgnoreCase("-rename") == 0 ) {
 					rename = true;
@@ -79,9 +79,10 @@ public class BatchRemoveLensDistortion {
 				}
 			}
 
-			regex = args[numFlags];
-			pathIntrinsic = args[numFlags+1];
-			outputDir = args[numFlags+2];
+			inputPath = args[numFlags];
+			regex = args[numFlags+1];
+			pathIntrinsic = args[numFlags+2];
+			outputDir = args[numFlags+3];
 		}else {
 			printHelpAndExit(args);
 			System.exit(0);
@@ -90,7 +91,8 @@ public class BatchRemoveLensDistortion {
 
 		System.out.println("AdjustmentType = "+adjustmentType);
 		System.out.println("rename         = "+rename);
-		System.out.println("input regex      = "+regex);
+		System.out.println("input path     = "+inputPath);
+		System.out.println("name regex     = "+regex);
 		System.out.println("output dir     = "+outputDir);
 
 
@@ -106,7 +108,7 @@ public class BatchRemoveLensDistortion {
 		CameraPinholeRadial param = CalibrationIO.load(pathIntrinsic);
 		CameraPinholeRadial paramAdj = new CameraPinholeRadial();
 
-		List<File> files = Arrays.asList(UtilIO.findMatches(regex));
+		List<File> files = Arrays.asList(UtilIO.findMatches(new File(inputPath),regex));
 		Collections.sort(files);
 
 		System.out.println("Found a total of "+files.size()+" matching files");
