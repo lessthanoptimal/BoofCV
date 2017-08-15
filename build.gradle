@@ -1,5 +1,3 @@
-// TODO insert analytics and adsense into javadoc
-
 ext.libpath = file('./').absolutePath
 
 allprojects {
@@ -101,6 +99,11 @@ subprojects {
     task sourcesJar(type: Jar) {
         classifier = 'sources'
         from sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives sourcesJar
+//        archives javadocJar
     }
 
     // Force the release build to fail if it depends on a SNAPSHOT
@@ -254,8 +257,6 @@ task alljavadoc(type: Javadoc) {
 
     destinationDir = file("docs/api")
 
-    // Hack for Java 8u121 and beyond. Comment out if running an earlier version of Java
-    options.addBooleanOption("-allow-script-in-comments", true)
     configure(options) {
         failOnError = false
         docTitle = "BoofCV JavaDoc ($project.version)"

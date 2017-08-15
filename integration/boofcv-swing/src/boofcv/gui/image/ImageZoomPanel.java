@@ -47,6 +47,14 @@ public class ImageZoomPanel extends JScrollPane {
 		getViewport().setView(panel);
 	}
 
+	/**
+	 * Makes it so that the image is no longer saved when clicked.
+	 */
+	public void disableSaveOnClick() {
+		panel.removeMouseListener(panel.mouseListener);
+		panel.mouseListener = null;
+	}
+
 	public synchronized void setScale( double scale ) {
 
 		Rectangle r = panel.getVisibleRect();
