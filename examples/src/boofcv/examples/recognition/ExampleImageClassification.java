@@ -26,7 +26,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
 import deepboof.io.DeepBoofDataBaseOps;
@@ -56,8 +55,8 @@ public class ExampleImageClassification {
 		classifier.loadModel(path);
 		List<String> categories = classifier.getCategories();
 
-		String regex = UtilIO.pathExample("recognition/pixabay")+"/^\\w*.jpg";
-		List<File> images = Arrays.asList(BoofMiscOps.findMatches(regex));
+		String regex = UtilIO.pathExample("recognition/pixabay")+"\\w*.jpg";
+		List<File> images = Arrays.asList(UtilIO.findMatches(regex));
 		Collections.sort(images);
 
 		ImageClassificationPanel gui = new ImageClassificationPanel();

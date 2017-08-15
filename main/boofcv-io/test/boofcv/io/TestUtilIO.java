@@ -18,6 +18,7 @@
 
 package boofcv.io;
 
+import boofcv.misc.TestBoofMiscOps;
 import org.junit.Test;
 
 import java.io.File;
@@ -109,5 +110,12 @@ public class TestUtilIO {
 		String example2 = "/* copyright*/\nimport stuff;\n/** comments */public class stuff{\n/** Yo Dog*/public void class()}";
 
 		assertEquals(29,UtilIO.indexOfSourceStart(example2));
+	}
+
+	@Test
+	public void findMatches() {
+		String f = TestBoofMiscOps.class.getResource(".").getFile();
+		File[] matches = UtilIO.findMatches(f+"\\w*.class");
+		assertTrue(matches.length>=3);
 	}
 }

@@ -22,6 +22,7 @@ import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.core.image.border.BorderType;
+import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -105,7 +106,7 @@ public class BatchRemoveLensDistortion {
 		CameraPinholeRadial param = CalibrationIO.load(pathIntrinsic);
 		CameraPinholeRadial paramAdj = new CameraPinholeRadial();
 
-		List<File> files = Arrays.asList(BoofMiscOps.findMatches(regex));
+		List<File> files = Arrays.asList(UtilIO.findMatches(regex));
 		Collections.sort(files);
 
 		System.out.println("Found a total of "+files.size()+" matching files");

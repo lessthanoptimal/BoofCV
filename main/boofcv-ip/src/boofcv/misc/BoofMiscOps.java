@@ -21,13 +21,8 @@ package boofcv.misc;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Miscellaneous functions which have no better place to go.
@@ -334,80 +329,6 @@ public class BoofMiscOps {
 			System.out.println();
 		}
 		System.out.println();
-	}
-
-	/**
-	 * Loads a list of files with the specified prefix.
-	 *
-	 * @param directory Directory it looks inside of
-	 * @param prefix Prefix that the file must have
-	 * @return List of files that are in the directory and match the prefix.
-	 */
-	public static List<String> directoryList( String directory , String prefix ) {
-		List<String> ret = new ArrayList<>();
-
-		File d = new File(directory);
-
-		if( !d.isDirectory() )
-			throw new IllegalArgumentException("Must specify an directory");
-
-		File files[] = d.listFiles();
-
-		for( File f : files ) {
-			if( f.isDirectory() || f.isHidden() )
-				continue;
-
-			if( f.getName().contains(prefix )) {
-				ret.add(f.getAbsolutePath());
-			}
-		}
-
-		return ret;
-	}
-
-	/**
-	 * <p>
-	 * Looks for file names which match the regex in the directory.
-	 * </p>
-	 * <p>
-	 * Example:<br>
-	 * BoofMiscOps.findMatches(new File("/path/to/directory"), ".+jpg");
-	 * </p>
-	 *
-	 * @param directory directory
-	 * @param regex file name regex
-	 * @return array of matching files
-	 */
-	public static File[] findMatches( File directory , String regex ) {
-		final Pattern p = Pattern.compile(regex); // careful: could also throw an exception!
-		return directory.listFiles(new FileFilter(){
-			@Override
-			public boolean accept(File file) {
-				return p.matcher(file.getName()).matches();
-			}
-		});
-	}
-
-	/**
-	 * Looks up all files which are in the specified directory and match the regex.<br>
-	 * Example: path/to/input/image\d*.jpg
-	 *
-	 * @param pathRegex regex
-	 * @return list of matching files
-	 */
-	public static File[] findMatches( String pathRegex ) {
-
-		File f = new File(pathRegex);
-		File directory = f.getParentFile();
-		String regex = f.getName();
-
-		final Pattern p = Pattern.compile(regex); // careful: could also throw an exception!
-		return directory.listFiles(new FileFilter(){
-			@Override
-			public boolean accept(File file) {
-				return p.matcher(file.getName()).matches();
-			}
-		});
 	}
 
 	public static int[] convertArray( double input[] , int output[] ) {

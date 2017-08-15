@@ -19,6 +19,7 @@
 package boofcv.app;
 
 import boofcv.alg.filter.misc.AverageDownSampleOps;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
@@ -111,7 +112,7 @@ public class BatchDownSizeImage {
 			if( !outputDir.mkdirs() )
 				throw new IllegalArgumentException("Can't create output directory: "+output);
 
-		images = Arrays.asList(BoofMiscOps.findMatches(fileRegex));
+		images = Arrays.asList(UtilIO.findMatches(fileRegex));
 		Collections.sort(images);
 
 		if( images.size() == 0 ) {
