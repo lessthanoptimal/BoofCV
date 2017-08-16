@@ -85,6 +85,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 		updateDescriptor();
 
 		imagePanel.setScaling(ScaleOptions.NONE);
+		imagePanel.setCentering(false);
 		imagePanel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
