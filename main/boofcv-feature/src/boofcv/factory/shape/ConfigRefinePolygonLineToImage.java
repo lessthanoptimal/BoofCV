@@ -64,7 +64,7 @@ public class ConfigRefinePolygonLineToImage implements Configuration {
 
 	@Override
 	public String toString() {
-		return "ConfigRefinePolygonLineToImage{" +
+		return getClass().getSimpleName()+"{" +
 				"cornerOffset=" + cornerOffset +
 				", lineSamples=" + lineSamples +
 				", sampleRadius=" + sampleRadius +

@@ -23,20 +23,18 @@ import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.shapes.EllipseRotated_F64;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +55,10 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 	}
 
 	@Override
-	protected void createDetector() {
+	protected void createDetector( boolean initializing ) {
+		if( !initializing)
+			BoofSwingUtil.checkGuiThread();
+
 		DetectEllipseControlPanel controls = (DetectEllipseControlPanel)DetectBlackEllipseApp.this.controls;
 		synchronized (this) {
 			detector = FactoryShapeDetector.ellipse(controls.getConfigEllipse(), imageClass);
@@ -66,27 +67,12 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
-		original = ConvertBufferedImage.checkCopy(buffered,original);
-		work = ConvertBufferedImage.checkDeclare(buffered,work);
-
-		binary.reshape(work.getWidth(), work.getHeight());
-		this.input = (T)input;
-
-		synchronized (this) {
-			inputToBinary.process((T) input, binary);
-			detector.process((T) input, binary);
-		}
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				viewUpdated();
-			}
-		});
+	protected void detectorProcess(ImageGray input, GrayU8 binary) {
+		detector.process((T) input, binary);
 	}
 
 	public void configUpdate() {
-		createDetector();
+		createDetector(false);
 		// does process and render too
 	}
 

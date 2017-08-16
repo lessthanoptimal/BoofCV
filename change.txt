@@ -3,6 +3,29 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2017
+Version : 0.28
+
+TOP ITEMS
+- TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
+        It is a homogenous coordinate with z=1 being implicit.
+- TODO Integrate in Marius Orfgen's image statistics histogram ideas
+- TODO Fisheye calibration using omni model
+- TODO QR Code support
+
+OTHER ITEMS
+- TODO Visualization tools for Direct VO
+-      Show warped image
+- TODO ExampleRectifyUncalibratedStereo is upside down.  Adjust the math to avoid that
+- TODO Calibration application.
+       Select output format: BoofCV, OpenCV
+       Create a stand alone application that people can download to calibrate
+- TODO Tutorial on image features?  Sparse and dense?
+- TODO Look at AKAZE feature
+- TODO Clarify how you calibrate the camera in Processing
+- TODO DescribeDenseHogFastAlg naming consistency. See TODO at top
+
+---------------------------------------------
 Date    : 2017-08-16
 Version : 0.27
 

@@ -23,10 +23,13 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase2;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImageZoomPanel;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
@@ -46,7 +49,6 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 
 	BufferedImage original;
 	BufferedImage work;
-	T input;
 	GrayU8 binary = new GrayU8(1,1);
 
 	public DetectBlackShapeAppBase(List<String> examples , Class<T> imageType) {
@@ -63,7 +65,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, guiImage);
 
-		createDetector();
+		createDetector(true);
 
 		guiImage.addMouseWheelListener(new MouseAdapter() {
 			@Override
@@ -81,7 +83,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 		});
 	}
 
-	protected abstract void createDetector();
+	protected abstract void createDetector( boolean initializing );
 
 	@Override
 	protected void handleInputChange( int source , InputMethod method , final int width , final int height ) {
@@ -106,6 +108,30 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 		});
 	}
 
+	@Override
+	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
+		System.out.flush();
+
+		original = ConvertBufferedImage.checkCopy(buffered,original);
+		work = ConvertBufferedImage.checkDeclare(buffered,work);
+
+		binary.reshape(work.getWidth(), work.getHeight());
+
+		synchronized (this) {
+			inputToBinary.process((T)input, binary);
+			detectorProcess((T)input, binary);
+		}
+
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				viewUpdated();
+			}
+		});
+	}
+
+	protected abstract void detectorProcess(T input , GrayU8 binary );
+
 	/**
 	 * Called when how the data is visualized has changed
 	 */
@@ -129,5 +155,4 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 
 		guiImage.repaint();
 	}
-
 }

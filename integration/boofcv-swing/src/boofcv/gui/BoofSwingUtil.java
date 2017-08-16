@@ -28,4 +28,9 @@ public class BoofSwingUtil {
 			SwingUtilities.invokeLater(r);
 		}
 	}
+
+	public static void checkGuiThread() {
+		if( !SwingUtilities.isEventDispatchThread() )
+			throw new RuntimeException("Must be run in UI thread");
+	}
 }

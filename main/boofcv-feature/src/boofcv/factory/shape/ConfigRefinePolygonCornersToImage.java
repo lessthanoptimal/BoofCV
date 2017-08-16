@@ -71,7 +71,7 @@ public class ConfigRefinePolygonCornersToImage implements Configuration
 
 	@Override
 	public String toString() {
-		return "ConfigRefinePolygonCornersToImage{" +
+		return getClass().getSimpleName()+"{" +
 				"endPointDistance=" + endPointDistance +
 				", cornerOffset=" + cornerOffset +
 				", lineSamples=" + lineSamples +

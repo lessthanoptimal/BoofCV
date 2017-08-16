@@ -34,7 +34,7 @@ import java.text.DecimalFormat;
  * @author Peter Abeles
  */
 public class DetectPolygonControlPanel extends DetectBlackShapePanel
-	implements ActionListener, ChangeListener
+		implements ActionListener, ChangeListener
 {
 	DetectBlackPolygonApp owner;
 
@@ -254,7 +254,7 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 			owner.viewUpdated();
 			return;
 		} else if( e.getSource() == spinnerMinContourSize ) {
-				config.minContourImageWidthFraction = ((Number) spinnerMinContourSize.getValue()).doubleValue();
+			config.minContourImageWidthFraction = ((Number) spinnerMinContourSize.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourSplit ) {
 			config.contour2Poly_splitFraction = ((Number) spinnerContourSplit.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourMinSplit ) {
@@ -317,20 +317,33 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		spinnerConvergeTol.removeChangeListener(this);
 		spinnerMaxCornerChange.removeChangeListener(this);
 
+		// not entirely sure if all of these if statements are needed but I was seeing weird behavior
 		if( refineType == PolygonRefineType.LINE ) {
-			spinnerLineSamples.setValue(configLine.lineSamples);
-			spinnerCornerOffset.setValue(configLine.cornerOffset);
-			spinnerSampleRadius.setValue(configLine.sampleRadius);
-			spinnerRefineMaxIterations.setValue(configLine.maxIterations);
-			spinnerConvergeTol.setValue(configLine.convergeTolPixels);
-			spinnerMaxCornerChange.setValue(configLine.maxCornerChangePixel);
+			if( ((Number)spinnerLineSamples.getValue()).intValue() != configLine.lineSamples )
+				spinnerLineSamples.setValue(configLine.lineSamples);
+			if( ((Number)spinnerCornerOffset.getValue()).doubleValue() != configLine.cornerOffset )
+				spinnerCornerOffset.setValue(configLine.cornerOffset);
+			if( ((Number)spinnerSampleRadius.getValue()).intValue() != configLine.sampleRadius )
+				spinnerSampleRadius.setValue(configLine.sampleRadius);
+			if( ((Number)spinnerRefineMaxIterations.getValue()).intValue() != configLine.maxIterations )
+				spinnerRefineMaxIterations.setValue(configLine.maxIterations);
+			if( ((Number)spinnerConvergeTol.getValue()).doubleValue() != configLine.convergeTolPixels )
+				spinnerConvergeTol.setValue(configLine.convergeTolPixels);
+			if( ((Number)spinnerMaxCornerChange.getValue()).doubleValue() != configLine.maxCornerChangePixel )
+				spinnerMaxCornerChange.setValue(configLine.maxCornerChangePixel);
 		} else if( refineType == PolygonRefineType.CORNER ){
-			spinnerLineSamples.setValue(configCorner.lineSamples);
-			spinnerCornerOffset.setValue(configCorner.cornerOffset);
-			spinnerSampleRadius.setValue(configCorner.sampleRadius);
-			spinnerRefineMaxIterations.setValue(configCorner.maxIterations);
-			spinnerConvergeTol.setValue(configCorner.convergeTolPixels);
-			spinnerMaxCornerChange.setValue(configCorner.maxCornerChangePixel);
+			if( ((Number)spinnerLineSamples.getValue()).intValue() != configCorner.lineSamples )
+				spinnerLineSamples.setValue(configCorner.lineSamples);
+			if( ((Number)spinnerCornerOffset.getValue()).doubleValue() != configCorner.cornerOffset )
+				spinnerCornerOffset.setValue(configCorner.cornerOffset);
+			if( ((Number)spinnerSampleRadius.getValue()).intValue() != configCorner.sampleRadius )
+				spinnerSampleRadius.setValue(configCorner.sampleRadius);
+			if( ((Number)spinnerRefineMaxIterations.getValue()).intValue() != configCorner.maxIterations )
+				spinnerRefineMaxIterations.setValue(configCorner.maxIterations);
+			if( ((Number)spinnerConvergeTol.getValue()).doubleValue() != configCorner.convergeTolPixels )
+				spinnerConvergeTol.setValue(configCorner.convergeTolPixels);
+			if( ((Number)spinnerMaxCornerChange.getValue()).doubleValue() != configCorner.maxCornerChangePixel )
+				spinnerMaxCornerChange.setValue(configCorner.maxCornerChangePixel);
 		}
 
 		spinnerLineSamples.addChangeListener(this);
