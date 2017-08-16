@@ -45,6 +45,6 @@ public class IntrinsicToDepthParameters {
 		depth.setMaxDepth(UtilOpenKinect.FREENECT_DEPTH_MM_MAX_VALUE);
 		depth.setPixelNoDepth(UtilOpenKinect.FREENECT_DEPTH_MM_NO_VALUE);
 
-		UtilIO.saveXML(depth, baseDir + "visualdepth.xml");
+		CalibrationIO.save(depth, baseDir + "visualdepth.yaml");
 	}
 }

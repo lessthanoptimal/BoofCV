@@ -23,8 +23,8 @@ if (System.getenv()['ANDROID_HOME']) {
     logger.warn('Skipping integration/android because ANDROID_HOME has not been set!  See integration/android/readme.txt')
 }
 
-if( file('./integration/openkinect/libfreenect').exists()) {
+if( file('./integration/boofcv-openkinect/libfreenect').exists()) {
     include 'integration:boofcv-openkinect'
 } else {
-    logger.warn('Skipping integration/openkinect because openkinect/libfreenect is missing! See integration/openkinect/readme.txt')
+    logger.warn('Skipping integration/boofcv-openkinect because boofcv-openkinect/libfreenect is missing! See integration/openkinect/readme.txt')
 }
