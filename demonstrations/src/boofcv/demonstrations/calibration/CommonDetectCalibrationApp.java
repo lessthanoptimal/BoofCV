@@ -78,6 +78,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 
 		controlPanel.setListener(this);
 
+		imagePanel.setScale(controlPanel.getScale());
 		imagePanel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -165,6 +166,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 
 	@Override
 	public void calibEventGUI() {
+		imagePanel.setScale(controlPanel.getScale());
 		if( controlPanel.getSelectedView() == 0 ) {
 			imagePanel.setBufferedImage(input);
 		} else if( controlPanel.getSelectedView() == 1 ){
@@ -173,7 +175,6 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 			throw new RuntimeException("Unknown");
 		}
 
-		imagePanel.setScale(controlPanel.getScale());
 		imagePanel.repaint();
 	}
 
@@ -198,9 +199,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 					controlPanel.setSuccessMessage("FOUND", true);
 				else
 					controlPanel.setSuccessMessage("FAILED", false);
-				imagePanel.setPreferredSize(new Dimension(input.getWidth()+5, input.getHeight()+5));
 				calibEventGUI();
-				imagePanel.repaint();
 			}
 		});
 	}

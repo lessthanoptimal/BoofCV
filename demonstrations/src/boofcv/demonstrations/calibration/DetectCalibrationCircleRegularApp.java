@@ -200,8 +200,6 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 			l.setLine(scale * p3.x , scale * p3.y, scale * p0.x, scale * p0.y );
 			g2.setColor(colorsSquare[3]);
 			g2.draw(l);
-
-
 		}
 	}
 

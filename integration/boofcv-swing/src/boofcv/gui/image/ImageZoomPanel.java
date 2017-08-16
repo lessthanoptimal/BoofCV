@@ -58,6 +58,9 @@ public class ImageZoomPanel extends JScrollPane {
 	}
 
 	public synchronized void setScale( double scale ) {
+		// do nothing if the scale has not changed
+		if( this.scale == scale )
+			return;
 
 		Rectangle r = panel.getVisibleRect();
 		double centerX = (r.x + r.width/2.0)/this.scale;
