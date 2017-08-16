@@ -105,9 +105,6 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 		createNodes(root,"Color",
 				ShowColorModelApp.class);
 
-		createNodes(root,"Denoise",
-				DenoiseVisualizeApp.class);
-
 		createNodes(root,"Distort",
 				EquirectangularCylinderApp.class,
 				EquirectangularPinholeApp.class,
@@ -118,7 +115,8 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				RenderSyntheticCamerModelApp.class);
 
 		createNodes(root,"Enhance",
-				ImageEnhanceApp.class);
+				ImageEnhanceApp.class,
+				DenoiseVisualizeApp.class);
 
 		createNodes(root,"Feature",
 				VisualizeAssociationAlgorithmsApp.class,

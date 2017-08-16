@@ -270,7 +270,8 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 		processedInputImage = false;
 
 		String videoName = inputRefs.get(index).getPath();
-		String path = videoName.substring(0, videoName.lastIndexOf('/'));
+		String seperator = System.getProperty("file.separator");
+		String path = videoName.substring(0, videoName.lastIndexOf(seperator.charAt(0)));
 
 		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10);
 
