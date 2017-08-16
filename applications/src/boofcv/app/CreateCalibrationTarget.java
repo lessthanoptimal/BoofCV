@@ -87,7 +87,10 @@ public class CreateCalibrationTarget {
 		System.out.println();
 		System.out.println("Examples:");
 		System.out.println("-r 8 -c 5 -o target -t CIRCLE_ASYMMETRIC_GRID -u cm -w 2 -d 6 -p LETTER");
-		System.out.println("          circle assymetric grid target, grid 8x5, 2cm diameter, 6cm distance, on letter paper");
+		System.out.println("          circle asymmetric grid target, grid 8x5, 2cm diameter, 6cm distance, on letter paper");
+		System.out.println();
+		System.out.println("-r 8 -c 6 -o target -t CIRCLE_GRID -u cm -w 2 -d 3 -p LETTER");
+		System.out.println("          circle regular grid target, grid 8x6, 2cm diameter, 3cm distance, on letter paper");
 		System.out.println();
 		System.out.println("-r 4 -c 3 -o target -t SQUARE_GRID -u cm -w 3 -s 3 -p LETTER");
 		System.out.println("          square grid target, grid 4x3, 3cm squares, 3cm space, on letter paper");
