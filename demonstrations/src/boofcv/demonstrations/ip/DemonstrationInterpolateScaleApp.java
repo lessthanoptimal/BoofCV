@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DemonstrationInterpolateScaleApp<T extends ImageBase>
+public class DemonstrationInterpolateScaleApp<T extends ImageBase<T>>
 	extends DemonstrationBase<T> implements ItemListener, ComponentListener
 {
 	private final ImageType<T> imageType;
@@ -78,9 +78,9 @@ public class DemonstrationInterpolateScaleApp<T extends ImageBase>
 	}
 
 	@Override
-	public void processImage(BufferedImage buffered, T input) {
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 		synchronized (latestImage) {
-			latestImage.setTo(input);
+			latestImage.setTo((T)input);
 			applyScaling();
 		}
 	}
@@ -95,7 +95,7 @@ public class DemonstrationInterpolateScaleApp<T extends ImageBase>
 			new FDistort(latestImage, scaledImage).interp(interpType).border(BorderType.EXTENDED).scale().apply();
 			BufferedImage out = ConvertBufferedImage.convertTo(scaledImage, null, true);
 
-			panel.setBufferedImageSafe(out);
+			panel.setImageUI(out);
 			panel.repaint();
 		}
 	}

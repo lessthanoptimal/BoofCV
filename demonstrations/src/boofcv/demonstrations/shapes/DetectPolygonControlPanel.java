@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.demonstrations.shapes;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonCornersToImage;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
-import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -34,7 +33,7 @@ import java.text.DecimalFormat;
 /**
  * @author Peter Abeles
  */
-public class DetectPolygonControlPanel extends StandardAlgConfigPanel
+public class DetectPolygonControlPanel extends DetectBlackShapePanel
 	implements ActionListener, ChangeListener
 {
 	DetectBlackPolygonApp owner;
@@ -42,15 +41,12 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 	// selects which image to view
 	JComboBox imageView;
 
-	JSpinner selectZoom;
-
 	JCheckBox showCorners;
 	JCheckBox showLines;
 	JCheckBox showContour;
 
 	JComboBox refineChoice;
 
-	int selectedView = 0;
 	boolean bShowCorners = true;
 	boolean bShowLines = true;
 	boolean bShowContour = false;
@@ -84,8 +80,6 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 	int minSides = 3;
 	int maxSides = 6;
 
-	double zoom = 1;
-
 	public DetectPolygonControlPanel(DetectBlackPolygonApp owner) {
 		this.owner = owner;
 
@@ -96,7 +90,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		imageView.addActionListener(this);
 		imageView.setMaximumSize(imageView.getPreferredSize());
 
-		selectZoom = new JSpinner(new SpinnerNumberModel(1,0.1,50,1));
+		selectZoom = new JSpinner(new SpinnerNumberModel(1,minZoom,maxZoom,1));
 		selectZoom.addChangeListener(this);
 		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
@@ -136,7 +130,6 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		configureSpinnerFloat(spinnerContourSplit);
 		spinnerContourMinSplit = new JSpinner(new SpinnerNumberModel(config.contour2Poly_minimumSideFraction, 0.0, 1.0, 0.001));
 		configureSpinnerFloat(spinnerContourMinSplit);
-		spinnerContourSplit.addChangeListener(this);
 		spinnerContourIterations = new JSpinner(new SpinnerNumberModel(config.contour2Poly_iterations, 1, 200, 1));
 		spinnerContourIterations.setMaximumSize(spinnerContourIterations.getPreferredSize());
 		spinnerContourIterations.addChangeListener(this);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,11 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
@@ -47,7 +49,7 @@ public class BatchRemoveLensDistortion {
 	public static void printHelpAndExit(String[] args) {
 		System.out.println("Expected 1 flag and 3 arguments, had "+args.length+" instead");
 		System.out.println();
-		System.out.println("<file path regex> <path to intrinsic.yaml> <output directory>");
+		System.out.println("<path to directory> <file name regex> <path to intrinsic.yaml> <output directory>");
 		System.out.println("path/to/input/image\\d*.jpg path/to/intrinsic.yaml");
 		System.out.println();
 		System.out.println("Flags:");
@@ -59,12 +61,12 @@ public class BatchRemoveLensDistortion {
 	}
 
 	public static void main(String[] args) {
-		String regex,pathIntrinsic,outputDir;
+		String inputPath,regex,pathIntrinsic,outputDir;
 		AdjustmentType adjustmentType = AdjustmentType.FULL_VIEW;
 		boolean rename = false;
 
-		if( args.length >= 3 ) {
-			int numFlags = args.length-3;
+		if( args.length >= 4 ) {
+			int numFlags = args.length-4;
 			for (int i = 0; i < numFlags; i++) {
 				if( args[i].compareToIgnoreCase("-rename") == 0 ) {
 					rename = true;
@@ -77,9 +79,10 @@ public class BatchRemoveLensDistortion {
 				}
 			}
 
-			regex = args[numFlags];
-			pathIntrinsic = args[numFlags+1];
-			outputDir = args[numFlags+2];
+			inputPath = args[numFlags];
+			regex = args[numFlags+1];
+			pathIntrinsic = args[numFlags+2];
+			outputDir = args[numFlags+3];
 		}else {
 			printHelpAndExit(args);
 			System.exit(0);
@@ -88,7 +91,8 @@ public class BatchRemoveLensDistortion {
 
 		System.out.println("AdjustmentType = "+adjustmentType);
 		System.out.println("rename         = "+rename);
-		System.out.println("input regex      = "+regex);
+		System.out.println("input path     = "+inputPath);
+		System.out.println("name regex     = "+regex);
 		System.out.println("output dir     = "+outputDir);
 
 
@@ -101,10 +105,10 @@ public class BatchRemoveLensDistortion {
 			}
 		}
 
-		CameraPinholeRadial param = UtilIO.loadXML(pathIntrinsic);
+		CameraPinholeRadial param = CalibrationIO.load(pathIntrinsic);
 		CameraPinholeRadial paramAdj = new CameraPinholeRadial();
 
-		List<File> files = Arrays.asList(BoofMiscOps.findMatches(regex));
+		List<File> files = Arrays.asList(UtilIO.findMatches(new File(inputPath),regex));
 		Collections.sort(files);
 
 		System.out.println("Found a total of "+files.size()+" matching files");
@@ -112,18 +116,20 @@ public class BatchRemoveLensDistortion {
 		Planar<GrayF32> distoredImg = new Planar<>(GrayF32.class,param.width,param.height,3);
 		Planar<GrayF32> undistoredImg = new Planar<>(GrayF32.class,param.width,param.height,3);
 
-		ImageDistort distort = LensDistortionOps.imageRemoveDistortion(adjustmentType, BorderType.ZERO, param, paramAdj,
-				(ImageType) distoredImg.getImageType());
-		UtilIO.saveXML(paramAdj,new File(outputDir,"intrinsicUndistorted.xml").getAbsolutePath());
+		ImageDistort distort = LensDistortionOps.changeCameraModel(adjustmentType, BorderType.ZERO, param,
+				new CameraPinhole(param), paramAdj, (ImageType) distoredImg.getImageType());
+		CalibrationIO.save(paramAdj,new File(outputDir,"intrinsicUndistorted.yaml").getAbsolutePath());
 
 		BufferedImage out = new BufferedImage(param.width,param.height,BufferedImage.TYPE_INT_RGB);
 
+		int numDigits = BoofMiscOps.numDigits(files.size()-1);
+		String format = "%0"+numDigits+"d";
 		for( int i = 0; i < files.size(); i++ ) {
 			File file = files.get(i);
 			System.out.println("processing " + file.getName());
 			BufferedImage orig = UtilImageIO.loadImage(file.getAbsolutePath());
 			if( orig == null ) {
-				throw new RuntimeException("Can't load file");
+				throw new RuntimeException("Can't load file: "+file.getAbsolutePath());
 			}
 
 			if( orig.getWidth() != param.width || orig.getHeight() != param.height ) {
@@ -131,13 +137,13 @@ public class BatchRemoveLensDistortion {
 				System.exit(-1);
 			}
 
-			ConvertBufferedImage.convertFromMulti(orig, distoredImg, true, GrayF32.class);
+			ConvertBufferedImage.convertFromPlanar(orig, distoredImg, true, GrayF32.class);
 			distort.apply(distoredImg,undistoredImg);
 			ConvertBufferedImage.convertTo(undistoredImg,out,true);
 
 			String nameOut;
 			if( rename ) {
-				nameOut = String.format("image%05d.png",i);
+				nameOut = String.format("image"+format+".png",i);
 			} else {
 				nameOut = file.getName().split("\\.")[0]+"_undistorted.png";
 			}

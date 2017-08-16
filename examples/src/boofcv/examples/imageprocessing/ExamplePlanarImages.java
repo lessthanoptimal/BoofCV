@@ -59,7 +59,7 @@ public class ExamplePlanarImages {
 	 */
 	public static void independent( BufferedImage input ) {
 		// convert the BufferedImage into a Planar
-		Planar<GrayU8> image = ConvertBufferedImage.convertFromMulti(input,null,true,GrayU8.class);
+		Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input,null,true,GrayU8.class);
 
 		// declare the output blurred image
 		Planar<GrayU8> blurred = image.createSameShape();
@@ -85,7 +85,7 @@ public class ExamplePlanarImages {
 	 */
 	public static void pixelAccess(  BufferedImage input ) {
 		// convert the BufferedImage into a Planar
-		Planar<GrayU8> image = ConvertBufferedImage.convertFromMulti(input,null,true,GrayU8.class);
+		Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input,null,true,GrayU8.class);
 
 		int x = 10, y = 10;
 
@@ -109,7 +109,7 @@ public class ExamplePlanarImages {
 	 */
 	public static void convertToGray( BufferedImage input ) {
 		// convert the BufferedImage into a Planar
-		Planar<GrayU8> image = ConvertBufferedImage.convertFromMulti(input,null,true,GrayU8.class);
+		Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input,null,true,GrayU8.class);
 
 		GrayU8 gray = new GrayU8( image.width,image.height);
 

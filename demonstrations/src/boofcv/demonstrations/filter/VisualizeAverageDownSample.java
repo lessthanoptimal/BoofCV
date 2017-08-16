@@ -39,7 +39,7 @@ public class VisualizeAverageDownSample {
 		Planar<GrayF32> input = new Planar<>(GrayF32.class,
 				original.getWidth(),original.getHeight(),3);
 
-		ConvertBufferedImage.convertFromMulti(original,input,true,GrayF32.class);
+		ConvertBufferedImage.convertFromPlanar(original,input,true,GrayF32.class);
 
 		Planar<GrayF32> output = new Planar<>(GrayF32.class,
 				original.getWidth()/3,original.getHeight()/3,3);

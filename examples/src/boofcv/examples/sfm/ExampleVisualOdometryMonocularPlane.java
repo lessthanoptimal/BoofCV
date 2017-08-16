@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,7 @@ import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.calib.MonoPlaneParameters;
@@ -52,7 +53,7 @@ public class ExampleVisualOdometryMonocularPlane {
 		String directory = UtilIO.pathExample("vo/drc/");
 
 		// load camera description and the video sequence
-		MonoPlaneParameters calibration = UtilIO.loadXML(media.openFile(directory + "mono_plane.xml"));
+		MonoPlaneParameters calibration = CalibrationIO.load(media.openFile(directory + "mono_plane.yaml"));
 		SimpleImageSequence<GrayU8> video = media.openVideo(directory + "left.mjpeg", ImageType.single(GrayU8.class));
 
 		// specify how the image features are going to be tracked

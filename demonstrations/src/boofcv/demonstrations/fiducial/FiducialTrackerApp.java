@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FiducialTrackerApp<I extends ImageGray>
+public class FiducialTrackerApp<I extends ImageGray<I>>
 		extends VideoProcessAppBase<Planar<I>>
 {
 	private static final String SQUARE_NUMBER = "Square Number";
@@ -206,7 +206,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 			}
 		}
 
-		panel.setBufferedImageSafe(imageCopy);
+		panel.setImageUI(imageCopy);
 		panel.repaint();
 	}
 
@@ -270,7 +270,8 @@ public class FiducialTrackerApp<I extends ImageGray>
 		processedInputImage = false;
 
 		String videoName = inputRefs.get(index).getPath();
-		String path = videoName.substring(0, videoName.lastIndexOf('/'));
+		String seperator = System.getProperty("file.separator");
+		String path = videoName.substring(0, videoName.lastIndexOf(seperator.charAt(0)));
 
 		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10);
 

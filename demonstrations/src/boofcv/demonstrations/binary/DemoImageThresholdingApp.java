@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ import java.util.ArrayList;
 // select algorithm
 // configure universal threshold
 // configure adaptive threshold
-public class DemoImageThresholdingApp<T extends ImageGray> extends SelectInputPanel
+public class DemoImageThresholdingApp<T extends ImageGray<T>> extends SelectInputPanel
 	implements DemoThresholdingPanel.Listener
 {
 
@@ -125,7 +125,7 @@ public class DemoImageThresholdingApp<T extends ImageGray> extends SelectInputPa
 					work = new BufferedImage(imageInput.width, imageInput.height, BufferedImage.TYPE_INT_BGR);
 				}
 				VisualizeBinaryData.renderBinary(imageBinary, false, work);
-				gui.setBufferedImage(work);
+				gui.setImage(work);
 				gui.setPreferredSize(new Dimension(imageInput.width, imageInput.height));
 				processedImage = true;
 				gui.repaint();

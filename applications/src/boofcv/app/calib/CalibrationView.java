@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.app.calib;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid;
+import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -140,7 +141,7 @@ public interface CalibrationView {
 
 		int gridRows, gridCols;
 
-		double spaceToRadius;
+		double spaceToDiameter;
 
 		// indexes of corners in convex hull
 		int indexes[];
@@ -150,7 +151,7 @@ public interface CalibrationView {
 			gridRows = target.getRows();
 			gridCols = target.getColumns();
 
-			spaceToRadius = target.getSpaceToRadius();
+			spaceToDiameter = target.getSpaceToDiameter();
 
 			// find the convex hull and use that as the collision region
 			List<Point2D_F64> layout = detector.getLayout();
@@ -184,7 +185,6 @@ public interface CalibrationView {
 			}
 		}
 
-
 		@Override
 		public void getQuadFocus(CalibrationObservation detections, List<Point2D_F64> sides) {
 			sides.clear();
@@ -217,7 +217,77 @@ public interface CalibrationView {
 
 			double spaceWidth = gridPixelsWide/(outerCols-1);
 			System.out.println("grid width "+gridPixelsWide+" spaceWidth "+spaceWidth+" GRID COLS "+gridCols+"  outerCols "+outerCols);
-			return (int)(1.25*spaceWidth/spaceToRadius+0.5);
+			return (int)(1.25*spaceWidth/ (2.0*spaceToDiameter) +0.5);
 		}
 	}
+
+	class CircleRegularGrid implements CalibrationView {
+
+		int gridRows, gridCols;
+
+		double spaceToDiameter;
+
+		// indexes of corners in convex hull
+		int indexes[];
+
+		public void initialize( DetectorFiducialCalibration detector ) {
+			CalibrationDetectorCircleRegularGrid target = (CalibrationDetectorCircleRegularGrid)detector;
+			gridRows = target.getRows();
+			gridCols = target.getColumns();
+
+			spaceToDiameter = target.getSpaceToDiameter();
+
+			// find the convex hull and use that as the collision region
+			List<Point2D_F64> layout = detector.getLayout();
+			Polygon2D_F64 poly = new Polygon2D_F64(layout.size());
+			UtilPolygons2D_F64.convexHull(layout,poly);
+
+			if( !poly.isCCW() )
+				poly.flip();
+
+			UtilPolygons2D_F64.removeAlmostParallel(poly, UtilAngle.radian(5));
+
+			// save the indexes of these points
+			indexes = new int[layout.size()];
+			for (int i = 0; i < poly.size(); i++) {
+				int match = -1;
+				for (int j = 0; j < layout.size(); j++) {
+					if( layout.get(j).distance(poly.get(i)) <= 1e-8 ) {
+						match = j;
+						break;
+					}
+				}
+				indexes[i] = match;
+			}
+		}
+
+		@Override
+		public void getSidesCollision(CalibrationObservation detections, List<Point2D_F64> sides) {
+			sides.clear();
+			for( int i = 0; i < indexes.length; i++ ) {
+				sides.add( detections.get(indexes[i]));
+			}
+		}
+
+		@Override
+		public void getQuadFocus(CalibrationObservation detections, List<Point2D_F64> sides) {
+			sides.clear();
+
+			int pointsCols = 4*gridCols;
+
+			sides.add( detections.get(3) );
+			sides.add( detections.get(pointsCols-3) );
+			sides.add( detections.get(pointsCols*gridRows-3));
+			sides.add( detections.get(3+pointsCols*(gridRows-1)) );
+		}
+
+		@Override
+		public int getBufferWidth( double gridPixelsWide ) {
+
+			double spaceWidth = gridPixelsWide/(gridCols-1);
+			System.out.println("grid width "+gridPixelsWide+" spaceWidth "+spaceWidth+" GRID COLS "+gridCols);
+			return (int)(1.25*spaceWidth/ (2.0*spaceToDiameter) +0.5);
+		}
+	}
+
 }

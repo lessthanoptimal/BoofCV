@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
 import deepboof.io.DeepBoofDataBaseOps;
@@ -47,8 +46,8 @@ import java.util.List;
 public class ExampleImageClassification {
 
 	public static void main(String[] args) throws IOException {
-		ClassifierAndSource cs = FactoryImageClassifier.vgg_cifar10();
-//		ClassifierAndSource cs = FactoryImageClassifier.nin_imagenet();
+		ClassifierAndSource cs = FactoryImageClassifier.vgg_cifar10();  // Test set 89.9% for 10 categories
+//		ClassifierAndSource cs = FactoryImageClassifier.nin_imagenet(); // Test set 62.6% for 1000 categories
 
 		File path = DeepBoofDataBaseOps.downloadModel(cs.getSource(),new File("download_data"));
 
@@ -56,8 +55,8 @@ public class ExampleImageClassification {
 		classifier.loadModel(path);
 		List<String> categories = classifier.getCategories();
 
-		String regex = UtilIO.pathExample("recognition/pixabay")+"/^\\w*.jpg";
-		List<File> images = Arrays.asList(BoofMiscOps.findMatches(regex));
+		String imagePath = UtilIO.pathExample("recognition/pixabay");
+		List<File> images = Arrays.asList(UtilIO.findMatches(new File(imagePath),"\\w*.jpg"));
 		Collections.sort(images);
 
 		ImageClassificationPanel gui = new ImageClassificationPanel();
@@ -69,7 +68,7 @@ public class ExampleImageClassification {
 				throw new RuntimeException("Couldn't find input image");
 
 			Planar<GrayF32> image = new Planar<>(GrayF32.class,buffered.getWidth(), buffered.getHeight(), 3);
-			ConvertBufferedImage.convertFromMulti(buffered,image,true,GrayF32.class);
+			ConvertBufferedImage.convertFromPlanar(buffered,image,true,GrayF32.class);
 
 			classifier.classify(image);
 

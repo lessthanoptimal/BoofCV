@@ -36,6 +36,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidFloat;
 
 import javax.swing.*;
@@ -49,7 +50,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class IntensityFeaturePyramidApp<T extends ImageGray, D extends ImageGray>
+public class IntensityFeaturePyramidApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel
 {
 	ListDisplayPanel gui = new ListDisplayPanel();
@@ -75,7 +76,7 @@ public class IntensityFeaturePyramidApp<T extends ImageGray, D extends ImageGray
 		addAlgorithm(0, "Shi Tomasi",new WrapperGradientCornerIntensity<T,D>( FactoryIntensityPointAlg.shiTomasi(2, false, derivType)));
 		addAlgorithm(0, "FAST",new WrapperFastCornerIntensity<T,D>(FactoryIntensityPointAlg.fast(5, 11, imageType)));
 		addAlgorithm(0, "KitRos",new WrapperKitRosCornerIntensity<T,D>(derivType));
-		addAlgorithm(0, "Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(imageType,2),imageType));
+		addAlgorithm(0, "Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(ImageType.single(imageType),2),imageType));
 
 		addAlgorithm(1 , "Pyramid", 0);
 		addAlgorithm(1 , "Scale-Space", 1);

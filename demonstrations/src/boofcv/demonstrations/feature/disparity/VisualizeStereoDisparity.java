@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,9 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.ops.ConvertMatrixData;
 
 import javax.swing.*;
 import java.awt.*;
@@ -52,7 +54,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.alg.geo.RectifyImageOps.transformRectToPixel_F64;
+import static boofcv.alg.geo.RectifyImageOps.transformRectToPixel;
 
 /**
  * Computes and displays disparity from still disparity images.  The disparity can be viewed
@@ -61,7 +63,7 @@ import static boofcv.alg.geo.RectifyImageOps.transformRectToPixel_F64;
  *
  * @author Peter Abeles
  */
-public class VisualizeStereoDisparity <T extends ImageGray, D extends ImageGray>
+public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel
 	implements DisparityDisplayPanel.Listener
 {
@@ -103,7 +105,7 @@ public class VisualizeStereoDisparity <T extends ImageGray, D extends ImageGray>
 	private StereoDisparity<T,D> activeAlg;
 
 	// camera calibration matrix of rectified images
-	private DenseMatrix64F rectK;
+	private DMatrixRMaj rectK;
 
 	// makes sure process has been called before render disparity is done
 	// There was a threading issue where disparitySettingChange() created a new alg() but render was called before
@@ -178,7 +180,7 @@ public class VisualizeStereoDisparity <T extends ImageGray, D extends ImageGray>
 					throw new RuntimeException("Unknown option");
 			}
 
-			gui.setBufferedImage(img);
+			gui.setImage(img);
 			gui.setPreferredSize(new Dimension(origLeft.getWidth(), origLeft.getHeight()));
 			comp = gui;
 		} else {
@@ -231,28 +233,33 @@ public class VisualizeStereoDisparity <T extends ImageGray, D extends ImageGray>
 	 */
 	private void rectifyInputImages() {
 		// get intrinsic camera calibration matrices
-		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(calib.left, null);
-		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(calib.right, null);
+		DMatrixRMaj K1 = PerspectiveOps.calibrationMatrix(calib.left, (DMatrixRMaj)null);
+		DMatrixRMaj K2 = PerspectiveOps.calibrationMatrix(calib.right, (DMatrixRMaj)null);
 
 		// compute rectification matrices
 		rectifyAlg.process(K1,new Se3_F64(),K2,calib.getRightToLeft().invert(null));
 
-		DenseMatrix64F rect1 = rectifyAlg.getRect1();
-		DenseMatrix64F rect2 = rectifyAlg.getRect2();
+		DMatrixRMaj rect1 = rectifyAlg.getRect1();
+		DMatrixRMaj rect2 = rectifyAlg.getRect2();
 		rectK = rectifyAlg.getCalibrationMatrix();
 
 		// adjust view to maximize viewing area while not including black regions
 		RectifyImageOps.allInsideLeft(calib.left, rect1, rect2, rectK);
 
 		// compute transforms to apply rectify the images
-		leftRectToPixel = transformRectToPixel_F64(calib.left, rect1);
+		leftRectToPixel = transformRectToPixel(calib.left, rect1);
 
 		ImageType<T> imageType = ImageType.single(activeAlg.getInputType());
 
+		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3); // TODO simplify code some how
+		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
+		ConvertMatrixData.convert(rect1, rect1_F32);
+		ConvertMatrixData.convert(rect2, rect2_F32);
+
 		ImageDistort<T,T> distortRect1 = RectifyImageOps.rectifyImage(
-				calib.left, rect1, BorderType.SKIP,imageType);
+				calib.left, rect1_F32, BorderType.SKIP,imageType);
 		ImageDistort<T,T> distortRect2 = RectifyImageOps.rectifyImage(
-				calib.right, rect2, BorderType.SKIP, imageType);
+				calib.right, rect2_F32, BorderType.SKIP, imageType);
 
 		// rectify and undo distortion
 		distortRect1.apply(inputLeft, rectLeft);

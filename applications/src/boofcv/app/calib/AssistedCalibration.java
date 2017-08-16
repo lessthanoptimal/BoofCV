@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.app.calib;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid;
+import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -160,6 +161,8 @@ public class AssistedCalibration {
 			view = new CalibrationView.SquareGrid();
 		} else if( detector instanceof CalibrationDetectorCircleAsymmGrid) {
 			view = new CalibrationView.CircleAsymmGrid();
+		} else if( detector instanceof CalibrationDetectorCircleRegularGrid) {
+			view = new CalibrationView.CircleRegularGrid();
 		} else {
 			throw new RuntimeException("Unknown calibration detector type: "+detector.getClass().getSimpleName());
 		}
@@ -211,6 +214,7 @@ public class AssistedCalibration {
 		}
 
 		gui.setImage(image);
+		gui.repaint();
 	}
 
 	private void handleDetermineSize( boolean detected ) {
@@ -431,9 +435,13 @@ public class AssistedCalibration {
 	}
 
 	private void renderFillPolygons() {
+		if( regions.size() == 0)
+			return;
+
 		g2.setColor(new Color(0, 255, 255, 50));
-		int polyX[] = new int[20];
-		int polyY[] = new int[20];
+		int N = regions.get(0).size();
+		int polyX[] = new int[N];
+		int polyY[] = new int[N];
 
 		for (int i = 0; i < regions.size(); i++) {
 			Polygon2D_F64 poly = regions.get(i);

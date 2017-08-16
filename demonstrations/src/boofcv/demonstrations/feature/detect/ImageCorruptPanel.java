@@ -92,7 +92,7 @@ public class ImageCorruptPanel extends StandardAlgConfigPanel implements ChangeL
 	 * @param original Original uncorrupted image.
 	 * @param corrupted Corrupted mage.
 	 */
-	public <T extends ImageGray> void corruptImage(T original , T corrupted )
+	public <T extends ImageGray<T>> void corruptImage(T original , T corrupted )
 	{
 		GGrayImageOps.stretch(original, valueScale, valueOffset, 255.0, corrupted);
 		GImageMiscOps.addGaussian(corrupted, rand, valueNoise, 0, 255);

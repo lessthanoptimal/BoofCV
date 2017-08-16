@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ import java.util.ArrayList;
  * Demonstrates the affects of different binary operations on an image.
  */
 // todo clean up appearance
-public class DemoBinaryImageOpsApp<T extends ImageGray> extends SelectAlgorithmAndInputPanel
+public class DemoBinaryImageOpsApp<T extends ImageGray<T>> extends SelectAlgorithmAndInputPanel
 		implements SelectHistogramThresholdPanel.Listener
 {
 	Class<T> imageType;
@@ -160,7 +160,7 @@ public class DemoBinaryImageOpsApp<T extends ImageGray> extends SelectAlgorithmA
 					work = new BufferedImage(imageInput.width, imageInput.height, BufferedImage.TYPE_INT_BGR);
 				}
 				VisualizeBinaryData.renderBinary(selectedVisualize, false, work);
-				gui.setBufferedImage(work);
+				gui.setImage(work);
 				gui.setPreferredSize(new Dimension(imageInput.width, imageInput.height));
 				processedImage = true;
 				gui.repaint();

@@ -46,7 +46,7 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 public class WaveletVisualizeApp
-		<T extends ImageGray, W extends ImageGray, C extends WlCoef>
+		<T extends ImageGray<T>, W extends ImageGray<W>, C extends WlCoef>
 		extends SelectAlgorithmAndInputPanel
 {
 	int numLevels = 3;

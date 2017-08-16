@@ -34,7 +34,7 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
-import georegression.geometry.ConvertRotation3D_F64;
+import georegression.geometry.ConvertRotation3D_F32;
 import georegression.struct.EulerType;
 
 import java.awt.*;
@@ -76,14 +76,14 @@ public class ExampleEquirectangularToPinhole {
 		distorter.setModel(pinholeToEqui);
 
 		// change the orientation of the camera to make the view better
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.YXZ,0, 1.45, 2.2,pinholeToEqui.getRotation());
+		ConvertRotation3D_F32.eulerToMatrix(EulerType.YXZ,0, 1.45f, 2.2f,pinholeToEqui.getRotation());
 
 		// Render the image
 		distorter.apply(equiImage,pinholeImage);
 		BufferedImage bufferedPinhole0 = ConvertBufferedImage.convertTo(pinholeImage,null,true);
 
 		// Let's look at another view
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.YXZ,0, 1.25, -1.25,pinholeToEqui.getRotation());
+		ConvertRotation3D_F32.eulerToMatrix(EulerType.YXZ,0, 1.25f, -1.25f,pinholeToEqui.getRotation());
 
 		distorter.apply(equiImage,pinholeImage);
 		BufferedImage bufferedPinhole1 = ConvertBufferedImage.convertTo(pinholeImage,null,true);

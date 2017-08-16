@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,17 +32,19 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.geo.GeoLL_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import georegression.geometry.ConvertRotation3D_F64;
-import georegression.geometry.GeometryMath_F64;
+import georegression.geometry.ConvertRotation3D_F32;
+import georegression.geometry.GeometryMath_F32;
 import georegression.metric.UtilAngle;
+import georegression.misc.GrlConstants;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Vector3D_F64;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import georegression.struct.point.Vector3D_F32;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.dense.row.CommonOps_FDRM;
 
 import javax.swing.*;
 import java.awt.*;
@@ -63,7 +65,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class EquirectangularPinholeApp<T extends ImageBase<T>> extends DemonstrationBase<T>
-	implements PinholePanel.Listener
+	implements PinholeSimplifiedPanel.Listener
 {
 
 	PinholeToEquirectangular_F32 distorter = new PinholeToEquirectangular_F32();
@@ -87,7 +89,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 	ImagePanel panelPinhole = new ImagePanel();
 	EquiViewPanel panelEqui = new EquiViewPanel();
 
-	Object imageLock = new Object();
+	final Object imageLock = new Object();
 
 	public EquirectangularPinholeApp(List<?> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
@@ -105,29 +107,29 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 		pinhole = imageType.createImage(camWidth,camHeight);
 		buffPinhole = new BufferedImage(camWidth,camHeight,BufferedImage.TYPE_INT_BGR);
 		panelPinhole.setPreferredSize( new Dimension(camWidth,camHeight));
-		panelPinhole.setBufferedImage(buffEqui);
+		panelPinhole.setImage(buffEqui);
 		panelPinhole.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				double pitch=0;
-				double yaw=0;
-				double roll=0;
+				float pitch=0;
+				float yaw=0;
+				float roll=0;
 
 				switch( e.getKeyCode() ) {
-					case KeyEvent.VK_W: pitch += 0.01; break;
-					case KeyEvent.VK_S: pitch -= 0.01; break;
-					case KeyEvent.VK_A: yaw -= 0.01; break;
-					case KeyEvent.VK_D: yaw += 0.01; break;
-					case KeyEvent.VK_Q: roll -= 0.01; break;
-					case KeyEvent.VK_E: roll += 0.01; break;
+					case KeyEvent.VK_W: pitch += 0.01f; break;
+					case KeyEvent.VK_S: pitch -= 0.01f; break;
+					case KeyEvent.VK_A: yaw -= 0.01f; break;
+					case KeyEvent.VK_D: yaw += 0.01f; break;
+					case KeyEvent.VK_Q: roll -= 0.01f; break;
+					case KeyEvent.VK_E: roll += 0.01f; break;
 					default:
 						return;
 				}
 
 				synchronized (imageLock) {
-					DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,null);
-					DenseMatrix64F tmp = distorter.getRotation().copy();
-					CommonOps.mult(tmp,R,distorter.getRotation());
+					FMatrixRMaj R = ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,null);
+					FMatrixRMaj tmp = distorter.getRotation().copy();
+					CommonOps_FDRM.mult(tmp,R,distorter.getRotation());
 					distortImage.setModel(distorter); // dirty the transform
 					if (inputMethod == InputMethod.IMAGE) {
 						rerenderPinhole();
@@ -139,7 +141,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 		MouseAdapter mouseAdapter = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Point2D_F32 latlon = new Point2D_F32();
+				GeoLL_F32 geo = new GeoLL_F32();
 
 				double scale = panelEqui.scale;
 
@@ -150,16 +152,16 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 					return;
 				panelPinhole.grabFocus();
 				synchronized (imageLock) {
-					distorter.getTools().equiToLonlatFV(x,y,latlon);
-					distorter.setDirection(latlon.x,latlon.y,0);
+					distorter.getTools().equiToLatLonFV(x,y,geo);
+					distorter.setDirection(geo.lon,geo.lat,0);
 
 					// pinhole has a canonical view along +z
 					// equirectangular lon-lat uses +x
 					// this compensates for that
 					// roll rotation is to make the view appear "up"
-					DenseMatrix64F A = ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,Math.PI/2,0,Math.PI/2,null);
-					DenseMatrix64F tmp = distorter.getRotation().copy();
-					CommonOps.mult(tmp,A,distorter.getRotation());
+					FMatrixRMaj A = ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX, GrlConstants.F_PI/2,0,GrlConstants.F_PI/2,null);
+					FMatrixRMaj tmp = distorter.getRotation().copy();
+					CommonOps_FDRM.mult(tmp,A,distorter.getRotation());
 
 					distortImage.setModel(distorter); // let it know the transform has changed
 
@@ -183,7 +185,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 
 		JPanel controlPanel = new JPanel();
 		controlPanel.setLayout(new BoxLayout(controlPanel,BoxLayout.Y_AXIS));
-		PinholePanel controlPinhole = new PinholePanel(camWidth,camHeight,hfov,this);
+		PinholeSimplifiedPanel controlPinhole = new PinholeSimplifiedPanel(camWidth,camHeight,hfov,this);
 		controlPanel.add( controlPinhole );
 
 		add(controlPanel, BorderLayout.WEST );
@@ -192,19 +194,19 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 	}
 
 	@Override
-	public void processImage(BufferedImage buffered, T input) {
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 		synchronized (imageLock) {
 			// create a copy of the input image for output purposes
 			if (buffEqui.getWidth() != buffered.getWidth() || buffEqui.getHeight() != buffered.getHeight()) {
 				buffEqui = new BufferedImage(buffered.getWidth(), buffered.getHeight(), BufferedImage.TYPE_INT_BGR);
 				panelEqui.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
-				panelEqui.setBufferedImageSafe(buffEqui);
+				panelEqui.setImageUI(buffEqui);
 
 				distorter.setEquirectangularShape(input.width, input.height);
 				distortImage.setModel(distorter);
 			}
 			buffEqui.createGraphics().drawImage(buffered, 0, 0, null);
-			equi.setTo(input);
+			equi.setTo((T)input);
 
 			rerenderPinhole();
 		}
@@ -218,7 +220,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 //		System.out.println("Rendering time "+(after-before)/1e6+" ms");
 
 		ConvertBufferedImage.convertTo(pinhole,buffPinhole,true);
-		panelPinhole.setBufferedImageSafe(buffPinhole);
+		panelPinhole.setImageUI(buffPinhole);
 		panelEqui.repaint();
 	}
 
@@ -272,7 +274,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 	 * Draws a circle around the current view's center
 	 */
 	private class EquiViewPanel extends ImagePanel {
-		Vector3D_F64 v = new Vector3D_F64();
+		Vector3D_F32 v = new Vector3D_F32();
 		Point2D_F32 p = new Point2D_F32();
 		BasicStroke stroke0 = new BasicStroke(3);
 		BasicStroke stroke1 = new BasicStroke(6);
@@ -296,10 +298,10 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 			// center the center cicle
-			DenseMatrix64F R = distorter.getRotation();
+			FMatrixRMaj R = distorter.getRotation();
 
 			v.set(0,0,1); // canonical view is +z for pinhole cvamera
-			GeometryMath_F64.mult(R,v,v);
+			GeometryMath_F32.mult(R,v,v);
 
 			distorter.getTools().normToEquiFV((float)v.x,(float)v.y,(float)v.z,p);
 			circle.setFrame(p.x*scale-10,p.y*scale-10,20,20);

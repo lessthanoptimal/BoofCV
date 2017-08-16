@@ -53,7 +53,7 @@ public class DetectFastHessianApp {
 
 	static int NUM_FEATURES = 120;
 
-	private static <T extends ImageGray> void doStuff(Class<T> imageType , BufferedImage input ) {
+	private static <T extends ImageGray<T>> void doStuff(Class<T> imageType , BufferedImage input ) {
 		T workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract( 5 , 1 , 5, true) );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,7 @@ public class ExampleImageEnhancement {
 
 		ListDisplayPanel panel = new ListDisplayPanel();
 
-		ImageStatistics.histogram(gray, histogram);
+		ImageStatistics.histogram(gray,0, histogram);
 		EnhanceImageOps.equalize(histogram, transform);
 		EnhanceImageOps.applyTransform(gray, transform, adjusted);
 		panel.addImage(ConvertBufferedImage.convertTo(adjusted, null), "Global");

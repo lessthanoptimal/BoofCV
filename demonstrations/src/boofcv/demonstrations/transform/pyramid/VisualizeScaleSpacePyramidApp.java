@@ -39,7 +39,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class VisualizeScaleSpacePyramidApp<T extends ImageGray>
+public class VisualizeScaleSpacePyramidApp<T extends ImageGray<T>>
 	extends SelectInputPanel
 {
 	double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0,12,20};

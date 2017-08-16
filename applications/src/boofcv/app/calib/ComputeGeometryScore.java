@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.Zhang99CalibrationMatrixFromHomographies;
 import boofcv.alg.geo.calibration.Zhang99ComputeTargetHomography;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +39,7 @@ public class ComputeGeometryScore {
 	Zhang99ComputeTargetHomography computeHomography;
 	Zhang99CalibrationMatrixFromHomographies computeCalib;
 
-	List<DenseMatrix64F> homographies = new ArrayList<>();
+	List<DMatrixRMaj> homographies = new ArrayList<>();
 
 	double score = 0;
 

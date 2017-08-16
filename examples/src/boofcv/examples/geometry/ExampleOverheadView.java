@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewPL;
 import boofcv.alg.sfm.overhead.SelectOverheadParameters;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.StereoParameters;
@@ -44,10 +45,10 @@ public class ExampleOverheadView {
 	public static void main( String args[] ) {
 		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("road/left01.png"));
 
-		Planar<GrayU8> imageRGB = ConvertBufferedImage.convertFromMulti(input, null,true, GrayU8.class);
+		Planar<GrayU8> imageRGB = ConvertBufferedImage.convertFromPlanar(input, null,true, GrayU8.class);
 
-		StereoParameters stereoParam = UtilIO.loadXML(UtilIO.pathExample("road/stereo01.xml"));
-		Se3_F64 groundToLeft = UtilIO.loadXML(UtilIO.pathExample("road/ground_to_left_01.xml"));
+		StereoParameters stereoParam = CalibrationIO.load(UtilIO.pathExample("road/stereo01.yaml"));
+		Se3_F64 groundToLeft = CalibrationIO.load(UtilIO.pathExample("road/ground_to_left_01.yaml"));
 
 		CreateSyntheticOverheadView<Planar<GrayU8>> generateOverhead =
 				new CreateSyntheticOverheadViewPL<>(InterpolationType.BILINEAR,3,GrayU8.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,6 @@ import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.MonocularPlaneVisualOdometry;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
@@ -36,6 +35,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.GrayF32;
@@ -44,7 +44,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,7 +56,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray>
+public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 		extends VideoProcessAppBase<I> implements VisualizeApp, VisualOdometryPanel.Listener
 {
 
@@ -177,7 +176,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray>
 			if( line1.charAt(0) != '/' )
 				line1 = path+"/"+line1;
 
-			config = UtilIO.loadXML(media.openFile(lineConfig));
+			config = CalibrationIO.load(media.openFile(lineConfig));
 			SimpleImageSequence<I> video = media.openVideo(line1, imageType);
 
 			process(video);
@@ -227,7 +226,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray>
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				guiLeft.setBufferedImage(buffImage1);
+				guiLeft.setImage(buffImage1);
 				guiLeft.autoSetPreferredSize();
 				guiLeft.repaint();
 
@@ -276,9 +275,8 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray>
 
 		handleRunningStatus(2);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.intrinsic,null);
 		guiCam3D.init();
-		guiCam3D.setK(K);
+		guiCam3D.setFocalLength(300);
 		guiCam3D.setStepSize(1);
 		guiCam3D.setPreferredSize(new Dimension(config.intrinsic.width, config.intrinsic.height));
 		guiCam3D.setMaximumSize(guiCam3D.getPreferredSize());
@@ -290,7 +288,6 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray>
 	private MonocularPlaneVisualOdometry<I> createVisualOdometry( int whichAlg ) {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageClass);
-
 
 		if( whichAlg == 0 ) {
 			PkltConfig config = new PkltConfig();

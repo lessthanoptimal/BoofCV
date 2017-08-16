@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,7 +58,7 @@ import java.util.Vector;
  *
  * @author Peter Abeles
  */
-public class DenoiseVisualizeApp<T extends ImageGray,D extends ImageGray,W extends WlCoef>
+public class DenoiseVisualizeApp<T extends ImageGray<T>,D extends ImageGray<D>,W extends WlCoef>
 	extends SelectAlgorithmAndInputPanel implements DenoiseInfoPanel.Listener
 {
 
@@ -260,7 +260,7 @@ public class DenoiseVisualizeApp<T extends ImageGray,D extends ImageGray,W exten
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				BufferedImage b = images.get(which);
-				imagePanel.setBufferedImage(images.get(which));
+				imagePanel.setImage(images.get(which));
 				imagePanel.setPreferredSize(new Dimension(b.getWidth(),b.getHeight()));
 				gui.validate();
 				imagePanel.repaint();

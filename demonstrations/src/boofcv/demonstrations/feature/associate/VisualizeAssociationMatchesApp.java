@@ -68,7 +68,7 @@ import java.util.List;
  */
 // todo add waiting tool bar
 // todo show partial results
-public class VisualizeAssociationMatchesApp<T extends ImageGray, D extends ImageGray>
+public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel {
 
 	InterestPointDetector<T> detector;
@@ -133,8 +133,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray, D extends Image
 		grayLeft.reshape(buffLeft.getWidth(), buffLeft.getHeight());
 		grayRight.reshape(buffRight.getWidth(), buffRight.getHeight());
 
-		ConvertBufferedImage.convertFromMulti(buffLeft, imageLeft, true, imageType);
-		ConvertBufferedImage.convertFromMulti(buffRight, imageRight, true, imageType);
+		ConvertBufferedImage.convertFromPlanar(buffLeft, imageLeft, true, imageType);
+		ConvertBufferedImage.convertFromPlanar(buffRight, imageRight, true, imageType);
 		GConvertImage.average(imageLeft, grayLeft);
 		GConvertImage.average(imageRight, grayRight);
 

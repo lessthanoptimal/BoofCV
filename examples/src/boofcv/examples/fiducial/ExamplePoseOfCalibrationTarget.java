@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 import javax.swing.*;
 import java.awt.*;
@@ -89,7 +89,7 @@ public class ExamplePoseOfCalibrationTarget {
 		JPanel gui = new JPanel();
 		PointCloudViewer viewer = new PointCloudViewer(intrinsic, 0.01);
 		// make the view more interest.  From the side.
-		DenseMatrix64F rotY = ConvertRotation3D_F64.rotY(-Math.PI/2.0,null);
+		DMatrixRMaj rotY = ConvertRotation3D_F64.rotY(-Math.PI/2.0,null);
 		viewer.setWorldToCamera(new Se3_F64(rotY,new Vector3D_F64(0.75,0,1.25)));
 		ImagePanel imagePanel = new ImagePanel(intrinsic.width, intrinsic.height);
 		gui.add(BorderLayout.WEST, imagePanel); gui.add(BorderLayout.CENTER, viewer);
@@ -130,7 +130,7 @@ public class ExamplePoseOfCalibrationTarget {
 				}
 			}
 
-			imagePanel.setBufferedImage((BufferedImage) video.getGuiImage());
+			imagePanel.setImage((BufferedImage) video.getGuiImage());
 			viewer.repaint();
 			imagePanel.repaint();
 

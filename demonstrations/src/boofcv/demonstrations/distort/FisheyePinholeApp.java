@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,15 +42,15 @@ import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import georegression.geometry.ConvertRotation3D_F64;
-import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.UtilVector3D_F64;
+import georegression.geometry.ConvertRotation3D_F32;
+import georegression.geometry.GeometryMath_F32;
+import georegression.geometry.UtilVector3D_F32;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.point.Vector3D_F64;
-import georegression.struct.so.Rodrigues_F64;
-import org.ejml.data.DenseMatrix64F;
+import georegression.struct.point.Point3D_F32;
+import georegression.struct.point.Vector3D_F32;
+import georegression.struct.so.Rodrigues_F32;
+import org.ejml.data.FMatrixRMaj;
 
 import javax.swing.*;
 import java.awt.*;
@@ -72,7 +72,7 @@ import java.util.List;
 // TODO Show which calibration file is being used
 	// TODO when a file is opened look for a calibration file
 public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase<T>
-	implements PinholePanel.Listener
+	implements PinholeSimplifiedPanel.Listener
 {
 
 	NarrowToWidePtoP_F32 distorter = new NarrowToWidePtoP_F32();
@@ -106,6 +106,8 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 
 		updateIntrinsic();
 
+		setPreferredSize(new Dimension(800,800));
+
 		BorderType borderType = BorderType.EXTENDED;
 		InterpolatePixel<T> interp =
 				FactoryInterpolation.createPixel(0, 255, InterpolationType.BILINEAR,borderType, imageType);
@@ -116,19 +118,17 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 		pinhole = imageType.createImage(camWidth,camHeight);
 		buffPinhole = new BufferedImage(camWidth,camHeight,BufferedImage.TYPE_INT_BGR);
 		panelPinhole.setPreferredSize( new Dimension(camWidth,camHeight));
-		panelPinhole.setBufferedImage(buffFisheye);
-		final PinholePanel controlPinhole = new PinholePanel(camWidth,camHeight,hfov,this);
+		panelPinhole.setImage(buffFisheye);
+		final PinholeSimplifiedPanel controlPinhole = new PinholeSimplifiedPanel(camWidth,camHeight,hfov,this);
 
 		MouseAdapter adapter = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-
 				changeFocus(e);
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-
 				changeFocus(e);
 			}
 
@@ -142,17 +142,17 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 					return;
 				panelPinhole.grabFocus();
 				synchronized (imageLock) {
-					Point3D_F64 norm = new Point3D_F64();
-					fisheyeDistort.undistortPtoS_F64().compute(omniX, omniY, norm);
+					Point3D_F32 norm = new Point3D_F32();
+					fisheyeDistort.undistortPtoS_F32().compute((float)omniX, (float)omniY, norm);
 
-					Rodrigues_F64 rotation = new Rodrigues_F64();
+					Rodrigues_F32 rotation = new Rodrigues_F32();
 
-					Vector3D_F64 canonical = new Vector3D_F64(0,0,1);
-					rotation.theta = UtilVector3D_F64.acute(new Vector3D_F64(norm),canonical);
-					GeometryMath_F64.cross(canonical,norm,rotation.unitAxisRotation);
+					Vector3D_F32 canonical = new Vector3D_F32(0,0,1);
+					rotation.theta = UtilVector3D_F32.acute(new Vector3D_F32(norm),canonical);
+					GeometryMath_F32.cross(canonical,norm,rotation.unitAxisRotation);
 					rotation.unitAxisRotation.normalize();
 
-					DenseMatrix64F R = ConvertRotation3D_F64.rodriguesToMatrix(rotation,null);
+					FMatrixRMaj R = ConvertRotation3D_F32.rodriguesToMatrix(rotation,null);
 					distorter.setRotationWideToNarrow(R);
 
 					distortImage.setModel(new PointToPixelTransform_F32(distorter));
@@ -177,6 +177,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 
 		panelPinhole.setFocusable(true);
 		panelPinhole.grabFocus();
+		panelPinhole.setPreferredSize(new Dimension(camWidth,camHeight));
 
 		JPanel controlPanel = new JPanel();
 		controlPanel.setLayout(new BoxLayout(controlPanel,BoxLayout.Y_AXIS));
@@ -185,6 +186,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 		imageView = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		imageView.setTopComponent(panelPinhole);
 		imageView.setBottomComponent(panelFisheye);
+		imageView.setDividerLocation(camHeight);
 
 		add(controlPanel, BorderLayout.WEST );
 		add(imageView, BorderLayout.CENTER);
@@ -201,19 +203,19 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 	}
 
 	@Override
-	public void processImage(BufferedImage buffered, T input) {
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 		synchronized (imageLock) {
 			// create a copy of the input image for output purposes
 			if (buffFisheye.getWidth() != buffered.getWidth() || buffFisheye.getHeight() != buffered.getHeight()) {
 				buffFisheye = new BufferedImage(buffered.getWidth(), buffered.getHeight(), BufferedImage.TYPE_INT_BGR);
 
 				panelFisheye.setPreferredSize(new Dimension(buffered.getWidth(),buffered.getHeight()));
-				panelFisheye.setBufferedImageSafe(buffFisheye);
+				panelFisheye.setImageUI(buffFisheye);
 
 				distortImage.setModel(new PointToPixelTransform_F32(distorter));
 			}
 			buffFisheye.createGraphics().drawImage(buffered, 0, 0, null);
-			fisheye.setTo(input);
+			fisheye.setTo((T)input);
 
 			rerenderPinhole();
 		}
@@ -226,7 +228,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 //		System.out.println("Rendering time "+(after-before)/1e6+" ms");
 
 		ConvertBufferedImage.convertTo(pinhole,buffPinhole,true);
-		panelPinhole.setBufferedImageSafe(buffPinhole);
+		panelPinhole.setImageUI(buffPinhole);
 		panelFisheye.repaint();
 	}
 

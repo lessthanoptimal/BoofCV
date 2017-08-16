@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,23 +18,21 @@
 
 package boofcv.demonstrations.shapes;
 
-import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.Configuration;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
@@ -51,40 +49,20 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectBlackPolygonApp<T extends ImageGray> extends DemonstrationBase<T>
-		implements ThresholdControlPanel.Listener
+public class DetectBlackPolygonApp<T extends ImageGray<T>>
+		extends DetectBlackShapeAppBase
 {
-
-	Class<T> imageClass;
-
-	DetectPolygonControlPanel controls = new DetectPolygonControlPanel(this);
-
-	VisualizePanel guiImage;
-
-	InputToBinary<T> inputToBinary;
 	BinaryPolygonDetector<T> detector;
 
-	BufferedImage original;
-	BufferedImage work;
-	T inputPrev;
-	GrayU8 binary = new GrayU8(1,1);
-
-
 	public DetectBlackPolygonApp(List<String> examples , Class<T> imageType) {
-		super(examples, ImageType.single(imageType));
-		this.imageClass = imageType;
+		super(examples, imageType);
 
-		guiImage = new VisualizePanel();
-
-		add(BorderLayout.WEST, controls);
-		add(BorderLayout.CENTER, guiImage);
-
-		inputPrev = super.imageType.createImage(1,1);
-
-		createDetector();
+		setupGui(new VisualizePanel(),new DetectPolygonControlPanel(this));
 	}
 
-	private synchronized void createDetector() {
+	@Override
+	protected void createDetector() {
+		DetectPolygonControlPanel controls = (DetectPolygonControlPanel)DetectBlackPolygonApp.this.controls;
 
 		Configuration configRefine = null;
 
@@ -95,35 +73,44 @@ public class DetectBlackPolygonApp<T extends ImageGray> extends DemonstrationBas
 		}
 		controls.getConfigPolygon().refine = configRefine;
 
-		detector = FactoryShapeDetector.polygon(controls.getConfigPolygon(), imageClass);
+		synchronized (this) {
+			detector = FactoryShapeDetector.polygon(controls.getConfigPolygon(), imageClass);
+		}
 		imageThresholdUpdated();
 	}
 
+
+	public void configUpdate() {
+		createDetector();
+		// does process and render too
+	}
+
 	@Override
-	public synchronized void processImage(final BufferedImage buffered, T input ) {
-		if( buffered != null ) {
-			original = conditionalDeclare(buffered,original);
-			work = conditionalDeclare(buffered,work);
+	public void imageThresholdUpdated() {
+		DetectPolygonControlPanel controls = (DetectPolygonControlPanel)DetectBlackPolygonApp.this.controls;
 
-			this.original.createGraphics().drawImage(buffered,0,0,null);
+		ConfigThreshold config = controls.getThreshold().createConfig();
 
-			binary.reshape(work.getWidth(), work.getHeight());
-			inputPrev.setTo(input);
-
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					Dimension d = guiImage.getPreferredSize();
-					if( d.getWidth() < buffered.getWidth() || d.getHeight() < buffered.getHeight() ) {
-						guiImage.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
-					}
-				}});
-		} else {
-			input = inputPrev;
+		synchronized (this) {
+			inputToBinary = FactoryThresholdBinary.threshold(config, imageClass);
 		}
+		reprocessImageOnly();
+	}
 
-		inputToBinary.process(input, binary);
-		detector.process(input, binary);
+	@Override
+	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
+		System.out.flush();
+		this.input = (T)input;
+
+		original = ConvertBufferedImage.checkCopy(buffered,original);
+		work = ConvertBufferedImage.checkDeclare(buffered,work);
+
+		binary.reshape(work.getWidth(), work.getHeight());
+
+		synchronized (this) {
+			inputToBinary.process((T)input, binary);
+			detector.process((T) input, binary);
+		}
 
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -133,50 +120,16 @@ public class DetectBlackPolygonApp<T extends ImageGray> extends DemonstrationBas
 		});
 	}
 
-	/**
-	 * Called when how the data is visualized has changed
-	 */
-	public void viewUpdated() {
-		BufferedImage active = null;
-		if( controls.selectedView == 0 ) {
-			active = original;
-		} else if( controls.selectedView == 1 ) {
-			VisualizeBinaryData.renderBinary(binary,false,work);
-			active = work;
-			work.setRGB(0, 0, work.getRGB(0, 0));
-		} else {
-			Graphics2D g2 = work.createGraphics();
-			g2.setColor(Color.BLACK);
-			g2.fillRect(0,0,work.getWidth(),work.getHeight());
-			active = work;
-		}
-
-		guiImage.setScale(controls.zoom);
-
-		guiImage.setBufferedImage(active);
-		guiImage.repaint();
-	}
-
-	public void configUpdate() {
-		createDetector();
-		// does process and render too
-	}
-
-	@Override
-	public synchronized void imageThresholdUpdated() {
-
-		ConfigThreshold config = controls.getThreshold().createConfig();
-
-		inputToBinary = FactoryThresholdBinary.threshold(config, imageClass);
-		processImageThread(null,null);
-	}
-
 	class VisualizePanel extends ImageZoomPanel {
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+
+			DetectPolygonControlPanel controls = (DetectPolygonControlPanel)DetectBlackPolygonApp.this.controls;
+
+			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
 			synchronized ( DetectBlackPolygonApp.this ) {
-				g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 				if (controls.bShowContour) {
 					List<Contour> contours = detector.getAllContours();
@@ -233,7 +186,7 @@ public class DetectBlackPolygonApp<T extends ImageGray> extends DemonstrationBas
 
 		app.openFile(new File(examples.get(0)));
 
-		app.waitUntilDoneProcessing();
+		app.waitUntilInputSizeIsKnown();
 
 		ShowImages.showWindow(app,"Detect Black Polygons",true);
 	}

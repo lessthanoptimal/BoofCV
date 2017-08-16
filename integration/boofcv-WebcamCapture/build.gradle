@@ -1,0 +1,35 @@
+
+dependencies {
+    compile project(':main:boofcv-ip')
+    compile project(':main:boofcv-io')
+    compile project(':integration:boofcv-swing')
+
+    compile group: 'com.github.sarxos', name: 'webcam-capture', version: '0.3.11'
+}
+
+sourceSets {
+    test {
+        java {
+            srcDir 'test'
+            srcDir 'examples'
+        }
+        resources {
+            srcDir 'resources/test'
+        }
+    }
+}
+
+// Runs an application from the examples directory
+// gradle webcamRun -Pwhich=boofcv.examples.ExampleTrackingKlt
+task webcamRun(dependsOn: [classes,testClasses] ) {
+    doLast {
+        if (project.hasProperty('which')) {
+            javaexec {
+                main = "$which"
+                classpath = sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
+            }
+        } else {
+            print 'Which not specified!!!!!'
+        }
+    }
+}

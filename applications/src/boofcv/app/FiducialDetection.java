@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
-import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
@@ -429,7 +429,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 				g2.drawString("Uncalibrated",10,20);
 			}
 
-			gui.setBufferedImage(buffered);
+			gui.setImage(buffered);
 
 			long after = System.currentTimeMillis();
 			long time = Math.max(0,pauseMilli-(after-before));
@@ -476,7 +476,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 			g2.drawString("Uncalibrated",10,20);
 		}
 
-		gui.setBufferedImage(buffered);
+		gui.setImage(buffered);
 	}
 
 	private void saveResults( int frameNumber ) {
@@ -526,7 +526,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
-		CameraPinholeRadial intrinsic = intrinsicPath == null ? null : (CameraPinholeRadial)UtilIO.loadXML(intrinsicPath);
+		CameraPinholeRadial intrinsic = intrinsicPath == null ? null :  (CameraPinholeRadial)CalibrationIO.load(intrinsicPath);
 
 		SimpleImageSequence<GrayU8> sequence = null;
 		long pause = 0;

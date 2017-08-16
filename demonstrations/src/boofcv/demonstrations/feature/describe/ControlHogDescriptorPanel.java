@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,6 +91,8 @@ public class ControlHogDescriptorPanel extends StandardAlgConfigPanel
 		addLabeled(selectGridX, "Grid X:", this);
 		addLabeled(selectGridY, "Grid Y:", this);
 		addLabeled(selectHistogram, "Histogram:", this);
+		add(Box.createVerticalGlue());
+		addCenterLabel("Click on Image",this);
 	}
 
 	@Override

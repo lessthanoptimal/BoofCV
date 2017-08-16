@@ -44,7 +44,7 @@ import static boofcv.factory.filter.derivative.FactoryDerivative.*;
  *
  * @author Peter Abeles
  */
-public class ShowImageDerivative<T extends ImageGray, D extends ImageGray>
+public class ShowImageDerivative<T extends ImageGray<T>, D extends ImageGray<D>>
 	extends SelectAlgorithmAndInputPanel
 {
 	Class<T> imageType;

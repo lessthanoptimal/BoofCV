@@ -79,7 +79,7 @@ public class ExampleImageStitching {
 	 * Using abstracted code, find a transform which minimizes the difference between corresponding features
 	 * in both images.  This code is completely model independent and is the core algorithms.
 	 */
-	public static<T extends ImageGray, FD extends TupleDesc> Homography2D_F64
+	public static<T extends ImageGray<T>, FD extends TupleDesc> Homography2D_F64
 	computeTransform( T imageA , T imageB ,
 					  DetectDescribePoint<T,FD> detDesc ,
 					  AssociateDescription<FD> associate ,
@@ -124,7 +124,7 @@ public class ExampleImageStitching {
 	/**
 	 * Detects features inside the two images and computes descriptions at those points.
 	 */
-	private static <T extends ImageGray, FD extends TupleDesc>
+	private static <T extends ImageGray<T>, FD extends TupleDesc>
 	void describeImage(T image,
 					   DetectDescribePoint<T,FD> detDesc,
 					   List<Point2D_F64> points,
@@ -141,7 +141,7 @@ public class ExampleImageStitching {
 	/**
 	 * Given two input images create and display an image where the two have been overlayed on top of each other.
 	 */
-	public static <T extends ImageGray>
+	public static <T extends ImageGray<T>>
 	void stitch( BufferedImage imageA , BufferedImage imageB , Class<T> imageType )
 	{
 		T inputA = ConvertBufferedImage.convertFromSingle(imageA, null, imageType);
@@ -173,9 +173,9 @@ public class ExampleImageStitching {
 
 		// Convert into a BoofCV color format
 		Planar<GrayF32> colorA =
-				ConvertBufferedImage.convertFromMulti(imageA, null, true, GrayF32.class);
+				ConvertBufferedImage.convertFromPlanar(imageA, null, true, GrayF32.class);
 		Planar<GrayF32> colorB =
-				ConvertBufferedImage.convertFromMulti(imageB, null,true, GrayF32.class);
+				ConvertBufferedImage.convertFromPlanar(imageB, null,true, GrayF32.class);
 
 		// Where the output images are rendered into
 		Planar<GrayF32> work = colorA.createSameShape();

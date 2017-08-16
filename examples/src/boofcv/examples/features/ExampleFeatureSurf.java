@@ -75,7 +75,7 @@ public class ExampleFeatureSurf {
 	 * 
 	 * @param image Input image type. DOES NOT NEED TO BE GrayF32, GrayU8 works too
 	 */
-	public static <II extends ImageGray> void harder(GrayF32 image ) {
+	public static <II extends ImageGray<II>> void harder(GrayF32 image ) {
 		// SURF works off of integral images
 		Class<II> integralType = GIntegralImageOps.getIntegralType(GrayF32.class);
 		

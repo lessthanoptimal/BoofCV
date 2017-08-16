@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,13 +30,13 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.wrapper.DefaultMediaManager;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 import javax.swing.*;
 import java.awt.*;
@@ -134,8 +134,9 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 
 		calibrator.printStatistics();
 		param.print();
+
 		if( outputFileName != null )
-			UtilIO.saveXML(param, outputFileName);
+			CalibrationIO.save(param, outputFileName);
 	}
 
 	/**
@@ -144,14 +145,14 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	private void setRectification(final StereoParameters param) {
 
 		// calibration matrix for left and right camera
-		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), null);
-		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(param.getRight(), null);
+		DMatrixRMaj K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), (DMatrixRMaj)null);
+		DMatrixRMaj K2 = PerspectiveOps.calibrationMatrix(param.getRight(), (DMatrixRMaj)null);
 
 		RectifyCalibrated rectify = RectifyImageOps.createCalibrated();
 		rectify.process(K1,new Se3_F64(),K2,param.getRightToLeft().invert(null));
 
-		final DenseMatrix64F rect1 = rectify.getRect1();
-		final DenseMatrix64F rect2 = rectify.getRect2();
+		final DMatrixRMaj rect1 = rectify.getRect1();
+		final DMatrixRMaj rect2 = rectify.getRect2();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -248,8 +249,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 //		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 
-		List<String> leftImages = BoofMiscOps.directoryList(directory, "left");
-		List<String> rightImages = BoofMiscOps.directoryList(directory, "right");
+		List<String> leftImages = UtilIO.directoryList(directory, "left");
+		List<String> rightImages = UtilIO.directoryList(directory, "right");
 
 		Collections.sort(leftImages);
 		Collections.sort(rightImages);

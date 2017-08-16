@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,6 @@ import boofcv.demonstrations.transform.pyramid.VisualizePyramidFloatApp;
 import boofcv.demonstrations.transform.pyramid.VisualizeScaleSpacePyramidApp;
 import boofcv.demonstrations.transform.wavelet.WaveletVisualizeApp;
 import boofcv.gui.ApplicationLauncherApp;
-import boofcv.gui.image.ShowImages;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -84,6 +83,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author Peter Abeles
  */
 public class DemonstrationLauncherApp extends ApplicationLauncherApp {
+
+	public DemonstrationLauncherApp() {
+		super(true);
+	}
+
 	@Override
 	protected void createTree( DefaultMutableTreeNode root ) {
 		createNodes(root,"Binary",
@@ -94,25 +98,25 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				CalibrateMonoPlanarGuiApp.class,
 				CalibrateStereoPlanarGuiApp.class,
 				DetectCalibrationChessboardApp.class,
+				DetectCalibrationSquareGridApp.class,
 				DetectCalibrationCircleAsymmetricApp.class,
-				DetectCalibrationSquareGridApp.class);
+				DetectCalibrationCircleRegularApp.class);
 
 		createNodes(root,"Color",
 				ShowColorModelApp.class);
-
-		createNodes(root,"Denoise",
-				DenoiseVisualizeApp.class);
 
 		createNodes(root,"Distort",
 				EquirectangularCylinderApp.class,
 				EquirectangularPinholeApp.class,
 				EquirectangularRotatingApp.class,
 				FisheyePinholeApp.class,
+				DeformImageKeyPointsApp.class,
 				RemoveLensDistortionApp.class,
-				ShowLensDistortion.class);
+				RenderSyntheticCamerModelApp.class);
 
 		createNodes(root,"Enhance",
-				ImageEnhanceApp.class);
+				ImageEnhanceApp.class,
+				DenoiseVisualizeApp.class);
 
 		createNodes(root,"Feature",
 				VisualizeAssociationAlgorithmsApp.class,
@@ -181,8 +185,8 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 	}
 
 	public static void main(String[] args) {
-		DemonstrationLauncherApp app = new DemonstrationLauncherApp();
-		ShowImages.showWindow(app,"Demonstration Launcher",true);
+		final DemonstrationLauncherApp app = new DemonstrationLauncherApp();
+		app.showWindow("Demonstration Launcher");
 	}
 
 

@@ -50,7 +50,7 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 	public DetectCalibrationSquareGridApp(int numRows , int numColumns ,  double squareWidth, double spaceWidth,
 										  boolean forCalibration ,
 										  List<String> exampleInputs) {
-		super(numRows,numColumns,false,exampleInputs);
+		super(new DetectCalibrationPanel(numRows,numColumns,true),exampleInputs);
 
 		config = new ConfigSquareGrid(numRows, numColumns, squareWidth,spaceWidth);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,9 @@ import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.ops.ConvertMatrixData;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -70,9 +72,9 @@ public class ExampleRectifyCalibratedStereo {
 
 		// distorted images
 		Planar<GrayF32> distLeft =
-				ConvertBufferedImage.convertFromMulti(origLeft, null,true, GrayF32.class);
+				ConvertBufferedImage.convertFromPlanar(origLeft, null,true, GrayF32.class);
 		Planar<GrayF32> distRight =
-				ConvertBufferedImage.convertFromMulti(origRight, null,true, GrayF32.class);
+				ConvertBufferedImage.convertFromPlanar(origRight, null,true, GrayF32.class);
 
 		// storage for undistorted + rectified images
 		Planar<GrayF32> rectLeft = distLeft.createSameShape();
@@ -83,27 +85,32 @@ public class ExampleRectifyCalibratedStereo {
 		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), null);
-		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(param.getRight(), null);
+		DMatrixRMaj K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), (DMatrixRMaj)null);
+		DMatrixRMaj K2 = PerspectiveOps.calibrationMatrix(param.getRight(), (DMatrixRMaj)null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 
 		// rectification matrix for each image
-		DenseMatrix64F rect1 = rectifyAlg.getRect1();
-		DenseMatrix64F rect2 = rectifyAlg.getRect2();
+		DMatrixRMaj rect1 = rectifyAlg.getRect1();
+		DMatrixRMaj rect2 = rectifyAlg.getRect2();
 		// New calibration matrix,
 		// Both cameras have the same one after rectification.
-		DenseMatrix64F rectK = rectifyAlg.getCalibrationMatrix();
+		DMatrixRMaj rectK = rectifyAlg.getCalibrationMatrix();
 
 		// Adjust the rectification to make the view area more useful
 		RectifyImageOps.fullViewLeft(param.left, rect1, rect2, rectK);
 //		RectifyImageOps.allInsideLeft(param.left, leftHanded, rect1, rect2, rectK);
 
 		// undistorted and rectify images
+		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3); // TODO simplify code some how
+		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
+		ConvertMatrixData.convert(rect1, rect1_F32);
+		ConvertMatrixData.convert(rect2, rect2_F32);
+
 		ImageDistort rectifyImageLeft =
-				RectifyImageOps.rectifyImage(param.getLeft(), rect1, BorderType.SKIP, distLeft.getImageType());
+				RectifyImageOps.rectifyImage(param.getLeft(), rect1_F32, BorderType.SKIP, distLeft.getImageType());
 		ImageDistort rectifyImageRight =
-				RectifyImageOps.rectifyImage(param.getRight(), rect2, BorderType.SKIP, distRight.getImageType());
+				RectifyImageOps.rectifyImage(param.getRight(), rect2_F32, BorderType.SKIP, distRight.getImageType());
 
 		rectifyImageLeft.apply(distLeft,rectLeft);
 		rectifyImageRight.apply(distRight,rectRight);

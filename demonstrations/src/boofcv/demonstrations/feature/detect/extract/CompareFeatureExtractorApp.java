@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class CompareFeatureExtractorApp<T extends ImageGray, D extends ImageGray>
+public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel implements GeneralExtractConfigPanel.Listener {
 	T grayImage;
 
@@ -207,15 +207,15 @@ public class CompareFeatureExtractorApp<T extends ImageGray, D extends ImageGray
 			public void run() {
 				switch (viewImage) {
 					case 0:
-						imagePanel.setBufferedImage(input);
+						imagePanel.setImage(input);
 						break;
 
 					case 1:
-						imagePanel.setBufferedImage(intensityImage);
+						imagePanel.setImage(intensityImage);
 						break;
 
 					case 2:
-						imagePanel.setBufferedImage(workImage);
+						imagePanel.setImage(workImage);
 						break;
 				}
 				BufferedImage b = imagePanel.getImage();

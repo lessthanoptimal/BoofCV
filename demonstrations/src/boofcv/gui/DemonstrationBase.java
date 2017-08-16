@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
+public abstract class DemonstrationBase<T extends ImageBase<T>> extends JPanel {
 	protected JMenuBar menuBar;
 	JMenuItem menuFile, menuWebcam, menuQuit;
 	final JFileChooser fc = new JFileChooser();
@@ -62,7 +62,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 	BufferedImage imageCopy1;
 	T boofCopy1;
 
-	protected ImageType<T> imageType;
+	protected ImageType<T> defaultType;
 	T input;
 	BufferedImage inputBuffered;
 	protected MediaManager media = new DefaultMediaManager();
@@ -81,19 +81,24 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 	protected boolean allowVideos = true;
 	protected boolean allowWebcameras = true;
 
+	public DemonstrationBase(boolean allowWebcameras, List<?> exampleInputs, ImageType<T> defaultType) {
+		super(new BorderLayout());
+		this.allowWebcameras = allowWebcameras;
+		createMenuBar(exampleInputs);
+
+		this.input = defaultType.createImage(1,1);
+		this.defaultType = defaultType;
+		this.boofCopy1 = defaultType.createImage(1,1);
+	}
+
 	/**
 	 * Constructor that specifies examples and input image type
 	 *
 	 * @param exampleInputs List of paths to examples.  Either a String file path or {@link PathLabel}.
-	 * @param imageType Type of image it's processing
+	 * @param defaultType Type of image it's processing
 	 */
-	public DemonstrationBase(List<?> exampleInputs, ImageType<T> imageType) {
-		super(new BorderLayout());
-		createMenuBar(exampleInputs);
-
-		this.input = imageType.createImage(1,1);
-		this.imageType = imageType;
-		this.boofCopy1 = imageType.createImage(1,1);
+	public DemonstrationBase(List<?> exampleInputs, ImageType<T> defaultType) {
+		this(true,exampleInputs, defaultType);
 	}
 
 	private void createMenuBar(List<?> exampleInputs) {
@@ -108,17 +113,20 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 		menuFile.addActionListener(listener);
 		menuFile.setAccelerator(KeyStroke.getKeyStroke(
 				KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-		menuWebcam = new JMenuItem("Open Webcam", KeyEvent.VK_W);
-		menuWebcam.addActionListener(listener);
-		menuWebcam.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_W, ActionEvent.CTRL_MASK));
+		if( allowWebcameras ) {
+			menuWebcam = new JMenuItem("Open Webcam", KeyEvent.VK_W);
+			menuWebcam.addActionListener(listener);
+			menuWebcam.setAccelerator(KeyStroke.getKeyStroke(
+					KeyEvent.VK_W, ActionEvent.CTRL_MASK));
+		}
 		menuQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
 		menuQuit.addActionListener(listener);
 		menuQuit.setAccelerator(KeyStroke.getKeyStroke(
 				KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
 
 		menu.add(menuFile);
-		menu.add(menuWebcam);
+		if( allowWebcameras )
+			menu.add(menuWebcam);
 		menu.addSeparator();
 		menu.add(menuQuit);
 
@@ -166,9 +174,9 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 	 * Process the image.  Will be called in its own thread, but doesn't need to be re-entrant.  If image
 	 * is null then reprocess the previous image.
 	 */
-	public abstract void processImage(final BufferedImage buffered , final T input  );
+	public abstract void processImage(int sourceID, long frameID, final BufferedImage buffered , final ImageBase input  );
 
-	protected void processImageThread( final BufferedImage buffered , final T input ) {
+	protected void processImageThread(int sourceID, long frameID, final BufferedImage buffered , final ImageBase input ) {
 
 		// See if there is already a thread running that's processing an image.  If so copy
 		// the new image into storage for the new image that is to be processed after it finishes
@@ -176,8 +184,8 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 		synchronized (processLock) {
 			if(processRunning) {
 				if( buffered != null ) {
-					imageCopy1 = checkCopyBuffered(buffered, imageCopy1);
-					boofCopy1.setTo(input);
+					imageCopy1 = ConvertBufferedImage.checkCopy(buffered, imageCopy1);
+					boofCopy1.setTo((T)input);
 				} else
 					imageCopy1 = null;
 				processRequested = true;
@@ -186,7 +194,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 				processRunning = true;
 				processRequested = false;
 				if( buffered != null )
-					imageCopy0 = checkCopyBuffered(buffered, imageCopy0);
+					imageCopy0 = ConvertBufferedImage.checkCopy(buffered, imageCopy0);
 				else
 					imageCopy0 = null;
 			}
@@ -201,9 +209,9 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 							waitingToOpenImage = false;
 						}
 						if (imageCopy0 != null)
-							processImage(imageCopy0, input);
+							processImage(0,0,imageCopy0, input);
 						else
-							processImage(null, null);
+							processImage(0,0,null, null);
 
 						synchronized (processLock) {
 							if (!processRequested) {
@@ -212,7 +220,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 							}
 							processRequested = false;
 							if (imageCopy1 != null) {
-								imageCopy0 = checkCopyBuffered(imageCopy1, imageCopy0);
+								imageCopy0 = ConvertBufferedImage.checkCopy(imageCopy1, imageCopy0);
 								input.setTo(boofCopy1);
 							} else
 								imageCopy0 = null;
@@ -230,39 +238,6 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 				}
 			}
 		}.start();
-	}
-
-	private BufferedImage checkCopyBuffered(BufferedImage src, BufferedImage dst) {
-		dst = conditionalDeclare(src, dst);
-		dst.createGraphics().drawImage(src,0,0,null);
-		return dst;
-	}
-
-	public static BufferedImage conditionalDeclare(BufferedImage template, BufferedImage output) {
-		if( output == null ||
-				output.getWidth() != template.getWidth() ||
-				output.getHeight() != template.getHeight() ) {
-			int type;
-			if( output == null ) {
-				type = template.getType();
-				if (type == 0) {
-					type = BufferedImage.TYPE_INT_RGB;
-				}
-			} else {
-				type = output.getType();
-			}
-			output = new BufferedImage(template.getWidth(),template.getHeight(),type);
-		}
-		return output;
-	}
-
-	public static BufferedImage conditionalDeclare(BufferedImage template, BufferedImage output, int type ) {
-		if( output == null ||
-				output.getWidth() != template.getWidth() ||
-				output.getHeight() != template.getHeight() ) {
-			output = new BufferedImage(template.getWidth(),template.getHeight(),type);
-		}
-		return output;
 	}
 
 	private void stopPreviousInput() {
@@ -328,7 +303,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 			inputBuffered = buffered;
 			ConvertBufferedImage.convertFrom(buffered,input,true);
 			handleInputChange(inputMethod,buffered.getWidth(),buffered.getHeight());
-			processImageThread(buffered, input);
+			processImageThread(0,0,buffered, input);
 		}
 	}
 
@@ -336,7 +311,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 	 * Before invoking this function make sure waitingToOpenImage is false AND that the previous input has beens topped
 	 */
 	private void openVideo(String filePath) {
-		SimpleImageSequence<T> sequence = media.openVideo(filePath, imageType);
+		SimpleImageSequence<T> sequence = media.openVideo(filePath, defaultType);
 		if( sequence != null ) {
 			inputMethod = InputMethod.VIDEO;
 			streamPeriod = 33; // default to 33 FPS for a video
@@ -384,7 +359,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 		new WaitingThread("Opening Webcam").start();
 		new Thread() {
 			public void run() {
-				SimpleImageSequence<T> sequence = media.openCamera(null,640,480,imageType);
+				SimpleImageSequence<T> sequence = media.openCamera(null,640,480, defaultType);
 				if(sequence != null) {
 					sequenceThread = new ImageSequenceThread(sequence);
 					sequenceThread.start();
@@ -477,7 +452,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 					before = System.currentTimeMillis();
 				} else {
 					BufferedImage buffered = sequence.getGuiImage();
-					processImageThread(buffered,input);
+					processImageThread(0,0,buffered,input);
 					if( streamPeriod > 0 ) {
 						long time = Math.max(0, streamPeriod -(System.currentTimeMillis()-before));
 						if( time > 0 ) {
@@ -510,7 +485,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 	public void reprocessSingleImage() {
 		if( sequenceThread == null ) {
 			// hmm if it's reprocessing the last image in a sequence this might not work
-			processImageThread(inputBuffered, input);
+			processImageThread(0,0, inputBuffered, input);
 		}
 	}
 

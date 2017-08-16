@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.examples.sfm;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.geo.*;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -119,6 +120,7 @@ public class ExamplePnP {
 		Ransac<Se3_F64,Point2D3D> ransac =
 				FactoryMultiViewRobust.pnpRansac(new ConfigPnP(intrinsic),new ConfigRansac(300,1.0));
 
+		// Observations must be in normalized image coordinates!  See javadoc of pnpRansac
 		if( !ransac.process(observations) )
 			throw new RuntimeException("Probably got bad input data with NaN inside of it");
 
@@ -138,14 +140,16 @@ public class ExamplePnP {
 	}
 
 	/**
-	 * Generates synthetic observations randomly in front of the camera
+	 * Generates synthetic observations randomly in front of the camera.  Observations are in normalized image
+	 * coordinates and not pixels!  See {@link PerspectiveOps#convertPixelToNorm} for how to go from pixels
+	 * to normalized image coordinates.
 	 */
 	public List<Point2D3D> createObservations( Se3_F64 worldToCamera , int total ) {
 
 		Se3_F64 cameraToWorld = worldToCamera.invert(null);
 
 		// transform from pixel coordinates to normalized pixel coordinates, which removes lens distortion
-		Point2Transform2_F64 pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
+		Point2Transform2_F64 pixelToNorm = LensDistortionOps.narrow(intrinsic).undistort_F64(true,false);
 
 		List<Point2D3D> observations = new ArrayList<>();
 

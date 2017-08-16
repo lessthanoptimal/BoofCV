@@ -41,7 +41,7 @@ import java.awt.image.BufferedImage;
 /**
  * @author Peter Abeles
  */
-public class VisualizeTldTrackerApp<T extends ImageGray,D extends ImageGray>
+public class VisualizeTldTrackerApp<T extends ImageGray<T>,D extends ImageGray<D>>
 		implements TldVisualizationPanel.Listener
 {
 

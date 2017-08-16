@@ -46,7 +46,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class VideoStitchBaseApp<I extends ImageBase, IT extends InvertibleTransform>
+public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends InvertibleTransform>
 		extends VideoProcessAppBase<I> implements VisualizeApp
 {
 	// size of input image

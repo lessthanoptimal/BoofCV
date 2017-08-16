@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VideoDetectInterestPoints<T extends ImageGray>
+public class VideoDetectInterestPoints<T extends ImageGray<T>>
 		extends ProcessImageSequence<T> {
 
 	InterestPointDetector<T> detector;
@@ -94,12 +94,12 @@ public class VideoDetectInterestPoints<T extends ImageGray>
 			panel = ShowImages.showWindow(guiImage, "Image Sequence", true);
 			addComponent(panel);
 		} else {
-			panel.setBufferedImage(guiImage);
+			panel.setImage(guiImage);
 			panel.repaint();
 		}
 	}
 
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	void perform( String fileName , Class<T> imageType , Class<D> derivType )
 	{
 		SimpleImageSequence<T> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageType.single(imageType));
@@ -114,8 +114,8 @@ public class VideoDetectInterestPoints<T extends ImageGray>
 		InterestPointDetector<T> detector;
 
 		detector = FactoryInterestPoint.fastHessian(new ConfigFastHessian(1, 2, 100, 2, 9, 4, 4));
-//		FeatureScaleSpace<T,D> feature = FactoryInterestPointAlgs.hessianScaleSpace(radius,1,maxCorners,imageType,derivType);
-//		detector = FactoryInterestPoint.wrapDetector(feature,new double[]{1,2,4,6,8,12},imageType);
+//		FeatureScaleSpace<T,D> feature = FactoryInterestPointAlgs.hessianScaleSpace(radius,1,maxCorners,defaultType,derivType);
+//		detector = FactoryInterestPoint.wrapDetector(feature,new double[]{1,2,4,6,8,12},defaultType);
 
 		VideoDetectInterestPoints<T> display = new VideoDetectInterestPoints<>(sequence, detector, orientation);
 

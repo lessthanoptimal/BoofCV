@@ -40,7 +40,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class DetectPointsInsidePyramidApp<T extends ImageGray, D extends ImageGray>
+public class DetectPointsInsidePyramidApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel
 {
 	static int NUM_FEATURES = 100;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,13 +31,16 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.stereo.RectifiedPairPanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.ops.ConvertMatrixData;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -76,8 +79,8 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		this.param = param;
 
 		// distorted images
-		distLeft = ConvertBufferedImage.convertFromMulti(origLeft, null, true, GrayF32.class);
-		distRight = ConvertBufferedImage.convertFromMulti(origRight, null, true, GrayF32.class);
+		distLeft = ConvertBufferedImage.convertFromPlanar(origLeft, null, true, GrayF32.class);
+		distRight = ConvertBufferedImage.convertFromPlanar(origRight, null, true, GrayF32.class);
 
 		// storage for undistorted + rectified images
 		rectLeft = new Planar<>(GrayF32.class,
@@ -90,15 +93,15 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), null);
-		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(param.getRight(), null);
+		DMatrixRMaj K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), (DMatrixRMaj)null);
+		DMatrixRMaj K2 = PerspectiveOps.calibrationMatrix(param.getRight(),(DMatrixRMaj) null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 
 		// rectification matrix for each image
-		DenseMatrix64F rect1 = rectifyAlg.getRect1();
-		DenseMatrix64F rect2 = rectifyAlg.getRect2();
-		DenseMatrix64F rectK = rectifyAlg.getCalibrationMatrix();
+		DMatrixRMaj rect1 = rectifyAlg.getRect1();
+		DMatrixRMaj rect2 = rectifyAlg.getRect2();
+		DMatrixRMaj rectK = rectifyAlg.getCalibrationMatrix();
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier
 		SwingUtilities.invokeLater(new Runnable() {
@@ -118,13 +121,18 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		hasProcessed = true;
 	}
 
-	private void addRectified( final String name , final DenseMatrix64F rect1 , final DenseMatrix64F rect2 ) {
+	private void addRectified( final String name , final DMatrixRMaj rect1 , final DMatrixRMaj rect2 ) {
+		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3); // TODO simplify code some how
+		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
+		ConvertMatrixData.convert(rect1, rect1_F32);
+		ConvertMatrixData.convert(rect2, rect2_F32);
+
 		// Will rectify the image
 		ImageType<GrayF32> imageType = ImageType.single(GrayF32.class);
 		ImageDistort<GrayF32,GrayF32> imageDistortLeft =
-				RectifyImageOps.rectifyImage(param.getLeft(), rect1, BorderType.ZERO, imageType);
+				RectifyImageOps.rectifyImage(param.getLeft(), rect1_F32, BorderType.ZERO, imageType);
 		ImageDistort<GrayF32,GrayF32> imageDistortRight =
-				RectifyImageOps.rectifyImage(param.getRight(), rect2, BorderType.ZERO, imageType);
+				RectifyImageOps.rectifyImage(param.getRight(), rect2_F32, BorderType.ZERO, imageType);
 
 		// Fill the image with all black
 		GImageMiscOps.fill(rectLeft, 0);
@@ -155,7 +163,7 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 	public void changeInput(String name, int index) {
 		PathLabel refs = inputRefs.get(index);
 
-		StereoParameters param = UtilIO.loadXML(media.openFile(refs.getPath(0)));
+		StereoParameters param = CalibrationIO.load(media.openFile(refs.getPath(0)));
 		BufferedImage origLeft = media.openImage(refs.getPath(1));
 		BufferedImage origRight = media.openImage(refs.getPath(2));
 

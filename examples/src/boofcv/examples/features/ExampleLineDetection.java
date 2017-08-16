@@ -60,7 +60,7 @@ public class ExampleLineDetection {
 	 * @param imageType Type of image processed by line detector.
 	 * @param derivType Type of image derivative.
 	 */
-	public static<T extends ImageGray, D extends ImageGray>
+	public static<T extends ImageGray<T>, D extends ImageGray<D>>
 			void detectLines( BufferedImage image , 
 							  Class<T> imageType ,
 							  Class<D> derivType )
@@ -94,7 +94,7 @@ public class ExampleLineDetection {
 	 * @param imageType Type of image processed by line detector.
 	 * @param derivType Type of image derivative.
 	 */
-	public static<T extends ImageGray, D extends ImageGray>
+	public static<T extends ImageGray<T>, D extends ImageGray<D>>
 	void detectLineSegments( BufferedImage image ,
 							 Class<T> imageType ,
 							 Class<D> derivType )

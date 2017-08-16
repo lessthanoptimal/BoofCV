@@ -1,0 +1,6 @@
+dependencies {
+    compile project(':main:boofcv-ip')
+    compile project(':main:boofcv-calibration')
+
+    compile group: 'org.yaml', name: 'snakeyaml', version: '1.17'
+}

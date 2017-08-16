@@ -1,0 +1,20 @@
+
+dependencies {
+    compile project(':main:boofcv-ip')
+    compile project(':main:boofcv-io')
+    compile project(':integration:boofcv-swing')
+
+    compile group: 'org.jcodec', name: 'jcodec', version: '0.1.9'
+}
+
+sourceSets {
+    test {
+        java {
+            srcDir 'test'
+            srcDir 'examples'
+        }
+        resources {
+            srcDir 'resources/test'
+        }
+    }
+}

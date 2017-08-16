@@ -55,7 +55,7 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 	// toggle what is visible or not
 	JCheckBox showPoints;
 	JCheckBox showNumbers;
-	JCheckBox showClusters;
+
 	JCheckBox showGraph;
 	JCheckBox showGrids;
 	JCheckBox showShapes;
@@ -89,8 +89,11 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 	int selectedView = 0;
 	int thresholdLevel = 60;
 
-	public DetectCalibrationPanel(int gridRows, int gridColumns, boolean hasManualMode,
-								  boolean hasClusters ) {
+	public DetectCalibrationPanel(int gridRows, int gridColumns, boolean hasManualMode) {
+		this(gridRows,gridColumns,hasManualMode,true);
+	}
+
+	public DetectCalibrationPanel(int gridRows, int gridColumns, boolean hasManualMode, boolean addComponents ) {
 		this.gridRows = gridRows;
 		this.gridColumns = gridColumns;
 
@@ -103,9 +106,9 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		selectZoom = new JSpinner(new SpinnerNumberModel(1, ZOOM_MIN, ZOOM_MAX, ZOOM_INC));
 		selectZoom.addChangeListener(this);
 		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
-		
+
 		successIndicator = new JLabel();
-		
+
 		showPoints = new JCheckBox("Show Points");
 		showPoints.setSelected(doShowPoints);
 		showPoints.addItemListener(this);
@@ -115,11 +118,6 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		showNumbers.setSelected(doShowNumbers);
 		showNumbers.addItemListener(this);
 		showNumbers.setMaximumSize(showNumbers.getPreferredSize());
-
-		showClusters = new JCheckBox("Show Clusters");
-		showClusters.setSelected(doShowClusters);
-		showClusters.addItemListener(this);
-		showClusters.setMaximumSize(showClusters.getPreferredSize());
 
 		showGraph = new JCheckBox("Show Graphs");
 		showGraph.setSelected(doShowGraph);
@@ -162,11 +160,16 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		manualThreshold.setSelected(isManual);
 		manualThreshold.addItemListener(this);
 		manualThreshold.setMaximumSize(manualThreshold.getPreferredSize());
-		
+
 		if( !isManual ) {
 			thresholdSpinner.setEnabled(false);
 		}
 
+		if( addComponents )
+			addComponents(hasManualMode);
+	}
+
+	protected void addComponents( boolean hasManualMode ) {
 		addLabeled(successIndicator, "Found:", this);
 		addSeparator(100);
 		addLabeled(viewSelector, "View ", this);
@@ -180,8 +183,6 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		addLabeled(selectZoom, "Zoom ", this);
 		addAlignLeft(showPoints, this);
 		addAlignLeft(showNumbers,this);
-		if( hasClusters )
-			addAlignLeft(showClusters,this);
 		addAlignLeft(showGraph,this);
 		addAlignLeft(showGrids,this);
 		addAlignLeft(showOrder,this);
@@ -288,9 +289,6 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 			listener.calibEventGUI();
 		} else if( e.getSource() == showPoints ) {
 			doShowPoints = showPoints.isSelected();
-			listener.calibEventGUI();
-		} else if( e.getSource() == showClusters ) {
-			doShowClusters = showClusters.isSelected();
 			listener.calibEventGUI();
 		} else if( e.getSource() == showGraph ) {
 			doShowGraph = showGraph.isSelected();

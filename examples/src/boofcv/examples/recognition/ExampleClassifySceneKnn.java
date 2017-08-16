@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -252,11 +252,11 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		File testingDir = new File(UtilIO.pathExample("learning/scene/test"));
 
 		if( !trainingDir.exists() || !testingDir.exists() ) {
-			String addressSrc = "http://jaist.dl.sourceforge.net/project/boofcv/datasets/bow_data_v001.zip";
-			File dst = trainingDir.getParentFile();
+			String addressSrc = "http://boofcv.org/notwiki/largefiles/bow_data_v001.zip";
+			File dst = new File(trainingDir.getParentFile(),"bow_data_v001.zip");
 			try {
 				DeepBoofDataBaseOps.download(addressSrc, dst);
-				DeepBoofDataBaseOps.decompressZip(new File(dst, "bow_data_v001.zip"), dst, true);
+				DeepBoofDataBaseOps.decompressZip(dst, dst.getParentFile(), true);
 				System.out.println("Download complete!");
 			} catch( IOException e ) {
 				throw new RuntimeException(e);

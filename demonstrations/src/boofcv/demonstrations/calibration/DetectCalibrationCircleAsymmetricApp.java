@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,9 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid;
 import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
-import boofcv.alg.fiducial.calib.circle.AsymmetricGridKeyPointDetections.Tangents;
-import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoAsymmetricGrid.Grid;
+import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
+import boofcv.alg.fiducial.calib.circle.KeyPointsCircleAsymmetricGrid.Tangents;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
@@ -45,7 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Displays detected square grid fiducials.  Visualizes several of its processing steps making it easier to debug.
+ * Displays detected asymmetric circular grid.  Visualizes several of its processing steps making it easier to debug.
  *
  * @author Peter Abeles
  */
@@ -57,11 +57,11 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 	Color colorId[];
 
 	public DetectCalibrationCircleAsymmetricApp(int numRows , int numColumns ,
-												double circleRadius, double centerDistance,
+												double circleDiameter, double centerDistance,
 												List<String> exampleInputs) {
-		super(numRows,numColumns,true,exampleInputs);
+		super(new DetectCalibrationCirclePanel(numRows,numColumns,circleDiameter,centerDistance,true),exampleInputs);
 
-		config = new ConfigCircleAsymmetricGrid(numRows, numColumns, circleRadius, centerDistance);
+		config = new ConfigCircleAsymmetricGrid(numRows, numColumns, circleDiameter, centerDistance);
 
 		declareDetector();
 
@@ -79,6 +79,8 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 
 		config.numRows = controlPanel.getGridRows();
 		config.numCols = controlPanel.getGridColumns();
+		config.circleDiameter = ((DetectCalibrationCirclePanel)controlPanel).getCircleDiameter();
+		config.centerDistance = ((DetectCalibrationCirclePanel)controlPanel).getCircleSpacing();
 
 		detector = FactoryFiducialCalibration.circleAsymmGrid(config);
 	}
@@ -116,7 +118,7 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 		}
 	}
 
-	private void drawGraph(Graphics2D g2, Grid g, int row0 , int col0 ,  double scale) {
+	private void drawGraph(Graphics2D g2, Grid g, int row0 , int col0 , double scale) {
 		for (int row = row0; row < g.rows; row += 2) {
 			for (int col = col0; col < g.columns; col += 2) {
 				EllipseRotated_F64 a = g.get(row,col);
@@ -242,12 +244,11 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 
 		List<String>  examples = new ArrayList<>();
 
-		examples.add("/home/pja/projects/ValidationBoof/data/fiducials/circle_asymmetric/standard/cardboard/image00004.jpg");
 		for (int i = 1; i <= 9; i++) {
 			examples.add(UtilIO.pathExample(String.format("calibration/mono/Sony_DSC-HX5V_CircleAsym/image%02d.jpg", i)));
 		}
 
-		DetectCalibrationCircleAsymmetricApp app = new DetectCalibrationCircleAsymmetricApp(5, 8, 1,6,examples);
+		DetectCalibrationCircleAsymmetricApp app = new DetectCalibrationCircleAsymmetricApp(5, 8, 2,6,examples);
 
 		app.openFile(new File(examples.get(0)));
 		app.waitUntilDoneProcessing();

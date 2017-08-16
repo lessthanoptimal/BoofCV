@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class ShowFeatureOrientationApp<T extends ImageGray, D extends ImageGray>
+public class ShowFeatureOrientationApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel {
 	ImagePanel panel;
 
@@ -91,7 +91,7 @@ public class ShowFeatureOrientationApp<T extends ImageGray, D extends ImageGray>
 	public synchronized void process(final BufferedImage input) {
 		setInputImage(input);
 
-		panel.setBufferedImage(input);
+		panel.setImage(input);
 		this.input = input;
 		doRefreshAll();
 		SwingUtilities.invokeLater(new Runnable() {
@@ -167,7 +167,7 @@ public class ShowFeatureOrientationApp<T extends ImageGray, D extends ImageGray>
 		g2.drawImage(input, 0, 0, null);
 		g2.setStroke(new BasicStroke(2.5f));
 		render.draw(g2);
-		panel.setBufferedImage(temp);
+		panel.setImage(temp);
 		panel.repaint();
 	}
 

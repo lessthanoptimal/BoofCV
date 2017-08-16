@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VideoDetectCorners<T extends ImageGray, D extends ImageGray>
+public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends ProcessImageSequence<T> {
 
 	GeneralFeatureDetector<T, D> detector;
@@ -120,12 +120,12 @@ public class VideoDetectCorners<T extends ImageGray, D extends ImageGray>
 			panel = ShowImages.showWindow(guiImage, "Image Sequence");
 			addComponent(panel);
 		} else {
-			panel.setBufferedImage(guiImage);
+			panel.setImage(guiImage);
 			panel.repaint();
 		}
 	}
 
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	void perform(String fileName, Class<T> imageType, Class<D> derivType) {
 		SimpleImageSequence<T> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageType.single(imageType));
 
@@ -134,7 +134,7 @@ public class VideoDetectCorners<T extends ImageGray, D extends ImageGray>
 
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<>(FactoryIntensityPointAlg.shiTomasi(radius, false, derivType));
 //		GeneralFeatureIntensity<T, D> intensity =
-//				new WrapperFastCornerIntensity<T, D>(FactoryIntensityPointAlg.createFast12(imageType, 8 , 12));
+//				new WrapperFastCornerIntensity<T, D>(FactoryIntensityPointAlg.createFast12(defaultType, 8 , 12));
 
 		NonMaxSuppression extractor = new WrapperNonMaximumBlock(new NonMaxBlockStrict.Max());
 //		FeatureExtractor extractor = new WrapperNonMaximumBlock( new NonMaxExtractorNaive(radius+10,10f));

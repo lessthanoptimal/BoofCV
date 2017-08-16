@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.FastQueueArray_I32;
@@ -34,7 +35,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -51,12 +52,12 @@ public class ExampleDepthPointCloud {
 	public static void main( String args[] ) throws IOException {
 		String nameRgb = UtilIO.pathExample("kinect/basket/basket_rgb.png");
 		String nameDepth = UtilIO.pathExample("kinect/basket/basket_depth.png");
-		String nameCalib = UtilIO.pathExample("kinect/basket/visualdepth.xml");
+		String nameCalib = UtilIO.pathExample("kinect/basket/visualdepth.yaml");
 
-		VisualDepthParameters param = UtilIO.loadXML(nameCalib);
+		VisualDepthParameters param = CalibrationIO.load(nameCalib);
 
 		BufferedImage buffered = UtilImageIO.loadImage(nameRgb);
-		Planar<GrayU8> rgb = ConvertBufferedImage.convertFromMulti(buffered,null,true,GrayU8.class);
+		Planar<GrayU8> rgb = ConvertBufferedImage.convertFromPlanar(buffered,null,true,GrayU8.class);
 		GrayU16 depth =
 				ConvertBufferedImage.convertFrom(UtilImageIO.loadImage(nameDepth),null,GrayU16.class);
 
@@ -65,7 +66,7 @@ public class ExampleDepthPointCloud {
 
 		VisualDepthOps.depthTo3D(param.visualParam, rgb, depth, cloud, cloudColor);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param.visualParam,null);
+		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(param.visualParam, (DMatrixRMaj)null);
 
 		PointCloudViewer viewer = new PointCloudViewer(K, 15);
 		viewer.setPreferredSize(new Dimension(rgb.width,rgb.height));

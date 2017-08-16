@@ -37,7 +37,7 @@ import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
-import georegression.geometry.ConvertRotation3D_F64;
+import georegression.geometry.ConvertRotation3D_F32;
 import georegression.struct.EulerType;
 
 import java.awt.*;
@@ -88,7 +88,7 @@ public class ExampleFisheyeToPinhole {
 		BufferedImage bufferedPinhole0 = ConvertBufferedImage.convertTo(pinholeImage,null,true);
 
 		// rotate the virtual pinhole camera to the right
-		transform.setRotationWideToNarrow(ConvertRotation3D_F64.eulerToMatrix(EulerType.YXZ,0.8,0,0,null));
+		transform.setRotationWideToNarrow(ConvertRotation3D_F32.eulerToMatrix(EulerType.YXZ,0.8f,0,0,null));
 
 		distorter.apply(fisheyeImage,pinholeImage);
 		BufferedImage bufferedPinhole1 = ConvertBufferedImage.convertTo(pinholeImage,null,true);

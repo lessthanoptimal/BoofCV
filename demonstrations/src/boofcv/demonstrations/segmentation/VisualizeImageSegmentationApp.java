@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 // TODO Show image size on left panel
-public class VisualizeImageSegmentationApp <T extends ImageBase>
+public class VisualizeImageSegmentationApp <T extends ImageBase<T>>
 		extends SelectAlgorithmAndInputPanel
 {
 	ImageType<T> imageType;
@@ -111,7 +111,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				gui.setPreferredSize(new Dimension(color.getWidth(), color.getHeight()));
-				gui.setBufferedImage(input);
+				gui.setImage(input);
 				gui.revalidate();
 				processImage = true;
 			}
@@ -180,11 +180,11 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 		Runnable r = new Runnable() {
 			public void run() {
 				if( activeDisplay == 0 ) {
-					gui.setBufferedImage(outColor);
+					gui.setImage(outColor);
 				} else if( activeDisplay == 1 ) {
-					gui.setBufferedImage(outBorder);
+					gui.setImage(outBorder);
 				} else if( activeDisplay == 2 ) {
-					gui.setBufferedImage(outSegments);
+					gui.setImage(outSegments);
 				}
 				gui.repaint();
 			}};
@@ -237,9 +237,9 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 
 	public static void main(String[] args) {
 		ImageType<Planar<GrayF32>> imageType = ImageType.pl(3,GrayF32.class);
-//		ImageType<Planar<GrayU8>> imageType = ImageType.pl(3,GrayU8.class);
-//		ImageType<GrayF32> imageType = ImageType.single(GrayF32.class);
-//		ImageType<GrayU8> imageType = ImageType.single(GrayU8.class);
+//		ImageType<Planar<GrayU8>> defaultType = ImageType.pl(3,GrayU8.class);
+//		ImageType<GrayF32> defaultType = ImageType.single(GrayF32.class);
+//		ImageType<GrayU8> defaultType = ImageType.single(GrayU8.class);
 
 		VisualizeImageSegmentationApp app = new VisualizeImageSegmentationApp(imageType);
 

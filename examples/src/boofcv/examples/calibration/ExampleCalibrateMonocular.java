@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,6 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 
@@ -56,8 +55,12 @@ public class ExampleCalibrateMonocular {
 		DetectorFiducialCalibration detector;
 		List<String> images;
 
+		// Regular Circle Example
+//		detector = FactoryFiducialCalibration.circleRegularGrid(new ConfigCircleRegularGrid(8, 10, 1.5, 2.5));
+//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleRegular"),"image");
+
 		// Asymmetric Circle Example
-//		detector = FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleAsymmetricGrid(5, 8, 1, 6));
+//		detector = FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleAsymmetricGrid(5, 8, 2, 6));
 //		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleAsym"),"image");
 
 		// Square Grid example
@@ -66,7 +69,7 @@ public class ExampleCalibrateMonocular {
 
 		// Chessboard Example
 		detector = FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));
-		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"),"left");
+		images = UtilIO.directoryList(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"),"left");
 
 		// Declare and setup the calibration algorithm
 		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector);

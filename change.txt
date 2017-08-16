@@ -3,11 +3,97 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2017-08-16
+Version : 0.27
+
+- ImagePanel: Expanded click middle mouse to save image
+  * Was a secret new feature in the last release
+  * Added to ImageZoomPanel
+  * Opens a dialog letting the user know what just happened with option to be silent
+- ImagePanel: Now has a function for just calling repaint around the image
+- Renamed module visualize to visualize-swing
+- Added integration/visualize-javafx
+- camera distortion models
+  * Unrolled matrix inverse in pinhole and radtan
+- Equirectangular
+  * Added PinholeRadialToEquirectangular
+  * Fixed the meaning of latitude and longitude being swapped.  Thanks xzfinet
+- Updated generics to take advantage of Java 7 more
+- Image Pyramids
+  * PyramidDiscreteSampleBlur supports generic images
+- ConvolveDown
+  * Added an interface
+  * Added planar image support
+- Support for Interleaved Images Added to
+  * ConvolveWithBorder
+  * ConvolveNormalized
+- AverageDownSample
+  * Made image generic
+- Renamed for consistency
+  * Kernel2D_I32 -> Kernel2D_S32
+  * Kernel2D_I32 -> Kernel2D_S32
+- GConvolveImageOps actual works for all image types now not just gray
+- Changed behavior of ConvertBufferedImage
+  * When converting to interleaved and planar images the number of bands is adjusted to match the buffered image
+  * Buffered -> BoofCV: output images are reshaped to match input
+  * Removed references to private sun classes for Java 9 compatibility
+- ImageInterleaved
+  * Added a nicely formatted toString()
+- BlurImageOps - Fixed bug where for planar imges it was apply a median instead of mean filter
+- FactoryBlurFilter - Can now handle image types other than gray scale images
+- LensDistortionOps
+  * New function which lets you re-render an image with an arbitrary camera model
+  * Removed the imageRemoveDistortion() and relation functions since the new function is better.
+- Demonstrations
+  * Added RenderSyntheticCamerModelApp which shows you the effects of re-rendering the camera model
+  * Removed ShowLensDistoriton since it is now redundant
+- Added image distortion based on "Image Deformation Using Moving Least Squares"
+  * See ImageDeformPointMLS
+- Planar Images
+  * setTo will adjust the number of bands
+- Updated for full support of F32 data type in dependent libraries
+  * EJML -> ddoglog -> GeoRegression
+- Fixed calibration target generator app from printing out the wrong target type for asymmetric circles
+- Fixed and updated Android example
+- Android
+  * ConvertBitmap will reshape BoofCV images to match the input Bitmap when converting
+  * Refactored functions names with multi to planar
+- Fixed visual odometry path viewer so that the camera behaves in a same fashion when the window is resized
+- Multi View
+  * Split EnumEpiloar into EnumFundamental and EnumEssential to make it clearer
+  * Updated functions in FactoryMultiViewRobust for change
+- Calibration Targets
+  * Added support for circle grid pattern in generator app
+  * Added support for detection of circle grid patterns
+  * Calibration targets with circles now specify circle size with diameter instead of radius
+- Gradle
+  * Change directory structure to avoid jar naming conflict on maven central.  Idiotic that this is even possible...
+- Imaga Data Types
+  * Fixed ImageInterleaved.setNumBands() NOT correctly setting the stride and growing the data array
+- Removed XML all serialization
+  * Changed old XML files into YAML files
+- YAML format for camera calibration
+  * Added version parameter.  Assumed to be 0 if not present
+- Fixed histogram in ImageStatistics
+  * For unsigned data types minimum value was being ignored
+  * Thanks André Ambrósio Boechat for reporting the problem
+- ApplicationLauncherApp
+  * Thanks Jalal Khan for completing and going beyond what was required in the Bounty!
+  * Displays source code, GitHub button, search, and various other improvements
+- ConvertNV21 and ConvertYV12
+  * Speed up conversion from NV21 to RGB by about 1.9x by converting if statements into bitwise operations
+  * Refactored functions names with multi to planar
+- Split FFMPEG and JavaCV into separate dependencies
+- You can now specify which native architectures you wish to support
+  * See native_arch gradle parameter
+- ImageMultiBand added setNumberOfBands()
+
+---------------------------------------------
 Date    : 2016/12/07
 Version : 0.26
 
 - Fixed a long standing unit test issue where convolve unit test would some times on some systems erratically fail
-  * Appears that sometimes the random numbers caused a buffer overflow for U8 images
+  * Appears that sometimes the random numbers caused a numerical overflow for U8 images
   * Now why it didn't have the exact same numbers every time when it has a fixed seed is disturbing...
 - Renamed EquirectangularTo* to *ToEquirectangular
   * Those classes convert pixels in * coordinates into their location in the equirectangular image
@@ -27,7 +113,7 @@ Version : 0.26
   * Resolved xstream version conflict
 - Updated DeepBoof
   * This is to get around an issue with a java wget library where it would hang instead of giving up
-  * New code is also much more informative and prints out size info and download status\
+  * New code is also much more informative and prints out size info and download status
 - Visualization
   * Removed a bad +PI/2 from ellipse rendering.
 - SnapToEllipseEdge - Fixed bug where it was only performing one iteration no matter what
@@ -185,9 +271,9 @@ Version : Alpha 0.22
   * Removed configure() since it couldn't be generalized to HOG
   * Created config classes for all dense descriptors
 - No argument constructor in most image types
-  * Fixed bug where imageType was not being set.  Thanks pcmoen for reporting the bug
+  * Fixed bug where defaultType was not being set.  Thanks pcmoen for reporting the bug
 - Fixed bug in ConvertBufferedImage.extract where number of bands in interleaved images was not being set in ImageType
-  * Fixed bug where imageType was not being set.  Thanks pcmoen for reporting the bug
+  * Fixed bug where defaultType was not being set.  Thanks pcmoen for reporting the bug
 - PixelMath
   * Added partial support for Interleaved images
   * GPixelMath supports more than just single band images
@@ -713,7 +799,7 @@ Version : Alpha 0.14
   * There is no separate class for updating image pyramids any more.  The image pyramid takes in the input image
   * Scale-Space pyramids have been moved into the pyramid package instead of having its own
   * Bug Fix: FeatureLaplacePyramid now looks for local maximum or minimum in searching across scales
-  * Removed GaussianScaleSpace class since it can now be represented using ImageFloatPyramid 
+  * Removed GaussianScaleSpace class since it can now be represented using ImageFloatPyramid
 - Added ExampleStereoDisparity3D and tweaked the first one
 - Shape Fitting (Added)
   * Fit polygon
@@ -732,7 +818,7 @@ Version : Alpha 0.14
 Date    : 2013/02/16
 Version : Alpha 0.13
 
-- Removed TupleDescQueue 
+- Removed TupleDescQueue
   * Use UtilFeature.createFeature() instead or extend FastQueue
 - Fixed bug in ImplSelectSparseStandardWta_* where peak checks for 0 disparity were incorrectly handled
 - FactoryPointSequentialTracker tweaked tracker configurations for better SFM performance
@@ -780,11 +866,11 @@ Version : Alpha 0.13
   * Added ability to set a threshold via Associate interface
   * Can get a list of unassociate destination features
   * Can determine if the algorithm selects a unique match for source and destination
-  * Created MatchScoreType to provide more information on the score's behavior 
+  * Created MatchScoreType to provide more information on the score's behavior
 - Created EasyGeneralFeatureDetector
   * Automatically handles image derivatives
   * Split off from WrapGeneralFeatureDetector
-- GeneralFeatureDetector 
+- GeneralFeatureDetector
   * moved to alg package
   * can now detect local minimums
   * Removed ability to segment image.  Turned out to not be all that useful, just increase the size of the non-maximum region.
@@ -825,7 +911,7 @@ Version : Alpha 0.12
   * Moved what was left into KLT directory
 - ImagePointTracker
   * Changed contract, more fully specified contract, improved tests
-  * Updated behavior of implementing classes 
+  * Updated behavior of implementing classes
 - Deleted KeyFramePointTracker
   * Added pointless complexity.  Use ImagePointTracker instead
   * Changed 2D and 3D SFM algorithms which were using it
@@ -864,7 +950,7 @@ Version : Alpha 0.12
 - Maven build has been added.
   * BoofCV is on the central repository
 - Added SIFT feature descriptor and detector
-- Removed seperable kernel 
+- Removed seperable kernel
   * Wasn't being used and there is no need for it with more modern techniques
   * Plus it was causing a unit test to fail
 - Removed Gaussian12 and Steerable feature descriptors
@@ -916,7 +1002,7 @@ Version : Alpha 0.11
   * Deleted SURF,BRIEF,NCC specific implementations since they are no longer needed
 - AssociatedPair
   * renamed key and curr points to p1 and p2
-  * new names are more generic and consistent 
+  * new names are more generic and consistent
 - DetectAssociateTracker
   * Changed internal design a bit and fixed bugs
   * Performs well in structure from motion applications (2D and 3D)
@@ -951,7 +1037,7 @@ Version : Alpha 0.10
   * BRIEF and BRIEF-SO now can process features along the image border.  Bit set to false in that case.
 - Visualization Apps
   * VisualizeAssociationScoreApp has score type in a separate panel and can support binary descriptors
-- InterestPointDetector 
+- InterestPointDetector
   * WrapFHtoInterestPoint now returns the correct detection radius
   * Fixed non-compliant implementations with incorrectly handled unsupported features.  Thanks jasonnn for submitting this bug
 - FAST Feature Detector
@@ -972,7 +1058,7 @@ Version : Alpha 0.10
 - LensDistortionOps
   * Added normalized to distorted pixel transform
   * Tweaked some of the function names
-- SparseIntegralSample_I32.isInBounds() did not return that correct value along the right and bottom image border 
+- SparseIntegralSample_I32.isInBounds() did not return that correct value along the right and bottom image border
 - Functions inside of GThresholdImageOps did not return the number of blobs found like it should
   * Thanks jasonnn
 - NonMaxBlockStrict
@@ -980,7 +1066,7 @@ Version : Alpha 0.10
 - TemplateMatching
   * Added code for template matching
   * Added example code to demonstrate its use
-- Added support for alpha channel in ConvertBufferedImage 
+- Added support for alpha channel in ConvertBufferedImage
 - FactoryPointSequentialTracker doesn't create trackers with FAST detector instead uses ShiTomasi to improve stability
 
 ---------------------------------------------
@@ -997,7 +1083,7 @@ Version : Alpha 0.9
 - Created interface for Stereo visual odometry
 - Fixed bug in unsafe_set inside of ImageInt8
 - Added unsafe_set() and unsafe_get() to ImageFloat32, ImageFloat64, ImageSInt64
-- Fixed bug in ImageSInt64.set() where the value was cast into a short  
+- Fixed bug in ImageSInt64.set() where the value was cast into a short
 - Changed transform* functions inside of DistortImageOps so that you can specify how outside image pixels are handled.
 - Fixed bug in ImageHistogramPanel - reported by Ray
   * Added support for integer images
@@ -1053,7 +1139,7 @@ Version : Alpha 0.8
   * ExampleDetectCalibrationPoints
   * ExampleStereoDisparity
 - ImageTestingOps
-  * Flip image vertical 
+  * Flip image vertical
 - Fast point cloud viewer
 
 ---------------------------------------------
@@ -1115,11 +1201,11 @@ Version : Alpha 0.6
 - Generic code for detecting squares in binary images
   * Inside of calibration module
 - Application for calibration from planar calibration targets
-  * GUI and commandline 
+  * GUI and commandline
 - ImageDistort
   * Fixed bug where border.setImage() was not being called
 - ImageBorder
-  * Added generalized get(x,y) 
+  * Added generalized get(x,y)
 - Refactored FactoryImageBorder into two factories
 - Fixed bug in several derivative operators where the passed in border was being
   ignored and an extended border being used instead
@@ -1212,7 +1298,7 @@ Version : Alpha 0.3
   * Created functions to convert to and from BufferedImage
 - Changed behavior of several functions in GeneralizedImageOps to include
   MultiSpectral images
-  * refactor createImage -> createSingleBand 
+  * refactor createImage -> createSingleBand
 - Updated ant scripts
   * Common template is now used for the different modules
   * Fixed unit test and make it work across the whole project
@@ -1224,7 +1310,7 @@ Version : Alpha 0.3
   * http://code.google.com/p/caliper/
 
 ---------------------------------------------
-Date    : 2011/12/01 
+Date    : 2011/12/01
 Version : Alpha 0.2
 
 - Added integer polynomial interpolation
@@ -1251,7 +1337,7 @@ Version : Alpha 0.2
 - Added Sum of Absolute Difference (SAD) feature association score for several different descriptor types.
 
 ---------------------------------------------
-Date    : 2011/11/01 
-Version : Alpha 0.1 
+Date    : 2011/11/01
+Version : Alpha 0.1
 
 - Initial public release

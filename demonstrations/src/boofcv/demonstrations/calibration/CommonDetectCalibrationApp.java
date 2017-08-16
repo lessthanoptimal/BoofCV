@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,12 +24,15 @@ import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
+import boofcv.gui.calibration.CalibratedImageGridPanel;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F32;
@@ -48,7 +51,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.gui.calibration.CalibratedImageGridPanel.renderOrder;
 import static boofcv.gui.fiducial.VisualizeFiducial.drawLine;
 
 /**
@@ -68,14 +70,15 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 	BufferedImage binary;
 	GrayF32 grayPrev = new GrayF32(1,1);
 
-	public CommonDetectCalibrationApp(int numRows , int numColumns , boolean hasClusters, List<String> exampleInputs ) {
+	public CommonDetectCalibrationApp(DetectCalibrationPanel controlPanel, List<String> exampleInputs ) {
 		super(exampleInputs, ImageType.single(GrayF32.class));
-		controlPanel = new DetectCalibrationPanel(numRows,numColumns,true,hasClusters);
+		this.controlPanel = controlPanel;
 		add(imagePanel,BorderLayout.CENTER);
 		add(controlPanel,BorderLayout.WEST);
 
 		controlPanel.setListener(this);
 
+		imagePanel.setScale(controlPanel.getScale());
 		imagePanel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -106,12 +109,12 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 	protected abstract List<SquareGrid> getGrids();
 
 	@Override
-	public void processImage( final BufferedImage buffered , GrayF32 gray ) {
+	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase gray) {
 		this.input = buffered;
 
 		synchronized ( this ) {
-			binary = conditionalDeclare(buffered, binary, BufferedImage.TYPE_INT_RGB);
-			grayPrev.setTo(gray);
+			binary = ConvertBufferedImage.checkDeclare(gray.getWidth(), gray.getHeight(), binary, BufferedImage.TYPE_INT_RGB);
+			grayPrev.setTo((GrayF32)gray);
 		}
 
 		processFrame();
@@ -163,6 +166,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 
 	@Override
 	public void calibEventGUI() {
+		imagePanel.setScale(controlPanel.getScale());
 		if( controlPanel.getSelectedView() == 0 ) {
 			imagePanel.setBufferedImage(input);
 		} else if( controlPanel.getSelectedView() == 1 ){
@@ -171,7 +175,6 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 			throw new RuntimeException("Unknown");
 		}
 
-		imagePanel.setScale(controlPanel.getScale());
 		imagePanel.repaint();
 	}
 
@@ -196,9 +199,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 					controlPanel.setSuccessMessage("FOUND", true);
 				else
 					controlPanel.setSuccessMessage("FAILED", false);
-				imagePanel.setPreferredSize(new Dimension(input.getWidth()+5, input.getHeight()+5));
 				calibEventGUI();
-				imagePanel.repaint();
 			}
 		});
 	}
@@ -251,6 +252,10 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 				}
 			}
 		}
+	}
+
+	public void renderOrder(Graphics2D g2, double scale , List<Point2D_F64> points ) {
+		CalibratedImageGridPanel.renderOrder(g2,scale,points);
 	}
 
 	protected void renderClusters(Graphics2D g2, double scale) {}

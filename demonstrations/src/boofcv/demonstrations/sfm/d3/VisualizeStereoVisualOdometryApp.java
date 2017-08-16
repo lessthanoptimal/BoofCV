@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,6 @@ import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -65,7 +64,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
 
 import javax.swing.*;
 import java.awt.*;
@@ -78,7 +76,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeStereoVisualOdometryApp <I extends ImageGray>
+public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 		extends StereoVideoAppBase<I> implements VisualizeApp, VisualOdometryPanel.Listener
 {
 
@@ -218,8 +216,8 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray>
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				guiLeft.setBufferedImage(buffImage1);
-				guiRight.setBufferedImage(buffImage2);
+				guiLeft.setImage(buffImage1);
+				guiRight.setImage(buffImage2);
 				guiLeft.autoSetPreferredSize();
 				guiRight.autoSetPreferredSize();
 				guiLeft.repaint();
@@ -267,9 +265,8 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray>
 		handleRunningStatus(2);
 
 		CameraPinholeRadial right = config.right;
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.left,null);
 		guiCam3D.init();
-		guiCam3D.setK(K);
+		guiCam3D.setFocalLength(300);
 		guiCam3D.setStepSize(config.getBaseline());
 		guiCam3D.setPreferredSize(new Dimension(right.width, right.height));
 		guiCam3D.setMaximumSize(guiCam3D.getPreferredSize());
@@ -329,15 +326,15 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray>
 					trackerLeft, trackerRight,describe, imageType);
 		} else if( whichAlg == 4 ) {
 //			GeneralFeatureIntensity intensity =
-//					FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,imageType);
+//					FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,defaultType);
 			GeneralFeatureIntensity intensity =
 					FactoryIntensityPoint.shiTomasi(1,false,imageType);
 			NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(2,50,0,true,false,true));
 			GeneralFeatureDetector general = new GeneralFeatureDetector(intensity,nonmax);
 			general.setMaxFeatures(600);
 			DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,2,imageType,derivType);
-//			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true),imageType);
-//			DescribeRegionPoint describe = FactoryDescribeRegionPoint.pixelNCC(5,5,imageType);
+//			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true),defaultType);
+//			DescribeRegionPoint describe = FactoryDescribeRegionPoint.pixelNCC(5,5,defaultType);
 			DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, imageType);
 			DetectDescribeMulti detDescMulti =  new DetectDescribeMultiFusion(detector,null,describe);
 

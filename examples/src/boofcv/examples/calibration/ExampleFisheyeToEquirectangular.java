@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,14 +38,15 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
-import georegression.geometry.ConvertRotation3D_F64;
+import georegression.geometry.ConvertRotation3D_F32;
 import georegression.geometry.UtilVector3D_F64;
 import georegression.metric.UtilAngle;
+import georegression.misc.GrlConstants;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import georegression.struct.se.Se3_F32;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.dense.row.CommonOps_FDRM;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -125,15 +126,15 @@ public class ExampleFisheyeToEquirectangular {
 																		   // so crop it a bit..
 
 		// Rotate camera axis so that +x is forward and not +z and make it visually pleasing
-		DenseMatrix64F adjR = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,Math.PI/2,0,0,null);
+		FMatrixRMaj adjR = ConvertRotation3D_F32.eulerToMatrix(EulerType.XYZ, GrlConstants.F_PI/2,0,0,null);
 		// Rotation from the front camera to the back facing camera.
 		// This is only an approximation.  Should be determined through calibration.
-		DenseMatrix64F f2b = ConvertRotation3D_F64.eulerToMatrix(EulerType.ZYX,Math.PI,0,0,null);
+		FMatrixRMaj f2b = ConvertRotation3D_F32.eulerToMatrix(EulerType.ZYX,GrlConstants.F_PI,0,0,null);
 
-		Se3_F64 frontToFront = new Se3_F64();
+		Se3_F32 frontToFront = new Se3_F32();
 		frontToFront.setRotation(adjR);
-		Se3_F64 frontToBack = new Se3_F64();
-		CommonOps.mult(f2b,adjR,frontToBack.R);
+		Se3_F32 frontToBack = new Se3_F32();
+		CommonOps_FDRM.mult(f2b,adjR,frontToBack.R);
 
 		// add the camera and specify which pixels are valid.  These functions precompute the entire transform
 		// and can be relatively slow, but generating the equirectangular image should be much faster

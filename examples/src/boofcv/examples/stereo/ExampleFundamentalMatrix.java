@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.alg.geo.f.FundamentalResidualSampson;
 import boofcv.examples.features.ExampleAssociatePoints;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.factory.geo.EnumEpipolar;
+import boofcv.factory.geo.EnumFundamental;
 import boofcv.factory.geo.EpipolarError;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.gui.feature.AssociationPanel;
@@ -46,7 +46,7 @@ import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -77,22 +77,22 @@ public class ExampleFundamentalMatrix {
 	 * @param inliers List of feature pairs that were determined to not be noise.
 	 * @return The found fundamental matrix.
 	 */
-	public static DenseMatrix64F robustFundamental( List<AssociatedPair> matches ,
+	public static DMatrixRMaj robustFundamental( List<AssociatedPair> matches ,
 													List<AssociatedPair> inliers ) {
 
 		// used to create and copy new instances of the fit model
-		ModelManager<DenseMatrix64F> managerF = new ModelManagerEpipolarMatrix();
+		ModelManager<DMatrixRMaj> managerF = new ModelManagerEpipolarMatrix();
 		// Select which linear algorithm is to be used.  Try playing with the number of remove ambiguity points
-		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(EnumEpipolar.FUNDAMENTAL_7_LINEAR, 2);
+		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(EnumFundamental.LINEAR_7, 2);
 		// Wrapper so that this estimator can be used by the robust estimator
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
 
 		// How the error is measured
-		DistanceFromModelResidual<DenseMatrix64F,AssociatedPair> errorMetric =
+		DistanceFromModelResidual<DMatrixRMaj,AssociatedPair> errorMetric =
 				new DistanceFromModelResidual<>(new FundamentalResidualSampson());
 
 		// Use RANSAC to estimate the Fundamental matrix
-		ModelMatcher<DenseMatrix64F,AssociatedPair> robustF =
+		ModelMatcher<DMatrixRMaj,AssociatedPair> robustF =
 				new Ransac<>(123123, managerF, generateF, errorMetric, 6000, 0.1);
 
 		// Estimate the fundamental matrix while removing outliers
@@ -103,8 +103,8 @@ public class ExampleFundamentalMatrix {
 		inliers.addAll(robustF.getMatchSet());
 
 		// Improve the estimate of the fundamental matrix using non-linear optimization
-		DenseMatrix64F F = new DenseMatrix64F(3,3);
-		ModelFitter<DenseMatrix64F,AssociatedPair> refine =
+		DMatrixRMaj F = new DMatrixRMaj(3,3);
+		ModelFitter<DMatrixRMaj,AssociatedPair> refine =
 				FactoryMultiView.refineFundamental(1e-8, 400, EpipolarError.SAMPSON);
 		if( !refine.fitModel(inliers, robustF.getModelParameters(), F) )
 			throw new IllegalArgumentException("Failed");
@@ -118,11 +118,11 @@ public class ExampleFundamentalMatrix {
 	 * be computed directly with a lot less code.  The down side is that this technique is very
 	 * sensitive to noise.
 	 */
-	public static DenseMatrix64F simpleFundamental( List<AssociatedPair> matches ) {
+	public static DMatrixRMaj simpleFundamental( List<AssociatedPair> matches ) {
 		// Use the 8-point algorithm since it will work with an arbitrary number of points
-		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(EnumEpipolar.FUNDAMENTAL_8_LINEAR, 0);
+		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(EnumFundamental.LINEAR_8, 0);
 
-		DenseMatrix64F F = new DenseMatrix64F(3,3);
+		DMatrixRMaj F = new DMatrixRMaj(3,3);
 		if( !estimateF.process(matches,F) )
 			throw new IllegalArgumentException("Failed");
 
@@ -170,7 +170,7 @@ public class ExampleFundamentalMatrix {
 		List<AssociatedPair> matches = computeMatches(imageA,imageB);
 
 		// Where the fundamental matrix is stored
-		DenseMatrix64F F;
+		DMatrixRMaj F;
 		// List of matches that matched the model
 		List<AssociatedPair> inliers = new ArrayList<>();
 

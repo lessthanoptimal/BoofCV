@@ -42,7 +42,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.homography.Homography2D_F64;
-import georegression.struct.homography.UtilHomography;
+import org.ejml.ops.ConvertMatrixData;
 
 import java.awt.image.BufferedImage;
 
@@ -136,7 +136,7 @@ public class ExampleBackgroundRemovalMoving {
 			}
 
 			Homography2D_F64 firstToCurrent64 = motion2D.getFirstToCurrent();
-			UtilHomography.convert(firstToCurrent64, firstToCurrent32);
+			ConvertMatrixData.convert(firstToCurrent64, firstToCurrent32);
 
 			background.segment(firstToCurrent32, input, segmented);
 			background.updateBackground(firstToCurrent32,input);

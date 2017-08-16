@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ import java.io.FileNotFoundException;
  *
  * @author Peter Abeles
  */
-public class ExamplePointFeatureTracker< T extends ImageGray, D extends ImageGray>
+public class ExamplePointFeatureTracker< T extends ImageGray<T>, D extends ImageGray<D>>
 {
 	// type of input image
 	Class<T> imageType;
@@ -122,7 +122,7 @@ public class ExamplePointFeatureTracker< T extends ImageGray, D extends ImageGra
 		}
 
 		// tell the GUI to update
-		gui.setBufferedImage(orig);
+		gui.setImage(orig);
 		gui.repaint();
 	}
 

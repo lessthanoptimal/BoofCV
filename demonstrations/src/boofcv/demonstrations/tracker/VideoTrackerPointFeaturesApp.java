@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 // todo extract out base class for handling videos
-public class VideoTrackerPointFeaturesApp<I extends ImageGray, D extends ImageGray>
+public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>, D extends ImageGray<D>>
 		extends VideoProcessAppBase<I> implements MouseListener
 {
 
@@ -126,7 +126,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray, D extends ImageGr
 				I image = sequence.next();
 				gui.setPreferredSize(new Dimension(image.width,image.height));
 				workImage = new BufferedImage(image.width,image.height,BufferedImage.TYPE_INT_BGR);
-				gui.setBufferedImage(workImage);
+				gui.setImage(workImage);
 				revalidate();
 				startWorkerThread();
 			}});
@@ -177,7 +177,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray, D extends ImageGr
 		Class imageType = GrayF32.class;
 		Class derivType = GrayF32.class;
 
-//		Class imageType = GrayU8.class;
+//		Class defaultType = GrayU8.class;
 //		Class derivType = GrayS16.class;
 
 		VideoTrackerPointFeaturesApp app = new VideoTrackerPointFeaturesApp(imageType, derivType);

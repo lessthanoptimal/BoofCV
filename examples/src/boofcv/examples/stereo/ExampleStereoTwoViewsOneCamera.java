@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,9 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.ops.ConvertMatrixData;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -101,7 +103,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		drawInliers(origLeft, origRight, intrinsic, inliers);
 
 		// Rectify and remove lens distortion for stereo processing
-		DenseMatrix64F rectifiedK = new DenseMatrix64F(3, 3);
+		DMatrixRMaj rectifiedK = new DMatrixRMaj(3, 3);
 		GrayU8 rectifiedLeft = distortedLeft.createSameShape();
 		GrayU8 rectifiedRight = distortedRight.createSameShape();
 
@@ -165,7 +167,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	 */
 	public static List<AssociatedPair> convertToNormalizedCoordinates(List<AssociatedPair> matchedFeatures, CameraPinholeRadial intrinsic) {
 
-		Point2Transform2_F64 p_to_n = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true, false);
+		Point2Transform2_F64 p_to_n = LensDistortionOps.narrow(intrinsic).undistort_F64(true, false);
 
 		List<AssociatedPair> calibratedFeatures = new ArrayList<>();
 
@@ -198,17 +200,17 @@ public class ExampleStereoTwoViewsOneCamera {
 									 CameraPinholeRadial intrinsic,
 									 GrayU8 rectifiedLeft,
 									 GrayU8 rectifiedRight,
-									 DenseMatrix64F rectifiedK) {
+									 DMatrixRMaj rectifiedK) {
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 		// original camera calibration matrices
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
+		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(intrinsic, (DMatrixRMaj)null);
 
 		rectifyAlg.process(K, new Se3_F64(), K, leftToRight);
 
 		// rectification matrix for each image
-		DenseMatrix64F rect1 = rectifyAlg.getRect1();
-		DenseMatrix64F rect2 = rectifyAlg.getRect2();
+		DMatrixRMaj rect1 = rectifyAlg.getRect1();
+		DMatrixRMaj rect2 = rectifyAlg.getRect2();
 
 		// New calibration matrix,
 		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
@@ -217,10 +219,15 @@ public class ExampleStereoTwoViewsOneCamera {
 		RectifyImageOps.allInsideLeft(intrinsic, rect1, rect2, rectifiedK);
 
 		// undistorted and rectify images
+		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3);
+		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
+		ConvertMatrixData.convert(rect1, rect1_F32);
+		ConvertMatrixData.convert(rect2, rect2_F32);
+
 		ImageDistort<GrayU8,GrayU8> distortLeft =
-				RectifyImageOps.rectifyImage(intrinsic, rect1, BorderType.SKIP, distortedLeft.getImageType());
+				RectifyImageOps.rectifyImage(intrinsic, rect1_F32, BorderType.SKIP, distortedLeft.getImageType());
 		ImageDistort<GrayU8,GrayU8> distortRight =
-				RectifyImageOps.rectifyImage(intrinsic, rect2, BorderType.SKIP, distortedRight.getImageType());
+				RectifyImageOps.rectifyImage(intrinsic, rect2_F32, BorderType.SKIP, distortedRight.getImageType());
 
 		distortLeft.apply(distortedLeft, rectifiedLeft);
 		distortRight.apply(distortedRight, rectifiedRight);
@@ -231,7 +238,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	 */
 	public static void drawInliers(BufferedImage left, BufferedImage right, CameraPinholeRadial intrinsic,
 								   List<AssociatedPair> normalized) {
-		Point2Transform2_F64 n_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(false,true);
+		Point2Transform2_F64 n_to_p = LensDistortionOps.narrow(intrinsic).distort_F64(false,true);
 
 		List<AssociatedPair> pixels = new ArrayList<>();
 
@@ -256,7 +263,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	 * Show results as a point cloud
 	 */
 	public static void showPointCloud(ImageGray disparity, BufferedImage left,
-									  Se3_F64 motion, DenseMatrix64F rectifiedK ,
+									  Se3_F64 motion, DMatrixRMaj rectifiedK ,
 									  int minDisparity, int maxDisparity) {
 		PointCloudTiltPanel gui = new PointCloudTiltPanel();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,91 +18,120 @@
 
 package boofcv.demonstrations.distort;
 
-import boofcv.alg.distort.*;
-import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.distort.AdjustmentType;
+import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.distort.PointToPixelTransform_F32;
+import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.gui.DemonstrationBase;
 import boofcv.gui.ListDisplayPanel;
-import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F32;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.Planar;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Displays undistorted images with different types of adjustments for visibility.
  *
  * @author Peter Abeles
  */
-public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
+public class RemoveLensDistortionApp<T extends ImageBase<T>> extends DemonstrationBase<T> {
 
 	ListDisplayPanel gui = new ListDisplayPanel();
 
 	CameraPinholeRadial param;
 
 	// distorted input
-	Planar<GrayF32> dist;
+	T dist;
 
 	// storage for undistorted image
-	Planar<GrayF32> undist;
+	T undist;
 
-	boolean hasProcessed = false;
+	public RemoveLensDistortionApp(List<?> exampleInputs, ImageType<T> imageType) {
+		super(false,exampleInputs, imageType);
+		allowVideos = false;
 
-	public RemoveLensDistortionApp() {
-		super(0);
-
-		setMainGUI(gui);
+		add(gui, BorderLayout.CENTER);
 	}
 
-	public void configure( final BufferedImage orig , CameraPinholeRadial param )
+	@Override
+	public void openFile(File file) {
+		File candidates[] = new File[]{
+				new File(file.getParent(),"intrinsic.yaml"),
+				new File(file.getParent(),"intrinsicLeft.yaml"), // this is a bit of a hack...
+				new File(file.getParent(),file.getName()+".yaml")};
+
+		CameraPinholeRadial model = null;
+		for( File c : candidates ) {
+			if( c.exists() ) {
+				model = CalibrationIO.load(c);
+				break;
+			}
+		}
+		if( model == null ) {
+			System.err.println("Can't find camera model for this image");
+			return;
+		}
+		this.param = model;
+		super.openFile(file);
+	}
+
+	@Override
+	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input)
 	{
-		this.param = param;
+		// strip away distortion parameters
+		CameraPinhole desired = new CameraPinhole(param);
 
 		// distorted image
-		dist = ConvertBufferedImage.convertFromMulti(orig, null,true, GrayF32.class);
+		dist = (T)input.clone();
 
 		// storage for undistorted image
-		undist = new Planar<>(GrayF32.class,
-				dist.getWidth(),dist.getHeight(),dist.getNumBands());
+		undist = (T)input.createSameShape();
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				gui.reset();
-				gui.addItem(new ImagePanel(orig), "Original");
+				gui.addItem(new ImagePanel(buffered), "Original");
 			}
 		});
 
 		// add different types of adjustments
-		Point2Transform2_F32 add_p_to_p = LensDistortionOps.transformPoint(param).distort_F32(true,true);
+		Point2Transform2_F32 add_p_to_p = LensDistortionOps.transformChangeModel_F32(AdjustmentType.NONE, param,desired,true,null);
 		addUndistorted("No Adjustment", add_p_to_p);
-		Point2Transform2_F32 shrink = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, true);
-		addUndistorted("Shrink", shrink);
-		Point2Transform2_F32 fullView = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW,param, null,true);
+		Point2Transform2_F32 expand = LensDistortionOps.transformChangeModel_F32(AdjustmentType.EXPAND, param,desired, true, null);
+		addUndistorted("Expand", expand);
+		Point2Transform2_F32 fullView = LensDistortionOps.transformChangeModel_F32(AdjustmentType.FULL_VIEW,param, desired,true, null);
 		addUndistorted("Full View", fullView);
-
-		hasProcessed = true;
 	}
 
 	private void addUndistorted(final String name, final Point2Transform2_F32 model) {
 		// Set up image distort
-		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.ZERO);
-		ImageDistort<GrayF32,GrayF32> undistorter =
-				FactoryDistort.distortSB(false, interp, GrayF32.class);
+		InterpolatePixel<T> interp = FactoryInterpolation.
+				createPixel(0,255,InterpolationType.BILINEAR, BorderType.ZERO, undist.getImageType());
+		ImageDistort<T,T> undistorter = FactoryDistort.distort(false, interp, undist.getImageType());
 		undistorter.setModel(new PointToPixelTransform_F32(model));
 
-		DistortImageOps.distortPL(dist, undist, undistorter);
+		undistorter.apply(dist,undist);
 
 		final BufferedImage out = ConvertBufferedImage.convertTo(undist,null,true);
 
@@ -113,50 +142,20 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 			}});
 	}
 
-	@Override
-	public void refreshAll(Object[] cookies) {}
-
-	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {}
-
-	@Override
-	public void changeInput(String name, int index) {
-		PathLabel refs = inputRefs.get(index);
-
-		CameraPinholeRadial param = CalibrationIO.load(media.openFile(refs.getPath(0)));
-		BufferedImage orig = media.openImage(refs.getPath(1));
-
-		configure(orig,param);
-	}
-
-	@Override
-	public void loadConfigurationFile(String fileName) {}
-
-	@Override
-	public boolean getHasProcessedImage() {
-		return hasProcessed;
-	}
-
 	public static void main( String args[] ) {
-		RemoveLensDistortionApp app = new RemoveLensDistortionApp();
-
-		// camera config, image left, image right
-		String calibDir = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/");
-		String imageDir = UtilIO.pathExample("structure/");
-		String bumbleDir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
+		ImageType type = ImageType.pl(3, GrayU8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("Sony HX5V",calibDir + "intrinsic.yaml",imageDir + "dist_cyto_01.jpg"));
-		inputs.add(new PathLabel("BumbleBee2",bumbleDir+"intrinsicLeft.txt",bumbleDir + "left01.jpg"));
+		inputs.add(new PathLabel("Sony HX5V", UtilIO.pathExample("structure/dist_cyto_01.jpg")));
+		inputs.add(new PathLabel("BumbleBee2",
+				UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/left01.jpg")));
 
-		app.setInputList(inputs);
+		RemoveLensDistortionApp app = new RemoveLensDistortionApp(inputs,type);
 
-		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
-		}
+		app.openFile(new File(inputs.get(0).getPath()));
+
+		app.waitUntilDoneProcessing();
+
 		ShowImages.showWindow(app, "Remove Lens Distortion",true);
-
-		System.out.println("Done");
 	}
 }

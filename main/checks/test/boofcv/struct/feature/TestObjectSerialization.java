@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,16 +20,15 @@ package boofcv.struct.feature;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.io.UtilIO;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.After;
 import org.junit.Test;
 
-import java.io.File;
+import java.io.*;
 import java.util.Random;
 
 import static org.junit.Assert.*;
@@ -62,9 +61,7 @@ public class TestObjectSerialization {
 			orig.value[i] = i;
 		}
 
-		UtilIO.saveXML(orig, "temp.txt");
-
-		TupleDesc_F64 found = UtilIO.loadXML("temp.txt");
+		TupleDesc_F64 found = serializeDeSerialize(orig);
 
 		for( int i = 0; i < orig.value.length; i++ ) {
 			assertEquals(orig.value[i],found.value[i],1e-8);
@@ -79,9 +76,7 @@ public class TestObjectSerialization {
 			orig.value[i] = i;
 		}
 
-		UtilIO.saveXML(orig, "temp.txt");
-
-		BrightFeature found = UtilIO.loadXML("temp.txt");
+		BrightFeature found = serializeDeSerialize(orig);
 
 		assertEquals(orig.white,found.white);
 		for( int i = 0; i < orig.value.length; i++ ) {
@@ -98,9 +93,7 @@ public class TestObjectSerialization {
 			orig.value[i] = i;
 		}
 
-		UtilIO.saveXML(orig, "temp.txt");
-
-		NccFeature found = UtilIO.loadXML("temp.txt");
+		NccFeature found = serializeDeSerialize(orig);
 
 		assertEquals(orig.mean,found.mean,1e-8);
 		assertEquals(orig.sigma,found.sigma,1e-8);
@@ -116,9 +109,7 @@ public class TestObjectSerialization {
 		list.add(new GrayU8(1,2));
 		list.add(new GrayU8(2,4));
 
-		UtilIO.saveXML(list, "temp.txt");
-
-		FastQueue<GrayU8> found = UtilIO.loadXML("temp.txt");
+		FastQueue<GrayU8> found = serializeDeSerialize(list);
 
 		assertEquals(list.size(),found.size());
 		assertTrue(list.type == found.type);
@@ -134,12 +125,10 @@ public class TestObjectSerialization {
 	}
 
 	@Test
-	public void testDenseMatrix64F() {
-		DenseMatrix64F orig = new DenseMatrix64F(2,3,true,new double[]{1,2,3,4,5,6});
+	public void testDMatrixRMaj() {
+		DMatrixRMaj orig = new DMatrixRMaj(2,3,true,new double[]{1,2,3,4,5,6});
 
-		UtilIO.saveXML(orig, "temp.txt");
-
-		DenseMatrix64F found = UtilIO.loadXML("temp.txt");
+		DMatrixRMaj found = serializeDeSerialize(orig);
 
 		assertEquals(orig.numRows, found.numRows);
 		assertEquals(orig.numCols, found.numCols);
@@ -161,9 +150,8 @@ public class TestObjectSerialization {
 			ImageGray original = GeneralizedImageOps.createSingleBand(imageType,3,5);
 			GImageMiscOps.addUniform(original,rand,0,100);
 
-			UtilIO.saveXML(original, "temp.txt");
+			ImageGray found = serializeDeSerialize(original);
 
-			ImageGray found = UtilIO.loadXML("temp.txt");
 			assertEquals(original.width,found.width);
 			assertEquals(original.height,found.height);
 			assertEquals(original.stride,found.stride);
@@ -184,9 +172,9 @@ public class TestObjectSerialization {
 	public void testPlanar() {
 		Planar original = new Planar(GrayU8.class,40,50,3);
 		GImageMiscOps.addUniform(original, rand, 0, 100);
-		UtilIO.saveXML(original, "temp.txt");
 
-		Planar found = UtilIO.loadXML("temp.txt");
+		Planar found = serializeDeSerialize(original);
+
 		assertEquals(original.width,found.width);
 		assertEquals(original.height,found.height);
 		assertEquals(original.stride,found.stride);
@@ -201,9 +189,7 @@ public class TestObjectSerialization {
 		CameraPinholeRadial original = new CameraPinholeRadial().
 				fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(8,9).fsetTangental(10, 11);
 
-		UtilIO.saveXML(original, "temp.txt");
-
-		CameraPinholeRadial found = UtilIO.loadXML("temp.txt");
+		CameraPinholeRadial found = serializeDeSerialize(original);
 
 		assertEquals(original.fx,found.fx,1e-8);
 		assertEquals(original.fy, found.fy, 1e-8);
@@ -216,7 +202,21 @@ public class TestObjectSerialization {
 		assertEquals(original.radial[1],found.radial[1],1e-8);
 		assertEquals(original.t1,found.t1,1e-8);
 		assertEquals(original.t2,found.t2,1e-8);
+	}
 
-
+	private static <T>T serializeDeSerialize(Object orig ) {
+		try {
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("temp.txt"));
+			oos.writeObject(orig);
+			oos.close();
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream("temp.txt"));
+			Object o = ois.readObject();
+			ois.close();
+			return (T)o;
+		} catch( IOException | ClassNotFoundException e ) {
+			e.printStackTrace();
+			fail("Failed");
+		}
+		return null;
 	}
 }

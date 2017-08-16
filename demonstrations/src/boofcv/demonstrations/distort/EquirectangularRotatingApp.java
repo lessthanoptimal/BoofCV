@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,13 +32,13 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.geo.GeoLL_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import georegression.geometry.ConvertRotation3D_F64;
+import georegression.geometry.ConvertRotation3D_F32;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
-import georegression.struct.point.Point2D_F32;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -53,7 +53,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class EquirectangularRotatingApp<T extends ImageBase> extends DemonstrationBase<T>
+public class EquirectangularRotatingApp<T extends ImageBase<T>> extends DemonstrationBase<T>
 		implements RotationPanel.Listener
 {
 
@@ -93,16 +93,16 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 		panelImage.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Point2D_F32 latlon = new Point2D_F32();
+				GeoLL_F32 geo = new GeoLL_F32();
 
 				synchronized (distorter) {
 					EquirectangularTools_F32 tools = distorter.getTools();
 
 					double scale = panelImage.scale;
 					distorter.compute((int) (e.getX() / scale), (int) (e.getY() / scale));
-					tools.equiToLonlatFV(distorter.distX, distorter.distY, latlon);
-					panelRotate.setOrientation(UtilAngle.radianToDegree(latlon.y), UtilAngle.radianToDegree(latlon.x),0);
-					distorter.setDirection(latlon.x, latlon.y, 0);
+					tools.equiToLatLonFV(distorter.distX, distorter.distY, geo);
+					panelRotate.setOrientation(UtilAngle.radianToDegree(geo.lat), UtilAngle.radianToDegree(geo.lon),0);
+					distorter.setDirection(geo.lon, geo.lat, 0);
 					distortImage.setModel(distorter); // let it know the transform has changed
 
 					if (inputMethod == InputMethod.IMAGE) {
@@ -120,24 +120,24 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 		if( rendered.getWidth() != width || rendered.getHeight() != height ) {
 			rendered = new BufferedImage(width,height,BufferedImage.TYPE_INT_BGR);
 			panelImage.setPreferredSize(new Dimension(width,height));
-			distorter.setImageShape(width, height);
+			distorter.setEquirectangularShape(width, height);
 			distortImage.setModel(distorter); // let it know the transform has changed
 		}
 
 		centerLon = centerLat = 0;
 		distorted.reshape(width,height);
-		distorter.setImageShape(width,height);
+		distorter.setEquirectangularShape(width,height);
 	}
 
 	@Override
-	public void processImage(BufferedImage buffered, T input) {
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 
 		T in;
 		if( inputMethod == InputMethod.IMAGE ) {
-			inputCopy.setTo(input);
+			inputCopy.setTo((T)input);
 			in = inputCopy;
 		} else {
-			in = input;
+			in = (T)input;
 		}
 
 		synchronized (distorter) {
@@ -148,16 +148,16 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 	private void renderOutput(T in) {
 		distortImage.apply(in,distorted);
 		ConvertBufferedImage.convertTo(distorted,rendered,true);
-		panelImage.setBufferedImageSafe(rendered);
+		panelImage.setImageUI(rendered);
 	}
 
 	@Override
 	public void updatedOrientation(double pitch, double yaw, double roll) {
 		synchronized (distorter) {
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.ZYX,
-					UtilAngle.degreeToRadian(yaw),
-					UtilAngle.degreeToRadian(pitch),
-					UtilAngle.degreeToRadian(roll),
+			ConvertRotation3D_F32.eulerToMatrix(EulerType.ZYX,
+					(float)UtilAngle.degreeToRadian(yaw),
+					(float)UtilAngle.degreeToRadian(pitch),
+					(float)UtilAngle.degreeToRadian(roll),
 					distorter.getRotation());
 			distortImage.setModel(distorter); // let it know the transform has changed
 

@@ -3,10 +3,12 @@
 - Update Version
    * README.md
    * BoofDefaults.version
+   * Android example should reference latest BoofCV
    * Gradle
 - Set release data in change.txt
 - Make sure all examples work
 - Make sure all applications in evaluation work
+- Make sure android still works
 - Update examples on website
   * See what needs to be updated since TAG_NAME "git diff --name-status TAG_NAME path/to/examples"
 - Fresh checkout from repository then do the following
@@ -18,6 +20,8 @@
   * source code + data
 - Tag git
 - Upload to sourceforge
+  scp boofcv-vXXX-src.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv/vXXX/
+  scp boofcv-vXXX-libs.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv/vXXX/
 - Update version on website
 
 ----

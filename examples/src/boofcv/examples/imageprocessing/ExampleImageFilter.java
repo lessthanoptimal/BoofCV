@@ -37,10 +37,7 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.*;
 
 import java.awt.image.BufferedImage;
 
@@ -74,7 +71,7 @@ public class ExampleImageFilter {
 		panel.addImage(outputImage,"Procedural Fixed Type");
 	}
 
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	void generalized( T input )
 	{
 		Class<T> inputType = (Class<T>)input.getClass();
@@ -95,7 +92,7 @@ public class ExampleImageFilter {
 		panel.addImage(outputImage,"Generalized "+inputType.getSimpleName());
 	}
 
-	public static <T extends ImageGray, D extends ImageGray>
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	void filter( T input )
 	{
 		Class<T> inputType = (Class<T>)input.getClass();
@@ -106,7 +103,7 @@ public class ExampleImageFilter {
 		D derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 
 		// declare image filters
-		BlurFilter<T> filterBlur = FactoryBlurFilter.gaussian(inputType, -1, blurRadius);
+		BlurFilter<T> filterBlur = FactoryBlurFilter.gaussian(ImageType.single(inputType), -1, blurRadius);
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(inputType, derivType);
 
 		// process the image

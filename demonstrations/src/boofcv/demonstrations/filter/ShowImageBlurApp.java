@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class ShowImageBlurApp<T extends ImageGray>
+public class ShowImageBlurApp<T extends ImageGray<T>>
 	extends SelectAlgorithmAndInputPanel implements ChangeListener
 {
 	int radius = 2;
@@ -115,13 +115,13 @@ public class ShowImageBlurApp<T extends ImageGray>
 		output.reshape(image.getWidth(),image.getHeight());
 		storage.reshape(image.getWidth(),image.getHeight());
 
-		ConvertBufferedImage.convertFromMulti(image, input, true, imageType);
+		ConvertBufferedImage.convertFromPlanar(image, input, true, imageType);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				setInputImage(image);
 				renderedImage = new BufferedImage(input.width, input.height,BufferedImage.TYPE_INT_BGR);
-				gui.setBufferedImage(renderedImage);
+				gui.setImage(renderedImage);
 				gui.setPreferredSize(new Dimension(input.width,input.height));
 				gui.repaint();
 				processedImage = true;

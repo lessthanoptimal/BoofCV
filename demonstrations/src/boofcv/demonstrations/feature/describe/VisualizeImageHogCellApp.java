@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeImageHogCellApp<T extends ImageBase> extends DemonstrationBase<T> {
+public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends DemonstrationBase<T> {
 
 	// use the fast variant since it confidently computes each cell individually and doesn't normalize it
 	DescribeDenseHogFastAlg<T> hog;
@@ -109,9 +109,9 @@ public class VisualizeImageHogCellApp<T extends ImageBase> extends Demonstration
 	}
 
 	@Override
-	public void processImage(BufferedImage buffered, T input) {
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 		synchronized (lock) {
-			hog.setInput(input);
+			hog.setInput((T)input);
 			hog.process();
 
 			work = visualizers.createOutputBuffered(work);
@@ -126,14 +126,15 @@ public class VisualizeImageHogCellApp<T extends ImageBase> extends Demonstration
 				g2.drawImage(buffered,0,0,buffered.getWidth()/5,buffered.getHeight()/5,null);
 		}
 
-		imagePanel.setBufferedImage(work);
+		imagePanel.setImage(work);
 		imagePanel.setPreferredSize(new Dimension(work.getWidth(),work.getHeight()));
 		imagePanel.setMinimumSize(new Dimension(work.getWidth(),work.getHeight()));
+		imagePanel.repaint();
 	}
 
 	public void setCellWidth( int width ) {
 		synchronized (lock) {
-			createHoG(imageType);
+			createHoG(defaultType);
 			visualizers.setHoG(hog);
 			reprocessSingleImage();
 		}
@@ -141,7 +142,7 @@ public class VisualizeImageHogCellApp<T extends ImageBase> extends Demonstration
 
 	public void setOrientationBins(int histogram) {
 		synchronized (lock) {
-			createHoG(imageType);
+			createHoG(defaultType);
 			visualizers.setHoG(hog);
 			reprocessSingleImage();
 		}

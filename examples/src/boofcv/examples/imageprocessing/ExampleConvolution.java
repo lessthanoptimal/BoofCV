@@ -29,8 +29,8 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.Kernel1D_S32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 
@@ -61,8 +61,8 @@ public class ExampleConvolution {
 	 * Convolves a 1D kernel horizontally and vertically
 	 */
 	private static void convolve1D(GrayU8 gray) {
-		ImageBorder<GrayU8> border = FactoryImageBorder.single(gray, BorderType.EXTENDED);
-		Kernel1D_I32 kernel = new Kernel1D_I32(2);
+		ImageBorder<GrayU8> border = FactoryImageBorder.wrap(BorderType.EXTENDED, gray);
+		Kernel1D_S32 kernel = new Kernel1D_S32(2);
 		kernel.offset = 1; // specify the kernel's origin
 		kernel.data[0] = 1;
 		kernel.data[1] = -1;
@@ -81,7 +81,7 @@ public class ExampleConvolution {
 	 */
 	private static void convolve2D(GrayU8 gray) {
 		// By default 2D kernels will be centered around width/2
-		Kernel2D_I32 kernel = new Kernel2D_I32(3);
+		Kernel2D_S32 kernel = new Kernel2D_S32(3);
 		kernel.set(1,0,2);
 		kernel.set(2,1,2);
 		kernel.set(0,1,-2);
@@ -89,7 +89,7 @@ public class ExampleConvolution {
 
 		// Output needs to handle the increased domain after convolution.  Can't be 8bit
 		GrayS16 output = new GrayS16(gray.width,gray.height);
-		ImageBorder<GrayU8> border = FactoryImageBorder.single(gray, BorderType.EXTENDED);
+		ImageBorder<GrayU8> border = FactoryImageBorder.wrap( BorderType.EXTENDED,gray);
 
 		GConvolveImageOps.convolve(kernel, gray, output, border);
 		panel.addImage(VisualizeImageData.standard(output, null), "2D Kernel");
@@ -100,7 +100,7 @@ public class ExampleConvolution {
 	 */
 	private static void normalize2D(GrayU8 gray) {
 		// Create a Gaussian kernel with radius of 3
-		Kernel2D_I32 kernel = FactoryKernelGaussian.gaussian2D(GrayU8.class, -1, 3);
+		Kernel2D_S32 kernel = FactoryKernelGaussian.gaussian2D(GrayU8.class, -1, 3);
 		// Note that there is a more efficient way to compute this convolution since it is a separable kernel
 		// just use BlurImageOps instead.
 

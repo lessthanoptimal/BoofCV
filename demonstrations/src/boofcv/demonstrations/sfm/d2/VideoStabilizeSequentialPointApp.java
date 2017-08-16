@@ -45,7 +45,7 @@ import java.util.List;
  * @param <I> Input image type
  * @param <D> Image derivative type
  */
-public class VideoStabilizeSequentialPointApp<I extends ImageGray, D extends ImageGray,
+public class VideoStabilizeSequentialPointApp<I extends ImageGray<I>, D extends ImageGray<D>,
 		T extends InvertibleTransform<T>>
 		extends VideoStitchBaseApp<I,T>
 {

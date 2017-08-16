@@ -48,7 +48,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeAssociationAlgorithmsApp<T extends ImageGray>
+public class VisualizeAssociationAlgorithmsApp<T extends ImageGray<T>>
 		extends SelectAlgorithmAndInputPanel
 {
 

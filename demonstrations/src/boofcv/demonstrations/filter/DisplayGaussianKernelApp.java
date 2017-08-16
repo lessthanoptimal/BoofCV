@@ -42,7 +42,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class DisplayGaussianKernelApp<T extends ImageGray> extends SelectAlgorithmPanel {
+public class DisplayGaussianKernelApp<T extends ImageGray<T>> extends SelectAlgorithmPanel {
 	int imageSize = 400;
 
 	T largeImg;

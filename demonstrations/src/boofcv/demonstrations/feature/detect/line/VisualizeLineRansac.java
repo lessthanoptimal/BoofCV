@@ -58,7 +58,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeLineRansac<I extends ImageGray, D extends ImageGray> {
+public class VisualizeLineRansac<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 	Class<I> imageType;
 	Class<D> derivType;
