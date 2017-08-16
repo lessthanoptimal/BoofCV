@@ -28,8 +28,7 @@ BoofCV is an open source real-time computer vision library written entirely in J
 The bleeding edge source code can be obtained by cloning the git repository.
 
 ```
-git clone --recursive https://github.com/lessthanoptimal/BoofCV.git boofcv
-git checkout SNAPSHOT
+git clone -b SNAPSHOT --recursive https://github.com/lessthanoptimal/BoofCV.git boofcv
 ```
 
 Is the data directory empty?  That's because you didn't follow instructions and skipped --recursive.  Fix that by doing the following.
@@ -67,14 +66,15 @@ For Maven projects:
 
 There are also several integration modules which help BoofCV interact with external projects.  A list of those is included below:
 
-|     Name      |                 Description
-|---------------|---------------------------------------------------------------------
-| All           | Absolutely everything
-| Android       | Useful functions for working inside of Android devices.
-| javacv        | [JavaCV](https://github.com/bytedeco/javacv) is a wrapper around OpenCV and FFMPEG for reading video files.
-| jcodec        | [JCodec](http://jcodec.org/) is a pure Java video reader/writer.
-| openkinect    | Used the [Kinect](http://openkinect.org) RGB-D sensor with BoofCV.
-| WebcamCapture | A few functions that make [WebcamCapture](http://webcam-capture.sarxos.pl/) even easier to use.
+|     Name             |                 Description
+| boofcv-all           | Absolutely everything
+| boofcv-android       | Useful functions for working inside of Android devices.
+| boofcv-javacv        | [JavaCV](https://github.com/bytedeco/javacv) is a wrapper around OpenCV mainly for file IO.
+| boofcv-ffmpeg        | [javacpp-presets](https://github.com/bytedeco/javacpp-presets) their ffmepg wrapper is used for reading video files.
+| boofcv-jcodec        | [JCodec](http://jcodec.org/) is a pure Java video reader/writer.
+| boofcv-openkinect    | Used the [Kinect](http://openkinect.org) RGB-D sensor with BoofCV.
+| boofcv-swing  
+| boofcv-WebcamCapture | A few functions that make [WebcamCapture](http://webcam-capture.sarxos.pl/) even easier to use.
 
 ## Directories
 
@@ -89,7 +89,6 @@ There are also several integration modules which help BoofCV interact with exter
 
 ------------------------------------
 # Building from Source
-
 
 Building and installing BoofCV into your local Maven repository is easy[1] using the [gradlew](https://docs.gradle.org/current/userguide/gradle_wrapper.html) script:
 ```bash
@@ -129,9 +128,11 @@ Then in Eclipse; 1) "import existing projects", 2) Select your BoofCV directory,
 
 Core BoofCV modules depends on the following libraries
 
+- [ args4f        ]( http://args4j.kohsuke.org/)
 - [ EJML          ]( http://code.google.com/p/efficient-java-matrix-library )
 - [ GeoRegression ]( http://georegression.org )
 - [ DDogleg       ]( http://ddogleg.org)
+- [ DeepBoof      ]( https://github.com/lessthanoptimal/DeepBoof)
 
 The following is required for unit tests
 
