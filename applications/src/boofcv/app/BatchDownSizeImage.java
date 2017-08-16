@@ -19,6 +19,7 @@
 package boofcv.app;
 
 import boofcv.alg.filter.misc.AverageDownSampleOps;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
@@ -51,8 +52,8 @@ public class BatchDownSizeImage {
 
 	public static void printHelpAndExit(String[] args) {
 		System.out.println("=== Usage");
-		System.out.println("BatchDownSizeImage <flags>  <input file path regex> <output> <width> <height>");
-		System.out.println("BatchDownSizeImage <flags>  <input file path regex> <output> <max length>");
+		System.out.println("BatchDownSizeImage <flags>  <input directory path> <name regex> <output> <width> <height>");
+		System.out.println("BatchDownSizeImage <flags>  <input directory path> <name regex> <output> <max length>");
 		System.out.println();
 		System.out.println("Downsizes multiple files at once using average resampling.  When resizing a image "+
 				"to less than 50% of its original size this will typically perform much better than "+
@@ -62,13 +63,15 @@ public class BatchDownSizeImage {
 		System.out.println("-rename    Renames the output files to image%05d.png");
 		System.out.println();
 		System.out.println("=== Arguments");
-		System.out.println("First argument is a Java regex for input files. E.g.");
-		System.out.println("   /path/to/input/directory/\\\\S*.jpg");
-		System.out.println("Second argument is a path to the output directory");
-		System.out.println("If there are 4 arguments then last two is the width and height");
+		System.out.println("First argument is the path to the input directory, e.g.");
+		System.out.println("   /path/to/input/directory");
+		System.out.println("Second argument is a Java regex for input files. E.g.");
+		System.out.println("   \\\\S*.jpg");
+		System.out.println("Third argument is a path to the output directory");
+		System.out.println("If there are 5 arguments then last two is the width and height");
 		System.out.println("   either width or height can be zero.  If zero then it will maintain the aspect");
 		System.out.println("   ratio of the input file.");
-		System.out.println("If there are 3 arguments then that value is the length of the largest side");
+		System.out.println("If there are 4 arguments then that value is the length of the largest side");
 		System.out.println("   The other side will be set according to the aspect ratio.");
 		System.exit(0);
 	}
@@ -88,20 +91,21 @@ public class BatchDownSizeImage {
 			}
 		}
 
-		if( args.length-start > 4 || args.length-start < 3 )
+		if( args.length-start > 5 || args.length-start < 4 )
 			printHelpAndExit(args);
 
-		String fileRegex = args[start];
-		String output = args[start+1];
+		String inputPath = args[start];
+		String nameRegex = args[start+1];
+		String output = args[start+2];
 
-		if( args.length-start == 3 ) {
+		if( args.length-start == 4 ) {
 			useSide = true;
-			side = Integer.parseInt(args[start+2]);
+			side = Integer.parseInt(args[start+3]);
 			if( side <= 0 )
 				printHelpAndExit(args);
 		} else {
-			width = Integer.parseInt(args[start+2]);
-			height = Integer.parseInt(args[start+3]);
+			width = Integer.parseInt(args[start+3]);
+			height = Integer.parseInt(args[start+4]);
 			if( width <= 0 && height <= 0 )
 				printHelpAndExit(args);
 		}
@@ -111,11 +115,12 @@ public class BatchDownSizeImage {
 			if( !outputDir.mkdirs() )
 				throw new IllegalArgumentException("Can't create output directory: "+output);
 
-		images = Arrays.asList(BoofMiscOps.findMatches(fileRegex));
+		images = Arrays.asList(UtilIO.findMatches(new File(inputPath),nameRegex));
 		Collections.sort(images);
 
 		if( images.size() == 0 ) {
-			System.out.println(fileRegex);
+			System.out.println("Path       = "+inputPath);
+			System.out.println("Name Regex = "+nameRegex);
 			System.err.println("No images found.  Is the path/regex correct?");
 			System.exit(1);
 		}

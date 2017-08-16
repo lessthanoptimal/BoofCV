@@ -110,4 +110,11 @@ public class TestUtilIO {
 
 		assertEquals(29,UtilIO.indexOfSourceStart(example2));
 	}
+
+	@Test
+	public void findMatches() {
+		String f = TestUtilIO.class.getResource(".").getFile();
+		File[] matches = UtilIO.findMatches(new File(f),"\\w*.class");
+		assertTrue(matches.length>=3);
+	}
 }

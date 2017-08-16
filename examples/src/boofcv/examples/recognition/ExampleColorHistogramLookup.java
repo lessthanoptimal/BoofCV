@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -198,8 +197,8 @@ public class ExampleColorHistogramLookup {
 
 	public static void main(String[] args) {
 
-		String regex = UtilIO.pathExample("recognition/vacation")+"/^\\w*.jpg";
-		List<File> images = Arrays.asList(BoofMiscOps.findMatches(regex));
+		String imagePath = UtilIO.pathExample("recognition/vacation");
+		List<File> images = Arrays.asList(UtilIO.findMatches(new File(imagePath),"\\w*.jpg"));
 		Collections.sort(images);
 
 		// Different color spaces you can try

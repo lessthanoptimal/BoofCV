@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,6 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 
@@ -70,8 +69,8 @@ public class ExampleCalibrateStereo {
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 
-		left = BoofMiscOps.directoryList(directory, "left");
-		right = BoofMiscOps.directoryList(directory, "right");
+		left = UtilIO.directoryList(directory, "left");
+		right = UtilIO.directoryList(directory, "right");
 	}
 
 	/**
@@ -83,8 +82,8 @@ public class ExampleCalibrateStereo {
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 
-		left = BoofMiscOps.directoryList(directory, "left");
-		right = BoofMiscOps.directoryList(directory, "right");
+		left = UtilIO.directoryList(directory, "left");
+		right = UtilIO.directoryList(directory, "right");
 	}
 
 	/**

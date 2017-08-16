@@ -18,7 +18,7 @@
 
 package boofcv.io.video;
 
-import boofcv.misc.BoofMiscOps;
+import boofcv.io.UtilIO;
 import org.ddogleg.struct.GrowQueue_I8;
 
 import java.io.*;
@@ -78,7 +78,7 @@ public class CombineFilesTogether {
 	}
 
 	public static void main( String args[] ) throws IOException {
-		List<String> fileNames = BoofMiscOps.directoryList("log", "depth");
+		List<String> fileNames = UtilIO.directoryList("log", "depth");
 		Collections.sort(fileNames);
 		CombineFilesTogether.combine(fileNames,"combined.mpng");
 	}

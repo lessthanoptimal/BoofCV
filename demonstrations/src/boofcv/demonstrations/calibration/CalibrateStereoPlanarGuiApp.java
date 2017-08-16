@@ -33,7 +33,6 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.wrapper.DefaultMediaManager;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.se.Se3_F64;
@@ -250,8 +249,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 //		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 
-		List<String> leftImages = BoofMiscOps.directoryList(directory, "left");
-		List<String> rightImages = BoofMiscOps.directoryList(directory, "right");
+		List<String> leftImages = UtilIO.directoryList(directory, "left");
+		List<String> rightImages = UtilIO.directoryList(directory, "right");
 
 		Collections.sort(leftImages);
 		Collections.sort(rightImages);
