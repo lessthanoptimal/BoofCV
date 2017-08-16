@@ -106,6 +106,8 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 
 		updateIntrinsic();
 
+		setPreferredSize(new Dimension(800,800));
+
 		BorderType borderType = BorderType.EXTENDED;
 		InterpolatePixel<T> interp =
 				FactoryInterpolation.createPixel(0, 255, InterpolationType.BILINEAR,borderType, imageType);
@@ -122,13 +124,11 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 		MouseAdapter adapter = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-
 				changeFocus(e);
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-
 				changeFocus(e);
 			}
 
@@ -177,6 +177,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 
 		panelPinhole.setFocusable(true);
 		panelPinhole.grabFocus();
+		panelPinhole.setPreferredSize(new Dimension(camWidth,camHeight));
 
 		JPanel controlPanel = new JPanel();
 		controlPanel.setLayout(new BoxLayout(controlPanel,BoxLayout.Y_AXIS));
@@ -185,6 +186,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 		imageView = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		imageView.setTopComponent(panelPinhole);
 		imageView.setBottomComponent(panelFisheye);
+		imageView.setDividerLocation(camHeight);
 
 		add(controlPanel, BorderLayout.WEST );
 		add(imageView, BorderLayout.CENTER);
