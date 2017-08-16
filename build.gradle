@@ -222,23 +222,22 @@ task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+
         ext.listExternal = ext.listExternal - ext.boofJars
         ext.listExternal = ext.listExternal.findAll({ !it.getName().contains("android.jar") })
 
-        file('libraries').deleteDir()
-        file('libraries').mkdir()
+        ext.fileName = "boofcv-v"+version+"-libs"
+        file(ext.fileName).deleteDir()
+        file(ext.fileName).mkdir()
 
         copy {
             from ext.listExternal
-            into 'libraries'
+            into ext.fileName
         }
 
         copy {
             from ext.boofJars
-            into 'libraries'
+            into ext.fileName
 
-            // append on BoofCV so it's clear which jars are part of BoofCV and which are not
-            rename { String fileName ->
-                "BoofCV-" + fileName
-            }
         }
+
+        println("\n\nSaved to directory "+ext.fileName)
     }
 }
 

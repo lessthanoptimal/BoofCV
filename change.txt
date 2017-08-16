@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    :
+Date    : 2017-08-16
 Version : 0.27
 
 - ImagePanel: Expanded click middle mouse to save image
