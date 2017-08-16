@@ -184,7 +184,7 @@ public class VisualizeDepthVisualOdometryApp
 				line2 = path+"/"+line2;
 
 			config = CalibrationIO.load(media.openFile(lineConfig));
-			openVideo(line1,line2);
+			openVideo(false,line1,line2);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

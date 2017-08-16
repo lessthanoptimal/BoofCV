@@ -18,19 +18,19 @@
 
 package boofcv.demonstrations.shapes;
 
-import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.gui.DemonstrationBase2;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.*;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.shapes.EllipseRotated_F64;
 
 import javax.swing.*;
@@ -46,39 +46,19 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DemonstrationBase2
-		implements ThresholdControlPanel.Listener
+public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackShapeAppBase
 {
 
-	Class<T> imageClass;
-
-	DetectEllipseControlPanel controls = new DetectEllipseControlPanel(this);
-
-	VisualizePanel guiImage;
-
-	InputToBinary<T> inputToBinary;
 	BinaryEllipseDetector<T> detector;
 
-	BufferedImage original;
-	BufferedImage work;
-	T input;
-	GrayU8 binary = new GrayU8(1,1);
-
-
 	public DetectBlackEllipseApp(List<String> examples , Class<T> imageType) {
-		super(examples, ImageType.single(imageType));
-		this.imageClass = imageType;
-
-		guiImage = new VisualizePanel();
-
-		add(BorderLayout.WEST, controls);
-		add(BorderLayout.CENTER, guiImage);
-
-
-		createDetector();
+		super(examples, imageType);
+		setupGui(new VisualizePanel(), new DetectEllipseControlPanel(this) );
 	}
 
-	private void createDetector() {
+	@Override
+	protected void createDetector() {
+		DetectEllipseControlPanel controls = (DetectEllipseControlPanel)DetectBlackEllipseApp.this.controls;
 		synchronized (this) {
 			detector = FactoryShapeDetector.ellipse(controls.getConfigEllipse(), imageClass);
 		}
@@ -93,15 +73,6 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends Demonstration
 		binary.reshape(work.getWidth(), work.getHeight());
 		this.input = (T)input;
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				Dimension d = guiImage.getPreferredSize();
-				if( d.getWidth() < buffered.getWidth() || d.getHeight() < buffered.getHeight() ) {
-					guiImage.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
-				}
-			}});
-
 		synchronized (this) {
 			inputToBinary.process((T) input, binary);
 			detector.process((T) input, binary);
@@ -114,30 +85,6 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends Demonstration
 		});
 	}
 
-	/**
-	 * Called when how the data is visualized has changed
-	 */
-	public void viewUpdated() {
-		BufferedImage active = null;
-		if( controls.selectedView == 0 ) {
-			active = original;
-		} else if( controls.selectedView == 1 ) {
-			VisualizeBinaryData.renderBinary(binary,false,work);
-			active = work;
-			work.setRGB(0, 0, work.getRGB(0, 0));
-		} else {
-			Graphics2D g2 = work.createGraphics();
-			g2.setColor(Color.BLACK);
-			g2.fillRect(0,0,work.getWidth(),work.getHeight());
-			active = work;
-		}
-
-		guiImage.setScale(controls.zoom);
-
-		guiImage.setBufferedImage(active);
-		guiImage.repaint();
-	}
-
 	public void configUpdate() {
 		createDetector();
 		// does process and render too
@@ -145,6 +92,7 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends Demonstration
 
 	@Override
 	public void imageThresholdUpdated() {
+		DetectEllipseControlPanel controls = (DetectEllipseControlPanel)DetectBlackEllipseApp.this.controls;
 
 		ConfigThreshold config = controls.getThreshold().createConfig();
 
@@ -157,6 +105,8 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends Demonstration
 	class VisualizePanel extends ImageZoomPanel {
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+			DetectEllipseControlPanel controls = (DetectEllipseControlPanel)DetectBlackEllipseApp.this.controls;
+
 			synchronized ( DetectBlackEllipseApp.this ) {
 				g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -167,7 +117,7 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends Demonstration
 					VisualizeBinaryData.render(contours, null,Color.CYAN, scale, g2);
 				}
 
-				if (controls.bShowEllipses) {
+				if (controls.bShowShapes) {
 					List<EllipseRotated_F64> ellipses = detector.getFoundEllipses().toList();
 
 					g2.setColor(Color.RED);

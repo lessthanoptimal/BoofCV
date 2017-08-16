@@ -38,6 +38,8 @@ public class ImageZoomPanel extends JScrollPane {
 
 	protected double scale=1;
 
+	boolean checkEventDispatch = true;
+
 	public ImageZoomPanel(final BufferedImage img ) {
 		this.img = img;
 		setScale(1);
@@ -62,12 +64,11 @@ public class ImageZoomPanel extends JScrollPane {
 		double centerY = (r.y + r.height/2.0)/this.scale;
 
 		this.scale = scale;
-		int w=0,h=0;
 		if( img != null ) {
-			w = (int)Math.ceil(img.getWidth()*scale);
-			h = (int)Math.ceil(img.getHeight()*scale);
+			int w = (int)Math.ceil(img.getWidth()*scale);
+			int h = (int)Math.ceil(img.getHeight()*scale);
+			panel.setPreferredSize(new Dimension(w, h));
 		}
-		panel.setPreferredSize(new Dimension(w, h));
 		getViewport().setView(panel);
 
 		centerView(centerX, centerY);
@@ -82,14 +83,19 @@ public class ImageZoomPanel extends JScrollPane {
 		getVerticalScrollBar().setValue(y);
 	}
 
-
 	/**
 	 * Change the image being displayed.
 	 *
 	 * @param image The new image which will be displayed.
 	 */
 	public synchronized void setBufferedImage(BufferedImage image) {
+		// assume the image was initially set before the GUI was invoked
+		if( checkEventDispatch && this.img != null ) {
+			if( !SwingUtilities.isEventDispatchThread() )
+				throw new RuntimeException("Changed image when not in GUI thread?");
+		}
 		this.img = image;
+
 
 		Dimension prev = getPreferredSize();
 
@@ -100,7 +106,7 @@ public class ImageZoomPanel extends JScrollPane {
 		}
 
 		if( prev.getWidth() != w || prev.getHeight() != h ) {
-			panel.setPreferredSize(new Dimension(w,h));
+			setPreferredSize(new Dimension(w,h));
 			getViewport().setView(panel);
 		}
 	}

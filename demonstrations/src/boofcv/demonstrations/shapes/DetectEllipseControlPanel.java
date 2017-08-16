@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.demonstrations.shapes;
 
 import boofcv.factory.shape.ConfigEllipseDetector;
-import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -30,7 +29,7 @@ import java.awt.event.ActionListener;
 /**
  * @author Peter Abeles
  */
-public class DetectEllipseControlPanel extends StandardAlgConfigPanel
+public class DetectEllipseControlPanel extends DetectBlackShapePanel
 	implements ActionListener, ChangeListener
 {
 	DetectBlackEllipseApp owner;
@@ -38,13 +37,10 @@ public class DetectEllipseControlPanel extends StandardAlgConfigPanel
 	// selects which image to view
 	JComboBox imageView;
 
-	JSpinner selectZoom;
-
 	JCheckBox showEllipses;
 	JCheckBox showContour;
 
-	int selectedView = 0;
-	boolean bShowEllipses = true;
+	boolean bShowShapes = true;
 	boolean bShowContour = false;
 
 	ThresholdControlPanel threshold;
@@ -61,8 +57,6 @@ public class DetectEllipseControlPanel extends StandardAlgConfigPanel
 
 	ConfigEllipseDetector config = new ConfigEllipseDetector();
 
-	double zoom = 1;
-
 	public DetectEllipseControlPanel(DetectBlackEllipseApp owner) {
 		this.owner = owner;
 
@@ -78,7 +72,7 @@ public class DetectEllipseControlPanel extends StandardAlgConfigPanel
 		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
 		showEllipses = new JCheckBox("Ellipses");
-		showEllipses.setSelected(bShowEllipses);
+		showEllipses.setSelected(bShowShapes);
 		showEllipses.addActionListener(this);
 		showContour = new JCheckBox("Contour");
 		showContour.addActionListener(this);
@@ -121,7 +115,7 @@ public class DetectEllipseControlPanel extends StandardAlgConfigPanel
 			selectedView = imageView.getSelectedIndex();
 			owner.viewUpdated();
 		} else if( e.getSource() == showEllipses) {
-			bShowEllipses = showEllipses.isSelected();
+			bShowShapes = showEllipses.isSelected();
 			owner.viewUpdated();
 		} else if( e.getSource() == showContour ) {
 			bShowContour = showContour.isSelected();
@@ -156,8 +150,6 @@ public class DetectEllipseControlPanel extends StandardAlgConfigPanel
 
 		owner.configUpdate();
 	}
-
-
 
 	public ThresholdControlPanel getThreshold() {
 		return threshold;

@@ -266,21 +266,20 @@ public abstract class DemonstrationBase2 extends JPanel {
 			return;
 		}
 
-
 		// mjpegs can be opened up as images.  so override the default behavior
 		inputFilePath = file.getPath();
 		BufferedImage buffered = inputFilePath.endsWith("mjpeg") ? null : UtilImageIO.loadImage(inputFilePath);
 		if( buffered == null ) {
-			openVideo(inputFilePath);
+			openVideo(false,inputFilePath);
 		} else {
-			openImage(inputFilePath, buffered);
+			openImage(false,inputFilePath, buffered);
 		}
 	}
 
 	/**
 	 * Before invoking this function make sure waitingToOpenImage is false AND that the previous input has beens topped
 	 */
-	protected void openVideo(String ...filePaths) {
+	protected void openVideo(boolean reopen , String ...filePaths) {
 		synchronized (lockStartingProcess) {
 			if( startingProcess ) {
 				System.out.println("Ignoring video request.  Detected spamming");
@@ -321,6 +320,12 @@ public abstract class DemonstrationBase2 extends JPanel {
 					throw new RuntimeException("There was still an active stream thread!");
 				threadProcess = new SynchronizedStreamsThread();
 			}
+			if( !reopen ) {
+				for (int i = 0; i < inputStreams.size(); i++) {
+					CacheSequenceStream stream = inputStreams.get(i);
+					handleInputChange(i, inputMethod, stream.getWidth(), stream.getHeight());
+				}
+			}
 			threadProcess.start();
 		} else {
 			synchronized (inputStreams) {
@@ -334,7 +339,7 @@ public abstract class DemonstrationBase2 extends JPanel {
 		}
 	}
 
-	protected void openImage(String filePath , BufferedImage buffered ) {
+	protected void openImage(boolean reopen , String filePath , BufferedImage buffered ) {
 		synchronized (lockStartingProcess) {
 			if( startingProcess ) {
 				System.out.println("Ignoring image request.  Detected spamming");
@@ -365,6 +370,9 @@ public abstract class DemonstrationBase2 extends JPanel {
 				throw new RuntimeException("There was still an active stream thread!");
 			threadProcess = new ProcessImageThread();
 		}
+		if( !reopen ) {
+			handleInputChange(0, inputMethod, buffered.getWidth(), buffered.getHeight());
+		}
 		threadProcess.start();
 	}
 
@@ -392,6 +400,7 @@ public abstract class DemonstrationBase2 extends JPanel {
 			CacheSequenceStream cache = inputStreams.get(0);
 			SimpleImageSequence sequence = media.openCamera(null, 640, 480, cache.getImageType());
 
+
 			if (sequence == null) {
 				showRejectDiaglog("Can't open webcam");
 			} else {
@@ -400,6 +409,7 @@ public abstract class DemonstrationBase2 extends JPanel {
 
 				if (threadProcess != null)
 					throw new RuntimeException("There was still an active stream thread!");
+				handleInputChange(0, inputMethod, sequence.getNextWidth(), sequence.getNextHeight());
 				threadProcess = new SynchronizedStreamsThread();
 				threadProcess.start();
 			}
@@ -454,7 +464,6 @@ public abstract class DemonstrationBase2 extends JPanel {
 		public void run() {
 			for (int i = 0; i < inputStreams.size() ; i++) {
 				CacheSequenceStream cache = inputStreams.get(i);
-				handleInputChange(i, inputMethod, cache.getWidth(), cache.getHeight());
 				inputSizeKnown = true;
 
 				ImageBase boof = cache.getBoofImage();
@@ -477,7 +486,6 @@ public abstract class DemonstrationBase2 extends JPanel {
 		public void run() {
 			for (int i = 0; i < inputStreams.size() ; i++) {
 				CacheSequenceStream sequence = inputStreams.get(i);
-				handleInputChange(i, inputMethod, sequence.getWidth(), sequence.getHeight());
 			}
 			inputSizeKnown = true;
 
@@ -566,10 +574,10 @@ public abstract class DemonstrationBase2 extends JPanel {
 	 */
 	public void reprocessInput() {
 		if ( inputMethod == InputMethod.VIDEO ) {
-			openVideo(inputFilePath);
+			openVideo(true,inputFilePath);
 		} else if( inputMethod == InputMethod.IMAGE ) {
 			BufferedImage buff = inputStreams.get(0).getBufferedImage();
-			openImage(inputFilePath,buff);// TODO still does a pointless image conversion
+			openImage(true,inputFilePath,buff);// TODO still does a pointless image conversion
 		}
 	}
 
