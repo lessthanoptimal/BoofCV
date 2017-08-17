@@ -66,6 +66,8 @@ public class ExampleDenseImageFeatures {
 			TupleDesc_F64 d = describer.getDescriptions().get(i);
 
 			System.out.printf("%3d %3d = [ %f %f %f %f\n",p.x,p.y,d.value[0],d.value[1],d.value[2],d.value[3]);
+
+			// You would process the feature descriptor here
 		}
 	}
 
@@ -79,7 +81,7 @@ public class ExampleDenseImageFeatures {
 		describer.setInput(input);
 		describer.process();
 
-		// Let's print a few parameters because. They can be modified using the configuration class passed in
+		// Let's print a few parameters just because we can. They can be modified using the configuration class passed in
 		System.out.println("\n------------------- HOG Low Level");
 		System.out.println("HOG pixels per cell "+describer.getPixelsPerCell());
 		System.out.println("HOG region width "+describer.getRegionWidthPixelX());
