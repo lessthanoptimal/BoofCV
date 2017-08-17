@@ -67,6 +67,7 @@ For Maven projects:
 There are also several integration modules which help BoofCV interact with external projects.  A list of those is included below:
 
 |     Name             |                 Description
+|----------------------|-------------------------------------------------------------------------------------
 | boofcv-all           | Absolutely everything
 | boofcv-android       | Useful functions for working inside of Android devices.
 | boofcv-javacv        | [JavaCV](https://github.com/bytedeco/javacv) is a wrapper around OpenCV mainly for file IO.
