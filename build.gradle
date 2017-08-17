@@ -104,7 +104,7 @@ subprojects {
     javadoc.failOnError = false
     artifacts {
         archives sourcesJar
-        archives javadocJar
+//        archives javadocJar
     }
 
     // Force the release build to fail if it depends on a SNAPSHOT
@@ -294,7 +294,7 @@ task testReport(type: TestReport) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.0.1'
+    gradleVersion = '4.1'
 }
 
 idea {

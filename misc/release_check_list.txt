@@ -29,6 +29,7 @@ Gradle
 
 To post a SNAPSHOT or full release:
 
+1) In gradle.properties comment out "org.gradle.parallel=true"
 1) uncomment the following line in build.gradle so that it creates javadoc. Commented out to speed up build
    archives javadocJar
 2) Upload to Sonatype
