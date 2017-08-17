@@ -28,7 +28,11 @@
 Gradle
 
 To post a SNAPSHOT or full release:
-gradle uploadArchives
+
+1) uncomment the following line in build.gradle so that it creates javadoc. Commented out to speed up build
+   archives javadocJar
+2) Upload to Sonatype
+   ./gradlew uploadArchives
 
 A SNAPSHOT is created if SNAPSHOT is in its name.
 
