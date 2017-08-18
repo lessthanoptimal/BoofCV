@@ -119,8 +119,8 @@ public class CreateCalibrationTargetGenerator {
 	public void circleAsymmetric( double diameter , double centerDistance ) {
 		double diameterPoints = diameter*UNIT_TO_POINTS;
 		double separationPoints = centerDistance*UNIT_TO_POINTS;
-		patternWidth = (cols-1)*(separationPoints/2.0) + diameterPoints;
-		patternHeight = (rows-1)*(separationPoints/2.0) + diameterPoints;
+		patternWidth = ((cols-1)/2.0)*separationPoints + diameterPoints;
+		patternHeight = ((rows-1)/2.0)*separationPoints + diameterPoints;
 
 		printHeader("Asymmetric Circle "+rows+"x"+cols+", diameter "+diameter+", separation "+centerDistance+" "+units.abbreviation);
 
@@ -128,8 +128,10 @@ public class CreateCalibrationTargetGenerator {
 				"  /w "+separationPoints+" def\n"+
 				"  /s "+(separationPoints/2)+" def\n"+
 				"  /r "+(diameterPoints/2)+" def\n"+
+				"  /nr -1 r mul def\n"+
 				"  /patternWidth "+(patternWidth)+" def\n" +
 				"  /patternHeight "+(patternHeight)+" def\n" +
+
 				"\n" +
 				"  % ----- Define procedure for drawing a circle\n" +
 				"  /circle  {r 0 360 arc closepath} def\n" +
@@ -138,8 +140,8 @@ public class CreateCalibrationTargetGenerator {
 				"  /rowcircles {w patternWidth {y r add circle fill} for} def\n" +
 				"\n" +
 				"  % increments the y variable and draws all the rows\n"+
-				"  0 w patternHeight { /y exch def r rowcircles } for\n"+
-				"  s w patternHeight { /y exch def r s add rowcircles } for\n");
+				"  nr w patternHeight { /y exch def r rowcircles } for\n"+
+				"  r w patternHeight { /y exch def r s add rowcircles } for\n");
 
 		printTrailer();
 	}

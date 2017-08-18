@@ -15,6 +15,8 @@ Version : 0.28
   * Removed refine corner for black polygon detector
     - Was complex, didn't fit the new API, and calibration residuals got better once removed.
 - Adding the capability for demonstrations that open files to remember the last directory it opened
+- Calibration Target Generator
+  * Fixed bug in asymmetric circle target where it was shifted on the page
 
 Polygon Detector
 - More false positives in regression on polygon shapes.
