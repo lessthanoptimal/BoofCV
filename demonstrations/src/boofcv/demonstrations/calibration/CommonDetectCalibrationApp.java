@@ -118,20 +118,24 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 			grayPrev.setTo((GrayF32)gray);
 		}
 
+		processFrame();
+
 		// adjust the scale if needed so that the entire image is visible when loaded
 		if( imagePanel.getWidth() > 0 ) {
-			double scaleX = imagePanel.getWidth() / (double) buffered.getWidth();
-			double scaleY = imagePanel.getHeight() / (double) buffered.getHeight();
+			double scaleX = (imagePanel.getWidth()+5) / (double) buffered.getWidth();
+			double scaleY = (imagePanel.getHeight()+5) / (double) buffered.getHeight();
 
 			final double scale = Math.min(scaleX, scaleY);
 			if (scale < 1.0) {
 				BoofSwingUtil.invokeNowOrLater(new Runnable() {
 					@Override
 					public void run() {controlPanel.setScale(scale);}});
+			} else {
+				BoofSwingUtil.invokeNowOrLater(new Runnable() {
+					@Override
+					public void run() {controlPanel.setScale(1);}});
 			}
 		}
-
-		processFrame();
 	}
 
 	protected void renderGraph( Graphics2D g2 , double scale ) {
