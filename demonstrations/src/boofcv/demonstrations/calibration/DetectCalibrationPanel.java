@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -341,6 +341,9 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		setScale(curr);
 	}
 	public void setScale(double scale) {
+		if( ((Number)selectZoom.getValue()).doubleValue() == scale )
+			return;
+
 		double curr;
 
 		if( scale >= 1 ) {

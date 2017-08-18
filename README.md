@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/lessthanoptimal/BoofCV.svg?branch=master)](https://travis-ci.org/lessthanoptimal/BoofCV)
 [![Join the chat at https://gitter.im/lessthanoptimal/BoofCV](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/lessthanoptimal/BoofCV?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Maven Central](https://img.shields.io/maven-central/v/org.boofcv/core.svg)](https://maven-badges.herokuapp.com/maven-central/org.boofcv/core)
+[![Maven Central](https://img.shields.io/maven-central/v/org.boofcv/boofcv-core.svg)](https://maven-badges.herokuapp.com/maven-central/org.boofcv/boofcv-core)
 
 ------------------------------------------------------
 # Table of Contents
@@ -67,13 +67,14 @@ For Maven projects:
 There are also several integration modules which help BoofCV interact with external projects.  A list of those is included below:
 
 |     Name             |                 Description
+|----------------------|-------------------------------------------------------------------------------------
 | boofcv-all           | Absolutely everything
 | boofcv-android       | Useful functions for working inside of Android devices.
 | boofcv-javacv        | [JavaCV](https://github.com/bytedeco/javacv) is a wrapper around OpenCV mainly for file IO.
 | boofcv-ffmpeg        | [javacpp-presets](https://github.com/bytedeco/javacpp-presets) their ffmepg wrapper is used for reading video files.
 | boofcv-jcodec        | [JCodec](http://jcodec.org/) is a pure Java video reader/writer.
 | boofcv-openkinect    | Used the [Kinect](http://openkinect.org) RGB-D sensor with BoofCV.
-| boofcv-swing  
+| boofcv-swing         | Visualization using Java Swing
 | boofcv-WebcamCapture | A few functions that make [WebcamCapture](http://webcam-capture.sarxos.pl/) even easier to use.
 
 ## Directories
