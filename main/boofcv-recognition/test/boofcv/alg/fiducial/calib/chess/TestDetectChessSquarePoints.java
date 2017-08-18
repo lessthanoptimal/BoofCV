@@ -24,7 +24,7 @@ import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.fiducial.calib.squares.TestSquareRegularClustersIntoGrids;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.PixelMath;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.GrayU8;
@@ -108,7 +108,7 @@ public class TestDetectChessSquarePoints {
 //			Thread.sleep(2000);
 //		} catch (InterruptedException ignore) {}
 
-		BinaryPolygonDetector<GrayU8> detectorSquare = FactoryShapeDetector.
+		DetectPolygonBinaryGrayRefine<GrayU8> detectorSquare = FactoryShapeDetector.
 				polygon(new ConfigPolygonDetector(4,4),GrayU8.class);
 		DetectChessSquarePoints<GrayU8> alg =
 				new DetectChessSquarePoints<>(rows, cols,2, detectorSquare);
@@ -185,7 +185,7 @@ public class TestDetectChessSquarePoints {
 //			Thread.sleep(2000);
 //		} catch (InterruptedException ignore) {}
 
-		BinaryPolygonDetector<GrayU8> detectorSquare = FactoryShapeDetector.
+		DetectPolygonBinaryGrayRefine<GrayU8> detectorSquare = FactoryShapeDetector.
 				polygon(new ConfigPolygonDetector(4,4),GrayU8.class);
 		DetectChessSquarePoints<GrayU8> alg =
 				new DetectChessSquarePoints<>(gridWidth,gridHeight,2, detectorSquare);

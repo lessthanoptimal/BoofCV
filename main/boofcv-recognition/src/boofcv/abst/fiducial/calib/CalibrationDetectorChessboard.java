@@ -22,8 +22,7 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
-import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.GrayF32;
@@ -46,22 +45,14 @@ public class CalibrationDetectorChessboard implements DetectorFiducialCalibratio
 
 	public CalibrationDetectorChessboard(ConfigChessboard config) {
 
-		RefineBinaryPolygon<GrayF32> refineLine =
-				FactoryShapeDetector.refinePolygon(config.configRefineLines,GrayF32.class);
-		RefineBinaryPolygon<GrayF32> refineCorner = config.refineWithCorners ?
-				FactoryShapeDetector.refinePolygon(config.configRefineLines,GrayF32.class) : null;
-
-		config.square.refine = null;
-
-		BinaryPolygonDetector<GrayF32> detectorSquare =
+		DetectPolygonBinaryGrayRefine<GrayF32> detectorSquare =
 				FactoryShapeDetector.polygon(config.square,GrayF32.class);
 
 		InputToBinary<GrayF32> inputToBinary =
 				FactoryThresholdBinary.threshold(config.thresholding,GrayF32.class);
 
 		alg = new DetectChessboardFiducial<>(
-				config.numRows, config.numCols, config.maximumCornerDistance,detectorSquare,
-				refineLine,refineCorner,inputToBinary);
+				config.numRows, config.numCols, config.maximumCornerDistance,detectorSquare,inputToBinary);
 
 		layoutPoints = gridChess(config.numRows, config.numCols, config.squareWidth);
 	}

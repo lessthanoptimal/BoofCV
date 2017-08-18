@@ -23,7 +23,8 @@ import boofcv.abst.geo.RefineEpipolar;
 import boofcv.alg.distort.*;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
+import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.distort.FactoryDistort;
@@ -76,7 +77,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	// converts input image into a binary image
 	InputToBinary<T> inputToBinary;
 	// Detects the squares
-	private BinaryPolygonDetector<T> squareDetector;
+	private DetectPolygonBinaryGrayRefine<T> squareDetector;
 
 	// image with lens and perspective distortion removed from it
 	GrayF32 square;
@@ -122,7 +123,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	 * @param inputType Type of input image it's processing
 	 */
 	protected BaseDetectFiducialSquare(InputToBinary<T> inputToBinary,
-									   BinaryPolygonDetector<T> squareDetector,
+									   DetectPolygonBinaryGrayRefine<T> squareDetector,
 									   double borderWidthFraction ,
 									   double minimumBorderBlackFraction ,
 									   int squarePixels,
@@ -192,6 +193,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 
 	private Polygon2D_F64 interpolationHack = new Polygon2D_F64(4);
 	private Quadrilateral_F64 q = new Quadrilateral_F64(); // interpolation hack in quadrilateral format
+
+	List<Polygon2D_F64> candidates = new ArrayList<>();
 	/**
 	 * Examines the input image to detect fiducials inside of it
 	 *
@@ -202,14 +205,15 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 
 		inputToBinary.process(gray,binary);
 		squareDetector.process(gray,binary);
+		squareDetector.refineAll();
 		// These are in undistorted pixels
-		FastQueue<Polygon2D_F64> candidates = squareDetector.getFoundPolygons();
+		squareDetector.getPolygons(candidates);
 
 		found.reset();
 
-		if( verbose ) System.out.println("---------- Got Polygons! "+candidates.size);
+		if( verbose ) System.out.println("---------- Got Polygons! "+candidates.size());
 
-		for (int i = 0; i < candidates.size; i++) {
+		for (int i = 0; i < candidates.size(); i++) {
 			// compute the homography from the input image to an undistorted square image
 			Polygon2D_F64 p = candidates.get(i);
 
@@ -260,7 +264,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			// remove the perspective distortion and process it
 			removePerspective.apply(gray, square);
 
-			BinaryPolygonDetector.Info info = squareDetector.getPolygonInfo().get(i);
+			DetectPolygonFromContour.Info info = squareDetector.getPolygonInfo().get(i);
 
 			// see if the black border is actually black
 			if( minimumBorderBlackFraction > 0 ) {
@@ -386,7 +390,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 		this.verbose = verbose;
 	}
 
-	public BinaryPolygonDetector getSquareDetector() {
+	public DetectPolygonBinaryGrayRefine<T> getSquareDetector() {
 		return squareDetector;
 	}
 

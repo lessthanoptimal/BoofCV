@@ -26,10 +26,10 @@ import georegression.struct.ConvertFloatType;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
+import georegression.struct.shapes.Rectangle2D_I32;
 import georegression.transform.ConvertTransform_F64;
 import org.junit.Test;
 
@@ -41,7 +41,7 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public class TestRefinePolygonLineToImage extends BaseFitPolygon {
+public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 
 	/**
 	 * Give it a shape which is too small and see if it fails
@@ -51,15 +51,16 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 		final boolean black = true;
 
 		Polygon2D_F64 input = new Polygon2D_F64(5,5, 5,6, 6,6, 6,5);
+		rectangles.add(new Rectangle2D_I32(x0,y0,x1,y1));
 
 		for (Class imageType : imageTypes) {
-			setup(new Affine2D_F64(), black, imageType);
+			renderDistortedRectangles(black,imageType);
 
-			RefinePolygonLineToImage alg = createAlg(input.size(),imageType);
+			RefinePolygonToGrayLine alg = createAlg(input.size(),imageType);
 
 			Polygon2D_F64 output = new Polygon2D_F64(input.size());
 			alg.setImage(image);
-			assertFalse(alg.refine(input,null,null, output));
+			assertFalse(alg.refine(input, output));
 		}
 	}
 
@@ -70,22 +71,23 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 	public void fit_subimage() {
 		final boolean black = true;
 
+		rectangles.add(new Rectangle2D_I32(x0,y0,x1,y1));
 		Polygon2D_F64 input = new Polygon2D_F64(x0,y0 , x0,y1, x1,y1, x1,y0);
 
 		for (Class imageType : imageTypes) {
-			setup(new Affine2D_F64(), black, imageType);
+			renderDistortedRectangles(black,imageType);
 
-			RefinePolygonLineToImage alg = createAlg(input.size(),imageType);
+			RefinePolygonToGrayLine alg = createAlg(input.size(),imageType);
 
 			Polygon2D_F64 output = new Polygon2D_F64(4);
 			alg.setImage(image);
-			assertTrue(alg.refine(input,null,null, output));
+			assertTrue(alg.refine(input,output));
 
 			// do it again with a sub-image
 			Polygon2D_F64 output2 = new Polygon2D_F64(4);
 			image = BoofTesting.createSubImageOf_S(image);
 			alg.setImage(image);
-			assertTrue(alg.refine(input,null,null, output2));
+			assertTrue(alg.refine(input,output2));
 
 			assertTrue(UtilPolygons2D_F64.isIdentical(output, output2, 1e-8));
 		}
@@ -97,15 +99,16 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 	 */
 	@Test
 	public void alignedSquare() {
+		rectangles.add(new Rectangle2D_I32(x0,y0,x1,y1));
 		Polygon2D_F64 original = new Polygon2D_F64(x0,y0 , x0,y1, x1,y1, x1,y0);
 
 		for (Class imageType : imageTypes) {
 			for (int i = 0; i < 2; i++) {
 				boolean black = i == 0;
 
-				setup(new Affine2D_F64(), black, imageType);
+				renderDistortedRectangles(black,imageType);
 
-				RefinePolygonLineToImage alg = createAlg(original.size(),imageType);
+				RefinePolygonToGrayLine alg = createAlg(original.size(),imageType);
 
 				for (int j = 0; j < 20; j++) {
 					Polygon2D_F64 input = original.copy();
@@ -113,7 +116,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 
 					Polygon2D_F64 output = new Polygon2D_F64(original.size());
 					alg.setImage(image);
-					assertTrue(alg.refine(input,null,null, output));
+					assertTrue(alg.refine(input,output));
 
 					assertTrue(original.isIdentical(output, 0.01));
 				}
@@ -126,12 +129,15 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 	 */
 	@Test
 	public void fitWithEdgeOnBorder() {
-		for (Class imageType : imageTypes) {
-			x0 = 0; x1 = 100;
-			y0 = 100; y1 = 200;
-			setup(null, true, imageType);
+		x0 = 0; x1 = 100;
+		y0 = 100; y1 = 200;
+		rectangles.add(new Rectangle2D_I32(x0,y0,x1,y1));
 
-			RefinePolygonLineToImage alg = createAlg(4,imageType);
+		for (Class imageType : imageTypes) {
+
+			renderDistortedRectangles(true,imageType);
+
+			RefinePolygonToGrayLine alg = createAlg(4,imageType);
 
 			Polygon2D_F64 input = createFromSquare(null);
 
@@ -141,7 +147,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 			Polygon2D_F64 found = new Polygon2D_F64(4);
 
 			alg.setImage(image);
-			assertTrue(alg.refine(input,null,null,found));
+			assertTrue(alg.refine(input,found));
 
 			Polygon2D_F64 expected = createFromSquare(null);
 			assertTrue(expected.isIdentical(found, 0.01));
@@ -159,6 +165,8 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 		affines[1] = new Affine2D_F64(1.3,0.05,-0.15,0.87,0.1,0.6);
 		ConvertTransform_F64.convert(new Se2_F64(0,0,0.2),affines[0]);
 
+		rectangles.add(new Rectangle2D_I32(x0,y0,x1,y1));
+
 		for (Class imageType : imageTypes) {
 			for (Affine2D_F64 a : affines) {
 //				System.out.println(imageType+"  "+a);
@@ -169,9 +177,10 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 	}
 
 	public void fit_perfect_affine(boolean black, Affine2D_F64 affine, Class imageType) {
-		setup(affine, black, imageType);
+		this.transform.set(affine);
+		renderDistortedRectangles(black, imageType);
 
-		RefinePolygonLineToImage alg = createAlg(4,imageType);
+		RefinePolygonToGrayLine alg = createAlg(4,imageType);
 
 		Polygon2D_F64 input = createFromSquare(affine);
 
@@ -179,7 +188,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 		Polygon2D_F64 found = new Polygon2D_F64(4);
 
 		alg.setImage(image);
-		assertTrue(alg.refine(input,null,null, found));
+		assertTrue(alg.refine(input,found));
 
 		// input shouldn't be modified
 		assertTrue(expected.isIdentical(input,0));
@@ -189,7 +198,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 		// do it again with a sub-image to see if it handles that
 		image = BoofTesting.createSubImageOf_S(image);
 		alg.setImage(image);
-		assertTrue(alg.refine(input,null,null, found));
+		assertTrue(alg.refine(input,found));
 		assertTrue(expected.isIdentical(input,0));
 		assertTrue(expected.isIdentical(found,0.27));
 	}
@@ -202,6 +211,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 		// distorted and undistorted views
 		Affine2D_F64 affines[] = new Affine2D_F64[1];
 		affines[0] = new Affine2D_F64(0.8,0,0,0.8,0,0);
+		rectangles.add(new Rectangle2D_I32(x0,y0,x1,y1));
 
 		for (Class imageType : imageTypes) {
 			for (Affine2D_F64 a : affines) {
@@ -213,10 +223,10 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 	}
 
 	public void fit_perfect_transform(boolean black, Affine2D_F64 regToDist, Class imageType) {
+		this.transform.set(regToDist);
+		renderDistortedRectangles(black, imageType);
 
-		setup(regToDist, black, imageType);
-
-		RefinePolygonLineToImage alg = createAlg(4,imageType);
+		RefinePolygonToGrayLine alg = createAlg(4,imageType);
 
 		Polygon2D_F64 input = createFromSquare(null);
 
@@ -225,7 +235,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 
 		alg.setImage(image);
 		// fail without the transform
-		assertFalse(alg.refine(input,null,null, found));
+		assertFalse(alg.refine(input,found));
 
 		// work when the transform is applied
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32();
@@ -234,7 +244,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 		transform.set(regToDist_F32);
 		alg.setTransform(transform);
 		alg.setImage(image);
-		assertTrue(alg.refine(input,null,null, found));
+		assertTrue(alg.refine(input,found));
 
 		// should be close to the expected
 		assertTrue(expected.isIdentical(found,0.3));
@@ -250,6 +260,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 		affines[0] = new Affine2D_F64();
 		affines[1] = new Affine2D_F64(1.3,0.05,-0.15,0.87,0.1,0.6);
 		ConvertTransform_F64.convert(new Se2_F64(0,0,0.2),affines[0]);
+		rectangles.add(new Rectangle2D_I32(x0,y0,x1,y1));
 
 		for (Class imageType : imageTypes) {
 			for (Affine2D_F64 a : affines) {
@@ -261,9 +272,10 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 	}
 
 	public void fit_noisy_affine(boolean black, Affine2D_F64 affine, Class imageType) {
-		setup(affine, black, imageType);
+		this.transform.set(affine);
+		renderDistortedRectangles(black, imageType);
 
-		RefinePolygonLineToImage alg = createAlg(4,imageType);
+		RefinePolygonToGrayLine alg = createAlg(4,imageType);
 
 		Polygon2D_F64 input = createFromSquare(affine);
 
@@ -276,7 +288,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 			addNoise(input, 2);
 
 			alg.setImage(image);
-			assertTrue(alg.refine(input,null,null, found));
+			assertTrue(alg.refine(input,found));
 
 			// should be close to the expected
 			double before = computeMaxDistance(input,expected);
@@ -287,7 +299,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 
 			//----- Reverse the order and it should still work
 			input.flip();
-			assertTrue(alg.refine(input,null,null, found));
+			assertTrue(alg.refine(input,found));
 			found.flip();
 			after = computeMaxDistance(found, expected);
 
@@ -296,16 +308,8 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 		}
 	}
 
-	private void addNoise(Polygon2D_F64 input, double spread) {
-		for (int i = 0; i < input.size(); i++) {
-			Point2D_F64 v = input.get(i);
-			v.x += rand.nextDouble()*spread - spread/2.0;
-			v.y += rand.nextDouble()*spread - spread/2.0;
-		}
-	}
-
-	private RefinePolygonLineToImage createAlg( int numSides ,  Class imageType) {
-		return new RefinePolygonLineToImage(numSides,imageType);
+	private RefinePolygonToGrayLine createAlg(int numSides , Class imageType) {
+		return new RefinePolygonToGrayLine(numSides,imageType);
 	}
 
 	/**
@@ -313,6 +317,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 	 */
 	@Test
 	public void optimize_line_perfect() {
+		rectangles.add(new Rectangle2D_I32(x0,y0,x1,y1));
 		for (Class imageType : imageTypes) {
 			optimize_line_perfect(true, imageType);
 			optimize_line_perfect(false, imageType);
@@ -320,9 +325,9 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 	}
 
 	public void optimize_line_perfect(boolean black, Class imageType) {
-		setup(null, black, imageType);
+		renderDistortedRectangles(black, imageType);
 
-		RefinePolygonLineToImage alg = createAlg(4,imageType);
+		RefinePolygonToGrayLine alg = createAlg(4,imageType);
 
 		Quadrilateral_F64 input = new Quadrilateral_F64(x0,y0,x0,y1,x1,y1,x1,y0);
 		LineGeneral2D_F64 found = new LineGeneral2D_F64();

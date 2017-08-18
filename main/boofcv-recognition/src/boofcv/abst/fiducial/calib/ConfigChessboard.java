@@ -22,7 +22,6 @@ import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ConfigThresholdBlockMinMax;
 import boofcv.factory.shape.ConfigPolygonDetector;
-import boofcv.factory.shape.ConfigRefinePolygonCornersToImage;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.struct.Configuration;
 
@@ -62,19 +61,9 @@ public class ConfigChessboard implements Configuration {
 	public ConfigPolygonDetector square = new ConfigPolygonDetector(true, 3,8);
 
 	/**
-	 * If true then it only refines the corner region.  Otherwise it will refine the entire line.
-	 */
-	public boolean refineWithCorners = false;
-
-	/**
 	 * Configuration for refining with lines.  Ignored if not used.
 	 */
 	public ConfigRefinePolygonLineToImage configRefineLines = new ConfigRefinePolygonLineToImage();
-
-	/**
-	 * Configuration for refining with corners.  Ignored if not used.
-	 */
-	public ConfigRefinePolygonCornersToImage configRefineCorners = new ConfigRefinePolygonCornersToImage();
 
 	/**
 	 * Physical width of each square on the calibration target
@@ -85,16 +74,10 @@ public class ConfigChessboard implements Configuration {
 		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
 		thresholding.scale = 0.9;
 
-		square.contour2Poly_splitFraction = 0.1;
-		square.contour2Poly_minimumSideFraction = 0.025; // teh erosion step appears to require a smaller value here
-		square.minContourImageWidthFraction = 0.0005;
-		square.canTouchBorder = true;
-
-		// good value for squares.  Set it here to make it not coupled to default values
-		configRefineCorners.cornerOffset = 1;
-		configRefineCorners.lineSamples = 15;
-		configRefineCorners.convergeTolPixels = 0.2;
-		configRefineCorners.maxIterations = 5;
+		square.detector.contour2Poly_splitFraction = 0.1;
+		square.detector.contour2Poly_minimumSideFraction = 0.025; // teh erosion step appears to require a smaller value here
+		square.detector.minContourImageWidthFraction = 0.0005;
+		square.detector.canTouchBorder = true;
 
 		// defaults for if the user toggles it to lines
 		configRefineLines.cornerOffset = 1;

@@ -21,7 +21,6 @@ package boofcv.factory.fiducial;
 import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
-import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.struct.Configuration;
 
 /**
@@ -65,13 +64,10 @@ public class ConfigFiducialBinary implements Configuration {
 	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4,4);
 
 	{
-		squareDetector.contour2Poly_splitFraction = 0.1;
-		squareDetector.contour2Poly_minimumSideFraction = 0.05;
+		squareDetector.detector.contour2Poly_splitFraction = 0.1;
+		squareDetector.detector.contour2Poly_minimumSideFraction = 0.05;
 
-		ConfigRefinePolygonLineToImage refineLine = new ConfigRefinePolygonLineToImage();
-		refineLine.cornerOffset = 0;
-
-		squareDetector.refine = refineLine;
+		squareDetector.refine.cornerOffset = 0;
 	}
 
 	public ConfigFiducialBinary() {

@@ -21,7 +21,6 @@ package boofcv.alg.shapes.polygon;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
-import boofcv.alg.shapes.edge.EdgeIntensityPolygon;
 import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
 import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
@@ -31,6 +30,7 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
+import georegression.geometry.UtilPolygons2D_I32;
 import georegression.metric.Area2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -43,10 +43,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * TODO Update documentation
  * <p>
  * Detects convex polygons with the specified number of sides in an image.  Shapes are assumed to be black shapes
  * against a white background, allowing for thresholding to be used.  Subpixel refinement is done using the
- * provided implementation of {@link RefineBinaryPolygon}.
+ * provided implementation of {@link RefinePolygonToGray}.
  * </p>
  *
  * Processing Steps:
@@ -70,7 +71,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BinaryPolygonDetector<T extends ImageGray<T>> {
+public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 	// minimum size of a shape's contour as a fraction of the image width
 	private double minContourFraction;
@@ -87,22 +88,17 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 	private SplitMergeLineFitLoop fitPolygon;
 
 	// removes extra corners
-	GrowQueue_I32 pruned = new GrowQueue_I32();
-	MinimizeEnergyPrune pruner;
+	private GrowQueue_I32 pruned = new GrowQueue_I32(); // corners after pruning
+	private MinimizeEnergyPrune pruner;
+
+	// Used to prune false positives
+	private ContourEdgeIntensity<T> contourEdgeIntensity;
 
 	// Improve the selection of corner pixels in the contour
 	private RefinePolyLineCorner improveContour = new RefinePolyLineCorner(true,20);
 
-	// Refines the estimate of the polygon's lines using a subpixel technique
-	private RefineBinaryPolygon<T> refinePolygon;
-
-	// List of all squares that it finds
-	private FastQueue<Polygon2D_F64> found = new FastQueue<>(Polygon2D_F64.class, true);
 	// extera information for found shapes
 	private FastQueue<Info> foundInfo = new FastQueue<>(Info.class, true);
-
-	// type of input image
-	private Class<T> inputType;
 
 	// number of lines allowed in the polygon
 	private int minSides,maxSides;
@@ -111,32 +107,28 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 	private boolean canTouchBorder;
 
 	// work space for initial polygon
-	private Polygon2D_F64 workPoly = new Polygon2D_F64();
+	private Polygon2D_F64 polygonWork = new Polygon2D_F64(); // undistorted pixel coordinate
+	private Polygon2D_F64 polygonDistorted = new Polygon2D_F64(); // distorted pixel coordinates;
 
 	// should the order of the polygon be on clockwise order on output?
 	private boolean outputClockwise;
 
-	// storage for the contours associated with a found target.  used for debugging
-	// All contours are in distorted pixel coordiantes
-	private List<Contour> foundContours = new ArrayList<>();
-
 	// transforms which can be used to handle lens distortion
 	protected PixelTransform2_F32 distToUndist, undistToDist;
 
-	boolean verbose = false;
+	private boolean verbose = false;
 
-	// used to remove false positives
-	EdgeIntensityPolygon<T> edgeIntensity;
-	double edgeThreshold;
-	// should it check the edge score before?  With a chessboard pattern the initial guess is known to be very poor
-	// so it should only check the edge after.  Otherwise its good to filter before optimization.
-	boolean checkEdgeBefore = true;
+	// How intense the edge along a contour needs to be for it to be processed
+	double contourEdgeThreshold;
 
 	// helper used to customize low level behaviors internally
 	private PolygonHelper helper;
 
-	// storage for contour in undistorted image pixels
-	private FastQueue<Point2D_I32> contourUndist = new FastQueue<>(Point2D_I32.class, true);
+	// storage space for contour in undistorted pixels
+	private FastQueue<Point2D_I32> undistorted = new FastQueue<>(Point2D_I32.class,true);
+
+	// type of input gray scale image it can process
+	private Class<T> inputType;
 
 	/**
 	 * Configures the detector.
@@ -144,39 +136,39 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 	 * @param minSides minimum number of sides
 	 * @param maxSides maximum number of sides
 	 * @param contourToPolygon Fits a crude polygon to the shape's binary contour
-	 * @param refinePolygon (Optional) Refines the polygon's lines.  Set to null to skip step
 	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
 	 * @param convex If true it will only return convex shapes
 	 * @param touchBorder if true then shapes which touch the image border are allowed
 	 * @param splitPenalty Penalty given to a line segment while splitting.  See {@link MinimizeEnergyPrune}
-	 * @param edgeThreshold Polygons with an edge intensity less than this are discarded.
+	 * @param contourEdgeThreshold Polygons with an edge intensity less than this are discarded.
 	 * @param inputType Type of input image it's processing
 	 */
-	public BinaryPolygonDetector(int minSides, int maxSides,
-								 SplitMergeLineFitLoop contourToPolygon,
-								 RefineBinaryPolygon<T> refinePolygon,
-								 double minContourFraction,
-								 boolean outputClockwise,
-								 boolean convex,
-								 boolean touchBorder, double splitPenalty,
-								 double edgeThreshold,
-								 Class<T> inputType) {
+	public DetectPolygonFromContour(int minSides, int maxSides,
+									SplitMergeLineFitLoop contourToPolygon,
+									double minContourFraction,
+									boolean outputClockwise,
+									boolean convex,
+									boolean touchBorder, double splitPenalty,
+									double contourEdgeThreshold,
+									Class<T> inputType) {
 
 		setNumberOfSides(minSides,maxSides);
-		this.refinePolygon = refinePolygon;
-		this.edgeIntensity = new EdgeIntensityPolygon<>(1, 1.5, 15, inputType);
-		this.inputType = inputType;
 		this.minContourFraction = minContourFraction;
 		this.fitPolygon = contourToPolygon;
 		this.outputClockwise = outputClockwise;
 		this.convex = convex;
 		this.canTouchBorder = touchBorder;
-		this.edgeThreshold = edgeThreshold;
+		this.contourEdgeThreshold = contourEdgeThreshold;
+		this.inputType = inputType;
+
+		if( contourEdgeThreshold > 0 ) {
+			this.contourEdgeIntensity = new ContourEdgeIntensity<>(30, 1, 2.5, inputType);
+		}
 
 		pruner = new MinimizeEnergyPrune(splitPenalty);
 
-		workPoly = new Polygon2D_F64(1);
+		polygonWork = new Polygon2D_F64(1);
 	}
 
 	/**
@@ -193,12 +185,6 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 
 		this.distToUndist = distToUndist;
 		this.undistToDist = undistToDist;
-
-		if( refinePolygon != null ) {
-			refinePolygon.setLensDistortion(width, height, distToUndist, undistToDist);
-		}
-
-		edgeIntensity.setTransform(undistToDist);
 	}
 
 	/**
@@ -207,11 +193,6 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 	public void clearLensDistortion() {
 		this.distToUndist = null;
 		this.undistToDist = null;
-		if( refinePolygon != null ) {
-			refinePolygon.clearLensDistortion();
-		}
-
-		edgeIntensity.setTransform(null);
 	}
 
 	/**
@@ -220,20 +201,28 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 	 * @param gray Input image
 	 */
 	public void process(T gray, GrayU8 binary) {
-		if( verbose ) System.out.println("ENTER  BinaryPolygonDetector.process()");
+		if( verbose ) System.out.println("ENTER  DetectPolygonFromContour.process()");
 		InputSanityCheck.checkSameShape(binary, gray);
 
 		if( labeled.width != gray.width || labeled.height == gray.width )
 			configure(gray.width,gray.height);
 
-		found.reset();
-		foundContours.clear();
+		// reset storage for output. Call reset individually here to ensure that all references
+		// are nulled from last time
+		for (int i = 0; i < foundInfo.size; i++) {
+			foundInfo.get(i).reset();
+		}
 		foundInfo.reset();
 
-		edgeIntensity.setImage(gray);
+		if( contourEdgeIntensity != null )
+			contourEdgeIntensity.setImage(gray);
 
-		findCandidateShapes(gray, binary);
-		if( verbose ) System.out.println("EXIT  BinaryPolygonDetector.process()");
+		// find all the contours
+		contourFinder.process(binary, labeled);
+
+		// Using the contours find the polygons
+		findCandidateShapes();
+		if( verbose ) System.out.println("EXIT  DetectPolygonFromContour.process()");
 	}
 
 	/**
@@ -259,15 +248,11 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 	 * Finds blobs in the binary image.  Then looks for blobs that meet size and shape requirements.  See code
 	 * below for the requirements.  Those that remain are considered to be target candidates.
 	 */
-	private void findCandidateShapes( T gray , GrayU8 binary ) {
-
-		int maxSidesConsider = (int)Math.ceil(maxSides*1.5);
+	private void findCandidateShapes() {
 
 		// stop fitting the polygon if it clearly has way too many sides
+		int maxSidesConsider = (int)Math.ceil(maxSides*1.5);
 		fitPolygon.setAbortSplits(2*maxSides);
-
-		// find binary blobs
-		contourFinder.process(binary, labeled);
 
 		// find blobs where all 4 edges are lines
 		FastQueue<Contour> blobs = contourFinder.getContours();
@@ -275,6 +260,8 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 			Contour c = blobs.get(i);
 
 			if( c.external.size() >= minimumContour) {
+				float edgeInside=-1,edgeOutside=-1;
+
 //				System.out.println("----- candidate "+c.external.size());
 
 				// ignore shapes which touch the image border
@@ -288,37 +275,76 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 					if( !helper.filterContour(c.external,touchesBorder,true) )
 						continue;
 
-				// remove lens distortion
-				List<Point2D_I32> contourUndist;
-				if( distToUndist != null ) {
-					removeDistortionFromContour(c.external,this.contourUndist);
-					contourUndist = this.contourUndist.toList();
-					if( helper != null )
-						if( !helper.filterContour(contourUndist,touchesBorder,false) )
-							continue;
-				} else {
-					contourUndist = c.external;
+				// filter out contours which are noise
+				if( contourEdgeIntensity != null ) {
+					contourEdgeIntensity.process(c.external,true);
+					edgeInside = contourEdgeIntensity.getInsideAverage();
+					edgeOutside = contourEdgeIntensity.getOutsideAverage();
+
+					// take the ABS because CCW/CW isn't known yet
+					if( Math.abs(edgeOutside-edgeInside) < contourEdgeThreshold ) {
+						if( verbose ) System.out.println("rejected polygon. contour edge intensity");
+						continue;
+					}
 				}
 
-				if( !fitPolygon.process(contourUndist) ) {
+				// remove lens distortion
+				List<Point2D_I32> undistorted;
+				if( distToUndist != null ) {
+					undistorted = this.undistorted.toList();
+					removeDistortionFromContour(c.external,this.undistorted);
+					if( helper != null )
+						if( !helper.filterContour(this.undistorted.toList(),touchesBorder,false) )
+							continue;
+				} else {
+					undistorted = c.external;
+				}
+
+				// Find the initial approximate fit of a polygon to the contour
+				if( !fitPolygon.process(undistorted) ) {
 					if( verbose ) System.out.println("rejected polygon initial fit failed. contour size = "+c.external.size());
 					continue;
 				}
-
 				GrowQueue_I32 splits = fitPolygon.getSplits();
+
+				// determine the polygon's orientation
+				List<Point2D_I32> polygonPixel = new ArrayList<>();
+				for (int j = 0; j < splits.size; j++) {
+					polygonPixel.add(undistorted.get(splits.get(j)));
+				}
+
+				boolean isCCW = UtilPolygons2D_I32.isCCW(polygonPixel);
+
+				// Now that the orientation is known it can check to see if it's actually trying to fit to a
+				// white blob instead of a black blob
+				if( contourEdgeIntensity != null ) {
+					// before it assumed it was CCW
+					if( !isCCW ) {
+						float tmp = edgeInside;
+						edgeInside = edgeOutside;
+						edgeOutside = tmp;
+					}
+
+					if( edgeInside > edgeOutside ) {
+						if( verbose ) System.out.println("White blob. Rejected");
+						continue;
+					}
+				}
+
+
 				if( splits.size() > maxSidesConsider ) {
 					if( verbose ) System.out.println("Way too many corners, "+splits.size()+". Aborting before improve. Contour size "+c.external.size());
 					continue;
 				}
 
 				// Perform a local search and improve the corner placements
-				if( !improveContour.fit(contourUndist,splits) ) {
+				if( !improveContour.fit(undistorted,splits) ) {
 					if( verbose ) System.out.println("rejected improve contour. contour size = "+c.external.size());
 					continue;
 				}
 
 				// reduce the number of corners based on an energy model
-				pruner.prune(c.external, splits, pruned);
+				pruner.prune(undistorted, splits, pruned);
 				splits = pruned;
 
 				// only accept polygons with the expected number of sides
@@ -328,88 +354,80 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 					continue;
 				}
 
+				// see if it should be flipped so that the polygon has the correct orientation
+				if( outputClockwise == isCCW ) {
+					flip(splits.data,splits.size);
+				}
+
+				// convert the format of the initial crude polygon
+				polygonWork.vertexes.resize(splits.size());
+				polygonDistorted.vertexes.resize(splits.size());
+				for (int j = 0; j < splits.size(); j++) {
+					Point2D_I32 p = undistorted.get( splits.get(j) );
+					Point2D_I32 q = c.external.get( splits.get(j));
+					polygonWork.get(j).set(p.x,p.y);
+					polygonDistorted.get(j).set(q.x,q.y);
+				}
+
 				if( helper != null ) {
-					if( !helper.filterPixelPolygon(contourUndist,c.external,splits,touchesBorder) ) {
+					if( !helper.filterPixelPolygon(polygonWork,polygonDistorted,touchesBorder) ) {
 						if( verbose ) System.out.println("rejected by helper.filterPixelPolygon()");
 						continue;
 					}
 				}
 
-				// convert the format of the initial crude polygon
-				workPoly.vertexes.resize(splits.size());
-				for (int j = 0; j < splits.size(); j++) {
-					Point2D_I32 p = contourUndist.get( splits.get(j));
-					workPoly.get(j).set(p.x,p.y);
-				}
-
-				if( helper != null ) {
-					helper.adjustBeforeOptimize(workPoly);
-				}
-
 				// Filter out polygons which are not convex if requested by the user
-				if( convex && !UtilPolygons2D_F64.isConvex(workPoly)) {
+				if( convex && !UtilPolygons2D_F64.isConvex(polygonWork)) {
 					if( verbose ) System.out.println("Rejected not convex");
 					continue;
 				}
 
 				// make sure it's big enough
-				double area = Area2D_F64.polygonSimple(workPoly);
+				double area = Area2D_F64.polygonSimple(polygonWork);
 
 				if( area < minimumArea ) {
 					if( verbose ) System.out.println("Rejected area");
 					continue;
 				}
 
-				// Test the edge quality and prune before performing an expensive optimization
-				if( checkEdgeBefore && !checkPolygonEdge(workPoly,workPoly.isCCW())) {
-//					if( verbose ) System.out.println("Rejected edge score before");
-					continue;
-				}
+				// Get the storage for a new polygon. This is recycled and has already been cleaned up
+				Info info = foundInfo.grow();
 
-				Polygon2D_F64 refined = found.grow();
-				refined.vertexes.resize(splits.size);
-
-				boolean success;
-				if( refinePolygon != null ) {
-					refinePolygon.setImage(gray);
-					success = refinePolygon.refine(workPoly,contourUndist,splits,refined);
-					if( verbose && !success ) System.out.println("Rejected after refinePolygon");
-				} else {
-					refined.set(workPoly);
-					success = true;
-				}
-
-				boolean refinedCCW = refined.isCCW();
-
-				// test it again with the full threshold
-				if( !checkPolygonEdge(refined,refinedCCW)) {
-					if( verbose ) System.out.println("Rejected edge score, after");
-					success = false;
-				}
-
-				// refine the polygon and add it to the found list
-				if( success ) {
-					if( outputClockwise == refinedCCW )
-						refined.flip();
-
-//					System.out.println("SUCCESS!!!\n");
-					c.id = found.size();
-					foundContours.add(c);
-
-					Info info = foundInfo.grow();
-					info.external = true;
-					info.borderCorners.reset();
-
-					if( touchesBorder ) {
-						// tolerance is a little bit above 0.5.pixels due to prior rounding to integer
-						determineCornersOnBorder(refined, info.borderCorners, 0.7f);
+				// save the undistorted coordinate into external
+				if( c.external != undistorted ) {
+					for (int j = 0; j < c.external.size(); j++) {
+						c.external.get(j).set(undistorted.get(j));
 					}
-					info.edgeInside = edgeIntensity.getAverageInside();
-					info.edgeOutside = edgeIntensity.getAverageOutside();
-				} else {
-					found.removeTail();
+				}
+
+				// save results
+				info.splits.setTo(splits);
+				info.contourTouchesBorder = touchesBorder;
+				info.external = true;
+				info.edgeInside = edgeInside;
+				info.edgeOutside = edgeOutside;
+				info.label = c.id;
+				info.contour = c.external;
+				info.polygon.set(polygonWork);
+				info.polygonDistorted.set(polygonDistorted);
+
+				if( touchesBorder ) {
+					// tolerance is a little bit above 0.5.pixels due to prior rounding to integer
+					determineCornersOnBorder(info.polygonDistorted, info.borderCorners, 0.7f);
 				}
 			}
+		}
+	}
+
+	// TODO move into ddogleg?
+	public static void flip( int []a , int N ) {
+		int H = N/2;
+
+		for (int i = 1; i <= H; i++) {
+			int j = N-i;
+			int tmp = a[i];
+			a[i] = a[j];
+			a[j] = tmp;
 		}
 	}
 
@@ -447,27 +465,6 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Checks to see if the edge is intense enough or if it should be discarded as noise
-	 * @return true if the edge is strong enough
-	 */
-	private boolean checkPolygonEdge( Polygon2D_F64 polygon , boolean ccw ) {
-		if(!edgeIntensity.computeEdge(polygon,ccw)) {
-			if( verbose ) System.out.println("Can't compute polygon edge intensity");
-			return false;
-		}
-
-		if(!edgeIntensity.checkIntensity(true,edgeThreshold)) {
-			if( verbose ) {
-				double inside = edgeIntensity.getAverageInside();
-				double outside = edgeIntensity.getAverageOutside();
-				System.out.println("Rejected edge score inside: " + inside+" "+outside);
-			}
-			return false;
-		}
-		return true;
-	}
-
-	/**
 	 * True if the number of sides found matches what it is looking for
 	 */
 	private boolean expectedNumberOfSides(GrowQueue_I32 splits) {
@@ -477,22 +474,21 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 	/**
 	 * Removes lens distortion from the found contour
 	 */
-	private void removeDistortionFromContour(List<Point2D_I32> distorted, FastQueue<Point2D_I32> undistorted ) {
+	private void removeDistortionFromContour(List<Point2D_I32> distorted , FastQueue<Point2D_I32> undistorted  ) {
 		undistorted.reset();
+
 		for (int j = 0; j < distorted.size(); j++) {
 			// remove distortion
 			Point2D_I32 p = distorted.get(j);
+			Point2D_I32 q = undistorted.grow();
+
 			distToUndist.compute(p.x,p.y);
 
 			// round to minimize error
-			int x = Math.round(distToUndist.distX);
-			int y = Math.round(distToUndist.distY);
-
-			// save the results
-			undistorted.grow().set(x,y);
+			q.x = Math.round(distToUndist.distX);
+			q.y = Math.round(distToUndist.distY);
 		}
 	}
-
 
 	/**
 	 * Checks to see if some part of the contour touches the image border.  Most likely cropped
@@ -532,15 +528,6 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 		return outputClockwise;
 	}
 
-	/**
-	 * List of found polygons.  Points are in undistorted pixels.
-	 */
-	public FastQueue<Polygon2D_F64> getFoundPolygons() {
-		return found;
-	}
-
-	public List<Contour> getUsedContours(){return foundContours;}
-
 	public List<Contour> getAllContours(){return contourFinder.getContours().toList();}
 
 	public Class<T> getInputType() {
@@ -570,24 +557,12 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 		this.verbose = verbose;
 	}
 
-	public boolean isCheckEdgeBefore() {
-		return checkEdgeBefore;
+	public double getContourEdgeThreshold() {
+		return contourEdgeThreshold;
 	}
 
-	public RefineBinaryPolygon<T> getRefinePolygon() {
-		return refinePolygon;
-	}
-
-	public void setRefinePolygon(RefineBinaryPolygon<T> refinePolygon) {
-		this.refinePolygon = refinePolygon;
-	}
-
-	public double getEdgeThreshold() {
-		return edgeThreshold;
-	}
-
-	public void setEdgeThreshold(double edgeThreshold) {
-		this.edgeThreshold = edgeThreshold;
+	public void setContourEdgeThreshold(double contourEdgeThreshold) {
+		this.contourEdgeThreshold = contourEdgeThreshold;
 	}
 
 	public PixelTransform2_F32 getDistToUndist() {
@@ -601,17 +576,8 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 	/**
 	 * Returns additional information on the polygon
 	 */
-	public FastQueue<Info> getPolygonInfo() {
+	public FastQueue<Info> getFound() {
 		return foundInfo;
-	}
-
-	/**
-	 * If set to true it will prune using polygons using their edge intensity before sub-pixel optimization.
-	 * This should only be set to false if the initial edge is known to be off by a bit, like with a chessboard.
-	 * @param checkEdgeBefore true for checking before and false for after.
-	 */
-	public void setCheckEdgeBefore(boolean checkEdgeBefore) {
-		this.checkEdgeBefore = checkEdgeBefore;
 	}
 
 	public static class Info
@@ -622,14 +588,57 @@ public class BinaryPolygonDetector<T extends ImageGray<T>> {
 		public boolean external;
 
 		/**
+		 * The blob's label in the label image
+		 */
+		public int label;
+
+		/**
 		 * Average pixel intensity score along the polygon's edge inside and outside
 		 */
 		public double edgeInside,edgeOutside;
+
+		/**
+		 * True if the shape's contour touches the image border
+		 */
+		public boolean contourTouchesBorder;
 
 		/**
 		 * Boolean value for each corner being along the border.  If empty then non of the corners are long the border.
 		 * true means the corner is a border corner.
 		 */
 		public GrowQueue_B borderCorners = new GrowQueue_B();
+
+		/**
+		 * Polygon in undistorted image pixels.
+		 */
+		public Polygon2D_F64 polygon = new Polygon2D_F64();
+		/**
+		 * Polygon in the original (distorted) image pixels
+		 */
+		public Polygon2D_F64 polygonDistorted = new Polygon2D_F64();
+
+
+		public GrowQueue_I32 splits = new GrowQueue_I32();
+
+		/**
+		 * Contour that the shape was fit to. Might be in image pixels or undistorted image pixels
+		 */
+		public List<Point2D_I32> contour;
+
+		public double computeEdgeIntensity() {
+			return edgeOutside-edgeInside;
+		}
+
+		public void reset() {
+			external = false;
+			label = -1;
+			edgeInside = edgeOutside = -1;
+			contourTouchesBorder = true;
+			borderCorners.reset();
+			splits.reset();
+			polygon.vertexes.reset();
+			polygonDistorted.vertexes.reset();
+			contour = null;
+		}
 	}
 }

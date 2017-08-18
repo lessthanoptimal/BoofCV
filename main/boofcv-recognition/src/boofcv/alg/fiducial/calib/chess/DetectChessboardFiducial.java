@@ -20,8 +20,7 @@ package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.BinaryImageOps;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
-import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
@@ -59,7 +58,6 @@ public class DetectChessboardFiducial<T extends ImageGray<T>> {
 	// description of the grid its detecting
 	private int numRows,numCols;
 
-
 	InputToBinary<T> inputToBinary;
 
 	/**
@@ -69,9 +67,7 @@ public class DetectChessboardFiducial<T extends ImageGray<T>> {
 	 * @param maxCornerDistance The maximum distance two square corners can be from each other in pixels
 	 */
 	public DetectChessboardFiducial(int numRows, int numCols, double maxCornerDistance,
-									BinaryPolygonDetector<T> detectorSquare,
-									RefineBinaryPolygon<T> refineLine,
-									RefineBinaryPolygon<T> refineCorner,
+									DetectPolygonBinaryGrayRefine<T> detectorSquare,
 									InputToBinary<T> inputToBinary)
 	{
 		this.numRows = numRows;
@@ -81,7 +77,7 @@ public class DetectChessboardFiducial<T extends ImageGray<T>> {
 
 		findSeeds = new DetectChessSquarePoints<>(numRows, numCols, maxCornerDistance, detectorSquare);
 
-		detectorSquare.setHelper(new ChessboardPolygonHelper<>(detectorSquare, refineLine, refineCorner));
+		detectorSquare.setHelper(new ChessboardPolygonHelper<>());
 
 		reset();
 	}

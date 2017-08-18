@@ -18,11 +18,11 @@
 
 package boofcv.factory.shape;
 
-import boofcv.alg.shapes.polygon.RefinePolygonLineToImage;
+import boofcv.alg.shapes.polygon.RefinePolygonToGrayLine;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration parameters for {@link RefinePolygonLineToImage}
+ * Configuration parameters for {@link RefinePolygonToGrayLine}
  *
  * @author Peter Abeles
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,7 +99,7 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 
 	@Override
 	protected List<Polygon2D_F64> getFoundPolygons() {
-		return alg.getDetectorSquare().getFoundPolygons().toList();
+		return alg.getDetectorSquare().getPolygons(null);
 	}
 
 	@Override

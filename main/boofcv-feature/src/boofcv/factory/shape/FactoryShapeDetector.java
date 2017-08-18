@@ -22,10 +22,7 @@ import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
 import boofcv.alg.shapes.ellipse.EdgeIntensityEllipse;
 import boofcv.alg.shapes.ellipse.SnapToEllipseEdge;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
-import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
-import boofcv.alg.shapes.polygon.RefinePolygonCornersToImage;
-import boofcv.alg.shapes.polygon.RefinePolygonLineToImage;
+import boofcv.alg.shapes.polygon.*;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
 import boofcv.struct.image.ImageGray;
 
@@ -85,7 +82,21 @@ public class FactoryShapeDetector {
 	 * @return Detector
 	 */
 	public static <T extends ImageGray<T>>
-	BinaryPolygonDetector<T> polygon( ConfigPolygonDetector config, Class<T> imageType)
+	DetectPolygonBinaryGrayRefine<T> polygon(ConfigPolygonDetector config, Class<T> imageType)
+	{
+		config.checkValidity();
+
+		RefinePolygonToContour refineContour = new RefinePolygonToContour();
+
+		RefinePolygonToGray<T> refinePolygon = refinePolygon(config.refine,imageType);
+
+		DetectPolygonFromContour detector = polygonContour(config.detector,imageType);
+
+		return new DetectPolygonBinaryGrayRefine<>(detector,refineContour,refinePolygon);
+	}
+
+	public static <T extends ImageGray<T>>
+	DetectPolygonFromContour<T> polygonContour(ConfigPolygonFromContour config, Class<T> imageType)
 	{
 		config.checkValidity();
 
@@ -94,36 +105,16 @@ public class FactoryShapeDetector {
 				config.contour2Poly_minimumSideFraction,
 				config.contour2Poly_iterations);
 
-		RefineBinaryPolygon<T> refinePolygon = null;
-		if( config.refine != null ) {
-			if( config.refine instanceof ConfigRefinePolygonLineToImage ) {
-				refinePolygon = refinePolygon((ConfigRefinePolygonLineToImage)config.refine,imageType);
-			} else if( config.refine instanceof ConfigRefinePolygonCornersToImage ) {
-				refinePolygon = refinePolygon((ConfigRefinePolygonCornersToImage)config.refine,imageType);
-			} else {
-				throw new IllegalArgumentException("Unknown refine config type");
-			}
-		}
-
-		return new BinaryPolygonDetector<>(config.minimumSides, config.maximumSides, contourToPolygon,
-				refinePolygon, config.minContourImageWidthFraction,
+		return new DetectPolygonFromContour<>(
+				config.minimumSides, config.maximumSides, contourToPolygon,
+				config.minContourImageWidthFraction,
 				config.clockwise, config.convex, config.canTouchBorder, config.splitPenalty,
 				config.minimumEdgeIntensity, imageType);
 	}
 
 	public static <T extends ImageGray<T>>
-	RefineBinaryPolygon<T> refinePolygon( ConfigRefinePolygonLineToImage config , Class<T> imageType ) {
-		return new RefinePolygonLineToImage<>(
-				config.cornerOffset, config.lineSamples,
-				config.sampleRadius, config.maxIterations,
-				config.convergeTolPixels, config.maxCornerChangePixel,
-				imageType);
-	}
-
-	public static <T extends ImageGray<T>>
-	RefineBinaryPolygon<T> refinePolygon( ConfigRefinePolygonCornersToImage config , Class<T> imageType ) {
-		return new RefinePolygonCornersToImage<>(
-				config.endPointDistance,
+	RefinePolygonToGray<T> refinePolygon(ConfigRefinePolygonLineToImage config , Class<T> imageType ) {
+		return new RefinePolygonToGrayLine<>(
 				config.cornerOffset, config.lineSamples,
 				config.sampleRadius, config.maxIterations,
 				config.convergeTolPixels, config.maxCornerChangePixel,

@@ -25,15 +25,11 @@ import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.GrowQueue_I32;
-
-import java.util.List;
 
 /**
  * <p>
- * Improves the fits of a polygon's which is darker or lighter than the background. Polygon's edges are
+ * Improves the fits of a polygon's which is darker or lighter than the background. Info's edges are
  * assumed to be perfectly straight lines.  The edges are processed individually and fit to a line using weighted
  * regression. Both black squares with white backgrounds and white shapes with black backgrounds can be found.
  * The edges are selected to maximize the difference between light and dark regions.
@@ -54,7 +50,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RefinePolygonLineToImage<T extends ImageGray<T>> implements RefineBinaryPolygon<T> {
+public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePolygonToGray<T> {
 
 	// How far away from a corner will it sample the line
 	private double cornerOffset = 2.0;
@@ -92,9 +88,9 @@ public class RefinePolygonLineToImage<T extends ImageGray<T>> implements RefineB
 	 * value a description of these variables.
 	 *
 	 */
-	public RefinePolygonLineToImage(double cornerOffset, int lineSamples, int sampleRadius,
-									int maxIterations, double convergeTolPixels,double maxCornerChangePixel,
-									Class<T> imageType ) {
+	public RefinePolygonToGrayLine(double cornerOffset, int lineSamples, int sampleRadius,
+								   int maxIterations, double convergeTolPixels, double maxCornerChangePixel,
+								   Class<T> imageType ) {
 
 
 		this.cornerOffset = cornerOffset;
@@ -112,7 +108,7 @@ public class RefinePolygonLineToImage<T extends ImageGray<T>> implements RefineB
 	 * @param numSides Number of sides on the polygon
 	 * @param imageType Type of input image it processes
 	 */
-	public RefinePolygonLineToImage(int numSides ,Class<T> imageType) {
+	public RefinePolygonToGrayLine(int numSides , Class<T> imageType) {
 		previous = new Polygon2D_F64(numSides);
 		this.imageType = imageType;
 		this.snapToEdge = new SnapToLineEdge<>(20, 1, imageType);
@@ -145,7 +141,7 @@ public class RefinePolygonLineToImage<T extends ImageGray<T>> implements RefineB
 	 * @param output (output) the fitted polygon
 	 */
 	@Override
-	public boolean refine(Polygon2D_F64 input, List<Point2D_I32> contour, GrowQueue_I32 splits, Polygon2D_F64 output)
+	public boolean refine(Polygon2D_F64 input, Polygon2D_F64 output)
 	{
 		if( input.size() != output.size())
 			throw new IllegalArgumentException("Input and output sides do not match. "+input.size()+" "+output.size());

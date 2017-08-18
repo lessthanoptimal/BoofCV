@@ -20,12 +20,11 @@ package boofcv.alg.fiducial.calib.grid;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.squares.*;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +57,7 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 	InputToBinary<T> inputToBinary;
 
 	// detector for squares
-	BinaryPolygonDetector<T> detectorSquare;
+	DetectPolygonBinaryGrayRefine<T> detectorSquare;
 
 	// Converts detected squares into a graph and into grids
 	SquaresIntoRegularClusters s2c;
@@ -76,6 +75,8 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 
 	List<List<SquareNode>> clusters;
 
+	List<Polygon2D_F64> found = new ArrayList<>();
+
 	/**
 	 * COnfigures the detector
 	 *
@@ -87,7 +88,7 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 	 */
 	public DetectSquareGridFiducial(int numRows, int numCols, double spaceToSquareRatio,
 									InputToBinary<T> inputToBinary ,
-									BinaryPolygonDetector<T> detectorSquare) {
+									DetectPolygonBinaryGrayRefine<T> detectorSquare) {
 		this.numRows = numRows;
 		this.numCols = numCols;
 		this.inputToBinary = inputToBinary;
@@ -111,10 +112,11 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 
 		inputToBinary.process(image,binary);
 		detectorSquare.process(image, binary);
+		detectorSquare.refineAll();
 
-		FastQueue<Polygon2D_F64> found = detectorSquare.getFoundPolygons();
+		detectorSquare.getPolygons(found);
 
-		clusters = s2c.process(found.toList());
+		clusters = s2c.process(found);
 		c2g.process(clusters);
 		List<SquareGrid> grids = c2g.getGrids();
 
@@ -190,7 +192,7 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 		return calibCols;
 	}
 
-	public BinaryPolygonDetector<T> getDetectorSquare() {
+	public DetectPolygonBinaryGrayRefine<T> getDetectorSquare() {
 		return detectorSquare;
 	}
 

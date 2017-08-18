@@ -21,8 +21,6 @@ package boofcv.abst.fiducial.calib;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.ConfigPolygonDetector;
-import boofcv.factory.shape.ConfigRefinePolygonCornersToImage;
-import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.struct.Configuration;
 
 /**
@@ -64,41 +62,19 @@ public class ConfigSquareGrid implements Configuration {
 	 */
 	public double spaceWidth;
 
-	/**
-	 * Should it refine the corners only?  Useful if the input image is distorted
-	 */
-	public boolean refineWithCorners = true;
-
-	/**
-	 * Configuration for refining with lines.  Ignored if not used.
-	 */
-	public ConfigRefinePolygonLineToImage configRefineLines = new ConfigRefinePolygonLineToImage();
-
-	/**
-	 * Configuration for refining with corners.  Ignored if not used.
-	 */
-	public ConfigRefinePolygonCornersToImage configRefineCorners = new ConfigRefinePolygonCornersToImage();
-
 	{
 		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
 		thresholding.scale = 0.85;
 
-		square.contour2Poly_splitFraction = 0.1;
-		square.contour2Poly_minimumSideFraction = 0.1;
-		square.minContourImageWidthFraction = 0.0005;
-
-		// since it runs a separate sub-pixel algorithm these parameters can be tuned to create
-		// very crude corners
-		configRefineCorners.cornerOffset = 1;
-		configRefineCorners.lineSamples = 15;
-		configRefineCorners.convergeTolPixels = 0.2;
-		configRefineCorners.maxIterations = 5;
+		square.detector.contour2Poly_splitFraction = 0.1;
+		square.detector.contour2Poly_minimumSideFraction = 0.1;
+		square.detector.minContourImageWidthFraction = 0.0005;
 
 		// putting reasonable defaults for if the user decides to optimize by line
-		configRefineLines.cornerOffset = 1;
-		configRefineLines.lineSamples = 15;
-		configRefineLines.convergeTolPixels = 0.2;
-		configRefineLines.maxIterations = 5;
+		square.refine.cornerOffset = 1;
+		square.refine.lineSamples = 15;
+		square.refine.convergeTolPixels = 0.2;
+		square.refine.maxIterations = 5;
 	}
 
 	public ConfigSquareGrid(int numRows, int numCols, double squareWidth, double spaceWidth) {

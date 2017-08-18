@@ -20,7 +20,7 @@ package boofcv.alg.fiducial.square;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -98,7 +98,7 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 									  double borderWidthFraction ,
 									  double minimumBlackBorderFraction ,
 									  final InputToBinary<T> inputToBinary,
-									  final BinaryPolygonDetector<T> quadDetector, Class<T> inputType) {
+									  final DetectPolygonBinaryGrayRefine<T> quadDetector, Class<T> inputType) {
 		// Black borders occupies 2.0*borderWidthFraction of the total width
 		// The number of pixels for each square is held constant and the total pixels for the inner region
 		// is determined by the size of the grid

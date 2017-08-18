@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,11 +49,10 @@ public class DetectCalibrationChessboardApp
 	DetectChessboardFiducial<GrayF32> alg;
 	ConfigChessboard config;
 
-	public DetectCalibrationChessboardApp( int numRows , int numColumns , boolean forCalibration ,
+	public DetectCalibrationChessboardApp( int numRows , int numColumns ,
 										   List<String> exampleInputs) {
 		super(new DetectCalibrationPanel(numRows,numColumns,true),exampleInputs);
 		config = new ConfigChessboard(numRows, numColumns, 1);
-		config.refineWithCorners = forCalibration;
 
 		declareDetector();
 	}
@@ -100,7 +99,7 @@ public class DetectCalibrationChessboardApp
 
 	@Override
 	protected List<Polygon2D_F64> getFoundPolygons() {
-		return alg.getFindSeeds().getDetectorSquare().getFoundPolygons().toList();
+		return alg.getFindSeeds().getDetectorSquare().getPolygons(null);
 	}
 
 	@Override
@@ -113,10 +112,8 @@ public class DetectCalibrationChessboardApp
 		return alg.getFindSeeds().getGrids().getGrids().toList();
 	}
 
-	public void configure(int numRows, int numCols, boolean forCalibration) {
+	public void configure(int numRows, int numCols ) {
 		config = new ConfigChessboard(numRows, numCols, 1);
-
-		config.refineWithCorners = forCalibration;
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {
@@ -127,7 +124,7 @@ public class DetectCalibrationChessboardApp
 			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Chess/left%02d.jpg",i)));
 		}
 
-		DetectCalibrationChessboardApp app = new DetectCalibrationChessboardApp(7,5,false,examples);
+		DetectCalibrationChessboardApp app = new DetectCalibrationChessboardApp(7,5,examples);
 
 		app.openFile(new File(examples.get(0)));
 		app.waitUntilDoneProcessing();
