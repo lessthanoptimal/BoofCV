@@ -19,8 +19,31 @@
 package boofcv.gui;
 
 import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.util.prefs.Preferences;
 
 public class BoofSwingUtil {
+
+	public static File openFileChooseDialog(Component parent) {
+		return openFileChooseDialog(parent,new File(".").getPath());
+	}
+
+	public static File openFileChooseDialog(Component parent, String defaultPath ) {
+		String key = "PreviouslySelected";
+
+		Preferences prefs = Preferences.userRoot().node(parent.getClass().getSimpleName());
+		JFileChooser chooser = new JFileChooser(prefs.get(key, defaultPath));
+
+		File selected = null;
+		int returnVal = chooser.showOpenDialog(parent);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			selected = chooser.getSelectedFile();
+			prefs.put(key, selected.getParent());
+		}
+		return selected;
+	}
+
 	public static void invokeNowOrLater(Runnable r ) {
 		if(SwingUtilities.isEventDispatchThread() ) {
 			r.run();
