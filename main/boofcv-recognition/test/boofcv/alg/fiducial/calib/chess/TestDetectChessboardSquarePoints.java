@@ -44,7 +44,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestDetectChessSquarePoints {
+public class TestDetectChessboardSquarePoints {
 
 	int offsetX = 15;
 	int offsetY = 10;
@@ -110,8 +110,8 @@ public class TestDetectChessSquarePoints {
 
 		DetectPolygonBinaryGrayRefine<GrayU8> detectorSquare = FactoryShapeDetector.
 				polygon(new ConfigPolygonDetector(4,4),GrayU8.class);
-		DetectChessSquarePoints<GrayU8> alg =
-				new DetectChessSquarePoints<>(rows, cols,2, detectorSquare);
+		DetectChessboardSquarePoints<GrayU8> alg =
+				new DetectChessboardSquarePoints<>(rows, cols,2, detectorSquare);
 
 //		System.out.println("test grid "+ gridWidth + " " + gridHeight);
 		assertTrue(alg.process(gray, binary));
@@ -187,8 +187,8 @@ public class TestDetectChessSquarePoints {
 
 		DetectPolygonBinaryGrayRefine<GrayU8> detectorSquare = FactoryShapeDetector.
 				polygon(new ConfigPolygonDetector(4,4),GrayU8.class);
-		DetectChessSquarePoints<GrayU8> alg =
-				new DetectChessSquarePoints<>(gridWidth,gridHeight,2, detectorSquare);
+		DetectChessboardSquarePoints<GrayU8> alg =
+				new DetectChessboardSquarePoints<>(gridWidth,gridHeight,2, detectorSquare);
 
 		assertFalse(alg.process(gray, binary));
 	}
@@ -197,7 +197,7 @@ public class TestDetectChessSquarePoints {
 	public void putIntoCanonical() {
 		SquareGridTools tools = new SquareGridTools();
 
-		DetectChessSquarePoints alg = new DetectChessSquarePoints(2,2,10,null);
+		DetectChessboardSquarePoints alg = new DetectChessboardSquarePoints(2,2,10,null);
 		for (int rows = 2; rows <= 5; rows++) {
 			for (int cols = 2; cols <= 5; cols++) {
 				SquareGrid uber = createGrid(rows, cols);
@@ -239,7 +239,7 @@ public class TestDetectChessSquarePoints {
 
 		int shapes[][] = new int[][]{{4,5},{2,3},{3,2},{2,2}};
 
-		DetectChessSquarePoints<GrayU8> alg = new DetectChessSquarePoints<>(2,2,0.01,null);
+		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,0.01,null);
 
 		for( int[]shape : shapes ) {
 //			System.out.println(shape[0]+" "+shape[1]);
@@ -311,7 +311,7 @@ public class TestDetectChessSquarePoints {
 	@Test
 	public void computeCalibrationPoints() {
 
-		DetectChessSquarePoints<GrayU8> alg = new DetectChessSquarePoints<>(2,2,0.01,null);
+		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,0.01,null);
 
 		double w = TestSquareRegularClustersIntoGrids.DEFAULT_WIDTH;
 
@@ -340,6 +340,16 @@ public class TestDetectChessSquarePoints {
 				}
 			}
 		}
+	}
+
+	@Test
+	public void adjustBeforeOptimize() {
+		fail("Implement");
+	}
+
+	@Test
+	public void adjustBeforeOptimize_touchesBorder() {
+		fail("Implement");
 	}
 
 	public static SquareGrid createGrid(int rows , int cols ) {

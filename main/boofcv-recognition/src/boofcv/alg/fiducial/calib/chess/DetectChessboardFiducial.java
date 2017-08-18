@@ -31,7 +31,7 @@ import java.util.List;
  * <p>
  * Detects calibration points inside a chessboard calibration target.  The image is first the image
  * is thresholded to create a binary image for square detection, then the binary image is eroded to make sure
- * the squares don't touch.  After that {@link DetectChessSquarePoints} is called and it detects and sorts
+ * the squares don't touch.  After that {@link DetectChessboardSquarePoints} is called and it detects and sorts
  * the squares.
  * </p>
  * <p>
@@ -50,7 +50,7 @@ import java.util.List;
 public class DetectChessboardFiducial<T extends ImageGray<T>> {
 
 	// detects the chess board
-	private DetectChessSquarePoints<T> findSeeds;
+	private DetectChessboardSquarePoints<T> findSeeds;
 	// binary images used to detect chess board
 	private GrayU8 binary = new GrayU8(1, 1);
 	private GrayU8 eroded = new GrayU8(1, 1);
@@ -75,7 +75,7 @@ public class DetectChessboardFiducial<T extends ImageGray<T>> {
 
 		this.inputToBinary = inputToBinary;
 
-		findSeeds = new DetectChessSquarePoints<>(numRows, numCols, maxCornerDistance, detectorSquare);
+		findSeeds = new DetectChessboardSquarePoints<>(numRows, numCols, maxCornerDistance, detectorSquare);
 
 		detectorSquare.setHelper(new ChessboardPolygonHelper<>());
 
@@ -100,7 +100,7 @@ public class DetectChessboardFiducial<T extends ImageGray<T>> {
 		return findSeeds.process(gray, eroded);
 	}
 
-	public DetectChessSquarePoints getFindSeeds() {
+	public DetectChessboardSquarePoints getFindSeeds() {
 		return findSeeds;
 	}
 

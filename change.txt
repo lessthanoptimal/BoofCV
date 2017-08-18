@@ -16,6 +16,15 @@ Version : 0.28
     - Was complex, didn't fit the new API, and calibration residuals got better once removed.
 - Adding the capability for demonstrations that open files to remember the last directory it opened
 
+Polygon Detector
+- More false positives in regression on polygon shapes.
+- Ambiguous change in speed. Some faster some slower. Within normal variance.
+- At least one fiducial was much worse on blurred images
+- NOTE: Chessboard detector was from 5% to 40% faster when refine turned off. Much worse in all other metrics
+- TODO edge score after refine for rejection
+- TODO refine by fitting to contour
+- TODO see if a shape can be rejected before refining the polygon fit to improve speed for all fiducals
+
 TOP ITEMS
 - TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
         It is a homogenous coordinate with z=1 being implicit.

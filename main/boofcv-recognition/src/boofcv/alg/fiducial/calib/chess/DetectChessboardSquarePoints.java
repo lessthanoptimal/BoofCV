@@ -38,7 +38,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectChessSquarePoints<T extends ImageGray<T>> {
+public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 
 	// detector for squares
 	DetectPolygonBinaryGrayRefine<T> detectorSquare;
@@ -72,8 +72,8 @@ public class DetectChessSquarePoints<T extends ImageGray<T>> {
 	 * @param numCols Number of columns in square grid
 	 * @param maxCornerDistance Maximum distance in pixels that two "overlapping" corners can be from each other.
 	 */
-	public DetectChessSquarePoints(int numRows, int numCols, double maxCornerDistance,
-								   DetectPolygonBinaryGrayRefine<T> detectorSquare)
+	public DetectChessboardSquarePoints(int numRows, int numCols, double maxCornerDistance,
+										DetectPolygonBinaryGrayRefine<T> detectorSquare)
 	{
 		this.maxCornerDistanceSq = maxCornerDistance*maxCornerDistance;
 
