@@ -22,6 +22,7 @@ import boofcv.alg.fiducial.calib.squares.SquareEdge;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.calibration.CalibratedImageGridPanel;
@@ -118,6 +119,23 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 		}
 
 		processFrame();
+
+		// adjust the scale if needed so that the entire image is visible when loaded
+		if( imagePanel.getWidth() > 0 ) {
+			double scaleX = (imagePanel.getWidth()+5) / (double) buffered.getWidth();
+			double scaleY = (imagePanel.getHeight()+5) / (double) buffered.getHeight();
+
+			final double scale = Math.min(scaleX, scaleY);
+			if (scale < 1.0) {
+				BoofSwingUtil.invokeNowOrLater(new Runnable() {
+					@Override
+					public void run() {controlPanel.setScale(scale);}});
+			} else {
+				BoofSwingUtil.invokeNowOrLater(new Runnable() {
+					@Override
+					public void run() {controlPanel.setScale(1);}});
+			}
+		}
 	}
 
 	protected void renderGraph( Graphics2D g2 , double scale ) {

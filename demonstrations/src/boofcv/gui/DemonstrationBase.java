@@ -387,12 +387,9 @@ public abstract class DemonstrationBase<T extends ImageBase<T>> extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (menuFile == e.getSource()) {
-					int returnVal = fc.showOpenDialog(DemonstrationBase.this);
-
-					if (returnVal == JFileChooser.APPROVE_OPTION) {
-						File file = fc.getSelectedFile();
+					File file = BoofSwingUtil.openFileChooseDialog(DemonstrationBase.this);
+					if (file != null) {
 						openFile(file);
-					} else {
 					}
 				} else if (menuWebcam == e.getSource()) {
 					openWebcam();
