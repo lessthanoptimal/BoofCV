@@ -119,9 +119,6 @@ public class FactoryFiducial {
 	 */
 	public static <T extends ImageGray<T>>
 	CalibrationFiducialDetector<T> calibChessboard( ConfigChessboard config, Class<T> imageType) {
-
-		config.refineWithCorners = false;
-
 		return new CalibrationFiducialDetector<>(config, imageType);
 	}
 
