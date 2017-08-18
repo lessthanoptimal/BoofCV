@@ -22,6 +22,7 @@ import boofcv.alg.fiducial.calib.squares.SquareEdge;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.calibration.CalibratedImageGridPanel;
@@ -115,6 +116,19 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 		synchronized ( this ) {
 			binary = ConvertBufferedImage.checkDeclare(gray.getWidth(), gray.getHeight(), binary, BufferedImage.TYPE_INT_RGB);
 			grayPrev.setTo((GrayF32)gray);
+		}
+
+		// adjust the scale if needed so that the entire image is visible when loaded
+		if( imagePanel.getWidth() > 0 ) {
+			double scaleX = imagePanel.getWidth() / (double) buffered.getWidth();
+			double scaleY = imagePanel.getHeight() / (double) buffered.getHeight();
+
+			final double scale = Math.min(scaleX, scaleY);
+			if (scale < 1.0) {
+				BoofSwingUtil.invokeNowOrLater(new Runnable() {
+					@Override
+					public void run() {controlPanel.setScale(scale);}});
+			}
 		}
 
 		processFrame();
