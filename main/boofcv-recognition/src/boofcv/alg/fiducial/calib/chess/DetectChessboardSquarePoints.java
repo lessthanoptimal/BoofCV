@@ -19,13 +19,15 @@
 package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.alg.fiducial.calib.squares.*;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
+import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Polygon2D_I32;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_B;
 
 import java.util.List;
 
@@ -36,10 +38,10 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectChessSquarePoints<T extends ImageGray<T>> {
+public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 
 	// detector for squares
-	BinaryPolygonDetector<T> detectorSquare;
+	DetectPolygonBinaryGrayRefine<T> detectorSquare;
 
 	// Converts detected squares into a graph and into grids
 	SquaresIntoCrossClusters s2c;
@@ -61,6 +63,8 @@ public class DetectChessSquarePoints<T extends ImageGray<T>> {
 	// List of nodes put into clusters
 	List<List<SquareNode>> clusters;
 
+	Polygon2D_F64 work = new Polygon2D_F64();
+
 	/**
 	 * Configures chess board detector.
 	 *
@@ -68,8 +72,8 @@ public class DetectChessSquarePoints<T extends ImageGray<T>> {
 	 * @param numCols Number of columns in square grid
 	 * @param maxCornerDistance Maximum distance in pixels that two "overlapping" corners can be from each other.
 	 */
-	public DetectChessSquarePoints(int numRows, int numCols, double maxCornerDistance,
-								   BinaryPolygonDetector<T> detectorSquare)
+	public DetectChessboardSquarePoints(int numRows, int numCols, double maxCornerDistance,
+										DetectPolygonBinaryGrayRefine<T> detectorSquare)
 	{
 		this.maxCornerDistanceSq = maxCornerDistance*maxCornerDistance;
 
@@ -94,11 +98,27 @@ public class DetectChessSquarePoints<T extends ImageGray<T>> {
 		boundPolygon.vertexes.reset();
 
 		detectorSquare.process(input, binary);
+		List<DetectPolygonFromContour.Info> found = detectorSquare.getPolygonInfo();
 
-		FastQueue<Polygon2D_F64> found = detectorSquare.getFoundPolygons();
-		FastQueue<BinaryPolygonDetector.Info> foundInfo = detectorSquare.getPolygonInfo();
+		for (int i = 0; i < found.size(); i++) {
+			DetectPolygonFromContour.Info f = found.get(i);
+//			System.out.println("  touches "+f.contourTouchesBorder+"  size "+f.polygon.size());
 
-		clusters = s2c.process(found.toList(),foundInfo.toList());
+			// get a better fit onto the contour
+			detectorSquare.refineContour(f);
+
+			// expand the polygons to compensate for the binary image being dilated
+			adjustBeforeOptimize(f.polygon,f.borderCorners);
+
+			// now refine the polygon fit
+//			System.out.println("before "+f.polygon);
+			if( !detectorSquare.refineUsingEdge(f) ) {
+//				System.out.println("Refine failed");
+			}
+//			System.out.println("       "+f.polygon.areaSimple());
+		}
+
+		clusters = s2c.process(found);
 
 		c2g.process(clusters);
 		List<SquareGrid> grids = c2g.getGrids().toList();
@@ -133,6 +153,54 @@ public class DetectChessSquarePoints<T extends ImageGray<T>> {
 		}
 
 		return false;
+	}
+
+	/**
+	 * The polygon detected from the contour is too small because the binary image was eroded. This expand the size
+	 * of the polygon so that it fits the image edge better
+	 */
+	public void adjustBeforeOptimize(Polygon2D_F64 polygon, GrowQueue_B touchesBorder) {
+		int N = polygon.size();
+		work.vertexes.resize(N);
+		for (int i = 0; i < N; i++) {
+			work.get(i).set(0, 0);
+		}
+
+		for (int i = N - 1, j = 0; j < N; i = j, j++) {
+			Point2D_F64 a = polygon.get(i);
+			Point2D_F64 b = polygon.get(j);
+
+			double dx = b.x - a.x;
+			double dy = b.y - a.y;
+
+			double l = Math.sqrt(dx * dx + dy * dy);
+			dx *= 1.5 / l;
+			dy *= 1.5 / l;
+
+			Point2D_F64 _a = work.get(i);
+			Point2D_F64 _b = work.get(j);
+
+			if (touchesBorder.size() > 0 && touchesBorder.get(i) && touchesBorder.get(j)) {
+				// move the point along the image border
+				_a.x -= dx;
+				_a.y -= dy;
+				_b.x += dx;
+				_b.y += dy;
+			} else {
+				// move the point away from the line
+				_a.x += -dy;
+				_a.y += dx;
+				_b.x += -dy;
+				_b.y += dx;
+			}
+		}
+
+		for (int i = 0; i < N; i++) {
+			Point2D_F64 a = polygon.get(i);
+			Point2D_F64 b = work.get(i);
+			a.x += b.x;
+			a.y += b.y;
+		}
 	}
 
 	/**
@@ -272,7 +340,7 @@ public class DetectChessSquarePoints<T extends ImageGray<T>> {
 		return c2g;
 	}
 
-	public BinaryPolygonDetector<T> getDetectorSquare() {
+	public DetectPolygonBinaryGrayRefine<T> getDetectorSquare() {
 		return detectorSquare;
 	}
 

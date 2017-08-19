@@ -408,7 +408,7 @@ public class VisualizeBinaryData {
 					}
 				}
 			}
-		} else {
+		} else if( numBands == 3) {
 			if (invert) {
 				for (int y = 0; y < h; y++) {
 					int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
@@ -430,7 +430,31 @@ public class VisualizeBinaryData {
 					}
 				}
 			}
+		} else if( numBands == 4) {
+		if (invert) {
+			for (int y = 0; y < h; y++) {
+				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
+				for (int x = 0; x < w; x++) {
+					byte val = (byte) ((1 - binaryImage.data[indexSrc++]) * 255);
+					data[rasterIndex++] = (byte)0xFF;
+					for (int i = 1; i < 4; i++) {
+						data[rasterIndex++] = val;
+					}
+				}
+			}
+		} else {
+			for (int y = 0; y < h; y++) {
+				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
+				for (int x = 0; x < w; x++) {
+					byte val = (byte) (binaryImage.data[indexSrc++] * 255);
+					data[rasterIndex++] = (byte)0xFF;
+					for (int i = 1; i < 4; i++) {
+						data[rasterIndex++] = val;
+					}
+				}
+			}
 		}
+	}
 	}
 
 	private static void renderBinary(GrayU8 binaryImage, boolean invert,

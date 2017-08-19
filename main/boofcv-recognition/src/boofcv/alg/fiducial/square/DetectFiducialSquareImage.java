@@ -26,7 +26,7 @@ import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.core.image.ConvertImage;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -87,7 +87,7 @@ public class DetectFiducialSquareImage<T extends ImageGray<T>>
 	 * @param matchThreshold Considered a match if the hamming distance is less than this fraction of the maximum
 	 */
 	public DetectFiducialSquareImage(InputToBinary<T> inputToBinary,
-									 BinaryPolygonDetector<T> quadDetector,
+									 DetectPolygonBinaryGrayRefine<T> quadDetector,
 									 double borderWidthFraction ,
 									 double minimumBlackBorderFraction ,
 									 double matchThreshold, Class<T> inputType) {

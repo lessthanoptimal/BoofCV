@@ -20,12 +20,11 @@ package boofcv.alg.shapes.polygon;
 
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.List;
 
 /**
- * Interface which allows low level customization of {@link BinaryPolygonDetector}
+ * Interface which allows low level customization of {@link DetectPolygonFromContour}
  *
  * @author Peter Abeles
  */
@@ -39,10 +38,6 @@ public interface PolygonHelper {
 	 */
 	void setImageShape( int width , int height );
 
-	/**
-	 * This function is invoked just before a polygon's edge is optimized.  It's pixel precise at this point.
-	 */
-	void adjustBeforeOptimize( Polygon2D_F64 polygon );
 
 	/**
 	 * User defined filter to accept/reject or modify the contour of a shape.  Called at most twice. First
@@ -58,11 +53,10 @@ public interface PolygonHelper {
 	/**
 	 * Function which allows a custom filter function to be used on the pixel level precise polygon
 	 *
-	 * @param externalUndist External contour around a shape in undistorted pixel coordinates.  Can be modified
-	 * @param externalDist External contour around a shape in distorted pixel coordinates.  Modifications ignored.
-	 * @param splits Indexes in the contour where the polygon has a vertex
+	 * @param undistorted Polygon in undistorted image pixels.
+	 * @param distorted Polygon in distorted/original image pixels.
 	 * @param touchesBorder true if the contour touches the image border or false if it doesnt
 	 * @return true to keep the contour for further processing or false to reject it
 	 */
-	boolean filterPixelPolygon(List<Point2D_I32> externalUndist , List<Point2D_I32> externalDist,  GrowQueue_I32 splits, boolean touchesBorder);
+	boolean filterPixelPolygon( Polygon2D_F64 undistorted , Polygon2D_F64 distorted, boolean touchesBorder);
 }

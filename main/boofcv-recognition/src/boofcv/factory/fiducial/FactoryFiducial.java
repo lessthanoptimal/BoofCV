@@ -26,7 +26,7 @@ import boofcv.abst.fiducial.calib.*;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.square.DetectFiducialSquareImage;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.filter.binary.ThresholdType;
@@ -61,10 +61,10 @@ public class FactoryFiducial {
 
 		configFiducial.checkValidity();
 
-		configFiducial.squareDetector.clockwise = false;
+		configFiducial.squareDetector.detector.clockwise = false;
 
 		final InputToBinary<T> binary = FactoryThresholdBinary.threshold(configThreshold, imageType);
-		final BinaryPolygonDetector<T> squareDetector = FactoryShapeDetector.
+		final DetectPolygonBinaryGrayRefine<T> squareDetector = FactoryShapeDetector.
 				polygon(configFiducial.squareDetector,imageType);
 
 		final DetectFiducialSquareBinary<T> alg =
@@ -97,10 +97,10 @@ public class FactoryFiducial {
 			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE,10);
 		}
 
-		configFiducial.squareDetector.clockwise = false;
+		configFiducial.squareDetector.detector.clockwise = false;
 
 		InputToBinary<T> binary = FactoryThresholdBinary.threshold(configThreshold, imageType);
-		BinaryPolygonDetector<T> squareDetector =
+		DetectPolygonBinaryGrayRefine<T> squareDetector =
 				FactoryShapeDetector.polygon(configFiducial.squareDetector, imageType);
 		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<>(binary,
 				squareDetector, configFiducial.borderWidthFraction, configFiducial.minimumBlackBorderFraction,
@@ -132,9 +132,6 @@ public class FactoryFiducial {
 	 */
 	public static <T extends ImageGray<T>>
 	CalibrationFiducialDetector<T> calibSquareGrid( ConfigSquareGrid config, Class<T> imageType) {
-
-		config.refineWithCorners = false;
-
 		return new CalibrationFiducialDetector<>(config, imageType);
 	}
 

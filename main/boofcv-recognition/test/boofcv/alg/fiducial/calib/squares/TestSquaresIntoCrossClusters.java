@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.junit.Test;
 
@@ -41,16 +41,14 @@ public class TestSquaresIntoCrossClusters {
 	public void process_simple() {
 		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(0.05, -1);
 
-		List<Polygon2D_F64> squares = new ArrayList<>();
+		List<DetectPolygonFromContour.Info> squares = new ArrayList<>();
 		squares.add( createSquare(7,8));
 		squares.add( createSquare(9,8));
 		squares.add( createSquare(8,9));
 		squares.add( createSquare(7,10));
 		squares.add( createSquare(9,10));
 
-		List<BinaryPolygonDetector.Info> squareInfo = createInfo(squares);
-
-		List<List<SquareNode>> clusters = alg.process(squares,squareInfo);
+		List<List<SquareNode>> clusters = alg.process(squares);
 
 		assertEquals(1,clusters.size());
 
@@ -68,10 +66,10 @@ public class TestSquaresIntoCrossClusters {
 		assertEquals(1,connections[4]);
 	}
 
-	private List<BinaryPolygonDetector.Info> createInfo(List<Polygon2D_F64> squares) {
-		List<BinaryPolygonDetector.Info> squareInfo = new ArrayList<>();
+	private List<DetectPolygonFromContour.Info> createInfo(List<Polygon2D_F64> squares) {
+		List<DetectPolygonFromContour.Info> squareInfo = new ArrayList<>();
 		for (int i = 0; i < squares.size(); i++) {
-			squareInfo.add( new BinaryPolygonDetector.Info() );
+			squareInfo.add( new DetectPolygonFromContour.Info() );
 		}
 		return squareInfo;
 	}
@@ -83,27 +81,25 @@ public class TestSquaresIntoCrossClusters {
 	public void shapesOnBorder() {
 		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(0.05, -1);
 
-		List<Polygon2D_F64> squares = new ArrayList<>();
+		List<DetectPolygonFromContour.Info> squares = new ArrayList<>();
 		squares.add( createSquare(7,8));
 		squares.add( createSquare(9,8));
 		squares.add( createSquare(8,9));
 		squares.add( createSquare(7,10));
 		squares.add( createSquare(9,10));
 
-		List<BinaryPolygonDetector.Info> squareInfo = createInfo(squares);
+		markTouch(squares.get(0),true,false,true,true);
+		markTouch(squares.get(1),false,true,true,false);
+		markTouch(squares.get(3),true,true,false,true);
 
-		markTouch(squareInfo.get(0),true,false,true,true);
-		markTouch(squareInfo.get(1),false,true,true,false);
-		markTouch(squareInfo.get(3),true,true,false,true);
-
-		List<List<SquareNode>> clusters = alg.process(squares,squareInfo);
+		List<List<SquareNode>> clusters = alg.process(squares);
 
 		assertEquals(1,clusters.size());
 		assertEquals(5,clusters.get(0).size());
 
 	}
 
-	private void markTouch( BinaryPolygonDetector.Info info , boolean ...marks ) {
+	private void markTouch(DetectPolygonFromContour.Info info , boolean ...marks ) {
 		for( boolean b : marks ) {
 			info.borderCorners.add(b);
 		}
@@ -117,27 +113,27 @@ public class TestSquaresIntoCrossClusters {
 	public void process_connect_threshold() {
 		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(0.2,-1);
 
-		List<Polygon2D_F64> squares = new ArrayList<>();
+		List<DetectPolygonFromContour.Info> squares = new ArrayList<>();
 		squares.add( createSquare(5,6));
 		squares.add( createSquare(6.20001,7));
 		squares.add( createSquare(6.1999999,5));
 
-		List<BinaryPolygonDetector.Info> squareInfo = createInfo(squares);
-
-		List<List<SquareNode>> clusters = alg.process(squares,squareInfo);
+		List<List<SquareNode>> clusters = alg.process(squares);
 
 		assertEquals(2,clusters.size());
 	}
 
-	private Polygon2D_F64 createSquare( double x , double y ) {
-		Polygon2D_F64 out = new Polygon2D_F64(4);
+	private DetectPolygonFromContour.Info createSquare( double x , double y ) {
+		DetectPolygonFromContour.Info info = new DetectPolygonFromContour.Info();
+		info.reset();
+		info.polygon = new Polygon2D_F64(4);
 
-		out.get(0).set(x,y);
-		out.get(1).set(x+1,y);
-		out.get(2).set(x+1,y-1);
-		out.get(3).set(x,y-1);
+		info.polygon.get(0).set(x,y);
+		info.polygon.get(1).set(x+1,y);
+		info.polygon.get(2).set(x+1,y-1);
+		info.polygon.get(3).set(x,y-1);
 
-		return out;
+		return info;
 	}
 
 	@Test
@@ -172,7 +168,7 @@ public class TestSquaresIntoCrossClusters {
 		assertFalse(alg.candidateIsMuchCloser(node0,node1,20));
 
 		double frac = alg.tooFarFraction;
-		node1.corners = createSquare(12,10);
+		node1.corners = createSquare(12,10).polygon;
 		// the closest neighboring node should be 1 away
 		assertTrue(alg.candidateIsMuchCloser(node0,node1,Math.pow(2*frac-1e-6,2)));
 		assertFalse(alg.candidateIsMuchCloser(node0,node1,Math.pow(2*frac+1e-6,2)));

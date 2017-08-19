@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,8 @@ package boofcv.examples.features;
 
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
+import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.ListDisplayPanel;
@@ -31,14 +32,13 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
 /**
- * Example of how to use {@link BinaryPolygonDetector} to find black polygons in an image.  This algorithm
+ * Example of how to use {@link DetectPolygonFromContour} to find black polygons in an image.  This algorithm
  * is the basis for several fiducial detectors in BoofCV and fits the polygon to sub-pixel accuracy and produces
  * reasonable results on blurred images too.  It is highly configurable and can even sparsely fit polygons
  * in a distorted image.  Meaning the expensive step of undistorting the entire image is not needed.
@@ -59,13 +59,13 @@ public class ExampleDetectBlackPolygon {
 
 		// first configure the detector to only detect convex shapes with 3 to 7 sides
 		ConfigPolygonDetector config = new ConfigPolygonDetector(3,7);
-		BinaryPolygonDetector<GrayU8> detector = FactoryShapeDetector.polygon(config, GrayU8.class);
+		DetectPolygonBinaryGrayRefine<GrayU8> detector = FactoryShapeDetector.polygon(config, GrayU8.class);
 
 		processImages(imagesConvex, detector, panel);
 
 		// now lets detect concave shapes with many sides
-		config.maximumSides = 12;
-		config.convex = false;
+		config.detector.maximumSides = 12;
+		config.detector.convex = false;
 		detector = FactoryShapeDetector.polygon(config, GrayU8.class);
 
 		processImages(imagesConcave, detector, panel);
@@ -74,7 +74,7 @@ public class ExampleDetectBlackPolygon {
 	}
 
 	private static void processImages(String[] files,
-									  BinaryPolygonDetector<GrayU8> detector,
+									  DetectPolygonBinaryGrayRefine<GrayU8> detector,
 									  ListDisplayPanel panel)
 	{
 		for( String fileName : files ) {
@@ -95,10 +95,10 @@ public class ExampleDetectBlackPolygon {
 			detector.process(input, binary);
 
 			// visualize results by drawing red polygons
-			FastQueue<Polygon2D_F64> found = detector.getFoundPolygons();
+			java.util.List<Polygon2D_F64> found = detector.getPolygons(null);
 			Graphics2D g2 = image.createGraphics();
 			g2.setStroke(new BasicStroke(3));
-			for (int i = 0; i < found.size; i++) {
+			for (int i = 0; i < found.size(); i++) {
 				g2.setColor(Color.RED);
 				VisualizeShapes.drawPolygon(found.get(i), true, g2, true);
 				g2.setColor(Color.CYAN);

@@ -20,18 +20,15 @@ package boofcv.alg.shapes.polygon;
 
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageGray;
-import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.GrowQueue_I32;
-
-import java.util.List;
 
 /**
- * Abstract interface for refining a polygon detected inside of {@link BinaryPolygonDetector}.
+ * Refines a polygon using the gray scale image. This results in a more accurate fit than just the contour alone
+ * will provide and removes the shift that fitting to contour injects.
  *
  * @author Peter Abeles
  */
-public interface RefineBinaryPolygon<T extends ImageGray<T>> {
+public interface RefinePolygonToGray<T extends ImageGray<T>> {
 
 	/**
 	 * Sets the input image
@@ -54,10 +51,8 @@ public interface RefineBinaryPolygon<T extends ImageGray<T>> {
 	 * Refines the initial polygon
 	 *
 	 * @param input 2D polygon version of contour polygon
-	 * @param contour List of pixels in the contour
-	 * @param splits Indexes in the contour where the initial polygon was found
 	 * @param output Storage for the refined polygon
 	 * @return true if successful or false if it failed
 	 */
-	boolean refine(Polygon2D_F64 input, List<Point2D_I32> contour , GrowQueue_I32 splits, Polygon2D_F64 output);
+	boolean refine(Polygon2D_F64 input, Polygon2D_F64 output);
 }

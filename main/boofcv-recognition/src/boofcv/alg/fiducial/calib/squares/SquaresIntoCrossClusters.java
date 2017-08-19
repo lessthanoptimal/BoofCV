@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -84,11 +84,11 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	 * @param squares Set of squares
 	 * @return List of graphs.  All data structures are recycled on the next call to process().
 	 */
-	public List<List<SquareNode>> process(List<Polygon2D_F64> squares , List<BinaryPolygonDetector.Info> info ) {
+	public List<List<SquareNode>> process(List<DetectPolygonFromContour.Info> squares ) {
 		recycleData();
 
 		// set up nodes
-		computeNodeInfo(squares,info);
+		computeNodeInfo(squares);
 
 		// Connect nodes to each other
 		connectNodes();
@@ -98,13 +98,13 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 		return clusters.toList();
 	}
 
-	void computeNodeInfo( List<Polygon2D_F64> squares , List<BinaryPolygonDetector.Info> squaresInfo ) {
+	void computeNodeInfo( List<DetectPolygonFromContour.Info> squares ) {
 		for (int i = 0; i < squares.size(); i++) {
 			SquareNode n = nodes.grow();
 			n.reset();
 
-			Polygon2D_F64 polygon = squares.get(i);
-			BinaryPolygonDetector.Info info = squaresInfo.get(i);
+			DetectPolygonFromContour.Info info = squares.get(i);
+			Polygon2D_F64 polygon = info.polygon;
 
 			// see if every corner touches a border
 			if( info.borderCorners.size() > 0 ) {

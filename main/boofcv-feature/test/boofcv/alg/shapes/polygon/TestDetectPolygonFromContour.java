@@ -18,36 +18,26 @@
 
 package boofcv.alg.shapes.polygon;
 
-import boofcv.abst.distort.FDistort;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.distort.PixelTransformAffine_F32;
-import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
-import boofcv.factory.shape.ConfigPolygonDetector;
-import boofcv.factory.shape.ConfigRefinePolygonCornersToImage;
-import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
+import boofcv.factory.shape.ConfigPolygonFromContour;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.distort.PixelTransform2_F32;
-import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.affine.Affine2D_F32;
-import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.affine.UtilAffine;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
-import georegression.transform.affine.AffinePointOps_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_B;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.awt.*;
@@ -60,28 +50,14 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestBinaryPolygonDetector {
-
-	int width = 400,height=450;
-	boolean showRendered = false;
-
+public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
+	
 	GrayU8 binary = new GrayU8(1,1);
-	ImageGray orig;
-	ImageGray dist;
-
-	Class imageTypes[] = new Class[]{GrayU8.class, GrayF32.class};
-
-	List<Rectangle2D_I32> rectangles = new ArrayList<>();
-	List<Polygon2D_F64> distorted = new ArrayList<>();
-
-	Affine2D_F64 transform = new Affine2D_F64();
 
 	InputToBinary<GrayU8> inputToBinary_U8 = FactoryThresholdBinary.globalFixed(100, true, GrayU8.class);
 
-	@Before
-	public void before() {
-		rectangles.clear();
-		transform.reset();
+	public TestDetectPolygonFromContour() {
+		this.fittingToBinaryImage = true;
 	}
 
 	/**
@@ -100,13 +76,12 @@ public class TestBinaryPolygonDetector {
 		transform = transform.invert(null);
 
 		for( Class imageType : imageTypes ) {
-			checkDetected_LensDistortion(imageType, true, 0.5);
-			checkDetected_LensDistortion(imageType, false, 0.5);
+			checkDetected_LensDistortion(imageType, 0.5);
 		}
 	}
 
-	private void checkDetected_LensDistortion(Class imageType, boolean useLines , double tol) {
-		renderDistortedRectangle(imageType);
+	private void checkDetected_LensDistortion(Class imageType, double tol) {
+		renderDistortedRectangles(true,imageType);
 
 		Affine2D_F32 a = new Affine2D_F32();
 		UtilAffine.convert(transform,a);
@@ -114,16 +89,19 @@ public class TestBinaryPolygonDetector {
 		PixelTransform2_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
 
 		int numberOfSides = 4;
-		BinaryPolygonDetector alg = createDetector(imageType, useLines, numberOfSides,numberOfSides);
-		alg.setLensDistortion(dist.width, dist.height, tranTo, tranFrom);
-		alg.process(dist, binary);
+		DetectPolygonFromContour alg = createDetector(imageType, numberOfSides,numberOfSides);
+		alg.setLensDistortion(image.width, image.height, tranTo, tranFrom);
+		alg.process(image, binary);
 
-		FastQueue<Polygon2D_F64> found = alg.getFoundPolygons();
+		FastQueue<DetectPolygonFromContour.Info> found = alg.getFound();
 
 		assertEquals(rectangles.size(),found.size);
 
 		for (int i = 0; i < found.size; i++) {
-			assertEquals(1, findMatchesOriginal(found.get(i), tol));
+			Polygon2D_F64 p = found.get(i).polygon;
+			assertEquals(1, findMatchesOriginal(p, tol));
+			assertEquals(black,found.get(i).edgeInside,3);
+			assertEquals(white,found.get(i).edgeOutside,white*0.05);
 		}
 	}
 
@@ -135,8 +113,7 @@ public class TestBinaryPolygonDetector {
 		rectangles.add(new Rectangle2D_I32(90,90,120,120));
 
 		for( Class imageType : imageTypes ) {
-			checkDetected(imageType,true,1e-8);
-			checkDetected(imageType,false,1e-8);
+			checkDetected(imageType,0.01); // the match should be perfect since the size of the
 		}
 	}
 
@@ -150,24 +127,27 @@ public class TestBinaryPolygonDetector {
 		transform.set(1.1, 0.2, 0.12, 1.3, 10.2, 20.3);
 
 		for( Class imageType : imageTypes ) {
-			checkDetected(imageType,true,0.3);
-			checkDetected(imageType,false,0.5);
+			checkDetected(imageType,1.0);
 		}
 	}
 
-	private void checkDetected(Class imageType, boolean useLines,  double tol ) {
-		renderDistortedRectangle(imageType);
+	private void checkDetected(Class imageType, double tol ) {
+		renderDistortedRectangles(true,imageType);
 
 		int numberOfSides = 4;
-		BinaryPolygonDetector alg = createDetector(imageType, useLines, numberOfSides,numberOfSides);
-		alg.process(dist, binary);
+		DetectPolygonFromContour alg = createDetector(imageType, numberOfSides,numberOfSides);
+		alg.process(image, binary);
 
-		FastQueue<Polygon2D_F64> found = alg.getFoundPolygons();
+		FastQueue<DetectPolygonFromContour.Info> found = alg.getFound();
 
 		assertEquals(rectangles.size(), found.size);
 
 		for (int i = 0; i < found.size; i++) {
-			assertEquals(1,findMatches(found.get(i),tol));
+			Polygon2D_F64 p = found.get(i).polygon;
+			assertEquals(1,findMatches(p,tol));
+
+			assertEquals(black,found.get(i).edgeInside,4);
+			assertEquals(white,found.get(i).edgeOutside,white*0.1);
 		}
 	}
 
@@ -179,36 +159,30 @@ public class TestBinaryPolygonDetector {
 		polygons.add(new Polygon2D_F64(20, 60, 20, 90, 40, 90,40, 60));
 
 		for( Class imageType : imageTypes ) {
-			checkDetectedMulti(imageType, polygons, true,1.5);
-			checkDetectedMulti(imageType, polygons, false,2);
+			checkDetectedMulti(imageType, polygons,2.5);
 		}
 	}
 
-	private void checkDetectedMulti(Class imageType,List<Polygon2D_F64> polygons, boolean useLines,  double tol ) {
+	private void checkDetectedMulti(Class imageType,List<Polygon2D_F64> polygons,  double tol ) {
 		renderPolygons(polygons,imageType);
 
-		BinaryPolygonDetector alg = createDetector(imageType, useLines, 3,4);
-		alg.process(dist, binary);
+		DetectPolygonFromContour alg = createDetector(imageType, 3,4);
+		alg.process(image, binary);
 
-		FastQueue<Polygon2D_F64> found = alg.getFoundPolygons();
+		FastQueue<DetectPolygonFromContour.Info> found = alg.getFound();
 
 		assertEquals(polygons.size(), found.size);
 
 		for (int i = 0; i < found.size; i++) {
-			assertEquals(1,findMatches(found.get(i),tol));
+			Polygon2D_F64 p = found.get(i).polygon;
+			assertEquals(1,findMatches(p,tol));
 		}
 	}
 
-	private <T extends ImageGray<T>> BinaryPolygonDetector<T> createDetector(Class<T> imageType, boolean useLines, int minSides, int maxSides) {
-		ConfigPolygonDetector config = new ConfigPolygonDetector(minSides,maxSides);
+	private <T extends ImageGray<T>> DetectPolygonFromContour<T> createDetector(Class<T> imageType, int minSides, int maxSides) {
+		ConfigPolygonFromContour config = new ConfigPolygonFromContour(minSides,maxSides);
 
-		if( useLines ) {
-			config.refine = new ConfigRefinePolygonLineToImage();
-		} else {
-			config.refine = new ConfigRefinePolygonCornersToImage();
-		}
-
-		return FactoryShapeDetector.polygon(config,imageType);
+		return FactoryShapeDetector.polygonContour(config,imageType);
 	}
 
 	/**
@@ -230,99 +204,24 @@ public class TestBinaryPolygonDetector {
 		return match;
 	}
 
-	private int findMatches( Polygon2D_F64 found , double tol ) {
-		int match = 0;
-		for (int i = 0; i < distorted.size(); i++) {
-			if(UtilPolygons2D_F64.isEquivalent(found, distorted.get(i),tol))
-				match++;
-		}
-		return match;
-	}
 
-
+	@Override
 	public void renderPolygons( List<Polygon2D_F64> polygons, Class imageType ) {
+		super.renderPolygons(polygons,imageType);
 		InputToBinary inputToBinary = FactoryThresholdBinary.globalFixed(100, true, imageType);
 
-		BufferedImage work = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-
-		Graphics2D g2 = work.createGraphics();
-
-		g2.setColor(Color.WHITE);
-		g2.fillRect(0, 0, width, height);
-		g2.setColor(Color.BLACK);
-
-		distorted.clear();
-		for (int i = 0; i < polygons.size(); i++) {
-			Polygon2D_F64 orig = polygons.get(i);
-
-			int x[] = new int[ orig.size() ];
-			int y[] = new int[ orig.size() ];
-
-			for (int j = 0; j < orig.size(); j++) {
-				x[j] = (int)orig.get(j).x;
-				y[j] = (int)orig.get(j).y;
-			}
-
-			g2.fillPolygon(x,y,orig.size());
-
-			distorted.add( orig );
-		}
-
-		dist = GeneralizedImageOps.createSingleBand(imageType, width, height);
-		binary = new GrayU8(width,height);
-
-		ConvertBufferedImage.convertFrom(work,dist,true);
-
-		inputToBinary.process(dist,binary);
-
-		if( showRendered ) {
-			ShowImages.showWindow(work, "Rendered");
-			try {
-				Thread.sleep(4000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+		binary.reshape(width,height);
+		inputToBinary.process(image,binary);
 	}
 
-	public void renderDistortedRectangle( Class imageType ) {
+	@Override
+	public void renderDistortedRectangles( boolean black, Class imageType ) {
+		super.renderDistortedRectangles(black,imageType);
 		InputToBinary inputToBinary = FactoryThresholdBinary.globalFixed(100, true, imageType);
 
-		orig = GeneralizedImageOps.createSingleBand(imageType,width,height);
-		dist = GeneralizedImageOps.createSingleBand(imageType,width,height);
 		binary.reshape(width,height);
 
-		GImageMiscOps.fill(orig, 200);
-		GImageMiscOps.fill(dist, 200);
-
-		distorted.clear();
-		for (Rectangle2D_I32 q : rectangles) {
-
-			GImageMiscOps.fillRectangle(orig,10,q.x0,q.y0,q.x1-q.x0,q.y1-q.y0);
-
-			Polygon2D_F64 tran = new Polygon2D_F64(4);
-
-			AffinePointOps_F64.transform(transform,q.x0,q.y0,tran.get(0));
-			AffinePointOps_F64.transform(transform,q.x0,q.y1,tran.get(1));
-			AffinePointOps_F64.transform(transform,q.x1,q.y1,tran.get(2));
-			AffinePointOps_F64.transform(transform,q.x1,q.y0,tran.get(3));
-
-			distorted.add(tran);
-		}
-
-		new FDistort(orig,dist).border(200).affine(transform).apply();
-
-		inputToBinary.process(dist,binary);
-
-		if( showRendered ) {
-			BufferedImage out = ConvertBufferedImage.convertTo(dist, null, true);
-			ShowImages.showWindow(out, "Rendered");
-			try {
-				Thread.sleep(4000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+		inputToBinary.process(image,binary);
 	}
 
 	@Test
@@ -339,10 +238,10 @@ public class TestBinaryPolygonDetector {
 		inputToBinary_U8.process(gray,binary);
 
 		for (int i = 3; i <= 6; i++) {
-			BinaryPolygonDetector alg = createDetector(GrayU8.class, true, i,i);
+			DetectPolygonFromContour alg = createDetector(GrayU8.class, i,i);
 
 			alg.process(gray,binary);
-			assertEquals("num sides = "+i,0,alg.getFoundPolygons().size());
+			assertEquals("num sides = "+i,0,alg.getFound().size());
 		}
 	}
 
@@ -360,39 +259,16 @@ public class TestBinaryPolygonDetector {
 		inputToBinary_U8.process(gray,binary);
 
 		for (int i = 3; i <= 6; i++) {
-			BinaryPolygonDetector alg = createDetector(GrayU8.class, true, i, i);
+			DetectPolygonFromContour<GrayU8> alg = createDetector(GrayU8.class, i, i);
 
 			alg.process(gray,binary);
 			if( i == 3 ) {
-				double tol = 0.5;
-				assertEquals(1, alg.getFoundPolygons().size());
-				Polygon2D_F64 found = (Polygon2D_F64)alg.getFoundPolygons().get(0);
+				assertEquals(1, alg.getFound().size());
+				Polygon2D_F64 found = alg.getFound().get(0).polygon;
 				checkPolygon(new double[]{10, 10, 30, 40, 50, 10}, found);
 			} else
-				assertEquals(0,alg.getFoundPolygons().size());
+				assertEquals(0,alg.getFound().size());
 		}
-	}
-
-	public static boolean checkPolygon( double[] expected , Polygon2D_F64 found  ) {
-		for (int i = 0; i < found.size(); i++) {
-
-
-			boolean matched = true;
-			for (int j = 0; j < found.size(); j++) {
-				double x = expected[j*2];
-				double y = expected[j*2+1];
-
-				Point2D_F64 p = found.get((i+j)%found.size());
-
-				if( Math.abs(p.x-x) > 1e-5 || Math.abs(p.y-y) > 1e-5 ) {
-					matched = false;
-					break;
-				}
-			}
-			if( matched )
-				return true;
-		}
-		return false;
 	}
 
 	/**
@@ -406,11 +282,29 @@ public class TestBinaryPolygonDetector {
 		for( Class imageType : imageTypes ) {
 			renderPolygons(polygons, imageType);
 
-			BinaryPolygonDetector alg = createDetector(imageType, true, 5,5);
+			DetectPolygonFromContour alg = createDetector(imageType, 5,5);
 
-			alg.process(dist,binary);
+			alg.process(image,binary);
 
-			assertEquals(0,alg.getFoundPolygons().size());
+			assertEquals(0,alg.getFound().size());
+		}
+	}
+
+	/**
+	 * Make sure it rejects shapes with low contract
+	 */
+	@Test
+	public void rejectLowContract() {
+		rectangles.add(new Rectangle2D_I32(30,30,60,60));
+		black = white-2;
+
+		for( Class imageType : imageTypes ) {
+			renderDistortedRectangles(true,imageType);
+
+			DetectPolygonFromContour alg = createDetector(imageType, 3, 5);
+			alg.process(image, binary);
+
+			assertEquals(0, alg.getFound().size);
 		}
 	}
 
@@ -426,15 +320,15 @@ public class TestBinaryPolygonDetector {
 		for( Class imageType : imageTypes ) {
 			renderPolygons(polygons,imageType );
 
-			BinaryPolygonDetector alg = createDetector(imageType, true, 5,5);
+			DetectPolygonFromContour alg = createDetector(imageType, 5,5);
 			alg.setConvex(false);
 
-			alg.process(dist, binary);
+			alg.process(image, binary);
 
-			assertEquals(1, alg.getFoundPolygons().size());
+			assertEquals(1, alg.getFound().size());
 
-			Polygon2D_F64 found = (Polygon2D_F64)alg.getFoundPolygons().get(0);
-			assertEquals(1, findMatches(found, 1));
+			Polygon2D_F64 found = ((DetectPolygonFromContour.Info)alg.getFound().get(0)).polygon;
+			assertEquals(1, findMatches(found,3));
 		}
 	}
 
@@ -442,7 +336,7 @@ public class TestBinaryPolygonDetector {
 	public void touchesBorder_false() {
 		List<Point2D_I32> contour = new ArrayList<>();
 
-		BinaryPolygonDetector alg = createDetector(GrayU8.class, true, 4,4);
+		DetectPolygonFromContour alg = createDetector(GrayU8.class, 4,4);
 		alg.getLabeled().reshape(20,30);
 		assertFalse(alg.touchesBorder(contour));
 
@@ -461,27 +355,27 @@ public class TestBinaryPolygonDetector {
 	 * the polygon is fit to it it can snap around the white object
 	 */
 	@Test
-	public void snapToBrightObject() {
+	public void doNotSnapToBrightObject() {
 		GrayU8 gray = new GrayU8(200,200);
 		GrayU8 binary = new GrayU8(200,200);
 
-		ImageMiscOps.fillRectangle(gray,200,40,40,40,40);
+		ImageMiscOps.fillRectangle(gray,white,40,40,40,40);
 		ImageMiscOps.fillRectangle(binary,1,38,38,44,44);
 		ImageMiscOps.fillRectangle(binary,0,40,40,40,40);
 
-		BinaryPolygonDetector<GrayU8> alg = createDetector(GrayU8.class, true, 4,4);
+		DetectPolygonFromContour<GrayU8> alg = createDetector(GrayU8.class, 4,4);
 
 		// edge threshold test will only fail now if the sign is reversed
-		alg.edgeThreshold = 0;
+		alg.contourEdgeThreshold = 0;
 
 		alg.process(gray,binary);
 
-		assertEquals(0,alg.getFoundPolygons().size);
+		assertEquals(0,alg.getFound().size);
 	}
 
 	@Test
 	public void determineCornersOnBorder() {
-		BinaryPolygonDetector alg = createDetector(GrayU8.class, true, 4,4);
+		DetectPolygonFromContour alg = createDetector(GrayU8.class, 4,4);
 		alg.getLabeled().reshape(width,height);
 
 		Polygon2D_F64 poly = new Polygon2D_F64(0,0, 10,0, 10,10, 0,10);
@@ -506,7 +400,7 @@ public class TestBinaryPolygonDetector {
 		PixelTransform2_F32 tranFrom = new PixelTransformAffine_F32(a);
 		PixelTransform2_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
 
-		BinaryPolygonDetector alg = createDetector(GrayU8.class, true, 4,4);
+		DetectPolygonFromContour alg = createDetector(GrayU8.class, 4,4);
 		alg.undistToDist = tranFrom;
 		alg.distToUndist = tranTo;
 		alg.getLabeled().reshape(width,height);

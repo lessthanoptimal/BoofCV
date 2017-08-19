@@ -64,7 +64,7 @@ public class ShapeFitContourPanel extends StandardAlgConfigPanel
 		this.owner = owner;
 
 		algorithmCombo = new JComboBox();
-		algorithmCombo.addItem("Polygon");
+		algorithmCombo.addItem("Info");
 		algorithmCombo.addItem("Oval");
 		algorithmCombo.addActionListener(this);
 		algorithmCombo.setMaximumSize(algorithmCombo.getPreferredSize());

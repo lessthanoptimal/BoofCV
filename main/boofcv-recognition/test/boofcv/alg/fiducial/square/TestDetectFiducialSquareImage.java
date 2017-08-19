@@ -22,7 +22,7 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.PixelMath;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
@@ -44,7 +44,7 @@ import static org.junit.Assert.*;
 public class TestDetectFiducialSquareImage {
 
 	private Random rand = new Random(234);
-	private BinaryPolygonDetector squareDetector = FactoryShapeDetector.
+	private DetectPolygonBinaryGrayRefine<GrayU8> squareDetector = FactoryShapeDetector.
 			polygon(new ConfigPolygonDetector(false, 4,4), GrayU8.class);
 	private InputToBinary<GrayU8> inputToBinary = FactoryThresholdBinary.globalFixed(50, true, GrayU8.class);
 

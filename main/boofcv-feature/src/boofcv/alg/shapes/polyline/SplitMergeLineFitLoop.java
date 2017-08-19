@@ -224,6 +224,8 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	/**
 	 * Finds the point between indexStart and the end point which is the greater distance from the line
 	 * (set up prior to calling).  Returns the index of the element with a distances greater than tolerance, otherwise -1
+	 *
+	 * @return Selected offset from start of the split. -1 if no split was selected
 	 */
 	protected int selectSplitOffset( int indexStart , int length ) {
 		int bestOffset = -1;

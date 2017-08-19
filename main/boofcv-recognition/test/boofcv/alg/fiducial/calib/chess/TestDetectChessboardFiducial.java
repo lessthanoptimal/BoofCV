@@ -22,9 +22,10 @@ import boofcv.abst.distort.FDistort;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
+import boofcv.gui.image.ShowImages;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
@@ -56,6 +57,8 @@ public class TestDetectChessboardFiducial {
 
 	Se2_F64 transform;
 
+	boolean showRendered = false;
+
 	@Before
 	public void setup() {
 		offsetX = 15;
@@ -71,6 +74,7 @@ public class TestDetectChessboardFiducial {
 		for( int numRows = 3; numRows <= 7; numRows++ ) {
 			for( int numCols = 3; numCols <= 7; numCols++ ) {
 //				System.out.println("shape "+numCols+"  "+numRows);
+				basicTest(numRows, numCols, false);
 				basicTest(numRows, numCols, true);
 			}
 		}
@@ -86,7 +90,7 @@ public class TestDetectChessboardFiducial {
 
 		ConfigChessboard configChess = new ConfigChessboard(5, 5, 1);
 
-		BinaryPolygonDetector<GrayF32> detectorSquare =
+		DetectPolygonBinaryGrayRefine<GrayF32> detectorSquare =
 				FactoryShapeDetector.polygon(configChess.square, GrayF32.class);
 //		detectorSquare.setVerbose(true);
 
@@ -97,7 +101,7 @@ public class TestDetectChessboardFiducial {
 			inputToBinary = FactoryThresholdBinary.globalFixed(50,true,GrayF32.class);
 
 		DetectChessboardFiducial alg =
-				new DetectChessboardFiducial(numRows, numCols, 4,detectorSquare,null,null,inputToBinary);
+				new DetectChessboardFiducial(numRows, numCols, 4,detectorSquare,inputToBinary);
 
 		assertTrue(alg.process(gray));
 
@@ -154,6 +158,15 @@ public class TestDetectChessboardFiducial {
 			f.border(80f).affine(transform.c,-transform.s,transform.s,transform.c,
 					transform.T.x,transform.T.y).apply();
 			gray = distorted;
+		}
+
+		if( showRendered ) {
+			ShowImages.showWindow(gray,"Rendered");
+			try {
+				Thread.sleep(4000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 
 		return gray;
@@ -213,14 +226,20 @@ public class TestDetectChessboardFiducial {
 		transforms.add( new Se2_F64(50,h-65,-0.05));
 		transforms.add( new Se2_F64(50,h-90,0.05));
 
-
 		offsetX = 0;
 		offsetY = 0;
 
-		for(Se2_F64 t : transforms ) {
-			transform = t;
-			basicTest(3,4, false);
-			basicTest(3,4, true);
+//		showRendered = true;
+
+		for( int test = 0; test < transforms.size(); test++ ) {
+//			System.out.println("====================================== Test = "+test);
+			transform = transforms.get(test);
+
+			// noise is added to images. Make sure the algorithms aren't brittle
+			for (int mc = 0; mc < 5; mc++) {
+				basicTest(3,4, false);
+				basicTest(3,4, true);
+			}
 		}
 	}
 }

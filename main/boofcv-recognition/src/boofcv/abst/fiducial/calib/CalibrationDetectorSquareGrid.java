@@ -22,7 +22,7 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.GrayF32;
@@ -46,18 +46,12 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 
 	public CalibrationDetectorSquareGrid(ConfigSquareGrid config) {
 
-		if( config.refineWithCorners) {
-			config.square.refine = config.configRefineCorners;
-		} else {
-			config.square.refine = config.configRefineLines;
-		}
-
 		double spaceToSquareRatio = config.spaceWidth/config.squareWidth;
 
 		InputToBinary<GrayF32> inputToBinary =
 				FactoryThresholdBinary.threshold(config.thresholding,GrayF32.class);
 
-		BinaryPolygonDetector<GrayF32> detectorSquare =
+		DetectPolygonBinaryGrayRefine<GrayF32> detectorSquare =
 				FactoryShapeDetector.polygon(config.square,GrayF32.class);
 
 		detect = new DetectSquareGridFiducial<>(config.numRows,config.numCols,

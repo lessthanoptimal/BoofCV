@@ -209,7 +209,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 //		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleAsym"),"image");
 //		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang"),"CalibIm");
 //		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration//stereo/Bumblebee2_Square"),"left");
-		images = UtilIO.directoryList(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"),"left");
+		images = UtilIO.directoryList("/home/pja/projects/ValidationBoof/scripts/output","right");
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
 		app.configure(detector,images,2,false);

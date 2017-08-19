@@ -18,11 +18,11 @@
 
 package boofcv.factory.shape;
 
-import boofcv.alg.shapes.polygon.RefinePolygonLineToImage;
+import boofcv.alg.shapes.polygon.RefinePolygonToGrayLine;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration parameters for {@link RefinePolygonLineToImage}
+ * Configuration parameters for {@link RefinePolygonToGrayLine}
  *
  * @author Peter Abeles
  */
@@ -64,7 +64,7 @@ public class ConfigRefinePolygonLineToImage implements Configuration {
 
 	@Override
 	public String toString() {
-		return "ConfigRefinePolygonLineToImage{" +
+		return getClass().getSimpleName()+"{" +
 				"cornerOffset=" + cornerOffset +
 				", lineSamples=" + lineSamples +
 				", sampleRadius=" + sampleRadius +

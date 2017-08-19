@@ -19,27 +19,24 @@
 package boofcv.demonstrations.shapes;
 
 import boofcv.alg.filter.binary.Contour;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.Configuration;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +49,7 @@ import java.util.List;
 public class DetectBlackPolygonApp<T extends ImageGray<T>>
 		extends DetectBlackShapeAppBase
 {
-	BinaryPolygonDetector<T> detector;
+	DetectPolygonBinaryGrayRefine<T> detector;
 
 	public DetectBlackPolygonApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);
@@ -61,17 +58,11 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 	}
 
 	@Override
-	protected void createDetector() {
+	protected void createDetector(boolean initializing) {
+		if( !initializing)
+			BoofSwingUtil.checkGuiThread();
+
 		DetectPolygonControlPanel controls = (DetectPolygonControlPanel)DetectBlackPolygonApp.this.controls;
-
-		Configuration configRefine = null;
-
-		if( controls.refineType == PolygonRefineType.LINE ) {
-			configRefine = controls.getConfigLine();
-		} else if( controls.refineType == PolygonRefineType.CORNER ) {
-			configRefine = controls.getConfigCorner();
-		}
-		controls.getConfigPolygon().refine = configRefine;
 
 		synchronized (this) {
 			detector = FactoryShapeDetector.polygon(controls.getConfigPolygon(), imageClass);
@@ -81,7 +72,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 
 
 	public void configUpdate() {
-		createDetector();
+		createDetector(false);
 		// does process and render too
 	}
 
@@ -97,27 +88,11 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 		reprocessImageOnly();
 	}
 
+	int count = 0;
 	@Override
-	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
-		System.out.flush();
-		this.input = (T)input;
-
-		original = ConvertBufferedImage.checkCopy(buffered,original);
-		work = ConvertBufferedImage.checkDeclare(buffered,work);
-
-		binary.reshape(work.getWidth(), work.getHeight());
-
-		synchronized (this) {
-			inputToBinary.process((T)input, binary);
-			detector.process((T) input, binary);
-		}
-
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				viewUpdated();
-			}
-		});
+	protected void detectorProcess(ImageGray input, GrayU8 binary) {
+//		System.out.println("processing image "+count++);
+		detector.process((T) input, binary);
 	}
 
 	class VisualizePanel extends ImageZoomPanel {
@@ -138,7 +113,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 				}
 
 				if (controls.bShowLines) {
-					List<Polygon2D_F64> polygons = detector.getFoundPolygons().toList();
+					List<Polygon2D_F64> polygons = detector.getPolygons(null);
 
 					g2.setColor(Color.RED);
 					g2.setStroke(new BasicStroke(3));
@@ -154,7 +129,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 				}
 
 				if (controls.bShowCorners) {
-					List<Polygon2D_F64> polygons = detector.getFoundPolygons().toList();
+					List<Polygon2D_F64> polygons = detector.getPolygons(null);
 
 					g2.setColor(Color.BLUE);
 					g2.setStroke(new BasicStroke(1));
