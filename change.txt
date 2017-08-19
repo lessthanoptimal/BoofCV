@@ -35,6 +35,8 @@ TOP ITEMS
 - TODO QR Code support
 
 OTHER ITEMS
+- TODO Calibration Target PS generator unit test
+       Convert document into a graphic and detect
 - TODO Visualization tools for Direct VO
 -      Show warped image
 - TODO ExampleRectifyUncalibratedStereo is upside down.  Adjust the math to avoid that
