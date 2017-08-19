@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.calib.chess;
 import boofcv.alg.fiducial.calib.squares.*;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
+import boofcv.misc.CircularIndex;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
@@ -85,8 +86,8 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 		if( detectorSquare != null ) { // null in some unit tests for simplicity
 			this.detectorSquare.setFunctionAdjust(new DetectPolygonBinaryGrayRefine.AdjustBeforeRefineEdge() {
 				@Override
-				public void adjust(DetectPolygonFromContour.Info info) {
-					DetectChessboardSquarePoints.this.adjustBeforeOptimize(info.polygon, info.borderCorners);
+				public void adjust(DetectPolygonFromContour.Info info, boolean clockwise) {
+					DetectChessboardSquarePoints.this.adjustBeforeOptimize(info.polygon, info.borderCorners,clockwise);
 				}
 			});
 		}
@@ -151,7 +152,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	 * The polygon detected from the contour is too small because the binary image was eroded. This expand the size
 	 * of the polygon so that it fits the image edge better
 	 */
-	public void adjustBeforeOptimize(Polygon2D_F64 polygon, GrowQueue_B touchesBorder) {
+	public void adjustBeforeOptimize(Polygon2D_F64 polygon, GrowQueue_B touchesBorder, boolean clockwise) {
 		int N = polygon.size();
 		work.vertexes.resize(N);
 		for (int i = 0; i < N; i++) {
@@ -159,8 +160,18 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 		}
 
 		for (int i = N - 1, j = 0; j < N; i = j, j++) {
-			Point2D_F64 a = polygon.get(i);
-			Point2D_F64 b = polygon.get(j);
+			int ii,jj,kk,mm;
+			if( clockwise ) {
+				mm = CircularIndex.addOffset(-1,i,N);
+				ii=i;jj=j;
+				kk = CircularIndex.addOffset(1,j,N);
+			} else {
+				mm = CircularIndex.addOffset(1,j,N);
+				ii=j;jj=i;
+				kk = CircularIndex.addOffset(-1,i,N);
+			}
+
+			Point2D_F64 a = polygon.get(ii), b = polygon.get(jj);
 
 			double dx = b.x - a.x;
 			double dy = b.y - a.y;
@@ -169,19 +180,25 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 			dx *= 1.5 / l;
 			dy *= 1.5 / l;
 
-			Point2D_F64 _a = work.get(i);
-			Point2D_F64 _b = work.get(j);
+			Point2D_F64 _a = work.get(ii);
+			Point2D_F64 _b = work.get(jj);
 
-			if (touchesBorder.size() > 0 && touchesBorder.get(i) && touchesBorder.get(j)) {
-				// move the point along the image border
-				_a.x -= dx;
-				_a.y -= dy;
-				_b.x += dx;
-				_b.y += dy;
+			// move the point away from the line
+			if( touchesBorder.size>0 && touchesBorder.get(ii) ) {
+				if(!touchesBorder.get(mm)) {
+					_a.x -= dx;
+					_a.y -= dy;
+				}
 			} else {
-				// move the point away from the line
 				_a.x += -dy;
 				_a.y += dx;
+			}
+			if( touchesBorder.size>0 && touchesBorder.get(jj) ) {
+				if( !touchesBorder.get(kk) ) {
+					_b.x += dx;
+					_b.y += dy;
+				}
+			} else {
 				_b.x += -dy;
 				_b.y += dx;
 			}

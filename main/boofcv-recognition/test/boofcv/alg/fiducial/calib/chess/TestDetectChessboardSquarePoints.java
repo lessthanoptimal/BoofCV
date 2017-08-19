@@ -31,6 +31,8 @@ import boofcv.struct.image.GrayU8;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.ddogleg.struct.GrowQueue_B;
+import org.ejml.UtilEjml;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Before;
 import org.junit.Test;
@@ -344,12 +346,75 @@ public class TestDetectChessboardSquarePoints {
 
 	@Test
 	public void adjustBeforeOptimize() {
-		fail("Implement");
+
+		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,0.01,null);
+
+		Polygon2D_F64 polygon = new Polygon2D_F64(10,12,30,12,30,40,10,40);
+
+		alg.adjustBeforeOptimize(polygon,new GrowQueue_B(),false);
+
+		assertEquals(8.5, polygon.get(0).x, UtilEjml.TEST_F64);
+		assertEquals(10.5, polygon.get(0).y, UtilEjml.TEST_F64);
+
+		assertEquals(31.5, polygon.get(1).x, UtilEjml.TEST_F64);
+		assertEquals(10.5, polygon.get(1).y, UtilEjml.TEST_F64);
+
+		assertEquals(31.5, polygon.get(2).x, UtilEjml.TEST_F64);
+		assertEquals(41.5, polygon.get(2).y, UtilEjml.TEST_F64);
+
+		assertEquals(8.5, polygon.get(3).x, UtilEjml.TEST_F64);
+		assertEquals(41.5, polygon.get(3).y, UtilEjml.TEST_F64);
+
+		polygon = new Polygon2D_F64(10,12,30,12,30,40,10,40);
+		polygon.flip();
+		alg.adjustBeforeOptimize(polygon,new GrowQueue_B(),true);
+
+		assertEquals(8.5, polygon.get(0).x, UtilEjml.TEST_F64);
+		assertEquals(10.5, polygon.get(0).y, UtilEjml.TEST_F64);
+
+		assertEquals(31.5, polygon.get(3).x, UtilEjml.TEST_F64);
+		assertEquals(10.5, polygon.get(3).y, UtilEjml.TEST_F64);
+
+		assertEquals(31.5, polygon.get(2).x, UtilEjml.TEST_F64);
+		assertEquals(41.5, polygon.get(2).y, UtilEjml.TEST_F64);
+
+		assertEquals(8.5, polygon.get(1).x, UtilEjml.TEST_F64);
+		assertEquals(41.5, polygon.get(1).y, UtilEjml.TEST_F64);
 	}
 
 	@Test
 	public void adjustBeforeOptimize_touchesBorder() {
-		fail("Implement");
+		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,0.01,null);
+
+
+		GrowQueue_B touches = new GrowQueue_B();
+		touches.add(true);
+		touches.add(true);
+		touches.add(false);
+		touches.add(true);
+
+		for( boolean clockwise : new boolean[]{true,false} ) {
+			Polygon2D_F64 polygon = new Polygon2D_F64(10,12,30,12,30,40,10,40);
+
+			if(clockwise)
+				polygon.flip();
+
+			alg.adjustBeforeOptimize(polygon, touches, clockwise);
+
+			int table[] = clockwise ? new int[]{0, 3, 2, 1} : new int[]{0, 1, 2, 3};
+
+			assertEquals(10, polygon.get(table[0]).x, UtilEjml.TEST_F64);
+			assertEquals(12, polygon.get(table[0]).y, UtilEjml.TEST_F64);
+
+			assertEquals(31.5, polygon.get(table[1]).x, UtilEjml.TEST_F64);
+			assertEquals(12, polygon.get(table[1]).y, UtilEjml.TEST_F64);
+
+			assertEquals(31.5, polygon.get(table[2]).x, UtilEjml.TEST_F64);
+			assertEquals(41.5, polygon.get(table[2]).y, UtilEjml.TEST_F64);
+
+			assertEquals(10, polygon.get(table[3]).x, UtilEjml.TEST_F64);
+			assertEquals(41.5, polygon.get(table[3]).y, UtilEjml.TEST_F64);
+		}
 	}
 
 	public static SquareGrid createGrid(int rows , int cols ) {

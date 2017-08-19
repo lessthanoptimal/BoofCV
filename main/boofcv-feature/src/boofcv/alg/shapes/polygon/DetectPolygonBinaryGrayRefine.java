@@ -129,7 +129,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		}
 
 		if( functionAdjust != null )
-			functionAdjust.adjust(info);
+			functionAdjust.adjust(info, detector.isOutputClockwise());
 
 		if( refineGray != null ) {
 			if( refineGray.refine(info.polygon,work) ) {
@@ -205,6 +205,6 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	}
 
 	public interface AdjustBeforeRefineEdge {
-		void adjust( DetectPolygonFromContour.Info info );
+		void adjust( DetectPolygonFromContour.Info info , boolean clockwise );
 	}
 }
