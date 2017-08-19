@@ -38,7 +38,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
+public class DetectChessboardSquarePoints<T extends ImageGray<T>>
+{
 
 	// detector for squares
 	DetectPolygonBinaryGrayRefine<T> detectorSquare;
@@ -81,6 +82,14 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 		this.numCols = numCols;
 
 		this.detectorSquare = detectorSquare;
+		if( detectorSquare != null ) { // null in some unit tests for simplicity
+			this.detectorSquare.setFunctionAdjust(new DetectPolygonBinaryGrayRefine.AdjustBeforeRefineEdge() {
+				@Override
+				public void adjust(DetectPolygonFromContour.Info info) {
+					DetectChessboardSquarePoints.this.adjustBeforeOptimize(info.polygon, info.borderCorners);
+				}
+			});
+		}
 
 		s2c = new SquaresIntoCrossClusters(maxCornerDistance,-1);
 		c2g = new SquareCrossClustersIntoGrids();
@@ -98,25 +107,8 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 		boundPolygon.vertexes.reset();
 
 		detectorSquare.process(input, binary);
+		detectorSquare.refineAll();
 		List<DetectPolygonFromContour.Info> found = detectorSquare.getPolygonInfo();
-
-		for (int i = 0; i < found.size(); i++) {
-			DetectPolygonFromContour.Info f = found.get(i);
-//			System.out.println("  touches "+f.contourTouchesBorder+"  size "+f.polygon.size());
-
-			// get a better fit onto the contour
-			detectorSquare.refineContour(f);
-
-			// expand the polygons to compensate for the binary image being dilated
-			adjustBeforeOptimize(f.polygon,f.borderCorners);
-
-			// now refine the polygon fit
-//			System.out.println("before "+f.polygon);
-			if( !detectorSquare.refineUsingEdge(f) ) {
-//				System.out.println("Refine failed");
-			}
-//			System.out.println("       "+f.polygon.areaSimple());
-		}
 
 		clusters = s2c.process(found);
 

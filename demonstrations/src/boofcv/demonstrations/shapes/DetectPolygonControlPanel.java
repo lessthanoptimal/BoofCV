@@ -133,21 +133,21 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		setBorder.addActionListener(this);
 		setBorder.setSelected(config.detector.canTouchBorder);
 
-		spinnerLineSamples = new JSpinner(new SpinnerNumberModel(config.refine.lineSamples, 5, 100, 1));
+		spinnerLineSamples = new JSpinner(new SpinnerNumberModel(config.refineGray.lineSamples, 5, 100, 1));
 		spinnerLineSamples.setMaximumSize(spinnerLineSamples.getPreferredSize());
 		spinnerLineSamples.addChangeListener(this);
-		spinnerCornerOffset = new JSpinner(new SpinnerNumberModel(config.refine.cornerOffset, 0, 10, 1));
+		spinnerCornerOffset = new JSpinner(new SpinnerNumberModel(config.refineGray.cornerOffset, 0, 10, 1));
 		spinnerCornerOffset.setMaximumSize(spinnerCornerOffset.getPreferredSize());
 		spinnerCornerOffset.addChangeListener(this);
-		spinnerSampleRadius = new JSpinner(new SpinnerNumberModel(config.refine.sampleRadius, 0, 10, 1));
+		spinnerSampleRadius = new JSpinner(new SpinnerNumberModel(config.refineGray.sampleRadius, 0, 10, 1));
 		spinnerSampleRadius.setMaximumSize(spinnerCornerOffset.getPreferredSize());
 		spinnerSampleRadius.addChangeListener(this);
-		spinnerRefineMaxIterations = new JSpinner(new SpinnerNumberModel(config.refine.maxIterations, 0, 200, 1));
+		spinnerRefineMaxIterations = new JSpinner(new SpinnerNumberModel(config.refineGray.maxIterations, 0, 200, 1));
 		spinnerRefineMaxIterations.setMaximumSize(spinnerRefineMaxIterations.getPreferredSize());
 		spinnerRefineMaxIterations.addChangeListener(this);
-		spinnerConvergeTol = new JSpinner(new SpinnerNumberModel(config.refine.convergeTolPixels, 0.0, 2.0, 0.005));
+		spinnerConvergeTol = new JSpinner(new SpinnerNumberModel(config.refineGray.convergeTolPixels, 0.0, 2.0, 0.005));
 		configureSpinnerFloat(spinnerConvergeTol);
-		spinnerMaxCornerChange = new JSpinner(new SpinnerNumberModel(config.refine.maxCornerChangePixel, 0.0, 50.0, 1.0));
+		spinnerMaxCornerChange = new JSpinner(new SpinnerNumberModel(config.refineGray.maxCornerChangePixel, 0.0, 50.0, 1.0));
 		configureSpinnerFloat(spinnerMaxCornerChange);
 
 		addLabeled(imageView, "View: ", this);
@@ -246,17 +246,17 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		} else if( e.getSource() == spinnerSplitPenalty ) {
 			config.detector.splitPenalty = ((Number) spinnerSplitPenalty.getValue()).doubleValue();
 		} else if (e.getSource() == spinnerLineSamples) {
-			config.refine.lineSamples = ((Number) spinnerLineSamples.getValue()).intValue();
+			config.refineGray.lineSamples = ((Number) spinnerLineSamples.getValue()).intValue();
 		} else if (e.getSource() == spinnerCornerOffset) {
-			config.refine.cornerOffset = ((Number) spinnerCornerOffset.getValue()).intValue();
+			config.refineGray.cornerOffset = ((Number) spinnerCornerOffset.getValue()).intValue();
 		} else if (e.getSource() == spinnerSampleRadius) {
-			config.refine.sampleRadius = ((Number) spinnerSampleRadius.getValue()).intValue();
+			config.refineGray.sampleRadius = ((Number) spinnerSampleRadius.getValue()).intValue();
 		} else if (e.getSource() == spinnerRefineMaxIterations) {
-			config.refine.maxIterations = ((Number) spinnerRefineMaxIterations.getValue()).intValue();
+			config.refineGray.maxIterations = ((Number) spinnerRefineMaxIterations.getValue()).intValue();
 		} else if (e.getSource() == spinnerConvergeTol) {
-			config.refine.convergeTolPixels = ((Number) spinnerConvergeTol.getValue()).doubleValue();
+			config.refineGray.convergeTolPixels = ((Number) spinnerConvergeTol.getValue()).doubleValue();
 		} else if (e.getSource() == spinnerMaxCornerChange) {
-			config.refine.maxCornerChangePixel = ((Number) spinnerMaxCornerChange.getValue()).doubleValue();
+			config.refineGray.maxCornerChangePixel = ((Number) spinnerMaxCornerChange.getValue()).doubleValue();
 		}
 		owner.configUpdate();
 	}
@@ -276,18 +276,18 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		spinnerMaxCornerChange.removeChangeListener(this);
 
 		// not entirely sure if all of these if statements are needed but I was seeing weird behavior
-		if( ((Number)spinnerLineSamples.getValue()).intValue() != config.refine.lineSamples )
-			spinnerLineSamples.setValue(config.refine.lineSamples);
-		if( ((Number)spinnerCornerOffset.getValue()).doubleValue() != config.refine.cornerOffset )
-			spinnerCornerOffset.setValue(config.refine.cornerOffset);
-		if( ((Number)spinnerSampleRadius.getValue()).intValue() != config.refine.sampleRadius )
-			spinnerSampleRadius.setValue(config.refine.sampleRadius);
-		if( ((Number)spinnerRefineMaxIterations.getValue()).intValue() != config.refine.maxIterations )
-			spinnerRefineMaxIterations.setValue(config.refine.maxIterations);
-		if( ((Number)spinnerConvergeTol.getValue()).doubleValue() != config.refine.convergeTolPixels )
-			spinnerConvergeTol.setValue(config.refine.convergeTolPixels);
-		if( ((Number)spinnerMaxCornerChange.getValue()).doubleValue() != config.refine.maxCornerChangePixel )
-			spinnerMaxCornerChange.setValue(config.refine.maxCornerChangePixel);
+		if( ((Number)spinnerLineSamples.getValue()).intValue() != config.refineGray.lineSamples )
+			spinnerLineSamples.setValue(config.refineGray.lineSamples);
+		if( ((Number)spinnerCornerOffset.getValue()).doubleValue() != config.refineGray.cornerOffset )
+			spinnerCornerOffset.setValue(config.refineGray.cornerOffset);
+		if( ((Number)spinnerSampleRadius.getValue()).intValue() != config.refineGray.sampleRadius )
+			spinnerSampleRadius.setValue(config.refineGray.sampleRadius);
+		if( ((Number)spinnerRefineMaxIterations.getValue()).intValue() != config.refineGray.maxIterations )
+			spinnerRefineMaxIterations.setValue(config.refineGray.maxIterations);
+		if( ((Number)spinnerConvergeTol.getValue()).doubleValue() != config.refineGray.convergeTolPixels )
+			spinnerConvergeTol.setValue(config.refineGray.convergeTolPixels);
+		if( ((Number)spinnerMaxCornerChange.getValue()).doubleValue() != config.refineGray.maxCornerChangePixel )
+			spinnerMaxCornerChange.setValue(config.refineGray.maxCornerChangePixel);
 
 		spinnerLineSamples.addChangeListener(this);
 		spinnerCornerOffset.addChangeListener(this);

@@ -67,7 +67,7 @@ public class ConfigFiducialBinary implements Configuration {
 		squareDetector.detector.contour2Poly_splitFraction = 0.1;
 		squareDetector.detector.contour2Poly_minimumSideFraction = 0.05;
 
-		squareDetector.refine.cornerOffset = 0;
+		squareDetector.refineGray.cornerOffset = 0;
 	}
 
 	public ConfigFiducialBinary() {

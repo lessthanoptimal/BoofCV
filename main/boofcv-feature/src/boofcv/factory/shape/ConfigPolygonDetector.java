@@ -46,10 +46,12 @@ public class ConfigPolygonDetector implements Configuration {
 	 */
 	public double minimumEdgeIntensity = 6.0;
 
+	public boolean refineContour = true;
+
 	/**
 	 * Configuration for sub-pixel refinement of line.  If null then this step is skipped.
 	 */
-	public ConfigRefinePolygonLineToImage refine = new ConfigRefinePolygonLineToImage();
+	public ConfigRefinePolygonLineToImage refineGray = new ConfigRefinePolygonLineToImage();
 
 	/**
 	 * Specifies the number of sides in the polygon and uses default settings for everything else
@@ -72,7 +74,8 @@ public class ConfigPolygonDetector implements Configuration {
 		return "ConfigPolygonDetector{" +
 				"detector=" + detector +
 				", minimumEdgeIntensity=" + minimumEdgeIntensity +
-				", refine=" + refine +
+				", refineContour=" + refineContour +
+				", refineGray=" + refineGray +
 				'}';
 	}
 }

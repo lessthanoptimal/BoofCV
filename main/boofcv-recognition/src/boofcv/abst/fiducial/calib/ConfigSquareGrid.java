@@ -71,10 +71,10 @@ public class ConfigSquareGrid implements Configuration {
 		square.detector.minContourImageWidthFraction = 0.0005;
 
 		// putting reasonable defaults for if the user decides to optimize by line
-		square.refine.cornerOffset = 1;
-		square.refine.lineSamples = 15;
-		square.refine.convergeTolPixels = 0.2;
-		square.refine.maxIterations = 5;
+		square.refineGray.cornerOffset = 1;
+		square.refineGray.lineSamples = 15;
+		square.refineGray.convergeTolPixels = 0.2;
+		square.refineGray.maxIterations = 5;
 	}
 
 	public ConfigSquareGrid(int numRows, int numCols, double squareWidth, double spaceWidth) {

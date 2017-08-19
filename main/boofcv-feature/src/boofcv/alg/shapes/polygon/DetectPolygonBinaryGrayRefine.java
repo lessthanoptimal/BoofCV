@@ -33,6 +33,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// TODO prune using edge intensity after refine
 public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 
 	// Detects the polygons using a contour from a binary image
@@ -48,6 +49,9 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	private EdgeIntensityPolygon<T> edgeIntensity;
 
 	private Polygon2D_F64 work = new Polygon2D_F64();
+
+	// useful for customization
+	AdjustBeforeRefineEdge functionAdjust;
 
 	public DetectPolygonBinaryGrayRefine(DetectPolygonFromContour<T> detector,
 										 RefinePolygonToContour refineContour,
@@ -80,7 +84,8 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	public void setLensDistortion(int width , int height ,
 								  PixelTransform2_F32 distToUndist , PixelTransform2_F32 undistToDist ) {
 		detector.setLensDistortion(width, height, distToUndist, undistToDist);
-		refineGray.setLensDistortion(width, height, distToUndist, undistToDist);
+		if( refineGray != null )
+			refineGray.setLensDistortion(width, height, distToUndist, undistToDist);
 		edgeIntensity.setTransform(undistToDist);
 	}
 
@@ -89,53 +94,63 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	 */
 	public void clearLensDistortion() {
 		detector.clearLensDistortion();
-		refineGray.clearLensDistortion();
+		if( refineGray != null )
+			refineGray.clearLensDistortion();
 		edgeIntensity.setTransform(null);
 	}
 
 	public void process(T gray , GrayU8 binary ) {
 		detector.process(gray,binary);
-		refineGray.setImage(gray);
+		if( refineGray != null )
+			refineGray.setImage(gray);
 		edgeIntensity.setImage(gray);
 	}
 
-	public boolean refineContour(DetectPolygonFromContour.Info polygon ) {
-
+	public boolean refine( DetectPolygonFromContour.Info info ) {
 		double before,after;
-		if( edgeIntensity.computeEdge(polygon.polygon,!detector.isOutputClockwise()) ) {
+		if( edgeIntensity.computeEdge(info.polygon,!detector.isOutputClockwise()) ) {
 			before = edgeIntensity.getAverageOutside() - edgeIntensity.getAverageInside();
 		} else {
 			return false;
 		}
 
-		refineContour.process(polygon.contour,polygon.splits,work);
+		boolean success = false;
 
-		if( edgeIntensity.computeEdge(work,!detector.isOutputClockwise()) ) {
-			after = edgeIntensity.getAverageOutside() - edgeIntensity.getAverageInside();
-			if( after > before ) {
-				polygon.polygon.set(work);
-				return true;
+		if( refineContour != null ) {
+			work.set(info.polygon);
+			if( edgeIntensity.computeEdge(work,!detector.isOutputClockwise()) ) {
+				after = edgeIntensity.getAverageOutside() - edgeIntensity.getAverageInside();
+				if( after > before ) {
+					info.polygon.set(work);
+					success = true;
+					before = after;
+				}
 			}
 		}
-		return false;
-	}
 
-	public boolean refineUsingEdge(DetectPolygonFromContour.Info polygon ) {
-		work.set(polygon.polygon);
-		return refineGray.refine(work,polygon.polygon);
+		if( functionAdjust != null )
+			functionAdjust.adjust(info);
 
-		// todo save edge intensity.  NEED SAME INENSITY
+		if( refineGray != null ) {
+			if( refineGray.refine(info.polygon,work) ) {
+				if( edgeIntensity.computeEdge(work,!detector.isOutputClockwise()) ) {
+					after = edgeIntensity.getAverageOutside() - edgeIntensity.getAverageInside();
+					if( after > before ) {
+						info.polygon.set(work);
+						success = true;
+					}
+				}
+			}
+		}
+
+		return success;
 	}
 
 	public void refineAll() {
 		List<DetectPolygonFromContour.Info> detections = detector.getFound().toList();
-		double minEdgeIntensity = detector.getContourEdgeThreshold();
 
 		for (int i = 0; i < detections.size(); i++) {
-			DetectPolygonFromContour.Info d = detections.get(i);
-			refineContour(d);
-			if( d.computeEdgeIntensity() >= minEdgeIntensity )
-				refineUsingEdge(d);
+			refine(detections.get(i));
 		}
 	}
 
@@ -183,5 +198,13 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 
 	public List<Contour> getAllContours() {
 		return detector.getAllContours();
+	}
+
+	public void setFunctionAdjust(AdjustBeforeRefineEdge functionAdjust) {
+		this.functionAdjust = functionAdjust;
+	}
+
+	public interface AdjustBeforeRefineEdge {
+		void adjust( DetectPolygonFromContour.Info info );
 	}
 }

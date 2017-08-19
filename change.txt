@@ -6,14 +6,13 @@ Date Format: year/month/day
 Date    : 2017
 Version : 0.28
 
-// TODO make contour intensoity sample radius configurable. normally 1.5 but 2.5 for chessboard
-
 - Black Polygon Detector
   * Redesigned so that its possible to process in a course to fine manor
   * Can detect polygons using contour, then on an individual basis refine them now. Before it was all or nothing.
   * Prune contours based on edge intensity earlier
   * Removed refine corner for black polygon detector
     - Was complex, didn't fit the new API, and calibration residuals got better once removed.
+  * Added option to optimize by fitting lines to the contour
 - Adding the capability for demonstrations that open files to remember the last directory it opened
 - Calibration Target Generator
   * Fixed bug in asymmetric circle target where it was shifted on the page
@@ -32,8 +31,11 @@ Polygon Detector
 - At least one fiducial was much worse on blurred images
 - NOTE: Chessboard detector was from 5% to 40% faster when refine turned off. Much worse in all other metrics
 - TODO edge score after refine for rejection
-- TODO refine by fitting to contour
+- TODO make contour intensoity sample radius configurable. normally 1.5 but 2.5 for chessboard
 - TODO see if a shape can be rejected before refining the polygon fit to improve speed for all fiducals
+- TODO  profile detectors.
+- TODO Make it so split merge can abort early if too many splits? if very large sub-sample and fit?
+- TODO Toggle the two different refine options in demonstration applications
 
 Fisheye Calibration Detectors
    TODO Square Grid
