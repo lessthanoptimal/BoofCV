@@ -3,6 +3,60 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2017
+Version : 0.28
+
+// TODO make contour intensoity sample radius configurable. normally 1.5 but 2.5 for chessboard
+
+- Black Polygon Detector
+  * Redesigned so that its possible to process in a course to fine manor
+  * Can detect polygons using contour, then on an individual basis refine them now. Before it was all or nothing.
+  * Prune contours based on edge intensity earlier
+  * Removed refine corner for black polygon detector
+    - Was complex, didn't fit the new API, and calibration residuals got better once removed.
+- Adding the capability for demonstrations that open files to remember the last directory it opened
+- Calibration Target Generator
+  * Fixed bug in asymmetric circle target where it was shifted on the page
+- DetectPolygonFromContour
+  * Fix a bug where labeled image was not being resized if the height of input image changed
+
+Polygon Detector
+- More false positives in regression on polygon shapes.
+- Ambiguous change in speed. Some faster some slower. Within normal variance.
+- At least one fiducial was much worse on blurred images
+- NOTE: Chessboard detector was from 5% to 40% faster when refine turned off. Much worse in all other metrics
+- TODO edge score after refine for rejection
+- TODO refine by fitting to contour
+- TODO see if a shape can be rejected before refining the polygon fit to improve speed for all fiducals
+
+Fisheye Calibration Detectors
+   TODO Square Grid
+   TODO Asymmetric Circle
+   TODO Regular Circle
+
+TOP ITEMS
+- TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
+        It is a homogenous coordinate with z=1 being implicit.
+- TODO Integrate in Marius Orfgen's image statistics histogram ideas
+- TODO Fisheye calibration using omni model
+- TODO QR Code support
+
+OTHER ITEMS
+- TODO Calibration Target PS generator unit test
+       Convert document into a graphic and detect
+- TODO Visualization tools for Direct VO
+-      Show warped image
+- TODO ExampleRectifyUncalibratedStereo is upside down.  Adjust the math to avoid that
+- TODO Calibration application.
+       Select output format: BoofCV, OpenCV
+       Create a stand alone application that people can download to calibrate
+- TODO Tutorial on image features?  Sparse and dense?
+- TODO Look at AKAZE feature
+- TODO Clarify how you calibrate the camera in Processing
+- TODO DescribeDenseHogFastAlg naming consistency. See TODO at top
+- TODO See if contour shape fitting algorithm can be speed up by using a continious set of memory instead of Point2D
+
+---------------------------------------------
 Date    : 2017-08-16
 Version : 0.27
 
