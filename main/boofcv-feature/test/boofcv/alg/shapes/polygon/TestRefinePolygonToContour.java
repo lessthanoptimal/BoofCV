@@ -53,13 +53,25 @@ public class TestRefinePolygonToContour {
 		List<Point2D_I32> contour = rectToContour(rect);
 		GrowQueue_I32 vertexes = computeContourVertexes(rect);
 
-		DetectPolygonFromContour.flip(vertexes.data,vertexes.size);
+		flip(vertexes.data,vertexes.size);
 
 		RefinePolygonToContour alg = new RefinePolygonToContour();
 
 		Polygon2D_F64 found = new Polygon2D_F64();
 		alg.process(contour,vertexes,found);
 		assertTrue(checkPolygon(new double[]{0,0, 0,4, 9,4, 9,0},found));
+	}
+
+	//TODO move to ddogleg? primitive flip
+	public static void flip( int []a , int N ) {
+		int H = N/2;
+
+		for (int i = 0; i < H; i++) {
+			int j = N-i-1;
+			int tmp = a[i];
+			a[i] = a[j];
+			a[j] = tmp;
+		}
 	}
 
 }

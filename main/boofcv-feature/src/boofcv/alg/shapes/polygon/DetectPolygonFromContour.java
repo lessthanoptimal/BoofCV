@@ -419,12 +419,12 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		}
 	}
 
-	// TODO move into ddogleg? primitive flip
+	// TODO move into ddogleg? primitive flip  <--- I think this is specific to polygons
 	public static void flip( int []a , int N ) {
 		int H = N/2;
 
-		for (int i = 0; i < H; i++) {
-			int j = N-i-1;
+		for (int i = 1; i <= H; i++) {
+			int j = N-i;
 			int tmp = a[i];
 			a[i] = a[j];
 			a[j] = tmp;

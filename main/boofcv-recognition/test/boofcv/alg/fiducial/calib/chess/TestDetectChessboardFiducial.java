@@ -232,7 +232,7 @@ public class TestDetectChessboardFiducial {
 //		showRendered = true;
 
 		for( int test = 0; test < transforms.size(); test++ ) {
-//			System.out.println("====================================== Test = "+test);
+			System.out.println("====================================== Test = "+test);
 			transform = transforms.get(test);
 
 			// noise is added to images. Make sure the algorithms aren't brittle
