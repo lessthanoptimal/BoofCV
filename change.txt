@@ -19,6 +19,10 @@ Version : 0.28
   * Fixed bug in asymmetric circle target where it was shifted on the page
 - DetectPolygonFromContour
   * Fix a bug where labeled image was not being resized if the height of input image changed
+- BOverrideClass
+  * Provides a framework for overriding some functionality in BoofCV with an external implementation without changing your code
+  * Added JavaCV Override for:
+    - BlurImageOps TODO
 
 Polygon Detector
 - More false positives in regression on polygon shapes.

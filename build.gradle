@@ -78,7 +78,7 @@ subprojects {
     }
 
     dependencies {
-        compile group: 'org.georegression', name: 'georegression', version: '0.13'
+        compile group: 'org.georegression', name: 'georegression', version: '0.14-SNAPSHOT'
 
         testCompile group: 'junit', name: 'junit', version: '4.12'
     }
@@ -294,7 +294,7 @@ task testReport(type: TestReport) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.1'
+    gradleVersion = '4.0.1'
 }
 
 idea {

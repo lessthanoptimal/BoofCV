@@ -56,94 +56,12 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		ConvolveImageMean.horizontal(input,storage,radius);
-		ConvolveImageMean.vertical(storage, output, radius);
-
-		return output;
-	}
-
-	/**
-	 * Applies a median filter.
-	 *
-	 * @param input Input image.  Not modified.
-	 * @param output (Optional) Storage for output image, Can be null.  Modified.
-	 * @param radius Radius of the median blur function.
-	 * @return Output blurred image.
-	 */
-	public static GrayU8 median(GrayU8 input, GrayU8 output, int radius) {
-		if( radius <= 0 )
-			throw new IllegalArgumentException("Radius must be > 0");
-
-		output = InputSanityCheck.checkDeclare(input,output);
-
-		int w = radius*2+1;
-		int offset[] = new int[ w*w ];
-		int histogram[] = new int[ 256 ];
-
-		ImplMedianHistogramInner.process(input, output, radius, offset, histogram);
-		ImplMedianSortEdgeNaive.process(input, output, radius, offset);
-
-		return output;
-	}
-
-	/**
-	 * Applies Gaussian blur.
-	 *
-	 * @param input Input image.  Not modified.
-	 * @param output (Optional) Storage for output image, Can be null.  Modified.
-	 * @param sigma Gaussian distribution's sigma.  If &le; 0 then will be selected based on radius.
-	 * @param radius Radius of the Gaussian blur function. If &le; 0 then radius will be determined by sigma.
-	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
-	 * @return Output blurred image.
-	 */
-	public static GrayU8 gaussian(GrayU8 input, GrayU8 output, double sigma , int radius,
-								  GrayU8 storage ) {
-		output = InputSanityCheck.checkDeclare(input,output);
-		storage = InputSanityCheck.checkDeclare(input,storage,GrayU8.class);
-
-		Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,sigma,radius);
-
-		ConvolveNormalized.horizontal(kernel, input, storage);
-		ConvolveNormalized.vertical(kernel,storage,output);
-
-		return output;
-	}
-
-	public static InterleavedU8 gaussian(InterleavedU8 input, InterleavedU8 output, double sigma , int radius,
-								  InterleavedU8 storage ) {
-		output = InputSanityCheck.checkDeclare(input,output);
-		storage = InputSanityCheck.checkDeclare(input,storage);
-
-		Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,sigma,radius);
-
-		ConvolveNormalized.horizontal(kernel, input, storage);
-		ConvolveNormalized.vertical(kernel,storage,output);
-
-		return output;
-	}
-
-	public static InterleavedF32 gaussian(InterleavedF32 input, InterleavedF32 output, double sigma , int radius,
-										  InterleavedF32 storage ) {
-		output = InputSanityCheck.checkDeclare(input,output);
-		storage = InputSanityCheck.checkDeclare(input,storage);
-
-		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,sigma,radius);
-
-		ConvolveNormalized.horizontal(kernel, input, storage);
-		ConvolveNormalized.vertical(kernel,storage,output);
-
-		return output;
-	}
-
-	public static InterleavedF64 gaussian(InterleavedF64 input, InterleavedF64 output, double sigma , int radius,
-										  InterleavedF64 storage ) {
-		output = InputSanityCheck.checkDeclare(input,output);
-		storage = InputSanityCheck.checkDeclare(input,storage);
-
-		Kernel1D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F64.class,sigma,radius);
-
-		ConvolveNormalized.horizontal(kernel, input, storage);
-		ConvolveNormalized.vertical(kernel,storage,output);
+		if( BOverrideBlurImageOps.mean_U8 != null )
+			BOverrideBlurImageOps.mean_U8.process(input,output,radius,storage);
+		else {
+			ConvolveImageMean.horizontal(input, storage, radius);
+			ConvolveImageMean.vertical(storage, output, radius);
+		}
 
 		return output;
 	}
@@ -165,8 +83,12 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		ConvolveImageMean.horizontal(input,storage,radius);
-		ConvolveImageMean.vertical(storage,output,radius);
+		if( BOverrideBlurImageOps.mean_F32 != null ) {
+			BOverrideBlurImageOps.mean_F32.process(input,output,radius,storage);
+		} else {
+			ConvolveImageMean.horizontal(input, storage, radius);
+			ConvolveImageMean.vertical(storage, output, radius);
+		}
 
 		return output;
 	}
@@ -188,76 +110,12 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		ConvolveImageMean.horizontal(input,storage,radius);
-		ConvolveImageMean.vertical(storage,output,radius);
-
-		return output;
-	}
-
-	/**
-	 * Applies a median filter.
-	 *
-	 * @param input Input image.  Not modified.
-	 * @param output (Optional) Storage for output image, Can be null.  Modified.
-	 * @param radius Radius of the median blur function.
-	 * @return Output blurred image.
-	 */
-	public static GrayF32 median(GrayF32 input, GrayF32 output, int radius) {
-
-		if( radius <= 0 )
-			throw new IllegalArgumentException("Radius must be > 0");
-
-		output = InputSanityCheck.checkDeclare(input,output);
-
-		ImplMedianSortNaive.process(input,output,radius,null);
-
-		return output;
-	}
-
-	/**
-	 * Applies Gaussian blur.
-	 *
-	 * @param input Input image.  Not modified.
-	 * @param output (Optional) Storage for output image, Can be null.  Modified.
-	 * @param sigma Gaussian distribution's sigma.  If &le; 0 then will be selected based on radius.
-	 * @param radius Radius of the Gaussian blur function. If &le; 0 then radius will be determined by sigma.
-	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
-	 * @return Output blurred image.
-	 */
-	public static GrayF32 gaussian(GrayF32 input, GrayF32 output,
-								   double sigma , int radius,
-								   GrayF32 storage ) {
-		output = InputSanityCheck.checkDeclare(input,output);
-		storage = InputSanityCheck.checkDeclare(input,storage);
-
-		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,sigma, radius);
-
-		ConvolveNormalized.horizontal(kernel,input,storage);
-		ConvolveNormalized.vertical(kernel,storage,output);
-
-		return output;
-	}
-
-	/**
-	 * Applies Gaussian blur.
-	 *
-	 * @param input Input image.  Not modified.
-	 * @param output (Optional) Storage for output image, Can be null.  Modified.
-	 * @param sigma Gaussian distribution's sigma.  If &le; 0 then will be selected based on radius.
-	 * @param radius Radius of the Gaussian blur function. If &le; 0 then radius will be determined by sigma.
-	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
-	 * @return Output blurred image.
-	 */
-	public static GrayF64 gaussian(GrayF64 input, GrayF64 output,
-								   double sigma , int radius,
-								   GrayF64 storage ) {
-		output = InputSanityCheck.checkDeclare(input,output);
-		storage = InputSanityCheck.checkDeclare(input,storage);
-
-		Kernel1D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F64.class,sigma, radius);
-
-		ConvolveNormalized.horizontal(kernel,input,storage);
-		ConvolveNormalized.vertical(kernel,storage,output);
+		if( BOverrideBlurImageOps.mean_F64 != null ) {
+			BOverrideBlurImageOps.mean_F64.process(input,output,radius,storage);
+		} else {
+			ConvolveImageMean.horizontal(input, storage, radius);
+			ConvolveImageMean.vertical(storage, output, radius);
+		}
 
 		return output;
 	}
@@ -287,6 +145,57 @@ public class BlurImageOps {
 	}
 
 	/**
+	 * Applies a median filter.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radius Radius of the median blur function.
+	 * @return Output blurred image.
+	 */
+	public static GrayU8 median(GrayU8 input, GrayU8 output, int radius) {
+		if( radius <= 0 )
+			throw new IllegalArgumentException("Radius must be > 0");
+
+		output = InputSanityCheck.checkDeclare(input,output);
+
+		if( BOverrideBlurImageOps.median_U8 != null )
+			BOverrideBlurImageOps.median_U8.process(input,output,radius);
+		else {
+			int w = radius * 2 + 1;
+			int offset[] = new int[w * w];
+			int histogram[] = new int[256];
+
+			ImplMedianHistogramInner.process(input, output, radius, offset, histogram);
+			ImplMedianSortEdgeNaive.process(input, output, radius, offset);
+		}
+
+		return output;
+	}
+
+	/**
+	 * Applies a median filter.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radius Radius of the median blur function.
+	 * @return Output blurred image.
+	 */
+	public static GrayF32 median(GrayF32 input, GrayF32 output, int radius) {
+
+		if( radius <= 0 )
+			throw new IllegalArgumentException("Radius must be > 0");
+
+		output = InputSanityCheck.checkDeclare(input,output);
+
+		if( BOverrideBlurImageOps.median_F32 != null )
+			BOverrideBlurImageOps.median_F32.process(input,output,radius);
+		else {
+			ImplMedianSortNaive.process(input, output, radius, null);
+		}
+		return output;
+	}
+
+	/**
 	 * Applies median filter to a {@link Planar}
 	 *
 	 * @param input Input image.  Not modified.
@@ -304,6 +213,140 @@ public class BlurImageOps {
 		for( int band = 0; band < input.getNumBands(); band++ ) {
 			GBlurImageOps.median(input.getBand(band),output.getBand(band),radius);
 		}
+		return output;
+	}
+
+	/**
+	 * Applies Gaussian blur.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param sigma Gaussian distribution's sigma.  If &le; 0 then will be selected based on radius.
+	 * @param radius Radius of the Gaussian blur function. If &le; 0 then radius will be determined by sigma.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @return Output blurred image.
+	 */
+	public static GrayU8 gaussian(GrayU8 input, GrayU8 output, double sigma , int radius,
+								  GrayU8 storage ) {
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage,GrayU8.class);
+
+		Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class, sigma, radius);
+
+		if( BOverrideBlurImageOps.gaussian_U8 != null ) {
+			BOverrideBlurImageOps.gaussian_U8.process(input,output,kernel,storage);
+		} else {
+			ConvolveNormalized.horizontal(kernel, input, storage);
+			ConvolveNormalized.vertical(kernel, storage, output);
+		}
+
+		return output;
+	}
+
+	public static InterleavedU8 gaussian(InterleavedU8 input, InterleavedU8 output, double sigma , int radius,
+								  InterleavedU8 storage ) {
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,sigma,radius);
+
+		if( BOverrideBlurImageOps.gaussian_IU8 != null ) {
+			BOverrideBlurImageOps.gaussian_IU8.process(input,output,kernel,storage);
+		} else {
+			ConvolveNormalized.horizontal(kernel, input, storage);
+			ConvolveNormalized.vertical(kernel, storage, output);
+		}
+
+		return output;
+	}
+
+	/**
+	 * Applies Gaussian blur.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param sigma Gaussian distribution's sigma.  If &le; 0 then will be selected based on radius.
+	 * @param radius Radius of the Gaussian blur function. If &le; 0 then radius will be determined by sigma.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @return Output blurred image.
+	 */
+	public static GrayF32 gaussian(GrayF32 input, GrayF32 output,
+								   double sigma , int radius,
+								   GrayF32 storage ) {
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,sigma, radius);
+
+		if( BOverrideBlurImageOps.gaussian_F32 != null ) {
+			BOverrideBlurImageOps.gaussian_F32.process(input,output,kernel,storage);
+		} else {
+			ConvolveNormalized.horizontal(kernel, input, storage);
+			ConvolveNormalized.vertical(kernel, storage, output);
+		}
+
+		return output;
+	}
+
+	/**
+	 * Applies Gaussian blur.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param sigma Gaussian distribution's sigma.  If &le; 0 then will be selected based on radius.
+	 * @param radius Radius of the Gaussian blur function. If &le; 0 then radius will be determined by sigma.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @return Output blurred image.
+	 */
+	public static GrayF64 gaussian(GrayF64 input, GrayF64 output,
+								   double sigma , int radius,
+								   GrayF64 storage ) {
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		Kernel1D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F64.class,sigma, radius);
+
+		if( BOverrideBlurImageOps.gaussian_F64 != null ) {
+			BOverrideBlurImageOps.gaussian_F64.process(input,output,kernel,storage);
+		} else {
+			ConvolveNormalized.horizontal(kernel, input, storage);
+			ConvolveNormalized.vertical(kernel, storage, output);
+		}
+
+		return output;
+	}
+
+	public static InterleavedF32 gaussian(InterleavedF32 input, InterleavedF32 output, double sigma , int radius,
+										  InterleavedF32 storage ) {
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,sigma,radius);
+
+		if( BOverrideBlurImageOps.gaussian_IF32 != null ) {
+			BOverrideBlurImageOps.gaussian_IF32.process(input,output,kernel,storage);
+		} else {
+			ConvolveNormalized.horizontal(kernel, input, storage);
+			ConvolveNormalized.vertical(kernel, storage, output);
+		}
+
+		return output;
+	}
+
+	public static InterleavedF64 gaussian(InterleavedF64 input, InterleavedF64 output, double sigma , int radius,
+										  InterleavedF64 storage ) {
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		Kernel1D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F64.class,sigma,radius);
+
+		if( BOverrideBlurImageOps.gaussian_IF64 != null ) {
+			BOverrideBlurImageOps.gaussian_IF64.process(input,output,kernel,storage);
+		} else {
+			ConvolveNormalized.horizontal(kernel, input, storage);
+			ConvolveNormalized.vertical(kernel, storage, output);
+		}
+
 		return output;
 	}
 
