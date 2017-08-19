@@ -130,6 +130,9 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	// type of input gray scale image it can process
 	private Class<T> inputType;
 
+	// indicates which corners touch the border
+	private GrowQueue_B borderCorners = new GrowQueue_B();
+
 	/**
 	 * Configures the detector.
 	 *
@@ -369,8 +372,14 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 					polygonDistorted.get(j).set(q.x,q.y);
 				}
 
+				if( touchesBorder ) {
+					determineCornersOnBorder(polygonDistorted, borderCorners);
+				} else {
+					borderCorners.resize(0);
+				}
+
 				if( helper != null ) {
-					if( !helper.filterPixelPolygon(polygonWork,polygonDistorted,touchesBorder) ) {
+					if( !helper.filterPixelPolygon(polygonWork,polygonDistorted,borderCorners,touchesBorder) ) {
 						if( verbose ) System.out.println("rejected by helper.filterPixelPolygon()");
 						continue;
 					}
@@ -410,11 +419,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 				info.contour = c.external;
 				info.polygon.set(polygonWork);
 				info.polygonDistorted.set(polygonDistorted);
-
-				if( touchesBorder ) {
-					// tolerance is a little bit above 0.5.pixels due to prior rounding to integer
-					determineCornersOnBorder(info.polygonDistorted, info.borderCorners, 0.7f);
-				}
+				info.borderCorners.setTo(borderCorners);
 			}
 		}
 	}
@@ -433,36 +438,50 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 	/**
 	 * Check to see if corners are touching the image border
-	 * @param polygon Refined polygon
-	 * @param corners storage for corner indexes
+	 * @param polygon Polygon in distorted (original image) pixels
+	 * @param onImageBorder storage for corner indexes
 	 */
-	void determineCornersOnBorder( Polygon2D_F64 polygon , GrowQueue_B corners , float tol ) {
-		corners.reset();
+	void determineCornersOnBorder( Polygon2D_F64 polygon , GrowQueue_B onImageBorder ) {
+		onImageBorder.reset();
 		for (int i = 0; i < polygon.size(); i++) {
-			corners.add(isUndistortedOnBorder(polygon.get(i),tol));
+			Point2D_F64 p = polygon.get(i);
+
+			onImageBorder.add( p.x <= 1 || p.y <= 1 || p.x >= labeled.width-2 || p.y >= labeled.height-2);
 		}
 	}
 
-	/**
-	 * Coverts the point into distorted image coordinates and then checks to see if it is on the image border
-	 * @param undistorted pixel in undistorted coordinates
-	 * @param tol Tolerance for a point being on the image border
-	 * @return true if on the border or false otherwise
-	 */
-	boolean isUndistortedOnBorder( Point2D_F64 undistorted , float tol ) {
-		float x,y;
-
-		if( undistToDist == null ) {
-			x = (float)undistorted.x;
-			y = (float)undistorted.y;
-		} else {
-			undistToDist.compute((int)Math.round(undistorted.x),(int)Math.round(undistorted.y));
-			x = undistToDist.distX;
-			y = undistToDist.distY;
-		}
-
-		return( x <= tol || y <= tol || x+tol >= labeled.width-1 || y+tol >= labeled.height-1 );
-	}
+//	/**
+//	 * Check to see if corners are touching the image border
+//	 * @param polygon Refined polygon
+//	 * @param corners storage for corner indexes
+//	 */
+//	void determineCornersOnBorder( Polygon2D_F64 polygon , GrowQueue_B corners , float tol ) {
+//		corners.reset();
+//		for (int i = 0; i < polygon.size(); i++) {
+//			corners.add(isUndistortedOnBorder(polygon.get(i),tol));
+//		}
+//	}
+//
+//	/**
+//	 * Coverts the point into distorted image coordinates and then checks to see if it is on the image border
+//	 * @param undistorted pixel in undistorted coordinates
+//	 * @param tol Tolerance for a point being on the image border
+//	 * @return true if on the border or false otherwise
+//	 */
+//	boolean isUndistortedOnBorder( Point2D_F64 undistorted , float tol ) {
+//		float x,y;
+//
+//		if( undistToDist == null ) {
+//			x = (float)undistorted.x;
+//			y = (float)undistorted.y;
+//		} else {
+//			undistToDist.compute((int)Math.round(undistorted.x),(int)Math.round(undistorted.y));
+//			x = undistToDist.distX;
+//			y = undistToDist.distY;
+//		}
+//
+//		return( x <= tol || y <= tol || x+tol >= labeled.width-1 || y+tol >= labeled.height-1 );
+//	}
 
 	/**
 	 * True if the number of sides found matches what it is looking for

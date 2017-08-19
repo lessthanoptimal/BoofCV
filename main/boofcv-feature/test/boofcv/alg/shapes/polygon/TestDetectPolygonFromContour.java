@@ -31,7 +31,6 @@ import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.UtilAffine;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_F64;
@@ -45,7 +44,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author Peter Abeles
@@ -381,7 +381,7 @@ public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
 		Polygon2D_F64 poly = new Polygon2D_F64(0,0, 10,0, 10,10, 0,10);
 
 		GrowQueue_B corners = new GrowQueue_B();
-		alg.determineCornersOnBorder(poly,corners,0.5f);
+		alg.determineCornersOnBorder(poly,corners);
 
 		assertEquals(4,corners.size());
 
@@ -389,45 +389,5 @@ public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
 		assertEquals(true,corners.get(1));
 		assertEquals(false,corners.get(2));
 		assertEquals(true,corners.get(3));
-	}
-
-	@Test
-	public void isUndistortedOnBorder() {
-		Affine2D_F32 a = new Affine2D_F32();
-		transform.set(1.2,0,0,1.2,0,0);
-		UtilAffine.convert(transform,a);
-
-		PixelTransform2_F32 tranFrom = new PixelTransformAffine_F32(a);
-		PixelTransform2_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
-
-		DetectPolygonFromContour alg = createDetector(GrayU8.class, 4,4);
-		alg.undistToDist = tranFrom;
-		alg.distToUndist = tranTo;
-		alg.getLabeled().reshape(width,height);
-
-		List<Point2D_I32> positive = new ArrayList<>();
-		positive.add( new Point2D_I32(20,0));
-		positive.add( new Point2D_I32(width-1,30));
-		positive.add( new Point2D_I32(0,30));
-		positive.add( new Point2D_I32(20,height-1));
-
-		for( Point2D_I32 p : positive ) {
-			alg.distToUndist.compute(p.x,p.y);
-			float x = alg.distToUndist.distX;
-			float y = alg.distToUndist.distY;
-			assertTrue(alg.isUndistortedOnBorder(new Point2D_F64(x,y),0.7f));
-		}
-
-		List<Point2D_I32> negative = new ArrayList<>();
-		negative.add( new Point2D_I32(20,5));
-		negative.add( new Point2D_I32(width-3,30));
-		negative.add( new Point2D_I32(7,30));
-		negative.add( new Point2D_I32(20,height-4));
-		for( Point2D_I32 p : negative ) {
-			alg.distToUndist.compute(p.x,p.y);
-			float x = alg.distToUndist.distX;
-			float y = alg.distToUndist.distY;
-			assertFalse(alg.isUndistortedOnBorder(new Point2D_F64(x,y),0.7f));
-		}
 	}
 }

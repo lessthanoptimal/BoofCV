@@ -20,9 +20,9 @@ package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.alg.shapes.polygon.PolygonHelper;
 import boofcv.struct.image.ImageGray;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.ddogleg.struct.GrowQueue_B;
 
 import java.util.List;
 
@@ -54,16 +54,16 @@ public class ChessboardPolygonHelper<T extends ImageGray<T>> implements PolygonH
 	 * a square can have.
 	 */
 	@Override
-	public boolean filterPixelPolygon( Polygon2D_F64 undistorted , Polygon2D_F64 distorted, boolean touchesBorder) {
+	public boolean filterPixelPolygon(Polygon2D_F64 undistorted , Polygon2D_F64 distorted,
+									  GrowQueue_B touches, boolean touchesBorder) {
 
 		if( touchesBorder ) {
 			if( distorted.size() > 7 || distorted.size() < 3)
 				return false;
-			int totalRegular = 0;
+			int totalRegular = distorted.size();
 			for (int i = 0; i < distorted.size(); i++) {
-				Point2D_F64 p = distorted.get(i);
-				if( !(p.x  < 1.0 || p.y < 1.0 || p.x > width-2 || p.y > height-2))
-					totalRegular++;
+				if( touches.get(i) )
+					totalRegular--;
 			}
 			return totalRegular > 0 && totalRegular <= 4; // should be 3, but noise/imprecision in corner can make it 4
 		} else {

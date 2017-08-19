@@ -18,9 +18,12 @@
 
 package boofcv.alg.fiducial.calib.chess;
 
+import georegression.struct.shapes.Polygon2D_F64;
+import org.ddogleg.struct.GrowQueue_B;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -28,92 +31,66 @@ import static org.junit.Assert.fail;
 public class TestChessboardPolygonHelper {
 
 	@Test
-	public void implement() {
-		fail("Implement");
+	public void filterPixelPolygon_noborder() {
+		ChessboardPolygonHelper alg = new ChessboardPolygonHelper();
+
+		assertFalse(alg.filterPixelPolygon(null,new Polygon2D_F64(3),null,false));
+		assertTrue(alg.filterPixelPolygon(null,new Polygon2D_F64(4),null,false));
+		assertFalse(alg.filterPixelPolygon(null,new Polygon2D_F64(5),null,false));
 	}
 
-//	@Test
-//	public void filterPixelPolygon_noborder() {
-//		ChessboardPolygonHelper alg = new ChessboardPolygonHelper();
-//
-//		List<Point2D_I32> externalUndist = new ArrayList<>();
-//		List<Point2D_I32> externalDist = new ArrayList<>();
-//		GrowQueue_I32 splits = new GrowQueue_I32();
-//
-//		splits.add(0);
-//		splits.add(10);
-//		splits.add(20);
-//		assertFalse(alg.filterPixelPolygon(externalUndist,externalDist,splits,false));
-//		splits.add(30);
-//		assertTrue(alg.filterPixelPolygon(externalUndist,externalDist,splits,false));
-//		splits.add(40);
-//		assertFalse(alg.filterPixelPolygon(externalUndist,externalDist,splits,false));
-//	}
-//
-//	@Test
-//	public void filterPixelPolygon_border() {
-//		ChessboardPolygonHelper alg = new ChessboardPolygonHelper(null,null,null);
-//		alg.width = 50;
-//		alg.height = 60;
-//
-//		List<Point2D_I32> externalUndist = new ArrayList<>();
-//		List<Point2D_I32> externalDist = new ArrayList<>();
-//		GrowQueue_I32 splits = new GrowQueue_I32();
-//
-//		for (int i = 0; i < 100; i++) {
-//			externalUndist.add(new Point2D_I32(10,10));
-//			externalDist.add(new Point2D_I32(10,10));
-//		}
-//
-//		// test initially with all corners inside
-//		splits.add(0);
-//		splits.add(10);
-//		assertFalse(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
-//		splits.add(20);
-//		assertTrue(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
-//		splits.add(30);
-//		assertTrue(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
-//		// these should all fail because there are too many corners inside not touching the border
-//		for (int i = 0; i < 3; i++) {
-//			splits.add(40+i*10);
-//			assertFalse(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
-//		}
-//
-//		// this should pass because only 1 or 3 corners are inside
-//		for (int i = 0; i < splits.size(); i++) {
-//			externalDist.get(splits.get(i)).set(0,0);
-//		}
-//		for (int i = 0; i < 3; i++) {
-//			externalDist.get(i).set(10,10);
-//			assertTrue(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
-//		}
-//	}
-//
-//	@Test
-//	public void filterPixelPolygon_AllBorder() {
-//		ChessboardPolygonHelper alg = new ChessboardPolygonHelper(null,null,null);
-//		alg.width = 50;
-//		alg.height = 60;
-//
-//		List<Point2D_I32> externalUndist = new ArrayList<>();
-//		List<Point2D_I32> externalDist = new ArrayList<>();
-//		GrowQueue_I32 splits = new GrowQueue_I32();
-//
-//		for (int i = 0; i < 100; i++) {
-//			externalUndist.add(new Point2D_I32(10,10));
-//			externalDist.add(new Point2D_I32(10,10));
-//		}
-//
-//		splits.add(0);
-//		splits.add(10);
-//		splits.add(20);
-//
-//		// nothing is actually touching the border, should be valid
-//		assertTrue(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
-//
-//		for (int i = 0; i < splits.size(); i++) {
-//			externalDist.get(splits.get(i)).set(0,0);
-//		}
-//		assertFalse(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
-//	}
+	@Test
+	public void filterPixelPolygon_border() {
+		ChessboardPolygonHelper alg = new ChessboardPolygonHelper();
+
+		Polygon2D_F64 distorted = new Polygon2D_F64(2);
+		GrowQueue_B touches = new GrowQueue_B();
+
+		// test initially with all corners inside
+		touches.add(false);
+		touches.add(false);
+		assertFalse(alg.filterPixelPolygon(null,distorted,touches,true));
+		distorted.vertexes.resize(3);
+		touches.add(false);
+		assertTrue(alg.filterPixelPolygon(null,distorted,touches,true));
+		distorted.vertexes.resize(3);
+		touches.add(false);
+		assertTrue(alg.filterPixelPolygon(null,distorted,touches,true));
+		// these should all fail because there are too many corners inside not touching the border
+		for (int i = 0; i < 3; i++) {
+			distorted.vertexes.resize(4+i+1);
+			touches.add(false);
+			assertFalse(alg.filterPixelPolygon(null,distorted,touches,true));
+		}
+
+		// this should pass because only 1 or 3 corners are inside
+		for (int i = 0; i < touches.size(); i++) {
+			touches.set(i,true);
+		}
+		for (int i = 0; i < 3; i++) {
+			touches.set(i,false);
+			assertTrue(alg.filterPixelPolygon(null,distorted,touches,true));
+		}
+	}
+
+	@Test
+	public void filterPixelPolygon_AllBorder() {
+		ChessboardPolygonHelper alg = new ChessboardPolygonHelper();
+
+		Polygon2D_F64 distorted = new Polygon2D_F64(3);
+		GrowQueue_B touches = new GrowQueue_B();
+
+		touches.add(false);
+		touches.add(false);
+		touches.add(false);
+
+		// nothing is actually touching the border, should be valid
+		assertTrue(alg.filterPixelPolygon(null,distorted,touches,true));
+
+		touches.set(0,true);
+		touches.set(1,true);
+		touches.set(2,true);
+
+		assertFalse(alg.filterPixelPolygon(null,distorted,touches,true));
+	}
 }

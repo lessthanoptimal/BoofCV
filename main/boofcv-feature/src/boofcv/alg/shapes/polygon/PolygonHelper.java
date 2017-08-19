@@ -20,6 +20,7 @@ package boofcv.alg.shapes.polygon;
 
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.ddogleg.struct.GrowQueue_B;
 
 import java.util.List;
 
@@ -55,8 +56,9 @@ public interface PolygonHelper {
 	 *
 	 * @param undistorted Polygon in undistorted image pixels.
 	 * @param distorted Polygon in distorted/original image pixels.
+	 * @param touches Array of booleans indicating which corners touch the image border. Only valid if part of it touches
 	 * @param touchesBorder true if the contour touches the image border or false if it doesnt
 	 * @return true to keep the contour for further processing or false to reject it
 	 */
-	boolean filterPixelPolygon( Polygon2D_F64 undistorted , Polygon2D_F64 distorted, boolean touchesBorder);
+	boolean filterPixelPolygon(Polygon2D_F64 undistorted , Polygon2D_F64 distorted, GrowQueue_B touches, boolean touchesBorder);
 }
