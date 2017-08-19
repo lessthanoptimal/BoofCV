@@ -113,7 +113,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 			// now refine the polygon fit
 //			System.out.println("before "+f.polygon);
 			if( !detectorSquare.refineUsingEdge(f) ) {
-				System.out.println("Refine failed");
+//				System.out.println("Refine failed");
 			}
 //			System.out.println("       "+f.polygon.areaSimple());
 		}

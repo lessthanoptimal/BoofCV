@@ -186,8 +186,6 @@ public class CommonFitPolygonChecks {
 
 	public static boolean checkPolygon( double[] expected , Polygon2D_F64 found  ) {
 		for (int i = 0; i < found.size(); i++) {
-
-
 			boolean matched = true;
 			for (int j = 0; j < found.size(); j++) {
 				double x = expected[j*2];

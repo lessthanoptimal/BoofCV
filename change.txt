@@ -24,6 +24,8 @@ Version : 0.28
   * Added JavaCV Override for:
     - BlurImageOps TODO
 
+TODO Add flip primitive array to ddogleg. Search for "primitive flip" for code that should be replaced here
+
 Polygon Detector
 - More false positives in regression on polygon shapes.
 - Ambiguous change in speed. Some faster some slower. Within normal variance.

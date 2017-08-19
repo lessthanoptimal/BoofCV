@@ -88,7 +88,7 @@ public class TestUtilImageIO {
 		}
 
 		// clean up
-		assertTrue(temp.delete());
+		temp.delete();// no assertTrue() here because in windows it will fail
 	}
 
 	@Test
@@ -107,7 +107,7 @@ public class TestUtilImageIO {
 		}
 
 		// clean up
-		assertTrue(temp.delete());
+		temp.delete();// no assertTrue() here because in windows it will fail
 	}
 
 	/**

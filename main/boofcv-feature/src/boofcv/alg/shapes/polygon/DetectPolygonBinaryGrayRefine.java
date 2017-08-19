@@ -99,11 +99,25 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		edgeIntensity.setImage(gray);
 	}
 
-	public void refineContour(DetectPolygonFromContour.Info polygon ) {
-		refineContour.process(polygon.contour,polygon.splits,polygon.polygon);
+	public boolean refineContour(DetectPolygonFromContour.Info polygon ) {
 
-		// todo save edge intensity.  NEED SAME INENSITY
+		double before,after;
+		if( edgeIntensity.computeEdge(polygon.polygon,!detector.isOutputClockwise()) ) {
+			before = edgeIntensity.getAverageOutside() - edgeIntensity.getAverageInside();
+		} else {
+			return false;
+		}
 
+		refineContour.process(polygon.contour,polygon.splits,work);
+
+		if( edgeIntensity.computeEdge(work,!detector.isOutputClockwise()) ) {
+			after = edgeIntensity.getAverageOutside() - edgeIntensity.getAverageInside();
+			if( after > before ) {
+				polygon.polygon.set(work);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public boolean refineUsingEdge(DetectPolygonFromContour.Info polygon ) {

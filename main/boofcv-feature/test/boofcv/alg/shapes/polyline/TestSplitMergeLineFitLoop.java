@@ -19,12 +19,14 @@
 package boofcv.alg.shapes.polyline;
 
 import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.RectangleLength2D_I32;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static boofcv.alg.shapes.polygon.TestContourEdgeIntensity.rectToContour;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -55,20 +57,12 @@ public class TestSplitMergeLineFitLoop {
 	 */
 	@Test
 	public void simpleSquareAll() {
-		List<Point2D_I32> contour = new ArrayList<>();
-		for( int i = 0; i < 10; i++ )
-			contour.add( new Point2D_I32(i,0));
-		for( int i = 1; i < 5; i++ )
-			contour.add( new Point2D_I32(9,i));
-		for( int i = 0; i < 10; i++ )
-			contour.add( new Point2D_I32(9-i,4));
-		for( int i = 2; i < 5; i++ )
-			contour.add( new Point2D_I32(0,5-i));
+		List<Point2D_I32> contour = rectToContour(new RectangleLength2D_I32(0,0,10,5));
 
 		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15, MINIMUM_SPLIT_FRACTION,100);
 		alg.process(contour);
 		GrowQueue_I32 splits = alg.getSplits();
-		matchSplitsToExpected(new int[]{0, 9, 13, 23}, splits);
+		matchSplitsToExpected(new int[]{8, 12, 21, 25}, splits);
 	}
 
 	@Test
