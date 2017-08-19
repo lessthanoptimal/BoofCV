@@ -204,7 +204,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		if( verbose ) System.out.println("ENTER  DetectPolygonFromContour.process()");
 		InputSanityCheck.checkSameShape(binary, gray);
 
-		if( labeled.width != gray.width || labeled.height == gray.width )
+		if( labeled.width != gray.width || labeled.height != gray.height )
 			configure(gray.width,gray.height);
 
 		// reset storage for output. Call reset individually here to ensure that all references
