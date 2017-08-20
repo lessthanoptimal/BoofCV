@@ -251,7 +251,7 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 		DetectCalibrationCircleAsymmetricApp app = new DetectCalibrationCircleAsymmetricApp(5, 8, 2,6,examples);
 
 		app.openFile(new File(examples.get(0)));
-		app.waitUntilDoneProcessing();
+		app.waitUntilInputSizeIsKnown();
 
 		ShowImages.showWindow(app,"Circle Asymmetric Grid Detector",true);
 	}

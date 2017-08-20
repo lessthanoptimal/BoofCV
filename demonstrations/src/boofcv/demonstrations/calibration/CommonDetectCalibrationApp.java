@@ -23,7 +23,7 @@ import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.gui.BoofSwingUtil;
-import boofcv.gui.DemonstrationBase;
+import boofcv.gui.DemonstrationBase2;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.calibration.CalibratedImageGridPanel;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -59,7 +59,7 @@ import static boofcv.gui.fiducial.VisualizeFiducial.drawLine;
  *
  * @author Peter Abeles
  */
-public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF32>
+public abstract class CommonDetectCalibrationApp extends DemonstrationBase2
 		implements DetectCalibrationPanel.Listener
 {
 	boolean success;
@@ -110,6 +110,39 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 	protected abstract List<SquareGrid> getGrids();
 
 	@Override
+	protected void handleInputChange( int source , InputMethod method , final int width , final int height ) {
+		// adjust the scale if needed so that the entire image is visible when loaded
+		BoofSwingUtil.invokeNowOrLater(new Runnable() {
+			@Override
+			public void run() {
+				if (imagePanel.getWidth() > 0) {
+					double scaleX = (imagePanel.getWidth() + 5) / (double) width;
+					double scaleY = (imagePanel.getHeight() + 5) / (double) height;
+
+					final double scale = Math.min(scaleX, scaleY);
+					if (scale < 1.0) {
+						BoofSwingUtil.invokeNowOrLater(new Runnable() {
+							@Override
+							public void run() {
+								controlPanel.setScale(scale);
+							}
+						});
+					} else {
+						BoofSwingUtil.invokeNowOrLater(new Runnable() {
+							@Override
+							public void run() {
+								controlPanel.setScale(1);
+							}
+						});
+					}
+				} else {
+					imagePanel.setPreferredSize(new Dimension(width,height));
+				}
+			}
+		});
+	}
+
+	@Override
 	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase gray) {
 		this.input = buffered;
 
@@ -119,23 +152,6 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 		}
 
 		processFrame();
-
-		// adjust the scale if needed so that the entire image is visible when loaded
-		if( imagePanel.getWidth() > 0 ) {
-			double scaleX = (imagePanel.getWidth()+5) / (double) buffered.getWidth();
-			double scaleY = (imagePanel.getHeight()+5) / (double) buffered.getHeight();
-
-			final double scale = Math.min(scaleX, scaleY);
-			if (scale < 1.0) {
-				BoofSwingUtil.invokeNowOrLater(new Runnable() {
-					@Override
-					public void run() {controlPanel.setScale(scale);}});
-			} else {
-				BoofSwingUtil.invokeNowOrLater(new Runnable() {
-					@Override
-					public void run() {controlPanel.setScale(1);}});
-			}
-		}
 	}
 
 	protected void renderGraph( Graphics2D g2 , double scale ) {

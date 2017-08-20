@@ -56,7 +56,7 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 
 	@Override
 	protected void createDetector( boolean initializing ) {
-		if( !initializing)
+		if( !initializing )
 			BoofSwingUtil.checkGuiThread();
 
 		DetectEllipseControlPanel controls = (DetectEllipseControlPanel)DetectBlackEllipseApp.this.controls;

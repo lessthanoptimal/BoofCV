@@ -45,7 +45,6 @@ import java.util.List;
 public abstract class DemonstrationBase<T extends ImageBase<T>> extends JPanel {
 	protected JMenuBar menuBar;
 	JMenuItem menuFile, menuWebcam, menuQuit;
-	final JFileChooser fc = new JFileChooser();
 
 	protected InputMethod inputMethod = InputMethod.NONE;
 

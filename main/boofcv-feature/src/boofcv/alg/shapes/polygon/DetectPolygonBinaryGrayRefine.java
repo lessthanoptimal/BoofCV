@@ -117,7 +117,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		boolean success = false;
 
 		if( refineContour != null ) {
-			work.set(info.polygon);
+			refineContour.process(info.contour,info.splits,work);
 			if( edgeIntensity.computeEdge(work,!detector.isOutputClockwise()) ) {
 				after = edgeIntensity.getAverageOutside() - edgeIntensity.getAverageInside();
 				if( after > before ) {
@@ -128,10 +128,13 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 			}
 		}
 
-		if( functionAdjust != null )
+		if( functionAdjust != null ) {
+			double area = info.polygon.areaSimple();
 			functionAdjust.adjust(info, detector.isOutputClockwise());
+		}
 
 		if( refineGray != null ) {
+			work.vertexes.resize(info.polygon.size());
 			if( refineGray.refine(info.polygon,work) ) {
 				if( edgeIntensity.computeEdge(work,!detector.isOutputClockwise()) ) {
 					after = edgeIntensity.getAverageOutside() - edgeIntensity.getAverageInside();

@@ -88,11 +88,12 @@ public class FactoryShapeDetector {
 
 		RefinePolygonToContour refineContour = config.refineContour ? new RefinePolygonToContour() : null;
 
-		RefinePolygonToGray<T> refinePolygon = refinePolygon(config.refineGray,imageType);
+		RefinePolygonToGray<T> refineGray = config.refineGray != null ?
+				refinePolygon(config.refineGray,imageType) : null;
 
 		DetectPolygonFromContour<T> detector = polygonContour(config.detector,imageType);
 
-		return new DetectPolygonBinaryGrayRefine<>(detector,refineContour,refinePolygon);
+		return new DetectPolygonBinaryGrayRefine<>(detector,refineContour,refineGray);
 	}
 
 	public static <T extends ImageGray<T>>

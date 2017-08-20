@@ -33,7 +33,8 @@ public class BoofSwingUtil {
 		String key = "PreviouslySelected";
 
 		Preferences prefs = Preferences.userRoot().node(parent.getClass().getSimpleName());
-		JFileChooser chooser = new JFileChooser(prefs.get(key, defaultPath));
+		String previousPath=prefs.get(key, defaultPath);
+		JFileChooser chooser = new JFileChooser(previousPath);
 
 		File selected = null;
 		int returnVal = chooser.showOpenDialog(parent);

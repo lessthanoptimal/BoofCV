@@ -47,7 +47,6 @@ import java.util.List;
 public abstract class DemonstrationBase2 extends JPanel {
 	protected JMenuBar menuBar;
 	JMenuItem menuFile, menuWebcam, menuQuit;
-	final JFileChooser fc = new JFileChooser();
 
 	// controls by synchornized(inputStreams)
 	protected InputMethod inputMethod = InputMethod.NONE;
@@ -437,12 +436,9 @@ public abstract class DemonstrationBase2 extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (menuFile == e.getSource()) {
-					int returnVal = fc.showOpenDialog(DemonstrationBase2.this);
-
-					if (returnVal == JFileChooser.APPROVE_OPTION) {
-						File file = fc.getSelectedFile();
+					File file = BoofSwingUtil.openFileChooseDialog(DemonstrationBase2.this);
+					if (file != null) {
 						openFile(file);
-					} else {
 					}
 				} else if (menuWebcam == e.getSource()) {
 					openWebcam();

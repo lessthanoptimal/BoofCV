@@ -22,6 +22,7 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
@@ -65,7 +66,15 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 		DetectPolygonControlPanel controls = (DetectPolygonControlPanel)DetectBlackPolygonApp.this.controls;
 
 		synchronized (this) {
-			detector = FactoryShapeDetector.polygon(controls.getConfigPolygon(), imageClass);
+			ConfigPolygonDetector config = controls.getConfigPolygon();
+
+			if( controls.bRefineGray ) {
+				config.refineGray = controls.refineGray;
+			} else {
+				config.refineGray = null;
+			}
+
+			detector = FactoryShapeDetector.polygon(config, imageClass);
 		}
 		imageThresholdUpdated();
 	}
@@ -93,6 +102,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 	protected void detectorProcess(ImageGray input, GrayU8 binary) {
 //		System.out.println("processing image "+count++);
 		detector.process((T) input, binary);
+		detector.refineAll();
 	}
 
 	class VisualizePanel extends ImageZoomPanel {

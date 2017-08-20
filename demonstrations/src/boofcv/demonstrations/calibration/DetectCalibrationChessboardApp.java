@@ -127,7 +127,7 @@ public class DetectCalibrationChessboardApp
 		DetectCalibrationChessboardApp app = new DetectCalibrationChessboardApp(7,5,examples);
 
 		app.openFile(new File(examples.get(0)));
-		app.waitUntilDoneProcessing();
+		app.waitUntilInputSizeIsKnown();
 
 		ShowImages.showWindow(app, "Calibration Target Detection",true);
 	}

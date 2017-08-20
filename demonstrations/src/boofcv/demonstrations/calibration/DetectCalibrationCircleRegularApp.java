@@ -254,7 +254,7 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 		DetectCalibrationCircleRegularApp app = new DetectCalibrationCircleRegularApp(10, 8, 1.5,2.5,examples);
 
 		app.openFile(new File(examples.get(0)));
-		app.waitUntilDoneProcessing();
+		app.waitUntilInputSizeIsKnown();
 
 		ShowImages.showWindow(app,"Circle Regular Grid Detector",true);
 	}

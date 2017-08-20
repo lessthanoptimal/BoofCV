@@ -123,7 +123,7 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 		DetectCalibrationSquareGridApp app = new DetectCalibrationSquareGridApp(4, 3, 1,1,false,examples);
 
 		app.openFile(new File(examples.get(0)));
-		app.waitUntilDoneProcessing();
+		app.waitUntilInputSizeIsKnown();
 
 		ShowImages.showWindow(app,"Square Grid Detector",true);
 	}

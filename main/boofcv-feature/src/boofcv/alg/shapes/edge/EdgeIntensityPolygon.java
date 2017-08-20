@@ -110,14 +110,16 @@ public class EdgeIntensityPolygon<T extends ImageGray<T>>  {
 			dy /= t;
 
 			// see if the side is too small
-			if( t <= 3*cornerOffset )
-				return false;
+			if( t < 3*cornerOffset ) {
+				offsetA.set(a);
+				offsetB.set(b);
+			} else {
+				offsetA.x = a.x + cornerOffset * dx;
+				offsetA.y = a.y + cornerOffset * dy;
 
-			offsetA.x = a.x + cornerOffset*dx;
-			offsetA.y = a.y + cornerOffset*dy;
-
-			offsetB.x = b.x - cornerOffset*dx;
-			offsetB.y = b.y - cornerOffset*dy;
+				offsetB.x = b.x - cornerOffset * dx;
+				offsetB.y = b.y - cornerOffset * dy;
+			}
 
 			double tanX = -dy*tangentDistance*tangentSign;
 			double tanY =  dx*tangentDistance*tangentSign;

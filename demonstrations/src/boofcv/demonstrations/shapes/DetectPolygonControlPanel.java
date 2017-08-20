@@ -19,6 +19,7 @@
 package boofcv.demonstrations.shapes;
 
 import boofcv.factory.shape.ConfigPolygonDetector;
+import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -47,6 +48,9 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 	boolean bShowLines = true;
 	boolean bShowContour = false;
 
+	boolean bRefineGray = true;
+	ConfigRefinePolygonLineToImage refineGray = new ConfigRefinePolygonLineToImage();
+
 	ThresholdControlPanel threshold;
 
 	JSpinner spinnerMinContourSize;
@@ -61,6 +65,9 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 	JSpinner spinnerContourIterations;
 	JSpinner spinnerSplitPenalty;
 
+
+	JCheckBox setRefineContour;
+	JCheckBox setRefineGray;
 	JSpinner spinnerLineSamples;
 	JSpinner spinnerCornerOffset;
 	JSpinner spinnerSampleRadius;
@@ -133,21 +140,27 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		setBorder.addActionListener(this);
 		setBorder.setSelected(config.detector.canTouchBorder);
 
-		spinnerLineSamples = new JSpinner(new SpinnerNumberModel(config.refineGray.lineSamples, 5, 100, 1));
+		setRefineContour = new JCheckBox("Refine Contour");
+		setRefineContour.addActionListener(this);
+		setRefineContour.setSelected(config.refineContour);
+		setRefineGray = new JCheckBox("Refine Gray");
+		setRefineGray.addActionListener(this);
+		setRefineGray.setSelected(config.refineGray != null);
+		spinnerLineSamples = new JSpinner(new SpinnerNumberModel(refineGray.lineSamples, 5, 100, 1));
 		spinnerLineSamples.setMaximumSize(spinnerLineSamples.getPreferredSize());
 		spinnerLineSamples.addChangeListener(this);
-		spinnerCornerOffset = new JSpinner(new SpinnerNumberModel(config.refineGray.cornerOffset, 0, 10, 1));
+		spinnerCornerOffset = new JSpinner(new SpinnerNumberModel(refineGray.cornerOffset, 0, 10, 1));
 		spinnerCornerOffset.setMaximumSize(spinnerCornerOffset.getPreferredSize());
 		spinnerCornerOffset.addChangeListener(this);
-		spinnerSampleRadius = new JSpinner(new SpinnerNumberModel(config.refineGray.sampleRadius, 0, 10, 1));
+		spinnerSampleRadius = new JSpinner(new SpinnerNumberModel(refineGray.sampleRadius, 0, 10, 1));
 		spinnerSampleRadius.setMaximumSize(spinnerCornerOffset.getPreferredSize());
 		spinnerSampleRadius.addChangeListener(this);
-		spinnerRefineMaxIterations = new JSpinner(new SpinnerNumberModel(config.refineGray.maxIterations, 0, 200, 1));
+		spinnerRefineMaxIterations = new JSpinner(new SpinnerNumberModel(refineGray.maxIterations, 0, 200, 1));
 		spinnerRefineMaxIterations.setMaximumSize(spinnerRefineMaxIterations.getPreferredSize());
 		spinnerRefineMaxIterations.addChangeListener(this);
-		spinnerConvergeTol = new JSpinner(new SpinnerNumberModel(config.refineGray.convergeTolPixels, 0.0, 2.0, 0.005));
+		spinnerConvergeTol = new JSpinner(new SpinnerNumberModel(refineGray.convergeTolPixels, 0.0, 2.0, 0.005));
 		configureSpinnerFloat(spinnerConvergeTol);
-		spinnerMaxCornerChange = new JSpinner(new SpinnerNumberModel(config.refineGray.maxCornerChangePixel, 0.0, 50.0, 1.0));
+		spinnerMaxCornerChange = new JSpinner(new SpinnerNumberModel(refineGray.maxCornerChangePixel, 0.0, 50.0, 1.0));
 		configureSpinnerFloat(spinnerMaxCornerChange);
 
 		addLabeled(imageView, "View: ", this);
@@ -168,6 +181,8 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		addLabeled(spinnerContourIterations, "Max Iterations: ", this);
 		addLabeled(spinnerSplitPenalty, "Split Penalty: ", this);
 		addCenterLabel("Refinement", this);
+		addAlignLeft(setRefineContour, this);
+		addAlignLeft(setRefineGray, this);
 		addLabeled(spinnerLineSamples, "Line Samples: ", this);
 		addLabeled(spinnerCornerOffset, "Corner Offset: ", this);
 		addLabeled(spinnerSampleRadius, "Sample Radius: ", this);
@@ -210,6 +225,12 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		} else if( e.getSource() == setBorder ) {
 			config.detector.canTouchBorder = setBorder.isSelected();
 			owner.configUpdate();
+		} else if( e.getSource() == setRefineContour ) {
+			config.refineContour = setRefineContour.isSelected();
+			owner.configUpdate();
+		} else if( e.getSource() == setRefineGray ) {
+			bRefineGray = setRefineGray.isSelected();
+			owner.configUpdate();
 		}
 	}
 
@@ -246,17 +267,17 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		} else if( e.getSource() == spinnerSplitPenalty ) {
 			config.detector.splitPenalty = ((Number) spinnerSplitPenalty.getValue()).doubleValue();
 		} else if (e.getSource() == spinnerLineSamples) {
-			config.refineGray.lineSamples = ((Number) spinnerLineSamples.getValue()).intValue();
+			refineGray.lineSamples = ((Number) spinnerLineSamples.getValue()).intValue();
 		} else if (e.getSource() == spinnerCornerOffset) {
-			config.refineGray.cornerOffset = ((Number) spinnerCornerOffset.getValue()).intValue();
+			refineGray.cornerOffset = ((Number) spinnerCornerOffset.getValue()).intValue();
 		} else if (e.getSource() == spinnerSampleRadius) {
-			config.refineGray.sampleRadius = ((Number) spinnerSampleRadius.getValue()).intValue();
+			refineGray.sampleRadius = ((Number) spinnerSampleRadius.getValue()).intValue();
 		} else if (e.getSource() == spinnerRefineMaxIterations) {
-			config.refineGray.maxIterations = ((Number) spinnerRefineMaxIterations.getValue()).intValue();
+			refineGray.maxIterations = ((Number) spinnerRefineMaxIterations.getValue()).intValue();
 		} else if (e.getSource() == spinnerConvergeTol) {
-			config.refineGray.convergeTolPixels = ((Number) spinnerConvergeTol.getValue()).doubleValue();
+			refineGray.convergeTolPixels = ((Number) spinnerConvergeTol.getValue()).doubleValue();
 		} else if (e.getSource() == spinnerMaxCornerChange) {
-			config.refineGray.maxCornerChangePixel = ((Number) spinnerMaxCornerChange.getValue()).doubleValue();
+			refineGray.maxCornerChangePixel = ((Number) spinnerMaxCornerChange.getValue()).doubleValue();
 		}
 		owner.configUpdate();
 	}
@@ -264,37 +285,6 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 	private void updateSidesInConfig() {
 		config.detector.minimumSides = minSides;
 		config.detector.maximumSides = maxSides;
-	}
-
-	private void updateRefineSettings() {
-
-		spinnerLineSamples.removeChangeListener(this);
-		spinnerCornerOffset.removeChangeListener(this);
-		spinnerSampleRadius.removeChangeListener(this);
-		spinnerRefineMaxIterations.removeChangeListener(this);
-		spinnerConvergeTol.removeChangeListener(this);
-		spinnerMaxCornerChange.removeChangeListener(this);
-
-		// not entirely sure if all of these if statements are needed but I was seeing weird behavior
-		if( ((Number)spinnerLineSamples.getValue()).intValue() != config.refineGray.lineSamples )
-			spinnerLineSamples.setValue(config.refineGray.lineSamples);
-		if( ((Number)spinnerCornerOffset.getValue()).doubleValue() != config.refineGray.cornerOffset )
-			spinnerCornerOffset.setValue(config.refineGray.cornerOffset);
-		if( ((Number)spinnerSampleRadius.getValue()).intValue() != config.refineGray.sampleRadius )
-			spinnerSampleRadius.setValue(config.refineGray.sampleRadius);
-		if( ((Number)spinnerRefineMaxIterations.getValue()).intValue() != config.refineGray.maxIterations )
-			spinnerRefineMaxIterations.setValue(config.refineGray.maxIterations);
-		if( ((Number)spinnerConvergeTol.getValue()).doubleValue() != config.refineGray.convergeTolPixels )
-			spinnerConvergeTol.setValue(config.refineGray.convergeTolPixels);
-		if( ((Number)spinnerMaxCornerChange.getValue()).doubleValue() != config.refineGray.maxCornerChangePixel )
-			spinnerMaxCornerChange.setValue(config.refineGray.maxCornerChangePixel);
-
-		spinnerLineSamples.addChangeListener(this);
-		spinnerCornerOffset.addChangeListener(this);
-		spinnerSampleRadius.addChangeListener(this);
-		spinnerRefineMaxIterations.addChangeListener(this);
-		spinnerConvergeTol.addChangeListener(this);
-		spinnerMaxCornerChange.addChangeListener(this);
 	}
 
 	public ThresholdControlPanel getThreshold() {
