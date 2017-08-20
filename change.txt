@@ -29,7 +29,6 @@ Polygon Detector
 - More false positives in regression on polygon shapes.
 - Ambiguous change in speed. Some faster some slower. Within normal variance.
 - At least one fiducial was much worse on blurred images
-- TODO make contour intensoity sample radius configurable. normally 1.5 but 2.5 for chessboard
 - TODO see if a shape can be rejected before refining the polygon fit to improve speed for all fiducals
 - TODO  profile detectors.
 - TODO Make it so split merge can abort early if too many splits? if very large sub-sample and fit?
