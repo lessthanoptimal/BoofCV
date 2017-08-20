@@ -63,6 +63,10 @@ public class FactoryFeatureExtractor {
 			config = new ConfigExtract();
 		config.checkValidity();
 
+		if( BOverrideFactoryFeatureExtractor.nonmax != null ) {
+			return BOverrideFactoryFeatureExtractor.nonmax.process(config);
+		}
+
 		NonMaxBlock ret;
 		if (config.useStrictRule) {
 			if( config.detectMaximums)
@@ -101,6 +105,10 @@ public class FactoryFeatureExtractor {
 		if( config == null )
 			config = new ConfigExtract();
 		config.checkValidity();
+
+		if( BOverrideFactoryFeatureExtractor.nonmaxCandidate != null ) {
+			return BOverrideFactoryFeatureExtractor.nonmaxCandidate.process(config);
+		}
 
 		NonMaxCandidate alg;
 
