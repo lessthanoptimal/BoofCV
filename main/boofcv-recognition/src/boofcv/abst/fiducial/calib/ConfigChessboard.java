@@ -74,8 +74,9 @@ public class ConfigChessboard implements Configuration {
 		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
 		thresholding.scale = 0.9;
 
-		square.detector.contour2Poly_splitFraction = 0.1;
-		square.detector.contour2Poly_minimumSideFraction = 0.025; // teh erosion step appears to require a smaller value here
+		square.detector.contourToPoly.splitFraction = 0.1;
+		square.detector.contourToPoly.minimumSideFraction = 0.025; // teh erosion step appears to require a smaller value here
+		square.detector.tangentEdgeIntensity = 2.5; // the initial contour is the result of being eroded
 		square.detector.minContourImageWidthFraction = 0.0005;
 		square.detector.canTouchBorder = true;
 

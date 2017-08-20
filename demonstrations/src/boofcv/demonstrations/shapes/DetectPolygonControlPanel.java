@@ -120,13 +120,13 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 				0.0,255.0,1.0));
 		spinnerMinEdge.setMaximumSize(spinnerMinEdge.getPreferredSize());
 		spinnerMinEdge.addChangeListener(this);
-		spinnerContourSplit = new JSpinner(new SpinnerNumberModel(config.detector.contour2Poly_splitFraction,
+		spinnerContourSplit = new JSpinner(new SpinnerNumberModel(config.detector.contourToPoly.splitFraction,
 				0.0,1.0,0.01));
 		configureSpinnerFloat(spinnerContourSplit);
-		spinnerContourMinSplit = new JSpinner(new SpinnerNumberModel(config.detector.contour2Poly_minimumSideFraction,
+		spinnerContourMinSplit = new JSpinner(new SpinnerNumberModel(config.detector.contourToPoly.minimumSideFraction,
 				0.0, 1.0, 0.001));
 		configureSpinnerFloat(spinnerContourMinSplit);
-		spinnerContourIterations = new JSpinner(new SpinnerNumberModel(config.detector.contour2Poly_iterations,
+		spinnerContourIterations = new JSpinner(new SpinnerNumberModel(config.detector.contourToPoly.iterations,
 				1, 200, 1));
 		spinnerContourIterations.setMaximumSize(spinnerContourIterations.getPreferredSize());
 		spinnerContourIterations.addChangeListener(this);
@@ -259,11 +259,11 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		} else if( e.getSource() == spinnerMinContourSize ) {
 			config.detector.minContourImageWidthFraction = ((Number) spinnerMinContourSize.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourSplit ) {
-			config.detector.contour2Poly_splitFraction = ((Number) spinnerContourSplit.getValue()).doubleValue();
+			config.detector.contourToPoly.splitFraction = ((Number) spinnerContourSplit.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourMinSplit ) {
-			config.detector.contour2Poly_minimumSideFraction = ((Number) spinnerContourMinSplit.getValue()).doubleValue();
+			config.detector.contourToPoly.minimumSideFraction = ((Number) spinnerContourMinSplit.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourIterations ) {
-			config.detector.contour2Poly_iterations = ((Number) spinnerContourIterations.getValue()).intValue();
+			config.detector.contourToPoly.iterations = ((Number) spinnerContourIterations.getValue()).intValue();
 		} else if( e.getSource() == spinnerSplitPenalty ) {
 			config.detector.splitPenalty = ((Number) spinnerSplitPenalty.getValue()).doubleValue();
 		} else if (e.getSource() == spinnerLineSamples) {

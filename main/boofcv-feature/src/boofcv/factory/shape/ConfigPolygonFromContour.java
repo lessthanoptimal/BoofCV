@@ -45,20 +45,9 @@ public class ConfigPolygonFromContour implements Configuration {
 	public boolean canTouchBorder = false;
 
 	/**
-	 * A line is split if a point along the contour between the two end points has a distance from the line
-	 * which is greater than this fraction of the line's length
+	 * Configuration for fitting a polygon to the contour.
 	 */
-	public double contour2Poly_splitFraction = 0.10;
-
-	/**
-	 * Number of split and merge iterations when converting contour into polygon
-	 */
-	public int contour2Poly_iterations = 10;
-
-	/**
-	 * The minimum allowed length of a side as a fraction of the total contour length
-	 */
-	public double contour2Poly_minimumSideFraction = 0.025;
+	public ConfigSplitMergeLineFit contourToPoly = new ConfigSplitMergeLineFit();
 
 	/**
 	 * Magic number used to penalize a polygon when a new corner is added
@@ -80,6 +69,11 @@ public class ConfigPolygonFromContour implements Configuration {
 	public double minimumEdgeIntensity = 6.0;
 
 	/**
+	 * Tangential distance away in pixels from the contour that the edge intensity is sampled.
+	 */
+	public double tangentEdgeIntensity = 1.5;
+
+	/**
 	 * Specifies the minimum allowed contour length as a fraction of the input image's width.  Smaller numbers
 	 * mean smaller objects are allowed.
 	 */
@@ -98,12 +92,12 @@ public class ConfigPolygonFromContour implements Configuration {
 	/**
 	 * Specifies the number of sides in the polygon and uses default settings for everything else
 	 */
-	public ConfigPolygonFromContour( int minimumSides , int maximumSides) {
+	public ConfigPolygonFromContour(int minimumSides, int maximumSides) {
 		this.minimumSides = minimumSides;
 		this.maximumSides = maximumSides;
 	}
 
-	public ConfigPolygonFromContour(boolean clockwise, int minimumSides , int maximumSides) {
+	public ConfigPolygonFromContour(boolean clockwise, int minimumSides, int maximumSides) {
 		this.minimumSides = minimumSides;
 		this.maximumSides = maximumSides;
 
@@ -117,15 +111,14 @@ public class ConfigPolygonFromContour implements Configuration {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+"{" +
+		return "ConfigPolygonFromContour{" +
 				"minimumSides=" + minimumSides +
 				", maximumSides=" + maximumSides +
 				", canTouchBorder=" + canTouchBorder +
-				", contour2Poly_splitFraction=" + contour2Poly_splitFraction +
-				", contour2Poly_iterations=" + contour2Poly_iterations +
-				", contour2Poly_minimumSideFraction=" + contour2Poly_minimumSideFraction +
+				", contourToPoly=" + contourToPoly +
 				", splitPenalty=" + splitPenalty +
 				", minimumEdgeIntensity=" + minimumEdgeIntensity +
+				", tangentEdgeIntensity=" + tangentEdgeIntensity +
 				", minContourImageWidthFraction=" + minContourImageWidthFraction +
 				", clockwise=" + clockwise +
 				", convex=" + convex +

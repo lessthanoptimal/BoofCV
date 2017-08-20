@@ -102,15 +102,15 @@ public class FactoryShapeDetector {
 		config.checkValidity();
 
 		SplitMergeLineFitLoop contourToPolygon = new SplitMergeLineFitLoop(
-				config.contour2Poly_splitFraction,
-				config.contour2Poly_minimumSideFraction,
-				config.contour2Poly_iterations);
+				config.contourToPoly.splitFraction,
+				config.contourToPoly.minimumSideFraction,
+				config.contourToPoly.iterations);
 
 		return new DetectPolygonFromContour<>(
 				config.minimumSides, config.maximumSides, contourToPolygon,
 				config.minContourImageWidthFraction,
 				config.clockwise, config.convex, config.canTouchBorder, config.splitPenalty,
-				config.minimumEdgeIntensity, imageType);
+				config.minimumEdgeIntensity, config.tangentEdgeIntensity, imageType);
 	}
 
 	public static <T extends ImageGray<T>>

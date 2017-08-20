@@ -42,6 +42,10 @@ public class BOverrideManager {
 	 * Prints a summary of what has been overriden
 	 */
 	public static void print() {
+		System.out.println("Total registered "+list.size());
+	}
 
+	public static void main(String[] args) {
+		BOverrideManager.print();
 	}
 }

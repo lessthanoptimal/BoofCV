@@ -154,6 +154,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 									boolean convex,
 									boolean touchBorder, double splitPenalty,
 									double contourEdgeThreshold,
+									double tangentEdgeIntensity,
 									Class<T> inputType) {
 
 		setNumberOfSides(minSides,maxSides);
@@ -166,7 +167,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		this.inputType = inputType;
 
 		if( contourEdgeThreshold > 0 ) {
-			this.contourEdgeIntensity = new ContourEdgeIntensity<>(30, 1, 2.5, inputType);
+			this.contourEdgeIntensity = new ContourEdgeIntensity<>(30, 1, tangentEdgeIntensity, inputType);
 		}
 
 		pruner = new MinimizeEnergyPrune(splitPenalty);

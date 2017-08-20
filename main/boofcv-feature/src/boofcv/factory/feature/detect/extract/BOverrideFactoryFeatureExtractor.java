@@ -28,7 +28,7 @@ import boofcv.override.BOverrideManager;
  *
  * @author Peter Abeles
  */
-public class BOverrideFactoryFeatureExtractor extends BOverrideClass{
+public class BOverrideFactoryFeatureExtractor extends BOverrideClass {
 
 	public static NonMax nonmax;
 	public static NonMaxCandidate nonmaxCandidate;

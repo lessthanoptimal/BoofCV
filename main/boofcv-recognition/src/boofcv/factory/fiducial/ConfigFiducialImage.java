@@ -55,8 +55,8 @@ public class ConfigFiducialImage implements Configuration {
 	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4,4);
 
 	{
-		squareDetector.detector.contour2Poly_splitFraction = 0.1;
-		squareDetector.detector.contour2Poly_minimumSideFraction = 0.05;
+		squareDetector.detector.contourToPoly.splitFraction = 0.1;
+		squareDetector.detector.contourToPoly.minimumSideFraction = 0.05;
 		squareDetector.refineGray.cornerOffset = 0;
 	}
 

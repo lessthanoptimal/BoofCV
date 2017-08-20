@@ -66,8 +66,8 @@ public class ConfigSquareGrid implements Configuration {
 		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
 		thresholding.scale = 0.85;
 
-		square.detector.contour2Poly_splitFraction = 0.1;
-		square.detector.contour2Poly_minimumSideFraction = 0.1;
+		square.detector.contourToPoly.splitFraction = 0.1;
+		square.detector.contourToPoly.minimumSideFraction = 0.1;
 		square.detector.minContourImageWidthFraction = 0.0005;
 
 		// putting reasonable defaults for if the user decides to optimize by line
