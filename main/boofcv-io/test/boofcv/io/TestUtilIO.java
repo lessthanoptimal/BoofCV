@@ -114,7 +114,16 @@ public class TestUtilIO {
 	@Test
 	public void findMatches() {
 		String f = TestUtilIO.class.getResource(".").getFile();
+		String w = "resources";
 		File[] matches = UtilIO.findMatches(new File(f),"\\w*.class");
+		if( matches.length < 3 ) {
+			// depending on how the IDE is configured it might not point it where one might think it should be
+			if( f.contains(w) ) {
+				int l = f.lastIndexOf(w);
+				f = f.substring(0,l)+"classes"+f.substring(l+w.length(),f.length());
+			}
+			matches = UtilIO.findMatches(new File(f),"\\w*.class");
+		}
 		assertTrue(matches.length>=3);
 	}
 }
