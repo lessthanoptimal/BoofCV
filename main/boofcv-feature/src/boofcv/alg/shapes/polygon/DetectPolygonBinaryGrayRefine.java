@@ -129,7 +129,6 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		}
 
 		if( functionAdjust != null ) {
-			double area = info.polygon.areaSimple();
 			functionAdjust.adjust(info, detector.isOutputClockwise());
 		}
 

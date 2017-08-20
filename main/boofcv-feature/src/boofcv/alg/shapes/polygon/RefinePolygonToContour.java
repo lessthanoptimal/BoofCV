@@ -23,6 +23,7 @@ import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LinePolar2D_F64;
+import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -45,7 +46,11 @@ public class RefinePolygonToContour {
 
 	private FastQueue<LineGeneral2D_F64> lines = new FastQueue<>(LineGeneral2D_F64.class,true);
 
-	private Polygon2D_F64 delta = new Polygon2D_F64();
+	// work space for bias removal
+	private FastQueue<LineSegment2D_F64> segments = new FastQueue<>(LineSegment2D_F64.class,true);
+	LineGeneral2D_F64 ga = new LineGeneral2D_F64();
+	LineGeneral2D_F64 gb = new LineGeneral2D_F64();
+	Point2D_F64 intersection = new Point2D_F64();
 
 	/**
 	 * Refines the estimate using all the points in the contour
@@ -110,10 +115,7 @@ public class RefinePolygonToContour {
 
 	public void adjustForThresholdBias(Polygon2D_F64 polygon, boolean clockwise) {
 		int N = polygon.size();
-		delta.vertexes.resize(N);
-		for (int i = 0; i < N; i++) {
-			delta.get(i).set(0, 0);
-		}
+		segments.resize(N);
 
 		for (int i = N - 1, j = 0; j < N; i = j, j++) {
 
@@ -126,28 +128,33 @@ public class RefinePolygonToContour {
 
 			Point2D_F64 a = polygon.get(ii), b = polygon.get(jj);
 
-			double dx0 = b.x - a.x;
-			double dy0 = b.y - a.y;
-			double l0 = Math.sqrt(dx0 * dx0 + dy0 * dy0);
+			double dx = b.x - a.x;
+			double dy = b.y - a.y;
+			double l = Math.sqrt(dx * dx + dy * dy);
 
-			if( dx0 < 0 )
-				dx0 = 0;
-			if( dy0 > 0 )
-				dy0 = 0;
+			if( dx < 0 )
+				dx = 0;
+			if( dy > 0 )
+				dy = 0;
 
-			Point2D_F64 _a = delta.get(ii), _b = delta.get(jj);
-
-			_a.x += -dy0/l0;
-			_a.y +=  dx0/l0;
-			_b.x += -dy0/l0;
-			_b.y +=  dx0/l0;
+			LineSegment2D_F64 s = segments.get(i);
+			s.a.x = a.x - dy/l;
+			s.a.y = a.y + dx/l;
+			s.b.x = b.x - dy/l;
+			s.b.y = b.y + dx/l;
 		}
 
-		for (int i = 0; i < N; i++) {
-			Point2D_F64 a = polygon.get(i);
-			Point2D_F64 b = delta.get(i);
-			a.x += b.x;
-			a.y += b.y;
+		// Find the intersection between the adjusted lines to convert it back into polygon format
+		for (int i = N - 1, j = 0; j < N; i = j, j++) {
+			UtilLine2D_F64.convert(segments.get(i),ga);
+			UtilLine2D_F64.convert(segments.get(j),gb);
+
+			if( null != Intersection2D_F64.intersection(ga,gb,intersection)) {
+				// very acute angles can cause a large delta. This is conservative and prevents that
+				if( intersection.distance2(polygon.get(j)) < 1.6 ) {
+					polygon.get(j).set(intersection);
+				}
+			}
 		}
 	}
 }
