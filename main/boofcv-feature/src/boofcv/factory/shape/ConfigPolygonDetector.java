@@ -52,6 +52,12 @@ public class ConfigPolygonDetector implements Configuration {
 	public boolean refineContour = true;
 
 	/**
+	 * Because of how a binary image is created the contour is biases along some sided. This algorithm
+	 * will adjust the polygon computed directly from a contour to remove that bias.
+	 */
+	public boolean adjustForThresholdBias = true;
+
+	/**
 	 * Configuration for sub-pixel refinement of line.  If null then this step is skipped.
 	 */
 	public ConfigRefinePolygonLineToImage refineGray = new ConfigRefinePolygonLineToImage();

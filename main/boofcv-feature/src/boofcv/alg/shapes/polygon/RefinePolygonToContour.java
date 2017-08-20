@@ -23,8 +23,6 @@ import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LinePolar2D_F64;
-import georegression.struct.line.LineSegment2D_F64;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -46,27 +44,15 @@ public class RefinePolygonToContour {
 
 	private FastQueue<LineGeneral2D_F64> lines = new FastQueue<>(LineGeneral2D_F64.class,true);
 
-	// work space for bias removal
-	private FastQueue<LineSegment2D_F64> segments = new FastQueue<>(LineSegment2D_F64.class,true);
-	LineGeneral2D_F64 ga = new LineGeneral2D_F64();
-	LineGeneral2D_F64 gb = new LineGeneral2D_F64();
-	Point2D_F64 intersection = new Point2D_F64();
-
 	/**
 	 * Refines the estimate using all the points in the contour
 	 *
 	 * @param contour (Input) The shape's contour
 	 * @param vertexes (Input) List of indexes that are vertexes in the contour
-	 * @param clockwise (Input) Orientation of the polygon
 	 * @param output (Output) Storage for where the found polygon is saved to
 	 */
-	public void process(List<Point2D_I32> contour , GrowQueue_I32 vertexes , boolean clockwise, Polygon2D_F64 output ) {
+	public void process(List<Point2D_I32> contour , GrowQueue_I32 vertexes , Polygon2D_F64 output ) {
 
-		fitLinesToContour(contour, vertexes, output);
-		adjustForThresholdBias(output,clockwise);
-	}
-
-	protected void fitLinesToContour(List<Point2D_I32> contour, GrowQueue_I32 vertexes, Polygon2D_F64 output) {
 		int numDecreasing = 0;
 		for (int i = vertexes.size-1,j=0; j < vertexes.size; i=j,j++) {
 			if( vertexes.get(i) > vertexes.get(j ) )
@@ -110,51 +96,6 @@ public class RefinePolygonToContour {
 			LineGeneral2D_F64 lineB = lines.get(j);
 
 			Intersection2D_F64.intersection(lineA,lineB,output.get(j));
-		}
-	}
-
-	public void adjustForThresholdBias(Polygon2D_F64 polygon, boolean clockwise) {
-		int N = polygon.size();
-		segments.resize(N);
-
-		for (int i = N - 1, j = 0; j < N; i = j, j++) {
-
-			int ii,jj;
-			if( clockwise ) {
-				ii = i; jj = j;
-			} else {
-				ii = j; jj = i;
-			}
-
-			Point2D_F64 a = polygon.get(ii), b = polygon.get(jj);
-
-			double dx = b.x - a.x;
-			double dy = b.y - a.y;
-			double l = Math.sqrt(dx * dx + dy * dy);
-
-			if( dx < 0 )
-				dx = 0;
-			if( dy > 0 )
-				dy = 0;
-
-			LineSegment2D_F64 s = segments.get(i);
-			s.a.x = a.x - dy/l;
-			s.a.y = a.y + dx/l;
-			s.b.x = b.x - dy/l;
-			s.b.y = b.y + dx/l;
-		}
-
-		// Find the intersection between the adjusted lines to convert it back into polygon format
-		for (int i = N - 1, j = 0; j < N; i = j, j++) {
-			UtilLine2D_F64.convert(segments.get(i),ga);
-			UtilLine2D_F64.convert(segments.get(j),gb);
-
-			if( null != Intersection2D_F64.intersection(ga,gb,intersection)) {
-				// very acute angles can cause a large delta. This is conservative and prevents that
-				if( intersection.distance2(polygon.get(j)) < 1.6 ) {
-					polygon.get(j).set(intersection);
-				}
-			}
 		}
 	}
 }

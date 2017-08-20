@@ -22,7 +22,6 @@ import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.RectangleLength2D_I32;
 import org.ddogleg.struct.GrowQueue_I32;
-import org.ejml.UtilEjml;
 import org.junit.Test;
 
 import java.util.List;
@@ -37,19 +36,19 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestRefinePolygonToContour {
 	@Test
-	public void fitLinesToContour_basic() {
+	public void basic() {
 		RectangleLength2D_I32 rect = new RectangleLength2D_I32(0,0,10,5);
 		List<Point2D_I32> contour = rectToContour(rect);
 		GrowQueue_I32 vertexes = computeContourVertexes(rect);
 		RefinePolygonToContour alg = new RefinePolygonToContour();
 
 		Polygon2D_F64 found = new Polygon2D_F64();
-		alg.fitLinesToContour(contour,vertexes,found);
+		alg.process(contour,vertexes,found);
 		assertTrue(checkPolygon(new double[]{0,0, 9,0, 9,4, 0,4},found));
 	}
 
 	@Test
-	public void fitLinesToContour_reverseOrder() {
+	public void reverseOrder() {
 		RectangleLength2D_I32 rect = new RectangleLength2D_I32(0,0,10,5);
 		List<Point2D_I32> contour = rectToContour(rect);
 		GrowQueue_I32 vertexes = computeContourVertexes(rect);
@@ -59,32 +58,8 @@ public class TestRefinePolygonToContour {
 		RefinePolygonToContour alg = new RefinePolygonToContour();
 
 		Polygon2D_F64 found = new Polygon2D_F64();
-		alg.fitLinesToContour(contour,vertexes,found);
+		alg.process(contour,vertexes,found);
 		assertTrue(checkPolygon(new double[]{0,0, 0,4, 9,4, 9,0},found));
-	}
-
-	@Test
-	public void adjustForThresholdBias() {
-		RefinePolygonToContour alg = new RefinePolygonToContour();
-
-		Polygon2D_F64 original = new Polygon2D_F64(10,10, 10,40, 35,40, 35,10);
-		Polygon2D_F64 shape = original.copy();
-		alg.adjustForThresholdBias(shape,true);
-
-		assertTrue( shape.get(0).distance(10,10) <= UtilEjml.EPS );
-		assertTrue( shape.get(1).distance(10,41) <= UtilEjml.EPS );
-		assertTrue( shape.get(2).distance(36,41) <= UtilEjml.EPS );
-		assertTrue( shape.get(3).distance(36,10) <= UtilEjml.EPS );
-
-		shape = original.copy();
-		shape.flip();
-
-		alg.adjustForThresholdBias(shape,false);
-
-		assertTrue( shape.get(0).distance(10,10) <= UtilEjml.EPS );
-		assertTrue( shape.get(3).distance(10,41) <= UtilEjml.EPS );
-		assertTrue( shape.get(2).distance(36,41) <= UtilEjml.EPS );
-		assertTrue( shape.get(1).distance(36,10) <= UtilEjml.EPS );
 	}
 
 	//TODO move to ddogleg? primitive flip

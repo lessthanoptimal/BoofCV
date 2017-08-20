@@ -68,6 +68,7 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 
 	JCheckBox setRefineContour;
 	JCheckBox setRefineGray;
+	JCheckBox setRemoveBias;
 	JSpinner spinnerLineSamples;
 	JSpinner spinnerCornerOffset;
 	JSpinner spinnerSampleRadius;
@@ -146,6 +147,9 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		setRefineGray = new JCheckBox("Refine Gray");
 		setRefineGray.addActionListener(this);
 		setRefineGray.setSelected(config.refineGray != null);
+		setRemoveBias = new JCheckBox("Remove Bias");
+		setRemoveBias.addActionListener(this);
+		setRemoveBias.setSelected(config.adjustForThresholdBias);
 		spinnerLineSamples = new JSpinner(new SpinnerNumberModel(refineGray.lineSamples, 5, 100, 1));
 		spinnerLineSamples.setMaximumSize(spinnerLineSamples.getPreferredSize());
 		spinnerLineSamples.addChangeListener(this);
@@ -181,6 +185,7 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		addLabeled(spinnerContourIterations, "Max Iterations: ", this);
 		addLabeled(spinnerSplitPenalty, "Split Penalty: ", this);
 		addCenterLabel("Refinement", this);
+		addAlignLeft(setRemoveBias, this);
 		addAlignLeft(setRefineContour, this);
 		addAlignLeft(setRefineGray, this);
 		addLabeled(spinnerLineSamples, "Line Samples: ", this);
@@ -230,6 +235,9 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 			owner.configUpdate();
 		} else if( e.getSource() == setRefineGray ) {
 			bRefineGray = setRefineGray.isSelected();
+			owner.configUpdate();
+		} else if( e.getSource() == setRemoveBias ) {
+			config.adjustForThresholdBias = setRemoveBias.isSelected();
 			owner.configUpdate();
 		}
 	}
