@@ -23,6 +23,7 @@ import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LinePolar2D_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -44,15 +45,23 @@ public class RefinePolygonToContour {
 
 	private FastQueue<LineGeneral2D_F64> lines = new FastQueue<>(LineGeneral2D_F64.class,true);
 
+	private Polygon2D_F64 delta = new Polygon2D_F64();
+
 	/**
 	 * Refines the estimate using all the points in the contour
 	 *
 	 * @param contour (Input) The shape's contour
 	 * @param vertexes (Input) List of indexes that are vertexes in the contour
+	 * @param clockwise (Input) Orientation of the polygon
 	 * @param output (Output) Storage for where the found polygon is saved to
 	 */
-	public void process(List<Point2D_I32> contour , GrowQueue_I32 vertexes , Polygon2D_F64 output ) {
+	public void process(List<Point2D_I32> contour , GrowQueue_I32 vertexes , boolean clockwise, Polygon2D_F64 output ) {
 
+		fitLinesToContour(contour, vertexes, output);
+		adjustForThresholdBias(output,clockwise);
+	}
+
+	protected void fitLinesToContour(List<Point2D_I32> contour, GrowQueue_I32 vertexes, Polygon2D_F64 output) {
 		int numDecreasing = 0;
 		for (int i = vertexes.size-1,j=0; j < vertexes.size; i=j,j++) {
 			if( vertexes.get(i) > vertexes.get(j ) )
@@ -96,6 +105,49 @@ public class RefinePolygonToContour {
 			LineGeneral2D_F64 lineB = lines.get(j);
 
 			Intersection2D_F64.intersection(lineA,lineB,output.get(j));
+		}
+	}
+
+	public void adjustForThresholdBias(Polygon2D_F64 polygon, boolean clockwise) {
+		int N = polygon.size();
+		delta.vertexes.resize(N);
+		for (int i = 0; i < N; i++) {
+			delta.get(i).set(0, 0);
+		}
+
+		for (int i = N - 1, j = 0; j < N; i = j, j++) {
+
+			int ii,jj;
+			if( clockwise ) {
+				ii = i; jj = j;
+			} else {
+				ii = j; jj = i;
+			}
+
+			Point2D_F64 a = polygon.get(ii), b = polygon.get(jj);
+
+			double dx0 = b.x - a.x;
+			double dy0 = b.y - a.y;
+			double l0 = Math.sqrt(dx0 * dx0 + dy0 * dy0);
+
+			if( dx0 < 0 )
+				dx0 = 0;
+			if( dy0 > 0 )
+				dy0 = 0;
+
+			Point2D_F64 _a = delta.get(ii), _b = delta.get(jj);
+
+			_a.x += -dy0/l0;
+			_a.y +=  dx0/l0;
+			_b.x += -dy0/l0;
+			_b.y +=  dx0/l0;
+		}
+
+		for (int i = 0; i < N; i++) {
+			Point2D_F64 a = polygon.get(i);
+			Point2D_F64 b = delta.get(i);
+			a.x += b.x;
+			a.y += b.y;
 		}
 	}
 }

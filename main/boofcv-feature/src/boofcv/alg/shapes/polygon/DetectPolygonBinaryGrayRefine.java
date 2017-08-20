@@ -117,7 +117,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		boolean success = false;
 
 		if( refineContour != null ) {
-			refineContour.process(info.contour,info.splits,work);
+			refineContour.process(info.contour,info.splits,detector.isOutputClockwise(),work);
 			if( edgeIntensity.computeEdge(work,!detector.isOutputClockwise()) ) {
 				after = edgeIntensity.getAverageOutside() - edgeIntensity.getAverageInside();
 				if( after > before ) {
