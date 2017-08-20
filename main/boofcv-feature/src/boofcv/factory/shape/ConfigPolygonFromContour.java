@@ -71,7 +71,7 @@ public class ConfigPolygonFromContour implements Configuration {
 	/**
 	 * Tangential distance away in pixels from the contour that the edge intensity is sampled.
 	 */
-	public double tangentEdgeIntensity = 1.5;
+	public double tangentEdgeIntensity = 2.5;
 
 	/**
 	 * Specifies the minimum allowed contour length as a fraction of the input image's width.  Smaller numbers

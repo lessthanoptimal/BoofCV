@@ -46,6 +46,9 @@ public class ConfigPolygonDetector implements Configuration {
 	 */
 	public double minimumEdgeIntensity = 6.0;
 
+	/**
+	 * If true then a contour based refinement will be run to improve the polygon estimate
+	 */
 	public boolean refineContour = true;
 
 	/**
