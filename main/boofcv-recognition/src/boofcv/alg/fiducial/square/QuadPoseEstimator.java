@@ -298,7 +298,7 @@ public class QuadPoseEstimator {
 		// initial estimate for the pose
 		solutions.reset();
 		if( !p3p.process(inputP3P,solutions) ) {
-			System.out.println("Failed!?!");
+//			System.err.println("PIP Failed!?! That's weird");
 			return;
 		}
 

@@ -25,10 +25,12 @@ Version : 0.28
 
 TODO Add flip primitive array to ddogleg. Search for "primitive flip" for code that should be replaced here
 
+Fiducials
+- Changes in polygon have affected performance. Mostly negative on blurred images.
+  Ambiguous in other areas.
+
 Polygon Detector
-- More false positives in regression on polygon shapes.
-- Ambiguous change in speed. Some faster some slower. Within normal variance.
-- At least one fiducial was much worse on blurred images
+- Blurred images cause the biggest problems
 - TODO have contour edge filter use line integral instead of a single sample?
 - TODO make contour intensoity sample radius configurable. normally 1.5 but 2.5 for chessboard
 - TODO see if a shape can be rejected before refining the polygon fit to improve speed for all fiducals

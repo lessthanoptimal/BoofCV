@@ -31,7 +31,7 @@ public class ConfigSplitMergeLineFit implements Configuration {
 	 * A line is split if a point along the contour between the two end points has a distance from the line
 	 * which is greater than this fraction of the line's length
 	 */
-	public double splitFraction = 0.10;
+	public double splitFraction = 0.05;
 
 	/**
 	 * Number of split and merge iterations when converting contour into polygon
