@@ -87,7 +87,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 
 	@Override
 	protected void handleInputChange( int source , InputMethod method , final int width , final int height ) {
-		// reset the scaling and ensure the entire ne wimage is visible
+		// reset the scaling and ensure the entire new image is visible
 		BoofSwingUtil.invokeNowOrLater(new Runnable() {
 			@Override
 			public void run() {

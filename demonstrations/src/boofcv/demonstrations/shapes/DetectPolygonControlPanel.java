@@ -156,10 +156,10 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		spinnerCornerOffset = new JSpinner(new SpinnerNumberModel(refineGray.cornerOffset, 0, 10, 1));
 		spinnerCornerOffset.setMaximumSize(spinnerCornerOffset.getPreferredSize());
 		spinnerCornerOffset.addChangeListener(this);
-		spinnerSampleRadius = new JSpinner(new SpinnerNumberModel(refineGray.sampleRadius, 0, 10, 1));
+		spinnerSampleRadius = new JSpinner(new SpinnerNumberModel(refineGray.sampleRadius, 1, 10, 1));
 		spinnerSampleRadius.setMaximumSize(spinnerCornerOffset.getPreferredSize());
 		spinnerSampleRadius.addChangeListener(this);
-		spinnerRefineMaxIterations = new JSpinner(new SpinnerNumberModel(refineGray.maxIterations, 0, 200, 1));
+		spinnerRefineMaxIterations = new JSpinner(new SpinnerNumberModel(refineGray.maxIterations, 1, 200, 1));
 		spinnerRefineMaxIterations.setMaximumSize(spinnerRefineMaxIterations.getPreferredSize());
 		spinnerRefineMaxIterations.addChangeListener(this);
 		spinnerConvergeTol = new JSpinner(new SpinnerNumberModel(refineGray.convergeTolPixels, 0.0, 2.0, 0.005));
