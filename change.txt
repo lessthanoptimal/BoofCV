@@ -22,6 +22,8 @@ Version : 0.28
   * Provides a framework for overriding some functionality in BoofCV with an external implementation without changing your code
   * Added JavaCV Override for:
     - BlurImageOps TODO
+- Examples
+  * Added ExamplePointDeformKeyPoints
 
 TODO Add flip primitive array to ddogleg. Search for "primitive flip" for code that should be replaced here
 
