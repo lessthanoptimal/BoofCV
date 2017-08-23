@@ -26,6 +26,7 @@ import javax.swing.*;
 public abstract class DetectBlackShapePanel extends StandardAlgConfigPanel {
 
 	JSpinner selectZoom;
+	JLabel processingTimeLabel = new JLabel();
 
 	int selectedView = 0;
 
@@ -44,5 +45,9 @@ public abstract class DetectBlackShapePanel extends StandardAlgConfigPanel {
 				selectZoom.setValue(DetectBlackShapePanel.this.zoom);
 			}
 		});
+	}
+
+	public void setProcessingTime( double seconds ) {
+		processingTimeLabel.setText(String.format("%7.1f",(seconds*1000)));
 	}
 }

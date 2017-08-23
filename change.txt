@@ -33,12 +33,12 @@ Fiducials
 
 Polygon Detector
 - Blurred images cause the biggest problems
-- TODO have contour edge filter use line integral instead of a single sample?
-- TODO make contour intensoity sample radius configurable. normally 1.5 but 2.5 for chessboard
 - TODO see if a shape can be rejected before refining the polygon fit to improve speed for all fiducals
-- TODO  profile detectors.
+- Profile of Square Binary  (2 large squares video)
+  * 40% thresholding
+  * 44% contour -> polygon
+  * 6%  refine polygon
 - TODO Make it so split merge can abort early if too many splits? if very large sub-sample and fit?
-- TODO Toggle the two different refine options in demonstration applications
 
 Fisheye Calibration Detectors
    TODO Square Grid

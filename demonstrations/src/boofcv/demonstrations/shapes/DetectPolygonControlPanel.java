@@ -167,6 +167,7 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		spinnerMaxCornerChange = new JSpinner(new SpinnerNumberModel(refineGray.maxCornerChangePixel, 0.0, 50.0, 1.0));
 		configureSpinnerFloat(spinnerMaxCornerChange);
 
+		addLabeled(processingTimeLabel,"Time (ms)", this);
 		addLabeled(imageView, "View: ", this);
 		addLabeled(selectZoom,"Zoom",this);
 		addAlignLeft(showCorners, this);

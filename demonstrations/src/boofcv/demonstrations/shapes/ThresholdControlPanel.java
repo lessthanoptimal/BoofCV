@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		spinnerThreshold = new JSpinner(new SpinnerNumberModel(fixedThreshold,0,255,1));
 		spinnerThreshold.setMaximumSize(spinnerThreshold.getPreferredSize());
 
-		spinnerRadius = new JSpinner(new SpinnerNumberModel(radius,1,50,1));
+		spinnerRadius = new JSpinner(new SpinnerNumberModel(radius,1,500,1));
 		spinnerRadius.setMaximumSize(spinnerRadius.getPreferredSize());
 
 		spinnerScale = new JSpinner(new SpinnerNumberModel(scale,0,2.0,0.05));

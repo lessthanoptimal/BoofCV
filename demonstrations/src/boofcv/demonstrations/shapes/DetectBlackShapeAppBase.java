@@ -117,14 +117,19 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 
 		binary.reshape(work.getWidth(), work.getHeight());
 
+		final double timeInSeconds;
 		synchronized (this) {
+			long before = System.nanoTime();
 			inputToBinary.process((T)input, binary);
 			detectorProcess((T)input, binary);
+			long after = System.nanoTime();
+			timeInSeconds = (after-before)*1e-9;
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				controls.setProcessingTime(timeInSeconds);
 				viewUpdated();
 			}
 		});
