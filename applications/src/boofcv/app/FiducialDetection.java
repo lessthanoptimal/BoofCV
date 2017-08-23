@@ -216,7 +216,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		ConfigFiducialBinary configFid = new ConfigFiducialBinary();
 		configFid.targetWidth = size;
 		configFid.gridWidth = gridWidth;
-		configFid.squareDetector.minimumEdgeIntensity = 10;
+		configFid.squareDetector.minimumRefineEdgeIntensity = 10;
 		configFid.borderWidthFraction = borderWidth;
 
 		ConfigThreshold configThreshold ;

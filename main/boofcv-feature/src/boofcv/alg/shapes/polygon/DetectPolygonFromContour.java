@@ -646,7 +646,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		public List<Point2D_I32> contour;
 
 		public double computeEdgeIntensity() {
-			return edgeOutside-edgeInside;
+			return edgeOutside-edgeInside; // black square. Outside should be a high value (white) inside low (black)
 		}
 
 		public void reset() {

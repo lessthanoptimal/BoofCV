@@ -56,7 +56,8 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 	JSpinner spinnerMinContourSize;
 	JSpinner spinnerMinSides;
 	JSpinner spinnerMaxSides;
-	JSpinner spinnerMinEdge;
+	JSpinner spinnerMinEdgeD; // threshold for detect
+	JSpinner spinnerMinEdgeR; // threshold for refine
 	JCheckBox setConvex;
 	JCheckBox setBorder;
 
@@ -117,10 +118,15 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		spinnerMaxSides.setMaximumSize(spinnerMaxSides.getPreferredSize());
 		spinnerMaxSides.addChangeListener(this);
 
-		spinnerMinEdge = new JSpinner(new SpinnerNumberModel(config.minimumEdgeIntensity,
+		spinnerMinEdgeD = new JSpinner(new SpinnerNumberModel(config.detector.minimumEdgeIntensity,
 				0.0,255.0,1.0));
-		spinnerMinEdge.setMaximumSize(spinnerMinEdge.getPreferredSize());
-		spinnerMinEdge.addChangeListener(this);
+		spinnerMinEdgeD.setMaximumSize(spinnerMinEdgeD.getPreferredSize());
+		spinnerMinEdgeD.addChangeListener(this);
+		spinnerMinEdgeR = new JSpinner(new SpinnerNumberModel(config.minimumRefineEdgeIntensity,
+				0.0,255.0,1.0));
+		spinnerMinEdgeR.setMaximumSize(spinnerMinEdgeR.getPreferredSize());
+		spinnerMinEdgeR.addChangeListener(this);
+
 		spinnerContourSplit = new JSpinner(new SpinnerNumberModel(config.detector.contourToPoly.splitFraction,
 				0.0,1.0,0.01));
 		configureSpinnerFloat(spinnerContourSplit);
@@ -177,7 +183,8 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		addLabeled(spinnerMinContourSize, "Min Contour Size: ", this);
 		addLabeled(spinnerMinSides, "Minimum Sides: ", this);
 		addLabeled(spinnerMaxSides, "Maximum Sides: ", this);
-		addLabeled(spinnerMinEdge, "Edge Intensity: ", this);
+		addLabeled(spinnerMinEdgeD, "Edge Intensity D: ", this);
+		addLabeled(spinnerMinEdgeR, "Edge Intensity R: ", this);
 		addAlignLeft(setConvex, this);
 		addAlignLeft(setBorder, this);
 		addCenterLabel("Contour", this);
@@ -245,8 +252,10 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == spinnerMinEdge) {
-			config.minimumEdgeIntensity = ((Number) spinnerMinEdge.getValue()).doubleValue();
+		if( e.getSource() == spinnerMinEdgeD) {
+			config.detector.minimumEdgeIntensity = ((Number) spinnerMinEdgeD.getValue()).doubleValue();
+		} else if( e.getSource() == spinnerMinEdgeR) {
+			config.minimumRefineEdgeIntensity = ((Number) spinnerMinEdgeR.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerMinSides ) {
 			minSides = ((Number) spinnerMinSides.getValue()).intValue();
 			if( minSides > maxSides ) {

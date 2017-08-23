@@ -44,7 +44,7 @@ public class ConfigPolygonDetector implements Configuration {
 	 *
 	 * @see EdgeIntensityPolygon
 	 */
-	public double minimumEdgeIntensity = 6.0;
+	public double minimumRefineEdgeIntensity = 6.0;
 
 	/**
 	 * If true then a contour based refinement will be run to improve the polygon estimate. 
@@ -82,7 +82,7 @@ public class ConfigPolygonDetector implements Configuration {
 	public String toString() {
 		return "ConfigPolygonDetector{" +
 				"detector=" + detector +
-				", minimumEdgeIntensity=" + minimumEdgeIntensity +
+				", minimumEdgeIntensity=" + minimumRefineEdgeIntensity +
 				", refineContour=" + refineContour +
 				", refineGray=" + refineGray +
 				'}';

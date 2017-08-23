@@ -94,6 +94,7 @@ public class FactoryShapeDetector {
 		DetectPolygonFromContour<T> detector = polygonContour(config.detector,imageType);
 
 		return new DetectPolygonBinaryGrayRefine<>(detector,refineContour,refineGray,
+				config.minimumRefineEdgeIntensity,
 				config.adjustForThresholdBias);
 	}
 

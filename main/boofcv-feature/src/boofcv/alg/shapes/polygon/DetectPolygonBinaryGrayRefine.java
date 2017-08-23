@@ -55,13 +55,17 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	// useful for customization
 	AdjustBeforeRefineEdge functionAdjust;
 
+	double minimumRefineEdgeIntensity;
+
 	public DetectPolygonBinaryGrayRefine(DetectPolygonFromContour<T> detector,
 										 RefinePolygonToContour refineContour,
 										 RefinePolygonToGray<T> refineGray ,
+										 double minimumRefineEdgeIntensity ,
 										 boolean adjustForThresholdBias ) {
 		this.detector = detector;
 		this.refineContour = refineContour;
 		this.refineGray = refineGray;
+		this.minimumRefineEdgeIntensity = minimumRefineEdgeIntensity;
 		if( adjustForThresholdBias ) {
 			this.adjustForBias = new AdjustPolygonForThresholdBias();
 		}
@@ -105,6 +109,11 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		edgeIntensity.setTransform(null);
 	}
 
+	/**
+	 * Detects polygons inside the grayscale image and its thresholded version
+	 * @param gray Gray scale image
+	 * @param binary Binary version of grayscale image
+	 */
 	public void process(T gray , GrayU8 binary ) {
 		detector.process(gray,binary);
 		if( refineGray != null )
@@ -120,6 +129,11 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		}
 	}
 
+	/**
+	 * Refines the fit to the specified polygon. Only info.polygon is modified
+	 * @param info The polygon and related info
+	 * @return true if successful or false if not
+	 */
 	public boolean refine( DetectPolygonFromContour.Info info ) {
 		double before,after;
 		if( edgeIntensity.computeEdge(info.polygon,!detector.isOutputClockwise()) ) {
@@ -139,6 +153,8 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 			if( edgeIntensity.computeEdge(work,!detector.isOutputClockwise()) ) {
 				after = edgeIntensity.getAverageOutside() - edgeIntensity.getAverageInside();
 				if( after > before ) {
+					info.edgeInside = edgeIntensity.getAverageInside();
+					info.edgeOutside = edgeIntensity.getAverageOutside();
 					info.polygon.set(work);
 					success = true;
 					before = after;
@@ -159,6 +175,8 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 					// basically, unless it diverged stick with this optimization
 					// a near tie
 					if( after*1.5 > before ) {
+						info.edgeInside = edgeIntensity.getAverageInside();
+						info.edgeOutside = edgeIntensity.getAverageOutside();
 						info.polygon.set(work);
 						success = true;
 					}
@@ -169,6 +187,10 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		return success;
 	}
 
+	/**
+	 * Refines all the detected polygons and places them into the provided list. Polygons which fail the refinement
+	 * step are not added.
+	 */
 	public void refineAll() {
 		List<DetectPolygonFromContour.Info> detections = detector.getFound().toList();
 
@@ -183,13 +205,11 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		else
 			storage.clear();
 
-		double minEdgeIntensity = detector.getContourEdgeThreshold();
-
 		List<DetectPolygonFromContour.Info> detections = detector.getFound().toList();
 		for (int i = 0; i < detections.size(); i++) {
 			DetectPolygonFromContour.Info d = detections.get(i);
 
-			if( d.computeEdgeIntensity() >= minEdgeIntensity )
+			if( d.computeEdgeIntensity() >= minimumRefineEdgeIntensity )
 				storage.add( detections.get(i).polygon );
 		}
 		return storage;
