@@ -40,6 +40,15 @@ Polygon Detector
   * 6%  refine polygon
 - TODO Make it so split merge can abort early if too many splits? if very large sub-sample and fit?
 
+Contour to Line
+- TODO New algorithm. Try one that's interest point based
+-      Pathological case. Circle.
+-      Maybe hybrid? Find obvious corners. Split and merge when there is no obvious corner but a curve
+- Try fitting to the specified number of sides
+- Current algorithm breaks down when there is a mixture of long and short sides. Tuning to make it work on
+  them makes it break on others
+
+
 Fisheye Calibration Detectors
    TODO Square Grid
    TODO Asymmetric Circle
