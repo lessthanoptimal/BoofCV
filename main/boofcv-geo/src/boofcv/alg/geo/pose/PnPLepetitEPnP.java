@@ -32,7 +32,7 @@ import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.dense.row.mult.MatrixVectorMult_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
-import org.ejml.interfaces.linsol.LinearSolver;
+import org.ejml.interfaces.linsol.LinearSolverDense;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,8 +103,8 @@ public class PnPLepetitEPnP {
 
 	// used to solve various linear problems
 	private SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(12, 12, false, true, false);
-	private LinearSolver<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(6, 4);
-	private LinearSolver<DMatrixRMaj> solverPinv = LinearSolverFactory_DDRM.pseudoInverse(true);
+	private LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(6, 4);
+	private LinearSolverDense<DMatrixRMaj> solverPinv = LinearSolverFactory_DDRM.pseudoInverse(true);
 
 	// weighting factor to go from control point into world coordinate
 	protected DMatrixRMaj alphas = new DMatrixRMaj(1,1);

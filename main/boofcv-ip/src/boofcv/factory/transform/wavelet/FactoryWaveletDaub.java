@@ -26,7 +26,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.struct.wavelet.*;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
-import org.ejml.interfaces.linsol.LinearSolver;
+import org.ejml.interfaces.linsol.LinearSolverDense;
 
 
 /**
@@ -204,7 +204,7 @@ public class FactoryWaveletDaub {
 			}
 		}
 
-		LinearSolver<DMatrixRMaj> solver = LinearSolverFactory_DDRM.linear(N);
+		LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.linear(N);
 		if( !solver.setA(A) || solver.quality() < 1e-5) {
 			throw new IllegalArgumentException("Can't invert matrix");
 		}

@@ -24,7 +24,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
-import org.ejml.interfaces.linsol.LinearSolver;
+import org.ejml.interfaces.linsol.LinearSolverDense;
 
 import java.util.List;
 
@@ -55,7 +55,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PositionFromPairLinear2 {
-	LinearSolver<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(300, 3);
+	LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(300, 3);
 	
 	// storage for system of equations
 	DMatrixRMaj A = new DMatrixRMaj(3,3);

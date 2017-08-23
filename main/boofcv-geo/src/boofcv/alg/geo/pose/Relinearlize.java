@@ -23,7 +23,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.interfaces.linsol.LinearSolver;
+import org.ejml.interfaces.linsol.LinearSolverDense;
 
 /**
  * <p>
@@ -64,7 +64,7 @@ public class Relinearlize {
 	DMatrixRMaj xx = new DMatrixRMaj(1,1);
 
 	// used to compute one possible solution
-	LinearSolver<DMatrixRMaj> pseudo = LinearSolverFactory_DDRM.pseudoInverse(true);
+	LinearSolverDense<DMatrixRMaj> pseudo = LinearSolverFactory_DDRM.pseudoInverse(true);
 
 	// stores constraints
 	double XiiXjk[] = new double[10];

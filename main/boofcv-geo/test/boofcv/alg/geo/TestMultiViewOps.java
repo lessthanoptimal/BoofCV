@@ -113,7 +113,7 @@ public class TestMultiViewOps {
 
 			SimpleMatrix expected = ai.mult(b4.transpose()).minus(a4.mult(bi.transpose()));
 
-			assertTrue(MatrixFeatures_DDRM.isIdentical(expected.matrix_F64(),found.getT(i),1e-8));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(expected.getDDRM(),found.getT(i),1e-8));
 		}
 	}
 
@@ -144,7 +144,7 @@ public class TestMultiViewOps {
 
 			SimpleMatrix expected = ai.mult(b4.transpose()).minus(a4.mult(bi.transpose()));
 
-			assertTrue(MatrixFeatures_DDRM.isIdentical(expected.matrix_F64(),found.getT(i),1e-8));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(expected.getDDRM(),found.getT(i),1e-8));
 		}
 	}
 
