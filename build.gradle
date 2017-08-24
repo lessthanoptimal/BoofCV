@@ -257,26 +257,9 @@ task alljavadoc(type: Javadoc) {
 
     destinationDir = file("docs/api")
 
-    configure(options) {
-        failOnError = false
-        docTitle = "BoofCV JavaDoc ($project.version)"
-        links = [ 'http://docs.oracle.com/javase/7/docs/api/',
-                  'http://ejml.org/javadoc/',
-                  'http://georegression.org/javadoc/',
-                  'http://ddogleg.org/javadoc/']
-    }
-}
-
-task alljavadocWeb(type: Javadoc) {
-    // only include source code in src directory to avoid including 3rd party code which some projects do as a hack
-    source = javadocProjects.collect { project(it).fileTree('src').include('**/*.java') }
-//    source = javadocProjects.collect { project(it).sourceSets.main.allJava }
-    classpath = files(javadocProjects.collect { project(it).sourceSets.main.compileClasspath })
-
-    destinationDir = file("docs/api-web")
-
     // Hack for Java 8u121 and beyond. Comment out if running an earlier version of Java
     options.addBooleanOption("-allow-script-in-comments", true)
+
     configure(options) {
         failOnError = false
         docTitle = "BoofCV JavaDoc ($project.version)"
@@ -284,9 +267,26 @@ task alljavadocWeb(type: Javadoc) {
                   'http://ejml.org/javadoc/',
                   'http://georegression.org/javadoc/',
                   'http://ddogleg.org/javadoc/']
-        bottom = file('misc/bottom.txt').text
+    }
+
+    // Work around a Gradle design flaw. It won't copy over files in doc-files
+    doLast {
+        copy {
+            from javadocProjects.collect { project(it).fileTree('src').include('**/doc-files/*') }
+            into destinationDir
+        }
+    }
+
+}
+
+task alljavadocWeb() {
+    doFirst {
+        alljavadoc.options.bottom = file('misc/bottom.txt').text
+        alljavadoc.destinationDir = file("docs/api-web")
     }
 }
+alljavadocWeb.finalizedBy(alljavadoc)
+
 
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/allTests")

@@ -26,6 +26,8 @@ Version : 0.28
   * Fixed issue where it picked the wrong circle for the initial corner
 - Examples
   * Added ExamplePointDeformKeyPoints
+- Gradle
+  * fixed gradle not copying over doc-files
 
 TODO Add flip primitive array to ddogleg. Search for "primitive flip" for code that should be replaced here
 
@@ -62,6 +64,7 @@ TOP ITEMS
 - TODO Integrate in Marius Orfgen's image statistics histogram ideas
 - TODO Fisheye calibration using omni model
 - TODO QR Code support
+
 
 OTHER ITEMS
 - TODO Calibration Target PS generator unit test
