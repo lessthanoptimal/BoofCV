@@ -18,7 +18,11 @@
 
 package boofcv.alg.fiducial.calib;
 
+import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.LensDistortionWideFOV;
+import boofcv.alg.distort.NarrowPixelToSphere_F64;
+import boofcv.alg.distort.SphereToNarrowPixel_F64;
+import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
@@ -31,6 +35,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.distort.Point2Transform3_F64;
 import boofcv.struct.distort.Point3Transform2_F64;
@@ -41,6 +47,7 @@ import georegression.struct.EulerType;
 import georegression.struct.line.LineParametric3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Triangle3D_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -75,6 +82,23 @@ public class RenderSimulatedFisheye {
 
 		pixelTo3 = factory.undistortPtoS_F64();
 		sphereToPixel = factory.distortStoP_F64();
+
+		computeProjectionTable(model);
+	}
+
+	public void setCamera( CameraPinholeRadial model ) {
+		output.reshape(model.width,model.height);
+		depthMap.reshape(model.width,model.height);
+		LensDistortionNarrowFOV factory = new LensDistortionRadialTangential(model);
+
+		pixelTo3 = new NarrowPixelToSphere_F64(factory.undistort_F64(true,false));
+		sphereToPixel = new SphereToNarrowPixel_F64(factory.undistort_F64(false,true));
+
+
+		computeProjectionTable(model);
+	}
+
+	private void computeProjectionTable(CameraPinhole model) {
 		ImageMiscOps.fill(depthMap,-1);
 
 		pointing = new float[model.width*model.height*3];
@@ -135,18 +159,24 @@ public class RenderSimulatedFisheye {
 		}
 	}
 
+	Vector3D_F64 _u = new Vector3D_F64();
+	Vector3D_F64 _v =new Vector3D_F64();
+	Vector3D_F64 _n = new Vector3D_F64();
+	Vector3D_F64 _w0 = new Vector3D_F64();
+
 	private void renderPixel( LineParametric3D_F64 ray , int x , int y ) {
 		float minDepth = Float.MAX_VALUE;
 
 		for (int i = 0; i < scene.size(); i++) {
 			ImageRect r = scene.get(i);
 
-			if( 3==Intersection3D_F64.intersect(r.A,ray,p3) ||
-					3 == Intersection3D_F64.intersect(r.B,ray,p3) ) {
+			// only care about intersections in front of the camera
+			if( 1 == Intersection3D_F64.intersect(r.A,ray,p3,_u,_v,_n,_w0) ||
+					1 == Intersection3D_F64.intersect(r.B,ray,p3,_u,_v,_n,_w0) ) {
 
 				double imageRatio = r.image.height/(double)r.image.width;
 
-				float depth = (float)-p3.z;
+				float depth = (float)p3.z;
 				if( depth < minDepth) {
 					minDepth = depth;
 
@@ -183,7 +213,6 @@ public class RenderSimulatedFisheye {
 
 	public void computePixel(int which, double x, double y, Point2D_F64 output) {
 		ImageRect r = scene.get(which);
-		double imageRatio = r.image.height/(double)r.image.width;
 
 		Point3D_F64 p3 = new Point3D_F64(x,y,0);
 		SePointOps_F64.transform(r.rectToWorld, p3, p3);
@@ -228,12 +257,12 @@ public class RenderSimulatedFisheye {
 		GImageMiscOps.fillRectangle(image,90,300,200,60,60);
 
 		Se3_F64 rectToWorld = new Se3_F64();
-		rectToWorld.T.set(0,0,0.2);
+		rectToWorld.T.set(0,0,-0.2);
 //		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,1.0,0,rectToWorld.R);
 		rectToWorld = rectToWorld.invert(null);
 
 		Se3_F64 rectToWorld2 = new Se3_F64();
-		rectToWorld2.T.set(0,-0.20,-0.3);
+		rectToWorld2.T.set(0,-0.20,0.3);
 
 		String fisheyePath = UtilIO.pathExample("fisheye/theta/");
 		CameraUniversalOmni model = CalibrationIO.load(new File(fisheyePath,"front.yaml"));

@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestPinholeN2toP_F32 {
+public class TestPinholeNtoP_F32 {
 
 	@Test
 	public void basicTest() {
