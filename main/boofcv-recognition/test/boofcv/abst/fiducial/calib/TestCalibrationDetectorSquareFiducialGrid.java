@@ -39,8 +39,12 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 	private static final int numCols = 2;
 
 	public TestCalibrationDetectorSquareFiducialGrid() {
+		targetLayouts.add( new ConfigSquareGridBinary(3,4,30,30) );
 		width = 500;
 		height = 600;
+
+		// make it bigger so that the squares are easier to decode
+		simulatedTargetWidth  *= 1.2;
 	}
 
 	@Test
@@ -65,7 +69,18 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 
 	@Override
 	public void renderTarget(Object layout, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
+		ConfigSquareGridBinary config = (ConfigSquareGridBinary)layout;
 
+		RenderSquareBinaryGridFiducial renderer = new RenderSquareBinaryGridFiducial();
+		renderer.squareWidth = 50;
+
+		image.setTo(renderer.generate(config.numRows,config.numCols));
+
+		double squareWidthWorld = length3D*renderer.squareWidth/(double)image.width;
+		double spacingWorld = length3D*renderer.squareWidth/(double)image.width;
+		points2D.clear();
+		points2D.addAll( CalibrationDetectorSquareGrid.
+				createLayout(config.numRows, config.numCols, squareWidthWorld,spacingWorld ));
 	}
 
 	@Override
@@ -93,5 +108,10 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 		config.spaceWidth = 1;
 
 		return FactoryFiducialCalibration.binaryGrid(config);
+	}
+
+	@Override
+	public DetectorFiducialCalibration createDetector(Object layout) {
+		return FactoryFiducialCalibration.binaryGrid((ConfigSquareGridBinary)layout);
 	}
 }

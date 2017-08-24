@@ -79,6 +79,8 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	double fisheyeMatchTol = 3; // how close a pixel needs to come to be considered a match
 
+	double simulatedTargetWidth = 0.3; // size of target in simulated world
+
 	/**
 	 * Renders an image of the calibration target.
 	 * @param layout (Optional)
@@ -92,6 +94,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	public abstract void renderTarget(GrayF32 original , List<CalibrationObservation> solutions );
 
 	public abstract DetectorFiducialCalibration createDetector();
+	public abstract DetectorFiducialCalibration createDetector(Object layout);
 
 	@Before
 	public void setup() {
@@ -105,22 +108,19 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 */
 	@Test
 	public void fisheye_fullview() {
-		double targetWidth = 0.3;
-
 		CameraUniversalOmni model = CalibrationIO.load(getClass().getResource("fisheye.yaml"));
 		RenderSimulatedFisheye simulator = new RenderSimulatedFisheye();
 		simulator.setCamera(model);
 
-		DetectorFiducialCalibration detector = createDetector();
-
 		List<Point2D_F64> locations2D = new ArrayList<>();
 		GrayF32 pattern = new GrayF32(1,1);
 		for (int i = 0; i < targetLayouts.size(); i++) {
-			renderTarget(targetLayouts.get(i),targetWidth,pattern,locations2D);
+			DetectorFiducialCalibration detector = createDetector(targetLayouts.get(i));
+			renderTarget(targetLayouts.get(i), simulatedTargetWidth,pattern,locations2D);
 
 			simulator.resetScene();
 			Se3_F64 markerToWorld = new Se3_F64();
-			simulator.addTarget(markerToWorld,targetWidth,pattern);
+			simulator.addTarget(markerToWorld, simulatedTargetWidth,pattern);
 
 			// up close exploding - center
 			markerToWorld.T.set(0,0,0.08);
@@ -156,6 +156,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	{
 		simulator.render();
 
+//		visualize(simulator, locations2D, null);
 		if( !detector.process(simulator.getOutput())) {
 			visualize(simulator, locations2D, null);
 			fail("Detection failed");
@@ -163,6 +164,9 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 		CalibrationObservation found = detector.getDetectedPoints();
 
+		if( locations2D.size() != found.size() ) {
+			visualize(simulator, locations2D, found);
+		}
 		assertEquals(locations2D.size(),found.size());
 
 		Point2D_F64 truth = new Point2D_F64();
@@ -194,14 +198,16 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		Graphics2D g2 = buff.createGraphics();
 		for (int j = 0; found != null && j < found.size(); j++) {
 			Point2D_F64 f = found.get(j);
-			VisualizeFeatures.drawPoint(g2,f.x,f.y,4,Color.RED,false);
+			VisualizeFeatures.drawPoint(g2,f.x,f.y,2,Color.RED,false);
 		}
 		Point2D_F64 truth = new Point2D_F64();
 
+		g2.setColor(Color.GREEN);
+		g2.setStroke(new BasicStroke(2));
 		for (int j = 0; j < locations2D.size(); j++) {
 			p = locations2D.get(j);
 			simulator.computePixel( 0, p.x , p.y , truth);
-			VisualizeFeatures.drawPoint(g2,truth.x,truth.y,4,Color.GREEN,false);
+			VisualizeFeatures.drawCircle(g2,truth.x,truth.y,4);
 		}
 
 		ShowImages.showWindow(buff,"Foo",true);
@@ -213,23 +219,20 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 */
 	@Test
 	public void pinhole_radial_fullview() {
-		double targetWidth = 0.3;
-
 
 		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("pinhole_radial.yaml"));
 		RenderSimulatedFisheye simulator = new RenderSimulatedFisheye();
 		simulator.setCamera(model);
 
-		DetectorFiducialCalibration detector = createDetector();
-
 		List<Point2D_F64> locations2D = new ArrayList<>();
 		GrayF32 pattern = new GrayF32(1,1);
 		for (int i = 0; i < targetLayouts.size(); i++) {
-			renderTarget(targetLayouts.get(i), targetWidth, pattern, locations2D);
+			DetectorFiducialCalibration detector = createDetector(targetLayouts.get(i));
+			renderTarget(targetLayouts.get(i), simulatedTargetWidth, pattern, locations2D);
 
 			simulator.resetScene();
 			Se3_F64 markerToWorld = new Se3_F64();
-			simulator.addTarget(markerToWorld, targetWidth, pattern);
+			simulator.addTarget(markerToWorld, simulatedTargetWidth, pattern);
 
 			// up close exploding - center
 			markerToWorld.T.set(0, 0, 0.5);

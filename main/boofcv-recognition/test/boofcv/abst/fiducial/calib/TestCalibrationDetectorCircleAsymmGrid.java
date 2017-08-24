@@ -74,9 +74,6 @@ public class TestCalibrationDetectorCircleAsymmGrid extends GenericPlanarCalibra
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		points2D.clear();
-
-
 		Ellipse2D.Double ellipse = new Ellipse2D.Double();
 
 		for (int row = 0; row < config.numRows; row++) {
@@ -133,4 +130,10 @@ public class TestCalibrationDetectorCircleAsymmGrid extends GenericPlanarCalibra
 	public DetectorFiducialCalibration createDetector() {
 		return FactoryFiducialCalibration.circleAsymmGrid(config);
 	}
+
+	@Override
+	public DetectorFiducialCalibration createDetector(Object layout) {
+		return FactoryFiducialCalibration.circleAsymmGrid((ConfigCircleAsymmetricGrid)layout);
+	}
+
 }

@@ -62,8 +62,8 @@ public class RenderSquareBinaryGridFiducial {
 	public GrayF32 generate(int numRows, int numCols ) {
 		expectedCorners.clear();
 
-		int imageWidth = (numCols*2+2)*squareWidth;
-		int imageHeight = (numRows*2+2)*squareWidth;
+		int imageWidth = (2*numCols-1)*squareWidth + 2*squareWidth;
+		int imageHeight = (2*numRows-1)*squareWidth+ 2*squareWidth;
 
 		GrayF32 image = new GrayF32(imageWidth,imageHeight);
 		ImageMiscOps.fill(image, 255);

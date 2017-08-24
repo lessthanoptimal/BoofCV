@@ -37,6 +37,9 @@ public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationD
 
 	private final static ConfigSquareGrid config = new ConfigSquareGrid(3, 2, 30,30);
 
+	public TestCalibrationDetectorSquareGrid() {
+		targetLayouts.add(  new ConfigSquareGrid(3, 2, 30,30) );
+	}
 
 	@Test
 	public void createLayout() {
@@ -57,7 +60,35 @@ public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationD
 
 	@Override
 	public void renderTarget(Object layout, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
+		ConfigSquareGrid config = (ConfigSquareGrid)layout;
 
+		double squareWidthPixels = 20;
+		double spacingPixels = squareWidthPixels*(config.spaceWidth/config.squareWidth);
+		double borderPixels = 20;
+
+		int imageWidth = (int)(config.numCols*squareWidthPixels + (config.numCols-1)*spacingPixels + 2*borderPixels+0.5);
+		int imageHeight = (int)(config.numRows*squareWidthPixels + (config.numRows-1)*spacingPixels + 2*borderPixels+0.5);
+
+		image.reshape(imageWidth,imageHeight);
+		ImageMiscOps.fill(image, 255);
+
+		for (int i = 0; i < config.numRows; i++ ){
+			double y = borderPixels + i * (squareWidthPixels+spacingPixels);
+
+			for (int j = 0; j < config.numCols; j++) {
+				double x = borderPixels + j * (squareWidthPixels + spacingPixels);
+
+				ImageMiscOps.fillRectangle(image, 0, (int)(x+0.5), (int)(y+0.5),
+						(int)squareWidthPixels, (int)squareWidthPixels);
+			}
+		}
+
+		double squareWidthWorld = length3D*squareWidthPixels/(double)imageWidth;
+		double spacingWorld = length3D*spacingPixels/(double)imageWidth;
+
+		points2D.clear();
+		points2D.addAll( CalibrationDetectorSquareGrid.
+				createLayout(config.numRows, config.numCols, squareWidthWorld,spacingWorld ));
 	}
 
 	@Override
@@ -102,5 +133,10 @@ public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationD
 	@Override
 	public DetectorFiducialCalibration createDetector() {
 		return FactoryFiducialCalibration.squareGrid(config);
+	}
+
+	@Override
+	public DetectorFiducialCalibration createDetector(Object layout) {
+		return FactoryFiducialCalibration.squareGrid((ConfigSquareGrid)layout);
 	}
 }
