@@ -37,13 +37,8 @@ import static org.junit.Assert.fail;
  */
 public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCalibrationDetectorChecks {
 
-	private static final int numRows = 3;
-	private static final int numCols = 2;
-
 	public TestCalibrationDetectorSquareFiducialGrid() {
-		targetLayouts.add( new ConfigSquareGridBinary(3,4,30,30) );
-		width = 500;
-		height = 600;
+		targetConfigs.add( new ConfigSquareGridBinary(3,4,30,30) );
 
 		// make it bigger so that the squares are easier to decode
 		simulatedTargetWidth  *= 1.2;
@@ -51,10 +46,12 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 
 	@Test
 	public void createLayout() {
-		List<Point2D_F64> l = createDetector().getLayout();
+		ConfigSquareGridBinary config = new ConfigSquareGridBinary(3,4,30,30);
 
-		int pointCols = numCols*2;
-		int pointRows = numRows*2;
+		List<Point2D_F64> l = createDetector(config).getLayout();
+
+		int pointCols = config.numCols*2;
+		int pointRows = config.numRows*2;
 
 		assertEquals(pointCols*pointRows,l.size());
 
@@ -83,24 +80,6 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 		points2D.clear();
 		points2D.addAll( CalibrationDetectorSquareGrid.
 				createLayout(config.numRows, config.numCols, squareWidthWorld,spacingWorld ));
-	}
-
-	@Override
-	public void renderTarget(GrayF32 original, List<CalibrationObservation> solutions) {
-		RenderSquareBinaryGridFiducial renderer = new RenderSquareBinaryGridFiducial();
-		renderer.squareWidth = 50;
-
-		GrayF32 rendered = renderer.generate(numRows,numCols);
-
-		original.subimage(0,0,rendered.width,rendered.height).setTo(rendered);
-
-		CalibrationObservation set = new CalibrationObservation();
-		List<Point2D_F64> points = renderer.getOrderedExpectedPoints(numRows, numCols);
-		for (int i = 0; i < points.size(); i++) {
-			set.add( points.get(i), i);
-		}
-
-		solutions.add(set);
 	}
 
 	/**
@@ -133,15 +112,6 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 		}
 
 		assertEquals(totalMatched, found.size());
-	}
-
-	@Override
-	public DetectorFiducialCalibration createDetector() {
-		ConfigSquareGridBinary config = new ConfigSquareGridBinary(numRows,numCols,1.0,1.0);
-		config.squareWidth = 1;
-		config.spaceWidth = 1;
-
-		return FactoryFiducialCalibration.binaryGrid(config);
 	}
 
 	@Override

@@ -19,20 +19,14 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
-import boofcv.alg.fiducial.calib.circle.TestDetectCircleAsymmetricGrid;
-import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.core.image.ConvertImage;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
-import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.List;
 
 import static boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid.createLayout;
@@ -42,13 +36,8 @@ import static boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid.crea
  */
 public class TestCalibrationDetectorCircleAsymmGrid extends GenericPlanarCalibrationDetectorChecks {
 
-	private final static ConfigCircleAsymmetricGrid config =
-			new ConfigCircleAsymmetricGrid(5, 4, 5,50);
-
 	public TestCalibrationDetectorCircleAsymmGrid() {
-		targetLayouts.add( new ConfigCircleAsymmetricGrid(5, 4, 20,50) );
-		width = 500;
-		height = 600;
+		targetConfigs.add( new ConfigCircleAsymmetricGrid(5, 4, 20,50) );
 	}
 
 	@Override
@@ -57,7 +46,7 @@ public class TestCalibrationDetectorCircleAsymmGrid extends GenericPlanarCalibra
 
 		double radiusPixels = 20;
 		double centerDistancePixels = 2*radiusPixels*config.centerDistance/config.circleDiameter;
-		double borderPixels = 40;
+		double borderPixels = 20;
 
 		int imageWidth = (int)(borderPixels*2 + (config.numCols-1)*centerDistancePixels/2.0 + 2*radiusPixels+0.5);
 		int imageHeight = (int)(borderPixels*2 + (config.numRows-1)*centerDistancePixels/2.0 + 2*radiusPixels+0.5);
@@ -95,40 +84,6 @@ public class TestCalibrationDetectorCircleAsymmGrid extends GenericPlanarCalibra
 
 		points2D.clear();
 		points2D.addAll( createLayout(config.numRows, config.numCols, centerDistanceWorld ));
-	}
-
-	@Override
-	public void renderTarget(GrayF32 original, List<CalibrationObservation> solutions) {
-		Affine2D_F64 affine = new Affine2D_F64(1,0,0,1,100,100);
-
-		List<Point2D_F64> pixels = new ArrayList<>();
-
-		double radiusToDistance = config.centerDistance/config.circleDiameter;
-		int radiusPixels = 20;
-
-		GrayU8 imageU8 = new GrayU8(original.width,original.height);
-		TestDetectCircleAsymmetricGrid.render(config.numRows,config.numCols,radiusPixels,
-				(int)(radiusToDistance*radiusPixels),
-				affine,pixels,imageU8);
-		ConvertImage.convert(imageU8,original);
-
-//		ShowImages.showWindow(original,"ASdasd");
-//		try {
-//			Thread.sleep(10000);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-
-		CalibrationObservation solution = new CalibrationObservation();
-		for (int i = 0; i < pixels.size(); i++) {
-			solution.add(pixels.get(i),i);
-		}
-		solutions.add( solution );
-	}
-
-	@Override
-	public DetectorFiducialCalibration createDetector() {
-		return FactoryFiducialCalibration.circleAsymmGrid(config);
 	}
 
 	@Override

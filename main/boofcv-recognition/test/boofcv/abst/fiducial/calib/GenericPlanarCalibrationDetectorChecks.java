@@ -18,18 +18,9 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
-import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.distort.PointTransformHomography_F32;
-import boofcv.alg.distort.PointTransformHomography_F64;
 import boofcv.alg.fiducial.calib.RenderSimulatedFisheye;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.alg.interpolate.InterpolationType;
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.border.BorderType;
-import boofcv.factory.geo.FactoryMultiView;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.calibration.CalibrationIO;
@@ -37,20 +28,11 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.CameraUniversalOmni;
-import boofcv.struct.distort.PixelTransform2_F32;
-import boofcv.struct.distort.Point2Transform2_F32;
-import boofcv.struct.distort.Point2Transform2_F64;
-import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DMatrixRMaj;
-import org.ejml.data.FMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
-import org.ejml.ops.ConvertMatrixData;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.awt.*;
@@ -65,17 +47,8 @@ import static org.junit.Assert.*;
  */
 public abstract class GenericPlanarCalibrationDetectorChecks {
 
-	int width = 300,height= 300;
 
-	// TODO Remove and new new renderer
-	GrayF32 original;
-	GrayF32 distorted;
-	List<CalibrationObservation> solutions = new ArrayList<>();
-
-	List targetLayouts = new ArrayList();
-
-	Point2Transform2_F32 d2o;
-	Point2Transform2_F64 o2d;
+	List targetConfigs = new ArrayList();
 
 	double fisheyeMatchTol = 3; // how close a pixel needs to come to be considered a match
 
@@ -83,25 +56,15 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	/**
 	 * Renders an image of the calibration target.
-	 * @param layout (Optional)
+	 * @param config (Optional)
 	 * @param image Storage for rendered calibration target This should be just the calibration target
 	 */
-	public abstract void renderTarget( Object layout ,
+	public abstract void renderTarget( Object config ,
 									   double targetWidth ,
 									   GrayF32 image ,
 									   List<Point2D_F64> points2D );
 
-	public abstract void renderTarget(GrayF32 original , List<CalibrationObservation> solutions );
-
-	public abstract DetectorFiducialCalibration createDetector();
 	public abstract DetectorFiducialCalibration createDetector(Object layout);
-
-	@Before
-	public void setup() {
-		original = new GrayF32(width,height);
-		distorted = new GrayF32(width, height);
-		renderTarget(original, solutions);
-	}
 
 	/**
 	 * See if it can detect targets distorted by fisheye lens. Entire target is always seen
@@ -114,9 +77,9 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 		List<Point2D_F64> locations2D = new ArrayList<>();
 		GrayF32 pattern = new GrayF32(1,1);
-		for (int i = 0; i < targetLayouts.size(); i++) {
-			DetectorFiducialCalibration detector = createDetector(targetLayouts.get(i));
-			renderTarget(targetLayouts.get(i), simulatedTargetWidth,pattern,locations2D);
+		for (int i = 0; i < targetConfigs.size(); i++) {
+			DetectorFiducialCalibration detector = createDetector(targetConfigs.get(i));
+			renderTarget(targetConfigs.get(i), simulatedTargetWidth,pattern,locations2D);
 
 			simulator.resetScene();
 			Se3_F64 markerToWorld = new Se3_F64();
@@ -197,6 +160,9 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		BufferedImage buff = new BufferedImage(output.width,output.height,BufferedImage.TYPE_INT_RGB);
 		ConvertBufferedImage.convertTo(simulator.getOutput(),buff,true);
 
+
+//		UtilImageIO.saveImage(buff,"failed.png");
+
 		Graphics2D g2 = buff.createGraphics();
 		for (int j = 0; found != null && j < found.size(); j++) {
 			Point2D_F64 f = found.get(j);
@@ -228,9 +194,9 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 		List<Point2D_F64> locations2D = new ArrayList<>();
 		GrayF32 pattern = new GrayF32(1,1);
-		for (int i = 0; i < targetLayouts.size(); i++) {
-			DetectorFiducialCalibration detector = createDetector(targetLayouts.get(i));
-			renderTarget(targetLayouts.get(i), simulatedTargetWidth, pattern, locations2D);
+		for (int i = 0; i < targetConfigs.size(); i++) {
+			DetectorFiducialCalibration detector = createDetector(targetConfigs.get(i));
+			renderTarget(targetConfigs.get(i), simulatedTargetWidth, pattern, locations2D);
 
 			simulator.resetScene();
 			Se3_F64 markerToWorld = new Se3_F64();
@@ -269,17 +235,39 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 			checkRenderedResults(detector, simulator, locations2D);
 		}
 	}
+
+	protected GrayF32 renderEasy( Object layout , List<Point2D_F64> locations2D ) {
+		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("pinhole_radial.yaml"));
+
+		if( locations2D == null )
+			locations2D = new ArrayList<>();
+		GrayF32 pattern = new GrayF32(1,1);
+		renderTarget(layout, simulatedTargetWidth, pattern, locations2D);
+
+		RenderSimulatedFisheye simulator = new RenderSimulatedFisheye();
+		simulator.setCamera(model);
+
+		Se3_F64 markerToWorld = new Se3_F64();
+		markerToWorld.T.set(0, 0, 0.5);
+		simulator.addTarget(markerToWorld, simulatedTargetWidth, pattern);
+		simulator.render();
+
+		return simulator.getOutput();
+	}
+
 	/**
 	 * Nothing was detected.  make sure it doesn't return null.
 	 */
 	@Test
 	public void checkDetectionsNotNull() {
-		DetectorFiducialCalibration detector = createDetector();
+		for( Object layout : targetConfigs) {
+			DetectorFiducialCalibration detector = createDetector(layout);
 
-		detector.process(original.createSameShape());
+			detector.process(new GrayF32(300,400));
 
-		assertTrue( detector.getDetectedPoints() != null );
-		assertTrue( detector.getDetectedPoints().size() == 0 );
+			assertTrue(detector.getDetectedPoints() != null);
+			assertTrue(detector.getDetectedPoints().size() == 0);
+		}
 	}
 
 	/**
@@ -287,12 +275,14 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 */
 	@Test
 	public void checkDetectionsResetOnFailure() {
-		DetectorFiducialCalibration detector = createDetector();
+		DetectorFiducialCalibration detector = createDetector(targetConfigs.get(0));
+
+		GrayF32 original = renderEasy(targetConfigs.get(0),null);
 
 		detector.process(original);
 		assertTrue( detector.getDetectedPoints().size() > 0 );
 
-		detector.process(original.createSameShape());
+		detector.process(new GrayF32(300,400));
 
 		assertTrue( detector.getDetectedPoints() != null );
 		assertTrue( detector.getDetectedPoints().size() == 0 );
@@ -307,7 +297,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 */
 	@Test
 	public void targetIsCentered() {
-		List<Point2D_F64> layout = createDetector().getLayout();
+		List<Point2D_F64> layout = createDetector(targetConfigs.get(0)).getLayout();
 
 		double minX=Double.MAX_VALUE,maxX=-Double.MAX_VALUE;
 		double minY=Double.MAX_VALUE,maxY=-Double.MAX_VALUE;
@@ -332,160 +322,42 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 */
 	@Test
 	public void dataNotRecycled() {
-		DetectorFiducialCalibration detector = createDetector();
+		for( Object layout : targetConfigs) {
+			DetectorFiducialCalibration detector = createDetector(layout);
 
-		assertTrue(detector.process(original));
-		CalibrationObservation found0 = detector.getDetectedPoints();
+			GrayF32 original = renderEasy(layout,null);
+			assertTrue(detector.process(original));
+			CalibrationObservation found0 = detector.getDetectedPoints();
 
-		assertTrue(detector.process(original));
-		CalibrationObservation found1 = detector.getDetectedPoints();
+			assertTrue(detector.process(original));
+			CalibrationObservation found1 = detector.getDetectedPoints();
 
-		assertEquals(found0.size(),found1.size());
-		assertTrue(found0 != found1);
-		for (int i = 0; i < found0.size(); i++) {
-			assertFalse(found1.points.contains(found0.points.get(0)));
-		}
-	}
-
-	/**
-	 * Easy case with no distortion
-	 */
-	@Test
-	public void undistorted() {
-		DetectorFiducialCalibration detector = createDetector();
-
-//		display(original);
-
-		assertTrue(detector.process(original));
-
-		CalibrationObservation found = detector.getDetectedPoints();
-
-		checkList(found, false);
-	}
-
-	/**
-	 * Pinch it a little bit like what is found with perspective distortion
-	 */
-	@Test
-	public void distorted() { // TODO Remove
-		DetectorFiducialCalibration detector = createDetector();
-
-		createTransform(width / 5, height / 5, width * 4 / 5, height / 6, width - 1, height - 1, 0, height - 1);
-
-		PixelTransform2_F32 pixelTransform = new PointToPixelTransform_F32(d2o);
-
-		ImageMiscOps.fill(distorted, 0xff);
-		DistortImageOps.distortSingle(original, distorted, pixelTransform,
-				InterpolationType.BILINEAR, BorderType.EXTENDED);
-
-//		display(distorted);
-
-		assertTrue(detector.process(distorted));
-
-		CalibrationObservation found = detector.getDetectedPoints();
-		checkList(found, true);
-	}
-
-	private void display( GrayF32 image ) { // TODO remove
-		BufferedImage visualized = ConvertBufferedImage.convertTo(image, null, true);
-		ShowImages.showWindow(visualized, "Input");
-
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	// TODO remove
-	public void checkList(CalibrationObservation found , boolean applyTransform ) {
-		List<CalibrationObservation> expectedList = new ArrayList<>();
-
-		if( !applyTransform ) {
-			expectedList.addAll(this.solutions);
-		} else {
-			for (int i = 0; i < solutions.size(); i++) {
-				CalibrationObservation orig = solutions.get(i);
-				CalibrationObservation mod = new CalibrationObservation();
-				for (int j = 0; j < orig.size(); j++) {
-					Point2D_F64 p = orig.points.get(i).copy();
-
-					o2d.compute(p.x, p.y, p);
-					mod.add(p, orig.get(j).index );
-				}
-				expectedList.add(mod);
+			assertEquals(found0.size(), found1.size());
+			assertTrue(found0 != found1);
+			for (int i = 0; i < found0.size(); i++) {
+				assertFalse(found1.points.contains(found0.points.get(0)));
 			}
 		}
-
-		assertEquals(expectedList.get(0).size(),found.size());
-
-		// the order is important.  check to see that they are close and in the correct order
-		boolean anyMatched = false;
-		for (int i = 0; i < expectedList.size(); i++) {
-			CalibrationObservation expected = expectedList.get(i);
-			boolean matched = true;
-
-			for (int j = 0; j < expected.size(); j++) {
-				if( found.get(j).index != expected.get(j).index ) {
-					matched = false;
-					break;
-				}
-
-				Point2D_F64 f = found.get(i);
-				Point2D_F64 e = expected.get(i);
-				if( f.distance(e) >= 3 ) {
-					matched = false;
-					break;
-				}
-			}
-			if( matched ) {
-				anyMatched = true;
-				break;
-			}
-		}
-		assertTrue(anyMatched);
 	}
 
-	// TODO remove
-	public void createTransform( double x0 , double y0 , double x1 , double y1 ,
-								 double x2 , double y2 , double x3 , double y3 )
-	{
-		// Homography estimation algorithm.  Requires a minimum of 4 points
-		Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomography(true);
-
-		// Specify the pixel coordinates from destination to target
-		ArrayList<AssociatedPair> associatedPairs = new ArrayList<>();
-		associatedPairs.add(new AssociatedPair(x0, y0, 0, 0));
-		associatedPairs.add(new AssociatedPair(x1, y1, width-1, 0));
-		associatedPairs.add(new AssociatedPair(x2, y2, width-1, height-1));
-		associatedPairs.add(new AssociatedPair(x3, y3, 0, height - 1));
-
-		// Compute the homography
-		DMatrixRMaj H = new DMatrixRMaj(3, 3);
-		computeHomography.process(associatedPairs, H);
-
-		// Create the transform for distorting the image
-		FMatrixRMaj H32 = new FMatrixRMaj(3,3);
-		ConvertMatrixData.convert(H,H32);
-		d2o = new PointTransformHomography_F32(H32);
-		CommonOps_DDRM.invert(H);
-		o2d = new PointTransformHomography_F64(H);
-	}
 
 	/**
 	 * Observations points should always be in increasing order
 	 */
 	@Test
 	public void checkPointIndexIncreasingOrder() {
-		DetectorFiducialCalibration detector = createDetector();
+		for( Object layout : targetConfigs) {
+			DetectorFiducialCalibration detector = createDetector(layout);
 
-		assertTrue(detector.process(original));
-		CalibrationObservation found = detector.getDetectedPoints();
+			GrayF32 original = renderEasy(layout,null);
+			assertTrue(detector.process(original));
+			CalibrationObservation found = detector.getDetectedPoints();
 
-		assertEquals(detector.getLayout().size(),found.size());
+			assertEquals(detector.getLayout().size(), found.size());
 
-		for (int i = 0; i < found.size(); i++) {
-			assertEquals(i, found.get(i).index);
+			for (int i = 0; i < found.size(); i++) {
+				assertEquals(i, found.get(i).index);
+			}
 		}
 	}
 }

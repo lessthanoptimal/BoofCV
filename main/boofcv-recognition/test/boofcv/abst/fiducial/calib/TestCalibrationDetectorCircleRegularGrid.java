@@ -19,20 +19,14 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
-import boofcv.alg.fiducial.calib.circle.TestDetectCircleRegularGrid;
-import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.core.image.ConvertImage;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
-import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,13 +34,8 @@ import java.util.List;
  */
 public class TestCalibrationDetectorCircleRegularGrid extends GenericPlanarCalibrationDetectorChecks {
 
-	private final static ConfigCircleRegularGrid config =
-			new ConfigCircleRegularGrid(5, 4, 16,50);
-
 	public TestCalibrationDetectorCircleRegularGrid() {
-		targetLayouts.add( new ConfigCircleRegularGrid(5, 4, 30,50));
-		width = 500;
-		height = 600;
+		targetConfigs.add( new ConfigCircleRegularGrid(5, 4, 30,50));
 	}
 
 	@Override
@@ -91,38 +80,6 @@ public class TestCalibrationDetectorCircleRegularGrid extends GenericPlanarCalib
 		points2D.clear();
 		points2D.addAll( CalibrationDetectorCircleRegularGrid.
 				createLayout(config.numRows, config.numCols, centerDistanceWorld,radiusWorld*2 ));
-	}
-
-	@Override
-	public void renderTarget(GrayF32 original, List<CalibrationObservation> solutions) {
-		Affine2D_F64 affine = new Affine2D_F64(1,0,0,1,100,100);
-
-		List<Point2D_F64> keypoints = new ArrayList<>();
-		List<Point2D_F64> centers = new ArrayList<>();
-
-		double diameterToDistance = config.centerDistance/config.circleDiameter;
-		double radiusToDistance = diameterToDistance*2.0;
-		int radiusPixels = 20;
-
-		GrayU8 imageU8 = new GrayU8(original.width,original.height);
-		TestDetectCircleRegularGrid.render(config.numRows,config.numCols,radiusPixels,
-				radiusToDistance*radiusPixels,
-				affine,keypoints,centers,imageU8);
-		ConvertImage.convert(imageU8,original);
-
-//		ShowImages.showWindow(original,"ASdasd");
-//		BoofMiscOps.sleep(10000);
-
-		CalibrationObservation solution = new CalibrationObservation();
-		for (int i = 0; i < keypoints.size(); i++) {
-			solution.add(keypoints.get(i),i);
-		}
-		solutions.add( solution );
-	}
-
-	@Override
-	public DetectorFiducialCalibration createDetector() {
-		return FactoryFiducialCalibration.circleRegularGrid(config);
 	}
 
 	@Override

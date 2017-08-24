@@ -19,7 +19,6 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
-import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.struct.image.GrayF32;
@@ -36,15 +35,14 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationDetectorChecks {
 
-	private final static ConfigChessboard config = new ConfigChessboard(5, 4, 30);
 
 	public TestCalibrationDetectorChessboard() {
-		targetLayouts.add( new ConfigChessboard(5, 4, 30) );
+		targetConfigs.add( new ConfigChessboard(5, 4, 30) );
 	}
 
 	@Test
 	public void createLayout() {
-		List<Point2D_F64> layout = createDetector().getLayout();
+		List<Point2D_F64> layout = createDetector(new ConfigChessboard(5, 4, 30) ).getLayout();
 
 		// first control points should be the top left corner then work it's way down in a
 		// grid pattern
@@ -83,49 +81,6 @@ public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationD
 		points2D.clear();
 		points2D.addAll( gridChess(config.numRows, config.numCols, lengthPattern/config.numCols ));
 
-	}
-
-	@Override
-	public void renderTarget(GrayF32 original, List<CalibrationObservation> solutions) {
-
-		ImageMiscOps.fill(original, 255);
-
-		int square = original.getWidth()/(Math.max(config.numCols,config.numRows)+4);
-
-		int targetWidth  = square * config.numCols;
-		int targetHeight = square * config.numRows;
-
-		int x0 = (original.width - targetWidth) / 2;
-		int y0 = (original.height- targetHeight) / 2;
-
-		for (int i = 0; i < config.numRows; i++) {
-			int y = y0 + i*square;
-
-			int startJ = i%2 == 0 ? 0 : 1;
-			for (int j = startJ; j < config.numCols; j += 2) {
-				int x = x0 + j * square;
-				ImageMiscOps.fillRectangle(original,0,x,y,square,square);
-			}
-		}
-
-		int pointsRow = 2*(config.numRows/2) - (1 - config.numRows % 2);
-		int pointsCol = 2*(config.numCols/2) - (1 - config.numCols % 2);
-
-		CalibrationObservation set = new CalibrationObservation();
-		int gridIndex = 0;
-		for (int i = 0; i < pointsRow; i++) {
-			for (int j = 0; j < pointsCol; j++,gridIndex++) {
-				double y = y0+(i+1)*square;
-				double x = x0+(j+1)*square;
-				set.add(new Point2D_F64(x, y), gridIndex);
-			}
-		}
-		solutions.add(set);
-	}
-
-	@Override
-	public DetectorFiducialCalibration createDetector() {
-		return FactoryFiducialCalibration.chessboard(config);
 	}
 
 	@Override

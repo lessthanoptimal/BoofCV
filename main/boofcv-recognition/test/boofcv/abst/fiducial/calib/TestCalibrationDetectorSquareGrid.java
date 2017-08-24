@@ -19,7 +19,6 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
-import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.struct.image.GrayF32;
@@ -38,7 +37,7 @@ public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationD
 	private final static ConfigSquareGrid config = new ConfigSquareGrid(3, 2, 30,30);
 
 	public TestCalibrationDetectorSquareGrid() {
-		targetLayouts.add(  new ConfigSquareGrid(3, 2, 30,30) );
+		targetConfigs.add(  new ConfigSquareGrid(3, 2, 30,30) );
 	}
 
 	@Test
@@ -89,50 +88,6 @@ public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationD
 		points2D.clear();
 		points2D.addAll( CalibrationDetectorSquareGrid.
 				createLayout(config.numRows, config.numCols, squareWidthWorld,spacingWorld ));
-	}
-
-	@Override
-	public void renderTarget(GrayF32 original, List<CalibrationObservation> solutions) {
-		ImageMiscOps.fill(original, 255);
-
-		int numRows = config.numRows*2-1;
-		int numCols = config.numCols*2-1;
-
-		int square = original.getWidth() / (Math.max(numRows,numCols) + 4);
-
-		int targetWidth = square * numCols;
-		int targetHeight = square * numRows;
-
-		int x0 = (original.width - targetWidth) / 2;
-		int y0 = (original.height - targetHeight) / 2;
-
-		for (int i = 0; i < numRows; i += 2) {
-			int y = y0 + i * square;
-
-			for (int j = 0; j < numCols; j += 2) {
-				int x = x0 + j * square;
-				ImageMiscOps.fillRectangle(original, 0, x, y, square, square);
-			}
-		}
-
-		int pointsRow = numRows+1;
-		int pointsCol = numCols+1;
-
-		CalibrationObservation set = new CalibrationObservation();
-		int gridIndex = 0;
-		for (int i = 0; i < pointsRow; i++) {
-			for (int j = 0; j < pointsCol; j++, gridIndex++) {
-				double y = y0 + i*square;
-				double x = x0 + j*square;
-				set.add(new Point2D_F64(x, y), gridIndex);
-			}
-		}
-		solutions.add(set);
-	}
-
-	@Override
-	public DetectorFiducialCalibration createDetector() {
-		return FactoryFiducialCalibration.squareGrid(config);
 	}
 
 	@Override
