@@ -46,7 +46,7 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 
 	@Test
 	public void createLayout() {
-		ConfigSquareGridBinary config = new ConfigSquareGridBinary(3,4,30,30);
+		ConfigSquareGridBinary config = new ConfigSquareGridBinary(3,4,30,20);
 
 		List<Point2D_F64> l = createDetector(config).getLayout();
 
@@ -58,12 +58,12 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 		double w = l.get(1).x - l.get(0).x;
 		double h = l.get(0).y - l.get(pointCols).y ;
 
-		assertEquals(1,w,1e-8);
-		assertEquals(1,h,1e-8);
+		assertEquals(30,w,1e-8);
+		assertEquals(30,h,1e-8);
 
 		double s = l.get(2).x - l.get(1).x;
 
-		assertEquals(1, s, 1e-8);
+		assertEquals(20, s, 1e-8);
 	}
 
 	@Override

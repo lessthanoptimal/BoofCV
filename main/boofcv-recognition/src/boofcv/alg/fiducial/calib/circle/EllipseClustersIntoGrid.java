@@ -364,20 +364,18 @@ public abstract class EllipseClustersIntoGrid {
 	}
 
 	/**
-	 * Selects the node on the contour which is closest to 270 degrees and is thus likely to be
-	 * a node on the corner
+	 * Pick the node in the contour with the largest angle. Distortion tends to make the acute angle smaller.
+	 * Without distortion it will be 270 degrees.
 	 */
 	NodeInfo selectSeedCorner() {
 		NodeInfo best = null;
-		double bestError = Double.MAX_VALUE;
+		double bestAngle = 0;
 
 		for (int i = 0; i < contour.size; i++) {
 			NodeInfo info = contour.get(i);
 
-			double error = UtilAngle.dist(3*Math.PI/2.0,info.angleBetween);
-
-			if( error < bestError ) {
-				bestError = error;
+			if( info.angleBetween > bestAngle ) {
+				bestAngle = info.angleBetween;
 				best = info;
 			}
 		}

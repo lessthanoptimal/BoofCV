@@ -133,7 +133,7 @@ public class ImageZoomPanel extends JScrollPane {
 		// intentionally empty
 	}
 
-	protected class ImagePanel extends JPanel
+	public class ImagePanel extends JPanel
 	{
 		SaveImageOnClick mouseListener = new SaveImageOnClick(this);
 
@@ -160,5 +160,9 @@ public class ImageZoomPanel extends JScrollPane {
 
 	public double getScale() {
 		return scale;
+	}
+
+	public ImagePanel getImagePanel() {
+		return panel;
 	}
 }

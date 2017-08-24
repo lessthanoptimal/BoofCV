@@ -22,6 +22,8 @@ Version : 0.28
   * Provides a framework for overriding some functionality in BoofCV with an external implementation without changing your code
   * Added JavaCV Override for:
     - BlurImageOps TODO
+- DetectCircleAsymmetricGrid
+  * Fixed issue where it picked the wrong circle for the initial corner
 - Examples
   * Added ExamplePointDeformKeyPoints
 

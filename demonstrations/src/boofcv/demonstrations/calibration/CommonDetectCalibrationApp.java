@@ -80,7 +80,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase2
 		controlPanel.setListener(this);
 
 		imagePanel.setScale(controlPanel.getScale());
-		imagePanel.addMouseListener(new MouseAdapter() {
+		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				double scale = imagePanel.getScale();
@@ -89,6 +89,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase2
 		});
 
 		imagePanel.addMouseWheelListener(controlPanel);
+		imagePanel.requestFocus();
 	}
 
 	protected abstract void declareDetector();
