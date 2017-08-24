@@ -24,19 +24,27 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.distort.PointTransformHomography_F64;
+import boofcv.alg.fiducial.calib.RenderSimulatedFisheye;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -44,6 +52,7 @@ import org.ejml.ops.ConvertMatrixData;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,8 +70,22 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	GrayF32 distorted;
 	List<CalibrationObservation> solutions = new ArrayList<>();
 
+	List targetLayouts = new ArrayList();
+
 	Point2Transform2_F32 d2o;
 	Point2Transform2_F64 o2d;
+
+	double fisheyeMatchTol = 3; // how close a pixel needs to come to be considered a match
+
+	/**
+	 * Renders an image of the calibration target.
+	 * @param layout (Optional)
+	 * @param image Storage for rendered calibration target This should be just the calibration target
+	 */
+	public abstract void renderTarget( Object layout ,
+									   double targetWidth ,
+									   GrayF32 image ,
+									   List<Point2D_F64> points2D );
 
 	public abstract void renderTarget(GrayF32 original , List<CalibrationObservation> solutions );
 
@@ -75,6 +98,117 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		renderTarget(original, solutions);
 	}
 
+	/**
+	 * See if it can detect targets distorted by fisheye lens. Entire target is always seen
+	 */
+	@Test
+	public void fisheye_fullview() {
+
+		double targetWidth = 0.3;
+
+		CameraUniversalOmni model = CalibrationIO.load(getClass().getResource("fisheye.yaml"));
+		RenderSimulatedFisheye simulator = new RenderSimulatedFisheye();
+		simulator.setCamera(model);
+
+		DetectorFiducialCalibration detector = createDetector();
+
+		List<Point2D_F64> locations2D = new ArrayList<>();
+		GrayF32 pattern = new GrayF32(1,1);
+		for (int i = 0; i < targetLayouts.size(); i++) {
+			renderTarget(targetLayouts.get(i),targetWidth,pattern,locations2D);
+
+			simulator.resetScene();
+			Se3_F64 markerToWorld = new Se3_F64();
+			simulator.addTarget(markerToWorld,targetWidth,pattern);
+
+			// up close exploding - center
+			markerToWorld.T.set(0,0,-0.08);
+			checkFisheyeResults(detector,simulator,locations2D);
+
+			// up close exploding - left
+			markerToWorld.T.set(0.1,0,-0.08);
+			checkFisheyeResults(detector,simulator,locations2D);
+
+			markerToWorld.T.set(0.25,0,-0.2);
+			checkFisheyeResults(detector,simulator,locations2D);
+
+			System.out.println("Applying rotation");
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-0.5,0,markerToWorld.getR());
+			checkFisheyeResults(detector,simulator,locations2D);
+
+			markerToWorld.T.set(0.3,0,-0.05);
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0,markerToWorld.getR());
+			checkFisheyeResults(detector,simulator,locations2D);
+
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0.5,markerToWorld.getR());
+			simulator.render();
+			checkFisheyeResults(detector,simulator,locations2D);
+
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,1,markerToWorld.getR());
+			simulator.render();
+			checkFisheyeResults(detector,simulator,locations2D);
+		}
+	}
+
+	private void checkFisheyeResults( DetectorFiducialCalibration detector,
+									  RenderSimulatedFisheye simulator ,
+									  List<Point2D_F64> locations2D )
+	{
+		System.out.println("************************************");
+		simulator.render();
+		assertTrue(detector.process(simulator.getOutput()));
+
+		CalibrationObservation found = detector.getDetectedPoints();
+
+		assertEquals(locations2D.size(),found.size());
+
+//		ShowImages.showWindow(simulator.getOutput(),"Foo",true);
+//		BoofMiscOps.sleep(2000);
+
+		Point2D_F64 truth = new Point2D_F64();
+
+		for (int i = 0; i < locations2D.size(); i++) {
+			Point2D_F64 p = locations2D.get(i);
+			simulator.computePixel( 0, p.x , p.y , truth);
+
+			// TODO ensure that the order is correct. Kinda a pain since some targets have symmetry...
+			boolean matched = false;
+			for (int j = 0; j < found.size(); j++) {
+				if( found.get(j).distance(truth) <= fisheyeMatchTol ) {
+					matched = true;
+					break;
+				}
+			}
+			if( !matched ) {
+				GrayF32 output = simulator.getOutput();
+				BufferedImage buff = new BufferedImage(output.width,output.height,BufferedImage.TYPE_INT_RGB);
+				ConvertBufferedImage.convertTo(simulator.getOutput(),buff,true);
+
+				Graphics2D g2 = buff.createGraphics();
+				for (int j = 0; j < found.size(); j++) {
+					Point2D_F64 f = found.get(j);
+					VisualizeFeatures.drawPoint(g2,f.x,f.y,4,Color.RED,false);
+				}
+				for (int j = 0; j < locations2D.size(); j++) {
+					p = locations2D.get(j);
+					simulator.computePixel( 0, p.x , p.y , truth);
+					VisualizeFeatures.drawPoint(g2,truth.x,truth.y,4,Color.GREEN,false);
+				}
+
+//				VisualizeFeatures.drawPoint(g2,truth.x,truth.y,4,Color.GREEN,false);
+
+				ShowImages.showWindow(buff,"Foo",true);
+				BoofMiscOps.sleep(1000);
+
+//				assertTrue(matched);
+				return;
+			}
+		}
+
+//		ShowImages.showWindow(simulator.getOutput(),"Foo",true);
+//		BoofMiscOps.sleep(500);
+
+	}
 
 	/**
 	 * Nothing was detected.  make sure it doesn't return null.

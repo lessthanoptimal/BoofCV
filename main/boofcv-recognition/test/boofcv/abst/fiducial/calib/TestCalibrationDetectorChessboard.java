@@ -28,6 +28,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static boofcv.abst.fiducial.calib.CalibrationDetectorChessboard.gridChess;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -36,6 +37,10 @@ import static org.junit.Assert.assertTrue;
 public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationDetectorChecks {
 
 	private final static ConfigChessboard config = new ConfigChessboard(5, 4, 30);
+
+	public TestCalibrationDetectorChessboard() {
+		targetLayouts.add( new ConfigChessboard(5, 4, 30) );
+	}
 
 	@Test
 	public void createLayout() {
@@ -46,6 +51,37 @@ public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationD
 		assertTrue(layout.get(0).y == layout.get(2).y);
 		assertTrue(layout.get(0).x <  layout.get(2).x);
 		assertTrue(layout.get(0).y >  layout.get(3).y);
+	}
+
+	@Override
+	public void renderTarget(Object layout, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
+		ConfigChessboard config = (ConfigChessboard)layout;
+
+		int square = 20;
+
+		int targetWidth  = square * config.numCols;
+		int targetHeight = square * config.numRows;
+
+		image.reshape(square*2 + targetWidth, square*2 + targetHeight);
+		ImageMiscOps.fill(image, 255);
+
+		int x0 = square;
+		int y0 = (image.height- targetHeight) / 2;
+
+		for (int i = 0; i < config.numRows; i++) {
+			int y = y0 + i*square;
+
+			int startJ = i%2 == 0 ? 0 : 1;
+			for (int j = startJ; j < config.numCols; j += 2) {
+				int x = x0 + j * square;
+				ImageMiscOps.fillRectangle(image,0,x,y,square,square);
+			}
+		}
+
+		double lengthPattern = length3D*config.numCols/(config.numCols+2);
+
+		points2D.clear();
+		points2D.addAll( gridChess(config.numRows, config.numCols, lengthPattern/config.numCols ));
 
 	}
 

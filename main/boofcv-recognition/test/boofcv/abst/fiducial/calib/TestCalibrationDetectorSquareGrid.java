@@ -56,6 +56,11 @@ public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationD
 	}
 
 	@Override
+	public void renderTarget(Object layout, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
+
+	}
+
+	@Override
 	public void renderTarget(GrayF32 original, List<CalibrationObservation> solutions) {
 		ImageMiscOps.fill(original, 255);
 

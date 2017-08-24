@@ -45,6 +45,11 @@ public class TestCalibrationDetectorCircleRegularGrid extends GenericPlanarCalib
 	}
 
 	@Override
+	public void renderTarget(Object layout, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
+
+	}
+
+	@Override
 	public void renderTarget(GrayF32 original, List<CalibrationObservation> solutions) {
 		Affine2D_F64 affine = new Affine2D_F64(1,0,0,1,100,100);
 
