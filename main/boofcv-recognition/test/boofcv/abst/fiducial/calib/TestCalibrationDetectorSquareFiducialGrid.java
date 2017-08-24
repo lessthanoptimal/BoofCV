@@ -19,6 +19,7 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.alg.fiducial.calib.RenderSimulatedFisheye;
 import boofcv.alg.fiducial.calib.RenderSquareBinaryGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
@@ -29,6 +30,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -99,6 +101,38 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 		}
 
 		solutions.add(set);
+	}
+
+	/**
+	 * Specialized function which allows partial matches. hard to properly decode all the binary patterns at this
+	 * resolution and it is designed for partial matches after all.
+	 */
+	@Override
+	protected void checkResults(RenderSimulatedFisheye simulator, CalibrationObservation found, List<Point2D_F64> locations2D) {
+		// require at least 3/4 of the corners to be detected
+		if( locations2D.size() < found.size() || found.size() < locations2D.size()*3/4 ) {
+			visualize(simulator, locations2D, found);
+			fail("Number of detected points miss match");
+		}
+
+		Point2D_F64 truth = new Point2D_F64();
+
+		int totalMatched = 0;
+		for (int i = 0; i < locations2D.size(); i++) {
+			Point2D_F64 p = locations2D.get(i);
+			simulator.computePixel( 0, p.x , p.y , truth);
+
+			// TODO ensure that the order is correct. Kinda a pain since some targets have symmetry...
+			for (int j = 0; j < found.size(); j++) {
+				double distance = found.get(j).distance(truth);
+				if( distance <= fisheyeMatchTol ) {
+					totalMatched++;
+					break;
+				}
+			}
+		}
+
+		assertEquals(totalMatched, found.size());
 	}
 
 	@Override

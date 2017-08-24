@@ -92,7 +92,7 @@ public class RenderSimulatedFisheye {
 		LensDistortionNarrowFOV factory = new LensDistortionRadialTangential(model);
 
 		pixelTo3 = new NarrowPixelToSphere_F64(factory.undistort_F64(true,false));
-		sphereToPixel = new SphereToNarrowPixel_F64(factory.undistort_F64(false,true));
+		sphereToPixel = new SphereToNarrowPixel_F64(factory.distort_F64(false,true));
 
 
 		computeProjectionTable(model);

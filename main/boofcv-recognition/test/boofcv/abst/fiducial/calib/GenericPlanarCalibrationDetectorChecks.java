@@ -162,12 +162,14 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 			fail("Detection failed");
 		}
 
-		CalibrationObservation found = detector.getDetectedPoints();
+		checkResults(simulator,detector.getDetectedPoints(), locations2D);
+	}
 
+	protected void checkResults(RenderSimulatedFisheye simulator, CalibrationObservation found, List<Point2D_F64> locations2D) {
 		if( locations2D.size() != found.size() ) {
 			visualize(simulator, locations2D, found);
+			fail("Number of detected points miss match");
 		}
-		assertEquals(locations2D.size(),found.size());
 
 		Point2D_F64 truth = new Point2D_F64();
 
@@ -190,7 +192,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		}
 	}
 
-	private void visualize(RenderSimulatedFisheye simulator, List<Point2D_F64> locations2D, CalibrationObservation found) {
+	protected void visualize(RenderSimulatedFisheye simulator, List<Point2D_F64> locations2D, CalibrationObservation found) {
 		Point2D_F64 p;GrayF32 output = simulator.getOutput();
 		BufferedImage buff = new BufferedImage(output.width,output.height,BufferedImage.TYPE_INT_RGB);
 		ConvertBufferedImage.convertTo(simulator.getOutput(),buff,true);
@@ -255,7 +257,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0.8,markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 
-			markerToWorld.T.set(0, -0.25, 1);
+			markerToWorld.T.set(0, -0.20, 1);
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.8,-1,0.8,markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 

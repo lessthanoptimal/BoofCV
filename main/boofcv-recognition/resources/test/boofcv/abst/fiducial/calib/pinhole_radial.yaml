@@ -13,7 +13,7 @@ pinhole:
 model: pinhole_radial_tangential
 radial_tangential:
   radial:
-  - 0.05587710526409107
-  - -0.16596851121196668
+  - -0.1287710526409107
+  - -0.10596851121196668
   t1: 0.0
   t2: 0.0
