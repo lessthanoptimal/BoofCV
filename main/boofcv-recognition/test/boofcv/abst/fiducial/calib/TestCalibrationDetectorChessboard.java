@@ -55,7 +55,7 @@ public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationD
 	public void renderTarget(Object layout, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
 		ConfigChessboard config = (ConfigChessboard)layout;
 
-		int square = 20;
+		int square = 40;
 
 		int targetWidth  = square * config.numCols;
 		int targetHeight = square * config.numRows;

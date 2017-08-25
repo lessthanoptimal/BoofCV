@@ -21,7 +21,11 @@ package boofcv.abst.fiducial.calib;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.fiducial.calib.RenderSimulatedFisheye;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.gui.feature.VisualizeFeatures;
+import boofcv.gui.image.ShowImages;
 import boofcv.io.calibration.CalibrationIO;
+import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.image.GrayF32;
@@ -31,6 +35,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,9 +50,11 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	List targetConfigs = new ArrayList();
 
-	double fisheyeMatchTol = 3; // how close a pixel needs to come to be considered a match
+	double fisheyeMatchTol = 3.0; // how close a pixel needs to come to be considered a match
 
 	double simulatedTargetWidth = 0.3; // size of target in simulated world
+
+	boolean visualizeFailures = false;
 
 	/**
 	 * Renders an image of the calibration target.
@@ -150,29 +158,31 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	}
 
 	protected void visualize(RenderSimulatedFisheye simulator, List<Point2D_F64> locations2D, CalibrationObservation found) {
-//		GrayF32 output = simulator.getOutput();
-//		BufferedImage buff = new BufferedImage(output.width,output.height,BufferedImage.TYPE_INT_RGB);
-//		ConvertBufferedImage.convertTo(simulator.getOutput(),buff,true);
-//
-////		UtilImageIO.saveImage(buff,"failed.png");
-//
-//		Graphics2D g2 = buff.createGraphics();
-//		for (int j = 0; found != null && j < found.size(); j++) {
-//			Point2D_F64 f = found.get(j);
-//			VisualizeFeatures.drawPoint(g2,f.x,f.y,2,Color.RED,false);
-//		}
-//		Point2D_F64 truth = new Point2D_F64();
-//
-//		g2.setColor(Color.GREEN);
-//		g2.setStroke(new BasicStroke(2));
-//		for (int j = 0; j < locations2D.size(); j++) {
-//			Point2D_F64 p = locations2D.get(j);
-//			simulator.computePixel( 0, p.x , p.y , truth);
-//			VisualizeFeatures.drawCircle(g2,truth.x,truth.y,4);
-//		}
-//
-//		ShowImages.showWindow(buff,"Foo",true);
-//		BoofMiscOps.sleep(3000);
+		if( !visualizeFailures )
+			return;
+		GrayF32 output = simulator.getOutput();
+		BufferedImage buff = new BufferedImage(output.width,output.height,BufferedImage.TYPE_INT_RGB);
+		ConvertBufferedImage.convertTo(simulator.getOutput(),buff,true);
+
+//		UtilImageIO.saveImage(buff,"failed.png");
+
+		Graphics2D g2 = buff.createGraphics();
+		for (int j = 0; found != null && j < found.size(); j++) {
+			Point2D_F64 f = found.get(j);
+			VisualizeFeatures.drawPoint(g2,f.x,f.y,2,Color.RED,false);
+		}
+		Point2D_F64 truth = new Point2D_F64();
+
+		g2.setColor(Color.GREEN);
+		g2.setStroke(new BasicStroke(2));
+		for (int j = 0; j < locations2D.size(); j++) {
+			Point2D_F64 p = locations2D.get(j);
+			simulator.computePixel( 0, p.x , p.y , truth);
+			VisualizeFeatures.drawCircle(g2,truth.x,truth.y,4);
+		}
+
+		ShowImages.showWindow(buff,"Foo",true);
+		BoofMiscOps.sleep(30000);
 	}
 
 	/**

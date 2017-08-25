@@ -59,6 +59,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Simulates a scene composed of planar objects. The camera is distorted using the provided camera model.
+ *
  * @author Peter Abeles
  */
 public class RenderSimulatedFisheye {
@@ -94,7 +96,6 @@ public class RenderSimulatedFisheye {
 		pixelTo3 = new NarrowPixelToSphere_F64(factory.undistort_F64(true,false));
 		sphereToPixel = new SphereToNarrowPixel_F64(factory.distort_F64(false,true));
 
-
 		computeProjectionTable(model);
 	}
 
@@ -105,6 +106,8 @@ public class RenderSimulatedFisheye {
 
 		for (int y = 0; y < output.height; y++) {
 			for (int x = 0; x < output.width; x++) {
+				// Should this add 0.5 so that the ray goes out of the pixel's center? Seems to increase reprojection
+				// error in calibration tests if I do...
 				pixelTo3.compute(x, y, p3);
 				if(UtilEjml.isUncountable(p3.x)) {
 					depthMap.unsafe_set(x,y,Float.NaN);
@@ -211,6 +214,9 @@ public class RenderSimulatedFisheye {
 		return scene.get(which);
 	}
 
+	/**
+	 * Project a point which lies on the 2D planar polygon's surface onto the rendered image
+	 */
 	public void computePixel(int which, double x, double y, Point2D_F64 output) {
 		ImageRect r = scene.get(which);
 
