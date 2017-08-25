@@ -42,6 +42,7 @@ import boofcv.struct.distort.Point2Transform3_F64;
 import boofcv.struct.distort.Point3Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import georegression.geometry.ConvertRotation3D_F64;
+import georegression.geometry.UtilShape3D_F64;
 import georegression.metric.Intersection3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.line.LineParametric3D_F64;
@@ -49,8 +50,9 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.struct.shapes.Triangle3D_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 
 import java.awt.image.BufferedImage;
@@ -138,13 +140,7 @@ public class RenderSimulatedFisheye {
 		for (int i = 0; i < scene.size(); i++) {
 			ImageRect r = scene.get(i);
 
-			r.canonicalRect();
-			SePointOps_F64.transform(r.rectToWorld,r.A.v0,r.A.v0);
-			SePointOps_F64.transform(r.rectToWorld,r.A.v1,r.A.v1);
-			SePointOps_F64.transform(r.rectToWorld,r.A.v2,r.A.v2);
-			SePointOps_F64.transform(r.rectToWorld,r.B.v0,r.B.v0);
-			SePointOps_F64.transform(r.rectToWorld,r.B.v1,r.B.v1);
-			SePointOps_F64.transform(r.rectToWorld,r.B.v2,r.B.v2);
+			r.worldRect();
 		}
 
 		LineParametric3D_F64 ray = new LineParametric3D_F64();
@@ -174,8 +170,7 @@ public class RenderSimulatedFisheye {
 			ImageRect r = scene.get(i);
 
 			// only care about intersections in front of the camera
-			if( 1 == Intersection3D_F64.intersect(r.A,ray,p3,_u,_v,_n,_w0) ||
-					1 == Intersection3D_F64.intersect(r.B,ray,p3,_u,_v,_n,_w0) ) {
+			if( 1 == Intersection3D_F64.intersectConvex(r.rect3D,ray,p3,_u,_v,_n,_w0)) {
 
 				double imageRatio = r.image.height/(double)r.image.width;
 
@@ -233,19 +228,20 @@ public class RenderSimulatedFisheye {
 		Se3_F64 rectToWorld;
 		GrayF32 image;
 		double width3D;
-		Triangle3D_F64 A = new Triangle3D_F64();
-		Triangle3D_F64 B = new Triangle3D_F64();
+		FastQueue<Point3D_F64> rect3D = new FastQueue<>(Point3D_F64.class,true);
+		Polygon2D_F64 rect2D = new Polygon2D_F64();
 
-		public void canonicalRect() {
+		public void worldRect() {
 			double imageRatio = image.height/(double)image.width;
-			A.set(
-					-width3D/2,-width3D*imageRatio/2,0,
-					-width3D/2, width3D*imageRatio/2,0,
-					width3D/2, -width3D*imageRatio/2,0);
-			B.set(
-					-width3D/2, width3D*imageRatio/2,0,
-					width3D/2, width3D*imageRatio/2,0,
-					width3D/2, -width3D*imageRatio/2,0);
+			double height3D = width3D*imageRatio;
+
+			rect2D.vertexes.resize(4);
+			rect2D.set(0,-width3D/2,-height3D/2);
+			rect2D.set(1,-width3D/2, height3D/2);
+			rect2D.set(2,width3D/2, height3D/2);
+			rect2D.set(3,width3D/2,-height3D/2);
+
+			UtilShape3D_F64.polygon2Dto3D(rect2D,rectToWorld,rect3D);
 		}
 	}
 
@@ -287,7 +283,7 @@ public class RenderSimulatedFisheye {
 		ImagePanel panel = ShowImages.showWindow(output,"Rendered Fisheye",true);
 
 		for (int i = 0; i < 2000; i++) {
-			alg.getImageRect(0).rectToWorld.T.x = Math.sin(i*0.01);
+			alg.getImageRect(0).rectToWorld.T.x = 0.7*Math.sin(i*0.01);
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,0,i*0.05,
 					alg.getImageRect(1).rectToWorld.R);
 			alg.render();

@@ -54,7 +54,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	double simulatedTargetWidth = 0.3; // size of target in simulated world
 
-	boolean visualizeFailures = false;
+	boolean visualizeFailures = true;
 
 	/**
 	 * Renders an image of the calibration target.
@@ -136,6 +136,8 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 			fail("Number of detected points miss match");
 		}
 
+		visualize(simulator, locations2D, found);
+
 		Point2D_F64 truth = new Point2D_F64();
 
 		for (int i = 0; i < locations2D.size(); i++) {
@@ -182,7 +184,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		}
 
 		ShowImages.showWindow(buff,"Foo",true);
-		BoofMiscOps.sleep(30000);
+		BoofMiscOps.sleep(1000);
 	}
 
 	/**
