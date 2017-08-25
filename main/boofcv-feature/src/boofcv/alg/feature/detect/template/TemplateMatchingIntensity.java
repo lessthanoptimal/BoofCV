@@ -28,13 +28,11 @@ import boofcv.struct.image.ImageBase;
  * matches always have a more positive value.  If a metric inheritally has a small value for
  * better matches then its sign will be adjusted so that poor matches have a negative value.
  * </p>
- * <p/>
  * <p>
  * A pixel in the intensity image is the result of evaluating the template with its center over
  * that pixel.  Given pixel (x,y) in the intensity image the template's top left corner (x',y') can be
  * found at: x' = x - getOffsetX() and y' = y - getOffsetY().
  * </p>
- * <p/>
  * <p>
  * IMAGE BORDER: If the image border is processed or not depends on the implementation.  If the border
  * is processed then partial templates are considered.  If the border is not processed then the

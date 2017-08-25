@@ -19,7 +19,7 @@
 package boofcv.struct.feature;
 
 /**
- * Description for normalized cross correlation (NCC).  The descriptor's value
+ * <p>Description for normalized cross correlation (NCC).  The descriptor's value
  * in a NCC feature is the pixel intensity value minus the mean pixel intensity value.
  * </p>
  * value[i] = I(x,y) - mean

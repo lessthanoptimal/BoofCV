@@ -420,7 +420,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 	/**
 	 * Requests that all active processes be killed.
-	 * @param blockTimeMS If > 0 then it will block until all processes are killed for the specified number
+	 * @param blockTimeMS If &gt; 0 then it will block until all processes are killed for the specified number
 	 *                    of milliseconds
 	 */
 	public void killAllProcesses( long blockTimeMS ) {

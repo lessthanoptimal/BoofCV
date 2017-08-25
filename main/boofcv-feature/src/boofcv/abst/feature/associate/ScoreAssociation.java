@@ -22,7 +22,7 @@ import boofcv.struct.feature.MatchScoreType;
 
 /**
  * Scores the fit quality between two feature descriptions.  A lower score always indicate a better match a larger one.
- * Thus scoreA < scoreB will return true if scoreA is a better score than scoreB.
+ * Thus scoreA &lt; scoreB will return true if scoreA is a better score than scoreB.
  * The range of possible scores is not specified by this interface.  For example, correlation based scores can
  * take on both positive and negative values while Euclidean will always be positive or zero.
  *

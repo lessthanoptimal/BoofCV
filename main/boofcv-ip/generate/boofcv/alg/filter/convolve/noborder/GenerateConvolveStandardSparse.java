@@ -51,7 +51,7 @@ public class GenerateConvolveStandardSparse extends CodeGeneratorBase {
 				"/**\n" +
 				" *\n" +
 				" * <p>\n" +
-				" * General implementation of {@link boofcv.alg.filter.convolve.ConvolveImageNoBorderSparse}.\n" +
+				" * General implementation of "+getClass().getSimpleName()+".\n" +
 				" * </p>\n" +
 				" *\n" +
 				" * <p>\n" +

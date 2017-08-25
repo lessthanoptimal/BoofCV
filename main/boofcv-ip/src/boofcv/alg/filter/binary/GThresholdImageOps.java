@@ -201,7 +201,7 @@ public class GThresholdImageOps {
 
 	/**
 	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values &le;
-	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >
+	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values &gt;
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.

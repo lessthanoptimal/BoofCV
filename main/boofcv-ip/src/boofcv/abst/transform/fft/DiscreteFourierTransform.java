@@ -29,11 +29,12 @@ import boofcv.struct.image.ImageBase;
  * <p>
  * The Fourier transform of an image contains both real an imaginary components. These are stored in the output
  * image in an interleaved format.  As a result the output image will have twice the width and height as the input
- * image. This format is shown below:
+ * image. This format is shown below:</p>
  * <pre>
  * a[i*2*width+2*j] = Re[i][j],
- * a[i*2*width+2*j+1] = Im[i][j], 0&le;i&lt;height, 0&le;j&lt;width,</pre>
- * </p>
+ * a[i*2*width+2*j+1] = Im[i][j], 0&le;i&lt;height, 0&le;j&lt;width
+ * </pre>
+ *
  * <p>
  * INPUT MODIFICATION: By default none of the inputs are modified.  However, in some implementations, memory can be
  * saved by allowing inputs to be modified.  To allow the class to modify its inputs use the following function,

@@ -21,7 +21,7 @@ package boofcv.struct.calib;
 import java.io.Serializable;
 
 /**
- * <p>Adds radial and tangential distortion to the intrinsic parameters of a {@link CameraPinhole pinhole camera}.</p?
+ * <p>Adds radial and tangential distortion to the intrinsic parameters of a {@link CameraPinhole pinhole camera}.</p>
  *
  * <p>
  * Radial and Tangential Distortion:<br>

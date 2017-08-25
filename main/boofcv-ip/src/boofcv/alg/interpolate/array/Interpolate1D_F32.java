@@ -190,7 +190,7 @@ public abstract class Interpolate1D_F32 {
 	/**
 	 * Searches the x array by bisecting it.  This takes advantage of the data being
 	 * monotonic.  This finds a center index which has the following property:
-	 * x[center] &le; val < x[center+1]
+	 * x[center] &le; val &lt; x[center+1]
 	 * From that it selects index0 which is center - M/2.
 	 *
 	 * @param val		The value that is to be interpolated.
