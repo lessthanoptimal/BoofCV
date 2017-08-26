@@ -62,7 +62,7 @@ public class TestCalibrationPlanarGridZhang99 {
 			}
 		}
 		CalibrationPlanarGridZhang99 alg =
-				new CalibrationPlanarGridZhang99(grid,true,2,true);
+				new CalibrationPlanarGridZhang99(grid,new CalibParamPinholeRadial(true,2,true));
 
 		assertTrue(alg.process(observations));
 
@@ -106,7 +106,7 @@ public class TestCalibrationPlanarGridZhang99 {
 
 		List<CalibrationObservation> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
-		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(grid,true,2,true);
+		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(grid,new CalibParamPinholeRadial(true,2,true));
 		assertTrue(alg.optimizedParam(observations, grid, initial, found,null));
 
 		checkEquals(initial, found, initial);
@@ -137,7 +137,7 @@ public class TestCalibrationPlanarGridZhang99 {
 			intrinsic.radial[i] = rand.nextGaussian()*intrinsic.radial[i]*0.1;
 		}
 
-		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(grid,true,2,true);
+		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(grid,new CalibParamPinholeRadial(true,2,true));
 		assertTrue(alg.optimizedParam(observations, grid, initial, found,null));
 
 		checkEquals(expected, found, initial);
@@ -225,7 +225,7 @@ public class TestCalibrationPlanarGridZhang99 {
 
 		public Helper(List<Point2D_F64> layout, boolean assumeZeroSkew,
 					  int numRadial, boolean includeTangential) {
-			super(layout, assumeZeroSkew, numRadial,includeTangential);
+			super(layout, new CalibParamPinholeRadial(assumeZeroSkew, numRadial,includeTangential));
 		}
 
 		public boolean initialParam(List<CalibrationObservation> observations , Zhang99AllParam param  ) {

@@ -86,9 +86,14 @@ public class TestZhang99ParamAll {
 		}
 	}
 
-	private static class Dummy implements Zhang99IntrinsicParam {
+	private static class Dummy extends Zhang99IntrinsicParam {
 
 		public double a;
+
+		@Override
+		public int getNumberOfRadial() {
+			return 0;
+		}
 
 		@Override
 		public void initialize(DMatrixRMaj K, double[] radial) {

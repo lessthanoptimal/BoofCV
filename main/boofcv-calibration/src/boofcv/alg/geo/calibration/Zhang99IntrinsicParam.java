@@ -28,7 +28,12 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
-public interface Zhang99IntrinsicParam {
+public abstract class Zhang99IntrinsicParam {
+
+	// does it assume c = 0?
+	public boolean assumeZeroSkew;
+
+	public abstract int getNumberOfRadial();
 
 	/**
 	 * Set from the initial estimate
@@ -36,17 +41,17 @@ public interface Zhang99IntrinsicParam {
 	 * @param K 3x3 intrinsic matrix
 	 * @param radial Radial distortion parameters
 	 */
-	void initialize(DMatrixRMaj K , double[] radial);
+	public abstract void initialize(DMatrixRMaj K , double[] radial);
 
-	int numParameters();
-	int setFromParam( double param[] );
-	int convertToParam( double param[] );
+	public abstract int numParameters();
+	public abstract int setFromParam( double param[] );
+	public abstract int convertToParam( double param[] );
 
-	<T extends CameraModel>T getCameraModel();
+	public abstract <T extends CameraModel>T getCameraModel();
 
-	Zhang99IntrinsicParam createLike();
+	public abstract Zhang99IntrinsicParam createLike();
 
-	void setTo( Zhang99IntrinsicParam orig );
+	public abstract void setTo( Zhang99IntrinsicParam orig );
 
 	/**
 	 * Projects a point on the camera
@@ -54,5 +59,5 @@ public interface Zhang99IntrinsicParam {
 	 * @param cameraPt (Input) 3D point in camera reference frame. Can be modified.
 	 * @param pixel (Output) Projected pixel coordinate of point
 	 */
-	void project(Point3D_F64 cameraPt , Point2D_F64 pixel );
+	public abstract void project(Point3D_F64 cameraPt , Point2D_F64 pixel );
 }

@@ -30,22 +30,31 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
-public class CalibParamPinholeRadial implements Zhang99IntrinsicParam {
+public class CalibParamPinholeRadial extends Zhang99IntrinsicParam {
 	public CameraPinholeRadial intrinsic;
-
-	// does it assume c = 0?
-	public boolean assumeZeroSkew;
-	// should it estimate the tangential terms?
-	public boolean includeTangential;
 
 	private Point2D_F64 normPt = new Point2D_F64();
 
+	// should it estimate the tangential terms?
+	public boolean includeTangential;
+
+	/**
+	 *
+	 * @param assumeZeroSkew Should it assumed the camera has zero skew. Typically true.
+	 * @param numRadial Number of radial distortion parameters to consider.  Typically 0,1,2.
+	 * @param includeTangential Should it include tangential distortion?
+	 */
 	public CalibParamPinholeRadial(boolean assumeZeroSkew, int numRadial, boolean includeTangential) {
 		this.intrinsic = new CameraPinholeRadial(numRadial);
 		this.assumeZeroSkew = assumeZeroSkew;
 		this.includeTangential = includeTangential;
 	}
 
+
+	@Override
+	public int getNumberOfRadial() {
+		return intrinsic.radial.length;
+	}
 
 	@Override
 	public void initialize(DMatrixRMaj K , double[] radial) {

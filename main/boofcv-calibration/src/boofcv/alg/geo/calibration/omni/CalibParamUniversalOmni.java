@@ -30,7 +30,7 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
-public class CalibParamUniversalOmni implements Zhang99IntrinsicParam
+public class CalibParamUniversalOmni extends Zhang99IntrinsicParam
 {
 	public CameraUniversalOmni intrinsic;
 
@@ -60,6 +60,11 @@ public class CalibParamUniversalOmni implements Zhang99IntrinsicParam
 		intrinsic.set(o.intrinsic);
 		includeTangential = o.includeTangential;
 		assumeZeroSkew = o.assumeZeroSkew;
+	}
+
+	@Override
+	public int getNumberOfRadial() {
+		return intrinsic.radial.length;
 	}
 
 	@Override

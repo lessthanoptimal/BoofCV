@@ -22,6 +22,7 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.Zhang99AllParam;
 import boofcv.alg.geo.calibration.Zhang99OptimizationFunction;
+import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
@@ -101,7 +102,7 @@ public class CalibrateMonoPlanar {
 						   boolean includeTangential )
 	{
 		zhang99 = new CalibrationPlanarGridZhang99(
-				detector.getLayout(),assumeZeroSkew,numRadialParam,includeTangential);
+				detector.getLayout(),new CalibParamPinholeRadial(assumeZeroSkew,numRadialParam,includeTangential));
 	}
 
 	/**

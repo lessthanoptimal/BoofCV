@@ -18,7 +18,6 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
@@ -80,21 +79,15 @@ public class CalibrationPlanarGridZhang99 {
 	 * Configures calibration process.
 	 *
 	 * @param layout Layout of calibration points on the target
-	 * @param assumeZeroSkew Should it assumed the camera has zero skew. Typically true.
-	 * @param numRadialParam Number of radial distortion parameters to consider.  Typically 0,1,2.
-	 * @param includeTangential Should it include tangential distortion?
+	 * @param intrinsicParam
 	 */
-	public CalibrationPlanarGridZhang99(List<Point2D_F64> layout,
-										boolean assumeZeroSkew,
-										int numRadialParam,
-										boolean includeTangential )
+	public CalibrationPlanarGridZhang99(List<Point2D_F64> layout, Zhang99IntrinsicParam intrinsicParam)
 	{
 		this.layout = layout;
 		computeHomography = new Zhang99ComputeTargetHomography(layout);
-		computeK = new Zhang99CalibrationMatrixFromHomographies(assumeZeroSkew);
-		computeRadial = new RadialDistortionEstimateLinear(layout,numRadialParam);
-		optimized = new Zhang99AllParam(
-				new CalibParamPinholeRadial(assumeZeroSkew,numRadialParam,includeTangential),0);
+		computeK = new Zhang99CalibrationMatrixFromHomographies(intrinsicParam.assumeZeroSkew);
+		computeRadial = new RadialDistortionEstimateLinear(layout,intrinsicParam.getNumberOfRadial());
+		optimized = new Zhang99AllParam(intrinsicParam,0);
 		initial = optimized.createLike();
 	}
 
@@ -201,10 +194,10 @@ public class CalibrationPlanarGridZhang99 {
 		Zhang99OptimizationFunction func = new Zhang99OptimizationFunction(
 				initial.createLike(), grid,observations);
 
-		Zhang99OptimizationJacobian jacobian = new Zhang99OptimizationJacobian(
-				(CalibParamPinholeRadial)found.getIntrinsic(), observations,grid);
+//		Zhang99OptimizationJacobian jacobian = new Zhang99OptimizationJacobian(
+//				(CalibParamPinholeRadial)found.getIntrinsic(), observations,grid);
 
-		optimizer.setFunction(func,jacobian);
+		optimizer.setFunction(func,null);
 		optimizer.initialize(model,1e-10,1e-25*observations.size());
 
 		for( int i = 0; i < 500; i++ ) {
