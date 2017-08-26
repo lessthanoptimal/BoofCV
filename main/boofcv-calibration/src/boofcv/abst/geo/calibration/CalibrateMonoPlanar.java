@@ -20,8 +20,8 @@ package boofcv.abst.geo.calibration;
 
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
+import boofcv.alg.geo.calibration.Zhang99AllParam;
 import boofcv.alg.geo.calibration.Zhang99OptimizationFunction;
-import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
@@ -66,7 +66,7 @@ public class CalibrateMonoPlanar {
 	protected CalibrationPlanarGridZhang99 zhang99;
 
 	// computed parameters
-	protected Zhang99ParamAll foundZhang;
+	protected Zhang99AllParam foundZhang;
 	protected CameraPinholeRadial foundIntrinsic;
 
 	// Information on calibration targets and results
@@ -159,7 +159,7 @@ public class CalibrateMonoPlanar {
 
 		errors = computeErrors(observations, foundZhang,detector.getLayout());
 
-		foundIntrinsic = foundZhang.convertToIntrinsic();
+		foundIntrinsic = (CameraPinholeRadial)foundZhang.getIntrinsic().getCameraModel();
 		foundIntrinsic.width = widthImg;
 		foundIntrinsic.height = heightImg;
 
@@ -179,7 +179,7 @@ public class CalibrateMonoPlanar {
 	 * @return List of error statistics
 	 */
 	public static List<ImageResults> computeErrors( List<CalibrationObservation> observation ,
-													Zhang99ParamAll param ,
+													Zhang99AllParam param ,
 													List<Point2D_F64> grid )
 	{
 		Zhang99OptimizationFunction function =
@@ -248,7 +248,7 @@ public class CalibrateMonoPlanar {
 		return errors;
 	}
 
-	public Zhang99ParamAll getZhangParam() {
+	public Zhang99AllParam getZhangParam() {
 		return foundZhang;
 	}
 

@@ -52,7 +52,6 @@ Contour to Line
 - Current algorithm breaks down when there is a mixture of long and short sides. Tuning to make it work on
   them makes it break on others
 
-
 Fisheye Calibration Detectors
    TODO Square Grid
    TODO Asymmetric Circle

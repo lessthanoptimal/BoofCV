@@ -19,6 +19,7 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
+import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.junit.Test;
@@ -61,7 +62,7 @@ public class TestZhang99OptimizationJacobian {
 	}
 
 	private void compareToNumerical(boolean assumeZeroSkew, boolean includeTangential ) {
-		Zhang99ParamAll param = GenericCalibrationGrid.createStandardParam(assumeZeroSkew, 2,includeTangential, 3, rand);
+		Zhang99AllParam param = GenericCalibrationGrid.createStandardParam(assumeZeroSkew, 2,includeTangential, 3, rand);
 
 		List<Point2D_F64> gridPts = CalibrationDetectorSquareGrid.createLayout(3, 2, 30, 30);
 
@@ -87,7 +88,7 @@ public class TestZhang99OptimizationJacobian {
 				new Zhang99OptimizationFunction( param.copy(),gridPts,observations );
 
 		Zhang99OptimizationJacobian alg = new Zhang99OptimizationJacobian(
-				assumeZeroSkew,param.radial.length,param.includeTangential,observations,gridPts);
+				(CalibParamPinholeRadial)param.getIntrinsic(),observations,gridPts);
 
 		// Why does the tolerance need to be so crude?  Is there a fundamental reason for this?
 		double tol = includeTangential ? 0.05 : 0.01;

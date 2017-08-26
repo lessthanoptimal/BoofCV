@@ -21,7 +21,9 @@ package boofcv.alg.geo.calibration;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
+import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.EulerType;
@@ -158,30 +160,27 @@ public class GenericCalibrationGrid {
 		return homographies;
 	}
 
-	public static Zhang99ParamAll createStandardParam(boolean zeroSkew, int numRadial,
+	public static Zhang99AllParam createStandardParam(boolean zeroSkew, int numRadial,
 													  boolean includeTangential,
 													  int numView, Random rand) {
-		Zhang99ParamAll ret = new Zhang99ParamAll(zeroSkew,numRadial,includeTangential,numView);
+		Zhang99AllParam ret = new Zhang99AllParam(
+				new CalibParamPinholeRadial(zeroSkew,numRadial,includeTangential),numView);
 
 		DMatrixRMaj K = createStandardCalibration();
-		ret.a = K.get(0,0);
-		ret.b = K.get(1,1);
-		ret.c = K.get(0,1);
-		ret.x0 = K.get(0,2);
-		ret.y0 = K.get(1,2);
-		if( zeroSkew ) ret.c = 0;
-
-		ret.radial = new double[numRadial];
+		double []radial = new double[numRadial];
 		for( int i = 0; i < numRadial;i++ ) {
-			ret.radial[i] = rand.nextGaussian()*1.0;
+			radial[i] = rand.nextGaussian()*1.0;
 		}
+
+		ret.getIntrinsic().initialize(K,radial);
 
 		if( includeTangential ) {
-			ret.t1 = rand.nextGaussian()*0.1;
-			ret.t2 = rand.nextGaussian()*0.1;
+			CameraPinholeRadial intrinsic = ret.getIntrinsic().getCameraModel();
+			intrinsic.t1 = rand.nextGaussian()*0.1;
+			intrinsic.t2 = rand.nextGaussian()*0.1;
 		}
 
-		for(Zhang99ParamAll.View v : ret.views ) {
+		for(Zhang99AllParam.View v : ret.views ) {
 			double rotX = (rand.nextDouble()-0.5)*0.05;
 			double rotY = (rand.nextDouble()-0.5)*0.05;
 			double rotZ = (rand.nextDouble()-0.5)*0.05;
@@ -197,30 +196,27 @@ public class GenericCalibrationGrid {
 		return ret;
 	}
 
-	public static Zhang99ParamAll createEasierParam(boolean zeroSkew, int numRadial,
-													  boolean includeTangential,
-													  int numView, Random rand) {
-		Zhang99ParamAll ret = new Zhang99ParamAll(zeroSkew,numRadial,includeTangential,numView);
+	public static Zhang99AllParam createEasierParam(boolean zeroSkew, int numRadial,
+													boolean includeTangential,
+													int numView, Random rand) {
+		Zhang99AllParam ret = new Zhang99AllParam(
+				new CalibParamPinholeRadial(zeroSkew,numRadial,includeTangential),numView);
 
 		DMatrixRMaj K = createStandardCalibration();
-		ret.a = K.get(0,0);
-		ret.b = K.get(1,1);
-		ret.c = K.get(0,1);
-		ret.x0 = K.get(0,2);
-		ret.y0 = K.get(1,2);
-		if( zeroSkew ) ret.c = 0;
-
-		ret.radial = new double[numRadial];
+		double []radial = new double[numRadial];
 		for( int i = 0; i < numRadial;i++ ) {
-			ret.radial[i] = rand.nextGaussian()*0.01;
+			radial[i] = rand.nextGaussian()*0.01;
 		}
+
+		ret.getIntrinsic().initialize(K,radial);
 
 		if( includeTangential ) {
-			ret.t1 = rand.nextGaussian()*0.01;
-			ret.t2 = rand.nextGaussian()*0.01;
+			CameraPinholeRadial intrinsic = ret.getIntrinsic().getCameraModel();
+			intrinsic.t1 = rand.nextGaussian()*0.01;
+			intrinsic.t2 = rand.nextGaussian()*0.01;
 		}
 
-		for(Zhang99ParamAll.View v : ret.views ) {
+		for(Zhang99AllParam.View v : ret.views ) {
 			double rotX = (rand.nextDouble()-0.5)*0.1;
 			double rotY = (rand.nextDouble()-0.5)*0.1;
 			double rotZ = (rand.nextDouble()-0.5)*0.1;
@@ -236,12 +232,11 @@ public class GenericCalibrationGrid {
 		return ret;
 	}
 
-
 	/**
 	 * Creates a set of observed points in pixel coordinates given zhang parameters and a calibration
 	 * grid.
 	 */
-	public static List<CalibrationObservation> createObservations( Zhang99ParamAll config,
+	public static List<CalibrationObservation> createObservations( Zhang99AllParam config,
 															  List<Point2D_F64> grid)
 	{
 		List<CalibrationObservation> ret = new ArrayList<>();
@@ -249,7 +244,9 @@ public class GenericCalibrationGrid {
 		Point3D_F64 cameraPt = new Point3D_F64();
 		Point2D_F64 calibratedPt = new Point2D_F64();
 
-		for( Zhang99ParamAll.View v : config.views ) {
+		CameraPinholeRadial intrinsic = config.getIntrinsic().getCameraModel();
+
+		for( Zhang99AllParam.View v : config.views ) {
 			CalibrationObservation set = new CalibrationObservation();
 			Se3_F64 se = new Se3_F64();
 			ConvertRotation3D_F64.rodriguesToMatrix(v.rotation,se.getR());
@@ -267,11 +264,11 @@ public class GenericCalibrationGrid {
 				calibratedPt.y = cameraPt.y/ cameraPt.z;
 
 				// apply radial distortion
-				CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, config.radial,config.t1,config.t2);
+				CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, intrinsic.radial,intrinsic.t1,intrinsic.t2);
 
 				// convert to pixel coordinates
-				double x = config.a*calibratedPt.x + config.c*calibratedPt.y + config.x0;
-				double y = config.b*calibratedPt.y + config.y0;
+				double x = intrinsic.fx*calibratedPt.x + intrinsic.skew*calibratedPt.y + intrinsic.cx;
+				double y = intrinsic.fy*calibratedPt.y + intrinsic.cy;
 
 				set.add(new Point2D_F64(x, y),i);
 			}

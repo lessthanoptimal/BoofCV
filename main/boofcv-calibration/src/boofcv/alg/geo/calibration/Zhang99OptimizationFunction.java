@@ -40,13 +40,14 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 	// description of the calibration grid
 	private List<Point3D_F64> grid = new ArrayList<>();
 	// optimization parameters
-	private Zhang99ParamAll param;
+	private Zhang99AllParam param;
 
 	// variables for storing intermediate results
 	private Se3_F64 se = new Se3_F64();
 
 	private Point3D_F64 cameraPt = new Point3D_F64();
-	private Point2D_F64 normPt = new Point2D_F64();
+	private Point2D_F64 pixelPt = new Point2D_F64();
+
 
 	// observations
 	private List<CalibrationObservation> observations;
@@ -59,7 +60,7 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 	 * @param grid Location of points on the calibration grid.  z=0
 	 * @param observations calibration point observation pixel coordinates
 	 */
-	public Zhang99OptimizationFunction(Zhang99ParamAll param,
+	public Zhang99OptimizationFunction(Zhang99AllParam param,
 									   List<Point2D_F64> grid,
 									   List<CalibrationObservation> observations) {
 		if( param.views.length != observations.size() )
@@ -93,11 +94,11 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 		process(param,output);
 	}
 
-	public void process( Zhang99ParamAll param , double []residuals ) {
+	public void process(Zhang99AllParam param , double []residuals ) {
 		int index = 0;
 		for( int indexView = 0; indexView < param.views.length; indexView++ ) {
 
-			Zhang99ParamAll.View v = param.views[indexView];
+			Zhang99AllParam.View v = param.views[indexView];
 
 			ConvertRotation3D_F64.rodriguesToMatrix(v.rotation,se.getR());
 			se.T = v.T;
@@ -112,19 +113,10 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 				// Put the point in the camera's reference frame
 				SePointOps_F64.transform(se,grid.get(gridIndex), cameraPt);
 
-				// normalized image coordinates
-				normPt.x = cameraPt.x/ cameraPt.z;
-				normPt.y = cameraPt.y/ cameraPt.z;
+				param.getIntrinsic().project(cameraPt,pixelPt);
 
-				// apply distortion
-				CalibrationPlanarGridZhang99.applyDistortion(normPt, param.radial, param.t1, param.t2);
-
-				// convert to pixel coordinates
-				double x = param.a * normPt.x + param.c * normPt.y + param.x0;
-				double y = param.b * normPt.y + param.y0;
-
-				residuals[index++] = x-obs.x;
-				residuals[index++] = y-obs.y;
+				residuals[index++] = pixelPt.x-obs.x;
+				residuals[index++] = pixelPt.y-obs.y;
 			}
 		}
 	}

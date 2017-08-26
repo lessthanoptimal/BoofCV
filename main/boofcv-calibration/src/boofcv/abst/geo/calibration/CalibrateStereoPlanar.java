@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.calibration;
 
-import boofcv.alg.geo.calibration.Zhang99ParamAll;
+import boofcv.alg.geo.calibration.Zhang99AllParam;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
@@ -142,9 +142,9 @@ public class CalibrateStereoPlanar {
 	{
 		CameraPinholeRadial intrinsic = calib.process();
 
-		Zhang99ParamAll zhangParam = calib.getZhangParam();
+		Zhang99AllParam zhangParam = calib.getZhangParam();
 
-		for( Zhang99ParamAll.View v : zhangParam.views ) {
+		for( Zhang99AllParam.View v : zhangParam.views ) {
 			Se3_F64 pose = new Se3_F64();
 			ConvertRotation3D_F64.rodriguesToMatrix(v.rotation,pose.getR());
 			pose.getT().set(v.T);

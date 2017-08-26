@@ -19,6 +19,8 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.alg.geo.RodriguesRotationJacobian;
+import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
@@ -74,7 +76,8 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	private Point2D_F64 dnormPt = new Point2D_F64();
 
 	// stores the optimization parameters
-	private Zhang99ParamCamera param;
+	private CalibParamPinholeRadial param;
+	private CameraPinholeRadial intrinsic;
 
 	// output index for x and y
 	int indexJacX;
@@ -87,12 +90,10 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	 *
 	 * @param grid Location of points on the calibration grid.  z=0
 	 */
-	public Zhang99OptimizationJacobian(boolean assumeZeroSkew,
-									   int numRadial ,
-									   boolean includeTangential,
+	public Zhang99OptimizationJacobian(CalibParamPinholeRadial param,
 									   List<CalibrationObservation> observationSets,
 									   List<Point2D_F64> grid ) {
-		this.param = new Zhang99ParamCamera(assumeZeroSkew,numRadial,includeTangential);
+		this.param = param;
 		this.observationSets = observationSets;
 
 		for( Point2D_F64 p : grid ) {
@@ -102,7 +103,6 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 		numParam = param.numParameters()+(3+3)*observationSets.size();
 
 		numFuncs = CalibrationPlanarGridZhang99.totalPoints(observationSets)*2;
-		param.zeroNotUsed();
 	}
 
 	@Override
@@ -118,7 +118,8 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	@Override
 	public void process(double[] input, double[] output) {
 		int index = param.setFromParam(input);
-
+		intrinsic = (CameraPinholeRadial)param.getCameraModel();
+		
 		int indexPoint = 0;
 		for( int indexView = 0; indexView < observationSets.size(); indexView++ ) {
 			CalibrationObservation set = observationSets.get(indexView);
@@ -153,7 +154,7 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 
 				// apply distortion to the normalized coordinate
 				dnormPt.set(normPt);
-				CalibrationPlanarGridZhang99.applyDistortion(dnormPt, param.radial, param.t1, param.t2);
+				CalibrationPlanarGridZhang99.applyDistortion(dnormPt, intrinsic.radial, intrinsic.t1, intrinsic.t2);
 
 				calibrationGradient(dnormPt,output);
 				distortGradient(normPt,output);
@@ -198,12 +199,12 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 
 		double r2 = norm.x*norm.x + norm.y*norm.y;
 		double r2i = r2;
-		for( int i = 0; i < param.radial.length; i++ ) {
+		for( int i = 0; i < intrinsic.radial.length; i++ ) {
 			double xdot = norm.x*r2i;
 			double ydot = norm.y*r2i;
 
-			output[indexJacX++] = param.a*xdot + param.c*ydot;
-			output[indexJacY++] = param.b*ydot;
+			output[indexJacX++] = intrinsic.fx*xdot + intrinsic.skew*ydot;
+			output[indexJacY++] = intrinsic.fy*ydot;
 			r2i *= r2;
 		}
 
@@ -212,11 +213,11 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 			double r2yy = r2 + 2*norm.y*norm.y;
 			double r2xx = r2 + 2*norm.x*norm.x;
 
-			output[indexJacX++] = param.a*xy2 + param.c*r2yy;
-			output[indexJacY++] = param.b*r2yy;
+			output[indexJacX++] = intrinsic.fx*xy2 + intrinsic.skew*r2yy;
+			output[indexJacY++] = intrinsic.fy*r2yy;
 
-			output[indexJacX++] = param.a*r2xx + param.c*xy2;
-			output[indexJacY++] = param.b*xy2;
+			output[indexJacX++] = intrinsic.fx*r2xx + intrinsic.skew*xy2;
+			output[indexJacY++] = intrinsic.fy*xy2;
 		}
 	}
 
@@ -246,9 +247,9 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 		double sum = 0;
 		double sumdot = 0;
 
-		for( int i = 0; i < param.radial.length; i++ ) {
-			sum += param.radial[i]*r2i;
-			sumdot += param.radial[i]*2*(i+1)*rdev;
+		for( int i = 0; i < intrinsic.radial.length; i++ ) {
+			sum += intrinsic.radial[i]*r2i;
+			sumdot += intrinsic.radial[i]*2*(i+1)*rdev;
 
 			r2i *= r2;
 			rdev *= r2;
@@ -270,12 +271,12 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 //		double zdot = 0;
 
 		if( param.includeTangential ) {
-			xdot += 2*param.t1*(n_dot_x*y + x*n_dot_y) + 6*param.t2*x*n_dot_x + 2*param.t2*y*n_dot_y;
-			ydot += 2*param.t1*x*n_dot_x + 6*param.t1*y*n_dot_y + 2*param.t2*(n_dot_x*y + x*n_dot_y);
+			xdot += 2*intrinsic.t1*(n_dot_x*y + x*n_dot_y) + 6*intrinsic.t2*x*n_dot_x + 2*intrinsic.t2*y*n_dot_y;
+			ydot += 2*intrinsic.t1*x*n_dot_x + 6*intrinsic.t1*y*n_dot_y + 2*intrinsic.t2*(n_dot_x*y + x*n_dot_y);
 		}
 
-		output[indexJacX++] = param.a*xdot + param.c*ydot;
-		output[indexJacY++] = param.b*ydot;
+		output[indexJacX++] = intrinsic.fx*xdot + intrinsic.skew*ydot;
+		output[indexJacY++] = intrinsic.fy*ydot;
 	}
 
 	/**
@@ -300,9 +301,9 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 		double sum = 0;
 		double sumdot = 0;
 
-		for( int i = 0; i < param.radial.length; i++ ) {
-			sum += param.radial[i]*r2i;
-			sumdot += param.radial[i]*(i+1)*rdev;
+		for( int i = 0; i < intrinsic.radial.length; i++ ) {
+			sum += intrinsic.radial[i]*r2i;
+			sumdot += intrinsic.radial[i]*(i+1)*rdev;
 
 			r2i *= r2;
 			rdev *= r2;
@@ -312,23 +313,23 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 		double ydot = sumdot*2*x*y/cameraPt.z;
 		// double zdot = 0
 		if( param.includeTangential ) {
-			xdot += (2*param.t1*y + param.t2*6*x)/cameraPt.z;
-			ydot += (2*param.t1*x + 2*y*param.t2)/cameraPt.z;
+			xdot += (2*intrinsic.t1*y + intrinsic.t2*6*x)/cameraPt.z;
+			ydot += (2*intrinsic.t1*x + 2*y*intrinsic.t2)/cameraPt.z;
 		}
 
-		output[indexJacX++] = param.a*xdot + param.c*ydot;
-		output[indexJacY++] = param.b*ydot;
+		output[indexJacX++] = intrinsic.fx*xdot + intrinsic.skew*ydot;
+		output[indexJacY++] = intrinsic.fy*ydot;
 
 		// Partial T.y
 		xdot = sumdot*2*y*x/cameraPt.z;
 		ydot = sumdot*2*y*y/cameraPt.z + (1 + sum)/cameraPt.z;
 		if( param.includeTangential ) {
-			xdot += (2*param.t1*x + param.t2*2*y)/cameraPt.z;
-			ydot += (6*param.t1*y + 2*x*param.t2)/cameraPt.z;
+			xdot += (2*intrinsic.t1*x + intrinsic.t2*2*y)/cameraPt.z;
+			ydot += (6*intrinsic.t1*y + 2*x*intrinsic.t2)/cameraPt.z;
 		}
 
-		output[indexJacX++] = param.a*xdot + param.c*ydot;
-		output[indexJacY++] = param.b*ydot;
+		output[indexJacX++] = intrinsic.fx*xdot + intrinsic.skew*ydot;
+		output[indexJacY++] = intrinsic.fy*ydot;
 
 		// Partial T.z
 		xdot = -sumdot*2*r2*x/cameraPt.z;
@@ -338,11 +339,11 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 		ydot += -(1 + sum)*y/cameraPt.z;
 
 		if( param.includeTangential ) {
-			xdot += -(4*param.t1*x*y + 6*param.t2*x*x + 2*param.t2*y*y)/cameraPt.z;
-			ydot += -(2*param.t1*x*x + 6*param.t1*y*y + 4*x*y*param.t2)/cameraPt.z;
+			xdot += -(4*intrinsic.t1*x*y + 6*intrinsic.t2*x*x + 2*intrinsic.t2*y*y)/cameraPt.z;
+			ydot += -(2*intrinsic.t1*x*x + 6*intrinsic.t1*y*y + 4*x*y*intrinsic.t2)/cameraPt.z;
 		}
 
-		output[indexJacX++] = param.a*xdot + param.c*ydot;
-		output[indexJacY++] = param.b*ydot;
+		output[indexJacX++] = intrinsic.fx*xdot + intrinsic.skew*ydot;
+		output[indexJacY++] = intrinsic.fy*ydot;
 	}
 }

@@ -18,6 +18,8 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.misc.test.GeometryUnitTest;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -47,7 +49,7 @@ public class TestCalibrationPlanarGridZhang99 {
 
 	public void fullTest( boolean partial ) {
 		List<Point2D_F64> grid = GenericCalibrationGrid.standardLayout();
-		Zhang99ParamAll expected = GenericCalibrationGrid.createStandardParam(true,2,true,3,rand);
+		Zhang99AllParam expected = GenericCalibrationGrid.createStandardParam(true,2,true,3,rand);
 
 		List<CalibrationObservation> observations = GenericCalibrationGrid.createObservations(expected,grid);
 
@@ -60,13 +62,15 @@ public class TestCalibrationPlanarGridZhang99 {
 			}
 		}
 		CalibrationPlanarGridZhang99 alg =
-				new CalibrationPlanarGridZhang99(grid,expected.assumeZeroSkew,2,expected.includeTangential);
+				new CalibrationPlanarGridZhang99(grid,true,2,true);
 
 		assertTrue(alg.process(observations));
 
-		Zhang99ParamAll found = alg.getOptimized();
+		Zhang99AllParam found = alg.getOptimized();
 
-		checkIntrinsicOnly(expected, found,0.01,0.1,0.1);
+		checkIntrinsicOnly(
+				(CameraPinholeRadial)expected.getIntrinsic().getCameraModel(),
+				(CameraPinholeRadial)found.getIntrinsic().getCameraModel(),0.01,0.1,0.1);
 	}
 
 	/**
@@ -75,16 +79,19 @@ public class TestCalibrationPlanarGridZhang99 {
 	@Test
 	public void initialParam() {
 		List<Point2D_F64> grid = GenericCalibrationGrid.standardLayout();
-		Zhang99ParamAll initial = GenericCalibrationGrid.createEasierParam(true, 2, false, 3, rand);
+		Zhang99AllParam initial = GenericCalibrationGrid.createEasierParam(true, 2, false, 3, rand);
 		// tangential can't be linearly estimated
 
 		List<CalibrationObservation> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
 		Helper alg = new Helper(grid,true,2,false);
 
-		Zhang99ParamAll found = alg.initialParam(observations);
+		Zhang99AllParam found = initial.createLike();
+		alg.initialParam(observations,found);
 
-		checkIntrinsicOnly(initial, found, 0.01, 0.1, 0.1);
+		checkIntrinsicOnly(
+				(CameraPinholeRadial)initial.getIntrinsic().getCameraModel(),
+				(CameraPinholeRadial)found.getIntrinsic().getCameraModel(), 0.01, 0.1, 0.1);
 	}
 
 	/**
@@ -94,8 +101,8 @@ public class TestCalibrationPlanarGridZhang99 {
 	public void optimizedParam_perfect() {
 
 		List<Point2D_F64> grid = GenericCalibrationGrid.standardLayout();
-		Zhang99ParamAll initial = GenericCalibrationGrid.createStandardParam(true,2,true,3,rand);
-		Zhang99ParamAll found = new Zhang99ParamAll(true,2,true,3);
+		Zhang99AllParam initial = GenericCalibrationGrid.createStandardParam(true,2,true,3,rand);
+		Zhang99AllParam found = new Zhang99AllParam(new CalibParamPinholeRadial(true,2,true),3);
 
 		List<CalibrationObservation> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
@@ -112,21 +119,22 @@ public class TestCalibrationPlanarGridZhang99 {
 	public void optimizedParam_noisy() {
 
 		List<Point2D_F64> grid = GenericCalibrationGrid.standardLayout();
-		Zhang99ParamAll initial = GenericCalibrationGrid.createStandardParam(true,2,true,3,rand);
-		Zhang99ParamAll expected = initial.copy();
-		Zhang99ParamAll found = new Zhang99ParamAll(true,2,true,3);
+		Zhang99AllParam initial = GenericCalibrationGrid.createStandardParam(true,2,true,3,rand);
+		Zhang99AllParam expected = initial.copy();
+		Zhang99AllParam found = new Zhang99AllParam(new CalibParamPinholeRadial(true,2,true),3);
 
 		List<CalibrationObservation> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
 		// add a tinny bit of noise
-		initial.a += rand.nextDouble()*0.01*Math.abs(initial.a);
-		initial.b += rand.nextDouble()*0.01*Math.abs(initial.b);
-		initial.c += rand.nextDouble()*0.01*Math.abs(initial.c);
-		initial.x0 += rand.nextDouble()*0.01*Math.abs(initial.x0);
-		initial.y0 += rand.nextDouble()*0.01*Math.abs(initial.y0);
+		CameraPinholeRadial intrinsic = initial.getIntrinsic().getCameraModel();
+		intrinsic.fx += rand.nextDouble()*0.01*Math.abs(intrinsic.fx);
+		intrinsic.fy += rand.nextDouble()*0.01*Math.abs(intrinsic.fy);
+		intrinsic.skew += rand.nextDouble()*0.01*Math.abs(intrinsic.skew);
+		intrinsic.cx += rand.nextDouble()*0.01*Math.abs(intrinsic.cx);
+		intrinsic.cy += rand.nextDouble()*0.01*Math.abs(intrinsic.cy);
 
-		for( int i = 0; i < expected.radial.length; i++ ) {
-			initial.radial[i] = rand.nextGaussian()*expected.radial[i]*0.1;
+		for( int i = 0; i < intrinsic.radial.length; i++ ) {
+			intrinsic.radial[i] = rand.nextGaussian()*intrinsic.radial[i]*0.1;
 		}
 
 		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(grid,true,2,true);
@@ -153,13 +161,13 @@ public class TestCalibrationPlanarGridZhang99 {
 		assertEquals(distorted.y, n.y, 1e-8);
 	}
 
-	private void checkIntrinsicOnly(Zhang99ParamAll initial,
-									Zhang99ParamAll found , double tolK , double tolD , double tolT ) {
-		assertEquals(initial.a,found.a,Math.abs(initial.a)*tolK);
-		assertEquals(initial.b,found.b,Math.abs(initial.b)*tolK);
-		assertEquals(initial.c,found.c,Math.abs(initial.c)*tolK);
-		assertEquals(initial.x0,found.x0,Math.abs(initial.x0)*tolK);
-		assertEquals(initial.y0, found.y0, Math.abs(initial.y0) * tolK);
+	private void checkIntrinsicOnly(CameraPinholeRadial initial,
+									CameraPinholeRadial found , double tolK , double tolD , double tolT ) {
+		assertEquals(initial.fx,found.fx,Math.abs(initial.fx)*tolK);
+		assertEquals(initial.fy,found.fy,Math.abs(initial.fy)*tolK);
+		assertEquals(initial.skew,found.skew,Math.abs(initial.skew)*tolK);
+		assertEquals(initial.cx,found.cx,Math.abs(initial.cx)*tolK);
+		assertEquals(initial.cy, found.cy, Math.abs(initial.cy) * tolK);
 
 		for( int i = 0; i < initial.radial.length; i++ ) {
 			assertEquals(initial.radial[i],found.radial[i],tolD);
@@ -168,19 +176,38 @@ public class TestCalibrationPlanarGridZhang99 {
 		assertEquals(initial.t2,found.t2,tolT);
 	}
 
-	public static void checkEquals( Zhang99ParamAll expected ,
-									Zhang99ParamAll found ,
-									Zhang99ParamAll initial )
+	public static void checkEquals( Zhang99AllParam expected ,
+									Zhang99AllParam found ,
+									Zhang99AllParam initial )
 	{
+		checkEquals((CameraPinholeRadial)expected.getIntrinsic().getCameraModel(),
+				(CameraPinholeRadial)found.getIntrinsic().getCameraModel(),
+				(CameraPinholeRadial)initial.getIntrinsic().getCameraModel());
+
 		double pixelTol=0.5;
+
+		for( int i = 0; i < 2; i++ ) {
+			Zhang99AllParam.View pp = expected.views[i];
+			Zhang99AllParam.View ff = found.views[i];
+
+			GeometryUnitTest.assertEquals(pp.T, ff.T, pixelTol);
+			GeometryUnitTest.assertEquals(pp.rotation.unitAxisRotation,ff.rotation.unitAxisRotation,pixelTol);
+			assertEquals(pp.rotation.theta,ff.rotation.theta,pixelTol);
+		}
+	}
+
+	private static void checkEquals( CameraPinholeRadial expected ,
+									 CameraPinholeRadial found ,
+									 CameraPinholeRadial initial )
+	{
 		double paramTol=0.3;
 
 		// see if it improved the estimate
-		assertTrue(Math.abs(expected.a-initial.a)*paramTol >= Math.abs(expected.a-found.a));
-		assertTrue(Math.abs(expected.b-initial.b)*paramTol >= Math.abs(expected.b-found.b));
-		assertEquals(expected.c, found.c, 1e-5);
-		assertTrue(Math.abs(expected.x0-initial.x0)*paramTol >= Math.abs(expected.x0-found.x0));
-		assertTrue(Math.abs(expected.y0-initial.y0)*paramTol >= Math.abs(expected.y0-found.y0));
+		assertTrue(Math.abs(expected.fx-initial.fx)*paramTol >= Math.abs(expected.fx-found.fx));
+		assertTrue(Math.abs(expected.fy-initial.fy)*paramTol >= Math.abs(expected.fy-found.fy));
+		assertEquals(expected.skew, found.skew, 1e-5);
+		assertTrue(Math.abs(expected.cx-initial.cx)*paramTol >= Math.abs(expected.cx-found.cx));
+		assertTrue(Math.abs(expected.cy-initial.cy)*paramTol >= Math.abs(expected.cy-found.cy));
 
 		for( int i = 0; i < expected.radial.length; i++ ) {
 			double e = expected.radial[i];
@@ -191,15 +218,6 @@ public class TestCalibrationPlanarGridZhang99 {
 
 		assertTrue(Math.abs(expected.t1 - found.t1) <= Math.abs(initial.t1 - found.t1));
 		assertTrue(Math.abs(expected.t2 - found.t2) <= Math.abs(initial.t2 - found.t2));
-
-		for( int i = 0; i < 2; i++ ) {
-			Zhang99ParamAll.View pp = expected.views[i];
-			Zhang99ParamAll.View ff = found.views[i];
-
-			GeometryUnitTest.assertEquals(pp.T, ff.T, pixelTol);
-			GeometryUnitTest.assertEquals(pp.rotation.unitAxisRotation,ff.rotation.unitAxisRotation,pixelTol);
-			assertEquals(pp.rotation.theta,ff.rotation.theta,pixelTol);
-		}
 	}
 
 	private static class Helper extends CalibrationPlanarGridZhang99
@@ -210,8 +228,8 @@ public class TestCalibrationPlanarGridZhang99 {
 			super(layout, assumeZeroSkew, numRadial,includeTangential);
 		}
 
-		public Zhang99ParamAll initialParam( List<CalibrationObservation> observations ) {
-			return super.initialParam(observations);
+		public boolean initialParam(List<CalibrationObservation> observations , Zhang99AllParam param  ) {
+			return super.initialParam(observations,param);
 		}
 	}
 }
