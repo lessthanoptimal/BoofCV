@@ -59,8 +59,6 @@ Fisheye Calibration Detectors
 
 Calibration
    TODO Analytic jacobian for universal omni.  After design have stabilized
-   TODO Provide a mechanism to provide a hint at parameters which can't be estimated linearly.
-   TODO Add regularization?
 
 TOP ITEMS
 - TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
@@ -69,10 +67,10 @@ TOP ITEMS
 - TODO Fisheye calibration using omni model
 - TODO QR Code support
 
-
 OTHER ITEMS
 - TODO Calibration Target PS generator unit test
        Convert document into a graphic and detect
+- TODO Update IntensityPointFeatureApp. Let it select image to open
 - TODO Visualization tools for Direct VO
 -      Show warped image
 - TODO ExampleRectifyUncalibratedStereo is upside down.  Adjust the math to avoid that

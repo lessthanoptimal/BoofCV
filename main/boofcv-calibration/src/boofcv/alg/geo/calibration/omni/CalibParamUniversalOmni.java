@@ -121,7 +121,7 @@ public class CalibParamUniversalOmni extends Zhang99IntrinsicParam
 		intrinsic.t1 = intrinsic.t2 = 0;
 
 		if( !fixedMirror )
-			intrinsic.mirrorOffset = 0;
+			intrinsic.mirrorOffset = 0; // paper recommends 1. Doesn't seem to make a difference
 
 		sphereToPixel.setModel(intrinsic);
 	}

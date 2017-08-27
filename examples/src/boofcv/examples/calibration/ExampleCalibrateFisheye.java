@@ -56,7 +56,7 @@ public class ExampleCalibrateFisheye {
 
 		// Chessboard Example
 		detector = FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));
-		images = UtilIO.directoryList(UtilIO.pathExample("calibration/fisheye/chessboard"),"image");
+		images = UtilIO.directoryList(UtilIO.pathExample("calibration/fisheye/chessboard"),"right");
 
 		// Declare and setup the calibration algorithm
 		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector);
@@ -64,9 +64,9 @@ public class ExampleCalibrateFisheye {
 		// tell it type type of target and which parameters to estimate
 		calibrationAlg.configureUniversalOmni( true, 2, false);
 
-		// it's also possible to provide an initial estimate of the mirrorOffset parameter
-		// TODO Is this a desirable feature?
-		calibrationAlg.configureUniversalOmni( true, 2, false,1.0);
+		// it's also possible to fix the mirror offset parameter
+		// 0 = pinhole camera. 1 = fisheye
+//		calibrationAlg.configureUniversalOmni( true, 2, false,1.0);
 
 
 		for( String n : images ) {
