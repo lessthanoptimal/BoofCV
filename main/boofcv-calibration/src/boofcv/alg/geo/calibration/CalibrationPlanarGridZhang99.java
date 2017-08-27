@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
@@ -110,7 +111,7 @@ public class CalibrationPlanarGridZhang99 {
 	public boolean process( List<CalibrationObservation> observations ) {
 
 		// compute initial parameter estimates using linear algebra
-		if( !initialParam(observations,initial) )
+		if( !linearEstimate(observations,initial) )
 			return false;
 
 		status("Non-linear refinement");
@@ -125,7 +126,7 @@ public class CalibrationPlanarGridZhang99 {
 	/**
 	 * Find an initial estimate for calibration parameters using linear techniques.
 	 */
-	protected boolean initialParam(List<CalibrationObservation> observations , Zhang99AllParam param )
+	protected boolean linearEstimate(List<CalibrationObservation> observations , Zhang99AllParam param )
 	{
 		status("Estimating Homographies");
 		List<DMatrixRMaj> homographies = new ArrayList<>();
@@ -194,10 +195,10 @@ public class CalibrationPlanarGridZhang99 {
 		Zhang99OptimizationFunction func = new Zhang99OptimizationFunction(
 				initial.createLike(), grid,observations);
 
-//		Zhang99OptimizationJacobian jacobian = new Zhang99OptimizationJacobian(
-//				(CalibParamPinholeRadial)found.getIntrinsic(), observations,grid);
+		Zhang99OptimizationJacobian jacobian = new Zhang99OptimizationJacobian(
+				(CalibParamPinholeRadial)found.getIntrinsic(), observations,grid);
 
-		optimizer.setFunction(func,null);
+		optimizer.setFunction(func,jacobian);
 		optimizer.initialize(model,1e-10,1e-25*observations.size());
 
 		for( int i = 0; i < 500; i++ ) {

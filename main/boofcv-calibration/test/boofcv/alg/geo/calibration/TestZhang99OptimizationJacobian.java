@@ -20,6 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
+import boofcv.alg.geo.calibration.pinhole.TestPinholeCalibrationZhang99;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.junit.Test;
@@ -62,7 +63,8 @@ public class TestZhang99OptimizationJacobian {
 	}
 
 	private void compareToNumerical(boolean assumeZeroSkew, boolean includeTangential ) {
-		Zhang99AllParam param = GenericCalibrationGrid.createStandardParam(assumeZeroSkew, 2,includeTangential, 3, rand);
+		Zhang99AllParam param = GenericCalibrationGrid.createStandardParam(
+				TestPinholeCalibrationZhang99.createStandard(assumeZeroSkew, includeTangential,2,rand), 3, rand);
 
 		List<Point2D_F64> gridPts = CalibrationDetectorSquareGrid.createLayout(3, 2, 30, 30);
 

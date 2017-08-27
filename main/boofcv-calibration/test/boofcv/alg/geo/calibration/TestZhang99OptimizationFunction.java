@@ -19,6 +19,7 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
+import boofcv.alg.geo.calibration.pinhole.TestPinholeCalibrationZhang99;
 import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -45,7 +46,8 @@ public class TestZhang99OptimizationFunction {
 	 */
 	@Test
 	public void computeResidualsPerfect() {
-		Zhang99AllParam param = GenericCalibrationGrid.createStandardParam(false, 2, true, 3, rand);
+		Zhang99AllParam param = GenericCalibrationGrid.createStandardParam(
+				TestPinholeCalibrationZhang99.createStandard(false,  true,2,rand), 3, rand);
 
 		double array[] = new double[ param.numParameters() ];
 		param.convertToParam(array);
@@ -116,7 +118,8 @@ public class TestZhang99OptimizationFunction {
 	 */
 	@Test
 	public void computeResidualsPerfect_partial() {
-		Zhang99AllParam param = GenericCalibrationGrid.createStandardParam(false, 2, true, 3, rand);
+		Zhang99AllParam param = GenericCalibrationGrid.createStandardParam(
+				TestPinholeCalibrationZhang99.createStandard(false, true,2,rand), 3, rand);
 
 		double array[] = new double[ param.numParameters() ];
 		param.convertToParam(array);
