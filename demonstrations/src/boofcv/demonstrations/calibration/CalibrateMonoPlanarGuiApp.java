@@ -204,12 +204,11 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 //				FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleAsymmetricGrid(5, 8, 1, 6));
 
 		List<String> images;
-//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square"),"frame");
-//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess"),"frame");
-//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleAsym"),"image");
-//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang"),"CalibIm");
-//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration//stereo/Bumblebee2_Square"),"left");
-		images = UtilIO.directoryList("/home/pja/projects/ValidationBoof/scripts/output","right");
+//		images = UtilIO.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square"),"frame");
+		images = UtilIO.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess"),"frame");
+//		images = UtilIO.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleAsym"),"image");
+//		images = UtilIO.directoryList(UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang"),"CalibIm");
+//		images = UtilIO.directoryList(UtilIO.pathExample("calibration//stereo/Bumblebee2_Square"),"left");
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
 		app.configure(detector,images,2,false);

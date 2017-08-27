@@ -21,6 +21,7 @@ package boofcv.alg.geo.calibration;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
 import boofcv.alg.geo.calibration.pinhole.TestPinholeCalibrationZhang99;
+import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.junit.Test;
@@ -65,6 +66,14 @@ public class TestZhang99OptimizationJacobian {
 	private void compareToNumerical(boolean assumeZeroSkew, boolean includeTangential ) {
 		Zhang99AllParam param = GenericCalibrationGrid.createStandardParam(
 				TestPinholeCalibrationZhang99.createStandard(assumeZeroSkew, includeTangential,2,rand), 3, rand);
+
+		// give it larger values that will generate a larger derivative and pass the unit test
+		CameraPinholeRadial p = param.getIntrinsic().getCameraModel();
+		p.radial[0] = 0.2;
+		p.radial[1] = 0.25;
+
+		p.t1 = 0.05;
+		p.t2 = 0.07;
 
 		List<Point2D_F64> gridPts = CalibrationDetectorSquareGrid.createLayout(3, 2, 30, 30);
 

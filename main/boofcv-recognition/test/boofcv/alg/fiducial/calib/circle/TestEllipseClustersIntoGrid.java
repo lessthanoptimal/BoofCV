@@ -130,7 +130,7 @@ public class TestEllipseClustersIntoGrid {
 
 		for (int i = 0; i < 10; i++) {
 			NodeInfo n = new NodeInfo();
-			n.angleBetween = 2.0*Math.PI*i/10.0 + 0.01;
+			n.angleBetween = best.angleBetween*(i/10.0);
 			alg.contour.add( n );
 
 			if( i == 4 )

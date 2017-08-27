@@ -24,22 +24,22 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 
 /**
- * Given a
+ * Given a transform from pixels to normalized image coordinate it will output unit sphere coordinates.
  *
  * @author Peter Abeles
  */
 public class NarrowPixelToSphere_F64 implements Point2Transform3_F64 {
 
-	Point2Transform2_F64 pixelToProj;
+	Point2Transform2_F64 pixelToNorm;
 	Point2D_F64 projected = new Point2D_F64();
 
-	public NarrowPixelToSphere_F64(Point2Transform2_F64 pixelToProj) {
-		this.pixelToProj = pixelToProj;
+	public NarrowPixelToSphere_F64(Point2Transform2_F64 pixelToNorm) {
+		this.pixelToNorm = pixelToNorm;
 	}
 
 	@Override
 	public void compute(double x, double y, Point3D_F64 out) {
-		pixelToProj.compute(x,y,projected);
+		pixelToNorm.compute(x,y,projected);
 
 		out.set(projected.x,projected.y,1);
 		out.scale( 1.0/out.norm() );

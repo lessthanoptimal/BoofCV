@@ -1,3 +1,7 @@
+# Jacobian
+
+* Added analytic jacobian for universal omni
+
 # Regularization
 
 The optimization step might benefit from regularization to prevent rediculous solutions from being generated.

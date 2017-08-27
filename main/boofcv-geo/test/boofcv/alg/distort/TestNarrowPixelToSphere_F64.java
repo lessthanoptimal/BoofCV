@@ -18,16 +18,36 @@
 
 package boofcv.alg.distort;
 
+import boofcv.struct.distort.Point2Transform2_F64;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import org.ejml.UtilEjml;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestNarrowPixelToSphere_F64 {
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void basic() {
+
+		NarrowPixelToSphere_F64 alg = new NarrowPixelToSphere_F64(new Dummy());
+
+		Point3D_F64 found = new Point3D_F64();
+		alg.compute(100,120, found);
+
+		assertEquals(1.0,found.norm(), UtilEjml.TEST_F64);
+		assertEquals(100,found.x/found.z, UtilEjml.TEST_F64);
+		assertEquals(120,found.y/found.z, UtilEjml.TEST_F64);
+	}
+
+	private static class Dummy implements Point2Transform2_F64 {
+
+		@Override
+		public void compute(double x, double y, Point2D_F64 out) {
+			out.set(x,y);
+		}
 	}
 }
