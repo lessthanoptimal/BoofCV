@@ -50,26 +50,34 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel>
 	public void fullTest( boolean partial ) {
 		List<Point2D_F64> grid = GenericCalibrationGrid.standardLayout();
 		for( Zhang99IntrinsicParam intrinsic : createParameters(rand) ) {
-			Zhang99AllParam expected = GenericCalibrationGrid.createStandardParam(intrinsic, 4, rand);
+//			System.out.println("Full Test : partial = "+partial);
+
+			Zhang99AllParam expected = GenericCalibrationGrid.createStandardParam(intrinsic, 10, rand);
 			List<CalibrationObservation> observations = GenericCalibrationGrid.createObservations(expected, grid);
 
 			if (partial) {
 				for (int i = 0; i < observations.size(); i++) {
 					CalibrationObservation o = observations.get(i);
 					for (int j = 0; j < 5; j++) {
-						o.points.remove(i * 2 + j);
+						o.points.remove(rand.nextInt(o.points.size()));
 					}
 				}
 			}
+
 			CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(grid, intrinsic.createLike());
 
 			assertTrue(alg.process(observations));
 
 			Zhang99AllParam found = alg.getOptimized();
 
-			checkIntrinsicOnly(
-					(CM) expected.getIntrinsic().getCameraModel(),
-					(CM) found.getIntrinsic().getCameraModel(), 0.02, 0.1, 0.1);
+			double after = GenericCalibrationGrid.computeErrors(expected,grid,found);
+
+//			System.out.println("After pixel error after: "+after);
+			assertTrue(after < 0.001 );
+
+//			checkIntrinsicOnly(
+//					(CM) expected.getIntrinsic().getCameraModel(),
+//					(CM) found.getIntrinsic().getCameraModel(), 0.02, 0.1, 0.1);
 		}
 	}
 
@@ -104,19 +112,20 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel>
 		List<Point2D_F64> grid = GenericCalibrationGrid.standardLayout();
 
 		for( Zhang99IntrinsicParam intrinsic : createParameters(rand) ) {
-			Zhang99AllParam initial = GenericCalibrationGrid.createStandardParam(intrinsic,3,rand);
+			Zhang99AllParam initial = GenericCalibrationGrid.createStandardParam(intrinsic,8,rand);
 			Zhang99AllParam found = initial.createLike();
 
 			List<CalibrationObservation> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
 			CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(grid, intrinsic.createLike());
-			assertTrue(alg.optimizedParam(observations, grid, initial, found,null));
+			assertTrue(alg.optimizedParam(observations, grid, initial.copy(), found,null));
 
-			checkEquals(initial, found, initial);
+			double after = GenericCalibrationGrid.computeErrors(initial,grid,found);
+			assertTrue(after < 1e-12 );
+
+//			checkEquals(initial, found, initial);
 		}
 	}
-
-	public abstract Zhang99IntrinsicParam createEmptyParam();
 
 	/**
 	 * Standard testing parameters. Should be solvable with non-linear refinement.
@@ -137,7 +146,8 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel>
 		List<Point2D_F64> grid = GenericCalibrationGrid.standardLayout();
 
 		for( Zhang99IntrinsicParam intrinsic : createParameters(rand) ) {
-			Zhang99AllParam initial = GenericCalibrationGrid.createStandardParam(intrinsic,4, rand);
+//			System.out.println("***** noisy");
+			Zhang99AllParam initial = GenericCalibrationGrid.createStandardParam(intrinsic,6, rand);
 			Zhang99AllParam expected = initial.copy();
 			Zhang99AllParam found = initial.createLike();
 
@@ -145,11 +155,15 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel>
 
 			// add a tinny bit of noise
 			addNoise((CM) initial.getIntrinsic().getCameraModel(), 0.01);
+			initial.getIntrinsic().forceProjectionUpdate();
+
+			double before = GenericCalibrationGrid.computeErrors(expected,grid,initial);
 
 			CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(grid, intrinsic.createLike());
 			assertTrue(alg.optimizedParam(observations, grid, initial, found, null));
 
-			checkEquals(expected, found, initial);
+			double after = GenericCalibrationGrid.computeErrors(expected,grid,found);
+			assertTrue(after*0.0001 < before);
 		}
 	}
 

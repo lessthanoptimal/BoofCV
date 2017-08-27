@@ -313,7 +313,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 	protected void handleDirectory() {
 		final CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector);
 
-		calibrationAlg.configure( zeroSkew, numRadial, tangential);
+		calibrationAlg.configurePinhole( zeroSkew, numRadial, tangential);
 
 		File directory = new File(inputDirectory);
 		if( !directory.exists() ) {

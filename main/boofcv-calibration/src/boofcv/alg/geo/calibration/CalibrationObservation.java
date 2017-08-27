@@ -50,6 +50,11 @@ public class CalibrationObservation {
 		return points.get(index);
 	}
 
+	/**
+	 *
+	 * @param observation The observation. A copy is internally created.
+	 * @param which Index of the observed feature
+	 */
 	public void add( Point2D_F64 observation , int which ) {
 		points.add(new PointIndex2D_F64(observation, which));
 	}

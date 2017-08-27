@@ -18,12 +18,10 @@
 
 package boofcv.abst.geo.calibration;
 
-import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
-import boofcv.alg.geo.calibration.Zhang99AllParam;
-import boofcv.alg.geo.calibration.Zhang99OptimizationFunction;
+import boofcv.alg.geo.calibration.*;
+import boofcv.alg.geo.calibration.omni.CalibParamUniversalOmni;
 import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraModel;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 
@@ -68,7 +66,7 @@ public class CalibrateMonoPlanar {
 
 	// computed parameters
 	protected Zhang99AllParam foundZhang;
-	protected CameraPinholeRadial foundIntrinsic;
+	protected CameraModel foundIntrinsic;
 
 	// Information on calibration targets and results
 	protected List<CalibrationObservation> observations = new ArrayList<>();
@@ -90,20 +88,38 @@ public class CalibrateMonoPlanar {
 	}
 
 	/**
-	 * Specify calibration assumptions.
-	 *
-	 * @param assumeZeroSkew If true then zero skew is assumed.  Typically this will be true.
-	 * @param numRadialParam Number of radial parameters. Typically set to 2.
-	 * @param includeTangential If true it will estimate tangential distortion parameters.
-	 *                          Try false then true
+	 * Specifies the calibration model.
 	 */
-	public void configure( boolean assumeZeroSkew ,
-						   int numRadialParam ,
-						   boolean includeTangential )
+	public void configure(Zhang99IntrinsicParam param )
 	{
-		zhang99 = new CalibrationPlanarGridZhang99(
-				detector.getLayout(),new CalibParamPinholeRadial(assumeZeroSkew,numRadialParam,includeTangential));
+		zhang99 = new CalibrationPlanarGridZhang99(detector.getLayout(),param);
 	}
+
+	public void configurePinhole(boolean assumeZeroSkew ,
+								 int numRadialParam ,
+								 boolean includeTangential )
+	{
+		zhang99 = new CalibrationPlanarGridZhang99(detector.getLayout(),
+				new CalibParamPinholeRadial(assumeZeroSkew,numRadialParam,includeTangential));
+	}
+
+	public void configureUniversalOmni(boolean assumeZeroSkew ,
+									   int numRadialParam ,
+									   boolean includeTangential )
+	{
+		zhang99 = new CalibrationPlanarGridZhang99(detector.getLayout(),
+				new CalibParamUniversalOmni(assumeZeroSkew,numRadialParam,includeTangential,false));
+	}
+
+	public void configureUniversalOmni(boolean assumeZeroSkew ,
+									   int numRadialParam ,
+									   boolean includeTangential ,
+									   double mirrorOffset )
+	{
+		zhang99 = new CalibrationPlanarGridZhang99(detector.getLayout(),
+				new CalibParamUniversalOmni(assumeZeroSkew,numRadialParam,includeTangential,mirrorOffset));
+	}
+
 
 	/**
 	 * Resets internal data structures.  Must call before adding images
@@ -149,7 +165,7 @@ public class CalibrateMonoPlanar {
 	 * After calibration points have been found this invokes the Zhang99 algorithm to
 	 * estimate calibration parameters.  Error statistics are also computed.
 	 */
-	public CameraPinholeRadial process() {
+	public <T extends CameraModel>T process() {
 		if( zhang99 == null )
 			throw new IllegalArgumentException("Please call configure first.");
 		if( !zhang99.process(observations) ) {
@@ -160,11 +176,11 @@ public class CalibrateMonoPlanar {
 
 		errors = computeErrors(observations, foundZhang,detector.getLayout());
 
-		foundIntrinsic = (CameraPinholeRadial)foundZhang.getIntrinsic().getCameraModel();
+		foundIntrinsic = foundZhang.getIntrinsic().getCameraModel();
 		foundIntrinsic.width = widthImg;
 		foundIntrinsic.height = heightImg;
 
-		return foundIntrinsic;
+		return (T)foundIntrinsic;
 	}
 
 	public void printStatistics() {
@@ -253,7 +269,7 @@ public class CalibrateMonoPlanar {
 		return foundZhang;
 	}
 
-	public CameraPinholeRadial getIntrinsic() {
-		return foundIntrinsic;
+	public <T extends CameraModel>T getIntrinsic() {
+		return (T)foundIntrinsic;
 	}
 }

@@ -25,6 +25,7 @@ import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -128,7 +129,17 @@ public class TestZhang99ParamAll {
 		}
 
 		@Override
+		public Zhang99OptimizationJacobian createJacobian(List<CalibrationObservation> observations, List<Point2D_F64> grid) {
+			return null;
+		}
+
+		@Override
 		public void setTo(Zhang99IntrinsicParam orig) {
+
+		}
+
+		@Override
+		public void forceProjectionUpdate() {
 
 		}
 

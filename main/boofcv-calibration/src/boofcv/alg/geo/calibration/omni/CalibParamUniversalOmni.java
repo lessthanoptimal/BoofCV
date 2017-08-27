@@ -19,11 +19,16 @@
 
 package boofcv.alg.geo.calibration.omni;
 
+import boofcv.alg.distort.universal.UniOmniStoP_F64;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.Zhang99IntrinsicParam;
+import boofcv.alg.geo.calibration.Zhang99OptimizationJacobian;
 import boofcv.struct.calib.CameraUniversalOmni;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DMatrixRMaj;
+
+import java.util.List;
 
 /**
  * Parameters for batch optimization of extrinsic and intrinsic calibration parameters.
@@ -34,32 +39,59 @@ public class CalibParamUniversalOmni extends Zhang99IntrinsicParam
 {
 	public CameraUniversalOmni intrinsic;
 
-	// does it assume skew = 0?
-	public boolean assumeZeroSkew;
 	// should it estimate the tangential terms?
 	public boolean includeTangential;
+	// the mirror parameter will not be changed during optimization
+	public boolean fixedMirror;
+
+	UniOmniStoP_F64 sphereToPixel = new UniOmniStoP_F64();
 
 	public CalibParamUniversalOmni(boolean assumeZeroSkew,
-								   int numRadial, boolean includeTangential)
+								   int numRadial, boolean includeTangential, boolean fixedMirror)
 	{
 		this.intrinsic = new CameraUniversalOmni(numRadial);
 		this.assumeZeroSkew = assumeZeroSkew;
 		this.includeTangential = includeTangential;
+		this.fixedMirror = fixedMirror;
+	}
+
+	public CalibParamUniversalOmni(boolean assumeZeroSkew,
+								   int numRadial, boolean includeTangential, double mirrorOffset)
+	{
+		this(assumeZeroSkew,numRadial,includeTangential,true);
+		this.intrinsic.mirrorOffset = mirrorOffset;
 	}
 
 	@Override
 	public CalibParamUniversalOmni createLike() {
-		return new CalibParamUniversalOmni(assumeZeroSkew,
-				intrinsic.radial.length,
-				includeTangential);
+		CalibParamUniversalOmni ret = new CalibParamUniversalOmni(
+						assumeZeroSkew,
+						intrinsic.radial.length,
+						includeTangential,fixedMirror);
+
+		if( fixedMirror )
+			ret.intrinsic.mirrorOffset = intrinsic.mirrorOffset;
+
+		return ret;
+	}
+
+	@Override
+	public Zhang99OptimizationJacobian createJacobian(List<CalibrationObservation> observations, List<Point2D_F64> grid) {
+		return null;
 	}
 
 	@Override
 	public void setTo( Zhang99IntrinsicParam orig ) {
 		CalibParamUniversalOmni o = (CalibParamUniversalOmni)orig;
 		intrinsic.set(o.intrinsic);
+		sphereToPixel.setModel(intrinsic);
 		includeTangential = o.includeTangential;
 		assumeZeroSkew = o.assumeZeroSkew;
+	}
+
+	@Override
+	public void forceProjectionUpdate() {
+		sphereToPixel.setModel(intrinsic);
 	}
 
 	@Override
@@ -70,6 +102,9 @@ public class CalibParamUniversalOmni extends Zhang99IntrinsicParam
 	@Override
 	public void project(Point3D_F64 cameraPt, Point2D_F64 pixel) {
 
+		cameraPt.divideIP(cameraPt.norm());
+
+		sphereToPixel.compute(cameraPt.x,cameraPt.y,cameraPt.z,pixel);
 	}
 
 	@Override
@@ -84,7 +119,11 @@ public class CalibParamUniversalOmni extends Zhang99IntrinsicParam
 			throw new RuntimeException("BUG!");
 		System.arraycopy(radial,0,intrinsic.radial,0,intrinsic.radial.length);
 		intrinsic.t1 = intrinsic.t2 = 0;
-		intrinsic.mirrorOffset = 0;
+
+		if( !fixedMirror )
+			intrinsic.mirrorOffset = 0;
+
+		sphereToPixel.setModel(intrinsic);
 	}
 
 	@Override
@@ -94,6 +133,8 @@ public class CalibParamUniversalOmni extends Zhang99IntrinsicParam
 			totalIntrinsic += 2;
 		if( !assumeZeroSkew )
 			totalIntrinsic += 1;
+		if( fixedMirror )
+			totalIntrinsic -= 1;
 
 		return totalIntrinsic;
 	}
@@ -103,19 +144,26 @@ public class CalibParamUniversalOmni extends Zhang99IntrinsicParam
 		int index = 0;
 		intrinsic.fx = param[index++];
 		intrinsic.fy = param[index++];
-		intrinsic.cx = param[index++];
-		intrinsic.cy = param[index++];
-		intrinsic.mirrorOffset = param[index++];
 		if( !assumeZeroSkew )
 			intrinsic.skew = param[index++];
+		else
+			intrinsic.skew = 0;
+		intrinsic.cx = param[index++];
+		intrinsic.cy = param[index++];
 		for (int i = 0; i < intrinsic.radial.length; i++) {
 			intrinsic.radial[i]=param[index++];
 		}
 		if( includeTangential ) {
 			intrinsic.t1 = param[index++];
 			intrinsic.t2 = param[index++];
+		} else {
+			intrinsic.t1 = 0;
+			intrinsic.t2 = 0;
 		}
+		if( !fixedMirror )
+			intrinsic.mirrorOffset = param[index++];
 
+		sphereToPixel.setModel(intrinsic);
 		return index;
 	}
 
@@ -124,11 +172,10 @@ public class CalibParamUniversalOmni extends Zhang99IntrinsicParam
 		int index = 0;
 		param[index++] = intrinsic.fx;
 		param[index++] = intrinsic.fy;
-		param[index++] = intrinsic.cx;
-		param[index++] = intrinsic.cy;
-		param[index++] = intrinsic.mirrorOffset;
 		if( !assumeZeroSkew )
 			param[index++] = intrinsic.skew;
+		param[index++] = intrinsic.cx;
+		param[index++] = intrinsic.cy;
 		for (int i = 0; i < intrinsic.radial.length; i++) {
 			param[index++] = intrinsic.radial[i];
 		}
@@ -136,6 +183,8 @@ public class CalibParamUniversalOmni extends Zhang99IntrinsicParam
 			param[index++] = intrinsic.t1;
 			param[index++] = intrinsic.t2;
 		}
+		if( !fixedMirror )
+			param[index++] = intrinsic.mirrorOffset;
 
 		return index;
 	}

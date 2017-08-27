@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.calibration.pinhole;
+package boofcv.alg.geo.calibration.omni;
 
 import boofcv.alg.geo.calibration.GenericCalibrationZhang99;
 import boofcv.alg.geo.calibration.Zhang99IntrinsicParam;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraUniversalOmni;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,18 +32,21 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-// TODO estimate cameras VFOV and HFOV
-	// TODO create observation across the entire FOV
-public class TestPinholeCalibrationZhang99 extends GenericCalibrationZhang99<CameraPinholeRadial> {
+public class TestUniversalOmniCalibrationZhang99
+		extends GenericCalibrationZhang99<CameraUniversalOmni>
+{
 
 	@Override
 	public List<Zhang99IntrinsicParam> createParameters(Random rand) {
 		List<Zhang99IntrinsicParam> list = new ArrayList<>();
 
-		list.add( createStandard(false,false,0,rand));
-		list.add( createStandard(true,true,2,rand));
-		list.add( createStandard(false,true,2,rand));
-		list.add( createStandard(true,false,2,rand));
+		list.add( createStandard(false,false,0,0,rand));
+		list.add( createStandard(true,true,2,0,rand));
+		list.add( createStandard(false,true,2,0,rand));
+		list.add( createStandard(true,false,2,0,rand));
+
+		list.add( createFisheye(true));
+		list.add( createFisheye(false));
 
 		return list;
 	}
@@ -53,8 +56,8 @@ public class TestPinholeCalibrationZhang99 extends GenericCalibrationZhang99<Cam
 		List<Zhang99IntrinsicParam> list = new ArrayList<>();
 
 		// tangent can't be linearly estimated
-		list.add( createStandard(false,false,0,rand));
-		list.add( createStandard(true,false,0,rand));
+		list.add( createStandard(false,false,0,0,rand));
+		list.add( createStandard(true,false,0,0,rand));
 
 		// radial distortion has to be very small for parameters to have a decent estimate
 		// the estimate it does come up with is much better than starting from zero but has
@@ -66,9 +69,10 @@ public class TestPinholeCalibrationZhang99 extends GenericCalibrationZhang99<Cam
 
 	public static Zhang99IntrinsicParam createStandard( boolean zeroSkew ,
 														boolean tangent , int numRadial ,
+														double mirror ,
 														Random rand) {
 
-		CalibParamPinholeRadial p = new CalibParamPinholeRadial(zeroSkew,numRadial,tangent);
+		CalibParamUniversalOmni p = new CalibParamUniversalOmni(zeroSkew,numRadial,tangent,true);
 
 		p.intrinsic.cx = 255;
 		p.intrinsic.cy = 260;
@@ -88,11 +92,33 @@ public class TestPinholeCalibrationZhang99 extends GenericCalibrationZhang99<Cam
 			p.intrinsic.t2 = rand.nextGaussian()*0.02;
 		}
 
+		p.intrinsic.mirrorOffset = mirror;
+
+		p.forceProjectionUpdate();
+
+		return p;
+	}
+
+	public static Zhang99IntrinsicParam createFisheye( boolean fixedMirror ) {
+		CalibParamUniversalOmni p = new CalibParamUniversalOmni(true,2,true,fixedMirror);
+
+		p.intrinsic.fx = 562.90;
+		p.intrinsic.fy = 563.58;
+		p.intrinsic.cx = 239.72;
+		p.intrinsic.cy = 239.72;
+		p.intrinsic.skew = 0.0;
+		p.intrinsic.radial[0] = 0.226573352659;
+		p.intrinsic.radial[1] = 6.72940754992;
+		p.intrinsic.t1 = 0.004624464338;
+		p.intrinsic.t2 = 9.66390674543E-4;
+		p.intrinsic.mirrorOffset = 2.94487011878;
+		p.forceProjectionUpdate();
+
 		return p;
 	}
 
 	@Override
-	public void addNoise(CameraPinholeRadial param, double magnitude) {
+	public void addNoise(CameraUniversalOmni param, double magnitude) {
 		param.fx += rand.nextDouble()*magnitude*Math.abs(param.fx);
 		param.fy += rand.nextDouble()*magnitude*Math.abs(param.fy);
 		param.skew += rand.nextDouble()*magnitude*Math.abs(param.skew);
@@ -102,13 +128,15 @@ public class TestPinholeCalibrationZhang99 extends GenericCalibrationZhang99<Cam
 		param.t1 += rand.nextDouble()*magnitude*Math.abs(param.t1);
 		param.t2 += rand.nextDouble()*magnitude*Math.abs(param.t2);
 
+		param.mirrorOffset += rand.nextGaussian()*magnitude*0.01;
+
 		for( int i = 0; i < param.radial.length; i++ ) {
 			param.radial[i] = rand.nextGaussian()*param.radial[i]*magnitude*10;
 		}
 	}
 
 	@Override
-	protected void checkIntrinsicOnly(CameraPinholeRadial expected, CameraPinholeRadial found,
+	protected void checkIntrinsicOnly(CameraUniversalOmni expected, CameraUniversalOmni found,
 									  double tolK, double tolD, double tolT) {
 		assertEquals(expected.fx,found.fx,Math.abs(expected.fx)*tolK);
 		assertEquals(expected.fy,found.fy,Math.abs(expected.fy)*tolK);
@@ -121,13 +149,14 @@ public class TestPinholeCalibrationZhang99 extends GenericCalibrationZhang99<Cam
 		}
 		assertEquals(expected.t1,found.t1,tolT);
 		assertEquals(expected.t2,found.t2,tolT);
+
+		assertEquals(expected.mirrorOffset,found.mirrorOffset,tolT);
 	}
 
 	@Override
-	public void checkEquals(CameraPinholeRadial expected,
-							CameraPinholeRadial found,
-							CameraPinholeRadial initial, double tol)
-	{
+	public void checkEquals(CameraUniversalOmni expected,
+							CameraUniversalOmni found,
+							CameraUniversalOmni initial, double tol) {
 		// see if it improved the estimate
 		assertTrue(Math.abs(expected.fx-initial.fx)*tol >= Math.abs(expected.fx-found.fx));
 		assertTrue(Math.abs(expected.fy-initial.fy)*tol >= Math.abs(expected.fy-found.fy));
@@ -144,5 +173,8 @@ public class TestPinholeCalibrationZhang99 extends GenericCalibrationZhang99<Cam
 
 		assertTrue(Math.abs(expected.t1 - found.t1) <= Math.abs(initial.t1 - found.t1));
 		assertTrue(Math.abs(expected.t2 - found.t2) <= Math.abs(initial.t2 - found.t2));
+
+		assertTrue(Math.abs(expected.mirrorOffset - found.mirrorOffset)
+				<= Math.abs(initial.mirrorOffset - found.mirrorOffset));
 	}
 }

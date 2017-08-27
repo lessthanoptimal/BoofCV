@@ -23,6 +23,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DMatrixRMaj;
 
+import java.util.List;
+
 /**
  * Interface that specifies how to optimize a intrinsic camera model
  *
@@ -51,7 +53,16 @@ public abstract class Zhang99IntrinsicParam {
 
 	public abstract Zhang99IntrinsicParam createLike();
 
+	public abstract Zhang99OptimizationJacobian createJacobian(List<CalibrationObservation> observations ,
+															   List<Point2D_F64> grid);
+
 	public abstract void setTo( Zhang99IntrinsicParam orig );
+
+	/**
+	 * Call when the intrinsic parameters have been modified by a function NOT in this interface.
+	 * This should be called automatically by all functions which modify parameters.
+	 */
+	public abstract void forceProjectionUpdate();
 
 	/**
 	 * Projects a point on the camera

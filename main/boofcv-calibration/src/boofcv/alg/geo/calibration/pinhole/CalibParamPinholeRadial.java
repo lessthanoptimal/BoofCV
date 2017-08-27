@@ -18,12 +18,16 @@
 
 package boofcv.alg.geo.calibration.pinhole;
 
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.Zhang99IntrinsicParam;
+import boofcv.alg.geo.calibration.Zhang99OptimizationJacobian;
 import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DMatrixRMaj;
+
+import java.util.List;
 
 /**
  * Intrinsic camera parameters for optimization in Zhang99
@@ -157,11 +161,20 @@ public class CalibParamPinholeRadial extends Zhang99IntrinsicParam {
 	}
 
 	@Override
+	public Zhang99OptimizationJacobian createJacobian(List<CalibrationObservation> observations, List<Point2D_F64> grid) {
+		return new Zhang99OptimizationJacobian(this,observations,grid);
+	}
+
+	@Override
 	public void setTo(Zhang99IntrinsicParam orig) {
 		CalibParamPinholeRadial o = (CalibParamPinholeRadial)orig;
 		intrinsic.set(o.intrinsic);
 		includeTangential = o.includeTangential;
 		assumeZeroSkew = o.assumeZeroSkew;
+	}
+
+	@Override
+	public void forceProjectionUpdate() {
 	}
 
 	@Override

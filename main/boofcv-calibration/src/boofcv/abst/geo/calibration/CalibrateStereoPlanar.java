@@ -97,8 +97,8 @@ public class CalibrateStereoPlanar {
 						   int numRadialParam ,
 						   boolean includeTangential )
 	{
-		calibLeft.configure(assumeZeroSkew,numRadialParam,includeTangential);
-		calibRight.configure(assumeZeroSkew,numRadialParam,includeTangential);
+		calibLeft.configurePinhole(assumeZeroSkew,numRadialParam,includeTangential);
+		calibRight.configurePinhole(assumeZeroSkew,numRadialParam,includeTangential);
 	}
 
 	/**

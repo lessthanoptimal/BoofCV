@@ -57,6 +57,11 @@ Fisheye Calibration Detectors
    TODO Asymmetric Circle
    TODO Regular Circle
 
+Calibration
+   TODO Analytic jacobian for universal omni.  After design have stabilized
+   TODO Provide a mechanism to provide a hint at parameters which can't be estimated linearly.
+   TODO Add regularization?
+
 TOP ITEMS
 - TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
         It is a homogenous coordinate with z=1 being implicit.
