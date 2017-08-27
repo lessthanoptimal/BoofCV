@@ -18,7 +18,6 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.so.Rodrigues_F64;
 
@@ -32,25 +31,18 @@ import georegression.struct.so.Rodrigues_F64;
  *
  * @author Peter Abeles
  */
-public class Zhang99ParamAll extends Zhang99ParamCamera {
+public class Zhang99AllParam {
 
 	// position of each view of the target
 	// target to camera transform
 	public View[] views;
 
-	public Zhang99ParamAll(boolean assumeZeroSkew,
-						   int numRadial, boolean includeTangential,
-						   int numViews)
+	Zhang99IntrinsicParam intrinsic;
+
+	public Zhang99AllParam(Zhang99IntrinsicParam intrinsic, int numViews)
 	{
-		super(assumeZeroSkew,numRadial,includeTangential);
+		this.intrinsic = intrinsic;
 		setNumberOfViews(numViews);
-	}
-
-	public Zhang99ParamAll(boolean assumeZeroSkew, int numRadial, boolean includeTangential) {
-		super(assumeZeroSkew,numRadial,includeTangential);
-	}
-
-	public Zhang99ParamAll() {
 	}
 
 	public void setNumberOfViews( int numViews ) {
@@ -60,23 +52,13 @@ public class Zhang99ParamAll extends Zhang99ParamCamera {
 		}
 	}
 
-	public Zhang99ParamAll createNew() {
-		return new Zhang99ParamAll(assumeZeroSkew, radial.length,includeTangential,views.length);
+	public Zhang99AllParam createLike() {
+		return new Zhang99AllParam(intrinsic.createLike(),views.length);
 	}
 
-	public Zhang99ParamAll copy() {
-		Zhang99ParamAll ret = createNew();
-		ret.a = a;
-		ret.b = b;
-		ret.c = c;
-		ret.x0 = x0;
-		ret.y0 = y0;
-
-		System.arraycopy(radial, 0, ret.radial, 0, radial.length);
-
-		ret.t1 = t1;
-		ret.t2 = t2;
-		ret.includeTangential = includeTangential;
+	public Zhang99AllParam copy() {
+		Zhang99AllParam ret = createLike();
+		ret.intrinsic.setTo(intrinsic);
 
 		for( int i = 0; i < views.length; i++ ) {
 			View a = views[i];
@@ -98,13 +80,12 @@ public class Zhang99ParamAll extends Zhang99ParamCamera {
 		public Vector3D_F64 T = new Vector3D_F64();
 	}
 
-	@Override
 	public int numParameters() {
-		return super.numParameters()+ (3+3)*views.length;
+		return intrinsic.numParameters()+ (3+3)*views.length;
 	}
 
 	public int setFromParam( double param[] ) {
-		int index = super.setFromParam(param);
+		int index = intrinsic.setFromParam(param);
 
 		for( View v : views ) {
 			v.rotation.setParamVector(param[index++],param[index++],param[index++]);
@@ -116,9 +97,8 @@ public class Zhang99ParamAll extends Zhang99ParamCamera {
 		return index;
 	}
 
-	@Override
 	public int convertToParam( double param[] ) {
-		int index = super.convertToParam(param);
+		int index = intrinsic.convertToParam(param);
 
 		for( View v : views ) {
 			param[index++] = v.rotation.unitAxisRotation.x*v.rotation.theta;
@@ -136,26 +116,7 @@ public class Zhang99ParamAll extends Zhang99ParamCamera {
 	 *
 	 * @return Intrinsic parameters
 	 */
-	public CameraPinholeRadial convertToIntrinsic() {
-		CameraPinholeRadial ret = new CameraPinholeRadial();
-
-		ret.fx = a;
-		ret.fy = b;
-		if( assumeZeroSkew )
-			ret.skew = 0;
-		else
-			ret.skew = c;
-		ret.cx = x0;
-		ret.cy = y0;
-		ret.radial = new double[ radial.length ];
-		System.arraycopy(radial,0,ret.radial,0, radial.length);
-		if( includeTangential ) {
-			ret.t1 = t1;
-			ret.t2 = t2;
-		} else {
-			ret.t1 = ret.t2 = 0;
-		}
-
-		return ret;
+	public Zhang99IntrinsicParam getIntrinsic() {
+		return this.intrinsic;
 	}
 }

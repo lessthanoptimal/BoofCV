@@ -18,9 +18,14 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.struct.calib.CameraModel;
 import georegression.misc.test.GeometryUnitTest;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -37,21 +42,14 @@ public class TestZhang99ParamAll {
 	 */
 	@Test
 	public void toAndFromParametersArray() {
-		checkToAndFromParam(true,false);
-		checkToAndFromParam(false,false);
-		checkToAndFromParam(true,true);
-		checkToAndFromParam(false,true);
-	}
 
-	public void checkToAndFromParam( boolean assumeZeroSkew , boolean includeTangential )
-	{
-		Zhang99ParamAll p = new Zhang99ParamAll(assumeZeroSkew,3,includeTangential,2);
+		Dummy dummy = new Dummy();
 
-		p.a = 2;p.b=3;p.c=4;p.x0=5;p.y0=6;
-		p.radial = new double[]{1,2,3};
-		p.t1 = 7; p.t2 = 8;
+		Zhang99AllParam p = new Zhang99AllParam(dummy,2);
+
+		dummy.a = 3;
 		for( int i = 0; i < 2; i++ ) {
-			Zhang99ParamAll.View v = p.views[i];
+			Zhang99AllParam.View v = p.views[i];
 			v.T.set(rand.nextDouble(),rand.nextDouble(),rand.nextDouble());
 			v.rotation.theta = rand.nextDouble();
 			v.rotation.unitAxisRotation.set(rand.nextGaussian(),rand.nextGaussian(),rand.nextGaussian());
@@ -63,41 +61,91 @@ public class TestZhang99ParamAll {
 		p.convertToParam(array);
 
 		// create a new set of parameters and assign its value from the array
-		Zhang99ParamAll found = new Zhang99ParamAll(assumeZeroSkew,3,includeTangential,2);
+		Zhang99AllParam found = new Zhang99AllParam(new Dummy(),2);
 		found.setFromParam(array);
 
 		// compare the two sets of parameters
-		checkEquals(p,found,assumeZeroSkew,includeTangential);
+		checkEquals(p,found);
 	}
 
-	private void checkEquals(Zhang99ParamAll expected ,
-							 Zhang99ParamAll found ,
-							 boolean assumeZeroSkew , boolean includeTangential) {
+	private void checkEquals(Zhang99AllParam expected ,
+							 Zhang99AllParam found ) {
 		double tol = 1e-6;
 
-		assertEquals(expected.a,found.a,tol);
-		assertEquals(expected.b,found.b,tol);
-		if( !assumeZeroSkew )
-			assertEquals(expected.c,found.c,tol);
-		assertEquals(expected.x0,found.x0,tol);
-		assertEquals(expected.y0,found.y0,tol);
+		Dummy dummyE = (Dummy)expected.getIntrinsic();
+		Dummy dummyF = (Dummy)expected.getIntrinsic();
 
-		for( int i = 0; i < expected.radial.length; i++ ) {
-			assertEquals(expected.radial[i],found.radial[i],tol);
-		}
-
-		if( includeTangential ) {
-			assertEquals(expected.t1,found.t1,tol);
-			assertEquals(expected.t2,found.t2,tol);
-		}
+		assertEquals(dummyE.a,dummyF.a,tol);
 
 		for( int i = 0; i < 2; i++ ) {
-			Zhang99ParamAll.View pp = expected.views[i];
-			Zhang99ParamAll.View ff = found.views[i];
+			Zhang99AllParam.View pp = expected.views[i];
+			Zhang99AllParam.View ff = found.views[i];
 
 			GeometryUnitTest.assertEquals(pp.T, ff.T, tol);
 			GeometryUnitTest.assertEquals(pp.rotation.unitAxisRotation,ff.rotation.unitAxisRotation,tol);
 			assertEquals(pp.rotation.theta,ff.rotation.theta,tol);
+		}
+	}
+
+	private static class Dummy extends Zhang99IntrinsicParam {
+
+		public double a;
+
+		@Override
+		public int getNumberOfRadial() {
+			return 0;
+		}
+
+		@Override
+		public void initialize(DMatrixRMaj K, double[] radial) {
+
+		}
+
+		@Override
+		public int numParameters() {
+			return 1;
+		}
+
+		@Override
+		public int setFromParam(double[] param) {
+			a = param[0];
+			return 1;
+		}
+
+		@Override
+		public int convertToParam(double[] param) {
+			param[0] = a;
+			return 1;
+		}
+
+		@Override
+		public <T extends CameraModel> T getCameraModel() {
+			return null;
+		}
+
+		@Override
+		public Zhang99IntrinsicParam createLike() {
+			return null;
+		}
+
+		@Override
+		public Zhang99OptimizationJacobian createJacobian(List<CalibrationObservation> observations, List<Point2D_F64> grid) {
+			return null;
+		}
+
+		@Override
+		public void setTo(Zhang99IntrinsicParam orig) {
+
+		}
+
+		@Override
+		public void forceProjectionUpdate() {
+
+		}
+
+		@Override
+		public void project(Point3D_F64 cameraPt, Point2D_F64 pixel) {
+
 		}
 	}
 }

@@ -20,7 +20,7 @@ package boofcv.gui.calibration;
 
 import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.alg.geo.calibration.Zhang99ParamAll;
+import boofcv.alg.geo.calibration.Zhang99AllParam;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.calib.CameraPinholeRadial;
 
@@ -64,9 +64,9 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	JTextArea paramCenterX;
 	JTextArea paramCenterY;
-	JTextArea paramA;
-	JTextArea paramB;
-	JTextArea paramC;
+	JTextArea paramFX;
+	JTextArea paramFY;
+	JTextArea paramSkew;
 
 	boolean showPoints = false;
 	boolean showErrors = true;
@@ -97,9 +97,9 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		maxError = createErrorComponent();
 		paramCenterX = createErrorComponent();
 		paramCenterY = createErrorComponent();
-		paramA = createErrorComponent();
-		paramB = createErrorComponent();
-		paramC = createErrorComponent();
+		paramFX = createErrorComponent();
+		paramFY = createErrorComponent();
+		paramSkew = createErrorComponent();
 
 		mainView.setImages(images);
 		mainView.setResults(features,results);
@@ -189,18 +189,19 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		updateResultsGUI();
 	}
 
-	public void setCalibration(Zhang99ParamAll found) {
-		String textX = String.format("%5.1f",found.x0);
-		String textY = String.format("%5.1f", found.y0);
+	public void setCalibration(Zhang99AllParam found) {
+		CameraPinholeRadial intrinsic = (CameraPinholeRadial)found.getIntrinsic().getCameraModel();
+		String textX = String.format("%5.1f",intrinsic.cx);
+		String textY = String.format("%5.1f", intrinsic.cy);
 		paramCenterX.setText(textX);
 		paramCenterY.setText(textY);
 
-		String textA = String.format("%5.1f",found.a);
-		String textB = String.format("%5.1f",found.b);
-		paramA.setText(textA);
-		paramB.setText(textB);
-		String textC = String.format("%5.1e",found.c);
-		paramC.setText(textC);
+		String textA = String.format("%5.1f",intrinsic.fx);
+		String textB = String.format("%5.1f",intrinsic.fy);
+		paramFX.setText(textA);
+		paramFY.setText(textB);
+		String textC = String.format("%5.1e",intrinsic.skew);
+		paramSkew.setText(textC);
 	}
 
 	public void setCorrection( CameraPinholeRadial param )
@@ -278,9 +279,9 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 			addSeparator(200);
 			addLabeled(paramCenterX,"Xc",this);
 			addLabeled(paramCenterY,"Yc",this);
-			addLabeled(paramA,"fx",this);
-			addLabeled(paramB,"fy",this);
-			addLabeled(paramC,"skew",this);
+			addLabeled(paramFX,"fx",this);
+			addLabeled(paramFY,"fy",this);
+			addLabeled(paramSkew,"skew",this);
 			addSeparator(200);
 			add(scroll);
 		}

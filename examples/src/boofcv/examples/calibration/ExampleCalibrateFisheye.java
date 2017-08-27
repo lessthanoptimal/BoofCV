@@ -26,42 +26,29 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.image.GrayF32;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
- * Example of how to calibrate a single (monocular) camera using a high level interface. Depending on the calibration
- * target detector and target type, the entire target might need to be visible in the image. All camera images
- * should be in focus and that target evenly spread through out the images. In particular the edges of the image
- * should be covered.
- *
- * After processing both intrinsic camera parameters and lens distortion are estimated.  Square grid and chessboard
- * targets are demonstrated by this example. See calibration tutorial for a discussion of different target types
- * and how to collect good calibration images.
- *
- * All the image processing and calibration is taken care of inside of {@link CalibrateMonoPlanar}.  The code below
- * loads calibration images as inputs, calibrates, and saves results to an XML file.  See in code comments for tuning
- * and implementation issues.
+ * Example of how to calibrate a single (monocular) fisheye camera using a high level interface. This example
+ * for the most part follows the same routine as {@link ExampleCalibrateMonocular}. Fisheye cameras tend to require
+ * more images to properly calibrate. Often people will use larger calibration targets too that are easier to
+ * see at a distance and cover more of the fisheye's camera large FOV.
  *
  * @see CalibrateMonoPlanar
  *
  * @author Peter Abeles
  */
-public class ExampleCalibrateMonocular {
+public class ExampleCalibrateFisheye {
 	public static void main( String args[] ) {
 		DetectorFiducialCalibration detector;
 		List<String> images;
 
-		// Regular Circle Example
-//		detector = FactoryFiducialCalibration.circleRegularGrid(new ConfigCircleRegularGrid(8, 10, 1.5, 2.5));
-//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleRegular"),"image");
-
-		// Asymmetric Circle Example
-//		detector = FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleAsymmetricGrid(5, 8, 2, 6));
-//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleAsym"),"image");
+		// Circle based calibration targets not not recommended because the sever lens distortion will change
+		// the apparent location of tangent points.
 
 		// Square Grid example
 //		detector = FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(4, 3, 30, 30));
@@ -69,13 +56,18 @@ public class ExampleCalibrateMonocular {
 
 		// Chessboard Example
 		detector = FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));
-		images = UtilIO.directoryList(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"),"left");
+		images = UtilIO.directoryList(UtilIO.pathExample("calibration/fisheye/chessboard"),"right");
 
 		// Declare and setup the calibration algorithm
 		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector);
 
 		// tell it type type of target and which parameters to estimate
-		calibrationAlg.configurePinhole( true, 2, false);
+		calibrationAlg.configureUniversalOmni( true, 2, false);
+
+		// it's also possible to fix the mirror offset parameter
+		// 0 = pinhole camera. 1 = fisheye
+//		calibrationAlg.configureUniversalOmni( true, 2, false,1.0);
+
 
 		for( String n : images ) {
 			BufferedImage input = UtilImageIO.loadImage(n);
@@ -86,10 +78,10 @@ public class ExampleCalibrateMonocular {
 			}
 		}
 		// process and compute intrinsic parameters
-		CameraPinholeRadial intrinsic = calibrationAlg.process();
+		CameraUniversalOmni intrinsic = calibrationAlg.process();
 
 		// save results to a file and print out
-		CalibrationIO.save(intrinsic, "intrinsic.yaml");
+		CalibrationIO.save(intrinsic, "fisheye.yaml");
 
 		calibrationAlg.printStatistics();
 		System.out.println();

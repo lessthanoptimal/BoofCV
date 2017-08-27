@@ -75,7 +75,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 			throw new IllegalArgumentException("No images!");
 		Collections.sort(images);
 		calibrator = new CalibrateMonoPlanar(detector);
-		calibrator.configure(true,numRadial,includeTangential);
+		calibrator.configurePinhole(true,numRadial,includeTangential);
 		this.images = images;
 	}
 

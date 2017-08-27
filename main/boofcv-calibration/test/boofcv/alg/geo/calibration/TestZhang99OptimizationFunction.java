@@ -18,6 +18,9 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
+import boofcv.alg.geo.calibration.pinhole.TestPinholeCalibrationZhang99;
+import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -43,7 +46,8 @@ public class TestZhang99OptimizationFunction {
 	 */
 	@Test
 	public void computeResidualsPerfect() {
-		Zhang99ParamAll param = GenericCalibrationGrid.createStandardParam(false, 2, true, 3, rand);
+		Zhang99AllParam param = GenericCalibrationGrid.createStandardParam(
+				TestPinholeCalibrationZhang99.createStandard(false,  true,2,rand), 3, rand);
 
 		double array[] = new double[ param.numParameters() ];
 		param.convertToParam(array);
@@ -57,7 +61,8 @@ public class TestZhang99OptimizationFunction {
 		}
 
 		Zhang99OptimizationFunction alg =
-				new Zhang99OptimizationFunction( new Zhang99ParamAll(false,2,true,3),gridPts,observations );
+				new Zhang99OptimizationFunction( new Zhang99AllParam(new CalibParamPinholeRadial(false,2,true)
+						,3),gridPts,observations );
 
 		double residuals[] = new double[ alg.getNumOfOutputsM()];
 		for( int i = 0; i < residuals.length; i++ )
@@ -70,8 +75,8 @@ public class TestZhang99OptimizationFunction {
 		}
 	}
 	
-	protected static CalibrationObservation estimate( Zhang99ParamAll param ,
-													  Zhang99ParamAll.View v ,
+	protected static CalibrationObservation estimate( Zhang99AllParam param ,
+													  Zhang99AllParam.View v ,
 													  List<Point2D_F64> grid ) {
 
 		CalibrationObservation ret = new CalibrationObservation();
@@ -82,6 +87,8 @@ public class TestZhang99OptimizationFunction {
 
 		ConvertRotation3D_F64.rodriguesToMatrix(v.rotation, se.getR());
 		se.T = v.T;
+
+		CameraPinholeRadial intrinsic = param.getIntrinsic().getCameraModel();
 
 		for( int i = 0; i < grid.size(); i++ ) {
 			Point2D_F64 gridPt = grid.get(i);
@@ -94,11 +101,11 @@ public class TestZhang99OptimizationFunction {
 			calibratedPt.y = cameraPt.y/ cameraPt.z;
 
 			// apply radial distortion
-			CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, param.radial,param.t1,param.t2);
+			CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, intrinsic.radial,intrinsic.t1,intrinsic.t2);
 
 			// convert to pixel coordinates
-			double x = param.a*calibratedPt.x + param.c*calibratedPt.y + param.x0;
-			double y = param.b*calibratedPt.y + param.y0;
+			double x = intrinsic.fx*calibratedPt.x + intrinsic.skew*calibratedPt.y + intrinsic.cx;
+			double y = intrinsic.fy*calibratedPt.y + intrinsic.cy;
 			
 			ret.add( new Point2D_F64(x,y), i);
 		}
@@ -111,7 +118,8 @@ public class TestZhang99OptimizationFunction {
 	 */
 	@Test
 	public void computeResidualsPerfect_partial() {
-		Zhang99ParamAll param = GenericCalibrationGrid.createStandardParam(false, 2, true, 3, rand);
+		Zhang99AllParam param = GenericCalibrationGrid.createStandardParam(
+				TestPinholeCalibrationZhang99.createStandard(false, true,2,rand), 3, rand);
 
 		double array[] = new double[ param.numParameters() ];
 		param.convertToParam(array);
@@ -135,7 +143,8 @@ public class TestZhang99OptimizationFunction {
 		}
 
 		Zhang99OptimizationFunction alg =
-				new Zhang99OptimizationFunction( new Zhang99ParamAll(false,2,true,3),gridPts,observations );
+				new Zhang99OptimizationFunction( new Zhang99AllParam(
+						new CalibParamPinholeRadial(false,2,true),3),gridPts,observations );
 
 		assertEquals(expectedM,alg.getNumOfOutputsM());
 		double residuals[] = new double[ alg.getNumOfOutputsM()];

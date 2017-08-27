@@ -71,7 +71,7 @@ public class TestCalibrateMonoPlanar {
 
 		FakeDetector detector = new FakeDetector();
 		CalibrateMonoPlanar alg = new CalibrateMonoPlanar(detector);
-		alg.configure(true,2,true);
+		alg.configurePinhole(true,2,true);
 
 		for (int i = 0; i < targetToCamera.size(); i++) {
 			alg.addImage(blank);

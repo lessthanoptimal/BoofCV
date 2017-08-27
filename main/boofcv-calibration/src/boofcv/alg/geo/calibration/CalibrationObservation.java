@@ -27,8 +27,8 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * List of observed features on a single calibration target from one image.  Support for partial observations
- * is provided by giving the index of the.
+ * List of observed features and their pixel locations on a single calibration target from one image.
+ * Partially observable calibration targets is supported by the associated index for each point.
  *
  * @author Peter Abeles
  */
@@ -50,6 +50,11 @@ public class CalibrationObservation {
 		return points.get(index);
 	}
 
+	/**
+	 *
+	 * @param observation The observation. A copy is internally created.
+	 * @param which Index of the observed feature
+	 */
 	public void add( Point2D_F64 observation , int which ) {
 		points.add(new PointIndex2D_F64(observation, which));
 	}

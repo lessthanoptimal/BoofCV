@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.calibration;
+package boofcv.alg.geo.calibration.omni;
 
 import org.junit.Test;
 
@@ -26,39 +26,18 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestZhang99ParamCamera {
-	@Test
-	public void zeroNotUsed() {
-		for (int i = 0; i < 4; i++) {
-			boolean skew = i%2 == 0;
-			boolean tangent = i/2 == 0;
-
-			Zhang99ParamCamera param = new Zhang99ParamCamera(skew,2,tangent);
-			param.a = param.b = param.c = param.x0 = param.y0 = 2;
-			param.t1 = param.t2 = 3;
-
-			param.zeroNotUsed();
-
-			assertTrue(param.a != 0);
-			assertTrue(param.b != 0);
-			assertTrue(skew == (param.c == 0));
-			assertTrue(param.x0 != 0);
-			assertTrue(param.y0 != 0);
-
-			assertTrue(tangent == (param.t1 != 0));
-			assertTrue(tangent == (param.t2 != 0));
-		}
-	}
-
+public class TestCalibParamUniversalOmni {
 	@Test
 	public void numParameters() {
 		for (int i = 0; i < 4; i++) {
+			boolean mirror = i / 4 == 0;
 			boolean skew = i % 2 == 0;
 			boolean tangent = i / 2 == 0;
 
-			Zhang99ParamCamera param = new Zhang99ParamCamera(skew, 2, tangent);
+			CalibParamUniversalOmni param = new CalibParamUniversalOmni(skew, 2, tangent,mirror);
 
-			int expected = 6;
+			int expected = 7;
+			if( mirror )expected--;
 			if( !skew ) expected++;
 			if( tangent ) expected += 2;
 
@@ -68,11 +47,15 @@ public class TestZhang99ParamCamera {
 
 	@Test
 	public void setFromParam_convertToParam() {
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 8; i++) {
+			boolean mirror = i / 4 == 0;
 			boolean skew = i % 2 == 0;
 			boolean tangent = i / 2 == 0;
 
-			Zhang99ParamCamera param = new Zhang99ParamCamera(skew, 2, tangent);
+			CalibParamUniversalOmni param = new CalibParamUniversalOmni(skew, 2, tangent,mirror);
+
+			if( mirror )
+				param.intrinsic.mirrorOffset = 2.5;
 
 			double d[] = new double[ param.numParameters()];
 			for (int j = 0; j < d.length; j++) {
@@ -82,24 +65,27 @@ public class TestZhang99ParamCamera {
 			param.setFromParam(d);
 
 			int c = 1;
-			assertEquals(c++, param.a, 1e-8);
-			assertEquals(c++, param.b, 1e-8);
+			assertEquals(c++, param.intrinsic.fx, 1e-8);
+			assertEquals(c++, param.intrinsic.fy, 1e-8);
 			if( !skew )
-				assertEquals(c++, param.c, 1e-8);
+				assertEquals(c++, param.intrinsic.skew, 1e-8);
 			else
-				assertEquals(0, param.c, 1e-8);
-			assertEquals(c++, param.x0, 1e-8);
-			assertEquals(c++, param.y0, 1e-8);
-			assertEquals(c++, param.radial[0], 1e-8);
-			assertEquals(c++, param.radial[1], 1e-8);
+				assertEquals(0, param.intrinsic.skew, 1e-8);
+			assertEquals(c++, param.intrinsic.cx, 1e-8);
+			assertEquals(c++, param.intrinsic.cy, 1e-8);
+			assertEquals(c++, param.intrinsic.radial[0], 1e-8);
+			assertEquals(c++, param.intrinsic.radial[1], 1e-8);
 			if (tangent) {
-				assertEquals(c++, param.t1, 1e-8);
-				assertEquals(c, param.t2, 1e-8);
+				assertEquals(c++, param.intrinsic.t1, 1e-8);
+				assertEquals(c++, param.intrinsic.t2, 1e-8);
 			} else {
-				assertEquals(0, param.t1, 1e-8);
-				assertEquals(0, param.t2, 1e-8);
+				assertEquals(0, param.intrinsic.t1, 1e-8);
+				assertEquals(0, param.intrinsic.t2, 1e-8);
 			}
-
+			if( !mirror )
+				assertEquals(c, param.intrinsic.mirrorOffset, 1e-8);
+			else
+				assertEquals(2.5, param.intrinsic.mirrorOffset, 1e-8);
 			double e[] = new double[d.length];
 			param.convertToParam(e);
 

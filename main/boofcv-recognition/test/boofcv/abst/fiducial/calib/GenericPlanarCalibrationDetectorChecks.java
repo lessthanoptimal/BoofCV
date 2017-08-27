@@ -54,7 +54,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	double simulatedTargetWidth = 0.3; // size of target in simulated world
 
-	boolean visualizeFailures = true;
+	boolean visualizeFailures = false;
 
 	/**
 	 * Renders an image of the calibration target.

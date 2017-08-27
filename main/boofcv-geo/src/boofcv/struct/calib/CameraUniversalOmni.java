@@ -156,4 +156,22 @@ public class CameraUniversalOmni extends CameraPinhole {
 	public void setMirrorOffset(double mirrorOffset) {
 		this.mirrorOffset = mirrorOffset;
 	}
+
+	@Override
+	public void print() {
+		super.print();
+		if( radial != null ) {
+			for( int i = 0; i < radial.length; i++ ) {
+				System.out.printf("radial[%d] = %6.2e\n",i,radial[i]);
+			}
+		} else {
+			System.out.println("No radial");
+		}
+		if( t1 != 0 && t2 != 0)
+			System.out.printf("tangential = ( %6.2e , %6.2e)\n", t1, t2);
+		else {
+			System.out.println("No tangential");
+		}
+		System.out.printf("mirror offset = %7.3f",mirrorOffset);
+	}
 }
