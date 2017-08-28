@@ -20,7 +20,7 @@ if( project.hasProperty("native_arch")) {
 
 subprojects {
     apply plugin: 'java'
-    apply plugin: 'osgi'
+//    apply plugin: 'osgi'
     apply plugin: 'maven'
     apply plugin: 'signing'
 
@@ -54,15 +54,6 @@ subprojects {
     }
 
     sourceSets {
-//        main {
-//            java {
-//                srcDir 'src'
-//            }
-//            resources {
-//                srcDir 'resources/src'
-//            }
-//        }
-
         test {
             java {
                 srcDir 'src/generate/java'
@@ -70,9 +61,6 @@ subprojects {
                 srcDir 'src/experimental/java'
                 srcDir 'src/experimental/test'
             }
-//            resources {
-//                srcDir 'resources/test'
-//            }
         }
     }
 
@@ -82,13 +70,13 @@ subprojects {
         testCompile group: 'junit', name: 'junit', version: '4.12'
     }
 
-    jar {
-        manifest { // the manifest of the default jar is of type OsgiManifest
-            instruction 'Bundle-Vendor', 'BoofCV'
-//            instruction 'Bundle-Description', 'BoofCV'
-            instruction 'Bundle-DocURL', 'http://boofcv.org'
-        }
-    }
+//    jar {
+//        manifest { // the manifest of the default jar is of type OsgiManifest
+//            instruction 'Bundle-Vendor', 'BoofCV'
+////            instruction 'Bundle-Description', 'BoofCV'
+//            instruction 'Bundle-DocURL', 'http://boofcv.org'
+//        }
+//    }
 
     task javadocJar(type: Jar) {
         classifier = 'javadoc'
