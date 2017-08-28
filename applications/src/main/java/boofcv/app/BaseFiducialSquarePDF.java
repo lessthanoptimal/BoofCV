@@ -24,6 +24,7 @@ import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.util.Matrix;
 
 import java.awt.*;
@@ -209,7 +210,7 @@ public abstract class BaseFiducialSquarePDF {
 		info.setCreator("BoofCV");
 		info.setTitle(documentName+" w="+ fiducialWidthUnit +" "+unit.abbreviation);
 
-		generateDocument();
+		generateDocument(fiducialWidthUnit);
 
 		// save and close document
 		document.save(outputName);
@@ -323,7 +324,7 @@ public abstract class BaseFiducialSquarePDF {
 	/**
 	 * Creates an EPS document from all the specifications in the class
 	 */
-	private void generateDocument() throws IOException {
+	private void generateDocument( float fiducialWidthUnit ) throws IOException {
 
 		int patternsPerPage = numRows*numCols;
 		int numPages = (int)Math.ceil(totalPatterns()/(double)patternsPerPage);
@@ -341,29 +342,21 @@ public abstract class BaseFiducialSquarePDF {
 
 			for (int row = 0; row < numRows; row++) {
 				for (int col = 0; col < numCols; col++) {
-					insertFiducial(startPattern,row,col);
+					insertFiducial(startPattern,row,col,fiducialWidthUnit);
 				}
 			}
 
 			if( printGrid )
 				printGrid();
 
-//			if (printInfo) {
-//				for (int pattern = 0; pattern < totalPatterns(); pattern++) {
-//					String patternName = getPatternName(pattern);
-//					out.print(" /" + getDisplayDef(pattern) + "\n" +
-//							"{\n" +
-//							"  /Times-Roman findfont\n" + "7 scalefont setfont b1 " + (fiducialTotalWidth - 10) +
-//							" moveto (" + patternName + ",  width: " + fiducialWidthUnit + " " + unit.abbreviation + ") show\n" +
-//							"} def\n");
-//				}
-//			}
-//
-//			if (printInfo) {
-//				out.print("  /Times-Roman findfont\n" + "7 scalefont setfont "+offsetX+" "+offsetY +
-//						String.format(" moveto ( Page Size: %4.1f by %4.1f %s) show\n",
-//								paper.width,paper.height,paper.unit.abbreviation));
-//			}
+			if (printInfo) {
+				pcs.beginText();
+				pcs.setFont(PDType1Font.TIMES_ROMAN,7);
+				pcs.newLineAtOffset( offsetX+1, offsetY+1 );
+				pcs.showText(String.format("Page Size: %4.1f by %4.1f %s",
+						paper.width,paper.height,paper.unit.abbreviation));
+				pcs.endText();
+			}
 
 			pcs.close();
 		}
@@ -389,27 +382,29 @@ public abstract class BaseFiducialSquarePDF {
 	/**
 	 * Draws the grid in light grey on the document
 	 */
-	private void printGrid() {
-		double pageWidth = paper.convertWidth(unit)*UNIT_TO_POINTS;
-		double pageHeight = paper.convertHeight(unit)*UNIT_TO_POINTS;
+	private void printGrid() throws IOException {
+		float pageWidth = (float)paper.convertWidth(unit)*UNIT_TO_POINTS;
+		float pageHeight = (float)paper.convertHeight(unit)*UNIT_TO_POINTS;
 
-//		out.println("% grid lines");
-//
-//		out.print(" /drawRow { moveto "+pageWidth+" 0 rlineto 1 setlinewidth stroke} def\n");
-//		out.print(" /drawColumn { moveto 0 "+pageHeight+" rlineto 1 setlinewidth stroke} def\n");
-//		out.print(" 0.75 setgray\n");
-//		for (int i = 0; i <= numCols; i++) {
-//			double x = offsetX + i*fiducialTotalWidth;
-//			out.printf(" newpath %f 0 drawColumn\n",x);
-//		}
-//		for (int i = 0; i <= numRows; i++) {
-//			double y = offsetY + i*fiducialTotalWidth;
-//			out.printf(" newpath 0 %f drawRow\n",y);
-//		}
+//		pcs.setLineCapStyle(1);
+		pcs.setStrokingColor(0.75);
+
+		for (int i = 0; i <= numCols; i++) {
+			float x = offsetX + i*fiducialTotalWidth;
+			pcs.moveTo(x,0);
+			pcs.lineTo(x,pageHeight);
+		}
+		for (int i = 0; i <= numRows; i++) {
+			float y = offsetY + i*fiducialTotalWidth;
+			pcs.moveTo(0,y);
+			pcs.lineTo(pageWidth,y);
+		}
+		pcs.closeAndStroke();
 	}
 
-	private void insertFiducial(int startPattern, int row, int col ) throws IOException {
+	private void insertFiducial(int patternCount, int row, int col , float fiducialWidthUnit ) throws IOException {
 		// Chance coordinate for this fiducial
+		pcs.saveGraphicsState();
 		pcs.transform(Matrix.getTranslateInstance(
 				offsetX + col * fiducialTotalWidth, offsetY + row * fiducialTotalWidth));
 
@@ -427,18 +422,23 @@ public abstract class BaseFiducialSquarePDF {
 		pcs.lineTo(wb+innerWidth,wb);
 		pcs.fillEvenOdd();
 
-		int imageNum = (startPattern+(row*numCols+col))%totalPatterns();
+		int patternID = (patternCount+(row*numCols+col))%totalPatterns();
 
 		// print out encoding information for convenience
-		if(printInfo) {
-//			out.println("  " + getDisplayDef(imageNum));  TODO what ever is going on here
+
+		if (printInfo) {
+			pcs.beginText();
+				pcs.setFont(PDType1Font.TIMES_ROMAN,7);
+			String patternName = getPatternName(patternID);
+			pcs.newLineAtOffset( whiteBorder+blackBorder, fiducialTotalWidth-10 );
+			pcs.showText(patternName + ",  width: " + fiducialWidthUnit + " " + unit.abbreviation);
+			pcs.endText();
 		}
 
 		// translate to where the pattern will be drawn
-		pcs.transform(Matrix.getTranslateInstance(
-				offsetX + col * fiducialTotalWidth+wb, offsetY + row * fiducialTotalWidth+wb));
-		drawPattern(imageNum);
-		pcs.transform(new Matrix());
+		pcs.transform(Matrix.getTranslateInstance(wb, wb));
+		drawPattern(patternID);
+		pcs.restoreGraphicsState();
 	}
 
 	public static String binaryToHex( GrayU8 binary ) {
