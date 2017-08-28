@@ -28,12 +28,10 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.UtilAffine;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import georegression.struct.shapes.Rectangle2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_B;
@@ -183,25 +181,6 @@ public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
 		ConfigPolygonFromContour config = new ConfigPolygonFromContour(minSides,maxSides);
 
 		return FactoryShapeDetector.polygonContour(config,imageType);
-	}
-
-	/**
-	 * Compare found rectangle against rectangles in the original undistorted image
-	 */
-	private int findMatchesOriginal(Polygon2D_F64 found, double tol) {
-		int match = 0;
-		for (int i = 0; i < rectangles.size(); i++) {
-			Rectangle2D_I32 ri = rectangles.get(i);
-			Rectangle2D_F64 r = new Rectangle2D_F64(ri.x0,ri.y0,ri.x1,ri.y1);
-			Polygon2D_F64 p = new Polygon2D_F64(4);
-			UtilPolygons2D_F64.convert(r,p);
-			if( p.isCCW() )
-				p.flip();
-
-			if(UtilPolygons2D_F64.isEquivalent(found,p,tol))
-				match++;
-		}
-		return match;
 	}
 
 
