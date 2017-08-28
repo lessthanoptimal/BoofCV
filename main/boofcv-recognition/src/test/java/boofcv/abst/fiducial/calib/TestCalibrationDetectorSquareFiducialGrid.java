@@ -19,10 +19,10 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
-import boofcv.alg.fiducial.calib.RenderSimulatedFisheye;
 import boofcv.alg.fiducial.calib.RenderSquareBinaryGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
+import boofcv.simulation.SimulatePlanarWorld;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -87,7 +87,7 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 	 * resolution and it is designed for partial matches after all.
 	 */
 	@Override
-	protected void checkResults(RenderSimulatedFisheye simulator, CalibrationObservation found, List<Point2D_F64> locations2D) {
+	protected void checkResults(SimulatePlanarWorld simulator, CalibrationObservation found, List<Point2D_F64> locations2D) {
 		// require at least 3/4 of the corners to be detected
 		if( locations2D.size() < found.size() || found.size() < locations2D.size()*3/4 ) {
 			visualize(simulator, locations2D, found);

@@ -171,6 +171,7 @@ def mainProjects = [
         ':main:boofcv-sfm',
         ':main:boofcv-recognition',
         ':main:boofcv-learning',
+        ':main:boofcv-simulation',
         ':integration:boofcv-swing'
 ]
 
