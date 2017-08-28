@@ -54,26 +54,25 @@ subprojects {
     }
 
     sourceSets {
-        main {
-            java {
-                srcDir 'src'
-            }
-            resources {
-                srcDir 'resources/src'
-            }
-        }
+//        main {
+//            java {
+//                srcDir 'src'
+//            }
+//            resources {
+//                srcDir 'resources/src'
+//            }
+//        }
 
         test {
             java {
-                srcDir 'test'
-                srcDir 'generate'
-                srcDir 'benchmark'
-                srcDir 'experimental/src'
-                srcDir 'experimental/test'
+                srcDir 'src/generate/java'
+                srcDir 'src/benchmark/java'
+                srcDir 'src/experimental/java'
+                srcDir 'src/experimental/test'
             }
-            resources {
-                srcDir 'resources/test'
-            }
+//            resources {
+//                srcDir 'resources/test'
+//            }
         }
     }
 
