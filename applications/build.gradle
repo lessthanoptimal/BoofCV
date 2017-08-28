@@ -10,6 +10,7 @@ dependencies {
     compile project(':integration:boofcv-WebcamCapture')
 
     compile group: 'args4j', name: 'args4j', version: '2.33'
+    compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.7'
 }
 
 idea {
