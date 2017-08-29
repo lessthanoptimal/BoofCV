@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib;
 
+import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
 import boofcv.alg.fiducial.square.FoundFiducial;
 import boofcv.struct.image.ImageGray;
@@ -118,12 +119,19 @@ public class DetectFiducialSquareGrid<T extends ImageGray<T>> {
 	 * @return true if it's looking for this ID number
 	 */
 	private int isExpected( long found ) {
+
+		int bestHamming = 2;
+		int bestNumber = -1;
 		for (int i = 0; i < numbers.length; i++) {
-			if( numbers[i] == found ) {
-				return i;
+
+			int hamming = DescriptorDistance.hamming((int)found^(int)numbers[i]);
+
+			if( hamming < bestHamming ) {
+				bestHamming = hamming;
+				bestNumber = i;
 			}
 		}
-		return -1;
+		return bestNumber;
 	}
 
 	/**

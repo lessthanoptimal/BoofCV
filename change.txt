@@ -55,7 +55,6 @@ Contour to Line
   them makes it break on others
 
 Calibration
-  TODO Fisheye Detector - Square Grid
   TODO Fisheye Detector - Asymmetric Circle
   TODO Fisheye Detector - Regular Circle
   TODO Fisheye Calibration Demonstration
@@ -70,8 +69,6 @@ TOP ITEMS
 - TODO QR Code support
 
 OTHER ITEMS
-- TODO Calibration Target PS generator unit test
-       Convert document into a graphic and detect
 - TODO Update IntensityPointFeatureApp. Let it select image to open
 - TODO Visualization tools for Direct VO
 -      Show warped image

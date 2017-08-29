@@ -72,6 +72,9 @@ public class ConfigSquareGridBinary implements Configuration {
 
 	{
 		configDetector.gridWidth = 3;
+		// Ambigious binary numbers won't be filtered any more
+		// Since the value of targets is known they will get filtered out later on
+		configDetector.ambiguousThreshold = 1.0;
 	}
 
 	/**
@@ -84,9 +87,12 @@ public class ConfigSquareGridBinary implements Configuration {
 		this.squareWidth = squareWidth;
 		this.spaceWidth = spaceWidth;
 
+		int maxID = configDetector.gridWidth*configDetector.gridWidth-4;
+		maxID = (int)Math.pow(2,maxID);
 		this.ids = new long[numRows*numCols];
+		int space = maxID/ids.length;
 		for (int i = 0; i < ids.length; i++) {
-			ids[i] = i;
+			ids[i] = i*space;
 		}
 	}
 

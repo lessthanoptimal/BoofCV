@@ -55,7 +55,41 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	double simulatedTargetWidth = 0.3; // size of target in simulated world
 
-	boolean visualizeFailures = true;
+	boolean visualizeFailures = false;
+
+	// list of posses for fisheye test
+	protected List<Se3_F64> fisheye_poses = new ArrayList<>();
+
+	public GenericPlanarCalibrationDetectorChecks() {
+		createFisheyePoses();
+	}
+
+	protected void createFisheyePoses() {
+		Se3_F64 markerToWorld = new Se3_F64();
+		// up close exploding - center
+		markerToWorld.T.set(0,0,0.08);
+		fisheye_poses.add(markerToWorld.copy());
+
+		// up close exploding - left
+		markerToWorld.T.set(0.1,0,0.08);
+		fisheye_poses.add(markerToWorld.copy());
+
+		markerToWorld.T.set(0.25,0,0.2);
+		fisheye_poses.add(markerToWorld.copy());
+
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-0.2,0,markerToWorld.getR());
+		fisheye_poses.add(markerToWorld.copy());
+
+		markerToWorld.T.set(0.3,0,0.05);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0,markerToWorld.getR());
+		fisheye_poses.add(markerToWorld.copy());
+
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0.5,markerToWorld.getR());
+		fisheye_poses.add(markerToWorld.copy());
+
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0.7,markerToWorld.getR());
+		fisheye_poses.add(markerToWorld.copy());
+	}
 
 	/**
 	 * Renders an image of the calibration target.
@@ -88,31 +122,10 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 			Se3_F64 markerToWorld = new Se3_F64();
 			simulator.addTarget(markerToWorld, simulatedTargetWidth,pattern);
 
-			// up close exploding - center
-			markerToWorld.T.set(0,0,0.08);
-			checkRenderedResults(detector,simulator,locations2D);
-
-			// up close exploding - left
-			markerToWorld.T.set(0.1,0,0.08);
-			checkRenderedResults(detector,simulator,locations2D);
-
-			markerToWorld.T.set(0.25,0,0.2);
-			checkRenderedResults(detector,simulator,locations2D);
-
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-0.2,0,markerToWorld.getR());
-			checkRenderedResults(detector,simulator,locations2D);
-
-			markerToWorld.T.set(0.3,0,0.05);
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0,markerToWorld.getR());
-			checkRenderedResults(detector,simulator,locations2D);
-
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0.5,markerToWorld.getR());
-			simulator.render();
-			checkRenderedResults(detector,simulator,locations2D);
-
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0.7,markerToWorld.getR());
-			simulator.render();
-			checkRenderedResults(detector,simulator,locations2D);
+			for( int j = 0; j < fisheye_poses.size(); j++ ) {
+				markerToWorld.set(fisheye_poses.get(j));
+				checkRenderedResults(detector,simulator,locations2D);
+			}
 		}
 	}
 
@@ -183,7 +196,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		}
 
 		ShowImages.showWindow(buff,"Foo",true);
-		BoofMiscOps.sleep(1000);
+		BoofMiscOps.sleep(10000);
 	}
 
 	/**

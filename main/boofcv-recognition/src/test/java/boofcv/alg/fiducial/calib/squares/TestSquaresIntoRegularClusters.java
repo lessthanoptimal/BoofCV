@@ -373,6 +373,16 @@ public class TestSquaresIntoRegularClusters {
 		assertConnected(b, 3, c, 1, 0.5);
 	}
 
+	/**
+	 * A perfect grid has been detected but a small square was also detected because
+	 * of noise. The square is much smaller than the other shapes, but still makes
+	 * it through the initial filter. Side are parallel too.
+	 */
+	@Test
+	public void noiseShapeSmallParallelSides() {
+		fail("implement");
+	}
+
 	private void assertConnected(SquareNode a , int indexA , SquareNode b , int indexB , double distance)
 	{
 		assertTrue(a.edges[indexA]==b.edges[indexB]);

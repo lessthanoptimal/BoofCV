@@ -47,12 +47,14 @@ public class TestDetectFiducialSquareGrid {
 		ConfigFiducialBinary configBinary = new ConfigFiducialBinary(1);
 		configBinary.gridWidth = 3;
 
+		long values[] = new long[]{0,1,2,3,4,5};
 		BaseDetectFiducialSquare<GrayF32> detector =
 				FactoryFiducial.squareBinary(configBinary, ConfigThreshold.fixed(125),GrayF32.class).getAlgorithm();
 		DetectFiducialSquareGrid<GrayF32> alg = new DetectFiducialSquareGrid<>(3,2,
-				new long[]{0,1,2,3,4,5},detector);
+				values,detector);
 
 		RenderSquareBinaryGridFiducial render = new RenderSquareBinaryGridFiducial();
+		render.values = values;
 		GrayF32 image = render.generate(3, 2);
 
 		assertTrue(alg.detect(image));

@@ -36,6 +36,7 @@ public class RenderSquareBinaryGridFiducial {
 	public double border = 0.25;
 	public int binaryGrid = 3;
 	public int squareWidth = 40;
+	public long values[];
 
 
 	public List<Quadrilateral_F64> expectedCorners = new ArrayList<>();
@@ -71,10 +72,10 @@ public class RenderSquareBinaryGridFiducial {
 		int number = 0;
 		for (int i = 0; i < numRows; i++) {
 			int y0 = i*squareWidth*2 + squareWidth;
-			for (int j = 0; j < numCols; j++) {
+			for (int j = 0; j < numCols; j++, number++) {
 				int x0 = j*squareWidth*2 + squareWidth;
 
-				generateSquare(x0,y0,squareWidth,number++,image);
+				generateSquare(x0,y0,squareWidth,(int)values[number],image);
 			}
 		}
 
