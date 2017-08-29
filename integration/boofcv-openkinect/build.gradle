@@ -12,21 +12,13 @@ dependencies {
 sourceSets {
     main {
         java {
-            srcDir 'src'
             srcDir 'libfreenect/wrappers/java/src/main/java'
-        }
-        resources {
-            srcDir 'resources/src'
         }
     }
 
     test {
         java {
-            srcDir 'test'
             srcDir 'examples/src'
-        }
-        resources {
-            srcDir 'resources/test'
         }
     }
 }

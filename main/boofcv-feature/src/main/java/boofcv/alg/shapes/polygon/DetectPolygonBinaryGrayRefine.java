@@ -230,7 +230,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 			DetectPolygonFromContour.Info d = detections.get(i);
 
 			if( d.computeEdgeIntensity() >= minimumRefineEdgeIntensity )
-				storage.add( detections.get(i).polygon );
+				storage.add( d.polygon );
 		}
 		return storage;
 	}

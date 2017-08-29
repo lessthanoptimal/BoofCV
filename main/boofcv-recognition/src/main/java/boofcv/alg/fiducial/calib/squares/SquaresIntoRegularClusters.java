@@ -102,7 +102,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	 * @param squares Set of squares
 	 * @return List of graphs.  All data structures are recycled on the next call to process().
 	 */
-	public List<List<SquareNode>> process( List<Polygon2D_F64> squares ) {
+	public List<List<SquareNode>> process(List<Polygon2D_F64> squares ) {
 		recycleData();
 
 		// set up nodes
@@ -141,6 +141,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 				double l = n.corners.get(j).distance(n.corners.get(k));
 				n.sideLengths[j] = l;
 				n.largestSide = Math.max(n.largestSide,l);
+				n.smallestSide = Math.min(n.smallestSide,l);
 			}
 		}
 	}
@@ -190,60 +191,98 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 		search.setPoints(searchPoints.toList(), nodes.toList());
 	}
 
+	LineSegment2D_F64 connectLine = new LineSegment2D_F64();
 	/**
 	 * Connects the 'candidate' node to node 'n' if they meet several criteria.  See code for details.
 	 */
 	void considerConnect(SquareNode node0, SquareNode node1) {
+
 		// Find the side on each line which intersects the line connecting the two centers
 		lineA.a = node0.center;
 		lineA.b = node1.center;
 
 		int intersection0 = findSideIntersect(node0,lineA,lineB);
+		connectLine.a.set(intersection);
 		int intersection1 = findSideIntersect(node1,lineA,lineB);
+		connectLine.b.set(intersection);
 
 		if( intersection1 < 0 || intersection0 < 0 ) {
 			return;
 		}
 
-		// see if they have a similar shape
-		double sideSideRatio0 = node0.largestSide/node0.smallestSideLength();
-		double sideSideRatio1 = node1.largestSide/node1.smallestSideLength();
+		double side0 = node0.sideLengths[intersection0];
+		double side1 = node1.sideLengths[intersection1];
 
-		if( Math.abs(sideSideRatio0-sideSideRatio1) > 1.2 ) {
+		// it shuold intersect about in the middle of the line
+
+		double sideLoc0 = connectLine.a.distance(node0.corners.get(intersection0))/side0;
+		double sideLoc1 = connectLine.b.distance(node1.corners.get(intersection1))/side1;
+
+		if( Math.abs(sideLoc0-0.5)>0.35 || Math.abs(sideLoc1-0.5)>0.35 )
+			return;
+
+		// seems to be about 1/2 the length typically
+//		System.out.println("lineA "+lineA.getLength()+"  connectLine "+connectLine.getLength());
+
+		// see if the spacing makes sense
+		double distanceApart = connectLine.getLength()*spaceToSquareRatio;
+
+//		if( distanceApart*1.2 < Math.min(side0,side1) )
+//			return;
+//		if( distanceApart*0.8 > Math.max(side0,side1) )
+//			return;
+
+		// see if connecting sides are of similar size
+		if( Math.abs(side0-side1)/Math.max(side0,side1) > 0.25 ) {
 			return;
 		}
+//
+//		// see if the intersection line is about perpendicular to both sides
+//		double angle0 = acuteAngle(node0,intersection0,lineA);
+//		double angle1 = acuteAngle(node1,intersection1,lineA);
+//
+//		System.out.printf("  acute %5.2f   %5.2f\n",UtilAngle.degree(angle0),UtilAngle.degree(angle1));
 
-		// compare the size of the two closest sides.  They should be similarish
-		double closeSide0 = node0.sideLengths[intersection0];
-		double closeSide1 = node1.sideLengths[intersection1];
-		double ratio = closeSide0>closeSide1  ? closeSide1/closeSide0 : closeSide0/closeSide1;
-		if( ratio < 0.5 ) {
-			return;
-		}
+//		double angle = UtilAngle.radian(20);
+//		if( Math.abs(angle0-Math.PI/2) > angle || Math.abs(angle1-Math.PI/2) > angle)
+//			return;
 
-		double distanceApart = lineA.getLength();
 
 		// Checks to see if the two sides selected above are closest to being parallel to each other.
 		// Perspective distortion will make the lines not parallel, but will still have a smaller
 		// acute angle than the adjacent sides
-		if( !mostParallel(node0, intersection0, node1, intersection1)) {
+		if( !almostParallel(node0, intersection0, node1, intersection1)) {
 			return;
 		}
+
+		double ratio = Math.max(node0.smallestSide/node1.largestSide ,
+				node1.smallestSide/node0.largestSide);
+
+//		System.out.println("ratio "+ratio);
+		if( ratio > 1.3 )
+			return;
+
+		// See if they are crudely the same size
+//		double area0 = node0.corners.areaSimple();
+//		double area1 = node1.corners.areaSimple();
+
+//		if( Math.min(area0,area1)/Math.max(area0,area1) < 0.25 )
+//			return;
 
 		// The following two tests see if the end points which define the two selected sides are close to
 		// the line created by the end points which define the opposing side.
 		// Another way of saying this, for the "top" corner on the side, is it close to the line defined
 		// by the side "top" sides on both squares.
 		// just look at the code its easier than understanding that description
-		if( !areMiddlePointsClose(node0.corners.get(add(intersection0, -1)), node0.corners.get(intersection0),
-				node1.corners.get(add(intersection1, 1)), node1.corners.get(add(intersection1, 2)))) {
-			return;
-		}
-
-		if( !areMiddlePointsClose(node0.corners.get(add(intersection0,2)),node0.corners.get(add(intersection0,1)),
-				node1.corners.get(intersection1),node1.corners.get(add(intersection1,-1)))) {
-			return;
-		}
+//		if( !areMiddlePointsClose(node0.corners.get(add(intersection0, -1)), node0.corners.get(intersection0),
+//				node1.corners.get(add(intersection1, 1)), node1.corners.get(add(intersection1, 2)))) {
+//			return;
+//		}
+//
+//		if( !areMiddlePointsClose(node0.corners.get(add(intersection0,2)),node0.corners.get(add(intersection0,1)),
+//				node1.corners.get(intersection1),node1.corners.get(add(intersection1,-1)))) {
+//			return;
+//		}
 		checkConnect(node0,intersection0,node1,intersection1,distanceApart);
 
 	}
@@ -272,14 +311,24 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	 * Returns true if the two sides are the two sides on each shape which are closest to being parallel
 	 * to each other.  Only the two sides which are adjacent are considered
 	 */
-	boolean mostParallel( SquareNode a , int sideA , SquareNode b , int sideB ) {
+	boolean almostParallel(SquareNode a , int sideA , SquareNode b , int sideB ) {
 		double selected = acuteAngle(a,sideA,b,sideB);
 
-		if( selected >  acuteAngle(a,sideA,b,add(sideB,1)) || selected >  acuteAngle(a,sideA,b,add(sideB,-1)) )
+		// see if the two sides are about parallel too
+		double left = acuteAngle(a,add(sideA,-1),b,add(sideB,1));
+		double right = acuteAngle(a,add(sideA,1),b,add(sideB,-1));
+
+		double tol = UtilAngle.radian(45);
+
+		if( left > selected+tol || right > selected+tol )
 			return false;
 
-		if( selected >  acuteAngle(a,add(sideA,1),b,sideB) || selected >  acuteAngle(a,add(sideA,-1),b,sideB) )
-			return false;
+
+//		if( selected >  acuteAngle(a,sideA,b,add(sideB,1)) || selected >  acuteAngle(a,sideA,b,add(sideB,-1)) )
+//			return false;
+//
+//		if( selected >  acuteAngle(a,add(sideA,1),b,sideB) || selected >  acuteAngle(a,add(sideA,-1),b,sideB) )
+//			return false;
 
 		return true;
 	}

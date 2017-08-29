@@ -52,7 +52,7 @@ public class ExampleCalibrateFisheye {
 
 		// Square Grid example
 //		detector = FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(4, 3, 30, 30));
-//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/stereo/Bumblebee2_Square"),"left");
+//		images = UtilIO.directoryList(UtilIO.pathExample("calibration/fisheye/square_grid"),"right");
 
 		// Chessboard Example
 		detector = FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));

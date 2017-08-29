@@ -18,8 +18,6 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
-import georegression.metric.Distance2D_F64;
-import georegression.struct.line.LineParametric2D_F64;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -276,48 +274,58 @@ public class SquareRegularClustersIntoGrids {
 	 * Add all the nodes into the list which lie along the line defined by a and b.  a is assumed to be
 	 * an end point.  Care is taken to not cycle.
 	 */
-	LineParametric2D_F64 line = new LineParametric2D_F64();
 	int addLineToGrid(SquareNode a, SquareNode b, List<SquareNode> list) {
 
 		int total = 2;
+//		double maxAngle = UtilAngle.radian(45);
 
 		while( true ) {
-			// maximum distance off of line
-			double bestDistance = b.largestSide / 4.0;
-			bestDistance *= bestDistance;
+//			double slopeX0 = b.center.x - a.center.x;
+//			double slopeY0 = b.center.y - a.center.y;
 
-			SquareNode best = null;
+//			double angleAB = Math.atan2(slopeY0,slopeX0);
 
-			line.setP(a.center);
-			line.setSlope(b.center.x - a.center.x, b.center.y - a.center.y);
-
-			// pick the child of b which is closest to the line going through the centers and not outside of tolerance
-			for (int i = 0; i < 4; i++) {
-				if( b.edges[i] == null )
-					continue;
-
-				SquareNode c = b.edges[i].destination(b);
-
-				if (c.graph == SEARCHED )
-					continue;
-
-				double distance = Distance2D_F64.distanceSq(line, c.center);
-				if (distance < bestDistance) {
-					bestDistance = distance;
-					best = c;
+			// see which side the edge belongs to on b
+			boolean matched = false;
+			int side;
+			for( side = 0; side < 4; side++ ) {
+				if( b.edges[side] != null && b.edges[side].destination(b) == a ) {
+					matched = true;
+					break;
 				}
 			}
 
-			if( best == null )
-				return total;
-			else {
-				total++;
-				best.graph = SEARCHED;
-				list.add(best);
-				a = b;
-				b = best;
+			if(!matched) {
+				throw new RuntimeException("BUG!");
 			}
+
+			// must be on the adjacent side
+			side = (side+2)%4;
+
+			if( b.edges[side] == null )
+				break;
+
+			SquareNode c = b.edges[side].destination(b);
+
+			if (c.graph == SEARCHED )
+				break;
+
+//			double slopeX1 = c.center.x - b.center.x;
+//			double slopeY1 = c.center.y - b.center.y;
+//
+//			double angleBC = Math.atan2(slopeY1,slopeX1);
+//			double acute = Math.abs(UtilAngle.minus(angleAB,angleBC));
+
+//			if( acute >= maxAngle )
+//				break;
+
+			total++;
+			c.graph = SEARCHED;
+			list.add(c);
+			a = b;
+			b = c;
 		}
+		return total;
 	}
 
 	/**

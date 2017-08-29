@@ -24,6 +24,7 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.simulation.SimulatePlanarWorld;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -54,7 +55,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	double simulatedTargetWidth = 0.3; // size of target in simulated world
 
-	boolean visualizeFailures = false;
+	boolean visualizeFailures = true;
 
 	/**
 	 * Renders an image of the calibration target.
@@ -136,8 +137,6 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 			fail("Number of detected points miss match");
 		}
 
-		visualize(simulator, locations2D, found);
-
 		Point2D_F64 truth = new Point2D_F64();
 
 		for (int i = 0; i < locations2D.size(); i++) {
@@ -166,7 +165,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		BufferedImage buff = new BufferedImage(output.width,output.height,BufferedImage.TYPE_INT_RGB);
 		ConvertBufferedImage.convertTo(simulator.getOutput(),buff,true);
 
-//		UtilImageIO.saveImage(buff,"failed.png");
+		UtilImageIO.saveImage(buff,"failed.png");
 
 		Graphics2D g2 = buff.createGraphics();
 		for (int j = 0; found != null && j < found.size(); j++) {
