@@ -23,10 +23,8 @@ import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -46,7 +44,8 @@ public class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 
 	private final ConfigThreshold configThreshold = ConfigThreshold.fixed(125);
 
-	private final static String patternName = "temp.jpg";
+	private final static String names[] =
+			new String[]{"temp0.jpg","temp1.jpg"};
 
 	public void createDocument( String args ) throws IOException, InterruptedException {
 		CreateFiducialSquareImagePDF.main(args.split("\\s+"));
@@ -56,10 +55,6 @@ public class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 		BufferedImage image = loadImage();
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
-
-		ShowImages.showWindow(gray,"ASdads");
-		BoofMiscOps.sleep(10000);
-//		UtilImageIO.saveImage(image,"saved.png");
 
 		return gray;
 	}
@@ -74,24 +69,31 @@ public class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 		g2.fillRect(0,100,100,30);
 		g2.fillRect(70,130,30,70);
 
-		UtilImageIO.saveImage(output,patternName);
+		UtilImageIO.saveImage(output, names[0]);
+
+		g2.fillOval(100,100,50,50);
+		UtilImageIO.saveImage(output, names[1]);
 	}
 
 	@AfterClass
 	public static void cleanUpImages() {
-		new File(patternName).delete();
+		for( String s : names) {
+			new File(s).delete();
+		}
 	}
 
 	private SquareImage_to_FiducialDetector<GrayF32> createDetector(ConfigFiducialImage config) {
 		SquareImage_to_FiducialDetector<GrayF32> detector = FactoryFiducial.squareImage(config,configThreshold,GrayF32.class);
-		detector.addPatternImage(UtilImageIO.loadImage(patternName,GrayF32.class),125,30);
+		for( String s : names) {
+			detector.addPatternImage(UtilImageIO.loadImage(s, GrayF32.class), 125, 30);
+		}
 		return detector;
 	}
 
 	@Test
 	public void single() throws IOException, InterruptedException {
 		createDocument(String.format("-PrintInfo -PageSize=letter -OutputFile=%s 4 %s",
-				document_name+".pdf",patternName));
+				document_name+".pdf", names[0]));
 		GrayF32 gray = loadImageGray();
 
 		ConfigFiducialImage config = new ConfigFiducialImage();
@@ -105,10 +107,8 @@ public class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 
 	@Test
 	public void grid() throws IOException, InterruptedException {
-//		createDocument(String.format("-PrintInfo -Grid=fill -PageSize=letter -OutputFile=%s 4 %s",
-//				document_name+".pdf",patternName));
-		createDocument(String.format("-Grid=fill -PageSize=letter -OutputFile=%s 4 %s",
-				document_name+".pdf",patternName));
+		createDocument(String.format("-PrintInfo -Grid=fill -PageSize=letter -OutputFile=%s 3 %s %s",
+				document_name+".pdf", names[0], names[1]));
 		GrayF32 gray = loadImageGray();
 
 		ConfigFiducialImage config = new ConfigFiducialImage();
@@ -118,7 +118,7 @@ public class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 
 		assertEquals(9,detector.totalFound());
 		for (int i = 0; i < detector.totalFound(); i++) {
-			assertEquals(0,detector.getId(i));
+			assertEquals(i%2,detector.getId(i));
 		}
 	}
 
