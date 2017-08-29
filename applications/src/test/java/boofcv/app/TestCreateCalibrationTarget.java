@@ -22,13 +22,10 @@ import boofcv.abst.fiducial.calib.*;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayF32;
-import org.junit.After;
 import org.junit.Test;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
@@ -40,31 +37,16 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public class TestCreateCalibrationTarget {
-
-	String document_name = "target.ps";
-	String image_name = "target.png";
-
+public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 
 	public void createDocument( String args ) throws IOException, InterruptedException {
-		CreateCalibrationTarget.main(args.split("\\s+"));
-		Runtime rt = Runtime.getRuntime();
-		Process pr = rt.exec("convert "+document_name+" "+image_name);
-
-		assertTrue(pr.waitFor()==0);
-	}
-
-	@After
-	public void cleanup() {
-		new File(document_name).delete();
-		new File(image_name).delete();
+		CreateCalibrationTargetPDF.main(args.split("\\s+"));
 	}
 
 	@Test
 	public void chessboard() throws IOException, InterruptedException {
 		createDocument("-r 7 -c 5 -o target -t CHESSBOARD -u cm -w 3 -p LETTER");
-		BufferedImage image = UtilImageIO.loadImage(image_name);
-		assertTrue(image != null);
+		BufferedImage image = loadImage();
 
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
@@ -78,8 +60,7 @@ public class TestCreateCalibrationTarget {
 	@Test
 	public void square_grid() throws IOException, InterruptedException {
 		createDocument("-r 4 -c 3 -o target -t SQUARE_GRID -u cm -w 3 -s 3 -p LETTER\n");
-		BufferedImage image = UtilImageIO.loadImage(image_name);
-		assertTrue(image != null);
+		BufferedImage image = loadImage();
 
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
@@ -93,8 +74,7 @@ public class TestCreateCalibrationTarget {
 	@Test
 	public void circle_asym() throws IOException, InterruptedException {
 		createDocument("-r 8 -c 5 -o target -t CIRCLE_ASYMMETRIC_GRID -u cm -w 2 -d 6 -p LETTER");
-		BufferedImage image = UtilImageIO.loadImage(image_name);
-		assertTrue(image != null);
+		BufferedImage image = loadImage();
 
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
@@ -108,8 +88,7 @@ public class TestCreateCalibrationTarget {
 	@Test
 	public void circle_regular() throws IOException, InterruptedException {
 		createDocument("-r 8 -c 6 -o target -t CIRCLE_GRID -u cm -w 2 -d 3 -p LETTER");
-		BufferedImage image = UtilImageIO.loadImage(image_name);
-		assertTrue(image != null);
+		BufferedImage image = loadImage();
 
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);

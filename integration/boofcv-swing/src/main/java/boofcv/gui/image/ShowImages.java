@@ -80,6 +80,7 @@ public class ShowImages {
 		JFrame frame = new JFrame(title);
 
 		ImagePanel panel = new ImagePanel(img);
+		panel.setScaling(ScaleOptions.DOWN);
 
 		frame.add(panel, BorderLayout.CENTER);
 
