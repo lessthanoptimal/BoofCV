@@ -204,8 +204,6 @@ public abstract class BaseFiducialSquarePDF {
 
 		// print out the selected number in binary for debugging purposes
 		document = new PDDocument();
-
-
 		PDDocumentInformation info = document.getDocumentInformation();
 		info.setCreator("BoofCV");
 		info.setTitle(documentName+" w="+ fiducialWidthUnit +" "+unit.abbreviation);

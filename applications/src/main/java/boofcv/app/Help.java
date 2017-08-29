@@ -29,13 +29,13 @@ import java.lang.reflect.Method;
 public class Help {
 
 	static Class []options = new Class[]{
-			CreateFiducialSquareImage.class,
-			CreateFiducialSquareBinary.class,
+			CreateFiducialSquareImagePDF.class,
+			CreateFiducialSquareBinaryPDF.class,
 			BatchRemoveLensDistortion.class,
 			BatchDownSizeImage.class,
 			FiducialDetection.class,
 			CameraCalibration.class,
-			CreateCalibrationTarget.class};
+			CreateCalibrationTargetPDF.class};
 
 	public static void printHelp() {
 		System.out.println("Trying to run a command-line application?  Here are your options!");
