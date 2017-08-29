@@ -252,9 +252,9 @@ public class TestSquaresIntoRegularClusters {
 
 		SquaresIntoRegularClusters alg = new SquaresIntoRegularClusters(2,6, 1.35);
 		for (int i = 0; i < 4; i++) {
-			assertTrue(alg.mostParallel(a, i, b, i));
-			assertTrue(alg.mostParallel(a, i, b, (i + 2) % 4));
-			assertFalse(alg.mostParallel(a, i, b, (i + 1) % 4));
+			assertTrue(alg.almostParallel(a, i, b, i));
+			assertTrue(alg.almostParallel(a, i, b, (i + 2) % 4));
+			assertFalse(alg.almostParallel(a, i, b, (i + 1) % 4));
 		}
 
 		// give it some slant
@@ -266,11 +266,11 @@ public class TestSquaresIntoRegularClusters {
 		double sin1 = Math.sin(angle1);
 
 		a.corners.get(adj).set(-1 + 2 * cos0, 1 + 2 * sin0);
-		assertTrue(alg.mostParallel(a, 0, b, 0));
-		assertFalse(alg.mostParallel(a, 1, b, 0));
+		assertTrue(alg.almostParallel(a, 0, b, 0));
+		assertFalse(alg.almostParallel(a, 1, b, 0));
 		a.corners.get(adj).set(-1 + 2 * cos1, 1 + 2 * sin1);
-		assertTrue(alg.mostParallel(a, 0, b, 0));
-		assertFalse(alg.mostParallel(a, 1, b, 0));
+		assertTrue(alg.almostParallel(a, 0, b, 0));
+		assertFalse(alg.almostParallel(a, 1, b, 0));
 	}
 
 	@Test

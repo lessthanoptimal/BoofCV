@@ -43,6 +43,7 @@ public class SquareNode {
 	public double sideLengths[] = new double[4];
 	// the largest length
 	public double largestSide;
+	public double smallestSide;
 
 	// marker used to indicate that this has been traversed by different algorithms
 	public int graph;
@@ -72,6 +73,7 @@ public class SquareNode {
 		touch = null;
 		center.set(-1,-1);
 		largestSide = 0;
+		smallestSide = Double.MAX_VALUE;
 		graph = RESET_GRAPH;
 		for (int i = 0; i < edges.length; i++) {
 			if ( edges[i] != null )

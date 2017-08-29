@@ -19,13 +19,14 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
-import boofcv.alg.fiducial.calib.RenderSimulatedFisheye;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
+import boofcv.simulation.SimulatePlanarWorld;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.image.GrayF32;
@@ -54,7 +55,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	double simulatedTargetWidth = 0.3; // size of target in simulated world
 
-	boolean visualizeFailures = false;
+	boolean visualizeFailures = true;
 
 	/**
 	 * Renders an image of the calibration target.
@@ -74,7 +75,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	@Test
 	public void fisheye_fullview() {
 		CameraUniversalOmni model = CalibrationIO.load(getClass().getResource("fisheye.yaml"));
-		RenderSimulatedFisheye simulator = new RenderSimulatedFisheye();
+		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(model);
 
 		List<Point2D_F64> locations2D = new ArrayList<>();
@@ -116,7 +117,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	}
 
 	private void checkRenderedResults(DetectorFiducialCalibration detector,
-									  RenderSimulatedFisheye simulator ,
+									  SimulatePlanarWorld simulator ,
 									  List<Point2D_F64> locations2D )
 	{
 		simulator.render();
@@ -130,13 +131,11 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		checkResults(simulator,detector.getDetectedPoints(), locations2D);
 	}
 
-	protected void checkResults(RenderSimulatedFisheye simulator, CalibrationObservation found, List<Point2D_F64> locations2D) {
+	protected void checkResults(SimulatePlanarWorld simulator, CalibrationObservation found, List<Point2D_F64> locations2D) {
 		if( locations2D.size() != found.size() ) {
 			visualize(simulator, locations2D, found);
 			fail("Number of detected points miss match");
 		}
-
-		visualize(simulator, locations2D, found);
 
 		Point2D_F64 truth = new Point2D_F64();
 
@@ -159,14 +158,14 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		}
 	}
 
-	protected void visualize(RenderSimulatedFisheye simulator, List<Point2D_F64> locations2D, CalibrationObservation found) {
+	protected void visualize(SimulatePlanarWorld simulator, List<Point2D_F64> locations2D, CalibrationObservation found) {
 		if( !visualizeFailures )
 			return;
 		GrayF32 output = simulator.getOutput();
 		BufferedImage buff = new BufferedImage(output.width,output.height,BufferedImage.TYPE_INT_RGB);
 		ConvertBufferedImage.convertTo(simulator.getOutput(),buff,true);
 
-//		UtilImageIO.saveImage(buff,"failed.png");
+		UtilImageIO.saveImage(buff,"failed.png");
 
 		Graphics2D g2 = buff.createGraphics();
 		for (int j = 0; found != null && j < found.size(); j++) {
@@ -194,7 +193,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	public void pinhole_radial_fullview() {
 
 		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("pinhole_radial.yaml"));
-		RenderSimulatedFisheye simulator = new RenderSimulatedFisheye();
+		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(model);
 
 		List<Point2D_F64> locations2D = new ArrayList<>();
@@ -249,7 +248,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		GrayF32 pattern = new GrayF32(1,1);
 		renderTarget(layout, simulatedTargetWidth, pattern, locations2D);
 
-		RenderSimulatedFisheye simulator = new RenderSimulatedFisheye();
+		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(model);
 
 		Se3_F64 markerToWorld = new Se3_F64();

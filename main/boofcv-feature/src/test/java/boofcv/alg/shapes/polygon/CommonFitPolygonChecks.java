@@ -31,6 +31,7 @@ import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import georegression.struct.shapes.Rectangle2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 import georegression.transform.affine.AffinePointOps_F64;
 import org.junit.Before;
@@ -172,6 +173,25 @@ public class CommonFitPolygonChecks {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	/**
+	 * Compare found rectangle against rectangles in the original undistorted image
+	 */
+	protected int findMatchesOriginal(Polygon2D_F64 found, double tol) {
+		int match = 0;
+		for (int i = 0; i < rectangles.size(); i++) {
+			Rectangle2D_I32 ri = rectangles.get(i);
+			Rectangle2D_F64 r = new Rectangle2D_F64(ri.x0,ri.y0,ri.x1,ri.y1);
+			Polygon2D_F64 p = new Polygon2D_F64(4);
+			UtilPolygons2D_F64.convert(r,p);
+			if( p.isCCW() )
+				p.flip();
+
+			if(UtilPolygons2D_F64.isEquivalent(found,p,tol))
+				match++;
+		}
+		return match;
 	}
 
 	protected Polygon2D_F64 apply( Affine2D_F64 affine , Polygon2D_F64 input ) {

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.calib;
+package boofcv.simulation;
 
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.LensDistortionWideFOV;
@@ -25,26 +25,17 @@ import boofcv.alg.distort.SphereToNarrowPixel_F64;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
-import boofcv.io.UtilIO;
-import boofcv.io.calibration.CalibrationIO;
-import boofcv.io.image.ConvertBufferedImage;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.distort.Point2Transform3_F64;
 import boofcv.struct.distort.Point3Transform2_F64;
 import boofcv.struct.image.GrayF32;
-import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.UtilShape3D_F64;
 import georegression.metric.Intersection3D_F64;
-import georegression.struct.EulerType;
 import georegression.struct.line.LineParametric3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -55,8 +46,6 @@ import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,7 +54,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RenderSimulatedFisheye {
+public class SimulatePlanarWorld {
 
 	GrayF32 output = new GrayF32(1,1);
 	GrayF32 depthMap = new GrayF32(1,1);
@@ -247,49 +236,5 @@ public class RenderSimulatedFisheye {
 
 	public GrayF32 getOutput() {
 		return output;
-	}
-
-	public static void main(String[] args) {
-		GrayF32 image = new GrayF32(400,300);
-		GImageMiscOps.fill(image,255);
-		GImageMiscOps.fillRectangle(image,90,20,20,40,40);
-		GImageMiscOps.fillRectangle(image,90,60,60,40,40);
-		GImageMiscOps.fillRectangle(image,90,100,20,40,40);
-
-		GImageMiscOps.fillRectangle(image,90,300,200,60,60);
-
-		Se3_F64 rectToWorld = new Se3_F64();
-		rectToWorld.T.set(0,0,-0.2);
-//		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,1.0,0,rectToWorld.R);
-		rectToWorld = rectToWorld.invert(null);
-
-		Se3_F64 rectToWorld2 = new Se3_F64();
-		rectToWorld2.T.set(0,-0.20,0.3);
-
-		String fisheyePath = UtilIO.pathExample("fisheye/theta/");
-		CameraUniversalOmni model = CalibrationIO.load(new File(fisheyePath,"front.yaml"));
-
-		RenderSimulatedFisheye alg = new RenderSimulatedFisheye();
-
-		alg.setCamera(model);
-		alg.addTarget(rectToWorld,0.3,image);
-		alg.addTarget(rectToWorld2,0.15,image);
-		alg.render();
-
-		BufferedImage output = new BufferedImage(model.width,model.height,BufferedImage.TYPE_INT_RGB);
-
-		ConvertBufferedImage.convertTo(alg.getOutput(),output);
-
-		ImagePanel panel = ShowImages.showWindow(output,"Rendered Fisheye",true);
-
-		for (int i = 0; i < 2000; i++) {
-			alg.getImageRect(0).rectToWorld.T.x = 0.7*Math.sin(i*0.01);
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,0,i*0.05,
-					alg.getImageRect(1).rectToWorld.R);
-			alg.render();
-			ConvertBufferedImage.convertTo(alg.getOutput(),output);
-			panel.repaint();
-			BoofMiscOps.sleep(10);
-		}
 	}
 }

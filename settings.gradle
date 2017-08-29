@@ -1,8 +1,9 @@
 include 'examples','demonstrations','applications',
 
         'main:boofcv-ip','main:boofcv-io','main:boofcv-feature','main:boofcv-geo','main:boofcv-calibration',
-        'main:boofcv-sfm','main:boofcv-recognition','main:boofcv-core',
-        'main:checks','main:autocode','main:boofcv-learning','integration:boofcv-all',
+        'main:boofcv-sfm','main:boofcv-recognition','main:boofcv-simulation',
+        'main:checks','main:autocode','main:boofcv-learning',
+        'integration:boofcv-all','main:boofcv-core',
 
         'integration:boofcv-javacv',"integration:boofcv-WebcamCapture",
         'integration:boofcv-jcodec','integration:boofcv-swing',

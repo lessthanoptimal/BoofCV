@@ -29,11 +29,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO Comment
+ * Detects polygons using contour of blobs in a binary image. The contours can then have their edges refined as a
+ * whole or on an individual basis. Lens distortion can be specified. Lens distortion is handled in a sparse way
+ * along the contour of shapes.
  *
  * @author Peter Abeles
  */
-// TODO prune using edge intensity after refine
 public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 
 	// Detects the polygons using a contour from a binary image
@@ -55,8 +56,18 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	// useful for customization
 	AdjustBeforeRefineEdge functionAdjust;
 
+	// threshold for pruning after refinement
 	double minimumRefineEdgeIntensity;
 
+	/**
+	 * Configures the polygon detector
+	 *
+	 * @param detector Fits a polygon to a contour
+	 * @param refineContour Refines the polygon produce a better fit against the contour
+	 * @param refineGray Refine the edges to the input gray scale image
+	 * @param minimumRefineEdgeIntensity Threshold for pruning shapes. Must have this edge intensity. Try 6
+	 * @param adjustForThresholdBias Should it adjust contour polygons for the bias caused by thresholding?
+	 */
 	public DetectPolygonBinaryGrayRefine(DetectPolygonFromContour<T> detector,
 										 RefinePolygonToContour refineContour,
 										 RefinePolygonToGray<T> refineGray ,
@@ -74,10 +85,16 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 				detector.getInputType());
 	}
 
+	/**
+	 * Specify a helper used to inject specialized code into the polygon detector
+	 */
 	public void setHelper( PolygonHelper helper ) {
 		detector.setHelper(helper);
 	}
 
+	/**
+	 * Turn on and off verbose output to standard out
+	 */
 	public void setVerbose( boolean verbose ) {
 		detector.setVerbose(verbose);
 	}
@@ -199,6 +216,9 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		}
 	}
 
+	/**
+	 * Returns a list of all polygons with an edge threshold above the minimum
+	 */
 	public List<Polygon2D_F64> getPolygons( List<Polygon2D_F64> storage ) {
 		if( storage == null )
 			storage = new ArrayList<>();
@@ -210,7 +230,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 			DetectPolygonFromContour.Info d = detections.get(i);
 
 			if( d.computeEdgeIntensity() >= minimumRefineEdgeIntensity )
-				storage.add( detections.get(i).polygon );
+				storage.add( d.polygon );
 		}
 		return storage;
 	}

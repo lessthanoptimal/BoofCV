@@ -10,5 +10,6 @@ dependencies {
         }}
 
     testCompile project(':main:boofcv-io')
+    testCompile project(':main:boofcv-simulation')
     testCompile project(':integration:boofcv-swing')
 }
