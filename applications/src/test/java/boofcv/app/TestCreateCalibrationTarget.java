@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
 public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 
 	public void createDocument( String args ) throws IOException, InterruptedException {
-		CreateCalibrationTargetPDF.main(args.split("\\s+"));
+		CreateCalibrationTarget.main(args.split("\\s+"));
 	}
 
 	@Test

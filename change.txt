@@ -28,6 +28,8 @@ Version : 0.28
 - Gradle
   * fixed gradle not copying over doc-files
 - Changed directory structure to gradle standard to better integrate source code from other languages
+- Applications
+  * Changed format from postscript to PDF. Better support for file format and easier to use.
 
 TODO Add flip primitive array to ddogleg. Search for "primitive flip" for code that should be replaced here
 

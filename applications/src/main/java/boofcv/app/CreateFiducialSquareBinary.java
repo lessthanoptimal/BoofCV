@@ -21,7 +21,6 @@ package boofcv.app;
 import org.ddogleg.struct.GrowQueue_I64;
 
 import java.io.IOException;
-import java.io.PrintStream;
 
 /**
  * Outputs an EPS document describing a binary square fiducial that encodes the specified number
@@ -36,28 +35,20 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 	private int gridWidth = 4;
 
 	@Override
-	protected void printPatternDefinitions() {
+	protected void drawPattern( int patternID ) throws IOException {
 
-		out.print("  /sl "+(innerWidth/gridWidth)+" def\n  /w0 0 def\n");
-		// Handle different size grids.
-		for(int i = 1; i < gridWidth; i++) {
-			out.print("  /w" + i + " { w" + (i-1) + " sl add} def\n");
-		}
-		out.print("  /box {newpath moveto sl 0 rlineto 0 sl rlineto sl neg 0 rlineto closepath fill} def\n");
+		float bw = innerWidth/gridWidth;
 
-		for( int i = 0; i < numbers.size(); i++ ) {
-			long patternNumber = numbers.get(i);
+		// Draw the black corner used to ID the orientation
+		pcs.addRect(0,0,bw,bw);pcs.fill();
 
-			out.print("  /"+getPatternPrintDef(i)+" {\n"+
-					"% Block corner used to identify orientation\n" +
-					"  0 0 box\n");
-			final int bitCount = numberOfElements() - 4;
-			for (int j = 0; j < bitCount; j++) {
-				if( (patternNumber & (1L<<j)) != 0 ) {
-					box(out, j);
-				}
+		long patternNumber = numbers.get(patternID);
+
+		final int bitCount = numberOfElements() - 4;
+		for (int j = 0; j < bitCount; j++) {
+			if( (patternNumber & (1L<<j)) != 0 ) {
+				box(bw,j);
 			}
-			out.print("} def\n");
 		}
 	}
 
@@ -96,7 +87,7 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 			return numbers.get(0)+" and more";
 	}
 
-	private void box( PrintStream out , final int bit ) {
+	private void box( float boxWidth , final int bit ) throws IOException {
 
 		int transitionBit0 = gridWidth-3;
 		int transitionBit1 = transitionBit0 + gridWidth*(gridWidth-2);
@@ -114,7 +105,7 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 
 		int x = adjustedBit % gridWidth;
 		int y = adjustedBit / gridWidth;
-		out.print("  w" + x + " w" + y +" box\n");
+		pcs.addRect(x*boxWidth,y*boxWidth,boxWidth,boxWidth);pcs.fill();
 	}
 
 	private int numberOfElements() {

@@ -19,15 +19,22 @@
 package boofcv.app;
 
 import boofcv.struct.image.GrayU8;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.util.Matrix;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
 
 /**
  * <p>
- * Base class for generating square fiducials postscript documents for printing.  Fiducials are placed in a regular grid.
+ * Base class for generating square fiducial PDF documents for printing.  Fiducials are placed in a regular grid.
  * The width of each element in the grid is the fiducial's width (pattern + black border) and a white border.  The
  * grid starts in the page's lower left and corner.
  * </p>
@@ -44,10 +51,15 @@ import java.io.PrintStream;
  */
 public abstract class BaseFiducialSquare {
 
+	// objects for writing PDF document
+	PDDocument document;
+	PDPage page;
+	PDPageContentStream pcs;
+
 	// threshold for converting to a binary image
 	public int threshold = 255/2;
-	public double UNIT_TO_POINTS;
-	public static final double CM_TO_POINTS = 72.0/2.54;
+	public float UNIT_TO_POINTS;
+	public static final float CM_TO_POINTS = 72.0f/2.54f;
 	// should it add the file name and size to the document?
 	public boolean printInfo = true;
 
@@ -68,42 +80,36 @@ public abstract class BaseFiducialSquare {
 	public int numCols = 1;
 	public int numRows = 1;
 
-	// draw an invisible border around the document.
-	boolean boundaryHack = true;
-
 	//============= These Parameters specify how it's printed
 	// Total length of the target.  image + black border
-	double fiducialBoxWidth;
+	float fiducialBoxWidth;
 	// length of the white border surrounding the fiducial
-	double whiteBorder;
+	float whiteBorder;
 	// length of the black border
-	double blackBorder;
+	float blackBorder;
 	// length of the inner pattern
-	double innerWidth ;
+	float innerWidth ;
 	// Length of the fiducial plus the white border
-	double fiducialTotalWidth;
+	float fiducialTotalWidth;
 	// offset of the page.  basically changes the origin
-	double offsetX, offsetY;
+	float offsetX, offsetY;
 
 	// requested paper size.  If null it will be automatically selected
 	PaperSize paper;
 
 	//============= These parameters are used to automatically generate some of the above parameters
 	// No printing is allowed inside the border and this information is used to adjust offsets with the user request
-	double pageBorderX = 1*CM_TO_POINTS;
-	double pageBorderY = 1*CM_TO_POINTS;
+	float pageBorderX = 1*CM_TO_POINTS;
+	float pageBorderY = 1*CM_TO_POINTS;
 
 	// how wide the fiducial's black border is relative to its total width
-	public double blackBorderFractionalWidth;
+	public float blackBorderFractionalWidth;
 
 	// name of the output file
 	String outputFileName;
 
-	// stream in which the output file is written to
-	PrintStream out;
-
 	// file type extension
-	String typeExtension = "ps";
+	String typeExtension = "pdf";
 
 	public Unit getUnit() {
 		return unit;
@@ -141,29 +147,25 @@ public abstract class BaseFiducialSquare {
 		this.showPreview = showPreview;
 	}
 
-	public void setPageBorder( double borderX , double borderY , Unit units) {
-		pageBorderX = units.convert(borderX,Unit.CENTIMETER)*CM_TO_POINTS;
-		pageBorderY = units.convert(borderY,Unit.CENTIMETER)*CM_TO_POINTS;
+	public void setPageBorder( float borderX , float borderY , Unit units) {
+		pageBorderX = (float)units.convert(borderX,Unit.CENTIMETER)*CM_TO_POINTS;
+		pageBorderY = (float)units.convert(borderY,Unit.CENTIMETER)*CM_TO_POINTS;
 	}
 
-	public void setOffset( double offsetX , double offsetY , Unit units) {
-		this.offsetX = units.convert(offsetX,Unit.CENTIMETER)*CM_TO_POINTS;
-		this.offsetY = units.convert(offsetY,Unit.CENTIMETER)*CM_TO_POINTS;
+	public void setOffset( float offsetX , float offsetY , Unit units) {
+		this.offsetX = (float)units.convert(offsetX,Unit.CENTIMETER)*CM_TO_POINTS;
+		this.offsetY = (float)units.convert(offsetY,Unit.CENTIMETER)*CM_TO_POINTS;
 	}
 
-	public void setBlackBorderFractionalWidth(double blackBorderFractionalWidth) {
+	public void setBlackBorderFractionalWidth(float blackBorderFractionalWidth) {
 		this.blackBorderFractionalWidth = blackBorderFractionalWidth;
-	}
-
-	public void setBoundaryHack(boolean boundaryHack) {
-		this.boundaryHack = boundaryHack;
 	}
 
 	public void setOutputFileName(String outputFileName)  {
 		this.outputFileName = outputFileName;
 	}
 
-	public void generateGrid( double fiducialWidth , double whiteBorder , int numCols , int numRows , PaperSize paper )
+	public void generateGrid( float fiducialWidth , float whiteBorder , int numCols , int numRows , PaperSize paper )
 			throws IOException
 	{
 		this.paper = paper;
@@ -174,8 +176,8 @@ public abstract class BaseFiducialSquare {
 			this.autofillGrid = true;
 
 		if( whiteBorder < 0 ) {
-			double cm2 = Unit.CENTIMETER.convert(2.0,unit);
-			whiteBorder = Math.max(cm2, fiducialWidth / 4.0);
+			float cm2 = (float)Unit.CENTIMETER.convert(2.0,unit);
+			whiteBorder = Math.max(cm2, fiducialWidth / 4.0f);
 		}
 		generate(fiducialWidth, whiteBorder);
 	}
@@ -187,7 +189,7 @@ public abstract class BaseFiducialSquare {
 	 * @param whiteBorderUnit Thickness of the border around the fiducial
 	 * @throws IOException
 	 */
-	private void generate(double fiducialWidthUnit, double whiteBorderUnit) throws IOException {
+	private void generate(float fiducialWidthUnit, float whiteBorderUnit) throws IOException {
 
 		String outputName;
 		if( this.outputFileName == null ) {
@@ -196,23 +198,30 @@ public abstract class BaseFiducialSquare {
 			outputName = this.outputFileName;
 		}
 
-		String imageName = selectDocumentName();
+		String documentName = selectDocumentName();
 
 		configureDocument(fiducialWidthUnit, whiteBorderUnit);
 
 		// print out the selected number in binary for debugging purposes
-		out = new PrintStream(outputName);
-		generateDocument(fiducialWidthUnit, imageName);
+		document = new PDDocument();
+		PDDocumentInformation info = document.getDocumentInformation();
+		info.setCreator("BoofCV");
+		info.setTitle(documentName+" w="+ fiducialWidthUnit +" "+unit.abbreviation);
 
+		generateDocument(fiducialWidthUnit);
+
+		// save and close document
+		document.save(outputName);
+		document.close();
 		System.out.println("Saved to "+new File(outputName).getAbsolutePath());
 	}
 
 	/**
 	 * Compute how to build the documetn and setup all parameters
 	 */
-	private void configureDocument(double fiducialWidthUnit, double whiteBorderUnit) throws FileNotFoundException
+	private void configureDocument(float fiducialWidthUnit, float whiteBorderUnit) throws FileNotFoundException
 	{
-		UNIT_TO_POINTS = 72.0/(2.54* Unit.conversion(Unit.CENTIMETER, unit));
+		UNIT_TO_POINTS = 72.0f/(2.54f* (float)Unit.conversion(Unit.CENTIMETER, unit));
 
 		if( autofillGrid ) {
 			if( paper == null )
@@ -226,7 +235,7 @@ public abstract class BaseFiducialSquare {
 		fiducialBoxWidth = fiducialWidthUnit* UNIT_TO_POINTS;
 		whiteBorder = whiteBorderUnit* UNIT_TO_POINTS;
 		blackBorder = fiducialBoxWidth*blackBorderFractionalWidth;
-		innerWidth = fiducialBoxWidth*(1.0-2.0*blackBorderFractionalWidth);
+		innerWidth = fiducialBoxWidth*(1.0f-2.0f*blackBorderFractionalWidth);
 		fiducialTotalWidth = fiducialBoxWidth +whiteBorder*2;
 
 		//  zone in which the target can't be placed unless it will print inside the border, which is not allowed
@@ -250,34 +259,34 @@ public abstract class BaseFiducialSquare {
 	 * the grid if necessary.
 	 */
 	private void centerPage() {
-		double pageWidth = paper.convertWidth(unit)*UNIT_TO_POINTS;
-		double pageHeight = paper.convertHeight(unit)*UNIT_TO_POINTS;
+		float pageWidth = (float)paper.convertWidth(unit)*UNIT_TO_POINTS;
+		float pageHeight = (float)paper.convertHeight(unit)*UNIT_TO_POINTS;
 
-		double validX0 = pageBorderX;
-		double validX1 = pageWidth-pageBorderX;
-		double validY0 = pageBorderY;
-		double validY1 = pageHeight-pageBorderY;
+		float validX0 = pageBorderX;
+		float validX1 = pageWidth-pageBorderX;
+		float validY0 = pageBorderY;
+		float validY1 = pageHeight-pageBorderY;
 
 		boolean allGood = false;
 		while( numCols > 0 && numRows > 0 && !allGood) {
 			allGood = true;
 
 			// center the current target inside the page
-			offsetX = (pageWidth  - fiducialTotalWidth * numCols ) / 2.0;
-			offsetY = (pageHeight - fiducialTotalWidth * numRows ) / 2.0;
+			offsetX = (pageWidth  - fiducialTotalWidth * numCols ) / 2.0f;
+			offsetY = (pageHeight - fiducialTotalWidth * numRows ) / 2.0f;
 
 			// Find the edges which bound the regions where printing is done
-			double edgeBlackLeft = offsetX+whiteBorder;
-			double edgeBlackRight = offsetX+ fiducialTotalWidth *numCols-whiteBorder;
-			double edgeBlackBottom = offsetY+whiteBorder;
-			double edgeBlackTop = offsetY+ fiducialTotalWidth *numRows-whiteBorder;
+			float edgeBlackLeft = offsetX+whiteBorder;
+			float edgeBlackRight = offsetX+ fiducialTotalWidth *numCols-whiteBorder;
+			float edgeBlackBottom = offsetY+whiteBorder;
+			float edgeBlackTop = offsetY+ fiducialTotalWidth *numRows-whiteBorder;
 
-			if( edgeBlackLeft+1e-8 < validX0 ||edgeBlackRight-1e-8 > validX1 ) {
+			if( edgeBlackLeft+1e-4f < validX0 ||edgeBlackRight-1e-4f > validX1 ) {
 				allGood = false;
 				numCols--;
 			}
 
-			if( edgeBlackBottom+1e-8 < validY0 ||edgeBlackTop-1e-8 > validY1 ) {
+			if( edgeBlackBottom+1e-4f < validY0 ||edgeBlackTop-1e-4f > validY1 ) {
 				allGood = false;
 				numRows--;
 			}
@@ -312,69 +321,44 @@ public abstract class BaseFiducialSquare {
 
 	/**
 	 * Creates an EPS document from all the specifications in the class
-	 * @param fiducialWidthUnit Width of fiducial (including border) in user specified units.
-	 * @param documentTitle Title of the document
 	 */
-	private void generateDocument(double fiducialWidthUnit, String documentTitle) {
+	private void generateDocument( float fiducialWidthUnit ) throws IOException {
 
 		int patternsPerPage = numRows*numCols;
 		int numPages = (int)Math.ceil(totalPatterns()/(double)patternsPerPage);
 
-		printHeader(documentTitle, fiducialWidthUnit, numPages);
-
-		printPatternDefinitions();
-		if (printInfo) {
-			for (int pattern = 0; pattern < totalPatterns(); pattern++) {
-				String patternName = getPatternName(pattern);
-				out.print(" /" + getDisplayDef(pattern) + "\n" +
-						"{\n" +
-						"  /Times-Roman findfont\n" + "7 scalefont setfont b1 " + (fiducialTotalWidth - 10) +
-						" moveto (" + patternName + ",  width: " + fiducialWidthUnit + " " + unit.abbreviation + ") show\n" +
-						"} def\n");
-			}
-		}
-
-		if (printInfo) {
-			out.print("  /Times-Roman findfont\n" + "7 scalefont setfont "+offsetX+" "+offsetY +
-					String.format(" moveto ( Page Size: %4.1f by %4.1f %s) show\n",
-							paper.width,paper.height,paper.unit.abbreviation));
-		}
+		float pageWidth = (float)(paper.convertWidth(unit)*UNIT_TO_POINTS);
+		float pageHeight = (float)(paper.convertHeight(unit)*UNIT_TO_POINTS);
+		PDRectangle rectangle = new PDRectangle(pageWidth, pageHeight);
 
 		for (int i = 0; i < numPages; i++) {
-			printPageHeader(i+1);
-			if(boundaryHack)
-				printInvisibleBoundary();
+			page = new PDPage(rectangle);
+			document.addPage(page);
+			pcs = new PDPageContentStream(document , page);
 
 			int startPattern = i*patternsPerPage;
 
-			// draws the black border around the fiducial
-			out.print(" /drawBorder\n"+
-					"{\n" +
-					" newpath b0 b0 moveto 0 ow rlineto bb 0 rlineto 0 -1 ow mul rlineto closepath fill\n" +
-					" newpath b1 b2 moveto iw 0 rlineto 0 bb rlineto -1 iw mul 0 rlineto closepath fill\n" +
-					" newpath b1 b0 moveto iw 0 rlineto 0 bb rlineto -1 iw mul 0 rlineto closepath fill\n" +
-					" newpath b2 b0 moveto 0 ow rlineto bb 0 rlineto 0 -1 ow mul rlineto closepath fill\n" +
-					"} def\n");
-
 			for (int row = 0; row < numRows; row++) {
 				for (int col = 0; col < numCols; col++) {
-					insertFiducial(startPattern,row,col);
+					insertFiducial(startPattern,row,col,fiducialWidthUnit);
 				}
 			}
 
 			if( printGrid )
 				printGrid();
 
-			out.print("  showpage\n");
-		}
-		out.print("%%EOF\n");
-	}
+			if (printInfo) {
+				pcs.beginText();
+				pcs.setFont(PDType1Font.TIMES_ROMAN,7);
+				pcs.newLineAtOffset( offsetX+1, offsetY+1 );
+				pcs.showText(String.format("Page Size: %4.1f by %4.1f %s",
+						paper.width,paper.height,paper.unit.abbreviation));
+				pcs.endText();
+			}
 
-	/**
-	 * Creates definitions which will render the pattern.  Each pattern's difintion will have the name returned
-	 * by {@link #getPatternPrintDef(int)}
-	 */
-	protected abstract void printPatternDefinitions();
+			pcs.close();
+		}
+	}
 
 	/**
 	 * Returns the total number of unqiue patterns
@@ -388,104 +372,71 @@ public abstract class BaseFiducialSquare {
 	 */
 	protected abstract String getPatternName( int num );
 
-	protected String getPatternPrintDef(int num) {
-		return String.format("drawImage%03d",num);
-	}
-
 	protected String getDisplayDef(int num) {
 		return String.format("displayInfo%03d",num);
 	}
 
-	private void printHeader( String documentTitle , double widthCM, int totalPages) {
-		double pageWidth = paper.convertWidth(unit)*UNIT_TO_POINTS;
-		double pageHeight = paper.convertHeight(unit)*UNIT_TO_POINTS;
-		out.println("%!PS-Adobe-3.0\n" +
-				"%%Creator: BoofCV\n" +
-				"%%DocumentMedia: Plain "+pageWidth+" "+pageHeight+" 80 white ( )\n" +
-				"%%Title: "+documentTitle+" w="+ widthCM +" "+unit.abbreviation+"\n" +
-				"%%DocumentData: Clean7Bit\n" +
-				"%%LanguageLevel: 2\n" +
-				"%%BeginSetup\n" +
-				"  << /PageSize ["+pageWidth+" "+pageHeight+"] /Orientation 0 >> setpagedevice\n" +
-				"%%EndSetup\n" +
-				"%%EndComments\n" +
-				"%%BeginProlog\n" +
-				"%%EndProlog\n" +
-				"%%Pages: "+totalPages+"\n" +
-				"  /iw " + innerWidth + " def\n" +
-				"  /ow " + (innerWidth + 2 * blackBorder) + " def\n" +
-				"  /wb " + whiteBorder + " def\n" +
-				"  /bb " + blackBorder + " def\n" +
-				"  /b0 wb def\n" +
-				"  /b1 { wb bb add} def\n" +
-				"  /b2 { b1 " + innerWidth + " add} def\n" +
-				"  /b3 { b2 bb add} def\n"
-		);
-	}
-
-	private void printPageHeader( int pageNumber ) {
-		out.println("%%Page: "+pageNumber+" "+pageNumber+"\n");
-	}
-
-	/**
-	 * Prints an invisible boundary around the document to prevent a smart cropping script from cropping the white space
-	 */
-	private void printInvisibleBoundary() {
-		double pageWidth = paper.convertWidth(unit)*UNIT_TO_POINTS;
-		double pageHeight = paper.convertHeight(unit)*UNIT_TO_POINTS;
-
-		out.println(" 1.0 setgray");
-		out.printf(" newpath 0 0 moveto %f 0 rlineto 0 setlinewidth stroke\n", pageWidth);
-		out.printf(" newpath 0 0 moveto 0 %f lineto 0 setlinewidth stroke\n", pageHeight);
-		out.printf(" newpath %f 0 moveto %f %f lineto 0 setlinewidth stroke\n", pageWidth, pageWidth, pageHeight);
-		out.printf(" newpath 0 %f moveto %f %f lineto 0 setlinewidth stroke\n", pageHeight, pageWidth, pageHeight);
-		out.println(" 0.0 setgray");
-		out.println();
-	}
 
 	/**
 	 * Draws the grid in light grey on the document
 	 */
-	private void printGrid() {
-		double pageWidth = paper.convertWidth(unit)*UNIT_TO_POINTS;
-		double pageHeight = paper.convertHeight(unit)*UNIT_TO_POINTS;
+	private void printGrid() throws IOException {
+		float pageWidth = (float)paper.convertWidth(unit)*UNIT_TO_POINTS;
+		float pageHeight = (float)paper.convertHeight(unit)*UNIT_TO_POINTS;
 
-		out.println("% grid lines");
+//		pcs.setLineCapStyle(1);
+		pcs.setStrokingColor(0.75);
 
-		out.print(" /drawRow { moveto "+pageWidth+" 0 rlineto 1 setlinewidth stroke} def\n");
-		out.print(" /drawColumn { moveto 0 "+pageHeight+" rlineto 1 setlinewidth stroke} def\n");
-		out.print(" 0.75 setgray\n");
 		for (int i = 0; i <= numCols; i++) {
-			double x = offsetX + i*fiducialTotalWidth;
-			out.printf(" newpath %f 0 drawColumn\n",x);
+			float x = offsetX + i*fiducialTotalWidth;
+			pcs.moveTo(x,0);
+			pcs.lineTo(x,pageHeight);
 		}
 		for (int i = 0; i <= numRows; i++) {
-			double y = offsetY + i*fiducialTotalWidth;
-			out.printf(" newpath 0 %f drawRow\n",y);
+			float y = offsetY + i*fiducialTotalWidth;
+			pcs.moveTo(0,y);
+			pcs.lineTo(pageWidth,y);
 		}
+		pcs.closeAndStroke();
 	}
 
-	private void insertFiducial(int startPattern, int row, int col ) {
-		out.print(
-				"  /originX " + (offsetX + col * fiducialTotalWidth) + " def\n" +
-						"  /originY " + (offsetY + row * fiducialTotalWidth) + " def\n" +
-						"  originX originY translate\n" );
-		out.println();
-		out.println("  drawBorder");
+	private void insertFiducial(int patternCount, int row, int col , float fiducialWidthUnit ) throws IOException {
+		// Chance coordinate for this fiducial
+		pcs.saveGraphicsState();
+		pcs.transform(Matrix.getTranslateInstance(
+				offsetX + col * fiducialTotalWidth, offsetY + row * fiducialTotalWidth));
 
-		int imageNum = (startPattern+(row*numCols+col))%totalPatterns();
+		// Draw the black border around the fiducial
+		pcs.setNonStrokingColor(Color.BLACK);
+		float ow = innerWidth + 2 * blackBorder;
+		float wb = whiteBorder+blackBorder;
+		pcs.moveTo(whiteBorder,whiteBorder);
+		pcs.lineTo(whiteBorder+ow,whiteBorder);
+		pcs.lineTo(whiteBorder+ow,whiteBorder+ow);
+		pcs.lineTo(whiteBorder,whiteBorder+ow);
+		pcs.moveTo(wb,wb);
+		pcs.lineTo(wb,wb+innerWidth);
+		pcs.lineTo(wb+innerWidth,wb+innerWidth);
+		pcs.lineTo(wb+innerWidth,wb);
+		pcs.fillEvenOdd();
+
+		int patternID = (patternCount+(row*numCols+col))%totalPatterns();
 
 		// print out encoding information for convenience
-		if(printInfo) {
-			out.println("  " + getDisplayDef(imageNum));
+
+		if (printInfo) {
+			pcs.beginText();
+				pcs.setFont(PDType1Font.TIMES_ROMAN,7);
+			String patternName = getPatternName(patternID);
+			pcs.newLineAtOffset( whiteBorder+blackBorder, fiducialTotalWidth-10 );
+			pcs.showText(patternName + ",  width: " + fiducialWidthUnit + " " + unit.abbreviation);
+			pcs.endText();
 		}
 
-		out.println("% Center then draw the image");
-		out.println("  b1 b1 translate");
-		out.println("  "+getPatternPrintDef(imageNum));
-		out.println("% Undo translations");
-		out.println("  -1 b1 mul -1 b1 mul translate");
-		out.println("  -1 originX mul -1 originY mul translate");
+		// translate to where the pattern will be drawn
+		pcs.transform(Matrix.getTranslateInstance(wb, wb));
+		drawPattern(patternID);
+		pcs.restoreGraphicsState();
 	}
 
 	public static String binaryToHex( GrayU8 binary ) {
@@ -512,6 +463,8 @@ public abstract class BaseFiducialSquare {
 
 		return s.toString();
 	}
+
+	protected abstract void drawPattern( int patternID ) throws IOException;
 
 	public void setGrid( int numRows , int numCols ) {
 		this.numRows = numRows;

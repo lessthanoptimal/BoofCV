@@ -35,15 +35,14 @@ public class CommandParserFiducialSquare {
 	public String outputName = null;
 	public int gridX = 1, gridY = 1;
 	public LengthUnit pageBorderX = null, pageBorderY = null;
-	public double blackBorder = 0.25;
-	public double offsetX = 0, offsetY = 0;
+	public float blackBorder = 0.25f;
+	public float offsetX = 0, offsetY = 0;
 	public boolean autoCenter = true;
 	public LengthUnit whiteBorder = null;
 	public Unit units = Unit.CENTIMETER;
 	public PaperSize paper = null;
 	public boolean printInfo = false;
 	public boolean printGrid = false;
-	public boolean noBoundaryHack = false;
 	public LengthUnit fiducialWidth = null;
 	private boolean isBinary = false;
 
@@ -71,16 +70,13 @@ public class CommandParserFiducialSquare {
 		System.out.println("./application <optional flags> <fiducial width>  <"+nameOfPatterns+" 0> ... <"+nameOfPatterns+" N-1>");
 		System.out.println();
 		System.out.println("Optional Flags");
-		System.out.println("-OutputFile=<name>    Specify name of output file.  Default is <name>.ps");
+		System.out.println("-OutputFile=<name>    Specify name of output file.  Default is <name>.pdf");
 		System.out.println("-Grid=fill            Automatically fill the paper with fiducials");
 		System.out.println("-Grid=<rows>,<cols>   Create a grid of fiducials with the specified number of rows and columns");
 		System.out.println("-WhiteBorder=<val>    Size of the white border around the fiducial.");
 		System.out.println("-BlackBorder=<frac>   Specifies the fractional width of the fiducial's black border. default = 0.25");
 		System.out.println("-PrintInfo            Will print the size and name of each fiducial.");
 		System.out.println("-PrintGrid            Will draw a light gray grid around the fiducials");
-		System.out.println("-NoBoundaryHack       By default an invisible rectangle around the document border is added.");
-		System.out.println("                      The invisible border prevents some smart printers from cropping the document.");
-		System.out.println("                      Using this flag will turn off this option.");
 		System.out.println("-PageBorder=<x>,<y>   Specifies the border of the page in which it can't print. Default = 1cm");
 		System.out.println("-Offsets=<x>,<y>      Shift the fiducial/grid");
 		System.out.println("                      Turns off auto centering");
@@ -98,7 +94,7 @@ public class CommandParserFiducialSquare {
 		}
 		System.out.println();
 		System.out.println("Examples:");
-		System.out.println("./application -PrintInfo -OutputFile=fiducial.ps 10 "+n0);
+		System.out.println("./application -PrintInfo -OutputFile=fiducial.pdf 10 "+n0);
 		System.out.println("         10cm fiducial using '"+n0+"' as the pattern with it's size and info");
 		System.out.println("./application -Grid=fill -Units=inch -PageSize=letter 2.5 "+n0);
 		System.out.println("         2.5 inch fiducial, filling letter sized paper with grid, '"+n0+"' as the pattern");
@@ -131,22 +127,20 @@ public class CommandParserFiducialSquare {
 					printInfo = true;
 				} else if( "PrintGrid".compareToIgnoreCase(label) == 0 ) {
 					printGrid = true;
-				} else if( "NoBoundaryHack".compareToIgnoreCase(label) == 0 ) {
-					noBoundaryHack = true;
 				} else if( "PageBorder".compareToIgnoreCase(label) == 0 ) {
 					String words[] = split(param(arg));
 					pageBorderX = new LengthUnit(words[0]);
 					pageBorderY = new LengthUnit(words[1]);
 				} else if( "BlackBorder".compareToIgnoreCase(label) == 0 ) {
-					blackBorder = Double.parseDouble(param(arg));
+					blackBorder = Float.parseFloat(param(arg));
 					if( blackBorder <= 0 || blackBorder >= 0.5 ) {
 						System.err.println("black border should be 0 < border < 0.5");
 						System.exit(1);
 					}
 				} else if( "Offsets".compareToIgnoreCase(label) == 0 ) {
 					String words[] = split(param(arg));
-					offsetX = Double.parseDouble(words[0]);
-					offsetY = Double.parseDouble(words[1]);
+					offsetX = Float.parseFloat(words[0]);
+					offsetY = Float.parseFloat(words[1]);
 					autoCenter = false;
 				} else if( "Units".compareToIgnoreCase(label) == 0 ) {
 					units = Unit.lookup(param(arg));
@@ -204,7 +198,6 @@ public class CommandParserFiducialSquare {
 		System.out.println("Black Border         "+blackBorder);
 		System.out.println("Print Info           "+printInfo);
 		System.out.println("Print Grid           "+printGrid);
-		System.out.println("Boundary Hack        "+(!noBoundaryHack));
 		if(isBinary) System.out.println("Binary Grid Size     "+ binaryGridSize + "x" + binaryGridSize);
 		if( paper != null )	System.out.println("Paper Size           "+paper);
 		if( gridX < 0)
@@ -249,20 +242,19 @@ public class CommandParserFiducialSquare {
 
 		app.setPrintInfo(printInfo);
 		app.setPrintGrid(printGrid);
-		app.setBoundaryHack(!noBoundaryHack);
 		app.setUnit(units);
 		if( !autoCenter ) {
 			app.setCentering(false);
 			app.setOffset(offsetX, offsetY, units);
 		}
 		if( pageBorderX != null ) {
-			app.setPageBorder(pageBorderX.convert(units), pageBorderY.convert(units), units);
+			app.setPageBorder((float)pageBorderX.convert(units), (float)pageBorderY.convert(units), units);
 		} else {
 			app.setPageBorder(0,0, units);
 		}
 		double whiteBorderValue = whiteBorder==null?-1:whiteBorder.convert(units);
 		app.setBlackBorderFractionalWidth(blackBorder);
-		app.generateGrid(fiducialWidth.convert(units),whiteBorderValue,gridX,gridY,paper);
+		app.generateGrid((float)fiducialWidth.convert(units),(float)whiteBorderValue,gridX,gridY,paper);
 
 		System.out.println("################### Finished");
 	}

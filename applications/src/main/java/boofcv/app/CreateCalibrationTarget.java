@@ -23,6 +23,8 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+import java.io.IOException;
+
 /**
  * Application for generating calibration targets
  *
@@ -51,15 +53,15 @@ public class CreateCalibrationTarget {
 	PaperSize paperSize;
 
 	@Option(name="-w",aliases = {"--ShapeWidth"}, usage="Width of the shape or diameter if a circle.  In document units.")
-	double shapeWidth=-1;
+	float shapeWidth=-1;
 
 	@Option(name="-s",aliases = {"--Space"}, usage="Spacing between the shapes.  In document units.")
-	double shapeSpace=-1;
+	float shapeSpace=-1;
 
 	@Option(name="-d",aliases = {"--CenterDistance"}, usage="Distance between circle centers.  In document units.")
-	double centerDistance=-1;
+	float centerDistance=-1;
 
-	@Option(name="-o",aliases = {"--OutputName"}, usage="Name of output file.  E.g. chessboard for chessboard.ps")
+	@Option(name="-o",aliases = {"--OutputName"}, usage="Name of output file.  E.g. chessboard for chessboard.pdf")
 	String fileName = "target";
 
 	@Option(name="-i",aliases = {"--DisablePrintInfo"}, usage="Disable printing information about the calibration target")
@@ -173,8 +175,8 @@ public class CreateCalibrationTarget {
 		}
 	}
 
-	public void run() {
-		String suffix = ".ps";
+	public void run() throws IOException {
+		String suffix = ".pdf";
 		System.out.println("Saving to "+fileName+suffix);
 		CreateCalibrationTargetGenerator generator =
 				new CreateCalibrationTargetGenerator(fileName+suffix,paperSize,rows,columns,unit);
@@ -209,6 +211,8 @@ public class CreateCalibrationTarget {
 			// handling of wrong arguments
 			System.err.println(e.getMessage());
 			printHelpExit(parser);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

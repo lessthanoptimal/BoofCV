@@ -39,7 +39,7 @@ public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 	private final ConfigThreshold configThreshold = ConfigThreshold.fixed(125);
 
 	public void createDocument( String args ) throws IOException, InterruptedException {
-		CreateFiducialSquareBinaryPDF.main(args.split("\\s+"));
+		CreateFiducialSquareBinary.main(args.split("\\s+"));
 	}
 
 	public GrayF32 loadImageGray() throws IOException {

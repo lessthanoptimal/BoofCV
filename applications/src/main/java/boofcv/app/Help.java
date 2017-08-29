@@ -29,13 +29,13 @@ import java.lang.reflect.Method;
 public class Help {
 
 	static Class []options = new Class[]{
-			CreateFiducialSquareImagePDF.class,
-			CreateFiducialSquareBinaryPDF.class,
+			CreateFiducialSquareImage.class,
+			CreateFiducialSquareBinary.class,
 			BatchRemoveLensDistortion.class,
 			BatchDownSizeImage.class,
 			FiducialDetection.class,
 			CameraCalibration.class,
-			CreateCalibrationTargetPDF.class};
+			CreateCalibrationTarget.class};
 
 	public static void printHelp() {
 		System.out.println("Trying to run a command-line application?  Here are your options!");
@@ -45,7 +45,7 @@ public class Help {
 			System.out.println("  "+c.getName());
 		}
 		System.out.println("Example:");
-		System.out.println("java -cp applications.jar "+CreateFiducialSquareImage.class.getSimpleName());
+		System.out.println("java -cp applications.jar "+options[0].getSimpleName());
 	}
 
 	public static void main(String[] args) {
@@ -74,7 +74,7 @@ public class Help {
 				System.out.println("  " + c.getSimpleName());
 			}
 			System.out.println("Example:");
-			System.out.println("java -jar applications.jar " + CreateFiducialSquareImage.class.getSimpleName());
+			System.out.println("java -jar applications.jar " + options[0].getSimpleName());
 		}
 	}
 }
