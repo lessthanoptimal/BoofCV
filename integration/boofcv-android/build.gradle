@@ -4,11 +4,15 @@
 ext.ANDROID_HOME = System.getenv()['ANDROID_HOME'];
 ext.ANDROID_PLATFORMS = new File((String)ext.ANDROID_HOME+"/platforms").list().grep{it.contains("android-")}
 
-if( ext.ANDROID_PLATFORMS.isEmpty() )
+if( ext.ANDROID_PLATFORMS.isEmpty() ) {
     ext.ANDROID_PLATFORMS = new File((String)ext.ANDROID_HOME).list().grep{it.contains("android-")}
+    if( ext.ANDROID_PLATFORMS.isEmpty() )
+        throw new RuntimeException("Can't find any platforms in "+ext.ANDROID_HOME+"/platforms")
+    else
+        ext.ANDROID_PATH = ext.ANDROID_HOME+ext.ANDROID_PLATFORMS.sort().last()
+} else
+    ext.ANDROID_PATH = ext.ANDROID_HOME+"/platforms/"+ext.ANDROID_PLATFORMS.sort().last()
 
-if( ext.ANDROID_PLATFORMS.isEmpty() )
-    throw new RuntimeException("Can't find any platforms in "+ext.ANDROID_HOME+"/platforms")
 
 ext.ANDROID_PATH = System.getenv()['ANDROID_HOME']+"/platforms/"+ext.ANDROID_PLATFORMS.sort().last()
 
