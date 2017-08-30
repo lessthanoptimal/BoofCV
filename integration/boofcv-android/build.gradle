@@ -13,9 +13,6 @@ if( ext.ANDROID_PLATFORMS.isEmpty() ) {
 } else
     ext.ANDROID_PATH = ext.ANDROID_HOME+"/platforms/"+ext.ANDROID_PLATFORMS.sort().last()
 
-
-ext.ANDROID_PATH = System.getenv()['ANDROID_HOME']+"/platforms/"+ext.ANDROID_PLATFORMS.sort().last()
-
 println "Build Android module using $ext.ANDROID_PATH"
 
 // disable tests since they can't be run on a regular desktop
