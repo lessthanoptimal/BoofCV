@@ -112,7 +112,7 @@ public class TestEllipseClustersIntoGrid {
 		alg.computeNodeInfo(grid.data1,grid.data0);
 
 		List<NodeInfo> line;
-		line = EllipseClustersIntoGrid.findLine(alg.listInfo.get(0),alg.listInfo.get(1),5*4);
+		line = EllipseClustersIntoGrid.findLine(alg.listInfo.get(0),alg.listInfo.get(1),5*4, null);
 
 		assertEquals(4, line.size());
 		for (int i = 0; i < cols; i++) {

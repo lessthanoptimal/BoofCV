@@ -42,7 +42,7 @@ public abstract class EllipseClustersIntoGrid {
 	protected FastQueue<Grid> foundGrids = new FastQueue<>(Grid.class,true);
 
 	// When finding lines this is the largest change in angle between the two edges allowed for it to be on the line
-	protected static double MAX_LINE_ANGLE_CHANGE = UtilAngle.degreeToRadian(10);
+	protected static double MAX_LINE_ANGLE_CHANGE = UtilAngle.degreeToRadian(30);
 
 	// Information on each ellipse/node in a cluster
 	protected FastQueue<NodeInfo> listInfo = new FastQueue<>(NodeInfo.class,true);
@@ -82,15 +82,19 @@ public abstract class EllipseClustersIntoGrid {
 	 * Finds all the nodes which form an approximate line
 	 * @param seed First ellipse
 	 * @param next Second ellipse, specified direction of line relative to seed
+	 * @param line
 	 * @return All the nodes along the line
 	 */
-	protected static List<NodeInfo> findLine(NodeInfo seed , NodeInfo next , int clusterSize ) {
+	protected static List<NodeInfo> findLine(NodeInfo seed, NodeInfo next, int clusterSize, List<NodeInfo> line) {
 		if( next == null )
 			return null;
+		if( line == null )
+			line = new ArrayList<>();
+		else
+			line.clear();
 
 		double anglePrev = direction(seed, next);
 
-		List<NodeInfo> line = new ArrayList<>(); // TODO recycle this
 		line.add( seed );
 		line.add( next );
 
@@ -105,11 +109,16 @@ public abstract class EllipseClustersIntoGrid {
 			for (int j = 0; j < next.edges.size(); j++) {
 				double angle = next.edges.get(j).angle;
 				NodeInfo c = next.edges.get(j).target;
+				if( c.marked )
+					continue;
 
 				double diff = UtilAngle.dist(angle,anglePrev);
 				if( diff <= MAX_LINE_ANGLE_CHANGE ) {
 					double d = c.ellipse.center.distance(next.ellipse.center);
+					d *= scoreDistanceFromEdges(next.edges,c.ellipse.center);
+
 					double score = (diff+0.01)*d;
+
 					if( score < bestScore ) {
 						bestDistance = d;
 						bestScore = score;
@@ -120,15 +129,38 @@ public abstract class EllipseClustersIntoGrid {
 				}
 			}
 
-			if( best == null || bestDistance > closestDistance*2.0)
+			if( best == null || bestDistance > closestDistance*2.0) {
 				return line;
-			else {
+			} else {
+				best.marked = true;
 				line.add(best);
 				anglePrev = bestAngle;
 				next = best;
 			}
 		}
-		throw new RuntimeException("Stuck in a loop?  Maximum line length exceeded");
+//		if( verbose ) {
+//			System.out.println("Stuck in a loop?  Maximum line length exceeded");
+//		}
+		return null;
+	}
+
+	private static double scoreDistanceFromEdges( FastQueue<Edge> edges , Point2D_F64 target ) {
+		double total = 0;
+		for (int i = 0; i < edges.size(); i++) {
+			Edge e = edges.get(i);
+
+			if( e.target.marked )
+				continue;
+			if( e.target.ellipse.center == target )
+				continue;
+			double d = target.distance(e.target.ellipse.center);
+
+			if( e.target.marked )
+				total -= 1/d;
+			else
+				total += 1/d;
+		}
+		return total;
 	}
 
 	/**
@@ -152,6 +184,8 @@ public abstract class EllipseClustersIntoGrid {
 
 		for (int i = 0; i < currentSeed.edges.size(); i++) {
 			Edge edge = currentSeed.edges.get(i);
+			if( edge.target.marked )
+				continue;
 
 			double angleDiff = UtilAngle.dist(edge.angle, angleTarget);
 			if( angleDiff > MAX_LINE_ANGLE_CHANGE*1.5 )
@@ -165,6 +199,8 @@ public abstract class EllipseClustersIntoGrid {
 			}
 		}
 
+		if( best != null )
+			best.marked = true;
 		return best;
 	}
 
@@ -177,6 +213,9 @@ public abstract class EllipseClustersIntoGrid {
 
 		for (int i = 0; i < n.edges.size(); i++) {
 			Edge e = n.edges.get(i);
+			if( e.target.marked )
+				continue;
+
 			double d = e.target.ellipse.center.distance2(p);
 			if( d < bestDistance ) {
 				bestDistance = d;
@@ -191,6 +230,10 @@ public abstract class EllipseClustersIntoGrid {
 	 * Checks to see if any node is used more than once
 	 */
 	boolean checkDuplicates(List<List<NodeInfo>> grid ) {
+
+		for (int i = 0; i < listInfo.size; i++) {
+			listInfo.get(i).marked = false;
+		}
 
 		for (int i = 0; i < grid.size(); i++) {
 			List<NodeInfo> list = grid.get(i);
@@ -380,6 +423,7 @@ public abstract class EllipseClustersIntoGrid {
 			}
 		}
 
+		best.marked = true;
 		return best;
 	}
 

@@ -57,10 +57,16 @@ public class EllipseClustersIntoRegularGrid extends EllipseClustersIntoGrid {
 
 			// Find corner to start alignment
 			NodeInfo corner = selectSeedCorner();
+			corner.marked = true;
 
 			// find the row and column which the corner is a member of
-			List<NodeInfo> cornerRow = findLine(corner,corner.left,clusterSize);
-			List<NodeInfo> cornerColumn = findLine(corner,corner.right,clusterSize);
+			List<NodeInfo> cornerRow = findLine(corner,corner.left,clusterSize, null);
+			List<NodeInfo> cornerColumn = findLine(corner,corner.right,clusterSize, null);
+
+			if( cornerRow == null || cornerColumn == null ) {
+				if( verbose )System.out.println("Corner row/column line find failed");
+				continue;
+			}
 
 			// Go down the columns and find each of the rows
 			List<List<NodeInfo>> gridByRows = new ArrayList<>();
@@ -77,7 +83,7 @@ public class EllipseClustersIntoRegularGrid extends EllipseClustersIntoGrid {
 					failed = true;
 					break;
 				}
-				List<NodeInfo> row = findLine( seed , next, clusterSize);
+				List<NodeInfo> row = findLine( seed , next, clusterSize, null);
 				gridByRows.add( row );
 			}
 			if( failed )

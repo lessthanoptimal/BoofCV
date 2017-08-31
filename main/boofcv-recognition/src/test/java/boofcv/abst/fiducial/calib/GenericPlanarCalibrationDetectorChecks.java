@@ -55,7 +55,8 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	double simulatedTargetWidth = 0.3; // size of target in simulated world
 
-	boolean visualizeFailures = false;
+	boolean visualizeFailures = true;
+	long visualizeTime = 10000;
 
 	// list of posses for fisheye test
 	protected List<Se3_F64> fisheye_poses = new ArrayList<>();
@@ -123,6 +124,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 			simulator.addTarget(markerToWorld, simulatedTargetWidth,pattern);
 
 			for( int j = 0; j < fisheye_poses.size(); j++ ) {
+				System.out.println("fisheye pose = "+j);
 				markerToWorld.set(fisheye_poses.get(j));
 				checkRenderedResults(detector,simulator,locations2D);
 			}
@@ -196,7 +198,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		}
 
 		ShowImages.showWindow(buff,"Foo",true);
-		BoofMiscOps.sleep(10000);
+		BoofMiscOps.sleep(visualizeTime);
 	}
 
 	/**

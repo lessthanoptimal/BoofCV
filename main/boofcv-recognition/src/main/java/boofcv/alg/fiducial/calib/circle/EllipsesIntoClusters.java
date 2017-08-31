@@ -41,7 +41,7 @@ public class EllipsesIntoClusters {
 	private double maxDistanceToMajorAxisRatio;
 
 	// minimum allowed ratio difference between major and minor axis
-	private double sizeSimilarityTolerance = 0.5;
+	private double sizeSimilarityTolerance;
 
 	// minimum number of elements in a cluster
 	private int minimumClusterSize = 2;
@@ -56,8 +56,8 @@ public class EllipsesIntoClusters {
 	/**
 	 * Configures clustering
 	 *
-	 * @param maxDistanceToMajorAxisRatio The maxium distance away the center of another ellipse can be relative
-	 *                                    to the major axis of the ellipse being examined
+	 * @param maxDistanceToMajorAxisRatio The maximum distance away the center of another ellipse that will be
+	 *                                   considered specifies as a multiple of the ellipse's major axis
 	 * @param sizeSimilarityTolerance How similar two ellipses must be to be connected.  0 to 1.0.  1.0 = perfect
 	 *                                match and 0.0 = infinite difference in size
 	 */
@@ -140,10 +140,13 @@ public class EllipsesIntoClusters {
 				if( e2 == e1 )
 					continue;
 
+				// TODO prune by orientation but only if strongly elliposoidal
+
 				// the initial search was based on size of major axis.  Now prune and take in account the distance
 				// from the minor axis
-				if( axisAdjustedDistance(e1,e2) > maxDistance )
+				if( axisAdjustedDistance(e1,e2) > maxDistance ) {
 					continue;
+				}
 
 				// smallest shape divided by largest shape
 				double ratioA = e1.a > e2.a ? e2.a / e1.a : e1.a / e2.a;

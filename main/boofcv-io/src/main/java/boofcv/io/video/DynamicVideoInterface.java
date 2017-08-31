@@ -36,7 +36,6 @@ import java.util.List;
  */
 public class DynamicVideoInterface implements VideoInterface {
 
-	VideoInterface xuggler;
 	VideoInterface jcodec;
 	VideoInterface ffmpeg;
 	BoofMjpegVideo mjpeg = new BoofMjpegVideo();
@@ -73,18 +72,10 @@ public class DynamicVideoInterface implements VideoInterface {
 		}
 
 		try {
-			if( xuggler != null ) {
-				return xuggler.load(fileName, imageType);
-			}
-		} catch( RuntimeException ignore ){}
-
-		try {
 			if( ffmpeg != null ) {
 				return ffmpeg.load(fileName, imageType);
 			}
-		} catch( RuntimeException ignore ){
-			ignore.printStackTrace();
-		}
+		} catch( RuntimeException ignore ){}
 
 		try {
 			if( jcodec != null ) {
@@ -93,7 +84,7 @@ public class DynamicVideoInterface implements VideoInterface {
 				}
 			}
 		} catch( RuntimeException ignore ){}
-		System.err.println("Codec finally not found for file: " + fileName);
+		System.err.println("No working codec found for file: " + fileName);
 		return null;
 	}
 

@@ -22,7 +22,10 @@ import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayF32;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se3_F64;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -35,7 +38,43 @@ import java.util.List;
 public class TestCalibrationDetectorCircleRegularGrid extends GenericPlanarCalibrationDetectorChecks {
 
 	public TestCalibrationDetectorCircleRegularGrid() {
-		targetConfigs.add( new ConfigCircleRegularGrid(5, 4, 30,50));
+		targetConfigs.add( new ConfigCircleRegularGrid(4, 3, 30,50));
+
+		// Does a good job detecting the ellipses, but a shit job determining with the tangent points
+		// The lens distortion moves them so that they aren't even close
+		fisheyeMatchTol = 7;
+	}
+
+	/**
+	 * Reduce the intensity of fisheye distortion by moving the markers away from the border
+	 */
+	@Override
+	protected void createFisheyePoses() {
+		Se3_F64 markerToWorld = new Se3_F64();
+		// up close exploding - center
+		markerToWorld.T.set(0,0,0.08);
+		fisheye_poses.add(markerToWorld.copy());
+
+		// up close exploding - left
+		markerToWorld.T.set(0.1,0,0.18);
+		fisheye_poses.add(markerToWorld.copy());
+
+		markerToWorld.T.set(0.25,0,0.2);
+		fisheye_poses.add(markerToWorld.copy());
+
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-0.2,0,markerToWorld.getR());
+		fisheye_poses.add(markerToWorld.copy());
+
+		markerToWorld.T.set(0.3,0,0.15);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0,markerToWorld.getR());
+		fisheye_poses.add(markerToWorld.copy());
+
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0.15,markerToWorld.getR());
+		fisheye_poses.add(markerToWorld.copy());
+
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0.27,markerToWorld.getR());
+		fisheye_poses.add(markerToWorld.copy());
+
 	}
 
 	@Override
@@ -45,7 +84,7 @@ public class TestCalibrationDetectorCircleRegularGrid extends GenericPlanarCalib
 
 		double radiusPixels = 20;
 		double centerDistancePixels = 2*radiusPixels*config.centerDistance/config.circleDiameter;
-		double borderPixels = 20;
+		double borderPixels = 40;
 
 		int imageWidth = (int)(borderPixels*2 + (config.numCols-1)*centerDistancePixels + 2*radiusPixels+0.5);
 		int imageHeight = (int)(borderPixels*2 + (config.numRows-1)*centerDistancePixels + 2*radiusPixels+0.5);

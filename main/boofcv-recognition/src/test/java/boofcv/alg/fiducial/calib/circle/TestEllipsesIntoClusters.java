@@ -226,7 +226,7 @@ public class TestEllipsesIntoClusters {
 		a.phi = Math.PI/2.0;
 		assertEquals(4*4, EllipsesIntoClusters.axisAdjustedDistance(a,b), 1e-6);
 
-		// not a circle any more.  First test it lies along the major axis, should still be eclidean
+		// not a circle any more.  First test it lies along the major axis, should still be euclidean
 		a.a=6;a.phi = 0;
 		assertEquals(4*4, EllipsesIntoClusters.axisAdjustedDistance(a,b), 1e-6);
 		// now rotate it.  Distance should double

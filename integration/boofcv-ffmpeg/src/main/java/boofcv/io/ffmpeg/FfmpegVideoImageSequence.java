@@ -54,6 +54,8 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 		this.imageType = imageType;
 		converter = new Java2DFrameConverter();
 		reset();
+		if( finished )
+			throw new RuntimeException("FFMPEG failed to open file");
 	}
 
 	@Override
@@ -127,7 +129,7 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 			finished = false;
 			frameGrabber.start();
 		} catch (FrameGrabber.Exception e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 			finished = true;
 			return;
 		}

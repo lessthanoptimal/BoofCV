@@ -64,7 +64,12 @@ public class EllipseClustersIntoAsymmetricGrid extends EllipseClustersIntoGrid {
 	@Override
 	public void process(List<EllipseRotated_F64> ellipses , List<List<Node>> clusters ) {
 
+		System.out.println("---------------- ENTER clusters into asym grid");
 		foundGrids.reset();
+		if( clusters.size() == 0 )
+			return;
+
+		verbose = true;
 
 		for (int i = 0; i < clusters.size(); i++) {
 			List<Node> cluster = clusters.get(i);
@@ -81,8 +86,8 @@ public class EllipseClustersIntoAsymmetricGrid extends EllipseClustersIntoGrid {
 			NodeInfo corner = selectSeedCorner();
 
 			// find the row and column which the corner is a member of
-			List<NodeInfo> cornerRow = findLine(corner,corner.left,clusterSize);
-			List<NodeInfo> cornerColumn = findLine(corner,corner.right,clusterSize);
+			List<NodeInfo> cornerRow = findLine(corner,corner.left,clusterSize, null);
+			List<NodeInfo> cornerColumn = findLine(corner,corner.right,clusterSize, null);
 
 			// Go down the columns and find each of the rows
 			List<List<NodeInfo>> outerGrid = new ArrayList<>();
@@ -99,11 +104,13 @@ public class EllipseClustersIntoAsymmetricGrid extends EllipseClustersIntoGrid {
 					failed = true;
 					break;
 				}
-				List<NodeInfo> row = findLine( seed , next, clusterSize);
+				List<NodeInfo> row = findLine( seed , next, clusterSize, null);
 				outerGrid.add( row );
 			}
 			if( failed )
 				continue;
+
+			System.out.println("Rows/Cols = "+cornerRow.size()+" / "+cornerColumn.size());
 
 			List<List<NodeInfo>> innerGrid = findInnerGrid(outerGrid, clusterSize);
 
@@ -158,8 +165,10 @@ public class EllipseClustersIntoAsymmetricGrid extends EllipseClustersIntoGrid {
 		NodeInfo a = findClosestEdge(c00,intersection);
 		NodeInfo b = findClosestEdge(c11,intersection);
 
-		if( a == b )
+		if( a == b ) {
+			a.marked = true;
 			return a;
+		}
 		return null;
 	}
 
@@ -234,12 +243,13 @@ public class EllipseClustersIntoAsymmetricGrid extends EllipseClustersIntoGrid {
 				System.out.println("Can't select inner grid seed");
 			return null;
 		}
+		corner.marked = true;
 
 		NodeInfo rowNext = selectSeedNext(c00,c01,corner);
 		NodeInfo colNext = selectSeedNext(c00,c10,corner);
 
-		List<NodeInfo> row = findLine(corner, rowNext, clusterSize);
-		List<NodeInfo> column = findLine(corner, colNext, clusterSize);
+		List<NodeInfo> row = findLine(corner, rowNext, clusterSize, null);
+		List<NodeInfo> column = findLine(corner, colNext, clusterSize, null);
 
 		List<List<NodeInfo>> grid = new ArrayList<>();
 
@@ -249,7 +259,7 @@ public class EllipseClustersIntoAsymmetricGrid extends EllipseClustersIntoGrid {
 				List<NodeInfo> prev = grid.get(i - 1);
 				NodeInfo seed = column.get(i);
 				NodeInfo next = selectSeedNext(prev.get(0), prev.get(1), seed);
-				row = findLine(seed, next, clusterSize);
+				row = findLine(seed, next, clusterSize, null);
 				if (row == null) {
 					if( verbose )
 						System.out.println("Inner grid missing a row");
