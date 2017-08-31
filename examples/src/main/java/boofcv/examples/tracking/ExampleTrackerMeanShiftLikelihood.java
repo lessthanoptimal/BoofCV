@@ -119,7 +119,7 @@ public class ExampleTrackerMeanShiftLikelihood {
 		// For displaying the results
 		TrackerObjectQuadPanel gui = new TrackerObjectQuadPanel(null);
 		gui.setPreferredSize(new Dimension(frame.getWidth(),frame.getHeight()));
-		gui.setBackGround((BufferedImage)video.getGuiImage());
+		gui.setImageUI((BufferedImage)video.getGuiImage());
 		gui.setTarget(location,true);
 		ShowImages.showWindow(gui, "Tracking Results", true);
 
@@ -129,7 +129,7 @@ public class ExampleTrackerMeanShiftLikelihood {
 
 			boolean visible = tracker.process(frame);
 
-			gui.setBackGround((BufferedImage) video.getGuiImage());
+			gui.setImageUI((BufferedImage) video.getGuiImage());
 			gui.setTarget(tracker.getLocation(),visible);
 			gui.repaint();
 

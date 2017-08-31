@@ -173,7 +173,7 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 	/**
 	 * Create the list of observed points in 2D3D
 	 */
-	public void createDetectedList(int which, List<PointIndex2D_F64> pixels) {
+	private void createDetectedList(int which, List<PointIndex2D_F64> pixels) {
 		detected2D3D.clear();
 		List<Point2D3D> all = getControl3D(which);
 		for (int i = 0; i < pixels.size(); i++) {
@@ -198,7 +198,7 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 	 * Returns a list of detected control points in the image for the specified fiducial.  Observations
 	 * will be in distorted image pixels.
 	 */
-	protected abstract List<PointIndex2D_F64> getDetectedControl(int which );
+	public abstract List<PointIndex2D_F64> getDetectedControl(int which );
 
 	/**
 	 * 3D location of control points in the fiducial reference frame

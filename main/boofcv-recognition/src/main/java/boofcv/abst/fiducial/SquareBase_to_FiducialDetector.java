@@ -180,7 +180,7 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Dete
 	}
 
 	@Override
-	protected List<PointIndex2D_F64> getDetectedControl(int which) {
+	public List<PointIndex2D_F64> getDetectedControl(int which) {
 		FoundFiducial found = getAlgorithm().getFound().get(which);
 		listQuad.get(0).set( found.distortedPixels.a );
 		listQuad.get(1).set( found.distortedPixels.b );

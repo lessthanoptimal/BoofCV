@@ -74,7 +74,7 @@ public class ExampleTrackerObjectQuad {
 		// For displaying the results
 		TrackerObjectQuadPanel gui = new TrackerObjectQuadPanel(null);
 		gui.setPreferredSize(new Dimension(frame.getWidth(),frame.getHeight()));
-		gui.setBackGround((BufferedImage)video.getGuiImage());
+		gui.setImageUI((BufferedImage)video.getGuiImage());
 		gui.setTarget(location,true);
 		ShowImages.showWindow(gui,"Tracking Results", true);
 
@@ -85,7 +85,7 @@ public class ExampleTrackerObjectQuad {
 
 			boolean visible = tracker.process(frame,location);
 
-			gui.setBackGround((BufferedImage) video.getGuiImage());
+			gui.setImageUI((BufferedImage) video.getGuiImage());
 			gui.setTarget(location, visible);
 			gui.repaint();
 

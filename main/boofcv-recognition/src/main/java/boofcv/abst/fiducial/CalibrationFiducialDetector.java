@@ -234,7 +234,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	}
 
 	@Override
-	protected List<PointIndex2D_F64> getDetectedControl(int which) {
+	public List<PointIndex2D_F64> getDetectedControl(int which) {
 		CalibrationObservation view = getCalibDetector().getDetectedPoints();
 		return view.points;
 	}
