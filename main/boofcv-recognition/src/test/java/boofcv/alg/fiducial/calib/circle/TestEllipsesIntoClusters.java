@@ -239,6 +239,41 @@ public class TestEllipsesIntoClusters {
 			double dd = Math.pow(4*Math.cos(a.phi),2) + Math.pow(2*4*Math.sin(a.phi),2);
 			assertEquals(dd, EllipsesIntoClusters.axisAdjustedDistance(a,b), 1e-6);
 		}
+	}
 
+	@Test
+	public void removeSingleConnections() {
+		List<EllipsesIntoClusters.Node> cluster = new ArrayList<>();
+
+		for (int i = 0; i < 5; i++) {
+			EllipsesIntoClusters.Node n = new EllipsesIntoClusters.Node();
+			n.which = i;
+			cluster.add(n);
+		}
+
+		for (int i = 0,j=3; i < 4; j=i,i++) {
+			cluster.get(i).connections.add(j);
+			cluster.get(j).connections.add(i);
+		}
+
+		cluster.get(2).connections.add(4);
+		cluster.get(4).connections.add(2);
+
+		EllipsesIntoClusters.removeSingleConnections(cluster);
+		assertEquals(4,cluster.size());
+		assertEquals(-1,EllipsesIntoClusters.findNode(4,cluster));
+	}
+
+	@Test
+	public void findNode() {
+		List<EllipsesIntoClusters.Node> cluster = new ArrayList<>();
+
+		for (int i = 0; i < 6; i++) {
+			EllipsesIntoClusters.Node n = new EllipsesIntoClusters.Node();
+			n.which = i;
+			cluster.add(n);
+		}
+
+		assertEquals(4,EllipsesIntoClusters.findNode(4,cluster));
 	}
 }

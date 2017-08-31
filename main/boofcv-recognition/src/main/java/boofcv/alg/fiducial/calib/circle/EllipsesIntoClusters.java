@@ -44,7 +44,7 @@ public class EllipsesIntoClusters {
 	private double sizeSimilarityTolerance;
 
 	// minimum number of elements in a cluster
-	private int minimumClusterSize = 2;
+	private int minimumClusterSize = 3;
 
 	private NearestNeighbor<Node> search = FactoryNearestNeighbor.kdtree();
 	private FastQueue<double[]> searchPoints;
@@ -99,6 +99,10 @@ public class EllipsesIntoClusters {
 		output.clear();
 		for (int i = 0; i < clusters.size(); i++) {
 			List<Node> c = clusters.get(i);
+
+			// remove noise
+			removeSingleConnections(c);
+
 			if( c.size() >= minimumClusterSize) {
 				output.add(c);
 			}
@@ -179,6 +183,56 @@ public class EllipsesIntoClusters {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Removes stray connections that are highly likely to be noise. If a node has one connection it then removed.
+	 * Then it's only connection is considered for removal.
+	 */
+	static void removeSingleConnections( List<Node> cluster ) {
+		List<Node> open = new ArrayList<>();
+		List<Node> future = new ArrayList<>();
+
+		open.addAll(cluster);
+
+		while( !open.isEmpty() ) {
+			for (int i = open.size()-1; i >= 0; i--) {
+				Node n = open.get(i);
+
+				if( n.connections.size == 1 ) {
+					// clear it's connections and remove it from the cluster
+					int index = findNode(n.which,cluster);
+					cluster.remove(index);
+
+					// Remove the reference to this node from its one connection
+					int parent = findNode(n.connections.get(0),cluster);
+					n.connections.reset();
+					if( parent == -1 ) throw new RuntimeException("BUG!");
+					Node p = cluster.get(parent);
+					int edge = p.connections.indexOf(n.which);
+					if( edge == -1 ) throw new RuntimeException("BUG!");
+					p.connections.remove(edge);
+
+					// if the parent now only has one connection
+					if( p.connections.size == 1) {
+						future.add(p);
+					}
+				}
+			}
+			open.clear();
+			List<Node> tmp = open;
+			open = future;
+			future = tmp;
+		}
+	}
+
+	static int findNode( int target , List<Node> cluster ) {
+		for (int i = 0; i < cluster.size(); i++) {
+			if( cluster.get(i).which == target ) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	/**
