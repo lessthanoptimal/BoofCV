@@ -351,4 +351,24 @@ public class VisualizeShapes {
 			g2.drawLine((int) (quad.d.x + 0.5), (int) (quad.d.y + 0.5), (int) (quad.a.x + 0.5), (int) (quad.a.y + 0.5));
 		}
 	}
+
+	public static void drawQuad( Quadrilateral_F64 quad , Graphics2D g2 , double scale,
+								 boolean subpixel , Color color1 , Color color2) {
+		g2.setColor(color1);
+		if( subpixel ) {
+			Line2D.Double line = new Line2D.Double();
+
+			line.setLine(quad.a.x*scale,quad.a.y*scale,quad.b.x*scale,quad.b.y*scale);  g2.draw(line);
+			line.setLine(quad.b.x*scale, quad.b.y*scale, quad.c.x*scale, quad.c.y*scale);  g2.draw(line);
+			line.setLine(quad.c.x*scale, quad.c.y*scale, quad.d.x*scale, quad.d.y*scale);  g2.draw(line);
+			g2.setColor(color2);
+			line.setLine(quad.d.x*scale,quad.d.y*scale,quad.a.x*scale,quad.a.y*scale);  g2.draw(line);
+		} else {
+			g2.drawLine((int) (quad.a.x*scale + 0.5), (int) (quad.a.y*scale + 0.5), (int) (quad.b.x*scale + 0.5), (int) (quad.b.y*scale + 0.5));
+			g2.drawLine((int) (quad.b.x*scale + 0.5), (int) (quad.b.y*scale + 0.5), (int) (quad.c.x*scale + 0.5), (int) (quad.c.y*scale + 0.5));
+			g2.drawLine((int) (quad.c.x*scale + 0.5), (int) (quad.c.y*scale + 0.5), (int) (quad.d.x*scale + 0.5), (int) (quad.d.y*scale + 0.5));
+			g2.setColor(color2);
+			g2.drawLine((int) (quad.d.x*scale + 0.5), (int) (quad.d.y*scale + 0.5), (int) (quad.a.x*scale + 0.5), (int) (quad.a.y*scale + 0.5));
+		}
+	}
 }

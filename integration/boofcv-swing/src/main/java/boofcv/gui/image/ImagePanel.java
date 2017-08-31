@@ -18,6 +18,8 @@
 
 package boofcv.gui.image;
 
+import boofcv.gui.BoofSwingUtil;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
@@ -179,7 +181,7 @@ public class ImagePanel extends JPanel {
 	 * @param image The new image which will be displayed.
 	 */
 	public void setImageUI(final BufferedImage image) {
-		SwingUtilities.invokeLater(new Runnable() {
+		BoofSwingUtil.invokeNowOrLater(new Runnable() {
 			@Override
 			public void run() {
 				repaintJustImage(ImagePanel.this.img,adjustmentGUI);

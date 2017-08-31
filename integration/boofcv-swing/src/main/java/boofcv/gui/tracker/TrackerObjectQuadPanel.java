@@ -20,25 +20,25 @@ package boofcv.gui.tracker;
 
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
+import boofcv.gui.image.ImagePanel;
+import boofcv.gui.image.ScaleOptions;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Area2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.struct.shapes.RectangleLength2D_I32;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferedImage;
 
 /**
  * Panel for displaying results of {@link boofcv.abst.tracker.TrackerObjectQuad}.
  *
  * @author Peter Abeles
  */
-public class TrackerObjectQuadPanel extends JPanel implements MouseListener, MouseMotionListener {
+public class TrackerObjectQuadPanel extends ImagePanel implements MouseListener, MouseMotionListener {
 
 	int numSelected = 0;
 
@@ -47,25 +47,17 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener, Mou
 
 	Listener listener;
 
-	BufferedImage bg;
 
 	Mode mode = Mode.IDLE;
 
 	public TrackerObjectQuadPanel(Listener listener) {
-		super(new BorderLayout());
 		this.listener = listener;
 		if( listener != null ){
 			addMouseListener(this);
 			addMouseMotionListener(this);
 			grabFocus();
 		}
-	}
-
-	public synchronized void setBackGround( BufferedImage image ) {
-		if( bg == null || bg.getWidth() != image.getWidth() || bg.getHeight() != image.getHeight() ) {
-			bg = new BufferedImage(image.getWidth(),image.getHeight(),BufferedImage.TYPE_INT_RGB);
-		}
-		bg.createGraphics().drawImage(image,0,0,null);
+		setScaling(ScaleOptions.DOWN);
 	}
 
 	public synchronized void enterIdleMode() {
@@ -96,11 +88,10 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener, Mou
 	}
 
 	@Override
-	protected synchronized void paintComponent(Graphics g) {
+	public synchronized void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		Graphics2D g2 = (Graphics2D) g;
 
-		g2.drawImage(bg, 0, 0, null);
+		Graphics2D g2 = (Graphics2D)g;
 
 		g2.setStroke(new BasicStroke(5));
 		g2.setColor(Color.gray);
@@ -119,21 +110,21 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener, Mou
 				drawCorner(g2, quad.b, Color.ORANGE);
 				drawCorner(g2, quad.c, Color.CYAN);
 			} else if (numSelected == 4) {
-				VisualizeShapes.drawQuad(quad, g2, true, Color.gray, Color.CYAN);
+				VisualizeShapes.drawQuad(quad, g2, scale, true, Color.gray, Color.CYAN);
 				drawCorner(g2, quad.a, Color.RED);
 				drawCorner(g2, quad.b, Color.ORANGE);
 				drawCorner(g2, quad.c, Color.CYAN);
 				drawCorner(g2, quad.d, Color.BLUE);
 			}
 		} else if (mode == Mode.DRAGGING_RECT) {
-			VisualizeShapes.drawQuad(quad, g2, true, Color.gray, Color.gray);
+			VisualizeShapes.drawQuad(quad, g2, scale, true, Color.gray, Color.gray);
 			drawCorner(g2, quad.a, Color.RED);
 			drawCorner(g2, quad.b, Color.RED);
 			drawCorner(g2, quad.c, Color.RED);
 			drawCorner(g2, quad.d, Color.RED);
 		} else if (mode == Mode.TRACKING) {
 			if (targetVisible) {
-				VisualizeShapes.drawQuad(quad, g2, true, Color.gray, Color.CYAN);
+				VisualizeShapes.drawQuad(quad, g2, scale, true, Color.gray, Color.CYAN);
 				drawCorner(g2, quad.a, Color.RED);
 				drawCorner(g2, quad.b, Color.RED);
 				drawCorner(g2, quad.c, Color.RED);
@@ -143,11 +134,11 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener, Mou
 	}
 
 	private void drawLine( Graphics2D g2 , Point2D_F64 a , Point2D_F64 b ) {
-		g2.drawLine((int)(a.x+0.5),(int)(a.y+0.5),(int)(b.x+0.5),(int)(b.y+0.5));
+		g2.drawLine((int)(a.x*scale+0.5),(int)(a.y*scale+0.5),(int)(b.x*scale+0.5),(int)(b.y*scale+0.5));
 	}
 
 	private void drawCorner( Graphics2D g2 , Point2D_F64 a , Color color ) {
-		VisualizeFeatures.drawPoint(g2,a.x,a.y,6,color,false);
+		VisualizeFeatures.drawPoint(g2,a.x*scale,a.y*scale,6,color,false);
 	}
 
 	@Override
@@ -161,13 +152,13 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener, Mou
 		}
 
 		if( numSelected == 0 ) {
-			quad.a.set(e.getX(),e.getY());
+			quad.a.set(e.getX()/scale,e.getY()/scale);
 		} else if( numSelected == 1 ) {
-			quad.b.set(e.getX(),e.getY());
+			quad.b.set(e.getX()/scale,e.getY()/scale);
 		} else if( numSelected == 2 ) {
-			quad.c.set(e.getX(),e.getY());
+			quad.c.set(e.getX()/scale,e.getY()/scale);
 		} else if( numSelected == 3 ) {
-			quad.d.set(e.getX(),e.getY());
+			quad.d.set(e.getX()/scale,e.getY()/scale);
 		}
 		numSelected++;
 		repaint();
@@ -183,7 +174,7 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener, Mou
 		if( mode == Mode.PLACING_POINTS )
 			return;
 		mode = Mode.DRAGGING_RECT;
-		quad.a.set(e.getX(),e.getY());
+		quad.a.set(e.getX()/scale,e.getY()/scale);
 		setCornerC(e.getX(),e.getY());
 
 		listener.pauseTracker();
@@ -191,6 +182,9 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener, Mou
 	}
 
 	private void setCornerC( double x , double y ) {
+		x /= scale;
+		y /= scale;
+
 		quad.b.set(quad.a.x,y);
 		quad.c.set(x,y);
 		quad.d.set(x,quad.a.y);

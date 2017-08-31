@@ -217,12 +217,12 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 
 	protected void updateGUI(BufferedImage imageGUI) {
 		if( firstFrame ) {
-			videoPanel.setBackGround(imageGUI);
+			videoPanel.setImageUI(imageGUI);
 			infoBar.setFPS(0);
 			infoBar.setTracking("");
 			firstFrame = false;
 		} else {
-			videoPanel.setBackGround(imageGUI);
+			videoPanel.setImageUI(imageGUI);
 			if( targetSelected )
 				videoPanel.setTarget(target, success);
 			infoBar.setFPS(FPS);
