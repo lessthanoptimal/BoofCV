@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.calibration;
 
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
@@ -41,7 +42,11 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 	private static double ZOOM_MAX = 20;
 	private static double ZOOM_MIN = 0.1;
 	private static double ZOOM_INC = 0.1;
-	
+
+	// cursor location
+	JTextField textCursorX = new JTextField(10);
+	JTextField textCursorY = new JTextField(10);
+
 	// indicates if a calibration grid was found or not
 	JLabel successIndicator;
 
@@ -96,6 +101,11 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 	public DetectCalibrationPanel(int gridRows, int gridColumns, boolean hasManualMode, boolean addComponents ) {
 		this.gridRows = gridRows;
 		this.gridColumns = gridColumns;
+
+		textCursorX.setEditable(false);
+		textCursorX.setMaximumSize(textCursorX.getPreferredSize());
+		textCursorY.setEditable(false);
+		textCursorY.setMaximumSize(textCursorY.getPreferredSize());
 
 		viewSelector = new JComboBox();
 		viewSelector.addItem("Original");
@@ -171,6 +181,8 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 
 	protected void addComponents( boolean hasManualMode ) {
 		addLabeled(successIndicator, "Found:", this);
+		addLabeled(textCursorX,"X",this);
+		addLabeled(textCursorY,"Y",this);
 		addSeparator(100);
 		addLabeled(viewSelector, "View ", this);
 		addSeparator(100);
@@ -271,6 +283,17 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 
 	public void setThreshold(int threshold) {
 		thresholdSpinner.setValue(threshold);
+	}
+
+	public void setCursor( final double x , final double y ) {
+		BoofSwingUtil.invokeNowOrLater(
+				new Runnable() {
+					@Override
+					public void run() {
+						textCursorX.setText(String.format("%5.3f", x));
+						textCursorY.setText(String.format("%5.3f", y));
+					}
+				});
 	}
 
 	@Override

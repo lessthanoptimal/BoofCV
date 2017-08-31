@@ -71,7 +71,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase2
 	BufferedImage binary;
 	GrayF32 grayPrev = new GrayF32(1,1);
 
-	public CommonDetectCalibrationApp(DetectCalibrationPanel controlPanel, List<String> exampleInputs ) {
+	public CommonDetectCalibrationApp(final DetectCalibrationPanel controlPanel, List<String> exampleInputs ) {
 		super(exampleInputs, ImageType.single(GrayF32.class));
 		this.controlPanel = controlPanel;
 		add(imagePanel,BorderLayout.CENTER);
@@ -84,7 +84,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase2
 			@Override
 			public void mousePressed(MouseEvent e) {
 				double scale = imagePanel.getScale();
-				System.out.println("clicked at " + (e.getX()/scale) + " " + (e.getY()/scale));
+				controlPanel.setCursor(e.getX()/scale,e.getY()/scale);
 			}
 		});
 

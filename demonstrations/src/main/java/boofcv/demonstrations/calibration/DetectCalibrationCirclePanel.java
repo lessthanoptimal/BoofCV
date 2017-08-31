@@ -60,6 +60,8 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 	@Override
 	protected void addComponents( boolean hasManualMode ) {
 		addLabeled(successIndicator, "Found:", this);
+		addLabeled(textCursorX,"X",this);
+		addLabeled(textCursorY,"Y",this);
 		addSeparator(100);
 		addLabeled(viewSelector, "View ", this);
 		addSeparator(100);
