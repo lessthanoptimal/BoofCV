@@ -12,6 +12,14 @@ Version : 0.28
   * Removed refine corner for black polygon detector
     - Was complex, didn't fit the new API, and calibration residuals got better once removed.
   * Added option to optimize by fitting lines to the contour
+- Asymmetric Circle Grid
+  * Renamed asymmetric circle to hexagonal circle. TODO
+  * LAYOUT HAS CHANGED! Old layout was poorly chosen and didn't increase the point density, which is the whole point
+    of this layout.
+  * Spacing in Y direction is now (x spacing)*2.0*sin(60 degrees).  Before it was the same along both axises
+
+
+
 - Adding the capability for demonstrations that open files to remember the last directory it opened
 - Calibration Target Generator
   * Fixed bug in asymmetric circle target where it was shifted on the page
@@ -55,6 +63,9 @@ Contour to Line
 - Try fitting to the specified number of sides
 - Current algorithm breaks down when there is a mixture of long and short sides. Tuning to make it work on
   them makes it break on others
+
+Asymmetric Circle
+  - Change spacing. vertical distance = horizontal spacing * 2.0*sin(60 degrees)
 
 Calibration
   TODO Fisheye Detector - Asymmetric Circle

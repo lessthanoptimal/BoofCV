@@ -88,17 +88,17 @@ public class CreateCalibrationTarget {
 
 		System.out.println();
 		System.out.println("Examples:");
-		System.out.println("-r 8 -c 5 -o target -t CIRCLE_ASYMMETRIC_GRID -u cm -w 2 -d 6 -p LETTER");
-		System.out.println("          circle asymmetric grid target, grid 8x5, 2cm diameter, 6cm distance, on letter paper");
+		System.out.println("-r 24 -c 28 -o target -t CIRCLE_HEXAGONAL -u cm -w 1 -d 1.2 -p LETTER");
+		System.out.println("          circle hexagonal, grid 24x28, 1cm diameter, 1.2cm horizontal distance, on letter paper");
 		System.out.println();
-		System.out.println("-r 8 -c 6 -o target -t CIRCLE_GRID -u cm -w 2 -d 3 -p LETTER");
-		System.out.println("          circle regular grid target, grid 8x6, 2cm diameter, 3cm distance, on letter paper");
+		System.out.println("-r 16 -c 12 -o target -t CIRCLE_GRID -u cm -w 1 -d 1.5 -p LETTER");
+		System.out.println("          circle grid, grid 16x12, 1cm diameter, 1.5cm distance, on letter paper");
 		System.out.println();
 		System.out.println("-r 4 -c 3 -o target -t SQUARE_GRID -u cm -w 3 -s 3 -p LETTER");
-		System.out.println("          square grid target, grid 4x3, 3cm squares, 3cm space, on letter paper");
+		System.out.println("          square grid, grid 4x3, 3cm squares, 3cm space, on letter paper");
 		System.out.println();
 		System.out.println("-r 7 -c 5 -o target -t CHESSBOARD -u cm -w 3 -p LETTER");
-		System.out.println("          square grid target, grid 7x5, 3cm squares, on letter paper");
+		System.out.println("          chessboard, grid 7x5, 3cm squares, on letter paper");
 		System.out.println();
 
 		System.exit(1);
@@ -159,7 +159,7 @@ public class CreateCalibrationTarget {
 					failExit("Don't specify center distance for chessboard targets");
 				break;
 
-			case CIRCLE_ASYMMETRIC_GRID:
+			case CIRCLE_HEXAGONAL:
 				if( shapeSpace > 0 )
 					failExit("Don't specify space for circle type targets, use center distance instead");
 				if( centerDistance <= 0 )
@@ -194,7 +194,7 @@ public class CreateCalibrationTarget {
 			case CHESSBOARD:generator.chessboard(shapeWidth);break;
 			case SQUARE_GRID:generator.squareGrid(shapeWidth,shapeSpace);break;
 			case BINARY_GRID:generator.binaryGrid(shapeWidth,shapeSpace);break;
-			case CIRCLE_ASYMMETRIC_GRID:generator.circleAsymmetric(shapeWidth,centerDistance);break;
+			case CIRCLE_HEXAGONAL:generator.circleHexagonal(shapeWidth,centerDistance);break;
 			case CIRCLE_GRID:generator.circleGrid(shapeWidth,centerDistance);break;
 			default: throw new RuntimeException("Unknown target type");
 		}

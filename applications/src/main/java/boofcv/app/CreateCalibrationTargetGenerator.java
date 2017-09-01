@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import georegression.metric.UtilAngle;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -122,19 +123,20 @@ public class CreateCalibrationTargetGenerator {
 		System.exit(0);
 	}
 
-	public void circleAsymmetric( float diameter , float centerDistance ) throws IOException {
+	public void circleHexagonal(float diameter , float centerDistance ) throws IOException {
 		float diameterPoints = diameter*UNIT_TO_POINTS;
-		float separationPoints = centerDistance*UNIT_TO_POINTS;
-		patternWidth = ((cols-1)/2.0f)*separationPoints + diameterPoints;
-		patternHeight = ((rows-1)/2.0f)*separationPoints + diameterPoints;
+		float separationPointsW = centerDistance*UNIT_TO_POINTS;
+		float separationPointsH = separationPointsW*(float)Math.sin(UtilAngle.radian(60))*2.0f;
+		patternWidth = ((cols-1)/2.0f)*separationPointsW + diameterPoints;
+		patternHeight = ((rows-1)/2.0f)*separationPointsH + diameterPoints;
 
-		printHeader("Asymmetric Circle "+rows+"x"+cols+", diameter "+diameter+", separation "+centerDistance+" "+units.abbreviation);
+		printHeader("Hexagonal Circle "+rows+"x"+cols+", diameter "+diameter+", separation "+centerDistance+" "+units.abbreviation);
 
 		pcs.setStrokingColor(Color.BLACK);
 		for (int col = 0; col < cols; col++) {
-			float x = diameterPoints/2+(separationPoints/2)*col;
+			float x = diameterPoints/2+(separationPointsW/2)*col;
 			for (int row = col%2; row < rows; row+=2) {
-				float y = diameterPoints/2+(separationPoints/2)*row;
+				float y = diameterPoints/2+(separationPointsH/2)*row;
 				drawCircle(x,y,diameterPoints/2);
 			}
 		}
