@@ -34,6 +34,7 @@ import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.RecycleManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -111,6 +112,9 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 		// Connect nodes to each other
 		connectNodes();
 
+		// Prune noise
+		disconnectSingleConnections();
+
 		// Find all valid graphs
 		findClusters();
 		return clusters.toList();
@@ -172,6 +176,46 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 				NnData<SquareNode> neighbor = searchResults.get(j);
 				if( neighbor.data != n )
 					considerConnect(n, neighbor.data);
+			}
+		}
+	}
+
+	/**
+	 * Nodes that have only a single connection to one other node are disconnected since they are likely to be noise.
+	 * This is done recursively
+	 */
+	void disconnectSingleConnections() {
+
+		List<SquareNode> open = new ArrayList<>();
+		List<SquareNode> open2 = new ArrayList<>();
+
+		for (int i = 0; i < nodes.size(); i++) {
+			SquareNode n = nodes.get(i);
+			checkDisconnectSingleEdge(open, n);
+		}
+
+
+		while( !open.isEmpty() ) {
+			for (int i = 0; i < open.size(); i++) {
+				SquareNode n = open.get(i);
+				checkDisconnectSingleEdge(open2, n);
+
+				open.clear();
+				List<SquareNode> tmp = open;
+				open = open2;
+				open2 = tmp;
+			}
+		}
+	}
+
+	private void checkDisconnectSingleEdge(List<SquareNode> open, SquareNode n) {
+		if( n.getNumberOfConnections() == 1 )  {
+			for (int j = 0; j < n.corners.size(); j++) {
+				if( n.edges[j] != null ) {
+					open.add( n.edges[j].destination(n));
+					detachEdge(n.edges[j]);
+					break;
+				}
 			}
 		}
 	}

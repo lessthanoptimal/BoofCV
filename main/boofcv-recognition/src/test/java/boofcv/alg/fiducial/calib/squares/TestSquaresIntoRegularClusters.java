@@ -373,6 +373,37 @@ public class TestSquaresIntoRegularClusters {
 		assertConnected(b, 3, c, 1, 0.5);
 	}
 
+	@Test
+	public void disconnectSingleConnections() {
+		SquaresIntoRegularClusters alg = new SquaresIntoRegularClusters(0.1,6, 1.35);
+
+		alg.nodes.resize(4);
+		for (int i = 0; i < 4; i++) {
+			alg.nodes.get(i).corners = new Polygon2D_F64(4);
+		}
+
+		SquareNode a = alg.nodes.get(1);
+		SquareNode b = alg.nodes.get(2);
+		SquareNode c = alg.nodes.get(3);
+		SquareNode d = alg.nodes.get(0);
+
+		// these will all have two connections
+		alg.connect(a,0,b,0,2);
+		alg.connect(a,1,c,1,2);
+		alg.connect(b,2,c,2,2);
+
+		// just one connection
+		alg.connect(b,3,d,2,2);
+
+		alg.disconnectSingleConnections();
+
+		for (int i = 1; i < 4; i++) {
+			assertEquals(2,alg.nodes.get(i).getNumberOfConnections());
+		}
+		assertEquals(0,alg.nodes.get(0).getNumberOfConnections());
+	}
+
+
 	/**
 	 * A perfect grid has been detected but a small square was also detected because
 	 * of noise. The square is much smaller than the other shapes, but still makes
@@ -382,6 +413,7 @@ public class TestSquaresIntoRegularClusters {
 	public void noiseShapeSmallParallelSides() {
 		fail("implement");
 	}
+
 
 	private void assertConnected(SquareNode a , int indexA , SquareNode b , int indexB , double distance)
 	{
