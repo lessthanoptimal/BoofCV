@@ -37,6 +37,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import static georegression.metric.UtilAngle.radian;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -270,10 +271,13 @@ public class TestDetectCircleAsymmetricGrid {
 
 		locations.clear();
 
+		double spaceX = centerDistance/2.0;
+		double spaceY = centerDistance*Math.sin(radian(60));
+
 		for (int row = 0; row < rows; row++) {
-			double y = row*centerDistance/2.0;
+			double y = row*spaceY;
 			for (int col = 0; col < cols; col++) {
-				double x = col*centerDistance/2.0;
+				double x = col*spaceX;
 
 				if( row%2 == 1 && col%2 ==0 )
 					continue;

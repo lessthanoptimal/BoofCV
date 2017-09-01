@@ -19,7 +19,7 @@
 package boofcv.app;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
+import boofcv.abst.fiducial.calib.ConfigCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.ConfigCircleRegularGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
@@ -272,7 +272,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		if( asymmetric ) {
 			System.out.println("circle asymmetric: "+numRows+" x "+numColumns+" diameter = "+diameter+" center distance = "+centerDistance);
-			ConfigCircleAsymmetricGrid config = new ConfigCircleAsymmetricGrid(numRows, numColumns, diameter, centerDistance);
+			ConfigCircleHexagonalGrid config = new ConfigCircleHexagonalGrid(numRows, numColumns, diameter, centerDistance);
 
 			detector = FactoryFiducialCalibration.circleAsymmGrid(config);
 		} else {

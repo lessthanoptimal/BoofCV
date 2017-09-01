@@ -22,6 +22,7 @@ import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayF32;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
@@ -34,22 +35,25 @@ import static boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid.crea
 /**
  * @author Peter Abeles
  */
-public class TestCalibrationDetectorCircleAsymmGrid extends GenericPlanarCalibrationDetectorChecks {
+public class TestCalibrationDetectorCircleHexagonalGrid extends GenericPlanarCalibrationDetectorChecks {
 
-	public TestCalibrationDetectorCircleAsymmGrid() {
-		targetConfigs.add( new ConfigCircleAsymmetricGrid(5, 4, 20,50) );
+	public TestCalibrationDetectorCircleHexagonalGrid() {
+		targetConfigs.add( new ConfigCircleHexagonalGrid(5, 5, 20,24) );
 	}
 
 	@Override
 	public void renderTarget(Object layout, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
-		ConfigCircleAsymmetricGrid config = (ConfigCircleAsymmetricGrid)layout;
+		ConfigCircleHexagonalGrid config = (ConfigCircleHexagonalGrid)layout;
 
 		double radiusPixels = 20;
 		double centerDistancePixels = 2*radiusPixels*config.centerDistance/config.circleDiameter;
-		double borderPixels = 20;
+		double borderPixels = 30;
 
-		int imageWidth = (int)(borderPixels*2 + (config.numCols-1)*centerDistancePixels/2.0 + 2*radiusPixels+0.5);
-		int imageHeight = (int)(borderPixels*2 + (config.numRows-1)*centerDistancePixels/2.0 + 2*radiusPixels+0.5);
+		double spaceX = centerDistancePixels/2.0;
+		double spaceY = centerDistancePixels*Math.sin(UtilAngle.radian(60));
+
+		int imageWidth = (int)(borderPixels*2 + (config.numCols-1)*spaceX + 2*radiusPixels+0.5);
+		int imageHeight = (int)(borderPixels*2 + (config.numRows-1)*spaceY + 2*radiusPixels+0.5);
 
 		double centerDistanceWorld = length3D*centerDistancePixels/(double)imageWidth;
 
@@ -66,9 +70,9 @@ public class TestCalibrationDetectorCircleAsymmGrid extends GenericPlanarCalibra
 		Ellipse2D.Double ellipse = new Ellipse2D.Double();
 
 		for (int row = 0; row < config.numRows; row++) {
-			double y = borderPixels+radiusPixels+row*centerDistancePixels/2.0;
+			double y = borderPixels+radiusPixels+row*spaceY;
 			for (int col = 0; col < config.numCols; col++) {
-				double x = borderPixels+radiusPixels+col*centerDistancePixels/2.0;
+				double x = borderPixels+radiusPixels+col*spaceX;
 
 				if( row%2 == 1 && col%2 == 0 )
 					continue;
@@ -88,7 +92,7 @@ public class TestCalibrationDetectorCircleAsymmGrid extends GenericPlanarCalibra
 
 	@Override
 	public DetectorFiducialCalibration createDetector(Object layout) {
-		return FactoryFiducialCalibration.circleAsymmGrid((ConfigCircleAsymmetricGrid)layout);
+		return FactoryFiducialCalibration.circleAsymmGrid((ConfigCircleHexagonalGrid)layout);
 	}
 
 }

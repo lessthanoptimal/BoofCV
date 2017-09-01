@@ -464,6 +464,14 @@ public abstract class EllipseClustersIntoGrid {
 	public static class Edge {
 		NodeInfo target;
 		double angle;
+
+		public Edge() {
+		}
+
+		public Edge(NodeInfo target, double angle) {
+			this.target = target;
+			this.angle = angle;
+		}
 	}
 
 	public boolean isVerbose() {

@@ -79,7 +79,7 @@ public class FactoryFiducialCalibration {
 	 * @param config Configuration for target
 	 * @return The detector
 	 */
-	public static CalibrationDetectorCircleAsymmGrid circleAsymmGrid( ConfigCircleAsymmetricGrid config ) {
+	public static CalibrationDetectorCircleAsymmGrid circleAsymmGrid( ConfigCircleHexagonalGrid config ) {
 		config.checkValidity();
 
 		return new CalibrationDetectorCircleAsymmGrid(config);

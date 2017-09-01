@@ -25,9 +25,13 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.shapes.EllipseRotated_F64;
 
 /**
- * <p>Detects asymmetric grids of circles.  The grid is composed of two regular grids which are offset by half a period.
- * See image below for an example.  Rows and columns are counted by counting every row even if they are offset
- * from each other.  The returned grid will be put into canonical orientation, see below.</p>
+ * <p>Detects a hexagonal circle grid. Circles are spaced such that center of each circle is the same distance from
+ * each of its five neighbors. Rows and columns are counted in a zig-zag pattern, see example below. When there
+ * is symmetric ambiguity the canonical orientation is used.</p>
+ *
+ * <p>Canonical orientation is defined as having the rows/columns matched, element (0,0) being occupied.
+ * If there are multiple solution a solution will be selected which is in counter-clockwise order (image coordinates)
+ * and if there is still ambiguity the ellipse closest to the image origin will be selected as (0,0).</p>
  *
  * <p>
  * For each circle there is one control point.  The control point is first found by detecting all the ellipses, which
@@ -38,13 +42,9 @@ import georegression.struct.shapes.EllipseRotated_F64;
  * </p>
  *
  * <center>
- * <img src="doc-files/asymcirclegrid.jpg"/>
+ * <img src="doc-files/asymcirclegrid.jpg"/> TODO update
  * </center>
  * Example of a 8 by 5 grid; row, column.
- *
- * <p>Canonical orientation is defined as having the rows/columns matched, element (0,0) being occupied.
- * If there are multiple solution a solution will be selected which is in counter-clockwise order (image coordinates)
- * and if there is still ambiguity the ellipse closest to the image origin will be selected as (0,0).</p>
  *
  * @author Peter Abeles
  */
@@ -64,7 +64,7 @@ public class DetectCircleAsymmetricGrid<T extends ImageGray<T>> extends DetectCi
 									  BinaryEllipseDetector<T> ellipseDetector,
 									  EllipsesIntoClusters clustering) {
 		super(numRows,numCols,inputToBinary,ellipseDetector, clustering,
-				new EllipseClustersIntoAsymmetricGrid());
+				new EllipseClustersIntoHexagonalGrid());
 	}
 
 	@Override

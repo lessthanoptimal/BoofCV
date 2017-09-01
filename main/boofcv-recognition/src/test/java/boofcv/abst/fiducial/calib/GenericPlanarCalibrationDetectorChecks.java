@@ -56,7 +56,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	double simulatedTargetWidth = 0.3; // size of target in simulated world
 
 	boolean visualizeFailures = true;
-	long visualizeTime = 10000;
+	long visualizeTime = 2000;
 
 	// list of posses for fisheye test
 	protected List<Se3_F64> fisheye_poses = new ArrayList<>();

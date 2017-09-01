@@ -141,7 +141,7 @@ public class FactoryFiducial {
 	}
 
 	public static <T extends ImageGray<T>>
-	CalibrationFiducialDetector<T> calibCircleAsymGrid(ConfigCircleAsymmetricGrid config, Class<T> imageType) {
+	CalibrationFiducialDetector<T> calibCircleAsymGrid(ConfigCircleHexagonalGrid config, Class<T> imageType) {
 		return new CalibrationFiducialDetector<>(config, imageType);
 	}
 

@@ -30,18 +30,18 @@ import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.struct.FastQueue;
 
 /**
- * <p>Computes key points from an observed asymmetric circular grid.  Each key point is defined as the center's true
+ * <p>Computes key points from an observed hexagonal circular grid.  Each key point is defined as the center's true
  * geometric center.  The center is found by detecting tangent points between two neighboring circles (red dots) and
  * then finding the closest point (green circle) to their lines (yellow).  Tangent points are the same under perspective
  * distortion and the same can be said for the intersection of their lines.</p>
  *
  * <center>
- * <img src="doc-files/asymcircle_tangent_intersections.png"/>
+ * <img src="doc-files/asymcircle_tangent_intersections.png"/>TODO UPDATE
  * </center>
  *
  * @author Peter Abeles
  */
-public class KeyPointsCircleAsymmetricGrid {
+public class KeyPointsCircleHexagonalGrid {
 
 	// tangent points on each ellipse
 	FastQueue<Tangents> tangents = new FastQueue<>(Tangents.class,true);

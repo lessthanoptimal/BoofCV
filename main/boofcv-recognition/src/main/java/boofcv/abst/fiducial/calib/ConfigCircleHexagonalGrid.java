@@ -31,7 +31,7 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class ConfigCircleAsymmetricGrid implements Configuration {
+public class ConfigCircleHexagonalGrid implements Configuration {
 
 	/**
 	 * Number of black circles tall the grid is. Target dependent.
@@ -54,8 +54,7 @@ public class ConfigCircleAsymmetricGrid implements Configuration {
 	public ConfigEllipseDetector ellipse = new ConfigEllipseDetector();
 
 	/**
-	 * Distance between each center's center along the x and y axis.  Another way to look at this is that
-	 * it is twice the distance of the center of each grid cell.
+	 * Euclidean distance between the center of a circle and each of its 5 neighbors.
 	 */
 	public double centerDistance;
 
@@ -75,8 +74,8 @@ public class ConfigCircleAsymmetricGrid implements Configuration {
 		thresholding.scale = 0.85;
 	}
 
-	public ConfigCircleAsymmetricGrid(int numRows, int numCols,
-									  double circleDiameter, double centerDistance )
+	public ConfigCircleHexagonalGrid(int numRows, int numCols,
+									 double circleDiameter, double centerDistance )
 	{
 		this.numRows = numRows;
 		this.numCols = numCols;

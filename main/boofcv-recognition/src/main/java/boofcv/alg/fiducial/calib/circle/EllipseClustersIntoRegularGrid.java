@@ -27,7 +27,7 @@ import java.util.List;
  * <p>Given a cluster of ellipses (created with {@link EllipsesIntoClusters}) order the ellipses into an regular
  * grid.  Must be a proper grid too.  That means number of rows and columns both need to be 2 or more.</p>
  * 
- * <p>Unlike the {@link EllipseClustersIntoAsymmetricGrid asymmetric} grid the return grid object will be dense
+ * <p>Unlike the {@link EllipseClustersIntoHexagonalGrid asymmetric} grid the return grid object will be dense
  * with every element filled as expected.</p>
  *
  * @author Peter Abeles

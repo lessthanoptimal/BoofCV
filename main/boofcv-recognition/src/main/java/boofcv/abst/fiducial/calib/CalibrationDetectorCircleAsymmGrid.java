@@ -23,12 +23,13 @@ import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.fiducial.calib.circle.DetectCircleAsymmetricGrid;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
-import boofcv.alg.fiducial.calib.circle.KeyPointsCircleAsymmetricGrid;
+import boofcv.alg.fiducial.calib.circle.KeyPointsCircleHexagonalGrid;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.GrayF32;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -36,10 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Calibration implementation of circle asymmetric grid fiducial.
+ * Calibration implementation of circle hexagonal grid fiducial.
  *
  * @see DetectCircleAsymmetricGrid
- * @see KeyPointsCircleAsymmetricGrid
+ * @see KeyPointsCircleHexagonalGrid
  *
  * @author Peter Abeles
  */
@@ -48,7 +49,7 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 	// Detectors the grids
 	private DetectCircleAsymmetricGrid<GrayF32> detector;
 	// extracts key points from detected grid
-	private KeyPointsCircleAsymmetricGrid keypoint = new KeyPointsCircleAsymmetricGrid();
+	private KeyPointsCircleHexagonalGrid keypoint = new KeyPointsCircleHexagonalGrid();
 
 	// Storage for 2D location of points on fiducial
 	private List<Point2D_F64> layout;
@@ -61,7 +62,7 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 	 * Configures the detector based on the pass in configuration class
 	 * @param config Configuration for detector and target description
 	 */
-	public CalibrationDetectorCircleAsymmGrid(ConfigCircleAsymmetricGrid config ) {
+	public CalibrationDetectorCircleAsymmGrid(ConfigCircleHexagonalGrid config ) {
 
 		InputToBinary<GrayF32> inputToBinary =
 				FactoryThresholdBinary.threshold(config.thresholding,GrayF32.class);
@@ -124,15 +125,16 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 
 		List<Point2D_F64> ret = new ArrayList<>();
 
-		double widthCell = centerDistance/2;
+		double spaceX = centerDistance/2.0;
+		double spaceY = centerDistance*Math.sin(UtilAngle.radian(60));
 
-		double width = (numCols-1)*widthCell;
-		double height = (numRows-1)*widthCell;
+		double width = (numCols-1)*spaceX;
+		double height = (numRows-1)*spaceY;
 
 		for (int row = 0; row < numRows; row++) {
-			double y = (numRows-row-1)*widthCell - height/2;
+			double y = (numRows-row-1)*spaceY - height/2;
 			for (int col = 0; col < numCols; col++) {
-				double x = col*widthCell - width/2;
+				double x = col*spaceX - width/2;
 
 				if( row%2==0 && col%2==1)
 					continue;
@@ -149,7 +151,7 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 		return detector;
 	}
 
-	public KeyPointsCircleAsymmetricGrid getKeypointFinder() {
+	public KeyPointsCircleHexagonalGrid getKeypointFinder() {
 		return keypoint;
 	}
 

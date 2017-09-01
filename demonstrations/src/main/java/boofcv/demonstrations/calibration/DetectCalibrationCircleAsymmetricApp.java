@@ -19,10 +19,10 @@
 package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid;
-import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
+import boofcv.abst.fiducial.calib.ConfigCircleHexagonalGrid;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
-import boofcv.alg.fiducial.calib.circle.KeyPointsCircleAsymmetricGrid.Tangents;
+import boofcv.alg.fiducial.calib.circle.KeyPointsCircleHexagonalGrid.Tangents;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
@@ -52,7 +52,7 @@ import java.util.List;
 public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibrationApp
 {
 	CalibrationDetectorCircleAsymmGrid detector;
-	ConfigCircleAsymmetricGrid config;
+	ConfigCircleHexagonalGrid config;
 
 	Color colorId[];
 
@@ -61,7 +61,7 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 												List<String> exampleInputs) {
 		super(new DetectCalibrationCirclePanel(numRows,numColumns,circleDiameter,centerDistance,true),exampleInputs);
 
-		config = new ConfigCircleAsymmetricGrid(numRows, numColumns, circleDiameter, centerDistance);
+		config = new ConfigCircleHexagonalGrid(numRows, numColumns, circleDiameter, centerDistance);
 
 		declareDetector();
 

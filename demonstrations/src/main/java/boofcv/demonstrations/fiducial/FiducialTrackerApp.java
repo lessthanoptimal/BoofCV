@@ -22,7 +22,7 @@ import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.FiducialStability;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
+import boofcv.abst.fiducial.calib.ConfigCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGridBinary;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
@@ -309,7 +309,7 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 				throw new RuntimeException(e);
 			}
 		} else if( name.compareTo(CALIB_CIRCLE_ASYM_GRID) == 0 ) {
-			detector = FactoryFiducial.calibCircleAsymGrid(new ConfigCircleAsymmetricGrid(5, 8, 1, 6), imageClass);
+			detector = FactoryFiducial.calibCircleAsymGrid(new ConfigCircleHexagonalGrid(5, 8, 1, 6), imageClass);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}

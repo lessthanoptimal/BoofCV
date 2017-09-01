@@ -60,7 +60,7 @@ public class ExampleCalibrateMonocular {
 //		images = UtilIO.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleRegular"),"image");
 
 		// Asymmetric Circle Example
-//		detector = FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleAsymmetricGrid(5, 8, 2, 6));
+//		detector = FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleHexagonalGrid(5, 8, 2, 6));
 //		images = UtilIO.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleAsym"),"image");
 
 		// Square Grid example

@@ -18,7 +18,6 @@
 
 package boofcv.app;
 
-import georegression.metric.UtilAngle;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -29,6 +28,8 @@ import org.apache.pdfbox.util.Matrix;
 
 import java.awt.*;
 import java.io.IOException;
+
+import static georegression.metric.UtilAngle.radian;
 
 /**
  * Generates the actual calibration target.
@@ -125,8 +126,12 @@ public class CreateCalibrationTargetGenerator {
 
 	public void circleHexagonal(float diameter , float centerDistance ) throws IOException {
 		float diameterPoints = diameter*UNIT_TO_POINTS;
-		float separationPointsW = centerDistance*UNIT_TO_POINTS;
-		float separationPointsH = separationPointsW*(float)Math.sin(UtilAngle.radian(60))*2.0f;
+
+		centerDistance *= UNIT_TO_POINTS;
+
+		float separationPointsW = centerDistance;
+		float separationPointsH = 2.0f*centerDistance*(float)Math.sin(radian(60));
+
 		patternWidth = ((cols-1)/2.0f)*separationPointsW + diameterPoints;
 		patternHeight = ((rows-1)/2.0f)*separationPointsH + diameterPoints;
 

@@ -19,7 +19,7 @@
 package boofcv.alg.fiducial.calib.circle;
 
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
-import boofcv.alg.fiducial.calib.circle.KeyPointsCircleAsymmetricGrid.Tangents;
+import boofcv.alg.fiducial.calib.circle.KeyPointsCircleHexagonalGrid.Tangents;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.EllipseRotated_F64;
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestKeyPointsCircleAsymmetricGrid {
+public class TestKeyPointsCircleHexagonalGrid {
 	@Test
 	public void all() {
 		all(3,3);
@@ -41,7 +41,7 @@ public class TestKeyPointsCircleAsymmetricGrid {
 	}
 
 	public void all( int numRows , int numCols ) {
-		KeyPointsCircleAsymmetricGrid alg = new KeyPointsCircleAsymmetricGrid();
+		KeyPointsCircleHexagonalGrid alg = new KeyPointsCircleHexagonalGrid();
 		double r = 0.5;
 		double s = 2.0;
 		Grid grid = createGrid(numRows,numCols,s,r);
@@ -72,7 +72,7 @@ public class TestKeyPointsCircleAsymmetricGrid {
 	}
 
 	private void horizontal( int numRows , int numCols ) {
-		KeyPointsCircleAsymmetricGrid alg = new KeyPointsCircleAsymmetricGrid();
+		KeyPointsCircleHexagonalGrid alg = new KeyPointsCircleHexagonalGrid();
 
 		double r = 0.5;
 		double s = 2.0;
@@ -107,7 +107,7 @@ public class TestKeyPointsCircleAsymmetricGrid {
 	}
 
 	private void vertical( int numRows , int numCols ) {
-		KeyPointsCircleAsymmetricGrid alg = new KeyPointsCircleAsymmetricGrid();
+		KeyPointsCircleHexagonalGrid alg = new KeyPointsCircleHexagonalGrid();
 
 		double r = 0.5;
 		double s = 2.0;
@@ -142,7 +142,7 @@ public class TestKeyPointsCircleAsymmetricGrid {
 	}
 
 	private void diagonalLR( int numRows , int numCols ) {
-		KeyPointsCircleAsymmetricGrid alg = new KeyPointsCircleAsymmetricGrid();
+		KeyPointsCircleHexagonalGrid alg = new KeyPointsCircleHexagonalGrid();
 
 		double r = 0.5;
 		double s = 2.0;
@@ -179,7 +179,7 @@ public class TestKeyPointsCircleAsymmetricGrid {
 	}
 
 	private void diagonalRL( int numRows , int numCols ) {
-		KeyPointsCircleAsymmetricGrid alg = new KeyPointsCircleAsymmetricGrid();
+		KeyPointsCircleHexagonalGrid alg = new KeyPointsCircleHexagonalGrid();
 
 		double r = 0.5;
 		double s = 2.0;
@@ -210,7 +210,7 @@ public class TestKeyPointsCircleAsymmetricGrid {
 
 	@Test
 	public void computeEllipseCenters() {
-		KeyPointsCircleAsymmetricGrid alg = new KeyPointsCircleAsymmetricGrid();
+		KeyPointsCircleHexagonalGrid alg = new KeyPointsCircleHexagonalGrid();
 
 		Tangents t = alg.tangents.grow();
 

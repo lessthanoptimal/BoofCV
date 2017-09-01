@@ -89,7 +89,7 @@ public class CreateCalibrationTarget {
 		System.out.println();
 		System.out.println("Examples:");
 		System.out.println("-r 24 -c 28 -o target -t CIRCLE_HEXAGONAL -u cm -w 1 -d 1.2 -p LETTER");
-		System.out.println("          circle hexagonal, grid 24x28, 1cm diameter, 1.2cm horizontal distance, on letter paper");
+		System.out.println("          circle hexagonal, grid 24x28, 1cm diameter, 1.2cm separation, on letter paper");
 		System.out.println();
 		System.out.println("-r 16 -c 12 -o target -t CIRCLE_GRID -u cm -w 1 -d 1.5 -p LETTER");
 		System.out.println("          circle grid, grid 16x12, 1cm diameter, 1.5cm distance, on letter paper");

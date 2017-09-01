@@ -148,7 +148,7 @@ public class EllipsesIntoClusters {
 
 				// the initial search was based on size of major axis.  Now prune and take in account the distance
 				// from the minor axis
-				if( axisAdjustedDistance(e1,e2) > maxDistance ) {
+				if( axisAdjustedDistanceSq(e1,e2) > maxDistance ) {
 					continue;
 				}
 
@@ -240,7 +240,7 @@ public class EllipsesIntoClusters {
 	 * same size then there is no change.  If the minor axis is much smaller and ellipse b lies along that
 	 * axis then the returned distance will be greater.
 	 */
-	static double axisAdjustedDistance( EllipseRotated_F64 a , EllipseRotated_F64 b ) {
+	static double axisAdjustedDistanceSq(EllipseRotated_F64 a , EllipseRotated_F64 b ) {
 		double dx = b.center.x - a.center.x;
 		double dy = b.center.y - a.center.y;
 

@@ -106,7 +106,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		init(detector, width, imageType);
 	}
 
-	public CalibrationFiducialDetector(ConfigCircleAsymmetricGrid config,
+	public CalibrationFiducialDetector(ConfigCircleHexagonalGrid config,
 									   Class<T> imageType) {
 		DetectorFiducialCalibration detector = FactoryFiducialCalibration.circleAsymmGrid(config);
 		int squareCols = config.numCols;

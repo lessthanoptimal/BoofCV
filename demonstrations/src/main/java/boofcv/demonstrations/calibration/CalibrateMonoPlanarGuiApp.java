@@ -201,7 +201,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 //				FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(8, 8, 0.5, 7.0 / 18.0));
 //				FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(4,3,30,30));
 				FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));
-//				FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleAsymmetricGrid(5, 8, 1, 6));
+//				FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleHexagonalGrid(5, 8, 1, 6));
 
 		List<String> images;
 //		images = UtilIO.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square"),"frame");

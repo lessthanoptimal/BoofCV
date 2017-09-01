@@ -80,7 +80,7 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 		ConvertBufferedImage.convertFrom(image,gray);
 
 		CalibrationDetectorCircleAsymmGrid detector =
-				FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleAsymmetricGrid(8,5,2,6));
+				FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleHexagonalGrid(8,5,2,6));
 
 		assertTrue(detector.process(gray));
 	}

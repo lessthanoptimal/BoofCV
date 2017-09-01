@@ -222,22 +222,22 @@ public class TestEllipsesIntoClusters {
 		EllipseRotated_F64 b = new EllipseRotated_F64(6,3,3,3,0);
 
 		// it's circular so it should be the usual euclidean distance squared
-		assertEquals(4*4, EllipsesIntoClusters.axisAdjustedDistance(a,b), 1e-6);
+		assertEquals(4*4, EllipsesIntoClusters.axisAdjustedDistanceSq(a,b), 1e-6);
 		a.phi = Math.PI/2.0;
-		assertEquals(4*4, EllipsesIntoClusters.axisAdjustedDistance(a,b), 1e-6);
+		assertEquals(4*4, EllipsesIntoClusters.axisAdjustedDistanceSq(a,b), 1e-6);
 
 		// not a circle any more.  First test it lies along the major axis, should still be euclidean
 		a.a=6;a.phi = 0;
-		assertEquals(4*4, EllipsesIntoClusters.axisAdjustedDistance(a,b), 1e-6);
+		assertEquals(4*4, EllipsesIntoClusters.axisAdjustedDistanceSq(a,b), 1e-6);
 		// now rotate it.  Distance should double
 		a.phi = Math.PI/2.0;
-		assertEquals(8*8, EllipsesIntoClusters.axisAdjustedDistance(a,b), 1e-6);
+		assertEquals(8*8, EllipsesIntoClusters.axisAdjustedDistanceSq(a,b), 1e-6);
 
 		// Now do a rigorous test across all angles
 		for (int i = 0; i < 60; i++) {
 			a.phi = 2.0*Math.PI*i/60;
 			double dd = Math.pow(4*Math.cos(a.phi),2) + Math.pow(2*4*Math.sin(a.phi),2);
-			assertEquals(dd, EllipsesIntoClusters.axisAdjustedDistance(a,b), 1e-6);
+			assertEquals(dd, EllipsesIntoClusters.axisAdjustedDistanceSq(a,b), 1e-6);
 		}
 	}
 
