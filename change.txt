@@ -58,7 +58,6 @@ Contour to Line
 
 Calibration
   TODO Fisheye Detector - Asymmetric Circle
-  TODO Fisheye Detector - Regular Circle
   TODO Fisheye Calibration Demonstration
   TODO Add fisheye to calibration application
 
@@ -67,8 +66,8 @@ TOP ITEMS
         It is a homogenous coordinate with z=1 being implicit.
         Found papers that use "normalized coordinates"!
 - TODO Integrate in Marius Orfgen's image statistics histogram ideas
-- TODO Fisheye calibration using omni model
 - TODO QR Code support
+- TODO Add calibration circle regular to FiducialTrackerApp
 
 OTHER ITEMS
 - TODO Update IntensityPointFeatureApp. Let it select image to open

@@ -68,7 +68,6 @@ public class ExampleCalibrateFisheye {
 		// 0 = pinhole camera. 1 = fisheye
 //		calibrationAlg.configureUniversalOmni( true, 2, false,1.0);
 
-
 		for( String n : images ) {
 			BufferedImage input = UtilImageIO.loadImage(n);
 			if( n != null ) {
