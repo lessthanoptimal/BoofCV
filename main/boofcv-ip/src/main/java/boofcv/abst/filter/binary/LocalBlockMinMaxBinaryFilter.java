@@ -18,31 +18,31 @@
 
 package boofcv.abst.filter.binary;
 
-import boofcv.alg.filter.binary.ThresholdSquareBlockMinMax;
-import boofcv.alg.filter.binary.impl.ThresholdSquareBlockMinMax_F32;
-import boofcv.alg.filter.binary.impl.ThresholdSquareBlockMinMax_U8;
+import boofcv.alg.filter.binary.ThresholdBlockMinMax;
+import boofcv.alg.filter.binary.impl.ThresholdBlockMinMax_F32;
+import boofcv.alg.filter.binary.impl.ThresholdBlockMinMax_U8;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
- * Wrapper around {@link ThresholdSquareBlockMinMax}.
+ * Wrapper around {@link ThresholdBlockMinMax}.
  *
  * @author Peter Abeles
  */
 public class LocalBlockMinMaxBinaryFilter<T extends ImageGray<T>>
 		implements InputToBinary<T>
 {
-	ThresholdSquareBlockMinMax alg;
+	ThresholdBlockMinMax alg;
 	ImageType<T> imageType;
 
 	public LocalBlockMinMaxBinaryFilter(double minimumSpread, int requestedBlockWidth, double scale , boolean down, Class<T> imageType ) {
 
 		if( imageType == GrayF32.class )
-			this.alg = new ThresholdSquareBlockMinMax_F32((float)minimumSpread,requestedBlockWidth,(float)scale,down);
+			this.alg = new ThresholdBlockMinMax_F32((float)minimumSpread,requestedBlockWidth,(float)scale,down);
 		else if( imageType == GrayU8.class )
-			this.alg = new ThresholdSquareBlockMinMax_U8(minimumSpread,requestedBlockWidth,scale,down);
+			this.alg = new ThresholdBlockMinMax_U8(minimumSpread,requestedBlockWidth,scale,down);
 		else
 			throw new IllegalArgumentException("Unsupported image type");
 

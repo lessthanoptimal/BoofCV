@@ -40,7 +40,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class ThresholdSquareBlockCommon
+public abstract class ThresholdBlockCommon
 		<T extends ImageGray<T>,S extends ImageBase<S>>
 {
 	// Stores computed block statistics
@@ -56,7 +56,7 @@ public abstract class ThresholdSquareBlockCommon
 	 * Configures the detector
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 */
-	public ThresholdSquareBlockCommon(int requestedBlockWidth) {
+	public ThresholdBlockCommon(int requestedBlockWidth) {
 		this.requestedBlockWidth = requestedBlockWidth;
 	}
 
@@ -111,7 +111,7 @@ public abstract class ThresholdSquareBlockCommon
 	/**
 	 * Computes the min-max value for each block in the image
 	 */
-	private void computeStatistics(T input, int innerWidth, int innerHeight) {
+	protected void computeStatistics(T input, int innerWidth, int innerHeight) {
 		int statPixelStride = stats.getImageType().getNumBands();
 
 		int indexStats = 0;

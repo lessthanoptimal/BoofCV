@@ -18,6 +18,8 @@
 
 package boofcv.factory.filter.binary;
 
+import boofcv.alg.filter.binary.ThresholdBlockMean;
+import boofcv.alg.filter.binary.ThresholdBlockMinMax;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.struct.image.GrayU8;
 
@@ -59,16 +61,24 @@ public enum ThresholdType {
 	 * Breaks the image into blocks and computes the min and max inside each block.  Then thresholds
 	 * each pixel using interpolated min/max values.
 	 *
-	 * @see boofcv.alg.filter.binary.ThresholdSquareBlockMinMax
+	 * @see ThresholdBlockMinMax
 	 */
 	LOCAL_BLOCK_MIN_MAX(true,false),
 
 	/**
-	 * Breaks the image into blocks and computes the meaninside each block.
+	 * Breaks the image into blocks and computes the mean inside each block.
 	 *
-	 * @see boofcv.alg.filter.binary.ThresholdSquareBlockMean
+	 * @see ThresholdBlockMean
 	 */
 	LOCAL_BLOCK_MEAN(true,false),
+
+	/**
+	 * Breaks the image into blocks and computes the an Otsu threshold in each block
+	 *
+	 * @see boofcv.alg.filter.binary.ThresholdBlockOtsu
+	 */
+	LOCAL_BLOCK_OTSU(true,false),
+
 	/**
 	 * Locally adaptive computed using Savola's method
 	 *

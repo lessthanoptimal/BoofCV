@@ -20,6 +20,7 @@ package boofcv.alg.filter.binary;
 
 import boofcv.abst.filter.binary.LocalBlockMeanBinaryFilter;
 import boofcv.abst.filter.binary.LocalBlockMinMaxBinaryFilter;
+import boofcv.abst.filter.binary.LocalBlockOtsuBinaryFilter;
 import boofcv.alg.filter.binary.impl.ThresholdSauvola;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GConvertImage;
@@ -341,7 +342,7 @@ public class GThresholdImageOps {
 
 	/**
 	 * Applies a threshold to an image by computing the min and max values in a regular grid across
-	 * the input image.  See {@link ThresholdSquareBlockMinMax} for the details.
+	 * the input image.  See {@link ThresholdBlockMinMax} for the details.
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
@@ -366,8 +367,8 @@ public class GThresholdImageOps {
 	}
 
 	/**
-	 * Applies a threshold to an image by computing the min and max values in a regular grid across
-	 * the input image.  See {@link ThresholdSquareBlockMean} for the details.
+	 * Applies a threshold to an image by computing the mean values in a regular grid across
+	 * the input image.  See {@link ThresholdBlockMean} for the details.
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
@@ -381,6 +382,31 @@ public class GThresholdImageOps {
 	{
 		LocalBlockMeanBinaryFilter<T> alg = new LocalBlockMeanBinaryFilter<>(radius * 2 + 1, scale, down,
 				(Class<T>) input.getClass());
+
+		if( output == null )
+			output = new GrayU8(input.width,input.height);
+
+		alg.process(input,output);
+
+		return output;
+	}
+
+	/**
+	 * Applies a threshold to an image by computing the Otsu threshold in a regular grid across
+	 * the input image.  See {@link ThresholdBlockOtsu} for the details.
+	 *
+	 * @param input Input image.
+	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param radius Radius of square region.
+	 * @param scale Scale factor used to adjust threshold
+	 * @param down Should it threshold up or down.
+	 * @return Binary image
+	 */
+	public static <T extends ImageGray<T>>
+	GrayU8 localBlockOtsu(T input, GrayU8 output, int radius, double scale , boolean down)
+	{
+		LocalBlockOtsuBinaryFilter<T> alg = new LocalBlockOtsuBinaryFilter<>(radius * 2 + 1, scale, down,
+				input.getImageType());
 
 		if( output == null )
 			output = new GrayU8(input.width,input.height);

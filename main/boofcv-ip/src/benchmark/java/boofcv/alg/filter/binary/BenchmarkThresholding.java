@@ -18,9 +18,9 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.alg.filter.binary.impl.ThresholdBlockMinMax_F32;
+import boofcv.alg.filter.binary.impl.ThresholdBlockMinMax_U8;
 import boofcv.alg.filter.binary.impl.ThresholdSauvola;
-import boofcv.alg.filter.binary.impl.ThresholdSquareBlockMinMax_F32;
-import boofcv.alg.filter.binary.impl.ThresholdSquareBlockMinMax_U8;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.ConvertImage;
 import boofcv.misc.PerformerBase;
@@ -96,7 +96,7 @@ public class BenchmarkThresholding {
 	}
 
 	public static class SquareBlockMinMax_F32 extends PerformerBase {
-		ThresholdSquareBlockMinMax_F32 alg = new ThresholdSquareBlockMinMax_F32(2*adaptiveRadius+1,20,0.95f,true);
+		ThresholdBlockMinMax_F32 alg = new ThresholdBlockMinMax_F32(2*adaptiveRadius+1,20,0.95f,true);
 		@Override
 		public void process() {
 			alg.process(inputF32,output_U8);
@@ -104,7 +104,7 @@ public class BenchmarkThresholding {
 	}
 
 	public static class SquareBlockMinMax_U8 extends PerformerBase {
-		ThresholdSquareBlockMinMax_U8 alg = new ThresholdSquareBlockMinMax_U8(2*adaptiveRadius+1,20,0.95,true);
+		ThresholdBlockMinMax_U8 alg = new ThresholdBlockMinMax_U8(2*adaptiveRadius+1,20,0.95,true);
 		@Override
 		public void process() {
 			alg.process(input,output_U8);

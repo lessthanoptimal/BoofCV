@@ -18,40 +18,49 @@
 
 package boofcv.abst.filter.binary;
 
-import boofcv.alg.filter.binary.ThresholdBlockMean;
-import boofcv.alg.filter.binary.impl.ThresholdBlockMean_F32;
-import boofcv.alg.filter.binary.impl.ThresholdBlockMean_U8;
-import boofcv.struct.image.GrayF32;
+import boofcv.alg.filter.binary.ThresholdBlockOtsu;
+import boofcv.core.image.GConvertImage;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
- * Wrapper around {@link ThresholdBlockMean}.
+ * Wrapper around {@link ThresholdBlockOtsu}
  *
  * @author Peter Abeles
  */
-public class LocalBlockMeanBinaryFilter<T extends ImageGray<T>>
-		implements InputToBinary<T>
-{
-	ThresholdBlockMean alg;
-	ImageType<T> imageType;
+public class LocalBlockOtsuBinaryFilter<T extends ImageGray<T>> implements InputToBinary<T> {
 
-	public LocalBlockMeanBinaryFilter( int requestedBlockWidth, double scale , boolean down, Class<T> imageType ) {
+	ImageType<T> inputType;
 
-		if( imageType == GrayF32.class )
-			this.alg = new ThresholdBlockMean_F32(requestedBlockWidth,scale,down);
-		else if( imageType == GrayU8.class )
-			this.alg = new ThresholdBlockMean_U8(requestedBlockWidth,scale,down);
-		else
-			throw new IllegalArgumentException("Unsupported image type");
+	ThresholdBlockOtsu alg;
+	GrayU8 input;
 
-		this.imageType = ImageType.single(imageType);
+	/**
+	 * @see ThresholdBlockOtsu
+	 */
+	public LocalBlockOtsuBinaryFilter(int requestedBlockWidth, double scale, boolean down,
+									  ImageType<T> inputType) {
+
+		this.inputType = inputType;
+
+		if( inputType.getDataType() != ImageDataType.U8 ) {
+			input = new GrayU8(1,1);
+		}
+
+		alg = new ThresholdBlockOtsu(requestedBlockWidth,scale,down);
 	}
 
 	@Override
 	public void process(T input, GrayU8 output) {
-		alg.process(input,output);
+		if( this.input == null )
+			alg.process((GrayU8)input,output);
+		else {
+			this.input.reshape(input.width,input.height);
+			GConvertImage.convert(input,this.input);
+			alg.process(this.input,output);
+		}
 	}
 
 	@Override
@@ -66,7 +75,7 @@ public class LocalBlockMeanBinaryFilter<T extends ImageGray<T>>
 
 	@Override
 	public ImageType<T> getInputType() {
-		return imageType;
+		return inputType;
 	}
 
 	@Override

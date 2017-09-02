@@ -39,7 +39,8 @@ Version : 0.28
   * Provide access to detected points in PNP detector. Thought this was done a while ago...
 - Binary Thresholding
   * Renamed classes/functions to remove redundancy and clarify
-  * Added BLOCK_MEAN to algorithm list
+  * Added BLOCK_MEAN
+  * Added BLOCK_OTSU
 
 TODO Add flip primitive array to ddogleg. Search for "primitive flip" for code that should be replaced here
 

@@ -19,7 +19,8 @@
 package boofcv.factory.filter.binary;
 
 import boofcv.abst.filter.binary.*;
-import boofcv.alg.filter.binary.ThresholdSquareBlockMinMax;
+import boofcv.alg.filter.binary.ThresholdBlockMean;
+import boofcv.alg.filter.binary.ThresholdBlockMinMax;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -76,7 +77,7 @@ public class FactoryThresholdBinary {
 	/**
 	 * Applies a very fast non-overlapping block thresholding algorithm which uses min/max statistics.
 	 *
-	 * @see ThresholdSquareBlockMinMax
+	 * @see ThresholdBlockMinMax
 	 *
 	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
 	 * @param down Should it threshold up or down.
@@ -93,9 +94,9 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
-	 * Applies a very fast non-overlapping block thresholding algorithm which uses min/max statistics.
+	 * Applies a non-overlapping block mean threshold
 	 *
-	 * @see boofcv.alg.filter.binary.ThresholdSquareBlockMean
+	 * @see ThresholdBlockMean
 	 *
 	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
 	 * @param down Should it threshold up or down.
@@ -107,6 +108,21 @@ public class FactoryThresholdBinary {
 	InputToBinary<T> localBlockMean(int regionWidth, double scale , boolean down,
 									Class<T> inputType) {
 		return new LocalBlockMeanBinaryFilter<>(regionWidth, scale, down, inputType);
+	}
+
+	/**
+	 * Applies a non-overlapping block Otsu threhsold
+	 *
+	 * @see boofcv.alg.filter.binary.ThresholdBlockOtsu
+	 *
+	 * @param down Should it threshold up or down.
+	 * @param regionWidth About how wide and tall you wish a block to be in pixels.
+	 * @param inputType Type of input image
+	 * @return Filter to binary
+	 */
+	public static <T extends ImageGray<T>>
+	InputToBinary<T> localBlockOtsu(int regionWidth , double scale, boolean down, Class<T> inputType) {
+		return new LocalBlockOtsuBinaryFilter<>(regionWidth, scale, down, ImageType.single(inputType));
 	}
 
 	/**
@@ -186,6 +202,9 @@ public class FactoryThresholdBinary {
 
 			case LOCAL_BLOCK_MEAN:
 				return localBlockMean(config.radius * 2 + 1, config.scale , config.down, inputType);
+
+			case LOCAL_BLOCK_OTSU:
+				return localBlockOtsu(config.radius * 2 + 1, config.scale, config.down, inputType);
 
 		}
 		throw new IllegalArgumentException("Unknown type "+config.type);
