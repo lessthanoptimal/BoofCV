@@ -111,7 +111,7 @@ public abstract class ThresholdBlockCommon
 	/**
 	 * Computes the min-max value for each block in the image
 	 */
-	private void computeStatistics(T input, int innerWidth, int innerHeight) {
+	protected void computeStatistics(T input, int innerWidth, int innerHeight) {
 		int statPixelStride = stats.getImageType().getNumBands();
 
 		int indexStats = 0;

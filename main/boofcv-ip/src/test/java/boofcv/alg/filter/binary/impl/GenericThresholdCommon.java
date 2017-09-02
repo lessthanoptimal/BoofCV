@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import boofcv.alg.filter.binary.ThresholdBlockMean;
+import boofcv.alg.filter.binary.ThresholdBlockCommon;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayU8;
@@ -33,19 +33,19 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericThresholdBlockMeanChecks
+public abstract class GenericThresholdCommon
 		<T extends ImageGray<T>>
 {
 
 	Class<T> imageType;
 	Random rand = new Random(234);
 
-	public GenericThresholdBlockMeanChecks(Class<T> imageType) {
+	public GenericThresholdCommon(Class<T> imageType) {
 		this.imageType = imageType;
 	}
 
-	public abstract ThresholdBlockMean<T> createAlg(int requestedBlockWidth,
-													double scale , boolean down );
+	public abstract ThresholdBlockCommon<T,?> createAlg(int requestedBlockWidth,
+													  double scale , boolean down );
 
 
 	@Test
@@ -72,7 +72,7 @@ public abstract class GenericThresholdBlockMeanChecks
 		T input = GeneralizedImageOps.createSingleBand(imageType,10,12);
 		GrayU8 output = new GrayU8(10,12);
 
-		ThresholdBlockMean<T> alg = createAlg(20,1.0,true);
+		ThresholdBlockCommon<T,?> alg = createAlg(20,1.0,true);
 		alg.process(input,output);
 	}
 
@@ -86,7 +86,7 @@ public abstract class GenericThresholdBlockMeanChecks
 		T sub_input = BoofTesting.createSubImageOf(input);
 		GrayU8 sub_output = BoofTesting.createSubImageOf(expected);
 
-		ThresholdBlockMean<T> alg = createAlg(14,1.0,true);
+		ThresholdBlockCommon<T,?> alg = createAlg(14,1.0,true);
 
 		alg.process(input,expected);
 		alg.process(sub_input,sub_output);

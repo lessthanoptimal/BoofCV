@@ -16,24 +16,21 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.binary.impl;
+package boofcv.alg.filter.binary;
 
-import boofcv.alg.filter.binary.ThresholdBlockMean;
-import boofcv.struct.image.GrayF32;
+import boofcv.alg.filter.binary.impl.GenericThresholdCommon;
+import boofcv.struct.image.GrayU8;
 
 /**
  * @author Peter Abeles
  */
-public class TestThresholdBlockMean_F32
-		extends GenericThresholdCommon<GrayF32> {
-
-	public TestThresholdBlockMean_F32() {
-		super(GrayF32.class);
+public class TestThresholdBlockOtsu extends GenericThresholdCommon<GrayU8> {
+	public TestThresholdBlockOtsu() {
+		super(GrayU8.class);
 	}
 
 	@Override
-	public ThresholdBlockMean<GrayF32>
-	createAlg(int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdBlockMean_F32(requestedBlockWidth,scale,down);
+	public ThresholdBlockCommon<GrayU8, ?> createAlg(int requestedBlockWidth, double scale, boolean down) {
+		return new ThresholdBlockOtsu(requestedBlockWidth, scale, down);
 	}
 }

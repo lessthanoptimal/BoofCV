@@ -70,12 +70,10 @@ public class ThresholdBlockMean_U8
 		for (int y = y0; y < y1; y++) {
 			int indexInput = input.startIndex + y*input.stride + x0;
 			int indexOutput = output.startIndex + y*output.stride + x0;
-			for (int x = x0; x < x1; x++, indexOutput++, indexInput++ ) {
-				if( down == (input.data[indexInput]&0xFF) <= mean ) {
-					output.data[indexOutput] = 1;
-				} else {
-					output.data[indexOutput] = 0;
-				}
+			int end = indexOutput + (x1-x0);
+			for (; indexOutput < end; indexOutput++, indexInput++ ) {
+				output.data[indexOutput] = down == (input.data[indexInput]&0xFF) <= mean ?
+						(byte)1 : 0;
 			}
 		}
 	}

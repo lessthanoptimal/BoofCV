@@ -25,7 +25,7 @@ import boofcv.struct.image.GrayU8;
  * @author Peter Abeles
  */
 public class TestThresholdBlockMean_U8
-		extends GenericThresholdBlockMeanChecks<GrayU8> {
+		extends GenericThresholdCommon<GrayU8> {
 
 	public TestThresholdBlockMean_U8() {
 		super(GrayU8.class);

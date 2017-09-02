@@ -18,36 +18,35 @@
 
 package boofcv.alg.filter.binary.impl;
 
+import boofcv.alg.filter.binary.ThresholdBlockCommon;
 import boofcv.alg.filter.binary.ThresholdBlockMinMax;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
-import java.util.Random;
-
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public abstract class GenericThresholdBlockMinMaxChecks
-		<T extends ImageGray<T>>
+		<T extends ImageGray<T>> extends GenericThresholdCommon<T>
 {
 
-	Class<T> imageType;
-	Random rand = new Random(234);
-
 	public GenericThresholdBlockMinMaxChecks(Class<T> imageType) {
-		this.imageType = imageType;
+		super(imageType);
 	}
 
 	public abstract ThresholdBlockMinMax<T,?> createAlg(double textureThreshold, int requestedBlockWidth,
 														double scale , boolean down );
+
+	@Override
+	public ThresholdBlockCommon<T, ?> createAlg(int requestedBlockWidth, double scale, boolean down) {
+		return createAlg(requestedBlockWidth, scale, down);
+	}
 
 	@Test
 	public void thresholdSquare() {
@@ -74,51 +73,5 @@ public abstract class GenericThresholdBlockMinMaxChecks
 			assertEquals(0,output.get(39,y));
 			assertEquals(0,output.get(71,y));
 		}
-	}
-
-	@Test
-	public void toggleDown() {
-		T input = GeneralizedImageOps.createSingleBand(imageType,100,120);
-		GImageMiscOps.fillUniform(input,rand,0,255);
-
-		GrayU8 down = new GrayU8(100,120);
-		GrayU8 up = new GrayU8(100,120);
-
-		// turn off texture so that the output's can be the inverse of each other
-		createAlg(-1,6,1.0,true).process(input,down);
-		createAlg(-1,6,1.0,false).process(input,up);
-
-		for (int y = 0; y < down.height; y++) {
-			for (int x = 0; x < down.width; x++) {
-				assertTrue((down.get(x,y)==0) == !(up.get(x,y)==0));
-			}
-		}
-	}
-
-	@Test(expected=IllegalArgumentException.class)
-	public void widthLargerThanImage() {
-		T input = GeneralizedImageOps.createSingleBand(imageType,10,12);
-		GrayU8 output = new GrayU8(10,12);
-
-		ThresholdBlockMinMax<T,?> alg = createAlg(10,20,1.0,true);
-		alg.process(input,output);
-	}
-
-	@Test
-	public void subImage() {
-		T input = GeneralizedImageOps.createSingleBand(imageType,100,120);
-		GImageMiscOps.fillUniform(input,rand,0,255);
-
-		GrayU8 expected = new GrayU8(100,120);
-
-		T sub_input = BoofTesting.createSubImageOf(input);
-		GrayU8 sub_output = BoofTesting.createSubImageOf(expected);
-
-		ThresholdBlockMinMax<T,?> alg = createAlg(10,14,1.0,true);
-
-		alg.process(input,expected);
-		alg.process(sub_input,sub_output);
-
-		BoofTesting.assertEquals(expected,sub_output,0);
 	}
 }
