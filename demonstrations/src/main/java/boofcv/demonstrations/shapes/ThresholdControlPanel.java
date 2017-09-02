@@ -46,18 +46,21 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	JSpinner spinnerScale;
 	JButton buttonUpDown;
 
-	boolean thresholdAdaptive;
-	boolean thresholdGlobal;
+	boolean isAdaptive;
+	boolean isThresholdGlobal;
 
 	public ThresholdType type = ThresholdType.GLOBAL_OTSU;
-	public double fixedThreshold = 50;
-	public double scale = 0.95;
+
+	public double scale = new ConfigThreshold().scale;
 	public boolean down = true;
 	public int radius = 10;
-	public float savolaK = 0.3f;
+	public float savolaK = new ConfigThreshold().savolaK;
 	public int minPixelValue = 0;
 	public int maxPixelValue = 255;
-	public double minimumSpread = 10;
+
+	// toggle value of threshold
+	public double minimumSpread = new ConfigThresholdBlockMinMax().minimumSpread;
+	public int globalThreshold = 50;
 
 	public ThresholdControlPanel(Listener listener) {
 		this.listener = listener;
@@ -70,7 +73,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		comboType.setMaximumSize(comboType.getPreferredSize());
 		comboType.setSelectedIndex(type.ordinal());
 
-		spinnerThreshold = new JSpinner(new SpinnerNumberModel(fixedThreshold,0,255,1));
+		spinnerThreshold = new JSpinner(new SpinnerNumberModel(globalThreshold,0,255,1));
 		spinnerThreshold.setMaximumSize(spinnerThreshold.getPreferredSize());
 
 		spinnerRadius = new JSpinner(new SpinnerNumberModel(radius,1,500,1));
@@ -99,6 +102,16 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 
 
 		updateEnabledByType();
+	}
+
+	private void updateThresholdValue() {
+		spinnerRadius.removeChangeListener(this);
+		if( type == ThresholdType.FIXED ) {
+			spinnerThreshold.setValue(globalThreshold);
+		} else if( type == ThresholdType.LOCAL_BLOCK_MIN_MAX ) {
+			spinnerThreshold.setValue((int)minimumSpread);
+		}
+		spinnerRadius.addChangeListener(this);
 	}
 
 	private void configureSpinnerFloat( JSpinner spinner ) {
@@ -137,24 +150,24 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	private void updateEnabledByType() {
 		switch( type ) {
 			case FIXED:
-				thresholdAdaptive = false;
+				isAdaptive = false;
 				break;
 
 			case GLOBAL_ENTROPY:
 			case GLOBAL_OTSU:
-				thresholdAdaptive = true;
-				thresholdGlobal = true;
+				isAdaptive = true;
+				isThresholdGlobal = true;
 				break;
 
 			default:
-				thresholdAdaptive = true;
-				thresholdGlobal = false;
+				isAdaptive = true;
+				isThresholdGlobal = false;
 				break;
 		}
 
-		if( thresholdAdaptive ) {
+		if(isAdaptive) {
 			spinnerThreshold.setEnabled(false);
-			if( thresholdGlobal ) {
+			if(isThresholdGlobal) {
 				spinnerRadius.setEnabled(false);
 				spinnerScale.setEnabled(false);
 			} else {
@@ -167,6 +180,12 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 			spinnerScale.setEnabled(false);
 		}
 
+		if( type == ThresholdType.LOCAL_BLOCK_MIN_MAX ) {
+			spinnerThreshold.setEnabled(true);
+			isAdaptive = false;
+		}
+		updateThresholdValue();
+
 		spinnerThreshold.repaint();
 		spinnerRadius.repaint();
 		spinnerScale.repaint();
@@ -175,7 +194,13 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		if( e.getSource() == spinnerThreshold ) {
-			fixedThreshold = ((Number) spinnerThreshold.getValue()).intValue();
+			int value = ((Number) spinnerThreshold.getValue()).intValue();
+			if( type == ThresholdType.LOCAL_BLOCK_MIN_MAX) {
+				minimumSpread = value;
+			} else {
+				globalThreshold = value;
+			}
+			updateThresholdValue();
 			listener.imageThresholdUpdated();
 		} else if( e.getSource() == spinnerRadius ) {
 			radius = ((Number) spinnerRadius.getValue()).intValue();
@@ -194,14 +219,14 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		ConfigThreshold config;
 		if( type == ThresholdType.LOCAL_BLOCK_MIN_MAX) {
 			ConfigThresholdBlockMinMax _config = new ConfigThresholdBlockMinMax();
-
 			_config.minimumSpread = minimumSpread;
 			config = _config;
 		} else {
 			config = new ConfigThreshold();
+			config.fixedThreshold = globalThreshold;
 		}
+
 		config.type = type;
-		config.fixedThreshold = fixedThreshold;
 		config.scale = scale;
 		config.down = down;
 		config.radius = radius;
