@@ -263,7 +263,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		for (int i = 0; i < blobs.size; i++) {
 			Contour c = blobs.get(i);
 
-			if( c.external.size() >= minimumContour) {
+			if( c.external.size() >= 35) {
 				float edgeInside=-1,edgeOutside=-1;
 
 //				System.out.println("----- candidate "+c.external.size());

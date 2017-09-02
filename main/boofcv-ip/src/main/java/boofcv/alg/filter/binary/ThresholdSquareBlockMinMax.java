@@ -18,8 +18,6 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.alg.InputSanityCheck;
-import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
 
@@ -52,20 +50,11 @@ import boofcv.struct.image.ImageInterleaved;
  * @author Peter Abeles
  */
 public abstract class ThresholdSquareBlockMinMax
-		<T extends ImageGray<T>, I extends ImageInterleaved>
+		<T extends ImageGray<T>, I extends ImageInterleaved<I>> extends ThresholdSquareBlockCommon<T,I>
 {
-	// interleaved image which stores min and max values inside each block
-	protected I minmax;
-
 	// if the min and max value's difference is <= to this value then it is considered
 	// to be textureless and a default value is used
 	protected double minimumSpread;
-
-	// the desired width and height of a block requested by the user
-	protected int requestedBlockWidth;
-
-	// the adjusted size to minimize extra pixels near the image upper extreme
-	protected int blockWidth,blockHeight;
 
 	/**
 	 * Configures the detector
@@ -74,106 +63,8 @@ public abstract class ThresholdSquareBlockMinMax
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 */
 	public ThresholdSquareBlockMinMax(double minimumSpread, int requestedBlockWidth) {
+		super(requestedBlockWidth);
 		this.minimumSpread = minimumSpread;
-		this.requestedBlockWidth = requestedBlockWidth;
 	}
-
-	/**
-	 * Converts the gray scale input image into a binary image
-	 * @param input Input image
-	 * @param output Output binary image
-	 */
-	public void process(T input , GrayU8 output ) {
-		InputSanityCheck.checkSameShape(input,output);
-
-		if( input.width < requestedBlockWidth || input.height < requestedBlockWidth ) {
-			throw new IllegalArgumentException("Image is smaller than block size");
-		}
-
-		selectBlockSize(input.width,input.height);
-
-		minmax.reshape(input.width/blockWidth,input.height/blockHeight);
-
-		int innerWidth = input.width%blockWidth == 0 ?
-				input.width : input.width-blockWidth-input.width%blockWidth;
-		int innerHeight = input.height%blockHeight == 0 ?
-				input.height : input.height-blockHeight-input.height%blockHeight;
-
-		computeMinMax(input, innerWidth, innerHeight);
-		applyThreshold(input,output);
-	}
-
-	/**
-	 * Selects a block size which is close to the requested block size by the user
-	 */
-	void selectBlockSize( int width , int height ) {
-
-		int rows = height/requestedBlockWidth;
-		int cols = width/requestedBlockWidth;
-
-		blockHeight = height/rows;
-		blockWidth = width/cols;
-	}
-
-	/**
-	 * Computes the min-max value for each block in the image
-	 */
-	private void computeMinMax(T input, int innerWidth, int innerHeight) {
-		int indexMinMax = 0;
-		for (int y = 0; y < innerHeight; y += blockHeight) {
-			for (int x = 0; x < innerWidth; x += blockWidth, indexMinMax += 2) {
-				computeMinMaxBlock(x,y,blockWidth,blockHeight,indexMinMax,input);
-			}
-			// handle the case where the image's width isn't evenly divisible by the block's width
-			if( innerWidth != input.width ) {
-				computeMinMaxBlock(innerWidth,y,input.width-innerWidth,blockHeight,indexMinMax,input);
-				indexMinMax += 2;
-			}
-		}
-		// handle the case where the image's height isn't evenly divisible by the block's height
-		if( innerHeight != input.height ) {
-			int y = innerHeight;
-			int blockHeight = input.height-innerHeight;
-			for (int x = 0; x < innerWidth; x += blockWidth, indexMinMax += 2) {
-				computeMinMaxBlock(x,y,blockWidth,blockHeight,indexMinMax,input);
-			}
-			if( innerWidth != input.width ) {
-				computeMinMaxBlock(innerWidth,y,input.width-innerWidth,blockHeight,indexMinMax,input);
-			}
-		}
-	}
-
-	/**
-	 * Applies the dynamically computed threshold to each pixel in the image, one block at a time
-	 */
-	private void applyThreshold( T input, GrayU8 output ) {
-		for (int blockY = 0; blockY < minmax.height; blockY++) {
-			for (int blockX = 0; blockX < minmax.width; blockX++) {
-				thresholdBlock(blockX,blockY,input,output);
-			}
-		}
-	}
-
-	/**
-	 * Thresholds all the pixels inside the specified block
-	 * @param blockX0 Block x-coordinate
-	 * @param blockY0 Block y-coordinate
-	 * @param input Input image
-	 * @param output Output image
-	 */
-	protected abstract void thresholdBlock(int blockX0 , int blockY0 ,
-										   T input, GrayU8 output );
-
-	/**
-	 * Computes the min-max value inside a block
-	 * @param x0 lower bound pixel value of block, x-axis
-	 * @param y0 upper bound pixel value of block, y-axis
-	 * @param width Block's width
-	 * @param height Block's height
-	 * @param indexMinMax array index of min-max image pixel
-	 * @param input Input image
-	 */
-	protected abstract void computeMinMaxBlock(int x0 , int y0 , int width , int height ,
-											   int indexMinMax , T input);
 
 }

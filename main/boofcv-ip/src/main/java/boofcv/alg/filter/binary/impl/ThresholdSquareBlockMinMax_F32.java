@@ -36,7 +36,7 @@ public class ThresholdSquareBlockMinMax_F32
 
 	public ThresholdSquareBlockMinMax_F32(float minimumSpread, int requestedBlockWidth, float scale , boolean down ) {
 		super(minimumSpread,requestedBlockWidth);
-		minmax = new InterleavedF32(1,1,2);
+		stats = new InterleavedF32(1,1,2);
 		this.scale = scale;
 		this.down = down;
 	}
@@ -47,12 +47,12 @@ public class ThresholdSquareBlockMinMax_F32
 		int x0 = blockX0*blockWidth;
 		int y0 = blockY0*blockHeight;
 
-		int x1 = blockX0==minmax.width-1 ? input.width : (blockX0+1)*blockWidth;
-		int y1 = blockY0==minmax.height-1 ? input.height: (blockY0+1)*blockHeight;
+		int x1 = blockX0== stats.width-1 ? input.width : (blockX0+1)*blockWidth;
+		int y1 = blockY0== stats.height-1 ? input.height: (blockY0+1)*blockHeight;
 
 		// define the local 3x3 region in blocks, taking in account the image border
-		int blockX1 = Math.min(minmax.width-1,blockX0+1);
-		int blockY1 = Math.min(minmax.height-1,blockY0+1);
+		int blockX1 = Math.min(stats.width-1,blockX0+1);
+		int blockY1 = Math.min(stats.height-1,blockY0+1);
 
 		blockX0 = Math.max(0,blockX0-1);
 		blockY0 = Math.max(0,blockY0-1);
@@ -63,8 +63,8 @@ public class ThresholdSquareBlockMinMax_F32
 
 		for (int y = blockY0; y <= blockY1; y++) {
 			for (int x = blockX0; x <= blockX1; x++) {
-				float localMin = minmax.getBand(x,y,0);
-				float localMax = minmax.getBand(x,y,1);
+				float localMin = stats.getBand(x,y,0);
+				float localMax = stats.getBand(x,y,1);
 
 				if( localMin < min )
 					min = localMin;
@@ -95,7 +95,7 @@ public class ThresholdSquareBlockMinMax_F32
 	}
 
 	@Override
-	protected void computeMinMaxBlock(int x0 , int y0 , int width , int height , int indexMinMax , GrayF32 input) {
+	protected void computeBlockStatistics(int x0 , int y0 , int width , int height , int indexMinMax , GrayF32 input) {
 
 		float min,max;
 		min = max = input.unsafe_get(x0,y0);
@@ -111,7 +111,7 @@ public class ThresholdSquareBlockMinMax_F32
 			}
 		}
 
-		minmax.data[indexMinMax]   = min;
-		minmax.data[indexMinMax+1] = max;
+		stats.data[indexMinMax]   = min;
+		stats.data[indexMinMax+1] = max;
 	}
 }
