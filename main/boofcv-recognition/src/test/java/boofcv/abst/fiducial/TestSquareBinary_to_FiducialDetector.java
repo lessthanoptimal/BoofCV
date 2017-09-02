@@ -66,7 +66,7 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 	@Override
 	public FiducialDetector createDetector(ImageType imageType) {
 		return FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1),
-				ConfigThreshold.local(ThresholdType.LOCAL_SQUARE,6),
+				ConfigThreshold.local(ThresholdType.LOCAL_MEAN,6),
 				imageType.getImageClass());
 	}
 }

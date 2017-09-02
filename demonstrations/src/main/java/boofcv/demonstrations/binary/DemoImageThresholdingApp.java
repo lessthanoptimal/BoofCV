@@ -99,7 +99,7 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>> extends SelectInpu
 			} break;
 
 			case 3:
-				GThresholdImageOps.localSquare(imageInput, imageBinary,
+				GThresholdImageOps.localMean(imageInput, imageBinary,
 						threshRadius, threshScale, thresholdDown, null, null);
 				break;
 

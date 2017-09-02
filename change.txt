@@ -12,14 +12,11 @@ Version : 0.28
   * Removed refine corner for black polygon detector
     - Was complex, didn't fit the new API, and calibration residuals got better once removed.
   * Added option to optimize by fitting lines to the contour
-- Asymmetric Circle Grid
+- Asymmetric Circle Grid -> Hexagonal Grid
   * Renamed asymmetric circle to hexagonal circle. TODO
   * LAYOUT HAS CHANGED! Old layout was poorly chosen and didn't increase the point density, which is the whole point
     of this layout.
   * Spacing in Y direction is now (x spacing)*2.0*sin(60 degrees).  Before it was the same along both axises
-
-
-
 - Adding the capability for demonstrations that open files to remember the last directory it opened
 - Calibration Target Generator
   * Fixed bug in asymmetric circle target where it was shifted on the page
@@ -40,6 +37,9 @@ Version : 0.28
   * Changed format from postscript to PDF. Better support for file format and easier to use.
 - FiducialDetectors
   * Provide access to detected points in PNP detector. Thought this was done a while ago...
+- Binary Thresholding
+  * Renamed classes/functions to remove redundancy and clarify
+  * Added BLOCK_MEAN to algorithm list
 
 TODO Add flip primitive array to ddogleg. Search for "primitive flip" for code that should be replaced here
 

@@ -273,7 +273,7 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 		String seperator = System.getProperty("file.separator");
 		String path = videoName.substring(0, videoName.lastIndexOf(seperator.charAt(0)));
 
-		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10);
+		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 10);
 
 		if( name.compareTo(SQUARE_NUMBER) == 0 ) {
 			detector = FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1), configThreshold, imageClass);

@@ -50,18 +50,25 @@ public enum ThresholdType {
 	 */
 	LOCAL_GAUSSIAN(true,false),
 	/**
-	 * Locally adaptive computed using Guassian weights
+	 * Locally adaptive using an average
 	 *
 	 * @see ThresholdImageOps#localSquare(GrayU8, GrayU8, int, float, boolean, GrayU8, GrayU8)
 	 */
-	LOCAL_SQUARE(true,false),
+	LOCAL_MEAN(true,false),
 	/**
 	 * Breaks the image into blocks and computes the min and max inside each block.  Then thresholds
 	 * each pixel using interpolated min/max values.
 	 *
 	 * @see boofcv.alg.filter.binary.ThresholdSquareBlockMinMax
 	 */
-	LOCAL_SQUARE_BLOCK_MIN_MAX(true,false),
+	LOCAL_BLOCK_MIN_MAX(true,false),
+
+	/**
+	 * Breaks the image into blocks and computes the meaninside each block.
+	 *
+	 * @see boofcv.alg.filter.binary.ThresholdSquareBlockMean
+	 */
+	LOCAL_BLOCK_MEAN(true,false),
 	/**
 	 * Locally adaptive computed using Savola's method
 	 *

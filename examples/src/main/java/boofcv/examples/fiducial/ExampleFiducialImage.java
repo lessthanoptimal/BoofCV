@@ -67,7 +67,7 @@ public class ExampleFiducialImage {
 
 		// Detect the fiducial
 		SquareImage_to_FiducialDetector<GrayF32> detector = FactoryFiducial.squareImage(
-				new ConfigFiducialImage(), ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10), GrayF32.class);
+				new ConfigFiducialImage(), ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 10), GrayF32.class);
 //				new ConfigFiducialImage(), ConfigThreshold.fixed(100), GrayF32.class);
 
 		// give it a description of all the targets

@@ -24,7 +24,6 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -33,7 +32,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestLocalSquareBinaryFilter {
+public class TestLocalBlockMeanBinaryFilter {
 	Random rand = new Random(234);
 
 	@Test
@@ -48,10 +47,11 @@ public class TestLocalSquareBinaryFilter {
 
 			GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-			LocalSquareBinaryFilter alg = new LocalSquareBinaryFilter(4,0.95,true, ImageType.single(type));
+			LocalBlockMeanBinaryFilter alg =
+					new LocalBlockMeanBinaryFilter<>(9,0.95,true, type);
 
 			alg.process(input,found);
-			GThresholdImageOps.localSquare(input, expected, 4, 0.95, true, null, null);
+			GThresholdImageOps.localBlockMean(input, expected, 4, 0.95, true);
 
 			BoofTesting.assertEquals(found, expected, 0);
 		}

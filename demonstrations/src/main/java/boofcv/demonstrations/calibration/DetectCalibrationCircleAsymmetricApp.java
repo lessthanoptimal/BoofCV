@@ -74,7 +74,7 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 			config.thresholding.type = ThresholdType.FIXED;
 			config.thresholding.fixedThreshold = controlPanel.getThresholdLevel();
 		} else {
-			config.thresholding.type = ThresholdType.LOCAL_SQUARE;
+			config.thresholding.type = ThresholdType.LOCAL_MEAN;
 		}
 
 		config.numRows = controlPanel.getGridRows();

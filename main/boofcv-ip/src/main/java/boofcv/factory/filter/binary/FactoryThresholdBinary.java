@@ -60,7 +60,7 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localSquare(ImageGray, GrayU8, int, double, boolean, ImageGray, ImageGray)
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localMean(ImageGray, GrayU8, int, double, boolean, ImageGray, ImageGray)
 	 *
 	 * @param radius Radius of square region.
 	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
@@ -69,8 +69,8 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> localSquare(int radius, double scale, boolean down, Class<T> inputType) {
-		return new LocalSquareBinaryFilter<>(radius, scale, down, ImageType.single(inputType));
+	InputToBinary<T> localMean(int radius, double scale, boolean down, Class<T> inputType) {
+		return new LocalMeanBinaryFilter<>(radius, scale, down, ImageType.single(inputType));
 	}
 
 	/**
@@ -87,9 +87,26 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> localSquareBlockMinMax(int regionWidth, double scale , boolean down,
-											double minimumSpread, Class<T> inputType) {
-		return new LocalSquareBlockMinMaxBinaryFilter<>(minimumSpread, regionWidth, scale, down, inputType);
+	InputToBinary<T> localBlockMinMax(int regionWidth, double scale , boolean down,
+									  double minimumSpread, Class<T> inputType) {
+		return new LocalBlockMinMaxBinaryFilter<>(minimumSpread, regionWidth, scale, down, inputType);
+	}
+
+	/**
+	 * Applies a very fast non-overlapping block thresholding algorithm which uses min/max statistics.
+	 *
+	 * @see boofcv.alg.filter.binary.ThresholdSquareBlockMean
+	 *
+	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
+	 * @param down Should it threshold up or down.
+	 * @param regionWidth About how wide and tall you wish a block to be in pixels.
+	 * @param inputType Type of input image
+	 * @return Filter to binary
+	 */
+	public static <T extends ImageGray<T>>
+	InputToBinary<T> localBlockMean(int regionWidth, double scale , boolean down,
+									Class<T> inputType) {
+		return new LocalBlockMeanBinaryFilter<>(regionWidth, scale, down, inputType);
 	}
 
 	/**
@@ -159,13 +176,17 @@ public class FactoryThresholdBinary {
 			case LOCAL_SAVOLA:
 				return localSauvola(config.radius, config.savolaK, config.down, inputType);
 
-			case LOCAL_SQUARE:
-				return localSquare(config.radius, config.scale, config.down, inputType);
+			case LOCAL_MEAN:
+				return localMean(config.radius, config.scale, config.down, inputType);
 
-			case LOCAL_SQUARE_BLOCK_MIN_MAX: {
+			case LOCAL_BLOCK_MIN_MAX: {
 				ConfigThresholdBlockMinMax c = (ConfigThresholdBlockMinMax) config;
-				return localSquareBlockMinMax(c.radius * 2 + 1, c.scale , c.down, c.minimumSpread, inputType);
+				return localBlockMinMax(c.radius * 2 + 1, c.scale , c.down, c.minimumSpread, inputType);
 			}
+
+			case LOCAL_BLOCK_MEAN:
+				return localBlockMean(config.radius * 2 + 1, config.scale , config.down, inputType);
+
 		}
 		throw new IllegalArgumentException("Unknown type "+config.type);
 	}

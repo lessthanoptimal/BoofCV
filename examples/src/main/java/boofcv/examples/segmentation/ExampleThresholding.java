@@ -62,7 +62,7 @@ public class ExampleThresholding {
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Global: Entropy");
 
 		// Local method
-		GThresholdImageOps.localSquare(input, binary, 28, 1.0, true, null, null);
+		GThresholdImageOps.localMean(input, binary, 28, 1.0, true, null, null);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Square");
 		GThresholdImageOps.localBlockMinMax(input, binary, 10, 1.0, true, 15 );
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Block Min-Max");

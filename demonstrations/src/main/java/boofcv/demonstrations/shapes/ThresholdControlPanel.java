@@ -192,7 +192,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 
 	public ConfigThreshold createConfig() {
 		ConfigThreshold config;
-		if( type == ThresholdType.LOCAL_SQUARE_BLOCK_MIN_MAX ) {
+		if( type == ThresholdType.LOCAL_BLOCK_MIN_MAX) {
 			ConfigThresholdBlockMinMax _config = new ConfigThresholdBlockMinMax();
 
 			_config.minimumSpread = minimumSpread;

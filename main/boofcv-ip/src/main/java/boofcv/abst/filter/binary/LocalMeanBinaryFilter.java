@@ -18,40 +18,47 @@
 
 package boofcv.abst.filter.binary;
 
-import boofcv.alg.filter.binary.ThresholdSquareBlockMinMax;
-import boofcv.alg.filter.binary.impl.ThresholdSquareBlockMinMax_F32;
-import boofcv.alg.filter.binary.impl.ThresholdSquareBlockMinMax_U8;
-import boofcv.struct.image.GrayF32;
+import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
- * Wrapper around {@link ThresholdSquareBlockMinMax}.
+ * Adaptive/local threshold using a square region
+ *
+ * @see boofcv.alg.filter.binary.GThresholdImageOps#localMean(ImageGray, GrayU8, int, double, boolean, ImageGray, ImageGray)
  *
  * @author Peter Abeles
  */
-public class LocalSquareBlockMinMaxBinaryFilter<T extends ImageGray<T>>
-		implements InputToBinary<T>
-{
-	ThresholdSquareBlockMinMax alg;
-	ImageType<T> imageType;
+public class LocalMeanBinaryFilter<T extends ImageGray<T>> implements InputToBinary<T> {
 
-	public LocalSquareBlockMinMaxBinaryFilter(double minimumSpread, int requestedBlockWidth, double scale , boolean down, Class<T> imageType ) {
+	ImageType<T> inputType;
 
-		if( imageType == GrayF32.class )
-			this.alg = new ThresholdSquareBlockMinMax_F32((float)minimumSpread,requestedBlockWidth,(float)scale,down);
-		else if( imageType == GrayU8.class )
-			this.alg = new ThresholdSquareBlockMinMax_U8(minimumSpread,requestedBlockWidth,scale,down);
-		else
-			throw new IllegalArgumentException("Unsupported image type");
+	T work1;
+	ImageGray work2;
 
-		this.imageType = ImageType.single(imageType);
+	int radius;
+	double scale;
+	boolean down;
+
+	/**
+	 * @see GThresholdImageOps#localMean
+	 */
+	public LocalMeanBinaryFilter(int radius, double scale, boolean down,
+								 ImageType<T> inputType) {
+		this.radius = radius;
+		this.scale = scale;
+		this.down = down;
+		this.inputType = inputType;
+		work1 = inputType.createImage(1,1);
+		work2 = inputType.createImage(1,1);
 	}
 
 	@Override
 	public void process(T input, GrayU8 output) {
-		alg.process(input,output);
+		work1.reshape(input.width,input.height);
+		work2.reshape(input.width,input.height);
+		GThresholdImageOps.localMean(input, output, radius, scale, down, work1, work2);
 	}
 
 	@Override
@@ -66,7 +73,7 @@ public class LocalSquareBlockMinMaxBinaryFilter<T extends ImageGray<T>>
 
 	@Override
 	public ImageType<T> getInputType() {
-		return imageType;
+		return inputType;
 	}
 
 	@Override

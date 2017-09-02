@@ -32,7 +32,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestLocalSquareBlockMinMaxBinaryFilter {
+public class TestLocalBlockMinMaxBinaryFilter {
 	Random rand = new Random(234);
 
 	@Test
@@ -47,8 +47,8 @@ public class TestLocalSquareBlockMinMaxBinaryFilter {
 
 			GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-			LocalSquareBlockMinMaxBinaryFilter alg =
-					new LocalSquareBlockMinMaxBinaryFilter(30,9,0.95,true, type);
+			LocalBlockMinMaxBinaryFilter alg =
+					new LocalBlockMinMaxBinaryFilter(30,9,0.95,true, type);
 
 			alg.process(input,found);
 			GThresholdImageOps.localBlockMinMax(input, expected, 4, 0.95, true,30);

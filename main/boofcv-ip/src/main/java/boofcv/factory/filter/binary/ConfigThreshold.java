@@ -97,7 +97,7 @@ public class ConfigThreshold implements Configuration {
 		if( type.isGlobal() )
 			throw new IllegalArgumentException("Type must be local");
 
-		if( type == ThresholdType.LOCAL_SQUARE_BLOCK_MIN_MAX) {
+		if( type == ThresholdType.LOCAL_BLOCK_MIN_MAX) {
 			return new ConfigThresholdBlockMinMax(radius,10,true);
 		} else {
 			ConfigThreshold config = new ConfigThreshold();
