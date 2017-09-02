@@ -18,31 +18,31 @@
 
 package boofcv.abst.filter.binary;
 
-import boofcv.alg.filter.binary.ThresholdSquareBlockMean;
-import boofcv.alg.filter.binary.impl.ThresholdSquareBlockMean_F32;
-import boofcv.alg.filter.binary.impl.ThresholdSquareBlockMean_U8;
+import boofcv.alg.filter.binary.ThresholdBlockMean;
+import boofcv.alg.filter.binary.impl.ThresholdBlockMean_F32;
+import boofcv.alg.filter.binary.impl.ThresholdBlockMean_U8;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
- * Wrapper around {@link ThresholdSquareBlockMean}.
+ * Wrapper around {@link ThresholdBlockMean}.
  *
  * @author Peter Abeles
  */
 public class LocalBlockMeanBinaryFilter<T extends ImageGray<T>>
 		implements InputToBinary<T>
 {
-	ThresholdSquareBlockMean alg;
+	ThresholdBlockMean alg;
 	ImageType<T> imageType;
 
 	public LocalBlockMeanBinaryFilter( int requestedBlockWidth, double scale , boolean down, Class<T> imageType ) {
 
 		if( imageType == GrayF32.class )
-			this.alg = new ThresholdSquareBlockMean_F32(requestedBlockWidth,scale,down);
+			this.alg = new ThresholdBlockMean_F32(requestedBlockWidth,scale,down);
 		else if( imageType == GrayU8.class )
-			this.alg = new ThresholdSquareBlockMean_U8(requestedBlockWidth,scale,down);
+			this.alg = new ThresholdBlockMean_U8(requestedBlockWidth,scale,down);
 		else
 			throw new IllegalArgumentException("Unsupported image type");
 

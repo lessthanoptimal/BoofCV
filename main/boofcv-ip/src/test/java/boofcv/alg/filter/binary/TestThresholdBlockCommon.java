@@ -27,11 +27,11 @@ import static junit.framework.TestCase.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestThresholdSquareBlockCommon {
+public class TestThresholdBlockCommon {
 	@Test
 	public void selectBlockSize() {
 
-		ThresholdSquareBlockCommon alg = new Dummy(30);
+		ThresholdBlockCommon alg = new Dummy(30);
 
 		alg.selectBlockSize(300,330);
 		assertEquals(30,alg.blockWidth);
@@ -46,7 +46,7 @@ public class TestThresholdSquareBlockCommon {
 		assertEquals(32,alg.blockHeight);
 	}
 
-	private class Dummy extends ThresholdSquareBlockCommon {
+	private class Dummy extends ThresholdBlockCommon {
 
 		public Dummy(int requestedBlockWidth) {
 			super(requestedBlockWidth);

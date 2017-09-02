@@ -18,26 +18,25 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import boofcv.alg.filter.binary.ThresholdSquareBlockMinMax;
+import boofcv.alg.filter.binary.ThresholdBlockMean;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.InterleavedF32;
 
 /**
- * Implementation of {@link ThresholdSquareBlockMinMax} for input images of type {@link GrayF32}
+ * Implementation of {@link ThresholdBlockMean} for input images of type {@link GrayU8}
  *
  * @author Peter Abeles
  */
-public class ThresholdSquareBlockMinMax_F32
-	extends ThresholdSquareBlockMinMax<GrayF32,InterleavedF32>
+public class ThresholdBlockMean_F32
+	extends ThresholdBlockMean<GrayF32>
 {
 	float scale;
 	boolean down;
 
-	public ThresholdSquareBlockMinMax_F32(float minimumSpread, int requestedBlockWidth, float scale , boolean down ) {
-		super(minimumSpread,requestedBlockWidth);
-		stats = new InterleavedF32(1,1,2);
-		this.scale = scale;
+	public ThresholdBlockMean_F32(int requestedBlockWidth, double scale , boolean down ) {
+		super(requestedBlockWidth);
+		this.stats = new GrayF32(1,1);
+		this.scale = (float)scale;
 		this.down = down;
 	}
 
@@ -47,8 +46,8 @@ public class ThresholdSquareBlockMinMax_F32
 		int x0 = blockX0*blockWidth;
 		int y0 = blockY0*blockHeight;
 
-		int x1 = blockX0== stats.width-1 ? input.width : (blockX0+1)*blockWidth;
-		int y1 = blockY0== stats.height-1 ? input.height: (blockY0+1)*blockHeight;
+		int x1 = blockX0==stats.width-1 ? input.width : (blockX0+1)*blockWidth;
+		int y1 = blockY0==stats.height-1 ? input.height: (blockY0+1)*blockHeight;
 
 		// define the local 3x3 region in blocks, taking in account the image border
 		int blockX1 = Math.min(stats.width-1,blockX0+1);
@@ -57,61 +56,44 @@ public class ThresholdSquareBlockMinMax_F32
 		blockX0 = Math.max(0,blockX0-1);
 		blockY0 = Math.max(0,blockY0-1);
 
-		// find the min and max pixel values inside this block region
-		float min = Float.MAX_VALUE;
-		float max = -Float.MAX_VALUE;
+		// Average the mean across local blocks
+		float mean = 0;
 
 		for (int y = blockY0; y <= blockY1; y++) {
 			for (int x = blockX0; x <= blockX1; x++) {
-				float localMin = stats.getBand(x,y,0);
-				float localMax = stats.getBand(x,y,1);
-
-				if( localMin < min )
-					min = localMin;
-				if( localMax > max )
-					max = localMax;
+				mean += stats.unsafe_get(x,y);
 			}
 		}
+		mean /= (blockY1-blockY0+1)*(blockX1-blockX0+1);
+
 
 		// apply threshold
-		float textureThreshold = (float)this.minimumSpread;
 		for (int y = y0; y < y1; y++) {
 			int indexInput = input.startIndex + y*input.stride + x0;
 			int indexOutput = output.startIndex + y*output.stride + x0;
 			for (int x = x0; x < x1; x++, indexOutput++, indexInput++ ) {
-
-				if( max-min <= textureThreshold ) {
+				if( down == input.data[indexInput] <= mean ) {
 					output.data[indexOutput] = 1;
 				} else {
-					float average = scale*(max+min)/2.0f;
-					if( down == input.data[indexInput] <= average ) {
-						output.data[indexOutput] = 1;
-					} else {
-						output.data[indexOutput] = 0;
-					}
+					output.data[indexOutput] = 0;
 				}
 			}
 		}
 	}
 
 	@Override
-	protected void computeBlockStatistics(int x0 , int y0 , int width , int height , int indexMinMax , GrayF32 input) {
+	protected void computeBlockStatistics(int x0, int y0, int width, int height, int indexStats, GrayF32 input) {
 
-		float min,max;
-		min = max = input.unsafe_get(x0,y0);
+		float sum = 0;
 
 		for (int y = 0; y < height; y++) {
 			int indexInput = input.startIndex + (y0+y)*input.stride + x0;
 			for (int x = 0; x < width; x++) {
-				float value = input.data[indexInput++];
-				if( value < min )
-					min = value;
-				else if( value > max )
-					max = value;
+				sum += input.data[indexInput++];
 			}
 		}
+		sum = scale*sum/(width*height);
 
-		stats.data[indexMinMax]   = min;
-		stats.data[indexMinMax+1] = max;
+		stats.data[indexStats]   = sum;
 	}
 }

@@ -49,8 +49,8 @@ import boofcv.struct.image.ImageInterleaved;
  *
  * @author Peter Abeles
  */
-public abstract class ThresholdSquareBlockMinMax
-		<T extends ImageGray<T>, I extends ImageInterleaved<I>> extends ThresholdSquareBlockCommon<T,I>
+public abstract class ThresholdBlockMinMax
+		<T extends ImageGray<T>, I extends ImageInterleaved<I>> extends ThresholdBlockCommon<T,I>
 {
 	// if the min and max value's difference is <= to this value then it is considered
 	// to be textureless and a default value is used
@@ -62,7 +62,7 @@ public abstract class ThresholdSquareBlockMinMax
 	 *                         value then it is considered textureless.  Set to &le; -1 to disable.
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 */
-	public ThresholdSquareBlockMinMax(double minimumSpread, int requestedBlockWidth) {
+	public ThresholdBlockMinMax(double minimumSpread, int requestedBlockWidth) {
 		super(requestedBlockWidth);
 		this.minimumSpread = minimumSpread;
 	}

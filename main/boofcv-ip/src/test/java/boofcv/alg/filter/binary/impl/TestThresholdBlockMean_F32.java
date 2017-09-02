@@ -18,22 +18,22 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import boofcv.alg.filter.binary.ThresholdSquareBlockMean;
+import boofcv.alg.filter.binary.ThresholdBlockMean;
 import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
  */
-public class TestThresholdSquareBlockMean_F32
-		extends GenericThresholdSquareBlockMeanChecks<GrayF32> {
+public class TestThresholdBlockMean_F32
+		extends GenericThresholdBlockMeanChecks<GrayF32> {
 
-	public TestThresholdSquareBlockMean_F32() {
+	public TestThresholdBlockMean_F32() {
 		super(GrayF32.class);
 	}
 
 	@Override
-	public ThresholdSquareBlockMean<GrayF32>
+	public ThresholdBlockMean<GrayF32>
 	createAlg(int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdSquareBlockMean_F32(requestedBlockWidth,scale,down);
+		return new ThresholdBlockMean_F32(requestedBlockWidth,scale,down);
 	}
 }

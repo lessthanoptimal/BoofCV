@@ -19,7 +19,8 @@
 package boofcv.factory.filter.binary;
 
 import boofcv.abst.filter.binary.*;
-import boofcv.alg.filter.binary.ThresholdSquareBlockMinMax;
+import boofcv.alg.filter.binary.ThresholdBlockMean;
+import boofcv.alg.filter.binary.ThresholdBlockMinMax;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -76,7 +77,7 @@ public class FactoryThresholdBinary {
 	/**
 	 * Applies a very fast non-overlapping block thresholding algorithm which uses min/max statistics.
 	 *
-	 * @see ThresholdSquareBlockMinMax
+	 * @see ThresholdBlockMinMax
 	 *
 	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
 	 * @param down Should it threshold up or down.
@@ -95,7 +96,7 @@ public class FactoryThresholdBinary {
 	/**
 	 * Applies a very fast non-overlapping block thresholding algorithm which uses min/max statistics.
 	 *
-	 * @see boofcv.alg.filter.binary.ThresholdSquareBlockMean
+	 * @see ThresholdBlockMean
 	 *
 	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
 	 * @param down Should it threshold up or down.

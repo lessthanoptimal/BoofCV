@@ -341,7 +341,7 @@ public class GThresholdImageOps {
 
 	/**
 	 * Applies a threshold to an image by computing the min and max values in a regular grid across
-	 * the input image.  See {@link ThresholdSquareBlockMinMax} for the details.
+	 * the input image.  See {@link ThresholdBlockMinMax} for the details.
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
@@ -367,7 +367,7 @@ public class GThresholdImageOps {
 
 	/**
 	 * Applies a threshold to an image by computing the min and max values in a regular grid across
-	 * the input image.  See {@link ThresholdSquareBlockMean} for the details.
+	 * the input image.  See {@link ThresholdBlockMean} for the details.
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.

@@ -18,24 +18,23 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import boofcv.alg.filter.binary.ThresholdSquareBlockMinMax;
-import boofcv.struct.image.GrayU8;
+import boofcv.alg.filter.binary.ThresholdBlockMinMax;
+import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
  */
-public class TestThresholdSquareBlockMinMax_U8
-		extends GenericThresholdSquareBlockMinMaxChecks<GrayU8>
-{
+public class TestThresholdBlockMinMax_F32
+		extends GenericThresholdBlockMinMaxChecks<GrayF32> {
 
-	public TestThresholdSquareBlockMinMax_U8() {
-		super(GrayU8.class);
+	public TestThresholdBlockMinMax_F32() {
+		super(GrayF32.class);
 	}
 
 	@Override
-	public ThresholdSquareBlockMinMax<GrayU8, ?>
+	public ThresholdBlockMinMax<GrayF32, ?>
 	createAlg(double textureThreshold, int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdSquareBlockMinMax_U8(textureThreshold,requestedBlockWidth,
-				scale,down);
+		return new ThresholdBlockMinMax_F32((float)textureThreshold,requestedBlockWidth,
+				(float)scale,down);
 	}
 }

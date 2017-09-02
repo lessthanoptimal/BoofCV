@@ -18,22 +18,22 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import boofcv.alg.filter.binary.ThresholdSquareBlockMean;
+import boofcv.alg.filter.binary.ThresholdBlockMean;
 import boofcv.struct.image.GrayU8;
 
 /**
  * @author Peter Abeles
  */
-public class TestThresholdSquareBlockMean_U8
-		extends GenericThresholdSquareBlockMeanChecks<GrayU8> {
+public class TestThresholdBlockMean_U8
+		extends GenericThresholdBlockMeanChecks<GrayU8> {
 
-	public TestThresholdSquareBlockMean_U8() {
+	public TestThresholdBlockMean_U8() {
 		super(GrayU8.class);
 	}
 
 	@Override
-	public ThresholdSquareBlockMean<GrayU8>
+	public ThresholdBlockMean<GrayU8>
 	createAlg( int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdSquareBlockMean_U8(requestedBlockWidth,scale,down);
+		return new ThresholdBlockMean_U8(requestedBlockWidth,scale,down);
 	}
 }
