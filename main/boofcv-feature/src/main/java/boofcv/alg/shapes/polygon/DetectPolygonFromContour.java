@@ -24,6 +24,7 @@ import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
 import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
+import boofcv.struct.ConfigMinimumSize;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayS32;
@@ -74,8 +75,8 @@ import java.util.List;
 public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 	// minimum size of a shape's contour as a fraction of the image width
-	private double minContourFraction;
-	private int minimumContour; // this is image.width*minContourFraction
+	private ConfigMinimumSize minimumContourConfig;
+	private int minimumContour;
 	private double minimumArea; // computed from minimumContour
 
 	// does the polygon have to be convex
@@ -139,7 +140,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 * @param minSides minimum number of sides
 	 * @param maxSides maximum number of sides
 	 * @param contourToPolygon Fits a crude polygon to the shape's binary contour
-	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
+	 * @param minimumContour Minimum allowed length of a contour.  Copy stored internally. Try 50 pixels.
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
 	 * @param convex If true it will only return convex shapes
 	 * @param touchBorder if true then shapes which touch the image border are allowed
@@ -149,7 +150,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 */
 	public DetectPolygonFromContour(int minSides, int maxSides,
 									SplitMergeLineFitLoop contourToPolygon,
-									double minContourFraction,
+									ConfigMinimumSize minimumContour,
 									boolean outputClockwise,
 									boolean convex,
 									boolean touchBorder, double splitPenalty,
@@ -158,7 +159,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 									Class<T> inputType) {
 
 		setNumberOfSides(minSides,maxSides);
-		this.minContourFraction = minContourFraction;
+		this.minimumContourConfig = minimumContour.copy(); // local copy so that external can be modified
 		this.fitPolygon = contourToPolygon;
 		this.outputClockwise = outputClockwise;
 		this.convex = convex;
@@ -241,7 +242,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		labeled.reshape(width, height);
 
 		// adjust size based parameters based on image size
-		this.minimumContour = (int)(width*minContourFraction);
+		this.minimumContour = minimumContourConfig.computeI(width,height);
 		this.minimumArea = Math.pow(this.minimumContour /4.0,2);
 
 		if( helper != null )

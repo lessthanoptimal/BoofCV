@@ -21,6 +21,7 @@ package boofcv.abst.fiducial.calib;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.ConfigPolygonDetector;
+import boofcv.struct.ConfigMinimumSize;
 import boofcv.struct.Configuration;
 
 /**
@@ -68,7 +69,7 @@ public class ConfigSquareGrid implements Configuration {
 
 		square.detector.contourToPoly.splitFraction = 0.1;
 		square.detector.contourToPoly.minimumSideFraction = 0.05;
-		square.detector.minContourImageWidthFraction = 0.0005;
+		square.detector.minimumContour = ConfigMinimumSize.byPixels(10);
 
 		square.refineGray.cornerOffset = 1;
 		square.refineGray.lineSamples = 15;

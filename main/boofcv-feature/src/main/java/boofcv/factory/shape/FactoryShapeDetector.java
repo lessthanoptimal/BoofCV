@@ -110,7 +110,7 @@ public class FactoryShapeDetector {
 
 		return new DetectPolygonFromContour<>(
 				config.minimumSides, config.maximumSides, contourToPolygon,
-				config.minContourImageWidthFraction,
+				config.minimumContour,
 				config.clockwise, config.convex, config.canTouchBorder, config.splitPenalty,
 				config.minimumEdgeIntensity, config.tangentEdgeIntensity, imageType);
 	}

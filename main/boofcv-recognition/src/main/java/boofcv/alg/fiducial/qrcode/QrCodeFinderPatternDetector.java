@@ -18,17 +18,31 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
+
 /**
  * @author Peter Abeles
  */
 // TODO
-public class QrCodeFinderPatternDetector {
-	public void process() {
-		// detect squares but refine initially
+public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 
-		// search for squares which have square inside
+	// converts input image into a binary image
+	InputToBinary<T> inputToBinary;
 
-		// make sure it's just one square that's inside
+	// Detects squares inside the image
+	DetectPolygonBinaryGrayRefine<T> squareDetector;
+
+
+
+	public void process( T gray, GrayU8 binary ) {
+		// detect squares but don't refine  until later
+		squareDetector.process(gray,binary);
+
+		// Create graph of neighboring squares and prune squares which are inside of other squares
+
 
 		// make sure the size of the squares make sense
 
@@ -40,4 +54,38 @@ public class QrCodeFinderPatternDetector {
 
 		// see if it has the expected distribution
 	}
+
+	private void identifyFinderSquares() {
+
+		// Create NN search
+
+		// for each square search around it's center to see if there are other squares there
+
+		// remove all but the largest square
+
+		// test remaining squares to see have the expected B&W pattern
+
+	}
+
+	private void createGraph() {
+		// create a graph of finder squares using nearest neighbor search
+	}
+
+	private void identifyTripleSquares() {
+		// See if two squares have parallel sides
+
+		// Determine orientation and check for white on outside and timing pattern on inside
+	}
+
+	private void connectSquaresIntoFinderPattern() {
+		// sides need to be approximately parallel
+
+		// need to be the expected distance apart
+	}
+
+	private void refineSquares() {
+
+	}
+
+
 }
