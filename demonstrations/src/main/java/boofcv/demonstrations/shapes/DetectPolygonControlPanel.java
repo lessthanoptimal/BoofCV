@@ -20,6 +20,7 @@ package boofcv.demonstrations.shapes;
 
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
+import boofcv.struct.ConfigMinimumSize;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -82,6 +83,10 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 	int minSides = 3;
 	int maxSides = 6;
 
+	{
+		config.detector.minimumContour = ConfigMinimumSize.byPixels(20);
+	}
+
 	public DetectPolygonControlPanel(DetectBlackPolygonApp owner) {
 		this.owner = owner;
 
@@ -108,9 +113,10 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 
 		threshold = new ThresholdControlPanel(owner);
 
-		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(config.detector.minContourImageWidthFraction,
-				0.0,0.2,0.01));
-		configureSpinnerFloat(spinnerMinContourSize);
+		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(config.detector.minimumContour.pixels,
+				5,10000,2));
+		spinnerMinContourSize.setMaximumSize(spinnerMinContourSize.getPreferredSize());
+		spinnerMinContourSize.addChangeListener(this);
 		spinnerMinSides = new JSpinner(new SpinnerNumberModel(minSides, 3, 20, 1));
 		spinnerMinSides.setMaximumSize(spinnerMinSides.getPreferredSize());
 		spinnerMinSides.addChangeListener(this);
@@ -275,7 +281,7 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 			owner.viewUpdated();
 			return;
 		} else if( e.getSource() == spinnerMinContourSize ) {
-			config.detector.minContourImageWidthFraction = ((Number) spinnerMinContourSize.getValue()).doubleValue();
+			config.detector.minimumContour.pixels = ((Number) spinnerMinContourSize.getValue()).intValue();
 		} else if( e.getSource() == spinnerContourSplit ) {
 			config.detector.contourToPoly.splitFraction = ((Number) spinnerContourSplit.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourMinSplit ) {

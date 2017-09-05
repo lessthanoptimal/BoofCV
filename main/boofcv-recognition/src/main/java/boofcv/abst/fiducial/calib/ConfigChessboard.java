@@ -23,6 +23,7 @@ import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ConfigThresholdBlockMinMax;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
+import boofcv.struct.ConfigMinimumSize;
 import boofcv.struct.Configuration;
 
 /**
@@ -77,7 +78,7 @@ public class ConfigChessboard implements Configuration {
 		square.detector.contourToPoly.splitFraction = 0.1;
 		square.detector.contourToPoly.minimumSideFraction = 0.025; // teh erosion step appears to require a smaller value here
 		square.detector.tangentEdgeIntensity = 2.5; // the initial contour is the result of being eroded
-		square.detector.minContourImageWidthFraction = 0.0005;
+		square.detector.minimumContour = ConfigMinimumSize.byPixels(10);
 		square.detector.canTouchBorder = true;
 
 		// defaults for if the user toggles it to lines

@@ -20,6 +20,7 @@ package boofcv.factory.shape;
 
 import boofcv.alg.shapes.edge.EdgeIntensityPolygon;
 import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
+import boofcv.struct.ConfigMinimumSize;
 import boofcv.struct.Configuration;
 
 /**
@@ -74,10 +75,9 @@ public class ConfigPolygonFromContour implements Configuration {
 	public double tangentEdgeIntensity = 2.5;
 
 	/**
-	 * Specifies the minimum allowed contour length as a fraction of the input image's width.  Smaller numbers
-	 * mean smaller objects are allowed.
+	 * Specifies the minimum allowed contour length.
 	 */
-	public double minContourImageWidthFraction = 0.05;
+	public ConfigMinimumSize minimumContour = ConfigMinimumSize.bySize(0.05);
 
 	/**
 	 * Will the found polygons be in clockwise order?
@@ -119,7 +119,7 @@ public class ConfigPolygonFromContour implements Configuration {
 				", splitPenalty=" + splitPenalty +
 				", minimumEdgeIntensity=" + minimumEdgeIntensity +
 				", tangentEdgeIntensity=" + tangentEdgeIntensity +
-				", minContourImageWidthFraction=" + minContourImageWidthFraction +
+				", minimumContour=" + minimumContour +
 				", clockwise=" + clockwise +
 				", convex=" + convex +
 				'}';

@@ -25,7 +25,8 @@ import boofcv.struct.image.InterleavedS32;
 import java.util.Arrays;
 
 /**
- * Block Otsu threshold implementation.
+ * Block Otsu threshold implementation based on {@link ThresholdBlockCommon}. Computes a histogram in non-overlapping
+ * square regions. Then thresholds a single region by combining histograms from its neighbors.
  *
  * @see GThresholdImageOps#computeOtsu(ImageGray, int, int)
  *
