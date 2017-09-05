@@ -415,6 +415,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 				info.splits.setTo(splits);
 				info.contourTouchesBorder = touchesBorder;
 				info.external = true;
+				info.hasInternal = !c.internal.isEmpty();
 				info.edgeInside = edgeInside;
 				info.edgeOutside = edgeOutside;
 				info.label = c.id;
@@ -573,6 +574,9 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		return maxSides;
 	}
 
+	public void setOutputClockwise(boolean outputClockwise) {
+		this.outputClockwise = outputClockwise;
+	}
 
 	public void setVerbose(boolean verbose) {
 		this.verbose = verbose;
@@ -607,6 +611,11 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		 * Was it created from an external or internal contour
 		 */
 		public boolean external;
+
+		/**
+		 * If it was made from an external contour did the blob also have an internal contour?
+		 */
+		public boolean hasInternal;
 
 		/**
 		 * The blob's label in the label image
@@ -652,6 +661,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 		public void reset() {
 			external = false;
+			hasInternal = false;
 			label = -1;
 			edgeInside = edgeOutside = -1;
 			contourTouchesBorder = true;

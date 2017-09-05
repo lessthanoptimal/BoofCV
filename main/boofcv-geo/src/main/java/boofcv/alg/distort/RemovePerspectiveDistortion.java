@@ -52,7 +52,7 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 	FMatrixRMaj H32 = new FMatrixRMaj(3,3);
 //	DMatrixRMaj Hrefined = new DMatrixRMaj(3,3);
 	// transform which applies the homography
-	PointTransformHomography_F32 homography = new PointTransformHomography_F32();
+	PointTransformHomography_F32 transform = new PointTransformHomography_F32();
 
 	// storage for associated points between the two images
 	ArrayList<AssociatedPair> associatedPairs = new ArrayList<>();
@@ -71,17 +71,23 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 		output = imageType.createImage(width,height);
 		distort = new FDistort(imageType);
 		distort.output(output);
+		distort.interp(InterpolationType.BILINEAR).transform(transform);
+	}
 
-		distort.interp(InterpolationType.BILINEAR).transform(homography);
-
+	/**
+	 * Creates the variables for computing the transform but not rendering the image
+	 * @param width Width of undistorted image
+	 * @param height Height of undistorted image
+	 */
+	public RemovePerspectiveDistortion(int width , int height) {
 		for (int i = 0; i < 4; i++) {
 			associatedPairs.add( new AssociatedPair());
 		}
 
 		associatedPairs.get(0).p1.set(0,0);
-		associatedPairs.get(1).p1.set(output.width-1,0);
-		associatedPairs.get(2).p1.set(output.width-1,output.height-1);
-		associatedPairs.get(3).p1.set(0,output.height-1);
+		associatedPairs.get(1).p1.set(width-1,0);
+		associatedPairs.get(2).p1.set(width-1,height-1);
+		associatedPairs.get(3).p1.set(0,height-1);
 	}
 
 	/**
@@ -97,10 +103,31 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 					Point2D_F64 corner0 , Point2D_F64 corner1 ,
 					Point2D_F64 corner2 , Point2D_F64 corner3 )
 	{
-		associatedPairs.get(0).p2.set(corner0);
-		associatedPairs.get(1).p2.set(corner1);
-		associatedPairs.get(2).p2.set(corner2);
-		associatedPairs.get(3).p2.set(corner3);
+		if( createTransform(corner0, corner1, corner2, corner3)) {
+			distort.input(input).apply();
+
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Compues the distortion removal transform
+	 *
+	 * @param tl Top left corner
+	 * @param tr Top right corner
+	 * @param br Bottom right corner
+	 * @param bl Bottom left corner
+	 * @return true if successful or false if it failed
+	 */
+	public boolean createTransform( Point2D_F64 tl , Point2D_F64 tr ,
+									Point2D_F64 br , Point2D_F64 bl )
+	{
+		associatedPairs.get(0).p2.set(tl);
+		associatedPairs.get(1).p2.set(tr);
+		associatedPairs.get(2).p2.set(br);
+		associatedPairs.get(3).p2.set(bl);
 
 		if( !computeHomography.process(associatedPairs, H) )
 			return false;
@@ -111,10 +138,13 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 //		homography.set(Hrefined);
 
 		ConvertMatrixData.convert(H,H32);
-		homography.set(H32);
-		distort.input(input).apply();
+		transform.set(H32);
 
 		return true;
+	}
+
+	public PointTransformHomography_F32 getTransform() {
+		return transform;
 	}
 
 	/**
