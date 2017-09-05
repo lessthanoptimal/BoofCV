@@ -81,8 +81,6 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 			this.adjustForBias = new AdjustPolygonForThresholdBias();
 		}
 
-		detector.setOutputClockwise(true);
-
 		this.edgeIntensity = new EdgeIntensityPolygon<>(1, 1.5, 15,
 				detector.getInputType());
 	}
