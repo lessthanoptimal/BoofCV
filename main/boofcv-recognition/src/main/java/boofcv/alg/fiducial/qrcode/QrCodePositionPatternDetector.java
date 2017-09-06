@@ -29,7 +29,6 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
@@ -39,14 +38,16 @@ import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastQueue;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Detects position patterns for a QR code inside an image and forms a graph of ones which can potentially
+ * be connected together. Squares are detected in the image and position patterns are found based on their appearance.
+ *
+ *
  * @author Peter Abeles
  */
-// TODO
-public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
+public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 	InterpolatePixelS<T> interpolate;
 
@@ -56,9 +57,8 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 	// Detects squares inside the image
 	DetectPolygonBinaryGrayRefine<T> squareDetector;
 
-	FastQueue<PositionSquare> squares = new FastQueue<>(PositionSquare.class,true);
+	FastQueue<PositionSquare> positionPatterns = new FastQueue<>(PositionSquare.class,true);
 	SquareGraph graph = new SquareGraph();
-	List<PositionSquare> positionSquares = new ArrayList<>();
 
 	// Nearst Neighbor Search related variables
 	private NearestNeighbor<PositionSquare> search = FactoryNearestNeighbor.kdtree();
@@ -74,7 +74,13 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 	protected LineSegment2D_F64 connectLine = new LineSegment2D_F64();
 	protected Point2D_F64 intersection = new Point2D_F64();
 
-	public QrCodeFinderPatternDetector(DetectPolygonBinaryGrayRefine<T> squareDetector , int maxVersionQR) {
+	/**
+	 * Configures the detector
+	 *
+	 * @param squareDetector Square detector
+	 * @param maxVersionQR Maximum QR code version it can detect.
+	 */
+	public QrCodePositionPatternDetector(DetectPolygonBinaryGrayRefine<T> squareDetector , int maxVersionQR) {
 
 		// verify and configure polygon detector
 		if( squareDetector.getMinimumSides() != 4 || squareDetector.getMaximumSides() != 4 )
@@ -96,9 +102,15 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 		interpolate = FactoryInterpolation.bilinearPixelS(squareDetector.getInputType(), BorderType.EXTENDED);
 	}
 
+	/**
+	 * Detects position patterns inside the image and forms a graph.
+	 * @param gray Gray scale input image
+	 * @param binary Thresholed version of gray image.
+	 */
 	public void process(T gray, GrayU8 binary ) {
 
-		squares.reset();
+		recycleData();
+		positionPatterns.reset();
 		interpolate.setImage(gray);
 
 		// detect squares
@@ -109,8 +121,23 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 		createPositionPatternGraph();
 	}
 
+	protected void recycleData() {
+		for (int i = 0; i < positionPatterns.size(); i++) {
+			SquareNode n = positionPatterns.get(i);
+			for (int j = 0; j < n.edges.length; j++) {
+				if (n.edges[j] != null) {
+					graph.detachEdge(n.edges[j]);
+				}
+			}
+		}
+		positionPatterns.reset();
+	}
+
+	/**
+	 * Takes the detected squares and turns it into a list of {@link PositionSquare}.
+	 */
 	private void squaresToPositionList() {
-		this.squares.reset();
+		this.positionPatterns.reset();
 		List<DetectPolygonFromContour.Info> infoList = squareDetector.getPolygonInfo();
 		for (int i = 0; i < infoList.size(); i++) {
 			DetectPolygonFromContour.Info info = infoList.get(i);
@@ -124,62 +151,53 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 			if( !checkPositionPatternAppearance(info.polygon,(float)grayThreshold))
 				continue;
 
-			PositionSquare fs = this.squares.grow();
-			fs.reset();
-			fs.square = info.polygon;
-			fs.grayThreshold = grayThreshold;
+			// refine the edge estimate
+			squareDetector.refine(info);
 
-			// Under perspective distortion the geometric center is the intersection of the lines formed by
-			// opposing corners.
-			if( null == Intersection2D_F64.intersection(
-					fs.square.get(0),fs.square.get(2),fs.square.get(1),fs.square.get(3),
-					fs.center) ) {
-				// This should be impossible
-				throw new RuntimeException("BAD");
-			}
+			PositionSquare pp = this.positionPatterns.grow();
+			pp.reset();
+			pp.square = info.polygon;
+			pp.grayThreshold = grayThreshold;
 
-			// Find the length of the largest side on the square
-			double largest = 0;
-			for (int j = 0; j < 4; j++) {
-				double l = fs.square.getSideLength(j);
-				if( l > largest ) {
-					largest = l;
-				}
-			}
-			fs.largestSide = largest;
+			graph.computeNodeInfo(pp);
 		}
 	}
 
+	/**
+	 * Connects together position patterns. For each square, finds all of its neighbors based on center distance.
+	 * Then considers them for connections
+	 */
 	private void createPositionPatternGraph() {
 		// Add items to NN search
-		searchPoints.resize(positionSquares.size());
-		for (int i = 0; i < positionSquares.size(); i++) {
-			PositionSquare f = positionSquares.get(i);
+		searchPoints.resize(positionPatterns.size());
+		for (int i = 0; i < positionPatterns.size(); i++) {
+			PositionSquare f = positionPatterns.get(i);
 			double[] p = searchPoints.get(i);
 			p[0] = f.center.x;
 			p[1] = f.center.y;
 		}
+		search.setPoints(searchPoints.toList(),positionPatterns.toList());
 
 		double point[] = new double[2]; // TODO remove
-		for (int i = 0; i < positionSquares.size(); i++) {
-			PositionSquare f = positionSquares.get(i);
+		for (int i = 0; i < positionPatterns.size(); i++) {
+			PositionSquare f = positionPatterns.get(i);
 
 			// The QR code version specifies the number of "modules"/blocks across the marker is
 			// A position pattern is 7 blocks. A version 1 qr code is 21 blocks. Each version past one increments
 			// by 4 blocks. The search is relative to the center of each position pattern, hence the - 7
-			double maximumQrCodeWidth = f.largestSide*(21+4*(maxVersionQR-1)-7.0)/7.0;
-			double searchRadius = 1.2*maximumQrCodeWidth/2.0; // search 1/2 the width + some fudge factor
+			double maximumQrCodeWidth = f.largestSide*(17+4*maxVersionQR-7.0)/7.0;
+			double searchRadius = 1.2*maximumQrCodeWidth; // search 1/2 the width + some fudge factor
 			searchRadius*=searchRadius;
 
 			point[0] = f.center.x;
 			point[1] = f.center.y;
 
 			// Connect all the finder patterns which are near by each other together in a graph
-			search.findNearest(point,searchRadius,-1,searchResults);
+			search.findNearest(point,searchRadius,Integer.MAX_VALUE,searchResults);
 
 			if( searchResults.size > 1) {
 				for (int j = 0; j < searchResults.size; j++) {
-					NnData<PositionSquare> r = searchResults.get(i);
+					NnData<PositionSquare> r = searchResults.get(j);
 
 					if( r.data == f ) continue; // skip over if it's the square that initiated the search
 
@@ -193,9 +211,6 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 	 * Connects the 'candidate' node to node 'n' if they meet several criteria.  See code for details.
 	 */
 	void considerConnect(SquareNode node0, SquareNode node1) {
-
-		// TODO Make sure the outside edge is white
-
 		// Find the side on each line which intersects the line connecting the two centers
 		lineA.a = node0.center;
 		lineA.b = node1.center;
@@ -262,7 +277,7 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 		float lineX[] = new float[7]; // TODO move outside
 		float lineY[] = new float[7];
 		for (int i = 0; i < 7; i++) {
-			float location = 10*i;
+			float location = 10*i+5;
 			p2i.compute(location,35,imagePixel);
 			lineX[i] = interpolate.get(imagePixel.x,imagePixel.y);
 			p2i.compute(35,location,imagePixel);
@@ -295,7 +310,6 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 	 * space 1 block think, then the stone which is 3 blocks think. Total of 7 blocks.
 	 */
 	public static class PositionSquare extends SquareNode {
-		public boolean candidate;
 
 		// threshold for binary classification.
 		public double grayThreshold;
@@ -303,9 +317,24 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 		@Override
 		public void reset()
 		{
-			center.set(-1,-1);
-			candidate = true;
+			super.reset();
 			grayThreshold = -1;
 		}
+	}
+
+	/**
+	 * Returns a list of all the detected position pattern squares and the other PP that they are connected to.
+	 * @return List of PP
+	 */
+	public FastQueue<PositionSquare> getPositionPatterns() {
+		return positionPatterns;
+	}
+
+	public DetectPolygonBinaryGrayRefine<T> getSquareDetector() {
+		return squareDetector;
+	}
+
+	public SquareGraph getGraph() {
+		return graph;
 	}
 }

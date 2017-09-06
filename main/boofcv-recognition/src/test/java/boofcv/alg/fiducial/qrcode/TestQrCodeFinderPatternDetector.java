@@ -19,13 +19,26 @@
 package boofcv.alg.fiducial.qrcode;
 
 
+import boofcv.alg.fiducial.calib.squares.SquareNode;
+import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import georegression.metric.UtilAngle;
+import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.se.Se2_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.junit.Test;
+
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -35,12 +48,36 @@ import static org.junit.Assert.*;
 public class TestQrCodeFinderPatternDetector {
 	@Test
 	public void easy() {
-		fail("Implement");
+		GrayF32 image = render(null,
+				new PP(40,60,70), new PP(140,60,70),new PP(40,150,70));
+
+		GrayU8 binary = new GrayU8(image.width,image.height);
+
+		ThresholdImageOps.threshold(image,binary,100,true);
+
+		QrCodePositionPatternDetector<GrayF32> alg = createAlg();
+
+		alg.process(image,binary);
+
+		List<QrCodePositionPatternDetector.PositionSquare> list = alg.getPositionPatterns().toList();
+		assertEquals(3,list.size());
+
+		checkNode(40+35,60+35,2,list);
+		checkNode(140+35,60+35,1,list);
+		checkNode(40+35,150+35,1,list);
 	}
 
-	@Test
-	public void just_two() {
-		fail("Implement");
+	private void checkNode( double cx , double cy , int numEdges ,
+							List<QrCodePositionPatternDetector.PositionSquare> list )
+	{
+		for (int i = 0; i < list.size(); i++) {
+			QrCodePositionPatternDetector.PositionSquare p = list.get(i);
+			if( p.center.distance(cx,cy) < 3 ) {
+				assertEquals(numEdges,p.getNumberOfConnections());
+				return;
+			}
+		}
+		fail("No match");
 	}
 
 	/**
@@ -48,7 +85,15 @@ public class TestQrCodeFinderPatternDetector {
 	 */
 	@Test
 	public void considerConnect_positive() {
-		fail("Implement");
+		QrCodePositionPatternDetector<GrayF32> alg = createAlg();
+
+		SquareNode n0 = squareNode(40,60,70);
+		SquareNode n1 = squareNode(140,60,70);
+
+		alg.considerConnect(n0,n1);
+
+		assertEquals(1,n0.getNumberOfConnections());
+		assertEquals(1,n1.getNumberOfConnections());
 	}
 
 	/**
@@ -56,21 +101,35 @@ public class TestQrCodeFinderPatternDetector {
 	 */
 	@Test
 	public void considerConnect_negative_rotated() {
-		fail("Implement");
-	}
+		QrCodePositionPatternDetector<GrayF32> alg = createAlg();
 
+		SquareNode n0 = squareNode(40,60,70);
+		SquareNode n1 = squareNode(140,60,70);
+
+		Se2_F64 translate = new Se2_F64(-175,-95,0);
+		Se2_F64 rotate = new Se2_F64(0,0, UtilAngle.radian(45));
+
+		Se2_F64 tmp = translate.concat(rotate,null);
+		Se2_F64 combined = tmp.concat(translate.invert(null),null);
+
+		for (int i = 0; i < 4; i++) {
+			SePointOps_F64.transform(combined,n1.square.get(i),n1.square.get(i));
+		}
+		SePointOps_F64.transform(combined,n1.center,n1.center);
+
+		alg.considerConnect(n0,n1);
+
+		assertEquals(0,n0.getNumberOfConnections());
+		assertEquals(0,n1.getNumberOfConnections());
+	}
 
 	@Test
 	public void checkPositionPatternAppearance() {
-		GrayF32 image = render(40,60,70);
+		GrayF32 image = render(null,new PP(40,60,70));
 
-		QrCodeFinderPatternDetector<GrayF32> alg = createAlg();
+		QrCodePositionPatternDetector<GrayF32> alg = createAlg();
 
-		Polygon2D_F64 square = new Polygon2D_F64(4);
-		square.get(0).set(40,60);
-		square.get(1).set(110,60);
-		square.get(2).set(110,130);
-		square.get(3).set(40,130);
+		Polygon2D_F64 square = square(40,60,70);
 
 		alg.interpolate.setImage(image);
 
@@ -80,42 +139,103 @@ public class TestQrCodeFinderPatternDetector {
 		assertFalse(alg.checkPositionPatternAppearance(square,100));
 	}
 
+	private SquareNode squareNode( int x0 , int y0 , int width ) {
+		Polygon2D_F64 square = new Polygon2D_F64(4);
+		square.get(0).set(x0,y0);
+		square.get(1).set(x0+width,y0);
+		square.get(2).set(x0+width,y0+width);
+		square.get(3).set(x0,y0+width);
+
+		SquareNode node = new SquareNode();
+		node.square = square;
+		node.largestSide = width;
+		node.smallestSide = width;
+		node.center.set(x0+width/2,y0+width/2);
+		for (int i = 0; i < 4; i++) {
+			node.sideLengths[i] = width;
+		}
+
+		return node;
+	}
+
+	private Polygon2D_F64 square( int x0 , int y0 , int width ) {
+		Polygon2D_F64 square = new Polygon2D_F64(4);
+		square.get(0).set(x0,y0);
+		square.get(1).set(x0+width,y0);
+		square.get(2).set(x0+width,y0+width);
+		square.get(3).set(x0,y0+width);
+		return square;
+	}
+
 	@Test
 	public void positionSquareIntensityCheck() {
 
 		float positive[] = new float[]{10,200,10,10,10,200,10};
 
-		assertTrue(QrCodeFinderPatternDetector.positionSquareIntensityCheck(positive,100));
+		assertTrue(QrCodePositionPatternDetector.positionSquareIntensityCheck(positive,100));
 
 		for (int i = 0; i < 7; i++) {
 			float negative[] = positive.clone();
 
 			negative[i] = negative[i] < 100 ? 200 : 10;
-			assertFalse(QrCodeFinderPatternDetector.positionSquareIntensityCheck(negative,100));
+			assertFalse(QrCodePositionPatternDetector.positionSquareIntensityCheck(negative,100));
 		}
 	}
 
-	private QrCodeFinderPatternDetector<GrayF32> createAlg() {
+	private QrCodePositionPatternDetector<GrayF32> createAlg() {
 
 		ConfigPolygonDetector config = new ConfigPolygonDetector(4,4);
 		config.detector.clockwise = false;
 		DetectPolygonBinaryGrayRefine<GrayF32> squareDetector =
 				FactoryShapeDetector.polygon(config, GrayF32.class);
 
-		return new QrCodeFinderPatternDetector<>(squareDetector,2);
+		return new QrCodePositionPatternDetector<>(squareDetector,2);
 	}
 
+	private GrayF32 render(Affine2D_F64 affine , PP ...pps ) {
 
-	private GrayF32 render( int x0 , int y0 , int width ) {
-		GrayF32 image = new GrayF32(300,350);
-		ImageMiscOps.fill(image,255);
+		BufferedImage image = new BufferedImage(300,400,BufferedImage.TYPE_INT_RGB);
 
-		ImageMiscOps.fillRectangle(image,0,x0,y0,width,width);
-		ImageMiscOps.fillRectangle(image,255,x0+width/7,y0+width/7,width*5/7,width*5/7);
-		ImageMiscOps.fillRectangle(image,0,x0+width*2/7,y0+width*2/7,width*3/7,width*3/7);
+		Graphics2D g2 = image.createGraphics();
+		g2.setColor(Color.WHITE);
+		g2.fillRect(0,0,image.getWidth(),image.getHeight());
 
-		return image;
+		if( affine != null ) {
+			g2.setTransform(new AffineTransform(affine.a11,affine.a12,affine.a21,affine.a22,affine.tx,affine.ty));
+		}
+
+		for( PP p : pps ) {
+			renderPP(g2,p.x0,p.y0,p.width);
+		}
+
+		GrayF32 out = new GrayF32(image.getWidth(),image.getHeight());
+		ConvertBufferedImage.convertFrom(image,out);
+
+//		ShowImages.showWindow(image,"Rendered", true);
+//		try {
+//			Thread.sleep(2000);
+//		} catch (InterruptedException ignore) {}
+
+		return out;
 	}
 
+	private void renderPP(Graphics2D g2 , int x0 , int y0 , int width ) {
+		g2.setColor(Color.BLACK);
+		g2.fillRect(x0,y0,width,width);
+		g2.setColor(Color.WHITE);
+		g2.fillRect(x0+width/7,y0+width/7,width*5/7,width*5/7);
+		g2.setColor(Color.BLACK);
+		g2.fillRect(x0+width*2/7,y0+width*2/7,width*3/7,width*3/7);
+	}
+
+	private static class PP {
+		int x0,y0,width;
+
+		public PP(int x0, int y0, int width) {
+			this.x0 = x0;
+			this.y0 = y0;
+			this.width = width;
+		}
+	}
 
 }

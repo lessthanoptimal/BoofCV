@@ -32,10 +32,29 @@ import org.ddogleg.struct.RecycleManager;
  * @author Peter Abeles
  */
 public class SquareGraph {
-	protected RecycleManager<SquareEdge> edges = new RecycleManager<>(SquareEdge.class);
+	protected RecycleManager<SquareEdge> edgeManager = new RecycleManager<>(SquareEdge.class);
 
 	Vector2D_F64 vector0 = new Vector2D_F64();
 	Vector2D_F64 vector1 = new Vector2D_F64();
+
+	public void computeNodeInfo( SquareNode n ) {
+		// Under perspective distortion the geometric center is the intersection of the lines formed by
+		// opposing corners.
+		if( null == Intersection2D_F64.intersection(
+				n.square.get(0),n.square.get(2),n.square.get(1),n.square.get(3),
+				n.center) ) {
+			// This should be impossible
+			throw new RuntimeException("BAD");
+		}
+
+		// side lengths
+		for (int j = 0,k=3; j < 4; k=j,j++) {
+			double l = n.square.get(j).distance(n.square.get(k));
+			n.sideLengths[j] = l;
+			n.largestSide = Math.max(n.largestSide,l);
+			n.smallestSide = Math.min(n.smallestSide,l);
+		}
+	}
 
 	/**
 	 * Removes the edge from the two nodes and recycles the data structure
@@ -46,7 +65,7 @@ public class SquareGraph {
 		edge.b.edges[edge.sideB] = null;
 		edge.distance = 0;
 
-		edges.recycleInstance(edge);
+		edgeManager.recycleInstance(edge);
 	}
 
 	/**
@@ -98,7 +117,7 @@ public class SquareGraph {
 	 * @param distance distance apart the center of the two nodes
 	 */
 	void connect( SquareNode a , int indexA , SquareNode b , int indexB , double distance ) {
-		SquareEdge edge = edges.requestInstance();
+		SquareEdge edge = edgeManager.requestInstance();
 		edge.reset();
 
 		edge.a = a;
@@ -160,5 +179,9 @@ public class SquareGraph {
 	 */
 	private static int add( int index , int value ) {
 		return CircularIndex.addOffset(index, value, 4);
+	}
+
+	public RecycleManager<SquareEdge> getEdgeManager() {
+		return edgeManager;
 	}
 }

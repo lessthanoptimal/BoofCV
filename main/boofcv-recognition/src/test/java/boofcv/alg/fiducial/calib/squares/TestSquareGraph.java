@@ -144,7 +144,7 @@ public class TestSquareGraph {
 
 		alg.detachEdge(e);
 
-		assertEquals(1, alg.edges.getUnused().size());
+		assertEquals(1, alg.edgeManager.getUnused().size());
 		assertTrue(a.edges[1] == null);
 		assertTrue(b.edges[2] == null);
 	}

@@ -49,7 +49,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	boolean isAdaptive;
 	boolean isThresholdGlobal;
 
-	public ThresholdType type = ThresholdType.GLOBAL_OTSU;
+	public ThresholdType type;
 
 	public double scale = new ConfigThreshold().scale;
 	public boolean down = true;
@@ -63,7 +63,12 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	public int globalThreshold = 50;
 
 	public ThresholdControlPanel(Listener listener) {
+		this(listener,ThresholdType.GLOBAL_OTSU);
+	}
+
+	public ThresholdControlPanel(Listener listener, ThresholdType defaultType ) {
 		this.listener = listener;
+		this.type = defaultType;
 
 		comboType = new JComboBox();
 		for( ThresholdType type : ThresholdType.values() ) {
@@ -71,7 +76,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		}
 
 		comboType.setMaximumSize(comboType.getPreferredSize());
-		comboType.setSelectedIndex(type.ordinal());
+		comboType.setSelectedIndex(defaultType.ordinal());
 
 		spinnerThreshold = new JSpinner(new SpinnerNumberModel(globalThreshold,0,255,1));
 		spinnerThreshold.setMaximumSize(spinnerThreshold.getPreferredSize());
@@ -102,6 +107,12 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 
 
 		updateEnabledByType();
+	}
+
+	public void setRadius( int value ) {
+		spinnerRadius.removeChangeListener(this);
+		spinnerRadius.setValue(value);
+		spinnerRadius.addChangeListener(this);
 	}
 
 	private void updateThresholdValue() {

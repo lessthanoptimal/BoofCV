@@ -39,13 +39,13 @@ import java.util.List;
 public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends DemonstrationBase2
 		implements ThresholdControlPanel.Listener
 {
-	Class<T> imageClass;
+	protected Class<T> imageClass;
 
 	protected DetectBlackShapePanel controls;
 
 	ImageZoomPanel guiImage;
 
-	InputToBinary<T> inputToBinary;
+	protected InputToBinary<T> inputToBinary;
 
 	BufferedImage original;
 	BufferedImage work;
@@ -56,7 +56,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 		this.imageClass = imageType;
 	}
 
-	void setupGui(ImageZoomPanel guiImage, DetectBlackShapePanel controls) {
+	protected void setupGui(ImageZoomPanel guiImage, DetectBlackShapePanel controls) {
 		this.guiImage = guiImage;
 		this.controls = controls;
 

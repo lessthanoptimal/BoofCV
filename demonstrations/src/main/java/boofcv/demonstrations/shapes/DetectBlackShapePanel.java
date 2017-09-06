@@ -25,10 +25,10 @@ import javax.swing.*;
 
 public abstract class DetectBlackShapePanel extends StandardAlgConfigPanel {
 
-	JSpinner selectZoom;
-	JLabel processingTimeLabel = new JLabel();
+	protected JSpinner selectZoom;
+	protected JLabel processingTimeLabel = new JLabel();
 
-	int selectedView = 0;
+	protected int selectedView = 0;
 
 	protected double zoom = 1;
 	protected final double minZoom = 0.01;

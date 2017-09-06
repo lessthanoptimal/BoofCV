@@ -20,7 +20,6 @@ package boofcv.alg.fiducial.calib.squares;
 
 import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Distance2D_F64;
-import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -129,23 +128,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 			if( n.square.size() != 4 )
 				throw new RuntimeException("Sqaures have four corners not "+n.square.size());
 
-			// does not assume CW or CCW ordering just that it is ordered
-			lineA.a = n.square.get(0);
-			lineA.b = n.square.get(2);
-			lineB.a = n.square.get(1);
-			lineB.b = n.square.get(3);
-
-			// this will be the geometric center and invariant of perspective distortion
-			Intersection2D_F64.intersection(lineA, lineB, n.center);
-
-
-			for (int j = 0; j < 4; j++) {
-				int k = (j+1)%4;
-				double l = n.square.get(j).distance(n.square.get(k));
-				n.sideLengths[j] = l;
-				n.largestSide = Math.max(n.largestSide,l);
-				n.smallestSide = Math.min(n.smallestSide,l);
-			}
+			graph.computeNodeInfo(n);
 		}
 	}
 
