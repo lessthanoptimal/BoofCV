@@ -56,6 +56,10 @@ public class SquareEdge {
 			throw new IllegalArgumentException("BUG! src is not a or b");
 	}
 
+	public boolean isEndPoint(SquareNode target ) {
+		return a == target || b == target;
+	}
+
 	/**
 	 * Discards previous settings.
 	 */

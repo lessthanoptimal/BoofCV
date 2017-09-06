@@ -63,11 +63,11 @@ public class SquareCrossClustersIntoGrids {
 	protected boolean checkPreconditions(List<SquareNode> cluster) {
 		for( int i = 0; i < cluster.size(); i++ ) {
 			SquareNode n = cluster.get(i);
-			for (int j = 0; j < n.corners.size(); j++) {
+			for (int j = 0; j < n.square.size(); j++) {
 				SquareEdge e0 = n.edges[j];
 				if( e0 == null)
 					continue;
-				for (int k = j+1; k < n.corners.size(); k++) {
+				for (int k = j+1; k < n.square.size(); k++) {
 					SquareEdge e1 = n.edges[k];
 					if( e1 == null)
 						continue;
@@ -223,7 +223,7 @@ public class SquareCrossClustersIntoGrids {
 	 * Adds the first row to the list of rows when the seed element has only one edge
 	 */
 	List<SquareNode> firstRow1( SquareNode seed ) {
-		for (int i = 0; i < seed.corners.size(); i++) {
+		for (int i = 0; i < seed.square.size(); i++) {
 			if( isOpenEdge(seed,i) ) {
 				List<SquareNode> list = new ArrayList<>();
 				seed.graph = 0;
@@ -232,8 +232,8 @@ public class SquareCrossClustersIntoGrids {
 				// by looking at the node its linked to
 				int corner = seed.edges[i].destinationSide(seed);
 				SquareNode dst = seed.edges[i].destination(seed);
-				int l = addOffset(corner,-1,dst.corners.size());
-				int u = addOffset(corner, 1,dst.corners.size());
+				int l = addOffset(corner,-1,dst.square.size());
+				int u = addOffset(corner, 1,dst.square.size());
 
 				if( dst.edges[u] != null ) {
 					list.add(seed);
@@ -259,7 +259,7 @@ public class SquareCrossClustersIntoGrids {
 	 */
 	List<SquareNode> firstRow2(SquareNode seed ) {
 		int indexLower = lowerEdgeIndex(seed);
-		int indexUpper = addOffset(indexLower,1,seed.corners.size());
+		int indexUpper = addOffset(indexLower,1,seed.square.size());
 
 		List<SquareNode> listDown = new ArrayList<>();
 		List<SquareNode> list = new ArrayList<>();
@@ -287,7 +287,7 @@ public class SquareCrossClustersIntoGrids {
 		if( numConnections == 0 ) {
 			return false;
 		} else if( numConnections == 1 ) {
-			for (int i = 0; i < seed.corners.size(); i++) {
+			for (int i = 0; i < seed.square.size(); i++) {
 				SquareEdge edge = seed.edges[i];
 				if( edge != null ) {
 					// see if the edge is one of the open ones
@@ -297,8 +297,8 @@ public class SquareCrossClustersIntoGrids {
 
 					// determine which direction to traverse along
 					int corner = edge.destinationSide(seed);
-					int l = addOffset(corner,-1,dst.corners.size());
-					int u = addOffset(corner, 1,dst.corners.size());
+					int l = addOffset(corner,-1,dst.square.size());
+					int u = addOffset(corner, 1,dst.square.size());
 
 					// Nodes in the seed's row should all be marked, so any unmarked nodes
 					// are ones you don't want to traverse down
@@ -316,7 +316,7 @@ public class SquareCrossClustersIntoGrids {
 			}
 		} else if( numConnections == 2 ) {
 			int indexLower = lowerEdgeIndex(seed);
-			int indexUpper = addOffset(indexLower,1,seed.corners.size());
+			int indexUpper = addOffset(indexLower,1,seed.square.size());
 
 			if( !addToRow(seed,indexUpper, 1,false,tmp) ) return false;
 			flipAdd(tmp, row);
@@ -338,14 +338,14 @@ public class SquareCrossClustersIntoGrids {
 	 * Returns the open corner index which is first.  Assuming that there are two adjacent corners.
 	 */
 	static int lowerEdgeIndex( SquareNode node ) {
-		for (int i = 0; i < node.corners.size(); i++) {
+		for (int i = 0; i < node.square.size(); i++) {
 			if( isOpenEdge(node,i) ) {
-				int next = addOffset(i,1,node.corners.size());
+				int next = addOffset(i,1,node.square.size());
 				if( isOpenEdge(node,next)) {
 					return i;
 				}
 				if( i == 0 ) {
-					int previous = node.corners.size()-1;
+					int previous = node.square.size()-1;
 					if( isOpenEdge(node,previous)) {
 						return previous;
 					}
@@ -359,7 +359,7 @@ public class SquareCrossClustersIntoGrids {
 
 	static int numberOfOpenEdges( SquareNode node ) {
 		int total = 0;
-		for (int i = 0; i < node.corners.size(); i++) {
+		for (int i = 0; i < node.square.size(); i++) {
 			if( isOpenEdge(node,i) )
 				total++;
 		}
@@ -419,7 +419,7 @@ public class SquareCrossClustersIntoGrids {
 			}
 			skip = !skip;
 			sign *= -1;
-			corner = addOffset(corner,sign,n.corners.size());
+			corner = addOffset(corner,sign,n.square.size());
 		}
 		return true;
 	}

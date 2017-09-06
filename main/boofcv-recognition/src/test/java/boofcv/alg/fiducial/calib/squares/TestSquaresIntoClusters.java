@@ -18,47 +18,8 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author Peter Abeles
  */
 public class TestSquaresIntoClusters {
-
-	@Test
-	public void detachEdge() {
-		SquareNode a = new SquareNode();
-		SquareNode b = new SquareNode();
-
-		SquaresIntoClusters alg = new SquaresIntoClusters();
-
-		alg.connect(a, 1, b, 2, 2.5);
-		SquareEdge e = a.edges[1];
-
-		alg.detachEdge(e);
-
-		assertEquals(1, alg.edges.getUnused().size());
-		assertTrue(a.edges[1] == null);
-		assertTrue(b.edges[2] == null);
-
-	}
-
-	@Test
-	public void connect() {
-		SquareNode a = new SquareNode();
-		SquareNode b = new SquareNode();
-
-		SquaresIntoClusters alg = new SquaresIntoClusters();
-
-		alg.connect(a,1,b,2,2.5);
-
-		assertTrue(a.edges[1] == b.edges[2]);
-		SquareEdge e = a.edges[1];
-		assertEquals(e.distance,2.5,1e-8);
-		assertEquals(1, e.sideA);
-		assertEquals(2, e.sideB);
-	}
 }

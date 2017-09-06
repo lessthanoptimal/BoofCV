@@ -253,7 +253,7 @@ public class TestSquareGridTools {
 			SquareNode n = grid.nodes.get(i);
 
 			if( i%2 == 0 ) {
-				UtilPolygons2D_F64.shiftDown(n.corners);
+				UtilPolygons2D_F64.shiftDown(n.square);
 			}
 		}
 
@@ -270,10 +270,10 @@ public class TestSquareGridTools {
 				double x = x0 + 2*col*w;
 				double y = y0 + 2*row*w;
 
-				assertTrue(n.corners.get(0).distance(new Point2D_F64(x  , y)) < 1e-8);
-				assertTrue(n.corners.get(1).distance(new Point2D_F64(x+w, y)) < 1e-8);
-				assertTrue(n.corners.get(2).distance(new Point2D_F64(x+w, y+w)) < 1e-8);
-				assertTrue(n.corners.get(3).distance(new Point2D_F64(x  , y+w)) < 1e-8);
+				assertTrue(n.square.get(0).distance(new Point2D_F64(x  , y)) < 1e-8);
+				assertTrue(n.square.get(1).distance(new Point2D_F64(x+w, y)) < 1e-8);
+				assertTrue(n.square.get(2).distance(new Point2D_F64(x+w, y+w)) < 1e-8);
+				assertTrue(n.square.get(3).distance(new Point2D_F64(x  , y+w)) < 1e-8);
 			}
 		}
 	}
@@ -307,13 +307,13 @@ public class TestSquareGridTools {
 						}
 						for (int i = 0; i < rows; i++) {
 							for (int j = 0; j < cols; j++) {
-								UtilPolygons2D_F64.shiftDown(grid.get(i,j).corners);
+								UtilPolygons2D_F64.shiftDown(grid.get(i,j).square);
 							}
 						}
 					}
 					for (int i = 0; i < rows; i++) {
 						for (int j = 0; j < cols; j++) {
-							UtilPolygons2D_F64.flip(grid.get(i, j).corners);
+							UtilPolygons2D_F64.flip(grid.get(i, j).square);
 						}
 					}
 				}
@@ -342,11 +342,11 @@ public class TestSquareGridTools {
 	@Test
 	public void orderNode() {
 		SquareNode target = new SquareNode();
-		target.corners = new Polygon2D_F64(4);
-		target.corners.get(0).set(-1,-1);
-		target.corners.get(1).set( 1,-1);
-		target.corners.get(2).set( 1, 1);
-		target.corners.get(3).set(-1, 1);
+		target.square = new Polygon2D_F64(4);
+		target.square.get(0).set(-1,-1);
+		target.square.get(1).set( 1,-1);
+		target.square.get(2).set( 1, 1);
+		target.square.get(3).set(-1, 1);
 
 		SquareNode up = new SquareNode();    up.center.set(0, 5);
 		SquareNode down = new SquareNode();  down.center.set(0,-5);
@@ -369,9 +369,9 @@ public class TestSquareGridTools {
 				alg.orderNode(target, down,false);
 				checkOrder(alg.ordered, 1,1,  -1,1,  -1,-1,  1,-1);
 
-				UtilPolygons2D_F64.shiftDown(target.corners);
+				UtilPolygons2D_F64.shiftDown(target.square);
 			}
-			UtilPolygons2D_F64.flip(target.corners);
+			UtilPolygons2D_F64.flip(target.square);
 		}
 	}
 
@@ -406,8 +406,8 @@ public class TestSquareGridTools {
 		for (int i = 0; i < 4; i++) {
 			int j = (i+1)%4;
 
-			double distI = node.corners.get(i).distance(point);
-			double distJ = node.corners.get(j).distance(point);
+			double distI = node.square.get(i).distance(point);
+			double distJ = node.square.get(j).distance(point);
 
 			double distance = distI+distJ;
 			if( distance < bestDistance ) {

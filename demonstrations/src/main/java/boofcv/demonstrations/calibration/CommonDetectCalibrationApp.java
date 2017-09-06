@@ -354,9 +354,9 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase2
 				if( n == null )
 					continue;
 				g2.setColor(color);
-				VisualizeShapes.drawPolygon(n.corners, true, scale, g2);
+				VisualizeShapes.drawPolygon(n.square, true, scale, g2);
 
-				drawCornersInside(g2,scale,n.corners);
+				drawCornersInside(g2,scale,n.square);
 			}
 		}
 	}
@@ -386,7 +386,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase2
 		for (int i = 0; i < grids.size(); i++) {
 			SquareGrid g = grids.get(i);
 			for (int j = 0; j < g.nodes.size(); j++) {
-				if( g.nodes.get(j) != null && g.nodes.get(j).corners == p )
+				if( g.nodes.get(j) != null && g.nodes.get(j).square == p )
 					return true;
 			}
 		}

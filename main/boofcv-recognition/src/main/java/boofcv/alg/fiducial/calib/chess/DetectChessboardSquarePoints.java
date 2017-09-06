@@ -326,8 +326,8 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 		for (int i = 0; i < 4; i++) {
 			SquareEdge edge = a.edges[i];
 			if( edge != null && edge.destination(a) == n ) {
-				Point2D_F64 p0 = edge.a.corners.get(edge.sideA);
-				Point2D_F64 p1 = edge.b.corners.get(edge.sideB);
+				Point2D_F64 p0 = edge.a.square.get(edge.sideA);
+				Point2D_F64 p1 = edge.b.square.get(edge.sideB);
 
 				point.x = (p0.x+p1.x)/2.0;
 				point.y = (p0.y+p1.y)/2.0;

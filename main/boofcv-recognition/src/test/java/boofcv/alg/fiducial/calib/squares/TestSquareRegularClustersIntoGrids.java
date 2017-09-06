@@ -276,7 +276,7 @@ public class TestSquareRegularClustersIntoGrids {
 			square.sideLengths[i] = width;
 		}
 
-		square.corners = poly;
+		square.square = poly;
 		square.center.set(x,y);
 		square.largestSide = width;
 

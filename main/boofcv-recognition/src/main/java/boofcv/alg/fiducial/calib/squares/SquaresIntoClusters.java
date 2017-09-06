@@ -18,9 +18,7 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
-import georegression.struct.line.LineSegment2D_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.RecycleManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,10 +37,8 @@ public class SquaresIntoClusters {
 
 	// storage for open list when clustering points
 	protected List<SquareNode> open = new ArrayList<>();
-	protected RecycleManager<SquareEdge> edges = new RecycleManager<>(SquareEdge.class);
 
-	protected LineSegment2D_F64 lineA = new LineSegment2D_F64();
-	protected LineSegment2D_F64 lineB = new LineSegment2D_F64();
+	protected SquareGraph graph = new SquareGraph();
 
 	/**
 	 * Reset and recycle data structures from the previous run
@@ -52,7 +48,7 @@ public class SquaresIntoClusters {
 			SquareNode n = nodes.get(i);
 			for (int j = 0; j < n.edges.length; j++) {
 				if( n.edges[j] != null ) {
-					detachEdge(n.edges[j]);
+					graph.detachEdge(n.edges[j]);
 				}
 			}
 		}
@@ -98,7 +94,7 @@ public class SquaresIntoClusters {
 		while( !open.isEmpty() ) {
 			SquareNode n = open.remove( open.size() - 1 );
 
-			for (int i = 0; i < n.corners.size(); i++) {
+			for (int i = 0; i < n.square.size(); i++) {
 				SquareEdge edge = n.edges[i];
 				if( edge == null )
 					continue;
@@ -122,38 +118,4 @@ public class SquaresIntoClusters {
 		}
 	}
 
-	/**
-	 * Removes the edge from the two nodes and recycles the data structure
-	 */
-	void detachEdge(SquareEdge edge) {
-
-		edge.a.edges[edge.sideA] = null;
-		edge.b.edges[edge.sideB] = null;
-		edge.distance = 0;
-
-		edges.recycleInstance(edge);
-	}
-
-	/**
-	 * Creates a new edge which will connect the two nodes.  The side on each node which is connected
-	 * is specified by the indexes.
-	 * @param a First node
-	 * @param indexA side on node 'a'
-	 * @param b Second node
-	 * @param indexB side on node 'b'
-	 * @param distance distance apart the center of the two nodes
-	 */
-	void connect( SquareNode a , int indexA , SquareNode b , int indexB , double distance ) {
-		SquareEdge edge = edges.requestInstance();
-		edge.reset();
-
-		edge.a = a;
-		edge.sideA = indexA;
-		edge.b = b;
-		edge.sideB = indexB;
-		edge.distance = distance;
-
-		a.edges[indexA] = edge;
-		b.edges[indexB] = edge;
-	}
 }

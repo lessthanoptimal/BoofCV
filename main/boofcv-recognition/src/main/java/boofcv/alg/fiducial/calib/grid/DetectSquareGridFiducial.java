@@ -164,7 +164,7 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 			row0.clear();
 			row1.clear();
 			for (int col = 0; col < grid.columns; col++) {
-				Polygon2D_F64 square = grid.get(row,col).corners;
+				Polygon2D_F64 square = grid.get(row,col).square;
 
 				row0.add(square.get(0));
 				row0.add(square.get(1));

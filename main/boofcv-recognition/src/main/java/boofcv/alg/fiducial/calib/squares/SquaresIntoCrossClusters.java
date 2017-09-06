@@ -129,7 +129,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 				n.largestSide = Math.max(n.largestSide,l);
 			}
 
-			n.corners = polygon;
+			n.square = polygon;
 			n.touch = info.borderCorners;
 			n.updateArrayLength();
 		}
@@ -147,7 +147,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			// search all the corners of this node for their neighbors
 			SquareNode n = nodes.get(indexNode);
 
-			for (int indexLocal = 0; indexLocal < n.corners.size(); indexLocal++) {
+			for (int indexLocal = 0; indexLocal < n.square.size(); indexLocal++) {
 				if( n.touch.size > 0 && n.touch.get(indexLocal) )
 					continue;
 
@@ -167,7 +167,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 					int neighborCornerIndex = getCornerIndex(neighborNode,neighborData.point[0],neighborData.point[1]);
 
 					if( candidateIsMuchCloser(n, neighborNode, neighborData.distance))
-						considerConnect(n, indexLocal, neighborNode, neighborCornerIndex, neighborData.distance);
+						graph.checkConnect(n, indexLocal, neighborNode, neighborCornerIndex, neighborData.distance);
 				}
 			}
 		}
@@ -177,8 +177,8 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	 * Returns the corner index of the specified coordinate
 	 */
 	int getCornerIndex( SquareNode node , double x , double y ) {
-		for (int i = 0; i < node.corners.size(); i++) {
-			Point2D_F64 c = node.corners.get(i);
+		for (int i = 0; i < node.square.size(); i++) {
+			Point2D_F64 c = node.square.get(i);
 			if( c.x == x && c.y == y )
 				return i;
 		}
@@ -196,11 +196,11 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 		for (int i = 0; i < nodes.size(); i++) {
 			SquareNode n = nodes.get(i);
 
-			for (int j = 0; j < n.corners.size(); j++) {
+			for (int j = 0; j < n.square.size(); j++) {
 				if( n.touch.size > 0 && n.touch.get(j) )
 					continue;
 
-				Point2D_F64 c = n.corners.get(j);
+				Point2D_F64 c = n.square.get(j);
 				double[] point = searchPoints.grow();
 				point[0] = c.x;
 				point[1] = c.y;
@@ -225,25 +225,5 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 		if( distance2 > length)
 			return false;
 		return distance2 <= length;
-	}
-
-	/**
-	 * Connects the 'candidate' node to node 'n' if they meet several criteria.  See code for details.
-	 */
-	void considerConnect(SquareNode node0,  int corner0 , SquareNode node1 , int corner1 , double distance ) {
-
-		// TODO check max size change
-
-		if( node0.edges[corner0] != null && node0.edges[corner0].distance > distance ) {
-			detachEdge(node0.edges[corner0]);
-		}
-
-		if( node1.edges[corner1] != null && node1.edges[corner1].distance > distance ) {
-			detachEdge(node1.edges[corner1]);
-		}
-
-		if( node0.edges[corner0] == null && node1.edges[corner1] == null) {
-			connect(node0,corner0,node1,corner1,distance);
-		}
 	}
 }

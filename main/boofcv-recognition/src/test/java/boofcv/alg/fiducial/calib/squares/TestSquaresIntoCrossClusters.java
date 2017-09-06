@@ -139,11 +139,11 @@ public class TestSquaresIntoCrossClusters {
 	@Test
 	public void getCornerIndex() {
 		SquareNode node = new SquareNode();
-		node.corners = new Polygon2D_F64(4);
-		node.corners.get(0).set(5,6);
-		node.corners.get(1).set(6,7);
-		node.corners.get(2).set(7,8);
-		node.corners.get(3).set(8,9);
+		node.square = new Polygon2D_F64(4);
+		node.square.get(0).set(5,6);
+		node.square.get(1).set(6,7);
+		node.square.get(2).set(7,8);
+		node.square.get(3).set(8,9);
 
 		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(5,-1);
 
@@ -168,41 +168,9 @@ public class TestSquaresIntoCrossClusters {
 		assertFalse(alg.candidateIsMuchCloser(node0,node1,20));
 
 		double frac = alg.tooFarFraction;
-		node1.corners = createSquare(12,10).polygon;
+		node1.square = createSquare(12,10).polygon;
 		// the closest neighboring node should be 1 away
 		assertTrue(alg.candidateIsMuchCloser(node0,node1,Math.pow(2*frac-1e-6,2)));
 		assertFalse(alg.candidateIsMuchCloser(node0,node1,Math.pow(2*frac+1e-6,2)));
 	}
-
-	@Test
-	public void considerConnect() {
-		SquareNode node0 = new SquareNode();
-		SquareNode node1 = new SquareNode();
-
-		// first do it with no connections
-		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(5,-1);
-
-		alg.considerConnect(node0,0,node1,0,4);
-
-		assertTrue(node0.edges[0]==node1.edges[0]);
-		assertTrue(node0.edges[0].a==node0);
-		assertTrue(node0.edges[0].b==node1);
-
-		// try to connect when its worse
-		alg.considerConnect(node0,0,node1,1,4.5);
-		assertTrue(node0.edges[0].a==node0);
-		assertTrue(node1.edges[1]==null);
-		alg.considerConnect(node1,1,node0,0,4.5);
-		assertTrue(node0.edges[0].a==node0);
-		assertTrue(node1.edges[1]==null);
-
-
-		// have one be better
-		alg.considerConnect(node0,0,node1,1,3.5);
-		assertTrue(node0.edges[0]==node1.edges[1]);
-		assertTrue(node0.edges[0].a==node0);
-		assertTrue(node0.edges[0].b==node1);
-		assertTrue(node1.edges[0]==null);
-	}
-
 }

@@ -212,7 +212,7 @@ public class TestSquareCrossClustersIntoGrids {
 				int second = (first + 1) % numCorners;
 
 				SquareNode node = new SquareNode();
-				node.corners = new Polygon2D_F64(numCorners);
+				node.square = new Polygon2D_F64(numCorners);
 				node.updateArrayLength();
 				connect(node, first, new SquareNode(), 0);
 				node.edges[first].b.graph = SquareNode.RESET_GRAPH;
@@ -311,7 +311,7 @@ public class TestSquareCrossClustersIntoGrids {
 	@Test
 	public void numberOfOpenEdges() {
 		SquareNode a = new SquareNode();
-		a.corners = new Polygon2D_F64(4);
+		a.square = new Polygon2D_F64(4);
 
 		assertEquals(0, SquareCrossClustersIntoGrids.numberOfOpenEdges(a));
 		connect(a,1,new SquareNode(),0);
@@ -335,7 +335,7 @@ public class TestSquareCrossClustersIntoGrids {
 		for (int i = 0; i < total; i++) {
 			out.add( new SquareNode());
 			out.get(i).graph = SquareNode.RESET_GRAPH;
-			out.get(i).corners = new Polygon2D_F64(4);
+			out.get(i).square = new Polygon2D_F64(4);
 		}
 
 		int previous = 0;
@@ -380,7 +380,7 @@ public class TestSquareCrossClustersIntoGrids {
 		cluster.add( new SquareNode());
 		cluster.add( new SquareNode());
 		for( SquareNode n : cluster ) {
-			n.corners = new Polygon2D_F64(4);
+			n.square = new Polygon2D_F64(4);
 		}
 
 		cluster.get(1).edges[2] = new SquareEdge();

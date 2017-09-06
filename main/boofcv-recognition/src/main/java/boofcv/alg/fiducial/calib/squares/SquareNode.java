@@ -33,7 +33,7 @@ public class SquareNode {
 
 	// polygon which this node represents.
 	// cw or ccw ordering of edges doesn't matter
-	public Polygon2D_F64 corners;
+	public Polygon2D_F64 square;
 	// does a corner touch the border?
 	public GrowQueue_B touch;
 
@@ -57,7 +57,7 @@ public class SquareNode {
 	public double distanceSqCorner( Point2D_F64 p ) {
 		double best = Double.MAX_VALUE;
 		for (int i = 0; i < 4; i++) {
-			double d = corners.get(i).distance2(p);
+			double d = square.get(i).distance2(p);
 			if( d < best ) {
 				best = d;
 			}
@@ -69,7 +69,7 @@ public class SquareNode {
 	 * Discards previous information
 	 */
 	public void reset() {
-		corners = null;
+		square = null;
 		touch = null;
 		center.set(-1,-1);
 		largestSide = 0;
@@ -83,9 +83,9 @@ public class SquareNode {
 	}
 
 	public void updateArrayLength() {
-		if( edges.length < corners.size() ) {
-			edges = new SquareEdge[corners.size()];
-			sideLengths = new double[corners.size()];
+		if( edges.length < square.size() ) {
+			edges = new SquareEdge[square.size()];
+			sideLengths = new double[square.size()];
 		}
 	}
 
@@ -94,7 +94,7 @@ public class SquareNode {
 	 */
 	public int getNumberOfConnections() {
 		int ret = 0;
-		for (int i = 0; i < corners.size(); i++) {
+		for (int i = 0; i < square.size(); i++) {
 			if( edges[i] != null )
 				ret++;
 		}
@@ -103,12 +103,21 @@ public class SquareNode {
 
 	public double smallestSideLength() {
 		double smallest = Double.MAX_VALUE;
-		for (int i = 0; i < corners.size(); i++) {
+		for (int i = 0; i < square.size(); i++) {
 			double length = sideLengths[i];
 			if( length < smallest ) {
 				smallest = length;
 			}
 		}
 		return smallest;
+	}
+
+	public SquareEdge findEdge( SquareNode target ) {
+		for (int i = 0; i < 4; i++) {
+			if( edges[i] != null && edges[i].isEndPoint(target) ) {
+				return edges[i];
+			}
+		}
+		return null;
 	}
 }

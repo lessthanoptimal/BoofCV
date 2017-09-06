@@ -32,11 +32,11 @@ public class TestSquareNode {
 	@Test
 	public void distanceSqCorner() {
 		SquareNode a = new SquareNode();
-		a.corners = new Polygon2D_F64(4);
-		a.corners.get(0).set(-2,-2);
-		a.corners.get(1).set( 2,-2);
-		a.corners.get(2).set( 2, 2);
-		a.corners.get(3).set(-2, 2);
+		a.square = new Polygon2D_F64(4);
+		a.square.get(0).set(-2,-2);
+		a.square.get(1).set( 2,-2);
+		a.square.get(2).set( 2, 2);
+		a.square.get(3).set(-2, 2);
 
 		assertEquals(0, a.distanceSqCorner(new Point2D_F64(-2, -2)), 1e-8);
 		assertEquals(0, a.distanceSqCorner(new Point2D_F64( 2, 2)),1e-8);
@@ -47,7 +47,7 @@ public class TestSquareNode {
 	@Test
 	public void getNumberOfConnections() {
 		SquareNode a = new SquareNode();
-		a.corners = new Polygon2D_F64(4);
+		a.square = new Polygon2D_F64(4);
 
 		assertEquals(0,a.getNumberOfConnections());
 		a.edges[2] = new SquareEdge();

@@ -186,10 +186,10 @@ public class SquareGridTools {
 
 		if( w == 1 && h == 1 ) {
 			SquareNode n = grid.get(0,0);
-			bounding.get(0).set(n.corners.get(0));
-			bounding.get(1).set(n.corners.get(1));
-			bounding.get(2).set(n.corners.get(2));
-			bounding.get(3).set(n.corners.get(3));
+			bounding.get(0).set(n.square.get(0));
+			bounding.get(1).set(n.square.get(1));
+			bounding.get(2).set(n.square.get(2));
+			bounding.get(3).set(n.square.get(3));
 		} else if( w == 1 ) {
 			orderNode(grid.get(0, 0), grid.get(h - 1, 0), false);
 			bounding.get(0).set(ordered[0]);
@@ -225,7 +225,7 @@ public class SquareGridTools {
 
 		if(grid.rows==1 && grid.columns==1 ) {
 			for (int i = 0; i < 4; i++) {
-				ordered[i] = node.corners.get(i);
+				ordered[i] = node.square.get(i);
 			}
 		} else if( grid.columns==1 ) {
 			if (row == grid.rows - 1) {
@@ -286,7 +286,7 @@ public class SquareGridTools {
 		lineCenters.b = node.center;
 		UtilLine2D_F64.convert(lineCenters,general);
 
-		Polygon2D_F64 poly = target.corners;
+		Polygon2D_F64 poly = target.square;
 		if( pointingX ) {
 			if (sign(general, poly.get(index0)) > 0) {
 				ordered[1] = poly.get(index1);
@@ -330,8 +330,8 @@ public class SquareGridTools {
 		for (int i = 0; i < 4; i++) {
 			int j = (i+1)%4;
 
-			lineSide.a = target.corners.get(i);
-			lineSide.b = target.corners.get(j);
+			lineSide.a = target.square.get(i);
+			lineSide.b = target.square.get(j);
 
 			if(Intersection2D_F64.intersection(lineCenters,lineSide,dummy) != null ) {
 				return i;
@@ -354,7 +354,7 @@ public class SquareGridTools {
 
 			for (int col = 0; col < grid.columns; col++) {
 				orderNodeGrid(grid, row, col);
-				Polygon2D_F64 square = grid.get(row,col).corners;
+				Polygon2D_F64 square = grid.get(row,col).square;
 
 				for (int i = 0; i < 4; i++) {
 					square.vertexes.data[i] = ordered[i];

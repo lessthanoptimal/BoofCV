@@ -475,7 +475,7 @@ public class TestDetectChessboardSquarePoints {
 			poly.get(i).y += y;
 		}
 
-		square.corners = poly;
+		square.square = poly;
 		square.center.set(x, y);
 		square.largestSide = width;
 
