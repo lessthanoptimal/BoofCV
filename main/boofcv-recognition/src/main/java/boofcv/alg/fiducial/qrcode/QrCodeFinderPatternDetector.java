@@ -68,6 +68,7 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 	// Computes a mapping to remove perspective distortion
 	private RemovePerspectiveDistortion<?> removePerspective = new RemovePerspectiveDistortion(70,70);
 
+	// Workspace for checking to see if two squares should be connected
 	protected LineSegment2D_F64 lineA = new LineSegment2D_F64();
 	protected LineSegment2D_F64 lineB = new LineSegment2D_F64();
 	protected LineSegment2D_F64 connectLine = new LineSegment2D_F64();
@@ -102,23 +103,17 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 
 		// detect squares
 		squareDetector.process(gray,binary);
-		squresToPositionList();
+		squaresToPositionList();
 
 		// Create graph of neighboring squares
 		createPositionPatternGraph();
-
-		// connect finder squares together into a finder pattern
-		identifyTripleSquares();
-
-
-		// Refine the squares found in complete finder patterns
-
 	}
 
-	private void squresToPositionList() {
-		List<DetectPolygonFromContour.Info> squares = squareDetector.getPolygonInfo();
-		for (int i = 0; i < squares.size(); i++) {
-			DetectPolygonFromContour.Info info = squares.get(i);
+	private void squaresToPositionList() {
+		this.squares.reset();
+		List<DetectPolygonFromContour.Info> infoList = squareDetector.getPolygonInfo();
+		for (int i = 0; i < infoList.size(); i++) {
+			DetectPolygonFromContour.Info info = infoList.get(i);
 
 			// squares with no internal contour cannot possibly be a finder pattern
 			if( !info.hasInternal )
@@ -126,7 +121,7 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 
 			// See if the appearance matches a finder pattern
 			double grayThreshold = (info.edgeInside+info.edgeOutside)/2;
-			if( !checkPositionPatternApperance(info,(float)grayThreshold))
+			if( !checkPositionPatternAppearance(info.polygon,(float)grayThreshold))
 				continue;
 
 			PositionSquare fs = this.squares.grow();
@@ -199,6 +194,8 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 	 */
 	void considerConnect(SquareNode node0, SquareNode node1) {
 
+		// TODO Make sure the outside edge is white
+
 		// Find the side on each line which intersects the line connecting the two centers
 		lineA.a = node0.center;
 		lineA.b = node1.center;
@@ -215,7 +212,7 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 		double side0 = node0.sideLengths[intersection0];
 		double side1 = node1.sideLengths[intersection1];
 
-		// it shuold intersect about in the middle of the line
+		// it should intersect about in the middle of the line
 
 		double sideLoc0 = connectLine.a.distance(node0.square.get(intersection0))/side0;
 		double sideLoc1 = connectLine.b.distance(node1.square.get(intersection1))/side1;
@@ -223,22 +220,10 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 		if( Math.abs(sideLoc0-0.5)>0.35 || Math.abs(sideLoc1-0.5)>0.35 )
 			return;
 
-
 		// see if connecting sides are of similar size
 		if( Math.abs(side0-side1)/Math.max(side0,side1) > 0.25 ) {
 			return;
 		}
-//
-//		// see if the intersection line is about perpendicular to both sides
-//		double angle0 = acuteAngle(node0,intersection0,lineA);
-//		double angle1 = acuteAngle(node1,intersection1,lineA);
-//
-//		System.out.printf("  acute %5.2f   %5.2f\n",UtilAngle.degree(angle0),UtilAngle.degree(angle1));
-
-//		double angle = UtilAngle.radian(20);
-//		if( Math.abs(angle0-Math.PI/2) > angle || Math.abs(angle1-Math.PI/2) > angle)
-//			return;
-
 
 		// Checks to see if the two sides selected above are closest to being parallel to each other.
 		// Perspective distortion will make the lines not parallel, but will still have a smaller
@@ -254,45 +239,27 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 		if( ratio > 1.3 )
 			return;
 
-		// See if they are crudely the same size
-//		double area0 = node0.corners.areaSimple();
-//		double area1 = node1.corners.areaSimple();
-
-//		if( Math.min(area0,area1)/Math.max(area0,area1) < 0.25 )
-//			return;
-
-		// The following two tests see if the end points which define the two selected sides are close to
-		// the line created by the end points which define the opposing side.
-		// Another way of saying this, for the "top" corner on the side, is it close to the line defined
-		// by the side "top" sides on both squares.
-		// just look at the code its easier than understanding that description
-//		if( !areMiddlePointsClose(node0.corners.get(add(intersection0, -1)), node0.corners.get(intersection0),
-//				node1.corners.get(add(intersection1, 1)), node1.corners.get(add(intersection1, 2)))) {
-//			return;
-//		}
-//
-//		if( !areMiddlePointsClose(node0.corners.get(add(intersection0,2)),node0.corners.get(add(intersection0,1)),
-//				node1.corners.get(intersection1),node1.corners.get(add(intersection1,-1)))) {
-//			return;
-//		}
 		graph.checkConnect(node0,intersection0,node1,intersection1,lineA.getLength2());
 	}
 
-	private boolean checkPositionPatternApperance(DetectPolygonFromContour.Info info , float grayThreshold ) {
-		Polygon2D_F64 sq = info.polygon;
+	/**
+	 * Determines if the found polygon looks like a position pattern. A horizontal and vertical line are sampled.
+	 * At each sample point it is marked if it is above or below the binary threshold for this square. Location
+	 * of sample points is found by "removing" perspective distortion.
+	 */
+	boolean checkPositionPatternAppearance( Polygon2D_F64 square , float grayThreshold ) {
 
 		// create a mapping assuming perspective distortion
 		// NOTE: Order doesn't matter here as long as the square is CW or CCW
-		if( !removePerspective.createTransform(sq.get(0),sq.get(1),sq.get(2),sq.get(3)) )
+		if( !removePerspective.createTransform(square.get(0),square.get(1),square.get(2),square.get(3)) )
 			return false;
 
 		// with Perspective removed to Image coordinates.
 		PointTransformHomography_F32 p2i = removePerspective.getTransform();
 
-		// a single scan line across the position pattern. Sample inside each square once
-		// X.XXX.X
+		// Sample horizontal nad vertical scan lines which are approximately in the middle of the shape.
 		Point2D_F32 imagePixel = new Point2D_F32();
-		float lineX[] = new float[7];
+		float lineX[] = new float[7]; // TODO move outside
 		float lineY[] = new float[7];
 		for (int i = 0; i < 7; i++) {
 			float location = 10*i;
@@ -303,37 +270,24 @@ public class QrCodeFinderPatternDetector<T extends ImageGray<T>> {
 		}
 
 		// see if the change in intensity matched the expected pattern
-		if( !finderSquareIntensityCheck(lineX,grayThreshold))
+		if( !positionSquareIntensityCheck(lineX,grayThreshold))
 			return false;
 
-		return finderSquareIntensityCheck(lineY,grayThreshold);
+		return positionSquareIntensityCheck(lineY,grayThreshold);
 	}
 
-	private boolean finderSquareIntensityCheck( float values[] , float threshold ) {
-		if( values[0] < threshold || values[1] > threshold )
+	/**
+	 * Checks to see if the array of sampled intensity values follows the expected pattern for a position pattern.
+	 * X.XXX.X where x = black and . = white.
+	 */
+	static boolean positionSquareIntensityCheck(float values[] , float threshold ) {
+		if( values[0] > threshold || values[1] < threshold )
 			return false;
-		if( values[2] < threshold || values[3] < threshold || values[4] < threshold  )
+		if( values[2] > threshold || values[3] > threshold || values[4] > threshold  )
 			return false;
-		if( values[5] > threshold || values[6] < threshold )
+		if( values[5] < threshold || values[6] > threshold )
 			return false;
 		return true;
-	}
-
-
-	private void identifyTripleSquares() {
-		// See if two squares have parallel sides
-
-		// Determine orientation and check for white on outside and timing pattern on inside
-	}
-
-	private void connectSquaresIntoFinderPattern() {
-		// sides need to be approximately parallel
-
-		// need to be the expected distance apart
-	}
-
-	private void refineSquares() {
-
 	}
 
 	/**
