@@ -108,7 +108,6 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	protected void detectorProcess(ImageGray input, GrayU8 binary) {
 //		System.out.println("processing image "+count++);
 		detector.process((T) input, binary);
-		System.out.println("Position Patterns Found = "+detector.getPositionPatterns().size);
 	}
 
 	class VisualizePanel extends ImageZoomPanel {
