@@ -45,7 +45,7 @@ public class ImplImageDistort_PL<Input extends ImageGray<Input>,Output extends I
 	@Override
 	public void apply(Planar<Input> srcImg, Planar<Output> dstImg) {
 		if( srcImg.getNumBands() != dstImg.getNumBands() )
-			throw new IllegalArgumentException("Number of bands must be the same");
+			throw new IllegalArgumentException("Number of bands must be the same. "+srcImg.getNumBands()+" vs "+dstImg.getNumBands());
 		int N = srcImg.getNumBands();
 		
 		for( int i = 0; i < N; i++ ) {
@@ -57,7 +57,7 @@ public class ImplImageDistort_PL<Input extends ImageGray<Input>,Output extends I
 	public void apply(Planar<Input> srcImg, Planar<Output> dstImg,
 					  int dstX0, int dstY0, int dstX1, int dstY1) {
 		if( srcImg.getNumBands() != dstImg.getNumBands() )
-			throw new IllegalArgumentException("Number of bands must be the same");
+			throw new IllegalArgumentException("Number of bands must be the same. "+srcImg.getNumBands()+" vs "+dstImg.getNumBands());
 		int N = srcImg.getNumBands();
 
 		for( int i = 0; i < N; i++ ) {

@@ -171,13 +171,13 @@ public class ContourTracer {
 			dir = nextDirection[dir];
 		}
 
-		while( true ) {
+		for( ;; ) {
 			// search in clockwise direction around the current pixel for next black pixel
 			searchBlack();
 			if( x == initialX && y == initialY && dir == initialDir ) {
 				// returned to the initial state again. search is finished
 				return;
-			}else {
+			} else {
 				add(x, y);
 				moveToNext();
 				dir = nextDirection[dir];
@@ -189,11 +189,61 @@ public class ContourTracer {
 	 * Searches in a circle around the current point in a clock-wise direction for the first black pixel.
 	 */
 	private boolean searchBlack() {
-		for( int i = 0; i < offsetsBinary.length; i++ ) {
-			if( checkBlack(indexBinary + offsetsBinary[dir]))
-				return true;
-			dir = (dir+1)%ruleN;
-		}
+//		for( int i = 0; i < ruleN; i++ ) {
+//			if( checkBlack(indexBinary + offsetsBinary[dir]))
+//				return true;
+//			dir = (dir+1)%ruleN;
+//		}
+//		return false;
+
+		// Unrolling here results in about a 10% speed up
+		if( ruleN == 4 )
+			return searchBlack4();
+		else
+			return searchBlack8();
+	}
+
+	private boolean searchBlack4() {
+		if( checkBlack(indexBinary + offsetsBinary[dir]))
+			return true;
+		dir = (dir+1)%4;
+		if( checkBlack(indexBinary + offsetsBinary[dir]))
+			return true;
+		dir = (dir+1)%4;
+		if( checkBlack(indexBinary + offsetsBinary[dir]))
+			return true;
+		dir = (dir+1)%4;
+		if( checkBlack(indexBinary + offsetsBinary[dir]))
+			return true;
+		dir = (dir+1)%4;
+		return false;
+	}
+
+	private boolean searchBlack8() {
+		if( checkBlack(indexBinary + offsetsBinary[dir]))
+			return true;
+		dir = (dir+1)%8;
+		if( checkBlack(indexBinary + offsetsBinary[dir]))
+			return true;
+		dir = (dir+1)%8;
+		if( checkBlack(indexBinary + offsetsBinary[dir]))
+			return true;
+		dir = (dir+1)%8;
+		if( checkBlack(indexBinary + offsetsBinary[dir]))
+			return true;
+		dir = (dir+1)%8;
+		if( checkBlack(indexBinary + offsetsBinary[dir]))
+			return true;
+		dir = (dir+1)%8;
+		if( checkBlack(indexBinary + offsetsBinary[dir]))
+			return true;
+		dir = (dir+1)%8;
+		if( checkBlack(indexBinary + offsetsBinary[dir]))
+			return true;
+		dir = (dir+1)%8;
+		if( checkBlack(indexBinary + offsetsBinary[dir]))
+			return true;
+		dir = (dir+1)%8;
 		return false;
 	}
 

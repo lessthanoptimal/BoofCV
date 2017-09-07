@@ -44,6 +44,8 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 	// selects which image to view
 	JComboBox imageView;
 
+	JButton bRunAgain = new JButton("Run Again");
+
 	JCheckBox showSquares;
 	JCheckBox showPositionPattern;
 	JCheckBox showContour;
@@ -90,6 +92,13 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 
 	public DetectQrCodeControlPanel(DetectQrCodeApp owner) {
 		this.owner = owner;
+
+		bRunAgain.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				DetectQrCodeControlPanel.this.owner.reprocessImageOnly();
+			}
+		});
 
 		imageView = new JComboBox();
 		imageView.addItem("Input");
@@ -173,6 +182,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		configureSpinnerFloat(spinnerMaxCornerChange);
 
 		addLabeled(processingTimeLabel,"Time (ms)", this);
+		add(bRunAgain);
 		addLabeled(imageView, "View: ", this);
 		addLabeled(selectZoom,"Zoom",this);
 		addAlignLeft(showSquares, this);
