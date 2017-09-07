@@ -270,15 +270,4 @@ public class TestSquaresIntoRegularClusters {
 		}
 		assertEquals(0, alg.nodes.get(0).getNumberOfConnections());
 	}
-
-
-	/**
-	 * A perfect grid has been detected but a small square was also detected because
-	 * of noise. The square is much smaller than the other shapes, but still makes
-	 * it through the initial filter. Side are parallel too.
-	 */
-	@Test
-	public void noiseShapeSmallParallelSides() {
-		fail("implement");
-	}
 }

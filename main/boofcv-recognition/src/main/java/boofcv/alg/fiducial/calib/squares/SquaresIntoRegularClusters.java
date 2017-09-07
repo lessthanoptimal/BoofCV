@@ -125,7 +125,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 			n.square = squares.get(i);
 
 			if( n.square.size() != 4 )
-				throw new RuntimeException("Sqaures have four corners not "+n.square.size());
+				throw new RuntimeException("Squares have four corners not "+n.square.size());
 
 			graph.computeNodeInfo(n);
 		}
