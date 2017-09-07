@@ -173,7 +173,8 @@ public class TestSquaresIntoRegularClusters {
 		SquareNode b = alg.nodes.get(1);
 
 		alg.considerConnect(a, b);
-		assertConnected(a, 1, b, 3, 3);
+		// distance is the space between the sides
+		assertConnected(a, 1, b, 3, 1);
 	}
 
 	/**

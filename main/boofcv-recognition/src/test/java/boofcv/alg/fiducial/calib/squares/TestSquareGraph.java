@@ -22,6 +22,7 @@ import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.ejml.UtilEjml;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -30,6 +31,28 @@ import static org.junit.Assert.*;
  * @author Peter Abeles
  */
 public class TestSquareGraph {
+
+	@Test
+	public void computeNodeInfo() {
+		SquareNode a = new SquareNode();
+		a.square = new Polygon2D_F64(-1,1,  2,1,  2,-1,  -1,-1);
+
+		SquareGraph alg = new SquareGraph();
+
+		alg.computeNodeInfo(a);
+
+		assertEquals(3,a.sideLengths[0], UtilEjml.TEST_F64);
+		assertEquals(2,a.sideLengths[1], UtilEjml.TEST_F64);
+		assertEquals(3,a.sideLengths[2], UtilEjml.TEST_F64);
+		assertEquals(2,a.sideLengths[3], UtilEjml.TEST_F64);
+
+		assertEquals(3,a.largestSide, UtilEjml.TEST_F64);
+		assertEquals(2,a.smallestSide, UtilEjml.TEST_F64);
+
+		assertTrue(a.center.distance(0.5,0)<UtilEjml.TEST_F64);
+
+	}
+
 	@Test
 	public void findSideIntersect() {
 		LineSegment2D_F64 line = new LineSegment2D_F64();
@@ -51,12 +74,12 @@ public class TestSquareGraph {
 	}
 
 	@Test
-	public void mostParallel() {
-		mostParallel(false);
-		mostParallel(true);
+	public void almostParallel() {
+		almostParallel(false);
+		almostParallel(true);
 	}
 
-	private void mostParallel(boolean changeClock) {
+	private void almostParallel(boolean changeClock) {
 		SquareNode a = new SquareNode();
 		a.square = new Polygon2D_F64(-1,1,  1,1,  1,-1,  -1,-1);
 		SquareNode b = new SquareNode();

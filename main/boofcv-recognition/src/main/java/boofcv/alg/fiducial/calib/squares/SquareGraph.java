@@ -37,6 +37,8 @@ public class SquareGraph {
 	Vector2D_F64 vector0 = new Vector2D_F64();
 	Vector2D_F64 vector1 = new Vector2D_F64();
 
+	double parallelThreshold = UtilAngle.radian(45);
+
 	public void computeNodeInfo( SquareNode n ) {
 		// Under perspective distortion the geometric center is the intersection of the lines formed by
 		// opposing corners.
@@ -48,9 +50,11 @@ public class SquareGraph {
 		}
 
 		// side lengths
-		for (int j = 0,k=3; j < 4; k=j,j++) {
-			double l = n.square.get(j).distance(n.square.get(k));
-			n.sideLengths[j] = l;
+		n.largestSide = 0;
+		n.smallestSide = Double.MAX_VALUE;
+		for (int j = 0,i=3; j < 4; i=j,j++) {
+			double l = n.square.get(j).distance(n.square.get(i));
+			n.sideLengths[i] = l;
 			n.largestSide = Math.max(n.largestSide,l);
 			n.smallestSide = Math.min(n.smallestSide,l);
 		}
@@ -73,9 +77,7 @@ public class SquareGraph {
 	 * so if there is no intersection it is considered a bug
 	 */
 	public int findSideIntersect(SquareNode n , LineSegment2D_F64 line , Point2D_F64 intersection, LineSegment2D_F64 storage ) {
-		for (int i = 0; i < 4; i++) {
-			int j = (i+1)%4;
-
+		for (int j = 0,i=3; j < 4; i=j,j++) {
 			storage.a = n.square.get(i);
 			storage.b = n.square.get(j);
 
@@ -131,20 +133,21 @@ public class SquareGraph {
 	}
 
 	/**
-	 * Returns true if the two sides are the two sides on each shape which are closest to being parallel
-	 * to each other.  Only the two sides which are adjacent are considered
+	 * Checks to see if the two sides are almost parallel to each other by looking at their acute
+	 * angle.
 	 */
 	public boolean almostParallel(SquareNode a , int sideA , SquareNode b , int sideB ) {
 		double selected = acuteAngle(a,sideA,b,sideB);
 
-		// see if the two sides are about parallel too
-		double left = acuteAngle(a,add(sideA,-1),b,add(sideB,1));
-		double right = acuteAngle(a,add(sideA,1),b,add(sideB,-1));
-
-		double tol = UtilAngle.radian(45);
-
-		if( left > selected+tol || right > selected+tol )
+		if( selected > parallelThreshold )
 			return false;
+
+		// see if the two sides are about parallel too
+//		double left = acuteAngle(a,add(sideA,-1),b,add(sideB,1));
+//		double right = acuteAngle(a,add(sideA,1),b,add(sideB,-1));
+//
+//		if( left > selected+parallelThreshold || right > selected+parallelThreshold )
+//			return false;
 
 
 //		if( selected >  acuteAngle(a,sideA,b,add(sideB,1)) || selected >  acuteAngle(a,sideA,b,add(sideB,-1)) )
@@ -183,5 +186,13 @@ public class SquareGraph {
 
 	public RecycleManager<SquareEdge> getEdgeManager() {
 		return edgeManager;
+	}
+
+	public double getParallelThreshold() {
+		return parallelThreshold;
+	}
+
+	public void setParallelThreshold(double parallelThreshold) {
+		this.parallelThreshold = parallelThreshold;
 	}
 }

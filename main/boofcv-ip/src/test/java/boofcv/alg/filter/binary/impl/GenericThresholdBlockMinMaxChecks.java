@@ -45,7 +45,7 @@ public abstract class GenericThresholdBlockMinMaxChecks
 
 	@Override
 	public ThresholdBlockCommon<T, ?> createAlg(int requestedBlockWidth, double scale, boolean down) {
-		return createAlg(requestedBlockWidth, scale, down);
+		return createAlg(1.0,requestedBlockWidth, scale, down);
 	}
 
 	@Test

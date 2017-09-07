@@ -68,7 +68,6 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	private FastQueue<double[]> searchPoints;
 	private FastQueue<NnData<SquareNode>> searchResults = new FastQueue(NnData.class,true);
 
-
 	/**
 	 * Declares data structures and configures algorithm
 	 * @param spaceToSquareRatio Ratio of space between squares to square lengths
@@ -269,8 +268,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 		double side0 = node0.sideLengths[intersection0];
 		double side1 = node1.sideLengths[intersection1];
 
-		// it shuold intersect about in the middle of the line
-
+		// it should intersect about in the middle of the line
 		double sideLoc0 = connectLine.a.distance(node0.square.get(intersection0))/side0;
 		double sideLoc1 = connectLine.b.distance(node1.square.get(intersection1))/side1;
 
@@ -281,7 +279,8 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 //		System.out.println("lineA "+lineA.getLength()+"  connectLine "+connectLine.getLength());
 
 		// see if the spacing makes sense
-		double distanceApart = connectLine.getLength()*spaceToSquareRatio;
+		double spaceDistance = connectLine.getLength();
+//		double distanceApart = spaceDistance*spaceToSquareRatio;
 
 //		if( distanceApart*1.2 < Math.min(side0,side1) )
 //			return;
@@ -339,7 +338,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 //				node1.corners.get(intersection1),node1.corners.get(add(intersection1,-1)))) {
 //			return;
 //		}
-		graph.checkConnect(node0,intersection0,node1,intersection1,distanceApart);
+		graph.checkConnect(node0,intersection0,node1,intersection1,spaceDistance);
 	}
 
 
