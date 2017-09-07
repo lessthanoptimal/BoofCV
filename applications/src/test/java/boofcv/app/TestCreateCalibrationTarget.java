@@ -72,8 +72,8 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 	}
 
 	@Test
-	public void circle_asym() throws IOException, InterruptedException {
-		createDocument("-r 8 -c 5 -o target -t CIRCLE_ASYMMETRIC_GRID -u cm -w 2 -d 6 -p LETTER");
+	public void circle_hexagonal() throws IOException, InterruptedException {
+		createDocument("-r 8 -c 5 -o target -t CIRCLE_HEXAGONAL -u cm -w 2 -d 6 -p LETTER");
 		BufferedImage image = loadImage();
 
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
