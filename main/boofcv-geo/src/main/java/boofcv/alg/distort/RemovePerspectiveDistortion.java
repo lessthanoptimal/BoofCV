@@ -68,6 +68,7 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 	 * @param imageType Type of undistorted image
 	 */
 	public RemovePerspectiveDistortion( int width , int height , ImageType<T> imageType ) {
+		this(width,height);
 		output = imageType.createImage(width,height);
 		distort = new FDistort(imageType);
 		distort.output(output);
