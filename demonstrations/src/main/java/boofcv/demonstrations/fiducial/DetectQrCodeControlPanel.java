@@ -60,7 +60,6 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 	JSpinner spinnerMinContourSize;
 	JSpinner spinnerMinEdgeD; // threshold for detect
 	JSpinner spinnerMinEdgeR; // threshold for refine
-	JCheckBox setConvex;
 	JCheckBox setBorder;
 
 	JSpinner spinnerContourSplit;
@@ -143,9 +142,6 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		spinnerSplitPenalty = new JSpinner(new SpinnerNumberModel(config.detector.splitPenalty, 0.0, 100.0, 1.0));
 		configureSpinnerFloat(spinnerSplitPenalty);
 
-		setConvex = new JCheckBox("Convex");
-		setConvex.addActionListener(this);
-		setConvex.setSelected(config.detector.convex);
 		setBorder = new JCheckBox("Image Border");
 		setBorder.addActionListener(this);
 		setBorder.setSelected(config.detector.canTouchBorder);
@@ -186,7 +182,6 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		addLabeled(spinnerMinContourSize, "Min Contour Size: ", this);
 		addLabeled(spinnerMinEdgeD, "Edge Intensity D: ", this);
 		addLabeled(spinnerMinEdgeR, "Edge Intensity R: ", this);
-		addAlignLeft(setConvex, this);
 		addAlignLeft(setBorder, this);
 		addCenterLabel("Contour", this);
 		addLabeled(spinnerContourSplit, "Split Fraction: ", this);
@@ -233,9 +228,6 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		} else if( e.getSource() == showContour ) {
 			bShowContour = showContour.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == setConvex ) {
-			config.detector.convex = setConvex.isSelected();
-			owner.configUpdate();
 		} else if( e.getSource() == setBorder ) {
 			config.detector.canTouchBorder = setBorder.isSelected();
 			owner.configUpdate();
