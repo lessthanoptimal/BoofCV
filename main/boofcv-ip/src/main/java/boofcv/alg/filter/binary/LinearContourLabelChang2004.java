@@ -105,20 +105,19 @@ public class LinearContourLabelChang2004 {
 		tracer.setInputs(binary,labeled,storagePoints);
 
 		// Outside border is all zeros so it can be ignored
-		for( y = 1; y < binary.height-1; y++ ) {
+		int endY = binary.height-1, enxX = binary.width-1;
+		for( y = 1; y < endY; y++ ) {
 			indexIn = binary.startIndex + y*binary.stride+1;
 			indexOut = labeled.startIndex + (y-1)*labeled.stride;
 
-			for( x = 1; x < binary.width-1; x++ , indexIn++ , indexOut++) {
+			for( x = 1; x < enxX; x++ , indexIn++ , indexOut++) {
 				int bit = binary.data[indexIn];
 
 				// white pixels are ignored
-				if( !(bit == 1) )
+				if( bit != 1 )
 					continue;
 
 				int label = labeled.data[indexOut];
-
-//				long startTraceTime = System.currentTimeMillis();
 				boolean handled = false;
 				if( label == 0 && binary.data[indexIn - binary.stride ] != 1 ) {
 					handleStep1();

@@ -79,7 +79,6 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 	public DeformImageKeyPointsApp(List<?> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
 
-		distorted = imageType.createImage(1,1);
 		undistorted = imageType.createImage(1,1);
 
 		distortImage = FactoryDistort.distort(true,InterpolationType.BILINEAR,
@@ -93,11 +92,14 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, final BufferedImage buffered, final ImageBase undistorted)
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, final ImageBase undistorted)
 	{
+		// do this here instead of a reshape to ensure the number of bands is the same
+		distorted = (T)undistorted.createSameShape();
+
 		BufferedImage tmp = distortedBuff;
 		distortedBuff = ConvertBufferedImage.checkDeclare(
-				undistorted.width,undistorted.height,distortedBuff,BufferedImage.TYPE_INT_RGB);
+				undistorted.width,undistorted.height,distortedBuff,buffered.getType());
 
 		if( tmp != distortedBuff ) {
 			distorted.reshape(undistorted.width, undistorted.height);
