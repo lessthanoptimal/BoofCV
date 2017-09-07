@@ -46,12 +46,12 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 		super(requestedBlockWidth);
 		this.down = down;
 		this.scale = scale;
-		stats = new InterleavedS32(1,1,255);
+		stats = new InterleavedS32(1,1,256);
 	}
 
 	@Override
 	protected void computeStatistics(GrayU8 input, int innerWidth, int innerHeight) {
-		Arrays.fill(stats.data,0,stats.width*stats.height*255,0);
+		Arrays.fill(stats.data,0,stats.width*stats.height*256,0);
 		super.computeStatistics(input, innerWidth, innerHeight);
 	}
 
@@ -83,12 +83,12 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 
 
 		// sum up histogram in local region
-		Arrays.fill(histogram,0,255,0);
+		Arrays.fill(histogram,0,256,0);
 
 		for (int y = blockY0; y <= blockY1; y++) {
 			for (int x = blockX0; x <= blockX1; x++) {
 				int indexStats = stats.getIndex(x,y,0);
-				for (int i = 0; i < 255; i++) {
+				for (int i = 0; i < 256; i++) {
 					histogram[i] += stats.data[indexStats+i];
 				}
 			}
@@ -96,12 +96,12 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 
 		// this can vary across the image at the borders
 		int total = 0;
-		for (int i = 0; i < 255; i++) {
+		for (int i = 0; i < 256; i++) {
 			total += histogram[i];
 		}
 
 		// compute threshold
-		int threshold = GThresholdImageOps.computeOtsu(histogram,255,total);
+		int threshold = GThresholdImageOps.computeOtsu(histogram,256,total);
 
 		threshold = (int)(threshold*scale+0.5);
 
