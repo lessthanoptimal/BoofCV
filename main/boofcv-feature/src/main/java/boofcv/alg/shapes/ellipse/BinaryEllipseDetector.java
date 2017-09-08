@@ -22,9 +22,11 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.struct.FastQueue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,7 +44,7 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 	EdgeIntensityEllipse<T> intensityCheck;
 
 	// storage for the output refined ellipses
-	FastQueue<EllipseRotated_F64> refined = new FastQueue<>(EllipseRotated_F64.class, true);
+	FastQueue<EllipseInfo> results = new FastQueue<>(EllipseInfo.class, true);
 
 	Class<T> inputType;
 
@@ -95,7 +97,7 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 	 * @param binary Binary image of grayscale. 1 = ellipse and 0 = ignored background
 	 */
 	public void process(T gray, GrayU8 binary) {
-		refined.reset();
+		results.reset();
 
 		ellipseDetector.process(binary);
 		if( ellipseRefiner != null)
@@ -107,21 +109,28 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 		for( BinaryEllipseDetectorPixel.Found f : found ) {
 
 			if( !intensityCheck.process(f.ellipse) ) {
-				if( verbose )
-					System.out.println("Rejecting ellipse which isn't intense enough");
-
+				if( verbose ) System.out.println("Rejecting ellipse. Initial fit didn't have intense enough edge");
 				continue;
 			}
 
-			EllipseRotated_F64 r = refined.grow();
+			EllipseInfo r = results.grow();
+			r.contour = f.contour;
 
 			if( ellipseRefiner != null ) {
-				if (!ellipseRefiner.process(f.ellipse, r)) {
-					refined.removeTail();
+				if (!ellipseRefiner.process(f.ellipse, r.ellipse)) {
+					if( verbose ) System.out.println("Rejecting ellipse. Refined fit didn't have an intense enough edge");
+					results.removeTail();
+					continue;
+				} else if( !intensityCheck.process(f.ellipse) ) {
+					if( verbose ) System.out.println("Rejecting ellipse. Refined fit didn't have an intense enough edge");
+					continue;
 				}
 			} else {
-				r.set(f.ellipse);
+				r.ellipse.set(f.ellipse);
 			}
+
+			r.averageInside = intensityCheck.averageInside;
+			r.averageOutside = intensityCheck.averageOutside;
 		}
 	}
 
@@ -178,7 +187,29 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 	 *
 	 * @return List of found ellipses.
 	 */
-	public FastQueue<EllipseRotated_F64> getFoundEllipses() {
-		return refined;
+	public FastQueue<EllipseInfo> getFound() {
+		return results;
+	}
+
+	public List<EllipseRotated_F64> getFoundEllipses( List<EllipseRotated_F64> storage ) {
+		if( storage == null )
+			storage = new ArrayList<>();
+		for (int i = 0; i < results.size; i++) {
+			storage.add( results.get(i).ellipse );
+		}
+		return storage;
+	}
+
+	public static class EllipseInfo {
+		public EllipseRotated_F64 ellipse = new EllipseRotated_F64();
+		public List<Point2D_I32> contour;
+		/**
+		 * Average pixel intensity along the inside of the fitted ellipse
+		 */
+		public double averageInside;
+		/**
+		 * Average pixel intensity along the outside of the fitted ellipse
+		 */
+		public double averageOutside;
 	}
 }

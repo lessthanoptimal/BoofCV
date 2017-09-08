@@ -29,7 +29,6 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayU8;
-import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
@@ -72,12 +71,12 @@ public class ExampleDetectBlackEllipse {
 			detector.process(input, binary);
 
 			// visualize results by drawing red polygons
-			FastQueue<EllipseRotated_F64> found = detector.getFoundEllipses();
+			FastQueue<BinaryEllipseDetector.EllipseInfo> found = detector.getFound();
 			Graphics2D g2 = image.createGraphics();
 			g2.setStroke(new BasicStroke(3));
 			g2.setColor(Color.RED);
 			for (int i = 0; i < found.size; i++) {
-				VisualizeShapes.drawEllipse(found.get(i), g2);
+				VisualizeShapes.drawEllipse(found.get(i).ellipse, g2);
 			}
 
 			panel.addImage(image,new File(fileName).getName());

@@ -87,7 +87,7 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 
 	@Override
 	protected void renderClusters(Graphics2D g2, double scale) {
-		List<EllipseRotated_F64> found = detector.getDetector().getEllipseDetector().getFoundEllipses().toList();
+		List<EllipseRotated_F64> found = detector.getDetector().getEllipseDetector().getFoundEllipses(null);
 		List<List<EllipsesIntoClusters.Node>> clusters = detector.getDetector().getClusters();
 
 		g2.setStroke(new BasicStroke(2));
@@ -232,7 +232,7 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 
 	@Override
 	protected List<EllipseRotated_F64> getFoundEllipses() {
-		return detector.getDetector().getEllipseDetector().getFoundEllipses().toList();
+		return detector.getDetector().getEllipseDetector().getFoundEllipses(null);
 	}
 
 	@Override

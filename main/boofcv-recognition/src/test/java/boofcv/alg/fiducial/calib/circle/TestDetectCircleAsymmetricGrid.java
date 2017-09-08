@@ -128,7 +128,7 @@ public class TestDetectCircleAsymmetricGrid {
 
 		InputToBinary<GrayU8> threshold = FactoryThresholdBinary.globalFixed(100,true,GrayU8.class);
 		BinaryEllipseDetector<GrayU8> detector = FactoryShapeDetector.ellipse(null, GrayU8.class);
-		EllipsesIntoClusters cluster = new EllipsesIntoClusters(spaceRatio,0.8);
+		EllipsesIntoClusters cluster = new EllipsesIntoClusters(spaceRatio,0.8,0.5);
 		return new DetectCircleAsymmetricGrid<>( numRows, numCols,threshold, detector,  cluster);
 	}
 

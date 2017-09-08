@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.circle;
 
+import boofcv.alg.shapes.ellipse.BinaryEllipseDetector.EllipseInfo;
 import georegression.misc.GrlConstants;
 import georegression.struct.shapes.EllipseRotated_F64;
 import org.junit.Test;
@@ -36,9 +37,9 @@ public class TestEllipsesIntoClusters {
 	 */
 	@Test
 	public void emptyInput() {
-		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5);
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5,0.5);
 
-		List<EllipseRotated_F64> input = new ArrayList<>();
+		List<EllipseInfo> input = new ArrayList<>();
 		List<List<EllipsesIntoClusters.Node>> output = new ArrayList<>();
 
 		alg.process(input,output);
@@ -51,9 +52,9 @@ public class TestEllipsesIntoClusters {
 	 */
 	@Test
 	public void outputCleared() {
-		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5);
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5,0.5);
 
-		List<EllipseRotated_F64> input = new ArrayList<>();
+		List<EllipseInfo> input = new ArrayList<>();
 		List<List<EllipsesIntoClusters.Node>> output = new ArrayList<>();
 
 		output.add( new ArrayList<EllipsesIntoClusters.Node>());
@@ -68,15 +69,15 @@ public class TestEllipsesIntoClusters {
 	 */
 	@Test
 	public void checkConnections() {
-		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.1,0.5);
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.1,0.5,0.5);
 
-		List<EllipseRotated_F64> input = new ArrayList<>();
-		input.add(new EllipseRotated_F64(0  ,0,1,1,0));
-		input.add(new EllipseRotated_F64(2.0,0,1,1,0));
-		input.add(new EllipseRotated_F64(4.0,0,1,1,0));
-		input.add(new EllipseRotated_F64(  0,2,1,1,0));
-		input.add(new EllipseRotated_F64(2.0,2,1,1,0));
-		input.add(new EllipseRotated_F64(4.0,2,1,1,0));
+		List<EllipseInfo> input = new ArrayList<>();
+		input.add(create(0  ,0,1,1,0));
+		input.add(create(2.0,0,1,1,0));
+		input.add(create(4.0,0,1,1,0));
+		input.add(create(  0,2,1,1,0));
+		input.add(create(2.0,2,1,1,0));
+		input.add(create(4.0,2,1,1,0));
 
 		List<List<EllipsesIntoClusters.Node>> output = new ArrayList<>();
 
@@ -97,23 +98,32 @@ public class TestEllipsesIntoClusters {
 		assertEquals(0, histogram[4]);
 	}
 
+	private EllipseInfo create( double x0 , double y0, double a, double b, double phi ) {
+		EllipseInfo out = new EllipseInfo();
+		out.ellipse = new EllipseRotated_F64(x0, y0, a, b, phi);
+		out.averageInside = 10;
+		out.averageOutside = 200;
+		out.contour = new ArrayList<>();
+		return out;
+	}
+
 	/**
 	 * Points should not be clustered together due to distance apart
 	 */
 	@Test
 	public void noCluster_distance() {
-		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5);
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5,0.5);
 
-		List<EllipseRotated_F64> input = new ArrayList<>();
-		input.add(new EllipseRotated_F64(0,0,2,1,0));
-		input.add(new EllipseRotated_F64(4.1,0,2,1,0));
+		List<EllipseInfo> input = new ArrayList<>();
+		input.add(create(0,0,2,1,0));
+		input.add(create(4.1,0,2,1,0));
 
 		alg.init(input);
 		alg.connect(input);
 		assertEquals( 2 , alg.clusters.size()); // each ellipse is its cluster
 
 		// a positive case for sanity right at the border
-		input.get(1).center.x = 4;
+		input.get(1).ellipse.center.x = 4;
 		alg.init(input);
 		alg.connect(input);
 		assertEquals( 1 , alg.clusters.size());
@@ -124,18 +134,18 @@ public class TestEllipsesIntoClusters {
 	 */
 	@Test
 	public void noCluster_size() {
-		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5);
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5,0.5);
 
-		List<EllipseRotated_F64> input = new ArrayList<>();
-		input.add(new EllipseRotated_F64(0,0,2,1,0));
-		input.add(new EllipseRotated_F64(2,0,0.999,1,0));
+		List<EllipseInfo> input = new ArrayList<>();
+		input.add(create(0,0,2,1,0));
+		input.add(create(2,0,0.999,1,0));
 
 		alg.init(input);
 		alg.connect(input);
 		assertEquals( 2 , alg.clusters.size());
 
 		// a positive case for sanity right at the border
-		input.get(1).a = 1.0;
+		input.get(1).ellipse.a = 1.0;
 		alg.init(input);
 		alg.connect(input);
 		assertEquals( 1 , alg.clusters.size());
@@ -143,17 +153,17 @@ public class TestEllipsesIntoClusters {
 
 	@Test
 	public void multipleClusters() {
-		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5);
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5,0.5);
 
 		// two clusters differentiated by size
-		List<EllipseRotated_F64> input = new ArrayList<>();
-		input.add(new EllipseRotated_F64(0,0,2,1,0));
-		input.add(new EllipseRotated_F64(1,0,2,1,0));
-		input.add(new EllipseRotated_F64(1,0,8,1,0));
+		List<EllipseInfo> input = new ArrayList<>();
+		input.add(create(0,0,2,1,0));
+		input.add(create(1,0,2,1,0));
+		input.add(create(1,0,8,1,0));
 
-		input.add(new EllipseRotated_F64(0,0,8,1,0));
-		input.add(new EllipseRotated_F64(2.2,0,2,1,0));
-		input.add(new EllipseRotated_F64(2.2,0,8,1,0));
+		input.add(create(0,0,8,1,0));
+		input.add(create(2.2,0,2,1,0));
+		input.add(create(2.2,0,8,1,0));
 
 		List<List<EllipsesIntoClusters.Node>> output = new ArrayList<>();
 		alg.process(input,output);
@@ -161,26 +171,26 @@ public class TestEllipsesIntoClusters {
 
 		for (int i = 0; i < 2; i++) {
 			assertEquals( 3 , output.get(i).size());
-			double expected = input.get(output.get(i).get(0).which).a;
+			double expected = input.get(output.get(i).get(0).which).ellipse.a;
 			for (int j = 0; j < 3; j++) {
-				assertEquals(expected, input.get( output.get(i).get(j).which).a, GrlConstants.TEST_F64);
+				assertEquals(expected, input.get( output.get(i).get(j).which).ellipse.a, GrlConstants.TEST_F64);
 			}
 		}
 	}
 
 	@Test
 	public void multipleCalls() {
-		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5);
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5,0.5);
 
 		// two clusters differentiated by size
-		List<EllipseRotated_F64> input = new ArrayList<>();
-		input.add(new EllipseRotated_F64(0,0,2,1,0));
-		input.add(new EllipseRotated_F64(1,0,2,1,0));
-		input.add(new EllipseRotated_F64(1,0,8,1,0));
+		List<EllipseInfo> input = new ArrayList<>();
+		input.add(create(0,0,2,1,0));
+		input.add(create(1,0,2,1,0));
+		input.add(create(1,0,8,1,0));
 
-		input.add(new EllipseRotated_F64(0,0,8,1,0));
-		input.add(new EllipseRotated_F64(2.2,0,2,1,0));
-		input.add(new EllipseRotated_F64(2.2,0,8,1,0));
+		input.add(create(0,0,8,1,0));
+		input.add(create(2.2,0,2,1,0));
+		input.add(create(2.2,0,8,1,0));
 
 		List<List<EllipsesIntoClusters.Node>> output = new ArrayList<>();
 
@@ -206,7 +216,7 @@ public class TestEllipsesIntoClusters {
 			food.add( new EllipsesIntoClusters.Node());
 		}
 
-		EllipsesIntoClusters alg = new EllipsesIntoClusters(0.5,0.5);
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(0.5,0.5,0.5);
 		alg.clusters.add(mouth);
 		alg.clusters.add(food);
 

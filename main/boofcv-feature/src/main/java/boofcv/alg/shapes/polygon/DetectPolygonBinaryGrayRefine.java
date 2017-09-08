@@ -126,6 +126,8 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		edgeIntensity.setTransform(null);
 	}
 
+	double milliAdjustBias = 0;
+
 	/**
 	 * Detects polygons inside the grayscale image and its thresholded version
 	 * @param gray Gray scale image
@@ -137,6 +139,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 			refineGray.setImage(gray);
 		edgeIntensity.setImage(gray);
 
+		long time0 = System.nanoTime();
 		List<DetectPolygonFromContour.Info> detections = detector.getFound().toList();
 
 		if( adjustForBias != null ) {
@@ -144,6 +147,16 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 				adjustForBias.process(detections.get(i).polygon, detector.isOutputClockwise());
 			}
 		}
+		long time1 = System.nanoTime();
+
+		double milli = (time1-time0)*1e-6;
+
+		if( milliAdjustBias == 0 ) {
+			milliAdjustBias = milli;
+		} else {
+			milliAdjustBias = 0.95*milliAdjustBias + 0.5*milli;
+		}
+		System.out.printf(" adjust_bias %7.2f\n",milliAdjustBias);
 	}
 
 	/**

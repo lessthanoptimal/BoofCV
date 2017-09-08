@@ -58,7 +58,7 @@ public class TestBinaryEllipseDetector {
 
 		alg.process(image, binary);
 
-		List<EllipseRotated_F64> found = alg.getFoundEllipses().toList();
+		List<EllipseRotated_F64> found = alg.getFoundEllipses(null);
 
 		TestBinaryEllipseDetectorPixel.checkEquals_F64(expected,found, 1.0, 0.1);
 	}
@@ -80,13 +80,13 @@ public class TestBinaryEllipseDetector {
 
 		// pass once with it being a clear edge
 		alg.process(image, binary);
-		List<EllipseRotated_F64> found = alg.getFoundEllipses().toList();
+		List<EllipseRotated_F64> found = alg.getFoundEllipses(null);
 		TestBinaryEllipseDetectorPixel.checkEquals_F64(expected,found, 1.0, 0.1);
 
 		// now make the ellipse more dim so it shouldn't pass
 		image = TestBinaryEllipseDetectorPixel.renderEllipses_F64(200,210, expected, 255-THRESHOLD+5);
 		alg.process(image, binary);
-		assertEquals(0,alg.getFoundEllipses().size());
+		assertEquals(0,alg.getFound().size());
 	}
 
 	/**
@@ -119,7 +119,7 @@ public class TestBinaryEllipseDetector {
 			expected.add( e );
 		}
 
-		List<EllipseRotated_F64> found = alg.getFoundEllipses().toList();
+		List<EllipseRotated_F64> found = alg.getFoundEllipses(null);
 		TestBinaryEllipseDetectorPixel.checkEquals_F64(expected,found, 1.0, 0.1);
 	}
 
@@ -142,7 +142,7 @@ public class TestBinaryEllipseDetector {
 
 		alg.process(image, binary);
 
-		List<EllipseRotated_F64> found = alg.getFoundEllipses().toList();
+		List<EllipseRotated_F64> found = alg.getFoundEllipses(null);
 		List<EllipseRotated_F64> refined = new ArrayList<>();
 
 		for( EllipseRotated_F64 f : found ) {

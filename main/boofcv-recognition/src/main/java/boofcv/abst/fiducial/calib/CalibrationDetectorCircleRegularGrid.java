@@ -72,7 +72,8 @@ public class CalibrationDetectorCircleRegularGrid implements DetectorFiducialCal
 		spaceToDiameter = (config.centerDistance/config.circleDiameter);
 		double spaceToRadius = 2.0*spaceToDiameter;
 
-		EllipsesIntoClusters e2c = new EllipsesIntoClusters(spaceToRadius*1.5,config.ellipseSizeSimilarity);
+		EllipsesIntoClusters e2c = new EllipsesIntoClusters(
+				spaceToRadius*1.5,config.ellipseSizeSimilarity,config.edgeIntensitySimilarityTolerance);
 
 		detector = new DetectCircleRegularGrid<>(config.numRows,config.numCols,inputToBinary,
 				ellipseDetector,e2c);

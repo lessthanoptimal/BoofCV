@@ -31,7 +31,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import georegression.struct.shapes.EllipseRotated_F64;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -104,13 +103,13 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 				}
 
 				if (controls.bShowShapes) {
-					List<EllipseRotated_F64> ellipses = detector.getFoundEllipses().toList();
+					List<BinaryEllipseDetector.EllipseInfo> ellipses = detector.getFound().toList();
 
 					g2.setColor(Color.RED);
 					g2.setStroke(new BasicStroke(3));
 
-					for (EllipseRotated_F64 p : ellipses) {
-						VisualizeShapes.drawEllipse(p,scale,g2);
+					for (BinaryEllipseDetector.EllipseInfo p : ellipses) {
+						VisualizeShapes.drawEllipse(p.ellipse,scale,g2);
 					}
 				}
 			}

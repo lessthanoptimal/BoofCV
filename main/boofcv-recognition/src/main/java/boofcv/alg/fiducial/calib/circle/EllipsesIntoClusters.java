@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.circle;
 
+import boofcv.alg.shapes.ellipse.BinaryEllipseDetector.EllipseInfo;
 import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
@@ -44,6 +45,8 @@ public class EllipsesIntoClusters {
 	private double sizeSimilarityTolerance;
 	// how similar the ratio of major/minor axises need to be to each other to connect
 	private double ratioSimilarityTolerance;
+	// how similar edge intensity needs to be
+	private double edgeIntensitySimilarityTolerance;
 
 	// minimum number of elements in a cluster
 	private int minimumClusterSize = 3;
@@ -62,13 +65,17 @@ public class EllipsesIntoClusters {
 	 *                                   considered specifies as a multiple of the ellipse's major axis
 	 * @param sizeSimilarityTolerance How similar two ellipses must be to be connected.  0 to 1.0.  1.0 = perfect
 	 *                                match and 0.0 = infinite difference in size
+	 * @param edgeIntensitySimilarityTolerance How similar the intensity of the ellipses edges need to be.
+	 *                                         0 to 1.0.  1.0 = perfect
 	 */
 	public EllipsesIntoClusters( double maxDistanceToMajorAxisRatio,
-								 double sizeSimilarityTolerance ) {
+								 double sizeSimilarityTolerance ,
+								 double edgeIntensitySimilarityTolerance ) {
 
 		this.maxDistanceToMajorAxisRatio = maxDistanceToMajorAxisRatio;
 		this.sizeSimilarityTolerance = sizeSimilarityTolerance;
-		this.ratioSimilarityTolerance = Math.min(1,sizeSimilarityTolerance);
+		this.ratioSimilarityTolerance = sizeSimilarityTolerance;
+		this.edgeIntensitySimilarityTolerance = edgeIntensitySimilarityTolerance;
 
 		search.init(2);
 
@@ -93,7 +100,7 @@ public class EllipsesIntoClusters {
 	 * @param ellipses Set of unordered ellipses
 	 * @param output Resulting found clusters.  Cleared automatically.  Returned lists are recycled on next call.
 	 */
-	public void process(List<EllipseRotated_F64> ellipses , List<List<Node>> output ) {
+	public void process(List<EllipseInfo> ellipses , List<List<Node>> output ) {
 
 		init(ellipses);
 
@@ -115,9 +122,10 @@ public class EllipsesIntoClusters {
 	/**
 	 * Internal function which connects ellipses together
 	 */
-	void connect(List<EllipseRotated_F64> ellipses) {
+	void connect(List<EllipseInfo> ellipses) {
 		for (int i = 0; i < ellipses.size(); i++) {
-			EllipseRotated_F64 e1 = ellipses.get(i);
+			EllipseInfo info1 = ellipses.get(i);
+			EllipseRotated_F64 e1 = info1.ellipse;
 			Node node1 = nodes.get(i);
 
 			// Only search the maximum of the major axis times two
@@ -140,11 +148,22 @@ public class EllipsesIntoClusters {
 				cluster1 = clusters.get( node1.cluster );
 			}
 
+			double edge1 = info1.averageOutside-info1.averageInside;
+
 			// only accept ellipses which have a similar size
 			for (int j = 0; j < searchResults.size(); j++) {
 				NnData<Node> d = searchResults.get(j);
-				EllipseRotated_F64 e2 = ellipses.get(d.data.which);
+				EllipseInfo info2 = ellipses.get(d.data.which);
+				EllipseRotated_F64 e2 = info2.ellipse;
 				if( e2 == e1 )
+					continue;
+
+
+				// test the appearance of the ellipses edge
+				double edge2 = info2.averageOutside-info2.averageInside;
+				double edgeRatio = Math.abs(edge1-edge2)/Math.max(edge1,edge2);
+
+				if( edgeRatio > edgeIntensitySimilarityTolerance)
 					continue;
 
 				// the initial search was based on size of major axis.  Now prune and take in account the distance
@@ -270,13 +289,13 @@ public class EllipsesIntoClusters {
 	/**
 	 * Recycles and initializes all internal data structures
 	 */
-	void init(List<EllipseRotated_F64> ellipses) {
+	void init(List<EllipseInfo> ellipses) {
 		searchPoints.resize(ellipses.size());
 		nodes.resize(ellipses.size());
 		clusters.reset();
 
 		for (int i = 0; i < ellipses.size(); i++) {
-			EllipseRotated_F64 e = ellipses.get(i);
+			EllipseRotated_F64 e = ellipses.get(i).ellipse;
 			double[] p = searchPoints.get(i);
 			p[0] = e.center.x;
 			p[1] = e.center.y;

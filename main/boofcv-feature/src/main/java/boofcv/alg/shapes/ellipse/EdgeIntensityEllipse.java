@@ -30,6 +30,7 @@ import georegression.struct.shapes.EllipseRotated_F64;
  *
  * @author Peter Abeles
  */
+// TODO compensate for binary bias
 public class EdgeIntensityEllipse<T extends ImageGray<T>> extends BaseIntegralEdge<T> {
 
 	// distance away from line in tangent direction it will sample
@@ -43,6 +44,10 @@ public class EdgeIntensityEllipse<T extends ImageGray<T>> extends BaseIntegralEd
 
 	// computed edge score
 	double score;
+
+	// gray value along contour
+	public double averageInside;
+	public double averageOutside;
 
 	/**
 	 * Configures edge intensity calculation
@@ -81,8 +86,8 @@ public class EdgeIntensityEllipse<T extends ImageGray<T>> extends BaseIntegralEd
 		double cphi = Math.cos(ellipse.phi);
 		double sphi = Math.sin(ellipse.phi);
 
-		double aveInside = 0;
-		double aveOutside = 0;
+		averageInside = 0;
+		averageOutside = 0;
 
 		int total = 0;
 
@@ -116,15 +121,15 @@ public class EdgeIntensityEllipse<T extends ImageGray<T>> extends BaseIntegralEd
 			double yout = py+dy*tangentDistance;
 
 			if( integral.isInside(xin,yin) && integral.isInside(xout,yout)) {
-				aveInside += integral.compute(px,py, xin, yin);
-				aveOutside += integral.compute(px,py, xout, yout);
+				averageInside += integral.compute(px,py, xin, yin);
+				averageOutside += integral.compute(px,py, xout, yout);
 				total++;
 			}
 		}
 
 		score = 0;
 		if( total > 0 ) {
-			score = Math.abs(aveOutside-aveInside)/(total*tangentDistance);
+			score = Math.abs(averageOutside-averageInside)/(total*tangentDistance);
 		}
 
 		return score >= passThreshold;

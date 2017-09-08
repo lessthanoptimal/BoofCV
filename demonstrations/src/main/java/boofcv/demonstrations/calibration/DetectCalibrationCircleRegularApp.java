@@ -25,6 +25,7 @@ import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
+import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.feature.VisualizeShapes;
@@ -86,7 +87,7 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 
 	@Override
 	protected void renderClusters(Graphics2D g2, double scale) {
-		List<EllipseRotated_F64> found = detector.getDetector().getEllipseDetector().getFoundEllipses().toList();
+		List<BinaryEllipseDetector.EllipseInfo> found = detector.getDetector().getEllipseDetector().getFound().toList();
 		List<List<EllipsesIntoClusters.Node>> clusters = detector.getDetector().getClusters();
 
 		g2.setStroke(new BasicStroke(2));
@@ -95,9 +96,9 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 
 			g2.setColor(colorId[Math.min(id++,colorId.length-1)]);
 			for( EllipsesIntoClusters.Node n : c ) {
-				EllipseRotated_F64 a = found.get(n.which);
+				EllipseRotated_F64 a = found.get(n.which).ellipse;
 				for (int i = 0; i < n.connections.size; i++) {
-					EllipseRotated_F64 b = found.get(n.connections.get(i));
+					EllipseRotated_F64 b = found.get(n.connections.get(i)).ellipse;
 					g2.drawLine((int)(a.center.x*scale),(int)(a.center.y*scale),(int)(b.center.x*scale),(int)(b.center.y*scale));
 				}
 			}
@@ -235,7 +236,7 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 
 	@Override
 	protected List<EllipseRotated_F64> getFoundEllipses() {
-		return detector.getDetector().getEllipseDetector().getFoundEllipses().toList();
+		return detector.getDetector().getEllipseDetector().getFoundEllipses(null);
 	}
 
 	@Override

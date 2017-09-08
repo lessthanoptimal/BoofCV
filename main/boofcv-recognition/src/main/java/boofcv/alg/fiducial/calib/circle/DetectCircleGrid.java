@@ -97,7 +97,7 @@ public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 		inputToBinary.process(gray, binary);
 
 		ellipseDetector.process(gray, binary);
-		List<EllipseRotated_F64> found = ellipseDetector.getFoundEllipses().toList();
+		List<BinaryEllipseDetector.EllipseInfo> found = ellipseDetector.getFound().toList();
 
 		if( verbose) System.out.println("  Found "+found.size()+" ellpises");
 
@@ -110,7 +110,12 @@ public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 		pruneIncorrectSize(clustersPruned, totalEllipses(numRows,numCols) );
 		if( verbose) System.out.println("  Remaining clusters after pruning by size "+clustersPruned.size());
 
-		grider.process(found, clustersPruned);
+		List<EllipseRotated_F64> foundEllipses = new ArrayList<>();
+		for (int i = 0; i < found.size(); i++) {
+			foundEllipses.add( found.get(i).ellipse );
+		}
+
+		grider.process(foundEllipses, clustersPruned);
 
 		FastQueue<Grid> grids = grider.getGrids();
 
