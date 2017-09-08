@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.circle;
 
+import georegression.metric.UtilAngle;
 import georegression.struct.shapes.EllipseRotated_F64;
 
 import java.util.ArrayList;
@@ -59,9 +60,11 @@ public class EllipseClustersIntoRegularGrid extends EllipseClustersIntoGrid {
 			NodeInfo corner = selectSeedCorner();
 			corner.marked = true;
 
+			boolean ccw = UtilAngle.distanceCCW(direction(corner,corner.right),direction(corner,corner.left)) > Math.PI;
+
 			// find the row and column which the corner is a member of
-			List<NodeInfo> cornerRow = findLine(corner,corner.left,clusterSize, null);
-			List<NodeInfo> cornerColumn = findLine(corner,corner.right,clusterSize, null);
+			List<NodeInfo> cornerRow = findLine(corner,corner.left,clusterSize, null,ccw);
+			List<NodeInfo> cornerColumn = findLine(corner,corner.right,clusterSize, null,!ccw);
 
 			if( cornerRow == null || cornerColumn == null ) {
 				if( verbose )System.out.println("Corner row/column line find failed");
@@ -76,14 +79,14 @@ public class EllipseClustersIntoRegularGrid extends EllipseClustersIntoGrid {
 			for (int j = 1; j < cornerColumn.size(); j++) {
 				List<NodeInfo> prev = gridByRows.get( j - 1);
 				NodeInfo seed = cornerColumn.get(j);
-				NodeInfo next = selectSeedNext(prev.get(0),prev.get(1), seed);
+				NodeInfo next = selectSeedNext(prev.get(0),prev.get(1), seed,ccw);
 				if( next == null ) {
 					if( verbose )
 						System.out.println("Outer column with a row that has only one element");
 					failed = true;
 					break;
 				}
-				List<NodeInfo> row = findLine( seed , next, clusterSize, null);
+				List<NodeInfo> row = findLine( seed , next, clusterSize, null,ccw);
 				gridByRows.add( row );
 			}
 			if( failed )

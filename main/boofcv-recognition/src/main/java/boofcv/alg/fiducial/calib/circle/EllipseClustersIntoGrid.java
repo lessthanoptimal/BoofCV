@@ -85,7 +85,7 @@ public abstract class EllipseClustersIntoGrid {
 	 * @param line
 	 * @return All the nodes along the line
 	 */
-	protected static List<NodeInfo> findLine(NodeInfo seed, NodeInfo next, int clusterSize, List<NodeInfo> line) {
+	protected static List<NodeInfo> findLine(NodeInfo seed, NodeInfo next, int clusterSize, List<NodeInfo> line, boolean ccw ) {
 		if( next == null )
 			return null;
 		if( line == null )
@@ -93,7 +93,10 @@ public abstract class EllipseClustersIntoGrid {
 		else
 			line.clear();
 
-		double anglePrev = direction(seed, next);
+		next.marked = true;
+		double anglePrev = direction(next, seed);
+
+		double prevDist = next.ellipse.center.distance(seed.ellipse.center);
 
 		line.add( seed );
 		line.add( next );
@@ -112,12 +115,12 @@ public abstract class EllipseClustersIntoGrid {
 				if( c.marked )
 					continue;
 
-				double diff = UtilAngle.dist(angle,anglePrev);
-				if( diff <= MAX_LINE_ANGLE_CHANGE ) {
-					double d = c.ellipse.center.distance(next.ellipse.center);
-					d *= scoreDistanceFromEdges(next.edges,c.ellipse.center);
+				double angleDist = ccw ? UtilAngle.distanceCCW(anglePrev,angle) : UtilAngle.distanceCW(anglePrev,angle);
 
-					double score = (diff+0.01)*d;
+				if( angleDist <= Math.PI+MAX_LINE_ANGLE_CHANGE ) {
+					double d = c.ellipse.center.distance(next.ellipse.center);
+
+					double score = d/prevDist+angleDist;
 
 					if( score < bestScore ) {
 						bestDistance = d;
@@ -133,8 +136,9 @@ public abstract class EllipseClustersIntoGrid {
 				return line;
 			} else {
 				best.marked = true;
+				prevDist = bestDistance;
 				line.add(best);
-				anglePrev = bestAngle;
+				anglePrev = UtilAngle.bound(bestAngle+Math.PI);
 				next = best;
 			}
 		}
@@ -142,25 +146,6 @@ public abstract class EllipseClustersIntoGrid {
 //			System.out.println("Stuck in a loop?  Maximum line length exceeded");
 //		}
 		return null;
-	}
-
-	private static double scoreDistanceFromEdges( FastQueue<Edge> edges , Point2D_F64 target ) {
-		double total = 0;
-		for (int i = 0; i < edges.size(); i++) {
-			Edge e = edges.get(i);
-
-			if( e.target.marked )
-				continue;
-			if( e.target.ellipse.center == target )
-				continue;
-			double d = target.distance(e.target.ellipse.center);
-
-			if( e.target.marked )
-				total -= 1/d;
-			else
-				total += 1/d;
-		}
-		return total;
 	}
 
 	/**
@@ -173,8 +158,8 @@ public abstract class EllipseClustersIntoGrid {
 	 * @return The found node or null if one was not found
 	 */
 	static protected NodeInfo selectSeedNext(  NodeInfo prevSeed , NodeInfo prevNext ,
-											   NodeInfo currentSeed) {
-		double angleTarget = direction(prevSeed, prevNext);
+											   NodeInfo currentSeed, boolean ccw  ) {
+		double referenceAngle = direction(prevNext, prevSeed);
 
 		double bestScore = Double.MAX_VALUE;
 		NodeInfo best = null;
@@ -187,11 +172,14 @@ public abstract class EllipseClustersIntoGrid {
 			if( edge.target.marked )
 				continue;
 
-			double angleDiff = UtilAngle.dist(edge.angle, angleTarget);
-			if( angleDiff > MAX_LINE_ANGLE_CHANGE*1.5 )
+			double angle = edge.angle;
+			double angleDist = ccw ? UtilAngle.distanceCCW(referenceAngle,angle) : UtilAngle.distanceCW(referenceAngle,angle);
+			if( angleDist > Math.PI+MAX_LINE_ANGLE_CHANGE )
 				continue;
 
-			double score = (angleDiff+0.001)*c.distance(edge.target.ellipse.center);
+			Point2D_F64 p = edge.target.ellipse.center;
+
+			double score = angleDist*c.distance(p);
 
 			if( score < bestScore ) {
 				bestScore = score;
@@ -249,9 +237,9 @@ public abstract class EllipseClustersIntoGrid {
 
 
 
-	static double direction(NodeInfo seed, NodeInfo next) {
-		return Math.atan2( next.ellipse.center.y - seed.ellipse.center.y ,
-				next.ellipse.center.x - seed.ellipse.center.x );
+	static double direction(NodeInfo src, NodeInfo dst) {
+		return Math.atan2( dst.ellipse.center.y - src.ellipse.center.y ,
+				dst.ellipse.center.x - src.ellipse.center.x );
 	}
 
 	/**
