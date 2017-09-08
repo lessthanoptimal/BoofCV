@@ -46,8 +46,6 @@ Version : 0.28
 - ImageZoomPanel
   * Draws to a buffer first which fixes a major problem on some JVM implementations have a very slow render
 
-TODO Add flip primitive array to ddogleg. Search for "primitive flip" for code that should be replaced here
-
 Fiducials
 - Changes in polygon have affected performance. Mostly negative on blurred images.
   Ambiguous in other areas.
@@ -76,6 +74,7 @@ Calibration
   TODO Fisheye Detector - Asymmetric Circle
   TODO Fisheye Calibration Demonstration
   TODO Add fisheye to calibration application
+  TODO Adjust ellipses fit to contour for contour bias
 
 TOP ITEMS
 - TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.

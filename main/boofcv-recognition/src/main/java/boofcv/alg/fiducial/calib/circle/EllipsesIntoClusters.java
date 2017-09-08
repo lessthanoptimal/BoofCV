@@ -42,6 +42,8 @@ public class EllipsesIntoClusters {
 
 	// minimum allowed ratio difference between major and minor axis
 	private double sizeSimilarityTolerance;
+	// how similar the ratio of major/minor axises need to be to each other to connect
+	private double ratioSimilarityTolerance;
 
 	// minimum number of elements in a cluster
 	private int minimumClusterSize = 3;
@@ -66,6 +68,7 @@ public class EllipsesIntoClusters {
 
 		this.maxDistanceToMajorAxisRatio = maxDistanceToMajorAxisRatio;
 		this.sizeSimilarityTolerance = sizeSimilarityTolerance;
+		this.ratioSimilarityTolerance = Math.min(1,sizeSimilarityTolerance);
 
 		search.init(2);
 
@@ -144,41 +147,50 @@ public class EllipsesIntoClusters {
 				if( e2 == e1 )
 					continue;
 
-				// TODO prune by orientation but only if strongly elliposoidal
-
 				// the initial search was based on size of major axis.  Now prune and take in account the distance
 				// from the minor axis
 				if( axisAdjustedDistanceSq(e1,e2) > maxDistance ) {
 					continue;
 				}
 
+				// TODO take in in account how similar their orientation is, but less important when they are circular
+				//      somehow work into aspect ratio test?
+
 				// smallest shape divided by largest shape
 				double ratioA = e1.a > e2.a ? e2.a / e1.a : e1.a / e2.a;
 				double ratioB = e1.b > e2.b ? e2.b / e1.b : e1.b / e2.b;
 
+				if( ratioA < sizeSimilarityTolerance && ratioB < sizeSimilarityTolerance ) {
+					continue;
+				}
+
+				// axis ratio simularity check
+				double ratioC = (e1.a*e1.a*e2.b*e2.b)/(e1.b*e1.b*e2.a*e2.a);
+				if( ratioC > 1 ) ratioC = 1.0/ratioC;
+
+				if( ratioC < ratioSimilarityTolerance ) {
+					continue;
+				}
+
 				int indexNode2 = d.data.which;
 				Node node2 = nodes.get(indexNode2);
 
-				// connect if they have a similar size to each other
-				if( ratioA >= sizeSimilarityTolerance && ratioB >= sizeSimilarityTolerance ) {
-
-					// node2 isn't in a cluster already.  Add it to this one
-					if( node2.cluster == -1 ) {
-						node2.cluster = node1.cluster;
-						cluster1.add( node2 );
+				// node2 isn't in a cluster already.  Add it to this one
+				if( node2.cluster == -1 ) {
+					node2.cluster = node1.cluster;
+					cluster1.add( node2 );
+					node1.connections.add( indexNode2 );
+					node2.connections.add( i );
+				} else if( node2.cluster != node1.cluster ) {
+					// Node2 is in a different cluster.  Merge the clusters
+					joinClusters( node1.cluster , node2.cluster );
+					node1.connections.add( indexNode2 );
+					node2.connections.add( i );
+				} else {
+					// see if they are already connected, if not connect them
+					if( node1.connections.indexOf(indexNode2) == -1 ) {
 						node1.connections.add( indexNode2 );
 						node2.connections.add( i );
-					} else if( node2.cluster != node1.cluster ) {
-						// Node2 is in a different cluster.  Merge the clusters
-						joinClusters( node1.cluster , node2.cluster );
-						node1.connections.add( indexNode2 );
-						node2.connections.add( i );
-					} else {
-						// see if they are already connected, if not connect them
-						if( node1.connections.indexOf(indexNode2) == -1 ) {
-							node1.connections.add( indexNode2 );
-							node2.connections.add( i );
-						}
 					}
 				}
 			}
