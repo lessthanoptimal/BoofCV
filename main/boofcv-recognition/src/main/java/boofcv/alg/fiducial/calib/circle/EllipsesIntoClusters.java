@@ -258,7 +258,7 @@ public class EllipsesIntoClusters {
 	/**
 	 * Recycles and initializes all internal data structures
 	 */
-	private void init(List<EllipseRotated_F64> ellipses) {
+	void init(List<EllipseRotated_F64> ellipses) {
 		searchPoints.resize(ellipses.size());
 		nodes.resize(ellipses.size());
 		clusters.reset();
