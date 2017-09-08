@@ -163,7 +163,8 @@ public class EllipsesIntoClusters {
 				double edge2 = info2.averageOutside-info2.averageInside;
 				double edgeRatio = Math.abs(edge1-edge2)/Math.max(edge1,edge2);
 
-				if( edgeRatio > edgeIntensitySimilarityTolerance)
+				// relax the edge intensity ratio here
+				if( edgeRatio > edgeIntensitySimilarityTolerance*1.5)
 					continue;
 
 				// the initial search was based on size of major axis.  Now prune and take in account the distance
@@ -183,13 +184,18 @@ public class EllipsesIntoClusters {
 					continue;
 				}
 
-				// axis ratio simularity check
+				// axis ratio similarity check
 				double ratioC = (e1.a*e1.a*e2.b*e2.b)/(e1.b*e1.b*e2.a*e2.a);
 				if( ratioC > 1 ) ratioC = 1.0/ratioC;
 
 				if( ratioC < ratioSimilarityTolerance ) {
 					continue;
 				}
+
+				// Apply rule which combines two features
+				if( edgeRatio + 1-ratioC >
+						(1-edgeIntensitySimilarityTolerance+ratioSimilarityTolerance) )
+					continue;
 
 				int indexNode2 = d.data.which;
 				Node node2 = nodes.get(indexNode2);
