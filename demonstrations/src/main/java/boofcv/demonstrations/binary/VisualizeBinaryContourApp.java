@@ -24,6 +24,7 @@ import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase2;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImageZoomPanel;
@@ -61,6 +62,7 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 		super(exampleInputs, imageType);
 
 		guiImage = new VisualizePanel();
+		guiImage.setPreferredSize(new Dimension(800,800));
 
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, guiImage);
@@ -71,23 +73,47 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 	}
 
 	@Override
+	protected void handleInputChange(int source, InputMethod method, final int width, final int height) {
+		super.handleInputChange(source, method, width, height);
+
+		binary.reshape(width,height);
+		labeled.reshape(width,height);
+
+		// reset the scaling and ensure the entire new image is visible
+		BoofSwingUtil.invokeNowOrLater(new Runnable() {
+			@Override
+			public void run() {
+				int w = guiImage.getWidth();
+				int h = guiImage.getHeight();
+				if( w == 0 ) {
+					w = guiImage.getPreferredSize().width;
+					h = guiImage.getPreferredSize().height;
+				}
+
+				double scale = Math.max(width/(double)w,height/(double)h);
+				scale = Math.max(1,scale);
+				System.out.println("scale "+scale);
+				controls.setZoom(1.0/scale);
+			}
+		});
+	}
+
+	@Override
 	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
 
 		synchronized (this) {
 			original = ConvertBufferedImage.checkCopy(buffered, original);
 			work = ConvertBufferedImage.checkDeclare(buffered, work);
-			binary.reshape(input.width,input.height);
-			labeled.reshape(input.width,input.height);
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				Dimension d = guiImage.getPreferredSize();
-				if( d.getWidth() < buffered.getWidth() || d.getHeight() < buffered.getHeight() ) {
-					guiImage.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
-				}
-			}});
+//		SwingUtilities.invokeLater(new Runnable() {
+//			@Override
+//			public void run() {
+//				Dimension d = guiImage.getPreferredSize();
+//				if( d.getWidth() < buffered.getWidth() || d.getHeight() < buffered.getHeight() ) {
+//					guiImage.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
+//				}
+//			}});
 
 		synchronized (this) {
 			inputToBinary.process((T)input,binary);
@@ -137,17 +163,15 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 		}
 
 		guiImage.setScale(controls.zoom);
-		guiImage.setBufferedImage(active);
+		guiImage.setBufferedImageNoChange(active);
 		guiImage.repaint();
 	}
 
 	class VisualizePanel extends ImageZoomPanel {
+
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 			synchronized (VisualizeBinaryContourApp.this) {
-				g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
 				List<Contour> contours = contourAlg.getContours().toList();
 				g2.setStroke(new BasicStroke(1));
 				VisualizeBinaryData.render(contours,Color.BLUE, Color.RED, scale, g2);
@@ -168,6 +192,6 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 
 		app.waitUntilInputSizeIsKnown();
 
-		ShowImages.showWindow(app,"Contour Visualization",true);
+		ShowImages.showWindow(app,"Binary Contour Visualization",true);
 	}
 }

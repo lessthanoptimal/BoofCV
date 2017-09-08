@@ -43,6 +43,8 @@ Version : 0.28
   * Added BLOCK_OTSU
 - Created ConfigMinimumSize
   * Provides a way to specify the size of an object as based on input image size or an exact pixels
+- ImageZoomPanel
+  * Draws to a buffer first which fixes a major problem on some JVM implementations have a very slow render
 
 TODO Add flip primitive array to ddogleg. Search for "primitive flip" for code that should be replaced here
 

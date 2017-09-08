@@ -104,4 +104,8 @@ public class ContourControlPanel extends StandardAlgConfigPanel
 	public ConnectRule getConnectRule() {
 		return connectRule;
 	}
+
+	public void setZoom(double zoom) {
+		selectZoom.setValue(zoom);
+	}
 }

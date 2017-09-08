@@ -18,6 +18,7 @@
 
 package boofcv.gui.image;
 
+import boofcv.io.image.ConvertBufferedImage;
 import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
@@ -114,6 +115,15 @@ public class ImageZoomPanel extends JScrollPane {
 		}
 	}
 
+	public synchronized void setBufferedImageNoChange(BufferedImage image) {
+		// assume the image was initially set before the GUI was invoked
+		if( checkEventDispatch && this.img != null ) {
+			if( !SwingUtilities.isEventDispatchThread() )
+				throw new RuntimeException("Changed image when not in GUI thread?");
+		}
+		this.img = image;
+	}
+
 	public BufferedImage getImage() {
 		return img;
 	}
@@ -137,6 +147,8 @@ public class ImageZoomPanel extends JScrollPane {
 	{
 		SaveImageOnClick mouseListener = new SaveImageOnClick(this);
 
+		BufferedImage buffer = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
+
 		public ImagePanel() {
 			addMouseListener(mouseListener);
 		}
@@ -147,14 +159,22 @@ public class ImageZoomPanel extends JScrollPane {
 
 			if( img == null ) return;
 
-			Graphics2D g2 = (Graphics2D)g;
+			// render to a buffer first to improve performance. This is particularly evident when rendering
+			// lines for some reason
 
+			int w = getWidth(),h = getHeight();
+			buffer = ConvertBufferedImage.checkDeclare(w,h,buffer,buffer.getType());
+			Graphics2D g2 = buffer.createGraphics();
+			g2.setColor(getBackground());
+			g2.fillRect(0,0,w,h);
+			AffineTransform tran = AffineTransform.getScaleInstance(scale, scale);
 			synchronized ( ImageZoomPanel.this ) {
-				AffineTransform tran = AffineTransform.getScaleInstance(scale, scale);
 				g2.drawImage(img, tran, null);
-
-				paintInPanel(tran, g2);
 			}
+
+			paintInPanel(tran, g2);
+
+			g.drawImage(buffer,0,0,null);
 		}
 	}
 
