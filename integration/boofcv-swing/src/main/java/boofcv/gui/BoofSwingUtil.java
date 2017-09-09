@@ -21,9 +21,11 @@ package boofcv.gui;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
 public class BoofSwingUtil {
+	private static final String KEY_RECENT_FILES = "RecentFiles";
 
 	public static File openFileChooseDialog(Component parent) {
 		return openFileChooseDialog(parent,new File(".").getPath());
@@ -43,6 +45,41 @@ public class BoofSwingUtil {
 			prefs.put(key, selected.getParent());
 		}
 		return selected;
+	}
+
+	public static java.util.List<String> getListOfRecentFiles(Component parent) {
+
+		Preferences prefs = Preferences.userRoot().node(parent.getClass().getSimpleName());
+		String encodedString =prefs.get(KEY_RECENT_FILES, "");
+
+		String []fileNames = encodedString.split("\n");
+
+		java.util.List<String> output = new ArrayList<>();
+		for( String f : fileNames ) {
+			output.add(f);
+		}
+		return output;
+	}
+
+	public static void addToRecentFiles( Component parent , String filePath ) {
+		java.util.List<String> files = getListOfRecentFiles(parent);
+
+		files.remove(filePath);
+
+		if( files.size() >= 10 ) {
+			files.remove(9);
+		}
+		files.add(0,filePath);
+
+		String encoded = "";
+		for (int i = 0; i < files.size(); i++) {
+			encoded += files.get(i);
+			if( i < files.size()-1 ) {
+				encoded += "\n";
+			}
+		}
+		Preferences prefs = Preferences.userRoot().node(parent.getClass().getSimpleName());
+		prefs.put(KEY_RECENT_FILES,encoded);
 	}
 
 	public static void invokeNowOrLater(Runnable r ) {
