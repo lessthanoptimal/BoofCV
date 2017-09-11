@@ -24,6 +24,8 @@ import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.*;
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.fiducial.qrcode.QrCodeDetector;
+import boofcv.alg.fiducial.qrcode.QrCodePositionPatternDetector;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.square.DetectFiducialSquareImage;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
@@ -149,4 +151,16 @@ public class FactoryFiducial {
 	CalibrationFiducialDetector<T> calibCircleRegularGrid(ConfigCircleRegularGrid config, Class<T> imageType) {
 		return new CalibrationFiducialDetector<>(config, imageType);
 	}
+
+	public static <T extends ImageGray<T>>
+	QrCodeDetector<T> qrcode(ConfigQrCode config, Class<T> imageType) {
+		config.checkValidity();
+
+		DetectPolygonBinaryGrayRefine<T> squareDetector = FactoryShapeDetector.polygon(config.polygon, imageType);
+		QrCodePositionPatternDetector<T> detectPositionPatterns =
+				new QrCodePositionPatternDetector<>(squareDetector,config.versionMaximum);
+
+		return new QrCodeDetector<>(detectPositionPatterns);
+	}
+
 }

@@ -28,6 +28,7 @@ import georegression.struct.shapes.Rectangle2D_I32;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.util.List;
 
@@ -253,6 +254,21 @@ public class VisualizeShapes {
 		}
 	}
 
+	public static void fillPolygon( Polygon2D_F64 polygon, double scale,  Graphics2D g2 ) {
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		GeneralPath path = new GeneralPath();
+
+		Point2D_F64 p = polygon.get(0);
+		path.moveTo(p.x*scale,p.y*scale);
+
+		for( int i = 1; i <= polygon.size(); i++ ) {
+			p = polygon.get(i%polygon.size());
+			path.lineTo(p.x*scale,p.y*scale);
+		}
+		g2.fill(path);
+	}
 
 	public static void drawPolygonCorners( Polygon2D_F64 polygon, int radius , Graphics2D g2 , boolean interpolate ) {
 		if( interpolate ) {

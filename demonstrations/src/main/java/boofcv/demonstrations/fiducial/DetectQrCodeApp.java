@@ -20,14 +20,15 @@ package boofcv.demonstrations.fiducial;
 
 import boofcv.alg.fiducial.calib.squares.SquareEdge;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
-import boofcv.alg.fiducial.qrcode.QrCodePositionPatternDetector;
+import boofcv.alg.fiducial.qrcode.PositionPatternNode;
+import boofcv.alg.fiducial.qrcode.QrCode;
+import boofcv.alg.fiducial.qrcode.QrCodeDetector;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.demonstrations.shapes.DetectBlackShapeAppBase;
+import boofcv.factory.fiducial.ConfigQrCode;
+import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
-import boofcv.factory.shape.ConfigPolygonDetector;
-import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
@@ -55,7 +56,7 @@ import java.util.List;
 public class DetectQrCodeApp<T extends ImageGray<T>>
 		extends DetectBlackShapeAppBase
 {
-	QrCodePositionPatternDetector<T> detector;
+	QrCodeDetector<T> detector;
 
 	public DetectQrCodeApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);
@@ -71,16 +72,15 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		DetectQrCodeControlPanel controls = (DetectQrCodeControlPanel)DetectQrCodeApp.this.controls;
 
 		synchronized (this) {
-			ConfigPolygonDetector config = controls.getConfigPolygon();
+			ConfigQrCode config = controls.getConfigPolygon();
 
 			if( controls.bRefineGray ) {
-				config.refineGray = controls.refineGray;
+				config.polygon.refineGray = controls.refineGray;
 			} else {
-				config.refineGray = null;
+				config.polygon.refineGray = null;
 			}
 
-			DetectPolygonBinaryGrayRefine<T> squareDetector = FactoryShapeDetector.polygon(config, imageClass);
-			detector = new QrCodePositionPatternDetector<>(squareDetector,2); // TODO make config able
+			detector = FactoryFiducial.qrcode(config,imageClass);
 		}
 		imageThresholdUpdated();
 	}
@@ -127,10 +127,22 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					VisualizeBinaryData.render(contours, null,Color.CYAN, scale, g2);
 				}
 
+				if ( true ) {
+					FastQueue<QrCode> detected = detector.getDetections();
+
+					System.out.println("Total Detections: "+detected.size);
+
+					g2.setColor(new Color(0x90FF0000,true));
+					for (int i = 0; i < detected.size; i++) {
+						QrCode qr = detected.get(i);
+						VisualizeShapes.fillPolygon(qr.bounds,scale,g2);
+					}
+				}
+
 				if (controls.bShowSquares) {
 					List<Polygon2D_F64> polygons = detector.getSquareDetector().getPolygons(null);
 
-					g2.setColor(Color.ORANGE);
+					g2.setColor(Color.GREEN);
 					g2.setStroke(new BasicStroke(3));
 					for (Polygon2D_F64 p : polygons) {
 						VisualizeShapes.drawPolygon(p, true, scale, g2);
@@ -138,9 +150,9 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 				}
 
 				if (controls.bShowPositionPattern ) {
-					FastQueue<QrCodePositionPatternDetector.PositionSquare> nodes = detector.getPositionPatterns();
+					FastQueue<PositionPatternNode> nodes = detector.getDetectPositionPatterns().getPositionPatterns();
 
-					g2.setColor(Color.RED);
+					g2.setColor(Color.ORANGE);
 					g2.setStroke(new BasicStroke(3));
 					List<SquareEdge> list = new ArrayList<>();
 					for (int i = 0; i < nodes.size(); i++) {
@@ -157,7 +169,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 					g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 					g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-					g2.setColor(Color.RED);
+					g2.setColor( new Color(255, 150, 100));
 					g2.setStroke(new BasicStroke(3));
 					Line2D.Double l = new Line2D.Double();
 					for (int i = 0; i < list.size(); i++) {
