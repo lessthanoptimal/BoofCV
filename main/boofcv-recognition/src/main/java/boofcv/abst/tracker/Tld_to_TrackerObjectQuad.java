@@ -77,4 +77,8 @@ public class Tld_to_TrackerObjectQuad<T extends ImageGray<T>, D extends ImageGra
 		return type;
 	}
 
+	@Override
+	public TldTracker<T, D> getLowLevelTracker() {
+		return tracker;
+	}
 }

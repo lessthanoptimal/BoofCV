@@ -90,4 +90,9 @@ public class Circulant_to_TrackerObjectQuad<T extends ImageGray<T>> implements T
 	public ImageType<T> getImageType() {
 		return imageType;
 	}
+
+	@Override
+	public CirculantTracker<T> getLowLevelTracker() {
+		return tracker;
+	}
 }

@@ -67,4 +67,9 @@ public class Comaniciu2003_to_TrackerObjectQuad<T extends ImageBase<T>>
 	public ImageType<T> getImageType() {
 		return type;
 	}
+
+	@Override
+	public TrackerMeanShiftComaniciu2003<T> getLowLevelTracker() {
+		return alg;
+	}
 }

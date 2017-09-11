@@ -67,4 +67,11 @@ public interface TrackerObjectQuad<T extends ImageBase<T>> {
 	 * @return Image type
 	 */
 	public ImageType<T> getImageType();
+
+	/**
+	 * Provides access to the inner low level tracker. You need to be familiar with the tracker's source code
+	 * to make sure of this function. Returns null if implementing it doesn't make sense.
+	 * @return Tracking algorithm.
+	 */
+	<T extends Object>T getLowLevelTracker();
 }

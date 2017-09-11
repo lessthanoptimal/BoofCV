@@ -83,4 +83,13 @@ public class Msl_to_TrackerObjectQuad <T extends ImageBase<T>> implements Tracke
 	public ImageType<T> getImageType() {
 		return type;
 	}
+
+	@Override
+	public TrackerMeanShiftLikelihood<T> getLowLevelTracker() {
+		return tracker;
+	}
+
+	public PixelLikelihood<T> getLikelihood() {
+		return likelihood;
+	}
 }

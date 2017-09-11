@@ -157,4 +157,9 @@ public class Sfot_to_TrackObjectQuad<T extends ImageGray<T>, D extends ImageGray
 		p.x = x*c - y*s;
 		p.y = x*s + y*c;
 	}
+
+	@Override
+	public SparseFlowObjectTracker<T, D> getLowLevelTracker() {
+		return alg;
+	}
 }
