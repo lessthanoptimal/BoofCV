@@ -43,6 +43,9 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 										boolean showGraphs ) {
 		super(gridRows, gridColumns, true, false);
 
+		doShowNumbers = false;
+		this.showNumbers.setSelected(doShowNumbers);
+
 		this.showGraphs = showGraphs;
 		this.circleDiameter = diameter;
 		this.circleSpacing = spacing;

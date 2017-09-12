@@ -47,6 +47,7 @@ import java.util.List;
 public abstract class DemonstrationBase2 extends JPanel {
 	protected JMenuBar menuBar;
 	JMenuItem menuFile, menuWebcam, menuQuit;
+	JMenu menuRecent;
 
 	// controls by synchornized(inputStreams)
 	protected InputMethod inputMethod = InputMethod.NONE;
@@ -126,6 +127,10 @@ public abstract class DemonstrationBase2 extends JPanel {
 			menuFile.setAccelerator(KeyStroke.getKeyStroke(
 					KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 			menu.add(menuFile);
+
+			menuRecent = new JMenu("Open Recent");
+			menu.add(menuRecent);
+			updateRecentItems();
 		}
 		if( openWebcam ) {
 			menuWebcam = new JMenuItem("Open Webcam", KeyEvent.VK_W);
@@ -168,6 +173,25 @@ public abstract class DemonstrationBase2 extends JPanel {
 		}
 
 		add(BorderLayout.NORTH, menuBar);
+	}
+
+	/**
+	 * Updates the list in recent menu
+	 */
+	private void updateRecentItems() {
+		menuRecent.removeAll();
+		List<String> recentFiles = BoofSwingUtil.getListOfRecentFiles(this);
+		for( String filePath : recentFiles ) {
+			final File f = new File(filePath);
+			JMenuItem recentItem = new JMenuItem(f.getName());
+			recentItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					openFile(f);
+				}
+			});
+			menuRecent.add(recentItem);
+		}
 	}
 
 	/**
@@ -264,6 +288,16 @@ public abstract class DemonstrationBase2 extends JPanel {
 			System.err.println("Can't find file "+file.getPath());
 			return;
 		}
+
+		// update recent items menu
+		final File _file = file;
+		BoofSwingUtil.invokeNowOrLater(new Runnable() {
+			@Override
+			public void run() {
+				BoofSwingUtil.addToRecentFiles(DemonstrationBase2.this,_file.getAbsolutePath());
+				updateRecentItems();
+			}
+		});
 
 		// mjpegs can be opened up as images.  so override the default behavior
 		inputFilePath = file.getPath();
