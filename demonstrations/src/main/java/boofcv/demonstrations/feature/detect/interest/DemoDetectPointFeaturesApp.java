@@ -220,11 +220,11 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 			synchronized (featureLock) {
 				for (int i = 0; i < positive.size; i++) {
 					Point2D_I16 c = positive.get(i);
-					VisualizeFeatures.drawPoint(g2,(int)(c.x*scale+0.5),(int)(c.y*scale+0.5),Color.RED);
+					VisualizeFeatures.drawPoint(g2,(int)((c.x+0.5)*scale),(int)((c.y+0.5)*scale),Color.RED);
 				}
 				for (int i = 0; i < negative.size; i++) {
 					Point2D_I16 c = negative.get(i);
-					VisualizeFeatures.drawPoint(g2,(int)(c.x*scale+0.5),(int)(c.y*scale+0.5),Color.BLUE);
+					VisualizeFeatures.drawPoint(g2,(int)((c.x+0.5)*scale),(int)((c.y+0.5)*scale),Color.BLUE);
 				}
 			}
 		}
