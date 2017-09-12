@@ -24,9 +24,10 @@ import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
-import boofcv.gui.DemonstrationBase;
+import boofcv.gui.BoofSwingUtil;
+import boofcv.gui.DemonstrationBase2;
 import boofcv.gui.feature.VisualizeShapes;
-import boofcv.gui.image.ImagePanel;
+import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
@@ -38,9 +39,8 @@ import georegression.struct.point.Point2D_F32;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
@@ -53,7 +53,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends DemonstrationBase<T>
+public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends DemonstrationBase2
 	implements DeformKeypointPanel.Listener
 {
 
@@ -87,8 +87,37 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		control = new DeformKeypointPanel(this);
 		handleAlgorithmChange();
 
+		gui.setPreferredSize(new Dimension(600,600));
+
 		add(control, BorderLayout.WEST);
 		add(gui, BorderLayout.CENTER);
+
+		gui.addMouseWheelListener(new MouseAdapter() {
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				double curr = control.zoom;
+				if( e.getWheelRotation() > 0 )
+					curr *= 1.1;
+				else
+					curr /= 1.1;
+				control.setZoom(curr);
+			}
+		});
+	}
+
+	@Override
+	protected void handleInputChange(int source, InputMethod method, final int width, final int height) {
+		super.handleInputChange(source, method, width, height);
+
+		BoofSwingUtil.invokeNowOrLater(new Runnable() {
+			@Override
+			public void run() {
+				double zoom = BoofSwingUtil.selectZoomToShowAll(gui,width,height);
+				control.setZoom(zoom);
+				gui.getVerticalScrollBar().setValue(0);
+				gui.getHorizontalScrollBar().setValue(0);
+			}
+		});
 	}
 
 	@Override
@@ -131,15 +160,27 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 				ConvertBufferedImage.convertTo(undistorted, distortedBuff, true);
 			}
 		}
-		gui.setImageUI(distortedBuff);
+		BoofSwingUtil.invokeNowOrLater(new Runnable() {
+			@Override
+			public void run() {
+				gui.setBufferedImage(distortedBuff);
+				gui.repaint();
+			}
+		});
 	}
 
 	@Override
 	public void handleVisualizationChange() {
+
 		if( inputMethod == InputMethod.IMAGE ) {
 			renderDistorted(null, undistorted);
 		}
-		gui.repaint();
+		BoofSwingUtil.invokeNowOrLater(new Runnable() {
+			@Override
+			public void run() {
+				gui.setScale(control.zoom);
+			}
+		});
 	}
 
 	@Override
@@ -179,7 +220,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		gui.repaint();
 	}
 
-	class CustomImagePanel extends ImagePanel implements MouseListener, MouseMotionListener{
+	class CustomImagePanel extends ImageZoomPanel implements MouseListener, MouseMotionListener{
 
 		int active = -1;
 		boolean selectedUndist;
@@ -189,16 +230,13 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		BasicStroke strokeThin = new BasicStroke(2);
 
 		CustomImagePanel() {
-			addMouseListener(this);
-			addMouseMotionListener(this);
+			getImagePanel().addMouseListener(this);
+			getImagePanel().addMouseMotionListener(this);
 			requestFocus();
 		}
 
 		@Override
-		public void paintComponent(Graphics g) {
-			super.paintComponent(g);
-
-			Graphics2D g2 = (Graphics2D)g;
+		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -348,7 +386,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 
 		app.openFile(new File(inputs.get(0).getPath()));
 
-		app.waitUntilDoneProcessing();
+		app.waitUntilInputSizeIsKnown();
 
 		ShowImages.showWindow(app, "Deform Image Key Points",true);
 	}

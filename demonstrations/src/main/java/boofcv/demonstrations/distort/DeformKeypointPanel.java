@@ -20,6 +20,7 @@ package boofcv.demonstrations.distort;
 
 import boofcv.abst.distort.ConfigDeformPointMLS;
 import boofcv.alg.distort.mls.TypeDeformMLS;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
@@ -27,6 +28,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
+import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 
 /**
  * @author Peter Abeles
@@ -37,6 +41,7 @@ public class DeformKeypointPanel extends StandardAlgConfigPanel
 //	JSpinner selectAlgorithm;
 
 	JCheckBox checkShowOriginal;
+	JSpinner selectZoom;
 	JCheckBox checkShowPoints;
 	JButton buttonClear;
 
@@ -47,6 +52,7 @@ public class DeformKeypointPanel extends StandardAlgConfigPanel
 
 	boolean showOriginal = false;
 	boolean showPoints = true;
+	protected double zoom = 1;
 
 	ConfigDeformPointMLS configMLS = new ConfigDeformPointMLS();
 
@@ -58,6 +64,10 @@ public class DeformKeypointPanel extends StandardAlgConfigPanel
 		checkShowOriginal = new JCheckBox("Original");
 		checkShowOriginal.setSelected(showOriginal);
 		checkShowOriginal.addActionListener(this);
+
+		selectZoom = new JSpinner(new SpinnerNumberModel(zoom,MIN_ZOOM,MAX_ZOOM,1));
+		selectZoom.addChangeListener(this);
+		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
 		checkShowPoints = new JCheckBox("Show Points");
 		checkShowPoints.setSelected(showPoints);
@@ -75,14 +85,30 @@ public class DeformKeypointPanel extends StandardAlgConfigPanel
 		selectAlpha = spinner(configMLS.alpha, 0.5f, 20.f, 0.5f);
 
 		addAlignLeft(checkShowOriginal,this);
+		addLabeled(selectZoom,"Zoom",this);
 		addAlignLeft(checkShowPoints,this);
 		addAlignCenter(buttonClear,this);
-		addSeparator();
+		addSeparator(200);
 		addLabeled(selectModel, "Model", this);
 		addLabeled(selectGridRows, "Grid Rows", this);
 		addLabeled(selectGridCols, "Grid Cols", this);
 		addLabeled(selectAlpha, "Alpha", this);
 		addVerticalGlue(this);
+	}
+
+	public void setZoom( double _zoom ) {
+		_zoom = Math.max(MIN_ZOOM,_zoom);
+		_zoom = Math.min(MAX_ZOOM,_zoom);
+		if( zoom == _zoom )
+			return;
+		this.zoom = _zoom;
+
+		BoofSwingUtil.invokeNowOrLater(new Runnable() {
+			@Override
+			public void run() {
+				selectZoom.setValue(zoom);
+			}
+		});
 	}
 
 	public boolean isShowOriginal() {
@@ -104,7 +130,11 @@ public class DeformKeypointPanel extends StandardAlgConfigPanel
 		} else if( e.getSource() == selectGridCols ) {
 			configMLS.cols = ((SpinnerNumberModel)selectGridCols.getModel()).getNumber().intValue();
 		} else if( e.getSource() == selectAlpha ) {
-			configMLS.alpha = ((SpinnerNumberModel)selectAlpha.getModel()).getNumber().floatValue();
+			configMLS.alpha = ((SpinnerNumberModel) selectAlpha.getModel()).getNumber().floatValue();
+		} else if( e.getSource() == selectZoom ) {
+			zoom = ((Number) selectZoom.getValue()).doubleValue();
+			listener.handleVisualizationChange();
+			return;
 		} else {
 			return;
 		}

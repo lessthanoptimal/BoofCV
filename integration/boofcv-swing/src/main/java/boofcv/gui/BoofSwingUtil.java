@@ -27,6 +27,9 @@ import java.util.prefs.Preferences;
 public class BoofSwingUtil {
 	private static final String KEY_RECENT_FILES = "RecentFiles";
 
+	public static final double MIN_ZOOM = 0.01;
+	public static final double MAX_ZOOM = 50;
+
 	public static File openFileChooseDialog(Component parent) {
 		return openFileChooseDialog(parent,new File(".").getPath());
 	}

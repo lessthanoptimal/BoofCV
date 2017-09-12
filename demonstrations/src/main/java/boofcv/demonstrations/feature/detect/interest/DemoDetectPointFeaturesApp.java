@@ -54,6 +54,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
+import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
+
 /**
  * Runs several point feature detection algorithms
  *
@@ -232,8 +235,6 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 
 	class ControlPanel extends StandardAlgConfigPanel implements ChangeListener {
 
-		protected final double minZoom = 0.01;
-		protected final double maxZoom = 50;
 
 		protected JLabel processingTimeLabel = new JLabel();
 
@@ -269,7 +270,7 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 			comboAlgorithms.setSelectedIndex(0);
 			comboAlgorithms.setMaximumSize(comboAlgorithms.getPreferredSize());
 
-			selectZoom = new JSpinner(new SpinnerNumberModel(1,minZoom,maxZoom,1));
+			selectZoom = new JSpinner(new SpinnerNumberModel(zoom,MIN_ZOOM,MAX_ZOOM,1));
 			selectZoom.addChangeListener(this);
 			selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
@@ -336,8 +337,8 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		}
 
 		public void setZoom( double zoom ) {
-			zoom = Math.max(minZoom,zoom);
-			zoom = Math.min(maxZoom,zoom);
+			zoom = Math.max(MIN_ZOOM,zoom);
+			zoom = Math.min(MAX_ZOOM,zoom);
 			this.zoom = zoom;
 
 			BoofSwingUtil.invokeNowOrLater(new Runnable() {

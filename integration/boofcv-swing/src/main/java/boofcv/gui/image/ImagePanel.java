@@ -233,6 +233,10 @@ public class ImagePanel extends JPanel {
 		return mouseListener;
 	}
 
+	public void setScale(double scale) {
+		this.scale = scale;
+	}
+
 	private static class ScaleOffset {
 		double scale,offsetX,offsetY;
 	}

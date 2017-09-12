@@ -130,8 +130,6 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 				if ( true ) {
 					FastQueue<QrCode> detected = detector.getDetections();
 
-					System.out.println("Total Detections: "+detected.size);
-
 					g2.setColor(new Color(0x90FF0000,true));
 					for (int i = 0; i < detected.size; i++) {
 						QrCode qr = detected.get(i);

@@ -23,6 +23,9 @@ import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
 
+import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
+import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
+
 public abstract class DetectBlackShapePanel extends StandardAlgConfigPanel {
 
 	protected JSpinner selectZoom;
@@ -31,18 +34,18 @@ public abstract class DetectBlackShapePanel extends StandardAlgConfigPanel {
 	protected int selectedView = 0;
 
 	protected double zoom = 1;
-	protected final double minZoom = 0.01;
-	protected final double maxZoom = 50;
 
-	public void setZoom( double zoom ) {
-		zoom = Math.max(minZoom,zoom);
-		zoom = Math.min(maxZoom,zoom);
-		this.zoom = zoom;
+	public void setZoom( double _zoom ) {
+		_zoom = Math.max(MIN_ZOOM,_zoom);
+		_zoom = Math.min(MAX_ZOOM,_zoom);
+		if( _zoom == zoom )
+			return;
+		zoom = _zoom;
 
 		BoofSwingUtil.invokeNowOrLater(new Runnable() {
 			@Override
 			public void run() {
-				selectZoom.setValue(DetectBlackShapePanel.this.zoom);
+				selectZoom.setValue(zoom);
 			}
 		});
 	}

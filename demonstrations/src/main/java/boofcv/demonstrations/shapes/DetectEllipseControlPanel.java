@@ -26,6 +26,9 @@ import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
+import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
+
 /**
  * @author Peter Abeles
  */
@@ -67,7 +70,7 @@ public class DetectEllipseControlPanel extends DetectBlackShapePanel
 		imageView.addActionListener(this);
 		imageView.setMaximumSize(imageView.getPreferredSize());
 
-		selectZoom = new JSpinner(new SpinnerNumberModel(1,minZoom,maxZoom,1));
+		selectZoom = new JSpinner(new SpinnerNumberModel(1,MIN_ZOOM,MAX_ZOOM,1));
 		selectZoom.addChangeListener(this);
 		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
