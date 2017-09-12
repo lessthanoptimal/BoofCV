@@ -271,6 +271,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		// adjust size based parameters based on image size
 		this.minimumContour = minimumContourConfig.computeI(width,height);
 		this.minimumArea = Math.pow(this.minimumContour /4.0,2);
+		contourFinder.setMinContourSize(minimumContour);
 
 		if( helper != null )
 			helper.setImageShape(width,height);

@@ -37,7 +37,9 @@ public class ConfigQrCode implements Configuration {
 	{
 		polygon.detector.clockwise = false;
 		polygon.detector.contourToPoly.splitFraction = 0.1;
-		polygon.detector.minimumContour = ConfigMinimumSize.byPixels(20);
+		// 28 pixels = 7 by 7 square viewed head on. Each cell is then 1 pixel. Any slight skew results in
+		// aliasing and will most likely not be read well.
+		polygon.detector.minimumContour = ConfigMinimumSize.byPixels(27);
 		polygon.detector.minimumEdgeIntensity = 15;
 		polygon.minimumRefineEdgeIntensity = 20;
 	}

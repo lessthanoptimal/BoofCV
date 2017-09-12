@@ -61,7 +61,9 @@ import java.util.List;
  */
 public class LinearContourLabelChang2004 {
 
-	// The maximum number of elements in a contour
+	// The maximum number of elements in a contour that will be recorded
+	private int minContourSize = 0;
+	// The maximum number of elements in a contour that will be recorded
 	private int maxContourSize = Integer.MAX_VALUE;
 	// If false it will not save internal contours as they are found
 	private boolean saveInternalContours = true;
@@ -162,7 +164,7 @@ public class LinearContourLabelChang2004 {
 		tracer.trace(contours.size(),x,y,true,c.external);
 
 		// release the unused contour
-		if( c.external.size() >= maxContourSize ) {
+		if( c.external.size() >= maxContourSize || c.external.size() < minContourSize ) {
 			storagePoints.size -= c.external.size();
 			c.external.clear();
 		}
@@ -201,6 +203,14 @@ public class LinearContourLabelChang2004 {
 	private void handleStep3(GrayS32 labeled) {
 		if( labeled.data[indexOut] == 0 )
 			labeled.data[indexOut] = labeled.data[indexOut-1];
+	}
+
+	public int getMinContourSize() {
+		return minContourSize;
+	}
+
+	public void setMinContourSize(int minContourSize) {
+		this.minContourSize = minContourSize;
 	}
 
 	public int getMaxContourSize() {

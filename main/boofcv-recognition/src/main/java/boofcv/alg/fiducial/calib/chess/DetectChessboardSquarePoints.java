@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.alg.fiducial.calib.squares.*;
+import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import boofcv.misc.CircularIndex;
@@ -105,6 +106,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	 * @return True if successful.
 	 */
 	public boolean process( T input , GrayU8 binary ) {
+		configureContourDetector(input);
 		boundPolygon.vertexes.reset();
 
 		detectorSquare.process(input, binary);
@@ -146,6 +148,18 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 		}
 
 		return false;
+	}
+
+	/**
+	 * Configures the contour detector based on the image size. Setting a maximum contour and turning off recording
+	 * of inner contours and improve speed and reduce the memory foot print significantly.
+	 */
+	private void configureContourDetector(T gray) {
+		// determine the maximum possible size of a square when viewed head on
+		int maxContourSize = Math.min(gray.width,gray.height)/Math.max(numCols,numRows);
+		LinearContourLabelChang2004 contourFinder = detectorSquare.getDetector().getContourFinder();
+		contourFinder.setMaxContourSize(maxContourSize);
+		contourFinder.setSaveInternalContours(false);
 	}
 
 	/**

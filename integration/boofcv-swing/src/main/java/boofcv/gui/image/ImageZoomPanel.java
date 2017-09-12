@@ -38,6 +38,7 @@ public class ImageZoomPanel extends JScrollPane {
 	protected ImagePanel panel = new ImagePanel();
 
 	protected double scale=1;
+	protected double transX=0,transY=0;
 
 	boolean checkEventDispatch = true;
 
@@ -162,19 +163,29 @@ public class ImageZoomPanel extends JScrollPane {
 			// render to a buffer first to improve performance. This is particularly evident when rendering
 			// lines for some reason
 
-			int w = getWidth(),h = getHeight();
+			int w = ImageZoomPanel.this.getWidth(),h = ImageZoomPanel.this.getHeight();
 			buffer = ConvertBufferedImage.checkDeclare(w,h,buffer,buffer.getType());
 			Graphics2D g2 = buffer.createGraphics();
 			g2.setColor(getBackground());
 			g2.fillRect(0,0,w,h);
-			AffineTransform tran = AffineTransform.getScaleInstance(scale, scale);
+
+			ImageZoomPanel.this.transX = -ImageZoomPanel.this.getHorizontalScrollBar().getValue();
+			ImageZoomPanel.this.transY = -ImageZoomPanel.this.getVerticalScrollBar().getValue();
+
+			AffineTransform tran = new AffineTransform(scale,0,0,scale,transX,transY);
 			synchronized ( ImageZoomPanel.this ) {
 				g2.drawImage(img, tran, null);
 			}
 
+			AffineTransform orig = g2.getTransform();
+			// make the default behavior be a translate for backwards compatibility. Before it was rendered in a
+			// buffered image it was rendered into the full scale panel
+			tran = new AffineTransform(1,0,0,1,transX,transY);
+			g2.setTransform(tran);
 			paintInPanel(tran, g2);
+			g2.setTransform(orig);
 
-			g.drawImage(buffer,0,0,null);
+			g.drawImage(buffer,(int)-transX,(int)-transY,null);
 		}
 	}
 
