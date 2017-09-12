@@ -91,19 +91,8 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 		BoofSwingUtil.invokeNowOrLater(new Runnable() {
 			@Override
 			public void run() {
-				int w = guiImage.getWidth();
-				int h = guiImage.getHeight();
-				if( w == 0 ) {
-					w = guiImage.getPreferredSize().width;
-					h = guiImage.getPreferredSize().height;
-				}
-
-				double scale = Math.max(width/(double)w,height/(double)h);
-				if( scale > 1.0 ) {
-					controls.setZoom(1.0/scale);
-				} else {
-					controls.setZoom(1.0);
-				}
+				double zoom = BoofSwingUtil.selectZoomToShowAll(guiImage,width,height);
+				controls.setZoom(zoom);
 				milliBinary = 0;
 			}
 		});
@@ -124,15 +113,15 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 		synchronized (this) {
 			long before = System.nanoTime();
 			inputToBinary.process((T)input, binary);
-//			long middle = System.nanoTime();
-//
-//			double a = (middle-before)*1e-6;
-//			if( milliBinary == 0 ) {
-//				milliBinary = a;
-//			} else {
-//				milliBinary = 0.95*milliBinary+0.05*a;
-//			}
-//			System.out.printf(" binary %7.2f ",milliBinary);
+			long middle = System.nanoTime();
+
+			double a = (middle-before)*1e-6;
+			if( milliBinary == 0 ) {
+				milliBinary = a;
+			} else {
+				milliBinary = 0.95*milliBinary+0.05*a;
+			}
+			System.out.printf(" binary %7.2f ",milliBinary);
 
 			detectorProcess((T)input, binary);
 			long after = System.nanoTime();

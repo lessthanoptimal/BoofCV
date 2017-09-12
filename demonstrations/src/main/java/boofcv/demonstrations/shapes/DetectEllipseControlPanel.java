@@ -67,7 +67,7 @@ public class DetectEllipseControlPanel extends DetectBlackShapePanel
 		imageView.addActionListener(this);
 		imageView.setMaximumSize(imageView.getPreferredSize());
 
-		selectZoom = new JSpinner(new SpinnerNumberModel(1,0.1,50,1));
+		selectZoom = new JSpinner(new SpinnerNumberModel(1,minZoom,maxZoom,1));
 		selectZoom.addChangeListener(this);
 		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 

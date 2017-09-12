@@ -34,9 +34,9 @@ import boofcv.demonstrations.feature.describe.VisualizeRegionDescriptionApp;
 import boofcv.demonstrations.feature.detect.edge.ShowEdgeContourApp;
 import boofcv.demonstrations.feature.detect.extract.CompareFeatureExtractorApp;
 import boofcv.demonstrations.feature.detect.intensity.IntensityFeaturePyramidApp;
+import boofcv.demonstrations.feature.detect.interest.DemoDetectPointFeaturesApp;
 import boofcv.demonstrations.feature.detect.interest.DetectPointScaleOriWithNoiseApp;
 import boofcv.demonstrations.feature.detect.interest.DetectPointsInsidePyramidApp;
-import boofcv.demonstrations.feature.detect.interest.DetectPointsWithNoiseApp;
 import boofcv.demonstrations.feature.detect.line.DetectLineApp;
 import boofcv.demonstrations.feature.detect.line.VisualizeHoughFoot;
 import boofcv.demonstrations.feature.detect.line.VisualizeHoughPolar;
@@ -44,6 +44,7 @@ import boofcv.demonstrations.feature.detect.line.VisualizeLineRansac;
 import boofcv.demonstrations.feature.disparity.VisualizeStereoDisparity;
 import boofcv.demonstrations.feature.flow.DenseFlowApp;
 import boofcv.demonstrations.feature.orientation.ShowFeatureOrientationApp;
+import boofcv.demonstrations.fiducial.DetectQrCodeApp;
 import boofcv.demonstrations.fiducial.FiducialTrackerApp;
 import boofcv.demonstrations.fiducial.VisualizeSquareBinaryFiducial;
 import boofcv.demonstrations.fiducial.VisualizeSquareFiducial;
@@ -129,7 +130,8 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				ShowEdgeContourApp.class,
 				CompareFeatureExtractorApp.class,
 				IntensityFeaturePyramidApp.class,
-				DetectPointsWithNoiseApp.class,
+				DemoDetectPointFeaturesApp.class,
+//				DetectPointsWithNoiseApp.class,
 				DetectPointScaleOriWithNoiseApp.class,
 				DetectPointsInsidePyramidApp.class,
 				DetectLineApp.class,
@@ -152,6 +154,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 
 		createNodes(root,"Fiducial / Markers",
 				FiducialTrackerApp.class,
+				DetectQrCodeApp.class,
 				VisualizeSquareBinaryFiducial.class,
 				VisualizeSquareFiducial.class);
 

@@ -94,4 +94,23 @@ public class BoofSwingUtil {
 		if( !SwingUtilities.isEventDispatchThread() )
 			throw new RuntimeException("Must be run in UI thread");
 	}
+
+	/**
+	 * Select a zoom which will allow the entire image to be shown in the panel
+	 */
+	public static double selectZoomToShowAll(JComponent panel , int width , int height ) {
+		int w = panel.getWidth();
+		int h = panel.getHeight();
+		if( w == 0 ) {
+			w = panel.getPreferredSize().width;
+			h = panel.getPreferredSize().height;
+		}
+
+		double scale = Math.max(width/(double)w,height/(double)h);
+		if( scale > 1.0 ) {
+			return 1.0/scale;
+		} else {
+			return 1.0;
+		}
+	}
 }

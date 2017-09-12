@@ -176,6 +176,10 @@ public class FactoryDetectPoint {
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createGeneral(GeneralFeatureIntensity<T, D> intensity,
 											   ConfigGeneralDetector config ) {
+		// create a copy since it's going to modify the detector config
+		ConfigGeneralDetector foo = new ConfigGeneralDetector();
+		foo.setTo(config);
+		config = foo;
 		config.ignoreBorder += config.radius;
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(config);
 		GeneralFeatureDetector<T, D> det = new GeneralFeatureDetector<>(intensity, extractor);
