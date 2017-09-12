@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class ContourTracer {
 
+	// Stops saving the contour when it meets or exceeds this value
+	private int maxContourSize=Integer.MAX_VALUE;
+
 	// which connectivity rule is being used. 4 and 8 supported
 	private ConnectRule rule;
 	private int ruleN;
@@ -275,10 +278,16 @@ public class ContourTracer {
 	 * Adds a point to the contour list
 	 */
 	private void add( int x , int y ) {
-		Point2D_I32 p = storagePoints.grow();
-		// compensate for the border added to binary image
-		p.set(x-1, y-1);
-		contour.add(p);
 		labeled.data[indexLabel] = label;
+		if( contour.size() < maxContourSize ) {
+			Point2D_I32 p = storagePoints.grow();
+			// compensate for the border added to binary image
+			p.set(x - 1, y - 1);
+			contour.add(p);
+		}
+	}
+
+	public void setMaxContourSize(int maxContourSize) {
+		this.maxContourSize = maxContourSize;
 	}
 }

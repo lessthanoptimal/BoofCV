@@ -22,6 +22,7 @@ import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.distort.RemovePerspectiveDistortion;
 import boofcv.alg.fiducial.calib.squares.SquareGraph;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
+import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
@@ -108,7 +109,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 * @param binary Thresholed version of gray image.
 	 */
 	public void process(T gray, GrayU8 binary ) {
-
+		configureContourDetector(gray);
 		recycleData();
 		positionPatterns.reset();
 		interpolate.setImage(gray);
@@ -119,6 +120,20 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 		// Create graph of neighboring squares
 		createPositionPatternGraph();
+	}
+
+	/**
+	 * Configures the contour detector based on the image size. Setting a maximum contour and turning off recording
+	 * of inner contours and improve speed and reduce the memory foot print significantly.
+	 */
+	private void configureContourDetector(T gray) {
+		// determine the maximum possible size of a position pattern
+		// contour size is maximum when viewed head one. Assume the smallest qrcode is 3x this width
+		// 4 side in a square
+		int maxContourSize = Math.min(gray.width,gray.height)*4/3;
+		LinearContourLabelChang2004 contourFinder = squareDetector.getDetector().getContourFinder();
+		contourFinder.setMaxContourSize(maxContourSize);
+		contourFinder.setSaveInternalContours(false);
 	}
 
 	protected void recycleData() {

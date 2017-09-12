@@ -42,6 +42,11 @@ import java.util.List;
  * ID starting from 1 up to the number of blobs.
  * </p>
  *
+ * <p>The maximum contour size says how many elements are allowed in a contour. if that number is exceeded
+ * by the external contour the external contour will be zeroed. Internal contours that exceed it will
+ * be discarded. Note that the all external and internal contours will still be traversed they will
+ * just not be recorded if too large.</p>
+ *
  * <p>
  * Internally, the input binary image is copied into another image which will have a 1 pixel border of all zeros
  * around it.  This ensures that boundary checks will not need to be done, speeding up the algorithm by about 25%.
@@ -55,6 +60,11 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class LinearContourLabelChang2004 {
+
+	// The maximum number of elements in a contour
+	private int maxContourSize = Integer.MAX_VALUE;
+	// If false it will not save internal contours as they are found
+	private boolean saveInternalContours = true;
 
 	// traces edge pixels
 	private ContourTracer tracer;
@@ -148,7 +158,14 @@ public class LinearContourLabelChang2004 {
 		Contour c = contours.grow();
 		c.reset();
 		c.id = contours.size();
+		tracer.setMaxContourSize(maxContourSize);
 		tracer.trace(contours.size(),x,y,true,c.external);
+
+		// release the unused contour
+		if( c.external.size() >= maxContourSize ) {
+			storagePoints.size -= c.external.size();
+			c.external.clear();
+		}
 	}
 
 	/**
@@ -163,8 +180,18 @@ public class LinearContourLabelChang2004 {
 		Contour c = contours.get(label-1);
 		List<Point2D_I32> inner = storageLists.grow();
 		inner.clear();
-		c.internal.add(inner);
+		tracer.setMaxContourSize(saveInternalContours?maxContourSize:0);
 		tracer.trace(label,x,y,false,inner);
+
+		// See if the inner contour exceeded the maximum size. If so free its points
+		if( inner.size() >= maxContourSize || inner.size() == 0 ) {
+			storagePoints.size -= inner.size();
+			storageLists.removeTail();
+			inner.clear();
+		}
+		// add the inner contour so that other algorithms know that it has X number of inner contours
+		c.internal.add(inner);
+
 	}
 
 	/**
@@ -176,4 +203,19 @@ public class LinearContourLabelChang2004 {
 			labeled.data[indexOut] = labeled.data[indexOut-1];
 	}
 
+	public int getMaxContourSize() {
+		return maxContourSize;
+	}
+
+	public void setMaxContourSize(int maxContourSize) {
+		this.maxContourSize = maxContourSize;
+	}
+
+	public boolean isSaveInternalContours() {
+		return saveInternalContours;
+	}
+
+	public void setSaveInternalContours(boolean saveInternalContours) {
+		this.saveInternalContours = saveInternalContours;
+	}
 }

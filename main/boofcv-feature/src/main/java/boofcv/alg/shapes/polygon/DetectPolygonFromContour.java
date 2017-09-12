@@ -632,6 +632,10 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		return foundInfo;
 	}
 
+	public LinearContourLabelChang2004 getContourFinder() {
+		return contourFinder;
+	}
+
 	public static class Info
 	{
 		/**

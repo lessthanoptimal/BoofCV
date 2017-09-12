@@ -45,10 +45,16 @@ Version : 0.28
   * Provides a way to specify the size of an object as based on input image size or an exact pixels
 - ImageZoomPanel
   * Draws to a buffer first which fixes a major problem on some JVM implementations have a very slow render
+- LinearContourLabelChang2004
+  * Added ability to stop recording contours which exceed a maximum size
+  * Added ability to not record internal contours
 
 Fiducials
 - Changes in polygon have affected performance. Mostly negative on blurred images.
   Ambiguous in other areas.
+- FiducialDetector.setLensDistortion() add width and height parameters
+  * Unit test with heavy lens distortion and see if it fixes it
+- Have square fiducials call init if lens distortion is set.
 
 Polygon Detector
 - Blurred images cause the biggest problems
