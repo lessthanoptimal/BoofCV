@@ -45,7 +45,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestQrCodeFinderPatternDetector {
+public class TestQrCodePositionPatternDetector {
 	@Test
 	public void easy() {
 		GrayF32 image = render(null,
@@ -59,7 +59,7 @@ public class TestQrCodeFinderPatternDetector {
 
 		alg.process(image,binary);
 
-		List<QrCodePositionPatternDetector.PositionSquare> list = alg.getPositionPatterns().toList();
+		List<PositionPatternNode> list = alg.getPositionPatterns().toList();
 		assertEquals(3,list.size());
 
 		checkNode(40+35,60+35,2,list);
@@ -68,10 +68,10 @@ public class TestQrCodeFinderPatternDetector {
 	}
 
 	private void checkNode( double cx , double cy , int numEdges ,
-							List<QrCodePositionPatternDetector.PositionSquare> list )
+							List<PositionPatternNode> list )
 	{
 		for (int i = 0; i < list.size(); i++) {
-			QrCodePositionPatternDetector.PositionSquare p = list.get(i);
+			PositionPatternNode p = list.get(i);
 			if( p.center.distance(cx,cy) < 3 ) {
 				assertEquals(numEdges,p.getNumberOfConnections());
 				return;

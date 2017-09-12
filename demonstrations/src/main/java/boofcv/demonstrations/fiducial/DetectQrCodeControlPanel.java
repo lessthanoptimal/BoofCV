@@ -20,10 +20,9 @@ package boofcv.demonstrations.fiducial;
 
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
+import boofcv.factory.fiducial.ConfigQrCode;
 import boofcv.factory.filter.binary.ThresholdType;
-import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
-import boofcv.struct.ConfigMinimumSize;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -80,15 +79,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 	JSpinner spinnerConvergeTol;
 	JSpinner spinnerMaxCornerChange;
 
-	ConfigPolygonDetector config = new ConfigPolygonDetector(4,4);
-
-	{
-		config.detector.clockwise = false;
-		config.detector.contourToPoly.splitFraction = 0.1;
-		config.detector.minimumContour = ConfigMinimumSize.byPixels(20);
-		config.detector.minimumEdgeIntensity = 15;
-		config.minimumRefineEdgeIntensity = 20;
-	}
+	ConfigQrCode config = new ConfigQrCode();
 
 	public DetectQrCodeControlPanel(DetectQrCodeApp owner) {
 		this.owner = owner;
@@ -124,46 +115,46 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		threshold = new ThresholdControlPanel(owner, ThresholdType.LOCAL_BLOCK_OTSU);
 		threshold.setRadius(40);
 
-		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(config.detector.minimumContour.pixels,
+		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(config.polygon.detector.minimumContour.pixels,
 				5,10000,2));
 		spinnerMinContourSize.setMaximumSize(spinnerMinContourSize.getPreferredSize());
 		spinnerMinContourSize.addChangeListener(this);
 
-		spinnerMinEdgeD = new JSpinner(new SpinnerNumberModel(config.detector.minimumEdgeIntensity,
+		spinnerMinEdgeD = new JSpinner(new SpinnerNumberModel(config.polygon.detector.minimumEdgeIntensity,
 				0.0,255.0,1.0));
 		spinnerMinEdgeD.setMaximumSize(spinnerMinEdgeD.getPreferredSize());
 		spinnerMinEdgeD.addChangeListener(this);
-		spinnerMinEdgeR = new JSpinner(new SpinnerNumberModel(config.minimumRefineEdgeIntensity,
+		spinnerMinEdgeR = new JSpinner(new SpinnerNumberModel(config.polygon.minimumRefineEdgeIntensity,
 				0.0,255.0,1.0));
 		spinnerMinEdgeR.setMaximumSize(spinnerMinEdgeR.getPreferredSize());
 		spinnerMinEdgeR.addChangeListener(this);
 
-		spinnerContourSplit = new JSpinner(new SpinnerNumberModel(config.detector.contourToPoly.splitFraction,
+		spinnerContourSplit = new JSpinner(new SpinnerNumberModel(config.polygon.detector.contourToPoly.splitFraction,
 				0.0,1.0,0.01));
 		configureSpinnerFloat(spinnerContourSplit);
-		spinnerContourMinSplit = new JSpinner(new SpinnerNumberModel(config.detector.contourToPoly.minimumSideFraction,
+		spinnerContourMinSplit = new JSpinner(new SpinnerNumberModel(config.polygon.detector.contourToPoly.minimumSideFraction,
 				0.0, 1.0, 0.001));
 		configureSpinnerFloat(spinnerContourMinSplit);
-		spinnerContourIterations = new JSpinner(new SpinnerNumberModel(config.detector.contourToPoly.iterations,
+		spinnerContourIterations = new JSpinner(new SpinnerNumberModel(config.polygon.detector.contourToPoly.iterations,
 				1, 200, 1));
 		spinnerContourIterations.setMaximumSize(spinnerContourIterations.getPreferredSize());
 		spinnerContourIterations.addChangeListener(this);
-		spinnerSplitPenalty = new JSpinner(new SpinnerNumberModel(config.detector.splitPenalty, 0.0, 100.0, 1.0));
+		spinnerSplitPenalty = new JSpinner(new SpinnerNumberModel(config.polygon.detector.splitPenalty, 0.0, 100.0, 1.0));
 		configureSpinnerFloat(spinnerSplitPenalty);
 
 		setBorder = new JCheckBox("Image Border");
 		setBorder.addActionListener(this);
-		setBorder.setSelected(config.detector.canTouchBorder);
+		setBorder.setSelected(config.polygon.detector.canTouchBorder);
 
 		setRefineContour = new JCheckBox("Refine Contour");
 		setRefineContour.addActionListener(this);
-		setRefineContour.setSelected(config.refineContour);
+		setRefineContour.setSelected(config.polygon.refineContour);
 		setRefineGray = new JCheckBox("Refine Gray");
 		setRefineGray.addActionListener(this);
-		setRefineGray.setSelected(config.refineGray != null);
+		setRefineGray.setSelected(config.polygon.refineGray != null);
 		setRemoveBias = new JCheckBox("Remove Bias");
 		setRemoveBias.addActionListener(this);
-		setRemoveBias.setSelected(config.adjustForThresholdBias);
+		setRemoveBias.setSelected(config.polygon.adjustForThresholdBias);
 		spinnerLineSamples = new JSpinner(new SpinnerNumberModel(refineGray.lineSamples, 5, 100, 1));
 		spinnerLineSamples.setMaximumSize(spinnerLineSamples.getPreferredSize());
 		spinnerLineSamples.addChangeListener(this);
@@ -239,16 +230,16 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 			bShowContour = showContour.isSelected();
 			owner.viewUpdated();
 		} else if( e.getSource() == setBorder ) {
-			config.detector.canTouchBorder = setBorder.isSelected();
+			config.polygon.detector.canTouchBorder = setBorder.isSelected();
 			owner.configUpdate();
 		} else if( e.getSource() == setRefineContour ) {
-			config.refineContour = setRefineContour.isSelected();
+			config.polygon.refineContour = setRefineContour.isSelected();
 			owner.configUpdate();
 		} else if( e.getSource() == setRefineGray ) {
 			bRefineGray = setRefineGray.isSelected();
 			owner.configUpdate();
 		} else if( e.getSource() == setRemoveBias ) {
-			config.adjustForThresholdBias = setRemoveBias.isSelected();
+			config.polygon.adjustForThresholdBias = setRemoveBias.isSelected();
 			owner.configUpdate();
 		}
 	}
@@ -256,23 +247,23 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		if( e.getSource() == spinnerMinEdgeD) {
-			config.detector.minimumEdgeIntensity = ((Number) spinnerMinEdgeD.getValue()).doubleValue();
+			config.polygon.detector.minimumEdgeIntensity = ((Number) spinnerMinEdgeD.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerMinEdgeR) {
-			config.minimumRefineEdgeIntensity = ((Number) spinnerMinEdgeR.getValue()).doubleValue();
+			config.polygon.minimumRefineEdgeIntensity = ((Number) spinnerMinEdgeR.getValue()).doubleValue();
 		} else if( e.getSource() == selectZoom ) {
 			zoom = ((Number) selectZoom.getValue()).doubleValue();
 			owner.viewUpdated();
 			return;
 		} else if( e.getSource() == spinnerMinContourSize ) {
-			config.detector.minimumContour.pixels = ((Number) spinnerMinContourSize.getValue()).intValue();
+			config.polygon.detector.minimumContour.pixels = ((Number) spinnerMinContourSize.getValue()).intValue();
 		} else if( e.getSource() == spinnerContourSplit ) {
-			config.detector.contourToPoly.splitFraction = ((Number) spinnerContourSplit.getValue()).doubleValue();
+			config.polygon.detector.contourToPoly.splitFraction = ((Number) spinnerContourSplit.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourMinSplit ) {
-			config.detector.contourToPoly.minimumSideFraction = ((Number) spinnerContourMinSplit.getValue()).doubleValue();
+			config.polygon.detector.contourToPoly.minimumSideFraction = ((Number) spinnerContourMinSplit.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourIterations ) {
-			config.detector.contourToPoly.iterations = ((Number) spinnerContourIterations.getValue()).intValue();
+			config.polygon.detector.contourToPoly.iterations = ((Number) spinnerContourIterations.getValue()).intValue();
 		} else if( e.getSource() == spinnerSplitPenalty ) {
-			config.detector.splitPenalty = ((Number) spinnerSplitPenalty.getValue()).doubleValue();
+			config.polygon.detector.splitPenalty = ((Number) spinnerSplitPenalty.getValue()).doubleValue();
 		} else if (e.getSource() == spinnerLineSamples) {
 			refineGray.lineSamples = ((Number) spinnerLineSamples.getValue()).intValue();
 		} else if (e.getSource() == spinnerCornerOffset) {
@@ -293,7 +284,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		return threshold;
 	}
 
-	public ConfigPolygonDetector getConfigPolygon() {
+	public ConfigQrCode getConfigPolygon() {
 		return config;
 	}
 }

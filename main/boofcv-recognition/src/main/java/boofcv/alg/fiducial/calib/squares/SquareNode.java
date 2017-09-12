@@ -113,11 +113,18 @@ public class SquareNode {
 	}
 
 	public SquareEdge findEdge( SquareNode target ) {
+		int index = findEdgeIndex(target);
+		if( index >= 0 )
+			return edges[index];
+		return null;
+	}
+
+	public int findEdgeIndex( SquareNode target ) {
 		for (int i = 0; i < 4; i++) {
 			if( edges[i] != null && edges[i].isEndPoint(target) ) {
-				return edges[i];
+				return i;
 			}
 		}
-		return null;
+		return -1;
 	}
 }

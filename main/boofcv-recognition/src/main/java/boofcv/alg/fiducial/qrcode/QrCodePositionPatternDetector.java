@@ -57,13 +57,13 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	// Detects squares inside the image
 	DetectPolygonBinaryGrayRefine<T> squareDetector;
 
-	FastQueue<PositionSquare> positionPatterns = new FastQueue<>(PositionSquare.class,true);
+	FastQueue<PositionPatternNode> positionPatterns = new FastQueue<>(PositionPatternNode.class,true);
 	SquareGraph graph = new SquareGraph();
 
 	// Nearst Neighbor Search related variables
-	private NearestNeighbor<PositionSquare> search = FactoryNearestNeighbor.kdtree();
+	private NearestNeighbor<PositionPatternNode> search = FactoryNearestNeighbor.kdtree();
 	private FastQueue<double[]> searchPoints;
-	private FastQueue<NnData<PositionSquare>> searchResults = new FastQueue(NnData.class,true);
+	private FastQueue<NnData<PositionPatternNode>> searchResults = new FastQueue(NnData.class,true);
 
 	// Computes a mapping to remove perspective distortion
 	private RemovePerspectiveDistortion<?> removePerspective = new RemovePerspectiveDistortion(70,70);
@@ -134,7 +134,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Takes the detected squares and turns it into a list of {@link PositionSquare}.
+	 * Takes the detected squares and turns it into a list of {@link PositionPatternNode}.
 	 */
 	private void squaresToPositionList() {
 		this.positionPatterns.reset();
@@ -154,7 +154,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 			// refine the edge estimate
 			squareDetector.refine(info);
 
-			PositionSquare pp = this.positionPatterns.grow();
+			PositionPatternNode pp = this.positionPatterns.grow();
 			pp.reset();
 			pp.square = info.polygon;
 			pp.grayThreshold = grayThreshold;
@@ -171,7 +171,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		// Add items to NN search
 		searchPoints.resize(positionPatterns.size());
 		for (int i = 0; i < positionPatterns.size(); i++) {
-			PositionSquare f = positionPatterns.get(i);
+			PositionPatternNode f = positionPatterns.get(i);
 			double[] p = searchPoints.get(i);
 			p[0] = f.center.x;
 			p[1] = f.center.y;
@@ -180,7 +180,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 		double point[] = new double[2]; // TODO remove
 		for (int i = 0; i < positionPatterns.size(); i++) {
-			PositionSquare f = positionPatterns.get(i);
+			PositionPatternNode f = positionPatterns.get(i);
 
 			// The QR code version specifies the number of "modules"/blocks across the marker is
 			// A position pattern is 7 blocks. A version 1 qr code is 21 blocks. Each version past one increments
@@ -197,7 +197,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 			if( searchResults.size > 1) {
 				for (int j = 0; j < searchResults.size; j++) {
-					NnData<PositionSquare> r = searchResults.get(j);
+					NnData<PositionPatternNode> r = searchResults.get(j);
 
 					if( r.data == f ) continue; // skip over if it's the square that initiated the search
 
@@ -306,27 +306,10 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Information for position patterns. These are squares. One outer shape that is 1 block think, inner white
-	 * space 1 block think, then the stone which is 3 blocks think. Total of 7 blocks.
-	 */
-	public static class PositionSquare extends SquareNode {
-
-		// threshold for binary classification.
-		public double grayThreshold;
-
-		@Override
-		public void reset()
-		{
-			super.reset();
-			grayThreshold = -1;
-		}
-	}
-
-	/**
 	 * Returns a list of all the detected position pattern squares and the other PP that they are connected to.
 	 * @return List of PP
 	 */
-	public FastQueue<PositionSquare> getPositionPatterns() {
+	public FastQueue<PositionPatternNode> getPositionPatterns() {
 		return positionPatterns;
 	}
 
