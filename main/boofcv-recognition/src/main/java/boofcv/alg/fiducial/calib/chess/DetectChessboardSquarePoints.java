@@ -156,9 +156,9 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	 */
 	private void configureContourDetector(T gray) {
 		// determine the maximum possible size of a square when viewed head on
-		int maxContourSize = Math.min(gray.width,gray.height)/Math.max(numCols,numRows);
+		int maxContourSize = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
 		LinearContourLabelChang2004 contourFinder = detectorSquare.getDetector().getContourFinder();
-		contourFinder.setMaxContourSize(maxContourSize);
+		contourFinder.setMaxContourSize(maxContourSize*4);
 		contourFinder.setSaveInternalContours(false);
 	}
 
