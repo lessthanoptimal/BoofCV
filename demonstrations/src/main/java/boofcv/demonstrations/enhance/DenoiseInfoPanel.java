@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.demonstrations.denoise;
+package boofcv.demonstrations.enhance;
 
 import boofcv.gui.StandardAlgConfigPanel;
 

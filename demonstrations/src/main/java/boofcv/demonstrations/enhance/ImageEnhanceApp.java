@@ -52,6 +52,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
+// TODO Add wavelet denoising
 public class ImageEnhanceApp extends DemonstrationBase2 {
 
 	public static String HISTOGRAM_GLOBAL = "Histogram Global";

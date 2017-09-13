@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.demonstrations.denoise;
+package boofcv.demonstrations.enhance;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.Performer;
@@ -28,7 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-import static boofcv.demonstrations.denoise.DenoiseAccuracyStudyApp.TestItem;
+import static boofcv.demonstrations.enhance.DenoiseAccuracyStudyApp.TestItem;
 
 
 /**

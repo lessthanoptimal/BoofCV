@@ -25,6 +25,7 @@ import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
 
 /**
+ * Quick Response (QR) Code detector.
  * TODO Comment
  *
  * @author Peter Abeles
