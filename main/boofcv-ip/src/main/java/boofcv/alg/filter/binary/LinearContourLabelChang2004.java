@@ -186,9 +186,8 @@ public class LinearContourLabelChang2004 {
 		tracer.trace(label,x,y,false,inner);
 
 		// See if the inner contour exceeded the maximum size. If so free its points
-		if( inner.size() >= maxContourSize || inner.size() == 0 ) {
+		if( inner.size() >= maxContourSize ) {
 			storagePoints.size -= inner.size();
-			storageLists.removeTail();
 			inner.clear();
 		}
 		// add the inner contour so that other algorithms know that it has X number of inner contours
