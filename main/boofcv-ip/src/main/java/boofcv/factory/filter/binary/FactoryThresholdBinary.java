@@ -121,8 +121,8 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> localBlockOtsu(int regionWidth , double scale, boolean down, Class<T> inputType) {
-		return new LocalBlockOtsuBinaryFilter<>(regionWidth, scale, down, ImageType.single(inputType));
+	InputToBinary<T> localBlockOtsu(int regionWidth , double tuning, boolean down, Class<T> inputType) {
+		return new LocalBlockOtsuBinaryFilter<>(regionWidth, tuning, down, ImageType.single(inputType));
 	}
 
 	/**
@@ -203,8 +203,10 @@ public class FactoryThresholdBinary {
 			case LOCAL_BLOCK_MEAN:
 				return localBlockMean(config.radius * 2 + 1, config.scale , config.down, inputType);
 
-			case LOCAL_BLOCK_OTSU:
-				return localBlockOtsu(config.radius * 2 + 1, config.scale, config.down, inputType);
+			case LOCAL_BLOCK_OTSU: {
+				ConfigThresholdBlockOtsu c = (ConfigThresholdBlockOtsu) config;
+				return localBlockOtsu(config.radius * 2 + 1, c.tuning, config.down, inputType);
+			}
 
 		}
 		throw new IllegalArgumentException("Unknown type "+config.type);

@@ -40,7 +40,7 @@ public class LocalBlockOtsuBinaryFilter<T extends ImageGray<T>> implements Input
 	/**
 	 * @see ThresholdBlockOtsu
 	 */
-	public LocalBlockOtsuBinaryFilter(int requestedBlockWidth, double scale, boolean down,
+	public LocalBlockOtsuBinaryFilter(int requestedBlockWidth, double tuning, boolean down,
 									  ImageType<T> inputType) {
 
 		this.inputType = inputType;
@@ -49,7 +49,7 @@ public class LocalBlockOtsuBinaryFilter<T extends ImageGray<T>> implements Input
 			input = new GrayU8(1,1);
 		}
 
-		alg = new ThresholdBlockOtsu(requestedBlockWidth,scale,down);
+		alg = new ThresholdBlockOtsu(requestedBlockWidth,tuning,down);
 	}
 
 	@Override

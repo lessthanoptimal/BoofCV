@@ -16,21 +16,27 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.binary;
+package boofcv.alg.misc;
 
-import boofcv.alg.filter.binary.impl.GenericThresholdCommon;
-import boofcv.struct.image.GrayU8;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestThresholdBlockOtsu extends GenericThresholdCommon<GrayU8> {
-	public TestThresholdBlockOtsu() {
-		super(GrayU8.class);
+public class TestHistogramStatistics {
+	@Test
+	public void variance() {
+		fail("implement");
+	}
+	@Test
+	public void countValues() {
+		fail("implement");
 	}
 
-	@Override
-	public ThresholdBlockCommon<GrayU8, ?> createAlg(int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdBlockOtsu(requestedBlockWidth, 0, down);
+	@Test
+	public void mean() {
+		fail("implement");
 	}
 }

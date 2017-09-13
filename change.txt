@@ -48,6 +48,8 @@ Version : 0.28
 - LinearContourLabelChang2004
   * Added ability to stop recording contours which exceed a maximum size
   * Added ability to not record internal contours
+- Added HistogramStatistics
+  * Thanks Marius Orfgen for the idea and code
 
 Fiducials
 - Changes in polygon have affected performance. Mostly negative on blurred images.
@@ -86,7 +88,6 @@ TOP ITEMS
 - TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
         It is a homogenous coordinate with z=1 being implicit.
         Found papers that use "normalized coordinates"!
-- TODO Integrate in Marius Orfgen's image statistics histogram ideas
 - TODO QR Code support
 - TODO Add calibration circle regular to FiducialTrackerApp
 

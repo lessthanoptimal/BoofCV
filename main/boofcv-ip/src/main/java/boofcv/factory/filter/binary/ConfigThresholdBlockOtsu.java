@@ -16,21 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.binary;
-
-import boofcv.alg.filter.binary.impl.GenericThresholdCommon;
-import boofcv.struct.image.GrayU8;
+package boofcv.factory.filter.binary;
 
 /**
+ * Configuration for all threshold types.
+ *
  * @author Peter Abeles
  */
-public class TestThresholdBlockOtsu extends GenericThresholdCommon<GrayU8> {
-	public TestThresholdBlockOtsu() {
-		super(GrayU8.class);
-	}
+public class ConfigThresholdBlockOtsu extends ConfigThreshold {
 
-	@Override
-	public ThresholdBlockCommon<GrayU8, ?> createAlg(int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdBlockOtsu(requestedBlockWidth, 0, down);
-	}
+	/**
+	 * Tuning parameter that will make it harder for pixels to be marked in low texture regions.
+	 * 0 = regular Otsu. Try 15 when tuning.
+	 *
+	 * @see boofcv.alg.filter.binary.ThresholdBlockOtsu
+	 */
+	public double tuning=0;
 }
