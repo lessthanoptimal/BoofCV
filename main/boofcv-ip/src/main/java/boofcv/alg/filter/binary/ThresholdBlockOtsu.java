@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.alg.misc.HistogramStatistics;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.InterleavedS32;
@@ -28,6 +29,9 @@ import java.util.Arrays;
  * Block Otsu threshold implementation based on {@link ThresholdBlockCommon}. Computes a histogram in non-overlapping
  * square regions. Then thresholds a single region by combining histograms from its neighbors.
  *
+ * This implementation includes a modification from the traditional Otsu algorithm. The threshold can optionally
+ * be adjusted in low variance regions. See code for details.
+ *
  * @see GThresholdImageOps#computeOtsu(ImageGray, int, int)
  *
  * @author Peter Abeles
@@ -36,16 +40,24 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 
 	int histogram[] = new int[256];
 	boolean down;
-	double scale;
+	/**
+	 * Tuning parameter that tweaks the otsu value depending on local variance.
+	 */
+	double tuning;
+
+	int threshold;
+	int maxValue;
+	double variance;
 	/**
 	 * Configures the detector
 	 *
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
+	 * @param tuning Tuning parameter. 0 = standard Otsu. Greater than 0 will penalize zero texture.
 	 */
-	public ThresholdBlockOtsu(int requestedBlockWidth, double scale, boolean down ) {
+	public ThresholdBlockOtsu(int requestedBlockWidth, double tuning, boolean down ) {
 		super(requestedBlockWidth);
 		this.down = down;
-		this.scale = scale;
+		this.tuning = tuning;
 		stats = new InterleavedS32(1,1,256);
 	}
 
@@ -102,10 +114,16 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 		}
 
 		// compute threshold
-		int threshold = GThresholdImageOps.computeOtsu(histogram,256,total);
+		computeOtsu(histogram,256,total);
 
-		threshold = (int)(threshold*scale+0.5);
+		double high = HistogramStatistics.percentile(histogram,0.95,256);
 
+		// apply optional penalty to low texture regions
+		variance += 0.001; // avoid divide by zero
+		// multiply by high twice in an effort to have the image's scaling not effect the tuning parameter
+		int adjustment =  (int)(tuning*high*tuning*high/variance+0.5);
+		threshold += down ? -adjustment : adjustment;
+		threshold = Math.max(threshold,0);
 
 		for (int y = y0; y < y1; y++) {
 			int indexInput = input.startIndex + y*input.stride + x0;
@@ -116,5 +134,43 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 						(byte)1 : 0;
 			}
 		}
+	}
+
+	public void computeOtsu( int histogram[] , int length , int totalPixels ) {
+
+		double dlength = length;
+		double sum = 0;
+		for (int i=0 ; i< length ; i++)
+			sum += (i/dlength)*histogram[i];
+
+		double sumB = 0;
+		int wB = 0;
+
+		variance = 0;
+		threshold = 0;
+
+		int i;
+		for (i=0 ; i<length ; i++) {
+			wB += histogram[i];               // Weight Background
+			if (wB == 0) continue;
+
+			int wF = totalPixels - wB;         // Weight Foreground
+			if (wF == 0) break;
+
+			sumB += (i/dlength)*histogram[i];
+
+			double mB = sumB / wB;            // Mean Background
+			double mF = (sum - sumB) / wF;    // Mean Foreground
+
+			// Calculate Between Class Variance
+			double varBetween = (double)wB*(double)wF*(mB - mF)*(mB - mF);
+
+			// Check if new maximum found
+			if (varBetween > variance) {
+				variance = varBetween;
+				threshold = i;
+			}
+		}
+		maxValue = i;
 	}
 }

@@ -398,14 +398,14 @@ public class GThresholdImageOps {
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
 	 * @param radius Radius of square region.
-	 * @param scale Scale factor used to adjust threshold
+	 * @param tuning Tuning parameter. 0 = regular Otsu
 	 * @param down Should it threshold up or down.
 	 * @return Binary image
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localBlockOtsu(T input, GrayU8 output, int radius, double scale , boolean down)
+	GrayU8 localBlockOtsu(T input, GrayU8 output, int radius, double tuning , boolean down)
 	{
-		LocalBlockOtsuBinaryFilter<T> alg = new LocalBlockOtsuBinaryFilter<>(radius * 2 + 1, scale, down,
+		LocalBlockOtsuBinaryFilter<T> alg = new LocalBlockOtsuBinaryFilter<>(radius * 2 + 1, tuning, down,
 				input.getImageType());
 
 		if( output == null )

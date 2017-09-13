@@ -41,11 +41,11 @@ public class TestLocalBlockOtsuBinaryFilter {
 
 		GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-		ThresholdBlockOtsu compare = new ThresholdBlockOtsu(9,0.95,true);
+		ThresholdBlockOtsu compare = new ThresholdBlockOtsu(9,0,true);
 		compare.process(input,expected);
 
 		LocalBlockOtsuBinaryFilter<GrayU8> alg =
-				new LocalBlockOtsuBinaryFilter<>(9,0.95,true, ImageType.single(GrayU8.class));
+				new LocalBlockOtsuBinaryFilter<>(9,0,true, ImageType.single(GrayU8.class));
 		alg.process(input,found);
 
 		BoofTesting.assertEquals(found, expected, 0);

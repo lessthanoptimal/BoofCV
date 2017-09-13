@@ -82,12 +82,26 @@ public class HistogramStatistics {
 		return mean(histogram, count(histogram,N),N);
 	}
 
-	public static double mean(int[] histogram, int numValues, int N) {
+	public static double mean(int[] histogram, int counts, int N) {
 		double sum = 0.0;
 		for(int i=0;i<N;i++) {
 			sum += (histogram[i]*i);
 		}
 
-		return sum/numValues;
+		return sum/counts;
+	}
+
+	public static int percentile(int[] histogram, double fraction , int N) {
+		return percentile(histogram, count(histogram,N),fraction,N);
+	}
+	public static int percentile(int[] histogram, int counts, double fraction , int N) {
+		int target = (int)(counts*fraction+0.5);
+		int count = 0;
+		int i;
+		for(i=0;i<N && count < target;i++) {
+			count += histogram[i];
+		}
+
+		return i;
 	}
 }

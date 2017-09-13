@@ -70,7 +70,6 @@ public class ConfigThreshold implements Configuration {
 	 */
 	public int maxPixelValue = 255;
 
-
 	public static ConfigThreshold fixed( double value ) {
 		ConfigThreshold config = new ConfigThreshold();
 		config.type = ThresholdType.FIXED;
