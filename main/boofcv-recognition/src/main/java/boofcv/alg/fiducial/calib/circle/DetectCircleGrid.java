@@ -37,7 +37,7 @@ import java.util.List;
  */
 public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 
-	private BinaryEllipseDetector<T> ellipseDetector;
+	protected BinaryEllipseDetector<T> ellipseDetector;
 	private InputToBinary<T> inputToBinary;
 
 	private GrayU8 binary = new GrayU8(1,1);
@@ -92,6 +92,7 @@ public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 	public void process(T gray) {
 		if( verbose) System.out.println("ENTER DetectAsymmetricCircleGrid.process()");
 
+		configureContourDetector(gray);
 		this.binary.reshape(gray.width,gray.height);
 
 		inputToBinary.process(gray, binary);
@@ -132,6 +133,12 @@ public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 
 		if( verbose) System.out.println("EXIT DetectAsymmetricCircleGrid.process()");
 	}
+
+	/**
+	 * Configures the contour detector based on the image size. Setting a maximum contour and turning off recording
+	 * of inner contours and improve speed and reduce the memory foot print significantly.
+	 */
+	protected abstract void configureContourDetector(T gray );
 
 	/**
 	 * Computes the number of ellipses on the grid
