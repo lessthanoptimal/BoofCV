@@ -102,49 +102,6 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		add(BorderLayout.CENTER, imagePanel);
 	}
 
-	private void createHarris() {
-		controls.configExtract.detectMinimums = false;
-		controls.adjustControls(true,false);
-		changeDetector(FactoryDetectPoint.createHarris(controls.configExtract, controls.weighted, derivClass));
-	}
-	private void createShiTomasi() {
-		controls.configExtract.detectMinimums = false;
-		controls.adjustControls(true,false);
-		changeDetector(FactoryDetectPoint.createShiTomasi(controls.configExtract, controls.weighted, derivClass));
-	}
-	private void createFast() {
-		controls.configExtract.detectMinimums = false;
-		controls.adjustControls(false,true);
-		changeDetector(FactoryDetectPoint.createFast(
-				new ConfigFast(controls.fastPixelTol,9),controls.configExtract, imageClass));
-	}
-	private void createKitRos() {
-		controls.configExtract.detectMinimums = false;
-		controls.adjustControls(false,false);
-		changeDetector(FactoryDetectPoint.createKitRos(controls.configExtract, derivClass));
-	}
-	private void createMedian() {
-		controls.configExtract.detectMinimums = false;
-		controls.adjustControls(false,false);
-		changeDetector(FactoryDetectPoint.createMedian(controls.configExtract, imageClass));
-	}
-	private void createHessian() {
-		controls.configExtract.detectMinimums = false;
-		controls.adjustControls(false,false);
-		changeDetector(FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT,
-				controls.configExtract, derivClass));
-	}
-	private void createLaplace() {
-		controls.configExtract.detectMinimums = true;
-		controls.adjustControls(false,false);
-		changeDetector(FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE,
-				controls.configExtract, derivClass));
-	}
-
-	private void changeDetector(GeneralFeatureDetector fd) {
-		detector = new EasyGeneralFeatureDetector<>(fd, imageClass, derivClass);
-	}
-
 	@Override
 	protected void handleInputChange(int source, InputMethod method, final int width, final int height) {
 		super.handleInputChange(source, method, width, height);
@@ -234,7 +191,6 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	}
 
 	class ControlPanel extends StandardAlgConfigPanel implements ChangeListener {
-
 
 		protected JLabel processingTimeLabel = new JLabel();
 
@@ -371,6 +327,50 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 			handleSettingsChanged();
 		}
 	}
+
+	private void createHarris() {
+		controls.configExtract.detectMinimums = false;
+		controls.adjustControls(true,false);
+		changeDetector(FactoryDetectPoint.createHarris(controls.configExtract, controls.weighted, derivClass));
+	}
+	private void createShiTomasi() {
+		controls.configExtract.detectMinimums = false;
+		controls.adjustControls(true,false);
+		changeDetector(FactoryDetectPoint.createShiTomasi(controls.configExtract, controls.weighted, derivClass));
+	}
+	private void createFast() {
+		controls.configExtract.detectMinimums = false;
+		controls.adjustControls(false,true);
+		changeDetector(FactoryDetectPoint.createFast(
+				new ConfigFast(controls.fastPixelTol,9),controls.configExtract, imageClass));
+	}
+	private void createKitRos() {
+		controls.configExtract.detectMinimums = false;
+		controls.adjustControls(false,false);
+		changeDetector(FactoryDetectPoint.createKitRos(controls.configExtract, derivClass));
+	}
+	private void createMedian() {
+		controls.configExtract.detectMinimums = false;
+		controls.adjustControls(false,false);
+		changeDetector(FactoryDetectPoint.createMedian(controls.configExtract, imageClass));
+	}
+	private void createHessian() {
+		controls.configExtract.detectMinimums = false;
+		controls.adjustControls(false,false);
+		changeDetector(FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT,
+				controls.configExtract, derivClass));
+	}
+	private void createLaplace() {
+		controls.configExtract.detectMinimums = true;
+		controls.adjustControls(false,false);
+		changeDetector(FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE,
+				controls.configExtract, derivClass));
+	}
+
+	private void changeDetector(GeneralFeatureDetector fd) {
+		detector = new EasyGeneralFeatureDetector<>(fd, imageClass, derivClass);
+	}
+
 
 	public static void main(String[] args) {
 		List<String> examples = new ArrayList<>();

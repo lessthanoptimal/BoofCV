@@ -20,166 +20,263 @@ package boofcv.demonstrations.enhance;
 
 import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.gui.SelectAlgorithmAndInputPanel;
-import boofcv.gui.image.ImagePanel;
+import boofcv.gui.BoofSwingUtil;
+import boofcv.gui.DemonstrationBase2;
+import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.PathLabel;
-import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
+import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
+import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 
 /**
  * Displays various image enhancement filters
  *
  * @author Peter Abeles
  */
-public class ImageEnhanceApp
-		extends SelectAlgorithmAndInputPanel implements ChangeListener
-{
-	// displays intensity image
-	ImagePanel gui;
+public class ImageEnhanceApp extends DemonstrationBase2 {
 
-	// converted input image
-	GrayU8 input;
-	GrayU8 enhanced = new GrayU8(1,1);
-	// if it has processed an image or not
-	boolean processImage = false;
+	public static String HISTOGRAM_GLOBAL = "Histogram Global";
+	public static String HISTOGRAM_LOCAL = "Histogram Local";
+	public static String SHARPEN_4 = "Sharpen-4";
+	public static String SHARPEN_8 = "Sharpen-8";
 
-	BufferedImage output;
+	ImageZoomPanel imagePanel = new ImageZoomPanel();
+	ControlPanel controls = new ControlPanel();
 
 	// storage for histogram
 	int histogram[] = new int[256];
 	int transform[] = new int[256];
 
-	// used to specify size of local region
-	JSpinner selectRadius;
+	GrayU8 enhanced = new GrayU8(1,1);
 
-	int radius = 50;
+	BufferedImage output = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
 
-	int previousActive=-1;
+	public ImageEnhanceApp(List<?> exampleInputs ) {
+		super(exampleInputs, ImageType.single(GrayU8.class));
 
-	public ImageEnhanceApp() {
-		super(1);
+		imagePanel.setPreferredSize(new Dimension(800,800));
+		imagePanel.addMouseWheelListener(new MouseAdapter() {
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
 
-		addAlgorithm(0, "Histogram Global", 0);
-		addAlgorithm(0, "Histogram Local", 1);
-		addAlgorithm(0, "Sharpen-4",2);
-		addAlgorithm(0, "Sharpen-8",3);
+				double curr = ImageEnhanceApp.this.controls.zoom;
 
-		selectRadius = new JSpinner(new SpinnerNumberModel(radius,10,100,10));
-		selectRadius.addChangeListener(this);
+				if( e.getWheelRotation() > 0 )
+					curr *= 1.1;
+				else
+					curr /= 1.1;
+				controls.setZoom(curr);
+			}
+		});
 
-		gui = new ImagePanel();
-		setMainGUI(gui);
+		imagePanel.requestFocus();
+
+		add(BorderLayout.WEST, controls);
+		add(BorderLayout.CENTER, imagePanel);
 	}
 
 	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if( input == null )
-			return;
+	protected void handleInputChange(int source, InputMethod method, final int width, final int height) {
+		super.handleInputChange(source, method, width, height);
 
-		int active = (Integer)cookie;
-		if( active == 0 ) {
-			ImageStatistics.histogram(input,0,histogram);
-			EnhanceImageOps.equalize(histogram, transform);
-			EnhanceImageOps.applyTransform(input, transform, enhanced);
-		} else if( active == 1 ) {
-			EnhanceImageOps.equalizeLocal(input, radius, enhanced, histogram, transform);
-		} else if( active == 2 ) {
-			EnhanceImageOps.sharpen4(input, enhanced);
-		} else if( active == 3 ) {
-			EnhanceImageOps.sharpen8(input, enhanced);
-		}
+		enhanced.reshape(width, height);
+		output = ConvertBufferedImage.checkDeclare(width,height,output,output.getType());
 
-		if( previousActive != active ) {
-			if( active == 1 ) {
-				addToToolbar(selectRadius);
-			} else {
-				removeFromToolbar(selectRadius);
-			}
-			previousActive = active;
-		}
-
-		ConvertBufferedImage.convertTo(enhanced, output);
-
-		SwingUtilities.invokeLater(new Runnable() {
+		BoofSwingUtil.invokeNowOrLater(new Runnable() {
 			@Override
 			public void run() {
-				gui.setImage(output);
-				gui.repaint();
-				gui.requestFocusInWindow();
+				double zoom = BoofSwingUtil.selectZoomToShowAll(imagePanel,width,height);
+				controls.setZoom(zoom);
+				imagePanel.getVerticalScrollBar().setValue(0);
+				imagePanel.getHorizontalScrollBar().setValue(0);
 			}
 		});
 	}
 
-	public void process( final BufferedImage input ) {
-		setInputImage(input);
-		this.input = ConvertBufferedImage.convertFromSingle(input, this.input, GrayU8.class);
-		this.enhanced = new GrayU8(input.getWidth(),input.getHeight());
-		this.output = new BufferedImage( input.getWidth(), input.getHeight(), BufferedImage.TYPE_INT_RGB);
+	@Override
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase _input) {
+		GrayU8 input = (GrayU8)_input;
 
-		// over write input image so that it's gray scale
-		ConvertBufferedImage.convertTo(this.input,input);
+		if( controls.showInput ) {
+			output.createGraphics().drawImage(buffered,0,0,null);
+		} else {
+			long before = System.nanoTime();
+			if( controls.activeAlgorithm.equals(HISTOGRAM_GLOBAL)) {
+				ImageStatistics.histogram(input,0,histogram);
+				EnhanceImageOps.equalize(histogram, transform);
+				EnhanceImageOps.applyTransform(input, transform, enhanced);
+			} else if( controls.activeAlgorithm.equals(HISTOGRAM_LOCAL)) {
+				EnhanceImageOps.equalizeLocal(input, controls.radius, enhanced, histogram, transform);
+			} else if( controls.activeAlgorithm.equals(SHARPEN_4)) {
+				EnhanceImageOps.sharpen4(input, enhanced);
+			} else if( controls.activeAlgorithm.equals(SHARPEN_8)) {
+				EnhanceImageOps.sharpen8(input, enhanced);
+			}
+			long after = System.nanoTime();
+
+			controls.setProcessingTime((after-before)*1e-9);
+
+			ConvertBufferedImage.convertTo(enhanced, output);
+		}
 
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
-				setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
-				processImage = true;
-			}});
-		doRefreshAll();
+				imagePanel.setBufferedImage(output);
+				imagePanel.repaint();
+			}
+		});
 	}
 
-	@Override
-	public void loadConfigurationFile(String fileName) {}
-
-	@Override
-	public void refreshAll(Object[] cookies) {
-		setActiveAlgorithm(0,null,cookies[0]);
+	protected void handleVisualsUpdate() {
+		imagePanel.setScale(controls.zoom);
+		imagePanel.repaint();
 	}
 
-	@Override
-	public void changeInput(String name, int index) {
-		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
-
-		if( image != null ) {
-			process(image);
+	protected void handleSettingsChanged() {
+		if( inputMethod == InputMethod.IMAGE ) {
+			reprocessInput();
 		}
 	}
 
-	@Override
-	public boolean getHasProcessedImage() {
-		return processImage;
-	}
+	class ControlPanel extends StandardAlgConfigPanel implements ChangeListener {
+		protected JLabel processingTimeLabel = new JLabel();
 
-	public static void main( String args[] ) {
+		Vector comboBoxItems = new Vector();
+		JComboBox comboAlgorithms = new JComboBox();
+		List<Runnable> comboRunnable = new ArrayList<>();
 
-		ImageEnhanceApp app = new ImageEnhanceApp();
+		protected JSpinner selectZoom;
+		JSpinner spinnerRadius;
+		JCheckBox checkShowInput = new JCheckBox("Show Input");
 
-		java.util.List<PathLabel> inputs = new ArrayList<>();
+		String activeAlgorithm;
+		protected double zoom = 1;
+		protected int radius = 50;
+		protected boolean showInput=false;
 
-		inputs.add(new PathLabel("dark", UtilIO.pathExample("enhance/dark.jpg")));
-		inputs.add(new PathLabel("dull",UtilIO.pathExample("enhance/dull.jpg")));
+		public ControlPanel() {
+			final DefaultComboBoxModel model = new DefaultComboBoxModel(comboBoxItems);
+			comboAlgorithms = new JComboBox(model);
+			comboAlgorithms.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent actionEvent) {
+					int selectedAlgorithm = comboAlgorithms.getSelectedIndex();
+					activeAlgorithm = (String)comboAlgorithms.getModel().getSelectedItem();
+					comboRunnable.get(selectedAlgorithm).run();
+					handleSettingsChanged();
+				}
+			});
 
-		app.setInputList(inputs);
+			selectZoom = new JSpinner(new SpinnerNumberModel(zoom,MIN_ZOOM,MAX_ZOOM,1));
+			selectZoom.addChangeListener(this);
+			selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
-		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
+			checkShowInput.setSelected(showInput);
+			checkShowInput.setMaximumSize(checkShowInput.getPreferredSize());
+			checkShowInput.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					showInput = checkShowInput.isSelected();
+					handleSettingsChanged(); // doesn't need to reprocess but easiest way to show input or not
+				}
+			});
+
+			spinnerRadius = new JSpinner(new SpinnerNumberModel(radius,1,200,1));
+			spinnerRadius.addChangeListener(this);
+			spinnerRadius.setMaximumSize(spinnerRadius.getPreferredSize());
+
+			addAlgorithms();
+			comboAlgorithms.setSelectedIndex(0);
+			comboAlgorithms.setMaximumSize(comboAlgorithms.getPreferredSize());
+
+			addLabeled(processingTimeLabel,"Time (ms)", this);
+			add(comboAlgorithms);
+			addLabeled(selectZoom,"Zoom",this);
+			add(checkShowInput);
+			addLabeled(spinnerRadius,"Radius", this);
+			addVerticalGlue(this);
 		}
 
-		ShowImages.showWindow(app,"Image Enhancement", true);
+		private void addAlgorithms() {
+			addAlgorithm(HISTOGRAM_GLOBAL,false);
+			addAlgorithm(HISTOGRAM_LOCAL,true);
+			addAlgorithm(SHARPEN_4,false);
+			addAlgorithm(SHARPEN_8,false);
+		}
+
+		public void addAlgorithm(String name, final boolean usesRadius ) {
+			comboBoxItems.add(name);
+
+			comboRunnable.add(new Runnable() {
+				@Override
+				public void run() {
+					spinnerRadius.setEnabled(usesRadius);
+				}
+			});
+		}
+
+		public void setZoom( double zoom ) {
+			zoom = Math.max(MIN_ZOOM,zoom);
+			zoom = Math.min(MAX_ZOOM,zoom);
+			this.zoom = zoom;
+
+			BoofSwingUtil.invokeNowOrLater(new Runnable() {
+				@Override
+				public void run() {
+					selectZoom.setValue(ControlPanel.this.zoom);
+				}
+			});
+		}
+
+		public void setProcessingTime( double seconds ) {
+			processingTimeLabel.setText(String.format("%7.1f",(seconds*1000)));
+		}
+
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			if( e.getSource() == selectZoom ) {
+				zoom = ((Number) selectZoom.getValue()).doubleValue();
+				handleVisualsUpdate();
+				return;
+			} else if( e.getSource() == spinnerRadius ) {
+				radius = ((Number) spinnerRadius.getValue()).intValue();
+			}
+			handleSettingsChanged();
+		}
 	}
 
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		radius = (Integer)selectRadius.getValue();
-		doRefreshAll();
+	public static void main(String[] args) {
+		List<String> examples = new ArrayList<>();
+		examples.add("enhance/dark.jpg");
+		examples.add("enhance/dull.jpg");
+
+		ImageEnhanceApp app = new ImageEnhanceApp(examples);
+
+		app.openFile(new File(examples.get(0)));
+
+		app.waitUntilInputSizeIsKnown();
+
+		ShowImages.showWindow(app,"Image Enhancement",true);
 	}
+
 }
