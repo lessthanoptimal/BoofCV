@@ -169,7 +169,20 @@ public class BinaryEllipseDetectorPixel {
 		if( verbose )
 			System.out.println("Success!  size = "+pointsF.size());
 
+		adjustElipseForBinaryBias(f.ellipse);
 		f.contour = contour;
+	}
+
+	/**
+	 * In a binary image the contour on the right and bottom is off by one pixel. This is because the block region
+	 * extends the entire pixel not just the lower extent which is where it is indexed from.
+	 */
+	protected void adjustElipseForBinaryBias( EllipseRotated_F64 ellipse ) {
+		ellipse.center.x += 0.5;
+		ellipse.center.y += 0.5;
+
+		ellipse.a += 0.5;
+		ellipse.b += 0.5;
 	}
 
 	protected final boolean touchesBorder( List<Point2D_I32> contour ) {
