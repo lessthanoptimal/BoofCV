@@ -158,7 +158,6 @@ public class EllipsesIntoClusters {
 				if( e2 == e1 )
 					continue;
 
-
 				// test the appearance of the ellipses edge
 				double edge2 = info2.averageOutside-info2.averageInside;
 				double edgeRatio = Math.abs(edge1-edge2)/Math.max(edge1,edge2);
@@ -193,8 +192,8 @@ public class EllipsesIntoClusters {
 				}
 
 				// Apply rule which combines two features
-				if( edgeRatio + 1-ratioC >
-						(1-edgeIntensitySimilarityTolerance+ratioSimilarityTolerance) )
+				if( edgeRatio + (1-ratioC) >
+						(edgeIntensitySimilarityTolerance+(1-ratioSimilarityTolerance)) )
 					continue;
 
 				int indexNode2 = d.data.which;
