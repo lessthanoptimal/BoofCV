@@ -95,7 +95,8 @@ public class TestEllipseClustersIntoGrid {
 		EllipseClustersIntoGrid alg = new HelperAlg();
 		alg.computeNodeInfo(grid.data1,grid.data0);
 
-
+		alg.listInfo.get(0).marked = true;
+		alg.listInfo.get(1).marked = true;
 		NodeInfo found = EllipseClustersIntoGrid.selectSeedNext(
 				alg.listInfo.get(0),alg.listInfo.get(1),alg.listInfo.get(cols),true);
 
@@ -111,6 +112,8 @@ public class TestEllipseClustersIntoGrid {
 		EllipseClustersIntoGrid alg = new HelperAlg();
 		alg.computeNodeInfo(grid.data1,grid.data0);
 
+		alg.listInfo.get(0).marked = true;
+		alg.listInfo.get(1).marked = true;
 		List<NodeInfo> line;
 		line = EllipseClustersIntoGrid.findLine(alg.listInfo.get(0),alg.listInfo.get(1),5*4, null,true);
 

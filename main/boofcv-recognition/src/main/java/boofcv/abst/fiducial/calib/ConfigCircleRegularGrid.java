@@ -73,7 +73,7 @@ public class ConfigCircleRegularGrid implements Configuration {
 	/**
 	 * How similar edge intensity between two ellipses need to be.  0 to 1.0.  1.0 = perfect match
 	 */
-	public double edgeIntensitySimilarityTolerance = 0.5;
+	public double edgeIntensitySimilarityTolerance = 0.75;
 
 	{
 		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit

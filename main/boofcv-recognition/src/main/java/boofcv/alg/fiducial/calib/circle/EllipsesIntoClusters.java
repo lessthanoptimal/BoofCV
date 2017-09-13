@@ -158,12 +158,16 @@ public class EllipsesIntoClusters {
 				if( e2 == e1 )
 					continue;
 
+				// see of they are already connected
+				if( node1.connections.indexOf(d.data.which) != -1 ) {
+					continue;
+				}
+
 				// test the appearance of the ellipses edge
 				double edge2 = info2.averageOutside-info2.averageInside;
-				double edgeRatio = Math.abs(edge1-edge2)/Math.max(edge1,edge2);
+				double intensityRatio = Math.abs(edge1-edge2)/Math.max(edge1,edge2);
 
-				// relax the edge intensity ratio here
-				if( edgeRatio > edgeIntensitySimilarityTolerance*1.5)
+				if( intensityRatio > edgeIntensitySimilarityTolerance)
 					continue;
 
 				// the initial search was based on size of major axis.  Now prune and take in account the distance
@@ -184,7 +188,7 @@ public class EllipsesIntoClusters {
 				}
 
 				// axis ratio similarity check
-				double ratioC = (e1.a*e1.a*e2.b*e2.b)/(e1.b*e1.b*e2.a*e2.a);
+				double ratioC = (e1.a*e2.b)/(e1.b*e2.a);
 				if( ratioC > 1 ) ratioC = 1.0/ratioC;
 
 				if( ratioC < ratioSimilarityTolerance ) {
@@ -192,8 +196,8 @@ public class EllipsesIntoClusters {
 				}
 
 				// Apply rule which combines two features
-				if( edgeRatio + (1-ratioC) >
-						(edgeIntensitySimilarityTolerance+(1-ratioSimilarityTolerance)) )
+				if( intensityRatio + (1-ratioC) >
+						(edgeIntensitySimilarityTolerance/1.5+(1-ratioSimilarityTolerance)) )
 					continue;
 
 				int indexNode2 = d.data.which;
@@ -211,11 +215,8 @@ public class EllipsesIntoClusters {
 					node1.connections.add( indexNode2 );
 					node2.connections.add( i );
 				} else {
-					// see if they are already connected, if not connect them
-					if( node1.connections.indexOf(indexNode2) == -1 ) {
-						node1.connections.add( indexNode2 );
-						node2.connections.add( i );
-					}
+					node1.connections.add( indexNode2 );
+					node2.connections.add( i );
 				}
 			}
 		}
