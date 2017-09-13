@@ -89,21 +89,25 @@ public class ConfigThreshold implements Configuration {
 		return config;
 	}
 
-	public static ConfigThreshold local( ThresholdType type , int radius ) {
+	public static <T extends ConfigThreshold>T local( ThresholdType type , int radius ) {
 		if( !type.isAdaptive() )
 			throw new IllegalArgumentException("Type must be adaptive");
 
 		if( type.isGlobal() )
 			throw new IllegalArgumentException("Type must be local");
 
+		ConfigThreshold config;
 		if( type == ThresholdType.LOCAL_BLOCK_MIN_MAX) {
-			return new ConfigThresholdBlockMinMax(radius,10,true);
+			config = new ConfigThresholdBlockMinMax(radius, 10, true);
+		} else if( type == ThresholdType.LOCAL_BLOCK_OTSU) {
+			config = new ConfigThresholdBlockOtsu();
 		} else {
-			ConfigThreshold config = new ConfigThreshold();
-			config.type = type;
-			config.radius = radius;
-			return config;
+			config = new ConfigThreshold();
 		}
+
+		config.type = type;
+		config.radius = radius;
+		return (T)config;
 	}
 
 	@Override

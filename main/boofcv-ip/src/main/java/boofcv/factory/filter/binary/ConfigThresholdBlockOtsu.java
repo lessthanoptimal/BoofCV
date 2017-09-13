@@ -32,4 +32,14 @@ public class ConfigThresholdBlockOtsu extends ConfigThreshold {
 	 * @see boofcv.alg.filter.binary.ThresholdBlockOtsu
 	 */
 	public double tuning=0;
+
+	public ConfigThresholdBlockOtsu(int radius , double tuning) {
+		this();
+		this.radius = radius;
+		this.tuning = tuning;
+	}
+
+	public ConfigThresholdBlockOtsu() {
+		this.type = ThresholdType.LOCAL_BLOCK_OTSU;
+	}
 }
