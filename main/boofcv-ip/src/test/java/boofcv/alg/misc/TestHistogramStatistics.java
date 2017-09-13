@@ -18,9 +18,10 @@
 
 package boofcv.alg.misc;
 
+import org.ejml.UtilEjml;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -28,15 +29,40 @@ import static org.junit.Assert.fail;
 public class TestHistogramStatistics {
 	@Test
 	public void variance() {
-		fail("implement");
+		int histogram[] = new int[]{0,3,10,3,6};
+
+		double mean = HistogramStatistics.mean(histogram,4);
+		double found = HistogramStatistics.variance(histogram,mean,4);
+		assertEquals(0.375,found, UtilEjml.TEST_F64);
 	}
+
 	@Test
-	public void countValues() {
-		fail("implement");
+	public void count() {
+		int histogram[] = new int[]{0,3,10,3,6};
+
+		int found = HistogramStatistics.count(histogram,4);
+		assertEquals(16,found);
 	}
 
 	@Test
 	public void mean() {
-		fail("implement");
+		int histogram[] = new int[]{0,3,10,3,6};
+
+		double found = HistogramStatistics.mean(histogram,4);
+		assertEquals((3+10*2+3*3)/(16.0),found, UtilEjml.TEST_F64);
+	}
+
+	@Test
+	public void percentile() {
+		int histogram[] = new int[]{0,3,10,3,6};
+
+		int found = HistogramStatistics.percentile(histogram,0,4);
+		assertEquals(0,found, UtilEjml.TEST_F64);
+		found = HistogramStatistics.percentile(histogram,1.0,4);
+		assertEquals(3,found, UtilEjml.TEST_F64);
+		found = HistogramStatistics.percentile(histogram,0.2,4);
+		assertEquals(1,found, UtilEjml.TEST_F64);
+		found = HistogramStatistics.percentile(histogram,0.6,4);
+		assertEquals(2,found, UtilEjml.TEST_F64);
 	}
 }

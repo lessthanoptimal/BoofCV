@@ -98,8 +98,12 @@ public class HistogramStatistics {
 		int target = (int)(counts*fraction+0.5);
 		int count = 0;
 		int i;
-		for(i=0;i<N && count < target;i++) {
+		if( count >= target )
+			return 0;
+		for(i=0;i<N;i++) {
 			count += histogram[i];
+			if( count >= target )
+				break;
 		}
 
 		return i;
