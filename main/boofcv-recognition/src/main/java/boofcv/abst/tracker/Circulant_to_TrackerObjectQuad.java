@@ -59,7 +59,17 @@ public class Circulant_to_TrackerObjectQuad<T extends ImageGray<T>> implements T
 	}
 
 	@Override
-	public boolean process(T image, Quadrilateral_F64 location) {
+	public void hint(Quadrilateral_F64 hint) {
+		UtilPolygons2D_F64.bounding(hint, rect);
+
+		int width = (int)(rect.p1.x - rect.p0.x);
+		int height = (int)(rect.p1.y - rect.p0.y);
+
+		tracker.setTrackLocation((int)rect.p0.x,(int)rect.p0.y,width,height);
+	}
+
+	@Override
+	public boolean process(T image, Quadrilateral_F64 results) {
 
 		tracker.performTracking(image);
 		RectangleLength2D_F32 r = tracker.getTargetLocation();
@@ -74,14 +84,14 @@ public class Circulant_to_TrackerObjectQuad<T extends ImageGray<T>> implements T
 		float x1 = r.x0 + r.width;
 		float y1 = r.y0 + r.height;
 
-		location.a.x = x0;
-		location.a.y = y0;
-		location.b.x = x1;
-		location.b.y = y0;
-		location.c.x = x1;
-		location.c.y = y1;
-		location.d.x = x0;
-		location.d.y = y1;
+		results.a.x = x0;
+		results.a.y = y0;
+		results.b.x = x1;
+		results.b.y = y0;
+		results.c.x = x1;
+		results.c.y = y1;
+		results.d.x = x0;
+		results.d.y = y1;
 
 		return true;
 	}

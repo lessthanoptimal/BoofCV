@@ -34,6 +34,8 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase<T>> {
 
+	boolean usesHint = true;
+
 	Random rand = new Random(234);
 
 	int width = 320;
@@ -86,6 +88,25 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase<T>>
 		assertEquals(initRegion.a.y, where.a.y, tolStationary);
 		assertEquals(initRegion.c.x, where.c.x, tolStationary);
 		assertEquals(initRegion.c.y, where.c.y, tolStationary);
+	}
+
+	@Test
+	public void hint() {
+		if( !usesHint )
+			return;
+
+		TrackerObjectQuad<T> tracker = create(imageType);
+		where = rect(20,25,90,100);
+		render(1,0,0);
+		assertTrue(tracker.initialize(input, where));
+
+		render(1,100,110);
+
+		where = rect(20+100,25+110,90+100,100+110);
+		tracker.hint(where);
+		where.a.set(0,0);where.b.set(0,0);where.c.set(0,0);where.d.set(0,0);
+		assertTrue(tracker.process(input, where));
+		checkSolution(20+100,25+110,90+100,100+110,tolTranslateSmall);
 	}
 
 	@Test

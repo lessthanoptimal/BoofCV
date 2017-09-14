@@ -55,15 +55,23 @@ public class Sfot_to_TrackObjectQuad<T extends ImageGray<T>, D extends ImageGray
 		return true;
 	}
 
+	/**
+	 * Doesn't support hint because it does a forwards and backwards track. Adding hint isn't trivial. To add it
+	 * a forward/reverse transform needs to be added
+	 */
 	@Override
-	public boolean process(T image, Quadrilateral_F64 location) {
+	public void hint(Quadrilateral_F64 hint) {
+	}
+
+	@Override
+	public boolean process(T image, Quadrilateral_F64 results) {
 
 		if( !alg.update(image,region) )
 			return false;
 
 //		System.out.println("width "+region.width+" height "+region.height);
 
-		rectRotToQuad(region, location);
+		rectRotToQuad(region, results);
 
 		return true;
 	}

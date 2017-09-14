@@ -83,6 +83,9 @@ public class CirculantTracker<T extends ImageGray<T>> {
 	private double padding;
 
 	//----- Internal variables
+	// Input image width and height
+	private int imageWidth,imageHeight;
+
 	// computes the FFT
 	private DiscreteFourierTransform<GrayF64,InterleavedF64> fft = DiscreteFourierTransformOps.createTransformF64();
 
@@ -185,7 +188,24 @@ public class CirculantTracker<T extends ImageGray<T>> {
 	 */
 	public void initialize( T image , int x0 , int y0 , int regionWidth , int regionHeight ) {
 
-		if( image.width < regionWidth || image.height < regionHeight)
+		this.imageWidth = image.width;
+		this.imageHeight = image.height;
+
+		setTrackLocation(x0,y0,regionWidth,regionHeight);
+
+		initialLearning(image);
+	}
+
+	/**
+	 * Used to change the track's location. If this method is used it is assumed that tracking is active and that
+	 * the appearance of the target has not changed
+	 * @param x0 top-left corner of region
+	 * @param y0 top-left corner of region
+	 * @param regionWidth region's width
+	 * @param regionHeight region's height
+	 */
+	public void setTrackLocation( int x0 , int y0 , int regionWidth , int regionHeight ) {
+		if( imageWidth < regionWidth || imageHeight < regionHeight)
 			throw new IllegalArgumentException("Track region is larger than input image: "+regionWidth+" "+regionHeight);
 
 		regionOut.width = regionWidth;
@@ -207,8 +227,6 @@ public class CirculantTracker<T extends ImageGray<T>> {
 		stepY = (h-1)/(float)(workRegionSize-1);
 
 		updateRegionOut();
-
-		initialLearning(image);
 	}
 
 
@@ -300,6 +318,9 @@ public class CirculantTracker<T extends ImageGray<T>> {
 	 * @param image Next image in the sequence
 	 */
 	public void performTracking( T image ) {
+		if( image.width != imageWidth || image.height != imageHeight )
+			throw new IllegalArgumentException("Tracking image size is not the same as " +
+					"input image. Expected "+imageWidth+" x "+imageHeight);
 		updateTrackLocation(image);
 		if( interp_factor != 0 )
 			performLearning(image);

@@ -100,12 +100,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 		pdf.reshape(image.width,image.height);
 		ImageMiscOps.fill(pdf,-1);
 
-		location.set(initial);
-
-		// massage the rectangle so that it has an odd width and height
-		// otherwise it could experience a bias when localizing
-		location.width += 1-location.width%2;
-		location.height += 1-location.height%2;
+		setTrackLocation(initial);
 
 		failed = false;
 
@@ -119,6 +114,21 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 			}
 		}
 		minimumSum *= minFractionDrop;
+	}
+
+	/**
+	 * Used to set the location of the track without changing any appearance history.
+	 * @param location new location
+	 */
+	public void setTrackLocation( RectangleLength2D_I32 location ) {
+		this.location.set(location);
+
+		// massage the rectangle so that it has an odd width and height
+		// otherwise it could experience a bias when localizing
+		this.location.width += 1- this.location.width%2;
+		this.location.height += 1- this.location.height%2;
+
+		failed = false;
 	}
 
 	/**

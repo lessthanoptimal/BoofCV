@@ -68,13 +68,27 @@ public class Msl_to_TrackerObjectQuad <T extends ImageBase<T>> implements Tracke
 	}
 
 	@Override
-	public boolean process(T image, Quadrilateral_F64 location) {
+	public void hint(Quadrilateral_F64 hint) {
+
+
+		UtilPolygons2D_F64.bounding(hint, rect);
+
+		target.x0 = (int)rect.p0.x;
+		target.y0 = (int)rect.p0.y;
+		target.width = (int)rect.getWidth()+1;
+		target.height = (int)rect.getHeight()+1;
+
+		tracker.setTrackLocation(target);
+	}
+
+	@Override
+	public boolean process(T image, Quadrilateral_F64 results) {
 
 		if( !tracker.process(image ))
 		    return false;
 
 		RectangleLength2D_I32 rect = tracker.getLocation();
-		UtilPolygons2D_F64.convert(rect,location);
+		UtilPolygons2D_F64.convert(rect, results);
 
 		return true;
 	}

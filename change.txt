@@ -52,6 +52,8 @@ Version : 0.28
   * Added ability to not record internal contours
 - Added HistogramStatistics
   * Thanks Marius Orfgen for the idea and code
+- TrackerObjectQuad
+  * Added ability to provide a hint for where the object is now
 
 Fiducials
 - Changes in polygon have affected performance. Mostly negative on blurred images.

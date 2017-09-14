@@ -32,6 +32,10 @@ import boofcv.struct.image.ImageType;
  */
 public class TestSfot_to_TrackObjectQuad extends TextureGrayTrackerObjectRectangleTests {
 
+	public TestSfot_to_TrackObjectQuad() {
+		usesHint = false;
+	}
+
 	@Override
 	public TrackerObjectQuad<GrayU8> create(ImageType<GrayU8> imageType) {
 

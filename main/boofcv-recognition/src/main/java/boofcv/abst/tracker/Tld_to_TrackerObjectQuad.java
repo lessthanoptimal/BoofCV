@@ -53,21 +53,28 @@ public class Tld_to_TrackerObjectQuad<T extends ImageGray<T>, D extends ImageGra
 	}
 
 	@Override
-	public boolean process(T image, Quadrilateral_F64 location ) {
+	public void hint(Quadrilateral_F64 hint) {
+		UtilPolygons2D_F64.bounding(hint, rect);
+
+		tracker.setTrackerLocation((int)rect.p0.x,(int)rect.p0.y,(int)rect.p1.x,(int)rect.p1.y);
+	}
+
+	@Override
+	public boolean process(T image, Quadrilateral_F64 results) {
 
 		if( !tracker.track(image) )
 			return false;
 
 		Rectangle2D_F64 rect = tracker.getTargetRegion();
 
-		location.a.x = rect.p0.x;
-		location.a.y = rect.p0.y;
-		location.b.x = rect.p1.x;
-		location.b.y = rect.p0.y;
-		location.c.x = rect.p1.x;
-		location.c.y = rect.p1.y;
-		location.d.x = rect.p0.x;
-		location.d.y = rect.p1.y;
+		results.a.x = rect.p0.x;
+		results.a.y = rect.p0.y;
+		results.b.x = rect.p1.x;
+		results.b.y = rect.p0.y;
+		results.c.x = rect.p1.x;
+		results.c.y = rect.p1.y;
+		results.d.x = rect.p0.x;
+		results.d.y = rect.p1.y;
 
 		return true;
 	}

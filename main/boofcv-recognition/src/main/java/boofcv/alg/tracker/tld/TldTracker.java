@@ -174,6 +174,30 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 		previousTrackArea = targetRegion.area();
 	}
 
+	/**
+	 * Used to set the location of the track without changing any appearance history.
+	 *
+	 * Move the track region but keep the same aspect ratio as it had before
+	 * So scale the region and re-center it
+	 */
+	public void setTrackerLocation( int x0 , int y0 , int x1 , int y1 ) {
+
+		int width = x1-x0;
+		int height = y1-y0;
+
+		// change change in scale
+		double scale = (width/targetRegion.getWidth() + height/targetRegion.getHeight())/2.0;
+
+		// new center location
+		double centerX = (x0+x1)/2.0;
+		double centerY = (y0+y1)/2.0;
+
+		targetRegion.p0.x = centerX-scale*targetRegion.getWidth()/2.0;
+		targetRegion.p1.x = targetRegion.p0.x + scale*targetRegion.getWidth();
+		targetRegion.p0.y = centerY-scale*targetRegion.getHeight()/2.0;
+		targetRegion.p1.y = targetRegion.p0.y + scale*targetRegion.getHeight();
+	}
+
 
 	/**
 	 * Creates a list containing all the regions which need to be tested

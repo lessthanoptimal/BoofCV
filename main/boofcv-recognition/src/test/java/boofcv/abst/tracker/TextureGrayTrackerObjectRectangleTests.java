@@ -47,7 +47,7 @@ public abstract class TextureGrayTrackerObjectRectangleTests extends GenericTrac
 
 	@Override
 	protected void render( double scale , double tranX , double tranY ) {
-		Random rand = new Random(234);
+		Random rand = new Random(234); // need to use the same random seed each time
 
 		for( int i = 0; i < 500; i++ ) {
 

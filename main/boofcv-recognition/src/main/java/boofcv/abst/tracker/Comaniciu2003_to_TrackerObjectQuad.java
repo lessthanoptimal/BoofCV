@@ -54,11 +54,17 @@ public class Comaniciu2003_to_TrackerObjectQuad<T extends ImageBase<T>>
 	}
 
 	@Override
-	public boolean process(T image, Quadrilateral_F64 location) {
+	public void hint(Quadrilateral_F64 hint) {
+		Sfot_to_TrackObjectQuad.quadToRectRot(hint,rectangle);
+		alg.setTrackLocation(rectangle);
+	}
+
+	@Override
+	public boolean process(T image, Quadrilateral_F64 results) {
 
 		alg.track(image);
 
-		Sfot_to_TrackObjectQuad.rectRotToQuad(alg.getRegion(),location);
+		Sfot_to_TrackObjectQuad.rectRotToQuad(alg.getRegion(), results);
 
 		return true;
 	}

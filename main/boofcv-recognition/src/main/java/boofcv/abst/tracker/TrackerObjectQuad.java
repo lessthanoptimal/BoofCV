@@ -49,24 +49,35 @@ public interface TrackerObjectQuad<T extends ImageBase<T>> {
 	 * @param location Initial location of the object being tracked
 	 * @return true if successful and false if not.
 	 */
-	public boolean initialize( T image , Quadrilateral_F64 location );
+	boolean initialize( T image , Quadrilateral_F64 location );
+
+	/**
+	 * Provide a hint for where the tracked object is. How and if this hint is used at all is implementation specific.
+	 * This can be used add information from sensors such as gyros to the tracker.
+	 *
+	 * If this functionality isn't supported by the tracker then it will simply ignore the suggestion. It probably knows
+	 * what's happening than you do.
+	 *
+	 * @param hint (Input) estimated location of the object.
+	 */
+	void hint( Quadrilateral_F64 hint );
 
 	/**
 	 * Updates the tracks location using the latest video frame.  {@link #initialize(boofcv.struct.image.ImageBase, Quadrilateral_F64)}
 	 * must be called once before this function can be called.
 	 *
-	 * @param image The next image in the video sequence.
-	 * @param location The new location of the object being tracked.
+	 * @param image (Input) The next image in the video sequence.
+	 * @param results (Output) Storage for new location if tracking is successful.
 	 * @return true if the target was found and 'location' updated.
 	 */
-	public boolean process( T image , Quadrilateral_F64 location );
+	boolean process( T image , Quadrilateral_F64 results );
 
 	/**
 	 * Returns information on the type of image that it can process.
 	 *
 	 * @return Image type
 	 */
-	public ImageType<T> getImageType();
+	ImageType<T> getImageType();
 
 	/**
 	 * Provides access to the inner low level tracker. You need to be familiar with the tracker's source code

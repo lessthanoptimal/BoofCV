@@ -147,6 +147,15 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageBase<T>> {
 	}
 
 	/**
+	 * Used to set the location of the track without changing any appearance history.
+	 * @param location new location
+	 */
+	public void setTrackLocation( RectangleRotate_F32 location ) {
+		this.region.set(location);
+		this.minimumWidth = location.width*minimumSizeRatio;
+	}
+
+	/**
 	 * Searches for the target in the most recent image.
 	 * @param image Most recent image in the sequence
 	 */
