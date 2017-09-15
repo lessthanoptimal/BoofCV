@@ -128,7 +128,7 @@ public abstract class EllipseClustersIntoGrid {
 					ratioLengths = 1.0/ratioLengths;
 					ratioSize = 1.0/ratioSize;
 				}
-				if( Math.abs(ratioLengths-ratioSize) > 0.25 )
+				if( Math.abs(ratioLengths-ratioSize) > 0.4 )
 					continue;
 
 

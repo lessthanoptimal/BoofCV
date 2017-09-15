@@ -228,7 +228,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 
 		NodeInfo corner = alg.listInfo.get(0);
 
-		alg.bottomTwoColumns(corner, column0, column1);
+		alg.bottomTwoColumns(corner, null,column0, column1);
 
 		assertEquals(3,column0.size());
 		assertEquals(3,column1.size());
@@ -268,7 +268,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 
 		NodeInfo corner = alg.listInfo.get(0);
 
-		alg.bottomTwoColumns(corner, column0, column1);
+		alg.bottomTwoColumns(corner,null, column0, column1);
 
 		assertEquals(2,column0.size());
 		assertEquals(1,column1.size());
