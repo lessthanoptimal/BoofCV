@@ -75,7 +75,7 @@ public class DetectCircleAsymmetricGrid<T extends ImageGray<T>> extends DetectCi
 		int diameter = Math.max(gray.width,gray.height)/(Math.max(numCols,numRows));
 
 		LinearContourLabelChang2004 contourFinder = ellipseDetector.getEllipseDetector().getContourFinder();
-		contourFinder.setMaxContourSize((int)(Math.PI*diameter*2)+1);
+		contourFinder.setMaxContourSize((int)(Math.PI*diameter*3)+1);
 		contourFinder.setSaveInternalContours(false);
 	}
 
