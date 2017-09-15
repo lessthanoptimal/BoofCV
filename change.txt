@@ -12,11 +12,11 @@ Version : 0.28
   * Removed refine corner for black polygon detector
     - Was complex, didn't fit the new API, and calibration residuals got better once removed.
   * Added option to optimize by fitting lines to the contour
-- Asymmetric Circle Grid -> Hexagonal Grid
-  * Renamed asymmetric circle to hexagonal circle. TODO
-  * LAYOUT HAS CHANGED! Old layout was poorly chosen and didn't increase the point density, which is the whole point
-    of this layout.
-  * Spacing in Y direction is now (x spacing)*2.0*sin(60 degrees).  Before it was the same along both axises
+- Removed Asymmetric Circle Grid
+  * Less space efficient than Hexagonal Grid
+- Added Hexagonal Grid
+  * Similar to asymmetric but in Y direction is now (x spacing)*2.0*sin(60 degrees).
+  * Asymmetric was the same along both axises
 - Adding the capability for demonstrations that open files to remember the last directory it opened
 - Calibration Target Generator
   * Fixed bug in asymmetric circle target where it was shifted on the page
@@ -83,9 +83,10 @@ Asymmetric Circle
   - Change spacing. vertical distance = horizontal spacing * 2.0*sin(60 degrees)
 
 Calibration
-  TODO Fisheye Detector - Asymmetric Circle
   TODO Fisheye Calibration Demonstration
   TODO Add fisheye to calibration application
+  TODO Update documentation for hexagonal
+       - Swap images
 
 TOP ITEMS
 - TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.

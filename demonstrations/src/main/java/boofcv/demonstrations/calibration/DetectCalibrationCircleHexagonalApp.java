@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid;
+import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.ConfigCircleHexagonalGrid;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
@@ -45,13 +45,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Displays detected asymmetric circular grid.  Visualizes several of its processing steps making it easier to debug.
+ * Displays detected hexagonal circular grid.  Visualizes several of its processing steps making it easier to debug.
  *
  * @author Peter Abeles
  */
 public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibrationApp
 {
-	CalibrationDetectorCircleAsymmGrid detector;
+	CalibrationDetectorCircleHexagonalGrid detector;
 	ConfigCircleHexagonalGrid config;
 
 	Color colorId[];
@@ -82,7 +82,7 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 		config.circleDiameter = ((DetectCalibrationCirclePanel)controlPanel).getCircleDiameter();
 		config.centerDistance = ((DetectCalibrationCirclePanel)controlPanel).getCircleSpacing();
 
-		detector = FactoryFiducialCalibration.circleAsymmGrid(config);
+		detector = FactoryFiducialCalibration.circleHexagonalGrid(config);
 	}
 
 	@Override

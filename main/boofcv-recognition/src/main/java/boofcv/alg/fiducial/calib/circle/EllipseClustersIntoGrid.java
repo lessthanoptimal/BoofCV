@@ -33,7 +33,7 @@ import java.util.List;
  * <p>Base class for ordering clusters of ellipses into grids</p>
  *
  * <p>See {@link Grid} for a description of how the output grids are described.  It uses a sparse format.</p>
- * <p>See {@link DetectCircleAsymmetricGrid} for an example of an asymmetric grid</p>
+ * <p>See {@link DetectCircleHexagonalGrid} for an example of an hexagonal grid</p>
  *
  * @author Peter Abeles
  */
@@ -529,7 +529,7 @@ public abstract class EllipseClustersIntoGrid {
 			this.columns = columns;
 		}
 
-		public int getIndexOfAsymEllipse( int row , int col ) {
+		public int getIndexOfHexEllipse(int row , int col ) {
 			int index = 0;
 			index += (row/2)*this.columns + (row%2)*(this.columns/2+this.columns%2);
 			return index + col/2;

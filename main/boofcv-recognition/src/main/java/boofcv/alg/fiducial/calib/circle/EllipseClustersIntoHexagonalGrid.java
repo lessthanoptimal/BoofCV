@@ -49,7 +49,7 @@ import java.util.List;
  * </p>
  *
  * <p>See {@link Grid} for a description of how the output grids are described.  It uses a sparse format.</p>
- * <p>See {@link DetectCircleAsymmetricGrid} for an example of an asymmetric grid</p>
+ * <p>See {@link DetectCircleHexagonalGrid} for an example of an hexagonal grid</p>
  *
  * @author Peter Abeles
  */

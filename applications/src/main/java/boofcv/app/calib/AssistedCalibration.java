@@ -19,7 +19,7 @@
 package boofcv.app.calib;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
-import boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid;
+import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
@@ -159,8 +159,8 @@ public class AssistedCalibration {
 			view = new CalibrationView.Chessboard();
 		} else if( detector instanceof CalibrationDetectorSquareGrid) {
 			view = new CalibrationView.SquareGrid();
-		} else if( detector instanceof CalibrationDetectorCircleAsymmGrid) {
-			view = new CalibrationView.CircleAsymmGrid();
+		} else if( detector instanceof CalibrationDetectorCircleHexagonalGrid) {
+			view = new CalibrationView.CircleHexagonalGrid();
 		} else if( detector instanceof CalibrationDetectorCircleRegularGrid) {
 			view = new CalibrationView.CircleRegularGrid();
 		} else {

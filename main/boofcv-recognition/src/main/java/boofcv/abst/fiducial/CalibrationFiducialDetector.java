@@ -108,7 +108,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 
 	public CalibrationFiducialDetector(ConfigCircleHexagonalGrid config,
 									   Class<T> imageType) {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.circleAsymmGrid(config);
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.circleHexagonalGrid(config);
 		int squareCols = config.numCols;
 		int squareRows = config.numRows;
 		double sideWidth = squareCols*config.centerDistance/2.0;

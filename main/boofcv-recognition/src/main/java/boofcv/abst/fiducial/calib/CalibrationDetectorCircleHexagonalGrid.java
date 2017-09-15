@@ -20,7 +20,7 @@ package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
-import boofcv.alg.fiducial.calib.circle.DetectCircleAsymmetricGrid;
+import boofcv.alg.fiducial.calib.circle.DetectCircleHexagonalGrid;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
 import boofcv.alg.fiducial.calib.circle.KeyPointsCircleHexagonalGrid;
@@ -39,15 +39,15 @@ import java.util.List;
 /**
  * Calibration implementation of circle hexagonal grid fiducial.
  *
- * @see DetectCircleAsymmetricGrid
+ * @see DetectCircleHexagonalGrid
  * @see KeyPointsCircleHexagonalGrid
  *
  * @author Peter Abeles
  */
-public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalibration {
+public class CalibrationDetectorCircleHexagonalGrid implements DetectorFiducialCalibration {
 
 	// Detectors the grids
-	private DetectCircleAsymmetricGrid<GrayF32> detector;
+	private DetectCircleHexagonalGrid<GrayF32> detector;
 	// extracts key points from detected grid
 	private KeyPointsCircleHexagonalGrid keypoint = new KeyPointsCircleHexagonalGrid();
 
@@ -62,7 +62,7 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 	 * Configures the detector based on the pass in configuration class
 	 * @param config Configuration for detector and target description
 	 */
-	public CalibrationDetectorCircleAsymmGrid(ConfigCircleHexagonalGrid config ) {
+	public CalibrationDetectorCircleHexagonalGrid(ConfigCircleHexagonalGrid config ) {
 
 		InputToBinary<GrayF32> inputToBinary =
 				FactoryThresholdBinary.threshold(config.thresholding,GrayF32.class);
@@ -78,7 +78,7 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 		EllipsesIntoClusters e2c = new EllipsesIntoClusters(
 				spaceToRadius*factor,config.ellipseSizeSimilarity,config.edgeIntensitySimilarityTolerance);
 
-		detector = new DetectCircleAsymmetricGrid<>(config.numRows,config.numCols,inputToBinary,
+		detector = new DetectCircleHexagonalGrid<>(config.numRows,config.numCols,inputToBinary,
 				ellipseDetector,e2c);
 
 
@@ -150,7 +150,7 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 		return ret;
 	}
 
-	public DetectCircleAsymmetricGrid<GrayF32> getDetector() {
+	public DetectCircleHexagonalGrid<GrayF32> getDetector() {
 		return detector;
 	}
 

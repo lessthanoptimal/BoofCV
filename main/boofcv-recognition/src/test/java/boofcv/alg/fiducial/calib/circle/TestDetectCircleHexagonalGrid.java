@@ -44,7 +44,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDetectCircleAsymmetricGrid {
+public class TestDetectCircleHexagonalGrid {
 	@Test
 	public void process_easy() {
 
@@ -77,7 +77,7 @@ public class TestDetectCircleAsymmetricGrid {
 		int radius = 20;
 		int centerDistances = 80;
 
-		DetectCircleAsymmetricGrid<GrayU8> alg = createAlg(expectedRows,expectedCols,radius,centerDistances);
+		DetectCircleHexagonalGrid<GrayU8> alg = createAlg(expectedRows,expectedCols,radius,centerDistances);
 //		alg.setVerbose(true);
 
 		List<Point2D_F64> locations = new ArrayList<>();
@@ -97,7 +97,7 @@ public class TestDetectCircleAsymmetricGrid {
 		Grid g = found.get(0);
 		assertEquals(actualRows , g.rows );
 		assertEquals(actualCols , g.columns );
-		TestDetectCircleAsymmetricGrid.checkCounterClockWise(g);
+		TestDetectCircleHexagonalGrid.checkCounterClockWise(g);
 
 		int index = 0;
 		for (int row = 0; row < g.rows; row++) {
@@ -121,15 +121,15 @@ public class TestDetectCircleAsymmetricGrid {
 		}
 	}
 
-	private DetectCircleAsymmetricGrid<GrayU8> createAlg(int numRows , int numCols ,
-														 double radius , double centerDistance ) {
+	private DetectCircleHexagonalGrid<GrayU8> createAlg(int numRows , int numCols ,
+														double radius , double centerDistance ) {
 
 		double spaceRatio = 1.2*centerDistance/radius;
 
 		InputToBinary<GrayU8> threshold = FactoryThresholdBinary.globalFixed(100,true,GrayU8.class);
 		BinaryEllipseDetector<GrayU8> detector = FactoryShapeDetector.ellipse(null, GrayU8.class);
 		EllipsesIntoClusters cluster = new EllipsesIntoClusters(spaceRatio,0.8,0.5);
-		return new DetectCircleAsymmetricGrid<>( numRows, numCols,threshold, detector,  cluster);
+		return new DetectCircleHexagonalGrid<>( numRows, numCols,threshold, detector,  cluster);
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class TestDetectCircleAsymmetricGrid {
 		putGridIntoCanonical_vertical(5,6);
 	}
 	private void putGridIntoCanonical_vertical( int numRows , int numCols ) {
-		DetectCircleAsymmetricGrid<?> alg = new DetectCircleAsymmetricGrid(numRows,numCols,null,null,null);
+		DetectCircleHexagonalGrid<?> alg = new DetectCircleHexagonalGrid(numRows,numCols,null,null,null);
 
 		Grid g = createGrid(numRows,numCols);
 		List<EllipseRotated_F64> original = new ArrayList<>();
@@ -170,7 +170,7 @@ public class TestDetectCircleAsymmetricGrid {
 
 	}
 	private void putGridIntoCanonical_horizontal( int numRows , int numCols) {
-		DetectCircleAsymmetricGrid<?> alg = new DetectCircleAsymmetricGrid(numRows,numCols,null,null,null);
+		DetectCircleHexagonalGrid<?> alg = new DetectCircleHexagonalGrid(numRows,numCols,null,null,null);
 
 		Grid g = createGrid(numRows,numCols);
 		List<EllipseRotated_F64> original = new ArrayList<>();
@@ -199,7 +199,7 @@ public class TestDetectCircleAsymmetricGrid {
 		putGridIntoCanonical_rotate(5,3);
 	}
 	public void putGridIntoCanonical_rotate(int numRows , int numCols ) {
-		DetectCircleAsymmetricGrid<?> alg = new DetectCircleAsymmetricGrid(numRows,numCols,null,null,null);
+		DetectCircleHexagonalGrid<?> alg = new DetectCircleHexagonalGrid(numRows,numCols,null,null,null);
 
 		Grid g = createGrid(numRows,numCols);
 		List<EllipseRotated_F64> original = new ArrayList<>();

@@ -30,7 +30,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import static boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid.createLayout;
+import static boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid.createLayout;
 
 /**
  * @author Peter Abeles
@@ -101,7 +101,7 @@ public class TestCalibrationDetectorCircleHexagonalGrid extends GenericPlanarCal
 
 	@Override
 	public DetectorFiducialCalibration createDetector(Object layout) {
-		return FactoryFiducialCalibration.circleAsymmGrid((ConfigCircleHexagonalGrid)layout);
+		return FactoryFiducialCalibration.circleHexagonalGrid((ConfigCircleHexagonalGrid)layout);
 	}
 
 }
