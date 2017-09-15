@@ -43,9 +43,11 @@ import georegression.struct.shapes.EllipseRotated_F64;
  * </p>
  *
  * <center>
- * <img src="doc-files/asymcirclegrid.jpg"/> TODO update
+ * <img src="doc-files/hexagonal_grid.png"/>
  * </center>
- * Example of a 8 by 5 grid; row, column.
+ * Example of a 24 by 28 grid; row, column.
+ *
+ * @see KeyPointsCircleHexagonalGrid
  *
  * @author Peter Abeles
  */
