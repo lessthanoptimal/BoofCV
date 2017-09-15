@@ -127,15 +127,15 @@ public class CreateCalibrationTargetGenerator {
 	public void circleHexagonal(float diameter , float centerDistance ) throws IOException {
 		float diameterPoints = diameter*UNIT_TO_POINTS;
 
-		centerDistance *= UNIT_TO_POINTS;
+		float centerDistancePoints = centerDistance * UNIT_TO_POINTS;
 
-		float separationPointsW = centerDistance;
-		float separationPointsH = 2.0f*centerDistance*(float)Math.sin(radian(60));
+		float separationPointsW = centerDistancePoints;
+		float separationPointsH = 2.0f*centerDistancePoints*(float)Math.sin(radian(60));
 
 		patternWidth = ((cols-1)/2.0f)*separationPointsW + diameterPoints;
 		patternHeight = ((rows-1)/2.0f)*separationPointsH + diameterPoints;
 
-		printHeader("Hexagonal Circle "+rows+"x"+cols+", diameter "+diameter+", separation "+centerDistance+" "+units.abbreviation);
+		printHeader("Hexagonal Circle "+rows+"x"+cols+", diameter "+diameter+", center distance "+centerDistance+" "+units.abbreviation);
 
 		pcs.setStrokingColor(Color.BLACK);
 		for (int col = 0; col < cols; col++) {
@@ -155,7 +155,7 @@ public class CreateCalibrationTargetGenerator {
 		patternWidth = (cols-1)*separationPoints+diameterPoints;
 		patternHeight = (rows-1)*separationPoints+diameterPoints;
 
-		printHeader("Grid Circle "+rows+"x"+cols+", diameter "+diameter+", separation "+centerDistance+" "+units.abbreviation);
+		printHeader("Grid Circle "+rows+"x"+cols+", diameter "+diameter+", center distance "+centerDistance+" "+units.abbreviation);
 
 		for (int col = 0; col < cols; col++) {
 			float x = diameterPoints/2+(separationPoints)*col;
