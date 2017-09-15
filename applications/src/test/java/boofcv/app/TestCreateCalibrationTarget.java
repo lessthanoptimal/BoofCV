@@ -73,14 +73,14 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 
 	@Test
 	public void circle_hexagonal() throws IOException, InterruptedException {
-		createDocument("-r 8 -c 5 -o target -t CIRCLE_HEXAGONAL -u cm -w 2 -d 6 -p LETTER");
+		createDocument("-r 8 -c 7 -o target -t CIRCLE_HEXAGONAL -u cm -w 2 -d 3 -p LETTER");
 		BufferedImage image = loadImage();
 
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
 
 		CalibrationDetectorCircleHexagonalGrid detector =
-				FactoryFiducialCalibration.circleHexagonalGrid(new ConfigCircleHexagonalGrid(8,5,2,6));
+				FactoryFiducialCalibration.circleHexagonalGrid(new ConfigCircleHexagonalGrid(8,7,2,3));
 
 		assertTrue(detector.process(gray));
 	}
