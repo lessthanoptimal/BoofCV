@@ -124,7 +124,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 			simulator.addTarget(markerToWorld, simulatedTargetWidth,pattern);
 
 			for( int j = 0; j < fisheye_poses.size(); j++ ) {
-//				System.out.println("fisheye pose = "+j);
+				System.out.println("fisheye pose = "+j);
 				markerToWorld.set(fisheye_poses.get(j));
 				checkRenderedResults(detector,simulator,locations2D);
 			}
@@ -214,7 +214,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		List<Point2D_F64> locations2D = new ArrayList<>();
 		GrayF32 pattern = new GrayF32(1,1);
 		for (int i = 0; i < targetConfigs.size(); i++) {
-			System.out.println("*---------- Configuration "+i);
+//			System.out.println("*---------- Configuration "+i);
 			DetectorFiducialCalibration detector = createDetector(targetConfigs.get(i));
 			renderTarget(targetConfigs.get(i), simulatedTargetWidth, pattern, locations2D);
 

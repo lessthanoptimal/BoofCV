@@ -45,7 +45,7 @@ public class TestCalibrationDetectorCircleHexagonalGrid extends GenericPlanarCal
 
 		// Does a good job detecting the ellipses, but a shit job determining with the tangent points
 		// The lens distortion moves them so that they aren't even close
-		fisheyeMatchTol = 7;
+		fisheyeMatchTol = 10;
 	}
 
 	@Override

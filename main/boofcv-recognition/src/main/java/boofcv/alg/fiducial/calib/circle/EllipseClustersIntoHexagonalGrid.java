@@ -91,10 +91,6 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 				continue;
 			}
 
-			System.out.println("corner "+corner.ellipse.center);
-			System.out.println("left   "+corner.left.ellipse.center);
-			System.out.println("right  "+corner.right.ellipse.center);
-
 			List<List<NodeInfo>> grid = new ArrayList<>();
 
 			// traverse along the axis with closely spaced circles
@@ -102,17 +98,19 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 			double distRight = corner.distance(corner.right);
 			NodeInfo next = distLeft < distRight ? corner.left : corner.right;
 			next.marked = true;
-			NodeInfo other = distLeft < distRight ? corner.right : corner.left;
 
-			boolean ccw = UtilAngle.distanceCCW(direction(corner,other),direction(corner,next)) > Math.PI;
+//			System.out.println("corner "+corner.ellipse.center);
+//			System.out.println("next   "+next.ellipse.center);
 
 			List<NodeInfo> column0 = new ArrayList<>();
 			List<NodeInfo> column1 = new ArrayList<>();
 
 			bottomTwoColumns(corner,next,column0,column1);
 
-			if( column0.size() < 2 || column1.size() < 2)
+			if( column0.size() < 2 || column1.size() < 2) {
+				if( verbose ) System.out.println("First two columns to small! "+column0.size()+" "+column1.size());
 				continue;
+			}
 
 			grid.add(column0);
 			grid.add(column1);
@@ -127,7 +125,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 					break;
 				even = !even;
 				grid.add(column1);
-				System.out.println("column "+column1.size());
+//				System.out.println("column "+column1.size());
 				if( expected != column1.size() ) {
 					error = true;
 					if( verbose ) System.out.println("Unexpected column length! "+expected+" "+column1.size());
@@ -185,10 +183,10 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 			if( info.angleBetween < minAngle )
 				continue;
 
-			Edge middleR = selectClosest(info.right,info);
+			Edge middleR = selectClosest(info.right,info,true);
 			if( middleR == null )
 				continue;
-			Edge middleL = selectClosest(info.left,info);
+			Edge middleL = selectClosest(info,info.left,true);
 			if( middleL == null )
 				continue;
 
@@ -201,6 +199,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 			double difference = UtilAngle.dist(r,middleL.angle);
 
 			double score = info.angleBetween - difference;
+
 			if( score > bestScore ) {
 				best = info;
 				bestScore = score;
@@ -241,7 +240,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 			}
 		}
 
-		NodeInfo n = selectClosestN(column0.get(column0.size()-1), column1.get(column1.size()-1));
+		NodeInfo n = selectClosestN(column1.get(column1.size()-1), column0.get(column0.size()-1));
 		if (n == null)
 			return true;
 		n.marked = true;
@@ -266,13 +265,13 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 		NodeInfo b = second;
 
 		while( true ) {
-			NodeInfo t = selectClosestN(b,a);
+			NodeInfo t = selectClosestN(a,b);
 			if( t == null ) break;
 			t.marked = true;
 			column1.add(t);
 
 			a = t;
-			t = selectClosestN(b,a);
+			t = selectClosestN(a,b);
 			if( t == null ) break;
 			t.marked = true;
 			column0.add(t);
@@ -283,12 +282,19 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 	/**
 	 * Finds the closest that is the same distance from the two nodes and part of an approximate equilateral triangle
 	 */
-	static Edge selectClosest( NodeInfo a , NodeInfo b ) {
+	static Edge selectClosest( NodeInfo a , NodeInfo b , boolean checkSide ) {
 
 		NodeInfo best = null;
-		double bestDistance = Double.MAX_VALUE;
+		double bestScore = Double.MAX_VALUE;
 		Edge bestEdgeA = null;
 		Edge bestEdgeB = null;
+
+		Edge edgeAB = a.findEdge(b);
+		double distAB = a.distance(b);
+
+		if( edgeAB == null ) {
+			return null;// TODO BUG! FIX!
+		}
 
 		for (int i = 0; i < a.edges.size; i++) {
 			Edge edgeA = a.edges.get(i);
@@ -301,6 +307,10 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 				if( bb.marked ) continue;
 
 				if( aa == bb ) {
+//					System.out.println("center "+aa.ellipse.center);
+					if( checkSide && UtilAngle.distanceCW(edgeAB.angle,edgeA.angle) > Math.PI*0.75 )
+						continue;
+
 					double angle = UtilAngle.dist(edgeA.angle,edgeB.angle);
 
 					if( angle < 0.3 )
@@ -314,14 +324,14 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 
 					// see if they are approximately the same distance
 					double diffRatio = Math.abs(da-db)/Math.max(da,db);
-					if( diffRatio > 0.25 )
+					if( diffRatio > 0.3 )
 						continue;
 
 					// TODO reject if too far
-					double d = (da+db);
+					double d = (da+db)/distAB + 0.1*angle;
 
-					if( d < bestDistance ) {
-						bestDistance = d;
+					if( d < bestScore ) {
+						bestScore = d;
 						best = aa;
 						bestEdgeA = a.edges.get(i);
 						bestEdgeB = b.edges.get(j);
@@ -360,7 +370,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 	}
 
 	static NodeInfo selectClosestN( NodeInfo a , NodeInfo b ) {
-		Edge e = selectClosest(a,b);
+		Edge e = selectClosest(a,b,true);
 		if( e == null )
 			return null;
 		else
