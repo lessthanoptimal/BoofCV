@@ -40,12 +40,13 @@ public class TestCalibrationDetectorCircleHexagonalGrid extends GenericPlanarCal
 	public TestCalibrationDetectorCircleHexagonalGrid() {
 		// each configuration has a different ending that needs to be handled
 		targetConfigs.add( new ConfigCircleHexagonalGrid(5, 5, 20,24) );
-		targetConfigs.add( new ConfigCircleHexagonalGrid(5, 4, 20,24) );
-//		targetConfigs.add( new ConfigCircleHexagonalGrid(4, 4, 20,24) );
+		targetConfigs.add( new ConfigCircleHexagonalGrid(5, 6, 20,24) );
+		targetConfigs.add( new ConfigCircleHexagonalGrid(6, 6, 20,24) );
 
 		// Does a good job detecting the ellipses, but a shit job determining with the tangent points
 		// The lens distortion moves them so that they aren't even close
 		fisheyeMatchTol = 10;
+		fisheyeAllowedFails = 4;
 	}
 
 	@Override
@@ -77,7 +78,8 @@ public class TestCalibrationDetectorCircleHexagonalGrid extends GenericPlanarCal
 		Ellipse2D.Double ellipse = new Ellipse2D.Double();
 
 		for (int row = 0; row < config.numRows; row++) {
-			double y = borderPixels+radiusPixels+row*spaceY;
+			double y = borderPixels+radiusPixels;
+			y += (config.numRows-1-row)*spaceY;
 			for (int col = 0; col < config.numCols; col++) {
 				double x = borderPixels+radiusPixels+col*spaceX;
 

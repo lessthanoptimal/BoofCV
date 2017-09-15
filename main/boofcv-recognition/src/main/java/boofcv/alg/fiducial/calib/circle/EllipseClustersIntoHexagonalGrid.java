@@ -19,10 +19,7 @@
 package boofcv.alg.fiducial.calib.circle;
 
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters.Node;
-import georegression.metric.ClosestPoint2D_F64;
 import georegression.metric.UtilAngle;
-import georegression.struct.line.LineParametric2D_F64;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.EllipseRotated_F64;
 
 import java.util.ArrayList;
@@ -67,8 +64,6 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 		foundGrids.reset();
 		if( clusters.size() == 0 )
 			return;
-
-		verbose = true;
 
 		for (int i = 0; i < clusters.size(); i++) {
 			List<Node> cluster = clusters.get(i);
@@ -125,13 +120,11 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 					break;
 				even = !even;
 				grid.add(column1);
-//				System.out.println("column "+column1.size());
 				if( expected != column1.size() ) {
 					error = true;
 					if( verbose ) System.out.println("Unexpected column length! "+expected+" "+column1.size());
 					break;
 				}
-				// todo check lengths
 			}
 
 			if( !error ) {
@@ -146,27 +139,6 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 				saveResults(grid);
 			}
 		}
-	}
-
-	private NodeInfo smallestSweep( NodeInfo a , NodeInfo b , boolean ccw ) {
-
-		double bestSweep = Math.PI;
-		NodeInfo best = null;
-
-		double reference = b.findEdge(a).angle;
-
-		for (int i = 0; i < b.edges.size; i++) {
-			Edge e = b.edges.get(i);
-			if( e.target.marked )
-				continue;
-			double sweep = ccw ? UtilAngle.distanceCCW(reference,e.angle) : UtilAngle.distanceCW(reference,e.angle);
-
-			if( sweep < bestSweep ) {
-				bestSweep = sweep;
-				best = e.target;
-			}
-		}
-		return best;
 	}
 
 	/**
@@ -341,32 +313,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 			}
 		}
 
-		// check the angles
-//		if( best != null ) {
-//			double angleA = UtilAngle.(bestEdgeA.angle,bestEdgeB.angle);
-//
-//			if( angleA < Math.PI*0.5 ) // expected with zero distortion is 60 degrees
-//				return bestEdgeA;
-//			else
-//				return null;
-//		}
-
 		return bestEdgeA;
-	}
-
-	static boolean closestPointIsBetween( NodeInfo a , NodeInfo b , NodeInfo c ) {
-
-		Point2D_F64 pa = a.ellipse.center;
-		Point2D_F64 pb = b.ellipse.center;
-		Point2D_F64 pc = c.ellipse.center;
-
-		LineParametric2D_F64 line = new LineParametric2D_F64();
-		line.p.set(pa);
-		line.slope.set(pb.x-pa.x,pb.y-pa.y);
-
-		double t = ClosestPoint2D_F64.closestPointT(line,pc);
-
-		return t > 0 && t < 1;
 	}
 
 	static NodeInfo selectClosestN( NodeInfo a , NodeInfo b ) {
