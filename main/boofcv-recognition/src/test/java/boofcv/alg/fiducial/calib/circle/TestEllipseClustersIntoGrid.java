@@ -273,18 +273,18 @@ public class TestEllipseClustersIntoGrid {
 	}
 
 	@Test
-	public void grid_getIndexOfAsymEllipse() {
-		grid_getIndexOfAsymEllipse(1,1);
-		grid_getIndexOfAsymEllipse(1,4);
-		grid_getIndexOfAsymEllipse(4,1);
-		grid_getIndexOfAsymEllipse(4,4);
-		grid_getIndexOfAsymEllipse(4,5);
-		grid_getIndexOfAsymEllipse(5,4);
-		grid_getIndexOfAsymEllipse(5,5);
-		grid_getIndexOfAsymEllipse(5,6);
+	public void grid_getIndexOfHexEllipse() {
+		grid_getIndexOfHexEllipse(1,1);
+		grid_getIndexOfHexEllipse(1,4);
+		grid_getIndexOfHexEllipse(4,1);
+		grid_getIndexOfHexEllipse(4,4);
+		grid_getIndexOfHexEllipse(4,5);
+		grid_getIndexOfHexEllipse(5,4);
+		grid_getIndexOfHexEllipse(5,5);
+		grid_getIndexOfHexEllipse(5,6);
 	}
 
-	private void grid_getIndexOfAsymEllipse(int numRows , int numCols ) {
+	private void grid_getIndexOfHexEllipse(int numRows , int numCols ) {
 		Grid g = new Grid();
 		g.rows = numRows;
 		g.columns = numCols;
@@ -309,7 +309,7 @@ public class TestEllipseClustersIntoGrid {
 		for (int i = 0; i < totalEllipses; i++) {
 			int row = index[i]/g.columns;
 			int col = index[i]%g.columns;
-			assertEquals(row+" "+col, i , g.getIndexOfAsymEllipse(row,col));
+			assertEquals(row+" "+col, i , g.getIndexOfHexEllipse(row,col));
 		}
 	}
 

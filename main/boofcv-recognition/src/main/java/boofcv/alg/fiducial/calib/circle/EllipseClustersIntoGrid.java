@@ -33,7 +33,7 @@ import java.util.List;
  * <p>Base class for ordering clusters of ellipses into grids</p>
  *
  * <p>See {@link Grid} for a description of how the output grids are described.  It uses a sparse format.</p>
- * <p>See {@link DetectCircleAsymmetricGrid} for an example of an asymmetric grid</p>
+ * <p>See {@link DetectCircleHexagonalGrid} for an example of an hexagonal grid</p>
  *
  * @author Peter Abeles
  */
@@ -101,6 +101,7 @@ public abstract class EllipseClustersIntoGrid {
 		line.add( seed );
 		line.add( next );
 
+		NodeInfo previous = seed;
 		for( int i = 0; i < clusterSize+1; i++) {
 			// find the child of next which is within tolerance and closest to it
 			double bestScore = Double.MAX_VALUE;
@@ -109,11 +110,27 @@ public abstract class EllipseClustersIntoGrid {
 			double closestDistance = Double.MAX_VALUE;
 			NodeInfo best = null;
 
+			double previousLength = next.ellipse.center.distance(previous.ellipse.center);
+
+//			System.out.println("---- line connecting "+i);
 			for (int j = 0; j < next.edges.size(); j++) {
+
 				double angle = next.edges.get(j).angle;
 				NodeInfo c = next.edges.get(j).target;
 				if( c.marked )
 					continue;
+
+				double candidateLength = next.ellipse.center.distance(c.ellipse.center);
+
+				double ratioLengths = previousLength/candidateLength;
+				double ratioSize = previous.ellipse.a/c.ellipse.a;
+				if( ratioLengths > 1 ) {
+					ratioLengths = 1.0/ratioLengths;
+					ratioSize = 1.0/ratioSize;
+				}
+				if( Math.abs(ratioLengths-ratioSize) > 0.4 )
+					continue;
+
 
 				double angleDist = ccw ? UtilAngle.distanceCCW(anglePrev,angle) : UtilAngle.distanceCW(anglePrev,angle);
 
@@ -123,6 +140,7 @@ public abstract class EllipseClustersIntoGrid {
 					double score = d/prevDist+angleDist;
 
 					if( score < bestScore ) {
+//						System.out.println("  ratios: "+ratioLengths+" "+ratioSize);
 						bestDistance = d;
 						bestScore = score;
 						bestAngle = angle;
@@ -139,6 +157,7 @@ public abstract class EllipseClustersIntoGrid {
 				prevDist = bestDistance;
 				line.add(best);
 				anglePrev = UtilAngle.bound(bestAngle+Math.PI);
+				previous = next;
 				next = best;
 			}
 		}
@@ -439,6 +458,19 @@ public abstract class EllipseClustersIntoGrid {
 		// used to indicate if it has been inspected already
 		boolean marked;
 
+		public Edge findEdge( NodeInfo target ) {
+			for (int i = 0; i < edges.size; i++) {
+				if( edges.get(i).target == target ) {
+					return edges.get(i);
+				}
+			}
+			return null;
+		}
+
+		public double distance( NodeInfo target ) {
+			return ellipse.center.distance(target.ellipse.center);
+		}
+
 		public void reset() {
 			contour = false;
 			ellipse = null;
@@ -497,7 +529,7 @@ public abstract class EllipseClustersIntoGrid {
 			this.columns = columns;
 		}
 
-		public int getIndexOfAsymEllipse( int row , int col ) {
+		public int getIndexOfHexEllipse(int row , int col ) {
 			int index = 0;
 			index += (row/2)*this.columns + (row%2)*(this.columns/2+this.columns%2);
 			return index + col/2;

@@ -164,8 +164,8 @@ public class KeyPointsCircleHexagonalGrid {
 		if( !tangentFinder.process(a,b, A0, A1, A2, A3, B0, B1, B2, B3) ) {
 			return false;
 		}
-		Tangents ta = tangents.get(grid.getIndexOfAsymEllipse(rowA,colA));
-		Tangents tb = tangents.get(grid.getIndexOfAsymEllipse(rowB,colB));
+		Tangents ta = tangents.get(grid.getIndexOfHexEllipse(rowA,colA));
+		Tangents tb = tangents.get(grid.getIndexOfHexEllipse(rowB,colB));
 
 		// add tangent points from the two lines which do not cross the center line
 		ta.grow().set(A0);

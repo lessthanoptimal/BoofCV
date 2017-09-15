@@ -49,7 +49,7 @@ import georegression.struct.shapes.EllipseRotated_F64;
  *
  * @author Peter Abeles
  */
-public class DetectCircleAsymmetricGrid<T extends ImageGray<T>> extends DetectCircleGrid<T> {
+public class DetectCircleHexagonalGrid<T extends ImageGray<T>> extends DetectCircleGrid<T> {
 
 	/**
 	 * Creates and configures the detector
@@ -60,10 +60,10 @@ public class DetectCircleAsymmetricGrid<T extends ImageGray<T>> extends DetectCi
 	 * @param ellipseDetector Detects ellipses inside the image
 	 * @param clustering Finds clusters of ellipses
 	 */
-	public DetectCircleAsymmetricGrid(int numRows, int numCols,
-									  InputToBinary<T> inputToBinary,
-									  BinaryEllipseDetector<T> ellipseDetector,
-									  EllipsesIntoClusters clustering) {
+	public DetectCircleHexagonalGrid(int numRows, int numCols,
+									 InputToBinary<T> inputToBinary,
+									 BinaryEllipseDetector<T> ellipseDetector,
+									 EllipsesIntoClusters clustering) {
 		super(numRows,numCols,inputToBinary,ellipseDetector, clustering,
 				new EllipseClustersIntoHexagonalGrid());
 	}
@@ -72,10 +72,10 @@ public class DetectCircleAsymmetricGrid<T extends ImageGray<T>> extends DetectCi
 	protected void configureContourDetector(T gray) {
 		// overestimate for multiple reasons. Doesn't take in account space and distance between touching circles
 		// isn't correct
-		int diameter = Math.max(gray.width,gray.height)/(Math.max(numCols,numRows)/2);
+		int diameter = Math.max(gray.width,gray.height)/(Math.max(numCols,numRows));
 
 		LinearContourLabelChang2004 contourFinder = ellipseDetector.getEllipseDetector().getContourFinder();
-		contourFinder.setMaxContourSize((int)(2.0*Math.PI*diameter/2.0));
+		contourFinder.setMaxContourSize((int)(Math.PI*diameter*3)+1);
 		contourFinder.setSaveInternalContours(false);
 	}
 

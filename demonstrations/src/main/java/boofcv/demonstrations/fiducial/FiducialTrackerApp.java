@@ -74,7 +74,7 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 	private static final String CALIB_CHESS = "Chessboard";
 	private static final String CALIB_SQUARE_GRID = "Square Grid";
 	private static final String CALIB_SQUARE_BINARY_GRID = "Square Binary Grid";
-	private static final String CALIB_CIRCLE_ASYM_GRID = "Circle Asymmetric Grid";
+	private static final String CALIB_CIRCLE_HEXAGONAL_GRID = "Circle Hexagonal Grid";
 
 
 	private static final Font font = new Font("Serif", Font.BOLD, 14);
@@ -308,8 +308,8 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-		} else if( name.compareTo(CALIB_CIRCLE_ASYM_GRID) == 0 ) {
-			detector = FactoryFiducial.calibCircleAsymGrid(new ConfigCircleHexagonalGrid(5, 8, 1, 6), imageClass);
+		} else if( name.compareTo(CALIB_CIRCLE_HEXAGONAL_GRID) == 0 ) {
+			detector = FactoryFiducial.calibCircleHexagonalGrid(new ConfigCircleHexagonalGrid(5, 8, 1, 6), imageClass);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}
@@ -367,7 +367,7 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 		inputs.add(new PathLabel(CALIB_CHESS, UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 		inputs.add(new PathLabel(CALIB_SQUARE_GRID, UtilIO.pathExample("fiducial/square_grid/movie.mp4")));
 //		inputs.add(new PathLabel(CALIB_SQUARE_BINARY_GRID, UtilIO.pathExample("fiducial/binary_grid/movie.mp4")));
-		inputs.add(new PathLabel(CALIB_CIRCLE_ASYM_GRID, UtilIO.pathExample("fiducial/circle_asymmetric/movie.mp4")));
+		inputs.add(new PathLabel(CALIB_CIRCLE_HEXAGONAL_GRID, UtilIO.pathExample("fiducial/circle_asymmetric/movie.mp4")));
 
 		app.setInputList(inputs);
 

@@ -27,7 +27,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.alg.fiducial.calib.circle.TestDetectCircleAsymmetricGrid.createGrid;
+import static boofcv.alg.fiducial.calib.circle.TestDetectCircleHexagonalGrid.createGrid;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

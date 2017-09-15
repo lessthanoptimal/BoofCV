@@ -90,7 +90,7 @@ public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 	 * @param gray Input image
 	 */
 	public void process(T gray) {
-		if( verbose) System.out.println("ENTER DetectAsymmetricCircleGrid.process()");
+		if( verbose) System.out.println("ENTER DetectCircleGrid.process()");
 
 		configureContourDetector(gray);
 		this.binary.reshape(gray.width,gray.height);
@@ -131,7 +131,7 @@ public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 			validGrids.add( g );
 		}
 
-		if( verbose) System.out.println("EXIT DetectAsymmetricCircleGrid.process()");
+		if( verbose) System.out.println("EXIT DetectCircleGrid.process()");
 	}
 
 	/**

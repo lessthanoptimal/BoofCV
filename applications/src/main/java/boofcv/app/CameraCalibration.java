@@ -94,7 +94,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("Fiducial Types:");
 		System.out.println("   CHESSBOARD");
 		System.out.println("   SQUAREGRID");
-		System.out.println("   CIRCLE_ASYM");
+		System.out.println("   CIRCLE_HEX");
 		System.out.println("   CIRCLE_REG");
 		System.out.println();
 		System.out.println("Flags for CHESSBOARD:");
@@ -105,9 +105,9 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("  --SquareSpace=<square>:<space>     Specifies side of a square and space between square");
 		System.out.println("                                     Only the ratio matters.");
 		System.out.println("                                     Default: 1:1 square = 1 and space = 1");
-		System.out.println("Flags for CIRCLE_ASYM:");
+		System.out.println("Flags for CIRCLE_HEX:");
 		System.out.println("  --Grid=<rows>:<columns>            Specifies number of rows and columns");
-		System.out.println("  --CenterDistance=<length>          Specifies how far apart the center of two circles are along an axis");
+		System.out.println("  --CenterDistance=<length>          Distance between circle centers");
 		System.out.println("  --Diameter=<length>                Diameter of a circle");
 		System.out.println();
 		System.out.println("Flags for CIRCLE_REG:");
@@ -150,7 +150,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			} else if( arg.compareToIgnoreCase("SQUAREGRID") == 0 ) {
 				parseSquareGrid(i + 1, args);
 				break;
-			} else if( arg.compareToIgnoreCase("CIRCLE_ASYM") == 0 ) {
+			} else if( arg.compareToIgnoreCase("CIRCLE_HEX") == 0 ) {
 				parseCircle(i + 1, args, true);
 				break;
 			} else if( arg.compareToIgnoreCase("CIRCLE_REG") == 0 ) {
@@ -237,7 +237,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		detector = FactoryFiducialCalibration.squareGrid(config);
 	}
 
-	protected void parseCircle( int index , String []args , boolean asymmetric) {
+	protected void parseCircle( int index , String []args , boolean hexagonal) {
 		int numRows=0,numColumns=0;
 		double diameter=-1,centerDistance=-1;
 
@@ -270,11 +270,11 @@ public class CameraCalibration extends BaseStandardInputApp {
 			throw new RuntimeException("diameter and center distance must be specified and > 0");
 		}
 
-		if( asymmetric ) {
-			System.out.println("circle asymmetric: "+numRows+" x "+numColumns+" diameter = "+diameter+" center distance = "+centerDistance);
+		if( hexagonal ) {
+			System.out.println("circle hexagonal: "+numRows+" x "+numColumns+" diameter = "+diameter+" center distance = "+centerDistance);
 			ConfigCircleHexagonalGrid config = new ConfigCircleHexagonalGrid(numRows, numColumns, diameter, centerDistance);
 
-			detector = FactoryFiducialCalibration.circleAsymmGrid(config);
+			detector = FactoryFiducialCalibration.circleHexagonalGrid(config);
 		} else {
 			System.out.println("circle regular: "+numRows+" x "+numColumns+" diameter = "+diameter+" center distance = "+centerDistance);
 			ConfigCircleRegularGrid config = new ConfigCircleRegularGrid(numRows, numColumns, diameter, centerDistance);

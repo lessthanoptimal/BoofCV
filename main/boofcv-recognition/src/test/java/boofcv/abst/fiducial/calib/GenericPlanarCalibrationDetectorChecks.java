@@ -58,6 +58,9 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	boolean visualizeFailures = false;
 	long visualizeTime = 2000;
 
+	int failedToDetect;
+	double fisheyeAllowedFails = 0;
+
 	// list of posses for fisheye test
 	protected List<Se3_F64> fisheye_poses = new ArrayList<>();
 
@@ -123,12 +126,14 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 			Se3_F64 markerToWorld = new Se3_F64();
 			simulator.addTarget(markerToWorld, simulatedTargetWidth,pattern);
 
+			failedToDetect = 0;
 			for( int j = 0; j < fisheye_poses.size(); j++ ) {
 //				System.out.println("fisheye pose = "+j);
 				markerToWorld.set(fisheye_poses.get(j));
 				checkRenderedResults(detector,simulator,locations2D);
 			}
 		}
+		assertTrue(failedToDetect<=fisheyeAllowedFails);
 	}
 
 	private void checkRenderedResults(DetectorFiducialCalibration detector,
@@ -140,7 +145,8 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 //		visualize(simulator, locations2D, null);
 		if( !detector.process(simulator.getOutput())) {
 			visualize(simulator, locations2D, null);
-			fail("Detection failed");
+			failedToDetect++;
+			return;
 		}
 
 		checkResults(simulator,detector.getDetectedPoints(), locations2D);
@@ -214,6 +220,8 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		List<Point2D_F64> locations2D = new ArrayList<>();
 		GrayF32 pattern = new GrayF32(1,1);
 		for (int i = 0; i < targetConfigs.size(); i++) {
+//			System.out.println("*---------- Configuration "+i);
+			failedToDetect = 0;
 			DetectorFiducialCalibration detector = createDetector(targetConfigs.get(i));
 			renderTarget(targetConfigs.get(i), simulatedTargetWidth, pattern, locations2D);
 
@@ -253,6 +261,8 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.2,-1,2.4,markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 		}
+		assertEquals(0,failedToDetect);
+
 	}
 
 	protected GrayF32 renderEasy( Object layout , List<Point2D_F64> locations2D ) {

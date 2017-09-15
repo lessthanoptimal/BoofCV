@@ -74,15 +74,15 @@ public class FactoryFiducialCalibration {
 	}
 
 	/**
-	 * Detector for asymmetric grid of circles.  All circles must be entirely inside of the image.
+	 * Detector for hexagonal grid of circles.  All circles must be entirely inside of the image.
 	 *
 	 * @param config Configuration for target
 	 * @return The detector
 	 */
-	public static CalibrationDetectorCircleAsymmGrid circleAsymmGrid( ConfigCircleHexagonalGrid config ) {
+	public static CalibrationDetectorCircleHexagonalGrid circleHexagonalGrid(ConfigCircleHexagonalGrid config ) {
 		config.checkValidity();
 
-		return new CalibrationDetectorCircleAsymmGrid(config);
+		return new CalibrationDetectorCircleHexagonalGrid(config);
 	}
 
 	/**

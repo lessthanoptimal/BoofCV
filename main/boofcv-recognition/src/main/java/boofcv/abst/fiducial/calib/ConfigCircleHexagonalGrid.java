@@ -18,16 +18,16 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.alg.fiducial.calib.circle.DetectCircleAsymmetricGrid;
+import boofcv.alg.fiducial.calib.circle.DetectCircleHexagonalGrid;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.ConfigEllipseDetector;
 import boofcv.struct.Configuration;
 
 /**
- * Calibration parameters for an asymmetric grid of circle calibration target.
+ * Calibration parameters for an hexagonal grid of circle calibration target.
  *
- * @see DetectCircleAsymmetricGrid
+ * @see DetectCircleHexagonalGrid
  *
  * @author Peter Abeles
  */
@@ -67,7 +67,7 @@ public class ConfigCircleHexagonalGrid implements Configuration {
 	 * How similar two ellipses must be to be connected.  0 to 1.0.  1.0 = perfect match and 0.0 = infinite
 	 * difference in size
 	 */
-	public double ellipseSizeSimilarity = 0.6;
+	public double ellipseSizeSimilarity = 0.5;
 
 	/**
 	 * How similar edge intensity between two ellipses need to be.  0 to 1.0.  1.0 = perfect match

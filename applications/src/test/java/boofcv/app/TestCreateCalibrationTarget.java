@@ -79,8 +79,8 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
 
-		CalibrationDetectorCircleAsymmGrid detector =
-				FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleHexagonalGrid(8,5,2,6));
+		CalibrationDetectorCircleHexagonalGrid detector =
+				FactoryFiducialCalibration.circleHexagonalGrid(new ConfigCircleHexagonalGrid(8,5,2,6));
 
 		assertTrue(detector.process(gray));
 	}

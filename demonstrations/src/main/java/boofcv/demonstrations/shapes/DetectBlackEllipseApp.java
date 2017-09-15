@@ -119,12 +119,12 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 	public static void main(String[] args) {
 
 		List<String> examples = new ArrayList<>();
-		examples.add("fiducial/circle_asymmetric/image01.jpg");
+		examples.add("fiducial/circle_hexagonal/image01.jpg");
 		examples.add("shapes/polygons01.jpg");
 		examples.add("shapes/shapes01.png");
 		examples.add("shapes/shapes02.png");
-		examples.add("fiducial/circle_asymmetric/image00.jpg");
-		examples.add("fiducial/circle_asymmetric/movie.mp4");
+		examples.add("fiducial/circle_hexagonal/image00.jpg");
+		examples.add("fiducial/circle_hexagonal/movie.mp4");
 
 		DetectBlackEllipseApp app = new DetectBlackEllipseApp(examples,GrayF32.class);
 

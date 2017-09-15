@@ -46,8 +46,8 @@ public class ExampleDetectBlackEllipse {
 		String images[] = new String[]{
 				"shapes/polygons01.jpg",
 				"shapes/shapes02.png",
-				"fiducial/circle_asymmetric/image00.jpg",
-				"fiducial/circle_asymmetric/image01.jpg"};
+				"fiducial/circle_hexagonal/image00.jpg",
+				"fiducial/circle_hexagonal/image01.jpg"};
 
 		ListDisplayPanel panel = new ListDisplayPanel();
 

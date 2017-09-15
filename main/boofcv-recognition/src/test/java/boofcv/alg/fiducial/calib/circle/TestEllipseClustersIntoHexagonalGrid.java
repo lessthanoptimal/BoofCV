@@ -228,7 +228,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 
 		NodeInfo corner = alg.listInfo.get(0);
 
-		alg.bottomTwoColumns(corner, column0, column1);
+		alg.bottomTwoColumns(corner, null,column0, column1);
 
 		assertEquals(3,column0.size());
 		assertEquals(3,column1.size());
@@ -268,7 +268,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 
 		NodeInfo corner = alg.listInfo.get(0);
 
-		alg.bottomTwoColumns(corner, column0, column1);
+		alg.bottomTwoColumns(corner,null, column0, column1);
 
 		assertEquals(2,column0.size());
 		assertEquals(1,column1.size());
@@ -293,7 +293,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
 		alg.computeNodeInfo(input.data1,input.data0);
 
-		NodeInfo found = EllipseClustersIntoHexagonalGrid.selectClosest(alg.listInfo.get(0),alg.listInfo.get(1));
+		NodeInfo found = EllipseClustersIntoHexagonalGrid.selectClosestN(alg.listInfo.get(0),alg.listInfo.get(1));
 
 		assertTrue(found != null);
 
@@ -304,7 +304,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 		alg.listInfo.get(3).ellipse.set(0,1,1,1,0);
 		input = connectEllipses(ellipses,1.1);
 		alg.computeNodeInfo(input.data1,input.data0);
-		found = EllipseClustersIntoHexagonalGrid.selectClosest(alg.listInfo.get(0),alg.listInfo.get(1));
+		found = EllipseClustersIntoHexagonalGrid.selectClosestN(alg.listInfo.get(0),alg.listInfo.get(1));
 		assertTrue(found == null);
 
 	}
@@ -335,7 +335,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 		alg.listInfo.get(3).ellipse.set(0,1,1,1,0);
 		input = connectEllipses(ellipses,1.1);
 		alg.computeNodeInfo(input.data1,input.data0);
-		found = EllipseClustersIntoHexagonalGrid.selectClosest(alg.listInfo.get(0),alg.listInfo.get(1));
+		found = EllipseClustersIntoHexagonalGrid.selectClosestN(alg.listInfo.get(0),alg.listInfo.get(1));
 		assertTrue(found == null);
 	}
 

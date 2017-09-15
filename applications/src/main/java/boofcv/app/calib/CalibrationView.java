@@ -19,7 +19,7 @@
 package boofcv.app.calib;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
-import boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid;
+import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
@@ -137,7 +137,7 @@ public interface CalibrationView {
 		}
 	}
 
-	class CircleAsymmGrid implements CalibrationView {
+	class CircleHexagonalGrid implements CalibrationView {
 
 		int gridRows, gridCols;
 
@@ -147,7 +147,7 @@ public interface CalibrationView {
 		int indexes[];
 
 		public void initialize( DetectorFiducialCalibration detector ) {
-			CalibrationDetectorCircleAsymmGrid target = (CalibrationDetectorCircleAsymmGrid)detector;
+			CalibrationDetectorCircleHexagonalGrid target = (CalibrationDetectorCircleHexagonalGrid)detector;
 			gridRows = target.getRows();
 			gridCols = target.getColumns();
 
