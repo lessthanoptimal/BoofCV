@@ -55,7 +55,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	double simulatedTargetWidth = 0.3; // size of target in simulated world
 
-	boolean visualizeFailures = false;
+	boolean visualizeFailures = true;
 	long visualizeTime = 2000;
 
 	// list of posses for fisheye test
@@ -214,6 +214,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		List<Point2D_F64> locations2D = new ArrayList<>();
 		GrayF32 pattern = new GrayF32(1,1);
 		for (int i = 0; i < targetConfigs.size(); i++) {
+			System.out.println("*---------- Configuration "+i);
 			DetectorFiducialCalibration detector = createDetector(targetConfigs.get(i));
 			renderTarget(targetConfigs.get(i), simulatedTargetWidth, pattern, locations2D);
 

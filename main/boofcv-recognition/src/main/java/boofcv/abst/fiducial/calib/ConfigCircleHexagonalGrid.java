@@ -67,7 +67,7 @@ public class ConfigCircleHexagonalGrid implements Configuration {
 	 * How similar two ellipses must be to be connected.  0 to 1.0.  1.0 = perfect match and 0.0 = infinite
 	 * difference in size
 	 */
-	public double ellipseSizeSimilarity = 0.6;
+	public double ellipseSizeSimilarity = 0.5;
 
 	/**
 	 * How similar edge intensity between two ellipses need to be.  0 to 1.0.  1.0 = perfect match

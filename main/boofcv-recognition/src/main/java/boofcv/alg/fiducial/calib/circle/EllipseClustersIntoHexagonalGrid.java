@@ -19,9 +19,7 @@
 package boofcv.alg.fiducial.calib.circle;
 
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters.Node;
-import georegression.geometry.UtilVector2D_F64;
 import georegression.metric.UtilAngle;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.EllipseRotated_F64;
 
 import java.util.ArrayList;
@@ -85,27 +83,95 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 
 			// Find corner to start alignment
 			NodeInfo corner = selectSeedCorner();
-
-			List<NodeInfo> column0 = new ArrayList<>();
-			List<NodeInfo> column1 = new ArrayList<>();
-
-			bottomTwoColumns(corner, column0, column1);
-
-			List<List<NodeInfo>> grid = new ArrayList<>();
-			grid.add(column0);
-			grid.add(column1);
-
-			if( addRemainingColumns(column1, column0, grid) ) {
-				continue; // error message already printed in verbose
-			}
-
-			if( checkDuplicates(grid) ) {
-				if( verbose ) System.out.println("contains duplicates");
+			if( corner == null ) {
+				if( verbose ) System.out.println("No corner found!");
 				continue;
 			}
 
-			saveResults(grid);
+			System.out.println("corner "+corner.ellipse.center);
+			System.out.println("left   "+corner.left.ellipse.center);
+			System.out.println("right  "+corner.right.ellipse.center);
+
+			List<List<NodeInfo>> grid = new ArrayList<>();
+
+			// traverse along the axis with closely spaced circles
+			double distLeft = corner.distance(corner.left);
+			double distRight = corner.distance(corner.right);
+			NodeInfo next = distLeft < distRight ? corner.left : corner.right;
+			next.marked = true;
+			NodeInfo other = distLeft < distRight ? corner.right : corner.left;
+
+			boolean ccw = UtilAngle.distanceCCW(direction(corner,other),direction(corner,next)) > Math.PI;
+
+			boolean even = true;
+			boolean error = false;
+			while( true ) {
+				List<NodeInfo> column = findLine(corner,next,clusterSize,null,ccw);
+				System.out.println("column "+column.size());
+				grid.add(column);
+
+				if( grid.size() == 2 ) {
+					if( Math.abs(column.size() - grid.get(0).size()) > 1 ) {
+						if( verbose ) System.out.println("Unexpected line length, first offset line.");
+						error = true;break;
+					}
+				} else if( grid.size() > 1 ){
+					if( column.size() != grid.get( grid.size()-3).size() ) {
+						if( verbose )
+							System.out.println("Unexpected line length compared to previous.");
+						error = true;break;
+					}
+				}
+
+				if( even ) {
+					corner = selectClosestN(corner,next);
+					if( corner == null ) break;
+					next = selectClosestN(corner,next);
+					if( next == null ) break;
+				} else {
+					next = selectClosestN(corner,next);
+					if( next == null ) break;
+					corner = selectClosestN(corner,next);
+					if( corner == null ) break;
+				}
+				corner.marked = true;
+				next.marked = true;
+				even = !even;
+			}
+
+			if( !error ) {
+				if( grid.size() < 3)
+					continue;
+
+				if (checkDuplicates(grid)) {
+					if (verbose) System.out.println("contains duplicates");
+					continue;
+				}
+
+				saveResults(grid);
+			}
 		}
+	}
+
+	private NodeInfo smallestSweep( NodeInfo a , NodeInfo b , boolean ccw ) {
+
+		double bestSweep = Math.PI;
+		NodeInfo best = null;
+
+		double reference = b.findEdge(a).angle;
+
+		for (int i = 0; i < b.edges.size; i++) {
+			Edge e = b.edges.get(i);
+			if( e.target.marked )
+				continue;
+			double sweep = ccw ? UtilAngle.distanceCCW(reference,e.angle) : UtilAngle.distanceCW(reference,e.angle);
+
+			if( sweep < bestSweep ) {
+				bestSweep = sweep;
+				best = e.target;
+			}
+		}
+		return best;
 	}
 
 	/**
@@ -113,25 +179,34 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 	 */
 	NodeInfo selectSeedCorner() {
 		NodeInfo best = null;
-		double bestAngle = Math.PI;
+		double bestScore = 0;
+		double minAngle = Math.PI+0.1;
 
 		for (int i = 0; i < contour.size; i++) {
 			NodeInfo info = contour.get(i);
 
-			if( info.angleBetween > bestAngle ) {
-				NodeInfo middle = selectClosest(info.right,info);
+			if( info.angleBetween < minAngle )
+				continue;
 
-				if( middle == null || middle == info.left )
-					continue;
+			Edge middleR = selectClosest(info.right,info);
+			if( middleR == null )
+				continue;
+			Edge middleL = selectClosest(info.left,info);
+			if( middleL == null )
+				continue;
 
-				Point2D_F64 a = info.left.ellipse.center;
-				Point2D_F64 b = middle.ellipse.center;
-				Point2D_F64 c = info.right.ellipse.center;
+			if( middleL.target != middleR.target )
+				continue;
 
-				double acute = UtilVector2D_F64.acute(a.x-b.x,a.y-b.y,b.x-c.x,b.y-c.y);
+			// With no perspective distortion, at the correct corners difference should be zero
+			// while the bad ones will be around 60 degrees
+			double r = UtilAngle.bound( middleR.angle + Math.PI);
+			double difference = UtilAngle.dist(r,middleL.angle);
 
-				bestAngle = info.angleBetween - acute;
+			double score = info.angleBetween - difference;
+			if( score > bestScore ) {
 				best = info;
+				bestScore = score;
 			}
 		}
 
@@ -150,7 +225,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 			if( grid.size()%2 == 0 )
 				a = selectClosestSide(column1.get(0),column0.get(0));
 			else
-				a = selectClosest(column1.get(1),column1.get(0));
+				a = selectClosest(column1.get(1),column1.get(0)).target;
 			if( a == null )
 				break;
 			a.marked = true;
@@ -159,7 +234,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 			column1.add(a);
 			for (int j = grid.size()%2; j < column0.size(); j++) {
 				NodeInfo b = column0.get(j);
-				a = selectClosest(b,a);
+				a = selectClosest(b,a).target;
 				if( a != null ) {
 					a.marked = true;
 					column1.add(a);
@@ -185,7 +260,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 		column0.add(corner);
 		column0.add(corner.right);
 
-		NodeInfo a = selectClosest(corner.right,corner);
+		NodeInfo a = selectClosest(corner.right,corner).target;
 		if( a == null ) {
 			return;
 		}
@@ -197,13 +272,13 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 		corner.right.marked = true;
 
 		while( true ) {
-			NodeInfo t = selectClosest(b,a);
+			NodeInfo t = selectClosest(b,a).target;
 			if( t == null ) break;
 			t.marked = true;
 			column1.add(t);
 
 			a = t;
-			t = selectClosest(b,a);
+			t = selectClosest(b,a).target;
 			if( t == null ) break;
 			t.marked = true;
 			column0.add(t);
@@ -214,7 +289,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 	/**
 	 * Finds the closest that is the same distance from the two nodes and part of an approximate equilateral triangle
 	 */
-	static NodeInfo selectClosest( NodeInfo a , NodeInfo b ) {
+	static Edge selectClosest( NodeInfo a , NodeInfo b ) {
 
 		NodeInfo best = null;
 		double bestDistance = Double.MAX_VALUE;
@@ -242,7 +317,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 						continue;
 
 					// TODO reject if too far
-					double d = da+db;
+					double d = (da+db);
 
 					if( d < bestDistance ) {
 						bestDistance = d;
@@ -256,16 +331,24 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 		}
 
 		// check the angles
-		if( best != null ) {
-			double angleA = UtilAngle.distanceCW(bestEdgeA.angle,bestEdgeB.angle);
+//		if( best != null ) {
+//			double angleA = UtilAngle.(bestEdgeA.angle,bestEdgeB.angle);
+//
+//			if( angleA < Math.PI*0.5 ) // expected with zero distortion is 60 degrees
+//				return bestEdgeA;
+//			else
+//				return null;
+//		}
 
-			if( angleA < Math.PI*0.5 ) // expected with zero distortion is 60 degrees
-				return best;
-			else
-				return null;
-		}
+		return bestEdgeA;
+	}
 
-		return null;
+	static NodeInfo selectClosestN( NodeInfo a , NodeInfo b ) {
+		Edge e = selectClosest(a,b);
+		if( e == null )
+			return null;
+		else
+			return e.target;
 	}
 
 	/**

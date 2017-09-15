@@ -100,7 +100,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				CalibrateStereoPlanarGuiApp.class,
 				DetectCalibrationChessboardApp.class,
 				DetectCalibrationSquareGridApp.class,
-				DetectCalibrationCircleAsymmetricApp.class,
+				DetectCalibrationCircleHexagonalApp.class,
 				DetectCalibrationCircleRegularApp.class);
 
 		createNodes(root,"Color",

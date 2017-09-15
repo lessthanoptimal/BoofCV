@@ -38,7 +38,14 @@ import static boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid.crea
 public class TestCalibrationDetectorCircleHexagonalGrid extends GenericPlanarCalibrationDetectorChecks {
 
 	public TestCalibrationDetectorCircleHexagonalGrid() {
+		// each configuration has a different ending that needs to be handled
 		targetConfigs.add( new ConfigCircleHexagonalGrid(5, 5, 20,24) );
+		targetConfigs.add( new ConfigCircleHexagonalGrid(5, 4, 20,24) );
+//		targetConfigs.add( new ConfigCircleHexagonalGrid(4, 4, 20,24) );
+
+		// Does a good job detecting the ellipses, but a shit job determining with the tangent points
+		// The lens distortion moves them so that they aren't even close
+		fisheyeMatchTol = 7;
 	}
 
 	@Override

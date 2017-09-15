@@ -72,10 +72,10 @@ public class DetectCircleAsymmetricGrid<T extends ImageGray<T>> extends DetectCi
 	protected void configureContourDetector(T gray) {
 		// overestimate for multiple reasons. Doesn't take in account space and distance between touching circles
 		// isn't correct
-		int diameter = Math.max(gray.width,gray.height)/(Math.max(numCols,numRows)/2);
+		int diameter = Math.max(gray.width,gray.height)/(Math.max(numCols,numRows));
 
 		LinearContourLabelChang2004 contourFinder = ellipseDetector.getEllipseDetector().getContourFinder();
-		contourFinder.setMaxContourSize((int)(2.0*Math.PI*diameter/2.0));
+		contourFinder.setMaxContourSize((int)(Math.PI*diameter*1.2)+1);
 		contourFinder.setSaveInternalContours(false);
 	}
 
