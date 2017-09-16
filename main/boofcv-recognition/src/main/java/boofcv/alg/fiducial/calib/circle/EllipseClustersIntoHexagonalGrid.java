@@ -68,7 +68,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 		for (int i = 0; i < clusters.size(); i++) {
 			List<Node> cluster = clusters.get(i);
 			int clusterSize = cluster.size();
-			if( clusterSize < 5 ) // 3 x 3 grid has 5 elements
+			if( clusterSize < 6 ) // 3 x 4 grid has 6 elements
 				continue;
 
 			computeNodeInfo(ellipses, cluster);
@@ -89,9 +89,10 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 			List<List<NodeInfo>> grid = new ArrayList<>();
 
 			// traverse along the axis with closely spaced circles
-			double distLeft = corner.distance(corner.left);
-			double distRight = corner.distance(corner.right);
-			NodeInfo next = distLeft < distRight ? corner.left : corner.right;
+//			double distLeft = corner.distance(corner.left);
+//			double distRight = corner.distance(corner.right);
+//			NodeInfo next = distLeft < distRight ? corner.left : corner.right;
+			NodeInfo next = corner.left;
 			next.marked = true;
 
 //			System.out.println("corner "+corner.ellipse.center);
@@ -256,10 +257,8 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 	 */
 	static Edge selectClosest( NodeInfo a , NodeInfo b , boolean checkSide ) {
 
-		NodeInfo best = null;
 		double bestScore = Double.MAX_VALUE;
 		Edge bestEdgeA = null;
-		Edge bestEdgeB = null;
 
 		Edge edgeAB = a.findEdge(b);
 		double distAB = a.distance(b);
@@ -304,9 +303,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 
 					if( d < bestScore ) {
 						bestScore = d;
-						best = aa;
 						bestEdgeA = a.edges.get(i);
-						bestEdgeB = b.edges.get(j);
 					}
 					break;
 				}

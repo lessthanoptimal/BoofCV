@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static boofcv.alg.fiducial.calib.circle.TestEllipseClustersIntoGrid.connectEllipses;
-import static georegression.metric.UtilAngle.radian;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -42,6 +41,8 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public class TestEllipseClustersIntoHexagonalGrid {
+
+	private static final double hexY = Math.sqrt(3.0/4.0);
 
 	/**
 	 * See if it can handle a very easy case
@@ -51,10 +52,11 @@ public class TestEllipseClustersIntoHexagonalGrid {
 
 		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
 
-		process(3, 3, alg);
+//		process(3, 3, alg); // too small. Simplies the code by igniring this case
 		process(4, 3, alg);
 		process(4, 4, alg);
 		process(4, 5, alg);
+		process(5, 5, alg);
 		process(5, 8, alg);
 	}
 
@@ -87,15 +89,17 @@ public class TestEllipseClustersIntoHexagonalGrid {
 		// rotate a bit
 		Affine2D_F64 affine1 = ConvertTransform_F64.convert(new Se2_F64(0,0,0.5),(Affine2D_F64)null);
 
-		process_affine( 3,3,affine0);
+//		process_affine( 3,3,affine0);
 		process_affine( 4,3,affine0);
 		process_affine( 4,4,affine0);
 		process_affine( 4,5,affine0);
+		process_affine( 5,5,affine0);
 
-		process_affine( 3,3,affine1);
+//		process_affine( 3,3,affine1);
 		process_affine( 4,3,affine1);
 		process_affine( 4,4,affine1);
 		process_affine( 4,5,affine1);
+		process_affine( 5,5,affine1);
 	}
 
 	private void process_affine( int rows , int cols , Affine2D_F64 affine ) {
@@ -213,11 +217,11 @@ public class TestEllipseClustersIntoHexagonalGrid {
 
 		for (int i = 0; i < 3; i++) {
 			ellipses.add(new EllipseRotated_F64(i , 0, 1, 1, 0));
-			ellipses.add(new EllipseRotated_F64(i + 0.5, 0.866, 1, 1, 0));
-			ellipses.add(new EllipseRotated_F64(i , 0.866*2, 1, 1, 0));
+			ellipses.add(new EllipseRotated_F64(i + 0.5, hexY, 1, 1, 0));
+			ellipses.add(new EllipseRotated_F64(i , hexY*2, 1, 1, 0));
 		}
 
-		Tuple2<List<Node>,List<EllipseRotated_F64>> input = connectEllipses(ellipses,1.1);
+		Tuple2<List<Node>,List<EllipseRotated_F64>> input = connectEllipses(ellipses,hexY*2.1);
 
 		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
 		alg.computeNodeInfo(input.data1,input.data0);
@@ -226,16 +230,19 @@ public class TestEllipseClustersIntoHexagonalGrid {
 		List<NodeInfo> column0 = new ArrayList<>();
 		List<NodeInfo> column1 = new ArrayList<>();
 
-		NodeInfo corner = alg.listInfo.get(0);
+		// first two on top row
+		NodeInfo corner = alg.listInfo.get(2);
+		NodeInfo next = alg.listInfo.get(5);
 
-		alg.bottomTwoColumns(corner, null,column0, column1);
+		corner.marked = next.marked = true;
+		alg.bottomTwoColumns(corner, next,column0, column1);
 
 		assertEquals(3,column0.size());
 		assertEquals(3,column1.size());
 
 		for (int i = 0; i < 3; i++) {
-			assertTrue(column0.get(i).ellipse.center.distance(i,0) < 1e-4);
-			assertTrue(column1.get(i).ellipse.center.distance(i+0.5,0.866) < 1e-4);
+			assertTrue(column0.get(i).ellipse.center.distance(i,hexY*2) < 1e-4);
+			assertTrue(column1.get(i).ellipse.center.distance(i+0.5,hexY) < 1e-4);
 			assertTrue(column0.get(i).marked);
 			assertTrue(column1.get(i).marked);
 		}
@@ -250,9 +257,9 @@ public class TestEllipseClustersIntoHexagonalGrid {
 
 		for (int i = 0; i < 2; i++) {
 			ellipses.add(new EllipseRotated_F64(i, 0, 1, 1, 0));
-			ellipses.add(new EllipseRotated_F64(i, 0.866 * 2, 1, 1, 0));
+			ellipses.add(new EllipseRotated_F64(i, hexY * 2, 1, 1, 0));
 			if (i == 0) {
-				ellipses.add(new EllipseRotated_F64(i + 0.5, 0.866, 1, 1, 0));
+				ellipses.add(new EllipseRotated_F64(i + 0.5, hexY, 1, 1, 0));
 				ellipses.add(new EllipseRotated_F64(i + 0.5, 1.732, 1, 1, 0));
 			}
 		}
@@ -266,16 +273,18 @@ public class TestEllipseClustersIntoHexagonalGrid {
 		List<NodeInfo> column0 = new ArrayList<>();
 		List<NodeInfo> column1 = new ArrayList<>();
 
-		NodeInfo corner = alg.listInfo.get(0);
+		NodeInfo corner = alg.listInfo.get(4);
+		NodeInfo next = alg.listInfo.get(0);
 
-		alg.bottomTwoColumns(corner,null, column0, column1);
+		corner.marked = next.marked = true;
+		alg.bottomTwoColumns(corner,next, column0, column1);
 
 		assertEquals(2,column0.size());
 		assertEquals(1,column1.size());
 
-		assertTrue(column0.get(0).ellipse.center.distance(0,0) < 1e-4);
-		assertTrue(column0.get(1).ellipse.center.distance(1,0) < 1e-4);
-		assertTrue(column1.get(0).ellipse.center.distance(0.5,0.866) < 1e-4);
+		assertTrue(column0.get(0).ellipse.center.distance(1,0) < 1e-4);
+		assertTrue(column0.get(1).ellipse.center.distance(0,0) < 1e-4);
+		assertTrue(column1.get(0).ellipse.center.distance(0.5,hexY) < 1e-4);
 	}
 
 	@Test
@@ -379,7 +388,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 
 		double spaceX = distance/2.0;
-		double spaceY = distance*Math.sin(radian(60));
+		double spaceY = spaceX*hexY;
 
 		double r = diameter/2.0;
 
