@@ -30,13 +30,15 @@ import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.struct.FastQueue;
 
 /**
- * <p>Computes key points from an observed hexagonal circular grid.  Each key point is defined as the center's true
- * geometric center.  The center is found by detecting tangent points between two neighboring circles (red dots) and
- * then finding the closest point (green circle) to their lines (yellow).  Tangent points are the same under perspective
- * distortion and the same can be said for the intersection of their lines.</p>
+ * <p>Computes key points from an observed hexagonal circular grid.  Each key point is defined as the circle's true
+ * geometric center.  The center (green dot) is found by detecting tangent points between two neighboring
+ * circles (yellow dots) and
+ * then finding the intersection of all the lines created by connecting adjacent tangent points.
+ * Tangent points are the same under perspective distortion and the same can be said for the
+ * intersection of their lines.</p>
  *
  * <center>
- * <img src="doc-files/asymcircle_tangent_intersections.png"/>TODO UPDATE
+ * <img src="doc-files/hexagonal_tangent_intersections.png"/>
  * </center>
  *
  * @author Peter Abeles
