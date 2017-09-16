@@ -163,7 +163,7 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 		// this doesn't take in account the spacing between squares and will be an over estimate
 		int maxContourSize = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
 		LinearContourLabelChang2004 contourFinder = detectorSquare.getDetector().getContourFinder();
-		contourFinder.setMaxContourSize(maxContourSize*4);
+		contourFinder.setMaxContourSize(maxContourSize*4*2);
 		contourFinder.setSaveInternalContours(false);
 	}
 

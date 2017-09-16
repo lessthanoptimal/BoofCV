@@ -70,7 +70,7 @@ public class DetectCircleRegularGrid<T extends ImageGray<T>> extends DetectCircl
 		int diameter = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
 
 		LinearContourLabelChang2004 contourFinder = ellipseDetector.getEllipseDetector().getContourFinder();
-		contourFinder.setMaxContourSize((int)(2.0*Math.PI*diameter/2.0));
+		contourFinder.setMaxContourSize((int)(Math.PI*diameter)*2);
 		contourFinder.setSaveInternalContours(false);
 	}
 
