@@ -129,7 +129,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 			}
 
 			if( !error ) {
-				if( grid.size() < 3)
+				if( grid.size() < 2)
 					continue;
 
 				if (checkDuplicates(grid)) {

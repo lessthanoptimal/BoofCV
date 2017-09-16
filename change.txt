@@ -79,14 +79,11 @@ Contour to Line
 - Current algorithm breaks down when there is a mixture of long and short sides. Tuning to make it work on
   them makes it break on others
 
-Asymmetric Circle
-  - Change spacing. vertical distance = horizontal spacing * 2.0*sin(60 degrees)
-
 Calibration
   TODO Fisheye Calibration Demonstration
   TODO Add fisheye to calibration application
-  TODO Update documentation for hexagonal
-       - Swap images
+      - Command line only for now
+  TODO Update assisted calibration for hexagonal
 
 TOP ITEMS
 - TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
