@@ -135,7 +135,7 @@ public class CalibrationDetectorCircleHexagonalGrid implements DetectorFiducialC
 		double height = (numRows-1)*spaceY;
 
 		for (int row = 0; row < numRows; row++) {
-			double y = (numRows-row-1)*spaceY - height/2;
+			double y = row*spaceY - height/2;
 			for (int col = 0; col < numCols; col++) {
 				double x = col*spaceX - width/2;
 

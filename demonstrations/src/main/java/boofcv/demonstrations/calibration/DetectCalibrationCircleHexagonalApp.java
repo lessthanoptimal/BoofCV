@@ -245,7 +245,7 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 		List<String>  examples = new ArrayList<>();
 
 		for (int i = 1; i <= 7; i++) {
-			examples.add(UtilIO.pathExample(String.format("calibration/mono/Sony_DSC-HX5V_CircleHexagonal/image%02d.png", i)));
+			examples.add(UtilIO.pathExample(String.format("calibration/mono/Sony_DSC-HX5V_CircleHexagonal/image%02d.jpg", i)));
 		}
 
 		DetectCalibrationCircleHexagonalApp app = new DetectCalibrationCircleHexagonalApp(24, 28, 1,1.2,examples);

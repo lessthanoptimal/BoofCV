@@ -163,6 +163,10 @@ public class KeyPointsCircleHexagonalGrid {
 		EllipseRotated_F64 a = grid.get(rowA,colA);
 		EllipseRotated_F64 b = grid.get(rowB,colB);
 
+		if( a == null || b == null ) {
+			return false;
+		}
+
 		if( !tangentFinder.process(a,b, A0, A1, A2, A3, B0, B1, B2, B3) ) {
 			return false;
 		}

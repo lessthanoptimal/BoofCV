@@ -21,10 +21,7 @@ package boofcv.demonstrations.fiducial;
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.FiducialStability;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
-import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigCircleHexagonalGrid;
-import boofcv.abst.fiducial.calib.ConfigSquareGrid;
-import boofcv.abst.fiducial.calib.ConfigSquareGridBinary;
+import boofcv.abst.fiducial.calib.*;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
@@ -33,6 +30,7 @@ import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ImagePanel;
@@ -75,7 +73,7 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 	private static final String CALIB_SQUARE_GRID = "Square Grid";
 	private static final String CALIB_SQUARE_BINARY_GRID = "Square Binary Grid";
 	private static final String CALIB_CIRCLE_HEXAGONAL_GRID = "Circle Hexagonal Grid";
-
+	private static final String CALIB_CIRCLE_REGULAR_GRID = "Circle Regular Grid";
 
 	private static final Font font = new Font("Serif", Font.BOLD, 14);
 
@@ -275,6 +273,8 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 
 		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 10);
 
+		boolean stability = true;
+
 		if( name.compareTo(SQUARE_NUMBER) == 0 ) {
 			detector = FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1), configThreshold, imageClass);
 		} else if( name.compareTo(SQUARE_PICTURE) == 0 ) {
@@ -309,10 +309,22 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 				throw new RuntimeException(e);
 			}
 		} else if( name.compareTo(CALIB_CIRCLE_HEXAGONAL_GRID) == 0 ) {
-			detector = FactoryFiducial.calibCircleHexagonalGrid(new ConfigCircleHexagonalGrid(5, 8, 1, 6), imageClass);
+			stability = false;
+			detector = FactoryFiducial.calibCircleHexagonalGrid(new ConfigCircleHexagonalGrid(24, 28, 1, 1.2), imageClass);
+		} else if( name.compareTo(CALIB_CIRCLE_REGULAR_GRID) == 0 ) {
+			stability = false;
+			detector = FactoryFiducial.calibCircleRegularGrid(new ConfigCircleRegularGrid(10, 8, 1.5, 2.5), imageClass);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}
+
+		final boolean _stability = stability;
+		BoofSwingUtil.invokeNowOrLater(new Runnable() {
+			@Override
+			public void run() {
+				computeStability.setSelected(_stability);
+			}
+		});
 
 		intrinsic = CalibrationIO.load(media.openFile(path+"/intrinsic.yaml"));
 
@@ -367,7 +379,9 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 		inputs.add(new PathLabel(CALIB_CHESS, UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 		inputs.add(new PathLabel(CALIB_SQUARE_GRID, UtilIO.pathExample("fiducial/square_grid/movie.mp4")));
 //		inputs.add(new PathLabel(CALIB_SQUARE_BINARY_GRID, UtilIO.pathExample("fiducial/binary_grid/movie.mp4")));
-		inputs.add(new PathLabel(CALIB_CIRCLE_HEXAGONAL_GRID, UtilIO.pathExample("fiducial/circle_asymmetric/movie.mp4")));
+		inputs.add(new PathLabel(CALIB_CIRCLE_HEXAGONAL_GRID, UtilIO.pathExample("fiducial/circle_hexagonal/movie.mp4")));
+		inputs.add(new PathLabel(CALIB_CIRCLE_REGULAR_GRID, UtilIO.pathExample("fiducial/circle_regular/movie.mp4")));
+
 
 		app.setInputList(inputs);
 

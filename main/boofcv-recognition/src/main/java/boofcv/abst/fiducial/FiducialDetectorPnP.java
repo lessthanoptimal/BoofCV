@@ -90,15 +90,12 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 
 		maxOrientation = 0;
 		maxLocation = 0;
-		for (int i = 0; i < detected2D3D.size(); i++) {
 
-			estimatePose(which, detected2D3D, targetToCameraSample);
-			referenceCameraToTarget.concat(targetToCameraSample, difference);
+		for (int i = 0; i < detected2D3D.size(); i++) {
 			Point2D3D p23 = detected2D3D.get(i);
 			Point2D_F64 p = detectedPixels.get(i);
 			workPt.set(p);
-
-			perturb(which, disturbance,workPt,p,p23);
+			perturb(which, disturbance, workPt, p, p23);
 		}
 
 		results.location = maxLocation;
