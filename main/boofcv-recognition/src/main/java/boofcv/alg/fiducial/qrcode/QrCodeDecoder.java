@@ -34,6 +34,8 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 
 	FastQueue<QrCode> found = new FastQueue<>(QrCode.class,true);
 
+	PackedBits bits = new PackedBits();
+
 	/**
 	 *
 	 * @param pps

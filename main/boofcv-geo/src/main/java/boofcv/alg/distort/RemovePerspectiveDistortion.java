@@ -86,9 +86,9 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 		}
 
 		associatedPairs.get(0).p1.set(0,0);
-		associatedPairs.get(1).p1.set(width-1,0);
-		associatedPairs.get(2).p1.set(width-1,height-1);
-		associatedPairs.get(3).p1.set(0,height-1);
+		associatedPairs.get(1).p1.set(width,0);
+		associatedPairs.get(2).p1.set(width,height);
+		associatedPairs.get(3).p1.set(0,height);
 	}
 
 	/**

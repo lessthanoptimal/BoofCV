@@ -21,7 +21,10 @@ package boofcv.alg.fiducial.qrcode;
 import georegression.struct.shapes.Polygon2D_F64;
 
 /**
- * Information for a detected QR Code
+ * Information for a detected QR Code.
+ *
+ * <p>Position Patterns (PP) have their vertices CCW order. The polygons are oriented such that the following sides are
+ * paired: ppCorner[1,2] paired ppRight[3,0] and ppCorner[2,3] paired ppDown[0,1].</p>
  *
  * @author Peter Abeles
  */
@@ -38,4 +41,8 @@ public class QrCode {
 	 * Order: top-left = 0. Top-right = 1, Bottom-Right = 2, Bottom-Left = 3.
 	 */
 	public Polygon2D_F64 bounds = new Polygon2D_F64(4);
+
+	public enum ErrorCorrectionLevel {
+		L,M,Q,H
+	}
 }

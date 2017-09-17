@@ -24,7 +24,6 @@ import org.ejml.UtilEjml;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -87,6 +86,17 @@ public class TestQrCodeDecoder {
 
 	@Test
 	public void computeBoundingBox() {
-		fail("Ifoo");
+		QrCode qr = new QrCode();
+		qr.ppCorner = new Polygon2D_F64(0,0, 1,0, 1,1, 0,1);
+		qr.ppRight = new Polygon2D_F64(2,0, 3,0, 3,1, 2,1);
+		qr.ppDown = new Polygon2D_F64(0,2, 1,2, 1,3, 0,3);
+
+		QrCodeDecoder.computeBoundingBox(qr);
+
+		assertTrue(qr.bounds.get(0).distance(0,0) < UtilEjml.TEST_F64);
+		assertTrue(qr.bounds.get(1).distance(3,0) < UtilEjml.TEST_F64);
+		assertTrue(qr.bounds.get(2).distance(3,3) < UtilEjml.TEST_F64);
+		assertTrue(qr.bounds.get(3).distance(0,3) < UtilEjml.TEST_F64);
+
 	}
 }

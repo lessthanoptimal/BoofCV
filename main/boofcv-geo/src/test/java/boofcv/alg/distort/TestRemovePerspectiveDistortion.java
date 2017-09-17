@@ -27,7 +27,9 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
@@ -41,6 +43,30 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public class TestRemovePerspectiveDistortion {
+
+
+	/**
+	 * The transform should not scale and produce a simple transform from input to output
+	 */
+	@Test
+	public void identity() {
+		RemovePerspectiveDistortion<GrayF32> alg =
+				new RemovePerspectiveDistortion<>(30,40, ImageType.single(GrayF32.class));
+
+		alg.createTransform(
+				new Point2D_F64(20,30),new Point2D_F64(50,30),
+				new Point2D_F64(50,70),new Point2D_F64(20,70));
+
+		Point2D_F32 p = new Point2D_F32();
+		PointTransformHomography_F32 transform = alg.getTransform();
+
+		transform.compute(0,0,p);
+		assertTrue(p.distance(20,30)< UtilEjml.TEST_F64);
+
+		transform.compute(30,40,p);
+		assertTrue(p.distance(50,70)< UtilEjml.TEST_F64);
+	}
+
 	@Test
 	public void undoDistortion() {
 		GrayF32 expected = new GrayF32(30,40);

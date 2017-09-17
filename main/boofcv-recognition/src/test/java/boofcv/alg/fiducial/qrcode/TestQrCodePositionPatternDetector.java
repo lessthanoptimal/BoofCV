@@ -139,12 +139,8 @@ public class TestQrCodePositionPatternDetector {
 		assertFalse(alg.checkPositionPatternAppearance(square,100));
 	}
 
-	private SquareNode squareNode( int x0 , int y0 , int width ) {
-		Polygon2D_F64 square = new Polygon2D_F64(4);
-		square.get(0).set(x0,y0);
-		square.get(1).set(x0+width,y0);
-		square.get(2).set(x0+width,y0+width);
-		square.get(3).set(x0,y0+width);
+	public static SquareNode squareNode( int x0 , int y0 , int width ) {
+		Polygon2D_F64 square = square(x0,y0,width);
 
 		SquareNode node = new SquareNode();
 		node.square = square;
@@ -158,7 +154,7 @@ public class TestQrCodePositionPatternDetector {
 		return node;
 	}
 
-	private Polygon2D_F64 square( int x0 , int y0 , int width ) {
+	public static Polygon2D_F64 square( int x0 , int y0 , int width ) {
 		Polygon2D_F64 square = new Polygon2D_F64(4);
 		square.get(0).set(x0,y0);
 		square.get(1).set(x0+width,y0);
