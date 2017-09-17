@@ -54,6 +54,7 @@ public class FactoryShapeDetector {
 		detector.setMaxDistanceFromEllipse(config.maxDistanceFromEllipse);
 		detector.setMaximumContour(config.maximumContour);
 		detector.setMinimumContour(config.minimumContour);
+		detector.setMinimumMinorAxis(config.minimumMinorAxis);
 		detector.setInternalContour(config.processInternal);
 		detector.setMaxMajorToMinorRatio(config.maxMajorToMinorRatio);
 

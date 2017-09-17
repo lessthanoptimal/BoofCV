@@ -42,6 +42,11 @@ public class ConfigEllipseDetector implements Configuration {
 	public int maximumContour = 0;
 
 	/**
+	 * Minimum number of pixels in the minor axis
+	 */
+	public double minimumMinorAxis = 1.5;
+
+	/**
 	 * Detector: If true it will consider internal contours and not just external
 	 */
 	public boolean processInternal = false;

@@ -71,6 +71,9 @@ public class BinaryEllipseDetectorPixel {
 	// maximum number of pixels in the contour. 0 == no limit
 	private int maximumContour = 0;
 
+	// minimum number of pixels along the minor axis
+	private double minimumMinorAxis = 1.5;
+
 	// Can be used to filter out shapes which are very skinny
 	private double maxMajorToMinorRatio = Double.MAX_VALUE;
 
@@ -156,21 +159,31 @@ public class BinaryEllipseDetectorPixel {
 		Found f = found.grow();
 		UtilEllipse_F64.convert(quad,f.ellipse);
 
-		if( !isApproximatelyElliptical(f.ellipse,pointsF.toList(),20)) {
+		boolean accepted = true;
+
+		if( f.ellipse.b <= minimumMinorAxis ) {
+			if( verbose )
+				System.out.println("Rejecting: Minor axis too small. size = "+f.ellipse.b);
+			accepted = false;
+		} else if( !isApproximatelyElliptical(f.ellipse,pointsF.toList(),20)) {
 			if( verbose )
 				System.out.println("Rejecting: Not approximately elliptical. size = "+pointsF.size());
-			found.removeTail();
+			accepted = false;
 		} else if( f.ellipse.a > maxMajorToMinorRatio*f.ellipse.b ) {
 			if( verbose )
 				System.out.println("Rejecting: Major to minor axis length ratio too extreme = "+pointsF.size());
-			found.removeTail();
+			accepted = false;
 		}
 
-		if( verbose )
-			System.out.println("Success!  size = "+pointsF.size());
+		if( accepted ) {
+			if (verbose)
+				System.out.println("Success!  size = " + pointsF.size());
 
-		adjustElipseForBinaryBias(f.ellipse);
-		f.contour = contour;
+			adjustElipseForBinaryBias(f.ellipse);
+			f.contour = contour;
+		} else {
+			found.removeTail();
+		}
 	}
 
 	/**
@@ -302,6 +315,14 @@ public class BinaryEllipseDetectorPixel {
 
 	public void setMaxMajorToMinorRatio(double maxMajorToMinorRatio) {
 		this.maxMajorToMinorRatio = maxMajorToMinorRatio;
+	}
+
+	public double getMinimumMinorAxis() {
+		return minimumMinorAxis;
+	}
+
+	public void setMinimumMinorAxis(double minimumMinorAxis) {
+		this.minimumMinorAxis = minimumMinorAxis;
 	}
 
 	public List<Found> getFound() {

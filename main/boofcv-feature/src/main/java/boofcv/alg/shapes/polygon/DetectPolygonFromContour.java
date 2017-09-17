@@ -225,31 +225,31 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		if( contourEdgeIntensity != null )
 			contourEdgeIntensity.setImage(gray);
 
-		long time0 = System.nanoTime();
+//		long time0 = System.nanoTime();
 
 		// find all the contours
 		contourFinder.process(binary, labeled);
 
-		long time1 = System.nanoTime();
+//		long time1 = System.nanoTime();
 
 		// Using the contours find the polygons
 		findCandidateShapes();
 
-		long time2 = System.nanoTime();
+//		long time2 = System.nanoTime();
 
-		double a = (time1-time0)*1e-6;
-		double b = (time2-time1)*1e-6;
+//		double a = (time1-time0)*1e-6;
+//		double b = (time2-time1)*1e-6;
 
-		if( milliContour == 0 ) {
-			milliContour = a;
-			milliShapes = b;
-		} else {
-			double alpha = 0.95;
-			milliContour = alpha* milliContour + (1.0-alpha)*a;
-			milliShapes = alpha* milliShapes + (1.0-alpha)*b;
-		}
+//		if( milliContour == 0 ) {
+//			milliContour = a;
+//			milliShapes = b;
+//		} else {
+//			double alpha = 0.95;
+//			milliContour = alpha* milliContour + (1.0-alpha)*a;
+//			milliShapes = alpha* milliShapes + (1.0-alpha)*b;
+//		}
 
-		System.out.printf(" contour %7.2f  poly %7.2f ",milliContour,milliShapes);
+//		System.out.printf(" contour %7.2f  poly %7.2f ",milliContour,milliShapes);
 
 		if( verbose ) System.out.println("EXIT  DetectPolygonFromContour.process()");
 	}
