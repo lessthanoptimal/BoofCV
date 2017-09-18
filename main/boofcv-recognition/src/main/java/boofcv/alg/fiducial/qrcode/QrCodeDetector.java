@@ -33,10 +33,12 @@ import org.ddogleg.struct.FastQueue;
 public class QrCodeDetector<T extends ImageGray<T>> {
 
 	QrCodePositionPatternDetector<T> detectPositionPatterns;
-	QrCodeDecoder<T> decoder = new QrCodeDecoder<>();
+	QrCodeDecoder<T> decoder;
 
-	public QrCodeDetector( QrCodePositionPatternDetector<T> detectPositionPatterns ) {
+	public QrCodeDetector( QrCodePositionPatternDetector<T> detectPositionPatterns ,
+						   Class<T> imageType ) {
 		this.detectPositionPatterns = detectPositionPatterns;
+		this.decoder = new QrCodeDecoder<>(imageType);
 	}
 
 	public void process(T gray, GrayU8 binary ) {

@@ -160,7 +160,7 @@ public class FactoryFiducial {
 		QrCodePositionPatternDetector<T> detectPositionPatterns =
 				new QrCodePositionPatternDetector<>(squareDetector,config.versionMaximum);
 
-		return new QrCodeDetector<>(detectPositionPatterns);
+		return new QrCodeDetector<>(detectPositionPatterns,imageType);
 	}
 
 }

@@ -18,7 +18,6 @@
 
 package boofcv.alg.fiducial.qrcode;
 
-import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Intersection2D_F64;
@@ -34,7 +33,12 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 
 	FastQueue<QrCode> found = new FastQueue<>(QrCode.class,true);
 
+	SquareBitReader squareDecoder;
 	PackedBits bits = new PackedBits();
+
+	public QrCodeDecoder( Class<T> imageType ) {
+		squareDecoder = new SquareBitReader(imageType);
+	}
 
 	/**
 	 *
@@ -42,6 +46,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 * @param gray
 	 */
 	public void process(FastQueue<PositionPatternNode> pps , T gray ) {
+		squareDecoder.setImage(gray);
 		found.reset();
 
 		for (int i = 0; i < pps.size; i++) {
@@ -67,11 +72,15 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 									int cornerToRight, int cornerToDown,
 									QrCode qr) {
 		// copy the 3 position patterns over
-		SquareNode right = ppn.edges[cornerToRight].destination(ppn);
-		SquareNode down = ppn.edges[cornerToDown].destination(ppn);
+		PositionPatternNode right = ppn.edges[cornerToRight].destination(ppn);
+		PositionPatternNode down = ppn.edges[cornerToDown].destination(ppn);
 		qr.ppRight.set( right.square );
 		qr.ppCorner.set( ppn.square );
 		qr.ppDown.set( down.square );
+
+		qr.threshRight  = right.grayThreshold;
+		qr.threshCorner = ppn.grayThreshold;
+		qr.threshDown   = down.grayThreshold;
 
 		// Put it into canonical orientation
 		int indexR = right.findEdgeIndex(ppn);
@@ -113,7 +122,66 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	}
 
 	private boolean extractFormatInfo(QrCode qr) {
+
+		readFormatRegion0(qr);
+		//
+
 		return true;
+	}
+
+	/**
+	 * Reads the format bits near the corner position pattern
+	 */
+	private boolean readFormatRegion0(QrCode qr) {
+		if( !squareDecoder.setSquare(qr.ppCorner,(float)qr.threshCorner) )
+			return false;
+
+		bits.resize(15);
+		for (int i = 0; i < 6; i++) {
+			read(i,i,8);
+		}
+
+		read(6,7,8);
+		read(7,8,8);
+		read(8,8,7);
+
+		for (int i = 0; i < 6; i++) {
+			read(9+i,8,5-i);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Read the format bits on the right and bottom patterns
+	 */
+	private boolean readFormatRegion1(QrCode qr) {
+		bits.resize(15);
+		if( !squareDecoder.setSquare(qr.ppRight,(float)qr.threshRight) )
+			return false;
+
+		for (int i = 0; i < 8; i++) {
+			read(i,8,6-i);
+		}
+
+		if( !squareDecoder.setSquare(qr.ppDown,(float)qr.threshDown) )
+			return false;
+
+		for (int i = 0; i < 6; i++) {
+			read(i+8,i,8);
+		}
+
+		return true;
+	}
+
+	private void read( int bit , int row , int col ) {
+		int value = squareDecoder.read(row,col);
+		if( value == -1 ) {
+			// The requested region is outside the image. A partial QR code can be read so let's just
+			// assign it a value of zero and let error correction handle this
+			value = 0;
+		}
+		bits.set(bit,value);
 	}
 
 	private boolean extractVersionInfo(QrCode qr) {

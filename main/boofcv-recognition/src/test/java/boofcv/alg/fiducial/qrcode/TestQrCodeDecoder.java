@@ -19,16 +19,48 @@
 package boofcv.alg.fiducial.qrcode;
 
 import boofcv.alg.fiducial.calib.squares.SquareEdge;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestQrCodeDecoder {
+
+	/**
+	 * Runs through the entire algorithm using a rendered image
+	 */
+	@Test
+	public void full_simple() {
+		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(2,4);
+		generator.generate("test message");
+
+		FastQueue<PositionPatternNode> pps = new FastQueue<>(PositionPatternNode.class,true);
+
+		pps.grow().square = generator.qr.ppCorner;
+		pps.grow().square = generator.qr.ppRight;
+		pps.grow().square = generator.qr.ppDown;
+
+		connect(pps.get(1),pps.get(0),3,1);
+		connect(pps.get(2),pps.get(0),0,2);
+
+		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
+
+		decoder.process(pps,generator.gray);
+
+		assertEquals(1,decoder.found.size);
+		QrCode found = decoder.getFound().get(0);
+
+		// TODO Check position patterns
+		// TODO check version
+//		assertEquals(2,found.version);
+	}
 
 	@Test
 	public void setPositionPatterns() {
@@ -40,31 +72,23 @@ public class TestQrCodeDecoder {
 		PositionPatternNode n_right = new PositionPatternNode();
 		PositionPatternNode n_bottom = new PositionPatternNode();
 
-		SquareEdge e_right = new SquareEdge();
-		e_right.a = n_right; e_right.sideA = 3;
-		e_right.b = n_corner; e_right.sideB = 1;
-
-		SquareEdge e_bottom = new SquareEdge();
-		e_bottom.a = n_bottom; e_bottom.sideA = 0;
-		e_bottom.b = n_corner; e_bottom.sideB = 2;
-
 		n_corner.square = corner;
-		n_corner.edges[e_right.sideB] = e_right;
-		n_corner.edges[e_bottom.sideB] = e_bottom;
-
 		n_right.square = right;
-		n_right.edges[e_right.sideA] = e_right;
-
 		n_bottom.square = bottom;
-		n_bottom.edges[e_bottom.sideA] = e_bottom;
+		connect(n_right,n_corner,3,1);
+		connect(n_bottom,n_corner,0,2);
 
 		QrCode qr = new QrCode();
-		QrCodeDecoder.setPositionPatterns(n_corner,e_right.sideB,e_bottom.sideB,qr);
+		QrCodeDecoder.setPositionPatterns(n_corner,1,2,qr);
 
 		assertTrue(qr.ppCorner.get(0).distance(0,0) < UtilEjml.TEST_F64);
 		assertTrue(qr.ppRight.get(0).distance(5,0)  < UtilEjml.TEST_F64);
 		assertTrue(qr.ppDown.get(0).distance(0,5) < UtilEjml.TEST_F64);
+	}
 
+	private static void connect( PositionPatternNode a , PositionPatternNode b , int sideA , int sideB ) {
+		SquareEdge e = new SquareEdge(a,b,3,1);
+		a.edges[sideA] = b.edges[sideB] = e;
 	}
 
 	@Test
@@ -97,6 +121,5 @@ public class TestQrCodeDecoder {
 		assertTrue(qr.bounds.get(1).distance(3,0) < UtilEjml.TEST_F64);
 		assertTrue(qr.bounds.get(2).distance(3,3) < UtilEjml.TEST_F64);
 		assertTrue(qr.bounds.get(3).distance(0,3) < UtilEjml.TEST_F64);
-
 	}
 }

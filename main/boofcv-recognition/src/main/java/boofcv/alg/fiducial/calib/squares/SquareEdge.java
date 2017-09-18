@@ -35,14 +35,24 @@ public class SquareEdge {
 	// the distance between the square's centers
 	public double distance;
 
+	public SquareEdge() {
+	}
+
+	public SquareEdge(SquareNode a, SquareNode b, int sideA, int sideB) {
+		this.a = a;
+		this.b = b;
+		this.sideA = sideA;
+		this.sideB = sideB;
+	}
+
 	/**
 	 * Returns the destination node.
 	 */
-	public SquareNode destination(SquareNode src) {
+	public <T extends SquareNode>T destination(SquareNode src) {
 		if( a == src )
-			return b;
+			return (T)b;
 		else if( b == src )
-			return a;
+			return (T)a;
 		else
 			throw new IllegalArgumentException("BUG! src is not a or b");
 	}

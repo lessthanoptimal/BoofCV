@@ -29,10 +29,18 @@ import georegression.struct.shapes.Polygon2D_F64;
  * @author Peter Abeles
  */
 public class QrCode {
-	// Squares of position patterns
+	/**
+	 * The finder pattern that is composed of the 3 position patterns.
+	 */
 	public Polygon2D_F64 ppRight = new Polygon2D_F64(4);
 	public Polygon2D_F64 ppCorner = new Polygon2D_F64(4);
 	public Polygon2D_F64 ppDown = new Polygon2D_F64(4);
+
+	// locally computed binary threshold at each position pattern
+	public double threshRight,threshCorner,threshDown;
+
+	/** which version of QR code was found. 1 to 40*/
+	public int version;
 
 	/**
 	 * Approximate bounding box for QR-Code. The bottom right corner is estimated by intersecting lines

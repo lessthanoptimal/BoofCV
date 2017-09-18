@@ -58,6 +58,13 @@ public class SquareBitReader<T extends ImageGray<T>> {
 		this.height = image.height+0.99999f;
 	}
 
+	/**
+	 * Sets the square and defines coordinate system
+	 *
+	 * @param square Square that the grid is based around
+	 * @param threshold Threshold use to binarize image
+	 * @return true if this operation was able to complete
+	 */
 	public boolean setSquare(Polygon2D_F64 square , float threshold ) {
 		if( !removePerspective.createTransform(square.get(0),square.get(1),square.get(2),square.get(3)) )
 			return false;
@@ -66,6 +73,12 @@ public class SquareBitReader<T extends ImageGray<T>> {
 		return true;
 	}
 
+	/**
+	 * Reads the value of the grid at the specified grid coordinate
+	 * @param row grid row
+	 * @param col grid col
+	 * @return 0 = black 1 = white
+	 */
 	public int read( int row , int col ) {
 		// with Perspective removed to Image coordinates.
 		PointTransformHomography_F32 p2i = removePerspective.getTransform();
