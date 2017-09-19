@@ -20,7 +20,7 @@ package boofcv.demonstrations.shapes;
 
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ConfigThresholdBlockMinMax;
-import boofcv.factory.filter.binary.ConfigThresholdBlockOtsu;
+import boofcv.factory.filter.binary.ConfigThresholdLocalOtsu;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.StandardAlgConfigPanel;
 
@@ -56,7 +56,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	public boolean down = true;
 	public int radius = 10;
 	public float savolaK = new ConfigThreshold().savolaK;
-	public int otsuTuning = (int)new ConfigThresholdBlockOtsu().tuning;
+	public int otsuTuning = (int)new ConfigThresholdLocalOtsu().tuning;
 	public int minPixelValue = 0;
 	public int maxPixelValue = 255;
 
@@ -123,7 +123,8 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 			spinnerThreshold.setValue(globalThreshold);
 		} else if( type == ThresholdType.LOCAL_BLOCK_MIN_MAX ) {
 			spinnerThreshold.setValue((int)minimumSpread);
-		} else if( type == ThresholdType.LOCAL_BLOCK_OTSU ) {
+		} else if( type == ThresholdType.LOCAL_BLOCK_OTSU ||
+				type == ThresholdType.LOCAL_OTSU  ) {
 			spinnerThreshold.setValue(otsuTuning);
 		}
 		spinnerThreshold.addChangeListener(this);
@@ -199,7 +200,8 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 			spinnerThreshold.setEnabled(true);
 			isAdaptive = false;
 		}
-		if( type == ThresholdType.LOCAL_BLOCK_OTSU ) {
+		if( type == ThresholdType.LOCAL_BLOCK_OTSU ||
+				type == ThresholdType.LOCAL_OTSU  ) {
 			spinnerThreshold.setEnabled(true);
 			isAdaptive = false;
 		}
@@ -216,7 +218,8 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 			int value = ((Number) spinnerThreshold.getValue()).intValue();
 			if( type == ThresholdType.LOCAL_BLOCK_MIN_MAX) {
 				minimumSpread = value;
-			} else if( type == ThresholdType.LOCAL_BLOCK_OTSU) {
+			} else if( type == ThresholdType.LOCAL_BLOCK_OTSU ||
+					type == ThresholdType.LOCAL_OTSU ) {
 				otsuTuning = value;
 			} else {
 				globalThreshold = value;
@@ -242,8 +245,9 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 			ConfigThresholdBlockMinMax _config = new ConfigThresholdBlockMinMax();
 			_config.minimumSpread = minimumSpread;
 			config = _config;
-		} else if( type == ThresholdType.LOCAL_BLOCK_OTSU) {
-			ConfigThresholdBlockOtsu _config = new ConfigThresholdBlockOtsu();
+		} else if( type == ThresholdType.LOCAL_BLOCK_OTSU ||
+				type == ThresholdType.LOCAL_OTSU ) {
+			ConfigThresholdLocalOtsu _config = new ConfigThresholdLocalOtsu();
 			_config.tuning = otsuTuning;
 			config = _config;
 		} else {

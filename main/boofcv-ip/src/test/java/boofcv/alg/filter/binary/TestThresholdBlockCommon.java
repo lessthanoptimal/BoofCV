@@ -49,7 +49,7 @@ public class TestThresholdBlockCommon {
 	private class Dummy extends ThresholdBlockCommon {
 
 		public Dummy(int requestedBlockWidth) {
-			super(requestedBlockWidth);
+			super(requestedBlockWidth,GrayU8.class);
 		}
 
 		@Override

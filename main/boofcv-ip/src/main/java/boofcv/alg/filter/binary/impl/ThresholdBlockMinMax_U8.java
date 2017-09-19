@@ -34,7 +34,7 @@ public class ThresholdBlockMinMax_U8
 	boolean down;
 
 	public ThresholdBlockMinMax_U8(double minimumSpread, int requestedBlockWidth, double scale , boolean down ) {
-		super(minimumSpread,requestedBlockWidth);
+		super(minimumSpread,requestedBlockWidth,GrayU8.class);
 		stats = new InterleavedU8(1,1,2);
 		this.scale = scale;
 		this.down = down;

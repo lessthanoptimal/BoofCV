@@ -23,7 +23,7 @@ package boofcv.factory.filter.binary;
  *
  * @author Peter Abeles
  */
-public class ConfigThresholdBlockOtsu extends ConfigThreshold {
+public class ConfigThresholdLocalOtsu extends ConfigThreshold {
 
 	/**
 	 * Tuning parameter that will make it harder for pixels to be marked in low texture regions.
@@ -33,13 +33,13 @@ public class ConfigThresholdBlockOtsu extends ConfigThreshold {
 	 */
 	public double tuning=0;
 
-	public ConfigThresholdBlockOtsu(int radius , double tuning) {
+	public ConfigThresholdLocalOtsu(int radius , double tuning) {
 		this();
 		this.radius = radius;
 		this.tuning = tuning;
 	}
 
-	public ConfigThresholdBlockOtsu() {
+	public ConfigThresholdLocalOtsu() {
 		this.type = ThresholdType.LOCAL_BLOCK_OTSU;
 	}
 }

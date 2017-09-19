@@ -100,7 +100,7 @@ public class ConfigThreshold implements Configuration {
 		if( type == ThresholdType.LOCAL_BLOCK_MIN_MAX) {
 			config = new ConfigThresholdBlockMinMax(radius, 10, true);
 		} else if( type == ThresholdType.LOCAL_BLOCK_OTSU) {
-			config = new ConfigThresholdBlockOtsu();
+			config = new ConfigThresholdLocalOtsu();
 		} else {
 			config = new ConfigThreshold();
 		}

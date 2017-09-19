@@ -30,26 +30,25 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class LocalBlockOtsuBinaryFilter<T extends ImageGray<T>> implements InputToBinary<T> {
+public class InputToBinarySwitchU8<T extends ImageGray<T>> implements InputToBinary<T> {
 
 	ImageType<T> inputType;
 
-	ThresholdBlockOtsu alg;
+	InputToBinary<GrayU8> alg;
 	GrayU8 input;
 
 	/**
 	 * @see ThresholdBlockOtsu
 	 */
-	public LocalBlockOtsuBinaryFilter(int requestedBlockWidth, double tuning, boolean down,
-									  ImageType<T> inputType) {
+	public InputToBinarySwitchU8(InputToBinary<GrayU8> alg,
+								 Class<T> inputType) {
 
-		this.inputType = inputType;
+		this.alg = alg;
+		this.inputType = ImageType.single(inputType);
 
-		if( inputType.getDataType() != ImageDataType.U8 ) {
+		if( this.inputType.getDataType() != ImageDataType.U8 ) {
 			input = new GrayU8(1,1);
 		}
-
-		alg = new ThresholdBlockOtsu(requestedBlockWidth,tuning,down);
 	}
 
 	@Override
@@ -64,22 +63,7 @@ public class LocalBlockOtsuBinaryFilter<T extends ImageGray<T>> implements Input
 	}
 
 	@Override
-	public int getHorizontalBorder() {
-		return 0;
-	}
-
-	@Override
-	public int getVerticalBorder() {
-		return 0;
-	}
-
-	@Override
 	public ImageType<T> getInputType() {
 		return inputType;
-	}
-
-	@Override
-	public ImageType<GrayU8> getOutputType() {
-		return ImageType.single(GrayU8.class);
 	}
 }

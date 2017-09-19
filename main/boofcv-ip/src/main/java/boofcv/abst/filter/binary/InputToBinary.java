@@ -18,14 +18,18 @@
 
 package boofcv.abst.filter.binary;
 
-import boofcv.abst.filter.FilterImageInterface;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 /**
- * Outputs a binary image when given an input image
+ * Interface for threshold filters
  *
  * @author Peter Abeles
  */
-public interface InputToBinary<Input extends ImageBase<Input>> extends FilterImageInterface<Input,GrayU8> {
+public interface InputToBinary<Input extends ImageBase<Input>>
+{
+	void process(Input input , GrayU8 output );
+
+	ImageType<Input> getInputType();
 }

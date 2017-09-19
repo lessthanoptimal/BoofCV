@@ -21,6 +21,9 @@ package boofcv.factory.filter.binary;
 import boofcv.abst.filter.binary.*;
 import boofcv.alg.filter.binary.ThresholdBlockMean;
 import boofcv.alg.filter.binary.ThresholdBlockMinMax;
+import boofcv.alg.filter.binary.ThresholdBlockOtsu;
+import boofcv.alg.filter.binary.ThresholdLocalOtsu;
+import boofcv.alg.filter.binary.impl.*;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -56,8 +59,9 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> localSauvola(int radius, float k, boolean down, Class<T> inputType) {
-		return new LocalSauvolaBinaryFilter<>(radius, k, down, ImageType.single(inputType));
+	InputToBinary<T> localSauvola(int radius, float k, boolean down, Class<T> inputType)
+	{
+		return new InputToBinarySwitchF32<T>(new ThresholdSauvola(radius, k, down),inputType);
 	}
 
 	/**
@@ -90,7 +94,11 @@ public class FactoryThresholdBinary {
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localBlockMinMax(int regionWidth, double scale , boolean down,
 									  double minimumSpread, Class<T> inputType) {
-		return new LocalBlockMinMaxBinaryFilter<>(minimumSpread, regionWidth, scale, down, inputType);
+
+		if( inputType == GrayU8.class )
+			return (InputToBinary<T>)new ThresholdBlockMinMax_U8(minimumSpread,regionWidth,scale,down);
+		else
+			return (InputToBinary<T>)new ThresholdBlockMinMax_F32((float)minimumSpread,regionWidth,(float)scale,down);
 	}
 
 	/**
@@ -107,11 +115,14 @@ public class FactoryThresholdBinary {
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localBlockMean(int regionWidth, double scale , boolean down,
 									Class<T> inputType) {
-		return new LocalBlockMeanBinaryFilter<>(regionWidth, scale, down, inputType);
+		if( inputType == GrayU8.class )
+			return (InputToBinary<T>)new ThresholdBlockMean_U8(regionWidth,scale,down);
+		else
+			return (InputToBinary<T>)new ThresholdBlockMean_F32(regionWidth,scale,down);
 	}
 
 	/**
-	 * Applies a non-overlapping block Otsu threhsold
+	 * Applies a non-overlapping block Otsu threshold
 	 *
 	 * @see boofcv.alg.filter.binary.ThresholdBlockOtsu
 	 *
@@ -122,7 +133,22 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localBlockOtsu(int regionWidth , double tuning, boolean down, Class<T> inputType) {
-		return new LocalBlockOtsuBinaryFilter<>(regionWidth, tuning, down, ImageType.single(inputType));
+		return new InputToBinarySwitchU8<>(new ThresholdBlockOtsu(regionWidth,tuning,down),inputType);
+	}
+
+	/**
+	 * Applies a local Otsu threshold
+	 *
+	 * @see boofcv.alg.filter.binary.ThresholdLocalOtsu
+	 *
+	 * @param down Should it threshold up or down.
+	 * @param regionWidth About how wide and tall you wish a block to be in pixels.
+	 * @param inputType Type of input image
+	 * @return Filter to binary
+	 */
+	public static <T extends ImageGray<T>>
+	InputToBinary<T> localOtsu(int regionWidth , double tuning, boolean down, Class<T> inputType) {
+		return new InputToBinarySwitchU8<>(new ThresholdLocalOtsu(regionWidth,tuning,down),inputType);
 	}
 
 	/**
@@ -195,6 +221,11 @@ public class FactoryThresholdBinary {
 			case LOCAL_MEAN:
 				return localMean(config.radius, config.scale, config.down, inputType);
 
+			case LOCAL_OTSU: {
+				ConfigThresholdLocalOtsu c = (ConfigThresholdLocalOtsu) config;
+				return localOtsu(config.radius * 2 + 1, c.tuning, config.down, inputType);
+			}
+
 			case LOCAL_BLOCK_MIN_MAX: {
 				ConfigThresholdBlockMinMax c = (ConfigThresholdBlockMinMax) config;
 				return localBlockMinMax(c.radius * 2 + 1, c.scale , c.down, c.minimumSpread, inputType);
@@ -204,7 +235,7 @@ public class FactoryThresholdBinary {
 				return localBlockMean(config.radius * 2 + 1, config.scale , config.down, inputType);
 
 			case LOCAL_BLOCK_OTSU: {
-				ConfigThresholdBlockOtsu c = (ConfigThresholdBlockOtsu) config;
+				ConfigThresholdLocalOtsu c = (ConfigThresholdLocalOtsu) config;
 				return localBlockOtsu(config.radius * 2 + 1, c.tuning, config.down, inputType);
 			}
 

@@ -18,12 +18,11 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.abst.filter.binary.LocalBlockMeanBinaryFilter;
-import boofcv.abst.filter.binary.LocalBlockMinMaxBinaryFilter;
-import boofcv.abst.filter.binary.LocalBlockOtsuBinaryFilter;
+import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.impl.ThresholdSauvola;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GConvertImage;
+import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.image.*;
 
 
@@ -355,8 +354,8 @@ public class GThresholdImageOps {
 	public static <T extends ImageGray<T>>
 	GrayU8 localBlockMinMax(T input, GrayU8 output, int radius, double scale , boolean down, double textureThreshold)
 	{
-		LocalBlockMinMaxBinaryFilter<T> alg = new LocalBlockMinMaxBinaryFilter<>(textureThreshold, radius * 2 + 1, scale, down,
-				(Class<T>) input.getClass());
+		InputToBinary<T> alg = FactoryThresholdBinary.localBlockMinMax(
+				radius*2+1,scale,down,textureThreshold,(Class)input.getClass());
 
 		if( output == null )
 			output = new GrayU8(input.width,input.height);
@@ -380,7 +379,7 @@ public class GThresholdImageOps {
 	public static <T extends ImageGray<T>>
 	GrayU8 localBlockMean(T input, GrayU8 output, int radius, double scale , boolean down)
 	{
-		LocalBlockMeanBinaryFilter<T> alg = new LocalBlockMeanBinaryFilter<>(radius * 2 + 1, scale, down,
+		InputToBinary<T> alg = FactoryThresholdBinary.localBlockMean(radius * 2 + 1, scale, down,
 				(Class<T>) input.getClass());
 
 		if( output == null )
@@ -405,8 +404,8 @@ public class GThresholdImageOps {
 	public static <T extends ImageGray<T>>
 	GrayU8 localBlockOtsu(T input, GrayU8 output, int radius, double tuning , boolean down)
 	{
-		LocalBlockOtsuBinaryFilter<T> alg = new LocalBlockOtsuBinaryFilter<>(radius * 2 + 1, tuning, down,
-				input.getImageType());
+		InputToBinary<T> alg = FactoryThresholdBinary.localBlockOtsu(radius * 2 + 1, tuning, down,
+				(Class)input.getClass());
 
 		if( output == null )
 			output = new GrayU8(input.width,input.height);

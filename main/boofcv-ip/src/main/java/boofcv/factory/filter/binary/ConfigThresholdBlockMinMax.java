@@ -18,10 +18,9 @@
 
 package boofcv.factory.filter.binary;
 
-import boofcv.abst.filter.binary.LocalBlockMinMaxBinaryFilter;
 
 /**
- * Configuration for {@link LocalBlockMinMaxBinaryFilter}
+ * Configuration for {@link boofcv.alg.filter.binary.ThresholdBlockMinMax}
  *
  * @author Peter Abeles
  */

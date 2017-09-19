@@ -18,10 +18,12 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
 /**
  * <p> Computes image statistics in regularly spaced blocks across the image. Then computes an average
@@ -40,9 +42,11 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class ThresholdBlockCommon
-		<T extends ImageGray<T>,S extends ImageBase<S>>
+public abstract class ThresholdBlockCommon <T extends ImageGray<T>,S extends ImageBase<S>>
+	implements InputToBinary<T>
 {
+	ImageType<T> imageType;
+
 	// Stores computed block statistics
 	protected S stats;
 
@@ -56,8 +60,9 @@ public abstract class ThresholdBlockCommon
 	 * Configures the detector
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 */
-	public ThresholdBlockCommon(int requestedBlockWidth) {
+	public ThresholdBlockCommon(int requestedBlockWidth, Class<T> imageClass  ) {
 		this.requestedBlockWidth = requestedBlockWidth;
+		this.imageType = ImageType.single(imageClass);
 	}
 
 	/**
@@ -159,4 +164,8 @@ public abstract class ThresholdBlockCommon
 	 */
 	protected abstract void thresholdBlock(int blockX0 , int blockY0 , T input, GrayU8 output );
 
+	@Override
+	public ImageType<T> getInputType() {
+		return imageType;
+	}
 }

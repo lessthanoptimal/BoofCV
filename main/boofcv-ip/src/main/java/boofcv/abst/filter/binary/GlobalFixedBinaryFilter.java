@@ -52,22 +52,7 @@ public class GlobalFixedBinaryFilter<T extends ImageGray<T>> implements InputToB
 	}
 
 	@Override
-	public int getHorizontalBorder() {
-		return 0;
-	}
-
-	@Override
-	public int getVerticalBorder() {
-		return 0;
-	}
-
-	@Override
 	public ImageType<T> getInputType() {
 		return inputType;
-	}
-
-	@Override
-	public ImageType<GrayU8> getOutputType() {
-		return ImageType.single(GrayU8.class);
 	}
 }

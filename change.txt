@@ -41,8 +41,10 @@ Version : 0.28
   * Provide access to detected points in PNP detector. Thought this was done a while ago...
 - Binary Thresholding
   * Renamed classes/functions to remove redundancy and clarify
+  * Changed ImageToBinary to remove pointless bounds list and simply code
   * Added BLOCK_MEAN
   * Added BLOCK_OTSU
+  * Added LOCAL_OTSU
 - Created ConfigMinimumSize
   * Provides a way to specify the size of an object as based on input image size or an exact pixels
 - ImageZoomPanel
@@ -93,6 +95,7 @@ TOP ITEMS
 - TODO Add calibration circle regular to FiducialTrackerApp
 
 OTHER ITEMS
+- TODO Background Removal demonstration
 - TODO Update IntensityPointFeatureApp. Let it select image to open
 - TODO Visualization tools for Direct VO
 -      Show warped image

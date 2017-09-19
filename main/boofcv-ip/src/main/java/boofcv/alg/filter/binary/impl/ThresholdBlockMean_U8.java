@@ -33,7 +33,7 @@ public class ThresholdBlockMean_U8
 	boolean down;
 
 	public ThresholdBlockMean_U8(int requestedBlockWidth, double scale , boolean down ) {
-		super(requestedBlockWidth);
+		super(requestedBlockWidth,GrayU8.class);
 		this.stats = new GrayU8(1,1);
 		this.scale = scale;
 		this.down = down;

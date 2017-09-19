@@ -34,7 +34,7 @@ public class ThresholdBlockMean_F32
 	boolean down;
 
 	public ThresholdBlockMean_F32(int requestedBlockWidth, double scale , boolean down ) {
-		super(requestedBlockWidth);
+		super(requestedBlockWidth,GrayF32.class);
 		this.stats = new GrayF32(1,1);
 		this.scale = (float)scale;
 		this.down = down;

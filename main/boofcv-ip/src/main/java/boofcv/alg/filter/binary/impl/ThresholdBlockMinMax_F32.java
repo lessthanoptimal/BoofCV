@@ -35,7 +35,7 @@ public class ThresholdBlockMinMax_F32
 	boolean down;
 
 	public ThresholdBlockMinMax_F32(float minimumSpread, int requestedBlockWidth, float scale , boolean down ) {
-		super(minimumSpread,requestedBlockWidth);
+		super(minimumSpread,requestedBlockWidth,GrayF32.class);
 		stats = new InterleavedF32(1,1,2);
 		this.scale = scale;
 		this.down = down;

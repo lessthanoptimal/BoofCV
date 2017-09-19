@@ -58,6 +58,12 @@ public enum ThresholdType {
 	 */
 	LOCAL_MEAN(true,false),
 	/**
+	 * Applies a local Otsu across the entire image
+	 *
+	 * @see boofcv.alg.filter.binary.ThresholdLocalOtsu
+	 */
+	LOCAL_OTSU(true,false),
+	/**
 	 * Breaks the image into blocks and computes the min and max inside each block.  Then thresholds
 	 * each pixel using interpolated min/max values.
 	 *

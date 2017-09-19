@@ -18,37 +18,34 @@
 
 package boofcv.abst.filter.binary;
 
-import boofcv.alg.filter.binary.impl.ThresholdSauvola;
+import boofcv.alg.filter.binary.ThresholdBlockOtsu;
 import boofcv.core.image.GConvertImage;
 import boofcv.struct.image.*;
 
 /**
- * Adaptive/local threshold using a Sauvola calculation
- *
- * @see ThresholdSauvola
+ * Wrapper around {@link ThresholdBlockOtsu}
  *
  * @author Peter Abeles
  */
-public class LocalSauvolaBinaryFilter<T extends ImageGray<T>> implements InputToBinary<T> {
+public class InputToBinarySwitchF32<T extends ImageGray<T>> implements InputToBinary<T> {
 
 	ImageType<T> inputType;
 
-	ThresholdSauvola alg;
+	InputToBinary<GrayF32> alg;
 	GrayF32 input;
 
 	/**
-	 * @see ThresholdSauvola
+	 * @see ThresholdBlockOtsu
 	 */
-	public LocalSauvolaBinaryFilter(int radius, float k, boolean down,
-									ImageType<T> inputType) {
+	public InputToBinarySwitchF32(InputToBinary<GrayF32> alg,
+								  Class<T> inputType) {
 
-		this.inputType = inputType;
+		this.alg = alg;
+		this.inputType = ImageType.single(inputType);
 
-		if( inputType.getDataType() != ImageDataType.F32 ) {
+		if( this.inputType.getDataType() != ImageDataType.F32 ) {
 			input = new GrayF32(1,1);
 		}
-
-		alg = new ThresholdSauvola(radius,k, down);
 	}
 
 	@Override
@@ -63,22 +60,7 @@ public class LocalSauvolaBinaryFilter<T extends ImageGray<T>> implements InputTo
 	}
 
 	@Override
-	public int getHorizontalBorder() {
-		return 0;
-	}
-
-	@Override
-	public int getVerticalBorder() {
-		return 0;
-	}
-
-	@Override
 	public ImageType<T> getInputType() {
 		return inputType;
-	}
-
-	@Override
-	public ImageType<GrayU8> getOutputType() {
-		return ImageType.single(GrayU8.class);
 	}
 }

@@ -18,11 +18,13 @@
 
 package boofcv.alg.filter.binary.impl;
 
+import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 
 /**
  * <p>
@@ -40,7 +42,7 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-public class ThresholdSauvola {
+public class ThresholdSauvola implements InputToBinary<GrayF32> {
 
 	// user specified threshold
 	float k;
@@ -122,6 +124,11 @@ public class ThresholdSauvola {
 				}
 			}
 		}
+	}
+
+	@Override
+	public ImageType<GrayF32> getInputType() {
+		return ImageType.single(GrayF32.class);
 	}
 
 	public float getK() {
