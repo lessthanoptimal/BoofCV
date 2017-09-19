@@ -204,7 +204,7 @@ public class SimulatePlanarWorld {
 	public void computePixel(int which, double x, double y, Point2D_F64 output) {
 		ImageRect r = scene.get(which);
 
-		Point3D_F64 p3 = new Point3D_F64(x,y,0);
+		Point3D_F64 p3 = new Point3D_F64(x,-y,0);
 		SePointOps_F64.transform(r.rectToWorld, p3, p3);
 
 		// unit sphere

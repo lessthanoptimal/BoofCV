@@ -78,15 +78,11 @@ public class TestCalibrationDetectorCircleHexagonalGrid extends GenericPlanarCal
 		Ellipse2D.Double ellipse = new Ellipse2D.Double();
 
 		for (int row = 0; row < config.numRows; row++) {
-			double y = borderPixels+radiusPixels;
-			y += (config.numRows-1-row)*spaceY;
-			for (int col = 0; col < config.numCols; col++) {
+//			double y = borderPixels+radiusPixels + row*spaceY;
+			double y = borderPixels+radiusPixels + (config.numRows-row-1)*spaceY;
+			for (int col = row%2; col < config.numCols; col += 2) {
 				double x = borderPixels+radiusPixels+col*spaceX;
-
-				if( row%2 == 1 && col%2 == 0 )
-					continue;
-				if( row%2 == 0 && col%2 == 1 )
-					continue;
+//				double x = borderPixels+radiusPixels+(config.numCols-col-1)*spaceX;
 
 				ellipse.setFrame(x-radiusPixels,y-radiusPixels,2*radiusPixels,2*radiusPixels);
 				g2.fill(ellipse);

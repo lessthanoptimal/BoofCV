@@ -136,13 +136,8 @@ public class CalibrationDetectorCircleHexagonalGrid implements DetectorFiducialC
 
 		for (int row = 0; row < numRows; row++) {
 			double y = row*spaceY - height/2;
-			for (int col = 0; col < numCols; col++) {
+			for (int col = row%2; col < numCols; col += 2) {
 				double x = col*spaceX - width/2;
-
-				if( row%2==0 && col%2==1)
-					continue;
-				if( row%2==1 && col%2==0)
-					continue;
 				ret.add( new Point2D_F64(x,y));
 			}
 		}

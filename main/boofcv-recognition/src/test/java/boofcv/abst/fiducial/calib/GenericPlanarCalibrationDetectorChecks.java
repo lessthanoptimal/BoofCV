@@ -189,19 +189,29 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		UtilImageIO.saveImage(buff,"failed.png");
 
 		Graphics2D g2 = buff.createGraphics();
-		for (int j = 0; found != null && j < found.size(); j++) {
-			Point2D_F64 f = found.get(j);
-			VisualizeFeatures.drawPoint(g2,f.x,f.y,2,Color.RED,false);
+		Point2D_F64 p,f;
+		if( found != null ) {
+			for (int j = 0; j < found.size(); j++) {
+				f = found.get(j);
+				VisualizeFeatures.drawPoint(g2, f.x, f.y, 2, Color.RED, false);
+			}
+			g2.setStroke(new BasicStroke(5));
+			f = found.get(0);
+			VisualizeFeatures.drawCircle(g2, f.x, f.y, 4);
 		}
 		Point2D_F64 truth = new Point2D_F64();
 
 		g2.setColor(Color.GREEN);
 		g2.setStroke(new BasicStroke(2));
 		for (int j = 0; j < locations2D.size(); j++) {
-			Point2D_F64 p = locations2D.get(j);
+			p = locations2D.get(j);
 			simulator.computePixel( 0, p.x , p.y , truth);
 			VisualizeFeatures.drawCircle(g2,truth.x,truth.y,4);
 		}
+		p = locations2D.get(0);
+		g2.setStroke(new BasicStroke(5));
+		simulator.computePixel( 0, p.x , p.y , truth);
+		VisualizeFeatures.drawCircle(g2,truth.x,truth.y,4);
 
 		ShowImages.showWindow(buff,"Foo",true);
 		BoofMiscOps.sleep(visualizeTime);

@@ -36,7 +36,15 @@ public class UtilWebcamCapture {
 	 */
 	public static Webcam openDefault( int desiredWidth , int desiredHeight) {
 		Webcam webcam = Webcam.getDefault();
-		adjustResolution(webcam,desiredWidth,desiredHeight);
+
+		// Webcam doesn't list all available resolutions. Just pass in a custom
+		// resolution and hope it works
+//		adjustResolution(webcam,desiredWidth,desiredHeight);
+
+		Dimension d = new Dimension(desiredWidth,desiredHeight);
+		webcam.setCustomViewSizes(new Dimension[] { d });
+		webcam.setViewSize(d);
+
 		webcam.open();
 		return webcam;
 	}
