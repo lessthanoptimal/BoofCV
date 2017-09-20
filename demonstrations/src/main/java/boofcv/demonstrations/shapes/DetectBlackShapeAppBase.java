@@ -93,6 +93,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 			public void run() {
 				double zoom = BoofSwingUtil.selectZoomToShowAll(guiImage,width,height);
 				controls.setZoom(zoom);
+				controls.setImageSize(width,height);
 				milliBinary = 0;
 			}
 		});

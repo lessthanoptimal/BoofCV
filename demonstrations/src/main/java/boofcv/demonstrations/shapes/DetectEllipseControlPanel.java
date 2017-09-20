@@ -98,6 +98,7 @@ public class DetectEllipseControlPanel extends DetectBlackShapePanel
 		spinnerRadiusSample = spinner(config.refineRadialSamples, 1, 5, 1);
 
 		addLabeled(processingTimeLabel,"Time (ms)", this);
+		addLabeled(imageSizeLabel,"Size", this);
 		addLabeled(imageView, "View: ", this);
 		addLabeled(selectZoom,"Zoom",this);
 		addAlignLeft(showEllipses, this);

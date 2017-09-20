@@ -30,6 +30,7 @@ public abstract class DetectBlackShapePanel extends StandardAlgConfigPanel {
 
 	protected JSpinner selectZoom;
 	protected JLabel processingTimeLabel = new JLabel();
+	protected JLabel imageSizeLabel = new JLabel();
 
 	protected int selectedView = 0;
 
@@ -46,6 +47,15 @@ public abstract class DetectBlackShapePanel extends StandardAlgConfigPanel {
 			@Override
 			public void run() {
 				selectZoom.setValue(zoom);
+			}
+		});
+	}
+
+	public void setImageSize( final int width , final int height ) {
+		BoofSwingUtil.invokeNowOrLater(new Runnable() {
+			@Override
+			public void run() {
+				imageSizeLabel.setText(width+" x "+height);
 			}
 		});
 	}

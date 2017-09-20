@@ -18,6 +18,7 @@
 
 package boofcv.gui;
 
+import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
@@ -48,6 +49,12 @@ public abstract class DemonstrationBase2 extends JPanel {
 	protected JMenuBar menuBar;
 	JMenuItem menuFile, menuWebcam, menuQuit;
 	JMenu menuRecent;
+
+	// Window the application is shown in
+	JFrame window;
+
+	// name of the application
+	String appName;
 
 	// controls by synchornized(inputStreams)
 	protected InputMethod inputMethod = InputMethod.NONE;
@@ -346,6 +353,7 @@ public abstract class DemonstrationBase2 extends JPanel {
 		}
 
 		if (!failed) {
+			setInputName(new File(filePaths[0]).getName());
 			synchronized (inputStreams) {
 				inputMethod = InputMethod.VIDEO;
 				streamPeriod = 33; // default to 33 FPS for a video
@@ -404,6 +412,7 @@ public abstract class DemonstrationBase2 extends JPanel {
 			threadProcess = new ProcessImageThread();
 		}
 		if( !reopen ) {
+			setInputName(new File(filePath).getName());
 			handleInputChange(0, inputMethod, buffered.getWidth(), buffered.getHeight());
 		}
 		threadProcess.start();
@@ -442,10 +451,17 @@ public abstract class DemonstrationBase2 extends JPanel {
 
 				if (threadProcess != null)
 					throw new RuntimeException("There was still an active stream thread!");
+				setInputName("Webcam");
 				handleInputChange(0, inputMethod, sequence.getNextWidth(), sequence.getNextHeight());
 				threadProcess = new SynchronizedStreamsThread();
 				threadProcess.start();
 			}
+		}
+	}
+
+	private void setInputName( String name ) {
+		if( window != null ) {
+			window.setTitle(appName+":  "+name);
 		}
 	}
 
@@ -456,6 +472,16 @@ public abstract class DemonstrationBase2 extends JPanel {
 		while( !inputSizeKnown ) {
 			BoofMiscOps.sleep(5);
 		}
+	}
+
+	/**
+	 * Opens a window with this application inside of it
+	 * @param appName Name of the application
+	 */
+	public void openWindow( String appName ) {
+		waitUntilInputSizeIsKnown();
+		this.appName = appName;
+		window = ShowImages.showWindow(this,appName,true);
 	}
 
 	/**

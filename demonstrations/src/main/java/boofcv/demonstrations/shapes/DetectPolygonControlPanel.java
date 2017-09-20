@@ -183,6 +183,7 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		configureSpinnerFloat(spinnerMaxCornerChange);
 
 		addLabeled(processingTimeLabel,"Time (ms)", this);
+		addLabeled(imageSizeLabel,"Size", this);
 		addLabeled(imageView, "View: ", this);
 		addLabeled(selectZoom,"Zoom",this);
 		addAlignLeft(showCorners, this);

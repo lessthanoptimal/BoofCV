@@ -176,6 +176,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		configureSpinnerFloat(spinnerMaxCornerChange);
 
 		addLabeled(processingTimeLabel,"Time (ms)", this);
+		addLabeled(imageSizeLabel,"Size", this);
 		add(bRunAgain);
 		addLabeled(imageView, "View: ", this);
 		addLabeled(selectZoom,"Zoom",this);

@@ -29,7 +29,6 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -172,8 +171,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 		app.openFile(new File(examples.get(0)));
 
 		app.waitUntilInputSizeIsKnown();
-
-		ShowImages.showWindow(app,"Detect Black Polygons",true);
+		app.openWindow("Detect Black Polygons");
 	}
 
 

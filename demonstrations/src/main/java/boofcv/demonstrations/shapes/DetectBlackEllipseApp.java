@@ -27,7 +27,6 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -130,9 +129,7 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 
 		app.openFile(new File(examples.get(0)));
 
-		app.waitUntilInputSizeIsKnown();
-
-		ShowImages.showWindow(app,"Detect Black Ellipses",true);
+		app.openWindow("Detect Black Ellipses");
 	}
 
 
