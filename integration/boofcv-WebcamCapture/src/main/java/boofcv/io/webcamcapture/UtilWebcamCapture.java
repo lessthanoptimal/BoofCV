@@ -39,11 +39,7 @@ public class UtilWebcamCapture {
 
 		// Webcam doesn't list all available resolutions. Just pass in a custom
 		// resolution and hope it works
-//		adjustResolution(webcam,desiredWidth,desiredHeight);
-
-		Dimension d = new Dimension(desiredWidth,desiredHeight);
-		webcam.setCustomViewSizes(new Dimension[] { d });
-		webcam.setViewSize(d);
+		adjustResolution(webcam,desiredWidth,desiredHeight);
 
 		webcam.open();
 		return webcam;
@@ -77,16 +73,32 @@ public class UtilWebcamCapture {
 	}
 
 	public static void adjustResolution( Webcam webcam , int desiredWidth , int desiredHeight ) {
-		Dimension[] sizes = webcam.getViewSizes();
-		int bestError = Integer.MAX_VALUE;
-		Dimension best = sizes[0]; // to get rid of null warning
+		// Bug in the library where it doesn't list all the camera's possible resolutions
+//		Dimension[] sizes = webcam.getViewSizes();
+//		int bestError = Integer.MAX_VALUE;
+//		Dimension best = sizes[0]; // to get rid of null warning
+//		for( Dimension d : sizes ) {
+//			int error = (d.width-desiredWidth)*(d.height-desiredHeight);
+//			if( error < bestError ) {
+//				bestError = error;
+//				best = d;
+//			}
+//		}
+
+		Dimension[] sizes = webcam.getCustomViewSizes();
+		Dimension match = null;
 		for( Dimension d : sizes ) {
-			int error = (d.width-desiredWidth)*(d.height-desiredHeight);
-			if( error < bestError ) {
-				bestError = error;
-				best = d;
+			if( d.width == desiredWidth && d.height == desiredHeight ) {
+				match = d;
+				break;
 			}
 		}
-		webcam.setViewSize(best);
+
+		if( match == null ) {
+			match = new Dimension(desiredWidth,desiredHeight);
+			webcam.setCustomViewSizes(new Dimension[]{match});
+		}
+
+		webcam.setViewSize(match);
 	}
 }

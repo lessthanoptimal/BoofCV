@@ -19,8 +19,10 @@
 package boofcv.gui;
 
 import javax.swing.*;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
@@ -115,5 +117,19 @@ public class BoofSwingUtil {
 		} else {
 			return 1.0;
 		}
+	}
+
+	public static JFormattedTextField createTextField( int current , int min , int max ) {
+		NumberFormat format = NumberFormat.getInstance();
+		NumberFormatter formatter = new NumberFormatter(format);
+		formatter.setValueClass(Integer.class);
+		formatter.setMinimum(min);
+		formatter.setMaximum(max);
+		formatter.setAllowsInvalid(true);
+//		formatter.setCommitsOnValidEdit(true);
+		JFormattedTextField field = new JFormattedTextField(formatter);
+		field.setHorizontalAlignment(JTextField.RIGHT);
+		field.setValue(current);
+		return field;
 	}
 }

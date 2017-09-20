@@ -25,6 +25,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
+import boofcv.io.webcamcapture.OpenWebcamDialog;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageBase;
@@ -439,14 +440,23 @@ public abstract class DemonstrationBase extends JPanel {
 
 		stopAllInputProcessing();
 
+		// Let he user select and configure the webcam. If canceled it will return null
+		OpenWebcamDialog.Selection s = OpenWebcamDialog.showDialog(null);
+		if( s == null ) {
+			synchronized (lockStartingProcess) {
+				startingProcess = false;
+			}
+			return;
+		}
+
 		synchronized (inputStreams) {
 			inputMethod = InputMethod.WEBCAM;
 			inputFilePath = null;
 			streamPeriod = 0; // default to no delay in processing for a real time stream
 
 			CacheSequenceStream cache = inputStreams.get(0);
-			SimpleImageSequence sequence = media.openCamera(null, 640, 480, cache.getImageType());
-
+			SimpleImageSequence sequence =
+					media.openCamera(s.camera.getName(), s.width, s.height, cache.getImageType());
 
 			if (sequence == null) {
 				showRejectDiaglog("Can't open webcam");

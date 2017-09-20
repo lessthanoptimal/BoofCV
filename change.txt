@@ -17,7 +17,10 @@ Version : 0.28
 - Added Hexagonal Grid
   * Similar to asymmetric but in Y direction is now (x spacing)*2.0*sin(60 degrees).
   * Asymmetric was the same along both axises
-- Adding the capability for demonstrations that open files to remember the last directory it opened
+- Demonstrations
+  * Open files will remember the last directory it opened
+  * Added list of recently opened files
+  * Dialog for opening a webcam
 - Calibration Target Generator
   * Fixed bug in asymmetric circle target where it was shifted on the page
 - DetectPolygonFromContour
