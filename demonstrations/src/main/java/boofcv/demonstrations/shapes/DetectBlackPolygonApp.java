@@ -171,7 +171,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 		app.openFile(new File(examples.get(0)));
 
 		app.waitUntilInputSizeIsKnown();
-		app.openWindow("Detect Black Polygons");
+		app.display("Detect Black Polygons");
 	}
 
 

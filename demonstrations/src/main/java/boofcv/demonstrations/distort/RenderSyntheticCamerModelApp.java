@@ -30,7 +30,6 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -55,7 +54,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RenderSyntheticCamerModelApp<T extends ImageBase<T>> extends DemonstrationBase<T>
+public class RenderSyntheticCamerModelApp<T extends ImageBase<T>> extends DemonstrationBase
 	implements PinholePanel.Listener, ActionListener
 {
 
@@ -76,8 +75,7 @@ public class RenderSyntheticCamerModelApp<T extends ImageBase<T>> extends Demons
 	BufferedImage out;
 
 	public RenderSyntheticCamerModelApp(List<?> exampleInputs, ImageType<T> imageType) {
-		super(exampleInputs, imageType);
-		allowVideos = false;
+		super(true,true,exampleInputs, imageType);
 
 		configureDefaultModel(100, 100);
 
@@ -187,9 +185,7 @@ public class RenderSyntheticCamerModelApp<T extends ImageBase<T>> extends Demons
 
 		app.openFile(new File(inputs.get(0).getPath()));
 
-		app.waitUntilDoneProcessing();
-
-		ShowImages.showWindow(app, "Render Synthetic Camera Model",true);
+		app.display("Render Synthetic Camera Model");
 	}
 
 }

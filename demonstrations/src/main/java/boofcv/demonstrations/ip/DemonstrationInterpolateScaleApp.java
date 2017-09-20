@@ -24,7 +24,6 @@ import boofcv.core.image.border.BorderType;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayF32;
@@ -48,7 +47,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DemonstrationInterpolateScaleApp<T extends ImageBase<T>>
-	extends DemonstrationBase<T> implements ItemListener, ComponentListener
+	extends DemonstrationBase implements ItemListener, ComponentListener
 {
 	private final ImageType<T> imageType;
 	private final T latestImage;
@@ -140,8 +139,6 @@ public class DemonstrationInterpolateScaleApp<T extends ImageBase<T>>
 		app.setPreferredSize(new Dimension(500,500));
 
 		app.openFile(new File(examples.get(0)));
-		app.waitUntilDoneProcessing();
-
-		ShowImages.showWindow(app,"Interpolation Enlarge",true);
+		app.display("Interpolation Enlarge");
 	}
 }

@@ -200,7 +200,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 		app.openFile(new File(examples.get(0)));
 
-		app.openWindow("QR-Code Detector");
+		app.display("QR-Code Detector");
 	}
 
 

@@ -30,7 +30,6 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
@@ -54,7 +53,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ShapeFitContourApp
-		extends DemonstrationBase<GrayU8>
+		extends DemonstrationBase
 		implements ThresholdControlPanel.Listener
 {
 	// displays intensity image
@@ -162,7 +161,7 @@ public class ShapeFitContourApp
 	public void imageThresholdUpdated() {
 		ConfigThreshold config = controlPanel.getThreshold().createConfig();
 		inputToBinary = FactoryThresholdBinary.threshold(config,GrayU8.class);
-		processImageThread(0,0,null,null);
+		reprocessImageOnly();
 	}
 
 	protected void renderVisuals( Graphics2D g2 , double scale ) {
@@ -257,8 +256,6 @@ public class ShapeFitContourApp
 
 		app.openFile(new File(examples.get(0)));
 
-		app.waitUntilDoneProcessing();
-
-		ShowImages.showWindow(app,"Contour Shape Fitting",true);
+		app.display("Contour Shape Fitting");
 	}
 }

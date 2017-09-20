@@ -32,7 +32,6 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -71,7 +70,7 @@ import java.util.List;
  */
 // TODO Show which calibration file is being used
 	// TODO when a file is opened look for a calibration file
-public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase<T>
+public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 	implements PinholeSimplifiedPanel.Listener
 {
 
@@ -366,10 +365,6 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 		FisheyePinholeApp app = new FisheyePinholeApp(examples,type);
 
 		app.openFile(new File(examples.get(0).getPath()));
-
-		app.waitUntilDoneProcessing();
-
-		ShowImages.showWindow(app, "Fisheye to Pinhole Camera",true);
-
+		app.display("Fisheye to Pinhole Camera");
 	}
 }

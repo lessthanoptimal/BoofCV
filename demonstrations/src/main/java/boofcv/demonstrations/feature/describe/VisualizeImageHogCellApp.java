@@ -23,7 +23,6 @@ import boofcv.factory.feature.dense.ConfigDenseHoG;
 import boofcv.factory.feature.dense.FactoryDescribeImageDenseAlg;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
@@ -42,7 +41,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends DemonstrationBase<T> {
+public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends DemonstrationBase {
 
 	// use the fast variant since it confidently computes each cell individually and doesn't normalize it
 	DescribeDenseHogFastAlg<T> hog;
@@ -109,6 +108,15 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 	}
 
 	@Override
+	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+		super.handleInputChange(source, method, width, height);
+
+
+		imagePanel.setPreferredSize(new Dimension(width,height));
+		imagePanel.setMinimumSize(new Dimension(width,height));
+	}
+
+	@Override
 	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 		synchronized (lock) {
 			hog.setInput((T)input);
@@ -127,45 +135,43 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 		}
 
 		imagePanel.setImage(work);
-		imagePanel.setPreferredSize(new Dimension(work.getWidth(),work.getHeight()));
-		imagePanel.setMinimumSize(new Dimension(work.getWidth(),work.getHeight()));
 		imagePanel.repaint();
 	}
 
 	public void setCellWidth( int width ) {
 		synchronized (lock) {
-			createHoG(defaultType);
+			createHoG((ImageType)getImageType(0));
 			visualizers.setHoG(hog);
-			reprocessSingleImage();
+			reprocessImageOnly();
 		}
 	}
 
 	public void setOrientationBins(int histogram) {
 		synchronized (lock) {
-			createHoG(defaultType);
+			createHoG((ImageType)getImageType(0));
 			visualizers.setHoG(hog);
-			reprocessSingleImage();
+			reprocessImageOnly();
 		}
 	}
 
 	public void setShowGrid(boolean showGrid) {
 		visualizers.showGrid = showGrid;
-		reprocessSingleImage();
+		reprocessImageOnly();
 	}
 
 	public void setShowLocal(boolean show ) {
 		visualizers.localMax = show;
-		reprocessSingleImage();
+		reprocessImageOnly();
 	}
 
 	public void setShowLog(boolean show ) {
 		visualizers.setShowLog(show);
-		reprocessSingleImage();
+		reprocessImageOnly();
 	}
 
 	public void setShowInput( boolean show ) {
 		this.showInput = show;
-		reprocessSingleImage();
+		reprocessImageOnly();
 	}
 
 	public static void main(String[] args) {
@@ -180,8 +186,6 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 		VisualizeImageHogCellApp app = new VisualizeImageHogCellApp(examples, imageType);
 
 		app.openFile(new File(examples.get(0)));
-		app.waitUntilDoneProcessing();
-
-		ShowImages.showWindow(app, "Hog Descriptor Unnormalized Cell Visualization",true);
+		app.display( "Hog Descriptor Unnormalized Cell");
 	}
 }

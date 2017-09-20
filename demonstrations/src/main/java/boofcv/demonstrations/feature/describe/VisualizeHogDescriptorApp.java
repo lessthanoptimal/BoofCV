@@ -24,7 +24,6 @@ import boofcv.factory.feature.dense.FactoryDescribeImageDense;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
@@ -48,7 +47,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends DemonstrationBase<T>
+public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends DemonstrationBase
 {
 	ControlHogDescriptorPanel controlPanel = new ControlHogDescriptorPanel(this);
 	VisualizePanel imagePanel = new VisualizePanel();
@@ -120,7 +119,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 
 	private void updateDescriptor() {
 		synchronized (hogLock) {
-			hog = (DescribeImageDenseHoG<T>) FactoryDescribeImageDense.hog(config, defaultType);
+			hog = (DescribeImageDenseHoG<T>) FactoryDescribeImageDense.hog(config, getImageType(0));
 		}
 
 		int numAngles = config.orientationBins;
@@ -133,6 +132,14 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 			cos[i] = (float)Math.cos(theta);
 			sin[i] = (float)Math.sin(theta);
 		}
+	}
+
+	@Override
+	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+		super.handleInputChange(source, method, width, height);
+
+		imagePanel.setPreferredSize(new Dimension(width,height));
+		imagePanel.setMinimumSize(new Dimension(width,height));
 	}
 
 	@Override
@@ -157,8 +164,6 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 		}
 
 		imagePanel.setImage(buffered);
-		imagePanel.setPreferredSize(new Dimension(buffered.getWidth(),buffered.getHeight()));
-		imagePanel.setMinimumSize(new Dimension(buffered.getWidth(),buffered.getHeight()));
 		imagePanel.repaint();
 	}
 
@@ -270,9 +275,6 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 		VisualizeHogDescriptorApp app = new VisualizeHogDescriptorApp(examples, imageType);
 
 		app.openFile(new File(examples.get(0)));
-		app.waitUntilDoneProcessing();
-
-		ShowImages.showWindow(app, "Hog Descriptor Visualization",true);
-
+		app.display("Hog Descriptor Visualization");
 	}
 }

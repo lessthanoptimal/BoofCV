@@ -23,7 +23,7 @@ import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.gui.BoofSwingUtil;
-import boofcv.gui.DemonstrationBase2;
+import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.calibration.CalibratedImageGridPanel;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -59,7 +59,7 @@ import static boofcv.gui.fiducial.VisualizeFiducial.drawLine;
  *
  * @author Peter Abeles
  */
-public abstract class CommonDetectCalibrationApp extends DemonstrationBase2
+public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 		implements DetectCalibrationPanel.Listener
 {
 	boolean success;

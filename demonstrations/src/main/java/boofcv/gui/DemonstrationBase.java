@@ -18,6 +18,7 @@
 
 package boofcv.gui;
 
+import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
@@ -25,6 +26,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.wrapper.DefaultMediaManager;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
@@ -35,6 +37,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,65 +45,84 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class DemonstrationBase<T extends ImageBase<T>> extends JPanel {
+public abstract class DemonstrationBase extends JPanel {
 	protected JMenuBar menuBar;
 	JMenuItem menuFile, menuWebcam, menuQuit;
+	JMenu menuRecent;
 
+	// Window the application is shown in
+	JFrame window;
+
+	// name of the application
+	String appName;
+
+	// controls by synchornized(inputStreams)
 	protected InputMethod inputMethod = InputMethod.NONE;
 
-	ImageSequenceThread sequenceThread;
+	// When set to true the input's size is known and the GUI should be adjusted
+	volatile boolean inputSizeKnown = false;
 
-	volatile boolean waitingToOpenImage = false;
-	final Object waitingLock = new Object();
+	protected String inputFilePath;
 
-	volatile boolean processRunning = false;
-	volatile boolean processRequested = false;
+	// Storage for input list of input streams.  always synchronize before manipulating
+	private final List<CacheSequenceStream> inputStreams = new ArrayList<>();
 
-	final Object processLock = new Object();
-	BufferedImage imageCopy0;
-	BufferedImage imageCopy1;
-	T boofCopy1;
+	private ProcessThread threadProcess; // controls by synchronized(inputStreams)
 
-	protected ImageType<T> defaultType;
-	T input;
-	BufferedImage inputBuffered;
+	// lock to ensure it doesn't try to start multiple processes at the same time
+	private final Object lockStartingProcess = new Object();
+	private volatile boolean startingProcess = false;
+
 	protected MediaManager media = new DefaultMediaManager();
+	protected boolean allowVideos = true;
+	protected boolean allowImages = true;
 
 	// If true then any stream will be paused.  If a webcam is running it will skip new images
 	// if a video it will stop processing the input
 	protected volatile boolean streamPaused = false;
 
+	// specifies how many frames it should move before pausing
+	protected volatile int streamStepCounter = 0;
+
 	// minimum elapsed time between the each stream frame being processed, in milliseconds
 	protected volatile long streamPeriod = 30;
 
-	// File path to previously opened image or video.  null if webcam
-	protected String inputFilePath;
-
-	protected boolean allowImages = true;
-	protected boolean allowVideos = true;
-	protected boolean allowWebcameras = true;
-
-	public DemonstrationBase(boolean allowWebcameras, List<?> exampleInputs, ImageType<T> defaultType) {
+	public DemonstrationBase(boolean openFile , boolean openWebcam, List<?> exampleInputs, ImageType ...defaultTypes) {
 		super(new BorderLayout());
-		this.allowWebcameras = allowWebcameras;
-		createMenuBar(exampleInputs);
+		createMenuBar(openFile, openWebcam, exampleInputs);
 
-		this.input = defaultType.createImage(1,1);
-		this.defaultType = defaultType;
-		this.boofCopy1 = defaultType.createImage(1,1);
+		setImageTypes(defaultTypes);
 	}
 
 	/**
 	 * Constructor that specifies examples and input image type
 	 *
 	 * @param exampleInputs List of paths to examples.  Either a String file path or {@link PathLabel}.
-	 * @param defaultType Type of image it's processing
+	 * @param defaultTypes Type of image in each stream
 	 */
-	public DemonstrationBase(List<?> exampleInputs, ImageType<T> defaultType) {
-		this(true,exampleInputs, defaultType);
+	public DemonstrationBase(List<?> exampleInputs, ImageType ...defaultTypes) {
+		this(true,true,exampleInputs, defaultTypes);
 	}
 
-	private void createMenuBar(List<?> exampleInputs) {
+	public void setImageTypes( ImageType ...defaultTypes ) {
+		synchronized ( inputStreams ) {
+			inputStreams.clear();
+			for (ImageType type : defaultTypes) {
+				inputStreams.add(new CacheSequenceStream(type));
+			}
+		}
+	}
+
+	/**
+	 * Get input input type for a stream safely
+	 */
+	protected <T extends ImageBase> ImageType<T> getImageType( int which ) {
+		synchronized ( inputStreams ) {
+			return inputStreams.get(which).imageType;
+		}
+	}
+
+	private void createMenuBar(boolean openFile , boolean openWebcam , List<?> exampleInputs) {
 		menuBar = new JMenuBar();
 
 		JMenu menu = new JMenu("File");
@@ -108,53 +130,133 @@ public abstract class DemonstrationBase<T extends ImageBase<T>> extends JPanel {
 
 		ActionListener listener = createActionListener();
 
-		menuFile = new JMenuItem("Open File", KeyEvent.VK_O);
-		menuFile.addActionListener(listener);
-		menuFile.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-		if( allowWebcameras ) {
+		if( openFile ) {
+			menuFile = new JMenuItem("Open File", KeyEvent.VK_O);
+			menuFile.addActionListener(listener);
+			menuFile.setAccelerator(KeyStroke.getKeyStroke(
+					KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+			menu.add(menuFile);
+
+			menuRecent = new JMenu("Open Recent");
+			menu.add(menuRecent);
+			updateRecentItems();
+		}
+		if( openWebcam ) {
 			menuWebcam = new JMenuItem("Open Webcam", KeyEvent.VK_W);
 			menuWebcam.addActionListener(listener);
 			menuWebcam.setAccelerator(KeyStroke.getKeyStroke(
 					KeyEvent.VK_W, ActionEvent.CTRL_MASK));
+			menu.add(menuWebcam);
 		}
 		menuQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
 		menuQuit.addActionListener(listener);
 		menuQuit.setAccelerator(KeyStroke.getKeyStroke(
 				KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
 
-		menu.add(menuFile);
-		if( allowWebcameras )
-			menu.add(menuWebcam);
 		menu.addSeparator();
 		menu.add(menuQuit);
 
-		menu = new JMenu("Examples");
-		menuBar.add(menu);
+		if( exampleInputs != null && exampleInputs.size() > 0 ) {
+			menu = new JMenu("Examples");
+			menuBar.add(menu);
 
-		for (final Object o : exampleInputs ) {
-			final String path,name;
+			for (final Object o : exampleInputs) {
+				String name;
 
-			if( o instanceof PathLabel )  {
-				path = ((PathLabel)o).getPath();
-				name = ((PathLabel)o).getLabel();
-			} else if( o instanceof String ){
-				path = (String)o;
-				name = new File((String)o).getName();
-			} else {
-				throw new IllegalArgumentException("Example must be a PathLabel or a String path");
-			}
-			JMenuItem menuItem = new JMenuItem( name );
-			menuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					openFile(new File(path));
+				if (o instanceof PathLabel) {
+					name = ((PathLabel) o).getLabel();
+				} else if (o instanceof String) {
+					name = new File((String) o).getName();
+				} else {
+					name = o.toString();
 				}
-			});
-			menu.add(menuItem);
+				JMenuItem menuItem = new JMenuItem(name);
+				menuItem.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						openExample(o);
+					}
+				});
+				menu.add(menuItem);
+			}
 		}
 
 		add(BorderLayout.NORTH, menuBar);
+	}
+
+	/**
+	 * Updates the list in recent menu
+	 */
+	private void updateRecentItems() {
+		if( menuRecent == null )
+			return;
+		menuRecent.removeAll();
+		List<String> recentFiles = BoofSwingUtil.getListOfRecentFiles(this);
+		for( String filePath : recentFiles ) {
+			final File f = new File(filePath);
+			JMenuItem recentItem = new JMenuItem(f.getName());
+			recentItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					openFile(f);
+				}
+			});
+			menuRecent.add(recentItem);
+		}
+	}
+
+	/**
+	 * Function that is invoked when an example has been selected
+	 */
+	public void openExample( Object o ) {
+		String path;
+		if (o instanceof PathLabel) {
+			path = ((PathLabel) o).getPath();
+		} else if (o instanceof String) {
+			path = (String) o;
+		} else {
+			throw new IllegalArgumentException("Unknown example object type.  Please override openExample()");
+		}
+		openFile(new File(path));
+	}
+
+	/**
+	 * Blocks until it kills all input streams from running
+	 */
+	public void stopAllInputProcessing() {
+		ProcessThread threadProcess;
+		synchronized (inputStreams) {
+			threadProcess = this.threadProcess;
+			if( threadProcess != null ) {
+				if( threadProcess.running ) {
+					threadProcess.requestStop = true;
+				} else {
+					threadProcess = this.threadProcess = null;
+				}
+			}
+		}
+
+		inputSizeKnown = false;
+
+		if( threadProcess == null ) {
+			return;
+		}
+
+		long timeout = System.currentTimeMillis()+5000;
+		while( threadProcess.running && timeout >= System.currentTimeMillis() ) {
+			synchronized (inputStreams) {
+				if( threadProcess != this.threadProcess ) {
+					throw new RuntimeException("BUG! the thread got modified by anotehr process");
+				}
+			}
+
+			BoofMiscOps.sleep(100);
+		}
+
+		if( timeout < System.currentTimeMillis() )
+			throw new RuntimeException("Took too long to stop input processing thread");
+
+		this.threadProcess = null;
 	}
 
 	/**
@@ -165,7 +267,15 @@ public abstract class DemonstrationBase<T extends ImageBase<T>> extends JPanel {
 	 * @param width Width of input image
 	 * @param height Height of input image
 	 */
-	protected void handleInputChange( InputMethod method , int width , int height ) {
+	protected void handleInputChange( int source , InputMethod method , int width , int height ) {
+
+	}
+
+	/**
+	 * A streaming source of images has closed.
+	 * @param source
+	 */
+	protected void handleInputClose( int source ) {
 
 	}
 
@@ -174,87 +284,6 @@ public abstract class DemonstrationBase<T extends ImageBase<T>> extends JPanel {
 	 * is null then reprocess the previous image.
 	 */
 	public abstract void processImage(int sourceID, long frameID, final BufferedImage buffered , final ImageBase input  );
-
-	protected void processImageThread(int sourceID, long frameID, final BufferedImage buffered , final ImageBase input ) {
-
-		// See if there is already a thread running that's processing an image.  If so copy
-		// the new image into storage for the new image that is to be processed after it finishes
-		// processing the current image
-		synchronized (processLock) {
-			if(processRunning) {
-				if( buffered != null ) {
-					imageCopy1 = ConvertBufferedImage.checkCopy(buffered, imageCopy1);
-					boofCopy1.setTo((T)input);
-				} else
-					imageCopy1 = null;
-				processRequested = true;
-				return;
-			} else {
-				processRunning = true;
-				processRequested = false;
-				if( buffered != null )
-					imageCopy0 = ConvertBufferedImage.checkCopy(buffered, imageCopy0);
-				else
-					imageCopy0 = null;
-			}
-		}
-
-		new Thread() {
-			@Override
-			public void run() {
-				try {
-					while (true) {
-						synchronized (waitingLock) {
-							waitingToOpenImage = false;
-						}
-						if (imageCopy0 != null)
-							processImage(0,0,imageCopy0, input);
-						else
-							processImage(0,0,null, null);
-
-						synchronized (processLock) {
-							if (!processRequested) {
-								processRunning = false;
-								break;
-							}
-							processRequested = false;
-							if (imageCopy1 != null) {
-								imageCopy0 = ConvertBufferedImage.checkCopy(imageCopy1, imageCopy0);
-								input.setTo(boofCopy1);
-							} else
-								imageCopy0 = null;
-						}
-					}
-				} catch( RuntimeException e ) {
-					e.printStackTrace();
-					System.out.println(e.getMessage());
-					System.out.println("Thread crashed!  If possible, saving image to crashed_image.png");
-					if( imageCopy0 != null )
-						UtilImageIO.saveImage(imageCopy0,"crashed_image.png");
-					synchronized (processLock) {
-						processRunning = false;
-					}
-				}
-			}
-		}.start();
-	}
-
-	private void stopPreviousInput() {
-		switch ( inputMethod ) {
-			case WEBCAM: stopSequenceRunning("Shutting down webcam");break;
-			case VIDEO: stopSequenceRunning("Shutting down video");break;
-		}
-	}
-
-	private void stopSequenceRunning( String message ) {
-		sequenceThread.requestStop = true;
-		WaitingThread waiting = new WaitingThread(message);
-		waiting.start();
-		while( sequenceThread.running ) {
-			Thread.yield();
-		}
-		waiting.closeRequested = true;
-	}
 
 	/**
 	 * Opens a file.  First it will attempt to open it as an image.  If that fails it will try opening it as a
@@ -271,107 +300,193 @@ public abstract class DemonstrationBase<T extends ImageBase<T>> extends JPanel {
 			return;
 		}
 
-		synchronized (waitingLock) {
-			if (waitingToOpenImage) {
-				System.out.println("Waiting to open an image");
-				return;
+		// update recent items menu
+		final File _file = file;
+		BoofSwingUtil.invokeNowOrLater(new Runnable() {
+			@Override
+			public void run() {
+				BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,_file.getAbsolutePath());
+				updateRecentItems();
 			}
-			waitingToOpenImage = true;
-		}
+		});
 
-		stopPreviousInput();
-
-		String filePath = file.getPath();
-		inputFilePath = filePath;
 		// mjpegs can be opened up as images.  so override the default behavior
-		BufferedImage buffered = filePath.endsWith("mjpeg") ? null : UtilImageIO.loadImage(filePath);
+		inputFilePath = file.getPath();
+		BufferedImage buffered = inputFilePath.endsWith("mjpeg") ? null : UtilImageIO.loadImage(inputFilePath);
 		if( buffered == null ) {
-			if( !allowVideos ) {
-				showRejectDiaglog("Can't process video files");
-				return;
-			}
-			openVideo(filePath);
-		} else {
-			if( !allowImages ) {
-				showRejectDiaglog("Can't process images");
-				return;
-			}
-
-			inputMethod = InputMethod.IMAGE;
-			input.reshape(buffered.getWidth(),buffered.getHeight());
-			inputBuffered = buffered;
-			ConvertBufferedImage.convertFrom(buffered,input,true);
-			handleInputChange(inputMethod,buffered.getWidth(),buffered.getHeight());
-			processImageThread(0,0,buffered, input);
+			if( allowVideos )
+				openVideo(false,inputFilePath);
+		} else if( allowImages ){
+			openImage(false,inputFilePath, buffered);
 		}
 	}
 
 	/**
 	 * Before invoking this function make sure waitingToOpenImage is false AND that the previous input has beens topped
 	 */
-	private void openVideo(String filePath) {
-		SimpleImageSequence<T> sequence = media.openVideo(filePath, defaultType);
-		if( sequence != null ) {
-			inputMethod = InputMethod.VIDEO;
-			streamPeriod = 33; // default to 33 FPS for a video
-			sequenceThread = new ImageSequenceThread(sequence);
-			sequenceThread.start();
-		} else {
-			inputMethod = InputMethod.NONE;
-			waitingToOpenImage = false;
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					JOptionPane.showMessageDialog(DemonstrationBase.this, "Can't open file");
+	protected void openVideo(boolean reopen , String ...filePaths) {
+		synchronized (lockStartingProcess) {
+			if( startingProcess ) {
+				System.out.println("Ignoring video request.  Detected spamming");
+				return;
+			}
+			startingProcess = true;
+		}
+
+		synchronized (inputStreams) {
+			if (inputStreams.size() != filePaths.length)
+				throw new IllegalArgumentException("Input streams not equal to "+filePaths.length+".  Override openVideo()");
+		}
+
+		stopAllInputProcessing();
+
+		boolean failed = false;
+		for( int which = 0; which < filePaths.length; which++ ) {
+			CacheSequenceStream cache = inputStreams.get(which);
+
+			SimpleImageSequence sequence = media.openVideo(filePaths[which], cache.getImageType());
+
+			if( sequence == null ) {
+				failed = true;
+				break;
+			} else {
+				synchronized (inputStreams) {
+					cache.reset();
+					cache.setSequence(sequence);
 				}
-			});
+			}
+		}
+
+		if (!failed) {
+			setInputName(new File(filePaths[0]).getName());
+			synchronized (inputStreams) {
+				inputMethod = InputMethod.VIDEO;
+				streamPeriod = 33; // default to 33 FPS for a video
+				if( threadProcess != null )
+					throw new RuntimeException("There was still an active stream thread!");
+				threadProcess = new SynchronizedStreamsThread();
+			}
+			if( !reopen ) {
+				for (int i = 0; i < inputStreams.size(); i++) {
+					CacheSequenceStream stream = inputStreams.get(i);
+					handleInputChange(i, inputMethod, stream.getWidth(), stream.getHeight());
+				}
+			}
+			threadProcess.start();
+		} else {
+			synchronized (inputStreams) {
+				inputMethod = InputMethod.NONE;
+				inputFilePath = null;
+			}
+			synchronized (lockStartingProcess) {
+				startingProcess = false;
+			}
+			showRejectDiaglog("Can't open file");
+		}
+	}
+
+	protected void openImage(boolean reopen , String filePath , BufferedImage buffered ) {
+		synchronized (lockStartingProcess) {
+			if( startingProcess ) {
+				System.out.println("Ignoring image request.  Detected spamming");
+				return;
+			}
+			startingProcess = true;
+		}
+
+		synchronized (inputStreams) {
+			if (inputStreams.size() != 1)
+				throw new IllegalArgumentException("Input streams not equal to 1.  Override openImage()");
+		}
+
+		stopAllInputProcessing();
+
+		synchronized (inputStreams) {
+			inputMethod = InputMethod.IMAGE;
+
+			// copy the image into the cache
+			CacheSequenceStream cache = inputStreams.get(0);
+			cache.reset();
+			ImageBase boof = cache.getBoofImage();
+			boof.reshape(buffered.getWidth(), buffered.getHeight());
+			ConvertBufferedImage.convertFrom(buffered, boof, true);
+			cache.setBufferedImage(buffered);
+
+			if( threadProcess != null )
+				throw new RuntimeException("There was still an active stream thread!");
+			threadProcess = new ProcessImageThread();
+		}
+		if( !reopen ) {
+			setInputName(new File(filePath).getName());
+			handleInputChange(0, inputMethod, buffered.getWidth(), buffered.getHeight());
+		}
+		threadProcess.start();
+	}
+
+	public void openWebcam() {
+		synchronized (lockStartingProcess) {
+			if( startingProcess ) {
+				System.out.println("Ignoring webcam request.  Detected spamming");
+				return;
+			}
+			startingProcess = true;
+		}
+
+		synchronized (inputStreams) {
+			if (inputStreams.size() != 1)
+				throw new IllegalArgumentException("Input streams not equal to 1.  Override openImage()");
+		}
+
+		stopAllInputProcessing();
+
+		synchronized (inputStreams) {
+			inputMethod = InputMethod.WEBCAM;
+			inputFilePath = null;
+			streamPeriod = 0; // default to no delay in processing for a real time stream
+
+			CacheSequenceStream cache = inputStreams.get(0);
+			SimpleImageSequence sequence = media.openCamera(null, 640, 480, cache.getImageType());
+
+
+			if (sequence == null) {
+				showRejectDiaglog("Can't open webcam");
+			} else {
+				cache.reset();
+				cache.setSequence(sequence);
+
+				if (threadProcess != null)
+					throw new RuntimeException("There was still an active stream thread!");
+				setInputName("Webcam");
+				handleInputChange(0, inputMethod, sequence.getNextWidth(), sequence.getNextHeight());
+				threadProcess = new SynchronizedStreamsThread();
+				threadProcess.start();
+			}
+		}
+	}
+
+	private void setInputName( String name ) {
+		if( window != null ) {
+			window.setTitle(appName+":  "+name);
 		}
 	}
 
 	/**
 	 * waits until the processing thread is done.
 	 */
-	public void waitUntilDoneProcessing() {
-		while( processRunning ) {
-			Thread.yield();
+	public void waitUntilInputSizeIsKnown() {
+		while( !inputSizeKnown ) {
+			BoofMiscOps.sleep(5);
 		}
 	}
 
-	public void openWebcam() {
-		if( !allowWebcameras ) {
-			showRejectDiaglog("Can't process webcams");
-			return;
-		}
-
-		synchronized (waitingLock) {
-			if (waitingToOpenImage)
-				return;
-			waitingToOpenImage = true;
-		}
-
-		stopPreviousInput();
-
-		inputFilePath = null;
-		inputMethod = InputMethod.WEBCAM;
-		streamPeriod = 0; // default to no delay in processing for a real time stream
-
-		new WaitingThread("Opening Webcam").start();
-		new Thread() {
-			public void run() {
-				SimpleImageSequence<T> sequence = media.openCamera(null,640,480, defaultType);
-				if(sequence != null) {
-					sequenceThread = new ImageSequenceThread(sequence);
-					sequenceThread.start();
-				} else {
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							JOptionPane.showMessageDialog(DemonstrationBase.this, "Failed to open webcam");
-						}
-					});
-				}
-			}
-		}.start();
+	/**
+	 * Opens a window with this application inside of it
+	 * @param appName Name of the application
+	 */
+	public void display(String appName ) {
+		waitUntilInputSizeIsKnown();
+		this.appName = appName;
+		window = ShowImages.showWindow(this,appName,true);
 	}
 
 	/**
@@ -399,111 +514,145 @@ public abstract class DemonstrationBase<T extends ImageBase<T>> extends JPanel {
 		};
 	}
 
-	class WaitingThread extends Thread {
-		ProgressMonitor progress;
-		public volatile boolean closeRequested = false;
-		public WaitingThread( String message ) {
-			progress = new ProgressMonitor(DemonstrationBase.this,message,"", 0, 100);
-		}
+	class ProcessThread extends Thread {
+		volatile boolean requestStop = false;
+		volatile boolean running = true;
+	}
+
+	class ProcessImageThread extends ProcessThread {
 
 		@Override
 		public void run() {
-			while( waitingToOpenImage && !closeRequested ) {
-				SwingUtilities.invokeLater(new Runnable() { @Override public void run() { progress.setProgress(0); } });
-				try {Thread.sleep(250);} catch (InterruptedException ignore) {}
+			for (int i = 0; i < inputStreams.size() ; i++) {
+				CacheSequenceStream cache = inputStreams.get(i);
+				inputSizeKnown = true;
+
+				ImageBase boof = cache.getBoofImage();
+				BufferedImage buff = cache.getBufferedImage();
+
+				processImage(i,0, buff, boof);
 			}
-			SwingUtilities.invokeLater(
-					new Runnable() { @Override public void run() { progress.close(); } }
-			);
+
+			// Request spam prevention.  Must complete the request before it will accept the new one
+			synchronized (lockStartingProcess) {
+				startingProcess = false;
+			}
+
+			running = false;
 		}
 	}
 
-	class ImageSequenceThread extends Thread {
-
-		boolean requestStop = false;
-		boolean running = true;
-
-		SimpleImageSequence<T> sequence;
-
-
-		public ImageSequenceThread(SimpleImageSequence<T> sequence) {
-			this.sequence = sequence;
-		}
-
+	class SynchronizedStreamsThread extends ProcessThread {
 		@Override
 		public void run() {
-			handleInputChange(inputMethod,sequence.getNextWidth(),sequence.getNextHeight());
+			for (int i = 0; i < inputStreams.size() ; i++) {
+				CacheSequenceStream sequence = inputStreams.get(i);
+			}
+			inputSizeKnown = true;
+
+			boolean first = true;
 
 			long before = System.currentTimeMillis();
-			while( !requestStop && sequence.hasNext() ) {
-				T input = sequence.next();
+			while( !requestStop ) {
+				// see if all the streams have more data available
+				boolean allNext = true;
+				for (int i = 0; i < inputStreams.size() ; i++) {
+					if( !inputStreams.get(i).hasNext() ) {
+						allNext = false;
+						break;
+					}
+				}
 
-				// if it's a webcam and paused, just don't process the video frame
-				boolean skipFrame = streamPaused && inputMethod == InputMethod.WEBCAM;
-
-				if( input == null ) {
+				// stop processing if they don't all have data available
+				if( !allNext ) {
 					break;
-				} else if( skipFrame ) {
-					// do nothing just don't process it
-					before = System.currentTimeMillis();
-				} else {
-					BufferedImage buffered = sequence.getGuiImage();
-					processImageThread(0,0,buffered,input);
-					if( streamPeriod > 0 ) {
-						long time = Math.max(0, streamPeriod -(System.currentTimeMillis()-before));
-						if( time > 0 ) {
-							try {Thread.sleep(time);} catch (InterruptedException ignore) {}
-						} else {
-							try {Thread.sleep(5);} catch (InterruptedException ignore) {}
-						}
+				}
+
+				// grab images from all the streams and save local copy
+				for (int i = 0; i < inputStreams.size() ; i++) {
+					inputStreams.get(i).cacheNext();
+				}
+
+				if( first ) { // process at least one image before letting it try to process another source
+					first = false;
+					synchronized (lockStartingProcess) {
+						startingProcess = false;
+					}
+				}
+
+				// feed images to client - They will own the image data until they are passed new image data
+				for (int i = 0; i < inputStreams.size() ; i++) {
+					CacheSequenceStream cache = inputStreams.get(i);
+					int frameID = cache.sequence.getFrameNumber();
+					ImageBase boof = cache.getBoofImage();
+					BufferedImage buff = cache.getBufferedImage();
+
+					processImage(i,frameID, buff, boof);
+				}
+
+				// Throttle speed if requested
+				if( streamPeriod > 0 ) {
+					long time = Math.max(0, streamPeriod -(System.currentTimeMillis()-before));
+					if( time > 0 ) {
+						try {Thread.sleep(time);} catch (InterruptedException ignore) {}
 					} else {
 						try {Thread.sleep(5);} catch (InterruptedException ignore) {}
 					}
-					before = System.currentTimeMillis();
+				} else {
+					try {Thread.sleep(5);} catch (InterruptedException ignore) {}
+				}
+				before = System.currentTimeMillis();
+
+				if( streamStepCounter > 0 ) {
+					if( --streamStepCounter == 0 )
+						streamPaused = true;
 				}
 
-				// If paused and is a video, do thing until unpaused or a stop is requested
+				// Check to see if paused and wait
 				if( streamPaused && inputMethod == InputMethod.VIDEO ) {
+					enterPausedState();
 					while( streamPaused && !requestStop ) {
 						try {Thread.sleep(5);} catch (InterruptedException ignore) {}
 					}
 				}
 			}
-			sequence.close();
+
+			// clean up
+			for (int i = 0; i < inputStreams.size() ; i++) {
+				inputStreams.get(i).sequence.close();
+				handleInputClose(i);
+			}
+
 			running = false;
 		}
 	}
+
+	protected void enterPausedState() {}
 
 	/**
 	 * If just a single image was processed it will process it again.  If it's a stream
 	 * there is no need to reprocess, the next image will be handled soon enough.
 	 */
-	public void reprocessSingleImage() {
-		if( sequenceThread == null ) {
-			// hmm if it's reprocessing the last image in a sequence this might not work
-			processImageThread(0,0, inputBuffered, input);
+	public void reprocessInput() {
+		if ( inputMethod == InputMethod.VIDEO ) {
+			openVideo(true,inputFilePath);
+		} else if( inputMethod == InputMethod.IMAGE ) {
+			BufferedImage buff = inputStreams.get(0).getBufferedImage();
+			openImage(true,inputFilePath,buff);// TODO still does a pointless image conversion
 		}
 	}
 
 	/**
-	 * If the current input source is a video it will reload it from the start
+	 * Invokes {@link #reprocessInput()} only if the input is an IMAGE
 	 */
-	public void replayVideo() {
-		if( inputMethod == InputMethod.VIDEO ) {
-			synchronized (waitingLock) {
-				if (waitingToOpenImage) {
-					System.out.println("Waiting to open an image");
-					return;
-				}
-				waitingToOpenImage = true;
-			}
-
-			stopPreviousInput();
-			openVideo(inputFilePath);
+	public void reprocessImageOnly() {
+		if( inputMethod == InputMethod.IMAGE ) {
+			reprocessInput();
 		}
 	}
 
-	protected enum InputMethod {
+	protected enum InputMethod
+	{
 		NONE,
 		IMAGE,
 		VIDEO,

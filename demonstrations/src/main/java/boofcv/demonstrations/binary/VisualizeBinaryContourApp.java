@@ -25,7 +25,7 @@ import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.gui.BoofSwingUtil;
-import boofcv.gui.DemonstrationBase2;
+import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
@@ -43,7 +43,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends DemonstrationBase2
+public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends DemonstrationBase
 	implements ThresholdControlPanel.Listener
 {
 	VisualizePanel guiImage;

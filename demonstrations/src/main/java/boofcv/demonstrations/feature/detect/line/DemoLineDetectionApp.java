@@ -19,7 +19,7 @@
 package boofcv.demonstrations.feature.detect.line;
 
 import boofcv.abst.feature.detect.line.DetectLine;
-import boofcv.gui.DemonstrationBase2;
+import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.struct.image.ImageBase;
@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class DemoLineDetectionApp<T extends ImageGray<T>> extends DemonstrationBase2 {
+public class DemoLineDetectionApp<T extends ImageGray<T>> extends DemonstrationBase {
 	Class<T> imageClass;
 
 	DetectLine<T> detector;
