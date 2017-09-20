@@ -56,15 +56,18 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 	// Computed Otsu threshold
 	int threshold = 0;
 
+	double scale;
+
 	/**
 	 * Configures the detector
 	 *
 	 * @param regionWidth How wide the local square region is..
 	 * @param tuning Tuning parameter. 0 = standard Otsu. Greater than 0 will penalize zero texture.
 	 */
-	public ThresholdLocalOtsu(int regionWidth, double tuning, boolean down ) {
+	public ThresholdLocalOtsu(int regionWidth, double tuning, double scale, boolean down ) {
 		this.regionWidth = regionWidth;
 		this.down = down;
+		this.scale = scale;
 		this.tuning = tuning;
 	}
 
@@ -238,7 +241,7 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 		// multiply by threshold twice in an effort to have the image's scaling not effect the tuning parameter
 		int adjustment =  (int)(tuning*threshold*tuning*threshold/variance+0.5);
 		threshold += down ? -adjustment : adjustment;
-		threshold = Math.max(threshold,0);
+		threshold = (int)(scale*Math.max(threshold,0)+0.5);
 	}
 
 	public ImageType<GrayU8> getImageType() {

@@ -121,9 +121,9 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		spinnerThreshold.removeChangeListener(this);
 		if( type == ThresholdType.FIXED ) {
 			spinnerThreshold.setValue(globalThreshold);
-		} else if( type == ThresholdType.LOCAL_BLOCK_MIN_MAX ) {
+		} else if( type == ThresholdType.BLOCK_MIN_MAX) {
 			spinnerThreshold.setValue((int)minimumSpread);
-		} else if( type == ThresholdType.LOCAL_BLOCK_OTSU ||
+		} else if( type == ThresholdType.BLOCK_OTSU ||
 				type == ThresholdType.LOCAL_OTSU  ) {
 			spinnerThreshold.setValue(otsuTuning);
 		}
@@ -196,11 +196,11 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 			spinnerScale.setEnabled(false);
 		}
 
-		if( type == ThresholdType.LOCAL_BLOCK_MIN_MAX ) {
+		if( type == ThresholdType.BLOCK_MIN_MAX) {
 			spinnerThreshold.setEnabled(true);
 			isAdaptive = false;
 		}
-		if( type == ThresholdType.LOCAL_BLOCK_OTSU ||
+		if( type == ThresholdType.BLOCK_OTSU ||
 				type == ThresholdType.LOCAL_OTSU  ) {
 			spinnerThreshold.setEnabled(true);
 			isAdaptive = false;
@@ -216,9 +216,9 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	public void stateChanged(ChangeEvent e) {
 		if( e.getSource() == spinnerThreshold ) {
 			int value = ((Number) spinnerThreshold.getValue()).intValue();
-			if( type == ThresholdType.LOCAL_BLOCK_MIN_MAX) {
+			if( type == ThresholdType.BLOCK_MIN_MAX) {
 				minimumSpread = value;
-			} else if( type == ThresholdType.LOCAL_BLOCK_OTSU ||
+			} else if( type == ThresholdType.BLOCK_OTSU ||
 					type == ThresholdType.LOCAL_OTSU ) {
 				otsuTuning = value;
 			} else {
@@ -241,11 +241,11 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 
 	public ConfigThreshold createConfig() {
 		ConfigThreshold config;
-		if( type == ThresholdType.LOCAL_BLOCK_MIN_MAX) {
+		if( type == ThresholdType.BLOCK_MIN_MAX) {
 			ConfigThresholdBlockMinMax _config = new ConfigThresholdBlockMinMax();
 			_config.minimumSpread = minimumSpread;
 			config = _config;
-		} else if( type == ThresholdType.LOCAL_BLOCK_OTSU ||
+		} else if( type == ThresholdType.BLOCK_OTSU ||
 				type == ThresholdType.LOCAL_OTSU ) {
 			ConfigThresholdLocalOtsu _config = new ConfigThresholdLocalOtsu();
 			_config.tuning = otsuTuning;

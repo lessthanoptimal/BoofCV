@@ -32,6 +32,6 @@ public class TestThresholdLocalOtsu extends GenericThresholdCommon<GrayU8> {
 
 	@Override
 	public InputToBinary<GrayU8> createAlg(int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdLocalOtsu(requestedBlockWidth, 0, down);
+		return new ThresholdLocalOtsu(requestedBlockWidth, 0, 1.0,down);
 	}
 }

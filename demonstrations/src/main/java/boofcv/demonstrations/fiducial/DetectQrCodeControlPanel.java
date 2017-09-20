@@ -115,7 +115,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		showContour.addActionListener(this);
 		showContour.setSelected(bShowContour);
 
-		threshold = new ThresholdControlPanel(owner, ThresholdType.LOCAL_BLOCK_OTSU);
+		threshold = new ThresholdControlPanel(owner, ThresholdType.BLOCK_OTSU);
 		threshold.setRadius(40);
 
 		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(config.polygon.detector.minimumContour.pixels,

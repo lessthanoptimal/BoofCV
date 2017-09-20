@@ -79,6 +79,22 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
+	 * Applies a local Otsu threshold
+	 *
+	 * @see boofcv.alg.filter.binary.ThresholdLocalOtsu
+	 *
+	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
+	 * @param down Should it threshold up or down.
+	 * @param regionWidth About how wide and tall you wish a block to be in pixels.
+	 * @param inputType Type of input image
+	 * @return Filter to binary
+	 */
+	public static <T extends ImageGray<T>>
+	InputToBinary<T> localOtsu(int regionWidth , double tuning, double scale, boolean down, Class<T> inputType) {
+		return new InputToBinarySwitchU8<>(new ThresholdLocalOtsu(regionWidth,tuning,scale,down),inputType);
+	}
+
+	/**
 	 * Applies a very fast non-overlapping block thresholding algorithm which uses min/max statistics.
 	 *
 	 * @see ThresholdBlockMinMax
@@ -92,8 +108,8 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> localBlockMinMax(int regionWidth, double scale , boolean down,
-									  double minimumSpread, Class<T> inputType) {
+	InputToBinary<T> blockMinMax(int regionWidth, double scale , boolean down,
+								 double minimumSpread, Class<T> inputType) {
 
 		if( inputType == GrayU8.class )
 			return (InputToBinary<T>)new ThresholdBlockMinMax_U8(minimumSpread,regionWidth,scale,down);
@@ -113,8 +129,8 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> localBlockMean(int regionWidth, double scale , boolean down,
-									Class<T> inputType) {
+	InputToBinary<T> blockMean(int regionWidth, double scale , boolean down,
+							   Class<T> inputType) {
 		if( inputType == GrayU8.class )
 			return (InputToBinary<T>)new ThresholdBlockMean_U8(regionWidth,scale,down);
 		else
@@ -126,29 +142,15 @@ public class FactoryThresholdBinary {
 	 *
 	 * @see boofcv.alg.filter.binary.ThresholdBlockOtsu
 	 *
+	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
 	 * @param down Should it threshold up or down.
 	 * @param regionWidth About how wide and tall you wish a block to be in pixels.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> localBlockOtsu(int regionWidth , double tuning, boolean down, Class<T> inputType) {
-		return new InputToBinarySwitchU8<>(new ThresholdBlockOtsu(regionWidth,tuning,down),inputType);
-	}
-
-	/**
-	 * Applies a local Otsu threshold
-	 *
-	 * @see boofcv.alg.filter.binary.ThresholdLocalOtsu
-	 *
-	 * @param down Should it threshold up or down.
-	 * @param regionWidth About how wide and tall you wish a block to be in pixels.
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 */
-	public static <T extends ImageGray<T>>
-	InputToBinary<T> localOtsu(int regionWidth , double tuning, boolean down, Class<T> inputType) {
-		return new InputToBinarySwitchU8<>(new ThresholdLocalOtsu(regionWidth,tuning,down),inputType);
+	InputToBinary<T> blockOtsu(int regionWidth , double tuning, double scale, boolean down, Class<T> inputType) {
+		return new InputToBinarySwitchU8<>(new ThresholdBlockOtsu(regionWidth,tuning,scale,down),inputType);
 	}
 
 	/**
@@ -223,20 +225,20 @@ public class FactoryThresholdBinary {
 
 			case LOCAL_OTSU: {
 				ConfigThresholdLocalOtsu c = (ConfigThresholdLocalOtsu) config;
-				return localOtsu(config.radius * 2 + 1, c.tuning, config.down, inputType);
+				return localOtsu(config.radius * 2 + 1, c.tuning, config.scale,config.down, inputType);
 			}
 
-			case LOCAL_BLOCK_MIN_MAX: {
+			case BLOCK_MIN_MAX: {
 				ConfigThresholdBlockMinMax c = (ConfigThresholdBlockMinMax) config;
-				return localBlockMinMax(c.radius * 2 + 1, c.scale , c.down, c.minimumSpread, inputType);
+				return blockMinMax(c.radius * 2 + 1, c.scale , c.down, c.minimumSpread, inputType);
 			}
 
-			case LOCAL_BLOCK_MEAN:
-				return localBlockMean(config.radius * 2 + 1, config.scale , config.down, inputType);
+			case BLOCK_MEAN:
+				return blockMean(config.radius * 2 + 1, config.scale , config.down, inputType);
 
-			case LOCAL_BLOCK_OTSU: {
+			case BLOCK_OTSU: {
 				ConfigThresholdLocalOtsu c = (ConfigThresholdLocalOtsu) config;
-				return localBlockOtsu(config.radius * 2 + 1, c.tuning, config.down, inputType);
+				return blockOtsu(config.radius * 2 + 1, c.tuning, config.scale, config.down, inputType);
 			}
 
 		}

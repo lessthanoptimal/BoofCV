@@ -32,7 +32,7 @@ public class ConfigThresholdBlockMinMax extends ConfigThreshold {
 	public double minimumSpread = 10;
 
 	public ConfigThresholdBlockMinMax(int radius , double minimumSpread, boolean down ) {
-		this.type = ThresholdType.LOCAL_BLOCK_MIN_MAX;
+		this.type = ThresholdType.BLOCK_MIN_MAX;
 		this.radius = radius;
 		this.minimumSpread = minimumSpread;
 		this.down = down;

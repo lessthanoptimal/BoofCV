@@ -97,9 +97,9 @@ public class ConfigThreshold implements Configuration {
 			throw new IllegalArgumentException("Type must be local");
 
 		ConfigThreshold config;
-		if( type == ThresholdType.LOCAL_BLOCK_MIN_MAX) {
+		if( type == ThresholdType.BLOCK_MIN_MAX) {
 			config = new ConfigThresholdBlockMinMax(radius, 10, true);
-		} else if( type == ThresholdType.LOCAL_BLOCK_OTSU) {
+		} else if( type == ThresholdType.BLOCK_OTSU) {
 			config = new ConfigThresholdLocalOtsu();
 		} else {
 			config = new ConfigThreshold();

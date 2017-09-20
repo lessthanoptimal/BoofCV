@@ -42,6 +42,8 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 
 	int histogram[] = new int[256];
 	boolean down;
+	double scale;
+
 	/**
 	 * Tuning parameter that tweaks the otsu value depending on local variance.
 	 */
@@ -49,15 +51,17 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 
 	int threshold;
 	double variance;
+
 	/**
 	 * Configures the detector
 	 *
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 * @param tuning Tuning parameter. 0 = standard Otsu. Greater than 0 will penalize zero texture.
 	 */
-	public ThresholdBlockOtsu(int requestedBlockWidth, double tuning, boolean down ) {
+	public ThresholdBlockOtsu(int requestedBlockWidth, double tuning, double scale, boolean down ) {
 		super(requestedBlockWidth,GrayU8.class);
 		this.down = down;
+		this.scale = scale;
 		this.tuning = tuning;
 		stats = new InterleavedS32(1,1,256);
 	}
@@ -123,7 +127,7 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 		// multiply by threshold twice in an effort to have the image's scaling not effect the tuning parameter
 		int adjustment =  (int)(tuning*threshold*tuning*threshold/variance+0.5);
 		threshold += down ? -adjustment : adjustment;
-		threshold = Math.max(threshold,0);
+		threshold = (int)(scale*Math.max(threshold,0)+0.5);
 
 		for (int y = y0; y < y1; y++) {
 			int indexInput = input.startIndex + y*input.stride + x0;

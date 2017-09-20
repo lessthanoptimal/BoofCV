@@ -69,21 +69,21 @@ public enum ThresholdType {
 	 *
 	 * @see ThresholdBlockMinMax
 	 */
-	LOCAL_BLOCK_MIN_MAX(true,false),
+	BLOCK_MIN_MAX(true,false),
 
 	/**
 	 * Breaks the image into blocks and computes the mean inside each block.
 	 *
 	 * @see ThresholdBlockMean
 	 */
-	LOCAL_BLOCK_MEAN(true,false),
+	BLOCK_MEAN(true,false),
 
 	/**
 	 * Breaks the image into blocks and computes the an Otsu threshold in each block
 	 *
 	 * @see boofcv.alg.filter.binary.ThresholdBlockOtsu
 	 */
-	LOCAL_BLOCK_OTSU(true,false),
+	BLOCK_OTSU(true,false),
 
 	/**
 	 * Locally adaptive computed using Savola's method
