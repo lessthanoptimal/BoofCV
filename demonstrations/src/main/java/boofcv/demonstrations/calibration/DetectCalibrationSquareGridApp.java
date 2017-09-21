@@ -25,7 +25,6 @@ import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.factory.filter.binary.ThresholdType;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -123,8 +122,6 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 		DetectCalibrationSquareGridApp app = new DetectCalibrationSquareGridApp(4, 3, 1,1,false,examples);
 
 		app.openFile(new File(examples.get(0)));
-		app.waitUntilInputSizeIsKnown();
-
-		ShowImages.showWindow(app,"Square Grid Detector",true);
+		app.display("Square Grid Detector");
 	}
 }

@@ -29,7 +29,6 @@ import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.feature.VisualizeShapes;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -255,8 +254,6 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 		DetectCalibrationCircleRegularApp app = new DetectCalibrationCircleRegularApp(10, 8, 1.5,2.5,examples);
 
 		app.openFile(new File(examples.get(0)));
-		app.waitUntilInputSizeIsKnown();
-
-		ShowImages.showWindow(app,"Circle Regular Grid Detector",true);
+		app.display("Circle Regular Grid Detector");
 	}
 }

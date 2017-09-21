@@ -138,6 +138,18 @@ public abstract class DemonstrationBase extends JPanel {
 					KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 			menu.add(menuFile);
 
+			JMenuItem menuNext = new JMenuItem("Open Next File", KeyEvent.VK_I);
+			menuNext.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					openNextFile();
+				}
+			});
+			menuNext.setAccelerator(KeyStroke.getKeyStroke(
+					KeyEvent.VK_I, ActionEvent.CTRL_MASK));
+			menu.add(menuNext);
+
+
 			menuRecent = new JMenu("Open Recent");
 			menu.add(menuRecent);
 			updateRecentItems();
@@ -319,6 +331,37 @@ public abstract class DemonstrationBase extends JPanel {
 				openVideo(false,inputFilePath);
 		} else if( allowImages ){
 			openImage(false,inputFilePath, buffered);
+		}
+	}
+
+	/**
+	 * Opens the next file in the directory by lexicographical order.
+	 */
+	public void openNextFile() {
+		if( inputFilePath == null || inputMethod != InputMethod.IMAGE )
+			return;
+
+		File current = new File(inputFilePath);
+		File parent = current.getParentFile();
+		if( parent == null )
+			return;
+
+		File[] files = parent.listFiles();
+		if( files.length <= 1 )
+			return;
+		File closest = null;
+
+		for (int i = 0; i < files.length; i++) {
+			File f = files[i];
+			if( current.compareTo(f) < 0 ) {
+				if( closest == null || closest.compareTo(f) > 0 ) {
+					closest = f;
+				}
+			}
+		}
+
+		if( closest != null ) {
+			openFile(closest);
 		}
 	}
 

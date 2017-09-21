@@ -29,7 +29,6 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.feature.VisualizeShapes;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -251,8 +250,6 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 		DetectCalibrationCircleHexagonalApp app = new DetectCalibrationCircleHexagonalApp(24, 28, 1,1.2,examples);
 
 		app.openFile(new File(examples.get(0)));
-		app.waitUntilInputSizeIsKnown();
-
-		ShowImages.showWindow(app,"Circle Hexagonal Grid Detector",true);
+		app.display("Circle Hexagonal Grid Detector");
 	}
 }

@@ -25,7 +25,6 @@ import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.factory.filter.binary.ThresholdType;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -127,8 +126,6 @@ public class DetectCalibrationChessboardApp
 		DetectCalibrationChessboardApp app = new DetectCalibrationChessboardApp(7,5,examples);
 
 		app.openFile(new File(examples.get(0)));
-		app.waitUntilInputSizeIsKnown();
-
-		ShowImages.showWindow(app, "Calibration Target Detection",true);
+		app.display("Calibration Target Detection");
 	}
 }
