@@ -25,7 +25,7 @@ import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.gui.BoofSwingUtil;
-import boofcv.gui.DemonstrationBase2;
+import boofcv.gui.DemonstrationBase;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
@@ -53,7 +53,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends DemonstrationBase2
+public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends DemonstrationBase
 	implements DeformKeypointPanel.Listener
 {
 

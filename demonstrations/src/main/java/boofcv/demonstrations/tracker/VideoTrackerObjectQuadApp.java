@@ -23,7 +23,6 @@ import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
 import boofcv.gui.DemonstrationBase;
-import boofcv.gui.image.ShowImages;
 import boofcv.gui.tracker.TrackerObjectQuadPanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
@@ -45,7 +44,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
-		extends DemonstrationBase<Planar<I>>
+		extends DemonstrationBase
 		implements TrackerObjectQuadPanel.Listener  , TrackerQuadInfoPanel.Listener, ActionListener
 {
 	Class<I> imageClass;
@@ -109,7 +108,9 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 	}
 
 	@Override
-	protected void handleInputChange(InputMethod method, final int width, final int height) {
+	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+		super.handleInputChange(source, method, width, height);
+
 		if( !(method == InputMethod.VIDEO || method == InputMethod.WEBCAM) )
 			throw new IllegalArgumentException("Must be a video or webcam!");
 
@@ -193,6 +194,8 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 	}
 
 	private void createNewTracker() {
+		ImageType imageType = getImageType(0);
+
 		if( whichAlg == 0 )
 			tracker = FactoryTrackerObjectQuad.circulant(new ConfigCirculantTracker(), imageClass);
 		else if( whichAlg == 1 )
@@ -200,13 +203,14 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 		else if( whichAlg == 2 ) {
 			ConfigComaniciu2003 config = new ConfigComaniciu2003();
 			config.scaleChange = 0;
-			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config, defaultType);
+			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config, imageType);
 		} else if( whichAlg == 3 ) {
 			ConfigComaniciu2003 config = new ConfigComaniciu2003();
 			config.scaleChange = 0.05f;
-			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config, defaultType);
+			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config, imageType);
 		} else if( whichAlg == 4 ) {
-			tracker = FactoryTrackerObjectQuad.meanShiftLikelihood(30, 5, 256, MeanShiftLikelihoodType.HISTOGRAM, defaultType);
+			tracker = FactoryTrackerObjectQuad.meanShiftLikelihood(30, 5, 256,
+					MeanShiftLikelihoodType.HISTOGRAM, imageType);
 		} else if( whichAlg == 5 ) {
 			tracker = FactoryTrackerObjectQuad.sparseFlow(null,imageClass,null);
 		} else
@@ -257,7 +261,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 	@Override
 	public void replayVideo() {
 		if( inputMethod == InputMethod.VIDEO ) {
-			super.replayVideo();
+			super.reprocessInput();
 		}
 	}
 
@@ -364,8 +368,6 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 
 		app.openFile(new File(examples.get(0).getPath()));
 
-		app.waitUntilDoneProcessing();
-
-		ShowImages.showWindow(app, "Tracking Rectangle",true);
+		app.display( "Tracking Rectangle");
 	}
 }

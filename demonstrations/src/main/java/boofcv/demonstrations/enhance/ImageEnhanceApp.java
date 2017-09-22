@@ -21,7 +21,7 @@ package boofcv.demonstrations.enhance;
 import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.gui.BoofSwingUtil;
-import boofcv.gui.DemonstrationBase2;
+import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
@@ -53,7 +53,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  * @author Peter Abeles
  */
 // TODO Add wavelet denoising
-public class ImageEnhanceApp extends DemonstrationBase2 {
+public class ImageEnhanceApp extends DemonstrationBase {
 
 	public static String HISTOGRAM_GLOBAL = "Histogram Global";
 	public static String HISTOGRAM_LOCAL = "Histogram Local";

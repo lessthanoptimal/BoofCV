@@ -20,7 +20,7 @@ package boofcv.demonstrations.shapes;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.gui.BoofSwingUtil;
-import boofcv.gui.DemonstrationBase2;
+import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.image.ConvertBufferedImage;
@@ -36,7 +36,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends DemonstrationBase2
+public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends DemonstrationBase
 		implements ThresholdControlPanel.Listener
 {
 	protected Class<T> imageClass;

@@ -129,7 +129,7 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 
 		app.openFile(new File(examples.get(0)));
 
-		app.openWindow("Detect Black Ellipses");
+		app.display("Detect Black Ellipses");
 	}
 
 

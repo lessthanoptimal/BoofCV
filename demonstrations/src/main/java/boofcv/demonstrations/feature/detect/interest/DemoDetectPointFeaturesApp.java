@@ -26,7 +26,7 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.gui.BoofSwingUtil;
-import boofcv.gui.DemonstrationBase2;
+import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImageZoomPanel;
@@ -62,7 +62,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends DemonstrationBase2 {
+public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends DemonstrationBase {
 	protected Class<T> imageClass;
 	protected Class derivClass;
 

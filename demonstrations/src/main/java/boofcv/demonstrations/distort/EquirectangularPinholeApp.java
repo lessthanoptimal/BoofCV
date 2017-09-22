@@ -27,7 +27,6 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -64,7 +63,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class EquirectangularPinholeApp<T extends ImageBase<T>> extends DemonstrationBase<T>
+public class EquirectangularPinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 	implements PinholeSimplifiedPanel.Listener
 {
 
@@ -363,10 +362,6 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 		EquirectangularPinholeApp app = new EquirectangularPinholeApp(examples,type);
 
 		app.openFile(new File(examples.get(0).getPath()));
-
-		app.waitUntilDoneProcessing();
-
-		ShowImages.showWindow(app, "Equirectanglar to Pinhole Camera",true);
-
+		app.display("Equirectanglar to Pinhole Camera");
 	}
 }

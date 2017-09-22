@@ -38,7 +38,7 @@ import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.gui.DemonstrationBase2;
+import boofcv.gui.DemonstrationBase;
 import boofcv.gui.d3.Polygon3DSequenceViewer;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
@@ -82,7 +82,7 @@ import java.util.List;
 // TODO Click on polygon to get the frame it was generated from?
 // TODO Add log to file option for location and 3D cloud
 public class VisualizeDepthVisualOdometryApp
-		extends DemonstrationBase2 implements VisualOdometryPanel2.Listener, ActionListener
+		extends DemonstrationBase implements VisualOdometryPanel2.Listener, ActionListener
 {
 	VisualOdometryPanel2 statusPanel;
 	VisualOdometryAlgorithmPanel algorithmPanel;

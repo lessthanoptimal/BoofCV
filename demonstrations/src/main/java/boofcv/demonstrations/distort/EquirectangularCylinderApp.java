@@ -28,7 +28,6 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -54,7 +53,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class EquirectangularCylinderApp<T extends ImageBase<T>> extends DemonstrationBase<T>
+public class EquirectangularCylinderApp<T extends ImageBase<T>> extends DemonstrationBase
 		implements RotationPanel.Listener, CylinderPanel.Listener
 {
 	final CylinderToEquirectangular_F32 distorter = new CylinderToEquirectangular_F32();
@@ -126,8 +125,8 @@ public class EquirectangularCylinderApp<T extends ImageBase<T>> extends Demonstr
 	}
 
 	@Override
-	protected void handleInputChange(InputMethod method, int width, int height) {
-		super.handleInputChange(method, width, height);
+	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+		super.handleInputChange(source, method, width, height);
 
 		if( inputCopy.getWidth() != width || inputCopy.getHeight() != height ) {
 			panelImage.setPreferredSize(new Dimension(width,height));
@@ -204,10 +203,7 @@ public class EquirectangularCylinderApp<T extends ImageBase<T>> extends Demonstr
 
 		app.openFile(new File(examples.get(0).getPath()));
 
-		app.waitUntilDoneProcessing();
-
-		ShowImages.showWindow(app, "Equirectanglar to Cylindrical",true);
-
+		app.display("Equirectanglar to Cylindrical");
 	}
 
 

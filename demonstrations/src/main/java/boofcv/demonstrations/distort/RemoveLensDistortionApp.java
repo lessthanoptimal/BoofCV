@@ -30,7 +30,6 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -54,7 +53,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RemoveLensDistortionApp<T extends ImageBase<T>> extends DemonstrationBase<T> {
+public class RemoveLensDistortionApp<T extends ImageBase<T>> extends DemonstrationBase {
 
 	ListDisplayPanel gui = new ListDisplayPanel();
 
@@ -67,8 +66,7 @@ public class RemoveLensDistortionApp<T extends ImageBase<T>> extends Demonstrati
 	T undist;
 
 	public RemoveLensDistortionApp(List<?> exampleInputs, ImageType<T> imageType) {
-		super(false,exampleInputs, imageType);
-		allowVideos = false;
+		super(false,false,exampleInputs, imageType);
 
 		add(gui, BorderLayout.CENTER);
 	}
@@ -154,8 +152,6 @@ public class RemoveLensDistortionApp<T extends ImageBase<T>> extends Demonstrati
 
 		app.openFile(new File(inputs.get(0).getPath()));
 
-		app.waitUntilDoneProcessing();
-
-		ShowImages.showWindow(app, "Remove Lens Distortion",true);
+		app.display("Remove Lens Distortion");
 	}
 }
