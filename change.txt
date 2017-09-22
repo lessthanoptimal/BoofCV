@@ -21,8 +21,14 @@ Version : 0.28
   * Open files will remember the last directory it opened
   * Added list of recently opened files
   * Dialog for opening a webcam
-- Calibration Target Generator
-  * Fixed bug in asymmetric circle target where it was shifted on the page
+- Examples
+  * Added ExamplePointDeformKeyPoints
+- Application: Calibration Target Generator
+  * Added circle hexagonal
+  * Output is a PDF document now
+- Application: Camera Calibration
+  * Support for omni universal model
+  * Can choose to save output in OpenCV format
 - DetectPolygonFromContour
   * Fix a bug where labeled image was not being resized if the height of input image changed
 - BinaryEllipseDetectorPixel
@@ -33,13 +39,9 @@ Version : 0.28
     - BlurImageOps TODO
 - DetectCircleAsymmetricGrid
   * Fixed issue where it picked the wrong circle for the initial corner
-- Examples
-  * Added ExamplePointDeformKeyPoints
 - Gradle
   * fixed gradle not copying over doc-files
 - Changed directory structure to gradle standard to better integrate source code from other languages
-- Applications
-  * Changed format from postscript to PDF. Better support for file format and easier to use.
 - FiducialDetectors
   * Provide access to detected points in PNP detector. Thought this was done a while ago...
 - Binary Thresholding
@@ -60,7 +62,7 @@ Version : 0.28
 - TrackerObjectQuad
   * Added ability to provide a hint for where the object is now
 - JavaCV
-  * Provided support for reading webcams using JavaCV. Seems to work better than Webcam Capture
+  * Provided support for reading webcams using JavaCV. Seems to work better than Webcam Capture in some ways
 
 Fiducials
 - Changes in polygon have affected performance. Mostly negative on blurred images.
@@ -71,7 +73,6 @@ Fiducials
 
 Polygon Detector
 - Blurred images cause the biggest problems
-- TODO see if a shape can be rejected before refining the polygon fit to improve speed for all fiducals
 - Profile of Square Binary  (2 large squares video)
   * 40% thresholding
   * 44% contour -> polygon
@@ -88,8 +89,6 @@ Contour to Line
 
 Calibration
   TODO Fisheye Calibration Demonstration
-  TODO Add fisheye to calibration application
-      - Command line only for now
 
 TOP ITEMS
 - TODO Add QR Code to fiducial demonstration
@@ -105,9 +104,6 @@ OTHER ITEMS
 - TODO Visualization tools for Direct VO
 -      Show warped image
 - TODO ExampleRectifyUncalibratedStereo is upside down.  Adjust the math to avoid that
-- TODO Calibration application.
-       Select output format: BoofCV, OpenCV
-       Create a stand alone application that people can download to calibrate
 - TODO Tutorial on image features?  Sparse and dense?
 - TODO Look at AKAZE feature
 - TODO Clarify how you calibrate the camera in Processing

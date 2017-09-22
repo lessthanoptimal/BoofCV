@@ -34,7 +34,10 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
+import boofcv.javacv.UtilOpenCV;
+import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.image.GrayF32;
 import com.github.sarxos.webcam.Webcam;
 
@@ -61,6 +64,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 	protected boolean zeroSkew = true;
 	protected int numRadial = 2;
 	protected boolean tangential = false;
+	protected ModelType modeType = ModelType.PINHOLE;
+	protected FormatType formatType = FormatType.BOOFCV;
 
 	protected boolean visualize = true;
 
@@ -82,8 +87,17 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("                                     or device string.");
 		System.out.println("  --Resolution=<width>:<height>      Specifies camera image resolution.");
 		System.out.println();
+		System.out.println("Output Options");
+		System.out.println();
+		System.out.println("  --Format=<string>                  Format of output calibration file.");
+		System.out.println("                                     ( boofcv , opencv )");
+		System.out.println("                                     DEFAULT: boofcv");
+		System.out.println();
 		System.out.println("Calibration Parameters:");
 		System.out.println();
+		System.out.println("  --Model=<string>                   Specifies the camera model to use.");
+		System.out.println("                                     ( pinhole, universal )");
+		System.out.println("                                     DEFAULT: pinhole");
 		System.out.println("  --ZeroSkew=<true/false>            Can it assume zero skew?");
 		System.out.println("                                     DEFAULT: true");
 		System.out.println("  --NumRadial=<int>                  Number of radial coefficients");
@@ -134,6 +148,22 @@ public class CameraCalibration extends BaseStandardInputApp {
 						inputType = InputType.IMAGE;
 					} else if( flagName.compareToIgnoreCase("Visualize") == 0 ) {
 						visualize = Boolean.parseBoolean(parameters);
+					} else if( flagName.compareToIgnoreCase("Model") == 0 ) {
+						if( parameters.compareToIgnoreCase("pinhole") == 0 ) {
+							modeType = ModelType.PINHOLE;
+						} else if( parameters.compareToIgnoreCase("universal") == 0 ) {
+							modeType = ModelType.UNIVERSAL;
+						} else {
+							throw new RuntimeException("Unknown model type " + parameters);
+						}
+					} else if( flagName.compareToIgnoreCase("Format") == 0 ) {
+						if( parameters.compareToIgnoreCase("boofcv") == 0 ) {
+							formatType = FormatType.BOOFCV;
+						} else if( parameters.compareToIgnoreCase("opencv") == 0 ) {
+							formatType = FormatType.OPENCV;
+						} else {
+							throw new RuntimeException("Unknown model type " + parameters);
+						}
 					} else if( flagName.compareToIgnoreCase("ZeroSkew") == 0 ) {
 						zeroSkew = Boolean.parseBoolean(parameters);
 					} else if( flagName.compareToIgnoreCase("NumRadial") == 0 ) {
@@ -161,6 +191,14 @@ public class CameraCalibration extends BaseStandardInputApp {
 			} else {
 				throw new RuntimeException("Unknown fiducial type "+arg);
 			}
+		}
+
+		if( visualize && modeType != ModelType.PINHOLE) {
+			throw new RuntimeException("Can only visualize PINHOLE model types for now");
+		}
+
+		if( formatType == FormatType.OPENCV && modeType != ModelType.PINHOLE ) {
+			throw new RuntimeException("Can only save calibration in OpenCV format if pinhole model");
 		}
 	}
 
@@ -313,7 +351,15 @@ public class CameraCalibration extends BaseStandardInputApp {
 	protected void handleDirectory() {
 		final CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector);
 
-		calibrationAlg.configurePinhole( zeroSkew, numRadial, tangential);
+		switch( modeType ) {
+			case PINHOLE:
+				calibrationAlg.configurePinhole( zeroSkew, numRadial, tangential);
+				break;
+
+			case UNIVERSAL:
+				calibrationAlg.configureUniversalOmni( zeroSkew, numRadial, tangential);
+				break;
+		}
 
 		File directory = new File(inputDirectory);
 		if( !directory.exists() ) {
@@ -356,7 +402,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		}
 
 		// process and compute intrinsic parameters
-		final CameraPinholeRadial intrinsic = calibrationAlg.process();
+		final CameraModel intrinsic = calibrationAlg.process();
 
 		if( gui != null ) {
 			SwingUtilities.invokeLater(new Runnable() {
@@ -364,21 +410,40 @@ public class CameraCalibration extends BaseStandardInputApp {
 					gui.setObservations(calibrationAlg.getObservations());
 					gui.setResults(calibrationAlg.getErrors());
 					gui.setCalibration(calibrationAlg.getZhangParam());
-					gui.setCorrection(intrinsic);
+					gui.setCorrection((CameraPinholeRadial)intrinsic);
 					gui.repaint();
 				}
 			});
 
 		}
 
-		// save results to a file and print out
-		CalibrationIO.save(intrinsic,outputFileName);
-
 		calibrationAlg.printStatistics();
 		System.out.println();
-		System.out.println("--- Intrinsic Parameters ---");
+		System.out.println("--- "+modeType+" Parameters ---");
 		System.out.println();
-		intrinsic.print();
+
+		switch( modeType ) {
+			case PINHOLE: {
+				CameraPinholeRadial m = (CameraPinholeRadial)intrinsic;
+				switch (formatType) {
+					case BOOFCV: CalibrationIO.save(m, outputFileName); break;
+					case OPENCV: UtilOpenCV.save(m, outputFileName); break;
+				}
+				m.print();
+			}break;
+
+			case UNIVERSAL: {
+				CameraUniversalOmni m = (CameraUniversalOmni)intrinsic;
+				CalibrationIO.save(m, outputFileName);
+				m.print();
+			}break;
+
+			default:
+				throw new RuntimeException("Unknown model type. "+modeType);
+		}
+		System.out.println();
+		System.out.println("Save file format "+formatType);
+		System.out.println();
 	}
 
 	/**
@@ -430,6 +495,16 @@ public class CameraCalibration extends BaseStandardInputApp {
 			outputFileName = new File(OUTPUT_DIRECTORY, "intrinsic.yaml").getPath();
 			handleDirectory();
 		}
+	}
+
+	enum ModelType {
+		PINHOLE,
+		UNIVERSAL
+	}
+
+	enum FormatType {
+		BOOFCV,
+		OPENCV
 	}
 
 	public static void main(String[] args) {

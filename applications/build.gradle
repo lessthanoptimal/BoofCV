@@ -8,6 +8,7 @@ dependencies {
     compile project(':main:boofcv-recognition')
     compile project(':integration:boofcv-swing')
     compile project(':integration:boofcv-WebcamCapture')
+    compile project(':integration:boofcv-javacv')
 
     compile group: 'args4j', name: 'args4j', version: '2.33'
     compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.7'
