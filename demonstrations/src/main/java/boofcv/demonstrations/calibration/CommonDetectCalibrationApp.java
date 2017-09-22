@@ -45,6 +45,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -255,7 +257,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 					if ( controlPanel.isShowPoints() ) {
 						List<Point2D_F64> candidates = getCalibrationPoints();
 						for (Point2D_F64 c : candidates) {
-							VisualizeFeatures.drawPoint(g2, (int) (scale * c.x + 0.5), (int) (scale * c.y + 0.5), 1, Color.RED);
+							VisualizeFeatures.drawPoint(g2, scale * c.x,scale * c.y, 4*scale, Color.RED,false);
 						}
 					}
 					if( controlPanel.isShowNumbers() ) {
@@ -419,9 +421,12 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 
 		Font regular = new Font("Serif", Font.PLAIN, 16);
 		g2.setFont(regular);
+		g2.setStroke(new BasicStroke(2));
+		FontRenderContext frc = g2.getFontRenderContext();
 
 		Point2D_F32 adj = new Point2D_F32();
 
+		AffineTransform at = new AffineTransform();
 		AffineTransform origTran = g2.getTransform();
 		for (int i = 0; i < foundTarget.size(); i++) {
 			Point2D_F64 p = foundTarget.get(i);
@@ -433,18 +438,19 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 			}
 
 			String text = String.format("%2d", i);
+			GlyphVector gv = regular.createGlyphVector(frc, text);
 
-			int x = (int) (adj.x * scale);
-			int y = (int) (adj.y * scale);
+			at.setToTranslation(adj.x*scale,adj.y*scale);
+			at.concatenate(origTran);
+			g2.setTransform(at);
 
-			g2.setColor(Color.BLACK);
-			g2.drawString(text, x - 1, y);
-			g2.drawString(text, x + 1, y);
-			g2.drawString(text, x, y - 1);
-			g2.drawString(text, x, y + 1);
-			g2.setTransform(origTran);
-			g2.setColor(Color.GREEN);
-			g2.drawString(text, x, y);
+			for (int j = 0; j < gv.getNumGlyphs(); j++) {
+				g2.setColor(Color.BLACK);
+				g2.draw(gv.getGlyphOutline(j));
+				g2.setColor(Color.GREEN);
+				g2.fill(gv.getGlyphOutline(j));
+			}
 		}
+		g2.setTransform(origTran);
 	}
 }

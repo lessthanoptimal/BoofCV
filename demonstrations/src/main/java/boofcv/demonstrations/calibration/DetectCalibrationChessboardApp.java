@@ -24,7 +24,6 @@ import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
-import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -52,23 +51,19 @@ public class DetectCalibrationChessboardApp
 										   List<String> exampleInputs) {
 		super(new DetectCalibrationPanel(numRows,numColumns,true),exampleInputs);
 		config = new ConfigChessboard(numRows, numColumns, 1);
+		controlPanel.threshold.setConfiguration(config.thresholding);
 
 		declareDetector();
 	}
 
 	@Override
 	public void declareDetector() {
-		if( controlPanel.isManual()) {
-			config.thresholding.type = ThresholdType.FIXED;
-			config.thresholding.fixedThreshold = controlPanel.getThresholdLevel();
-		} else {
-			config.thresholding.type = ThresholdType.BLOCK_MIN_MAX;
-		}
-
+		config.thresholding = controlPanel.threshold.createConfig();
 		config.numRows = controlPanel.getGridRows();
 		config.numCols = controlPanel.getGridColumns();
 
 		alg = FactoryFiducialCalibration.chessboard(config).getAlgorithm();
+		reprocessImageOnly();
 	}
 
 	@Override

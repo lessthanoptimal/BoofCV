@@ -41,7 +41,7 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 
 	public DetectCalibrationCirclePanel(int gridRows, int gridColumns, double diameter , double spacing,
 										boolean showGraphs ) {
-		super(gridRows, gridColumns, true, false);
+		super(gridRows, gridColumns, false);
 
 		doShowNumbers = false;
 		this.showNumbers.setSelected(doShowNumbers);
@@ -57,11 +57,11 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 		selectDiameter = spinner(diameter,0.0,1000.0,1.0);
 		selectSpacing = spinner(spacing,0.0,1000.0,1.0);
 
-		addComponents(true);
+		addComponents();
 	}
 
 	@Override
-	protected void addComponents( boolean hasManualMode ) {
+	protected void addComponents() {
 		addLabeled(successIndicator, "Found:", this);
 		addLabeled(textCursorX,"X",this);
 		addLabeled(textCursorY,"Y",this);
@@ -72,10 +72,7 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 		addLabeled(selectColumns, "Cols", this);
 		addLabeled(selectDiameter, "Diameter", this);
 		addLabeled(selectSpacing, "Spacing", this);
-		if( hasManualMode )
-			addAlignLeft(manualThreshold,this);
-		addLabeled(thresholdSpinner, "Threshold", this);
-		addSeparator(100);
+		add(threshold);
 		addLabeled(selectZoom, "Zoom ", this);
 		addAlignLeft(showPoints, this);
 		addAlignLeft(showNumbers,this);

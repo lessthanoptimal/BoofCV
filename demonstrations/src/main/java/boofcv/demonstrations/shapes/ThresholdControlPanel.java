@@ -98,7 +98,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		comboType.addActionListener(this);
 		spinnerThreshold.addChangeListener(this);
 		spinnerRadius.addChangeListener(this);
-		spinnerScale.addChangeListener(this);
+//		spinnerScale.addChangeListener(this);
 		buttonUpDown.addActionListener(this);
 
 		addLabeled(comboType, "Type", this);
@@ -233,6 +233,45 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 			scale = ((Number) spinnerScale.getValue()).doubleValue();
 			listener.imageThresholdUpdated();
 		}
+	}
+
+	public void setConfiguration(ConfigThreshold configuration) {
+		System.out.println("num listeners "+spinnerScale.getChangeListeners().length);
+		comboType.removeActionListener(this);
+		spinnerRadius.removeChangeListener(this);
+		spinnerScale.removeChangeListener(this);
+		buttonUpDown.removeActionListener(this);
+		System.out.println("num listeners "+spinnerScale.getChangeListeners().length);
+
+
+		comboType.setSelectedIndex(configuration.type.ordinal());
+		spinnerRadius.setValue(configuration.radius);
+		spinnerScale.setValue(configuration.scale);
+		buttonUpDown.setSelected(configuration.down);
+
+		type = configuration.type;
+		radius = configuration.radius;
+		scale = configuration.scale;
+		down = configuration.down;
+		if( type == ThresholdType.FIXED ) {
+			globalThreshold = (int)configuration.fixedThreshold;
+		} else if( type == ThresholdType.BLOCK_MIN_MAX) {
+			minimumSpread = ((ConfigThresholdBlockMinMax)configuration).minimumSpread;
+		} else if( type == ThresholdType.BLOCK_OTSU ||
+				type == ThresholdType.LOCAL_OTSU  ) {
+			otsuTuning = (int)((ConfigThresholdLocalOtsu)configuration).tuning;
+		}
+
+		comboType.addActionListener(this);
+		spinnerRadius.addChangeListener(this);
+		spinnerScale.addChangeListener(this);
+		buttonUpDown.addActionListener(this);
+
+		updateThresholdValue();
+	}
+
+	public void setListener(Listener listener) {
+		this.listener = listener;
 	}
 
 	public interface Listener {

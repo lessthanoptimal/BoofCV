@@ -27,7 +27,6 @@ import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
-import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
@@ -61,6 +60,7 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 		super(new DetectCalibrationCirclePanel(numRows,numColumns,circleDiameter,centerDistance,true),exampleInputs);
 
 		config = new ConfigCircleHexagonalGrid(numRows, numColumns, circleDiameter, centerDistance);
+		controlPanel.threshold.setConfiguration(config.thresholding);
 
 		declareDetector();
 
@@ -69,12 +69,7 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 
 	@Override
 	public void declareDetector() {
-		if( controlPanel.isManual()) {
-			config.thresholding.type = ThresholdType.FIXED;
-			config.thresholding.fixedThreshold = controlPanel.getThresholdLevel();
-		} else {
-			config.thresholding.type = ThresholdType.LOCAL_MEAN;
-		}
+		config.thresholding = controlPanel.threshold.createConfig();
 
 		config.numRows = controlPanel.getGridRows();
 		config.numCols = controlPanel.getGridColumns();
@@ -82,6 +77,7 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 		config.centerDistance = ((DetectCalibrationCirclePanel)controlPanel).getCircleSpacing();
 
 		detector = FactoryFiducialCalibration.circleHexagonalGrid(config);
+		reprocessImageOnly();
 	}
 
 	@Override

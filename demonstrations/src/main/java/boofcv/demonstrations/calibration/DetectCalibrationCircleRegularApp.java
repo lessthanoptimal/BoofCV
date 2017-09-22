@@ -27,7 +27,6 @@ import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
-import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
@@ -61,7 +60,7 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 		super(new DetectCalibrationCirclePanel(numRows,numColumns,circleDiameter,centerDistance,false),exampleInputs);
 
 		config = new ConfigCircleRegularGrid(numRows, numColumns, circleDiameter, centerDistance);
-
+		controlPanel.threshold.setConfiguration(config.thresholding);
 		declareDetector();
 
 		colorId = new Color[]{Color.RED,Color.BLUE,Color.CYAN,Color.ORANGE};
@@ -69,19 +68,14 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 
 	@Override
 	public void declareDetector() {
-		if( controlPanel.isManual()) {
-			config.thresholding.type = ThresholdType.FIXED;
-			config.thresholding.fixedThreshold = controlPanel.getThresholdLevel();
-		} else {
-			config.thresholding.type = ThresholdType.LOCAL_MEAN;
-		}
-
+		config.thresholding = controlPanel.threshold.createConfig();
 		config.numRows = controlPanel.getGridRows();
 		config.numCols = controlPanel.getGridColumns();
 		config.circleDiameter = ((DetectCalibrationCirclePanel)controlPanel).getCircleDiameter();
 		config.centerDistance = ((DetectCalibrationCirclePanel)controlPanel).getCircleSpacing();
 
 		detector = FactoryFiducialCalibration.circleRegularGrid(config);
+		reprocessImageOnly();
 	}
 
 	@Override

@@ -92,17 +92,11 @@ Calibration
       - Command line only for now
 
 TOP ITEMS
-- TODO Dialog for webcam capture
-       - select camera
-       - enter custom resolution
-       - select from list
-       - checkbox to save selection
 - TODO Add QR Code to fiducial demonstration
 - TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
         It is a homogenous coordinate with z=1 being implicit.
         Found papers that use "normalized coordinates"!
 - TODO QR Code support
-- TODO Add calibration circle regular to FiducialTrackerApp
 
 OTHER ITEMS
 - TODO Background Removal demonstration

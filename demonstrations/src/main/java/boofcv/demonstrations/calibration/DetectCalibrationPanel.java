@@ -18,6 +18,8 @@
 
 package boofcv.demonstrations.calibration;
 
+import boofcv.demonstrations.shapes.ThresholdControlPanel;
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 
@@ -71,9 +73,7 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 	JSpinner selectZoom;
 
 	// selects threshold to create binary image from
-	JSpinner thresholdSpinner;
-	// should the threshold be manually selected or automatically
-	JCheckBox manualThreshold;
+	ThresholdControlPanel threshold;
 
 	boolean doShowPoints = true;
 	boolean doShowNumbers = true;
@@ -85,20 +85,18 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 	boolean doShowContour = false;
 
 	double scale = 1;
-	boolean isManual = false;
 	int gridRows;
 	int gridColumns;
 
 	Listener listener;
 	
 	int selectedView = 0;
-	int thresholdLevel = 60;
 
-	public DetectCalibrationPanel(int gridRows, int gridColumns, boolean hasManualMode) {
-		this(gridRows,gridColumns,hasManualMode,true);
+	public DetectCalibrationPanel(int gridRows, int gridColumns) {
+		this(gridRows,gridColumns,true);
 	}
 
-	public DetectCalibrationPanel(int gridRows, int gridColumns, boolean hasManualMode, boolean addComponents ) {
+	public DetectCalibrationPanel(int gridRows, int gridColumns, boolean addComponents ) {
 		this.gridRows = gridRows;
 		this.gridColumns = gridColumns;
 
@@ -162,24 +160,19 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		selectColumns.addChangeListener(this);
 		selectColumns.setMaximumSize(selectColumns.getPreferredSize());
 
-		thresholdSpinner = new JSpinner(new SpinnerNumberModel(thresholdLevel,0, 255, 20));
-		thresholdSpinner.addChangeListener(this);
-		thresholdSpinner.setMaximumSize(thresholdSpinner.getPreferredSize());
-
-		manualThreshold = new JCheckBox("Manual");
-		manualThreshold.setSelected(isManual);
-		manualThreshold.addItemListener(this);
-		manualThreshold.setMaximumSize(manualThreshold.getPreferredSize());
-
-		if( !isManual ) {
-			thresholdSpinner.setEnabled(false);
-		}
+		threshold = new ThresholdControlPanel(new ThresholdControlPanel.Listener() {
+			@Override
+			public void imageThresholdUpdated() {
+				listener.calibEventDetectorModified();
+			}
+		}, ThresholdType.BLOCK_OTSU);
+		threshold.setRadius(40);
 
 		if( addComponents )
-			addComponents(hasManualMode);
+			addComponents();
 	}
 
-	protected void addComponents( boolean hasManualMode ) {
+	protected void addComponents() {
 		addLabeled(successIndicator, "Found:", this);
 		addLabeled(textCursorX,"X",this);
 		addLabeled(textCursorY,"Y",this);
@@ -188,10 +181,7 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		addSeparator(100);
 		addLabeled(selectRows, "Rows", this);
 		addLabeled(selectColumns, "Cols", this);
-		if( hasManualMode )
-			addAlignLeft(manualThreshold,this);
-		addLabeled(thresholdSpinner, "Threshold", this);
-		addSeparator(100);
+		addAlignLeft(threshold,this);
 		addLabeled(selectZoom, "Zoom ", this);
 		addAlignLeft(showPoints, this);
 		addAlignLeft(showNumbers,this);
@@ -211,12 +201,7 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		if( listener == null )
 			return;
 
-		if( e.getSource() == thresholdSpinner) {
-			thresholdLevel = ((Number) thresholdSpinner.getValue()).intValue();
-			// Only need to recompute
-			if( isManual )
-				listener.calibEventDetectorModified();
-		}  else if( e.getSource() == selectRows) {
+		 if( e.getSource() == selectRows) {
 			gridRows = ((Number) selectRows.getValue()).intValue();
 			listener.calibEventDetectorModified();
 		}  else if( e.getSource() == selectColumns) {
@@ -265,13 +250,6 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		return doShowOrder;
 	}
 
-	public int getThresholdLevel() {
-		return thresholdLevel;
-	}
-
-	public boolean isManual() {
-		return isManual;
-	}
 
 	public void setListener( Listener listener) {
 		this.listener = listener;
@@ -279,10 +257,6 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 
 	public double getScale() {
 		return scale;
-	}
-
-	public void setThreshold(int threshold) {
-		thresholdSpinner.setValue(threshold);
 	}
 
 	public void setCursor( final double x , final double y ) {
@@ -325,21 +299,9 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		} else if( e.getSource() == showContour ) {
 			doShowContour = showContour.isSelected();
 			listener.calibEventGUI();
-		} else if( e.getSource() == thresholdSpinner) {
-			thresholdLevel = ((Number) thresholdSpinner.getValue()).intValue();
-			// Only need to recompute
-			if( isManual )
-				listener.calibEventDetectorModified();
 		} else if( e.getSource() == selectZoom ) {
 			scale = ((Number)selectZoom.getValue()).doubleValue();
 			listener.calibEventGUI();
-		} else if( e.getSource() == manualThreshold) {
-			if( isManual != manualThreshold.isSelected() ) {
-				isManual = manualThreshold.isSelected();
-				thresholdSpinner.setEnabled(isManual);
-
-				listener.calibEventDetectorModified();
-			}
 		}
 	}
 
