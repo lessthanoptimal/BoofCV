@@ -113,6 +113,7 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 		for (int i = 1; i <= 11; i++) {
 			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Square/left%02d.jpg", i)));
 		}
+		examples.add(UtilIO.pathExample("fiducial/square_grid/movie.mp4"));
 
 		DetectCalibrationSquareGridApp app = new DetectCalibrationSquareGridApp(4, 3, 1,1,false,examples);
 

@@ -244,6 +244,8 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 		for (int i = 0; i <= 5; i++) {
 			examples.add(UtilIO.pathExample(String.format("calibration/mono/Sony_DSC-HX5V_CircleRegular/image%05d.jpg", i)));
 		}
+		examples.add(UtilIO.pathExample("fiducial/circle_regular/movie.mp4"));
+
 
 		DetectCalibrationCircleRegularApp app = new DetectCalibrationCircleRegularApp(10, 8, 1.5,2.5,examples);
 

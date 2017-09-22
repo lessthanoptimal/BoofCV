@@ -242,6 +242,7 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 		for (int i = 1; i <= 7; i++) {
 			examples.add(UtilIO.pathExample(String.format("calibration/mono/Sony_DSC-HX5V_CircleHexagonal/image%02d.jpg", i)));
 		}
+		examples.add(UtilIO.pathExample("fiducial/circle_hexagonal/movie.mp4"));
 
 		DetectCalibrationCircleHexagonalApp app = new DetectCalibrationCircleHexagonalApp(24, 28, 1,1.2,examples);
 

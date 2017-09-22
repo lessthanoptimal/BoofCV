@@ -117,6 +117,7 @@ public class DetectCalibrationChessboardApp
 		for (int i = 1; i <= 11; i++) {
 			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Chess/left%02d.jpg",i)));
 		}
+		examples.add(UtilIO.pathExample("fiducial/chessboard/movie.mjpeg"));
 
 		DetectCalibrationChessboardApp app = new DetectCalibrationChessboardApp(7,5,examples);
 

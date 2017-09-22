@@ -30,6 +30,7 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -143,6 +144,11 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 				}
 			}
 		});
+	}
+
+	@Override
+	protected void configureVideo(int which, SimpleImageSequence sequence) {
+		sequence.setLoop(true);
 	}
 
 	@Override

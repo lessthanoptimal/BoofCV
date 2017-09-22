@@ -389,6 +389,7 @@ public abstract class DemonstrationBase extends JPanel {
 			CacheSequenceStream cache = inputStreams.get(which);
 
 			SimpleImageSequence sequence = media.openVideo(filePaths[which], cache.getImageType());
+			configureVideo(which,sequence);
 
 			if( sequence == null ) {
 				failed = true;
@@ -515,6 +516,14 @@ public abstract class DemonstrationBase extends JPanel {
 				threadProcess.start();
 			}
 		}
+	}
+
+	/**
+	 * Provides access to an image sequence so that its configuration can be customized
+	 * @param sequence
+	 */
+	protected void configureVideo( int which , SimpleImageSequence sequence ) {
+
 	}
 
 	private void setInputName( String name ) {
