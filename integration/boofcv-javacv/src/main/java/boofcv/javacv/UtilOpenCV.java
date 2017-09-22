@@ -114,4 +114,28 @@ public class UtilOpenCV {
 
 		return out;
 	}
+
+	// can't find library issues
+//	public static List<String> listWebcams() {
+//		List<String> output = new ArrayList<>();
+//
+//		int N = videoInputLib.videoInput.listDevices();
+//		for (int i = 0; i < N; i++) {
+//			String name = videoInputLib.videoInput.getDeviceName(i).getString();
+//			output.add(name);
+//		}
+//
+//		return output;
+//	}
+//
+//	public static OpenCVFrameGrabber findWebcam( String name ) {
+//		int N = videoInputLib.videoInput.listDevices();
+//		for (int i = 0; i < N; i++) {
+//			String device = videoInputLib.videoInput.getDeviceName(i).getString();
+//			if( device.equals(name)) {
+//				return new OpenCVFrameGrabber(i);
+//			}
+//		}
+//		return null;
+//	}
 }

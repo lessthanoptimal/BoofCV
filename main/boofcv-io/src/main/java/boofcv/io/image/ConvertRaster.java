@@ -36,7 +36,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	static void bufferedToGray(DataBufferByte buffer, WritableRaster src, GrayU8 dst) {
+	public static void bufferedToGray(DataBufferByte buffer, WritableRaster src, GrayU8 dst) {
 		byte[] srcData = buffer.getData();
 
 
@@ -62,7 +62,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	static void bufferedToGray(DataBufferUShort buffer , WritableRaster src, GrayI16 dst) {
+	public static void bufferedToGray(DataBufferUShort buffer , WritableRaster src, GrayI16 dst) {
 		short[] srcData = buffer.getData();
 
 		int numBands = src.getNumBands();
@@ -92,7 +92,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	static void bufferedToGray(DataBufferByte buffer, WritableRaster src, GrayF32 dst) {
+	public static void bufferedToGray(DataBufferByte buffer, WritableRaster src, GrayF32 dst) {
 		byte[] srcData = buffer.getData();
 
 		int numBands = src.getNumBands();
@@ -119,7 +119,7 @@ public class ConvertRaster {
 		return raster.getWidth()*raster.getNumDataElements();
 	}
 
-	private static void from_4BU8_to_U8(GrayU8 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	public static void from_4BU8_to_U8(GrayU8 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
@@ -138,7 +138,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_1BU8_to_U8(GrayU8 dst, byte[] srcData, int size, int srcStride, int srcOffset, int srcStrideDiff) {
+	public static void from_1BU8_to_U8(GrayU8 dst, byte[] srcData, int size, int srcStride, int srcOffset, int srcStrideDiff) {
 		if (dst.startIndex == 0 && dst.width == dst.stride && srcStrideDiff == 0 && srcOffset == 0 )
 			System.arraycopy(srcData, 0, dst.data, 0, size);
 		else {
@@ -151,7 +151,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_3BU8_to_U8(GrayU8 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	public static void from_3BU8_to_U8(GrayU8 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
@@ -169,7 +169,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_4BU8_to_F32(GrayF32 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	public static void from_4BU8_to_F32(GrayF32 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
@@ -188,7 +188,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_1BU8_to_F32(GrayF32 dst, byte[] srcData, int srcStride, int srcOffset) {
+	public static void from_1BU8_to_F32(GrayF32 dst, byte[] srcData, int srcStride, int srcOffset) {
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
@@ -200,7 +200,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_3BU8_to_F32(GrayF32 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	public static void from_3BU8_to_F32(GrayF32 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
@@ -301,7 +301,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_4BU8_to_PLF32(Planar<GrayF32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	public static void from_4BU8_to_PLF32(Planar<GrayF32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		float[] band1 = dst.getBand(0).data;
 		float[] band2 = dst.getBand(1).data;
 		float[] band3 = dst.getBand(2).data;
@@ -322,7 +322,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_1BU8_to_PLF32(Planar<GrayF32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	public static void from_1BU8_to_PLF32(Planar<GrayF32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		float[] data = dst.getBand(0).data;
 
 		int indexSrc = srcOffset;
@@ -338,7 +338,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_3BU8_to_PLF32(Planar<GrayF32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	public static void from_3BU8_to_PLF32(Planar<GrayF32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		float[] band1 = dst.getBand(0).data;
 		float[] band2 = dst.getBand(1).data;
 		float[] band3 = dst.getBand(2).data;
@@ -356,7 +356,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_4BU8_to_PLU8(Planar<GrayU8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	public static void from_4BU8_to_PLU8(Planar<GrayU8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		byte[] band1 = dst.getBand(0).data;
 		byte[] band2 = dst.getBand(1).data;
 		byte[] band3 = dst.getBand(2).data;
@@ -376,7 +376,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_1BU8_to_PLU8(Planar<GrayU8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	public static void from_1BU8_to_PLU8(Planar<GrayU8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		byte dstData[] = dst.getBand(0).data;
 
 		int indexSrc = srcOffset;
@@ -388,7 +388,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_3BU8_to_PLU8(Planar<GrayU8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	public static void from_3BU8_to_PLU8(Planar<GrayU8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		byte[] band1 = dst.getBand(0).data;
 		byte[] band2 = dst.getBand(1).data;
 		byte[] band3 = dst.getBand(2).data;
@@ -681,7 +681,7 @@ public class ConvertRaster {
 		bufferedToGray(src, dst.data, dst.startIndex, dst.stride);
 	}
 
-	private static void bufferedToGray(BufferedImage src, byte[] dstData, int dstStartIndex , int dstStride ) {
+	public static void bufferedToGray(BufferedImage src, byte[] dstData, int dstStartIndex , int dstStride ) {
 
 		int width = src.getWidth();
 		int height = src.getHeight();
@@ -1818,7 +1818,7 @@ public class ConvertRaster {
 		}
 	}
 
-//	private static int getOffset( ByteComponentRaster raster ) {
+//	public static int getOffset( ByteComponentRaster raster ) {
 //		int min = Integer.MAX_VALUE;
 //		for (int i = 0; i < raster.getNumDataElements(); i++) {
 //			min = Math.min(raster.getDataOffset(i),min);
@@ -1826,7 +1826,7 @@ public class ConvertRaster {
 //		return min;
 //	}
 //
-//	private static int getOffset( IntegerInterleavedRaster raster ) {
+//	public static int getOffset( IntegerInterleavedRaster raster ) {
 //		int min = Integer.MAX_VALUE;
 //		for (int i = 0; i < raster.getNumDataElements(); i++) {
 //			min = Math.min(raster.getDataOffset(i),min);
@@ -1834,7 +1834,7 @@ public class ConvertRaster {
 //		return min;
 //	}
 //
-//	private static int getOffset( ShortInterleavedRaster raster ) {
+//	public static int getOffset( ShortInterleavedRaster raster ) {
 //		int min = Integer.MAX_VALUE;
 //		for (int i = 0; i < raster.getNumDataElements(); i++) {
 //			min = Math.min(raster.getDataOffset(i),min);

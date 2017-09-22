@@ -8,6 +8,8 @@ dependencies {
     compile project(':main:boofcv-ip')
     compile project(':main:boofcv-io')
 
+    compile project(':integration:boofcv-swing')
+
     compile group: 'org.bytedeco', name: 'javacv', version: '1.3'
 
     native_arch.each {
@@ -18,11 +20,7 @@ dependencies {
 sourceSets {
     test {
         java {
-            srcDir 'test'
-            srcDir 'examples'
-        }
-        resources {
-            srcDir 'resources/test'
+            srcDir 'src/main/examples'
         }
     }
 }
