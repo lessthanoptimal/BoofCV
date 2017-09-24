@@ -34,7 +34,6 @@ import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import georegression.struct.shapes.Rectangle2D_I32;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
@@ -53,6 +52,7 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 	ConfigCircleRegularGrid config;
 
 	Color colorId[];
+	Line2D.Double line = new Line2D.Double();
 
 	public DetectCalibrationCircleRegularApp(int numRows , int numColumns ,
 											 double circleDiameter, double centerDistance,
@@ -90,9 +90,13 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 			g2.setColor(colorId[Math.min(id++,colorId.length-1)]);
 			for( EllipsesIntoClusters.Node n : c ) {
 				EllipseRotated_F64 a = found.get(n.which).ellipse;
+				line.x1 = a.center.x*scale;
+				line.y1 = a.center.y*scale;
 				for (int i = 0; i < n.connections.size; i++) {
 					EllipseRotated_F64 b = found.get(n.connections.get(i)).ellipse;
-					g2.drawLine((int)(a.center.x*scale),(int)(a.center.y*scale),(int)(b.center.x*scale),(int)(b.center.y*scale));
+					line.x2 = b.center.x*scale;
+					line.y2 = b.center.y*scale;
+					g2.draw(line);
 				}
 			}
 		}
@@ -110,7 +114,6 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 		BasicStroke thin = new BasicStroke(3);
 		BasicStroke thick = new BasicStroke(5);
 
-		Rectangle2D_I32 r = new Rectangle2D_I32();
 		for( Grid g : grids ) {
 			double x0 = Double.MAX_VALUE;
 			double x1 = -Double.MAX_VALUE;
@@ -126,16 +129,15 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 				y1 = Math.max(e.center.y,y1);
 			}
 
-			r.x0 = (int)(scale*x0+0.5);
-			r.x1 = (int)(scale*x1+0.5);
-			r.y0 = (int)(scale*y0+0.5);
-			r.y1 = (int)(scale*y1+0.5);
+			x0 *= scale; y0 *= scale;
+			x1 *= scale; y1 *= scale;
+
 			g2.setColor(Color.WHITE);
 			g2.setStroke(thick);
-			VisualizeShapes.drawRectangle(r,g2);
+			VisualizeShapes.drawRectangle(x0,y0,x1,y1,line,g2);
 			g2.setColor(Color.ORANGE);
 			g2.setStroke(thin);
-			VisualizeShapes.drawRectangle(r,g2);
+			VisualizeShapes.drawRectangle(x0,y0,x1,y1,line,g2);
 		}
 	}
 
@@ -153,7 +155,7 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 		colorsSquare[2] = new Color(160,140,0);
 		colorsSquare[3] = new Color(0,140,100);
 
-		Line2D.Double l = new Line2D.Double();
+		Line2D.Double line = new Line2D.Double();
 
 		for (int i = 1; i+6 < points.size(); i += 4) {
 			Point2D_F64 p0 = points.get(i);
@@ -167,10 +169,10 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 
 			int lineRGB = red << 16 | green << 8 | blue;
 
-			l.setLine(scale * p0.x , scale * p0.y, scale * p1.x, scale * p1.y );
+			line.setLine(scale * p0.x , scale * p0.y, scale * p1.x, scale * p1.y );
 
 			g2.setColor(new Color(lineRGB));
-			g2.draw(l);
+			g2.draw(line);
 		}
 
 		for (int i = 0; i+3 < points.size(); i += 4) {
@@ -179,21 +181,21 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 			Point2D_F64 p2 = points.get(i+2);
 			Point2D_F64 p3 = points.get(i+3);
 
-			l.setLine(scale * p0.x , scale * p0.y, scale * p1.x, scale * p1.y );
+			line.setLine(scale * p0.x , scale * p0.y, scale * p1.x, scale * p1.y );
 			g2.setColor(colorsSquare[0]);
-			g2.draw(l);
+			g2.draw(line);
 
-			l.setLine(scale * p1.x , scale * p1.y, scale * p2.x, scale * p2.y );
+			line.setLine(scale * p1.x , scale * p1.y, scale * p2.x, scale * p2.y );
 			g2.setColor(colorsSquare[1]);
-			g2.draw(l);
+			g2.draw(line);
 
-			l.setLine(scale * p2.x , scale * p2.y, scale * p3.x, scale * p3.y );
+			line.setLine(scale * p2.x , scale * p2.y, scale * p3.x, scale * p3.y );
 			g2.setColor(colorsSquare[2]);
-			g2.draw(l);
+			g2.draw(line);
 
-			l.setLine(scale * p3.x , scale * p3.y, scale * p0.x, scale * p0.y );
+			line.setLine(scale * p3.x , scale * p3.y, scale * p0.x, scale * p0.y );
 			g2.setColor(colorsSquare[3]);
-			g2.draw(l);
+			g2.draw(line);
 		}
 	}
 

@@ -34,10 +34,10 @@ import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import georegression.struct.shapes.Rectangle2D_I32;
 import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +53,7 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 	ConfigCircleHexagonalGrid config;
 
 	Color colorId[];
+	Line2D.Double line = new Line2D.Double();
 
 	public DetectCalibrationCircleHexagonalApp(int numRows , int numColumns ,
 											   double circleDiameter, double centerDistance,
@@ -92,9 +93,13 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 			g2.setColor(colorId[Math.min(id++,colorId.length-1)]);
 			for( EllipsesIntoClusters.Node n : c ) {
 				EllipseRotated_F64 a = found.get(n.which);
+				line.x1 = scale*a.center.x;
+				line.y1 = scale*a.center.y;
 				for (int i = 0; i < n.connections.size; i++) {
 					EllipseRotated_F64 b = found.get(n.connections.get(i));
-					g2.drawLine((int)(a.center.x*scale),(int)(a.center.y*scale),(int)(b.center.x*scale),(int)(b.center.y*scale));
+					line.x2 = scale*b.center.x;
+					line.y2 = scale*b.center.y;
+					g2.draw(line);
 				}
 			}
 		}
@@ -117,15 +122,19 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 		for (int row = row0; row < g.rows; row += 2) {
 			for (int col = col0; col < g.columns; col += 2) {
 				EllipseRotated_F64 a = g.get(row,col);
+				line.x1 = scale*a.center.x;
+				line.y1 = scale*a.center.y;
 				if( col+2 < g.columns) {
 					EllipseRotated_F64 b = g.get(row, col + 2);
-					g2.drawLine((int)(scale*a.center.x),(int)(scale*a.center.y),
-							(int)(scale*b.center.x),(int)(scale*b.center.y));
+					line.x2 = scale*b.center.x;
+					line.y2 = scale*b.center.y;
+					g2.draw(line);
 				}
 				if( row+2 < g.rows) {
 					EllipseRotated_F64 b = g.get(row+2, col);
-					g2.drawLine((int)(scale*a.center.x),(int)(scale*a.center.y),
-							(int)(scale*b.center.x),(int)(scale*b.center.y));
+					line.x2 = scale*b.center.x;
+					line.y2 = scale*b.center.y;
+					g2.draw(line);
 				}
 			}
 		}
@@ -138,7 +147,6 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 		BasicStroke thin = new BasicStroke(3);
 		BasicStroke thick = new BasicStroke(5);
 
-		Rectangle2D_I32 r = new Rectangle2D_I32();
 		for( Grid g : grids ) {
 			double x0 = Double.MAX_VALUE;
 			double x1 = -Double.MAX_VALUE;
@@ -153,17 +161,15 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 				y0 = Math.min(e.center.y,y0);
 				y1 = Math.max(e.center.y,y1);
 			}
+			x0 *= scale; y0 *= scale;
+			x1 *= scale; y1 *= scale;
 
-			r.x0 = (int)(scale*x0+0.5);
-			r.x1 = (int)(scale*x1+0.5);
-			r.y0 = (int)(scale*y0+0.5);
-			r.y1 = (int)(scale*y1+0.5);
 			g2.setColor(Color.WHITE);
 			g2.setStroke(thick);
-			VisualizeShapes.drawRectangle(r,g2);
+			VisualizeShapes.drawRectangle(x0,y0,x1,y1,line,g2);
 			g2.setColor(Color.ORANGE);
 			g2.setStroke(thin);
-			VisualizeShapes.drawRectangle(r,g2);
+			VisualizeShapes.drawRectangle(x0,y0,x1,y1,line,g2);
 		}
 
 		renderTangents(g2,scale);

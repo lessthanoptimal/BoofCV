@@ -333,6 +333,16 @@ public class VisualizeShapes {
 		g2.drawLine(rect.x0, rect.y1, rect.x0, rect.y0);
 	}
 
+	public static void drawRectangle( double x0, double y0, double x1, double y1, Line2D.Double line , Graphics2D g2 ) {
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		line.setLine(x0,y0,x1,y0);g2.draw(line);
+		line.setLine(x1,y0,x1,y1);g2.draw(line);
+		line.setLine(x1,y1,x0,y1);g2.draw(line);
+		line.setLine(x0,y1,x0,y0);g2.draw(line);
+	}
+
 	public static void drawQuad( Quadrilateral_F64 quad , Graphics2D g2 , boolean subpixel  ) {
 		if( subpixel ) {
 			Line2D.Double line = new Line2D.Double();
