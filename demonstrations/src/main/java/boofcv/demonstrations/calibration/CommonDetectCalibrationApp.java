@@ -248,6 +248,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 	}
 
 	class VisualizePanel extends ImageZoomPanel {
+		Ellipse2D.Double storage = new Ellipse2D.Double();
 		@Override
 		protected void paintInPanel(AffineTransform tran,Graphics2D g2 ) {
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
@@ -263,7 +264,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 					if ( controlPanel.isShowPoints() ) {
 						List<Point2D_F64> candidates = getCalibrationPoints();
 						for (Point2D_F64 c : candidates) {
-							VisualizeFeatures.drawPoint(g2, scale * c.x,scale * c.y, 4*scale, Color.RED,false);
+							VisualizeFeatures.drawPoint(g2, scale * c.x,scale * c.y, 4*scale, Color.RED,false,storage);
 						}
 					}
 					if( controlPanel.isShowNumbers() ) {

@@ -46,6 +46,10 @@ public class QrCodeDetector<T extends ImageGray<T>> {
 		decoder.process(detectPositionPatterns.getPositionPatterns(),gray);
 	}
 
+	public void resetRuntimeProfiling() {
+		detectPositionPatterns.resetRuntimeProfiling();
+	}
+
 	public QrCodePositionPatternDetector<T> getDetectPositionPatterns() {
 		return detectPositionPatterns;
 	}

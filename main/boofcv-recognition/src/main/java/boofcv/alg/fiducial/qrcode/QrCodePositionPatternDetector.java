@@ -75,6 +75,12 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	protected LineSegment2D_F64 connectLine = new LineSegment2D_F64();
 	protected Point2D_F64 intersection = new Point2D_F64();
 
+	// runtime profiling
+	protected double milliGraph = 0;
+
+	// storage for nearest neighbor
+	double point[] = new double[2];
+
 	/**
 	 * Configures the detector
 	 *
@@ -103,6 +109,11 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		interpolate = FactoryInterpolation.bilinearPixelS(squareDetector.getInputType(), BorderType.EXTENDED);
 	}
 
+	public void resetRuntimeProfiling() {
+		squareDetector.resetRuntimeProfiling();
+		milliGraph = 0;
+	}
+
 	/**
 	 * Detects position patterns inside the image and forms a graph.
 	 * @param gray Gray scale input image
@@ -116,10 +127,28 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 		// detect squares
 		squareDetector.process(gray,binary);
+
+		long time0 = System.nanoTime();
 		squaresToPositionList();
+
+		long time1 = System.nanoTime();
 
 		// Create graph of neighboring squares
 		createPositionPatternGraph();
+//		long time2 = System.nanoTime();  // doesn't take very long
+
+		double milli = (time1-time0)*1e-6;
+
+		if( milliGraph == 0 ) {
+			milliGraph = milli;
+		} else {
+			milliGraph = 0.95*milliGraph + 0.5*milli;
+		}
+
+		DetectPolygonFromContour<T> detectorPoly = squareDetector.getDetector();
+		System.out.printf(" contour %5.1f shapes %5.1f adjust_bias %5.2f PosPat %6.2f\n",
+				detectorPoly.getMilliContour(),detectorPoly.getMilliShapes(),squareDetector.getMilliAdjustBias(),
+				milliGraph);
 	}
 
 	/**
@@ -193,7 +222,6 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		}
 		search.setPoints(searchPoints.toList(),positionPatterns.toList());
 
-		double point[] = new double[2]; // TODO remove
 		for (int i = 0; i < positionPatterns.size(); i++) {
 			PositionPatternNode f = positionPatterns.get(i);
 

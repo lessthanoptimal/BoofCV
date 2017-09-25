@@ -72,8 +72,14 @@ public class VisualizeFeatures {
 		g2.fillOval(x - r, y - r, w, w);
 	}
 
-	public static void drawPoint( Graphics2D g2 , double x , double y ,double r,  Color color , boolean hasBorder) {
-		Ellipse2D.Double c = new Ellipse2D.Double();
+	public static void drawPoint( Graphics2D g2 , double x , double y ,double r,
+								  Color color , boolean hasBorder) {
+		drawPoint(g2, x, y, r, color, hasBorder,new Ellipse2D.Double());
+	}
+
+	public static void drawPoint( Graphics2D g2 , double x , double y ,double r,
+								  Color color , boolean hasBorder, Ellipse2D.Double c )
+	{
 		double w = r*2;
 
 		if( hasBorder ) {

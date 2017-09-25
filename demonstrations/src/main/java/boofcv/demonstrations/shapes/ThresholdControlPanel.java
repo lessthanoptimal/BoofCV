@@ -111,9 +111,15 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		updateEnabledByType();
 	}
 
-	public void setRadius( int value ) {
+	public void setOtsuTuning(int otsuTuning) {
+		this.otsuTuning = otsuTuning;
+		updateThresholdValue();
+	}
+
+	public void setRadius(int value ) {
 		spinnerRadius.removeChangeListener(this);
 		spinnerRadius.setValue(value);
+		this.radius = value;
 		spinnerRadius.addChangeListener(this);
 	}
 

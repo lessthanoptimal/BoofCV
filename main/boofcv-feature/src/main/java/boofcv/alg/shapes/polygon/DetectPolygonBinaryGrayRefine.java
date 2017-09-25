@@ -59,6 +59,9 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	// threshold for pruning after refinement
 	double minimumRefineEdgeIntensity;
 
+	// timing for profiler
+	double milliAdjustBias = 0;
+
 	/**
 	 * Configures the polygon detector
 	 *
@@ -126,7 +129,10 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		edgeIntensity.setTransform(null);
 	}
 
-//	double milliAdjustBias = 0;
+	public void resetRuntimeProfiling() {
+		detector.resetRuntimeProfiling();
+		milliAdjustBias = 0;
+	}
 
 	/**
 	 * Detects polygons inside the grayscale image and its thresholded version
@@ -139,7 +145,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 			refineGray.setImage(gray);
 		edgeIntensity.setImage(gray);
 
-//		long time0 = System.nanoTime();
+		long time0 = System.nanoTime();
 		List<DetectPolygonFromContour.Info> detections = detector.getFound().toList();
 
 		if( adjustForBias != null ) {
@@ -147,16 +153,17 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 				adjustForBias.process(detections.get(i).polygon, detector.isOutputClockwise());
 			}
 		}
-//		long time1 = System.nanoTime();
+		long time1 = System.nanoTime();
 
-//		double milli = (time1-time0)*1e-6;
+		double milli = (time1-time0)*1e-6;
 
-//		if( milliAdjustBias == 0 ) {
-//			milliAdjustBias = milli;
-//		} else {
-//			milliAdjustBias = 0.95*milliAdjustBias + 0.5*milli;
-//		}
-//		System.out.printf(" adjust_bias %7.2f\n",milliAdjustBias);
+		if( milliAdjustBias == 0 ) {
+			milliAdjustBias = milli;
+		} else {
+			milliAdjustBias = 0.95*milliAdjustBias + 0.5*milli;
+		}
+//		System.out.printf(" contour %7.2f shapes %7.2f adjust_bias %7.2f\n",
+//				detector.getMilliShapes(),detector.getMilliShapes(),milliAdjustBias);
 	}
 
 	/**
@@ -278,6 +285,10 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 
 	public void setFunctionAdjust(AdjustBeforeRefineEdge functionAdjust) {
 		this.functionAdjust = functionAdjust;
+	}
+
+	public double getMilliAdjustBias() {
+		return milliAdjustBias;
 	}
 
 	public interface AdjustBeforeRefineEdge {
