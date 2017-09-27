@@ -26,8 +26,13 @@ import org.junit.Test;
  * @author Peter Abeles
  */
 public class TestQrCodeGeneratorImage {
+	boolean showImage = false; // use a boolean to make it easier to turn on and off. Don't need to import
+
 	@Test
-	public void stuff() {
+	public void showImage() {
+		if(!showImage)
+			return;
+
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(2,4);
 
 		generator.generate("message");
