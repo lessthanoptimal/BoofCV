@@ -33,7 +33,7 @@ public class TestQrCodeGeneratorImage {
 		if(!showImage)
 			return;
 
-		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(2,4);
+		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4,4);
 
 		generator.generate("message");
 

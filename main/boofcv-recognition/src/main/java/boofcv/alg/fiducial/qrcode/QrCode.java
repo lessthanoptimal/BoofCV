@@ -40,7 +40,7 @@ public class QrCode {
 	public double threshRight,threshCorner,threshDown;
 
 	/** which version of QR code was found. 1 to 40*/
-	public int version;
+	public int version=1;
 
 	/** Level of error correction */
 	ErrorCorrectionLevel errorCorrection = ErrorCorrectionLevel.L;

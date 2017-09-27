@@ -26,6 +26,33 @@ import static org.junit.Assert.*;
  * @author Peter Abeles
  */
 public class TestQrCodePolynomialMath {
+
+	/**
+	 * Compare to QR code reference
+	 */
+	@Test
+	public void encodeVersionBits() {
+		int found = QrCodePolynomialMath.encodeVersionBits(7);
+		int expected = 0b000111110010010100;
+
+		assertEquals(expected,found);
+	}
+
+	@Test
+	public void checkVersionBits() {
+		for (int version = 7; version <= 40; version++) {
+			int found = QrCodePolynomialMath.encodeVersionBits(version);
+			assertTrue( QrCodePolynomialMath.checkVersionBits(found));
+
+			// introduce a single bit flip
+			for ( int i = 0; i < 18; i++ ) {
+				int mod = found ^ (1<<i);
+				assertFalse(QrCodePolynomialMath.checkVersionBits(mod));
+			}
+		}
+	}
+
+
 	/**
 	 * Compare to QR code reference
 	 */
@@ -74,7 +101,7 @@ public class TestQrCodePolynomialMath {
 		int errorBits = 10;
 		int dataBits = 5;
 		int generator = QrCodePolynomialMath.FORMAT_GENERATOR;
-		int message = (data<<errorBits)^QrCodePolynomialMath.bitPolyDivide(data<<errorBits,generator,
+		int message = (data<<errorBits)^QrCodePolynomialMath.bitPolyModulus(data<<errorBits,generator,
 				errorBits+dataBits,dataBits);
 
 		for (int i = 0; i < data; i++) {
@@ -104,7 +131,7 @@ public class TestQrCodePolynomialMath {
 		int message = 0b00101 << 10;
 		int divisor = 0b10100110111;
 
-		int found = QrCodePolynomialMath.bitPolyDivide(message,divisor,15,5);
+		int found = QrCodePolynomialMath.bitPolyModulus(message,divisor,15,5);
 		int expected = 0b0011011100;
 
 		assertEquals(expected,found);

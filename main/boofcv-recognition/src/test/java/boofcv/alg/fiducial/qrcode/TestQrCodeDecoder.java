@@ -23,10 +23,10 @@ import boofcv.struct.image.GrayU8;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -37,7 +37,7 @@ public class TestQrCodeDecoder {
 	 * Runs through the entire algorithm using a rendered image
 	 */
 	@Test
-	public void full_simple() {
+	public void full_simple_ver2() {
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(2,4);
 		generator.generate("test message");
 
@@ -60,17 +60,31 @@ public class TestQrCodeDecoder {
 		assertEquals(1,decoder.found.size);
 		QrCode found = decoder.getFound().get(0);
 
-		// TODO Check position patterns
+		// sanity check the position patterns
+		for (int i = 0; i < 4; i++) {
+			assertEquals(7*4,found.ppCorner.getSideLength(i),0.01);
+			assertEquals(7*4,found.ppRight.getSideLength(i),0.01);
+			assertEquals(7*4,found.ppDown.getSideLength(i),0.01);
+		}
+		assertTrue(found.ppCorner.get(0).distance(0,0) < 1e-4);
+		assertTrue(found.ppRight.get(0).distance((24-6)*4,0) < 1e-4);
+		assertTrue(found.ppDown.get(0).distance(0,(24-6)*4) < 1e-4);
 
 		// Check format info
 		assertEquals(generator.qr.errorCorrection,found.errorCorrection);
 		assertEquals(generator.qr.maskPattern,found.maskPattern);
 
-		// TODO check version
-//		assertEquals(2,found.version);
+		// check version info
+		assertEquals(2,found.version);
 	}
 
+	@Ignore
 	@Test
+	public void full_simple_ver7() {
+		fail("Implement");
+	}
+
+		@Test
 	public void setPositionPatterns() {
 		Polygon2D_F64 corner = new Polygon2D_F64(0,0, 2,0, 2,2, 0,2);
 		Polygon2D_F64 right = new Polygon2D_F64(5,0, 7,0, 7,2, 5,2);

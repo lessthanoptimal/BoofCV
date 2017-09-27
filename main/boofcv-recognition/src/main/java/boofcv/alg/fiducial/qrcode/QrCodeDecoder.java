@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.qrcode;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Intersection2D_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -35,6 +36,9 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 
 	SquareBitReader squareDecoder;
 	PackedBits bits = new PackedBits();
+
+	// internal workspace
+	Point2D_F64 grid = new Point2D_F64();
 
 	public QrCodeDecoder( Class<T> imageType ) {
 		squareDecoder = new SquareBitReader(imageType);
@@ -152,6 +156,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 * Reads the format bits near the corner position pattern
 	 */
 	private boolean readFormatRegion0(QrCode qr) {
+		// set the coordinate system to the closest pp to reduce position errors
 		if( !squareDecoder.setSquare(qr.ppCorner,(float)qr.threshCorner) )
 			return false;
 
@@ -176,10 +181,11 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 * Read the format bits on the right and bottom patterns
 	 */
 	private boolean readFormatRegion1(QrCode qr) {
-		bits.resize(15);
+		// set the coordinate system to the closest pp to reduce position errors
 		if( !squareDecoder.setSquare(qr.ppRight,(float)qr.threshRight) )
 			return false;
 
+		bits.resize(15);
 		for (int i = 0; i < 8; i++) {
 			read(i,8,6-i);
 		}
@@ -205,6 +211,108 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	}
 
 	private boolean extractVersionInfo(QrCode qr) {
+		int version = estimateVersionBySize(qr);
+
+		// Fpr version 7 and beyond use the version which has been encoded into the qr code
+		if( version >= 7 ) {
+			readFormatRegion0(qr);
+			int version0 = decodeVersion();
+			readFormatRegion1(qr);
+			int version1 = decodeVersion();
+
+			if (version0 < 1 && version1 < 1) { // both decodings failed
+				version = -1;
+			} else if (version0 < 1) { // one failed so use the good one
+				version = version1;
+			} else if (version1 < 1) {
+				version = version0;
+			} else if( version0 != version1 ){
+				version = -1;
+			} else {
+				version = version0;
+			}
+		}
+		qr.version = version;
+		return version != -1;
+	}
+
+	private int decodeVersion() {
+		int bits = this.bits.data[0];
+		int message;
+		if (QrCodePolynomialMath.checkVersionBits(bits)) {
+			message = bits >> 12;
+		} else {
+			message = QrCodePolynomialMath.correctVersionBits(bits);
+		}
+		return message;
+	}
+
+	/**
+	 * Attempts to estimate the qr-code's version based on distance between position patterns.
+	 * If it can't estimate it based on distance return -1
+	 */
+	private int estimateVersionBySize( QrCode qr ) {
+		// Just need the homography for this corner square square
+		if( !squareDecoder.setSquare(qr.ppCorner,0) )
+			return -1;
+
+		// Compute location of position patterns relative to corner PP
+		squareDecoder.imageToGrid(qr.ppRight.get(0),grid);
+
+		// see if pp is miss aligned. Probably not a flat surface
+		// or they don't belong to the same qr code
+		if( Math.abs(grid.y) >= 1 )
+			return -1;
+
+		double versionX = ((grid.x+7)-17)/4;
+
+		squareDecoder.imageToGrid(qr.ppDown.get(0),grid);
+
+		if( Math.abs(grid.x) >= 1 )
+			return -1;
+
+		double versionY = ((grid.y+7)-17)/4;
+
+		// see if they are in agreement
+		if( Math.abs(versionX-versionY) > 1.5 )
+			return -1;
+
+		return (int)((versionX+versionY)/2.0 + 0.5);
+	}
+
+	/**
+	 * Reads the version bits near the right position pattern
+	 */
+	private boolean readVersionRegion0(QrCode qr) {
+		// set the coordinate system to the closest pp to reduce position errors
+		if (!squareDecoder.setSquare(qr.ppRight, (float) qr.threshRight))
+			return false;
+
+		bits.resize(18);
+		for (int i = 0; i < 18; i++) {
+			int row = i/3;
+			int col = i%3;
+			read(i,row,col-4);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Reads the version bits near the bottom position pattern
+	 */
+	private boolean readVersionRegion1(QrCode qr) {
+		// set the coordinate system to the closest pp to reduce position errors
+		if (!squareDecoder.setSquare(qr.ppDown, (float) qr.threshRight))
+			return false;
+
+		bits.resize(18);
+		for (int i = 0; i < 18; i++) {
+			int row = i/3;
+			int col = i%3;
+			read(i,row-4,col);
+		}
+
 		return true;
 	}
 

@@ -25,10 +25,40 @@ import boofcv.alg.descriptor.DescriptorDistance;
  *
  * @author Peter Abeles
  */
+// TODO replaced correctDCH() with a non-brute force method.
 public class QrCodePolynomialMath {
 
 	public static final int FORMAT_GENERATOR = 0b10100110111;
 	public static final int FORMAT_MASK = 0b101010000010010;
+	public static final int VERSION_GENERATOR = 0b1111100100101;
+
+	/**
+	 * Encodes the version bits. BCH(18,6)
+	 * @param version QR code version. 7 to 40
+	 * @return encoded bit field
+	 */
+	public static int encodeVersionBits(int version) {
+		int message = version << 12;
+		return message ^ bitPolyModulus(message, VERSION_GENERATOR,18,6);
+	}
+
+	/**
+	 * Encodes the version bits. BCH(18,6)
+	 * @param bits Read in bits. Should encode 18-bits
+	 * @return encoded bit field
+	 */
+	public static boolean checkVersionBits(int bits) {
+		return bitPolyModulus(bits, VERSION_GENERATOR,18,6) == 0;
+	}
+
+	/**
+	 * Attempts to correct version bit sequence.
+	 * @param bits Read in bits after removing the mask
+	 * @return If the message could be corrected, th 5-bit format message. -1 if it couldn't
+	 */
+	public static int correctVersionBits(int bits ) {
+		return correctDCH(64,bits,VERSION_GENERATOR,18,6);
+	}
 
 	/**
 	 * Encodes the format bits. BCH(15,5)
@@ -39,14 +69,14 @@ public class QrCodePolynomialMath {
 	public static int encodeFormatBits(QrCode.ErrorCorrectionLevel level , int mask ) {
 		int message = (level.value << 3) | (mask & 0xFFFFFFF7);
 		message = message << 10;
-		return message ^ bitPolyDivide(message, FORMAT_GENERATOR,15,5);
+		return message ^ bitPolyModulus(message, FORMAT_GENERATOR,15,5);
 	}
 
 	/**
 	 * Check the format bits. BCH(15,5) code.
 	 */
 	public static boolean checkFormatBits(int bitsNoMask ) {
-		return bitPolyDivide(bitsNoMask, FORMAT_GENERATOR,15,5) == 0;
+		return bitPolyModulus(bitsNoMask, FORMAT_GENERATOR,15,5) == 0;
 	}
 
 	/**
@@ -90,7 +120,7 @@ public class QrCodePolynomialMath {
 		// exhaustively check all possibilities
 		for (int i = 0; i < N; i++) {
 			int test = i << errorBits;
-			test = test ^ bitPolyDivide(test,generator,totalBits,dataBits);
+			test = test ^ bitPolyModulus(test,generator,totalBits,dataBits);
 
 			int distance = DescriptorDistance.hamming(test^messageNoMask);
 
@@ -114,7 +144,7 @@ public class QrCodePolynomialMath {
 	 * @param dataBits Number of data bits. Rest are error correction bits
 	 * @return Remainder after polynomial division
 	 */
-	public static int bitPolyDivide(int data , int generator , int totalBits, int dataBits) {
+	public static int bitPolyModulus(int data , int generator , int totalBits, int dataBits) {
 		int errorBits = totalBits-dataBits;
 		for (int i = dataBits-1; i >= 0; i--) {
 			if( (data & (1 << (i+errorBits))) != 0 ) {

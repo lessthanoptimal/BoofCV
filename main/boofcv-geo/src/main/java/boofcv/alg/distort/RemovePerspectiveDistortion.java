@@ -144,6 +144,10 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 		return true;
 	}
 
+	public DMatrixRMaj getH() {
+		return H;
+	}
+
 	public PointTransformHomography_F32 getTransform() {
 		return transform;
 	}

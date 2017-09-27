@@ -62,11 +62,14 @@ public abstract class QrCodeGenerator {
 
 		formatInformation();
 
+		if( qr.version >= 7 )
+			versionInformation();
+
 		if( version == 1 ) {
 		} else if( version <= 6 ) {
 			// TODO create table that can be specified for all version and create generic code
-			int x = numModules-6;
-			int y = 10+4*version;
+			int x = numModules-7;
+			int y = numModules-7;
 			alignmentPattern(x,y);
 		} else {
 			throw new RuntimeException("Add support");
@@ -119,6 +122,25 @@ public abstract class QrCodeGenerator {
 				square(numModules-(15-i),8);
 			}
 			square(numModules-8,8);
+		}
+	}
+
+	private void versionInformation() {
+		PackedBits bits = new PackedBits(18);
+		bits.data[0] = QrCodePolynomialMath.encodeVersionBits(qr.version);
+
+		for (int i = 0; i < 18; i++) {
+			if( bits.get(i)==1) {
+				continue;
+			}
+
+			int row = i/3;
+			int col = i%3;
+
+			// top right
+			square(row,numModules-11+col);
+			// bottom left
+			square(numModules-11+col,+row);
 		}
 	}
 
