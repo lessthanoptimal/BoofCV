@@ -42,6 +42,13 @@ public class QrCode {
 	/** which version of QR code was found. 1 to 40*/
 	public int version;
 
+	/** Level of error correction */
+	ErrorCorrectionLevel errorCorrection = ErrorCorrectionLevel.L;
+	/**
+	 * 3 byte value indicating the mask pattern used in the QR code
+	 */
+	int maskPattern = 0b101;
+
 	/**
 	 * Approximate bounding box for QR-Code. The bottom right corner is estimated by intersecting lines
 	 * and should not be used in SFM applications.
@@ -51,6 +58,29 @@ public class QrCode {
 	public Polygon2D_F64 bounds = new Polygon2D_F64(4);
 
 	public enum ErrorCorrectionLevel {
-		L,M,Q,H
+		L(0b01),
+		M(0b00),
+		Q(0b11),
+		H(0b10);
+
+		ErrorCorrectionLevel(int value) {
+			this.value = value;
+		}
+
+		public int getValue() {
+			return value;
+		}
+
+		public static ErrorCorrectionLevel lookup( int value ) {
+			switch( value ) {
+				case 0b01:return L;
+				case 0b00:return M;
+				case 0b11:return Q;
+				case 0b10:return H;
+			}
+			throw new IllegalArgumentException("Unknown");
+		}
+
+		int value;
 	}
 }
