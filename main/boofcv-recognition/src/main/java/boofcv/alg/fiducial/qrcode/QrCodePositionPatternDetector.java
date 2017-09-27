@@ -205,6 +205,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 			graph.computeNodeInfo(pp);
 		}
+		System.out.println("total PP "+positionPatterns.size);
 	}
 
 	/**
@@ -300,12 +301,22 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		graph.checkConnect(node0,intersection0,node1,intersection1,lineA.getLength2());
 	}
 
+	float lineX[] = new float[7];
+	float lineY[] = new float[7];
+	Point2D_F32 imagePixel = new Point2D_F32();
 	/**
 	 * Determines if the found polygon looks like a position pattern. A horizontal and vertical line are sampled.
 	 * At each sample point it is marked if it is above or below the binary threshold for this square. Location
 	 * of sample points is found by "removing" perspective distortion.
 	 */
 	boolean checkPositionPatternAppearance( Polygon2D_F64 square , float grayThreshold ) {
+
+		// TODO Improve accuracy for small shapes
+		// lines can be inaccurate. That appears to cause a significant number of false negatives
+		// maybe sample outside of the line and see if it's black. If it is add an offset.
+		// seems to rarely extend outside beyound the true square.
+		// Also increasing number of samples and having a soft threshold seems to help
+		// need to test against a more exhaustive set of images before doing these optimizations
 
 		// create a mapping assuming perspective distortion
 		// NOTE: Order doesn't matter here as long as the square is CW or CCW
@@ -316,9 +327,6 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		PointTransformHomography_F32 p2i = removePerspective.getTransform();
 
 		// Sample horizontal nad vertical scan lines which are approximately in the middle of the shape.
-		Point2D_F32 imagePixel = new Point2D_F32();
-		float lineX[] = new float[7]; // TODO move outside
-		float lineY[] = new float[7];
 		for (int i = 0; i < 7; i++) {
 			float location = 10*i+5;
 			p2i.compute(location,35,imagePixel);
