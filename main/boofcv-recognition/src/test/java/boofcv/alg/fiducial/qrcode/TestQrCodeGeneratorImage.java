@@ -18,6 +18,8 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.gui.image.ShowImages;
+import boofcv.misc.BoofMiscOps;
 import org.junit.Test;
 
 /**
@@ -26,11 +28,11 @@ import org.junit.Test;
 public class TestQrCodeGeneratorImage {
 	@Test
 	public void stuff() {
-//		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(2,4);
-//
-//		generator.generate("message");
-//
-//		ShowImages.showWindow(generator.gray,"QR Code");
-//		BoofMiscOps.sleep(10000);
+		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(2,4);
+
+		generator.generate("message");
+
+		ShowImages.showWindow(generator.gray,"QR Code");
+		BoofMiscOps.sleep(10000);
 	}
 }

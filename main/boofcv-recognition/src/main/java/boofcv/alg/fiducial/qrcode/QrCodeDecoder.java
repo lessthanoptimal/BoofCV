@@ -121,12 +121,31 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		return true;
 	}
 
+	/**
+	 * Reads format info bits from the image and saves the results in qr
+	 * @return true if successful or false if it failed
+	 */
 	private boolean extractFormatInfo(QrCode qr) {
-
-		readFormatRegion0(qr);
-		//
-
-		return true;
+		for (int i = 0; i < 2; i++) {
+			// probably a better way to do this would be to go with the region that has the smallest
+			// hamming distance
+			if (i == 0)
+				readFormatRegion0(qr);
+			else
+				readFormatRegion1(qr);
+			int bits = this.bits.data[0] ^ QrCodePolynomialMath.FORMAT_MASK;
+			int message;
+			if (QrCodePolynomialMath.checkFormatBits(bits)) {
+				message = bits >> 10;
+			} else {
+				message = QrCodePolynomialMath.correctFormatBits(bits);
+			}
+			if (message >= 0) {
+				QrCodePolynomialMath.decodeFormatMessage(message, qr);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -137,6 +156,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			return false;
 
 		bits.resize(15);
+		bits.zero();
 		for (int i = 0; i < 6; i++) {
 			read(i,i,8);
 		}

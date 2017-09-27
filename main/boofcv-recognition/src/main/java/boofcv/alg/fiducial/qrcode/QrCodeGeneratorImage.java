@@ -20,6 +20,8 @@ package boofcv.alg.fiducial.qrcode;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayU8;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 
 /**
  * @author Peter Abeles
@@ -38,6 +40,22 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 	@Override
 	public void init() {
 		ImageMiscOps.fill(gray,255);
+	}
+
+	@Override
+	public void generate(String message) {
+		super.generate(message);
+		adjustSize(qr.ppRight);
+		adjustSize(qr.ppCorner);
+		adjustSize(qr.ppDown);
+	}
+
+	private void adjustSize(Polygon2D_F64 poly) {
+		for (int i = 0; i < poly.size(); i++) {
+			Point2D_F64 p = poly.get(i);
+			p.x *= gray.width;
+			p.y *= gray.width;
+		}
 	}
 
 	@Override

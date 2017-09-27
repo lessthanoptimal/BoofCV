@@ -44,6 +44,9 @@ public class SquareBitReader<T extends ImageGray<T>> {
 
 	Point2D_F32 pixel = new Point2D_F32();
 
+	// offset to read in the middle of a block. Less error unless the qr code is VERY small
+	float sampleMiddle;
+
 	// Computes a mapping to remove perspective distortion
 	private RemovePerspectiveDistortion<?> removePerspective = new RemovePerspectiveDistortion(7,7);
 
@@ -69,6 +72,13 @@ public class SquareBitReader<T extends ImageGray<T>> {
 		if( !removePerspective.createTransform(square.get(0),square.get(1),square.get(2),square.get(3)) )
 			return false;
 
+		// if it's super small don't read in the middle. otherwise read in the middle
+		if( square.areaSimple() < 1.5*49 ) {
+			sampleMiddle = 0;
+		} else {
+			sampleMiddle = 0.5f;
+		}
+
 		this.threshold = threshold;
 		return true;
 	}
@@ -83,9 +93,9 @@ public class SquareBitReader<T extends ImageGray<T>> {
 		// with Perspective removed to Image coordinates.
 		PointTransformHomography_F32 p2i = removePerspective.getTransform();
 
-		p2i.compute(col,row,pixel);
+		p2i.compute(col+ sampleMiddle,row+ sampleMiddle,pixel);
 
-		if( pixel.x < 0 || pixel.y < 0 || pixel.x > width || pixel.y > height )
+		if( pixel.x < -0.5 || pixel.y < -0.5 || pixel.x > width || pixel.y > height )
 			return -1;
 
 		if( interpolate.get(pixel.x,pixel.y) > threshold )

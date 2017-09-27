@@ -18,6 +18,8 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.alg.descriptor.DescriptorDistance;
+
 /**
  * Contains all the formulas for encoding and decoding BCH and Reid-Solomon codes.
  *
@@ -31,33 +33,77 @@ public class QrCodePolynomialMath {
 	/**
 	 * Encodes the format bits. BCH(15,5)
 	 * @param level Error correction level
+	 * @param mask The type of mask that is applied to the qr code
 	 * @return encoded bit field
 	 */
-	public static int encodeFormatMessage(QrCode.ErrorCorrectionLevel level , int mask ) {
+	public static int encodeFormatBits(QrCode.ErrorCorrectionLevel level , int mask ) {
 		int message = (level.value << 3) | (mask & 0xFFFFFFF7);
 		message = message << 10;
-		int tmp = message ^ bitPolyDivide(message, FORMAT_GENERATOR,15,5);
-		return tmp ^ FORMAT_MASK;
+		return message ^ bitPolyDivide(message, FORMAT_GENERATOR,15,5);
 	}
 
 	/**
 	 * Check the format bits. BCH(15,5) code.
 	 */
-	public static boolean checkFormatMessage(int value ) {
-		return bitPolyDivide(value^FORMAT_MASK, FORMAT_GENERATOR,15,5) == 0;
+	public static boolean checkFormatBits(int bitsNoMask ) {
+		return bitPolyDivide(bitsNoMask, FORMAT_GENERATOR,15,5) == 0;
 	}
 
 	/**
 	 * Assumes that the format message has no errors in it and decodes its data and saves it into the qr code
 	 *
-	 * @param message format data bits after the mask has been applied
+	 * @param message format data bits after the mask has been remove and shifted over 10 bits
 	 * @param qr Where the results are written to
 	 */
-	public static void decodeFormat( int message , QrCode qr ) {
-		int error = message >> 13;
+	public static void decodeFormatMessage(int message , QrCode qr ) {
+		int error = message >> 3;
 
 		qr.errorCorrection = QrCode.ErrorCorrectionLevel.lookup(error);
-		qr.maskPattern = (message >> 10)&0x07;
+		qr.maskPattern = message&0x07;
+	}
+
+	/**
+	 * Attempts to correct format bit sequence.
+	 * @param bitsNoMask Read in bits after removing the mask
+	 * @return If the message could be corrected, th 5-bit format message. -1 if it couldn't
+	 */
+	public static int correctFormatBits(int bitsNoMask ) {
+		return correctDCH(32,bitsNoMask,FORMAT_GENERATOR,15,5);
+	}
+
+	/**
+	 * Applies a brute force algorithm to find the message which has the smallest hamming distance. if two
+	 * messages have the same distance -1 is returned.
+	 * @param N Number of possible messages. 32 or 64
+	 * @param messageNoMask The observed message with mask removed
+	 * @param generator Generator polynomial
+	 * @param totalBits Total number of bits in the message.
+	 * @param dataBits Total number of data bits in the message
+	 * @return The error corrected message or -1 if it can't be determined.
+	 */
+	public static int correctDCH( int N , int messageNoMask , int generator , int totalBits, int dataBits) {
+		int bestHamming = 255;
+		int bestMessage = -1;
+
+		int errorBits = totalBits-dataBits;
+
+		// exhaustively check all possibilities
+		for (int i = 0; i < N; i++) {
+			int test = i << errorBits;
+			test = test ^ bitPolyDivide(test,generator,totalBits,dataBits);
+
+			int distance = DescriptorDistance.hamming(test^messageNoMask);
+
+			// see if it found a better match
+			if( distance < bestHamming ) {
+				bestHamming = distance;
+				bestMessage = i;
+			} else if( distance == bestHamming ) {
+				// ambiguous so reject
+				bestMessage = -1;
+			}
+		}
+		return bestMessage;
 	}
 
 	/**

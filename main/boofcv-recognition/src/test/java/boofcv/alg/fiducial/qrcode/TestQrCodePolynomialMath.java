@@ -26,26 +26,30 @@ import static org.junit.Assert.*;
  * @author Peter Abeles
  */
 public class TestQrCodePolynomialMath {
+	/**
+	 * Compare to QR code reference
+	 */
 	@Test
-	public void encodeFormatMessage() {
+	public void encodeFormatBits() {
 
-		int found = QrCodePolynomialMath.encodeFormatMessage(QrCode.ErrorCorrectionLevel.M,0b101);
+		int found = QrCodePolynomialMath.encodeFormatBits(QrCode.ErrorCorrectionLevel.M,0b101);
+		found ^= QrCodePolynomialMath.FORMAT_MASK;
 		int expected = 0b100000011001110;
 
 		assertEquals(expected,found);
 	}
 
 	@Test
-	public void checkFormatmessage() {
+	public void checkFormatBits() {
 		for( QrCode.ErrorCorrectionLevel error : QrCode.ErrorCorrectionLevel.values()) {
-			int found = QrCodePolynomialMath.encodeFormatMessage(error,0b101);
+			int found = QrCodePolynomialMath.encodeFormatBits(error,0b101);
 
-			assertTrue( QrCodePolynomialMath.checkFormatMessage(found));
+			assertTrue( QrCodePolynomialMath.checkFormatBits(found));
 
 			// introduce a single bit flip
 			for ( int i = 0; i < 15; i++ ) {
 				int mod = found ^ (1<<i);
-				assertFalse(QrCodePolynomialMath.checkFormatMessage(mod));
+				assertFalse(QrCodePolynomialMath.checkFormatBits(mod));
 			}
 		}
 	}
@@ -54,12 +58,41 @@ public class TestQrCodePolynomialMath {
 	public void decodeFormatMessage() {
 		QrCode qr = new QrCode();
 		for( QrCode.ErrorCorrectionLevel error : QrCode.ErrorCorrectionLevel.values()) {
-			int message = QrCodePolynomialMath.encodeFormatMessage(error,0b101);
+			int message = QrCodePolynomialMath.encodeFormatBits(error,0b101);
+			message >>= 10;
 
-			QrCodePolynomialMath.decodeFormat(message^QrCodePolynomialMath.FORMAT_MASK,qr);
+			QrCodePolynomialMath.decodeFormatMessage(message,qr);
 
 			assertEquals(error,qr.errorCorrection);
 			assertEquals(0b101,qr.maskPattern);
+		}
+	}
+
+	@Test
+	public void correctDCH() {
+		int data = 0b10101;
+		int errorBits = 10;
+		int dataBits = 5;
+		int generator = QrCodePolynomialMath.FORMAT_GENERATOR;
+		int message = (data<<errorBits)^QrCodePolynomialMath.bitPolyDivide(data<<errorBits,generator,
+				errorBits+dataBits,dataBits);
+
+		for (int i = 0; i < data; i++) {
+			// single bit errors
+			int corrupted = message ^ (1<<i);
+			int corrected = QrCodePolynomialMath.correctDCH(
+					32,corrupted,generator,errorBits+dataBits,dataBits);
+
+			assertEquals(data,corrected);
+
+			// two bit errors
+			for (int j = 0; j < 32; j++) {
+				int corrupted2 = corrupted ^ (1<<j);
+				corrected = QrCodePolynomialMath.correctDCH(
+						32,corrupted2,generator,errorBits+dataBits,dataBits);
+
+				assertEquals(data,corrected);
+			}
 		}
 	}
 

@@ -52,12 +52,20 @@ public class TestQrCodeDecoder {
 
 		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
 
+//		ShowImages.showWindow(generator.gray,"QR Code");
+//		BoofMiscOps.sleep(10000);
+
 		decoder.process(pps,generator.gray);
 
 		assertEquals(1,decoder.found.size);
 		QrCode found = decoder.getFound().get(0);
 
 		// TODO Check position patterns
+
+		// Check format info
+		assertEquals(generator.qr.errorCorrection,found.errorCorrection);
+		assertEquals(generator.qr.maskPattern,found.maskPattern);
+
 		// TODO check version
 //		assertEquals(2,found.version);
 	}

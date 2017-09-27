@@ -60,6 +60,8 @@ public abstract class QrCodeGenerator {
 		timingPattern(7*moduleWidth,6*moduleWidth,moduleWidth,0);
 		timingPattern(6*moduleWidth,7*moduleWidth,0,moduleWidth);
 
+		formatInformation();
+
 		if( version == 1 ) {
 		} else if( version <= 6 ) {
 			// TODO create table that can be specified for all version and create generic code
@@ -92,6 +94,34 @@ public abstract class QrCodeGenerator {
 		}
 	}
 
+	private void formatInformation() {
+		PackedBits bits = new PackedBits(15);
+		bits.data[0] = QrCodePolynomialMath.encodeFormatBits(qr.errorCorrection,qr.maskPattern);
+		bits.data[0] ^= QrCodePolynomialMath.FORMAT_MASK;
+
+		for (int i = 0; i < 15; i++) {
+			if( bits.get(i)==1) {
+				continue;
+			}
+			if( i < 6 ) {
+				square(i,8);
+			} else if( i < 8) {
+				square(i+1,8);
+			} else if( i == 8 ) {
+				square( 8,7);
+			} else {
+				square( 8,14-i);
+			}
+
+			if( i < 8 ) {
+				square(8,numModules-i-1);
+			} else {
+				square(numModules-(15-i),8);
+			}
+			square(numModules-8,8);
+		}
+	}
+
 	private void alignmentPattern(int gridX , int gridY ) {
 
 		double x = (gridX-2)*moduleWidth;
@@ -99,6 +129,10 @@ public abstract class QrCodeGenerator {
 
 		square(x,y,moduleWidth*5, moduleWidth);
 		square(x + moduleWidth*2,y + moduleWidth*2, moduleWidth);
+	}
+
+	private void square( int row , int col ) {
+		square(col*moduleWidth,row*moduleWidth,moduleWidth);
 	}
 
 	public abstract void init();
