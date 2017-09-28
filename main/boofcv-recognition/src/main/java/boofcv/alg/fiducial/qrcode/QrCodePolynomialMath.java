@@ -21,7 +21,13 @@ package boofcv.alg.fiducial.qrcode;
 import boofcv.alg.descriptor.DescriptorDistance;
 
 /**
- * Contains all the formulas for encoding and decoding BCH and Reid-Solomon codes.
+ * Contains all the formulas for encoding and decoding BCH and Reid-Solomon codes. For a more accessible
+ * introduction to this material see [1] and [2].
+ *
+ * <pre>
+ * [1] S. A. Tretter "Introduction to Bose Chaudhuri Hocquenghem codes" Goddard Space Flight Center, September 1967
+ * [2] https://en.wikiversity.org/wiki/Reed–Solomon_codes_for_coders
+ * </pre>
  *
  * @author Peter Abeles
  */
