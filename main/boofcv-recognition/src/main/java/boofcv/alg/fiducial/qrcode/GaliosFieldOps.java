@@ -70,10 +70,10 @@ public class GaliosFieldOps {
 	 * @param x polynomial
 	 * @param y polynomial
 	 * @param primitive Primitive polynomial which is irreducible.
-	 * @param max_poly Value of a the largest possible polynomial. All coefficients set to 1. GF(2**8) should be 256
+	 * @param domain Value of a the largest possible value plus 1. E.g. GF(2**8) would be 256
 	 * @return result polynomial
 	 */
-	public static int multiply( int x , int y , int primitive , int max_poly ) {
+	public static int multiply( int x , int y , int primitive , int domain ) {
 		int r = 0;
 		while( y > 0 ) {
 			if( (y&1) != 0 ) {
@@ -82,7 +82,7 @@ public class GaliosFieldOps {
 			y = y >> 1;
 			x = x << 1;
 
-			if( x >= max_poly) {
+			if( x >= domain) {
 				x ^= primitive;
 			}
 		}
