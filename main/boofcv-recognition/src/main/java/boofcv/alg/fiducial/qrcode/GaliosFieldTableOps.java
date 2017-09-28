@@ -24,52 +24,83 @@ package boofcv.alg.fiducial.qrcode;
  * @author Peter Abeles
  */
 public class GaliosFieldTableOps {
-	int max_value; // maximum value in the field plus 1
-	int degree;
+	int max_value; // maximum possible
+	int num_values; // number of values in the field
+	int numBits;
 	int primitive;
 
-	int table_exp[];
-	int table_log[];
+	int exp[];
+	int log[];
 
 	/**
 	 * Specifies the GF polynomial
 	 *
-	 * @param degree maximum degree of the polynomial
+	 * @param numBits Number of bits needed to describe the polynomial. GF(2**8) = 8 bits
 	 * @param primitive The primitive polynomial
 	 */
-	public GaliosFieldTableOps( int degree , int primitive) {
-		if( degree < 1 || degree > 16 )
+	public GaliosFieldTableOps( int numBits , int primitive) {
+		if( numBits < 1 || numBits > 16 )
 			throw new IllegalArgumentException("Degree must be more than 1 and less than or equal to 16");
 
-		this.degree = degree;
+		this.numBits = numBits;
 		this.primitive = primitive;
-		max_value = 1;
-		for (int i = 0; i < degree; i++) {
-			max_value *= 2;
+		max_value = 0;
+		for (int i = 0; i < numBits; i++) {
+			max_value |= 1<<i;
 		}
+		num_values = max_value+1;
 
-		table_log = new int[ max_value ];
-		table_exp = new int[ max_value*2 ]; // make it twice as long to avoid a modulus operation
+		log = new int[ num_values ];
+		exp = new int[ num_values*2 ]; // make it twice as long to avoid a modulus operation
 
 		// exhaustively compute all values
 		int x = 1;
 		for (int i = 0; i < max_value; i++) {
-			table_exp[i] = x;
-			table_log[x] = i;
-			x = GaliosFieldOps.multiply(x,2,primitive,max_value);
+			exp[i] = x;
+			log[x] = i;
+			x = GaliosFieldOps.multiply(x,2,primitive,num_values);
 		}
 
-		for (int i = 0; i < max_value; i++) {
-			table_exp[i+max_value] = table_exp[i];
+		for (int i = 0; i < num_values; i++) {
+			exp[i+max_value] = exp[i];
 		}
 	}
 
-	public int power( int x , int power ) {
-		return 0;
+	/**
+	 * Computes the following (x*y) mod primitive. This is done by
+	 */
+	public int multiply(int x , int y ) {
+		if( x==0 || y == 0)
+			return 0;
+		return exp[ log[x] + log[y]];
 	}
 
-	public int inverse( int x ) {
-		return 0;
+
+	/**
+	 * Computes the following the value of output such that:<br>
+	 * <p>divide(multiply(x,y),y)==x for any x and any nonzero y.</p>
+	 */
+	public int divide(int x , int y ) {
+		if( y == 0 )
+			throw new ArithmeticException("Divide by zero");
+		if( x == 0 )
+			return 0;
+
+		return exp[ log[x] + max_value - log[y] ];
+	}
+
+	/**
+	 * Computes the following x**power mod primitive
+	 */
+	public int power(int x , int power ) {
+		return exp[(log[x] * power)%max_value];
+	}
+
+	/**
+	 * Computes the following 2**(max-x) mod primitive
+	 */
+	public int inverse(int x ) {
+		return exp[max_value - log[x]];
 	}
 
 	public int polyScale( int p , int x ) {

@@ -205,7 +205,6 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 			graph.computeNodeInfo(pp);
 		}
-		System.out.println("total PP "+positionPatterns.size);
 	}
 
 	/**
