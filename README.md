@@ -59,7 +59,7 @@ For Maven projects:
 ```
 <dependency>
   <groupId>org.boofcv</groupId>
-  <artifactId>core</artifactId>
+  <artifactId>boofcv-core</artifactId>
   <version>0.27</version>
 </dependency>
 ```
