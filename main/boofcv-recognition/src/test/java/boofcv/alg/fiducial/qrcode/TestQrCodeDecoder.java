@@ -38,8 +38,9 @@ public class TestQrCodeDecoder {
 	 */
 	@Test
 	public void full_simple_ver2() {
-		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(2,4);
-		generator.generate("test message");
+		QrCode truthQr = new QrCode();
+		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+		generator.generate(truthQr);
 
 		FastQueue<PositionPatternNode> pps = new FastQueue<>(PositionPatternNode.class,true);
 

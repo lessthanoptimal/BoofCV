@@ -33,9 +33,12 @@ public class TestQrCodeGeneratorImage {
 		if(!showImage)
 			return;
 
-		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4,4);
+		QrCode qr = new QrCode();
+		qr.version = 40;
 
-		generator.generate("message");
+		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+
+		generator.generate(qr);
 
 		ShowImages.showWindow(generator.gray,"QR Code");
 		BoofMiscOps.sleep(10000);

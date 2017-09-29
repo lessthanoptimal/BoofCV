@@ -28,30 +28,28 @@ import georegression.struct.shapes.Polygon2D_F64;
  */
 public abstract class QrCodeGenerator {
 
-	int version;
+	QrCode qr;
+
 	double markerWidth;
 
 	// derived constants
 	double moduleWidth;
 	int numModules;
 
-	// Symbolic description of the qrcode just created. used for testing purposes
-	public QrCode qr = new QrCode();
 
-	public QrCodeGenerator( int version , double markerWidth ) {
-		this.version = version;
-		this.markerWidth= markerWidth;
-		this.numModules = version*4+17;
-		this.moduleWidth = markerWidth/numModules;
+	public QrCodeGenerator( double markerWidth ) {
+		this.markerWidth = markerWidth;
 	}
 
 	/**
 	 * Generates a QR Code with the specified message. An exception is thrown if the message is
 	 * too long to be encoded.
-	 *
-	 * @param message Message encoded in qr-code
 	 */
-	public void generate( String message ) {
+	public void generate( QrCode qr ) {
+		this.qr = qr;
+		this.numModules = qr.version*4+17;
+		this.moduleWidth = markerWidth/numModules;
+
 		init();
 		positionPattern(0,0, qr.ppCorner);
 		positionPattern((numModules-7)*moduleWidth,0, qr.ppRight);
@@ -65,14 +63,24 @@ public abstract class QrCodeGenerator {
 		if( qr.version >= 7 )
 			versionInformation();
 
-		if( version == 1 ) {
-		} else if( version <= 6 ) {
-			// TODO create table that can be specified for all version and create generic code
-			int x = numModules-7;
-			int y = numModules-7;
-			alignmentPattern(x,y);
-		} else {
-			throw new RuntimeException("Add support");
+		// render alignment patterns
+		QRCodePatternLocations locations = new QRCodePatternLocations();
+
+		int alignment[] = locations.alignment[qr.version];
+		for (int i = 0; i < alignment.length; i++) {
+			int row = alignment[i];
+
+			for (int j = 0; j < alignment.length; j++) {
+				if( i == 0 & j == 0 )
+					continue;
+				if( i == alignment.length-1 & j == 0)
+					continue;
+				if( i == alignment.length-1 & j == alignment.length-1)
+					continue;
+
+				int col = alignment[j];
+				alignmentPattern(col,numModules-row-1);
+			}
 		}
 	}
 
@@ -126,6 +134,7 @@ public abstract class QrCodeGenerator {
 	}
 
 	private void versionInformation() {
+		System.out.println("Version Info Printing");
 		PackedBits bits = new PackedBits(18);
 		bits.data[0] = QrCodePolynomialMath.encodeVersionBits(qr.version);
 
