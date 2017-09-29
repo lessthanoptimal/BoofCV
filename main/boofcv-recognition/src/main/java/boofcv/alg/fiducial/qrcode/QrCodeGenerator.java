@@ -106,7 +106,7 @@ public abstract class QrCodeGenerator {
 	}
 
 	private void formatInformation() {
-		PackedBits bits = new PackedBits(15);
+		PackedBits32 bits = new PackedBits32(15);
 		bits.data[0] = QrCodePolynomialMath.encodeFormatBits(qr.errorCorrection,qr.maskPattern);
 		bits.data[0] ^= QrCodePolynomialMath.FORMAT_MASK;
 
@@ -135,7 +135,7 @@ public abstract class QrCodeGenerator {
 
 	private void versionInformation() {
 		System.out.println("Version Info Printing");
-		PackedBits bits = new PackedBits(18);
+		PackedBits32 bits = new PackedBits32(18);
 		bits.data[0] = QrCodePolynomialMath.encodeVersionBits(qr.version);
 
 		for (int i = 0; i < 18; i++) {

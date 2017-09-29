@@ -18,6 +18,8 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import org.ddogleg.struct.GrowQueue_I8;
+
 /**
  * Precomputed look up table for performing operations on GF polynomials of the specified degree.
  *
@@ -103,20 +105,95 @@ public class GaliosFieldTableOps {
 		return exp[max_value - log[x]];
 	}
 
-	public int polyScale( int p , int x ) {
-		return 0;
+	/**
+	 * Scales the polynomial.
+	 *
+	 * <p>Coeffients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
+	 *
+	 * @param input Input polynomial.
+	 * @param scale scale
+	 * @param output Output polynomial.
+	 */
+	public void polyScale(GrowQueue_I8 input , int scale , GrowQueue_I8 output) {
+
+		output.resize(input.size);
+
+		for (int i = 0; i < input.size; i++) {
+			output.data[i] = (byte)multiply(input.data[i]&0xFF, scale);
+		}
 	}
 
-	public int polyAdd( int p , int x ) {
-		return 0;
+	/**
+	 *
+	 * <p>Coeffients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
+	 *
+	 * @param polyA
+	 * @param polyB
+	 * @param output
+	 */
+	public void polyAdd(GrowQueue_I8 polyA , GrowQueue_I8 polyB , GrowQueue_I8 output ) {
+		output.resize(Math.max(polyA.size,polyB.size));
+
+		// compute offset that would align the smaller polynomial with the larger polynomial
+		int offsetA = Math.max(0,polyB.size-polyA.size);
+		int offsetB = Math.max(0,polyA.size-polyB.size);
+		int N = output.size;
+
+		for (int i = 0; i < offsetB; i++) {
+			output.data[i] = polyA.data[i];
+		}
+		for (int i = 0; i < offsetA; i++) {
+			output.data[i] = polyB.data[i];
+		}
+		for (int i = Math.max(offsetA,offsetB); i < N; i++) {
+			output.data[i] = (byte)((polyA.data[i-offsetA]&0xFF) ^ (polyB.data[i-offsetB]&0xFF));
+		}
 	}
 
-	public int polyMult( int p , int x ) {
-		return 0;
+
+	/**
+	 *
+	 * <p>Coeffients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
+	 *
+	 * @param polyA
+	 * @param polyB
+	 * @param output
+	 */
+	public void polyMult(GrowQueue_I8 polyA , GrowQueue_I8 polyB , GrowQueue_I8 output ) {
+
+		// Lots of room for efficiency improvements in this function
+		output.resize(polyA.size+polyB.size-1);
+		output.zero();
+
+		for (int j = 0; j < polyB.size; j++) {
+			int vb = polyB.data[j]&0xFF;
+			for (int i = 0; i < polyA.size; i++) {
+				int va = polyA.data[i]&0xFF;
+				output.data[i+j] ^= multiply(va,vb);
+			}
+		}
 	}
 
-	public int polyEval( int p , int x ) {
-		return 0;
+
+	/**
+	 *
+	 * <p>Coeffients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
+	 *
+	 * @param input
+	 * @param x
+	 * @return
+	 */
+	public int polyEval(GrowQueue_I8 input , int x ) {
+		int y = input.data[0];
+
+		for (int i = 1; i < input.size; i++) {
+			y = multiply(y,x) ^ (input.data[i]&0xFF);
+		}
+
+		return y;
 	}
 
+	public void polyDivide(GrowQueue_I8 polyA , GrowQueue_I8 polyB , GrowQueue_I8 output ) {
+		output.setTo(polyA);
+	}
 }

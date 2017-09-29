@@ -35,7 +35,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	FastQueue<QrCode> found = new FastQueue<>(QrCode.class,true);
 
 	SquareBitReader squareDecoder;
-	PackedBits bits = new PackedBits();
+	PackedBits32 bits = new PackedBits32();
 
 	// internal workspace
 	Point2D_F64 grid = new Point2D_F64();

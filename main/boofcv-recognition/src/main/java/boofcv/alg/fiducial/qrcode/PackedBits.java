@@ -18,54 +18,24 @@
 
 package boofcv.alg.fiducial.qrcode;
 
-import java.util.Arrays;
-
 /**
- * Stores a set of bits inside of a packed array of integers.
+ * Stores a set of bits inside of a array
  *
  * @author Peter Abeles
  */
-public class PackedBits {
-	/**
-	 * Integer array used to store bits
-	 */
-	public int data[] = new int[1];
-	/**
-	 * Number of bits stored
-	 */
-	public int size;
+public interface PackedBits {
 
-	public PackedBits( int totalBits ) {
-		resize(totalBits);
-	}
+	int get( int which );
 
-	public PackedBits() {
-	}
+	void set( int which , int value );
 
-	public int get( int which ) {
-		int index = which/32;
-		int offset = which%32;
+	void resize(int totalBits );
 
-		return (data[index] & (1 << offset)) >> offset;
-	}
+	void zero();
 
-	public void set( int which , int value ) {
-		int index = which/32;
-		int offset = which%32;
+	int length();
 
-		data[index] ^= (-value ^ data[index]) & (1 << offset);
-	}
+	int arrayLength();
 
-	public void resize(int totalBits ) {
-		this.size = totalBits;
-		int N = totalBits/32 + (totalBits%32 > 0 ? 1 : 0);
-		if( data.length < N ) {
-			data = new int[ N ];
-		}
-	}
-
-	public void zero() {
-		int N = size/32;
-		Arrays.fill(data,0,N,0);
-	}
+	int elementBits();
 }

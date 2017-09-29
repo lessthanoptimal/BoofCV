@@ -25,11 +25,11 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestPackedBits {
+public class TestPackedBits32 {
 	@Test
 	public void set_get() {
 
-		PackedBits values = new PackedBits(60);
+		PackedBits32 values = new PackedBits32(60);
 
 		values.set(2,1); assertTrue(1==values.get(2));
 		values.set(2,0); assertFalse(1==values.get(2));
@@ -41,7 +41,7 @@ public class TestPackedBits {
 
 	}
 
-	private void isZeros( PackedBits values ) {
+	private void isZeros( PackedBits32 values ) {
 		int N = values.size/32;
 		for (int i = 0; i < N; i++) {
 			assertEquals(0,values.data[i]);
@@ -50,7 +50,7 @@ public class TestPackedBits {
 
 	@Test
 	public void resize() {
-		PackedBits values = new PackedBits(60);
+		PackedBits32 values = new PackedBits32(60);
 		assertEquals(60,values.size);
 		assertEquals(2,values.data.length);
 		values.resize(20);

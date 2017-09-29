@@ -18,11 +18,13 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import org.ddogleg.struct.GrowQueue_I8;
 import org.junit.Test;
 
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -155,4 +157,83 @@ public class TestGaliosFieldTableOps {
 			assertEquals(expected,found);
 		}
 	}
+
+	@Test
+	public void polyScale() {
+
+		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+
+		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
+		GrowQueue_I8 input = new GrowQueue_I8(3);
+		input.set(0,0x12);
+		input.set(1,0x54);
+		input.set(2,0xFF);
+
+		int scale = 0x45;
+
+		GrowQueue_I8 output = new GrowQueue_I8();
+
+		alg.polyScale(input.copy(),scale,output);
+
+		assertEquals(input.size,output.size);
+
+		for (int i = 0; i < input.size; i++) {
+			int expected = alg.multiply(input.data[i]&0xFF, scale);
+			assertEquals(expected,output.data[i]&0xFF);
+		}
+	}
+
+	@Test
+	public void polyAdd() {
+		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+
+		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
+		GrowQueue_I8 inputA = new GrowQueue_I8(3);
+		inputA.resize(3);
+		inputA.set(0,0x12);
+		inputA.set(1,0x54);
+		inputA.set(2,0xFF);
+
+		// Create an arbitrary polynomial: 0xA0*x^3 + 0x45
+		GrowQueue_I8 inputB = new GrowQueue_I8(4);
+		inputB.resize(4);
+		inputB.set(0,0xA0);
+		inputB.set(3,0x45);
+
+		// make sure the order doesn't matter
+		GrowQueue_I8 output0 = new GrowQueue_I8();
+		alg.polyAdd(inputA,inputB,output0);
+
+		GrowQueue_I8 output1 = new GrowQueue_I8();
+		alg.polyAdd(inputB,inputA,output1);
+
+		assertEquals(4,output0.size);
+		assertEquals(output0.size,output1.size);
+
+		for (int i = 0; i < output0.size; i++) {
+			assertEquals(output0.get(i),output1.get(i));
+		}
+
+		// compare to hand computed solution
+		assertEquals(0xA0,output0.data[0]&0xFF);
+		assertEquals(0x12,output0.data[1]&0xFF);
+		assertEquals(0x54,output0.data[2]&0xFF);
+		assertEquals(0xFF^0x45,output0.data[3]&0xFF);
+	}
+
+	@Test
+	public void polyMult() {
+		fail("Implement");
+	}
+
+	@Test
+	public void polyEval() {
+		fail("Implement");
+	}
+
+	@Test
+	public void polyDivide() {
+		fail("Implement");
+	}
+
 }
