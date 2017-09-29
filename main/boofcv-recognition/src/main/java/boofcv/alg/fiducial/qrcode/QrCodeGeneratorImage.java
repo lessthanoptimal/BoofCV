@@ -29,22 +29,23 @@ import georegression.struct.shapes.Polygon2D_F64;
 public class QrCodeGeneratorImage extends QrCodeGenerator {
 
 	GrayU8 gray = new GrayU8(1,1);
+	int pixelsPerModule;
 
-	public QrCodeGeneratorImage(int version, int pixelsPerModule) {
-		super(version, 1.0);
-
-		int width = pixelsPerModule*numModules;
-		gray.reshape(width,width);
+	public QrCodeGeneratorImage( int pixelsPerModule) {
+		super(1.0);
+		this.pixelsPerModule = pixelsPerModule;
 	}
 
 	@Override
 	public void init() {
+		int width = pixelsPerModule*numModules;
+		gray.reshape(width,width);
 		ImageMiscOps.fill(gray,255);
 	}
 
 	@Override
-	public void generate(String message) {
-		super.generate(message);
+	public void generate( QrCode qr ) {
+		super.generate(qr);
 		adjustSize(qr.ppRight);
 		adjustSize(qr.ppCorner);
 		adjustSize(qr.ppDown);
