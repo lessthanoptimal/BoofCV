@@ -59,6 +59,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			for (int j = 3,k=0; k < 4; j=k,k++) {
 				if( ppn.edges[j] != null && ppn.edges[k] != null ) {
 					QrCode qr = found.grow();
+					qr.reset();
 
 					setPositionPatterns(ppn, j, k, qr);
 					computeBoundingBox(qr);

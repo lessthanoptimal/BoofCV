@@ -64,7 +64,7 @@ public abstract class QrCodeGenerator {
 			versionInformation();
 
 		// render alignment patterns
-		QRCodePatternLocations locations = new QRCodePatternLocations();
+		QrCodePatternLocations locations = new QrCodePatternLocations();
 
 		int alignment[] = locations.alignment[qr.version];
 		for (int i = 0; i < alignment.length; i++) {

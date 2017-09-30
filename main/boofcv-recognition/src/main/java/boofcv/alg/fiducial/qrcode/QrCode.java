@@ -18,7 +18,9 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Information for a detected QR Code.
@@ -40,14 +42,19 @@ public class QrCode {
 	public double threshRight,threshCorner,threshDown;
 
 	/** which version of QR code was found. 1 to 40*/
-	public int version=1;
+	public int version;
 
 	/** Level of error correction */
-	ErrorCorrectionLevel errorCorrection = ErrorCorrectionLevel.L;
+	ErrorCorrectionLevel errorCorrection;
 	/**
 	 * 3 byte value indicating the mask pattern used in the QR code
 	 */
-	int maskPattern = 0b101;
+	int maskPattern;
+
+	/**
+	 * Alignment pattern information
+	 */
+	public FastQueue<Alignment> alignment = new FastQueue<>(Alignment.class,true);
 
 	/**
 	 * Approximate bounding box for QR-Code. The bottom right corner is estimated by intersecting lines
@@ -56,6 +63,23 @@ public class QrCode {
 	 * Order: top-left = 0. Top-right = 1, Bottom-Right = 2, Bottom-Left = 3.
 	 */
 	public Polygon2D_F64 bounds = new Polygon2D_F64(4);
+
+	public QrCode() {
+		reset();
+	}
+
+	public void reset() {
+		for (int i = 0; i < 4; i++) {
+			ppCorner.get(i).set(0,0);
+			ppDown.get(i).set(0,0);
+			ppRight.get(i).set(0,0);
+		}
+
+		version = 1;
+		errorCorrection = ErrorCorrectionLevel.L;
+		maskPattern = 0b101;
+		alignment.reset();
+	}
 
 	public enum ErrorCorrectionLevel {
 		L(0b01),
@@ -82,5 +106,31 @@ public class QrCode {
 		}
 
 		int value;
+	}
+
+	/**
+	 * Information related to a specific alignment pattern.  The center coordinate is stored.
+	 */
+	public static class Alignment
+	{
+		/**
+		 * Pixel coordinate of this alignment pattern's center
+		 */
+		public Point2D_F64 pixel = new Point2D_F64();
+
+		/**
+		 * Center grid coordinate of alignment pattern.
+		 */
+		public int moduleX,moduleY;
+
+		/**
+		 * The found grid coordinate
+		 */
+		Point2D_F64 moduleFound = new Point2D_F64();
+
+		/**
+		 * Threshold value selected at this alignment pattern
+		 */
+		public double threshold;
 	}
 }
