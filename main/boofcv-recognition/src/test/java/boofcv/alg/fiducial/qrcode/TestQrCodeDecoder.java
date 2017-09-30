@@ -23,10 +23,10 @@ import boofcv.struct.image.GrayU8;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -37,8 +37,16 @@ public class TestQrCodeDecoder {
 	 * Runs through the entire algorithm using a rendered image
 	 */
 	@Test
-	public void full_simple_ver2() {
+	public void full_simple() {
+		full_simple(1);
+		full_simple(2);
+		full_simple(7);
+		full_simple(40);
+	}
+
+	public void full_simple(int version) {
 		QrCode truthQr = new QrCode();
+		truthQr.version = version;
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 		generator.generate(truthQr);
 
@@ -53,13 +61,22 @@ public class TestQrCodeDecoder {
 
 		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
 
-//		ShowImages.showWindow(generator.gray,"QR Code");
+//		ShowImages.showWindow(generator.gray,"QR Code", true);
 //		BoofMiscOps.sleep(10000);
 
 		decoder.process(pps,generator.gray);
 
 		assertEquals(1,decoder.found.size);
 		QrCode found = decoder.getFound().get(0);
+
+		// Check format info
+		assertEquals(generator.qr.errorCorrection,found.errorCorrection);
+		assertEquals(generator.qr.maskPattern,found.maskPattern);
+
+		// check version info
+		assertEquals(version,found.version);
+
+		int numModules = new QrCodePatternLocations().size[version];
 
 		// sanity check the position patterns
 		for (int i = 0; i < 4; i++) {
@@ -68,24 +85,21 @@ public class TestQrCodeDecoder {
 			assertEquals(7*4,found.ppDown.getSideLength(i),0.01);
 		}
 		assertTrue(found.ppCorner.get(0).distance(0,0) < 1e-4);
-		assertTrue(found.ppRight.get(0).distance((24-6)*4,0) < 1e-4);
-		assertTrue(found.ppDown.get(0).distance(0,(24-6)*4) < 1e-4);
+		assertTrue(found.ppRight.get(0).distance((numModules-7)*4,0) < 1e-4);
+		assertTrue(found.ppDown.get(0).distance(0,(numModules-7)*4) < 1e-4);
 
-		// Check format info
-		assertEquals(generator.qr.errorCorrection,found.errorCorrection);
-		assertEquals(generator.qr.maskPattern,found.maskPattern);
+		// Check alignment patterns
+		int alignment[] =  new QrCodePatternLocations().alignment[version];
+		if( alignment.length == 0 ) {
+			assertEquals(0,found.alignment.size);
+		} else {
+			assertEquals(found.alignment.size, alignment.length * alignment.length - 3);
+			// TODO Check alignment pattern locations
+		}
 
-		// check version info
-		assertEquals(2,found.version);
 	}
 
-	@Ignore
 	@Test
-	public void full_simple_ver7() {
-		fail("Implement");
-	}
-
-		@Test
 	public void setPositionPatterns() {
 		Polygon2D_F64 corner = new Polygon2D_F64(0,0, 2,0, 2,2, 0,2);
 		Polygon2D_F64 right = new Polygon2D_F64(5,0, 7,0, 7,2, 5,2);

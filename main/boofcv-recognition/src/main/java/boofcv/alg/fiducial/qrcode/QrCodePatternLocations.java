@@ -23,15 +23,15 @@ package boofcv.alg.fiducial.qrcode;
  *
  * @author Peter Abeles
  */
-public class QRCodePatternLocations {
+public class QrCodePatternLocations {
 	public static final int MAX_VERSION = 40;
 	
-	int []size = new int[MAX_VERSION+1];
+	public int []size = new int[MAX_VERSION+1];
 	
 	// alignment pattern center location as specified in QR documentation
-	int [][] alignment = new int[MAX_VERSION+1][];
+	public int [][] alignment = new int[MAX_VERSION+1][];
 
-	public QRCodePatternLocations() {
+	public QrCodePatternLocations() {
 		for (int v = 1; v <= MAX_VERSION; v++) {
 			size[v] = v*4+17;
 		}
@@ -82,6 +82,6 @@ public class QRCodePatternLocations {
 	}
 
 	public static void main(String[] args) {
-		QRCodePatternLocations alg = new QRCodePatternLocations();
+		QrCodePatternLocations alg = new QrCodePatternLocations();
 	}
 }
