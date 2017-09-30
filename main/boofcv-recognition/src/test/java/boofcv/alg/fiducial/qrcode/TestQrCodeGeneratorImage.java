@@ -19,8 +19,11 @@
 package boofcv.alg.fiducial.qrcode;
 
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.misc.BoofMiscOps;
 import org.junit.Test;
+
+import java.awt.image.BufferedImage;
 
 /**
  * @author Peter Abeles
@@ -34,13 +37,14 @@ public class TestQrCodeGeneratorImage {
 			return;
 
 		QrCode qr = new QrCode();
-		qr.version = 40;
+		qr.version = 7;
 
-		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(6);
 
 		generator.generate(qr);
 
-		ShowImages.showWindow(generator.gray,"QR Code");
-		BoofMiscOps.sleep(10000);
+		BufferedImage output = ConvertBufferedImage.convertTo(generator.gray,null,true);
+		ShowImages.showWindow(output,"QR Code", true);
+		BoofMiscOps.sleep(100000);
 	}
 }

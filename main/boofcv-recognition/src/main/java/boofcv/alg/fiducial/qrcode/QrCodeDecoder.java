@@ -146,6 +146,9 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			else
 				readFormatRegion1(qr);
 			int bits = this.bits.data[0] ^ QrCodePolynomialMath.FORMAT_MASK;
+
+//			System.out.println("decoder format bits "+Integer.toBinaryString(this.bits.data[0]));
+
 			int message;
 			if (QrCodePolynomialMath.checkFormatBits(bits)) {
 				message = bits >> 10;
@@ -194,6 +197,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			return false;
 
 		bits.resize(15);
+		bits.zero();
 		for (int i = 0; i < 8; i++) {
 			read(i,8,6-i);
 		}
@@ -297,11 +301,14 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			return false;
 
 		bits.resize(18);
+		bits.zero();
 		for (int i = 0; i < 18; i++) {
 			int row = i/3;
 			int col = i%3;
 			read(i,row,col-4);
 		}
+//		System.out.println(" decoder version region 0 =  "+Integer.toBinaryString(bits.data[0]));
+
 
 		return true;
 	}
@@ -311,15 +318,18 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 */
 	private boolean readVersionRegion1(QrCode qr) {
 		// set the coordinate system to the closest pp to reduce position errors
-		if (!squareDecoder.setSquare(qr.ppDown, (float) qr.threshRight))
+		if (!squareDecoder.setSquare(qr.ppDown, (float) qr.threshDown))
 			return false;
 
 		bits.resize(18);
+		bits.zero();
 		for (int i = 0; i < 18; i++) {
-			int row = i/3;
-			int col = i%3;
+			int row = i%3;
+			int col = i/3;
 			read(i,row-4,col);
 		}
+
+//		System.out.println(" decoder version region 1 =  "+Integer.toBinaryString(bits.data[0]));
 
 		return true;
 	}

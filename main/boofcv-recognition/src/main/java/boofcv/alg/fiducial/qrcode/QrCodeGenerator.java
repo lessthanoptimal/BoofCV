@@ -64,7 +64,7 @@ public abstract class QrCodeGenerator {
 			versionInformation();
 
 		// render alignment patterns
-		QRCodePatternLocations locations = new QRCodePatternLocations();
+		QrCodePatternLocations locations = new QrCodePatternLocations();
 
 		int alignment[] = locations.alignment[qr.version];
 		for (int i = 0; i < alignment.length; i++) {
@@ -109,9 +109,10 @@ public abstract class QrCodeGenerator {
 		PackedBits32 bits = new PackedBits32(15);
 		bits.data[0] = QrCodePolynomialMath.encodeFormatBits(qr.errorCorrection,qr.maskPattern);
 		bits.data[0] ^= QrCodePolynomialMath.FORMAT_MASK;
+//		System.out.println("encoder format bits "+Integer.toBinaryString(bits.data[0]));
 
 		for (int i = 0; i < 15; i++) {
-			if( bits.get(i)==1) {
+			if( bits.get(i)==0) {
 				continue;
 			}
 			if( i < 6 ) {
@@ -134,12 +135,12 @@ public abstract class QrCodeGenerator {
 	}
 
 	private void versionInformation() {
-		System.out.println("Version Info Printing");
 		PackedBits32 bits = new PackedBits32(18);
 		bits.data[0] = QrCodePolynomialMath.encodeVersionBits(qr.version);
+//		System.out.println("encoder version bits "+Integer.toBinaryString(bits.data[0]));
 
 		for (int i = 0; i < 18; i++) {
-			if( bits.get(i)==1) {
+			if( bits.get(i)==0) {
 				continue;
 			}
 

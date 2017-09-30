@@ -32,7 +32,7 @@ public class ConfigQrCode implements Configuration {
 	public ConfigPolygonDetector polygon = new ConfigPolygonDetector(false,4,4);
 
 	public int versionMinimum = 2;
-	public int versionMaximum = 2;
+	public int versionMaximum = 40;
 
 	{
 		polygon.detector.clockwise = false;

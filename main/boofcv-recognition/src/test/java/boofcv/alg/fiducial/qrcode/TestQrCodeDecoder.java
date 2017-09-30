@@ -56,13 +56,17 @@ public class TestQrCodeDecoder {
 		pps.grow().square = generator.qr.ppRight;
 		pps.grow().square = generator.qr.ppDown;
 
+		for (int i = 0; i < pps.size; i++) {
+			pps.get(i).grayThreshold = 125;
+		}
+
 		connect(pps.get(1),pps.get(0),3,1);
 		connect(pps.get(2),pps.get(0),0,2);
 
 		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
 
-//		ShowImages.showWindow(generator.gray,"QR Code", true);
-//		BoofMiscOps.sleep(10000);
+//		ShowImages.showWindow(generator.gray,"QR Code");
+//		BoofMiscOps.sleep(100000);
 
 		decoder.process(pps,generator.gray);
 
@@ -70,8 +74,8 @@ public class TestQrCodeDecoder {
 		QrCode found = decoder.getFound().get(0);
 
 		// Check format info
-		assertEquals(generator.qr.errorCorrection,found.errorCorrection);
-		assertEquals(generator.qr.maskPattern,found.maskPattern);
+		assertEquals(truthQr.errorCorrection,found.errorCorrection);
+		assertEquals(truthQr.maskPattern,found.maskPattern);
 
 		// check version info
 		assertEquals(version,found.version);

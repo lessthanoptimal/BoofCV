@@ -49,6 +49,10 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 		adjustSize(qr.ppRight);
 		adjustSize(qr.ppCorner);
 		adjustSize(qr.ppDown);
+
+		qr.threshRight = 125;
+		qr.threshCorner = 125;
+		qr.threshDown = 125;
 	}
 
 	private void adjustSize(Polygon2D_F64 poly) {

@@ -121,7 +121,9 @@ public class SquareBitReader<T extends ImageGray<T>> {
 		if( pixel.x < -0.5 || pixel.y < -0.5 || pixel.x > width || pixel.y > height )
 			return -1;
 
-		if( interpolate.get(pixel.x,pixel.y) > threshold )
+//		System.out.println("grid ("+row+" , "+col+") = "+pixel.x+" "+pixel.y+" = "+interpolate.get(pixel.x,pixel.y));
+
+		if( interpolate.get(pixel.x,pixel.y) < threshold )
 			return 1;
 		else
 			return 0;
