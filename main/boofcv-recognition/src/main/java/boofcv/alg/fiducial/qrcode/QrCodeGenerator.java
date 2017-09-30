@@ -134,7 +134,6 @@ public abstract class QrCodeGenerator {
 	}
 
 	private void versionInformation() {
-		System.out.println("Version Info Printing");
 		PackedBits bits = new PackedBits(18);
 		bits.data[0] = QrCodePolynomialMath.encodeVersionBits(qr.version);
 

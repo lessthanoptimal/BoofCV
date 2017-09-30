@@ -31,6 +31,7 @@ import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
+import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.struct.image.GrayF32;
@@ -41,6 +42,8 @@ import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.io.File;
@@ -60,7 +63,16 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	public DetectQrCodeApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);
 
-		setupGui(new VisualizePanel(),new DetectQrCodeControlPanel(this));
+		final VisualizePanel gui = new VisualizePanel();
+		setupGui(gui,new DetectQrCodeControlPanel(this));
+
+		gui.getImagePanel().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				double scale = gui.getScale();
+				System.out.printf("click %5.1f %5.1f\n",e.getX()/scale,e.getY()/scale);
+			}
+		});
 	}
 
 	@Override
@@ -129,11 +141,32 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 				if ( true ) {
 					FastQueue<QrCode> detected = detector.getDetections();
 
-					g2.setColor(new Color(0x90FF0000,true));
+					g2.setColor(new Color(0x50FF0000,true));
 					for (int i = 0; i < detected.size; i++) {
 						QrCode qr = detected.get(i);
 						VisualizeShapes.fillPolygon(qr.bounds,scale,g2);
 					}
+
+//					g2.setColor(Color.BLUE);
+//					for (int i = 0; i < detected.size; i++) {
+//						QrCode qr = detected.get(i);
+//						Point2D_F64 c = qr.ppCorner.get(0);
+//						VisualizeFeatures.drawCircle(g2, c.x * scale, c.y * scale, 5 * scale);
+//						c = qr.ppRight.get(0);
+//						VisualizeFeatures.drawCircle(g2, c.x * scale, c.y * scale, 5 * scale);
+//						c = qr.ppDown.get(0);
+//						VisualizeFeatures.drawCircle(g2, c.x * scale, c.y * scale, 5 * scale);
+//					}
+//					g2.setColor(Color.GREEN);
+//					for (int i = 0; i < detected.size; i++) {
+//						QrCode qr = detected.get(i);
+//						Point2D_F64 c = qr.ppCorner.get(1);
+//						VisualizeFeatures.drawCircle(g2, c.x * scale, c.y * scale, 5 * scale);
+//						c = qr.ppRight.get(1);
+//						VisualizeFeatures.drawCircle(g2, c.x * scale, c.y * scale, 5 * scale);
+//						c = qr.ppDown.get(1);
+//						VisualizeFeatures.drawCircle(g2, c.x * scale, c.y * scale, 5 * scale);
+//					}
 				}
 
 				if (controls.bShowSquares) {
@@ -143,6 +176,22 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					g2.setStroke(new BasicStroke(3));
 					for (Polygon2D_F64 p : polygons) {
 						VisualizeShapes.drawPolygon(p, true, scale, g2);
+					}
+				}
+
+				if (controls.bShowAlignmentPattern) {
+					List<QrCode> codes = detector.getDetections().toList();
+
+					g2.setColor(Color.BLUE);
+					g2.setStroke(new BasicStroke(3));
+					for (QrCode qr : codes) {
+						double size = Math.sqrt(qr.ppCorner.areaSimple())/14.0;
+						for (int i = 0; i < qr.alignment.size; i++) {
+							QrCode.Alignment a = qr.alignment.get(i);
+							VisualizeFeatures.drawCircle(g2, a.pixel.x*scale, a.pixel.y*scale,size*scale);
+//							if( scale > 4 )
+//								VisualizeFeatures.drawCircle(g2, a.pixel.x*scale, a.pixel.y*scale,0.2*scale);
+						}
 					}
 				}
 

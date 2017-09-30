@@ -40,8 +40,11 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	// internal workspace
 	Point2D_F64 grid = new Point2D_F64();
 
+	QrCodeAlignmentPatternLocator<T> alignmentLocator;
+
 	public QrCodeDecoder( Class<T> imageType ) {
-		squareDecoder = new SquareBitReader(imageType);
+		squareDecoder = new SquareBitReader<>(imageType);
+		alignmentLocator = new QrCodeAlignmentPatternLocator<>(imageType);
 	}
 
 	/**
@@ -65,7 +68,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 					computeBoundingBox(qr);
 
 					// Decode the entire marker now
-					if( !decode(qr)) {
+					if( !decode(gray,qr)) {
 						found.removeTail();
 					}
 				}
@@ -117,11 +120,15 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		qr.bounds.get(3).set(qr.ppDown.get(3));
 	}
 
-	private boolean decode( QrCode qr ) {
+	private boolean decode( T gray , QrCode qr ) {
 		if( !extractFormatInfo(qr) )
 			return false;
 		if( !extractVersionInfo(qr) )
 			return false;
+		if( !alignmentLocator.process(gray,qr )) {
+			System.out.println("Failed alignment pattern");
+			return false;
+		}
 
 		return true;
 	}
@@ -216,9 +223,9 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 
 		// Fpr version 7 and beyond use the version which has been encoded into the qr code
 		if( version >= 7 ) {
-			readFormatRegion0(qr);
+			readVersionRegion0(qr);
 			int version0 = decodeVersion();
-			readFormatRegion1(qr);
+			readVersionRegion1(qr);
 			int version1 = decodeVersion();
 
 			if (version0 < 1 && version1 < 1) { // both decodings failed
@@ -315,6 +322,10 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		}
 
 		return true;
+	}
+
+	public QrCodeAlignmentPatternLocator<T> getAlignmentLocator() {
+		return alignmentLocator;
 	}
 
 	public FastQueue<QrCode> getFound() {

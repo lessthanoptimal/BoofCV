@@ -50,10 +50,12 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 
 	JCheckBox showSquares;
 	JCheckBox showPositionPattern;
+	JCheckBox showAlignmentPattern;
 	JCheckBox showContour;
 
 	boolean bShowSquares = true;
 	boolean bShowPositionPattern = true; // show position patterns
+	boolean bShowAlignmentPattern = true; // show position patterns
 	boolean bShowContour = false;
 
 	boolean bRefineGray = true;
@@ -111,6 +113,9 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		showPositionPattern = new JCheckBox("Position Pattern");
 		showPositionPattern.setSelected(bShowPositionPattern);
 		showPositionPattern.addActionListener(this);
+		showAlignmentPattern = new JCheckBox("Alignment Pattern");
+		showAlignmentPattern.setSelected(bShowAlignmentPattern);
+		showAlignmentPattern.addActionListener(this);
 		showContour = new JCheckBox("Contour");
 		showContour.addActionListener(this);
 		showContour.setSelected(bShowContour);
@@ -182,6 +187,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		addLabeled(imageView, "View: ", this);
 		addLabeled(selectZoom,"Zoom",this);
 		addAlignLeft(showSquares, this);
+		addAlignLeft(showAlignmentPattern, this);
 		addAlignLeft(showPositionPattern, this);
 		addAlignLeft(showContour, this);
 		add(threshold);
@@ -230,6 +236,9 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 			owner.viewUpdated();
 		} else if( e.getSource() == showPositionPattern ) {
 			bShowPositionPattern = showPositionPattern.isSelected();
+			owner.viewUpdated();
+		} else if( e.getSource() == showAlignmentPattern ) {
+			bShowAlignmentPattern = showAlignmentPattern.isSelected();
 			owner.viewUpdated();
 		} else if( e.getSource() == showContour ) {
 			bShowContour = showContour.isSelected();

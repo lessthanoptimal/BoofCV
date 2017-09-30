@@ -21,6 +21,8 @@ package boofcv.alg.fiducial.qrcode;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.core.image.border.BorderType;
+import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.geo.AssociatedPair;
@@ -64,18 +66,21 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	FMatrixRMaj H_inv = new FMatrixRMaj(3,3);
 
 	// pixel value storage used when localizing
-	float arrayX[] = new float[11];
-	float arrayY[] = new float[11];
+	float arrayX[] = new float[12];
+	float arrayY[] = new float[12];
 
 	// more work space
-	Point2D_F32 p32 = new Point2D_F32();
+	Point2D_F32 pixel = new Point2D_F32();
+	Point2D_F32 seed = new Point2D_F32();
+	Point2D_F32 guess = new Point2D_F32();
 
 	public QrCodeAlignmentPatternLocator( Class<T> imageType ) {
 
 		// use nearest neighbor to avoid shifting the location
 		interpolate = FactoryInterpolation.nearestNeighborPixelS(imageType);
+		interpolate.setBorder(FactoryImageBorder.single(imageType, BorderType.EXTENDED));
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 7; i++) {
 			associatedPairs.add( new AssociatedPair() );
 		}
 	}
@@ -97,7 +102,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		return localizePositionPatterns(patternLocations.alignment[qr.version]);
 	}
 
-	private boolean localizePositionPatterns(int[] alignmentLocations) {
+	boolean localizePositionPatterns(int[] alignmentLocations ) {
 		int size = alignmentLocations.length;
 
 		for (int row = 0; row < size; row++) {
@@ -111,17 +116,76 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
 				if( row > 0) {
 					QrCode.Alignment p = lookup.get((row - 1) * size + col);
-					adjY = p.moduleY+0.5-p.moduleFound.y;
+					if( p != null )
+						adjY = p.moduleY+0.5-p.moduleFound.y;
 				}
 				if( col > 0 ) {
-					QrCode.Alignment p = lookup.get((row - 1) * size + col);
-					adjX = p.moduleX+0.5-p.moduleFound.x;
+					QrCode.Alignment p = lookup.get(row * size + col -1);
+					if( p != null )
+						adjX = p.moduleX+0.5-p.moduleFound.x;
 				}
 
-				if( !localize(a,(float)(a.moduleX+0.5+adjX),(float)(a.moduleY+0.5+adjY)) )
+
+				if( !centerOnSquare(a,(float)(a.moduleX+0.5+adjX),(float)(a.moduleY+0.5+adjY))) {
 					return false;
+				}
+
+				if( !localize(a,(float)a.moduleFound.x,(float)a.moduleFound.y) ) {
+					return false;
+				}
 			}
 		}
+		return true;
+	}
+
+	float samples[] = new float[9];
+
+	/**
+	 * If the initial guess is within the inner white circle or black dot this will ensure that it is centered
+	 * on the black dot
+	 */
+	boolean centerOnSquare(QrCode.Alignment pattern , float guessX , float guessY) {
+		float step = 1;
+		float bestMag = Float.MAX_VALUE;
+		float bestX = guessX;
+		float bestY = guessY;
+
+		for (int i = 0; i < 10; i++) {
+			for (int row = 0; row < 3; row++) {
+				float gridy = guessY - 1f + row;
+				for (int col = 0; col < 3; col++) {
+					float gridx = guessX - 1f + col;
+
+					gridToImage.compute(gridx,gridy,pixel);
+					samples[row*3+col] = interpolate.get(pixel.x,pixel.y);
+				}
+			}
+
+			float dx = (samples[2]+samples[5]+samples[8])-(samples[0]+samples[3]+samples[6]);
+			float dy = (samples[6]+samples[7]+samples[8])-(samples[0]+samples[1]+samples[2]);
+
+			float r = (float)Math.sqrt(dx*dx + dy*dy);
+
+			if( bestMag > r ) {
+//				System.out.println("good step at "+i);
+				bestMag = r;
+				bestX = guessX;
+				bestY = guessY;
+			} else {
+//				System.out.println("bad step at "+i);
+				step *= 0.75f;
+			}
+
+			guessX = bestX+step*dx/r;
+			guessY = bestY+step*dy/r;
+		}
+
+		pattern.moduleFound.x = bestX;
+		pattern.moduleFound.y = bestY;
+
+		gridToImage.compute((float)pattern.moduleFound.x,(float)pattern.moduleFound.y,pixel);
+		pattern.pixel.set(pixel.x,pixel.y);
+
 		return true;
 	}
 
@@ -131,33 +195,35 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	 *
 	 * @return true if success or false if it doesn't resemble an alignment pattern
 	 */
-	protected boolean localize(QrCode.Alignment pattern , float guessX , float guessY)
+	boolean localize(QrCode.Alignment pattern , float guessX , float guessY)
 	{
 		// sample along the middle. Try to not sample the outside edges which could confuse it
 		for (int i = 0; i < arrayY.length; i++) {
-			float x = guessX - 1.25f + i*2.5f/10.0f;
-			float y = guessY - 1.25f + i*2.5f/10.0f;
-			arrayX[i] = interpolate.get(x,guessY);
-			arrayY[i] = interpolate.get(guessX,y);
+			float x = guessX - 1.5f + i*3f/12.0f;
+			float y = guessY - 1.5f + i*3f/12.0f;
+
+			gridToImage.compute(x,guessY,pixel);
+			arrayX[i] = interpolate.get(pixel.x,pixel.y);
+			gridToImage.compute(guessX,y,pixel);
+			arrayY[i] = interpolate.get(pixel.x,pixel.y);
 		}
 
+		// TODO turn this into an exhaustive search of the array for best up and down point?
 		int downX = greatestDown(arrayX);
+		if( downX == -1) return false;
 		int upX = greatestUp(arrayX,downX);
-
-		if( downX == -1 || upX == -1)
-			return false;
+		if( upX == -1) return false;
 
 		int downY = greatestDown(arrayY);
+		if( downY == -1 ) return false;
 		int upY = greatestUp(arrayY,downY);
+		if( upY == -1 ) return false;
 
-		if( downY == -1 || upY == -1)
-			return false;
+		pattern.moduleFound.x = guessX - 1.5f + (downX+upX)*3f/24.0f;
+		pattern.moduleFound.y = guessY - 1.5f + (downY+upY)*3f/24.0f;
 
-		pattern.moduleFound.x = guessX - 1.25f + (downX+upX)*2.5f/20.0f;
-		pattern.moduleFound.y = guessY - 1.25f + (downY+upY)*2.5f/20.0f;
-
-		gridToImage.compute((float)pattern.moduleFound.x,(float)pattern.moduleFound.y,p32);
-		pattern.pixel.set(p32.x,p32.y);
+		gridToImage.compute((float)pattern.moduleFound.x,(float)pattern.moduleFound.y,pixel);
+		pattern.pixel.set(pixel.x,pixel.y);
 
 		return true;
 	}
@@ -169,11 +235,13 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		int best = -1;
 		float bestScore = 0;
 
-		for (int i = 1; i < array.length; i++) {
-			float diff = array[i]-array[i-1];
-			if( diff < bestScore) {
+		for (int i = 5; i < array.length; i++) {
+			float diff = (4.0f/2.0f)*( array[i-5]+array[i]);
+			diff -= array[i-4]+array[i-3]+array[i-2]+array[i-1];
+
+			if( diff > bestScore) {
 				bestScore = diff;
-				best = i;
+				best = i-4;
 			}
 		}
 		return best;
@@ -187,7 +255,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 			float diff = array[i]-array[i-1];
 			if( diff > bestScore) {
 				bestScore = diff;
-				best = i;
+				best = i-1;
 			}
 		}
 		return best;
@@ -196,10 +264,12 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	/**
 	 * Creates a list of alignment patterns to look for and their grid coordinates
 	 */
-	private void initializePatterns(QrCode qr) {
+	void initializePatterns(QrCode qr) {
+		int qrsize = patternLocations.size[qr.version];
 		int where[] = patternLocations.alignment[qr.version];
 		qr.alignment.reset();
-		for (int row = 0; row < where.length; row++) {
+		lookup.reset();
+		for (int row = where.length-1; row >= 0; row--) {
 			for (int col = 0; col < where.length; col++) {
 				boolean skip = false;
 				if( row == 0 & col == 0 )
@@ -213,8 +283,8 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 					lookup.add(null);
 				} else {
 					QrCode.Alignment a = qr.alignment.grow();
-					a.moduleX = col;
-					a.moduleY = row;
+					a.moduleX = where[col];
+					a.moduleY = qrsize-where[row]-1;
 					lookup.add(a);
 				}
 			}
@@ -227,7 +297,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	 *
 	 * @param qr The QR code with detected position patterns
 	 */
-	private boolean computeHomography( QrCode qr ) {
+	boolean computeHomography( QrCode qr ) {
 		int gridSize = patternLocations.size[qr.version];
 
 		// features from corner
