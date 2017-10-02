@@ -24,7 +24,6 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -208,11 +207,7 @@ public class TestGaliosFieldTableOps {
 		alg.polyAdd(inputB,inputA,output1);
 
 		assertEquals(4,output0.size);
-		assertEquals(output0.size,output1.size);
-
-		for (int i = 0; i < output0.size; i++) {
-			assertEquals(output0.get(i),output1.get(i));
-		}
+		assertEqualsG(output0, output1);
 
 		// compare to hand computed solution
 		assertEquals(0xA0,output0.data[0]&0xFF);
@@ -223,17 +218,115 @@ public class TestGaliosFieldTableOps {
 
 	@Test
 	public void polyMult() {
-		fail("Implement");
+		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+
+		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
+		GrowQueue_I8 inputA = new GrowQueue_I8();
+		inputA.resize(3);
+		inputA.set(0,0x12);
+		inputA.set(1,0x54);
+		inputA.set(2,0xFF);
+
+		GrowQueue_I8 inputB = new GrowQueue_I8();
+		inputB.resize(2);
+		inputB.set(1,0x03);
+
+		// make sure the order doesn't matter
+		GrowQueue_I8 output0 = new GrowQueue_I8();
+		alg.polyMult(inputA,inputB,output0);
+
+		GrowQueue_I8 output1 = new GrowQueue_I8();
+		alg.polyMult(inputB,inputA,output1);
+
+		assertEquals(4,output0.size);
+		assertEqualsG(output0, output1);
+
+		// check the value against a manual solution
+		GrowQueue_I8 expected = new GrowQueue_I8();
+		expected.resize(4);
+		expected.set(1,alg.multiply(0x12,0x03));
+		expected.set(2,alg.multiply(0x54,0x03));
+		expected.set(3,alg.multiply(0xFF,0x03));
 	}
 
 	@Test
 	public void polyEval() {
-		fail("Implement");
+		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+
+		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
+		GrowQueue_I8 inputA = new GrowQueue_I8();
+		inputA.resize(3);
+		inputA.set(0,0x12);
+		inputA.set(1,0x54);
+		inputA.set(2,0xFF);
+
+		int input = 0x09;
+		int found = alg.polyEval(inputA,input);
+
+		int expected = 0xFF ^ alg.multiply(0x54,input);
+		expected ^= alg.multiply(0x12,alg.multiply(input,input));
+
+		assertEquals(expected,found);
 	}
 
 	@Test
 	public void polyDivide() {
-		fail("Implement");
+		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+
+		// Create an arbitrary polynomial: 0BB*x^4 + 0x12*x^3 + 0x54*x^2 + 0*x + 0xFF
+		GrowQueue_I8 inputA = new GrowQueue_I8();
+		inputA.resize(5);
+		inputA.set(0,0xBB);
+		inputA.set(1,0x12);
+		inputA.set(2,0x54);
+		inputA.set(4,0xFF);
+
+		GrowQueue_I8 inputB = new GrowQueue_I8();
+		inputB.resize(2);
+		inputB.set(0,0xF0);
+		inputB.set(1,0x0A);
+
+		GrowQueue_I8 quotent = new GrowQueue_I8();
+		GrowQueue_I8 remainder = new GrowQueue_I8();
+		alg.polyDivide(inputA,inputB,quotent,remainder);
+		assertEquals(4,quotent.size);
+		assertEquals(1,remainder.size);
+
+		// see if division was done correct and reconstruct the original equation
+		checkDivision(alg, inputA, inputB, quotent, remainder);
+
+		// have the divisor be larger than the dividend
+		alg.polyDivide(inputB,inputA,quotent,remainder);
+
+		checkDivision(alg, inputB, inputA, quotent, remainder);
+	}
+
+	private void checkDivision(GaliosFieldTableOps alg, GrowQueue_I8 inputA, GrowQueue_I8 inputB, GrowQueue_I8 quotent, GrowQueue_I8 remainder) {
+		GrowQueue_I8 tmp = new GrowQueue_I8();
+		GrowQueue_I8 found = new GrowQueue_I8();
+		alg.polyMult(inputB,quotent,tmp);
+		alg.polyAdd(tmp,remainder,found);
+		assertEqualsG(inputA, found);
+	}
+
+	private static void assertEqualsG(GrowQueue_I8 inputA, GrowQueue_I8 inputB) {
+		int offsetA=0,offsetB=0;
+		if( inputA.size > inputB.size ) {
+			offsetA = inputA.size-inputB.size;
+		} else {
+			offsetB = inputB.size-inputA.size;
+		}
+		for (int i = 0; i < offsetA; i++) {
+			assertEquals(0,inputA.data[i]);
+		}
+		for (int i = 0; i < offsetB; i++) {
+			assertEquals(0,inputB.data[i]);
+		}
+
+		int N = Math.min(inputA.size,inputB.size);
+		for (int i = 0; i < N; i++) {
+			assertEquals(inputA.get(i+offsetA),inputB.get(i+offsetB));
+		}
 	}
 
 }
