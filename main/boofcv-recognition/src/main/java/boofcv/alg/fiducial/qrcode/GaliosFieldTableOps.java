@@ -198,41 +198,41 @@ public class GaliosFieldTableOps {
 	 *
 	 * @param dividend (Input) Polynomial dividend
 	 * @param divisor (Input) Polynomial divisor
-	 * @param quotent (Output) Division's quotent
+	 * @param quotient (Output) Division's quotient
 	 * @param remainder (Output) Divisions's remainder
 	 */
 	public void polyDivide(GrowQueue_I8 dividend , GrowQueue_I8 divisor ,
-						   GrowQueue_I8 quotent, GrowQueue_I8 remainder ) {
+						   GrowQueue_I8 quotient, GrowQueue_I8 remainder ) {
 
 		// handle special case
 		if( divisor.size > dividend.size ) {
 			remainder.setTo(dividend);
-			quotent.resize(0);
+			quotient.resize(0);
 			return;
 		} else {
 			remainder.resize(divisor.size-1);
-			quotent.setTo(dividend);
+			quotient.setTo(dividend);
 		}
 
 		int normalizer = divisor.data[0]&0xFF;
 
 		int N = dividend.size-divisor.size+1;
 		for (int i = 0; i < N; i++) {
-			quotent.data[i] = (byte)divide(quotent.data[i]&0xFF,normalizer);
+			quotient.data[i] = (byte)divide(quotient.data[i]&0xFF,normalizer);
 
-			int coef = quotent.data[i]&0xFF;
+			int coef = quotient.data[i]&0xFF;
 			if( coef != 0 ) { // division by zero is undefined.
 				for (int j = 1; j < divisor.size; j++) { // skip the first coeffient in synthetic division
 					int div_j = divisor.data[j]&0xFF;
 					if( div_j != 0 ) {// log(0) is undefined.
-						quotent.data[i+j] ^= multiply(div_j,coef);
+						quotient.data[i+j] ^= multiply(div_j,coef);
 					}
 				}
 			}
 		}
 
-		// quotent currently contains the quotent and remainder. Copy remainder into it's own polynomial
-		System.arraycopy(quotent.data,quotent.size-remainder.size,remainder.data,0,remainder.size);
-		quotent.size -= remainder.size;
+		// quotient currently contains the quotient and remainder. Copy remainder into it's own polynomial
+		System.arraycopy(quotient.data,quotient.size-remainder.size,remainder.data,0,remainder.size);
+		quotient.size -= remainder.size;
 	}
 }

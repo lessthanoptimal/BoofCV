@@ -286,19 +286,19 @@ public class TestGaliosFieldTableOps {
 		inputB.set(0,0xF0);
 		inputB.set(1,0x0A);
 
-		GrowQueue_I8 quotent = new GrowQueue_I8();
+		GrowQueue_I8 quotient = new GrowQueue_I8();
 		GrowQueue_I8 remainder = new GrowQueue_I8();
-		alg.polyDivide(inputA,inputB,quotent,remainder);
-		assertEquals(4,quotent.size);
+		alg.polyDivide(inputA,inputB,quotient,remainder);
+		assertEquals(4,quotient.size);
 		assertEquals(1,remainder.size);
 
 		// see if division was done correct and reconstruct the original equation
-		checkDivision(alg, inputA, inputB, quotent, remainder);
+		checkDivision(alg, inputA, inputB, quotient, remainder);
 
 		// have the divisor be larger than the dividend
-		alg.polyDivide(inputB,inputA,quotent,remainder);
+		alg.polyDivide(inputB,inputA,quotient,remainder);
 
-		checkDivision(alg, inputB, inputA, quotent, remainder);
+		checkDivision(alg, inputB, inputA, quotient, remainder);
 	}
 
 	private void checkDivision(GaliosFieldTableOps alg, GrowQueue_I8 inputA, GrowQueue_I8 inputB, GrowQueue_I8 quotent, GrowQueue_I8 remainder) {
