@@ -23,6 +23,11 @@ import org.ddogleg.struct.GrowQueue_I8;
 /**
  * TODO Summarize
  *
+ * <p>Code and code comments based on the tutorial at [1].</p>
+ *
+ *  <p>[1] <a href="https://en.wikiversity.org/wiki/Reed–Solomon_codes_for_coders">Reed-Solomon Codes for Coders</a>
+ *  Viewed on September 28, 2017</p>
+ *
  * @author Peter Abeles
  */
 public class ReidSolomonCodes {
@@ -33,7 +38,6 @@ public class ReidSolomonCodes {
 
 	GrowQueue_I8 tmp0 = new GrowQueue_I8();
 	GrowQueue_I8 tmp1 = new GrowQueue_I8();
-
 
 	public ReidSolomonCodes( int numBits , int primitive) {
 		math = new GaliosFieldTableOps(numBits,primitive);
@@ -48,7 +52,7 @@ public class ReidSolomonCodes {
 	 * @param input Input message
 	 * @param output error correction code
 	 */
-	public void computeErrorCorrection( GrowQueue_I8 input , GrowQueue_I8 output ) {
+	public void computeECC( GrowQueue_I8 input , GrowQueue_I8 output ) {
 		math.polyDivide(input,generator,tmp0,output);
 	}
 
@@ -68,11 +72,29 @@ public class ReidSolomonCodes {
 	}
 
 	/**
-	 * Creates the generator function with the specified polynomial degree
+	 * Computes the syndromes for the message (input + ecc). If there's no error then the output will be zero.
+	 * @param input Data portion of the message
+	 * @param ecc ECC portion of the message
+	 * @param syncdromes (Output) results of the syndromes
+	 */
+	void computeSyndromes( GrowQueue_I8 input ,
+						   GrowQueue_I8 ecc ,
+						   int syncdromes[])
+	{
+		for (int i = 0; i < generator.size-1; i++) {
+			syncdromes[i] = math.polyEval(input,math.power(2,i));
+			syncdromes[i] = math.polyEval(ecc,syncdromes[i]);
+		}
+	}
+
+	/**
+	 * Creates the generator function with the specified polynomial degree. The generator function is composed
+	 * of factors of (x-a_n) where a_n is a power of 2.<br>
+	 *
+	 * g<sub>4</sub>(x) = (x - α0) (x - α1) (x - α2) (x - α3) = 01 x4 + 0f x3 + 36 x2 + 78 x + 40
 	 */
 	void generator( int degree ) {
-		generator.resize(1);
-		generator.data[0] = 1;
+		generator.resize(degree+1);
 
 		tmp1.resize(2);
 		tmp1.data[0 ] = 1;

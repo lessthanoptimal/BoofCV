@@ -23,6 +23,11 @@ import org.ddogleg.struct.GrowQueue_I8;
 /**
  * Precomputed look up table for performing operations on GF polynomials of the specified degree.
  *
+ * <p>Code and code comments based on the tutorial at [1].</p>
+ *
+ *  <p>[1] <a href="https://en.wikiversity.org/wiki/Reed–Solomon_codes_for_coders">Reed-Solomon Codes for Coders</a>
+ *  Viewed on September 28, 2017</p>
+ *
  * @author Peter Abeles
  */
 public class GaliosFieldTableOps {
@@ -108,7 +113,7 @@ public class GaliosFieldTableOps {
 	/**
 	 * Scales the polynomial.
 	 *
-	 * <p>Coeffients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
+	 * <p>Coefficients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
 	 *
 	 * @param input Input polynomial.
 	 * @param scale scale
@@ -124,12 +129,13 @@ public class GaliosFieldTableOps {
 	}
 
 	/**
+	 * Adds two polynomials together.
 	 *
-	 * <p>Coeffients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
+	 * <p>Coefficients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
 	 *
-	 * @param polyA
-	 * @param polyB
-	 * @param output
+	 * @param polyA (Input) First polynomial
+	 * @param polyB (Input) Second polynomial
+	 * @param output (Output) Results of addition
 	 */
 	public void polyAdd(GrowQueue_I8 polyA , GrowQueue_I8 polyB , GrowQueue_I8 output ) {
 		output.resize(Math.max(polyA.size,polyB.size));
@@ -150,10 +156,9 @@ public class GaliosFieldTableOps {
 		}
 	}
 
-
 	/**
 	 *
-	 * <p>Coeffients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
+	 * <p>Coefficients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
 	 *
 	 * @param polyA
 	 * @param polyB
@@ -174,14 +179,13 @@ public class GaliosFieldTableOps {
 		}
 	}
 
-
 	/**
 	 *
-	 * <p>Coeffients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
+	 * <p>Coefficients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
 	 *
-	 * @param input
-	 * @param x
-	 * @return
+	 * @param input Polynomial being evaluated
+	 * @param x Value of x
+	 * @return Output of function
 	 */
 	public int polyEval(GrowQueue_I8 input , int x ) {
 		int y = input.data[0];
@@ -195,6 +199,8 @@ public class GaliosFieldTableOps {
 
 	/**
 	 * Performs polynomial division using a synthetic division algorithm.
+	 *
+	 * <p>Coefficients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
 	 *
 	 * @param dividend (Input) Polynomial dividend
 	 * @param divisor (Input) Polynomial divisor

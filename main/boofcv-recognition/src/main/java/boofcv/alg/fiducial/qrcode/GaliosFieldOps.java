@@ -25,7 +25,7 @@ package boofcv.alg.fiducial.qrcode;
  *
  * <p>Code and code comments based on the tutorial at [1].</p>
  *
- *  <p>[1] <a href="https://en.wikiversity.org/wiki/Reed–Solomon_codes_for_coder">Reed-Solomon Codes for Coders</a>
+ *  <p>[1] <a href="https://en.wikiversity.org/wiki/Reed–Solomon_codes_for_coders">Reed-Solomon Codes for Coders</a>
  *  Viewed on September 28, 2017</p>
  *
  * @author Peter Abeles

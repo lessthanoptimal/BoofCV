@@ -27,7 +27,17 @@ import static org.junit.Assert.fail;
  */
 public class TestReidSolomonCodes {
 	@Test
-	public void stuff() {
+	public void computeECC() {
+		fail("implement");
+	}
+
+	@Test
+	public void computeSyndromes() {
+		fail("implement");
+	}
+
+	@Test
+	public void generator() {
 		fail("implement");
 	}
 }

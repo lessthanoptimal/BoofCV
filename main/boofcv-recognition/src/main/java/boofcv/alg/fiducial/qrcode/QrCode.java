@@ -49,12 +49,17 @@ public class QrCode {
 	/**
 	 * 3 byte value indicating the mask pattern used in the QR code
 	 */
-	int maskPattern;
+	public int maskPattern;
 
 	/**
 	 * Alignment pattern information
 	 */
 	public FastQueue<Alignment> alignment = new FastQueue<>(Alignment.class,true);
+
+	/**
+	 * Text encoding mode
+	 */
+	public Mode mode;
 
 	/**
 	 * Approximate bounding box for QR-Code. The bottom right corner is estimated by intersecting lines
@@ -79,6 +84,7 @@ public class QrCode {
 		errorCorrection = ErrorCorrectionLevel.L;
 		maskPattern = 0b101;
 		alignment.reset();
+		mode = Mode.ALPHANUMERIC;
 	}
 
 	public enum ErrorCorrectionLevel {
@@ -132,5 +138,13 @@ public class QrCode {
 		 * Threshold value selected at this alignment pattern
 		 */
 		public double threshold;
+	}
+
+	public enum Mode {
+		ECI,
+		NUMERIC,
+		ALPHANUMERIC,
+		BYTE,
+		KANJI
 	}
 }
