@@ -180,6 +180,10 @@ public class GaliosFieldTableOps {
 	}
 
 	/**
+	 * Evaluate the polynomial using Horner's method. Avoids explicit calculating the powers of x.
+	 *
+	 * <p>01x**4 + 0fx**3 + 36x**2 + 78x + 40 = (((01 x + 0f) x + 36) x + 78) x + 40</p>
+	 *
 	 *
 	 * <p>Coefficients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
 	 *
@@ -188,10 +192,27 @@ public class GaliosFieldTableOps {
 	 * @return Output of function
 	 */
 	public int polyEval(GrowQueue_I8 input , int x ) {
-		int y = input.data[0];
+		int y = input.data[0]&0xFF;
 
 		for (int i = 1; i < input.size; i++) {
 			y = multiply(y,x) ^ (input.data[i]&0xFF);
+		}
+
+		return y;
+	}
+
+	/**
+	 * Continue evaluating a polynomial which has been broken up into multiple arrays.
+	 *
+	 * @param previousOutput Output from the evaluation of the prior part of the polynomial
+	 * @param part Additional segment of the polynomial
+	 * @param x Point it's being evaluated at
+	 * @return results
+	 */
+	public int polyEvalContinue( int previousOutput, GrowQueue_I8 part , int x ) {
+		int y = previousOutput;
+		for (int i = 0; i < part.size; i++) {
+			y = multiply(y,x) ^ (part.data[i]&0xFF);
 		}
 
 		return y;

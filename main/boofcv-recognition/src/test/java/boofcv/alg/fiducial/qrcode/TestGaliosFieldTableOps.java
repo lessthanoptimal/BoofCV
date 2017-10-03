@@ -24,6 +24,7 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -249,6 +250,13 @@ public class TestGaliosFieldTableOps {
 		expected.set(3,alg.multiply(0xFF,0x03));
 	}
 
+	private void randomPoly(GrowQueue_I8 inputA, int length) {
+		inputA.reset();
+		for (int j = 0; j < length; j++) {
+			inputA.add( rand.nextInt(256));
+		}
+	}
+
 	@Test
 	public void polyEval() {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
@@ -265,6 +273,42 @@ public class TestGaliosFieldTableOps {
 
 		int expected = 0xFF ^ alg.multiply(0x54,input);
 		expected ^= alg.multiply(0x12,alg.multiply(input,input));
+
+		assertEquals(expected,found);
+	}
+
+	@Test
+	public void polyEval_random() {
+		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+		GrowQueue_I8 inputA = new GrowQueue_I8();
+
+		for (int i = 0; i < 1000; i++) {
+			randomPoly(inputA,30);
+
+			int value = rand.nextInt(256);
+
+			int found = alg.polyEval(inputA,value);
+			assertTrue(found >= 0 && found < 256);
+		}
+	}
+
+	@Test
+	public void polyEvalContinue() {
+		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+
+		GrowQueue_I8 polyA = new GrowQueue_I8();
+		randomPoly(polyA,30);
+
+		int x = 0x09;
+		int expected = alg.polyEval(polyA,x);
+
+		GrowQueue_I8 polyB = new GrowQueue_I8(10);
+		polyB.resize(10);
+		System.arraycopy(polyA.data,20,polyB.data,0,10);
+		polyA.size = 20;
+
+		int found = alg.polyEval(polyA,x);
+		found = alg.polyEvalContinue(found,polyB,x);
 
 		assertEquals(expected,found);
 	}

@@ -20,6 +20,8 @@ package boofcv.alg.fiducial.qrcode;
 
 import org.ddogleg.struct.GrowQueue_I8;
 
+import java.util.Arrays;
+
 /**
  * TODO Summarize
  *
@@ -49,11 +51,18 @@ public class ReidSolomonCodes {
 
 	/**
 	 * Given the input message compute the error correction code for it
-	 * @param input Input message
+	 * @param input Input message. Modified internally then returned to its initial state
 	 * @param output error correction code
 	 */
 	public void computeECC( GrowQueue_I8 input , GrowQueue_I8 output ) {
+
+		int N = generator.size-1;
+		input.extend(input.size+N);
+		Arrays.fill(input.data,input.size-N,input.size,(byte)0);
+
 		math.polyDivide(input,generator,tmp0,output);
+
+		input.size -= N;
 	}
 
 	/**
@@ -75,15 +84,16 @@ public class ReidSolomonCodes {
 	 * Computes the syndromes for the message (input + ecc). If there's no error then the output will be zero.
 	 * @param input Data portion of the message
 	 * @param ecc ECC portion of the message
-	 * @param syncdromes (Output) results of the syndromes
+	 * @param syndromes (Output) results of the syndromes computations
 	 */
 	void computeSyndromes( GrowQueue_I8 input ,
 						   GrowQueue_I8 ecc ,
-						   int syncdromes[])
+						   int syndromes[])
 	{
 		for (int i = 0; i < generator.size-1; i++) {
-			syncdromes[i] = math.polyEval(input,math.power(2,i));
-			syncdromes[i] = math.polyEval(ecc,syncdromes[i]);
+			int val = math.power(2,i);
+			syndromes[i] = math.polyEval(input,val);
+			syndromes[i] = math.polyEvalContinue(syndromes[i],ecc,val);
 		}
 	}
 
@@ -94,10 +104,15 @@ public class ReidSolomonCodes {
 	 * g<sub>4</sub>(x) = (x - α0) (x - α1) (x - α2) (x - α3) = 01 x4 + 0f x3 + 36 x2 + 78 x + 40
 	 */
 	void generator( int degree ) {
+		// predeclare memory
 		generator.resize(degree+1);
+		// initialize to a polynomial = 1
+		generator.size = 1;
+		generator.data[0] = 1;
 
+		// (1*x - a[i])
 		tmp1.resize(2);
-		tmp1.data[0 ] = 1;
+		tmp1.data[0] = 1;
 		for (int i = 0; i < degree; i++) {
 			tmp1.data[1] = (byte)math.power(2,i);
 			math.polyMult(generator,tmp1,tmp0);
