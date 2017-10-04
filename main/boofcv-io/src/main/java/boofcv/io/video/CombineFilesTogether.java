@@ -78,7 +78,7 @@ public class CombineFilesTogether {
 	}
 
 	public static void main( String args[] ) throws IOException {
-		List<String> fileNames = UtilIO.directoryList("log", "depth");
+		List<String> fileNames = UtilIO.listByPrefix("log", "depth");
 		Collections.sort(fileNames);
 		CombineFilesTogether.combine(fileNames,"combined.mpng");
 	}

@@ -362,7 +362,7 @@ public class UtilIO {
 	 * @param prefix Prefix that the file must have
 	 * @return List of files that are in the directory and match the prefix.
 	 */
-	public static List<String> directoryList(String directory , String prefix ) {
+	public static List<String> listByPrefix(String directory , String prefix ) {
 		List<String> ret = new ArrayList<>();
 
 		File d = new File(directory);
@@ -379,6 +379,26 @@ public class UtilIO {
 			if( f.getName().contains(prefix )) {
 				ret.add(f.getAbsolutePath());
 			}
+		}
+
+		return ret;
+	}
+
+	public static List<String> listAll(String directory ) {
+		List<String> ret = new ArrayList<>();
+
+		File d = new File(directory);
+
+		if( !d.isDirectory() )
+			throw new IllegalArgumentException("Must specify an directory");
+
+		File files[] = d.listFiles();
+
+		for( File f : files ) {
+			if( f.isDirectory() || f.isHidden() )
+				continue;
+
+			ret.add(f.getAbsolutePath());
 		}
 
 		return ret;

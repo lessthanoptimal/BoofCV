@@ -34,6 +34,7 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
+import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -73,6 +74,13 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 				System.out.printf("click %5.1f %5.1f\n",e.getX()/scale,e.getY()/scale);
 			}
 		});
+
+		setPreferredSize(new Dimension(800,800));
+	}
+
+	@Override
+	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+		super.handleInputChange(source, method, width, height);
 	}
 
 	@Override
@@ -235,20 +243,13 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	public static void main(String[] args) {
 
 		List<String> examples = new ArrayList<>();
-		examples.add("shapes/polygons01.jpg");
-		examples.add("shapes/polygons_border_01.jpg");
-//		examples.add("shapes/shapes01.png"); This is a pathological case specifically design to screw up threshold algs
-		examples.add("shapes/shapes02.png");
-		examples.add("shapes/concave01.jpg");
-		examples.add("shapes/line_text_test_image.png");
-		examples.add("fiducial/binary/image0000.jpg");
-		examples.add("calibration/stereo/Bumblebee2_Square/left10.jpg");
-		examples.add("fiducial/square_grid/movie.mp4");
+		examples.add(UtilIO.pathExample("fiducial/qrcode/image01.jpg"));
+		examples.add(UtilIO.pathExample("fiducial/qrcode/image02.jpg"));
+		examples.add(UtilIO.pathExample("fiducial/qrcode/image03.jpg"));
 
 		DetectQrCodeApp app = new DetectQrCodeApp(examples,GrayF32.class);
 
 		app.openFile(new File(examples.get(0)));
-
 		app.display("QR-Code Detector");
 	}
 

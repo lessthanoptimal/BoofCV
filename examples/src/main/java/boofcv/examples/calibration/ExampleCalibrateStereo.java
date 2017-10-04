@@ -69,8 +69,8 @@ public class ExampleCalibrateStereo {
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 
-		left = UtilIO.directoryList(directory, "left");
-		right = UtilIO.directoryList(directory, "right");
+		left = UtilIO.listByPrefix(directory, "left");
+		right = UtilIO.listByPrefix(directory, "right");
 	}
 
 	/**
@@ -82,8 +82,8 @@ public class ExampleCalibrateStereo {
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 
-		left = UtilIO.directoryList(directory, "left");
-		right = UtilIO.directoryList(directory, "right");
+		left = UtilIO.listByPrefix(directory, "left");
+		right = UtilIO.listByPrefix(directory, "right");
 	}
 
 	/**

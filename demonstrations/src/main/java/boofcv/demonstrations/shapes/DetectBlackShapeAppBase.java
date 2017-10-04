@@ -43,7 +43,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 
 	protected DetectBlackShapePanel controls;
 
-	ImageZoomPanel guiImage;
+	protected ImageZoomPanel guiImage;
 
 	protected InputToBinary<T> inputToBinary;
 

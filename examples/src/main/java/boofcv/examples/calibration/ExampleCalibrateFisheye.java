@@ -52,11 +52,11 @@ public class ExampleCalibrateFisheye {
 
 		// Square Grid example
 //		detector = FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(4, 3, 30, 30));
-//		images = UtilIO.directoryList(UtilIO.pathExample("calibration/fisheye/square_grid"),"right");
+//		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/square_grid"));
 
-		// Chessboard Example
+//		 Chessboard Example
 		detector = FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));
-		images = UtilIO.directoryList(UtilIO.pathExample("calibration/fisheye/chessboard"),"right");
+		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/chessboard"));
 
 		// Declare and setup the calibration algorithm
 		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector);

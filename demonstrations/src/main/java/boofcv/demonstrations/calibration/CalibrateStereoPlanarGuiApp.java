@@ -249,8 +249,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 //		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 
-		List<String> leftImages = UtilIO.directoryList(directory, "left");
-		List<String> rightImages = UtilIO.directoryList(directory, "right");
+		List<String> leftImages = UtilIO.listByPrefix(directory, "left");
+		List<String> rightImages = UtilIO.listByPrefix(directory, "right");
 
 		Collections.sort(leftImages);
 		Collections.sort(rightImages);

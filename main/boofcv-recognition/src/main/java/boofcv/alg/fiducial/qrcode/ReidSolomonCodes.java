@@ -97,6 +97,14 @@ public class ReidSolomonCodes {
 		}
 	}
 
+	void findErrorLocator( int length ) {
+		GrowQueue_I8 poly = new GrowQueue_I8();
+		poly.resize(1);
+		poly.data[0] = 1;
+
+
+	}
+
 	/**
 	 * Creates the generator function with the specified polynomial degree. The generator function is composed
 	 * of factors of (x-a_n) where a_n is a power of 2.<br>
