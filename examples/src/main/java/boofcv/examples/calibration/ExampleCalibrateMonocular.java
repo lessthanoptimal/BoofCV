@@ -79,7 +79,7 @@ public class ExampleCalibrateMonocular {
 
 		for( String n : images ) {
 			BufferedImage input = UtilImageIO.loadImage(n);
-			if( n != null ) {
+			if( input != null ) {
 				GrayF32 image = ConvertBufferedImage.convertFrom(input,(GrayF32)null);
 				if( !calibrationAlg.addImage(image) )
 					System.err.println("Failed to detect target in "+n);
