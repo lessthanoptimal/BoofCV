@@ -46,7 +46,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CalibrateMonoPlanarGuiApp extends JPanel
+public class CalibratePinholePlanarGuiApp extends JPanel
 		implements VisualizeApp {
 
 	// computes calibration parameters
@@ -59,9 +59,9 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	List<String> images;
 	MediaManager media = DefaultMediaManager.INSTANCE;
 
-	public CalibrateMonoPlanarGuiApp() {
+	public CalibratePinholePlanarGuiApp() {
 		setLayout(new BorderLayout());
-		setPreferredSize(new Dimension(800,525));
+		gui.mainView.setPreferredSize(new Dimension(500,480));
 		this.owner = this;
 
 		add(gui,BorderLayout.CENTER);
@@ -210,10 +210,10 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 //		images = UtilIO.directoryList(UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang"),"CalibIm");
 //		images = UtilIO.directoryList(UtilIO.pathExample("calibration//stereo/Bumblebee2_Square"),"left");
 
-		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
+		CalibratePinholePlanarGuiApp app = new CalibratePinholePlanarGuiApp();
 		app.configure(detector,images,2,false);
 
-		JFrame frame = new JFrame("Planar Calibration");
+		JFrame frame = new JFrame("Pinhole Calribation with Planar Targets");
 		frame.add(app, BorderLayout.CENTER);
 		frame.pack();
 		frame.setVisible(true);

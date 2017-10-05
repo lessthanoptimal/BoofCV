@@ -26,12 +26,8 @@ import boofcv.gui.ViewedImageInfoPanel;
 import boofcv.struct.calib.CameraUniversalOmni;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -43,33 +39,15 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class FisheyePlanarPanel extends CalibratedPlanarPanel<CameraUniversalOmni>
-		implements ItemListener , ChangeListener
 {
-	JCheckBox checkPoints;
-	JCheckBox checkErrors;
-	JCheckBox checkUndistorted;
-	JCheckBox checkAll;
-	JCheckBox checkNumbers;
-	JCheckBox checkOrder;
-	JSpinner selectErrorScale;
-
-	JTextArea meanError;
-	JTextArea maxError;
-
 	JTextArea paramCenterX;
 	JTextArea paramCenterY;
 	JTextArea paramFX;
 	JTextArea paramFY;
 	JTextArea paramSkew;
+	JTextArea paramRadial;
+	JTextArea paramTangental;
 	JTextArea paramOffset;
-
-	boolean showPoints = false;
-	boolean showErrors = true;
-	boolean showUndistorted = false;
-	boolean showAll = false;
-	boolean showNumbers = false;
-	boolean showOrder = true;
-	int errorScale = 20;
 
 	public FisheyePlanarPanel() {
 
@@ -93,14 +71,14 @@ public class FisheyePlanarPanel extends CalibratedPlanarPanel<CameraUniversalOmn
 		imageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		imageList.addListSelectionListener(this);
 
-		meanError = createErrorComponent();
-		maxError = createErrorComponent();
-		paramCenterX = createErrorComponent();
-		paramCenterY = createErrorComponent();
-		paramFX = createErrorComponent();
-		paramFY = createErrorComponent();
-		paramSkew = createErrorComponent();
-		paramOffset = createErrorComponent();
+		paramCenterX = createErrorComponent(1);
+		paramCenterY = createErrorComponent(1);
+		paramFX = createErrorComponent(1);
+		paramFY = createErrorComponent(1);
+		paramSkew = createErrorComponent(1);
+		paramRadial = createErrorComponent(2);
+		paramTangental = createErrorComponent(2);
+		paramOffset = createErrorComponent(1);
 
 		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
 		mainView.addMouseWheelListener(viewInfo);
@@ -108,14 +86,6 @@ public class FisheyePlanarPanel extends CalibratedPlanarPanel<CameraUniversalOmn
 		add(mainView, BorderLayout.CENTER);
 		add( new LeftPanel(), BorderLayout.WEST);
 		add( new RightPanel() , BorderLayout.EAST );
-	}
-
-
-	private JTextArea createErrorComponent() {
-		JTextArea comp = new JTextArea(1,6);
-		comp.setMaximumSize(comp.getPreferredSize());
-		comp.setEditable(false);
-		return comp;
 	}
 
 	public void setObservations( List<CalibrationObservation> features  ) {
@@ -139,10 +109,30 @@ public class FisheyePlanarPanel extends CalibratedPlanarPanel<CameraUniversalOmn
 		String textB = String.format("%5.1f",intrinsic.fy);
 		paramFX.setText(textA);
 		paramFY.setText(textB);
-		String textC = String.format("%5.1e",intrinsic.skew);
-		paramSkew.setText(textC);
+		if( intrinsic.skew == 0 ) {
+			paramSkew.setText("");
+		} else {
+			String textC = String.format("%5.1e", intrinsic.skew);
+			paramSkew.setText(textC);
+		}
 		String textD = String.format("%5.1e",intrinsic.mirrorOffset);
 		paramOffset.setText(textD);
+
+		String radial = "";
+		if( intrinsic.radial != null ) {
+			for (int i = 0; i < intrinsic.radial.length; i++) {
+				radial += String.format("%5.2e",intrinsic.radial[i]);
+				if( i != intrinsic.radial.length-1) {
+					radial += "\n";
+				}
+			}
+		}
+		paramRadial.setText(radial);
+
+		if( intrinsic.t1 != 0 && intrinsic.t2 != 0 )
+			paramTangental.setText(String.format("%5.2e\n%5.2e",intrinsic.t1,intrinsic.t2));
+		else
+			paramTangental.setText("");
 	}
 
 	@Override
@@ -150,25 +140,6 @@ public class FisheyePlanarPanel extends CalibratedPlanarPanel<CameraUniversalOmn
 	{
 		checkUndistorted.setEnabled(true);
 		mainView.setCalibration(param);
-	}
-
-	@Override
-	public void itemStateChanged(ItemEvent e) {
-		if( e.getSource() == checkPoints ) {
-			showPoints = checkPoints.isSelected();
-		} else if( e.getSource() == checkErrors ) {
-			showErrors = checkErrors.isSelected();
-		} else if( e.getSource() == checkAll ) {
-			showAll = checkAll.isSelected();
-		} else if( e.getSource() == checkUndistorted ) {
-			showUndistorted = checkUndistorted.isSelected();
-		} else if( e.getSource() == checkNumbers ) {
-			showNumbers = checkNumbers.isSelected();
-		} else if( e.getSource() == checkOrder ) {
-			showOrder = checkOrder.isSelected();
-		}
-		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
-		mainView.repaint();
 	}
 
 	@Override
@@ -193,16 +164,6 @@ public class FisheyePlanarPanel extends CalibratedPlanarPanel<CameraUniversalOmn
 		}
 	}
 
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == selectErrorScale) {
-			errorScale = ((Number) selectErrorScale.getValue()).intValue();
-		}
-
-		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
-		mainView.repaint();
-	}
-
 	private class LeftPanel extends StandardAlgConfigPanel
 	{
 		public LeftPanel() {
@@ -216,52 +177,11 @@ public class FisheyePlanarPanel extends CalibratedPlanarPanel<CameraUniversalOmn
 			addLabeled(paramFX,"fx",this);
 			addLabeled(paramFY,"fy",this);
 			addLabeled(paramSkew,"skew",this);
+			addLabeled(paramRadial,"radial",this);
+			addLabeled(paramTangental,"tangential",this);
 			addLabeled(paramOffset,"offset",this);
 			addCenterLabel("Images",this);
 			add(scroll);
-		}
-	}
-
-	private class RightPanel extends StandardAlgConfigPanel
-	{
-		public RightPanel() {
-			checkPoints = new JCheckBox("Show Points");
-			checkPoints.setSelected(showPoints);
-			checkPoints.addItemListener(FisheyePlanarPanel.this);
-
-			checkErrors = new JCheckBox("Show Errors");
-			checkErrors.setSelected(showErrors);
-			checkErrors.addItemListener(FisheyePlanarPanel.this);
-
-			checkAll = new JCheckBox("All Points");
-			checkAll.setSelected(showAll);
-			checkAll.addItemListener(FisheyePlanarPanel.this);
-
-			checkUndistorted = new JCheckBox("Undistort");
-			checkUndistorted.setSelected(showUndistorted);
-			checkUndistorted.addItemListener(FisheyePlanarPanel.this);
-			checkUndistorted.setEnabled(false);
-
-			checkNumbers = new JCheckBox("Numbers");
-			checkNumbers.setSelected(showNumbers);
-			checkNumbers.addItemListener(FisheyePlanarPanel.this);
-
-			checkOrder = new JCheckBox("Order");
-			checkOrder.setSelected(showOrder);
-			checkOrder.addItemListener(FisheyePlanarPanel.this);
-
-			selectErrorScale = new JSpinner(new SpinnerNumberModel(errorScale, 1, 100, 5));
-			selectErrorScale.addChangeListener(FisheyePlanarPanel.this);
-			selectErrorScale.setMaximumSize(selectErrorScale.getPreferredSize());
-
-			add(viewInfo);
-			addAlignLeft(checkPoints, this);
-			addAlignLeft(checkErrors, this);
-			addAlignLeft(checkAll, this);
-			addAlignLeft(checkUndistorted, this);
-			addAlignLeft(checkNumbers, this);
-			addAlignLeft(checkOrder, this);
-			addLabeled(selectErrorScale,"Error Scale", this);
 		}
 	}
 }

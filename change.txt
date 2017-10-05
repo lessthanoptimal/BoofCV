@@ -88,12 +88,10 @@ Contour to Line
 - Current algorithm breaks down when there is a mixture of long and short sides. Tuning to make it work on
   them makes it break on others
 
-Calibration
-  TODO Calibration Demonstration features
-    - show all calibration parameters
-    - move checkboxes to right in pinhole
-    - open a directory
-    - save intrinsic parameters to a file
+Calibration Application
+  - Open a directory
+  - Configure detector and show preview
+  - File->Save intrinsics to disk
 
 TOP ITEMS
 - TODO Add QR Code to fiducial demonstration

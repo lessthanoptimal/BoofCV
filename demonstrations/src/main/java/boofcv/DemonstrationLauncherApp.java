@@ -96,7 +96,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				DemoBinaryImageOpsApp.class);
 
 		createNodes(root,"Calibration",
-				CalibrateMonoPlanarGuiApp.class,
+				CalibratePinholePlanarGuiApp.class,
 				CalibrateFisheyePlanarGuiApp.class,
 				CalibrateStereoPlanarGuiApp.class,
 				DetectCalibrationChessboardApp.class,

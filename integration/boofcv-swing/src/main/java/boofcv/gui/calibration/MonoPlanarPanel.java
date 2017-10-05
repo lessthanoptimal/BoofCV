@@ -22,6 +22,7 @@ import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.Zhang99AllParam;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.ViewedImageInfoPanel;
 import boofcv.struct.calib.CameraPinholeRadial;
 
 import javax.swing.*;
@@ -31,6 +32,8 @@ import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 /**
@@ -42,104 +45,51 @@ import java.util.List;
 public class MonoPlanarPanel extends CalibratedPlanarPanel<CameraPinholeRadial>
 		implements ItemListener , ChangeListener
 {
-	JCheckBox checkPoints;
-	JCheckBox checkErrors;
-	JCheckBox checkUndistorted;
-	JCheckBox checkAll;
-	JCheckBox checkNumbers;
-	JCheckBox checkOrder;
-	JSpinner selectErrorScale;
-
-	JTextArea meanError;
-	JTextArea maxError;
-
 	JTextArea paramCenterX;
 	JTextArea paramCenterY;
 	JTextArea paramFX;
 	JTextArea paramFY;
 	JTextArea paramSkew;
-
-	boolean showPoints = false;
-	boolean showErrors = true;
-	boolean showUndistorted = false;
-	boolean showAll = false;
-	boolean showNumbers = false;
-	boolean showOrder = true;
-
-	int errorScale = 20;
+	JTextArea paramRadial;
+	JTextArea paramTangental;
 
 	public MonoPlanarPanel() {
-		mainView = new DisplayPinholeCalibrationPanel();
+		viewInfo.setListener(new ViewedImageInfoPanel.Listener() {
+			@Override
+			public void zoomChanged(double zoom) {
+				mainView.setScale(zoom);
+			}
+		});
 
-		JToolBar toolBar = createToolBar();
+		mainView = new DisplayPinholeCalibrationPanel();
+		mainView.getImagePanel().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				double scale = viewInfo.getZoom();
+				viewInfo.setCursor(e.getX()/scale,e.getY()/scale);
+			}
+		});
 
 		imageList = new JList();
 		imageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		imageList.addListSelectionListener(this);
 
-		meanError = createErrorComponent();
-		maxError = createErrorComponent();
-		paramCenterX = createErrorComponent();
-		paramCenterY = createErrorComponent();
-		paramFX = createErrorComponent();
-		paramFY = createErrorComponent();
-		paramSkew = createErrorComponent();
+		meanError = createErrorComponent(1);
+		maxError = createErrorComponent(1);
+		paramCenterX = createErrorComponent(1);
+		paramCenterY = createErrorComponent(1);
+		paramFX = createErrorComponent(1);
+		paramFY = createErrorComponent(1);
+		paramSkew = createErrorComponent(1);
+		paramRadial = createErrorComponent(2);
+		paramTangental = createErrorComponent(2);
 
 		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
+		mainView.addMouseWheelListener(viewInfo);
 
-		add(toolBar, BorderLayout.PAGE_START);
 		add(mainView, BorderLayout.CENTER);
-		add(new SideBar(), BorderLayout.WEST);
-	}
-
-	private JToolBar createToolBar() {
-		JToolBar toolBar = new JToolBar("Controls");
-
-		checkPoints = new JCheckBox("Show Points");
-		checkPoints.setSelected(showPoints);
-		checkPoints.addItemListener(this);
-
-		checkErrors = new JCheckBox("Show Errors");
-		checkErrors.setSelected(showErrors);
-		checkErrors.addItemListener(this);
-
-		checkAll = new JCheckBox("All Points");
-		checkAll.setSelected(showAll);
-		checkAll.addItemListener(this);
-
-		checkUndistorted = new JCheckBox("Undistort");
-		checkUndistorted.setSelected(showUndistorted);
-		checkUndistorted.addItemListener(this);
-		checkUndistorted.setEnabled(false);
-
-		checkNumbers = new JCheckBox("Numbers");
-		checkNumbers.setSelected(showNumbers);
-		checkNumbers.addItemListener(this);
-
-		checkOrder = new JCheckBox("Order");
-		checkOrder.setSelected(showOrder);
-		checkOrder.addItemListener(this);
-
-		selectErrorScale = new JSpinner(new SpinnerNumberModel(errorScale, 1, 100, 5));
-		selectErrorScale.addChangeListener(this);
-		selectErrorScale.setMaximumSize(selectErrorScale.getPreferredSize());
-
-		toolBar.add(checkPoints);
-		toolBar.add(checkErrors);
-		toolBar.add(checkAll);
-		toolBar.add(checkUndistorted);
-		toolBar.add(checkNumbers);
-		toolBar.add(checkOrder);
-		toolBar.add(new JLabel("| Error Scale"));
-		toolBar.add(selectErrorScale);
-		return toolBar;
-	}
-
-	private JTextArea createErrorComponent() {
-		JTextArea comp = new JTextArea(1,6);
-		comp.setMaximumSize(comp.getPreferredSize());
-		comp.setEditable(false);
-		return comp;
+		add( new LeftPanel() , BorderLayout.WEST);
+		add( new RightPanel() , BorderLayout.EAST );
 	}
 
 	public void setObservations( List<CalibrationObservation> features  ) {
@@ -163,8 +113,28 @@ public class MonoPlanarPanel extends CalibratedPlanarPanel<CameraPinholeRadial>
 		String textB = String.format("%5.1f",intrinsic.fy);
 		paramFX.setText(textA);
 		paramFY.setText(textB);
-		String textC = String.format("%5.1e",intrinsic.skew);
-		paramSkew.setText(textC);
+		if( intrinsic.skew == 0 ) {
+			paramSkew.setText("");
+		} else {
+			String textC = String.format("%5.1e", intrinsic.skew);
+			paramSkew.setText(textC);
+		}
+
+		String radial = "";
+		if( intrinsic.radial != null ) {
+			for (int i = 0; i < intrinsic.radial.length; i++) {
+				radial += String.format("%5.2e",intrinsic.radial[i]);
+				if( i != intrinsic.radial.length-1) {
+					radial += "\n";
+				}
+			}
+		}
+		paramRadial.setText(radial);
+
+		if( intrinsic.t1 != 0 && intrinsic.t2 != 0 )
+			paramTangental.setText(String.format("%5.2e\n%5.2e",intrinsic.t1,intrinsic.t2));
+		else
+			paramTangental.setText("");
 	}
 
 	@Override
@@ -234,9 +204,9 @@ public class MonoPlanarPanel extends CalibratedPlanarPanel<CameraPinholeRadial>
 		mainView.repaint();
 	}
 
-	private class SideBar extends StandardAlgConfigPanel
+	private class LeftPanel extends StandardAlgConfigPanel
 	{
-		public SideBar() {
+		public LeftPanel() {
 			JScrollPane scroll = new JScrollPane(imageList);
 
 			addLabeled(meanError,"Mean Error",this);
@@ -247,6 +217,8 @@ public class MonoPlanarPanel extends CalibratedPlanarPanel<CameraPinholeRadial>
 			addLabeled(paramFX,"fx",this);
 			addLabeled(paramFY,"fy",this);
 			addLabeled(paramSkew,"skew",this);
+			addLabeled(paramRadial,"radial",this);
+			addLabeled(paramTangental,"tangential",this);
 			addSeparator(200);
 			add(scroll);
 		}

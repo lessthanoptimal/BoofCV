@@ -21,13 +21,18 @@ package boofcv.gui.calibration;
 import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.Zhang99AllParam;
+import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.ViewedImageInfoPanel;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraModel;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -38,8 +43,26 @@ import java.util.Vector;
  * @author Peter Abeles
  */
 public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPanel
-	implements ListSelectionListener
+	implements ListSelectionListener, ItemListener, ChangeListener
 {
+	JCheckBox checkPoints;
+	JCheckBox checkErrors;
+	JCheckBox checkUndistorted;
+	JCheckBox checkAll;
+	JCheckBox checkNumbers;
+	JCheckBox checkOrder;
+	JSpinner selectErrorScale;
+
+	JTextArea meanError;
+	JTextArea maxError;
+
+	boolean showPoints = false;
+	boolean showErrors = true;
+	boolean showUndistorted = false;
+	boolean showAll = false;
+	boolean showNumbers = false;
+	boolean showOrder = true;
+	int errorScale = 20;
 
 	ViewedImageInfoPanel viewInfo = new ViewedImageInfoPanel();
 	public DisplayCalibrationPanel<CM> mainView;
@@ -56,6 +79,9 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 
 	public CalibratedPlanarPanel() {
 		super(new BorderLayout());
+
+		meanError = createErrorComponent(1);
+		maxError = createErrorComponent(1);
 	}
 
 	public void setObservations(List<CalibrationObservation> features  ) {
@@ -108,5 +134,85 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 	public abstract void setCalibration(Zhang99AllParam found);
 
 	public abstract void setCorrection( CM param );
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		if( e.getSource() == checkPoints ) {
+			showPoints = checkPoints.isSelected();
+		} else if( e.getSource() == checkErrors ) {
+			showErrors = checkErrors.isSelected();
+		} else if( e.getSource() == checkAll ) {
+			showAll = checkAll.isSelected();
+		} else if( e.getSource() == checkUndistorted ) {
+			showUndistorted = checkUndistorted.isSelected();
+		} else if( e.getSource() == checkNumbers ) {
+			showNumbers = checkNumbers.isSelected();
+		} else if( e.getSource() == checkOrder ) {
+			showOrder = checkOrder.isSelected();
+		}
+		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
+		mainView.repaint();
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		if( e.getSource() == selectErrorScale) {
+			errorScale = ((Number) selectErrorScale.getValue()).intValue();
+		}
+
+		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
+		mainView.repaint();
+	}
+
+	JTextArea createErrorComponent(int numRows) {
+		JTextArea comp = new JTextArea(numRows,6);
+		comp.setMaximumSize(comp.getPreferredSize());
+		comp.setEditable(false);
+		comp.setBorder(BorderFactory.createEmptyBorder(0,0,4,0));
+		return comp;
+	}
+
+	class RightPanel extends StandardAlgConfigPanel
+	{
+		public RightPanel() {
+			checkPoints = new JCheckBox("Show Points");
+			checkPoints.setSelected(showPoints);
+			checkPoints.addItemListener(CalibratedPlanarPanel.this);
+
+			checkErrors = new JCheckBox("Show Errors");
+			checkErrors.setSelected(showErrors);
+			checkErrors.addItemListener(CalibratedPlanarPanel.this);
+
+			checkAll = new JCheckBox("All Points");
+			checkAll.setSelected(showAll);
+			checkAll.addItemListener(CalibratedPlanarPanel.this);
+
+			checkUndistorted = new JCheckBox("Undistort");
+			checkUndistorted.setSelected(showUndistorted);
+			checkUndistorted.addItemListener(CalibratedPlanarPanel.this);
+			checkUndistorted.setEnabled(false);
+
+			checkNumbers = new JCheckBox("Numbers");
+			checkNumbers.setSelected(showNumbers);
+			checkNumbers.addItemListener(CalibratedPlanarPanel.this);
+
+			checkOrder = new JCheckBox("Order");
+			checkOrder.setSelected(showOrder);
+			checkOrder.addItemListener(CalibratedPlanarPanel.this);
+
+			selectErrorScale = new JSpinner(new SpinnerNumberModel(errorScale, 1, 100, 5));
+			selectErrorScale.addChangeListener(CalibratedPlanarPanel.this);
+			selectErrorScale.setMaximumSize(selectErrorScale.getPreferredSize());
+
+			add(viewInfo);
+			addAlignLeft(checkPoints, this);
+			addAlignLeft(checkErrors, this);
+			addAlignLeft(checkAll, this);
+			addAlignLeft(checkUndistorted, this);
+			addAlignLeft(checkNumbers, this);
+			addAlignLeft(checkOrder, this);
+			addLabeled(selectErrorScale,"Error Scale", this);
+		}
+	}
 
 }
