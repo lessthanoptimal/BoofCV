@@ -137,4 +137,8 @@ public class BoofSwingUtil {
 		field.setValue(current);
 		return field;
 	}
+
+	public static void warningDialog(Component component, RuntimeException e) {
+		JOptionPane.showMessageDialog(component, e.getMessage());
+	}
 }

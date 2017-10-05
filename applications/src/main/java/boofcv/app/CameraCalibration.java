@@ -28,6 +28,7 @@ import boofcv.app.calib.AssistedCalibration;
 import boofcv.app.calib.AssistedCalibrationGui;
 import boofcv.app.calib.ComputeGeometryScore;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.calibration.CalibratedPlanarPanel;
 import boofcv.gui.calibration.FisheyePlanarPanel;
 import boofcv.gui.calibration.MonoPlanarPanel;
@@ -44,6 +45,7 @@ import boofcv.struct.image.GrayF32;
 import com.github.sarxos.webcam.Webcam;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Arrays;
@@ -193,10 +195,6 @@ public class CameraCalibration extends BaseStandardInputApp {
 			} else {
 				throw new RuntimeException("Unknown fiducial type "+arg);
 			}
-		}
-
-		if( visualize && modeType != ModelType.PINHOLE) {
-			throw new RuntimeException("Can only visualize PINHOLE model types for now");
 		}
 
 		if( formatType == FormatType.OPENCV && modeType != ModelType.PINHOLE ) {
@@ -357,16 +355,24 @@ public class CameraCalibration extends BaseStandardInputApp {
 		switch( modeType ) {
 			case PINHOLE:
 				calibrationAlg.configurePinhole( zeroSkew, numRadial, tangential);
-				gui = new MonoPlanarPanel();
 				break;
 
 			case UNIVERSAL:
 				calibrationAlg.configureUniversalOmni( zeroSkew, numRadial, tangential);
-				gui = new FisheyePlanarPanel();
 				break;
 
 			default:
 				throw new RuntimeException("Unknown model type: "+modeType);
+		}
+
+		if( visualize ) {
+			switch( modeType ) {
+				case PINHOLE: gui = new MonoPlanarPanel(); break;
+				case UNIVERSAL: gui = new FisheyePlanarPanel(); break;
+				default: throw new RuntimeException("Unknown model type: "+modeType);
+			}
+		} else {
+			gui = null;
 		}
 
 		File directory = new File(inputDirectory);
@@ -395,12 +401,21 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 			GrayF32 image = ConvertBufferedImage.convertFrom(buffered,(GrayF32)null);
 
-			if( gui != null ) {
-				gui.addImage(f);
+			if( visualize ) {
+				final File _f = f;
+
 				if( first ) {
 					first = false;
+					gui.mainView.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 					ShowImages.showWindow(gui,"Monocular Calibration",true);
 				}
+
+				BoofSwingUtil.invokeNowOrLater(new Runnable() {
+					@Override
+					public void run() {
+						gui.addImage(_f);
+					}
+				});
 			}
 
 			if( !calibrationAlg.addImage(image) )
@@ -408,48 +423,54 @@ public class CameraCalibration extends BaseStandardInputApp {
 		}
 
 		// process and compute intrinsic parameters
-		final CameraModel intrinsic = calibrationAlg.process();
+		try {
+			final CameraModel intrinsic = calibrationAlg.process();
 
-		if( gui != null ) {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					gui.setObservations(calibrationAlg.getObservations());
-					gui.setResults(calibrationAlg.getErrors());
-					gui.setCalibration(calibrationAlg.getZhangParam());
-					gui.setCorrection(intrinsic);
-					gui.repaint();
-				}
-			});
+			if( visualize ) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						gui.setObservations(calibrationAlg.getObservations());
+						gui.setResults(calibrationAlg.getErrors());
+						gui.setCalibration(calibrationAlg.getZhangParam());
+						gui.setCorrection(intrinsic);
+						gui.repaint();
+					}
+				});
+			}
 
+			calibrationAlg.printStatistics();
+			System.out.println();
+			System.out.println("--- "+modeType+" Parameters ---");
+			System.out.println();
+
+			switch( modeType ) {
+				case PINHOLE: {
+					CameraPinholeRadial m = (CameraPinholeRadial)intrinsic;
+					switch (formatType) {
+						case BOOFCV: CalibrationIO.save(m, outputFileName); break;
+						case OPENCV: UtilOpenCV.save(m, outputFileName); break;
+					}
+					m.print();
+				}break;
+
+				case UNIVERSAL: {
+					CameraUniversalOmni m = (CameraUniversalOmni)intrinsic;
+					CalibrationIO.save(m, outputFileName);
+					m.print();
+				}break;
+
+				default:
+					throw new RuntimeException("Unknown model type. "+modeType);
+			}
+			System.out.println();
+			System.out.println("Save file format "+formatType);
+			System.out.println();
+		} catch( RuntimeException e ) {
+			if( visualize )
+				BoofSwingUtil.warningDialog(gui,e);
+			e.printStackTrace();
+			System.exit(1);
 		}
-
-		calibrationAlg.printStatistics();
-		System.out.println();
-		System.out.println("--- "+modeType+" Parameters ---");
-		System.out.println();
-
-		switch( modeType ) {
-			case PINHOLE: {
-				CameraPinholeRadial m = (CameraPinholeRadial)intrinsic;
-				switch (formatType) {
-					case BOOFCV: CalibrationIO.save(m, outputFileName); break;
-					case OPENCV: UtilOpenCV.save(m, outputFileName); break;
-				}
-				m.print();
-			}break;
-
-			case UNIVERSAL: {
-				CameraUniversalOmni m = (CameraUniversalOmni)intrinsic;
-				CalibrationIO.save(m, outputFileName);
-				m.print();
-			}break;
-
-			default:
-				throw new RuntimeException("Unknown model type. "+modeType);
-		}
-		System.out.println();
-		System.out.println("Save file format "+formatType);
-		System.out.println();
 	}
 
 	/**
