@@ -22,6 +22,7 @@ import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.Zhang99AllParam;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.ViewedImageInfoPanel;
 import boofcv.struct.calib.CameraUniversalOmni;
 
 import javax.swing.*;
@@ -32,6 +33,8 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +52,7 @@ public class FisheyePlanarPanel extends JPanel implements ItemListener ,
 
 	public CalibratedFisheyeImagePanel mainView = new CalibratedFisheyeImagePanel();
 
+	ViewedImageInfoPanel viewInfo = new ViewedImageInfoPanel();
 	JCheckBox checkPoints;
 	JCheckBox checkErrors;
 	JCheckBox checkUndistorted;
@@ -88,6 +92,21 @@ public class FisheyePlanarPanel extends JPanel implements ItemListener ,
 	public FisheyePlanarPanel() {
 		super(new BorderLayout());
 
+		viewInfo.setListener(new ViewedImageInfoPanel.Listener() {
+			@Override
+			public void zoomChanged(double zoom) {
+				mainView.setScale(zoom);
+			}
+		});
+
+		mainView.getImagePanel().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				double scale = viewInfo.getZoom();
+				viewInfo.setCursor(e.getX()/scale,e.getY()/scale);
+			}
+		});
+
 		imageList = new JList();
 		imageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		imageList.addListSelectionListener(this);
@@ -102,6 +121,7 @@ public class FisheyePlanarPanel extends JPanel implements ItemListener ,
 		paramOffset = createErrorComponent();
 
 		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
+		mainView.addMouseWheelListener(viewInfo);
 
 		add(mainView, BorderLayout.CENTER);
 		add( new LeftPanel(), BorderLayout.WEST);
@@ -118,6 +138,8 @@ public class FisheyePlanarPanel extends JPanel implements ItemListener ,
 	
 	public void addImage( String name , BufferedImage image )
 	{
+		viewInfo.setImageSize(image.getWidth(),image.getHeight());
+
 		names.add(name);
 		images.add(image);
 
@@ -200,7 +222,7 @@ public class FisheyePlanarPanel extends JPanel implements ItemListener ,
 	private void setSelected( int selected ) {
 		if( selected < features.size() )
 			mainView.setResults(features.get(selected),results.get(selected), features);
-		mainView.setImage(images.get(selected));
+		mainView.setBufferedImage(images.get(selected));
 		selectedImage = selected;
 
 		if( results != null ) {
@@ -280,6 +302,7 @@ public class FisheyePlanarPanel extends JPanel implements ItemListener ,
 			selectErrorScale.addChangeListener(FisheyePlanarPanel.this);
 			selectErrorScale.setMaximumSize(selectErrorScale.getPreferredSize());
 
+			add(viewInfo);
 			addAlignLeft(checkPoints, this);
 			addAlignLeft(checkErrors, this);
 			addAlignLeft(checkAll, this);

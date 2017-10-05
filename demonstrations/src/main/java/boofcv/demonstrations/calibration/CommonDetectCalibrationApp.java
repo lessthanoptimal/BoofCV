@@ -82,7 +82,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 
 		controlPanel.setListener(this);
 
-		imagePanel.setScale(controlPanel.getScale());
+		imagePanel.setScale(controlPanel.getViewInfo().getZoom());
 		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -91,7 +91,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 			}
 		});
 
-		imagePanel.addMouseWheelListener(controlPanel);
+		imagePanel.addMouseWheelListener(controlPanel.getViewInfo());
 		imagePanel.requestFocus();
 	}
 
@@ -119,25 +119,16 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 		BoofSwingUtil.invokeNowOrLater(new Runnable() {
 			@Override
 			public void run() {
+				controlPanel.getViewInfo().setImageSize(width,height);
 				if (imagePanel.getWidth() > 0) {
 					double scaleX = (imagePanel.getWidth() + 5) / (double) width;
 					double scaleY = (imagePanel.getHeight() + 5) / (double) height;
 
 					final double scale = Math.min(scaleX, scaleY);
 					if (scale < 1.0) {
-						BoofSwingUtil.invokeNowOrLater(new Runnable() {
-							@Override
-							public void run() {
-								controlPanel.setScale(scale);
-							}
-						});
+						controlPanel.getViewInfo().setScale(scale);
 					} else {
-						BoofSwingUtil.invokeNowOrLater(new Runnable() {
-							@Override
-							public void run() {
-								controlPanel.setScale(1);
-							}
-						});
+						controlPanel.getViewInfo().setScale(1);
 					}
 				} else {
 					imagePanel.setPreferredSize(new Dimension(width,height));
@@ -209,7 +200,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 
 	@Override
 	public void calibEventGUI() {
-		imagePanel.setScale(controlPanel.getScale());
+		imagePanel.setScale(controlPanel.viewInfo.getZoom());
 		if( controlPanel.getSelectedView() == 0 ) {
 			imagePanel.setBufferedImage(input);
 		} else if( controlPanel.getSelectedView() == 1 ){

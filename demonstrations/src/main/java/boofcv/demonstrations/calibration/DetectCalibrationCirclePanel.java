@@ -63,17 +63,13 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 	@Override
 	protected void addComponents() {
 		addLabeled(successIndicator, "Found:", this);
-		addLabeled(textCursorX,"X",this);
-		addLabeled(textCursorY,"Y",this);
-		addSeparator(100);
+		add(viewInfo);
 		addLabeled(viewSelector, "View ", this);
-		addSeparator(100);
 		addLabeled(selectRows, "Rows", this);
 		addLabeled(selectColumns, "Cols", this);
 		addLabeled(selectDiameter, "Diameter", this);
 		addLabeled(selectSpacing, "Spacing", this);
 		add(threshold);
-		addLabeled(selectZoom, "Zoom ", this);
 		addAlignLeft(showPoints, this);
 		addAlignLeft(showNumbers,this);
 		addAlignLeft(showClusters,this);

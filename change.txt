@@ -90,8 +90,6 @@ Contour to Line
 
 Calibration
   TODO Calibration Demonstration features
-    - zoom in and out
-    - display pixel clicked
     - set initial window size intelligently
     - show all calibration parameters
     - move checkboxes to right in pinhole

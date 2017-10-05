@@ -22,6 +22,7 @@ import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.ViewedImageInfoPanel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -29,8 +30,6 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 
 /**
  * Shows calibration grid detector status, configure display, and adjust parameters.
@@ -38,16 +37,9 @@ import java.awt.event.MouseWheelListener;
  * @author Peter Abeles
  */
 public class DetectCalibrationPanel extends StandardAlgConfigPanel
-		implements ChangeListener, ItemListener, MouseWheelListener
+		implements ChangeListener, ItemListener
 {
-	// zoom values
-	private static double ZOOM_MAX = 20;
-	private static double ZOOM_MIN = 0.1;
-	private static double ZOOM_INC = 0.1;
-
-	// cursor location
-	JTextField textCursorX = new JTextField(10);
-	JTextField textCursorY = new JTextField(10);
+	ViewedImageInfoPanel viewInfo = new ViewedImageInfoPanel();
 
 	// indicates if a calibration grid was found or not
 	JLabel successIndicator;
@@ -69,8 +61,6 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 	JCheckBox showOrder;
 	JCheckBox showContour;
 
-	// allows the user to change the image zoom
-	JSpinner selectZoom;
 
 	// selects threshold to create binary image from
 	ThresholdControlPanel threshold;
@@ -84,7 +74,6 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 	boolean doShowShapes = false;
 	boolean doShowContour = false;
 
-	double scale = 1;
 	int gridRows;
 	int gridColumns;
 
@@ -100,20 +89,18 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		this.gridRows = gridRows;
 		this.gridColumns = gridColumns;
 
-		textCursorX.setEditable(false);
-		textCursorX.setMaximumSize(textCursorX.getPreferredSize());
-		textCursorY.setEditable(false);
-		textCursorY.setMaximumSize(textCursorY.getPreferredSize());
+		viewInfo.setListener(new ViewedImageInfoPanel.Listener() {
+			@Override
+			public void zoomChanged(double zoom) {
+				listener.calibEventGUI();
+			}
+		});
 
 		viewSelector = new JComboBox();
 		viewSelector.addItem("Original");
 		viewSelector.addItem("Threshold");
 		viewSelector.addItemListener(this);
 		viewSelector.setMaximumSize(viewSelector.getPreferredSize());
-
-		selectZoom = new JSpinner(new SpinnerNumberModel(1, ZOOM_MIN, ZOOM_MAX, ZOOM_INC));
-		selectZoom.addChangeListener(this);
-		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
 		successIndicator = new JLabel();
 
@@ -174,15 +161,11 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 
 	protected void addComponents() {
 		addLabeled(successIndicator, "Found:", this);
-		addLabeled(textCursorX,"X",this);
-		addLabeled(textCursorY,"Y",this);
-		addSeparator(100);
+		add(viewInfo);
 		addLabeled(viewSelector, "View ", this);
-		addSeparator(100);
 		addLabeled(selectRows, "Rows", this);
 		addLabeled(selectColumns, "Cols", this);
 		addAlignLeft(threshold,this);
-		addLabeled(selectZoom, "Zoom ", this);
 		addAlignLeft(showPoints, this);
 		addAlignLeft(showNumbers,this);
 		addAlignLeft(showGraph,this);
@@ -207,9 +190,6 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		}  else if( e.getSource() == selectColumns) {
 			gridColumns = ((Number) selectColumns.getValue()).intValue();
 			listener.calibEventDetectorModified();
-		} else if( e.getSource() == selectZoom ) {
-			scale = ((Number)selectZoom.getValue()).doubleValue();
-			listener.calibEventGUI();
 		}
 	}
 
@@ -255,17 +235,12 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		this.listener = listener;
 	}
 
-	public double getScale() {
-		return scale;
-	}
-
 	public void setCursor( final double x , final double y ) {
 		BoofSwingUtil.invokeNowOrLater(
 				new Runnable() {
 					@Override
 					public void run() {
-						textCursorX.setText(String.format("%5.3f", x));
-						textCursorY.setText(String.format("%5.3f", y));
+						viewInfo.setCursor(x,y);
 					}
 				});
 	}
@@ -299,9 +274,6 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		} else if( e.getSource() == showContour ) {
 			doShowContour = showContour.isSelected();
 			listener.calibEventGUI();
-		} else if( e.getSource() == selectZoom ) {
-			scale = ((Number)selectZoom.getValue()).doubleValue();
-			listener.calibEventGUI();
 		}
 	}
 
@@ -313,35 +285,10 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		return gridColumns;
 	}
 
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-
-		double curr = ((Number)selectZoom.getValue()).doubleValue();
-
-		if( e.getWheelRotation() > 0 )
-			curr *= 1.1;
-		else
-			curr /= 1.1;
-
-		setScale(curr);
+	public ViewedImageInfoPanel getViewInfo() {
+		return viewInfo;
 	}
-	public void setScale(double scale) {
-		if( ((Number)selectZoom.getValue()).doubleValue() == scale )
-			return;
 
-		double curr;
-
-		if( scale >= 1 ) {
-			curr = ZOOM_INC * ((int) (scale / ZOOM_INC + 0.5));
-		} else {
-			curr = scale;
-		}
-		if( curr < ZOOM_MIN ) curr = ZOOM_MIN;
-		if( curr > ZOOM_MAX) curr = ZOOM_MAX;
-
-		selectZoom.setValue(curr);
-	}
-	
 	public interface Listener
 	{
 		void calibEventGUI();

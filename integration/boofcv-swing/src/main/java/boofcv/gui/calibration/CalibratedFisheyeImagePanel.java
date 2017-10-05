@@ -30,7 +30,7 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.feature.VisualizeFeatures;
-import boofcv.gui.image.ImagePanel;
+import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraUniversalOmni;
@@ -50,6 +50,7 @@ import org.ejml.data.FMatrixRMaj;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -62,7 +63,7 @@ import static boofcv.gui.calibration.CalibratedImageGridPanel.drawNumbers;
  *
  * @author Peter Abeles
  */
-public class CalibratedFisheyeImagePanel extends ImagePanel {
+public class CalibratedFisheyeImagePanel extends ImageZoomPanel {
 
 	boolean showPoints = true;
 	boolean showErrors = true;
@@ -96,11 +97,6 @@ public class CalibratedFisheyeImagePanel extends ImagePanel {
 
 		MouseAdapter adapter = new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
-				changeFocus(e);
-			}
-
-			@Override
 			public void mouseDragged(MouseEvent e) {
 				changeFocus(e);
 			}
@@ -116,7 +112,7 @@ public class CalibratedFisheyeImagePanel extends ImagePanel {
 				repaint();
 			}
 		};
-		addMouseMotionListener(adapter);
+		panel.addMouseMotionListener(adapter);
 
 	}
 
@@ -135,9 +131,9 @@ public class CalibratedFisheyeImagePanel extends ImagePanel {
 	}
 
 	@Override
-	public void setImage(BufferedImage image) {
+	public void setBufferedImage(BufferedImage image) {
 		BoofSwingUtil.checkGuiThread();
-		super.setImage(image);
+		super.setBufferedImage(image);
 		ConvertBufferedImage.convertFrom(image,imageFisheye,true);
 
 		if( imageFisheye.getNumBands() != imageRendered.getNumBands() ) {
@@ -215,22 +211,19 @@ public class CalibratedFisheyeImagePanel extends ImagePanel {
 		ConvertBufferedImage.convertTo(imageRendered,bufferedRendered,true);
 	}
 
+	AffineTransform renderTran = new AffineTransform();
 	@Override
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-
-		Graphics2D g2 = (Graphics2D)g;
-
+	protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 		drawFeatures(g2,scale);
 
 		if( !showUndistorted || bufferedRendered == null )
 			return;
 
-		double offX = (pixelX - bufferedRendered.getWidth()/2)*scale + offsetX;
-		double offY = (pixelY - bufferedRendered.getHeight()/2)*scale + offsetY;
+		double offX = (pixelX - bufferedRendered.getWidth()/2)*scale;
+		double offY = (pixelY - bufferedRendered.getHeight()/2)*scale;
 
-		transform.setTransform(scale,0,0,scale,offX,offY);
-		g2.drawImage(bufferedRendered,transform,null);
+		renderTran.setTransform(scale,0,0,scale,offX,offY);
+		g2.drawImage(bufferedRendered,renderTran,null);
 	}
 
 	private void drawFeatures(Graphics2D g2 , double scale) {
