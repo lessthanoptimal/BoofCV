@@ -83,8 +83,8 @@ public class FisheyePlanarPanel extends CalibratedPlanarPanel<CameraUniversalOmn
 		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
 		mainView.addMouseWheelListener(viewInfo);
 
-		add(mainView, BorderLayout.CENTER);
 		add( new LeftPanel(), BorderLayout.WEST);
+		add(mainView, BorderLayout.CENTER);
 		add( new RightPanel() , BorderLayout.EAST );
 	}
 

@@ -171,6 +171,7 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 
 		List<String> images;
 		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/chessboard"));
+//		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/square_grid"));
 
 		CalibrateFisheyePlanarGuiApp app = new CalibrateFisheyePlanarGuiApp();
 		app.configure(detector,images).configureUniversalOmni(true,2,false);
