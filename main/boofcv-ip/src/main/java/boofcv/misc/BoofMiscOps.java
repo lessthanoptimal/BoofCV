@@ -21,8 +21,12 @@ package boofcv.misc;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Miscellaneous functions which have no better place to go.
@@ -48,6 +52,38 @@ public class BoofMiscOps {
 			digits++;
 		}
 		return digits;
+	}
+
+	public static void sortImageNames(List<String> images ) {
+		Collections.sort(images,new Comparator<String>() {
+					@Override
+					public int compare(String o1, String o2) {
+						if( o1.length() < o2.length() ) {
+							return -1;
+						} else if( o1.length() > o2.length() ) {
+							return 1;
+						} else {
+							return o1.compareTo(o2);
+						}
+					}
+				}
+		);
+	}
+
+	public static void sortImageFiles(List<File> images ) {
+		Collections.sort(images,new Comparator<File>() {
+					@Override
+					public int compare(File o1, File o2) {
+						if( o1.length() < o2.length() ) {
+							return -1;
+						} else if( o1.length() > o2.length() ) {
+							return 1;
+						} else {
+							return o1.compareTo(o2);
+						}
+					}
+				}
+		);
 	}
 
 	public static String toString( Reader r ) {

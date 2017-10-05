@@ -39,6 +39,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
 import boofcv.javacv.UtilOpenCV;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.CameraUniversalOmni;
@@ -50,7 +51,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static boofcv.app.calib.AssistedCalibration.IMAGE_DIRECTORY;
@@ -386,7 +386,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			System.exit(0);
 		}
 		List<File> files = Arrays.asList(directory.listFiles());
-		Collections.sort(files);
+		BoofMiscOps.sortImageFiles(files);
 
 		if( files.isEmpty() ) {
 			System.err.println("No image files found!");

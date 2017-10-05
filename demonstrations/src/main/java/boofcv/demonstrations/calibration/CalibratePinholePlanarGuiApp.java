@@ -30,6 +30,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.wrapper.DefaultMediaManager;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 
@@ -37,7 +38,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -73,7 +73,7 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 	{
 		if( images.size() == 0 )
 			throw new IllegalArgumentException("No images!");
-		Collections.sort(images);
+		BoofMiscOps.sortImageNames(images);
 		calibrator = new CalibrateMonoPlanar(detector);
 		calibrator.configurePinhole(true,numRadial,includeTangential);
 		this.images = images;
