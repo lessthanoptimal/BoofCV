@@ -21,6 +21,7 @@ Version : 0.28
   * Open files will remember the last directory it opened
   * Added list of recently opened files
   * Dialog for opening a webcam
+  * Added fisheye calibration demo
 - Examples
   * Added ExamplePointDeformKeyPoints
 - Application: Calibration Target Generator
@@ -88,7 +89,14 @@ Contour to Line
   them makes it break on others
 
 Calibration
-  TODO Fisheye Calibration Demonstration
+  TODO Calibration Demonstration features
+    - zoom in and out
+    - display pixel clicked
+    - set initial window size intelligently
+    - show all calibration parameters
+    - move checkboxes to right in pinhole
+    - open a directory
+    - save intrinsic parameters to a file
 
 TOP ITEMS
 - TODO Add QR Code to fiducial demonstration

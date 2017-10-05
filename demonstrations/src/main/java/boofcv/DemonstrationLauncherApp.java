@@ -97,6 +97,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 
 		createNodes(root,"Calibration",
 				CalibrateMonoPlanarGuiApp.class,
+				CalibrateFisheyePlanarGuiApp.class,
 				CalibrateStereoPlanarGuiApp.class,
 				DetectCalibrationChessboardApp.class,
 				DetectCalibrationSquareGridApp.class,

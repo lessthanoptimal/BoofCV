@@ -47,8 +47,7 @@ public class ImagePanel extends JPanel {
 
 	protected SaveImageOnClick mouseListener;
 
-	private AffineTransform transform = new AffineTransform();
-	private AffineTransform original = new AffineTransform();
+	protected AffineTransform transform = new AffineTransform();
 	private boolean center = false;
 
 	public ImagePanel(BufferedImage img) {
