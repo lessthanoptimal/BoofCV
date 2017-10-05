@@ -33,6 +33,7 @@ import boofcv.gui.calibration.CalibratedPlanarPanel;
 import boofcv.gui.calibration.FisheyePlanarPanel;
 import boofcv.gui.calibration.MonoPlanarPanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.ProgressMonitorThread;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -351,6 +352,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 	protected void handleDirectory() {
 		final CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector);
 		final CalibratedPlanarPanel gui;
+		ProcessThread monitor = null;
 
 		switch( modeType ) {
 			case PINHOLE:
@@ -371,6 +373,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 				case UNIVERSAL: gui = new FisheyePlanarPanel(); break;
 				default: throw new RuntimeException("Unknown model type: "+modeType);
 			}
+			monitor = new ProcessThread(gui);
+			monitor.start();
 		} else {
 			gui = null;
 		}
@@ -390,6 +394,10 @@ public class CameraCalibration extends BaseStandardInputApp {
 			System.exit(0);
 		}
 
+		if( visualize ) {
+			monitor.setMessage(0,"Loading images");
+		}
+
 		boolean first = true;
 		for( File f : files ){
 			if( f.isDirectory() || f.isHidden())
@@ -402,6 +410,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			GrayF32 image = ConvertBufferedImage.convertFrom(buffered,(GrayF32)null);
 
 			if( visualize ) {
+				monitor.setMessage(0,f.getName());
 				final File _f = f;
 
 				if( first ) {
@@ -422,11 +431,16 @@ public class CameraCalibration extends BaseStandardInputApp {
 				System.err.println("Failed to detect target in "+f.getName());
 		}
 
+		if( visualize ) {
+			monitor.setMessage(1,"Computing intrinsics");
+		}
+
 		// process and compute intrinsic parameters
 		try {
 			final CameraModel intrinsic = calibrationAlg.process();
 
 			if( visualize ) {
+				monitor.stopThread();
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						gui.setObservations(calibrationAlg.getObservations());
@@ -470,6 +484,28 @@ public class CameraCalibration extends BaseStandardInputApp {
 				BoofSwingUtil.warningDialog(gui,e);
 			e.printStackTrace();
 			System.exit(1);
+		}
+	}
+
+	/**
+	 * Displays a progress monitor and updates its state periodically
+	 */
+	public class ProcessThread extends ProgressMonitorThread
+	{
+		public ProcessThread(Component parent ) {
+			super(new ProgressMonitor(parent, "Computing Calibration", "", 0, 2));
+		}
+
+		public void setMessage( final int state , final String message ) {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					monitor.setProgress(state);
+					monitor.setNote(message);
+				}});
+		}
+
+		@Override
+		public void doRun() {
 		}
 	}
 
