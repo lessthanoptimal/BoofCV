@@ -18,7 +18,6 @@
 
 package boofcv.gui.calibration;
 
-import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.distort.*;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
@@ -30,7 +29,6 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.feature.VisualizeFeatures;
-import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraUniversalOmni;
@@ -55,7 +53,7 @@ import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import static boofcv.gui.calibration.CalibratedImageGridPanel.drawNumbers;
+import static boofcv.gui.calibration.DisplayPinholeCalibrationPanel.drawNumbers;
 
 /**
  * Used to display a calibrated fisheye camera. Shows a rendered pinhole camera view at the selected location
@@ -63,16 +61,7 @@ import static boofcv.gui.calibration.CalibratedImageGridPanel.drawNumbers;
  *
  * @author Peter Abeles
  */
-public class CalibratedFisheyeImagePanel extends ImageZoomPanel {
-
-	boolean showPoints = true;
-	boolean showErrors = true;
-	boolean showUndistorted = false;
-	boolean showAll = false;
-	boolean showNumbers = true;
-	boolean showOrder = true;
-	// how much errors are scaled up
-	double errorScale;
+public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel<CameraUniversalOmni> {
 
 	NarrowToWidePtoP_F32 distorter;
 	LensDistortionWideFOV fisheyeDistort;
@@ -87,13 +76,7 @@ public class CalibratedFisheyeImagePanel extends ImageZoomPanel {
 	// selected center point for undistorted view
 	double pixelX,pixelY;
 
-	// observed feature locations
-	CalibrationObservation features = null;
-	// results of calibration
-	ImageResults results = null;
-	List<CalibrationObservation> allFeatures;
-
-	public CalibratedFisheyeImagePanel() {
+	public DisplayFisheyeCalibrationPanel() {
 
 		MouseAdapter adapter = new MouseAdapter() {
 			@Override
@@ -116,20 +99,6 @@ public class CalibratedFisheyeImagePanel extends ImageZoomPanel {
 
 	}
 
-	public void setDisplay( boolean showPoints , boolean showErrors ,
-							boolean showUndistorted , boolean showAll , boolean showNumbers ,
-							boolean showOrder,
-							double errorScale )
-	{
-		this.showPoints = showPoints;
-		this.showErrors = showErrors;
-		this.showUndistorted = showUndistorted;
-		this.showAll = showAll;
-		this.showNumbers = showNumbers;
-		this.showOrder = showOrder;
-		this.errorScale = errorScale;
-	}
-
 	@Override
 	public void setBufferedImage(BufferedImage image) {
 		BoofSwingUtil.checkGuiThread();
@@ -141,21 +110,6 @@ public class CalibratedFisheyeImagePanel extends ImageZoomPanel {
 		}
 		renderPinhole();
 
-	}
-
-	public void setResults(CalibrationObservation features , ImageResults results ,
-						   List<CalibrationObservation> allFeatures ) {
-		BoofSwingUtil.checkGuiThread();
-
-		this.features = features;
-		this.results = results;
-		this.allFeatures = allFeatures;
-	}
-
-	public void clearCalibration() {
-		fisheyeDistort = null;
-		distorter = null;
-		distortImage = null;
 	}
 
 	public void setCalibration(CameraUniversalOmni fisheyeModel) {

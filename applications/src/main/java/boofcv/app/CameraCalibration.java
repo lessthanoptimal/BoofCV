@@ -28,6 +28,8 @@ import boofcv.app.calib.AssistedCalibration;
 import boofcv.app.calib.AssistedCalibrationGui;
 import boofcv.app.calib.ComputeGeometryScore;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
+import boofcv.gui.calibration.CalibratedPlanarPanel;
+import boofcv.gui.calibration.FisheyePlanarPanel;
 import boofcv.gui.calibration.MonoPlanarPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.calibration.CalibrationIO;
@@ -350,15 +352,21 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 	protected void handleDirectory() {
 		final CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector);
+		final CalibratedPlanarPanel gui;
 
 		switch( modeType ) {
 			case PINHOLE:
 				calibrationAlg.configurePinhole( zeroSkew, numRadial, tangential);
+				gui = new MonoPlanarPanel();
 				break;
 
 			case UNIVERSAL:
 				calibrationAlg.configureUniversalOmni( zeroSkew, numRadial, tangential);
+				gui = new FisheyePlanarPanel();
 				break;
+
+			default:
+				throw new RuntimeException("Unknown model type: "+modeType);
 		}
 
 		File directory = new File(inputDirectory);
@@ -369,8 +377,6 @@ public class CameraCalibration extends BaseStandardInputApp {
 		}
 		List<File> files = Arrays.asList(directory.listFiles());
 		Collections.sort(files);
-
-		final MonoPlanarPanel gui = visualize ? new MonoPlanarPanel() : null;
 
 		if( files.isEmpty() ) {
 			System.err.println("No image files found!");
@@ -390,7 +396,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			GrayF32 image = ConvertBufferedImage.convertFrom(buffered,(GrayF32)null);
 
 			if( gui != null ) {
-				gui.addImage(f.getName(),buffered);
+				gui.addImage(f);
 				if( first ) {
 					first = false;
 					ShowImages.showWindow(gui,"Monocular Calibration",true);
@@ -410,7 +416,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 					gui.setObservations(calibrationAlg.getObservations());
 					gui.setResults(calibrationAlg.getErrors());
 					gui.setCalibration(calibrationAlg.getZhangParam());
-					gui.setCorrection((CameraPinholeRadial)intrinsic);
+					gui.setCorrection(intrinsic);
 					gui.repaint();
 				}
 			});

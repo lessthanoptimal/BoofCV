@@ -104,7 +104,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 				if( calibrator.addImage(input) ) {
 					SwingUtilities.invokeLater(new Runnable() {
 						public void run() {
-							gui.addImage(file.getName(), orig);
+							gui.addImage(file);
 							gui.repaint();
 							monitor.setMessage(0, file.getName());
 						}

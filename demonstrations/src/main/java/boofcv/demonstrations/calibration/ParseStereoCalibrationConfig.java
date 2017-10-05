@@ -20,10 +20,7 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.io.MediaManager;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,8 +31,8 @@ import java.util.List;
  */
 public class ParseStereoCalibrationConfig extends BaseCalibrationConfig {
 
-	public List<String> leftImages = new ArrayList<>();
-	public List<String> rightImages = new ArrayList<>();
+	public List<File> leftImages = new ArrayList<>();
+	public List<File> rightImages = new ArrayList<>();
 
 	public ParseStereoCalibrationConfig(MediaManager media) {
 		this.media = media;
@@ -80,9 +77,9 @@ public class ParseStereoCalibrationConfig extends BaseCalibrationConfig {
 					continue;
 
 				if( v[0].compareTo("addLeft") == 0 )
-					leftImages.add(v[2]);
+					leftImages.add(new File(v[2]));
 				else if( v[0].compareTo("addRight") == 0 )
-					rightImages.add(v[2]);
+					rightImages.add(new File(v[2]));
 			}
 
 		} catch (IOException e) {
@@ -101,11 +98,11 @@ public class ParseStereoCalibrationConfig extends BaseCalibrationConfig {
 		return true;
 	}
 
-	public List<String> getLeftImages() {
+	public List<File> getLeftImages() {
 		return leftImages;
 	}
 
-	public List<String> getRightImages() {
+	public List<File> getRightImages() {
 		return rightImages;
 	}
 }

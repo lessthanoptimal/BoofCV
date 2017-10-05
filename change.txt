@@ -90,7 +90,6 @@ Contour to Line
 
 Calibration
   TODO Calibration Demonstration features
-    - set initial window size intelligently
     - show all calibration parameters
     - move checkboxes to right in pinhole
     - open a directory

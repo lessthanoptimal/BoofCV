@@ -21,7 +21,8 @@ package boofcv.demonstrations.calibration;
 import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.gui.calibration.CalibratedImageGridPanel;
+import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
+import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinholeRadial;
 import org.ejml.data.DMatrixRMaj;
 
@@ -36,6 +37,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -49,13 +51,15 @@ public class StereoPlanarPanel extends JPanel
 	implements ListSelectionListener, ItemListener, ChangeListener, MouseListener
 {
 	// display for calibration information on individual cameras
-	CalibratedImageGridPanel leftView = new CalibratedImageGridPanel();
-	CalibratedImageGridPanel rightView = new CalibratedImageGridPanel();
+	DisplayPinholeCalibrationPanel leftView = new DisplayPinholeCalibrationPanel();
+	DisplayPinholeCalibrationPanel rightView = new DisplayPinholeCalibrationPanel();
 
 	// list of images and calibration results
-	List<BufferedImage> listLeft = new ArrayList<>();
-	List<BufferedImage> listRight = new ArrayList<>();
+	List<File> listLeft = new ArrayList<>();
+	List<File> listRight = new ArrayList<>();
 
+	List<CalibrationObservation> leftObservations;
+	List<CalibrationObservation> rightObservations;
 	List<ImageResults> leftResults;
 	List<ImageResults> rightResults;
 
@@ -88,9 +92,6 @@ public class StereoPlanarPanel extends JPanel
 	public StereoPlanarPanel() {
 		super(new BorderLayout());
 
-		leftView.setImages(listLeft);
-		rightView.setImages(listRight);
-
 		imageList = new JList();
 		imageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		imageList.addListSelectionListener(this);
@@ -100,8 +101,8 @@ public class StereoPlanarPanel extends JPanel
 		meanErrorRight = createTextComponent();
 		maxErrorRight = createTextComponent();
 
-		leftView.addMouseListener(this);
-		rightView.addMouseListener(this);
+		leftView.getImagePanel().addMouseListener(this);
+		rightView.getImagePanel().addMouseListener(this);
 
 		JToolBar toolBar = createToolBar();
 
@@ -162,12 +163,13 @@ public class StereoPlanarPanel extends JPanel
 
 	public void setRectification(CameraPinholeRadial leftParam , DMatrixRMaj leftRect ,
 								 CameraPinholeRadial rightParam , DMatrixRMaj rightRect ) {
-		leftView.setDistorted(leftParam,leftRect);
-		rightView.setDistorted(rightParam,rightRect);
+		leftView.setCalibration(leftParam,leftRect);
+		rightView.setCalibration(rightParam,rightRect);
 		checkUndistorted.setEnabled(true);
+		setSelected(selectedImage); // this will cause it to render the rectified image
 	}
 
-	public void addPair( String name , BufferedImage imageLeft , BufferedImage imageRight )
+	public void addPair( String name , File imageLeft , File imageRight )
 	{
 		listLeft.add(imageLeft);
 		listRight.add(imageRight);
@@ -175,22 +177,22 @@ public class StereoPlanarPanel extends JPanel
 
 		imageList.removeListSelectionListener(this);
 		imageList.setListData(new Vector<Object>(names));
+		imageList.addListSelectionListener(this);
 		if( names.size() == 1 ) {
-			imageList.addListSelectionListener(this);
-			leftView.setPreferredSize(new Dimension(imageLeft.getWidth(), imageLeft.getHeight()));
-			rightView.setPreferredSize(new Dimension(imageRight.getWidth(), imageRight.getHeight()));
+//			leftView.setPreferredSize(new Dimension(imageLeft.getWidth(), imageLeft.getHeight()));
+//			rightView.setPreferredSize(new Dimension(imageRight.getWidth(), imageRight.getHeight()));
 			imageList.setSelectedIndex(0);
-		} else {
-			imageList.addListSelectionListener(this);
 		}
 		validate();
 	}
 
 	public synchronized void setObservations( List<CalibrationObservation> leftObservations , List<ImageResults> leftResults ,
 											  List<CalibrationObservation> rightObservations , List<ImageResults> rightResults ) {
-		leftView.setResults(leftObservations,leftResults);
-		rightView.setResults(rightObservations,rightResults);
+//		if( leftObservations == null || leftResults == null || rightObservations == null || rightResults == null )
+//			return;
 
+		this.leftObservations = leftObservations;
+		this.rightObservations = rightObservations;
 		this.leftResults = leftResults;
 		this.rightResults = rightResults;
 
@@ -198,13 +200,24 @@ public class StereoPlanarPanel extends JPanel
 		leftView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
 		rightView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
 
+		setSelected(selectedImage);
+
 		updateResultsGUI();
 	}
 
 	protected void setSelected( int selected ) {
 		selectedImage = selected;
-		leftView.setSelected(selected);
-		rightView.setSelected(selected);
+
+		BufferedImage imageLeft = UtilImageIO.loadImage(listLeft.get(selected).getPath());
+		BufferedImage imageRight = UtilImageIO.loadImage(listRight.get(selected).getPath());
+
+		leftView.setBufferedImage(imageLeft);
+		rightView.setBufferedImage(imageRight);
+
+		if( leftObservations == null )
+			return;
+		leftView.setResults(leftObservations.get(selected),leftResults.get(selected),leftObservations);
+		rightView.setResults(rightObservations.get(selected),rightResults.get(selected),rightObservations);
 
 		updateResultsGUI();
 	}

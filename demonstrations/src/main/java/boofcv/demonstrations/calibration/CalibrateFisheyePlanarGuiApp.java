@@ -22,7 +22,6 @@ import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
-import boofcv.gui.VisualizeApp;
 import boofcv.gui.calibration.FisheyePlanarPanel;
 import boofcv.io.MediaManager;
 import boofcv.io.ProgressMonitorThread;
@@ -46,8 +45,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CalibrateFisheyePlanarGuiApp extends JPanel
-		implements VisualizeApp {
+public class CalibrateFisheyePlanarGuiApp extends JPanel {
 
 	// computes calibration parameters
 	CalibrateMonoPlanar calibrator;
@@ -61,7 +59,7 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel
 
 	public CalibrateFisheyePlanarGuiApp() {
 		setLayout(new BorderLayout());
-		gui.mainView.setPreferredSize(new Dimension(800,600));
+		gui.mainView.setPreferredSize(new Dimension(600,720));
 		this.owner = this;
 
 		add(gui,BorderLayout.CENTER);
@@ -78,19 +76,6 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel
 		return calibrator;
 	}
 
-	@Override
-	public void loadConfigurationFile(String fileName) {
-//		ParseMonoCalibrationConfig parser = new ParseMonoCalibrationConfig(media);
-//
-//		if( parser.parse(fileName) ) {
-//			configure(parser.detector,parser.images,
-//					parser.numRadial,parser.includeTangential);
-//		} else {
-//			System.err.println("Configuration failed");
-//		}
-		throw new RuntimeException("Not supported");
-	}
-
 	public void process( String outputFileName ) {
 		calibrator.reset();
 		final ProcessThread monitor = new ProcessThread();
@@ -104,7 +89,7 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel
 				if( calibrator.addImage(input) ) {
 					SwingUtilities.invokeLater(new Runnable() {
 						public void run() {
-							gui.addImage(file.getName(), orig);
+							gui.addImage(file);
 							gui.repaint();
 							monitor.setMessage(0, file.getName());
 						}
@@ -155,11 +140,6 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel
 		param.print();
 	}
 
-	@Override
-	public void setMediaManager(MediaManager manager) {
-		media = manager;
-	}
-
 	/**
 	 * Displays a progress monitor and updates its state periodically
 	 */
@@ -180,20 +160,6 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel
 		@Override
 		public void doRun() {
 		}
-	}
-
-	@Override
-	public void loadInputData(String fileName) {
-		new Thread() {
-			public void run() {
-				process(null);
-			}
-		}.start();
-	}
-
-	@Override
-	public boolean getHasProcessedImage() {
-		return true;
 	}
 
 	public static void main( String args[] ) {

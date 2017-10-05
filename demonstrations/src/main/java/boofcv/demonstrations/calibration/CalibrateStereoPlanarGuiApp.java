@@ -25,7 +25,6 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
-import boofcv.gui.VisualizeApp;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
 import boofcv.io.ProgressMonitorThread;
@@ -41,14 +40,15 @@ import org.ejml.data.DMatrixRMaj;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Peter Abeles
  */
-public class CalibrateStereoPlanarGuiApp extends JPanel
-		implements VisualizeApp {
+public class CalibrateStereoPlanarGuiApp extends JPanel {
 
 	// computes calibration parameters
 	CalibrateStereoPlanar calibrator;
@@ -58,8 +58,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	JPanel owner;
 
 	// file reference to calibration images
-	List<String> leftImages;
-	List<String> rightImages;
+	List<File> leftImages;
+	List<File> rightImages;
 
 	MediaManager media = DefaultMediaManager.INSTANCE;
 
@@ -82,8 +82,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		int N = leftImages.size();
 
 		for( int i = 0; i < N; i++ ) {
-			final BufferedImage leftOrig = media.openImage(leftImages.get(i));
-			final BufferedImage rightOrig = media.openImage(rightImages.get(i));
+			final BufferedImage leftOrig = media.openImage(leftImages.get(i).getPath());
+			final BufferedImage rightOrig = media.openImage(rightImages.get(i).getPath());
 			if( leftOrig != null && rightOrig != null ) {
 				GrayF32 leftInput = ConvertBufferedImage.convertFrom(leftOrig, (GrayF32) null);
 				GrayF32 rightInput = ConvertBufferedImage.convertFrom(rightOrig, (GrayF32) null);
@@ -91,7 +91,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 					final int number = i;
 					SwingUtilities.invokeLater(new Runnable() {
 						public void run() {
-							gui.addPair("Image " + number, leftOrig, rightOrig);
+							gui.addPair("Image " + number, leftImages.get(number), rightImages.get(number));
 							gui.repaint();
 							monitor.setMessage(0, "Image "+number);
 						}});
@@ -106,12 +106,12 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 			}
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.setObservations(calibrator.getCalibLeft().getObservations(),calibrator.getCalibLeft().getErrors(),
-						calibrator.getCalibRight().getObservations(),calibrator.getCalibRight().getErrors());
-			}});
-		gui.repaint();
+//		SwingUtilities.invokeLater(new Runnable() {
+//			public void run() {
+//				gui.setObservations(calibrator.getCalibLeft().getObservations(),calibrator.getCalibLeft().getErrors(),
+//						calibrator.getCalibRight().getObservations(),calibrator.getCalibRight().getErrors());
+//			}});
+//		gui.repaint();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -162,11 +162,6 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		gui.repaint();
 	}
 
-	@Override
-	public void setMediaManager(MediaManager manager) {
-		this.media = manager;
-	}
-
 	/**
 	 * Configures the calibration tool. For the calibration images, the image index in both lists must
 	 * correspond to images taken at the same time.
@@ -180,7 +175,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 						   int numRadial,
 						   boolean includeTangential,
 						   boolean assumeZeroSkew ,
-						   List<String> leftImages , List<String> rightImages  ) {
+						   List<File> leftImages , List<File> rightImages  ) {
 
 		if( leftImages.size() != rightImages.size() )
 			throw new IllegalArgumentException("Number of left and right images must be the same");
@@ -189,28 +184,6 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		calibrator.configure(assumeZeroSkew,numRadial,includeTangential);
 		this.leftImages = leftImages;
 		this.rightImages = rightImages;
-	}
-
-	@Override
-	public void loadConfigurationFile(String fileName) {
-		ParseStereoCalibrationConfig parser = new ParseStereoCalibrationConfig(media);
-
-		if( parser.parse(fileName) ) {
-			configure(parser.detector,parser.numRadial,
-					parser.includeTangential,parser.assumeZeroSkew,
-					parser.getLeftImages(),parser.getRightImages());
-		} else {
-			System.err.println("Configuration failed");
-		}
-	}
-
-	@Override
-	public void loadInputData(String fileName) {
-		new Thread() {
-			public void run() {
-				process(null);
-			}
-		}.start();
 	}
 
 	/**
@@ -235,11 +208,6 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		}
 	}
 
-	@Override
-	public boolean getHasProcessedImage() {
-		return true;
-	}
-
 	public static void main( String args[] ) {
 		DetectorFiducialCalibration detector =
 				FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));
@@ -255,8 +223,18 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		Collections.sort(leftImages);
 		Collections.sort(rightImages);
 
+		List<File> leftFiles = new ArrayList<>();
+		List<File> rightFiles = new ArrayList<>();
+
+		for( String s : leftImages ) {
+			leftFiles.add( new File(s));
+		}
+		for( String s : rightImages ) {
+			rightFiles.add( new File(s));
+		}
+
 		CalibrateStereoPlanarGuiApp app = new CalibrateStereoPlanarGuiApp();
-		app.configure(detector,2,false,true, leftImages,rightImages);
+		app.configure(detector,2,false,true, leftFiles,rightFiles);
 
 		ShowImages.showWindow(app,"Planar Stereo Calibration",true);
 

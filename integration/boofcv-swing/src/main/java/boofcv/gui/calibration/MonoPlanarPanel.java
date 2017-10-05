@@ -28,14 +28,10 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * GUI interface for CalibrateMonoPlanarGuiApp.  Displays results for each calibration
@@ -43,12 +39,9 @@ import java.util.Vector;
  * 
  * @author Peter Abeles
  */
-public class MonoPlanarPanel extends JPanel implements ItemListener ,
-		ListSelectionListener, ChangeListener 
+public class MonoPlanarPanel extends CalibratedPlanarPanel<CameraPinholeRadial>
+		implements ItemListener , ChangeListener
 {
-
-	CalibratedImageGridPanel mainView = new CalibratedImageGridPanel();
-	
 	JCheckBox checkPoints;
 	JCheckBox checkErrors;
 	JCheckBox checkUndistorted;
@@ -56,8 +49,6 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 	JCheckBox checkNumbers;
 	JCheckBox checkOrder;
 	JSpinner selectErrorScale;
-	
-	JList imageList;
 
 	JTextArea meanError;
 	JTextArea maxError;
@@ -75,17 +66,10 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 	boolean showNumbers = false;
 	boolean showOrder = true;
 
-	int selectedImage = 0;
-
-	List<String> names = new ArrayList<>();
-	List<BufferedImage> images = new ArrayList<>();
-	List<CalibrationObservation> features = new ArrayList<>();
-	List<ImageResults> results = new ArrayList<>();
-
 	int errorScale = 20;
 
 	public MonoPlanarPanel() {
-		super(new BorderLayout());
+		mainView = new DisplayPinholeCalibrationPanel();
 
 		JToolBar toolBar = createToolBar();
 
@@ -101,8 +85,6 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		paramFY = createErrorComponent();
 		paramSkew = createErrorComponent();
 
-		mainView.setImages(images);
-		mainView.setResults(features,results);
 		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
 
 		add(toolBar, BorderLayout.PAGE_START);
@@ -159,36 +141,17 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		comp.setEditable(false);
 		return comp;
 	}
-	
-	public void addImage( String name , BufferedImage image )
-	{
-		names.add(name);
-		images.add(image);
-
-		imageList.removeListSelectionListener(this);
-		imageList.setListData(new Vector<Object>(names));
-		if( names.size() == 1 ) {
-			imageList.addListSelectionListener(this);
-			mainView.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
-			imageList.setSelectedIndex(0);
-			validate();
-		} else {
-			// each time an image is added it resets the selected value
-			imageList.setSelectedIndex(selectedImage);
-			imageList.addListSelectionListener(this);
-		}
-	}
 
 	public void setObservations( List<CalibrationObservation> features  ) {
 		this.features = features;
 	}
 
 	public void setResults(List<ImageResults> results) {
-		mainView.setResults(features,results);
 		this.results = results;
-		updateResultsGUI();
+		setSelected(selectedImage);
 	}
 
+	@Override
 	public void setCalibration(Zhang99AllParam found) {
 		CameraPinholeRadial intrinsic = (CameraPinholeRadial)found.getIntrinsic().getCameraModel();
 		String textX = String.format("%5.1f",intrinsic.cx);
@@ -204,10 +167,11 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		paramSkew.setText(textC);
 	}
 
+	@Override
 	public void setCorrection( CameraPinholeRadial param )
 	{
 		checkUndistorted.setEnabled(true);
-		mainView.setDistorted(param,null);
+		mainView.setCalibration(param);
 	}
 
 	@Override
@@ -240,16 +204,17 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		}
 	}
 
-	private void setSelected( int selected ) {
-		mainView.setSelected(selected);
-		selectedImage = selected;
+//	private void setSelected( int selected ) {
+//		mainView.setSelected(selected);
+//		selectedImage = selected;
+//
+//		if( results != null ) {
+//			updateResultsGUI();
+//		}
+//	}
 
-		if( results != null ) {
-			updateResultsGUI();
-		}
-	}
-
-	private void updateResultsGUI() {
+	@Override
+	protected void updateResultsGUI() {
 		if( selectedImage < results.size() ) {
 			ImageResults r = results.get(selectedImage);
 			String textMean = String.format("%5.1e", r.meanError);

@@ -18,7 +18,6 @@
 
 package boofcv.gui.calibration;
 
-import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
@@ -40,7 +39,6 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
@@ -53,114 +51,47 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CalibratedImageGridPanel extends JPanel {
+public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<CameraPinholeRadial> {
 
-	// images of calibration target
-	List<BufferedImage> images;
 	// which image is being displayed
 	int selectedImage;
 	// for displaying undistorted image
+	BufferedImage distorted;
 	BufferedImage undistorted;
 	// true if the image has been undistorted
 	boolean isUndistorted = false;
 
-	// observed feature locations
-	List<CalibrationObservation> features = new ArrayList<>();
-	// results of calibration
-	List<ImageResults> results = new ArrayList<>();
-
 	// for displaying corrected image
-	Planar<GrayF32> origMS;
-	Planar<GrayF32> correctedMS;
-
-	// configures what is displayed or not
-	boolean showPoints = true;
-	boolean showErrors = true;
-	boolean showUndistorted = false;
-	boolean showAll = false;
-	boolean showNumbers = true;
-	boolean showOrder = true;
+	Planar<GrayF32> origMS = new Planar<>(GrayF32.class,1,1,3);
+	Planar<GrayF32> correctedMS = new Planar<>(GrayF32.class,1,1,3);
 
 	ImageDistort<GrayF32,GrayF32> undoRadial;
 	Point2Transform2_F32 remove_p_to_p;
 
-	// how much errors are scaled up
-	double errorScale;
-
 	// int horizontal line
 	int lineY=-1;
 
-	public void setDisplay( boolean showPoints , boolean showErrors ,
-							boolean showUndistorted , boolean showAll , boolean showNumbers ,
-							boolean showOrder,
-							double errorScale )
-	{
-		this.showPoints = showPoints;
-		this.showErrors = showErrors;
-		this.showUndistorted = showUndistorted;
-		this.showAll = showAll;
-		this.showNumbers = showNumbers;
-		this.showOrder = showOrder;
-		this.errorScale = errorScale;
-	}
+	@Override
+	public void setBufferedImage(BufferedImage image) {
+		this.distorted = image;
 
-	public void setSelected( int selected ) {
-		this.selectedImage = selected;
-		this.isUndistorted = false;
-
-		if( origMS == null ) {
-			BufferedImage image = images.get(selected);
-
-			// the number of bands can be difficult to ascertain without digging deep into the data structure
-			// so just declare a new one using convert
-			origMS = ConvertBufferedImage.convertFromPlanar(image,null,true,GrayF32.class);
-			correctedMS = ConvertBufferedImage.convertFromPlanar(image,null,true,GrayF32.class);
-			undistorted = new BufferedImage(image.getWidth(),image.getHeight(),image.getType());
-		}
-	}
-
-	public void setImages( List<BufferedImage> images ) {
-		this.images = images;
-	}
-
-	public void setResults( List<CalibrationObservation> features , List<ImageResults> results ) {
-		this.features = features;
-		this.results = results;
+		undoRadialDistortion(distorted);
 	}
 
 	@Override
 	public void paintComponent(Graphics g) {
+		if( showUndistorted ) {
+			this.img = undistorted;
+		} else {
+			this.img = distorted;
+		}
+
 		super.paintComponent(g);
+	}
 
-		Graphics2D g2 = (Graphics2D)g;
-
-		if( images == null || selectedImage >= images.size() )
-			return;
-
-		BufferedImage image = images.get(selectedImage);
-
-		double scaleX = getWidth()/(double)image.getWidth();
-		double scaleY = getHeight()/(double)image.getHeight();
-		double scale = Math.min(1,Math.min(scaleX,scaleY));
-
-		AffineTransform tranOrig = g2.getTransform();
-		AffineTransform tran = g2.getTransform();
-		tran.concatenate(AffineTransform.getScaleInstance(scale,scale));
-
-		g2.setTransform(tran);
-
-		if( showUndistorted) {
-			if( undoRadial != null && !isUndistorted ) {
-				undoRadialDistortion(image);
-				isUndistorted = true;
-			}
-			g2.drawImage(undistorted,0,0,null);
-		} else
-			g2.drawImage(image,0,0,null);
-
-		g2.setTransform(tranOrig);
-
-		if( features.size() > selectedImage ) {
+	@Override
+	protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+		if( features != null && features.size() > selectedImage ) {
 			drawFeatures(g2, scale);
 		}
 
@@ -172,7 +103,13 @@ public class CalibratedImageGridPanel extends JPanel {
 	}
 
 	private void undoRadialDistortion(BufferedImage image) {
-		ConvertBufferedImage.convertFromPlanar(image, origMS,true, GrayF32.class);
+		if( undoRadial == null )
+			return;
+
+		ConvertBufferedImage.convertFrom(image,origMS,true);
+		if( correctedMS.getNumBands() != origMS.getNumBands() )
+			correctedMS.setNumberOfBands(origMS.getNumBands());
+		correctedMS.reshape(origMS.width,origMS.height);
 
 		for( int i = 0; i < origMS.getNumBands(); i++ ) {
 			GrayF32 in = origMS.getBand(i);
@@ -180,12 +117,9 @@ public class CalibratedImageGridPanel extends JPanel {
 
 			undoRadial.apply(in,out);
 		}
-		if( correctedMS.getNumBands() == 3 )
-			ConvertBufferedImage.convertTo(correctedMS,undistorted,true);
-		else if( correctedMS.getNumBands() == 1 )
-			ConvertBufferedImage.convertTo(correctedMS.getBand(0),undistorted);
-		else
-			throw new RuntimeException("What kind of image has "+correctedMS.getNumBands()+"???");
+		undistorted = ConvertBufferedImage.checkDeclare(origMS.width,origMS.height,undistorted,BufferedImage.TYPE_INT_RGB);
+
+		ConvertBufferedImage.convertTo(correctedMS,undistorted,true);
 	}
 
 	private void drawFeatures(Graphics2D g2 , double scale) {
@@ -193,7 +127,7 @@ public class CalibratedImageGridPanel extends JPanel {
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		CalibrationObservation set = features.get(selectedImage);
+		CalibrationObservation set = features;
 
 		Point2D_F32 adj = new Point2D_F32();
 
@@ -235,7 +169,7 @@ public class CalibratedImageGridPanel extends JPanel {
 		}
 
 		if( showAll ) {
-			for( CalibrationObservation l : features ) {
+			for( CalibrationObservation l : allFeatures ) {
 				for( PointIndex2D_F64 p : l.points ) {
 					if( showUndistorted ) {
 						remove_p_to_p.compute((float)p.x,(float)p.y,adj);
@@ -254,9 +188,7 @@ public class CalibratedImageGridPanel extends JPanel {
 				drawNumbers(g2, set,null,scale);
 		}
 
-		if( showErrors && results != null && results.size() > selectedImage ) {
-			ImageResults result = results.get(selectedImage);
-
+		if( showErrors && results != null ) {
 			g2.setStroke(new BasicStroke(4));
 			g2.setColor(Color.BLACK);
 			for( int i = 0; i < set.size(); i++ ) {
@@ -268,7 +200,7 @@ public class CalibratedImageGridPanel extends JPanel {
 					adj.set((float)p.x,(float)p.y);
 				}
 
-				double r = errorScale*result.pointError[i];
+				double r = errorScale*results.pointError[i];
 				if( r < 1 )
 					continue;
 
@@ -286,7 +218,7 @@ public class CalibratedImageGridPanel extends JPanel {
 					adj.set((float)p.x,(float)p.y);
 				}
 
-				double r = errorScale*result.pointError[i];
+				double r = errorScale*results.pointError[i];
 				if( r < 1 )
 					continue;
 
@@ -321,20 +253,23 @@ public class CalibratedImageGridPanel extends JPanel {
 		}
 	}
 
-	public void setDistorted (CameraPinholeRadial param , DMatrixRMaj rect ) {
-		if( rect == null ) {
-			CameraPinhole undistorted = new CameraPinhole(param);
-			this.undoRadial = LensDistortionOps.changeCameraModel(
-					AdjustmentType.FULL_VIEW, BorderType.ZERO, param, undistorted,null, ImageType.single(GrayF32.class));
-			this.remove_p_to_p = LensDistortionOps.transformChangeModel_F32(AdjustmentType.FULL_VIEW, param, undistorted, false,null);
-		} else {
-			FMatrixRMaj rect_f32 = new FMatrixRMaj(3,3);
-			ConvertMatrixData.convert(rect,rect_f32);
+	@Override
+	public void setCalibration (CameraPinholeRadial param  ) {
+		CameraPinhole undistorted = new CameraPinhole(param);
+		this.undoRadial = LensDistortionOps.changeCameraModel(
+				AdjustmentType.FULL_VIEW, BorderType.ZERO, param, undistorted,null, ImageType.single(GrayF32.class));
+		this.remove_p_to_p = LensDistortionOps.transformChangeModel_F32(AdjustmentType.FULL_VIEW, param, undistorted, false,null);
 
-			this.undoRadial = RectifyImageOps.rectifyImage(
-					param, rect_f32, BorderType.ZERO, ImageType.single(GrayF32.class));
-			this.remove_p_to_p = RectifyImageOps.transformPixelToRect(param, rect_f32);
-		}
+		undoRadialDistortion(distorted);
+	}
+
+	public void setCalibration (CameraPinholeRadial param , DMatrixRMaj rect ) {
+		FMatrixRMaj rect_f32 = new FMatrixRMaj(3,3);
+		ConvertMatrixData.convert(rect,rect_f32);
+
+		this.undoRadial = RectifyImageOps.rectifyImage(
+				param, rect_f32, BorderType.ZERO, ImageType.single(GrayF32.class));
+		this.remove_p_to_p = RectifyImageOps.transformPixelToRect(param, rect_f32);
 	}
 
 	public void setLine( int y ) {

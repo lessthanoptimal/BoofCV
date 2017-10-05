@@ -29,16 +29,12 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * GUI interface for CalibrateMonoPlanarGuiApp.  Displays results for each calibration
@@ -46,13 +42,9 @@ import java.util.Vector;
  * 
  * @author Peter Abeles
  */
-public class FisheyePlanarPanel extends JPanel implements ItemListener ,
-		ListSelectionListener, ChangeListener
+public class FisheyePlanarPanel extends CalibratedPlanarPanel<CameraUniversalOmni>
+		implements ItemListener , ChangeListener
 {
-
-	public CalibratedFisheyeImagePanel mainView = new CalibratedFisheyeImagePanel();
-
-	ViewedImageInfoPanel viewInfo = new ViewedImageInfoPanel();
 	JCheckBox checkPoints;
 	JCheckBox checkErrors;
 	JCheckBox checkUndistorted;
@@ -60,8 +52,6 @@ public class FisheyePlanarPanel extends JPanel implements ItemListener ,
 	JCheckBox checkNumbers;
 	JCheckBox checkOrder;
 	JSpinner selectErrorScale;
-
-	JList imageList;
 
 	JTextArea meanError;
 	JTextArea maxError;
@@ -79,18 +69,9 @@ public class FisheyePlanarPanel extends JPanel implements ItemListener ,
 	boolean showAll = false;
 	boolean showNumbers = false;
 	boolean showOrder = true;
-
-	int selectedImage = 0;
-
-	List<String> names = new ArrayList<>();
-	List<BufferedImage> images = new ArrayList<>();
-	List<CalibrationObservation> features = new ArrayList<>();
-	List<ImageResults> results = new ArrayList<>();
-
 	int errorScale = 20;
 
 	public FisheyePlanarPanel() {
-		super(new BorderLayout());
 
 		viewInfo.setListener(new ViewedImageInfoPanel.Listener() {
 			@Override
@@ -99,6 +80,7 @@ public class FisheyePlanarPanel extends JPanel implements ItemListener ,
 			}
 		});
 
+		mainView = new DisplayFisheyeCalibrationPanel();
 		mainView.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -135,27 +117,6 @@ public class FisheyePlanarPanel extends JPanel implements ItemListener ,
 		comp.setEditable(false);
 		return comp;
 	}
-	
-	public void addImage( String name , BufferedImage image )
-	{
-		viewInfo.setImageSize(image.getWidth(),image.getHeight());
-
-		names.add(name);
-		images.add(image);
-
-		imageList.removeListSelectionListener(this);
-		imageList.setListData(new Vector<Object>(names));
-		if( names.size() == 1 ) {
-			imageList.addListSelectionListener(this);
-			mainView.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
-			imageList.setSelectedIndex(0);
-			validate();
-		} else {
-			// each time an image is added it resets the selected value
-			imageList.setSelectedIndex(selectedImage);
-			imageList.addListSelectionListener(this);
-		}
-	}
 
 	public void setObservations( List<CalibrationObservation> features  ) {
 		this.features = features;
@@ -166,6 +127,7 @@ public class FisheyePlanarPanel extends JPanel implements ItemListener ,
 		setSelected(selectedImage);
 	}
 
+	@Override
 	public void setCalibration(Zhang99AllParam found) {
 		CameraUniversalOmni intrinsic = (CameraUniversalOmni)found.getIntrinsic().getCameraModel();
 		String textX = String.format("%5.1f",intrinsic.cx);
@@ -183,6 +145,7 @@ public class FisheyePlanarPanel extends JPanel implements ItemListener ,
 		paramOffset.setText(textD);
 	}
 
+	@Override
 	public void setCorrection( CameraUniversalOmni param )
 	{
 		checkUndistorted.setEnabled(true);
@@ -219,19 +182,8 @@ public class FisheyePlanarPanel extends JPanel implements ItemListener ,
 		}
 	}
 
-	private void setSelected( int selected ) {
-		if( selected < features.size() )
-			mainView.setResults(features.get(selected),results.get(selected), features);
-		mainView.setBufferedImage(images.get(selected));
-		selectedImage = selected;
-
-		if( results != null ) {
-			updateResultsGUI();
-		}
-		mainView.repaint();
-	}
-
-	private void updateResultsGUI() {
+	@Override
+	protected void updateResultsGUI() {
 		if( selectedImage < results.size() ) {
 			ImageResults r = results.get(selectedImage);
 			String textMean = String.format("%5.1e", r.meanError);
