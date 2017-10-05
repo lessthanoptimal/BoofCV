@@ -242,12 +242,10 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	}
 
 	public void setConfiguration(ConfigThreshold configuration) {
-		System.out.println("num listeners "+spinnerScale.getChangeListeners().length);
 		comboType.removeActionListener(this);
 		spinnerRadius.removeChangeListener(this);
 		spinnerScale.removeChangeListener(this);
 		buttonUpDown.removeActionListener(this);
-		System.out.println("num listeners "+spinnerScale.getChangeListeners().length);
 
 
 		comboType.setSelectedIndex(configuration.type.ordinal());

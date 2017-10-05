@@ -255,7 +255,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 					if ( controlPanel.isShowPoints() ) {
 						List<Point2D_F64> candidates = getCalibrationPoints();
 						for (Point2D_F64 c : candidates) {
-							VisualizeFeatures.drawPoint(g2, scale * c.x,scale * c.y, 4*scale, Color.RED,false,storage);
+							VisualizeFeatures.drawPoint(g2, scale * c.x,scale * c.y, 4, Color.RED,false,storage);
 						}
 					}
 					if( controlPanel.isShowNumbers() ) {
