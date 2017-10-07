@@ -180,11 +180,11 @@ public class TestReidSolomonCodes {
 		alg.findErrorLocatorBM(syndromes,nsyn,errorLocator);
 
 		if( expectedFail ) {
-			assertFalse(alg.findErrors_BruteForce(errorLocator, N, locations));
+			assertFalse(alg.findErrorLocations_BruteForce(errorLocator, N, locations));
 		} else {
 
 			// find the error locations
-			assertTrue(alg.findErrors_BruteForce(errorLocator, N, locations));
+			assertTrue(alg.findErrorLocations_BruteForce(errorLocator, N, locations));
 
 			// see if it found the expected number of errors and that the locations match
 			assertEquals(numErrors, locations.size);

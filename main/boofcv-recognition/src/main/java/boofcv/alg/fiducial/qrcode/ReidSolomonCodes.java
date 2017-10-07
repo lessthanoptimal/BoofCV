@@ -42,6 +42,10 @@ public class ReidSolomonCodes {
 	GrowQueue_I8 tmp0 = new GrowQueue_I8();
 	GrowQueue_I8 tmp1 = new GrowQueue_I8();
 
+	GrowQueue_I32 errorLocations = new GrowQueue_I32();
+	GrowQueue_I8 errorLocatorPoly = new GrowQueue_I8();
+	GrowQueue_I32 syndromes = new GrowQueue_I32();
+
 	public ReidSolomonCodes( int numBits , int primitive) {
 		math = new GaliosFieldTableOps(numBits,primitive);
 	}
@@ -77,8 +81,16 @@ public class ReidSolomonCodes {
 						   GrowQueue_I8 ecc,
 						   GrowQueue_I8 output )
 	{
+		syndromes.resize(syndromeLength());
 
-		return false;
+		computeSyndromes(input,ecc,syndromes.data);
+		findErrorLocatorBM(syndromes.data,syndromes.size,errorLocatorPoly);
+		if( !findErrorLocations_BruteForce(errorLocatorPoly,input.size+ecc.size,errorLocations))
+			return false;
+
+		// todo output goes in output?
+		correctErrors(input,syndromes.data,errorLocations);
+		return true;
 	}
 
 	/**
@@ -107,7 +119,7 @@ public class ReidSolomonCodes {
 	 *
 	 * @param syndromes The syndromes
 	 * @param length number of elements in syndromes
-	 * @param errorLocator (Output) the error locator polynomial
+	 * @param errorLocator (Output) the error locator polynomial. Coefficients go for small to large.
 	 */
 	void findErrorLocatorBM( int syndromes[] , int length , GrowQueue_I8 errorLocator ) {
 		GrowQueue_I8 C = errorLocator; // error polynomial
@@ -156,10 +168,10 @@ public class ReidSolomonCodes {
 			}
 		}
 
-		removeZeros(C);
+		removeLeadingZeros(C);
 	}
 
-	private void removeZeros( GrowQueue_I8 poly ) {
+	private void removeLeadingZeros(GrowQueue_I8 poly ) {
 		int count = 0;
 		for (; count < poly.size; count++) {
 			if( poly.data[count] != 0 )
@@ -174,13 +186,13 @@ public class ReidSolomonCodes {
 	/**
 	 * Creates a list of bytes that have errors in them
 	 *
-	 * @param errorLocator Error locator polynomial
+	 * @param errorLocator Error locator polynomial. Coefficients from small to large.
 	 * @param messageLength Length of the message + ecc.
 	 * @param locations (Output) locations of bytes in message with errors.
 	 */
-	public boolean findErrors_BruteForce(GrowQueue_I8 errorLocator ,
-									  int messageLength ,
-									  GrowQueue_I32 locations )
+	public boolean findErrorLocations_BruteForce(GrowQueue_I8 errorLocator ,
+												 int messageLength ,
+												 GrowQueue_I32 locations )
 	{
 		locations.resize(0);
 		for (int i = 0; i < messageLength; i++) {
@@ -193,6 +205,10 @@ public class ReidSolomonCodes {
 		return locations.size == errorLocator.size - 1;
 	}
 
+	public void correctErrors( GrowQueue_I8 message , int syndromes[], GrowQueue_I32 locations )
+	{
+
+	}
 
 	/**
 	 * Creates the generator function with the specified polynomial degree. The generator function is composed
