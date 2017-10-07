@@ -218,6 +218,35 @@ public class TestGaliosFieldTableOps {
 	}
 
 	@Test
+	public void polyAddScaleB() {
+		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+
+		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
+		GrowQueue_I8 inputA = new GrowQueue_I8(3);
+		inputA.resize(3);
+		inputA.set(0,0x12);
+		inputA.set(1,0x54);
+		inputA.set(2,0xFF);
+
+		// Create an arbitrary polynomial: 0xA0*x^3 + 0x45
+		GrowQueue_I8 inputB = new GrowQueue_I8(4);
+		inputB.resize(4);
+		inputB.set(0,0xA0);
+		inputB.set(3,0x45);
+
+		int scale = 0x62;
+		GrowQueue_I8 scaleB = new GrowQueue_I8();
+		alg.polyScale(inputB,scale,scaleB);
+		GrowQueue_I8 expected = new GrowQueue_I8();
+		alg.polyAdd(inputA,scaleB,expected);
+
+		GrowQueue_I8 found = new GrowQueue_I8();
+		alg.polyAddScaleB(inputA,inputB,scale,found);
+
+		assertEqualsG(expected, found);
+	}
+
+	@Test
 	public void polyMult() {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 

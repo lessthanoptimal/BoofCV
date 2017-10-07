@@ -157,6 +157,35 @@ public class GaliosFieldTableOps {
 	}
 
 	/**
+	 * Adds two polynomials together while scaling the second.
+	 *
+	 * <p>Coefficients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
+	 *
+	 * @param polyA (Input) First polynomial
+	 * @param polyB (Input) Second polynomial
+	 * @param scaleB (Input) Scale factor applied to polyB
+	 * @param output (Output) Results of addition
+	 */
+	public void polyAddScaleB(GrowQueue_I8 polyA , GrowQueue_I8 polyB , int scaleB , GrowQueue_I8 output ) {
+		output.resize(Math.max(polyA.size,polyB.size));
+
+		// compute offset that would align the smaller polynomial with the larger polynomial
+		int offsetA = Math.max(0,polyB.size-polyA.size);
+		int offsetB = Math.max(0,polyA.size-polyB.size);
+		int N = output.size;
+
+		for (int i = 0; i < offsetB; i++) {
+			output.data[i] = polyA.data[i];
+		}
+		for (int i = 0; i < offsetA; i++) {
+			output.data[i] = (byte)multiply(polyB.data[i]&0xFF,scaleB);
+		}
+		for (int i = Math.max(offsetA,offsetB); i < N; i++) {
+			output.data[i] = (byte)((polyA.data[i-offsetA]&0xFF) ^ multiply(polyB.data[i-offsetB]&0xFF,scaleB));
+		}
+	}
+
+	/**
 	 *
 	 * <p>Coefficients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
 	 *

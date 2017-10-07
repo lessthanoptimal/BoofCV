@@ -90,19 +90,68 @@ public class ReidSolomonCodes {
 						   GrowQueue_I8 ecc ,
 						   int syndromes[])
 	{
-		for (int i = 0; i < generator.size-1; i++) {
+		int N = syndromeLength();
+		for (int i = 0; i < N; i++) {
 			int val = math.power(2,i);
 			syndromes[i] = math.polyEval(input,val);
 			syndromes[i] = math.polyEvalContinue(syndromes[i],ecc,val);
 		}
 	}
 
-	void findErrorLocator( int length ) {
-		GrowQueue_I8 poly = new GrowQueue_I8();
-		poly.resize(1);
-		poly.data[0] = 1;
+	/**
+	 * Computes the error locator polynomial using  Berlekamp-Massey algorithm [1]
+	 *
+	 * <p>[1] Massey, J. L. (1969), "Shift-register synthesis and BCH decoding" (PDF), IEEE Trans.
+	 * Information Theory, IT-15 (1): 122–127</p>
+	 */
+	void findErrorLocatorBM( int syndromes[] , int length , GrowQueue_I8 errorLocator ) {
+		GrowQueue_I8 C = errorLocator; // error polynomial
+		GrowQueue_I8 B = new GrowQueue_I8();  // previous error polynomial
 
+		initToOne(C,length+1);
+		initToOne(B,length+1);
 
+		GrowQueue_I8 tmp = new GrowQueue_I8(length);
+
+//		int L = 0;
+//		int m = 1; // stores how much B is 'shifted' by
+		int b = 1;
+
+		for (int n = 0; n < length; n++) {
+
+			// Compute discrepancy delta
+			int delta = syndromes[n];
+
+			for (int j = 1; j < C.size; j++) {
+				delta ^= math.multiply(C.data[C.size-j-1]&0xFF, syndromes[n-j]);
+			}
+
+			// B = D^m * B
+			B.data[B.size++] = 0;
+
+			// Step 3 is implicitly handled
+			// m = m + 1
+
+			if( delta != 0 ) {
+				int scale = math.multiply(delta, math.inverse(b));
+				math.polyAddScaleB(C, B, scale, tmp);
+
+				if (2 * C.size > length) {
+					// if 2*L > N ---- Step 4
+//					m += 1;
+				} else {
+					// if 2*L <= N --- Step 5
+					B.setTo(C);
+//					L = n+1-L;
+					b = delta;
+//					m = 1;
+				}
+				C.setTo(tmp);
+			}
+		}
+
+		// TODO drop leading zeros?
+		System.out.println();
 	}
 
 	/**
@@ -112,11 +161,8 @@ public class ReidSolomonCodes {
 	 * g<sub>4</sub>(x) = (x - α0) (x - α1) (x - α2) (x - α3) = 01 x4 + 0f x3 + 36 x2 + 78 x + 40
 	 */
 	void generator( int degree ) {
-		// predeclare memory
-		generator.resize(degree+1);
 		// initialize to a polynomial = 1
-		generator.size = 1;
-		generator.data[0] = 1;
+		initToOne(generator,degree+1);
 
 		// (1*x - a[i])
 		tmp1.resize(2);
@@ -126,5 +172,15 @@ public class ReidSolomonCodes {
 			math.polyMult(generator,tmp1,tmp0);
 			generator.setTo(tmp0);
 		}
+	}
+
+	void initToOne( GrowQueue_I8 poly , int length ) {
+		poly.setMaxSize(length);
+		poly.size = 1;
+		poly.data[0] = 1;
+	}
+
+	private int syndromeLength() {
+		return generator.size-1;
 	}
 }
