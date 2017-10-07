@@ -322,6 +322,26 @@ public class TestGaliosFieldTableOps {
 	}
 
 	@Test
+	public void polyEval_S() {
+		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+
+		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
+		GrowQueue_I8 inputA = new GrowQueue_I8();
+		inputA.resize(3);
+		inputA.set(2,0x12);
+		inputA.set(1,0x54);
+		inputA.set(0,0xFF);
+
+		int input = 0x09;
+		int found = alg.polyEval_S(inputA,input);
+
+		int expected = 0xFF ^ alg.multiply(0x54,input);
+		expected ^= alg.multiply(0x12,alg.multiply(input,input));
+
+		assertEquals(expected,found);
+	}
+
+	@Test
 	public void polyEvalContinue() {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 

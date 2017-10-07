@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.struct.GrowQueue_I8;
 
 import java.util.Arrays;
@@ -103,10 +104,15 @@ public class ReidSolomonCodes {
 	 *
 	 * <p>[1] Massey, J. L. (1969), "Shift-register synthesis and BCH decoding" (PDF), IEEE Trans.
 	 * Information Theory, IT-15 (1): 122–127</p>
+	 *
+	 * @param syndromes The syndromes
+	 * @param length number of elements in syndromes
+	 * @param errorLocator (Output) the error locator polynomial
 	 */
 	void findErrorLocatorBM( int syndromes[] , int length , GrowQueue_I8 errorLocator ) {
 		GrowQueue_I8 C = errorLocator; // error polynomial
 		GrowQueue_I8 B = new GrowQueue_I8();  // previous error polynomial
+		// TODO remove new from this function
 
 		initToOne(C,length+1);
 		initToOne(B,length+1);
@@ -150,9 +156,43 @@ public class ReidSolomonCodes {
 			}
 		}
 
-		// TODO drop leading zeros?
-		System.out.println();
+		removeZeros(C);
 	}
+
+	private void removeZeros( GrowQueue_I8 poly ) {
+		int count = 0;
+		for (; count < poly.size; count++) {
+			if( poly.data[count] != 0 )
+				break;
+		}
+		for (int i = count; i < poly.size; i++) {
+			poly.data[i-count] = poly.data[i];
+		}
+		poly.size -= count;
+	}
+
+	/**
+	 * Creates a list of bytes that have errors in them
+	 *
+	 * @param errorLocator Error locator polynomial
+	 * @param messageLength Length of the message + ecc.
+	 * @param locations (Output) locations of bytes in message with errors.
+	 */
+	public boolean findErrors_BruteForce(GrowQueue_I8 errorLocator ,
+									  int messageLength ,
+									  GrowQueue_I32 locations )
+	{
+		locations.resize(0);
+		for (int i = 0; i < messageLength; i++) {
+			if( math.polyEval_S(errorLocator,math.power(2,i)) == 0 ) {
+				locations.add(messageLength-i-1);
+			}
+		}
+
+		// see if the expected number of errors were found
+		return locations.size == errorLocator.size - 1;
+	}
+
 
 	/**
 	 * Creates the generator function with the specified polynomial degree. The generator function is composed

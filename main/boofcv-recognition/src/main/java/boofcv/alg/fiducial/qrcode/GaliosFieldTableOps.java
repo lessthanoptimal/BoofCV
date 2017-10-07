@@ -231,6 +231,28 @@ public class GaliosFieldTableOps {
 	}
 
 	/**
+	 * Evaluate the polynomial using Horner's method. Avoids explicit calculating the powers of x.
+	 *
+	 * <p>01x**4 + 0fx**3 + 36x**2 + 78x + 40 = (((01 x + 0f) x + 36) x + 78) x + 40</p>
+	 *
+	 *
+	 * <p>Coefficients for smallest powers are first, e.g. 2*x**3 + 8*x**2+1 = [1,0,2,8]</p>
+	 *
+	 * @param input Polynomial being evaluated
+	 * @param x Value of x
+	 * @return Output of function
+	 */
+	public int polyEval_S(GrowQueue_I8 input , int x ) {
+		int y = input.data[input.size-1]&0xFF;
+
+		for (int i = input.size-2; i >= 0; i--) {
+			y = multiply(y,x) ^ (input.data[i]&0xFF);
+		}
+
+		return y;
+	}
+
+	/**
 	 * Continue evaluating a polynomial which has been broken up into multiple arrays.
 	 *
 	 * @param previousOutput Output from the evaluation of the prior part of the polynomial
