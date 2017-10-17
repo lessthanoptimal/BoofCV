@@ -39,19 +39,14 @@ public class BoofMiscOps {
 	 * Returns the number of digits in a number. E.g. 345 = 3, -345 = 4, 0 = 1
 	 */
 	public static int numDigits(int number) {
-		int digits = 1;
-		if (number < 0) {
-			digits++;
-			number *= -1;
+		if( number == 0 )
+			return 1;
+		int adjustment = 0;
+		if( number < 0 ) {
+			adjustment = 1;
+			number = -number;
 		}
-
-		number -= number%10;
-		while (number > 0) {
-			number /= 10;
-			number -= number%10;
-			digits++;
-		}
-		return digits;
+		return adjustment + (int)Math.log10(number)+1;
 	}
 
 	public static void sortImageNames(List<String> images ) {

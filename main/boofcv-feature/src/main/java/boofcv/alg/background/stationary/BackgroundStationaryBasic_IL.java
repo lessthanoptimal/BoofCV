@@ -45,7 +45,7 @@ public class BackgroundStationaryBasic_IL<T extends ImageInterleaved<T>>
 
 		int numBands = imageType.getNumBands();
 
-		background = new InterleavedF32(1, 1, numBands);
+		background = new InterleavedF32(0, 0, numBands);
 
 		inputWrapper = FactoryGImageMultiBand.create(imageType);
 	}
@@ -61,12 +61,12 @@ public class BackgroundStationaryBasic_IL<T extends ImageInterleaved<T>>
 
 	@Override
 	public void reset() {
-		background.reshape(1,1);
+		background.reshape(0,0);
 	}
 
 	@Override
 	public void updateBackground( T frame) {
-		if( background.width == 1 ) {
+		if( background.width != frame.width ) {
 			background.reshape(frame.width, frame.height);
 			GConvertImage.convert(frame, background);
 			return;
@@ -97,7 +97,7 @@ public class BackgroundStationaryBasic_IL<T extends ImageInterleaved<T>>
 
 	@Override
 	public void segment(T frame, GrayU8 segmented) {
-		if( background.width == 1 ) {
+		if( background.width != frame.width ) {
 			ImageMiscOps.fill(segmented,unknownValue);
 			return;
 		}

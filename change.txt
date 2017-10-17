@@ -12,6 +12,8 @@ Version : 0.28
   * Removed refine corner for black polygon detector
     - Was complex, didn't fit the new API, and calibration residuals got better once removed.
   * Added option to optimize by fitting lines to the contour
+- Background Model
+  * Fixed a weird edge case that happened when you passed in a 1x1 pixel image
 - Removed Asymmetric Circle Grid
   * Less space efficient than Hexagonal Grid
 - Added Hexagonal Grid
@@ -79,6 +81,10 @@ Polygon Detector
   * 44% contour -> polygon
   * 6%  refine polygon
 - TODO Make it so split merge can abort early if too many splits? if very large sub-sample and fit?
+
+Contour
+- Improve memory efficiency. Use continuous memory broken up into chunks and convert back into a point
+  list upon request.
 
 Contour to Line
 - TODO New algorithm. Try one that's interest point based

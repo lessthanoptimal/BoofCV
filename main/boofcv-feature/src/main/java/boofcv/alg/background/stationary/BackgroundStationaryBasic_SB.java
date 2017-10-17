@@ -34,7 +34,7 @@ public class BackgroundStationaryBasic_SB<T extends ImageGray<T>>
 	extends BackgroundStationaryBasic<T>
 {
 	// storage for background image
-	protected GrayF32 background = new GrayF32(1,1);
+	protected GrayF32 background = new GrayF32(0,0);
 
 	// wrapper which provides abstraction across image types
 	protected GImageGray inputWrapper;
@@ -57,12 +57,12 @@ public class BackgroundStationaryBasic_SB<T extends ImageGray<T>>
 
 	@Override
 	public void reset() {
-		background.reshape(1,1);
+		background.reshape(0,0);
 	}
 
 	@Override
 	public void updateBackground( T frame) {
-		if( background.width == 1 ) {
+		if( background.width != frame.width ) {
 			background.reshape(frame.width, frame.height);
 			GConvertImage.convert(frame, background);
 			return;
@@ -89,7 +89,7 @@ public class BackgroundStationaryBasic_SB<T extends ImageGray<T>>
 
 	@Override
 	public void segment(T frame, GrayU8 segmented) {
-		if( background.width == 1 ) {
+		if( background.width != frame.width ) {
 			ImageMiscOps.fill(segmented,unknownValue);
 			return;
 		}
