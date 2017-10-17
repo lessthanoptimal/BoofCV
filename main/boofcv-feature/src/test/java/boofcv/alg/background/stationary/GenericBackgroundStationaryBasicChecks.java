@@ -27,6 +27,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -122,5 +123,38 @@ public abstract class GenericBackgroundStationaryBasicChecks extends GenericBack
 		alg.setThreshold(3.5f);
 		alg.segment(frame, segmented);
 		assertTrue(0 == ImageStatistics.sum(segmented));
+	}
+
+	/**
+	 * See if it runs correctly when a 1x1 pixel image is passed in
+	 */
+	@Test
+	public void image1x1() {
+		for( ImageType type : imageTypes ) {
+			image1x1(type);
+		}
+	}
+
+	private <T extends ImageBase<T>> void image1x1( ImageType<T> imageType ) {
+		BackgroundStationaryBasic<T> alg = (BackgroundStationaryBasic)create(imageType);
+		alg.setLearnRate(0.05f);
+
+		T frame = imageType.createImage(1,1);
+
+		// build a background model around these images
+		for (int i = 0; i < 5; i++) {
+			GImageMiscOps.fill(frame, 100);
+			alg.updateBackground(frame);
+		}
+
+		GrayU8 segmented = new GrayU8(1,1);
+
+		GImageMiscOps.fill(frame, 103);
+		alg.setThreshold(2.5f);
+		alg.segment(frame, segmented);
+
+		assertEquals(1,segmented.width);
+		assertEquals(1,segmented.height);
+		assertTrue(1 == ImageStatistics.sum(segmented));
 	}
 }

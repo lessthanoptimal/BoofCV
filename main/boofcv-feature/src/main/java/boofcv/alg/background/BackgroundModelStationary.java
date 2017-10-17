@@ -41,10 +41,11 @@ public abstract class BackgroundModelStationary<T extends ImageBase<T>> extends 
 	public abstract void updateBackground( T frame );
 
 	/**
-	 * Invoke to use the background image to segment the current frame into background and foreground pixels
+	 * Invoke to segment input image into background and foreground pixels. If 'segmented' isn't the
+	 * correct size it will be resized.
 	 *
-	 * @param frame current image
-	 * @param segmented Segmented image. 0 = background, 1 = foreground/moving
+	 * @param frame (input) current image
+	 * @param segmented (output) Segmented image. 0 = background, 1 = foreground/moving
 	 */
 	public abstract void segment( T frame , GrayU8 segmented );
 }

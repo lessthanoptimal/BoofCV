@@ -47,7 +47,7 @@ public class BackgroundStationaryBasic_PL<T extends ImageGray<T>>
 
 		int numBands = imageType.getNumBands();
 
-		background = new Planar<>(GrayF32.class,1,1,numBands);
+		background = new Planar<>(GrayF32.class,0,0,numBands);
 
 		inputWrapper = FactoryGImageMultiBand.create(imageType);
 
@@ -65,12 +65,12 @@ public class BackgroundStationaryBasic_PL<T extends ImageGray<T>>
 
 	@Override
 	public void reset() {
-		background.reshape(1,1);
+		background.reshape(0,0);
 	}
 
 	@Override
 	public void updateBackground( Planar<T> frame) {
-		if( background.width == 1 ) {
+		if( background.width != frame.width ) {
 			background.reshape(frame.width, frame.height);
 			GConvertImage.convert(frame, background);
 			return;
@@ -103,7 +103,7 @@ public class BackgroundStationaryBasic_PL<T extends ImageGray<T>>
 
 	@Override
 	public void segment(Planar<T> frame, GrayU8 segmented) {
-		if( background.width == 1 ) {
+		if( background.width != frame.width ) {
 			ImageMiscOps.fill(segmented,unknownValue);
 			return;
 		}
