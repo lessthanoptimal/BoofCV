@@ -13,7 +13,10 @@ if( ext.ANDROID_PLATFORMS.isEmpty() ) {
 } else
     ext.ANDROID_PATH = ext.ANDROID_HOME+"/platforms/"+ext.ANDROID_PLATFORMS.sort().last()
 
+ext.ANDROID_VERSION = ext.ANDROID_PATH.substring(ext.ANDROID_PATH.indexOf('-')+1,ext.ANDROID_PATH.length())
+
 println "Build Android module using $ext.ANDROID_PATH"
+println "Android version is $ext.ANDROID_VERSION"
 
 // disable tests since they can't be run on a regular desktop
 test.enabled = false
