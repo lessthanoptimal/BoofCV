@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.android.gui;
+package boofcv.android.camera;
 
 import android.graphics.Canvas;
 import android.hardware.Camera;
