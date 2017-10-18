@@ -31,7 +31,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public class PackedPointSets {
+public class PackedSetsPoint2D_I32 {
 	// maximum number of elements that can be in a block
 	final int blockLength;
 	// arrays which store the points
@@ -42,21 +42,25 @@ public class PackedPointSets {
 	// the length/size of the last block
 	int tailBlockSize;
 	// the set which is on the tail and can have points added to
-	BlockIndexLength tailSet;
+	BlockIndexLength tail;
 
 	/**
 	 * Configures the storage
 	 *
 	 * @param blockLength Number of elements in the block's array. Try 2000
 	 */
-	public PackedPointSets(final int blockLength ) {
-		this.blockLength = blockLength;
+	public PackedSetsPoint2D_I32(final int blockLength ) {
+		if( blockLength < 2 )
+			throw new IllegalArgumentException("Block length must be more than 2");
+		// ensure that the block length is divisible by two
+		this.blockLength = blockLength + (blockLength%2);
 		blocks = new FastQueue(int[].class,true) {
 			@Override
 			protected Object createInstance() {
 				return new int[ blockLength ];
 			}
 		};
+		blocks.grow();
 	}
 
 	/**
@@ -83,17 +87,18 @@ public class PackedPointSets {
 		s.start = tailBlockSize;
 		s.length = 0;
 
-		tailSet = s;
+		tail = s;
 	}
 
 	/**
 	 * Removes the current point set from the end
 	 */
 	public void removeTail() {
-		while( sets.size-1 != tailSet.block )
-			sets.removeTail();
-		tailBlockSize = tailSet.start;
-		tailSet = null;
+		while( blocks.size-1 != tail.block )
+			blocks.removeTail();
+		tailBlockSize = tail.start;
+		sets.removeTail();
+		tail = sets.size > 0 ? sets.get( sets.size-1 ) : null;
 	}
 
 	/**
@@ -102,23 +107,22 @@ public class PackedPointSets {
 	 * @param y coordinate
 	 */
 	public void addPointToTail( int x , int y ) {
-		int index = tailSet.start + tailSet.length*2;
+		int index = tail.start + tail.length*2;
 
 		int block[];
-		int blockIndex = tailSet.block + index/blockLength;
+		int blockIndex = tail.block + index/blockLength;
 		if( blockIndex == blocks.size ) {
 			tailBlockSize = 0;
 			block = blocks.grow();
 		} else {
-			tailBlockSize += 2;
 			block = blocks.get( blockIndex );
 		}
-
+		tailBlockSize += 2;
 		index %= blockLength;
 
-		block[tailSet.start + index ] = x;
-		block[tailSet.start + index+1 ] = y;
-		tailSet.length += 1;
+		block[index ] = x;
+		block[index+1 ] = y;
+		tail.length += 1;
 	}
 
 	/**
@@ -126,7 +130,7 @@ public class PackedPointSets {
 	 * @return
 	 */
 	public int totalPoints() {
-		return blockLength*(blocks.size-1) + tailBlockSize;
+		return (blockLength*(blocks.size-1) + tailBlockSize)/2;
 	}
 
 	/**
@@ -157,8 +161,8 @@ public class PackedPointSets {
 		BlockIndexLength set = sets.get(which);
 
 		for (int i = 0; i < set.length; i++) {
-			int index = tailSet.start + i*2;
-			int blockIndex = tailSet.block + index/blockLength;
+			int index = set.start + i*2;
+			int blockIndex = set.block + index/blockLength;
 			index %= blockLength;
 
 			int block[] = blocks.get( blockIndex );
@@ -195,8 +199,8 @@ public class PackedPointSets {
 		}
 
 		public Point2D_I32 next() {
-			int index = tailSet.start + pointIndex*2;
-			int blockIndex = tailSet.block + index/blockLength;
+			int index = set.start + pointIndex*2;
+			int blockIndex = set.block + index/blockLength;
 			index %= blockLength;
 
 			int block[] = blocks.get( blockIndex );
