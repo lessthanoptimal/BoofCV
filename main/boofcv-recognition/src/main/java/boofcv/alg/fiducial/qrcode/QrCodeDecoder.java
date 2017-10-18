@@ -244,6 +244,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 				version = version0;
 			}
 		}
+
 		qr.version = version;
 		return version != -1;
 	}
@@ -251,11 +252,16 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	private int decodeVersion() {
 		int bits = this.bits.data[0];
 		int message;
+		// see if there's any errors
 		if (QrCodePolynomialMath.checkVersionBits(bits)) {
 			message = bits >> 12;
 		} else {
 			message = QrCodePolynomialMath.correctVersionBits(bits);
 		}
+		// sanity check results
+		if( message > 40 || message < 7 )
+			return -1;
+
 		return message;
 	}
 
