@@ -84,12 +84,12 @@ public class ReidSolomonCodes {
 		syndromes.resize(syndromeLength());
 
 		computeSyndromes(input,ecc,syndromes.data);
-		findErrorLocatorBM(syndromes.data,syndromes.size,errorLocatorPoly);
+		findErrorLocatorPolynomialBM(syndromes.data,syndromes.size,errorLocatorPoly);
 		if( !findErrorLocations_BruteForce(errorLocatorPoly,input.size+ecc.size,errorLocations))
 			return false;
 
 		// todo output goes in output?
-		correctErrors(input,syndromes.data,errorLocations);
+//		correctErrors(input,syndromes.data,syndromes.size,errorLocations);
 		return true;
 	}
 
@@ -117,11 +117,11 @@ public class ReidSolomonCodes {
 	 * <p>[1] Massey, J. L. (1969), "Shift-register synthesis and BCH decoding" (PDF), IEEE Trans.
 	 * Information Theory, IT-15 (1): 122–127</p>
 	 *
-	 * @param syndromes The syndromes
-	 * @param length number of elements in syndromes
+	 * @param syndromes (Input) The syndromes
+	 * @param length (Input) number of elements in syndromes
 	 * @param errorLocator (Output) the error locator polynomial. Coefficients go for small to large.
 	 */
-	void findErrorLocatorBM( int syndromes[] , int length , GrowQueue_I8 errorLocator ) {
+	void findErrorLocatorPolynomialBM(int syndromes[] , int length , GrowQueue_I8 errorLocator ) {
 		GrowQueue_I8 C = errorLocator; // error polynomial
 		GrowQueue_I8 B = new GrowQueue_I8();  // previous error polynomial
 		// TODO remove new from this function
@@ -184,10 +184,35 @@ public class ReidSolomonCodes {
 	}
 
 	/**
+	 * Compute the error locator polynomial when given the error locations in the message.
+	 *
+	 * @param messageLength (Input) Length of the message
+	 * @param errorLocations (Input) List of error locations in the byte
+	 * @param errorLocator (Output) error locator polynomial
+	 */
+	void findErrorLocatorPolynomial( int messageLength , GrowQueue_I32 errorLocations , GrowQueue_I8 errorLocator ) {
+		tmp1.resize(2);
+		tmp1.data[1] = 1;
+		errorLocator.resize(1);
+		errorLocator.data[0] = 1;
+		for (int i = 0; i < errorLocations.size; i++) {
+			// Convert from positions in the message to coefficient degrees
+			int where = messageLength - errorLocations.get(i) - 1;
+
+			// tmp1 = [2**w,1]
+			tmp1.data[0] = (byte)math.power(2,where);
+//			tmp1.data[1] = 1;
+
+			tmp0.setTo(errorLocator);
+			math.polyMult(tmp0,tmp1,errorLocator);
+		}
+	}
+
+	/**
 	 * Creates a list of bytes that have errors in them
 	 *
-	 * @param errorLocator Error locator polynomial. Coefficients from small to large.
-	 * @param messageLength Length of the message + ecc.
+	 * @param errorLocator (Input) Error locator polynomial. Coefficients from small to large.
+	 * @param messageLength (Input) Length of the message + ecc.
 	 * @param locations (Output) locations of bytes in message with errors.
 	 */
 	public boolean findErrorLocations_BruteForce(GrowQueue_I8 errorLocator ,
@@ -205,8 +230,25 @@ public class ReidSolomonCodes {
 		return locations.size == errorLocator.size - 1;
 	}
 
-	public void correctErrors( GrowQueue_I8 message , int syndromes[], GrowQueue_I32 locations )
+	/**
+	 * Use Forney algorithm to compute correction values.
+	 *
+	 * @param message
+	 * @param errorLocations (Input) locations of bytes in message with errors.
+	 */
+	public void correctErrors( GrowQueue_I8 message , GrowQueue_I8 ecc,
+							   GrowQueue_I8 errorLocator ,
+							   GrowQueue_I32 errorLocations )
 	{
+		// convert the positions to coefficients degrees for the errata locator algo to work
+		// (eg: instead of [0, 1, 2] it will become [len(msg)-1, len(msg)-2, len(msg) -3])
+		GrowQueue_I32 coefLocations = new GrowQueue_I32(errorLocations.size);
+		for (int i = 0; i < errorLocations.size; i++) {
+			coefLocations.data[message.size-i-1] = errorLocations.get(i);
+		}
+	}
+
+	void findErrorEvaluator( int syndromes[] , int syndromeLength , GrowQueue_I8 errorLocator ) {
 
 	}
 

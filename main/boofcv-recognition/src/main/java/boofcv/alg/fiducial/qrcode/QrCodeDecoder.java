@@ -222,6 +222,11 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		bits.set(bit,value);
 	}
 
+	/**
+	 * Determine the QR code's version. For QR codes version < 7 it can be determined using the marker's size alone.
+	 * Otherwise the version is read from the image itself
+	 * @return true if version was successfully extracted or false if it failed
+	 */
 	private boolean extractVersionInfo(QrCode qr) {
 		int version = estimateVersionBySize(qr);
 

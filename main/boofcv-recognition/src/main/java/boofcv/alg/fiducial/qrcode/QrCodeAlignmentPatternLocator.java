@@ -89,6 +89,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	 * Uses the previously detected position patterns to seed the search for the alignment patterns
 	 */
 	public boolean process(T image , QrCode qr ) {
+		// version 1 has no alignment patterns
 		if( qr.version <= 1 )
 			return true;
 

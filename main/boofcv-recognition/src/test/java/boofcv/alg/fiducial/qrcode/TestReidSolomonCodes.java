@@ -112,7 +112,7 @@ public class TestReidSolomonCodes {
 	 * Computed using a reference implementation found at [1].
 	 */
 	@Test
-	public void findErrorLocatorBM() {
+	public void findErrorLocatorPolynomialBM() {
 		GrowQueue_I8 message = GrowQueue_I8.parseHex(
 				"[ 0x40, 0xd2, 0x75, 0x47, 0x76, 0x17, 0x32, 0x06, 0x27, 0x26, 0x96, 0xc6, 0xc6, 0x96, 0x70, 0xec ]");
 		GrowQueue_I8 ecc = new GrowQueue_I8();
@@ -126,18 +126,57 @@ public class TestReidSolomonCodes {
 		message.data[0] = 0;
 		alg.computeSyndromes(message,ecc,syndromes);
 		GrowQueue_I8 errorLocator = new GrowQueue_I8();
-		alg.findErrorLocatorBM(syndromes,nsyn,errorLocator);
+		alg.findErrorLocatorPolynomialBM(syndromes,nsyn,errorLocator);
 		assertEquals(2,errorLocator.size);
 		assertEquals(3,errorLocator.get(0));
 		assertEquals(1,errorLocator.get(1));
 
 		message.data[6] = 10;
 		alg.computeSyndromes(message,ecc,syndromes);
-		alg.findErrorLocatorBM(syndromes,nsyn,errorLocator);
+		alg.findErrorLocatorPolynomialBM(syndromes,nsyn,errorLocator);
 		assertEquals(3,errorLocator.size);
 		assertEquals(238,errorLocator.get(0)&0xFF);
 		assertEquals(89,errorLocator.get(1));
 		assertEquals(1,errorLocator.get(2));
+	}
+
+	/**
+	 * Compares the results from BM against an error locator polynomial computed directly given the known
+	 * error locations
+	 */
+	@Test
+	public void findErrorLocatorPolynomialBM_compareToDirect() {
+
+		GrowQueue_I8 found = new GrowQueue_I8();
+		GrowQueue_I8 expected = new GrowQueue_I8();
+
+		for (int i = 0; i < 30; i++) {
+			int N = 50;
+			GrowQueue_I8 message = randomMessage(N);
+
+			GrowQueue_I8 ecc = new GrowQueue_I8();
+			int nsyn = 10;
+			int syndromes[] = new int[nsyn];
+
+			ReidSolomonCodes alg = new ReidSolomonCodes(8,primitive8);
+			alg.generator(nsyn);
+			alg.computeECC(message,ecc);
+
+			int where = rand.nextInt(N);
+			message.data[where] ^= 0x12;
+			alg.computeSyndromes(message,ecc,syndromes);
+
+			GrowQueue_I32 whereList = new GrowQueue_I32(1);
+			whereList.add(where);
+
+			alg.findErrorLocatorPolynomialBM(syndromes,nsyn,found);
+			alg.findErrorLocatorPolynomial(N+ecc.size,whereList,expected);
+
+			assertEquals(found.size,expected.size);
+			for (int j = 0; j < found.size; j++) {
+				assertEquals(found.get(j),expected.get(j));
+			}
+		}
 	}
 
 	/**
@@ -177,7 +216,7 @@ public class TestReidSolomonCodes {
 		}
 		// compute needed info
 		alg.computeSyndromes(cmessage,ecc,syndromes);
-		alg.findErrorLocatorBM(syndromes,nsyn,errorLocator);
+		alg.findErrorLocatorPolynomialBM(syndromes,nsyn,errorLocator);
 
 		if( expectedFail ) {
 			assertFalse(alg.findErrorLocations_BruteForce(errorLocator, N, locations));
@@ -198,6 +237,10 @@ public class TestReidSolomonCodes {
 				}
 				assertEquals(1, num);
 			}
+
+			GrowQueue_I8 hack = new GrowQueue_I8();
+			alg.findErrorLocatorPolynomial(N,locations,hack);
+			System.out.println();
 		}
 	}
 
