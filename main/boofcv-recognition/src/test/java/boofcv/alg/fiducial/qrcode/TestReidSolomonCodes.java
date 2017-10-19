@@ -64,12 +64,12 @@ public class TestReidSolomonCodes {
 		alg.generator(6);
 		alg.computeECC(message,ecc);
 
-		int syndromes[] = new int[6];
+		GrowQueue_I8 syndromes = GrowQueue_I8.zeros(6);
 		alg.computeSyndromes(message,ecc,syndromes);
 
 		// no error. All syndromes values should be zero
-		for (int i = 0; i < syndromes.length; i++) {
-			assertEquals(0,syndromes[i]);
+		for (int i = 0; i < syndromes.size; i++) {
+			assertEquals(0,syndromes.data[i]);
 		}
 
 		// introduce an error
@@ -77,8 +77,8 @@ public class TestReidSolomonCodes {
 		alg.computeSyndromes(message,ecc,syndromes);
 
 		int notZero = 0;
-		for (int i = 0; i < syndromes.length; i++) {
-			if( syndromes[i] != 0 )
+		for (int i = 0; i < syndromes.size; i++) {
+			if( syndromes.data[i] != 0 )
 				notZero++;
 		}
 		assertTrue(notZero > 1);
@@ -98,7 +98,7 @@ public class TestReidSolomonCodes {
 		alg.generator(5);
 
 		// Evaluate it at the zeros and see if they are zero
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 5; i++) {
 			int value = alg.math.power(2,i);
 			int found = alg.math.polyEval(alg.generator,value);
 			assertEquals(0,found);
@@ -117,7 +117,7 @@ public class TestReidSolomonCodes {
 				"[ 0x40, 0xd2, 0x75, 0x47, 0x76, 0x17, 0x32, 0x06, 0x27, 0x26, 0x96, 0xc6, 0xc6, 0x96, 0x70, 0xec ]");
 		GrowQueue_I8 ecc = new GrowQueue_I8();
 		int nsyn = 10;
-		int syndromes[] = new int[nsyn];
+		GrowQueue_I8 syndromes = GrowQueue_I8.zeros(nsyn);
 
 		ReidSolomonCodes alg = new ReidSolomonCodes(8,primitive8);
 		alg.generator(nsyn);
@@ -126,14 +126,14 @@ public class TestReidSolomonCodes {
 		message.data[0] = 0;
 		alg.computeSyndromes(message,ecc,syndromes);
 		GrowQueue_I8 errorLocator = new GrowQueue_I8();
-		alg.findErrorLocatorPolynomialBM(syndromes,nsyn,errorLocator);
+		alg.findErrorLocatorPolynomialBM(syndromes,errorLocator);
 		assertEquals(2,errorLocator.size);
 		assertEquals(3,errorLocator.get(0));
 		assertEquals(1,errorLocator.get(1));
 
 		message.data[6] = 10;
 		alg.computeSyndromes(message,ecc,syndromes);
-		alg.findErrorLocatorPolynomialBM(syndromes,nsyn,errorLocator);
+		alg.findErrorLocatorPolynomialBM(syndromes,errorLocator);
 		assertEquals(3,errorLocator.size);
 		assertEquals(238,errorLocator.get(0)&0xFF);
 		assertEquals(89,errorLocator.get(1));
@@ -156,7 +156,7 @@ public class TestReidSolomonCodes {
 
 			GrowQueue_I8 ecc = new GrowQueue_I8();
 			int nsyn = 10;
-			int syndromes[] = new int[nsyn];
+			GrowQueue_I8 syndromes = GrowQueue_I8.zeros(nsyn);
 
 			ReidSolomonCodes alg = new ReidSolomonCodes(8,primitive8);
 			alg.generator(nsyn);
@@ -169,7 +169,7 @@ public class TestReidSolomonCodes {
 			GrowQueue_I32 whereList = new GrowQueue_I32(1);
 			whereList.add(where);
 
-			alg.findErrorLocatorPolynomialBM(syndromes,nsyn,found);
+			alg.findErrorLocatorPolynomialBM(syndromes,found);
 			alg.findErrorLocatorPolynomial(N+ecc.size,whereList,expected);
 
 			assertEquals(found.size,expected.size);
@@ -193,7 +193,7 @@ public class TestReidSolomonCodes {
 	public void findErrors_BruteForce( GrowQueue_I8 message, int numErrors , boolean expectedFail ) {
 		GrowQueue_I8 ecc = new GrowQueue_I8();
 		int nsyn = 10;
-		int syndromes[] = new int[nsyn];
+		GrowQueue_I8 syndromes = GrowQueue_I8.zeros(nsyn);
 		GrowQueue_I8 errorLocator = new GrowQueue_I8();
 		GrowQueue_I32 locations = new GrowQueue_I32();
 
@@ -216,7 +216,7 @@ public class TestReidSolomonCodes {
 		}
 		// compute needed info
 		alg.computeSyndromes(cmessage,ecc,syndromes);
-		alg.findErrorLocatorPolynomialBM(syndromes,nsyn,errorLocator);
+		alg.findErrorLocatorPolynomialBM(syndromes,errorLocator);
 
 		if( expectedFail ) {
 			assertFalse(alg.findErrorLocations_BruteForce(errorLocator, N, locations));

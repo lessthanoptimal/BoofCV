@@ -44,7 +44,7 @@ public class ReidSolomonCodes {
 
 	GrowQueue_I32 errorLocations = new GrowQueue_I32();
 	GrowQueue_I8 errorLocatorPoly = new GrowQueue_I8();
-	GrowQueue_I32 syndromes = new GrowQueue_I32();
+	GrowQueue_I8 syndromes = new GrowQueue_I8();
 
 	public ReidSolomonCodes( int numBits , int primitive) {
 		math = new GaliosFieldTableOps(numBits,primitive);
@@ -81,10 +81,8 @@ public class ReidSolomonCodes {
 						   GrowQueue_I8 ecc,
 						   GrowQueue_I8 output )
 	{
-		syndromes.resize(syndromeLength());
-
-		computeSyndromes(input,ecc,syndromes.data);
-		findErrorLocatorPolynomialBM(syndromes.data,syndromes.size,errorLocatorPoly);
+		computeSyndromes(input,ecc,syndromes);
+		findErrorLocatorPolynomialBM(syndromes,errorLocatorPoly);
 		if( !findErrorLocations_BruteForce(errorLocatorPoly,input.size+ecc.size,errorLocations))
 			return false;
 
@@ -101,13 +99,13 @@ public class ReidSolomonCodes {
 	 */
 	void computeSyndromes( GrowQueue_I8 input ,
 						   GrowQueue_I8 ecc ,
-						   int syndromes[])
+						   GrowQueue_I8 syndromes)
 	{
-		int N = syndromeLength();
-		for (int i = 0; i < N; i++) {
+		syndromes.resize(syndromeLength());
+		for (int i = 0; i < syndromes.size; i++) {
 			int val = math.power(2,i);
-			syndromes[i] = math.polyEval(input,val);
-			syndromes[i] = math.polyEvalContinue(syndromes[i],ecc,val);
+			syndromes.data[i] = (byte)math.polyEval(input,val);
+			syndromes.data[i] = (byte)math.polyEvalContinue(syndromes.data[i]&0xFF,ecc,val);
 		}
 	}
 
@@ -118,30 +116,29 @@ public class ReidSolomonCodes {
 	 * Information Theory, IT-15 (1): 122–127</p>
 	 *
 	 * @param syndromes (Input) The syndromes
-	 * @param length (Input) number of elements in syndromes
 	 * @param errorLocator (Output) the error locator polynomial. Coefficients go for small to large.
 	 */
-	void findErrorLocatorPolynomialBM(int syndromes[] , int length , GrowQueue_I8 errorLocator ) {
+	void findErrorLocatorPolynomialBM(GrowQueue_I8 syndromes , GrowQueue_I8 errorLocator ) {
 		GrowQueue_I8 C = errorLocator; // error polynomial
 		GrowQueue_I8 B = new GrowQueue_I8();  // previous error polynomial
 		// TODO remove new from this function
 
-		initToOne(C,length+1);
-		initToOne(B,length+1);
+		initToOne(C,syndromes.size+1);
+		initToOne(B,syndromes.size+1);
 
-		GrowQueue_I8 tmp = new GrowQueue_I8(length);
+		GrowQueue_I8 tmp = new GrowQueue_I8(syndromes.size);
 
 //		int L = 0;
 //		int m = 1; // stores how much B is 'shifted' by
 		int b = 1;
 
-		for (int n = 0; n < length; n++) {
+		for (int n = 0; n < syndromes.size; n++) {
 
 			// Compute discrepancy delta
-			int delta = syndromes[n];
+			int delta = syndromes.data[n]&0xFF;
 
 			for (int j = 1; j < C.size; j++) {
-				delta ^= math.multiply(C.data[C.size-j-1]&0xFF, syndromes[n-j]);
+				delta ^= math.multiply(C.data[C.size-j-1]&0xFF, syndromes.data[n-j]&0xFF);
 			}
 
 			// B = D^m * B
@@ -154,7 +151,7 @@ public class ReidSolomonCodes {
 				int scale = math.multiply(delta, math.inverse(b));
 				math.polyAddScaleB(C, B, scale, tmp);
 
-				if (2 * C.size > length) {
+				if (2 * C.size > syndromes.size) {
 					// if 2*L > N ---- Step 4
 //					m += 1;
 				} else {
@@ -248,7 +245,7 @@ public class ReidSolomonCodes {
 		}
 	}
 
-	void findErrorEvaluator( int syndromes[] , int syndromeLength , GrowQueue_I8 errorLocator ) {
+	void findErrorEvaluator( GrowQueue_I8 syndromes , GrowQueue_I8 errorLocator ) {
 
 	}
 
