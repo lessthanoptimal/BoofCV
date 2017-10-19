@@ -18,7 +18,7 @@
 
 package boofcv.alg.shapes.ellipse;
 
-import boofcv.alg.filter.binary.Contour;
+import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform2_F32;
@@ -95,6 +95,9 @@ public class BinaryEllipseDetectorPixel {
 
 	private FastQueue<Found> found = new FastQueue<>(Found.class, true);
 
+	// temporary storage for a contour
+	private FastQueue<Point2D_I32> contourTmp = new FastQueue<>(Point2D_I32.class,true);
+
 	/**
 	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted.
 	 * The undistorted image is never explicitly created.</p>
@@ -120,15 +123,17 @@ public class BinaryEllipseDetectorPixel {
 
 		contourFinder.process(binary, labeled);
 
-		FastQueue<Contour> blobs = contourFinder.getContours();
+		FastQueue<ContourPacked> blobs = contourFinder.getContours();
 		for (int i = 0; i < blobs.size; i++) {
-			Contour c = blobs.get(i);
+			ContourPacked c = blobs.get(i);
 
-			proccessContour(c.external);
+			contourFinder.getPackedPoints().setToList(c.externalIndex,contourTmp);
+			proccessContour(contourTmp.toList());
 
 			if(internalContour) {
-				for( int j = 0; j < c.internal.size(); j++ ) {
-					proccessContour(c.internal.get(j));
+				for( int j = 0; j < c.internalIndexes.size(); j++ ) {
+					contourFinder.getPackedPoints().setToList(c.internalIndexes.get(j),contourTmp);
+					proccessContour(contourTmp.toList());
 				}
 			}
 		}

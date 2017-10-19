@@ -20,6 +20,8 @@ package boofcv.demonstrations.feature.detect.edge;
 
 import boofcv.alg.feature.detect.edge.CannyEdge;
 import boofcv.alg.feature.detect.edge.EdgeContour;
+import boofcv.alg.filter.binary.BinaryImageOps;
+import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.misc.GImageStatistics;
@@ -173,7 +175,9 @@ public class ShowEdgeContourApp<T extends ImageGray<T>, D extends ImageGray<D>>
 			GThresholdImageOps.threshold(workImage, binary, barBinary.getThreshold(), barBinary.isDown());
 
 			contour.process(binary,labeled);
-			temp = VisualizeBinaryData.renderContours(contour.getContours().toList(),null,0xFF1010,
+			List<Contour> contours = BinaryImageOps.convertContours(
+					contour.getPackedPoints(), contour.getContours());
+			temp = VisualizeBinaryData.renderContours(contours,null,0xFF1010,
 					workImage.width,workImage.height,null);
 		}
 

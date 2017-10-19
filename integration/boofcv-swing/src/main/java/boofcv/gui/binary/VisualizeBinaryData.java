@@ -74,8 +74,8 @@ public class VisualizeBinaryData {
 	 * @param out (Optional) storage for output image
 	 * @return Rendered contours
 	 */
-	public static BufferedImage renderContours( List<Contour> contours , int colorExternal, int colorInternal ,
-												int width , int height , BufferedImage out) {
+	public static BufferedImage renderContours(List<Contour> contours , int colorExternal, int colorInternal ,
+											   int width , int height , BufferedImage out) {
 
 		if( out == null ) {
 			out = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
@@ -110,8 +110,8 @@ public class VisualizeBinaryData {
 	 * @param out (Optional) storage for output image
 	 * @return Rendered contours
 	 */
-	public static BufferedImage renderContours( List<Contour> contours , int colorExternal[], int colorInternal ,
-												int width , int height , BufferedImage out) {
+	public static BufferedImage renderContours(List<Contour> contours , int colorExternal[], int colorInternal ,
+											   int width , int height , BufferedImage out) {
 
 		if( out == null ) {
 			out = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);

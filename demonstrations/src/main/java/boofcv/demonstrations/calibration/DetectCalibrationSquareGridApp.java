@@ -22,7 +22,9 @@ import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
+import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
+import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
@@ -88,7 +90,13 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 
 	@Override
 	protected List<Contour> getContours() {
-		return alg.getDetectorSquare().getAllContours();
+
+		LinearContourLabelChang2004 contour = alg.getDetectorSquare().getDetector().getContourFinder();
+
+		List<Contour> contours = BinaryImageOps.convertContours(
+				contour.getPackedPoints(), contour.getContours());
+
+		return contours;
 	}
 
 	@Override

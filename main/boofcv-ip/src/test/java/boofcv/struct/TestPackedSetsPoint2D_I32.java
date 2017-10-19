@@ -145,6 +145,11 @@ public class TestPackedSetsPoint2D_I32 {
 	}
 
 	@Test
+	public void writePoints() {
+		fail("Implement");
+	}
+
+	@Test
 	public void iterator() {
 		PackedSetsPoint2D_I32 alg = new PackedSetsPoint2D_I32(6);
 

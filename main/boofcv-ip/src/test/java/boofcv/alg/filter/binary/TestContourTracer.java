@@ -20,15 +20,11 @@ package boofcv.alg.filter.binary;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
-import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -37,13 +33,11 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestContourTracer {
 
-	FastQueue<Point2D_I32> queue = new FastQueue<>(Point2D_I32.class, true);
-	List<Point2D_I32> found = new ArrayList<>();
+	PackedSetsPoint2D_I32 queue = new PackedSetsPoint2D_I32();
 
 	@Before
 	public void init() {
 		queue.reset();
-		found.clear();
 	}
 
 
@@ -121,10 +115,11 @@ public class TestContourTracer {
 
 		// process the image
 		alg.setInputs(addBorder(input),label,queue);
-		alg.trace(2,1+1,0+1,true,found);
+		queue.grow();
+		alg.trace(2,1+1,0+1,true);
 
-		assertEquals(7,queue.size);
-		assertEquals(7, found.size());
+		assertEquals(7, queue.totalPoints());
+		assertEquals(7, queue.sizeOfTail());
 	}
 
 	@Test
@@ -153,10 +148,10 @@ public class TestContourTracer {
 
 		// process the image
 		alg.setInputs(addBorder(input),label,queue);
-		alg.trace(2,3+1,0+1,false,found);
+		queue.grow();
+		alg.trace(2,3+1,0+1,false);
 
-		assertEquals(4, queue.size);
-		assertEquals(4,found.size());
+		assertEquals(4, queue.sizeOfTail());
 	}
 
 	@Test
@@ -173,10 +168,10 @@ public class TestContourTracer {
 
 		// process the image
 		alg.setInputs(addBorder(input),label,queue);
-		alg.trace(2,3+1,0+1,false,found);
+		queue.grow();
+		alg.trace(2,3+1,0+1,false);
 
-		assertEquals(8, queue.size);
-		assertEquals(8,found.size());
+		assertEquals(8, queue.sizeOfTail());
 	}
 
 	/**
@@ -203,7 +198,8 @@ public class TestContourTracer {
 
 		// process the image
 		alg.setInputs(before,label,queue);
-		alg.trace(2,2,1,true,found);
+		queue.grow();
+		alg.trace(2,2,1,true);
 
 		for( int i = 0; i < before.height; i++ ) {
 			for( int j = 0; j < before.width; j++ ) {
@@ -234,16 +230,14 @@ public class TestContourTracer {
 
 				// reset other data structures
 				ImageMiscOps.fill(label,0);
-				queue.reset();
-				found.clear();
+				queue.reset();queue.grow();
 
 				// process the image
 				alg.setInputs(addBorder(input),label,queue);
-				alg.trace(2,x+1,y+1,true,found);
+				alg.trace(2,x+1,y+1,true);
 
 				// forward then back
-				assertEquals(expectedSize,queue.size);
-				assertEquals(expectedSize,found.size());
+				assertEquals(expectedSize,queue.sizeOfTail());
 
 				// see if the image has been correctly labeled
 				for( int yy = 0; yy < input.height; yy++ ) {

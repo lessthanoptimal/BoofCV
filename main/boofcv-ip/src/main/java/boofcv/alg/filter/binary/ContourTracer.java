@@ -19,12 +19,9 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.struct.ConnectRule;
+import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
-import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
-
-import java.util.List;
 
 /**
  * Used to trace the external and internal contours around objects for {@link LinearContourLabelChang2004}.  As it
@@ -43,15 +40,12 @@ public class ContourTracer {
 	private int ruleN;
 
 	// storage for contour points.
-	private FastQueue<Point2D_I32> storagePoints;
+	private PackedSetsPoint2D_I32 storagePoints;
 
 	// binary image being traced
 	private GrayU8 binary;
 	// label image being marked
 	private GrayS32 labeled;
-
-	// storage for contour
-	private List<Point2D_I32> contour;
 
 	// coordinate of pixel being examined (x,y)
 	private int x,y;
@@ -103,7 +97,7 @@ public class ContourTracer {
 	 * @param labeled Labeled image.  Size is the same as the original binary image without border.
 	 * @param storagePoints
 	 */
-	public void setInputs(GrayU8 binary , GrayS32 labeled , FastQueue<Point2D_I32> storagePoints ) {
+	public void setInputs(GrayU8 binary , GrayS32 labeled , PackedSetsPoint2D_I32 storagePoints ) {
 		this.binary = binary;
 		this.labeled = labeled;
 		this.storagePoints = storagePoints;
@@ -142,10 +136,9 @@ public class ContourTracer {
 	 * @param label
 	 * @param initialX
 	 * @param initialY
-	 * @param external True for tracing an external contour or false for internal..
-	 * @param contour
+	 * @param external True for tracing an external contour or false for internal.
 	 */
-	public void trace( int label , int initialX , int initialY , boolean external , List<Point2D_I32> contour )
+	public void trace( int label , int initialX , int initialY , boolean external )
 	{
 		int initialDir;
 		if( rule == ConnectRule.EIGHT )
@@ -154,7 +147,6 @@ public class ContourTracer {
 			initialDir = external ? 0 : 2;
 
 		this.label = label;
-		this.contour = contour;
 		this.dir = initialDir;
 		x = initialX;
 		y = initialY;
@@ -279,11 +271,8 @@ public class ContourTracer {
 	 */
 	private void add( int x , int y ) {
 		labeled.data[indexLabel] = label;
-		if( contour.size() < maxContourSize ) {
-			Point2D_I32 p = storagePoints.grow();
-			// compensate for the border added to binary image
-			p.set(x - 1, y - 1);
-			contour.add(p);
+		if( storagePoints.sizeOfTail() < maxContourSize ) {
+			storagePoints.addPointToTail(x - 1, y - 1);
 		}
 	}
 

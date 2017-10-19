@@ -21,6 +21,7 @@ package boofcv.alg.filter.binary;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
@@ -186,10 +187,10 @@ public class TestLinearContourLabelChang2004 {
 		assertEquals(1,alg.getContours().size);
 		checkContour(alg, labeled,8);
 
-		Contour c = alg.getContours().get(0);
-		assertEquals(10, c.external.size());
-		assertEquals(1,c.internal.size());
-		assertEquals(4, c.internal.get(0).size());
+		ContourPacked c = alg.getContours().get(0);
+		assertEquals(10, alg.packedPoints.sizeOfSet(c.externalIndex));
+		assertEquals(1, c.internalIndexes.size);
+		assertEquals(4, alg.packedPoints.sizeOfSet(c.externalIndex +1));
 	}
 
 	/**
@@ -200,17 +201,18 @@ public class TestLinearContourLabelChang2004 {
 	 */
 	private void checkContour(LinearContourLabelChang2004 alg, GrayS32 labeled , int rule ) {
 
-		FastQueue<Contour> contours = alg.getContours();
+		FastQueue<ContourPacked> contours = alg.getContours();
 
 		for( int i = 0; i < contours.size(); i++ ) {
-			Contour c = contours.get(i);
+			System.out.println("=================== Contour "+i);
+			ContourPacked c = contours.get(i);
 
 			assertTrue(c.id > 0 );
 
 			List<Point2D_I32> found = new ArrayList<>();
-			found.addAll(c.external);
-			for( int j = 0; j < c.internal.size(); j++ ) {
-				found.addAll(c.internal.get(j));
+			addPointsToList(alg,c.externalIndex,found);
+			for(int j = 0; j < c.internalIndexes.size; j++ ) {
+				addPointsToList(alg,c.internalIndexes.get(j),found);
 			}
 
 			// there can be duplicate points, remove them
@@ -219,10 +221,10 @@ public class TestLinearContourLabelChang2004 {
 			// see if the two lists are equivalent
 			List<Point2D_I32> expected = rule == 8 ? findContour8(labeled, c.id) : findContour4(labeled, c.id);
 
-//			labeled.print();
-//			System.out.println("------------------");
-//			print(found,labeled.width,labeled.height);
-//			print(expected,labeled.width,labeled.height);
+			labeled.print();
+			System.out.println("------------------");
+			print(found,labeled.width,labeled.height);
+			print(expected,labeled.width,labeled.height);
 
 			assertEquals(expected.size(),found.size());
 
@@ -236,6 +238,14 @@ public class TestLinearContourLabelChang2004 {
 				}
 				assertTrue(match);
 			}
+		}
+	}
+
+	private void addPointsToList( LinearContourLabelChang2004 alg , int set , List<Point2D_I32> list ) {
+		PackedSetsPoint2D_I32.SetIterator iter = alg.packedPoints.createIterator();
+		iter.setup(set);
+		while( iter.hasNext() ) {
+			list.add( iter.next().copy() );
 		}
 	}
 
@@ -333,13 +343,13 @@ public class TestLinearContourLabelChang2004 {
 		return ret;
 	}
 
-//	private void print( List<Point2D_I32> l , int w, int h ) {
-//		GrayU8 img = new GrayU8(w,h);
-//
-//		for( Point2D_I32 p : l ) {
-//			img.set(p.x,p.y,1);
-//		}
-//		img.print();
-//		System.out.println("------------------");
-//	}
+	private void print( List<Point2D_I32> l , int w, int h ) {
+		GrayU8 img = new GrayU8(w,h);
+
+		for( Point2D_I32 p : l ) {
+			img.set(p.x,p.y,1);
+		}
+		img.print();
+		System.out.println("------------------");
+	}
 }

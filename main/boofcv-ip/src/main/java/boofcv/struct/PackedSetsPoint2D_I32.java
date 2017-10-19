@@ -21,6 +21,9 @@ package boofcv.struct;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Compact storage for a set of points. Designed to minimize memory usage. New points can only be added to a set
  * when the set is the tail/last one in the list.
@@ -61,6 +64,10 @@ public class PackedSetsPoint2D_I32 {
 			}
 		};
 		blocks.grow();
+	}
+
+	public PackedSetsPoint2D_I32() {
+		this(2000);
 	}
 
 	/**
@@ -169,8 +176,44 @@ public class PackedSetsPoint2D_I32 {
 			list.grow().set( block[index] , block[index+1] );
 		}
 	}
+
+	public List<Point2D_I32> setToList(int which) {
+		FastQueue<Point2D_I32> tmp = new FastQueue<>(Point2D_I32.class,true);
+		setToList(which,tmp);
+		List<Point2D_I32> output = new ArrayList<>();
+		output.addAll( tmp.toList() );
+		return output;
+	}
+
 	public SetIterator createIterator() {
 		return new SetIterator();
+	}
+
+	/**
+	 * Returns the size of the set at the tail. If there is no tail an exception will be thrown.
+	 */
+	public int sizeOfTail() {
+		return tail.length;
+	}
+
+	/**
+	 * Overwrites the points in the set with the list of points
+	 */
+	public void writePoints(int which, List<Point2D_I32> points) {
+		BlockIndexLength set = sets.get(which);
+		if( set.length != points.size() )
+			throw new IllegalArgumentException("points and set don't have the same length");
+
+		for (int i = 0; i < set.length; i++) {
+			int index = set.start + i*2;
+			int blockIndex = set.block + index/blockLength;
+			index %= blockLength;
+
+			Point2D_I32 p = points.get(i);
+			int block[] = blocks.get( blockIndex );
+			block[index] = p.x;
+			block[index+1] = p.y;
+		}
 	}
 
 	/**

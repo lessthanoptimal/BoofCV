@@ -24,6 +24,7 @@ import boofcv.alg.filter.binary.impl.ImplBinaryBorderOps;
 import boofcv.alg.filter.binary.impl.ImplBinaryInnerOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
@@ -434,7 +435,26 @@ public class BinaryImageOps {
 
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(rule);
 		alg.process(input,output);
-		return alg.getContours().toList();
+
+		List<Contour> ret = convertContours(alg.getPackedPoints(),alg.getContours());
+
+		return ret;
+	}
+
+	public static List<Contour> convertContours(PackedSetsPoint2D_I32 packed,
+												FastQueue<ContourPacked> contours ) {
+		List<Contour> ret = new ArrayList<>();
+		for (int i = 0; i < contours.size; i++) {
+			ContourPacked p = contours.get(i);
+			Contour c = new Contour();
+			c.external = packed.setToList(p.externalIndex);
+
+			for (int j = 0; j < p.internalIndexes.size; j++) {
+				c.internal.add( packed.setToList(p.internalIndexes.get(j)));
+			}
+			ret.add(c);
+		}
+		return ret;
 	}
 
 	/**

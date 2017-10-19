@@ -18,51 +18,41 @@
 
 package boofcv.alg.filter.binary;
 
-import georegression.struct.point.Point2D_I32;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.ddogleg.struct.GrowQueue_I32;
 
 /**
- * Internal and externals contours for a binary blob.  The set of points in each contour list are ordered in
+ * Internal and externals contours for a binary blob with the actual points stored in a
+ * {@link boofcv.struct.PackedSetsPoint2D_I32}.  The set of points in each contour list are ordered in
  * CW or CCW directions.
  *
  * @author Peter Abeles
  */
-public class Contour {
+public class ContourPacked {
 	/**
 	 * ID of blob in the image.  Pixels belonging to this blob in the labeled image will have this pixel value.
 	 */
 	public int id;
 
-	public List<Point2D_I32> external = new ArrayList<>();
 	/**
-	 * Internal contours that are inside the blob.
+	 * Index in the packed list of the external contour
 	 */
-	public List<List<Point2D_I32>> internal = new ArrayList<>();
+	public int externalIndex;
+	/**
+	 * Number of internal contours. Their ID = external + 1 + internal index
+	 */
+	public GrowQueue_I32 internalIndexes = new GrowQueue_I32();
 
 	public void reset() {
 		id = -1;
-		external.clear();
-		internal.clear();
+		externalIndex = -1;
+		internalIndexes.reset();
 	}
 
-   public Contour copy() {
-      Contour ret = new Contour();
+   public ContourPacked copy() {
+      ContourPacked ret = new ContourPacked();
       ret.id = id;
-      for( Point2D_I32 p : external ) {
-         ret.external.add( p.copy() );
-      }
-
-      for( List<Point2D_I32> l : ret.internal ) {
-         List<Point2D_I32> a = new ArrayList<>();
-
-         for( Point2D_I32 p : l ) {
-            a.add( p.copy() );
-         }
-
-         internal.add(a);
-      }
+      ret.externalIndex = externalIndex;
+      ret.internalIndexes = internalIndexes.copy();
 
       return ret;
    }

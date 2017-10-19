@@ -19,7 +19,7 @@
 package boofcv.alg.shapes.polygon;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.filter.binary.Contour;
+import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
 import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
@@ -133,6 +133,9 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 	// indicates which corners touch the border
 	private GrowQueue_B borderCorners = new GrowQueue_B();
+
+	// temporary storage for a contour
+	private FastQueue<Point2D_I32> contourTmp = new FastQueue<>(Point2D_I32.class,true);
 
 	// times for internal profiling
 	double milliContour;
@@ -292,29 +295,30 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		fitPolygon.setAbortSplits(2*maxSides);
 
 		// find blobs where all 4 edges are lines
-		FastQueue<Contour> blobs = contourFinder.getContours();
+		FastQueue<ContourPacked> blobs = contourFinder.getContours();
 		for (int i = 0; i < blobs.size; i++) {
-			Contour c = blobs.get(i);
+			ContourPacked c = blobs.get(i);
 
-			if( c.external.size() >= minimumContour) {
+			contourFinder.getPackedPoints().setToList(c.externalIndex,contourTmp);
+			if( contourTmp.size() >= minimumContour) {
 				float edgeInside=-1,edgeOutside=-1;
 
 //				System.out.println("----- candidate "+c.external.size());
 
 				// ignore shapes which touch the image border
-				boolean touchesBorder = touchesBorder(c.external);
+				boolean touchesBorder = touchesBorder(contourTmp.toList());
 				if( !canTouchBorder && touchesBorder ) {
 					if( verbose ) System.out.println("rejected polygon, touched border");
 					continue;
 				}
 
 				if( helper != null )
-					if( !helper.filterContour(c.external,touchesBorder,true) )
+					if( !helper.filterContour(contourTmp.toList(),touchesBorder,true) )
 						continue;
 
 				// filter out contours which are noise
 				if( contourEdgeIntensity != null ) {
-					contourEdgeIntensity.process(c.external,true);
+					contourEdgeIntensity.process(contourTmp.toList(),true);
 					edgeInside = contourEdgeIntensity.getInsideAverage();
 					edgeOutside = contourEdgeIntensity.getOutsideAverage();
 
@@ -329,17 +333,17 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 				List<Point2D_I32> undistorted;
 				if( distToUndist != null ) {
 					undistorted = this.undistorted.toList();
-					removeDistortionFromContour(c.external,this.undistorted);
+					removeDistortionFromContour(contourTmp.toList(),this.undistorted);
 					if( helper != null )
 						if( !helper.filterContour(this.undistorted.toList(),touchesBorder,false) )
 							continue;
 				} else {
-					undistorted = c.external;
+					undistorted = contourTmp.toList();
 				}
 
 				// Find the initial approximate fit of a polygon to the contour
 				if( !fitPolygon.process(undistorted) ) {
-					if( verbose ) System.out.println("rejected polygon initial fit failed. contour size = "+c.external.size());
+					if( verbose ) System.out.println("rejected polygon initial fit failed. contour size = "+contourTmp.toList());
 					continue;
 				}
 				GrowQueue_I32 splits = fitPolygon.getSplits();
@@ -370,13 +374,13 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 
 				if( splits.size() > maxSidesConsider ) {
-					if( verbose ) System.out.println("Way too many corners, "+splits.size()+". Aborting before improve. Contour size "+c.external.size());
+					if( verbose ) System.out.println("Way too many corners, "+splits.size()+". Aborting before improve. Contour size "+contourTmp.size());
 					continue;
 				}
 
 				// Perform a local search and improve the corner placements
 				if( !improveContour.fit(undistorted,splits) ) {
-					if( verbose ) System.out.println("rejected improve contour. contour size = "+c.external.size());
+					if( verbose ) System.out.println("rejected improve contour. contour size = "+contourTmp.size());
 					continue;
 				}
 
@@ -387,7 +391,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 				// only accept polygons with the expected number of sides
 				if (!expectedNumberOfSides(splits)) {
 //					System.out.println("First point "+c.external.get(0));
-					if( verbose ) System.out.println("rejected number of sides. "+splits.size()+"  contour "+c.external.size());
+					if( verbose ) System.out.println("rejected number of sides. "+splits.size()+"  contour "+contourTmp.size());
 					continue;
 				}
 
@@ -401,7 +405,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 				polygonDistorted.vertexes.resize(splits.size());
 				for (int j = 0; j < splits.size(); j++) {
 					Point2D_I32 p = undistorted.get( splits.get(j) );
-					Point2D_I32 q = c.external.get( splits.get(j));
+					Point2D_I32 q = contourTmp.get( splits.get(j));
 					polygonWork.get(j).set(p.x,p.y);
 					polygonDistorted.get(j).set(q.x,q.y);
 				}
@@ -437,21 +441,18 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 				Info info = foundInfo.grow();
 
 				// save the undistorted coordinate into external
-				if( c.external != undistorted ) {
-					for (int j = 0; j < c.external.size(); j++) {
-						c.external.get(j).set(undistorted.get(j));
-					}
+				if( distToUndist != null ) {
+					// changed the save points in the packed contour list with undistorted coordinates
+					contourFinder.getPackedPoints().writePoints(c.externalIndex,undistorted);
 				}
 
 				// save results
 				info.splits.setTo(splits);
 				info.contourTouchesBorder = touchesBorder;
 				info.external = true;
-				info.hasInternal = !c.internal.isEmpty();
 				info.edgeInside = edgeInside;
 				info.edgeOutside = edgeOutside;
-				info.label = c.id;
-				info.contour = c.external;
+				info.contour = c;
 				info.polygon.set(polygonWork);
 				info.polygonDistorted.set(polygonDistorted);
 				info.borderCorners.setTo(borderCorners);
@@ -483,6 +484,11 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 			onImageBorder.add( p.x <= 1 || p.y <= 1 || p.x >= labeled.width-2 || p.y >= labeled.height-2);
 		}
+	}
+
+	public List<Point2D_I32> getContour( Info info ) {
+		contourFinder.getPackedPoints().setToList(info.contour.externalIndex,contourTmp);
+		return contourTmp.toList();
 	}
 
 //	/**
@@ -582,7 +588,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		return outputClockwise;
 	}
 
-	public List<Contour> getAllContours(){return contourFinder.getContours().toList();}
+	public List<ContourPacked> getAllContours(){return contourFinder.getContours().toList();}
 
 	public Class<T> getInputType() {
 		return inputType;
@@ -657,16 +663,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		public boolean external;
 
 		/**
-		 * If it was made from an external contour did the blob also have an internal contour?
-		 */
-		public boolean hasInternal;
-
-		/**
-		 * The blob's label in the label image
-		 */
-		public int label;
-
-		/**
 		 * Average pixel intensity score along the polygon's edge inside and outside
 		 */
 		public double edgeInside,edgeOutside;
@@ -695,18 +691,20 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		public GrowQueue_I32 splits = new GrowQueue_I32();
 
 		/**
-		 * Contour that the shape was fit to. Might be in image pixels or undistorted image pixels
+		 * Contour that the shape was fit to.
 		 */
-		public List<Point2D_I32> contour;
+		public ContourPacked contour;
 
 		public double computeEdgeIntensity() {
 			return edgeOutside-edgeInside; // black square. Outside should be a high value (white) inside low (black)
 		}
 
+		public boolean hasInternal() {
+			return contour.internalIndexes.size > 0;
+		}
+
 		public void reset() {
 			external = false;
-			hasInternal = false;
-			label = -1;
 			edgeInside = edgeOutside = -1;
 			contourTouchesBorder = true;
 			borderCorners.reset();

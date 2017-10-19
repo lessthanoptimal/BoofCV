@@ -23,7 +23,9 @@ import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.fiducial.qrcode.PositionPatternNode;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeDetector;
+import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
+import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.demonstrations.shapes.DetectBlackShapeAppBase;
 import boofcv.factory.fiducial.ConfigQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
@@ -141,7 +143,10 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			synchronized ( DetectQrCodeApp.this ) {
 
 				if (controls.bShowContour) {
-					List<Contour> contours = detector.getSquareDetector().getAllContours();
+
+					LinearContourLabelChang2004 contour = detector.getSquareDetector().getDetector().getContourFinder();
+					List<Contour> contours =
+							BinaryImageOps.convertContours(contour.getPackedPoints(), contour.getContours());
 					g2.setStroke(new BasicStroke(1));
 					VisualizeBinaryData.render(contours, null,Color.CYAN, scale, g2);
 				}

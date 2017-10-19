@@ -19,6 +19,7 @@
 package boofcv.demonstrations.binary;
 
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
@@ -172,7 +173,10 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 			synchronized (VisualizeBinaryContourApp.this) {
-				List<Contour> contours = contourAlg.getContours().toList();
+
+				List<Contour> contours = BinaryImageOps.convertContours(
+						contourAlg.getPackedPoints(), contourAlg.getContours());
+
 				g2.setStroke(new BasicStroke(1));
 				VisualizeBinaryData.render(contours,Color.BLUE, Color.RED, scale, g2);
 			}

@@ -18,7 +18,9 @@
 
 package boofcv.demonstrations.shapes;
 
+import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
+import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
@@ -116,8 +118,14 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 			synchronized ( DetectBlackPolygonApp.this ) {
 
 				if (controls.bShowContour) {
-					List<Contour> contours = detector.getAllContours();
 					g2.setStroke(new BasicStroke(1));
+
+					LinearContourLabelChang2004 contour = detector.getDetector().getContourFinder();
+
+					List<Contour> contours = BinaryImageOps.convertContours(
+							contour.getPackedPoints(), contour.getContours());
+
+
 					VisualizeBinaryData.render(contours, null,Color.CYAN, scale, g2);
 				}
 

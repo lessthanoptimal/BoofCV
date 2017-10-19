@@ -20,13 +20,10 @@ package boofcv.alg.filter.binary;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
-import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * <p>
@@ -75,9 +72,8 @@ public class LinearContourLabelChang2004 {
 	private GrayU8 border = new GrayU8(1,1);
 
 	// predeclared/recycled data structures
-	private FastQueue<Point2D_I32> storagePoints = new FastQueue<>(Point2D_I32.class, true);
-	private FastQueue<List<Point2D_I32>> storageLists = new FastQueue<>((Class) ArrayList.class, true);
-	private FastQueue<Contour> contours = new FastQueue<>(Contour.class, true);
+	PackedSetsPoint2D_I32 packedPoints = new PackedSetsPoint2D_I32(2000);
+	private FastQueue<ContourPacked> contours = new FastQueue<>(ContourPacked.class, true);
 
 	// internal book keeping variables
 	private int x,y,indexIn,indexOut;
@@ -111,10 +107,9 @@ public class LinearContourLabelChang2004 {
 		ImageMiscOps.fill(labeled,0);
 
 		binary = border;
-		storagePoints.reset();
-		storageLists.reset();
+		packedPoints.reset();
 		contours.reset();
-		tracer.setInputs(binary,labeled,storagePoints);
+		tracer.setInputs(binary,labeled, packedPoints);
 
 		// Outside border is all zeros so it can be ignored
 		int endY = binary.height-1, enxX = binary.width-1;
@@ -148,7 +143,7 @@ public class LinearContourLabelChang2004 {
 		}
 	}
 
-	public FastQueue<Contour> getContours() {
+	public FastQueue<ContourPacked> getContours() {
 		return contours;
 	}
 
@@ -157,16 +152,20 @@ public class LinearContourLabelChang2004 {
 	 *          must be an external contour of a newly encountered blob.
 	 */
 	private void handleStep1() {
-		Contour c = contours.grow();
+		ContourPacked c = contours.grow();
 		c.reset();
 		c.id = contours.size();
 		tracer.setMaxContourSize(maxContourSize);
-		tracer.trace(contours.size(),x,y,true,c.external);
+		// save the set index for this contour and declare memory for it
+		c.externalIndex = packedPoints.size();
+		packedPoints.grow();
+		c.internalIndexes.reset();
+		tracer.trace(contours.size(),x,y,true);
 
-		// release the unused contour
-		if( c.external.size() >= maxContourSize || c.external.size() < minContourSize ) {
-			storagePoints.size -= c.external.size();
-			c.external.clear();
+		// Keep track that this was a contour, but free up all the points used in defining it
+		if( packedPoints.sizeOfTail() >= maxContourSize || packedPoints.sizeOfTail() < minContourSize ) {
+			packedPoints.removeTail();
+			packedPoints.grow();
 		}
 	}
 
@@ -179,20 +178,17 @@ public class LinearContourLabelChang2004 {
 		if( label == 0 )
 			label = labeled.data[indexOut-1];
 
-		Contour c = contours.get(label-1);
-		List<Point2D_I32> inner = storageLists.grow();
-		inner.clear();
+		ContourPacked c = contours.get(label-1);
+		c.internalIndexes.add( packedPoints.size() );
+		packedPoints.grow();
 		tracer.setMaxContourSize(saveInternalContours?maxContourSize:0);
-		tracer.trace(label,x,y,false,inner);
+		tracer.trace(label,x,y,false);
 
-		// See if the inner contour exceeded the maximum size. If so free its points
-		if( inner.size() >= maxContourSize ) {
-			storagePoints.size -= inner.size();
-			inner.clear();
+		// See if the inner contour exceeded the maximum  or minimum size. If so free its points
+		if( packedPoints.sizeOfTail() >= maxContourSize || packedPoints.sizeOfTail() < minContourSize ) {
+			packedPoints.removeTail();
+			packedPoints.grow();
 		}
-		// add the inner contour so that other algorithms know that it has X number of inner contours
-		c.internal.add(inner);
-
 	}
 
 	/**
@@ -202,6 +198,10 @@ public class LinearContourLabelChang2004 {
 	private void handleStep3(GrayS32 labeled) {
 		if( labeled.data[indexOut] == 0 )
 			labeled.data[indexOut] = labeled.data[indexOut-1];
+	}
+
+	public PackedSetsPoint2D_I32 getPackedPoints() {
+		return packedPoints;
 	}
 
 	public int getMinContourSize() {

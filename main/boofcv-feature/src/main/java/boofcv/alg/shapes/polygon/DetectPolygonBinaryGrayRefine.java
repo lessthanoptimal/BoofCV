@@ -18,11 +18,12 @@
 
 package boofcv.alg.shapes.polygon;
 
-import boofcv.alg.filter.binary.Contour;
+import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.alg.shapes.edge.EdgeIntensityPolygon;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 
 import java.util.ArrayList;
@@ -182,7 +183,8 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		boolean success = false;
 
 		if( refineContour != null ) {
-			refineContour.process(info.contour,info.splits,work);
+			List<Point2D_I32> contour = detector.getContour(info);
+			refineContour.process(contour,info.splits,work);
 
 			if( adjustForBias != null )
 				adjustForBias.process(work, detector.isOutputClockwise());
@@ -279,7 +281,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		return detector;
 	}
 
-	public List<Contour> getAllContours() {
+	public List<ContourPacked> getAllContours() {
 		return detector.getAllContours();
 	}
 
