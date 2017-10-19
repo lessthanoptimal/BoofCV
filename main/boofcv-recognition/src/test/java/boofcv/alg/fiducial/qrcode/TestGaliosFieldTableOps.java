@@ -218,6 +218,40 @@ public class TestGaliosFieldTableOps {
 	}
 
 	@Test
+	public void polyAdd_S() {
+		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+
+		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
+		GrowQueue_I8 inputA = new GrowQueue_I8(3);
+		inputA.resize(3);
+		inputA.set(2,0x12);
+		inputA.set(1,0x54);
+		inputA.set(0,0xFF);
+
+		// Create an arbitrary polynomial: 0xA0*x^3 + 0x45
+		GrowQueue_I8 inputB = new GrowQueue_I8(4);
+		inputB.resize(4);
+		inputB.set(3,0xA0);
+		inputB.set(0,0x45);
+
+		// make sure the order doesn't matter
+		GrowQueue_I8 output0 = new GrowQueue_I8();
+		alg.polyAdd_S(inputA,inputB,output0);
+
+		GrowQueue_I8 output1 = new GrowQueue_I8();
+		alg.polyAdd_S(inputB,inputA,output1);
+
+		assertEquals(4,output0.size);
+		assertEqualsG_S(output0, output1);
+
+		// compare to hand computed solution
+		assertEquals(0xA0,output0.data[3]&0xFF);
+		assertEquals(0x12,output0.data[2]&0xFF);
+		assertEquals(0x54,output0.data[1]&0xFF);
+		assertEquals(0xFF^0x45,output0.data[0]&0xFF);
+	}
+
+	@Test
 	public void polyAddScaleB() {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 
@@ -277,6 +311,39 @@ public class TestGaliosFieldTableOps {
 		expected.set(1,alg.multiply(0x12,0x03));
 		expected.set(2,alg.multiply(0x54,0x03));
 		expected.set(3,alg.multiply(0xFF,0x03));
+	}
+
+	@Test
+	public void polyMult_S() {
+		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+
+		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
+		GrowQueue_I8 inputA = new GrowQueue_I8();
+		inputA.resize(3);
+		inputA.set(2,0x12);
+		inputA.set(1,0x54);
+		inputA.set(0,0xFF);
+
+		GrowQueue_I8 inputB = new GrowQueue_I8();
+		inputB.resize(2);
+		inputB.set(0,0x03);
+
+		// make sure the order doesn't matter
+		GrowQueue_I8 output0 = new GrowQueue_I8();
+		alg.polyMult_S(inputA,inputB,output0);
+
+		GrowQueue_I8 output1 = new GrowQueue_I8();
+		alg.polyMult_S(inputB,inputA,output1);
+
+		assertEquals(4,output0.size);
+		assertEqualsG_S(output0, output1);
+
+		// check the value against a manual solution
+		GrowQueue_I8 expected = new GrowQueue_I8();
+		expected.resize(4);
+		expected.set(2,alg.multiply(0x12,0x03));
+		expected.set(1,alg.multiply(0x54,0x03));
+		expected.set(0,alg.multiply(0xFF,0x03));
 	}
 
 	private void randomPoly(GrowQueue_I8 inputA, int length) {
@@ -390,6 +457,8 @@ public class TestGaliosFieldTableOps {
 
 		// have the divisor be larger than the dividend
 		alg.polyDivide(inputB,inputA,quotient,remainder);
+		assertEquals(0,quotient.size);
+		assertEquals(2,remainder.size);
 
 		checkDivision(alg, inputB, inputA, quotient, remainder);
 	}
@@ -400,6 +469,48 @@ public class TestGaliosFieldTableOps {
 		alg.polyMult(inputB,quotent,tmp);
 		alg.polyAdd(tmp,remainder,found);
 		assertEqualsG(inputA, found);
+	}
+
+	@Test
+	public void polyDivide_S() {
+		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+
+		// Create an arbitrary polynomial: 0BB*x^4 + 0x12*x^3 + 0x54*x^2 + 0*x + 0xFF
+		GrowQueue_I8 inputA = new GrowQueue_I8();
+		inputA.resize(5);
+		inputA.set(4,0xBB);
+		inputA.set(3,0x12);
+		inputA.set(2,0x54);
+		inputA.set(0,0xFF);
+
+		GrowQueue_I8 inputB = new GrowQueue_I8();
+		inputB.resize(2);
+		inputB.set(1,0xF0);
+		inputB.set(0,0x0A);
+
+		GrowQueue_I8 quotient = new GrowQueue_I8();
+		GrowQueue_I8 remainder = new GrowQueue_I8();
+		alg.polyDivide_S(inputA,inputB,quotient,remainder);
+		assertEquals(4,quotient.size);
+		assertEquals(1,remainder.size);
+
+		// see if division was done correct and reconstruct the original equation
+		checkDivision_S(alg, inputA, inputB, quotient, remainder);
+
+		// have the divisor be larger than the dividend
+		alg.polyDivide_S(inputB,inputA,quotient,remainder);
+		assertEquals(0,quotient.size);
+		assertEquals(2,remainder.size);
+
+		checkDivision_S(alg, inputB, inputA, quotient, remainder);
+	}
+
+	private void checkDivision_S(GaliosFieldTableOps alg, GrowQueue_I8 inputA, GrowQueue_I8 inputB, GrowQueue_I8 quotent, GrowQueue_I8 remainder) {
+		GrowQueue_I8 tmp = new GrowQueue_I8();
+		GrowQueue_I8 found = new GrowQueue_I8();
+		alg.polyMult_S(inputB,quotent,tmp);
+		alg.polyAdd_S(tmp,remainder,found);
+		assertEqualsG_S(inputA, found);
 	}
 
 	private static void assertEqualsG(GrowQueue_I8 inputA, GrowQueue_I8 inputB) {
@@ -419,6 +530,20 @@ public class TestGaliosFieldTableOps {
 		int N = Math.min(inputA.size,inputB.size);
 		for (int i = 0; i < N; i++) {
 			assertEquals(inputA.get(i+offsetA),inputB.get(i+offsetB));
+		}
+	}
+
+	private static void assertEqualsG_S(GrowQueue_I8 inputA, GrowQueue_I8 inputB) {
+		int M = Math.min(inputA.size,inputB.size);
+
+		for (int i = M; i < inputA.size; i++) {
+			assertEquals(0,inputA.data[i]);
+		}
+		for (int i = M; i < inputB.size; i++) {
+			assertEquals(0,inputB.data[i]);
+		}
+		for (int i = 0; i < M; i++) {
+			assertEquals(inputA.get(i),inputB.get(i));
 		}
 	}
 

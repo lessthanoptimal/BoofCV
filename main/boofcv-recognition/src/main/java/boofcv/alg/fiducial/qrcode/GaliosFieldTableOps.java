@@ -157,6 +157,31 @@ public class GaliosFieldTableOps {
 	}
 
 	/**
+	 * Adds two polynomials together.
+	 *
+	 * <p>Coefficients for smallest powers are first, e.g. 2*x**3 + 8*x**2+1 = [1,0,2,8]</p>
+	 *
+	 * @param polyA (Input) First polynomial
+	 * @param polyB (Input) Second polynomial
+	 * @param output (Output) Results of addition
+	 */
+	public void polyAdd_S(GrowQueue_I8 polyA , GrowQueue_I8 polyB , GrowQueue_I8 output ) {
+		output.resize(Math.max(polyA.size,polyB.size));
+		int M = Math.min(polyA.size, polyB.size);
+
+		for (int i = M; i < polyA.size; i++) {
+			output.data[i] = polyA.data[i];
+		}
+		for (int i = M; i < polyB.size; i++) {
+			output.data[i] = polyB.data[i];
+		}
+
+		for (int i = 0; i < M; i++) {
+			output.data[i] = (byte)((polyA.data[i]&0xFF) ^ (polyB.data[i]&0xFF));
+		}
+	}
+
+	/**
 	 * Adds two polynomials together while scaling the second.
 	 *
 	 * <p>Coefficients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
@@ -202,6 +227,29 @@ public class GaliosFieldTableOps {
 		for (int j = 0; j < polyB.size; j++) {
 			int vb = polyB.data[j]&0xFF;
 			for (int i = 0; i < polyA.size; i++) {
+				int va = polyA.data[i]&0xFF;
+				output.data[i+j] ^= multiply(va,vb);
+			}
+		}
+	}
+
+	/**
+	 *
+	 * <p>Coefficients for smallest powers are first, e.g. 2*x**3 + 8*x**2+1 = [1,0,2,8]</p>
+	 *
+	 * @param polyA
+	 * @param polyB
+	 * @param output
+	 */
+	public void polyMult_S(GrowQueue_I8 polyA , GrowQueue_I8 polyB , GrowQueue_I8 output ) {
+
+		// Lots of room for efficiency improvements in this function
+		output.resize(polyA.size+polyB.size-1);
+		output.zero();
+
+		for (int j = polyB.size-1; j >= 0; j--) {
+			int vb = polyB.data[j]&0xFF;
+			for (int i = polyA.size-1; i >= 0; i--) {
 				int va = polyA.data[i]&0xFF;
 				output.data[i+j] ^= multiply(va,vb);
 			}
@@ -302,6 +350,7 @@ public class GaliosFieldTableOps {
 			if( coef != 0 ) { // division by zero is undefined.
 				for (int j = 1; j < divisor.size; j++) { // skip the first coeffient in synthetic division
 					int div_j = divisor.data[j]&0xFF;
+
 					if( div_j != 0 ) {// log(0) is undefined.
 						quotient.data[i+j] ^= multiply(div_j,coef);
 					}
@@ -312,5 +361,52 @@ public class GaliosFieldTableOps {
 		// quotient currently contains the quotient and remainder. Copy remainder into it's own polynomial
 		System.arraycopy(quotient.data,quotient.size-remainder.size,remainder.data,0,remainder.size);
 		quotient.size -= remainder.size;
+	}
+
+	/**
+	 * Performs polynomial division using a synthetic division algorithm.
+	 *
+	 * <p>Coefficients for smallest powers are first, e.g. 2*x**3 + 8*x**2+1 = [1,0,2,8]</p>
+	 *
+	 * @param dividend (Input) Polynomial dividend
+	 * @param divisor (Input) Polynomial divisor
+	 * @param quotient (Output) Division's quotient
+	 * @param remainder (Output) Divisions's remainder
+	 */
+	public void polyDivide_S(GrowQueue_I8 dividend , GrowQueue_I8 divisor ,
+							 GrowQueue_I8 quotient, GrowQueue_I8 remainder ) {
+
+		// handle special case
+		if( divisor.size > dividend.size ) {
+			remainder.setTo(dividend);
+			quotient.resize(0);
+			return;
+		} else {
+			quotient.resize(dividend.size-divisor.size+1);
+			remainder.setTo(dividend);
+		}
+
+		int normalizer = divisor.data[divisor.size-1]&0xFF;
+
+		int N = dividend.size-divisor.size+1;
+		for (int i = 0; i < N; i++) {
+			int q_i = remainder.size-i-1;
+			remainder.data[q_i] = (byte)divide(remainder.data[q_i]&0xFF,normalizer);
+
+			int coef = remainder.data[q_i]&0xFF;
+			if( coef != 0 ) { // division by zero is undefined.
+				for (int j = 1; j < divisor.size; j++) { // skip the first coeffient in synthetic division
+					int d_j = divisor.size-j-1;
+					int div_j = divisor.data[d_j]&0xFF;
+					if( div_j != 0 ) {// log(0) is undefined.
+						remainder.data[remainder.size-i-j-1] ^= multiply(div_j,coef);
+					}
+				}
+			}
+		}
+
+		// quotient currently contains the quotient and remainder. Copy remainder into it's own polynomial
+		remainder.size -= quotient.size;
+		System.arraycopy(remainder.data,remainder.size,quotient.data,0,quotient.size);
 	}
 }
