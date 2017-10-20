@@ -240,7 +240,6 @@ public class TestReidSolomonCodes {
 
 			GrowQueue_I8 hack = new GrowQueue_I8();
 			alg.findErrorLocatorPolynomial(N,locations,hack);
-			System.out.println();
 		}
 	}
 
