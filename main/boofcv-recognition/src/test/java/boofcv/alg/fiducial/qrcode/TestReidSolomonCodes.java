@@ -358,12 +358,14 @@ public class TestReidSolomonCodes {
 		ReidSolomonCodes alg = new ReidSolomonCodes(8,primitive8);
 		alg.generator(nsyn);
 
-		for (int i = 0; i < 2000; i++) {
-			GrowQueue_I8 message = randomMessage(100);
+		for (int i = 0; i < 20000; i++) {
+			GrowQueue_I8 message = randomMessage(10);
 			GrowQueue_I8 corrupted = message.copy();
 
+			alg.computeECC(message,ecc);
+
 			// apply noise to the message
-			int numErrors = 4;//rand.nextInt(6);
+			int numErrors = rand.nextInt(6);
 			int eccErrors = 0;
 
 			for (int j = 0; j < numErrors; j++) {
@@ -371,20 +373,20 @@ public class TestReidSolomonCodes {
 				corrupted.data[selected] ^= (0x12+j); // make sure it changes even if the same number is selected twice
 			}
 
-			alg.computeECC(message,ecc);
-
-			// TODO turn this code back on once everything else is working correctly
 			// corrupt the ecc code
-//			if( numErrors < 5 && rand.nextInt(5) < 1 ) {
-//				numErrors++;
-//				ecc.data[rand.nextInt(ecc.size)] ^= 0x13;
-//			}
+			if( numErrors < 5 && rand.nextInt(5) < 1 ) {
+				numErrors++;
+				ecc.data[rand.nextInt(ecc.size)] ^= 0x13;
+			}
 
 			int N = message.size+ecc.size;
 
 			alg.computeSyndromes(corrupted,ecc,syndromes);
 			alg.findErrorLocatorPolynomialBM(syndromes,errorLocator);
 			if( !alg.findErrorLocations_BruteForce(errorLocator,N,locations)) {
+				message.printHex();
+				System.out.println();
+				corrupted.printHex();
 				fail("can't determine error locations. "+numErrors+" "+eccErrors);
 			}
 

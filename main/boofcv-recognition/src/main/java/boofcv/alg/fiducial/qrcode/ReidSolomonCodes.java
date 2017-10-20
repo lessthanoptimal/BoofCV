@@ -151,7 +151,7 @@ public class ReidSolomonCodes {
 				int scale = math.multiply(delta, math.inverse(b));
 				math.polyAddScaleB(C, B, scale, tmp);
 
-				if (2 * C.size > syndromes.size) {
+				if (B.size <= C.size) {
 					// if 2*L > N ---- Step 4
 //					m += 1;
 				} else {
