@@ -314,6 +314,34 @@ public class TestGaliosFieldTableOps {
 	}
 
 	@Test
+	public void polyMult_flipA() {
+		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+
+		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
+		GrowQueue_I8 inputA = new GrowQueue_I8();
+		inputA.resize(3);
+		inputA.set(2,0x12);
+		inputA.set(1,0x54);
+		inputA.set(0,0xFF);
+
+		GrowQueue_I8 inputB = new GrowQueue_I8();
+		inputB.resize(2);
+		inputB.set(1,0x03);
+
+		GrowQueue_I8 output0 = new GrowQueue_I8();
+		alg.polyMult_flipA(inputA,inputB,output0);
+
+		assertEquals(4,output0.size);
+
+		// check the value against a manual solution
+		GrowQueue_I8 expected = new GrowQueue_I8();
+		expected.resize(4);
+		expected.set(1,alg.multiply(0x12,0x03));
+		expected.set(2,alg.multiply(0x54,0x03));
+		expected.set(3,alg.multiply(0xFF,0x03));
+	}
+
+	@Test
 	public void polyMult_S() {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 

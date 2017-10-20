@@ -129,7 +129,7 @@ public class GaliosFieldTableOps {
 	}
 
 	/**
-	 * Adds two polynomials together.
+	 * Adds two polynomials together. output = polyA + polyB
 	 *
 	 * <p>Coefficients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
 	 *
@@ -233,7 +233,24 @@ public class GaliosFieldTableOps {
 		}
 	}
 
+	public void polyMult_flipA(GrowQueue_I8 polyA , GrowQueue_I8 polyB , GrowQueue_I8 output ) {
+
+		// Lots of room for efficiency improvements in this function
+		output.resize(polyA.size+polyB.size-1);
+		output.zero();
+
+		for (int j = 0; j < polyB.size; j++) {
+			int vb = polyB.data[j]&0xFF;
+			for (int i = 0; i < polyA.size; i++) {
+				int va = polyA.data[polyA.size-i-1]&0xFF;
+				output.data[i+j] ^= multiply(va,vb);
+			}
+		}
+	}
+
 	/**
+	 *
+	 * Identical to {@link #polyMult(GrowQueue_I8, GrowQueue_I8, GrowQueue_I8)}
 	 *
 	 * <p>Coefficients for smallest powers are first, e.g. 2*x**3 + 8*x**2+1 = [1,0,2,8]</p>
 	 *

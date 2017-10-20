@@ -271,4 +271,115 @@ public class TestReidSolomonCodes {
 		System.arraycopy(a,0,out,0,setSize);
 		return out;
 	}
+
+	/**
+	 * Compare solution to reference code
+	 */
+	@Test
+	public void findErrorEvaluator() {
+		GrowQueue_I8 syndromes = array(64, 192, 93, 231, 52, 92, 228, 49, 83, 245);
+		GrowQueue_I8 errorLocator = array(3,1);
+
+		GrowQueue_I8 found = new GrowQueue_I8();
+		GrowQueue_I8 expected = array(0,64);
+
+		ReidSolomonCodes alg = new ReidSolomonCodes(8,primitive8);
+		alg.findErrorEvaluator(syndromes,errorLocator,found);
+
+		assertEquals(found.size,expected.size);
+		for (int j = 0; j < found.size; j++) {
+			assertEquals(found.get(j),expected.get(j));
+		}
+	}
+
+	@Test
+	public void correctErrors() {
+		GrowQueue_I8 message = GrowQueue_I8.parseHex(
+				"[ 0x40, 0xd2, 0x75, 0x47, 0x76, 0x17, 0x32, 0x06, 0x27, 0x26, 0x96, 0xc6, 0xc6, 0x96, 0x70, 0xec ]");
+		GrowQueue_I8 ecc = new GrowQueue_I8();
+		GrowQueue_I8 syndromes = new GrowQueue_I8();
+		GrowQueue_I8 errorLocator = new GrowQueue_I8();
+		int nsyn = 10;
+
+		ReidSolomonCodes alg = new ReidSolomonCodes(8,primitive8);
+		alg.generator(nsyn);
+		alg.computeECC(message,ecc);
+
+		message.data[0] = 0;
+		alg.computeSyndromes(message,ecc,syndromes);
+		alg.findErrorLocatorPolynomialBM(syndromes,errorLocator);
+
+		GrowQueue_I32 errorLocations = new GrowQueue_I32(1);
+		errorLocations.data[0] = 0;
+		errorLocations.size = 1;
+
+		GrowQueue_I8 corrected = new GrowQueue_I8();
+
+		alg.correctErrors(message,message.size+ecc.size,syndromes,errorLocator,errorLocations,corrected);
+
+		message.data[0] = 0x40;
+		assertEquals(corrected.size,message.size);
+		for (int j = 0; j < corrected.size; j++) {
+			assertEquals(corrected.get(j),message.get(j));
+		}
+	}
+
+	@Test
+	public void correctErrors_random() {
+		GrowQueue_I8 ecc = new GrowQueue_I8();
+		GrowQueue_I8 syndromes = new GrowQueue_I8();
+		GrowQueue_I8 errorLocator = new GrowQueue_I8();
+		GrowQueue_I8 corrected = new GrowQueue_I8();
+		GrowQueue_I32 locations = new GrowQueue_I32();
+		int nsyn = 10;
+
+		for (int i = 0; i < 50; i++) {
+			GrowQueue_I8 message = randomMessage(100);
+			GrowQueue_I8 corrupted = message.copy();
+
+			int numErrors = 2;//rand.nextInt(5);
+
+			for (int j = 0; j < numErrors; j++) {
+				int selected = rand.nextInt(100);
+				System.out.println("  selected "+selected);
+				corrupted.data[selected] ^= (0x12+j); // make sure it changes even if the same number is selected twice
+			}
+
+			ReidSolomonCodes alg = new ReidSolomonCodes(8,primitive8);
+			alg.generator(nsyn);
+			alg.computeECC(message,ecc);
+
+			// corrupt the ecc code
+//			if( rand.nextInt(5) < 1 ) {
+//				ecc.data[rand.nextInt(ecc.size)] ^= 0x13;
+//			}
+
+			int N = message.size+ecc.size;
+
+			alg.computeSyndromes(corrupted,ecc,syndromes);
+			alg.findErrorLocatorPolynomialBM(syndromes,errorLocator);
+			assertTrue(alg.findErrorLocations_BruteForce(errorLocator,N,locations));
+
+			System.out.println("locations");
+			for (int j = 0; j < locations.size; j++) {
+				System.out.print(locations.get(j)+" ");
+			}
+			System.out.println();
+
+			alg.correctErrors(corrupted,N,syndromes,errorLocator,locations,corrected);
+
+			assertEquals(corrected.size,message.size);
+			for (int j = 0; j < corrected.size; j++) {
+				assertEquals(corrected.get(j),message.get(j));
+			}
+		}
+	}
+
+	private static GrowQueue_I8 array( int ...values ) {
+		GrowQueue_I8 out = GrowQueue_I8.zeros(values.length);
+		for (int i = 0; i < values.length; i++) {
+			out.data[i] = (byte)values[i];
+		}
+		return out;
+	}
 }

@@ -116,7 +116,7 @@ public class ReidSolomonCodes {
 	 * Information Theory, IT-15 (1): 122–127</p>
 	 *
 	 * @param syndromes (Input) The syndromes
-	 * @param errorLocator (Output) the error locator polynomial. Coefficients go for small to large.
+	 * @param errorLocator (Output) Error locator polynomial. Coefficients are large to small.
 	 */
 	void findErrorLocatorPolynomialBM(GrowQueue_I8 syndromes , GrowQueue_I8 errorLocator ) {
 		GrowQueue_I8 C = errorLocator; // error polynomial
@@ -185,7 +185,7 @@ public class ReidSolomonCodes {
 	 *
 	 * @param messageLength (Input) Length of the message
 	 * @param errorLocations (Input) List of error locations in the byte
-	 * @param errorLocator (Output) error locator polynomial
+	 * @param errorLocator (Output) Error locator polynomial. Coefficients are large to small.
 	 */
 	void findErrorLocatorPolynomial( int messageLength , GrowQueue_I32 errorLocations , GrowQueue_I8 errorLocator ) {
 		tmp1.resize(2);
@@ -230,23 +230,78 @@ public class ReidSolomonCodes {
 	/**
 	 * Use Forney algorithm to compute correction values.
 	 *
-	 * @param message
+	 * @param message (Input) The message which is to be corrected. Just the message. ECC not required.
+	 * @param length_msg_ecc (Input) length of message and ecc code
 	 * @param errorLocations (Input) locations of bytes in message with errors.
 	 */
-	public void correctErrors( GrowQueue_I8 message , GrowQueue_I8 ecc,
-							   GrowQueue_I8 errorLocator ,
-							   GrowQueue_I32 errorLocations )
+	void correctErrors( GrowQueue_I8 message ,
+						int length_msg_ecc,
+						GrowQueue_I8 syndromes,
+						GrowQueue_I8 errorLocator ,
+						GrowQueue_I32 errorLocations ,
+						GrowQueue_I8 corrected )
 	{
-		// convert the positions to coefficients degrees for the errata locator algo to work
-		// (eg: instead of [0, 1, 2] it will become [len(msg)-1, len(msg)-2, len(msg) -3])
-		GrowQueue_I32 coefLocations = new GrowQueue_I32(errorLocations.size);
+
+		GrowQueue_I8 err_eval = new GrowQueue_I8();
+		findErrorEvaluator(syndromes,errorLocator,err_eval);
+
+		// Compute error positions
+		GrowQueue_I8 X = GrowQueue_I8.zeros(errorLocations.size);
 		for (int i = 0; i < errorLocations.size; i++) {
-			coefLocations.data[message.size-i-1] = errorLocations.get(i);
+			int coef_pos = (length_msg_ecc-errorLocations.data[i]-1);
+			X.data[i] = (byte)math.power(2,coef_pos);
 		}
+
+		// storage for error magnitude polynomial
+		GrowQueue_I8 E = GrowQueue_I8.zeros(message.size); // todo is this even needed? Can message be modified directly?
+
+		for (int i = 0; i < X.size; i++) {
+			int Xi = X.data[i]&0xFF;
+			int Xi_inv = math.inverse(Xi);
+
+			// Compute the polynomial derivative
+			GrowQueue_I8 err_loc_prime_tmp = new GrowQueue_I8(X.size);
+			for (int j = 0; j < X.size; j++) {
+				if( i == j )
+					continue;
+				err_loc_prime_tmp.data[err_loc_prime_tmp.size++] =
+						(byte)GaliosFieldOps.subtract(1,math.multiply(Xi_inv,X.data[j]&0xFF));
+			}
+			// compute the product, which is the denominator of Forney algorithm (errata locator derivative)
+			int err_loc_prime = 1;
+			for (int j = 0; j < err_loc_prime_tmp.size; j++) {
+				err_loc_prime = GaliosFieldOps.multiply(err_loc_prime,err_loc_prime_tmp.data[j]&0xFF);
+			}
+
+			int y = math.polyEval_S(err_eval,Xi_inv);
+			y = math.multiply(math.power(Xi,1),y);
+
+			// Compute the magnitude
+			int magnitude = GaliosFieldOps.divide(y,err_loc_prime);
+
+			E.data[errorLocations.get(i)] = (byte)magnitude; // todo what happens if an error is in ECC?
+		}
+
+		// apply the correction
+		math.polyAdd(message,E,corrected); // todo replace with an inplace modification of message
 	}
 
-	void findErrorEvaluator( GrowQueue_I8 syndromes , GrowQueue_I8 errorLocator ) {
-
+	/**
+	 * Compute the error evaluator polynomial Omega.
+	 *
+	 * @param syndromes (Input) syndromes
+	 * @param errorLocator (Input) error locator polynomial.
+	 * @param evaluator (Output) error evaluator polynomial. large to small coef
+	 */
+	void findErrorEvaluator( GrowQueue_I8 syndromes , GrowQueue_I8 errorLocator ,
+							 GrowQueue_I8 evaluator )
+	{
+		math.polyMult_flipA(syndromes,errorLocator,evaluator);
+		int offset = evaluator.size-errorLocator.size;
+		for (int i = 0; i < errorLocator.size; i++) {
+			evaluator.data[i] = evaluator.data[i+offset];
+		}
+		evaluator.size = errorLocator.size;
 	}
 
 	/**
