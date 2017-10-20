@@ -246,8 +246,10 @@ public class ReidSolomonCodes {
 		// Compute error positions
 		GrowQueue_I8 X = GrowQueue_I8.zeros(errorLocations.size); // TODO avoid new
 		for (int i = 0; i < errorLocations.size; i++) {
-			int coef_pos = (length_msg_ecc-errorLocations.data[i]-1);
-			X.data[i] = (byte)math.power(2,coef_pos);
+//			int coef_pos = (length_msg_ecc-errorLocations.data[i]-1);
+//			X.data[i] = (byte)math.power(2,coef_pos);
+			int coef_pos = math.max_value-(length_msg_ecc-errorLocations.data[i]-1);
+			X.data[i] = (byte)math.power_n(2,-coef_pos);
 		}
 
 		GrowQueue_I8 err_loc_prime_tmp = new GrowQueue_I8(X.size);

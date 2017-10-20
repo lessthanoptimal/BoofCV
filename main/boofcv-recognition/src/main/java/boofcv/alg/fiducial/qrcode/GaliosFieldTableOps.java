@@ -103,6 +103,13 @@ public class GaliosFieldTableOps {
 		return exp[(log[x] * power)%max_value];
 	}
 
+	public int power_n(int x , int power ) {
+		int a = (log[x] * power)%max_value;
+		if( a < 0 )
+			a = max_value*2 + a;
+		return exp[a];
+	}
+
 	/**
 	 * Computes the following 2**(max-x) mod primitive
 	 */
