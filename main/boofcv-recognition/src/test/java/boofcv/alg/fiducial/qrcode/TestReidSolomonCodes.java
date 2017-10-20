@@ -307,8 +307,11 @@ public class TestReidSolomonCodes {
 		}
 	}
 
+	/**
+	 * Compare against a hand computed scenario
+	 */
 	@Test
-	public void correctErrors() {
+	public void correctErrors_hand() {
 		GrowQueue_I8 message = GrowQueue_I8.parseHex(
 				"[ 0x40, 0xd2, 0x75, 0x47, 0x76, 0x17, 0x32, 0x06, 0x27, 0x26, 0x96, 0xc6, 0xc6, 0x96, 0x70, 0xec ]");
 		GrowQueue_I8 ecc = new GrowQueue_I8();
@@ -320,10 +323,11 @@ public class TestReidSolomonCodes {
 		alg.generator(nsyn);
 		alg.computeECC(message,ecc);
 
-		message.data[0] = 0;
-		message.data[4] = 8;
-		message.data[5] = 9;
-		alg.computeSyndromes(message,ecc,syndromes);
+		GrowQueue_I8 corrupted = message.copy();
+		corrupted.data[0] = 0;
+		corrupted.data[4] = 8;
+		corrupted.data[5] = 9;
+		alg.computeSyndromes(corrupted,ecc,syndromes);
 		alg.findErrorLocatorPolynomialBM(syndromes,errorLocator);
 
 		GrowQueue_I32 errorLocations = new GrowQueue_I32(3);
@@ -332,39 +336,35 @@ public class TestReidSolomonCodes {
 		errorLocations.data[2] = 5;
 		errorLocations.size = 3;
 
-		GrowQueue_I8 corrected = new GrowQueue_I8();
+		alg.correctErrors(corrupted,message.size+ecc.size,syndromes,errorLocator,errorLocations);
 
-		alg.correctErrors(message,message.size+ecc.size,syndromes,errorLocator,errorLocations,corrected);
-
-		message.data[0] = 0x40;
-		message.data[4] = 0x76;
-		message.data[5] = 0x17;
-		assertEquals(corrected.size,message.size);
-		for (int j = 0; j < corrected.size; j++) {
-			assertEquals(corrected.get(j),message.get(j));
+		assertEquals(corrupted.size,message.size);
+		for (int j = 0; j < corrupted.size; j++) {
+			assertEquals(corrupted.get(j),message.get(j));
 		}
 	}
 
+	/**
+	 * Randomly correct the message and ECC. See if the message is correctly reconstructed.
+	 */
 	@Test
 	public void correctErrors_random() {
 		GrowQueue_I8 ecc = new GrowQueue_I8();
 		GrowQueue_I8 syndromes = new GrowQueue_I8();
 		GrowQueue_I8 errorLocator = new GrowQueue_I8();
-		GrowQueue_I8 corrected = new GrowQueue_I8();
 		GrowQueue_I32 locations = new GrowQueue_I32();
 		int nsyn = 10;
 
 		int locationsFailed = 0;
 		for (int i = 0; i < 2000; i++) {
-			System.out.println("-----------------------------");
 			GrowQueue_I8 message = randomMessage(100);
 			GrowQueue_I8 corrupted = message.copy();
 
+			// apply noise to the message
 			int numErrors = rand.nextInt(6);
 
 			for (int j = 0; j < numErrors; j++) {
 				int selected = rand.nextInt(100);
-				System.out.println("  selected "+selected);
 				corrupted.data[selected] ^= (0x12+j); // make sure it changes even if the same number is selected twice
 			}
 
@@ -386,20 +386,16 @@ public class TestReidSolomonCodes {
 				continue;
 			}
 
-			System.out.println("locations");
-			for (int j = 0; j < locations.size; j++) {
-				System.out.print(locations.get(j)+" ");
-			}
-			System.out.println();
+			alg.correctErrors(corrupted,N,syndromes,errorLocator,locations);
 
-			alg.correctErrors(corrupted,N,syndromes,errorLocator,locations,corrected);
-
-			assertEquals(corrected.size,message.size);
-			for (int j = 0; j < corrected.size; j++) {
-				assertEquals(corrected.get(j),message.get(j));
+			assertEquals(corrupted.size,message.size);
+			for (int j = 0; j < corrupted.size; j++) {
+				assertEquals(corrupted.get(j),message.get(j));
 			}
 		}
-		System.out.println("total failed "+locationsFailed);
+		// I'm not sure if it should be ever failing...
+		if( locationsFailed > 10 )
+			fail("Too many errors");
 	}
 
 	private static GrowQueue_I8 array( int ...values ) {

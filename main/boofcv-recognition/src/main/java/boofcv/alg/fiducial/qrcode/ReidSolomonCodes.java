@@ -230,7 +230,7 @@ public class ReidSolomonCodes {
 	/**
 	 * Use Forney algorithm to compute correction values.
 	 *
-	 * @param message (Input) The message which is to be corrected. Just the message. ECC not required.
+	 * @param message (Input/Output) The message which is to be corrected. Just the message. ECC not required.
 	 * @param length_msg_ecc (Input) length of message and ecc code
 	 * @param errorLocations (Input) locations of bytes in message with errors.
 	 */
@@ -238,29 +238,27 @@ public class ReidSolomonCodes {
 						int length_msg_ecc,
 						GrowQueue_I8 syndromes,
 						GrowQueue_I8 errorLocator ,
-						GrowQueue_I32 errorLocations ,
-						GrowQueue_I8 corrected )
+						GrowQueue_I32 errorLocations)
 	{
-
-		GrowQueue_I8 err_eval = new GrowQueue_I8();
+		GrowQueue_I8 err_eval = new GrowQueue_I8(); // TODO avoid new
 		findErrorEvaluator(syndromes,errorLocator,err_eval);
 
 		// Compute error positions
-		GrowQueue_I8 X = GrowQueue_I8.zeros(errorLocations.size);
+		GrowQueue_I8 X = GrowQueue_I8.zeros(errorLocations.size); // TODO avoid new
 		for (int i = 0; i < errorLocations.size; i++) {
 			int coef_pos = (length_msg_ecc-errorLocations.data[i]-1);
 			X.data[i] = (byte)math.power(2,coef_pos);
 		}
 
-		// storage for error magnitude polynomial
-		GrowQueue_I8 E = GrowQueue_I8.zeros(message.size); // todo is this even needed? Can message be modified directly?
+		GrowQueue_I8 err_loc_prime_tmp = new GrowQueue_I8(X.size);
 
+		// storage for error magnitude polynomial
 		for (int i = 0; i < X.size; i++) {
 			int Xi = X.data[i]&0xFF;
 			int Xi_inv = math.inverse(Xi);
 
 			// Compute the polynomial derivative
-			GrowQueue_I8 err_loc_prime_tmp = new GrowQueue_I8(X.size);
+			err_loc_prime_tmp.size = 0;
 			for (int j = 0; j < X.size; j++) {
 				if( i == j )
 					continue;
@@ -279,11 +277,11 @@ public class ReidSolomonCodes {
 			// Compute the magnitude
 			int magnitude = math.divide(y,err_loc_prime);
 
-			E.data[errorLocations.get(i)] = (byte)magnitude; // todo what happens if an error is in ECC?
+			// only apply a correction if it's part of the message and not the ECC
+			int loc = errorLocations.get(i);
+			if( loc < message.size )
+				message.data[loc] = (byte)((message.data[loc]&0xFF) ^ magnitude);
 		}
-
-		// apply the correction
-		math.polyAdd(message,E,corrected); // todo replace with an inplace modification of message
 	}
 
 	/**
