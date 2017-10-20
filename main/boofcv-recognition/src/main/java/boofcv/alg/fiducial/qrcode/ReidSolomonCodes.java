@@ -270,14 +270,14 @@ public class ReidSolomonCodes {
 			// compute the product, which is the denominator of Forney algorithm (errata locator derivative)
 			int err_loc_prime = 1;
 			for (int j = 0; j < err_loc_prime_tmp.size; j++) {
-				err_loc_prime = GaliosFieldOps.multiply(err_loc_prime,err_loc_prime_tmp.data[j]&0xFF);
+				err_loc_prime = math.multiply(err_loc_prime,err_loc_prime_tmp.data[j]&0xFF);
 			}
 
 			int y = math.polyEval_S(err_eval,Xi_inv);
 			y = math.multiply(math.power(Xi,1),y);
 
 			// Compute the magnitude
-			int magnitude = GaliosFieldOps.divide(y,err_loc_prime);
+			int magnitude = math.divide(y,err_loc_prime);
 
 			E.data[errorLocations.get(i)] = (byte)magnitude; // todo what happens if an error is in ECC?
 		}
@@ -297,11 +297,21 @@ public class ReidSolomonCodes {
 							 GrowQueue_I8 evaluator )
 	{
 		math.polyMult_flipA(syndromes,errorLocator,evaluator);
-		int offset = evaluator.size-errorLocator.size;
-		for (int i = 0; i < errorLocator.size; i++) {
+		int N = errorLocator.size-1;
+		int offset = evaluator.size-N;
+		for (int i = 0; i < N; i++) {
 			evaluator.data[i] = evaluator.data[i+offset];
 		}
+		evaluator.data[N]=0;
 		evaluator.size = errorLocator.size;
+
+		// flip evaluator around // TODO remove this flip and do it in place
+		for (int i = 0; i < evaluator.size / 2; i++) {
+			int j = evaluator.size-i-1;
+			int tmp = evaluator.data[i];
+			evaluator.data[i] = evaluator.data[j];
+			evaluator.data[j] = (byte)tmp;
+		}
 	}
 
 	/**
