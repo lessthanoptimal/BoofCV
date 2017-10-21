@@ -372,7 +372,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 					}
 				}
 
-
 				if( splits.size() > maxSidesConsider ) {
 					if( verbose ) System.out.println("Way too many corners, "+splits.size()+". Aborting before improve. Contour size "+contourTmp.size());
 					continue;
@@ -440,7 +439,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 				// Get the storage for a new polygon. This is recycled and has already been cleaned up
 				Info info = foundInfo.grow();
 
-				// save the undistorted coordinate into external
 				if( distToUndist != null ) {
 					// changed the save points in the packed contour list with undistorted coordinates
 					contourFinder.getPackedPoints().writePoints(c.externalIndex,undistorted);
@@ -687,11 +685,11 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		 */
 		public Polygon2D_F64 polygonDistorted = new Polygon2D_F64();
 
-
 		public GrowQueue_I32 splits = new GrowQueue_I32();
 
 		/**
-		 * Contour that the shape was fit to.
+		 * Contour that the shape was fit to. The point coordinates will be in undistorted coordinates if
+		 * an undistortion function was passed in.
 		 */
 		public ContourPacked contour;
 

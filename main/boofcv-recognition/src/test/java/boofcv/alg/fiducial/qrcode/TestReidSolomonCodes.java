@@ -358,7 +358,7 @@ public class TestReidSolomonCodes {
 		alg.generator(nsyn);
 
 		for (int i = 0; i < 20000; i++) {
-			GrowQueue_I8 message = randomMessage(10);
+			GrowQueue_I8 message = randomMessage(100);
 			GrowQueue_I8 corrupted = message.copy();
 
 			alg.computeECC(message,ecc);
