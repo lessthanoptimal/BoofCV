@@ -22,6 +22,11 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 
+import static boofcv.alg.fiducial.qrcode.QrCodeMaskPattern.*;
+
+
+// TODO Structure Appended
+
 /**
  * Information for a detected QR Code.
  *
@@ -62,6 +67,11 @@ public class QrCode {
 	public Mode mode;
 
 	/**
+	 * The raw byte data encoded into the QR Code
+	 */
+	public byte[] dataRaw = new byte[0];
+
+	/**
 	 * Approximate bounding box for QR-Code. The bottom right corner is estimated by intersecting lines
 	 * and should not be used in SFM applications.
 	 *
@@ -71,6 +81,20 @@ public class QrCode {
 
 	public QrCode() {
 		reset();
+	}
+
+	public QrCodeMaskPattern lookupMask() {
+		switch( maskPattern ) {
+			case 0b000: return M000;
+			case 0b001: return M001;
+			case 0b010: return M010;
+			case 0b011: return M011;
+			case 0b100: return M100;
+			case 0b101: return M101;
+			case 0b110: return M110;
+			case 0b111: return M111;
+			default: throw new RuntimeException("Unknown mask: "+maskPattern);
+		}
 	}
 
 	public void reset() {

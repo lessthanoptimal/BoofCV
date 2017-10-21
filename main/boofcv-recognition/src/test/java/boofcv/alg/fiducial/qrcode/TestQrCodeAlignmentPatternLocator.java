@@ -40,7 +40,7 @@ public class TestQrCodeAlignmentPatternLocator {
 		qr.version = 7;
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
-		generator.generate(qr);
+		generator.render(qr);
 
 		QrCodeAlignmentPatternLocator<GrayU8> alg = new QrCodeAlignmentPatternLocator<>(GrayU8.class);
 		assertTrue(alg.process(generator.gray,qr));
@@ -62,7 +62,7 @@ public class TestQrCodeAlignmentPatternLocator {
 
 	public void centerOnSquare( QrCode qr, int scale ) {
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(scale);
-		generator.generate(qr);
+		generator.render(qr);
 
 		QrCodeAlignmentPatternLocator<GrayU8> alg = new QrCodeAlignmentPatternLocator<>(GrayU8.class);
 		alg.interpolate.setImage(generator.gray);
@@ -97,7 +97,7 @@ public class TestQrCodeAlignmentPatternLocator {
 
 	private void localize(QrCode qr, int scale) {
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(scale);
-		generator.generate(qr);
+		generator.render(qr);
 
 		QrCodeAlignmentPatternLocator<GrayU8> alg = new QrCodeAlignmentPatternLocator<>(GrayU8.class);
 		alg.interpolate.setImage(generator.gray);
@@ -167,7 +167,7 @@ public class TestQrCodeAlignmentPatternLocator {
 		QrCode truthQr = new QrCode();
 		truthQr.version = 2;
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
-		generator.generate(truthQr);
+		generator.render(truthQr);
 
 		QrCodeAlignmentPatternLocator<GrayU8> alg = new QrCodeAlignmentPatternLocator<>(GrayU8.class);
 

@@ -44,8 +44,8 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 	}
 
 	@Override
-	public void generate( QrCode qr ) {
-		super.generate(qr);
+	public void render(QrCode qr ) {
+		super.render(qr);
 		adjustSize(qr.ppRight);
 		adjustSize(qr.ppCorner);
 		adjustSize(qr.ppDown);

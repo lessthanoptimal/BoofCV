@@ -41,7 +41,7 @@ public class TestQrCodeGeneratorImage {
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(6);
 
-		generator.generate(qr);
+		generator.render(qr);
 
 		BufferedImage output = ConvertBufferedImage.convertTo(generator.gray,null,true);
 		ShowImages.showWindow(output,"QR Code", true);

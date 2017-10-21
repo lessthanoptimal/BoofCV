@@ -48,7 +48,7 @@ public class TestQrCodeDecoder {
 		QrCode truthQr = new QrCode();
 		truthQr.version = version;
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
-		generator.generate(truthQr);
+		generator.render(truthQr);
 
 		FastQueue<PositionPatternNode> pps = new FastQueue<>(PositionPatternNode.class,true);
 

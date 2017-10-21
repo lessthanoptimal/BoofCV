@@ -20,6 +20,8 @@ package boofcv.alg.fiducial.qrcode;
 
 import georegression.struct.shapes.Polygon2D_F64;
 
+import java.util.Arrays;
+
 /**
  * Abstract class for creating qr codes. Contains the logic for rendering the QR Code but is missing
  * the actual renderer.
@@ -36,6 +38,11 @@ public abstract class QrCodeGenerator {
 	double moduleWidth;
 	int numModules;
 
+	// data mask
+	QrCodeDataBits mask;
+
+	// array which stores output data. QR code data is copied here so that the length can be ensured
+	byte[] output = new byte[0];
 
 	public QrCodeGenerator( double markerWidth ) {
 		this.markerWidth = markerWidth;
@@ -45,9 +52,9 @@ public abstract class QrCodeGenerator {
 	 * Generates a QR Code with the specified message. An exception is thrown if the message is
 	 * too long to be encoded.
 	 */
-	public void generate( QrCode qr ) {
+	public void render( QrCode qr ) {
 		this.qr = qr;
-		this.numModules = qr.version*4+17;
+		this.numModules = QrCodePatternLocations.totalModules(qr.version);
 		this.moduleWidth = markerWidth/numModules;
 
 		init();
@@ -60,7 +67,7 @@ public abstract class QrCodeGenerator {
 
 		formatInformation();
 
-		if( qr.version >= 7 )
+		if( qr.version >= QrCodePatternLocations.VERSION_VERSION )
 			versionInformation();
 
 		// render alignment patterns
@@ -81,6 +88,34 @@ public abstract class QrCodeGenerator {
 				int col = alignment[j];
 				alignmentPattern(col,numModules-row-1);
 			}
+		}
+
+		// mark which modules can store data
+		mask = new QrCodeDataBits(numModules,alignment,qr.version >= QrCodePatternLocations.VERSION_VERSION);
+
+		int numBytes = mask.dataBits/8;
+		if( output.length < numBytes ) {
+			output = new byte[numBytes];
+		}
+		// make sure the raw array does not exceed the maximum number of bytes and that unused bytes are set to zero
+		int length = Math.min(qr.dataRaw.length,numBytes);
+		System.arraycopy(qr.dataRaw,0,output,0,length);
+		Arrays.fill(output,length,numBytes,(byte)0);
+
+		// start encoding!
+	}
+
+	private void renderData( int length ) {
+		QrCodeMaskPattern mask = qr.lookupMask();
+		boolean upwards = true;
+
+		int count = 0;
+		int row = numModules-1;
+		int col = numModules-1;
+
+		while( count < length ) {
+			int bits = output[count]&0xFF;
+
 		}
 	}
 

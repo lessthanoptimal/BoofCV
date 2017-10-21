@@ -24,7 +24,14 @@ package boofcv.alg.fiducial.qrcode;
  * @author Peter Abeles
  */
 public class QrCodePatternLocations {
+	/**
+	 * Maximum possible version of a QR Code
+	 */
 	public static final int MAX_VERSION = 40;
+	/**
+	 * The QR code version after which and including version information is encoded into the QR code
+	 */
+	public static final int VERSION_VERSION = 7;
 	
 	public int []size = new int[MAX_VERSION+1];
 	
@@ -33,7 +40,7 @@ public class QrCodePatternLocations {
 
 	public QrCodePatternLocations() {
 		for (int v = 1; v <= MAX_VERSION; v++) {
-			size[v] = v*4+17;
+			size[v] = totalModules(v);
 		}
 
 		// There appears to be no simple equation for alignment pattern locations
@@ -79,6 +86,10 @@ public class QrCodePatternLocations {
 		alignment[39] = new int[]{6,32,58,84,110,136,162};
 		alignment[38] = new int[]{6,26,54,82,110,138,166};
 		alignment[40] = new int[]{6,30,58,86,114,142,170};
+	}
+
+	public static int totalModules( int version ) {
+		return version*4+17;
 	}
 
 	public static void main(String[] args) {
