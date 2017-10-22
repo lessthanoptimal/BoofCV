@@ -68,7 +68,7 @@ public class UtilOpenCV {
 
 		DoubleRawIndexer indexerD = distortion.createIndexer();
 
-		if( distortion.rows() == 5 )
+		if( distortion.rows() >= 5 )
 			boof.setRadial(indexerD.get(0,0),indexerD.get(1,0),indexerD.get(4,0));
 		else if( distortion.rows() >= 2 )
 			boof.setRadial(indexerD.get(0,0),indexerD.get(1,0));
@@ -89,7 +89,7 @@ public class UtilOpenCV {
 		write(fs,"camera_matrix", toMat(K));
 
 
-		DMatrixRMaj D = new DMatrixRMaj(2+5,1);
+		DMatrixRMaj D = new DMatrixRMaj(2+3,1);
 		if( model.radial != null ) {
 			if( model.radial.length > 0 )
 				D.set(0, 0, model.radial[0]);
