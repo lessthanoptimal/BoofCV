@@ -447,10 +447,10 @@ public class BinaryImageOps {
 		for (int i = 0; i < contours.size; i++) {
 			ContourPacked p = contours.get(i);
 			Contour c = new Contour();
-			c.external = packed.setToList(p.externalIndex);
+			c.external = packed.getSet(p.externalIndex);
 
 			for (int j = 0; j < p.internalIndexes.size; j++) {
-				c.internal.add( packed.setToList(p.internalIndexes.get(j)));
+				c.internal.add( packed.getSet(p.internalIndexes.get(j)));
 			}
 			ret.add(c);
 		}

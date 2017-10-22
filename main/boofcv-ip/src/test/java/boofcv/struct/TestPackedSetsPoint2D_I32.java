@@ -22,6 +22,9 @@ import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 /**
@@ -138,15 +141,60 @@ public class TestPackedSetsPoint2D_I32 {
 							 PackedSetsPoint2D_I32 alg) {
 
 		FastQueue<Point2D_I32> list = new FastQueue<>(Point2D_I32.class,true);
-		alg.setToList(set,list);
+		alg.getSet(set,list);
 
 		assertEquals(x,list.get(point).x);
 		assertEquals(y,list.get(point).y);
 	}
 
 	@Test
-	public void writePoints() {
-		fail("Implement");
+	public void writeOverSet() {
+		PackedSetsPoint2D_I32 alg = new PackedSetsPoint2D_I32(6);
+
+		alg.grow();
+		for (int i = 0; i < 12; i++) {
+			alg.addPointToTail(1,i);
+		}
+		alg.grow();
+		for (int i = 0; i < 20; i++) {
+			alg.addPointToTail(2,i);
+		}
+		// sanity check
+		assertEquals(12,alg.sizeOfSet(0));
+		assertEquals(20,alg.sizeOfSet(1));
+
+		// write new values
+		List<Point2D_I32> expected = new ArrayList<>();
+		for (int i = 0; i < 20; i++) {
+			expected.add( new Point2D_I32(3,i));
+		}
+		alg.writeOverSet(1,expected);
+		List<Point2D_I32> found = alg.getSet(1);
+
+		assertEquals(expected.size(),found.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertTrue(expected.get(i).distance(found.get(i)) <= 1e-5);
+		}
+	}
+
+	@Test
+	public void writeOverSet_badsize() {
+		PackedSetsPoint2D_I32 alg = new PackedSetsPoint2D_I32(6);
+
+		alg.grow();
+		for (int i = 0; i < 12; i++) {
+			alg.addPointToTail(1,i);
+		}
+
+		List<Point2D_I32> expected = new ArrayList<>();
+		for (int i = 0; i < 20; i++) {
+			expected.add( new Point2D_I32(3,i));
+		}
+
+		try {
+			alg.writeOverSet(0, expected);
+			fail("exception expected");
+		} catch( RuntimeException ignore){}
 	}
 
 	@Test

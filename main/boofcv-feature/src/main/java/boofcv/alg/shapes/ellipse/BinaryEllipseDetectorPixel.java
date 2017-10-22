@@ -127,12 +127,12 @@ public class BinaryEllipseDetectorPixel {
 		for (int i = 0; i < blobs.size; i++) {
 			ContourPacked c = blobs.get(i);
 
-			contourFinder.getPackedPoints().setToList(c.externalIndex,contourTmp);
+			contourFinder.getPackedPoints().getSet(c.externalIndex,contourTmp);
 			proccessContour(contourTmp.toList());
 
 			if(internalContour) {
 				for( int j = 0; j < c.internalIndexes.size(); j++ ) {
-					contourFinder.getPackedPoints().setToList(c.internalIndexes.get(j),contourTmp);
+					contourFinder.getPackedPoints().getSet(c.internalIndexes.get(j),contourTmp);
 					proccessContour(contourTmp.toList());
 				}
 			}

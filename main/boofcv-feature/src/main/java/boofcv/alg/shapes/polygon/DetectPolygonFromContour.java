@@ -300,7 +300,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		for (int i = 0; i < blobs.size; i++) {
 			ContourPacked c = blobs.get(i);
 
-			contourFinder.getPackedPoints().setToList(c.externalIndex,contourTmp);
+			contourFinder.getPackedPoints().getSet(c.externalIndex,contourTmp);
 			if( contourTmp.size() >= minimumContour) {
 				float edgeInside=-1,edgeOutside=-1;
 
@@ -440,7 +440,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 				if( distToUndist != null ) {
 					// changed the save points in the packed contour list with undistorted coordinates
-					contourFinder.getPackedPoints().writePoints(c.externalIndex,undistorted);
+					contourFinder.getPackedPoints().writeOverSet(c.externalIndex,undistorted);
 				}
 
 				// save results
@@ -484,7 +484,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	}
 
 	public List<Point2D_I32> getContour( Info info ) {
-		contourFinder.getPackedPoints().setToList(info.contour.externalIndex,contourTmp);
+		contourFinder.getPackedPoints().getSet(info.contour.externalIndex,contourTmp);
 		return contourTmp.toList();
 	}
 

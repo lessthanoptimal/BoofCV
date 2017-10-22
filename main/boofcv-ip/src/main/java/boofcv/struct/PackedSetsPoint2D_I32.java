@@ -162,7 +162,7 @@ public class PackedSetsPoint2D_I32 {
 	 * @param which (Input) which point set
 	 * @param list (Output) Storage for points
 	 */
-	public void setToList(int which , FastQueue<Point2D_I32> list ) {
+	public void getSet(int which , FastQueue<Point2D_I32> list ) {
 		list.reset();
 
 		BlockIndexLength set = sets.get(which);
@@ -177,9 +177,9 @@ public class PackedSetsPoint2D_I32 {
 		}
 	}
 
-	public List<Point2D_I32> setToList(int which) {
+	public List<Point2D_I32> getSet(int which) {
 		FastQueue<Point2D_I32> tmp = new FastQueue<>(Point2D_I32.class,true);
-		setToList(which,tmp);
+		getSet(which,tmp);
 		List<Point2D_I32> output = new ArrayList<>();
 		output.addAll( tmp.toList() );
 		return output;
@@ -197,9 +197,11 @@ public class PackedSetsPoint2D_I32 {
 	}
 
 	/**
-	 * Overwrites the points in the set with the list of points
+	 * Overwrites the points in the set with the list of points.
+	 *
+	 * @param points Points which are to be written into the set. Must be the same size as the set.
 	 */
-	public void writePoints(int which, List<Point2D_I32> points) {
+	public void writeOverSet(int which, List<Point2D_I32> points) {
 		BlockIndexLength set = sets.get(which);
 		if( set.length != points.size() )
 			throw new IllegalArgumentException("points and set don't have the same length");
