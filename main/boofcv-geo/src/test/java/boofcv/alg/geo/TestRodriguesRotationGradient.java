@@ -88,7 +88,7 @@ public class TestRodriguesRotationGradient {
 		}
 	}
 
-	public static class RodToGradient implements FunctionNtoMxN
+	public static class RodToGradient implements FunctionNtoMxN<DMatrixRMaj>
 	{
 		@Override
 		public int getNumOfInputsN() {
@@ -101,18 +101,25 @@ public class TestRodriguesRotationGradient {
 		}
 
 		@Override
-		public void process(double[] input, double[] output) {
+		public void process(double[] input, DMatrixRMaj J) {
 			RodriguesRotationJacobian g = new RodriguesRotationJacobian();
 			
 			g.process(input[0],input[1],input[2]);
 
-			DMatrixRMaj J = DMatrixRMaj.wrap(3,9,output);
+			double output[] = J.data;
 			
 			System.arraycopy(g.Rx.data,0,output,0,9);
 			System.arraycopy(g.Ry.data,0,output,9,9);
 			System.arraycopy(g.Rz.data,0,output,18,9);
 
+			J.numRows = getNumOfInputsN();
+			J.numCols = getNumOfOutputsM();
 			CommonOps_DDRM.transpose(J);
+		}
+
+		@Override
+		public DMatrixRMaj declareMatrixMxN() {
+			return new DMatrixRMaj(getNumOfOutputsM(),getNumOfInputsN());
 		}
 	}
 }

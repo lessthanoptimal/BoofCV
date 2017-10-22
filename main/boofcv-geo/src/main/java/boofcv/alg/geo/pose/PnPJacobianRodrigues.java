@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PnPJacobianRodrigues implements FunctionNtoMxN {
+public class PnPJacobianRodrigues implements FunctionNtoMxN<DMatrixRMaj> {
 
 	// transformation from world to camera frame
 	private Se3_F64 worldToCamera = new Se3_F64();
@@ -73,9 +73,9 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN {
 	}
 
 	@Override
-	public void process(double[] input, double[] output) {
+	public void process(double[] input, DMatrixRMaj J) {
 
-		this.output = output;
+		this.output = J.data;
 
 		// initialize data structures
 		rodrigues.setParamVector(input[0],input[1],input[2]);
@@ -104,6 +104,11 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN {
 			// add gradient from translation
 			addTranslationJacobian(cameraPt);
 		}
+	}
+
+	@Override
+	public DMatrixRMaj declareMatrixMxN() {
+		return new DMatrixRMaj(getNumOfOutputsM(),getNumOfInputsN());
 	}
 
 	/**

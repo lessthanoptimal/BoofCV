@@ -71,15 +71,13 @@ public class TestUtilLepetitEPnP {
 	/**
 	 * Used to check jacobian function in UtilLepetitEPnP
 	 */
-	public class JacobianEPnP implements FunctionNtoMxN {
+	public class JacobianEPnP implements FunctionNtoMxN<DMatrixRMaj> {
 
 		// number of control points
 		protected int numControl;
 
 		// linear constraint matrix
 		protected DMatrixRMaj L_full;
-
-		protected DMatrixRMaj jacobian = new DMatrixRMaj(1,1);
 
 		public void setParameters( DMatrixRMaj L_full ) {
 			if( L_full.numRows == 6 )
@@ -88,8 +86,6 @@ public class TestUtilLepetitEPnP {
 				numControl = 3;
 
 			this.L_full = L_full;
-			jacobian.numRows = L_full.numRows;
-			jacobian.numCols = numControl;
 		}
 
 		@Override
@@ -103,14 +99,17 @@ public class TestUtilLepetitEPnP {
 		}
 
 		@Override
-		public void process(double[] input, double[] output) {
-
-			jacobian.data = output;
+		public void process(double[] input, DMatrixRMaj J) {
 
 			if( numControl == 3)
-				UtilLepetitEPnP.jacobian_Control3(L_full, input, jacobian);
+				UtilLepetitEPnP.jacobian_Control3(L_full, input, J);
 			else
-				UtilLepetitEPnP.jacobian_Control4(L_full, input, jacobian);
+				UtilLepetitEPnP.jacobian_Control4(L_full, input, J);
+		}
+
+		@Override
+		public DMatrixRMaj declareMatrixMxN() {
+			return new DMatrixRMaj(getNumOfOutputsM(),getNumOfInputsN());
 		}
 	}
 

@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CalibPoseAndPointRodriguesJacobian implements FunctionNtoMxN {
+public class CalibPoseAndPointRodriguesJacobian implements FunctionNtoMxN<DMatrixRMaj> {
 
 	// if the extrinsic parameters are known, specify them here
 	Se3_F64 extrinsic[];
@@ -112,8 +112,8 @@ public class CalibPoseAndPointRodriguesJacobian implements FunctionNtoMxN {
 	}
 
 	@Override
-	public void process(double[] input, double[] output) {
-		this.output = output;
+	public void process(double[] input, DMatrixRMaj J) {
+		this.output = J.data;
 		int paramIndex = 0;
 		countPointObs = 0;
 		
@@ -144,6 +144,11 @@ public class CalibPoseAndPointRodriguesJacobian implements FunctionNtoMxN {
 				gradientViewPoint(input, obs);
 			}
 		}
+	}
+
+	@Override
+	public DMatrixRMaj declareMatrixMxN() {
+		return new DMatrixRMaj(getNumOfOutputsM(),getNumOfInputsN());
 	}
 
 	/**

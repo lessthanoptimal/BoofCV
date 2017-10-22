@@ -48,7 +48,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
+public class Zhang99OptimizationJacobian implements FunctionNtoMxN<DMatrixRMaj> {
 
 	// used to compute the Jacobian from Rodrigues coordinates
 	RodriguesRotationJacobian rodJacobian = new RodriguesRotationJacobian();
@@ -116,7 +116,8 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	}
 
 	@Override
-	public void process(double[] input, double[] output) {
+	public void process(double[] input, DMatrixRMaj J) {
+		double output[] = J.data;
 		int index = param.setFromParam(input);
 		intrinsic = (CameraPinholeRadial)param.getCameraModel();
 		
@@ -169,6 +170,11 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 				translateGradient(cameraPt, normPt,output);
 			}
 		}
+	}
+
+	@Override
+	public DMatrixRMaj declareMatrixMxN() {
+		return new DMatrixRMaj(getNumOfOutputsM(),getNumOfInputsN());
 	}
 
 	/**

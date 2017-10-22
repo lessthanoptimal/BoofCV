@@ -66,8 +66,8 @@ public abstract class SplitMergeLineFit {
 	protected Point2D_F64 point2D = new Point2D_F64();
 
 	// list of vertexes
-	protected GrowQueue_I32 splits;
-	protected GrowQueue_I32 work = new GrowQueue_I32();
+	protected GrowQueue_I32 splits = new GrowQueue_I32();
+	GrowQueue_I32 work = new GrowQueue_I32();
 
 	// indicates which line segments need to be checked for splits
 	protected GrowQueue_B changed = new GrowQueue_B();
@@ -101,13 +101,13 @@ public abstract class SplitMergeLineFit {
 	public boolean process( List<Point2D_I32> list , GrowQueue_I32 vertexes ) {
 		this.contour = list;
 		this.minimumSideLengthPixel = (int)Math.ceil(contour.size()* minimumSideLengthFraction);
-		this.splits = vertexes;
 		splits.reset();
 
 		boolean result = _process(list);
 
 		// remove reference so that it can be freed
 		this.contour = null;
+		vertexes.setTo(splits);
 		return result;
 	}
 

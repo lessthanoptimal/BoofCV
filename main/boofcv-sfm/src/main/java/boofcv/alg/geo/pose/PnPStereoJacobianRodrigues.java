@@ -39,7 +39,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO Make PnPJacobianRodrigues and this class share a common parent for common functions?
-public class PnPStereoJacobianRodrigues implements FunctionNtoMxN {
+public class PnPStereoJacobianRodrigues implements FunctionNtoMxN<DMatrixRMaj> {
 
 	// transformation from world to left camera frame
 	private Se3_F64 worldToLeft = new Se3_F64();
@@ -85,9 +85,9 @@ public class PnPStereoJacobianRodrigues implements FunctionNtoMxN {
 	}
 
 	@Override
-	public void process(double[] input, double[] output) {
+	public void process(double[] input, DMatrixRMaj J) {
 
-		this.output = output;
+		this.output = J.data;
 
 		// initialize data structures
 		rodrigues.setParamVector(input[0],input[1],input[2]);
@@ -133,6 +133,11 @@ public class PnPStereoJacobianRodrigues implements FunctionNtoMxN {
 
 			addTranslationJacobian(leftToRight.getR(),cameraPt);
 		}
+	}
+
+	@Override
+	public DMatrixRMaj declareMatrixMxN() {
+		return new DMatrixRMaj(getNumOfOutputsM(),getNumOfInputsN());
 	}
 
 	/**
