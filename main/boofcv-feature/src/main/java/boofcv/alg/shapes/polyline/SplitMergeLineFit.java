@@ -66,7 +66,7 @@ public abstract class SplitMergeLineFit {
 	protected Point2D_F64 point2D = new Point2D_F64();
 
 	// list of vertexes
-	protected GrowQueue_I32 splits = new GrowQueue_I32();
+	protected GrowQueue_I32 splits;
 	protected GrowQueue_I32 work = new GrowQueue_I32();
 
 	// indicates which line segments need to be checked for splits
@@ -94,28 +94,30 @@ public abstract class SplitMergeLineFit {
 	/**
 	 * Approximates the input list with a set of line segments
 	 *
-	 * @param list Ordered list of connected points.
+	 * @param list (Input) Ordered list of connected points.
+	 * @param vertexes (Output) Indexes in the input list which are corners in the polyline
 	 * @return true if it could fit a polygon to the points or false if not
 	 */
-	public abstract boolean process( List<Point2D_I32> list );
+	public boolean process( List<Point2D_I32> list , GrowQueue_I32 vertexes ) {
+		this.contour = list;
+		this.minimumSideLengthPixel = (int)Math.ceil(contour.size()* minimumSideLengthFraction);
+		this.splits = vertexes;
+		splits.reset();
+
+		boolean result = _process(list);
+
+		// remove reference so that it can be freed
+		this.contour = null;
+		return result;
+	}
+
+	protected abstract boolean _process( List<Point2D_I32> list );
 
 	/**
 	 * Computes the split threshold from the end point of two lines
 	 */
 	protected double splitThresholdSq( Point2D_I32 a , Point2D_I32 b ) {
 		return Math.max(2,a.distance2(b)* toleranceFractionSq);
-	}
-
-	/**
-	 * List of point indexes in the contour.  Each point is the end of a line segment.  A minimum of
-	 * two points will be returned.
-	 *
-	 * NOTE: This list is modified the next time process is called.
-	 *
-	 * @return List of indexes
-	 */
-	public GrowQueue_I32 getSplits() {
-		return splits;
 	}
 
 	public void setMaxIterations(int maxIterations) {

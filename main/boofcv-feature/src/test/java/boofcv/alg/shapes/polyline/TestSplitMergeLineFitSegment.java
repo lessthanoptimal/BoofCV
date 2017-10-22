@@ -35,6 +35,8 @@ public class TestSplitMergeLineFitSegment {
 
 	private static final double MIN_SPLIT = 0.1;
 
+	GrowQueue_I32 splits = new GrowQueue_I32();
+	
 	/**
 	 * Tests contours with zero and one points in them
 	 */
@@ -42,12 +44,12 @@ public class TestSplitMergeLineFitSegment {
 	public void checkZeroOne() {
 		List<Point2D_I32> contour = new ArrayList<>();
 		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,MIN_SPLIT,100);
-		alg.process(contour);
-		assertEquals(0,alg.getSplits().size);
+		alg.process(contour,splits);
+		assertEquals(0,splits.size);
 
 		contour.add( new Point2D_I32(2,3));
-		alg.process(contour);
-		assertEquals(0,alg.getSplits().size);
+		alg.process(contour,splits);
+		assertEquals(0,splits.size);
 	}
 
 	/**
@@ -66,9 +68,8 @@ public class TestSplitMergeLineFitSegment {
 			contour.add( new Point2D_I32(18,5-i));
 
 		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,MIN_SPLIT,100);
-		alg.process(contour);
+		alg.process(contour,splits);
 
-		GrowQueue_I32 splits = alg.getSplits();
 		assertEquals(5 , splits.size );
 		assertEquals(0,alg.splits.data[0]);
 		assertEquals(9,alg.splits.data[1]);
@@ -86,6 +87,7 @@ public class TestSplitMergeLineFitSegment {
 		alg.contour.get(4).y=5;
 
 		// single split
+		alg.splits = splits;
 		alg.splits.add(0);
 		alg.splits.add(9);
 		assertTrue(alg.splitSegments());
@@ -131,6 +133,7 @@ public class TestSplitMergeLineFitSegment {
 		alg.contour.add(new Point2D_I32(3,4));
 		alg.contour.add(new Point2D_I32(4,4));
 		alg.contour.add(new Point2D_I32(5,4));
+		alg.splits = splits;
 		for( int i = 0; i < alg.contour.size(); i++ ) {
 			alg.splits.add(i);
 		}
@@ -187,7 +190,7 @@ public class TestSplitMergeLineFitSegment {
 		}
 
 		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.001,minSplitFraction,100);
-		alg.process(contour);
+		alg.process(contour,splits);
 
 		assertEquals(contour.size()/10,alg.minimumSideLengthPixel);
 	}

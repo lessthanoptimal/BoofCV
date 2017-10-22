@@ -18,12 +18,12 @@
 
 package boofcv.factory.shape;
 
+import boofcv.abst.shapes.polyline.PointsToPolyline;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
 import boofcv.alg.shapes.ellipse.EdgeIntensityEllipse;
 import boofcv.alg.shapes.ellipse.SnapToEllipseEdge;
 import boofcv.alg.shapes.polygon.*;
-import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
 import boofcv.struct.image.ImageGray;
 
 /**
@@ -104,10 +104,8 @@ public class FactoryShapeDetector {
 	{
 		config.checkValidity();
 
-		SplitMergeLineFitLoop contourToPolygon = new SplitMergeLineFitLoop(
-				config.contourToPoly.splitFraction,
-				config.contourToPoly.minimumSideFraction,
-				config.contourToPoly.iterations);
+		PointsToPolyline contourToPolygon =
+				FactoryPointsToPolyline.splitMerge(config.contourToPoly);
 
 		return new DetectPolygonFromContour<>(
 				config.minimumSides, config.maximumSides, contourToPolygon,

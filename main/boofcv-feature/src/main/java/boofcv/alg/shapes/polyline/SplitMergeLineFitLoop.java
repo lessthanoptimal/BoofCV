@@ -49,14 +49,10 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 
 	@Override
-	public boolean process( List<Point2D_I32> contour ) {
-		this.contour = contour;
+	public boolean _process( List<Point2D_I32> contour ) {
 		this.N = contour.size();
-		this.minimumSideLengthPixel = (int)Math.ceil(N* minimumSideLengthFraction);
 
 		// ------------- find initial line segments
-		splits.reset();
-
 		// can't fit a line to a single point
 		if( N <= 1 ) {
 			return false;

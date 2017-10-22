@@ -66,6 +66,8 @@ Version : 0.28
   * Added ability to provide a hint for where the object is now
 - JavaCV
   * Provided support for reading webcams using JavaCV. Seems to work better than Webcam Capture in some ways
+- Created interface for contour to polyline
+  * ASDASDASD
 
 Fiducials
 - Changes in polygon have affected performance. Mostly negative on blurred images.

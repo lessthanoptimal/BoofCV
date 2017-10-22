@@ -18,12 +18,12 @@
 
 package boofcv.alg.shapes.polygon;
 
+import boofcv.abst.shapes.polyline.PointsToPolyline;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
 import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
-import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
 import boofcv.struct.ConfigMinimumSize;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform2_F32;
@@ -86,7 +86,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private GrayS32 labeled = new GrayS32(1,1);
 
 	// finds the initial polygon around a target candidate
-	private SplitMergeLineFitLoop fitPolygon;
+	private PointsToPolyline fitPolygon;
+	private GrowQueue_I32 splits = new GrowQueue_I32();
 
 	// removes extra corners
 	private GrowQueue_I32 pruned = new GrowQueue_I32(); // corners after pruning
@@ -157,7 +158,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 * @param inputType Type of input image it's processing
 	 */
 	public DetectPolygonFromContour(int minSides, int maxSides,
-									SplitMergeLineFitLoop contourToPolygon,
+									PointsToPolyline contourToPolygon,
 									ConfigMinimumSize minimumContour,
 									boolean outputClockwise,
 									boolean convex,
@@ -292,7 +293,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 		// stop fitting the polygon if it clearly has way too many sides
 		int maxSidesConsider = (int)Math.ceil(maxSides*1.5);
-		fitPolygon.setAbortSplits(2*maxSides);
+		fitPolygon.setMaxVertexes(2*maxSides);
 
 		// find blobs where all 4 edges are lines
 		FastQueue<ContourPacked> blobs = contourFinder.getContours();
@@ -342,12 +343,10 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 				}
 
 				// Find the initial approximate fit of a polygon to the contour
-				if( !fitPolygon.process(undistorted) ) {
+				if( !fitPolygon.process(undistorted,true,splits) ) {
 					if( verbose ) System.out.println("rejected polygon initial fit failed. contour size = "+contourTmp.toList());
 					continue;
 				}
-				GrowQueue_I32 splits = fitPolygon.getSplits();
-
 				// determine the polygon's orientation
 				List<Point2D_I32> polygonPixel = new ArrayList<>();
 				for (int j = 0; j < splits.size; j++) {

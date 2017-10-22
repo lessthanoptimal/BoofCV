@@ -32,18 +32,17 @@ import java.util.List;
 // TODO only check lines that changed for splitting
 public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 
-	public SplitMergeLineFitSegment(double splitFraction, double minimumSplitFraction, int maxIterations) {
+	public SplitMergeLineFitSegment(double splitFraction,
+									double minimumSplitFraction,
+									int maxIterations) {
 		super(splitFraction,minimumSplitFraction, maxIterations);
 	}
 
 	@Override
-	public boolean process(List<Point2D_I32> list) {
-		splits.reset();
-		this.contour = list;
+	public boolean _process(List<Point2D_I32> list) {
 		if( list.size() <= 2 ) { // can't do anything with two or less points
 			return false;
 		}
-		this.minimumSideLengthPixel = (int)Math.ceil(contour.size()* minimumSideLengthFraction);
 
 		// initial segmentation
 		splits.add(0);

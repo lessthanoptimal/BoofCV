@@ -37,6 +37,8 @@ public class TestSplitMergeLineFitLoop {
 
 	public static final double MINIMUM_SPLIT_FRACTION = 0.01;
 
+	GrowQueue_I32 splits = new GrowQueue_I32();
+	
 	/**
 	 * Tests contours with zero and one points in them
 	 */
@@ -44,12 +46,12 @@ public class TestSplitMergeLineFitLoop {
 	public void checkZeroOne() {
 		List<Point2D_I32> contour = new ArrayList<>();
 		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15, MINIMUM_SPLIT_FRACTION,100);
-		alg.process(contour);
-		assertEquals(0,alg.getSplits().size);
+		alg.process(contour,splits);
+		assertEquals(0,splits.size);
 
 		contour.add( new Point2D_I32(2,3));
-		alg.process(contour);
-		assertEquals(0,alg.getSplits().size);
+		alg.process(contour,splits);
+		assertEquals(0,splits.size);
 	}
 
 	/**
@@ -60,8 +62,7 @@ public class TestSplitMergeLineFitLoop {
 		List<Point2D_I32> contour = rectToContour(new RectangleLength2D_I32(0,0,10,5));
 
 		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15, MINIMUM_SPLIT_FRACTION,100);
-		alg.process(contour);
-		GrowQueue_I32 splits = alg.getSplits();
+		alg.process(contour,splits);
 		matchSplitsToExpected(new int[]{8, 12, 21, 25}, splits);
 	}
 
@@ -94,6 +95,7 @@ public class TestSplitMergeLineFitLoop {
 		for( int i = 0; i < 10; i++ )
 			alg.contour.add( new Point2D_I32(i,0));
 		alg.N = alg.contour.size();
+		alg.splits = splits;
 
 		alg.splitPixels(0,5);
 		assertEquals(0,alg.splits.size);
@@ -119,6 +121,7 @@ public class TestSplitMergeLineFitLoop {
 			alg.contour.add( new Point2D_I32(i,0));
 		alg.N = alg.contour.size();
 		alg.contour.get(4).y = 6;// set it just above the threshold
+		alg.splits = splits;
 
 		// tests which require splits on recursive calls
 		alg.splitPixels(0,3);
@@ -160,6 +163,7 @@ public class TestSplitMergeLineFitLoop {
 		alg.contour.add( new Point2D_I32(70,0));
 		alg.N = alg.contour.size();
 
+		alg.splits = splits;
 		alg.splitPixels(0,alg.N-1);
 		assertEquals(2,alg.splits.size);
 		assertEquals(3,alg.splits.data[0]);
@@ -184,6 +188,7 @@ public class TestSplitMergeLineFitLoop {
 			alg.contour.add( new Point2D_I32(9-i,3));
 		alg.N = alg.contour.size();
 
+		alg.splits = splits;
 		alg.splits.add(0);
 		alg.splits.add(5);
 		alg.splits.add(9);
@@ -215,6 +220,7 @@ public class TestSplitMergeLineFitLoop {
 		alg.contour.get(4).y=5;
 		alg.N = alg.contour.size();
 
+		alg.splits = splits;
 		alg.splits.add(0);
 		alg.splits.add(6);
 
@@ -327,7 +333,7 @@ public class TestSplitMergeLineFitLoop {
 		}
 
 		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.001,minSplitFraction,100);
-		alg.process(contour);
+		alg.process(contour,splits);
 
 		assertEquals(contour.size()/5,alg.minimumSideLengthPixel);
 	}
