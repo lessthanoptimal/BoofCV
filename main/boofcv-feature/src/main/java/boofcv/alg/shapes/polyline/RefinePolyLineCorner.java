@@ -18,6 +18,7 @@
 
 package boofcv.alg.shapes.polyline;
 
+import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFit;
 import boofcv.misc.CircularIndex;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;

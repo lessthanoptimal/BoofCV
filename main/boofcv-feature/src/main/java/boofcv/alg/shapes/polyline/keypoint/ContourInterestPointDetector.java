@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.polyline.keyline;
+package boofcv.alg.shapes.polyline.keypoint;
 
 import boofcv.misc.CircularIndex;
 import georegression.metric.Distance2D_I32;
@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ContourInterestPointDetectorLoop {
+public class ContourInterestPointDetector {
 
 	// which indexes in the contour are local maximums
 	GrowQueue_I32 indexes = new GrowQueue_I32();
@@ -49,7 +49,11 @@ public class ContourInterestPointDetectorLoop {
 	// threshold for rejecting corners as a maximum
 	double threshold;
 
-	public ContourInterestPointDetectorLoop(int period, double threshold) {
+	// Is the input a loop or not?
+	boolean loop;
+
+	public ContourInterestPointDetector(boolean loop, int period, double threshold) {
+		this.loop = loop;
 		this.period = period;
 		this.threshold = threshold;
 	}
@@ -57,29 +61,34 @@ public class ContourInterestPointDetectorLoop {
 	public void process(List<Point2D_I32> contour ) {
 		if( contour.size() < period )
 			throw new RuntimeException("Contour is too small. Must be at least the period or even better more!");
-		computeCornerIntensity(contour);
-		nonMaximumSupression(contour);
+
+		if( loop ) {
+			computeCornerIntensityLoop(contour);
+			nonMaximumSupressionLoop();
+		} else {
+			// TODO implement
+		}
 	}
 
-	private void nonMaximumSupression(List<Point2D_I32> contour) {
+	void nonMaximumSupressionLoop() {
 		indexes.reset();
 
 		int centerOffset = period/2;
 
-		for (int i = 0; i < contour.size(); i++) {
-			int target = (i+centerOffset)%contour.size();
+		for (int i = 0; i < intensity.size(); i++) {
+			int target = (i+centerOffset)%intensity.size();
 			double value = intensity.get(target);
 
 			if( value <= threshold )
 				continue;
 
-			boolean maximum = false;
+			boolean maximum = true;
 			for (int j = 0; j < period; j++) {
-				int k = CircularIndex.addOffset(i,j,contour.size());
+				int k = CircularIndex.addOffset(i,j,intensity.size());
 
 				if( intensity.get(k) >= value ) {
 					if( k != target ) {
-						maximum = true;
+						maximum = false;
 						break;
 					}
 				}
@@ -91,7 +100,7 @@ public class ContourInterestPointDetectorLoop {
 		}
 	}
 
-	private void computeCornerIntensity(List<Point2D_I32> contour) {
+	void computeCornerIntensityLoop(List<Point2D_I32> contour) {
 		intensity.resize(contour.size());
 		int centerOffset = period/2;
 
@@ -134,6 +143,5 @@ public class ContourInterestPointDetectorLoop {
 		for (int i = 0; i < indexes.size; i++) {
 			output.add( contour.get( indexes.get(i)));
 		}
-		output.clear();
 	}
 }

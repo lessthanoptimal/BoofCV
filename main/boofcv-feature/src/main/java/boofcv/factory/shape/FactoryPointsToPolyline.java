@@ -20,7 +20,7 @@ package boofcv.factory.shape;
 
 import boofcv.abst.shapes.polyline.PointsToPolyline;
 import boofcv.abst.shapes.polyline.SplitMergeLineFit_to_PointsToPolyline;
-import boofcv.alg.shapes.polyline.SplitMergeLineFit;
+import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFit;
 
 /**
  * Factory for creating instances of {@link PointsToPolyline}

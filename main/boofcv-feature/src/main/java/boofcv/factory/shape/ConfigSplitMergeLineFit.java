@@ -18,7 +18,7 @@
 
 package boofcv.factory.shape;
 
-import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
+import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitLoop;
 import boofcv.struct.Configuration;
 
 /**

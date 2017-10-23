@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.polyline.keyline;
+package boofcv.alg.shapes.polyline.keypoint;
 
 /**
  * Uses contour interest points as a seed to fit a polygon to the contour.

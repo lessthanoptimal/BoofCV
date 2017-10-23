@@ -19,8 +19,8 @@
 package boofcv.alg.shapes;
 
 import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
-import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
-import boofcv.alg.shapes.polyline.SplitMergeLineFitSegment;
+import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitLoop;
+import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitSegment;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;

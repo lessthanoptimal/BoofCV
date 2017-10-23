@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.polyline;
+package boofcv.alg.shapes.polyline.splitmerge;
 
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.RectangleLength2D_I32;
@@ -338,7 +338,7 @@ public class TestSplitMergeLineFitLoop {
 		assertEquals(contour.size()/5,alg.minimumSideLengthPixel);
 	}
 
-	private List<Point2D_I32> shiftContour( List<Point2D_I32> contour , int offset ) {
+	public static List<Point2D_I32> shiftContour( List<Point2D_I32> contour , int offset ) {
 		List<Point2D_I32> ret = new ArrayList<>();
 		for( int i = 0; i < contour.size(); i++ ) {
 			ret.add( contour.get( (i+offset)%contour.size()));

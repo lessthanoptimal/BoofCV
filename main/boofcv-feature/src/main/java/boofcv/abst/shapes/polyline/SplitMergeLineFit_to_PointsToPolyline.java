@@ -18,15 +18,16 @@
 
 package boofcv.abst.shapes.polyline;
 
-import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
-import boofcv.alg.shapes.polyline.SplitMergeLineFitSegment;
+import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFit;
+import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitLoop;
+import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitSegment;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.List;
 
 /**
- * Wrapper around {@link boofcv.alg.shapes.polyline.SplitMergeLineFit} for {@link PointsToPolyline}.
+ * Wrapper around {@link SplitMergeLineFit} for {@link PointsToPolyline}.
  *
  * @author Peter Abeles
  */
