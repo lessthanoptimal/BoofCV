@@ -75,7 +75,32 @@ public class ContourInterestPointDetector {
 
 		int centerOffset = period/2;
 
-		for (int i = 0; i < intensity.size(); i++) {
+		// to make the computation faster handle the nominal case here
+		int end = intensity.size-period;
+		for (int i = 0; i < end; i++) {
+			int target = i+centerOffset;
+			double value = intensity.get(target);
+
+			if( value <= threshold )
+				continue;
+
+			boolean maximum = true;
+			for (int k = i; k < i+period; k++) {
+				if( intensity.data[k] >= value ) {
+					if( k != target ) {
+						maximum = false;
+						break;
+					}
+				}
+			}
+
+			if( maximum ) {
+				indexes.add(target);
+			}
+		}
+
+		// handle the edge case now
+		for (int i = end; i < intensity.size; i++) {
 			int target = (i+centerOffset)%intensity.size();
 			double value = intensity.get(target);
 
@@ -93,7 +118,6 @@ public class ContourInterestPointDetector {
 					}
 				}
 			}
-
 			if( maximum ) {
 				indexes.add(target);
 			}
@@ -104,7 +128,28 @@ public class ContourInterestPointDetector {
 		intensity.resize(contour.size());
 		int centerOffset = period/2;
 
-		for (int i = 0; i < contour.size(); i++) {
+		int end = intensity.size-period;
+		for (int i = 0; i < end; i++) {
+			int j = i+period;
+			int center = i+centerOffset;
+
+			Point2D_I32 a = contour.get(i);
+			Point2D_I32 b = contour.get(center);
+			Point2D_I32 c = contour.get(j);
+
+			line.p.set(a);
+			line.slopeX = c.x-a.x;
+			line.slopeY = c.y-a.y;
+
+			// not sure if this is even possible...
+			if( line.slopeX == 0 && line.slopeY == 0 ) {
+				intensity.data[center] = 0;
+			} else {
+				intensity.data[center] = Distance2D_I32.distance(line,b);
+			}
+		}
+
+		for (int i = end; i < contour.size(); i++) {
 			int j = (i+period)%contour.size();
 			int center = (i+centerOffset)%contour.size();
 
