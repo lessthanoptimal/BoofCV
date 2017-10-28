@@ -19,6 +19,7 @@
 package boofcv.alg.shapes.polyline.keypoint;
 
 import boofcv.misc.CircularIndex;
+import boofcv.struct.ConfigLength;
 import georegression.metric.Distance2D_I32;
 import georegression.struct.line.LineParametric2D_I32;
 import georegression.struct.point.Point2D_I32;
@@ -40,8 +41,8 @@ public class ContourInterestPointDetector {
 	GrowQueue_I32 indexes = new GrowQueue_I32();
 	// the corner intensity of each pixel in the contour
 	GrowQueue_F64 intensity = new GrowQueue_F64();
-	// seperation along the contour
-	int period = 0;
+	// distance between two points along the contour that form the line
+	ConfigLength period;
 
 	// Work space for used to compute corner intensity
 	LineParametric2D_I32 line = new LineParametric2D_I32();
@@ -52,25 +53,24 @@ public class ContourInterestPointDetector {
 	// Is the input a loop or not?
 	boolean loop;
 
-	public ContourInterestPointDetector(boolean loop, int period, double threshold) {
+	public ContourInterestPointDetector(boolean loop, ConfigLength period, double threshold) {
 		this.loop = loop;
 		this.period = period;
 		this.threshold = threshold;
 	}
 
 	public void process(List<Point2D_I32> contour ) {
-		if( contour.size() < period )
-			throw new RuntimeException("Contour is too small. Must be at least the period or even better more!");
+		int period = this.period.computeI(contour.size());
 
 		if( loop ) {
-			computeCornerIntensityLoop(contour);
-			nonMaximumSupressionLoop();
+			computeCornerIntensityLoop(contour,period);
+			nonMaximumSupressionLoop(period);
 		} else {
 			// TODO implement
 		}
 	}
 
-	void nonMaximumSupressionLoop() {
+	void nonMaximumSupressionLoop( int period ) {
 		indexes.reset();
 
 		int centerOffset = period/2;
@@ -124,7 +124,7 @@ public class ContourInterestPointDetector {
 		}
 	}
 
-	void computeCornerIntensityLoop(List<Point2D_I32> contour) {
+	void computeCornerIntensityLoop(List<Point2D_I32> contour, int period ) {
 		intensity.resize(contour.size());
 		int centerOffset = period/2;
 

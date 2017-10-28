@@ -18,12 +18,16 @@
 
 package boofcv.alg.shapes.polyline.keypoint;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
+
 /**
- * Uses contour interest points as a seed to fit a polygon to the contour.
- *
  * @author Peter Abeles
  */
-public class FitLinesToInterestPointsLoop {
-
-//	public boolean process( List<Point2D_I32> list ){}
+public class TestContourInterestThenSplitMerge {
+	@Test
+	public void dummy() {
+		fail("implement");
+	}
 }
