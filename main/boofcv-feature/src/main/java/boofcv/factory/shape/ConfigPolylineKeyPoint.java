@@ -27,7 +27,7 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class ConfigSplitMergeLineFit implements Configuration {
+public class ConfigPolylineKeyPoint implements Configuration {
 	/**
 	 * A line is split if a point along the contour between the two end points has a distance from the line
 	 * which is greater than this fraction of the line's length
@@ -39,27 +39,22 @@ public class ConfigSplitMergeLineFit implements Configuration {
 	 */
 	public int iterations = 10;
 
-	/**
-	 * The minimum allowed length of a side as a fraction of the total contour length
-	 */
-	public ConfigLength minimumSide = ConfigLength.relative(0.025,10);
+	public ConfigLength period = ConfigLength.relative(0.025,5);
 
-	/**
-	 * Does the contour loop?
-	 */
-	public boolean loops = true;
+	public boolean looping = true;
 
 	@Override
 	public void checkValidity() {
-		minimumSide.checkValidity();
+		period.checkValidity();
 	}
 
 	@Override
 	public String toString() {
-		return "ConfigSplitMergeLineFit{" +
+		return "ConfigPolylineKeyPoint{" +
 				"splitFraction=" + splitFraction +
 				", iterations=" + iterations +
-				", minimumSideFraction=" + minimumSide +
+				", period=" + period +
+				", looping=" + looping +
 				'}';
 	}
 }

@@ -29,6 +29,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.simulation.SimulatePlanarWorld;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.CameraUniversalOmni;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
@@ -374,7 +375,12 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 			assertEquals(found0.size(), found1.size());
 			assertTrue(found0 != found1);
 			for (int i = 0; i < found0.size(); i++) {
-				assertFalse(found1.points.contains(found0.points.get(0)));
+				PointIndex2D_F64 p0 = found0.get(i);
+
+				for (int j = 0; j < found1.size(); j++) {
+					PointIndex2D_F64 p1 = found1.get(j);
+					assertFalse(p0==p1);
+				}
 			}
 		}
 	}

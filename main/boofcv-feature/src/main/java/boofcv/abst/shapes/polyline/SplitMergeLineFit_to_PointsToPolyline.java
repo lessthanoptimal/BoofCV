@@ -21,6 +21,7 @@ package boofcv.abst.shapes.polyline;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFit;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitLoop;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitSegment;
+import boofcv.struct.ConfigLength;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -37,11 +38,11 @@ public class SplitMergeLineFit_to_PointsToPolyline implements PointsToPolyline {
 	SplitMergeLineFitSegment algSegments;
 
 	public SplitMergeLineFit_to_PointsToPolyline(double splitFraction,
-												 double minimumSplitFraction,
+												 ConfigLength minimumSplit,
 												 int maxIterations)
 	{
-		algLoop = new SplitMergeLineFitLoop(splitFraction, minimumSplitFraction, maxIterations);
-		algSegments = new SplitMergeLineFitSegment(splitFraction, minimumSplitFraction, maxIterations);
+		algLoop = new SplitMergeLineFitLoop(splitFraction, minimumSplit, maxIterations);
+		algSegments = new SplitMergeLineFitSegment(splitFraction, minimumSplit, maxIterations);
 	}
 
 

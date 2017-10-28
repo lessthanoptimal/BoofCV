@@ -24,7 +24,7 @@ import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
 import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
-import boofcv.struct.ConfigMinimumSize;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayS32;
@@ -75,7 +75,7 @@ import java.util.List;
 public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 	// minimum size of a shape's contour as a fraction of the image width
-	private ConfigMinimumSize minimumContourConfig;
+	private ConfigLength minimumContourConfig;
 	private int minimumContour;
 	private double minimumArea; // computed from minimumContour
 
@@ -159,7 +159,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 */
 	public DetectPolygonFromContour(int minSides, int maxSides,
 									PointsToPolyline contourToPolygon,
-									ConfigMinimumSize minimumContour,
+									ConfigLength minimumContour,
 									boolean outputClockwise,
 									boolean convex,
 									boolean touchBorder, double splitPenalty,
@@ -277,7 +277,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		labeled.reshape(width, height);
 
 		// adjust size based parameters based on image size
-		this.minimumContour = minimumContourConfig.computeI(width,height);
+		this.minimumContour = minimumContourConfig.computeI(Math.min(width,height));
 		this.minimumArea = Math.pow(this.minimumContour /4.0,2);
 		contourFinder.setMinContourSize(minimumContour);
 

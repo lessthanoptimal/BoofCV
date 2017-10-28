@@ -124,7 +124,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		threshold.setRadius(15);
 		threshold.setOtsuTuning(20);
 
-		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(config.polygon.detector.minimumContour.pixels,
+		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(config.polygon.detector.minimumContour.length,
 				5,10000,2));
 		spinnerMinContourSize.setMaximumSize(spinnerMinContourSize.getPreferredSize());
 		spinnerMinContourSize.addChangeListener(this);
@@ -141,7 +141,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		spinnerContourSplit = new JSpinner(new SpinnerNumberModel(config.polygon.detector.contourToPoly.splitFraction,
 				0.0,1.0,0.01));
 		configureSpinnerFloat(spinnerContourSplit);
-		spinnerContourMinSplit = new JSpinner(new SpinnerNumberModel(config.polygon.detector.contourToPoly.minimumSideFraction,
+		spinnerContourMinSplit = new JSpinner(new SpinnerNumberModel(config.polygon.detector.contourToPoly.minimumSide.fraction,
 				0.0, 1.0, 0.001));
 		configureSpinnerFloat(spinnerContourMinSplit);
 		spinnerContourIterations = new JSpinner(new SpinnerNumberModel(config.polygon.detector.contourToPoly.iterations,
@@ -269,11 +269,11 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 			owner.viewUpdated();
 			return;
 		} else if( e.getSource() == spinnerMinContourSize ) {
-			config.polygon.detector.minimumContour.pixels = ((Number) spinnerMinContourSize.getValue()).intValue();
+			config.polygon.detector.minimumContour.length = ((Number) spinnerMinContourSize.getValue()).intValue();
 		} else if( e.getSource() == spinnerContourSplit ) {
 			config.polygon.detector.contourToPoly.splitFraction = ((Number) spinnerContourSplit.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourMinSplit ) {
-			config.polygon.detector.contourToPoly.minimumSideFraction = ((Number) spinnerContourMinSplit.getValue()).doubleValue();
+			config.polygon.detector.contourToPoly.minimumSide.fraction = ((Number) spinnerContourMinSplit.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourIterations ) {
 			config.polygon.detector.contourToPoly.iterations = ((Number) spinnerContourIterations.getValue()).intValue();
 		} else if( e.getSource() == spinnerSplitPenalty ) {

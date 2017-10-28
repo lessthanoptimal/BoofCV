@@ -26,48 +26,44 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestConfigMinimumSize {
+public class TestConfigLength {
 
 	@Test
-	public void byPixels() {
-		ConfigMinimumSize c = ConfigMinimumSize.byPixels(3);
+	public void fixed() {
+		ConfigLength c = ConfigLength.fixed(3);
 
-		assertEquals(3,c.pixels);
+		assertEquals(3,c.length);
 		assertEquals(-1,c.fraction, UtilEjml.TEST_F64);
 	}
 
 	@Test
-	public void bySize() {
-		ConfigMinimumSize c = ConfigMinimumSize.bySize(0.01);
+	public void relative() {
+		ConfigLength c = ConfigLength.relative(0.01,0);
 
-		assertEquals(-1,c.pixels);
+		assertEquals(0,c.length);
 		assertEquals(0.01,c.fraction, UtilEjml.TEST_F64);
 	}
 
 	@Test
 	public void compute() {
-		ConfigMinimumSize c = ConfigMinimumSize.byPixels(3);
+		ConfigLength c = ConfigLength.fixed(3);
+		assertEquals(3,c.compute(200), UtilEjml.TEST_F64);
 
-		assertEquals(3,c.compute(200,230), UtilEjml.TEST_F64);
+		c = ConfigLength.relative(0.1,18);
+		assertEquals(20,c.compute(200), UtilEjml.TEST_F64);
 
-		c = ConfigMinimumSize.bySize(0.1);
+		c = ConfigLength.relative(0.1,22);
+		assertEquals(22,c.compute(200), UtilEjml.TEST_F64);
 
-		assertEquals(20,c.compute(200,230), UtilEjml.TEST_F64);
-
-		c = new ConfigMinimumSize(25,0.1);
-
-		assertEquals(20,c.compute(200,230), UtilEjml.TEST_F64);
-
-		c = new ConfigMinimumSize(15,0.1);
-
-		assertEquals(15,c.compute(200,230), UtilEjml.TEST_F64);
+		c = ConfigLength.relative(0.1,-1);
+		assertEquals(20,c.compute(200), UtilEjml.TEST_F64);
 	}
 
 	@Test
 	public void copy() {
-		ConfigMinimumSize found = new ConfigMinimumSize(2,0.1).copy();
+		ConfigLength found = new ConfigLength(2,0.1).copy();
 
-		assertEquals(2,found.pixels);
+		assertEquals(2,found.length);
 		assertEquals(0.1,found.fraction,UtilEjml.TEST_F64);
 	}
 }

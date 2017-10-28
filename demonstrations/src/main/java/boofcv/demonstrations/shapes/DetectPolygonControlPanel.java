@@ -20,7 +20,7 @@ package boofcv.demonstrations.shapes;
 
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
-import boofcv.struct.ConfigMinimumSize;
+import boofcv.struct.ConfigLength;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -87,7 +87,7 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 	int maxSides = 6;
 
 	{
-		config.detector.minimumContour = ConfigMinimumSize.byPixels(20);
+		config.detector.minimumContour = ConfigLength.fixed(20);
 	}
 
 	public DetectPolygonControlPanel(DetectBlackPolygonApp owner) {
@@ -116,7 +116,7 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 
 		threshold = new ThresholdControlPanel(owner);
 
-		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(config.detector.minimumContour.pixels,
+		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(config.detector.minimumContour.length,
 				5,10000,2));
 		spinnerMinContourSize.setMaximumSize(spinnerMinContourSize.getPreferredSize());
 		spinnerMinContourSize.addChangeListener(this);
@@ -139,7 +139,7 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		spinnerContourSplit = new JSpinner(new SpinnerNumberModel(config.detector.contourToPoly.splitFraction,
 				0.0,1.0,0.01));
 		configureSpinnerFloat(spinnerContourSplit);
-		spinnerContourMinSplit = new JSpinner(new SpinnerNumberModel(config.detector.contourToPoly.minimumSideFraction,
+		spinnerContourMinSplit = new JSpinner(new SpinnerNumberModel(config.detector.contourToPoly.minimumSide.fraction,
 				0.0, 1.0, 0.001));
 		configureSpinnerFloat(spinnerContourMinSplit);
 		spinnerContourIterations = new JSpinner(new SpinnerNumberModel(config.detector.contourToPoly.iterations,
@@ -285,11 +285,11 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 			owner.viewUpdated();
 			return;
 		} else if( e.getSource() == spinnerMinContourSize ) {
-			config.detector.minimumContour.pixels = ((Number) spinnerMinContourSize.getValue()).intValue();
+			config.detector.minimumContour.length = ((Number) spinnerMinContourSize.getValue()).intValue();
 		} else if( e.getSource() == spinnerContourSplit ) {
 			config.detector.contourToPoly.splitFraction = ((Number) spinnerContourSplit.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourMinSplit ) {
-			config.detector.contourToPoly.minimumSideFraction = ((Number) spinnerContourMinSplit.getValue()).doubleValue();
+			config.detector.contourToPoly.minimumSide.fraction = ((Number) spinnerContourMinSplit.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourIterations ) {
 			config.detector.contourToPoly.iterations = ((Number) spinnerContourIterations.getValue()).intValue();
 		} else if( e.getSource() == spinnerSplitPenalty ) {

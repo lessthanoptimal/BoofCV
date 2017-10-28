@@ -21,6 +21,7 @@ package boofcv.alg.shapes;
 import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitLoop;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitSegment;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
@@ -65,21 +66,21 @@ public class ShapeFittingOps {
 	 * @param loop If true the sequence is a connected at both ends, otherwise it is assumed to not be.
 	 * @param splitFraction A line will be split if a point is more than this fraction of its
 	 *                     length away from the line. Try 0.05
-	 * @param minimumSideFraction The minimum allowed side length as a function of contour length.
+	 * @param minimumSideLength The minimum allowed side length as a function of contour length.
 	 * @param iterations Maximum number of iterations done to improve the fit. Can be 0. Try 50.
 	 * @return Vertexes in the fit polygon.
 	 */
-	public static List<PointIndex_I32> fitPolygon(List<Point2D_I32> sequence,  boolean loop,
-												  double splitFraction, double minimumSideFraction, int iterations) {
+	public static List<PointIndex_I32> fitPolygon(List<Point2D_I32> sequence, boolean loop,
+												  double splitFraction, ConfigLength minimumSideLength, int iterations) {
 		GrowQueue_I32 splits = new GrowQueue_I32();
 
 		if( loop ) {
-			SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(splitFraction,minimumSideFraction,iterations);
+			SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(splitFraction,minimumSideLength,iterations);
 			alg.process(sequence,splits);
 			RefinePolyLineCorner refine = new RefinePolyLineCorner(true,10);
 			refine.fit(sequence,splits);
 		} else {
-			SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(splitFraction,minimumSideFraction,iterations);
+			SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(splitFraction,minimumSideLength,iterations);
 			alg.process(sequence,splits);
 			RefinePolyLineCorner refine = new RefinePolyLineCorner(false,10);
 			refine.fit(sequence,splits);

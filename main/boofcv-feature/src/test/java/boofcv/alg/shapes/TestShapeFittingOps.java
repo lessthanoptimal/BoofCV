@@ -18,6 +18,7 @@
 
 package boofcv.alg.shapes;
 
+import boofcv.struct.ConfigLength;
 import boofcv.struct.PointIndex_I32;
 import georegression.geometry.UtilEllipse_F32;
 import georegression.geometry.UtilEllipse_F64;
@@ -40,6 +41,8 @@ import static org.junit.Assert.*;
  */
 public class TestShapeFittingOps {
 
+	ConfigLength cl = ConfigLength.fixed(0);
+
 	/**
 	 * Fit a polygon to a simple rectangle, loop assumed
 	 */
@@ -47,7 +50,7 @@ public class TestShapeFittingOps {
 	public void fitPolygon_loop() {
 		List<Point2D_I32> sequence = createRectangle();
 
-		List<PointIndex_I32> result = ShapeFittingOps.fitPolygon(sequence,true,0.05,0,100);
+		List<PointIndex_I32> result = ShapeFittingOps.fitPolygon(sequence,true,0.05,cl,100);
 
 		assertEquals(4, result.size());
 		checkPolygon(new int[]{5, 0, 5, 9, 0, 9, 0, 0}, new int[]{5, 14, 19, 0}, result);
@@ -60,7 +63,7 @@ public class TestShapeFittingOps {
 	public void fitPolygon_regular() {
 		List<Point2D_I32> sequence = createRectangle();
 
-		List<PointIndex_I32> result = ShapeFittingOps.fitPolygon(sequence,false,0.05,0,100);
+		List<PointIndex_I32> result = ShapeFittingOps.fitPolygon(sequence,false,0.05,cl,100);
 
 		assertEquals(5, result.size());
 		checkPolygon(new int[]{0, 0, 5, 0, 5, 9, 0, 9, 0, 1}, new int[]{0, 5, 14, 19, 27}, result);

@@ -18,6 +18,7 @@
 
 package boofcv.alg.shapes.polyline.splitmerge;
 
+import boofcv.struct.ConfigLength;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.RectangleLength2D_I32;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -35,7 +36,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestSplitMergeLineFitLoop {
 
-	public static final double MINIMUM_SPLIT_FRACTION = 0.01;
+	public static final ConfigLength MINIMUM_LENGTH = ConfigLength.relative(0.01,0);
+	public static final ConfigLength MINIMUM_LENGTH_5X = ConfigLength.relative(0.05,0);
 
 	GrowQueue_I32 splits = new GrowQueue_I32();
 	
@@ -45,7 +47,7 @@ public class TestSplitMergeLineFitLoop {
 	@Test
 	public void checkZeroOne() {
 		List<Point2D_I32> contour = new ArrayList<>();
-		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15, MINIMUM_SPLIT_FRACTION,100);
+		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15, MINIMUM_LENGTH,100);
 		alg.process(contour,splits);
 		assertEquals(0,splits.size);
 
@@ -61,14 +63,14 @@ public class TestSplitMergeLineFitLoop {
 	public void simpleSquareAll() {
 		List<Point2D_I32> contour = rectToContour(new RectangleLength2D_I32(0,0,10,5));
 
-		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15, MINIMUM_SPLIT_FRACTION,100);
+		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15, MINIMUM_LENGTH,100);
 		alg.process(contour,splits);
 		matchSplitsToExpected(new int[]{8, 12, 21, 25}, splits);
 	}
 
 	@Test
 	public void selectFarthest() {
-		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15, MINIMUM_SPLIT_FRACTION,100);
+		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15, MINIMUM_LENGTH,100);
 		List<Point2D_I32> contour = new ArrayList<>();
 		for( int i = 0; i < 10; i++ )
 			contour.add( new Point2D_I32(i,0));
@@ -90,7 +92,7 @@ public class TestSplitMergeLineFitLoop {
 	 */
 	@Test
 	public void splitPixels_nosplit() {
-		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15,5* MINIMUM_SPLIT_FRACTION,100);
+		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15,MINIMUM_LENGTH_5X,100);
 		alg.contour = new ArrayList<>();
 		for( int i = 0; i < 10; i++ )
 			alg.contour.add( new Point2D_I32(i,0));
@@ -115,7 +117,7 @@ public class TestSplitMergeLineFitLoop {
 	 */
 	@Test
 	public void splitPixels() {
-		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.01, MINIMUM_SPLIT_FRACTION,100);
+		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.01, MINIMUM_LENGTH,100);
 		alg.contour = new ArrayList<>();
 		for( int i = 0; i < 10; i++ )
 			alg.contour.add( new Point2D_I32(i,0));
@@ -152,7 +154,7 @@ public class TestSplitMergeLineFitLoop {
 	 */
 	@Test
 	public void splitPixels_multiple() {
-		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.001, MINIMUM_SPLIT_FRACTION,100);
+		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.001, MINIMUM_LENGTH,100);
 		alg.contour = new ArrayList<>();
 		alg.contour.add( new Point2D_I32(0,0));
 		alg.contour.add( new Point2D_I32(10,10));
@@ -180,7 +182,7 @@ public class TestSplitMergeLineFitLoop {
 
 	@Test
 	public void mergeLines() {
-		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.05, MINIMUM_SPLIT_FRACTION,100);
+		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.05, MINIMUM_LENGTH,100);
 		alg.contour = new ArrayList<>();
 		for( int i = 0; i < 10; i++ )
 			alg.contour.add( new Point2D_I32(i,0));
@@ -213,7 +215,7 @@ public class TestSplitMergeLineFitLoop {
 
 	@Test
 	public void splitSegments() {
-		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.001, MINIMUM_SPLIT_FRACTION,100);
+		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.001, MINIMUM_LENGTH,100);
 		alg.contour = new ArrayList<>();
 		for( int i = 0; i < 10; i++ )
 			alg.contour.add( new Point2D_I32(i,0));
@@ -230,7 +232,7 @@ public class TestSplitMergeLineFitLoop {
 
 	@Test
 	public void circularDistance() {
-		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15,5* MINIMUM_SPLIT_FRACTION,100);
+		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15,MINIMUM_LENGTH_5X,100);
 		alg.N = 15;
 
 		assertEquals(0, alg.circularDistance(0, 0));
@@ -245,7 +247,7 @@ public class TestSplitMergeLineFitLoop {
 	@Test
 	public void selectSplitOffset() {
 
-		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(9.0/9.0, MINIMUM_SPLIT_FRACTION,100);
+		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(9.0/9.0, MINIMUM_LENGTH,100);
 
 		alg.contour = new ArrayList<>();
 		for( int i = 0; i < 10; i++ )
@@ -289,7 +291,7 @@ public class TestSplitMergeLineFitLoop {
 	 */
 	@Test
 	public void selectSplitOffset_minimumSideLengthPixel() {
-		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(9.99/9.0, MINIMUM_SPLIT_FRACTION,100);
+		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(9.99/9.0, MINIMUM_LENGTH,100);
 
 		alg.contour = new ArrayList<>();
 		for( int i = 0; i < 10; i++ )
@@ -325,14 +327,14 @@ public class TestSplitMergeLineFitLoop {
 	 */
 	@Test
 	public void set_minimumSideLengthPixel() {
-		double minSplitFraction = 0.2;
 		List<Point2D_I32> contour = new ArrayList<>();
 
 		for (int i = 0; i < 30; i++) {
 			contour.add(new Point2D_I32(i, 0));
 		}
 
-		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.001,minSplitFraction,100);
+		ConfigLength cl = ConfigLength.relative(0.2,0);
+		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.001,cl,100);
 		alg.process(contour,splits);
 
 		assertEquals(contour.size()/5,alg.minimumSideLengthPixel);

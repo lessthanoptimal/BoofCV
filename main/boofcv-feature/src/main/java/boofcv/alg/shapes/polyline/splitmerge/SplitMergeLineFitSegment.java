@@ -18,6 +18,7 @@
 
 package boofcv.alg.shapes.polyline.splitmerge;
 
+import boofcv.struct.ConfigLength;
 import georegression.metric.Distance2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -33,9 +34,9 @@ import java.util.List;
 public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 
 	public SplitMergeLineFitSegment(double splitFraction,
-									double minimumSplitFraction,
+									ConfigLength minimumSplit,
 									int maxIterations) {
-		super(splitFraction,minimumSplitFraction, maxIterations);
+		super(splitFraction,minimumSplit, maxIterations);
 	}
 
 	@Override

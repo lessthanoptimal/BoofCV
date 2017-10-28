@@ -18,6 +18,7 @@
 
 package boofcv.alg.shapes.polyline.splitmerge;
 
+import boofcv.struct.ConfigLength;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
@@ -33,7 +34,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestSplitMergeLineFitSegment {
 
-	private static final double MIN_SPLIT = 0.1;
+	private static final ConfigLength MIN_SPLIT = ConfigLength.relative(0.1,0);
 
 	GrowQueue_I32 splits = new GrowQueue_I32();
 	
@@ -182,14 +183,15 @@ public class TestSplitMergeLineFitSegment {
 	 */
 	@Test
 	public void set_minimumSideLengthPixel() {
-		double minSplitFraction = 0.1;
 		List<Point2D_I32> contour = new ArrayList<>();
 
 		for (int i = 0; i < 30; i++) {
 			contour.add(new Point2D_I32(i, 0));
 		}
 
-		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.001,minSplitFraction,100);
+		ConfigLength cl = ConfigLength.relative(0.1,0);
+
+		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.001,cl,100);
 		alg.process(contour,splits);
 
 		assertEquals(contour.size()/10,alg.minimumSideLengthPixel);

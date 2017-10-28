@@ -47,7 +47,7 @@ public class TestContourInterestPointDetector {
 
 		List<Point2D_I32> found = new ArrayList<>();
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 15; i++) {
 			alg.process(contour);
 			alg.getInterestPoints(contour,found);
 			int matches = 0;

@@ -18,6 +18,7 @@
 
 package boofcv.alg.shapes.polyline.splitmerge;
 
+import boofcv.struct.ConfigLength;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -55,7 +56,7 @@ public abstract class SplitMergeLineFit {
 
 	// The maximum allowed distance a point can be from a line as a function of the overall
 	// contour length
-	protected double minimumSideLengthFraction;
+	protected ConfigLength minimumSideLength;
 	protected int minimumSideLengthPixel;
 
 	// Reference to the input contour list
@@ -79,15 +80,15 @@ public abstract class SplitMergeLineFit {
 	 * Configures algorithm
 	 * @param splitFraction A line will be split if a point is more than this fraction of its
 	 *                     length away from the line. Try 0.05
-	 * @param minimumSideLengthFraction The minimum length of a side as a function of contour length
+	 * @param minimumSideLength The minimum length of a side as a function of contour length
 	 * @param maxIterations  Maximum number of split and merge refinements. Set to zero to disable refinement. Try 20
 	 */
 	public SplitMergeLineFit(double splitFraction,
-							 double minimumSideLengthFraction,
+							 ConfigLength minimumSideLength,
 							 int maxIterations)
 	{
 		setSplitFraction(splitFraction);
-		setMinimumSideLengthFraction(minimumSideLengthFraction);
+		this.minimumSideLength = minimumSideLength;
 		setMaxIterations(maxIterations);
 	}
 
@@ -100,7 +101,7 @@ public abstract class SplitMergeLineFit {
 	 */
 	public boolean process( List<Point2D_I32> list , GrowQueue_I32 vertexes ) {
 		this.contour = list;
-		this.minimumSideLengthPixel = (int)Math.ceil(contour.size()* minimumSideLengthFraction);
+		this.minimumSideLengthPixel = minimumSideLength.computeI(contour.size());
 		splits.reset();
 
 		boolean result = _process(list);
@@ -134,15 +135,5 @@ public abstract class SplitMergeLineFit {
 
 	public void setAbortSplits(int abortSplits) {
 		this.abortSplits = abortSplits;
-	}
-
-	public double getMinimumSideLengthFraction() {
-		return minimumSideLengthFraction;
-	}
-
-	public void setMinimumSideLengthFraction(double minimumSideLengthFraction) {
-		if( minimumSideLengthFraction >= 1.0 || minimumSideLengthFraction < 0 )
-			throw new IllegalArgumentException("The minimumSplitFraction must be 0 <= val < 1 ");
-		this.minimumSideLengthFraction = minimumSideLengthFraction;
 	}
 }

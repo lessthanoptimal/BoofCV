@@ -20,7 +20,7 @@ package boofcv.factory.shape;
 
 import boofcv.alg.shapes.edge.EdgeIntensityPolygon;
 import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
-import boofcv.struct.ConfigMinimumSize;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
 /**
@@ -77,7 +77,7 @@ public class ConfigPolygonFromContour implements Configuration {
 	/**
 	 * Specifies the minimum allowed contour length.
 	 */
-	public ConfigMinimumSize minimumContour = ConfigMinimumSize.bySize(0.05);
+	public ConfigLength minimumContour = ConfigLength.relative(0.05,4);
 
 	/**
 	 * Will the found polygons be in clockwise order?
