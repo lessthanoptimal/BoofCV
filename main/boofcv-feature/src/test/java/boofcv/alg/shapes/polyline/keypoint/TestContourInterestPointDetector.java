@@ -19,6 +19,7 @@
 package boofcv.alg.shapes.polyline.keypoint;
 
 import boofcv.alg.shapes.polyline.splitmerge.TestSplitMergeLineFitLoop;
+import boofcv.struct.ConfigLength;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.junit.Test;
@@ -33,9 +34,12 @@ import static org.junit.Assert.*;
  */
 public class TestContourInterestPointDetector {
 
+	int period = 5;
+	ConfigLength cperiod = ConfigLength.fixed(period);
+
 	@Test
 	public void simpleLoop() {
-		ContourInterestPointDetector alg = new ContourInterestPointDetector(true,5,1);
+		ContourInterestPointDetector alg = new ContourInterestPointDetector(true, cperiod,1);
 
 		List<Point2D_I32> contour = rect(0,0,10,15);
 
@@ -71,11 +75,11 @@ public class TestContourInterestPointDetector {
 
 	@Test
 	public void computeCornerIntensityLoop() {
-		ContourInterestPointDetector alg = new ContourInterestPointDetector(true,5,1);
+		ContourInterestPointDetector alg = new ContourInterestPointDetector(true,cperiod,1);
 
 		List<Point2D_I32> contour = rect(0,0,10,15);
 
-		alg.computeCornerIntensityLoop(contour);
+		alg.computeCornerIntensityLoop(contour,period);
 
 		GrowQueue_F64 intensity = alg.intensity;
 		assertEquals(contour.size(),intensity.size);
@@ -94,7 +98,7 @@ public class TestContourInterestPointDetector {
 
 	@Test
 	public void nonMaximumSupressionLoop() {
-		ContourInterestPointDetector alg = new ContourInterestPointDetector(true,5,1);
+		ContourInterestPointDetector alg = new ContourInterestPointDetector(true,cperiod,1);
 
 		GrowQueue_F64 intensity = GrowQueue_F64.zeros(20);
 		intensity.set(19,20.0); // test wrapping
@@ -110,7 +114,7 @@ public class TestContourInterestPointDetector {
 		intensity.set(17,3);
 
 		alg.intensity = intensity;
-		alg.nonMaximumSupressionLoop();
+		alg.nonMaximumSupressionLoop(period);
 
 		assertEquals(3,alg.indexes.size);
 		assertEquals(8,alg.indexes.get(0));
