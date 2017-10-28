@@ -34,12 +34,11 @@ public interface PointsToPolyline {
 	 * Computes a polyline from the set of image pixels.
 	 *
 	 * @param input (Input) List of points in order
-	 * @param loop (Input) Is the input list of points a loop or not
 	 * @param vertexes (Output) Indexes in the input list which are corners in the polyline
 	 *
 	 * @return true if successful or false if no fit could be found which matched the requirements
 	 */
-	boolean process(List<Point2D_I32> input , boolean loop , GrowQueue_I32 vertexes );
+	boolean process(List<Point2D_I32> input , GrowQueue_I32 vertexes );
 
 	/**
 	 * Specifies the maximum allowed vertexes. How this is interpreted is implementation specific.
@@ -54,4 +53,11 @@ public interface PointsToPolyline {
 	void setMaxVertexes( int maximum );
 
 	int getMaxVertexes();
+
+	/**
+	 * Is it configured for loops or lines?
+	 *
+	 * @return true means it assumes the input points form a loop.
+	 */
+	boolean isLoop();
 }

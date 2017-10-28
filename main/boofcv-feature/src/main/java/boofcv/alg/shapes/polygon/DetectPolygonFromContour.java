@@ -176,6 +176,9 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		this.contourEdgeThreshold = contourEdgeThreshold;
 		this.inputType = inputType;
 
+		if( !fitPolygon.isLoop() )
+			throw new IllegalArgumentException("ContourToPolygon must be configured for loops");
+
 		if( contourEdgeThreshold > 0 ) {
 			this.contourEdgeIntensity = new ContourEdgeIntensity<>(30, 1, tangentEdgeIntensity, inputType);
 		}
@@ -343,7 +346,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 				}
 
 				// Find the initial approximate fit of a polygon to the contour
-				if( !fitPolygon.process(undistorted,true,splits) ) {
+				if( !fitPolygon.process(undistorted,splits) ) {
 					if( verbose ) System.out.println("rejected polygon initial fit failed. contour size = "+contourTmp.toList());
 					continue;
 				}

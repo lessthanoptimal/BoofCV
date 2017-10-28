@@ -42,7 +42,7 @@ public class FactoryPointsToPolyline {
 			config = new ConfigSplitMergeLineFit();
 		config.checkValidity();
 		return new SplitMergeLineFit_to_PointsToPolyline(
-				config.splitFraction, config.minimumSide,config.iterations);
+				config.splitFraction, config.minimumSide,config.iterations,config.loop);
 	}
 
 }

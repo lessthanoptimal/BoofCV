@@ -34,34 +34,38 @@ import java.util.List;
  */
 public class SplitMergeLineFit_to_PointsToPolyline implements PointsToPolyline {
 
-	SplitMergeLineFitLoop algLoop;
-	SplitMergeLineFitSegment algSegments;
+	SplitMergeLineFit alg;
 
 	public SplitMergeLineFit_to_PointsToPolyline(double splitFraction,
 												 ConfigLength minimumSplit,
-												 int maxIterations)
+												 int maxIterations,
+												 boolean loop )
 	{
-		algLoop = new SplitMergeLineFitLoop(splitFraction, minimumSplit, maxIterations);
-		algSegments = new SplitMergeLineFitSegment(splitFraction, minimumSplit, maxIterations);
+		if( loop ) {
+			alg = new SplitMergeLineFitLoop(splitFraction, minimumSplit, maxIterations);
+		} else {
+			alg = new SplitMergeLineFitSegment(splitFraction, minimumSplit, maxIterations);
+		}
 	}
 
 
 	@Override
-	public boolean process(List<Point2D_I32> input, boolean loop, GrowQueue_I32 vertexes) {
-		if( loop )
-			return algLoop.process(input,vertexes);
-		else
-			return algSegments.process(input,vertexes);
+	public boolean process(List<Point2D_I32> input, GrowQueue_I32 vertexes) {
+		return alg.process(input,vertexes);
 	}
 
 	@Override
 	public void setMaxVertexes(int maximum) {
-		algLoop.setAbortSplits(maximum);
-		algSegments.setAbortSplits(maximum);
+		alg.setAbortSplits(maximum);
 	}
 
 	@Override
 	public int getMaxVertexes() {
-		return algLoop.getAbortSplits();
+		return alg.getAbortSplits();
+	}
+
+	@Override
+	public boolean isLoop() {
+		return alg instanceof SplitMergeLineFitLoop;
 	}
 }

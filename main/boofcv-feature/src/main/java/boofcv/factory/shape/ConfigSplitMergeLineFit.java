@@ -47,7 +47,7 @@ public class ConfigSplitMergeLineFit implements Configuration {
 	/**
 	 * Does the contour loop?
 	 */
-	public boolean loops = true;
+	public boolean loop = true;
 
 	@Override
 	public void checkValidity() {
@@ -59,7 +59,8 @@ public class ConfigSplitMergeLineFit implements Configuration {
 		return "ConfigSplitMergeLineFit{" +
 				"splitFraction=" + splitFraction +
 				", iterations=" + iterations +
-				", minimumSideFraction=" + minimumSide +
+				", minimumSide=" + minimumSide +
+				", loop=" + loop +
 				'}';
 	}
 }
