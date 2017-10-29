@@ -348,7 +348,7 @@ public class TestSplitMergeLineFitLoop {
 		return ret;
 	}
 
-	private boolean matchSplitsToExpected(int[] expected, GrowQueue_I32 found) {
+	public static boolean matchSplitsToExpected(int[] expected, GrowQueue_I32 found) {
 		assertEquals(expected.length,found.size());
 
 		for (int i = 0; i < expected.length; i++) {

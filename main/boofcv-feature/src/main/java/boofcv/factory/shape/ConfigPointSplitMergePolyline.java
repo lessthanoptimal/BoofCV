@@ -27,7 +27,7 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class ConfigPolylineKeyPoint implements Configuration {
+public class ConfigPointSplitMergePolyline implements Configuration {
 	/**
 	 * A line is split if a point along the contour between the two end points has a distance from the line
 	 * which is greater than this fraction of the line's length
@@ -35,12 +35,23 @@ public class ConfigPolylineKeyPoint implements Configuration {
 	public double splitFraction = 0.05;
 
 	/**
+	 * Minimum feature intensity allowed
+	 */
+	public double featureThreshold = 1;
+
+	/**
 	 * Number of split and merge iterations when converting contour into polygon
 	 */
 	public int iterations = 10;
 
-	public ConfigLength period = ConfigLength.relative(0.025,5);
+	/**
+	 * Distance between pixels on contour when computing feature intensity
+	 */
+	public ConfigLength period = ConfigLength.relative(0.1,5);
 
+	/**
+	 * True if the contour loops or false if it is a line segment
+	 */
 	public boolean looping = true;
 
 	@Override
@@ -50,7 +61,7 @@ public class ConfigPolylineKeyPoint implements Configuration {
 
 	@Override
 	public String toString() {
-		return "ConfigPolylineKeyPoint{" +
+		return "ConfigPointSplitMergePolyline{" +
 				"splitFraction=" + splitFraction +
 				", iterations=" + iterations +
 				", period=" + period +

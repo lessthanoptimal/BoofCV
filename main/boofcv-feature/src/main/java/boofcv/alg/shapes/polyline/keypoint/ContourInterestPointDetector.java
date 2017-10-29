@@ -48,7 +48,7 @@ public class ContourInterestPointDetector {
 	LineParametric2D_I32 line = new LineParametric2D_I32();
 
 	// threshold for rejecting corners as a maximum
-	double threshold;
+	double thresholdSq;
 
 	// Is the input a loop or not?
 	boolean loop;
@@ -56,7 +56,7 @@ public class ContourInterestPointDetector {
 	public ContourInterestPointDetector(boolean loop, ConfigLength period, double threshold) {
 		this.loop = loop;
 		this.period = period;
-		this.threshold = threshold;
+		this.thresholdSq = threshold*threshold;
 	}
 
 	public void process(List<Point2D_I32> contour ) {
@@ -81,7 +81,7 @@ public class ContourInterestPointDetector {
 			int target = i+centerOffset;
 			double value = intensity.get(target);
 
-			if( value <= threshold )
+			if( value <= thresholdSq)
 				continue;
 
 			boolean maximum = true;
@@ -104,7 +104,7 @@ public class ContourInterestPointDetector {
 			int target = (i+centerOffset)%intensity.size();
 			double value = intensity.get(target);
 
-			if( value <= threshold )
+			if( value <= thresholdSq)
 				continue;
 
 			boolean maximum = true;
@@ -145,7 +145,7 @@ public class ContourInterestPointDetector {
 			if( line.slopeX == 0 && line.slopeY == 0 ) {
 				intensity.data[center] = 0;
 			} else {
-				intensity.data[center] = Distance2D_I32.distance(line,b);
+				intensity.data[center] = Distance2D_I32.distanceSq(line,b);
 			}
 		}
 
@@ -165,7 +165,7 @@ public class ContourInterestPointDetector {
 			if( line.slopeX == 0 && line.slopeY == 0 ) {
 				intensity.data[center] = 0;
 			} else {
-				intensity.data[center] = Distance2D_I32.distance(line,b);
+				intensity.data[center] = Distance2D_I32.distanceSq(line,b);
 			}
 		}
 	}

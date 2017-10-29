@@ -137,7 +137,7 @@ public class TestContourInterestPointDetector {
 		fail("Implement");
 	}
 
-	private static List<Point2D_I32> rect( int x0 , int y0 , int x1 , int y1 ) {
+	public static List<Point2D_I32> rect( int x0 , int y0 , int x1 , int y1 ) {
 		List<Point2D_I32> out = new ArrayList<>();
 
 		out.addAll( line(x0,y0,x1,y0));

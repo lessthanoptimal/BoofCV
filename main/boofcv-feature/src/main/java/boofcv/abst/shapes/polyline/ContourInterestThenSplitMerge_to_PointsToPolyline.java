@@ -16,40 +16,42 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.polyline.keypoint;
+package boofcv.abst.shapes.polyline;
 
-import boofcv.struct.ConfigLength;
+import boofcv.alg.shapes.polyline.keypoint.ContourInterestThenSplitMerge;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.GrowQueue_I32;
-import org.junit.Test;
 
 import java.util.List;
-
-import static boofcv.alg.shapes.polyline.splitmerge.TestSplitMergeLineFitLoop.matchSplitsToExpected;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestContourInterestThenSplitMerge {
-	@Test
-	public void simpleLoop() {
-		List<Point2D_I32> contour = TestContourInterestPointDetector.rect(10,12,20,22);
+public class ContourInterestThenSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 
-		ContourInterestThenSplitMerge alg = new ContourInterestThenSplitMerge(
-				true, ConfigLength.fixed(5),1,0.1,10);
+	ContourInterestThenSplitMerge alg;
 
-		GrowQueue_I32 found = new GrowQueue_I32();
-
-		assertTrue(alg.process(contour,found));
-
-		matchSplitsToExpected(new int[]{0, 10, 20, 30}, found);
+	public ContourInterestThenSplitMerge_to_PointsToPolyline(ContourInterestThenSplitMerge alg) {
+		this.alg = alg;
 	}
 
-	@Test
-	public void simpleSegment() {
-		fail("implement");
+	@Override
+	public boolean process(List<Point2D_I32> input, GrowQueue_I32 vertexes) {
+		return alg.process(input,vertexes);
 	}
 
+	@Override
+	public void setMaxVertexes(int maximum) {
+		alg.getSplitMerge().setAbortSplits(maximum);
+	}
+
+	@Override
+	public int getMaxVertexes() {
+		return alg.getSplitMerge().getAbortSplits();
+	}
+
+	@Override
+	public boolean isLoop() {
+		return alg.isLoop();
+	}
 }

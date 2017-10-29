@@ -137,6 +137,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 	// temporary storage for a contour
 	private FastQueue<Point2D_I32> contourTmp = new FastQueue<>(Point2D_I32.class,true);
+	List<Point2D_I32> polygonPixel = new ArrayList<>();
 
 	// times for internal profiling
 	double milliContour;
@@ -350,8 +351,9 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 					if( verbose ) System.out.println("rejected polygon initial fit failed. contour size = "+contourTmp.toList());
 					continue;
 				}
+
 				// determine the polygon's orientation
-				List<Point2D_I32> polygonPixel = new ArrayList<>();
+				polygonPixel.clear();
 				for (int j = 0; j < splits.size; j++) {
 					polygonPixel.add(undistorted.get(splits.get(j)));
 				}
