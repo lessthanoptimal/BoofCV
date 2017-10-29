@@ -52,17 +52,14 @@ public class ConfigLength implements Configuration {
 
 	public double compute(int totalLength) {
 
-		double size = -1;
+		double size;
 		if (fraction >= 0) {
 			size = fraction*totalLength;
+			size = Math.max(size, length);
+		} else {
+			size = length;
 		}
-		if( length >= 0 ) {
-			if( size >= 0 ) {
-				size = Math.max(size, length);
-			} else {
-				size = length;
-			}
-		}
+
 		return size;
 	}
 

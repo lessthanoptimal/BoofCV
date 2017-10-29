@@ -37,7 +37,7 @@ public class ConfigPointSplitMergePolyline implements Configuration {
 	/**
 	 * Minimum feature intensity allowed
 	 */
-	public double featureThreshold = 1;
+	public double featureThreshold = 0.1;
 
 	/**
 	 * Number of split and merge iterations when converting contour into polygon
@@ -47,7 +47,7 @@ public class ConfigPointSplitMergePolyline implements Configuration {
 	/**
 	 * Distance between pixels on contour when computing feature intensity
 	 */
-	public ConfigLength period = ConfigLength.relative(0.1,5);
+	public ConfigLength period = ConfigLength.relative(0.05,10);
 
 	/**
 	 * True if the contour loops or false if it is a line segment

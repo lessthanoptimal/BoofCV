@@ -33,6 +33,9 @@ import java.util.List;
  *
  * TODO describe in more detail
  *
+ * Non-maximum suppression is not strict in the sense that equals is allowed. This was determined empirically where
+ * it was discovered to be a common situation.
+ *
  * @author Peter Abeles
  */
 public class ContourInterestPointDetector {
@@ -62,6 +65,11 @@ public class ContourInterestPointDetector {
 	public void process(List<Point2D_I32> contour ) {
 		int period = this.period.computeI(contour.size());
 
+		if( contour.size() <= period ) {
+			indexes.reset();
+			return;
+		}
+
 		if( loop ) {
 			computeCornerIntensityLoop(contour,period);
 			nonMaximumSupressionLoop(period);
@@ -72,6 +80,8 @@ public class ContourInterestPointDetector {
 
 	void nonMaximumSupressionLoop( int period ) {
 		indexes.reset();
+
+//		double thresholdSq = this.thresholdSq * period;
 
 		int centerOffset = period/2;
 
@@ -86,11 +96,9 @@ public class ContourInterestPointDetector {
 
 			boolean maximum = true;
 			for (int k = i; k < i+period; k++) {
-				if( intensity.data[k] >= value ) {
-					if( k != target ) {
-						maximum = false;
-						break;
-					}
+				if( intensity.data[k] > value ) {
+					maximum = false;
+					break;
 				}
 			}
 
@@ -108,14 +116,12 @@ public class ContourInterestPointDetector {
 				continue;
 
 			boolean maximum = true;
-			for (int j = 0; j < period; j++) {
-				int k = CircularIndex.addOffset(i,j,intensity.size());
+			for (int offset = 0; offset < period; offset++) {
+				int k = CircularIndex.addOffset(i,offset,intensity.size());
 
-				if( intensity.get(k) >= value ) {
-					if( k != target ) {
-						maximum = false;
-						break;
-					}
+				if( intensity.get(k) > value ) {
+					maximum = false;
+					break;
 				}
 			}
 			if( maximum ) {
@@ -145,7 +151,7 @@ public class ContourInterestPointDetector {
 			if( line.slopeX == 0 && line.slopeY == 0 ) {
 				intensity.data[center] = 0;
 			} else {
-				intensity.data[center] = Distance2D_I32.distanceSq(line,b);
+				intensity.data[center] = Distance2D_I32.distanceSq(line,b)/a.distance2(c);
 			}
 		}
 
@@ -165,7 +171,7 @@ public class ContourInterestPointDetector {
 			if( line.slopeX == 0 && line.slopeY == 0 ) {
 				intensity.data[center] = 0;
 			} else {
-				intensity.data[center] = Distance2D_I32.distanceSq(line,b);
+				intensity.data[center] = Distance2D_I32.distanceSq(line,b)/a.distance2(c);
 			}
 		}
 	}
