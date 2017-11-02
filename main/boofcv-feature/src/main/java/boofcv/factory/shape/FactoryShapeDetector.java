@@ -104,11 +104,11 @@ public class FactoryShapeDetector {
 	{
 		config.checkValidity();
 
-//		PointsToPolyline contourToPolygon =
-//				FactoryPointsToPolyline.splitMerge(config.contourToPoly);
-
 		PointsToPolyline contourToPolygon =
-				FactoryPointsToPolyline.featuresSplitMerge(null);
+				FactoryPointsToPolyline.splitMerge(config.contourToPoly);
+
+//		PointsToPolyline contourToPolygon =
+//				FactoryPointsToPolyline.featuresSplitMerge(null);
 
 		return new DetectPolygonFromContour<>(
 				config.minimumSides, config.maximumSides, contourToPolygon,
