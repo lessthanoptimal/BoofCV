@@ -19,7 +19,6 @@
 package boofcv.abst.filter.convolve;
 
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
-import boofcv.alg.filter.convolve.ConvolveUnsafe_U8;
 import boofcv.alg.filter.convolve.ConvolveWithBorder;
 import boofcv.alg.filter.convolve.noborder.*;
 import boofcv.alg.misc.ImageMiscOps;
@@ -179,12 +178,6 @@ public class BenchmarkConvolve  {
 	public int timeConvolve2D_I8_I8_DIV(int reps) {
 		for( int i = 0; i < reps; i++ )
 			ConvolveImageNoBorder.convolve(kernel2D_I32, input_U8, out_U8,10);
-		return 0;
-	}
-
-	public int timeConvolveUnsafe2D_I8_I8_DIV(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ConvolveUnsafe_U8.convolve(kernel2D_I32, input_U8, out_U8, 10);
 		return 0;
 	}
 
