@@ -18,6 +18,8 @@
 
 package boofcv.factory.shape;
 
+import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
+import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitLoop;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
@@ -38,6 +40,20 @@ public class ConfigSplitMergeLineFit implements Configuration {
 	 * Number of split and merge iterations when converting contour into polygon
 	 */
 	public int iterations = 10;
+
+	/**
+	 * Number of refine iterations. Set to 0 to disable.
+	 *
+	 * @see RefinePolyLineCorner
+	 */
+	public int refine = 20;
+
+	/**
+	 * If a split adds too much energy to the contour it will be pruned. Disable by setting to a value &le; 0
+	 *
+	 * @see MinimizeEnergyPrune
+	 */
+	public double pruneSplitPenalty = 2.0;
 
 	/**
 	 * The minimum allowed length of a side as a fraction of the total contour length

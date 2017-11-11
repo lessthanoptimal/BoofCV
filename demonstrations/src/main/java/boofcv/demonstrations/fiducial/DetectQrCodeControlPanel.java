@@ -148,7 +148,8 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 				1, 200, 1));
 		spinnerContourIterations.setMaximumSize(spinnerContourIterations.getPreferredSize());
 		spinnerContourIterations.addChangeListener(this);
-		spinnerSplitPenalty = new JSpinner(new SpinnerNumberModel(config.polygon.detector.splitPenalty, 0.0, 100.0, 1.0));
+		spinnerSplitPenalty = new JSpinner(new SpinnerNumberModel(
+				config.polygon.detector.contourToPoly.pruneSplitPenalty , 0.0, 100.0, 1.0));
 		configureSpinnerFloat(spinnerSplitPenalty);
 
 		setBorder = new JCheckBox("Image Border");
@@ -277,7 +278,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		} else if( e.getSource() == spinnerContourIterations ) {
 			config.polygon.detector.contourToPoly.iterations = ((Number) spinnerContourIterations.getValue()).intValue();
 		} else if( e.getSource() == spinnerSplitPenalty ) {
-			config.polygon.detector.splitPenalty = ((Number) spinnerSplitPenalty.getValue()).doubleValue();
+			config.polygon.detector.contourToPoly.pruneSplitPenalty  = ((Number) spinnerSplitPenalty.getValue()).doubleValue();
 		} else if (e.getSource() == spinnerLineSamples) {
 			refineGray.lineSamples = ((Number) spinnerLineSamples.getValue()).intValue();
 		} else if (e.getSource() == spinnerCornerOffset) {

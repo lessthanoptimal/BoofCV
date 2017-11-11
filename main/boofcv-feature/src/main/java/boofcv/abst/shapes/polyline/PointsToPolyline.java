@@ -24,8 +24,9 @@ import org.ddogleg.struct.GrowQueue_I32;
 import java.util.List;
 
 /**
- * Interface for algorithm which convert a continuous sequence of pixel coordinates into a polyline. A polyline is a polygon which
- * is specified using points along the contour. Polyline can be a loop or it can be disconnected
+ * Interface for algorithm which convert a continuous sequence of pixel coordinates into a polyline.
+ * A polyline is a polygon which is specified using points along the contour. Polyline can be a loop or it
+ * can be disconnected.
  *
  * @author Peter Abeles
  */

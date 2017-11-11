@@ -22,8 +22,6 @@ import boofcv.abst.shapes.polyline.PointsToPolyline;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
-import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
-import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform2_F32;
@@ -89,15 +87,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private PointsToPolyline fitPolygon;
 	private GrowQueue_I32 splits = new GrowQueue_I32();
 
-	// removes extra corners
-	private GrowQueue_I32 pruned = new GrowQueue_I32(); // corners after pruning
-	private MinimizeEnergyPrune pruner;
-
 	// Used to prune false positives
 	private ContourEdgeIntensity<T> contourEdgeIntensity;
-
-	// Improve the selection of corner pixels in the contour
-	private RefinePolyLineCorner improveContour = new RefinePolyLineCorner(true,20);
 
 	// extera information for found shapes
 	private FastQueue<Info> foundInfo = new FastQueue<>(Info.class, true);
@@ -146,7 +137,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 	/**
 	 * Configures the detector.
-	 *
 	 * @param minSides minimum number of sides
 	 * @param maxSides maximum number of sides
 	 * @param contourToPolygon Fits a crude polygon to the shape's binary contour
@@ -154,7 +144,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
 	 * @param convex If true it will only return convex shapes
 	 * @param touchBorder if true then shapes which touch the image border are allowed
-	 * @param splitPenalty Penalty given to a line segment while splitting.  See {@link MinimizeEnergyPrune}
 	 * @param contourEdgeThreshold Polygons with an edge intensity less than this are discarded.
 	 * @param inputType Type of input image it's processing
 	 */
@@ -163,7 +152,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 									ConfigLength minimumContour,
 									boolean outputClockwise,
 									boolean convex,
-									boolean touchBorder, double splitPenalty,
+									boolean touchBorder,
 									double contourEdgeThreshold,
 									double tangentEdgeIntensity,
 									Class<T> inputType) {
@@ -183,8 +172,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		if( contourEdgeThreshold > 0 ) {
 			this.contourEdgeIntensity = new ContourEdgeIntensity<>(30, 1, tangentEdgeIntensity, inputType);
 		}
-
-		pruner = new MinimizeEnergyPrune(splitPenalty);
 
 		polygonWork = new Polygon2D_F64(1);
 	}
@@ -295,9 +282,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 */
 	private void findCandidateShapes() {
 
-		// stop fitting the polygon if it clearly has way too many sides
-		int maxSidesConsider = (int)Math.ceil(maxSides*1.5);
-		fitPolygon.setMaxVertexes(2*maxSides);
+		fitPolygon.setMaxVertexes(maxSides);
 
 		// find blobs where all 4 edges are lines
 		FastQueue<ContourPacked> blobs = contourFinder.getContours();
@@ -375,21 +360,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 						continue;
 					}
 				}
-
-				if( splits.size() > maxSidesConsider ) {
-					if( verbose ) System.out.println("Way too many corners, "+splits.size()+". Aborting before improve. Contour size "+contourTmp.size());
-					continue;
-				}
-
-				// Perform a local search and improve the corner placements
-				if( !improveContour.fit(undistorted,splits) ) {
-					if( verbose ) System.out.println("rejected improve contour. contour size = "+contourTmp.size());
-					continue;
-				}
-
-				// reduce the number of corners based on an energy model
-				pruner.prune(undistorted, splits, pruned);
-				splits = pruned;
 
 				// only accept polygons with the expected number of sides
 				if (!expectedNumberOfSides(splits)) {

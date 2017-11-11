@@ -20,7 +20,7 @@ package boofcv.factory.shape;
 
 import boofcv.abst.shapes.polyline.ContourInterestThenSplitMerge_to_PointsToPolyline;
 import boofcv.abst.shapes.polyline.PointsToPolyline;
-import boofcv.abst.shapes.polyline.SplitMergeLineFit_to_PointsToPolyline;
+import boofcv.abst.shapes.polyline.SplitMergeLineRefine_to_PointsToPolyline;
 import boofcv.alg.shapes.polyline.keypoint.ContourInterestThenSplitMerge;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFit;
 
@@ -37,14 +37,14 @@ public class FactoryPointsToPolyline {
 	 * @see SplitMergeLineFit
 	 *
 	 * @param config Configuration. null if use default
-	 * @return {@link SplitMergeLineFit_to_PointsToPolyline}
+	 * @return {@link SplitMergeLineRefine_to_PointsToPolyline}
 	 */
 	public static PointsToPolyline splitMerge(ConfigSplitMergeLineFit config ) {
 		if( config == null )
 			config = new ConfigSplitMergeLineFit();
 		config.checkValidity();
-		return new SplitMergeLineFit_to_PointsToPolyline(
-				config.splitFraction, config.minimumSide,config.iterations,config.loop);
+		return new SplitMergeLineRefine_to_PointsToPolyline(
+				config.splitFraction, config.minimumSide,config.iterations,config.refine,config.pruneSplitPenalty,config.loop);
 	}
 
 	/**

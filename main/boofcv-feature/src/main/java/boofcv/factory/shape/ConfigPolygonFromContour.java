@@ -19,7 +19,6 @@
 package boofcv.factory.shape;
 
 import boofcv.alg.shapes.edge.EdgeIntensityPolygon;
-import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
@@ -49,13 +48,6 @@ public class ConfigPolygonFromContour implements Configuration {
 	 * Configuration for fitting a polygon to the contour.
 	 */
 	public ConfigSplitMergeLineFit contourToPoly = new ConfigSplitMergeLineFit();
-
-	/**
-	 * Magic number used to penalize a polygon when a new corner is added
-	 *
-	 * @see MinimizeEnergyPrune
-	 */
-	public double splitPenalty = 2.0;
 
 	/**
 	 * <p>
@@ -116,7 +108,6 @@ public class ConfigPolygonFromContour implements Configuration {
 				", maximumSides=" + maximumSides +
 				", canTouchBorder=" + canTouchBorder +
 				", contourToPoly=" + contourToPoly +
-				", splitPenalty=" + splitPenalty +
 				", minimumEdgeIntensity=" + minimumEdgeIntensity +
 				", tangentEdgeIntensity=" + tangentEdgeIntensity +
 				", minimumContour=" + minimumContour +
