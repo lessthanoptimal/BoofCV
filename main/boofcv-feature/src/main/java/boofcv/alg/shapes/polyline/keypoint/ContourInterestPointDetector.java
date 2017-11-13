@@ -96,7 +96,8 @@ public class ContourInterestPointDetector {
 
 			boolean maximum = true;
 			for (int k = i; k < i+period; k++) {
-				if( intensity.data[k] > value ) {
+//				if( intensity.get(k) >= value && k != target ) {
+				if( intensity.get(k) > value ) {
 					maximum = false;
 					break;
 				}
@@ -119,6 +120,7 @@ public class ContourInterestPointDetector {
 			for (int offset = 0; offset < period; offset++) {
 				int k = CircularIndex.addOffset(i,offset,intensity.size());
 
+//				if( intensity.get(k) >= value && k != target ) {
 				if( intensity.get(k) > value ) {
 					maximum = false;
 					break;
