@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.polyline;
+package boofcv.alg.shapes.polyline.splitmerge;
 
 import boofcv.misc.CircularIndex;
 import georegression.metric.Distance2D_F64;
@@ -29,10 +29,13 @@ import org.ddogleg.struct.LinkedList;
 import java.util.List;
 
 /**
- * Fits a polyline to a contour by fitting the simplest model and adding more sides to it. First it always finds
+ * Fits a polyline to a contour by fitting the simplest model and adding more sides to it and then
+ * seeing if the lines can be merged together. First it always finds
  * an approximation of a triangle which minimizes the error. A side is added to the current polyline by finding
  * the side that when split will reduce the error by the largest amount. This is repeated until no sides can be
  * split or the maximum number of sides has been reached.
+ *
+ * TODO redo description
  *
  * TODO Sampling of a side
  *
@@ -42,53 +45,42 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PolylineSimpleToComplex {
+public class PolylineSplitMerge {
+	// TODO add max iterations?
+
 	// Can it assume the shape is convex? If so it can reject shapes earlier
-	boolean convex;
+	private boolean convex = false;
 
 	// maximum number of sides it will consider
-	int maxSides;
+	private int maxSides = 100;
 
 	// The minimum length of a side
-	int minimumSideLength;
+	private int minimumSideLength = 10;
 
 	// When selecting the best model how much is a split penalized
-	double cornerScorePenalty;
+	private double cornerScorePenalty = 4;
 
 	// If the score of a side is less than this it is considered a perfect fit and won't be split any more
-	double perfectSideScore;
+	private double perfectSideScore = 1;
 
 	// maximum number of points along a side it will sample when computing a score
 	// used to limit computational cost of large contours
-	int maxNumberOfSideSamples;
+	private int maxNumberOfSideSamples = 50;
+
 	// work space for side score calculation
-	LineParametric2D_F64 line = new LineParametric2D_F64();
+	private LineParametric2D_F64 line = new LineParametric2D_F64();
 
 	// the corner list that's being built
-	LinkedList<Corner> list = new LinkedList<>();
-	FastQueue<Corner> corners = new FastQueue<>(Corner.class,true);
+	private LinkedList<Corner> list = new LinkedList<>();
+	private FastQueue<Corner> corners = new FastQueue<>(Corner.class,true);
 
-	SplitSelector splitter = new MaximumLineDistance();
-	SplitResults resultsA = new SplitResults();
-	SplitResults resultsB = new SplitResults();
+	private SplitSelector splitter = new MaximumLineDistance();
+	private SplitResults resultsA = new SplitResults();
+	private SplitResults resultsB = new SplitResults();
 
 	// List of all the found polylines and their score
-	FastQueue<CandidatePolyline> polylines = new FastQueue<>(CandidatePolyline.class,true);
-	CandidatePolyline bestPolyline;
-
-	public PolylineSimpleToComplex(boolean convex,
-								   int maxSides,
-								   int minimumSideLength,
-								   double cornerScorePenalty,
-								   double perfectSideScore,
-								   int maxNumberOfSideSamples) {
-		this.convex = convex;
-		this.maxSides = maxSides;
-		this.minimumSideLength = minimumSideLength;
-		this.cornerScorePenalty = cornerScorePenalty;
-		this.perfectSideScore = perfectSideScore;
-		this.maxNumberOfSideSamples = maxNumberOfSideSamples;
-	}
+	private FastQueue<CandidatePolyline> polylines = new FastQueue<>(CandidatePolyline.class,true);
+	private CandidatePolyline bestPolyline;
 
 	public boolean process(List<Point2D_I32> contour ) {
 		list.reset();
@@ -123,19 +115,37 @@ public class PolylineSimpleToComplex {
 	 * Saves the current polyline
 	 */
 	private void savePolyline() {
-		CandidatePolyline c = polylines.grow();
-		c.splits.reset();
-
-		double averageScore = 0;
-		LinkedList.Element<Corner> e = list.getHead();
-		while( e != null ) {
-			averageScore += e.object.sideScore;
-			e = e.next;
-
-			c.splits.add( e.object.index );
+		// if a polyline of this size has already been saved then over write it
+		CandidatePolyline c;
+		if( list.size() <= polylines.size+2 ) {
+			c = polylines.get( list.size()-3 );
+			// TODO sanity check to see new poly has a better score
+		} else {
+			c = polylines.grow();
 		}
 
-		c.score = averageScore/list.size() + cornerScorePenalty*list.size();
+		c.score = computeScore(list,cornerScorePenalty);
+
+		c.splits.reset();
+		LinkedList.Element<Corner> e = list.getHead();
+		while( e != null ) {
+			c.splits.add( e.object.index );
+			e = e.next;
+		}
+	}
+
+	/**
+	 * Computes the score for a list
+	 */
+	static double computeScore( LinkedList<Corner> list , double cornerPenalty ) {
+		double sumSides = 0;
+		LinkedList.Element<Corner> e = list.getHead();
+		while( e != null ) {
+			sumSides += e.object.sideScore;
+			e = e.next;
+		}
+
+		return sumSides/list.size() + cornerPenalty*list.size();
 	}
 
 	private boolean findInitialTriangle(List<Point2D_I32> contour) {
@@ -206,6 +216,36 @@ public class PolylineSimpleToComplex {
 	 * @return true if a split was selected and false if not
 	 */
 	private boolean increaseNumberOfSidesByOne(List<Point2D_I32> contour) {
+		LinkedList.Element<Corner> selected = selectCornerToSplit();
+
+		// No side can be split
+		if( selected == null )
+			return false;
+
+		// split the selected side and add a new corner
+		Corner c = corners.grow();
+		c.index = selected.object.splitLocation;
+		LinkedList.Element<Corner> cornerE = list.insertAfter(selected,c);
+
+		// compute the score for sides which just changed
+		computePotentialSplitScore(contour,next(cornerE));
+		computePotentialSplitScore(contour,previous(cornerE));
+
+		// Save the results
+		savePolyline();
+
+		// See if new lines formed by split should be merged together with old adjacent lines
+		considerAndRemoveCorner(contour,cornerE.next,getCurrentPolylineScore());
+		considerAndRemoveCorner(contour,cornerE.previous,getCurrentPolylineScore());
+
+		return true;
+	}
+
+	/**
+	 * Selects the best side to split the polyline at.
+	 * @return the selected side or null if the score will not be improved if any of the sides are split
+	 */
+	private LinkedList.Element<Corner> selectCornerToSplit() {
 		LinkedList.Element<Corner> selected = null;
 		double bestChange = 0;
 
@@ -225,20 +265,54 @@ public class PolylineSimpleToComplex {
 			e = e.next;
 		}
 
-		// No side can be split
-		if( selected == null )
-			return false;
+		return selected;
+	}
 
-		// split the selected side
-		Corner c = corners.grow();
-		c.index = selected.object.splitLocation;
-		list.insertAfter(selected,c);
+	private double getCurrentPolylineScore() {
+		return polylines.get(list.size()-3).score;
+	}
 
-		// compute the score for sides which just changed
-		computePotentialSplitScore(contour,selected);
-		computePotentialSplitScore(contour,selected.next);
+	/**
+	 * See if removing a corner will improve the overall score. If it will remove the score remove the corner
+	 * (merging two sides)
+	 * @param contour Shape's contour
+	 * @param target The corner which is to be removed
+	 * @param scoreCurrent Score of the current polygon
+	 */
+	private void considerAndRemoveCorner( List<Point2D_I32> contour,
+										  LinkedList.Element<Corner> target,
+										  double scoreCurrent ) {
+		LinkedList.Element<Corner> p = previous(target);
+		LinkedList.Element<Corner> n = next(target);
 
-		return true;
+		// Sum up all the sides
+		double sumSides = 0;
+		LinkedList.Element<Corner> e = list.getHead();
+		while( e != null ) {
+			sumSides += e.object.sideScore;
+			e = e.next;
+		}
+
+		// Remove the score from the two sides which are being removed
+		sumSides -= target.object.sideScore + p.object.sideScore;
+
+		// compute the score of the new side
+		double scoreNewSide = scoreSide(contour,p.object.index,n.object.index);
+		sumSides += scoreNewSide;
+
+		// Compute the score for the new side
+		double scoreNoCorner = sumSides/(list.size()-1) + cornerScorePenalty*(list.size()-1);
+
+		// See if the new shape has a better score. if so save the results
+		if( scoreNoCorner < scoreCurrent ) {
+			// Note: the corner is "lost" until the next contour is fit. Not worth the effort to recycle
+			list.remove(target);
+			p.object.splitLocation = target.object.index;
+			p.object.splitScore0 = target.object.sideScore;
+			p.object.splitScore1 = n.object.sideScore;
+			p.object.sideScore = scoreNewSide;
+			savePolyline();
+		}
 	}
 
 	/**
@@ -340,6 +414,17 @@ public class PolylineSimpleToComplex {
 	}
 
 	/**
+	 * Returns the previous corner in the list
+	 */
+	LinkedList.Element<Corner> previous( LinkedList.Element<Corner> e ) {
+		if( e.previous == null ) {
+			return list.getTail();
+		} else {
+			return e.previous;
+		}
+	}
+
+	/**
 	 * For convex shapes no point along the contour can be farther away from A is from B. Thus the maximum number
 	 * of points can't exceed a 1/2 circle.
 	 *
@@ -374,7 +459,7 @@ public class PolylineSimpleToComplex {
 		return dx*dx + dy*dy;
 	}
 
-	private static void assignLine(List<Point2D_I32> contour, int indexA, int indexB, LineParametric2D_F64 line) {
+	public static void assignLine(List<Point2D_I32> contour, int indexA, int indexB, LineParametric2D_F64 line) {
 		Point2D_I32 endA = contour.get(indexA);
 		Point2D_I32 endB = contour.get(indexB);
 
@@ -382,63 +467,6 @@ public class PolylineSimpleToComplex {
 		line.p.y = endA.y;
 		line.slope.x = endB.x-endA.x;
 		line.slope.y = endB.y-endA.y;
-	}
-
-	public static class MaximumLineDistance implements SplitSelector {
-
-		LineParametric2D_F64 line = new LineParametric2D_F64();
-
-		@Override
-		public void selectSplitPoint(List<Point2D_I32> contour, int indexA, int indexB, SplitResults results) {
-			assignLine(contour, indexA, indexB, line);
-
-			if( indexB >= indexA ) {
-				results.index = indexA;
-				results.score = 0;
-				for (int i = indexA+1; i < indexB; i++) {
-					Point2D_I32 p = contour.get(i);
-					double distanceSq = Distance2D_F64.distanceSq(line,p.x,p.y);
-
-					if( distanceSq > results.score ) {
-						results.score = distanceSq;
-						results.index = i;
-					}
-				}
-			} else {
-				results.index = indexA;
-				results.score = 0;
-				int distance = contour.size()-indexB + indexA-1;
-				for (int i = 1; i < distance; i++) {
-					int index = (indexB+i)%contour.size();
-					Point2D_I32 p = contour.get(index);
-					double distanceSq = Distance2D_F64.distanceSq(line,p.x,p.y);
-
-					if( distanceSq > results.score ) {
-						results.score = distanceSq;
-						results.index = index;
-					}
-				}
-			}
-		}
-
-		@Override
-		public int compareScore(double scoreA, double scoreB) {
-			if( scoreA > scoreB )
-				return 1;
-			else if( scoreA < scoreB )
-				return -1;
-			else
-				return 0;
-		}
-	}
-
-	/**
-	 * Interface for splitting a line.
-	 */
-	public interface SplitSelector {
-		void selectSplitPoint( List<Point2D_I32> contour , int indexA , int indexB , SplitResults results );
-
-		int compareScore( double scoreA , double scoreB );
 	}
 
 	public FastQueue<CandidatePolyline> getPolylines() {
@@ -452,7 +480,7 @@ public class PolylineSimpleToComplex {
 	/**
 	 * Storage for results from selecting where to split a line
 	 */
-	private static class SplitResults
+	static class SplitResults
 	{
 		public int index;
 		public double score;
@@ -461,7 +489,7 @@ public class PolylineSimpleToComplex {
 	/**
 	 * Corner in the polyline. The side that this represents is this corner and the next in the list
 	 */
-	private static class Corner
+	static class Corner
 	{
 		public int index;
 		public double sideScore;
@@ -480,5 +508,56 @@ public class PolylineSimpleToComplex {
 		public double score;
 	}
 
+	public boolean isConvex() {
+		return convex;
+	}
+
+	public void setConvex(boolean convex) {
+		this.convex = convex;
+	}
+
+	public int getMaxSides() {
+		return maxSides;
+	}
+
+	public void setMaxSides(int maxSides) {
+		this.maxSides = maxSides;
+	}
+
+	public int getMinimumSideLength() {
+		return minimumSideLength;
+	}
+
+	public void setMinimumSideLength(int minimumSideLength) {
+		this.minimumSideLength = minimumSideLength;
+	}
+
+	public double getCornerScorePenalty() {
+		return cornerScorePenalty;
+	}
+
+	public void setCornerScorePenalty(double cornerScorePenalty) {
+		this.cornerScorePenalty = cornerScorePenalty;
+	}
+
+	public double getPerfectSideScore() {
+		return perfectSideScore;
+	}
+
+	public void setPerfectSideScore(double perfectSideScore) {
+		this.perfectSideScore = perfectSideScore;
+	}
+
+	public int getMaxNumberOfSideSamples() {
+		return maxNumberOfSideSamples;
+	}
+
+	public void setMaxNumberOfSideSamples(int maxNumberOfSideSamples) {
+		this.maxNumberOfSideSamples = maxNumberOfSideSamples;
+	}
+
+	public void setSplitter(SplitSelector splitter) {
+		this.splitter = splitter;
+	}
 }
 

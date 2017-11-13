@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.polyline;
+package boofcv.alg.shapes.polyline.splitmerge;
 
 import org.junit.Test;
 
@@ -25,9 +25,9 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestPolylineSimpleToComplex {
+public class TestMaximumLineDistance {
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void dummy() {
+		fail("implement");
 	}
 }
