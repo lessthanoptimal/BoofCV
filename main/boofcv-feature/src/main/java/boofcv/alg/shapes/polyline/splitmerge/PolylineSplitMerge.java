@@ -61,18 +61,18 @@ public class PolylineSplitMerge {
 	private double cornerScorePenalty = 4;
 
 	// If the score of a side is less than this it is considered a perfect fit and won't be split any more
-	private double perfectSideScore = 1;
+	private double thresholdSideSplitScore = 1;
 
 	// maximum number of points along a side it will sample when computing a score
 	// used to limit computational cost of large contours
-	private int maxNumberOfSideSamples = 50;
+	int maxNumberOfSideSamples = 50;
 
 	// work space for side score calculation
 	private LineParametric2D_F64 line = new LineParametric2D_F64();
 
 	// the corner list that's being built
-	private LinkedList<Corner> list = new LinkedList<>();
-	private FastQueue<Corner> corners = new FastQueue<>(Corner.class,true);
+	LinkedList<Corner> list = new LinkedList<>();
+	FastQueue<Corner> corners = new FastQueue<>(Corner.class,true);
 
 	private SplitSelector splitter = new MaximumLineDistance();
 	private SplitResults resultsA = new SplitResults();
@@ -185,9 +185,9 @@ public class PolylineSplitMerge {
 			LinkedList.Element<Corner> n = e.next;
 			double score;
 			if( n == null ) {
-				score = scoreSide(contour,e.object.index, list.getHead().object.index);
+				score = computeSideError(contour,e.object.index, list.getHead().object.index);
 			} else {
-				score = scoreSide(contour,e.object.index, n.object.index);
+				score = computeSideError(contour,e.object.index, n.object.index);
 			}
 			e.object.sideScore = score;
 			e = n;
@@ -203,7 +203,7 @@ public class PolylineSplitMerge {
 		return true;
 	}
 
-	private void addCorner( int where ) {
+	void addCorner( int where ) {
 		Corner c = corners.grow();
 		c.index = where;
 		list.pushTail(c);
@@ -297,7 +297,7 @@ public class PolylineSplitMerge {
 		sumSides -= target.object.sideScore + p.object.sideScore;
 
 		// compute the score of the new side
-		double scoreNewSide = scoreSide(contour,p.object.index,n.object.index);
+		double scoreNewSide = computeSideError(contour,p.object.index,n.object.index);
 		sumSides += scoreNewSide;
 
 		// Compute the score for the new side
@@ -341,32 +341,36 @@ public class PolylineSplitMerge {
 	/**
 	 * Scores a side based on the sum of Euclidean distance squared of each point along the line. Euclidean squared
 	 * is used because its fast to compute
+	 *
+	 * @param indexA first index. Inclusive
+	 * @param indexA last index. Exclusive
 	 */
-	private double scoreSide( List<Point2D_I32> contour , int indexA , int indexB ) {
+	double computeSideError(List<Point2D_I32> contour , int indexA , int indexB ) {
 		assignLine(contour, indexA, indexB, line);
 
+		// don't sample the end points because the error will be zero by definition
 		int numSamples;
 		double sumOfDistances = 0;
 		if( indexB >= indexA ) {
-			int length = indexB-indexA-2;
+			int length = indexB-indexA-1;
 			numSamples = Math.min(length,maxNumberOfSideSamples);
 			for (int i = 0; i < numSamples; i++) {
-				int index = indexA+1+length*i/(numSamples-1);
+				int index = indexA+1+length*i/numSamples;
 				Point2D_I32 p = contour.get(index);
 				sumOfDistances += Distance2D_F64.distanceSq(line,p.x,p.y);
 			}
-			sumOfDistances /= (indexB-indexA-1);
+			sumOfDistances /= (numSamples+1); // add back the two end point samples
 		} else {
-			int length = contour.size()-indexB + indexA-2;
+			int length = contour.size()-indexA-1 + indexB;
 			numSamples = Math.min(length,maxNumberOfSideSamples);
 			for (int i = 0; i < numSamples; i++) {
-				int where = length*i/(numSamples-1);
-				int index = (indexB+1+where)%contour.size();
+				int where = length*i/numSamples;
+				int index = (indexA+1+where)%contour.size();
 				Point2D_I32 p = contour.get(index);
 				sumOfDistances += Distance2D_F64.distanceSq(line,p.x,p.y);
 			}
+			sumOfDistances /= (numSamples+1);
 		}
-		sumOfDistances /= numSamples;
 
 		return sumOfDistances;
 	}
@@ -378,28 +382,29 @@ public class PolylineSplitMerge {
 	{
 		LinkedList.Element<Corner> e1 = next(e0);
 
-		e0.object.splitable = canBeSplit(contour,e0);
+		e0.object.splitable = canBeSplit(contour.size(),e0);
 
 		if( e0.object.splitable ) {
 			splitter.selectSplitPoint(contour, e0.object.index, e1.object.index, resultsA);
 			e0.object.splitLocation = resultsA.index;
-			e0.object.splitScore0 = scoreSide(contour, e0.object.index, resultsA.index);
-			e0.object.splitScore1 = scoreSide(contour, resultsA.index, e1.object.index);
+			e0.object.splitScore0 = computeSideError(contour, e0.object.index, resultsA.index);
+			e0.object.splitScore1 = computeSideError(contour, resultsA.index, e1.object.index);
 		}
 	}
 
 	/**
-	 * Determines if the side can be split again
+	 * Determines if the side can be split again. A side can always be split as long as
+	 * its >= the minimum length or that the side score is larger the the split threshold
 	 */
-	boolean canBeSplit( List<Point2D_I32> contour , LinkedList.Element<Corner> e0 ) {
+	boolean canBeSplit( int contourSize , LinkedList.Element<Corner> e0 ) {
 		LinkedList.Element<Corner> e1 = next(e0);
 
-		int length = CircularIndex.distance(e0.object.index,e1.object.index,contour.size());
+		int length = CircularIndex.distance(e0.object.index,e1.object.index,contourSize);
 		if( length < minimumSideLength ) {
 			return false;
 		}
 
-		return !(e0.object.sideScore <= perfectSideScore);
+		return !(e0.object.sideScore < thresholdSideSplitScore);
 	}
 
 	/**
@@ -430,6 +435,7 @@ public class PolylineSplitMerge {
 	 *
 	 * NOTE: indexA is probably the top left point in the contour, since that's how most contour algorithm scan
 	 * but this isn't known for sure. If it was known you could make this requirement tighter.
+	 *
 	 * @param contour Contour points
 	 * @param indexA index of first point
 	 * @param indexB index of second point
@@ -441,6 +447,11 @@ public class PolylineSplitMerge {
 
 		int maxAllowed = (int)(2*Math.PI*d+0.5);
 
+		if( indexA > indexB ) {
+			int tmp = indexA;
+			indexA = indexB;
+			indexB = tmp;
+		}
 		if( indexB-indexA > maxAllowed )
 			return false;
 		if( indexA + contour.size()-indexB > maxAllowed )
@@ -459,6 +470,9 @@ public class PolylineSplitMerge {
 		return dx*dx + dy*dy;
 	}
 
+	/**
+	 * Assigns the line so that it passes through points A and B.
+	 */
 	public static void assignLine(List<Point2D_I32> contour, int indexA, int indexB, LineParametric2D_F64 line) {
 		Point2D_I32 endA = contour.get(indexA);
 		Point2D_I32 endB = contour.get(indexB);
@@ -489,7 +503,7 @@ public class PolylineSplitMerge {
 	/**
 	 * Corner in the polyline. The side that this represents is this corner and the next in the list
 	 */
-	static class Corner
+	public static class Corner
 	{
 		public int index;
 		public double sideScore;
@@ -540,12 +554,12 @@ public class PolylineSplitMerge {
 		this.cornerScorePenalty = cornerScorePenalty;
 	}
 
-	public double getPerfectSideScore() {
-		return perfectSideScore;
+	public double getThresholdSideSplitScore() {
+		return thresholdSideSplitScore;
 	}
 
-	public void setPerfectSideScore(double perfectSideScore) {
-		this.perfectSideScore = perfectSideScore;
+	public void setThresholdSideSplitScore(double thresholdSideSplitScore) {
+		this.thresholdSideSplitScore = thresholdSideSplitScore;
 	}
 
 	public int getMaxNumberOfSideSamples() {
