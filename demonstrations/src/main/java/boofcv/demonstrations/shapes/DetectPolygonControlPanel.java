@@ -39,7 +39,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		implements ActionListener, ChangeListener
 {
-	DetectBlackPolygonApp owner;
+	ShapeGuiListener owner;
 
 	// selects which image to view
 	JComboBox imageView;
@@ -90,7 +90,7 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		config.detector.minimumContour = ConfigLength.fixed(20);
 	}
 
-	public DetectPolygonControlPanel(DetectBlackPolygonApp owner) {
+	public DetectPolygonControlPanel(ShapeGuiListener owner) {
 		this.owner = owner;
 
 		imageView = new JComboBox();

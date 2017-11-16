@@ -62,6 +62,9 @@ public class MaximumLineDistance implements SplitSelector {
 				}
 			}
 		}
+
+		if( results.index >= contour.size() )
+			throw new RuntimeException("Egads");
 	}
 
 	@Override

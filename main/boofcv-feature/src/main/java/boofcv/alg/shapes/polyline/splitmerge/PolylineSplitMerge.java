@@ -23,7 +23,7 @@ import georegression.metric.Distance2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.struct.LinkedList;
 import org.ddogleg.struct.LinkedList.Element;
 
@@ -49,6 +49,8 @@ import java.util.List;
 public class PolylineSplitMerge {
 	// todo if flagged as convex only add the corner if it would be convex. that can be done earily if CCW is known
 	// TODO add max iterations?
+	// todo add max side error?
+	// TODO non loop version
 
 	// Can it assume the shape is convex? If so it can reject shapes earlier
 	private boolean convex = false;
@@ -84,7 +86,11 @@ public class PolylineSplitMerge {
 	private FastQueue<CandidatePolyline> polylines = new FastQueue<>(CandidatePolyline.class,true);
 	private CandidatePolyline bestPolyline;
 
+	int contourSize;
+
 	public boolean process(List<Point2D_I32> contour ) {
+		contourSize = contour.size();
+
 		list.reset();
 		corners.reset();
 		polylines.reset();
@@ -216,7 +222,10 @@ public class PolylineSplitMerge {
 	}
 
 	Element<Corner> addCorner( int where ) {
+		if( where >= contourSize )
+			throw new RuntimeException("Egads");
 		Corner c = corners.grow();
+		c.reset();
 		c.index = where;
 		list.pushTail(c);
 		return list.getTail();
@@ -239,9 +248,13 @@ public class PolylineSplitMerge {
 		selected.object.sideError = selected.object.splitError0;
 		// split the selected side and add a new corner
 		Corner c = corners.grow();
+		c.reset();
 		c.index = selected.object.splitLocation;
 		c.sideError = selected.object.splitError1;
 		Element<Corner> cornerE = list.insertAfter(selected,c);
+
+		if( c.index >= contour.size() )
+			throw new RuntimeException("Egads");
 
 		// compute the score for sides which just changed
 		computePotentialSplitScore(contour,next(cornerE));
@@ -292,8 +305,10 @@ public class PolylineSplitMerge {
 	 * @param contour Shape's contour
 	 * @param target The corner which is to be removed
 	 */
-	void considerRemovingAndRemove(List<Point2D_I32> contour,
-										   Element<Corner> target ) {
+	void considerRemovingAndRemove(List<Point2D_I32> contour, Element<Corner> target ) {
+		if( list.size() <= 3 )
+			return;
+
 		Element<Corner> p = previous(target);
 		Element<Corner> n = next(target);
 
@@ -309,6 +324,10 @@ public class PolylineSplitMerge {
 			p.object.splitError0 = target.object.sideError;
 			p.object.splitError1 = n.object.sideError;
 			p.object.sideError = sideScoreNew;
+
+			if( p.object.splitLocation >= contour.size() )
+				throw new RuntimeException("Egads");
+
 			list.remove(target);
 			savePolyline();
 		}
@@ -393,6 +412,9 @@ public class PolylineSplitMerge {
 		e0.object.splitLocation = resultsA.index;
 		e0.object.splitError0 = computeSideError(contour, e0.object.index, resultsA.index);
 		e0.object.splitError1 = computeSideError(contour, resultsA.index, e1.object.index);
+
+		if( e0.object.splitLocation >= contour.size() )
+			throw new RuntimeException("Egads");
 	}
 
 	/**
@@ -517,11 +539,19 @@ public class PolylineSplitMerge {
 
 		// if a side can't be split (e.g. too small or already perfect)
 		public boolean splitable;
+
+		public void reset() {
+			index = -1;
+			sideError = -1;
+			splitLocation = -1;
+			splitError0 = splitError1 = -1;
+			splitable = true;
+		}
 	}
 
 	public static class CandidatePolyline
 	{
-		public GrowQueue_I8 splits = new GrowQueue_I8();
+		public GrowQueue_I32 splits = new GrowQueue_I32();
 		public double score;
 	}
 
