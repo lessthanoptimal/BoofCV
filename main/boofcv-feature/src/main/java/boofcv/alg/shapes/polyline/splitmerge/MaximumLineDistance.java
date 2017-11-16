@@ -50,9 +50,9 @@ public class MaximumLineDistance implements SplitSelector {
 		} else {
 			results.index = indexA;
 			results.score = 0;
-			int distance = contour.size()-indexB + indexA-1;
+			int distance = contour.size()-indexA + indexB-1;
 			for (int i = 1; i < distance; i++) {
-				int index = (indexB+i)%contour.size();
+				int index = (indexA+i)%contour.size();
 				Point2D_I32 p = contour.get(index);
 				double distanceSq = Distance2D_F64.distanceSq(line,p.x,p.y);
 
