@@ -51,8 +51,12 @@ public class TestPolylineSplitMerge {
 
 		PolylineSplitMerge.CandidatePolyline result = alg.getBestPolyline();
 
+//		for (int i = 0; i < result.splits.size; i++) {
+//			System.out.println(contour.get(result.splits.get(i)));
+//		}
+
 		assertEquals(4,result.splits.size);
-		assertEquals(0.1,result.score, 1e-8);
+		assertEquals(0.1*4,result.score, 1e-8);
 	}
 
 	@Test
@@ -114,8 +118,8 @@ public class TestPolylineSplitMerge {
 		// te indexes are what it should be no matter what
 		Element<Corner> e = alg.list.getHead();
 		assertEquals(9,e.object.index);e = e.next;
-		assertEquals(0,e.object.index);e = e.next;
-		assertEquals(19,e.object.index);
+		assertEquals(19,e.object.index);e = e.next;
+		assertEquals(0,e.object.index);
 	}
 
 	/**
@@ -147,9 +151,13 @@ public class TestPolylineSplitMerge {
 
 		assertEquals(4,alg.list.size());
 		e = alg.list.getHead();
+		assertEquals(0,e.object.sideError,1e-8);
 		assertEquals(10,e.object.index);e = e.next;
+		assertEquals(0,e.object.sideError,1e-8);
 		assertEquals(20,e.object.index);e = e.next;
+		assertEquals(0,e.object.sideError,1e-8);
 		assertEquals(30,e.object.index);e = e.next;
+		assertEquals(0,e.object.sideError,1e-8);
 		assertEquals(0,e.object.index);
 	}
 

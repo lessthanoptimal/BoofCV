@@ -95,6 +95,7 @@ public class LinearContourLabelChang2004 {
 	 */
 	public void process(GrayU8 binary , GrayS32 labeled ) {
 		// initialize data structures
+		labeled.reshape(binary.width,binary.height);
 
 		// ensure that the image border pixels are filled with zero by enlarging the image
 		if( border.width != binary.width+2 || border.height != binary.height+2)  {
