@@ -38,6 +38,7 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 		alg.setMaxNumberOfSideSamples(config.maxNumberOfSideSamples);
 		alg.setMaxSides(config.maxSides);
 		alg.setMinSides(config.minSides);
+		alg.setExtraConsider(config.extraConsider);
 		alg.setConvex(config.convex);
 		alg.setThresholdSideSplitScore(config.thresholdSideSplitScore);
 		alg.setCornerScorePenalty(config.cornerScorePenalty);

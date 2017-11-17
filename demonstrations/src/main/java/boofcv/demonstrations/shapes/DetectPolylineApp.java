@@ -48,7 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Application which lets you configure the black polygon detector in real-time
+ * Application which lets you select and configure different polyline fitting algorithms
  *
  * @author Peter Abeles
  */
@@ -89,10 +89,11 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 			c.minSides = config.detector.minimumSides;
 			c.maxSides = config.detector.maximumSides;
 			c.convex = config.detector.convex;
-			c.cornerScorePenalty = 0.1;
-			c.thresholdSideSplitScore = 0;//0.15;
+			c.cornerScorePenalty = 0.15;
+			c.thresholdSideSplitScore = 0.15;
 //			c.maxNumberOfSideSamples = 50;
-			c.minimumSideLength = 4;
+			c.minimumSideLength = 1;
+			c.extraConsider = 4;
 
 			minimumContourSize = config.detector.minimumContour;
 			contourToPolyline = new NewSplitMerge_to_PointsToPolyline(c);
@@ -206,7 +207,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 		app.openFile(new File(examples.get(0)));
 
 		app.waitUntilInputSizeIsKnown();
-		app.display("Detect Black Polygons");
+		app.display("Detect Polylines");
 	}
 
 
