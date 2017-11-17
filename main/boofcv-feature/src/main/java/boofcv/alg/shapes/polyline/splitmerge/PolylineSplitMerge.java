@@ -105,25 +105,30 @@ public class PolylineSplitMerge {
 
 		if( !findInitialTriangle(contour) )
 			return false;
-//		printCurrent(contour);
 		savePolyline(contour.size());
 
-
-		// Split until it reaches the maximum consider
-
-		// merge corners until no more can be merged
-
-		// split until max consider reached
-
-		// repeat
-
-		// Since this uses a greedy approach you need to search for more than is needed for it to undo a bad
-		// decision. TODO make into a parameters?
-		int extraConsider = 2;
-		for (int numSides = 4; numSides <= maxSides+extraConsider; numSides++) {
-			if( !increaseNumberOfSidesByOne(contour) ) {
+		int extraConsider = 4;
+		int limit = maxSides+extraConsider;
+		for (int i = 0; i < 10; i++) {
+//			System.out.println("*********** GROWING");
+			boolean change = false;
+			while( list.size() < limit ) {
+				if( !increaseNumberOfSidesByOne(contour) ) {
+					break;
+				}
+//				printCurrent(contour);
+				change = true;
+			}
+//			break;
+//			System.out.println("*********** SHRINKING");
+			while( change ) {
+				change = selectAndRemoveCorner(contour);
+//				printCurrent(contour);
+			}
+			if( !change ) {
 				break;
 			}
+
 		}
 
 		bestPolyline = null;
@@ -336,8 +341,8 @@ public class PolylineSplitMerge {
 		savePolyline(contour.size());
 
 		// See if new lines formed by split should be merged together with old adjacent lines
-		considerRemovingAndRemove(contour,next(cornerE));
-		considerRemovingAndRemove(contour,previous(cornerE));
+//		considerRemovingAndRemove(contour,next(cornerE));
+//		considerRemovingAndRemove(contour,previous(cornerE));
 
 		return true;
 	}
@@ -361,6 +366,10 @@ public class PolylineSplitMerge {
 
 			// compute how much better the score will improve because of the split
 			double change = c.sideError - c.splitError0 - c.splitError1;
+			// it was found that selecting for the biggest change tends to produce better results
+			if( change < 0 ) {
+				change = -change;
+			}
 			if( change > bestChange ) {
 				bestChange = change;
 				selected = e;
@@ -400,6 +409,51 @@ public class PolylineSplitMerge {
 			list.remove(target);
 			computePotentialSplitScore(contour,p);
 
+			savePolyline(contour.size());
+			return true;
+		}
+		return false;
+	}
+
+	boolean selectAndRemoveCorner(List<Point2D_I32> contour ) {
+		if( list.size() <= 3 )
+			return false;
+
+		Element<Corner> target = list.getHead();
+		Element<Corner> best = null;
+		double bestScore = 0;
+		double newEdgeScore = -1;
+
+		double cornerPenalty = computeCornerPenalty(contour.size(), cornerScorePenalty);
+
+		while( target != null ) {
+
+			Element<Corner> p = previous(target);
+			Element<Corner> n = next(target);
+
+			// just contributions of the corners in question
+			double before = p.object.sideError + target.object.sideError + cornerPenalty;
+			double after = computeSideError(contour, p.object.index, n.object.index);
+
+			if( before-after > bestScore ) {
+				bestScore = before-after;
+				newEdgeScore = after;
+				best = target;
+			}
+			target = target.next;
+		}
+
+		// See if the new shape has a better score. if so save the results
+		if( best != null ) {
+//			System.out.println("removing a corner idx="+target.object.index);
+			// Note: the corner is "lost" until the next contour is fit. Not worth the effort to recycle
+//			p.object.splitLocation = target.object.index;
+//			p.object.splitError0 = target.object.sideError;
+//			p.object.splitError1 = n.object.sideError;
+			Element<Corner> p = previous(best);
+			p.object.sideError = newEdgeScore;
+			list.remove(best);
+			computePotentialSplitScore(contour,p);
 			savePolyline(contour.size());
 			return true;
 		}

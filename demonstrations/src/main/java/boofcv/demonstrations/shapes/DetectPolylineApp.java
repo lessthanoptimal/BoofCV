@@ -89,8 +89,10 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 			c.minSides = config.detector.minimumSides;
 			c.maxSides = config.detector.maximumSides;
 			c.convex = config.detector.convex;
-			c.cornerScorePenalty = 0.0;
+			c.cornerScorePenalty = 0.1;
+			c.thresholdSideSplitScore = 0;//0.15;
 //			c.maxNumberOfSideSamples = 50;
+			c.minimumSideLength = 4;
 
 			minimumContourSize = config.detector.minimumContour;
 			contourToPolyline = new NewSplitMerge_to_PointsToPolyline(c);
