@@ -52,6 +52,8 @@ public class PolylineSplitMerge {
 	// todo Change how score is computed to minimize overflow
 	// TODO non loop version
 	// TODO Figure out why it sometimes picks a not so great corner
+	// TODO doesn't select a good corner when the other wise is parallel to it. happens when going from 2 to 3 corners.
+	// TODO need to add a way to abort early if it's obvious the shape is too complex
 
 	// Can it assume the shape is convex? If so it can reject shapes earlier
 	private boolean convex = false;
@@ -564,16 +566,19 @@ public class PolylineSplitMerge {
 	{
 		double d = Math.sqrt(distanceSq(contour.get(indexA),contour.get(indexB)));
 
-		int maxAllowed = (int)(2*Math.PI*d+0.5);
+		// conservative upper bounds would be 1/2 a circle.
+		int maxAllowed = (int)(Math.PI*d+0.5);
 
 		if( indexA > indexB ) {
 			int tmp = indexA;
 			indexA = indexB;
 			indexB = tmp;
 		}
-		if( indexB-indexA > maxAllowed )
-			return false;
-		if( indexA + contour.size()-indexB > maxAllowed )
+
+		int length0 = CircularIndex.subtract(indexA,indexB,contour.size());
+		int length1 = CircularIndex.subtract(indexB,indexA,contour.size());
+
+		if( length0 > maxAllowed || length1 > maxAllowed )
 			return false;
 
 		return true;

@@ -73,10 +73,12 @@ public class TestPolylineSplitMerge {
 		alg.addCorner(0);
 		alg.addCorner(0);
 
-		alg.savePolyline();
+		alg.savePolyline(20);
 
 		assertTrue(alg.getPolylines().get(1).score > 0);
 		assertEquals(4,alg.getPolylines().get(1).splits.size);
+
+		fail("update to check if saved or not");
 	}
 
 	@Test
@@ -198,7 +200,7 @@ public class TestPolylineSplitMerge {
 	 * Test case where the corner is removed
 	 */
 	@Test
-	public void considerRemovingAndRemove_positive() {
+	public void selectAndRemoveCorner_positive() {
 		List<Point2D_I32> contour = rect(10,12,20,18);
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
@@ -214,15 +216,16 @@ public class TestPolylineSplitMerge {
 		e1.object.sideError = 0;
 		e2.object.sideError = 0;
 
-		alg.considerRemovingAndRemove(contour,e2);
+		alg.selectAndRemoveCorner(contour);
 		assertEquals(3,alg.list.size());
+		fail("update. no longer given an edge");
 	}
 
 	/**
 	 * Test case where the corner is NOT removed
 	 */
 	@Test
-	public void considerRemovingAndRemove_negative() {
+	public void selectAndRemoveCorner_negative() {
 		List<Point2D_I32> contour = rect(10,12,20,18);
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
@@ -238,8 +241,9 @@ public class TestPolylineSplitMerge {
 		e1.object.sideError = 0;
 		e2.object.sideError = 0;
 
-		alg.considerRemovingAndRemove(contour,e2);
+		alg.selectAndRemoveCorner(contour);
 		assertEquals(4,alg.list.size());
+		fail("update. no longer given an edge");
 	}
 
 //	@Test

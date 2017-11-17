@@ -93,7 +93,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 			c.thresholdSideSplitScore = 0.15;
 //			c.maxNumberOfSideSamples = 50;
 			c.minimumSideLength = 1;
-			c.extraConsider = 4;
+			c.extraConsider = 10;
 
 			minimumContourSize = config.detector.minimumContour;
 			contourToPolyline = new NewSplitMerge_to_PointsToPolyline(c);
