@@ -32,6 +32,7 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
@@ -60,6 +61,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 	List<List<Point2D_I32>> polylines = new ArrayList<>();
 	GrayS32 labeled = new GrayS32(1,1);
 	List<Contour> contours;
+	ConfigLength minimumContourSize;
 
 	public DetectPolylineApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);
@@ -84,8 +86,13 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 			}
 
 			ConfigPolylineSplitMerge c = new ConfigPolylineSplitMerge();
-
+			c.minSides = config.detector.minimumSides;
+			c.maxSides = config.detector.maximumSides;
 			c.convex = config.detector.convex;
+			c.cornerScorePenalty = 0.0;
+//			c.maxNumberOfSideSamples = 50;
+
+			minimumContourSize = config.detector.minimumContour;
 			contourToPolyline = new NewSplitMerge_to_PointsToPolyline(c);
 		}
 		imageThresholdUpdated();
@@ -117,10 +124,14 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 
 		contours = BinaryImageOps.convertContours(binaryToContour.getPackedPoints(),binaryToContour.getContours());
 
+		int minContourPixels = minimumContourSize.computeI(Math.min(input.width,input.height));
+
 		polylines.clear();
 		GrowQueue_I32 indices = new GrowQueue_I32();
 		for (int i = 0; i < contours.size(); i++) {
 			List<Point2D_I32> contour = contours.get(i).external;
+			if( contour.size() < minContourPixels )
+				continue;
 			if( contourToPolyline.process(contour,indices) ) {
 				List<Point2D_I32> l = new ArrayList<>();
 				for (int j = 0; j < indices.size; j++) {

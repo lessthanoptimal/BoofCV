@@ -19,6 +19,7 @@
 package boofcv.alg.shapes.polyline.splitmerge;
 
 import boofcv.misc.CircularIndex;
+import georegression.geometry.UtilPolygons2D_I32;
 import georegression.metric.Distance2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -43,26 +44,28 @@ import java.util.List;
  * TODO how sides are scored
  *
  *
+ * The polyline will always be in counter-clockwise ordering.
  *
  * @author Peter Abeles
  */
 public class PolylineSplitMerge {
-	// todo if flagged as convex only add the corner if it would be convex. that can be done earily if CCW is known
 	// TODO add max iterations?
-	// todo add max side error?
+	// todo add max side error to accept a solution?
 	// TODO non loop version
 
 	// Can it assume the shape is convex? If so it can reject shapes earlier
 	private boolean convex = false;
 
 	// maximum number of sides it will consider
-	private int maxSides = 100;
+	private int maxSides = 20;
+	// minimum number of sides that will be considered for the best polyline
+	private int minSides = 3;
 
 	// The minimum length of a side
 	private int minimumSideLength = 10;
 
 	// When selecting the best model how much is a split penalized
-	private double cornerScorePenalty = 2;
+	private double cornerScorePenalty = 0.5;
 
 	// If the score of a side is less than this it is considered a perfect fit and won't be split any more
 	private double thresholdSideSplitScore = 1;
@@ -89,6 +92,7 @@ public class PolylineSplitMerge {
 	int contourSize;
 
 	public boolean process(List<Point2D_I32> contour ) {
+//		System.out.println("\n\n\nBEGIN\n\n\n");
 		contourSize = contour.size();
 
 		list.reset();
@@ -101,29 +105,60 @@ public class PolylineSplitMerge {
 
 		if( !findInitialTriangle(contour) )
 			return false;
-		savePolyline();
+//		printCurrent(contour);
+		savePolyline(contour.size());
 
-		for (int numSides = 4; numSides < maxSides; numSides++) {
-			if( !increaseNumberOfSidesByOne(contour) )
+
+		// Split until it reaches the maximum consider
+
+		// merge corners until no more can be merged
+
+		// split until max consider reached
+
+		// repeat
+
+		// Since this uses a greedy approach you need to search for more than is needed for it to undo a bad
+		// decision. TODO make into a parameters?
+		int extraConsider = 2;
+		for (int numSides = 4; numSides <= maxSides+extraConsider; numSides++) {
+			if( !increaseNumberOfSidesByOne(contour) ) {
 				break;
-			savePolyline();
+			}
 		}
 
-		bestPolyline = polylines.get(0);
-		for (int i = 1; i < polylines.size; i++) {
-			if( polylines.get(i).score < bestPolyline.score ) {
+		bestPolyline = null;
+		double bestScore = Double.MAX_VALUE;
+		for (int i = minSides-3; i < Math.min(maxSides-2,polylines.size); i++) {
+			if( polylines.get(i).score < bestScore ) {
 				bestPolyline = polylines.get(i);
+				bestScore = bestPolyline.score;
 			}
 		}
 
 		return true;
 	}
 
-	private void printCurrent() {
-		System.out.print("Indexes[");
+	private void printCurrent( List<Point2D_I32> contour ) {
+		System.out.print(list.size()+"  Indexes[");
 		Element<Corner> e = list.getHead();
 		while( e != null ) {
 			System.out.print(" "+e.object.index);
+			e = e.next;
+		}
+		System.out.println(" ]");
+		System.out.print("   Errors[");
+		e = list.getHead();
+		while( e != null ) {
+			String split = e.object.splitable ? "T" : "F";
+			System.out.print(String.format(" %6.1f %1s",e.object.sideError,split));
+			e = e.next;
+		}
+		System.out.println(" ]");
+		System.out.print("      Pos[");
+		e = list.getHead();
+		while( e != null ) {
+			Point2D_I32 p = contour.get(e.object.index);
+			System.out.print(String.format(" %3d %3d,",p.x,p.y));
 			e = e.next;
 		}
 		System.out.println(" ]");
@@ -132,23 +167,34 @@ public class PolylineSplitMerge {
 	/**
 	 * Saves the current polyline
 	 */
-	void savePolyline() {
+	boolean savePolyline( int contourSize ) {
 		// if a polyline of this size has already been saved then over write it
 		CandidatePolyline c;
 		if( list.size() <= polylines.size+2 ) {
+//			System.out.println("  save poly. compare against existing. "+polylines.size+"  "+list.size());
 			c = polylines.get( list.size()-3 );
 			// TODO sanity check to see new poly has a better score
 		} else {
+//			System.out.println("  save poly. new                     . "+polylines.size+"  "+list.size());
 			c = polylines.grow();
+			c.score = Double.MAX_VALUE;
 		}
 
-		c.score = computeScore(list,cornerScorePenalty);
+		double foundScore = computeScore(list,computeCornerPenalty(contourSize,cornerScorePenalty));
 
-		c.splits.reset();
-		Element<Corner> e = list.getHead();
-		while( e != null ) {
-			c.splits.add( e.object.index );
-			e = e.next;
+		// only save the results if it's an improvement
+		if( c.score > foundScore ) {
+			c.score = foundScore;
+			c.splits.reset();
+			Element<Corner> e = list.getHead();
+			while (e != null) {
+				c.splits.add(e.object.index);
+				e = e.next;
+			}
+			return true;
+		} else {
+//			System.out.println("Worse score! "+c.score+" vs "+foundScore);
+			return false;
 		}
 	}
 
@@ -163,7 +209,11 @@ public class PolylineSplitMerge {
 			e = e.next;
 		}
 
-		return sumSides/list.size() + cornerPenalty*list.size();
+		return sumSides + cornerPenalty*list.size();
+	}
+
+	static double computeCornerPenalty( int contourSize , double parameter ) {
+		return contourSize*parameter;
 	}
 
 	boolean findInitialTriangle(List<Point2D_I32> contour) {
@@ -195,6 +245,9 @@ public class PolylineSplitMerge {
 		splitter.selectSplitPoint(contour,index1,index0,resultsA);
 		addCorner(resultsA.index);
 
+		// enforce CCW requirement
+		ensureTriangleIsCCW(contour);
+
 		// TODO recompute the seed corner? maximum distance from some arbitrary point is kinda arbitrary
 
 		// Score each side
@@ -221,9 +274,29 @@ public class PolylineSplitMerge {
 		return true;
 	}
 
+	/**
+	 * Ensure that thr triangle is in CCW ordering
+	 */
+	void ensureTriangleIsCCW(List<Point2D_I32> contour ) {
+		Element<Corner> e = list.getHead();
+		Corner a = e.object;e=e.next;
+		Corner b = e.object;e=e.next;
+		Corner c = e.object;
+
+		Point2D_I32 pa = contour.get(a.index);
+		Point2D_I32 pb = contour.get(b.index);
+		Point2D_I32 pc = contour.get(c.index);
+
+		// see if it is in clock-wise ordering
+		if( UtilPolygons2D_I32.isPositiveZ(pa,pb,pc) ) {
+			list.reset();
+			list.pushHead(c);
+			list.pushHead(b);
+			list.pushHead(a);
+		}
+	}
+
 	Element<Corner> addCorner( int where ) {
-		if( where >= contourSize )
-			throw new RuntimeException("Egads");
 		Corner c = corners.grow();
 		c.reset();
 		c.index = where;
@@ -238,6 +311,7 @@ public class PolylineSplitMerge {
 	 * @return true if a split was selected and false if not
 	 */
 	boolean increaseNumberOfSidesByOne(List<Point2D_I32> contour) {
+//		System.out.println("increase number of sides by one. list = "+list.size());
 		Element<Corner> selected = selectCornerToSplit();
 
 		// No side can be split
@@ -253,15 +327,13 @@ public class PolylineSplitMerge {
 		c.sideError = selected.object.splitError1;
 		Element<Corner> cornerE = list.insertAfter(selected,c);
 
-		if( c.index >= contour.size() )
-			throw new RuntimeException("Egads");
-
 		// compute the score for sides which just changed
-		computePotentialSplitScore(contour,next(cornerE));
-		computePotentialSplitScore(contour,previous(cornerE));
+		computePotentialSplitScore(contour,cornerE);
+		computePotentialSplitScore(contour,selected);
 
 		// Save the results
-		savePolyline();
+//		printCurrent(contour);
+		savePolyline(contour.size());
 
 		// See if new lines formed by split should be merged together with old adjacent lines
 		considerRemovingAndRemove(contour,next(cornerE));
@@ -276,7 +348,7 @@ public class PolylineSplitMerge {
 	 */
 	Element<Corner> selectCornerToSplit() {
 		Element<Corner> selected = null;
-		double bestChange = 0;
+		double bestChange = convex ? 0 : -Double.MAX_VALUE;
 
 		// Pick the side that if split would improve the overall score the most
 		Element<Corner> e = list.getHead();
@@ -288,7 +360,7 @@ public class PolylineSplitMerge {
 			}
 
 			// compute how much better the score will improve because of the split
-			double change = c.sideError -(c.splitError0 +c.splitError1)/2.0;
+			double change = c.sideError - c.splitError0 - c.splitError1;
 			if( change > bestChange ) {
 				bestChange = change;
 				selected = e;
@@ -305,32 +377,33 @@ public class PolylineSplitMerge {
 	 * @param contour Shape's contour
 	 * @param target The corner which is to be removed
 	 */
-	void considerRemovingAndRemove(List<Point2D_I32> contour, Element<Corner> target ) {
+	boolean considerRemovingAndRemove(List<Point2D_I32> contour, Element<Corner> target ) {
 		if( list.size() <= 3 )
-			return;
+			return false;
 
 		Element<Corner> p = previous(target);
 		Element<Corner> n = next(target);
 
 		// just contributions of the corners in question
-		double before = (p.object.sideError +target.object.sideError)/list.size() + cornerScorePenalty;
-		double sideScoreNew = computeSideError(contour,p.object.index,n.object.index);
-		double after = sideScoreNew/(list.size()-1);
+		double cornerPenalty = computeCornerPenalty(contour.size(),cornerScorePenalty);
+		double before = p.object.sideError +target.object.sideError + cornerPenalty;
+		double after = computeSideError(contour,p.object.index,n.object.index);
 
 		// See if the new shape has a better score. if so save the results
 		if( after < before ) {
+//			System.out.println("removing a corner idx="+target.object.index);
 			// Note: the corner is "lost" until the next contour is fit. Not worth the effort to recycle
-			p.object.splitLocation = target.object.index;
-			p.object.splitError0 = target.object.sideError;
-			p.object.splitError1 = n.object.sideError;
-			p.object.sideError = sideScoreNew;
-
-			if( p.object.splitLocation >= contour.size() )
-				throw new RuntimeException("Egads");
-
+//			p.object.splitLocation = target.object.index;
+//			p.object.splitError0 = target.object.sideError;
+//			p.object.splitError1 = n.object.sideError;
+			p.object.sideError = after;
 			list.remove(target);
-			savePolyline();
+			computePotentialSplitScore(contour,p);
+
+			savePolyline(contour.size());
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -361,7 +434,7 @@ public class PolylineSplitMerge {
 	 * is used because its fast to compute
 	 *
 	 * @param indexA first index. Inclusive
-	 * @param indexA last index. Exclusive
+	 * @param indexB last index. Exclusive
 	 */
 	double computeSideError(List<Point2D_I32> contour , int indexA , int indexB ) {
 		assignLine(contour, indexA, indexB, line);
@@ -377,7 +450,8 @@ public class PolylineSplitMerge {
 				Point2D_I32 p = contour.get(index);
 				sumOfDistances += Distance2D_F64.distanceSq(line,p.x,p.y);
 			}
-			sumOfDistances /= (numSamples+1); // add back the two end point samples
+			// scale the error to the actual length in pixels
+			sumOfDistances *= length/(double)numSamples;
 		} else {
 			int length = contour.size()-indexA-1 + indexB;
 			numSamples = Math.min(length,maxNumberOfSideSamples);
@@ -387,7 +461,7 @@ public class PolylineSplitMerge {
 				Point2D_I32 p = contour.get(index);
 				sumOfDistances += Distance2D_F64.distanceSq(line,p.x,p.y);
 			}
-			sumOfDistances /= (numSamples+1);
+			sumOfDistances *= length/(double)numSamples;
 		}
 
 		return sumOfDistances;
@@ -407,8 +481,25 @@ public class PolylineSplitMerge {
 		}
 	}
 
+	/**
+	 * Selects and splits the side defined by the e0 corner. If convex a check is performed to
+	 * ensure that the polyline will be convex still.
+	 */
 	void setSplitVariables(List<Point2D_I32> contour, Element<Corner> e0, Element<Corner> e1) {
 		splitter.selectSplitPoint(contour, e0.object.index, e1.object.index, resultsA);
+
+		// if convex only perform the split if it would result in a convex polygon
+		if( convex ) {
+			Point2D_I32 a = contour.get(e0.object.index);
+			Point2D_I32 b = contour.get(resultsA.index);
+			Point2D_I32 c = contour.get(next(e0).object.index);
+
+			if (UtilPolygons2D_I32.isPositiveZ(a, b, c)) {
+				e0.object.splitable = false;
+				return;
+			}
+		}
+
 		e0.object.splitLocation = resultsA.index;
 		e0.object.splitError0 = computeSideError(contour, e0.object.index, resultsA.index);
 		e0.object.splitError1 = computeSideError(contour, resultsA.index, e1.object.index);
@@ -429,7 +520,7 @@ public class PolylineSplitMerge {
 			return false;
 		}
 
-		return !(e0.object.sideError < thresholdSideSplitScore);
+		return e0.object.sideError > thresholdSideSplitScore*length;
 	}
 
 	/**
@@ -605,6 +696,14 @@ public class PolylineSplitMerge {
 
 	public void setSplitter(SplitSelector splitter) {
 		this.splitter = splitter;
+	}
+
+	public int getMinSides() {
+		return minSides;
+	}
+
+	public void setMinSides(int minSides) {
+		this.minSides = minSides;
 	}
 }
 

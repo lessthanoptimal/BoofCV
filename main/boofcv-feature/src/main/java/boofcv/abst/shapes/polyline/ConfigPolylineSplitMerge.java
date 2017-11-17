@@ -28,13 +28,16 @@ public class ConfigPolylineSplitMerge implements Configuration{
 	public boolean convex = true;
 
 	// maximum number of sides it will consider
-	public int maxSides = 100;
+	public int maxSides = 20;
+
+	// maximum number of sides it will consider
+	public int minSides = 3;
 
 	// The minimum length of a side
 	public int minimumSideLength = 5;
 
 	// When selecting the best model how much is a split penalized
-	public double cornerScorePenalty = 0.5;
+	public double cornerScorePenalty = 0.1;
 
 	// If the score of a side is less than this it is considered a perfect fit and won't be split any more
 	public double thresholdSideSplitScore = 1;
@@ -45,6 +48,7 @@ public class ConfigPolylineSplitMerge implements Configuration{
 
 	@Override
 	public void checkValidity() {
-
+		if( minSides < 3 )
+			throw new RuntimeException("Minimum sides must be >= 3");
 	}
 }

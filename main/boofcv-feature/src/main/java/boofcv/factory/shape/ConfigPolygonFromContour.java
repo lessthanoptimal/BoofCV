@@ -67,7 +67,8 @@ public class ConfigPolygonFromContour implements Configuration {
 	public double tangentEdgeIntensity = 2.5;
 
 	/**
-	 * Specifies the minimum allowed contour length.
+	 * Specifies the minimum allowed contour length. Relative lengths will be relative with to the image's
+	 * width and height.
 	 */
 	public ConfigLength minimumContour = ConfigLength.relative(0.05,4);
 

@@ -440,6 +440,11 @@ public class TestPolylineSplitMerge {
 		assertTrue(c==alg.previous(alg.list.find(a)).object);
 	}
 
+	@Test
+	public void ensureTriangleIsCCW() {
+		fail("Implement");
+	}
+
 	/**
 	 * Create a rectangle and feed it every point in the rectangle and see if it has the expected response
 	 */
