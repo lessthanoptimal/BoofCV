@@ -23,6 +23,7 @@ import boofcv.struct.ConfigLength;
 import georegression.geometry.UtilPolygons2D_I32;
 import georegression.metric.Distance2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
+import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -81,7 +82,7 @@ public class PolylineSplitMerge {
 	int maxNumberOfSideSamples = 50;
 
 	// work space for side score calculation
-	private LineParametric2D_F64 line = new LineParametric2D_F64();
+	private LineSegment2D_F64 line = new LineSegment2D_F64();
 
 	// the corner list that's being built
 	LinkedList<Corner> list = new LinkedList<>();
@@ -173,7 +174,7 @@ public class PolylineSplitMerge {
 			c.score = Double.MAX_VALUE;
 		}
 
-		double foundScore = computeScore(list,computeCornerPenalty(contourSize,cornerScorePenalty));
+		double foundScore = computeScore(list,cornerScorePenalty);
 
 		// only save the results if it's an improvement
 		if( c.score > foundScore ) {
@@ -204,11 +205,7 @@ public class PolylineSplitMerge {
 			e = e.next;
 		}
 
-		return sumSides + cornerPenalty*list.size();
-	}
-
-	static double computeCornerPenalty( int contourSize , double parameter ) {
-		return contourSize*parameter;
+		return sumSides/list.size() + cornerPenalty*list.size();
 	}
 
 	boolean findInitialTriangle(List<Point2D_I32> contour) {
@@ -351,7 +348,7 @@ public class PolylineSplitMerge {
 			}
 
 			// compute how much better the score will improve because of the split
-			double change = c.sideError - c.splitError0 - c.splitError1;
+			double change = c.sideError*2 - c.splitError0 - c.splitError1;
 			// it was found that selecting for the biggest change tends to produce better results
 			if( change < 0 ) {
 				change = -change;
@@ -380,14 +377,12 @@ public class PolylineSplitMerge {
 		double bestScore = -Double.MAX_VALUE;
 		double newEdgeScore = -1;
 
-		double cornerPenalty = computeCornerPenalty(contour.size(), cornerScorePenalty);
-
 		while( target != null ) {
 			Element<Corner> p = previous(target);
 			Element<Corner> n = next(target);
 
 			// just contributions of the corners in question
-			double before = p.object.sideError + target.object.sideError + cornerPenalty;
+			double before = (p.object.sideError + target.object.sideError)/2.0 + cornerScorePenalty;
 			double after = computeSideError(contour, p.object.index, n.object.index);
 
 			if( before-after > bestScore ) {
@@ -405,7 +400,7 @@ public class PolylineSplitMerge {
 			Element<Corner> p = previous(best);
 			p.object.sideError = newEdgeScore;
 			list.remove(best);
-			computePotentialSplitScore(contour,p);
+			computePotentialSplitScore(contour,p);// TODO is this required? it's never split again in the future right now
 			savePolyline(contour.size());
 			return true;
 		}
@@ -448,8 +443,9 @@ public class PolylineSplitMerge {
 		// don't sample the end points because the error will be zero by definition
 		int numSamples;
 		double sumOfDistances = 0;
+		int length;
 		if( indexB >= indexA ) {
-			int length = indexB-indexA-1;
+			length = indexB-indexA-1;
 			numSamples = Math.min(length,maxNumberOfSideSamples);
 			for (int i = 0; i < numSamples; i++) {
 				int index = indexA+1+length*i/numSamples;
@@ -457,9 +453,11 @@ public class PolylineSplitMerge {
 				sumOfDistances += Distance2D_F64.distanceSq(line,p.x,p.y);
 			}
 			// scale the error to the actual length in pixels
-			sumOfDistances *= length/(double)numSamples;
+//			sumOfDistances *= length/(double)numSamples;
+//			sumOfDistances = Math.sqrt(sumOfDistances)/numSamples;
+			sumOfDistances /= numSamples;
 		} else {
-			int length = contour.size()-indexA-1 + indexB;
+			length = contour.size()-indexA-1 + indexB;
 			numSamples = Math.min(length,maxNumberOfSideSamples);
 			for (int i = 0; i < numSamples; i++) {
 				int where = length*i/numSamples;
@@ -467,7 +465,9 @@ public class PolylineSplitMerge {
 				Point2D_I32 p = contour.get(index);
 				sumOfDistances += Distance2D_F64.distanceSq(line,p.x,p.y);
 			}
-			sumOfDistances *= length/(double)numSamples;
+//			sumOfDistances *= length/(double)numSamples;
+//			sumOfDistances = Math.sqrt(sumOfDistances)/numSamples;
+			sumOfDistances /= numSamples;
 		}
 
 		return sumOfDistances;
@@ -526,7 +526,7 @@ public class PolylineSplitMerge {
 			return false;
 		}
 
-		return e0.object.sideError > thresholdSideSplitScore*length;
+		return e0.object.sideError > thresholdSideSplitScore;
 	}
 
 	/**
@@ -606,6 +606,14 @@ public class PolylineSplitMerge {
 		line.p.y = endA.y;
 		line.slope.x = endB.x-endA.x;
 		line.slope.y = endB.y-endA.y;
+	}
+
+	public static void assignLine(List<Point2D_I32> contour, int indexA, int indexB, LineSegment2D_F64 line) {
+		Point2D_I32 endA = contour.get(indexA);
+		Point2D_I32 endB = contour.get(indexB);
+
+		line.a.set(endA.x,endA.y);
+		line.b.set(endB.x,endB.y);
 	}
 
 	public FastQueue<CandidatePolyline> getPolylines() {
