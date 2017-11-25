@@ -19,6 +19,7 @@
 package boofcv.alg.shapes.polyline.splitmerge;
 
 import boofcv.misc.CircularIndex;
+import boofcv.struct.ConfigLength;
 import georegression.geometry.UtilPolygons2D_I32;
 import georegression.metric.Distance2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
@@ -67,7 +68,7 @@ public class PolylineSplitMerge {
 	private int minimumSideLength = 10;
 
 	// how many corners past the max it will fit a polygon to
-	private int extraConsider = 4;
+	private ConfigLength extraConsider = ConfigLength.relative(1.0,0);
 
 	// When selecting the best model how much is a split penalized
 	private double cornerScorePenalty = 0.25;
@@ -108,7 +109,7 @@ public class PolylineSplitMerge {
 		savePolyline(contour.size());
 
 		// by finding more corners than necessary it can recover from mistakes previously
-		int limit = maxSides+extraConsider;
+		int limit = maxSides+extraConsider.computeI(maxSides);
 		while( list.size() < limit ) {
 			if( !increaseNumberOfSidesByOne(contour) ) {
 				break;
@@ -715,11 +716,11 @@ public class PolylineSplitMerge {
 		this.minSides = minSides;
 	}
 
-	public int getExtraConsider() {
+	public ConfigLength getExtraConsider() {
 		return extraConsider;
 	}
 
-	public void setExtraConsider(int extraConsider) {
+	public void setExtraConsider( ConfigLength extraConsider) {
 		this.extraConsider = extraConsider;
 	}
 }

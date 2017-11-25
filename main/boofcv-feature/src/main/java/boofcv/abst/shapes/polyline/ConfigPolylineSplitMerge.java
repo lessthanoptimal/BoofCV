@@ -18,6 +18,7 @@
 
 package boofcv.abst.shapes.polyline;
 
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
 /**
@@ -25,7 +26,7 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class ConfigPolylineSplitMerge implements Configuration{
+public class ConfigPolylineSplitMerge implements Configuration {
 	/**
 	 * Can it assume the shape is convex? If so it can reject shapes earlier
 	 */
@@ -47,9 +48,10 @@ public class ConfigPolylineSplitMerge implements Configuration{
 	public int minimumSideLength = 5;
 
 	/**
-	 * How many corners past the max it will fit a polygon to. This enables it to recover from mistakes
+	 * How many corners past the max it will fit a polygon to. This enables it to recover from mistakes.
+	 * Relative: Maximum number of sides.
  	 */
-	public int extraConsider = 4;
+	public ConfigLength extraConsider = ConfigLength.relative(1.0,0);
 
 	/**
 	 * When selecting the best model how much is a split penalized

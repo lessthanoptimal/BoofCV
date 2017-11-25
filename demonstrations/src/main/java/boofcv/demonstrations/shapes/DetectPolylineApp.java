@@ -26,7 +26,6 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
-import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -66,7 +65,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 	public DetectPolylineApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);
 
-		setupGui(new VisualizePanel(),new DetectPolygonControlPanel(this));
+		setupGui(new VisualizePanel(),new PolylineControlPanel(this));
 	}
 
 	@Override
@@ -74,29 +73,24 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 		if( !initializing)
 			BoofSwingUtil.checkGuiThread();
 
-		DetectPolygonControlPanel controls = (DetectPolygonControlPanel)DetectPolylineApp.this.controls;
+		PolylineControlPanel controls = (PolylineControlPanel)DetectPolylineApp.this.controls;
+
+		minimumContourSize = ConfigLength.fixed(controls.minimumContourSize);
 
 		synchronized (this) {
-			ConfigPolygonDetector config = controls.getConfigPolygon();
+			switch( controls.whichAlgorithm ) {
+				case 0:{
+					ConfigPolylineSplitMerge config = controls.panelSplitMerge2.config;
 
-			if( controls.bRefineGray ) {
-				config.refineGray = controls.refineGray;
-			} else {
-				config.refineGray = null;
+					config.minSides = controls.minSides;
+					config.maxSides = controls.maxSides;
+					config.convex = controls.convex;
+					contourToPolyline = new NewSplitMerge_to_PointsToPolyline(config);
+				}break;
+
+				default:
+					throw new RuntimeException("Egads");
 			}
-
-			ConfigPolylineSplitMerge c = new ConfigPolylineSplitMerge();
-			c.minSides = config.detector.minimumSides;
-			c.maxSides = config.detector.maximumSides;
-			c.convex = config.detector.convex;
-			c.cornerScorePenalty = 0.15;
-			c.thresholdSideSplitScore = 0.15;
-//			c.maxNumberOfSideSamples = 50;
-			c.minimumSideLength = 1;
-			c.extraConsider = 10;
-
-			minimumContourSize = config.detector.minimumContour;
-			contourToPolyline = new NewSplitMerge_to_PointsToPolyline(c);
 		}
 		imageThresholdUpdated();
 	}
@@ -109,7 +103,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 
 	@Override
 	public void imageThresholdUpdated() {
-		DetectPolygonControlPanel controls = (DetectPolygonControlPanel)DetectPolylineApp.this.controls;
+		PolylineControlPanel controls = (PolylineControlPanel)DetectPolylineApp.this.controls;
 
 		ConfigThreshold config = controls.getThreshold().createConfig();
 
@@ -149,7 +143,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 
-			DetectPolygonControlPanel controls = (DetectPolygonControlPanel)DetectPolylineApp.this.controls;
+			PolylineControlPanel controls = (PolylineControlPanel)DetectPolylineApp.this.controls;
 
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
