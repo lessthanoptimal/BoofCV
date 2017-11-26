@@ -24,10 +24,8 @@ import boofcv.gui.StandardAlgConfigPanel;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
 
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
@@ -108,7 +106,6 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 		spinnerMaxSides.setMaximumSize(spinnerMaxSides.getPreferredSize());
 		spinnerMaxSides.addChangeListener(this);
 
-
 		checkConvex = new JCheckBox("Convex");
 		checkConvex.addActionListener(this);
 		checkConvex.setSelected(convex);
@@ -133,19 +130,6 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 		addVerticalGlue(this);
 	}
 
-	private void configureSpinnerFloat( JSpinner spinner ) {
-		JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinner.getEditor();
-		DecimalFormat format = editor.getFormat();
-		format.setMinimumFractionDigits(3);
-		format.setMinimumIntegerDigits(1);
-		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
-		Dimension d = spinner.getPreferredSize();
-		d.width = 60;
-		spinner.setPreferredSize(d);
-		spinner.addChangeListener(this);
-		spinner.setMaximumSize(d);
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if( e.getSource() == imageView ) {
@@ -167,7 +151,6 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 			looping = checkLooping.isSelected();
 			owner.configUpdate();
 		}
-
 	}
 
 	@Override
@@ -204,22 +187,24 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 		JSpinner spinnerMinSideLength;
 		JSpinner spinnerCornerPenalty;
 		JSpinner spinnerSideSplitScore;
+		JSpinner spinnerConvexTest;
 
 		JSpinner spinnerSideSamples;
 
 		public SplitMergePanel2() {
-			spinnerConsiderSides  = spinner(config.extraConsider.fraction, 0, 5.0, 0.05);
-			configureSpinnerFloat(spinnerConsiderSides,1,3);
+			spinnerConsiderSides  = spinner(config.extraConsider.fraction, 0, 5.0, 0.25,1,3);
 			spinnerMinSideLength  = spinner(config.minimumSideLength, 1, 1000, 1);
 			spinnerCornerPenalty  = spinner(config.cornerScorePenalty,0,100,0.1);
 			spinnerSideSplitScore = spinner(config.thresholdSideSplitScore,0,100,0.1);
 			spinnerSideSamples    = spinner(config.maxNumberOfSideSamples, 5, 1000, 5);
+			spinnerConvexTest     = spinner(config.convexTest, 0.0, 20.0, 0.25,2,2);
 
 			addLabeled(spinnerConsiderSides, "Extra Consider:", this);
 			addLabeled(spinnerMinSideLength, "Min Side Length: ", this);
 			addLabeled(spinnerCornerPenalty, "Corner Penalty: ", this);
 			addLabeled(spinnerSideSplitScore, "Side Split: ", this);
 			addLabeled(spinnerSideSamples, "Side Samples: ", this);
+			addLabeled(spinnerConvexTest, "Convex Test: ", this);
 		}
 
 		@Override
@@ -234,8 +219,10 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 				config.thresholdSideSplitScore = ((Number) spinnerSideSplitScore.getValue()).doubleValue();
 			} else if (spinnerSideSamples == e.getSource()) {
 				config.maxNumberOfSideSamples = ((Number) spinnerSideSamples.getValue()).intValue();
+			} else if (spinnerConvexTest == e.getSource()) {
+				config.convexTest = ((Number) spinnerConvexTest.getValue()).doubleValue();
 			} else {
-				throw new RuntimeException("Unknonw");
+				throw new RuntimeException("Unknown");
 			}
 			owner.configUpdate();
 		}

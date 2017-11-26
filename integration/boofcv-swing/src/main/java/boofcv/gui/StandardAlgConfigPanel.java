@@ -58,6 +58,24 @@ public class StandardAlgConfigPanel extends JPanel {
 		return spinner;
 	}
 
+	protected JSpinner spinner( double initial , double minimum , double maximum, double stepSize,
+								int integerDigits, int fractionDigits ) {
+		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
+		JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinner.getEditor();
+		DecimalFormat format = editor.getFormat();
+		format.setMinimumFractionDigits(fractionDigits);
+		format.setMinimumIntegerDigits(integerDigits);
+		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
+		Dimension d = spinner.getPreferredSize();
+		d.width = 60;
+		spinner.setPreferredSize(d);
+		spinner.setMaximumSize(d);
+		// force it to render using the format specified above. A bit of a hack. Got a better idea?
+		spinner.setValue(1-initial);spinner.setValue(initial);
+		spinner.addChangeListener((ChangeListener)this);
+		return spinner;
+	}
+
 	protected void configureSpinnerFloat(JSpinner spinner, int integerDigits, int fractionDigits) {
 		JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinner.getEditor();
 		DecimalFormat format = editor.getFormat();
