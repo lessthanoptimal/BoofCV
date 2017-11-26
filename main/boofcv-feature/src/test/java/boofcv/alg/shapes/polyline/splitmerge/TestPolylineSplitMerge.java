@@ -73,7 +73,7 @@ public class TestPolylineSplitMerge {
 		alg.addCorner(0);
 		alg.addCorner(0);
 
-		alg.savePolyline(20);
+		alg.savePolyline();
 
 		assertTrue(alg.getPolylines().get(1).score > 0);
 		assertEquals(4,alg.getPolylines().get(1).splits.size);
