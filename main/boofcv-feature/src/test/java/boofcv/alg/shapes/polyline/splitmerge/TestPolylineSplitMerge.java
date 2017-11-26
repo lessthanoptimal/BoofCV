@@ -383,33 +383,35 @@ public class TestPolylineSplitMerge {
 		alg.setMinimumSideLength(5);
 		alg.setThresholdSideSplitScore(0); // turn off this test
 
-		assertTrue(alg.canBeSplit(50,alg.list.getElement(5,true)));
-		assertTrue(alg.canBeSplit(50,alg.list.getElement(9,true)));
-
-		alg.setMinimumSideLength(6);
-		assertFalse(alg.canBeSplit(50,alg.list.getElement(5,true)));
-		assertFalse(alg.canBeSplit(50,alg.list.getElement(9,true)));
-
-		// test side split score
-		alg.setMinimumSideLength(5);
-		alg.setThresholdSideSplitScore(1);
-
-		alg.list.getElement(5,true).object.sideError = 1;
-		assertTrue(alg.canBeSplit(50,alg.list.getElement(5,true)));
-		alg.list.getElement(5,true).object.sideError = 0.9999999;
-		assertFalse(alg.canBeSplit(50,alg.list.getElement(5,true)));
+//		assertTrue(alg.canBeSplit(50,alg.list.getElement(5,true)));
+//		assertTrue(alg.canBeSplit(50,alg.list.getElement(9,true)));
+//
+//		alg.setMinimumSideLength(6);
+//		assertFalse(alg.canBeSplit(50,alg.list.getElement(5,true)));
+//		assertFalse(alg.canBeSplit(50,alg.list.getElement(9,true)));
+//
+//		// test side split score
+//		alg.setMinimumSideLength(5);
+//		alg.setThresholdSideSplitScore(1);
+//
+//		alg.list.getElement(5,true).object.sideError = 1;
+//		assertTrue(alg.canBeSplit(50,alg.list.getElement(5,true)));
+//		alg.list.getElement(5,true).object.sideError = 0.9999999;
+//		assertFalse(alg.canBeSplit(50,alg.list.getElement(5,true)));
+		fail("update");
 	}
 
 	@Test
 	public void canBeSplit_special_case() {
-		PolylineSplitMerge alg = new PolylineSplitMerge();
-		alg.setMinimumSideLength(5);
-		alg.setThresholdSideSplitScore(0);
-
-		alg.addCorner(0);
-		alg.addCorner(10);
-
-		assertTrue(alg.canBeSplit(11,alg.list.getHead()));
+//		PolylineSplitMerge alg = new PolylineSplitMerge();
+//		alg.setMinimumSideLength(5);
+//		alg.setThresholdSideSplitScore(0);
+//
+//		alg.addCorner(0);
+//		alg.addCorner(10);
+//
+//		assertTrue(alg.canBeSplit(11,alg.list.getHead()));
+		fail("update");
 	}
 
 	@Test

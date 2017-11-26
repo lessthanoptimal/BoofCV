@@ -42,6 +42,7 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 		alg.setConvex(config.convex);
 		alg.setThresholdSideSplitScore(config.thresholdSideSplitScore);
 		alg.setCornerScorePenalty(config.cornerScorePenalty);
+		alg.setConvexTest(config.convexTest);
 	}
 
 	@Override
