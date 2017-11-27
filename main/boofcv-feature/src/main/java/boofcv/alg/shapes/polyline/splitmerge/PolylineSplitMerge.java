@@ -83,6 +83,9 @@ public class PolylineSplitMerge {
 	// between the two corners then it will be rejected as not convex
 	double convexTest = 2.5;
 
+	// maximum error along any side
+	double maxSideErrorSq = 9;
+
 	// work space for side score calculation
 	private LineSegment2D_F64 line = new LineSegment2D_F64();
 
@@ -154,6 +157,9 @@ public class PolylineSplitMerge {
 		if( bestSize < minSides) {
 			return false;
 		}
+
+		if( bestPolyline.maxSideError >= maxSideErrorSq )
+			return false;
 
 		return true;
 	}
@@ -509,8 +515,8 @@ public class PolylineSplitMerge {
 		for (int i = 0; i < contour.size(); i++) {
 			Point2D_I32 c = contour.get(i);
 			// can't sum sq distance because some skinny shapes it maximizes one and not the other
-			double d = Math.sqrt(distanceSq(a,c)) + Math.sqrt(distanceSq(b,c));
-//			double d = distanceAbs(a,c) + distanceAbs(b,c);
+//			double d = Math.sqrt(distanceSq(a,c)) + Math.sqrt(distanceSq(b,c));
+			double d = distanceAbs(a,c) + distanceAbs(b,c);
 			if( d > bestDistance ) {
 				bestDistance = d;
 				best = i;
@@ -840,6 +846,14 @@ public class PolylineSplitMerge {
 
 	public void setConvexTest(double convexTest) {
 		this.convexTest = convexTest;
+	}
+
+	public double getMaxSideError() {
+		return Math.sqrt(maxSideErrorSq);
+	}
+
+	public void setMaxSideError(double maxSideError) {
+		this.maxSideErrorSq = maxSideError*maxSideError;
 	}
 }
 

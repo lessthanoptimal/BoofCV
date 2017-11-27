@@ -198,10 +198,12 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 		JSpinner spinnerCornerPenalty;
 		JSpinner spinnerSideSplitScore;
 		JSpinner spinnerConvexTest;
+		JSpinner spinnerMaxSideError;
 
 		JSpinner spinnerSideSamples;
 
 		public SplitMergePanel2() {
+			spinnerMaxSideError   = spinner(config.maxSideError,0,500,0.2,1,2);
 			spinnerConsiderSides  = spinner(config.extraConsider.fraction, 0, 5.0, 0.25,1,3);
 			spinnerMinSideLength  = spinner(config.minimumSideLength, 1, 1000, 1);
 			spinnerCornerPenalty  = spinner(config.cornerScorePenalty,0,100,0.1);
@@ -209,6 +211,7 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 			spinnerSideSamples    = spinner(config.maxNumberOfSideSamples, 5, 1000, 5);
 			spinnerConvexTest     = spinner(config.convexTest, 0.0, 20.0, 0.25,2,2);
 
+			addLabeled(spinnerMaxSideError, "Max Error:", this);
 			addLabeled(spinnerConsiderSides, "Extra Consider:", this);
 			addLabeled(spinnerMinSideLength, "Min Side Length: ", this);
 			addLabeled(spinnerCornerPenalty, "Corner Penalty: ", this);
@@ -231,6 +234,8 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 				config.maxNumberOfSideSamples = ((Number) spinnerSideSamples.getValue()).intValue();
 			} else if (spinnerConvexTest == e.getSource()) {
 				config.convexTest = ((Number) spinnerConvexTest.getValue()).doubleValue();
+			} else if (spinnerMaxSideError == e.getSource()) {
+				config.maxSideError = ((Number) spinnerMaxSideError.getValue()).doubleValue();
 			} else {
 				throw new RuntimeException("Unknown");
 			}

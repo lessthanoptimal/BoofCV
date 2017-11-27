@@ -75,6 +75,11 @@ public class ConfigPolylineSplitMerge implements Configuration {
 	 */
 	public double convexTest = 2.5;
 
+	/**
+	 * Maximum allowed error along a single side in Eclidean distance.
+	 */
+	public double maxSideError = 3;
+
 	@Override
 	public void checkValidity() {
 		if( minSides < 3 )
