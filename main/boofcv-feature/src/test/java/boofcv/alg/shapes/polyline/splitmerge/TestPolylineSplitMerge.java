@@ -297,7 +297,7 @@ public class TestPolylineSplitMerge {
 		Element<Corner> e = alg.list.getHead();
 		e.object.sideError =20;
 
-		alg.computePotentialSplitScore(contour,e);
+		alg.computePotentialSplitScore(contour,e,false);
 
 		assertTrue(e.object.splitable);
 		assertTrue(e.object.splitError0 >0);
