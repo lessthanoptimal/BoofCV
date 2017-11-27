@@ -141,15 +141,17 @@ public class PolylineSplitMerge {
 
 		bestPolyline = null;
 		double bestScore = Double.MAX_VALUE;
-		for (int i = minSides-3; i < Math.min(maxSides-2,polylines.size); i++) {
+		int bestSize = -1;
+		for (int i = 0; i < Math.min(maxSides-2,polylines.size); i++) {
 			if( polylines.get(i).score < bestScore ) {
 				bestPolyline = polylines.get(i);
 				bestScore = bestPolyline.score;
+				bestSize = i + 3;
 			}
 		}
 
 		// There was no good match within the min/max size requirement
-		if( bestPolyline == null ) {
+		if( bestSize < minSides) {
 			return false;
 		}
 
