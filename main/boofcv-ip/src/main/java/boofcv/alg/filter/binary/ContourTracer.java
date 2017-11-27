@@ -279,4 +279,8 @@ public class ContourTracer {
 	public void setMaxContourSize(int maxContourSize) {
 		this.maxContourSize = maxContourSize;
 	}
+
+	public ConnectRule getConnectRule() {
+		return rule;
+	}
 }

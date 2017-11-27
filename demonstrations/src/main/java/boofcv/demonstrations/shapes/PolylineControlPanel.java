@@ -20,6 +20,7 @@ package boofcv.demonstrations.shapes;
 
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.struct.ConnectRule;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -51,6 +52,7 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 
 	ThresholdControlPanel threshold;
 
+	JSpinner spinnerContourConnect;
 	JSpinner spinnerMinContourSize;
 	JSpinner spinnerMinSides;
 	JSpinner spinnerMaxSides;
@@ -67,6 +69,7 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 	boolean convex = true;
 	boolean looping = true;
 	int minimumContourSize = 10;
+	ConnectRule connectRule = ConnectRule.FOUR;
 
 
 	public PolylineControlPanel(ShapeGuiListener owner) {
@@ -82,6 +85,8 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 		selectZoom = new JSpinner(new SpinnerNumberModel(1,MIN_ZOOM,MAX_ZOOM,1));
 		selectZoom.addChangeListener(this);
 		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
+
+		spinnerContourConnect = spinner(connectRule.ordinal(), ConnectRule.values());
 
 		showCorners = new JCheckBox("Corners");
 		showCorners.addActionListener(this);
@@ -122,6 +127,7 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 		addAlignLeft(showContour, this);
 		add(threshold);
 		addLabeled(spinnerMinContourSize, "Min Contour Size: ", this);
+		addLabeled(spinnerContourConnect, "Contour Connect: ", this);
 		addLabeled(spinnerMinSides, "Minimum Sides: ", this);
 		addLabeled(spinnerMaxSides, "Maximum Sides: ", this);
 		addAlignLeft(checkConvex, this);
@@ -173,6 +179,10 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 			return;
 		} else if( e.getSource() == spinnerMinContourSize ) {
 			minimumContourSize = ((Number) spinnerMinContourSize.getValue()).intValue();
+		} else if( e.getSource() == spinnerContourConnect ) {
+			connectRule = (ConnectRule)spinnerContourConnect.getValue();
+		} else {
+			throw new RuntimeException("Egads");
 		}
 
 		owner.configUpdate();

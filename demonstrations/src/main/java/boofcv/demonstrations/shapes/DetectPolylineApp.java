@@ -77,6 +77,10 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 
 		minimumContourSize = ConfigLength.fixed(controls.minimumContourSize);
 
+		if( binaryToContour.getConnectRule() != controls.connectRule ) {
+			binaryToContour = new LinearContourLabelChang2004(controls.connectRule);
+		}
+
 		synchronized (this) {
 			switch( controls.whichAlgorithm ) {
 				case 0:{

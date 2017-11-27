@@ -228,4 +228,8 @@ public class LinearContourLabelChang2004 {
 	public void setSaveInternalContours(boolean saveInternalContours) {
 		this.saveInternalContours = saveInternalContours;
 	}
+
+	public ConnectRule getConnectRule() {
+		return tracer.getConnectRule();
+	}
 }
