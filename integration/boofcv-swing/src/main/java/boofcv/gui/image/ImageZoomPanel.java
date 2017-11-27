@@ -101,7 +101,8 @@ public class ImageZoomPanel extends JScrollPane {
 		}
 
 		this.img = image;
-		updateSize(image.getWidth(),image.getHeight());
+		if( image != null )
+			updateSize(image.getWidth(),image.getHeight());
 	}
 
 	public void updateSize( int width , int height ) {
