@@ -389,6 +389,8 @@ public abstract class DemonstrationBase extends JPanel {
 
 		stopAllInputProcessing();
 
+		streamPaused = false;
+
 		boolean failed = false;
 		for( int which = 0; which < filePaths.length; which++ ) {
 			CacheSequenceStream cache = inputStreams.get(which);

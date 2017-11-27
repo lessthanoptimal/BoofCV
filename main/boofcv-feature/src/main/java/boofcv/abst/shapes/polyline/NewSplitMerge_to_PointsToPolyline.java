@@ -47,7 +47,8 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 
 	@Override
 	public boolean process(List<Point2D_I32> input, GrowQueue_I32 vertexes) {
-		alg.process(input);
+		if( !alg.process(input) )
+			return false;
 
 		PolylineSplitMerge.CandidatePolyline best = alg.getBestPolyline();
 

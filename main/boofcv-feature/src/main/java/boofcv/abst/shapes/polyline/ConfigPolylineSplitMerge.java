@@ -73,7 +73,7 @@ public class ConfigPolylineSplitMerge implements Configuration {
 	 * If the contour between two corners is longer than this multiple of the distance
 	 * between the two corners then it will be rejected as not convex
 	 */
-	public double convexTest = 2.0;
+	public double convexTest = 2.5;
 
 	@Override
 	public void checkValidity() {

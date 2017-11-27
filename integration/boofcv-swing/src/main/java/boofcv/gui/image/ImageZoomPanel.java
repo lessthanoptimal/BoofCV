@@ -99,19 +99,19 @@ public class ImageZoomPanel extends JScrollPane {
 			if( !SwingUtilities.isEventDispatchThread() )
 				throw new RuntimeException("Changed image when not in GUI thread?");
 		}
+
 		this.img = image;
+		updateSize(image.getWidth(),image.getHeight());
+	}
 
-
+	public void updateSize( int width , int height ) {
 		Dimension prev = getPreferredSize();
 
-		int w=0,h=0;
-		if( img != null ) {
-			w = (int)Math.ceil(img.getWidth()*scale);
-			h = (int)Math.ceil(img.getHeight()*scale);
-		}
+		int w = (int)Math.ceil(width*scale);
+		int h = (int)Math.ceil(height*scale);
 
 		if( prev.getWidth() != w || prev.getHeight() != h ) {
-			setPreferredSize(new Dimension(w,h));
+			panel.setPreferredSize(new Dimension(w,h));
 			getViewport().setView(panel);
 		}
 	}

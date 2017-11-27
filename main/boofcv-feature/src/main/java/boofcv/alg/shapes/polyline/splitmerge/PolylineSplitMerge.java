@@ -81,7 +81,7 @@ public class PolylineSplitMerge {
 
 	// If the contour between two corners is longer than this multiple of the distance
 	// between the two corners then it will be rejected as not convex
-	double convexTest = 2.0;
+	double convexTest = 2.5;
 
 	// work space for side score calculation
 	private LineSegment2D_F64 line = new LineSegment2D_F64();
@@ -148,6 +148,11 @@ public class PolylineSplitMerge {
 			}
 		}
 
+		// There was no good match within the min/max size requirement
+		if( bestPolyline == null ) {
+			return false;
+		}
+
 		return true;
 	}
 
@@ -185,6 +190,9 @@ public class PolylineSplitMerge {
 		CandidatePolyline c;
 		if( list.size() <= polylines.size+2 ) {
 			c = polylines.get( list.size()-3 );
+			// sanity check
+			if( c.splits.size != list.size() )
+				throw new RuntimeException("Egads saved polylines aren't in the expected order");
 		} else {
 			c = polylines.grow();
 			c.score = Double.MAX_VALUE;
@@ -258,12 +266,16 @@ public class PolylineSplitMerge {
 		addCorner(index2);
 
 		// enforce CCW requirement
-		ensureTriangleIsCCW(contour);
+		ensureTriangleOrder(contour);
 
 		// Score each side
 		Element<Corner> e = list.getHead();
 		while( e != null ) {
+			if (convex && !isSideConvex(contour, e))
+				return false;
+
 			Element<Corner> n = e.next;
+
 			double error;
 			if( n == null ) {
 				error = computeSideError(contour,e.object.index, list.getHead().object.index);
@@ -277,7 +289,7 @@ public class PolylineSplitMerge {
 		// Compute what would happen if a side was split
 		e = list.getHead();
 		while( e != null ) {
-			computePotentialSplitScore(contour,e);
+			computePotentialSplitScore(contour,e,list.size() < minSides);
 			e = e.next;
 		}
 
@@ -285,24 +297,22 @@ public class PolylineSplitMerge {
 	}
 
 	/**
-	 * Ensure that thr triangle is in CCW ordering
+	 * Make sure the next corner after the head is the closest one to the head
 	 */
-	void ensureTriangleIsCCW(List<Point2D_I32> contour ) {
+	void ensureTriangleOrder(List<Point2D_I32> contour ) {
 		Element<Corner> e = list.getHead();
 		Corner a = e.object;e=e.next;
 		Corner b = e.object;e=e.next;
 		Corner c = e.object;
 
-		Point2D_I32 pa = contour.get(a.index);
-		Point2D_I32 pb = contour.get(b.index);
-		Point2D_I32 pc = contour.get(c.index);
+		int distB = CircularIndex.distanceP(a.index,b.index,contour.size());
+		int distC = CircularIndex.distanceP(a.index,c.index,contour.size());
 
-		// see if it is in clock-wise ordering
-		if( UtilPolygons2D_I32.isPositiveZ(pa,pb,pc) ) {
+		if( distB > distC ) {
 			list.reset();
-			list.pushHead(c);
-			list.pushHead(b);
-			list.pushHead(a);
+			list.pushTail(a);
+			list.pushTail(c);
+			list.pushTail(b);
 		}
 	}
 
@@ -337,14 +347,42 @@ public class PolylineSplitMerge {
 		c.sideError = selected.object.splitError1;
 		Element<Corner> cornerE = list.insertAfter(selected,c);
 
-		// compute the score for sides which just changed
-		computePotentialSplitScore(contour,cornerE);
-		computePotentialSplitScore(contour,selected);
+		// see if the new side could be convex
+		if (convex && !isSideConvex(contour, selected))
+			return false;
+		else {
+			// compute the score for sides which just changed
+			computePotentialSplitScore(contour, cornerE, list.size() < minSides);
+			computePotentialSplitScore(contour, selected, list.size() < minSides);
 
-		// Save the results
+			// Save the results
 //		printCurrent(contour);
-		savePolyline();
+			savePolyline();
 
+			return true;
+		}
+	}
+
+	/**
+	 * Checks to see if the side could belong to a convex shape
+	 */
+	private boolean isSideConvex(List<Point2D_I32> contour, Element<Corner> e1) {
+		// a conservative estimate for concavity. Assumes a triangle and that the farthest
+		// point is equal to the distance between the two corners
+
+		Element<Corner> e2 = next(e1);
+
+		int length = CircularIndex.distanceP(e1.object.index,e2.object.index,contour.size());
+
+		Point2D_I32 p0 = contour.get(e1.object.index);
+		Point2D_I32 p1 = contour.get(e2.object.index);
+
+		double d = p0.distance(p1);
+
+		if (length >= d*convexTest) {
+			fatalError = true;
+			return false;
+		}
 		return true;
 	}
 
@@ -468,7 +506,9 @@ public class PolylineSplitMerge {
 
 		for (int i = 0; i < contour.size(); i++) {
 			Point2D_I32 c = contour.get(i);
-			double d = distanceSq(a,c) + distanceSq(b,c);
+			// can't sum sq distance because some skinny shapes it maximizes one and not the other
+			double d = Math.sqrt(distanceSq(a,c)) + Math.sqrt(distanceSq(b,c));
+//			double d = distanceAbs(a,c) + distanceAbs(b,c);
 			if( d > bestDistance ) {
 				bestDistance = d;
 				best = i;
@@ -518,17 +558,21 @@ public class PolylineSplitMerge {
 			sumOfDistances /= numSamples;
 		}
 
-		return sumOfDistances;
+		// handle divide by zero error
+		if( numSamples > 0 )
+			return sumOfDistances;
+		else
+			return 0;
 	}
 
 	/**
 	 * Computes the split location and the score of the two new sides if it's split there
 	 */
-	void computePotentialSplitScore( List<Point2D_I32> contour , Element<Corner> e0 )
+	void computePotentialSplitScore( List<Point2D_I32> contour , Element<Corner> e0 , boolean mustSplit )
 	{
 		Element<Corner> e1 = next(e0);
 
-		e0.object.splitable = canBeSplit(contour,e0);
+		e0.object.splitable = canBeSplit(contour,e0,mustSplit);
 
 		if( e0.object.splitable ) {
 			setSplitVariables(contour, e0, e1);
@@ -566,29 +610,16 @@ public class PolylineSplitMerge {
 	 * Determines if the side can be split again. A side can always be split as long as
 	 * its >= the minimum length or that the side score is larger the the split threshold
 	 */
-	boolean canBeSplit( List<Point2D_I32> contour, Element<Corner> e0 ) {
+	boolean canBeSplit( List<Point2D_I32> contour, Element<Corner> e0 , boolean mustSplit ) {
 		Element<Corner> e1 = next(e0);
 
-		int length = CircularIndex.distanceP(e0.object.index,e1.object.index,contour.size());
-		if( length < minimumSideLength ) {
+		int length = CircularIndex.distanceP(e0.object.index, e1.object.index, contour.size());
+
+		if (length < minimumSideLength) {
 			return false;
 		}
 
-		// a conservative estimate for concavity. Assumes a triangle and that the farthest
-		// point is equal to the distance between the two corners
-		if( convex ) {
-			Point2D_I32 p0 = contour.get(e0.object.index);
-			Point2D_I32 p1 = contour.get(e1.object.index);
-
-			double d = p0.distance(p1);
-
-			if (length >= d*convexTest) {
-				fatalError = true;
-				return false;
-			}
-		}
-
-		return e0.object.sideError > thresholdSideSplitScore;
+		return mustSplit || e0.object.sideError > thresholdSideSplitScore;
 	}
 
 	/**
@@ -655,6 +686,13 @@ public class PolylineSplitMerge {
 		double dy = b.y-a.y;
 
 		return dx*dx + dy*dy;
+	}
+
+	static double distanceAbs( Point2D_I32 a , Point2D_I32 b ) {
+		double dx = b.x-a.x;
+		double dy = b.y-a.y;
+
+		return Math.abs(dx) + Math.abs(dy);
 	}
 
 	/**

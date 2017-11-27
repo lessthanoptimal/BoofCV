@@ -32,6 +32,7 @@ import boofcv.struct.image.ImageType;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -67,7 +68,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 
 		createDetector(true);
 
-		guiImage.addMouseWheelListener(new MouseAdapter() {
+		guiImage.getImagePanel().addMouseWheelListener(new MouseAdapter() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 
@@ -81,6 +82,17 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 				DetectBlackShapeAppBase.this.controls.setZoom(curr);
 			}
 		});
+
+		guiImage.getImagePanel().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if( SwingUtilities.isLeftMouseButton(e)) {
+					if (inputMethod == InputMethod.VIDEO) {
+						streamPaused = !streamPaused;
+					}
+				}
+			}
+		});
 	}
 
 	protected abstract void createDetector( boolean initializing );
@@ -92,9 +104,13 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 			@Override
 			public void run() {
 				double zoom = BoofSwingUtil.selectZoomToShowAll(guiImage,width,height);
-				controls.setZoom(zoom);
 				controls.setImageSize(width,height);
+				controls.setZoom(zoom);
 				milliBinary = 0;
+				guiImage.setScale(zoom);
+				guiImage.updateSize(width,height);
+				guiImage.getHorizontalScrollBar().setValue(0);
+				guiImage.getVerticalScrollBar().setValue(0);
 			}
 		});
 	}
