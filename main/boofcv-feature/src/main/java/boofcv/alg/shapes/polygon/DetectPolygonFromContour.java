@@ -23,7 +23,6 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.struct.ConfigLength;
-import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
@@ -80,7 +79,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	// does the polygon have to be convex
 	private boolean convex;
 
-	private LinearContourLabelChang2004 contourFinder = new LinearContourLabelChang2004(ConnectRule.FOUR);
+	private LinearContourLabelChang2004 contourFinder;
 	private GrayS32 labeled = new GrayS32(1,1);
 
 	// finds the initial polygon around a target candidate
@@ -155,6 +154,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 									boolean touchBorder,
 									double contourEdgeThreshold,
 									double tangentEdgeIntensity,
+									LinearContourLabelChang2004 contourFinder,
 									Class<T> inputType) {
 
 		setNumberOfSides(minSides,maxSides);
@@ -164,6 +164,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		this.convex = convex;
 		this.canTouchBorder = touchBorder;
 		this.contourEdgeThreshold = contourEdgeThreshold;
+		this.contourFinder = contourFinder;
 		this.inputType = inputType;
 
 		if( !fitPolygon.isLoop() )

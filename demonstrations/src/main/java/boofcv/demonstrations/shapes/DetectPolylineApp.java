@@ -65,7 +65,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 	public DetectPolylineApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);
 
-		setupGui(new VisualizePanel(),new PolylineControlPanel(this));
+		setupGui(new VisualizePanel(),new PolylineAppControlPanel(this));
 	}
 
 	@Override
@@ -73,7 +73,8 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 		if( !initializing)
 			BoofSwingUtil.checkGuiThread();
 
-		PolylineControlPanel controls = (PolylineControlPanel)DetectPolylineApp.this.controls;
+		PolylineAppControlPanel controls = (PolylineAppControlPanel)DetectPolylineApp.this.controls;
+		PolylineControlPanel polyControls = controls.polylinePanel;
 
 		minimumContourSize = ConfigLength.fixed(controls.minimumContourSize);
 
@@ -82,13 +83,13 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 		}
 
 		synchronized (this) {
-			switch( controls.whichAlgorithm ) {
+			switch( polyControls.whichAlgorithm ) {
 				case 0:{
-					ConfigPolylineSplitMerge config = controls.panelSplitMerge2.config;
+					ConfigPolylineSplitMerge config = polyControls.panelSplitMerge2.config;
 
-					config.minSides = controls.minSides;
-					config.maxSides = controls.maxSides;
-					config.convex = controls.convex;
+					config.minSides = polyControls.minSides;
+					config.maxSides = polyControls.maxSides;
+					config.convex = polyControls.convex;
 					contourToPolyline = new NewSplitMerge_to_PointsToPolyline(config);
 				}break;
 
@@ -107,7 +108,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 
 	@Override
 	public void imageThresholdUpdated() {
-		PolylineControlPanel controls = (PolylineControlPanel)DetectPolylineApp.this.controls;
+		PolylineAppControlPanel controls = (PolylineAppControlPanel)DetectPolylineApp.this.controls;
 
 		ConfigThreshold config = controls.getThreshold().createConfig();
 
@@ -147,7 +148,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 
-			PolylineControlPanel controls = (PolylineControlPanel)DetectPolylineApp.this.controls;
+			PolylineAppControlPanel controls = (PolylineAppControlPanel)DetectPolylineApp.this.controls;
 
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

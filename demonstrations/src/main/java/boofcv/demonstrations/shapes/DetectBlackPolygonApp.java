@@ -69,6 +69,8 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 		synchronized (this) {
 			ConfigPolygonDetector config = controls.getConfigPolygon();
 
+			config.detector.contourRule = controls.connectRule;
+
 			if( controls.bRefineGray ) {
 				config.refineGray = controls.refineGray;
 			} else {

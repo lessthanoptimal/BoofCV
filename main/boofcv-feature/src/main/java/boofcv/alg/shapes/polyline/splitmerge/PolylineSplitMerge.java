@@ -73,7 +73,7 @@ public class PolylineSplitMerge {
 	private double cornerScorePenalty = 0.25;
 
 	// If the score of a side is less than this it is considered a perfect fit and won't be split any more
-	private double thresholdSideSplitScore = 1;
+	private double thresholdSideSplitScore = 0;
 
 	// maximum number of points along a side it will sample when computing a score
 	// used to limit computational cost of large contours

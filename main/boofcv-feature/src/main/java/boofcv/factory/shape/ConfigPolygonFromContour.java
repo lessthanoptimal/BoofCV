@@ -21,6 +21,7 @@ package boofcv.factory.shape;
 import boofcv.alg.shapes.edge.EdgeIntensityPolygon;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
+import boofcv.struct.ConnectRule;
 
 /**
  * Configuration for {@link boofcv.alg.shapes.polygon.DetectPolygonFromContour}
@@ -43,6 +44,11 @@ public class ConfigPolygonFromContour implements Configuration {
 	 * If false then polygons which touch the image border are pruned
 	 */
 	public boolean canTouchBorder = false;
+
+	/**
+	 * Connect rule for contour finding in binary image.
+	 */
+	public ConnectRule contourRule = ConnectRule.FOUR;
 
 	/**
 	 * Configuration for fitting a polygon to the contour.

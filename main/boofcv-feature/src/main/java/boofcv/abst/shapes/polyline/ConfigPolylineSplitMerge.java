@@ -61,7 +61,7 @@ public class ConfigPolylineSplitMerge implements Configuration {
 	/**
 	 *If the score of a side is less than this it is considered a perfect fit and won't be split any more
 	 */
-	public double thresholdSideSplitScore = 0.4;
+	public double thresholdSideSplitScore = 0.2;
 
 	/**
 	 * maximum number of points along a side it will sample when computing a score

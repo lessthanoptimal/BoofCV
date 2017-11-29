@@ -28,32 +28,16 @@ import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
-import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
-
 /**
+ * Control panel for configuring a polyline algorithm
+ *
  * @author Peter Abeles
  */
-public class PolylineControlPanel extends DetectBlackShapePanel
+public class PolylineControlPanel extends StandardAlgConfigPanel
 		implements ActionListener, ChangeListener
 {
 	ShapeGuiListener owner;
 
-	// selects which image to view
-	JComboBox imageView;
-
-	JCheckBox showCorners;
-	JCheckBox showLines;
-	JCheckBox showContour;
-
-	boolean bShowCorners = true;
-	boolean bShowLines = true;
-	boolean bShowContour = false;
-
-	ThresholdControlPanel threshold;
-
-	JSpinner spinnerContourConnect;
-	JSpinner spinnerMinContourSize;
 	JSpinner spinnerMinSides;
 	JSpinner spinnerMaxSides;
 	JCheckBox checkConvex;
@@ -75,35 +59,7 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 	public PolylineControlPanel(ShapeGuiListener owner) {
 		this.owner = owner;
 
-		imageView = new JComboBox();
-		imageView.addItem("Input");
-		imageView.addItem("Binary");
-		imageView.addItem("Black");
-		imageView.addActionListener(this);
-		imageView.setMaximumSize(imageView.getPreferredSize());
 
-		selectZoom = new JSpinner(new SpinnerNumberModel(1,MIN_ZOOM,MAX_ZOOM,1));
-		selectZoom.addChangeListener(this);
-		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
-
-		spinnerContourConnect = spinner(connectRule.ordinal(), ConnectRule.values());
-
-		showCorners = new JCheckBox("Corners");
-		showCorners.addActionListener(this);
-		showCorners.setSelected(bShowCorners);
-		showLines = new JCheckBox("Lines");
-		showLines.setSelected(bShowLines);
-		showLines.addActionListener(this);
-		showContour = new JCheckBox("Contour");
-		showContour.addActionListener(this);
-		showContour.setSelected(bShowContour);
-
-		threshold = new ThresholdControlPanel(owner);
-
-		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(minimumContourSize,
-				5,10000,2));
-		spinnerMinContourSize.setMaximumSize(spinnerMinContourSize.getPreferredSize());
-		spinnerMinContourSize.addChangeListener(this);
 		spinnerMinSides = new JSpinner(new SpinnerNumberModel(minSides, 3, 20, 1));
 		spinnerMinSides.setMaximumSize(spinnerMinSides.getPreferredSize());
 		spinnerMinSides.addChangeListener(this);
@@ -118,16 +74,6 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 		checkLooping.addActionListener(this);
 		checkLooping.setSelected(looping);
 
-		addLabeled(processingTimeLabel,"Time (ms)", this);
-		addLabeled(imageSizeLabel,"Size", this);
-		addLabeled(imageView, "View: ", this);
-		addLabeled(selectZoom,"Zoom",this);
-		addAlignLeft(showCorners, this);
-		addAlignLeft(showLines, this);
-		addAlignLeft(showContour, this);
-		add(threshold);
-		addLabeled(spinnerMinContourSize, "Min Contour Size: ", this);
-		addLabeled(spinnerContourConnect, "Contour Connect: ", this);
 		addLabeled(spinnerMinSides, "Minimum Sides: ", this);
 		addLabeled(spinnerMaxSides, "Maximum Sides: ", this);
 		addAlignLeft(checkConvex, this);
@@ -138,19 +84,7 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == imageView ) {
-			selectedView = imageView.getSelectedIndex();
-			owner.viewUpdated();
-		} else if( e.getSource() == showCorners ) {
-			bShowCorners = showCorners.isSelected();
-			owner.viewUpdated();
-		} else if( e.getSource() == showLines ) {
-			bShowLines = showLines.isSelected();
-			owner.viewUpdated();
-		} else if( e.getSource() == showContour ) {
-			bShowContour = showContour.isSelected();
-			owner.viewUpdated();
-		} else if( e.getSource() == checkConvex ) {
+		if( e.getSource() == checkConvex ) {
 			convex = checkConvex.isSelected();
 			owner.configUpdate();
 		} else if( e.getSource() == checkLooping ) {
@@ -173,14 +107,6 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 				minSides = maxSides;
 				spinnerMinSides.setValue(minSides);
 			}
-		} else if( e.getSource() == selectZoom ) {
-			zoom = ((Number) selectZoom.getValue()).doubleValue();
-			owner.viewUpdated();
-			return;
-		} else if( e.getSource() == spinnerMinContourSize ) {
-			minimumContourSize = ((Number) spinnerMinContourSize.getValue()).intValue();
-		} else if( e.getSource() == spinnerContourConnect ) {
-			connectRule = (ConnectRule)spinnerContourConnect.getValue();
 		} else {
 			throw new RuntimeException("Egads");
 		}
@@ -243,7 +169,7 @@ public class PolylineControlPanel extends DetectBlackShapePanel
 		}
 	}
 
-	public ThresholdControlPanel getThreshold() {
-		return threshold;
+	public SplitMergePanel2 getSplitMerge2() {
+		return panelSplitMerge2;
 	}
 }

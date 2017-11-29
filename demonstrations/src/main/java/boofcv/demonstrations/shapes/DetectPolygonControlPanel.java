@@ -21,6 +21,7 @@ package boofcv.demonstrations.shapes;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.struct.ConfigLength;
+import boofcv.struct.ConnectRule;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -47,7 +48,9 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 	JCheckBox showCorners;
 	JCheckBox showLines;
 	JCheckBox showContour;
+	JSpinner spinnerContourConnect;
 
+	ConnectRule connectRule = ConnectRule.FOUR;
 	boolean bShowCorners = true;
 	boolean bShowLines = true;
 	boolean bShowContour = false;
@@ -99,6 +102,8 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		imageView.addItem("Black");
 		imageView.addActionListener(this);
 		imageView.setMaximumSize(imageView.getPreferredSize());
+
+		spinnerContourConnect = spinner(connectRule.ordinal(), ConnectRule.values());
 
 		selectZoom = new JSpinner(new SpinnerNumberModel(1,MIN_ZOOM,MAX_ZOOM,1));
 		selectZoom.addChangeListener(this);
@@ -190,6 +195,7 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		addAlignLeft(showLines, this);
 		addAlignLeft(showContour, this);
 		add(threshold);
+		addLabeled(spinnerContourConnect,"Contour Connect: ",this);
 		addLabeled(spinnerMinContourSize, "Min Contour Size: ", this);
 		addLabeled(spinnerMinSides, "Minimum Sides: ", this);
 		addLabeled(spinnerMaxSides, "Maximum Sides: ", this);
@@ -306,6 +312,8 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 			refineGray.convergeTolPixels = ((Number) spinnerConvergeTol.getValue()).doubleValue();
 		} else if (e.getSource() == spinnerMaxCornerChange) {
 			refineGray.maxCornerChangePixel = ((Number) spinnerMaxCornerChange.getValue()).doubleValue();
+		} else if( e.getSource() == spinnerContourConnect ) {
+			connectRule = (ConnectRule)spinnerContourConnect.getValue();
 		}
 		owner.configUpdate();
 	}

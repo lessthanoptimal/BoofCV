@@ -19,6 +19,7 @@
 package boofcv.factory.shape;
 
 import boofcv.abst.shapes.polyline.PointsToPolyline;
+import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
 import boofcv.alg.shapes.ellipse.EdgeIntensityEllipse;
@@ -110,11 +111,13 @@ public class FactoryShapeDetector {
 //		PointsToPolyline contourToPolygon =
 //				FactoryPointsToPolyline.featuresSplitMerge(null);
 
+		LinearContourLabelChang2004 contour = new LinearContourLabelChang2004(config.contourRule);
+
 		return new DetectPolygonFromContour<>(
 				config.minimumSides, config.maximumSides, contourToPolygon,
 				config.minimumContour,
 				config.clockwise, config.convex, config.canTouchBorder,
-				config.minimumEdgeIntensity, config.tangentEdgeIntensity, imageType);
+				config.minimumEdgeIntensity, config.tangentEdgeIntensity,contour, imageType);
 	}
 
 	public static <T extends ImageGray<T>>
