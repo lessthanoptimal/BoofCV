@@ -30,7 +30,6 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
-import boofcv.gui.image.ImageZoomPanel;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -103,7 +102,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 		detector.refineAll();
 	}
 
-	class VisualizePanel extends ImageZoomPanel {
+	class VisualizePanel extends ShapeVisualizePanel {
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 

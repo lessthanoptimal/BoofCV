@@ -78,6 +78,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		selectAlgorithm = new JComboBox(new String[]{"New","Old"});
 		selectAlgorithm.setSelectedIndex(whichAlgorithm);
 		selectAlgorithm.addActionListener(this);
+		selectAlgorithm.setMaximumSize(selectAlgorithm.getPreferredSize());
 
 		spinnerMinSides = new JSpinner(new SpinnerNumberModel(minSides, 3, 20, 1));
 		spinnerMinSides.setMaximumSize(spinnerMinSides.getPreferredSize());
@@ -105,7 +106,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		flagsPanel.add(checkConvex);
 		flagsPanel.add(checkLooping);
 
-		add(selectAlgorithm);
+		addLabeled(selectAlgorithm,"Algorithm");
 		add(sidesPanel);
 		add(flagsPanel);
 

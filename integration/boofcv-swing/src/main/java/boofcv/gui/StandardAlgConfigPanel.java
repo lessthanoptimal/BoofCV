@@ -162,7 +162,11 @@ public class StandardAlgConfigPanel extends JPanel {
 		owner.add(p);
 	}
 
-	public void addLabeledV( JComponent target , String text , JPanel owner ) {
+	public void addLabeledV( JComponent target , String text ) {
+		addLabeledV(target,text,this);
+	}
+
+	public static void addLabeledV( JComponent target , String text , JPanel owner ) {
 		JLabel label = new JLabel(text);
 		label.setLabelFor(target);
 		target.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -174,7 +178,10 @@ public class StandardAlgConfigPanel extends JPanel {
 		owner.add(p);
 	}
 
-	public void addVerticalGlue( JPanel owner ) {
+	public void addVerticalGlue() {
+		addVerticalGlue(this);
+	}
+	public static void addVerticalGlue( JPanel owner ) {
 		owner.add(Box.createVerticalGlue());
 	}
 

@@ -31,7 +31,6 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
-import boofcv.gui.image.ImageZoomPanel;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayF32;
@@ -147,7 +146,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 		}
 	}
 
-	class VisualizePanel extends ImageZoomPanel {
+	class VisualizePanel extends ShapeVisualizePanel {
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 

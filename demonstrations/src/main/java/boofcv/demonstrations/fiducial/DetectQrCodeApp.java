@@ -28,6 +28,7 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.demonstrations.shapes.DetectBlackShapeAppBase;
 import boofcv.demonstrations.shapes.ShapeGuiListener;
+import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.fiducial.ConfigQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
@@ -36,7 +37,6 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
-import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -126,7 +126,8 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		detector.process((T) input, binary);
 	}
 
-	class VisualizePanel extends ImageZoomPanel {
+	class VisualizePanel extends ShapeVisualizePanel {
+
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 
