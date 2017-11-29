@@ -19,8 +19,8 @@
 package boofcv.demonstrations.shapes;
 
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
+import boofcv.factory.shape.ConfigSplitMergeLineFit;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.struct.ConnectRule;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -45,20 +45,19 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 
 	int whichAlgorithm = 0;
 
-	SplitMergePanel2 panelSplitMerge2 = new SplitMergePanel2();
+	SplitMergePanel panelSplitMerge = new SplitMergePanel();
+	OldSplitMergePanel panelOldSplitMerge = new OldSplitMergePanel();
 
 	// parameters that are common to all algorithms
 	int minSides = 3;
 	int maxSides = 6;
 	boolean convex = true;
 	boolean looping = true;
-	int minimumContourSize = 10;
-	ConnectRule connectRule = ConnectRule.FOUR;
-
 
 	public PolylineControlPanel(ShapeGuiListener owner) {
 		this.owner = owner;
 
+		setBorder(BorderFactory.createEmptyBorder());
 
 		spinnerMinSides = new JSpinner(new SpinnerNumberModel(minSides, 3, 20, 1));
 		spinnerMinSides.setMaximumSize(spinnerMinSides.getPreferredSize());
@@ -78,7 +77,11 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		addLabeled(spinnerMaxSides, "Maximum Sides: ", this);
 		addAlignLeft(checkConvex, this);
 		addAlignLeft(checkLooping, this);
-		add(panelSplitMerge2);
+
+		if( whichAlgorithm == 0 )
+			add(panelSplitMerge);
+		else
+			add(panelOldSplitMerge);
 		addVerticalGlue(this);
 	}
 
@@ -114,7 +117,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		owner.configUpdate();
 	}
 
-	class SplitMergePanel2 extends StandardAlgConfigPanel
+	class SplitMergePanel extends StandardAlgConfigPanel
 		implements ChangeListener
 	{
 		ConfigPolylineSplitMerge config = new ConfigPolylineSplitMerge();
@@ -128,7 +131,8 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 
 		JSpinner spinnerSideSamples;
 
-		public SplitMergePanel2() {
+		public SplitMergePanel() {
+			setBorder(BorderFactory.createEmptyBorder());
 			spinnerMaxSideError   = spinner(config.maxSideError,0,500,0.2,1,2);
 			spinnerConsiderSides  = spinner(config.extraConsider.fraction, 0, 5.0, 0.25,1,3);
 			spinnerMinSideLength  = spinner(config.minimumSideLength, 1, 1000, 1);
@@ -169,7 +173,61 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		}
 	}
 
-	public SplitMergePanel2 getSplitMerge2() {
-		return panelSplitMerge2;
+	class OldSplitMergePanel extends StandardAlgConfigPanel
+			implements ChangeListener
+	{
+		ConfigSplitMergeLineFit config = new ConfigSplitMergeLineFit();
+
+		JSpinner spinnerContourSplit;
+		JSpinner spinnerContourMinSplit;
+		JSpinner spinnerContourIterations;
+		JSpinner spinnerSplitPenalty;
+
+		public OldSplitMergePanel() {
+			setBorder(BorderFactory.createEmptyBorder());
+			spinnerContourSplit = spinner(config.splitFraction,0.0,1.0,0.01,1,2);
+			spinnerContourMinSplit = spinner(config.minimumSide.fraction,0.0, 1.0, 0.001,1,3);
+			spinnerContourIterations = spinner(config.iterations,1, 200, 1,1,2);
+//			spinnerContourIterations.setMaximumSize(spinnerContourIterations.getPreferredSize());
+//			spinnerContourIterations.addChangeListener(this);
+			spinnerSplitPenalty = spinner(config.pruneSplitPenalty, 0.0, 100.0, 1.0,1,1);
+
+			addLabeled(spinnerContourSplit, "Split Fraction: ", this);
+			addLabeled(spinnerContourMinSplit, "Min Split: ", this);
+			addLabeled(spinnerContourIterations, "Max Iterations: ", this);
+			addLabeled(spinnerSplitPenalty, "Split Penalty: ", this);
+		}
+
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			if( e.getSource() == spinnerContourSplit ) {
+				config.splitFraction = ((Number) spinnerContourSplit.getValue()).doubleValue();
+			} else if( e.getSource() == spinnerContourMinSplit ) {
+				config.minimumSide.fraction = ((Number) spinnerContourMinSplit.getValue()).doubleValue();
+			} else if( e.getSource() == spinnerContourIterations ) {
+				config.iterations = ((Number) spinnerContourIterations.getValue()).intValue();
+			} else if( e.getSource() == spinnerSplitPenalty ) {
+				config.pruneSplitPenalty = ((Number) spinnerSplitPenalty.getValue()).doubleValue();
+			} else {
+				throw new RuntimeException("Unknown");
+			}
+			owner.configUpdate();
+		}
+	}
+
+	public ConfigPolylineSplitMerge getConfigSplitMerge() {
+		ConfigPolylineSplitMerge config = panelSplitMerge.config;
+		config.minSides = minSides;
+		config.maxSides = maxSides;
+		config.convex = convex;
+
+		return config;
+	}
+
+
+	public ConfigSplitMergeLineFit getConfigSplitMergeOld() {
+		ConfigSplitMergeLineFit config = panelOldSplitMerge.config;
+		config.loop = looping;
+		return config;
 	}
 }

@@ -65,14 +65,9 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 	JSpinner spinnerMaxSides;
 	JSpinner spinnerMinEdgeD; // threshold for detect
 	JSpinner spinnerMinEdgeR; // threshold for refine
-	JCheckBox setConvex;
 	JCheckBox setBorder;
 
-	JSpinner spinnerContourSplit;
-	JSpinner spinnerContourMinSplit;
-	JSpinner spinnerContourIterations;
-	JSpinner spinnerSplitPenalty;
-
+	PolylineControlPanel polylinePanel;
 
 	JCheckBox setRefineContour;
 	JCheckBox setRefineGray;
@@ -141,22 +136,8 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		spinnerMinEdgeR.setMaximumSize(spinnerMinEdgeR.getPreferredSize());
 		spinnerMinEdgeR.addChangeListener(this);
 
-		spinnerContourSplit = new JSpinner(new SpinnerNumberModel(config.detector.contourToPoly.splitFraction,
-				0.0,1.0,0.01));
-		configureSpinnerFloat(spinnerContourSplit);
-		spinnerContourMinSplit = new JSpinner(new SpinnerNumberModel(config.detector.contourToPoly.minimumSide.fraction,
-				0.0, 1.0, 0.001));
-		configureSpinnerFloat(spinnerContourMinSplit);
-		spinnerContourIterations = new JSpinner(new SpinnerNumberModel(config.detector.contourToPoly.iterations,
-				1, 200, 1));
-		spinnerContourIterations.setMaximumSize(spinnerContourIterations.getPreferredSize());
-		spinnerContourIterations.addChangeListener(this);
-		spinnerSplitPenalty = new JSpinner(new SpinnerNumberModel(config.detector.contourToPoly.pruneSplitPenalty, 0.0, 100.0, 1.0));
-		configureSpinnerFloat(spinnerSplitPenalty);
+		polylinePanel = new PolylineControlPanel(owner);
 
-		setConvex = new JCheckBox("Convex");
-		setConvex.addActionListener(this);
-		setConvex.setSelected(config.detector.convex);
 		setBorder = new JCheckBox("Image Border");
 		setBorder.addActionListener(this);
 		setBorder.setSelected(config.detector.canTouchBorder);
@@ -201,13 +182,9 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		addLabeled(spinnerMaxSides, "Maximum Sides: ", this);
 		addLabeled(spinnerMinEdgeD, "Edge Intensity D: ", this);
 		addLabeled(spinnerMinEdgeR, "Edge Intensity R: ", this);
-		addAlignLeft(setConvex, this);
 		addAlignLeft(setBorder, this);
-		addCenterLabel("Contour", this);
-		addLabeled(spinnerContourSplit, "Split Fraction: ", this);
-		addLabeled(spinnerContourMinSplit, "Min Split: ", this);
-		addLabeled(spinnerContourIterations, "Max Iterations: ", this);
-		addLabeled(spinnerSplitPenalty, "Split Penalty: ", this);
+		addCenterLabel("Polyline", this);
+		add(polylinePanel);
 		addCenterLabel("Refinement", this);
 		addAlignLeft(setRemoveBias, this);
 		addAlignLeft(setRefineContour, this);
@@ -248,9 +225,6 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		} else if( e.getSource() == showContour ) {
 			bShowContour = showContour.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == setConvex ) {
-			config.detector.convex = setConvex.isSelected();
-			owner.configUpdate();
 		} else if( e.getSource() == setBorder ) {
 			config.detector.canTouchBorder = setBorder.isSelected();
 			owner.configUpdate();
@@ -292,14 +266,6 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 			return;
 		} else if( e.getSource() == spinnerMinContourSize ) {
 			config.detector.minimumContour.length = ((Number) spinnerMinContourSize.getValue()).intValue();
-		} else if( e.getSource() == spinnerContourSplit ) {
-			config.detector.contourToPoly.splitFraction = ((Number) spinnerContourSplit.getValue()).doubleValue();
-		} else if( e.getSource() == spinnerContourMinSplit ) {
-			config.detector.contourToPoly.minimumSide.fraction = ((Number) spinnerContourMinSplit.getValue()).doubleValue();
-		} else if( e.getSource() == spinnerContourIterations ) {
-			config.detector.contourToPoly.iterations = ((Number) spinnerContourIterations.getValue()).intValue();
-		} else if( e.getSource() == spinnerSplitPenalty ) {
-			config.detector.contourToPoly.pruneSplitPenalty = ((Number) spinnerSplitPenalty.getValue()).doubleValue();
 		} else if (e.getSource() == spinnerLineSamples) {
 			refineGray.lineSamples = ((Number) spinnerLineSamples.getValue()).intValue();
 		} else if (e.getSource() == spinnerCornerOffset) {

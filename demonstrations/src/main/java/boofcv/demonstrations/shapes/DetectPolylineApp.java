@@ -19,13 +19,14 @@
 package boofcv.demonstrations.shapes;
 
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
-import boofcv.abst.shapes.polyline.NewSplitMerge_to_PointsToPolyline;
 import boofcv.abst.shapes.polyline.PointsToPolyline;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.factory.shape.ConfigSplitMergeLineFit;
+import boofcv.factory.shape.FactoryPointsToPolyline;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -85,12 +86,14 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 		synchronized (this) {
 			switch( polyControls.whichAlgorithm ) {
 				case 0:{
-					ConfigPolylineSplitMerge config = polyControls.panelSplitMerge2.config;
+					ConfigPolylineSplitMerge config = polyControls.getConfigSplitMerge();
+					contourToPolyline = FactoryPointsToPolyline.splitMerge(config);
+				}break;
 
-					config.minSides = polyControls.minSides;
-					config.maxSides = polyControls.maxSides;
-					config.convex = polyControls.convex;
-					contourToPolyline = new NewSplitMerge_to_PointsToPolyline(config);
+				case 1:{
+					ConfigSplitMergeLineFit config = polyControls.getConfigSplitMergeOld();
+					contourToPolyline = FactoryPointsToPolyline.splitMerge(config);
+					contourToPolyline.setMaxVertexes(polyControls.maxSides);
 				}break;
 
 				default:
