@@ -27,6 +27,7 @@ import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.demonstrations.shapes.DetectBlackShapeAppBase;
+import boofcv.demonstrations.shapes.ShapeGuiListener;
 import boofcv.factory.fiducial.ConfigQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
@@ -59,7 +60,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectQrCodeApp<T extends ImageGray<T>>
-		extends DetectBlackShapeAppBase
+		extends DetectBlackShapeAppBase implements ShapeGuiListener
 {
 	QrCodeDetector<T> detector;
 
@@ -93,13 +94,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		DetectQrCodeControlPanel controls = (DetectQrCodeControlPanel)DetectQrCodeApp.this.controls;
 
 		synchronized (this) {
-			ConfigQrCode config = controls.getConfigPolygon();
-
-			if( controls.bRefineGray ) {
-				config.polygon.refineGray = controls.refineGray;
-			} else {
-				config.polygon.refineGray = null;
-			}
+			ConfigQrCode config = controls.getConfigQr();
 
 			detector = FactoryFiducial.qrcode(config,imageClass);
 		}

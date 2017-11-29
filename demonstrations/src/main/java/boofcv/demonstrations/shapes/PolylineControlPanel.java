@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.shapes;
 
+import boofcv.abst.shapes.polyline.ConfigPolyline;
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.factory.shape.ConfigSplitMergeLineFit;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -25,6 +26,7 @@ import boofcv.gui.StandardAlgConfigPanel;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -37,6 +39,8 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		implements ActionListener, ChangeListener
 {
 	ShapeGuiListener owner;
+
+	JComboBox selectAlgorithm;
 
 	JSpinner spinnerMinSides;
 	JSpinner spinnerMaxSides;
@@ -55,9 +59,25 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 	boolean looping = true;
 
 	public PolylineControlPanel(ShapeGuiListener owner) {
+		this(owner,new ConfigPolylineSplitMerge());
+	}
+
+	public PolylineControlPanel(ShapeGuiListener owner, ConfigPolyline config ) {
 		this.owner = owner;
 
+		if( config instanceof ConfigPolylineSplitMerge ) {
+			panelSplitMerge = new SplitMergePanel((ConfigPolylineSplitMerge)config);
+			whichAlgorithm = 0;
+		} else {
+			panelOldSplitMerge = new OldSplitMergePanel((ConfigSplitMergeLineFit)config);
+			whichAlgorithm = 1;
+		}
+
 		setBorder(BorderFactory.createEmptyBorder());
+
+		selectAlgorithm = new JComboBox(new String[]{"New","Old"});
+		selectAlgorithm.setSelectedIndex(whichAlgorithm);
+		selectAlgorithm.addActionListener(this);
 
 		spinnerMinSides = new JSpinner(new SpinnerNumberModel(minSides, 3, 20, 1));
 		spinnerMinSides.setMaximumSize(spinnerMinSides.getPreferredSize());
@@ -65,6 +85,14 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		spinnerMaxSides = new JSpinner(new SpinnerNumberModel(maxSides, 3, 20, 1));
 		spinnerMaxSides.setMaximumSize(spinnerMaxSides.getPreferredSize());
 		spinnerMaxSides.addChangeListener(this);
+		JPanel sidesPanel = new JPanel();
+		sidesPanel.setLayout(new BoxLayout(sidesPanel,BoxLayout.X_AXIS));
+		sidesPanel.add( new JLabel("Sides:"));
+		sidesPanel.add(spinnerMinSides);
+		sidesPanel.add(Box.createRigidArea(new Dimension(10,10)));
+		sidesPanel.add( new JLabel("to"));
+		sidesPanel.add(Box.createRigidArea(new Dimension(10,10)));
+		sidesPanel.add(spinnerMaxSides);
 
 		checkConvex = new JCheckBox("Convex");
 		checkConvex.addActionListener(this);
@@ -72,17 +100,19 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		checkLooping = new JCheckBox("Looping");
 		checkLooping.addActionListener(this);
 		checkLooping.setSelected(looping);
+		JPanel flagsPanel = new JPanel();
+		flagsPanel.setLayout(new BoxLayout(flagsPanel,BoxLayout.X_AXIS));
+		flagsPanel.add(checkConvex);
+		flagsPanel.add(checkLooping);
 
-		addLabeled(spinnerMinSides, "Minimum Sides: ", this);
-		addLabeled(spinnerMaxSides, "Maximum Sides: ", this);
-		addAlignLeft(checkConvex, this);
-		addAlignLeft(checkLooping, this);
+		add(selectAlgorithm);
+		add(sidesPanel);
+		add(flagsPanel);
 
 		if( whichAlgorithm == 0 )
 			add(panelSplitMerge);
 		else
 			add(panelOldSplitMerge);
-		addVerticalGlue(this);
 	}
 
 	@Override
@@ -92,6 +122,20 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 			owner.configUpdate();
 		} else if( e.getSource() == checkLooping ) {
 			looping = checkLooping.isSelected();
+			owner.configUpdate();
+		} else if( e.getSource() == selectAlgorithm ) {
+			if( whichAlgorithm == 0 )
+				remove(panelSplitMerge);
+			else
+				remove(panelOldSplitMerge);
+			this.whichAlgorithm = selectAlgorithm.getSelectedIndex();
+			if( whichAlgorithm == 0 )
+				add(panelSplitMerge);
+			else
+				add(panelOldSplitMerge);
+			invalidate();
+			validate();
+			repaint();
 			owner.configUpdate();
 		}
 	}
@@ -120,7 +164,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 	class SplitMergePanel extends StandardAlgConfigPanel
 		implements ChangeListener
 	{
-		ConfigPolylineSplitMerge config = new ConfigPolylineSplitMerge();
+		ConfigPolylineSplitMerge config;
 
 		JSpinner spinnerConsiderSides;
 		JSpinner spinnerMinSideLength;
@@ -131,7 +175,14 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 
 		JSpinner spinnerSideSamples;
 
+
 		public SplitMergePanel() {
+			this(new ConfigPolylineSplitMerge());
+		}
+
+		public SplitMergePanel(ConfigPolylineSplitMerge config ) {
+			this.config = config;
+
 			setBorder(BorderFactory.createEmptyBorder());
 			spinnerMaxSideError   = spinner(config.maxSideError,0,500,0.2,1,2);
 			spinnerConsiderSides  = spinner(config.extraConsider.fraction, 0, 5.0, 0.25,1,3);
@@ -176,7 +227,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 	class OldSplitMergePanel extends StandardAlgConfigPanel
 			implements ChangeListener
 	{
-		ConfigSplitMergeLineFit config = new ConfigSplitMergeLineFit();
+		ConfigSplitMergeLineFit config;
 
 		JSpinner spinnerContourSplit;
 		JSpinner spinnerContourMinSplit;
@@ -184,6 +235,11 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		JSpinner spinnerSplitPenalty;
 
 		public OldSplitMergePanel() {
+			this(new ConfigSplitMergeLineFit());
+		}
+
+		public OldSplitMergePanel(ConfigSplitMergeLineFit config) {
+			this.config = config;
 			setBorder(BorderFactory.createEmptyBorder());
 			spinnerContourSplit = spinner(config.splitFraction,0.0,1.0,0.01,1,2);
 			spinnerContourMinSplit = spinner(config.minimumSide.fraction,0.0, 1.0, 0.001,1,3);

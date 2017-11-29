@@ -18,18 +18,18 @@
 
 package boofcv.factory.shape;
 
+import boofcv.abst.shapes.polyline.ConfigPolyline;
 import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
 import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitLoop;
 import boofcv.struct.ConfigLength;
-import boofcv.struct.Configuration;
 
 /**
  * Configuration for {@link SplitMergeLineFitLoop}
  *
  * @author Peter Abeles
  */
-public class ConfigSplitMergeLineFit implements Configuration {
+public class ConfigSplitMergeLineFit extends ConfigPolyline {
 	/**
 	 * A line is split if a point along the contour between the two end points has a distance from the line
 	 * which is greater than this fraction of the line's length

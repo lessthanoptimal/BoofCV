@@ -20,6 +20,7 @@ package boofcv.demonstrations.shapes;
 
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
+import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 
@@ -31,47 +32,34 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 
-import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
-import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
-
 /**
  * @author Peter Abeles
  */
-public class DetectPolygonControlPanel extends DetectBlackShapePanel
+public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		implements ActionListener, ChangeListener
 {
 	ShapeGuiListener owner;
-
-	// selects which image to view
-	JComboBox imageView;
-
-	JCheckBox showCorners;
-	JCheckBox showLines;
-	JCheckBox showContour;
 	JSpinner spinnerContourConnect;
 
-	ConnectRule connectRule = ConnectRule.FOUR;
-	boolean bShowCorners = true;
-	boolean bShowLines = true;
-	boolean bShowContour = false;
+	public boolean bRefineGray = true;
+	public ConfigRefinePolygonLineToImage refineGray;
 
-	boolean bRefineGray = true;
-	ConfigRefinePolygonLineToImage refineGray = new ConfigRefinePolygonLineToImage();
-
-	ThresholdControlPanel threshold;
+	public ThresholdControlPanel threshold;
 
 	JSpinner spinnerMinContourSize;
-	JSpinner spinnerMinSides;
-	JSpinner spinnerMaxSides;
 	JSpinner spinnerMinEdgeD; // threshold for detect
 	JSpinner spinnerMinEdgeR; // threshold for refine
 	JCheckBox setBorder;
 
-	PolylineControlPanel polylinePanel;
+	public PolylineControlPanel polylinePanel;
 
 	JCheckBox setRefineContour;
 	JCheckBox setRefineGray;
 	JCheckBox setRemoveBias;
+
+	JSpinner spinnerMinSides;
+	JSpinner spinnerMaxSides;
+
 	JSpinner spinnerLineSamples;
 	JSpinner spinnerCornerOffset;
 	JSpinner spinnerSampleRadius;
@@ -79,40 +67,26 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 	JSpinner spinnerConvergeTol;
 	JSpinner spinnerMaxCornerChange;
 
-	ConfigPolygonDetector config = new ConfigPolygonDetector(3,6);
+	public ConfigPolygonDetector config;
 
-	int minSides = 3;
-	int maxSides = 6;
+	public int minSides;
+	public int maxSides;
 
-	{
-		config.detector.minimumContour = ConfigLength.fixed(20);
+	// todo add back control for min/max sides
+
+	public DetectBlackPolygonControlPanel(ShapeGuiListener owner) {
+		this(owner,new ConfigPolygonDetector(3,6));
 	}
 
-	public DetectPolygonControlPanel(ShapeGuiListener owner) {
+	public DetectBlackPolygonControlPanel(ShapeGuiListener owner, ConfigPolygonDetector config) {
+		setBorder(BorderFactory.createEmptyBorder());
 		this.owner = owner;
-
-		imageView = new JComboBox();
-		imageView.addItem("Input");
-		imageView.addItem("Binary");
-		imageView.addItem("Black");
-		imageView.addActionListener(this);
-		imageView.setMaximumSize(imageView.getPreferredSize());
-
-		spinnerContourConnect = spinner(connectRule.ordinal(), ConnectRule.values());
-
-		selectZoom = new JSpinner(new SpinnerNumberModel(1,MIN_ZOOM,MAX_ZOOM,1));
-		selectZoom.addChangeListener(this);
-		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
-
-		showCorners = new JCheckBox("Corners");
-		showCorners.addActionListener(this);
-		showCorners.setSelected(bShowCorners);
-		showLines = new JCheckBox("Lines");
-		showLines.setSelected(bShowLines);
-		showLines.addActionListener(this);
-		showContour = new JCheckBox("Contour");
-		showContour.addActionListener(this);
-		showContour.setSelected(bShowContour);
+		this.config = config;
+		config.detector.minimumContour = ConfigLength.fixed(20);
+		minSides = config.detector.minimumSides;
+		maxSides = config.detector.maximumSides;
+		refineGray = config.refineGray != null ? config.refineGray : new ConfigRefinePolygonLineToImage();
+		spinnerContourConnect = spinner(config.detector.contourRule.ordinal(), ConnectRule.values());
 
 		threshold = new ThresholdControlPanel(owner);
 
@@ -120,81 +94,77 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 				5,10000,2));
 		spinnerMinContourSize.setMaximumSize(spinnerMinContourSize.getPreferredSize());
 		spinnerMinContourSize.addChangeListener(this);
+
+		spinnerMinSides = spinner(minSides, 3, 20, 1);
+		spinnerMaxSides = spinner(maxSides, 3, 20, 1);
 		spinnerMinSides = new JSpinner(new SpinnerNumberModel(minSides, 3, 20, 1));
 		spinnerMinSides.setMaximumSize(spinnerMinSides.getPreferredSize());
 		spinnerMinSides.addChangeListener(this);
 		spinnerMaxSides = new JSpinner(new SpinnerNumberModel(maxSides, 3, 20, 1));
 		spinnerMaxSides.setMaximumSize(spinnerMaxSides.getPreferredSize());
 		spinnerMaxSides.addChangeListener(this);
+		JPanel sidesPanel = new JPanel();
+		sidesPanel.setLayout(new BoxLayout(sidesPanel,BoxLayout.X_AXIS));
+		sidesPanel.add( new JLabel("Sides:"));
+		sidesPanel.add(spinnerMinSides);
+		sidesPanel.add(Box.createRigidArea(new Dimension(10,10)));
+		sidesPanel.add( new JLabel("to"));
+		sidesPanel.add(Box.createRigidArea(new Dimension(10,10)));
+		sidesPanel.add(spinnerMaxSides);
 
-		spinnerMinEdgeD = new JSpinner(new SpinnerNumberModel(config.detector.minimumEdgeIntensity,
-				0.0,255.0,1.0));
-		spinnerMinEdgeD.setMaximumSize(spinnerMinEdgeD.getPreferredSize());
-		spinnerMinEdgeD.addChangeListener(this);
-		spinnerMinEdgeR = new JSpinner(new SpinnerNumberModel(config.minimumRefineEdgeIntensity,
-				0.0,255.0,1.0));
-		spinnerMinEdgeR.setMaximumSize(spinnerMinEdgeR.getPreferredSize());
-		spinnerMinEdgeR.addChangeListener(this);
+		spinnerMinEdgeD = spinner(config.detector.minimumEdgeIntensity, 0.0,255.0,1.0);
+		spinnerMinEdgeR = spinner(config.minimumRefineEdgeIntensity, 0.0,255.0,1.0);
 
-		polylinePanel = new PolylineControlPanel(owner);
+		polylinePanel = new PolylineControlPanel(owner,config.detector.contourToPoly);
 
 		setBorder = new JCheckBox("Image Border");
 		setBorder.addActionListener(this);
 		setBorder.setSelected(config.detector.canTouchBorder);
 
 		setRefineContour = new JCheckBox("Refine Contour");
-		setRefineContour.addActionListener(this);
 		setRefineContour.setSelected(config.refineContour);
+		setRefineContour.addActionListener(this);
 		setRefineGray = new JCheckBox("Refine Gray");
-		setRefineGray.addActionListener(this);
 		setRefineGray.setSelected(config.refineGray != null);
+		setRefineGray.addActionListener(this);
 		setRemoveBias = new JCheckBox("Remove Bias");
-		setRemoveBias.addActionListener(this);
 		setRemoveBias.setSelected(config.adjustForThresholdBias);
-		spinnerLineSamples = new JSpinner(new SpinnerNumberModel(refineGray.lineSamples, 5, 100, 1));
-		spinnerLineSamples.setMaximumSize(spinnerLineSamples.getPreferredSize());
-		spinnerLineSamples.addChangeListener(this);
-		spinnerCornerOffset = new JSpinner(new SpinnerNumberModel(refineGray.cornerOffset, 0, 10, 1));
-		spinnerCornerOffset.setMaximumSize(spinnerCornerOffset.getPreferredSize());
-		spinnerCornerOffset.addChangeListener(this);
-		spinnerSampleRadius = new JSpinner(new SpinnerNumberModel(refineGray.sampleRadius, 1, 10, 1));
-		spinnerSampleRadius.setMaximumSize(spinnerCornerOffset.getPreferredSize());
-		spinnerSampleRadius.addChangeListener(this);
-		spinnerRefineMaxIterations = new JSpinner(new SpinnerNumberModel(refineGray.maxIterations, 1, 200, 1));
-		spinnerRefineMaxIterations.setMaximumSize(spinnerRefineMaxIterations.getPreferredSize());
-		spinnerRefineMaxIterations.addChangeListener(this);
-		spinnerConvergeTol = new JSpinner(new SpinnerNumberModel(refineGray.convergeTolPixels, 0.0, 2.0, 0.005));
+		setRemoveBias.addActionListener(this);
+		spinnerLineSamples = spinner(refineGray.lineSamples, 5, 100, 1);
+		spinnerCornerOffset = spinner(refineGray.cornerOffset, 0, 10, 1);
+		spinnerSampleRadius = spinner(refineGray.sampleRadius, 1, 10, 1);
+		spinnerRefineMaxIterations = spinner(refineGray.maxIterations, 1, 200, 1);
+		spinnerConvergeTol = spinner(refineGray.convergeTolPixels, 0.0, 2.0, 0.005);
 		configureSpinnerFloat(spinnerConvergeTol);
-		spinnerMaxCornerChange = new JSpinner(new SpinnerNumberModel(refineGray.maxCornerChangePixel, 0.0, 50.0, 1.0));
+		spinnerMaxCornerChange = spinner(refineGray.maxCornerChangePixel, 0.0, 50.0, 1.0);
 		configureSpinnerFloat(spinnerMaxCornerChange);
 
-		addLabeled(processingTimeLabel,"Time (ms)", this);
-		addLabeled(imageSizeLabel,"Size", this);
-		addLabeled(imageView, "View: ", this);
-		addLabeled(selectZoom,"Zoom",this);
-		addAlignLeft(showCorners, this);
-		addAlignLeft(showLines, this);
-		addAlignLeft(showContour, this);
-		add(threshold);
-		addLabeled(spinnerContourConnect,"Contour Connect: ",this);
-		addLabeled(spinnerMinContourSize, "Min Contour Size: ", this);
-		addLabeled(spinnerMinSides, "Minimum Sides: ", this);
-		addLabeled(spinnerMaxSides, "Maximum Sides: ", this);
-		addLabeled(spinnerMinEdgeD, "Edge Intensity D: ", this);
-		addLabeled(spinnerMinEdgeR, "Edge Intensity R: ", this);
+		StandardAlgConfigPanel refinePanel = new StandardAlgConfigPanel();
+		refinePanel.addAlignLeft(setRemoveBias);
+		refinePanel.addAlignLeft(setRefineContour);
+		refinePanel.addAlignLeft(setRefineGray);
+		refinePanel.addLabeled(spinnerLineSamples, "Line Samples: ");
+		refinePanel.addLabeled(spinnerCornerOffset, "Corner Offset: ");
+		refinePanel.addLabeled(spinnerSampleRadius, "Sample Radius: ");
+		refinePanel.addLabeled(spinnerRefineMaxIterations, "Iterations: ");
+		refinePanel.addLabeled(spinnerConvergeTol, "Converge Tol Pixels: ");
+		refinePanel.addLabeled(spinnerMaxCornerChange, "Max Corner Change: ");
+
+		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane.addTab("Threshold", threshold);
+		tabbedPane.addTab("Polyline", polylinePanel);
+		tabbedPane.addTab("Refine", refinePanel);
+
+		addLabeled(spinnerContourConnect,"Contour Connect: ");
+		addLabeled(spinnerMinContourSize, "Min Contour Size: ");
+		addLabeled(spinnerMinEdgeD, "Edge Intensity D: ");
+		addLabeled(spinnerMinEdgeR, "Edge Intensity R: ");
+		addLabeled(spinnerMinSides,"Min Sides");
+		addLabeled(spinnerMaxSides,"Max Sides");
+
 		addAlignLeft(setBorder, this);
-		addCenterLabel("Polyline", this);
-		add(polylinePanel);
-		addCenterLabel("Refinement", this);
-		addAlignLeft(setRemoveBias, this);
-		addAlignLeft(setRefineContour, this);
-		addAlignLeft(setRefineGray, this);
-		addLabeled(spinnerLineSamples, "Line Samples: ", this);
-		addLabeled(spinnerCornerOffset, "Corner Offset: ", this);
-		addLabeled(spinnerSampleRadius, "Sample Radius: ", this);
-		addLabeled(spinnerRefineMaxIterations, "Iterations: ", this);
-		addLabeled(spinnerConvergeTol, "Converge Tol Pixels: ", this);
-		addLabeled(spinnerMaxCornerChange, "Max Corner Change: ", this);
+		add(tabbedPane);
+
 		addVerticalGlue(this);
 	}
 
@@ -213,19 +183,7 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == imageView ) {
-			selectedView = imageView.getSelectedIndex();
-			owner.viewUpdated();
-		} else if( e.getSource() == showCorners ) {
-			bShowCorners = showCorners.isSelected();
-			owner.viewUpdated();
-		} else if( e.getSource() == showLines ) {
-			bShowLines = showLines.isSelected();
-			owner.viewUpdated();
-		} else if( e.getSource() == showContour ) {
-			bShowContour = showContour.isSelected();
-			owner.viewUpdated();
-		} else if( e.getSource() == setBorder ) {
+		if( e.getSource() == setBorder ) {
 			config.detector.canTouchBorder = setBorder.isSelected();
 			owner.configUpdate();
 		} else if( e.getSource() == setRefineContour ) {
@@ -244,8 +202,6 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 	public void stateChanged(ChangeEvent e) {
 		if( e.getSource() == spinnerMinEdgeD) {
 			config.detector.minimumEdgeIntensity = ((Number) spinnerMinEdgeD.getValue()).doubleValue();
-		} else if( e.getSource() == spinnerMinEdgeR) {
-			config.minimumRefineEdgeIntensity = ((Number) spinnerMinEdgeR.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerMinSides ) {
 			minSides = ((Number) spinnerMinSides.getValue()).intValue();
 			if( minSides > maxSides ) {
@@ -260,10 +216,8 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 				spinnerMinSides.setValue(minSides);
 			}
 			updateSidesInConfig();
-		} else if( e.getSource() == selectZoom ) {
-			zoom = ((Number) selectZoom.getValue()).doubleValue();
-			owner.viewUpdated();
-			return;
+		} else if( e.getSource() == spinnerMinEdgeR) {
+			config.minimumRefineEdgeIntensity = ((Number) spinnerMinEdgeR.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerMinContourSize ) {
 			config.detector.minimumContour.length = ((Number) spinnerMinContourSize.getValue()).intValue();
 		} else if (e.getSource() == spinnerLineSamples) {
@@ -279,7 +233,7 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 		} else if (e.getSource() == spinnerMaxCornerChange) {
 			refineGray.maxCornerChangePixel = ((Number) spinnerMaxCornerChange.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourConnect ) {
-			connectRule = (ConnectRule)spinnerContourConnect.getValue();
+			config.detector.contourRule = (ConnectRule)spinnerContourConnect.getValue();
 		}
 		owner.configUpdate();
 	}
@@ -294,6 +248,18 @@ public class DetectPolygonControlPanel extends DetectBlackShapePanel
 	}
 
 	public ConfigPolygonDetector getConfigPolygon() {
+		if( polylinePanel.whichAlgorithm == 0 ) {
+			config.detector.contourToPoly = polylinePanel.getConfigSplitMerge();
+		} else {
+			config.detector.contourToPoly = polylinePanel.getConfigSplitMergeOld();
+		}
+		if( bRefineGray ) {
+			System.out.println("refine on ");
+			config.refineGray = refineGray;
+		} else {
+			System.out.println("refine off ");
+			config.refineGray = null;
+		}
 		return config;
 	}
 }

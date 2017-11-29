@@ -106,10 +106,7 @@ public class FactoryShapeDetector {
 		config.checkValidity();
 
 		PointsToPolyline contourToPolygon =
-				FactoryPointsToPolyline.splitMerge(config.contourToPoly);
-
-//		PointsToPolyline contourToPolygon =
-//				FactoryPointsToPolyline.featuresSplitMerge(null);
+				FactoryPointsToPolyline.create(config.contourToPoly);
 
 		LinearContourLabelChang2004 contour = new LinearContourLabelChang2004(config.contourRule);
 

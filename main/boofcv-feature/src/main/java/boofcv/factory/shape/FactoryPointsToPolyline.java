@@ -19,7 +19,6 @@
 package boofcv.factory.shape;
 
 import boofcv.abst.shapes.polyline.*;
-import boofcv.alg.shapes.polyline.keypoint.ContourInterestThenSplitMerge;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFit;
 
 /**
@@ -28,6 +27,19 @@ import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFit;
  * @author Peter Abeles
  */
 public class FactoryPointsToPolyline {
+
+	/**
+	 * Generic function for create polyline algorithms based on configuration type
+	 */
+	public static PointsToPolyline create( ConfigPolyline config ) {
+		if( config instanceof ConfigSplitMergeLineFit ) {
+			return splitMerge((ConfigSplitMergeLineFit)config);
+		} else if( config instanceof ConfigPolylineSplitMerge ) {
+			return splitMerge((ConfigPolylineSplitMerge)config);
+		} else {
+			throw new RuntimeException("Unknown");
+		}
+	}
 
 	/**
 	 * Use a split-merge strategy to fit the contour
@@ -45,23 +57,6 @@ public class FactoryPointsToPolyline {
 				config.splitFraction, config.minimumSide,config.iterations,config.refine,config.pruneSplitPenalty,config.loop);
 	}
 
-	/**
-	 * Finds features along the contour first then applies a split merge strategy on the sparse set of points
-	 *
-	 * @param config Configuration. null if use default
-	 * @return {@link ContourInterestThenSplitMerge}
-	 */
-	public static PointsToPolyline featuresSplitMerge(ConfigPointSplitMergePolyline config ) {
-		if( config == null )
-			config = new ConfigPointSplitMergePolyline();
-
-		config.checkValidity();
-
-		ContourInterestThenSplitMerge alg = new ContourInterestThenSplitMerge(config.looping,config.period,
-				config.featureThreshold,config.splitFraction,config.iterations);
-
-		return new ContourInterestThenSplitMerge_to_PointsToPolyline(alg);
-	}
 
 	public static PointsToPolyline splitMerge(ConfigPolylineSplitMerge config ) {
 		if( config == null )

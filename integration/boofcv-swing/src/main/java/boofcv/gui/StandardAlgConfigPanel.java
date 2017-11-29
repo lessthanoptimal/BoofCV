@@ -88,7 +88,20 @@ public class StandardAlgConfigPanel extends JPanel {
 		spinner.setMaximumSize(d);
 	}
 
-	public void addAlignLeft( JComponent target, JPanel owner ) {
+	public void addAlignLeft( JComponent target ) {
+		addAlignLeft(target,this);
+	}
+
+	public void addAlignRight( JComponent target ) {
+		addAlignRight(target,this);
+	}
+
+	public void addAlignCenter( JComponent target ) {
+		addAlignCenter(target,this);
+	}
+
+
+	public static void addAlignLeft( JComponent target, JPanel owner ) {
 		JPanel p = new JPanel();
 		p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
 		p.add(target);
@@ -96,7 +109,7 @@ public class StandardAlgConfigPanel extends JPanel {
 		owner.add(p);
 	}
 
-	public void addAlignRight( JComponent target, JPanel owner ) {
+	public static void addAlignRight( JComponent target, JPanel owner ) {
 		JPanel p = new JPanel();
 		p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
 		p.add(Box.createHorizontalGlue());
@@ -104,7 +117,7 @@ public class StandardAlgConfigPanel extends JPanel {
 		owner.add(p);
 	}
 
-	public void addAlignCenter( JComponent target, JPanel owner ) {
+	public static void addAlignCenter( JComponent target, JPanel owner ) {
 		JPanel p = new JPanel();
 		p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
 		p.add(Box.createHorizontalGlue());
@@ -134,7 +147,11 @@ public class StandardAlgConfigPanel extends JPanel {
 		add(Box.createRigidArea(new Dimension(1,8)));
 	}
 
-	public void addLabeled( JComponent target , String text , JPanel owner ) {
+	public void addLabeled( JComponent target , String text ) {
+		addLabeled(target,text,this);
+	}
+
+	public static void addLabeled( JComponent target , String text , JPanel owner ) {
 		JLabel label = new JLabel(text);
 		label.setLabelFor(target);
 		JPanel p = new JPanel();

@@ -29,7 +29,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.alg.shapes.polyline.keypoint.TestContourInterestPointDetector.rect;
 import static org.junit.Assert.*;
 
 /**
@@ -513,5 +512,39 @@ public class TestPolylineSplitMerge {
 		assertEquals(0, Distance2D_F64.distanceSq(line,1,5), GrlConstants.TEST_F64);
 		assertEquals(0, Distance2D_F64.distanceSq(line,9,5), GrlConstants.TEST_F64);
 
+	}
+
+	public static List<Point2D_I32> rect( int x0 , int y0 , int x1 , int y1 ) {
+		List<Point2D_I32> out = new ArrayList<>();
+
+		out.addAll( line(x0,y0,x1,y0));
+		out.addAll( line(x1,y0,x1,y1));
+		out.addAll( line(x1,y1,x0,y1));
+		out.addAll( line(x0,y1,x0,y0));
+
+		return out;
+	}
+
+	private static List<Point2D_I32> line( int x0 , int y0 , int x1 , int y1 ) {
+		List<Point2D_I32> out = new ArrayList<>();
+
+		int lengthY = Math.abs(y1-y0);
+		int lengthX = Math.abs(x1-x0);
+
+		int x,y;
+		if( lengthY > lengthX ) {
+			for (int i = 0; i < lengthY; i++) {
+				x = x0 + (x1-x0)*lengthX*i/lengthY;
+				y = y0 + (y1-y0)*i/lengthY;
+				out.add( new Point2D_I32(x,y));
+			}
+		} else {
+			for (int i = 0; i < lengthX; i++) {
+				x = x0 + (x1-x0)*i/lengthX;
+				y = y0 + (y1-y0)*lengthY*i/lengthX;
+				out.add( new Point2D_I32(x,y));
+			}
+		}
+		return out;
 	}
 }

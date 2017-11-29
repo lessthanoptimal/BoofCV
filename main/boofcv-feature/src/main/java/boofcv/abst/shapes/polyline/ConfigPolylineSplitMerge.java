@@ -19,14 +19,13 @@
 package boofcv.abst.shapes.polyline;
 
 import boofcv.struct.ConfigLength;
-import boofcv.struct.Configuration;
 
 /**
  * Configuration for {@link boofcv.alg.shapes.polyline.splitmerge.PolylineSplitMerge}
  *
  * @author Peter Abeles
  */
-public class ConfigPolylineSplitMerge implements Configuration {
+public class ConfigPolylineSplitMerge extends ConfigPolyline {
 	/**
 	 * Can it assume the shape is convex? If so it can reject shapes earlier
 	 */

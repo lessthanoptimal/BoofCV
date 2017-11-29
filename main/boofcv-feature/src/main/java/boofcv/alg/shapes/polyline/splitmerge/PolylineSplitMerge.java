@@ -192,6 +192,8 @@ public class PolylineSplitMerge {
 
 	/**
 	 * Saves the current polyline
+	 *
+	 * @return true if the polyline is better than any previously saved result false if not and it wasn't saved
 	 */
 	boolean savePolyline() {
 		// if a polyline of this size has already been saved then over write it

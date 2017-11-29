@@ -18,6 +18,7 @@
 
 package boofcv.factory.shape;
 
+import boofcv.abst.shapes.polyline.ConfigPolyline;
 import boofcv.alg.shapes.edge.EdgeIntensityPolygon;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
@@ -53,7 +54,7 @@ public class ConfigPolygonFromContour implements Configuration {
 	/**
 	 * Configuration for fitting a polygon to the contour.
 	 */
-	public ConfigSplitMergeLineFit contourToPoly = new ConfigSplitMergeLineFit();
+	public ConfigPolyline contourToPoly = new ConfigSplitMergeLineFit();
 
 	/**
 	 * <p>

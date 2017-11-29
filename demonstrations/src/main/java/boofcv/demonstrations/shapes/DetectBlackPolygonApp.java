@@ -56,7 +56,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 	public DetectBlackPolygonApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);
 
-		setupGui(new VisualizePanel(),new DetectPolygonControlPanel(this));
+		setupGui(new VisualizePanel(),new DetectBlackPolygonAppControlPanel(this));
 	}
 
 	@Override
@@ -64,24 +64,19 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 		if( !initializing)
 			BoofSwingUtil.checkGuiThread();
 
-		DetectPolygonControlPanel controls = (DetectPolygonControlPanel)DetectBlackPolygonApp.this.controls;
-
 		synchronized (this) {
-			ConfigPolygonDetector config = controls.getConfigPolygon();
-
-			config.detector.contourRule = controls.connectRule;
-
-			if( controls.bRefineGray ) {
-				config.refineGray = controls.refineGray;
-			} else {
-				config.refineGray = null;
-			}
+			ConfigPolygonDetector config = getConfigPolygonDetector();
 
 			detector = FactoryShapeDetector.polygon(config, imageClass);
 		}
 		imageThresholdUpdated();
 	}
 
+	public ConfigPolygonDetector getConfigPolygonDetector() {
+		DetectBlackPolygonAppControlPanel controls = (DetectBlackPolygonAppControlPanel)DetectBlackPolygonApp.this.controls;
+		ConfigPolygonDetector config = controls.polygonPanel.getConfigPolygon();
+		return config;
+	}
 
 	public void configUpdate() {
 		createDetector(false);
@@ -90,9 +85,9 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 
 	@Override
 	public void imageThresholdUpdated() {
-		DetectPolygonControlPanel controls = (DetectPolygonControlPanel)DetectBlackPolygonApp.this.controls;
+		DetectBlackPolygonAppControlPanel controls = (DetectBlackPolygonAppControlPanel)DetectBlackPolygonApp.this.controls;
 
-		ConfigThreshold config = controls.getThreshold().createConfig();
+		ConfigThreshold config = controls.polygonPanel.getThreshold().createConfig();
 
 		synchronized (this) {
 			inputToBinary = FactoryThresholdBinary.threshold(config, imageClass);
@@ -112,7 +107,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 
-			DetectPolygonControlPanel controls = (DetectPolygonControlPanel)DetectBlackPolygonApp.this.controls;
+			DetectBlackPolygonAppControlPanel controls = (DetectBlackPolygonAppControlPanel)DetectBlackPolygonApp.this.controls;
 
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

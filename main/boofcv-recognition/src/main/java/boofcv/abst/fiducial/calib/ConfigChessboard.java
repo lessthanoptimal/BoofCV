@@ -23,6 +23,7 @@ import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ConfigThresholdBlockMinMax;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
+import boofcv.factory.shape.ConfigSplitMergeLineFit;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
@@ -75,9 +76,9 @@ public class ConfigChessboard implements Configuration {
 		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
 		thresholding.scale = 0.9;
 
-		square.detector.contourToPoly.splitFraction = 0.1;
+		((ConfigSplitMergeLineFit)square.detector.contourToPoly).splitFraction = 0.1;
 		// the erosion step appears to require a smaller value here
-		square.detector.contourToPoly.minimumSide = ConfigLength.relative(0.025,0);
+		((ConfigSplitMergeLineFit)square.detector.contourToPoly).minimumSide = ConfigLength.relative(0.025,0);
 		square.detector.tangentEdgeIntensity = 2.5; // the initial contour is the result of being eroded
 		square.detector.minimumContour = ConfigLength.fixed(10);
 		square.detector.canTouchBorder = true;
