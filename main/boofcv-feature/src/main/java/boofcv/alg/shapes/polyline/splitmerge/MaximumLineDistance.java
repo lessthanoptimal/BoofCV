@@ -37,7 +37,7 @@ public class MaximumLineDistance implements SplitSelector {
 
 		if( indexB >= indexA ) {
 			results.index = indexA;
-			results.score = 0;
+			results.score = -1;
 			for (int i = indexA+1; i < indexB; i++) {
 				Point2D_I32 p = contour.get(i);
 				double distanceSq = Distance2D_F64.distanceSq(line,p.x,p.y);
@@ -49,8 +49,8 @@ public class MaximumLineDistance implements SplitSelector {
 			}
 		} else {
 			results.index = indexA;
-			results.score = 0;
-			int distance = contour.size()-indexA + indexB-1;
+			results.score = -1;
+			int distance = contour.size()-indexA + indexB;
 			for (int i = 1; i < distance; i++) {
 				int index = (indexA+i)%contour.size();
 				Point2D_I32 p = contour.get(index);
@@ -63,8 +63,8 @@ public class MaximumLineDistance implements SplitSelector {
 			}
 		}
 
-		if( results.index >= contour.size() )
-			throw new RuntimeException("Egads");
+//		if( results.index >= contour.size() )
+//			throw new RuntimeException("Egads");
 	}
 
 	@Override

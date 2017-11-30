@@ -18,10 +18,10 @@
 
 package boofcv.abst.fiducial.calib;
 
+import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.ConfigPolygonDetector;
-import boofcv.factory.shape.ConfigSplitMergeLineFit;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
@@ -68,8 +68,7 @@ public class ConfigSquareGrid implements Configuration {
 		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
 		thresholding.scale = 0.85;
 
-		((ConfigSplitMergeLineFit)square.detector.contourToPoly).splitFraction = 0.1;
-		((ConfigSplitMergeLineFit)square.detector.contourToPoly).minimumSide = ConfigLength.relative(0.05,0);
+		((ConfigPolylineSplitMerge)square.detector.contourToPoly).cornerScorePenalty = 0.5;
 		square.detector.minimumContour = ConfigLength.fixed(10);
 
 		square.refineGray.cornerOffset = 1;

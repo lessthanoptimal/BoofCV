@@ -18,12 +18,12 @@
 
 package boofcv.abst.fiducial.calib;
 
+import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ConfigThresholdBlockMinMax;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
-import boofcv.factory.shape.ConfigSplitMergeLineFit;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
@@ -76,9 +76,12 @@ public class ConfigChessboard implements Configuration {
 		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
 		thresholding.scale = 0.9;
 
-		((ConfigSplitMergeLineFit)square.detector.contourToPoly).splitFraction = 0.1;
-		// the erosion step appears to require a smaller value here
-		((ConfigSplitMergeLineFit)square.detector.contourToPoly).minimumSide = ConfigLength.relative(0.025,0);
+		((ConfigPolylineSplitMerge)square.detector.contourToPoly).minSides = 3;
+		((ConfigPolylineSplitMerge)square.detector.contourToPoly).cornerScorePenalty = 0.5;
+		((ConfigPolylineSplitMerge)square.detector.contourToPoly).minimumSideLength = 2;
+//		((ConfigPolylineSplitMerge)square.detector.contourToPoly).thresholdSideSplitScore = 0;
+//		((ConfigPolylineSplitMerge)square.detector.contourToPoly).maxSideError = 1000;
+//		((ConfigPolylineSplitMerge)square.detector.contourToPoly).convexTest = 1000;
 		square.detector.tangentEdgeIntensity = 2.5; // the initial contour is the result of being eroded
 		square.detector.minimumContour = ConfigLength.fixed(10);
 		square.detector.canTouchBorder = true;

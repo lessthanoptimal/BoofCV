@@ -294,7 +294,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 			if( contourTmp.size() >= minimumContour) {
 				float edgeInside=-1,edgeOutside=-1;
 
-//				System.out.println("----- candidate "+c.external.size());
+//				System.out.println("----- candidate "+contourTmp.size()+"  "+contourTmp.get(0));
 
 				// ignore shapes which touch the image border
 				boolean touchesBorder = touchesBorder(contourTmp.toList());
@@ -334,7 +334,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 				// Find the initial approximate fit of a polygon to the contour
 				if( !fitPolygon.process(undistorted,splits) ) {
-					if( verbose ) System.out.println("rejected polygon initial fit failed. contour size = "+contourTmp.toList());
+					if( verbose ) System.out.println("rejected polygon initial fit failed. contour size = "+contourTmp.size());
 					continue;
 				}
 

@@ -18,8 +18,8 @@
 
 package boofcv.factory.fiducial;
 
+import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.factory.shape.ConfigPolygonDetector;
-import boofcv.factory.shape.ConfigSplitMergeLineFit;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
@@ -37,7 +37,7 @@ public class ConfigQrCode implements Configuration {
 
 	{
 		polygon.detector.clockwise = false;
-		((ConfigSplitMergeLineFit)polygon.detector.contourToPoly).splitFraction = 0.1;
+		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).cornerScorePenalty = 0.2;
 		// 28 pixels = 7 by 7 square viewed head on. Each cell is then 1 pixel. Any slight skew results in
 		// aliasing and will most likely not be read well.
 		polygon.detector.minimumContour = ConfigLength.fixed(27);

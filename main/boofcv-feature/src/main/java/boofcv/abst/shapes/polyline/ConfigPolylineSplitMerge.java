@@ -75,7 +75,7 @@ public class ConfigPolylineSplitMerge extends ConfigPolyline {
 	public double convexTest = 2.5;
 
 	/**
-	 * Maximum allowed error along a single side in Eclidean distance.
+	 * Maximum allowed error along a single side in Eclidean distance in pixels.
 	 */
 	public double maxSideError = 3;
 
@@ -83,5 +83,21 @@ public class ConfigPolylineSplitMerge extends ConfigPolyline {
 	public void checkValidity() {
 		if( minSides < 3 )
 			throw new RuntimeException("Minimum sides must be >= 3");
+	}
+
+	@Override
+	public String toString() {
+		return "ConfigPolylineSplitMerge{" +
+				"convex=" + convex +
+				", maxSides=" + maxSides +
+				", minSides=" + minSides +
+				", minimumSideLength=" + minimumSideLength +
+				", extraConsider=" + extraConsider +
+				", cornerScorePenalty=" + cornerScorePenalty +
+				", thresholdSideSplitScore=" + thresholdSideSplitScore +
+				", maxNumberOfSideSamples=" + maxNumberOfSideSamples +
+				", convexTest=" + convexTest +
+				", maxSideError=" + maxSideError +
+				'}';
 	}
 }
