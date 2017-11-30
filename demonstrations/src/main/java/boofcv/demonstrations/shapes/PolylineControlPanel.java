@@ -185,7 +185,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 			this.config = config;
 
 			setBorder(BorderFactory.createEmptyBorder());
-			spinnerMaxSideError   = spinner(config.maxSideError,0,500,0.2,1,2);
+			spinnerMaxSideError   = spinner(config.maxSideError.fraction,0,1.0,0.01,1,3);
 			spinnerConsiderSides  = spinner(config.extraConsider.fraction, 0, 5.0, 0.25,1,3);
 			spinnerMinSideLength  = spinner(config.minimumSideLength, 1, 1000, 1);
 			spinnerCornerPenalty  = spinner(config.cornerScorePenalty,0,100,0.1);
@@ -217,7 +217,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 			} else if (spinnerConvexTest == e.getSource()) {
 				config.convexTest = ((Number) spinnerConvexTest.getValue()).doubleValue();
 			} else if (spinnerMaxSideError == e.getSource()) {
-				config.maxSideError = ((Number) spinnerMaxSideError.getValue()).doubleValue();
+				config.maxSideError.fraction = ((Number) spinnerMaxSideError.getValue()).doubleValue();
 			} else {
 				throw new RuntimeException("Unknown");
 			}

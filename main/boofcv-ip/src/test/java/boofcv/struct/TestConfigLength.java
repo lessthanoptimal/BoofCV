@@ -32,7 +32,7 @@ public class TestConfigLength {
 	public void fixed() {
 		ConfigLength c = ConfigLength.fixed(3);
 
-		assertEquals(3,c.length);
+		assertEquals(3,c.length, UtilEjml.TEST_F64);
 		assertEquals(-1,c.fraction, UtilEjml.TEST_F64);
 	}
 
@@ -40,7 +40,7 @@ public class TestConfigLength {
 	public void relative() {
 		ConfigLength c = ConfigLength.relative(0.01,0);
 
-		assertEquals(0,c.length);
+		assertEquals(0,c.length, UtilEjml.TEST_F64);
 		assertEquals(0.01,c.fraction, UtilEjml.TEST_F64);
 	}
 
@@ -63,7 +63,7 @@ public class TestConfigLength {
 	public void copy() {
 		ConfigLength found = new ConfigLength(2,0.1).copy();
 
-		assertEquals(2,found.length);
+		assertEquals(2,found.length, UtilEjml.TEST_F64);
 		assertEquals(0.1,found.fraction,UtilEjml.TEST_F64);
 	}
 }

@@ -24,7 +24,9 @@ import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFit;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitLoop;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitSegment;
 import boofcv.struct.ConfigLength;
+import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.List;
@@ -38,6 +40,7 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 
 	// reject the number of sides found is greater than this amount
 	int maxVertexes = Integer.MAX_VALUE;
+	int minVertexes = 3;
 
 	// standard split merge algorithm
 	SplitMergeLineFit splitMerge;
@@ -46,6 +49,10 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 	// removes extra corners
 	private GrowQueue_I32 pruned = new GrowQueue_I32(); // corners after pruning
 	private MinimizeEnergyPrune pruner;
+
+	boolean convex = true;
+
+	Polygon2D_F64 tmp = new Polygon2D_F64();
 
 	public SplitMergeLineRefine_to_PointsToPolyline(double splitFraction,
 													ConfigLength minimumSplit,
@@ -84,7 +91,26 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 			vertexes.setTo(pruned);
 		}
 
-		return vertexes.size <= maxVertexes;
+		if( vertexes.size > maxVertexes || vertexes.size < minVertexes )
+			return false;
+
+		tmp.vertexes.resize(vertexes.size);
+		for (int i = 0; i < vertexes.size; i++) {
+			Point2D_I32 p = input.get( vertexes.get(i));
+			tmp.set(i,p.x,p.y);
+		}
+
+		return convex == UtilPolygons2D_F64.isConvex(tmp);
+	}
+
+	@Override
+	public void getMinVertexes(int minimum) {
+		this.minVertexes = minimum;
+	}
+
+	@Override
+	public int getMinVertexes() {
+		return minVertexes;
 	}
 
 	@Override
@@ -102,5 +128,15 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 	@Override
 	public boolean isLoop() {
 		return splitMerge instanceof SplitMergeLineFitLoop;
+	}
+
+	@Override
+	public void setConvex(boolean convex) {
+		this.convex = convex;
+	}
+
+	@Override
+	public boolean isConvex() {
+		return convex;
 	}
 }

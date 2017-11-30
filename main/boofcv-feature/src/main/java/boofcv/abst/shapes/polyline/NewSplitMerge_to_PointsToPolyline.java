@@ -29,17 +29,18 @@ import java.util.List;
  */
 public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 
-	// todo add max side error?
 	PolylineSplitMerge alg;
 
 	public NewSplitMerge_to_PointsToPolyline( ConfigPolylineSplitMerge config ){
+
+		// ignore parameters which are specified in the PointsToPolyline interface
 		alg = new PolylineSplitMerge();
 		alg.setMinimumSideLength(config.minimumSideLength);
 		alg.setMaxNumberOfSideSamples(config.maxNumberOfSideSamples);
-		alg.setMaxSides(config.maxSides);
-		alg.setMinSides(config.minSides);
+		alg.setMaxSides(Integer.MAX_VALUE);
+		alg.setMinSides(3);
 		alg.setExtraConsider(config.extraConsider);
-		alg.setConvex(config.convex);
+		alg.setConvex(true);
 		alg.setThresholdSideSplitScore(config.thresholdSideSplitScore);
 		alg.setCornerScorePenalty(config.cornerScorePenalty);
 		alg.setConvexTest(config.convexTest);
@@ -63,6 +64,16 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 	}
 
 	@Override
+	public void getMinVertexes(int minimum) {
+		alg.setMinSides(minimum);
+	}
+
+	@Override
+	public int getMinVertexes() {
+		return alg.getMinSides();
+	}
+
+	@Override
 	public void setMaxVertexes(int maximum) {
 		alg.setMaxSides(maximum);
 	}
@@ -75,5 +86,15 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 	@Override
 	public boolean isLoop() {
 		return true;
+	}
+
+	@Override
+	public void setConvex(boolean convex) {
+		alg.setConvex(convex);
+	}
+
+	@Override
+	public boolean isConvex() {
+		return alg.isConvex();
 	}
 }

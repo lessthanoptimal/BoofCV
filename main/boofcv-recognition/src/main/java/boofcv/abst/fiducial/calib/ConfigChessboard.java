@@ -58,9 +58,12 @@ public class ConfigChessboard implements Configuration {
 	public ConfigThreshold thresholding = new ConfigThresholdBlockMinMax(10,35,true);
 
 	/**
-	 * Configuration for square detector
+	 * Configuration for square detector.
+	 *
+	 * NOTE: Number of sides, clockwise, and convex are all set by the detector in its consturctor. Values
+	 * specified here are ignored.
 	 */
-	public ConfigPolygonDetector square = new ConfigPolygonDetector(true, 3,8);
+	public ConfigPolygonDetector square = new ConfigPolygonDetector();
 
 	/**
 	 * Configuration for refining with lines.  Ignored if not used.

@@ -32,7 +32,7 @@ public class ConfigPolygonDetector implements Configuration {
 	/**
 	 * Configuration for detecting polygons from their contour
 	 */
-	public ConfigPolygonFromContour detector;
+	public ConfigPolygonFromContour detector = new ConfigPolygonFromContour(3,10000);
 
 	/**
 	 * <p>
@@ -71,6 +71,9 @@ public class ConfigPolygonDetector implements Configuration {
 
 	public ConfigPolygonDetector(boolean clockwise, int minimumSides, int maximumSides) {
 		detector = new ConfigPolygonFromContour(clockwise, minimumSides, maximumSides);
+	}
+
+	public ConfigPolygonDetector() {
 	}
 
 	@Override

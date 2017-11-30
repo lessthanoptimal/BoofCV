@@ -42,6 +42,17 @@ public interface PointsToPolyline {
 	boolean process(List<Point2D_I32> input , GrowQueue_I32 vertexes );
 
 	/**
+	 * Specifies the minimum number of vertexes in a polyline that's returned
+
+	 * By default the minimum is 3.
+	 *
+	 * @param minimum The minimum number of allowed vertices
+	 */
+	void getMinVertexes(int minimum );
+
+	int getMinVertexes();
+
+	/**
 	 * Specifies the maximum allowed vertexes. How this is interpreted is implementation specific.
 	 * For example, two possible interpretations are that it could abort if the number of sides is more
 	 * than this or to only consides up to this number of sides. The number of found sides
@@ -61,4 +72,11 @@ public interface PointsToPolyline {
 	 * @return true means it assumes the input points form a loop.
 	 */
 	boolean isLoop();
+
+	/**
+	 * Specifies if the found polygons will be convex or not. Default is true.
+	 */
+	void setConvex( boolean convex );
+
+	boolean isConvex();
 }

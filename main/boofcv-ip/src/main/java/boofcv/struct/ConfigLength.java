@@ -27,14 +27,14 @@ public class ConfigLength implements Configuration {
 	/**
 	 * If in fixed mode this is the length or it's the minimum length of a relative length is being specified
 	 */
-	public int length =-1;
+	public double length =-1;
 	/**
 	 * If &ge; 0 the length is relative to the total size and the 'fixed' number is treated
 	 * as a minium size.
 	 */
 	public double fraction=-1;
 
-	public ConfigLength(int length, double fraction) {
+	public ConfigLength(double length, double fraction) {
 		this.length = length;
 		this.fraction = fraction;
 	}
@@ -50,7 +50,7 @@ public class ConfigLength implements Configuration {
 		return new ConfigLength(minimum,fraction);
 	}
 
-	public double compute(int totalLength) {
+	public double compute(double totalLength) {
 
 		double size;
 		if (fraction >= 0) {
@@ -63,7 +63,7 @@ public class ConfigLength implements Configuration {
 		return size;
 	}
 
-	public int computeI( int totalLength ) {
+	public int computeI( double totalLength ) {
 		double size = compute(totalLength);
 		if( size >= 0 )
 			return (int)(size+0.5);

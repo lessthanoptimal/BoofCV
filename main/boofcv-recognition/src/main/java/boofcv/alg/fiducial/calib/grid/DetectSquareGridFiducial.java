@@ -95,6 +95,13 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 		this.inputToBinary = inputToBinary;
 		this.detectorSquare = detectorSquare;
 
+		// some unit tests will pass in a null value
+		if( detectorSquare != null ) {
+			detectorSquare.getDetector().setOutputClockwise(true);
+			detectorSquare.getDetector().setConvex(true);
+			detectorSquare.getDetector().setNumberOfSides(4, 4);
+		}
+
 		s2c = new SquaresIntoRegularClusters(spaceToSquareRatio,Integer.MAX_VALUE, 1.35);
 		c2g = new SquareRegularClustersIntoGrids(numCols*numRows);
 

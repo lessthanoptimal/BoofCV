@@ -30,14 +30,16 @@ import boofcv.struct.Configuration;
  */
 public class ConfigQrCode implements Configuration {
 
-	public ConfigPolygonDetector polygon = new ConfigPolygonDetector(false,4,4);
+	public ConfigPolygonDetector polygon = new ConfigPolygonDetector();
 
 	public int versionMinimum = 2;
 	public int versionMaximum = 40;
 
 	{
 		polygon.detector.clockwise = false;
-		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).cornerScorePenalty = 0.2;
+		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).maxSideError = ConfigLength.relative(0.08,3);
+		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).cornerScorePenalty = 0.4;
+		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).minimumSideLength = 2;
 		// 28 pixels = 7 by 7 square viewed head on. Each cell is then 1 pixel. Any slight skew results in
 		// aliasing and will most likely not be read well.
 		polygon.detector.minimumContour = ConfigLength.fixed(27);

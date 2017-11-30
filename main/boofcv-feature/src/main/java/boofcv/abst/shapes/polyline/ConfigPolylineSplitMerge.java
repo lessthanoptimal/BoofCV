@@ -34,7 +34,7 @@ public class ConfigPolylineSplitMerge extends ConfigPolyline {
 	/**
 	 * maximum number of sides it will consider
 	 */
-	public int maxSides = 20;
+	public int maxSides = Integer.MAX_VALUE;
 
 	/**
 	 * maximum number of sides it will consider
@@ -76,8 +76,9 @@ public class ConfigPolylineSplitMerge extends ConfigPolyline {
 
 	/**
 	 * Maximum allowed error along a single side in Eclidean distance in pixels.
+	 * Relative to number of pixels in contour.
 	 */
-	public double maxSideError = 3;
+	public ConfigLength maxSideError = ConfigLength.relative(0.05,3);
 
 	@Override
 	public void checkValidity() {

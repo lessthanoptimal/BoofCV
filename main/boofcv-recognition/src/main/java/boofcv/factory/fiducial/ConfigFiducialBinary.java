@@ -61,8 +61,11 @@ public class ConfigFiducialBinary implements Configuration {
 
 	/**
 	 * Configuration for square detector
+	 *
+	 * NOTE: Number of sides, clockwise, and convex are all set by the detector in its consturctor. Values
+	 * specified here are ignored.
 	 */
-	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4,4);
+	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector();
 
 	{
 		((ConfigPolylineSplitMerge)squareDetector.detector.contourToPoly).cornerScorePenalty = 0.2;

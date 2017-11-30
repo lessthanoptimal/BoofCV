@@ -26,6 +26,7 @@ import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.struct.LinkedList;
 import org.ddogleg.struct.LinkedList.Element;
@@ -84,7 +85,7 @@ public class PolylineSplitMerge {
 	double convexTest = 2.5;
 
 	// maximum error along any side
-	double maxSideErrorSq = 9;
+	ConfigLength maxSideError = ConfigLength.relative(0.1,3);
 
 	// work space for side score calculation
 	private LineSegment2D_F64 line = new LineSegment2D_F64();
@@ -158,8 +159,16 @@ public class PolylineSplitMerge {
 			return false;
 		}
 
-		if( bestPolyline.maxSideError >= maxSideErrorSq )
-			return false;
+		// make sure all the sides are within error tolerance
+		for (int i = 0,j=bestSize-1; i < bestSize; j=i,i++) {
+			Point2D_I32 a = contour.get(bestPolyline.splits.get(i));
+			Point2D_I32 b = contour.get(bestPolyline.splits.get(j));
+
+			double length = a.distance(b);
+			double thresholdSideError = this.maxSideError.compute(length);
+			if( bestPolyline.sideErrors.get(i) >= thresholdSideError*thresholdSideError)
+				return false;
+		}
 
 		return true;
 	}
@@ -205,6 +214,7 @@ public class PolylineSplitMerge {
 				throw new RuntimeException("Egads saved polylines aren't in the expected order");
 		} else {
 			c = polylines.grow();
+			c.reset();
 			c.score = Double.MAX_VALUE;
 		}
 
@@ -214,11 +224,13 @@ public class PolylineSplitMerge {
 		if( c.score > foundScore ) {
 			c.score = foundScore;
 			c.splits.reset();
+			c.sideErrors.reset();
 			Element<Corner> e = list.getHead();
 			double maxSideError = 0;
 			while (e != null) {
 				maxSideError = Math.max(maxSideError,e.object.sideError);
 				c.splits.add(e.object.index);
+				c.sideErrors.add(e.object.sideError);
 				e = e.next;
 			}
 			c.maxSideError = maxSideError;
@@ -772,6 +784,14 @@ public class PolylineSplitMerge {
 		public GrowQueue_I32 splits = new GrowQueue_I32();
 		public double score;
 		public double maxSideError;
+		public GrowQueue_F64 sideErrors = new GrowQueue_F64();
+
+		public void reset() {
+			splits.reset();
+			sideErrors.reset();
+			score = Double.NaN;
+			maxSideError = Double.NaN;
+		}
 	}
 
 	public boolean isConvex() {
@@ -850,12 +870,12 @@ public class PolylineSplitMerge {
 		this.convexTest = convexTest;
 	}
 
-	public double getMaxSideError() {
-		return Math.sqrt(maxSideErrorSq);
+	public ConfigLength getMaxSideError() {
+		return maxSideError;
 	}
 
-	public void setMaxSideError(double maxSideError) {
-		this.maxSideErrorSq = maxSideError*maxSideError;
+	public void setMaxSideError(ConfigLength maxSideError) {
+		this.maxSideError = maxSideError;
 	}
 }
 

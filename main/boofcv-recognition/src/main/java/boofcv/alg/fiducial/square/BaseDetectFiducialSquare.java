@@ -130,10 +130,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 									   int squarePixels,
 									   Class<T> inputType) {
 
-		if( squareDetector.getMinimumSides() != 4 || squareDetector.getMaximumSides() != 4)
-			throw new IllegalArgumentException("quadDetector not configured to detect quadrilaterals");
-		if( squareDetector.isOutputClockwise() )
-			throw new IllegalArgumentException("output polygons needs to be counter-clockwise");
+		squareDetector.getDetector().setOutputClockwise(false);
+		squareDetector.getDetector().setConvex(true);
+		squareDetector.getDetector().setNumberOfSides(4,4);
 
 		if( borderWidthFraction <= 0 || borderWidthFraction >= 0.5 )
 			throw new RuntimeException("Border width fraction must be 0 < x < 0.5");

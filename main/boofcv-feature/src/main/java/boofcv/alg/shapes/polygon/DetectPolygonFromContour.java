@@ -27,7 +27,6 @@ import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import georegression.geometry.UtilPolygons2D_F64;
 import georegression.geometry.UtilPolygons2D_I32;
 import georegression.metric.Area2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -76,14 +75,11 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private int minimumContour;
 	private double minimumArea; // computed from minimumContour
 
-	// does the polygon have to be convex
-	private boolean convex;
-
 	private LinearContourLabelChang2004 contourFinder;
 	private GrayS32 labeled = new GrayS32(1,1);
 
 	// finds the initial polygon around a target candidate
-	private PointsToPolyline fitPolygon;
+	private PointsToPolyline contourToPolyline;
 	private GrowQueue_I32 splits = new GrowQueue_I32();
 
 	// Used to prune false positives
@@ -91,9 +87,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 	// extera information for found shapes
 	private FastQueue<Info> foundInfo = new FastQueue<>(Info.class, true);
-
-	// number of lines allowed in the polygon
-	private int minSides,maxSides;
 
 	// true if points touching the border are NOT pruned
 	private boolean canTouchBorder;
@@ -138,7 +131,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 * Configures the detector.
 	 * @param minSides minimum number of sides
 	 * @param maxSides maximum number of sides
-	 * @param contourToPolygon Fits a crude polygon to the shape's binary contour
+	 * @param contourToPolyline Fits a crude polygon to the shape's binary contour
 	 * @param minimumContour Minimum allowed length of a contour.  Copy stored internally. Try 50 pixels.
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
 	 * @param convex If true it will only return convex shapes
@@ -147,7 +140,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 * @param inputType Type of input image it's processing
 	 */
 	public DetectPolygonFromContour(int minSides, int maxSides,
-									PointsToPolyline contourToPolygon,
+									PointsToPolyline contourToPolyline,
 									ConfigLength minimumContour,
 									boolean outputClockwise,
 									boolean convex,
@@ -157,18 +150,20 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 									LinearContourLabelChang2004 contourFinder,
 									Class<T> inputType) {
 
-		setNumberOfSides(minSides,maxSides);
 		this.minimumContourConfig = minimumContour.copy(); // local copy so that external can be modified
-		this.fitPolygon = contourToPolygon;
+		this.contourToPolyline = contourToPolyline;
 		this.outputClockwise = outputClockwise;
-		this.convex = convex;
 		this.canTouchBorder = touchBorder;
 		this.contourEdgeThreshold = contourEdgeThreshold;
 		this.contourFinder = contourFinder;
 		this.inputType = inputType;
 
-		if( !fitPolygon.isLoop() )
+		if( !this.contourToPolyline.isLoop() )
 			throw new IllegalArgumentException("ContourToPolygon must be configured for loops");
+
+		// configure the polyline fitter
+		setNumberOfSides(minSides,maxSides);
+		this.contourToPolyline.setConvex(convex);
 
 		if( contourEdgeThreshold > 0 ) {
 			this.contourEdgeIntensity = new ContourEdgeIntensity<>(30, 1, tangentEdgeIntensity, inputType);
@@ -283,8 +278,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 */
 	private void findCandidateShapes() {
 
-		fitPolygon.setMaxVertexes(maxSides);
-
 		// find blobs where all 4 edges are lines
 		FastQueue<ContourPacked> blobs = contourFinder.getContours();
 		for (int i = 0; i < blobs.size; i++) {
@@ -333,7 +326,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 				}
 
 				// Find the initial approximate fit of a polygon to the contour
-				if( !fitPolygon.process(undistorted,splits) ) {
+				if( !contourToPolyline.process(undistorted,splits) ) {
 					if( verbose ) System.out.println("rejected polygon initial fit failed. contour size = "+contourTmp.size());
 					continue;
 				}
@@ -362,13 +355,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 					}
 				}
 
-				// only accept polygons with the expected number of sides
-				if (!expectedNumberOfSides(splits)) {
-//					System.out.println("First point "+c.external.get(0));
-					if( verbose ) System.out.println("rejected number of sides. "+splits.size()+"  contour "+contourTmp.size());
-					continue;
-				}
-
 				// see if it should be flipped so that the polygon has the correct orientation
 				if( outputClockwise == isCCW ) {
 					flip(splits.data,splits.size);
@@ -395,12 +381,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 						if( verbose ) System.out.println("rejected by helper.filterPixelPolygon()");
 						continue;
 					}
-				}
-
-				// Filter out polygons which are not convex if requested by the user
-				if( convex && !UtilPolygons2D_F64.isConvex(polygonWork)) {
-					if( verbose ) System.out.println("Rejected not convex");
-					continue;
 				}
 
 				// make sure it's big enough
@@ -498,13 +478,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 //	}
 
 	/**
-	 * True if the number of sides found matches what it is looking for
-	 */
-	private boolean expectedNumberOfSides(GrowQueue_I32 splits) {
-		return splits.size() >= minSides && splits.size() <= maxSides;
-	}
-
-	/**
 	 * Removes lens distortion from the found contour
 	 */
 	private void removeDistortionFromContour(List<Point2D_I32> distorted , FastQueue<Point2D_I32> undistorted  ) {
@@ -546,11 +519,11 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	}
 
 	public boolean isConvex() {
-		return convex;
+		return contourToPolyline.isConvex();
 	}
 
 	public void setConvex(boolean convex) {
-		this.convex = convex;
+		contourToPolyline.setConvex(convex);
 	}
 
 	public GrayS32 getLabeled() {
@@ -573,16 +546,16 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		if( max < min )
 			throw new IllegalArgumentException("The max must be >= the min");
 
-		this.minSides = min;
-		this.maxSides = max;
+		this.contourToPolyline.getMinVertexes(min);
+		this.contourToPolyline.setMaxVertexes(max);
 	}
 
 	public int getMinimumSides() {
-		return minSides;
+		return contourToPolyline.getMinVertexes();
 	}
 
 	public int getMaximumSides() {
-		return maxSides;
+		return contourToPolyline.getMaxVertexes();
 	}
 
 	public void setOutputClockwise(boolean outputClockwise) {

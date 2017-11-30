@@ -89,13 +89,12 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 */
 	public QrCodePositionPatternDetector(DetectPolygonBinaryGrayRefine<T> squareDetector , int maxVersionQR) {
 
-		// verify and configure polygon detector
-		if( squareDetector.getMinimumSides() != 4 || squareDetector.getMaximumSides() != 4 )
-			throw new IllegalArgumentException("Must detect 4 and only 4 sided polygons");
-		if( squareDetector.getDetector().isOutputClockwise() )
-			throw new IllegalArgumentException("Must be CCW");
 		this.squareDetector = squareDetector;
 		this.maxVersionQR = maxVersionQR;
+
+		squareDetector.getDetector().setConvex(true);
+		squareDetector.getDetector().setOutputClockwise(false);
+		squareDetector.getDetector().setNumberOfSides(4,4);
 
 		// set up nearest neighbor search for 2-DOF
 		search.init(2);

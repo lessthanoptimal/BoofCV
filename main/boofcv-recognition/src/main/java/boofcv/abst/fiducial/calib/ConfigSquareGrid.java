@@ -51,8 +51,11 @@ public class ConfigSquareGrid implements Configuration {
 
 	/**
 	 * Configuration for square detector
+	 *
+	 * NOTE: Number of sides, clockwise, and convex are all set by the detector in its consturctor. Values
+	 * specified here are ignored.
 	 */
-	public ConfigPolygonDetector square = new ConfigPolygonDetector(true,4, 4);
+	public ConfigPolygonDetector square = new ConfigPolygonDetector();
 
 	/**
 	 * Physical width of the square.

@@ -254,10 +254,8 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 			config.detector.contourToPoly = polylinePanel.getConfigSplitMergeOld();
 		}
 		if( bRefineGray ) {
-			System.out.println("refine on ");
 			config.refineGray = refineGray;
 		} else {
-			System.out.println("refine off ");
 			config.refineGray = null;
 		}
 		return config;
