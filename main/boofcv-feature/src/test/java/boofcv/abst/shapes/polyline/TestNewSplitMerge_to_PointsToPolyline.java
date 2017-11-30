@@ -18,19 +18,15 @@
 
 package boofcv.abst.shapes.polyline;
 
-import boofcv.factory.shape.ConfigSplitMergeLineFit;
 import boofcv.factory.shape.FactoryPointsToPolyline;
 
 /**
  * @author Peter Abeles
  */
-public class TestSplitMergeLineRefine_to_PointsToPolyline extends ChecksGenericPointsToPolyline{
+public class TestNewSplitMerge_to_PointsToPolyline extends ChecksGenericPointsToPolyline{
 
 	@Override
 	public PointsToPolyline createAlg(boolean loop) {
-		ConfigSplitMergeLineFit config = new ConfigSplitMergeLineFit();
-		config.loop = loop;
-
-		return FactoryPointsToPolyline.splitMerge(config);
+		return FactoryPointsToPolyline.splitMerge((ConfigPolylineSplitMerge) null);
 	}
 }
