@@ -63,8 +63,6 @@ public class FactoryFiducial {
 
 		configFiducial.checkValidity();
 
-		configFiducial.squareDetector.detector.clockwise = false;
-
 		final InputToBinary<T> binary = FactoryThresholdBinary.threshold(configThreshold, imageType);
 		final DetectPolygonBinaryGrayRefine<T> squareDetector = FactoryShapeDetector.
 				polygon(configFiducial.squareDetector,imageType);

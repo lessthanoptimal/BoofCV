@@ -86,7 +86,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 	public void imageThresholdUpdated() {
 		DetectBlackPolygonAppControlPanel controls = (DetectBlackPolygonAppControlPanel)DetectBlackPolygonApp.this.controls;
 
-		ConfigThreshold config = controls.polygonPanel.getThreshold().createConfig();
+		ConfigThreshold config = controls.polygonPanel.getThresholdPanel().createConfig();
 
 		synchronized (this) {
 			inputToBinary = FactoryThresholdBinary.threshold(config, imageClass);

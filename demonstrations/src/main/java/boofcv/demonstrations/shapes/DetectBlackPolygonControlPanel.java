@@ -44,7 +44,7 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 	public boolean bRefineGray = true;
 	public ConfigRefinePolygonLineToImage refineGray;
 
-	public ThresholdControlPanel threshold;
+	public ThresholdControlPanel thresholdPanel;
 
 	JSpinner spinnerMinContourSize;
 	JSpinner spinnerMinEdgeD; // threshold for detect
@@ -82,27 +82,22 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		setBorder(BorderFactory.createEmptyBorder());
 		this.owner = owner;
 		this.config = config;
+		config.detector.maximumSides = Math.min(50,config.detector.maximumSides);
 		config.detector.minimumContour = ConfigLength.fixed(20);
 		minSides = config.detector.minimumSides;
 		maxSides = config.detector.maximumSides;
 		refineGray = config.refineGray != null ? config.refineGray : new ConfigRefinePolygonLineToImage();
 		spinnerContourConnect = spinner(config.detector.contourRule.ordinal(), ConnectRule.values());
 
-		threshold = new ThresholdControlPanel(owner);
+		thresholdPanel = new ThresholdControlPanel(owner);
 
 		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(config.detector.minimumContour.length,
 				5,10000,2));
 		spinnerMinContourSize.setMaximumSize(spinnerMinContourSize.getPreferredSize());
 		spinnerMinContourSize.addChangeListener(this);
 
-		spinnerMinSides = spinner(minSides, 3, 20, 1);
-		spinnerMaxSides = spinner(maxSides, 3, 20, 1);
-		spinnerMinSides = new JSpinner(new SpinnerNumberModel(minSides, 3, 20, 1));
-		spinnerMinSides.setMaximumSize(spinnerMinSides.getPreferredSize());
-		spinnerMinSides.addChangeListener(this);
-		spinnerMaxSides = new JSpinner(new SpinnerNumberModel(maxSides, 3, 20, 1));
-		spinnerMaxSides.setMaximumSize(spinnerMaxSides.getPreferredSize());
-		spinnerMaxSides.addChangeListener(this);
+		spinnerMinSides = spinner(minSides, 3, 50, 1);
+		spinnerMaxSides = spinner(maxSides, 3, 50, 1);
 		JPanel sidesPanel = new JPanel();
 		sidesPanel.setLayout(new BoxLayout(sidesPanel,BoxLayout.X_AXIS));
 		sidesPanel.add( new JLabel("Sides:"));
@@ -151,7 +146,7 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		refinePanel.addLabeled(spinnerMaxCornerChange, "Max Corner Change: ");
 
 		JTabbedPane tabbedPane = new JTabbedPane();
-		tabbedPane.addTab("Threshold", threshold);
+		tabbedPane.addTab("Threshold", thresholdPanel);
 		tabbedPane.addTab("Polyline", polylinePanel);
 		tabbedPane.addTab("Refine", refinePanel);
 
@@ -243,8 +238,8 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		config.detector.maximumSides = maxSides;
 	}
 
-	public ThresholdControlPanel getThreshold() {
-		return threshold;
+	public ThresholdControlPanel getThresholdPanel() {
+		return thresholdPanel;
 	}
 
 	public ConfigPolygonDetector getConfigPolygon() {

@@ -76,7 +76,7 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 	// width of a square in the inner undistorted image.
 	protected final static int w=10;
 	// total number of pixels in a square.  Outer pixels are ignored, hence -2 for each axis
-	protected final static int N=(w-2)*(w-2);
+	protected final static int N=(w-4)*(w-4);
 
 	// length of a side for the fiducial's black border in world units.
 	private double lengthSide = 1;
@@ -254,11 +254,11 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 
 		Arrays.fill(counts, 0);
 		for (int row = 0; row < gridWidth; row++) {
-			int y0 = row * binaryInner.width / gridWidth + 1;
-			int y1 = (row + 1) * binaryInner.width / gridWidth - 1;
+			int y0 = row * binaryInner.width / gridWidth + 2;
+			int y1 = (row + 1) * binaryInner.width / gridWidth - 2;
 			for (int col = 0; col < gridWidth; col++) {
-				int x0 = col * binaryInner.width / gridWidth + 1;
-				int x1 = (col + 1) * binaryInner.width / gridWidth - 1;
+				int x0 = col * binaryInner.width / gridWidth + 2;
+				int x1 = (col + 1) * binaryInner.width / gridWidth - 2;
 
 				int total = 0;
 				for (int i = y0; i < y1; i++) {

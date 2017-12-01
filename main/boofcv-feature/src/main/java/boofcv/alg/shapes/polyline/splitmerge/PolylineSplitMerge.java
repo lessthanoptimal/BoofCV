@@ -53,14 +53,11 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PolylineSplitMerge {
-	// TODO non loop version
-	// TODO max side error
-
 	// Can it assume the shape is convex? If so it can reject shapes earlier
 	private boolean convex = false;
 
 	// maximum number of sides it will consider
-	private int maxSides = 20;
+	private int maxSides = Integer.MAX_VALUE;
 	// minimum number of sides that will be considered for the best polyline
 	private int minSides = 3;
 

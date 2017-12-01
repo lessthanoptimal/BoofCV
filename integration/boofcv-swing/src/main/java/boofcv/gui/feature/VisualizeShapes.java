@@ -58,11 +58,12 @@ public class VisualizeShapes {
 		g2.draw(line);
 	}
 
-	public static void drawArrowSubPixel( Quadrilateral_F64 quad , double strokeSize , Graphics2D g2 ) {
+	public static void drawArrowSubPixel(Quadrilateral_F64 quad, double strokeSize, double scale, Graphics2D g2) {
 		Line2D.Double line = new Line2D.Double();
 
 		Color colors[] = new Color[]{Color.RED,Color.ORANGE,Color.CYAN,Color.BLUE};
 
+		Point2D_F64 start = new Point2D_F64();
 		Point2D_F64 end = new Point2D_F64();
 		for (int i = 0; i < 4; i++ ) {
 			int j = (i+1)%4;
@@ -73,18 +74,18 @@ public class VisualizeShapes {
 			double length = a.distance(b);
 			double dx = (b.x-a.x)/length;
 			double dy = (b.y-a.y)/length;
+			start.x = a.x*scale;
+			start.y = a.y*scale;
 
-			length -= strokeSize*2;
-
-			end.x = length*dx + a.x;
-			end.y = length*dy + a.y;
+			end.x = (length*scale-strokeSize*2)*dx + start.x;
+			end.y = (length*scale-strokeSize*2)*dy + start.y;
 
 			g2.setColor(Color.BLACK);
 			g2.setStroke(new BasicStroke((float)strokeSize*2.0f));
-			drawArrowSubPixel(quad.get(i), end, line, g2);
+			drawArrowSubPixel(start, end, line, g2);
 			g2.setColor(colors[i]);
 			g2.setStroke(new BasicStroke((float)strokeSize));
-			drawArrowSubPixel(quad.get(i), end, line, g2);
+			drawArrowSubPixel(start, end, line, g2);
 		}
 	}
 

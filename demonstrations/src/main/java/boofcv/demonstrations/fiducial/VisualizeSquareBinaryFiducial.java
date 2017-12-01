@@ -33,7 +33,6 @@ import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -59,23 +58,26 @@ public class VisualizeSquareBinaryFiducial {
 
 	public void process( String nameImage , String nameIntrinsic ) {
 
-		CameraPinholeRadial intrinsic = CalibrationIO.load(nameIntrinsic);
+		CameraPinholeRadial intrinsic = nameIntrinsic == null ? null : (CameraPinholeRadial)CalibrationIO.load(nameIntrinsic);
 		GrayF32 input = UtilImageIO.loadImage(nameImage, GrayF32.class);
 		GrayF32 undistorted = new GrayF32(input.width,input.height);
 
-		CameraPinholeRadial paramUndist = new CameraPinholeRadial();
-		ImageDistort<GrayF32,GrayF32> undistorter = LensDistortionOps.changeCameraModel(
-				AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic,new CameraPinhole(intrinsic), paramUndist,
-				ImageType.single(GrayF32.class));
-
 		InputToBinary<GrayF32> inputToBinary = FactoryThresholdBinary.globalOtsu(0,255, true,GrayF32.class);
 		Detector detector = new Detector(gridWidth,borderWidth,inputToBinary);
-		detector.configure(new LensDistortionRadialTangential(paramUndist),
-				paramUndist.width, paramUndist.height, false);
 		detector.setLengthSide(0.1);
 
-		undistorter.apply(input,undistorted);
-		detector.process(undistorted);
+		if( intrinsic != null ) {
+			CameraPinholeRadial paramUndist = new CameraPinholeRadial();
+			ImageDistort<GrayF32, GrayF32> undistorter = LensDistortionOps.changeCameraModel(
+					AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, new CameraPinhole(intrinsic), paramUndist,
+					ImageType.single(GrayF32.class));
+			detector.configure(new LensDistortionRadialTangential(paramUndist),
+					paramUndist.width, paramUndist.height, false);
+			undistorter.apply(input,undistorted);
+			detector.process(undistorted);
+		} else {
+			detector.process(input);
+		}
 
 		System.out.println("Total Found: "+detector.squares.size());
 		FastQueue<FoundFiducial> fiducials = detector.getFound();
@@ -93,7 +95,7 @@ public class VisualizeSquareBinaryFiducial {
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(2));
 		for (int i = 0; i < N; i++) {
-			VisualizeShapes.drawArrowSubPixel(fiducials.get(i).distortedPixels,3,g2);
+			VisualizeShapes.drawArrowSubPixel(fiducials.get(i).distortedPixels,3, 1, g2);
 		}
 
 		ShowImages.showWindow(output,"Binary",true);
@@ -124,10 +126,13 @@ public class VisualizeSquareBinaryFiducial {
 
 	public static void main(String[] args) {
 
-		String directory = UtilIO.pathExample("fiducial/binary/");
+//		String directory = UtilIO.pathExample("fiducial/binary/");
 
 		VisualizeSquareBinaryFiducial app = new VisualizeSquareBinaryFiducial();
 
-		app.process(directory+"/image0000.jpg",directory+"/intrinsic.yaml");
+		String directory = "/home/pja/projects/ValidationBoof/data/fiducials/square_border_binary/standard/distance_angle/";
+		app.process(directory+"image00007.png",null);
+
+//		app.process(directory+"/image0000.jpg",directory+"/intrinsic.yaml");
 	}
 }

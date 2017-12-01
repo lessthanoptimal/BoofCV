@@ -32,9 +32,9 @@ public abstract class DetectBlackShapePanel extends StandardAlgConfigPanel {
 	protected JLabel processingTimeLabel = new JLabel();
 	protected JLabel imageSizeLabel = new JLabel();
 
-	protected int selectedView = 0;
+	public int selectedView = 0;
 
-	protected double zoom = 1;
+	public double zoom = 1;
 
 	public void setZoom( double _zoom ) {
 		_zoom = Math.max(MIN_ZOOM,_zoom);

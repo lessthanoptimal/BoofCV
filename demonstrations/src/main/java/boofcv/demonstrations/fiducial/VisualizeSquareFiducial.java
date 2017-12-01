@@ -35,7 +35,6 @@ import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -126,7 +125,7 @@ public class VisualizeSquareFiducial {
 			Quadrilateral_F64 q = fiducials.get(i).distortedPixels;
 //			g2.setStroke(new BasicStroke(2));
 //			VisualizeBinaryData.render(detector.getSquareDetector().getUsedContours(),Color.BLUE,outputGray);
-			VisualizeShapes.drawArrowSubPixel(q,3,g2);
+			VisualizeShapes.drawArrowSubPixel(q,3, 1, g2);
 		}
 
 		ShowImages.showWindow(output,"Binary");
@@ -156,13 +155,15 @@ public class VisualizeSquareFiducial {
 
 	public static void main(String[] args) {
 
-		String directory = UtilIO.pathExample("fiducial/binary");
+//		"/home/pja/projects/ValidationBoof/data/fiducials/square_border_binary/standard/distance_angle/image00008.png";
+//		String directory = UtilIO.pathExample("fiducial/binary");
 //		String directory = UtilIO.pathExample("fiducial/image");
+		String directory = "/home/pja/projects/ValidationBoof/data/fiducials/square_border_binary/standard/distance_angle/";
 
 		VisualizeSquareFiducial app = new VisualizeSquareFiducial();
 
-		app.process(directory+"/image0000.jpg",directory+"/intrinsic.yaml");
-		app.process(directory+"/image0001.jpg",directory+"/intrinsic.yaml");
-		app.process(directory+"/image0002.jpg",directory+"/intrinsic.yaml");
+		app.process(directory+"image00008.png",null);
+//		app.process(directory+"/image0001.jpg",directory+"/intrinsic.yaml");
+//		app.process(directory+"/image0002.jpg",directory+"/intrinsic.yaml");
 	}
 }

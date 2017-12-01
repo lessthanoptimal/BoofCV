@@ -84,7 +84,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	GrayF32 square;
 
 	// storage for binary image
-	GrayU8 binary = new GrayU8(1,1);
+	protected GrayU8 binary = new GrayU8(1,1);
 
 	// Used to compute/remove perspective distortion
 	private HomographyLinear4 computeHomography = new HomographyLinear4(true);
@@ -108,6 +108,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 
 	// type of input image
 	private Class<T> inputType;
+
+	// Smallest allowed aspect ratio between the smallest and largest side in a polygon
+	private double thresholdSideRatio = 0.05;
 
 	// verbose debugging output
 	protected boolean verbose = false;
@@ -217,6 +220,13 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 		for (int i = 0; i < candidates.size(); i++) {
 			// compute the homography from the input image to an undistorted square image
 			Polygon2D_F64 p = candidates.get(i);
+//			System.out.println(i+"  processing...  "+p.areaSimple()+" at "+p.get(0));
+
+			// sanity check before processing
+			if( !checkSideSize(p) ) {
+				if( verbose ) System.out.println("  rejected side aspect ratio or size");
+				continue;
+			}
 
 			// REMOVE EVENTUALLY  This is a hack around how interpolation is performed
 			// Using a surface integral instead would remove the need for this.  Basically by having it start
@@ -243,13 +253,13 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			pairsRemovePerspective.get(3).set( 0            , square.height , q.d.x , q.d.y );
 
 			if( !computeHomography.process(pairsRemovePerspective,H) ) {
-				if( verbose ) System.out.println("rejected initial homography");
+				if( verbose ) System.out.println("  rejected initial homography");
 				continue;
 			}
 
 			// refine homography estimate
 			if( !refineHomography.fitModel(pairsRemovePerspective,H,H_refined) ) {
-				if( verbose ) System.out.println("rejected refine homography");
+				if( verbose ) System.out.println("  rejected refine homography");
 				continue;
 			}
 
@@ -272,18 +282,39 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 				double pixelThreshold = (info.edgeInside + info.edgeOutside) / 2;
 				double foundFraction = computeFractionBoundary((float) pixelThreshold);
 				if( foundFraction < minimumBorderBlackFraction ) {
-					if( verbose ) System.out.println("rejected black border fraction "+foundFraction);
+					if( verbose ) System.out.println("  rejected black border fraction "+foundFraction);
 					continue;
 				}
 			}
 			if( processSquare(square,result,info.edgeInside,info.edgeOutside)) {
 				prepareForOutput(q,result);
 
-				if( verbose ) System.out.println("accepted!");
+				if( verbose ) System.out.println("  accepted!");
 			} else {
-				if( verbose ) System.out.println("rejected process square");
+				if( verbose ) System.out.println("  rejected process square");
 			}
 		}
+	}
+
+	/**
+	 * Sanity check the polygon based on the size of its sides to see if it could be a fiducial that can
+	 * be decoded
+	 */
+	private boolean checkSideSize( Polygon2D_F64 p ) {
+		double max=0,min=Double.MAX_VALUE;
+
+		for (int i = 0; i < p.size(); i++) {
+			double l = p.getSideLength(i);
+			max = Math.max(max,l);
+			min = Math.min(min,l);
+		}
+
+		// See if a side is too small to decode
+		if( min < 10 )
+			return false;
+
+		// see if it's under extreme perspective distortion and unlikely to be readable
+		return !(min / max < thresholdSideRatio);
 	}
 
 	/**
@@ -417,6 +448,14 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 
 	public double getBorderWidthFraction() {
 		return borderWidthFraction;
+	}
+
+	public double getThresholdSideRatio() {
+		return thresholdSideRatio;
+	}
+
+	public void setThresholdSideRatio(double thresholdSideRatio) {
+		this.thresholdSideRatio = thresholdSideRatio;
 	}
 
 	public static class Result {

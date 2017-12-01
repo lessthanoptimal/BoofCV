@@ -20,16 +20,15 @@ package boofcv.demonstrations.fiducial;
 
 import boofcv.demonstrations.shapes.DetectBlackPolygonControlPanel;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
+import boofcv.demonstrations.shapes.ShapeGuiListener;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
-import boofcv.factory.fiducial.ConfigQrCode;
+import boofcv.factory.fiducial.ConfigFiducialBinary;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
 
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
@@ -37,41 +36,32 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 /**
  * @author Peter Abeles
  */
-public class DetectQrCodeControlPanel extends DetectBlackShapePanel
+public class DetectFiducialSquareBinaryPanel extends DetectBlackShapePanel
 		implements ActionListener, ChangeListener
 {
-	DetectQrCodeApp owner;
+	ShapeGuiListener owner;
 
 	// selects which image to view
 	JComboBox imageView;
 
-	JButton bRunAgain = new JButton("Run Again");
-
 	JCheckBox showSquares;
-	JCheckBox showPositionPattern;
-	JCheckBox showAlignmentPattern;
+	JCheckBox showOrientation;
 	JCheckBox showContour;
+	JCheckBox showLabels;
 
 	boolean bShowSquares = true;
-	boolean bShowPositionPattern = true; // show position patterns
-	boolean bShowAlignmentPattern = true; // show position patterns
+	boolean bShowOrienation = true;
 	boolean bShowContour = false;
+	boolean bShowlabels = false;
 
 	DetectBlackPolygonControlPanel polygonPanel;
 
-	ConfigQrCode config = new ConfigQrCode();
+	ConfigFiducialBinary config = new ConfigFiducialBinary(1);
 
-	public DetectQrCodeControlPanel(DetectQrCodeApp owner) {
+	public DetectFiducialSquareBinaryPanel(ShapeGuiListener owner) {
 		this.owner = owner;
 
-		polygonPanel = new DetectBlackPolygonControlPanel(owner,config.polygon);
-
-		bRunAgain.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent actionEvent) {
-				DetectQrCodeControlPanel.this.owner.reprocessImageOnly();
-			}
-		});
+		polygonPanel = new DetectBlackPolygonControlPanel(owner,config.squareDetector);
 
 		imageView = new JComboBox();
 		imageView.addItem("Input");
@@ -87,41 +77,27 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		showSquares = new JCheckBox("Squares");
 		showSquares.addActionListener(this);
 		showSquares.setSelected(bShowSquares);
-		showPositionPattern = new JCheckBox("Position Pattern");
-		showPositionPattern.setSelected(bShowPositionPattern);
-		showPositionPattern.addActionListener(this);
-		showAlignmentPattern = new JCheckBox("Alignment Pattern");
-		showAlignmentPattern.setSelected(bShowAlignmentPattern);
-		showAlignmentPattern.addActionListener(this);
+		showOrientation = new JCheckBox("Orientation");
+		showOrientation.setSelected(bShowOrienation);
+		showOrientation.addActionListener(this);
 		showContour = new JCheckBox("Contour");
 		showContour.addActionListener(this);
 		showContour.setSelected(bShowContour);
+		showLabels = new JCheckBox("Labels");
+		showLabels.addActionListener(this);
+		showLabels.setSelected(bShowlabels);
 
 
-		addLabeled(processingTimeLabel,"Time (ms)", this);
-		addLabeled(imageSizeLabel,"Size", this);
-		add(bRunAgain);
-		addLabeled(imageView, "View: ", this);
-		addLabeled(selectZoom,"Zoom",this);
-		addAlignLeft(showSquares, this);
-		addAlignLeft(showAlignmentPattern, this);
-		addAlignLeft(showPositionPattern, this);
-		addAlignLeft(showContour, this);
+		addLabeled(processingTimeLabel,"Time (ms)");
+		addLabeled(imageSizeLabel,"Size");
+		addLabeled(imageView, "View");
+		addLabeled(selectZoom,"Zoom");
+		addAlignLeft(showOrientation);
+		addAlignLeft(showLabels);
+		addAlignLeft(showSquares);
+		addAlignLeft(showContour);
 		add(polygonPanel);
 		addVerticalGlue(this);
-	}
-
-	private void configureSpinnerFloat( JSpinner spinner ) {
-		JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinner.getEditor();
-		DecimalFormat format = editor.getFormat();
-		format.setMinimumFractionDigits(3);
-		format.setMinimumIntegerDigits(1);
-		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
-		Dimension d = spinner.getPreferredSize();
-		d.width = 60;
-		spinner.setPreferredSize(d);
-		spinner.addChangeListener(this);
-		spinner.setMaximumSize(d);
 	}
 
 	@Override
@@ -132,14 +108,14 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		} else if( e.getSource() == showSquares ) {
 			bShowSquares = showSquares.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == showPositionPattern ) {
-			bShowPositionPattern = showPositionPattern.isSelected();
-			owner.viewUpdated();
-		} else if( e.getSource() == showAlignmentPattern ) {
-			bShowAlignmentPattern = showAlignmentPattern.isSelected();
+		} else if( e.getSource() == showOrientation) {
+			bShowOrienation = showOrientation.isSelected();
 			owner.viewUpdated();
 		} else if( e.getSource() == showContour ) {
 			bShowContour = showContour.isSelected();
+			owner.viewUpdated();
+		} else if( e.getSource() == showLabels ) {
+			bShowlabels = showLabels.isSelected();
 			owner.viewUpdated();
 		}
 	}
@@ -158,8 +134,8 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		return polygonPanel.thresholdPanel;
 	}
 
-	public ConfigQrCode getConfigQr() {
-		config.polygon = polygonPanel.getConfigPolygon();
+	public ConfigFiducialBinary getConfig() {
+		config.squareDetector = polygonPanel.getConfigPolygon();
 		return config;
 	}
 }

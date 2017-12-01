@@ -22,6 +22,7 @@ import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
 /**
@@ -60,6 +61,8 @@ public class ConfigFiducialImage implements Configuration {
 
 	{
 		((ConfigPolylineSplitMerge)squareDetector.detector.contourToPoly).cornerScorePenalty = 0.2;
+//		((ConfigPolylineSplitMerge)squareDetector.detector.contourToPoly).convexTest = 2.0;
+		squareDetector.detector.minimumContour = ConfigLength.fixed(80);
 		squareDetector.refineGray.cornerOffset = 0;
 	}
 
