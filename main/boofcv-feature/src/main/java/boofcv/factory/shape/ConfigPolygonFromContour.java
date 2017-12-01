@@ -107,7 +107,7 @@ public class ConfigPolygonFromContour implements Configuration {
 
 	@Override
 	public void checkValidity() {
-
+		minimumContour.checkValidity();
 	}
 
 	@Override

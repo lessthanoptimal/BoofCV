@@ -74,6 +74,8 @@ public class DetectFiducialSquareBinaryApp
 	BufferedImage original;
 	BufferedImage work;
 
+	final Object lockProcessing = new Object();
+
 	public DetectFiducialSquareBinaryApp(List<String> examples ) {
 		super(examples, ImageType.single(GrayF32.class) );
 		setupGui();
@@ -135,7 +137,7 @@ public class DetectFiducialSquareBinaryApp
 		if( !initializing)
 			BoofSwingUtil.checkGuiThread();
 
-		synchronized (this) {
+		synchronized (lockProcessing) {
 			ConfigThreshold configThresh = controls.polygonPanel.getThresholdPanel().createConfig();
 			ConfigFiducialBinary configFid = controls.getConfig();
 
@@ -168,9 +170,7 @@ public class DetectFiducialSquareBinaryApp
 		work = ConvertBufferedImage.checkDeclare(buffered,work);
 
 		final double timeInSeconds;
-		synchronized (this) {
-
-
+		synchronized (lockProcessing) {
 			long before = System.nanoTime();
 			detector.process((GrayF32)input);
 			long after = System.nanoTime();
@@ -194,7 +194,7 @@ public class DetectFiducialSquareBinaryApp
 		if( controls.selectedView == 0 ) {
 			active = original;
 		} else if( controls.selectedView == 1 ) {
-			synchronized (this) {
+			synchronized (lockProcessing) {
 				VisualizeBinaryData.renderBinary(detector.getBinaryImage(), false, work);
 			}
 			active = work;
@@ -220,7 +220,7 @@ public class DetectFiducialSquareBinaryApp
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-			synchronized ( DetectFiducialSquareBinaryApp.this ) {
+			synchronized ( lockProcessing ) {
 
 				if (controls.bShowContour) {
 
@@ -239,7 +239,7 @@ public class DetectFiducialSquareBinaryApp
 //					VisualizeShapes.drawQuad(fid.distortedPixels,g2,scale,true,Color.RED,Color.BLACK);
 //				}
 				if (controls.bShowSquares) {
-					List<Polygon2D_F64> polygons = detector.getSquareDetector().getPolygons(null);
+					List<Polygon2D_F64> polygons = detector.getSquareDetector().getPolygons(null,null);
 
 					g2.setColor(Color.GREEN);
 					g2.setStroke(new BasicStroke(3));
@@ -311,7 +311,7 @@ public class DetectFiducialSquareBinaryApp
 		DetectFiducialSquareBinaryApp app = new DetectFiducialSquareBinaryApp(examples);
 
 		app.openFile(new File(examples.get(0)));
-		app.display("QR-Code Detector");
+		app.display("Fiducial Square Binary Detector");
 	}
 
 

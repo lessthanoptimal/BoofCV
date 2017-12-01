@@ -131,12 +131,12 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 
-			DetectQrCodeControlPanel controls = (DetectQrCodeControlPanel)DetectQrCodeApp.this.controls;
+			DetectQrCodeControlPanel controls = (DetectQrCodeControlPanel) DetectQrCodeApp.this.controls;
 
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-			synchronized ( DetectQrCodeApp.this ) {
+			synchronized (DetectQrCodeApp.this) {
 
 				if (controls.bShowContour) {
 
@@ -144,42 +144,19 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					List<Contour> contours =
 							BinaryImageOps.convertContours(contour.getPackedPoints(), contour.getContours());
 					g2.setStroke(new BasicStroke(1));
-					VisualizeBinaryData.render(contours, null,Color.CYAN, scale, g2);
+					VisualizeBinaryData.render(contours, null, Color.CYAN, scale, g2);
 				}
 
-				if ( true ) {
-					FastQueue<QrCode> detected = detector.getDetections();
+				FastQueue<QrCode> detected = detector.getDetections();
 
-					g2.setColor(new Color(0x50FF0000,true));
-					for (int i = 0; i < detected.size; i++) {
-						QrCode qr = detected.get(i);
-						VisualizeShapes.fillPolygon(qr.bounds,scale,g2);
-					}
-
-//					g2.setColor(Color.BLUE);
-//					for (int i = 0; i < detected.size; i++) {
-//						QrCode qr = detected.get(i);
-//						Point2D_F64 c = qr.ppCorner.get(0);
-//						VisualizeFeatures.drawCircle(g2, c.x * scale, c.y * scale, 5 * scale);
-//						c = qr.ppRight.get(0);
-//						VisualizeFeatures.drawCircle(g2, c.x * scale, c.y * scale, 5 * scale);
-//						c = qr.ppDown.get(0);
-//						VisualizeFeatures.drawCircle(g2, c.x * scale, c.y * scale, 5 * scale);
-//					}
-//					g2.setColor(Color.GREEN);
-//					for (int i = 0; i < detected.size; i++) {
-//						QrCode qr = detected.get(i);
-//						Point2D_F64 c = qr.ppCorner.get(1);
-//						VisualizeFeatures.drawCircle(g2, c.x * scale, c.y * scale, 5 * scale);
-//						c = qr.ppRight.get(1);
-//						VisualizeFeatures.drawCircle(g2, c.x * scale, c.y * scale, 5 * scale);
-//						c = qr.ppDown.get(1);
-//						VisualizeFeatures.drawCircle(g2, c.x * scale, c.y * scale, 5 * scale);
-//					}
+				g2.setColor(new Color(0x50FF0000, true));
+				for (int i = 0; i < detected.size; i++) {
+					QrCode qr = detected.get(i);
+					VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
 				}
 
 				if (controls.bShowSquares) {
-					List<Polygon2D_F64> polygons = detector.getSquareDetector().getPolygons(null);
+					List<Polygon2D_F64> polygons = detector.getSquareDetector().getPolygons(null, null);
 
 					g2.setColor(Color.GREEN);
 					g2.setStroke(new BasicStroke(3));
@@ -194,17 +171,15 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					g2.setColor(Color.BLUE);
 					g2.setStroke(new BasicStroke(3));
 					for (QrCode qr : codes) {
-						double size = Math.sqrt(qr.ppCorner.areaSimple())/14.0;
+						double size = Math.sqrt(qr.ppCorner.areaSimple()) / 14.0;
 						for (int i = 0; i < qr.alignment.size; i++) {
 							QrCode.Alignment a = qr.alignment.get(i);
-							VisualizeFeatures.drawCircle(g2, a.pixel.x*scale, a.pixel.y*scale,size*scale);
-//							if( scale > 4 )
-//								VisualizeFeatures.drawCircle(g2, a.pixel.x*scale, a.pixel.y*scale,0.2*scale);
+							VisualizeFeatures.drawCircle(g2, a.pixel.x * scale, a.pixel.y * scale, size * scale);
 						}
 					}
 				}
 
-				if (controls.bShowPositionPattern ) {
+				if (controls.bShowPositionPattern) {
 					FastQueue<PositionPatternNode> nodes = detector.getDetectPositionPatterns().getPositionPatterns();
 
 					g2.setColor(Color.ORANGE);
@@ -214,8 +189,8 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 						SquareNode n = nodes.get(i);
 						VisualizeShapes.drawPolygon(n.square, true, scale, g2);
 						for (int j = 0; j < 4; j++) {
-							if( n.edges[j] != null ) {
-								if( !list.contains(n.edges[j])) {
+							if (n.edges[j] != null) {
+								if (!list.contains(n.edges[j])) {
 									list.add(n.edges[j]);
 								}
 							}
@@ -224,7 +199,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 					g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 					g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-					g2.setColor( new Color(255, 150, 100));
+					g2.setColor(new Color(255, 150, 100));
 					g2.setStroke(new BasicStroke(3));
 					Line2D.Double l = new Line2D.Double();
 					for (int i = 0; i < list.size(); i++) {
@@ -232,10 +207,9 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 						Point2D_F64 a = e.a.center;
 						Point2D_F64 b = e.b.center;
 
-						l.setLine(scale*a.x,scale*a.y,scale*b.x,scale*b.y);
+						l.setLine(scale * a.x, scale * a.y, scale * b.x, scale * b.y);
 						g2.draw(l);
 					}
-					
 				}
 			}
 		}

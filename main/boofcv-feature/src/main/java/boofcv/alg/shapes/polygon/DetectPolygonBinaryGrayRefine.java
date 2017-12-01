@@ -240,19 +240,31 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 
 	/**
 	 * Returns a list of all polygons with an edge threshold above the minimum
+	 *
+	 *
+	 * @param storageInfo Optional storage for info associated with polygons. Pruning is done so the info list
+	 *                    and the returned polygon list are not in synch with each other
 	 */
-	public List<Polygon2D_F64> getPolygons( List<Polygon2D_F64> storage ) {
+	public List<Polygon2D_F64> getPolygons( List<Polygon2D_F64> storage ,
+											List<DetectPolygonFromContour.Info> storageInfo ) {
 		if( storage == null )
 			storage = new ArrayList<>();
 		else
 			storage.clear();
 
+		if( storageInfo != null )
+			storageInfo.clear();
+
 		List<DetectPolygonFromContour.Info> detections = detector.getFound().toList();
 		for (int i = 0; i < detections.size(); i++) {
 			DetectPolygonFromContour.Info d = detections.get(i);
 
-			if( d.computeEdgeIntensity() >= minimumRefineEdgeIntensity )
-				storage.add( d.polygon );
+			if( d.computeEdgeIntensity() >= minimumRefineEdgeIntensity ) {
+				storage.add(d.polygon);
+				if( storageInfo != null ) {
+					storageInfo.add(d);
+				}
+			}
 		}
 		return storage;
 	}

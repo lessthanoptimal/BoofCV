@@ -61,6 +61,7 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 													double pruneSplitPentially,
 													boolean loop )
 	{
+		minimumSplit = minimumSplit.copy();
 		if( loop ) {
 			splitMerge = new SplitMergeLineFitLoop(splitFraction, minimumSplit, maxIterations);
 		} else {

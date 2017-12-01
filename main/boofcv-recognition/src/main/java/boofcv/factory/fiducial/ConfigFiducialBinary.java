@@ -71,7 +71,7 @@ public class ConfigFiducialBinary implements Configuration {
 	{
 		((ConfigPolylineSplitMerge)squareDetector.detector.contourToPoly).cornerScorePenalty = 0.2;
 		((ConfigPolylineSplitMerge)squareDetector.detector.contourToPoly).thresholdSideSplitScore = 0;
-		squareDetector.detector.minimumContour = ConfigLength.fixed(80);
+		squareDetector.detector.minimumContour = ConfigLength.fixed(20);
 
 		squareDetector.refineGray.cornerOffset = 0;
 	}

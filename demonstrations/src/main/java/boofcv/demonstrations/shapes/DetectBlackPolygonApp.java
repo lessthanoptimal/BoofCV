@@ -126,7 +126,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 				}
 
 				if (controls.bShowLines) {
-					List<Polygon2D_F64> polygons = detector.getPolygons(null);
+					List<Polygon2D_F64> polygons = detector.getPolygons(null,null);
 
 					g2.setColor(Color.RED);
 					g2.setStroke(new BasicStroke(3));
@@ -142,7 +142,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 				}
 
 				if (controls.bShowCorners) {
-					List<Polygon2D_F64> polygons = detector.getPolygons(null);
+					List<Polygon2D_F64> polygons = detector.getPolygons(null,null);
 
 					g2.setColor(Color.BLUE);
 					g2.setStroke(new BasicStroke(1));

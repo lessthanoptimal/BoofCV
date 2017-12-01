@@ -98,7 +98,7 @@ public class DetectCalibrationChessboardApp
 
 	@Override
 	protected List<Polygon2D_F64> getFoundPolygons() {
-		return alg.getFindSeeds().getDetectorSquare().getPolygons(null);
+		return alg.getFindSeeds().getDetectorSquare().getPolygons(null,null);
 	}
 
 	@Override

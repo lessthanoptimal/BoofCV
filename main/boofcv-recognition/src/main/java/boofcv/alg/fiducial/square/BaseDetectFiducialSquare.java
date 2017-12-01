@@ -198,6 +198,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	private Quadrilateral_F64 q = new Quadrilateral_F64(); // interpolation hack in quadrilateral format
 
 	List<Polygon2D_F64> candidates = new ArrayList<>();
+	List<DetectPolygonFromContour.Info> candidatesInfo = new ArrayList<>();
+
 	/**
 	 * Examines the input image to detect fiducials inside of it
 	 *
@@ -211,7 +213,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 		squareDetector.process(gray,binary);
 		squareDetector.refineAll();
 		// These are in undistorted pixels
-		squareDetector.getPolygons(candidates);
+		squareDetector.getPolygons(candidates,candidatesInfo);
 
 		found.reset();
 
@@ -275,7 +277,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			// remove the perspective distortion and process it
 			removePerspective.apply(gray, square);
 
-			DetectPolygonFromContour.Info info = squareDetector.getPolygonInfo().get(i);
+			DetectPolygonFromContour.Info info = candidatesInfo.get(i);
 
 			// see if the black border is actually black
 			if( minimumBorderBlackFraction > 0 ) {

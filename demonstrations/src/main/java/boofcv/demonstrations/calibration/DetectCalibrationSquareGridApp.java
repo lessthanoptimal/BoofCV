@@ -101,7 +101,7 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 
 	@Override
 	protected List<Polygon2D_F64> getFoundPolygons() {
-		return alg.getDetectorSquare().getPolygons(null);
+		return alg.getDetectorSquare().getPolygons(null,null);
 	}
 
 	@Override

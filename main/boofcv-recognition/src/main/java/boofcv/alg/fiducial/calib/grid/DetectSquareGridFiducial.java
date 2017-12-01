@@ -123,7 +123,7 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 		detectorSquare.process(image, binary);
 		detectorSquare.refineAll();
 
-		detectorSquare.getPolygons(found);
+		detectorSquare.getPolygons(found,null);
 
 		clusters = s2c.process(found);
 		c2g.process(clusters);

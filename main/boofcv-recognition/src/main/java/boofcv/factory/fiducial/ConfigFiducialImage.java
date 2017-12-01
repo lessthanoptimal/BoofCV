@@ -61,8 +61,8 @@ public class ConfigFiducialImage implements Configuration {
 
 	{
 		((ConfigPolylineSplitMerge)squareDetector.detector.contourToPoly).cornerScorePenalty = 0.2;
-//		((ConfigPolylineSplitMerge)squareDetector.detector.contourToPoly).convexTest = 2.0;
-		squareDetector.detector.minimumContour = ConfigLength.fixed(80);
+		((ConfigPolylineSplitMerge)squareDetector.detector.contourToPoly).thresholdSideSplitScore = 0;
+		squareDetector.detector.minimumContour = ConfigLength.fixed(20);
 		squareDetector.refineGray.cornerOffset = 0;
 	}
 
