@@ -20,6 +20,7 @@ package boofcv.alg.shapes.polygon;
 
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.alg.shapes.edge.EdgeIntensityPolygon;
+import boofcv.misc.MovingAverage;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -61,7 +62,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	double minimumRefineEdgeIntensity;
 
 	// timing for profiler
-	double milliAdjustBias = 0;
+	MovingAverage milliAdjustBias = new MovingAverage(0.8);
 
 	/**
 	 * Configures the polygon detector
@@ -132,7 +133,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 
 	public void resetRuntimeProfiling() {
 		detector.resetRuntimeProfiling();
-		milliAdjustBias = 0;
+		milliAdjustBias.reset();
 	}
 
 	/**
@@ -158,11 +159,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 
 		double milli = (time1-time0)*1e-6;
 
-		if( milliAdjustBias == 0 ) {
-			milliAdjustBias = milli;
-		} else {
-			milliAdjustBias = 0.95*milliAdjustBias + 0.5*milli;
-		}
+		milliAdjustBias.update(milli);
 //		System.out.printf(" contour %7.2f shapes %7.2f adjust_bias %7.2f\n",
 //				detector.getMilliShapes(),detector.getMilliShapes(),milliAdjustBias);
 	}
@@ -302,7 +299,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	}
 
 	public double getMilliAdjustBias() {
-		return milliAdjustBias;
+		return milliAdjustBias.getAverage();
 	}
 
 	public interface AdjustBeforeRefineEdge {

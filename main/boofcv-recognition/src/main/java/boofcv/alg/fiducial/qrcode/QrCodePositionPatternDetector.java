@@ -28,6 +28,7 @@ import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.misc.MovingAverage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineSegment2D_F64;
@@ -76,7 +77,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	protected Point2D_F64 intersection = new Point2D_F64();
 
 	// runtime profiling
-	protected double milliGraph = 0;
+	protected MovingAverage milliGraph = new MovingAverage(0.8);
 
 	// storage for nearest neighbor
 	double point[] = new double[2];
@@ -110,7 +111,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 	public void resetRuntimeProfiling() {
 		squareDetector.resetRuntimeProfiling();
-		milliGraph = 0;
+		milliGraph.reset();
 	}
 
 	/**
@@ -138,16 +139,12 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 		double milli = (time1-time0)*1e-6;
 
-		if( milliGraph == 0 ) {
-			milliGraph = milli;
-		} else {
-			milliGraph = 0.95*milliGraph + 0.5*milli;
-		}
+		milliGraph.update(milli);
 
 		DetectPolygonFromContour<T> detectorPoly = squareDetector.getDetector();
 		System.out.printf(" contour %5.1f shapes %5.1f adjust_bias %5.2f PosPat %6.2f\n",
 				detectorPoly.getMilliContour(),detectorPoly.getMilliShapes(),squareDetector.getMilliAdjustBias(),
-				milliGraph);
+				milliGraph.getAverage());
 	}
 
 	/**

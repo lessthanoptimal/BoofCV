@@ -86,6 +86,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	@Override
 	protected void handleInputChange(int source, InputMethod method, int width, int height) {
 		super.handleInputChange(source, method, width, height);
+		detector.resetRuntimeProfiling();
 	}
 
 	@Override
@@ -104,6 +105,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	}
 
 
+	@Override
 	public void configUpdate() {
 		createDetector(false);
 		// does process and render too

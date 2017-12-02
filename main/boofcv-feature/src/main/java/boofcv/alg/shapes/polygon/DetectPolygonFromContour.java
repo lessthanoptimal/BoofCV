@@ -22,6 +22,7 @@ import boofcv.abst.shapes.polyline.PointsToPolyline;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
+import boofcv.misc.MovingAverage;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayS32;
@@ -123,9 +124,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	List<Point2D_I32> polygonPixel = new ArrayList<>();
 
 	// times for internal profiling
-	double milliContour;
-	double milliShapes;
-	double profileAlpha = 0.95;
+	MovingAverage milliContour = new MovingAverage(0.8);
+	MovingAverage milliShapes = new MovingAverage(0.8);
 
 	/**
 	 * Configures the detector.
@@ -189,8 +189,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	}
 
 	public void resetRuntimeProfiling() {
-		milliContour = 0;
-		milliShapes = 0;
+		milliContour.reset();
+		milliShapes.reset();
 	}
 
 	/**
@@ -238,13 +238,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		double a = (time1-time0)*1e-6;
 		double b = (time2-time1)*1e-6;
 
-		if( milliContour == 0 ) {
-			milliContour = a;
-			milliShapes = b;
-		} else {
-			milliContour = profileAlpha * milliContour + (1.0- profileAlpha)*a;
-			milliShapes = profileAlpha * milliShapes + (1.0- profileAlpha)*b;
-		}
+		milliContour.update(a);
+		milliShapes.update(b);
 
 		if( verbose ) System.out.println("EXIT  DetectPolygonFromContour.process()");
 	}
@@ -599,11 +594,11 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	}
 
 	public double getMilliContour() {
-		return milliContour;
+		return milliContour.getAverage();
 	}
 
 	public double getMilliShapes() {
-		return milliShapes;
+		return milliShapes.getAverage();
 	}
 
 	public static class Info
