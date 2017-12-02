@@ -80,28 +80,28 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 
 	@Override
 	public boolean process(List<Point2D_I32> input, GrowQueue_I32 vertexes) {
-		if( !splitMerge.process(input,vertexes) ) {
+		if (!splitMerge.process(input, vertexes)) {
 			return false;
 		}
 
-		if( refine != null && !refine.fit(input,vertexes)) {
+		if (refine != null && !refine.fit(input, vertexes)) {
 			return false;
 		}
 
-		if( pruner != null && pruner.prune(input,vertexes,pruned) ) {
+		if (pruner != null && pruner.prune(input, vertexes, pruned)) {
 			vertexes.setTo(pruned);
 		}
 
-		if( vertexes.size > maxVertexes || vertexes.size < minVertexes )
+		if (vertexes.size > maxVertexes || vertexes.size < minVertexes)
 			return false;
 
 		tmp.vertexes.resize(vertexes.size);
 		for (int i = 0; i < vertexes.size; i++) {
-			Point2D_I32 p = input.get( vertexes.get(i));
-			tmp.set(i,p.x,p.y);
+			Point2D_I32 p = input.get(vertexes.get(i));
+			tmp.set(i, p.x, p.y);
 		}
 
-		return convex == UtilPolygons2D_F64.isConvex(tmp);
+		return !convex || UtilPolygons2D_F64.isConvex(tmp);
 	}
 
 	@Override

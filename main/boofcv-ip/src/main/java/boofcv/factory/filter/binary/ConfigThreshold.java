@@ -52,7 +52,7 @@ public class ConfigThreshold implements Configuration {
 	/**
 	 * Radius of adaptive threshold.
 	 */
-	public int radius;
+	public int radius=5;
 
 	/**
 	 * Positive parameter used to tune threshold in Savola.  Try 0.3

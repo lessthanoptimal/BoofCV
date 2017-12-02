@@ -84,8 +84,7 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		this.owner = owner;
 		this.config = configPolygon;
 		configPolygon.detector.maximumSides = Math.min(50,configPolygon.detector.maximumSides);
-		if( configPolygon.detector.minimumContour.fraction > 0 )
-			throw new RuntimeException("Can't handle a contour with a relative measurement. Update GUI code");
+
 		minSides = configPolygon.detector.minimumSides;
 		maxSides = configPolygon.detector.maximumSides;
 		refineGray = configPolygon.refineGray != null ? configPolygon.refineGray : new ConfigRefinePolygonLineToImage();
@@ -95,10 +94,11 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 				new ThresholdControlPanel(owner) :
 				new ThresholdControlPanel(owner,configThreshold);
 
-		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(configPolygon.detector.minimumContour.length,
-				5,10000,2));
-		spinnerMinContourSize.setMaximumSize(spinnerMinContourSize.getPreferredSize());
-		spinnerMinContourSize.addChangeListener(this);
+		if( configPolygon.detector.minimumContour.isFixed()) {
+			spinnerMinContourSize = spinner(configPolygon.detector.minimumContour.getLengthI(),5, 10000, 2);
+		} else {
+			spinnerMinContourSize = spinner(configPolygon.detector.minimumContour.fraction,0, 1.0,0.05,1,2);
+		}
 
 		spinnerMinSides = spinner(minSides, 3, 50, 1);
 		spinnerMaxSides = spinner(maxSides, 3, 50, 1);
@@ -120,23 +120,15 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		setBorder.addActionListener(this);
 		setBorder.setSelected(configPolygon.detector.canTouchBorder);
 
-		setRefineContour = new JCheckBox("Refine Contour");
-		setRefineContour.setSelected(configPolygon.refineContour);
-		setRefineContour.addActionListener(this);
-		setRefineGray = new JCheckBox("Refine Gray");
-		setRefineGray.setSelected(configPolygon.refineGray != null);
-		setRefineGray.addActionListener(this);
-		setRemoveBias = new JCheckBox("Remove Bias");
-		setRemoveBias.setSelected(configPolygon.adjustForThresholdBias);
-		setRemoveBias.addActionListener(this);
+		setRefineContour = checkbox("Refine Contour",configPolygon.refineContour);
+		setRefineGray = checkbox("Refine Gray",configPolygon.refineGray != null);
+		setRemoveBias = checkbox("Remove Bias",configPolygon.adjustForThresholdBias);
 		spinnerLineSamples = spinner(refineGray.lineSamples, 5, 100, 1);
 		spinnerCornerOffset = spinner(refineGray.cornerOffset, 0, 10, 1);
 		spinnerSampleRadius = spinner(refineGray.sampleRadius, 1, 10, 1);
 		spinnerRefineMaxIterations = spinner(refineGray.maxIterations, 1, 200, 1);
-		spinnerConvergeTol = spinner(refineGray.convergeTolPixels, 0.0, 2.0, 0.005);
-		configureSpinnerFloat(spinnerConvergeTol);
-		spinnerMaxCornerChange = spinner(refineGray.maxCornerChangePixel, 0.0, 50.0, 1.0);
-		configureSpinnerFloat(spinnerMaxCornerChange);
+		spinnerConvergeTol = spinner(refineGray.convergeTolPixels, 0.0, 2.0, 0.005,1,3);
+		spinnerMaxCornerChange = spinner(refineGray.maxCornerChangePixel, 0.0, 50.0, 1.0,1,3);
 
 		StandardAlgConfigPanel refinePanel = new StandardAlgConfigPanel();
 		refinePanel.addAlignLeft(setRemoveBias);
@@ -218,7 +210,10 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		} else if( e.getSource() == spinnerMinEdgeR) {
 			config.minimumRefineEdgeIntensity = ((Number) spinnerMinEdgeR.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerMinContourSize ) {
-			config.detector.minimumContour.length = ((Number) spinnerMinContourSize.getValue()).intValue();
+			if( config.detector.minimumContour.isRelative())
+				config.detector.minimumContour.fraction = ((Number) spinnerMinContourSize.getValue()).doubleValue();
+			else
+				config.detector.minimumContour.length = ((Number) spinnerMinContourSize.getValue()).intValue();
 		} else if (e.getSource() == spinnerLineSamples) {
 			refineGray.lineSamples = ((Number) spinnerLineSamples.getValue()).intValue();
 		} else if (e.getSource() == spinnerCornerOffset) {

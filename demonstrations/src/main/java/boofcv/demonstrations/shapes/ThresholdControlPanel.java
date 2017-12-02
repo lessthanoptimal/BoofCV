@@ -80,6 +80,8 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 
 		if( configThreshold instanceof ConfigThresholdLocalOtsu ) {
 			otsuTuning = (int)((ConfigThresholdLocalOtsu)configThreshold).tuning;
+		} else {
+			otsuTuning = (int)new ConfigThresholdLocalOtsu().tuning;
 		}
 
 		comboType = new JComboBox();
@@ -90,11 +92,8 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		comboType.setMaximumSize(comboType.getPreferredSize());
 		comboType.setSelectedIndex(this.type.ordinal());
 
-		spinnerThreshold = new JSpinner(new SpinnerNumberModel(globalThreshold,0,1000,1));
-		spinnerThreshold.setMaximumSize(spinnerThreshold.getPreferredSize());
-
-		spinnerRadius = new JSpinner(new SpinnerNumberModel(radius,1,500,1));
-		spinnerRadius.setMaximumSize(spinnerRadius.getPreferredSize());
+		spinnerThreshold = spinner(globalThreshold,0,1000,1);
+		spinnerRadius = spinner(radius,1,500,1);
 
 		spinnerScale = new JSpinner(new SpinnerNumberModel(scale,0,2.0,0.05));
 		configureSpinnerFloat(spinnerScale);
@@ -106,8 +105,6 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		setToggleText(down);
 
 		comboType.addActionListener(this);
-		spinnerThreshold.addChangeListener(this);
-		spinnerRadius.addChangeListener(this);
 //		spinnerScale.addChangeListener(this);
 		buttonUpDown.addActionListener(this);
 

@@ -22,6 +22,7 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 
 /**
@@ -86,6 +87,13 @@ public class StandardAlgConfigPanel extends JPanel {
 		d.width = 60;
 		spinner.setPreferredSize(d);
 		spinner.setMaximumSize(d);
+	}
+
+	protected JCheckBox checkbox( String text , boolean value ) {
+		JCheckBox c = new JCheckBox(text);
+		c.setSelected(value);
+		c.addActionListener((ActionListener) this);
+		return c;
 	}
 
 	public void addAlignLeft( JComponent target ) {

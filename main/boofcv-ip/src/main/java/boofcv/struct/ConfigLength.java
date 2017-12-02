@@ -63,12 +63,24 @@ public class ConfigLength implements Configuration {
 		return size;
 	}
 
+	public boolean isRelative() {
+		return fraction >= 0;
+	}
+
+	public boolean isFixed() {
+		return fraction < 0;
+	}
+
 	public int computeI( double totalLength ) {
 		double size = compute(totalLength);
 		if( size >= 0 )
 			return (int)(size+0.5);
 		else
 			return -1;
+	}
+
+	public int getLengthI() {
+		return (int)(length + 0.5);
 	}
 
 	@Override
