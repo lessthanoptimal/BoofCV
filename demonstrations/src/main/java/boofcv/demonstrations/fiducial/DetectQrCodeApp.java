@@ -68,7 +68,9 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		super(examples, imageType);
 
 		final VisualizePanel gui = new VisualizePanel();
-		setupGui(gui,new DetectQrCodeControlPanel(this));
+		DetectQrCodeControlPanel controlPanel = new DetectQrCodeControlPanel(this);
+		controlPanel.polygonPanel.removeControlNumberOfSides();
+		setupGui(gui,controlPanel);
 
 		gui.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override

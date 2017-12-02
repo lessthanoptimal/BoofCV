@@ -58,6 +58,8 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 	boolean convex = true;
 	boolean looping = true;
 
+	JPanel sideCountPanel = new JPanel();
+
 	public PolylineControlPanel(ShapeGuiListener owner) {
 		this(owner,new ConfigPolylineSplitMerge());
 	}
@@ -86,14 +88,13 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		spinnerMaxSides = new JSpinner(new SpinnerNumberModel(maxSides, 3, 20, 1));
 		spinnerMaxSides.setMaximumSize(spinnerMaxSides.getPreferredSize());
 		spinnerMaxSides.addChangeListener(this);
-		JPanel sidesPanel = new JPanel();
-		sidesPanel.setLayout(new BoxLayout(sidesPanel,BoxLayout.X_AXIS));
-		sidesPanel.add( new JLabel("Sides:"));
-		sidesPanel.add(spinnerMinSides);
-		sidesPanel.add(Box.createRigidArea(new Dimension(10,10)));
-		sidesPanel.add( new JLabel("to"));
-		sidesPanel.add(Box.createRigidArea(new Dimension(10,10)));
-		sidesPanel.add(spinnerMaxSides);
+		sideCountPanel.setLayout(new BoxLayout(sideCountPanel,BoxLayout.X_AXIS));
+		sideCountPanel.add( new JLabel("Sides:"));
+		sideCountPanel.add(spinnerMinSides);
+		sideCountPanel.add(Box.createRigidArea(new Dimension(10,10)));
+		sideCountPanel.add( new JLabel("to"));
+		sideCountPanel.add(Box.createRigidArea(new Dimension(10,10)));
+		sideCountPanel.add(spinnerMaxSides);
 
 		checkConvex = new JCheckBox("Convex");
 		checkConvex.addActionListener(this);
@@ -107,13 +108,22 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		flagsPanel.add(checkLooping);
 
 		addLabeled(selectAlgorithm,"Algorithm");
-		add(sidesPanel);
+		add(sideCountPanel);
 		add(flagsPanel);
 
 		if( whichAlgorithm == 0 )
 			add(panelSplitMerge);
 		else
 			add(panelOldSplitMerge);
+	}
+
+	/**
+	 * Removes controls related to the number of sides in the polygon. useful when it's not something that
+	 * can actually be tuned. ONLY CALL BEFORE DISPLAYED OR INSIDE THE UI THREAD.
+	 */
+	public void removeControlNumberOfSides() {
+		remove(sideCountPanel);
+		validate();
 	}
 
 	@Override

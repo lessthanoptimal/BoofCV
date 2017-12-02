@@ -27,10 +27,8 @@ import boofcv.struct.ConnectRule;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
 
 /**
  * @author Peter Abeles
@@ -102,15 +100,6 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 
 		spinnerMinSides = spinner(minSides, 3, 50, 1);
 		spinnerMaxSides = spinner(maxSides, 3, 50, 1);
-		JPanel sidesPanel = new JPanel();
-		sidesPanel.setLayout(new BoxLayout(sidesPanel,BoxLayout.X_AXIS));
-		sidesPanel.add( new JLabel("Sides:"));
-		sidesPanel.add(spinnerMinSides);
-		sidesPanel.add(Box.createRigidArea(new Dimension(10,10)));
-		sidesPanel.add( new JLabel("to"));
-		sidesPanel.add(Box.createRigidArea(new Dimension(10,10)));
-		sidesPanel.add(spinnerMaxSides);
-
 		spinnerMinEdgeD = spinner(configPolygon.detector.minimumEdgeIntensity, 0.0,255.0,1.0);
 		spinnerMinEdgeR = spinner(configPolygon.minimumRefineEdgeIntensity, 0.0,255.0,1.0);
 
@@ -159,17 +148,15 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		addVerticalGlue(this);
 	}
 
-	private void configureSpinnerFloat( JSpinner spinner ) {
-		JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinner.getEditor();
-		DecimalFormat format = editor.getFormat();
-		format.setMinimumFractionDigits(3);
-		format.setMinimumIntegerDigits(1);
-		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
-		Dimension d = spinner.getPreferredSize();
-		d.width = 60;
-		spinner.setPreferredSize(d);
-		spinner.addChangeListener(this);
-		spinner.setMaximumSize(d);
+	/**
+	 * Removes controls related to the number of sides in the polygon. useful when it's not something that
+	 * can actually be tuned. ONLY CALL BEFORE DISPLAYED OR INSIDE THE UI THREAD.
+	 */
+	public void removeControlNumberOfSides() {
+		removeChildInsidePanel(this,spinnerMinSides);
+		removeChildInsidePanel(this,spinnerMaxSides);
+		validate();
+		polylinePanel.removeControlNumberOfSides();
 	}
 
 	@Override

@@ -70,31 +70,9 @@ Version : 0.28
   * ASDASDASD
 
 Fiducials
-- Changes in polygon have affected performance. Mostly negative on blurred images.
-  Ambiguous in other areas.
 - FiducialDetector.setLensDistortion() add width and height parameters
   * Unit test with heavy lens distortion and see if it fixes it
 - Have square fiducials call init if lens distortion is set.
-
-Polygon Detector
-- Blurred images cause the biggest problems
-- Profile of Square Binary  (2 large squares video)
-  * 40% thresholding
-  * 44% contour -> polygon
-  * 6%  refine polygon
-- TODO Make it so split merge can abort early if too many splits? if very large sub-sample and fit?
-
-Contour
-- Improve memory efficiency. Use continuous memory broken up into chunks and convert back into a point
-  list upon request.
-
-Contour to Line
-- TODO New algorithm. Try one that's interest point based
--      Pathological case. Circle.
--      Maybe hybrid? Find obvious corners. Split and merge when there is no obvious corner but a curve
-- Try fitting to the specified number of sides
-- Current algorithm breaks down when there is a mixture of long and short sides. Tuning to make it work on
-  them makes it break on others
 
 Calibration Application
   - Open a directory

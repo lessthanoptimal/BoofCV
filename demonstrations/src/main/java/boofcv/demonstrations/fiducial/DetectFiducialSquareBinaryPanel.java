@@ -62,6 +62,7 @@ public class DetectFiducialSquareBinaryPanel extends DetectBlackShapePanel
 		this.owner = owner;
 
 		polygonPanel = new DetectBlackPolygonControlPanel(owner,config.squareDetector,null);
+		polygonPanel.removeControlNumberOfSides();
 
 		imageView = new JComboBox();
 		imageView.addItem("Input");

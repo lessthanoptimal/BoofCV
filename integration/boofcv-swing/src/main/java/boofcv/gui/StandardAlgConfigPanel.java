@@ -208,4 +208,43 @@ public class StandardAlgConfigPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Searches inside the children of "root" for a component that's a JPanel. Then inside the JPanel it
+	 * looks for the target. If the target is inside the JPanel the JPanel is removed from root.
+	 */
+	protected static void removeChildInsidePanel( JComponent root , JComponent target ) {
+		int N = root.getComponentCount();
+
+		for (int i = 0; i < N; i++) {
+			try {
+				JPanel p = (JPanel)root.getComponent(i);
+				Component[] children = p.getComponents();
+				for (int j = 0; j < children.length; j++) {
+					if( children[j] == target ) {
+						root.remove(i);
+						return;
+					}
+				}
+			}catch( ClassCastException ignore){}
+		}
+	}
+
+	/**
+	 * Searches inside the children of "root" for 'target'. If found it is removed and the
+	 * previous component.
+	 */
+	protected static void removeChildAndPrevious( JComponent root , JComponent target ) {
+		int N = root.getComponentCount();
+
+		for (int i = 0; i < N; i++) {
+			if( root.getComponent(i) == target ) {
+				root.remove(i);
+				root.remove(i-1);
+				return;
+			}
+		}
+		throw new RuntimeException("Can't find component");
+	}
+
+
 }

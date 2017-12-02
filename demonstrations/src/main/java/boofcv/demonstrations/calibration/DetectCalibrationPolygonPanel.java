@@ -55,6 +55,7 @@ public class DetectCalibrationPolygonPanel extends DetectCalibrationPanel
 				listener.calibEventDetectorModified();
 			}
 		},configPolygon,configThreshold);
+		polygonPanel.removeControlNumberOfSides();
 
 		threshold = null;
 		addComponents();
