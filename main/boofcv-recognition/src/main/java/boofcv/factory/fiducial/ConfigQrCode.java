@@ -22,6 +22,7 @@ import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
+import boofcv.struct.ConnectRule;
 
 /**
  * TODO Comment
@@ -36,6 +37,7 @@ public class ConfigQrCode implements Configuration {
 	public int versionMaximum = 40;
 
 	{
+		polygon.detector.contourRule = ConnectRule.EIGHT;
 		polygon.detector.clockwise = false;
 		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).maxSideError = ConfigLength.relative(0.08,3);
 		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).cornerScorePenalty = 0.4;
@@ -49,10 +51,11 @@ public class ConfigQrCode implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( polygon.detector.clockwise )
-			throw new IllegalArgumentException("Must be counter clockwise");
-		if( polygon.detector.minimumSides != 4 || polygon.detector.maximumSides != 4)
-			throw new IllegalArgumentException("Must detect 4 sides and only 4 sides");
+		// this is now manually set by the detector. previous settings don't matter
+//		if( polygon.detector.clockwise )
+//			throw new IllegalArgumentException("Must be counter clockwise");
+//		if( polygon.detector.minimumSides != 4 || polygon.detector.maximumSides != 4)
+//			throw new IllegalArgumentException("Must detect 4 sides and only 4 sides");
 
 	}
 }

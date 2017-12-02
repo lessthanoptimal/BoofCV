@@ -18,10 +18,10 @@
 
 package boofcv.demonstrations.shapes;
 
+import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 
 import javax.swing.*;
@@ -75,23 +75,27 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 	// todo add back control for min/max sides
 
 	public DetectBlackPolygonControlPanel(ShapeGuiListener owner) {
-		this(owner,new ConfigPolygonDetector(3,6));
+		this(owner,new ConfigPolygonDetector(3,6),null);
 	}
 
-	public DetectBlackPolygonControlPanel(ShapeGuiListener owner, ConfigPolygonDetector config) {
+	public DetectBlackPolygonControlPanel(ShapeGuiListener owner,
+										  ConfigPolygonDetector configPolygon, ConfigThreshold configThreshold ) {
 		setBorder(BorderFactory.createEmptyBorder());
 		this.owner = owner;
-		this.config = config;
-		config.detector.maximumSides = Math.min(50,config.detector.maximumSides);
-		config.detector.minimumContour = ConfigLength.fixed(20);
-		minSides = config.detector.minimumSides;
-		maxSides = config.detector.maximumSides;
-		refineGray = config.refineGray != null ? config.refineGray : new ConfigRefinePolygonLineToImage();
-		spinnerContourConnect = spinner(config.detector.contourRule.ordinal(), ConnectRule.values());
+		this.config = configPolygon;
+		configPolygon.detector.maximumSides = Math.min(50,configPolygon.detector.maximumSides);
+		if( configPolygon.detector.minimumContour.fraction > 0 )
+			throw new RuntimeException("Can't handle a contour with a relative measurement. Update GUI code");
+		minSides = configPolygon.detector.minimumSides;
+		maxSides = configPolygon.detector.maximumSides;
+		refineGray = configPolygon.refineGray != null ? configPolygon.refineGray : new ConfigRefinePolygonLineToImage();
+		spinnerContourConnect = spinner(configPolygon.detector.contourRule.ordinal(), ConnectRule.values());
 
-		thresholdPanel = new ThresholdControlPanel(owner);
+		thresholdPanel = configThreshold == null ?
+				new ThresholdControlPanel(owner) :
+				new ThresholdControlPanel(owner,configThreshold);
 
-		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(config.detector.minimumContour.length,
+		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(configPolygon.detector.minimumContour.length,
 				5,10000,2));
 		spinnerMinContourSize.setMaximumSize(spinnerMinContourSize.getPreferredSize());
 		spinnerMinContourSize.addChangeListener(this);
@@ -107,23 +111,23 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		sidesPanel.add(Box.createRigidArea(new Dimension(10,10)));
 		sidesPanel.add(spinnerMaxSides);
 
-		spinnerMinEdgeD = spinner(config.detector.minimumEdgeIntensity, 0.0,255.0,1.0);
-		spinnerMinEdgeR = spinner(config.minimumRefineEdgeIntensity, 0.0,255.0,1.0);
+		spinnerMinEdgeD = spinner(configPolygon.detector.minimumEdgeIntensity, 0.0,255.0,1.0);
+		spinnerMinEdgeR = spinner(configPolygon.minimumRefineEdgeIntensity, 0.0,255.0,1.0);
 
-		polylinePanel = new PolylineControlPanel(owner,config.detector.contourToPoly);
+		polylinePanel = new PolylineControlPanel(owner,configPolygon.detector.contourToPoly);
 
 		setBorder = new JCheckBox("Image Border");
 		setBorder.addActionListener(this);
-		setBorder.setSelected(config.detector.canTouchBorder);
+		setBorder.setSelected(configPolygon.detector.canTouchBorder);
 
 		setRefineContour = new JCheckBox("Refine Contour");
-		setRefineContour.setSelected(config.refineContour);
+		setRefineContour.setSelected(configPolygon.refineContour);
 		setRefineContour.addActionListener(this);
 		setRefineGray = new JCheckBox("Refine Gray");
-		setRefineGray.setSelected(config.refineGray != null);
+		setRefineGray.setSelected(configPolygon.refineGray != null);
 		setRefineGray.addActionListener(this);
 		setRemoveBias = new JCheckBox("Remove Bias");
-		setRemoveBias.setSelected(config.adjustForThresholdBias);
+		setRemoveBias.setSelected(configPolygon.adjustForThresholdBias);
 		setRemoveBias.addActionListener(this);
 		spinnerLineSamples = spinner(refineGray.lineSamples, 5, 100, 1);
 		spinnerCornerOffset = spinner(refineGray.cornerOffset, 0, 10, 1);

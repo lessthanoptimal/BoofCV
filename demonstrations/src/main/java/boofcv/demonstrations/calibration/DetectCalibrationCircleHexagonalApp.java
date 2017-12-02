@@ -60,8 +60,8 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 	public DetectCalibrationCircleHexagonalApp(int numRows , int numColumns ,
 											   double circleDiameter, double centerDistance,
 											   List<String> exampleInputs) {
-		super(new DetectCalibrationCirclePanel(numRows,numColumns,circleDiameter,centerDistance,true),exampleInputs);
-
+		super(exampleInputs);
+		setUpGui(new DetectCalibrationCirclePanel(numRows,numColumns,circleDiameter,centerDistance,true));
 		config = new ConfigCircleHexagonalGrid(numRows, numColumns, circleDiameter, centerDistance);
 		controlPanel.threshold.setConfiguration(config.thresholding);
 

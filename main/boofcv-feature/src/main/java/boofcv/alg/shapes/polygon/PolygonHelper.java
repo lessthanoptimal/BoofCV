@@ -18,6 +18,7 @@
 
 package boofcv.alg.shapes.polygon;
 
+import boofcv.abst.shapes.polyline.PointsToPolyline;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.GrowQueue_B;
@@ -61,4 +62,9 @@ public interface PolygonHelper {
 	 * @return true to keep the contour for further processing or false to reject it
 	 */
 	boolean filterPixelPolygon(Polygon2D_F64 undistorted , Polygon2D_F64 distorted, GrowQueue_B touches, boolean touchesBorder);
+
+	/**
+	 * Provide an oportunity to configure the polyline fit based on what's currently known
+	 */
+	void configureBeforePolyline(PointsToPolyline contourToPolyline, boolean touchesBorder);
 }

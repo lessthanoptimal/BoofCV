@@ -37,15 +37,15 @@ public abstract class ChecksGenericPointsToPolyline {
 	public void checkDefaults() {
 		PointsToPolyline alg = createAlg(true);
 
-		assertEquals(3,alg.getMinVertexes());
-		assertEquals(Integer.MAX_VALUE,alg.getMaxVertexes());
+		assertEquals(3,alg.getMinimumSides());
+		assertEquals(Integer.MAX_VALUE,alg.getMaximumSides());
 		assertEquals(true,alg.isConvex());
 		assertEquals(true,alg.isLoop());
 
 		alg = createAlg(false);
 
-		assertEquals(3,alg.getMinVertexes());
-		assertEquals(Integer.MAX_VALUE,alg.getMaxVertexes());
+		assertEquals(3,alg.getMinimumSides());
+		assertEquals(Integer.MAX_VALUE,alg.getMaximumSides());
 		assertEquals(true,alg.isConvex());
 		assertEquals(false,alg.isLoop());
 	}

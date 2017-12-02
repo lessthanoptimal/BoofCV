@@ -42,29 +42,29 @@ public interface PointsToPolyline {
 	boolean process(List<Point2D_I32> input , GrowQueue_I32 vertexes );
 
 	/**
-	 * Specifies the minimum number of vertexes in a polyline that's returned
+	 * Specifies the minimum number of sides in a polyline that's returned
 
 	 * By default the minimum is 3.
 	 *
 	 * @param minimum The minimum number of allowed vertices
 	 */
-	void getMinVertexes(int minimum );
+	void setMinimumSides(int minimum );
 
-	int getMinVertexes();
+	int getMinimumSides();
 
 	/**
-	 * Specifies the maximum allowed vertexes. How this is interpreted is implementation specific.
+	 * Specifies the maximum allowed sides. How this is interpreted is implementation specific.
 	 * For example, two possible interpretations are that it could abort if the number of sides is more
-	 * than this or to only consides up to this number of sides. The number of found sides
+	 * than this or to only considered up to this number of sides. The number of found sides
 	 * will never exceed this number.
 
 	 * By default the maximum is Integer.MAX_VALUE.
 	 *
 	 * @param maximum The maximum number of allowed vertices
 	 */
-	void setMaxVertexes( int maximum );
+	void setMaximumSides(int maximum );
 
-	int getMaxVertexes();
+	int getMaximumSides();
 
 	/**
 	 * Is it configured for loops or lines?

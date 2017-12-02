@@ -27,21 +27,6 @@ import boofcv.struct.ConfigLength;
  */
 public class ConfigPolylineSplitMerge extends ConfigPolyline {
 	/**
-	 * Can it assume the shape is convex? If so it can reject shapes earlier
-	 */
-	public boolean convex = true;
-
-	/**
-	 * maximum number of sides it will consider
-	 */
-	public int maxSides = Integer.MAX_VALUE;
-
-	/**
-	 * maximum number of sides it will consider
-	 */
-	public int minSides = 3;
-
-	/**
 	 * The minimum length of a side
 	 */
 	public int minimumSideLength = 5;
@@ -53,12 +38,14 @@ public class ConfigPolylineSplitMerge extends ConfigPolyline {
 	public ConfigLength extraConsider = ConfigLength.relative(1.0,0);
 
 	/**
-	 * When selecting the best model how much is a split penalized
+	 * Used to adjust the penalty for adding a new corner. Larger numbers will bias it towards shapes with fewer
+	 * sides.  For simple convex shapes 0.2 is a reasonable value. For complex concave shapes 0.025 seems to do better.
 	 */
-	public double cornerScorePenalty = 0.1;
+	public double cornerScorePenalty = 0.025;
 
 	/**
-	 *If the score of a side is less than this it is considered a perfect fit and won't be split any more
+	 *If the error forside is less than this it is considered a perfect fit and the side won't be split. Adjust
+	 * this value to improve the speed. Try setting to zero if corners are precise enough.
 	 */
 	public double thresholdSideSplitScore = 0.2;
 
@@ -70,7 +57,9 @@ public class ConfigPolylineSplitMerge extends ConfigPolyline {
 
 	/**
 	 * If the contour between two corners is longer than this multiple of the distance
-	 * between the two corners then it will be rejected as not convex
+	 * between the two corners then it will be rejected as not convex. larger values
+	 * make the tolerance weaker and smaller values make it more strict. Setting it too small can make it
+	 * reject convex shapes.
 	 */
 	public double convexTest = 2.5;
 
@@ -80,25 +69,28 @@ public class ConfigPolylineSplitMerge extends ConfigPolyline {
 	 */
 	public ConfigLength maxSideError = ConfigLength.relative(0.05,3);
 
+	/**
+	 * Extra refinement that it does after the initial polyline has been found. Set to a value above zero to use
+	 * this feature.
+	 */
+	public int refineIterations = 10;
+
 	@Override
 	public void checkValidity() {
-		if( minSides < 3 )
-			throw new RuntimeException("Minimum sides must be >= 3");
+		extraConsider.checkValidity();
 	}
 
 	@Override
 	public String toString() {
 		return "ConfigPolylineSplitMerge{" +
-				"convex=" + convex +
-				", maxSides=" + maxSides +
-				", minSides=" + minSides +
-				", minimumSideLength=" + minimumSideLength +
+				"minimumSideLength=" + minimumSideLength +
 				", extraConsider=" + extraConsider +
 				", cornerScorePenalty=" + cornerScorePenalty +
 				", thresholdSideSplitScore=" + thresholdSideSplitScore +
 				", maxNumberOfSideSamples=" + maxNumberOfSideSamples +
 				", convexTest=" + convexTest +
 				", maxSideError=" + maxSideError +
+				", refineIterations=" + refineIterations +
 				'}';
 	}
 }

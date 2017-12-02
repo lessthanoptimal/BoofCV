@@ -18,6 +18,7 @@
 
 package boofcv.abst.shapes.polyline;
 
+import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.splitmerge.PolylineSplitMerge;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -29,9 +30,15 @@ import java.util.List;
  */
 public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 
+	// The base algorithm
 	PolylineSplitMerge alg;
 
+	// refine corner location
+	RefinePolyLineCorner refine;
+
 	public NewSplitMerge_to_PointsToPolyline( ConfigPolylineSplitMerge config ){
+
+		boolean loop = true;
 
 		// ignore parameters which are specified in the PointsToPolyline interface
 		alg = new PolylineSplitMerge();
@@ -45,6 +52,10 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 		alg.setCornerScorePenalty(config.cornerScorePenalty);
 		alg.setConvexTest(config.convexTest);
 		alg.setMaxSideError(config.maxSideError);
+
+		if( config.refineIterations > 0 ) {
+			refine = new RefinePolyLineCorner(loop,config.refineIterations);
+		}
 	}
 
 	@Override
@@ -60,26 +71,30 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 
 		vertexes.setTo(best.splits);
 
+		if( refine != null && !refine.fit(input,vertexes)) {
+			return false;
+		}
+
 		return true;
 	}
 
 	@Override
-	public void getMinVertexes(int minimum) {
+	public void setMinimumSides(int minimum) {
 		alg.setMinSides(minimum);
 	}
 
 	@Override
-	public int getMinVertexes() {
+	public int getMinimumSides() {
 		return alg.getMinSides();
 	}
 
 	@Override
-	public void setMaxVertexes(int maximum) {
+	public void setMaximumSides(int maximum) {
 		alg.setMaxSides(maximum);
 	}
 
 	@Override
-	public int getMaxVertexes() {
+	public int getMaximumSides() {
 		return alg.getMaxSides();
 	}
 

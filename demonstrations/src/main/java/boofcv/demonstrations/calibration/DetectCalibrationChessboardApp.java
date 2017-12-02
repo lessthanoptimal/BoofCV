@@ -51,16 +51,17 @@ public class DetectCalibrationChessboardApp
 
 	public DetectCalibrationChessboardApp( int numRows , int numColumns ,
 										   List<String> exampleInputs) {
-		super(new DetectCalibrationPanel(numRows,numColumns,true),exampleInputs);
+		super(exampleInputs);
 		config = new ConfigChessboard(numRows, numColumns, 1);
-		controlPanel.threshold.setConfiguration(config.thresholding);
+		setUpGui(new DetectCalibrationPolygonPanel(numRows,numColumns,config.square,config.thresholding));
 
 		declareDetector();
 	}
 
 	@Override
 	public void declareDetector() {
-		config.thresholding = controlPanel.threshold.createConfig();
+		config.thresholding = ((DetectCalibrationPolygonPanel)controlPanel).polygonPanel.thresholdPanel.createConfig();
+		config.square = ((DetectCalibrationPolygonPanel)controlPanel).polygonPanel.getConfigPolygon();
 		config.numRows = controlPanel.getGridRows();
 		config.numCols = controlPanel.getGridColumns();
 

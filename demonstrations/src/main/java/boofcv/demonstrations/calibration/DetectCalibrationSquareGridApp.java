@@ -50,16 +50,17 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 	public DetectCalibrationSquareGridApp(int numRows , int numColumns ,  double squareWidth, double spaceWidth,
 										  boolean forCalibration ,
 										  List<String> exampleInputs) {
-		super(new DetectCalibrationPanel(numRows,numColumns,true),exampleInputs);
-
+		super(exampleInputs);
 		config = new ConfigSquareGrid(numRows, numColumns, squareWidth,spaceWidth);
-		controlPanel.threshold.setConfiguration(config.thresholding);
+		setUpGui(new DetectCalibrationPolygonPanel(numRows,numColumns,config.square,config.thresholding));
 		declareDetector();
 	}
 
 	@Override
 	public void declareDetector() {
-		config.thresholding = controlPanel.threshold.createConfig();
+		config.thresholding = ((DetectCalibrationPolygonPanel)controlPanel).polygonPanel.getThresholdPanel().createConfig();
+		config.square = ((DetectCalibrationPolygonPanel)controlPanel).polygonPanel.getConfigPolygon();
+
 
 		config.numRows = controlPanel.getGridRows();
 		config.numCols = controlPanel.getGridColumns();

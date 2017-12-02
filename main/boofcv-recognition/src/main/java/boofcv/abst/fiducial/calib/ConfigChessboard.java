@@ -21,9 +21,8 @@ package boofcv.abst.fiducial.calib;
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
-import boofcv.factory.filter.binary.ConfigThresholdBlockMinMax;
+import boofcv.factory.filter.binary.ConfigThresholdLocalOtsu;
 import boofcv.factory.shape.ConfigPolygonDetector;
-import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
@@ -55,7 +54,8 @@ public class ConfigChessboard implements Configuration {
 	/**
 	 * Configuration for thresholding the image
 	 */
-	public ConfigThreshold thresholding = new ConfigThresholdBlockMinMax(10,35,true);
+//	public ConfigThreshold thresholding = new ConfigThresholdBlockMinMax(10,35,true);
+	public ConfigThreshold thresholding = new ConfigThresholdLocalOtsu(10,10);
 
 	/**
 	 * Configuration for square detector.
@@ -66,34 +66,31 @@ public class ConfigChessboard implements Configuration {
 	public ConfigPolygonDetector square = new ConfigPolygonDetector();
 
 	/**
-	 * Configuration for refining with lines.  Ignored if not used.
-	 */
-	public ConfigRefinePolygonLineToImage configRefineLines = new ConfigRefinePolygonLineToImage();
-
-	/**
 	 * Physical width of each square on the calibration target
 	 */
 	public double squareWidth;
 
 	{
 		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
-		thresholding.scale = 0.9;
+		thresholding.scale = 0.85;
 
-		((ConfigPolylineSplitMerge)square.detector.contourToPoly).minSides = 3;
-		((ConfigPolylineSplitMerge)square.detector.contourToPoly).cornerScorePenalty = 0.5;
+		((ConfigPolylineSplitMerge)square.detector.contourToPoly).cornerScorePenalty = 0.2;
 		((ConfigPolylineSplitMerge)square.detector.contourToPoly).minimumSideLength = 2;
-//		((ConfigPolylineSplitMerge)square.detector.contourToPoly).thresholdSideSplitScore = 0;
-//		((ConfigPolylineSplitMerge)square.detector.contourToPoly).maxSideError = 1000;
+		((ConfigPolylineSplitMerge)square.detector.contourToPoly).thresholdSideSplitScore = 0;
+		// max side error is increased for  shapes which are parially outside of the image, but the local threshold
+		// makes them concave
+		((ConfigPolylineSplitMerge)square.detector.contourToPoly).maxSideError = new ConfigLength(2,0.5);
 //		((ConfigPolylineSplitMerge)square.detector.contourToPoly).convexTest = 1000;
 		square.detector.tangentEdgeIntensity = 2.5; // the initial contour is the result of being eroded
 		square.detector.minimumContour = ConfigLength.fixed(10);
 		square.detector.canTouchBorder = true;
 
 		// defaults for if the user toggles it to lines
-		configRefineLines.cornerOffset = 1;
-		configRefineLines.lineSamples = 15;
-		configRefineLines.convergeTolPixels = 0.2;
-		configRefineLines.maxIterations = 5;
+		square.refineGray.cornerOffset = 1;
+		square.refineGray.sampleRadius = 3;
+		square.refineGray.lineSamples = 15;
+		square.refineGray.convergeTolPixels = 0.2;
+		square.refineGray.maxIterations = 5;
 	}
 
 	public ConfigChessboard(int numRows, int numCols, double squareWidth) {

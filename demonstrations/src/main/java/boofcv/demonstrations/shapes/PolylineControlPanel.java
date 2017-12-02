@@ -175,6 +175,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		JSpinner spinnerMaxSideError;
 
 		JSpinner spinnerSideSamples;
+		JSpinner spinnerRefine;
 
 
 		public SplitMergePanel() {
@@ -192,14 +193,16 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 			spinnerSideSplitScore = spinner(config.thresholdSideSplitScore,0,100,0.1);
 			spinnerSideSamples    = spinner(config.maxNumberOfSideSamples, 5, 1000, 5);
 			spinnerConvexTest     = spinner(config.convexTest, 0.0, 20.0, 0.25,2,2);
+			spinnerRefine         = spinner(config.refineIterations, 0, 20, 1);
 
-			addLabeled(spinnerMaxSideError, "Max Error:", this);
-			addLabeled(spinnerConsiderSides, "Extra Consider:", this);
-			addLabeled(spinnerMinSideLength, "Min Side Length: ", this);
-			addLabeled(spinnerCornerPenalty, "Corner Penalty: ", this);
-			addLabeled(spinnerSideSplitScore, "Side Split: ", this);
-			addLabeled(spinnerSideSamples, "Side Samples: ", this);
-			addLabeled(spinnerConvexTest, "Convex Test: ", this);
+			addLabeled(spinnerMaxSideError, "Max Side Error", this);
+			addLabeled(spinnerConsiderSides, "Extra Side Consider", this);
+			addLabeled(spinnerMinSideLength, "Min Side Length", this);
+			addLabeled(spinnerCornerPenalty, "Corner Penalty", this);
+			addLabeled(spinnerSideSplitScore, "Side Split", this);
+			addLabeled(spinnerSideSamples, "Side Samples", this);
+			addLabeled(spinnerConvexTest, "Convex Test", this);
+			addLabeled(spinnerRefine, "Refine Iterations ", this);
 		}
 
 		@Override
@@ -218,6 +221,8 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 				config.convexTest = ((Number) spinnerConvexTest.getValue()).doubleValue();
 			} else if (spinnerMaxSideError == e.getSource()) {
 				config.maxSideError.fraction = ((Number) spinnerMaxSideError.getValue()).doubleValue();
+			} else if (spinnerRefine == e.getSource()) {
+				config.refineIterations = ((Number) spinnerRefine.getValue()).intValue();
 			} else {
 				throw new RuntimeException("Unknown");
 			}
@@ -274,10 +279,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 
 	public ConfigPolylineSplitMerge getConfigSplitMerge() {
 		ConfigPolylineSplitMerge config = panelSplitMerge.config;
-		config.minSides = minSides;
-		config.maxSides = maxSides;
-		config.convex = convex;
-
+		// TODO set looping
 		return config;
 	}
 

@@ -61,7 +61,7 @@ public class DetectFiducialSquareBinaryPanel extends DetectBlackShapePanel
 	public DetectFiducialSquareBinaryPanel(ShapeGuiListener owner) {
 		this.owner = owner;
 
-		polygonPanel = new DetectBlackPolygonControlPanel(owner,config.squareDetector);
+		polygonPanel = new DetectBlackPolygonControlPanel(owner,config.squareDetector,null);
 
 		imageView = new JComboBox();
 		imageView.addItem("Input");

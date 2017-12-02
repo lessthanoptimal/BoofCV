@@ -105,24 +105,24 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 	}
 
 	@Override
-	public void getMinVertexes(int minimum) {
+	public void setMinimumSides(int minimum) {
 		this.minVertexes = minimum;
 	}
 
 	@Override
-	public int getMinVertexes() {
+	public int getMinimumSides() {
 		return minVertexes;
 	}
 
 	@Override
-	public void setMaxVertexes(int maximum) {
+	public void setMaximumSides(int maximum) {
 		this.maxVertexes = maximum;
 		// detect more than the max. Prune will reduce the number of corners later on
 		splitMerge.setAbortSplits(maximum*2);
 	}
 
 	@Override
-	public int getMaxVertexes() {
+	public int getMaximumSides() {
 		return maxVertexes;
 	}
 

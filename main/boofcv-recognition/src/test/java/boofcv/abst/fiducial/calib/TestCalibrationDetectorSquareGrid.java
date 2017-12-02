@@ -38,7 +38,7 @@ public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationD
 
 	public TestCalibrationDetectorSquareGrid() {
 		targetConfigs.add(  new ConfigSquareGrid(3, 2, 30,30) );
-		fisheyeMatchTol = 4.0;
+		fisheyeMatchTol = 5.0;
 		fisheyeAllowedFails = 1;
 	}
 

@@ -22,14 +22,14 @@ import boofcv.demonstrations.shapes.DetectBlackPolygonControlPanel;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.factory.fiducial.ConfigQrCode;
+import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.ThresholdType;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
 
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
@@ -64,7 +64,10 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 	public DetectQrCodeControlPanel(DetectQrCodeApp owner) {
 		this.owner = owner;
 
-		polygonPanel = new DetectBlackPolygonControlPanel(owner,config.polygon);
+		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,20);
+		configThreshold.scale = 0.95;
+
+		polygonPanel = new DetectBlackPolygonControlPanel(owner,config.polygon,configThreshold);
 
 		bRunAgain.addActionListener(new ActionListener() {
 			@Override
@@ -109,19 +112,6 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		addAlignLeft(showContour, this);
 		add(polygonPanel);
 		addVerticalGlue(this);
-	}
-
-	private void configureSpinnerFloat( JSpinner spinner ) {
-		JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinner.getEditor();
-		DecimalFormat format = editor.getFormat();
-		format.setMinimumFractionDigits(3);
-		format.setMinimumIntegerDigits(1);
-		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
-		Dimension d = spinner.getPreferredSize();
-		d.width = 60;
-		spinner.setPreferredSize(d);
-		spinner.addChangeListener(this);
-		spinner.setMaximumSize(d);
 	}
 
 	@Override

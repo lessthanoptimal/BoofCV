@@ -59,8 +59,8 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 	public DetectCalibrationCircleRegularApp(int numRows , int numColumns ,
 											 double circleDiameter, double centerDistance,
 											 List<String> exampleInputs) {
-		super(new DetectCalibrationCirclePanel(numRows,numColumns,circleDiameter,centerDistance,false),exampleInputs);
-
+		super(exampleInputs);
+		setUpGui(new DetectCalibrationCirclePanel(numRows,numColumns,circleDiameter,centerDistance,false));
 		config = new ConfigCircleRegularGrid(numRows, numColumns, circleDiameter, centerDistance);
 		controlPanel.threshold.setConfiguration(config.thresholding);
 		declareDetector();

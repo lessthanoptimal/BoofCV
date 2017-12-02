@@ -326,6 +326,10 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 					undistorted = contourTmp.toList();
 				}
 
+				if( helper != null ) {
+					helper.configureBeforePolyline(contourToPolyline,touchesBorder);
+				}
+
 				// Find the initial approximate fit of a polygon to the contour
 				if( !contourToPolyline.process(undistorted,splits) ) {
 					if( verbose ) System.out.println("rejected polygon initial fit failed. contour size = "+contourTmp.size());
@@ -547,16 +551,16 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		if( max < min )
 			throw new IllegalArgumentException("The max must be >= the min");
 
-		this.contourToPolyline.getMinVertexes(min);
-		this.contourToPolyline.setMaxVertexes(max);
+		this.contourToPolyline.setMinimumSides(min);
+		this.contourToPolyline.setMaximumSides(max);
 	}
 
 	public int getMinimumSides() {
-		return contourToPolyline.getMinVertexes();
+		return contourToPolyline.getMinimumSides();
 	}
 
 	public int getMaximumSides() {
-		return contourToPolyline.getMaxVertexes();
+		return contourToPolyline.getMaximumSides();
 	}
 
 	public void setOutputClockwise(boolean outputClockwise) {

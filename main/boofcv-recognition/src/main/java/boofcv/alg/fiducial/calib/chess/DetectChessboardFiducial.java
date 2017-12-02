@@ -77,8 +77,6 @@ public class DetectChessboardFiducial<T extends ImageGray<T>> {
 
 		findSeeds = new DetectChessboardSquarePoints<>(numRows, numCols, maxCornerDistance, detectorSquare);
 
-		detectorSquare.setHelper(new ChessboardPolygonHelper<>());
-
 		reset();
 	}
 

@@ -92,12 +92,14 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 				case 1:{
 					ConfigSplitMergeLineFit config = polyControls.getConfigSplitMergeOld();
 					contourToPolyline = FactoryPointsToPolyline.splitMerge(config);
-					contourToPolyline.setMaxVertexes(polyControls.maxSides);
 				}break;
 
 				default:
 					throw new RuntimeException("Egads");
 			}
+			contourToPolyline.setMinimumSides(polyControls.minSides);
+			contourToPolyline.setMaximumSides(polyControls.maxSides);
+			contourToPolyline.setConvex(polyControls.convex);
 		}
 		imageThresholdUpdated();
 	}

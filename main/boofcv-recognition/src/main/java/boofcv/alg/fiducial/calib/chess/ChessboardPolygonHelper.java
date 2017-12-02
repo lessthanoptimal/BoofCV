@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.chess;
 
+import boofcv.abst.shapes.polyline.PointsToPolyline;
 import boofcv.alg.shapes.polygon.PolygonHelper;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
@@ -68,6 +69,17 @@ public class ChessboardPolygonHelper<T extends ImageGray<T>> implements PolygonH
 			return totalRegular > 0 && totalRegular <= 4; // should be 3, but noise/imprecision in corner can make it 4
 		} else {
 			return distorted.size() == 4;
+		}
+	}
+
+	@Override
+	public void configureBeforePolyline(PointsToPolyline contourToPolyline, boolean touchesBorder) {
+		if( touchesBorder ) {
+			contourToPolyline.setMinimumSides(3);
+			contourToPolyline.setMaximumSides(8);
+		} else {
+			contourToPolyline.setMinimumSides(4);
+			contourToPolyline.setMaximumSides(4);
 		}
 	}
 }

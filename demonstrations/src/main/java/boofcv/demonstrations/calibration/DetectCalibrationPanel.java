@@ -19,6 +19,7 @@
 package boofcv.demonstrations.calibration;
 
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
+import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -152,8 +153,7 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 			public void imageThresholdUpdated() {
 				listener.calibEventDetectorModified();
 			}
-		}, ThresholdType.BLOCK_OTSU);
-		threshold.setRadius(40);
+		}, ConfigThreshold.local(ThresholdType.BLOCK_OTSU,40));
 
 		if( addComponents )
 			addComponents();

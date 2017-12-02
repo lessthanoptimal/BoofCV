@@ -86,15 +86,17 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 		this.detectorSquare = detectorSquare;
 		if( detectorSquare != null ) { // null in some unit tests for simplicity
 			// configure the detector
+			detectorSquare.setHelper(new ChessboardPolygonHelper<>());
 			detectorSquare.getDetector().setOutputClockwise(true);
 			detectorSquare.getDetector().setConvex(true);
-			detectorSquare.getDetector().setNumberOfSides(3,8);
+//			detectorSquare.getDetector().setNumberOfSides(3,8);  <--- this is handled by the helper
 			this.detectorSquare.setFunctionAdjust(new DetectPolygonBinaryGrayRefine.AdjustBeforeRefineEdge() {
 				@Override
 				public void adjust(DetectPolygonFromContour.Info info, boolean clockwise) {
 					DetectChessboardSquarePoints.this.adjustBeforeOptimize(info.polygon, info.borderCorners,clockwise);
 				}
 			});
+
 		}
 
 		s2c = new SquaresIntoCrossClusters(maxCornerDistance,-1);

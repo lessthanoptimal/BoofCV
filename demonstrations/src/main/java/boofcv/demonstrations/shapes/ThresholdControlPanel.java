@@ -52,11 +52,11 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 
 	public ThresholdType type;
 
-	public double scale = new ConfigThreshold().scale;
+	public double scale = -1;
 	public boolean down = true;
 	public int radius = 10;
-	public float savolaK = new ConfigThreshold().savolaK;
-	public int otsuTuning = (int)new ConfigThresholdLocalOtsu().tuning;
+	public float savolaK = -1;
+	public int otsuTuning = -1;
 	public int minPixelValue = 0;
 	public int maxPixelValue = 255;
 
@@ -65,12 +65,22 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	public int globalThreshold = 50;
 
 	public ThresholdControlPanel(Listener listener) {
-		this(listener,ThresholdType.GLOBAL_OTSU);
+		this(listener,ConfigThreshold.global(ThresholdType.GLOBAL_OTSU));
 	}
 
-	public ThresholdControlPanel(Listener listener, ThresholdType defaultType ) {
+	public ThresholdControlPanel(Listener listener, ConfigThreshold configThreshold) {
 		this.listener = listener;
-		this.type = defaultType;
+		this.type = configThreshold.type;
+		this.scale = configThreshold.scale;
+		this.down = configThreshold.down;
+		this.radius = configThreshold.radius;
+		this.savolaK = configThreshold.savolaK;
+		this.minPixelValue = configThreshold.minPixelValue;
+		this.maxPixelValue = configThreshold.maxPixelValue;
+
+		if( configThreshold instanceof ConfigThresholdLocalOtsu ) {
+			otsuTuning = (int)((ConfigThresholdLocalOtsu)configThreshold).tuning;
+		}
 
 		comboType = new JComboBox();
 		for( ThresholdType type : ThresholdType.values() ) {
@@ -78,7 +88,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		}
 
 		comboType.setMaximumSize(comboType.getPreferredSize());
-		comboType.setSelectedIndex(defaultType.ordinal());
+		comboType.setSelectedIndex(this.type.ordinal());
 
 		spinnerThreshold = new JSpinner(new SpinnerNumberModel(globalThreshold,0,1000,1));
 		spinnerThreshold.setMaximumSize(spinnerThreshold.getPreferredSize());
