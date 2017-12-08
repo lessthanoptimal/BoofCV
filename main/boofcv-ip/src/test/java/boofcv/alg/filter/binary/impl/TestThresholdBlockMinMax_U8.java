@@ -36,6 +36,6 @@ public class TestThresholdBlockMinMax_U8
 	public ThresholdBlockMinMax<GrayU8, ?>
 	createAlg(double textureThreshold, int requestedBlockWidth, double scale, boolean down) {
 		return new ThresholdBlockMinMax_U8(textureThreshold,requestedBlockWidth,
-				scale,down);
+				scale,down,true);
 	}
 }

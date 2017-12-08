@@ -39,8 +39,8 @@ public abstract class ThresholdBlockMean
 	 *
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 */
-	public ThresholdBlockMean(int requestedBlockWidth, Class<T> imageType) {
-		super(requestedBlockWidth,imageType);
+	public ThresholdBlockMean(int requestedBlockWidth, boolean thresholdFromLocalBlocks,Class<T> imageType) {
+		super(requestedBlockWidth,thresholdFromLocalBlocks,imageType);
 	}
 
 }

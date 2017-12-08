@@ -114,13 +114,14 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> blockMinMax(int regionWidth, double scale , boolean down,
-								 double minimumSpread, Class<T> inputType) {
+								 double minimumSpread, boolean thresholdFromLocalBlocks, Class<T> inputType) {
 		if( BOverrideFactoryThresholdBinary.blockMinMax != null )
-			return BOverrideFactoryThresholdBinary.blockMinMax.handle(regionWidth, scale, down, minimumSpread, inputType);
+			return BOverrideFactoryThresholdBinary.blockMinMax.handle(regionWidth, scale, down,
+					minimumSpread,thresholdFromLocalBlocks, inputType);
 		if( inputType == GrayU8.class )
-			return (InputToBinary<T>)new ThresholdBlockMinMax_U8(minimumSpread,regionWidth,scale,down);
+			return (InputToBinary<T>)new ThresholdBlockMinMax_U8(minimumSpread,regionWidth,scale,down,thresholdFromLocalBlocks);
 		else
-			return (InputToBinary<T>)new ThresholdBlockMinMax_F32((float)minimumSpread,regionWidth,(float)scale,down);
+			return (InputToBinary<T>)new ThresholdBlockMinMax_F32((float)minimumSpread,regionWidth,(float)scale,down,thresholdFromLocalBlocks);
 	}
 
 	/**
@@ -135,14 +136,15 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> blockMean(int regionWidth, double scale , boolean down,
+	InputToBinary<T> blockMean(int regionWidth, double scale , boolean down, boolean thresholdFromLocalBlocks,
 							   Class<T> inputType) {
 		if( BOverrideFactoryThresholdBinary.blockMean != null )
-			return BOverrideFactoryThresholdBinary.blockMean.handle(regionWidth, scale, down, inputType);
+			return BOverrideFactoryThresholdBinary.blockMean.handle(regionWidth, scale, down,
+					thresholdFromLocalBlocks, inputType);
 		if( inputType == GrayU8.class )
-			return (InputToBinary<T>)new ThresholdBlockMean_U8(regionWidth,scale,down);
+			return (InputToBinary<T>)new ThresholdBlockMean_U8(regionWidth,scale,down,thresholdFromLocalBlocks);
 		else
-			return (InputToBinary<T>)new ThresholdBlockMean_F32(regionWidth,scale,down);
+			return (InputToBinary<T>)new ThresholdBlockMean_F32(regionWidth,scale,down,thresholdFromLocalBlocks);
 	}
 
 	/**
@@ -157,10 +159,13 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> blockOtsu(int regionWidth , double tuning, double scale, boolean down, Class<T> inputType) {
+	InputToBinary<T> blockOtsu(int regionWidth , double tuning, double scale, boolean down,
+							   boolean thresholdFromLocalBlocks, Class<T> inputType) {
 		if( BOverrideFactoryThresholdBinary.blockOtsu != null )
-			return BOverrideFactoryThresholdBinary.blockOtsu.handle(regionWidth, tuning, scale, down, inputType);
-		return new InputToBinarySwitchU8<>(new ThresholdBlockOtsu(regionWidth,tuning,scale,down),inputType);
+			return BOverrideFactoryThresholdBinary.blockOtsu.handle(regionWidth, tuning, scale, down,
+					thresholdFromLocalBlocks, inputType);
+		return new InputToBinarySwitchU8<>(new ThresholdBlockOtsu(regionWidth,tuning,scale,down,
+				thresholdFromLocalBlocks),inputType);
 	}
 
 	/**
@@ -246,15 +251,18 @@ public class FactoryThresholdBinary {
 
 			case BLOCK_MIN_MAX: {
 				ConfigThresholdBlockMinMax c = (ConfigThresholdBlockMinMax) config;
-				return blockMinMax(c.radius * 2 + 1, c.scale , c.down, c.minimumSpread, inputType);
+				return blockMinMax(c.radius * 2 + 1, c.scale , c.down, c.minimumSpread,
+						c.thresholdFromLocalBlocks, inputType);
 			}
 
 			case BLOCK_MEAN:
-				return blockMean(config.radius * 2 + 1, config.scale , config.down, inputType);
+				return blockMean(config.radius * 2 + 1, config.scale , config.down,
+						config.thresholdFromLocalBlocks, inputType);
 
 			case BLOCK_OTSU: {
 				ConfigThresholdLocalOtsu c = (ConfigThresholdLocalOtsu) config;
-				return blockOtsu(config.radius * 2 + 1, c.tuning, config.scale, config.down, inputType);
+				return blockOtsu(c.radius * 2 + 1, c.tuning, c.scale, c.down,
+						c.thresholdFromLocalBlocks, inputType);
 			}
 
 		}

@@ -96,7 +96,7 @@ public class TestDetectChessboardFiducial {
 
 		InputToBinary<GrayF32> inputToBinary;
 		if( localThreshold )
-			inputToBinary = FactoryThresholdBinary.blockMinMax(10,0.90,true,10,GrayF32.class);
+			inputToBinary = FactoryThresholdBinary.blockMinMax(10,0.90,true,10,true,GrayF32.class);
 		else
 			inputToBinary = FactoryThresholdBinary.globalFixed(50,true,GrayF32.class);
 

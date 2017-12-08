@@ -355,7 +355,7 @@ public class GThresholdImageOps {
 	GrayU8 localBlockMinMax(T input, GrayU8 output, int radius, double scale , boolean down, double textureThreshold)
 	{
 		InputToBinary<T> alg = FactoryThresholdBinary.blockMinMax(
-				radius*2+1,scale,down,textureThreshold,(Class)input.getClass());
+				radius*2+1,scale,down,textureThreshold,true,(Class)input.getClass());
 
 		if( output == null )
 			output = new GrayU8(input.width,input.height);
@@ -379,7 +379,7 @@ public class GThresholdImageOps {
 	public static <T extends ImageGray<T>>
 	GrayU8 localBlockMean(T input, GrayU8 output, int radius, double scale , boolean down)
 	{
-		InputToBinary<T> alg = FactoryThresholdBinary.blockMean(radius * 2 + 1, scale, down,
+		InputToBinary<T> alg = FactoryThresholdBinary.blockMean(radius * 2 + 1, scale, down,true,
 				(Class<T>) input.getClass());
 
 		if( output == null )
@@ -405,7 +405,7 @@ public class GThresholdImageOps {
 	GrayU8 localBlockOtsu(T input, GrayU8 output, int radius, double tuning , double scale, boolean down)
 	{
 		InputToBinary<T> alg = FactoryThresholdBinary.blockOtsu(radius * 2 + 1, tuning,
-				scale,down, (Class)input.getClass());
+				scale,down,true, (Class)input.getClass());
 
 		if( output == null )
 			output = new GrayU8(input.width,input.height);

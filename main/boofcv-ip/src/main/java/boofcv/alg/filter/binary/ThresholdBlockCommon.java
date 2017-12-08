@@ -56,13 +56,17 @@ public abstract class ThresholdBlockCommon <T extends ImageGray<T>,S extends Ima
 	// the adjusted size to minimize extra pixels near the image upper extreme
 	protected int blockWidth,blockHeight;
 
+	// Should it use the local 3x3 block region
+	protected boolean thresholdFromLocalBlocks;
+
 	/**
 	 * Configures the detector
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 */
-	public ThresholdBlockCommon(int requestedBlockWidth, Class<T> imageClass  ) {
+	public ThresholdBlockCommon(int requestedBlockWidth, boolean thresholdFromLocalBlocks, Class<T> imageClass  ) {
 		this.requestedBlockWidth = requestedBlockWidth;
 		this.imageType = ImageType.single(imageClass);
+		this.thresholdFromLocalBlocks = thresholdFromLocalBlocks;
 	}
 
 	/**
@@ -163,6 +167,14 @@ public abstract class ThresholdBlockCommon <T extends ImageGray<T>,S extends Ima
 	 * @param output Output image
 	 */
 	protected abstract void thresholdBlock(int blockX0 , int blockY0 , T input, GrayU8 output );
+
+	public boolean isThresholdFromLocalBlocks() {
+		return thresholdFromLocalBlocks;
+	}
+
+	public void setThresholdFromLocalBlocks(boolean thresholdFromLocalBlocks) {
+		this.thresholdFromLocalBlocks = thresholdFromLocalBlocks;
+	}
 
 	@Override
 	public ImageType<T> getInputType() {

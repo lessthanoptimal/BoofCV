@@ -30,13 +30,15 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
 
 /**
  * @author Peter Abeles
  */
 public class ThresholdControlPanel extends StandardAlgConfigPanel
-		implements ActionListener, ChangeListener
+		implements ActionListener, ChangeListener, ItemListener
 {
 
 	Listener listener;
@@ -46,6 +48,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	JSpinner spinnerRadius;
 	JSpinner spinnerScale;
 	JButton buttonUpDown;
+	JCheckBox checkLocalBlock = new JCheckBox("Local Blocks",true);
 
 	boolean isAdaptive;
 	boolean isThresholdGlobal;
@@ -63,6 +66,8 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	// toggle value of threshold
 	public double minimumSpread = new ConfigThresholdBlockMinMax().minimumSpread;
 	public int globalThreshold = 50;
+
+	public boolean thresholdLocalBlocks = true;
 
 	public ThresholdControlPanel(Listener listener) {
 		this(listener,ConfigThreshold.global(ThresholdType.GLOBAL_OTSU));
@@ -108,12 +113,19 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 //		spinnerScale.addChangeListener(this);
 		buttonUpDown.addActionListener(this);
 
+		checkLocalBlock.addItemListener(this);
+		checkLocalBlock.setMaximumSize(checkLocalBlock.getPreferredSize());
+
+		JPanel togglePanels = new JPanel();
+		togglePanels.setLayout(new BoxLayout(togglePanels,BoxLayout.X_AXIS));
+		togglePanels.add(buttonUpDown);
+		togglePanels.add(checkLocalBlock);
+
 		addLabeled(comboType, "Type", this);
 		addLabeled(spinnerThreshold, "Threshold", this);
 		addLabeled(spinnerRadius, "Radius", this);
 		addLabeled(spinnerScale, "Scale", this);
-		addAlignCenter(buttonUpDown, this);
-
+		addAlignCenter(togglePanels, this);
 
 		updateEnabledByType();
 	}
@@ -209,6 +221,17 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 			spinnerScale.setEnabled(false);
 		}
 
+		switch( type ) {
+			case BLOCK_OTSU:
+			case BLOCK_MEAN:
+			case BLOCK_MIN_MAX:
+				checkLocalBlock.setEnabled(true);
+				break;
+
+			default:
+				checkLocalBlock.setEnabled(false);
+		}
+
 		if( type == ThresholdType.BLOCK_MIN_MAX) {
 			spinnerThreshold.setEnabled(true);
 			isAdaptive = false;
@@ -218,6 +241,9 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 			spinnerThreshold.setEnabled(true);
 			isAdaptive = false;
 		}
+
+
+
 		updateThresholdValue();
 
 		spinnerThreshold.repaint();
@@ -247,6 +273,15 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 			listener.imageThresholdUpdated();
 		}
 	}
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		if( e.getSource() == checkLocalBlock ) {
+			thresholdLocalBlocks = checkLocalBlock.isSelected();
+			listener.imageThresholdUpdated();
+		}
+	}
+
 
 	public void setConfiguration(ConfigThreshold configuration) {
 		comboType.removeActionListener(this);
@@ -312,6 +347,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		config.savolaK = savolaK;
 		config.minPixelValue = minPixelValue;
 		config.maxPixelValue = maxPixelValue;
+		config.thresholdFromLocalBlocks = thresholdLocalBlocks;
 
 		return config;
 	}

@@ -62,8 +62,9 @@ public abstract class ThresholdBlockMinMax
 	 *                         value then it is considered textureless.  Set to &le; -1 to disable.
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 */
-	public ThresholdBlockMinMax(double minimumSpread, int requestedBlockWidth, Class<T> imageType ) {
-		super(requestedBlockWidth,imageType);
+	public ThresholdBlockMinMax(double minimumSpread, int requestedBlockWidth,
+								boolean thresholdFromLocalBlocks, Class<T> imageType ) {
+		super(requestedBlockWidth,thresholdFromLocalBlocks,imageType);
 		this.minimumSpread = minimumSpread;
 	}
 

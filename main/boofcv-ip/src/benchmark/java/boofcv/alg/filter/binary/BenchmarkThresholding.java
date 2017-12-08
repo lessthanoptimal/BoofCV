@@ -96,7 +96,7 @@ public class BenchmarkThresholding {
 	}
 
 	public static class SquareBlockMinMax_F32 extends PerformerBase {
-		ThresholdBlockMinMax_F32 alg = new ThresholdBlockMinMax_F32(2*adaptiveRadius+1,20,0.95f,true);
+		ThresholdBlockMinMax_F32 alg = new ThresholdBlockMinMax_F32(2*adaptiveRadius+1,20,0.95f,true, true);
 		@Override
 		public void process() {
 			alg.process(inputF32,output_U8);
@@ -104,7 +104,7 @@ public class BenchmarkThresholding {
 	}
 
 	public static class SquareBlockMinMax_U8 extends PerformerBase {
-		ThresholdBlockMinMax_U8 alg = new ThresholdBlockMinMax_U8(2*adaptiveRadius+1,20,0.95,true);
+		ThresholdBlockMinMax_U8 alg = new ThresholdBlockMinMax_U8(2*adaptiveRadius+1,20,0.95,true, true);
 		@Override
 		public void process() {
 			alg.process(input,output_U8);

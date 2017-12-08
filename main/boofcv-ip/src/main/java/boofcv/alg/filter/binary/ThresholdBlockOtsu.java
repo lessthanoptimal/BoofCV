@@ -58,8 +58,9 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 * @param tuning Tuning parameter. 0 = standard Otsu. Greater than 0 will penalize zero texture.
 	 */
-	public ThresholdBlockOtsu(int requestedBlockWidth, double tuning, double scale, boolean down ) {
-		super(requestedBlockWidth,GrayU8.class);
+	public ThresholdBlockOtsu(int requestedBlockWidth, double tuning, double scale, boolean down,
+							  boolean thresholdFromLocalBlocks ) {
+		super(requestedBlockWidth,thresholdFromLocalBlocks,GrayU8.class);
 		this.down = down;
 		this.scale = scale;
 		this.tuning = tuning;
@@ -93,12 +94,17 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 		int y1 = blockY0== stats.height-1 ? input.height: (blockY0+1)*blockHeight;
 
 		// define the local 3x3 region in blocks, taking in account the image border
-		int blockX1 = Math.min(stats.width-1,blockX0+1);
-		int blockY1 = Math.min(stats.height-1,blockY0+1);
+		int blockX1, blockY1;
+		if(thresholdFromLocalBlocks) {
+			blockX1 = Math.min(stats.width - 1, blockX0 + 1);
+			blockY1 = Math.min(stats.height - 1, blockY0 + 1);
 
-		blockX0 = Math.max(0,blockX0-1);
-		blockY0 = Math.max(0,blockY0-1);
-
+			blockX0 = Math.max(0, blockX0 - 1);
+			blockY0 = Math.max(0, blockY0 - 1);
+		} else {
+			blockX1 = blockX0;
+			blockY1 = blockY0;
+		}
 
 		// sum up histogram in local region
 		Arrays.fill(histogram,0,256,0);

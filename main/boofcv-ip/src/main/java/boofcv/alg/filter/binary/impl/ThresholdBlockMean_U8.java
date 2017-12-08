@@ -32,8 +32,9 @@ public class ThresholdBlockMean_U8
 	double scale;
 	boolean down;
 
-	public ThresholdBlockMean_U8(int requestedBlockWidth, double scale , boolean down ) {
-		super(requestedBlockWidth,GrayU8.class);
+	public ThresholdBlockMean_U8(int requestedBlockWidth, double scale , boolean down,
+								 boolean thresholdFromLocalBlocks ) {
+		super(requestedBlockWidth,thresholdFromLocalBlocks,GrayU8.class);
 		this.stats = new GrayU8(1,1);
 		this.scale = scale;
 		this.down = down;
@@ -49,11 +50,17 @@ public class ThresholdBlockMean_U8
 		int y1 = blockY0==stats.height-1 ? input.height: (blockY0+1)*blockHeight;
 
 		// define the local 3x3 region in blocks, taking in account the image border
-		int blockX1 = Math.min(stats.width-1,blockX0+1);
-		int blockY1 = Math.min(stats.height-1,blockY0+1);
+		int blockX1, blockY1;
+		if(thresholdFromLocalBlocks) {
+			blockX1 = Math.min(stats.width - 1, blockX0 + 1);
+			blockY1 = Math.min(stats.height - 1, blockY0 + 1);
 
-		blockX0 = Math.max(0,blockX0-1);
-		blockY0 = Math.max(0,blockY0-1);
+			blockX0 = Math.max(0, blockX0 - 1);
+			blockY0 = Math.max(0, blockY0 - 1);
+		} else {
+			blockX1 = blockX0;
+			blockY1 = blockY0;
+		}
 
 		// Average the mean across local blocks
 		int mean = 0;

@@ -34,6 +34,6 @@ public class TestThresholdBlockMean_F32
 	@Override
 	public ThresholdBlockMean<GrayF32>
 	createAlg(int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdBlockMean_F32(requestedBlockWidth,scale,down);
+		return new ThresholdBlockMean_F32(requestedBlockWidth,scale,down,true);
 	}
 }

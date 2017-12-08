@@ -70,6 +70,13 @@ public class ConfigThreshold implements Configuration {
 	 */
 	public int maxPixelValue = 255;
 
+	/**
+	 * If a block threshold is being used then this indicates if the threshold should be computed
+	 * using a local 3x3 block region (true) or just one block (false). The local region should result in a less
+	 * abrupt change in threshold.
+	 */
+	public boolean thresholdFromLocalBlocks = true;
+
 	public static ConfigThreshold fixed( double value ) {
 		ConfigThreshold config = new ConfigThreshold();
 		config.type = ThresholdType.FIXED;

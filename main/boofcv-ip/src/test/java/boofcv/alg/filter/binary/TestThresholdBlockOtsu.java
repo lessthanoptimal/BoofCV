@@ -31,6 +31,6 @@ public class TestThresholdBlockOtsu extends GenericThresholdCommon<GrayU8> {
 
 	@Override
 	public ThresholdBlockCommon<GrayU8, ?> createAlg(int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdBlockOtsu(requestedBlockWidth, 0,1.0, down);
+		return new ThresholdBlockOtsu(requestedBlockWidth, 0,1.0, down, true);
 	}
 }

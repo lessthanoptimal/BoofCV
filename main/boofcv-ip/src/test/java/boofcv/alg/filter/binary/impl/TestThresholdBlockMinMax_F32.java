@@ -35,6 +35,6 @@ public class TestThresholdBlockMinMax_F32
 	public ThresholdBlockMinMax<GrayF32, ?>
 	createAlg(double textureThreshold, int requestedBlockWidth, double scale, boolean down) {
 		return new ThresholdBlockMinMax_F32((float)textureThreshold,requestedBlockWidth,
-				(float)scale,down);
+				(float)scale,down,true);
 	}
 }

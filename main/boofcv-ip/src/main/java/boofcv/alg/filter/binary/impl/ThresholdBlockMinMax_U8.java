@@ -33,8 +33,9 @@ public class ThresholdBlockMinMax_U8
 	double scale;
 	boolean down;
 
-	public ThresholdBlockMinMax_U8(double minimumSpread, int requestedBlockWidth, double scale , boolean down ) {
-		super(minimumSpread,requestedBlockWidth,GrayU8.class);
+	public ThresholdBlockMinMax_U8(double minimumSpread, int requestedBlockWidth, double scale , boolean down,
+								   boolean thresholdFromLocalBlocks) {
+		super(minimumSpread,requestedBlockWidth,thresholdFromLocalBlocks,GrayU8.class);
 		stats = new InterleavedU8(1,1,2);
 		this.scale = scale;
 		this.down = down;
@@ -50,11 +51,17 @@ public class ThresholdBlockMinMax_U8
 		int y1 = blockY0== stats.height-1 ? input.height: (blockY0+1)*blockHeight;
 
 		// define the local 3x3 region in blocks, taking in account the image border
-		int blockX1 = Math.min(stats.width-1,blockX0+1);
-		int blockY1 = Math.min(stats.height-1,blockY0+1);
+		int blockX1, blockY1;
+		if(thresholdFromLocalBlocks) {
+			blockX1 = Math.min(stats.width - 1, blockX0 + 1);
+			blockY1 = Math.min(stats.height - 1, blockY0 + 1);
 
-		blockX0 = Math.max(0,blockX0-1);
-		blockY0 = Math.max(0,blockY0-1);
+			blockX0 = Math.max(0, blockX0 - 1);
+			blockY0 = Math.max(0, blockY0 - 1);
+		} else {
+			blockX1 = blockX0;
+			blockY1 = blockY0;
+		}
 
 		// find the min and max pixel values inside this block region
 		int min = Integer.MAX_VALUE;

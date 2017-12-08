@@ -34,8 +34,9 @@ public class ThresholdBlockMinMax_F32
 	float scale;
 	boolean down;
 
-	public ThresholdBlockMinMax_F32(float minimumSpread, int requestedBlockWidth, float scale , boolean down ) {
-		super(minimumSpread,requestedBlockWidth,GrayF32.class);
+	public ThresholdBlockMinMax_F32(float minimumSpread, int requestedBlockWidth, float scale , boolean down ,
+									boolean thresholdFromLocalBlocks) {
+		super(minimumSpread,requestedBlockWidth,thresholdFromLocalBlocks,GrayF32.class);
 		stats = new InterleavedF32(1,1,2);
 		this.scale = scale;
 		this.down = down;
@@ -51,11 +52,18 @@ public class ThresholdBlockMinMax_F32
 		int y1 = blockY0== stats.height-1 ? input.height: (blockY0+1)*blockHeight;
 
 		// define the local 3x3 region in blocks, taking in account the image border
-		int blockX1 = Math.min(stats.width-1,blockX0+1);
-		int blockY1 = Math.min(stats.height-1,blockY0+1);
+		int blockX1, blockY1;
+		if(thresholdFromLocalBlocks) {
+			blockX1 = Math.min(stats.width - 1, blockX0 + 1);
+			blockY1 = Math.min(stats.height - 1, blockY0 + 1);
 
-		blockX0 = Math.max(0,blockX0-1);
-		blockY0 = Math.max(0,blockY0-1);
+			blockX0 = Math.max(0, blockX0 - 1);
+			blockY0 = Math.max(0, blockY0 - 1);
+		} else {
+			blockX1 = blockX0;
+			blockY1 = blockY0;
+		}
+
 
 		// find the min and max pixel values inside this block region
 		float min = Float.MAX_VALUE;

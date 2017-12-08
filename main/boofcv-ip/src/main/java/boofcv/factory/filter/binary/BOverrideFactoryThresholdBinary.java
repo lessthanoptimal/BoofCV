@@ -76,18 +76,19 @@ public class BOverrideFactoryThresholdBinary extends BOverrideClass {
 	public interface LocalBlockMinMax {
 		<T extends ImageGray<T>>
 		InputToBinary<T> handle(int regionWidth, double scale , boolean down,
-								double minimumSpread, Class<T> inputType);
+								double minimumSpread, boolean thresholdFromLocalBlocks, Class<T> inputType);
 	}
 
 	public interface LocalBlockMean {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle(int regionWidth, double scale , boolean down,
+		InputToBinary<T> handle(int regionWidth, double scale , boolean down, boolean thresholdFromLocalBlocks,
 								Class<T> inputType);
 	}
 
 	public interface LocalBlockOtsu {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle(int regionWidth , double tuning, double scale, boolean down, Class<T> inputType);
+		InputToBinary<T> handle(int regionWidth , double tuning, double scale,
+								boolean down, boolean thresholdFromLocalBlocks,  Class<T> inputType);
 	}
 
 	public interface LocalOtsu {

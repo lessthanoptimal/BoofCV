@@ -34,6 +34,6 @@ public class TestThresholdBlockMean_U8
 	@Override
 	public ThresholdBlockMean<GrayU8>
 	createAlg( int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdBlockMean_U8(requestedBlockWidth,scale,down);
+		return new ThresholdBlockMean_U8(requestedBlockWidth,scale,down, true);
 	}
 }
