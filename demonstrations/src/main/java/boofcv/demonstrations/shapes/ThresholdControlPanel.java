@@ -67,7 +67,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	public double minimumSpread = new ConfigThresholdBlockMinMax().minimumSpread;
 	public int globalThreshold = 50;
 
-	public boolean thresholdLocalBlocks = true;
+	public boolean thresholdLocalBlocks;
 
 	public ThresholdControlPanel(Listener listener) {
 		this(listener,ConfigThreshold.global(ThresholdType.GLOBAL_OTSU));
@@ -82,6 +82,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		this.savolaK = configThreshold.savolaK;
 		this.minPixelValue = configThreshold.minPixelValue;
 		this.maxPixelValue = configThreshold.maxPixelValue;
+		this.thresholdLocalBlocks = configThreshold.thresholdFromLocalBlocks;
 
 		if( configThreshold instanceof ConfigThresholdLocalOtsu ) {
 			otsuTuning = (int)((ConfigThresholdLocalOtsu)configThreshold).tuning;
@@ -113,6 +114,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 //		spinnerScale.addChangeListener(this);
 		buttonUpDown.addActionListener(this);
 
+		checkLocalBlock.setSelected(thresholdLocalBlocks);
 		checkLocalBlock.addItemListener(this);
 		checkLocalBlock.setMaximumSize(checkLocalBlock.getPreferredSize());
 
