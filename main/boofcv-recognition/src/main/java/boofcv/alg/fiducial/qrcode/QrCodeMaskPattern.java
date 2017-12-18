@@ -19,7 +19,8 @@
 package boofcv.alg.fiducial.qrcode;
 
 /**
- * Masks that are applied to the QR code toe ensure that there are no regions with "structure" in them.
+ * Masks that are applied to the QR code toe ensure that there are no regions with "structure" in them. Avoid
+ * accidentally having patterns that look like a finder pattern or alignment pattern.
  *
  * @author Peter Abeles
  */

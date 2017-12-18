@@ -39,7 +39,7 @@ public abstract class QrCodeGenerator {
 	int numModules;
 
 	// data mask
-	QrCodeDataBits mask;
+	QrCodeCodeWordLocations mask;
 
 	// array which stores output data. QR code data is copied here so that the length can be ensured
 	byte[] output = new byte[0];
@@ -91,7 +91,7 @@ public abstract class QrCodeGenerator {
 		}
 
 		// mark which modules can store data
-		mask = new QrCodeDataBits(numModules,alignment,qr.version >= QrCodePatternLocations.VERSION_VERSION);
+		mask = new QrCodeCodeWordLocations(numModules,alignment,qr.version >= QrCodePatternLocations.VERSION_VERSION);
 
 		int numBytes = mask.dataBits/8;
 		if( output.length < numBytes ) {

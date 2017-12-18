@@ -18,7 +18,11 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import georegression.struct.point.Point2D_I32;
 import org.ejml.data.BMatrixRMaj;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Pre-computes which pixels in a QR code are data bits or not. (0,0) is top left corner of QR code. +x are columns
@@ -27,14 +31,26 @@ import org.ejml.data.BMatrixRMaj;
  *
  * @author Peter Abeles
  */
-public class QrCodeDataBits extends BMatrixRMaj{
+public class QrCodeCodeWordLocations extends BMatrixRMaj {
 
 	// how many bits are available to store data.
 	public int dataBits;
 
-	public QrCodeDataBits(int numModules , int alignment[] , boolean hasVersion ) {
-		super(numModules,numModules);
+	public List<Point2D_I32> bits = new ArrayList<>();
 
+	public QrCodeCodeWordLocations(int numModules , int alignment[] , boolean hasVersion ) {
+		super(numModules,numModules);
+		computeFeatureMask(numModules, alignment, hasVersion);
+		computeBitLocations();
+	}
+
+	/**
+	 * Blocks out the location of features in the image. Needed for codeworld location extraction
+	 * @param numModules
+	 * @param alignment
+	 * @param hasVersion
+	 */
+	private void computeFeatureMask(int numModules, int[] alignment, boolean hasVersion) {
 		// mark alignment patterns + format info
 		markSquare(0,0,9);
 		markRectangle(numModules-8,0,9,8);
@@ -86,6 +102,36 @@ public class QrCodeDataBits extends BMatrixRMaj{
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
 				set(row+i,col+j,true);
+			}
+		}
+	}
+
+	/**
+	 * Snakes through and specifies the location of each bit for all the code words in the grid.
+	 */
+	private void computeBitLocations() {
+		int N = numRows;
+		int row = N-1;
+		int col = N-1;
+		int direction = -1;
+
+		while (col > 0) {
+			if (col == 6)
+				col -= 1;
+
+			if (!get(row,col)) {
+				bits.add( new Point2D_I32(col,row));
+			}
+			if (!get(row,col-1)) {
+				bits.add( new Point2D_I32(col-1,row));
+			}
+
+			row += direction;
+
+			if (row < 0 || row >= N) {
+				direction = -direction;
+				col -= 2;
+				row += direction;
 			}
 		}
 	}
