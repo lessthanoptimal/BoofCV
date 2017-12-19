@@ -59,6 +59,55 @@ public class TestPackedBits8 {
 		values.resize(100);
 		assertEquals(100,values.size);
 		assertEquals(100/8+1,values.data.length);
+	}
+
+	@Test
+	public void growArray() {
+		PackedBits8 values = new PackedBits8(8);
+		assertEquals(1,values.data.length);
+
+		values.growArray(2,false);
+		assertEquals(2,values.data.length);
+		assertEquals(10,values.size);
+
+		values.growArray(7,false);
+		assertEquals(3,values.data.length);
+		assertEquals(17,values.size);
+
+
+		// see if save value works
+		values.set(10,1);
+		values.growArray(1,true);
+		assertEquals(1,values.get(10));
+		assertEquals(3,values.data.length);
+		assertEquals(18,values.size);
+		values.growArray(7,true);
+		assertEquals(1,values.get(10));
+		assertEquals(4,values.data.length);
+		assertEquals(25,values.size);
+		values.growArray(8,false);
+		assertEquals(0,values.get(10));
+	}
+
+	@Test
+	public void append() {
+		PackedBits8 values = new PackedBits8(0);
+
+		values.append(0b1101,4,true);
+		assertEquals(4,values.size);
+		assertEquals(1,values.get(0));
+		assertEquals(0,values.get(1));
+		assertEquals(1,values.get(2));
+		assertEquals(1,values.get(3));
+
+		values.append(0b1101,4,false);
+		assertEquals(8,values.size);
+		assertEquals(1,values.get(4));
+		assertEquals(1,values.get(5));
+		assertEquals(0,values.get(6));
+		assertEquals(1,values.get(7));
 
 	}
+
+
 }

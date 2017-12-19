@@ -56,6 +56,29 @@ public class PackedBits8 implements PackedBits {
 		data[index] ^= (-value ^ data[index]) & (1 << offset);
 	}
 
+	/**
+	 * Appends bits on to the end of the stack.
+	 * @param bits Storage for bits. Relevant bits start at the front.
+	 * @param numberOfBits Number of relevant bits in 'bits'
+	 * @param frontToBack If true append bits at the front onto the tail, otherwise front bits are appended in the reverse order
+	 */
+	public void append( int bits , int numberOfBits , boolean frontToBack ) {
+		if( numberOfBits > 32 )
+			throw new RuntimeException("Number of bits exceeds the size of bits");
+		int indexTail = size;
+		growArray(numberOfBits,true);
+
+		if( frontToBack ) {
+			for (int i = 0; i < numberOfBits; i++) {
+				set( indexTail + i , ( bits >> i ) & 1 );
+			}
+		} else {
+			for (int i = 0; i < numberOfBits; i++) {
+				set( indexTail + numberOfBits-i-1 , ( bits >> i ) & 1 );
+			}
+		}
+	}
+
 	public int getArray( int index ) {
 		return data[index]&0xFF;
 	}
@@ -66,6 +89,24 @@ public class PackedBits8 implements PackedBits {
 		if( data.length < N ) {
 			data = new byte[ N ];
 		}
+	}
+
+	/**
+	 * Increases the size of the data array so that it can store an addition number of bits
+	 * @param amountBits Number of bits beyond 'size' that you wish the array to be able to store
+	 * @param saveValue if true it will save the value of the array. If false it will not copy it
+	 */
+	public void growArray( int amountBits , boolean saveValue ) {
+		size = size+amountBits;
+		int N = size/8 + (size%8==0?0:1);
+
+		if( N > data.length ) {
+			byte[] tmp = new byte[N];
+			if( saveValue )
+				System.arraycopy(data,0,tmp,0,data.length);
+			this.data = tmp;
+		}
+
 	}
 
 	public void zero() {
