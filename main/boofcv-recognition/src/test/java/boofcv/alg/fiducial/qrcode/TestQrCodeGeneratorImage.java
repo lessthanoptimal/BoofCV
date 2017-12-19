@@ -29,7 +29,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class TestQrCodeGeneratorImage {
-	boolean showImage = false; // use a boolean to make it easier to turn on and off. Don't need to import
+	boolean showImage = false; // use a boolean to make it easier to turn on and off. Don't need to add import
 
 	@Test
 	public void showImage() {

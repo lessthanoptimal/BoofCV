@@ -24,16 +24,22 @@ package boofcv.alg.fiducial.qrcode;
  *
  * @author Peter Abeles
  */
-public interface QrCodeMaskPattern {
+public abstract class QrCodeMaskPattern {
 
-	QrCodeMaskPattern M000 = new M000();
-	QrCodeMaskPattern M001 = new M001();
-	QrCodeMaskPattern M010 = new M010();
-	QrCodeMaskPattern M011 = new M011();
-	QrCodeMaskPattern M100 = new M100();
-	QrCodeMaskPattern M101 = new M101();
-	QrCodeMaskPattern M110 = new M110();
-	QrCodeMaskPattern M111 = new M111();
+	public static final QrCodeMaskPattern M000 = new M000();
+	public static final QrCodeMaskPattern M001 = new M001();
+	public static final QrCodeMaskPattern M010 = new M010();
+	public static final QrCodeMaskPattern M011 = new M011();
+	public static final QrCodeMaskPattern M100 = new M100();
+	public static final QrCodeMaskPattern M101 = new M101();
+	public static final QrCodeMaskPattern M110 = new M110();
+	public static final QrCodeMaskPattern M111 = new M111();
+
+	int bits;
+
+	public QrCodeMaskPattern( int bits ) {
+		this.bits = bits;
+	}
 
 	/**
 	 * Applies the mask to the specified bit. grid coordinates are relative to top left corner (0,0)
@@ -42,59 +48,77 @@ public interface QrCodeMaskPattern {
 	 * @param bitValue value of the bit. 0 or 1
 	 * @return value after masking has been applied
 	 */
-	int apply( int row , int col , int bitValue );
+	public abstract int apply( int row , int col , int bitValue );
 
-	class M000 implements QrCodeMaskPattern {
+	public static QrCodeMaskPattern lookupMask( int maskPattern ) {
+		switch( maskPattern ) {
+			case 0b000: return M000;
+			case 0b001: return M001;
+			case 0b010: return M010;
+			case 0b011: return M011;
+			case 0b100: return M100;
+			case 0b101: return M101;
+			case 0b110: return M110;
+			case 0b111: return M111;
+			default: throw new RuntimeException("Unknown mask: "+maskPattern);
+		}
+	}
+
+	static class M000 extends QrCodeMaskPattern {
+		public M000() { super(0b000); }
+
 		@Override
 		public int apply(int row, int col, int bitValue) {
 			int mask = (row+col)%2;
 			return bitValue^((~mask)&0x1);
 		}
 	}
-
-	class M001 implements QrCodeMaskPattern {
+	static class M001 extends QrCodeMaskPattern {
+		public M001() { super(0b001); }
 		@Override
 		public int apply(int row, int col, int bitValue) {
 			int mask = row%2;
 			return bitValue^((~mask)&0x1);
 		}
 	}
-	class M010 implements QrCodeMaskPattern {
+	static class M010 extends QrCodeMaskPattern {
+		public M010() { super(0b010); }
 		@Override
 		public int apply(int row, int col, int bitValue) {
 			return bitValue^(col%3 == 0 ? 1 : 0);
 		}
 	}
-	class M011 implements QrCodeMaskPattern {
+	static class M011 extends QrCodeMaskPattern {
+		public M011() { super(0b011); }
 		@Override
 		public int apply(int row, int col, int bitValue) {
 			return bitValue^((row+col)%3 == 0 ? 1 : 0);
 		}
 	}
-
-	class M100 implements QrCodeMaskPattern {
+	static class M100 extends QrCodeMaskPattern {
+		public M100() { super(0b100); }
 		@Override
 		public int apply(int row, int col, int bitValue) {
 			int mask = (row/2 + col/3)%2;
 			return bitValue^((~mask)&0x1);
 		}
 	}
-
-	class M101 implements QrCodeMaskPattern {
+	static class M101 extends QrCodeMaskPattern {
+		public M101() { super(0b101); }
 		@Override
 		public int apply(int row, int col, int bitValue) {
 			return bitValue^((row*col)%2 + (row*col)%3 == 0 ? 1 : 0);
 		}
 	}
-
-	class M110 implements QrCodeMaskPattern {
+	static class M110 extends QrCodeMaskPattern {
+		public M110() { super(0b110); }
 		@Override
 		public int apply(int row, int col, int bitValue) {
 			return bitValue^(((row*col)%2 + (row*col)%3)%2 == 0 ? 1 : 0);
 		}
 	}
-
-	class M111 implements QrCodeMaskPattern {
+	static class M111 extends QrCodeMaskPattern {
+		public M111() { super(0b111); }
 		@Override
 		public int apply(int row, int col, int bitValue) {
 			int mask = ((row*col)%3 + (row+col)%2)%2;

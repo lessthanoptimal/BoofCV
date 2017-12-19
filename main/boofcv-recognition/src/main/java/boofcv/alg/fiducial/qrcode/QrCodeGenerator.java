@@ -18,9 +18,11 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Abstract class for creating qr codes. Contains the logic for rendering the QR Code but is missing
@@ -39,7 +41,7 @@ public abstract class QrCodeGenerator {
 	int numModules;
 
 	// data mask
-	QrCodeCodeWordLocations mask;
+	List<Point2D_I32> bitLocations;
 
 	// array which stores output data. QR code data is copied here so that the length can be ensured
 	byte[] output = new byte[0];
@@ -91,9 +93,9 @@ public abstract class QrCodeGenerator {
 		}
 
 		// mark which modules can store data
-		mask = new QrCodeCodeWordLocations(numModules,alignment,qr.version >= QrCodePatternLocations.VERSION_VERSION);
+		bitLocations = new QrCodeCodeWordLocations(numModules,alignment,qr.version >= QrCodePatternLocations.VERSION_VERSION).bits;
 
-		int numBytes = mask.dataBits/8;
+		int numBytes = bitLocations.size()/8;
 		if( output.length < numBytes ) {
 			output = new byte[numBytes];
 		}
@@ -103,19 +105,38 @@ public abstract class QrCodeGenerator {
 		Arrays.fill(output,length,numBytes,(byte)0);
 
 		// start encoding!
+
+		// Render the output data
+		renderData();
 	}
 
-	private void renderData( int length ) {
-		QrCodeMaskPattern mask = qr.lookupMask();
-		boolean upwards = true;
-
+	/**
+	 * Renders the raw data bit output while applying the selected mask
+	 */
+	private void renderData() {
+		QrCodeMaskPattern mask = qr.mask;
 		int count = 0;
-		int row = numModules-1;
-		int col = numModules-1;
 
-		while( count < length ) {
-			int bits = output[count]&0xFF;
+		while( count+8 < bitLocations.size() ) {
+			int bits = output[count/8]&0xFF;
 
+			for (int i = 0; i < 8; i++) {
+				Point2D_I32 coor = bitLocations.get(count+i);
+				int value = mask.apply(coor.y,coor.x, ((bits >> i ) & 0x01));
+				if( value > 0 ) {
+					square(coor.y,coor.x);
+				}
+			}
+			count += 8;
+		}
+
+		// remainder bits are always zero
+		for(;count < bitLocations.size(); count++ ) {
+			Point2D_I32 coor = bitLocations.get(count);
+			int value = mask.apply(coor.y,coor.x, 0);
+			if( value > 0 ) {
+				square(coor.y,coor.x);
+			}
 		}
 	}
 
@@ -142,7 +163,7 @@ public abstract class QrCodeGenerator {
 
 	private void formatInformation() {
 		PackedBits32 bits = new PackedBits32(15);
-		bits.data[0] = QrCodePolynomialMath.encodeFormatBits(qr.errorCorrection,qr.maskPattern);
+		bits.data[0] = QrCodePolynomialMath.encodeFormatBits(qr.errorCorrection,qr.mask.bits);
 		bits.data[0] ^= QrCodePolynomialMath.FORMAT_MASK;
 //		System.out.println("encoder format bits "+Integer.toBinaryString(bits.data[0]));
 
@@ -207,6 +228,5 @@ public abstract class QrCodeGenerator {
 	public abstract void square(double x0 , double y0 , double width );
 
 	public abstract void square(double x0, double y0, double width0, double thickness);
-
 
 }

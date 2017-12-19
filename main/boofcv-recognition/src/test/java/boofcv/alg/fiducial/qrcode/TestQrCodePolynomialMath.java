@@ -91,7 +91,7 @@ public class TestQrCodePolynomialMath {
 			QrCodePolynomialMath.decodeFormatMessage(message,qr);
 
 			assertEquals(error,qr.errorCorrection);
-			assertEquals(0b101,qr.maskPattern);
+			assertTrue(QrCodeMaskPattern.M101==qr.mask);
 		}
 	}
 

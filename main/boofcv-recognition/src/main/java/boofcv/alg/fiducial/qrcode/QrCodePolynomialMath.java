@@ -95,7 +95,7 @@ public class QrCodePolynomialMath {
 		int error = message >> 3;
 
 		qr.errorCorrection = QrCode.ErrorCorrectionLevel.lookup(error);
-		qr.maskPattern = message&0x07;
+		qr.mask = QrCodeMaskPattern.lookupMask(message&0x07);
 	}
 
 	/**

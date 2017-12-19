@@ -22,8 +22,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 
-import static boofcv.alg.fiducial.qrcode.QrCodeMaskPattern.*;
-
 
 // TODO Structure Appended
 
@@ -51,10 +49,11 @@ public class QrCode {
 
 	/** Level of error correction */
 	ErrorCorrectionLevel errorCorrection;
+
 	/**
-	 * 3 byte value indicating the mask pattern used in the QR code
+	 * Which masking pattern is applied
 	 */
-	public int maskPattern;
+	public QrCodeMaskPattern mask = QrCodeMaskPattern.M111;
 
 	/**
 	 * Alignment pattern information
@@ -83,20 +82,6 @@ public class QrCode {
 		reset();
 	}
 
-	public QrCodeMaskPattern lookupMask() {
-		switch( maskPattern ) {
-			case 0b000: return M000;
-			case 0b001: return M001;
-			case 0b010: return M010;
-			case 0b011: return M011;
-			case 0b100: return M100;
-			case 0b101: return M101;
-			case 0b110: return M110;
-			case 0b111: return M111;
-			default: throw new RuntimeException("Unknown mask: "+maskPattern);
-		}
-	}
-
 	public void reset() {
 		for (int i = 0; i < 4; i++) {
 			ppCorner.get(i).set(0,0);
@@ -106,7 +91,7 @@ public class QrCode {
 
 		version = 1;
 		errorCorrection = ErrorCorrectionLevel.L;
-		maskPattern = 0b101;
+		mask = QrCodeMaskPattern.M111;
 		alignment.reset();
 		mode = Mode.ALPHANUMERIC;
 	}

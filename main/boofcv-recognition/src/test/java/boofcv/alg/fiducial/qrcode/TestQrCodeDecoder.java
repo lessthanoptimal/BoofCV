@@ -75,7 +75,7 @@ public class TestQrCodeDecoder {
 
 		// Check format info
 		assertEquals(truthQr.errorCorrection,found.errorCorrection);
-		assertEquals(truthQr.maskPattern,found.maskPattern);
+		assertTrue(truthQr.mask==found.mask);
 
 		// check version info
 		assertEquals(version,found.version);
