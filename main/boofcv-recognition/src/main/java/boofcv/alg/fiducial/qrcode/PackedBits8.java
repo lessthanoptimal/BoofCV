@@ -60,15 +60,15 @@ public class PackedBits8 implements PackedBits {
 	 * Appends bits on to the end of the stack.
 	 * @param bits Storage for bits. Relevant bits start at the front.
 	 * @param numberOfBits Number of relevant bits in 'bits'
-	 * @param frontToBack If true append bits at the front onto the tail, otherwise front bits are appended in the reverse order
+	 * @param swapOrder If true then the first bit in 'bits' will be the last bit in this array.
 	 */
-	public void append( int bits , int numberOfBits , boolean frontToBack ) {
+	public void append( int bits , int numberOfBits , boolean swapOrder ) {
 		if( numberOfBits > 32 )
 			throw new RuntimeException("Number of bits exceeds the size of bits");
 		int indexTail = size;
 		growArray(numberOfBits,true);
 
-		if( frontToBack ) {
+		if( swapOrder ) {
 			for (int i = 0; i < numberOfBits; i++) {
 				set( indexTail + i , ( bits >> i ) & 1 );
 			}

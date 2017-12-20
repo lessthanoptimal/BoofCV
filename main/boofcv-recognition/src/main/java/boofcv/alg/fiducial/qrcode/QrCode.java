@@ -19,8 +19,16 @@
 package boofcv.alg.fiducial.qrcode;
 
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static boofcv.alg.fiducial.qrcode.QrCode.ErrorCorrectionLevel.*;
 
 
 // TODO Structure Appended
@@ -34,6 +42,23 @@ import org.ddogleg.struct.FastQueue;
  * @author Peter Abeles
  */
 public class QrCode {
+
+	/**
+	 * Maximum possible version of a QR Code
+	 */
+	public static final int MAX_VERSION = 40;
+	/**
+	 * The QR code version after which and including version information is encoded into the QR code
+	 */
+	public static final int VERSION_VERSION = 7;
+
+	public static final VersionInfo VERSION_INFO[] = new VersionInfo[MAX_VERSION+1];
+
+	/**
+	 * Location of data bits in the code qr for each version
+	 */
+	public static final List<Point2D_I32> locationBits[] = new ArrayList[MAX_VERSION+1];
+
 	/**
 	 * The finder pattern that is composed of the 3 position patterns.
 	 */
@@ -78,8 +103,171 @@ public class QrCode {
 	 */
 	public Polygon2D_F64 bounds = new Polygon2D_F64(4);
 
+	static {
+		// Manually entered from QR Code table. There's no simple equation for these magic numbers
+		VERSION_INFO[1] = new VersionInfo(26, new int[0]);
+		VERSION_INFO[1].add(L,26,19,1);
+		VERSION_INFO[1].add(M,26,16,1);
+		VERSION_INFO[1].add(Q,26,13,1);
+		VERSION_INFO[1].add(H,26,9,1);
+
+		VERSION_INFO[2] = new VersionInfo(44, new int[]{6,18});
+		VERSION_INFO[2].add(L,44,32,1);
+		VERSION_INFO[2].add(M,44,28,1);
+		VERSION_INFO[2].add(Q,44,22,1);
+		VERSION_INFO[2].add(H,44,16,1);
+
+		VERSION_INFO[3] = new VersionInfo(70, new int[]{6,22});
+		VERSION_INFO[3].add(L,70,55,1);
+		VERSION_INFO[3].add(M,70,44,1);
+		VERSION_INFO[3].add(Q,35,22,2);
+		VERSION_INFO[3].add(H,35,16,2);
+
+		VERSION_INFO[4] = new VersionInfo(100, new int[]{6,26});
+		VERSION_INFO[4].add(L,100,80,1);
+		VERSION_INFO[4].add(M,50,32,2);
+		VERSION_INFO[4].add(Q,50,24,2);
+		VERSION_INFO[4].add(H,25,9,4);
+
+		VERSION_INFO[5] = new VersionInfo(134, new int[]{6,30});
+		VERSION_INFO[5].add(L,134,80,1);
+		VERSION_INFO[5].add(M,67,43,2);
+		VERSION_INFO[5].add(Q,33,15,2);
+		VERSION_INFO[5].add(H,33,11,2);
+
+		VERSION_INFO[6] = new VersionInfo(172, new int[]{6,34});
+		VERSION_INFO[6].add(L,86,80,2);
+		VERSION_INFO[6].add(M,43,27,4);
+		VERSION_INFO[6].add(Q,43,19,4);
+		VERSION_INFO[6].add(H,43,15,4);
+
+		VERSION_INFO[7] = new VersionInfo(196, new int[]{6,22,38});
+		VERSION_INFO[7].add(L,98,78,2);
+		VERSION_INFO[7].add(M,49,31,4);
+		VERSION_INFO[7].add(Q,32,14,2);
+		VERSION_INFO[7].add(H,33,13,4);
+
+		VERSION_INFO[8] = new VersionInfo(242, new int[]{6,24,42});
+		VERSION_INFO[8].add(L,121,97,2);
+		VERSION_INFO[8].add(M,60,38,2);
+		VERSION_INFO[8].add(Q,40,18,4);
+		VERSION_INFO[8].add(H,40,14,4);
+
+		VERSION_INFO[9] = new VersionInfo(292, new int[]{6,26,46});
+		VERSION_INFO[9].add(L,146,116,2);
+		VERSION_INFO[9].add(M,58,36,3);
+		VERSION_INFO[9].add(Q,36,16,4);
+		VERSION_INFO[9].add(H,36,12,4);
+
+		VERSION_INFO[10] = new VersionInfo(346, new int[]{6,28,50});
+		VERSION_INFO[10].add(L,86,68,2);
+		VERSION_INFO[10].add(M,59,43,4);
+		VERSION_INFO[10].add(Q,43,19,6);
+		VERSION_INFO[10].add(H,43,15,6);
+
+		VERSION_INFO[11] = new VersionInfo(404, new int[]{6,30,54});
+		VERSION_INFO[11].add(L,101,81,4);
+		VERSION_INFO[11].add(M,80,50,1);
+		VERSION_INFO[11].add(Q,50,22,4);
+		VERSION_INFO[11].add(H,36,12,3);
+
+		VERSION_INFO[12] = new VersionInfo(466, new int[]{6,32,58});
+		VERSION_INFO[12].add(L,116,92,2);
+		VERSION_INFO[12].add(M,58,36,6);
+		VERSION_INFO[12].add(Q,46,20,4);
+		VERSION_INFO[12].add(H,42,14,7);
+
+		VERSION_INFO[13] = new VersionInfo(532, new int[]{6,34,60});
+		VERSION_INFO[13].add(L,133,107,4);
+		VERSION_INFO[13].add(M,59,37,8);
+		VERSION_INFO[13].add(Q,44,20,8);
+		VERSION_INFO[13].add(H,33,11,12);
+
+		VERSION_INFO[14] = new VersionInfo(581, new int[]{6,26,46,66});
+		VERSION_INFO[14].add(L,145,115,3);
+		VERSION_INFO[14].add(M,64,40,4);
+		VERSION_INFO[14].add(Q,36,16,11);
+		VERSION_INFO[14].add(H,36,12,11);
+
+		VERSION_INFO[15] = new VersionInfo(655, new int[]{6,26,48,70});
+		VERSION_INFO[15].add(L,109,87,5);
+		VERSION_INFO[15].add(M,65,41,5);
+		VERSION_INFO[15].add(Q,54,24,5);
+		VERSION_INFO[15].add(H,36,12,11);
+
+		VERSION_INFO[16] = new VersionInfo(733, new int[]{6,26,50,74});
+		VERSION_INFO[16].add(L,122,98,5);
+		VERSION_INFO[16].add(M,73,45,7);
+		VERSION_INFO[16].add(Q,43,19,15);
+		VERSION_INFO[16].add(H,45,15,3);
+
+		VERSION_INFO[17] = new VersionInfo(815, new int[]{6,30,54,78});
+		VERSION_INFO[17].add(L,135,107,1);
+		VERSION_INFO[17].add(M,74,46,10);
+		VERSION_INFO[17].add(Q,50,22,1);
+		VERSION_INFO[17].add(H,42,14,2);
+
+		VERSION_INFO[18] = new VersionInfo(815, new int[]{6,30,56,82});
+		VERSION_INFO[18].add(L,150,120,5);
+		VERSION_INFO[18].add(M,69,43,9);
+		VERSION_INFO[18].add(Q,50,22,17);
+		VERSION_INFO[18].add(H,42,14,2);
+
+		VERSION_INFO[19] = new VersionInfo(991, new int[]{6,30,58,86});
+		VERSION_INFO[19].add(L,141,113,3);
+		VERSION_INFO[19].add(M,70,44,3);
+		VERSION_INFO[19].add(Q,47,21,17);
+		VERSION_INFO[19].add(H,39,13,9);
+
+		VERSION_INFO[20] = new VersionInfo(1085, new int[]{6,34,62,90});
+		VERSION_INFO[20].add(L,135,107,3);
+		VERSION_INFO[20].add(M,67,41,3);
+		VERSION_INFO[20].add(Q,54,24,15);
+		VERSION_INFO[20].add(H,43,15,15);
+
+		VERSION_INFO[21] = new VersionInfo(1156, new int[]{6,28,50,72,94});
+		VERSION_INFO[21].add(L,144,116,4);
+		VERSION_INFO[21].add(M,68,42,17);
+		VERSION_INFO[21].add(Q,50,22,19);
+		VERSION_INFO[21].add(H,46,16,19);
+
+//		alignment[22] = new int[]{6,26,50,74,98};
+//		alignment[23] = new int[]{6,30,54,78,102};
+//		alignment[24] = new int[]{6,28,54,80,106};
+//		alignment[25] = new int[]{6,32,58,84,110};
+//		alignment[26] = new int[]{6,30,58,86,114};
+//		alignment[27] = new int[]{6,34,62,90,118};
+//		alignment[28] = new int[]{6,26,50,74, 98,122};
+//		alignment[29] = new int[]{6,30,54,78,102,126};
+//		alignment[30] = new int[]{6,26,52,78,104,130};
+//		alignment[31] = new int[]{6,30,56,82,108,134};
+//		alignment[32] = new int[]{6,34,60,86,112,138};
+//		alignment[33] = new int[]{6,30,58,86,114,142};
+//		alignment[34] = new int[]{6,34,62,90,118,146};
+//		alignment[35] = new int[]{6,30,54,78,102,126,150};
+//		alignment[36] = new int[]{6,24,50,76,102,128,154};
+//		alignment[37] = new int[]{6,28,54,80,106,132,158};
+//		alignment[39] = new int[]{6,32,58,84,110,136,162};
+//		alignment[38] = new int[]{6,26,54,82,110,138,166};
+//		alignment[40] = new int[]{6,30,58,86,114,142,170};
+
+		for (int version = 1; version <= 21; version++ ) {// TODO MAX_VERSION; version++) {
+			QrCodeCodeWordLocations mask = new QrCodeCodeWordLocations(version);
+
+			locationBits[version] = mask.bits;
+		}
+	}
+
 	public QrCode() {
 		reset();
+	}
+
+	public int totalModules() {
+		return totalModules(version);
+	}
+
+	public static int totalModules(int version ) {
+		return version*4+17;
 	}
 
 	public void reset() {
@@ -90,7 +278,7 @@ public class QrCode {
 		}
 
 		version = 1;
-		errorCorrection = ErrorCorrectionLevel.L;
+		errorCorrection = L;
 		mask = QrCodeMaskPattern.M111;
 		alignment.reset();
 		mode = Mode.ALPHANUMERIC;
@@ -147,6 +335,51 @@ public class QrCode {
 		 * Threshold value selected at this alignment pattern
 		 */
 		public double threshold;
+	}
+
+	public static class VersionInfo {
+
+		// total number of codewords available
+		final public int codewords;
+
+		// location of alignment patterns
+		final public int alignment[];
+
+		// information for each error correction level
+		final public Map<ErrorCorrectionLevel,ErrorBlock> levels = new HashMap<>();
+
+		public VersionInfo(int codewords , int alignment[] ) {
+			this.codewords = codewords;
+			this.alignment = alignment;
+		}
+
+		public void add(ErrorCorrectionLevel level , int codeWords, int dataCodewords , int eccBlocks ) {
+			levels.put( level , new ErrorBlock(codeWords,dataCodewords, eccBlocks));
+		}
+	}
+
+	public static class ErrorBlock {
+
+		/**
+		 * Code words per block
+		 */
+		final public int codewords;
+
+		/**
+		 * Number of data codewords
+		 */
+		final public int dataCodewords;
+
+		/**
+		 * Number of error correction blocks
+		 */
+		final public int eccBlocks;
+
+		public ErrorBlock( int codewords, int dataCodewords, int eccBlocks) {
+			this.codewords = codewords;
+			this.dataCodewords = dataCodewords;
+			this.eccBlocks = eccBlocks;
+		}
 	}
 
 	public enum Mode {

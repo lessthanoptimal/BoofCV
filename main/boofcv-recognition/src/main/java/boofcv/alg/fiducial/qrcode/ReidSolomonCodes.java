@@ -71,7 +71,7 @@ public class ReidSolomonCodes {
 	}
 
 	/**
-	 * Decodes the message and performs any neccisary error correction
+	 * Decodes the message and performs any necessary error correction
 	 * @param input (Input) Message
 	 * @param ecc (Input) error correction code for the message
 	 * @param output (Output) the error corrected message

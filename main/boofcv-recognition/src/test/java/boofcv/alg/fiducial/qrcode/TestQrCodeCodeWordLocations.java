@@ -28,8 +28,6 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestQrCodeCodeWordLocations {
 
-	private QrCodePatternLocations locations = new QrCodePatternLocations();
-
 	/**
 	 * Used specification example to test bit ordering
 	 */
@@ -94,8 +92,7 @@ public class TestQrCodeCodeWordLocations {
 	}
 
 	private QrCodeCodeWordLocations setup(int version) {
-		return new QrCodeCodeWordLocations(locations.size[version],
-					locations.alignment[version],version >= QrCodePatternLocations.VERSION_VERSION);
+		return new QrCodeCodeWordLocations(version);
 	}
 
 	void printCodeWordsBits( QrCodeCodeWordLocations alg ) {

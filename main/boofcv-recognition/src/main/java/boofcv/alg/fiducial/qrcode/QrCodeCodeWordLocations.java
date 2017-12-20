@@ -44,6 +44,10 @@ public class QrCodeCodeWordLocations extends BMatrixRMaj {
 		computeBitLocations();
 	}
 
+	public QrCodeCodeWordLocations( int version ) {
+		this(QrCode.totalModules(version), QrCode.VERSION_INFO[version].alignment,version >= QrCode.VERSION_VERSION);
+	}
+
 	/**
 	 * Blocks out the location of features in the image. Needed for codeworld location extraction
 	 * @param numModules
@@ -134,5 +138,12 @@ public class QrCodeCodeWordLocations extends BMatrixRMaj {
 				row += direction;
 			}
 		}
+	}
+
+	/**
+	 * Returns number of data bits available.
+	 */
+	public int getTotalDataBits() {
+		return numRows*numRows - sum();
 	}
 }

@@ -80,7 +80,7 @@ public class TestQrCodeDecoder {
 		// check version info
 		assertEquals(version,found.version);
 
-		int numModules = new QrCodePatternLocations().size[version];
+		int numModules = QrCode.totalModules(version);
 
 		// sanity check the position patterns
 		for (int i = 0; i < 4; i++) {
@@ -93,7 +93,7 @@ public class TestQrCodeDecoder {
 		assertTrue(found.ppDown.get(0).distance(0,(numModules-7)*4) < 1e-4);
 
 		// Check alignment patterns
-		int alignment[] =  new QrCodePatternLocations().alignment[version];
+		int alignment[] =  QrCode.VERSION_INFO[version].alignment;
 		if( alignment.length == 0 ) {
 			assertEquals(0,found.alignment.size);
 		} else {

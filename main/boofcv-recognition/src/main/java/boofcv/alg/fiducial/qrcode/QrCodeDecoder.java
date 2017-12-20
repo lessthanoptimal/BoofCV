@@ -231,7 +231,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		int version = estimateVersionBySize(qr);
 
 		// For version 7 and beyond use the version which has been encoded into the qr code
-		if( version >= QrCodePatternLocations.VERSION_VERSION ) {
+		if( version >= QrCode.VERSION_VERSION ) {
 			readVersionRegion0(qr);
 			int version0 = decodeVersion();
 			readVersionRegion1(qr);
@@ -264,7 +264,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			message = QrCodePolynomialMath.correctVersionBits(bits);
 		}
 		// sanity check results
-		if( message > QrCodePatternLocations.MAX_VERSION || message < QrCodePatternLocations.VERSION_VERSION )
+		if( message > QrCode.MAX_VERSION || message < QrCode.VERSION_VERSION )
 			return -1;
 
 		return message;

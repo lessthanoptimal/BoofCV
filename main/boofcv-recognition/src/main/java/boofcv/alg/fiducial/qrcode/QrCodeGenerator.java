@@ -56,7 +56,7 @@ public abstract class QrCodeGenerator {
 	 */
 	public void render( QrCode qr ) {
 		this.qr = qr;
-		this.numModules = QrCodePatternLocations.totalModules(qr.version);
+		this.numModules = QrCode.totalModules(qr.version);
 		this.moduleWidth = markerWidth/numModules;
 
 		init();
@@ -69,13 +69,13 @@ public abstract class QrCodeGenerator {
 
 		formatInformation();
 
-		if( qr.version >= QrCodePatternLocations.VERSION_VERSION )
+		if( qr.version >= QrCode.VERSION_VERSION )
 			versionInformation();
 
 		// render alignment patterns
-		QrCodePatternLocations locations = new QrCodePatternLocations();
+//		QrCodePatternLocations locations = new QrCodePatternLocations();
 
-		int alignment[] = locations.alignment[qr.version];
+		int alignment[] = QrCode.VERSION_INFO[qr.version].alignment;
 		for (int i = 0; i < alignment.length; i++) {
 			int row = alignment[i];
 
@@ -93,7 +93,7 @@ public abstract class QrCodeGenerator {
 		}
 
 		// mark which modules can store data
-		bitLocations = new QrCodeCodeWordLocations(numModules,alignment,qr.version >= QrCodePatternLocations.VERSION_VERSION).bits;
+		bitLocations = new QrCodeCodeWordLocations(numModules,alignment,qr.version >= QrCode.VERSION_VERSION).bits;
 
 		int numBytes = bitLocations.size()/8;
 		if( output.length < numBytes ) {

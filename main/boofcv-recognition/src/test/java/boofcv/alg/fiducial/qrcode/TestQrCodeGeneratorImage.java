@@ -23,6 +23,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.misc.BoofMiscOps;
 import org.junit.Test;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -39,12 +40,22 @@ public class TestQrCodeGeneratorImage {
 		QrCode qr = new QrCode();
 		qr.version = 7;
 
+		qr = new QrCodeEncoder().setVersion(1).encodeNumeric("123456");
+
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(6);
 
 		generator.render(qr);
 
 		BufferedImage output = ConvertBufferedImage.convertTo(generator.gray,null,true);
-		ShowImages.showWindow(output,"QR Code", true);
+
+		// add a border so that qr code readers can decode what is shown
+		BufferedImage border = new BufferedImage(output.getWidth()+50,output.getHeight()+50,output.getType());
+		Graphics2D g2 = border.createGraphics();
+		g2.setColor(Color.WHITE);
+		g2.fillRect(0,0,border.getWidth(),border.getHeight());
+		g2.drawImage(output,25,25,null);
+
+		ShowImages.showWindow(border,"QR Code", true);
 		BoofMiscOps.sleep(100000);
 	}
 }

@@ -46,7 +46,6 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
-	QrCodePatternLocations patternLocations = new QrCodePatternLocations();
 
 	InterpolatePixelS<T> interpolate;
 
@@ -100,7 +99,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
 		initializePatterns(qr);
 
-		return localizePositionPatterns(patternLocations.alignment[qr.version]);
+		return localizePositionPatterns(QrCode.VERSION_INFO[qr.version].alignment);
 	}
 
 	boolean localizePositionPatterns(int[] alignmentLocations ) {
@@ -266,8 +265,8 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	 * Creates a list of alignment patterns to look for and their grid coordinates
 	 */
 	void initializePatterns(QrCode qr) {
-		int qrsize = patternLocations.size[qr.version];
-		int where[] = patternLocations.alignment[qr.version];
+		int qrsize = qr.totalModules();
+		int where[] = QrCode.VERSION_INFO[qr.version].alignment;
 		qr.alignment.reset();
 		lookup.reset();
 		for (int row = where.length-1; row >= 0; row--) {
@@ -299,7 +298,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	 * @param qr The QR code with detected position patterns
 	 */
 	boolean computeHomography( QrCode qr ) {
-		int gridSize = patternLocations.size[qr.version];
+		int gridSize = qr.totalModules();
 
 		// features from corner
 		associatedPairs.get(0).p1.set(7,0);
