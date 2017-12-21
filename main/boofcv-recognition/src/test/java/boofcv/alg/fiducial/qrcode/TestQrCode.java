@@ -20,7 +20,8 @@ package boofcv.alg.fiducial.qrcode;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestQrCode {
 
@@ -30,6 +31,50 @@ public class TestQrCode {
 	 */
 	@Test
 	public void sanityVersionInfo() {
-		fail("Implement");
+		for (int version = 1; version <= QrCode.MAX_VERSION; version++) {
+//			System.out.println("version "+version);
+			QrCode.VersionInfo info = QrCode.VERSION_INFO[version];
+
+			// the number of bits determined by applying a mask to all static features should match the entered
+			// number of code words
+			int totalBits = new QrCodeCodeWordLocations(version).bits.size();
+			assertEquals(totalBits/8,info.codewords);
+
+			// test values found at each error level
+			for( QrCode.ErrorLevel level : QrCode.ErrorLevel.values() ) {
+				QrCode.ErrorBlock block = info.levels.get(level);
+
+				assertTrue( block.dataCodewords < block.codewords);
+
+				int byteBlockB = block.codewords+1;
+				int byteDataB = block.dataCodewords+1;
+				int countB = (info.codewords - block.codewords*block.eccBlocks);
+
+				assertTrue( countB >= 0 );
+				if( countB > 0 ) {
+					assertTrue(countB % byteBlockB == 0 );
+					countB /= byteBlockB;
+
+					assertEquals( info.codewords, block.codewords*block.eccBlocks + byteBlockB*countB);
+					assertTrue( byteDataB < byteBlockB);
+				}
+
+
+			}
+		}
+	}
+
+	/**
+	 * The last digit in the alignment pattern should always be increasing. Try to catch type-os
+	 */
+	@Test
+	public void versionInfo_alignment_lastNumberIncreasing() {
+		for (int version = 3; version <= QrCode.MAX_VERSION; version++) {
+//			System.out.println("version "+version);
+			QrCode.VersionInfo infoA = QrCode.VERSION_INFO[version-1];
+			QrCode.VersionInfo infoB = QrCode.VERSION_INFO[version];
+
+			assertTrue(infoA.alignment[infoA.alignment.length-1] < infoB.alignment[infoB.alignment.length-1]);
+		}
 	}
 }

@@ -145,7 +145,7 @@ public class QrCode {
 		VERSION_INFO[7].add(L,98,78,2);
 		VERSION_INFO[7].add(M,49,31,4);
 		VERSION_INFO[7].add(Q,32,14,2);
-		VERSION_INFO[7].add(H,33,13,4);
+		VERSION_INFO[7].add(H,39,13,4);
 
 		VERSION_INFO[8] = new VersionInfo(242, new int[]{6,24,42});
 		VERSION_INFO[8].add(L,121,97,2);
@@ -161,7 +161,7 @@ public class QrCode {
 
 		VERSION_INFO[10] = new VersionInfo(346, new int[]{6,28,50});
 		VERSION_INFO[10].add(L,86,68,2);
-		VERSION_INFO[10].add(M,59,43,4);
+		VERSION_INFO[10].add(M,69,43,4);
 		VERSION_INFO[10].add(Q,43,19,6);
 		VERSION_INFO[10].add(H,43,15,6);
 
@@ -207,7 +207,7 @@ public class QrCode {
 		VERSION_INFO[17].add(Q,50,22,1);
 		VERSION_INFO[17].add(H,42,14,2);
 
-		VERSION_INFO[18] = new VersionInfo(815, new int[]{6,30,56,82});
+		VERSION_INFO[18] = new VersionInfo(901, new int[]{6,30,56,82});
 		VERSION_INFO[18].add(L,150,120,5);
 		VERSION_INFO[18].add(M,69,43,9);
 		VERSION_INFO[18].add(Q,50,22,17);
@@ -228,7 +228,7 @@ public class QrCode {
 		VERSION_INFO[21] = new VersionInfo(1156, new int[]{6,28,50,72,94});
 		VERSION_INFO[21].add(L,144,116,4);
 		VERSION_INFO[21].add(M,68,42,17);
-		VERSION_INFO[21].add(Q,50,22,19);
+		VERSION_INFO[21].add(Q,50,22,17);
 		VERSION_INFO[21].add(H,46,16,19);
 
 		VERSION_INFO[22] = new VersionInfo(1258, new int[]{6,26,50,74,98});
@@ -244,7 +244,7 @@ public class QrCode {
 		VERSION_INFO[23].add(H,45,15,16);
 
 
-		VERSION_INFO[24] = new VersionInfo(1364, new int[]{6,28,54,80,106});
+		VERSION_INFO[24] = new VersionInfo(1474, new int[]{6,28,54,80,106});
 		VERSION_INFO[24].add(L,147,117,6);
 		VERSION_INFO[24].add(M,73,45,6);
 		VERSION_INFO[24].add(Q,54,24,11);
@@ -260,9 +260,9 @@ public class QrCode {
 		VERSION_INFO[26].add(L,142,114,10);
 		VERSION_INFO[26].add(M,74,46,19);
 		VERSION_INFO[26].add(Q,50,22,28);
-		VERSION_INFO[26].add(H,46,16,32);
+		VERSION_INFO[26].add(H,46,16,33);
 
-		VERSION_INFO[27] = new VersionInfo(1706, new int[]{6,34,62,90,118});
+		VERSION_INFO[27] = new VersionInfo(1828, new int[]{6,34,62,90,118});
 		VERSION_INFO[27].add(L,152,122,8);
 		VERSION_INFO[27].add(M,73,45,22);
 		VERSION_INFO[27].add(Q,53,23,8);
@@ -310,14 +310,43 @@ public class QrCode {
 		VERSION_INFO[34].add(Q,54,24,44);
 		VERSION_INFO[34].add(H,46,16,59);
 
-//		alignment[35] = new int[]{6,30,54,78,102,126,150};
-//		alignment[36] = new int[]{6,24,50,76,102,128,154};
-//		alignment[37] = new int[]{6,28,54,80,106,132,158};
-//		alignment[39] = new int[]{6,32,58,84,110,136,162};
-//		alignment[38] = new int[]{6,26,54,82,110,138,166};
-//		alignment[40] = new int[]{6,30,58,86,114,142,170};
+		VERSION_INFO[35] = new VersionInfo(2876, new int[]{6,30,54,78,102,126,150});
+		VERSION_INFO[35].add(L,151,121,12);
+		VERSION_INFO[35].add(M,75,47,12);
+		VERSION_INFO[35].add(Q,54,24,39);
+		VERSION_INFO[35].add(H,45,15,22);
 
-		for (int version = 1; version <= 21; version++ ) {// TODO MAX_VERSION; version++) {
+		VERSION_INFO[36] = new VersionInfo(3034, new int[]{6,24,50,76,102,128,154});
+		VERSION_INFO[36].add(L,151,121,6);
+		VERSION_INFO[36].add(M,75,47,6);
+		VERSION_INFO[36].add(Q,54,24,46);
+		VERSION_INFO[36].add(H,45,15,2);
+
+		VERSION_INFO[37] = new VersionInfo(3196, new int[]{6,28,54,80,106,132,158});
+		VERSION_INFO[37].add(L,152,122,17);
+		VERSION_INFO[37].add(M,74,46,29);
+		VERSION_INFO[37].add(Q,54,24,49);
+		VERSION_INFO[37].add(H,45,15,24);
+
+		VERSION_INFO[38] = new VersionInfo(3362, new int[]{6,32,58,84,110,136,162});
+		VERSION_INFO[38].add(L,152,122,4);
+		VERSION_INFO[38].add(M,74,46,13);
+		VERSION_INFO[38].add(Q,54,24,48);
+		VERSION_INFO[38].add(H,45,15,42);
+
+		VERSION_INFO[39] = new VersionInfo(3532, new int[]{6,26,54,82,110,138,166});
+		VERSION_INFO[39].add(L,147,117,20);
+		VERSION_INFO[39].add(M,75,47,40);
+		VERSION_INFO[39].add(Q,54,24,43);
+		VERSION_INFO[39].add(H,45,15,10);
+
+		VERSION_INFO[40] = new VersionInfo(3706, new int[]{6,30,58,86,114,142,170});
+		VERSION_INFO[40].add(L,148,118,19);
+		VERSION_INFO[40].add(M,75,47,18);
+		VERSION_INFO[40].add(Q,54,24,34);
+		VERSION_INFO[40].add(H,45,15,20);
+
+		for (int version = 1; version <= MAX_VERSION; version++) {
 			QrCodeCodeWordLocations mask = new QrCodeCodeWordLocations(version);
 
 			locationBits[version] = mask.bits;
