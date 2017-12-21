@@ -55,6 +55,31 @@ public class TestReidSolomonCodes {
 		// numerical properties are tested by computeSyndromes
 	}
 
+	/**
+	 * Compare against results from python tutorial
+	 */
+	@Test
+	public void computeECC_python() {
+		byte a[] = new byte[]{0x40, (byte)0xd2, 0x75, 0x47, 0x76, 0x17, 0x32,
+				0x06, 0x27, 0x26, (byte)0x96, (byte)0xc6, (byte)0xc6, (byte)0x96, 0x70, (byte)0xec};
+		byte b[] = new byte[]{(byte)0xbc, 0x2a, (byte)0x90, 0x13, 0x6b,
+				(byte)0xaf, (byte)0xef, (byte)0xfd, 0x4b, (byte)0xe0};
+
+		GrowQueue_I8 message = new GrowQueue_I8();
+		GrowQueue_I8 ecc = new GrowQueue_I8();
+		message.data = a;
+		message.size = a.length;
+
+		ReidSolomonCodes alg = new ReidSolomonCodes(8,0x11d);
+		alg.generator(10);
+		alg.computeECC(message,ecc);
+
+		assertEquals(10,ecc.size);
+		for (int i = 0; i < b.length; i++) {
+			assertEquals(b[i],ecc.data[i]);
+		}
+	}
+
 	@Test
 	public void computeSyndromes() {
 		GrowQueue_I8 message = randomMessage(50);

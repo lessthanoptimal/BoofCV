@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static boofcv.alg.fiducial.qrcode.QrCode.ErrorCorrectionLevel.*;
+import static boofcv.alg.fiducial.qrcode.QrCode.ErrorLevel.*;
 
 
 // TODO Structure Appended
@@ -73,7 +73,7 @@ public class QrCode {
 	public int version;
 
 	/** Level of error correction */
-	ErrorCorrectionLevel errorCorrection;
+	ErrorLevel error;
 
 	/**
 	 * Which masking pattern is applied
@@ -278,19 +278,22 @@ public class QrCode {
 		}
 
 		version = 1;
-		errorCorrection = L;
+		error = L;
 		mask = QrCodeMaskPattern.M111;
 		alignment.reset();
 		mode = Mode.ALPHANUMERIC;
 	}
 
-	public enum ErrorCorrectionLevel {
+	/**
+	 * Error correction level
+	 */
+	public enum ErrorLevel {
 		L(0b01),
 		M(0b00),
 		Q(0b11),
 		H(0b10);
 
-		ErrorCorrectionLevel(int value) {
+		ErrorLevel(int value) {
 			this.value = value;
 		}
 
@@ -298,7 +301,7 @@ public class QrCode {
 			return value;
 		}
 
-		public static ErrorCorrectionLevel lookup( int value ) {
+		public static ErrorLevel lookup(int value ) {
 			switch( value ) {
 				case 0b01:return L;
 				case 0b00:return M;
@@ -346,14 +349,14 @@ public class QrCode {
 		final public int alignment[];
 
 		// information for each error correction level
-		final public Map<ErrorCorrectionLevel,ErrorBlock> levels = new HashMap<>();
+		final public Map<ErrorLevel,ErrorBlock> levels = new HashMap<>();
 
 		public VersionInfo(int codewords , int alignment[] ) {
 			this.codewords = codewords;
 			this.alignment = alignment;
 		}
 
-		public void add(ErrorCorrectionLevel level , int codeWords, int dataCodewords , int eccBlocks ) {
+		public void add(ErrorLevel level , int codeWords, int dataCodewords , int eccBlocks ) {
 			levels.put( level , new ErrorBlock(codeWords,dataCodewords, eccBlocks));
 		}
 	}

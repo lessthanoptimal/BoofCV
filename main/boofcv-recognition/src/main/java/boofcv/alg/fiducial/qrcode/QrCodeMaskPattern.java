@@ -64,6 +64,14 @@ public abstract class QrCodeMaskPattern {
 		}
 	}
 
+	static class NONE extends QrCodeMaskPattern {
+		public NONE(int bits) { super(bits); }
+
+		@Override
+		public int apply(int row, int col, int bitValue) {
+			return bitValue;
+		}
+	}
 	static class M000 extends QrCodeMaskPattern {
 		public M000() { super(0b000); }
 

@@ -21,7 +21,6 @@ package boofcv.alg.fiducial.qrcode;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,9 +41,6 @@ public abstract class QrCodeGenerator {
 
 	// data mask
 	List<Point2D_I32> bitLocations;
-
-	// array which stores output data. QR code data is copied here so that the length can be ensured
-	byte[] output = new byte[0];
 
 	public QrCodeGenerator( double markerWidth ) {
 		this.markerWidth = markerWidth;
@@ -72,8 +68,7 @@ public abstract class QrCodeGenerator {
 		if( qr.version >= QrCode.VERSION_VERSION )
 			versionInformation();
 
-		// render alignment patterns
-//		QrCodePatternLocations locations = new QrCodePatternLocations();
+		// render alignment patterns\
 
 		int alignment[] = QrCode.VERSION_INFO[qr.version].alignment;
 		for (int i = 0; i < alignment.length; i++) {
@@ -96,15 +91,8 @@ public abstract class QrCodeGenerator {
 		bitLocations = new QrCodeCodeWordLocations(numModules,alignment,qr.version >= QrCode.VERSION_VERSION).bits;
 
 		int numBytes = bitLocations.size()/8;
-		if( output.length < numBytes ) {
-			output = new byte[numBytes];
-		}
-		// make sure the raw array does not exceed the maximum number of bytes and that unused bytes are set to zero
-		int length = Math.min(qr.dataRaw.length,numBytes);
-		System.arraycopy(qr.dataRaw,0,output,0,length);
-		Arrays.fill(output,length,numBytes,(byte)0);
-
-		// start encoding!
+		if( numBytes != qr.dataRaw.length )
+			throw new RuntimeException("Egads. unexpected length of qrcode raw data");
 
 		// Render the output data
 		renderData();
@@ -117,12 +105,15 @@ public abstract class QrCodeGenerator {
 		QrCodeMaskPattern mask = qr.mask;
 		int count = 0;
 
-		while( count+8 < bitLocations.size() ) {
-			int bits = output[count/8]&0xFF;
+		while( count < bitLocations.size() ) {
+			int bits = qr.dataRaw[count/8]&0xFF;
 
-			for (int i = 0; i < 8; i++) {
+			int N = Math.min(8,bitLocations.size()-count);
+
+			for (int i = 0; i < N; i++) {
 				Point2D_I32 coor = bitLocations.get(count+i);
 				int value = mask.apply(coor.y,coor.x, ((bits >> i ) & 0x01));
+//				int value = ((bits >> i ) & 0x01);
 				if( value > 0 ) {
 					square(coor.y,coor.x);
 				}
@@ -130,14 +121,6 @@ public abstract class QrCodeGenerator {
 			count += 8;
 		}
 
-		// remainder bits are always zero
-		for(;count < bitLocations.size(); count++ ) {
-			Point2D_I32 coor = bitLocations.get(count);
-			int value = mask.apply(coor.y,coor.x, 0);
-			if( value > 0 ) {
-				square(coor.y,coor.x);
-			}
-		}
 	}
 
 	private void positionPattern(double x , double y , Polygon2D_F64 where ) {
@@ -161,10 +144,15 @@ public abstract class QrCodeGenerator {
 		}
 	}
 
-	private void formatInformation() {
+	static PackedBits32 formatInformationBits( QrCode qr ) {
 		PackedBits32 bits = new PackedBits32(15);
-		bits.data[0] = QrCodePolynomialMath.encodeFormatBits(qr.errorCorrection,qr.mask.bits);
+		bits.data[0] = QrCodePolynomialMath.encodeFormatBits(qr.error,qr.mask.bits);
 		bits.data[0] ^= QrCodePolynomialMath.FORMAT_MASK;
+		return bits;
+	}
+
+	private void formatInformation() {
+		PackedBits32 bits = formatInformationBits(qr);
 //		System.out.println("encoder format bits "+Integer.toBinaryString(bits.data[0]));
 
 		for (int i = 0; i < 15; i++) {
@@ -186,8 +174,8 @@ public abstract class QrCodeGenerator {
 			} else {
 				square(numModules-(15-i),8);
 			}
-			square(numModules-8,8);
 		}
+		square(numModules-8,8);
 	}
 
 	private void versionInformation() {

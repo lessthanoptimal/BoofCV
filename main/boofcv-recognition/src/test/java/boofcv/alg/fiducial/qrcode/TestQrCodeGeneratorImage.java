@@ -37,10 +37,10 @@ public class TestQrCodeGeneratorImage {
 		if(!showImage)
 			return;
 
-		QrCode qr = new QrCode();
-		qr.version = 7;
-
-		qr = new QrCodeEncoder().setVersion(1).encodeNumeric("123456");
+		QrCode qr = new QrCodeEncoder().setVersion(1).
+				setError(QrCode.ErrorLevel.M).
+				setMask(QrCodeMaskPattern.M011).
+				numeric("01234567");
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(6);
 

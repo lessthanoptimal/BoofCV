@@ -20,8 +20,6 @@ package boofcv.alg.fiducial.qrcode;
 
 import org.ddogleg.struct.GrowQueue_I8;
 
-import java.util.Arrays;
-
 /**
  * Used to create QR Codes given a message. By default it will select the qr code version based on the number of
  * bits and the error correction level based on the version and number of bits. If the error correction isn't specified
@@ -36,6 +34,8 @@ public class QrCodeEncoder {
 	// If true it will automatically select the amount of error correction depending on the length of the data
 	boolean autoErrorCorrection = true;
 
+	boolean autoMask = true;
+
 	public QrCodeEncoder() {
 		qr.version = -1;
 	}
@@ -45,13 +45,19 @@ public class QrCodeEncoder {
 		return this;
 	}
 
-	public QrCodeEncoder setErrorCorrection(QrCode.ErrorCorrectionLevel level ) {
+	public QrCodeEncoder setError(QrCode.ErrorLevel level ) {
 		autoErrorCorrection = false;
-		qr.errorCorrection = level;
+		qr.error = level;
 		return this;
 	}
 
-	public QrCode encodeNumeric( String message ) {
+	public QrCodeEncoder setMask( QrCodeMaskPattern pattern ) {
+		autoMask = false;
+		qr.mask = pattern;
+		return this;
+	}
+
+	public QrCode numeric(String message ) {
 		int[] numbers = new int[ message.length() ];
 
 		for (int i = 0; i < message.length(); i++) {
@@ -61,10 +67,10 @@ public class QrCodeEncoder {
 				throw new RuntimeException("Expected each character to be a number from 0 to 9");
 			numbers[i] = values;
 		}
-		return encodeNumeric(numbers);
+		return numeric(numbers);
 	}
 
-	public QrCode encodeNumeric( int[] numbers ) {
+	public QrCode numeric(int[] numbers ) {
 		for (int i = 0; i < numbers.length; i++) {
 			if( numbers[i] < 0 || numbers[i] > 9 )
 				throw new IllegalArgumentException("All numbers must have a value from 0 to 9");
@@ -112,28 +118,30 @@ public class QrCodeEncoder {
 		return qr;
 	}
 
-	public QrCode encodeAlphaNumeric( String alphaNumeric ) {
+	public QrCode alphaNumeric( String alphaNumeric ) {
 		return null;
 	}
 
-	public QrCode encodeBytes( byte[] data ) {
+	public QrCode bytes( byte[] data ) {
 		return null;
 	}
 
-	public QrCode encodeKanji( short[] kanji ) {
+	public QrCode kanji( short[] kanji ) {
 		return null;
 	}
 
 	protected void bitsToMessage( PackedBits8 stream ) {
-		ReidSolomonCodes codes = new ReidSolomonCodes(8,0b100011101);
+		// add padding to make it align to 8
+		stream.append(0,(8-(stream.size%8))%8,false);
 
 		QrCode.VersionInfo info = QrCode.VERSION_INFO[qr.version];
-		QrCode.ErrorBlock block = info.levels.get(qr.errorCorrection);
+		QrCode.ErrorBlock block = info.levels.get(qr.error);
 
 		qr.dataRaw = new byte[info.codewords];
 
 		int blockCodeWordsA = block.codewords;
 		int blockDataA = block.dataCodewords;
+		int blockEccA = blockCodeWordsA-blockDataA;
 		int numBlocksA = block.eccBlocks;
 
 		int blockCodeWordsB = blockCodeWordsA + 1;
@@ -143,10 +151,12 @@ public class QrCodeEncoder {
 		int streamOffset = 0;
 
 		GrowQueue_I8 input = new GrowQueue_I8();
-		input.resize(blockCodeWordsA+1);
-		input.size = blockCodeWordsA;
+		input.resize(blockDataA+1);
+		input.size = blockDataA;
 		GrowQueue_I8 ecc = new GrowQueue_I8();
-		ecc.resize(blockCodeWordsA-blockDataA);
+		ecc.resize(blockEccA);
+
+		ReidSolomonCodes codes = new ReidSolomonCodes(8,0b100011101);
 		codes.generator(ecc.size);
 
 		int startEcc = numBlocksA*blockDataA + numBlocksB*blockDataB;
@@ -154,12 +164,22 @@ public class QrCodeEncoder {
 
 		for (int i = 0; i < numBlocksA; i++) {
 			// copy the portion of the stream that's being processed
-			int length = Math.min(blockCodeWordsA,Math.max(0,stream.arrayLength()-streamOffset));
+			int length = Math.min(blockDataA,Math.max(0,stream.arrayLength()-streamOffset));
 			System.arraycopy(stream.data,streamOffset,input.data,0,length);
-			Arrays.fill(input.data,length,input.size,(byte)0);
+			addPadding(input,length,0b00110111,0b10001000);
+
+			// the need for these flips is really unexpected. once they are flipped the numbers match
+			// an online example and the encodes a real qr-code
+			flip(input);
 
 			// compute the ecc
 			codes.computeECC(input,ecc);
+
+			flip(input);
+			flip(ecc);
+
+//			print("input",input);
+//			print("ecc",ecc);
 
 			// write it into the output array
 			copyIntoRawData(input,ecc,i,totalBlocks,startEcc,qr.dataRaw);
@@ -173,6 +193,45 @@ public class QrCodeEncoder {
 			// todo write
 			streamOffset += input.size;
 		}
+	}
+
+	public static void flip( byte[] array, int size ) {
+		for (int j = 0; j < size; j++) {
+			array[j] = flip(array[j]&0xFF);
+		}
+	}
+
+	public static void flip( GrowQueue_I8 array ) {
+		flip(array.data,array.size);
+	}
+
+	public static byte flip( int x ) {
+		int b=0;
+		for (int i = 0; i < 8; i++) {
+			b<<=1;
+			b|=( x &1);
+			x>>=1;
+		}
+		return (byte)b;
+	}
+
+	private void addPadding(GrowQueue_I8 queue , int dataBytes, int padding0 , int padding1 ) {
+
+		boolean a = true;
+		for (int i = dataBytes; i < queue.size; i++,a=!a) {
+			if( a )
+				queue.data[i] = (byte)padding0;
+			else
+				queue.data[i] = (byte)padding1;
+		}
+	}
+
+	private void print( String name , GrowQueue_I8 queue ) {
+		PackedBits8 bits = new PackedBits8();
+		bits.size = queue.size*8;
+		bits.data = queue.data;
+		System.out.print(name+"  ");
+		bits.print();
 	}
 
 	private void copyIntoRawData( GrowQueue_I8 message , GrowQueue_I8 ecc , int offset , int stride ,

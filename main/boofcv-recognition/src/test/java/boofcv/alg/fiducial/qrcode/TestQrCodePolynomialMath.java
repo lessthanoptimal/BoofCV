@@ -59,7 +59,7 @@ public class TestQrCodePolynomialMath {
 	@Test
 	public void encodeFormatBits() {
 
-		int found = QrCodePolynomialMath.encodeFormatBits(QrCode.ErrorCorrectionLevel.M,0b101);
+		int found = QrCodePolynomialMath.encodeFormatBits(QrCode.ErrorLevel.M,0b101);
 		found ^= QrCodePolynomialMath.FORMAT_MASK;
 		int expected = 0b100000011001110;
 
@@ -68,7 +68,7 @@ public class TestQrCodePolynomialMath {
 
 	@Test
 	public void checkFormatBits() {
-		for( QrCode.ErrorCorrectionLevel error : QrCode.ErrorCorrectionLevel.values()) {
+		for( QrCode.ErrorLevel error : QrCode.ErrorLevel.values()) {
 			int found = QrCodePolynomialMath.encodeFormatBits(error,0b101);
 
 			assertTrue( QrCodePolynomialMath.checkFormatBits(found));
@@ -84,13 +84,13 @@ public class TestQrCodePolynomialMath {
 	@Test
 	public void decodeFormatMessage() {
 		QrCode qr = new QrCode();
-		for( QrCode.ErrorCorrectionLevel error : QrCode.ErrorCorrectionLevel.values()) {
+		for( QrCode.ErrorLevel error : QrCode.ErrorLevel.values()) {
 			int message = QrCodePolynomialMath.encodeFormatBits(error,0b101);
 			message >>= 10;
 
 			QrCodePolynomialMath.decodeFormatMessage(message,qr);
 
-			assertEquals(error,qr.errorCorrection);
+			assertEquals(error,qr.error);
 			assertTrue(QrCodeMaskPattern.M101==qr.mask);
 		}
 	}

@@ -74,7 +74,7 @@ public class TestQrCodeDecoder {
 		QrCode found = decoder.getFound().get(0);
 
 		// Check format info
-		assertEquals(truthQr.errorCorrection,found.errorCorrection);
+		assertEquals(truthQr.error,found.error);
 		assertTrue(truthQr.mask==found.mask);
 
 		// check version info

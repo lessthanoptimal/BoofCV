@@ -124,6 +124,15 @@ public class PackedBits8 implements PackedBits {
 			return size/8 + 1;
 	}
 
+
+	public void print() {
+		System.out.println("size = "+size);
+		for (int i = 0; i < size; i++) {
+			System.out.print(get(i));
+		}
+		System.out.println();
+	}
+
 	@Override
 	public int elementBits() {
 		return 8;

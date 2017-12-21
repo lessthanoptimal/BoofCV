@@ -72,7 +72,7 @@ public class QrCodePolynomialMath {
 	 * @param mask The type of mask that is applied to the qr code
 	 * @return encoded bit field
 	 */
-	public static int encodeFormatBits(QrCode.ErrorCorrectionLevel level , int mask ) {
+	public static int encodeFormatBits(QrCode.ErrorLevel level , int mask ) {
 		int message = (level.value << 3) | (mask & 0xFFFFFFF7);
 		message = message << 10;
 		return message ^ bitPolyModulus(message, FORMAT_GENERATOR,15,5);
@@ -94,7 +94,7 @@ public class QrCodePolynomialMath {
 	public static void decodeFormatMessage(int message , QrCode qr ) {
 		int error = message >> 3;
 
-		qr.errorCorrection = QrCode.ErrorCorrectionLevel.lookup(error);
+		qr.error = QrCode.ErrorLevel.lookup(error);
 		qr.mask = QrCodeMaskPattern.lookupMask(message&0x07);
 	}
 
