@@ -20,6 +20,8 @@ package boofcv.alg.fiducial.qrcode;
 
 import org.ddogleg.struct.GrowQueue_I8;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * Provides an easy to use interface for specifying QR-Code parameters and generating the raw data sequence. After
  * the QR Code has been created using this class it can then be rendered.
@@ -30,6 +32,8 @@ import org.ddogleg.struct.GrowQueue_I8;
  *
  * @author Peter Abeles
  */
+// TODO support Kanji
+	// TODO support ECI
 // TODO autoselect version
 	// TODO autoselect error correction
 	// TODO autoselect mask
@@ -72,6 +76,11 @@ public class QrCodeEncoder {
 		return this;
 	}
 
+	/**
+	 * Creates a QR-Code which encodes a number sequence
+	 * @param message String that specifies numbers and no other types. Each number has to be from 0 to 9 inclusive.
+	 * @return The QR-Code
+	 */
 	public QrCode numeric(String message ) {
 		int[] numbers = new int[ message.length() ];
 
@@ -85,6 +94,12 @@ public class QrCodeEncoder {
 		return numeric(numbers);
 	}
 
+
+	/**
+	 * Creates a QR-Code which encodes a number sequence
+	 * @param numbers Array of numbers. Each number has to be from 0 to 9 inclusive.
+	 * @return The QR-Code
+	 */
 	public QrCode numeric(int[] numbers ) {
 		for (int i = 0; i < numbers.length; i++) {
 			if( numbers[i] < 0 || numbers[i] > 9 )
@@ -131,6 +146,11 @@ public class QrCodeEncoder {
 		return qr;
 	}
 
+	/**
+	 * Creates a QR-Code which encodes data in the alphanumeric format
+	 * @param alphaNumeric String containing only alphanumeric values.
+	 * @return The QR-Code
+	 */
 	public QrCode alphanumeric( String alphaNumeric ) {
 		byte values[] = alphanumericToValues(alphaNumeric);
 
@@ -167,7 +187,7 @@ public class QrCodeEncoder {
 		// add the terminator to the bit stream
 		packed.append(0b0000,4,false);
 
-		packed.print();
+//		packed.print();
 
 		bitsToMessage(packed);
 
@@ -224,6 +244,11 @@ public class QrCodeEncoder {
 		return output;
 	}
 
+	/**
+	 * Creates a QR-Code which encodes data in the byte format.
+	 * @param data Data to be encoded
+	 * @return The QR-Code
+	 */
 	public QrCode bytes( byte[] data ) {
 		int lengthBits;
 
@@ -251,14 +276,70 @@ public class QrCodeEncoder {
 		// add the terminator to the bit stream
 		packed.append(0b0000,4,false);
 
-		packed.print();
+//		packed.print();
 
 		bitsToMessage(packed);
 
 		return qr;
 	}
 
-	public QrCode kanji( short[] kanji ) {
+	/**
+	 * Creates a QR-Code which encodes Kanji characters
+	 * @param message Data to be encoded
+	 * @return The QR-Code
+	 */
+	public QrCode kanji( String message ) {
+
+		int lengthBits;
+
+		if (qr.version < 10)
+			lengthBits = 8;
+		else if (qr.version < 27)
+			lengthBits = 10;
+		else
+			lengthBits = 12;
+
+		byte[] bytes;
+		try {
+			bytes = message.getBytes("Shift_JIS");
+		} catch (UnsupportedEncodingException ex) {
+			throw new IllegalArgumentException(ex);
+		}
+
+		packed.resize(lengthBits + 8*bytes.length); // predeclare memory
+		packed.size = 0; // set size to 0 so that append() starts from the front
+
+		// specify the mode
+		packed.append(0b1000,4,false);
+
+		// Specify the number of characters
+		packed.append(message.length(),lengthBits,false);
+
+		for (int i = 0; i < bytes.length; i += 2) {
+			int byte1 = bytes[i] & 0xFF;
+			int byte2 = bytes[i + 1] & 0xFF;
+			int code = (byte1 << 8) | byte2;
+			int adjusted;
+			if (code >= 0x8140 && code <= 0x9ffc) {
+				adjusted = code - 0x8140;
+			} else if (code >= 0xe040 && code <= 0xebbf) {
+				adjusted = code - 0xc140;
+			} else {
+				throw new IllegalArgumentException("Invalid byte sequence. "+message.charAt(i/2));
+			}
+			int encoded = ((adjusted >> 8) * 0xc0) + (adjusted & 0xff);
+			packed.append(encoded, 13, false);
+		}
+
+		// add the terminator to the bit stream
+		packed.append(0b0000,4,false);
+//		packed.print();
+		bitsToMessage(packed);
+
+		return qr;
+	}
+
+	public QrCode eci() {
 		return null;
 	}
 
