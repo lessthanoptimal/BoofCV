@@ -21,7 +21,10 @@ package boofcv.alg.fiducial.qrcode;
 import org.ddogleg.struct.GrowQueue_I8;
 
 /**
- * Used to create QR Codes given a message. By default it will select the qr code version based on the number of
+ * Provides an easy to use interface for specifying QR-Code parameters and generating the raw data sequence. After
+ * the QR Code has been created using this class it can then be rendered.
+ *
+ * By default it will select the qr code version based on the number of
  * bits and the error correction level based on the version and number of bits. If the error correction isn't specified
  * and the version isn't specified then error correction level Q is used by default.
  *
@@ -32,12 +35,20 @@ import org.ddogleg.struct.GrowQueue_I8;
 	// TODO autoselect mask
 public class QrCodeEncoder {
 
+	// used to compute error correction
+	ReidSolomonCodes codes = new ReidSolomonCodes(8,0b100011101);
+
+	// output qr code
 	QrCode qr = new QrCode();
 
 	// If true it will automatically select the amount of error correction depending on the length of the data
 	boolean autoErrorCorrection = true;
 
 	boolean autoMask = true;
+
+	// workspace variables
+	GrowQueue_I8 input = new GrowQueue_I8();
+	GrowQueue_I8 ecc = new GrowQueue_I8();
 
 	public QrCodeEncoder() {
 		qr.version = -1;
@@ -142,55 +153,47 @@ public class QrCodeEncoder {
 
 		qr.dataRaw = new byte[info.codewords];
 
-		int blockCodeWordsA = block.codewords;
-		int blockDataA = block.dataCodewords;
-		int blockEccA = blockCodeWordsA-blockDataA;
+		// there are some times two different sizes of blocks. The smallest is written to first and the second
+		// is larger and can be derived from the size of the first
+		int wordsBlockAllA = block.codewords;
+		int wordsBlockDataA = block.dataCodewords;
+		int wordsEcc = wordsBlockAllA-wordsBlockDataA;
 		int numBlocksA = block.eccBlocks;
 
-		int blockCodeWordsB = blockCodeWordsA + 1;
-		int blockDataB = blockDataA + 1;
-		int numBlocksB = (info.codewords-blockCodeWordsA*numBlocksA)/blockCodeWordsB;
+		int wordsBlockAllB = wordsBlockAllA + 1;
+		int wordsBlockDataB = wordsBlockDataA + 1;
+		int numBlocksB = (info.codewords-wordsBlockAllA*numBlocksA)/wordsBlockAllB;
 
-		int streamOffset = 0;
+		input.resize(wordsBlockDataA+1);
 
-		GrowQueue_I8 input = new GrowQueue_I8();
-		input.resize(blockDataA+1);
-		input.size = blockDataA;
-		GrowQueue_I8 ecc = new GrowQueue_I8();
-		ecc.resize(blockEccA);
-
-		ReidSolomonCodes codes = new ReidSolomonCodes(8,0b100011101);
-		codes.generator(ecc.size);
-
-		int startEcc = numBlocksA*blockDataA + numBlocksB*blockDataB;
+		int startEcc = numBlocksA*wordsBlockDataA + numBlocksB*wordsBlockDataB;
 		int totalBlocks = numBlocksA + numBlocksB;
 
-		for (int i = 0; i < numBlocksA; i++) {
-			// copy the portion of the stream that's being processed
-			int length = Math.min(blockDataA,Math.max(0,stream.arrayLength()-streamOffset));
-			System.arraycopy(stream.data,streamOffset,input.data,0,length);
-			addPadding(input,length,0b00110111,0b10001000);
+		codes.generator(wordsEcc);
+		ecc.resize(wordsEcc);
+		encodeBlocks(stream, wordsBlockDataA, numBlocksA, 0, 0,startEcc, totalBlocks);
+		encodeBlocks(stream, wordsBlockDataB, numBlocksB, wordsBlockDataA*numBlocksA,numBlocksA, startEcc, totalBlocks);
+	}
 
+	private void encodeBlocks(PackedBits8 stream, int bytesInDataBlock, int numberOfBlocks, int streamOffset,
+							  int blockOffset, int startEcc, int stride) {
+		input.size = bytesInDataBlock;
+
+		for (int idxBlock = 0; idxBlock < numberOfBlocks; idxBlock++) {
+			// copy the portion of the stream that's being processed
+			int length = Math.min(bytesInDataBlock,Math.max(0,stream.arrayLength()-streamOffset));
+			if( length > 0 )
+				System.arraycopy(stream.data,streamOffset,input.data,0,length);
+			addPadding(input,length,0b00110111,0b10001000);
 			flipBits8(input);
 
 			// compute the ecc
 			codes.computeECC(input,ecc);
-
 			flipBits8(input); flipBits8(ecc);
 
-//			print("input",input);
-//			print("ecc",ecc);
-
 			// write it into the output array
-			copyIntoRawData(input,ecc,i,totalBlocks,startEcc,qr.dataRaw);
+			copyIntoRawData(input,ecc,idxBlock+blockOffset,stride,startEcc,qr.dataRaw);
 
-			streamOffset += input.size;
-		}
-
-		input.size = blockCodeWordsB;
-		for (int i = 0; i < numBlocksB; i++) {
-
-			// todo write
 			streamOffset += input.size;
 		}
 	}

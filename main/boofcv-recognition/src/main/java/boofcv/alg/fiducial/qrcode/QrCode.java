@@ -231,12 +231,43 @@ public class QrCode {
 		VERSION_INFO[21].add(Q,50,22,19);
 		VERSION_INFO[21].add(H,46,16,19);
 
-//		alignment[22] = new int[]{6,26,50,74,98};
-//		alignment[23] = new int[]{6,30,54,78,102};
-//		alignment[24] = new int[]{6,28,54,80,106};
-//		alignment[25] = new int[]{6,32,58,84,110};
-//		alignment[26] = new int[]{6,30,58,86,114};
-//		alignment[27] = new int[]{6,34,62,90,118};
+		VERSION_INFO[22] = new VersionInfo(1258, new int[]{6,26,50,74,98});
+		VERSION_INFO[22].add(L,139,111,2);
+		VERSION_INFO[22].add(M,74,46,17);
+		VERSION_INFO[22].add(Q,54,24,7);
+		VERSION_INFO[22].add(H,37,13,34);
+
+		VERSION_INFO[23] = new VersionInfo(1364, new int[]{6,30,54,78,102});
+		VERSION_INFO[23].add(L,151,121,4);
+		VERSION_INFO[23].add(M,75,47,4);
+		VERSION_INFO[23].add(Q,54,24,11);
+		VERSION_INFO[23].add(H,45,15,16);
+
+
+		VERSION_INFO[24] = new VersionInfo(1364, new int[]{6,28,54,80,106});
+		VERSION_INFO[24].add(L,147,117,6);
+		VERSION_INFO[24].add(M,73,45,6);
+		VERSION_INFO[24].add(Q,54,24,11);
+		VERSION_INFO[24].add(H,46,16,30);
+
+		VERSION_INFO[25] = new VersionInfo(1588, new int[]{6,32,58,84,110});
+		VERSION_INFO[25].add(L,132,106,8);
+		VERSION_INFO[25].add(M,75,47,8);
+		VERSION_INFO[25].add(Q,54,24,7);
+		VERSION_INFO[25].add(H,45,15,22);
+
+		VERSION_INFO[26] = new VersionInfo(1706, new int[]{6,30,58,86,114});
+		VERSION_INFO[26].add(L,142,114,10);
+		VERSION_INFO[26].add(M,74,46,19);
+		VERSION_INFO[26].add(Q,50,22,28);
+		VERSION_INFO[26].add(H,46,16,32);
+
+		VERSION_INFO[27] = new VersionInfo(1706, new int[]{6,34,62,90,118});
+		VERSION_INFO[27].add(L,152,122,8);
+		VERSION_INFO[27].add(M,73,45,22);
+		VERSION_INFO[27].add(Q,53,23,8);
+		VERSION_INFO[27].add(H,45,15,12);
+
 //		alignment[28] = new int[]{6,26,50,74, 98,122};
 //		alignment[29] = new int[]{6,30,54,78,102,126};
 //		alignment[30] = new int[]{6,26,52,78,104,130};

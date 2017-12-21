@@ -54,6 +54,8 @@ public abstract class QrCodeGenerator {
 		this.qr = qr;
 		this.numModules = QrCode.totalModules(qr.version);
 		this.moduleWidth = markerWidth/numModules;
+		if( qr.dataRaw.length != QrCode.VERSION_INFO[qr.version].codewords )
+			throw new RuntimeException("Unexpected length of raw data.");
 
 		init();
 		positionPattern(0,0, qr.ppCorner);
@@ -68,7 +70,7 @@ public abstract class QrCodeGenerator {
 		if( qr.version >= QrCode.VERSION_VERSION )
 			versionInformation();
 
-		// render alignment patterns\
+		// render alignment patterns
 
 		int alignment[] = QrCode.VERSION_INFO[qr.version].alignment;
 		for (int i = 0; i < alignment.length; i++) {
@@ -88,7 +90,7 @@ public abstract class QrCodeGenerator {
 		}
 
 		// mark which modules can store data
-		bitLocations = new QrCodeCodeWordLocations(numModules,alignment,qr.version >= QrCode.VERSION_VERSION).bits;
+		bitLocations = new QrCodeCodeWordLocations(qr.version).bits;
 
 		int numBytes = bitLocations.size()/8;
 		if( numBytes != qr.dataRaw.length )
@@ -105,7 +107,8 @@ public abstract class QrCodeGenerator {
 		QrCodeMaskPattern mask = qr.mask;
 		int count = 0;
 
-		while( count < bitLocations.size() ) {
+		int length = bitLocations.size() - bitLocations.size()%8;
+		while( count < length ) {
 			int bits = qr.dataRaw[count/8]&0xFF;
 
 			int N = Math.min(8,bitLocations.size()-count);
