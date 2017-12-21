@@ -27,6 +27,9 @@ import org.ddogleg.struct.GrowQueue_I8;
  *
  * @author Peter Abeles
  */
+// TODO autoselect version
+	// TODO autoselect error correction
+	// TODO autoselect mask
 public class QrCodeEncoder {
 
 	QrCode qr = new QrCode();
@@ -168,15 +171,12 @@ public class QrCodeEncoder {
 			System.arraycopy(stream.data,streamOffset,input.data,0,length);
 			addPadding(input,length,0b00110111,0b10001000);
 
-			// the need for these flips is really unexpected. once they are flipped the numbers match
-			// an online example and the encodes a real qr-code
-			flip(input);
+			flipBits8(input);
 
 			// compute the ecc
 			codes.computeECC(input,ecc);
 
-			flip(input);
-			flip(ecc);
+			flipBits8(input); flipBits8(ecc);
 
 //			print("input",input);
 //			print("ecc",ecc);
@@ -195,17 +195,17 @@ public class QrCodeEncoder {
 		}
 	}
 
-	public static void flip( byte[] array, int size ) {
+	public static void flipBits8(byte[] array, int size ) {
 		for (int j = 0; j < size; j++) {
-			array[j] = flip(array[j]&0xFF);
+			array[j] = flipBits8(array[j]&0xFF);
 		}
 	}
 
-	public static void flip( GrowQueue_I8 array ) {
-		flip(array.data,array.size);
+	public static void flipBits8(GrowQueue_I8 array ) {
+		flipBits8(array.data,array.size);
 	}
 
-	public static byte flip( int x ) {
+	public static byte flipBits8(int x ) {
 		int b=0;
 		for (int i = 0; i < 8; i++) {
 			b<<=1;
