@@ -268,13 +268,48 @@ public class QrCode {
 		VERSION_INFO[27].add(Q,53,23,8);
 		VERSION_INFO[27].add(H,45,15,12);
 
-//		alignment[28] = new int[]{6,26,50,74, 98,122};
-//		alignment[29] = new int[]{6,30,54,78,102,126};
-//		alignment[30] = new int[]{6,26,52,78,104,130};
-//		alignment[31] = new int[]{6,30,56,82,108,134};
-//		alignment[32] = new int[]{6,34,60,86,112,138};
-//		alignment[33] = new int[]{6,30,58,86,114,142};
-//		alignment[34] = new int[]{6,34,62,90,118,146};
+		VERSION_INFO[28] = new VersionInfo(1921, new int[]{6,26,50,74,98,122});
+		VERSION_INFO[28].add(L,147,117,3);
+		VERSION_INFO[28].add(M,73,45,3);
+		VERSION_INFO[28].add(Q,54,24,4);
+		VERSION_INFO[28].add(H,45,15,11);
+
+		VERSION_INFO[29] = new VersionInfo(2051, new int[]{6,30,54,78,102,126});
+		VERSION_INFO[29].add(L,146,116,7);
+		VERSION_INFO[29].add(M,73,45,21);
+		VERSION_INFO[29].add(Q,53,23,1);
+		VERSION_INFO[29].add(H,45,15,19);
+
+		VERSION_INFO[30] = new VersionInfo(2185, new int[]{6,26,52,78,104,130});
+		VERSION_INFO[30].add(L,145,115,5);
+		VERSION_INFO[30].add(M,75,47,19);
+		VERSION_INFO[30].add(Q,54,24,15);
+		VERSION_INFO[30].add(H,45,15,23);
+
+		VERSION_INFO[31] = new VersionInfo(2323, new int[]{6,30,56,82,108,134});
+		VERSION_INFO[31].add(L,145,115,13);
+		VERSION_INFO[31].add(M,74,46,2);
+		VERSION_INFO[31].add(Q,54,24,42);
+		VERSION_INFO[31].add(H,45,15,23);
+
+		VERSION_INFO[32] = new VersionInfo(2465, new int[]{6,34,60,86,112,138});
+		VERSION_INFO[32].add(L,145,115,17);
+		VERSION_INFO[32].add(M,74,46,10);
+		VERSION_INFO[32].add(Q,54,24,10);
+		VERSION_INFO[32].add(H,45,15,19);
+
+		VERSION_INFO[33] = new VersionInfo(2611, new int[]{6,30,58,86,114,142});
+		VERSION_INFO[33].add(L,145,115,17);
+		VERSION_INFO[33].add(M,74,46,14);
+		VERSION_INFO[33].add(Q,54,24,29);
+		VERSION_INFO[33].add(H,45,15,11);
+
+		VERSION_INFO[34] = new VersionInfo(2761, new int[]{6,34,62,90,118,146});
+		VERSION_INFO[34].add(L,145,115,13);
+		VERSION_INFO[34].add(M,74,46,14);
+		VERSION_INFO[34].add(Q,54,24,44);
+		VERSION_INFO[34].add(H,46,16,59);
+
 //		alignment[35] = new int[]{6,30,54,78,102,126,150};
 //		alignment[36] = new int[]{6,24,50,76,102,128,154};
 //		alignment[37] = new int[]{6,28,54,80,106,132,158};

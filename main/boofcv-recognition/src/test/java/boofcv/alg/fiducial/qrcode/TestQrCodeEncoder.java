@@ -20,7 +20,7 @@ package boofcv.alg.fiducial.qrcode;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -51,4 +51,65 @@ public class TestQrCodeEncoder {
 			assertEquals(qr.dataRaw[i],expected[i]);
 		}
 	}
+
+	/**
+	 * Compare only the data portion against an example from the specification
+	 */
+	@Test
+	public void alphanumeric_specification() {
+		QrCodeEncoder encoder = new QrCodeEncoder();
+		encoder.setVersion(1).
+				setError(QrCode.ErrorLevel.H).
+				setMask(new QrCodeMaskPattern.NONE(0b011)).
+				alphanumeric("AC-42");
+
+
+		byte[] expected = new byte[]{0b00100000, 0b00101001, (byte)0b11001110, (byte)0b11100111, 0b00100001,0};
+
+		QrCodeEncoder.flipBits8(expected,expected.length);
+
+		assertEquals(encoder.packed.size/8,expected.length);
+		for (int i = 0; i < expected.length; i++) {
+			assertEquals(encoder.packed.data[i],expected[i]);
+		}
+	}
+
+	@Test
+	public void alphanumericToValues() {
+		byte found[] = QrCodeEncoder.alphanumericToValues("14AE%*+-./:");
+		byte expected[] = new byte[]{1,4,10,14,38,39,40,41,42,43,44};
+
+		assertArrayEquals(expected,found);
+	}
+
+	@Test
+	public void autoSelectVersion() {
+		fail("Implement");
+	}
+
+	@Test
+	public void autoSelectMask() {
+		fail("Implement");
+	}
+
+	@Test
+	public void autoSelectErrorCorrection() {
+		fail("Implement");
+	}
+
+	@Test
+	public void manuialVersion() {
+		fail("Implement");
+	}
+
+	@Test
+	public void manuialMask() {
+		fail("Implement");
+	}
+
+	@Test
+	public void manuialErrorCorrection() {
+		fail("Implement");
+	}
+
 }

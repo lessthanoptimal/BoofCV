@@ -47,6 +47,7 @@ public class QrCodeEncoder {
 	boolean autoMask = true;
 
 	// workspace variables
+	PackedBits8 packed = new PackedBits8();
 	GrowQueue_I8 input = new GrowQueue_I8();
 	GrowQueue_I8 ecc = new GrowQueue_I8();
 
@@ -98,9 +99,7 @@ public class QrCodeEncoder {
 		else
 			lengthBits = 14;
 
-		int totalBits = lengthBits + 10*(numbers.length/3);
-
-		PackedBits8 packed = new PackedBits8(totalBits);
+		packed.resize(lengthBits + 10*(numbers.length/3)); // predeclare memory
 		packed.size = 0; // set size to 0 so that append() starts from the front
 
 		// specify the mode
@@ -132,8 +131,97 @@ public class QrCodeEncoder {
 		return qr;
 	}
 
-	public QrCode alphaNumeric( String alphaNumeric ) {
-		return null;
+	public QrCode alphanumeric( String alphaNumeric ) {
+		byte values[] = alphanumericToValues(alphaNumeric);
+
+		int lengthBits;
+
+		if (qr.version < 10)
+			lengthBits = 9;
+		else if (qr.version < 27)
+			lengthBits = 11;
+		else
+			lengthBits = 13;
+
+		packed.resize(lengthBits + 11*(values.length/2+1)); // predeclare memory
+		packed.size = 0; // set size to 0 so that append() starts from the front
+
+		// specify the mode
+		packed.append(0b0010,4,false);
+
+		// Specify the number of digits
+		packed.append(values.length,lengthBits,false);
+
+		// Append the digits
+		int index = 0;
+		while( values.length-index >= 2 ) {
+			int value = values[index] * 45 + values[index+1];
+			packed.append(value,11,false);
+			index += 2;
+		}
+		if( values.length-index == 1 ) {
+			int value = values[index];
+			packed.append(value,6,false);
+		}
+
+		// add the terminator to the bit stream
+		packed.append(0b0000,4,false);
+
+		packed.print();
+
+		bitsToMessage(packed);
+
+		return qr;
+	}
+
+	protected static byte[] alphanumericToValues( String data ) {
+		byte[] output = new byte[ data.length() ];
+
+		for (int i = 0; i < data.length(); i++) {
+			char c = data.charAt(i);
+			if( Character.isDigit(c)) {
+				output[i] = (byte)(c-'0');
+			} else {
+				int value = (int)(Character.toUpperCase(c)-'A');
+				if( value >= 0 && value < 36 ) {
+					output[i] = (byte)(10+value);
+				} else {
+					switch(c) {
+						case ' ':
+							output[i] = 36; break;
+
+						case '$':
+							output[i] = 37; break;
+
+						case '%':
+							output[i] = 38; break;
+
+						case '*':
+							output[i] = 39; break;
+
+						case '+':
+							output[i] = 40; break;
+
+						case '-':
+							output[i] = 41; break;
+
+						case '.':
+							output[i] = 42; break;
+
+						case '/':
+							output[i] = 43; break;
+
+						case ':':
+							output[i] = 44; break;
+
+							default:
+								throw new IllegalArgumentException("Unsupported character '"+c+"' = "+(int)c);
+
+					}
+				}
+			}
+		}
+		return output;
 	}
 
 	public QrCode bytes( byte[] data ) {
