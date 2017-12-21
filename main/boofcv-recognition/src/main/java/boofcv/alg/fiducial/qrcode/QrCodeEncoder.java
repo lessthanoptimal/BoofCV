@@ -225,7 +225,37 @@ public class QrCodeEncoder {
 	}
 
 	public QrCode bytes( byte[] data ) {
-		return null;
+		int lengthBits;
+
+		if (qr.version < 10)
+			lengthBits = 8;
+		else if (qr.version < 27)
+			lengthBits = 16;
+		else
+			lengthBits = 16;
+
+		packed.resize(lengthBits + 8*data.length); // predeclare memory
+		packed.size = 0; // set size to 0 so that append() starts from the front
+
+		// specify the mode
+		packed.append(0b0100,4,false);
+
+		// Specify the number of digits
+		packed.append(data.length,lengthBits,false);
+
+		// Append the digits
+		for (int i = 0; i < data.length; i++) {
+			packed.append(data[i]&0xff,8,false);
+		}
+
+		// add the terminator to the bit stream
+		packed.append(0b0000,4,false);
+
+		packed.print();
+
+		bitsToMessage(packed);
+
+		return qr;
 	}
 
 	public QrCode kanji( short[] kanji ) {
