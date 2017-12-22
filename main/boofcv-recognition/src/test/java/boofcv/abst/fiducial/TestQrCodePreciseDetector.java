@@ -22,8 +22,7 @@ import boofcv.factory.fiducial.ConfigQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.struct.image.GrayF32;
 
-public class TestQrCodePreciseScanner extends GenericQrCodeDetectorChecks {
-
+public class TestQrCodePreciseDetector extends GenericQrCodeDetectorChecks {
 
 	@Override
 	protected QrCodeDetector<GrayF32> createDetector() {

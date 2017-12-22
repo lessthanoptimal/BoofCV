@@ -37,54 +37,62 @@ public class TestQrCodeDecoder {
 	 */
 	@Test
 	public void message_numeric() {
-		QrCode expected = new QrCodeEncoder().setVersion(1).
-				setError(QrCode.ErrorLevel.M).
-				setMask(QrCodeMaskPattern.M011).
-				numeric("01234567");
+		String message = "";
+		for (int i = 0; i < 20; i++) {
+			QrCode expected = new QrCodeEncoder().setVersion(1).
+					setError(QrCode.ErrorLevel.M).
+					setMask(QrCodeMaskPattern.M011).
+					numeric(message);
 
-		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
-		generator.render(expected);
-		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
+			QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+			generator.render(expected);
+			FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
 
 //		ShowImages.showWindow(generator.gray,"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
-		decoder.process(pps,generator.gray);
+			QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
+			decoder.process(pps,generator.gray);
 
-		assertEquals(1,decoder.successes.size());
-		QrCode found = decoder.getFound().get(0);
+			assertEquals(1,decoder.successes.size());
+			QrCode found = decoder.getFound().get(0);
 
-		assertEquals(expected.version,found.version);
-		assertEquals(expected.error,found.error);
-		assertEquals(expected.mode,found.mode);
-		assertEquals("01234567",new String(found.message));
+			assertEquals(expected.version,found.version);
+			assertEquals(expected.error,found.error);
+			assertEquals(expected.mode,found.mode);
+			assertEquals(message,new String(found.message));
+			message += (i%10)+"";
+		}
 	}
 
 	@Test
 	public void message_alphanumeric() {
-		QrCode expected = new QrCodeEncoder().setVersion(2).
-				setError(QrCode.ErrorLevel.M).
-				setMask(QrCodeMaskPattern.M011).
-				alphanumeric("01234567ABCD%*+-./:");
+		String messages[] = new String[]{"","0","12","123","1234","12345","01234567ABCD%*+-./:"};
 
-		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
-		generator.render(expected);
-		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
+		for( String message : messages ) {
+			QrCode expected = new QrCodeEncoder().setVersion(2).
+					setError(QrCode.ErrorLevel.M).
+					setMask(QrCodeMaskPattern.M011).
+					alphanumeric(message);
+
+			QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+			generator.render(expected);
+			FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
 
 //		ShowImages.showWindow(generator.gray,"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
-		decoder.process(pps,generator.gray);
+			QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
+			decoder.process(pps, generator.gray);
 
-		assertEquals(1,decoder.successes.size());
-		QrCode found = decoder.getFound().get(0);
+			assertEquals(1, decoder.successes.size());
+			QrCode found = decoder.getFound().get(0);
 
-		assertEquals(expected.version,found.version);
-		assertEquals(expected.error,found.error);
-		assertEquals(expected.mode,found.mode);
-		assertEquals("01234567ABCD%*+-./:",new String(found.message));
+			assertEquals(expected.version, found.version);
+			assertEquals(expected.error, found.error);
+			assertEquals(expected.mode, found.mode);
+			assertEquals(message, new String(found.message));
+		}
 	}
 
 	@Test

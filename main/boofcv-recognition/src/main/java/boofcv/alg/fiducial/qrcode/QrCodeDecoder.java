@@ -357,6 +357,9 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		bits.data = qr.rawdata;
 		bits.size = qr.rawdata.length*8;
 
+//		System.out.println("decoded message");
+//		bits.print();System.out.println();
+
 		int modeBits = bits.read(0,4,true);
 		switch( modeBits ) {
 			case 0b0001: qr.mode = QrCode.Mode.NUMERIC;break;
@@ -453,7 +456,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		qr.message = new char[length];
 
 		int i = 0;
-		for (; i+3 < length; i += 3) {
+		for (; i+2 < length; i += 3) {
 			int chunk = data.read(bitLocation,10,true);
 			bitLocation += 10;
 
@@ -499,7 +502,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		qr.message = new char[length];
 
 		int i = 0;
-		for (; i+2 < length; i += 2) {
+		for (; i+1 < length; i += 2) {
 			int chunk = data.read(bitLocation,11,true);
 			bitLocation += 11;
 

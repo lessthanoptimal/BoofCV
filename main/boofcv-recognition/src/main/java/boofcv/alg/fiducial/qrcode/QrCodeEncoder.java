@@ -377,6 +377,9 @@ public class QrCodeEncoder {
 		// add padding to make it align to 8
 		stream.append(0,(8-(stream.size%8))%8,false);
 
+//		System.out.println("encoded message");
+//		stream.print();System.out.println();
+
 		QrCode.VersionInfo info = QrCode.VERSION_INFO[qr.version];
 		QrCode.ErrorBlock block = info.levels.get(qr.error);
 

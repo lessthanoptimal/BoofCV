@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.fiducial;
 
-import boofcv.abst.fiducial.QrCodePreciseScanner;
+import boofcv.abst.fiducial.QrCodePreciseDetector;
 import boofcv.alg.fiducial.calib.squares.SquareEdge;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.fiducial.qrcode.PositionPatternNode;
@@ -64,7 +64,7 @@ import java.util.List;
 public class DetectQrCodeApp<T extends ImageGray<T>>
 		extends DetectBlackShapeAppBase implements ShapeGuiListener
 {
-	QrCodePreciseScanner<T> detector;
+	QrCodePreciseDetector<T> detector;
 
 	public DetectQrCodeApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);

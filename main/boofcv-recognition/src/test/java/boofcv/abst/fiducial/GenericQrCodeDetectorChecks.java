@@ -26,6 +26,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.ConvertImage;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.calibration.CalibrationIO;
+import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.simulation.SimulatePlanarWorld;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -193,6 +194,7 @@ public abstract class GenericQrCodeDetectorChecks {
 		if( display ) {
 			ShowImages.showWindow(simulator.getOutput(), "Foo", true);
 			BoofMiscOps.sleep(200);
+			UtilImageIO.saveImage(simulator.getOutput(),"qrcode_rendered.png");
 		}
 
 		List<QrCode> detections = detector.getDetections();

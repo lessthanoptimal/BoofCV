@@ -147,7 +147,7 @@ public class FactoryFiducial {
 	}
 
 	public static <T extends ImageGray<T>>
-	QrCodePreciseScanner<T> qrcode(ConfigQrCode config, Class<T> imageType) {
+	QrCodePreciseDetector<T> qrcode(ConfigQrCode config, Class<T> imageType) {
 		config.checkValidity();
 
 		InputToBinary<T> inputToBinary = FactoryThresholdBinary.threshold(config.threshold,imageType);
@@ -156,7 +156,7 @@ public class FactoryFiducial {
 		QrCodePositionPatternDetector<T> detectPositionPatterns =
 				new QrCodePositionPatternDetector<>(squareDetector,config.versionMaximum);
 
-		return new QrCodePreciseScanner<>(inputToBinary,detectPositionPatterns,imageType);
+		return new QrCodePreciseDetector<>(inputToBinary,detectPositionPatterns,imageType);
 	}
 
 }

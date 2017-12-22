@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @param <T>
  */
-public class QrCodePreciseScanner<T extends ImageGray<T>> implements QrCodeDetector<T>
+public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDetector<T>
 {
 	QrCodePositionPatternDetector<T> detectPositionPatterns;
 	QrCodeDecoder<T> decoder;
@@ -47,7 +47,7 @@ public class QrCodePreciseScanner<T extends ImageGray<T>> implements QrCodeDetec
 	protected MovingAverage milliBinary = new MovingAverage(0.8);
 	protected MovingAverage milliDecoding = new MovingAverage(0.8);
 
-	public QrCodePreciseScanner( InputToBinary<T> inputToBinary,
+	public QrCodePreciseDetector(InputToBinary<T> inputToBinary,
 								 QrCodePositionPatternDetector<T> detectPositionPatterns ,
 								 Class<T> imageType ) {
 		this.inputToBinary = inputToBinary;
@@ -90,8 +90,13 @@ public class QrCodePreciseScanner<T extends ImageGray<T>> implements QrCodeDetec
 		return decoder.getFailures();
 	}
 
+	public GrayU8 getBinary() {
+		return binary;
+	}
+
 	public void resetRuntimeProfiling() {
 		milliBinary.reset();
+		milliDecoding.reset();
 		detectPositionPatterns.resetRuntimeProfiling();
 	}
 
