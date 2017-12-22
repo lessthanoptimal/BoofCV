@@ -18,36 +18,17 @@
 
 package boofcv.abst.fiducial;
 
-import org.junit.Test;
+import boofcv.factory.fiducial.ConfigQrCode;
+import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.struct.image.GrayF32;
 
-import static org.junit.Assert.fail;
+public class TestQrCodePreciseScanner extends GenericQrCodeDetectorChecks {
 
-public class TestQrCodePreciseScanner {
 
-	/**
-	 * See if a clear well defined qr code can be detected while rating
-	 */
-	@Test
-	public void rotation() {
-		fail("Implement");
+	@Override
+	protected QrCodeDetector<GrayF32> createDetector() {
+		ConfigQrCode config = new ConfigQrCode();
+
+		return FactoryFiducial.qrcode(config,GrayF32.class);
 	}
-
-
-	/**
-	 * See if the qr code can be detected under perspective distortion
-	 */
-	@Test
-	public void perspective() {
-		fail("Implement");
-	}
-
-	/**
-	 * See if the QR-Code can be detected under mild lens distortion
-	 */
-	@Test
-	public void lens() {
-		fail("Implement");
-	}
-
-
 }

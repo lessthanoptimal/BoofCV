@@ -20,6 +20,8 @@ package boofcv.factory.fiducial;
 
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.ConfigThresholdLocalOtsu;
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
@@ -32,7 +34,7 @@ import boofcv.struct.ConnectRule;
  */
 public class ConfigQrCode implements Configuration {
 
-	public ConfigThreshold threshold = new ConfigThreshold();
+	public ConfigThreshold threshold;
 
 	public ConfigPolygonDetector polygon = new ConfigPolygonDetector();
 
@@ -40,6 +42,14 @@ public class ConfigQrCode implements Configuration {
 	public int versionMaximum = 40;
 
 	{
+
+		ConfigThresholdLocalOtsu configThreshold = ConfigThreshold.local(ThresholdType.BLOCK_OTSU,20);
+		configThreshold.scale = 1.0;
+		configThreshold.thresholdFromLocalBlocks = false;
+		configThreshold.tuning = 5;
+
+		threshold = configThreshold;
+
 		polygon.detector.contourRule = ConnectRule.EIGHT;
 		polygon.detector.clockwise = false;
 		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).maxSideError = ConfigLength.relative(0.08,3);
