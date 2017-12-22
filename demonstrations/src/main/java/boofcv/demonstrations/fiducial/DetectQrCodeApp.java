@@ -241,6 +241,28 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		}
 	}
 
+	@Override
+	public void viewUpdated() {
+		BufferedImage active = null;
+		if( controls.selectedView == 0 ) {
+			active = original;
+		} else if( controls.selectedView == 1 ) {
+			VisualizeBinaryData.renderBinary(detector.getBinary(),false,work);
+			active = work;
+			work.setRGB(0, 0, work.getRGB(0, 0)); // hack so that Swing knows it's been modified
+		} else {
+			Graphics2D g2 = work.createGraphics();
+			g2.setColor(Color.BLACK);
+			g2.fillRect(0,0,work.getWidth(),work.getHeight());
+			active = work;
+		}
+
+		guiImage.setBufferedImage(active);
+		guiImage.setScale(controls.zoom);
+
+		guiImage.repaint();
+	}
+
 	public static void main(String[] args) {
 
 		List<String> examples = new ArrayList<>();
