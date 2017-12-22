@@ -61,11 +61,39 @@ public class TestQrCodeDecoder {
 		assertEquals("01234567",new String(found.message));
 	}
 
+	@Test
+	public void message_alphanumeric() {
+		QrCode expected = new QrCodeEncoder().setVersion(2).
+				setError(QrCode.ErrorLevel.M).
+				setMask(QrCodeMaskPattern.M011).
+				alphanumeric("01234567ABCD%*+-./:");
+
+		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+		generator.render(expected);
+		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
+
+//		ShowImages.showWindow(generator.gray,"QR Code", true);
+//		BoofMiscOps.sleep(100000);
+
+		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
+		decoder.process(pps,generator.gray);
+
+		assertEquals(1,decoder.found.size);
+		QrCode found = decoder.getFound().get(0);
+
+		assertEquals(expected.version,found.version);
+		assertEquals(expected.error,found.error);
+		assertEquals(expected.mode,found.mode);
+		assertEquals("01234567ABCD%*+-./:",new String(found.message));
+	}
+
 	/**
 	 * Runs through the entire algorithm using a rendered image
 	 */
 	@Test
 	public void full_simple() {
+//		full_simple(7, QrCode.ErrorLevel.M, QrCodeMaskPattern.M010);
+
 		for( QrCode.ErrorLevel error : QrCode.ErrorLevel.values() ) {
 			for( QrCodeMaskPattern mask : QrCodeMaskPattern.values() ) {
 				full_simple(1,error, mask);
@@ -78,9 +106,10 @@ public class TestQrCodeDecoder {
 	}
 
 	public void full_simple(int version, QrCode.ErrorLevel error , QrCodeMaskPattern mask ) {
+//		System.out.println("version "+version+" error "+error+" mask "+mask);
 		QrCode expected = new QrCodeEncoder().setVersion(version).
 				setError(error).
-				setMask(QrCodeMaskPattern.M011).
+				setMask(mask).
 				numeric("01234567");
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);

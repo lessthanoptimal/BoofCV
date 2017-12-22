@@ -140,7 +140,6 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		if( !extractVersionInfo(qr) )
 			return false;
 		if( !alignmentLocator.process(gray,qr )) {
-			System.out.println("Failed alignment pattern");
 			return false;
 		}
 		if( !readRawData(qr) ) {
@@ -269,9 +268,9 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 */
 	private boolean applyErrorCorrection(QrCode qr) {
 
-		System.out.println("decoder ver   "+qr.version);
-		System.out.println("decoder mask  "+qr.mask);
-		System.out.println("decoder error "+qr.error);
+//		System.out.println("decoder ver   "+qr.version);
+//		System.out.println("decoder mask  "+qr.mask);
+//		System.out.println("decoder error "+qr.error);
 
 		QrCode.VersionInfo info = QrCode.VERSION_INFO[qr.version];
 		QrCode.ErrorBlock block = info.levels.get(qr.error);
@@ -305,17 +304,14 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		for (int idxBlock = 0; idxBlock < numberOfBlocks; idxBlock++) {
 			copyFromRawData(qr.rawbits,message,ecc,offsetBlock+idxBlock,stride,offsetEcc);
 
-			System.out.println("decoder");
-			message.printHex();System.out.println();
 			QrCodeEncoder.flipBits8(message);
 			QrCodeEncoder.flipBits8(ecc);
 
 			if( !rscodes.correct(message,ecc) ) {
 				return false;
 			}
+
 			QrCodeEncoder.flipBits8(message);
-			System.out.println("decoder");
-			message.printHex();System.out.println();
 			System.arraycopy(message.data,0,qr.rawdata,bytesDataRead,message.size);
 			bytesDataRead += message.size;
 		}
@@ -349,8 +345,6 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 				return false;
 		}
 
-		System.out.println("Mode "+qr.mode);
-
 		int lengthBits;
 		switch( qr.mode ) {
 			case NUMERIC: lengthBits = decodeNumeric(qr,bits); break;
@@ -377,19 +371,28 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		return checkPaddingBytes(qr, lengthBytes);
 	}
 
-	private int alignToBytes(int lengthBits) {
+	private static int alignToBytes(int lengthBits) {
 		return lengthBits + (8-lengthBits%8)%8;
 	}
 
 	private boolean checkPaddingBytes(QrCode qr, int lengthBytes) {
 		boolean a = true;
+
 		for (int i = lengthBytes; i < qr.rawdata.length; i++) {
-			if( a ) {
-				if( 0b00110111 != (qr.rawdata[i]&0xFF))
+			if (a) {
+				if (0b00110111 != (qr.rawdata[i] & 0xFF))
 					return false;
 			} else {
-				if( 0b10001000 != (qr.rawdata[i]&0xFF))
-					return false;
+				if (0b10001000 != (qr.rawdata[i] & 0xFF)) {
+					// the pattern starts over at the beginning of a block. Strictly enforcing the standard
+					// requires knowing size of a data chunk and where it starts. Possible but
+					// probably not worth the effort the implement as a strict requirement.
+					if (0b00110111 == (qr.rawdata[i] & 0xFF)) {
+						a = true;
+					} else {
+						return false;
+					}
+				}
 			}
 			a = !a;
 		}
