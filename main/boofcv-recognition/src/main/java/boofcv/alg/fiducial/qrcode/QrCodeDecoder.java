@@ -29,6 +29,8 @@ import org.ddogleg.struct.GrowQueue_I8;
 
 import java.util.List;
 
+import static boofcv.alg.fiducial.qrcode.QrCodeEncoder.valueToAlphanumeric;
+
 /**
  * TODO document
  *
@@ -348,7 +350,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		int lengthBits;
 		switch( qr.mode ) {
 			case NUMERIC: lengthBits = decodeNumeric(qr,bits); break;
-			case ALPHANUMERIC: lengthBits = decodeNumeric(qr,bits); break;
+			case ALPHANUMERIC: lengthBits = decodeAlphanumeric(qr,bits); break;
 			case BYTE: lengthBits = decodeNumeric(qr,bits); break;
 			case KANJI: lengthBits = decodeNumeric(qr,bits); break;
 			case ECI:throw new RuntimeException("Not supported yet");
@@ -446,6 +448,48 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		return bitLocation;
 	}
 
+	/**
+	 * Decodes alphanumeric messages
+	 *
+	 * @param qr QR code
+	 * @param data encoded data
+	 * @return Location it has read up to in bits
+	 */
+	private int decodeAlphanumeric( QrCode qr , PackedBits8 data ) {
+		int lengthBits = QrCodeEncoder.getLengthBitsAlphanumeric(qr.version);
+
+		int bitLocation = 4;
+		int length = data.read(bitLocation,lengthBits,true);
+		bitLocation += lengthBits;
+
+		qr.message = new char[length];
+
+		int i = 0;
+		for (; i+2 < length; i += 2) {
+			int chunk = data.read(bitLocation,11,true);
+			bitLocation += 11;
+
+			int valA = chunk/45;
+			int valB = chunk-valA*45;
+
+			qr.message[i] = valueToAlphanumeric(valA);
+			qr.message[i+1] =  valueToAlphanumeric(valB);
+		}
+
+		if( length-i == 1 ) {
+			int valA = data.read(bitLocation,6,true);
+			bitLocation += 6;
+			qr.message[i] = valueToAlphanumeric(valA);
+		}
+		return bitLocation;
+	}
+
+	/**
+	 * Reads a bit from the image.
+	 * @param bit Index the bit will be written to
+	 * @param row row in qr code grid
+	 * @param col column in qr code grid
+	 */
 	private void read(int bit , int row , int col ) {
 		int value = squareDecoder.read(row,col);
 		if( value == -1 ) {

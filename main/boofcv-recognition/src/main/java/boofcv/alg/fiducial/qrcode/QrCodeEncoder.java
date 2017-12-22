@@ -184,7 +184,7 @@ public class QrCodeEncoder {
 		return qr;
 	}
 
-	protected static byte[] alphanumericToValues( String data ) {
+	public static byte[] alphanumericToValues( String data ) {
 		byte[] output = new byte[ data.length() ];
 
 		for (int i = 0; i < data.length(); i++) {
@@ -224,14 +224,33 @@ public class QrCodeEncoder {
 						case ':':
 							output[i] = 44; break;
 
-							default:
-								throw new IllegalArgumentException("Unsupported character '"+c+"' = "+(int)c);
+						default:
+							throw new IllegalArgumentException("Unsupported character '"+c+"' = "+(int)c);
 
 					}
 				}
 			}
 		}
 		return output;
+	}
+
+	public static char valueToAlphanumeric( int value ) {
+		if( value <= 9 )
+			return (char)(value+'0');
+		if( value < 36 )
+			return (char)(value-10+'A');
+		switch(value) {
+			case 36: return ' ';
+			case 37: return '$';
+			case 38: return '%';
+			case 39: return '*';
+			case 40: return '+';
+			case 41: return '-';
+			case 42: return '.';
+			case 43: return '/';
+			case 44: return ':';
+			default: throw new IllegalArgumentException("value out of range");
+		}
 	}
 
 	/**
@@ -334,6 +353,9 @@ public class QrCodeEncoder {
 		return getLengthBits( version, 8, 10, 12);
 	}
 
+	/**
+	 * Returns the length of the message length variable in bits. Dependent on version
+	 */
 	private static int getLengthBits( int version , int bitsA , int bitsB , int bitsC ) {
 		int lengthBits;
 
