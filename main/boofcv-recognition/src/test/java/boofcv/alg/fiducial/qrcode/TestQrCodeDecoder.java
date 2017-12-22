@@ -52,7 +52,7 @@ public class TestQrCodeDecoder {
 		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
 		decoder.process(pps,generator.gray);
 
-		assertEquals(1,decoder.found.size);
+		assertEquals(1,decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);
 
 		assertEquals(expected.version,found.version);
@@ -78,13 +78,65 @@ public class TestQrCodeDecoder {
 		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
 		decoder.process(pps,generator.gray);
 
-		assertEquals(1,decoder.found.size);
+		assertEquals(1,decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);
 
 		assertEquals(expected.version,found.version);
 		assertEquals(expected.error,found.error);
 		assertEquals(expected.mode,found.mode);
 		assertEquals("01234567ABCD%*+-./:",new String(found.message));
+	}
+
+	@Test
+	public void message_byte() {
+		QrCode expected = new QrCodeEncoder().setVersion(2).
+				setError(QrCode.ErrorLevel.M).
+				setMask(QrCodeMaskPattern.M011).
+				bytes(new byte[]{0x1f,0x22,0x56,(byte)0xFF});
+
+		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+		generator.render(expected);
+		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
+
+//		ShowImages.showWindow(generator.gray,"QR Code", true);
+//		BoofMiscOps.sleep(100000);
+
+		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
+		decoder.process(pps,generator.gray);
+
+		assertEquals(1,decoder.successes.size());
+		QrCode found = decoder.getFound().get(0);
+
+		assertEquals(expected.version,found.version);
+		assertEquals(expected.error,found.error);
+		assertEquals(expected.mode,found.mode);
+		assertEquals("1F2256FF",new String(found.message));
+	}
+
+	@Test
+	public void message_kanji() {
+		QrCode expected = new QrCodeEncoder().setVersion(2).
+				setError(QrCode.ErrorLevel.M).
+				setMask(QrCodeMaskPattern.M011).
+				kanji("阿ん鞠ぷへ≦Ｋ");
+
+		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+		generator.render(expected);
+		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
+
+//		ShowImages.showWindow(generator.gray,"QR Code", true);
+//		BoofMiscOps.sleep(100000);
+
+		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
+		decoder.process(pps,generator.gray);
+
+		assertEquals(1,decoder.successes.size());
+		QrCode found = decoder.getFound().get(0);
+
+		assertEquals(expected.version,found.version);
+		assertEquals(expected.error,found.error);
+		assertEquals(expected.mode,found.mode);
+		assertEquals("阿ん鞠ぷへ≦Ｋ",new String(found.message));
 	}
 
 	/**
@@ -125,7 +177,7 @@ public class TestQrCodeDecoder {
 
 		decoder.process(pps,generator.gray);
 
-		assertEquals(1,decoder.found.size);
+		assertEquals(1,decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);
 
 		// Check format info

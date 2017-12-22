@@ -93,17 +93,22 @@ public class QrCode {
 	/**
 	 * The raw byte data encoded into the QR Code. data + ecc
 	 */
-	public byte[] rawbits = new byte[0];
+	public byte[] rawbits = null;
 
 	/**
 	 * Raw message after error correction has been applied to it
 	 */
-	public byte[] rawdata = new byte[0];
+	public byte[] rawdata = null;
 
 	/**
 	 * If applicable the message is decoded into a sequence of characters.
 	 */
 	public char[] message = null;
+
+	/**
+	 * Specifies where the QR code parsing failed
+	 */
+	public Failure failureCause = Failure.NONE;
 
 	/**
 	 * Approximate bounding box for QR-Code. The bottom right corner is estimated by intersecting lines
@@ -387,6 +392,10 @@ public class QrCode {
 		mask = QrCodeMaskPattern.M111;
 		alignment.reset();
 		mode = Mode.ALPHANUMERIC;
+		failureCause = Failure.NONE;
+		rawbits = null;
+		rawdata = null;
+		message = null;
 	}
 
 	/**
@@ -496,5 +505,20 @@ public class QrCode {
 		ALPHANUMERIC,
 		BYTE,
 		KANJI
+	}
+
+	/**
+	 * Specifies the step at which decoding failed
+	 */
+	public enum Failure {
+		NONE,
+		FORMAT,
+		VERSION,
+		ALIGNMENT,
+		READING_BITS,
+		CORRECTING_ERRORS,
+		READING_PADDING,
+		DECODING_MESSAGE,
+		KANJI_UNAVAILABLE
 	}
 }

@@ -27,8 +27,11 @@ import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I8;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
+import static boofcv.alg.fiducial.qrcode.QrCode.Failure.KANJI_UNAVAILABLE;
 import static boofcv.alg.fiducial.qrcode.QrCodeEncoder.valueToAlphanumeric;
 
 /**
@@ -46,7 +49,9 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	// storage fot the message's ecc
 	GrowQueue_I8 ecc = new GrowQueue_I8();
 
-	FastQueue<QrCode> found = new FastQueue<>(QrCode.class,true);
+	FastQueue<QrCode> storageQR = new FastQueue<>(QrCode.class,true);
+	List<QrCode> successes = new ArrayList<>();
+	List<QrCode> failures = new ArrayList<>();
 
 	SquareBitReader squareDecoder;
 	PackedBits32 bits = new PackedBits32();
@@ -69,22 +74,26 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 */
 	public void process(FastQueue<PositionPatternNode> pps , T gray ) {
 		squareDecoder.setImage(gray);
-		found.reset();
+		storageQR.reset();
+		successes.clear();
+		failures.clear();
 
 		for (int i = 0; i < pps.size; i++) {
 			PositionPatternNode ppn = pps.get(i);
 
 			for (int j = 3,k=0; k < 4; j=k,k++) {
 				if( ppn.edges[j] != null && ppn.edges[k] != null ) {
-					QrCode qr = found.grow();
+					QrCode qr = storageQR.grow();
 					qr.reset();
 
 					setPositionPatterns(ppn, j, k, qr);
 					computeBoundingBox(qr);
 
 					// Decode the entire marker now
-					if( !decode(gray,qr)) {
-						found.removeTail();
+					if( decode(gray,qr)) {
+						successes.add(qr);
+					} else {
+						failures.add(qr);
 					}
 
 				}
@@ -137,21 +146,30 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	}
 
 	private boolean decode( T gray , QrCode qr ) {
-		if( !extractFormatInfo(qr) )
+		if( !extractFormatInfo(qr) ) {
+			qr.failureCause = QrCode.Failure.FORMAT;
 			return false;
-		if( !extractVersionInfo(qr) )
+		}
+		if( !extractVersionInfo(qr) ) {
+			qr.failureCause = QrCode.Failure.VERSION;
 			return false;
+		}
 		if( !alignmentLocator.process(gray,qr )) {
+			qr.failureCause = QrCode.Failure.ALIGNMENT;
 			return false;
 		}
 		if( !readRawData(qr) ) {
+			qr.failureCause = QrCode.Failure.READING_BITS;
 			return false;
 		}
 		if( !applyErrorCorrection(qr)) {
+			qr.failureCause = QrCode.Failure.CORRECTING_ERRORS;
 			return false;
 		}
-		if( !decodeMessage(qr) )
+		if( !decodeMessage(qr) ) {
+			// error enum is set internally so that it can be more specific
 			return false;
+		}
 
 		return true;
 	}
@@ -344,6 +362,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			case 0b1000: qr.mode = QrCode.Mode.KANJI;break;
 //			case ECI:throw new RuntimeException("Not supported yet");
 			default:
+				qr.failureCause = QrCode.Failure.DECODING_MESSAGE;
 				return false;
 		}
 
@@ -351,18 +370,23 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		switch( qr.mode ) {
 			case NUMERIC: lengthBits = decodeNumeric(qr,bits); break;
 			case ALPHANUMERIC: lengthBits = decodeAlphanumeric(qr,bits); break;
-			case BYTE: lengthBits = decodeNumeric(qr,bits); break;
-			case KANJI: lengthBits = decodeNumeric(qr,bits); break;
+			case BYTE: lengthBits = decodeByte(qr,bits); break;
+			case KANJI: lengthBits = decodeKanji(qr,bits);break;
 			case ECI:throw new RuntimeException("Not supported yet");
 			default:throw new RuntimeException("Egads");
 		}
+
+		if( lengthBits < 0 )
+			return false;
 
 		// check terminator bits
 		int remaining = bits.size-lengthBits;
 		int read = Math.min(4,remaining);
 		int terminator = read==0?0:bits.read(lengthBits,read,false);
-		if( terminator != 0 )
+		if( terminator != 0 ) {
+			qr.failureCause = QrCode.Failure.DECODING_MESSAGE;
 			return false;
+		}
 		lengthBits += read;
 
 		// ensure the length is byte aligned
@@ -370,7 +394,12 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		int lengthBytes = lengthBits/8;
 
 		// sanity check padding
-		return checkPaddingBytes(qr, lengthBytes);
+		if( !checkPaddingBytes(qr, lengthBytes) ) {
+			qr.failureCause = QrCode.Failure.READING_PADDING;
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	private static int alignToBytes(int lengthBits) {
@@ -483,6 +512,77 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		}
 		return bitLocation;
 	}
+
+	/**
+	 * Decodes byte messages
+	 *
+	 * @param qr QR code
+	 * @param data encoded data
+	 * @return Location it has read up to in bits
+	 */
+	private int decodeByte( QrCode qr , PackedBits8 data ) {
+		int lengthBits = QrCodeEncoder.getLengthBitsBytes(qr.version);
+
+		int bitLocation = 4;
+		int length = data.read(bitLocation,lengthBits,true);
+		bitLocation += lengthBits;
+
+		qr.message = new char[length*2];
+
+		for (int i = 0; i < length; i++) {
+			String w = String.format("%02X",data.read(bitLocation,8,true));
+			qr.message[i*2] = w.charAt(0);
+			qr.message[i*2+1] = w.charAt(1);
+			bitLocation += 8;
+		}
+		return bitLocation;
+	}
+
+	/**
+	 * Decodes Kanji messages
+	 *
+	 * @param qr QR code
+	 * @param data encoded data
+	 * @return Location it has read up to in bits
+	 */
+	private int decodeKanji( QrCode qr , PackedBits8 data ) {
+		int lengthBits = QrCodeEncoder.getLengthBitsKanji(qr.version);
+
+		int bitLocation = 4;
+		int length = data.read(bitLocation,lengthBits,true);
+		bitLocation += lengthBits;
+
+		byte rawdata[] = new byte[ length*2 ];
+		qr.message = new char[length];
+
+		for (int i = 0; i < length; i++) {
+			int letter = data.read(bitLocation,13,true);
+			bitLocation += 13;
+
+			letter = ((letter/0x0C0) << 8) | (letter%0x0C0);
+
+			if (letter < 0x01F00) {
+				// In the 0x8140 to 0x9FFC range
+				letter += 0x08140;
+			} else {
+				// In the 0xE040 to 0xEBBF range
+				letter += 0x0C140;
+			}
+			rawdata[i*2] = (byte) (letter >> 8);
+			rawdata[i*2 + 1] = (byte) letter;
+		}
+
+		// Shift_JIS may not be supported in some environments:
+		try {
+			qr.message = new String(rawdata, "Shift_JIS").toCharArray();
+		} catch (UnsupportedEncodingException ignored) {
+			qr.failureCause = KANJI_UNAVAILABLE;
+			return -1;
+		}
+
+		return bitLocation;
+	}
+
 
 	/**
 	 * Reads a bit from the image.
@@ -637,7 +737,11 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		return alignmentLocator;
 	}
 
-	public FastQueue<QrCode> getFound() {
-		return found;
+	public List<QrCode> getFound() {
+		return successes;
+	}
+
+	public List<QrCode> getFailures() {
+		return failures;
 	}
 }

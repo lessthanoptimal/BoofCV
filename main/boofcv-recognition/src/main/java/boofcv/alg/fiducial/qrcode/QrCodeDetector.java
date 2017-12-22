@@ -22,7 +22,8 @@ import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.FastQueue;
+
+import java.util.List;
 
 /**
  * Quick Response (QR) Code detector.
@@ -44,6 +45,11 @@ public class QrCodeDetector<T extends ImageGray<T>> {
 	public void process(T gray, GrayU8 binary ) {
 		detectPositionPatterns.process(gray,binary);
 		decoder.process(detectPositionPatterns.getPositionPatterns(),gray);
+
+		System.out.println("Failed "+decoder.failures.size());
+		for( QrCode qr : decoder.failures ) {
+			System.out.println("  cause "+qr.failureCause);
+		}
 	}
 
 	public void resetRuntimeProfiling() {
@@ -58,7 +64,7 @@ public class QrCodeDetector<T extends ImageGray<T>> {
 		return detectPositionPatterns.getSquareDetector();
 	}
 
-	public FastQueue<QrCode> getDetections() {
+	public List<QrCode> getDetections() {
 		return decoder.getFound();
 	}
 

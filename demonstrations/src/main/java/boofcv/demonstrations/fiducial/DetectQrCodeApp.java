@@ -151,10 +151,10 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					VisualizeBinaryData.render(contours, null, Color.CYAN, scale, g2);
 				}
 
-				FastQueue<QrCode> detected = detector.getDetections();
+				List<QrCode> detected = detector.getDetections();
 
 				g2.setColor(new Color(0x50FF0000, true));
-				for (int i = 0; i < detected.size; i++) {
+				for (int i = 0; i < detected.size(); i++) {
 					QrCode qr = detected.get(i);
 					VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
 				}
@@ -170,7 +170,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 				}
 
 				if (controls.bShowAlignmentPattern) {
-					List<QrCode> codes = detector.getDetections().toList();
+					List<QrCode> codes = detector.getDetections();
 
 					g2.setColor(Color.BLUE);
 					g2.setStroke(new BasicStroke(3));
