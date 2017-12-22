@@ -40,6 +40,9 @@ import static boofcv.alg.fiducial.qrcode.QrCodeEncoder.valueToAlphanumeric;
  * @author Peter Abeles
  */
 // todo add more fine grained error reporting for why a decoding failed
+	// TODO clean up multiple packed bits
+	// TODO change QrCode to use GrowQueue's so that data can be recycled
+	// TODO better support for damaged qr codes with missing finder patterns.
 public class QrCodeDecoder<T extends ImageGray<T>> {
 
 	// used to compute error correction
@@ -360,9 +363,9 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			case 0b0010: qr.mode = QrCode.Mode.ALPHANUMERIC;break;
 			case 0b0100: qr.mode = QrCode.Mode.BYTE;break;
 			case 0b1000: qr.mode = QrCode.Mode.KANJI;break;
-//			case ECI:throw new RuntimeException("Not supported yet");
+			case 0b0111: qr.mode = QrCode.Mode.ECI;break;
 			default:
-				qr.failureCause = QrCode.Failure.DECODING_MESSAGE;
+				qr.failureCause = QrCode.Failure.UNKNOWN_MODE;
 				return false;
 		}
 
@@ -376,8 +379,10 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			default:throw new RuntimeException("Egads");
 		}
 
-		if( lengthBits < 0 )
+		if( lengthBits < 0 ) {
+			// cause is set inside of decoding function
 			return false;
+		}
 
 		// check terminator bits
 		int remaining = bits.size-lengthBits;

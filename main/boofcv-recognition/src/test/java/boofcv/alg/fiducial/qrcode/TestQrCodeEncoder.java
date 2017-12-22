@@ -81,6 +81,11 @@ public class TestQrCodeEncoder {
 		assertArrayEquals(expected,found);
 	}
 
+	@Test
+	public void valueToAlphanumeric() {
+		fail("Implement");
+	}
+
 	/**
 	 * Test comparing against a data stream that was successfully decoded by another qr-code reader
 	 */
