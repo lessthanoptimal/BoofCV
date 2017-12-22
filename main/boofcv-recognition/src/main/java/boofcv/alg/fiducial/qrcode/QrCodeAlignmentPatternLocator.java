@@ -68,6 +68,11 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	float arrayX[] = new float[12];
 	float arrayY[] = new float[12];
 
+	QrCode qr;
+
+	// input image size
+	int imageWidth,imageHeight;
+
 	// more work space
 	Point2D_F32 pixel = new Point2D_F32();
 	Point2D_F32 seed = new Point2D_F32();
@@ -88,9 +93,9 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	 * Uses the previously detected position patterns to seed the search for the alignment patterns
 	 */
 	public boolean process(T image , QrCode qr ) {
-		// version 1 has no alignment patterns
-		if( qr.version <= 1 )
-			return true;
+		this.imageWidth = image.width;
+		this.imageHeight = image.height;
+		this.qr = qr;
 
 		interpolate.setImage(image);
 
@@ -99,6 +104,9 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
 		initializePatterns(qr);
 
+		// version 1 has no alignment patterns
+		if( qr.version <= 1 )
+			return true;
 		return localizePositionPatterns(QrCode.VERSION_INFO[qr.version].alignment);
 	}
 
@@ -335,6 +343,33 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		imageToGrid.set(H_inv);
 
 		return true;
+	}
+
+	/**
+	 * Reads a bit from the qr code's data matrix while adjusting for location distortions using known
+	 * feature locations.
+	 * @param row grid row
+	 * @param col grid column
+	 * @return
+	 */
+	public int readBit( int row , int col ) {
+
+		// todo use adjustments from near by alignment patterns
+
+		float center = 0.5f;
+		gridToImage.compute(col+center,row+center,pixel);
+		if( pixel.x < -0.5 || pixel.y < -0.5 || pixel.x > imageWidth || pixel.y > imageHeight )
+			return -1;
+
+//		System.out.println("grid ("+row+" , "+col+") = "+pixel.x+" "+pixel.y+" = "+interpolate.get(pixel.x,pixel.y));
+
+//		float threshold = qr.threshCorner; // todo make this adaptive based on the location
+		float threshold = (float)(qr.threshCorner+qr.threshDown+qr.threshRight)/3.0f;
+
+		if( interpolate.get(pixel.x,pixel.y) < threshold )
+			return 1;
+		else
+			return 0;
 	}
 
 	private void set(int pairIndex , Polygon2D_F64 square , int squareIndex ) {

@@ -166,7 +166,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			return false;
 		}
 		if( !applyErrorCorrection(qr)) {
-			qr.failureCause = QrCode.Failure.CORRECTING_ERRORS;
+			qr.failureCause = QrCode.Failure.ERROR_CORRECTION;
 			return false;
 		}
 		if( !decodeMessage(qr) ) {
@@ -275,7 +275,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		// end at bits.size instead of locationBits.size because location might point to useless bits
 		for (int i = 0; i < bits8.size; i++ ) {
 			Point2D_I32 b = locationBits.get(i);
-			read8(i,b.y,b.x, qr.mask);
+			readDataMatrix(i,b.y,b.x, qr.mask);
 		}
 
 		// copy over the results
@@ -608,8 +608,8 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		bits.set(bit,value);
 	}
 
-	private void read8(int bit , int row , int col , QrCodeMaskPattern mask ) {
-		int value = squareDecoder.read(row,col);
+	private void readDataMatrix(int bit , int row , int col , QrCodeMaskPattern mask ) {
+		int value = alignmentLocator.readBit(row,col);
 		if( value == -1 ) {
 			// The requested region is outside the image. A partial QR code can be read so let's just
 			// assign it a value of zero and let error correction handle this

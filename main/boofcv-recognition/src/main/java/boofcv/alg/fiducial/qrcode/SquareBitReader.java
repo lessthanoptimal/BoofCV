@@ -38,6 +38,7 @@ import org.ejml.dense.row.misc.UnrolledInverseFromMinor_DDRM;
  *
  * @author Peter Abeles
  */
+// TODO Have the ability to use all the finder patterns and just the width.height based on version
 // TODO remove lens distortion
 public class SquareBitReader<T extends ImageGray<T>> {
 
@@ -74,7 +75,7 @@ public class SquareBitReader<T extends ImageGray<T>> {
 	 * Sets the square and defines coordinate system
 	 *
 	 * @param square Square that the grid is based around
-	 * @param threshold Threshold use to binarize image
+	 * @param threshold Threshold use to binary image
 	 * @return true if this operation was able to complete
 	 */
 	public boolean setSquare(Polygon2D_F64 square , float threshold ) {

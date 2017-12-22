@@ -175,10 +175,21 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 				List<QrCode> detected = detector.getDetections();
 
-				g2.setColor(new Color(0x50FF0000, true));
+				g2.setColor(new Color(0x5011FF00, true));
 				for (int i = 0; i < detected.size(); i++) {
 					QrCode qr = detected.get(i);
 					VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
+				}
+
+				List<QrCode> failures = detector.getFailures();
+
+				g2.setColor(new Color(0x50FF0000, true));
+				for (int i = 0; i < failures.size(); i++) {
+					QrCode qr = failures.get(i);
+					switch( qr.failureCause ) {
+						case ERROR_CORRECTION:
+							VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
+					}
 				}
 
 				if (controls.bShowSquares) {
