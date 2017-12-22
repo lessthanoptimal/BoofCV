@@ -72,22 +72,18 @@ public class ReidSolomonCodes {
 
 	/**
 	 * Decodes the message and performs any necessary error correction
-	 * @param input (Input) Message
+	 * @param input (Input) Corrupted Message (Output) corrected message
 	 * @param ecc (Input) error correction code for the message
-	 * @param output (Output) the error corrected message
 	 * @return true if it was successful or false if it failed
 	 */
-	public boolean decode( GrowQueue_I8 input ,
-						   GrowQueue_I8 ecc,
-						   GrowQueue_I8 output )
+	public boolean correct(GrowQueue_I8 input , GrowQueue_I8 ecc )
 	{
 		computeSyndromes(input,ecc,syndromes);
 		findErrorLocatorPolynomialBM(syndromes,errorLocatorPoly);
 		if( !findErrorLocations_BruteForce(errorLocatorPoly,input.size+ecc.size,errorLocations))
 			return false;
 
-		// todo output goes in output?
-//		correctErrors(input,syndromes.data,syndromes.size,errorLocations);
+		correctErrors(input,input.size+ecc.size,syndromes,errorLocatorPoly,errorLocations);
 		return true;
 	}
 

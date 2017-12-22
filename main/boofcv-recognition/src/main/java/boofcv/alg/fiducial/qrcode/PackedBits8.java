@@ -64,7 +64,7 @@ public class PackedBits8 implements PackedBits {
 	 */
 	public void append( int bits , int numberOfBits , boolean swapOrder ) {
 		if( numberOfBits > 32 )
-			throw new RuntimeException("Number of bits exceeds the size of bits");
+			throw new IllegalArgumentException("Number of bits exceeds the size of bits");
 		int indexTail = size;
 		growArray(numberOfBits,true);
 
@@ -77,6 +77,33 @@ public class PackedBits8 implements PackedBits {
 				set( indexTail + numberOfBits-i-1 , ( bits >> i ) & 1 );
 			}
 		}
+	}
+
+	/**
+	 * Read bits from the array and store them in an int
+	 * @param location The index of the first bit
+	 * @param length Number of bits to real up to 32
+	 * @param swapOrder Should the order be swapped?
+	 * @return The read in data
+	 */
+	public int read( int location , int length , boolean swapOrder ) {
+		if( length < 0 || length > 32 )
+			throw new IllegalArgumentException("Length can't exceed 32");
+		if( location + length > size )
+			throw new IllegalArgumentException("Attempting to read past the end");
+
+		// TODO speed up by reading in byte chunks
+		int output = 0;
+		if( swapOrder ) {
+			for (int i = 0; i < length; i++) {
+				output |= get(location+i) << (length-i-1);
+			}
+		} else {
+			for (int i = 0; i < length; i++) {
+				output |= get(location+i) << i;
+			}
+		}
+		return output;
 	}
 
 	public int getArray( int index ) {

@@ -18,6 +18,9 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Masks that are applied to the QR code toe ensure that there are no regions with "structure" in them. Avoid
  * accidentally having patterns that look like a finder pattern or alignment pattern.
@@ -36,6 +39,18 @@ public abstract class QrCodeMaskPattern {
 	public static final QrCodeMaskPattern M111 = new M111();
 
 	int bits;
+
+	public static List<QrCodeMaskPattern> values() {
+		List<QrCodeMaskPattern> values = new ArrayList<>();
+		values.add(M001);
+		values.add(M010);
+		values.add(M011);
+		values.add(M100);
+		values.add(M101);
+		values.add(M110);
+		values.add(M111);
+		return values;
+	}
 
 	public QrCodeMaskPattern( int bits ) {
 		this.bits = bits;
@@ -132,5 +147,10 @@ public abstract class QrCodeMaskPattern {
 			int mask = ((row*col)%3 + (row+col)%2)%2;
 			return bitValue^((~mask)&0x1);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 }

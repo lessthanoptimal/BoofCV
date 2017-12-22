@@ -25,8 +25,7 @@ import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -34,34 +33,61 @@ import static org.junit.Assert.assertTrue;
 public class TestQrCodeDecoder {
 
 	/**
+	 * Run the entire algorithm on a rendered image but just care about the message
+	 */
+	@Test
+	public void message_numeric() {
+		QrCode expected = new QrCodeEncoder().setVersion(1).
+				setError(QrCode.ErrorLevel.M).
+				setMask(QrCodeMaskPattern.M011).
+				numeric("01234567");
+
+		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+		generator.render(expected);
+		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
+
+//		ShowImages.showWindow(generator.gray,"QR Code", true);
+//		BoofMiscOps.sleep(100000);
+
+		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
+		decoder.process(pps,generator.gray);
+
+		assertEquals(1,decoder.found.size);
+		QrCode found = decoder.getFound().get(0);
+
+		assertEquals(expected.version,found.version);
+		assertEquals(expected.error,found.error);
+		assertEquals(expected.mode,found.mode);
+		assertEquals("01234567",new String(found.message));
+	}
+
+	/**
 	 * Runs through the entire algorithm using a rendered image
 	 */
 	@Test
 	public void full_simple() {
-		full_simple(1);
-		full_simple(2);
-		full_simple(7);
-		full_simple(40);
+		for( QrCode.ErrorLevel error : QrCode.ErrorLevel.values() ) {
+			for( QrCodeMaskPattern mask : QrCodeMaskPattern.values() ) {
+				full_simple(1,error, mask);
+				full_simple(2,error, mask);
+				full_simple(7, error, mask);
+				full_simple(20,error, mask);
+				full_simple(40,error, mask);
+			}
+		}
 	}
 
-	public void full_simple(int version) {
-		QrCode truthQr = new QrCode();
-		truthQr.version = version;
+	public void full_simple(int version, QrCode.ErrorLevel error , QrCodeMaskPattern mask ) {
+		QrCode expected = new QrCodeEncoder().setVersion(version).
+				setError(error).
+				setMask(QrCodeMaskPattern.M011).
+				numeric("01234567");
+
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
-		generator.render(truthQr);
+//		generator.renderData = false;
+		generator.render(expected);
 
-		FastQueue<PositionPatternNode> pps = new FastQueue<>(PositionPatternNode.class,true);
-
-		pps.grow().square = generator.qr.ppCorner;
-		pps.grow().square = generator.qr.ppRight;
-		pps.grow().square = generator.qr.ppDown;
-
-		for (int i = 0; i < pps.size; i++) {
-			pps.get(i).grayThreshold = 125;
-		}
-
-		connect(pps.get(1),pps.get(0),3,1);
-		connect(pps.get(2),pps.get(0),0,2);
+		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
 
 		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
 
@@ -74,8 +100,8 @@ public class TestQrCodeDecoder {
 		QrCode found = decoder.getFound().get(0);
 
 		// Check format info
-		assertEquals(truthQr.error,found.error);
-		assertTrue(truthQr.mask==found.mask);
+		assertEquals(expected.error,found.error);
+		assertTrue(expected.mask==found.mask);
 
 		// check version info
 		assertEquals(version,found.version);
@@ -101,6 +127,22 @@ public class TestQrCodeDecoder {
 			// TODO Check alignment pattern locations
 		}
 
+	}
+
+	private FastQueue<PositionPatternNode> createPositionPatterns(QrCodeGeneratorImage generator) {
+		FastQueue<PositionPatternNode> pps = new FastQueue<>(PositionPatternNode.class,true);
+
+		pps.grow().square = generator.qr.ppCorner;
+		pps.grow().square = generator.qr.ppRight;
+		pps.grow().square = generator.qr.ppDown;
+
+		for (int i = 0; i < pps.size; i++) {
+			pps.get(i).grayThreshold = 125;
+		}
+
+		connect(pps.get(1),pps.get(0),3,1);
+		connect(pps.get(2),pps.get(0),0,2);
+		return pps;
 	}
 
 	@Test
@@ -162,5 +204,30 @@ public class TestQrCodeDecoder {
 		assertTrue(qr.bounds.get(1).distance(3,0) < UtilEjml.TEST_F64);
 		assertTrue(qr.bounds.get(2).distance(3,3) < UtilEjml.TEST_F64);
 		assertTrue(qr.bounds.get(3).distance(0,3) < UtilEjml.TEST_F64);
+	}
+
+	@Test
+	public void applyErrorCorrection() {
+		fail("implement");
+	}
+
+	@Test
+	public void copyFromRawData() {
+		fail("implement");
+	}
+
+	@Test
+	public void decodeMessage() {
+		fail("implement");
+	}
+
+	@Test
+	public void alignToBytes() {
+		fail("implement");
+	}
+
+	@Test
+	public void checkPaddingBytes() {
+		fail("implement");
 	}
 }

@@ -32,7 +32,6 @@ import java.io.UnsupportedEncodingException;
  *
  * @author Peter Abeles
  */
-// TODO support Kanji
 	// TODO support ECI
 // TODO autoselect version
 	// TODO autoselect error correction
@@ -40,7 +39,7 @@ import java.io.UnsupportedEncodingException;
 public class QrCodeEncoder {
 
 	// used to compute error correction
-	ReidSolomonCodes codes = new ReidSolomonCodes(8,0b100011101);
+	ReidSolomonCodes rscodes = new ReidSolomonCodes(8,0b100011101);
 
 	// output qr code
 	QrCode qr = new QrCode();
@@ -52,7 +51,9 @@ public class QrCodeEncoder {
 
 	// workspace variables
 	PackedBits8 packed = new PackedBits8();
-	GrowQueue_I8 input = new GrowQueue_I8();
+	// storage for the data message
+	GrowQueue_I8 message = new GrowQueue_I8();
+	// storage fot the message's ecc
 	GrowQueue_I8 ecc = new GrowQueue_I8();
 
 	public QrCodeEncoder() {
@@ -105,14 +106,8 @@ public class QrCodeEncoder {
 			if( numbers[i] < 0 || numbers[i] > 9 )
 				throw new IllegalArgumentException("All numbers must have a value from 0 to 9");
 		}
-		int lengthBits;
-
-		if (qr.version < 10)
-			lengthBits = 10;
-		else if (qr.version < 27)
-			lengthBits = 12;
-		else
-			lengthBits = 14;
+		qr.mode = QrCode.Mode.NUMERIC;
+		int lengthBits = getLengthBitsNumeric(qr.version);
 
 		packed.resize(lengthBits + 10*(numbers.length/3)); // predeclare memory
 		packed.size = 0; // set size to 0 so that append() starts from the front
@@ -154,14 +149,9 @@ public class QrCodeEncoder {
 	public QrCode alphanumeric( String alphaNumeric ) {
 		byte values[] = alphanumericToValues(alphaNumeric);
 
-		int lengthBits;
+		qr.mode = QrCode.Mode.ALPHANUMERIC;
 
-		if (qr.version < 10)
-			lengthBits = 9;
-		else if (qr.version < 27)
-			lengthBits = 11;
-		else
-			lengthBits = 13;
+		int lengthBits = getLengthBitsAlphanumeric(qr.version);
 
 		packed.resize(lengthBits + 11*(values.length/2+1)); // predeclare memory
 		packed.size = 0; // set size to 0 so that append() starts from the front
@@ -250,14 +240,9 @@ public class QrCodeEncoder {
 	 * @return The QR-Code
 	 */
 	public QrCode bytes( byte[] data ) {
-		int lengthBits;
+		qr.mode = QrCode.Mode.BYTE;
 
-		if (qr.version < 10)
-			lengthBits = 8;
-		else if (qr.version < 27)
-			lengthBits = 16;
-		else
-			lengthBits = 16;
+		int lengthBits = getLengthBitsBytes(qr.version);
 
 		packed.resize(lengthBits + 8*data.length); // predeclare memory
 		packed.size = 0; // set size to 0 so that append() starts from the front
@@ -289,15 +274,9 @@ public class QrCodeEncoder {
 	 * @return The QR-Code
 	 */
 	public QrCode kanji( String message ) {
+		qr.mode = QrCode.Mode.KANJI;
 
-		int lengthBits;
-
-		if (qr.version < 10)
-			lengthBits = 8;
-		else if (qr.version < 27)
-			lengthBits = 10;
-		else
-			lengthBits = 12;
+		int lengthBits = getLengthBitsKanji(qr.version);
 
 		byte[] bytes;
 		try {
@@ -339,6 +318,35 @@ public class QrCodeEncoder {
 		return qr;
 	}
 
+	public static int getLengthBitsNumeric( int version ) {
+		return getLengthBits( version, 10, 12, 14);
+	}
+
+	public static int getLengthBitsAlphanumeric( int version ) {
+		return getLengthBits( version, 9, 11, 13);
+	}
+
+	public static int getLengthBitsBytes( int version ) {
+		return getLengthBits( version, 8, 16, 16);
+	}
+
+	public static int getLengthBitsKanji(int version) {
+		return getLengthBits( version, 8, 10, 12);
+	}
+
+	private static int getLengthBits( int version , int bitsA , int bitsB , int bitsC ) {
+		int lengthBits;
+
+		if (version < 10)
+			lengthBits = bitsA;
+		else if (version < 27)
+			lengthBits = bitsB;
+		else
+			lengthBits = bitsC;
+		return lengthBits;
+	}
+
+	// todo implement
 	public QrCode eci() {
 		return null;
 	}
@@ -350,7 +358,7 @@ public class QrCodeEncoder {
 		QrCode.VersionInfo info = QrCode.VERSION_INFO[qr.version];
 		QrCode.ErrorBlock block = info.levels.get(qr.error);
 
-		qr.dataRaw = new byte[info.codewords];
+		qr.rawbits = new byte[info.codewords];
 
 		// there are some times two different sizes of blocks. The smallest is written to first and the second
 		// is larger and can be derived from the size of the first
@@ -363,12 +371,12 @@ public class QrCodeEncoder {
 		int wordsBlockDataB = wordsBlockDataA + 1;
 		int numBlocksB = (info.codewords-wordsBlockAllA*numBlocksA)/wordsBlockAllB;
 
-		input.resize(wordsBlockDataA+1);
+		message.resize(wordsBlockDataA+1);
 
 		int startEcc = numBlocksA*wordsBlockDataA + numBlocksB*wordsBlockDataB;
 		int totalBlocks = numBlocksA + numBlocksB;
 
-		codes.generator(wordsEcc);
+		rscodes.generator(wordsEcc);
 		ecc.resize(wordsEcc);
 		encodeBlocks(stream, wordsBlockDataA, numBlocksA, 0, 0,startEcc, totalBlocks);
 		encodeBlocks(stream, wordsBlockDataB, numBlocksB, wordsBlockDataA*numBlocksA,numBlocksA, startEcc, totalBlocks);
@@ -376,24 +384,24 @@ public class QrCodeEncoder {
 
 	private void encodeBlocks(PackedBits8 stream, int bytesInDataBlock, int numberOfBlocks, int streamOffset,
 							  int blockOffset, int startEcc, int stride) {
-		input.size = bytesInDataBlock;
+		message.size = bytesInDataBlock;
 
 		for (int idxBlock = 0; idxBlock < numberOfBlocks; idxBlock++) {
 			// copy the portion of the stream that's being processed
 			int length = Math.min(bytesInDataBlock,Math.max(0,stream.arrayLength()-streamOffset));
 			if( length > 0 )
-				System.arraycopy(stream.data,streamOffset,input.data,0,length);
-			addPadding(input,length,0b00110111,0b10001000);
-			flipBits8(input);
+				System.arraycopy(stream.data,streamOffset, message.data,0,length);
+			addPadding(message,length,0b00110111,0b10001000);
+			flipBits8(message);
 
 			// compute the ecc
-			codes.computeECC(input,ecc);
-			flipBits8(input); flipBits8(ecc);
+			rscodes.computeECC(message,ecc);
+			flipBits8(message); flipBits8(ecc);
 
 			// write it into the output array
-			copyIntoRawData(input,ecc,idxBlock+blockOffset,stride,startEcc,qr.dataRaw);
+			copyIntoRawData(message,ecc,idxBlock+blockOffset,stride,startEcc,qr.rawbits);
 
-			streamOffset += input.size;
+			streamOffset += message.size;
 		}
 	}
 
@@ -445,6 +453,5 @@ public class QrCodeEncoder {
 		for (int i = 0; i < ecc.size; i++) {
 			output[i*stride+offset+startEcc] = ecc.data[i];
 		}
-
 	}
 }

@@ -46,9 +46,9 @@ public class TestQrCodeEncoder {
 
 		QrCodeEncoder.flipBits8(expected,expected.length);
 
-		assertEquals(qr.dataRaw.length,expected.length);
+		assertEquals(qr.rawbits.length,expected.length);
 		for (int i = 0; i < expected.length; i++) {
-			assertEquals(qr.dataRaw[i],expected[i]);
+			assertEquals(qr.rawbits[i],expected[i]);
 		}
 	}
 

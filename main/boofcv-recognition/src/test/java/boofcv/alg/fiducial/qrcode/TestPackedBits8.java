@@ -106,8 +106,20 @@ public class TestPackedBits8 {
 		assertEquals(1,values.get(5));
 		assertEquals(0,values.get(6));
 		assertEquals(1,values.get(7));
-
 	}
 
+	@Test
+	public void read() {
+		PackedBits8 values = new PackedBits8(0);
 
+		values.append(0b1101,4,true);
+		values.append(0b00011,5,true);
+
+		assertEquals(0b1101,values.read(0,4,false));
+		assertEquals(0b00011,values.read(4,5,false));
+
+		assertEquals(0b1011,values.read(0,4,true));
+		assertEquals(0b11000,values.read(4,5,true));
+
+	}
 }

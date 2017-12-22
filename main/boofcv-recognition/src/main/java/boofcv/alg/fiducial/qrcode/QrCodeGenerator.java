@@ -35,6 +35,9 @@ public abstract class QrCodeGenerator {
 
 	double markerWidth;
 
+	// used to toggle rendering of data
+	boolean renderData=true;
+
 	// derived constants
 	double moduleWidth;
 	int numModules;
@@ -54,8 +57,6 @@ public abstract class QrCodeGenerator {
 		this.qr = qr;
 		this.numModules = QrCode.totalModules(qr.version);
 		this.moduleWidth = markerWidth/numModules;
-		if( qr.dataRaw.length != QrCode.VERSION_INFO[qr.version].codewords )
-			throw new RuntimeException("Unexpected length of raw data.");
 
 		init();
 		positionPattern(0,0, qr.ppCorner);
@@ -89,15 +90,21 @@ public abstract class QrCodeGenerator {
 			}
 		}
 
-		// mark which modules can store data
-		bitLocations = new QrCodeCodeWordLocations(qr.version).bits;
+		if( renderData ) {
 
-		int numBytes = bitLocations.size()/8;
-		if( numBytes != qr.dataRaw.length )
-			throw new RuntimeException("Egads. unexpected length of qrcode raw data");
+			if( qr.rawbits.length != QrCode.VERSION_INFO[qr.version].codewords )
+				throw new RuntimeException("Unexpected length of raw data.");
 
-		// Render the output data
-		renderData();
+			// mark which modules can store data
+			bitLocations = new QrCodeCodeWordLocations(qr.version).bits;
+
+			int numBytes = bitLocations.size() / 8;
+			if (numBytes != qr.rawbits.length)
+				throw new RuntimeException("Egads. unexpected length of qrcode raw data");
+
+			// Render the output data
+			renderData();
+		}
 	}
 
 	/**
@@ -109,7 +116,7 @@ public abstract class QrCodeGenerator {
 
 		int length = bitLocations.size() - bitLocations.size()%8;
 		while( count < length ) {
-			int bits = qr.dataRaw[count/8]&0xFF;
+			int bits = qr.rawbits[count/8]&0xFF;
 
 			int N = Math.min(8,bitLocations.size()-count);
 

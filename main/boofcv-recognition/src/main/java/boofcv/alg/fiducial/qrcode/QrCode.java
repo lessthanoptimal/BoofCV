@@ -57,7 +57,7 @@ public class QrCode {
 	/**
 	 * Location of data bits in the code qr for each version
 	 */
-	public static final List<Point2D_I32> locationBits[] = new ArrayList[MAX_VERSION+1];
+	public static final List<Point2D_I32> LOCATION_BITS[] = new ArrayList[MAX_VERSION+1];
 
 	/**
 	 * The finder pattern that is composed of the 3 position patterns.
@@ -91,9 +91,19 @@ public class QrCode {
 	public Mode mode;
 
 	/**
-	 * The raw byte data encoded into the QR Code
+	 * The raw byte data encoded into the QR Code. data + ecc
 	 */
-	public byte[] dataRaw = new byte[0];
+	public byte[] rawbits = new byte[0];
+
+	/**
+	 * Raw message after error correction has been applied to it
+	 */
+	public byte[] rawdata = new byte[0];
+
+	/**
+	 * If applicable the message is decoded into a sequence of characters.
+	 */
+	public char[] message = null;
 
 	/**
 	 * Approximate bounding box for QR-Code. The bottom right corner is estimated by intersecting lines
@@ -349,7 +359,7 @@ public class QrCode {
 		for (int version = 1; version <= MAX_VERSION; version++) {
 			QrCodeCodeWordLocations mask = new QrCodeCodeWordLocations(version);
 
-			locationBits[version] = mask.bits;
+			LOCATION_BITS[version] = mask.bits;
 		}
 	}
 

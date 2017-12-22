@@ -163,10 +163,7 @@ public class TestQrCodeCodeWordLocations {
 
 	private void dataCapability(int version , int expected ) {
 		QrCodeCodeWordLocations mask = setup(version);
-
-		int countData = countFalse(mask);
-		assertEquals(expected,countData);
-		assertEquals(expected,mask.dataBits);
+		assertEquals(expected,mask.sum());
 	}
 
 	private int countFalse(QrCodeCodeWordLocations mask) {

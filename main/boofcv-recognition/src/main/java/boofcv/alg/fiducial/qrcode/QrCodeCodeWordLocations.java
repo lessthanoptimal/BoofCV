@@ -33,9 +33,6 @@ import java.util.List;
  */
 public class QrCodeCodeWordLocations extends BMatrixRMaj {
 
-	// how many bits are available to store data.
-	public int dataBits;
-
 	public List<Point2D_I32> bits = new ArrayList<>();
 
 	public QrCodeCodeWordLocations(int numModules , int alignment[] , boolean hasVersion ) {
@@ -83,14 +80,8 @@ public class QrCodeCodeWordLocations extends BMatrixRMaj {
 					continue;
 
 				int col = alignment[j];
-				markSquare(col-2,numModules-row-3,5);
+				markSquare(numModules-row-3,col-2,5);
 			}
-		}
-
-		dataBits = 0;
-		for (int i = 0; i < data.length; i++) {
-			if( !data[i] )
-				dataBits++;
 		}
 	}
 
