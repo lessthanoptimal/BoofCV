@@ -18,13 +18,9 @@
 
 package boofcv.factory.fiducial;
 
-import boofcv.abst.fiducial.CalibrationFiducialDetector;
-import boofcv.abst.fiducial.FiducialDetector;
-import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
-import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
+import boofcv.abst.fiducial.*;
 import boofcv.abst.fiducial.calib.*;
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.fiducial.qrcode.QrCodeDetector;
 import boofcv.alg.fiducial.qrcode.QrCodePositionPatternDetector;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.square.DetectFiducialSquareImage;
@@ -151,14 +147,16 @@ public class FactoryFiducial {
 	}
 
 	public static <T extends ImageGray<T>>
-	QrCodeDetector<T> qrcode(ConfigQrCode config, Class<T> imageType) {
+	QrCodePreciseScanner<T> qrcode(ConfigQrCode config, Class<T> imageType) {
 		config.checkValidity();
+
+		InputToBinary<T> inputToBinary = FactoryThresholdBinary.threshold(config.threshold,imageType);
 
 		DetectPolygonBinaryGrayRefine<T> squareDetector = FactoryShapeDetector.polygon(config.polygon, imageType);
 		QrCodePositionPatternDetector<T> detectPositionPatterns =
 				new QrCodePositionPatternDetector<>(squareDetector,config.versionMaximum);
 
-		return new QrCodeDetector<>(detectPositionPatterns,imageType);
+		return new QrCodePreciseScanner<>(inputToBinary,detectPositionPatterns,imageType);
 	}
 
 }

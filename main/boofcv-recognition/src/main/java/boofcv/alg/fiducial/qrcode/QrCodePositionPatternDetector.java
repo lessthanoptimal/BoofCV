@@ -142,7 +142,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		milliGraph.update(milli);
 
 		DetectPolygonFromContour<T> detectorPoly = squareDetector.getDetector();
-		System.out.printf(" contour %5.1f shapes %5.1f adjust_bias %5.2f PosPat %6.2f\n",
+		System.out.printf(" contour %5.1f shapes %5.1f adjust_bias %5.2f PosPat %6.2f",
 				detectorPoly.getMilliContour(),detectorPoly.getMilliShapes(),squareDetector.getMilliAdjustBias(),
 				milliGraph.getAverage());
 	}

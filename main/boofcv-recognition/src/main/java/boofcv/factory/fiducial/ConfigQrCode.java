@@ -19,6 +19,7 @@
 package boofcv.factory.fiducial;
 
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
+import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
@@ -30,6 +31,8 @@ import boofcv.struct.ConnectRule;
  * @author Peter Abeles
  */
 public class ConfigQrCode implements Configuration {
+
+	public ConfigThreshold threshold = new ConfigThreshold();
 
 	public ConfigPolygonDetector polygon = new ConfigPolygonDetector();
 

@@ -48,8 +48,8 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 
 	protected InputToBinary<T> inputToBinary;
 
-	BufferedImage original;
-	BufferedImage work;
+	protected BufferedImage original;
+	protected BufferedImage work;
 	GrayU8 binary = new GrayU8(1,1);
 
 	public DetectBlackShapeAppBase(List<String> examples , Class<T> imageType) {

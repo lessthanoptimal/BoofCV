@@ -18,11 +18,11 @@
 
 package boofcv.demonstrations.fiducial;
 
+import boofcv.abst.fiducial.QrCodePreciseScanner;
 import boofcv.alg.fiducial.calib.squares.SquareEdge;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.fiducial.qrcode.PositionPatternNode;
 import boofcv.alg.fiducial.qrcode.QrCode;
-import boofcv.alg.fiducial.qrcode.QrCodeDetector;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
@@ -31,25 +31,27 @@ import boofcv.demonstrations.shapes.ShapeGuiListener;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.fiducial.ConfigQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
-import boofcv.factory.filter.binary.ConfigThreshold;
-import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.io.UtilIO;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +64,7 @@ import java.util.List;
 public class DetectQrCodeApp<T extends ImageGray<T>>
 		extends DetectBlackShapeAppBase implements ShapeGuiListener
 {
-	QrCodeDetector<T> detector;
+	QrCodePreciseScanner<T> detector;
 
 	public DetectQrCodeApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);
@@ -98,36 +100,56 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 		synchronized (this) {
 			ConfigQrCode config = controls.getConfigQr();
+			config.threshold = controls.getThreshold().createConfig();
 
 			detector = FactoryFiducial.qrcode(config,imageClass);
 		}
-		imageThresholdUpdated();
 	}
 
 
 	@Override
 	public void configUpdate() {
 		createDetector(false);
+		reprocessImageOnly();
 		// does process and render too
 	}
 
 	@Override
 	public void imageThresholdUpdated() {
-		DetectQrCodeControlPanel controls = (DetectQrCodeControlPanel)DetectQrCodeApp.this.controls;
+		configUpdate();
+	}
 
-		ConfigThreshold config = controls.getThreshold().createConfig();
+	/**
+	 * Override this function so that it doesn't threshold the image twice
+	 */
+	@Override
+	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
+		System.out.flush();
 
+		original = ConvertBufferedImage.checkCopy(buffered,original);
+		work = ConvertBufferedImage.checkDeclare(buffered,work);
+
+		final double timeInSeconds;
 		synchronized (this) {
-			inputToBinary = FactoryThresholdBinary.threshold(config, imageClass);
+			long before = System.nanoTime();
+			detector.process((T)input);
+			long after = System.nanoTime();
+			timeInSeconds = (after-before)*1e-9;
 		}
-		reprocessImageOnly();
+
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				controls.setProcessingTime(timeInSeconds);
+				viewUpdated();
+			}
+		});
 	}
 
 	int count = 0;
 	@Override
 	protected void detectorProcess(ImageGray input, GrayU8 binary) {
-//		System.out.println("processing image "+count++);
-		detector.process((T) input, binary);
+		throw new RuntimeException("This shouldn't be called");
 	}
 
 	class VisualizePanel extends ShapeVisualizePanel {
