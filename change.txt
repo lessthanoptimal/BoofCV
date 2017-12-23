@@ -66,8 +66,8 @@ Version : 0.28
   * Added ability to provide a hint for where the object is now
 - JavaCV
   * Provided support for reading webcams using JavaCV. Seems to work better than Webcam Capture in some ways
-- Created interface for contour to polyline
-  * ASDASDASD
+- Created interface for contour to polyline. PointsToPolyline
+  * Added ability to set min/max number of sides. convex
 
 Fiducials
 - FiducialDetector.setLensDistortion() add width and height parameters

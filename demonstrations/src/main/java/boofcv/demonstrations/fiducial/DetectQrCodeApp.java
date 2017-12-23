@@ -21,8 +21,10 @@ package boofcv.demonstrations.fiducial;
 import boofcv.abst.fiducial.QrCodePreciseDetector;
 import boofcv.alg.fiducial.calib.squares.SquareEdge;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
+import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.fiducial.qrcode.PositionPatternNode;
 import boofcv.alg.fiducial.qrcode.QrCode;
+import boofcv.alg.fiducial.qrcode.QrCodeAlignmentPatternLocator;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
@@ -41,7 +43,9 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -55,6 +59,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static boofcv.alg.fiducial.qrcode.QrCode.Failure.ALIGNMENT;
 
 /**
  * Application which lets you configure the black polygon detector in real-time
@@ -183,13 +189,25 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 				List<QrCode> failures = detector.getFailures();
 
-				g2.setColor(new Color(0x50FF0000, true));
+
 				for (int i = 0; i < failures.size(); i++) {
 					QrCode qr = failures.get(i);
+					if( qr.failureCause.ordinal() < ALIGNMENT.ordinal())
+						continue;
 					switch( qr.failureCause ) {
 						case ERROR_CORRECTION:
-							VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
+							g2.setColor(new Color(0x80FF0000, true));
+							break;
+						case DECODING_MESSAGE:
+							g2.setColor(new Color(0x80FF9000, true));
+							break;
+						default:
+							g2.setColor(new Color(0x80FF00C0, true));
+							break;
 					}
+					VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
+
+					renderBinaryValues(g2,qr);
 				}
 
 				if (controls.bShowSquares) {
@@ -249,6 +267,50 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					}
 				}
 			}
+		}
+
+		private void renderBinaryValues( Graphics2D g2 , QrCode qr ) {
+			QrCodeAlignmentPatternLocator<T> locator = detector.getDecoder().getAlignmentLocator();
+			locator.setTransform(qr);
+
+			List<Point2D_I32> points = QrCode.LOCATION_BITS[qr.version];
+
+			PackedBits8 bits = new PackedBits8();
+			bits.data = qr.rawbits;
+			bits.size = qr.rawbits.length*8;
+
+			Point2D_F32 p = new Point2D_F32();
+			for (int i = 0; i < bits.size; i++) {
+				Point2D_I32 c = points.get(i);
+				locator.gridToImage(c.y+0.5f,c.x+0.5f,p);
+				int value = qr.mask.apply(c.y,c.x,bits.get(i));
+
+				if( value == 1 )
+					g2.setColor(Color.BLACK);
+				else if( value == 0 )
+					g2.setColor(Color.WHITE);
+				else
+					g2.setColor(Color.RED);
+
+				renderCircleAt(g2, p);
+			}
+
+			int N = qr.totalModules();
+			g2.setColor(Color.BLUE);
+			locator.gridToImage(0,N-7,p);
+			renderCircleAt(g2, p);
+			locator.gridToImage(7,N-7,p);
+			renderCircleAt(g2, p);
+			locator.gridToImage(N-7,0,p);
+			renderCircleAt(g2, p);
+			locator.gridToImage(N-7,7,p);
+			renderCircleAt(g2, p);
+		}
+
+		private void renderCircleAt(Graphics2D g2, Point2D_F32 p) {
+			int x = (int)(scale*p.x+0.5);
+			int y = (int)(scale*p.y+0.5);
+			g2.fillOval(x-3,y-3,7,7);
 		}
 	}
 

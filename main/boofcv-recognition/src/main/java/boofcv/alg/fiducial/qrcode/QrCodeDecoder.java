@@ -31,6 +31,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static boofcv.alg.fiducial.qrcode.QrCode.Failure.JIS_UNAVAILABLE;
 import static boofcv.alg.fiducial.qrcode.QrCode.Failure.KANJI_UNAVAILABLE;
 import static boofcv.alg.fiducial.qrcode.QrCodeEncoder.valueToAlphanumeric;
 
@@ -278,6 +279,10 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			readDataMatrix(i,b.y,b.x, qr.mask);
 		}
 
+//		System.out.println("Version "+qr.version);
+//		System.out.println("bits8.size "+bits8.size+"  locationBits "+locationBits.size());
+//		bits8.print();
+
 		// copy over the results
 		System.arraycopy(bits8.data,0,qr.rawbits,0,qr.rawbits.length);
 
@@ -286,8 +291,6 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 
 	/**
 	 * Reconstruct the data while applying error correction.
-	 * @param qr
-	 * @return
 	 */
 	private boolean applyErrorCorrection(QrCode qr) {
 
@@ -360,54 +363,57 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 //		System.out.println("decoded message");
 //		bits.print();System.out.println();
 
-		int modeBits = bits.read(0,4,true);
-		switch( modeBits ) {
-			case 0b0001: qr.mode = QrCode.Mode.NUMERIC;break;
-			case 0b0010: qr.mode = QrCode.Mode.ALPHANUMERIC;break;
-			case 0b0100: qr.mode = QrCode.Mode.BYTE;break;
-			case 0b1000: qr.mode = QrCode.Mode.KANJI;break;
-			case 0b0111: qr.mode = QrCode.Mode.ECI;break;
-			default:
-				qr.failureCause = QrCode.Failure.UNKNOWN_MODE;
+		qr.message = new StringBuilder();
+
+		int location = 0;
+		escape:
+		while( location <= bits.size ) {
+			int modeBits = bits.read(location, 4, true);
+			location += 4;
+
+			switch (modeBits) {
+				case 0b0000:
+					break escape;
+				case 0b0001:
+					qr.mode = QrCode.Mode.NUMERIC;
+					location = decodeNumeric(qr, bits,location);
+					break;
+				case 0b0010:
+					qr.mode = QrCode.Mode.ALPHANUMERIC;
+					location = decodeAlphanumeric(qr, bits,location);
+					break;
+				case 0b0100:
+					qr.mode = QrCode.Mode.BYTE;
+					location = decodeByte(qr, bits,location);
+					break;
+				case 0b1000:
+					qr.mode = QrCode.Mode.KANJI;
+					location = decodeKanji(qr, bits,location);
+					break;
+				case 0b0111:
+					qr.mode = QrCode.Mode.ECI;
+					throw new RuntimeException("Not supported yet");
+				default:
+					qr.failureCause = QrCode.Failure.UNKNOWN_MODE;
+					return false;
+			}
+
+			if (location < 0) {
+				// cause is set inside of decoding function
 				return false;
+			}
 		}
-
-		int lengthBits;
-		switch( qr.mode ) {
-			case NUMERIC: lengthBits = decodeNumeric(qr,bits); break;
-			case ALPHANUMERIC: lengthBits = decodeAlphanumeric(qr,bits); break;
-			case BYTE: lengthBits = decodeByte(qr,bits); break;
-			case KANJI: lengthBits = decodeKanji(qr,bits);break;
-			case ECI:throw new RuntimeException("Not supported yet");
-			default:throw new RuntimeException("Egads");
-		}
-
-		if( lengthBits < 0 ) {
-			// cause is set inside of decoding function
-			return false;
-		}
-
-		// check terminator bits
-		int remaining = bits.size-lengthBits;
-		int read = Math.min(4,remaining);
-		int terminator = read==0?0:bits.read(lengthBits,read,false);
-		if( terminator != 0 ) {
-			qr.failureCause = QrCode.Failure.DECODING_MESSAGE;
-			return false;
-		}
-		lengthBits += read;
-
 		// ensure the length is byte aligned
-		lengthBits = alignToBytes(lengthBits);
-		int lengthBytes = lengthBits/8;
+		location = alignToBytes(location);
+		int lengthBytes = location / 8;
 
 		// sanity check padding
-		if( !checkPaddingBytes(qr, lengthBytes) ) {
+		if (!checkPaddingBytes(qr, lengthBytes)) {
 			qr.failureCause = QrCode.Failure.READING_PADDING;
 			return false;
-		} else {
-			return true;
 		}
+
+		return true;
 	}
 
 	private static int alignToBytes(int lengthBits) {
@@ -446,17 +452,17 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 * @param data encoded data
 	 * @return Location it has read up to in bits
 	 */
-	private int decodeNumeric( QrCode qr , PackedBits8 data ) {
+	private int decodeNumeric( QrCode qr , PackedBits8 data, int bitLocation ) {
 		int lengthBits = QrCodeEncoder.getLengthBitsNumeric(qr.version);
 
-		int bitLocation = 4;
 		int length = data.read(bitLocation,lengthBits,true);
 		bitLocation += lengthBits;
 
-		qr.message = new char[length];
-
-		int i = 0;
-		for (; i+2 < length; i += 3) {
+		while( length >= 3 ) {
+			if( data.size < bitLocation+10 ) {
+				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
+				return -1;
+			}
 			int chunk = data.read(bitLocation,10,true);
 			bitLocation += 10;
 
@@ -464,23 +470,33 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			int valB = (chunk-valA*100)/10;
 			int valC = chunk-valA*100-valB*10;
 
-			qr.message[i] = (char)(valA + '0');
-			qr.message[i+1] = (char)(valB + '0');
-			qr.message[i+2] = (char)(valC + '0');
+			qr.message.append((char)(valA + '0'));
+			qr.message.append((char)(valB + '0'));
+			qr.message.append((char)(valC + '0'));
+
+			length -= 3;
 		}
 
-		if( length-i == 2 ) {
+		if( length == 2 ) {
+			if( data.size < bitLocation+7 ) {
+				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
+				return -1;
+			}
 			int chunk = data.read(bitLocation,7,true);
 			bitLocation += 7;
 
 			int valA = chunk/10;
 			int valB = chunk-valA*10;
-			qr.message[i] = (char)(valA + '0');
-			qr.message[i+1] = (char)(valB + '0');
-		} else if( length-i == 1 ) {
+			qr.message.append((char)(valA + '0'));
+			qr.message.append((char)(valB + '0'));
+		} else if( length == 1 ) {
+			if( data.size < bitLocation+4 ) {
+				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
+				return -1;
+			}
 			int valA = data.read(bitLocation,4,true);
 			bitLocation += 4;
-			qr.message[i] = (char)(valA + '0');
+			qr.message.append((char)(valA + '0'));
 		}
 		return bitLocation;
 	}
@@ -492,31 +508,36 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 * @param data encoded data
 	 * @return Location it has read up to in bits
 	 */
-	private int decodeAlphanumeric( QrCode qr , PackedBits8 data ) {
+	private int decodeAlphanumeric( QrCode qr , PackedBits8 data, int bitLocation ) {
 		int lengthBits = QrCodeEncoder.getLengthBitsAlphanumeric(qr.version);
 
-		int bitLocation = 4;
 		int length = data.read(bitLocation,lengthBits,true);
 		bitLocation += lengthBits;
 
-		qr.message = new char[length];
-
-		int i = 0;
-		for (; i+1 < length; i += 2) {
+		while( length >= 2 ) {
+			if( data.size < bitLocation+11 ) {
+				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
+				return -1;
+			}
 			int chunk = data.read(bitLocation,11,true);
 			bitLocation += 11;
 
 			int valA = chunk/45;
 			int valB = chunk-valA*45;
 
-			qr.message[i] = valueToAlphanumeric(valA);
-			qr.message[i+1] =  valueToAlphanumeric(valB);
+			qr.message.append(valueToAlphanumeric(valA));
+			qr.message.append(valueToAlphanumeric(valB));
+			length -= 2;
 		}
 
-		if( length-i == 1 ) {
+		if( length == 1 ) {
+			if( data.size < bitLocation+6 ) {
+				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
+				return -1;
+			}
 			int valA = data.read(bitLocation,6,true);
 			bitLocation += 6;
-			qr.message[i] = valueToAlphanumeric(valA);
+			qr.message.append(valueToAlphanumeric(valA));
 		}
 		return bitLocation;
 	}
@@ -528,20 +549,27 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 * @param data encoded data
 	 * @return Location it has read up to in bits
 	 */
-	private int decodeByte( QrCode qr , PackedBits8 data ) {
+	private int decodeByte( QrCode qr , PackedBits8 data, int bitLocation ) {
 		int lengthBits = QrCodeEncoder.getLengthBitsBytes(qr.version);
 
-		int bitLocation = 4;
 		int length = data.read(bitLocation,lengthBits,true);
 		bitLocation += lengthBits;
 
-		qr.message = new char[length*2];
+		byte rawdata[] = new byte[ length ];
 
 		for (int i = 0; i < length; i++) {
-			String w = String.format("%02X",data.read(bitLocation,8,true));
-			qr.message[i*2] = w.charAt(0);
-			qr.message[i*2+1] = w.charAt(1);
+			if( data.size < bitLocation+8 ) {
+				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
+				return -1;
+			}
+			rawdata[i] = (byte)data.read(bitLocation,8,true);
 			bitLocation += 8;
+		}
+		try {
+			qr.message.append( new String(rawdata, "JIS") );
+		} catch (UnsupportedEncodingException ignored) {
+			qr.failureCause = JIS_UNAVAILABLE;
+			return -1;
 		}
 		return bitLocation;
 	}
@@ -553,17 +581,19 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 * @param data encoded data
 	 * @return Location it has read up to in bits
 	 */
-	private int decodeKanji( QrCode qr , PackedBits8 data ) {
+	private int decodeKanji( QrCode qr , PackedBits8 data, int bitLocation ) {
 		int lengthBits = QrCodeEncoder.getLengthBitsKanji(qr.version);
 
-		int bitLocation = 4;
 		int length = data.read(bitLocation,lengthBits,true);
 		bitLocation += lengthBits;
 
 		byte rawdata[] = new byte[ length*2 ];
-		qr.message = new char[length];
 
 		for (int i = 0; i < length; i++) {
+			if( data.size < bitLocation+13 ) {
+				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
+				return -1;
+			}
 			int letter = data.read(bitLocation,13,true);
 			bitLocation += 13;
 
@@ -582,7 +612,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 
 		// Shift_JIS may not be supported in some environments:
 		try {
-			qr.message = new String(rawdata, "Shift_JIS").toCharArray();
+			qr.message.append( new String(rawdata, "Shift_JIS") );
 		} catch (UnsupportedEncodingException ignored) {
 			qr.failureCause = KANJI_UNAVAILABLE;
 			return -1;

@@ -103,7 +103,7 @@ public class QrCode {
 	/**
 	 * If applicable the message is decoded into a sequence of characters.
 	 */
-	public char[] message = null;
+	public StringBuilder message = null;
 
 	/**
 	 * Specifies where the QR code parsing failed
@@ -517,9 +517,11 @@ public class QrCode {
 		ALIGNMENT,
 		READING_BITS,
 		ERROR_CORRECTION,
-		READING_PADDING,
-		DECODING_MESSAGE,
 		UNKNOWN_MODE,
-		KANJI_UNAVAILABLE
+		READING_PADDING,
+		MESSAGE_OVERFLOW,
+		DECODING_MESSAGE,
+		KANJI_UNAVAILABLE,
+		JIS_UNAVAILABLE
 	}
 }

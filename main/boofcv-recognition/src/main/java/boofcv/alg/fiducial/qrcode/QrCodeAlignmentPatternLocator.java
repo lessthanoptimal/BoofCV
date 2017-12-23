@@ -57,6 +57,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	PointTransformHomography_F32 gridToImage = new PointTransformHomography_F32();
 	PointTransformHomography_F32 imageToGrid = new PointTransformHomography_F32();
 
+	// TODO Try affine model instead
 	// used for homography calculation
 	Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomography(true);
 	ArrayList<AssociatedPair> associatedPairs = new ArrayList<>();
@@ -75,8 +76,6 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
 	// more work space
 	Point2D_F32 pixel = new Point2D_F32();
-	Point2D_F32 seed = new Point2D_F32();
-	Point2D_F32 guess = new Point2D_F32();
 
 	public QrCodeAlignmentPatternLocator( Class<T> imageType ) {
 
@@ -84,7 +83,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		interpolate = FactoryInterpolation.nearestNeighborPixelS(imageType);
 		interpolate.setBorder(FactoryImageBorder.single(imageType, BorderType.EXTENDED));
 
-		for (int i = 0; i < 7; i++) {
+		for (int i = 0; i < 9; i++) {
 			associatedPairs.add( new AssociatedPair() );
 		}
 	}
@@ -108,6 +107,12 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		if( qr.version <= 1 )
 			return true;
 		return localizePositionPatterns(QrCode.VERSION_INFO[qr.version].alignment);
+	}
+
+	public boolean setTransform( QrCode qr ) {
+		if( !computeHomography(qr))
+			return false;
+		return true;
 	}
 
 	boolean localizePositionPatterns(int[] alignmentLocations ) {
@@ -316,10 +321,12 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		// features from right
 		associatedPairs.get(3).p1.set(gridSize-7,0);
 		associatedPairs.get(4).p1.set(gridSize-7,7);
+		associatedPairs.get(5).p1.set(gridSize,7);
 
 		// features from bottom
-		associatedPairs.get(5).p1.set(0,gridSize-7);
-		associatedPairs.get(6).p1.set(7,gridSize-7);
+		associatedPairs.get(6).p1.set(0,gridSize-7);
+		associatedPairs.get(7).p1.set(7,gridSize-7);
+		associatedPairs.get(8).p1.set(7,gridSize);
 
 		// apply the actual pixel coordinates
 		set(0,qr.ppCorner,1);
@@ -328,9 +335,11 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
 		set(3,qr.ppRight,0);
 		set(4,qr.ppRight,3);
+		set(5,qr.ppRight,2);
 
-		set(5,qr.ppDown,0);
-		set(6,qr.ppDown,1);
+		set(6,qr.ppDown,0);
+		set(7,qr.ppDown,1);
+		set(8,qr.ppDown,2);
 
 		// Compute the homography
 		if( !computeHomography.process(associatedPairs, H) )
@@ -353,7 +362,6 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	 * @return
 	 */
 	public int readBit( int row , int col ) {
-
 		// todo use adjustments from near by alignment patterns
 
 		float center = 0.5f;
@@ -370,6 +378,10 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 			return 1;
 		else
 			return 0;
+	}
+
+	public void gridToImage(float row , float col , Point2D_F32 pixel ) {
+		gridToImage.compute(col,row,pixel);
 	}
 
 	private void set(int pairIndex , Polygon2D_F64 square , int squareIndex ) {

@@ -108,6 +108,10 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 		return detectPositionPatterns.getSquareDetector();
 	}
 
+	public QrCodeDecoder<T> getDecoder() {
+		return decoder;
+	}
+
 	@Override
 	public Class<T> getImageType() {
 		return imageType;
