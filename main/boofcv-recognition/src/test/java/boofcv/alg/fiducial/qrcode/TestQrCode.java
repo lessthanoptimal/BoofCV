@@ -48,14 +48,14 @@ public class TestQrCode {
 
 				int byteBlockB = block.codewords+1;
 				int byteDataB = block.dataCodewords+1;
-				int countB = (info.codewords - block.codewords*block.eccBlocks);
+				int countB = (info.codewords - block.codewords*block.blocks);
 
 				assertTrue( countB >= 0 );
 				if( countB > 0 ) {
 					assertTrue(countB % byteBlockB == 0 );
 					countB /= byteBlockB;
 
-					assertEquals( info.codewords, block.codewords*block.eccBlocks + byteBlockB*countB);
+					assertEquals( info.codewords, block.codewords*block.blocks + byteBlockB*countB);
 					assertTrue( byteDataB < byteBlockB);
 				}
 

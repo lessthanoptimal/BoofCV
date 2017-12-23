@@ -390,7 +390,7 @@ public class QrCodeEncoder {
 		int wordsBlockAllA = block.codewords;
 		int wordsBlockDataA = block.dataCodewords;
 		int wordsEcc = wordsBlockAllA-wordsBlockDataA;
-		int numBlocksA = block.eccBlocks;
+		int numBlocksA = block.blocks;
 
 		int wordsBlockAllB = wordsBlockAllA + 1;
 		int wordsBlockDataB = wordsBlockDataA + 1;

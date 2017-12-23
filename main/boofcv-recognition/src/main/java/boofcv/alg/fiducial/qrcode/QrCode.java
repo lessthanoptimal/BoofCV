@@ -127,7 +127,7 @@ public class QrCode {
 		VERSION_INFO[1].add(H,26,9,1);
 
 		VERSION_INFO[2] = new VersionInfo(44, new int[]{6,18});
-		VERSION_INFO[2].add(L,44,32,1);
+		VERSION_INFO[2].add(L,44,34,1);
 		VERSION_INFO[2].add(M,44,28,1);
 		VERSION_INFO[2].add(Q,44,22,1);
 		VERSION_INFO[2].add(H,44,16,1);
@@ -145,13 +145,13 @@ public class QrCode {
 		VERSION_INFO[4].add(H,25,9,4);
 
 		VERSION_INFO[5] = new VersionInfo(134, new int[]{6,30});
-		VERSION_INFO[5].add(L,134,80,1);
+		VERSION_INFO[5].add(L,134,108,1);
 		VERSION_INFO[5].add(M,67,43,2);
 		VERSION_INFO[5].add(Q,33,15,2);
 		VERSION_INFO[5].add(H,33,11,2);
 
 		VERSION_INFO[6] = new VersionInfo(172, new int[]{6,34});
-		VERSION_INFO[6].add(L,86,80,2);
+		VERSION_INFO[6].add(L,86,68,2);
 		VERSION_INFO[6].add(M,43,27,4);
 		VERSION_INFO[6].add(Q,43,19,4);
 		VERSION_INFO[6].add(H,43,15,4);
@@ -490,12 +490,12 @@ public class QrCode {
 		/**
 		 * Number of error correction blocks
 		 */
-		final public int eccBlocks;
+		final public int blocks;
 
-		public ErrorBlock( int codewords, int dataCodewords, int eccBlocks) {
+		public ErrorBlock( int codewords, int dataCodewords, int blocks) {
 			this.codewords = codewords;
 			this.dataCodewords = dataCodewords;
-			this.eccBlocks = eccBlocks;
+			this.blocks = blocks;
 		}
 	}
 

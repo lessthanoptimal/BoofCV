@@ -72,6 +72,9 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 {
 	QrCodePreciseDetector<T> detector;
 
+	//--------- ONLY INVOKE IN THE GUI ------------
+	QrCodeAlignmentPatternLocator<T> locator = new QrCodeAlignmentPatternLocator(GrayU8.class); // image type doesn't matter
+
 	public DetectQrCodeApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);
 
@@ -152,7 +155,6 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		});
 	}
 
-	int count = 0;
 	@Override
 	protected void detectorProcess(ImageGray input, GrayU8 binary) {
 		throw new RuntimeException("This shouldn't be called");
@@ -181,8 +183,9 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 				if( controls.bShowMarkers ) {
 					List<QrCode> detected = detector.getDetections();
-					g2.setColor(new Color(0x5011FF00, true));
+
 					for (int i = 0; i < detected.size(); i++) {
+						g2.setColor(new Color(0x5011FF00, true));
 						QrCode qr = detected.get(i);
 						VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
 
@@ -272,8 +275,10 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			}
 		}
 
+		/**
+		 * Draws the estimated value of each bit onto the image
+		 */
 		private void renderBinaryValues( Graphics2D g2 , QrCode qr ) {
-			QrCodeAlignmentPatternLocator<T> locator = detector.getDecoder().getAlignmentLocator();
 			locator.setTransform(qr);
 
 			List<Point2D_I32> points = QrCode.LOCATION_BITS[qr.version];
@@ -298,16 +303,16 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 				renderCircleAt(g2, p);
 			}
 
-			int N = qr.totalModules();
-			g2.setColor(Color.BLUE);
-			locator.gridToImage(0,N-7,p);
-			renderCircleAt(g2, p);
-			locator.gridToImage(7,N-7,p);
-			renderCircleAt(g2, p);
-			locator.gridToImage(N-7,0,p);
-			renderCircleAt(g2, p);
-			locator.gridToImage(N-7,7,p);
-			renderCircleAt(g2, p);
+//			int N = qr.totalModules();
+//			g2.setColor(Color.BLUE);
+//			locator.gridToImage(0,N-7,p);
+//			renderCircleAt(g2, p);
+//			locator.gridToImage(7,N-7,p);
+//			renderCircleAt(g2, p);
+//			locator.gridToImage(N-7,0,p);
+//			renderCircleAt(g2, p);
+//			locator.gridToImage(N-7,7,p);
+//			renderCircleAt(g2, p);
 		}
 
 		private void renderCircleAt(Graphics2D g2, Point2D_F32 p) {
@@ -319,7 +324,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 	@Override
 	public void viewUpdated() {
-		BufferedImage active = null;
+		BufferedImage active;
 		if( controls.selectedView == 0 ) {
 			active = original;
 		} else if( controls.selectedView == 1 ) {
