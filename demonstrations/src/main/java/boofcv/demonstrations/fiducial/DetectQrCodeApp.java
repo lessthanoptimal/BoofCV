@@ -21,10 +21,7 @@ package boofcv.demonstrations.fiducial;
 import boofcv.abst.fiducial.QrCodePreciseDetector;
 import boofcv.alg.fiducial.calib.squares.SquareEdge;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
-import boofcv.alg.fiducial.qrcode.PackedBits8;
-import boofcv.alg.fiducial.qrcode.PositionPatternNode;
-import boofcv.alg.fiducial.qrcode.QrCode;
-import boofcv.alg.fiducial.qrcode.QrCodeAlignmentPatternLocator;
+import boofcv.alg.fiducial.qrcode.*;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
@@ -74,6 +71,8 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 	//--------- ONLY INVOKE IN THE GUI ------------
 	QrCodeAlignmentPatternLocator<T> locator = new QrCodeAlignmentPatternLocator(GrayU8.class); // image type doesn't matter
+
+	QrCodeBinaryGridToPixel locatorB = new QrCodeBinaryGridToPixel();
 
 	public DetectQrCodeApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);
@@ -227,17 +226,8 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 				}
 
 				if (controls.bShowAlignmentPattern) {
-					List<QrCode> codes = detector.getDetections();
-
-					g2.setColor(Color.BLUE);
-					g2.setStroke(new BasicStroke(3));
-					for (QrCode qr : codes) {
-						double size = Math.sqrt(qr.ppCorner.areaSimple()) / 14.0;
-						for (int i = 0; i < qr.alignment.size; i++) {
-							QrCode.Alignment a = qr.alignment.get(i);
-							VisualizeFeatures.drawCircle(g2, a.pixel.x * scale, a.pixel.y * scale, size * scale);
-						}
-					}
+					renderAlignmentPatterns(g2, detector.getDetections());
+					renderAlignmentPatterns(g2, detector.getFailures());
 				}
 
 				if (controls.bShowPositionPattern) {
@@ -275,12 +265,24 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			}
 		}
 
+		private void renderAlignmentPatterns(Graphics2D g2, List<QrCode> codes) {
+			g2.setColor(Color.BLUE);
+			g2.setStroke(new BasicStroke(3));
+			for (QrCode qr : codes) {
+				double size = Math.sqrt(qr.ppCorner.areaSimple()) / 14.0;
+				for (int i = 0; i < qr.alignment.size; i++) {
+					QrCode.Alignment a = qr.alignment.get(i);
+					VisualizeFeatures.drawCircle(g2, a.pixel.x * scale, a.pixel.y * scale, size * scale);
+				}
+			}
+		}
+
 		/**
 		 * Draws the estimated value of each bit onto the image
 		 */
 		private void renderBinaryValues( Graphics2D g2 , QrCode qr ) {
-			locator.setTransform(qr);
 
+			locatorB.setMarker(qr);
 			List<Point2D_I32> points = QrCode.LOCATION_BITS[qr.version];
 
 			PackedBits8 bits = new PackedBits8();
@@ -288,19 +290,19 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			bits.size = qr.rawbits.length*8;
 
 			Point2D_F32 p = new Point2D_F32();
+			g2.setStroke(new BasicStroke(1));
 			for (int i = 0; i < bits.size; i++) {
 				Point2D_I32 c = points.get(i);
-				locator.gridToImage(c.y+0.5f,c.x+0.5f,p);
+				locatorB.gridToImage(c.y+0.5f,c.x+0.5f,  p);
 				int value = qr.mask.apply(c.y,c.x,bits.get(i));
 
-				if( value == 1 )
-					g2.setColor(Color.BLACK);
-				else if( value == 0 )
-					g2.setColor(Color.WHITE);
-				else
-					g2.setColor(Color.RED);
-
-				renderCircleAt(g2, p);
+				if( value == 1 ) {
+					renderCircleAt(g2, p, Color.BLACK,Color.LIGHT_GRAY);
+				} else if( value == 0 ) {
+					renderCircleAt(g2, p, Color.WHITE,Color.LIGHT_GRAY);
+				} else {
+					renderCircleAt(g2, p, Color.RED	,Color.LIGHT_GRAY);
+				}
 			}
 
 //			int N = qr.totalModules();
@@ -315,10 +317,13 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 //			renderCircleAt(g2, p);
 		}
 
-		private void renderCircleAt(Graphics2D g2, Point2D_F32 p) {
+		private void renderCircleAt(Graphics2D g2, Point2D_F32 p, Color center , Color border ) {
 			int x = (int)(scale*p.x+0.5);
 			int y = (int)(scale*p.y+0.5);
+			g2.setColor(center);
 			g2.fillOval(x-3,y-3,7,7);
+			g2.setColor(border);
+			g2.drawOval(x-3,y-3,7,7);
 		}
 	}
 

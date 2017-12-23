@@ -18,24 +18,9 @@
 
 package boofcv.alg.fiducial.qrcode;
 
-import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.alg.distort.PointTransformHomography_F32;
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.border.BorderType;
-import boofcv.core.image.border.FactoryImageBorder;
-import boofcv.factory.geo.FactoryMultiView;
-import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
-import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DMatrixRMaj;
-import org.ejml.data.FMatrixRMaj;
-import org.ejml.dense.row.misc.UnrolledInverseFromMinor_FDRM;
-import org.ejml.ops.ConvertMatrixData;
-
-import java.util.ArrayList;
 
 /**
  * Searches the image for alignment patterns. First it computes a transform that removes perspective distortion
@@ -47,23 +32,10 @@ import java.util.ArrayList;
  */
 public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
-	InterpolatePixelS<T> interpolate;
-
 	// grid for quick look up of alignment patterns to adjust search
-	FastQueue<QrCode.Alignment> lookup = new FastQueue<>(QrCode.Alignment.class,true);
+	private FastQueue<QrCode.Alignment> lookup = new FastQueue<>(QrCode.Alignment.class,true);
 
-	// Transform from undistorted to image coordinates
-	// Grid is the QR coordinate system where a grid element is a qr's square module
-	PointTransformHomography_F32 gridToImage = new PointTransformHomography_F32();
-	PointTransformHomography_F32 imageToGrid = new PointTransformHomography_F32();
-
-	// TODO Try affine model instead
-	// used for homography calculation
-	Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomography(true);
-	ArrayList<AssociatedPair> associatedPairs = new ArrayList<>();
-	DMatrixRMaj H = new DMatrixRMaj(3,3);
-	FMatrixRMaj H32 = new FMatrixRMaj(3,3);
-	FMatrixRMaj H_inv = new FMatrixRMaj(3,3);
+	private QrCodeBinaryGridReader<T> reader;
 
 	// pixel value storage used when localizing
 	float arrayX[] = new float[12];
@@ -71,35 +43,22 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
 	QrCode qr;
 
-	// input image size
-	int imageWidth,imageHeight;
-
 	// more work space
 	Point2D_F32 pixel = new Point2D_F32();
 
 	public QrCodeAlignmentPatternLocator( Class<T> imageType ) {
 
-		// use nearest neighbor to avoid shifting the location
-		interpolate = FactoryInterpolation.nearestNeighborPixelS(imageType);
-		interpolate.setBorder(FactoryImageBorder.single(imageType, BorderType.EXTENDED));
-
-		for (int i = 0; i < 9; i++) {
-			associatedPairs.add( new AssociatedPair() );
-		}
+		reader = new QrCodeBinaryGridReader<T>(imageType);
 	}
 
 	/**
 	 * Uses the previously detected position patterns to seed the search for the alignment patterns
 	 */
 	public boolean process(T image , QrCode qr ) {
-		this.imageWidth = image.width;
-		this.imageHeight = image.height;
 		this.qr = qr;
 
-		interpolate.setImage(image);
-
-		if( !computeHomography(qr))
-			return false;
+		reader.setImage(image);
+		reader.setMarker(qr);
 
 		initializePatterns(qr);
 
@@ -107,12 +66,6 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		if( qr.version <= 1 )
 			return true;
 		return localizePositionPatterns(QrCode.VERSION_INFO[qr.version].alignment);
-	}
-
-	public boolean setTransform( QrCode qr ) {
-		if( !computeHomography(qr))
-			return false;
-		return true;
 	}
 
 	boolean localizePositionPatterns(int[] alignmentLocations ) {
@@ -169,8 +122,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 				for (int col = 0; col < 3; col++) {
 					float gridx = guessX - 1f + col;
 
-					gridToImage.compute(gridx,gridy,pixel);
-					samples[row*3+col] = interpolate.get(pixel.x,pixel.y);
+					samples[row*3+col] = reader.read(gridx,gridy);
 				}
 			}
 
@@ -196,7 +148,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		pattern.moduleFound.x = bestX;
 		pattern.moduleFound.y = bestY;
 
-		gridToImage.compute((float)pattern.moduleFound.x,(float)pattern.moduleFound.y,pixel);
+		reader.gridToImage((float)pattern.moduleFound.x,(float)pattern.moduleFound.y,pixel);
 		pattern.pixel.set(pixel.x,pixel.y);
 
 		return true;
@@ -215,10 +167,8 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 			float x = guessX - 1.5f + i*3f/12.0f;
 			float y = guessY - 1.5f + i*3f/12.0f;
 
-			gridToImage.compute(x,guessY,pixel);
-			arrayX[i] = interpolate.get(pixel.x,pixel.y);
-			gridToImage.compute(guessX,y,pixel);
-			arrayY[i] = interpolate.get(pixel.x,pixel.y);
+			arrayX[i] = reader.read(x,guessY);
+			arrayY[i] = reader.read(guessX,y);
 		}
 
 		// TODO turn this into an exhaustive search of the array for best up and down point?
@@ -235,8 +185,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		pattern.moduleFound.x = guessX - 1.5f + (downX+upX)*3f/24.0f;
 		pattern.moduleFound.y = guessY - 1.5f + (downY+upY)*3f/24.0f;
 
-		gridToImage.compute((float)pattern.moduleFound.x,(float)pattern.moduleFound.y,pixel);
-		pattern.pixel.set(pixel.x,pixel.y);
+		reader.gridToImage((float)pattern.moduleFound.x,(float)pattern.moduleFound.y,pattern.pixel);
 
 		return true;
 	}
@@ -304,87 +253,6 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		}
 	}
 
-	/**
-	 * Computes an approximate homography the initialize the search. Avoid corner features since they
-	 * are more likely to be damaged. Outside features are also likely to be damaged fewer of them are sampled
-	 *
-	 * @param qr The QR code with detected position patterns
-	 */
-	boolean computeHomography( QrCode qr ) {
-		int gridSize = qr.totalModules();
 
-		// features from corner
-		associatedPairs.get(0).p1.set(7,0);
-		associatedPairs.get(1).p1.set(7,7);
-		associatedPairs.get(2).p1.set(0,7);
 
-		// features from right
-		associatedPairs.get(3).p1.set(gridSize-7,0);
-		associatedPairs.get(4).p1.set(gridSize-7,7);
-		associatedPairs.get(5).p1.set(gridSize,7);
-
-		// features from bottom
-		associatedPairs.get(6).p1.set(0,gridSize-7);
-		associatedPairs.get(7).p1.set(7,gridSize-7);
-		associatedPairs.get(8).p1.set(7,gridSize);
-
-		// apply the actual pixel coordinates
-		set(0,qr.ppCorner,1);
-		set(1,qr.ppCorner,2);
-		set(2,qr.ppCorner,3);
-
-		set(3,qr.ppRight,0);
-		set(4,qr.ppRight,3);
-		set(5,qr.ppRight,2);
-
-		set(6,qr.ppDown,0);
-		set(7,qr.ppDown,1);
-		set(8,qr.ppDown,2);
-
-		// Compute the homography
-		if( !computeHomography.process(associatedPairs, H) )
-			return false;
-
-		ConvertMatrixData.convert(H,H32);
-		UnrolledInverseFromMinor_FDRM.inv(H32,H_inv);
-
-		gridToImage.set(H32);
-		imageToGrid.set(H_inv);
-
-		return true;
-	}
-
-	/**
-	 * Reads a bit from the qr code's data matrix while adjusting for location distortions using known
-	 * feature locations.
-	 * @param row grid row
-	 * @param col grid column
-	 * @return
-	 */
-	public int readBit( int row , int col ) {
-		// todo use adjustments from near by alignment patterns
-
-		float center = 0.5f;
-		gridToImage.compute(col+center,row+center,pixel);
-		if( pixel.x < -0.5 || pixel.y < -0.5 || pixel.x > imageWidth || pixel.y > imageHeight )
-			return -1;
-
-//		System.out.println("grid ("+row+" , "+col+") = "+pixel.x+" "+pixel.y+" = "+interpolate.get(pixel.x,pixel.y));
-
-//		float threshold = qr.threshCorner; // todo make this adaptive based on the location
-		float threshold = (float)(qr.threshCorner+qr.threshDown+qr.threshRight)/3.0f;
-
-		if( interpolate.get(pixel.x,pixel.y) < threshold )
-			return 1;
-		else
-			return 0;
-	}
-
-	public void gridToImage(float row , float col , Point2D_F32 pixel ) {
-		gridToImage.compute(col,row,pixel);
-	}
-
-	private void set(int pairIndex , Polygon2D_F64 square , int squareIndex ) {
-		associatedPairs.get(pairIndex).p2.set(square.get(squareIndex));
-	}
 }

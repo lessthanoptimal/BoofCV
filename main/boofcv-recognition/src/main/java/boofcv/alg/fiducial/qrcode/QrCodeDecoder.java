@@ -57,7 +57,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	List<QrCode> successes = new ArrayList<>();
 	List<QrCode> failures = new ArrayList<>();
 
-	SquareBitReader squareDecoder;
+	SquareBitReader<T> squareDecoder;
 	PackedBits32 bits = new PackedBits32();
 	PackedBits8 bits8 = new PackedBits8();
 
@@ -65,9 +65,11 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	Point2D_F64 grid = new Point2D_F64();
 
 	QrCodeAlignmentPatternLocator<T> alignmentLocator;
+	QrCodeBinaryGridReader<T> gridReader;
 
 	public QrCodeDecoder( Class<T> imageType ) {
 		squareDecoder = new SquareBitReader<>(imageType);
+		gridReader = new QrCodeBinaryGridReader<>(imageType);
 		alignmentLocator = new QrCodeAlignmentPatternLocator<>(imageType);
 	}
 
@@ -77,6 +79,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 * @param gray
 	 */
 	public void process(FastQueue<PositionPatternNode> pps , T gray ) {
+		gridReader.setImage(gray);
 		squareDecoder.setImage(gray);
 		storageQR.reset();
 		successes.clear();
@@ -264,6 +267,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		if( !squareDecoder.setSquare(qr.ppCorner,(float)qr.threshCorner) )
 			return false;
 
+		gridReader.setMarker(qr);
 		QrCode.VersionInfo info = QrCode.VERSION_INFO[qr.version];
 
 		qr.rawbits = new byte[info.codewords];
@@ -639,7 +643,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	}
 
 	private void readDataMatrix(int bit , int row , int col , QrCodeMaskPattern mask ) {
-		int value = alignmentLocator.readBit(row,col);
+		int value = gridReader.readBit(row,col);
 		if( value == -1 ) {
 			// The requested region is outside the image. A partial QR code can be read so let's just
 			// assign it a value of zero and let error correction handle this

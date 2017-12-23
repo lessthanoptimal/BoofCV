@@ -154,6 +154,21 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	}
 
 	/**
+	 * Function that let's you set control and undistorted points at the same time
+	 * @param srcX distorted coordinate
+	 * @param srcY distorted coordinate
+	 * @param dstX undistorted coordinate
+	 * @param dstY undistorted coordinate
+	 * @return Index of control point
+	 */
+	public int add( float srcX , float srcY , float dstX , float dstY )
+	{
+		int which = addControl(srcX,srcY);
+		setUndistorted(which,dstX,dstY);
+		return which;
+	}
+
+	/**
 	 * Sets the distorted location of a specific control point
 	 * @param which Which control point
 	 * @param x distorted coordinate x-axis in image pixels
