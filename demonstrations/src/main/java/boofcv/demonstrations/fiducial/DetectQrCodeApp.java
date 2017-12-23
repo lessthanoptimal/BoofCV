@@ -179,35 +179,38 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					VisualizeBinaryData.render(contours, null, Color.CYAN, scale, g2);
 				}
 
-				List<QrCode> detected = detector.getDetections();
+				if( controls.bShowMarkers ) {
+					List<QrCode> detected = detector.getDetections();
+					g2.setColor(new Color(0x5011FF00, true));
+					for (int i = 0; i < detected.size(); i++) {
+						QrCode qr = detected.get(i);
+						VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
 
-				g2.setColor(new Color(0x5011FF00, true));
-				for (int i = 0; i < detected.size(); i++) {
-					QrCode qr = detected.get(i);
-					VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
-				}
-
-				List<QrCode> failures = detector.getFailures();
-
-
-				for (int i = 0; i < failures.size(); i++) {
-					QrCode qr = failures.get(i);
-					if( qr.failureCause.ordinal() < ALIGNMENT.ordinal())
-						continue;
-					switch( qr.failureCause ) {
-						case ERROR_CORRECTION:
-							g2.setColor(new Color(0x80FF0000, true));
-							break;
-						case DECODING_MESSAGE:
-							g2.setColor(new Color(0x80FF9000, true));
-							break;
-						default:
-							g2.setColor(new Color(0x80FF00C0, true));
-							break;
+						if( controls.bShowBits )
+							renderBinaryValues(g2, qr);
 					}
-					VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
 
-					renderBinaryValues(g2,qr);
+					List<QrCode> failures = detector.getFailures();
+					for (int i = 0; i < failures.size(); i++) {
+						QrCode qr = failures.get(i);
+						if (qr.failureCause.ordinal() < ALIGNMENT.ordinal())
+							continue;
+						switch (qr.failureCause) {
+							case ERROR_CORRECTION:
+								g2.setColor(new Color(0x80FF0000, true));
+								break;
+							case DECODING_MESSAGE:
+								g2.setColor(new Color(0x80FF9000, true));
+								break;
+							default:
+								g2.setColor(new Color(0x80FF00C0, true));
+								break;
+						}
+						VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
+
+						if( controls.bShowBits )
+							renderBinaryValues(g2, qr);
+					}
 				}
 
 				if (controls.bShowSquares) {

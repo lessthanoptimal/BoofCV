@@ -48,14 +48,18 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 
 	JButton bRunAgain = new JButton("Run Again");
 
+	JCheckBox showMarkers;
+	JCheckBox showBits;
 	JCheckBox showSquares;
 	JCheckBox showPositionPattern;
 	JCheckBox showAlignmentPattern;
 	JCheckBox showContour;
 
-	boolean bShowSquares = true;
-	boolean bShowPositionPattern = true; // show position patterns
-	boolean bShowAlignmentPattern = true; // show position patterns
+	boolean bShowMarkers = true;
+	boolean bShowBits = false;
+	boolean bShowSquares = false;
+	boolean bShowPositionPattern = true;
+	boolean bShowAlignmentPattern = true;
 	boolean bShowContour = false;
 
 	DetectBlackPolygonControlPanel polygonPanel;
@@ -90,36 +94,37 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		selectZoom.addChangeListener(this);
 		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
-		showSquares = new JCheckBox("Squares");
-		showSquares.addActionListener(this);
-		showSquares.setSelected(bShowSquares);
-		showPositionPattern = new JCheckBox("Position Pattern");
-		showPositionPattern.setSelected(bShowPositionPattern);
-		showPositionPattern.addActionListener(this);
-		showAlignmentPattern = new JCheckBox("Alignment Pattern");
-		showAlignmentPattern.setSelected(bShowAlignmentPattern);
-		showAlignmentPattern.addActionListener(this);
-		showContour = new JCheckBox("Contour");
-		showContour.addActionListener(this);
-		showContour.setSelected(bShowContour);
+		showMarkers = checkbox("Markers",bShowMarkers);
+		showBits = checkbox("Bits",bShowBits);
+		showSquares = checkbox("Squares", bShowSquares);
+		showPositionPattern = checkbox("Position Pattern",bShowPositionPattern);
+		showAlignmentPattern = checkbox("Alignment Pattern", bShowAlignmentPattern);
+		showContour = checkbox("Contour",bShowContour);
 
-
-		addLabeled(processingTimeLabel,"Time (ms)", this);
-		addLabeled(imageSizeLabel,"Size", this);
+		addLabeled(processingTimeLabel,"Time (ms)");
+		addLabeled(imageSizeLabel,"Size");
 		add(bRunAgain);
-		addLabeled(imageView, "View: ", this);
-		addLabeled(selectZoom,"Zoom",this);
-		addAlignLeft(showSquares, this);
-		addAlignLeft(showAlignmentPattern, this);
-		addAlignLeft(showPositionPattern, this);
-		addAlignLeft(showContour, this);
+		addLabeled(imageView, "View: ");
+		addLabeled(selectZoom,"Zoom");
+		addAlignLeft(showMarkers);
+		addAlignLeft(showBits);
+		addAlignLeft(showSquares);
+		addAlignLeft(showAlignmentPattern);
+		addAlignLeft(showPositionPattern);
+		addAlignLeft(showContour);
 		add(polygonPanel);
-		addVerticalGlue(this);
+		addVerticalGlue();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == imageView ) {
+		if( e.getSource() == showMarkers ) {
+			bShowMarkers = showMarkers.isSelected();
+			owner.viewUpdated();
+		} else if( e.getSource() == showBits ) {
+			bShowBits = showBits.isSelected();
+			owner.viewUpdated();
+		} else if( e.getSource() == imageView ) {
 			selectedView = imageView.getSelectedIndex();
 			owner.viewUpdated();
 		} else if( e.getSource() == showSquares ) {
