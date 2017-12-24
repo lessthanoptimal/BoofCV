@@ -238,6 +238,22 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					}
 				}
 
+				if( controls.bShowBits ) {
+					synchronized (detected) {
+						for (int i = 0; i < detected.size(); i++) {
+							QrCode qr = detected.get(i);
+							renderBinaryValues(g2, qr);
+						}
+
+						for (int i = 0; i < failures.size(); i++) {
+							QrCode qr = failures.get(i);
+							if (qr.failureCause.ordinal() < ALIGNMENT.ordinal())
+								continue;
+							renderBinaryValues(g2, qr);
+						}
+					}
+				}
+
 				if (controls.bShowSquares) {
 					// todo copy after process() to avoid thread issues
 					List<Polygon2D_F64> polygons = detector.getSquareDetector().getPolygons(null, null);

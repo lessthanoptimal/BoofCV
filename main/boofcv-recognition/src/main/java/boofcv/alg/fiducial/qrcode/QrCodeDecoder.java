@@ -369,50 +369,30 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 
 		qr.message = new StringBuilder();
 
+		// if there isn't enough bits left to read the mode it must be done
 		int location = 0;
-		escape:
-		while( location <= bits.size ) {
+		while( location+4 <= bits.size ) {
 			int modeBits = bits.read(location, 4, true);
 			location += 4;
-
-			switch (modeBits) {
-				case 0b0000:
-					break escape;
-				case 0b0001:
-					qr.mode = QrCode.Mode.NUMERIC;
-					location = decodeNumeric(qr, bits,location);
-					break;
-				case 0b0010:
-					qr.mode = QrCode.Mode.ALPHANUMERIC;
-					location = decodeAlphanumeric(qr, bits,location);
-					break;
-				case 0b0100:
-					qr.mode = QrCode.Mode.BYTE;
-					location = decodeByte(qr, bits,location);
-					break;
-				case 0b1000:
-					qr.mode = QrCode.Mode.KANJI;
-					location = decodeKanji(qr, bits,location);
-					break;
-				case 0b0111:
-					qr.mode = QrCode.Mode.ECI;
-					throw new RuntimeException("Not supported yet");
-				case 0b0101:
+			if( modeBits == 0) // escape indicator
+				break;
+			QrCode.Mode mode = QrCode.Mode.lookup(modeBits);
+			qr.mode = updateModeLogic(qr.mode,mode);
+			switch (mode) {
+				case NUMERIC: location = decodeNumeric(qr, bits,location); break;
+				case ALPHANUMERIC: location = decodeAlphanumeric(qr, bits,location); break;
+				case BYTE: location = decodeByte(qr, bits,location); break;
+				case KANJI: location = decodeKanji(qr, bits,location); break;
+				case ECI:
+//					throw new RuntimeException("Not supported yet");
+					qr.failureCause = QrCode.Failure.UNKNOWN_MODE;
+					return false;
+				case FNC1_FIRST:
+				case FNC1_SECOND:
 					// This isn't the proper way to handle this mode, but it
 					// should still parse the data
-					qr.mode = QrCode.Mode.FNC1_1;
 					break;
-
-				case 0b1001:
-					// second FNC1 mode requires parsing and application
-					// ID which can't just be ignored
-					qr.mode = QrCode.Mode.FNC1_2;
-					qr.failureCause = QrCode.Failure.UNKNOWN_MODE;
-					return false;
-//					throw new RuntimeException("Not supported yet");
-				default:
-					qr.failureCause = QrCode.Failure.UNKNOWN_MODE;
-					return false;
+				default: qr.failureCause = QrCode.Failure.UNKNOWN_MODE; return false;
 			}
 
 			if (location < 0) {
@@ -431,6 +411,17 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Set the mode to the most complex character encoding.
+	 */
+	private QrCode.Mode updateModeLogic( QrCode.Mode current , QrCode.Mode candidate )
+	{
+		if( candidate.ordinal() <= QrCode.Mode.KANJI.ordinal() ) {
+			current = current.ordinal() > candidate.ordinal() ? current : candidate;
+		}
+		return current;
 	}
 
 	private static int alignToBytes(int lengthBits) {

@@ -88,7 +88,7 @@ public class QrCode implements Cloneable {
 	/**
 	 * Text encoding mode
 	 */
-	public Mode mode;
+	public Mode mode = Mode.UNKNOWN;
 
 	/**
 	 * The raw byte data encoded into the QR Code. data + ecc
@@ -396,7 +396,7 @@ public class QrCode implements Cloneable {
 		error = L;
 		mask = QrCodeMaskPattern.M111;
 		alignment.reset();
-		mode = Mode.ALPHANUMERIC;
+		mode = Mode.UNKNOWN;
 		failureCause = Failure.NONE;
 		rawbits = null;
 		rawdata = null;
@@ -546,13 +546,39 @@ public class QrCode implements Cloneable {
 	}
 
 	public enum Mode {
-		ECI,
-		NUMERIC,
-		ALPHANUMERIC,
-		BYTE,
-		KANJI,
-		FNC1_1, // FNC1 in first position
-		FNC1_2  // FNC1 in second position
+		UNKNOWN(-1),
+		NUMERIC(0b0001),
+		ALPHANUMERIC(0b0010),
+		BYTE(0b0100),
+		KANJI(0b1000),
+		ECI(0b0111),
+		FNC1_FIRST(0b0101),
+		FNC1_SECOND(0b1001);
+
+		int bits;
+
+		Mode(int bits) {
+			this.bits = bits;
+		}
+
+		public static Mode lookup( int bits ) {
+			if( NUMERIC.bits == bits )
+				return NUMERIC;
+			else if( ALPHANUMERIC.bits == bits )
+				return ALPHANUMERIC;
+			else if( BYTE.bits == bits )
+				return BYTE;
+			else if( KANJI.bits == bits )
+				return KANJI;
+			else if( ECI.bits == bits )
+				return ECI;
+			else if( FNC1_FIRST.bits == bits )
+				return FNC1_FIRST;
+			else if( FNC1_SECOND.bits == bits )
+				return FNC1_SECOND;
+			else
+				return UNKNOWN;
+		}
 	}
 
 	/**
