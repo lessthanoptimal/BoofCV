@@ -18,9 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
-import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.struct.image.GrayU8;
-import georegression.struct.point.Point2D_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -36,8 +34,7 @@ public class TestQrCodeAlignmentPatternLocator {
 	 */
 	@Test
 	public void simple() {
-		QrCode qr = new QrCode();
-		qr.version = 7;
+		QrCode qr = new QrCodeEncoder().setVersion(7).numeric("12340324").fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 		generator.render(qr);
@@ -53,8 +50,7 @@ public class TestQrCodeAlignmentPatternLocator {
 	 */
 	@Test
 	public void centerOnSquare() {
-		QrCode qr = new QrCode();
-		qr.version = 2;
+		QrCode qr = new QrCodeEncoder().setVersion(2).numeric("12340324").fixate();
 
 		centerOnSquare(qr,4);
 		centerOnSquare(qr,1);
@@ -63,11 +59,12 @@ public class TestQrCodeAlignmentPatternLocator {
 	public void centerOnSquare( QrCode qr, int scale ) {
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(scale);
 		generator.render(qr);
+		qr.alignment.reset(); // need to clear the alignment so that it doesn't mess up the reader
 
 		QrCodeAlignmentPatternLocator<GrayU8> alg = new QrCodeAlignmentPatternLocator<>(GrayU8.class);
-//		alg.interpolate.setImage(generator.gray);
+		alg.reader.setImage(generator.gray);
+		alg.reader.setMarker(qr);
 		alg.initializePatterns(qr);
-//		alg.computeHomography(qr);
 
 		QrCode.Alignment a = qr.alignment.get(0);
 
@@ -90,8 +87,7 @@ public class TestQrCodeAlignmentPatternLocator {
 
 	@Test
 	public void localize() {
-		QrCode qr = new QrCode();
-		qr.version = 2;
+		QrCode qr = new QrCodeEncoder().setVersion(2).numeric("12340324").fixate();
 		localize(qr, 4);
 	}
 
@@ -100,9 +96,9 @@ public class TestQrCodeAlignmentPatternLocator {
 		generator.render(qr);
 
 		QrCodeAlignmentPatternLocator<GrayU8> alg = new QrCodeAlignmentPatternLocator<>(GrayU8.class);
-//		alg.interpolate.setImage(generator.gray);
+		alg.reader.setImage(generator.gray);
+		alg.reader.setMarker(qr);
 		alg.initializePatterns(qr);
-//		alg.computeHomography(qr);
 
 		QrCode.Alignment a = qr.alignment.get(0);
 		assertTrue(alg.localize(a, a.moduleY+0.5f, a.moduleX+0.5f));
@@ -119,8 +115,7 @@ public class TestQrCodeAlignmentPatternLocator {
 	 */
 	@Test
 	public void localize_OnePixelModules() {
-		QrCode qr = new QrCode();
-		qr.version = 2;
+		QrCode qr = new QrCodeEncoder().setVersion(2).numeric("12340324").fixate();
 
 		localize(qr, 1);
 	}
@@ -143,8 +138,7 @@ public class TestQrCodeAlignmentPatternLocator {
 	public void initializePatterns() {
 		QrCodeAlignmentPatternLocator<GrayU8> alg = new QrCodeAlignmentPatternLocator<>(GrayU8.class);
 
-		QrCode qr = new QrCode();
-		qr.version = 2;
+		QrCode qr = new QrCodeEncoder().setVersion(2).numeric("12340324").fixate();
 
 		alg.initializePatterns(qr);
 		assertEquals(1,qr.alignment.size);
@@ -160,34 +154,5 @@ public class TestQrCodeAlignmentPatternLocator {
 		assertEquals(22,qr.alignment.get(1).moduleY);
 		assertEquals(22,qr.alignment.get(2).moduleX);
 		assertEquals(22,qr.alignment.get(2).moduleY);
-	}
-
-	@Test
-	public void computeHomography() {
-		QrCode truthQr = new QrCode();
-		truthQr.version = 2;
-		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
-		generator.render(truthQr);
-
-		QrCodeAlignmentPatternLocator<GrayU8> alg = new QrCodeAlignmentPatternLocator<>(GrayU8.class);
-
-//		assertTrue(alg.computeHomography(truthQr));
-
-//		check(alg.gridToImage,0,0,0,0);
-//		check(alg.gridToImage,7,0,7*4,0);
-//		check(alg.gridToImage,7,7,7*4,7*4);
-
-	}
-
-	private void check(PointTransformHomography_F32 gridToImage ,
-					   float x , float y ,
-					   float expectedX , float expectedY )
-	{
-		Point2D_F32 found = new Point2D_F32();
-
-		gridToImage.compute(x,y,found);
-
-		assertEquals(expectedX,found.x,1e-4f);
-		assertEquals(expectedY,found.y,1e-4f);
 	}
 }

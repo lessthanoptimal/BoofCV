@@ -34,7 +34,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	// grid for quick look up of alignment patterns to adjust search
 	private FastQueue<QrCode.Alignment> lookup = new FastQueue<>(QrCode.Alignment.class,true);
 
-	private QrCodeBinaryGridReader<T> reader;
+	QrCodeBinaryGridReader<T> reader;
 
 	// pixel value storage used when localizing
 	float arrayX[] = new float[12];
@@ -52,6 +52,8 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	 */
 	public boolean process(T image , QrCode qr ) {
 		this.qr = qr;
+		// this must be cleared before calling setMarker or else the distortion will be messed up
+		qr.alignment.reset();
 
 		reader.setImage(image);
 		reader.setMarker(qr);
@@ -156,9 +158,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
 			float r = (float)Math.sqrt(dx*dx + dy*dy);
 
-			if( r == 0 ) {
-				break;
-			} else if( bestMag > r ) {
+			if( bestMag > r ) {
 //				System.out.println("good step at "+i);
 				bestMag = r;
 				bestX = guessX;
@@ -168,8 +168,12 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 				step *= 0.75f;
 			}
 
-			guessX = bestX+step*dx/r;
-			guessY = bestY+step*dy/r;
+			if( r > 0 ) {
+				guessX = bestX + step * dx / r;
+				guessY = bestY + step * dy / r;
+			} else {
+				break;
+			}
 		}
 
 		pattern.moduleFound.x = bestX;
