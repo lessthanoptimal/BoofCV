@@ -134,7 +134,53 @@ public class TestQrCodeEncoder {
 
 	@Test
 	public void autoSelectVersion() {
-		fail("Implement");
+		QrCode qr = new QrCodeEncoder().
+				setError(QrCode.ErrorLevel.M).
+				setMask(QrCodeMaskPattern.M011).
+				alphanumeric("123132123").fixate();
+
+		assertEquals(1,qr.version);
+
+		qr = new QrCodeEncoder().
+				setError(QrCode.ErrorLevel.M).
+				setMask(QrCodeMaskPattern.M011).
+				alphanumeric("123132123123132123123132123").fixate();
+
+		assertEquals(2,qr.version);
+	}
+
+	@Test
+	public void autoSelectErrorCorrection() {
+		QrCode qr = new QrCodeEncoder().
+				setVersion(1).
+				setMask(QrCodeMaskPattern.M011).
+				alphanumeric("123").fixate();
+
+		assertEquals(QrCode.ErrorLevel.H,qr.error);
+
+		qr = new QrCodeEncoder().
+				setVersion(1).
+				setMask(QrCodeMaskPattern.M011).
+				alphanumeric("123123213AADE324254349985").fixate();
+
+		assertEquals(QrCode.ErrorLevel.L,qr.error);
+	}
+
+	@Test
+	public void autoSelectVersionAndError() {
+		QrCode qr = new QrCodeEncoder().
+				setMask(QrCodeMaskPattern.M011).
+				alphanumeric("123").fixate();
+
+		assertEquals(1,qr.version);
+		assertEquals(QrCode.ErrorLevel.M,qr.error);
+
+		qr = new QrCodeEncoder().
+				setMask(QrCodeMaskPattern.M011).
+				alphanumeric("123123213AADE324254349985ASDASD").fixate();
+
+		assertEquals(2,qr.version);
+		assertEquals(QrCode.ErrorLevel.M,qr.error);
 	}
 
 	@Test
@@ -142,24 +188,5 @@ public class TestQrCodeEncoder {
 		fail("Implement");
 	}
 
-	@Test
-	public void autoSelectErrorCorrection() {
-		fail("Implement");
-	}
-
-	@Test
-	public void manuialVersion() {
-		fail("Implement");
-	}
-
-	@Test
-	public void manuialMask() {
-		fail("Implement");
-	}
-
-	@Test
-	public void manuialErrorCorrection() {
-		fail("Implement");
-	}
 
 }

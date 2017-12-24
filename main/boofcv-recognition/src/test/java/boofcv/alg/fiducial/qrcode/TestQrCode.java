@@ -42,7 +42,7 @@ public class TestQrCode {
 
 			// test values found at each error level
 			for( QrCode.ErrorLevel level : QrCode.ErrorLevel.values() ) {
-				QrCode.ErrorBlock block = info.levels.get(level);
+				QrCode.BlockInfo block = info.levels.get(level);
 
 				assertTrue( block.dataCodewords < block.codewords);
 
@@ -76,5 +76,21 @@ public class TestQrCode {
 
 			assertTrue(infoA.alignment[infoA.alignment.length-1] < infoB.alignment[infoB.alignment.length-1]);
 		}
+	}
+
+	/**
+	 * Compare against specification
+	 */
+	@Test
+	public void VersionInfo_totalDataBytes() {
+		assertEquals(19, QrCode.VERSION_INFO[1].totalDataBytes(QrCode.ErrorLevel.L));
+		assertEquals(16, QrCode.VERSION_INFO[1].totalDataBytes(QrCode.ErrorLevel.M));
+		assertEquals(13, QrCode.VERSION_INFO[1].totalDataBytes(QrCode.ErrorLevel.Q));
+		assertEquals(9, QrCode.VERSION_INFO[1].totalDataBytes(QrCode.ErrorLevel.H));
+
+		assertEquals(242-48,  QrCode.VERSION_INFO[8].totalDataBytes(QrCode.ErrorLevel.L));
+		assertEquals(242-88,  QrCode.VERSION_INFO[8].totalDataBytes(QrCode.ErrorLevel.M));
+		assertEquals(242-132, QrCode.VERSION_INFO[8].totalDataBytes(QrCode.ErrorLevel.Q));
+		assertEquals(242-156, QrCode.VERSION_INFO[8].totalDataBytes(QrCode.ErrorLevel.H));
 	}
 }

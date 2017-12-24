@@ -303,7 +303,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 //		System.out.println("decoder error "+qr.error);
 
 		QrCode.VersionInfo info = QrCode.VERSION_INFO[qr.version];
-		QrCode.ErrorBlock block = info.levels.get(qr.error);
+		QrCode.BlockInfo block = info.levels.get(qr.error);
 
 		int wordsBlockAllA = block.codewords;
 		int wordsBlockDataA = block.dataCodewords;

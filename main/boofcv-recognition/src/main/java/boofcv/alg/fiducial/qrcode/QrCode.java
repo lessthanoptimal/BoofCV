@@ -55,7 +55,7 @@ public class QrCode implements Cloneable {
 	public static final VersionInfo VERSION_INFO[] = new VersionInfo[MAX_VERSION+1];
 
 	/**
-	 * Location of data bits in the code qr for each version
+	 * Location of data bits in the code qr for each version. Precomputed for speed.
 	 */
 	public static final List<Point2D_I32> LOCATION_BITS[] = new ArrayList[MAX_VERSION+1];
 
@@ -441,9 +441,21 @@ public class QrCode implements Cloneable {
 	 * Error correction level
 	 */
 	public enum ErrorLevel {
+		/**
+		 * Error correction of about 7%
+		 */
 		L(0b01),
+		/**
+		 * Error correction of about 15%
+		 */
 		M(0b00),
+		/**
+		 * Error correction of about 25%
+		 */
 		Q(0b11),
+		/**
+		 * Error correction of about 30%
+		 */
 		H(0b10);
 
 		ErrorLevel(int value) {
@@ -509,7 +521,7 @@ public class QrCode implements Cloneable {
 		final public int alignment[];
 
 		// information for each error correction level
-		final public Map<ErrorLevel,ErrorBlock> levels = new HashMap<>();
+		final public Map<ErrorLevel,BlockInfo> levels = new HashMap<>();
 
 		public VersionInfo(int codewords , int alignment[] ) {
 			this.codewords = codewords;
@@ -517,11 +529,28 @@ public class QrCode implements Cloneable {
 		}
 
 		public void add(ErrorLevel level , int codeWords, int dataCodewords , int eccBlocks ) {
-			levels.put( level , new ErrorBlock(codeWords,dataCodewords, eccBlocks));
+			levels.put( level , new BlockInfo(codeWords,dataCodewords, eccBlocks));
+		}
+
+		/**
+		 * Returns the total number of bytes in the data area that can be stored in at this version and error
+		 * correction level.
+		 * @param error Error correction level
+		 * @return total bytes that can be stored.
+		 */
+		public int totalDataBytes( ErrorLevel error ) {
+			BlockInfo b = levels.get(error);
+			int remaining = codewords - b.codewords*b.blocks;
+			int blocksB = remaining/(b.codewords+1);
+
+			return b.dataCodewords*b.blocks + (b.dataCodewords+1)*blocksB;
 		}
 	}
 
-	public static class ErrorBlock {
+	/**
+	 * Specifies the format for a data block. Storage for data and ECC plus the number of blocks of each size.
+	 */
+	public static class BlockInfo {
 
 		/**
 		 * Code words per block
@@ -534,17 +563,22 @@ public class QrCode implements Cloneable {
 		final public int dataCodewords;
 
 		/**
-		 * Number of error correction blocks
+		 * Number of error data blocks of this size. There can be one other set of blocks which will store codewords
+		 * + 1 and dataCodewords + 1.
 		 */
 		final public int blocks;
 
-		public ErrorBlock( int codewords, int dataCodewords, int blocks) {
+		public BlockInfo(int codewords, int dataCodewords, int blocks) {
 			this.codewords = codewords;
 			this.dataCodewords = dataCodewords;
 			this.blocks = blocks;
 		}
 	}
 
+	/**
+	 * The encoding mode. A QR Code can be encoded with multiple modes. The most complex character set is what the
+	 * final mode is set to when decoding a QR code.
+	 */
 	public enum Mode {
 		UNKNOWN(-1),
 		NUMERIC(0b0001),

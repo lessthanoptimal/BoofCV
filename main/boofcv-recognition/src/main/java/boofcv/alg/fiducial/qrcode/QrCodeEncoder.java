@@ -28,13 +28,11 @@ import java.io.UnsupportedEncodingException;
  *
  * By default it will select the qr code version based on the number of
  * bits and the error correction level based on the version and number of bits. If the error correction isn't specified
- * and the version isn't specified then error correction level Q is used by default.
+ * and the version isn't specified then error correction level M is used by default.
  *
  * @author Peter Abeles
  */
 	// TODO support ECI
-// TODO autoselect version
-	// TODO autoselect error correction
 	// TODO autoselect mask
 public class QrCodeEncoder {
 
@@ -313,6 +311,12 @@ public class QrCodeEncoder {
 	 * @return The generated QR Code
 	 */
 	public QrCode fixate() {
+		autoSelectVersionAndError();
+
+		if( autoMask ) {
+			// todo
+		}
+
 		int maxBits = QrCode.VERSION_INFO[qr.version].codewords*8;
 
 		if( packed.size > maxBits ) {
@@ -327,6 +331,44 @@ public class QrCodeEncoder {
 		return qr;
 	}
 
+	/**
+	 * Checks to see if a request has been made to select version and/or error correction. If so it will pick something
+	 */
+	private void autoSelectVersionAndError() {
+		if( qr.version == -1 ) {
+			if( autoErrorCorrection ) {
+				// this is a reasonable compromise between robustness and data storage
+				qr.error = QrCode.ErrorLevel.M;
+			}
+			// select the smallest version which can store all the data
+			for (int i = 1; i <= 40; i++) {
+				if( packed.size/8 <= QrCode.VERSION_INFO[i].totalDataBytes(qr.error) ) {
+					qr.version = i;
+					break;
+				}
+			}
+			if( qr.version == -1 ) {
+				throw new IllegalArgumentException("Packet too large to store at error level "+qr.error);
+			}
+		} else {
+			// the version is set but the error correction level isn't. Pick the one with
+			// the most error correction that can which can store all the data
+			if( autoErrorCorrection ) {
+				qr.error = null;
+				QrCode.VersionInfo v = QrCode.VERSION_INFO[qr.version];
+				for(QrCode.ErrorLevel level : QrCode.ErrorLevel.values() ) {
+					if( packed.size/8 <= v.totalDataBytes(level)) {
+						qr.error = level;
+					}
+				}
+				if( qr.error == null ) {
+					throw new IllegalArgumentException("You need to use a high version number to store the data. Tried" +
+							"all error correction levels at version "+qr.version+". Total Data "+(packed.size/8));
+				}
+			}
+		}
+	}
+
 	protected void bitsToMessage( PackedBits8 stream ) {
 		// add padding to make it align to 8
 		stream.append(0,(8-(stream.size%8))%8,false);
@@ -335,7 +377,7 @@ public class QrCodeEncoder {
 //		stream.print();System.out.println();
 
 		QrCode.VersionInfo info = QrCode.VERSION_INFO[qr.version];
-		QrCode.ErrorBlock block = info.levels.get(qr.error);
+		QrCode.BlockInfo block = info.levels.get(qr.error);
 
 		qr.rawbits = new byte[info.codewords];
 
