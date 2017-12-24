@@ -19,7 +19,6 @@
 package boofcv.alg.fiducial.qrcode;
 
 import boofcv.struct.image.ImageGray;
-import georegression.struct.point.Point2D_F32;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -43,9 +42,6 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
 	QrCode qr;
 
-	// more work space
-	Point2D_F32 pixel = new Point2D_F32();
-
 	public QrCodeAlignmentPatternLocator( Class<T> imageType ) {
 
 		reader = new QrCodeBinaryGridReader<T>(imageType);
@@ -66,6 +62,36 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		if( qr.version <= 1 )
 			return true;
 		return localizePositionPatterns(QrCode.VERSION_INFO[qr.version].alignment);
+	}
+
+	/**
+	 * Creates a list of alignment patterns to look for and their grid coordinates
+	 */
+	void initializePatterns(QrCode qr) {
+		int qrsize = qr.getNumberOfModules();
+		int where[] = QrCode.VERSION_INFO[qr.version].alignment;
+		qr.alignment.reset();
+		lookup.reset();
+		for (int row = 0; row < where.length; row++) {
+			for (int col = 0; col < where.length; col++) {
+				boolean skip = false;
+				if( row == 0 && col == 0 )
+					skip = true;
+				else if( row == 0 && col == where.length-1 )
+					skip = true;
+				else if( row == where.length-1 && col == 0)
+					skip = true;
+
+				if( skip ) {
+					lookup.add(null);
+				} else {
+					QrCode.Alignment a = qr.alignment.grow();
+					a.moduleX = where[col];
+					a.moduleY = where[row];
+					lookup.add(a);
+				}
+			}
+		}
 	}
 
 	boolean localizePositionPatterns(int[] alignmentLocations ) {
@@ -91,12 +117,11 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 						adjX = p.moduleX+0.5-p.moduleFound.x;
 				}
 
-
-				if( !centerOnSquare(a,(float)(a.moduleX+0.5+adjX),(float)(a.moduleY+0.5+adjY))) {
+				if( !centerOnSquare(a, (float)(a.moduleY+0.5+adjY), (float)(a.moduleX+0.5+adjX))) {
 					return false;
 				}
 
-				if( !localize(a,(float)a.moduleFound.x,(float)a.moduleFound.y) ) {
+				if( !localize(a, (float)a.moduleFound.y, (float)a.moduleFound.x) ) {
 					return false;
 				}
 			}
@@ -110,7 +135,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	 * If the initial guess is within the inner white circle or black dot this will ensure that it is centered
 	 * on the black dot
 	 */
-	boolean centerOnSquare(QrCode.Alignment pattern , float guessX , float guessY) {
+	boolean centerOnSquare(QrCode.Alignment pattern, float guessY, float guessX) {
 		float step = 1;
 		float bestMag = Float.MAX_VALUE;
 		float bestX = guessX;
@@ -122,7 +147,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 				for (int col = 0; col < 3; col++) {
 					float gridx = guessX - 1f + col;
 
-					samples[row*3+col] = reader.read(gridx,gridy);
+					samples[row*3+col] = reader.read(gridy,gridx);
 				}
 			}
 
@@ -131,7 +156,9 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
 			float r = (float)Math.sqrt(dx*dx + dy*dy);
 
-			if( bestMag > r ) {
+			if( r == 0 ) {
+				break;
+			} else if( bestMag > r ) {
 //				System.out.println("good step at "+i);
 				bestMag = r;
 				bestX = guessX;
@@ -148,8 +175,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		pattern.moduleFound.x = bestX;
 		pattern.moduleFound.y = bestY;
 
-		reader.gridToImage((float)pattern.moduleFound.x,(float)pattern.moduleFound.y,pixel);
-		pattern.pixel.set(pixel.x,pixel.y);
+		reader.gridToImage((float)pattern.moduleFound.y,(float)pattern.moduleFound.x,pattern.pixel);
 
 		return true;
 	}
@@ -160,15 +186,15 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	 *
 	 * @return true if success or false if it doesn't resemble an alignment pattern
 	 */
-	boolean localize(QrCode.Alignment pattern , float guessX , float guessY)
+	boolean localize(QrCode.Alignment pattern, float guessY, float guessX)
 	{
 		// sample along the middle. Try to not sample the outside edges which could confuse it
 		for (int i = 0; i < arrayY.length; i++) {
 			float x = guessX - 1.5f + i*3f/12.0f;
 			float y = guessY - 1.5f + i*3f/12.0f;
 
-			arrayX[i] = reader.read(x,guessY);
-			arrayY[i] = reader.read(guessX,y);
+			arrayX[i] = reader.read(guessY,x);
+			arrayY[i] = reader.read(y,guessX);
 		}
 
 		// TODO turn this into an exhaustive search of the array for best up and down point?
@@ -185,7 +211,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		pattern.moduleFound.x = guessX - 1.5f + (downX+upX)*3f/24.0f;
 		pattern.moduleFound.y = guessY - 1.5f + (downY+upY)*3f/24.0f;
 
-		reader.gridToImage((float)pattern.moduleFound.x,(float)pattern.moduleFound.y,pattern.pixel);
+		reader.gridToImage((float)pattern.moduleFound.y,(float)pattern.moduleFound.x,pattern.pixel);
 
 		return true;
 	}
@@ -222,37 +248,5 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		}
 		return best;
 	}
-
-	/**
-	 * Creates a list of alignment patterns to look for and their grid coordinates
-	 */
-	void initializePatterns(QrCode qr) {
-		int qrsize = qr.totalModules();
-		int where[] = QrCode.VERSION_INFO[qr.version].alignment;
-		qr.alignment.reset();
-		lookup.reset();
-		for (int row = where.length-1; row >= 0; row--) {
-			for (int col = 0; col < where.length; col++) {
-				boolean skip = false;
-				if( row == 0 & col == 0 )
-					skip = true;
-				else if( row == where.length-1 & col == 0)
-					skip = true;
-				else if( row == where.length-1 & col == where.length-1)
-					skip = true;
-
-				if( skip ) {
-					lookup.add(null);
-				} else {
-					QrCode.Alignment a = qr.alignment.grow();
-					a.moduleX = where[col];
-					a.moduleY = qrsize-where[row]-1;
-					lookup.add(a);
-				}
-			}
-		}
-	}
-
-
 
 }

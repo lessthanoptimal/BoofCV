@@ -41,7 +41,7 @@ import static boofcv.alg.fiducial.qrcode.QrCode.ErrorLevel.*;
  *
  * @author Peter Abeles
  */
-public class QrCode {
+public class QrCode implements Cloneable {
 
 	/**
 	 * Maximum possible version of a QR Code
@@ -372,7 +372,7 @@ public class QrCode {
 		reset();
 	}
 
-	public int totalModules() {
+	public int getNumberOfModules() {
 		return totalModules(version);
 	}
 
@@ -380,13 +380,18 @@ public class QrCode {
 		return version*4+17;
 	}
 
+	/**
+	 * Resets the QR-Code so that it's in its initial state.
+	 */
 	public void reset() {
 		for (int i = 0; i < 4; i++) {
 			ppCorner.get(i).set(0,0);
 			ppDown.get(i).set(0,0);
 			ppRight.get(i).set(0,0);
 		}
-
+		this.threshCorner = 0;
+		this.threshDown = 0;
+		this.threshRight = 0;
 		version = 1;
 		error = L;
 		mask = QrCodeMaskPattern.M111;
@@ -396,6 +401,40 @@ public class QrCode {
 		rawbits = null;
 		rawdata = null;
 		message = null;
+	}
+
+	@Override
+	public QrCode clone() {
+		QrCode c = new QrCode();
+		c.set(this);
+		return this;
+	}
+
+	/**
+	 * Sets 'this' so that it's equivalent to 'o'.
+	 * @param o The target object
+	 */
+	public void set( QrCode o ) {
+		this.version = o.version;
+		this.error = o.error;
+		this.mask = o.mask;
+		this.message = o.message;
+		this.mode = o.mode;
+		this.rawbits = o.rawbits == null ? null : o.rawbits.clone();
+		this.rawdata = o.rawdata == null ? null : o.rawdata.clone();
+		this.message = o.message == null ? null : new StringBuilder(o.message);
+		this.threshCorner = o.threshCorner;
+		this.threshDown = o.threshDown;
+		this.threshRight = o.threshRight;
+		this.ppCorner.set(o.ppCorner);
+		this.ppDown.set(o.ppDown);
+		this.ppRight.set(o.ppRight);
+		this.failureCause = o.failureCause;
+		this.bounds.set(o.bounds);
+		this.alignment.reset();
+		for (int i = 0; i < o.alignment.size; i++) {
+			this.alignment.grow().set(o.alignment.get(i));
+		}
 	}
 
 	/**
@@ -452,6 +491,13 @@ public class QrCode {
 		 * Threshold value selected at this alignment pattern
 		 */
 		public double threshold;
+
+		public void set( Alignment o ){
+			this.pixel.set(o.pixel);
+			this.moduleX = o.moduleX;
+			this.moduleY = o.moduleY;
+			this.moduleFound.set(o.moduleFound);
+		}
 	}
 
 	public static class VersionInfo {

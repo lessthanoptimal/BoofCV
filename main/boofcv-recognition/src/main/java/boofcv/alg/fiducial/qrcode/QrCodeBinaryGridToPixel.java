@@ -47,7 +47,7 @@ public class QrCodeBinaryGridToPixel {
 	Homography2D_F32 Hinv32 = new Homography2D_F32();
 
 	public void setMarker( QrCode qr ) {
-		int N = qr.totalModules();
+		int N = qr.getNumberOfModules();
 
 		pairs.reset();
 		set(0, 7, qr.ppCorner,1);
@@ -98,7 +98,7 @@ public class QrCodeBinaryGridToPixel {
 		int closest = -1;
 		double best = Double.MAX_VALUE;
 		for (int i = 0; i < pairs.size; i++) {
-			double d = pairs.get(i).p2.distance2(row,col);
+			double d = pairs.get(i).p2.distance2(col,row);
 			if( d < best ) {
 				best = d;
 				closest = i;

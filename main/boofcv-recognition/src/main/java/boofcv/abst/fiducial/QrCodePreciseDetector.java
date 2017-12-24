@@ -73,11 +73,6 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 		milliDecoding.update((time1-time0)*1e-6);
 
 		System.out.printf(" decoding %5.1f\n",milliDecoding.getAverage());
-
-		System.out.println("Failed "+decoder.getFailures().size());
-		for( QrCode qr : decoder.getFailures() ) {
-			System.out.println("  cause "+qr.failureCause);
-		}
 	}
 
 	@Override

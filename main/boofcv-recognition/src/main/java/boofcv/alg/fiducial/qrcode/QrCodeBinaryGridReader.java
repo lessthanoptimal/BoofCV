@@ -87,16 +87,16 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 		if( pixel.x < -0.5 || pixel.y < -0.5 || pixel.x > imageWidth || pixel.y > imageHeight )
 			return -1;
 
-		float pixel01 = interpolate.get(pixel.x-1,pixel.y);
-		float pixel21 = interpolate.get(pixel.x+1,pixel.y);
-		float pixel10 = interpolate.get(pixel.x,pixel.y-1);
-		float pixel12 = interpolate.get(pixel.x,pixel.y+1);
+//		float pixel01 = interpolate.get(pixel.x-1,pixel.y);
+//		float pixel21 = interpolate.get(pixel.x+1,pixel.y);
+//		float pixel10 = interpolate.get(pixel.x,pixel.y-1);
+//		float pixel12 = interpolate.get(pixel.x,pixel.y+1);
 		float pixel00 = interpolate.get(pixel.x,pixel.y);
 
-		float value = (pixel01+pixel21+pixel10+pixel12)*0.25f;
-		value = value*0.5f + pixel00*0.5f;
+//		float value = (pixel01+pixel21+pixel10+pixel12)*0.25f;
+//		value = value*0.5f + pixel00*0.5f;
 
-		if( value < threshold )
+		if( pixel00 < threshold )
 			return 1;
 		else
 			return 0;

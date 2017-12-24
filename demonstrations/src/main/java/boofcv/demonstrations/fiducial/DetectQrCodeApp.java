@@ -21,7 +21,10 @@ package boofcv.demonstrations.fiducial;
 import boofcv.abst.fiducial.QrCodePreciseDetector;
 import boofcv.alg.fiducial.calib.squares.SquareEdge;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
-import boofcv.alg.fiducial.qrcode.*;
+import boofcv.alg.fiducial.qrcode.PackedBits8;
+import boofcv.alg.fiducial.qrcode.PositionPatternNode;
+import boofcv.alg.fiducial.qrcode.QrCode;
+import boofcv.alg.fiducial.qrcode.QrCodeBinaryGridToPixel;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
@@ -70,9 +73,12 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	QrCodePreciseDetector<T> detector;
 
 	//--------- ONLY INVOKE IN THE GUI ------------
-	QrCodeAlignmentPatternLocator<T> locator = new QrCodeAlignmentPatternLocator(GrayU8.class); // image type doesn't matter
+	QrCodeBinaryGridToPixel locator = new QrCodeBinaryGridToPixel();
 
-	QrCodeBinaryGridToPixel locatorB = new QrCodeBinaryGridToPixel();
+	// Loack against detected
+	final FastQueue<QrCode> detected = new FastQueue<>(QrCode.class,true);
+	final FastQueue<QrCode> failures = new FastQueue<>(QrCode.class,true);
+
 
 	public DetectQrCodeApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);
@@ -145,6 +151,24 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			timeInSeconds = (after-before)*1e-9;
 		}
 
+		// create a local copy so that gui and processing thread's dont conflict
+		synchronized (detected) {
+			this.detected.reset();
+			for (QrCode d : detector.getDetections()) {
+				this.detected.grow().set(d);
+			}
+			this.failures.reset();
+			for (QrCode d : detector.getFailures()) {
+				this.failures.grow().set(d);
+			}
+
+			System.out.println("Failed "+failures.size());
+			for( QrCode qr : failures.toList() ) {
+				System.out.println("  cause "+qr.failureCause);
+			}
+		}
+
+
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -172,7 +196,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			synchronized (DetectQrCodeApp.this) {
 
 				if (controls.bShowContour) {
-
+					// todo copy after process() to avoid thread issues. or lock
 					LinearContourLabelChang2004 contour = detector.getSquareDetector().getDetector().getContourFinder();
 					List<Contour> contours =
 							BinaryImageOps.convertContours(contour.getPackedPoints(), contour.getContours());
@@ -181,41 +205,41 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 				}
 
 				if( controls.bShowMarkers ) {
-					List<QrCode> detected = detector.getDetections();
+					synchronized (detected) {
+						for (int i = 0; i < detected.size(); i++) {
+							g2.setColor(new Color(0x5011FF00, true));
+							QrCode qr = detected.get(i);
+							VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
 
-					for (int i = 0; i < detected.size(); i++) {
-						g2.setColor(new Color(0x5011FF00, true));
-						QrCode qr = detected.get(i);
-						VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
-
-						if( controls.bShowBits )
-							renderBinaryValues(g2, qr);
-					}
-
-					List<QrCode> failures = detector.getFailures();
-					for (int i = 0; i < failures.size(); i++) {
-						QrCode qr = failures.get(i);
-						if (qr.failureCause.ordinal() < ALIGNMENT.ordinal())
-							continue;
-						switch (qr.failureCause) {
-							case ERROR_CORRECTION:
-								g2.setColor(new Color(0x80FF0000, true));
-								break;
-							case DECODING_MESSAGE:
-								g2.setColor(new Color(0x80FF9000, true));
-								break;
-							default:
-								g2.setColor(new Color(0x80FF00C0, true));
-								break;
+							if (controls.bShowBits)
+								renderBinaryValues(g2, qr);
 						}
-						VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
 
-						if( controls.bShowBits )
-							renderBinaryValues(g2, qr);
+						for (int i = 0; i < failures.size(); i++) {
+							QrCode qr = failures.get(i);
+							if (qr.failureCause.ordinal() < ALIGNMENT.ordinal())
+								continue;
+							switch (qr.failureCause) {
+								case ERROR_CORRECTION:
+									g2.setColor(new Color(0x80FF0000, true));
+									break;
+								case DECODING_MESSAGE:
+									g2.setColor(new Color(0x80FF9000, true));
+									break;
+								default:
+									g2.setColor(new Color(0x80FF00C0, true));
+									break;
+							}
+							VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
+
+							if (controls.bShowBits)
+								renderBinaryValues(g2, qr);
+						}
 					}
 				}
 
 				if (controls.bShowSquares) {
+					// todo copy after process() to avoid thread issues
 					List<Polygon2D_F64> polygons = detector.getSquareDetector().getPolygons(null, null);
 
 					g2.setColor(Color.GREEN);
@@ -226,11 +250,14 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 				}
 
 				if (controls.bShowAlignmentPattern) {
-					renderAlignmentPatterns(g2, detector.getDetections());
-					renderAlignmentPatterns(g2, detector.getFailures());
+					synchronized (detected) {
+						renderAlignmentPatterns(g2, detected.toList());
+						renderAlignmentPatterns(g2, failures.toList());
+					}
 				}
 
 				if (controls.bShowPositionPattern) {
+					// todo copy after process() to avoid thread issues
 					FastQueue<PositionPatternNode> nodes = detector.getDetectPositionPatterns().getPositionPatterns();
 
 					g2.setColor(Color.ORANGE);
@@ -282,7 +309,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		 */
 		private void renderBinaryValues( Graphics2D g2 , QrCode qr ) {
 
-			locatorB.setMarker(qr);
+			locator.setMarker(qr);
 			List<Point2D_I32> points = QrCode.LOCATION_BITS[qr.version];
 
 			PackedBits8 bits = new PackedBits8();
@@ -293,7 +320,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			g2.setStroke(new BasicStroke(1));
 			for (int i = 0; i < bits.size; i++) {
 				Point2D_I32 c = points.get(i);
-				locatorB.gridToImage(c.y+0.5f,c.x+0.5f,  p);
+				locator.gridToImage(c.y+0.5f,c.x+0.5f,  p);
 				int value = qr.mask.apply(c.y,c.x,bits.get(i));
 
 				if( value == 1 ) {
