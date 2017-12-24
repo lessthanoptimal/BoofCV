@@ -550,7 +550,9 @@ public class QrCode implements Cloneable {
 		NUMERIC,
 		ALPHANUMERIC,
 		BYTE,
-		KANJI
+		KANJI,
+		FNC1_1, // FNC1 in first position
+		FNC1_2  // FNC1 in second position
 	}
 
 	/**

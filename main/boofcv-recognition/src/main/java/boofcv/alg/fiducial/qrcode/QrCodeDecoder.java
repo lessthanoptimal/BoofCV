@@ -397,6 +397,19 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 				case 0b0111:
 					qr.mode = QrCode.Mode.ECI;
 					throw new RuntimeException("Not supported yet");
+				case 0b0101:
+					// This isn't the proper way to handle this mode, but it
+					// should still parse the data
+					qr.mode = QrCode.Mode.FNC1_1;
+					break;
+
+				case 0b1001:
+					// second FNC1 mode requires parsing and application
+					// ID which can't just be ignored
+					qr.mode = QrCode.Mode.FNC1_2;
+					qr.failureCause = QrCode.Failure.UNKNOWN_MODE;
+					return false;
+//					throw new RuntimeException("Not supported yet");
 				default:
 					qr.failureCause = QrCode.Failure.UNKNOWN_MODE;
 					return false;
