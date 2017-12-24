@@ -32,10 +32,8 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.geometry.UtilPoint2D_F64;
-import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
-import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
@@ -299,58 +297,23 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		graph.checkConnect(node0,intersection0,node1,intersection1,lineA.getLength2());
 	}
 
-	float lineX[] = new float[7];
-	float lineY[] = new float[7];
-	Point2D_F32 imagePixel = new Point2D_F32();
 	/**
 	 * Determines if the found polygon looks like a position pattern. A horizontal and vertical line are sampled.
 	 * At each sample point it is marked if it is above or below the binary threshold for this square. Location
 	 * of sample points is found by "removing" perspective distortion.
 	 */
 	boolean checkPositionPatternAppearance( Polygon2D_F64 square , float grayThreshold ) {
-
-		if(Intersection2D_F64.containConvex(square,new Point2D_F64(2948.6, 1435.67))) {
-			System.out.println("The target");
-		}
-
-		return( checkLine(square,grayThreshold,0) && checkLine(square,grayThreshold,1));
-
-		// TODO Improve accuracy for small shapes
-		// lines can be inaccurate. That appears to cause a significant number of false negatives
-		// maybe sample outside of the line and see if it's black. If it is add an offset.
-		// seems to rarely extend outside beyound the true square.
-		// Also increasing number of samples and having a soft threshold seems to help
-		// need to test against a more exhaustive set of images before doing these optimizations
-
-		// create a mapping assuming perspective distortion
-		// NOTE: Order doesn't matter here as long as the square is CW or CCW
-//		if( !removePerspective.createTransform(square.get(0),square.get(1),square.get(2),square.get(3)) )
-//			return false;
-//
-//		// with Perspective removed to Image coordinates.
-//		PointTransformHomography_F32 p2i = removePerspective.getTransform();
-//
-//		// Sample horizontal and vertical scan lines which are approximately in the middle of the shape.
-//		for (int i = 0; i < 7; i++) {
-//			float location = 10*i+5;
-//			p2i.compute(location,35,imagePixel);
-//			lineX[i] = interpolate.get(imagePixel.x,imagePixel.y);
-//			p2i.compute(35,location,imagePixel);
-//			lineY[i] = interpolate.get(imagePixel.x,imagePixel.y);
-//		}
-//
-//		// see if the change in intensity matched the expected pattern
-//		if( !positionSquareIntensityCheck(lineX,grayThreshold))
-//			return false;
-//
-//		return positionSquareIntensityCheck(lineY,grayThreshold);
+		return( checkLine(square,grayThreshold,0) || checkLine(square,grayThreshold,1));
 	}
 
 	LineSegment2D_F64 segment = new LineSegment2D_F64();
 	LineParametric2D_F64 parametric = new LineParametric2D_F64();
-	float[] samples = new float[9*4+1];
+	float[] samples = new float[9*5+1];
+	int length[] = new int[30];
+	int type[] = new int[30];
 	private boolean checkLine( Polygon2D_F64 square , float grayThreshold , int side )
 	{
+		// find the mid point between two parallel sides
 		int c0 = side;
 		int c1 = (side+1)%4;
 		int c2 = (side+2)%4;
@@ -361,6 +324,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 		UtilLine2D_F64.convert(segment,parametric);
 
+		// Scan along the line plus some extra
 		int period = samples.length/9;
 		double N = samples.length-2*period-1;
 
@@ -373,8 +337,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 			samples[i] = interpolate.get(x,y);
 		}
 
-		int length[] = new int[30];
-		int type[] = new int[30];
+		// threshold and compute run length encoding
 
 		int size = 0;
 		boolean black = samples[0] < grayThreshold;
@@ -393,15 +356,30 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		}
 		size++;
 
+		// if too simple or too complex reject
 		if( size < 5 || size > 9)
 			return false;
+		// detect finder pattern inside RLE
 		for (int i = 0; i+5 <= size; i++) {
 			if( type[i] != 0)
 				continue;
-			int totalBlack = length[i]+length[i+2]+length[i+4];
-			int totalWhite = length[i+1]+length[i+3];
 
-			if( totalBlack < 5.5*totalWhite && totalBlack > 1.5*totalWhite )
+			int black0 = length[i];
+			int black1 = length[i+2];
+			int black2 = length[i+4];
+
+			int white0 = length[i+1];
+			int white1 = length[i+3];
+
+			// the center black area can get exagerated easily
+			if( black0 < 0.4*white0 || black0 > 3*white0 )
+				continue;
+			if( black2 < 0.4*white1 || black2 > 3*white1 )
+				continue;
+
+			int black02 = black0+black2;
+
+			if( black1 >= black02 && black1 <= 2*black02 )
 				return true;
 		}
 		return false;
