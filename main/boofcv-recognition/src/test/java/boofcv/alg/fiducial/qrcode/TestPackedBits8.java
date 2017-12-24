@@ -64,29 +64,33 @@ public class TestPackedBits8 {
 	@Test
 	public void growArray() {
 		PackedBits8 values = new PackedBits8(8);
+		assertEquals(8,values.size);
 		assertEquals(1,values.data.length);
 
 		values.growArray(2,false);
-		assertEquals(2,values.data.length);
+		assertTrue(2<=values.data.length);
 		assertEquals(10,values.size);
 
 		values.growArray(7,false);
-		assertEquals(3,values.data.length);
+		assertTrue(3 <= values.data.length);
 		assertEquals(17,values.size);
-
 
 		// see if save value works
 		values.set(10,1);
 		values.growArray(1,true);
 		assertEquals(1,values.get(10));
-		assertEquals(3,values.data.length);
+		assertTrue(3 <= values.data.length);
 		assertEquals(18,values.size);
 		values.growArray(7,true);
 		assertEquals(1,values.get(10));
-		assertEquals(4,values.data.length);
+		assertTrue(4 <= values.data.length);
 		assertEquals(25,values.size);
+
+		values = new PackedBits8(8);
+		values.set(2,1);
+		assertEquals(1,values.get(2));
 		values.growArray(8,false);
-		assertEquals(0,values.get(10));
+		assertEquals(0,values.get(2));
 	}
 
 	@Test

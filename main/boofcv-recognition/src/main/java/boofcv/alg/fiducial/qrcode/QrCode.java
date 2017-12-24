@@ -78,7 +78,7 @@ public class QrCode implements Cloneable {
 	/**
 	 * Which masking pattern is applied
 	 */
-	public QrCodeMaskPattern mask = QrCodeMaskPattern.M111;
+	public QrCodeMaskPattern mask = null;
 
 	/**
 	 * Alignment pattern information
@@ -108,7 +108,7 @@ public class QrCode implements Cloneable {
 	/**
 	 * Specifies where the QR code parsing failed
 	 */
-	public Failure failureCause = Failure.NONE;
+	public Failure failureCause = null;
 
 	/**
 	 * Approximate bounding box for QR-Code. The bottom right corner is estimated by intersecting lines
@@ -392,7 +392,7 @@ public class QrCode implements Cloneable {
 		this.threshCorner = 0;
 		this.threshDown = 0;
 		this.threshRight = 0;
-		version = 1;
+		version = -1;
 		error = L;
 		mask = QrCodeMaskPattern.M111;
 		alignment.reset();
