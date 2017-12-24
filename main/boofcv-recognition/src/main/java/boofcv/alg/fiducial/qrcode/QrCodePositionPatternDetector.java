@@ -18,7 +18,6 @@
 
 package boofcv.alg.fiducial.qrcode;
 
-import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.distort.RemovePerspectiveDistortion;
 import boofcv.alg.fiducial.calib.squares.SquareGraph;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
@@ -31,6 +30,10 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import georegression.geometry.UtilLine2D_F64;
+import georegression.geometry.UtilPoint2D_F64;
+import georegression.metric.Intersection2D_F64;
+import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
@@ -306,6 +309,12 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 */
 	boolean checkPositionPatternAppearance( Polygon2D_F64 square , float grayThreshold ) {
 
+		if(Intersection2D_F64.containConvex(square,new Point2D_F64(2948.6, 1435.67))) {
+			System.out.println("The target");
+		}
+
+		return( checkLine(square,grayThreshold,0) && checkLine(square,grayThreshold,1));
+
 		// TODO Improve accuracy for small shapes
 		// lines can be inaccurate. That appears to cause a significant number of false negatives
 		// maybe sample outside of the line and see if it's black. If it is add an offset.
@@ -315,26 +324,87 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 		// create a mapping assuming perspective distortion
 		// NOTE: Order doesn't matter here as long as the square is CW or CCW
-		if( !removePerspective.createTransform(square.get(0),square.get(1),square.get(2),square.get(3)) )
-			return false;
+//		if( !removePerspective.createTransform(square.get(0),square.get(1),square.get(2),square.get(3)) )
+//			return false;
+//
+//		// with Perspective removed to Image coordinates.
+//		PointTransformHomography_F32 p2i = removePerspective.getTransform();
+//
+//		// Sample horizontal and vertical scan lines which are approximately in the middle of the shape.
+//		for (int i = 0; i < 7; i++) {
+//			float location = 10*i+5;
+//			p2i.compute(location,35,imagePixel);
+//			lineX[i] = interpolate.get(imagePixel.x,imagePixel.y);
+//			p2i.compute(35,location,imagePixel);
+//			lineY[i] = interpolate.get(imagePixel.x,imagePixel.y);
+//		}
+//
+//		// see if the change in intensity matched the expected pattern
+//		if( !positionSquareIntensityCheck(lineX,grayThreshold))
+//			return false;
+//
+//		return positionSquareIntensityCheck(lineY,grayThreshold);
+	}
 
-		// with Perspective removed to Image coordinates.
-		PointTransformHomography_F32 p2i = removePerspective.getTransform();
+	LineSegment2D_F64 segment = new LineSegment2D_F64();
+	LineParametric2D_F64 parametric = new LineParametric2D_F64();
+	float[] samples = new float[9*4+1];
+	private boolean checkLine( Polygon2D_F64 square , float grayThreshold , int side )
+	{
+		int c0 = side;
+		int c1 = (side+1)%4;
+		int c2 = (side+2)%4;
+		int c3 = (side+3)%4;
 
-		// Sample horizontal nad vertical scan lines which are approximately in the middle of the shape.
-		for (int i = 0; i < 7; i++) {
-			float location = 10*i+5;
-			p2i.compute(location,35,imagePixel);
-			lineX[i] = interpolate.get(imagePixel.x,imagePixel.y);
-			p2i.compute(35,location,imagePixel);
-			lineY[i] = interpolate.get(imagePixel.x,imagePixel.y);
+		UtilPoint2D_F64.mean(square.get(c0),square.get(c1), segment.a);
+		UtilPoint2D_F64.mean(square.get(c2),square.get(c3), segment.b);
+
+		UtilLine2D_F64.convert(segment,parametric);
+
+		int period = samples.length/9;
+		double N = samples.length-2*period-1;
+
+		for (int i = 0; i < samples.length; i++) {
+			double location = (i-period)/N;
+
+			float x = (float)(parametric.p.x + location*parametric.slope.x);
+			float y = (float)(parametric.p.y + location*parametric.slope.y);
+
+			samples[i] = interpolate.get(x,y);
 		}
 
-		// see if the change in intensity matched the expected pattern
-		if( !positionSquareIntensityCheck(lineX,grayThreshold))
-			return false;
+		int length[] = new int[30];
+		int type[] = new int[30];
 
-		return positionSquareIntensityCheck(lineY,grayThreshold);
+		int size = 0;
+		boolean black = samples[0] < grayThreshold;
+		type[0] = black ? 0 : 1;
+		for (int i = 0; i < samples.length; i++) {
+			boolean b = samples[i] < grayThreshold;
+
+			if( black == b ) {
+				length[size]++;
+			} else {
+				black = b;
+				size += 1;
+				type[size] = black ? 0 : 1;
+				length[size] = 1;
+			}
+		}
+		size++;
+
+		if( size < 5 || size > 9)
+			return false;
+		for (int i = 0; i+5 <= size; i++) {
+			if( type[i] != 0)
+				continue;
+			int totalBlack = length[i]+length[i+2]+length[i+4];
+			int totalWhite = length[i+1]+length[i+3];
+
+			if( totalBlack < 5.5*totalWhite && totalBlack > 1.5*totalWhite )
+				return true;
+		}
+		return false;
 	}
 
 	/**
