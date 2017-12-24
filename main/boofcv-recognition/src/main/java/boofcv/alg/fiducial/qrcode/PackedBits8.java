@@ -128,7 +128,9 @@ public class PackedBits8 implements PackedBits {
 		int N = size/8 + (size%8==0?0:1);
 
 		if( N > data.length ) {
-			byte[] tmp = new byte[N];
+			// add in some buffer to avoid lots of calls to new
+			int extra = Math.min(1024,N+10);
+			byte[] tmp = new byte[N+extra];
 			if( saveValue )
 				System.arraycopy(data,0,tmp,0,data.length);
 			this.data = tmp;

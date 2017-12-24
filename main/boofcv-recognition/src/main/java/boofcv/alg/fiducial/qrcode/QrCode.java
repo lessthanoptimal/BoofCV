@@ -552,6 +552,7 @@ public class QrCode implements Cloneable {
 		BYTE(0b0100),
 		KANJI(0b1000),
 		ECI(0b0111),
+		STRUCTURE_APPENDED(0b0011),
 		FNC1_FIRST(0b0101),
 		FNC1_SECOND(0b1001);
 
@@ -572,6 +573,8 @@ public class QrCode implements Cloneable {
 				return KANJI;
 			else if( ECI.bits == bits )
 				return ECI;
+			else if( STRUCTURE_APPENDED.bits == bits )
+				return STRUCTURE_APPENDED;
 			else if( FNC1_FIRST.bits == bits )
 				return FNC1_FIRST;
 			else if( FNC1_SECOND.bits == bits )

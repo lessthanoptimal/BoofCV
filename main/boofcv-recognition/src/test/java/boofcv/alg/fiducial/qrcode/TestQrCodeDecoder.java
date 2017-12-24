@@ -42,7 +42,7 @@ public class TestQrCodeDecoder {
 			QrCode expected = new QrCodeEncoder().setVersion(1).
 					setError(QrCode.ErrorLevel.M).
 					setMask(QrCodeMaskPattern.M011).
-					numeric(message);
+					numeric(message).fixate();
 
 			QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 			generator.render(expected);
@@ -73,7 +73,7 @@ public class TestQrCodeDecoder {
 			QrCode expected = new QrCodeEncoder().setVersion(2).
 					setError(QrCode.ErrorLevel.M).
 					setMask(QrCodeMaskPattern.M011).
-					alphanumeric(message);
+					alphanumeric(message).fixate();
 
 			QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 			generator.render(expected);
@@ -100,7 +100,7 @@ public class TestQrCodeDecoder {
 		QrCode expected = new QrCodeEncoder().setVersion(2).
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				bytes(new byte[]{0x1f,0x22,0x56,(byte)0xFF});
+				bytes(new byte[]{0x50,0x70,0x34,0x2F}).fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 		generator.render(expected);
@@ -118,7 +118,7 @@ public class TestQrCodeDecoder {
 		assertEquals(expected.version,found.version);
 		assertEquals(expected.error,found.error);
 		assertEquals(expected.mode,found.mode);
-		assertEquals("1F2256FF",new String(found.message));
+		assertEquals("Pp4/",new String(found.message));
 	}
 
 	@Test
@@ -126,7 +126,7 @@ public class TestQrCodeDecoder {
 		QrCode expected = new QrCodeEncoder().setVersion(2).
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				kanji("阿ん鞠ぷへ≦Ｋ");
+				kanji("阿ん鞠ぷへ≦Ｋ").fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 		generator.render(expected);
@@ -147,6 +147,32 @@ public class TestQrCodeDecoder {
 		assertEquals("阿ん鞠ぷへ≦Ｋ",new String(found.message));
 	}
 
+
+	@Test
+	public void message_multiple() {
+		QrCode expected = new QrCodeEncoder().setVersion(3).
+				setError(QrCode.ErrorLevel.M).
+				setMask(QrCodeMaskPattern.M011).
+				kanji("阿ん鞠ぷへ≦Ｋ").numeric("1235").alphanumeric("AF").bytes("efg").fixate();
+
+		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+		generator.render(expected);
+		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
+
+//		ShowImages.showWindow(generator.gray,"QR Code", true);
+//		BoofMiscOps.sleep(100000);
+
+		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
+		decoder.process(pps,generator.gray);
+
+		assertEquals(1,decoder.successes.size());
+		QrCode found = decoder.getFound().get(0);
+
+		assertEquals(expected.version,found.version);
+		assertEquals(expected.error,found.error);
+		assertEquals(QrCode.Mode.KANJI,found.mode);
+		assertEquals("阿ん鞠ぷへ≦Ｋ1235AFefg",new String(found.message));
+	}
 	/**
 	 * Runs through the entire algorithm using a rendered image
 	 */
@@ -170,7 +196,7 @@ public class TestQrCodeDecoder {
 		QrCode expected = new QrCodeEncoder().setVersion(version).
 				setError(error).
 				setMask(mask).
-				numeric("01234567");
+				numeric("01234567").fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 //		generator.renderData = false;
@@ -312,7 +338,11 @@ public class TestQrCodeDecoder {
 
 	@Test
 	public void alignToBytes() {
-		fail("implement");
+		assertEquals(0,QrCodeDecoder.alignToBytes(0));
+		assertEquals(8,QrCodeDecoder.alignToBytes(1));
+		assertEquals(8,QrCodeDecoder.alignToBytes(7));
+		assertEquals(8,QrCodeDecoder.alignToBytes(8));
+		assertEquals(16,QrCodeDecoder.alignToBytes(9));
 	}
 
 	@Test

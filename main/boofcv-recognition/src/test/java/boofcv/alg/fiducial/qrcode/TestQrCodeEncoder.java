@@ -35,7 +35,7 @@ public class TestQrCodeEncoder {
 		QrCode qr = new QrCodeEncoder().setVersion(1).
 				setError(QrCode.ErrorLevel.M).
 				setMask(new QrCodeMaskPattern.NONE(0b011)).
-				numeric("01234567");
+				numeric("01234567").fixate();
 
 		byte[] expected = new byte[]{0b00010000,
 		0b00100000, 0b00001100, 0b01010110, 0b01100001 ,(byte)0b10000000, (byte)0b11101100, 0b00010001,
@@ -48,8 +48,13 @@ public class TestQrCodeEncoder {
 
 		assertEquals(qr.rawbits.length,expected.length);
 		for (int i = 0; i < expected.length; i++) {
-			assertEquals(qr.rawbits[i],expected[i]);
+			assertEquals(expected[i],qr.rawbits[i]);
 		}
+	}
+
+	@Test
+	public void checkAlphaNumericLookUpTable() {
+		assertEquals(45,QrCodeEncoder.ALPHANUMERIC.length());
 	}
 
 	/**
@@ -61,7 +66,7 @@ public class TestQrCodeEncoder {
 		encoder.setVersion(1).
 				setError(QrCode.ErrorLevel.H).
 				setMask(new QrCodeMaskPattern.NONE(0b011)).
-				alphanumeric("AC-42");
+				alphanumeric("AC-42").fixate();
 
 		byte[] expected = new byte[]{0b00100000, 0b00101001, (byte)0b11001110, (byte)0b11100111, 0b00100001,0};
 
@@ -69,7 +74,7 @@ public class TestQrCodeEncoder {
 
 		assertEquals(encoder.packed.size/8,expected.length);
 		for (int i = 0; i < expected.length; i++) {
-			assertEquals(encoder.packed.data[i],expected[i]);
+			assertEquals(expected[i],encoder.packed.data[i]);
 		}
 	}
 
@@ -94,7 +99,7 @@ public class TestQrCodeEncoder {
 		QrCodeEncoder encoder = new QrCodeEncoder();
 		encoder.setVersion(1).setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				kanji("阿ん鞠ぷへ≦Ｋ");
+				kanji("阿ん鞠ぷへ≦Ｋ").fixate();
 
 		byte expected[] = new byte[]{
 				0x01,0x4E,(byte)0x8B,(byte)0xA0,0x23,
@@ -105,6 +110,27 @@ public class TestQrCodeEncoder {
 		}
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void messageTooLong() {
+		QrCode qr = new QrCodeEncoder().setVersion(1).
+				setError(QrCode.ErrorLevel.M).
+				setMask(QrCodeMaskPattern.M011).
+				alphanumeric("01234567890123456789012345678901234567890123456789012345678901234567890123456789").fixate();
+
+		assertTrue(qr.rawbits.length==26);
+	}
+
+	/**
+	 * See if it blows up when encoding using multiple encoding methods
+	 */
+	@Test
+	public void multipleModes() {
+		new QrCodeEncoder()
+				.setVersion(1).setError(QrCode.ErrorLevel.M).
+				setMask(QrCodeMaskPattern.M011).
+				numeric("1234").
+				kanji("阿ん鞠ぷへ≦Ｋ").fixate();
+	}
 
 	@Test
 	public void autoSelectVersion() {

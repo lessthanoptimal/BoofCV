@@ -68,16 +68,16 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	 * Creates a list of alignment patterns to look for and their grid coordinates
 	 */
 	void initializePatterns(QrCode qr) {
-		int qrsize = qr.getNumberOfModules();
+		int N = qr.getNumberOfModules();
 		int where[] = QrCode.VERSION_INFO[qr.version].alignment;
 		qr.alignment.reset();
 		lookup.reset();
-		for (int row = 0; row < where.length; row++) {
+		for (int row =  where.length-1; row >= 0; row--) {
 			for (int col = 0; col < where.length; col++) {
 				boolean skip = false;
 				if( row == 0 && col == 0 )
 					skip = true;
-				else if( row == 0 && col == where.length-1 )
+				else if( row ==  where.length-1 && col == where.length-1 )
 					skip = true;
 				else if( row == where.length-1 && col == 0)
 					skip = true;
@@ -87,7 +87,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 				} else {
 					QrCode.Alignment a = qr.alignment.grow();
 					a.moduleX = where[col];
-					a.moduleY = where[row];
+					a.moduleY = N-where[row]-1;
 					lookup.add(a);
 				}
 			}

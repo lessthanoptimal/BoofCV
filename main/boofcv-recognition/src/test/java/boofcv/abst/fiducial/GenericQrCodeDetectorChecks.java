@@ -59,7 +59,7 @@ public abstract class GenericQrCodeDetectorChecks {
 		expected = new QrCodeEncoder().setVersion(2).
 				setError(QrCode.ErrorLevel.H).
 				setMask(QrCodeMaskPattern.M010).
-				numeric(message);
+				numeric(message).fixate();
 	}
 
 	protected abstract QrCodeDetector<GrayF32> createDetector();

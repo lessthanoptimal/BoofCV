@@ -424,7 +424,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		return current;
 	}
 
-	private static int alignToBytes(int lengthBits) {
+	public static int alignToBytes(int lengthBits) {
 		return lengthBits + (8-lengthBits%8)%8;
 	}
 
@@ -688,6 +688,10 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		return version != -1;
 	}
 
+	/**
+	 * Decode version information from read in bits
+	 * @return The found version or -1 if it failed
+	 */
 	private int decodeVersion() {
 		int bits = this.bits.data[0];
 		int message;

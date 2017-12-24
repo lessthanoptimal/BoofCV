@@ -38,26 +38,39 @@ import java.io.UnsupportedEncodingException;
 	// TODO autoselect mask
 public class QrCodeEncoder {
 
+	/**
+	 * All the possible values in alphanumeric mode.
+	 */
+	public static final String ALPHANUMERIC= "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
+
 	// used to compute error correction
-	ReidSolomonCodes rscodes = new ReidSolomonCodes(8,0b100011101);
+	private ReidSolomonCodes rscodes = new ReidSolomonCodes(8,0b100011101);
 
 	// output qr code
-	QrCode qr = new QrCode();
+	private QrCode qr = new QrCode();
 
 	// If true it will automatically select the amount of error correction depending on the length of the data
-	boolean autoErrorCorrection = true;
+	private boolean autoErrorCorrection;
 
-	boolean autoMask = true;
+	private boolean autoMask;
 
 	// workspace variables
 	PackedBits8 packed = new PackedBits8();
 	// storage for the data message
-	GrowQueue_I8 message = new GrowQueue_I8();
+	private GrowQueue_I8 message = new GrowQueue_I8();
 	// storage fot the message's ecc
-	GrowQueue_I8 ecc = new GrowQueue_I8();
+	private GrowQueue_I8 ecc = new GrowQueue_I8();
 
 	public QrCodeEncoder() {
+		reset();
+	}
+
+	public void reset() {
+		qr.reset();
 		qr.version = -1;
+		packed.size = 0;
+		autoMask = true;
+		autoErrorCorrection = true;
 	}
 
 	public QrCodeEncoder setVersion(int version ) {
@@ -82,7 +95,7 @@ public class QrCodeEncoder {
 	 * @param message String that specifies numbers and no other types. Each number has to be from 0 to 9 inclusive.
 	 * @return The QR-Code
 	 */
-	public QrCode numeric(String message ) {
+	public QrCodeEncoder numeric(String message ) {
 		int[] numbers = new int[ message.length() ];
 
 		for (int i = 0; i < message.length(); i++) {
@@ -95,22 +108,19 @@ public class QrCodeEncoder {
 		return numeric(numbers);
 	}
 
-
 	/**
 	 * Creates a QR-Code which encodes a number sequence
 	 * @param numbers Array of numbers. Each number has to be from 0 to 9 inclusive.
 	 * @return The QR-Code
 	 */
-	public QrCode numeric(int[] numbers ) {
+	public QrCodeEncoder numeric(int[] numbers ) {
 		for (int i = 0; i < numbers.length; i++) {
 			if( numbers[i] < 0 || numbers[i] > 9 )
 				throw new IllegalArgumentException("All numbers must have a value from 0 to 9");
 		}
+
 		qr.mode = QrCode.Mode.NUMERIC;
 		int lengthBits = getLengthBitsNumeric(qr.version);
-
-		packed.resize(lengthBits + 10*(numbers.length/3)); // predeclare memory
-		packed.size = 0; // set size to 0 so that append() starts from the front
 
 		// specify the mode
 		packed.append(0b0001,4,false);
@@ -133,12 +143,7 @@ public class QrCodeEncoder {
 			packed.append(value,4,false);
 		}
 
-		// add the terminator to the bit stream
-		packed.append(0b0000,4,false);
-
-		bitsToMessage(packed);
-
-		return qr;
+		return this;
 	}
 
 	/**
@@ -146,15 +151,12 @@ public class QrCodeEncoder {
 	 * @param alphaNumeric String containing only alphanumeric values.
 	 * @return The QR-Code
 	 */
-	public QrCode alphanumeric( String alphaNumeric ) {
+	public QrCodeEncoder alphanumeric( String alphaNumeric ) {
 		byte values[] = alphanumericToValues(alphaNumeric);
 
 		qr.mode = QrCode.Mode.ALPHANUMERIC;
 
 		int lengthBits = getLengthBitsAlphanumeric(qr.version);
-
-		packed.resize(lengthBits + 11*(values.length/2+1)); // predeclare memory
-		packed.size = 0; // set size to 0 so that append() starts from the front
 
 		// specify the mode
 		packed.append(0b0010,4,false);
@@ -174,14 +176,7 @@ public class QrCodeEncoder {
 			packed.append(value,6,false);
 		}
 
-		// add the terminator to the bit stream
-		packed.append(0b0000,4,false);
-
-//		packed.print();
-
-		bitsToMessage(packed);
-
-		return qr;
+		return this;
 	}
 
 	public static byte[] alphanumericToValues( String data ) {
@@ -189,67 +184,25 @@ public class QrCodeEncoder {
 
 		for (int i = 0; i < data.length(); i++) {
 			char c = data.charAt(i);
-			if( Character.isDigit(c)) {
-				output[i] = (byte)(c-'0');
-			} else {
-				int value = (int)(Character.toUpperCase(c)-'A');
-				if( value >= 0 && value < 36 ) {
-					output[i] = (byte)(10+value);
-				} else {
-					switch(c) {
-						case ' ':
-							output[i] = 36; break;
-
-						case '$':
-							output[i] = 37; break;
-
-						case '%':
-							output[i] = 38; break;
-
-						case '*':
-							output[i] = 39; break;
-
-						case '+':
-							output[i] = 40; break;
-
-						case '-':
-							output[i] = 41; break;
-
-						case '.':
-							output[i] = 42; break;
-
-						case '/':
-							output[i] = 43; break;
-
-						case ':':
-							output[i] = 44; break;
-
-						default:
-							throw new IllegalArgumentException("Unsupported character '"+c+"' = "+(int)c);
-
-					}
-				}
-			}
+			int value = ALPHANUMERIC.indexOf(c);
+			if( value < 0 )
+				throw new IllegalArgumentException("Unsupported character '"+c+"' = "+(int)c);
+			output[i] = (byte)value;
 		}
 		return output;
 	}
 
 	public static char valueToAlphanumeric( int value ) {
-		if( value <= 9 )
-			return (char)(value+'0');
-		if( value < 36 )
-			return (char)(value-10+'A');
-		switch(value) {
-			case 36: return ' ';
-			case 37: return '$';
-			case 38: return '%';
-			case 39: return '*';
-			case 40: return '+';
-			case 41: return '-';
-			case 42: return '.';
-			case 43: return '/';
-			case 44: return ':';
-			default: throw new IllegalArgumentException("value out of range");
+		if( value < 0 || value >= ALPHANUMERIC.length() )
+			throw new RuntimeException("Value out of range");
+		return ALPHANUMERIC.charAt(value);
+	}
+
+	public QrCodeEncoder bytes( String message ) {
+		try {
+			return bytes(message.getBytes("JIS"));
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -258,13 +211,10 @@ public class QrCodeEncoder {
 	 * @param data Data to be encoded
 	 * @return The QR-Code
 	 */
-	public QrCode bytes( byte[] data ) {
+	public QrCodeEncoder bytes( byte[] data ) {
 		qr.mode = QrCode.Mode.BYTE;
 
 		int lengthBits = getLengthBitsBytes(qr.version);
-
-		packed.resize(lengthBits + 8*data.length); // predeclare memory
-		packed.size = 0; // set size to 0 so that append() starts from the front
 
 		// specify the mode
 		packed.append(0b0100,4,false);
@@ -277,14 +227,7 @@ public class QrCodeEncoder {
 			packed.append(data[i]&0xff,8,false);
 		}
 
-		// add the terminator to the bit stream
-		packed.append(0b0000,4,false);
-
-//		packed.print();
-
-		bitsToMessage(packed);
-
-		return qr;
+		return this;
 	}
 
 	/**
@@ -292,7 +235,7 @@ public class QrCodeEncoder {
 	 * @param message Data to be encoded
 	 * @return The QR-Code
 	 */
-	public QrCode kanji( String message ) {
+	public QrCodeEncoder kanji( String message ) {
 		qr.mode = QrCode.Mode.KANJI;
 
 		int lengthBits = getLengthBitsKanji(qr.version);
@@ -303,9 +246,6 @@ public class QrCodeEncoder {
 		} catch (UnsupportedEncodingException ex) {
 			throw new IllegalArgumentException(ex);
 		}
-
-		packed.resize(lengthBits + 8*bytes.length); // predeclare memory
-		packed.size = 0; // set size to 0 so that append() starts from the front
 
 		// specify the mode
 		packed.append(0b1000,4,false);
@@ -329,12 +269,7 @@ public class QrCodeEncoder {
 			packed.append(encoded, 13, false);
 		}
 
-		// add the terminator to the bit stream
-		packed.append(0b0000,4,false);
-//		packed.print();
-		bitsToMessage(packed);
-
-		return qr;
+		return this;
 	}
 
 	public static int getLengthBitsNumeric( int version ) {
@@ -371,6 +306,25 @@ public class QrCodeEncoder {
 	// todo implement
 	public QrCode eci() {
 		return null;
+	}
+
+	/**
+	 * Call this function after you are done adding to the QR code
+	 * @return The generated QR Code
+	 */
+	public QrCode fixate() {
+		int maxBits = QrCode.VERSION_INFO[qr.version].codewords*8;
+
+		if( packed.size > maxBits ) {
+			throw new IllegalArgumentException("The message is longer than the max possible size");
+		}
+
+		if( packed.size+4 <= maxBits) {
+			// add the terminator to the bit stream
+			packed.append(0b0000, 4, false);
+		}
+		bitsToMessage(packed);
+		return qr;
 	}
 
 	protected void bitsToMessage( PackedBits8 stream ) {
