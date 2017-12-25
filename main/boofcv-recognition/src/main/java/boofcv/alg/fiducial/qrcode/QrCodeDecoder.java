@@ -166,17 +166,14 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			return false;
 		}
 
-		// most of the time features are localized well, but some times there can be bad ones. This
-		// adds and removes them and sees if anything works
+		//F irst try using all the features then remove features if they have large errors and might
+		// have incorrectly localized
 		boolean success = false;
 		gridReader.setMarker(qr);
+		gridReader.getGridToImage().addAllFeatures(qr);
 		// by default it removes outside corners. This works most of the time
 		for (int i = 0; i < 6; i++) {
 			if( i > 0 ) {
-				// remove features based on their errors
-				if( i == 1 ) {
-					gridReader.getGridToImage().addAllFeatures(qr);
-				}
 				boolean removed = gridReader.getGridToImage().removeFeatureWithLargestError();
 				if( !removed ) {
 					break;
@@ -200,7 +197,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 //				System.out.println("failed trial "+i+" "+qr.failureCause);
 				continue;
 			}
-//			if( i > 2 )
+//			if( i > 0 )
 //				System.out.println("***<<<<  decoded on trial "+i);
 			success = true;
 			break;

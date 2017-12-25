@@ -75,7 +75,7 @@ public class QrCodeBinaryGridToPixel {
 		set(N-7, 0, qr.ppDown,0);
 		set(N-7, 7, qr.ppDown,1);
 		set(N, 7, qr.ppDown,2);
-		set(N, 0, qr.ppDown,2); // outside corner
+		set(N, 0, qr.ppDown,3); // outside corner
 
 		for (int i = 0; i < qr.alignment.size; i++) {
 			QrCode.Alignment a = qr.alignment.get(i);
