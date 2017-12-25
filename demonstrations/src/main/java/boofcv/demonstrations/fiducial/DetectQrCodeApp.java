@@ -162,10 +162,10 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 				this.failures.grow().set(d);
 			}
 
-			System.out.println("Failed "+failures.size());
-			for( QrCode qr : failures.toList() ) {
-				System.out.println("  cause "+qr.failureCause);
-			}
+//			System.out.println("Failed "+failures.size());
+//			for( QrCode qr : failures.toList() ) {
+//				System.out.println("  cause "+qr.failureCause);
+//			}
 		}
 
 
@@ -325,8 +325,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		 */
 		private void renderBinaryValues( Graphics2D g2 , QrCode qr ) {
 
-			locator.addAllFeatures(qr);
-			// TODO save what's in the used feature list
+			locator.setHomographyInv(qr.Hinv);
 
 			List<Point2D_I32> points = QrCode.LOCATION_BITS[qr.version];
 

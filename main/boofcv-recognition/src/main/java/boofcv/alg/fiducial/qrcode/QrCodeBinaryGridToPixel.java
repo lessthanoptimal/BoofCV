@@ -97,7 +97,7 @@ public class QrCodeBinaryGridToPixel {
 		pairs.remove(0);
 	}
 
-	public void removeFeatureWithLargestError() {
+	public boolean removeFeatureWithLargestError() {
 		int selected = -1;
 		double largestError = 0;
 
@@ -113,8 +113,11 @@ public class QrCodeBinaryGridToPixel {
 				selected = i;
 			}
 		}
-		if( selected != -1 ) {
+		if( selected != -1 && largestError > 2*2 ) {
 			pairs.remove(selected);
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -173,5 +176,10 @@ public class QrCodeBinaryGridToPixel {
 
 	public void setAdjustWithFeatures(boolean adjustWithFeatures) {
 		this.adjustWithFeatures = adjustWithFeatures;
+	}
+
+	public void setHomographyInv(Homography2D_F64 Hinv) {
+		this.Hinv.set(Hinv);
+		ConvertFloatType.convert(Hinv, Hinv32);
 	}
 }

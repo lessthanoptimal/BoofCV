@@ -36,7 +36,7 @@ public class TestQrCodeBinaryGridToPixel {
 		generator.render(qr);
 
 		QrCodeBinaryGridToPixel alg = new QrCodeBinaryGridToPixel();
-		alg.setMarker(qr);
+//		alg.setMarker(qr);
 
 		check(alg,0,0,0,0);
 		check(alg,7,0,7*4,0);

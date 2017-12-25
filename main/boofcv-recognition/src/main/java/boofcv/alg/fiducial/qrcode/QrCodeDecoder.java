@@ -170,40 +170,44 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		// adds and removes them and sees if anything works
 		boolean success = false;
 		gridReader.setMarker(qr);
-		gridReader.getGridToImage().addAllFeatures(qr);
+		// by default it removes outside corners. This works most of the time
 		for (int i = 0; i < 6; i++) {
-			qr.failureCause = QrCode.Failure.NONE;
 			if( i > 0 ) {
-				if (i < 5) {
-					gridReader.getGridToImage().removeFeatureWithLargestError();
-				} else {
+				// remove features based on their errors
+				if( i == 1 ) {
 					gridReader.getGridToImage().addAllFeatures(qr);
-					gridReader.getGridToImage().removeOutsideCornerFeatures();
-					gridReader.getGridToImage().setAdjustWithFeatures(true);
+				}
+				boolean removed = gridReader.getGridToImage().removeFeatureWithLargestError();
+				if( !removed ) {
+					break;
 				}
 			}
 			gridReader.getGridToImage().computeTransform();
+			qr.failureCause = QrCode.Failure.NONE;
 
 			if( !readRawData(qr) ) {
 				qr.failureCause = QrCode.Failure.READING_BITS;
-				System.out.println("failed trial "+i+" "+qr.failureCause);
+//				System.out.println("failed trial "+i+" "+qr.failureCause);
 				continue;
 			}
 			if( !applyErrorCorrection(qr)) {
 				qr.failureCause = QrCode.Failure.ERROR_CORRECTION;
-				System.out.println("failed trial "+i+" "+qr.failureCause);
+//				System.out.println("failed trial "+i+" "+qr.failureCause);
 				continue;
 			}
 			if( !decodeMessage(qr) ) {
 				// error enum is set internally so that it can be more specific
-				System.out.println("failed trial "+i+" "+qr.failureCause);
+//				System.out.println("failed trial "+i+" "+qr.failureCause);
 				continue;
 			}
-			System.out.println("***<<<<  decoded on trial "+i);
+//			if( i > 2 )
+//				System.out.println("***<<<<  decoded on trial "+i);
 			success = true;
 			break;
 		}
 
+//		System.out.println("success "+success+" v "+qr.version+" mask "+qr.mask+" error "+qr.error);
+		qr.Hinv.set(gridReader.getGridToImage().Hinv);
 		return success;
 	}
 

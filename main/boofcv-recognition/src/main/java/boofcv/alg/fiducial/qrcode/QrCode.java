@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -117,6 +118,8 @@ public class QrCode implements Cloneable {
 	 * Order: top-left = 0. Top-right = 1, Bottom-Right = 2, Bottom-Left = 3.
 	 */
 	public Polygon2D_F64 bounds = new Polygon2D_F64(4);
+
+	public Homography2D_F64 Hinv = new Homography2D_F64();
 
 	static {
 		// Manually entered from QR Code table. There's no simple equation for these magic numbers
@@ -435,6 +438,7 @@ public class QrCode implements Cloneable {
 		for (int i = 0; i < o.alignment.size; i++) {
 			this.alignment.grow().set(o.alignment.get(i));
 		}
+		this.Hinv.set(o.Hinv);
 	}
 
 	/**
