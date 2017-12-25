@@ -41,6 +41,7 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 
 	float threshold;
 
+
 	public QrCodeBinaryGridReader( Class<T> imageType ) {
 		// use nearest neighbor to avoid shifting the location
 		interpolate = FactoryInterpolation.nearestNeighborPixelS(imageType);
@@ -54,7 +55,9 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 	}
 
 	public void setMarker( QrCode qr ) {
-		gridToImage.setMarker(qr);
+		gridToImage.addAllFeatures(qr);
+		gridToImage.removeOutsideCornerFeatures();
+		gridToImage.computeTransform();
 		threshold = (float)(qr.threshCorner+qr.threshDown+qr.threshRight)/3.0f;
 	}
 
@@ -100,5 +103,9 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 			return 1;
 		else
 			return 0;
+	}
+
+	public QrCodeBinaryGridToPixel getGridToImage() {
+		return gridToImage;
 	}
 }

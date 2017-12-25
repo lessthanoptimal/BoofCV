@@ -325,7 +325,9 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		 */
 		private void renderBinaryValues( Graphics2D g2 , QrCode qr ) {
 
-			locator.setMarker(qr);
+			locator.addAllFeatures(qr);
+			// TODO save what's in the used feature list
+
 			List<Point2D_I32> points = QrCode.LOCATION_BITS[qr.version];
 
 			PackedBits8 bits = new PackedBits8();

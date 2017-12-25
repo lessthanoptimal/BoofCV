@@ -165,20 +165,46 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			qr.failureCause = QrCode.Failure.ALIGNMENT;
 			return false;
 		}
-		if( !readRawData(qr) ) {
-			qr.failureCause = QrCode.Failure.READING_BITS;
-			return false;
-		}
-		if( !applyErrorCorrection(qr)) {
-			qr.failureCause = QrCode.Failure.ERROR_CORRECTION;
-			return false;
-		}
-		if( !decodeMessage(qr) ) {
-			// error enum is set internally so that it can be more specific
-			return false;
+
+		// most of the time features are localized well, but some times there can be bad ones. This
+		// adds and removes them and sees if anything works
+		boolean success = false;
+		gridReader.setMarker(qr);
+		gridReader.getGridToImage().addAllFeatures(qr);
+		for (int i = 0; i < 6; i++) {
+			qr.failureCause = QrCode.Failure.NONE;
+			if( i > 0 ) {
+				if (i < 5) {
+					gridReader.getGridToImage().removeFeatureWithLargestError();
+				} else {
+					gridReader.getGridToImage().addAllFeatures(qr);
+					gridReader.getGridToImage().removeOutsideCornerFeatures();
+					gridReader.getGridToImage().setAdjustWithFeatures(true);
+				}
+			}
+			gridReader.getGridToImage().computeTransform();
+
+			if( !readRawData(qr) ) {
+				qr.failureCause = QrCode.Failure.READING_BITS;
+				System.out.println("failed trial "+i+" "+qr.failureCause);
+				continue;
+			}
+			if( !applyErrorCorrection(qr)) {
+				qr.failureCause = QrCode.Failure.ERROR_CORRECTION;
+				System.out.println("failed trial "+i+" "+qr.failureCause);
+				continue;
+			}
+			if( !decodeMessage(qr) ) {
+				// error enum is set internally so that it can be more specific
+				System.out.println("failed trial "+i+" "+qr.failureCause);
+				continue;
+			}
+			System.out.println("***<<<<  decoded on trial "+i);
+			success = true;
+			break;
 		}
 
-		return true;
+		return success;
 	}
 
 	/**
@@ -264,10 +290,6 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 * Read the raw data from input memory
 	 */
 	private boolean readRawData( QrCode qr) {
-		if( !squareDecoder.setSquare(qr.ppCorner,(float)qr.threshCorner) )
-			return false;
-
-		gridReader.setMarker(qr);
 		QrCode.VersionInfo info = QrCode.VERSION_INFO[qr.version];
 
 		qr.rawbits = new byte[info.codewords];
