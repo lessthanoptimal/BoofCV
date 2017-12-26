@@ -88,7 +88,12 @@ public class TestQrCodeEncoder {
 
 	@Test
 	public void valueToAlphanumeric() {
-		fail("Implement");
+		byte input[] = new byte[]{1,4,10,14,38,39,40,41,42,43,44};
+		String expected = "14AE%*+-./:";
+		for (int i = 0; i < input.length; i++) {
+			char c = QrCodeEncoder.valueToAlphanumeric(input[i]);
+			assertTrue(c == expected.charAt(i));
+		}
 	}
 
 	/**

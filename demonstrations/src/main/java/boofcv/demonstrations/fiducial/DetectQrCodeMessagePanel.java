@@ -62,6 +62,7 @@ implements ListSelectionListener
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,new JScrollPane(listDetected),textArea);
 		splitPane.setDividerLocation(150);
+		splitPane.setPreferredSize(new Dimension(200,0));
 
 		addAlignCenter(new JLabel("QR-Codes"));
 		addAlignCenter(splitPane);
@@ -77,13 +78,13 @@ implements ListSelectionListener
 		this.detected.clear();
 		for (int i = 0; i < detected.size(); i++) {
 			QrCode qr = detected.get(i);
-			model.addElement(String.format("Ver. %2d Mode %s. %10s",qr.version,qr.mode.toString(),qr.message.toString()));
+			model.addElement(String.format("V%2d Mode %.5s %.10s",qr.version,qr.mode.toString(),qr.message.toString()));
 			this.detected.add( qr.clone() );
 		}
 		this.failures.clear();
 		for (int i = 0; i < failures.size(); i++) {
 			QrCode qr = failures.get(i);
-			model.addElement(String.format("Ver. %2d Mode %s. FAILED",qr.version,qr.mode.toString()));
+			model.addElement(String.format("V%2d Mode %.6s FAILED",qr.version,qr.mode.toString()));
 			this.failures.add( qr.clone() );
 		}
 		listDetected.invalidate();
