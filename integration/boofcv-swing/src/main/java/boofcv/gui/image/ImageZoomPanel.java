@@ -79,6 +79,17 @@ public class ImageZoomPanel extends JScrollPane {
 		centerView(centerX, centerY);
 	}
 
+	public synchronized void setScaleAndCenter( double scale,  double cx , double cy) {
+		this.scale = scale;
+		if( img != null ) {
+			int w = (int)Math.ceil(img.getWidth()*scale);
+			int h = (int)Math.ceil(img.getHeight()*scale);
+			panel.setPreferredSize(new Dimension(w, h));
+		}
+		getViewport().setView(panel);
+		centerView(cx,cy);
+	}
+
 	public synchronized void centerView( double cx , double cy ) {
 		Rectangle r = panel.getVisibleRect();
 		int x = (int)(cx*scale-r.width/2);

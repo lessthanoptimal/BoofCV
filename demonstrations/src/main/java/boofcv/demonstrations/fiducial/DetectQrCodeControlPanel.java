@@ -44,6 +44,8 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 {
 	DetectQrCodeApp owner;
 
+	DetectQrCodeMessagePanel messagePanel;
+
 	// selects which image to view
 	JComboBox imageView;
 
@@ -72,6 +74,8 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 
 	public DetectQrCodeControlPanel(DetectQrCodeApp owner) {
 		this.owner = owner;
+
+		messagePanel = new DetectQrCodeMessagePanel(owner);
 
 		ConfigThresholdLocalOtsu configThreshold = ConfigThreshold.local(ThresholdType.BLOCK_OTSU,20);
 		configThreshold.scale = 1.0;
@@ -117,6 +121,10 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		togglePanel.add(showContour);
 		togglePanel.setMaximumSize(togglePanel.getPreferredSize());
 
+		JTabbedPane tabbedPanel = new JTabbedPane();
+		tabbedPanel.addTab("Message", messagePanel);
+		tabbedPanel.addTab("Controls", polygonPanel);
+
 		addLabeled(processingTimeLabel,"Time (ms)");
 		addLabeled(imageSizeLabel,"Size");
 		add(bRunAgain);
@@ -125,7 +133,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		add(togglePanel);
 		addLabeled(spinnerMinimumVersion,"Min. Version");
 		addLabeled(spinnerMaximumVersion,"Max. Version");
-		add(polygonPanel);
+		add(tabbedPanel);
 		addVerticalGlue();
 	}
 

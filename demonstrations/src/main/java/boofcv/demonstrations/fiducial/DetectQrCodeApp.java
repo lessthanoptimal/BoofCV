@@ -43,6 +43,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -68,11 +69,14 @@ import static boofcv.alg.fiducial.qrcode.QrCode.Failure.ALIGNMENT;
  * @author Peter Abeles
  */
 public class DetectQrCodeApp<T extends ImageGray<T>>
-		extends DetectBlackShapeAppBase implements ShapeGuiListener
+		extends DetectBlackShapeAppBase implements ShapeGuiListener, DetectQrCodeMessagePanel.Listener
 {
 	QrCodePreciseDetector<T> detector;
 
+
 	//--------- ONLY INVOKE IN THE GUI ------------
+	DetectQrCodeControlPanel controlPanel;
+	VisualizePanel gui = new VisualizePanel();
 	QrCodeBinaryGridToPixel locator = new QrCodeBinaryGridToPixel();
 
 	// Loack against detected
@@ -83,8 +87,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	public DetectQrCodeApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);
 
-		final VisualizePanel gui = new VisualizePanel();
-		DetectQrCodeControlPanel controlPanel = new DetectQrCodeControlPanel(this);
+		controlPanel = new DetectQrCodeControlPanel(this);
 		controlPanel.polygonPanel.removeControlNumberOfSides();
 		setupGui(gui,controlPanel);
 
@@ -159,9 +162,9 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			}
 			this.failures.reset();
 			for (QrCode d : detector.getFailures()) {
-				this.failures.grow().set(d);
+				if( d.failureCause.ordinal() >= QrCode.Failure.READING_BITS.ordinal())
+					this.failures.grow().set(d);
 			}
-
 //			System.out.println("Failed "+failures.size());
 //			for( QrCode qr : failures.toList() ) {
 //				System.out.println("  cause "+qr.failureCause);
@@ -174,6 +177,9 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			public void run() {
 				controls.setProcessingTime(timeInSeconds);
 				viewUpdated();
+				synchronized (detected) {
+					controlPanel.messagePanel.updateList(detected.toList(),failures.toList());
+				}
 			}
 		});
 	}
@@ -181,6 +187,43 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	@Override
 	protected void detectorProcess(ImageGray input, GrayU8 binary) {
 		throw new RuntimeException("This shouldn't be called");
+	}
+
+	@Override
+	public void selectedMarker(int index, boolean failure) {
+		double width=0;
+		final Point2D_F64 center = new Point2D_F64();
+
+		synchronized (detected) {
+			QrCode qr;
+			if( failure ) {
+				if (index >= failures.size)
+					return;
+				qr = failures.get(index);
+			} else {
+				if (index >= detected.size)
+					return;
+				qr = detected.get(index);
+			}
+			UtilPolygons2D_F64.vertexAverage(qr.bounds,center);
+
+
+			for (int i = 0; i < 4; i++) {
+				width = Math.max(width,qr.bounds.getSideLength(i));
+			}
+		}
+
+		final double _width = width;
+
+		BoofSwingUtil.invokeNowOrLater(new Runnable() {
+			@Override
+			public void run() {
+				double scale = 0.75*Math.min(gui.getWidth(),gui.getHeight())/_width;
+				gui.setScaleAndCenter(scale,center.x,center.y);
+				controlPanel.setZoom(scale);
+			}
+		});
+
 	}
 
 	class VisualizePanel extends ShapeVisualizePanel {
