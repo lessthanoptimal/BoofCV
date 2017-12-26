@@ -54,7 +54,7 @@ implements ListSelectionListener
 		listDetected.addListSelectionListener(this);
 
 		textArea.setEditable(false);
-		textArea.setWrapStyleWord(false);
+		textArea.setWrapStyleWord(true);
 		textArea.setLineWrap(true);
 
 		// ensures that the split pane can be dragged
