@@ -49,7 +49,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 	// selects which image to view
 	JComboBox imageView;
 
-	JButton bRunAgain = new JButton("Run Again");
+	JButton bRunAgain = new JButton("(ms)");
 
 	JSpinner spinnerMinimumVersion;
 	JSpinner spinnerMaximumVersion;
@@ -90,6 +90,8 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 				DetectQrCodeControlPanel.this.owner.reprocessImageOnly();
 			}
 		});
+		bRunAgain.setMaximumSize(bRunAgain.getPreferredSize());
+		bRunAgain.setBorder(BorderFactory.createEmptyBorder(1,4,1,4));
 
 		imageView = new JComboBox();
 		imageView.addItem("Input");
@@ -125,9 +127,13 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		tabbedPanel.addTab("Message", messagePanel);
 		tabbedPanel.addTab("Controls", polygonPanel);
 
-		addLabeled(processingTimeLabel,"Time (ms)");
+		JPanel timePanel = new JPanel();
+		timePanel.setLayout(new BoxLayout(timePanel,BoxLayout.X_AXIS));
+		timePanel.add(processingTimeLabel);
+		timePanel.add(bRunAgain);
+
+		addLabeled(timePanel,"Time");
 		addLabeled(imageSizeLabel,"Size");
-		add(bRunAgain);
 		addLabeled(imageView, "View: ");
 		addLabeled(selectZoom,"Zoom");
 		add(togglePanel);

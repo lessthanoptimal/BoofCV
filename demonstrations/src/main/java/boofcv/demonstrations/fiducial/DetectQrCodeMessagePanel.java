@@ -54,6 +54,7 @@ implements ListSelectionListener
 		listDetected.addListSelectionListener(this);
 
 		textArea.setEditable(false);
+		textArea.setWrapStyleWord(false);
 
 		// ensures that the split pane can be dragged
 		Dimension minimumSize = new Dimension(0, 0);
@@ -78,13 +79,13 @@ implements ListSelectionListener
 		this.detected.clear();
 		for (int i = 0; i < detected.size(); i++) {
 			QrCode qr = detected.get(i);
-			model.addElement(String.format("V%2d Mode %.5s %.10s",qr.version,qr.mode.toString(),qr.message.toString()));
+			model.addElement(String.format("v%2d Mode %.5s %.10s",qr.version,qr.mode.toString(),qr.message.toString()));
 			this.detected.add( qr.clone() );
 		}
 		this.failures.clear();
 		for (int i = 0; i < failures.size(); i++) {
 			QrCode qr = failures.get(i);
-			model.addElement(String.format("V%2d Mode %.6s FAILED",qr.version,qr.mode.toString()));
+			model.addElement(String.format("v%2d Mode %.6s FAILED",qr.version,qr.mode.toString()));
 			this.failures.add( qr.clone() );
 		}
 		listDetected.invalidate();
@@ -110,21 +111,48 @@ implements ListSelectionListener
 			if (failed) {
 				selected -= detected.size();
 				QrCode qr = failures.get(selected);
-				listener.selectedMarker(selected,true);
-				textArea.setText(String.format("Version %2d\nMode %s\nMask %s\n\n%s",
-						qr.version, qr.mode==null?"":qr.mode,qr.mask==null?"":qr.mask,qr.failureCause.toString()));
+				listener.selectedMarkerInList(selected,true);
+				setMarkerMessageText(qr,true);
 			} else {
-				listener.selectedMarker(selected,false);
+				listener.selectedMarkerInList(selected,false);
 				QrCode qr = detected.get(selected);
-				textArea.setText(String.format("Version %2d\nMode %s\nMask %s\n\n%s",
-						qr.version, qr.mode.toString(), qr.mask.toString(), qr.message));
+				setMarkerMessageText(qr,false);
 			}
 			textArea.invalidate();
 
 		}
 	}
 
+	private void setMarkerMessageText(QrCode qr, boolean failure ) {
+		if( failure ) {
+			textArea.setText(String.format("Version %2d\nMode %s\nMask %s\n\n%s",
+					qr.version, qr.mode == null ? "" : qr.mode, qr.mask == null ? "" : qr.mask, qr.failureCause.toString()));
+		} else {
+			textArea.setText(String.format("Version %2d\nMode %s\nMask %s\n\n%s",
+					qr.version, qr.mode.toString(), qr.mask.toString(), qr.message));
+		}
+	}
+
+	public void setSelectedMarker(int index, boolean failure) {
+		BoofSwingUtil.checkGuiThread();
+		this.listDetected.removeListSelectionListener(this);
+
+		if( failure ) {
+			if( index < failures.size() ) {
+				listDetected.setSelectedIndex(index+detected.size());
+				setMarkerMessageText(failures.get(index),true);
+			}
+		} else {
+			if( index < detected.size() ) {
+				listDetected.setSelectedIndex(index);
+				setMarkerMessageText(detected.get(index),false);
+			}
+		}
+
+		this.listDetected.addListSelectionListener(this);
+	}
+
 	public interface Listener {
-		void selectedMarker( int index , boolean failure );
+		void selectedMarkerInList(int index , boolean failure );
 	}
 }

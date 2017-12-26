@@ -44,6 +44,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
+import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -95,7 +96,22 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			@Override
 			public void mousePressed(MouseEvent e) {
 				double scale = gui.getScale();
-				System.out.printf("click %5.1f %5.1f\n",e.getX()/scale,e.getY()/scale);
+				Point2D_F64 p = new Point2D_F64(e.getX()/scale,e.getY()/scale);
+				System.out.printf("click %5.1f %5.1f\n",p.x,p.y);
+				synchronized (detected) {
+					for (int i = 0; i < detected.size; i++) {
+						if( Intersection2D_F64.containConvex(detected.get(i).bounds,p) ) {
+							selectedMarkerMouse(i,false);
+							return;
+						}
+					}
+					for (int i = 0; i < failures.size; i++) {
+						if( Intersection2D_F64.containConvex(failures.get(i).bounds,p) ) {
+							selectedMarkerMouse(i,true);
+							return;
+						}
+					}
+				}
 			}
 		});
 
@@ -189,8 +205,12 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		throw new RuntimeException("This shouldn't be called");
 	}
 
+	public void selectedMarkerMouse( int index , boolean failure ) {
+		controlPanel.messagePanel.setSelectedMarker(index,failure);
+	}
+
 	@Override
-	public void selectedMarker(int index, boolean failure) {
+	public void selectedMarkerInList(int index, boolean failure) {
 		double width=0;
 		final Point2D_F64 center = new Point2D_F64();
 
