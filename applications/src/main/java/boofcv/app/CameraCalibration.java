@@ -571,15 +571,19 @@ public class CameraCalibration extends BaseStandardInputApp {
 	}
 
 	public static void main(String[] args) {
-		CameraCalibration app = new CameraCalibration();
-		try {
-			app.parse(args);
-		} catch( RuntimeException e ) {
-			app.printHelp();
-			System.out.println();
-			System.out.println(e.getMessage());
-			System.exit(0);
+		if( args.length == 0 ) {
+			new CameraCalibrationGui();
+		} else {
+			CameraCalibration app = new CameraCalibration();
+			try {
+				app.parse(args);
+			} catch (RuntimeException e) {
+				app.printHelp();
+				System.out.println();
+				System.out.println(e.getMessage());
+				System.exit(0);
+			}
+			app.process();
 		}
-		app.process();
 	}
 }

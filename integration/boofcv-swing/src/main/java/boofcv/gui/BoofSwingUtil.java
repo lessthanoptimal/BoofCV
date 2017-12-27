@@ -29,7 +29,8 @@ import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
 public class BoofSwingUtil {
-	private static final String KEY_RECENT_FILES = "RecentFiles";
+	public static final String KEY_RECENT_FILES = "RecentFiles";
+	public static final String KEY_PREVIOUS_SELECTION = "PreviouslySelected";
 
 	public static final double MIN_ZOOM = 0.01;
 	public static final double MAX_ZOOM = 50;
@@ -39,7 +40,6 @@ public class BoofSwingUtil {
 	}
 
 	public static File openFileChooser(Component parent, String defaultPath , FileTypes ...filters) {
-		String key = "PreviouslySelected";
 
 		Preferences prefs;
 		if( parent == null ) {
@@ -47,7 +47,7 @@ public class BoofSwingUtil {
 		} else {
 			prefs = Preferences.userRoot().node(parent.getClass().getSimpleName());
 		}
-		String previousPath=prefs.get(key, defaultPath);
+		String previousPath=prefs.get(KEY_PREVIOUS_SELECTION, defaultPath);
 		JFileChooser chooser = new JFileChooser(previousPath);
 
 		for( FileTypes t : filters ) {
@@ -72,7 +72,7 @@ public class BoofSwingUtil {
 		int returnVal = chooser.showOpenDialog(parent);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			selected = chooser.getSelectedFile();
-			prefs.put(key, selected.getParent());
+			prefs.put(KEY_PREVIOUS_SELECTION, selected.getParent());
 		}
 		return selected;
 	}
