@@ -32,6 +32,7 @@ Version : 0.28
 - Application: Camera Calibration
   * Support for omni universal model
   * Can choose to save output in OpenCV format
+  * GUI for configuring calibration
 - DetectPolygonFromContour
   * Fix a bug where labeled image was not being resized if the height of input image changed
 - BinaryEllipseDetectorPixel
@@ -74,11 +75,6 @@ Fiducials
 - FiducialDetector.setLensDistortion() add width and height parameters
   * Unit test with heavy lens distortion and see if it fixes it
 - Have square fiducials call init if lens distortion is set.
-
-Calibration Application
-  - Open a directory
-  - Configure detector and show preview
-  - File->Save intrinsics to disk
 
 TOP ITEMS
 - TODO QR Code algorithm

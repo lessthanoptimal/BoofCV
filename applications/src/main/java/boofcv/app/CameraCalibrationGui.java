@@ -33,6 +33,7 @@ import boofcv.io.webcamcapture.OpenWebcamDialog;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
+import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,6 +42,7 @@ import java.io.File;
 import java.util.prefs.Preferences;
 
 import static boofcv.gui.BoofSwingUtil.KEY_PREVIOUS_SELECTION;
+import static boofcv.gui.StandardAlgConfigPanel.addLabeled;
 
 /**
  * GUI which let's you configure the camera calibration process
@@ -50,10 +52,14 @@ import static boofcv.gui.BoofSwingUtil.KEY_PREVIOUS_SELECTION;
 // TODO specify output file name
 // TODO output format
 public class CameraCalibrationGui extends JPanel
-		implements CalibrationTargetPanel.Listener
+		implements CalibrationTargetPanel.Listener, ActionListener
 {
 
 	CameraCalibration app;
+
+	JComboBox<CameraCalibration.FormatType> comboOutputFormat;
+	CameraCalibration.FormatType outputFormat = CameraCalibration.FormatType.BOOFCV;
+	JTextField textOutput;
 
 	CalibrationTargetPanel controlsTarget = new CalibrationTargetPanel(this);
 	CalibrationModelPanel controlsModel = new CalibrationModelPanel();
@@ -67,9 +73,25 @@ public class CameraCalibrationGui extends JPanel
 		this.app = new CameraCalibration();
 		this.app.visualize = true;
 
+		File outputFile = FileSystemView.getFileSystemView().getHomeDirectory();
+		outputFile = new File(outputFile,"camera_calibration.yaml");
+
+		textOutput = new JTextField();
+		textOutput.setColumns(20);
+		textOutput.setText(outputFile.getAbsolutePath());
+		textOutput.setMaximumSize(textOutput.getPreferredSize());
+
+		comboOutputFormat = new JComboBox<>(CameraCalibration.FormatType.values());
+		comboOutputFormat.setSelectedIndex(outputFormat.ordinal());
+		comboOutputFormat.addActionListener(this);
+		comboOutputFormat.setMaximumSize(comboOutputFormat.getPreferredSize());
+
 		JPanel controlsPanel = new JPanel();
-		controlsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 		controlsPanel.setLayout(new BoxLayout(controlsPanel,BoxLayout.Y_AXIS) );
+		controlsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+		addLabeled(textOutput,"Output",controlsPanel);
+		addLabeled(comboOutputFormat,"Format",controlsPanel);
+		controlsPanel.add(Box.createRigidArea(new Dimension(5,5)));
 		controlsPanel.add(controlsTarget);
 		controlsPanel.add(controlsModel);
 
@@ -86,6 +108,7 @@ public class CameraCalibrationGui extends JPanel
 
 		frame = ShowImages.showWindow(this,"BoofCv Camera Calibration",true);
 	}
+
 
 	void createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
@@ -137,8 +160,14 @@ public class CameraCalibrationGui extends JPanel
 			app.cameraName = s.camera.getName();
 			app.desiredWidth = s.width;
 			app.desiredHeight = s.height;
-			app.process();
-			System.exit(0);
+			createDetector();
+			frame.setVisible(false);
+
+			new Thread() {
+				public void run() {
+					app.process();
+				}
+			}.start();
 		}
 	}
 
@@ -158,7 +187,6 @@ public class CameraCalibrationGui extends JPanel
 			app.inputType = BaseStandardInputApp.InputType.IMAGE;
 			app.inputDirectory = chooser.getSelectedFile().getAbsolutePath();
 			createDetector();
-
 			frame.setVisible(false);
 
 			new Thread() {
@@ -187,6 +215,9 @@ public class CameraCalibrationGui extends JPanel
 			app.tangential = controlsModel.universalTangential;
 			app.zeroSkew = controlsModel.universalSkew;
 		}
+
+		app.formatType = outputFormat;
+		app.outputFileName = textOutput.getText();
 	}
 
 	@Override
@@ -210,5 +241,12 @@ public class CameraCalibrationGui extends JPanel
 			renderer.circleHex(config.numRows,config.numCols,10,space);
 		}
 		renderingPanel.setImageUI(renderer.getBufferred());
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if( e.getSource() == comboOutputFormat ) {
+			outputFormat = (CameraCalibration.FormatType)comboOutputFormat.getSelectedItem();
+		}
 	}
 }
