@@ -22,9 +22,6 @@ import boofcv.demonstrations.shapes.DetectBlackPolygonControlPanel;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.factory.fiducial.ConfigQrCode;
-import boofcv.factory.filter.binary.ConfigThreshold;
-import boofcv.factory.filter.binary.ConfigThresholdLocalOtsu;
-import boofcv.factory.filter.binary.ThresholdType;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -77,12 +74,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 
 		messagePanel = new DetectQrCodeMessagePanel(owner);
 
-		ConfigThresholdLocalOtsu configThreshold = ConfigThreshold.local(ThresholdType.BLOCK_OTSU,20);
-		configThreshold.scale = 1.0;
-		configThreshold.thresholdFromLocalBlocks = false;
-		configThreshold.tuning = 5;
-
-		polygonPanel = new DetectBlackPolygonControlPanel(owner,config.polygon,configThreshold);
+		polygonPanel = new DetectBlackPolygonControlPanel(owner,config.polygon,config.threshold);
 
 		bRunAgain.addActionListener(new ActionListener() {
 			@Override

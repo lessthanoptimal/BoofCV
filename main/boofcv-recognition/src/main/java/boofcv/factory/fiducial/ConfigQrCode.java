@@ -43,6 +43,11 @@ public class ConfigQrCode implements Configuration {
 
 	{
 
+		// 40% slower but better at detecting markers by a few percentage points
+//		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,10);
+//		configThreshold.scale = 0.95;
+
+		// fast but does a bad job detecting markers that are up close
 		ConfigThresholdLocalOtsu configThreshold = ConfigThreshold.local(ThresholdType.BLOCK_OTSU,20);
 		configThreshold.scale = 1.0;
 		configThreshold.thresholdFromLocalBlocks = false;
