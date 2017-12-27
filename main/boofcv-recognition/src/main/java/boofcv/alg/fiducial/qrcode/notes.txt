@@ -1,0 +1,5 @@
+- adaptive thresholding based on local region
+  * alignment pattern loactor
+  * bit reader
+- Mark bits which are ambiguous as being omitted
+  * Might be able to correct more bits this way
