@@ -50,10 +50,24 @@ public class QrCodeBinaryGridToPixel {
 	Homography2D_F64 H = new Homography2D_F64();
 	Homography2D_F64 Hinv = new Homography2D_F64();
 	Homography2D_F32 Hinv32 = new Homography2D_F32();
+	Homography2D_F32 H32 = new Homography2D_F32();
 
 	Point2D_F64 tmp64 = new Point2D_F64();
 
 	boolean adjustWithFeatures;
+
+	public void setTransformFromSquare( Polygon2D_F64 square ) {
+		adjustWithFeatures = false;
+		storagePairs.reset();
+		pairs.clear();
+
+		set(0, 0, square,0);
+		set(0, 7, square,1);
+		set(7, 7, square,2);
+		set(7, 0, square,3);
+
+		computeTransform();
+	}
 
 	public void addAllFeatures( QrCode qr ) {
 		adjustWithFeatures = false;
@@ -121,17 +135,13 @@ public class QrCodeBinaryGridToPixel {
 		}
 	}
 
-	public void saveFeatures( QrCode qr ) {
-
-	}
-
 	public void computeTransform() {
 		generator.generate(pairs,H);
 		H.invert(Hinv);
 		ConvertFloatType.convert(Hinv, Hinv32);
+		ConvertFloatType.convert(H, H32);
 
 		adjustments.reset();
-
 		if( adjustWithFeatures ) {
 			for (int i = 0; i < pairs.size(); i++) {
 				AssociatedPair p = pairs.get(i);
@@ -149,6 +159,14 @@ public class QrCodeBinaryGridToPixel {
 		Point2D_F64 c = polygon.get(corner);
 		p.set(c.x,c.y,col,row);
 		pairs.add(p);
+	}
+
+	public final void imageToGrid(float x, float y, Point2D_F32 grid) {
+		HomographyPointOps_F32.transform(H32, x, y, grid);
+	}
+
+	public final void imageToGrid(double x, double y, Point2D_F64 grid) {
+		HomographyPointOps_F64.transform(H, x, y, grid);
 	}
 
 	public final void gridToImage(float row, float col, Point2D_F32 pixel) {

@@ -25,6 +25,7 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 
 /**
  * Reads binary values from the qr code's grid.
@@ -32,7 +33,7 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
-	QrCodeBinaryGridToPixel gridToImage = new QrCodeBinaryGridToPixel();
+	QrCodeBinaryGridToPixel transformGrid = new QrCodeBinaryGridToPixel();
 
 	InterpolatePixelS<T> interpolate;
 	Point2D_F32 pixel = new Point2D_F32();
@@ -41,6 +42,7 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 
 	float threshold;
 
+	QrCode qr;
 
 	public QrCodeBinaryGridReader( Class<T> imageType ) {
 		// use nearest neighbor to avoid shifting the location
@@ -55,23 +57,44 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 	}
 
 	public void setMarker( QrCode qr ) {
-		gridToImage.addAllFeatures(qr);
-		gridToImage.removeOutsideCornerFeatures();
-		gridToImage.computeTransform();
+		this.qr = qr;
+		transformGrid.addAllFeatures(qr);
+		transformGrid.removeOutsideCornerFeatures();
+		transformGrid.computeTransform();
 		threshold = (float)(qr.threshCorner+qr.threshDown+qr.threshRight)/3.0f;
 	}
 
-	public void gridToImage( float row , float col , Point2D_F32 image ) {
-		gridToImage.gridToImage(row, col, image);
+	public void setSquare(Polygon2D_F64 square , float threshold ) {
+		this.qr = null;
+		transformGrid.setTransformFromSquare(square);
+		this.threshold = threshold;
 	}
+
+	public void imageToGrid( float x , float y , Point2D_F32 grid ) {
+		transformGrid.imageToGrid(x, y, grid);
+	}
+
+	public void imageToGrid( Point2D_F32 pixel , Point2D_F32 grid ) {
+		transformGrid.imageToGrid(pixel.x, pixel.y, grid);
+	}
+
+	public void imageToGrid( Point2D_F64 pixel , Point2D_F64 grid ) {
+		transformGrid.imageToGrid(pixel.x, pixel.y, grid);
+	}
+
+
+	public void gridToImage( float row , float col , Point2D_F32 image ) {
+		transformGrid.gridToImage(row, col, image);
+	}
+
 	public void gridToImage( double row , double col , Point2D_F64 image ) {
-		gridToImage.gridToImage((float)row, (float)col, pixel);
+		transformGrid.gridToImage((float)row, (float)col, pixel);
 		image.x = pixel.x;
 		image.y = pixel.y;
 	}
 
 	public float read( float row , float col ) {
-		gridToImage.gridToImage(row, col, pixel);
+		transformGrid.gridToImage(row, col, pixel);
 		return interpolate.get(pixel.x,pixel.y);
 	}
 
@@ -86,7 +109,7 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 		// todo use adjustments from near by alignment patterns
 
 		float center = 0.5f;
-		gridToImage.gridToImage(row+center, col+center, pixel);
+		transformGrid.gridToImage(row+center, col+center, pixel);
 		if( pixel.x < -0.5 || pixel.y < -0.5 || pixel.x > imageWidth || pixel.y > imageHeight )
 			return -1;
 
@@ -99,13 +122,32 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 //		float value = (pixel01+pixel21+pixel10+pixel12)*0.25f;
 //		value = value*0.5f + pixel00*0.5f;
 
+		// in at least one situation this was found to improve the reading
+//		float threshold;
+//		if( qr  != null ) {
+//			int N = qr.getNumberOfModules();
+//			if( row > N/2 ) {
+//				if( col < N/2 )
+//					threshold = (float)qr.threshDown;
+//				else {
+//					threshold = (float)(qr.threshDown+qr.threshRight)/2f;
+//				}
+//			} else if( col < N/2 ) {
+//				threshold = (float)qr.threshCorner;
+//			} else {
+//				threshold = (float)qr.threshRight;
+//			}
+//		} else {
+//			threshold = this.threshold;
+//		}
+
 		if( pixel00 < threshold )
 			return 1;
 		else
 			return 0;
 	}
 
-	public QrCodeBinaryGridToPixel getGridToImage() {
-		return gridToImage;
+	public QrCodeBinaryGridToPixel getTransformGrid() {
+		return transformGrid;
 	}
 }

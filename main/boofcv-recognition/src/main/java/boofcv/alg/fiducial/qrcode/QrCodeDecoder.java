@@ -57,9 +57,8 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	List<QrCode> successes = new ArrayList<>();
 	List<QrCode> failures = new ArrayList<>();
 
-	SquareBitReader<T> squareDecoder;
-	PackedBits32 bits = new PackedBits32();
-	PackedBits8 bits8 = new PackedBits8();
+	// storage for read in bits from the grid
+	PackedBits8 bits = new PackedBits8();
 
 	// internal workspace
 	Point2D_F64 grid = new Point2D_F64();
@@ -68,7 +67,6 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	QrCodeBinaryGridReader<T> gridReader;
 
 	public QrCodeDecoder( Class<T> imageType ) {
-		squareDecoder = new SquareBitReader<>(imageType);
 		gridReader = new QrCodeBinaryGridReader<>(imageType);
 		alignmentLocator = new QrCodeAlignmentPatternLocator<>(imageType);
 	}
@@ -80,7 +78,6 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 */
 	public void process(FastQueue<PositionPatternNode> pps , T gray ) {
 		gridReader.setImage(gray);
-		squareDecoder.setImage(gray);
 		storageQR.reset();
 		successes.clear();
 		failures.clear();
@@ -166,22 +163,22 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			return false;
 		}
 
-		//F irst try using all the features then remove features if they have large errors and might
+		// First try using all the features then remove features if they have large errors and might
 		// have incorrectly localized
 		boolean success = false;
 		gridReader.setMarker(qr);
-		gridReader.getGridToImage().addAllFeatures(qr);
+		gridReader.getTransformGrid().addAllFeatures(qr);
 		// by default it removes outside corners. This works most of the time
 		for (int i = 0; i < 6; i++) {
 			if( i > 0 ) {
-				boolean removed = gridReader.getGridToImage().removeFeatureWithLargestError();
+				boolean removed = gridReader.getTransformGrid().removeFeatureWithLargestError();
 				if( !removed ) {
 					break;
 				}
 			}
-			gridReader.getGridToImage().computeTransform();
-			qr.failureCause = QrCode.Failure.NONE;
 
+			gridReader.getTransformGrid().computeTransform();
+			qr.failureCause = QrCode.Failure.NONE;
 			if( !readRawData(qr) ) {
 				qr.failureCause = QrCode.Failure.READING_BITS;
 //				System.out.println("failed trial "+i+" "+qr.failureCause);
@@ -204,7 +201,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		}
 
 //		System.out.println("success "+success+" v "+qr.version+" mask "+qr.mask+" error "+qr.error);
-		qr.Hinv.set(gridReader.getGridToImage().Hinv);
+		qr.Hinv.set(gridReader.getTransformGrid().Hinv);
 		return success;
 	}
 
@@ -220,15 +217,14 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 				readFormatRegion0(qr);
 			else
 				readFormatRegion1(qr);
-			int bits = this.bits.data[0] ^ QrCodePolynomialMath.FORMAT_MASK;
-
-//			System.out.println("decoder format bits "+Integer.toBinaryString(this.bits.data[0]));
+			int bitField = this.bits.read(0,15,false);
+			bitField ^= QrCodePolynomialMath.FORMAT_MASK;
 
 			int message;
-			if (QrCodePolynomialMath.checkFormatBits(bits)) {
-				message = bits >> 10;
+			if (QrCodePolynomialMath.checkFormatBits(bitField)) {
+				message = bitField >> 10;
 			} else {
-				message = QrCodePolynomialMath.correctFormatBits(bits);
+				message = QrCodePolynomialMath.correctFormatBits(bitField);
 			}
 			if (message >= 0) {
 				QrCodePolynomialMath.decodeFormatMessage(message, qr);
@@ -243,8 +239,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 */
 	private boolean readFormatRegion0(QrCode qr) {
 		// set the coordinate system to the closest pp to reduce position errors
-		if( !squareDecoder.setSquare(qr.ppCorner,(float)qr.threshCorner) )
-			return false;
+		gridReader.setSquare(qr.ppCorner,(float)qr.threshCorner);
 
 		bits.resize(15);
 		bits.zero();
@@ -267,9 +262,12 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 * Read the format bits on the right and bottom patterns
 	 */
 	private boolean readFormatRegion1(QrCode qr) {
+//		if( qr.ppRight.get(0).distance(988.8,268.3) < 30 )
+//			System.out.println("tjere");
+//		System.out.println(qr.ppRight.get(0));
+
 		// set the coordinate system to the closest pp to reduce position errors
-		if( !squareDecoder.setSquare(qr.ppRight,(float)qr.threshRight) )
-			return false;
+		gridReader.setSquare(qr.ppRight,(float)qr.threshRight);
 
 		bits.resize(15);
 		bits.zero();
@@ -277,8 +275,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			read(i,8,6-i);
 		}
 
-		if( !squareDecoder.setSquare(qr.ppDown,(float)qr.threshDown) )
-			return false;
+		gridReader.setSquare(qr.ppDown,(float)qr.threshDown);
 
 		for (int i = 0; i < 6; i++) {
 			read(i+8,i,8);
@@ -296,12 +293,12 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 		qr.rawbits = new byte[info.codewords];
 
 		// predeclare memory
-		bits8.resize(info.codewords*8);
+		bits.resize(info.codewords*8);
 
 		// read bits from memory
 		List<Point2D_I32> locationBits =  QrCode.LOCATION_BITS[qr.version];
 		// end at bits.size instead of locationBits.size because location might point to useless bits
-		for (int i = 0; i < bits8.size; i++ ) {
+		for (int i = 0; i < bits.size; i++ ) {
 			Point2D_I32 b = locationBits.get(i);
 			readDataMatrix(i,b.y,b.x, qr.mask);
 		}
@@ -311,7 +308,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 //		bits8.print();
 
 		// copy over the results
-		System.arraycopy(bits8.data,0,qr.rawbits,0,qr.rawbits.length);
+		System.arraycopy(bits.data,0,qr.rawbits,0,qr.rawbits.length);
 
 		return true;
 	}
@@ -660,7 +657,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 * @param col column in qr code grid
 	 */
 	private void read(int bit , int row , int col ) {
-		int value = squareDecoder.read(row,col);
+		int value = gridReader.readBit(row,col);
 		if( value == -1 ) {
 			// The requested region is outside the image. A partial QR code can be read so let's just
 			// assign it a value of zero and let error correction handle this
@@ -676,7 +673,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 			// assign it a value of zero and let error correction handle this
 			value = 0;
 		}
-		bits8.set(bit,mask.apply(row,col,value));
+		bits.set(bit,mask.apply(row,col,value));
 	}
 
 	/**
@@ -716,13 +713,13 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 * @return The found version or -1 if it failed
 	 */
 	private int decodeVersion() {
-		int bits = this.bits.data[0];
+		int bitField = this.bits.read(0,18,false);
 		int message;
 		// see if there's any errors
-		if (QrCodePolynomialMath.checkVersionBits(bits)) {
-			message = bits >> 12;
+		if (QrCodePolynomialMath.checkVersionBits(bitField)) {
+			message = bitField >> 12;
 		} else {
-			message = QrCodePolynomialMath.correctVersionBits(bits);
+			message = QrCodePolynomialMath.correctVersionBits(bitField);
 		}
 		// sanity check results
 		if( message > QrCode.MAX_VERSION || message < QrCode.VERSION_VERSION )
@@ -737,11 +734,10 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 */
 	private int estimateVersionBySize( QrCode qr ) {
 		// Just need the homography for this corner square square
-		if( !squareDecoder.setSquare(qr.ppCorner,0) )
-			return -1;
+		gridReader.setSquare(qr.ppCorner,0);
 
 		// Compute location of position patterns relative to corner PP
-		squareDecoder.imageToGrid(qr.ppRight.get(0),grid);
+		gridReader.imageToGrid(qr.ppRight.get(0),grid);
 
 		// see if pp is miss aligned. Probably not a flat surface
 		// or they don't belong to the same qr code
@@ -750,7 +746,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 
 		double versionX = ((grid.x+7)-17)/4;
 
-		squareDecoder.imageToGrid(qr.ppDown.get(0),grid);
+		gridReader.imageToGrid(qr.ppDown.get(0),grid);
 
 		if( Math.abs(grid.x) >= 1 )
 			return -1;
@@ -769,8 +765,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 */
 	private boolean readVersionRegion0(QrCode qr) {
 		// set the coordinate system to the closest pp to reduce position errors
-		if (!squareDecoder.setSquare(qr.ppRight, (float) qr.threshRight))
-			return false;
+		gridReader.setSquare(qr.ppRight, (float) qr.threshRight);
 
 		bits.resize(18);
 		bits.zero();
@@ -790,8 +785,7 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 	 */
 	private boolean readVersionRegion1(QrCode qr) {
 		// set the coordinate system to the closest pp to reduce position errors
-		if (!squareDecoder.setSquare(qr.ppDown, (float) qr.threshDown))
-			return false;
+		gridReader.setSquare(qr.ppDown, (float) qr.threshDown);
 
 		bits.resize(18);
 		bits.zero();

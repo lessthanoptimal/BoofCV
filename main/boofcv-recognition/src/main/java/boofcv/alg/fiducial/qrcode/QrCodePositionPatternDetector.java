@@ -294,7 +294,10 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		if( ratio > 1.3 )
 			return;
 
-		graph.checkConnect(node0,intersection0,node1,intersection1,lineA.getLength2());
+		double angle = graph.acuteAngle(node0, intersection0, node1, intersection1);
+		double score = lineA.getLength()*(1.0+angle/0.1);
+
+		graph.checkConnect(node0,intersection0,node1,intersection1,score);
 	}
 
 	/**

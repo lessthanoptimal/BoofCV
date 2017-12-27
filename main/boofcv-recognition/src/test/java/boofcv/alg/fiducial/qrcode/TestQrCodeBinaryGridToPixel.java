@@ -45,13 +45,13 @@ public class TestQrCodeBinaryGridToPixel {
 
 	}
 
-	private void check(QrCodeBinaryGridToPixel gridToImage ,
+	private void check(QrCodeBinaryGridToPixel transformGrid ,
 					   float x , float y ,
 					   float expectedX , float expectedY )
 	{
 		Point2D_F32 found = new Point2D_F32();
 
-		gridToImage.gridToImage(y,x,found);
+		transformGrid.gridToImage(y,x,found);
 
 		assertEquals(expectedX,found.x,1e-4f);
 		assertEquals(expectedY,found.y,1e-4f);

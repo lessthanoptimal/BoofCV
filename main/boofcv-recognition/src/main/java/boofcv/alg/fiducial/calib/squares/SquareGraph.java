@@ -163,7 +163,7 @@ public class SquareGraph {
 	 * Returns an angle between 0 and PI/4 which describes the difference in slope
 	 * between the two sides
 	 */
-	double acuteAngle(  SquareNode a , int sideA , SquareNode b , int sideB ) {
+	public double acuteAngle(  SquareNode a , int sideA , SquareNode b , int sideB ) {
 		Point2D_F64 a0 = a.square.get(sideA);
 		Point2D_F64 a1 = a.square.get(add(sideA, 1));
 

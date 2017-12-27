@@ -135,7 +135,8 @@ public class TestQrCodePositionPatternDetector {
 
 		assertTrue(alg.checkPositionPatternAppearance(square,100));
 
-		ImageMiscOps.fillRectangle(image,0,40,60,70,30);
+		// fill in the inner "stone"
+		ImageMiscOps.fillRectangle(image,0,40,60,70,70);
 		assertFalse(alg.checkPositionPatternAppearance(square,100));
 	}
 
