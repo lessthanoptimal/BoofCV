@@ -22,6 +22,7 @@ import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.ConfigCircleRegularGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.app.calib.CalibrationModelPanel;
 import boofcv.app.calib.CalibrationTargetPanel;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.RenderCalibrationTargetsGraphics2D;
@@ -31,6 +32,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.webcamcapture.OpenWebcamDialog;
 
 import javax.swing.*;
+import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,13 +48,15 @@ import static boofcv.gui.BoofSwingUtil.KEY_PREVIOUS_SELECTION;
  * @author Peter Abeles
  */
 // TODO specify output file name
-	// TODO model (pinhole/fisheye). radial, tangential, ...etc
-	// TODO output format
-public class CameraCalibrationGui extends JPanel implements CalibrationTargetPanel.Listener {
+// TODO output format
+public class CameraCalibrationGui extends JPanel
+		implements CalibrationTargetPanel.Listener
+{
 
 	CameraCalibration app;
 
-	CalibrationTargetPanel controls = new CalibrationTargetPanel(this);
+	CalibrationTargetPanel controlsTarget = new CalibrationTargetPanel(this);
+	CalibrationModelPanel controlsModel = new CalibrationModelPanel();
 	ImagePanel renderingPanel = new ImagePanel();
 
 	JFrame frame;
@@ -63,18 +67,24 @@ public class CameraCalibrationGui extends JPanel implements CalibrationTargetPan
 		this.app = new CameraCalibration();
 		this.app.visualize = true;
 
+		JPanel controlsPanel = new JPanel();
+		controlsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+		controlsPanel.setLayout(new BoxLayout(controlsPanel,BoxLayout.Y_AXIS) );
+		controlsPanel.add(controlsTarget);
+		controlsPanel.add(controlsModel);
+
 		renderingPanel.setScaling(ScaleOptions.DOWN);
 		renderingPanel.setCentering(true);
 		renderingPanel.setPreferredSize(new Dimension(400,400));
 
-		add(BorderLayout.WEST,controls);
+		add(BorderLayout.WEST, controlsPanel);
 		add(BorderLayout.CENTER,renderingPanel);
 		createMenuBar();
 
 		// trigger an event which will cause the target to be rendered
-		controls.updateParameters();
+		controlsTarget.updateParameters();
 
-		frame = ShowImages.showWindow(this,"BoofCv Camera Calibration",false);
+		frame = ShowImages.showWindow(this,"BoofCv Camera Calibration",true);
 	}
 
 	void createMenuBar() {
@@ -160,11 +170,22 @@ public class CameraCalibrationGui extends JPanel implements CalibrationTargetPan
 	}
 
 	private void createDetector() {
-		switch( controls.selected ) {
-			case CHESSBOARD: app.detector = FactoryFiducialCalibration.chessboard(controls.configChessboard);break;
-			case SQUARE_GRID: app.detector = FactoryFiducialCalibration.squareGrid(controls.configSquare);break;
-			case CIRCLE_GRID: app.detector = FactoryFiducialCalibration.circleRegularGrid(controls.configCircle);break;
-			case CIRCLE_HEX: app.detector = FactoryFiducialCalibration.circleHexagonalGrid(controls.configCircleHex);break;
+		switch( controlsTarget.selected ) {
+			case CHESSBOARD: app.detector = FactoryFiducialCalibration.chessboard(controlsTarget.configChessboard);break;
+			case SQUARE_GRID: app.detector = FactoryFiducialCalibration.squareGrid(controlsTarget.configSquare);break;
+			case CIRCLE_GRID: app.detector = FactoryFiducialCalibration.circleRegularGrid(controlsTarget.configCircle);break;
+			case CIRCLE_HEX: app.detector = FactoryFiducialCalibration.circleHexagonalGrid(controlsTarget.configCircleHex);break;
+		}
+
+		app.modeType = controlsModel.selected;
+		if( app.modeType == CameraCalibration.ModelType.PINHOLE ) {
+			app.numRadial = controlsModel.pinholeRadial;
+			app.tangential = controlsModel.pinholeTangential;
+			app.zeroSkew = controlsModel.pinholeSkew;
+		} else if( app.modeType == CameraCalibration.ModelType.UNIVERSAL ) {
+			app.numRadial = controlsModel.universalRadial;
+			app.tangential = controlsModel.universalTangential;
+			app.zeroSkew = controlsModel.universalSkew;
 		}
 	}
 
@@ -190,5 +211,4 @@ public class CameraCalibrationGui extends JPanel implements CalibrationTargetPan
 		}
 		renderingPanel.setImageUI(renderer.getBufferred());
 	}
-
 }

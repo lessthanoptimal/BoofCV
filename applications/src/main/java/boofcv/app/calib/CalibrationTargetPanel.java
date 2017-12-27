@@ -51,17 +51,19 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	public ConfigCircleHexagonalGrid configCircleHex = new ConfigCircleHexagonalGrid(15,15,1,1.5);
 
 	public CalibrationTargetPanel( Listener listener ) {
+		setBorder(BorderFactory.createEmptyBorder());
+
 		this.listener = listener;
 		comboType = new JComboBox<>(TargetType.values());
 		comboType.addActionListener(this);
 		comboType.setMaximumSize(comboType.getPreferredSize());
 
 		panelTarget.setLayout(new BorderLayout());
-		panelTarget.setPreferredSize(new Dimension(250,400));
+		panelTarget.setPreferredSize(new Dimension(250,100));
 		panelTarget.setMaximumSize(panelTarget.getPreferredSize());
 		changeTargetPanel();
 
-		addLabeled(comboType,"Type");
+		addLabeled(comboType,"Target Type");
 		add(Box.createRigidArea(new Dimension(10,10)));
 		addAlignCenter(panelTarget);
 	}
@@ -73,7 +75,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 			case SQUARE_GRID:c=configSquare;break;
 			case CIRCLE_GRID:c=configCircle;break;
 			case CIRCLE_HEX:c=configCircleHex;break;
-			default: throw new RuntimeException("Unknonw");
+			default: throw new RuntimeException("Unknown");
 		}
 		listener.calibrationParametersChanged(selected,c);
 	}
@@ -100,7 +102,6 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 
 		panelTarget.removeAll();
 		panelTarget.add(BorderLayout.CENTER,p);
-		panelTarget.invalidate();
 		panelTarget.validate();
 		panelTarget.repaint();
 	}

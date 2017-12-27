@@ -560,12 +560,12 @@ public class CameraCalibration extends BaseStandardInputApp {
 		}
 	}
 
-	enum ModelType {
+	public enum ModelType {
 		PINHOLE,
 		UNIVERSAL
 	}
 
-	enum FormatType {
+	public enum FormatType {
 		BOOFCV,
 		OPENCV
 	}
