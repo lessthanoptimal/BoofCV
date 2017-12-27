@@ -69,6 +69,7 @@ Version : 0.28
 - Created interface for contour to polyline. PointsToPolyline
   * Added ability to set min/max number of sides. convex
 
+--------- TODO ITEMS BELOW ----------------
 Fiducials
 - FiducialDetector.setLensDistortion() add width and height parameters
   * Unit test with heavy lens distortion and see if it fixes it
@@ -80,11 +81,26 @@ Calibration Application
   - File->Save intrinsics to disk
 
 TOP ITEMS
-- TODO Add QR Code to fiducial demonstration
-- TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
-        It is a homogenous coordinate with z=1 being implicit.
-        Found papers that use "normalized coordinates"!
-- TODO QR Code support
+- TODO QR Code algorithm
+  * Better rejection of finder patterns using graph
+  * See if a better reading of mode bits is needed
+- TODO QR Code Regresstion Test
+  * Manually label 4 corners only
+  * Use version 1 and version 2 qr codes for most of the tests
+  * Have a test with all the versions
+  * 4000x3000 images with small and large markers
+  * 640x480 images with small and large markers
+  * very dark images
+  * very dark images with bright spots near qr codes
+  * very bright images
+  * Shadows going across the marker
+  * curved surfaces
+  * crinkled paper
+  * different versions
+  * lots of qr codes right next to each other. Generate these
+  * Curved surfaces on bottles
+  * Damaged qr codes. Data Bits, Locator Patterns, Alignment Patterns.
+
 
 OTHER ITEMS
 - TODO Background Removal demonstration
@@ -98,6 +114,9 @@ OTHER ITEMS
 - TODO Clarify how you calibrate the camera in Processing
 - TODO DescribeDenseHogFastAlg naming consistency. See TODO at top
 - TODO See if contour shape fitting algorithm can be speed up by using a continious set of memory instead of Point2D
+- TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
+        It is a homogenous coordinate with z=1 being implicit.
+        Found papers that use "normalized coordinates"!
 
 ---------------------------------------------
 Date    : 2017-08-16

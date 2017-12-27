@@ -570,7 +570,14 @@ public abstract class DemonstrationBase extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (menuFile == e.getSource()) {
-					File file = BoofSwingUtil.openFileChooseDialog(DemonstrationBase.this);
+					List<BoofSwingUtil.FileTypes> types = new ArrayList<>();
+					if( allowImages )
+						types.add(BoofSwingUtil.FileTypes.IMAGES);
+					if( allowVideos )
+						types.add(BoofSwingUtil.FileTypes.VIDEOS);
+					BoofSwingUtil.FileTypes array[] = types.toArray(new BoofSwingUtil.FileTypes[0]);
+
+					File file = BoofSwingUtil.openFileChooser(DemonstrationBase.this,array);
 					if (file != null) {
 						openFile(file);
 					}

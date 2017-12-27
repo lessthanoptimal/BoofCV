@@ -18,7 +18,9 @@
 
 package boofcv.gui;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.io.File;
@@ -32,11 +34,11 @@ public class BoofSwingUtil {
 	public static final double MIN_ZOOM = 0.01;
 	public static final double MAX_ZOOM = 50;
 
-	public static File openFileChooseDialog(Component parent) {
-		return openFileChooseDialog(parent,new File(".").getPath());
+	public static File openFileChooser(Component parent, FileTypes ...filters) {
+		return openFileChooser(parent,new File(".").getPath(),filters);
 	}
 
-	public static File openFileChooseDialog(Component parent, String defaultPath ) {
+	public static File openFileChooser(Component parent, String defaultPath , FileTypes ...filters) {
 		String key = "PreviouslySelected";
 
 		Preferences prefs;
@@ -47,6 +49,24 @@ public class BoofSwingUtil {
 		}
 		String previousPath=prefs.get(key, defaultPath);
 		JFileChooser chooser = new JFileChooser(previousPath);
+
+		for( FileTypes t : filters ) {
+			FileNameExtensionFilter ff;
+			switch( t ) {
+				case IMAGES:
+					ff = new FileNameExtensionFilter("Images", ImageIO.getReaderFileSuffixes());
+					break;
+				case VIDEOS:
+					ff = new FileNameExtensionFilter("Videos","mpg","mp4","mov","avi","wmv");
+					break;
+				default:
+					throw new RuntimeException("Unknown file type");
+			}
+			chooser.addChoosableFileFilter(ff);
+		}
+		if( filters.length > 0 ) {
+			chooser.setFileFilter(chooser.getChoosableFileFilters()[1]);
+		}
 
 		File selected = null;
 		int returnVal = chooser.showOpenDialog(parent);
@@ -140,5 +160,10 @@ public class BoofSwingUtil {
 
 	public static void warningDialog(Component component, RuntimeException e) {
 		JOptionPane.showMessageDialog(component, e.getMessage());
+	}
+
+	public enum FileTypes
+	{
+		IMAGES,VIDEOS
 	}
 }
