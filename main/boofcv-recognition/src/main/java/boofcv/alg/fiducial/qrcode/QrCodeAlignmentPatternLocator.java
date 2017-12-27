@@ -42,6 +42,8 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
 	QrCode qr;
 
+	float threshold;
+
 	public QrCodeAlignmentPatternLocator( Class<T> imageType ) {
 
 		reader = new QrCodeBinaryGridReader<T>(imageType);
@@ -57,6 +59,8 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
 		reader.setImage(image);
 		reader.setMarker(qr);
+
+		threshold = (float)qr.threshCorner;
 
 		initializePatterns(qr);
 
@@ -123,7 +127,10 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 					return false;
 				}
 
-				if( !localize(a, (float)a.moduleFound.y, (float)a.moduleFound.x) ) {
+//				if( !localize(a, (float)a.moduleFound.y, (float)a.moduleFound.x) ) {
+//					return false;
+//				}
+				if( !meanshift(a, (float)a.moduleFound.y, (float)a.moduleFound.x) ) {
 					return false;
 				}
 			}
@@ -220,6 +227,48 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		return true;
 	}
 
+
+	boolean meanshift( QrCode.Alignment pattern, float guessY, float guessX ) {
+
+		System.out.println("before "+guessX+" "+guessY);
+		float step = 1;
+		float decay = 0.7f;
+		for (int i = 0; i < 10; i++) {
+			float sumX = 0;
+			float sumY = 0;
+			float total = 0;
+
+			for (int y = 0; y < 8; y++) {
+				float dy = -1.5f+3f*y/7f;
+				float gridY = guessY+dy;
+				for (int x = 0; x < 8; x++) {
+					float dx = -1.5f+3f*x/7f;
+					float gridX= guessX+dx;
+					float v =  reader.read(gridY,gridX);
+					float r = (float)Math.sqrt(dx*dx + dy*dy);
+
+					float w = Math.max(-10,(r > 0.5 ? v-threshold : threshold-v));
+					total += Math.abs(w);
+					sumX += w*dx;
+					sumY += w*dy;
+				}
+			}
+
+			guessX += step*sumX/total;
+			guessY += step*sumY/total;
+			step *= decay;
+		}
+
+		System.out.println("after "+guessX+" "+guessY+"\n");
+
+
+		pattern.moduleFound.x = guessX;
+		pattern.moduleFound.y = guessY;
+
+		reader.gridToImage((float)pattern.moduleFound.y,(float)pattern.moduleFound.x,pattern.pixel);
+
+		return true;
+	}
 	/**
 	 * Searches for the greatest down slope in the list
 	 */

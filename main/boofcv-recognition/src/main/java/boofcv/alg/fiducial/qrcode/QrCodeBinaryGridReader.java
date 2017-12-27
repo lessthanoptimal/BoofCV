@@ -109,15 +109,34 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 		// todo use adjustments from near by alignment patterns
 
 		float center = 0.5f;
-		transformGrid.gridToImage(row+center, col+center, pixel);
-		if( pixel.x < -0.5 || pixel.y < -0.5 || pixel.x > imageWidth || pixel.y > imageHeight )
-			return -1;
 
-//		float pixel01 = interpolate.get(pixel.x-1,pixel.y);
-//		float pixel21 = interpolate.get(pixel.x+1,pixel.y);
-//		float pixel10 = interpolate.get(pixel.x,pixel.y-1);
-//		float pixel12 = interpolate.get(pixel.x,pixel.y+1);
+//		if( pixel.x < -0.5 || pixel.y < -0.5 || pixel.x > imageWidth || pixel.y > imageHeight )
+//			return -1;
+
+		transformGrid.gridToImage(row+center-0.2f, col+center, pixel);
+		float pixel01 = interpolate.get(pixel.x,pixel.y);
+		transformGrid.gridToImage(row+center+0.2f, col+center, pixel);
+		float pixel21 = interpolate.get(pixel.x,pixel.y);
+		transformGrid.gridToImage(row+center, col+center-0.2f, pixel);
+		float pixel10 = interpolate.get(pixel.x,pixel.y);
+		transformGrid.gridToImage(row+center, col+center+0.2f, pixel);
+		float pixel12 = interpolate.get(pixel.x,pixel.y);
+		transformGrid.gridToImage(row+center, col+center, pixel);
 		float pixel00 = interpolate.get(pixel.x,pixel.y);
+
+//		float threshold = this.threshold*1.25f;
+
+		int total = 0;
+		if( pixel01 < threshold ) total++;
+		if( pixel21 < threshold ) total++;
+		if( pixel10 < threshold ) total++;
+		if( pixel12 < threshold ) total++;
+		if( pixel00 < threshold ) total++;
+
+		if( total >= 3 )
+			return 1;
+		else
+			return 0;
 
 //		float value = (pixel01+pixel21+pixel10+pixel12)*0.25f;
 //		value = value*0.5f + pixel00*0.5f;
@@ -141,10 +160,10 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 //			threshold = this.threshold;
 //		}
 
-		if( pixel00 < threshold )
-			return 1;
-		else
-			return 0;
+//		if( pixel00 < threshold )
+//			return 1;
+//		else
+//			return 0;
 	}
 
 	public QrCodeBinaryGridToPixel getTransformGrid() {
