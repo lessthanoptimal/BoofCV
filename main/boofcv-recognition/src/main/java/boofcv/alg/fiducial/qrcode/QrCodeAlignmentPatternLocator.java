@@ -230,7 +230,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
 	boolean meanshift( QrCode.Alignment pattern, float guessY, float guessX ) {
 
-		System.out.println("before "+guessX+" "+guessY);
+//		System.out.println("before "+guessX+" "+guessY);
 		float step = 1;
 		float decay = 0.7f;
 		for (int i = 0; i < 10; i++) {
@@ -259,8 +259,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 			step *= decay;
 		}
 
-		System.out.println("after "+guessX+" "+guessY+"\n");
-
+//		System.out.println("after "+guessX+" "+guessY+"\n");
 
 		pattern.moduleFound.x = guessX;
 		pattern.moduleFound.y = guessY;
