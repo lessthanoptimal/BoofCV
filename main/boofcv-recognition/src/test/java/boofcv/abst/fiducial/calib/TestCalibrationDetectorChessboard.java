@@ -19,8 +19,8 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
+import boofcv.gui.RenderCalibrationTargetsGraphics2D;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -58,26 +58,13 @@ public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationD
 	public void renderTarget(Object layout, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
 		ConfigChessboard config = (ConfigChessboard)layout;
 
-		int square = 40;
+		RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(40,1);
 
-		int targetWidth  = square * config.numCols;
-		int targetHeight = square * config.numRows;
+		renderer.chessboard(config.numRows,config.numCols,40);
 
-		image.reshape(square*2 + targetWidth, square*2 + targetHeight);
-		ImageMiscOps.fill(image, 255);
-
-		int x0 = square;
-		int y0 = (image.height- targetHeight) / 2;
-
-		for (int i = 0; i < config.numRows; i++) {
-			int y = y0 + i*square;
-
-			int startJ = i%2 == 0 ? 0 : 1;
-			for (int j = startJ; j < config.numCols; j += 2) {
-				int x = x0 + j * square;
-				ImageMiscOps.fillRectangle(image,0,x,y,square,square);
-			}
-		}
+//		ShowImages.showWindow(renderer.getBufferred(),"Rendered",true);
+//		BoofMiscOps.sleep(100000);
+		image.setTo(renderer.getGrayF32());
 
 		double lengthPattern = length3D*config.numCols/(config.numCols+2);
 

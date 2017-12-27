@@ -19,8 +19,8 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
+import boofcv.gui.RenderCalibrationTargetsGraphics2D;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -65,27 +65,14 @@ public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationD
 
 		double squareWidthPixels = 20;
 		double spacingPixels = squareWidthPixels*(config.spaceWidth/config.squareWidth);
-		double borderPixels = 20;
 
-		int imageWidth = (int)(config.numCols*squareWidthPixels + (config.numCols-1)*spacingPixels + 2*borderPixels+0.5);
-		int imageHeight = (int)(config.numRows*squareWidthPixels + (config.numRows-1)*spacingPixels + 2*borderPixels+0.5);
+		RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(20,1);
+		renderer.squareGrid(config.numRows,config.numCols,squareWidthPixels,spacingPixels);
 
-		image.reshape(imageWidth,imageHeight);
-		ImageMiscOps.fill(image, 255);
+		image.setTo(renderer.getGrayF32());
 
-		for (int i = 0; i < config.numRows; i++ ){
-			double y = borderPixels + i * (squareWidthPixels+spacingPixels);
-
-			for (int j = 0; j < config.numCols; j++) {
-				double x = borderPixels + j * (squareWidthPixels + spacingPixels);
-
-				ImageMiscOps.fillRectangle(image, 0, (int)(x+0.5), (int)(y+0.5),
-						(int)squareWidthPixels, (int)squareWidthPixels);
-			}
-		}
-
-		double squareWidthWorld = length3D*squareWidthPixels/(double)imageWidth;
-		double spacingWorld = length3D*spacingPixels/(double)imageWidth;
+		double squareWidthWorld = length3D*squareWidthPixels/(double)image.getWidth();
+		double spacingWorld = length3D*spacingPixels/(double)image.getWidth();
 
 		points2D.clear();
 		points2D.addAll( CalibrationDetectorSquareGrid.

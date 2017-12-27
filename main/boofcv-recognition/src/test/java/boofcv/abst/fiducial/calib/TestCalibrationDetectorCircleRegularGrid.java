@@ -20,16 +20,13 @@ package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
-import boofcv.io.image.ConvertBufferedImage;
+import boofcv.gui.RenderCalibrationTargetsGraphics2D;
 import boofcv.struct.image.GrayF32;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 
-import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
@@ -82,39 +79,21 @@ public class TestCalibrationDetectorCircleRegularGrid extends GenericPlanarCalib
 
 		ConfigCircleRegularGrid config = (ConfigCircleRegularGrid)layout;
 
+
+		RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(40,1);
+
 		double radiusPixels = 20;
 		double centerDistancePixels = 2*radiusPixels*config.centerDistance/config.circleDiameter;
-		double borderPixels = 40;
 
-		int imageWidth = (int)(borderPixels*2 + (config.numCols-1)*centerDistancePixels + 2*radiusPixels+0.5);
-		int imageHeight = (int)(borderPixels*2 + (config.numRows-1)*centerDistancePixels + 2*radiusPixels+0.5);
+		renderer.circleRegular(config.numRows,config.numCols,radiusPixels*2,centerDistancePixels);
 
+//		ShowImages.showWindow(renderer.getBufferred(),"Rendered",true);
+//		BoofMiscOps.sleep(100000);
 
-		image.reshape( imageWidth,imageHeight );
-		BufferedImage buffered = new BufferedImage(image.width,image.height, BufferedImage.TYPE_INT_BGR);
-		Graphics2D g2 = buffered.createGraphics();
-		g2.setColor(Color.WHITE);
-		g2.fillRect(0,0,buffered.getWidth(),buffered.getHeight());
-		g2.setColor(Color.BLACK);
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		image.setTo(renderer.getGrayF32());
 
-		Ellipse2D.Double ellipse = new Ellipse2D.Double();
-
-		for (int row = 0; row < config.numRows; row++) {
-			double y = borderPixels+radiusPixels+row*centerDistancePixels;
-			for (int col = 0; col < config.numCols; col++) {
-				double x = borderPixels+radiusPixels+col*centerDistancePixels;
-
-				ellipse.setFrame(x-radiusPixels,y-radiusPixels,radiusPixels*2,radiusPixels*2);
-				g2.fill(ellipse);
-			}
-		}
-
-		ConvertBufferedImage.convertFrom(buffered, image);
-
-		double centerDistanceWorld = length3D*centerDistancePixels/(double)imageWidth;
-		double radiusWorld = length3D*radiusPixels/(double)imageWidth;
+		double centerDistanceWorld = length3D*centerDistancePixels/(double)image.getWidth();
+		double radiusWorld = length3D*radiusPixels/(double)image.getWidth();
 
 		points2D.clear();
 		points2D.addAll( CalibrationDetectorCircleRegularGrid.
