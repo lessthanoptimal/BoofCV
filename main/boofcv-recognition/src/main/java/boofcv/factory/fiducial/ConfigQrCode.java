@@ -57,7 +57,7 @@ public class ConfigQrCode implements Configuration {
 
 		polygon.detector.contourRule = ConnectRule.EIGHT;
 		polygon.detector.clockwise = false;
-		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).maxSideError = ConfigLength.relative(0.08,3);
+		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).maxSideError = ConfigLength.relative(0.12,3);
 		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).cornerScorePenalty = 0.4;
 		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).minimumSideLength = 2;
 		// 28 pixels = 7 by 7 square viewed head on. Each cell is then 1 pixel. Any slight skew results in
