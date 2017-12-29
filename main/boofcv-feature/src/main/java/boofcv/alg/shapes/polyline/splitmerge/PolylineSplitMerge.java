@@ -696,8 +696,8 @@ public class PolylineSplitMerge {
 	{
 		double d = Math.sqrt(distanceSq(contour.get(indexA),contour.get(indexB)));
 
-		// conservative upper bounds would be 1/2 a circle.
-		int maxAllowed = (int)(Math.PI*d+0.5);
+		// conservative upper bounds would be 1/2 a circle, including interior side.
+		int maxAllowed = (int)((Math.PI+1)*d+0.5);
 
 		if( indexA > indexB ) {
 			int tmp = indexA;
