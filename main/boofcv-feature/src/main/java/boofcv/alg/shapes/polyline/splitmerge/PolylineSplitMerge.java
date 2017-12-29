@@ -34,19 +34,32 @@ import org.ddogleg.struct.LinkedList.Element;
 import java.util.List;
 
 /**
- * Fits a polyline to a contour by fitting the simplest model and adding more sides to it and then
- * seeing if the lines can be merged together. First it always finds
- * an approximation of a triangle which minimizes the error. A side is added to the current polyline by finding
- * the side that when split will reduce the error by the largest amount. This is repeated until no sides can be
- * split or the maximum number of sides has been reached.
+ * <p>
+ * Fits a polyline to a contour by fitting the simplest model (3 sides) and adding more sides to it. The number of sides
+ * is increased until the number of sides reaches maxSides  + extraConsider or it already has fit the contour
+ * to within the specified precision. It then merges lines together until no more can be merged.
+ * </p>
  *
- * TODO redo description
+ * <p>
+ * When a side is added to the polygon it selects the side in which the score will be improved the most by splitting.
+ * The score is computed by computing the euclidean distance a point on the contour is from the line segment it
+ * belongs to. Note that distance from a line segment and not a line is found, thus if the closest point is past
+ * an end point the end point is used. The final score is the average distance.
+ * </p>
  *
- * TODO Sampling of a side
+ * <p>
+ * A set of polylines is found and scored. The best polyline is the one with the best overall score. The overall score is
+ * found by summing up the average error across all line segments (sum of segment scores dividing by the number of
+ * segments) [1] and adding a fixed penalty for each line segment.
+ * Without a penalty the polyline with the largest number of sides will almost always be selected.
+ * </p>
  *
- * TODO how sides are scored
+ * <p>
+ * For a complete description of all parameters see the source code.
+ * </p>
  *
- * TODO make sure documentation on scoring is up to date
+ * <p>[1] Note that the score is NOT weighted based on the number of points in a line segment. This was done at one
+ * point at produced much worse results.</p>
  *
  * The polyline will always be in counter-clockwise ordering.
  *
@@ -125,6 +138,7 @@ public class PolylineSplitMerge {
 
 		// by finding more corners than necessary it can recover from mistakes previously
 		int limit = maxSides+extraConsider.computeI(maxSides);
+		if( limit <= 0 )limit = Integer.MAX_VALUE; // handle the situation where it overflows
 		while( list.size() < limit && !fatalError ) {
 			if( !increaseNumberOfSidesByOne(contour) ) {
 				break;
@@ -140,7 +154,6 @@ public class PolylineSplitMerge {
 		if( fatalError )
 			return false;
 
-		bestPolyline = null;
 		double bestScore = Double.MAX_VALUE;
 		int bestSize = -1;
 		for (int i = 0; i < Math.min(maxSides-2,polylines.size); i++) {
@@ -163,8 +176,10 @@ public class PolylineSplitMerge {
 
 			double length = a.distance(b);
 			double thresholdSideError = this.maxSideError.compute(length);
-			if( bestPolyline.sideErrors.get(i) >= thresholdSideError*thresholdSideError)
+			if( bestPolyline.sideErrors.get(i) >= thresholdSideError*thresholdSideError) {
+				bestPolyline = null;
 				return false;
+			}
 		}
 
 		return true;
@@ -664,15 +679,17 @@ public class PolylineSplitMerge {
 	}
 
 	/**
-	 * For convex shapes no point along the contour can be farther away from A is from B. Thus the maximum number
-	 * of points can't exceed a 1/2 circle.
+	 * If point B is the point farthest away from A then by definition this means no other point can be farther
+	 * away.If the shape is convex then the line integration from A to B or B to A cannot be greater than 1/2
+	 * a circle. This test makes sure that the line integral meets the just described constraint and is thus
+	 * convex.
 	 *
 	 * NOTE: indexA is probably the top left point in the contour, since that's how most contour algorithm scan
 	 * but this isn't known for sure. If it was known you could make this requirement tighter.
 	 *
 	 * @param contour Contour points
 	 * @param indexA index of first point
-	 * @param indexB index of second point
+	 * @param indexB index of second point, which is the farthest away from A.
 	 * @return if it passes the sanity check
 	 */
 	static boolean sanityCheckConvex( List<Point2D_I32> contour , int indexA , int indexB )
@@ -688,8 +705,8 @@ public class PolylineSplitMerge {
 			indexB = tmp;
 		}
 
-		int length0 = CircularIndex.subtract(indexA,indexB,contour.size());
-		int length1 = CircularIndex.subtract(indexB,indexA,contour.size());
+		int length0 = CircularIndex.distanceP(indexA,indexB,contour.size());
+		int length1 = CircularIndex.distanceP(indexB,indexA,contour.size());
 
 		if( length0 > maxAllowed || length1 > maxAllowed )
 			return false;
@@ -739,6 +756,9 @@ public class PolylineSplitMerge {
 		return polylines;
 	}
 
+	/**
+	 * Returns the polyline with the best score or null if it failed to fit a polyline
+	 */
 	public CandidatePolyline getBestPolyline() {
 		return bestPolyline;
 	}

@@ -78,6 +78,8 @@ Fiducials
   * Unit test with heavy lens distortion and see if it fixes it
 - Have square fiducials call init if lens distortion is set.
 
+- TODO Polyline with no algorithm that doesn't loop
+
 TOP ITEMS
 - TODO QR Code algorithm
   * Better rejection of finder patterns using graph

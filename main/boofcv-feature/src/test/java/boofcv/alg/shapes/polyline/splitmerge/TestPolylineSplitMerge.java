@@ -19,9 +19,11 @@
 package boofcv.alg.shapes.polyline.splitmerge;
 
 import boofcv.alg.shapes.polyline.splitmerge.PolylineSplitMerge.Corner;
+import boofcv.struct.ConfigLength;
 import georegression.metric.Distance2D_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.line.LineParametric2D_F64;
+import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.LinkedList.Element;
 import org.junit.Test;
@@ -47,15 +49,45 @@ public class TestPolylineSplitMerge {
 		List<Point2D_I32> contour = rect(10,12,20,24);
 
 		alg.process(contour);
-
 		PolylineSplitMerge.CandidatePolyline result = alg.getBestPolyline();
-
-//		for (int i = 0; i < result.splits.size; i++) {
-//			System.out.println(contour.get(result.splits.get(i)));
-//		}
 
 		assertEquals(4,result.splits.size);
 		assertEquals(0.1*4,result.score, 1e-8);
+
+		// set a limit to the number of sides. This is a test in response to a bug
+		alg.setMaxSides(4);
+		alg.setExtraConsider(ConfigLength.fixed(2));
+		assertTrue(alg.process(contour));
+		result = alg.getBestPolyline();
+
+		assertEquals(4,result.splits.size);
+		assertEquals(0.1*4,result.score, 1e-8);
+	}
+
+	/**
+	 * Data is a square but force it to match a triangle
+	 */
+	@Test
+	public void process_perfectSquare_forcedTriangle() {
+		PolylineSplitMerge alg = new PolylineSplitMerge();
+		alg.setCornerScorePenalty(0.1);
+		alg.setMinimumSideLength(5);
+		alg.setMaxNumberOfSideSamples(10);
+		alg.setConvex(true);
+		alg.setMaxSides(3);
+		alg.setExtraConsider(ConfigLength.fixed(2));
+		alg.setMaxSideError(ConfigLength.fixed(1000)); // allow for a huge error
+
+		List<Point2D_I32> contour = rect(10,12,20,24);
+
+		assertTrue(alg.process(contour));
+		PolylineSplitMerge.CandidatePolyline result = alg.getBestPolyline();
+		assertEquals(3,result.splits.size);
+
+		// make it have a stricter error test and it should fail
+		alg.setMaxSideError(ConfigLength.fixed(1));
+		assertFalse(alg.process(contour));
+		assertTrue(null==alg.getBestPolyline());
 	}
 
 	@Test
@@ -479,6 +511,7 @@ public class TestPolylineSplitMerge {
 	@Test
 	public void sanityCheckConvex_negative() {
 		List<Point2D_I32> contour = rect(5,6,12,20);
+		// have the line segment it';s
 		assertFalse( PolylineSplitMerge.sanityCheckConvex(contour,2,3));
 	}
 
@@ -494,7 +527,19 @@ public class TestPolylineSplitMerge {
 	}
 
 	@Test
-	public void assignLine() {
+	public void distanceAbs() {
+		Point2D_I32 a = new Point2D_I32(2,4);
+		Point2D_I32 b = new Point2D_I32( 10,-3);
+
+		int expected = Math.abs(2-10) + Math.abs(4+3);
+		double found = PolylineSplitMerge.distanceAbs(a,b);
+
+		assertEquals(expected,found,GrlConstants.TEST_F64);
+	}
+
+
+	@Test
+	public void assignLine_parametric() {
 		List<Point2D_I32> contour = new ArrayList<>();
 
 		for (int i = 0; i < 20; i++) {
@@ -509,8 +554,31 @@ public class TestPolylineSplitMerge {
 
 		PolylineSplitMerge.assignLine(contour,1,9,line);
 
+		assertEquals(0, Distance2D_F64.distanceSq(line,0,5), GrlConstants.TEST_F64);
 		assertEquals(0, Distance2D_F64.distanceSq(line,1,5), GrlConstants.TEST_F64);
 		assertEquals(0, Distance2D_F64.distanceSq(line,9,5), GrlConstants.TEST_F64);
+
+	}
+
+	@Test
+	public void assignLine_segment() {
+		List<Point2D_I32> contour = new ArrayList<>();
+
+		for (int i = 0; i < 20; i++) {
+			contour.add( new Point2D_I32(i,2));
+		}
+
+		// make these points offset from all the others. That way if it grabs the wrong points the line will be wrong
+		contour.get(1).set(1,5);
+		contour.get(9).set(9,5);
+
+		LineSegment2D_F64 line = new LineSegment2D_F64();
+
+		PolylineSplitMerge.assignLine(contour,1,9,line);
+
+		assertEquals(1, Distance2D_F64.distanceSq(line,0,5), GrlConstants.TEST_F64);
+		assertEquals(0, Distance2D_F64.distanceSq(line,2,5), GrlConstants.TEST_F64);
+		assertEquals(0, Distance2D_F64.distanceSq(line,8,5), GrlConstants.TEST_F64);
 
 	}
 
