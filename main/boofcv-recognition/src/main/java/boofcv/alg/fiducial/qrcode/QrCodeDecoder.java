@@ -40,8 +40,6 @@ import static boofcv.alg.fiducial.qrcode.QrCodeEncoder.valueToAlphanumeric;
  *
  * @author Peter Abeles
  */
-// todo add more fine grained error reporting for why a decoding failed
-	// TODO clean up multiple packed bits
 	// TODO change QrCode to use GrowQueue's so that data can be recycled
 	// TODO better support for damaged qr codes with missing finder patterns.
 public class QrCodeDecoder<T extends ImageGray<T>> {

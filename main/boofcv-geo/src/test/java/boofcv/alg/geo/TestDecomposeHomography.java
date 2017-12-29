@@ -23,6 +23,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
@@ -50,6 +51,9 @@ public class TestDecomposeHomography {
 		DMatrixRMaj H = MultiViewOps.createHomography(R, T, d, N);
 
 		DecomposeHomography alg = new DecomposeHomography();
+
+		// There's a scale ambiguity. Let's see if it handles it correctly
+		CommonOps_DDRM.scale(2.4,H);
 
 		alg.decompose(H);
 

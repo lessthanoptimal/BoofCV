@@ -683,13 +683,16 @@ public class MultiViewOps {
 	/**
 	 * <p>
 	 * Computes a homography matrix from a rotation, translation, plane normal and plane distance:<br>
-	 * H = R+(1/d)*T*N<sup>T</sup>
+	 * x[2] = H*x[1]<br>
+	 * where x[1] is the point on the first camera and x[2] the location in the second camera.<br>
+	 * H = R+(1/d)*T*N<sup>T</sup><br>
+	 * Where [R,T] is the transform from camera 1 to camera 2.
 	 * </p>
 	 *
-	 * @param R Rotation matrix.
-	 * @param T Translation vector.
-	 * @param d Distance of closest point on plane to camera
-	 * @param N Normal of plane
+	 * @param R Rotation matrix from camera 1 to camera 2.
+	 * @param T Translation vector from camera 1 to camera 2.
+	 * @param d Distance &gt; 0 of closest point on plane to the origin of camera 1.
+	 * @param N Normal of plane with respect to the first camera.
 	 * @return Calibrated homography matrix
 	 */
 	public static DMatrixRMaj createHomography(DMatrixRMaj R, Vector3D_F64 T,
@@ -708,19 +711,22 @@ public class MultiViewOps {
 	 * <p>
 	 * Computes a homography matrix from a rotation, translation, plane normal, plane distance, and
 	 * calibration matrix:<br>
-	 * H = K*(R+(1/d)*T*N<sup>T</sup>)*K<sup>-1</sup>
+	 * x[2] = H*x[1]<br>
+	 * where x[1] is the point on the first camera and x[2] the location in the second camera.<br>
+	 * H = K*(R+(1/d)*T*N<sup>T</sup>)*K<sup>-1</sup><br>
+	 * Where [R,T] is the transform from camera 1 to camera, and K is the calibration matrix for both cameras.
 	 * </p>
 	 *
-	 * @param R Rotation matrix.
-	 * @param T Translation vector.
-	 * @param d Distance of closest point on plane to camera
-	 * @param N Normal of plane
+	 * @param R Rotation matrix from camera 1 to camera 2.
+	 * @param T Translation vector from camera 1 to camera 2.
+	 * @param d Distance &gt; 0 of closest point on plane to the origin of camera 1.
+	 * @param N Normal of plane with respect to the first camera.
 	 * @param K Intrinsic calibration matrix
 	 * @return Uncalibrated homography matrix
 	 */
 	public static DMatrixRMaj createHomography(DMatrixRMaj R, Vector3D_F64 T,
-												  double d, Vector3D_F64 N,
-												  DMatrixRMaj K)
+											   double d, Vector3D_F64 N,
+											   DMatrixRMaj K)
 	{
 		DMatrixRMaj temp = new DMatrixRMaj(3,3);
 		DMatrixRMaj K_inv = new DMatrixRMaj(3,3);

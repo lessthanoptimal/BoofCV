@@ -46,7 +46,8 @@ import java.util.List;
  *
  * <p>
  * The input homography is assumed to be from view 'a' to view 'b'.  Then the resulting transform (R,T) is the
- * transform from view 'a' to view 'b'
+ * transform from view 'a' to view 'b'. The values of d and N are all from the view 'a' perspective. Since there's a
+ * scale ambiguity the value of d is assumed to be 1 and T is scaled appropriately.
  * </p>
  *
  * <p>
@@ -56,7 +57,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DecomposeHomography {
-	private SingularValueDecomposition<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(3, 3, false, true, false);
+	private SingularValueDecomposition<DMatrixRMaj> svd;
 
 	// storage for the four possible solutions
 	// Camera motion part of the solution
@@ -79,6 +80,9 @@ public class DecomposeHomography {
 	DMatrixRMaj Hv2 = new DMatrixRMaj(3,3);
 	DMatrixRMaj tempM = new DMatrixRMaj(3,3);
 
+	// workspace for H
+	DMatrixRMaj H = new DMatrixRMaj(3,3);
+
 	public DecomposeHomography() {
 		for( int i = 0; i < 4; i++ ) {
 			solutionsN.add( new Vector3D_F64() );
@@ -94,10 +98,10 @@ public class DecomposeHomography {
 	 * solutions will be produced and can be accessed with {@link #getSolutionsN()} and
 	 * {@link #getSolutionsSE()}.
 	 *
-	 * @param H Homography matrix.  Not modified.
+	 * @param homography Homography matrix.  Not modified.
 	 */
-	public void decompose( DMatrixRMaj H ) {
-		if( !svd.decompose(H) )
+	public void decompose( DMatrixRMaj homography ) {
+		if( !svd.decompose(homography) )
 			throw new RuntimeException("SVD failed somehow");
 
 		DMatrixRMaj V = svd.getV(null,false);
@@ -105,12 +109,18 @@ public class DecomposeHomography {
 
 		SingularOps_DDRM.descendingOrder(null,false,S, V,false);
 
-		// COMMENT: The smallest singular value should be zero so I'm not sure why
-		// that is not assumed here.  Seen the same strategy done in a few papers
-		// Maybe that really isn't always the case?
-		double s0 = S.get(0,0)*S.get(0,0);
-		// the middle singular value is known to be one
-		double s2 = S.get(2,2)*S.get(2,2);
+		double s0 = S.get(0,0);
+		double s1 = S.get(1,1); // This is the scale. If normalize it will be one
+		double s2 = S.get(2,2);
+
+		// force s1 to be 1
+		s0 /= s1;
+		s2 /= s1;
+		CommonOps_DDRM.scale(1.0/s1,homography,this.H);
+
+		// square s0 and s1 for other parts of the calculations
+		s0 *= s0;
+		s2 *= s2;
 
 		v2.set(V.get(0,1),V.get(1,1),V.get(2,1));
 

@@ -32,6 +32,7 @@ import java.util.Map;
 import static boofcv.alg.fiducial.qrcode.QrCode.ErrorLevel.*;
 
 
+// TODO ECI Mode
 // TODO Structure Appended
 
 /**
@@ -61,7 +62,9 @@ public class QrCode implements Cloneable {
 	public static final List<Point2D_I32> LOCATION_BITS[] = new ArrayList[MAX_VERSION+1];
 
 	/**
-	 * The finder pattern that is composed of the 3 position patterns.
+	 * The finder pattern that is composed of the 3 position patterns. Orientation of corners in each
+	 * position pattern goes in clockwise direction (when viewed in an image, CCW mathematically) 0 = top left,
+	 * 1 = top right, 2 = bottom right, 3 = bottom left.
 	 */
 	public Polygon2D_F64 ppRight = new Polygon2D_F64(4);
 	public Polygon2D_F64 ppCorner = new Polygon2D_F64(4);
@@ -119,6 +122,9 @@ public class QrCode implements Cloneable {
 	 */
 	public Polygon2D_F64 bounds = new Polygon2D_F64(4);
 
+	/**
+	 * A homography transform from grid bit coordinates into image pixels.
+	 */
 	public Homography2D_F64 Hinv = new Homography2D_F64();
 
 	static {

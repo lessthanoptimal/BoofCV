@@ -508,7 +508,7 @@ public class TestMultiViewOps {
 		DMatrixRMaj H = MultiViewOps.createHomography(R, T, d, N);
 
 		// Test using the following theorem:  x2 = H*x1
-		Point3D_F64 P = new Point3D_F64(0.1,0.1,d); // a point on the plane
+		Point3D_F64 P = new Point3D_F64(0.1,0.2,d); // a point on the plane
 
 		Point2D_F64 x0 = new Point2D_F64(P.x/P.z,P.y/P.z);
 		SePointOps_F64.transform(new Se3_F64(R,T),P,P);
@@ -532,7 +532,7 @@ public class TestMultiViewOps {
 		DMatrixRMaj H = MultiViewOps.createHomography(R, T, d, N, K);
 
 		// Test using the following theorem:  x2 = H*x1
-		Point3D_F64 P = new Point3D_F64(0.1,0.1,d); // a point on the plane
+		Point3D_F64 P = new Point3D_F64(0.1,0.2,d); // a point on the plane
 
 		Point2D_F64 x0 = new Point2D_F64(P.x/P.z,P.y/P.z);
 		GeometryMath_F64.mult(K,x0,x0);
