@@ -89,6 +89,15 @@ public class QrCodeEncoder {
 	}
 
 	/**
+	 * Select the encoding based on the letters in the message. In the future this might do fancy things like
+	 * switch between multiple modes to increase the number of characters.
+	 */
+	public QrCodeEncoder encodeAuto( String message ){
+		qr.message = new StringBuilder(message);
+		return bytes(message);
+	}
+
+	/**
 	 * Creates a QR-Code which encodes a number sequence
 	 * @param message String that specifies numbers and no other types. Each number has to be from 0 to 9 inclusive.
 	 * @return The QR-Code
@@ -362,7 +371,7 @@ public class QrCodeEncoder {
 					}
 				}
 				if( qr.error == null ) {
-					throw new IllegalArgumentException("You need to use a high version number to store the data. Tried" +
+					throw new IllegalArgumentException("You need to use a high version number to store the data. Tried " +
 							"all error correction levels at version "+qr.version+". Total Data "+(packed.size/8));
 				}
 			}

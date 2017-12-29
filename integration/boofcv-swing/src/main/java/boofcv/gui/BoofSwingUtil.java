@@ -35,11 +35,19 @@ public class BoofSwingUtil {
 	public static final double MIN_ZOOM = 0.01;
 	public static final double MAX_ZOOM = 50;
 
+	public static File saveFileChooser(Component parent, FileTypes ...filters) {
+		return openFileChooser(parent,false,new File(".").getPath(),filters);
+	}
+
 	public static File openFileChooser(Component parent, FileTypes ...filters) {
 		return openFileChooser(parent,new File(".").getPath(),filters);
 	}
 
 	public static File openFileChooser(Component parent, String defaultPath , FileTypes ...filters) {
+		return openFileChooser(parent,false,defaultPath,filters);
+	}
+
+	public static File openFileChooser(Component parent, boolean openFile, String defaultPath , FileTypes ...filters) {
 
 		Preferences prefs;
 		if( parent == null ) {
@@ -69,7 +77,7 @@ public class BoofSwingUtil {
 		}
 
 		File selected = null;
-		int returnVal = chooser.showOpenDialog(parent);
+		int returnVal = openFile ? chooser.showOpenDialog(parent) : chooser.showSaveDialog(parent);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			selected = chooser.getSelectedFile();
 			prefs.put(KEY_PREVIOUS_SELECTION, selected.getParent());
@@ -158,7 +166,7 @@ public class BoofSwingUtil {
 		return field;
 	}
 
-	public static void warningDialog(Component component, RuntimeException e) {
+	public static void warningDialog(Component component, Exception e) {
 		JOptionPane.showMessageDialog(component, e.getMessage());
 	}
 

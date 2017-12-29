@@ -57,6 +57,7 @@ public abstract class QrCodeGenerator {
 		this.qr = qr;
 		this.numModules = QrCode.totalModules(qr.version);
 		this.moduleWidth = markerWidth/numModules;
+		this.bitLocations = null;
 
 		init();
 		positionPattern(0,0, qr.ppCorner);

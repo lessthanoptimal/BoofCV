@@ -79,6 +79,20 @@ public abstract class QrCodeMaskPattern {
 		}
 	}
 
+	public static QrCodeMaskPattern lookupMask( String maskPattern ) {
+		switch( maskPattern ) {
+			case "000": return M000;
+			case "001": return M001;
+			case "010": return M010;
+			case "011": return M011;
+			case "100": return M100;
+			case "101": return M101;
+			case "110": return M110;
+			case "111": return M111;
+			default: throw new RuntimeException("Unknown mask: "+maskPattern);
+		}
+	}
+
 	static class NONE extends QrCodeMaskPattern {
 		public NONE(int bits) { super(bits); }
 

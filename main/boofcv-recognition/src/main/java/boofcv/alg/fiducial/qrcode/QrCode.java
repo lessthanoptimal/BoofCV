@@ -486,6 +486,16 @@ public class QrCode implements Cloneable {
 			throw new IllegalArgumentException("Unknown");
 		}
 
+		public static ErrorLevel lookup(String letter) {
+			switch( letter ) {
+				case "L":return L;
+				case "M":return M;
+				case "Q":return Q;
+				case "H":return H;
+			}
+			throw new IllegalArgumentException("Unknown");
+		}
+
 		int value;
 	}
 
@@ -625,6 +635,15 @@ public class QrCode implements Cloneable {
 				return FNC1_SECOND;
 			else
 				return UNKNOWN;
+		}
+
+		public static Mode lookup( String name ) {
+			name = name.toUpperCase();
+			for( Mode m : values() ) {
+				if( m.toString().equals(name))
+					return m;
+			}
+			return null;
 		}
 	}
 
