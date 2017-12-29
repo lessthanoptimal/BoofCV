@@ -29,6 +29,7 @@ import org.ddogleg.struct.LinkedList.Element;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -155,6 +156,11 @@ public class TestPolylineSplitMerge {
 		assertEquals(0,e.object.index);
 	}
 
+	@Test
+	public void ensureTriangleOrder() {
+		fail("implement");
+	}
+
 	/**
 	 * Case where it should add a corner and then remove a corner
 	 */
@@ -192,6 +198,11 @@ public class TestPolylineSplitMerge {
 		assertEquals(30,e.object.index);e = e.next;
 		assertEquals(0,e.object.sideError,1e-8);
 		assertEquals(0,e.object.index);
+	}
+
+	@Test
+	public void isSideConvex() {
+		fail("implement");
 	}
 
 	@Test
@@ -277,24 +288,6 @@ public class TestPolylineSplitMerge {
 		fail("update. no longer given an edge");
 	}
 
-//	@Test
-//	public void getCurrentPolylineScore() {
-//		PolylineSplitMerge.CandidatePolyline a;
-//
-//		PolylineSplitMerge alg = new PolylineSplitMerge();
-//		alg.addCorner(0);
-//		alg.addCorner(0);
-//		alg.addCorner(0);
-//		alg.getPolylines().grow().score = 2;
-//
-//		assertEquals(2,alg.getCurrentPolylineScore(),1e-8);
-//
-//		alg.getPolylines().grow().score = 3;
-//		assertEquals(2,alg.getCurrentPolylineScore(),1e-8);
-//		alg.addCorner(0);
-//		assertEquals(3,alg.getCurrentPolylineScore(),1e-8);
-//	}
-
 	@Test
 	public void findCornerSeed() {
 		List<Point2D_I32> contour = new ArrayList<>();
@@ -305,6 +298,11 @@ public class TestPolylineSplitMerge {
 		contour.add( new Point2D_I32(2,2));
 
 		assertEquals(19,PolylineSplitMerge.findCornerSeed(contour));
+	}
+
+	@Test
+	public void maximumDistance() {
+		fail("implement");
 	}
 
 	@Test
@@ -340,7 +338,7 @@ public class TestPolylineSplitMerge {
 	public void computeSideError_exhaustive() {
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
-		alg.maxNumberOfSideSamples = 30; // have it exhaustively sample all pixels
+		alg.maxNumberOfSideSamples = 300; // have it exhaustively sample all pixels
 
 		List<Point2D_I32> contour = new ArrayList<>();
 		for (int i = 0; i < 20; i++) {
@@ -352,16 +350,20 @@ public class TestPolylineSplitMerge {
 		}
 		contour.get(10).y = 0; // need this to be zero so that two lines are the same
 //		// average SSE
-		double expected = (5.0*5.0*17)/19.0;
+		double expected = (5.0*5.0*17)/18.0;
 		assertEquals(expected,alg.computeSideError(contour,0,19), GrlConstants.TEST_F64);
 		// the error should have this property to not bias it based on the number of sides
-		expected = (5*5*9)/10.0 + (5*5*8)/9.0;
+		expected = (5*5*9)/9.0 + (5*5*8)/8.0;
 		double split = alg.computeSideError(contour,0,10)+alg.computeSideError(contour,10,19);
 		assertEquals(expected,split, GrlConstants.TEST_F64);
 
-		//----------- Now in the reverse direction
-		expected = (5*5*8)/10.0;
-		assertEquals(expected,alg.computeSideError(contour,10,0), GrlConstants.TEST_F64);
+		//----------- Test the wrapping around case
+		List<Point2D_I32> contour2 = new ArrayList<>();
+		for (int i = 0; i < contour.size(); i++) {
+			contour2.add( contour.get((i+10)%contour.size()));
+		}
+		expected = (5*5*9)/9.0;
+		assertEquals(expected,alg.computeSideError(contour2,10,0), GrlConstants.TEST_F64);
 	}
 
 	@Test
@@ -384,8 +386,12 @@ public class TestPolylineSplitMerge {
 		assertEquals(expected,alg.computeSideError(contour,0,19), expected*0.15);
 
 		//----------- Now in the reverse direction
-		expected = (5*5*8)/10.0;
-		assertEquals(expected,alg.computeSideError(contour,10,0), expected*0.15);
+		List<Point2D_I32> contour2 = new ArrayList<>();
+		for (int i = 0; i < contour.size(); i++) {
+			contour2.add( contour.get((i+10)%contour.size()));
+		}
+		expected = (5*5*5)/5.0;
+		assertEquals(expected,alg.computeSideError(contour2,10,0), GrlConstants.TEST_F64);
 	}
 
 	@Test
@@ -402,47 +408,132 @@ public class TestPolylineSplitMerge {
 	}
 
 	@Test
+	public void setSplitVariables() {
+		List<Point2D_I32> contour = rect(5,6,12,20);
+
+		PolylineSplitMerge alg = new PolylineSplitMerge();
+		alg.setConvex(false); // make sure this test doesn't get triggered
+
+		// corners at 0,7,21,28
+		alg.addCorner(0);
+		alg.addCorner(21);
+		alg.addCorner(28);
+
+		Element<Corner> e = alg.list.getHead();
+		// these values should be overwritten
+		e.object.splitLocation = -1;
+		e.object.splitError0 = -1;
+		e.object.splitError1 = -1;
+
+		alg.setSplitVariables(contour,e,alg.list.getElement(1,true));
+
+		assertEquals(7,e.object.splitLocation);
+		assertEquals(0,e.object.splitError0,1e-4);
+		assertEquals(0,e.object.splitError1,1e-4);
+
+		// turn on contour test. Should produce same results
+		alg.setConvex(true);
+		e.object.splitLocation = -1;
+		e.object.splitError0 = -1;
+		e.object.splitError1 = -1;
+		alg.setSplitVariables(contour,e,alg.list.getElement(1,true));
+		assertTrue(e.object.splitable);
+		assertEquals(7,e.object.splitLocation);
+		assertEquals(0,e.object.splitError0,1e-4);
+		assertEquals(0,e.object.splitError1,1e-4);
+	}
+
+	/**
+	 * The convex check is now enabled and should failed the split
+	 */
+	@Test
+	public void setSplitVariables_withConvexCheck() {
+		List<Point2D_I32> contour = rect(5,6,12,20);
+		PolylineSplitMerge alg = new PolylineSplitMerge();
+		alg.setConvex(true);
+
+		// corners in reverse order to trigger convex failure
+		Collections.reverse(contour);
+		alg.addCorner(28);
+		alg.addCorner(21);
+		alg.addCorner(0);
+
+		Element<Corner> e0 = alg.list.getHead().next;
+		Element<Corner> e1 = e0.next;
+
+		e1.object.splitable = true;
+
+		alg.setSplitVariables(contour,e0,e1);
+
+		assertFalse(e1.object.splitable);
+	}
+
+	@Test
 	public void canBeSplit() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
+
+		// only the contour's size matters
+		List<Point2D_I32> contour = new ArrayList<>();
+		for (int i = 0; i < 50; i++) {
+			contour.add( new Point2D_I32());
+		}
 
 		for (int i = 0; i < 10; i++) {
 			Corner c = alg.corners.grow();
 			c.index = i*5;
+			c.sideError = 0.1; // give it an error greater than zero so that it will pass the side test
 			alg.list.pushTail(c);
 		}
 
 		alg.setMinimumSideLength(5);
 		alg.setThresholdSideSplitScore(0); // turn off this test
 
-//		assertTrue(alg.canBeSplit(50,alg.list.getElement(5,true)));
-//		assertTrue(alg.canBeSplit(50,alg.list.getElement(9,true)));
-//
-//		alg.setMinimumSideLength(6);
-//		assertFalse(alg.canBeSplit(50,alg.list.getElement(5,true)));
-//		assertFalse(alg.canBeSplit(50,alg.list.getElement(9,true)));
-//
-//		// test side split score
-//		alg.setMinimumSideLength(5);
-//		alg.setThresholdSideSplitScore(1);
-//
-//		alg.list.getElement(5,true).object.sideError = 1;
-//		assertTrue(alg.canBeSplit(50,alg.list.getElement(5,true)));
-//		alg.list.getElement(5,true).object.sideError = 0.9999999;
-//		assertFalse(alg.canBeSplit(50,alg.list.getElement(5,true)));
-		fail("update");
+		assertTrue(alg.canBeSplit(contour,alg.list.getElement(5,true),false));
+		assertTrue(alg.canBeSplit(contour,alg.list.getElement(9,true),false));
+
+		alg.setMinimumSideLength(6);
+		assertFalse(alg.canBeSplit(contour,alg.list.getElement(5,true),false));
+		assertFalse(alg.canBeSplit(contour,alg.list.getElement(9,true),false));
+
+		// test side split score
+		alg.setMinimumSideLength(5);
+		alg.setThresholdSideSplitScore(1);
+
+		alg.list.getElement(5,true).object.sideError = 1;
+		assertTrue(alg.canBeSplit(contour,alg.list.getElement(5,true),false));
+		alg.list.getElement(5,true).object.sideError = 0.9999999;
+		assertFalse(alg.canBeSplit(contour,alg.list.getElement(5,true),false));
+
+		// test the must split flag
+		alg.list.getElement(5,true).object.sideError = 0.9999999;
+		assertTrue(alg.canBeSplit(contour,alg.list.getElement(5,true),true));
+		alg.setMinimumSideLength(6);
+		assertFalse(alg.canBeSplit(contour,alg.list.getElement(5,true),true));
+
 	}
 
+	/**
+	 * Special case that requires wrapping around to compute the correct length
+	 */
 	@Test
 	public void canBeSplit_special_case() {
-//		PolylineSplitMerge alg = new PolylineSplitMerge();
-//		alg.setMinimumSideLength(5);
-//		alg.setThresholdSideSplitScore(0);
-//
-//		alg.addCorner(0);
-//		alg.addCorner(10);
-//
-//		assertTrue(alg.canBeSplit(11,alg.list.getHead()));
-		fail("update");
+		// only the contour's size matters
+		List<Point2D_I32> contour = new ArrayList<>();
+		for (int i = 0; i < 11; i++) {
+			contour.add( new Point2D_I32());
+		}
+
+		PolylineSplitMerge alg = new PolylineSplitMerge();
+		alg.setMinimumSideLength(5);
+		alg.setThresholdSideSplitScore(0);
+
+		alg.addCorner(0);
+		alg.addCorner(10);
+		alg.list.getHead().object.sideError = 0;
+		alg.list.getTail().object.sideError = 0;
+
+		assertTrue(alg.canBeSplit(contour,alg.list.getHead(),false));
+		assertFalse(alg.canBeSplit(contour,alg.list.getTail(),false));
 	}
 
 	@Test
@@ -477,16 +568,11 @@ public class TestPolylineSplitMerge {
 		assertTrue(c==alg.previous(alg.list.find(a)).object);
 	}
 
-	@Test
-	public void ensureTriangleIsCCW() {
-		fail("Implement");
-	}
-
 	/**
 	 * Create a rectangle and feed it every point in the rectangle and see if it has the expected response
 	 */
 	@Test
-	public void sanityCheckConvex_positive() {
+	public void isConvexUsingMaxDistantPoints_positive() {
 		List<Point2D_I32> contour = rect(5,6,12,20);
 
 		for (int i = 0; i < contour.size(); i++) {
@@ -501,7 +587,7 @@ public class TestPolylineSplitMerge {
 				}
 			}
 
-			assertTrue( PolylineSplitMerge.sanityCheckConvex(contour,i,farthest));
+			assertTrue( PolylineSplitMerge.isConvexUsingMaxDistantPoints(contour,i,farthest));
 		}
 	}
 
@@ -509,10 +595,10 @@ public class TestPolylineSplitMerge {
 	 * Give it a scenario where it should fail
 	 */
 	@Test
-	public void sanityCheckConvex_negative() {
+	public void isConvexUsingMaxDistantPoints_negative() {
 		List<Point2D_I32> contour = rect(5,6,12,20);
 		// have the line segment it';s
-		assertFalse( PolylineSplitMerge.sanityCheckConvex(contour,2,3));
+		assertFalse( PolylineSplitMerge.isConvexUsingMaxDistantPoints(contour,2,3));
 	}
 
 	@Test

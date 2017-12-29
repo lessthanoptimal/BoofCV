@@ -276,7 +276,7 @@ public class PolylineSplitMerge {
 
 		// see if it can reject the contour immediately
 		if( convex ) {
-			if( !sanityCheckConvex(contour,0,cornerSeed))
+			if( !isConvexUsingMaxDistantPoints(contour,0,cornerSeed))
 				return false;
 		}
 
@@ -574,9 +574,6 @@ public class PolylineSplitMerge {
 				Point2D_I32 p = contour.get(index);
 				sumOfDistances += Distance2D_F64.distanceSq(line,p.x,p.y);
 			}
-			// scale the error to the actual length in pixels
-//			sumOfDistances *= length/(double)numSamples;
-//			sumOfDistances = Math.sqrt(sumOfDistances)/numSamples;
 			sumOfDistances /= numSamples;
 		} else {
 			length = contour.size()-indexA-1 + indexB;
@@ -587,8 +584,6 @@ public class PolylineSplitMerge {
 				Point2D_I32 p = contour.get(index);
 				sumOfDistances += Distance2D_F64.distanceSq(line,p.x,p.y);
 			}
-//			sumOfDistances *= length/(double)numSamples;
-//			sumOfDistances = Math.sqrt(sumOfDistances)/numSamples;
 			sumOfDistances /= numSamples;
 		}
 
@@ -632,6 +627,7 @@ public class PolylineSplitMerge {
 			}
 		}
 
+		// this function is only called if splitable is set to true so no need to set it again
 		e0.object.splitLocation = resultsA.index;
 		e0.object.splitError0 = computeSideError(contour, e0.object.index, resultsA.index);
 		e0.object.splitError1 = computeSideError(contour, resultsA.index, e1.object.index);
@@ -642,18 +638,24 @@ public class PolylineSplitMerge {
 
 	/**
 	 * Determines if the side can be split again. A side can always be split as long as
-	 * its >= the minimum length or that the side score is larger the the split threshold
+	 * it's &ge; the minimum length or that the side score is larger the the split threshold
+	 *
+	 * @param e0 The side which is to be tested to see if it can be split
+	 * @param mustSplit if true this will force it to split even if the error would prevent it from splitting
+	 * @return true if it can be split or false if not
 	 */
 	boolean canBeSplit( List<Point2D_I32> contour, Element<Corner> e0 , boolean mustSplit ) {
 		Element<Corner> e1 = next(e0);
 
+		// NOTE: The contour is passed in but only the size of the contour matters. This was done to prevent
+		//       changing the signature if the algorithm was changed later on.
 		int length = CircularIndex.distanceP(e0.object.index, e1.object.index, contour.size());
 
 		if (length < minimumSideLength) {
 			return false;
 		}
 
-		return mustSplit || e0.object.sideError > thresholdSideSplitScore;
+		return mustSplit || e0.object.sideError >= thresholdSideSplitScore;
 	}
 
 	/**
@@ -692,26 +694,17 @@ public class PolylineSplitMerge {
 	 * @param indexB index of second point, which is the farthest away from A.
 	 * @return if it passes the sanity check
 	 */
-	static boolean sanityCheckConvex( List<Point2D_I32> contour , int indexA , int indexB )
+	static boolean isConvexUsingMaxDistantPoints(List<Point2D_I32> contour , int indexA , int indexB )
 	{
 		double d = Math.sqrt(distanceSq(contour.get(indexA),contour.get(indexB)));
 
 		// conservative upper bounds would be 1/2 a circle, including interior side.
 		int maxAllowed = (int)((Math.PI+1)*d+0.5);
 
-		if( indexA > indexB ) {
-			int tmp = indexA;
-			indexA = indexB;
-			indexB = tmp;
-		}
-
 		int length0 = CircularIndex.distanceP(indexA,indexB,contour.size());
 		int length1 = CircularIndex.distanceP(indexB,indexA,contour.size());
 
-		if( length0 > maxAllowed || length1 > maxAllowed )
-			return false;
-
-		return true;
+		return length0 <= maxAllowed && length1 <= maxAllowed;
 	}
 
 	/**
