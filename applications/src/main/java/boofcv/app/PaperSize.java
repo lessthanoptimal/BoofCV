@@ -27,6 +27,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PaperSize {
+	public static PaperSize FIT_CONTENT = new PaperSize("CONTENT",0,0,null);
 	public static PaperSize A0 = new PaperSize("A0",841 , 1189, Unit.MILLIMETER);
 	public static PaperSize A1 = new PaperSize("A1",594 , 841, Unit.MILLIMETER);
 	public static PaperSize A2 = new PaperSize("A2",420 , 594, Unit.MILLIMETER);

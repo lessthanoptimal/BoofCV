@@ -79,6 +79,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 	// runtime profiling
 	protected MovingAverage milliGraph = new MovingAverage(0.8);
+	protected boolean profiler = false;
 
 	// storage for nearest neighbor
 	double point[] = new double[2];
@@ -115,6 +116,10 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		milliGraph.reset();
 	}
 
+	public void setProfilerState( boolean active ) {
+		profiler = active;
+	}
+
 	/**
 	 * Detects position patterns inside the image and forms a graph.
 	 * @param gray Gray scale input image
@@ -143,9 +148,11 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		milliGraph.update(milli);
 
 		DetectPolygonFromContour<T> detectorPoly = squareDetector.getDetector();
-		System.out.printf(" contour %5.1f shapes %5.1f adjust_bias %5.2f PosPat %6.2f",
-				detectorPoly.getMilliContour(),detectorPoly.getMilliShapes(),squareDetector.getMilliAdjustBias(),
-				milliGraph.getAverage());
+		if( profiler ) {
+			System.out.printf(" contour %5.1f shapes %5.1f adjust_bias %5.2f PosPat %6.2f",
+					detectorPoly.getMilliContour(), detectorPoly.getMilliShapes(), squareDetector.getMilliAdjustBias(),
+					milliGraph.getAverage());
+		}
 	}
 
 	/**

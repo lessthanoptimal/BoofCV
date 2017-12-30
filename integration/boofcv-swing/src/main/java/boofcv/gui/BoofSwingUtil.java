@@ -44,7 +44,7 @@ public class BoofSwingUtil {
 	}
 
 	public static File openFileChooser(Component parent, String defaultPath , FileTypes ...filters) {
-		return openFileChooser(parent,false,defaultPath,filters);
+		return openFileChooser(parent,true,defaultPath,filters);
 	}
 
 	public static File openFileChooser(Component parent, boolean openFile, String defaultPath , FileTypes ...filters) {
@@ -57,6 +57,7 @@ public class BoofSwingUtil {
 		}
 		String previousPath=prefs.get(KEY_PREVIOUS_SELECTION, defaultPath);
 		JFileChooser chooser = new JFileChooser(previousPath);
+		chooser.setSelectedFile(new File(previousPath));
 
 		for( FileTypes t : filters ) {
 			FileNameExtensionFilter ff;
@@ -80,7 +81,7 @@ public class BoofSwingUtil {
 		int returnVal = openFile ? chooser.showOpenDialog(parent) : chooser.showSaveDialog(parent);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			selected = chooser.getSelectedFile();
-			prefs.put(KEY_PREVIOUS_SELECTION, selected.getParent());
+			prefs.put(KEY_PREVIOUS_SELECTION, selected.getPath());
 		}
 		return selected;
 	}
@@ -158,6 +159,22 @@ public class BoofSwingUtil {
 		formatter.setValueClass(Integer.class);
 		formatter.setMinimum(min);
 		formatter.setMaximum(max);
+		formatter.setAllowsInvalid(true);
+//		formatter.setCommitsOnValidEdit(true);
+		JFormattedTextField field = new JFormattedTextField(formatter);
+		field.setHorizontalAlignment(JTextField.RIGHT);
+		field.setValue(current);
+		return field;
+	}
+
+	public static JFormattedTextField createTextField( double current , double min , double max ) {
+		NumberFormat format = NumberFormat.getInstance();
+		NumberFormatter formatter = new NumberFormatter(format);
+		formatter.setValueClass(Double.class);
+		if( !Double.isNaN(min) )
+			formatter.setMinimum(min);
+		if( !Double.isNaN(max) )
+			formatter.setMaximum(max);
 		formatter.setAllowsInvalid(true);
 //		formatter.setCommitsOnValidEdit(true);
 		JFormattedTextField field = new JFormattedTextField(formatter);

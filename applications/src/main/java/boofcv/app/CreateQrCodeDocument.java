@@ -37,6 +37,9 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO Support image output
+	// TODO specify size using module size
+	// TODO GUI Specify QR code size and units
+
 public class CreateQrCodeDocument {
 
 	@Option(name = "-t", aliases = {"--Text","--Message"},
@@ -60,7 +63,7 @@ public class CreateQrCodeDocument {
 
 	@Option(name="-u",aliases = {"--Units"}, usage="Name of document units.  default: cm")
 	private String _unit = Unit.CENTIMETER.abbreviation;
-	private Unit unit;
+	public Unit unit;
 
 	@Option(name="-p",aliases = {"--PaperSize"}, usage="Size of paper used.  See below for predefined document sizes.  "
 	+"You can manually specify any size using the following notation. W:H  where W is the width and H is the height.  "
@@ -70,10 +73,13 @@ public class CreateQrCodeDocument {
 	public PaperSize paperSize;
 
 	@Option(name="-w",aliases = {"--MarkerWidth"}, usage="Width of the QR Code.  In document units.")
-	private float markerWidth=3;
+	public float markerWidth=-1;
+
+	@Option(name="-mw",aliases = {"--ModuleWidth"}, usage="Specify size of QR Code by its module/cells.  In document units.")
+	public float moduleWidth=-1;
 
 	@Option(name="-s",aliases = {"--Space"}, usage="Spacing between the markers.  In document units.")
-	private float spaceBetween =2;
+	public float spaceBetween =2;
 
 	@Option(name="-o",aliases = {"--OutputName"}, usage="Name of output file.  E.g. qrcode.pdf")
 	public String fileName = "qrcode";
@@ -122,16 +128,20 @@ public class CreateQrCodeDocument {
 		error = _error == null ? null : QrCode.ErrorLevel.lookup(_error);
 
 		if( version == 0 || version > 40 || version < -1 ) {
-			System.err.println("Version must be from 1 to 40 or set to -1 for auto select");
-			System.exit(1);
+			failExit("Version must be from 1 to 40 or set to -1 for auto select");
+		}
+
+		if( moduleWidth < 0 && markerWidth < 0 ) {
+			throw new RuntimeException("Must specify moduleWidth or markerWidth");
+		} else if( markerWidth < 0 ) {
+			markerWidth = moduleWidth*QrCode.totalModules(version);
 		}
 
 		encoding = _encoding == null ? null : QrCode.Mode.lookup(_encoding);
 
 		unit = Unit.lookup(_unit);
 		if( unit == null ) {
-			System.err.println("Must specify a valid unit or use default");
-			System.exit(1);
+			failExit("Must specify a valid unit or use default");
 		}
 		paperSize = PaperSize.lookup(_paperSize);
 		if( paperSize == null ) {
@@ -142,16 +152,12 @@ public class CreateQrCodeDocument {
 			if( w.unit != h.unit ) failExit("Same units must be specified for width and height");
 			paperSize = new PaperSize(w.length,h.length,w.unit);
 		}
-
-		if( markerWidth <= 0 )
-			failExit("Must specify a shape width more than zero");
 	}
 
 	public void run() throws IOException {
 
 		if( messages == null || messages.size() == 0 ) {
-			System.err.println("Need to specify a message");
-			return;
+			throw new RuntimeException("Need to specify a message");
 		}
 
 		System.out.println("   paper     : "+paperSize);

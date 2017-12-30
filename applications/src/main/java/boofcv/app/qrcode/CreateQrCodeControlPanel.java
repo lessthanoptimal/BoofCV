@@ -21,6 +21,8 @@ package boofcv.app.qrcode;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeMaskPattern;
 import boofcv.app.PaperSize;
+import boofcv.app.Unit;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
@@ -29,6 +31,8 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * Selects various parameters when generating a QR Code document
@@ -38,6 +42,7 @@ import java.awt.event.ActionListener;
 public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements ActionListener
 {
 	JTextArea messageField= new JTextArea();
+	JComboBox<String> comboOutputFormat = new JComboBox<>();
 	JComboBox<String> comboVersion = new JComboBox<>();
 	JComboBox<String> comboError = new JComboBox<>();
 	JComboBox<String> comboPattern = new JComboBox<>();
@@ -45,6 +50,9 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 	JCheckBox checkFillGrid;
 	JCheckBox checkHideInfo;
 	JComboBox<PaperSize> comboPaper = new JComboBox<>(PaperSize.values().toArray(new PaperSize[0]));
+
+	JComboBox<Unit> comboUnits = new JComboBox<>(Unit.values());
+	JFormattedTextField fieldMarkerWidth = BoofSwingUtil.createTextField(3.0,0.0,Double.NaN);
 
 	int version=-1;
 	String message = "";
@@ -55,11 +63,15 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 	boolean fillGrid=false;
 	boolean hideInfo=false;
 
+	Unit documentUnits = Unit.CENTIMETER;
+	double markerWidth = 3;
 
 	Listener listener;
 
 	public CreateQrCodeControlPanel(final Listener listener ) {
 		this.listener = listener;
+
+		comboOutputFormat.addItem("PDF");
 
 		messageField.setPreferredSize(new Dimension(200,300));
 		messageField.setLineWrap(true);
@@ -122,15 +134,45 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 		checkHideInfo = checkbox("Hide Info",hideInfo);
 
 		add(new JScrollPane(messageField));
+		addLabeled(comboOutputFormat,"Output Format");
+		addLabeled(comboPaper,"Paper Size");
+		add(createMarkerWidthPanel());
+		add(createFlagPanel());
+		add(new JSeparator());
 		addLabeled(comboVersion,"Version");
 		addLabeled(comboError,"Error");
 		addLabeled(comboPattern,"Pattern");
 		addLabeled(comboMode,"Mode");
-		addAlignLeft(checkFillGrid);
-		addAlignLeft(checkHideInfo);
-		addLabeled(comboPaper,"Paper Size");
-		add(checkFillGrid);
-		add(checkHideInfo);
+	}
+
+	private JPanel createFlagPanel() {
+		JPanel panel = new JPanel(new GridLayout(0,2));
+		panel.add(checkFillGrid);
+		panel.add(checkHideInfo);
+		return panel;
+	}
+
+	private JPanel createMarkerWidthPanel() {
+		fieldMarkerWidth.setPreferredSize(new Dimension(50,20));
+		fieldMarkerWidth.setMaximumSize(fieldMarkerWidth.getPreferredSize());
+		fieldMarkerWidth.setValue(markerWidth);
+		fieldMarkerWidth.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				markerWidth = (Double)fieldMarkerWidth.getValue();
+			}
+		});
+		comboUnits.setSelectedIndex(documentUnits.ordinal());
+		comboUnits.setMaximumSize(comboUnits.getPreferredSize());
+		comboUnits.addActionListener(this);
+
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
+		panel.add(new JLabel("Marker Width"));
+		panel.add(Box.createRigidArea(new Dimension(10,10)));
+		panel.add(fieldMarkerWidth);
+		panel.add(comboUnits);
+		return panel;
 	}
 
 	@Override
@@ -161,6 +203,8 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 			hideInfo = checkHideInfo.isSelected();
 		} else if( e.getSource() == checkFillGrid ) {
 			fillGrid = checkFillGrid.isSelected();
+		} else if( e.getSource() == comboUnits ) {
+			documentUnits = (Unit)comboUnits.getSelectedItem();
 		}
 	}
 

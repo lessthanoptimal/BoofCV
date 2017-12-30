@@ -48,6 +48,8 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 
 	JFrame frame;
 
+	String lastFileName = "qrcode.pdf";
+
 	public CreateQrCodeGui() {
 		setLayout(new BorderLayout());
 
@@ -132,6 +134,8 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 		generator.hideInfo = controls.hideInfo;
 		generator.messages = new ArrayList<>();
 		generator.messages.add( controls.message );
+		generator.unit = controls.documentUnits;
+		generator.markerWidth = (float)controls.markerWidth;
 
 		try {
 			generator.finishParsing();

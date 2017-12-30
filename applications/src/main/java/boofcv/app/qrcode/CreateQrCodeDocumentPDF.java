@@ -97,9 +97,9 @@ public class CreateQrCodeDocumentPDF {
 		int numCols = (int)Math.floor(pageWidth/sizeBox);
 
 		if( !gridFill) {
-			numRows = Math.min(numRows,1+markers.size()/numCols);
+			numRows = Math.max(1,markers.size()/numCols);
 			if( numRows == 1 ) {
-				numCols = Math.min(numCols,markers.size()%numCols);
+				numCols = Math.max(1,markers.size()%numCols);
 			}
 		}
 
@@ -133,6 +133,10 @@ public class CreateQrCodeDocumentPDF {
 					pcs.setFont(PDType1Font.TIMES_ROMAN,7);
 					pcs.newLineAtOffset( (float)g.offsetX, (float)g.offsetY-offset);
 					pcs.showText(message);
+					pcs.endText();
+					pcs.beginText();
+					pcs.newLineAtOffset( (float)g.offsetX, (float)g.offsetY+markerWidth*UNIT_TO_POINTS+offset-7);
+					pcs.showText(String.format("%4.1f %2s",markerWidth,units.getAbbreviation()));
 					pcs.endText();
 				}
 			}

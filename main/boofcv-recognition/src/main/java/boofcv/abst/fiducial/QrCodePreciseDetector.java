@@ -44,6 +44,7 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 	GrayU8 binary = new GrayU8(1,1);
 
 	// runtime profiling
+	boolean profiler = false;
 	protected MovingAverage milliBinary = new MovingAverage(0.8);
 	protected MovingAverage milliDecoding = new MovingAverage(0.8);
 
@@ -64,7 +65,8 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 		long time1 = System.nanoTime();
 		milliBinary.update((time1-time0)*1e-6);
 
-		System.out.printf("qrcode: binary %5.2f ",milliBinary.getAverage());
+		if( profiler )
+			System.out.printf("qrcode: binary %5.2f ",milliBinary.getAverage());
 
 		detectPositionPatterns.process(gray,binary);
 		time0 = System.nanoTime();
@@ -72,7 +74,8 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 		time1 = System.nanoTime();
 		milliDecoding.update((time1-time0)*1e-6);
 
-		System.out.printf(" decoding %5.1f\n",milliDecoding.getAverage());
+		if( profiler )
+			System.out.printf(" decoding %5.1f\n",milliDecoding.getAverage());
 	}
 
 	@Override
@@ -87,6 +90,11 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 
 	public GrayU8 getBinary() {
 		return binary;
+	}
+
+	public void setProfilerState( boolean active ) {
+		profiler = active;
+		detectPositionPatterns.setProfilerState(active);
 	}
 
 	public void resetRuntimeProfiling() {
