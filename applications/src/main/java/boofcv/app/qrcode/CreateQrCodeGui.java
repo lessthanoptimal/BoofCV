@@ -83,7 +83,15 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 		menuSave.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				saveFile();
+				saveFile(false);
+			}
+		});
+
+		JMenuItem menuPrint = new JMenuItem("Print...");
+		menuPrint.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				saveFile(true);
 			}
 		});
 
@@ -106,6 +114,7 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 
 		menuFile.addSeparator();
 		menuFile.add(menuSave);
+		menuFile.add(menuPrint);
 		menuFile.add(menuHelp);
 		menuFile.add(menuQuit);
 		menuBar.add(menuFile);
@@ -131,15 +140,26 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 		JOptionPane.showMessageDialog(this,"Many more options and better documentation available through commandline");
 	}
 
-	private void saveFile() {
-		File f = BoofSwingUtil.saveFileChooser(this);
-		if( f == null ) {
-			return;
-		}
+	private void saveFile( boolean sendToPrinter ) {
+		File f;
 
-		if( f.isDirectory() ) {
-			JOptionPane.showMessageDialog(this,"Can't save to a directory!");
-			return;
+		// see where the document is to be sent
+		if( sendToPrinter ) {
+			if (controls.format.compareToIgnoreCase("pdf") != 0) {
+				JOptionPane.showMessageDialog(this, "Must select PDF document type to print");
+				return;
+			}
+			f = new File(""); // dummy to make the code below happy and less complex
+		} else {
+			f = BoofSwingUtil.saveFileChooser(this);
+			if (f == null) {
+				return;
+			}
+
+			if (f.isDirectory()) {
+				JOptionPane.showMessageDialog(this, "Can't save to a directory!");
+				return;
+			}
 		}
 
 		CreateQrCodeDocument generator = new CreateQrCodeDocument();
@@ -164,6 +184,7 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 		generator.messages.add( controls.message );
 		generator.unit = controls.documentUnits;
 		generator.markerWidth = (float)controls.markerWidth;
+		generator.sendToPrinter = sendToPrinter;
 
 		try {
 			generator.finishParsing();

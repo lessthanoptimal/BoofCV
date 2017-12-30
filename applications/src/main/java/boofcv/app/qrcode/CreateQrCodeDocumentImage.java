@@ -28,7 +28,6 @@ import org.apache.commons.io.FilenameUtils;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Generates the QR Code PDF Document
@@ -46,7 +45,7 @@ public class CreateQrCodeDocumentImage {
 		this.moduleWidthPixels = moduleWidthPixels;
 	}
 
-	public void render(java.util.List<QrCode> markers ) throws IOException {
+	public void render(java.util.List<QrCode> markers ) {
 
 		for( int i = 0; i < markers.size(); i++ ) {
 			QrCodeGeneratorImage generator = new QrCodeGeneratorImage(moduleWidthPixels);

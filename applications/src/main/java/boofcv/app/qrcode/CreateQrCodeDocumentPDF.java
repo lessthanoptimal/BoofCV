@@ -28,8 +28,11 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.printing.PDFPageable;
 
 import java.awt.*;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.IOException;
 
 /**
@@ -141,8 +144,7 @@ public class CreateQrCodeDocumentPDF {
 				}
 			}
 		}
-
-		close();
+		pcs.close();
 	}
 
 	private class Generator extends QrCodeGenerator {
@@ -213,8 +215,16 @@ public class CreateQrCodeDocumentPDF {
 		}
 	}
 
-	private void close() throws IOException {
-		pcs.close();
+	public void sendToPrinter() throws PrinterException, IOException {
+		PrinterJob job = PrinterJob.getPrinterJob();
+		job.setPageable(new PDFPageable(document));
+		if (job.printDialog()) {
+			job.print();
+		}
+		document.close();
+	}
+
+	public void saveToDisk() throws IOException {
 		document.save(documentName);
 		document.close();
 	}

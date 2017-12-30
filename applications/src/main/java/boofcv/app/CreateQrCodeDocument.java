@@ -29,6 +29,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,6 +99,9 @@ public class CreateQrCodeDocument {
 
 	@Option(name="--GUI", usage="Ignore all other command line arguments and switch to GUI mode")
 	private boolean guiMode = false;
+
+	// if true it will send a document to the printer instead of saving it
+	public boolean sendToPrinter = false;
 
 	private static void printHelpExit( CmdLineParser parser ) {
 		parser.getProperties().withUsageWidth(120);
@@ -206,6 +210,14 @@ public class CreateQrCodeDocument {
 				renderer.gridFill = gridFill;
 				renderer.showInfo = !hideInfo;
 				renderer.render(markers);
+				if( sendToPrinter ) {
+					try {
+						renderer.sendToPrinter();
+					} catch( PrinterException e ) {
+						throw new RuntimeException(e);
+					}
+				} else
+					renderer.saveToDisk();
 			} break;
 
 			default: {
