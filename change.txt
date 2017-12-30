@@ -71,6 +71,10 @@ Version : 0.28
   * Added ability to set min/max number of sides. convex
 - DecomposeHomography
   * Can now handle the case where the scale factor is not equal to one
+- QR Code Support
+  * Detector and Decoder
+  * Renderer and Encoder
+  * Application for creating documents and images
 
 --------- TODO ITEMS BELOW ----------------
 Fiducials
@@ -79,6 +83,10 @@ Fiducials
 - Have square fiducials call init if lens distortion is set.
 
 - TODO Polyline with no algorithm that doesn't loop
+
+- TODO
+  * Why does German QR Code fail?
+  * Auto select mask
 
 TOP ITEMS
 - TODO QR Code algorithm

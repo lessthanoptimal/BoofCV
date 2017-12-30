@@ -351,7 +351,8 @@ public class QrCodeEncoder {
 			}
 			// select the smallest version which can store all the data
 			for (int i = 1; i <= 40; i++) {
-				if( packed.size/8 <= QrCode.VERSION_INFO[i].totalDataBytes(qr.error) ) {
+				int totalBytes = packed.size/8 + (packed.size%8)%8;
+				if( totalBytes <= QrCode.VERSION_INFO[i].totalDataBytes(qr.error) ) {
 					qr.version = i;
 					break;
 				}
