@@ -12,6 +12,8 @@ dependencies {
 
     compile group: 'args4j', name: 'args4j', version: '2.33'
     compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.7'
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+
 }
 
 idea {

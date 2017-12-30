@@ -27,8 +27,10 @@ import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
+import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -48,8 +50,6 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 
 	JFrame frame;
 
-	String lastFileName = "qrcode.pdf";
-
 	public CreateQrCodeGui() {
 		setLayout(new BorderLayout());
 
@@ -63,34 +63,40 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 		setPreferredSize(new Dimension(700,500));
 
 		frame = ShowImages.showWindow(this,"QR Code Document Creator",true);
+
+		// Render the QR Code
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				renderPreview();
+			}
+		});
 	}
 
 	void createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 
-		JMenu menu = new JMenu("File");
-		menuBar.add(menu);
-
-		JMenuItem menuSavePDF = new JMenuItem("Save as PDF", KeyEvent.VK_D);
-		menuSavePDF.addActionListener(new ActionListener() {
+		JMenu menuFile = new JMenu("File");
+		menuFile.setMnemonic(KeyEvent.VK_F);
+		JMenuItem menuSave = new JMenuItem("Save");
+		BoofSwingUtil.setMenuItemKeys(menuSave,KeyEvent.VK_S,KeyEvent.VK_S);
+		menuSave.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				savePDF();
+				saveFile();
 			}
 		});
-		menuSavePDF.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
 
-		JMenuItem menuQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
+		JMenuItem menuQuit = new JMenuItem("Quit");
+		BoofSwingUtil.setMenuItemKeys(menuQuit,KeyEvent.VK_Q,KeyEvent.VK_Q);
 		menuQuit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
 			}
 		});
-		menuQuit.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
 
-		JMenuItem menuHelp = new JMenuItem("Help");
+		JMenuItem menuHelp = new JMenuItem("Help", KeyEvent.VK_H);
 		menuHelp.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -98,11 +104,25 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 			}
 		});
 
+		menuFile.addSeparator();
+		menuFile.add(menuSave);
+		menuFile.add(menuHelp);
+		menuFile.add(menuQuit);
+		menuBar.add(menuFile);
 
-		menu.addSeparator();
-		menu.add(menuSavePDF);
-		menu.add(menuHelp);
-		menu.add(menuQuit);
+		JMenu editMenu = new JMenu("Edit");
+		editMenu.setMnemonic(KeyEvent.VK_E);
+		JMenuItem menuCut = new JMenuItem(new DefaultEditorKit.CutAction());
+		menuCut.setText("Cut");BoofSwingUtil.setMenuItemKeys(menuCut,KeyEvent.VK_T,KeyEvent.VK_X);
+		JMenuItem menuCopy = new JMenuItem(new DefaultEditorKit.CopyAction());
+		menuCopy.setText("Copy");BoofSwingUtil.setMenuItemKeys(menuCopy,KeyEvent.VK_C,KeyEvent.VK_C);
+		JMenuItem menuPaste = new JMenuItem(new DefaultEditorKit.PasteAction());
+		menuPaste.setText("Paste");BoofSwingUtil.setMenuItemKeys(menuPaste,KeyEvent.VK_P,KeyEvent.VK_P);
+
+		editMenu.add(menuCut);
+		editMenu.add(menuCopy);
+		editMenu.add(menuPaste);
+		menuBar.add(editMenu);
 
 		add(BorderLayout.NORTH,menuBar);
 	}
@@ -111,7 +131,7 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 		JOptionPane.showMessageDialog(this,"Many more options and better documentation available through commandline");
 	}
 
-	private void savePDF() {
+	private void saveFile() {
 		File f = BoofSwingUtil.saveFileChooser(this);
 		if( f == null ) {
 			return;
@@ -124,7 +144,15 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 
 		CreateQrCodeDocument generator = new CreateQrCodeDocument();
 
-		generator.fileName = f.getAbsolutePath();
+		// Make sure the file has the correct extension
+		String outputFile = f.getAbsolutePath();
+		String ext = FilenameUtils.getExtension(outputFile);
+		if( ext.compareToIgnoreCase(controls.format) != 0 ) {
+			outputFile = FilenameUtils.removeExtension(outputFile);
+			outputFile += "." + controls.format;
+		}
+
+		generator.fileName = outputFile;
 		generator.error = controls.error;
 		generator.mask = controls.mask;
 		generator.encoding = controls.mode;

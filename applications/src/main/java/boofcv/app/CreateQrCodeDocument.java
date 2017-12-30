@@ -21,8 +21,10 @@ package boofcv.app;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeEncoder;
 import boofcv.alg.fiducial.qrcode.QrCodeMaskPattern;
+import boofcv.app.qrcode.CreateQrCodeDocumentImage;
 import boofcv.app.qrcode.CreateQrCodeDocumentPDF;
 import boofcv.app.qrcode.CreateQrCodeGui;
+import org.apache.commons.io.FilenameUtils;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -81,7 +83,8 @@ public class CreateQrCodeDocument {
 	@Option(name="-s",aliases = {"--Space"}, usage="Spacing between the markers.  In document units.")
 	public float spaceBetween =2;
 
-	@Option(name="-o",aliases = {"--OutputName"}, usage="Name of output file.  E.g. qrcode.pdf")
+	@Option(name="-o",aliases = {"--OutputName"}, usage="Name of output file. Extension determines file type. E.g. qrcode.pdf. " +
+			"Valid extensions are pdf, png, jpg, gif, bmp")
 	public String fileName = "qrcode";
 
 	@Option(name="-i",aliases = {"--DisablePrintInfo"}, usage="Disable printing information about the calibration target")
@@ -187,12 +190,29 @@ public class CreateQrCodeDocument {
 			markers.add(encoder.fixate());
 		}
 
-		CreateQrCodeDocumentPDF renderer = new CreateQrCodeDocumentPDF(fileName,paperSize,unit);
-		renderer.markerWidth = markerWidth;
-		renderer.spaceBetween = spaceBetween;
-		renderer.gridFill = gridFill;
-		renderer.showInfo = !hideInfo;
-		renderer.render(markers);
+		// determine the output file type
+		String ext = FilenameUtils.getExtension(fileName);
+		if( ext.length() == 0 ) {
+			ext = "pdf";
+			fileName += ".pdf";
+		}
+		ext = ext.toLowerCase();
+
+		switch( ext ) {
+			case "pdf": {
+				CreateQrCodeDocumentPDF renderer = new CreateQrCodeDocumentPDF(fileName,paperSize,unit);
+				renderer.markerWidth = markerWidth;
+				renderer.spaceBetween = spaceBetween;
+				renderer.gridFill = gridFill;
+				renderer.showInfo = !hideInfo;
+				renderer.render(markers);
+			} break;
+
+			default: {
+				CreateQrCodeDocumentImage renderer = new CreateQrCodeDocumentImage(fileName,20);
+				renderer.render(markers);
+			} break;
+		}
 	}
 
 	public static void main(String[] args) {

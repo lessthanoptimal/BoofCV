@@ -42,7 +42,7 @@ import java.beans.PropertyChangeListener;
 public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements ActionListener
 {
 	JTextArea messageField= new JTextArea();
-	JComboBox<String> comboOutputFormat = new JComboBox<>();
+	JComboBox<String> comboOutputFormat = new JComboBox<>(new String[]{"PDF","PNG","BMP","JPG"});
 	JComboBox<String> comboVersion = new JComboBox<>();
 	JComboBox<String> comboError = new JComboBox<>();
 	JComboBox<String> comboPattern = new JComboBox<>();
@@ -62,6 +62,7 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 	PaperSize paperSize;
 	boolean fillGrid=false;
 	boolean hideInfo=false;
+	String format;
 
 	Unit documentUnits = Unit.CENTIMETER;
 	double markerWidth = 3;
@@ -71,8 +72,10 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 	public CreateQrCodeControlPanel(final Listener listener ) {
 		this.listener = listener;
 
-		comboOutputFormat.addItem("PDF");
+		format = (String)comboOutputFormat.getSelectedItem();
+		comboOutputFormat.addActionListener(this);
 
+		messageField.setText("Enter Text Here");
 		messageField.setPreferredSize(new Dimension(200,300));
 		messageField.setLineWrap(true);
 		messageField.setWrapStyleWord(true);
@@ -204,7 +207,16 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 		} else if( e.getSource() == checkFillGrid ) {
 			fillGrid = checkFillGrid.isSelected();
 		} else if( e.getSource() == comboUnits ) {
-			documentUnits = (Unit)comboUnits.getSelectedItem();
+			documentUnits = (Unit) comboUnits.getSelectedItem();
+		} else if( e.getSource() == comboOutputFormat ) {
+			format = (String)comboOutputFormat.getSelectedItem();
+			// toggle controls depending on type of output format
+			boolean enable = comboOutputFormat.getSelectedIndex() == 0;
+			comboPaper.setEnabled(enable);
+			checkHideInfo.setEnabled(enable);
+			checkFillGrid.setEnabled(enable);
+			comboUnits.setEnabled(enable);
+			fieldMarkerWidth.setEnabled(enable);
 		}
 	}
 

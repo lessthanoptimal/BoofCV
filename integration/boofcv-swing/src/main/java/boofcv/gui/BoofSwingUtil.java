@@ -183,6 +183,11 @@ public class BoofSwingUtil {
 		return field;
 	}
 
+	public static void setMenuItemKeys( JMenuItem menu , int mnmonic , int accelerator ) {
+		menu.setMnemonic(mnmonic);
+		menu.setAccelerator(KeyStroke.getKeyStroke(accelerator, Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask()));
+	}
+
 	public static void warningDialog(Component component, Exception e) {
 		JOptionPane.showMessageDialog(component, e.getMessage());
 	}
