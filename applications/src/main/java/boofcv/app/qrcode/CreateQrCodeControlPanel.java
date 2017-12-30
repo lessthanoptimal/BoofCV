@@ -55,7 +55,7 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 	JFormattedTextField fieldMarkerWidth = BoofSwingUtil.createTextField(3.0,0.0,Double.NaN);
 
 	int version=-1;
-	String message = "";
+	String message = "Enter Text Here";
 	QrCode.ErrorLevel error = null;
 	QrCodeMaskPattern mask = null;
 	QrCode.Mode mode = null;
@@ -75,7 +75,7 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 		format = (String)comboOutputFormat.getSelectedItem();
 		comboOutputFormat.addActionListener(this);
 
-		messageField.setText("Enter Text Here");
+		messageField.setText(message);
 		messageField.setPreferredSize(new Dimension(200,300));
 		messageField.setLineWrap(true);
 		messageField.setWrapStyleWord(true);

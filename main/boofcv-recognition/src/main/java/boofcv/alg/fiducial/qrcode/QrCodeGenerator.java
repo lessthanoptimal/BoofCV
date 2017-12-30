@@ -151,7 +151,7 @@ public abstract class QrCodeGenerator {
 		int length = numModules-7*2;
 
 		for (int i = 1; i < length; i += 2) {
-			square(x+i*slopeX,y+i*slopeY,moduleWidth,moduleWidth);
+			square(x+i*slopeX,y+i*slopeY,moduleWidth);
 		}
 	}
 
