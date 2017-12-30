@@ -50,8 +50,7 @@ public class SaveImageOnClick extends MouseAdapter {
 		if( clicked ) {
 			String fileName = String.format("saved_image%03d.png",saveCounter++);
 			System.out.println("Image saved to "+fileName);
-			BufferedImage output = new BufferedImage(parent.getWidth(),parent.getHeight(), BufferedImage.TYPE_INT_BGR);
-			parent.paint(output.createGraphics());
+			BufferedImage output = getBufferedImage();
 			UtilImageIO.saveImage(output, fileName);
 			if( hideSaveDialog )
 				return;
@@ -69,5 +68,11 @@ public class SaveImageOnClick extends MouseAdapter {
 			if( n == 0 )
 				hideSaveDialog = true;
 		}
+	}
+
+	protected BufferedImage getBufferedImage() {
+		BufferedImage output = new BufferedImage(parent.getWidth(),parent.getHeight(), BufferedImage.TYPE_INT_BGR);
+		parent.paint(output.createGraphics());
+		return output;
 	}
 }

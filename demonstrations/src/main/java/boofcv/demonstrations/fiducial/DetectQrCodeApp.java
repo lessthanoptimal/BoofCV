@@ -53,6 +53,8 @@ import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -95,6 +97,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		gui.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
+				gui.getImagePanel().grabFocus();
 				double scale = gui.getScale();
 				Point2D_F64 p = new Point2D_F64(e.getX()/scale,e.getY()/scale);
 				System.out.printf("click %5.1f %5.1f\n",p.x,p.y);
@@ -115,6 +118,39 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			}
 		});
 
+		KeyboardFocusManager.getCurrentKeyboardFocusManager()
+				.addKeyEventDispatcher(new KeyEventDispatcher() {
+					boolean spaceDown = false;
+					@Override
+					public boolean dispatchKeyEvent(KeyEvent e) {
+						if( e.getKeyCode() != KeyEvent.VK_SPACE )
+							return false;
+
+						if( spaceDown ) {
+							if( e.getID() != KeyEvent.KEY_RELEASED )
+								return false;
+						} else {
+							if( e.getID() != KeyEvent.KEY_PRESSED ) {
+								return false;
+							}
+						}
+						spaceDown = !spaceDown;
+
+						System.out.println("Space down = "+spaceDown);
+
+						if( spaceDown ) {
+							switch (DetectQrCodeApp.this.inputMethod) {
+								case VIDEO:
+								case WEBCAM:
+									DetectQrCodeApp.this.streamPaused = !DetectQrCodeApp.this.streamPaused;
+									break;
+							}
+						}
+						return false;
+					}
+				});
+
+
 		setPreferredSize(new Dimension(800,800));
 	}
 
@@ -122,6 +158,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	protected void handleInputChange(int source, InputMethod method, int width, int height) {
 		super.handleInputChange(source, method, width, height);
 		detector.resetRuntimeProfiling();
+
 	}
 
 	@Override
@@ -159,8 +196,15 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
 		System.out.flush();
 
-		original = ConvertBufferedImage.checkCopy(buffered,original);
-		work = ConvertBufferedImage.checkDeclare(buffered,work);
+		synchronized (bufferedImageLock) {
+			original = ConvertBufferedImage.checkCopy(buffered, original);
+			work = ConvertBufferedImage.checkDeclare(buffered, work);
+		}
+
+		if( saveRequested ) {
+			saveInputImage();
+			saveRequested = false;
+		}
 
 		final double timeInSeconds;
 		synchronized (this) {

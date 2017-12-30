@@ -24,6 +24,7 @@ import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
@@ -31,9 +32,7 @@ import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -48,13 +47,34 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 
 	protected InputToBinary<T> inputToBinary;
 
+	// Lock provided for the BufferedImagesbelow
+	protected final Object bufferedImageLock = new Object();
 	protected BufferedImage original;
 	protected BufferedImage work;
 	GrayU8 binary = new GrayU8(1,1);
 
+	// how many input images have been saved to disk
+	protected int saveCounter = 0;
+	protected boolean saveRequested = false;
+
 	public DetectBlackShapeAppBase(List<String> examples , Class<T> imageType) {
 		super(examples, ImageType.single(imageType));
 		this.imageClass = imageType;
+
+
+		JMenuItem menuSaveInput = new JMenuItem("Save Input", KeyEvent.VK_Y);
+		menuSaveInput.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				requestSaveInputImage();
+			}
+		});
+		menuSaveInput.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_Y, InputEvent.CTRL_MASK));
+
+		JMenu menu = new JMenu("Data");
+		menu.add(menuSaveInput);
+		menuBar.add(menu);
 	}
 
 	protected void setupGui(ImageZoomPanel guiImage, DetectBlackShapePanel controls) {
@@ -121,8 +141,15 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
 		System.out.flush();
 
-		original = ConvertBufferedImage.checkCopy(buffered,original);
-		work = ConvertBufferedImage.checkDeclare(buffered,work);
+		synchronized (bufferedImageLock) {
+			original = ConvertBufferedImage.checkCopy(buffered, original);
+			work = ConvertBufferedImage.checkDeclare(buffered, work);
+		}
+
+		if( saveRequested ) {
+			saveInputImage();
+			saveRequested = false;
+		}
 
 		binary.reshape(work.getWidth(), work.getHeight());
 
@@ -155,6 +182,40 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 	}
 
 	protected abstract void detectorProcess(T input , GrayU8 binary );
+
+	/**
+	 * Makes a request that the input image be saved. This request might be carried out immediately
+	 * or when then next image is processed.
+	 */
+	public void requestSaveInputImage() {
+		saveRequested = false;
+		switch( inputMethod ) {
+			case IMAGE:
+				new Thread() {
+					public void run() {
+						saveInputImage();
+					}
+				}.start();
+				break;
+
+			case VIDEO:
+			case WEBCAM:
+				if( streamPaused ) {
+					saveInputImage();
+				} else {
+					saveRequested = true;
+				}
+				break;
+		}
+	}
+
+	protected void saveInputImage() {
+		synchronized (bufferedImageLock) {
+			String fileName = String.format("saved_input%03d.png",saveCounter++);
+			System.out.println("Input image saved to "+fileName);
+			UtilImageIO.saveImage(original, fileName);
+		}
+	}
 
 	/**
 	 * Called when how the data is visualized has changed
