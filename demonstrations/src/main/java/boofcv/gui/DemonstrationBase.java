@@ -48,7 +48,7 @@ import java.util.List;
  */
 public abstract class DemonstrationBase extends JPanel {
 	protected JMenuBar menuBar;
-	JMenuItem menuFile, menuWebcam, menuQuit;
+	JMenuItem menuItemFile, menuItemWebcam, menuItenQuit;
 	JMenu menuRecent;
 
 	// Window the application is shown in
@@ -126,52 +126,50 @@ public abstract class DemonstrationBase extends JPanel {
 	private void createMenuBar(boolean openFile , boolean openWebcam , List<?> exampleInputs) {
 		menuBar = new JMenuBar();
 
-		JMenu menu = new JMenu("File");
-		menuBar.add(menu);
+		JMenu menuFile = new JMenu("File");
+		menuFile.setMnemonic(KeyEvent.VK_F);
+		menuBar.add(menuFile);
 
 		ActionListener listener = createActionListener();
 
 		if( openFile ) {
-			menuFile = new JMenuItem("Open File", KeyEvent.VK_O);
-			menuFile.addActionListener(listener);
-			menuFile.setAccelerator(KeyStroke.getKeyStroke(
-					KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-			menu.add(menuFile);
+			this.menuItemFile = new JMenuItem("Open File");
+			BoofSwingUtil.setMenuItemKeys(menuItemFile,KeyEvent.VK_O,KeyEvent.VK_O);
+			this.menuItemFile.addActionListener(listener);
+			menuFile.add(this.menuItemFile);
 
-			JMenuItem menuNext = new JMenuItem("Open Next File", KeyEvent.VK_I);
-			menuNext.addActionListener(new ActionListener() {
+			JMenuItem menuItemNext = new JMenuItem("Open Next File");
+			BoofSwingUtil.setMenuItemKeys(menuItemNext,KeyEvent.VK_N,KeyEvent.VK_I);
+			menuItemNext.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					openNextFile();
 				}
 			});
-			menuNext.setAccelerator(KeyStroke.getKeyStroke(
-					KeyEvent.VK_I, ActionEvent.CTRL_MASK));
-			menu.add(menuNext);
+			menuFile.add(menuItemNext);
 
 
 			menuRecent = new JMenu("Open Recent");
-			menu.add(menuRecent);
+			menuFile.add(menuRecent);
 			updateRecentItems();
 		}
 		if( openWebcam ) {
-			menuWebcam = new JMenuItem("Open Webcam", KeyEvent.VK_W);
-			menuWebcam.addActionListener(listener);
-			menuWebcam.setAccelerator(KeyStroke.getKeyStroke(
-					KeyEvent.VK_W, ActionEvent.CTRL_MASK));
-			menu.add(menuWebcam);
+			menuItemWebcam = new JMenuItem("Open Webcam");
+			BoofSwingUtil.setMenuItemKeys(menuItemWebcam,KeyEvent.VK_W,KeyEvent.VK_W);
+			menuItemWebcam.addActionListener(listener);
+			menuFile.add(menuItemWebcam);
 		}
-		menuQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
-		menuQuit.addActionListener(listener);
-		menuQuit.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
+		menuItenQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
+		menuItenQuit.addActionListener(listener);
+		BoofSwingUtil.setMenuItemKeys(menuItenQuit,KeyEvent.VK_Q,KeyEvent.VK_Q);
 
-		menu.addSeparator();
-		menu.add(menuQuit);
+		menuFile.addSeparator();
+		menuFile.add(menuItenQuit);
 
 		if( exampleInputs != null && exampleInputs.size() > 0 ) {
-			menu = new JMenu("Examples");
-			menuBar.add(menu);
+			JMenu menuExamples = new JMenu("Examples");
+			menuExamples.setMnemonic(KeyEvent.VK_E);
+			menuBar.add(menuExamples);
 
 			for (final Object o : exampleInputs) {
 				String name;
@@ -190,7 +188,7 @@ public abstract class DemonstrationBase extends JPanel {
 						openExample(o);
 					}
 				});
-				menu.add(menuItem);
+				menuExamples.add(menuItem);
 			}
 		}
 
@@ -569,7 +567,7 @@ public abstract class DemonstrationBase extends JPanel {
 		return new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (menuFile == e.getSource()) {
+				if (menuItemFile == e.getSource()) {
 					List<BoofSwingUtil.FileTypes> types = new ArrayList<>();
 					if( allowImages )
 						types.add(BoofSwingUtil.FileTypes.IMAGES);
@@ -581,9 +579,9 @@ public abstract class DemonstrationBase extends JPanel {
 					if (file != null) {
 						openFile(file);
 					}
-				} else if (menuWebcam == e.getSource()) {
+				} else if (menuItemWebcam == e.getSource()) {
 					openWebcam();
-				} else if (menuQuit == e.getSource()) {
+				} else if (menuItenQuit == e.getSource()) {
 					System.exit(0);
 				}
 			}

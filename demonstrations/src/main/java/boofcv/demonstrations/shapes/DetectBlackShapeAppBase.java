@@ -62,17 +62,17 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 		this.imageClass = imageType;
 
 
-		JMenuItem menuSaveInput = new JMenuItem("Save Input", KeyEvent.VK_Y);
+		JMenuItem menuSaveInput = new JMenuItem("Save Input");
 		menuSaveInput.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				requestSaveInputImage();
 			}
 		});
-		menuSaveInput.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_Y, InputEvent.CTRL_MASK));
+		BoofSwingUtil.setMenuItemKeys(menuSaveInput,KeyEvent.VK_S,KeyEvent.VK_Y);
 
 		JMenu menu = new JMenu("Data");
+		menu.setMnemonic(KeyEvent.VK_D);
 		menu.add(menuSaveInput);
 		menuBar.add(menu);
 	}
