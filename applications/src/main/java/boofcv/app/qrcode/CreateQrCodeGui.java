@@ -87,7 +87,7 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 			}
 		});
 
-		JMenuItem menuPrint = new JMenuItem("Print...");
+		JMenuItem menuPrint = new JMenuItem("Print...",KeyEvent.VK_P);
 		menuPrint.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -126,7 +126,7 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 		JMenuItem menuCopy = new JMenuItem(new DefaultEditorKit.CopyAction());
 		menuCopy.setText("Copy");BoofSwingUtil.setMenuItemKeys(menuCopy,KeyEvent.VK_C,KeyEvent.VK_C);
 		JMenuItem menuPaste = new JMenuItem(new DefaultEditorKit.PasteAction());
-		menuPaste.setText("Paste");BoofSwingUtil.setMenuItemKeys(menuPaste,KeyEvent.VK_P,KeyEvent.VK_P);
+		menuPaste.setText("Paste");BoofSwingUtil.setMenuItemKeys(menuPaste,KeyEvent.VK_P,KeyEvent.VK_V);
 
 		editMenu.add(menuCut);
 		editMenu.add(menuCopy);

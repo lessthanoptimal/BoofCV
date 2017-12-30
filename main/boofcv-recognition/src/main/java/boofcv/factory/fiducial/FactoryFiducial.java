@@ -148,6 +148,9 @@ public class FactoryFiducial {
 
 	public static <T extends ImageGray<T>>
 	QrCodePreciseDetector<T> qrcode(ConfigQrCode config, Class<T> imageType) {
+		if( config == null )
+			config = new ConfigQrCode();
+
 		config.checkValidity();
 
 		InputToBinary<T> inputToBinary = FactoryThresholdBinary.threshold(config.threshold,imageType);

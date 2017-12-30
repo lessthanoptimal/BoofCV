@@ -42,7 +42,7 @@ import java.beans.PropertyChangeListener;
 public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements ActionListener
 {
 	JTextArea messageField= new JTextArea();
-	JComboBox<String> comboOutputFormat = new JComboBox<>(new String[]{"PDF","PNG","BMP","JPG"});
+	JComboBox<String> comboOutputFormat = new JComboBox<>(new String[]{"pdf","png","bmp","jpg","ppm","pgm"});
 	JComboBox<String> comboVersion = new JComboBox<>();
 	JComboBox<String> comboError = new JComboBox<>();
 	JComboBox<String> comboPattern = new JComboBox<>();

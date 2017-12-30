@@ -33,17 +33,17 @@ public abstract class QrCodeGenerator {
 
 	QrCode qr;
 
-	double markerWidth;
+	protected double markerWidth;
 
 	// used to toggle rendering of data
-	boolean renderData=true;
+	protected boolean renderData=true;
 
 	// derived constants
-	double moduleWidth;
-	int numModules;
+	protected double moduleWidth;
+	protected int numModules;
 
 	// data mask
-	List<Point2D_I32> bitLocations;
+	protected List<Point2D_I32> bitLocations;
 
 	public QrCodeGenerator( double markerWidth ) {
 		this.markerWidth = markerWidth;

@@ -161,7 +161,7 @@ public class CreateQrCodeDocumentPDF {
 		public void square(double x0, double y0, double width) {
 			try {
 				pcs.setNonStrokingColor(Color.BLACK);
-				pcs.addRect((float)(offsetX + x0), (float)(offsetY + y0), (float)width, (float)width);
+				pcs.addRect(adjustX(x0), adjustY(y0)-(float)width, (float)width, (float)width);
 				pcs.fill();
 			} catch( IOException e ) {
 				throw new RuntimeException(e);
@@ -173,27 +173,35 @@ public class CreateQrCodeDocumentPDF {
 			try {
 				pcs.setNonStrokingColor(Color.BLACK);
 
-				pcs.moveTo((float)(offsetX + x0), (float)(offsetY + y0));
-				pcs.lineTo((float)(offsetX + x0+width0), (float)(offsetY + y0));
-				pcs.lineTo((float)(offsetX + x0+width0), (float)(offsetY + y0+width0));
-				pcs.lineTo((float)(offsetX + x0), (float)(offsetY + y0+width0));
-				pcs.lineTo((float)(offsetX + x0), (float)(offsetY + y0));
+				pcs.moveTo(adjustX(x0), adjustY(y0));
+				pcs.lineTo(adjustX(x0), adjustY(y0+width0));
+				pcs.lineTo(adjustX(x0+width0), adjustY(y0+width0));
+				pcs.lineTo(adjustX(x0+width0), adjustY(y0));
+				pcs.lineTo(adjustX(x0), adjustY(y0));
 
-				float x = (float)(offsetX+x0+thickness);
-				float y = (float)(offsetY+y0+thickness);
+				float x = (float)(x0+thickness);
+				float y = (float)(y0+thickness);
 				float w = (float)(width0-thickness*2);
 
-				pcs.moveTo(x,y);
-				pcs.lineTo(x+w,y);
-				pcs.lineTo(x+w,y+w);
-				pcs.lineTo(x,y+w);
-				pcs.lineTo(x,y);
+				pcs.moveTo(adjustX(x),adjustY(y));
+				pcs.lineTo(adjustX(x),adjustY(y+w));
+				pcs.lineTo(adjustX(x+w),adjustY(y+w));
+				pcs.lineTo(adjustX(x+w),adjustY(y));
+				pcs.lineTo(adjustX(x),adjustY(y));
 
 				pcs.fillEvenOdd();
 			} catch( IOException e ) {
 				throw new RuntimeException(e);
 			}
 		}
+
+		private float adjustX( double x ) {
+			return (float)(offsetX + x);
+		}
+		private float adjustY( double y ) {
+			return (float)(offsetY + markerWidth - y);
+		}
+
 	}
 
 	private void printHeader() throws IOException {

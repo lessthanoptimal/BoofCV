@@ -39,10 +39,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO Support image output
-	// TODO specify size using module size
-	// TODO GUI Specify QR code size and units
-
+// TODO Support multiple QR's in GUI
 public class CreateQrCodeDocument {
 
 	@Option(name = "-t", aliases = {"--Text","--Message"},
