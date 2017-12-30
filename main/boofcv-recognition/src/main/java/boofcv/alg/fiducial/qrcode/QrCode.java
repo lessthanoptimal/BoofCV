@@ -77,7 +77,7 @@ public class QrCode implements Cloneable {
 	public int version;
 
 	/** Level of error correction */
-	ErrorLevel error;
+	public ErrorLevel error;
 
 	/**
 	 * Which masking pattern is applied

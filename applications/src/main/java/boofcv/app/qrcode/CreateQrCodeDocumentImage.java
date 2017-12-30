@@ -76,6 +76,7 @@ public class CreateQrCodeDocumentImage {
 			g2.fillRect(0,0,output.getWidth(),output.getHeight());
 			g2.drawImage(tmp,moduleWidthPixels*2,moduleWidthPixels*2,tmp.getWidth(),tmp.getHeight(),null);
 
+			System.out.println("Saving "+name);
 			UtilImageIO.saveImage(output,name);
 		}
 	}

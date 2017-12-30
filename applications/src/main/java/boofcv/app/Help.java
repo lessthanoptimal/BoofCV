@@ -35,7 +35,9 @@ public class Help {
 			BatchDownSizeImage.class,
 			FiducialDetection.class,
 			CameraCalibration.class,
-			CreateCalibrationTarget.class};
+			CreateCalibrationTarget.class,
+			CreateQrCodeDocument.class
+	};
 
 	public static void printHelp() {
 		System.out.println("Trying to run a command-line application?  Here are your options!");

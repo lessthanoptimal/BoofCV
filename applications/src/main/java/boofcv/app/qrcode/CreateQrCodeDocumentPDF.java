@@ -72,7 +72,6 @@ public class CreateQrCodeDocumentPDF {
 		if( !documentName.toLowerCase().endsWith(".pdf")) {
 			this.documentName += ".pdf";
 		}
-		System.out.println("Saving to "+documentName);
 
 		UNIT_TO_POINTS = (float)units.getUnitToMeter()*100.0f*CM_TO_POINTS;
 
@@ -125,14 +124,14 @@ public class CreateQrCodeDocumentPDF {
 				if( showInfo ) {
 					float offset = UNIT_TO_POINTS*spaceBetween/4f;
 
-					int maxLength = (int)(markerWidth*UNIT_TO_POINTS)/7;
+					int maxLength = (int)(markerWidth*UNIT_TO_POINTS)/4;
 					String message = qr.message.toString();
 					if( message.length() > maxLength ) {
 						message = message.substring(0,maxLength);
 					}
 
 					pcs.beginText();
-					pcs.setNonStrokingColor(Color.LIGHT_GRAY);
+					pcs.setNonStrokingColor(Color.GRAY);
 					pcs.setFont(PDType1Font.TIMES_ROMAN,7);
 					pcs.newLineAtOffset( (float)g.offsetX, (float)g.offsetY-offset);
 					pcs.showText(message);
@@ -204,8 +203,8 @@ public class CreateQrCodeDocumentPDF {
 		info.setTitle(documentName);
 
 		if( showInfo ) {
-			float offX = Math.min(CM_TO_POINTS,spaceBetween*CM_TO_POINTS/4);
-			float offY = Math.min(CM_TO_POINTS,spaceBetween*CM_TO_POINTS/4);
+			float offX = Math.min(CM_TO_POINTS,spaceBetween*CM_TO_POINTS/2);
+			float offY = Math.min(CM_TO_POINTS,spaceBetween*CM_TO_POINTS/2);
 
 			pcs.beginText();
 			pcs.setFont(PDType1Font.TIMES_ROMAN,7);

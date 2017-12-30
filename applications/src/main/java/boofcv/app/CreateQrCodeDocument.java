@@ -102,6 +102,8 @@ public class CreateQrCodeDocument {
 
 	// if true it will send a document to the printer instead of saving it
 	public boolean sendToPrinter = false;
+	// specifies the file type
+	public String fileType;
 
 	private static void printHelpExit( CmdLineParser parser ) {
 		parser.getProperties().withUsageWidth(120);
@@ -118,9 +120,15 @@ public class CreateQrCodeDocument {
 		}
 
 		System.out.println();
-		System.out.println("Examples:"); // TODO WRITE
+		System.out.println("Examples:");
 		System.out.println();
 
+		System.out.println("-t \"http://boofcv.org\" -t \"Hello There!\" -p LETTER -w 5  --GridFill -o document.pdf");
+		System.out.println("   creates PDF with a grid that will fill the entire page composed of two qr codes on letter sized paper");
+		System.out.println();
+		System.out.println("-t \"http://boofcv.org\" -t \"Hello There!\" -o document.png");
+		System.out.println("   Creates two png images names document0.png and document1.png");
+		System.out.println();
 		System.exit(1);
 	}
 
@@ -138,26 +146,30 @@ public class CreateQrCodeDocument {
 			failExit("Version must be from 1 to 40 or set to -1 for auto select");
 		}
 
-		if( moduleWidth < 0 && markerWidth < 0 ) {
-			throw new RuntimeException("Must specify moduleWidth or markerWidth");
-		} else if( markerWidth < 0 ) {
-			markerWidth = moduleWidth*QrCode.totalModules(version);
-		}
-
 		encoding = _encoding == null ? null : QrCode.Mode.lookup(_encoding);
 
-		unit = Unit.lookup(_unit);
-		if( unit == null ) {
-			failExit("Must specify a valid unit or use default");
-		}
-		paperSize = PaperSize.lookup(_paperSize);
-		if( paperSize == null ) {
-			String words[] = _paperSize.split(":");
-			if( words.length != 2) failExit("Expected two value+unit separated by a :");
-			LengthUnit w = new LengthUnit(words[0]);
-			LengthUnit h = new LengthUnit(words[1]);
-			if( w.unit != h.unit ) failExit("Same units must be specified for width and height");
-			paperSize = new PaperSize(w.length,h.length,w.unit);
+		getFileTypeFromFileName();
+
+		if( fileType.equals("pdf") ) {
+			if( moduleWidth < 0 && markerWidth < 0 ) {
+				throw new RuntimeException("Must specify moduleWidth or markerWidth");
+			} else if( markerWidth < 0 ) {
+				markerWidth = moduleWidth*QrCode.totalModules(version);
+			}
+
+			unit = Unit.lookup(_unit);
+			if (unit == null) {
+				failExit("Must specify a valid unit or use default");
+			}
+			paperSize = PaperSize.lookup(_paperSize);
+			if (paperSize == null) {
+				String words[] = _paperSize.split(":");
+				if (words.length != 2) failExit("Expected two value+unit separated by a :");
+				LengthUnit w = new LengthUnit(words[0]);
+				LengthUnit h = new LengthUnit(words[1]);
+				if (w.unit != h.unit) failExit("Same units must be specified for width and height");
+				paperSize = new PaperSize(w.length, h.length, w.unit);
+			}
 		}
 	}
 
@@ -167,9 +179,17 @@ public class CreateQrCodeDocument {
 			throw new RuntimeException("Need to specify a message");
 		}
 
-		System.out.println("   paper     : "+paperSize);
-		System.out.println("   version   : "+version);
-		System.out.println("   info      : "+(!disablePrintInfo));
+		getFileTypeFromFileName();
+
+		if( fileType.equals("pdf") ) {
+			System.out.println("   Document  : PDF");
+			System.out.println("   paper     : "+paperSize);
+			System.out.println("   info      : "+(!disablePrintInfo));
+			System.out.println("   units     : "+unit);
+		} else {
+			System.out.println("   Document  : Image");
+		}
+		System.out.println();
 
 		List<QrCode> markers = new ArrayList<>();
 		for( String message : messages ) {
@@ -191,18 +211,17 @@ public class CreateQrCodeDocument {
 			} else {
 				encoder.encodeAuto(message);
 			}
-			markers.add(encoder.fixate());
+			QrCode qr = encoder.fixate();
+			markers.add(qr);
+
+			System.out.println("   Message");
+			System.out.println("     length    : "+qr.message.length());
+			System.out.println("     version   : "+qr.version);
+			System.out.println("     encoding  : "+qr.mode);
+			System.out.println("     error     : "+qr.error);
 		}
 
-		// determine the output file type
-		String ext = FilenameUtils.getExtension(fileName);
-		if( ext.length() == 0 ) {
-			ext = "pdf";
-			fileName += ".pdf";
-		}
-		ext = ext.toLowerCase();
-
-		switch( ext ) {
+		switch( fileType ) {
 			case "pdf": {
 				CreateQrCodeDocumentPDF renderer = new CreateQrCodeDocumentPDF(fileName,paperSize,unit);
 				renderer.markerWidth = markerWidth;
@@ -227,9 +246,23 @@ public class CreateQrCodeDocument {
 		}
 	}
 
+	private void getFileTypeFromFileName() {
+		fileType = FilenameUtils.getExtension(fileName);
+		if( fileType.length() == 0 ) {
+			fileType = "pdf";
+			fileName += ".pdf";
+		}
+		fileType = fileType.toLowerCase();
+	}
+
 	public static void main(String[] args) {
 		CreateQrCodeDocument generator = new CreateQrCodeDocument();
 		CmdLineParser parser = new CmdLineParser(generator);
+
+		if( args.length == 0 ) {
+			printHelpExit(parser);
+		}
+
 		try {
 			parser.parseArgument(args);
 			if( generator.guiMode ) {
