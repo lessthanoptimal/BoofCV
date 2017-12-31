@@ -144,8 +144,8 @@ public class QrCode implements Cloneable {
 		VERSION_INFO[3] = new VersionInfo(70, new int[]{6,22});
 		VERSION_INFO[3].add(L,70,55,1);
 		VERSION_INFO[3].add(M,70,44,1);
-		VERSION_INFO[3].add(Q,35,22,2);
-		VERSION_INFO[3].add(H,35,16,2);
+		VERSION_INFO[3].add(Q,35,17,2);
+		VERSION_INFO[3].add(H,35,13,2);
 
 		VERSION_INFO[4] = new VersionInfo(100, new int[]{6,26});
 		VERSION_INFO[4].add(L,100,80,1);
@@ -201,7 +201,7 @@ public class QrCode implements Cloneable {
 		VERSION_INFO[12].add(Q,46,20,4);
 		VERSION_INFO[12].add(H,42,14,7);
 
-		VERSION_INFO[13] = new VersionInfo(532, new int[]{6,34,60});
+		VERSION_INFO[13] = new VersionInfo(532, new int[]{6,34,62});
 		VERSION_INFO[13].add(L,133,107,4);
 		VERSION_INFO[13].add(M,59,37,8);
 		VERSION_INFO[13].add(Q,44,20,8);

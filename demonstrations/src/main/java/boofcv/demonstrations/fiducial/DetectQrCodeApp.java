@@ -53,7 +53,6 @@ import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -207,6 +206,8 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		}
 
 		final double timeInSeconds;
+
+		// TODO Copy all data that's visualized outside so that GUI doesn't lock
 		synchronized (this) {
 			long before = System.nanoTime();
 			detector.process((T)input);

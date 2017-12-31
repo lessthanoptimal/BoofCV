@@ -187,16 +187,21 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 //				System.out.println("failed trial "+i+" "+qr.failureCause);
 				continue;
 			}
-			if( !decodeMessage(qr) ) {
-				// error enum is set internally so that it can be more specific
-//				System.out.println("failed trial "+i+" "+qr.failureCause);
-				continue;
-			}
-//			if( i > 0 )
-//				System.out.println("***<<<<  decoded on trial "+i);
+
 			success = true;
 			break;
 		}
+
+		if( success ) {
+			// if it can error the errors that means it has all the bits correct
+			// that's why decode is outside of the loop above
+			if( !decodeMessage(qr) ) {
+				// error enum is set internally so that it can be more specific
+//				System.out.println("failed trial "+i+" "+qr.failureCause);
+				success = false;
+			}
+		}
+
 
 //		System.out.println("success "+success+" v "+qr.version+" mask "+qr.mask+" error "+qr.error);
 		qr.Hinv.set(gridReader.getTransformGrid().Hinv);
@@ -410,7 +415,9 @@ public class QrCodeDecoder<T extends ImageGray<T>> {
 					// This isn't the proper way to handle this mode, but it
 					// should still parse the data
 					break;
-				default: qr.failureCause = QrCode.Failure.UNKNOWN_MODE; return false;
+				default:
+					qr.failureCause = QrCode.Failure.UNKNOWN_MODE;
+					return false;
 			}
 
 			if (location < 0) {
