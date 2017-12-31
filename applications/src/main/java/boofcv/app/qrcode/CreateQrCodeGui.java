@@ -222,6 +222,8 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 		try {
 			generator.render(encoder.fixate());
 		} catch( RuntimeException e ) {
+			System.err.println("Render Failed! "+e.getClass().getSimpleName()+" "+e.getMessage());
+			e.printStackTrace();
 			return;
 		}
 		GrayU8 gray = generator.getGray();

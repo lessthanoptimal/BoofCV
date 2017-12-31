@@ -52,7 +52,7 @@ public class QrCode implements Cloneable {
 	/**
 	 * The QR code version after which and including version information is encoded into the QR code
 	 */
-	public static final int VERSION_VERSION = 7;
+	public static final int VERSION_ENCODED_AT = 7;
 
 	public static final VersionInfo VERSION_INFO[] = new VersionInfo[MAX_VERSION+1];
 

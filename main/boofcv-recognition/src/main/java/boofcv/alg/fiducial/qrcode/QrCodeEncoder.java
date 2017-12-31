@@ -18,9 +18,12 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.GrowQueue_I8;
+import org.ejml.ops.CommonOps_BDRM;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 /**
  * Provides an easy to use interface for specifying QR-Code parameters and generating the raw data sequence. After
@@ -322,10 +325,6 @@ public class QrCodeEncoder {
 	public QrCode fixate() {
 		autoSelectVersionAndError();
 
-		if( autoMask ) {
-			// todo
-		}
-
 		int maxBits = QrCode.VERSION_INFO[qr.version].codewords*8;
 
 		if( packed.size > maxBits ) {
@@ -336,8 +335,98 @@ public class QrCodeEncoder {
 			// add the terminator to the bit stream
 			packed.append(0b0000, 4, false);
 		}
+
 		bitsToMessage(packed);
+
+		if( autoMask ) {
+			qr.mask = selectMask(qr);
+		}
+
+
+
 		return qr;
+	}
+
+	/**
+	 * Selects a mask by minimizing the appearance of certain patterns. This is inspired by
+	 * what was described in the reference manual. I had a hard time understanding some
+	 * of the specifics so I improvised.
+	 */
+	static QrCodeMaskPattern selectMask( QrCode qr ) {
+		int N = qr.getNumberOfModules();
+		int totalBytes = QrCode.VERSION_INFO[qr.version].codewords;
+		List<Point2D_I32> locations = QrCode.LOCATION_BITS[qr.version];
+
+		QrCodeMaskPattern bestMask = null;
+		double bestScore = Double.MAX_VALUE;
+
+		PackedBits8 bits = new PackedBits8();
+		bits.size = totalBytes*8;
+		bits.data = qr.rawbits;
+
+		if( bits.size > locations.size() )
+			throw new RuntimeException("BUG in code");
+
+		// Bit value of 0 = white. 1 = black
+		QrCodeCodeWordLocations matrix = new QrCodeCodeWordLocations(qr.version);
+		for( QrCodeMaskPattern mask : QrCodeMaskPattern.values() ) {
+			int adjacent = 0;
+			int sameColorBlock = 0;
+			int position = 0;
+			int totalBlack = matrix.sum();
+
+			// write the bits plus mask into the matrix
+			int blackInBlock = 0;
+			for (int i = 0; i < bits.size; i++) {
+				Point2D_I32 p = locations.get(i);
+				boolean v = mask.apply(p.y,p.x,bits.get(i)) == 1;
+				matrix.unsafe_set(p.y,p.x,v);
+
+				if( v ) {
+					blackInBlock++;
+				}
+				if( (i+1)%8 == 0 ) {
+					if( blackInBlock == 0 || blackInBlock == 8) {
+						sameColorBlock++;
+					}
+					blackInBlock = 0;
+				}
+			}
+			// look for adjacent blocks that are the same color as well as patterns that
+			// could be confused for position patterns 1,1,3,1,1
+			// in vertical and horizontal directions
+			for (int foo = 0; foo < 2; foo++) {
+				for (int row = 0; row < N; row++) {
+					int index = row*N;
+					for (int col = 1; col < N; col++ ) {
+						if( matrix.data[index] == matrix.data[index+1])
+							adjacent++;
+					}
+					index = row*N;
+					for (int col = 6; col < N; col++ ) {
+						if( matrix.data[index] && !matrix.data[index+1] &&
+								matrix.data[index+2] && matrix.data[index+3] && matrix.data[index+4] &&
+								!matrix.data[index+5] && matrix.data[index+6])
+							position++;
+					}
+				}
+				CommonOps_BDRM.transposeSquare(matrix);
+			}
+			// get the symbols back in the expected location
+			CommonOps_BDRM.transposeSquare(matrix);
+
+			// penalize it if it's heavily skewed towards one color
+			// this is a more significant deviation
+			double scale = totalBlack/(double)(N*N);
+			scale = scale < 0.5 ? 0.5 - scale : scale - 0.5;
+
+			double score = adjacent/N + 10*sameColorBlock + 80*position + N*scale;
+			if( score < bestScore ) {
+				bestScore = score;
+				bestMask = mask;
+			}
+		}
+		return bestMask;
 	}
 
 	/**

@@ -84,10 +84,6 @@ Fiducials
 
 - TODO Polyline with no algorithm that doesn't loop
 
-- TODO
-  * Why does German QR Code fail?
-  * Auto select mask
-
 TOP ITEMS
 - TODO QR Code algorithm
   * Better rejection of finder patterns using graph

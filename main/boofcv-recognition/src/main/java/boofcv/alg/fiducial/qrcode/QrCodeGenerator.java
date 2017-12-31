@@ -69,7 +69,7 @@ public abstract class QrCodeGenerator {
 
 		formatInformation();
 
-		if( qr.version >= QrCode.VERSION_VERSION )
+		if( qr.version >= QrCode.VERSION_ENCODED_AT)
 			versionInformation();
 
 		// render alignment patterns

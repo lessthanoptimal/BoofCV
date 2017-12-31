@@ -42,7 +42,7 @@ public class QrCodeCodeWordLocations extends BMatrixRMaj {
 	}
 
 	public QrCodeCodeWordLocations( int version ) {
-		this(QrCode.totalModules(version), QrCode.VERSION_INFO[version].alignment,version >= QrCode.VERSION_VERSION);
+		this(QrCode.totalModules(version), QrCode.VERSION_INFO[version].alignment,version >= QrCode.VERSION_ENCODED_AT);
 	}
 
 	/**
