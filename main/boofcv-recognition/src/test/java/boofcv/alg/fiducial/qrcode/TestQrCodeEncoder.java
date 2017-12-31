@@ -190,7 +190,93 @@ public class TestQrCodeEncoder {
 
 	@Test
 	public void autoSelectMask() {
-		fail("Implement");
+		QrCode qr = new QrCodeEncoder().alphanumeric("123").fixate();
+		assertTrue(qr.mask != null);
+	}
+
+	/**
+	 * Sanity check on qr code with no data encoded.
+	 */
+	@Test
+	public void detectAdjacentAndPositionPatterns_test0() {
+		int version = 1;
+		QrCodeEncoder.FoundFeatures features = new QrCodeEncoder.FoundFeatures();
+		int N = QrCode.totalModules(version);
+		QrCodeCodeWordLocations matrix = new QrCodeCodeWordLocations(version);
+
+		QrCodeEncoder.detectAdjacentAndPositionPatterns(N,matrix,features);
+
+		// the matrix masks out pixels which are not data bits
+		assertEquals(0,features.position);
+		// lots of squares will have adjacent values be the same in this situation
+
+		// the matrix is modified. Make sure it's the same on output
+		QrCodeCodeWordLocations test = new QrCodeCodeWordLocations(version);
+		for (int i = 0; i < N*N; i++) {
+			assertEquals(test.data[i],matrix.data[i]);
+		}
+	}
+
+	/**
+	 * Insert a fake position pattern and see if it is found
+	 */
+	@Test
+	public void detectAdjacentAndPositionPatterns_test1() {
+		int version = 1;
+		QrCodeEncoder.FoundFeatures features = new QrCodeEncoder.FoundFeatures();
+		int N = QrCode.totalModules(version);
+		QrCodeCodeWordLocations matrix = new QrCodeCodeWordLocations(version);
+
+		matrix.set(10,10,true);
+		matrix.set(11,10,false);
+		matrix.set(12,10,true);
+		matrix.set(13,10,true);
+		matrix.set(14,10,true);
+		matrix.set(15,10,false);
+		matrix.set(16,10,true);
+
+		QrCodeEncoder.detectAdjacentAndPositionPatterns(N,matrix,features);
+		assertEquals(1, features.position);
+
+		matrix.set(10,10,true);
+		matrix.set(10,11,false);
+		matrix.set(10,12,true);
+		matrix.set(10,13,true);
+		matrix.set(10,14,true);
+		matrix.set(10,15,false);
+		matrix.set(10,16,true);
+
+		features.position = 0;
+		QrCodeEncoder.detectAdjacentAndPositionPatterns(N,matrix,features);
+		assertEquals(2, features.position);
+	}
+
+	/**
+	 * Test adjacent counter by making a very specific pattern
+	 */
+	@Test
+	public void detectAdjacentAndPositionPatterns_test2() {
+		int version = 1;
+		QrCodeEncoder.FoundFeatures features = new QrCodeEncoder.FoundFeatures();
+		int N = QrCode.totalModules(version);
+		QrCodeCodeWordLocations matrix = new QrCodeCodeWordLocations(version);
+
+		matrix.fill(false);
+		for (int i = 0; i < N; i++) {
+			boolean v = true;
+			for (int j = i%2; j < N; j++, v=!v) {
+				matrix.set(i,j,v);
+			}
+		}
+
+		int a = -222;
+		QrCodeEncoder.detectAdjacentAndPositionPatterns(N,matrix,features);
+		assertEquals(a,features.adjacent);
+
+		features.adjacent = 0;
+		matrix.set(0,1,true);
+		QrCodeEncoder.detectAdjacentAndPositionPatterns(N,matrix,features);
+		assertEquals(a+3,features.adjacent);
 	}
 
 
