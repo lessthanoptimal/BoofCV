@@ -343,7 +343,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	}
 
 	private boolean setIntersection( SquareNode a , SquareNode n , Point2D_F64 point ) {
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < a.edges.length; i++) {
 			SquareEdge edge = a.edges[i];
 			if( edge != null && edge.destination(a) == n ) {
 				Point2D_F64 p0 = edge.a.square.get(edge.sideA);
