@@ -199,14 +199,14 @@ public class CreateQrCodeDocument {
 
 			if( encoding != null ) {
 				switch( encoding ) {
-					case NUMERIC:encoder.numeric(message);break;
-					case ALPHANUMERIC:encoder.alphanumeric(message);break;
-					case BYTE:encoder.bytes(message);break;
-					case KANJI:encoder.kanji(message);break;
+					case NUMERIC:encoder.addNumeric(message);break;
+					case ALPHANUMERIC:encoder.addAlphanumeric(message);break;
+					case BYTE:encoder.addBytes(message);break;
+					case KANJI:encoder.addKanji(message);break;
 					default: throw new RuntimeException("Unknown mode");
 				}
 			} else {
-				encoder.encodeAuto(message);
+				encoder.addAutomatic(message);
 			}
 			QrCode qr = encoder.fixate();
 			markers.add(qr);

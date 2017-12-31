@@ -34,7 +34,7 @@ public class TestQrCodeAlignmentPatternLocator {
 	 */
 	@Test
 	public void simple() {
-		QrCode qr = new QrCodeEncoder().setVersion(7).numeric("12340324").fixate();
+		QrCode qr = new QrCodeEncoder().setVersion(7).addNumeric("12340324").fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 		generator.render(qr);
@@ -50,7 +50,7 @@ public class TestQrCodeAlignmentPatternLocator {
 	 */
 	@Test
 	public void centerOnSquare() {
-		QrCode qr = new QrCodeEncoder().setVersion(2).numeric("12340324").fixate();
+		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("12340324").fixate();
 
 		centerOnSquare(qr,4);
 		centerOnSquare(qr,1);
@@ -87,7 +87,7 @@ public class TestQrCodeAlignmentPatternLocator {
 
 	@Test
 	public void localize() {
-		QrCode qr = new QrCodeEncoder().setVersion(2).numeric("12340324").fixate();
+		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("12340324").fixate();
 		localize(qr, 4);
 	}
 
@@ -115,7 +115,7 @@ public class TestQrCodeAlignmentPatternLocator {
 	 */
 	@Test
 	public void localize_OnePixelModules() {
-		QrCode qr = new QrCodeEncoder().setVersion(2).numeric("12340324").fixate();
+		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("12340324").fixate();
 
 		localize(qr, 1);
 	}
@@ -138,7 +138,7 @@ public class TestQrCodeAlignmentPatternLocator {
 	public void initializePatterns() {
 		QrCodeAlignmentPatternLocator<GrayU8> alg = new QrCodeAlignmentPatternLocator<>(GrayU8.class);
 
-		QrCode qr = new QrCodeEncoder().setVersion(2).numeric("12340324").fixate();
+		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("12340324").fixate();
 
 		alg.initializePatterns(qr);
 		assertEquals(1,qr.alignment.size);

@@ -40,7 +40,7 @@ public class TestQrCodeGeneratorImage {
 		QrCode qr = new QrCodeEncoder().setVersion(1).
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				numeric("01234567").fixate();
+				addNumeric("01234567").fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(6);
 

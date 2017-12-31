@@ -39,7 +39,7 @@ public class TestQrCodeEncoder {
 		QrCode qr = new QrCodeEncoder().setVersion(1).
 				setError(QrCode.ErrorLevel.M).
 				setMask(new QrCodeMaskPattern.NONE(0b011)).
-				numeric("01234567").fixate();
+				addNumeric("01234567").fixate();
 
 		byte[] expected = new byte[]{0b00010000,
 		0b00100000, 0b00001100, 0b01010110, 0b01100001 ,(byte)0b10000000, (byte)0b11101100, 0b00010001,
@@ -70,7 +70,7 @@ public class TestQrCodeEncoder {
 		encoder.setVersion(1).
 				setError(QrCode.ErrorLevel.H).
 				setMask(new QrCodeMaskPattern.NONE(0b011)).
-				alphanumeric("AC-42").fixate();
+				addAlphanumeric("AC-42").fixate();
 
 		byte[] expected = new byte[]{0b00100000, 0b00101001, (byte)0b11001110, (byte)0b11100111, 0b00100001,0};
 
@@ -108,7 +108,7 @@ public class TestQrCodeEncoder {
 		QrCodeEncoder encoder = new QrCodeEncoder();
 		encoder.setVersion(1).setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				kanji("阿ん鞠ぷへ≦Ｋ").fixate();
+				addKanji("阿ん鞠ぷへ≦Ｋ").fixate();
 
 		byte expected[] = new byte[]{
 				0x01,0x4E,(byte)0x8B,(byte)0xA0,0x23,
@@ -124,7 +124,7 @@ public class TestQrCodeEncoder {
 		QrCode qr = new QrCodeEncoder().setVersion(1).
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				alphanumeric("01234567890123456789012345678901234567890123456789012345678901234567890123456789").fixate();
+				addAlphanumeric("01234567890123456789012345678901234567890123456789012345678901234567890123456789").fixate();
 
 		assertTrue(qr.rawbits.length==26);
 	}
@@ -135,12 +135,11 @@ public class TestQrCodeEncoder {
 	@Test
 	public void encodeThenDecode() {
 		for (int length = 1; length < 30; length++) {
-			System.out.println("length "+length);
 			encodeThenDecode(length);
 		}
 		encodeThenDecode(1000);
 		encodeThenDecode(2000);
-		encodeThenDecode(5000);
+		encodeThenDecode(2800);
 	}
 
 	private void encodeThenDecode(int length) {
@@ -149,7 +148,7 @@ public class TestQrCodeEncoder {
 			message += (char)(0x21+rand.nextInt(50));
 		}
 
-		QrCode qr = new QrCodeEncoder().setMask(QrCodeMaskPattern.M011).bytes(message).fixate();
+		QrCode qr = new QrCodeEncoder().setMask(QrCodeMaskPattern.M011).addBytes(message).fixate();
 
 		qr.message = null;
 		QrCodeDecoderBits decoder = new QrCodeDecoderBits();
@@ -167,8 +166,8 @@ public class TestQrCodeEncoder {
 		new QrCodeEncoder()
 				.setVersion(1).setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				numeric("1234").
-				kanji("阿ん鞠ぷへ≦Ｋ").fixate();
+				addNumeric("1234").
+				addKanji("阿ん鞠ぷへ≦Ｋ").fixate();
 	}
 
 	@Test
@@ -176,14 +175,14 @@ public class TestQrCodeEncoder {
 		QrCode qr = new QrCodeEncoder().
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				alphanumeric("123132123").fixate();
+				addAlphanumeric("123132123").fixate();
 
 		assertEquals(1,qr.version);
 
 		qr = new QrCodeEncoder().
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				alphanumeric("123132123123132123123132123").fixate();
+				addAlphanumeric("123132123123132123123132123").fixate();
 
 		assertEquals(2,qr.version);
 	}
@@ -193,14 +192,14 @@ public class TestQrCodeEncoder {
 		QrCode qr = new QrCodeEncoder().
 				setVersion(1).
 				setMask(QrCodeMaskPattern.M011).
-				alphanumeric("123").fixate();
+				addAlphanumeric("123").fixate();
 
 		assertEquals(QrCode.ErrorLevel.H,qr.error);
 
 		qr = new QrCodeEncoder().
 				setVersion(1).
 				setMask(QrCodeMaskPattern.M011).
-				alphanumeric("123123213AADE324254349985").fixate();
+				addAlphanumeric("123123213AADE32425434985").fixate();
 
 		assertEquals(QrCode.ErrorLevel.L,qr.error);
 	}
@@ -209,14 +208,14 @@ public class TestQrCodeEncoder {
 	public void autoSelectVersionAndError() {
 		QrCode qr = new QrCodeEncoder().
 				setMask(QrCodeMaskPattern.M011).
-				alphanumeric("123").fixate();
+				addAlphanumeric("123").fixate();
 
 		assertEquals(1,qr.version);
 		assertEquals(QrCode.ErrorLevel.M,qr.error);
 
 		qr = new QrCodeEncoder().
 				setMask(QrCodeMaskPattern.M011).
-				alphanumeric("123123213AADE324254349985ASDASD").fixate();
+				addAlphanumeric("123123213AADE324254349985ASDASD").fixate();
 
 		assertEquals(2,qr.version);
 		assertEquals(QrCode.ErrorLevel.M,qr.error);
@@ -224,7 +223,7 @@ public class TestQrCodeEncoder {
 
 	@Test
 	public void autoSelectMask() {
-		QrCode qr = new QrCodeEncoder().alphanumeric("123").fixate();
+		QrCode qr = new QrCodeEncoder().addAlphanumeric("123").fixate();
 		assertTrue(qr.mask != null);
 	}
 
