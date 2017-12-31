@@ -23,6 +23,7 @@ import org.ddogleg.struct.GrowQueue_I8;
 import org.ejml.ops.CommonOps_BDRM;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,6 +62,10 @@ public class QrCodeEncoder {
 	// storage fot the message's ecc
 	private GrowQueue_I8 ecc = new GrowQueue_I8();
 
+	// Since QR Code version might not be known initially and the size of the length byte depends on the
+	// version, store the segments here until fixate is called.
+	private List<MessageSegment> segments = new ArrayList<>();
+
 	public QrCodeEncoder() {
 		reset();
 	}
@@ -71,6 +76,7 @@ public class QrCodeEncoder {
 		packed.size = 0;
 		autoMask = true;
 		autoErrorCorrection = true;
+		segments.clear();
 	}
 
 	public QrCodeEncoder setVersion(int version) {
@@ -94,9 +100,9 @@ public class QrCodeEncoder {
 	 * Select the encoding based on the letters in the message. In the future this might do fancy things like
 	 * switch between multiple modes to increase the number of characters.
 	 */
-	public QrCodeEncoder encodeAuto(String message) {
+	public QrCodeEncoder addAutomatic(String message) {
 		qr.message = new StringBuilder(message);
-		return bytes(message);
+		return addBytes(message);
 	}
 
 	/**
@@ -105,17 +111,17 @@ public class QrCodeEncoder {
 	 * @param message String that specifies numbers and no other types. Each number has to be from 0 to 9 inclusive.
 	 * @return The QR-Code
 	 */
-	public QrCodeEncoder numeric(String message) {
-		int[] numbers = new int[message.length()];
+	public QrCodeEncoder addNumeric(String message) {
+		byte[] numbers = new byte[message.length()];
 
 		for (int i = 0; i < message.length(); i++) {
 			char c = message.charAt(i);
 			int values = c - '0';
 			if (values < 0 || values > 9)
 				throw new RuntimeException("Expected each character to be a number from 0 to 9");
-			numbers[i] = values;
+			numbers[i] = (byte)values;
 		}
-		return numeric(numbers);
+		return addNumeric(numbers);
 	}
 
 	/**
@@ -124,12 +130,31 @@ public class QrCodeEncoder {
 	 * @param numbers Array of numbers. Each number has to be from 0 to 9 inclusive.
 	 * @return The QR-Code
 	 */
-	public QrCodeEncoder numeric(int[] numbers) {
+	public QrCodeEncoder addNumeric(byte[] numbers) {
 		for (int i = 0; i < numbers.length; i++) {
 			if (numbers[i] < 0 || numbers[i] > 9)
 				throw new IllegalArgumentException("All numbers must have a value from 0 to 9");
 		}
 
+		MessageSegment segment = new MessageSegment();
+		segment.data = numbers;
+		segment.length = numbers.length;
+		segment.mode = QrCode.Mode.NUMERIC;
+
+		segment.encodedSizeBits += 4;
+		segment.encodedSizeBits += 10*(segment.length/3);
+		if( segment.length%3 == 2 ) {
+			segment.encodedSizeBits += 7;
+		} else if( segment.length%3 == 1 ) {
+			segment.encodedSizeBits += 4;
+		}
+
+		segments.add(segment);
+
+		return this;
+	}
+
+	private void encodeNumeric(byte[] numbers , int length ) {
 		qr.mode = QrCode.Mode.NUMERIC;
 		int lengthBits = getLengthBitsNumeric(qr.version);
 
@@ -137,24 +162,22 @@ public class QrCodeEncoder {
 		packed.append(0b0001, 4, false);
 
 		// Specify the number of digits
-		packed.append(numbers.length, lengthBits, false);
+		packed.append(length, lengthBits, false);
 
 		// Append the digits
 		int index = 0;
-		while (numbers.length - index >= 3) {
+		while (length - index >= 3) {
 			int value = numbers[index] * 100 + numbers[index + 1] * 10 + numbers[index + 2];
 			packed.append(value, 10, false);
 			index += 3;
 		}
-		if (numbers.length - index == 2) {
+		if (length - index == 2) {
 			int value = numbers[index] * 10 + numbers[index + 1];
 			packed.append(value, 7, false);
-		} else if (numbers.length - index == 1) {
+		} else if (length - index == 1) {
 			int value = numbers[index];
 			packed.append(value, 4, false);
 		}
-
-		return this;
 	}
 
 	/**
@@ -163,9 +186,26 @@ public class QrCodeEncoder {
 	 * @param alphaNumeric String containing only alphanumeric values.
 	 * @return The QR-Code
 	 */
-	public QrCodeEncoder alphanumeric(String alphaNumeric) {
+	public QrCodeEncoder addAlphanumeric(String alphaNumeric) {
 		byte values[] = alphanumericToValues(alphaNumeric);
 
+		MessageSegment segment = new MessageSegment();
+		segment.data = values;
+		segment.length = values.length;
+		segment.mode = QrCode.Mode.ALPHANUMERIC;
+
+		segment.encodedSizeBits += 4;
+		segment.encodedSizeBits += 11*(segment.length/2);
+		if( segment.length%2 == 1 ) {
+			segment.encodedSizeBits += 6;
+		}
+
+		segments.add(segment);
+
+		return this;
+	}
+
+	private void encodeAlphanumeric( byte[] numbers , int length ) {
 		qr.mode = QrCode.Mode.ALPHANUMERIC;
 
 		int lengthBits = getLengthBitsAlphanumeric(qr.version);
@@ -174,21 +214,19 @@ public class QrCodeEncoder {
 		packed.append(0b0010, 4, false);
 
 		// Specify the number of digits
-		packed.append(values.length, lengthBits, false);
+		packed.append(length, lengthBits, false);
 
 		// Append the digits
 		int index = 0;
-		while (values.length - index >= 2) {
-			int value = values[index] * 45 + values[index + 1];
+		while (length - index >= 2) {
+			int value = numbers[index] * 45 + numbers[index + 1];
 			packed.append(value, 11, false);
 			index += 2;
 		}
-		if (values.length - index == 1) {
-			int value = values[index];
+		if (length - index == 1) {
+			int value = numbers[index];
 			packed.append(value, 6, false);
 		}
-
-		return this;
 	}
 
 	public static byte[] alphanumericToValues(String data) {
@@ -210,9 +248,9 @@ public class QrCodeEncoder {
 		return ALPHANUMERIC.charAt(value);
 	}
 
-	public QrCodeEncoder bytes(String message) {
+	public QrCodeEncoder addBytes(String message) {
 		try {
-			return bytes(message.getBytes("JIS"));
+			return addBytes(message.getBytes("JIS"));
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
@@ -224,7 +262,21 @@ public class QrCodeEncoder {
 	 * @param data Data to be encoded
 	 * @return The QR-Code
 	 */
-	public QrCodeEncoder bytes(byte[] data) {
+	public QrCodeEncoder addBytes(byte[] data) {
+		MessageSegment segment = new MessageSegment();
+		segment.data = data;
+		segment.length = data.length;
+		segment.mode = QrCode.Mode.BYTE;
+
+		segment.encodedSizeBits += 4;
+		segment.encodedSizeBits += 8*segment.length;
+
+		segments.add(segment);
+
+		return this;
+	}
+
+	private void encodeBytes(byte[] data, int length) {
 		qr.mode = QrCode.Mode.BYTE;
 
 		int lengthBits = getLengthBitsBytes(qr.version);
@@ -233,14 +285,12 @@ public class QrCodeEncoder {
 		packed.append(0b0100, 4, false);
 
 		// Specify the number of digits
-		packed.append(data.length, lengthBits, false);
+		packed.append(length, lengthBits, false);
 
 		// Append the digits
-		for (int i = 0; i < data.length; i++) {
+		for (int i = 0; i < length; i++) {
 			packed.append(data[i] & 0xff, 8, false);
 		}
-
-		return this;
 	}
 
 	/**
@@ -249,11 +299,7 @@ public class QrCodeEncoder {
 	 * @param message Data to be encoded
 	 * @return The QR-Code
 	 */
-	public QrCodeEncoder kanji(String message) {
-		qr.mode = QrCode.Mode.KANJI;
-
-		int lengthBits = getLengthBitsKanji(qr.version);
-
+	public QrCodeEncoder addKanji(String message) {
 		byte[] bytes;
 		try {
 			bytes = message.getBytes("Shift_JIS");
@@ -261,11 +307,29 @@ public class QrCodeEncoder {
 			throw new IllegalArgumentException(ex);
 		}
 
+		MessageSegment segment = new MessageSegment();
+		segment.data = bytes;
+		segment.length = message.length();
+		segment.mode = QrCode.Mode.KANJI;
+
+		segment.encodedSizeBits += 4;
+		segment.encodedSizeBits += 13*segment.length;
+
+		segments.add(segment);
+
+		return this;
+	}
+
+	private void encodeKanji( byte []bytes , int length ) {
+		qr.mode = QrCode.Mode.KANJI;
+
+		int lengthBits = getLengthBitsKanji(qr.version);
+
 		// specify the mode
 		packed.append(0b1000, 4, false);
 
 		// Specify the number of characters
-		packed.append(message.length(), lengthBits, false);
+		packed.append(length, lengthBits, false);
 
 		for (int i = 0; i < bytes.length; i += 2) {
 			int byte1 = bytes[i] & 0xFF;
@@ -277,13 +341,11 @@ public class QrCodeEncoder {
 			} else if (code >= 0xe040 && code <= 0xebbf) {
 				adjusted = code - 0xc140;
 			} else {
-				throw new IllegalArgumentException("Invalid byte sequence. " + message.charAt(i / 2));
+				throw new IllegalArgumentException("Invalid byte sequence. At " +(i / 2));
 			}
 			int encoded = ((adjusted >> 8) * 0xc0) + (adjusted & 0xff);
 			packed.append(encoded, 13, false);
 		}
-
-		return this;
 	}
 
 	public static int getLengthBitsNumeric(int version) {
@@ -330,6 +392,23 @@ public class QrCodeEncoder {
 	public QrCode fixate() {
 		autoSelectVersionAndError();
 
+		// sanity check of code
+		int expectedBitSize = bitsAtVersion(qr.version);
+
+		for( MessageSegment m : segments ) {
+			switch( m.mode ) {
+				case NUMERIC:encodeNumeric(m.data,m.length);break;
+				case ALPHANUMERIC:encodeAlphanumeric(m.data,m.length);break;
+				case BYTE:encodeBytes(m.data,m.length);break;
+				case KANJI:encodeKanji(m.data,m.length);break;
+				default:
+					throw new RuntimeException("Unknown");
+			}
+		}
+
+		if( packed.size != expectedBitSize )
+			throw new RuntimeException("Bad size code");
+
 		int maxBits = QrCode.VERSION_INFO[qr.version].codewords * 8;
 
 		if (packed.size > maxBits) {
@@ -342,8 +421,6 @@ public class QrCodeEncoder {
 		}
 
 		bitsToMessage(packed);
-
-		System.out.println("encoded rawbits "+qr.rawbits.length);
 
 		if (autoMask) {
 			qr.mask = selectMask(qr);
@@ -464,20 +541,27 @@ public class QrCodeEncoder {
 	 */
 	private void autoSelectVersionAndError() {
 		if (qr.version == -1) {
+			QrCode.ErrorLevel levelsToTry[];
 			if (autoErrorCorrection) {
 				// this is a reasonable compromise between robustness and data storage
-				qr.error = QrCode.ErrorLevel.M;
+				levelsToTry = new QrCode.ErrorLevel[]{QrCode.ErrorLevel.M,QrCode.ErrorLevel.L};
+			} else {
+				levelsToTry = new QrCode.ErrorLevel[]{qr.error};
 			}
-			// select the smallest version which can store all the data
-			for (int i = 1; i <= 40; i++) {
-				int totalBytes = packed.size / 8 + (packed.size % 8) % 8;
-				if (totalBytes <= QrCode.VERSION_INFO[i].totalDataBytes(qr.error)) {
-					qr.version = i;
-					break;
+			escape:for( QrCode.ErrorLevel error : levelsToTry ) {
+				qr.error = error;
+				// select the smallest version which can store all the data
+				for (int i = 1; i <= 40; i++) {
+					int dataBits = bitsAtVersion(i);
+					int totalBytes = dataBits / 8 + (dataBits % 8) % 8;
+					if (totalBytes <= QrCode.VERSION_INFO[i].totalDataBytes(qr.error)) {
+						qr.version = i;
+						break escape;
+					}
 				}
 			}
 			if (qr.version == -1) {
-				throw new IllegalArgumentException("Packet too large to store at error level " + qr.error);
+				throw new IllegalArgumentException("Packet too to be encoded in a qr code");
 			}
 		} else {
 			// the version is set but the error correction level isn't. Pick the one with
@@ -485,8 +569,10 @@ public class QrCodeEncoder {
 			if (autoErrorCorrection) {
 				qr.error = null;
 				QrCode.VersionInfo v = QrCode.VERSION_INFO[qr.version];
+				int dataBits = bitsAtVersion(qr.version);
+				int totalBytes = dataBits / 8 + (dataBits % 8) % 8;
 				for (QrCode.ErrorLevel level : QrCode.ErrorLevel.values()) {
-					if (packed.size / 8 <= v.totalDataBytes(level)) {
+					if (totalBytes <= v.totalDataBytes(level)) {
 						qr.error = level;
 					}
 				}
@@ -496,6 +582,19 @@ public class QrCodeEncoder {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Computes how many bits it takes to encode the message at this version number
+	 * @param version
+	 * @return
+	 */
+	private int bitsAtVersion( int version ) {
+		int total = 0;
+		for (int i = 0; i < segments.size(); i++) {
+			total += segments.get(i).sizeInBits(version);
+		}
+		return total;
 	}
 
 	protected void bitsToMessage(PackedBits8 stream) {
@@ -602,6 +701,27 @@ public class QrCodeEncoder {
 		}
 		for (int i = 0; i < ecc.size; i++) {
 			output[i * stride + offset + startEcc] = ecc.data[i];
+		}
+	}
+
+	private static class MessageSegment
+	{
+		QrCode.Mode mode;
+		byte data[];
+		int length;
+		// number of bits in the encoded message, excluding the length bits
+		int encodedSizeBits;
+
+		public int sizeInBits( int version ) {
+			int lengthBits;
+			switch( mode ) {
+				case NUMERIC:lengthBits = getLengthBitsNumeric(version);break;
+				case ALPHANUMERIC:lengthBits = getLengthBitsAlphanumeric(version);break;
+				case BYTE:lengthBits = getLengthBitsBytes(version);break;
+				case KANJI:lengthBits = getLengthBitsKanji(version);break;
+				default:throw new RuntimeException("Egads");
+			}
+			return encodedSizeBits + lengthBits;
 		}
 	}
 }

@@ -43,7 +43,7 @@ public class TestQrCodeDecoderImage {
 			QrCode expected = new QrCodeEncoder().setVersion(1).
 					setError(QrCode.ErrorLevel.M).
 					setMask(QrCodeMaskPattern.M011).
-					numeric(message).fixate();
+					addNumeric(message).fixate();
 
 			QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 			generator.render(expected);
@@ -74,7 +74,7 @@ public class TestQrCodeDecoderImage {
 			QrCode expected = new QrCodeEncoder().setVersion(2).
 					setError(QrCode.ErrorLevel.M).
 					setMask(QrCodeMaskPattern.M011).
-					alphanumeric(message).fixate();
+					addAlphanumeric(message).fixate();
 
 			QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 			generator.render(expected);
@@ -101,7 +101,7 @@ public class TestQrCodeDecoderImage {
 		QrCode expected = new QrCodeEncoder().setVersion(2).
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				bytes(new byte[]{0x50,0x70,0x34,0x2F}).fixate();
+				addBytes(new byte[]{0x50,0x70,0x34,0x2F}).fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 		generator.render(expected);
@@ -127,7 +127,7 @@ public class TestQrCodeDecoderImage {
 		QrCode expected = new QrCodeEncoder().setVersion(2).
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				kanji("阿ん鞠ぷへ≦Ｋ").fixate();
+				addKanji("阿ん鞠ぷへ≦Ｋ").fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 		generator.render(expected);
@@ -154,7 +154,7 @@ public class TestQrCodeDecoderImage {
 		QrCode expected = new QrCodeEncoder().setVersion(3).
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				kanji("阿ん鞠ぷへ≦Ｋ").numeric("1235").alphanumeric("AF").bytes("efg").fixate();
+				addKanji("阿ん鞠ぷへ≦Ｋ").addNumeric("1235").addAlphanumeric("AF").addBytes("efg").fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 		generator.render(expected);
@@ -197,7 +197,7 @@ public class TestQrCodeDecoderImage {
 		QrCode expected = new QrCodeEncoder().setVersion(version).
 				setError(error).
 				setMask(mask).
-				numeric("01234567").fixate();
+				addNumeric("01234567").fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 //		generator.renderData = false;

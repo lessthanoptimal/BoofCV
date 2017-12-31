@@ -208,14 +208,14 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 
 		if( controls.mode != null ){
 			switch( controls.mode ) {
-				case NUMERIC:encoder.numeric(controls.message);break;
-				case ALPHANUMERIC:encoder.alphanumeric(controls.message);break;
-				case BYTE:encoder.bytes(controls.message);break;
-				case KANJI:encoder.kanji(controls.message);break;
-				default: encoder.encodeAuto(controls.message);break;
+				case NUMERIC:encoder.addNumeric(controls.message);break;
+				case ALPHANUMERIC:encoder.addAlphanumeric(controls.message);break;
+				case BYTE:encoder.addBytes(controls.message);break;
+				case KANJI:encoder.addKanji(controls.message);break;
+				default: encoder.addAutomatic(controls.message);break;
 			}
 		} else {
-			encoder.encodeAuto(controls.message);
+			encoder.addAutomatic(controls.message);
 		}
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(10);

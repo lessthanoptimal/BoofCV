@@ -30,7 +30,7 @@ public class TestQrCodeBinaryGridToPixel {
 	@Test
 	public void simple() {
 
-		QrCode qr = new QrCodeEncoder().setVersion(2).numeric("12340324").fixate();
+		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("12340324").fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 		generator.render(qr);
