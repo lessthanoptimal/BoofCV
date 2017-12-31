@@ -311,13 +311,14 @@ public class QrCodeDecoderBits {
 		int length = data.read(bitLocation,lengthBits,true);
 		bitLocation += lengthBits;
 
+		if( length*8 > data.size-bitLocation ) {
+			qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
+			return -1;
+		}
+
 		byte rawdata[] = new byte[ length ];
 
 		for (int i = 0; i < length; i++) {
-			if( data.size < bitLocation+8 ) {
-				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
-				return -1;
-			}
 			rawdata[i] = (byte)data.read(bitLocation,8,true);
 			bitLocation += 8;
 		}

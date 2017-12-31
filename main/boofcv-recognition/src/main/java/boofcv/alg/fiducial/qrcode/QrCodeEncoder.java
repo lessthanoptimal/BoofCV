@@ -343,10 +343,11 @@ public class QrCodeEncoder {
 
 		bitsToMessage(packed);
 
+		System.out.println("encoded rawbits "+qr.rawbits.length);
+
 		if (autoMask) {
 			qr.mask = selectMask(qr);
 		}
-
 
 		return qr;
 	}

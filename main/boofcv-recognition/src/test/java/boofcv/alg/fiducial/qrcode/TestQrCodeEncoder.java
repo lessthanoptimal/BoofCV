@@ -20,12 +20,16 @@ package boofcv.alg.fiducial.qrcode;
 
 import org.junit.Test;
 
+import java.util.Random;
+
 import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
  */
 public class TestQrCodeEncoder {
+	Random rand = new Random(234);
+
 	/**
 	 * In the qr code specification an example is given. This compares the computed results
 	 * to that example
@@ -123,6 +127,36 @@ public class TestQrCodeEncoder {
 				alphanumeric("01234567890123456789012345678901234567890123456789012345678901234567890123456789").fixate();
 
 		assertTrue(qr.rawbits.length==26);
+	}
+
+	/**
+	 * Encodes and then decodes it for several different lengths
+	 */
+	@Test
+	public void encodeThenDecode() {
+		for (int length = 1; length < 30; length++) {
+			System.out.println("length "+length);
+			encodeThenDecode(length);
+		}
+		encodeThenDecode(1000);
+		encodeThenDecode(2000);
+		encodeThenDecode(5000);
+	}
+
+	private void encodeThenDecode(int length) {
+		String message = "";
+		for (int i = 0; i < length; i++) {
+			message += (char)(0x21+rand.nextInt(50));
+		}
+
+		QrCode qr = new QrCodeEncoder().setMask(QrCodeMaskPattern.M011).bytes(message).fixate();
+
+		qr.message = null;
+		QrCodeDecoderBits decoder = new QrCodeDecoderBits();
+		assertTrue(decoder.applyErrorCorrection(qr));
+		assertTrue(decoder.decodeMessage(qr));
+
+		assertEquals(message, qr.message.toString());
 	}
 
 	/**
