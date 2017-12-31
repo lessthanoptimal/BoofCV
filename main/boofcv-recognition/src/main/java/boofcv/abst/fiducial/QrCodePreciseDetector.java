@@ -20,7 +20,7 @@ package boofcv.abst.fiducial;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.qrcode.QrCode;
-import boofcv.alg.fiducial.qrcode.QrCodeDecoder;
+import boofcv.alg.fiducial.qrcode.QrCodeDecoderImage;
 import boofcv.alg.fiducial.qrcode.QrCodePositionPatternDetector;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.misc.MovingAverage;
@@ -37,7 +37,7 @@ import java.util.List;
 public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDetector<T>
 {
 	QrCodePositionPatternDetector<T> detectPositionPatterns;
-	QrCodeDecoder<T> decoder;
+	QrCodeDecoderImage<T> decoder;
 	InputToBinary<T> inputToBinary;
 	Class<T> imageType;
 
@@ -53,7 +53,7 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 								 Class<T> imageType ) {
 		this.inputToBinary = inputToBinary;
 		this.detectPositionPatterns = detectPositionPatterns;
-		this.decoder = new QrCodeDecoder<>(imageType);
+		this.decoder = new QrCodeDecoderImage<>(imageType);
 		this.imageType = imageType;
 	}
 
@@ -111,7 +111,7 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 		return detectPositionPatterns.getSquareDetector();
 	}
 
-	public QrCodeDecoder<T> getDecoder() {
+	public QrCodeDecoderImage<T> getDecoder() {
 		return decoder;
 	}
 

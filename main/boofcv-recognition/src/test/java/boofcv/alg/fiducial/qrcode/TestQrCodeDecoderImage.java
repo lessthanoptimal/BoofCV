@@ -25,12 +25,13 @@ import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestQrCodeDecoder {
+public class TestQrCodeDecoderImage {
 
 	/**
 	 * Run the entire algorithm on a rendered image but just care about the message
@@ -51,7 +52,7 @@ public class TestQrCodeDecoder {
 //		ShowImages.showWindow(generator.gray,"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-			QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
+			QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
 			decoder.process(pps,generator.gray);
 
 			assertEquals(1,decoder.successes.size());
@@ -82,7 +83,7 @@ public class TestQrCodeDecoder {
 //		ShowImages.showWindow(generator.gray,"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-			QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
+			QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
 			decoder.process(pps, generator.gray);
 
 			assertEquals(1, decoder.successes.size());
@@ -109,7 +110,7 @@ public class TestQrCodeDecoder {
 //		ShowImages.showWindow(generator.gray,"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
+		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
 		decoder.process(pps,generator.gray);
 
 		assertEquals(1,decoder.successes.size());
@@ -135,7 +136,7 @@ public class TestQrCodeDecoder {
 //		ShowImages.showWindow(generator.gray,"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
+		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
 		decoder.process(pps,generator.gray);
 
 		assertEquals(1,decoder.successes.size());
@@ -162,7 +163,7 @@ public class TestQrCodeDecoder {
 //		ShowImages.showWindow(generator.gray,"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
+		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
 		decoder.process(pps,generator.gray);
 
 		assertEquals(1,decoder.successes.size());
@@ -204,7 +205,7 @@ public class TestQrCodeDecoder {
 
 		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
 
-		QrCodeDecoder<GrayU8> decoder = new QrCodeDecoder<>(GrayU8.class);
+		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
 
 //		ShowImages.showWindow(generator.gray,"QR Code");
 //		BoofMiscOps.sleep(100000);
@@ -277,7 +278,7 @@ public class TestQrCodeDecoder {
 		connect(n_bottom,n_corner,0,2);
 
 		QrCode qr = new QrCode();
-		QrCodeDecoder.setPositionPatterns(n_corner,1,2,qr);
+		QrCodeDecoderImage.setPositionPatterns(n_corner,1,2,qr);
 
 		assertTrue(qr.ppCorner.get(0).distance(0,0) < UtilEjml.TEST_F64);
 		assertTrue(qr.ppRight.get(0).distance(5,0)  < UtilEjml.TEST_F64);
@@ -295,14 +296,14 @@ public class TestQrCodeDecoder {
 		assertTrue(square.isCCW());
 		Polygon2D_F64 original = square.copy();
 
-		QrCodeDecoder.rotateUntilAt(square,0,0);
+		QrCodeDecoderImage.rotateUntilAt(square,0,0);
 		assertTrue(square.isIdentical(original, UtilEjml.TEST_F64));
 
-		QrCodeDecoder.rotateUntilAt(square,1,0);
+		QrCodeDecoderImage.rotateUntilAt(square,1,0);
 		assertTrue(square.isCCW());
 		assertTrue(square.get(0).distance(2,0) < UtilEjml.TEST_F64);
 
-		QrCodeDecoder.rotateUntilAt(square,0,1);
+		QrCodeDecoderImage.rotateUntilAt(square,0,1);
 		assertTrue(square.isIdentical(original, UtilEjml.TEST_F64));
 	}
 
@@ -313,40 +314,11 @@ public class TestQrCodeDecoder {
 		qr.ppRight = new Polygon2D_F64(2,0, 3,0, 3,1, 2,1);
 		qr.ppDown = new Polygon2D_F64(0,2, 1,2, 1,3, 0,3);
 
-		QrCodeDecoder.computeBoundingBox(qr);
+		QrCodeDecoderImage.computeBoundingBox(qr);
 
 		assertTrue(qr.bounds.get(0).distance(0,0) < UtilEjml.TEST_F64);
 		assertTrue(qr.bounds.get(1).distance(3,0) < UtilEjml.TEST_F64);
 		assertTrue(qr.bounds.get(2).distance(3,3) < UtilEjml.TEST_F64);
 		assertTrue(qr.bounds.get(3).distance(0,3) < UtilEjml.TEST_F64);
-	}
-
-	@Test
-	public void applyErrorCorrection() {
-		fail("implement");
-	}
-
-	@Test
-	public void copyFromRawData() {
-		fail("implement");
-	}
-
-	@Test
-	public void decodeMessage() {
-		fail("implement");
-	}
-
-	@Test
-	public void alignToBytes() {
-		assertEquals(0,QrCodeDecoder.alignToBytes(0));
-		assertEquals(8,QrCodeDecoder.alignToBytes(1));
-		assertEquals(8,QrCodeDecoder.alignToBytes(7));
-		assertEquals(8,QrCodeDecoder.alignToBytes(8));
-		assertEquals(16,QrCodeDecoder.alignToBytes(9));
-	}
-
-	@Test
-	public void checkPaddingBytes() {
-		fail("implement");
 	}
 }
