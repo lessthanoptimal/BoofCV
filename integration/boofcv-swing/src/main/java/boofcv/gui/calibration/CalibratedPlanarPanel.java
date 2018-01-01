@@ -21,6 +21,7 @@ package boofcv.gui.calibration;
 import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.Zhang99AllParam;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.ViewedImageInfoPanel;
 import boofcv.io.image.UtilImageIO;
@@ -119,6 +120,9 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 			throw new RuntimeException("Couldn't load image!");
 
 		mainView.setBufferedImage(image);
+		double zoom = BoofSwingUtil.selectZoomToShowAll(mainView,image.getWidth(),image.getHeight());
+		mainView.setScale(zoom);
+
 		selectedImage = selected;
 
 		viewInfo.setImageSize(image.getWidth(),image.getHeight());
