@@ -125,12 +125,16 @@ implements ListSelectionListener
 	}
 
 	private void setMarkerMessageText(QrCode qr, boolean failure ) {
+		String mask = qr.mask == null ? "" : qr.mask.toString();
+		String mode = qr.mode == null ? "" : qr.mode.toString();
+		String error = qr.error == null ? "" : qr.error.toString();
+
 		if( failure ) {
-			textArea.setText(String.format("Version %2d\nMode %s\nMask %s\n\n%s",
-					qr.version, qr.mode == null ? "" : qr.mode, qr.mask == null ? "" : qr.mask, qr.failureCause.toString()));
+			textArea.setText(String.format("Version %2d   Error %1s\nMask %4s   Mode %s\n\n%s",
+					qr.version, error,mask,mode,qr.failureCause.toString()));
 		} else {
-			textArea.setText(String.format("Version %2d\nMode %s\nMask %s\n\n%s",
-					qr.version, qr.mode.toString(), qr.mask.toString(), qr.message));
+			textArea.setText(String.format("Version %2d   Error %1s\nMask %4s   Mode %s\n\n%s",
+					qr.version, error,mask,mode, qr.message));
 		}
 	}
 

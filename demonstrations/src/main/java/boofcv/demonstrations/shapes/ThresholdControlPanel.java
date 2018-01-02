@@ -132,7 +132,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		addLabeled(comboType, "Type", this);
 		addLabeled(spinnerThreshold, "Threshold", this);
 		addLabeled(buttonUpDown,"Direction");
-		addLabeled(controlWidth,"Width");
+		addLabeled(controlWidth,"Reg. Width");
 		addAlignCenter(togglePanels, this);
 
 		updateEnabledByType();
