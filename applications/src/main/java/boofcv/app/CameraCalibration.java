@@ -50,6 +50,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -398,12 +399,15 @@ public class CameraCalibration extends BaseStandardInputApp {
 			monitor.setMessage(0,"Loading images");
 		}
 
+		final List<File> imagesSuccess = new ArrayList<>();
+		final List<File> imagesFailed = new ArrayList<>();
+
 		boolean first = true;
 		for( File f : files ){
 			if( f.isDirectory() || f.isHidden())
 				continue;
 
-			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
+			final BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
 			if( buffered == null )
 				continue;
 
@@ -411,24 +415,32 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 			if( visualize ) {
 				monitor.setMessage(0,f.getName());
-				final File _f = f;
 
 				if( first ) {
 					first = false;
-					gui.mainView.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
-					ShowImages.showWindow(gui,"Monocular Calibration",true);
-				}
+					// should do this more intelligently based on image resolution
+					int width = Math.min(1000,image.getWidth());
+					int height = Math.min(width*image.height/image.width,image.getHeight());
 
-				BoofSwingUtil.invokeNowOrLater(new Runnable() {
-					@Override
-					public void run() {
-						gui.addImage(_f);
-					}
-				});
+					gui.mainView.setPreferredSize(new Dimension(width,height));
+					gui.showImageProcessed(buffered);
+					ShowImages.showWindow(gui,"Monocular Calibration",true);
+				} else {
+					BoofSwingUtil.invokeNowOrLater(new Runnable() {
+						@Override
+						public void run() {
+							gui.showImageProcessed(buffered);
+						}
+					});
+				}
 			}
 
-			if( !calibrationAlg.addImage(image) )
-				System.err.println("Failed to detect target in "+f.getName());
+			if( !calibrationAlg.addImage(image) ) {
+				imagesFailed.add(f);
+				System.err.println("Failed to detect target in " + f.getName());
+			} else {
+				imagesSuccess.add(f);
+			}
 		}
 
 		if( visualize ) {
@@ -441,8 +453,15 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 			if( visualize ) {
 				monitor.stopThread();
+
+				if( imagesFailed.size() > 0 ) {
+					JOptionPane.showMessageDialog(gui,"Failed to detect in "+imagesFailed.size()+" images");
+				}
+
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
+						gui.setImages(imagesSuccess);
+						gui.setImagesFailed(imagesFailed);
 						gui.setObservations(calibrationAlg.getObservations());
 						gui.setResults(calibrationAlg.getErrors());
 						gui.setCalibration(calibrationAlg.getZhangParam());

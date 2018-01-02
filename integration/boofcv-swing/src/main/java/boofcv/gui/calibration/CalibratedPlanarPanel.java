@@ -94,21 +94,51 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 		setSelected(selectedImage);
 	}
 
+	public void showImageProcessed( final BufferedImage image ) {
+		BoofSwingUtil.invokeNowOrLater(new Runnable() {
+			@Override
+			public void run() {
+				mainView.setBufferedImage(image);
+				double zoom = BoofSwingUtil.selectZoomToShowAll(mainView,image.getWidth(),image.getHeight());
+				mainView.setScale(zoom);
+				mainView.repaint();
+			}
+		});
+	}
+
 	public void addImage( File filePath )
 	{
 		imagePaths.add(filePath.getPath());
 		imageNames.add( filePath.getName() );
 
-		imageList.removeListSelectionListener(this);
-		imageList.setListData(imageNames);
-		if( imageNames.size() == 1 ) {
-			imageList.addListSelectionListener(this);
-			imageList.setSelectedIndex(0);
-			validate();
-		} else {
-			// each time an image is added it resets the selected value
-			imageList.setSelectedIndex(selectedImage);
-			imageList.addListSelectionListener(this);
+		BoofSwingUtil.invokeNowOrLater(new Runnable() {
+			@Override
+			public void run() {
+				imageList.removeListSelectionListener(CalibratedPlanarPanel.this);
+				imageList.setListData(imageNames);
+				if( imageNames.size() == 1 ) {
+					imageList.addListSelectionListener(CalibratedPlanarPanel.this);
+					imageList.setSelectedIndex(0);
+					validate();
+				} else {
+					// each time an image is added it resets the selected value
+					imageList.setSelectedIndex(selectedImage);
+					imageList.addListSelectionListener(CalibratedPlanarPanel.this);
+				}
+			}
+		});
+
+	}
+
+	public void setImages( List<File> imageFiles ) {
+		for( File f : imageFiles ) {
+			addImage(f);
+		}
+	}
+
+	public void setImagesFailed( List<File> imageFiles ) {
+		for( File f : imageFiles ) {
+//			addImage(f);
 		}
 	}
 

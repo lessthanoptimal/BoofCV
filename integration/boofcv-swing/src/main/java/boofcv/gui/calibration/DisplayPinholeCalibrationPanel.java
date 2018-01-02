@@ -189,8 +189,8 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 		}
 
 		if( showErrors && results != null ) {
-			g2.setStroke(new BasicStroke(4));
-			g2.setColor(Color.BLACK);
+
+
 			for( int i = 0; i < set.size(); i++ ) {
 				PointIndex2D_F64 p = set.get(i);
 
@@ -200,29 +200,16 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 					adj.set((float)p.x,(float)p.y);
 				}
 
-				double r = errorScale*results.pointError[i];
+				double r = scale*errorScale*results.pointError[i];
 				if( r < 1 )
 					continue;
 
+				g2.setStroke(new BasicStroke(4));
+				g2.setColor(Color.BLACK);
 				VisualizeFeatures.drawCircle(g2, adj.x * scale, adj.y * scale, r);
-			}
 
-			g2.setStroke(new BasicStroke(2.5f));
-			g2.setColor(Color.ORANGE);
-			for( int i = 0; i < set.size(); i++ ) {
-				PointIndex2D_F64 p = set.get(i);
-
-				if( showUndistorted ) {
-					remove_p_to_p.compute((float)p.x,(float)p.y,adj);
-				} else {
-					adj.set((float)p.x,(float)p.y);
-				}
-
-				double r = errorScale*results.pointError[i];
-				if( r < 1 )
-					continue;
-
-
+				g2.setStroke(new BasicStroke(2.5f));
+				g2.setColor(Color.ORANGE);
 				VisualizeFeatures.drawCircle(g2, adj.x * scale, adj.y * scale, r);
 			}
 		}
