@@ -123,7 +123,7 @@ public class TestGThresholdImageOps {
 
 			double withinClassVariance = (weight0*var0 + weight1*var1);
 			double betweenClassVariance = varianceAll - withinClassVariance;
-			double score = betweenClassVariance/(d0*d0 + d1*d1);
+			double score = betweenClassVariance/(0.5+d0*d0 + d1*d1);
 
 			if( score > bestScore ) {
 				bestScore = score;
