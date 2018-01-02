@@ -143,15 +143,23 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 	}
 
 	protected void setSelected( int selected ) {
-		if( selected < features.size() )
-			mainView.setResults(features.get(selected),results.get(selected), features);
+		BoofSwingUtil.checkGuiThread();
+
+		long start = System.currentTimeMillis();;
 		BufferedImage image = UtilImageIO.loadImage(imagePaths.get(selected));
 		if( image == null )
 			throw new RuntimeException("Couldn't load image!");
+		long stop = System.currentTimeMillis();
+
+		System.out.println("Time to load image "+(stop-start)+" (ms)");
+
+		if( selected < features.size() )
+			mainView.setResults(features.get(selected),results.get(selected), features);
 
 		mainView.setBufferedImage(image);
 		double zoom = BoofSwingUtil.selectZoomToShowAll(mainView,image.getWidth(),image.getHeight());
 		mainView.setScale(zoom);
+		mainView.repaint();
 
 		selectedImage = selected;
 
@@ -160,7 +168,7 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 		if( results != null ) {
 			updateResultsGUI();
 		}
-		mainView.repaint();
+
 	}
 
 	protected abstract void updateResultsGUI();
