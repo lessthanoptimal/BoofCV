@@ -31,15 +31,13 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
 
 /**
  * @author Peter Abeles
  */
 public class ThresholdControlPanel extends StandardAlgConfigPanel
-		implements ActionListener, ChangeListener, ItemListener
+		implements ActionListener, ChangeListener
 {
 
 	Listener listener;
@@ -49,7 +47,8 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	JSpinner spinnerWidth;
 	JSpinner spinnerScale;
 	JButton buttonUpDown;
-	JCheckBox checkLocalBlock = new JCheckBox("Local Blocks",true);
+	JCheckBox checkLocalBlock;
+	JCheckBox checkOtsu2;
 
 	boolean isAdaptive;
 	boolean isThresholdGlobal;
@@ -104,6 +103,10 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		spinnerThreshold = spinner(globalThreshold,0,1000,1);
 		spinnerWidth = spinner(regionWidth.getLengthI(),1,500,1);
 
+		checkOtsu2 = checkbox("Otsu2",useOtsu2);
+		checkLocalBlock = checkbox("Local Blocks",thresholdLocalBlocks);
+
+
 		spinnerScale = new JSpinner(new SpinnerNumberModel(scale,0,2.0,0.05));
 		configureSpinnerFloat(spinnerScale);
 
@@ -117,19 +120,17 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 //		spinnerScale.addChangeListener(this);
 		buttonUpDown.addActionListener(this);
 
-		checkLocalBlock.setSelected(thresholdLocalBlocks);
-		checkLocalBlock.addItemListener(this);
-		checkLocalBlock.setMaximumSize(checkLocalBlock.getPreferredSize());
-
 		JPanel togglePanels = new JPanel();
-		togglePanels.setLayout(new BoxLayout(togglePanels,BoxLayout.X_AXIS));
-		togglePanels.add(buttonUpDown);
+		togglePanels.setLayout(new GridLayout(0,2));
+		addLabeled(spinnerWidth,"Width",togglePanels);
+		addLabeled(spinnerScale,"Scale",togglePanels);
 		togglePanels.add(checkLocalBlock);
+		togglePanels.add(checkOtsu2);
+		togglePanels.setMaximumSize(togglePanels.getPreferredSize());
 
 		addLabeled(comboType, "Type", this);
 		addLabeled(spinnerThreshold, "Threshold", this);
-		addLabeled(spinnerWidth, "Width", this);
-		addLabeled(spinnerScale, "Scale", this);
+		addLabeled(buttonUpDown,"Direction");
 		addAlignCenter(togglePanels, this);
 
 		updateEnabledByType();
@@ -190,6 +191,12 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 			down = !down;
 			setToggleText(down);
 			listener.imageThresholdUpdated();
+		} else if( e.getSource() == checkOtsu2 ) {
+			useOtsu2 = checkOtsu2.isSelected();
+			listener.imageThresholdUpdated();
+		} else if( e.getSource() == checkLocalBlock ) {
+			thresholdLocalBlocks = checkLocalBlock.isSelected();
+			listener.imageThresholdUpdated();
 		}
 	}
 
@@ -243,10 +250,12 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		}
 		if( type == ThresholdType.BLOCK_OTSU ||
 				type == ThresholdType.LOCAL_OTSU  ) {
+			checkOtsu2.setEnabled(true);
 			spinnerThreshold.setEnabled(true);
 			isAdaptive = false;
+		} else {
+			checkOtsu2.setEnabled(false);
 		}
-
 
 
 		updateThresholdValue();
@@ -279,20 +288,12 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		}
 	}
 
-	@Override
-	public void itemStateChanged(ItemEvent e) {
-		if( e.getSource() == checkLocalBlock ) {
-			thresholdLocalBlocks = checkLocalBlock.isSelected();
-			listener.imageThresholdUpdated();
-		}
-	}
-
-
 	public void setConfiguration(ConfigThreshold configuration) {
 		comboType.removeActionListener(this);
 		spinnerWidth.removeChangeListener(this);
 		spinnerScale.removeChangeListener(this);
 		buttonUpDown.removeActionListener(this);
+		checkOtsu2.removeActionListener(this);
 
 
 		comboType.setSelectedIndex(configuration.type.ordinal());
@@ -311,12 +312,14 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		} else if( type == ThresholdType.BLOCK_OTSU ||
 				type == ThresholdType.LOCAL_OTSU  ) {
 			otsuTuning = (int)((ConfigThresholdLocalOtsu)configuration).tuning;
+			useOtsu2 = ((ConfigThresholdLocalOtsu)configuration).useOtsu2;
 		}
 
 		comboType.addActionListener(this);
 		spinnerWidth.addChangeListener(this);
 		spinnerScale.addChangeListener(this);
 		buttonUpDown.addActionListener(this);
+		checkOtsu2.addActionListener(this);
 
 		updateThresholdValue();
 	}
