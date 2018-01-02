@@ -158,7 +158,7 @@ public class ComputeOtsu {
 			double d1 = (mF - f);
 
 			// Calculate Between Class Variance
-			double varBetween = (double) wB * (double) wF * (mB - mF) * (mB - mF) / (d0 * d0 + d1 * d1);
+			double varBetween = (double) wB * (double) wF * (mB - mF) * (mB - mF) / (0.5 + d0 * d0 + d1 * d1);
 
 			// Check if new maximum found
 			if (varBetween > variance) {

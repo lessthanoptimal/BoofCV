@@ -20,6 +20,7 @@ package boofcv.factory.fiducial;
 
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.ConfigThresholdLocalOtsu;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.ConfigLength;
@@ -43,14 +44,15 @@ public class ConfigQrCode implements Configuration {
 	{
 
 		// 40% slower but better at detecting markers by a few percentage points
-		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,21);
-		configThreshold.scale = 0.95;
+//		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,21);
+//		configThreshold.scale = 0.95;
 
 		// fast but does a bad job detecting markers that are up close
-//		ConfigThresholdLocalOtsu configThreshold = ConfigThreshold.local(ThresholdType.BLOCK_OTSU,20);
-//		configThreshold.scale = 1.0;
-//		configThreshold.thresholdFromLocalBlocks = false;
-//		configThreshold.tuning = 5;
+		ConfigThresholdLocalOtsu configThreshold = ConfigThreshold.local(ThresholdType.BLOCK_OTSU,40);
+		configThreshold.useOtsu2 = true;
+		configThreshold.scale = 1.0;
+		configThreshold.thresholdFromLocalBlocks = false;
+		configThreshold.tuning = 4;
 
 		threshold = configThreshold;
 

@@ -56,6 +56,7 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 		super(requestedBlockWidth,thresholdFromLocalBlocks,GrayU8.class);
 		this.otsu = new ComputeOtsu(otsu2,tuning,down,scale);
 		stats = new InterleavedS32(1,1,256);
+		System.out.println("Using otsu2 "+otsu2);
 	}
 
 	@Override

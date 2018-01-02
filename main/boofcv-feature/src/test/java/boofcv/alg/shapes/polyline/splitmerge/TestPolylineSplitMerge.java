@@ -302,7 +302,14 @@ public class TestPolylineSplitMerge {
 
 	@Test
 	public void maximumDistance() {
-		fail("implement");
+		List<Point2D_I32> contour = new ArrayList<>();
+		for (int i = 0; i < 20; i++) {
+			contour.add( new Point2D_I32(i,0));
+		}
+
+		contour.get(8).set(8,20);
+
+		assertEquals(8,PolylineSplitMerge.maximumDistance(contour,19,3));
 	}
 
 	@Test

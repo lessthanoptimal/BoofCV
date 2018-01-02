@@ -61,6 +61,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	public ConfigLength regionWidth = ConfigLength.fixed(21);
 	public float savolaK = -1;
 	public int otsuTuning = -1;
+	public boolean useOtsu2 = true;
 	public int minPixelValue = 0;
 	public int maxPixelValue = 255;
 
@@ -87,6 +88,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 
 		if( configThreshold instanceof ConfigThresholdLocalOtsu ) {
 			otsuTuning = (int)((ConfigThresholdLocalOtsu)configThreshold).tuning;
+			useOtsu2 = ((ConfigThresholdLocalOtsu)configThreshold).useOtsu2;
 		} else {
 			otsuTuning = (int)new ConfigThresholdLocalOtsu().tuning;
 		}
@@ -337,6 +339,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 				type == ThresholdType.LOCAL_OTSU ) {
 			ConfigThresholdLocalOtsu _config = new ConfigThresholdLocalOtsu();
 			_config.tuning = otsuTuning;
+			_config.useOtsu2 = useOtsu2;
 			config = _config;
 		} else {
 			config = new ConfigThreshold();
