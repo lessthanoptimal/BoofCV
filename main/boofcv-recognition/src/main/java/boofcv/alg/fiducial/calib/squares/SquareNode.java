@@ -82,8 +82,12 @@ public class SquareNode {
 		}
 	}
 
+	// TODO Make it so that it can handle "squares" that don't have a length of 4
+	// declaring new memory here and other places assume just 4. Have to update code to count corners
+	// in order that aren't touching the border. Or something like that. Or maybe just remove corners that
+	// touch the border?
 	public void updateArrayLength() {
-		if( edges.length < square.size() ) {
+		if( edges.length != square.size() ) {
 			edges = new SquareEdge[square.size()];
 			sideLengths = new double[square.size()];
 		}
