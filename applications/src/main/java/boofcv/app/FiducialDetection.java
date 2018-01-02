@@ -222,7 +222,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		ConfigThreshold configThreshold ;
 
 		if( robust )
-			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 10);
+			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21);
 		else
 			configThreshold = ConfigThreshold.fixed(DEFAULT_THRESHOLD);
 
@@ -268,7 +268,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		ConfigThreshold configThreshold;
 
 		if( robust )
-			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 10);
+			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21);
 		else
 			configThreshold = ConfigThreshold.fixed(DEFAULT_THRESHOLD);
 

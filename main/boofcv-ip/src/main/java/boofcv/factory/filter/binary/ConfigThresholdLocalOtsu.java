@@ -18,6 +18,9 @@
 
 package boofcv.factory.filter.binary;
 
+import boofcv.alg.filter.binary.ThresholdBlockOtsu;
+import boofcv.struct.ConfigLength;
+
 /**
  * Configuration for all threshold types.
  *
@@ -29,13 +32,24 @@ public class ConfigThresholdLocalOtsu extends ConfigThreshold {
 	 * Tuning parameter that will make it harder for pixels to be marked in low texture regions.
 	 * 0 = regular Otsu. Try 15 when tuning.
 	 *
-	 * @see boofcv.alg.filter.binary.ThresholdBlockOtsu
+	 * @see ThresholdBlockOtsu
 	 */
 	public double tuning=0;
 
-	public ConfigThresholdLocalOtsu(int radius , double tuning) {
+	/**
+	 * If true it will use Otsu 2. Produce much better results in binary or nearly binary images.
+	 *
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeOtsu2(int[], int, int)
+	 */
+	public boolean useOtsu2 = true;
+
+	public ConfigThresholdLocalOtsu(int regionWidth , double tuning) {
+		this(ConfigLength.fixed(regionWidth),tuning);
+	}
+
+	public ConfigThresholdLocalOtsu(ConfigLength regionWidth , double tuning) {
 		this();
-		this.radius = radius;
+		this.width =regionWidth;
 		this.tuning = tuning;
 	}
 

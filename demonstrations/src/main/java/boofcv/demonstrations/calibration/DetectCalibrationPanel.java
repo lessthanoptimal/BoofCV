@@ -153,7 +153,7 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 			public void imageThresholdUpdated() {
 				listener.calibEventDetectorModified();
 			}
-		}, ConfigThreshold.local(ThresholdType.BLOCK_OTSU,40));
+		}, ConfigThreshold.local(ThresholdType.BLOCK_OTSU,81));
 
 		if( addComponents )
 			addComponents();

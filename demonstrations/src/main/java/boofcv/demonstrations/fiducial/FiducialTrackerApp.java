@@ -271,7 +271,7 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 		String seperator = System.getProperty("file.separator");
 		String path = videoName.substring(0, videoName.lastIndexOf(seperator.charAt(0)));
 
-		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 10);
+		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21);
 
 		boolean stability = true;
 

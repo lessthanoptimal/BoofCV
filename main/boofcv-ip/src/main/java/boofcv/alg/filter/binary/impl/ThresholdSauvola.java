@@ -22,6 +22,7 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -47,7 +48,7 @@ public class ThresholdSauvola implements InputToBinary<GrayF32> {
 	// user specified threshold
 	float k;
 	// size of local region
-	int radius;
+	ConfigLength width;
 	// should it threshold down or up
 	boolean down;
 
@@ -62,13 +63,13 @@ public class ThresholdSauvola implements InputToBinary<GrayF32> {
 
 	/**
 	 * Configures the algorithm.
-	 * @param radius size of local radius.  Try 15
+	 * @param width size of local region.  Try 31
 	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
 	 * @param down Threshold down or up
 	 */
-	public ThresholdSauvola(int radius, float k, boolean down) {
+	public ThresholdSauvola(ConfigLength width, float k, boolean down) {
 		this.k = k;
-		this.radius = radius;
+		this.width = width;
 		this.down = down;
 	}
 
@@ -86,6 +87,8 @@ public class ThresholdSauvola implements InputToBinary<GrayF32> {
 		stdev.reshape(input.width,input.height);
 		tmp.reshape(input.width,input.height);
 		inputPow2.reshape(input.width,input.height);
+
+		int radius = width.computeI(Math.min(input.width,input.height))/2;
 
 		// mean of input image = E[X]
 		BlurImageOps.mean(input, inputMean, radius, tmp);
@@ -139,12 +142,12 @@ public class ThresholdSauvola implements InputToBinary<GrayF32> {
 		this.k = k;
 	}
 
-	public int getRadius() {
-		return radius;
+	public ConfigLength getWidth() {
+		return width;
 	}
 
-	public void setRadius(int radius) {
-		this.radius = radius;
+	public void setWidth(ConfigLength width) {
+		this.width = width;
 	}
 
 	public boolean isDown() {

@@ -22,6 +22,7 @@ import boofcv.alg.fiducial.calib.circle.DetectCircleHexagonalGrid;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.ConfigEllipseDetector;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
 /**
@@ -46,7 +47,7 @@ public class ConfigCircleRegularGrid implements Configuration {
 	/**
 	 * Configuration for thresholding the image
 	 */
-	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,20);
+	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, ConfigLength.relative(0.05,20));
 
 	/**
 	 * Configuration for the ellipse detector

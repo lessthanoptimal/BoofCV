@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.calib.chess;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
@@ -66,7 +67,7 @@ public class DetectChessboardFiducial<T extends ImageGray<T>> {
 	 * @param numCols Number of columns in the grid.  Target dependent.
 	 * @param maxCornerDistance The maximum distance two square corners can be from each other in pixels
 	 */
-	public DetectChessboardFiducial(int numRows, int numCols, double maxCornerDistance,
+	public DetectChessboardFiducial(int numRows, int numCols, ConfigLength maxCornerDistance,
 									DetectPolygonBinaryGrayRefine<T> detectorSquare,
 									InputToBinary<T> inputToBinary)
 	{

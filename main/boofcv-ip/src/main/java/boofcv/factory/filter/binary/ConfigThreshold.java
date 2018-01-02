@@ -18,6 +18,7 @@
 
 package boofcv.factory.filter.binary;
 
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
 /**
@@ -50,9 +51,9 @@ public class ConfigThreshold implements Configuration {
 	public boolean down = true;
 
 	/**
-	 * Radius of adaptive threshold.
+	 * Radius of adaptive threshold. If relative then it's relative to the min(width,height) of the image
 	 */
-	public int radius=5;
+	public ConfigLength width = ConfigLength.fixed(11);
 
 	/**
 	 * Positive parameter used to tune threshold in Savola.  Try 0.3
@@ -96,7 +97,11 @@ public class ConfigThreshold implements Configuration {
 		return config;
 	}
 
-	public static <T extends ConfigThreshold>T local( ThresholdType type , int radius ) {
+	public static <T extends ConfigThreshold>T local( ThresholdType type , int width ) {
+		return local(type, ConfigLength.fixed(width));
+	}
+
+	public static <T extends ConfigThreshold>T local( ThresholdType type , ConfigLength width ) {
 		if( !type.isAdaptive() )
 			throw new IllegalArgumentException("Type must be adaptive");
 
@@ -105,7 +110,7 @@ public class ConfigThreshold implements Configuration {
 
 		ConfigThreshold config;
 		if( type == ThresholdType.BLOCK_MIN_MAX) {
-			config = new ConfigThresholdBlockMinMax(radius, 10, true);
+			config = new ConfigThresholdBlockMinMax(width, 10, true);
 		} else if( type == ThresholdType.BLOCK_OTSU) {
 			config = new ConfigThresholdLocalOtsu();
 		} else {
@@ -113,7 +118,7 @@ public class ConfigThreshold implements Configuration {
 		}
 
 		config.type = type;
-		config.radius = radius;
+		config.width = width;
 		return (T)config;
 	}
 
@@ -129,7 +134,7 @@ public class ConfigThreshold implements Configuration {
 				", fixedThreshold=" + fixedThreshold +
 				", scale=" + scale +
 				", down=" + down +
-				", radius=" + radius +
+				", width=" + width +
 				", savolaK=" + savolaK +
 				", minPixelValue=" + minPixelValue +
 				", maxPixelValue=" + maxPixelValue +

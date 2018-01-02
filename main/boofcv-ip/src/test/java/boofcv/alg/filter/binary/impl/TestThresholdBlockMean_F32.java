@@ -19,6 +19,7 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.filter.binary.ThresholdBlockMean;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 
 /**
@@ -34,6 +35,6 @@ public class TestThresholdBlockMean_F32
 	@Override
 	public ThresholdBlockMean<GrayF32>
 	createAlg(int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdBlockMean_F32(requestedBlockWidth,scale,down,true);
+		return new ThresholdBlockMean_F32(ConfigLength.fixed(requestedBlockWidth),scale,down,true);
 	}
 }

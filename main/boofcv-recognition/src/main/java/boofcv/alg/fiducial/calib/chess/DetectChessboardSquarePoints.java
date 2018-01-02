@@ -23,6 +23,7 @@ import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import boofcv.misc.CircularIndex;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
@@ -61,7 +62,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	FastQueue<Point2D_F64> calibrationPoints = new FastQueue<>(Point2D_F64.class, true);
 
 	// maximum distance two corners can be from each other
-	double maxCornerDistanceSq;
+	ConfigLength maxCornerDistance;
 
 	// List of nodes put into clusters
 	List<List<SquareNode>> clusters;
@@ -75,10 +76,10 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	 * @param numCols Number of columns in square grid
 	 * @param maxCornerDistance Maximum distance in pixels that two "overlapping" corners can be from each other.
 	 */
-	public DetectChessboardSquarePoints(int numRows, int numCols, double maxCornerDistance,
+	public DetectChessboardSquarePoints(int numRows, int numCols, ConfigLength maxCornerDistance,
 										DetectPolygonBinaryGrayRefine<T> detectorSquare)
 	{
-		this.maxCornerDistanceSq = maxCornerDistance*maxCornerDistance;
+		this.maxCornerDistance = maxCornerDistance;
 
 		this.numRows = numRows;
 		this.numCols = numCols;
@@ -99,7 +100,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 
 		}
 
-		s2c = new SquaresIntoCrossClusters(maxCornerDistance,-1);
+		s2c = new SquaresIntoCrossClusters(-1,-1);
 		c2g = new SquareCrossClustersIntoGrids();
 	}
 
@@ -112,6 +113,10 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	 * @return True if successful.
 	 */
 	public boolean process( T input , GrayU8 binary ) {
+
+		double maxCornerDistancePixels = maxCornerDistance.computeI(Math.min(input.width,input.height));
+		s2c.setMaxCornerDistance(maxCornerDistancePixels);
+
 		configureContourDetector(input);
 		boundPolygon.vertexes.reset();
 
@@ -343,7 +348,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	}
 
 	private boolean setIntersection( SquareNode a , SquareNode n , Point2D_F64 point ) {
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < a.edges.length; i++) {
 			SquareEdge edge = a.edges[i];
 			if( edge != null && edge.destination(a) == n ) {
 				Point2D_F64 p0 = edge.a.square.get(edge.sideA);

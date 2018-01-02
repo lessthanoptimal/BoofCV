@@ -18,9 +18,7 @@
 
 package boofcv.factory.filter.binary;
 
-import boofcv.alg.filter.binary.ThresholdBlockMean;
-import boofcv.alg.filter.binary.ThresholdBlockMinMax;
-import boofcv.alg.filter.binary.ThresholdImageOps;
+import boofcv.alg.filter.binary.*;
 import boofcv.struct.image.GrayU8;
 
 /**
@@ -60,7 +58,7 @@ public enum ThresholdType {
 	/**
 	 * Applies a local Otsu across the entire image
 	 *
-	 * @see boofcv.alg.filter.binary.ThresholdLocalOtsu
+	 * @see ThresholdLocalOtsu
 	 */
 	LOCAL_OTSU(true,false),
 	/**
@@ -81,7 +79,7 @@ public enum ThresholdType {
 	/**
 	 * Breaks the image into blocks and computes the an Otsu threshold in each block
 	 *
-	 * @see boofcv.alg.filter.binary.ThresholdBlockOtsu
+	 * @see ThresholdBlockOtsu
 	 */
 	BLOCK_OTSU(true,false),
 

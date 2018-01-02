@@ -21,6 +21,7 @@ package boofcv.factory.filter.binary;
 import boofcv.abst.filter.binary.*;
 import boofcv.alg.filter.binary.*;
 import boofcv.alg.filter.binary.impl.*;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -35,56 +36,56 @@ public class FactoryThresholdBinary {
 	/**
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localGaussian(ImageGray, GrayU8, int, double, boolean, ImageGray, ImageGray)
 	 *
-	 * @param radius Radius of square region.
+	 * @param regionWidth Width of square region.
 	 * @param scale Threshold scale adjustment
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> localGaussian(int radius, double scale, boolean down, Class<T> inputType) {
+	InputToBinary<T> localGaussian(ConfigLength regionWidth, double scale, boolean down, Class<T> inputType) {
 		if( BOverrideFactoryThresholdBinary.localGaussian != null )
-			return BOverrideFactoryThresholdBinary.localGaussian.handle(radius, scale, down, inputType);
-		return new LocalGaussianBinaryFilter<>(radius, scale, down, ImageType.single(inputType));
+			return BOverrideFactoryThresholdBinary.localGaussian.handle(regionWidth, scale, down, inputType);
+		return new LocalGaussianBinaryFilter<>(regionWidth, scale, down, ImageType.single(inputType));
 	}
 
 	/**
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localSauvola(ImageGray, GrayU8, int, float, boolean)
 	 *
-	 * @param radius Radius of local region.  Try 15
+	 * @param width Width of square region.
 	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> localSauvola(int radius, float k, boolean down, Class<T> inputType)
+	InputToBinary<T> localSauvola(ConfigLength width, float k, boolean down, Class<T> inputType)
 	{
 		if( BOverrideFactoryThresholdBinary.localSauvola != null )
-			return BOverrideFactoryThresholdBinary.localSauvola.handle(radius, k, down, inputType);
-		return new InputToBinarySwitchF32<T>(new ThresholdSauvola(radius, k, down),inputType);
+			return BOverrideFactoryThresholdBinary.localSauvola.handle(width, k, down, inputType);
+		return new InputToBinarySwitchF32<T>(new ThresholdSauvola(width, k, down),inputType);
 	}
 
 	/**
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localMean(ImageGray, GrayU8, int, double, boolean, ImageGray, ImageGray)
 	 *
-	 * @param radius Radius of square region.
+	 * @param width Width of square region.
 	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> localMean(int radius, double scale, boolean down, Class<T> inputType) {
+	InputToBinary<T> localMean(ConfigLength width, double scale, boolean down, Class<T> inputType) {
 		if( BOverrideFactoryThresholdBinary.localMean != null )
-			return BOverrideFactoryThresholdBinary.localMean.handle(radius, scale, down, inputType);
-		return new LocalMeanBinaryFilter<>(radius, scale, down, ImageType.single(inputType));
+			return BOverrideFactoryThresholdBinary.localMean.handle(width, scale, down, inputType);
+		return new LocalMeanBinaryFilter<>(width, scale, down, ImageType.single(inputType));
 	}
 
 	/**
 	 * Applies a local Otsu threshold
 	 *
-	 * @see boofcv.alg.filter.binary.ThresholdLocalOtsu
+	 * @see ThresholdLocalOtsu
 	 *
 	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
 	 * @param down Should it threshold up or down.
@@ -93,10 +94,10 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> localOtsu(int regionWidth , double tuning, double scale, boolean down, Class<T> inputType) {
+	InputToBinary<T> localOtsu(boolean otsu2, ConfigLength regionWidth , double tuning, double scale, boolean down, Class<T> inputType) {
 		if( BOverrideFactoryThresholdBinary.localOtsu != null )
-			return BOverrideFactoryThresholdBinary.localOtsu.handle(regionWidth, tuning, scale, down, inputType);
-		return new InputToBinarySwitchU8<>(new ThresholdLocalOtsu(regionWidth,tuning,scale,down),inputType);
+			return BOverrideFactoryThresholdBinary.localOtsu.handle(otsu2,regionWidth, tuning, scale, down, inputType);
+		return new InputToBinarySwitchU8<>(new ThresholdLocalOtsu(otsu2,regionWidth,tuning,scale,down),inputType);
 	}
 
 	/**
@@ -108,12 +109,12 @@ public class FactoryThresholdBinary {
 	 * @param down Should it threshold up or down.
 	 * @param minimumSpread If the difference between min max is less than or equal to this
 	 *                         value then it is considered textureless.  Set to &le; -1 to disable.
-	 * @param regionWidth About how wide and tall you wish a block to be in pixels.
+	 * @param regionWidth Approximate size of block region
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> blockMinMax(int regionWidth, double scale , boolean down,
+	InputToBinary<T> blockMinMax(ConfigLength regionWidth, double scale , boolean down,
 								 double minimumSpread, boolean thresholdFromLocalBlocks, Class<T> inputType) {
 		if( BOverrideFactoryThresholdBinary.blockMinMax != null )
 			return BOverrideFactoryThresholdBinary.blockMinMax.handle(regionWidth, scale, down,
@@ -131,12 +132,12 @@ public class FactoryThresholdBinary {
 	 *
 	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
 	 * @param down Should it threshold up or down.
-	 * @param regionWidth About how wide and tall you wish a block to be in pixels.
+	 * @param regionWidth Approximate size of block region
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> blockMean(int regionWidth, double scale , boolean down, boolean thresholdFromLocalBlocks,
+	InputToBinary<T> blockMean(ConfigLength regionWidth, double scale , boolean down, boolean thresholdFromLocalBlocks,
 							   Class<T> inputType) {
 		if( BOverrideFactoryThresholdBinary.blockMean != null )
 			return BOverrideFactoryThresholdBinary.blockMean.handle(regionWidth, scale, down,
@@ -150,21 +151,21 @@ public class FactoryThresholdBinary {
 	/**
 	 * Applies a non-overlapping block Otsu threshold
 	 *
-	 * @see boofcv.alg.filter.binary.ThresholdBlockOtsu
+	 * @see ThresholdBlockOtsu
 	 *
 	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
 	 * @param down Should it threshold up or down.
-	 * @param regionWidth About how wide and tall you wish a block to be in pixels.
+	 * @param regionWidth Approximate size of block region
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> blockOtsu(int regionWidth , double tuning, double scale, boolean down,
+	InputToBinary<T> blockOtsu( boolean otsu2, ConfigLength regionWidth , double tuning, double scale, boolean down,
 							   boolean thresholdFromLocalBlocks, Class<T> inputType) {
 		if( BOverrideFactoryThresholdBinary.blockOtsu != null )
-			return BOverrideFactoryThresholdBinary.blockOtsu.handle(regionWidth, tuning, scale, down,
+			return BOverrideFactoryThresholdBinary.blockOtsu.handle(otsu2,regionWidth, tuning, scale, down,
 					thresholdFromLocalBlocks, inputType);
-		return new InputToBinarySwitchU8<>(new ThresholdBlockOtsu(regionWidth,tuning,scale,down,
+		return new InputToBinarySwitchU8<>(new ThresholdBlockOtsu(otsu2,regionWidth,tuning,scale,down,
 				thresholdFromLocalBlocks),inputType);
 	}
 
@@ -236,32 +237,32 @@ public class FactoryThresholdBinary {
 				return globalEntropy(config.minPixelValue, config.maxPixelValue, config.down, inputType);
 
 			case LOCAL_GAUSSIAN:
-				return localGaussian(config.radius, config.scale, config.down, inputType);
+				return localGaussian(config.width, config.scale, config.down, inputType);
 
 			case LOCAL_SAVOLA:
-				return localSauvola(config.radius, config.savolaK, config.down, inputType);
+				return localSauvola(config.width, config.savolaK, config.down, inputType);
 
 			case LOCAL_MEAN:
-				return localMean(config.radius, config.scale, config.down, inputType);
+				return localMean(config.width, config.scale, config.down, inputType);
 
 			case LOCAL_OTSU: {
 				ConfigThresholdLocalOtsu c = (ConfigThresholdLocalOtsu) config;
-				return localOtsu(config.radius * 2 + 1, c.tuning, config.scale,config.down, inputType);
+				return localOtsu(c.useOtsu2,config.width, c.tuning, config.scale,config.down, inputType);
 			}
 
 			case BLOCK_MIN_MAX: {
 				ConfigThresholdBlockMinMax c = (ConfigThresholdBlockMinMax) config;
-				return blockMinMax(c.radius * 2 + 1, c.scale , c.down, c.minimumSpread,
+				return blockMinMax(c.width, c.scale , c.down, c.minimumSpread,
 						c.thresholdFromLocalBlocks, inputType);
 			}
 
 			case BLOCK_MEAN:
-				return blockMean(config.radius * 2 + 1, config.scale , config.down,
+				return blockMean(config.width, config.scale , config.down,
 						config.thresholdFromLocalBlocks, inputType);
 
 			case BLOCK_OTSU: {
 				ConfigThresholdLocalOtsu c = (ConfigThresholdLocalOtsu) config;
-				return blockOtsu(c.radius * 2 + 1, c.tuning, c.scale, c.down,
+				return blockOtsu(c.useOtsu2,c.width, c.tuning, c.scale, c.down,
 						c.thresholdFromLocalBlocks, inputType);
 			}
 

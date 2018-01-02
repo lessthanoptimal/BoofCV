@@ -26,6 +26,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 
@@ -62,13 +63,13 @@ public class ExampleThresholding {
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Global: Entropy");
 
 		// Local method
-		GThresholdImageOps.localMean(input, binary, 28, 1.0, true, null, null);
+		GThresholdImageOps.localMean(input, binary, ConfigLength.fixed(57), 1.0, true, null, null);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Square");
-		GThresholdImageOps.localBlockMinMax(input, binary, 10, 1.0, true, 15 );
+		GThresholdImageOps.localBlockMinMax(input, binary, ConfigLength.fixed(21), 1.0, true, 15 );
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Block Min-Max");
-		GThresholdImageOps.localGaussian(input, binary, 42, 1.0, true, null, null);
+		GThresholdImageOps.localGaussian(input, binary,  ConfigLength.fixed(85), 1.0, true, null, null);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Gaussian");
-		GThresholdImageOps.localSauvola(input, binary, 5, 0.30f, true);
+		GThresholdImageOps.localSauvola(input, binary,  ConfigLength.fixed(11), 0.30f, true);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Sauvola");
 
 		// Sauvola is tuned for text image.  Change radius to make it run better in others.

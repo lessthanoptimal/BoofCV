@@ -19,6 +19,7 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.filter.binary.ThresholdBlockMinMax;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.InterleavedF32;
@@ -34,7 +35,7 @@ public class ThresholdBlockMinMax_F32
 	float scale;
 	boolean down;
 
-	public ThresholdBlockMinMax_F32(float minimumSpread, int requestedBlockWidth, float scale , boolean down ,
+	public ThresholdBlockMinMax_F32(float minimumSpread, ConfigLength requestedBlockWidth, float scale , boolean down ,
 									boolean thresholdFromLocalBlocks) {
 		super(minimumSpread,requestedBlockWidth,thresholdFromLocalBlocks,GrayF32.class);
 		stats = new InterleavedF32(1,1,2);

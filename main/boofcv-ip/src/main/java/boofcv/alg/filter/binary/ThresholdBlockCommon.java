@@ -20,6 +20,7 @@ package boofcv.alg.filter.binary;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.InputSanityCheck;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
@@ -51,7 +52,7 @@ public abstract class ThresholdBlockCommon <T extends ImageGray<T>,S extends Ima
 	protected S stats;
 
 	// the desired width and height of a block requested by the user
-	protected int requestedBlockWidth;
+	protected ConfigLength requestedBlockWidth;
 
 	// the adjusted size to minimize extra pixels near the image upper extreme
 	protected int blockWidth,blockHeight;
@@ -63,7 +64,7 @@ public abstract class ThresholdBlockCommon <T extends ImageGray<T>,S extends Ima
 	 * Configures the detector
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 */
-	public ThresholdBlockCommon(int requestedBlockWidth, boolean thresholdFromLocalBlocks, Class<T> imageClass  ) {
+	public ThresholdBlockCommon(ConfigLength requestedBlockWidth, boolean thresholdFromLocalBlocks, Class<T> imageClass  ) {
 		this.requestedBlockWidth = requestedBlockWidth;
 		this.imageType = ImageType.single(imageClass);
 		this.thresholdFromLocalBlocks = thresholdFromLocalBlocks;
@@ -77,11 +78,12 @@ public abstract class ThresholdBlockCommon <T extends ImageGray<T>,S extends Ima
 	public void process(T input , GrayU8 output ) {
 		InputSanityCheck.checkSameShape(input,output);
 
+		int requestedBlockWidth = this.requestedBlockWidth.computeI(Math.min(input.width,input.height));
 		if( input.width < requestedBlockWidth || input.height < requestedBlockWidth ) {
 			throw new IllegalArgumentException("Image is smaller than block size");
 		}
 
-		selectBlockSize(input.width,input.height);
+		selectBlockSize(input.width,input.height,requestedBlockWidth);
 
 		stats.reshape(input.width/blockWidth,input.height/blockHeight);
 
@@ -97,7 +99,7 @@ public abstract class ThresholdBlockCommon <T extends ImageGray<T>,S extends Ima
 	/**
 	 * Selects a block size which is close to the requested block size by the user
 	 */
-	void selectBlockSize( int width , int height ) {
+	void selectBlockSize( int width , int height , int requestedBlockWidth) {
 
 		int rows = height/requestedBlockWidth;
 		int cols = width/requestedBlockWidth;

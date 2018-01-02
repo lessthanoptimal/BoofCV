@@ -54,9 +54,22 @@ public class TestGThresholdImageOps {
 	private int bruteForceOtsu(int[] histogram, int total) {
 		int best = -1;
 		double bestScore = Double.MAX_VALUE;
+
 		for (int j = 0; j < histogram.length-1; j++) {
 			// the threshold is inclusive. <= upper value
-			double score = variance(histogram,0,j,total) + variance(histogram,j+1,histogram.length-1, total);
+			double stats0[] = variance(histogram,0,j,total);
+			double stats1[] = variance(histogram,j+1,histogram.length-1, total);
+
+			if( stats0 == null || stats1 == null )
+				continue;
+
+			double var0 = stats0[1];
+			double weight0 = stats0[2];
+
+			double var1 = stats1[1];
+			double weight1 = stats1[2];
+
+			double score = (weight0*var0 + weight1*var1);
 
 			if( score < bestScore ) {
 				bestScore = score;
@@ -66,7 +79,62 @@ public class TestGThresholdImageOps {
 		return best;
 	}
 
-	private static double variance( int histogram[] , int start , int stop , int allPixels) {
+	@Test
+	public void computeOtsu2() {
+
+		for (int i = 0; i < 100; i++) {
+			int histogram[] = new int[ 256 ];
+			int total = 0;
+			for (int j = 0; j < histogram.length; j++) {
+				total += histogram[j] = rand.nextInt(400);
+			}
+
+			int best = bruteForceOtsu2(histogram, total);
+			int found = GThresholdImageOps.computeOtsu2(histogram,histogram.length,total);
+
+			assertEquals(best,found);
+		}
+	}
+
+	private int bruteForceOtsu2(int[] histogram, int total) {
+		int best = -1;
+		double bestScore = 0;
+
+		double stats[] = variance(histogram,0,histogram.length-1,total);
+		double varianceAll = stats[1];
+		for (int j = 0; j < histogram.length-1; j++) {
+			// the threshold is inclusive. <= upper value
+			double stats0[] = variance(histogram,0,j,total);
+			double stats1[] = variance(histogram,j+1,histogram.length-1, total);
+
+			if( stats0 == null || stats1 == null )
+				continue;
+
+			double mean0 = stats0[0];
+			double var0 = stats0[1];
+			double weight0 = stats0[2];
+
+			double mean1 = stats1[0];
+			double var1 = stats1[1];
+			double weight1 = stats1[2];
+
+			double d0 = (j-mean0)/(histogram.length-1);
+			double d1 = (mean1-j)/(histogram.length-1);
+
+			double withinClassVariance = (weight0*var0 + weight1*var1);
+			double betweenClassVariance = varianceAll - withinClassVariance;
+			double score = betweenClassVariance/(d0*d0 + d1*d1);
+
+			if( score > bestScore ) {
+				bestScore = score;
+				best = j;
+			}
+		}
+		return best;
+	}
+
+
+	private static double[] variance( int histogram[] , int start , int stop , int allPixels) {
 		double mean = 0;
 		int total = 0;
 		for (int i = start; i <= stop; i++) {
@@ -74,7 +142,7 @@ public class TestGThresholdImageOps {
 			total += histogram[i];
 		}
 		if( total == 0 )
-			return 0;
+			return null;
 
 		mean /= total;
 
@@ -84,7 +152,7 @@ public class TestGThresholdImageOps {
 		}
 		variance /= total-1;
 
-		return variance*(total/(double)allPixels);
+		return new double[]{ mean , variance, total/(double)allPixels };
 	}
 
 	/**
@@ -103,6 +171,36 @@ public class TestGThresholdImageOps {
 		int found = GThresholdImageOps.computeOtsu(histogram,histogram.length,total);
 
 		assertEquals(best,found);
+	}
+
+	@Test
+	public void computeOtsu2_zeros() {
+		int histogram[] = new int[ 256 ];
+
+		int total = 0;
+		for (int j = 15; j < histogram.length-40; j++) {
+			total += histogram[j] = rand.nextInt(400);
+		}
+
+		int best = bruteForceOtsu2(histogram, total);
+		int found = GThresholdImageOps.computeOtsu2(histogram,histogram.length,total);
+
+		assertEquals(best,found);
+	}
+
+	/**
+	 * The histogram is composed of two values. See if it picks a threshold that can split this sest
+	 */
+	@Test
+	public void computeOtsu2_pathological() {
+		int histogram[] = new int[ 256 ];
+
+		histogram[10] = 200;
+		histogram[120] = 500;
+
+		int found = GThresholdImageOps.computeOtsu2(histogram,histogram.length,700);
+
+		assertEquals(65,found); // 65 maximizes the distance between the two
 	}
 
 	@Test

@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.InterleavedS32;
@@ -41,16 +42,8 @@ import java.util.Arrays;
 public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS32> {
 
 	int histogram[] = new int[256];
-	boolean down;
-	double scale;
 
-	/**
-	 * Tuning parameter that tweaks the otsu value depending on local variance.
-	 */
-	double tuning;
-
-	int threshold;
-	double variance;
+	ComputeOtsu otsu;
 
 	/**
 	 * Configures the detector
@@ -58,12 +51,10 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 * @param tuning Tuning parameter. 0 = standard Otsu. Greater than 0 will penalize zero texture.
 	 */
-	public ThresholdBlockOtsu(int requestedBlockWidth, double tuning, double scale, boolean down,
+	public ThresholdBlockOtsu(boolean otsu2, ConfigLength requestedBlockWidth, double tuning, double scale, boolean down,
 							  boolean thresholdFromLocalBlocks ) {
 		super(requestedBlockWidth,thresholdFromLocalBlocks,GrayU8.class);
-		this.down = down;
-		this.scale = scale;
-		this.tuning = tuning;
+		this.otsu = new ComputeOtsu(otsu2,tuning,down,scale);
 		stats = new InterleavedS32(1,1,256);
 	}
 
@@ -107,7 +98,7 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 		}
 
 		// sum up histogram in local region
-		Arrays.fill(histogram,0,256,0);
+		Arrays.fill(histogram,0,histogram.length,0);
 
 		for (int y = blockY0; y <= blockY1; y++) {
 			for (int x = blockX0; x <= blockX1; x++) {
@@ -120,64 +111,20 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 
 		// this can vary across the image at the borders
 		int total = 0;
-		for (int i = 0; i < 256; i++) {
+		for (int i = 0; i < histogram.length; i++) {
 			total += histogram[i];
 		}
 
 		// compute threshold
-		computeOtsu(histogram,256,total);
+		otsu.compute(histogram,histogram.length,total);
 
-
-		// apply optional penalty to low texture regions
-		variance += 0.001; // avoid divide by zero
-		// multiply by threshold twice in an effort to have the image's scaling not effect the tuning parameter
-		int adjustment =  (int)(tuning*threshold*tuning*threshold/variance+0.5);
-		threshold += down ? -adjustment : adjustment;
-		threshold = (int)(scale*Math.max(threshold,0)+0.5);
 
 		for (int y = y0; y < y1; y++) {
 			int indexInput = input.startIndex + y*input.stride + x0;
 			int indexOutput = output.startIndex + y*output.stride + x0;
 			int end = indexOutput + (x1-x0);
 			for (; indexOutput < end; indexOutput++, indexInput++ ) {
-				output.data[indexOutput] = down == (input.data[indexInput]&0xFF) <= threshold ? (byte)1 : 0;
-			}
-		}
-	}
-
-	public void computeOtsu( int histogram[] , int length , int totalPixels ) {
-
-		double dlength = length;
-		double sum = 0;
-		for (int i=0 ; i< length ; i++)
-			sum += (i/dlength)*histogram[i];
-
-		double sumB = 0;
-		int wB = 0;
-
-		variance = 0;
-		threshold = 0;
-
-		int i;
-		for (i=0 ; i<length ; i++) {
-			wB += histogram[i];               // Weight Background
-			if (wB == 0) continue;
-
-			int wF = totalPixels - wB;         // Weight Foreground
-			if (wF == 0) break;
-
-			sumB += (i/dlength)*histogram[i];
-
-			double mB = sumB / wB;            // Mean Background
-			double mF = (sum - sumB) / wF;    // Mean Foreground
-
-			// Calculate Between Class Variance
-			double varBetween = (double)wB*(double)wF*(mB - mF)*(mB - mF);
-
-			// Check if new maximum found
-			if (varBetween > variance) {
-				variance = varBetween;
-				threshold = i;
+				output.data[indexOutput] = otsu.down == (input.data[indexInput]&0xFF) <= otsu.threshold ? (byte)1 : 0;
 			}
 		}
 	}

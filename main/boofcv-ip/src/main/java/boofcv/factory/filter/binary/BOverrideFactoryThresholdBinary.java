@@ -21,6 +21,7 @@ package boofcv.factory.filter.binary;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.ImageGray;
 
 /**
@@ -60,40 +61,40 @@ public class BOverrideFactoryThresholdBinary extends BOverrideClass {
 
 	public interface LocalGaussian {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle(int radius, double scale, boolean down, Class<T> inputType);
+		InputToBinary<T> handle(ConfigLength regionWidth, double scale, boolean down, Class<T> inputType);
 	}
 
 	public interface LocalSauvola {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle(int radius, float k, boolean down, Class<T> inputType);
+		InputToBinary<T> handle(ConfigLength regionWidth, float k, boolean down, Class<T> inputType);
 	}
 
 	public interface LocalMean {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle(int radius, double scale, boolean down, Class<T> inputType);
+		InputToBinary<T> handle(ConfigLength regionWidth, double scale, boolean down, Class<T> inputType);
 	}
 
 	public interface LocalBlockMinMax {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle(int regionWidth, double scale , boolean down,
+		InputToBinary<T> handle(ConfigLength regionWidth, double scale , boolean down,
 								double minimumSpread, boolean thresholdFromLocalBlocks, Class<T> inputType);
 	}
 
 	public interface LocalBlockMean {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle(int regionWidth, double scale , boolean down, boolean thresholdFromLocalBlocks,
+		InputToBinary<T> handle(ConfigLength regionWidth, double scale , boolean down, boolean thresholdFromLocalBlocks,
 								Class<T> inputType);
 	}
 
 	public interface LocalBlockOtsu {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle(int regionWidth , double tuning, double scale,
+		InputToBinary<T> handle(boolean otsu2, ConfigLength regionWidth , double tuning, double scale,
 								boolean down, boolean thresholdFromLocalBlocks,  Class<T> inputType);
 	}
 
 	public interface LocalOtsu {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle(int regionWidth , double tuning, double scale, boolean down, Class<T> inputType);
+		InputToBinary<T> handle(boolean otsu2, ConfigLength regionWidth , double tuning, double scale, boolean down, Class<T> inputType);
 	}
 
 }

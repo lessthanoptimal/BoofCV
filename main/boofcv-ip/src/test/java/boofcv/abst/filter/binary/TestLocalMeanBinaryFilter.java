@@ -21,6 +21,7 @@ package boofcv.abst.filter.binary;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -48,10 +49,10 @@ public class TestLocalMeanBinaryFilter {
 
 			GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-			LocalMeanBinaryFilter alg = new LocalMeanBinaryFilter(4,0.95,true, ImageType.single(type));
+			LocalMeanBinaryFilter alg = new LocalMeanBinaryFilter(ConfigLength.fixed(9),0.95,true, ImageType.single(type));
 
 			alg.process(input,found);
-			GThresholdImageOps.localMean(input, expected, 4, 0.95, true, null, null);
+			GThresholdImageOps.localMean(input, expected, ConfigLength.fixed(9), 0.95, true, null, null);
 
 			BoofTesting.assertEquals(found, expected, 0);
 		}

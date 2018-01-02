@@ -204,7 +204,7 @@ public class TestLinearContourLabelChang2004 {
 		FastQueue<ContourPacked> contours = alg.getContours();
 
 		for( int i = 0; i < contours.size(); i++ ) {
-			System.out.println("=================== Contour "+i);
+//			System.out.println("=================== Contour "+i);
 			ContourPacked c = contours.get(i);
 
 			assertTrue(c.id > 0 );
@@ -221,10 +221,10 @@ public class TestLinearContourLabelChang2004 {
 			// see if the two lists are equivalent
 			List<Point2D_I32> expected = rule == 8 ? findContour8(labeled, c.id) : findContour4(labeled, c.id);
 
-			labeled.print();
-			System.out.println("------------------");
-			print(found,labeled.width,labeled.height);
-			print(expected,labeled.width,labeled.height);
+//			labeled.print();
+//			System.out.println("------------------");
+//			print(found,labeled.width,labeled.height);
+//			print(expected,labeled.width,labeled.height);
 
 			assertEquals(expected.size(),found.size());
 

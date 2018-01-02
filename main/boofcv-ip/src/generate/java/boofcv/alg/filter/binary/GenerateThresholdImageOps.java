@@ -28,8 +28,6 @@ import java.io.FileNotFoundException;
  * @author Peter Abeles
  */
 public class GenerateThresholdImageOps extends CodeGeneratorBase {
-	String className = "ThresholdImageOps";
-
 	@Override
 	public void generate() throws FileNotFoundException {
 		printPreamble();
@@ -49,10 +47,10 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() throws FileNotFoundException {
-		setOutputFile(className);
 		out.print("import boofcv.alg.InputSanityCheck;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import boofcv.alg.filter.blur.BlurImageOps;\n" +
+				"import boofcv.struct.ConfigLength;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -143,7 +141,7 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param input Input image.\n" +
 				"\t * @param output (optional) Output binary image.  If null it will be declared internally.\n" +
-				"\t * @param radius Radius of square region.\n" +
+				"\t * @param width Width of square region.\n" +
 				"\t * @param scale Scale factor used to adjust threshold.  Try 0.95\n" +
 				"\t * @param down Should it threshold up or down.\n" +
 				"\t * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.\n" +
@@ -151,12 +149,14 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t * @return Thresholded image.\n" +
 				"\t */\n" +
 				"\tpublic static GrayU8 localSquare( "+imageName+" input , GrayU8 output ,\n" +
-				"\t\t\t\t\t\t\t\t\t\t\t int radius , float scale , boolean down ,\n" +
+				"\t\t\t\t\t\t\t\t\t\t\t ConfigLength width , float scale , boolean down ,\n" +
 				"\t\t\t\t\t\t\t\t\t\t\t "+imageName+" storage1 , "+imageName+" storage2 ) {\n" +
 				"\n" +
 				"\t\toutput = InputSanityCheck.checkDeclare(input,output,GrayU8.class);\n" +
 				"\t\tstorage1 = InputSanityCheck.checkDeclare(input,storage1,"+imageName+".class);\n" +
 				"\t\tstorage2 = InputSanityCheck.checkDeclare(input,storage2,"+imageName+".class);\n" +
+				"\n" +
+				"\t\tint radius = width.computeI(Math.min(input.width,input.height))/2;\n" +
 				"\n" +
 				"\t\t"+imageName+" mean = storage1;\n" +
 				"\n" +
@@ -216,7 +216,7 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param input Input image.\n" +
 				"\t * @param output (optional) Output binary image.  If null it will be declared internally.\n" +
-				"\t * @param radius Radius of square region.\n" +
+				"\t * @param width Width of square region.\n" +
 				"\t * @param scale Scale factor used to adjust threshold.  Try 0.95\n" +
 				"\t * @param down Should it threshold up or down.\n" +
 				"\t * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.\n" +
@@ -224,12 +224,14 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t * @return Thresholded image.\n" +
 				"\t */\n" +
 				"\tpublic static GrayU8 localGaussian( "+imageName+" input , GrayU8 output ,\n" +
-				"\t\t\t\t\t\t\t\t\t\t\t   int radius , float scale , boolean down ,\n" +
-				"\t\t\t\t\t\t\t\t\t\t\t   "+imageName+" storage1 , "+imageName+" storage2 ) {\n" +
+				"\t\t\t\t\t\t\t\t\t\tConfigLength width , float scale , boolean down ,\n" +
+				"\t\t\t\t\t\t\t\t\t\t"+imageName+" storage1 , "+imageName+" storage2 ) {\n" +
 				"\n" +
 				"\t\toutput = InputSanityCheck.checkDeclare(input,output,GrayU8.class);\n" +
 				"\t\tstorage1 = InputSanityCheck.checkDeclare(input,storage1,"+imageName+".class);\n" +
 				"\t\tstorage2 = InputSanityCheck.checkDeclare(input,storage2,"+imageName+".class);\n" +
+				"\n" +
+				"\t\tint radius = width.computeI(Math.min(input.width,input.height))/2;\n" +
 				"\n" +
 				"\t\t"+imageName+" blur = storage1;\n" +
 				"\n" +

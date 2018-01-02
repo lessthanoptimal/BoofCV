@@ -47,7 +47,7 @@ public class ConfigSquareGrid implements Configuration {
 	/**
 	 * Configuration for thresholding the image
 	 */
-	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,20);
+	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,ConfigLength.relative(0.05,21));
 
 	/**
 	 * Configuration for square detector

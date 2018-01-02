@@ -19,6 +19,7 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.filter.binary.ThresholdBlockMinMax;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.InterleavedU8;
 
@@ -33,7 +34,7 @@ public class ThresholdBlockMinMax_U8
 	double scale;
 	boolean down;
 
-	public ThresholdBlockMinMax_U8(double minimumSpread, int requestedBlockWidth, double scale , boolean down,
+	public ThresholdBlockMinMax_U8(double minimumSpread, ConfigLength requestedBlockWidth, double scale , boolean down,
 								   boolean thresholdFromLocalBlocks) {
 		super(minimumSpread,requestedBlockWidth,thresholdFromLocalBlocks,GrayU8.class);
 		stats = new InterleavedU8(1,1,2);

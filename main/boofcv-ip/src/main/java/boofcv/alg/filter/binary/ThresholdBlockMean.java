@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.ImageGray;
 
 /**
@@ -39,7 +40,7 @@ public abstract class ThresholdBlockMean
 	 *
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 */
-	public ThresholdBlockMean(int requestedBlockWidth, boolean thresholdFromLocalBlocks,Class<T> imageType) {
+	public ThresholdBlockMean(ConfigLength requestedBlockWidth, boolean thresholdFromLocalBlocks, Class<T> imageType) {
 		super(requestedBlockWidth,thresholdFromLocalBlocks,imageType);
 	}
 

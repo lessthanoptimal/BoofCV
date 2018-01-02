@@ -19,6 +19,8 @@
 package boofcv.factory.filter.binary;
 
 
+import boofcv.struct.ConfigLength;
+
 /**
  * Configuration for {@link boofcv.alg.filter.binary.ThresholdBlockMinMax}
  *
@@ -31,9 +33,13 @@ public class ConfigThresholdBlockMinMax extends ConfigThreshold {
 	 */
 	public double minimumSpread = 10;
 
-	public ConfigThresholdBlockMinMax(int radius , double minimumSpread, boolean down ) {
+	public ConfigThresholdBlockMinMax(int width , double minimumSpread, boolean down ) {
+		this(ConfigLength.fixed(width),minimumSpread,down);
+	}
+
+	public ConfigThresholdBlockMinMax(ConfigLength width , double minimumSpread, boolean down ) {
 		this.type = ThresholdType.BLOCK_MIN_MAX;
-		this.radius = radius;
+		this.width = width;
 		this.minimumSpread = minimumSpread;
 		this.down = down;
 	}

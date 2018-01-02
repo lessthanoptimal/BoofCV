@@ -37,24 +37,24 @@ public class DemoThresholdingPanel extends StandardAlgConfigPanel implements Act
 
 	JButton directionButton;
 	JSlider thresholdLevel;
-	JSpinner spinnerRadius;
+	JSpinner spinnerWidth;
 	JSpinner spinnerScale;
 
 	Listener listener;
 
 	int valueThreshold;
 	boolean directionDown;
-	int threshRadius;
+	int threshWidth;
 	double scale;
 
 	public DemoThresholdingPanel(int threshold ,
 								 boolean directionDown,
-								 int radius, double scale,
+								 int width, double scale,
 								 Listener listener) {
 		this.listener = listener;
 		this.valueThreshold = threshold;
 		this.directionDown = directionDown;
-		this.threshRadius = radius;
+		this.threshWidth = width;
 		this.scale = scale;
 
 		String[] algStrings = { "Fixed", "Global Otsu" , "Global Entropy" ,
@@ -77,9 +77,9 @@ public class DemoThresholdingPanel extends StandardAlgConfigPanel implements Act
 		thresholdLevel.addChangeListener(this);
 		thresholdLevel.setValue(threshold);
 
-		spinnerRadius = new JSpinner(new SpinnerNumberModel(threshRadius,5,200,10));
-		spinnerRadius.addChangeListener(this);
-		spinnerRadius.setMaximumSize(spinnerRadius.getPreferredSize());
+		spinnerWidth = new JSpinner(new SpinnerNumberModel(threshWidth,10,400,20));
+		spinnerWidth.addChangeListener(this);
+		spinnerWidth.setMaximumSize(spinnerWidth.getPreferredSize());
 
 		spinnerScale = new JSpinner(new SpinnerNumberModel(scale,0,2.0,0.01));
 		spinnerScale.addChangeListener(this);
@@ -98,7 +98,7 @@ public class DemoThresholdingPanel extends StandardAlgConfigPanel implements Act
 		addSeparator(100);
 		addAlignLeft(directionButton, this);
 		addAlignLeft(thresholdLevel, this);
-		addLabeled(spinnerRadius, "Radius", this);
+		addLabeled(spinnerWidth, "Width", this);
 		addLabeled(spinnerScale, "Scale", this);
 		add(Box.createVerticalGlue());
 	}
@@ -113,11 +113,11 @@ public class DemoThresholdingPanel extends StandardAlgConfigPanel implements Act
 	protected void updateActive( int which ) {
 		if( which == 0 ) {
 			thresholdLevel.setEnabled(true);
-			spinnerRadius.setEnabled(false);
+			spinnerWidth.setEnabled(false);
 			spinnerScale.setEnabled(false);
 		} else {
 			thresholdLevel.setEnabled(false);
-			spinnerRadius.setEnabled(true);
+			spinnerWidth.setEnabled(true);
 			spinnerScale.setEnabled(true);
 		}
 	}
@@ -142,8 +142,8 @@ public class DemoThresholdingPanel extends StandardAlgConfigPanel implements Act
 		return valueThreshold;
 	}
 
-	public int getThreshRadius() {
-		return threshRadius;
+	public int getThreshWidth() {
+		return threshWidth;
 	}
 
 	public double getScale() {
@@ -155,8 +155,8 @@ public class DemoThresholdingPanel extends StandardAlgConfigPanel implements Act
 		if( e.getSource() == thresholdLevel ) {
 			valueThreshold = thresholdLevel.getValue();
 			listener.settingChanged();
-		} else if( e.getSource() == spinnerRadius) {
-			threshRadius = ((Number) spinnerRadius.getValue()).intValue();
+		} else if( e.getSource() == spinnerWidth) {
+			threshWidth = ((Number) spinnerWidth.getValue()).intValue();
 			listener.settingChanged();
 		} else if( e.getSource() == spinnerScale) {
 			scale = ((Number) spinnerScale.getValue()).doubleValue();

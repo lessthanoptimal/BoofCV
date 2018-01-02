@@ -12,6 +12,9 @@ Version : 0.28
   * Removed refine corner for black polygon detector
     - Was complex, didn't fit the new API, and calibration residuals got better once removed.
   * Added option to optimize by fitting lines to the contour
+- Chessboard Detector
+  * Improved performance on larger image by making thresholding region relative to image size
+  * Has known issue on larger images where a little bit of blur can join squares together.
 - Background Model
   * Fixed a weird edge case that happened when you passed in a 1x1 pixel image
 - Removed Asymmetric Circle Grid
@@ -49,11 +52,17 @@ Version : 0.28
 - FiducialDetectors
   * Provide access to detected points in PNP detector. Thought this was done a while ago...
 - Binary Thresholding
+  * Region size is now specified using ConfigLength and as a width instead of a radius
+    - Width makes more sense and is less restrictive. Can be specified as a relative to image size now too.
   * Renamed classes/functions to remove redundancy and clarify
   * Changed ImageToBinary to remove pointless bounds list and simply code
   * Added BLOCK_MEAN
   * Added BLOCK_OTSU
   * Added LOCAL_OTSU
+- OTSU Threshold
+  * Added Otsu 2
+    - Also seeks a threshold which maximizes the distance between the two distributions
+    - Can handle binary images much better when Otsu fails to select a reasonable threshold
 - Created ConfigMinimumSize
   * Provides a way to specify the size of an object as based on input image size or an exact pixels
 - ImageZoomPanel

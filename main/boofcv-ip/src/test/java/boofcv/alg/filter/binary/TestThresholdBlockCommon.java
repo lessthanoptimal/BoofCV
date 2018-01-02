@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import org.junit.Test;
@@ -31,17 +32,19 @@ public class TestThresholdBlockCommon {
 	@Test
 	public void selectBlockSize() {
 
-		ThresholdBlockCommon alg = new Dummy(30);
+		int width = 30;
 
-		alg.selectBlockSize(300,330);
+		ThresholdBlockCommon alg = new Dummy(width);
+
+		alg.selectBlockSize(300,330,width);
 		assertEquals(30,alg.blockWidth);
 		assertEquals(30,alg.blockHeight);
 
-		alg.selectBlockSize(329,301);
+		alg.selectBlockSize(329,301,width);
 		assertEquals(32,alg.blockWidth);
 		assertEquals(30,alg.blockHeight);
 
-		alg.selectBlockSize(301,329);
+		alg.selectBlockSize(301,329,width);
 		assertEquals(30,alg.blockWidth);
 		assertEquals(32,alg.blockHeight);
 	}
@@ -49,7 +52,7 @@ public class TestThresholdBlockCommon {
 	private class Dummy extends ThresholdBlockCommon {
 
 		public Dummy(int requestedBlockWidth) {
-			super(requestedBlockWidth,true,GrayU8.class);
+			super(ConfigLength.fixed(requestedBlockWidth),true,GrayU8.class);
 		}
 
 		@Override

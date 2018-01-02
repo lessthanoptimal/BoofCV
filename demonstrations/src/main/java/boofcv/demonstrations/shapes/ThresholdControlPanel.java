@@ -23,6 +23,7 @@ import boofcv.factory.filter.binary.ConfigThresholdBlockMinMax;
 import boofcv.factory.filter.binary.ConfigThresholdLocalOtsu;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.struct.ConfigLength;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -45,7 +46,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 
 	JComboBox comboType;
 	JSpinner spinnerThreshold;
-	JSpinner spinnerRadius;
+	JSpinner spinnerWidth;
 	JSpinner spinnerScale;
 	JButton buttonUpDown;
 	JCheckBox checkLocalBlock = new JCheckBox("Local Blocks",true);
@@ -57,7 +58,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 
 	public double scale = -1;
 	public boolean down = true;
-	public int radius = 10;
+	public ConfigLength regionWidth = ConfigLength.fixed(21);
 	public float savolaK = -1;
 	public int otsuTuning = -1;
 	public int minPixelValue = 0;
@@ -78,7 +79,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		this.type = configThreshold.type;
 		this.scale = configThreshold.scale;
 		this.down = configThreshold.down;
-		this.radius = configThreshold.radius;
+		this.regionWidth = configThreshold.width.copy();
 		this.savolaK = configThreshold.savolaK;
 		this.minPixelValue = configThreshold.minPixelValue;
 		this.maxPixelValue = configThreshold.maxPixelValue;
@@ -99,7 +100,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		comboType.setSelectedIndex(this.type.ordinal());
 
 		spinnerThreshold = spinner(globalThreshold,0,1000,1);
-		spinnerRadius = spinner(radius,1,500,1);
+		spinnerWidth = spinner(regionWidth.getLengthI(),1,500,1);
 
 		spinnerScale = new JSpinner(new SpinnerNumberModel(scale,0,2.0,0.05));
 		configureSpinnerFloat(spinnerScale);
@@ -125,7 +126,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 
 		addLabeled(comboType, "Type", this);
 		addLabeled(spinnerThreshold, "Threshold", this);
-		addLabeled(spinnerRadius, "Radius", this);
+		addLabeled(spinnerWidth, "Width", this);
 		addLabeled(spinnerScale, "Scale", this);
 		addAlignCenter(togglePanels, this);
 
@@ -137,11 +138,11 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		updateThresholdValue();
 	}
 
-	public void setRadius(int value ) {
-		spinnerRadius.removeChangeListener(this);
-		spinnerRadius.setValue(value);
-		this.radius = value;
-		spinnerRadius.addChangeListener(this);
+	public void setRegionWidth(int value ) {
+		spinnerWidth.removeChangeListener(this);
+		spinnerWidth.setValue(value);
+		this.regionWidth = ConfigLength.fixed(value);
+		spinnerWidth.addChangeListener(this);
 	}
 
 	private void updateThresholdValue() {
@@ -211,15 +212,15 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		if(isAdaptive) {
 			spinnerThreshold.setEnabled(false);
 			if(isThresholdGlobal) {
-				spinnerRadius.setEnabled(false);
+				spinnerWidth.setEnabled(false);
 				spinnerScale.setEnabled(false);
 			} else {
-				spinnerRadius.setEnabled(true);
+				spinnerWidth.setEnabled(true);
 				spinnerScale.setEnabled(true);
 			}
 		} else {
 			spinnerThreshold.setEnabled(true);
-			spinnerRadius.setEnabled(false);
+			spinnerWidth.setEnabled(false);
 			spinnerScale.setEnabled(false);
 		}
 
@@ -249,7 +250,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		updateThresholdValue();
 
 		spinnerThreshold.repaint();
-		spinnerRadius.repaint();
+		spinnerWidth.repaint();
 		spinnerScale.repaint();
 	}
 
@@ -267,8 +268,8 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 			}
 			updateThresholdValue();
 			listener.imageThresholdUpdated();
-		} else if( e.getSource() == spinnerRadius ) {
-			radius = ((Number) spinnerRadius.getValue()).intValue();
+		} else if( e.getSource() == spinnerWidth) {
+			regionWidth.length = ((Number) spinnerWidth.getValue()).intValue();
 			listener.imageThresholdUpdated();
 		} else if( e.getSource() == spinnerScale ) {
 			scale = ((Number) spinnerScale.getValue()).doubleValue();
@@ -287,18 +288,18 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 
 	public void setConfiguration(ConfigThreshold configuration) {
 		comboType.removeActionListener(this);
-		spinnerRadius.removeChangeListener(this);
+		spinnerWidth.removeChangeListener(this);
 		spinnerScale.removeChangeListener(this);
 		buttonUpDown.removeActionListener(this);
 
 
 		comboType.setSelectedIndex(configuration.type.ordinal());
-		spinnerRadius.setValue(configuration.radius);
+		spinnerWidth.setValue(configuration.width.getLengthI());
 		spinnerScale.setValue(configuration.scale);
 		buttonUpDown.setSelected(configuration.down);
 
 		type = configuration.type;
-		radius = configuration.radius;
+		regionWidth = configuration.width.copy();
 		scale = configuration.scale;
 		down = configuration.down;
 		if( type == ThresholdType.FIXED ) {
@@ -311,7 +312,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		}
 
 		comboType.addActionListener(this);
-		spinnerRadius.addChangeListener(this);
+		spinnerWidth.addChangeListener(this);
 		spinnerScale.addChangeListener(this);
 		buttonUpDown.addActionListener(this);
 
@@ -345,7 +346,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		config.type = type;
 		config.scale = scale;
 		config.down = down;
-		config.radius = radius;
+		config.width = regionWidth.copy();
 		config.savolaK = savolaK;
 		config.minPixelValue = minPixelValue;
 		config.maxPixelValue = maxPixelValue;

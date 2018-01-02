@@ -20,6 +20,7 @@ package boofcv.alg.filter.binary;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.impl.GenericThresholdCommon;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 
 /**
@@ -32,6 +33,6 @@ public class TestThresholdLocalOtsu extends GenericThresholdCommon<GrayU8> {
 
 	@Override
 	public InputToBinary<GrayU8> createAlg(int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdLocalOtsu(requestedBlockWidth, 0, 1.0,down);
+		return new ThresholdLocalOtsu(true,ConfigLength.fixed(requestedBlockWidth), 0, 1.0,down);
 	}
 }

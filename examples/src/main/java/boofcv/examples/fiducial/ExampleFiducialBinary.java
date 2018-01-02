@@ -63,7 +63,7 @@ public class ExampleFiducialBinary {
 
 		// Detect the fiducial
 		FiducialDetector<GrayF32> detector = FactoryFiducial.squareBinary(
-				new ConfigFiducialBinary(0.1), ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 10), GrayF32.class);
+				new ConfigFiducialBinary(0.1), ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21), GrayF32.class);
 //				new ConfigFiducialBinary(0.1), ConfigThreshold.fixed(100),GrayF32.class);
 
 		detector.setLensDistortion(lensDistortion);

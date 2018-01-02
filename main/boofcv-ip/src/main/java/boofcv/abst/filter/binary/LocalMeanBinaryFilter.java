@@ -19,6 +19,7 @@
 package boofcv.abst.filter.binary;
 
 import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -26,7 +27,7 @@ import boofcv.struct.image.ImageType;
 /**
  * Adaptive/local threshold using a square region
  *
- * @see boofcv.alg.filter.binary.GThresholdImageOps#localMean(ImageGray, GrayU8, int, double, boolean, ImageGray, ImageGray)
+ * @see boofcv.alg.filter.binary.GThresholdImageOps#localMean(ImageGray, GrayU8, ConfigLength, double, boolean, ImageGray, ImageGray)
  *
  * @author Peter Abeles
  */
@@ -37,16 +38,16 @@ public class LocalMeanBinaryFilter<T extends ImageGray<T>> implements InputToBin
 	T work1;
 	ImageGray work2;
 
-	int radius;
+	ConfigLength regionWidth;
 	double scale;
 	boolean down;
 
 	/**
 	 * @see GThresholdImageOps#localMean
 	 */
-	public LocalMeanBinaryFilter(int radius, double scale, boolean down,
+	public LocalMeanBinaryFilter(ConfigLength width, double scale, boolean down,
 								 ImageType<T> inputType) {
-		this.radius = radius;
+		this.regionWidth = width;
 		this.scale = scale;
 		this.down = down;
 		this.inputType = inputType;
@@ -58,7 +59,7 @@ public class LocalMeanBinaryFilter<T extends ImageGray<T>> implements InputToBin
 	public void process(T input, GrayU8 output) {
 		work1.reshape(input.width,input.height);
 		work2.reshape(input.width,input.height);
-		GThresholdImageOps.localMean(input, output, radius, scale, down, work1, work2);
+		GThresholdImageOps.localMean(input, output, regionWidth, scale, down, work1, work2);
 	}
 
 	@Override

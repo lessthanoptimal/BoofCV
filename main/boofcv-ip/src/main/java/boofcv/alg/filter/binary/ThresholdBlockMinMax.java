@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
 
@@ -62,7 +63,7 @@ public abstract class ThresholdBlockMinMax
 	 *                         value then it is considered textureless.  Set to &le; -1 to disable.
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 */
-	public ThresholdBlockMinMax(double minimumSpread, int requestedBlockWidth,
+	public ThresholdBlockMinMax(double minimumSpread, ConfigLength requestedBlockWidth,
 								boolean thresholdFromLocalBlocks, Class<T> imageType ) {
 		super(requestedBlockWidth,thresholdFromLocalBlocks,imageType);
 		this.minimumSpread = minimumSpread;

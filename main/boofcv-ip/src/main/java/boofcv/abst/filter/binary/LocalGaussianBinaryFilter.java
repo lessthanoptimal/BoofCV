@@ -19,6 +19,7 @@
 package boofcv.abst.filter.binary;
 
 import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -26,7 +27,7 @@ import boofcv.struct.image.ImageType;
 /**
  * Adaptive/local threshold using a Gaussian region
  *
- * @see boofcv.alg.filter.binary.GThresholdImageOps#localGaussian(ImageGray, GrayU8, int, double, boolean, ImageGray, ImageGray)
+ * @see boofcv.alg.filter.binary.GThresholdImageOps#localGaussian(ImageGray, GrayU8, ConfigLength, double, boolean, ImageGray, ImageGray)
  *
  * @author Peter Abeles
  */
@@ -37,16 +38,16 @@ public class LocalGaussianBinaryFilter<T extends ImageGray<T>> implements InputT
 	T work1;
 	ImageGray work2;
 
-	int radius;
+	ConfigLength regionWidth;
 	double scale;
 	boolean down;
 
 	/**
 	 * @see GThresholdImageOps#localGaussian
 	 */
-	public LocalGaussianBinaryFilter(int radius, double scale, boolean down,
+	public LocalGaussianBinaryFilter(ConfigLength regionWidth, double scale, boolean down,
 									 ImageType<T> inputType) {
-		this.radius = radius;
+		this.regionWidth = regionWidth;
 		this.scale = scale;
 		this.down = down;
 		this.inputType = inputType;
@@ -58,7 +59,7 @@ public class LocalGaussianBinaryFilter<T extends ImageGray<T>> implements InputT
 	public void process(T input, GrayU8 output) {
 		work1.reshape(input.width,input.height);
 		work2.reshape(input.width,input.height);
-		GThresholdImageOps.localGaussian(input, output, radius, scale, down, work1, work2);
+		GThresholdImageOps.localGaussian(input, output, regionWidth, scale, down, work1, work2);
 	}
 
 	@Override

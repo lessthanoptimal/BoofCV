@@ -19,6 +19,7 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.filter.binary.ThresholdBlockMean;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 
 /**
@@ -34,6 +35,6 @@ public class TestThresholdBlockMean_U8
 	@Override
 	public ThresholdBlockMean<GrayU8>
 	createAlg( int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdBlockMean_U8(requestedBlockWidth,scale,down, true);
+		return new ThresholdBlockMean_U8(ConfigLength.fixed(requestedBlockWidth),scale,down, true);
 	}
 }

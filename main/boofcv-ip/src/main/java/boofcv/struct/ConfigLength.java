@@ -42,7 +42,7 @@ public class ConfigLength implements Configuration {
 	public ConfigLength() {
 	}
 
-	public static ConfigLength fixed(int pixels ) {
+	public static ConfigLength fixed(double pixels ) {
 		return new ConfigLength(pixels,-1);
 	}
 

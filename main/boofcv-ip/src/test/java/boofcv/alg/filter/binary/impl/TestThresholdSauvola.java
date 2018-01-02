@@ -21,6 +21,7 @@ package boofcv.alg.filter.binary.impl;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
@@ -41,10 +42,10 @@ public class TestThresholdSauvola {
 	 */
 	@Test
 	public void simple() {
-		int radius = 5;
+		int width = 11;
 		GrayU8 expected = new GrayU8(30,35);
 
-		for (int y = radius; y < expected.height-radius; y++) {
+		for (int y = width/2; y < expected.height-width/2; y++) {
 			expected.set(20,y,1);
 			expected.set(21,y,1);
 			expected.set(22,y,1);
@@ -57,7 +58,10 @@ public class TestThresholdSauvola {
 
 		GrayU8 found = new GrayU8(expected.width,expected.height);
 
-		ThresholdSauvola alg = new ThresholdSauvola(radius,0.5f,true);
+		ConfigLength regionWidth = ConfigLength.fixed(width);
+		int radius = regionWidth.computeI(Math.min(input.width,input.height))/2;
+
+		ThresholdSauvola alg = new ThresholdSauvola(regionWidth,0.5f,true);
 
 		alg.process(input,found);
 
@@ -72,13 +76,13 @@ public class TestThresholdSauvola {
 
 	@Test
 	public void bruteForce() {
-		int radius = 2;
+		int width = 5;
 		float k = 0.5f;
-		checkBruteForce(10, 12, radius, k, true);
-		checkBruteForce(10, 12, radius, k, false);
+		checkBruteForce(10, 12, width, k, true);
+		checkBruteForce(10, 12, width, k, false);
 	}
 
-	private void checkBruteForce(int w, int h, int radius, float k, boolean down) {
+	private void checkBruteForce(int w, int h, int width, float k, boolean down) {
 		GrayU8 expected = new GrayU8(w,h);
 		GrayU8 found = new GrayU8(w,h);
 		GrayF32 input = new GrayF32(w,h);
@@ -89,9 +93,9 @@ public class TestThresholdSauvola {
 
 		for (int y = 0; y < h; y++) {
 			for (int x = 0; x < w; x++) {
-				float m = mean(input, x, y, radius);
+				float m = mean(input, x, y, width/2);
 				mean.set(x,y,m);
-				stdev.set(x,y,stdev(input, m, x, y, radius));
+				stdev.set(x,y,stdev(input, m, x, y, width/2));
 			}
 		}
 
@@ -105,7 +109,7 @@ public class TestThresholdSauvola {
 			}
 		}
 
-		ThresholdSauvola alg = new ThresholdSauvola(radius,k,down);
+		ThresholdSauvola alg = new ThresholdSauvola(ConfigLength.fixed(width),k,down);
 		alg.process(input,found);
 
 //		expected.printBinary();

@@ -54,7 +54,7 @@ public class FactoryFiducial {
 													  Class<T> imageType ) {
 
 		if( configThreshold == null ) {
-			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,10);
+			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,21);
 		}
 
 		configFiducial.checkValidity();
@@ -90,7 +90,7 @@ public class FactoryFiducial {
 													Class<T> imageType ) {
 
 		if( configThreshold == null ) {
-			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,10);
+			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,21);
 		}
 
 		configFiducial.squareDetector.detector.clockwise = false;

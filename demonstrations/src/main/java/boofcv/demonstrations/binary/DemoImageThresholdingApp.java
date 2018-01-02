@@ -27,6 +27,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -80,7 +81,7 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>> extends SelectInpu
 
 		int threshValue = control.getValueThreshold();
 		boolean thresholdDown = control.getDirection();
-		int threshRadius = control.getThreshRadius();
+		ConfigLength threshWidth = ConfigLength.fixed(control.getThreshWidth());
 		double threshScale = control.getScale();
 
 		switch( which ) {
@@ -100,22 +101,22 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>> extends SelectInpu
 
 			case 3:
 				GThresholdImageOps.localMean(imageInput, imageBinary,
-						threshRadius, threshScale, thresholdDown, null, null);
+						threshWidth, threshScale, thresholdDown, null, null);
 				break;
 
 			case 4:
 				GThresholdImageOps.localGaussian(imageInput, imageBinary,
-						threshRadius, threshScale, thresholdDown, null, null);
+						threshWidth, threshScale, thresholdDown, null, null);
 				break;
 
 			case 5:
 				GThresholdImageOps.localSauvola(imageInput, imageBinary,
-						threshRadius, 0.3f, thresholdDown);
+						threshWidth, 0.3f, thresholdDown);
 				break;
 
 			case 6:
 				GThresholdImageOps.localBlockMinMax(imageInput, imageBinary,
-						threshRadius*2+1, threshScale, thresholdDown ,15 );
+						threshWidth, threshScale, thresholdDown ,15 );
 				break;
 		}
 

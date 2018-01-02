@@ -25,6 +25,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.ConvertImage;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
@@ -51,7 +52,7 @@ public class BenchmarkThresholding {
 	static int threshLower = 20;
 	static int threshUpper = 30;
 
-	static int adaptiveRadius = 6;
+	static ConfigLength adaptiveWidth = ConfigLength.fixed(13);
 
 	public BenchmarkThresholding() {
 		Random rand = new Random(234);
@@ -69,26 +70,26 @@ public class BenchmarkThresholding {
 	public static class LocalSquare extends PerformerBase {
 		@Override
 		public void process() {
-			ThresholdImageOps.localSquare(input, output_U8, adaptiveRadius, 0, true, work, work2);
+			ThresholdImageOps.localSquare(input, output_U8, adaptiveWidth, 0, true, work, work2);
 		}
 	}
 
 	public static class LocalGaussian extends PerformerBase {
 		@Override
 		public void process() {
-			ThresholdImageOps.localGaussian(input, output_U8, adaptiveRadius, 0, true, work, work2);
+			ThresholdImageOps.localGaussian(input, output_U8, adaptiveWidth, 0, true, work, work2);
 		}
 	}
 
 	public static class LocalSauvola extends PerformerBase {
 		@Override
 		public void process() {
-			GThresholdImageOps.localSauvola(input, output_U8, adaptiveRadius, 0.3f, true);
+			GThresholdImageOps.localSauvola(input, output_U8, adaptiveWidth, 0.3f, true);
 		}
 	}
 
 	public static class LocalSauvola2 extends PerformerBase {
-		ThresholdSauvola alg = new ThresholdSauvola(adaptiveRadius,0.3f, true);
+		ThresholdSauvola alg = new ThresholdSauvola(adaptiveWidth,0.3f, true);
 		@Override
 		public void process() {
 			alg.process(inputF32,output_U8);
@@ -96,7 +97,7 @@ public class BenchmarkThresholding {
 	}
 
 	public static class SquareBlockMinMax_F32 extends PerformerBase {
-		ThresholdBlockMinMax_F32 alg = new ThresholdBlockMinMax_F32(2*adaptiveRadius+1,20,0.95f,true, true);
+		ThresholdBlockMinMax_F32 alg = new ThresholdBlockMinMax_F32(20,adaptiveWidth,0.95f,true, true);
 		@Override
 		public void process() {
 			alg.process(inputF32,output_U8);
@@ -104,7 +105,7 @@ public class BenchmarkThresholding {
 	}
 
 	public static class SquareBlockMinMax_U8 extends PerformerBase {
-		ThresholdBlockMinMax_U8 alg = new ThresholdBlockMinMax_U8(2*adaptiveRadius+1,20,0.95,true, true);
+		ThresholdBlockMinMax_U8 alg = new ThresholdBlockMinMax_U8(20,adaptiveWidth,0.95,true, true);
 		@Override
 		public void process() {
 			alg.process(input,output_U8);

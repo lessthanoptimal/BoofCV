@@ -20,6 +20,7 @@ package boofcv.alg.filter.binary;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.InputSanityCheck;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -27,12 +28,13 @@ import boofcv.struct.image.ImageType;
 import java.util.Arrays;
 
 /**
- * Local Otsu thresholding where each pixel is thresholded by computing the Otsu using its local region
+ * Local Otsu thresholding where each pixel is thresholded by computing the
+ * {@link GThresholdImageOps#computeOtsu2(int[], int, int)} Otsu-2} using its local region
  *
  * This implementation includes a modification from the traditional Otsu algorithm. The threshold can optionally
  * be adjusted in low variance regions. See code for details.
  *
- * @see GThresholdImageOps#computeOtsu(ImageGray, int, int)
+ * @see GThresholdImageOps#computeOtsu2(ImageGray, int, int)
  *
  * @author Peter Abeles
  */
@@ -40,35 +42,26 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 
 	ImageType<GrayU8> imageType = ImageType.single(GrayU8.class);
 
+	ComputeOtsu otsu;
+
 	int histogram[] = new int[256];
-	boolean down;
-	/**
-	 * Tuning parameter that tweaks the otsu value depending on local variance.
-	 */
-	double tuning;
 
 	// width of the local square region
+	ConfigLength regionWidthLength;
 	int regionWidth;
 
 	// number of pixels inside the local square region
 	int numPixels;
 
-	// Computed Otsu threshold
-	int threshold = 0;
-
-	double scale;
-
 	/**
 	 * Configures the detector
 	 *
-	 * @param regionWidth How wide the local square region is..
+	 * @param regionWidthLength How wide the local square region is.
 	 * @param tuning Tuning parameter. 0 = standard Otsu. Greater than 0 will penalize zero texture.
 	 */
-	public ThresholdLocalOtsu(int regionWidth, double tuning, double scale, boolean down ) {
-		this.regionWidth = regionWidth;
-		this.down = down;
-		this.scale = scale;
-		this.tuning = tuning;
+	public ThresholdLocalOtsu(boolean otsu2, ConfigLength regionWidthLength, double tuning, double scale, boolean down ) {
+		this.regionWidthLength = regionWidthLength;
+		this.otsu = new ComputeOtsu(otsu2,tuning,down,scale);
 	}
 
 	/**
@@ -78,6 +71,8 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 	 */
 	public void process(GrayU8 input , GrayU8 output ) {
 		InputSanityCheck.checkSameShape(input, output);
+
+		int regionWidth = regionWidthLength.computeI(Math.min(input.width,input.height));
 
 		if (input.width < regionWidth || input.height < regionWidth) {
 			throw new IllegalArgumentException("Image is smaller than region size");
@@ -96,11 +91,11 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 			int indexOutput = output.startIndex + y*output.stride + x0;
 
 			computeHistogram(0,y-y0,input);
-			output.data[indexOutput++] = down == (input.data[indexInput++]&0xFF) <= threshold ? (byte)1 : 0;
+			output.data[indexOutput++] = otsu.down == (input.data[indexInput++]&0xFF) <= otsu.threshold ? (byte)1 : 0;
 
 			for (int x = x0+1; x < x1; x++) {
 				updateHistogramX(x-x0,y-y0,input);
-				output.data[indexOutput++] = down == (input.data[indexInput++]&0xFF) <= threshold ? (byte)1 : 0;
+				output.data[indexOutput++] =otsu. down == (input.data[indexInput++]&0xFF) <= otsu.threshold ? (byte)1 : 0;
 			}
 		}
 
@@ -166,7 +161,7 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 			int indexOutput = output.startIndex + y*output.stride + x0;
 			int end = indexOutput + (x1-x0);
 			while ( indexOutput < end ) {
-				output.data[indexOutput++] = down == (input.data[indexInput++]&0xFF) <= threshold ? (byte)1 : 0;
+				output.data[indexOutput++] = otsu.down == (input.data[indexInput++]&0xFF) <= otsu.threshold ? (byte)1 : 0;
 			}
 		}
 	}
@@ -180,7 +175,7 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 				histogram[input.data[indexInput++] & 0xFF]++;
 			}
 		}
-		computeOtsu(histogram,numPixels);
+		otsu.compute(histogram,histogram.length,numPixels);
 	}
 
 	protected void updateHistogramX(int x0, int y0, GrayU8 input) {
@@ -189,7 +184,7 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 			histogram[input.data[indexInput] & 0xFF]--;
 			histogram[input.data[indexInput+regionWidth] & 0xFF]++;
 		}
-		computeOtsu(histogram,numPixels);
+		otsu.compute(histogram,histogram.length,numPixels);
 	}
 	protected void updateHistogramY(int x0, int y0, GrayU8 input) {
 		int offset = regionWidth*input.stride;
@@ -198,53 +193,14 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 			histogram[input.data[indexInput] & 0xFF]--;
 			histogram[input.data[indexInput+offset] & 0xFF]++;
 		}
-		computeOtsu(histogram,numPixels);
-	}
-
-	public void computeOtsu( int histogram[] , int totalPixels ) {
-
-		double dlength = 256;
-		double sum = 0;
-		for (int i=0 ; i< 256 ; i++)
-			sum += (i/dlength)*histogram[i];
-
-		double sumB = 0;
-		int wB = 0;
-
-		double variance = 0;
-
-		int i;
-		for (i=0 ; i<256 ; i++) {
-			wB += histogram[i];               // Weight Background
-			if (wB == 0) continue;
-
-			int wF = totalPixels - wB;         // Weight Foreground
-			if (wF == 0) break;
-
-			sumB += (i/dlength)*histogram[i];
-
-			double mB = sumB / wB;            // Mean Background
-			double mF = (sum - sumB) / wF;    // Mean Foreground
-
-			// Calculate Between Class Variance
-			double varBetween = (double)wB*(double)wF*(mB - mF)*(mB - mF);
-
-			// Check if new maximum found
-			if (varBetween > variance) {
-				variance = varBetween;
-				threshold = i;
-			}
-		}
-
-		// apply optional penalty to low texture regions
-		variance += 0.001; // avoid divide by zero
-		// multiply by threshold twice in an effort to have the image's scaling not effect the tuning parameter
-		int adjustment =  (int)(tuning*threshold*tuning*threshold/variance+0.5);
-		threshold += down ? -adjustment : adjustment;
-		threshold = (int)(scale*Math.max(threshold,0)+0.5);
+		otsu.compute(histogram,histogram.length,numPixels);
 	}
 
 	public ImageType<GrayU8> getImageType() {
 		return imageType;
+	}
+
+	public ComputeOtsu getOtsu() {
+		return otsu;
 	}
 }

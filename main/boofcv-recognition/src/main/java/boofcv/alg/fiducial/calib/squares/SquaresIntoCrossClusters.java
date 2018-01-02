@@ -226,4 +226,12 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			return false;
 		return distance2 <= length;
 	}
+
+	public double getMaxCornerDistance() {
+		return maxCornerDistance;
+	}
+
+	public void setMaxCornerDistance(double maxCornerDistance) {
+		this.maxCornerDistance = maxCornerDistance;
+	}
 }

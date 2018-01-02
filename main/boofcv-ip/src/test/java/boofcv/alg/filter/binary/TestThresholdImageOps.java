@@ -25,6 +25,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -76,18 +77,19 @@ public class TestThresholdImageOps {
 		GrayU8 expected = new GrayU8(output.width,output.height);
 
 		for( int radius = 1; radius <= 5; radius++ ) {
+			ConfigLength width = ConfigLength.fixed(radius*2+1);
 			for( int indexScale = 0; indexScale < 4; indexScale++ ) {
 				float scale = (float)(0.8+0.4*(indexScale/3.0));
 				ImageMiscOps.fillUniform(output,rand,0,200);
 				ImageMiscOps.fillUniform(expected,rand,0,200);
-				m.invoke(null,input,output,radius,scale,true,null,null);
+				m.invoke(null,input,output,width,scale,true,null,null);
 				naiveLocalSquare(input, expected, radius, scale, true);
 
 				BoofTesting.assertEquals(expected,output,0);
 
 				ImageMiscOps.fillUniform(output,rand,0,200);
 				ImageMiscOps.fillUniform(expected,rand,0,200);
-				m.invoke(null,input,output,radius,scale,false,null,null);
+				m.invoke(null,input,output,width,scale,false,null,null);
 				naiveLocalSquare(input, expected, radius, scale, false);
 
 				BoofTesting.assertEquals(expected,output,0);
@@ -170,18 +172,19 @@ public class TestThresholdImageOps {
 
 		for( int radius = 1; radius <= 5; radius++ ) {
 			for( int indexScale = 0; indexScale < 4; indexScale++ ) {
+				ConfigLength width = ConfigLength.fixed(radius*2+1);
 				float scale = (float)(0.8+0.4*(indexScale/3.0));
 
 				ImageMiscOps.fillUniform(output,rand,0,200);
 				ImageMiscOps.fillUniform(expected,rand,0,200);
-				m.invoke(null,input,output,radius,scale,true,null,null);
+				m.invoke(null,input,output,width,scale,true,null,null);
 				naiveLocalGaussian(input, expected, radius, scale, true);
 
 				BoofTesting.assertEquals(expected,output,0);
 
 				ImageMiscOps.fillUniform(output, rand, 0, 200);
 				ImageMiscOps.fillUniform(expected,rand,0,200);
-				m.invoke(null, input, output, radius, scale, false, null, null);
+				m.invoke(null, input, output, width, scale, false, null, null);
 				naiveLocalGaussian(input, expected, radius, scale, false);
 
 				BoofTesting.assertEquals(expected,output,0);

@@ -42,7 +42,7 @@ public class ConfigSquareGridBinary implements Configuration {
 	/**
 	 * Description of image thresholding algorithm
 	 */
-	public ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,20);
+	public ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,41);
 
 	/**
 	 * Ordered list of expected square fiducial ID numbers.  Starts from top left and follows a row major

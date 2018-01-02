@@ -26,6 +26,8 @@ import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.UtilImageIO;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
@@ -95,13 +97,19 @@ public class TestDetectChessboardFiducial {
 //		detectorSquare.setVerbose(true);
 
 		InputToBinary<GrayF32> inputToBinary;
-		if( localThreshold )
-			inputToBinary = FactoryThresholdBinary.blockMinMax(10,0.90,true,10,true,GrayF32.class);
-		else
+		if( localThreshold ) {
+			if( !configChess.thresholding.type.isAdaptive() )
+				throw new RuntimeException("This assumes that the default is local. Update unit test by specifying a local");
+			inputToBinary = FactoryThresholdBinary.threshold(configChess.thresholding, GrayF32.class);
+		} else
 			inputToBinary = FactoryThresholdBinary.globalFixed(50,true,GrayF32.class);
 
 		DetectChessboardFiducial alg =
-				new DetectChessboardFiducial(numRows, numCols, 4,detectorSquare,inputToBinary);
+				new DetectChessboardFiducial(numRows, numCols, ConfigLength.fixed(4),detectorSquare,inputToBinary);
+
+		if( !alg.process(gray)) {
+			UtilImageIO.saveImage(gray,"savedchessboard.png");
+		}
 
 		assertTrue(alg.process(gray));
 
@@ -126,7 +134,9 @@ public class TestDetectChessboardFiducial {
 
 	public GrayF32 renderTarget(int numRows, int numCols) {
 		GrayF32 gray = new GrayF32(w,h);
-		ImageMiscOps.fill(gray,80f);
+		float backgroundValue = 150f;
+		float squareValue = 20f;
+		ImageMiscOps.fill(gray,backgroundValue);
 
 		int numCols2 = numCols/2;
 		int numRows2 = numRows/2;
@@ -140,7 +150,7 @@ public class TestDetectChessboardFiducial {
 				int pixelY = 2*y*squareLength+offsetY;
 				int pixelX = 2*x*squareLength+offsetX;
 
-				ImageMiscOps.fillRectangle(gray, 20, pixelX, pixelY, squareLength, squareLength);
+				ImageMiscOps.fillRectangle(gray, squareValue, pixelX, pixelY, squareLength, squareLength);
 			}
 		}
 		for( int y = 0; y < numRows2; y++) {
@@ -148,14 +158,14 @@ public class TestDetectChessboardFiducial {
 				int pixelY = 2*y*squareLength+offsetY+squareLength;
 				int pixelX = 2*x*squareLength+offsetX+squareLength;
 
-				ImageMiscOps.fillRectangle(gray, 20, pixelX, pixelY, squareLength, squareLength);
+				ImageMiscOps.fillRectangle(gray, squareValue, pixelX, pixelY, squareLength, squareLength);
 			}
 		}
 
 		if( transform != null ) {
 			GrayF32 distorted = new GrayF32(gray.width,gray.height);
 			FDistort f = new FDistort(gray,distorted);
-			f.border(80f).affine(transform.c,-transform.s,transform.s,transform.c,
+			f.border(backgroundValue).affine(transform.c,-transform.s,transform.s,transform.c,
 					transform.T.x,transform.T.y).apply();
 			gray = distorted;
 		}

@@ -47,15 +47,17 @@ public class ConfigChessboard implements Configuration {
 
 	/**
 	 * The maximum distance in pixels that two corners can be from each other.  In well focused image
-	 * this number can be only a few pixels.  The default value has been selected to handle blurred images
+	 * this number can be only a few pixels.  The default value has been selected to handle blurred images.
+	 *
+	 * If relative it is relative to min(image.width,image.height)
 	 */
-	public double maximumCornerDistance = 8;
+	public ConfigLength maximumCornerDistance = ConfigLength.relative(8.0/800.0,8);
 
 	/**
 	 * Configuration for thresholding the image
 	 */
-//	public ConfigThreshold thresholding = new ConfigThresholdBlockMinMax(10,35,true);
-	public ConfigThreshold thresholding = new ConfigThresholdLocalOtsu(10,10);
+//	public ConfigThreshold thresholding = new ConfigThresholdBlockMinMax(21,35,true);
+	public ConfigThreshold thresholding = new ConfigThresholdLocalOtsu(ConfigLength.relative(0.05,10),10);
 
 	/**
 	 * Configuration for square detector.

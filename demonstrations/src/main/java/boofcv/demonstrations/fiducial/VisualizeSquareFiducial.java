@@ -57,7 +57,7 @@ import java.util.List;
  */
 public class VisualizeSquareFiducial {
 
-	static ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,6);
+	static ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,13);
 
 	static InputToBinary<GrayF32> inputToBinary = FactoryThresholdBinary.threshold(configThreshold, GrayF32.class);
 

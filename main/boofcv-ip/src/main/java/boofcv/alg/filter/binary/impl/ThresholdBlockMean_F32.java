@@ -19,6 +19,7 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.filter.binary.ThresholdBlockMean;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 
@@ -33,7 +34,7 @@ public class ThresholdBlockMean_F32
 	float scale;
 	boolean down;
 
-	public ThresholdBlockMean_F32(int requestedBlockWidth, double scale , boolean down, boolean thresholdFromLocalBlocks ) {
+	public ThresholdBlockMean_F32(ConfigLength requestedBlockWidth, double scale , boolean down, boolean thresholdFromLocalBlocks ) {
 		super(requestedBlockWidth,thresholdFromLocalBlocks,GrayF32.class);
 		this.stats = new GrayF32(1,1);
 		this.scale = (float)scale;

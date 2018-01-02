@@ -27,6 +27,7 @@ import boofcv.alg.misc.PixelMath;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
@@ -113,7 +114,7 @@ public class TestDetectChessboardSquarePoints {
 		DetectPolygonBinaryGrayRefine<GrayU8> detectorSquare = FactoryShapeDetector.
 				polygon(new ConfigPolygonDetector(4,4),GrayU8.class);
 		DetectChessboardSquarePoints<GrayU8> alg =
-				new DetectChessboardSquarePoints<>(rows, cols,2, detectorSquare);
+				new DetectChessboardSquarePoints<>(rows, cols, ConfigLength.fixed(2), detectorSquare);
 
 //		System.out.println("test grid "+ gridWidth + " " + gridHeight);
 		assertTrue(alg.process(gray, binary));
@@ -190,7 +191,7 @@ public class TestDetectChessboardSquarePoints {
 		DetectPolygonBinaryGrayRefine<GrayU8> detectorSquare = FactoryShapeDetector.
 				polygon(new ConfigPolygonDetector(4,4),GrayU8.class);
 		DetectChessboardSquarePoints<GrayU8> alg =
-				new DetectChessboardSquarePoints<>(gridWidth,gridHeight,2, detectorSquare);
+				new DetectChessboardSquarePoints<>(gridWidth,gridHeight,ConfigLength.fixed(2), detectorSquare);
 
 		assertFalse(alg.process(gray, binary));
 	}
@@ -199,7 +200,7 @@ public class TestDetectChessboardSquarePoints {
 	public void putIntoCanonical() {
 		SquareGridTools tools = new SquareGridTools();
 
-		DetectChessboardSquarePoints alg = new DetectChessboardSquarePoints(2,2,10,null);
+		DetectChessboardSquarePoints alg = new DetectChessboardSquarePoints(2,2,ConfigLength.fixed(10),null);
 		for (int rows = 2; rows <= 5; rows++) {
 			for (int cols = 2; cols <= 5; cols++) {
 				SquareGrid uber = createGrid(rows, cols);
@@ -241,7 +242,7 @@ public class TestDetectChessboardSquarePoints {
 
 		int shapes[][] = new int[][]{{4,5},{2,3},{3,2},{2,2}};
 
-		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,0.01,null);
+		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,ConfigLength.fixed(0.01),null);
 
 		for( int[]shape : shapes ) {
 //			System.out.println(shape[0]+" "+shape[1]);
@@ -313,7 +314,7 @@ public class TestDetectChessboardSquarePoints {
 	@Test
 	public void computeCalibrationPoints() {
 
-		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,0.01,null);
+		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,ConfigLength.fixed(0.01),null);
 
 		double w = TestSquareRegularClustersIntoGrids.DEFAULT_WIDTH;
 
@@ -347,7 +348,7 @@ public class TestDetectChessboardSquarePoints {
 	@Test
 	public void adjustBeforeOptimize() {
 
-		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,0.01,null);
+		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,ConfigLength.fixed(0.01),null);
 
 		Polygon2D_F64 polygon = new Polygon2D_F64(10,12,30,12,30,40,10,40);
 
@@ -384,7 +385,7 @@ public class TestDetectChessboardSquarePoints {
 
 	@Test
 	public void adjustBeforeOptimize_touchesBorder() {
-		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,0.01,null);
+		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,ConfigLength.fixed(0.01),null);
 
 
 		GrowQueue_B touches = new GrowQueue_B();

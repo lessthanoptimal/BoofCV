@@ -19,6 +19,7 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.filter.binary.ThresholdBlockMinMax;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 
 /**
@@ -35,7 +36,7 @@ public class TestThresholdBlockMinMax_U8
 	@Override
 	public ThresholdBlockMinMax<GrayU8, ?>
 	createAlg(double textureThreshold, int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdBlockMinMax_U8(textureThreshold,requestedBlockWidth,
+		return new ThresholdBlockMinMax_U8(textureThreshold, ConfigLength.fixed(requestedBlockWidth),
 				scale,down,true);
 	}
 }

@@ -23,6 +23,7 @@ import boofcv.alg.filter.binary.impl.ThresholdSauvola;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.*;
 
 
@@ -58,6 +59,30 @@ public class GThresholdImageOps {
 	}
 
 	/**
+	 * <p>
+	 * Computes the variance based threshold using a modified Otsu method from an input image. Internally it uses
+	 * {@link #computeOtsu2(int[], int, int)} and {@link boofcv.alg.misc.GImageStatistics#histogram(ImageGray, int, int[])}
+	 * </p>
+	 *
+	 * @param input Input gray-scale image
+	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
+	 * @return Selected threshold.
+	 */
+	public static int computeOtsu2(ImageGray input , int minValue , int maxValue ) {
+
+		int range = 1+maxValue - minValue;
+		int histogram[] = new int[ range ];
+
+		GImageStatistics.histogram(input,minValue,histogram);
+
+		// Total number of pixels
+		int total = input.width*input.height;
+
+		return computeOtsu2(histogram,range,total)+minValue;
+	}
+
+	/**
 	 * Computes the variance based Otsu threshold from a histogram directly. The threshold is selected by minimizing the
 	 * spread of both foreground and background pixel values.
 	 *
@@ -71,11 +96,12 @@ public class GThresholdImageOps {
 	// modifications to reduce overflow
 	public static int computeOtsu( int histogram[] , int length , int totalPixels ) {
 
+		// NOTE: ComputeOtsu is not used here since that will create memory.
+
 		double dlength = length;
 		double sum = 0;
 		for (int i=0 ; i< length ; i++)
 			sum += (i/dlength)*histogram[i];
-
 
 		double sumB = 0;
 		int wB = 0;
@@ -87,7 +113,7 @@ public class GThresholdImageOps {
 			wB += histogram[i];               // Weight Background
 			if (wB == 0) continue;
 
-			int wF = totalPixels - wB;         // Weight Foreground
+			int wF = totalPixels - wB;        // Weight Foreground
 			if (wF == 0) break;
 
 			sumB += (i/dlength)*histogram[i];
@@ -97,6 +123,63 @@ public class GThresholdImageOps {
 
 			// Calculate Between Class Variance
 			double varBetween = (double)wB*(double)wF*(mB - mF)*(mB - mF);
+
+			// Check if new maximum found
+			if (varBetween > varMax) {
+				varMax = varBetween;
+				threshold = i;
+			}
+		}
+
+		return threshold;
+	}
+
+	/**
+	 * Computes a modified modified Otsu threshold which maximizes the distance from the distributions means. In
+	 * extremely sparse histograms with the values clustered at the two means Otsu will select a threshold which
+	 * is at the lower peak and in binary data this can cause a total failure.
+	 *
+	 * @param histogram Histogram of pixel intensities.
+	 * @param length Number of elements in the histogram.
+	 * @param totalPixels Total pixels in the image
+	 * @return Selected threshold
+	 */
+	public static int computeOtsu2( int histogram[] , int length , int totalPixels ) {
+
+		// NOTE: ComputeOtsu is not used here since that will create memory.
+
+		double dlength = length;
+		double sum = 0;
+		for (int i=0 ; i< length ; i++)
+			sum += (i/dlength)*histogram[i];
+
+		double sumB = 0;
+		int wB = 0;
+
+		double varMax = 0;
+		int threshold = 0;
+
+		for (int i=0 ; i<length ; i++) {
+			wB += histogram[i];               // Weight Background
+			if (wB == 0) continue;
+
+			int wF = totalPixels - wB;        // Weight Foreground
+			if (wF == 0) break;
+
+			double f = i/dlength;
+			sumB += f*histogram[i];
+
+			double mB = sumB / wB;            // Mean Background
+			double mF = (sum - sumB) / wF;    // Mean Foreground
+
+			// used to select the value which maximizes the distance between the background and foreground
+			// This is very important when the histogram is sparse. Without it it's forced to select one of
+			// the non-zero values and might fail. The reference algorithm doesn't include this modification.
+			double d0 = (f-mB);
+			double d1 = (mF-f);
+
+			// Calculate Between Class Variance
+			double varBetween = (double)wB*(double)wF*(mB - mF)*(mB - mF)/(d0*d0 + d1*d1);
 
 			// Check if new maximum found
 			if (varBetween > varMax) {
@@ -247,7 +330,7 @@ public class GThresholdImageOps {
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
-	 * @param radius Radius of square region.
+	 * @param width Width of square region.
 	 * @param scale Scale factor used to adjust threshold
 	 * @param down Should it threshold up or down.
 	 * @param work1 (Optional) Internal workspace.  Can be null
@@ -256,13 +339,13 @@ public class GThresholdImageOps {
 	 */
 	public static <T extends ImageGray<T>>
 	GrayU8 localMean(T input, GrayU8 output,
-					 int radius, double scale, boolean down, T work1, T work2)
+					 ConfigLength width, double scale, boolean down, T work1, T work2)
 	{
 		if( input instanceof GrayF32) {
-			return ThresholdImageOps.localSquare((GrayF32) input, output, radius, (float) scale, down,
+			return ThresholdImageOps.localSquare((GrayF32) input, output, width, (float) scale, down,
 					(GrayF32) work1, (GrayF32) work2);
 		} else if( input instanceof GrayU8) {
-			return ThresholdImageOps.localSquare((GrayU8) input, output, radius, (float) scale, down,
+			return ThresholdImageOps.localSquare((GrayU8) input, output, width, (float) scale, down,
 					(GrayU8) work1, (GrayU8) work2);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
@@ -284,7 +367,7 @@ public class GThresholdImageOps {
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
-	 * @param radius Radius of square region.
+	 * @param width Width of square region.
 	 * @param scale Scale factor used to adjust threshold
 	 * @param down Should it threshold up or down.
 	 * @param work1 (Optional) Internal workspace.  Can be null
@@ -293,14 +376,14 @@ public class GThresholdImageOps {
 	 */
 	public static <T extends ImageGray<T>>
 	GrayU8 localGaussian(T input, GrayU8 output,
-						 int radius, double scale, boolean down,
+						 ConfigLength width, double scale, boolean down,
 						 T work1, ImageGray work2)
 	{
 		if( input instanceof GrayF32) {
-			return ThresholdImageOps.localGaussian((GrayF32) input, output, radius, (float) scale, down,
+			return ThresholdImageOps.localGaussian((GrayF32) input, output, width, (float) scale, down,
 					(GrayF32) work1, (GrayF32) work2);
 		} else if( input instanceof GrayU8) {
-			return ThresholdImageOps.localGaussian((GrayU8) input, output, radius, (float) scale, down,
+			return ThresholdImageOps.localGaussian((GrayU8) input, output, width, (float) scale, down,
 					(GrayU8) work1, (GrayU8) work2);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
@@ -315,15 +398,15 @@ public class GThresholdImageOps {
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
-	 * @param radius Radius of local region.  Try 15
+	 * @param width Width of square region.
 	 * @param k Positive parameter used to tune threshold.  Try 0.3
 	 * @param down Should it threshold up or down.
 	 * @return binary image
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localSauvola(T input, GrayU8 output, int radius, float k, boolean down)
+	GrayU8 localSauvola(T input, GrayU8 output, ConfigLength width, float k, boolean down)
 	{
-		ThresholdSauvola alg = new ThresholdSauvola(radius,k, down);
+		ThresholdSauvola alg = new ThresholdSauvola(width,k, down);
 
 		if( output == null )
 			output = new GrayU8(input.width,input.height);
@@ -345,17 +428,17 @@ public class GThresholdImageOps {
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
-	 * @param radius Radius of square region.
+	 * @param width Width of square region.
 	 * @param scale Scale factor used to adjust threshold
 	 * @param down Should it threshold up or down.
 	 * @param textureThreshold If the min and max values are within this threshold the pixel will be set to 1.
 	 * @return Binary image
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localBlockMinMax(T input, GrayU8 output, int radius, double scale , boolean down, double textureThreshold)
+	GrayU8 localBlockMinMax(T input, GrayU8 output, ConfigLength width, double scale , boolean down, double textureThreshold)
 	{
 		InputToBinary<T> alg = FactoryThresholdBinary.blockMinMax(
-				radius*2+1,scale,down,textureThreshold,true,(Class)input.getClass());
+				width,scale,down,textureThreshold,true,(Class)input.getClass());
 
 		if( output == null )
 			output = new GrayU8(input.width,input.height);
@@ -371,15 +454,15 @@ public class GThresholdImageOps {
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
-	 * @param radius Radius of square region.
+	 * @param width Width of square region.
 	 * @param scale Scale factor used to adjust threshold
 	 * @param down Should it threshold up or down.
 	 * @return Binary image
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localBlockMean(T input, GrayU8 output, int radius, double scale , boolean down)
+	GrayU8 localBlockMean(T input, GrayU8 output, ConfigLength width, double scale , boolean down)
 	{
-		InputToBinary<T> alg = FactoryThresholdBinary.blockMean(radius * 2 + 1, scale, down,true,
+		InputToBinary<T> alg = FactoryThresholdBinary.blockMean(width, scale, down,true,
 				(Class<T>) input.getClass());
 
 		if( output == null )
@@ -396,15 +479,15 @@ public class GThresholdImageOps {
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
-	 * @param radius Radius of square region.
+	 * @param width Width of square region.
 	 * @param tuning Tuning parameter. 0 = regular Otsu
 	 * @param down Should it threshold up or down.
 	 * @return Binary image
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localBlockOtsu(T input, GrayU8 output, int radius, double tuning , double scale, boolean down)
+	GrayU8 localBlockOtsu(T input, GrayU8 output, boolean otsu2, ConfigLength width, double tuning , double scale, boolean down)
 	{
-		InputToBinary<T> alg = FactoryThresholdBinary.blockOtsu(radius * 2 + 1, tuning,
+		InputToBinary<T> alg = FactoryThresholdBinary.blockOtsu(otsu2,width, tuning,
 				scale,down,true, (Class)input.getClass());
 
 		if( output == null )
