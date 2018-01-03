@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,7 +79,7 @@ public class BinaryEllipseDetectorPixel {
 
 	private boolean internalContour = false;
 
-	private LinearContourLabelChang2004 contourFinder = new LinearContourLabelChang2004(ConnectRule.FOUR);
+	private LinearContourLabelChang2004 contourFinder;
 	private GrayS32 labeled = new GrayS32(1,1);
 
 	private FitEllipseAlgebraic_F64 algebraic = new FitEllipseAlgebraic_F64();
@@ -97,6 +97,14 @@ public class BinaryEllipseDetectorPixel {
 
 	// temporary storage for a contour
 	private FastQueue<Point2D_I32> contourTmp = new FastQueue<>(Point2D_I32.class,true);
+
+	public BinaryEllipseDetectorPixel(ConnectRule connectRule ) {
+		contourFinder = new LinearContourLabelChang2004(connectRule);
+	}
+
+	public BinaryEllipseDetectorPixel() {
+		this(ConnectRule.FOUR);
+	}
 
 	/**
 	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted.

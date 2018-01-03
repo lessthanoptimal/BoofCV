@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class FactoryShapeDetector {
 
 		config.checkValidity();
 
-		BinaryEllipseDetectorPixel detector = new BinaryEllipseDetectorPixel();
+		BinaryEllipseDetectorPixel detector = new BinaryEllipseDetectorPixel(config.contourRule);
 		detector.setMaxDistanceFromEllipse(config.maxDistanceFromEllipse);
 		detector.setMaximumContour(config.maximumContour);
 		detector.setMinimumContour(config.minimumContour);

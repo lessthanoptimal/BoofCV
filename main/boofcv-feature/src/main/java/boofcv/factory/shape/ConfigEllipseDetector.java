@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.factory.shape;
 
 import boofcv.struct.Configuration;
+import boofcv.struct.ConnectRule;
 
 /**
  * Configuration for {@link boofcv.alg.shapes.ellipse.BinaryEllipseDetector} for use in {@link FactoryShapeDetector}
@@ -40,6 +41,11 @@ public class ConfigEllipseDetector implements Configuration {
 	 * Detector: maximum number of pixels in the contour. 0 == no limit
 	 */
 	public int maximumContour = 0;
+
+	/**
+	 * Pixel connectivity rule for blob/contour finder.
+	 */
+	public ConnectRule contourRule = ConnectRule.FOUR;
 
 	/**
 	 * Minimum number of pixels in the minor axis
