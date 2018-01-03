@@ -75,7 +75,23 @@ public class JConfigLength extends JPanel implements PropertyChangeListener , Ac
 		add(textLength);
 	}
 
-	public void setLengthBounds( double min , double max ) {
+	@Override
+	public void setEnabled(boolean enabled) {
+		super.setEnabled(enabled);
+
+		if( enabled ) {
+			toggleFixed.setEnabled(true);
+			if(modeRelative)
+				toggleFixed.setEnabled(true);
+			textLength.setEnabled(true);
+		} else {
+			toggleFixed.setEnabled(false);
+			spinnerFraction.setEnabled(false);
+			textLength.setEnabled(false);
+		}
+	}
+
+	public void setLengthBounds(double min , double max ) {
 		this.minimumLength = min;
 		this.maximumLength = max;
 	}

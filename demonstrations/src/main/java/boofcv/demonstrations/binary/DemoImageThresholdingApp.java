@@ -18,8 +18,11 @@
 
 package boofcv.demonstrations.binary;
 
-import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.demonstrations.shapes.ThresholdControlPanel;
+import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.gui.SelectInputPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImagePanel;
@@ -27,7 +30,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -42,12 +44,8 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-// TODO create top panel
-// select algorithm
-// configure universal threshold
-// configure adaptive threshold
 public class DemoImageThresholdingApp<T extends ImageGray<T>> extends SelectInputPanel
-	implements DemoThresholdingPanel.Listener
+	implements ThresholdControlPanel.Listener
 {
 
 	Class<T> imageType;
@@ -56,7 +54,7 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>> extends SelectInpu
 	BufferedImage work;
 
 	ImagePanel gui = new ImagePanel();
-	DemoThresholdingPanel control = new DemoThresholdingPanel(100,false,20,1.0,this);
+	ThresholdControlPanel controlPanel = new ThresholdControlPanel(this);
 
 	boolean processedImage = false;
 
@@ -71,7 +69,7 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>> extends SelectInpu
 		JPanel body = new JPanel();
 		body.setLayout(new BorderLayout());
 
-		body.add(control,BorderLayout.WEST);
+		body.add(controlPanel,BorderLayout.WEST);
 		body.add(gui,BorderLayout.CENTER);
 
 		setMainGUI(body);
@@ -79,46 +77,10 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>> extends SelectInpu
 
 	protected void process() {
 
-		int threshValue = control.getValueThreshold();
-		boolean thresholdDown = control.getDirection();
-		ConfigLength threshWidth = ConfigLength.fixed(control.getThreshWidth());
-		double threshScale = control.getScale();
+		ConfigThreshold config = controlPanel.createConfig();
+		InputToBinary inputToBinary = FactoryThresholdBinary.threshold(config,imageInput.imageType.getImageClass());
 
-		switch( which ) {
-			case 0:
-				GThresholdImageOps.threshold(imageInput,imageBinary,threshValue,thresholdDown);
-				break;
-
-			case 1: {
-				threshValue = GThresholdImageOps.computeOtsu(imageInput,0,255);
-				GThresholdImageOps.threshold(imageInput, imageBinary, threshValue, thresholdDown);
-			} break;
-
-			case 2: {
-				threshValue = GThresholdImageOps.computeEntropy(imageInput, 0, 255);
-				GThresholdImageOps.threshold(imageInput, imageBinary, threshValue, thresholdDown);
-			} break;
-
-			case 3:
-				GThresholdImageOps.localMean(imageInput, imageBinary,
-						threshWidth, threshScale, thresholdDown, null, null);
-				break;
-
-			case 4:
-				GThresholdImageOps.localGaussian(imageInput, imageBinary,
-						threshWidth, threshScale, thresholdDown, null, null);
-				break;
-
-			case 5:
-				GThresholdImageOps.localSauvola(imageInput, imageBinary,
-						threshWidth, 0.3f, thresholdDown);
-				break;
-
-			case 6:
-				GThresholdImageOps.localBlockMinMax(imageInput, imageBinary,
-						threshWidth, threshScale, thresholdDown ,15 );
-				break;
-		}
+		inputToBinary.process(imageInput,imageBinary);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -177,16 +139,7 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>> extends SelectInpu
 	}
 
 	@Override
-	public void changeSelected(int which) {
-		this.which = which;
-
-		new Thread() {
-			public void run() { process(); }
-		}.start();
-	}
-
-	@Override
-	public void settingChanged() {
+	public void imageThresholdUpdated() {
 		new Thread() {
 			public void run() { process(); }
 		}.start();
