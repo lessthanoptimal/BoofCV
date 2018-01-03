@@ -235,57 +235,110 @@ public class TestPolylineSplitMerge {
 		c4.object.sideError = 20;
 
 		assertTrue(c2==alg.selectCornerToSplit());
+	}
 
+	/**
+	 * Case where a corner is removed and the polyline saved
+	 */
+	@Test
+	public void removeAndSaveCorner_positive() {
+		PolylineSplitMerge alg = new PolylineSplitMerge();
+		alg.setCornerScorePenalty(0.5);
+		alg.addCorner(0);
+		alg.addCorner(10);
+		alg.addCorner(14);
+		Element<Corner> useless = alg.list.getElement(2,true);
+		useless.object.sideError = 5; // give it an error so that it will be removed
+		// create a list of polylines up to 5 corners
+		assertTrue(alg.savePolyline());
+		alg.addCorner(16);
+		assertTrue(alg.savePolyline());
+		alg.addCorner(26);
+		assertTrue(alg.savePolyline());
+
+
+		// sanity check
+		PolylineSplitMerge.CandidatePolyline c = alg.getPolylines().get(1);
+		assertEquals(4,c.splits.size);
+		assertEquals(14,c.splits.get(2));
+
+		// remove the useless corner
+		assertTrue(alg.removeCornerAndSavePolyline(useless,0));
+
+		c = alg.getPolylines().get(1);
+		assertEquals(4,c.splits.size);
+		assertEquals(16,c.splits.get(2));
+	}
+
+	/**
+	 * Case where a corner is removed and the polyline NOT saved
+	 */
+	@Test
+	public void removeAndSaveCorner_negative() {
+		PolylineSplitMerge alg = new PolylineSplitMerge();
+		alg.setCornerScorePenalty(0.5);
+		alg.addCorner(0);
+		alg.addCorner(10);
+		alg.addCorner(16);
+		assertTrue(alg.savePolyline());
+		alg.addCorner(26);
+		assertTrue(alg.savePolyline());
+
+
+		// All the corners are needed and the score will get worse if removed
+		Element<Corner> selected = alg.list.getElement(1,true);
+		assertFalse(alg.removeCornerAndSavePolyline(selected,5));
+
+		PolylineSplitMerge.CandidatePolyline c = alg.getPolylines().get(0);
+		assertEquals(3,c.splits.size);
+		assertEquals(10,c.splits.get(1)); // should still be there
 	}
 
 	/**
 	 * Test case where the corner is removed
 	 */
 	@Test
-	public void selectAndRemoveCorner_positive() {
+	public void selectCornerToRemove() {
 		List<Point2D_I32> contour = rect(10,12,20,18);
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.setCornerScorePenalty(0.5);
 		alg.addCorner(0);
-		alg.addCorner(5);
-		alg.addCorner(9);
+		alg.addCorner(5);  // point less corner.
+		alg.addCorner(10);
 		alg.addCorner(16);
-		Element<Corner> e1 = alg.list.getHead();
-		Element<Corner> e2 = e1.next;
-		alg.getPolylines().grow(); // need to give a polyline to store the results in
+		alg.addCorner(26);
 
-		e1.object.sideError = 0;
-		e2.object.sideError = 0;
+		Element<Corner> expected = alg.list.getHead().next;
+		PolylineSplitMerge.ErrorValue foundError = new PolylineSplitMerge.ErrorValue();
+		Element<Corner> found = alg.selectCornerToRemove(contour,foundError);
 
-		alg.selectAndRemoveCorner(contour);
-		assertEquals(3,alg.list.size());
-		fail("update. no longer given an edge");
+		assertTrue(expected == found);
+		assertEquals(0,foundError.value, GrlConstants.TEST_F64);
+
 	}
 
 	/**
 	 * Test case where the corner is NOT removed
 	 */
 	@Test
-	public void selectAndRemoveCorner_negative() {
+	public void selectCornerToRemove_null() {
 		List<Point2D_I32> contour = rect(10,12,20,18);
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.setCornerScorePenalty(0.5);
 		alg.addCorner(0);
-		alg.addCorner(5);
-		alg.addCorner(9);
+		alg.addCorner(10);
 		alg.addCorner(16);
-		Element<Corner> e1 = alg.list.getHead().next;
-		Element<Corner> e2 = e1.next;
-		alg.getPolylines().grow(); // need to give a polyline to store the results in
 
-		e1.object.sideError = 0;
-		e2.object.sideError = 0;
+		// fails because it has 3 sides
+		PolylineSplitMerge.ErrorValue foundError = new PolylineSplitMerge.ErrorValue();
+		assertTrue( null == alg.selectCornerToRemove(contour,foundError));
 
-		alg.selectAndRemoveCorner(contour);
-		assertEquals(4,alg.list.size());
-		fail("update. no longer given an edge");
+		// won't fail because it has more than 3 corners. There is no good choice to remove but it will still pick one
+		alg.addCorner(26);
+		assertTrue( null != alg.selectCornerToRemove(contour,foundError));
+		assertTrue(foundError.value>1);
 	}
 
 	@Test

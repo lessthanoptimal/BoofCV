@@ -115,6 +115,9 @@ public class PolylineSplitMerge {
 	// if true that means a fatal error and no polygon can be fit
 	private boolean fatalError;
 
+	// storage for results
+	ErrorValue sideError = new ErrorValue();
+
 	/**
 	 * Process the contour and returns true if a polyline could be found.
 	 * @param contour Contour. Must be a ordered in CW or CCW
@@ -146,7 +149,10 @@ public class PolylineSplitMerge {
 		}
 		// remove corners and recompute scores. If the result is better it will be saved
 		while( !fatalError  ) {
-			if( !selectAndRemoveCorner(contour) ) {
+			Element<Corner> c = selectCornerToRemove(contour, sideError);
+			if( c != null ) {
+				removeCornerAndSavePolyline(c, sideError.value);
+			} else {
 				break;
 			}
 		}
@@ -454,18 +460,17 @@ public class PolylineSplitMerge {
 	}
 
 	/**
-	 * Selects a corner that can be removed and results in the best score after it has been removed.
-	 * @param contour
-	 * @return true if a corner was removed
+	 * Selects the best corner to remove. If no corner was found that can be removed then null is returned
+	 * @return The corner to remove. Should only return null if there are 3 sides or less
 	 */
-	boolean selectAndRemoveCorner(List<Point2D_I32> contour ) {
+	Element<Corner> selectCornerToRemove(List<Point2D_I32> contour , ErrorValue sideError ) {
 		if( list.size() <= 3 )
-			return false;
+			return null;
 
 		Element<Corner> target = list.getHead();
 		Element<Corner> best = null;
 		double bestScore = -Double.MAX_VALUE;
-		double newEdgeScore = -1;
+		double bestSideError = -1;
 
 		while( target != null ) {
 			Element<Corner> p = previous(target);
@@ -477,26 +482,33 @@ public class PolylineSplitMerge {
 
 			if( before-after > bestScore ) {
 				bestScore = before-after;
-				newEdgeScore = after;
 				best = target;
+				sideError.value = after;
 			}
 			target = target.next;
 		}
 
-		// See if the new shape has a better score. if so save the results
-		if( best != null ) {
-//			System.out.println("removing a corner idx="+target.object.index);
-			// Note: the corner is "lost" until the next contour is fit. Not worth the effort to recycle
-			Element<Corner> p = previous(best);
-			p.object.sideError = newEdgeScore;
-			list.remove(best);
-			// the line below is commented out because right now the current algorithm will
-			// never grow after removing a corner. If this changes in the future uncomment it
+		return best;
+	}
+
+	/**
+	 * Remove the corner from the current polyline. If the new polyline has a better score than the currently
+	 * saved one with the same number of corners save it
+	 * @param corner The corner to removed
+	 */
+	boolean removeCornerAndSavePolyline( Element<Corner> corner, double sideErrorAfterRemoved ) {
+		//			System.out.println("removing a corner idx="+target.object.index);
+		// Note: the corner is "lost" until the next contour is fit. Not worth the effort to recycle
+		Element<Corner> p = previous(corner);
+
+		// go through the hastle of passing in this value instead of recomputing it
+		// since recomputing it isn't trivial
+		p.object.sideError = sideErrorAfterRemoved;
+		list.remove(corner);
+		// the line below is commented out because right now the current algorithm will
+		// never grow after removing a corner. If this changes in the future uncomment it
 //			computePotentialSplitScore(contour,p);
-			savePolyline();
-			return true;
-		}
-		return false;
+		return savePolyline();
 	}
 
 	/**
@@ -802,6 +814,10 @@ public class PolylineSplitMerge {
 			score = Double.NaN;
 			maxSideError = Double.NaN;
 		}
+	}
+
+	static class ErrorValue {
+		public double value;
 	}
 
 	public boolean isConvex() {
