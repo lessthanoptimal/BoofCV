@@ -406,7 +406,7 @@ public class PolylineSplitMerge {
 	/**
 	 * Checks to see if the side could belong to a convex shape
 	 */
-	private boolean isSideConvex(List<Point2D_I32> contour, Element<Corner> e1) {
+	boolean isSideConvex(List<Point2D_I32> contour, Element<Corner> e1) {
 		// a conservative estimate for concavity. Assumes a triangle and that the farthest
 		// point is equal to the distance between the two corners
 

@@ -94,23 +94,28 @@ public class TestPolylineSplitMerge {
 	@Test
 	public void savePolyline() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
-
-		alg.getPolylines().grow();
-		alg.getPolylines().grow();
-		alg.getPolylines().grow();
-		alg.getPolylines().grow();
-
+		alg.setCornerScorePenalty(0.5);
+		alg.addCorner(0);
+		alg.addCorner(0);
+		alg.addCorner(0);
+		assertTrue(alg.savePolyline());
 		alg.addCorner(0).object.sideError = 10;
+		assertTrue(alg.savePolyline());
 		alg.addCorner(0);
-		alg.addCorner(0);
-		alg.addCorner(0);
+		assertTrue(alg.savePolyline());
 
-		alg.savePolyline();
-
-		assertTrue(alg.getPolylines().get(1).score > 0);
+		assertTrue(alg.getPolylines().get(1).score > 2);
 		assertEquals(4,alg.getPolylines().get(1).splits.size);
 
-		fail("update to check if saved or not");
+		// remove the bad corner and save again. The new polyline should be saved ontop of the old one
+		alg.list.remove(alg.list.getElement(3,true));
+		assertTrue(alg.savePolyline());
+
+		assertTrue(alg.getPolylines().get(1).score < 2);
+		assertEquals(4,alg.getPolylines().get(1).splits.size);
+
+		// there should be no change now
+		assertFalse(alg.savePolyline());
 	}
 
 	@Test
@@ -158,7 +163,26 @@ public class TestPolylineSplitMerge {
 
 	@Test
 	public void ensureTriangleOrder() {
-		fail("implement");
+		List<Point2D_I32> contour = rect(10,12,20,22);
+
+		// no change needed
+		PolylineSplitMerge alg = new PolylineSplitMerge();
+		alg.addCorner(0);
+		alg.addCorner(10);
+		alg.addCorner(16);
+
+		alg.ensureTriangleOrder(contour);
+		assertEquals(10,alg.list.getHead().next.object.index);
+
+		// it's in the wrong order here
+		alg = new PolylineSplitMerge();
+		alg.addCorner(0);
+		alg.addCorner(16);
+		alg.addCorner(10);
+
+		alg.ensureTriangleOrder(contour);
+		assertEquals(10,alg.list.getHead().next.object.index);
+
 	}
 
 	/**
@@ -169,7 +193,9 @@ public class TestPolylineSplitMerge {
 		List<Point2D_I32> contour = rect(10,12,20,22);
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
-		alg.addCorner(5);
+		// when the new side as an error of zero this will make it impossible to split
+		alg.setMaxSideError(ConfigLength.fixed(1));
+		alg.addCorner(0);
 		alg.addCorner(10);
 		alg.addCorner(20);
 		alg.addCorner(30);
@@ -181,28 +207,39 @@ public class TestPolylineSplitMerge {
 			e = e.next;
 		}
 		e = alg.list.getTail();
-		e.object.splitable = true;
 		e.object.sideError = alg.computeSideError(contour,e.object.index,5);
-		alg.setSplitVariables(contour,e,alg.list.getHead());
-
+		e.object.splitable = true;
+		e.object.splitLocation = 34;
+		e.object.splitError0 = 0;
+		e.object.splitError1 = 0;
 
 		assertTrue(alg.increaseNumberOfSidesByOne(contour));
 
-		assertEquals(4,alg.list.size());
+		assertEquals(5,alg.list.size());
 		e = alg.list.getHead();
-		assertEquals(0,e.object.sideError,1e-8);
+		assertEquals(0,e.object.index);e = e.next;
 		assertEquals(10,e.object.index);e = e.next;
-		assertEquals(0,e.object.sideError,1e-8);
 		assertEquals(20,e.object.index);e = e.next;
-		assertEquals(0,e.object.sideError,1e-8);
 		assertEquals(30,e.object.index);e = e.next;
-		assertEquals(0,e.object.sideError,1e-8);
-		assertEquals(0,e.object.index);
+		assertFalse(e.object.splitable);
+		assertEquals(34,e.object.index);
 	}
 
 	@Test
 	public void isSideConvex() {
-		fail("implement");
+		List<Point2D_I32> contour = rect(10,12,20,22);
+
+		// staight line on a perfect side
+		PolylineSplitMerge alg = new PolylineSplitMerge();
+		alg.addCorner(0);
+		alg.addCorner(10);
+		assertTrue(alg.isSideConvex(contour,alg.list.getHead()));
+
+		// it now has to go the long way around
+		alg.list.reset();
+		alg.addCorner(10);
+		alg.addCorner(0);
+		assertFalse(alg.isSideConvex(contour,alg.list.getHead()));
 	}
 
 	@Test
@@ -521,11 +558,11 @@ public class TestPolylineSplitMerge {
 		Element<Corner> e0 = alg.list.getHead().next;
 		Element<Corner> e1 = e0.next;
 
-		e1.object.splitable = true;
+		e0.object.splitable = true;
 
 		alg.setSplitVariables(contour,e0,e1);
 
-		assertFalse(e1.object.splitable);
+		assertFalse(e0.object.splitable);
 	}
 
 	@Test
