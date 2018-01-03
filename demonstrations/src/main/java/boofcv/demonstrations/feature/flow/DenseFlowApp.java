@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,7 @@ public class DenseFlowApp
 		addAlgorithm(0, "Brox",FactoryDenseOpticalFlow.broxWarping(null, GrayF32.class));
 		addAlgorithm(0, "Horn-Schunck",FactoryDenseOpticalFlow.hornSchunck(null, GrayF32.class));
 
-		animationPanel = new AnimatePanel(200,null);
+		animationPanel = new AnimatePanel(200);
 		flowPanel = new ImagePanel();
 		gui = new PanelGridPanel(2,animationPanel,flowPanel);
 		animationPanel.start();

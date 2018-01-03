@@ -3,6 +3,23 @@ Next Release
 
 Less High Priority Next Release
 
+- Chessboard Detector
+  * Split shapes with contour that barely touch. This is more of a problem in large images.
+  * Handle case where squares touch border in large images better. Block region size had to be increased.
+
+- Polyline
+  * Fit a large contour where only a small part of it is a square. Use found corners in fiducials
+  * need to still be very fast and reject false positives
+
+- Calibration Target Clustering
+  * Random shapes can find their way into the grip
+  * Needing to be able to process fisheye images makes it hard to disconnect
+  * Compensating with thresholding and other methods which will degrade performance in other environments
+
+- Thresholding
+  * Handle shadows better in calibration targets
+  * Identifisd 3 distributions and picks a threshold between the two smallest
+
 - Stereo Rectification
   * Make it easier.  Single class like in pyboof
 - Stereo Disparity
@@ -16,15 +33,11 @@ Less High Priority Next Release
   * Black Border:   See comment below
 
 - Regression
-  * Chessboard image border to fiducial regression
   * Support binary features in Detect/Describe regression
   * Standardized format which is easy for human and machine to read?
     - This should enable easy automated checks for significant change
   * Automate fault detection from regression tests
   * Split runtime regression off from stability
-
-- Unit Tests for applications
-  * compare output to expected file bit by bit
 
 - BinaryPolygonConvexDetector
   * Reject a shape if after optimization contour points are really far away from it on average

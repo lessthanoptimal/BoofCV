@@ -91,7 +91,8 @@ Fiducials
   * Unit test with heavy lens distortion and see if it fixes it
 - Have square fiducials call init if lens distortion is set.
 
-- TODO Polyline with no algorithm that doesn't loop
+- TODO Improve Otsu 2
+       point at which pdf of two normal distributions have the same value in 1D
 
 TOP ITEMS
 - TODO QR Code algorithm
@@ -114,8 +115,8 @@ TOP ITEMS
   * Curved surfaces on bottles
   * Damaged qr codes. Data Bits, Locator Patterns, Alignment Patterns.
 
-
 OTHER ITEMS
+- TODO Polyline with no algorithm that doesn't loop
 - TODO Background Removal demonstration
 - TODO Binary blob demonstration
 - TODO Update IntensityPointFeatureApp. Let it select image to open
