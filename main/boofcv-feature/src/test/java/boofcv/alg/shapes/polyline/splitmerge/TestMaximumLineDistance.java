@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,16 +18,48 @@
 
 package boofcv.alg.shapes.polyline.splitmerge;
 
+import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.List;
+
+import static boofcv.alg.shapes.polyline.splitmerge.TestPolylineSplitMerge.rect;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestMaximumLineDistance {
+
 	@Test
-	public void dummy() {
-		fail("implement");
+	public void selectSplitPoint() {
+		List<Point2D_I32> contour = rect(10,12,20,22);
+
+		MaximumLineDistance alg = new MaximumLineDistance();
+
+		PolylineSplitMerge.SplitResults results = new PolylineSplitMerge.SplitResults();
+		alg.selectSplitPoint(contour,0,25,results);
+
+		assertEquals(10,results.index);
+		assertTrue(results.score > 1);
+
+		// see if it handles wrapping indexes
+
+		alg.selectSplitPoint(contour,31,4,results);
+
+		assertEquals(0,results.index);
+		assertTrue(results.score > 1);
+	}
+
+	@Test
+	public void compareScore() {
+
+		MaximumLineDistance alg = new MaximumLineDistance();
+
+		assertEquals(1,alg.compareScore(5,1));
+		assertEquals(0,alg.compareScore(5,5));
+		assertEquals(-1,alg.compareScore(1,5));
+
 	}
 }

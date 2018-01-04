@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,12 +23,28 @@ import georegression.struct.point.Point2D_I32;
 import java.util.List;
 
 /**
- * Interface for splitting a line.
+ * Interface for splitting a line along a contour.
  *
  * @author Peter Abeles
  */
 public interface SplitSelector {
+	/**
+	 * Selects the best point to split a long along a contour. Start and end locations are always traversed in the
+	 * positive direction along the contour.
+	 *
+	 * @param contour List of points along a contour in order
+	 * @param indexA Start of line
+	 * @param indexB End of line
+	 * @param results Where to split
+	 */
 	void selectSplitPoint(List<Point2D_I32> contour , int indexA , int indexB , PolylineSplitMerge.SplitResults results );
 
+	/**
+	 * Compares two scores against each other
+	 *
+	 * @param scoreA Score
+	 * @param scoreB Score
+	 * @return 1 = scoreA is best, 0 both equal, -1 scoreB is best
+	 */
 	int compareScore( double scoreA , double scoreB );
 }
