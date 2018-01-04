@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,15 @@
 
 package boofcv.abst.shapes.polyline;
 
+import boofcv.alg.shapes.polyline.splitmerge.TestPolylineSplitMerge;
+import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import java.util.List;
+
+import static boofcv.alg.shapes.polyline.splitmerge.TestPolylineSplitMerge.line;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -55,7 +60,25 @@ public abstract class ChecksGenericPointsToPolyline {
 	 */
 	@Test
 	public void checkMinVertexes() {
-		fail("implement");
+		PointsToPolyline alg = createAlg(true);
+		alg.setConvex(false);
+		alg.setMinimumSides(10);
+
+		List<Point2D_I32> contour = line(0,0,30,0);
+		contour.addAll(line(30,0,30,10));
+		contour.addAll(line(30,10,20,10));
+		contour.addAll(line(20,10,20,30));
+		contour.addAll(line(20,30,0,30));
+		contour.addAll(line(0,30,0,0));
+
+		GrowQueue_I32 found = new GrowQueue_I32();
+		if( alg.process(contour,found)) {
+			assertEquals(10, found.size);
+		}
+		alg.setMinimumSides(3);
+		assertTrue(alg.process(contour,found));
+
+		check(found,0,30,40,50,70,90);
 	}
 
 	/**
@@ -63,7 +86,18 @@ public abstract class ChecksGenericPointsToPolyline {
 	 */
 	@Test
 	public void checkMaxVertexes() {
-		fail("implement");
+		PointsToPolyline alg = createAlg(true);
+		alg.setMaximumSides(3);
+
+		List<Point2D_I32> contour = TestPolylineSplitMerge.rect(0,0,10,20);
+		GrowQueue_I32 found = new GrowQueue_I32();
+
+		// will fail because the error is too large for 3 sides
+		assertFalse(alg.process(contour,found));
+
+		alg.setMaximumSides(4);
+		assertTrue(alg.process(contour,found));
+		check(found,0,10,30,40);
 	}
 
 	/**
@@ -71,7 +105,39 @@ public abstract class ChecksGenericPointsToPolyline {
 	 */
 	@Test
 	public void checkIsConvex() {
-		fail("implement");
+		PointsToPolyline alg = createAlg(true);
+		alg.setConvex(true);
+
+		List<Point2D_I32> contour = line(0,0,30,0);
+		contour.addAll(line(30,0,30,10));
+		contour.addAll(line(30,10,20,10));
+		contour.addAll(line(20,10,20,30));
+		contour.addAll(line(20,30,0,30));
+		contour.addAll(line(0,30,0,0));
+
+		GrowQueue_I32 found = new GrowQueue_I32();
+		assertFalse(alg.process(contour,found));
+
+		alg.setConvex(false);
+		assertTrue(alg.process(contour,found));
+
 	}
 
+
+	private void check( GrowQueue_I32 found , int ...expected) {
+		assertEquals(expected.length,found.size());
+		boolean matched[] = new boolean[expected.length];
+		for (int i = 0; i < found.size(); i++) {
+			int where = found.get(i);
+			for (int j = 0; j < expected.length; j++) {
+				if( expected[j] == where ) {
+					matched[j] = true;
+					break;
+				}
+			}
+		}
+		for (int i = 0; i < expected.length; i++) {
+			assertTrue(matched[i]);
+		}
+	}
 }

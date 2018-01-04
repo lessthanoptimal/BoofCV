@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.abst.shapes.polyline;
 
 import boofcv.factory.shape.FactoryPointsToPolyline;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * @author Peter Abeles
@@ -28,5 +30,11 @@ public class TestNewSplitMerge_to_PointsToPolyline extends ChecksGenericPointsTo
 	@Override
 	public PointsToPolyline createAlg(boolean loop) {
 		return FactoryPointsToPolyline.splitMerge((ConfigPolylineSplitMerge) null);
+	}
+
+	@Ignore
+	@Test
+	public void checkDefaults() {
+		// override and ignore this test since line functionality hasn't been added yet
 	}
 }

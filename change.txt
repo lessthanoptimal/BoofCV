@@ -98,6 +98,8 @@ TOP ITEMS
 - TODO QR Code algorithm
   * Better rejection of finder patterns using graph
   * See if a better reading of mode bits is needed
+  * Reading mode and version. For small qr codes use the lines connecting position patterns
+    those will be more reliable than the sides
 - TODO QR Code Regresstion Test
   * Manually label 4 corners only
   * Use version 1 and version 2 qr codes for most of the tests

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.gui;
 
+import boofcv.struct.ConfigLength;
+
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeListener;
@@ -35,6 +37,14 @@ public class StandardAlgConfigPanel extends JPanel {
 	public StandardAlgConfigPanel() {
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+	}
+
+	protected JConfigLength configLength(ConfigLength initial , int min , int max ) {
+		JConfigLength control = new JConfigLength((JConfigLength.Listener)this,true);
+		control.setValue(initial);
+		control.setLengthBounds(min,max);
+		control.setMaximumSize(control.getPreferredSize());
+		return control;
 	}
 
 	protected JSpinner spinner(int initial , Object[] items ) {

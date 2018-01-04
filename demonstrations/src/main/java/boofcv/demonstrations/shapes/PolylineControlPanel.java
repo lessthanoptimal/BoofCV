@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.demonstrations.shapes;
 import boofcv.abst.shapes.polyline.ConfigPolyline;
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.factory.shape.ConfigSplitMergeLineFit;
+import boofcv.gui.JConfigLength;
 import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
@@ -173,16 +174,16 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 	}
 
 	class SplitMergePanel extends StandardAlgConfigPanel
-		implements ChangeListener
+		implements ChangeListener, JConfigLength.Listener
 	{
 		ConfigPolylineSplitMerge config;
 
-		JSpinner spinnerConsiderSides;
+		JConfigLength controlExtraConsider;
 		JSpinner spinnerMinSideLength;
 		JSpinner spinnerCornerPenalty;
 		JSpinner spinnerSideSplitScore;
 		JSpinner spinnerConvexTest;
-		JSpinner spinnerMaxSideError;
+		JConfigLength contorlMaxSideError;
 
 		JSpinner spinnerSideSamples;
 		JSpinner spinnerRefine;
@@ -196,8 +197,8 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 			this.config = config;
 
 			setBorder(BorderFactory.createEmptyBorder());
-			spinnerMaxSideError   = spinner(config.maxSideError.fraction,0,1.0,0.01,1,3);
-			spinnerConsiderSides  = spinner(config.extraConsider.fraction, 0, 5.0, 0.25,1,3);
+			contorlMaxSideError = configLength(config.maxSideError,0,1000);
+			controlExtraConsider = configLength(config.extraConsider,0,100);
 			spinnerMinSideLength  = spinner(config.minimumSideLength, 1, 1000, 1);
 			spinnerCornerPenalty  = spinner(config.cornerScorePenalty,0,100,0.1);
 			spinnerSideSplitScore = spinner(config.thresholdSideSplitScore,0,100,0.1);
@@ -205,8 +206,8 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 			spinnerConvexTest     = spinner(config.convexTest, 0.0, 20.0, 0.25,2,2);
 			spinnerRefine         = spinner(config.refineIterations, 0, 20, 1);
 
-			addLabeled(spinnerMaxSideError, "Max Side Error", this);
-			addLabeled(spinnerConsiderSides, "Extra Side Consider", this);
+			addLabeled(contorlMaxSideError, "Max Side Error", this);
+			addLabeled(controlExtraConsider, "Extra Side Consider", this);
 			addLabeled(spinnerMinSideLength, "Min Side Length", this);
 			addLabeled(spinnerCornerPenalty, "Corner Penalty", this);
 			addLabeled(spinnerSideSplitScore, "Side Split", this);
@@ -217,9 +218,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			if (spinnerConsiderSides == e.getSource()) {
-				config.extraConsider.fraction = ((Number) spinnerConsiderSides.getValue()).doubleValue();
-			} else if (spinnerMinSideLength == e.getSource()) {
+			if (spinnerMinSideLength == e.getSource()) {
 				config.minimumSideLength = ((Number) spinnerMinSideLength.getValue()).intValue();
 			} else if (spinnerCornerPenalty == e.getSource()) {
 				config.cornerScorePenalty = ((Number) spinnerCornerPenalty.getValue()).doubleValue();
@@ -229,12 +228,22 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 				config.maxNumberOfSideSamples = ((Number) spinnerSideSamples.getValue()).intValue();
 			} else if (spinnerConvexTest == e.getSource()) {
 				config.convexTest = ((Number) spinnerConvexTest.getValue()).doubleValue();
-			} else if (spinnerMaxSideError == e.getSource()) {
-				config.maxSideError.fraction = ((Number) spinnerMaxSideError.getValue()).doubleValue();
 			} else if (spinnerRefine == e.getSource()) {
 				config.refineIterations = ((Number) spinnerRefine.getValue()).intValue();
 			} else {
 				throw new RuntimeException("Unknown");
+			}
+			owner.configUpdate();
+		}
+
+		@Override
+		public void changeConfigLength(JConfigLength source, double fraction, double length) {
+			if( source == controlExtraConsider) {
+				config.extraConsider.fraction = fraction;
+				config.extraConsider.length = length;
+			} else if( source == contorlMaxSideError ) {
+				config.maxSideError.fraction = fraction;
+				config.maxSideError.length = length;
 			}
 			owner.configUpdate();
 		}

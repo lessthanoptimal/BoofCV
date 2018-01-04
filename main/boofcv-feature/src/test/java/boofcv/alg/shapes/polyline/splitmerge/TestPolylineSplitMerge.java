@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -776,7 +776,7 @@ public class TestPolylineSplitMerge {
 		return out;
 	}
 
-	private static List<Point2D_I32> line( int x0 , int y0 , int x1 , int y1 ) {
+	public static List<Point2D_I32> line( int x0 , int y0 , int x1 , int y1 ) {
 		List<Point2D_I32> out = new ArrayList<>();
 
 		int lengthY = Math.abs(y1-y0);

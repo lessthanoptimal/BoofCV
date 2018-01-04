@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,13 +44,13 @@ public class ConfigQrCode implements Configuration {
 	{
 
 		// 40% slower but better at detecting markers by a few percentage points
-//		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,21);
-//		configThreshold.scale = 0.95;
+//		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,15);
+//		configThreshold.scale = 1.00;
 
 		// fast but does a bad job detecting markers that are up close
 		ConfigThresholdLocalOtsu configThreshold = ConfigThreshold.local(ThresholdType.BLOCK_OTSU,40);
 		configThreshold.useOtsu2 = true;
-		configThreshold.scale = 1.0;
+		configThreshold.scale = 1.0; // 0.95 makes it better some times but worse overall
 		configThreshold.thresholdFromLocalBlocks = false;
 		configThreshold.tuning = 4;
 
@@ -63,9 +63,11 @@ public class ConfigQrCode implements Configuration {
 		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).minimumSideLength = 2;
 		// 28 pixels = 7 by 7 square viewed head on. Each cell is then 1 pixel. Any slight skew results in
 		// aliasing and will most likely not be read well.
-		polygon.detector.minimumContour = ConfigLength.fixed(27);
+		polygon.detector.minimumContour = ConfigLength.fixed(40);
 		polygon.detector.minimumEdgeIntensity = 10;
 		polygon.minimumRefineEdgeIntensity = 20;
+		// TODO This needs to be reduced for smaller shapes, but should be larger to better handle blur? Experiment
+		polygon.detector.tangentEdgeIntensity = 1.5;
 	}
 
 	@Override
