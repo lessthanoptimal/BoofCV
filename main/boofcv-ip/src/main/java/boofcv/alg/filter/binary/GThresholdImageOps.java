@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -150,45 +150,46 @@ public class GThresholdImageOps {
 
 		double dlength = length;
 		double sum = 0;
-		for (int i=0 ; i< length ; i++)
-			sum += (i/dlength)*histogram[i];
+		for (int i = 0; i < length; i++)
+			sum += (i / dlength) * histogram[i];
 
 		double sumB = 0;
 		int wB = 0;
 
-		double varMax = 0;
-		int threshold = 0;
+		double variance = 0;
 
-		for (int i=0 ; i<length ; i++) {
+		double selectedMB=0;
+		double selectedMF=0;
+
+		int i;
+		for (i = 0; i < length; i++) {
 			wB += histogram[i];               // Weight Background
 			if (wB == 0) continue;
 
 			int wF = totalPixels - wB;        // Weight Foreground
 			if (wF == 0) break;
 
-			double f = i/dlength;
-			sumB += f*histogram[i];
+			double f = i / dlength;
+			sumB += f * histogram[i];
 
 			double mB = sumB / wB;            // Mean Background
 			double mF = (sum - sumB) / wF;    // Mean Foreground
 
-			// used to select the value which maximizes the distance between the background and foreground
-			// This is very important when the histogram is sparse. Without it it's forced to select one of
-			// the non-zero values and might fail. The reference algorithm doesn't include this modification.
-			double d0 = (f-mB);
-			double d1 = (mF-f);
-
 			// Calculate Between Class Variance
-			double varBetween = (double)wB*(double)wF*(mB - mF)*(mB - mF)/(0.5 + d0*d0 + d1*d1);
+			double varBetween = (double) wB * (double) wF * (mB - mF) * (mB - mF);
 
 			// Check if new maximum found
-			if (varBetween > varMax) {
-				varMax = varBetween;
-				threshold = i;
+			if (varBetween > variance) {
+				variance = varBetween;
+				selectedMB = mB;
+				selectedMF = mF;
 			}
 		}
 
-		return threshold;
+		// select a threshold which maximizes the distance between the two distributions. In pathological
+		// cases there's a dead zone where all the values are equally good and it would select a value with a low index
+		// arbitrarily. Then if you scaled the threshold it would reject everything
+		return (int)(length*(selectedMB+selectedMF)/2.0 + 0.5);
 	}
 
 	/**

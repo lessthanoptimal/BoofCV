@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -137,6 +137,9 @@ public class ComputeOtsu {
 		variance = 0;
 		threshold = 0;
 
+		double selectedMB=0;
+		double selectedMF=0;
+
 		int i;
 		for (i = 0; i < length; i++) {
 			wB += histogram[i];               // Weight Background
@@ -151,21 +154,21 @@ public class ComputeOtsu {
 			double mB = sumB / wB;            // Mean Background
 			double mF = (sum - sumB) / wF;    // Mean Foreground
 
-			// used to select the value which maximizes the distance between the background and foreground
-			// This is very important when the histogram is sparse. Without it it's forced to select one of
-			// the non-zero values and might fail. The reference algorithm doesn't include this modification.
-			double d0 = (f - mB);
-			double d1 = (mF - f);
-
 			// Calculate Between Class Variance
-			double varBetween = (double) wB * (double) wF * (mB - mF) * (mB - mF) / (0.5 + d0 * d0 + d1 * d1);
+			double varBetween = (double) wB * (double) wF * (mB - mF) * (mB - mF);
 
 			// Check if new maximum found
 			if (varBetween > variance) {
 				variance = varBetween;
-				threshold = i;
+				selectedMB = mB;
+				selectedMF = mF;
 			}
 		}
+
+		// select a threshold which maximizes the distance between the two distributions. In pathological
+		// cases there's a dead zone where all the values are equally good and it would select a value with a low index
+		// arbitrarily. Then if you scaled the threshold it would reject everything
+		threshold = length*(selectedMB+selectedMF)/2.0;
 	}
 
 	public boolean isUseOtsu2() {

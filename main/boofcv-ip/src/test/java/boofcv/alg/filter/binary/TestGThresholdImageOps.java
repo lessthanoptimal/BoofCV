@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,8 +97,8 @@ public class TestGThresholdImageOps {
 	}
 
 	private int bruteForceOtsu2(int[] histogram, int total) {
-		int best = -1;
 		double bestScore = 0;
+		double bestMean0=0,bestMean1=0;
 
 		double stats[] = variance(histogram,0,histogram.length-1,total);
 		double varianceAll = stats[1];
@@ -118,19 +118,17 @@ public class TestGThresholdImageOps {
 			double var1 = stats1[1];
 			double weight1 = stats1[2];
 
-			double d0 = (j-mean0)/(histogram.length-1);
-			double d1 = (mean1-j)/(histogram.length-1);
 
 			double withinClassVariance = (weight0*var0 + weight1*var1);
 			double betweenClassVariance = varianceAll - withinClassVariance;
-			double score = betweenClassVariance/(0.5+d0*d0 + d1*d1);
 
-			if( score > bestScore ) {
-				bestScore = score;
-				best = j;
+			if( betweenClassVariance > bestScore ) {
+				bestScore = betweenClassVariance;
+				bestMean0 = mean0;
+				bestMean1 = mean1;
 			}
 		}
-		return best;
+		return (int)((bestMean0 + bestMean1)/2.0 + 0.5);
 	}
 
 
