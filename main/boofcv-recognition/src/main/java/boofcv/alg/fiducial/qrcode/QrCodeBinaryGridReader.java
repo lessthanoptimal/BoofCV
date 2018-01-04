@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
 /**
- * Reads binary values from the qr code's grid.
+ * Reads binary values from the qr code's grid. Top left corner of the qr code is it's origin. +x = right and +y = down
+ * same as it is in images.
  *
  * @author Peter Abeles
  */
@@ -78,6 +79,9 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 		transformGrid.imageToGrid(pixel.x, pixel.y, grid);
 	}
 
+	/**
+	 * Converts a pixel coordinate into a grid coordinate.
+	 */
 	public void imageToGrid( Point2D_F64 pixel , Point2D_F64 grid ) {
 		transformGrid.imageToGrid(pixel.x, pixel.y, grid);
 	}

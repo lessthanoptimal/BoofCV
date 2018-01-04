@@ -91,9 +91,6 @@ Fiducials
   * Unit test with heavy lens distortion and see if it fixes it
 - Have square fiducials call init if lens distortion is set.
 
-- TODO Improve Otsu 2
-       point at which pdf of two normal distributions have the same value in 1D
-
 TOP ITEMS
 - TODO QR Code algorithm
   * Better rejection of finder patterns using graph

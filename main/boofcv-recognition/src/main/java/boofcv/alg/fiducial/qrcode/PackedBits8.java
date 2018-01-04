@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,13 @@ public class PackedBits8 implements PackedBits {
 	 * Number of bits stored
 	 */
 	public int size;
+
+	public static PackedBits8 wrap( byte data[] , int numberOfBits ) {
+		PackedBits8 a = new PackedBits8();
+		a.data = data;
+		a.size = numberOfBits;
+		return a;
+	}
 
 	public PackedBits8(int totalBits ) {
 		resize(totalBits);

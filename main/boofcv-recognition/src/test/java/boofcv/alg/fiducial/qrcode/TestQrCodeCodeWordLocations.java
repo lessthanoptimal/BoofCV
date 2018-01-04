@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -163,7 +163,8 @@ public class TestQrCodeCodeWordLocations {
 
 	private void dataCapability(int version , int expected ) {
 		QrCodeCodeWordLocations mask = setup(version);
-		assertEquals(expected,mask.sum());
+		int N = mask.numRows*mask.numCols - mask.sum();
+		assertEquals(expected,N);
 	}
 
 	private int countFalse(QrCodeCodeWordLocations mask) {
