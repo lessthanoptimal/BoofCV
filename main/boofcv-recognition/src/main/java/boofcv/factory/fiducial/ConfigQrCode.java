@@ -64,8 +64,9 @@ public class ConfigQrCode implements Configuration {
 		// 28 pixels = 7 by 7 square viewed head on. Each cell is then 1 pixel. Any slight skew results in
 		// aliasing and will most likely not be read well.
 		polygon.detector.minimumContour = ConfigLength.fixed(40);
-		polygon.detector.minimumEdgeIntensity = 10;
-		polygon.minimumRefineEdgeIntensity = 20;
+		// can handle much darker images. No measurable decrease in speed
+		polygon.detector.minimumEdgeIntensity = 3;
+		polygon.minimumRefineEdgeIntensity = 6;
 		// TODO This needs to be reduced for smaller shapes, but should be larger to better handle blur? Experiment
 		polygon.detector.tangentEdgeIntensity = 1.5;
 	}
