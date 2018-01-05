@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -200,9 +200,11 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 
 		if (controls.error != null) {
 			encoder.setError(controls.error);
-		} else if (controls.mask != null) {
+		}
+		if (controls.mask != null) {
 			encoder.setMask(controls.mask);
-		} else if( controls.version > 0 ) {
+		}
+		if( controls.version > 0 ) {
 			encoder.setVersion(controls.version);
 		}
 
@@ -218,19 +220,29 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 			encoder.addAutomatic(controls.message);
 		}
 
+		boolean failed = false;
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(10);
 		try {
 			generator.render(encoder.fixate());
 		} catch( RuntimeException e ) {
+			failed = true;
 			System.err.println("Render Failed! "+e.getClass().getSimpleName()+" "+e.getMessage());
-			e.printStackTrace();
-			return;
+//			e.printStackTrace();
 		}
-		GrayU8 gray = generator.getGray();
-		BufferedImage output = new BufferedImage(gray.width,gray.height,BufferedImage.TYPE_INT_RGB);
-		ConvertBufferedImage.convertTo(gray,output);
 
-		imagePanel.setImageRepaint(output);
+		if( failed ) {
+			BufferedImage output = new BufferedImage(100,100, BufferedImage.TYPE_INT_RGB);
+			Graphics2D g2 = output.createGraphics();
+			g2.setColor(Color.RED);
+			g2.fillRect(0,0,output.getWidth(),output.getHeight());
+			imagePanel.setImageRepaint(output);
+		} else {
+			GrayU8 gray = generator.getGray();
+			BufferedImage output = new BufferedImage(gray.width, gray.height, BufferedImage.TYPE_INT_RGB);
+			ConvertBufferedImage.convertTo(gray, output);
+			imagePanel.setImageRepaint(output);
+		}
+
 	}
 
 	@Override

@@ -106,6 +106,9 @@ TOP ITEMS
   * very dark images
   * very dark images with bright spots near qr codes
   * very bright images
+  * rotate around axis - different ranges
+  * skewed
+  * super close
   * Shadows going across the marker
   * curved surfaces
   * crinkled paper
