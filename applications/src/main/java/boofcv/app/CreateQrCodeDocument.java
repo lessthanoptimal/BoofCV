@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -154,7 +154,7 @@ public class CreateQrCodeDocument {
 				markerWidth = moduleWidth*QrCode.totalModules(version);
 			}
 
-			unit = Unit.lookup(_unit);
+			unit = unit == null ? Unit.lookup(_unit) : unit;
 			if (unit == null) {
 				failExit("Must specify a valid unit or use default");
 			}
@@ -179,10 +179,11 @@ public class CreateQrCodeDocument {
 		getFileTypeFromFileName();
 
 		if( fileType.equals("pdf") ) {
-			System.out.println("   Document  : PDF");
-			System.out.println("   paper     : "+paperSize);
-			System.out.println("   info      : "+(!disablePrintInfo));
-			System.out.println("   units     : "+unit);
+			System.out.println("   Document     : PDF");
+			System.out.println("   paper        : "+paperSize);
+			System.out.println("   info         : "+(!disablePrintInfo));
+			System.out.println("   units        : "+unit);
+			System.out.println("   marker width : "+markerWidth+" ("+unit.abbreviation+")");
 		} else {
 			System.out.println("   Document  : Image");
 		}

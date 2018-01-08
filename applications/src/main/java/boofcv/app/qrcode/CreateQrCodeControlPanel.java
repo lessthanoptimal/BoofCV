@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.text.ParseException;
 
 /**
  * Selects various parameters when generating a QR Code document
@@ -159,11 +158,28 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 		fieldMarkerWidth.setPreferredSize(new Dimension(50,20));
 		fieldMarkerWidth.setMaximumSize(fieldMarkerWidth.getPreferredSize());
 		fieldMarkerWidth.setValue(markerWidth);
-		fieldMarkerWidth.addPropertyChangeListener(new PropertyChangeListener() {
+//		fieldMarkerWidth.addPropertyChangeListener(new PropertyChangeListener() {
+//			@Override
+//			public void propertyChange(PropertyChangeEvent evt) {
+//				markerWidth = (Double)fieldMarkerWidth.getValue();
+//				System.out.println("Marker width "+markerWidth);
+//			}
+//		});
+		// save the numeric value whenever it's valid. This way when the user selects print it will use the size
+		// that the user has typed in even if they didn't hit enter
+		fieldMarkerWidth.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				markerWidth = (Double)fieldMarkerWidth.getValue();
+			public void insertUpdate(DocumentEvent e) {
+				try {
+					markerWidth = ((Number)fieldMarkerWidth.getFormatter().stringToValue(fieldMarkerWidth.getText())).doubleValue();
+				} catch (ParseException ignore) {}
 			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {insertUpdate(e);}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {insertUpdate(e);}
 		});
 		comboUnits.setSelectedIndex(documentUnits.ordinal());
 		comboUnits.setMaximumSize(comboUnits.getPreferredSize());

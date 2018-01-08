@@ -87,7 +87,8 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 			}
 		});
 
-		JMenuItem menuPrint = new JMenuItem("Print...",KeyEvent.VK_P);
+		JMenuItem menuPrint = new JMenuItem("Print...");
+		BoofSwingUtil.setMenuItemKeys(menuPrint,KeyEvent.VK_P,KeyEvent.VK_P);
 		menuPrint.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -141,6 +142,8 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 	}
 
 	private void saveFile( boolean sendToPrinter ) {
+		// grab the focus and force what the user is editing to be saved
+
 		File f;
 
 		// see where the document is to be sent
