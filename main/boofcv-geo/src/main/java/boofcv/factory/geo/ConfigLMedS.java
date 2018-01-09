@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,9 +30,9 @@ public class ConfigLMedS implements Configuration {
 	/**
 	 * Random seed that's used internally
 	 */
-	public long randSeed;
+	public long randSeed = 0xDEADBEEF;
 	/**
-	 * Number of cycles it will perform when minimizing the median error
+	 * Number of cycles it will perform when minimizing the median error. TUNE THIS
 	 */
 	public int totalCycles;
 
@@ -42,12 +42,12 @@ public class ConfigLMedS implements Configuration {
 	public ConfigLMedS(long randSeed, int totalCycles) {
 		this.randSeed = randSeed;
 		this.totalCycles = totalCycles;
-
-
 	}
 
 	@Override
 	public void checkValidity() {
-
+		if( totalCycles <= 0 ) {
+			throw new RuntimeException("You need to set the number of cycles. Varies by problem. Try 100 and increase");
+		}
 	}
 }

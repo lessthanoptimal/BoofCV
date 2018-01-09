@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -287,6 +287,8 @@ public class FactoryMultiView {
 	 * Creates an estimator for the PnP problem that uses only three observations, which is the minimal case
 	 * and known as P3P.
 	 *
+	 * <p>NOTE: Observations are in normalized image coordinates NOT pixels.</p>
+	 *
 	 * @param which The algorithm which is to be returned.
 	 * @param numIterations Number of iterations. Only used by some algorithms and recommended number varies
 	 *                      significantly by algorithm.
@@ -317,8 +319,11 @@ public class FactoryMultiView {
 	 * Created an estimator for the P3P problem that selects a single solution by considering additional
 	 * observations.
 	 *
+	 * <p>NOTE: Observations are in normalized image coordinates NOT pixels.</p>
+	 *
 	 * <p>
 	 * NOTE: EPnP has several tuning parameters and the defaults here might not be the best for your situation.
+	 * Use {@link #computePnPwithEPnP} if you wish to have access to all parameters.
 	 * </p>
 	 *
 	 * @param which The algorithm which is to be returned.
@@ -344,6 +349,8 @@ public class FactoryMultiView {
 	/**
 	 * Returns a solution to the PnP problem for 4 or more points using EPnP. Fast and fairly
 	 * accurate algorithm.  Can handle general and planar scenario automatically.
+	 *
+	 * <p>NOTE: Observations are in normalized image coordinates NOT pixels.</p>
 	 *
 	 * @see PnPLepetitEPnP
 	 *

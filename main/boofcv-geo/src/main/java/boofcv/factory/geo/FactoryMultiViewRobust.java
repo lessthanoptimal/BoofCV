@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,8 @@ public class FactoryMultiViewRobust {
 	 * in normalized image coordinates.
 	 *
 	 * <ul>
-	 *     <li>Error units is pixels squared.</li>
+	 *     <li>Input observations are in normalized image coordinates NOT pixels</li>
+	 *     <li>Error units are pixels squared.</li>
 	 * </ul>
 	 *
 	 * <p>See code for all the details.</p>
@@ -66,7 +67,11 @@ public class FactoryMultiViewRobust {
 	public static LeastMedianOfSquares<Se3_F64, Point2D3D> pnpLMedS( ConfigPnP pnp,
 																	 ConfigLMedS lmeds)
 	{
-		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER, -1, 1);
+		pnp.checkValidity();
+		lmeds.checkValidity();
+
+		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1( pnp.which , pnp.epnpIterations, pnp.numResolve);
+
 		DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 		distance.setIntrinsic(pnp.intrinsic.fx,pnp.intrinsic.fy,pnp.intrinsic.skew);
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
@@ -80,6 +85,8 @@ public class FactoryMultiViewRobust {
 	 * Robust solution to PnP problem using {@link Ransac}.  Input observations are in normalized
 	 * image coordinates.
 	 *
+	 * <p>NOTE: Observations are in normalized image coordinates NOT pixels.</p>
+	 *
 	 * <p>See code for all the details.</p>
 	 *
 	 * @param pnp PnP parameters.  Can't be null.
@@ -89,7 +96,10 @@ public class FactoryMultiViewRobust {
 	public static Ransac<Se3_F64, Point2D3D> pnpRansac( ConfigPnP pnp,
 														ConfigRansac ransac)
 	{
-		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1(pnp.which, -1, pnp.numResolve);
+		pnp.checkValidity();
+		ransac.checkValidity();
+
+		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1(pnp.which, pnp.epnpIterations, pnp.numResolve);
 		DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 		distance.setIntrinsic(pnp.intrinsic.fx,pnp.intrinsic.fy,pnp.intrinsic.skew);
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
