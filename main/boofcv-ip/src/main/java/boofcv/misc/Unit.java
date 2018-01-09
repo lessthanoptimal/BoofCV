@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.app;
+package boofcv.misc;
 
 /**
  * Set of standard units of measure, conversions between them, and their abbreviations
@@ -33,8 +33,8 @@ public enum Unit {
 	YARD(0.9144,"yd"),
 	MILE(1852,"ml");
 
-	double unitToMeter;
-	String abbreviation;
+	public double unitToMeter;
+	public String abbreviation;
 
 	Unit(double unitToMeter, String abbreviation) {
 		this.unitToMeter = unitToMeter;

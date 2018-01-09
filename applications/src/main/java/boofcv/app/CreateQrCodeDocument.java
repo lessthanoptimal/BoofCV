@@ -24,6 +24,8 @@ import boofcv.alg.fiducial.qrcode.QrCodeMaskPattern;
 import boofcv.app.qrcode.CreateQrCodeDocumentImage;
 import boofcv.app.qrcode.CreateQrCodeDocumentPDF;
 import boofcv.app.qrcode.CreateQrCodeGui;
+import boofcv.misc.LengthUnit;
+import boofcv.misc.Unit;
 import org.apache.commons.io.FilenameUtils;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;

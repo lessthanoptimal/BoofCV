@@ -21,9 +21,9 @@ package boofcv.app.qrcode;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeMaskPattern;
 import boofcv.app.PaperSize;
-import boofcv.app.Unit;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.misc.Unit;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
