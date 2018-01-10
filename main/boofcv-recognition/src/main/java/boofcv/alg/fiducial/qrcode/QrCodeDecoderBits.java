@@ -40,6 +40,8 @@ public class QrCodeDecoderBits {
 	// storage fot the message's ecc
 	GrowQueue_I8 ecc = new GrowQueue_I8();
 
+	StringBuilder workString = new StringBuilder();
+
 	/**
 	 * Reconstruct the data while applying error correction.
 	 */
@@ -113,7 +115,8 @@ public class QrCodeDecoderBits {
 //		System.out.println("decoded message");
 //		bits.print();System.out.println();
 
-		qr.message = new StringBuilder();
+		workString.setLength(0);
+		qr.message = null;
 
 		// if there isn't enough bits left to read the mode it must be done
 		int location = 0;
@@ -158,6 +161,7 @@ public class QrCodeDecoderBits {
 			return false;
 		}
 
+		qr.message = workString.toString();
 		return true;
 	}
 
@@ -231,9 +235,9 @@ public class QrCodeDecoderBits {
 			int valB = (chunk-valA*100)/10;
 			int valC = chunk-valA*100-valB*10;
 
-			qr.message.append((char)(valA + '0'));
-			qr.message.append((char)(valB + '0'));
-			qr.message.append((char)(valC + '0'));
+			workString.append((char)(valA + '0'));
+			workString.append((char)(valB + '0'));
+			workString.append((char)(valC + '0'));
 
 			length -= 3;
 		}
@@ -248,8 +252,8 @@ public class QrCodeDecoderBits {
 
 			int valA = chunk/10;
 			int valB = chunk-valA*10;
-			qr.message.append((char)(valA + '0'));
-			qr.message.append((char)(valB + '0'));
+			workString.append((char)(valA + '0'));
+			workString.append((char)(valB + '0'));
 		} else if( length == 1 ) {
 			if( data.size < bitLocation+4 ) {
 				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
@@ -257,7 +261,7 @@ public class QrCodeDecoderBits {
 			}
 			int valA = data.read(bitLocation,4,true);
 			bitLocation += 4;
-			qr.message.append((char)(valA + '0'));
+			workString.append((char)(valA + '0'));
 		}
 		return bitLocation;
 	}
@@ -286,8 +290,8 @@ public class QrCodeDecoderBits {
 			int valA = chunk/45;
 			int valB = chunk-valA*45;
 
-			qr.message.append(valueToAlphanumeric(valA));
-			qr.message.append(valueToAlphanumeric(valB));
+			workString.append(valueToAlphanumeric(valA));
+			workString.append(valueToAlphanumeric(valB));
 			length -= 2;
 		}
 
@@ -298,7 +302,7 @@ public class QrCodeDecoderBits {
 			}
 			int valA = data.read(bitLocation,6,true);
 			bitLocation += 6;
-			qr.message.append(valueToAlphanumeric(valA));
+			workString.append(valueToAlphanumeric(valA));
 		}
 		return bitLocation;
 	}
@@ -328,7 +332,7 @@ public class QrCodeDecoderBits {
 			bitLocation += 8;
 		}
 		try {
-			qr.message.append( new String(rawdata, "JIS") );
+			workString.append( new String(rawdata, "JIS") );
 		} catch (UnsupportedEncodingException ignored) {
 			qr.failureCause = JIS_UNAVAILABLE;
 			return -1;
@@ -374,7 +378,7 @@ public class QrCodeDecoderBits {
 
 		// Shift_JIS may not be supported in some environments:
 		try {
-			qr.message.append( new String(rawdata, "Shift_JIS") );
+			workString.append( new String(rawdata, "Shift_JIS") );
 		} catch (UnsupportedEncodingException ignored) {
 			qr.failureCause = KANJI_UNAVAILABLE;
 			return -1;

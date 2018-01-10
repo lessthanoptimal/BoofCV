@@ -100,14 +100,14 @@ public class QrCode implements Cloneable {
 	public byte[] rawbits = null;
 
 	/**
-	 * Raw message after error correction has been applied to it
+	 * Raw byte data after error correction has been applied to it. Only contains the data portion.
 	 */
 	public byte[] corrected = null;
 
 	/**
 	 * If applicable the message is decoded into a sequence of characters.
 	 */
-	public StringBuilder message = null;
+	public String message = null;
 
 	/**
 	 * Specifies where the QR code parsing failed
@@ -434,7 +434,7 @@ public class QrCode implements Cloneable {
 		this.mode = o.mode;
 		this.rawbits = o.rawbits == null ? null : o.rawbits.clone();
 		this.corrected = o.corrected == null ? null : o.corrected.clone();
-		this.message = o.message == null ? null : new StringBuilder(o.message);
+		this.message = o.message;
 		this.threshCorner = o.threshCorner;
 		this.threshDown = o.threshDown;
 		this.threshRight = o.threshRight;

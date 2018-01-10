@@ -106,7 +106,12 @@ public class TestQrCode {
 		orig.ppCorner.set(1,3,6);
 		orig.ppRight.set(2,5,8);
 
-		orig.message = new StringBuilder("asdasd");
+		orig.failureCause = QrCode.Failure.ALIGNMENT;
+		orig.error = QrCode.ErrorLevel.M;
+		orig.version = 4;
+		orig.bounds.set(1,3,4);
+
+		orig.message = "asdasd";
 
 		QrCode found = orig.clone();
 
@@ -123,8 +128,13 @@ public class TestQrCode {
 		assertTrue(found.ppCorner.get(1).distance(3,6) <= 1e-8);
 		assertTrue(found.ppRight.get(2).distance(5,8) <= 1e-8);
 
-		assertTrue(orig.message != found.message);
-		assertTrue(found.message.toString().equals("asdasd"));
+		assertTrue(orig.failureCause==found.failureCause);
+		assertTrue(orig.error==found.error);
+		assertTrue(orig.version==found.version);
+		assertTrue(found.bounds.get(1).distance(3,4) <= 1e-8);
+		assertTrue(found.bounds != orig.bounds);
+
+		assertTrue(found.message.equals("asdasd"));
 
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,7 +101,7 @@ public class QrCodeEncoder {
 	 * switch between multiple modes to increase the number of characters.
 	 */
 	public QrCodeEncoder addAutomatic(String message) {
-		qr.message = new StringBuilder(message);
+		qr.message = message;
 		return addBytes(message);
 	}
 
