@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,9 +32,7 @@ public class NormalizedToPixelError {
 	private double skew; // pixel skew
 
 	public NormalizedToPixelError(double fx, double fy, double skew) {
-		this.fx = fx;
-		this.fy = fy;
-		this.skew = skew;
+		set(fx,fy,skew);
 	}
 
 	public NormalizedToPixelError()

@@ -420,7 +420,7 @@ public class QrCode implements Cloneable {
 	public QrCode clone() {
 		QrCode c = new QrCode();
 		c.set(this);
-		return this;
+		return c;
 	}
 
 	/**
@@ -431,7 +431,6 @@ public class QrCode implements Cloneable {
 		this.version = o.version;
 		this.error = o.error;
 		this.mask = o.mask;
-		this.message = o.message;
 		this.mode = o.mode;
 		this.rawbits = o.rawbits == null ? null : o.rawbits.clone();
 		this.corrected = o.corrected == null ? null : o.corrected.clone();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,11 @@ public class ConfigPnP implements Configuration {
 	public int numResolve = 1;
 
 	/**
+	 * Number of iterations for EPNP. Ignored by everything else
+	 */
+	public int epnpIterations = 10;
+
+	/**
 	 * Intrinsic camera parameters.  Used to compute error in pixels.
 	 */
 	public CameraPinholeRadial intrinsic;
@@ -49,13 +54,13 @@ public class ConfigPnP implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		switch (which) {
-			case P3P_FINSTERWALDER:
-			case P3P_GRUNERT:
-				break;
-
-			default:
-				throw new IllegalArgumentException("EPnP isn't handled here yet");
-		}
+//		switch (which) {
+//			case P3P_FINSTERWALDER:
+//			case P3P_GRUNERT:
+//				break;
+//
+//			default:
+//				throw new IllegalArgumentException("EPnP isn't handled here yet");
+//		}
 	}
 }

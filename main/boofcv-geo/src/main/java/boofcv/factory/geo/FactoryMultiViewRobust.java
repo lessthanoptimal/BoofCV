@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,31 +54,41 @@ public class FactoryMultiViewRobust {
 	 * in normalized image coordinates.
 	 *
 	 * <ul>
-	 *     <li>Error units is pixels squared.</li>
+	 *     <li>Input observations are in normalized image coordinates NOT pixels</li>
+	 *     <li>Error units are pixels squared.</li>
 	 * </ul>
 	 *
 	 * <p>See code for all the details.</p>
 	 *
-	 * @param pnp PnP parameters.  Can't be null.
-	 * @param lmeds Parameters for LMedS.  Can't be null.
+	 * @param configPnP PnP parameters.  Can't be null.
+	 * @param configLMedS Parameters for LMedS.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static LeastMedianOfSquares<Se3_F64, Point2D3D> pnpLMedS( ConfigPnP pnp,
-																	 ConfigLMedS lmeds)
+	public static LeastMedianOfSquares<Se3_F64, Point2D3D> pnpLMedS( ConfigPnP configPnP,
+																	 ConfigLMedS configLMedS)
 	{
-		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER, -1, 1);
+		configPnP.checkValidity();
+		configLMedS.checkValidity();
+
+		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1( configPnP.which , configPnP.epnpIterations, configPnP.numResolve);
+
 		DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
-		distance.setIntrinsic(pnp.intrinsic.fx,pnp.intrinsic.fy,pnp.intrinsic.skew);
+		distance.setIntrinsic(configPnP.intrinsic.fx,configPnP.intrinsic.fy,configPnP.intrinsic.skew);
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
 				new EstimatorToGenerator<>(estimatorPnP);
 
-		return new LeastMedianOfSquares<>(lmeds.randSeed, lmeds.totalCycles, manager, generator, distance);
+		LeastMedianOfSquares<Se3_F64, Point2D3D>  lmeds =
+				new LeastMedianOfSquares<>(configLMedS.randSeed, configLMedS.totalCycles, manager, generator, distance);
+		lmeds.setErrorFraction(configLMedS.errorFraction);
+		return lmeds;
 	}
 
 	/**
 	 * Robust solution to PnP problem using {@link Ransac}.  Input observations are in normalized
 	 * image coordinates.
+	 *
+	 * <p>NOTE: Observations are in normalized image coordinates NOT pixels.</p>
 	 *
 	 * <p>See code for all the details.</p>
 	 *
@@ -89,7 +99,10 @@ public class FactoryMultiViewRobust {
 	public static Ransac<Se3_F64, Point2D3D> pnpRansac( ConfigPnP pnp,
 														ConfigRansac ransac)
 	{
-		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1(pnp.which, -1, pnp.numResolve);
+		pnp.checkValidity();
+		ransac.checkValidity();
+
+		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1(pnp.which, pnp.epnpIterations, pnp.numResolve);
 		DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 		distance.setIntrinsic(pnp.intrinsic.fx,pnp.intrinsic.fy,pnp.intrinsic.skew);
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
@@ -141,7 +154,7 @@ public class FactoryMultiViewRobust {
 
 	private static LeastMedianOfSquares<Se3_F64, AssociatedPair> epipolarLMedS( Estimate1ofEpipolar epipolar,
 																				CameraPinholeRadial intrinsic,
-																				ConfigLMedS lmeds ) {
+																				ConfigLMedS configLMedS ) {
 		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
@@ -153,8 +166,10 @@ public class FactoryMultiViewRobust {
 						intrinsic.fx, intrinsic.fy, intrinsic.skew);
 
 
-		return new LeastMedianOfSquares<>
-				(lmeds.randSeed, lmeds.totalCycles, manager, generateEpipolarMotion, distanceSe3);
+		LeastMedianOfSquares<Se3_F64, AssociatedPair> config = new LeastMedianOfSquares<>
+				(configLMedS.randSeed, configLMedS.totalCycles, manager, generateEpipolarMotion, distanceSe3);
+		config.setErrorFraction(configLMedS.errorFraction);
+		return config;
 	}
 
 	/**
@@ -223,11 +238,11 @@ public class FactoryMultiViewRobust {
 	 * <p>See code for all the details.</p>
 	 *
 	 * @param homography Homography estimation parameters.  If null default is used.
-	 * @param lmeds Parameters for LMedS.  Can't be null.
+	 * @param configLMedS Parameters for LMedS.  Can't be null.
 	 * @return Homography estimator
 	 */
 	public static LeastMedianOfSquares<Homography2D_F64,AssociatedPair>
-	homographyLMedS( ConfigHomography homography , ConfigLMedS lmeds )
+	homographyLMedS( ConfigHomography homography , ConfigLMedS configLMedS )
 	{
 		if( homography == null )
 			homography = new ConfigHomography();
@@ -236,8 +251,10 @@ public class FactoryMultiViewRobust {
 		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(homography.normalize);
 		DistanceHomographySq distance = new DistanceHomographySq();
 
-		return new LeastMedianOfSquares<>
-				(lmeds.randSeed, lmeds.totalCycles, manager, modelFitter, distance);
+		LeastMedianOfSquares<Homography2D_F64,AssociatedPair> lmeds= new LeastMedianOfSquares<>
+				(configLMedS.randSeed, configLMedS.totalCycles, manager, modelFitter, distance);
+		lmeds.setErrorFraction(configLMedS.errorFraction);
+		return lmeds;
 	}
 
 	/**
