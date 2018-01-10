@@ -98,17 +98,8 @@ TOP ITEMS
   * Reading mode and version. For small qr codes use the lines connecting position patterns
     those will be more reliable than the sides
 - TODO QR Code Regresstion Test
-  * Manually label 4 corners only
-  * Use version 1 and version 2 qr codes for most of the tests
-  * Have a test with all the versions
-  * 4000x3000 images with small and large markers
-  * 640x480 images with small and large markers
-  * very dark images
-  * very dark images with bright spots near qr codes
-  * very bright images
   * rotate around axis - different ranges
   * skewed
-  * super close
   * Shadows going across the marker
   * curved surfaces
   * crinkled paper

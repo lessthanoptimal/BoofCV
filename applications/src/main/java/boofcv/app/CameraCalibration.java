@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,10 +73,13 @@ public class CameraCalibration extends BaseStandardInputApp {
 	protected ModelType modeType = ModelType.PINHOLE;
 	protected FormatType formatType = FormatType.BOOFCV;
 
+	protected boolean GUI = false;
 	protected boolean visualize = true;
 
 	public void printHelp() {
 		System.out.println("./application <output file> <Input Options> <Calibration Parameters> <Fiducial Type> <Fiducial Specific Options> ");
+		System.out.println();
+		System.out.println("  --GUI                              Turns on GUI mode and ignores other options.");
 		System.out.println();
 		System.out.println("<output file>                        file name for output");
 		System.out.println("                                     DEFAULT: \"intrinsic.yaml\"");
@@ -147,7 +150,9 @@ public class CameraCalibration extends BaseStandardInputApp {
 			String arg = args[i];
 
 			if( arg.startsWith("--") ) {
-				if (!checkCameraFlag(arg)) {
+				if( arg.compareToIgnoreCase("--GUI") == 0 ) {
+					GUI = true;
+				} else if (!checkCameraFlag(arg)) {
 					splitFlag(arg);
 					if( flagName.compareToIgnoreCase("Directory") == 0 ) {
 						inputDirectory = parameters;
@@ -590,19 +595,27 @@ public class CameraCalibration extends BaseStandardInputApp {
 	}
 
 	public static void main(String[] args) {
-		if( args.length == 0 ) {
-			new CameraCalibrationGui();
-		} else {
 			CameraCalibration app = new CameraCalibration();
+			boolean failed = true;
 			try {
-				app.parse(args);
+				if( args.length > 0 ) {
+					app.parse(args);
+					if( app.GUI ) {
+						new CameraCalibrationGui();
+					} else {
+						app.process();
+					}
+					failed = false;
+				}
 			} catch (RuntimeException e) {
-				app.printHelp();
 				System.out.println();
 				System.out.println(e.getMessage());
-				System.exit(0);
+			} finally {
+				if( failed ) {
+					app.printHelp();
+					System.exit(0);
+				}
 			}
-			app.process();
-		}
+
 	}
 }
