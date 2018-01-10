@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public class QrCodeDecoderBits {
 	/**
 	 * Reconstruct the data while applying error correction.
 	 */
-	public boolean applyErrorCorrection(QrCode qr) {
+	public boolean applyErrorCorrection( QrCode qr) {
 //		System.out.println("decoder ver   "+qr.version);
 //		System.out.println("decoder mask  "+qr.mask);
 //		System.out.println("decoder error "+qr.error);
@@ -62,7 +62,7 @@ public class QrCodeDecoderBits {
 
 		int totalBlocks = numBlocksA + numBlocksB;
 		int totalDataBytes = wordsBlockDataA*numBlocksA + wordsBlockDataB*numBlocksB;
-		qr.rawdata = new byte[totalDataBytes];
+		qr.corrected = new byte[totalDataBytes];
 
 		ecc.resize(wordsEcc);
 		rscodes.generator(wordsEcc);
@@ -88,7 +88,7 @@ public class QrCodeDecoderBits {
 			}
 
 			QrCodeEncoder.flipBits8(message);
-			System.arraycopy(message.data,0,qr.rawdata,bytesDataRead,message.size);
+			System.arraycopy(message.data,0,qr.corrected,bytesDataRead,message.size);
 			bytesDataRead += message.size;
 		}
 		return true;
@@ -107,8 +107,8 @@ public class QrCodeDecoderBits {
 
 	public boolean decodeMessage(QrCode qr) {
 		PackedBits8 bits = new PackedBits8();
-		bits.data = qr.rawdata;
-		bits.size = qr.rawdata.length*8;
+		bits.data = qr.corrected;
+		bits.size = qr.corrected.length*8;
 
 //		System.out.println("decoded message");
 //		bits.print();System.out.println();
@@ -176,19 +176,24 @@ public class QrCodeDecoderBits {
 		return lengthBits + (8-lengthBits%8)%8;
 	}
 
-	private boolean checkPaddingBytes(QrCode qr, int lengthBytes) {
+	/**
+	 * Makes sure the used bytes have the expected values
+	 *
+	 * @param lengthBytes Number of bytes that data should be been written to and not filled with padding.
+	 */
+	boolean checkPaddingBytes(QrCode qr, int lengthBytes) {
 		boolean a = true;
 
-		for (int i = lengthBytes; i < qr.rawdata.length; i++) {
+		for (int i = lengthBytes; i < qr.corrected.length; i++) {
 			if (a) {
-				if (0b00110111 != (qr.rawdata[i] & 0xFF))
+				if (0b00110111 != (qr.corrected[i] & 0xFF))
 					return false;
 			} else {
-				if (0b10001000 != (qr.rawdata[i] & 0xFF)) {
+				if (0b10001000 != (qr.corrected[i] & 0xFF)) {
 					// the pattern starts over at the beginning of a block. Strictly enforcing the standard
 					// requires knowing size of a data chunk and where it starts. Possible but
 					// probably not worth the effort the implement as a strict requirement.
-					if (0b00110111 == (qr.rawdata[i] & 0xFF)) {
+					if (0b00110111 == (qr.corrected[i] & 0xFF)) {
 						a = true;
 					} else {
 						return false;

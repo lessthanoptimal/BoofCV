@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -102,7 +102,7 @@ public class QrCode implements Cloneable {
 	/**
 	 * Raw message after error correction has been applied to it
 	 */
-	public byte[] rawdata = null;
+	public byte[] corrected = null;
 
 	/**
 	 * If applicable the message is decoded into a sequence of characters.
@@ -385,6 +385,10 @@ public class QrCode implements Cloneable {
 		return totalModules(version);
 	}
 
+	public int getNumberOfDataBytes() {
+		return VERSION_INFO[version].totalDataBytes(error);
+	}
+
 	public static int totalModules(int version ) {
 		return version*4+17;
 	}
@@ -408,7 +412,7 @@ public class QrCode implements Cloneable {
 		mode = Mode.UNKNOWN;
 		failureCause = Failure.NONE;
 		rawbits = null;
-		rawdata = null;
+		corrected = null;
 		message = null;
 	}
 
@@ -430,7 +434,7 @@ public class QrCode implements Cloneable {
 		this.message = o.message;
 		this.mode = o.mode;
 		this.rawbits = o.rawbits == null ? null : o.rawbits.clone();
-		this.rawdata = o.rawdata == null ? null : o.rawdata.clone();
+		this.corrected = o.corrected == null ? null : o.corrected.clone();
 		this.message = o.message == null ? null : new StringBuilder(o.message);
 		this.threshCorner = o.threshCorner;
 		this.threshDown = o.threshDown;

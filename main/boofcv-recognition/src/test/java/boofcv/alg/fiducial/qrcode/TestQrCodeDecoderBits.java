@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,26 +20,46 @@ package boofcv.alg.fiducial.qrcode;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
  */
 public class TestQrCodeDecoderBits {
+
 	@Test
 	public void applyErrorCorrection() {
-		fail("implement");
-	}
+		QrCode qr = new QrCodeEncoder().addNumeric("923492348985").fixate();
 
-	@Test
-	public void copyFromRawData() {
-		fail("implement");
-	}
+		QrCodeDecoderBits alg = new QrCodeDecoderBits();
 
-	@Test
-	public void decodeMessage() {
-		fail("implement");
+		byte original[] = new byte[qr.rawbits.length];
+		System.arraycopy(qr.rawbits,0,original,0,original.length);
+
+		// perfect message with no errors
+		assertTrue(alg.applyErrorCorrection(qr));
+
+		int dataSize = qr.getNumberOfDataBytes();
+		for (int i = 0; i < dataSize; i++) {
+			assertEquals(original[i],qr.corrected[i]);
+		}
+
+		// add noise and try again
+		qr.rawbits[5] ^= 0b1101001011;
+		qr.corrected = null;
+
+		assertTrue(alg.applyErrorCorrection(qr));
+
+		for (int i = 0; i < dataSize; i++) {
+			assertEquals(original[i],qr.corrected[i]);
+		}
+		// add too much noise and it should fail
+		for (int i = 0; i < 10; i++) {
+			qr.rawbits[6+i] = (byte)(qr.rawbits[i]+234);
+		}
+		qr.corrected = null;
+
+		assertFalse(alg.applyErrorCorrection(qr));
 	}
 
 	@Test
@@ -53,6 +73,30 @@ public class TestQrCodeDecoderBits {
 
 	@Test
 	public void checkPaddingBytes() {
-		fail("implement");
+		QrCode qr = new QrCodeEncoder().addNumeric("923492348985").fixate();
+
+		QrCodeDecoderBits alg = new QrCodeDecoderBits();
+
+		qr.corrected = new byte[50];
+
+		assertFalse(alg.checkPaddingBytes(qr,2));
+
+		// fill it with the pattern
+		for (int i = 2; i < qr.corrected.length; i++) {
+			if( i%2 == 0 ) {
+				qr.corrected[i] = 0b00110111;
+			} else {
+				qr.corrected[i] = (byte)0b10001000;
+			}
+		}
+
+		assertTrue(alg.checkPaddingBytes(qr,2));
+
+		// Test failure conditions now
+		assertFalse(alg.checkPaddingBytes(qr,3));
+		qr.corrected[8] ^= 0x1101;
+		assertFalse(alg.checkPaddingBytes(qr,2));
+
+
 	}
 }
