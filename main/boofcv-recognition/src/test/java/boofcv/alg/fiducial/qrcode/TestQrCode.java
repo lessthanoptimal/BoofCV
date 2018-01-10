@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,4 +93,39 @@ public class TestQrCode {
 		assertEquals(242-132, QrCode.VERSION_INFO[8].totalDataBytes(QrCode.ErrorLevel.Q));
 		assertEquals(242-156, QrCode.VERSION_INFO[8].totalDataBytes(QrCode.ErrorLevel.H));
 	}
+
+	@Test
+	public void checkClone() {
+		QrCode orig = new QrCode();
+
+		orig.threshDown = 2;
+		orig.threshCorner = 3;
+		orig.threshRight = 1;
+
+		orig.ppDown.set(0,1,2);
+		orig.ppCorner.set(1,3,6);
+		orig.ppRight.set(2,5,8);
+
+		orig.message = new StringBuilder("asdasd");
+
+		QrCode found = orig.clone();
+
+		assertTrue(found != orig);
+
+		assertEquals(2,found.threshDown,1e-8);
+		assertEquals(3,found.threshCorner,1e-8);
+		assertEquals(1,found.threshRight,1e-8);
+
+		assertTrue(orig.ppDown != found.ppDown);
+		assertTrue(orig.ppCorner != found.ppCorner);
+		assertTrue(orig.ppRight != found.ppRight);
+		assertTrue(found.ppDown.get(0).distance(1,2) <= 1e-8);
+		assertTrue(found.ppCorner.get(1).distance(3,6) <= 1e-8);
+		assertTrue(found.ppRight.get(2).distance(5,8) <= 1e-8);
+
+		assertTrue(orig.message != found.message);
+		assertTrue(found.message.toString().equals("asdasd"));
+
+	}
+
 }

@@ -60,25 +60,28 @@ public class FactoryMultiViewRobust {
 	 *
 	 * <p>See code for all the details.</p>
 	 *
-	 * @param pnp PnP parameters.  Can't be null.
-	 * @param lmeds Parameters for LMedS.  Can't be null.
+	 * @param configPnP PnP parameters.  Can't be null.
+	 * @param configLMedS Parameters for LMedS.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static LeastMedianOfSquares<Se3_F64, Point2D3D> pnpLMedS( ConfigPnP pnp,
-																	 ConfigLMedS lmeds)
+	public static LeastMedianOfSquares<Se3_F64, Point2D3D> pnpLMedS( ConfigPnP configPnP,
+																	 ConfigLMedS configLMedS)
 	{
-		pnp.checkValidity();
-		lmeds.checkValidity();
+		configPnP.checkValidity();
+		configLMedS.checkValidity();
 
-		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1( pnp.which , pnp.epnpIterations, pnp.numResolve);
+		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1( configPnP.which , configPnP.epnpIterations, configPnP.numResolve);
 
 		DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
-		distance.setIntrinsic(pnp.intrinsic.fx,pnp.intrinsic.fy,pnp.intrinsic.skew);
+		distance.setIntrinsic(configPnP.intrinsic.fx,configPnP.intrinsic.fy,configPnP.intrinsic.skew);
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
 				new EstimatorToGenerator<>(estimatorPnP);
 
-		return new LeastMedianOfSquares<>(lmeds.randSeed, lmeds.totalCycles, manager, generator, distance);
+		LeastMedianOfSquares<Se3_F64, Point2D3D>  lmeds =
+				new LeastMedianOfSquares<>(configLMedS.randSeed, configLMedS.totalCycles, manager, generator, distance);
+		lmeds.setErrorFraction(configLMedS.errorFraction);
+		return lmeds;
 	}
 
 	/**
@@ -151,7 +154,7 @@ public class FactoryMultiViewRobust {
 
 	private static LeastMedianOfSquares<Se3_F64, AssociatedPair> epipolarLMedS( Estimate1ofEpipolar epipolar,
 																				CameraPinholeRadial intrinsic,
-																				ConfigLMedS lmeds ) {
+																				ConfigLMedS configLMedS ) {
 		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
@@ -163,8 +166,10 @@ public class FactoryMultiViewRobust {
 						intrinsic.fx, intrinsic.fy, intrinsic.skew);
 
 
-		return new LeastMedianOfSquares<>
-				(lmeds.randSeed, lmeds.totalCycles, manager, generateEpipolarMotion, distanceSe3);
+		LeastMedianOfSquares<Se3_F64, AssociatedPair> config = new LeastMedianOfSquares<>
+				(configLMedS.randSeed, configLMedS.totalCycles, manager, generateEpipolarMotion, distanceSe3);
+		config.setErrorFraction(configLMedS.errorFraction);
+		return config;
 	}
 
 	/**
@@ -233,11 +238,11 @@ public class FactoryMultiViewRobust {
 	 * <p>See code for all the details.</p>
 	 *
 	 * @param homography Homography estimation parameters.  If null default is used.
-	 * @param lmeds Parameters for LMedS.  Can't be null.
+	 * @param configLMedS Parameters for LMedS.  Can't be null.
 	 * @return Homography estimator
 	 */
 	public static LeastMedianOfSquares<Homography2D_F64,AssociatedPair>
-	homographyLMedS( ConfigHomography homography , ConfigLMedS lmeds )
+	homographyLMedS( ConfigHomography homography , ConfigLMedS configLMedS )
 	{
 		if( homography == null )
 			homography = new ConfigHomography();
@@ -246,8 +251,10 @@ public class FactoryMultiViewRobust {
 		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(homography.normalize);
 		DistanceHomographySq distance = new DistanceHomographySq();
 
-		return new LeastMedianOfSquares<>
-				(lmeds.randSeed, lmeds.totalCycles, manager, modelFitter, distance);
+		LeastMedianOfSquares<Homography2D_F64,AssociatedPair> lmeds= new LeastMedianOfSquares<>
+				(configLMedS.randSeed, configLMedS.totalCycles, manager, modelFitter, distance);
+		lmeds.setErrorFraction(configLMedS.errorFraction);
+		return lmeds;
 	}
 
 	/**

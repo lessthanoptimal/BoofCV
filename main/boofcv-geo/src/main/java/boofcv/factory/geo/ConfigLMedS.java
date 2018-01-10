@@ -36,6 +36,11 @@ public class ConfigLMedS implements Configuration {
 	 */
 	public int totalCycles;
 
+	/**
+	 * The error fraction it's optimized against
+	 */
+	public double errorFraction = 0.5;
+
 	public ConfigLMedS() {
 	}
 
