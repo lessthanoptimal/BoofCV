@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class DetectFiducialSquareBinaryPanel extends DetectBlackShapePanel
 	ShapeGuiListener owner;
 
 	// selects which image to view
-	JComboBox imageView;
+	JComboBox<String> imageView;
 
 	JCheckBox showSquares;
 	JCheckBox showOrientation;
@@ -64,30 +64,12 @@ public class DetectFiducialSquareBinaryPanel extends DetectBlackShapePanel
 		polygonPanel = new DetectBlackPolygonControlPanel(owner,config.squareDetector,null);
 		polygonPanel.removeControlNumberOfSides();
 
-		imageView = new JComboBox();
-		imageView.addItem("Input");
-		imageView.addItem("Binary");
-		imageView.addItem("Black");
-		imageView.addActionListener(this);
-		imageView.setMaximumSize(imageView.getPreferredSize());
-
-		selectZoom = new JSpinner(new SpinnerNumberModel(1,MIN_ZOOM,MAX_ZOOM,1));
-		selectZoom.addChangeListener(this);
-		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
-
-		showSquares = new JCheckBox("Squares");
-		showSquares.addActionListener(this);
-		showSquares.setSelected(bShowSquares);
-		showOrientation = new JCheckBox("Orientation");
-		showOrientation.setSelected(bShowOrienation);
-		showOrientation.addActionListener(this);
-		showContour = new JCheckBox("Contour");
-		showContour.addActionListener(this);
-		showContour.setSelected(bShowContour);
-		showLabels = new JCheckBox("Labels");
-		showLabels.addActionListener(this);
-		showLabels.setSelected(bShowlabels);
-
+		imageView = combo(0,"Input","Binary","Black");
+		selectZoom = spinner(1,MIN_ZOOM,MAX_ZOOM,0.1);
+		showSquares = checkbox("Squares",bShowSquares);
+		showOrientation = checkbox("Orientation",bShowOrienation);
+		showContour = checkbox("Contour",bShowContour);
+		showLabels = checkbox("Labels",bShowlabels);
 
 		addLabeled(processingTimeLabel,"Time (ms)");
 		addLabeled(imageSizeLabel,"Size");
