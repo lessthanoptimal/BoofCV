@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,11 +30,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class Contour {
-	/**
-	 * ID of blob in the image.  Pixels belonging to this blob in the labeled image will have this pixel value.
-	 */
-	public int id;
-
 	public List<Point2D_I32> external = new ArrayList<>();
 	/**
 	 * Internal contours that are inside the blob.
@@ -42,14 +37,12 @@ public class Contour {
 	public List<List<Point2D_I32>> internal = new ArrayList<>();
 
 	public void reset() {
-		id = -1;
 		external.clear();
 		internal.clear();
 	}
 
    public Contour copy() {
       Contour ret = new Contour();
-      ret.id = id;
       for( Point2D_I32 p : external ) {
          ret.external.add( p.copy() );
       }
