@@ -100,13 +100,15 @@ public class StandardAlgConfigPanel extends JPanel {
 	}
 
 	protected void configureSpinnerFloat(JSpinner spinner, int integerDigits, int fractionDigits) {
+		double min = ((Number)((SpinnerNumberModel)spinner.getModel()).getMinimum()).doubleValue();
+		int adjust = min < 0 ? 1 : 0;
 		JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinner.getEditor();
 		DecimalFormat format = editor.getFormat();
 		format.setMinimumFractionDigits(fractionDigits);
 		format.setMinimumIntegerDigits(integerDigits);
 		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
 		Dimension d = spinner.getPreferredSize();
-		d.width = (integerDigits+1+fractionDigits)*9;
+		d.width = (adjust+integerDigits+1+fractionDigits)*11;
 		spinner.setPreferredSize(d);
 		spinner.setMaximumSize(d);
 	}

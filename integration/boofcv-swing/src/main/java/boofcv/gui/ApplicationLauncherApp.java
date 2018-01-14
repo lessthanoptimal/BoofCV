@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,12 +35,8 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.*;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Application which lists most of the demonstration application in a GUI and allows the user to double click
@@ -252,14 +248,10 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	}
 
 	private void launch(AppInfo info) {
-		List<String> classPath = new ArrayList<>();
-		ClassLoader cl = ClassLoader.getSystemClassLoader();
+		String path = System.getProperty("java.class.path");
+		String []arrayPath = path.split(":");
 
-		URL[] urls = ((URLClassLoader) cl).getURLs();
-
-		for (URL url : urls) {
-			classPath.add(url.getFile());
-		}
+		List<String> classPath = Arrays.asList(arrayPath);
 
 		final ActiveProcess process = new ActiveProcess();
 		process.info = info;
