@@ -47,6 +47,18 @@ public class StandardAlgConfigPanel extends JPanel {
 		return control;
 	}
 
+	protected JComboBox<String> combo( int initial , String... items ) {
+		JComboBox<String> c = new JComboBox<>();
+
+		for (int i = 0; i < items.length; i++) {
+			c.addItem(items[i]);
+		}
+		c.setSelectedIndex(initial);
+		c.addActionListener((ActionListener)this);
+		c.setMaximumSize(c.getPreferredSize());
+		return c;
+	}
+
 	protected JSpinner spinner(int initial , Object[] items ) {
 		JSpinner spinner = new JSpinner(new SpinnerListModel(items));
 		spinner.setValue(items[initial]);
@@ -78,7 +90,7 @@ public class StandardAlgConfigPanel extends JPanel {
 		format.setMinimumIntegerDigits(integerDigits);
 		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
 		Dimension d = spinner.getPreferredSize();
-		d.width = 60;
+		d.width = (integerDigits+1+fractionDigits)*9;
 		spinner.setPreferredSize(d);
 		spinner.setMaximumSize(d);
 		// force it to render using the format specified above. A bit of a hack. Got a better idea?
@@ -88,13 +100,15 @@ public class StandardAlgConfigPanel extends JPanel {
 	}
 
 	protected void configureSpinnerFloat(JSpinner spinner, int integerDigits, int fractionDigits) {
+		double min = ((Number)((SpinnerNumberModel)spinner.getModel()).getMinimum()).doubleValue();
+		int adjust = min < 0 ? 1 : 0;
 		JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinner.getEditor();
 		DecimalFormat format = editor.getFormat();
 		format.setMinimumFractionDigits(fractionDigits);
 		format.setMinimumIntegerDigits(integerDigits);
 		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
 		Dimension d = spinner.getPreferredSize();
-		d.width = 60;
+		d.width = (adjust+integerDigits+1+fractionDigits)*11;
 		spinner.setPreferredSize(d);
 		spinner.setMaximumSize(d);
 	}

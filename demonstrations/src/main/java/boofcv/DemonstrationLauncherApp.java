@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,6 +64,7 @@ import boofcv.demonstrations.sfm.d3.VisualizeStereoVisualOdometryApp;
 import boofcv.demonstrations.shapes.DetectBlackEllipseApp;
 import boofcv.demonstrations.shapes.DetectBlackPolygonApp;
 import boofcv.demonstrations.shapes.ShapeFitContourApp;
+import boofcv.demonstrations.tracker.DemoBackgroundRemoval;
 import boofcv.demonstrations.tracker.VideoTrackerObjectQuadApp;
 import boofcv.demonstrations.tracker.VideoTrackerPointFeaturesApp;
 import boofcv.demonstrations.tracker.VisualizeCirculantTrackerApp;
@@ -175,6 +176,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				ShapeFitContourApp.class);
 
 		createNodes(root, "Trackers",
+				DemoBackgroundRemoval.class,
 				VideoTrackerObjectQuadApp.class,
 				VideoTrackerPointFeaturesApp.class,
 				VisualizeCirculantTrackerApp.class);
@@ -192,8 +194,4 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 		final DemonstrationLauncherApp app = new DemonstrationLauncherApp();
 		app.showWindow("Demonstration Launcher");
 	}
-
-
-
-
 }

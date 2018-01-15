@@ -26,7 +26,8 @@ Version : 0.28
   * Open files will remember the last directory it opened
   * Added list of recently opened files
   * Dialog for opening a webcam
-  * Added fisheye calibration demo
+  * Added fisheye calibration
+  * Added background removal
 - Examples
   * Added ExamplePointDeformKeyPoints
 - Application: Calibration Target Generator
@@ -109,8 +110,7 @@ TOP ITEMS
   * Damaged qr codes. Data Bits, Locator Patterns, Alignment Patterns.
 
 OTHER ITEMS
-- TODO Polyline with no algorithm that doesn't loop
-- TODO Background Removal demonstration
+- TODO New polyline algorithm that doesn't loop
 - TODO Binary blob demonstration
 - TODO Update IntensityPointFeatureApp. Let it select image to open
 - TODO Visualization tools for Direct VO

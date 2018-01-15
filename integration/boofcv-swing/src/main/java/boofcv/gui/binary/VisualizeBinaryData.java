@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -150,8 +150,9 @@ public class VisualizeBinaryData {
 
 		colors = checkColors(colors,contours.size());
 
-		for( Contour c : contours ) {
-			int color = colors[c.id-1];
+		for( int i = 0; i < contours.size(); i++ ) {
+			Contour c = contours.get(i);
+			int color = colors[i];
 
 			for(Point2D_I32 p : c.external ) {
 				out.setRGB(p.x,p.y,color);

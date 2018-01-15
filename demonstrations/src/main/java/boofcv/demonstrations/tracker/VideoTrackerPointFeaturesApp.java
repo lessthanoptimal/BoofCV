@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -137,10 +137,10 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>, D extends Imag
 
 		g2.drawImage(orig,0,0,orig.getWidth(),orig.getHeight(),null);
 		for( PointTrack p : tracker.getActiveTracks(null) ) {
-			int x = (int)p.x;
-			int y = (int)p.y;
-
-			VisualizeFeatures.drawPoint(g2,x,y,Color.blue);
+			int red = (int)(2.5*(p.featureId%100));
+			int green = (int)((255.0/150.0)*(p.featureId%150));
+			int blue = (int)(p.featureId%255);
+			VisualizeFeatures.drawPoint(g2, (int)p.x, (int)p.y, new Color(red,green,blue));
 		}
 
 		for( PointTrack p : tracker.getNewTracks(null) ) {

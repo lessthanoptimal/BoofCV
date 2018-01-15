@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,6 +37,8 @@ public class ConfigBackgroundGaussian implements Configuration {
 	 * Threshold for classifying a pixel as background or not. This threshold is applied to the
 	 * computed Mahalanobis from the distribution.  An appropriate threshold will vary depending on the number
 	 * of bands in the image.
+	 *
+	 * Start tuning at 12.
 	 */
 	public float threshold;
 
