@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,5 +40,49 @@ public class TestQrCodeGenerator {
 
 		int expected = 0b1000000_11001110;
 		assertEquals(expected,found.data[0]);
+	}
+
+	@Test
+	public void alignmentPosition() {
+		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("123345").fixate();
+
+		Generator alg = new Generator();
+
+		alg.render(qr);
+
+		// get the location of alignment patterns in terms of modules
+		int alignment[] = QrCode.VERSION_INFO[qr.version].alignment;
+
+		QrCode.Alignment a = qr.alignment.get(0);
+		int N = qr.getNumberOfModules();
+
+		assertEquals(N-1-alignment[0],a.moduleX);
+		assertEquals(N-1-alignment[0],a.moduleY);
+		assertEquals((N-1-alignment[0]+0.5)/N,a.pixel.x, 1e-8);
+		assertEquals((N-1-alignment[0]+0.5)/N,a.pixel.y, 1e-8);
+
+
+	}
+
+	public class Generator extends QrCodeGenerator {
+
+		public Generator() {
+			super(1.0);
+		}
+
+		@Override
+		public void init() {
+
+		}
+
+		@Override
+		public void square(double x0, double y0, double width) {
+
+		}
+
+		@Override
+		public void square(double x0, double y0, double width0, double thickness) {
+
+		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -106,6 +106,11 @@ public abstract class QrCodeGenerator {
 			// Render the output data
 			renderData();
 		}
+
+		qr.bounds.set(0,0,0);
+		qr.bounds.set(1,markerWidth,0);
+		qr.bounds.set(2,markerWidth,markerWidth);
+		qr.bounds.set(3,0,markerWidth);
 	}
 
 	/**
@@ -216,6 +221,11 @@ public abstract class QrCodeGenerator {
 
 		square(x,y,moduleWidth*5, moduleWidth);
 		square(x + moduleWidth*2,y + moduleWidth*2, moduleWidth);
+
+		QrCode.Alignment a = qr.alignment.grow();
+		a.moduleX = gridX;
+		a.moduleY = gridY;
+		a.pixel.set( (gridX + 0.5)*moduleWidth , (gridY + 0.5)*moduleWidth );
 	}
 
 	private void square( int row , int col ) {
