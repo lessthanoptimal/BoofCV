@@ -7,6 +7,9 @@ dependencies {
     ['main','models'].each {String a ->
         compile( group: 'org.deepboof', name: a, version: project.deepboof_version) {
             exclude group: 'com.thoughtworks.xstream'
+            exclude group: 'org.ddogleg'
+            exclude group: 'org.georegression'
+            exclude group: 'org.ejml'
         }}
 
     testCompile project(':main:boofcv-io')
