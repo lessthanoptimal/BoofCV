@@ -10,10 +10,10 @@ dependencies {
 
     compile project(':integration:boofcv-swing')
 
-    compile group: 'org.bytedeco', name: 'javacv', version: '1.3'
+    compile group: 'org.bytedeco', name: 'javacv', version: '1.4'
 
     native_arch.each {
-        compile group: 'org.bytedeco.javacpp-presets', name: "opencv", version: '3.1.0-1.3', classifier: "${it}"
+        compile group: 'org.bytedeco.javacpp-presets', name: "opencv", version: '3.4.0-1.4', classifier: "${it}"
     }
 }
 
