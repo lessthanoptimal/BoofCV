@@ -1,4 +1,37 @@
-Next Release
+--------- TODO ITEMS BELOW ----------------
+Fiducials
+- FiducialDetector.setLensDistortion() add width and height parameters
+  * Unit test with heavy lens distortion and see if it fixes it
+- Have square fiducials call init if lens distortion is set.
+
+TOP ITEMS
+- TODO QR Code algorithm
+  * Better rejection of finder patterns using graph
+  * See if a better reading of mode bits is needed
+  * Reading mode and version. For small qr codes use the lines connecting position patterns
+    those will be more reliable than the sides
+- TODO QR Code Regresstion Test
+  * rotate around axis - different ranges
+  * Shadows going across the marker
+  * curved surfaces
+  * crinkled paper
+  * lots of qr codes right next to each other. Generate these
+
+OTHER ITEMS
+- TODO New polyline algorithm that doesn't loop
+- TODO Binary blob demonstration
+- TODO Update IntensityPointFeatureApp. Let it select image to open
+- TODO Visualization tools for Direct VO
+-      Show warped image
+- TODO ExampleRectifyUncalibratedStereo is upside down.  Adjust the math to avoid that
+- TODO Tutorial on image features?  Sparse and dense?
+- TODO Look at AKAZE feature
+- TODO Clarify how you calibrate the camera in Processing
+- TODO DescribeDenseHogFastAlg naming consistency. See TODO at top
+- TODO See if contour shape fitting algorithm can be speed up by using a continious set of memory instead of Point2D
+- TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
+        It is a homogenous coordinate with z=1 being implicit.
+        Found papers that use "normalized coordinates"!
 
 
 Less High Priority Next Release

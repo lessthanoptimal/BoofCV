@@ -5,7 +5,7 @@ allprojects {
     apply plugin: 'eclipse'
 
     group = 'org.boofcv'
-    version = '0.28-SNAPSHOT'
+    version = '0.28'
 }
 
 project.ext.set("deepboof_version", '0.4')
