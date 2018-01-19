@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -197,7 +197,7 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 			long id = detector.getId(i);
 
 			VisualizeFiducial.drawLabelCenter(targetToSensor, intrinsic, ""+id, g2);
-			VisualizeFiducial.drawCube(targetToSensor, intrinsic, width, 3, g2);
+			VisualizeFiducial.drawCube(targetToSensor, intrinsic, width, 5, g2);
 
 			if( computeStability.isSelected() ) {
 				handleStability(height, g2, i, id);
