@@ -19,7 +19,17 @@
 package boofcv.android;
 
 import android.graphics.Bitmap;
-import android.test.AndroidTestCase;
+import android.support.test.filters.SmallTest;
+import android.support.test.runner.AndroidJUnit4;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
@@ -28,11 +38,13 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
 
-import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
-public class TestImplConvertBitmap extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+@SmallTest
+public class TestImplConvertBitmap {
 
 	int w = 5;
 	int h = 10;
@@ -40,10 +52,15 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 	int buffer32[] = new int[w*h];
 	byte buffer8[] = new byte[w*h*4];
 
+	@Before
+	public void setup() {
+	}
+
 	public void testUpdateForFloat() {
 		fail("Should check to see if floating point gray scale images are handled correctly.  won't always be int");
 	}
 
+	@Test
 	public void testAll_ArrayToGray() {
 		Method methods[] = ImplConvertBitmap.class.getMethods();
 	
@@ -99,19 +116,20 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public void testAll_ArrayToMulti() {
+
+	@Test
+	public void testAll_ArrayToPlanar() {
 		Method methods[] = ImplConvertBitmap.class.getMethods();
 	
 		int numCount = 0;
 		
 		for( Method m : methods ) {
-			if( !m.getName().contains("arrayToMulti") )
+			if( !m.getName().contains("arrayToPlanar") )
 				continue;
 		
-			checkArrayToMulti(m,Bitmap.Config.ARGB_8888);
+			checkArrayToPlanar(m,Bitmap.Config.ARGB_8888);
 			try {
-				checkArrayToMulti(m,Bitmap.Config.RGB_565);
+				checkArrayToPlanar(m,Bitmap.Config.RGB_565);
 			} catch( RuntimeException e ) {
 				assertFalse( "Only byte supports this mode",m.getParameterTypes()[1] == byte[].class );
 			}
@@ -121,7 +139,7 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 		assertEquals(4,numCount);
 	}
 	
-	public void checkArrayToMulti( Method m , Bitmap.Config config ) {
+	public void checkArrayToPlanar( Method m , Bitmap.Config config ) {
 		Bitmap orig = Bitmap.createBitmap(w,h, config);
 		orig.setPixel(1, 2, 0xFF204010 );
 		
@@ -158,7 +176,8 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
+	@Test
 	public void testAll_BitmapToGrayRGB() {
 		Method methods[] = ImplConvertBitmap.class.getMethods();
 	
@@ -200,17 +219,18 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public void testAll_BitmapToMultiRGB() {
+
+	@Test
+	public void testAll_BitmapToPlanarRGB() {
 		Method methods[] = ImplConvertBitmap.class.getMethods();
 	
 		int numCount = 0;
 		
 		for( Method m : methods ) {
-			if( !m.getName().contains("bitmapToMulti") )
+			if( !m.getName().contains("bitmapToPlanar") )
 				continue;
 		
-			checkBitmapToMultiRGB(m,Bitmap.Config.ARGB_8888);
+			checkBitmapToPlanarRGB(m,Bitmap.Config.ARGB_8888);
 
 			numCount++;
 		}
@@ -218,7 +238,7 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 		assertEquals(2,numCount);
 	}
 	
-	public void checkBitmapToMultiRGB( Method m , Bitmap.Config config ) {
+	public void checkBitmapToPlanarRGB( Method m , Bitmap.Config config ) {
 		Bitmap orig = Bitmap.createBitmap(w,h, config);
 		orig.setPixel(1, 2, 0xFF204010 );
 		
@@ -243,7 +263,8 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
+	@Test
 	public void testAll_GrayToArray() {
 		Method methods[] = ImplConvertBitmap.class.getMethods();
 	
@@ -305,7 +326,8 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
+	@Test
 	public void testAll_GrayToBitmapRGB() {
 		Method methods[] = ImplConvertBitmap.class.getMethods();
 	
@@ -345,18 +367,19 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public void testAll_MultiToArray() {
+
+	@Test
+	public void testAll_PlanarToArray() {
 		Method methods[] = ImplConvertBitmap.class.getMethods();
 	
 		int numCount = 0;
 		
 		for( Method m : methods ) {
-			if( !m.getName().contains("multiToArray") )
+			if( !m.getName().contains("planarToArray") )
 				continue;
 		
-			checkMultiToArray(m,Bitmap.Config.ARGB_8888);
-			checkMultiToArray(m,Bitmap.Config.RGB_565);
+			checkPlanarToArray(m,Bitmap.Config.ARGB_8888);
+			checkPlanarToArray(m,Bitmap.Config.RGB_565);
 			
 			numCount++;
 		}
@@ -364,7 +387,7 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 		assertEquals(2,numCount);
 	}
 	
-	public void checkMultiToArray( Method m , Bitmap.Config config ) {
+	public void checkPlanarToArray( Method m , Bitmap.Config config ) {
 		Bitmap dst = Bitmap.createBitmap(w,h, config);
 		
 		Class[] params = m.getParameterTypes();
@@ -412,18 +435,19 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public void testAll_MultiToBitmapRGB() {
+
+	@Test
+	public void testAll_PlanarToBitmapRGB() {
 		Method methods[] = ImplConvertBitmap.class.getMethods();
 	
 		int numCount = 0;
 		
 		for( Method m : methods ) {
-			if( !m.getName().contains("multiToBitmapRGB") )
+			if( !m.getName().contains("planarToBitmapRGB") )
 				continue;
 		
-			checkMultiToBitmapRGB(m,Bitmap.Config.ARGB_8888);
-//			checkMultiToBitmapRGB(m,Bitmap.Config.RGB_565);
+			checkPlanarToBitmapRGB(m,Bitmap.Config.ARGB_8888);
+//			checkPlanarToBitmapRGB(m,Bitmap.Config.RGB_565);
 			
 			numCount++;
 		}
@@ -431,7 +455,7 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 		assertEquals(2,numCount);
 	}
 	
-	public void checkMultiToBitmapRGB( Method m , Bitmap.Config config ) {
+	public void checkPlanarToBitmapRGB( Method m , Bitmap.Config config ) {
 		Bitmap dst = Bitmap.createBitmap(w,h, config);
 		
 		Class[] params = m.getParameterTypes();
