@@ -63,6 +63,16 @@ public class CreateCalibrationTargetGui extends JPanel
 	public CreateCalibrationTargetGui() {
 		setLayout(new BorderLayout());
 
+		// set reasonable defaults
+		controlsTarget.configChessboard.squareWidth = 3;
+		controlsTarget.configSquare.numRows = 5;
+		controlsTarget.configSquare.numCols = 4;
+		controlsTarget.configSquare.squareWidth = 3;
+		controlsTarget.configSquare.spaceWidth = 2;
+		controlsTarget.configCircleHex = new ConfigCircleHexagonalGrid(20,24,1,1.5);
+		controlsTarget.configCircle =new ConfigCircleRegularGrid(17,12,1,1.5);
+		controlsTarget.changeTargetPanel();
+
 		comboPaper.addActionListener(this);
 		comboPaper.setSelectedItem(paper);
 		comboPaper.setMaximumSize(comboPaper.getPreferredSize());
@@ -79,9 +89,10 @@ public class CreateCalibrationTargetGui extends JPanel
 		addLabeled(comboUnits,"Target Units",controlsPanel);
 		controlsPanel.add(Box.createVerticalGlue());
 
-		renderingPanel.setPreferredSize(new Dimension(300,300));
+		renderingPanel.setPreferredSize(new Dimension(400,500));
 		renderingPanel.setCentering(true);
 		renderingPanel.setScaling(ScaleOptions.DOWN);
+		renderingPanel.setBackground(Color.GRAY);
 
 		add(BorderLayout.WEST, controlsPanel);
 		add(BorderLayout.CENTER,renderingPanel);
@@ -213,23 +224,25 @@ public class CreateCalibrationTargetGui extends JPanel
 		this.selectedType = type;
 		this.selectedCalib = _config;
 
-		final RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(20,1);
+		double paperWidth = paper.unit.convert(paper.width,units);
+		double paperHeight = paper.unit.convert(paper.height,units);
+
+		final RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(-1,400/paperWidth);
+
+		renderer.setPaperSize(paperWidth,paperHeight);
 
 		if( type == CalibrationTargetPanel.TargetType.CHESSBOARD ) {
 			ConfigChessboard config = (ConfigChessboard)_config;
-			renderer.chessboard(config.numRows,config.numCols,20);
+			renderer.chessboard(config.numRows,config.numCols,config.squareWidth);
 		} else if( type == CalibrationTargetPanel.TargetType.SQUARE_GRID ) {
 			ConfigSquareGrid config = (ConfigSquareGrid)_config;
-			double space = 20*config.spaceWidth/config.squareWidth;
-			renderer.squareGrid(config.numRows,config.numCols,20,space);
+			renderer.squareGrid(config.numRows,config.numCols,config.squareWidth,config.spaceWidth);
 		} else if( type == CalibrationTargetPanel.TargetType.CIRCLE_GRID ) {
 			ConfigCircleRegularGrid config = (ConfigCircleRegularGrid)_config;
-			double space = 10*config.centerDistance/config.circleDiameter;
-			renderer.circleRegular(config.numRows,config.numCols,10,space);
+			renderer.circleRegular(config.numRows,config.numCols,config.circleDiameter,config.centerDistance);
 		} else if( type == CalibrationTargetPanel.TargetType.CIRCLE_HEX ) {
 			ConfigCircleHexagonalGrid config = (ConfigCircleHexagonalGrid)_config;
-			double space = 10*config.centerDistance/config.circleDiameter;
-			renderer.circleHex(config.numRows,config.numCols,10,space);
+			renderer.circleHex(config.numRows,config.numCols,config.circleDiameter,config.centerDistance);
 		}
 
 

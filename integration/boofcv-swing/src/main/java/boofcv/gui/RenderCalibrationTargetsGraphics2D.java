@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,17 +39,38 @@ public class RenderCalibrationTargetsGraphics2D extends RenderCalibrationTargets
 	BufferedImage bufferred;
 	Graphics2D g2;
 
+	double paperWidth,paperHeight;
+
+	int offsetX,offsetY;
+
 	public RenderCalibrationTargetsGraphics2D(int padding, double unitsToPixels) {
 		this.padding = padding;
 		this.unitsToPixels = unitsToPixels;
 	}
 
+	public void setPaperSize( double widthUnits , double heightUnits ) {
+		this.paperWidth = widthUnits;
+		this.paperHeight = heightUnits;
+	}
+
 	@Override
 	public void specifySize(double width, double height) {
+
 		int w = (int)(unitsToPixels*width+0.5);
 		int h = (int)(unitsToPixels*height+0.5);
 
-		bufferred = new BufferedImage(w+2*padding,h+2*padding,BufferedImage.TYPE_INT_RGB);
+		if( paperWidth <= 0 || paperHeight <= 0 ) {
+			offsetX = offsetY = padding;
+		} else {
+			offsetX = ((int)(unitsToPixels*paperWidth+0.5)-w)/2;
+			offsetY = ((int)(unitsToPixels*paperHeight+0.5)-h)/2;
+		}
+
+		if( offsetX <= 0 || offsetY <= 0 )
+			bufferred = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
+		else
+			bufferred = new BufferedImage(w+2*offsetX,h+2*offsetY,BufferedImage.TYPE_INT_RGB);
+
 		g2 = bufferred.createGraphics();
 		g2.setColor(Color.WHITE);
 		g2.fillRect(0,0,bufferred.getWidth(),bufferred.getHeight());
@@ -61,8 +82,8 @@ public class RenderCalibrationTargetsGraphics2D extends RenderCalibrationTargets
 	@Override
 	public void drawSquare(double x, double y, double width) {
 		Rectangle2D.Double r = new Rectangle2D.Double();
-		r.x = padding + x*unitsToPixels;
-		r.y = padding + y*unitsToPixels;
+		r.x = offsetX + x*unitsToPixels;
+		r.y = offsetY + y*unitsToPixels;
 		r.width = width*unitsToPixels;
 		r.height = r.width;
 
@@ -72,8 +93,8 @@ public class RenderCalibrationTargetsGraphics2D extends RenderCalibrationTargets
 	@Override
 	public void drawCircle(double cx, double cy, double diameter) {
 		Ellipse2D.Double ellipse = new Ellipse2D.Double();
-		ellipse.x = padding + cx*unitsToPixels-diameter/2;
-		ellipse.y = padding + cy*unitsToPixels-diameter/2;
+		ellipse.x = offsetX + (cx-diameter/2)*unitsToPixels;
+		ellipse.y = offsetY + (cy-diameter/2)*unitsToPixels;
 		ellipse.width = diameter*unitsToPixels;
 		ellipse.height = diameter*unitsToPixels;
 		g2.fill(ellipse);

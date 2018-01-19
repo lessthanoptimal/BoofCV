@@ -92,7 +92,7 @@ public class CreateCalibrationTargetGenerator {
 
 		printHeader("Chessboard "+rows+"x"+cols+", squares "+squareWidth+" "+units.abbreviation);
 
-		pcs.setStrokingColor(Color.BLACK);
+		pcs.setNonStrokingColor(Color.BLACK);
 		for (int col = 0; col < cols; col++) {
 			float x = squarePoints*col;
 			for (int row = col%2; row < rows; row+=2) {
@@ -101,6 +101,7 @@ public class CreateCalibrationTargetGenerator {
 				pcs.fill();
 			}
 		}
+
 		close();
 	}
 
@@ -112,7 +113,7 @@ public class CreateCalibrationTargetGenerator {
 
 		printHeader("Square Grid "+rows+"x"+cols+", squares "+squareWidth+", space "+spacing+" "+units.abbreviation);
 
-		pcs.setStrokingColor(Color.BLACK);
+		pcs.setNonStrokingColor(Color.BLACK);
 		for (int col = 0; col < cols; col++) {
 			float x = (squarePoints+spacingPoints)*col;
 			for (int row = 0; row < rows; row++) {
@@ -143,7 +144,7 @@ public class CreateCalibrationTargetGenerator {
 
 		printHeader("Hexagonal Circle "+rows+"x"+cols+", diameter "+diameter+", center distance "+centerDistance+" "+units.abbreviation);
 
-		pcs.setStrokingColor(Color.BLACK);
+		pcs.setNonStrokingColor(Color.BLACK);
 		for (int col = 0; col < cols; col++) {
 			float x = diameterPoints/2+(separationPointsW/2)*col;
 			for (int row = col%2; row < rows; row+=2) {
@@ -163,6 +164,7 @@ public class CreateCalibrationTargetGenerator {
 
 		printHeader("Grid Circle "+rows+"x"+cols+", diameter "+diameter+", center distance "+centerDistance+" "+units.abbreviation);
 
+		pcs.setNonStrokingColor(Color.BLACK);
 		for (int col = 0; col < cols; col++) {
 			float x = diameterPoints/2+(separationPoints)*col;
 			for (int row = 0; row < rows; row++) {
@@ -193,20 +195,25 @@ public class CreateCalibrationTargetGenerator {
 		float pageWidth = (float)paper.convertWidth(units)*UNIT_TO_POINTS;
 		float pageHeight = (float)paper.convertHeight(units)*UNIT_TO_POINTS;
 
+		// center the pattern on the page
+		pcs.transform(Matrix.getTranslateInstance((pageWidth-patternWidth)/2.0f, (pageHeight-patternHeight)/2.0f));
+		// NOTE: Doing transform first ensure that the info is visible when sent to printer
+		//       for some reason
+
 		if( showInfo ) {
-			float offX = Math.min(CM_TO_POINTS,(pageWidth-patternWidth)/4);
-			float offY = Math.min(CM_TO_POINTS,(pageHeight-patternHeight)/4);
+			float offX = Math.max(CM_TO_POINTS,(pageWidth-patternWidth)/4);
+			float offY = Math.max(CM_TO_POINTS,(pageHeight-patternHeight)/4);
 
 			pcs.beginText();
+			pcs.setNonStrokingColor(Color.DARK_GRAY);
 			pcs.setFont(PDType1Font.TIMES_ROMAN,7);
-			pcs.newLineAtOffset( offX, offY );
+			pcs.newLineAtOffset( -offX, -offY );
 			pcs.showText(String.format("BoofCV: %s",documentTitle));
 			pcs.endText();
 		}
 
-		// center the pattern on the page
-		pcs.transform(Matrix.getTranslateInstance((pageWidth-patternWidth)/2.0f, (pageHeight-patternHeight)/2.0f));
 	}
+
 
 	private void close() throws IOException {
 		pcs.close();

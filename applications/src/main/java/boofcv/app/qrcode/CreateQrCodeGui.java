@@ -30,6 +30,7 @@ import boofcv.struct.image.GrayU8;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -154,7 +155,10 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 			}
 			f = new File(""); // dummy to make the code below happy and less complex
 		} else {
-			f = BoofSwingUtil.saveFileChooser(this);
+			f = FileSystemView.getFileSystemView().getHomeDirectory();
+			f = new File(f,"qrcode."+controls.format);
+
+			f = BoofSwingUtil.fileChooser(this,false,f.getPath());
 			if (f == null) {
 				return;
 			}

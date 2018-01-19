@@ -89,7 +89,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 		}
 	}
 
-	private void changeTargetPanel() {
+	public void changeTargetPanel() {
 
 		JPanel p;
 		switch(selected) {
