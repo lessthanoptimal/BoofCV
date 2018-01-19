@@ -51,12 +51,15 @@ public class ImplConvertBitmap {
 		final int h = output.height;
 		final int w = output.width;
 
-		int[] pixels = new int[h*w];
-		input.getPixels(pixels, 0,  w, 0, 0, w, h);
-		int indexSrc = 0;
+		// read one row at a time instead of the entire image to reduce memory requirements
+		int[] pixels = new int[w];
 
 		for (int y = 0; y < h; y++) {
 			int indexDst = output.startIndex + y * output.stride;
+
+			int indexSrc = 0;
+			input.getPixels(pixels, 0,  w, 0, y, w, 1);
+
 			for (int x = 0; x < w; x++) {
 				int rgb = pixels[indexSrc++];
 
@@ -70,12 +73,13 @@ public class ImplConvertBitmap {
 		final int h = output.height;
 		final int w = output.width;
 
-		int[] pixels = new int[h*w];
-		input.getPixels(pixels, 0,  w,  0, 0, w, h);
+		// read one row at a time instead of the entire image to reduce memory requirements
+		int[] pixels = new int[w];
 
-		int indexSrc = 0;
 		for (int y = 0; y < h; y++) {
 			int index = output.startIndex + y * output.stride;
+			int indexSrc = 0;
+			input.getPixels(pixels, 0,  w, 0, y, w, 1);
 			for (int x = 0; x < w; x++) {
 				int rgb = pixels[indexSrc++];
 
@@ -94,19 +98,20 @@ public class ImplConvertBitmap {
 		GrayU8 B = output.getBand(2);
 		GrayU8 A = output.getBand(3);
 
-		int[] pixels = new int[h*w];
-		input.getPixels(pixels, 0,  w , 0, 0, w, h);
-		int indexSrc = 0;
+		// read one row at a time instead of the entire image to reduce memory requirements
+		int[] pixels = new int[w];
 
 		for (int y = 0; y < h; y++) {
-			int index = output.startIndex + y * output.stride;
-			for (int x = 0; x < w; x++, index++ ) {
+			int indexDst = output.startIndex + y * output.stride;
+			int indexSrc = 0;
+			input.getPixels(pixels, 0,  w, 0, y, w, 1);
+			for (int x = 0; x < w; x++, indexDst++ ) {
 				int rgb = pixels[indexSrc++];
 
-				A.data[index] = (byte)(rgb >> 24);
-				R.data[index] = (byte)((rgb >> 16) & 0xFF);
-				G.data[index] = (byte)((rgb >> 8) & 0xFF);
-				B.data[index] = (byte)(rgb & 0xFF);
+				A.data[indexDst] = (byte)(rgb >> 24);
+				R.data[indexDst] = (byte)((rgb >> 16) & 0xFF);
+				G.data[indexDst] = (byte)((rgb >> 8) & 0xFF);
+				B.data[indexDst] = (byte)(rgb & 0xFF);
 			}
 		}
 	}
@@ -115,19 +120,20 @@ public class ImplConvertBitmap {
 		final int h = output.height;
 		final int w = output.width;
 
-		int[] pixels = new int[h*w];
-		input.getPixels(pixels, 0,  w , 0, 0, w, h);
-		int indexSrc = 0;
+		// read one row at a time instead of the entire image to reduce memory requirements
+		int[] pixels = new int[w];
 
 		for (int y = 0; y < h; y++) {
-			int index = output.startIndex + y * output.stride;
+			int indexDst = output.startIndex + y * output.stride;
+			int indexSrc = 0;
+			input.getPixels(pixels, 0,  w, 0, y, w, 1);
 			for (int x = 0; x < w; x++) {
 				int rgb = pixels[indexSrc++];
 
-				output.data[index++] = (byte)(rgb >> 24);
-				output.data[index++] = (byte)((rgb >> 16) & 0xFF);
-				output.data[index++] = (byte)((rgb >> 8) & 0xFF);
-				output.data[index++] = (byte)(rgb & 0xFF);
+				output.data[indexDst++] = (byte)(rgb >> 24);
+				output.data[indexDst++] = (byte)((rgb >> 16) & 0xFF);
+				output.data[indexDst++] = (byte)((rgb >> 8) & 0xFF);
+				output.data[indexDst++] = (byte)(rgb & 0xFF);
 			}
 		}
 	}
@@ -141,19 +147,20 @@ public class ImplConvertBitmap {
 		GrayF32 B = output.getBand(2);
 		GrayF32 A = output.getBand(3);
 
-		int[] pixels = new int[h*w];
-		input.getPixels(pixels, 0,  w , 0, 0, w, h);
-		int indexSrc = 0;
+		// read one row at a time instead of the entire image to reduce memory requirements
+		int[] pixels = new int[w];
 
 		for (int y = 0; y < h; y++) {
-			int index = output.startIndex + y * output.stride;
-			for (int x = 0; x < w; x++, index++ ) {
+			int indexDst = output.startIndex + y * output.stride;
+			int indexSrc = 0;
+			input.getPixels(pixels, 0,  w, 0, y, w, 1);
+			for (int x = 0; x < w; x++, indexDst++ ) {
 				int rgb = pixels[indexSrc++];
 
-				A.data[index] = (rgb >> 24) & 0xFF;
-				R.data[index] = (rgb >> 16) & 0xFF;
-				G.data[index] = (rgb >> 8) & 0xFF;
-				B.data[index] = rgb & 0xFF;
+				A.data[indexDst] = (rgb >> 24) & 0xFF;
+				R.data[indexDst] = (rgb >> 16) & 0xFF;
+				G.data[indexDst] = (rgb >> 8) & 0xFF;
+				B.data[indexDst] = rgb & 0xFF;
 			}
 		}
 	}
@@ -162,19 +169,20 @@ public class ImplConvertBitmap {
 		final int h = output.height;
 		final int w = output.width;
 
-		int[] pixels = new int[h*w];
-		input.getPixels(pixels, 0,  w , 0, 0, w, h);
-		int indexSrc = 0;
+		// read one row at a time instead of the entire image to reduce memory requirements
+		int[] pixels = new int[w];
 
 		for (int y = 0; y < h; y++) {
-			int index = output.startIndex + y * output.stride;
+			int indexDst = output.startIndex + y * output.stride;
+			int indexSrc = 0;
+			input.getPixels(pixels, 0,  w, 0, y, w, 1);
 			for (int x = 0; x < w; x++ ) {
 				int rgb = pixels[indexSrc++];
 
-				output.data[index++] = (rgb >> 24) & 0xFF;
-				output.data[index++] = (rgb >> 16) & 0xFF;
-				output.data[index++] = (rgb >> 8) & 0xFF;
-				output.data[index++] = rgb & 0xFF;
+				output.data[indexDst++] = (rgb >> 24) & 0xFF;
+				output.data[indexDst++] = (rgb >> 16) & 0xFF;
+				output.data[indexDst++] = (rgb >> 8) & 0xFF;
+				output.data[indexDst++] = rgb & 0xFF;
 			}
 		}
 	}
@@ -183,14 +191,18 @@ public class ImplConvertBitmap {
 		final int h = input.height;
 		final int w = input.width;
 
-		for (int y = 0; y < h; y++) {
-			int index = input.startIndex + y * input.stride;
-			for (int x = 0; x < w; x++) {
-				int gray = input.data[index++] & 0xFF;
+		// read one row at a time instead of the entire image to reduce memory requirements
+		int[] pixels = new int[w];
 
-				output.setPixel(x, y, 0xFF << 24 | gray << 16 | gray << 8
-						| gray);
+		for (int y = 0; y < h; y++) {
+			int indexSrc = input.startIndex + y * input.stride;
+			int indexDst = 0;
+			for (int x = 0; x < w; x++) {
+				int gray = input.data[indexSrc++] & 0xFF;
+
+				pixels[indexDst++] = (0xFF << 24) | (gray << 16) | (gray << 8) | gray;
 			}
+			output.setPixels(pixels,0,w,0,y,w,1);
 		}
 	}
 	
@@ -198,13 +210,18 @@ public class ImplConvertBitmap {
 		final int h = input.height;
 		final int w = input.width;
 
-		for (int y = 0; y < h; y++) {
-			int index = input.startIndex + y * input.stride;
-			for (int x = 0; x < w; x++) {
-				int gray = (int)input.data[index++];
+		// read one row at a time instead of the entire image to reduce memory requirements
+		int[] pixels = new int[w];
 
-				output.setPixel(x, y, 0xFF << 24 | gray << 16 | gray << 8 | gray);
+		for (int y = 0; y < h; y++) {
+			int indexSrc = input.startIndex + y * input.stride;
+			int indexDst = 0;
+			for (int x = 0; x < w; x++) {
+				int gray = (int)input.data[indexSrc++];
+
+				pixels[indexDst++] = (0xFF << 24) | (gray << 16) | (gray << 8) | gray;
 			}
+			output.setPixels(pixels,0,w,0,y,w,1);
 		}
 	}
 	
@@ -216,13 +233,17 @@ public class ImplConvertBitmap {
 		GrayU8 G = input.getBand(1);
 		GrayU8 B = input.getBand(2);
 		GrayU8 A = input.getBand(3);
-		
-		for (int y = 0; y < h; y++) {
-			int index = input.startIndex + y * input.stride;
-			for (int x = 0; x < w; x++,index++) {
 
-				output.setPixel(x, y,(A.data[index] & 0xFF) << 24 | (R.data[index] & 0xFF) << 16 | (G.data[index] & 0xFF) << 8 | (B.data[index] & 0xFF) );
+		// read one row at a time instead of the entire image to reduce memory requirements
+		int[] pixels = new int[w];
+
+		for (int y = 0; y < h; y++) {
+			int indexSrc = input.startIndex + y * input.stride;
+			int indexDst = 0;
+			for (int x = 0; x < w; x++,indexSrc++) {
+				pixels[indexDst++] = (A.data[indexSrc] & 0xFF) << 24 | (R.data[indexSrc] & 0xFF) << 16 | (G.data[indexSrc] & 0xFF) << 8 | (B.data[indexSrc] & 0xFF);
 			}
+			output.setPixels(pixels,0,w,0,y,w,1);
 		}
 	}
 
@@ -234,18 +255,23 @@ public class ImplConvertBitmap {
 		GrayF32 G = input.getBand(1);
 		GrayF32 B = input.getBand(2);
 		GrayF32 A = input.getBand(3);
-		
-		for (int y = 0; y < h; y++) {
-			int index = input.startIndex + y * input.stride;
-			for (int x = 0; x < w; x++,index++) {
 
-				int r = (int)R.data[index];
-				int g = (int)G.data[index];
-				int b = (int)B.data[index];
-				int a = (int)A.data[index];
-	
-				output.setPixel(x, y, a << 24 | r << 16 | g << 8 | b );
+		// read one row at a time instead of the entire image to reduce memory requirements
+		int[] pixels = new int[w];
+
+		for (int y = 0; y < h; y++) {
+			int indexSrc = input.startIndex + y * input.stride;
+			int indexDst = 0;
+			for (int x = 0; x < w; x++,indexSrc++) {
+
+				int r = (int)R.data[indexSrc];
+				int g = (int)G.data[indexSrc];
+				int b = (int)B.data[indexSrc];
+				int a = (int)A.data[indexSrc];
+
+				pixels[indexDst++] = a << 24 | r << 16 | g << 8 | b;
 			}
+			output.setPixels(pixels,0,w,0,y,w,1);
 		}
 	}
 	
