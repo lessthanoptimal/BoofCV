@@ -24,7 +24,9 @@ import org.ejml.ops.CommonOps_BDRM;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Provides an easy to use interface for specifying QR-Code parameters and generating the raw data sequence. After
@@ -66,6 +68,13 @@ public class QrCodeEncoder {
 	// version, store the segments here until fixate is called.
 	private List<MessageSegment> segments = new ArrayList<>();
 
+	Set<Character.UnicodeBlock> japaneseUnicodeBlocks = new HashSet<Character.UnicodeBlock>() {{
+		add(Character.UnicodeBlock.HIRAGANA);
+		add(Character.UnicodeBlock.KATAKANA);
+		add(Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS);
+	}};
+
+
 	public QrCodeEncoder() {
 		reset();
 	}
@@ -97,12 +106,73 @@ public class QrCodeEncoder {
 	}
 
 	/**
-	 * Select the encoding based on the letters in the message. In the future this might do fancy things like
-	 * switch between multiple modes to increase the number of characters.
+	 * Select the encoding based on the letters in the message. A very simple algorithm is used internally.
+	 *
 	 */
 	public QrCodeEncoder addAutomatic(String message) {
-		qr.message = message;
-		return addBytes(message);
+		// very simple coding algorithm. Doesn't try to compress by using multiple formats
+		if(containsKanji(message)) {
+			// split into kanji and non-kanji segments
+			int start = 0;
+			boolean kanji = isKanji(message.charAt(0));
+			for (int i = 0; i < message.length(); i++) {
+				if( isKanji(message.charAt(i))) {
+					if( !kanji ) {
+						addAutomatic(message.substring(start,i));
+						start = i;
+						kanji = true;
+					}
+				} else {
+					if( kanji ) {
+						addKanji(message.substring(start,i));
+						start = i;
+						kanji = false;
+					}
+				}
+			}
+			if( kanji ) {
+				addKanji(message.substring(start,message.length()));
+			} else {
+				addAutomatic(message.substring(start,message.length()));
+			}
+			return this;
+		} else if( containsByte(message)) {
+			return addBytes(message);
+		} else if( containsAlphaNumeric(message)) {
+			return addAlphanumeric(message);
+		} else {
+			return addNumeric(message);
+		}
+	}
+
+	private boolean isKanji( char c ) {
+		return japaneseUnicodeBlocks.contains(Character.UnicodeBlock.of(c));
+	}
+
+	private boolean containsKanji( String message ) {
+		for (int i = 0; i < message.length(); i++) {
+			if (isKanji(message.charAt(i))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean containsByte( String message ) {
+		for (int i = 0; i < message.length(); i++) {
+			if( ALPHANUMERIC.indexOf(message.charAt(i)) == -1)
+				return true;
+		}
+		return false;
+	}
+
+	private boolean containsAlphaNumeric( String message ) {
+		for (int i = 0; i < message.length(); i++) {
+			int c = (int)message.charAt(i) - '0';
+			if( c < 0 || c > 9  )
+				return true;
+		}
+		return false;
 	}
 
 	/**
@@ -407,7 +477,7 @@ public class QrCodeEncoder {
 		}
 
 		if( packed.size != expectedBitSize )
-			throw new RuntimeException("Bad size code");
+			throw new RuntimeException("Bad size code. "+packed.size+" vs "+expectedBitSize);
 
 		int maxBits = QrCode.VERSION_INFO[qr.version].codewords * 8;
 

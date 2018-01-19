@@ -30,6 +30,8 @@ Version : 0.28
   * Added background removal
 - Examples
   * Added ExamplePointDeformKeyPoints
+  * Added QR Code Detector
+  * Added QR Code Encoder
 - Application: Calibration Target Generator
   * Added circle hexagonal
   * Output is a PDF document now

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -108,7 +108,7 @@ public class TestQrCodeEncoder {
 		QrCodeEncoder encoder = new QrCodeEncoder();
 		encoder.setVersion(1).setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				addKanji("阿ん鞠ぷへ≦Ｋ").fixate();
+				addKanji("134阿ん鞠ぷへ≦Ｋ").fixate();
 
 		byte expected[] = new byte[]{
 				0x01,0x4E,(byte)0x8B,(byte)0xA0,0x23,
@@ -117,6 +117,35 @@ public class TestQrCodeEncoder {
 		for (int i = 0; i < expected.length; i++) {
 			assertEquals(expected[i],encoder.packed.data[i]);
 		}
+	}
+
+	@Test
+	public void automatic() {
+		QrCodeEncoder encoder = new QrCodeEncoder();
+		QrCodeDecoderBits decoder = new QrCodeDecoderBits(); // used to validate the message
+		QrCode qr = encoder.addAutomatic("123ASDdf阿ん鞠ぷへ≦Ｋ").fixate();
+
+		assertTrue(decoder.applyErrorCorrection(qr));
+		assertTrue(decoder.decodeMessage(qr));
+		assertEquals(QrCode.Mode.KANJI,qr.mode);
+
+		encoder.reset();
+		qr = encoder.addAutomatic("123ASDdf").fixate();
+		assertTrue(decoder.applyErrorCorrection(qr));
+		assertTrue(decoder.decodeMessage(qr));
+		assertEquals(QrCode.Mode.BYTE,qr.mode);
+
+		encoder.reset();
+		qr = encoder.addAutomatic("123ASD").fixate();
+		assertTrue(decoder.applyErrorCorrection(qr));
+		assertTrue(decoder.decodeMessage(qr));
+		assertEquals(QrCode.Mode.ALPHANUMERIC,qr.mode);
+
+		encoder.reset();
+		qr = encoder.addAutomatic("123").fixate();
+		assertTrue(decoder.applyErrorCorrection(qr));
+		assertTrue(decoder.decodeMessage(qr));
+		assertEquals(QrCode.Mode.NUMERIC,qr.mode);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
