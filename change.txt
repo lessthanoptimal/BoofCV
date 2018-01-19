@@ -83,6 +83,8 @@ Version : 0.28
   * Detector and Decoder
   * Renderer and Encoder
   * Application for creating documents and images
+- Android
+  * Faster RGB to Boof Image. Suggested by giulionf
 
 ---------------------------------------------
 Date    : 2017-08-16

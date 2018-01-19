@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,13 +51,17 @@ public class ImplConvertBitmap {
 		final int h = output.height;
 		final int w = output.width;
 
+		int[] pixels = new int[h*w];
+		input.getPixels(pixels, 0,  w, 0, 0, w, h);
+		int indexSrc = 0;
+
 		for (int y = 0; y < h; y++) {
-			int index = output.startIndex + y * output.stride;
+			int indexDst = output.startIndex + y * output.stride;
 			for (int x = 0; x < w; x++) {
-				int rgb = input.getPixel(x, y);
+				int rgb = pixels[indexSrc++];
 
 				int value = (((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF)) / 3;
-				output.data[index++] = (byte) value;
+				output.data[indexDst++] = (byte) value;
 			}
 		}
 	}
@@ -66,10 +70,14 @@ public class ImplConvertBitmap {
 		final int h = output.height;
 		final int w = output.width;
 
+		int[] pixels = new int[h*w];
+		input.getPixels(pixels, 0,  w,  0, 0, w, h);
+
+		int indexSrc = 0;
 		for (int y = 0; y < h; y++) {
 			int index = output.startIndex + y * output.stride;
 			for (int x = 0; x < w; x++) {
-				int rgb = input.getPixel(x, y);
+				int rgb = pixels[indexSrc++];
 
 				float value = (((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF)) / 3f;
 				output.data[index++] = value;
@@ -86,10 +94,14 @@ public class ImplConvertBitmap {
 		GrayU8 B = output.getBand(2);
 		GrayU8 A = output.getBand(3);
 
+		int[] pixels = new int[h*w];
+		input.getPixels(pixels, 0,  w , 0, 0, w, h);
+		int indexSrc = 0;
+
 		for (int y = 0; y < h; y++) {
 			int index = output.startIndex + y * output.stride;
 			for (int x = 0; x < w; x++, index++ ) {
-				int rgb = input.getPixel(x, y);
+				int rgb = pixels[indexSrc++];
 
 				A.data[index] = (byte)(rgb >> 24);
 				R.data[index] = (byte)((rgb >> 16) & 0xFF);
@@ -103,10 +115,14 @@ public class ImplConvertBitmap {
 		final int h = output.height;
 		final int w = output.width;
 
+		int[] pixels = new int[h*w];
+		input.getPixels(pixels, 0,  w , 0, 0, w, h);
+		int indexSrc = 0;
+
 		for (int y = 0; y < h; y++) {
 			int index = output.startIndex + y * output.stride;
 			for (int x = 0; x < w; x++) {
-				int rgb = input.getPixel(x, y);
+				int rgb = pixels[indexSrc++];
 
 				output.data[index++] = (byte)(rgb >> 24);
 				output.data[index++] = (byte)((rgb >> 16) & 0xFF);
@@ -125,10 +141,14 @@ public class ImplConvertBitmap {
 		GrayF32 B = output.getBand(2);
 		GrayF32 A = output.getBand(3);
 
+		int[] pixels = new int[h*w];
+		input.getPixels(pixels, 0,  w , 0, 0, w, h);
+		int indexSrc = 0;
+
 		for (int y = 0; y < h; y++) {
 			int index = output.startIndex + y * output.stride;
 			for (int x = 0; x < w; x++, index++ ) {
-				int rgb = input.getPixel(x, y);
+				int rgb = pixels[indexSrc++];
 
 				A.data[index] = (rgb >> 24) & 0xFF;
 				R.data[index] = (rgb >> 16) & 0xFF;
@@ -142,10 +162,14 @@ public class ImplConvertBitmap {
 		final int h = output.height;
 		final int w = output.width;
 
+		int[] pixels = new int[h*w];
+		input.getPixels(pixels, 0,  w , 0, 0, w, h);
+		int indexSrc = 0;
+
 		for (int y = 0; y < h; y++) {
 			int index = output.startIndex + y * output.stride;
 			for (int x = 0; x < w; x++ ) {
-				int rgb = input.getPixel(x, y);
+				int rgb = pixels[indexSrc++];
 
 				output.data[index++] = (rgb >> 24) & 0xFF;
 				output.data[index++] = (rgb >> 16) & 0xFF;
