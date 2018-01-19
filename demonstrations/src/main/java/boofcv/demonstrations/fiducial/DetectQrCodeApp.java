@@ -149,7 +149,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 				});
 
 
-		setPreferredSize(new Dimension(800,800));
+		setPreferredSize(new Dimension(1200,800));
 	}
 
 	@Override
