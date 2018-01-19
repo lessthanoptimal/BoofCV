@@ -224,28 +224,29 @@ public class CreateCalibrationTargetGui extends JPanel
 		this.selectedType = type;
 		this.selectedCalib = _config;
 
+		updatePreview();
+	}
+
+	private void updatePreview() {
 		double paperWidth = paper.unit.convert(paper.width,units);
 		double paperHeight = paper.unit.convert(paper.height,units);
 
 		final RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(-1,400/paperWidth);
-
 		renderer.setPaperSize(paperWidth,paperHeight);
 
-		if( type == CalibrationTargetPanel.TargetType.CHESSBOARD ) {
-			ConfigChessboard config = (ConfigChessboard)_config;
+		if( selectedType == CalibrationTargetPanel.TargetType.CHESSBOARD ) {
+			ConfigChessboard config = (ConfigChessboard)selectedCalib;
 			renderer.chessboard(config.numRows,config.numCols,config.squareWidth);
-		} else if( type == CalibrationTargetPanel.TargetType.SQUARE_GRID ) {
-			ConfigSquareGrid config = (ConfigSquareGrid)_config;
+		} else if( selectedType == CalibrationTargetPanel.TargetType.SQUARE_GRID ) {
+			ConfigSquareGrid config = (ConfigSquareGrid)selectedCalib;
 			renderer.squareGrid(config.numRows,config.numCols,config.squareWidth,config.spaceWidth);
-		} else if( type == CalibrationTargetPanel.TargetType.CIRCLE_GRID ) {
-			ConfigCircleRegularGrid config = (ConfigCircleRegularGrid)_config;
+		} else if( selectedType == CalibrationTargetPanel.TargetType.CIRCLE_GRID ) {
+			ConfigCircleRegularGrid config = (ConfigCircleRegularGrid)selectedCalib;
 			renderer.circleRegular(config.numRows,config.numCols,config.circleDiameter,config.centerDistance);
-		} else if( type == CalibrationTargetPanel.TargetType.CIRCLE_HEX ) {
-			ConfigCircleHexagonalGrid config = (ConfigCircleHexagonalGrid)_config;
+		} else if( selectedType == CalibrationTargetPanel.TargetType.CIRCLE_HEX ) {
+			ConfigCircleHexagonalGrid config = (ConfigCircleHexagonalGrid)selectedCalib;
 			renderer.circleHex(config.numRows,config.numCols,config.circleDiameter,config.centerDistance);
 		}
-
-
 
 		renderingPanel.setImageUI(renderer.getBufferred());
 	}
@@ -257,5 +258,7 @@ public class CreateCalibrationTargetGui extends JPanel
 		} else if( e.getSource() == comboUnits ) {
 			units = Unit.values()[comboUnits.getSelectedIndex()];
 		}
+
+		updatePreview();
 	}
 }
