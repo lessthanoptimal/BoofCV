@@ -104,10 +104,11 @@ public class CreateCalibrationTargetGui extends JPanel
 		frame = ShowImages.showWindow(this,"BoofCV Create Calibration Target",true);
 	}
 
-	void createMenuBar() {
+	private void createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 
 		JMenu menu = new JMenu("File");
+		menu.setMnemonic(KeyEvent.VK_F);
 		menuBar.add(menu);
 
 		JMenuItem menuSave = new JMenuItem("Save");
@@ -128,6 +129,14 @@ public class CreateCalibrationTargetGui extends JPanel
 			}
 		});
 
+		JMenuItem menuHelp = new JMenuItem("Help", KeyEvent.VK_H);
+		menuHelp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showHelp();
+			}
+		});
+
 		JMenuItem menuQuit = new JMenuItem("Quit");
 		BoofSwingUtil.setMenuItemKeys(menuQuit,KeyEvent.VK_Q,KeyEvent.VK_Q);
 		menuQuit.addActionListener(new ActionListener() {
@@ -140,12 +149,17 @@ public class CreateCalibrationTargetGui extends JPanel
 		menu.addSeparator();
 		menu.add(menuSave);
 		menu.add(menuPrint);
+		menu.add(menuHelp);
 		menu.add(menuQuit);
 
 		add(BorderLayout.NORTH,menuBar);
 	}
 
-	void saveFile( boolean sendToPrinter ) {
+	private void showHelp() {
+		JOptionPane.showMessageDialog(this,"Many more options and better documentation available through commandline");
+	}
+
+	private void saveFile( boolean sendToPrinter ) {
 		// grab the focus and force what the user is editing to be saved
 
 		File f;

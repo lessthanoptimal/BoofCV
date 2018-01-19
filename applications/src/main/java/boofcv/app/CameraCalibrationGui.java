@@ -115,6 +115,7 @@ public class CameraCalibrationGui extends JPanel
 		JMenuBar menuBar = new JMenuBar();
 
 		JMenu menu = new JMenu("File");
+		menu.setMnemonic(KeyEvent.VK_F);
 		menuBar.add(menu);
 
 		JMenuItem menuOpenDirectory = new JMenuItem("Input Directory");
@@ -135,6 +136,14 @@ public class CameraCalibrationGui extends JPanel
 			}
 		});
 
+		JMenuItem menuHelp = new JMenuItem("Help", KeyEvent.VK_H);
+		menuHelp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showHelp();
+			}
+		});
+
 		JMenuItem menuQuit = new JMenuItem("Quit");
 		BoofSwingUtil.setMenuItemKeys(menuOpenDirectory,KeyEvent.VK_Q,KeyEvent.VK_Q);
 		menuQuit.addActionListener(new ActionListener() {
@@ -147,9 +156,14 @@ public class CameraCalibrationGui extends JPanel
 		menu.addSeparator();
 		menu.add(menuOpenDirectory);
 		menu.add(menuWebcam);
+		menu.add(menuHelp);
 		menu.add(menuQuit);
 
 		add(BorderLayout.NORTH,menuBar);
+	}
+
+	private void showHelp() {
+		JOptionPane.showMessageDialog(this,"Many more options and better documentation available through commandline");
 	}
 
 	private void openWebcam() {
