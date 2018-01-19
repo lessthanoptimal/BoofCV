@@ -25,9 +25,12 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.printing.PDFPageable;
 import org.apache.pdfbox.util.Matrix;
 
 import java.awt.*;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.IOException;
 
 import static georegression.metric.UtilAngle.radian;
@@ -43,6 +46,8 @@ public class CreateCalibrationTargetGenerator {
 	PDDocument document;
 	PDPage page;
 	PDPageContentStream pcs;
+
+	public boolean sendToPrinter = false;
 
 	PaperSize paper;
 	int rows,cols;
@@ -205,8 +210,22 @@ public class CreateCalibrationTargetGenerator {
 
 	private void close() throws IOException {
 		pcs.close();
-		document.save(documentName);
-		document.close();
+
+		try {
+			if (sendToPrinter) {
+				PrinterJob job = PrinterJob.getPrinterJob();
+				job.setPageable(new PDFPageable(document));
+				if (job.printDialog()) {
+					job.print();
+				}
+			} else {
+				document.save(documentName);
+			}
+		} catch (PrinterException e) {
+			throw new IOException(e);
+		} finally {
+			document.close();
+		}
 	}
 
 	public void setShowInfo(boolean showInfo) {

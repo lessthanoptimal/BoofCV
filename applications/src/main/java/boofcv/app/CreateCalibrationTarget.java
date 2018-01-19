@@ -69,6 +69,9 @@ public class CreateCalibrationTarget {
 	@Option(name="-i",aliases = {"--DisablePrintInfo"}, usage="Disable printing information about the calibration target")
 	boolean disablePrintInfo = false;
 
+	@Option(name="--GUI", usage="Ignore all other command line arguments and switch to GUI mode")
+	private boolean guiMode = false;
+
 	private static void printHelpExit( CmdLineParser parser ) {
 		parser.getProperties().withUsageWidth(120);
 		parser.printUsage(System.out);
@@ -112,6 +115,11 @@ public class CreateCalibrationTarget {
 	}
 
 	private void finishParsing(CmdLineParser parser) {
+		if( guiMode ) {
+			new CreateCalibrationTargetGui();
+			return;
+		}
+
 		if( rows <= 0 || columns <= 0 || _type == null )
 			printHelpExit(parser);
 		for( CalibrationPatterns p : CalibrationPatterns.values() ) {
@@ -208,7 +216,8 @@ public class CreateCalibrationTarget {
 		try {
 			parser.parseArgument(args);
 			generator.finishParsing(parser);
-			generator.run();
+			if( !generator.guiMode )
+				generator.run();
 		} catch (CmdLineException e) {
 			// handling of wrong arguments
 			System.err.println(e.getMessage());

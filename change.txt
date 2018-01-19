@@ -33,6 +33,7 @@ Version : 0.28
 - Application: Calibration Target Generator
   * Added circle hexagonal
   * Output is a PDF document now
+  * Has a GUI
 - Application: Camera Calibration
   * Support for omni universal model
   * Can choose to save output in OpenCV format

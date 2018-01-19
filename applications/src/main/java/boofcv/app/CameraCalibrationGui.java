@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.app.calib.CalibrationModelPanel;
 import boofcv.app.calib.CalibrationTargetPanel;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.RenderCalibrationTargetsGraphics2D;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
@@ -106,7 +107,7 @@ public class CameraCalibrationGui extends JPanel
 		// trigger an event which will cause the target to be rendered
 		controlsTarget.updateParameters();
 
-		frame = ShowImages.showWindow(this,"BoofCv Camera Calibration",true);
+		frame = ShowImages.showWindow(this,"BoofCV Camera Calibration",true);
 	}
 
 
@@ -116,33 +117,32 @@ public class CameraCalibrationGui extends JPanel
 		JMenu menu = new JMenu("File");
 		menuBar.add(menu);
 
-		JMenuItem menuOpenDirectory = new JMenuItem("Input Directory", KeyEvent.VK_D);
+		JMenuItem menuOpenDirectory = new JMenuItem("Input Directory");
+		BoofSwingUtil.setMenuItemKeys(menuOpenDirectory,KeyEvent.VK_D,KeyEvent.VK_D);
 		menuOpenDirectory.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				processDirectory();
 			}
 		});
-		menuOpenDirectory.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
 
-		JMenuItem menuWebcam = new JMenuItem("Input Webcam", KeyEvent.VK_W);
+		JMenuItem menuWebcam = new JMenuItem("Input Webcam");
+		BoofSwingUtil.setMenuItemKeys(menuOpenDirectory,KeyEvent.VK_W,KeyEvent.VK_W);
 		menuWebcam.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				openWebcam();
 			}
 		});
-		menuWebcam.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
 
-		JMenuItem menuQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
+		JMenuItem menuQuit = new JMenuItem("Quit");
+		BoofSwingUtil.setMenuItemKeys(menuOpenDirectory,KeyEvent.VK_Q,KeyEvent.VK_Q);
 		menuQuit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
 			}
 		});
-		menuQuit.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
 
 		menu.addSeparator();
 		menu.add(menuOpenDirectory);

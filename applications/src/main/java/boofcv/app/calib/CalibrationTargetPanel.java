@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 		comboType.setMaximumSize(comboType.getPreferredSize());
 
 		panelTarget.setLayout(new BorderLayout());
-		panelTarget.setPreferredSize(new Dimension(250,100));
+		panelTarget.setPreferredSize(new Dimension(250,106));
 		panelTarget.setMaximumSize(panelTarget.getPreferredSize());
 		changeTargetPanel();
 
@@ -108,16 +108,18 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 
 	private class ChessPanel extends StandardAlgConfigPanel implements ChangeListener {
 
-		JSpinner sRows,sCols;
+		JSpinner sRows,sCols,sWidth;
 
 		public ChessPanel() {
 			setBorder(BorderFactory.createEmptyBorder());
 
 			sRows = spinner(configChessboard.numRows,1,1000,1);
 			sCols = spinner(configChessboard.numCols,1,1000,1);
+			sWidth = spinner(configChessboard.squareWidth,0,1000000.0,1);
 
 			addLabeled(sRows,"Rows");
 			addLabeled(sCols,"Cols");
+			addLabeled(sWidth,"Square Width");
 		}
 
 		@Override
@@ -126,6 +128,8 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 				configChessboard.numRows = ((Number)sRows.getValue()).intValue();
 			} else if( e.getSource() == sCols ) {
 				configChessboard.numCols = ((Number)sCols.getValue()).intValue();
+			} else if( e.getSource() == sWidth ) {
+				configChessboard.squareWidth = ((Number)sWidth.getValue()).doubleValue();
 			}
 			updateParameters();
 		}

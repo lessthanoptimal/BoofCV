@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public class BoofSwingUtil {
 	public static final double MAX_ZOOM = 50;
 
 	public static File saveFileChooser(Component parent, FileTypes ...filters) {
-		return openFileChooser(parent,false,new File(".").getPath(),filters);
+		return fileChooser(parent,false,new File(".").getPath(),filters);
 	}
 
 	public static File openFileChooser(Component parent, FileTypes ...filters) {
@@ -44,10 +44,10 @@ public class BoofSwingUtil {
 	}
 
 	public static File openFileChooser(Component parent, String defaultPath , FileTypes ...filters) {
-		return openFileChooser(parent,true,defaultPath,filters);
+		return fileChooser(parent,true,defaultPath,filters);
 	}
 
-	public static File openFileChooser(Component parent, boolean openFile, String defaultPath , FileTypes ...filters) {
+	public static File fileChooser(Component parent, boolean openFile, String defaultPath , FileTypes ...filters) {
 
 		Preferences prefs;
 		if( parent == null ) {
