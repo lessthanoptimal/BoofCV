@@ -128,7 +128,7 @@ public class CameraCalibrationGui extends JPanel
 		});
 
 		JMenuItem menuWebcam = new JMenuItem("Input Webcam");
-		BoofSwingUtil.setMenuItemKeys(menuOpenDirectory,KeyEvent.VK_W,KeyEvent.VK_W);
+		BoofSwingUtil.setMenuItemKeys(menuWebcam,KeyEvent.VK_W,KeyEvent.VK_W);
 		menuWebcam.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -145,7 +145,7 @@ public class CameraCalibrationGui extends JPanel
 		});
 
 		JMenuItem menuQuit = new JMenuItem("Quit");
-		BoofSwingUtil.setMenuItemKeys(menuOpenDirectory,KeyEvent.VK_Q,KeyEvent.VK_Q);
+		BoofSwingUtil.setMenuItemKeys(menuQuit,KeyEvent.VK_Q,KeyEvent.VK_Q);
 		menuQuit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -205,7 +205,11 @@ public class CameraCalibrationGui extends JPanel
 
 			new Thread() {
 				public void run() {
-					app.process();
+					try {
+						app.process();
+					} catch( RuntimeException e ) {
+						BoofSwingUtil.warningDialog(frame,e);
+					}
 				}
 			}.start();
 		}
