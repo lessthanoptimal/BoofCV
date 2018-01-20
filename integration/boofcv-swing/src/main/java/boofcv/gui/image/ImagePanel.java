@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,12 +114,16 @@ public class ImagePanel extends JPanel {
 
 	private void computeOffsetAndScale(BufferedImage img, ScaleOffset so ) {
 		if( scaling != ScaleOptions.NONE ) {
-			double ratioW = (double)getWidth()/(double)img.getWidth();
-			double ratioH = (double)getHeight()/(double)img.getHeight();
+			if( scaling == ScaleOptions.MANUAL ) {
+				so.scale = scale;
+			} else {
+				double ratioW = (double) getWidth() / (double) img.getWidth();
+				double ratioH = (double) getHeight() / (double) img.getHeight();
 
-			so.scale = Math.min(ratioW,ratioH);
-			if( scaling == ScaleOptions.DOWN && so.scale >= 1 )
-				so.scale = 1;
+				so.scale = Math.min(ratioW, ratioH);
+				if (scaling == ScaleOptions.DOWN && so.scale >= 1)
+					so.scale = 1;
+			}
 
 			if( center ) {
 				so.offsetX = (getWidth()-img.getWidth()*so.scale)/2;

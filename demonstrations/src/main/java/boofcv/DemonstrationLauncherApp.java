@@ -20,6 +20,7 @@ package boofcv;
 
 import boofcv.demonstrations.binary.DemoBinaryImageLabelOpsApp;
 import boofcv.demonstrations.binary.DemoBinaryImageOpsApp;
+import boofcv.demonstrations.binary.DemoImageThresholdingApp;
 import boofcv.demonstrations.calibration.*;
 import boofcv.demonstrations.color.ShowColorModelApp;
 import boofcv.demonstrations.distort.*;
@@ -63,6 +64,7 @@ import boofcv.demonstrations.sfm.d3.VisualizeMonocularPlaneVisualOdometryApp;
 import boofcv.demonstrations.sfm.d3.VisualizeStereoVisualOdometryApp;
 import boofcv.demonstrations.shapes.DetectBlackEllipseApp;
 import boofcv.demonstrations.shapes.DetectBlackPolygonApp;
+import boofcv.demonstrations.shapes.DetectPolylineApp;
 import boofcv.demonstrations.shapes.ShapeFitContourApp;
 import boofcv.demonstrations.tracker.DemoBackgroundRemoval;
 import boofcv.demonstrations.tracker.VideoTrackerObjectQuadApp;
@@ -93,6 +95,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 	@Override
 	protected void createTree( DefaultMutableTreeNode root ) {
 		createNodes(root,"Binary",
+				DemoImageThresholdingApp.class,
 				DemoBinaryImageLabelOpsApp.class,
 				DemoBinaryImageOpsApp.class);
 
@@ -171,6 +174,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				VisualizeWatershedApp.class);
 
 		createNodes(root, "Shapes",
+				DetectPolylineApp.class,
 				DetectBlackPolygonApp.class,
 				DetectBlackEllipseApp.class,
 				ShapeFitContourApp.class);

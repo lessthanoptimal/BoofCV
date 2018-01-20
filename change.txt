@@ -7,6 +7,7 @@ Date    : 2018
 Version : 0.29
 
 - Changed minimum Java version from 1.7 to 1.8 since Android now supports 1.8
+- Manual zoom added to ImagePanel
 
 TODO
 
