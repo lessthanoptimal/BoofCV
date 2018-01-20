@@ -124,6 +124,7 @@ public class TestQrCodeEncoder {
 		QrCodeEncoder encoder = new QrCodeEncoder();
 		QrCodeDecoderBits decoder = new QrCodeDecoderBits(); // used to validate the message
 		QrCode qr = encoder.addAutomatic("123ASDdf阿ん鞠ぷへ≦Ｋ").fixate();
+		assertTrue("123ASDdf阿ん鞠ぷへ≦Ｋ".equals(qr.message));
 
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
@@ -131,18 +132,21 @@ public class TestQrCodeEncoder {
 
 		encoder.reset();
 		qr = encoder.addAutomatic("123ASDdf").fixate();
+		assertTrue("123ASDdf".equals(qr.message));
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 		assertEquals(QrCode.Mode.BYTE,qr.mode);
 
 		encoder.reset();
 		qr = encoder.addAutomatic("123ASD").fixate();
+		assertTrue("123ASD".equals(qr.message));
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 		assertEquals(QrCode.Mode.ALPHANUMERIC,qr.mode);
 
 		encoder.reset();
 		qr = encoder.addAutomatic("123").fixate();
+		assertTrue("123".equals(qr.message));
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 		assertEquals(QrCode.Mode.NUMERIC,qr.mode);

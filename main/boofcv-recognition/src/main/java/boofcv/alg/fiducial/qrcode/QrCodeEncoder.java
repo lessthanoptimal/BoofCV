@@ -23,6 +23,8 @@ import org.ddogleg.struct.GrowQueue_I8;
 import org.ejml.ops.CommonOps_BDRM;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -73,6 +75,8 @@ public class QrCodeEncoder {
 		add(Character.UnicodeBlock.KATAKANA);
 		add(Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS);
 	}};
+
+	CharsetEncoder asciiEncoder = Charset.forName("ISO-8859-1").newEncoder();
 
 
 	public QrCodeEncoder() {
@@ -146,7 +150,8 @@ public class QrCodeEncoder {
 	}
 
 	private boolean isKanji( char c ) {
-		return japaneseUnicodeBlocks.contains(Character.UnicodeBlock.of(c));
+		return !asciiEncoder.canEncode(c);
+//		return japaneseUnicodeBlocks.contains(Character.UnicodeBlock.of(c));
 	}
 
 	private boolean containsKanji( String message ) {
@@ -206,7 +211,12 @@ public class QrCodeEncoder {
 				throw new IllegalArgumentException("All numbers must have a value from 0 to 9");
 		}
 
+		StringBuilder builder = new StringBuilder(numbers.length);
+		for (int i = 0; i < numbers.length; i++) {
+			builder.append(Integer.toString(numbers[i]));
+		}
 		MessageSegment segment = new MessageSegment();
+		segment.message = builder.toString();
 		segment.data = numbers;
 		segment.length = numbers.length;
 		segment.mode = QrCode.Mode.NUMERIC;
@@ -260,6 +270,7 @@ public class QrCodeEncoder {
 		byte values[] = alphanumericToValues(alphaNumeric);
 
 		MessageSegment segment = new MessageSegment();
+		segment.message = alphaNumeric;
 		segment.data = values;
 		segment.length = values.length;
 		segment.mode = QrCode.Mode.ALPHANUMERIC;
@@ -333,7 +344,13 @@ public class QrCodeEncoder {
 	 * @return The QR-Code
 	 */
 	public QrCodeEncoder addBytes(byte[] data) {
+		StringBuilder builder = new StringBuilder(data.length);
+		for (int i = 0; i < data.length; i++) {
+			builder.append((char)data[i]);
+		}
+
 		MessageSegment segment = new MessageSegment();
+		segment.message = builder.toString();
 		segment.data = data;
 		segment.length = data.length;
 		segment.mode = QrCode.Mode.BYTE;
@@ -378,6 +395,7 @@ public class QrCodeEncoder {
 		}
 
 		MessageSegment segment = new MessageSegment();
+		segment.message = message;
 		segment.data = bytes;
 		segment.length = message.length();
 		segment.mode = QrCode.Mode.KANJI;
@@ -465,7 +483,9 @@ public class QrCodeEncoder {
 		// sanity check of code
 		int expectedBitSize = bitsAtVersion(qr.version);
 
+		qr.message = "";
 		for( MessageSegment m : segments ) {
+			qr.message += m.message;
 			switch( m.mode ) {
 				case NUMERIC:encodeNumeric(m.data,m.length);break;
 				case ALPHANUMERIC:encodeAlphanumeric(m.data,m.length);break;
@@ -777,6 +797,7 @@ public class QrCodeEncoder {
 	private static class MessageSegment
 	{
 		QrCode.Mode mode;
+		String message;
 		byte data[];
 		int length;
 		// number of bits in the encoded message, excluding the length bits
