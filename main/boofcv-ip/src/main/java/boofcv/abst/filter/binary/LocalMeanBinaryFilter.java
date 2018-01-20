@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class LocalMeanBinaryFilter<T extends ImageGray<T>> implements InputToBin
 	public void process(T input, GrayU8 output) {
 		work1.reshape(input.width,input.height);
 		work2.reshape(input.width,input.height);
-		GThresholdImageOps.localMean(input, output, regionWidth, scale, down, work1, work2);
+		GThresholdImageOps.localMean((T)input, output, regionWidth, scale, down, (T)work1, (T)work2);
 	}
 
 	@Override

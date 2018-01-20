@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -121,7 +121,7 @@ public class FactoryInterpolation {
 		switch (imageType.getFamily()) {
 
 			case PLANAR:
-				return (InterpolatePixelMB) createPixelPL(createPixelS(min, max, type, borderType, imageType.getDataType()));
+				return (InterpolatePixelMB<T>) createPixelPL((InterpolatePixelS)createPixelS(min, max, type, borderType, imageType.getDataType()));
 
 			case GRAY:{
 				InterpolatePixelS interpS = createPixelS(min,max,type,borderType,imageType.getImageClass());
