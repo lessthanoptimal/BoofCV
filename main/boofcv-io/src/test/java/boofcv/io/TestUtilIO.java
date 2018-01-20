@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,14 +83,14 @@ public class TestUtilIO {
 		HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
 		con.setRequestMethod("HEAD");
 		con.setConnectTimeout(2000);
-		assertEquals(con.getResponseCode(), HttpURLConnection.HTTP_OK);
+		assertEquals(HttpURLConnection.HTTP_OK,con.getResponseCode());
 
 		String url2 = UtilIO.getGithubURL(validExamplePackage, validExampleClass);
 		HttpURLConnection.setFollowRedirects(false);
 		HttpURLConnection con2 = (HttpURLConnection) new URL(url2).openConnection();
 		con2.setRequestMethod("HEAD");
 		con2.setConnectTimeout(2000);
-		assertEquals(con2.getResponseCode(), HttpURLConnection.HTTP_OK);
+		assertEquals(HttpURLConnection.HTTP_OK,con2.getResponseCode());
 
 		String url3 = UtilIO.getGithubURL(null, null);
 		assertEquals(url3, "");
