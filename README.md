@@ -68,7 +68,7 @@ There are also several integration modules which help BoofCV interact with exter
 
 |     Name             |                 Description
 |----------------------|-------------------------------------------------------------------------------------
-| boofcv-all           | Absolutely everything
+| boofcv-core          | All the core libraries without any of the integration modules listed below
 | boofcv-android       | Useful functions for working inside of Android devices.
 | boofcv-javacv        | [JavaCV](https://github.com/bytedeco/javacv) is a wrapper around OpenCV mainly for file IO.
 | boofcv-ffmpeg        | [javacpp-presets](https://github.com/bytedeco/javacpp-presets) their ffmepg wrapper is used for reading video files.
