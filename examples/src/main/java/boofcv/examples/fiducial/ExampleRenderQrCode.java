@@ -58,5 +58,9 @@ public class ExampleRenderQrCode
 
 		// You can also save it to disk by uncommenting the line below
 //		UtilImageIO.saveImage(image,"qrcode.png");
+
+		// WARNING! This rendered image lacks the white border which is required to be a compliant
+		//          QR Code. As of this writing BoofCV's implementation might not be able to handle
+		//          this image unless you add a white border.
 	}
 }

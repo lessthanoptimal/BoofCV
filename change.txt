@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2017
+Date    : 2017/01/20
 Version : 0.28
 
 - Black Polygon Detector

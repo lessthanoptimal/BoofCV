@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public class BoofDefaults {
 	/**
 	 * String specifying BoofCV's version.
 	 */
-	public static String version = "0.27";
+	public static String version = "0.28";
 
 	// Use extended borders when computing image derivatives 
 	public static BorderType DERIV_BORDER_TYPE = BorderType.EXTENDED;
