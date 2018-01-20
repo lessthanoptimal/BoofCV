@@ -3,6 +3,93 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2018/01/20
+Version : 0.28
+
+- Black Polygon Detector
+  * Can detect polygons using contour, then on an individual basis refine them now. Before it was all or nothing.
+  * Prune contours based on edge intensity earlier
+  * Removed refine corner for black polygon detector
+    - Was complex, didn't fit the new API, and calibration residuals got better once removed.
+  * Added option to optimize by fitting lines to the contour
+- Chessboard Detector
+  * Improved performance on larger image by making thresholding region relative to image size
+  * Has known issue on larger images where a little bit of blur can join squares together.
+- Background Model
+  * Fixed a weird edge case that happened when you passed in a 1x1 pixel image
+- Removed Asymmetric Circle Grid
+  * Less space efficient than Hexagonal Grid
+- Added Hexagonal Grid
+  * Similar to asymmetric but in Y direction is now (x spacing)*2.0*sin(60 degrees).
+  * Asymmetric was the same along both axises
+- Demonstrations
+  * Open files will remember the last directory it opened
+  * Added list of recently opened files
+  * Dialog for opening a webcam
+  * Added fisheye calibration
+  * Added background removal
+- Examples
+  * Added ExamplePointDeformKeyPoints
+  * Added QR Code Detector
+  * Added QR Code Encoder
+- Application: Calibration Target Generator
+  * Added circle hexagonal
+  * Output is a PDF document now
+  * Has a GUI
+- Application: Camera Calibration
+  * Support for omni universal model
+  * Can choose to save output in OpenCV format
+  * GUI for configuring calibration
+- DetectPolygonFromContour
+  * Fix a bug where labeled image was not being resized if the height of input image changed
+- BinaryEllipseDetectorPixel
+  * Adjusted detected ellipse to remove bias caused by fitting to a binary image.
+- BOverrideClass
+  * Provides a framework for overriding some functionality in BoofCV with an external implementation without changing your code
+- DetectCircleAsymmetricGrid
+  * Fixed issue where it picked the wrong circle for the initial corner
+- Gradle
+  * fixed gradle not copying over doc-files
+- Changed directory structure to gradle standard to better integrate source code from other languages
+- FiducialDetectors
+  * Provide access to detected points in PNP detector. Thought this was done a while ago...
+- Binary Thresholding
+  * Region size is now specified using ConfigLength and as a width instead of a radius
+    - Width makes more sense and is less restrictive. Can be specified as a relative to image size now too.
+  * Renamed classes/functions to remove redundancy and clarify
+  * Changed ImageToBinary to remove pointless bounds list and simply code
+  * Added BLOCK_MEAN
+  * Added BLOCK_OTSU
+  * Added LOCAL_OTSU
+- OTSU Threshold
+  * Added Otsu 2
+    - Also seeks a threshold which maximizes the distance between the two distributions
+    - Can handle binary images much better when Otsu fails to select a reasonable threshold
+- Created ConfigMinimumSize
+  * Provides a way to specify the size of an object as based on input image size or an exact pixels
+- ImageZoomPanel
+  * Draws to a buffer first which fixes a major problem on some JVM implementations have a very slow render
+- LinearContourLabelChang2004
+  * Added ability to stop recording contours which exceed a maximum size
+  * Added ability to not record internal contours
+- Added HistogramStatistics
+  * Thanks Marius Orfgen for the idea and code
+- TrackerObjectQuad
+  * Added ability to provide a hint for where the object is now
+- JavaCV
+  * Provided support for reading webcams using JavaCV. Seems to work better than Webcam Capture in some ways
+- Created interface for contour to polyline. PointsToPolyline
+  * Added ability to set min/max number of sides. convex
+- DecomposeHomography
+  * Can now handle the case where the scale factor is not equal to one
+- QR Code Support
+  * Detector and Decoder
+  * Renderer and Encoder
+  * Application for creating documents and images
+- Android
+  * Faster RGB to Boof Image. Suggested by giulionf
+
+---------------------------------------------
 Date    : 2017-08-16
 Version : 0.27
 

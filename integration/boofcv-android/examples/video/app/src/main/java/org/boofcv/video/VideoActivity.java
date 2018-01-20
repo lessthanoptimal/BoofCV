@@ -25,7 +25,7 @@ import android.hardware.Camera;
 
 import java.util.List;
 
-import boofcv.android.gui.VideoDisplayActivity;
+import boofcv.android.camera.VideoDisplayActivity;
 
 /**
  * Demonstration of how to process a video stream on an Android device using BoofCV.  Most of the drudgery of

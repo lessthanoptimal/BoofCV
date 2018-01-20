@@ -5,7 +5,7 @@ allprojects {
     apply plugin: 'eclipse'
 
     group = 'org.boofcv'
-    version = '0.27'
+    version = '0.28'
 }
 
 project.ext.set("deepboof_version", '0.4')
@@ -20,7 +20,7 @@ if( project.hasProperty("native_arch")) {
 
 subprojects {
     apply plugin: 'java'
-    apply plugin: 'osgi'
+//    apply plugin: 'osgi'
     apply plugin: 'maven'
     apply plugin: 'signing'
 
@@ -54,42 +54,29 @@ subprojects {
     }
 
     sourceSets {
-        main {
-            java {
-                srcDir 'src'
-            }
-            resources {
-                srcDir 'resources/src'
-            }
-        }
-
         test {
             java {
-                srcDir 'test'
-                srcDir 'generate'
-                srcDir 'benchmark'
-                srcDir 'experimental/src'
-                srcDir 'experimental/test'
-            }
-            resources {
-                srcDir 'resources/test'
+                srcDir 'src/generate/java'
+                srcDir 'src/benchmark/java'
+                srcDir 'src/experimental/java'
+                srcDir 'src/experimental/test'
             }
         }
     }
 
     dependencies {
-        compile group: 'org.georegression', name: 'georegression', version: '0.13'
+        compile group: 'org.georegression', name: 'georegression', version: '0.15'
 
         testCompile group: 'junit', name: 'junit', version: '4.12'
     }
 
-    jar {
-        manifest { // the manifest of the default jar is of type OsgiManifest
-            instruction 'Bundle-Vendor', 'BoofCV'
-//            instruction 'Bundle-Description', 'BoofCV'
-            instruction 'Bundle-DocURL', 'http://boofcv.org'
-        }
-    }
+//    jar {
+//        manifest { // the manifest of the default jar is of type OsgiManifest
+//            instruction 'Bundle-Vendor', 'BoofCV'
+////            instruction 'Bundle-Description', 'BoofCV'
+//            instruction 'Bundle-DocURL', 'http://boofcv.org'
+//        }
+//    }
 
     task javadocJar(type: Jar) {
         classifier = 'javadoc'
@@ -101,6 +88,7 @@ subprojects {
         from sourceSets.main.allSource
     }
 
+    javadoc.failOnError = false
     artifacts {
         archives sourcesJar
 //        archives javadocJar
@@ -120,7 +108,7 @@ subprojects {
     }
     jar.dependsOn checkDependsOnSNAPSHOT
 
-    // if Maven central isn't setup in gradle.properties skip all of this
+    // if Maven central isn't setup in ~/.gradle/gradle.properties skip all of this
     if( project.hasProperty('ossrhUsername') ) {
         signing {
             sign configurations.archives
@@ -183,6 +171,7 @@ def mainProjects = [
         ':main:boofcv-sfm',
         ':main:boofcv-recognition',
         ':main:boofcv-learning',
+        ':main:boofcv-simulation',
         ':integration:boofcv-swing'
 ]
 
@@ -256,26 +245,12 @@ task alljavadoc(type: Javadoc) {
 
     destinationDir = file("docs/api")
 
-    configure(options) {
-        failOnError = false
-        docTitle = "BoofCV JavaDoc ($project.version)"
-        links = [ 'http://docs.oracle.com/javase/7/docs/api/',
-                  'http://ejml.org/javadoc/',
-                  'http://georegression.org/javadoc/',
-                  'http://ddogleg.org/javadoc/']
-    }
-}
-
-task alljavadocWeb(type: Javadoc) {
-    // only include source code in src directory to avoid including 3rd party code which some projects do as a hack
-    source = javadocProjects.collect { project(it).fileTree('src').include('**/*.java') }
-//    source = javadocProjects.collect { project(it).sourceSets.main.allJava }
-    classpath = files(javadocProjects.collect { project(it).sourceSets.main.compileClasspath })
-
-    destinationDir = file("docs/api-web")
-
     // Hack for Java 8u121 and beyond. Comment out if running an earlier version of Java
     options.addBooleanOption("-allow-script-in-comments", true)
+
+    // Add a list of uses of a class to javadoc
+    options.use = true
+
     configure(options) {
         failOnError = false
         docTitle = "BoofCV JavaDoc ($project.version)"
@@ -283,9 +258,26 @@ task alljavadocWeb(type: Javadoc) {
                   'http://ejml.org/javadoc/',
                   'http://georegression.org/javadoc/',
                   'http://ddogleg.org/javadoc/']
-        bottom = file('misc/bottom.txt').text
+    }
+
+    // Work around a Gradle design flaw. It won't copy over files in doc-files
+    doLast {
+        copy {
+            from javadocProjects.collect { project(it).fileTree('src').include('**/doc-files/*') }
+            into destinationDir
+        }
+    }
+
+}
+
+task alljavadocWeb() {
+    doFirst {
+        alljavadoc.options.bottom = file('misc/bottom.txt').text
+        alljavadoc.destinationDir = file("docs/api-web")
     }
 }
+alljavadocWeb.finalizedBy(alljavadoc)
+
 
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/allTests")
@@ -293,7 +285,7 @@ task testReport(type: TestReport) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.0.1'
+    gradleVersion = '4.3'
 }
 
 idea {

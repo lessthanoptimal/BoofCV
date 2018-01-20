@@ -1,0 +1,20 @@
+- adaptive thresholding based on local region
+  * alignment pattern locator
+  * bit reader
+- Better homography
+  * Find edges of squares.then use directory or intersections to compute homogrpahy
+  * Don't rely on features as much
+- Mark bits which are ambiguous as being omitted
+  * Might be able to correct more bits this way
+
+
+
+=================== FUTURE ==================================
+- Don't require alignment patterns
+- New position pattern detector
+  * Horizontal scan line
+  * Find stone inside
+  * Determine radius by looking for blobs around it
+- Using crude position patterns...
+  * Using shape estimate location of timing pattern and use that to determine version and initial homography estimate
+= Read bits using edge image some how?

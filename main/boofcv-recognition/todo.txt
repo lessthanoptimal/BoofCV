@@ -1,4 +1,6 @@
-- Fiducial Square
-   - Compute threshold for binarization in base by scanning around the fiducal border.
-   - also provide a binarization in the base.
-   - Configurable width of black border?
+# Binary Grid Detector
+
+* Very poor performance with fisheye distortion
+  * Can't read this with that amount of distortion.
+  * Shows how several aspects of the algorithm are brittle
+  * had to nerf unit tests to get them to pass

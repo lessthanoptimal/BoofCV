@@ -1,0 +1,147 @@
+/*
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.demonstrations.binary;
+
+import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.demonstrations.shapes.ThresholdControlPanel;
+import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.gui.SelectInputPanel;
+import boofcv.gui.binary.VisualizeBinaryData;
+import boofcv.gui.image.ImagePanel;
+import boofcv.gui.image.ShowImages;
+import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
+import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+
+/**
+ * Demonstrates different ways to threshold an image
+ *
+ * @author Peter Abeles
+ */
+public class DemoImageThresholdingApp<T extends ImageGray<T>> extends SelectInputPanel
+	implements ThresholdControlPanel.Listener
+{
+
+	Class<T> imageType;
+	T imageInput;
+	GrayU8 imageBinary = new GrayU8(1,1);
+	BufferedImage work;
+
+	ImagePanel gui = new ImagePanel();
+	ThresholdControlPanel controlPanel = new ThresholdControlPanel(this);
+
+	boolean processedImage = false;
+
+	// which algorithm is being used
+	int which=0;
+
+	public DemoImageThresholdingApp(Class<T> imageType) {
+		this.imageType = imageType;
+
+		imageInput = GeneralizedImageOps.createSingleBand(imageType,1,1);
+
+		JPanel body = new JPanel();
+		body.setLayout(new BorderLayout());
+
+		body.add(controlPanel,BorderLayout.WEST);
+		body.add(gui,BorderLayout.CENTER);
+
+		setMainGUI(body);
+	}
+
+	protected void process() {
+
+		ConfigThreshold config = controlPanel.createConfig();
+		InputToBinary inputToBinary = FactoryThresholdBinary.threshold(config,imageInput.imageType.getImageClass());
+
+		inputToBinary.process(imageInput,imageBinary);
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				if (work == null || work.getWidth() != imageInput.width || work.getHeight() != imageInput.height) {
+					work = new BufferedImage(imageInput.width, imageInput.height, BufferedImage.TYPE_INT_BGR);
+				}
+				VisualizeBinaryData.renderBinary(imageBinary, false, work);
+				gui.setImage(work);
+				gui.setPreferredSize(new Dimension(imageInput.width, imageInput.height));
+				processedImage = true;
+				gui.repaint();
+			}
+		});
+	}
+
+	@Override
+	public void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
+		if( image != null ) {
+			setInputImage(image);
+			imageInput.reshape(image.getWidth(),image.getHeight());
+			imageBinary.reshape(image.getWidth(),image.getHeight());
+
+			ConvertBufferedImage.convertFrom(image, imageInput, true);
+
+			process();
+		}
+	}
+
+	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
+	public boolean getHasProcessedImage() {
+		return processedImage;
+	}
+
+	public static void main( String args[] ) {
+		DemoImageThresholdingApp app = new DemoImageThresholdingApp(GrayF32.class);
+
+		java.util.List<PathLabel> inputs = new ArrayList<>();
+		inputs.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));
+		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
+		inputs.add(new PathLabel("stained",UtilIO.pathExample("segment/stained_handwriting.jpg")));
+
+		app.setInputList(inputs);
+
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
+
+		ShowImages.showWindow(app, "Thresholding Demo", true);
+
+		System.out.println("Done");
+	}
+
+	@Override
+	public void imageThresholdUpdated() {
+		new Thread() {
+			public void run() { process(); }
+		}.start();
+	}
+}

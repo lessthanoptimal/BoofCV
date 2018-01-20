@@ -10,25 +10,33 @@
 - Make sure all applications in evaluation work
 - Make sure android still works
 - Update examples on website
-  * See what needs to be updated since TAG_NAME "git diff --name-status TAG_NAME path/to/examples"
-- Fresh checkout from repository then do the following
-- See if gradle 1) main 2) integration 3) examples
-- ant javadoc for website
-- create zip files for
-  * binary of main + integration + source jars
-    - gradle createLibraryDirectory
-  * source code + data
+  * See what needs to be updated since TAG_NAME "git diff --name-status TAG_NAME examples"
+- Make sure external dependencies are meet and everything builds
+  * Android
+  * OpenKinect
+- Fresh Checkout
+  * Create source zip
+  * ./gradlew testReport   <--- make sure everything passes
+  * scp boofcv-vXXX-libs.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv/vXXX/
+- Create javadoc for websites
+  ./gradlew alljavadocWeb
+- Create jars
+  * ./gradlew createLibraryDirectory
+  * zip -r boofcv-vXXXX-libs.zip boofcv-v0.27-libs
+  * scp boofcv-vXXX-src.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv/vXXX/
 - Tag git
-- Upload to sourceforge
-  scp boofcv-vXXX-src.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv/vXXX/
-  scp boofcv-vXXX-libs.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv/vXXX/
 - Update version on website
 
 ----
 Gradle
 
 To post a SNAPSHOT or full release:
-gradle uploadArchives
+
+1) In gradle.properties comment out "org.gradle.parallel=true"
+1) uncomment the following line in build.gradle so that it creates javadoc. Commented out to speed up build
+   archives javadocJar
+2) Upload to Sonatype
+   ./gradlew uploadArchives
 
 A SNAPSHOT is created if SNAPSHOT is in its name.
 

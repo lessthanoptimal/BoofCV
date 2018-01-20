@@ -10,6 +10,7 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -34,7 +35,16 @@ configurations {
 }
 
 dependencies {
-    ['boofcv-android', 'boofcv-core'].each { String a -> compile group: 'org.boofcv', name: a, version: '0.27' }
+    ['boofcv-android', 'boofcv-core'].each { String a -> compile group: 'org.boofcv', name: a, version: '0.28' }
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:25.0.1'
+    testCompile 'junit:junit:4.12'
+//    testCompile 'org.powermock:powermock-api-mockito:1.6.1'
+//    testCompile 'org.powermock:powermock-module-junit4-rule-agent:1.6.1'
+//    testCompile 'org.powermock:powermock-module-junit4-rule:1.6.1'
+//    testCompile 'org.powermock:powermock-module-junit4:1.6.1'
+//    testCompile 'org.json:json:20140107' // it's in android and this causes problems
+    androidTestCompile 'com.android.support:support-annotations:25.0.1'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
 }
