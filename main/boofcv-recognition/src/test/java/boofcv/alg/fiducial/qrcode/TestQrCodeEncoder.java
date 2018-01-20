@@ -108,7 +108,7 @@ public class TestQrCodeEncoder {
 		QrCodeEncoder encoder = new QrCodeEncoder();
 		encoder.setVersion(1).setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				addKanji("134阿ん鞠ぷへ≦Ｋ").fixate();
+				addKanji("阿ん鞠ぷへ≦Ｋ").fixate();
 
 		byte expected[] = new byte[]{
 				0x01,0x4E,(byte)0x8B,(byte)0xA0,0x23,
