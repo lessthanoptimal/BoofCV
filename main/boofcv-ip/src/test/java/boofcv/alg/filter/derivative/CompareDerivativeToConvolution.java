@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,10 +90,10 @@ public class CompareDerivativeToConvolution {
 		this.processBorder = processBorder;
 		innerCompare(inputImage,outputImages);
 
-		inputImage = BoofTesting.createSubImageOf(inputImage);
+		inputImage = (ImageGray)BoofTesting.createSubImageOf(inputImage);
 		ImageGray subOut[] = new ImageGray[ outputImages.length ];
 		for( int i = 0; i < outputImages.length; i++ )
-			subOut[i] = BoofTesting.createSubImageOf(outputImages[i]);
+			subOut[i] = (ImageGray)BoofTesting.createSubImageOf(outputImages[i]);
 		innerCompare(inputImage,subOut);
 	}
 

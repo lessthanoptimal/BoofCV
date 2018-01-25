@@ -356,7 +356,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 	}
 
 	protected void handleDirectory() {
-		final CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector);
+		final CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());
 		final CalibratedPlanarPanel gui;
 		ProcessThread monitor = null;
 
@@ -440,10 +440,11 @@ public class CameraCalibration extends BaseStandardInputApp {
 				}
 			}
 
-			if( !calibrationAlg.addImage(image) ) {
+			if( !detector.process(image)) {
 				imagesFailed.add(f);
 				System.err.println("Failed to detect target in " + f.getName());
 			} else {
+				calibrationAlg.addImage(detector.getDetectedPoints());
 				imagesSuccess.add(f);
 			}
 		}

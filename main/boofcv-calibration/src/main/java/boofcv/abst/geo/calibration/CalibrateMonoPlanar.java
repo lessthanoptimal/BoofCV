@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.alg.geo.calibration.*;
 import boofcv.alg.geo.calibration.omni.CalibParamUniversalOmni;
 import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
 import boofcv.struct.calib.CameraModel;
-import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
@@ -61,6 +60,9 @@ public class CalibrateMonoPlanar {
 	// detects calibration points inside of images
 	protected DetectorFiducialCalibration detector;
 
+	// how the points are laid out
+	protected List<Point2D_F64> layout;
+	
 	// computes calibration parameters
 	protected CalibrationPlanarGridZhang99 zhang99;
 
@@ -78,13 +80,9 @@ public class CalibrateMonoPlanar {
 	private int widthImg;
 	private int heightImg;
 
-	/**
-	 * High level configuration
-	 *
-	 * @param detector Target detection algorithm.
-	 */
-	public CalibrateMonoPlanar(DetectorFiducialCalibration detector ) {
-		this.detector = detector;
+
+	public CalibrateMonoPlanar( List<Point2D_F64> layout ) {
+		this.layout = layout;
 	}
 
 	/**
@@ -92,14 +90,14 @@ public class CalibrateMonoPlanar {
 	 */
 	public void configure(Zhang99IntrinsicParam param )
 	{
-		zhang99 = new CalibrationPlanarGridZhang99(detector.getLayout(),param);
+		zhang99 = new CalibrationPlanarGridZhang99(layout,param);
 	}
 
 	public void configurePinhole(boolean assumeZeroSkew ,
 								 int numRadialParam ,
 								 boolean includeTangential )
 	{
-		zhang99 = new CalibrationPlanarGridZhang99(detector.getLayout(),
+		zhang99 = new CalibrationPlanarGridZhang99(layout,
 				new CalibParamPinholeRadial(assumeZeroSkew,numRadialParam,includeTangential));
 	}
 
@@ -107,7 +105,7 @@ public class CalibrateMonoPlanar {
 									   int numRadialParam ,
 									   boolean includeTangential )
 	{
-		zhang99 = new CalibrationPlanarGridZhang99(detector.getLayout(),
+		zhang99 = new CalibrationPlanarGridZhang99(layout,
 				new CalibParamUniversalOmni(assumeZeroSkew,numRadialParam,includeTangential,false));
 	}
 
@@ -116,7 +114,7 @@ public class CalibrateMonoPlanar {
 									   boolean includeTangential ,
 									   double mirrorOffset )
 	{
-		zhang99 = new CalibrationPlanarGridZhang99(detector.getLayout(),
+		zhang99 = new CalibrationPlanarGridZhang99(layout,
 				new CalibParamUniversalOmni(assumeZeroSkew,numRadialParam,includeTangential,mirrorOffset));
 	}
 
@@ -131,27 +129,11 @@ public class CalibrateMonoPlanar {
 	}
 
 	/**
-	 *  Adds a new view of the calibration target and processes it.  If processing fails
-	 *  then false is returned.
-	 *
-	 * @param image Image of a calibration target
-	 * @return true if a target was detected in the image or not
+	 * Adds the observations from a calibration target detector
+	 * @param observation Detected calibration points
 	 */
-	public boolean addImage( GrayF32 image ) {
-
-		if( widthImg == 0 ) {
-			widthImg = image.width;
-			heightImg = image.height;
-		} else if( widthImg != image.width || heightImg != image.height ) {
-			throw new IllegalArgumentException("All images must have the same shape");
-		}
-
-		if( !detector.process(image) )
-			return false;
-		else {
-			observations.add(detector.getDetectedPoints());
-			return true;
-		}
+	public void addImage( CalibrationObservation observation ) {
+		observations.add( observation );
 	}
 
 	/**
@@ -174,7 +156,7 @@ public class CalibrateMonoPlanar {
 
 		foundZhang = zhang99.getOptimized();
 
-		errors = computeErrors(observations, foundZhang,detector.getLayout());
+		errors = computeErrors(observations, foundZhang,layout);
 
 		foundIntrinsic = foundZhang.getIntrinsic().getCameraModel();
 		foundIntrinsic.width = widthImg;

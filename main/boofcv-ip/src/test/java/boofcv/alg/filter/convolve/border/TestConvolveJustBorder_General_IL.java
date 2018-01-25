@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -153,7 +153,7 @@ public class TestConvolveJustBorder_General_IL extends CompareImageBorder {
 
 		// remove the border
 		computeBorder((KernelBase)targetParam[0],methodTest.getName());
-		validationOut = stripBorder(validationOut,borderX0,borderY0,borderX1,borderY1);
+		validationOut = (ImageInterleaved)stripBorder(validationOut,borderX0,borderY0,borderX1,borderY1);
 
 		GImageMultiBand t = FactoryGImageMultiBand.wrap(targetOut);
 		GImageMultiBand v = FactoryGImageMultiBand.wrap(validationOut);

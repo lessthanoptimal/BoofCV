@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,6 +51,7 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 
 	// computes calibration parameters
 	CalibrateMonoPlanar calibrator;
+	DetectorFiducialCalibration detector;
 	// displays results
 	MonoPlanarPanel gui = new MonoPlanarPanel();
 	// needed by ProcessThread for displaying its dialog
@@ -71,10 +72,11 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 						   List<String> images  ,
 						   int numRadial, boolean includeTangential )
 	{
+		this.detector = detector;
 		if( images.size() == 0 )
 			throw new IllegalArgumentException("No images!");
 		BoofMiscOps.sortImageNames(images);
-		calibrator = new CalibrateMonoPlanar(detector);
+		calibrator = new CalibrateMonoPlanar(detector.getLayout());
 		calibrator.configurePinhole(true,numRadial,includeTangential);
 		this.images = images;
 	}
@@ -101,13 +103,12 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 			final BufferedImage orig = media.openImage(images.get(i));
 			if( orig != null ) {
 				GrayF32 input = ConvertBufferedImage.convertFrom(orig,(GrayF32)null);
-				if( calibrator.addImage(input) ) {
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							gui.addImage(file);
-							gui.repaint();
-							monitor.setMessage(0, file.getName());
-						}
+				if( detector.process(input)) {
+					calibrator.addImage(detector.getDetectedPoints());
+					SwingUtilities.invokeLater(() -> {
+						gui.addImage(file);
+						gui.repaint();
+						monitor.setMessage(0, file.getName());
 					});
 				} else {
 					System.out.println("Failed to detect image.  "+file.getName());
@@ -117,35 +118,27 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 			}
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.setObservations(calibrator.getObservations());
-			}});
+		SwingUtilities.invokeLater(() -> gui.setObservations(calibrator.getObservations()));
 		gui.repaint();
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				monitor.setMessage(1,"Estimating Parameters");
-			}});
+		SwingUtilities.invokeLater(() -> monitor.setMessage(1,"Estimating Parameters"));
 
 		final CameraPinholeRadial param = calibrator.process();
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.setResults(calibrator.getErrors());
-				gui.setCalibration(calibrator.getZhangParam());
-			}});
+		SwingUtilities.invokeLater(() -> {
+			gui.setResults(calibrator.getErrors());
+			gui.setCalibration(calibrator.getZhangParam());
+		});
 		monitor.stopThread();
 
 		if( outputFileName != null )
 			CalibrationIO.save(param, outputFileName);
 
 		// tell it how to undistort the image
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.setCorrection(param);
+		SwingUtilities.invokeLater(() -> {
+			gui.setCorrection(param);
 
-				gui.repaint();
-			}});
+			gui.repaint();
+		});
 
 		// print the output
 		calibrator.printStatistics();
@@ -170,11 +163,10 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 		}
 
 		public void setMessage( final int state , final String message ) {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					monitor.setProgress(state);
-					monitor.setNote(message);
-				}});
+			SwingUtilities.invokeLater(() -> {
+				monitor.setProgress(state);
+				monitor.setNote(message);
+			});
 		}
 
 		@Override

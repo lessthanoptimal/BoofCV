@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,11 +70,11 @@ public class TestCalibrateMonoPlanar {
 	public void fullBasic() {
 
 		FakeDetector detector = new FakeDetector();
-		CalibrateMonoPlanar alg = new CalibrateMonoPlanar(detector);
+		CalibrateMonoPlanar alg = new CalibrateMonoPlanar(detector.getLayout());
 		alg.configurePinhole(true,2,true);
 
 		for (int i = 0; i < targetToCamera.size(); i++) {
-			alg.addImage(blank);
+			alg.addImage(null);
 		}
 
 		CameraPinholeRadial found = alg.process();

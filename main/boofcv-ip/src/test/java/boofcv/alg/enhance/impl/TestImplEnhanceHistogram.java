@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -121,7 +121,7 @@ public class TestImplEnhanceHistogram {
 
 	public void equalizeLocalNaive(GrayI input , GrayI output ) {
 
-		GrayI tmp = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
+		GrayI tmp = (GrayI)GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
 		int transform[] = new int[10];
 		int histogram[] = new int[10];
 
@@ -192,7 +192,7 @@ public class TestImplEnhanceHistogram {
 	}
 
 	public void equalizeLocalInner(GrayI input , GrayI found ) {
-		GrayI expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
+		GrayI expected = (GrayI)GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
 		int histogram[] = new int[10];
 
 		GImageMiscOps.fillUniform(input,rand,0,10);
@@ -232,7 +232,7 @@ public class TestImplEnhanceHistogram {
 	}
 
 	public void equalizeLocalRow(GrayI input , GrayI found ) {
-		GrayI expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
+		GrayI expected = (GrayI) GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
 		int histogram[] = new int[10];
 		int transform[] = new int[10];
 
@@ -310,7 +310,7 @@ public class TestImplEnhanceHistogram {
 	}
 
 	public void equalizeLocalCol(GrayI input , GrayI found ) {
-		GrayI expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
+		GrayI expected = (GrayI) GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
 		int histogram[] = new int[10];
 		int transform[] = new int[10];
 

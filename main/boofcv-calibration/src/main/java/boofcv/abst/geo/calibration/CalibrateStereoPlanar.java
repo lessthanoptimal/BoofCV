@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,6 +64,8 @@ public class CalibrateStereoPlanar {
 
 	List<Point2D_F64> layout;
 
+	DetectorFiducialCalibration detector;
+
 	/**
 	 * Configures stereo calibration
 	 *
@@ -71,8 +73,8 @@ public class CalibrateStereoPlanar {
 	 */
 	public CalibrateStereoPlanar(DetectorFiducialCalibration detector)
 	{
-		calibLeft = new CalibrateMonoPlanar(detector);
-		calibRight = new CalibrateMonoPlanar(detector);
+		calibLeft = new CalibrateMonoPlanar(detector.getLayout());
+		calibRight = new CalibrateMonoPlanar(detector.getLayout());
 		layout = detector.getLayout();
 	}
 
@@ -108,13 +110,19 @@ public class CalibrateStereoPlanar {
 	 * @param right Image of right target.
 	 */
 	public boolean addPair(GrayF32 left , GrayF32 right ) {
-		if( !calibLeft.addImage(left) )
+		if( detector.process(left)) {
+			calibLeft.addImage(detector.getDetectedPoints());
+		} else {
 			return false;
+		}
 
-		if( !calibRight.addImage(right ) ) {
+		if( detector.process(right)) {
+			calibRight.addImage(detector.getDetectedPoints());
+		} else {
 			calibLeft.removeLatestImage();
 			return false;
 		}
+
 		return true;
 	}
 

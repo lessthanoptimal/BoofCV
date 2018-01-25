@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,6 +81,9 @@ public class CalibrationObservation {
 		return points.size();
 	}
 
+	public List<PointIndex2D_F64> getPoints() {
+		return points;
+	}
 
 	public CalibrationObservation copy() {
 		CalibrationObservation c = new CalibrationObservation();

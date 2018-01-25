@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,6 +49,7 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 
 	// computes calibration parameters
 	CalibrateMonoPlanar calibrator;
+	DetectorFiducialCalibration detector;
 	// displays results
 	FisheyePlanarPanel gui = new FisheyePlanarPanel();
 	// needed by ProcessThread for displaying its dialog
@@ -68,10 +69,11 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 	public CalibrateMonoPlanar configure( DetectorFiducialCalibration detector ,
 										  List<String> images  )
 	{
+		this.detector = detector;
 		if( images.size() == 0 )
 			throw new IllegalArgumentException("No images!");
 		BoofMiscOps.sortImageNames(images);
-		calibrator = new CalibrateMonoPlanar(detector);
+		calibrator = new CalibrateMonoPlanar(detector.getLayout());
 		this.images = images;
 		return calibrator;
 	}
@@ -86,13 +88,12 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 			final BufferedImage orig = media.openImage(images.get(i));
 			if( orig != null ) {
 				GrayF32 input = ConvertBufferedImage.convertFrom(orig,(GrayF32)null);
-				if( calibrator.addImage(input) ) {
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							gui.addImage(file);
-							gui.repaint();
-							monitor.setMessage(0, file.getName());
-						}
+				if( detector.process(input)) {
+					calibrator.addImage(detector.getDetectedPoints());
+					SwingUtilities.invokeLater(() -> {
+						gui.addImage(file);
+						gui.repaint();
+						monitor.setMessage(0, file.getName());
 					});
 				} else {
 					System.out.println("Failed to detect image.  "+file.getName());

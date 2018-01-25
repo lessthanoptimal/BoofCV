@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,7 +72,7 @@ public class ExampleCalibrateMonocular {
 		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"),"left");
 
 		// Declare and setup the calibration algorithm
-		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector);
+		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());
 
 		// tell it type type of target and which parameters to estimate
 		calibrationAlg.configurePinhole( true, 2, false);
@@ -81,8 +81,11 @@ public class ExampleCalibrateMonocular {
 			BufferedImage input = UtilImageIO.loadImage(n);
 			if( input != null ) {
 				GrayF32 image = ConvertBufferedImage.convertFrom(input,(GrayF32)null);
-				if( !calibrationAlg.addImage(image) )
-					System.err.println("Failed to detect target in "+n);
+				if( detector.process(image)) {
+					calibrationAlg.addImage(detector.getDetectedPoints().copy());
+				} else {
+					System.err.println("Failed to detect target in " + n);
+				}
 			}
 		}
 		// process and compute intrinsic parameters

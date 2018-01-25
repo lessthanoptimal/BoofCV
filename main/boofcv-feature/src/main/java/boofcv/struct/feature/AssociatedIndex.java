@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,5 +43,29 @@ public class AssociatedIndex {
 		src = a.src;
 		dst = a.dst;
 		fitScore = a.fitScore;
+	}
+
+	public int getSrc() {
+		return src;
+	}
+
+	public void setSrc(int src) {
+		this.src = src;
+	}
+
+	public int getDst() {
+		return dst;
+	}
+
+	public void setDst(int dst) {
+		this.dst = dst;
+	}
+
+	public double getFitScore() {
+		return fitScore;
+	}
+
+	public void setFitScore(double fitScore) {
+		this.fitScore = fitScore;
 	}
 }
