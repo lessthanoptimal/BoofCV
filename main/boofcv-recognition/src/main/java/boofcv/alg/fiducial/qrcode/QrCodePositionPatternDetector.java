@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -319,8 +319,8 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	LineSegment2D_F64 segment = new LineSegment2D_F64();
 	LineParametric2D_F64 parametric = new LineParametric2D_F64();
 	float[] samples = new float[9*5+1];
-	int length[] = new int[30];
-	int type[] = new int[30];
+	int length[] = new int[12]; // 9 is the max, but I'll let it go farther for no reason
+	int type[] = new int[12];
 	private boolean checkLine( Polygon2D_F64 square , float grayThreshold , int side )
 	{
 		// find the mid point between two parallel sides
@@ -359,9 +359,13 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 				length[size]++;
 			} else {
 				black = b;
-				size += 1;
-				type[size] = black ? 0 : 1;
-				length[size] = 1;
+				if( size < type.length-1 ) {
+					size += 1;
+					type[size] = black ? 0 : 1;
+					length[size] = 1;
+				} else {
+					break;
+				}
 			}
 		}
 		size++;
