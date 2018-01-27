@@ -91,7 +91,7 @@ subprojects {
     javadoc.failOnError = false
     artifacts {
         archives sourcesJar
-        archives javadocJar
+//        archives javadocJar
     }
 
     // Force the release build to fail if it depends on a SNAPSHOT
