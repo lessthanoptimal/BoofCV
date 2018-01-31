@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -210,7 +210,7 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> globalOtsu(int minValue, int maxValue, boolean down, Class<T> inputType) {
+	InputToBinary<T> globalOtsu(double minValue, double maxValue, boolean down, Class<T> inputType) {
 		if( BOverrideFactoryThresholdBinary.globalOtsu != null )
 			return BOverrideFactoryThresholdBinary.globalOtsu.handle(minValue, maxValue, down, inputType);
 		return new GlobalOtsuBinaryFilter<>(minValue, maxValue, down, ImageType.single(inputType));
