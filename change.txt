@@ -13,6 +13,10 @@ Version : 0.29
   * Fixed crash bug in position pattern detector. Complex B&W patterns could cause OOB
 - Image Thresholding
   * general otsu specifies pixel min/max with a double not an int
+- Stereo Calibration
+  * Moved detector to be outside of the main calibration class
+
+
 
 TODO
 

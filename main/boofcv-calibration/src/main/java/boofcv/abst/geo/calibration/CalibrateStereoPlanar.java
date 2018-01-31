@@ -18,10 +18,10 @@
 
 package boofcv.abst.geo.calibration;
 
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.Zhang99AllParam;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.GrayF32;
 import georegression.fitting.se.FitSpecialEuclideanOps_F64;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -64,18 +64,16 @@ public class CalibrateStereoPlanar {
 
 	List<Point2D_F64> layout;
 
-	DetectorFiducialCalibration detector;
-
 	/**
 	 * Configures stereo calibration
 	 *
-	 * @param detector Target detection algorithm.
+	 * @param layout How calibration points are laid out on the target
 	 */
-	public CalibrateStereoPlanar(DetectorFiducialCalibration detector)
+	public CalibrateStereoPlanar(List<Point2D_F64> layout )
 	{
-		calibLeft = new CalibrateMonoPlanar(detector.getLayout());
-		calibRight = new CalibrateMonoPlanar(detector.getLayout());
-		layout = detector.getLayout();
+		calibLeft = new CalibrateMonoPlanar(layout);
+		calibRight = new CalibrateMonoPlanar(layout);
+		this.layout = layout;
 	}
 
 	/**
@@ -109,21 +107,9 @@ public class CalibrateStereoPlanar {
 	 * @param left Image of left target.
 	 * @param right Image of right target.
 	 */
-	public boolean addPair(GrayF32 left , GrayF32 right ) {
-		if( detector.process(left)) {
-			calibLeft.addImage(detector.getDetectedPoints());
-		} else {
-			return false;
-		}
-
-		if( detector.process(right)) {
-			calibRight.addImage(detector.getDetectedPoints());
-		} else {
-			calibLeft.removeLatestImage();
-			return false;
-		}
-
-		return true;
+	public void addPair(CalibrationObservation left , CalibrationObservation right ) {
+		calibLeft.addImage(left);
+		calibRight.addImage(right);
 	}
 
 	/**

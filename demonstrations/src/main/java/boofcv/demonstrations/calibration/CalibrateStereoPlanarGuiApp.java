@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.image.ShowImages;
@@ -52,6 +53,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel {
 
 	// computes calibration parameters
 	CalibrateStereoPlanar calibrator;
+	DetectorFiducialCalibration detector;
 	// displays results
 	StereoPlanarPanel gui = new StereoPlanarPanel();
 	// needed by ProcessThread for displaying its dialog
@@ -87,18 +89,25 @@ public class CalibrateStereoPlanarGuiApp extends JPanel {
 			if( leftOrig != null && rightOrig != null ) {
 				GrayF32 leftInput = ConvertBufferedImage.convertFrom(leftOrig, (GrayF32) null);
 				GrayF32 rightInput = ConvertBufferedImage.convertFrom(rightOrig, (GrayF32) null);
-				if( calibrator.addPair(leftInput,rightInput ) ) {
-					final int number = i;
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							gui.addPair("Image " + number, leftImages.get(number), rightImages.get(number));
-							gui.repaint();
-							monitor.setMessage(0, "Image "+number);
-						}});
-				} else {
-					System.out.println("Feature detection failed in:");
-					System.out.println(leftImages.get(i)+" and/or "+rightImages.get(i));
+				CalibrationObservation calibLeft,calibRight;
+				if( !detector.process(leftInput)) {
+					System.out.println("Feature detection failed in "+leftImages.get(i));
+					continue;
 				}
+				calibLeft = detector.getDetectedPoints();
+				if( !detector.process(rightInput)) {
+					System.out.println("Feature detection failed in "+rightImages.get(i));
+					continue;
+				}
+				calibRight = detector.getDetectedPoints();
+
+				calibrator.addPair(calibLeft,calibRight );
+				final int number = i;
+				SwingUtilities.invokeLater(() -> {
+					gui.addPair("Image " + number, leftImages.get(number), rightImages.get(number));
+					gui.repaint();
+					monitor.setMessage(0, "Image "+number);
+				});
 			} else {
 				System.out.println("Failed to load left  = "+leftImages.get(i));
 				System.out.println("Failed to load right = "+rightImages.get(i));
@@ -180,7 +189,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel {
 		if( leftImages.size() != rightImages.size() )
 			throw new IllegalArgumentException("Number of left and right images must be the same");
 
-		calibrator = new CalibrateStereoPlanar(detector);
+		this.detector = detector;
+		calibrator = new CalibrateStereoPlanar(detector.getLayout());
 		calibrator.configure(assumeZeroSkew,numRadial,includeTangential);
 		this.leftImages = leftImages;
 		this.rightImages = rightImages;

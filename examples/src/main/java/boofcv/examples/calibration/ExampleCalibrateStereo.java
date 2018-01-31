@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -91,7 +92,7 @@ public class ExampleCalibrateStereo {
 	 */
 	public void process() {
 		// Declare and setup the calibration algorithm
-		CalibrateStereoPlanar calibratorAlg = new CalibrateStereoPlanar(detector);
+		CalibrateStereoPlanar calibratorAlg = new CalibrateStereoPlanar(detector.getLayout());
 		calibratorAlg.configure(true, 2, false);
 
 		// ensure the lists are in the same order
@@ -105,8 +106,19 @@ public class ExampleCalibrateStereo {
 			GrayF32 imageLeft = ConvertBufferedImage.convertFrom(l,(GrayF32)null);
 			GrayF32 imageRight = ConvertBufferedImage.convertFrom(r,(GrayF32)null);
 
-			if( !calibratorAlg.addPair(imageLeft, imageRight) )
-				System.out.println("Failed to detect target in "+left.get(i)+" and/or "+right.get(i));
+			CalibrationObservation calibLeft,calibRight;
+			if( !detector.process(imageLeft)) {
+				System.out.println("Failed to detect target in "+left.get(i));
+				continue;
+			}
+			calibLeft = detector.getDetectedPoints();
+			if( !detector.process(imageRight)) {
+				System.out.println("Failed to detect target in "+right.get(i));
+				continue;
+			}
+			calibRight = detector.getDetectedPoints();
+
+			calibratorAlg.addPair(calibLeft, calibRight);
 		}
 
 		// Process and compute calibration parameters

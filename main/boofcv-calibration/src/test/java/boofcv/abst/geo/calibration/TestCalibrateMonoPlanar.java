@@ -51,6 +51,8 @@ public class TestCalibrateMonoPlanar {
 
 	List<Se3_F64> targetToCamera = new ArrayList<>();
 
+	List<Point2D_F64> layout = CalibrationDetectorSquareGrid.createLayout(4, 3, 30, 30);
+
 	public TestCalibrateMonoPlanar() {
 		double z = 250;
 		double w = 40;
@@ -69,12 +71,11 @@ public class TestCalibrateMonoPlanar {
 	@Test
 	public void fullBasic() {
 
-		FakeDetector detector = new FakeDetector();
-		CalibrateMonoPlanar alg = new CalibrateMonoPlanar(detector.getLayout());
+		CalibrateMonoPlanar alg = new CalibrateMonoPlanar(layout);
 		alg.configurePinhole(true,2,true);
 
 		for (int i = 0; i < targetToCamera.size(); i++) {
-			alg.addImage(null);
+			alg.addImage(createFakeObservations(i));
 		}
 
 		CameraPinholeRadial found = alg.process();
@@ -92,48 +93,26 @@ public class TestCalibrateMonoPlanar {
 		assertEquals(intrinsic.t2,found.t2,1e-5);
 	}
 
-	private class FakeDetector implements DetectorFiducialCalibration {
+	private CalibrationObservation createFakeObservations( int which ) {
+		Se3_F64 t2c = targetToCamera.get(which);
+		CalibrationObservation set = new CalibrationObservation();
 
-		int count = 0;
+		for( int i = 0; i < layout.size(); i++ ) {
+			Point2D_F64 p2 = layout.get(i);
+			// location of calibration point on the target
+			Point3D_F64 p3 = new Point3D_F64(p2.x,p2.y,0);
 
-		CalibrationObservation set;
+			Point3D_F64 a = SePointOps_F64.transform(t2c,p3,null);
 
-		List<Point2D_F64> layout = CalibrationDetectorSquareGrid.createLayout(4, 3, 30, 30);
+			Point2D_F64 pixel = new Point2D_F64();
+			normToPixel.compute(a.x / a.z, a.y / a.z, pixel);
 
-		@Override
-		public boolean process(GrayF32 input) {
+			if( pixel.x < 0 || pixel.x >= intrinsic.width-1 || pixel.y < 0 || pixel.y >= intrinsic.height-1 )
+				throw new RuntimeException("Adjust test setup, bad observation");
 
-			Se3_F64 t2c = targetToCamera.get(count++);
-
-			set = new CalibrationObservation();
-
-			for( int i = 0; i < layout.size(); i++ ) {
-				Point2D_F64 p2 = layout.get(i);
-				// location of calibration point on the target
-				Point3D_F64 p3 = new Point3D_F64(p2.x,p2.y,0);
-
-				Point3D_F64 a = SePointOps_F64.transform(t2c,p3,null);
-
-				Point2D_F64 pixel = new Point2D_F64();
-				normToPixel.compute(a.x / a.z, a.y / a.z, pixel);
-
-				if( pixel.x < 0 || pixel.x >= intrinsic.width-1 || pixel.y < 0 || pixel.y >= input.height-1 )
-					throw new RuntimeException("Adjust test setup, bad observation");
-
-				set.add(pixel,i);
-			}
-
-			return true;
+			set.add(pixel,i);
 		}
 
-		@Override
-		public CalibrationObservation getDetectedPoints() {
-			return set;
-		}
-
-		@Override
-		public List<Point2D_F64> getLayout() {
-			return layout;
-		}
+		return set;
 	}
 }
