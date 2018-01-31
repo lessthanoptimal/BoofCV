@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public class ComputeOtsu {
-	// which Tosu variance to use
+	// which Otsu variant to use
 	private boolean useOtsu2;
 
 	// computed mean and variance
@@ -83,7 +83,7 @@ public class ComputeOtsu {
 		// multiply by threshold twice in an effort to have the image's scaling not effect the tuning parameter
 		int adjustment =  (int)(tuning*threshold*tuning*threshold/variance+0.5);
 		threshold += down ? -adjustment : adjustment;
-		threshold = (int)(scale*Math.max(threshold,0)+0.5);
+		threshold = (int)(scale*Math.max(threshold,0)+0.5); // TODO  threshold is a double. REmove rounding?
 	}
 
 	protected void computeOtsu(int histogram[] , int length , int totalPixels ) {

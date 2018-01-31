@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class ExampleDetectBlackEllipse {
 			// Binarization is done outside to allows creative tricks.  For example, when applied to a chessboard
 			// pattern where square touch each other, the binary image is eroded first so that they don't touch.
 			// The squares are expanded automatically during the subpixel optimization step.
-			int threshold = GThresholdImageOps.computeOtsu(input, 0, 255);
+			int threshold = (int)GThresholdImageOps.computeOtsu(input, 0, 255);
 			ThresholdImageOps.threshold(input, binary, threshold, true);
 
 			// it takes in a grey scale image and binary image

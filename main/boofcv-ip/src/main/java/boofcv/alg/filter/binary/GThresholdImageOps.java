@@ -37,7 +37,7 @@ public class GThresholdImageOps {
 	/**
 	 * <p>
 	 * Computes the variance based threshold using Otsu's method from an input image. Internally it uses
-	 * {@link #computeOtsu(int[], int, int)} and {@link boofcv.alg.misc.GImageStatistics#histogram(ImageGray, int, int[])}
+	 * {@link #computeOtsu(int[], int, int)} and {@link boofcv.alg.misc.GImageStatistics#histogram(ImageGray, double, int[])}
 	 * </p>
 	 *
 	 * @param input Input gray-scale image
@@ -45,9 +45,9 @@ public class GThresholdImageOps {
 	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
 	 * @return Selected threshold.
 	 */
-	public static int computeOtsu(ImageGray input , int minValue , int maxValue ) {
+	public static double computeOtsu(ImageGray input , double minValue , double maxValue ) {
 
-		int range = 1+maxValue - minValue;
+		int range = (int)(1+maxValue - minValue);
 		int histogram[] = new int[ range ];
 
 		GImageStatistics.histogram(input,minValue,histogram);
@@ -61,7 +61,7 @@ public class GThresholdImageOps {
 	/**
 	 * <p>
 	 * Computes the variance based threshold using a modified Otsu method from an input image. Internally it uses
-	 * {@link #computeOtsu2(int[], int, int)} and {@link boofcv.alg.misc.GImageStatistics#histogram(ImageGray, int, int[])}
+	 * {@link #computeOtsu2(int[], int, int)} and {@link boofcv.alg.misc.GImageStatistics#histogram(ImageGray, double, int[])}
 	 * </p>
 	 *
 	 * @param input Input gray-scale image
@@ -198,16 +198,16 @@ public class GThresholdImageOps {
 	 * {@link #computeEntropy(int[], int, int)} for more details.
 	 * </p>
 	 *
-	 * @see boofcv.alg.misc.GImageStatistics#histogram(ImageGray, int, int[])
+	 * @see boofcv.alg.misc.GImageStatistics#histogram(ImageGray, double, int[])
 	 *
 	 * @param input Input gray-scale image
 	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
 	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
 	 * @return Selected threshold.
 	 */
-	public static int computeEntropy(ImageGray input , int minValue , int maxValue ) {
+	public static double computeEntropy(ImageGray input , double minValue , double maxValue ) {
 
-		int range = 1 + maxValue - minValue;
+		int range = (int)(1 + maxValue - minValue);
 		int histogram[] = new int[ range ];
 
 		GImageStatistics.histogram(input,minValue,histogram);

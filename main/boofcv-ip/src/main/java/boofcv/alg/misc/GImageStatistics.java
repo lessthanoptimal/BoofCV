@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -443,21 +443,21 @@ public class GImageStatistics {
 	 * @param minValue (input) Minimum possible intensity value   Ignored for unsigned images.
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
-	public static void histogram(ImageGray input , int minValue , int histogram[] ) {
+	public static void histogram(ImageGray input , double minValue , int histogram[] ) {
 		if( GrayU8.class == input.getClass() ) {
-			ImageStatistics.histogram((GrayU8)input,minValue,histogram);
+			ImageStatistics.histogram((GrayU8)input,(int)minValue,histogram);
 		} else if( GrayS8.class == input.getClass() ) {
-			ImageStatistics.histogram((GrayS8)input,minValue,histogram);
+			ImageStatistics.histogram((GrayS8)input,(int)minValue,histogram);
 		} else if( GrayU16.class == input.getClass() ) {
-			ImageStatistics.histogram((GrayU16)input,minValue,histogram);
+			ImageStatistics.histogram((GrayU16)input,(int)minValue,histogram);
 		} else if( GrayS16.class == input.getClass() ) {
-			ImageStatistics.histogram((GrayS16)input,minValue,histogram);
+			ImageStatistics.histogram((GrayS16)input,(int)minValue,histogram);
 		} else if( GrayS32.class == input.getClass() ) {
-			ImageStatistics.histogram((GrayS32)input,minValue,histogram);
+			ImageStatistics.histogram((GrayS32)input,(int)minValue,histogram);
 		} else if( GrayS64.class == input.getClass() ) {
-			ImageStatistics.histogram((GrayS64)input,minValue,histogram);
+			ImageStatistics.histogram((GrayS64)input,(long)minValue,histogram);
 		} else if( GrayF32.class == input.getClass() ) {
-			ImageStatistics.histogram((GrayF32)input,minValue,histogram);
+			ImageStatistics.histogram((GrayF32)input,(float)minValue,histogram);
 		} else if( GrayF64.class == input.getClass() ) {
 			ImageStatistics.histogram((GrayF64)input,minValue,histogram);
 		} else {
