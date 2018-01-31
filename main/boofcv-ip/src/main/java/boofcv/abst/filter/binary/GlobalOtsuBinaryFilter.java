@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageType;
 /**
  * Computes a threshold using Otsu's equation.
  *
- * @see GThresholdImageOps#computeOtsu(ImageGray, int, int)
+ * @see GThresholdImageOps#computeOtsu(ImageGray, double, double)
  *
  * @author Peter Abeles
  */
@@ -35,13 +35,13 @@ public class GlobalOtsuBinaryFilter<T extends ImageGray<T>> implements InputToBi
 	ImageType<T> inputType;
 
 	boolean down;
-	int minValue;
-	int maxValue;
+	double minValue;
+	double maxValue;
 
 	/**
 	 * @see GThresholdImageOps#computeOtsu
 	 */
-	public GlobalOtsuBinaryFilter(int minValue, int maxValue,
+	public GlobalOtsuBinaryFilter(double minValue, double maxValue,
 								  boolean down, ImageType<T> inputType) {
 		this.minValue = minValue;
 		this.maxValue = maxValue;
