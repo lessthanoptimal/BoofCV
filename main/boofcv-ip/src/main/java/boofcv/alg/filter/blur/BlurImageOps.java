@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.alg.filter.convolve.ConvolveImageMean;
 import boofcv.alg.filter.convolve.ConvolveNormalized;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.convolve.Kernel1D_S32;
@@ -56,9 +57,9 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		if( BOverrideBlurImageOps.mean_U8 != null )
-			BOverrideBlurImageOps.mean_U8.process(input,output,radius,storage);
-		else {
+		boolean processed = invokeNativeMean(input, output, radius, storage);
+
+		if( !processed ){
 			ConvolveImageMean.horizontal(input, storage, radius);
 			ConvolveImageMean.vertical(storage, output, radius);
 		}
@@ -83,9 +84,9 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		if( BOverrideBlurImageOps.mean_F32 != null ) {
-			BOverrideBlurImageOps.mean_F32.process(input,output,radius,storage);
-		} else {
+		boolean processed = invokeNativeMean(input, output, radius, storage);
+
+		if( !processed ){
 			ConvolveImageMean.horizontal(input, storage, radius);
 			ConvolveImageMean.vertical(storage, output, radius);
 		}
@@ -110,9 +111,9 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		if( BOverrideBlurImageOps.mean_F64 != null ) {
-			BOverrideBlurImageOps.mean_F64.process(input,output,radius,storage);
-		} else {
+		boolean processed = invokeNativeMean(input, output, radius, storage);
+
+		if( !processed ){
 			ConvolveImageMean.horizontal(input, storage, radius);
 			ConvolveImageMean.vertical(storage, output, radius);
 		}
@@ -158,9 +159,9 @@ public class BlurImageOps {
 
 		output = InputSanityCheck.checkDeclare(input,output);
 
-		if( BOverrideBlurImageOps.median_U8 != null )
-			BOverrideBlurImageOps.median_U8.process(input,output,radius);
-		else {
+		boolean processed = invokeNativeMedian(input, output, radius);
+
+		if( !processed ) {
 			int w = radius * 2 + 1;
 			int offset[] = new int[w * w];
 			int histogram[] = new int[256];
@@ -187,9 +188,9 @@ public class BlurImageOps {
 
 		output = InputSanityCheck.checkDeclare(input,output);
 
-		if( BOverrideBlurImageOps.median_F32 != null )
-			BOverrideBlurImageOps.median_F32.process(input,output,radius);
-		else {
+		boolean processed = invokeNativeMedian(input, output, radius);
+
+		if( !processed ) {
 			ImplMedianSortNaive.process(input, output, radius, null);
 		}
 		return output;
@@ -233,9 +234,9 @@ public class BlurImageOps {
 
 		Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class, sigma, radius);
 
-		if( BOverrideBlurImageOps.gaussian_U8 != null ) {
-			BOverrideBlurImageOps.gaussian_U8.process(input,output,kernel,storage);
-		} else {
+		boolean processed = invokeNativeGaussian(input, output, kernel, storage);
+
+		if( !processed ) {
 			ConvolveNormalized.horizontal(kernel, input, storage);
 			ConvolveNormalized.vertical(kernel, storage, output);
 		}
@@ -250,9 +251,9 @@ public class BlurImageOps {
 
 		Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,sigma,radius);
 
-		if( BOverrideBlurImageOps.gaussian_IU8 != null ) {
-			BOverrideBlurImageOps.gaussian_IU8.process(input,output,kernel,storage);
-		} else {
+		boolean processed = invokeNativeGaussian(input, output, kernel, storage);
+
+		if( !processed ) {
 			ConvolveNormalized.horizontal(kernel, input, storage);
 			ConvolveNormalized.vertical(kernel, storage, output);
 		}
@@ -278,9 +279,9 @@ public class BlurImageOps {
 
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,sigma, radius);
 
-		if( BOverrideBlurImageOps.gaussian_F32 != null ) {
-			BOverrideBlurImageOps.gaussian_F32.process(input,output,kernel,storage);
-		} else {
+		boolean processed = invokeNativeGaussian(input, output, kernel, storage);
+
+		if( !processed ) {
 			ConvolveNormalized.horizontal(kernel, input, storage);
 			ConvolveNormalized.vertical(kernel, storage, output);
 		}
@@ -306,9 +307,9 @@ public class BlurImageOps {
 
 		Kernel1D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F64.class,sigma, radius);
 
-		if( BOverrideBlurImageOps.gaussian_F64 != null ) {
-			BOverrideBlurImageOps.gaussian_F64.process(input,output,kernel,storage);
-		} else {
+		boolean processed = invokeNativeGaussian(input, output, kernel, storage);
+
+		if( !processed ) {
 			ConvolveNormalized.horizontal(kernel, input, storage);
 			ConvolveNormalized.vertical(kernel, storage, output);
 		}
@@ -323,9 +324,9 @@ public class BlurImageOps {
 
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,sigma,radius);
 
-		if( BOverrideBlurImageOps.gaussian_IF32 != null ) {
-			BOverrideBlurImageOps.gaussian_IF32.process(input,output,kernel,storage);
-		} else {
+		boolean processed = invokeNativeGaussian(input, output, kernel, storage);
+
+		if( !processed ) {
 			ConvolveNormalized.horizontal(kernel, input, storage);
 			ConvolveNormalized.vertical(kernel, storage, output);
 		}
@@ -340,9 +341,9 @@ public class BlurImageOps {
 
 		Kernel1D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F64.class,sigma,radius);
 
-		if( BOverrideBlurImageOps.gaussian_IF64 != null ) {
-			BOverrideBlurImageOps.gaussian_IF64.process(input,output,kernel,storage);
-		} else {
+		boolean processed = invokeNativeGaussian(input, output, kernel, storage);
+
+		if( !processed ) {
 			ConvolveNormalized.horizontal(kernel, input, storage);
 			ConvolveNormalized.vertical(kernel, storage, output);
 		}
@@ -374,4 +375,42 @@ public class BlurImageOps {
 		}
 		return output;
 	}
+
+	private static <T extends ImageBase<T>>
+	boolean invokeNativeMean(T input, T output, int radius, T storage) {
+		boolean processed = false;
+		if( BOverrideBlurImageOps.mean != null ) {
+			try {
+				BOverrideBlurImageOps.mean.process(input,output,radius,storage);
+				processed = true;
+			} catch( RuntimeException ignore ) {}
+		}
+		return processed;
+	}
+
+	private static <T extends ImageBase<T>>
+	boolean invokeNativeMedian(T input, T output, int radius) {
+		boolean processed = false;
+		if( BOverrideBlurImageOps.median != null ) {
+			try {
+				BOverrideBlurImageOps.median.process(input,output,radius);
+				processed = true;
+			} catch( RuntimeException ignore ) {}
+		}
+		return processed;
+	}
+
+	// TODO replace with native normalized?
+	private static <T extends ImageBase<T>>
+	boolean invokeNativeGaussian(T input, T output, Kernel1D kernel, T storage) {
+		boolean processed = false;
+		if( BOverrideBlurImageOps.gaussian != null ) {
+			try {
+				BOverrideBlurImageOps.gaussian.process(input,output,kernel,storage);
+				processed = true;
+			} catch( RuntimeException ignore ) {}
+		}
+		return processed;
+	}
+
 }

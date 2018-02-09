@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import java.util.Arrays;
  * <p>NOTE: This produces visually different results from {@link ThresholdBlockOtsu} because the block algorithm
  * combines histograms from its neighboring blocks. That's why it appears to have a wider effective block.</p>
  *
- * @see GThresholdImageOps#computeOtsu(ImageGray, int, int)
+ * @see GThresholdImageOps#computeOtsu(ImageGray, double, double)
  *
  * @author Peter Abeles
  */
