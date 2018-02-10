@@ -39,14 +39,51 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 	public static Gaussian gaussian;
 
 	public interface Mean<T extends ImageBase<T>> {
-		void process(T input, T output, int radius, T storage);
+		void processMean(T input, T output, int radius, T storage);
 	}
 
 	public interface Median<T extends ImageBase<T>> {
-		void process(T input, T output, int radius);
+		void processMedian(T input, T output, int radius);
 	}
 	
 	public interface Gaussian<T extends ImageBase<T>> {
-		void process(T input, T output, Kernel1D kernel, T storage );
+		void processGaussian(T input, T output, Kernel1D kernel, T storage );
+	}
+
+	public static <T extends ImageBase<T>>
+	boolean invokeNativeMean(T input, T output, int radius, T storage) {
+		boolean processed = false;
+		if( BOverrideBlurImageOps.mean != null ) {
+			try {
+				BOverrideBlurImageOps.mean.processMean(input,output,radius,storage);
+				processed = true;
+			} catch( RuntimeException ignore ) {}
+		}
+		return processed;
+	}
+
+	public static <T extends ImageBase<T>>
+	boolean invokeNativeMedian(T input, T output, int radius) {
+		boolean processed = false;
+		if( BOverrideBlurImageOps.median != null ) {
+			try {
+				BOverrideBlurImageOps.median.processMedian(input,output,radius);
+				processed = true;
+			} catch( RuntimeException ignore ) {}
+		}
+		return processed;
+	}
+
+	// TODO replace with native normalized?
+	public static <T extends ImageBase<T>>
+	boolean invokeNativeGaussian(T input, T output, Kernel1D kernel, T storage) {
+		boolean processed = false;
+		if( BOverrideBlurImageOps.gaussian != null ) {
+			try {
+				BOverrideBlurImageOps.gaussian.processGaussian(input,output,kernel,storage);
+				processed = true;
+			} catch( RuntimeException ignore ) {}
+		}
+		return processed;
 	}
 }

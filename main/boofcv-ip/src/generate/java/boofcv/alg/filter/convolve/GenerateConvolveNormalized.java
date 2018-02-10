@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -106,6 +106,8 @@ public class GenerateConvolveNormalized extends CodeGeneratorBase {
 
 		String kernelTypeName = "Kernel"+dimen+"_"+kernelType;
 
+		String overrideName = name.equals("convolve") ? "Convolve" : name.equals("horizontal") ? "Horizontal" : "Vertical";
+
 		out.print(
 				"\t/**\n" +
 				"\t * Performs a"+docName+" "+dimen+" normalized convolution across the image.\n" +
@@ -115,10 +117,12 @@ public class GenerateConvolveNormalized extends CodeGeneratorBase {
 				"\t * @param kernel The kernel that is being convolved. Not modified.\n" +
 				"\t */\n" );
 
-		out.print("\tpublic static void "+name+"("+kernelTypeName+" kernel,\n" +
-				"\t\t\t\t\t\t\t\t  "+inputName+" src, "+outputName+" dst ) {\n" +
+		out.print("\tpublic static void "+name+"("+kernelTypeName+" kernel, "+inputName+" src, "+outputName+" dst ) {\n" +
 				"\t\tInputSanityCheck.checkSameShape"+suffice2+"(src, dst);\n" +
-				"\n");
+				"\n" +
+				"\t\tboolean processed = BOverrideConvolveNormalized.invokeNative"+overrideName+"(kernel,src,dst);\n" +
+				"\t\t\n" +
+				"\t\tif( !processed ) {\n");
 
 		String insideTest;
 		if( name.equals("horizontal") ) {
@@ -130,26 +134,27 @@ public class GenerateConvolveNormalized extends CodeGeneratorBase {
 		}
 
 		if( isInteger ) {
-			out.print("\t\tif( "+insideTest+" ) {\n" +
-					"\t\t\tConvolveNormalizedNaive_"+suffice+"."+name+"(kernel, src, dst);\n" +
-					"\t\t} else {\n" +
-					"\t\t\tConvolveImageNoBorder."+name+"(kernel, src, dst, kernel.computeSum());\n" +
-					"\t\t\tConvolveNormalized_JustBorder_"+suffice+"."+name+"(kernel, src, dst);\n" +
-					"\t\t}\n");
+			out.print("\t\t\tif( "+insideTest+" ) {\n" +
+					"\t\t\t\tConvolveNormalizedNaive_"+suffice+"."+name+"(kernel, src, dst);\n" +
+					"\t\t\t} else {\n" +
+					"\t\t\t\tConvolveImageNoBorder."+name+"(kernel, src, dst, kernel.computeSum());\n" +
+					"\t\t\t\tConvolveNormalized_JustBorder_"+suffice+"."+name+"(kernel, src, dst);\n" +
+					"\t\t\t}\n");
 		} else {
-			out.print("\t\tif( "+insideTest+" ) {\n" +
-					"\t\t\tConvolveNormalizedNaive_"+suffice+"."+name+"(kernel,src,dst);\n" +
-					"\t\t} else {\n" +
-					"\t\t\tif( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {\n" +
-					"\t\t\t\t"+kernelTypeName+" k = kernel.copy();\n" +
-					"\t\t\t\tKernelMath.normalizeSumToOne(k);\n" +
-					"\t\t\t\tkernel = k;\n" +
-					"\t\t\t}\n" +
-					"\t\t\tConvolveImageNoBorder."+name+"(kernel,src,dst);\n" +
-					"\t\t\tConvolveNormalized_JustBorder_"+suffice+"."+name+"(kernel,src,dst);\n" +
-					"\t\t}\n");
+			out.print("\t\t\tif( "+insideTest+" ) {\n" +
+					"\t\t\t\tConvolveNormalizedNaive_"+suffice+"."+name+"(kernel,src,dst);\n" +
+					"\t\t\t} else {\n" +
+					"\t\t\t\tif( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {\n" +
+					"\t\t\t\t\t"+kernelTypeName+" k = kernel.copy();\n" +
+					"\t\t\t\t\tKernelMath.normalizeSumToOne(k);\n" +
+					"\t\t\t\t\tkernel = k;\n" +
+					"\t\t\t\t}\n" +
+					"\t\t\t\tConvolveImageNoBorder."+name+"(kernel,src,dst);\n" +
+					"\t\t\t\tConvolveNormalized_JustBorder_"+suffice+"."+name+"(kernel,src,dst);\n" +
+					"\t\t\t}\n");
 		}
-		out.print("\t}\n\n");
+		out.print("\t\t}\n" +
+				"\t}\n\n");
 	}
 
 	public static void main(String[] args) {
