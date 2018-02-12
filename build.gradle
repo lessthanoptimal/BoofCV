@@ -54,13 +54,33 @@ subprojects {
     }
 
     sourceSets {
-        test {
+        benchmark {
+            java {
+                srcDir 'src/benchmark/java'
+            }
+            resources {
+                srcDir 'src/benchmark/resources'
+            }
+            compileClasspath += sourceSets.main.runtimeClasspath
+        }
+        generate {
             java {
                 srcDir 'src/generate/java'
-                srcDir 'src/benchmark/java'
-                srcDir 'src/experimental/java'
-                srcDir 'src/experimental/test'
             }
+            resources {
+                srcDir 'src/generate/resources'
+            }
+            compileClasspath += sourceSets.main.runtimeClasspath
+        }
+
+        experimental {
+            java {
+                srcDir 'src/experimental/java'
+            }
+            resources {
+                srcDir 'src/experimental/resources'
+            }
+            compileClasspath += sourceSets.main.runtimeClasspath
         }
     }
 
@@ -68,6 +88,14 @@ subprojects {
         compile group: 'org.georegression', name: 'georegression', version: '0.15'
 
         testCompile group: 'junit', name: 'junit', version: '4.12'
+
+        testCompile project.sourceSets.generate.output
+        testCompile project.sourceSets.benchmark.output
+        testCompile project.sourceSets.experimental.output
+
+        benchmarkCompile project.sourceSets.experimental.output
+        benchmarkCompile project.sourceSets.generate.output
+
     }
 
 //    jar {
