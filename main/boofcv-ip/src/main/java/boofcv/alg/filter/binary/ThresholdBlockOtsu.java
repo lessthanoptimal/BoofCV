@@ -118,13 +118,19 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 		// compute threshold
 		otsu.compute(histogram,histogram.length,total);
 
+		final byte a,b;
+		if( otsu.down ) {
+			a = 1; b = 0;
+		} else {
+			a = 0; b = 1;
+		}
 
 		for (int y = y0; y < y1; y++) {
-			int indexInput = input.startIndex + y*input.stride + x0;
-			int indexOutput = output.startIndex + y*output.stride + x0;
-			int end = indexOutput + (x1-x0);
-			for (; indexOutput < end; indexOutput++, indexInput++ ) {
-				output.data[indexOutput] = otsu.down == (input.data[indexInput]&0xFF) <= otsu.threshold ? (byte)1 : 0;
+			int indexInput = input.startIndex + y * input.stride + x0;
+			int indexOutput = output.startIndex + y * output.stride + x0;
+			int end = indexOutput + (x1 - x0);
+			for (; indexOutput < end; indexOutput++, indexInput++) {
+				output.data[indexOutput] = (input.data[indexInput] & 0xFF) <= otsu.threshold ? a : b;
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,13 +75,18 @@ public class ThresholdBlockMean_U8
 
 
 		// apply threshold
+		final byte a,b;
+		if( down ) {
+			a = 1; b = 0;
+		} else {
+			a = 0; b = 1;
+		}
 		for (int y = y0; y < y1; y++) {
-			int indexInput = input.startIndex + y*input.stride + x0;
-			int indexOutput = output.startIndex + y*output.stride + x0;
-			int end = indexOutput + (x1-x0);
-			for (; indexOutput < end; indexOutput++, indexInput++ ) {
-				output.data[indexOutput] = down == (input.data[indexInput]&0xFF) <= mean ?
-						(byte)1 : 0;
+			int indexInput = input.startIndex + y * input.stride + x0;
+			int indexOutput = output.startIndex + y * output.stride + x0;
+			int end = indexOutput + (x1 - x0);
+			for (; indexOutput < end; indexOutput++, indexInput++) {
+				output.data[indexOutput] = (input.data[indexInput]&0xFF) <= mean ? (byte) a : b;
 			}
 		}
 	}

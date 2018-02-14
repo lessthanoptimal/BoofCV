@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,19 +82,31 @@ public class ThresholdBlockMinMax_U8
 
 		// apply threshold
 		int textureThreshold = (int)this.minimumSpread;
-		for (int y = y0; y < y1; y++) {
-			int indexInput = input.startIndex + y*input.stride + x0;
-			int indexOutput = output.startIndex + y*output.stride + x0;
-			for (int x = x0; x < x1; x++, indexOutput++, indexInput++ ) {
+		if( down ) {
+			for (int y = y0; y < y1; y++) {
+				int indexInput = input.startIndex + y * input.stride + x0;
+				int indexOutput = output.startIndex + y * output.stride + x0;
+				for (int x = x0; x < x1; x++, indexOutput++, indexInput++) {
 
-				if( max-min <= textureThreshold ) {
-					output.data[indexOutput] = 1;
-				} else {
-					int average = (int)(scale*((max+min)/2));
-					if( down == (input.data[indexInput]&0xFF) <= average ) {
+					if (max - min <= textureThreshold) {
 						output.data[indexOutput] = 1;
 					} else {
-						output.data[indexOutput] = 0;
+						int average = (int)(scale * ((max+min)/2));
+						output.data[indexOutput] = (input.data[indexInput]&0xFF) <= average ? (byte) 1 : 0;
+					}
+				}
+			}
+		} else {
+			for (int y = y0; y < y1; y++) {
+				int indexInput = input.startIndex + y * input.stride + x0;
+				int indexOutput = output.startIndex + y * output.stride + x0;
+				for (int x = x0; x < x1; x++, indexOutput++, indexInput++) {
+
+					if (max - min <= textureThreshold) {
+						output.data[indexOutput] = 1;
+					} else {
+						int average = (int)(scale * ((max+min)/2));
+						output.data[indexOutput] = (input.data[indexInput]&0xFF) > average ? (byte) 1 : 0;
 					}
 				}
 			}

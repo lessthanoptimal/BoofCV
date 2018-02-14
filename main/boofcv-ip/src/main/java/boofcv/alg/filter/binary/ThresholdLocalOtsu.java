@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -156,12 +156,20 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 	}
 
 	private void applyToBlock( int x0 , int y0 , int x1 , int y1 , GrayU8 input , GrayU8 output ) {
+
+		final byte a,b;
+		if( otsu.down ) {
+			a = 1; b = 0;
+		} else {
+			a = 0; b = 1;
+		}
+
 		for (int y = y0; y < y1; y++) {
-			int indexInput = input.startIndex + y*input.stride + x0;
-			int indexOutput = output.startIndex + y*output.stride + x0;
-			int end = indexOutput + (x1-x0);
-			while ( indexOutput < end ) {
-				output.data[indexOutput++] = otsu.down == (input.data[indexInput++]&0xFF) <= otsu.threshold ? (byte)1 : 0;
+			int indexInput = input.startIndex + y * input.stride + x0;
+			int indexOutput = output.startIndex + y * output.stride + x0;
+			int end = indexOutput + (x1 - x0);
+			while (indexOutput < end) {
+				output.data[indexOutput++] = (input.data[indexInput++] & 0xFF) <= otsu.threshold ? a : b;
 			}
 		}
 	}
