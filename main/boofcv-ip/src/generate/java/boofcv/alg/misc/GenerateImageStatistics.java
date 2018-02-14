@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,6 +46,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 		out.print("import boofcv.struct.image.*;\n" +
 				"import javax.annotation.Generated;\n" +
 				"import boofcv.alg.InputSanityCheck;\n" +
+				"import java.util.Arrays;\n" +
 				"\n" +
 				"/**\n" +
 				" * Computes statistical properties of pixels inside an image.\n" +
@@ -100,21 +101,20 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
 				"\t */\n" +
 				"\tpublic static void histogram( "+input.getSingleBandName()+" input , "+sumType+" minValue , int histogram[] ) {\n" +
-				"\t\tfor( int i = 0; i < histogram.length; i++ )\n" +
-				"\t\t\thistogram[i] = 0;\n" +
-				"\t\t\n" +
+				"\t\tArrays.fill(histogram,0);\n" +
+				"\n" +
 				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\tint index = input.startIndex + y*input.stride;\n" +
 				"\t\t\tint end = index + input.width;\n" +
 				"\n" +
-				"\t\t\tfor( ; index < end; index++ ) {\n");
+				"\t\t\twhile( index < end ) {\n");
 		if( input.isInteger()) {
 			if( input.getNumBits() == 64 )
-				out.print("\t\t\t\thistogram[(int)(input.data[index] - minValue)]++;\n");
+				out.print("\t\t\t\thistogram[(int)(input.data[index++] - minValue)]++;\n");
 			else
-				out.print("\t\t\t\thistogram[(input.data[index]"+input.getBitWise()+") - minValue ]++;\n");
+				out.print("\t\t\t\thistogram[(input.data[index++]"+input.getBitWise()+") - minValue ]++;\n");
 		} else {
-			out.print("\t\t\t\thistogram[(int)(input.data[index] - minValue)]++;\n");
+			out.print("\t\t\t\thistogram[(int)(input.data[index++] - minValue)]++;\n");
 		}
 		out.print("\t\t\t}\n" +
 				"\t\t}\n" +

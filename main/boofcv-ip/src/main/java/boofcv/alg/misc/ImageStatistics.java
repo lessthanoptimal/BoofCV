@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
+import java.util.Arrays;
 
 /**
  * Computes statistical properties of pixels inside an image.
@@ -340,15 +341,14 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayU8 input , int minValue , int histogram[] ) {
-		for( int i = 0; i < histogram.length; i++ )
-			histogram[i] = 0;
-		
+		Arrays.fill(histogram,0);
+
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
-			for( ; index < end; index++ ) {
-				histogram[(input.data[index]& 0xFF) - minValue ]++;
+			while( index < end ) {
+				histogram[(input.data[index++]& 0xFF) - minValue ]++;
 			}
 		}
 	}
@@ -661,15 +661,14 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayS8 input , int minValue , int histogram[] ) {
-		for( int i = 0; i < histogram.length; i++ )
-			histogram[i] = 0;
-		
+		Arrays.fill(histogram,0);
+
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
-			for( ; index < end; index++ ) {
-				histogram[(input.data[index]) - minValue ]++;
+			while( index < end ) {
+				histogram[(input.data[index++]) - minValue ]++;
 			}
 		}
 	}
@@ -982,15 +981,14 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayU16 input , int minValue , int histogram[] ) {
-		for( int i = 0; i < histogram.length; i++ )
-			histogram[i] = 0;
-		
+		Arrays.fill(histogram,0);
+
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
-			for( ; index < end; index++ ) {
-				histogram[(input.data[index]& 0xFFFF) - minValue ]++;
+			while( index < end ) {
+				histogram[(input.data[index++]& 0xFFFF) - minValue ]++;
 			}
 		}
 	}
@@ -1303,15 +1301,14 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayS16 input , int minValue , int histogram[] ) {
-		for( int i = 0; i < histogram.length; i++ )
-			histogram[i] = 0;
-		
+		Arrays.fill(histogram,0);
+
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
-			for( ; index < end; index++ ) {
-				histogram[(input.data[index]) - minValue ]++;
+			while( index < end ) {
+				histogram[(input.data[index++]) - minValue ]++;
 			}
 		}
 	}
@@ -1624,15 +1621,14 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayS32 input , int minValue , int histogram[] ) {
-		for( int i = 0; i < histogram.length; i++ )
-			histogram[i] = 0;
-		
+		Arrays.fill(histogram,0);
+
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
-			for( ; index < end; index++ ) {
-				histogram[(input.data[index]) - minValue ]++;
+			while( index < end ) {
+				histogram[(input.data[index++]) - minValue ]++;
 			}
 		}
 	}
@@ -1945,15 +1941,14 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayS64 input , long minValue , int histogram[] ) {
-		for( int i = 0; i < histogram.length; i++ )
-			histogram[i] = 0;
-		
+		Arrays.fill(histogram,0);
+
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
-			for( ; index < end; index++ ) {
-				histogram[(int)(input.data[index] - minValue)]++;
+			while( index < end ) {
+				histogram[(int)(input.data[index++] - minValue)]++;
 			}
 		}
 	}
@@ -2266,15 +2261,14 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayF32 input , float minValue , int histogram[] ) {
-		for( int i = 0; i < histogram.length; i++ )
-			histogram[i] = 0;
-		
+		Arrays.fill(histogram,0);
+
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
-			for( ; index < end; index++ ) {
-				histogram[(int)(input.data[index] - minValue)]++;
+			while( index < end ) {
+				histogram[(int)(input.data[index++] - minValue)]++;
 			}
 		}
 	}
@@ -2587,15 +2581,14 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayF64 input , double minValue , int histogram[] ) {
-		for( int i = 0; i < histogram.length; i++ )
-			histogram[i] = 0;
-		
+		Arrays.fill(histogram,0);
+
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
-			for( ; index < end; index++ ) {
-				histogram[(int)(input.data[index] - minValue)]++;
+			while( index < end ) {
+				histogram[(int)(input.data[index++] - minValue)]++;
 			}
 		}
 	}
