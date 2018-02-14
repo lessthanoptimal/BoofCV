@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -98,13 +98,8 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
 				"\t\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
 				"\n" +
-				"\t\t\t\tint end = indexIn + input.width;\n" +
-				"\n" +
-				"\t\t\t\tfor( ; indexIn < end; indexIn++ , indexOut++ ) {\n" +
-				"\t\t\t\t\tif( (input.data[indexIn]"+imageIn.getBitWise()+") <= threshold )\n" +
-				"\t\t\t\t\t\toutput.data[indexOut] = 1;\n" +
-				"\t\t\t\t\telse\n" +
-				"\t\t\t\t\t\toutput.data[indexOut] = 0;\n" +
+				"\t\t\t\tfor( int i = input.width; i>0; i-- ) {\n" +
+				"\t\t\t\t\toutput.data[indexOut++] = (byte)((input.data[indexIn++]"+imageIn.getBitWise()+") <= threshold ? 1 : 0);\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t} else {\n" +
@@ -112,13 +107,8 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
 				"\t\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
 				"\n" +
-				"\t\t\t\tint end = indexIn + input.width;\n" +
-				"\n" +
-				"\t\t\t\tfor( ; indexIn < end; indexIn++ , indexOut++ ) {\n" +
-				"\t\t\t\t\tif( (input.data[indexIn]"+imageIn.getBitWise()+") > threshold )\n" +
-				"\t\t\t\t\t\toutput.data[indexOut] = 1;\n" +
-				"\t\t\t\t\telse\n" +
-				"\t\t\t\t\t\toutput.data[indexOut] = 0;\n" +
+				"\t\t\t\tfor( int i = input.width; i>0; i-- ) {\n" +
+				"\t\t\t\t\toutput.data[indexOut++] = (byte)((input.data[indexIn++]"+imageIn.getBitWise()+") > threshold ? 1 : 0);\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,13 +56,8 @@ public class ThresholdImageOps {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
-				int end = indexIn + input.width;
-
-				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]) <= threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				for( int i = input.width; i>0; i-- ) {
+					output.data[indexOut++] = (byte)((input.data[indexIn++]) <= threshold ? 1 : 0);
 				}
 			}
 		} else {
@@ -70,13 +65,8 @@ public class ThresholdImageOps {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
-				int end = indexIn + input.width;
-
-				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]) > threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				for( int i = input.width; i>0; i-- ) {
+					output.data[indexOut++] = (byte)((input.data[indexIn++]) > threshold ? 1 : 0);
 				}
 			}
 		}
@@ -105,13 +95,8 @@ public class ThresholdImageOps {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
-				int end = indexIn + input.width;
-
-				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]) <= threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				for( int i = input.width; i>0; i-- ) {
+					output.data[indexOut++] = (byte)((input.data[indexIn++]) <= threshold ? 1 : 0);
 				}
 			}
 		} else {
@@ -119,13 +104,8 @@ public class ThresholdImageOps {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
-				int end = indexIn + input.width;
-
-				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]) > threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				for( int i = input.width; i>0; i-- ) {
+					output.data[indexOut++] = (byte)((input.data[indexIn++]) > threshold ? 1 : 0);
 				}
 			}
 		}
@@ -154,13 +134,8 @@ public class ThresholdImageOps {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
-				int end = indexIn + input.width;
-
-				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]& 0xFF) <= threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				for( int i = input.width; i>0; i-- ) {
+					output.data[indexOut++] = (byte)((input.data[indexIn++]& 0xFF) <= threshold ? 1 : 0);
 				}
 			}
 		} else {
@@ -168,13 +143,8 @@ public class ThresholdImageOps {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
-				int end = indexIn + input.width;
-
-				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]& 0xFF) > threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				for( int i = input.width; i>0; i-- ) {
+					output.data[indexOut++] = (byte)((input.data[indexIn++]& 0xFF) > threshold ? 1 : 0);
 				}
 			}
 		}
@@ -203,13 +173,8 @@ public class ThresholdImageOps {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
-				int end = indexIn + input.width;
-
-				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]) <= threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				for( int i = input.width; i>0; i-- ) {
+					output.data[indexOut++] = (byte)((input.data[indexIn++]) <= threshold ? 1 : 0);
 				}
 			}
 		} else {
@@ -217,13 +182,8 @@ public class ThresholdImageOps {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
-				int end = indexIn + input.width;
-
-				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]) > threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				for( int i = input.width; i>0; i-- ) {
+					output.data[indexOut++] = (byte)((input.data[indexIn++]) > threshold ? 1 : 0);
 				}
 			}
 		}
@@ -252,13 +212,8 @@ public class ThresholdImageOps {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
-				int end = indexIn + input.width;
-
-				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]& 0xFFFF) <= threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				for( int i = input.width; i>0; i-- ) {
+					output.data[indexOut++] = (byte)((input.data[indexIn++]& 0xFFFF) <= threshold ? 1 : 0);
 				}
 			}
 		} else {
@@ -266,13 +221,8 @@ public class ThresholdImageOps {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
-				int end = indexIn + input.width;
-
-				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]& 0xFFFF) > threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				for( int i = input.width; i>0; i-- ) {
+					output.data[indexOut++] = (byte)((input.data[indexIn++]& 0xFFFF) > threshold ? 1 : 0);
 				}
 			}
 		}
@@ -301,13 +251,8 @@ public class ThresholdImageOps {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
-				int end = indexIn + input.width;
-
-				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]) <= threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				for( int i = input.width; i>0; i-- ) {
+					output.data[indexOut++] = (byte)((input.data[indexIn++]) <= threshold ? 1 : 0);
 				}
 			}
 		} else {
@@ -315,13 +260,8 @@ public class ThresholdImageOps {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
-				int end = indexIn + input.width;
-
-				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]) > threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				for( int i = input.width; i>0; i-- ) {
+					output.data[indexOut++] = (byte)((input.data[indexIn++]) > threshold ? 1 : 0);
 				}
 			}
 		}
