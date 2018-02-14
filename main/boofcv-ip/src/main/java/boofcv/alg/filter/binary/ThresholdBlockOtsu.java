@@ -69,7 +69,8 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 
 		for (int y = 0; y < height; y++) {
 			int indexInput = input.startIndex + (y0+y)*input.stride + x0;
-			for (int x = 0; x < width; x++) {
+			int end = indexInput + width;
+			while( indexInput < end ) {
 				stats.data[indexStats+(input.data[indexInput++] & 0xFF)]++;
 			}
 		}
