@@ -160,13 +160,9 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\t\tint end = indexIn + input.width;\n" +
 				"\n" +
-				"\t\t\t\tfor( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {\n" +
-				"\t\t\t\t\tfloat threshold = (mean.data[indexMean]"+bitwise+") * scale;\n" +
-				"\n" +
-				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") <= threshold )\n" +
-				"\t\t\t\t\t\toutput.data[indexOut] = 1;\n" +
-				"\t\t\t\t\telse\n" +
-				"\t\t\t\t\t\toutput.data[indexOut] = 0;\n" +
+				"\t\t\t\twhile(indexIn < end) {\n" +
+				"\t\t\t\t\tfloat threshold = (mean.data[indexMean++]"+bitwise+") * scale;\n" +
+				"\t\t\t\t\toutput.data[indexOut++] = (input.data[indexIn++]"+bitwise+") <= threshold ? (byte)1:0;\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t} else {\n" +
@@ -177,13 +173,9 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\t\tint end = indexIn + input.width;\n" +
 				"\n" +
-				"\t\t\t\tfor( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {\n" +
-				"\t\t\t\t\t"+sumType+" threshold = (mean.data[indexMean]"+bitwise+");\n" +
-				"\n" +
-				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") * scale > threshold )\n" +
-				"\t\t\t\t\t\toutput.data[indexOut] = 1;\n" +
-				"\t\t\t\t\telse\n" +
-				"\t\t\t\t\t\toutput.data[indexOut] = 0;\n" +
+				"\t\t\t\twhile(indexIn < end) {\n" +
+				"\t\t\t\t\tfloat threshold = (mean.data[indexMean++]"+bitwise+");\n" +
+				"\t\t\t\t\toutput.data[indexOut++] = (input.data[indexIn++]"+bitwise+")*scale > threshold ? (byte)1:0;\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +

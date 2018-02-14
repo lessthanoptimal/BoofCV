@@ -306,13 +306,9 @@ public class ThresholdImageOps {
 
 				int end = indexIn + input.width;
 
-				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
-					float threshold = (mean.data[indexMean]& 0xFF) * scale;
-
-					if( (input.data[indexIn]& 0xFF) <= threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				while(indexIn < end) {
+					float threshold = (mean.data[indexMean++]& 0xFF) * scale;
+					output.data[indexOut++] = (input.data[indexIn++]& 0xFF) <= threshold ? (byte)1:0;
 				}
 			}
 		} else {
@@ -323,13 +319,9 @@ public class ThresholdImageOps {
 
 				int end = indexIn + input.width;
 
-				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
-					int threshold = (mean.data[indexMean]& 0xFF);
-
-					if( (input.data[indexIn]& 0xFF) * scale > threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				while(indexIn < end) {
+					float threshold = (mean.data[indexMean++]& 0xFF);
+					output.data[indexOut++] = (input.data[indexIn++]& 0xFF)*scale > threshold ? (byte)1:0;
 				}
 			}
 		}
@@ -442,13 +434,9 @@ public class ThresholdImageOps {
 
 				int end = indexIn + input.width;
 
-				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
-					float threshold = (mean.data[indexMean]) * scale;
-
-					if( (input.data[indexIn]) <= threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				while(indexIn < end) {
+					float threshold = (mean.data[indexMean++]) * scale;
+					output.data[indexOut++] = (input.data[indexIn++]) <= threshold ? (byte)1:0;
 				}
 			}
 		} else {
@@ -459,13 +447,9 @@ public class ThresholdImageOps {
 
 				int end = indexIn + input.width;
 
-				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
-					float threshold = (mean.data[indexMean]);
-
-					if( (input.data[indexIn]) * scale > threshold )
-						output.data[indexOut] = 1;
-					else
-						output.data[indexOut] = 0;
+				while(indexIn < end) {
+					float threshold = (mean.data[indexMean++]);
+					output.data[indexOut++] = (input.data[indexIn++])*scale > threshold ? (byte)1:0;
 				}
 			}
 		}
