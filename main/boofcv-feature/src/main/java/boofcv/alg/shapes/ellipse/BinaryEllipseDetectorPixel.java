@@ -18,8 +18,9 @@
 
 package boofcv.alg.shapes.ellipse;
 
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.filter.binary.ContourPacked;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
+import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayS32;
@@ -79,7 +80,7 @@ public class BinaryEllipseDetectorPixel {
 
 	private boolean internalContour = false;
 
-	private LinearContourLabelChang2004 contourFinder;
+	private BinaryContourFinder contourFinder;
 	private GrayS32 labeled = new GrayS32(1,1);
 
 	private FitEllipseAlgebraic_F64 algebraic = new FitEllipseAlgebraic_F64();
@@ -99,7 +100,8 @@ public class BinaryEllipseDetectorPixel {
 	private FastQueue<Point2D_I32> contourTmp = new FastQueue<>(Point2D_I32.class,true);
 
 	public BinaryEllipseDetectorPixel(ConnectRule connectRule ) {
-		contourFinder = new LinearContourLabelChang2004(connectRule);
+		contourFinder = FactoryBinaryContourFinder.linearChang2004();
+		contourFinder.setConnectRule(connectRule);
 	}
 
 	public BinaryEllipseDetectorPixel() {
@@ -131,16 +133,16 @@ public class BinaryEllipseDetectorPixel {
 
 		contourFinder.process(binary, labeled);
 
-		FastQueue<ContourPacked> blobs = contourFinder.getContours();
-		for (int i = 0; i < blobs.size; i++) {
+		List<ContourPacked> blobs = contourFinder.getContours();
+		for (int i = 0; i < blobs.size(); i++) {
 			ContourPacked c = blobs.get(i);
 
-			contourFinder.getPackedPoints().getSet(c.externalIndex,contourTmp);
+			contourFinder.loadContour(c.externalIndex,contourTmp);
 			proccessContour(contourTmp.toList());
 
 			if(internalContour) {
 				for( int j = 0; j < c.internalIndexes.size(); j++ ) {
-					contourFinder.getPackedPoints().getSet(c.internalIndexes.get(j),contourTmp);
+					contourFinder.loadContour(c.internalIndexes.get(j),contourTmp);
 					proccessContour(contourTmp.toList());
 				}
 			}
@@ -278,7 +280,7 @@ public class BinaryEllipseDetectorPixel {
 		return true;
 	}
 
-	public LinearContourLabelChang2004 getContourFinder() {
+	public BinaryContourFinder getContourFinder() {
 		return contourFinder;
 	}
 

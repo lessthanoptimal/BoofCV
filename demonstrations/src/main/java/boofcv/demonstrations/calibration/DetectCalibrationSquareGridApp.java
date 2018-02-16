@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,12 +19,12 @@
 package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
@@ -92,10 +92,9 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 	@Override
 	protected List<Contour> getContours() {
 
-		LinearContourLabelChang2004 contour = alg.getDetectorSquare().getDetector().getContourFinder();
+		BinaryContourFinder contour = alg.getDetectorSquare().getDetector().getContourFinder();
 
-		List<Contour> contours = BinaryImageOps.convertContours(
-				contour.getPackedPoints(), contour.getContours());
+		List<Contour> contours = BinaryImageOps.convertContours(contour);
 
 		return contours;
 	}

@@ -15,6 +15,14 @@ Version : 0.29
   * general otsu specifies pixel min/max with a double not an int
 - Stereo Calibration
   * Moved detector to be outside of the main calibration class
+- Demonstrations
+  * Moved menu bar to the correct location
+  * Tweaks for Mac OS X
+- Images
+  * Gray images new support createSameShape(type)
+- Contours
+  * Created an interface for finding contours in a binary image
+  * Provided a way to override Chang2004
 
 
 

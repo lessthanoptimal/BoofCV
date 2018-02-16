@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.demonstrations.shapes;
 
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
@@ -116,10 +116,9 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 				if (controls.bShowContour) {
 					g2.setStroke(new BasicStroke(1));
 
-					LinearContourLabelChang2004 contour = detector.getDetector().getContourFinder();
+					BinaryContourFinder contour = detector.getDetector().getContourFinder();
 
-					List<Contour> contours = BinaryImageOps.convertContours(
-							contour.getPackedPoints(), contour.getContours());
+					List<Contour> contours = BinaryImageOps.convertContours(contour);
 
 
 					VisualizeBinaryData.render(contours, null,Color.CYAN, scale, g2);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,13 @@
 
 package boofcv.demonstrations.shapes;
 
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.abst.shapes.polyline.PointsToPolyline;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigSplitMergeLineFit;
 import boofcv.factory.shape.FactoryPointsToPolyline;
@@ -32,7 +33,6 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.struct.ConfigLength;
-import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
@@ -54,7 +54,7 @@ import java.util.List;
 public class DetectPolylineApp<T extends ImageGray<T>>
 		extends DetectBlackShapeAppBase implements ShapeGuiListener
 {
-	LinearContourLabelChang2004 binaryToContour = new LinearContourLabelChang2004(ConnectRule.FOUR);
+	BinaryContourFinder binaryToContour = FactoryBinaryContourFinder.linearChang2004();
 	PointsToPolyline contourToPolyline;
 
 	List<List<Point2D_I32>> polylines = new ArrayList<>();
@@ -78,9 +78,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 
 		minimumContourSize = ConfigLength.fixed(controls.minimumContourSize);
 
-		if( binaryToContour.getConnectRule() != controls.connectRule ) {
-			binaryToContour = new LinearContourLabelChang2004(controls.connectRule);
-		}
+		binaryToContour.setConnectRule(controls.connectRule);
 
 		synchronized (this) {
 			switch( polyControls.whichAlgorithm ) {
@@ -128,7 +126,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 //		System.out.println("processing image "+count++);
 		binaryToContour.process(binary,labeled);
 
-		contours = BinaryImageOps.convertContours(binaryToContour.getPackedPoints(),binaryToContour.getContours());
+		contours = BinaryImageOps.convertContours(binaryToContour);
 
 		int minContourPixels = minimumContourSize.computeI(Math.min(input.width,input.height));
 

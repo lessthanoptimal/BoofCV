@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,6 +17,8 @@
  */
 
 package boofcv.struct.image;
+
+import boofcv.core.image.GeneralizedImageOps;
 
 import java.lang.reflect.Array;
 
@@ -71,14 +73,18 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	 * @param height Image's height.
 	 */
 	protected ImageGray(int width, int height) {
+		initialize(width,height);
+	}
+
+	protected ImageGray() {
+	}
+
+	protected void initialize(int width, int height) {
 		_setData(Array.newInstance(getDataType().getDataType(), width * height));
 		this.startIndex = 0;
 		this.stride = width;
 		this.width = width;
 		this.height = height;
-	}
-
-	protected ImageGray() {
 	}
 
 	/**
@@ -173,6 +179,15 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 				indexDst += stride;
 			}
 		}
+	}
+
+	/**
+	 * Creates a single band image of the specified type that will have the same
+	 * shape as this image
+	 */
+	public <B extends ImageGray<B>> B createSameShape( Class<B> type )
+	{
+		return GeneralizedImageOps.createSingleBand(type,width,height);
 	}
 
 	/**

@@ -12,6 +12,8 @@ dependencies {
             exclude group: 'org.ejml'
         }}
 
+    benchmarkCompile project(':main:boofcv-io')
+    
     testCompile project(':main:boofcv-io')
     testCompile project(':main:boofcv-simulation')
     testCompile project(':integration:boofcv-swing')

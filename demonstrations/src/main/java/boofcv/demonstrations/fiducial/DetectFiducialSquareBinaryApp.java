@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,12 @@
 
 package boofcv.demonstrations.fiducial;
 
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.square.FoundFiducial;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.demonstrations.shapes.ShapeGuiListener;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
@@ -224,9 +224,8 @@ public class DetectFiducialSquareBinaryApp
 
 				if (controls.bShowContour) {
 
-					LinearContourLabelChang2004 contour = detector.getSquareDetector().getDetector().getContourFinder();
-					List<Contour> contours =
-							BinaryImageOps.convertContours(contour.getPackedPoints(), contour.getContours());
+					BinaryContourFinder contour = detector.getSquareDetector().getDetector().getContourFinder();
+					List<Contour> contours = BinaryImageOps.convertContours(contour);
 					g2.setStroke(new BasicStroke(1));
 					VisualizeBinaryData.render(contours, null,Color.CYAN, scale, g2);
 				}

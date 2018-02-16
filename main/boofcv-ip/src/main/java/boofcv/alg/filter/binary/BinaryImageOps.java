@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,14 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.impl.BinaryThinning;
 import boofcv.alg.filter.binary.impl.ImplBinaryBorderOps;
 import boofcv.alg.filter.binary.impl.ImplBinaryInnerOps;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
@@ -433,24 +434,25 @@ public class BinaryImageOps {
 			InputSanityCheck.checkSameShape(input,output);
 		}
 
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(rule);
+		BinaryContourFinder alg = FactoryBinaryContourFinder.linearChang2004();
+		alg.setConnectRule(rule);
 		alg.process(input,output);
 
-		List<Contour> ret = convertContours(alg.getPackedPoints(),alg.getContours());
-
-		return ret;
+		return convertContours(alg);
 	}
 
-	public static List<Contour> convertContours(PackedSetsPoint2D_I32 packed,
-												FastQueue<ContourPacked> contours ) {
+	public static List<Contour> convertContours(BinaryContourFinder alg ) {
+
+		List<ContourPacked> contours = alg.getContours();
+
 		List<Contour> ret = new ArrayList<>();
-		for (int i = 0; i < contours.size; i++) {
+		for (int i = 0; i < contours.size(); i++) {
 			ContourPacked p = contours.get(i);
 			Contour c = new Contour();
-			c.external = packed.getSet(p.externalIndex);
+			c.external = BinaryContourFinder.copyContour(alg,p.externalIndex);
 
 			for (int j = 0; j < p.internalIndexes.size; j++) {
-				c.internal.add( packed.getSet(p.internalIndexes.get(j)));
+				c.internal.add( BinaryContourFinder.copyContour(alg,p.internalIndexes.get(j)));
 			}
 			ret.add(c);
 		}

@@ -18,13 +18,14 @@
 
 package boofcv.factory.shape;
 
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.abst.shapes.polyline.PointsToPolyline;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
 import boofcv.alg.shapes.ellipse.EdgeIntensityEllipse;
 import boofcv.alg.shapes.ellipse.SnapToEllipseEdge;
 import boofcv.alg.shapes.polygon.*;
+import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
 import boofcv.struct.image.ImageGray;
 
 /**
@@ -108,7 +109,8 @@ public class FactoryShapeDetector {
 		PointsToPolyline contourToPolygon =
 				FactoryPointsToPolyline.create(config.contourToPoly);
 
-		LinearContourLabelChang2004 contour = new LinearContourLabelChang2004(config.contourRule);
+		BinaryContourFinder contour = FactoryBinaryContourFinder.linearChang2004();
+		contour.setConnectRule(config.contourRule);
 
 		return new DetectPolygonFromContour<>(
 				config.minimumSides, config.maximumSides, contourToPolygon,

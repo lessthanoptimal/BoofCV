@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,12 +19,12 @@
 package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
@@ -91,10 +91,9 @@ public class DetectCalibrationChessboardApp
 
 	@Override
 	protected List<Contour> getContours() {
-		LinearContourLabelChang2004 contour = alg.getFindSeeds().getDetectorSquare().getDetector().getContourFinder();
+		BinaryContourFinder contour = alg.getFindSeeds().getDetectorSquare().getDetector().getContourFinder();
 
-		return BinaryImageOps.convertContours(
-				contour.getPackedPoints(), contour.getContours());
+		return BinaryImageOps.convertContours(contour);
 	}
 
 	@Override

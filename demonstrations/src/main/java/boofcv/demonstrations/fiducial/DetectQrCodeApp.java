@@ -19,6 +19,7 @@
 package boofcv.demonstrations.fiducial;
 
 import boofcv.abst.fiducial.QrCodePreciseDetector;
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.fiducial.calib.squares.SquareEdge;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
@@ -27,7 +28,6 @@ import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeBinaryGridToPixel;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.demonstrations.shapes.DetectBlackShapeAppBase;
 import boofcv.demonstrations.shapes.ShapeGuiListener;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
@@ -171,6 +171,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			config.threshold = controls.getThreshold().createConfig();
 
 			detector = FactoryFiducial.qrcode(config,imageClass);
+			detector.setProfilerState(true);
 		}
 	}
 
@@ -304,9 +305,8 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 				if (controls.bShowContour) {
 					// todo copy after process() to avoid thread issues. or lock
-					LinearContourLabelChang2004 contour = detector.getSquareDetector().getDetector().getContourFinder();
-					List<Contour> contours =
-							BinaryImageOps.convertContours(contour.getPackedPoints(), contour.getContours());
+					BinaryContourFinder contour = detector.getSquareDetector().getDetector().getContourFinder();
+					List<Contour> contours = BinaryImageOps.convertContours(contour);
 					g2.setStroke(new BasicStroke(1));
 					VisualizeBinaryData.render(contours, null, Color.CYAN, scale, g2);
 				}

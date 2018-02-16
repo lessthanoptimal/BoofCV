@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,10 @@
 
 package boofcv.alg.shapes.polygon;
 
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.abst.shapes.polyline.PointsToPolyline;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.ContourPacked;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.distort.PixelTransform2_F32;
@@ -76,7 +76,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private int minimumContour;
 	private double minimumArea; // computed from minimumContour
 
-	private LinearContourLabelChang2004 contourFinder;
+	private BinaryContourFinder contourFinder;
 	private GrayS32 labeled = new GrayS32(1,1);
 
 	// finds the initial polygon around a target candidate
@@ -147,7 +147,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 									boolean touchBorder,
 									double contourEdgeThreshold,
 									double tangentEdgeIntensity,
-									LinearContourLabelChang2004 contourFinder,
+									BinaryContourFinder contourFinder,
 									Class<T> inputType) {
 
 		this.minimumContourConfig = minimumContour.copy(); // local copy so that external can be modified
@@ -262,7 +262,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		this.minimumContour = minimumContourConfig.computeI(Math.min(width,height));
 		this.minimumContour = Math.max(4,minimumContour); // This is needed to avoid processing zero or other impossible
 		this.minimumArea = Math.pow(this.minimumContour /4.0,2);
-		contourFinder.setMinContourSize(minimumContour);
+		contourFinder.setMinContour(minimumContour);
 
 		if( helper != null )
 			helper.setImageShape(width,height);
@@ -275,11 +275,12 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private void findCandidateShapes() {
 
 		// find blobs where all 4 edges are lines
-		FastQueue<ContourPacked> blobs = contourFinder.getContours();
-		for (int i = 0; i < blobs.size; i++) {
+		List<ContourPacked> blobs = contourFinder.getContours();
+		for (int i = 0; i < blobs.size(); i++) {
 			ContourPacked c = blobs.get(i);
 
-			contourFinder.getPackedPoints().getSet(c.externalIndex,contourTmp);
+			contourTmp.reset();
+			contourFinder.loadContour(c.externalIndex,contourTmp);
 			if( contourTmp.size() >= minimumContour) {
 				float edgeInside=-1,edgeOutside=-1;
 
@@ -396,7 +397,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 				if( distToUndist != null ) {
 					// changed the save points in the packed contour list with undistorted coordinates
-					contourFinder.getPackedPoints().writeOverSet(c.externalIndex,undistorted);
+					contourFinder.writeContour(c.externalIndex,undistorted);
 				}
 
 				// save results
@@ -439,8 +440,15 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		}
 	}
 
+	/**
+	 * Returns the undistorted contour for a shape. Data is potentially recycled the next time
+	 * any function in this class is invoked.
+	 * @param info Which shape
+	 * @return List of points in the contour
+	 */
 	public List<Point2D_I32> getContour( Info info ) {
-		contourFinder.getPackedPoints().getSet(info.contour.externalIndex,contourTmp);
+		contourTmp.reset();
+		contourFinder.loadContour(info.contour.externalIndex,contourTmp);
 		return contourTmp.toList();
 	}
 
@@ -534,7 +542,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		return outputClockwise;
 	}
 
-	public List<ContourPacked> getAllContours(){return contourFinder.getContours().toList();}
+	public List<ContourPacked> getAllContours(){return contourFinder.getContours();}
 
 	public Class<T> getInputType() {
 		return inputType;
@@ -589,7 +597,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		return foundInfo;
 	}
 
-	public LinearContourLabelChang2004 getContourFinder() {
+	public BinaryContourFinder getContourFinder() {
 		return contourFinder;
 	}
 

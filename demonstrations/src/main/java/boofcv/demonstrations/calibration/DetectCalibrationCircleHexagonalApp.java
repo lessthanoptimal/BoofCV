@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.ConfigCircleHexagonalGrid;
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
 import boofcv.alg.fiducial.calib.circle.KeyPointsCircleHexagonalGrid.Tangents;
@@ -27,7 +28,6 @@ import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.io.UtilIO;
@@ -225,10 +225,9 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 
 	@Override
 	protected List<Contour> getContours() {
-		LinearContourLabelChang2004 contour = detector.getDetector().getEllipseDetector().getEllipseDetector().getContourFinder();
+		BinaryContourFinder contour = detector.getDetector().getEllipseDetector().getEllipseDetector().getContourFinder();
 
-		return BinaryImageOps.convertContours(
-				contour.getPackedPoints(), contour.getContours());
+		return BinaryImageOps.convertContours(contour);
 	}
 
 	@Override

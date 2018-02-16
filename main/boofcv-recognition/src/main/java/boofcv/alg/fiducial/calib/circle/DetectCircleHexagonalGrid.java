@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.fiducial.calib.circle;
 
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.shapes.EllipseRotated_F64;
@@ -76,9 +76,9 @@ public class DetectCircleHexagonalGrid<T extends ImageGray<T>> extends DetectCir
 		// isn't correct
 		int diameter = Math.max(gray.width,gray.height)/(Math.max(numCols,numRows));
 
-		LinearContourLabelChang2004 contourFinder = ellipseDetector.getEllipseDetector().getContourFinder();
-		contourFinder.setMaxContourSize((int)(Math.PI*diameter*3)+1);
-		contourFinder.setSaveInternalContours(false);
+		BinaryContourFinder contourFinder = ellipseDetector.getEllipseDetector().getContourFinder();
+		contourFinder.setMaxContour((int)(Math.PI*diameter*3)+1);
+		contourFinder.setSaveInnerContour(false);
 	}
 
 	@Override

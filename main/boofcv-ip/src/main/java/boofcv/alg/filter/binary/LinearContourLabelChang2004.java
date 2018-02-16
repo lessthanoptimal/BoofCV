@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -228,6 +228,12 @@ public class LinearContourLabelChang2004 {
 	public void setSaveInternalContours(boolean saveInternalContours) {
 		this.saveInternalContours = saveInternalContours;
 	}
+
+	public void setConnectRule( ConnectRule rule ) {
+		if( rule != tracer.getConnectRule() )
+			tracer = new ContourTracer(rule);
+	}
+
 
 	public ConnectRule getConnectRule() {
 		return tracer.getConnectRule();

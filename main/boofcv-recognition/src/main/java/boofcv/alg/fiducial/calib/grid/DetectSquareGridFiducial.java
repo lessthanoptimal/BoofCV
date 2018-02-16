@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.fiducial.calib.grid;
 
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.squares.*;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -169,9 +169,9 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 		// determine the maximum possible size of a square when viewed head on
 		// this doesn't take in account the spacing between squares and will be an over estimate
 		int maxContourSize = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
-		LinearContourLabelChang2004 contourFinder = detectorSquare.getDetector().getContourFinder();
-		contourFinder.setMaxContourSize(maxContourSize*4*2);
-		contourFinder.setSaveInternalContours(false);
+		BinaryContourFinder contourFinder = detectorSquare.getDetector().getContourFinder();
+		contourFinder.setMaxContour(maxContourSize*4*2);
+		contourFinder.setSaveInnerContour(false);
 	}
 
 	List<Point2D_F64> row0 = new ArrayList<>();

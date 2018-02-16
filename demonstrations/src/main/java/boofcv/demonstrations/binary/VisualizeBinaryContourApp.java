@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,13 @@
 
 package boofcv.demonstrations.binary;
 
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
@@ -50,7 +51,7 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 	VisualizePanel guiImage;
 	ContourControlPanel controls = new ContourControlPanel(this);
 
-	LinearContourLabelChang2004 contourAlg;
+	BinaryContourFinder contourAlg;
 	InputToBinary<T> inputToBinary;
 
 	GrayU8 binary = new GrayU8(1,1);
@@ -70,7 +71,8 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 
 		ConfigThreshold config = controls.getThreshold().createConfig();
 		inputToBinary = FactoryThresholdBinary.threshold(config,imageType.getImageClass());
-		contourAlg = new LinearContourLabelChang2004(controls.getConnectRule());
+		contourAlg = FactoryBinaryContourFinder.linearChang2004();
+		contourAlg.setConnectRule(controls.getConnectRule());
 	}
 
 	@Override
@@ -140,7 +142,7 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 
 	public void contourAlgUpdated() {
 		synchronized (this) {
-			contourAlg = new LinearContourLabelChang2004(controls.getConnectRule());
+			contourAlg.setConnectRule(controls.getConnectRule());
 		}
 		reprocessImageOnly();
 	}
@@ -174,8 +176,7 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 			synchronized (VisualizeBinaryContourApp.this) {
 
-				List<Contour> contours = BinaryImageOps.convertContours(
-						contourAlg.getPackedPoints(), contourAlg.getContours());
+				List<Contour> contours = BinaryImageOps.convertContours(contourAlg);
 
 				g2.setStroke(new BasicStroke(1));
 				VisualizeBinaryData.render(contours,Color.BLUE, Color.RED, scale, g2);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.fiducial.calib.chess;
 
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.fiducial.calib.squares.*;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import boofcv.misc.CircularIndex;
@@ -168,9 +168,9 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	private void configureContourDetector(T gray) {
 		// determine the maximum possible size of a square when viewed head on
 		int maxContourSize = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
-		LinearContourLabelChang2004 contourFinder = detectorSquare.getDetector().getContourFinder();
-		contourFinder.setMaxContourSize(maxContourSize*4*2); // fisheye distortion can let one square go larger
-		contourFinder.setSaveInternalContours(false);
+		BinaryContourFinder contourFinder = detectorSquare.getDetector().getContourFinder();
+		contourFinder.setMaxContour(maxContourSize*4*2); // fisheye distortion can let one square go larger
+		contourFinder.setSaveInnerContour(false);
 	}
 
 	/**

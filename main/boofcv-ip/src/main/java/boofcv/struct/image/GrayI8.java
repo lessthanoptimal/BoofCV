@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,6 +40,26 @@ public abstract class GrayI8<T extends GrayI8<T>> extends GrayI<T> {
 	}
 
 	public GrayI8() {
+	}
+
+	/**
+	 * Create a copy from the two array. input[y][x]
+	 */
+	public GrayI8( byte[][] input ) {
+		this.height = input.length;
+		if( height == 0 ) {
+			width = 0;
+		} else {
+			width = input[0].length;
+		}
+
+		initialize(width,height);
+
+		for (int y = 0; y < height; y++) {
+			if( input[y].length != width )
+				throw new IllegalArgumentException("rows must have constant length");
+			System.arraycopy(input[y],0,data,y*width,width);
+		}
 	}
 
 	/**

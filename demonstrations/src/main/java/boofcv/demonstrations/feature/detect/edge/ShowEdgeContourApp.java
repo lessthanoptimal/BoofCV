@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,16 @@
 
 package boofcv.demonstrations.feature.detect.edge;
 
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.feature.detect.edge.CannyEdge;
 import boofcv.alg.feature.detect.edge.EdgeContour;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.demonstrations.binary.SelectHistogramThresholdPanel;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
+import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImagePanel;
@@ -73,7 +74,7 @@ public class ShowEdgeContourApp<T extends ImageGray<T>, D extends ImageGray<D>>
 
 	int previousBlur;
 	CannyEdge<T,D> canny;
-	LinearContourLabelChang2004 contour = new LinearContourLabelChang2004(ConnectRule.EIGHT);
+	BinaryContourFinder contour = FactoryBinaryContourFinder.linearChang2004();
 
 	public ShowEdgeContourApp(Class<T> imageType, Class<D> derivType) {
 		super(1);
@@ -97,6 +98,7 @@ public class ShowEdgeContourApp<T extends ImageGray<T>, D extends ImageGray<D>>
 
 		previousBlur = barCanny.getBlurRadius();
 		canny =  FactoryEdgeDetectors.canny(previousBlur, true, true, imageType, derivType);
+		contour.setConnectRule(ConnectRule.EIGHT);
 	}
 
 	public void process( BufferedImage input ) {
@@ -175,8 +177,7 @@ public class ShowEdgeContourApp<T extends ImageGray<T>, D extends ImageGray<D>>
 			GThresholdImageOps.threshold(workImage, binary, barBinary.getThreshold(), barBinary.isDown());
 
 			contour.process(binary,labeled);
-			List<Contour> contours = BinaryImageOps.convertContours(
-					contour.getPackedPoints(), contour.getContours());
+			List<Contour> contours = BinaryImageOps.convertContours(contour);
 			temp = VisualizeBinaryData.renderContours(contours,null,0xFF1010,
 					workImage.width,workImage.height,null);
 		}

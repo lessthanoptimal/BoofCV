@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,44 +39,43 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestLinearContourLabelChang2004 {
 
-	public static byte[] TEST1 = new byte[]
-				   {0,0,0,0,0,0,0,1,0,0,0,1,1,
-					0,0,0,0,0,0,0,1,0,0,0,1,1,
-					0,0,0,0,0,0,0,1,0,0,1,1,0,
-					0,0,0,0,0,0,0,0,1,1,1,1,0,
-					0,0,1,0,0,0,0,0,1,1,1,0,0,
-					0,0,1,0,0,0,1,1,1,1,1,0,0,
-					1,1,1,1,1,1,1,1,1,1,0,0,0,
-					0,0,0,1,1,1,1,1,0,0,0,0,0};
+	public static GrayU8 TEST1 = new GrayU8(new byte[][]
+						  {{0,0,0,0,0,0,0,1,0,0,0,1,1},
+						   {0,0,0,0,0,0,0,1,0,0,0,1,1},
+						   {0,0,0,0,0,0,0,1,0,0,1,1,0},
+						   {0,0,0,0,0,0,0,0,1,1,1,1,0},
+						   {0,0,1,0,0,0,0,0,1,1,1,0,0},
+						   {0,0,1,0,0,0,1,1,1,1,1,0,0},
+						   {1,1,1,1,1,1,1,1,1,1,0,0,0},
+						   {0,0,0,1,1,1,1,1,0,0,0,0,0}});
 
-	public static byte[] TEST2 = new byte[]
-				   {0,0,1,0,0,0,0,1,0,0,0,0,0,
-					0,1,0,1,0,0,1,0,0,1,0,0,0,
-					0,0,1,0,0,1,0,1,0,1,1,1,0,
-					0,0,0,0,1,0,0,0,1,1,1,1,0,
-					0,0,1,0,1,0,0,0,1,0,0,0,0,
-					0,0,0,0,1,0,1,1,1,0,1,1,0,
-					1,1,1,0,0,1,0,0,1,0,0,1,0,
-					0,0,0,1,1,1,1,1,0,0,0,0,0};
+	public static GrayU8 TEST2 = new GrayU8(new byte[][]
+				   {{0,0,1,0,0,0,0,1,0,0,0,0,0},
+					{0,1,0,1,0,0,1,0,0,1,0,0,0},
+					{0,0,1,0,0,1,0,1,0,1,1,1,0},
+					{0,0,0,0,1,0,0,0,1,1,1,1,0},
+					{0,0,1,0,1,0,0,0,1,0,0,0,0},
+					{0,0,0,0,1,0,1,1,1,0,1,1,0},
+					{1,1,1,0,0,1,0,0,1,0,0,1,0},
+					{0,0,0,1,1,1,1,1,0,0,0,0,0}});
 
-	public static byte[] TEST3 = new byte[]
-			{0,0,0,0,0,
-			 0,1,1,1,0,
-			 0,1,1,1,0,
-			 0,1,0,1,0,
-			 0,1,1,1,0,
-			 0,0,1,0,0,
-			 0,0,0,0,0};
+	public static GrayU8 TEST3 = new GrayU8(new byte[][]
+					{{0,0,0,0,0},
+					 {0,1,1,1,0},
+					 {0,1,1,1,0},
+					 {0,1,0,1,0},
+					 {0,1,1,1,0},
+					 {0,0,0,0,0}});
 
-	public static byte[] TEST4 = new byte[]
-			{0,0,0,0,0,0,0,
-			 0,0,1,1,1,1,1,
-			 0,1,0,1,1,1,1,
-			 0,1,1,1,0,1,1,
-			 0,1,1,1,1,1,1,
-			 0,1,1,1,1,1,1,
-			 0,1,1,1,1,1,1,
-			 0,0,0,0,0,0,0};
+	public static GrayU8 TEST4 = new GrayU8(new byte[][]
+					{{0,0,0,0,0,0,0},
+					 {0,0,1,1,1,1,1},
+					 {0,1,0,1,1,1,1},
+					 {0,1,1,1,0,1,1},
+					 {0,1,1,1,1,1,1},
+					 {0,1,1,1,1,1,1},
+					 {0,1,1,1,1,1,1},
+					 {0,0,0,0,0,0,0}});
 
 
 	List<Point2D_I32> local;
@@ -96,8 +95,7 @@ public class TestLinearContourLabelChang2004 {
 
 	@Test
 	public void test1_4() {
-		GrayU8 input = new GrayU8(13,8);
-		input.data = TEST1;
+		GrayU8 input = TEST1.clone();
 
 		GrayS32 labeled = new GrayS32(input.width,input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.FOUR);
@@ -109,8 +107,7 @@ public class TestLinearContourLabelChang2004 {
 
 	@Test
 	public void test1_8() {
-		GrayU8 input = new GrayU8(13,8);
-		input.data = TEST1;
+		GrayU8 input = TEST1.clone();
 
 		GrayS32 labeled = new GrayS32(input.width,input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
@@ -122,8 +119,7 @@ public class TestLinearContourLabelChang2004 {
 
 	@Test
 	public void test2_4() {
-		GrayU8 input = new GrayU8(13,8);
-		input.data = TEST2;
+		GrayU8 input = TEST2.clone();
 
 		GrayS32 labeled = new GrayS32(input.width,input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.FOUR);
@@ -135,8 +131,7 @@ public class TestLinearContourLabelChang2004 {
 
 	@Test
 	public void test2_8() {
-		GrayU8 input = new GrayU8(13,8);
-		input.data = TEST2;
+		GrayU8 input = TEST2.clone();
 
 		GrayS32 labeled = new GrayS32(input.width,input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
@@ -148,8 +143,7 @@ public class TestLinearContourLabelChang2004 {
 
 	@Test
 	public void test3_4() {
-		GrayU8 input = new GrayU8(7,8);
-		input.data = TEST4;
+		GrayU8 input = TEST4.clone();
 
 		GrayS32 labeled = new GrayS32(input.width,input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.FOUR);
@@ -161,8 +155,7 @@ public class TestLinearContourLabelChang2004 {
 
 	@Test
 	public void test3_8() {
-		GrayU8 input = new GrayU8(7,8);
-		input.data = TEST4;
+		GrayU8 input = TEST4.clone();
 
 		GrayS32 labeled = new GrayS32(input.width,input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
@@ -177,8 +170,7 @@ public class TestLinearContourLabelChang2004 {
 	 */
 	@Test
 	public void checkInnerOuterContour() {
-		GrayU8 input = new GrayU8(5,7);
-		input.data = TEST3;
+		GrayU8 input = TEST3.clone();
 
 		GrayS32 labeled = new GrayS32(input.width,input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);

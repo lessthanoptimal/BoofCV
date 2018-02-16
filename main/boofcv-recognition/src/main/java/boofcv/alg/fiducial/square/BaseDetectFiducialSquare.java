@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,10 @@
 
 package boofcv.alg.fiducial.square;
 
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.RefineEpipolar;
 import boofcv.alg.distort.*;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
@@ -326,9 +326,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	private void configureContourDetector(T gray) {
 		// determine the maximum possible size of a square based on image size
 		int maxContourSize = Math.min(gray.width,gray.height)*4;
-		LinearContourLabelChang2004 contourFinder = squareDetector.getDetector().getContourFinder();
-		contourFinder.setMaxContourSize(maxContourSize);
-		contourFinder.setSaveInternalContours(false);
+		BinaryContourFinder contourFinder = squareDetector.getDetector().getContourFinder();
+		contourFinder.setMaxContour(maxContourSize);
+		contourFinder.setSaveInnerContour(false);
 	}
 
 	/**
