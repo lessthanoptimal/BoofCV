@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,8 +88,21 @@ public abstract class DemonstrationBase extends JPanel {
 	// minimum elapsed time between the each stream frame being processed, in milliseconds
 	protected volatile long streamPeriod = 30;
 
+	{
+		try {
+			// In Mac OS X Display the menubar in the correct location
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+
+			// smoother font
+			System.setProperty("apple.awt.textantialiasing", "true");
+		} catch( Exception ignore ) {
+
+		}
+	}
+
 	public DemonstrationBase(boolean openFile , boolean openWebcam, List<?> exampleInputs, ImageType ...defaultTypes) {
 		super(new BorderLayout());
+
 		createMenuBar(openFile, openWebcam, exampleInputs);
 
 		setImageTypes(defaultTypes);
@@ -191,8 +204,6 @@ public abstract class DemonstrationBase extends JPanel {
 				menuExamples.add(menuItem);
 			}
 		}
-
-		add(BorderLayout.NORTH, menuBar);
 	}
 
 	/**
@@ -554,6 +565,7 @@ public abstract class DemonstrationBase extends JPanel {
 		waitUntilInputSizeIsKnown();
 		this.appName = appName;
 		window = ShowImages.showWindow(this,appName,true);
+		window.setJMenuBar(menuBar);
 	}
 
 	/**
