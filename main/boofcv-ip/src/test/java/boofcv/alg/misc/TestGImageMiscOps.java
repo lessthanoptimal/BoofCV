@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,13 +19,15 @@
 package boofcv.alg.misc;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.*;
 import org.junit.Test;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Random;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -188,6 +190,33 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 		}
 
 		return ret;
+	}
+
+	/**
+	 * See if it is inclusive for the upper limit
+	 */
+	@Test
+	public void fillUniform_Int_Inclusive() {
+		Class types[] = new Class[]{GrayU8.class,GrayS8.class,GrayU16.class,GrayS32.class,GrayS16.class,GrayS64.class};
+
+		for( Class type : types ) {
+			ImageGray image = GeneralizedImageOps.createSingleBand(type, width, height);
+
+			GImageMiscOps.fillUniform(image,rand,0,10);
+
+			boolean foundMax = false;
+			for (int i = 0; i < image.height; i++) {
+				for (int j = 0; j < image.width; j++ ) {
+					int found = (int)GeneralizedImageOps.get(image,j,i);
+					if( found == 10 ) {
+						foundMax = true;
+					} if( found < 0 || found > 10 ) {
+						fail("out of range");
+					}
+				}
+			}
+			assertTrue(foundMax);
+		}
 	}
 
 	@Override
