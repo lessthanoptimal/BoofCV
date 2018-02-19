@@ -22,9 +22,11 @@ Version : 0.29
   * Gray images new support createSameShape(type)
 - Contours
   * Created an interface for finding contours in a binary image
-  * Provided a way to override Chang2004\
+  * Provided a way to override Chang2004
 - GImageMiscOps
   * fillUniform wasn't actually inclusive on upper limit for integer values
+- ShowImages
+  * showWindow() adjusts preferred size to handle the case where the image is larger than the monitor
 
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,8 +82,17 @@ public class ShowImages {
 		ImagePanel panel = new ImagePanel(img);
 		panel.setScaling(ScaleOptions.DOWN);
 
-		frame.add(panel, BorderLayout.CENTER);
+		// If the window will be too large to be displayed on the monitor set the bounds to something that can be
+		// shown. The default behavior will just change one axis leaving it to have an awkward appearance
+		Rectangle monitorBounds = frame.getGraphicsConfiguration().getBounds();
+		if( monitorBounds.width < img.getWidth() || monitorBounds.height < img.getHeight()) {
+			double scale = Math.min(monitorBounds.width/(double)img.getWidth(),monitorBounds.height/(double)img.getHeight());
+			int width = (int)(scale*img.getWidth());
+			int height = (int)(scale*img.getHeight());
+			panel.setPreferredSize(new Dimension(width,height));
+		}
 
+		frame.add(panel, BorderLayout.CENTER);
 		frame.pack();
 		frame.setLocationByPlatform(true);
 		frame.setVisible(true);
