@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,12 @@ package boofcv.struct;
  */
 public class BlockIndexLength extends IndexLength {
 	public int block;
+
+	public void set( int start , int length , int block ) {
+		this.start = start;
+		this.length = length;
+		this.block = block;
+	}
 
 	@Override
 	public void zero() {
