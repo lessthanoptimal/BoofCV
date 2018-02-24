@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class TestQuadPoseEstimator {
 
 		alg.setFiducial(-0.5,0.5,0.5,0.5,0.5,-0.5,-0.5,-0.5);
 		alg.setLensDistoriton(distortion);
-		assertTrue(alg.process(quadViewed));
+		assertTrue(alg.process(quadViewed, false));
 
 		Se3_F64 found = alg.getWorldToCamera();
 

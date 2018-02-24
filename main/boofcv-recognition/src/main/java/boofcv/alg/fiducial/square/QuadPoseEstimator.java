@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.abst.geo.RefinePnP;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
-import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.UtilPolygons2D_F64;
@@ -68,7 +67,6 @@ public class QuadPoseEstimator {
 	private Estimate1ofPnP epnp = FactoryMultiView.computePnP_1(EnumPNP.EPNP,50,0);
 
 	// transforms from distorted pixel observation normalized image coordinates
-	private Point2Transform2_F64 normToUndistorted;
 	private Point2Transform2_F64 pixelToNorm;
 	private Point2Transform2_F64 normToPixel;
 
@@ -95,11 +93,9 @@ public class QuadPoseEstimator {
 	protected Se3_F64 bestPose = new Se3_F64();
 
 	// predeclared internal work space.  Minimizing new memory
-	CameraPinholeRadial intrinsicUndist = new CameraPinholeRadial();
 	Quadrilateral_F64 pixelCorners = new Quadrilateral_F64();
-	Quadrilateral_F64 enlargedCorners = new Quadrilateral_F64();
-	Se3_F64 foundEnlarged = new Se3_F64();
-	Se3_F64 foundRegular = new Se3_F64();
+	Quadrilateral_F64 normCorners = new Quadrilateral_F64();
+
 	Point2D_F64 center = new Point2D_F64();
 
 	/**
@@ -150,96 +146,53 @@ public class QuadPoseEstimator {
 	 *
 	 * MUST call {@link #setFiducial} and {@link #setLensDistoriton} before calling this function.
 	 *
-	 * @param corners Observed corners of the fiducial in normalized image coordinates.
+	 * @param corners Observed corners of the fiducial.
+	 * @param unitsPixels If true the specified corners are in  original image pixels or false for normalized image coordinates
 	 * @return true if successful or false if not
 	 */
-	public boolean process( Quadrilateral_F64 corners ) {
+	public boolean process(Quadrilateral_F64 corners, boolean unitsPixels) {
 
-		// put quad into undistorted pixels so that weird stuff doesn't happen when it expands
-		normToPixel.compute(corners.a.x, corners.a.y, pixelCorners.a);
-		normToPixel.compute(corners.b.x, corners.b.y, pixelCorners.b);
-		normToPixel.compute(corners.c.x, corners.c.y, pixelCorners.c);
-		normToPixel.compute(corners.d.x, corners.d.y, pixelCorners.d);
+		if( unitsPixels ) {
+			pixelCorners.set(corners);
+			pixelToNorm.compute(corners.a.x, corners.a.y, normCorners.a);
+			pixelToNorm.compute(corners.b.x, corners.b.y, normCorners.b);
+			pixelToNorm.compute(corners.c.x, corners.c.y, normCorners.c);
+			pixelToNorm.compute(corners.d.x, corners.d.y, normCorners.d);
+		} else {
+			normCorners.set(corners);
+			normToPixel.compute(corners.a.x, corners.a.y, pixelCorners.a);
+			normToPixel.compute(corners.b.x, corners.b.y, pixelCorners.b);
+			normToPixel.compute(corners.c.x, corners.c.y, pixelCorners.c);
+			normToPixel.compute(corners.d.x, corners.d.y, pixelCorners.d);
+		}
 
-		double length0 =  pixelCorners.getSideLength(0);
-		double length1 =  pixelCorners.getSideLength(1);
-
-		double ratio = Math.max(length0,length1)/Math.min(length0,length1);
-
-		// this is mainly an optimization thing.  The handling of the pathological cause is only
-		// used if it doesn't add a bunch of error.  But this technique is only needed when certain conditions
-		// are meet.
-		boolean success;
-//		if( ratio < 1.3 && length0 < SMALL_PIXELS && length1 < SMALL_PIXELS ) {
-//			success = estimatePathological(outputFiducialToCamera);
-//		} else {
-			success = estimate(pixelCorners, outputFiducialToCamera);
-//		}
-
-		if( success ) {
+		if( estimate(pixelCorners, normCorners, outputFiducialToCamera) ) {
 			outputError = computeErrors(outputFiducialToCamera);
-		}
-		return success;
-	}
-
-	/**
-	 * Estimating the orientation is difficult when looking directly at a fiducial head on.  Basically
-	 * when the target appears close to a perfect square.  What I believe is happening is that when
-	 * the target is small significant changes in orientation only cause a small change in reprojection
-	 * error.  So it over fits location and comes up with some crazy orientation.
-	 *
-	 * To add more emphasis on orientation  target is enlarged, which shouldn't change orientation, but now a small
-	 * change in orientation results in a large error.  The translational component is still estimated the
-	 * usual way.  To ensure that this technique isn't hurting the state estimate too much it checks to
-	 * see if the error has increased too much.
-	 *
-	 * TODO Potential improvement.  Non-linear refinement on translation only after estimating orientation.
-	 *      The location estimate uses the over fit result still in the code below.
-	 *
-	 * @return true if successful false if not
-	 */
-	private boolean estimatePathological( Se3_F64 outputFiducialToCamera ) {
-		enlargedCorners.set(pixelCorners);
-		enlarge(enlargedCorners, 4);
-
-		if( !estimate(enlargedCorners, foundEnlarged) )
+			return true;
+		} else {
 			return false;
-
-		if( !estimate(pixelCorners, foundRegular) )
-			return false;
-
-		double errorRegular = computeErrors(foundRegular);
-
-		outputFiducialToCamera.getT().set(foundRegular.getT());
-		outputFiducialToCamera.getR().set(foundEnlarged.getR());
-
-		double errorModified = computeErrors(outputFiducialToCamera);
-
-		// todo do a weighted average of the two estimates so the transition is smooth
-		// if the solutions are very similar go with the enlarged version
-		if (errorModified > errorRegular + FUDGE_FACTOR ) {
-			outputFiducialToCamera.set(foundRegular);
 		}
-		return true;
 	}
 
 	/**
 	 * Given the observed corners of the quad in the image in pixels estimate and store the results
 	 * of its pose
 	 */
-	protected boolean estimate( Quadrilateral_F64 corners , Se3_F64 foundFiducialToCamera ) {
+	protected boolean estimate( Quadrilateral_F64 cornersPixels ,
+								Quadrilateral_F64 cornersNorm ,
+								Se3_F64 foundFiducialToCamera ) {
 		// put it into a list to simplify algorithms
 		listObs.clear();
-		listObs.add( corners.a );
-		listObs.add( corners.b );
-		listObs.add( corners.c );
-		listObs.add( corners.d );
+		listObs.add( cornersPixels.a );
+		listObs.add( cornersPixels.b );
+		listObs.add( cornersPixels.c );
+		listObs.add( cornersPixels.d );
 
 		// convert observations into normalized image coordinates which P3P requires
-		pixelToNorm.compute(corners.a.x,corners.a.y,points.get(0).observation);
-		pixelToNorm.compute(corners.b.x,corners.b.y,points.get(1).observation);
-		pixelToNorm.compute(corners.c.x,corners.c.y,points.get(2).observation);
-		pixelToNorm.compute(corners.d.x,corners.d.y,points.get(3).observation);
+		points.get(0).observation.set(cornersNorm.a);
+		points.get(1).observation.set(cornersNorm.b);
+		points.get(2).observation.set(cornersNorm.c);
+		points.get(3).observation.set(cornersNorm.d);
 
 		// estimate pose using all permutations
 		bestError = Double.MAX_VALUE;

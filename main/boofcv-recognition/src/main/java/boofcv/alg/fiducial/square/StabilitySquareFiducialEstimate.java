@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,7 @@ public class StabilitySquareFiducialEstimate {
 		work.set(input);
 
 		samples.reset();
-		estimator.process(work);
+		estimator.process(work,false);
 		estimator.getWorldToCamera().invert(referenceCameraToWorld);
 
 		samples.reset();
@@ -111,21 +111,21 @@ public class StabilitySquareFiducialEstimate {
 	private void createSamples( double sampleRadius , Point2D_F64 workPoint , Point2D_F64 originalPoint ) {
 
 		workPoint.x = originalPoint.x + sampleRadius;
-		if( estimator.process(work) ) {
+		if( estimator.process(work,false) ) {
 			samples.grow().set( estimator.getWorldToCamera() );
 		}
 		workPoint.x = originalPoint.x - sampleRadius;
-		if( estimator.process(work) ) {
+		if( estimator.process(work,false) ) {
 			samples.grow().set( estimator.getWorldToCamera() );
 		}
 		workPoint.x = originalPoint.x;
 
 		workPoint.y = originalPoint.y + sampleRadius;
-		if( estimator.process(work) ) {
+		if( estimator.process(work,false) ) {
 			samples.grow().set( estimator.getWorldToCamera() );
 		}
 		workPoint.y = originalPoint.y - sampleRadius;
-		if( estimator.process(work) ) {
+		if( estimator.process(work,false) ) {
 			samples.grow().set( estimator.getWorldToCamera() );
 		}
 		workPoint.set(originalPoint);

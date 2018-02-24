@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 
-	final List<JPanel> panels = new ArrayList<>();
+	final List<JComponent> panels = new ArrayList<>();
 	private JPanel bodyPanel;
 	private JList listPanel;
 
@@ -112,7 +112,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	 * @param panel The panel being displayed
 	 * @param name Name of the image.  Shown in the list.
 	 */
-	public synchronized void addItem( final JPanel panel , final String name ) {
+	public synchronized void addItem( final JComponent panel , final String name ) {
 
 		Dimension panelD = panel.getPreferredSize();
 
@@ -153,7 +153,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 		final int index = listPanel.getSelectedIndex();
 		if( index >= 0 ) {
 			removeCenterBody();
-			JPanel p = panels.get(index);
+			JComponent p = panels.get(index);
 			p.setPreferredSize(new Dimension(bodyWidth,bodyHeight));
 			bodyPanel.add(p, BorderLayout.CENTER);
 			bodyPanel.validate();

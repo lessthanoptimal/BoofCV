@@ -27,6 +27,9 @@ Version : 0.29
   * fillUniform wasn't actually inclusive on upper limit for integer values
 - ShowImages
   * showWindow() adjusts preferred size to handle the case where the image is larger than the monitor
+- QuadPoseEstimator
+  * Can specify if input is in pixels or normalized coordinates
+  * Deleted unused code that was sketchy
 
 
 

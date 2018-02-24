@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -122,7 +122,7 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Dete
 		quad.c.set( points.get(2).observation );
 		quad.d.set( points.get(3).observation );
 
-		if( !poseEstimator.process(quad) ) {
+		if( !poseEstimator.process(quad,false) ) {
 			return false;
 		}
 
