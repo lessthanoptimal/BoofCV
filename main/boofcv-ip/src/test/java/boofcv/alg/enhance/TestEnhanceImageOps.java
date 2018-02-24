@@ -80,7 +80,7 @@ public class TestEnhanceImageOps {
 	public void equalizeLocal(GrayI input , GrayI found ) {
 
 		GrayI expected = (GrayI) GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
-		GImageMiscOps.fillUniform(input, rand, 0, 10);
+		GImageMiscOps.fillUniform(input, rand, 0, 9);
 
 		int transform[] = new int[10];
 		int histogram[] = new int[10];

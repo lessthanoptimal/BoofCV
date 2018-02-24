@@ -70,7 +70,7 @@ public class TestImplEnhanceHistogram {
 		int min = input.getDataType().isSigned() ? -10 : 0;
 		int transform[] = new int[10-min];
 
-		GImageMiscOps.fillUniform(input, rand, Math.min(min+1,0), 10);
+		GImageMiscOps.fillUniform(input, rand, Math.min(min+1,0), 9); // upper limit is inclusive
 		for( int i = min; i < 10; i++ )
 			transform[i-min] = i*2;
 
@@ -125,7 +125,7 @@ public class TestImplEnhanceHistogram {
 		int transform[] = new int[10];
 		int histogram[] = new int[10];
 
-		GImageMiscOps.fillUniform(input,rand,0,10);
+		GImageMiscOps.fillUniform(input,rand,0,9);
 
 		for( int radius = 1; radius < 11; radius++ ) {
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalNaive", input, radius, output, histogram);
@@ -195,7 +195,7 @@ public class TestImplEnhanceHistogram {
 		GrayI expected = (GrayI)GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
 		int histogram[] = new int[10];
 
-		GImageMiscOps.fillUniform(input,rand,0,10);
+		GImageMiscOps.fillUniform(input,rand,0,9);
 
 		for( int radius = 1; radius < 6; radius++ ) {
 			// fill with zeros so it can be tested using checkBorderZero
@@ -236,7 +236,7 @@ public class TestImplEnhanceHistogram {
 		int histogram[] = new int[10];
 		int transform[] = new int[10];
 
-		GImageMiscOps.fillUniform(input,rand,0,10);
+		GImageMiscOps.fillUniform(input,rand,0,9);
 
 		// check the top row
 		for( int radius = 1; radius < 6; radius++ ) {
@@ -314,7 +314,7 @@ public class TestImplEnhanceHistogram {
 		int histogram[] = new int[10];
 		int transform[] = new int[10];
 
-		GImageMiscOps.fillUniform(input,rand,1,10);
+		GImageMiscOps.fillUniform(input,rand,1,9);
 
 		// check the left column
 		for( int radius = 1; radius < 6; radius++ ) {

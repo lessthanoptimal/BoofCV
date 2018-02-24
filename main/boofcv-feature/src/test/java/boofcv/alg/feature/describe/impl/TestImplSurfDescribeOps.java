@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,7 @@ public class TestImplSurfDescribeOps {
 	@Test
 	public void gradientInner_I32() {
 		GrayS32 ii = new GrayS32(width,height);
-		GImageMiscOps.fillUniform(ii, rand, 0, 100);
+		GImageMiscOps.fillUniform(ii, rand, 0, 99);
 		int r = 2;
 		int w = r*2+1;
 

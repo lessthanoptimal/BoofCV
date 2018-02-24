@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,10 +99,10 @@ public class TestImageStatistics {
 		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0], width, height, numBands);
 
 		if( input.getImageType().getDataType().isSigned() ) {
-			GImageMiscOps.fillUniform(input, rand, -20,20);
+			GImageMiscOps.fillUniform(input, rand, -20,19);
 			GeneralizedImageOps.setB(input,0,3,0,-100);
 		} else {
-			GImageMiscOps.fillUniform(input, rand, 0,20);
+			GImageMiscOps.fillUniform(input, rand, 0,19);
 			GeneralizedImageOps.setB(input,0,3,0,100);
 		}
 
@@ -255,11 +255,11 @@ public class TestImageStatistics {
 		int numBands = inputA.getImageType().getNumBands();
 
 		if( inputA.getImageType().getDataType().isSigned() ) {
-			GImageMiscOps.fillUniform(inputA, rand, -20,20);
-			GImageMiscOps.fillUniform(inputB, rand, -20,20);
+			GImageMiscOps.fillUniform(inputA, rand, -20,19);
+			GImageMiscOps.fillUniform(inputB, rand, -20,19);
 		} else {
-			GImageMiscOps.fillUniform(inputA, rand, 0,20);
-			GImageMiscOps.fillUniform(inputB, rand, 0,20);
+			GImageMiscOps.fillUniform(inputA, rand, 0,19);
+			GImageMiscOps.fillUniform(inputB, rand, 0,19);
 		}
 
 		Object result = m.invoke(null,inputA,inputB);
@@ -326,7 +326,7 @@ public class TestImageStatistics {
 		int minValue;
 		if( inputA.getDataType().isSigned() ) {
 			minValue = -20;
-			GImageMiscOps.fillUniform(inputA, rand, minValue,20);
+			GImageMiscOps.fillUniform(inputA, rand, minValue,19);
 			m.invoke(null,inputA,minValue,histogram);
 		} else {
 			minValue = 5;

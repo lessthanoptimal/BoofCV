@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -225,20 +225,30 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> {
 	public void maskDifferentiate() {
 		GImageMiscOps.fillUniform(image, rand, 0, 200);
 
-		T template = (T)image.createNew(12,12);
-		GImageMiscOps.fillUniform(template, rand, 0, 200);
+		int x=10,y=12,tw=15,th=15;
 
-		int x = 10, y = 12;
-		template.subimage(3,3,9,9,null).setTo(image.subimage(x-3,y-3,x+3,y+3,null));
+		T template = image.createNew(tw,th);
+		GImageMiscOps.fillUniform(template, rand, 0, 200);
+		GImageMiscOps.fillBorder(template,150,2);
+
+		image.subimage(x-tw/2,y-th/2,x-tw/2+tw,y-th/2+th).setTo(template);
+
+//		ShowImages.showWindow(image,"foo",true);
+//		BoofMiscOps.sleep(10000);
+
+		GImageMiscOps.fillBorder(template,20,2); // change the template's border so that it won't match
+		GImageMiscOps.fillBorder(template,50,1); // change the template's border so that it won't match
+
 		alg.setInputImage(image);
 		alg.process(template);
 
 		float valueNoMask = fractionBest(alg.getIntensity(),x,y);
 		float averageNoMask = fractionAverage(alg.getIntensity(),x,y);
 
-		T mask = (T)image.createNew(12,12);
-		GImageMiscOps.fill(mask,0);
-		GImageMiscOps.fill(mask.subimage(3,3,9, 9, null),1);
+		T mask = (T)image.createNew(tw,th);
+		double v = image.getImageType().getDataType().isInteger() ? 100 : 1;
+		GImageMiscOps.fill(mask,v);
+		GImageMiscOps.fillBorder(mask,0,2); // ignore the border
 
 		alg.setInputImage(image);
 		alg.process(template,mask);
