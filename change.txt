@@ -30,13 +30,11 @@ Version : 0.29
 - QuadPoseEstimator
   * Can specify if input is in pixels or normalized coordinates
   * Deleted unused code that was sketchy
-
-
+- Added GVersion class that is automatically generated and contains build related information
 
 TODO
 
 - Create a fully automated build script for creating source and library zip and uploading them
-- Create an auto generated file with project version and git SHA
 - integrate into this a script which will check the readme and other files for out of date references to the old version
   check date in readme to see if it's correct
 
@@ -51,7 +49,7 @@ TOP ITEMS
   * See if a better reading of mode bits is needed
   * Reading mode and version. For small qr codes use the lines connecting position patterns
     those will be more reliable than the sides
-- TODO QR Code Regresstion Test
+- TODO QR Code Regrestion Test
   * rotate around axis - different ranges
   * Shadows going across the marker
   * curved surfaces

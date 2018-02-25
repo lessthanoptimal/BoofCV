@@ -306,17 +306,6 @@ task wrapper(type: Wrapper) {
     gradleVersion = '4.3'
 }
 
-idea {
-    project {
-        jdkName = '1.8 (64bit)'
-        languageLevel = '1.8'
-    }
-
-    module {
-        excludeDirs += file('.idea')
-    }
-}
-
 // Build the build info file every time it builds
 assemble.dependsOn(createVersionFile)
 

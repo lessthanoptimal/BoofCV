@@ -35,15 +35,9 @@ public class BoofDefaults {
 	 */
 	public static final double TEST_DOUBLE_TOL = 1e-8;
 
-
 	public static final double SURF_SCALE_TO_RADIUS = 2.0;
 	public static final double SIFT_SCALE_TO_RADIUS = 1.0;
 	public static final double BRIEF_SCALE_TO_RADIUS = 2.0;
-
-	/**
-	 * String specifying BoofCV's version.
-	 */
-	public static String version = "0.28";
 
 	// Use extended borders when computing image derivatives 
 	public static BorderType DERIV_BORDER_TYPE = BorderType.EXTENDED;
