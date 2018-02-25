@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,6 +66,10 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PolylineSplitMerge {
+
+	// Does the polyline form a loop or are the end points disconnected
+	private boolean loops;
+
 	// Can it assume the shape is convex? If so it can reject shapes earlier
 	private boolean convex = false;
 
@@ -125,48 +129,41 @@ public class PolylineSplitMerge {
 	 */
 	public boolean process(List<Point2D_I32> contour ) {
 		// Reset internal book keeping variables
-		list.reset();
-		corners.reset();
-		polylines.reset();
-		bestPolyline = null;
-		fatalError = false;
+		reset();
 
-		// Reject pathological case
-		if( contour.size() < 3 )
-			return false;
+		if( loops ) {
+			// Reject pathological case
+			if (contour.size() < 3)
+				return false;
 
-		if( !findInitialTriangle(contour) )
-			return false;
-		savePolyline();
+			if (!findInitialTriangle(contour))
+				return false;
+			savePolyline();
+		} else {
+			// Reject pathological case
+			if( contour.size() < 2 )
+				return false;
 
-		// by finding more corners than necessary it can recover from mistakes previously
-		int limit = maxSides+extraConsider.computeI(maxSides);
-		if( limit <= 0 )limit = Integer.MAX_VALUE; // handle the situation where it overflows
-		while( list.size() < limit && !fatalError ) {
-			if( !increaseNumberOfSidesByOne(contour) ) {
-				break;
-			}
+			// two end points are the seeds. Plus they can't change
+			addCorner(0);
+			addCorner(contour.size()-1);
+			savePolyline();
 		}
-		// remove corners and recompute scores. If the result is better it will be saved
-		while( !fatalError  ) {
-			Element<Corner> c = selectCornerToRemove(contour, sideError);
-			if( c != null ) {
-				removeCornerAndSavePolyline(c, sideError.value);
-			} else {
-				break;
-			}
-		}
+
+		sequentialSideFit(contour,loops);
 
 		if( fatalError )
 			return false;
 
+		int MIN_SIZE = loops ? 3 : 2;
+
 		double bestScore = Double.MAX_VALUE;
 		int bestSize = -1;
-		for (int i = 0; i < Math.min(maxSides-2,polylines.size); i++) {
+		for (int i = 0; i < Math.min(maxSides-MIN_SIZE-1,polylines.size); i++) {
 			if( polylines.get(i).score < bestScore ) {
 				bestPolyline = polylines.get(i);
 				bestScore = bestPolyline.score;
-				bestSize = i + 3;
+				bestSize = i + MIN_SIZE;
 			}
 		}
 
@@ -189,6 +186,34 @@ public class PolylineSplitMerge {
 		}
 
 		return true;
+	}
+
+	private void sequentialSideFit(List<Point2D_I32> contour, boolean loops ) {
+		// by finding more corners than necessary it can recover from mistakes previously
+		int limit = maxSides+extraConsider.computeI(maxSides);
+		if( limit <= 0 )limit = Integer.MAX_VALUE; // handle the situation where it overflows
+		while( list.size() < limit && !fatalError ) {
+			if( !increaseNumberOfSidesByOne(contour,loops) ) {
+				break;
+			}
+		}
+		// remove corners and recompute scores. If the result is better it will be saved
+		while( !fatalError  ) {
+			Element<Corner> c = selectCornerToRemove(contour, sideError, loops);
+			if( c != null ) {
+				removeCornerAndSavePolyline(c, sideError.value);
+			} else {
+				break;
+			}
+		}
+	}
+
+	private void reset() {
+		list.reset();
+		corners.reset();
+		polylines.reset();
+		bestPolyline = null;
+		fatalError = false;
 	}
 
 	private void printCurrent( List<Point2D_I32> contour ) {
@@ -223,10 +248,12 @@ public class PolylineSplitMerge {
 	 * @return true if the polyline is better than any previously saved result false if not and it wasn't saved
 	 */
 	boolean savePolyline() {
+		int N = loops ? 3 : 2;
+
 		// if a polyline of this size has already been saved then over write it
 		CandidatePolyline c;
-		if( list.size() <= polylines.size+2 ) {
-			c = polylines.get( list.size()-3 );
+		if( list.size() <= polylines.size+N-1 ) {
+			c = polylines.get( list.size()-N );
 			// sanity check
 			if( c.splits.size != list.size() )
 				throw new RuntimeException("Egads saved polylines aren't in the expected order");
@@ -370,9 +397,9 @@ public class PolylineSplitMerge {
 	 * @param contour Contour
 	 * @return true if a split was selected and false if not
 	 */
-	boolean increaseNumberOfSidesByOne(List<Point2D_I32> contour) {
+	boolean increaseNumberOfSidesByOne(List<Point2D_I32> contour, boolean loops ) {
 //		System.out.println("increase number of sides by one. list = "+list.size());
-		Element<Corner> selected = selectCornerToSplit();
+		Element<Corner> selected = selectCornerToSplit(loops);
 
 		// No side can be split
 		if( selected == null )
@@ -430,13 +457,23 @@ public class PolylineSplitMerge {
 	 * Selects the best side to split the polyline at.
 	 * @return the selected side or null if the score will not be improved if any of the sides are split
 	 */
-	Element<Corner> selectCornerToSplit() {
+	Element<Corner> selectCornerToSplit( boolean loops ) {
 		Element<Corner> selected = null;
 		double bestChange = convex ? 0 : -Double.MAX_VALUE;
 
 		// Pick the side that if split would improve the overall score the most
-		Element<Corner> e = list.getHead();
-		while( e != null ) {
+		Element<Corner> e,end;
+
+		// if it loops any corner can be split. If it doesn't look the end points can't be split
+		if( loops ) {
+			e = list.getHead();
+			end = null;
+		} else {
+			e = list.getHead().next;
+			end = list.getTail();
+		}
+
+		while( e != end ) {
 			Corner c = e.object;
 			if( !c.splitable) {
 				e = e.next;
@@ -463,16 +500,26 @@ public class PolylineSplitMerge {
 	 * Selects the best corner to remove. If no corner was found that can be removed then null is returned
 	 * @return The corner to remove. Should only return null if there are 3 sides or less
 	 */
-	Element<Corner> selectCornerToRemove(List<Point2D_I32> contour , ErrorValue sideError ) {
+	Element<Corner> selectCornerToRemove(List<Point2D_I32> contour , ErrorValue sideError , boolean loops ) {
 		if( list.size() <= 3 )
 			return null;
 
-		Element<Corner> target = list.getHead();
+		// Pick the side that if split would improve the overall score the most
+		Element<Corner> target,end;
+
+		// if it loops any corner can be split. If it doesn't look the end points can't be split
+		if( loops ) {
+			target = list.getHead();
+			end = null;
+		} else {
+			target = list.getHead().next;
+			end = list.getTail();
+		}
+
 		Element<Corner> best = null;
 		double bestScore = -Double.MAX_VALUE;
-		double bestSideError = -1;
 
-		while( target != null ) {
+		while( target != end ) {
 			Element<Corner> p = previous(target);
 			Element<Corner> n = next(target);
 
@@ -766,6 +813,14 @@ public class PolylineSplitMerge {
 	 */
 	public CandidatePolyline getBestPolyline() {
 		return bestPolyline;
+	}
+
+	public void setLoops(boolean loops) {
+		this.loops = loops;
+	}
+
+	public boolean isLoops() {
+		return loops;
 	}
 
 	/**

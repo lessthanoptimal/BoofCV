@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,6 +75,11 @@ public class ConfigPolylineSplitMerge extends ConfigPolyline {
 	 */
 	public int refineIterations = 10;
 
+	/**
+	 * If true then the polyline forms a loops. Otherwise the end points are disconnected from each other.
+	 */
+	public boolean loops = true;
+
 	@Override
 	public void checkValidity() {
 		extraConsider.checkValidity();
@@ -91,6 +96,7 @@ public class ConfigPolylineSplitMerge extends ConfigPolyline {
 				", convexTest=" + convexTest +
 				", maxSideError=" + maxSideError +
 				", refineIterations=" + refineIterations +
+				", loops=" + loops +
 				'}';
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,6 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 
 	public NewSplitMerge_to_PointsToPolyline( ConfigPolylineSplitMerge config ){
 
-		boolean loop = true;
-
 		// ignore parameters which are specified in the PointsToPolyline interface
 		alg = new PolylineSplitMerge();
 		alg.setMinimumSideLength(config.minimumSideLength);
@@ -52,9 +50,10 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 		alg.setCornerScorePenalty(config.cornerScorePenalty);
 		alg.setConvexTest(config.convexTest);
 		alg.setMaxSideError(config.maxSideError);
+		alg.setLoops(config.loops);
 
 		if( config.refineIterations > 0 ) {
-			refine = new RefinePolyLineCorner(loop,config.refineIterations);
+			refine = new RefinePolyLineCorner(config.loops,config.refineIterations);
 		}
 	}
 
@@ -100,7 +99,7 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 
 	@Override
 	public boolean isLoop() {
-		return true;
+		return alg.isLoops();
 	}
 
 	@Override

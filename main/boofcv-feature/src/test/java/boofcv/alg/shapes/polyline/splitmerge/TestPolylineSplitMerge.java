@@ -40,6 +40,16 @@ import static org.junit.Assert.*;
 public class TestPolylineSplitMerge {
 
 	@Test
+	public void process_line() {
+		fail("implement");
+	}
+
+	@Test
+	public void process_twoSegments() {
+		fail("implement");
+	}
+
+	@Test
 	public void process_perfectSquare() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.setCornerScorePenalty(0.1);
@@ -189,7 +199,7 @@ public class TestPolylineSplitMerge {
 	 * Case where it should add a corner and then remove a corner
 	 */
 	@Test
-	public void increaseNumberOfSidesByOne() {
+	public void increaseNumberOfSidesByOne_loops() {
 		List<Point2D_I32> contour = rect(10,12,20,22);
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
@@ -213,7 +223,7 @@ public class TestPolylineSplitMerge {
 		e.object.splitError0 = 0;
 		e.object.splitError1 = 0;
 
-		assertTrue(alg.increaseNumberOfSidesByOne(contour));
+		assertTrue(alg.increaseNumberOfSidesByOne(contour,true));
 
 		assertEquals(5,alg.list.size());
 		e = alg.list.getHead();
@@ -223,6 +233,11 @@ public class TestPolylineSplitMerge {
 		assertEquals(30,e.object.index);e = e.next;
 		assertFalse(e.object.splitable);
 		assertEquals(34,e.object.index);
+	}
+
+	@Test
+	public void increaseNumberOfSidesByOne_sequence() {
+		fail("Implement");
 	}
 
 	@Test
@@ -243,7 +258,7 @@ public class TestPolylineSplitMerge {
 	}
 
 	@Test
-	public void selectCornerToSplit() {
+	public void selectCornerToSplit_loop() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		Element<Corner> c0 = alg.addCorner(0);
 		Element<Corner> c1 = alg.addCorner(10);
@@ -271,8 +286,14 @@ public class TestPolylineSplitMerge {
 		c4.object.splitable = false;
 		c4.object.sideError = 20;
 
-		assertTrue(c2==alg.selectCornerToSplit());
+		assertTrue(c2==alg.selectCornerToSplit(true));
 	}
+
+	@Test
+	public void selectCornerToSplit_sequence() {
+		fail("Implement");
+	}
+
 
 	/**
 	 * Case where a corner is removed and the polyline saved
@@ -348,7 +369,7 @@ public class TestPolylineSplitMerge {
 
 		Element<Corner> expected = alg.list.getHead().next;
 		PolylineSplitMerge.ErrorValue foundError = new PolylineSplitMerge.ErrorValue();
-		Element<Corner> found = alg.selectCornerToRemove(contour,foundError);
+		Element<Corner> found = alg.selectCornerToRemove(contour,foundError,true);
 
 		assertTrue(expected == found);
 		assertEquals(0,foundError.value, GrlConstants.TEST_F64);
@@ -370,11 +391,11 @@ public class TestPolylineSplitMerge {
 
 		// fails because it has 3 sides
 		PolylineSplitMerge.ErrorValue foundError = new PolylineSplitMerge.ErrorValue();
-		assertTrue( null == alg.selectCornerToRemove(contour,foundError));
+		assertTrue( null == alg.selectCornerToRemove(contour,foundError,true));
 
 		// won't fail because it has more than 3 corners. There is no good choice to remove but it will still pick one
 		alg.addCorner(26);
-		assertTrue( null != alg.selectCornerToRemove(contour,foundError));
+		assertTrue( null != alg.selectCornerToRemove(contour,foundError,true));
 		assertTrue(foundError.value>1);
 	}
 

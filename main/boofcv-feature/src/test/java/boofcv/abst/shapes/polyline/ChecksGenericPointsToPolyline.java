@@ -59,7 +59,7 @@ public abstract class ChecksGenericPointsToPolyline {
 	 * Checks to see if this feature can be changed and is enforced
 	 */
 	@Test
-	public void checkMinVertexes() {
+	public void checkMinVertexes_loop() {
 		PointsToPolyline alg = createAlg(true);
 		alg.setConvex(false);
 		alg.setMinimumSides(10);
@@ -85,7 +85,32 @@ public abstract class ChecksGenericPointsToPolyline {
 	 * Checks to see if this feature can be changed and is enforced
 	 */
 	@Test
-	public void checkMaxVertexes() {
+	public void checkMinVertexes_sequence() {
+		PointsToPolyline alg = createAlg(false);
+		alg.setConvex(false);
+		alg.setMinimumSides(10);
+
+		List<Point2D_I32> contour = line(0,0,30,0);
+		contour.addAll(line(30,0,30,10));
+		contour.addAll(line(30,10,20,10));
+		contour.addAll(line(20,10,20,30));
+		contour.addAll(line(20,30,0,30));
+
+		GrowQueue_I32 found = new GrowQueue_I32();
+		if( alg.process(contour,found)) {
+			assertEquals(9, found.size);
+		}
+		alg.setMinimumSides(3);
+		assertTrue(alg.process(contour,found));
+
+		check(found,0,30,40,50,70,90);
+	}
+
+	/**
+	 * Checks to see if this feature can be changed and is enforced
+	 */
+	@Test
+	public void checkMaxVertexes_loop() {
 		PointsToPolyline alg = createAlg(true);
 		alg.setMaximumSides(3);
 
@@ -120,7 +145,6 @@ public abstract class ChecksGenericPointsToPolyline {
 
 		alg.setConvex(false);
 		assertTrue(alg.process(contour,found));
-
 	}
 
 
