@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,9 @@ import org.bytedeco.copiedstuff.Java2DFrameConverter;
 
 import java.awt.image.BufferedImage;
 
+import static org.bytedeco.javacpp.avutil.AV_LOG_ERROR;
+import static org.bytedeco.javacpp.avutil.av_log_set_level;
+
 /**
  * Uses JavaCV, which uses FFMPEG, to read in a video.
  *
@@ -50,6 +53,9 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 	int frameNumber;
 
 	public FfmpegVideoImageSequence(String filename, ImageType<T> imageType ) {
+		// Turn off that super annoying error message!
+		av_log_set_level(AV_LOG_ERROR);
+
 		this.filename = filename;
 		this.imageType = imageType;
 		converter = new Java2DFrameConverter();

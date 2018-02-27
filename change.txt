@@ -36,6 +36,8 @@ Version : 0.29
   * Added support for segments which don't loop
 - TODO Deleted SplitMergeLineFit
   * PolylineSplitMerge now has all of its functionality and out performs it
+- FFMPEG
+  * Suppressed warning message that has been smalling stderr
 
 TODO
 
