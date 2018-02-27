@@ -31,6 +31,10 @@ Version : 0.29
   * Can specify if input is in pixels or normalized coordinates
   * Deleted unused code that was sketchy
 - Added GVersion class that is automatically generated and contains build related information
+- PolylineSplitMerge
+  * Supports sequences that don't loop now
+- SplitMergeLineFit
+  * TODO Deleted since PolylineSplitMerge now has all of its functionality and out performs it
 
 TODO
 
@@ -57,7 +61,6 @@ TOP ITEMS
   * lots of qr codes right next to each other. Generate these
 
 OTHER ITEMS
-- TODO New polyline algorithm that doesn't loop
 - TODO Binary blob demonstration
 - TODO Update IntensityPointFeatureApp. Let it select image to open
 - TODO Visualization tools for Direct VO
@@ -67,7 +70,6 @@ OTHER ITEMS
 - TODO Look at AKAZE feature
 - TODO Clarify how you calibrate the camera in Processing
 - TODO DescribeDenseHogFastAlg naming consistency. See TODO at top
-- TODO See if contour shape fitting algorithm can be speed up by using a continious set of memory instead of Point2D
 - TODO "Normalized image coordinates" -> "projected coordinates" It is the 3D coordinate projected onto the image plane.
         It is a homogenous coordinate with z=1 being implicit.
         Found papers that use "normalized coordinates"!
