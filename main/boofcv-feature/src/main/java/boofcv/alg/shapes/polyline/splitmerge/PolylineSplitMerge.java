@@ -68,7 +68,7 @@ import java.util.List;
 public class PolylineSplitMerge {
 
 	// Does the polyline form a loop or are the end points disconnected
-	private boolean loops;
+	private boolean loops = true;
 
 	// Can it assume the shape is convex? If so it can reject shapes earlier
 	private boolean convex = false;
@@ -138,7 +138,6 @@ public class PolylineSplitMerge {
 
 			if (!findInitialTriangle(contour))
 				return false;
-			savePolyline();
 		} else {
 			// Reject pathological case
 			if( contour.size() < 2 )
@@ -147,8 +146,9 @@ public class PolylineSplitMerge {
 			// two end points are the seeds. Plus they can't change
 			addCorner(0);
 			addCorner(contour.size()-1);
-			savePolyline();
+			initializeScore(contour,false);
 		}
+		savePolyline();
 
 		sequentialSideFit(contour,loops);
 
@@ -159,7 +159,7 @@ public class PolylineSplitMerge {
 
 		double bestScore = Double.MAX_VALUE;
 		int bestSize = -1;
-		for (int i = 0; i < Math.min(maxSides-MIN_SIZE-1,polylines.size); i++) {
+		for (int i = 0; i < Math.min(maxSides-(MIN_SIZE-1),polylines.size); i++) {
 			if( polylines.get(i).score < bestScore ) {
 				bestPolyline = polylines.get(i);
 				bestScore = bestPolyline.score;
@@ -263,7 +263,7 @@ public class PolylineSplitMerge {
 			c.score = Double.MAX_VALUE;
 		}
 
-		double foundScore = computeScore(list,cornerScorePenalty);
+		double foundScore = computeScore(list,cornerScorePenalty, loops);
 
 		// only save the results if it's an improvement
 		if( c.score > foundScore ) {
@@ -288,15 +288,18 @@ public class PolylineSplitMerge {
 	/**
 	 * Computes the score for a list
 	 */
-	static double computeScore( LinkedList<Corner> list , double cornerPenalty ) {
+	static double computeScore( LinkedList<Corner> list , double cornerPenalty , boolean loops ) {
 		double sumSides = 0;
 		Element<Corner> e = list.getHead();
-		while( e != null ) {
+		Element<Corner> end = loops ? null : list.getTail();
+		while( e != end ) {
 			sumSides += e.object.sideError;
 			e = e.next;
 		}
 
-		return sumSides/list.size() + cornerPenalty*list.size();
+		int numSides = loops ? list.size() : list.size() - 1;
+
+		return sumSides/numSides + cornerPenalty*numSides;
 	}
 
 	/**
@@ -335,9 +338,19 @@ public class PolylineSplitMerge {
 		// enforce CCW requirement
 		ensureTriangleOrder(contour);
 
+		return initializeScore(contour, true);
+	}
+
+	/**
+	 * Computes the score and potential split for each side
+	 * @param contour
+	 * @return
+	 */
+	private boolean initializeScore(List<Point2D_I32> contour , boolean loops ) {
 		// Score each side
 		Element<Corner> e = list.getHead();
-		while( e != null ) {
+		Element<Corner> end = loops ? null : list.getTail();
+		while( e != end ) {
 			if (convex && !isSideConvex(contour, e))
 				return false;
 
@@ -355,7 +368,7 @@ public class PolylineSplitMerge {
 
 		// Compute what would happen if a side was split
 		e = list.getHead();
-		while( e != null ) {
+		while( e != end ) {
 			computePotentialSplitScore(contour,e,list.size() < minSides);
 			e = e.next;
 		}
@@ -462,16 +475,8 @@ public class PolylineSplitMerge {
 		double bestChange = convex ? 0 : -Double.MAX_VALUE;
 
 		// Pick the side that if split would improve the overall score the most
-		Element<Corner> e,end;
-
-		// if it loops any corner can be split. If it doesn't look the end points can't be split
-		if( loops ) {
-			e = list.getHead();
-			end = null;
-		} else {
-			e = list.getHead().next;
-			end = list.getTail();
-		}
+		Element<Corner> e=list.getHead();
+		Element<Corner> end = loops ? null : list.getTail();
 
 		while( e != end ) {
 			Corner c = e.object;
@@ -507,7 +512,7 @@ public class PolylineSplitMerge {
 		// Pick the side that if split would improve the overall score the most
 		Element<Corner> target,end;
 
-		// if it loops any corner can be split. If it doesn't look the end points can't be split
+		// if it loops any corner can be split. If it doesn't look the end points can't be removed
 		if( loops ) {
 			target = list.getHead();
 			end = null;

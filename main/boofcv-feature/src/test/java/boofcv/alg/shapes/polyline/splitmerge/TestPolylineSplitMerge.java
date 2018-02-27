@@ -41,12 +41,60 @@ public class TestPolylineSplitMerge {
 
 	@Test
 	public void process_line() {
-		fail("implement");
+		PolylineSplitMerge alg = new PolylineSplitMerge();
+		alg.setCornerScorePenalty(0.1);
+		alg.setMinimumSideLength(5);
+		alg.setMaxNumberOfSideSamples(10);
+		alg.setConvex(false);
+		alg.setLoops(false);
+
+		List<Point2D_I32> contour = line(5,2,20,2);
+
+		alg.process(contour);
+		PolylineSplitMerge.CandidatePolyline result = alg.getBestPolyline();
+
+		assertEquals(2,result.splits.size);
+		assertEquals(0,result.splits.get(0));
+		assertEquals(contour.size()-1,result.splits.get(1));
+		assertEquals(0.1*1,result.score, 1e-8);
+
+		// flip the line around and see if that changes the results
+		contour = flip(contour);
+		alg.process(contour);
+		result = alg.getBestPolyline();
+		assertEquals(2,result.splits.size);
+		assertEquals(0,result.splits.get(0));
+		assertEquals(0.1*1,result.score, 1e-8);
 	}
 
 	@Test
 	public void process_twoSegments() {
-		fail("implement");
+		PolylineSplitMerge alg = new PolylineSplitMerge();
+		alg.setCornerScorePenalty(0.1);
+		alg.setMinimumSideLength(5);
+		alg.setMaxNumberOfSideSamples(10);
+		alg.setConvex(false);
+		alg.setLoops(false);
+
+		List<Point2D_I32> contour = line(5,2,20,2);
+		contour.addAll(line(20,2,20,30));
+
+		alg.process(contour);
+		PolylineSplitMerge.CandidatePolyline result = alg.getBestPolyline();
+
+		assertEquals(3,result.splits.size);
+		assertEquals(0,result.splits.get(0));
+		assertEquals(contour.size()-1,result.splits.get(2));
+		assertEquals(0.1*2,result.score, 1e-8);
+
+		// flip the line around and see if that changes the results
+		contour = flip(contour);
+		alg.process(contour);
+		result = alg.getBestPolyline();
+		assertEquals(3,result.splits.size);
+		assertEquals(0,result.splits.get(0));
+		assertEquals(contour.size()-1,result.splits.get(2));
+		assertEquals(0.1*2,result.score, 1e-8);
 	}
 
 	@Test
@@ -129,14 +177,27 @@ public class TestPolylineSplitMerge {
 	}
 
 	@Test
-	public void computeScore() {
+	public void computeScore_loops() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.addCorner(0).object.sideError = 5;
 		alg.addCorner(0).object.sideError = 6;
 		alg.addCorner(0).object.sideError = 1;
 
 		double expected = 12/3.0 + 0.5*3;
-		double found = PolylineSplitMerge.computeScore(alg.list,0.5);
+		double found = PolylineSplitMerge.computeScore(alg.list,0.5, true);
+
+		assertEquals(expected,found,1e-8);
+	}
+
+	@Test
+	public void computeScore_sequence() {
+		PolylineSplitMerge alg = new PolylineSplitMerge();
+		alg.addCorner(0).object.sideError = 5;
+		alg.addCorner(0).object.sideError = 6;
+		alg.addCorner(0).object.sideError = 1;
+
+		double expected = 11/2.0 + 0.5*2;
+		double found = PolylineSplitMerge.computeScore(alg.list,0.5, false);
 
 		assertEquals(expected,found,1e-8);
 	}
@@ -231,13 +292,55 @@ public class TestPolylineSplitMerge {
 		assertEquals(10,e.object.index);e = e.next;
 		assertEquals(20,e.object.index);e = e.next;
 		assertEquals(30,e.object.index);e = e.next;
-		assertFalse(e.object.splitable);
+		assertFalse(e.object.splitable);  // less than minimum side length
 		assertEquals(34,e.object.index);
 	}
 
 	@Test
 	public void increaseNumberOfSidesByOne_sequence() {
-		fail("Implement");
+		List<Point2D_I32> contour = rect(10,12,20,22);
+
+		PolylineSplitMerge alg = new PolylineSplitMerge();
+		alg.setLoops(false);
+
+		// when the new side as an error of zero this will make it impossible to split
+		alg.setMaxSideError(ConfigLength.fixed(1));
+		alg.addCorner(0);
+		alg.addCorner(10);
+		alg.addCorner(20);
+		alg.addCorner(30);
+
+		// set up polyline variables
+		Element<Corner> e = alg.list.getHead();
+		while( e != null ) {
+			e.object.splitable = false;
+			e = e.next;
+		}
+		// this should be ignored and not selected even though by score it would be
+		e = alg.list.getTail();
+		e.object.sideError = alg.computeSideError(contour,e.object.index,5);
+		e.object.splitable = true;
+		e.object.splitLocation = 34;
+		e.object.splitError0 = 0;
+		e.object.splitError1 = 0;
+
+		e = e.previous;
+		e.object.sideError = alg.computeSideError(contour,e.object.index,5);
+		e.object.splitable = true;
+		e.object.splitLocation = 24;
+		e.object.splitError0 = 1;
+		e.object.splitError1 = 1;
+
+		assertTrue(alg.increaseNumberOfSidesByOne(contour,false));
+
+		assertEquals(5,alg.list.size());
+		e = alg.list.getHead();
+		assertEquals(0,e.object.index);e = e.next;
+		assertEquals(10,e.object.index);e = e.next;
+		assertEquals(20,e.object.index);e = e.next;
+		assertFalse(e.object.splitable); // less than minimum side length
+		assertEquals(24,e.object.index);e = e.next;
+		assertEquals(30,e.object.index);
 	}
 
 	@Test
@@ -291,7 +394,40 @@ public class TestPolylineSplitMerge {
 
 	@Test
 	public void selectCornerToSplit_sequence() {
-		fail("Implement");
+		PolylineSplitMerge alg = new PolylineSplitMerge();
+		Element<Corner> c0 = alg.addCorner(0);
+		Element<Corner> c1 = alg.addCorner(10);
+		Element<Corner> c2 = alg.addCorner(20);
+		Element<Corner> c3 = alg.addCorner(30);
+		Element<Corner> c4 = alg.addCorner(40);
+
+		// net reduction of 2
+		c2.object.splitable = true;
+		c2.object.sideError = 6;
+		c2.object.splitError0 = 1;
+		c2.object.splitError1 = 3;
+		// massive reduction but marked as not splittable
+		c3.object.splitable = false;
+		c3.object.sideError = 20;
+		c3.object.splitError0 = 5;
+		c3.object.splitError1 = 0;
+		// small split error but an increase
+		c1.object.splitable = true;
+		c1.object.sideError = 2;
+		c1.object.splitError0 = 1;
+		c1.object.splitError1 = 2;
+		// considered by not as good as 2
+		c0.object.splitable = true;
+		c0.object.sideError = 3.5;
+		c0.object.splitError0 = 2;
+		c0.object.splitError1 = 1;
+		// c4 is good a split candidate that should be ignored because it's on the tail
+		c4.object.splitable = true;
+		c4.object.sideError = 20;
+		c4.object.splitError0 = 1;
+		c4.object.splitError1 = 1;
+
+		assertTrue(c2==alg.selectCornerToSplit(false));
 	}
 
 
@@ -816,6 +952,14 @@ public class TestPolylineSplitMerge {
 				y = y0 + (y1-y0)*lengthY*i/lengthX;
 				out.add( new Point2D_I32(x,y));
 			}
+		}
+		return out;
+	}
+
+	public static List<Point2D_I32> flip( List<Point2D_I32> list ) {
+		List<Point2D_I32> out = new ArrayList<>();
+		for (int i = list.size()-1; i >= 0; i--) {
+			out.add(list.get(i));
 		}
 		return out;
 	}
