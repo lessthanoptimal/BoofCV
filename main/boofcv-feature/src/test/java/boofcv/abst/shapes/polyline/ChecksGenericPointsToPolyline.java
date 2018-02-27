@@ -103,7 +103,7 @@ public abstract class ChecksGenericPointsToPolyline {
 		alg.setMinimumSides(3);
 		assertTrue(alg.process(contour,found));
 
-		check(found,0,30,40,50,70,90);
+		check(found,0,30,40,50,70,89);
 	}
 
 	/**
