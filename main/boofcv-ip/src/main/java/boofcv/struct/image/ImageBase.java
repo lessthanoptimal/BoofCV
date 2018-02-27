@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,6 +101,14 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * @param height Desired image height
 	 */
 	public abstract void reshape(int width, int height);
+
+	/**
+	 * Reshapes this image so that it's shape matches the input image
+	 * @param image Image whose shape will be matched
+	 */
+	public void matchShape( ImageBase image ) {
+		reshape(image.width,image.height);
+	}
 
 	/**
 	 * Sets the value of 'this' image to be identical to the passed in image.  All structural

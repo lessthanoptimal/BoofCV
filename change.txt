@@ -16,10 +16,11 @@ Version : 0.29
 - Stereo Calibration
   * Moved detector to be outside of the main calibration class
 - Demonstrations
-  * Moved menu bar to the correct location
+  * Moved menubar to the correct location
   * Tweaks for Mac OS X
 - Images
   * Gray images new support createSameShape(type)
+  * Added matchShape() to replace the more verbose reshape(image.width,image.height)
 - Contours
   * Created an interface for finding contours in a binary image
   * Provided a way to override Chang2004
@@ -32,9 +33,9 @@ Version : 0.29
   * Deleted unused code that was sketchy
 - Added GVersion class that is automatically generated and contains build related information
 - PolylineSplitMerge
-  * Supports sequences that don't loop now
-- SplitMergeLineFit
-  * TODO Deleted since PolylineSplitMerge now has all of its functionality and out performs it
+  * Added support for segments which don't loop
+- TODO Deleted SplitMergeLineFit
+  * PolylineSplitMerge now has all of its functionality and out performs it
 
 TODO
 
