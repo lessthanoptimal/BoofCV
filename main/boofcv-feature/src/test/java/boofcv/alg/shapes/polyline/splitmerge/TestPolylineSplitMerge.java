@@ -753,7 +753,7 @@ public class TestPolylineSplitMerge {
 		alg.setMinimumSideLength(4);
 		alg.setThresholdSideSplitScore(1);
 
-		alg.list.getElement(5,true).object.sideError = 1;
+		alg.list.getElement(5,true).object.sideError = 1.0000001;
 		assertTrue(alg.canBeSplit(contour,alg.list.getElement(5,true),false));
 		alg.list.getElement(5,true).object.sideError = 0.9999999;
 		assertFalse(alg.canBeSplit(contour,alg.list.getElement(5,true),false));
@@ -763,6 +763,20 @@ public class TestPolylineSplitMerge {
 		assertTrue(alg.canBeSplit(contour,alg.list.getElement(5,true),true));
 		alg.setMinimumSideLength(6);
 		assertFalse(alg.canBeSplit(contour,alg.list.getElement(5,true),true));
+
+		// Will it try to split a side with zero error if the min score is zero?
+		alg.setMinimumSideLength(4);
+		alg.setThresholdSideSplitScore(0);
+		alg.corners.get(0).sideError = 0;
+		assertFalse(alg.canBeSplit(contour,alg.list.getHead(),false));
+
+		// now the minimum length is 1 and the side isn't perfect. Still shouldn't split
+		// because the length is now 1
+		alg.setMinimumSideLength(1);
+		alg.corners.get(0).sideError = 0.1;
+		alg.corners.get(0).index = 0;
+		alg.corners.get(1).index = 1;
+		assertFalse(alg.canBeSplit(contour,alg.list.getHead(),false));
 
 	}
 
