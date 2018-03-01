@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,6 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.GrayU8;
@@ -182,19 +181,18 @@ public class ShapeFitContourApp
 
 		if( activeAlg == 0 ) {
 
-			double splitFraction = controlPanel.getSplitFraction();
-			double minimumSplitFraction = controlPanel.getMinimumSplitFraction();
-			ConfigLength minimumSplit = ConfigLength.relative(minimumSplitFraction,0);
+			double cornerPalty = controlPanel.getCornerPenalty();
+			int minimumSplitPixels = controlPanel.getMinimumSplitPixels();
 
 			for( Contour c : contours ) {
 				List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(
-						c.external, true, splitFraction, minimumSplit, 100);
+						c.external, true, minimumSplitPixels,cornerPalty);
 
 				g2.setColor(Color.RED);
 				visualizePolygon(g2, scale, vertexes);
 
 				for( List<Point2D_I32> internal : c.internal ) {
-					vertexes = ShapeFittingOps.fitPolygon(internal, true, splitFraction, minimumSplit, 100);
+					vertexes = ShapeFittingOps.fitPolygon(internal, true, minimumSplitPixels,cornerPalty);
 
 					g2.setColor(Color.GREEN);
 					visualizePolygon(g2, scale, vertexes);

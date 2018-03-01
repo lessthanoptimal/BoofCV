@@ -739,18 +739,18 @@ public class TestPolylineSplitMerge {
 			alg.list.pushTail(c);
 		}
 
-		alg.setMinimumSideLength(5);
+		alg.setMinimumSideLength(4);
 		alg.setThresholdSideSplitScore(0); // turn off this test
 
 		assertTrue(alg.canBeSplit(contour,alg.list.getElement(5,true),false));
 		assertTrue(alg.canBeSplit(contour,alg.list.getElement(9,true),false));
 
-		alg.setMinimumSideLength(6);
+		alg.setMinimumSideLength(5);
 		assertFalse(alg.canBeSplit(contour,alg.list.getElement(5,true),false));
 		assertFalse(alg.canBeSplit(contour,alg.list.getElement(9,true),false));
 
 		// test side split score
-		alg.setMinimumSideLength(5);
+		alg.setMinimumSideLength(4);
 		alg.setThresholdSideSplitScore(1);
 
 		alg.list.getElement(5,true).object.sideError = 1;

@@ -191,7 +191,7 @@ public class PolylineSplitMerge {
 	private void sequentialSideFit(List<Point2D_I32> contour, boolean loops ) {
 		// by finding more corners than necessary it can recover from mistakes previously
 		int limit = maxSides+extraConsider.computeI(maxSides);
-		if( limit <= 0 )limit = Integer.MAX_VALUE; // handle the situation where it overflows
+		if( limit <= 0 )limit = contour.size(); // handle the situation where it overflows
 		while( list.size() < limit && !fatalError ) {
 			if( !increaseNumberOfSidesByOne(contour,loops) ) {
 				break;
@@ -460,7 +460,6 @@ public class PolylineSplitMerge {
 		double d = p0.distance(p1);
 
 		if (length >= d*convexTest) {
-			fatalError = true;
 			return false;
 		}
 		return true;
@@ -715,7 +714,7 @@ public class PolylineSplitMerge {
 		//       changing the signature if the algorithm was changed later on.
 		int length = CircularIndex.distanceP(e0.object.index, e1.object.index, contour.size());
 
-		if (length < minimumSideLength) {
+		if (length <= minimumSideLength) {
 			return false;
 		}
 
@@ -901,6 +900,8 @@ public class PolylineSplitMerge {
 	}
 
 	public void setMinimumSideLength(int minimumSideLength) {
+		if( minimumSideLength <= 0 )
+			throw new IllegalArgumentException("Minimum length must be at least 1");
 		this.minimumSideLength = minimumSideLength;
 	}
 

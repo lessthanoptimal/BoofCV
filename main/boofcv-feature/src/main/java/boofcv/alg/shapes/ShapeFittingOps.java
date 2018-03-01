@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,9 @@
 
 package boofcv.alg.shapes;
 
-import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
+import boofcv.alg.shapes.polyline.splitmerge.PolylineSplitMerge;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitLoop;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitSegment;
-import boofcv.struct.ConfigLength;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
@@ -64,30 +63,25 @@ public class ShapeFittingOps {
 	 *
 	 * @param sequence Ordered and connected list of points.
 	 * @param loop If true the sequence is a connected at both ends, otherwise it is assumed to not be.
-	 * @param splitFraction A line will be split if a point is more than this fraction of its
-	 *                     length away from the line. Try 0.05
-	 * @param minimumSideLength The minimum allowed side length as a function of contour length.
-	 * @param iterations Maximum number of iterations done to improve the fit. Can be 0. Try 50.
+	 * @param minimumSideLength The minimum allowed side length in pixels. Try 10
+	 * @param cornerPenalty How much a corner is penalized. Try 0.25
 	 * @return Vertexes in the fit polygon.
 	 */
 	public static List<PointIndex_I32> fitPolygon(List<Point2D_I32> sequence, boolean loop,
-												  double splitFraction, ConfigLength minimumSideLength, int iterations) {
-		GrowQueue_I32 splits = new GrowQueue_I32();
+												  int minimumSideLength , double cornerPenalty ) {
 
-		if( loop ) {
-			SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(splitFraction,minimumSideLength,iterations);
-			alg.process(sequence,splits);
-			RefinePolyLineCorner refine = new RefinePolyLineCorner(true,10);
-			refine.fit(sequence,splits);
-		} else {
-			SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(splitFraction,minimumSideLength,iterations);
-			alg.process(sequence,splits);
-			RefinePolyLineCorner refine = new RefinePolyLineCorner(false,10);
-			refine.fit(sequence,splits);
-		}
+		PolylineSplitMerge alg = new PolylineSplitMerge();
+		alg.setLoops(loop);
+		alg.setMinimumSideLength(minimumSideLength);
+		alg.setCornerScorePenalty(cornerPenalty);
+
+		alg.process(sequence);
+		PolylineSplitMerge.CandidatePolyline best = alg.getBestPolyline();
 
 		FastQueue<PointIndex_I32> output = new FastQueue<>(PointIndex_I32.class, true);
-		indexToPointIndex(sequence,splits,output);
+		if( best != null ) {
+			indexToPointIndex(sequence,best.splits,output);
+		}
 
 		return new ArrayList<>(output.toList());
 	}

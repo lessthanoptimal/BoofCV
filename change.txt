@@ -34,7 +34,9 @@ Version : 0.29
 - Added GVersion class that is automatically generated and contains build related information
 - PolylineSplitMerge
   * Added support for segments which don't loop
-- TODO Deleted SplitMergeLineFit
+  * Fixed Bug where if a segment was the minimum length exactly it could still be split
+- SplitMergeLineFit
+  * Deprecated and will be removed soon
   * PolylineSplitMerge now has all of its functionality and out performs it
 - FFMPEG
   * Suppressed warning message that has been smalling stderr

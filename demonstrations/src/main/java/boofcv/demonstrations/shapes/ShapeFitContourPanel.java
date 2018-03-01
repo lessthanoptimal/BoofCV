@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,8 +44,8 @@ public class ShapeFitContourPanel extends StandardAlgConfigPanel
 
 	ThresholdControlPanel threshold;
 
-	JSpinner selectMinimumSideFraction;
-	JSpinner selectSplitFraction;
+	JSpinner selectMinimumSplitPixels;
+	JSpinner selectCornerPenalty;
 	JCheckBox showCorners;
 	JCheckBox showContour;
 
@@ -53,8 +53,8 @@ public class ShapeFitContourPanel extends StandardAlgConfigPanel
 	int selectedView = 0;
 	double zoom = 1;
 
-	double minimumSplitFraction = 0.01;
-	double splitFraction = 0.05;
+	int minimumSplitPixels = 10;
+	double cornerPenalty = 0.25;
 
 	boolean cornersVisible = false;
 	boolean contoursVisible = true;
@@ -82,12 +82,12 @@ public class ShapeFitContourPanel extends StandardAlgConfigPanel
 
 		threshold = new ThresholdControlPanel(owner);
 
-		selectMinimumSideFraction = new JSpinner(new SpinnerNumberModel(minimumSplitFraction,0,0.999,0.0025));
-		selectMinimumSideFraction.setEditor(new JSpinner.NumberEditor(selectMinimumSideFraction, "#,####0.0000;(#,####0.0000)"));
-		selectMinimumSideFraction.addChangeListener(this);
-		selectMinimumSideFraction.setMaximumSize(selectMinimumSideFraction.getPreferredSize());
-		selectSplitFraction = new JSpinner(new SpinnerNumberModel(splitFraction,0,1.0,0.01));
-		selectSplitFraction.setEditor(new JSpinner.NumberEditor(selectSplitFraction, "#,##0.00;(#,##0.00)"));
+		selectMinimumSplitPixels = spinner(minimumSplitPixels,1,1000,5);
+		selectCornerPenalty = new JSpinner(new SpinnerNumberModel(cornerPenalty,0,10.0,0.01));
+		selectCornerPenalty.setEditor(new JSpinner.NumberEditor(selectCornerPenalty, "#,##0.00;(#,##0.00)"));
+		selectCornerPenalty.addChangeListener(this);
+		selectCornerPenalty.setMaximumSize(selectCornerPenalty.getPreferredSize());
+
 //		JComponent editor = selectSplitFraction.getEditor();
 //		JFormattedTextField ftf = ((JSpinner.DefaultEditor) editor).getTextField();
 //		ftf.setColumns(3);
@@ -98,16 +98,15 @@ public class ShapeFitContourPanel extends StandardAlgConfigPanel
 		showContour.setSelected(contoursVisible);
 		showContour.addChangeListener(this);
 
-		selectSplitFraction.addChangeListener(this);
-		selectSplitFraction.setMaximumSize(selectSplitFraction.getPreferredSize());
+
 
 		addLabeled(algorithmCombo, "Type of Shape", this);
 		addSeparator(200);
 		addLabeled(imageView, "Background", this);
 		addLabeled(selectZoom,"Zoom",this);
 		addAlignCenter(threshold,this);
-		addLabeled(selectMinimumSideFraction, "Min Side Fraction", this);
-		addLabeled(selectSplitFraction, "Split Fraction",this);
+		addLabeled(selectMinimumSplitPixels, "Min Split Pixels", this);
+		addLabeled(selectCornerPenalty, "Corner Penalty",this);
 		addAlignLeft(showCorners, this);
 		addAlignLeft(showContour, this);
 		addVerticalGlue(this);
@@ -128,10 +127,10 @@ public class ShapeFitContourPanel extends StandardAlgConfigPanel
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == selectMinimumSideFraction) {
-			minimumSplitFraction = (Double) selectMinimumSideFraction.getValue();
-		} else if( e.getSource() == selectSplitFraction) {
-			splitFraction = (Double) selectSplitFraction.getValue();
+		if( e.getSource() == selectMinimumSplitPixels) {
+			minimumSplitPixels = (Integer) selectMinimumSplitPixels.getValue();
+		} else if( e.getSource() == selectCornerPenalty) {
+			cornerPenalty = (Double) selectCornerPenalty.getValue();
 		} else if( e.getSource() == selectZoom ) {
 			zoom = ((Number) selectZoom.getValue()).doubleValue();
 			owner.viewUpdated();
@@ -151,12 +150,12 @@ public class ShapeFitContourPanel extends StandardAlgConfigPanel
 	private void updateEnabledByAlgorithm() {
 		if( selectedAlgorithm == 0 ) {
 			showCorners.setEnabled(true);
-			selectSplitFraction.setEnabled(true);
-			selectMinimumSideFraction.setEnabled(true);
+			selectCornerPenalty.setEnabled(true);
+			selectMinimumSplitPixels.setEnabled(true);
 		} else {
 			showCorners.setEnabled(false);
-			selectSplitFraction.setEnabled(false);
-			selectMinimumSideFraction.setEnabled(false);
+			selectCornerPenalty.setEnabled(false);
+			selectMinimumSplitPixels.setEnabled(false);
 		}
 	}
 
@@ -172,12 +171,12 @@ public class ShapeFitContourPanel extends StandardAlgConfigPanel
 		return zoom;
 	}
 
-	public double getMinimumSplitFraction() {
-		return minimumSplitFraction;
+	public int getMinimumSplitPixels() {
+		return minimumSplitPixels;
 	}
 
-	public double getSplitFraction() {
-		return splitFraction;
+	public double getCornerPenalty() {
+		return cornerPenalty;
 	}
 
 	public boolean isCornersVisible() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.GrayF32;
@@ -54,9 +53,10 @@ import java.util.Random;
  */
 public class ExampleFitPolygon {
 
-	// Polynomial fitting tolerances
-	static double splitFraction = 0.05;
-	static ConfigLength minimumSide = ConfigLength.relative(0.1,0);
+	// Used to bias it towards more or fewer sides. larger number = fewer sides
+	static double cornerPenalty = 0.25;
+	// The fewest number of pixels a side can have
+	static int minSide = 10;
 
 	static ListDisplayPanel gui = new ListDisplayPanel();
 
@@ -87,8 +87,7 @@ public class ExampleFitPolygon {
 
 		for( Contour c : contours ) {
 			// Fit the polygon to the found external contour.  Note loop = true
-			List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external,true,
-					splitFraction, minimumSide,100);
+			List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external,true, minSide,cornerPenalty);
 
 			g2.setColor(Color.RED);
 			VisualizeShapes.drawPolygon(vertexes,true,g2);
@@ -96,7 +95,7 @@ public class ExampleFitPolygon {
 			// handle internal contours now
 			g2.setColor(Color.BLUE);
 			for( List<Point2D_I32> internal : c.internal ) {
-				vertexes = ShapeFittingOps.fitPolygon(internal,true, splitFraction, minimumSide,100);
+				vertexes = ShapeFittingOps.fitPolygon(internal,true, minSide,cornerPenalty);
 				VisualizeShapes.drawPolygon(vertexes,true,g2);
 			}
 		}
@@ -131,8 +130,7 @@ public class ExampleFitPolygon {
 
 			for(EdgeSegment s : e.segments ) {
 				// fit line segments to the point sequence.  Note that loop is false
-				List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(s.points,false,
-						splitFraction, minimumSide,100);
+				List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(s.points,false, minSide,cornerPenalty);
 
 				VisualizeShapes.drawPolygon(vertexes, false, g2);
 			}
@@ -166,8 +164,7 @@ public class ExampleFitPolygon {
 
 		for( Contour c : contours ) {
 			// Only the external contours are relevant.
-			List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external,true,
-					splitFraction, minimumSide,100);
+			List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external,true, minSide,cornerPenalty);
 
 			g2.setColor(new Color(rand.nextInt()));
 			VisualizeShapes.drawPolygon(vertexes,true,g2);
