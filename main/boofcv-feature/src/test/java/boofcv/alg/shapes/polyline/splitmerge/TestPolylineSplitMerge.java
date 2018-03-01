@@ -797,8 +797,8 @@ public class TestPolylineSplitMerge {
 
 		alg.addCorner(0);
 		alg.addCorner(10);
-		alg.list.getHead().object.sideError = 0;
-		alg.list.getTail().object.sideError = 0;
+		alg.list.getHead().object.sideError = 1e-6;
+		alg.list.getTail().object.sideError = 1e-6;
 
 		assertTrue(alg.canBeSplit(contour,alg.list.getHead(),false));
 		assertFalse(alg.canBeSplit(contour,alg.list.getTail(),false));
