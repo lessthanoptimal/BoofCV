@@ -19,8 +19,6 @@
 package boofcv.abst.shapes.polyline;
 
 import boofcv.factory.shape.FactoryPointsToPolyline;
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  * @author Peter Abeles
@@ -28,13 +26,10 @@ import org.junit.Test;
 public class TestNewSplitMerge_to_PointsToPolyline extends ChecksGenericPointsToPolyline{
 
 	@Override
-	public PointsToPolyline createAlg(boolean loop) {
-		return FactoryPointsToPolyline.splitMerge((ConfigPolylineSplitMerge) null);
-	}
+	public PointsToPolyline createAlg(boolean loops) {
+		ConfigPolylineSplitMerge config = new ConfigPolylineSplitMerge();
+		config.loops = loops;
 
-	@Ignore
-	@Test
-	public void checkDefaults() {
-		// override and ignore this test since line functionality hasn't been added yet
+		return FactoryPointsToPolyline.splitMerge(config);
 	}
 }

@@ -298,7 +298,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 
 	public ConfigPolylineSplitMerge getConfigSplitMerge() {
 		ConfigPolylineSplitMerge config = panelSplitMerge.config;
-		// TODO set looping
+		config.loops = looping;
 		return config;
 	}
 
