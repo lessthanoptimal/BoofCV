@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,6 +49,7 @@ public class FactoryPointsToPolyline {
 	 * @param config Configuration. null if use default
 	 * @return {@link SplitMergeLineRefine_to_PointsToPolyline}
 	 */
+	@Deprecated
 	public static PointsToPolyline splitMerge(ConfigSplitMergeLineFit config ) {
 		if( config == null )
 			config = new ConfigSplitMergeLineFit();
@@ -57,7 +58,7 @@ public class FactoryPointsToPolyline {
 				config.splitFraction, config.minimumSide,config.iterations,config.refine,config.pruneSplitPenalty,config.loop);
 	}
 
-
+	@Deprecated
 	public static PointsToPolyline splitMerge(ConfigPolylineSplitMerge config ) {
 		if( config == null )
 			config = new ConfigPolylineSplitMerge();
