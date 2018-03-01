@@ -109,7 +109,7 @@ class BoofGradleTools implements Plugin<Project> {
         // Creates a resource file containing build information
         project.task('createVersionFile'){
             doLast {
-                println("createVersionFile called")
+                println("createVersionFile called. Path "+extension.gversion_file_path)
                 if(extension.gversion_file_path == null )
                     throw new RuntimeException("Must set gversion_file_path")
 
@@ -123,21 +123,23 @@ class BoofGradleTools implements Plugin<Project> {
                 }
 
                 def f = new File(extension.gversion_file_path,"GVersion.java")
-                f.write("")
+                def writer = new FileWriter(f);
                 if( extension.gversion_package.size() > 0 ) {
-                    f << "package $extension.gversion_package;\n"
-                    f << "\n\n"
+                    writer << "package $extension.gversion_package;\n"
+                    writer << "\n\n"
                 }
-                f << "/**\n"
-                f << " * Automatically generated file containing build version information.\n"
-                f << " */\n"
-                f << "public class GVersion {\n"
-                f << "\tpublic static final String MAVEN_GROUP = \"$project.group\";\n"
-                f << "\tpublic static final String MAVEN_NAME = \"$project.name\";\n"
-                f << "\tpublic static final String VERSION = \"$project.version\";\n"
-                f << "\tpublic static final int GIT_REVISION = $git_revision;\n"
-                f << "\tpublic static final String GIT_SHA = \"$git_sha\";\n"
-                f << "}"
+                writer << "/**\n"
+                writer << " * Automatically generated file containing build version information.\n"
+                writer << " */\n"
+                writer << "public class GVersion {\n"
+                writer << "\tpublic static final String MAVEN_GROUP = \"$project.group\";\n"
+                writer << "\tpublic static final String MAVEN_NAME = \"$project.name\";\n"
+                writer << "\tpublic static final String VERSION = \"$project.version\";\n"
+                writer << "\tpublic static final int GIT_REVISION = $git_revision;\n"
+                writer << "\tpublic static final String GIT_SHA = \"$git_sha\";\n"
+                writer << "}"
+                writer.flush()
+                writer.close()
             }
         }
 
