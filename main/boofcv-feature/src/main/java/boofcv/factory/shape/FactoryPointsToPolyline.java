@@ -58,7 +58,6 @@ public class FactoryPointsToPolyline {
 				config.splitFraction, config.minimumSide,config.iterations,config.refine,config.pruneSplitPenalty,config.loop);
 	}
 
-	@Deprecated
 	public static PointsToPolyline splitMerge(ConfigPolylineSplitMerge config ) {
 		if( config == null )
 			config = new ConfigPolylineSplitMerge();

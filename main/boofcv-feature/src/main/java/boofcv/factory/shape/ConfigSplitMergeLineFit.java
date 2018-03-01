@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,7 @@ import boofcv.struct.ConfigLength;
  *
  * @author Peter Abeles
  */
+@Deprecated
 public class ConfigSplitMergeLineFit extends ConfigPolyline {
 	/**
 	 * A line is split if a point along the contour between the two end points has a distance from the line
