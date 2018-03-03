@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,7 @@ import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.se.Se3_F32;
+import org.ejml.UtilEjml;
 import org.ejml.data.FMatrixRMaj;
 
 import java.util.ArrayList;
@@ -163,7 +164,7 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 
 		GrayF32 equiMask = new GrayF32(equiWidth, equHeight);
 
-		PixelTransform2_F32 transformEquiToCam = new PixelTransformCached_F32(equiWidth, equHeight,
+		PixelTransformCached_F32 transformEquiToCam = new PixelTransformCached_F32(equiWidth, equHeight,
 				new PointToPixelTransform_F32(equiToCamera));
 
 		int width = camMask.width;
@@ -175,11 +176,17 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 			for (int col = 0; col < equiWidth; col++) {
 				equiToCamera.compute(col,row,p2);
 
+				if( UtilEjml.isUncountable(p2.x) || UtilEjml.isUncountable(p2.y) ) {
+					// can't have it be an invalid number in the cache, but had to be invalid so that the mask
+					// could be set to zero.  So set it to some valid value that won't cause it to blow up
+					transformEquiToCam.getPixel(col,row).set(-1,-1);
+					continue;
+				}
+
 				int camX = (int)(p2.x+0.5f);
 				int camY = (int)(p2.y+0.5f);
 
-				if( Double.isNaN(p2.x) || Double.isNaN(p2.y) ||
-						camX < 0 || camY < 0 || camX >= width || camY >= height )
+				if( camX < 0 || camY < 0 || camX >= width || camY >= height )
 					continue;
 
 				if( camMask.unsafe_get(camX,camY) == 1 ) {
