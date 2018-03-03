@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,7 +84,7 @@ public class CalibrationDetectorCircleRegularGrid implements DetectorFiducialCal
 
 	@Override
 	public boolean process(GrayF32 input) {
-		results = new CalibrationObservation();
+		results = new CalibrationObservation(input.width,input.height);
 		detector.process(input);
 
 		List<Grid> grids = detector.getGrids();

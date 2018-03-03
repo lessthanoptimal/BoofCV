@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,8 @@ public class DetectUserActions {
 	double stationaryStart;
 	double stationaryTime;
 
-	CalibrationObservation previous = new CalibrationObservation();
-	CalibrationObservation first = new CalibrationObservation();
+	CalibrationObservation previous = new CalibrationObservation(0,0);
+	CalibrationObservation first = new CalibrationObservation(0,0);
 
 	CalibrationObservation points;
 	int numMissed;

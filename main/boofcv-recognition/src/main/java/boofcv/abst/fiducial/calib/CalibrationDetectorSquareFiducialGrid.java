@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,7 @@ public class CalibrationDetectorSquareFiducialGrid implements DetectorFiducialCa
 
 	@Override
 	public boolean process(GrayF32 input) {
-		observations = new CalibrationObservation();
+		observations = new CalibrationObservation(input.width,input.height);
 		if( !detector.detect(input) ) {
 			return false;
 		}

@@ -91,11 +91,14 @@ public class TestCalibrateMonoPlanar {
 
 		assertEquals(intrinsic.t1,found.t1,1e-5);
 		assertEquals(intrinsic.t2,found.t2,1e-5);
+
+		assertEquals(intrinsic.width,found.width,1e-3);
+		assertEquals(intrinsic.height,found.height,1e-3);
 	}
 
 	private CalibrationObservation createFakeObservations( int which ) {
 		Se3_F64 t2c = targetToCamera.get(which);
-		CalibrationObservation set = new CalibrationObservation();
+		CalibrationObservation set = new CalibrationObservation(intrinsic.width,intrinsic.height);
 
 		for( int i = 0; i < layout.size(); i++ ) {
 			Point2D_F64 p2 = layout.get(i);

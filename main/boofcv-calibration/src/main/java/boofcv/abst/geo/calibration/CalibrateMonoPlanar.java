@@ -77,8 +77,8 @@ public class CalibrateMonoPlanar {
 	public boolean verbose = false;
 
 	// shape of the image
-	private int widthImg;
-	private int heightImg;
+	private int imageWidth;
+	private int imageHeight;
 
 
 	public CalibrateMonoPlanar( List<Point2D_F64> layout ) {
@@ -125,7 +125,7 @@ public class CalibrateMonoPlanar {
 	public void reset() {
 		observations = new ArrayList<>();
 		errors = null;
-		heightImg = widthImg = 0;
+		imageHeight = imageWidth = 0;
 	}
 
 	/**
@@ -133,6 +133,12 @@ public class CalibrateMonoPlanar {
 	 * @param observation Detected calibration points
 	 */
 	public void addImage( CalibrationObservation observation ) {
+		if( imageWidth == 0 ) {
+			this.imageWidth = observation.getWidth();
+			this.imageHeight = observation.getHeight();
+		} else if( observation.getWidth() != this.imageWidth || observation.getHeight() != this.imageHeight) {
+			throw new IllegalArgumentException("Image shape miss match");
+		}
 		observations.add( observation );
 	}
 
@@ -159,8 +165,8 @@ public class CalibrateMonoPlanar {
 		errors = computeErrors(observations, foundZhang,layout);
 
 		foundIntrinsic = foundZhang.getIntrinsic().getCameraModel();
-		foundIntrinsic.width = widthImg;
-		foundIntrinsic.height = heightImg;
+		foundIntrinsic.width = imageWidth;
+		foundIntrinsic.height = imageHeight;
 
 		return (T)foundIntrinsic;
 	}
