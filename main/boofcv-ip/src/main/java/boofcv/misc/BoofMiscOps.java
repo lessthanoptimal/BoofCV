@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.struct.image.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -50,35 +49,11 @@ public class BoofMiscOps {
 	}
 
 	public static void sortImageNames(List<String> images ) {
-		Collections.sort(images,new Comparator<String>() {
-					@Override
-					public int compare(String o1, String o2) {
-						if( o1.length() < o2.length() ) {
-							return -1;
-						} else if( o1.length() > o2.length() ) {
-							return 1;
-						} else {
-							return o1.compareTo(o2);
-						}
-					}
-				}
-		);
+		images.sort(Comparator.naturalOrder());
 	}
 
 	public static void sortImageFiles(List<File> images ) {
-		Collections.sort(images,new Comparator<File>() {
-					@Override
-					public int compare(File o1, File o2) {
-						if( o1.length() < o2.length() ) {
-							return -1;
-						} else if( o1.length() > o2.length() ) {
-							return 1;
-						} else {
-							return o1.compareTo(o2);
-						}
-					}
-				}
-		);
+		images.sort(Comparator.comparing(File::getName));
 	}
 
 	public static String toString( Reader r ) {
