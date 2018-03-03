@@ -40,6 +40,8 @@ Version : 0.29
   * PolylineSplitMerge now has all of its functionality and out performs it
 - FFMPEG
   * Suppressed warning message that has been smalling stderr
+-Camera Calibration
+  * Fixed bug where width and height was not assigned to intrinsic during calibration
 
 TODO
 

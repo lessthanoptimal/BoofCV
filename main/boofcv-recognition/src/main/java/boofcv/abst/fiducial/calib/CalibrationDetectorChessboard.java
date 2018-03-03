@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class CalibrationDetectorChessboard implements DetectorFiducialCalibratio
 
 	@Override
 	public boolean process(GrayF32 input) {
-		detected = new CalibrationObservation();
+		detected = new CalibrationObservation(input.width,input.height);
 		if( alg.process(input) )  {
 			List<Point2D_F64> found = alg.getCalibrationPoints();
 			for (int i = 0; i < found.size(); i++) {

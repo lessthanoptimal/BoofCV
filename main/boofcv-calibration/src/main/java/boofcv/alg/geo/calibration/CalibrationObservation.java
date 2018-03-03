@@ -22,7 +22,6 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -33,13 +32,30 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class CalibrationObservation {
+
+	/**
+	 * Shape image image observations were created from. Use to configure intrinsics and sanity checks
+	 */
+	int width,height;
+
 	/**
 	 * List of pixel observations and the index of the control point
 	 */
 	public List<PointIndex2D_F64> points = new ArrayList<>();
 
-	public void setTo( CalibrationObservation obs ) {
+	public CalibrationObservation(int width, int height) {
+		this.width = width;
+		this.height = height;
+	}
+
+	protected CalibrationObservation(){
+
+	}
+
+	public void setTo(CalibrationObservation obs ) {
 		reset();
+		this.width = obs.width;
+		this.height = obs.height;
 		for (int i = 0; i < obs.size(); i++) {
 			PointIndex2D_F64 p = obs.points.get(i);
 			points.add( p.copy() );
@@ -61,20 +77,20 @@ public class CalibrationObservation {
 
 	public void reset() {
 		points.clear();
+		this.width = 0;
+		this.height = 0;
 	}
 
 	public void sort() {
-		Collections.sort(points, new Comparator<PointIndex2D_F64>() {
-			@Override
-			public int compare(PointIndex2D_F64 o1, PointIndex2D_F64 o2) {
-				if( o1.index < o2.index )
-					return -1;
-				else if( o1.index > o2.index )
-					return 1;
-				else
-					return 0;
-			}
-		});
+		points.sort(Comparator.comparingInt(o -> o.index));
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
 	}
 
 	public int size() {
