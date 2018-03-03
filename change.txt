@@ -45,6 +45,8 @@ Version : 0.29
   * For universal omni the undistorted window is automatically scaled based on image size
 - ImageConvert
   * Faster technique to convert between interleaved and planar
+- MultiCameraToEquirectangular
+  * Correctly handles NaN in equiToCam transform
 
 TODO
 
