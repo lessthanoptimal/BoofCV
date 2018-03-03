@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.core.image.impl;
 
 import boofcv.struct.image.*;
@@ -35,7 +34,7 @@ import boofcv.struct.image.*;
 @SuppressWarnings("Duplicates")
 public class ImplConvertImage {
 
-	public static void convert(GrayU8 from, GrayI8 to ) {
+	public static void convert( GrayU8 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -76,7 +75,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayU8 from, GrayI16 to ) {
+	public static void convert( GrayU8 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -121,7 +120,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayU8 from, GrayS32 to ) {
+	public static void convert( GrayU8 from, GrayS32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -166,7 +165,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayU8 from, GrayS64 to ) {
+	public static void convert( GrayU8 from, GrayS64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -211,7 +210,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayU8 from, GrayF32 to ) {
+	public static void convert( GrayU8 from, GrayF32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -256,7 +255,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayU8 from, GrayF64 to ) {
+	public static void convert( GrayU8 from, GrayF64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -304,34 +303,40 @@ public class ImplConvertImage {
 	public static void convert( InterleavedU8 input , Planar<GrayU8> output ) {
 
 		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-			
-			for (int x = 0; x < input.width; x++, indexDst++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.bands[i].data[indexDst] = input.data[indexSrc++];
+		for (int i = 0; i < numBands; i++) {
+			GrayU8 band = output.bands[i];
+
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y*input.stride + input.startIndex + i;
+				int indexDst = y*output.stride + output.startIndex;
+				int end = indexDst + input.width;
+				while( indexDst != end ) {
+					band.data[indexDst++] = input.data[indexSrc];
+					indexSrc += numBands;
 				}
 			}
 		}
 	}
 
-	public static void convert(Planar<GrayU8> input , InterleavedU8 output ) {
+	public static void convert( Planar<GrayU8> input , InterleavedU8 output ) {
 
 		final int numBands = input.getNumBands();
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-
-			for (int x = 0; x < input.width; x++, indexSrc++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.data[indexDst++] = input.bands[i].data[indexSrc];
+		for (int i = 0; i < numBands; i++) {
+			GrayU8 band = input.bands[i];
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y * input.stride + input.startIndex;
+				int indexDst = y * output.stride + output.startIndex + i;
+				int end = indexSrc + input.width;
+				
+				while( indexSrc != end ) { 
+					output.data[indexDst] = band.data[indexSrc++];
+					indexDst += numBands;
 				}
 			}
 		}
 	}
 
-	public static void convert(GrayS8 from, GrayI8 to ) {
+	public static void convert( GrayS8 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -372,7 +377,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS8 from, GrayI16 to ) {
+	public static void convert( GrayS8 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -417,7 +422,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS8 from, GrayS32 to ) {
+	public static void convert( GrayS8 from, GrayS32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -462,7 +467,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS8 from, GrayS64 to ) {
+	public static void convert( GrayS8 from, GrayS64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -507,7 +512,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS8 from, GrayF32 to ) {
+	public static void convert( GrayS8 from, GrayF32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -552,7 +557,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS8 from, GrayF64 to ) {
+	public static void convert( GrayS8 from, GrayF64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -600,34 +605,40 @@ public class ImplConvertImage {
 	public static void convert( InterleavedS8 input , Planar<GrayS8> output ) {
 
 		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-			
-			for (int x = 0; x < input.width; x++, indexDst++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.bands[i].data[indexDst] = input.data[indexSrc++];
+		for (int i = 0; i < numBands; i++) {
+			GrayS8 band = output.bands[i];
+
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y*input.stride + input.startIndex + i;
+				int indexDst = y*output.stride + output.startIndex;
+				int end = indexDst + input.width;
+				while( indexDst != end ) {
+					band.data[indexDst++] = input.data[indexSrc];
+					indexSrc += numBands;
 				}
 			}
 		}
 	}
 
-	public static void convert(Planar<GrayS8> input , InterleavedS8 output ) {
+	public static void convert( Planar<GrayS8> input , InterleavedS8 output ) {
 
 		final int numBands = input.getNumBands();
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-
-			for (int x = 0; x < input.width; x++, indexSrc++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.data[indexDst++] = input.bands[i].data[indexSrc];
+		for (int i = 0; i < numBands; i++) {
+			GrayS8 band = input.bands[i];
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y * input.stride + input.startIndex;
+				int indexDst = y * output.stride + output.startIndex + i;
+				int end = indexSrc + input.width;
+				
+				while( indexSrc != end ) { 
+					output.data[indexDst] = band.data[indexSrc++];
+					indexDst += numBands;
 				}
 			}
 		}
 	}
 
-	public static void convert(GrayU16 from, GrayI8 to ) {
+	public static void convert( GrayU16 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -672,7 +683,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayU16 from, GrayI16 to ) {
+	public static void convert( GrayU16 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -713,7 +724,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayU16 from, GrayS32 to ) {
+	public static void convert( GrayU16 from, GrayS32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -758,7 +769,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayU16 from, GrayS64 to ) {
+	public static void convert( GrayU16 from, GrayS64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -803,7 +814,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayU16 from, GrayF32 to ) {
+	public static void convert( GrayU16 from, GrayF32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -848,7 +859,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayU16 from, GrayF64 to ) {
+	public static void convert( GrayU16 from, GrayF64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -896,34 +907,40 @@ public class ImplConvertImage {
 	public static void convert( InterleavedU16 input , Planar<GrayU16> output ) {
 
 		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-			
-			for (int x = 0; x < input.width; x++, indexDst++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.bands[i].data[indexDst] = input.data[indexSrc++];
+		for (int i = 0; i < numBands; i++) {
+			GrayU16 band = output.bands[i];
+
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y*input.stride + input.startIndex + i;
+				int indexDst = y*output.stride + output.startIndex;
+				int end = indexDst + input.width;
+				while( indexDst != end ) {
+					band.data[indexDst++] = input.data[indexSrc];
+					indexSrc += numBands;
 				}
 			}
 		}
 	}
 
-	public static void convert(Planar<GrayU16> input , InterleavedU16 output ) {
+	public static void convert( Planar<GrayU16> input , InterleavedU16 output ) {
 
 		final int numBands = input.getNumBands();
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-
-			for (int x = 0; x < input.width; x++, indexSrc++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.data[indexDst++] = input.bands[i].data[indexSrc];
+		for (int i = 0; i < numBands; i++) {
+			GrayU16 band = input.bands[i];
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y * input.stride + input.startIndex;
+				int indexDst = y * output.stride + output.startIndex + i;
+				int end = indexSrc + input.width;
+				
+				while( indexSrc != end ) { 
+					output.data[indexDst] = band.data[indexSrc++];
+					indexDst += numBands;
 				}
 			}
 		}
 	}
 
-	public static void convert(GrayS16 from, GrayI8 to ) {
+	public static void convert( GrayS16 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -968,7 +985,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS16 from, GrayI16 to ) {
+	public static void convert( GrayS16 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1009,7 +1026,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS16 from, GrayS32 to ) {
+	public static void convert( GrayS16 from, GrayS32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1054,7 +1071,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS16 from, GrayS64 to ) {
+	public static void convert( GrayS16 from, GrayS64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1099,7 +1116,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS16 from, GrayF32 to ) {
+	public static void convert( GrayS16 from, GrayF32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1144,7 +1161,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS16 from, GrayF64 to ) {
+	public static void convert( GrayS16 from, GrayF64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1192,34 +1209,40 @@ public class ImplConvertImage {
 	public static void convert( InterleavedS16 input , Planar<GrayS16> output ) {
 
 		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-			
-			for (int x = 0; x < input.width; x++, indexDst++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.bands[i].data[indexDst] = input.data[indexSrc++];
+		for (int i = 0; i < numBands; i++) {
+			GrayS16 band = output.bands[i];
+
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y*input.stride + input.startIndex + i;
+				int indexDst = y*output.stride + output.startIndex;
+				int end = indexDst + input.width;
+				while( indexDst != end ) {
+					band.data[indexDst++] = input.data[indexSrc];
+					indexSrc += numBands;
 				}
 			}
 		}
 	}
 
-	public static void convert(Planar<GrayS16> input , InterleavedS16 output ) {
+	public static void convert( Planar<GrayS16> input , InterleavedS16 output ) {
 
 		final int numBands = input.getNumBands();
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-
-			for (int x = 0; x < input.width; x++, indexSrc++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.data[indexDst++] = input.bands[i].data[indexSrc];
+		for (int i = 0; i < numBands; i++) {
+			GrayS16 band = input.bands[i];
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y * input.stride + input.startIndex;
+				int indexDst = y * output.stride + output.startIndex + i;
+				int end = indexSrc + input.width;
+				
+				while( indexSrc != end ) { 
+					output.data[indexDst] = band.data[indexSrc++];
+					indexDst += numBands;
 				}
 			}
 		}
 	}
 
-	public static void convert(GrayS32 from, GrayI8 to ) {
+	public static void convert( GrayS32 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1264,7 +1287,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS32 from, GrayI16 to ) {
+	public static void convert( GrayS32 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1309,7 +1332,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS32 from, GrayS64 to ) {
+	public static void convert( GrayS32 from, GrayS64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1354,7 +1377,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS32 from, GrayF32 to ) {
+	public static void convert( GrayS32 from, GrayF32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1399,7 +1422,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS32 from, GrayF64 to ) {
+	public static void convert( GrayS32 from, GrayF64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1447,34 +1470,40 @@ public class ImplConvertImage {
 	public static void convert( InterleavedS32 input , Planar<GrayS32> output ) {
 
 		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-			
-			for (int x = 0; x < input.width; x++, indexDst++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.bands[i].data[indexDst] = input.data[indexSrc++];
+		for (int i = 0; i < numBands; i++) {
+			GrayS32 band = output.bands[i];
+
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y*input.stride + input.startIndex + i;
+				int indexDst = y*output.stride + output.startIndex;
+				int end = indexDst + input.width;
+				while( indexDst != end ) {
+					band.data[indexDst++] = input.data[indexSrc];
+					indexSrc += numBands;
 				}
 			}
 		}
 	}
 
-	public static void convert(Planar<GrayS32> input , InterleavedS32 output ) {
+	public static void convert( Planar<GrayS32> input , InterleavedS32 output ) {
 
 		final int numBands = input.getNumBands();
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-
-			for (int x = 0; x < input.width; x++, indexSrc++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.data[indexDst++] = input.bands[i].data[indexSrc];
+		for (int i = 0; i < numBands; i++) {
+			GrayS32 band = input.bands[i];
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y * input.stride + input.startIndex;
+				int indexDst = y * output.stride + output.startIndex + i;
+				int end = indexSrc + input.width;
+				
+				while( indexSrc != end ) { 
+					output.data[indexDst] = band.data[indexSrc++];
+					indexDst += numBands;
 				}
 			}
 		}
 	}
 
-	public static void convert(GrayS64 from, GrayI8 to ) {
+	public static void convert( GrayS64 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1519,7 +1548,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS64 from, GrayI16 to ) {
+	public static void convert( GrayS64 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1564,7 +1593,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS64 from, GrayS32 to ) {
+	public static void convert( GrayS64 from, GrayS32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1609,7 +1638,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS64 from, GrayF32 to ) {
+	public static void convert( GrayS64 from, GrayF32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1654,7 +1683,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayS64 from, GrayF64 to ) {
+	public static void convert( GrayS64 from, GrayF64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1702,34 +1731,40 @@ public class ImplConvertImage {
 	public static void convert( InterleavedS64 input , Planar<GrayS64> output ) {
 
 		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-			
-			for (int x = 0; x < input.width; x++, indexDst++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.bands[i].data[indexDst] = input.data[indexSrc++];
+		for (int i = 0; i < numBands; i++) {
+			GrayS64 band = output.bands[i];
+
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y*input.stride + input.startIndex + i;
+				int indexDst = y*output.stride + output.startIndex;
+				int end = indexDst + input.width;
+				while( indexDst != end ) {
+					band.data[indexDst++] = input.data[indexSrc];
+					indexSrc += numBands;
 				}
 			}
 		}
 	}
 
-	public static void convert(Planar<GrayS64> input , InterleavedS64 output ) {
+	public static void convert( Planar<GrayS64> input , InterleavedS64 output ) {
 
 		final int numBands = input.getNumBands();
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-
-			for (int x = 0; x < input.width; x++, indexSrc++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.data[indexDst++] = input.bands[i].data[indexSrc];
+		for (int i = 0; i < numBands; i++) {
+			GrayS64 band = input.bands[i];
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y * input.stride + input.startIndex;
+				int indexDst = y * output.stride + output.startIndex + i;
+				int end = indexSrc + input.width;
+				
+				while( indexSrc != end ) { 
+					output.data[indexDst] = band.data[indexSrc++];
+					indexDst += numBands;
 				}
 			}
 		}
 	}
 
-	public static void convert(GrayF32 from, GrayI8 to ) {
+	public static void convert( GrayF32 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1774,7 +1809,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayF32 from, GrayI16 to ) {
+	public static void convert( GrayF32 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1819,7 +1854,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayF32 from, GrayS32 to ) {
+	public static void convert( GrayF32 from, GrayS32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1864,7 +1899,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayF32 from, GrayS64 to ) {
+	public static void convert( GrayF32 from, GrayS64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1909,7 +1944,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayF32 from, GrayF64 to ) {
+	public static void convert( GrayF32 from, GrayF64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1957,34 +1992,40 @@ public class ImplConvertImage {
 	public static void convert( InterleavedF32 input , Planar<GrayF32> output ) {
 
 		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-			
-			for (int x = 0; x < input.width; x++, indexDst++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.bands[i].data[indexDst] = input.data[indexSrc++];
+		for (int i = 0; i < numBands; i++) {
+			GrayF32 band = output.bands[i];
+
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y*input.stride + input.startIndex + i;
+				int indexDst = y*output.stride + output.startIndex;
+				int end = indexDst + input.width;
+				while( indexDst != end ) {
+					band.data[indexDst++] = input.data[indexSrc];
+					indexSrc += numBands;
 				}
 			}
 		}
 	}
 
-	public static void convert(Planar<GrayF32> input , InterleavedF32 output ) {
+	public static void convert( Planar<GrayF32> input , InterleavedF32 output ) {
 
 		final int numBands = input.getNumBands();
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-
-			for (int x = 0; x < input.width; x++, indexSrc++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.data[indexDst++] = input.bands[i].data[indexSrc];
+		for (int i = 0; i < numBands; i++) {
+			GrayF32 band = input.bands[i];
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y * input.stride + input.startIndex;
+				int indexDst = y * output.stride + output.startIndex + i;
+				int end = indexSrc + input.width;
+				
+				while( indexSrc != end ) { 
+					output.data[indexDst] = band.data[indexSrc++];
+					indexDst += numBands;
 				}
 			}
 		}
 	}
 
-	public static void convert(GrayF64 from, GrayI8 to ) {
+	public static void convert( GrayF64 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -2029,7 +2070,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayF64 from, GrayI16 to ) {
+	public static void convert( GrayF64 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -2074,7 +2115,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayF64 from, GrayS32 to ) {
+	public static void convert( GrayF64 from, GrayS32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -2119,7 +2160,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayF64 from, GrayS64 to ) {
+	public static void convert( GrayF64 from, GrayS64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -2164,7 +2205,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert(GrayF64 from, GrayF32 to ) {
+	public static void convert( GrayF64 from, GrayF32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -2212,28 +2253,34 @@ public class ImplConvertImage {
 	public static void convert( InterleavedF64 input , Planar<GrayF64> output ) {
 
 		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-			
-			for (int x = 0; x < input.width; x++, indexDst++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.bands[i].data[indexDst] = input.data[indexSrc++];
+		for (int i = 0; i < numBands; i++) {
+			GrayF64 band = output.bands[i];
+
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y*input.stride + input.startIndex + i;
+				int indexDst = y*output.stride + output.startIndex;
+				int end = indexDst + input.width;
+				while( indexDst != end ) {
+					band.data[indexDst++] = input.data[indexSrc];
+					indexSrc += numBands;
 				}
 			}
 		}
 	}
 
-	public static void convert(Planar<GrayF64> input , InterleavedF64 output ) {
+	public static void convert( Planar<GrayF64> input , InterleavedF64 output ) {
 
 		final int numBands = input.getNumBands();
-		for (int y = 0; y < input.height; y++) {
-			int indexSrc = y*input.stride + input.startIndex;
-			int indexDst = y*output.stride + output.startIndex;
-
-			for (int x = 0; x < input.width; x++, indexSrc++ ) {
-				for (int i = 0; i < numBands; i++) {
-					output.data[indexDst++] = input.bands[i].data[indexSrc];
+		for (int i = 0; i < numBands; i++) {
+			GrayF64 band = input.bands[i];
+			for (int y = 0; y < input.height; y++) {
+				int indexSrc = y * input.stride + input.startIndex;
+				int indexDst = y * output.stride + output.startIndex + i;
+				int end = indexSrc + input.width;
+				
+				while( indexSrc != end ) { 
+					output.data[indexDst] = band.data[indexSrc++];
+					indexDst += numBands;
 				}
 			}
 		}
