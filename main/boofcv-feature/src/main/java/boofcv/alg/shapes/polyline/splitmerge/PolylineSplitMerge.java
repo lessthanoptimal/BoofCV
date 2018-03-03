@@ -714,11 +714,13 @@ public class PolylineSplitMerge {
 		//       changing the signature if the algorithm was changed later on.
 		int length = CircularIndex.distanceP(e0.object.index, e1.object.index, contour.size());
 
+		// needs to be <= to prevent it from trying to split a side less than 1
 		if (length <= minimumSideLength) {
 			return false;
 		}
 
-		return mustSplit || e0.object.sideError >= thresholdSideSplitScore;
+		// threshold is greater than zero ti prevent it from saying it can split a perfect side
+		return mustSplit || e0.object.sideError > thresholdSideSplitScore;
 	}
 
 	/**

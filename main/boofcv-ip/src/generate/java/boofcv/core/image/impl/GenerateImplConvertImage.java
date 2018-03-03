@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,12 +28,6 @@ import java.io.FileNotFoundException;
  * @author Peter Abeles
  */
 public class GenerateImplConvertImage extends CodeGeneratorBase {
-
-	String className = "ImplConvertImage";
-
-	public GenerateImplConvertImage() throws FileNotFoundException {
-		setOutputFile(className);
-	}
 
 	@Override
 	public void generate() throws FileNotFoundException {
@@ -166,13 +160,16 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 				"\tpublic static void convert( "+inputName+" input , Planar<"+bandName+"> output ) {\n" +
 				"\n" +
 				"\t\tfinal int numBands = input.numBands;\n" +
-				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
-				"\t\t\tint indexSrc = y*input.stride + input.startIndex;\n" +
-				"\t\t\tint indexDst = y*output.stride + output.startIndex;\n" +
-				"\t\t\t\n" +
-				"\t\t\tfor (int x = 0; x < input.width; x++, indexDst++ ) {\n" +
-				"\t\t\t\tfor (int i = 0; i < numBands; i++) {\n" +
-				"\t\t\t\t\toutput.bands[i].data[indexDst] = input.data[indexSrc++];\n" +
+				"\t\tfor (int i = 0; i < numBands; i++) {\n" +
+				"\t\t\t"+bandName+" band = output.bands[i];\n" +
+				"\n" +
+				"\t\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\t\tint indexSrc = y*input.stride + input.startIndex + i;\n" +
+				"\t\t\t\tint indexDst = y*output.stride + output.startIndex;\n" +
+				"\t\t\t\tint end = indexDst + input.width;\n" +
+				"\t\t\t\twhile( indexDst != end ) {\n" +
+				"\t\t\t\t\tband.data[indexDst++] = input.data[indexSrc];\n" +
+				"\t\t\t\t\tindexSrc += numBands;\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
@@ -187,13 +184,16 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 				"\tpublic static void convert( Planar<"+bandName+"> input , "+outputName+" output ) {\n" +
 				"\n" +
 				"\t\tfinal int numBands = input.getNumBands();\n" +
-				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
-				"\t\t\tint indexSrc = y*input.stride + input.startIndex;\n" +
-				"\t\t\tint indexDst = y*output.stride + output.startIndex;\n" +
-				"\n" +
-				"\t\t\tfor (int x = 0; x < input.width; x++, indexSrc++ ) {\n" +
-				"\t\t\t\tfor (int i = 0; i < numBands; i++) {\n" +
-				"\t\t\t\t\toutput.data[indexDst++] = input.bands[i].data[indexSrc];\n" +
+				"\t\tfor (int i = 0; i < numBands; i++) {\n" +
+				"\t\t\t"+bandName+" band = input.bands[i];\n" +
+				"\t\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\t\tint indexSrc = y * input.stride + input.startIndex;\n" +
+				"\t\t\t\tint indexDst = y * output.stride + output.startIndex + i;\n" +
+				"\t\t\t\tint end = indexSrc + input.width;\n" +
+				"\t\t\t\t\n" +
+				"\t\t\t\twhile( indexSrc != end ) { \n" +
+				"\t\t\t\t\toutput.data[indexDst] = band.data[indexSrc++];\n" +
+				"\t\t\t\t\tindexDst += numBands;\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
