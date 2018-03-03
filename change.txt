@@ -42,6 +42,7 @@ Version : 0.29
   * Suppressed warning message that has been smalling stderr
 -Camera Calibration
   * Fixed bug where width and height was not assigned to intrinsic during calibration
+  * For universal omni the undistorted window is automatically scaled based on image size
 
 TODO
 

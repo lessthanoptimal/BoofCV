@@ -133,8 +133,6 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel<Came
 	}
 
 	public void setPinholeCenter( double pixelX , double pixelY ) {
-
-		System.out.println("pinhole center "+pixelX);
 		this.pixelX = pixelX;
 		this.pixelY = pixelY;
 
@@ -174,10 +172,13 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel<Came
 		if( !showUndistorted || bufferedRendered == null )
 			return;
 
-		double offX = (pixelX - bufferedRendered.getWidth()/2)*scale;
-		double offY = (pixelY - bufferedRendered.getHeight()/2)*scale;
+		// Ensure that it is 1/2 the size of the input
+		double scaleSize = (img.getWidth()/2)/(double)bufferedRendered.getWidth();
 
-		renderTran.setTransform(scale,0,0,scale,offX,offY);
+		double offX = (pixelX - scaleSize*bufferedRendered.getWidth()/2)*scale;
+		double offY = (pixelY - scaleSize*bufferedRendered.getHeight()/2)*scale;
+
+		renderTran.setTransform(scale*scaleSize,0,0,scale*scaleSize,offX,offY);
 		g2.drawImage(bufferedRendered,renderTran,null);
 	}
 
