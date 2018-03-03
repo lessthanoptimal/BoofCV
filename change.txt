@@ -43,6 +43,8 @@ Version : 0.29
 -Camera Calibration
   * Fixed bug where width and height was not assigned to intrinsic during calibration
   * For universal omni the undistorted window is automatically scaled based on image size
+- ImageConvert
+  * Faster technique to convert between interleaved and planar
 
 TODO
 
