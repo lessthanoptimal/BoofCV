@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,13 +47,17 @@ public class ConvolveImageMean {
 	 */
 	public static void horizontal(GrayF32 input, GrayF32 output, int radius) {
 
-		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,true);
-		if( kernel.width > input.width ) {
-			ConvolveNormalized.horizontal(kernel,input,output);
-		} else {
-			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input ,output );
-			ImplConvolveMean.horizontal(input, output, radius);
+		boolean processed = BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, radius);
+
+		if( !processed ) {
+			Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius, true);
+			if (kernel.width > input.width) {
+				ConvolveNormalized.horizontal(kernel, input, output);
+			} else {
+				InputSanityCheck.checkSameShape(input, output);
+				ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
+				ImplConvolveMean.horizontal(input, output, radius);
+			}
 		}
 	}
 
@@ -67,13 +71,17 @@ public class ConvolveImageMean {
 	 */
 	public static void vertical(GrayF32 input, GrayF32 output, int radius) {
 
-		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,true);
-		if( kernel.width > input.height ) {
-			ConvolveNormalized.vertical(kernel, input, output);
-		} else {
-			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
-			ImplConvolveMean.vertical(input, output, radius);
+		boolean processed = BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius);
+
+		if( !processed ) {
+			Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius, true);
+			if (kernel.width > input.height) {
+				ConvolveNormalized.vertical(kernel, input, output);
+			} else {
+				InputSanityCheck.checkSameShape(input, output);
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
+				ImplConvolveMean.vertical(input, output, radius);
+			}
 		}
 	}
 
@@ -87,13 +95,17 @@ public class ConvolveImageMean {
 	 */
 	public static void horizontal(GrayF64 input, GrayF64 output, int radius) {
 
-		Kernel1D_F64 kernel = FactoryKernel.table1D_F64(radius,true);
-		if( kernel.width > input.width ) {
-			ConvolveNormalized.horizontal(kernel,input,output);
-		} else {
-			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input ,output );
-			ImplConvolveMean.horizontal(input, output, radius);
+		boolean processed = BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, radius);
+
+		if( !processed ) {
+			Kernel1D_F64 kernel = FactoryKernel.table1D_F64(radius, true);
+			if (kernel.width > input.width) {
+				ConvolveNormalized.horizontal(kernel, input, output);
+			} else {
+				InputSanityCheck.checkSameShape(input, output);
+				ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
+				ImplConvolveMean.horizontal(input, output, radius);
+			}
 		}
 	}
 
@@ -107,13 +119,17 @@ public class ConvolveImageMean {
 	 */
 	public static void vertical(GrayF64 input, GrayF64 output, int radius) {
 
-		Kernel1D_F64 kernel = FactoryKernel.table1D_F64(radius,true);
-		if( kernel.width > input.height ) {
-			ConvolveNormalized.vertical(kernel, input, output);
-		} else {
-			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
-			ImplConvolveMean.vertical(input, output, radius);
+		boolean processed = BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius);
+
+		if( !processed ) {
+			Kernel1D_F64 kernel = FactoryKernel.table1D_F64(radius, true);
+			if (kernel.width > input.height) {
+				ConvolveNormalized.vertical(kernel, input, output);
+			} else {
+				InputSanityCheck.checkSameShape(input, output);
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
+				ImplConvolveMean.vertical(input, output, radius);
+			}
 		}
 	}
 
@@ -126,13 +142,18 @@ public class ConvolveImageMean {
 	 * @param radius Kernel size.
 	 */
 	public static void horizontal(GrayU8 input, GrayU8 output, int radius) {
-		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
-		if( kernel.width > input.width ) {
-			ConvolveNormalized.horizontal(kernel,input,output);
-		} else {
-			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input ,output );
-			ImplConvolveMean.horizontal(input, output, radius);
+
+		boolean processed = BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, radius);
+
+		if( !processed ) {
+			Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+			if (kernel.width > input.width) {
+				ConvolveNormalized.horizontal(kernel, input, output);
+			} else {
+				InputSanityCheck.checkSameShape(input, output);
+				ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
+				ImplConvolveMean.horizontal(input, output, radius);
+			}
 		}
 	}
 
@@ -146,13 +167,17 @@ public class ConvolveImageMean {
 	 */
 	public static void vertical(GrayU8 input, GrayI8 output, int radius) {
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
-		if( kernel.width > input.height ) {
-			ConvolveNormalized.vertical(kernel,input,output);
-		} else {
-			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder_SB.vertical(kernel, input ,output );
-			ImplConvolveMean.vertical(input, output, radius);
+		boolean processed = BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius);
+
+		if( !processed ) {
+			Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+			if (kernel.width > input.height) {
+				ConvolveNormalized.vertical(kernel, input, output);
+			} else {
+				InputSanityCheck.checkSameShape(input, output);
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
+				ImplConvolveMean.vertical(input, output, radius);
+			}
 		}
 	}
 
@@ -165,13 +190,18 @@ public class ConvolveImageMean {
 	 * @param radius Kernel size.
 	 */
 	public static void horizontal(GrayS16 input, GrayI16 output, int radius) {
-		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
-		if( kernel.width > input.width ) {
-			ConvolveNormalized.horizontal(kernel,input,output);
-		} else {
-			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input ,output );
-			ImplConvolveMean.horizontal(input, output, radius);
+
+		boolean processed = BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, radius);
+
+		if( !processed ) {
+			Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+			if (kernel.width > input.width) {
+				ConvolveNormalized.horizontal(kernel, input, output);
+			} else {
+				InputSanityCheck.checkSameShape(input, output);
+				ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
+				ImplConvolveMean.horizontal(input, output, radius);
+			}
 		}
 	}
 
@@ -185,13 +215,17 @@ public class ConvolveImageMean {
 	 */
 	public static void vertical(GrayS16 input, GrayI16 output, int radius ) {
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
-		if( kernel.width > input.height ) {
-			ConvolveNormalized.vertical(kernel,input,output);
-		} else {
-			InputSanityCheck.checkSameShape(input , output);
-			ConvolveNormalized_JustBorder_SB.vertical(kernel, input ,output );
-			ImplConvolveMean.vertical(input, output, radius);
+		boolean processed = BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius);
+
+		if( !processed ) {
+			Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+			if (kernel.width > input.height) {
+				ConvolveNormalized.vertical(kernel, input, output);
+			} else {
+				InputSanityCheck.checkSameShape(input, output);
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
+				ImplConvolveMean.vertical(input, output, radius);
+			}
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,9 +54,13 @@ public class ConvolveWithBorder {
 								  GrayF32 input, GrayF32 output , ImageBorder_F32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.horizontal(kernel,input,output);
-		ConvolveJustBorder_General_SB.horizontal(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.horizontal(kernel,input,output);
+			ConvolveJustBorder_General_SB.horizontal(kernel, border,output);
+		}
 	}
 
 	/**
@@ -71,9 +75,13 @@ public class ConvolveWithBorder {
 								  GrayF32 input, GrayF32 output , ImageBorder_F32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.vertical(kernel,input,output);
-		ConvolveJustBorder_General_SB.vertical(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.vertical(kernel,input,output);
+			ConvolveJustBorder_General_SB.vertical(kernel, border,output);
+		}
 	}
 
 	/**
@@ -88,9 +96,13 @@ public class ConvolveWithBorder {
 								  GrayF32 input, GrayF32 output , ImageBorder_F32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.convolve(kernel,input,output);
-		ConvolveJustBorder_General_SB.convolve(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.convolve(kernel,input,output);
+			ConvolveJustBorder_General_SB.convolve(kernel, border,output);
+		}
 	}
 
 	/**
@@ -105,9 +117,13 @@ public class ConvolveWithBorder {
 								  InterleavedF32 input, InterleavedF32 output , ImageBorder_IL_F32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.horizontal(kernel,input,output);
-		ConvolveJustBorder_General_IL.horizontal(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.horizontal(kernel,input,output);
+			ConvolveJustBorder_General_IL.horizontal(kernel, border,output);
+		}
 	}
 
 	/**
@@ -122,9 +138,13 @@ public class ConvolveWithBorder {
 								  InterleavedF32 input, InterleavedF32 output , ImageBorder_IL_F32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.vertical(kernel,input,output);
-		ConvolveJustBorder_General_IL.vertical(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.vertical(kernel,input,output);
+			ConvolveJustBorder_General_IL.vertical(kernel, border,output);
+		}
 	}
 
 	/**
@@ -139,9 +159,13 @@ public class ConvolveWithBorder {
 								  InterleavedF32 input, InterleavedF32 output , ImageBorder_IL_F32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.convolve(kernel,input,output);
-		ConvolveJustBorder_General_IL.convolve(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.convolve(kernel,input,output);
+			ConvolveJustBorder_General_IL.convolve(kernel, border,output);
+		}
 	}
 
 	/**
@@ -156,9 +180,13 @@ public class ConvolveWithBorder {
 								  GrayU8 input, GrayI16 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.horizontal(kernel,input,output);
-		ConvolveJustBorder_General_SB.horizontal(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.horizontal(kernel,input,output);
+			ConvolveJustBorder_General_SB.horizontal(kernel, border,output);
+		}
 	}
 
 	/**
@@ -173,9 +201,13 @@ public class ConvolveWithBorder {
 								  GrayU8 input, GrayI16 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.vertical(kernel,input,output);
-		ConvolveJustBorder_General_SB.vertical(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.vertical(kernel,input,output);
+			ConvolveJustBorder_General_SB.vertical(kernel, border,output);
+		}
 	}
 
 	/**
@@ -190,9 +222,13 @@ public class ConvolveWithBorder {
 								  GrayU8 input, GrayI16 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.convolve(kernel,input,output);
-		ConvolveJustBorder_General_SB.convolve(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.convolve(kernel,input,output);
+			ConvolveJustBorder_General_SB.convolve(kernel, border,output);
+		}
 	}
 
 	/**
@@ -207,9 +243,13 @@ public class ConvolveWithBorder {
 								  InterleavedU8 input, InterleavedI16 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.horizontal(kernel,input,output);
-		ConvolveJustBorder_General_IL.horizontal(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.horizontal(kernel,input,output);
+			ConvolveJustBorder_General_IL.horizontal(kernel, border,output);
+		}
 	}
 
 	/**
@@ -224,9 +264,13 @@ public class ConvolveWithBorder {
 								  InterleavedU8 input, InterleavedI16 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.vertical(kernel,input,output);
-		ConvolveJustBorder_General_IL.vertical(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.vertical(kernel,input,output);
+			ConvolveJustBorder_General_IL.vertical(kernel, border,output);
+		}
 	}
 
 	/**
@@ -241,9 +285,13 @@ public class ConvolveWithBorder {
 								  InterleavedU8 input, InterleavedI16 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.convolve(kernel,input,output);
-		ConvolveJustBorder_General_IL.convolve(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.convolve(kernel,input,output);
+			ConvolveJustBorder_General_IL.convolve(kernel, border,output);
+		}
 	}
 
 	/**
@@ -258,9 +306,13 @@ public class ConvolveWithBorder {
 								  GrayU8 input, GrayS32 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.horizontal(kernel,input,output);
-		ConvolveJustBorder_General_SB.horizontal(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.horizontal(kernel,input,output);
+			ConvolveJustBorder_General_SB.horizontal(kernel, border,output);
+		}
 	}
 
 	/**
@@ -275,9 +327,13 @@ public class ConvolveWithBorder {
 								  GrayU8 input, GrayS32 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.vertical(kernel,input,output);
-		ConvolveJustBorder_General_SB.vertical(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.vertical(kernel,input,output);
+			ConvolveJustBorder_General_SB.vertical(kernel, border,output);
+		}
 	}
 
 	/**
@@ -292,9 +348,13 @@ public class ConvolveWithBorder {
 								  GrayU8 input, GrayS32 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.convolve(kernel,input,output);
-		ConvolveJustBorder_General_SB.convolve(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.convolve(kernel,input,output);
+			ConvolveJustBorder_General_SB.convolve(kernel, border,output);
+		}
 	}
 
 	/**
@@ -309,9 +369,13 @@ public class ConvolveWithBorder {
 								  InterleavedU8 input, InterleavedS32 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.horizontal(kernel,input,output);
-		ConvolveJustBorder_General_IL.horizontal(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.horizontal(kernel,input,output);
+			ConvolveJustBorder_General_IL.horizontal(kernel, border,output);
+		}
 	}
 
 	/**
@@ -326,9 +390,13 @@ public class ConvolveWithBorder {
 								  InterleavedU8 input, InterleavedS32 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.vertical(kernel,input,output);
-		ConvolveJustBorder_General_IL.vertical(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.vertical(kernel,input,output);
+			ConvolveJustBorder_General_IL.vertical(kernel, border,output);
+		}
 	}
 
 	/**
@@ -343,9 +411,13 @@ public class ConvolveWithBorder {
 								  InterleavedU8 input, InterleavedS32 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.convolve(kernel,input,output);
-		ConvolveJustBorder_General_IL.convolve(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.convolve(kernel,input,output);
+			ConvolveJustBorder_General_IL.convolve(kernel, border,output);
+		}
 	}
 
 	/**
@@ -360,9 +432,13 @@ public class ConvolveWithBorder {
 								  GrayS16 input, GrayI16 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.horizontal(kernel,input,output);
-		ConvolveJustBorder_General_SB.horizontal(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.horizontal(kernel,input,output);
+			ConvolveJustBorder_General_SB.horizontal(kernel, border,output);
+		}
 	}
 
 	/**
@@ -377,9 +453,13 @@ public class ConvolveWithBorder {
 								  GrayS16 input, GrayI16 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.vertical(kernel,input,output);
-		ConvolveJustBorder_General_SB.vertical(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.vertical(kernel,input,output);
+			ConvolveJustBorder_General_SB.vertical(kernel, border,output);
+		}
 	}
 
 	/**
@@ -394,9 +474,13 @@ public class ConvolveWithBorder {
 								  GrayS16 input, GrayI16 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.convolve(kernel,input,output);
-		ConvolveJustBorder_General_SB.convolve(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.convolve(kernel,input,output);
+			ConvolveJustBorder_General_SB.convolve(kernel, border,output);
+		}
 	}
 
 	/**
@@ -411,9 +495,13 @@ public class ConvolveWithBorder {
 								  InterleavedS16 input, InterleavedI16 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.horizontal(kernel,input,output);
-		ConvolveJustBorder_General_IL.horizontal(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.horizontal(kernel,input,output);
+			ConvolveJustBorder_General_IL.horizontal(kernel, border,output);
+		}
 	}
 
 	/**
@@ -428,9 +516,13 @@ public class ConvolveWithBorder {
 								  InterleavedS16 input, InterleavedI16 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.vertical(kernel,input,output);
-		ConvolveJustBorder_General_IL.vertical(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.vertical(kernel,input,output);
+			ConvolveJustBorder_General_IL.vertical(kernel, border,output);
+		}
 	}
 
 	/**
@@ -445,9 +537,13 @@ public class ConvolveWithBorder {
 								  InterleavedS16 input, InterleavedI16 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.convolve(kernel,input,output);
-		ConvolveJustBorder_General_IL.convolve(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.convolve(kernel,input,output);
+			ConvolveJustBorder_General_IL.convolve(kernel, border,output);
+		}
 	}
 
 	/**
@@ -462,9 +558,13 @@ public class ConvolveWithBorder {
 								  GrayS32 input, GrayS32 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.horizontal(kernel,input,output);
-		ConvolveJustBorder_General_SB.horizontal(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.horizontal(kernel,input,output);
+			ConvolveJustBorder_General_SB.horizontal(kernel, border,output);
+		}
 	}
 
 	/**
@@ -479,9 +579,13 @@ public class ConvolveWithBorder {
 								  GrayS32 input, GrayS32 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.vertical(kernel,input,output);
-		ConvolveJustBorder_General_SB.vertical(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.vertical(kernel,input,output);
+			ConvolveJustBorder_General_SB.vertical(kernel, border,output);
+		}
 	}
 
 	/**
@@ -496,9 +600,13 @@ public class ConvolveWithBorder {
 								  GrayS32 input, GrayS32 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.convolve(kernel,input,output);
-		ConvolveJustBorder_General_SB.convolve(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.convolve(kernel,input,output);
+			ConvolveJustBorder_General_SB.convolve(kernel, border,output);
+		}
 	}
 
 	/**
@@ -513,9 +621,13 @@ public class ConvolveWithBorder {
 								  InterleavedS32 input, InterleavedS32 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.horizontal(kernel,input,output);
-		ConvolveJustBorder_General_IL.horizontal(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.horizontal(kernel,input,output);
+			ConvolveJustBorder_General_IL.horizontal(kernel, border,output);
+		}
 	}
 
 	/**
@@ -530,9 +642,13 @@ public class ConvolveWithBorder {
 								  InterleavedS32 input, InterleavedS32 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.vertical(kernel,input,output);
-		ConvolveJustBorder_General_IL.vertical(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.vertical(kernel,input,output);
+			ConvolveJustBorder_General_IL.vertical(kernel, border,output);
+		}
 	}
 
 	/**
@@ -547,9 +663,13 @@ public class ConvolveWithBorder {
 								  InterleavedS32 input, InterleavedS32 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		border.setImage(input);
-		ConvolveImageNoBorder.convolve(kernel,input,output);
-		ConvolveJustBorder_General_IL.convolve(kernel, border,output);
+		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+
+		if( !processed ) {
+			border.setImage(input);
+			ConvolveImageNoBorder.convolve(kernel,input,output);
+			ConvolveJustBorder_General_IL.convolve(kernel, border,output);
+		}
 	}
 
 }

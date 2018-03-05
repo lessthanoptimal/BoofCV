@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -108,6 +108,8 @@ public class GenerateConvolveWithBorder extends CodeGeneratorBase {
 		String dimen = name.equals("convolve") ? "2D" : "1D";
 		String docName = name.equals("convolve") ? "" : " "+name;
 
+		String nativeName = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+
 		String suffice = singleBand ? "SB" : "IL";
 		String suffice2 = singleBand ? "" : "B";
 
@@ -125,9 +127,13 @@ public class GenerateConvolveWithBorder extends CodeGeneratorBase {
 				"\t\t\t\t\t\t\t\t  "+inputName+" input, "+outputName+" output , "+borderName+kernelType+" border ) {\n" +
 				"\t\tInputSanityCheck.checkSameShape"+suffice2+"(input, output);\n" +
 				"\n" +
-				"\t\tborder.setImage(input);\n" +
-				"\t\tConvolveImageNoBorder."+name+"(kernel,input,output);\n" +
-				"\t\tConvolveJustBorder_General_"+suffice+"."+name+"(kernel, border,output);\n" +
+				"\t\tboolean processed = BOverrideConvolveWidthBorder.invokeNative"+nativeName+"(kernel,input,output,border);\n" +
+				"\n" +
+				"\t\tif( !processed ) {\n" +
+				"\t\t\tborder.setImage(input);\n" +
+				"\t\t\tConvolveImageNoBorder."+name+"(kernel,input,output);\n" +
+				"\t\t\tConvolveJustBorder_General_"+suffice+"."+name+"(kernel, border,output);\n" +
+				"\t\t}\n" +
 				"\t}\n\n"
 		);
 	}
