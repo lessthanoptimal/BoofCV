@@ -24,12 +24,6 @@ sourceSets {
     }
 }
 
-idea {
-    module {
-        name = "BoofCV Demonstrations"
-    }
-}
-
 // Create a jar which contains all the applications
 task demonstrations(type: Jar) {
     manifest {

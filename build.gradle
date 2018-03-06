@@ -107,6 +107,10 @@ subprojects {
         benchmarkCompile project.sourceSets.experimental.output
         benchmarkCompile project.sourceSets.generate.output
 
+        ['core','generator-annprocess'].each { String a->
+            benchmarkCompile('org.openjdk.jmh:jmh-'+a+':1.19')
+        }
+
     }
 
 //    jar {
@@ -310,7 +314,7 @@ task wrapper(type: Wrapper) {
 assemble.dependsOn(createVersionFile)
 
 // Disable the creation of jars for distribution.  If you don't do this it will crash
-[':main',':examples',':main:checks',':main:autocode',':integration',':demonstrations'].each {String a ->
+[':main',':examples',':main:checks',':main:autocode',':integration'].each {String a ->
     project(a) {
         if( project.hasProperty('ossrhUsername') ) {
             signArchives.enabled = false

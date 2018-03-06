@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,12 +23,20 @@ import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
+import org.openjdk.jmh.annotations.*;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Peter Abeles
  */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value=1)
 public class BenchmarkColorConvert {
 	public static final int imgWidth = 640;
 	public static final int imgHeight = 480;
@@ -39,50 +47,34 @@ public class BenchmarkColorConvert {
 	public static Planar<GrayF32> src_F32;
 	public static Planar<GrayF32> dst_F32;
 
-	public static class RGB_to_HSV_F32 extends PerformerBase {
-
-		@Override
-		public void process() {
-			ColorHsv.rgbToHsv_F32(src_F32,dst_F32);
-		}
-	}
-
-	public static class HSV_to_RGB_F32 extends PerformerBase {
-
-		@Override
-		public void process() {
-			ColorHsv.hsvToRgb_F32(src_F32,dst_F32);
-		}
-	}
-
-	public static class RGB_to_YUV_F32 extends PerformerBase {
-
-		@Override
-		public void process() {
-			ColorYuv.rgbToYuv_F32(src_F32,dst_F32);
-		}
-	}
-
-	public static class YUV_to_RGB_F32 extends PerformerBase {
-
-		@Override
-		public void process() {
-			ColorYuv.yuvToRgb_F32(src_F32,dst_F32);
-		}
-	}
-
-	public static void main( String args[] ) {
-		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
-		System.out.println();
+	{
+//		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
+//		System.out.println();
 
 		src_F32 = new Planar<>(GrayF32.class,imgWidth,imgHeight,3);
 		dst_F32 = new Planar<>(GrayF32.class,imgWidth,imgHeight,3);
 
 		GImageMiscOps.addUniform(src_F32,rand,0,255);
-
-		ProfileOperation.printOpsPerSec(new RGB_to_HSV_F32(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new HSV_to_RGB_F32(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new RGB_to_YUV_F32(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new YUV_to_RGB_F32(),TEST_TIME);
 	}
+
+	@Benchmark
+	public void RGB_to_HSV_F32() {
+		ColorHsv.rgbToHsv_F32(src_F32,dst_F32);
+	}
+
+	@Benchmark
+	public void HSV_to_RGB_F32() {
+		ColorHsv.hsvToRgb_F32(src_F32,dst_F32);
+	}
+
+	@Benchmark
+	public void RGB_to_YUV_F32() {
+		ColorYuv.rgbToYuv_F32(src_F32,dst_F32);
+	}
+
+	@Benchmark
+	public void YUV_to_RGB_F32() {
+		ColorYuv.yuvToRgb_F32(src_F32,dst_F32);
+	}
+
 }
