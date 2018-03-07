@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ package boofcv.core.image.border;
  *
  * @author Peter Abeles
  */
-public class BorderIndex1D_Reflect extends BorderIndex1D{
+public class BorderIndex1D_Reflect extends BorderIndex1D {
 	@Override
 	public int getIndex(int index) {
 		if( index < 0 )

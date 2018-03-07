@@ -20,7 +20,6 @@ package boofcv.alg.filter.blur;
 
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
-import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.ImageBase;
 
 /**
@@ -47,7 +46,7 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 	}
 	
 	public interface Gaussian<T extends ImageBase<T>> {
-		void processGaussian(T input, T output, Kernel1D kernel, T storage );
+		void processGaussian(T input, T output, double sigma , int radius, T storage );
 	}
 
 	public static <T extends ImageBase<T>>
@@ -76,11 +75,11 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 
 	// TODO replace with native normalized?
 	public static <T extends ImageBase<T>>
-	boolean invokeNativeGaussian(T input, T output, Kernel1D kernel, T storage) {
+	boolean invokeNativeGaussian(T input, T output, double sigma , int radius, T storage) {
 		boolean processed = false;
 		if( BOverrideBlurImageOps.gaussian != null ) {
 			try {
-				BOverrideBlurImageOps.gaussian.processGaussian(input,output,kernel,storage);
+				BOverrideBlurImageOps.gaussian.processGaussian(input,output,sigma,radius,storage);
 				processed = true;
 			} catch( RuntimeException ignore ) {}
 		}

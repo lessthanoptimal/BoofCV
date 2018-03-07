@@ -231,11 +231,10 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage,GrayU8.class);
 
-		Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class, sigma, radius);
-
-		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, kernel, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigma,radius, storage);
 
 		if( !processed ) {
+			Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class, sigma, radius);
 			ConvolveNormalized.horizontal(kernel, input, storage);
 			ConvolveNormalized.vertical(kernel, storage, output);
 		}
@@ -248,11 +247,10 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,sigma,radius);
-
-		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, kernel, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigma , radius, storage);
 
 		if( !processed ) {
+			Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,sigma,radius);
 			ConvolveNormalized.horizontal(kernel, input, storage);
 			ConvolveNormalized.vertical(kernel, storage, output);
 		}
@@ -276,11 +274,10 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,sigma, radius);
-
-		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, kernel, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigma,radius, storage);
 
 		if( !processed ) {
+			Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,sigma, radius);
 			ConvolveNormalized.horizontal(kernel, input, storage);
 			ConvolveNormalized.vertical(kernel, storage, output);
 		}
@@ -304,11 +301,10 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		Kernel1D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F64.class,sigma, radius);
-
-		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, kernel, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigma,radius, storage);
 
 		if( !processed ) {
+			Kernel1D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F64.class,sigma, radius);
 			ConvolveNormalized.horizontal(kernel, input, storage);
 			ConvolveNormalized.vertical(kernel, storage, output);
 		}
@@ -321,11 +317,10 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,sigma,radius);
-
-		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, kernel, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigma,radius, storage);
 
 		if( !processed ) {
+			Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,sigma,radius);
 			ConvolveNormalized.horizontal(kernel, input, storage);
 			ConvolveNormalized.vertical(kernel, storage, output);
 		}
@@ -338,11 +333,10 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		Kernel1D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F64.class,sigma,radius);
-
-		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, kernel, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigma,radius, storage);
 
 		if( !processed ) {
+			Kernel1D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F64.class,sigma,radius);
 			ConvolveNormalized.horizontal(kernel, input, storage);
 			ConvolveNormalized.vertical(kernel, storage, output);
 		}
