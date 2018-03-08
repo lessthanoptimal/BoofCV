@@ -26,7 +26,9 @@ import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
+import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilPolygons2D_F64;
+import georegression.struct.line.LineParametric3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -67,8 +69,8 @@ public class QuadPoseEstimator {
 	private Estimate1ofPnP epnp = FactoryMultiView.computePnP_1(EnumPNP.EPNP,50,0);
 
 	// transforms from distorted pixel observation normalized image coordinates
-	private Point2Transform2_F64 pixelToNorm;
-	private Point2Transform2_F64 normToPixel;
+	protected Point2Transform2_F64 pixelToNorm;
+	protected Point2Transform2_F64 normToPixel;
 
 	// storage for inputs to estimation algorithms
 	// observations in normalized image coordinates
@@ -97,6 +99,9 @@ public class QuadPoseEstimator {
 	Quadrilateral_F64 normCorners = new Quadrilateral_F64();
 
 	Point2D_F64 center = new Point2D_F64();
+
+	// used to store the ray pointing from the camera to the marker in marker reference frame
+	LineParametric3D_F64 ray = new LineParametric3D_F64();
 
 	/**
 	 * Constructor which picks reasonable and generally good algorithms for pose estimation.
@@ -139,6 +144,30 @@ public class QuadPoseEstimator {
 		points.get(1).location.set(x1,y1,0);
 		points.get(2).location.set(x2,y2,0);
 		points.get(3).location.set(x3,y3,0);
+	}
+
+	/**
+	 * Given the found solution, compute the the observed pixel would appear on the marker's surface.
+	 * pixel -> normalized pixel -> rotated -> projected on to plane
+	 * @param pixelX (Input) pixel coordinate
+	 * @param pixelY (Input) pixel coordinate
+	 * @param marker (Output) location on the marker
+	 */
+	public void pixelToMarker( double pixelX , double pixelY , Point2D_F64 marker ) {
+
+		// find pointing vector in camera reference frame
+		pixelToNorm.compute(pixelX,pixelY,marker);
+		cameraP3.set(marker.x,marker.y,1);
+
+		// rotate into marker reference frame
+		GeometryMath_F64.multTran(outputFiducialToCamera.R,cameraP3,ray.slope);
+		GeometryMath_F64.multTran(outputFiducialToCamera.R,outputFiducialToCamera.T,ray.p);
+		ray.p.scale(-1);
+
+		double t = -ray.p.z/ray.slope.z;
+
+		marker.x = ray.p.x + ray.slope.x*t;
+		marker.y = ray.p.y + ray.slope.y*t;
 	}
 
 	/**

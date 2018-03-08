@@ -74,6 +74,22 @@ public class TestQuadPoseEstimator {
 
 		assertTrue(found.T.distance(expectedW2C.T)<1e-6);
 		assertTrue(MatrixFeatures_DDRM.isIdentical(found.R, expectedW2C.R,1e-6));
+
+		// project the found markers back onto the marker and see if it returns the expected result
+		Point2D_F64 foundMarker = new Point2D_F64();
+		Point2D_F64 pixel = new Point2D_F64();
+		alg.normToPixel.compute(quadViewed.a.x,quadViewed.a.y,pixel);
+		alg.pixelToMarker(pixel.x,pixel.y, foundMarker);
+		assertTrue(foundMarker.distance(-0.5,0.5) < 1e-6);
+		alg.normToPixel.compute(quadViewed.b.x,quadViewed.b.y,pixel);
+		alg.pixelToMarker(pixel.x,pixel.y, foundMarker);
+		assertTrue(foundMarker.distance(0.5,0.5) < 1e-6);
+		alg.normToPixel.compute(quadViewed.c.x,quadViewed.c.y,pixel);
+		alg.pixelToMarker(pixel.x,pixel.y, foundMarker);
+		assertTrue(foundMarker.distance(0.5,-0.5) < 1e-6);
+		alg.normToPixel.compute(quadViewed.d.x,quadViewed.d.y,pixel);
+		alg.pixelToMarker(pixel.x,pixel.y, foundMarker);
+		assertTrue(foundMarker.distance(-0.5,-0.5) < 1e-6);
 	}
 
 	private void project( Se3_F64 worldToCamera, Point2D_F64 p , Point2D_F64 v ) {

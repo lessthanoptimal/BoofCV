@@ -31,6 +31,7 @@ Version : 0.29
 - QuadPoseEstimator
   * Can specify if input is in pixels or normalized coordinates
   * Deleted unused code that was sketchy
+  * Added function to go from a pixel to a point in the marker frame
 - Added GVersion class that is automatically generated and contains build related information
 - PolylineSplitMerge
   * Added support for segments which don't loop
