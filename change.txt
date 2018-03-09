@@ -48,6 +48,8 @@ Version : 0.29
   * Faster technique to convert between interleaved and planar
 - MultiCameraToEquirectangular
   * Correctly handles NaN in equiToCam transform
+- Started using @Nullable and @NotNull
+  * Primarily in factories where if a config can be null is confusing
 - TODO Consider providing access to point features inside of FiducialDetector
 
 TODO

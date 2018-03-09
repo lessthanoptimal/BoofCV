@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.extract.*;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.struct.image.ImageGray;
+import com.sun.istack.internal.Nullable;
 
 /**
  * Creates {@link boofcv.abst.feature.detect.extract.NonMaxSuppression} for finding local maximums in feature intensity images.
@@ -57,7 +58,7 @@ public class FactoryFeatureExtractor {
 	 * @param config Configuration for extractor
 	 * @return A feature extractor.
 	 */
-	public static NonMaxSuppression nonmax( ConfigExtract config ) {
+	public static NonMaxSuppression nonmax( @Nullable ConfigExtract config ) {
 
 		if( config == null )
 			config = new ConfigExtract();
@@ -100,7 +101,7 @@ public class FactoryFeatureExtractor {
 	 * @param config Configuration for extractor
 	 * @return A feature extractor.
 	 */
-	public static NonMaxSuppression nonmaxCandidate(ConfigExtract config ) {
+	public static NonMaxSuppression nonmaxCandidate( @Nullable ConfigExtract config ) {
 
 		if( config == null )
 			config = new ConfigExtract();
@@ -134,7 +135,7 @@ public class FactoryFeatureExtractor {
 	 * @param maxFeatures maximum allowed features
 	 * @return The NonMaxLimiter
 	 */
-	public static NonMaxLimiter nonmaxLimiter( ConfigExtract config , int maxFeatures ) {
+	public static NonMaxLimiter nonmaxLimiter( @Nullable ConfigExtract config , int maxFeatures ) {
 		NonMaxSuppression nonmax = nonmax(config);
 		return new NonMaxLimiter(nonmax,maxFeatures);
 	}

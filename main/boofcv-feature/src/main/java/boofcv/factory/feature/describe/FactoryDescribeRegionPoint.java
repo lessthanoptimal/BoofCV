@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,7 @@ import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.*;
 import boofcv.struct.image.*;
+import com.sun.istack.internal.Nullable;
 
 import java.util.Random;
 
@@ -55,7 +56,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribeRegionPoint<T,BrightFeature> surfFast(ConfigSurfDescribe.Speed config , Class<T> imageType) {
+	DescribeRegionPoint<T,BrightFeature> surfFast(@Nullable ConfigSurfDescribe.Speed config , Class<T> imageType) {
 
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -75,7 +76,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF color description extractor
 	 */
 	public static <T extends ImageMultiBand<T>, II extends ImageGray<II>>
-	DescribeRegionPoint<T,BrightFeature> surfColorFast(ConfigSurfDescribe.Speed config , ImageType<T> imageType) {
+	DescribeRegionPoint<T,BrightFeature> surfColorFast(@Nullable ConfigSurfDescribe.Speed config , ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -105,7 +106,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribeRegionPoint<T,BrightFeature> surfStable(ConfigSurfDescribe.Stability config, Class<T> imageType) {
+	DescribeRegionPoint<T,BrightFeature> surfStable(@Nullable ConfigSurfDescribe.Stability config, Class<T> imageType) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
@@ -155,8 +156,8 @@ public class FactoryDescribeRegionPoint {
 	 * @return SIFT descriptor
 	 */
 	public static <T extends ImageGray<T>>
-	DescribeRegionPoint<T,TupleDesc_F64> sift(
-			ConfigSiftScaleSpace configSS, ConfigSiftDescribe configDescribe, Class<T> imageType)
+	DescribeRegionPoint<T,TupleDesc_F64> sift( @Nullable ConfigSiftScaleSpace configSS,
+											   @Nullable ConfigSiftDescribe configDescribe, Class<T> imageType)
 	{
 		if( configSS == null )
 			configSS = new ConfigSiftScaleSpace();
@@ -183,7 +184,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return BRIEF descriptor
 	 */
 	public static <T extends ImageGray<T>>
-	DescribeRegionPoint<T,TupleDesc_B> brief( ConfigBrief config , Class<T> imageType)
+	DescribeRegionPoint<T,TupleDesc_B> brief( @Nullable ConfigBrief config , Class<T> imageType)
 	{
 		if( config == null )
 			config = new ConfigBrief();

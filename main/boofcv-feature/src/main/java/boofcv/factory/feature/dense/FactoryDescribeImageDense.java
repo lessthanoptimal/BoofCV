@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import com.sun.istack.internal.Nullable;
 
 /**
  * Factory for creating {@link DescribeImageDense}.
@@ -56,7 +57,7 @@ public class FactoryDescribeImageDense {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribeImageDense<T,TupleDesc_F64> surfFast(ConfigDenseSurfFast config , Class<T> imageType)
+	DescribeImageDense<T,TupleDesc_F64> surfFast(@Nullable ConfigDenseSurfFast config , Class<T> imageType)
 	{
 		if( config == null )
 			config = new ConfigDenseSurfFast();
@@ -82,7 +83,7 @@ public class FactoryDescribeImageDense {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribeImageDense<T,TupleDesc_F64> surfStable( ConfigDenseSurfStable config,
+	DescribeImageDense<T,TupleDesc_F64> surfStable(@Nullable ConfigDenseSurfStable config,
 												   Class<T> imageType) {
 
 		if( config == null )
@@ -107,7 +108,7 @@ public class FactoryDescribeImageDense {
 	 * @return Dense SIFT
 	 */
 	public static <T extends ImageGray<T>>
-	DescribeImageDense<T,TupleDesc_F64> sift(ConfigDenseSift config , Class<T> imageType ) {
+	DescribeImageDense<T,TupleDesc_F64> sift(@Nullable ConfigDenseSift config , Class<T> imageType ) {
 		if( config == null )
 			config = new ConfigDenseSift();
 
@@ -135,7 +136,7 @@ public class FactoryDescribeImageDense {
 	 * @return Dense HOG extractor
 	 */
 	public static <T extends ImageBase<T>>
-	DescribeImageDense<T,TupleDesc_F64> hog(ConfigDenseHoG config , ImageType<T> imageType ) {
+	DescribeImageDense<T,TupleDesc_F64> hog(@Nullable ConfigDenseHoG config , ImageType<T> imageType ) {
 		if( config == null )
 			config = new ConfigDenseHoG();
 

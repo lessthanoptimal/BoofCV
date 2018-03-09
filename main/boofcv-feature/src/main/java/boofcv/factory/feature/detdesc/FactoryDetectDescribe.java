@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,6 +49,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
+import com.sun.istack.internal.Nullable;
 
 /**
  * Creates instances of {@link DetectDescribePoint} for different feature detectors/describers.
@@ -66,7 +67,7 @@ public class FactoryDetectDescribe {
 	 * @return SIFT
 	 */
 	public static <T extends ImageGray<T>>
-	DetectDescribePoint<T,BrightFeature> sift(ConfigCompleteSift config )
+	DetectDescribePoint<T,BrightFeature> sift( @Nullable ConfigCompleteSift config )
 	{
 		if( config == null )
 			config = new ConfigCompleteSift();
@@ -112,10 +113,10 @@ public class FactoryDetectDescribe {
 	 * @return SURF detector and descriptor
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DetectDescribePoint<T,BrightFeature> surfFast(ConfigFastHessian configDetector ,
-												  ConfigSurfDescribe.Speed configDesc,
-												  ConfigAverageIntegral configOrientation,
-												  Class<T> imageType) {
+	DetectDescribePoint<T,BrightFeature> surfFast( @Nullable ConfigFastHessian configDetector ,
+												   @Nullable ConfigSurfDescribe.Speed configDesc,
+												   @Nullable ConfigAverageIntegral configOrientation,
+												   Class<T> imageType) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
@@ -143,10 +144,10 @@ public class FactoryDetectDescribe {
 	 * @return SURF detector and descriptor
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DetectDescribePoint<T,BrightFeature> surfColorFast(ConfigFastHessian configDetector ,
-													   ConfigSurfDescribe.Speed configDesc,
-													   ConfigAverageIntegral configOrientation,
-													   ImageType<T> imageType) {
+	DetectDescribePoint<T,BrightFeature> surfColorFast( @Nullable ConfigFastHessian configDetector ,
+														@Nullable ConfigSurfDescribe.Speed configDesc,
+														@Nullable ConfigAverageIntegral configOrientation,
+														ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -190,10 +191,10 @@ public class FactoryDetectDescribe {
 	 * @return SURF detector and descriptor
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DetectDescribePoint<T,BrightFeature> surfStable(ConfigFastHessian configDetector,
-													ConfigSurfDescribe.Stability configDescribe,
-													ConfigSlidingIntegral configOrientation,
-													Class<T> imageType ) {
+	DetectDescribePoint<T,BrightFeature> surfStable( @Nullable ConfigFastHessian configDetector,
+													 @Nullable ConfigSurfDescribe.Stability configDescribe,
+													 @Nullable ConfigSlidingIntegral configOrientation,
+													 Class<T> imageType ) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
@@ -222,10 +223,10 @@ public class FactoryDetectDescribe {
 	 * @return SURF detector and descriptor
 	 */
 	public static <T extends ImageMultiBand<T>, II extends ImageGray<II>>
-	DetectDescribePoint<T,BrightFeature> surfColorStable(ConfigFastHessian configDetector,
-														 ConfigSurfDescribe.Stability configDescribe,
-														 ConfigSlidingIntegral configOrientation,
-														 ImageType<T> imageType ) {
+	DetectDescribePoint<T,BrightFeature> surfColorStable( @Nullable ConfigFastHessian configDetector,
+														  @Nullable ConfigSurfDescribe.Stability configDescribe,
+														  @Nullable ConfigSlidingIntegral configOrientation,
+														  ImageType<T> imageType ) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -258,7 +259,7 @@ public class FactoryDetectDescribe {
 	 */
 	public static <T extends ImageGray<T>, D extends TupleDesc>
 	DetectDescribePoint<T,D> fuseTogether( InterestPointDetector<T> detector,
-										   OrientationImage<T> orientation,
+										   @Nullable OrientationImage<T> orientation,
 										   DescribeRegionPoint<T, D> describe) {
 		return new DetectDescribeFusion<>(detector, orientation, describe);
 	}

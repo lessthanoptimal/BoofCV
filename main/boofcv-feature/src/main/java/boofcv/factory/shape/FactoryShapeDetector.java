@@ -27,6 +27,8 @@ import boofcv.alg.shapes.ellipse.SnapToEllipseEdge;
 import boofcv.alg.shapes.polygon.*;
 import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
 import boofcv.struct.image.ImageGray;
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 
 /**
  * Factory for detecting higher level shapes
@@ -45,7 +47,7 @@ public class FactoryShapeDetector {
 	 * @return Detecto
 	 */
 	public static <T extends ImageGray<T>>
-	BinaryEllipseDetector<T> ellipse(ConfigEllipseDetector config , Class<T> imageType )
+	BinaryEllipseDetector<T> ellipse(@Nullable ConfigEllipseDetector config , Class<T> imageType )
 	{
 		if( config == null )
 			config = new ConfigEllipseDetector();
@@ -85,7 +87,7 @@ public class FactoryShapeDetector {
 	 * @return Detector
 	 */
 	public static <T extends ImageGray<T>>
-	DetectPolygonBinaryGrayRefine<T> polygon(ConfigPolygonDetector config, Class<T> imageType)
+	DetectPolygonBinaryGrayRefine<T> polygon(@Nullable ConfigPolygonDetector config, Class<T> imageType)
 	{
 		config.checkValidity();
 
@@ -102,7 +104,7 @@ public class FactoryShapeDetector {
 	}
 
 	public static <T extends ImageGray<T>>
-	DetectPolygonFromContour<T> polygonContour(ConfigPolygonFromContour config, Class<T> imageType)
+	DetectPolygonFromContour<T> polygonContour(@NotNull ConfigPolygonFromContour config, Class<T> imageType)
 	{
 		config.checkValidity();
 
@@ -120,7 +122,7 @@ public class FactoryShapeDetector {
 	}
 
 	public static <T extends ImageGray<T>>
-	RefinePolygonToGray<T> refinePolygon(ConfigRefinePolygonLineToImage config , Class<T> imageType ) {
+	RefinePolygonToGray<T> refinePolygon(@NotNull ConfigRefinePolygonLineToImage config , Class<T> imageType ) {
 		return new RefinePolygonToGrayLine<>(
 				config.cornerOffset, config.lineSamples,
 				config.sampleRadius, config.maxIterations,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,6 +37,7 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.derivative.FactoryDerivativeSparse;
 import boofcv.struct.image.ImageGray;
+import com.sun.istack.internal.Nullable;
 
 /**
  * Factory for non-generic specific implementations of interest point detection algorithms.
@@ -166,7 +167,7 @@ public class FactoryInterestPointAlgs {
 	 * @return The feature detector
 	 */
 	public static <II extends ImageGray<II>>
-	FastHessianFeatureDetector<II> fastHessian( ConfigFastHessian config ) {
+	FastHessianFeatureDetector<II> fastHessian( @Nullable ConfigFastHessian config ) {
 
 		if( config == null )
 			config = new ConfigFastHessian();
@@ -183,7 +184,7 @@ public class FactoryInterestPointAlgs {
 	/**
 	 * Creates a SIFT detector
 	 */
-	public static SiftDetector sift(ConfigSiftScaleSpace configSS , ConfigSiftDetector configDetector ) {
+	public static SiftDetector sift( @Nullable ConfigSiftScaleSpace configSS , @Nullable ConfigSiftDetector configDetector ) {
 
 		if( configSS == null )
 			configSS = new ConfigSiftScaleSpace();

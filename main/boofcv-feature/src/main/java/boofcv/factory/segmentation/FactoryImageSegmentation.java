@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.alg.segmentation.slic.SegmentSlic;
 import boofcv.alg.segmentation.watershed.WatershedVincentSoille1991;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import com.sun.istack.internal.Nullable;
 
 /**
  * Factory for {@link ImageSuperpixels} algorithms, which are used to segment the image into super pixels.
@@ -44,7 +45,7 @@ public class FactoryImageSegmentation {
 	 * @return new instance of {@link ImageSuperpixels}
 	 */
 	public static <T extends ImageBase<T>>ImageSuperpixels<T>
-	meanShift( ConfigSegmentMeanShift config ,  ImageType<T> imageType )
+	meanShift(@Nullable ConfigSegmentMeanShift config , ImageType<T> imageType )
 	{
 		if( config == null )
 			config = new ConfigSegmentMeanShift();
@@ -65,7 +66,7 @@ public class FactoryImageSegmentation {
 	 * @return new instance of {@link ImageSuperpixels}
 	 */
 	public static <T extends ImageBase<T>>ImageSuperpixels<T>
-	slic( ConfigSlic config , ImageType<T> imageType )
+	slic( @Nullable ConfigSlic config , ImageType<T> imageType )
 	{
 		SegmentSlic<T> ms = FactorySegmentationAlg.slic(config, imageType);
 
@@ -83,7 +84,7 @@ public class FactoryImageSegmentation {
 	 * @return new instance of {@link ImageSuperpixels}
 	 */
 	public static <T extends ImageBase<T>>ImageSuperpixels<T>
-	fh04( ConfigFh04 config , ImageType<T> imageType )
+	fh04( @Nullable ConfigFh04 config , ImageType<T> imageType )
 	{
 		if( config == null )
 			config = new ConfigFh04();
@@ -106,7 +107,7 @@ public class FactoryImageSegmentation {
 	 * @return new instance of {@link ImageSuperpixels}
 	 */
 	public static <T extends ImageBase<T>>ImageSuperpixels<T>
-	watershed( ConfigWatershed config , ImageType<T> imageType )
+	watershed( @Nullable ConfigWatershed config , ImageType<T> imageType )
 	{
 		if( config == null )
 			config = new ConfigWatershed();

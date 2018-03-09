@@ -20,6 +20,8 @@ package boofcv.factory.shape;
 
 import boofcv.abst.shapes.polyline.*;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFit;
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 
 /**
  * Factory for creating instances of {@link PointsToPolyline}
@@ -31,7 +33,7 @@ public class FactoryPointsToPolyline {
 	/**
 	 * Generic function for create polyline algorithms based on configuration type
 	 */
-	public static PointsToPolyline create( ConfigPolyline config ) {
+	public static PointsToPolyline create( @NotNull ConfigPolyline config ) {
 		if( config instanceof ConfigSplitMergeLineFit ) {
 			return splitMerge((ConfigSplitMergeLineFit)config);
 		} else if( config instanceof ConfigPolylineSplitMerge ) {
@@ -50,7 +52,7 @@ public class FactoryPointsToPolyline {
 	 * @return {@link SplitMergeLineRefine_to_PointsToPolyline}
 	 */
 	@Deprecated
-	public static PointsToPolyline splitMerge(ConfigSplitMergeLineFit config ) {
+	public static PointsToPolyline splitMerge(@Nullable ConfigSplitMergeLineFit config ) {
 		if( config == null )
 			config = new ConfigSplitMergeLineFit();
 		config.checkValidity();
@@ -58,7 +60,7 @@ public class FactoryPointsToPolyline {
 				config.splitFraction, config.minimumSide,config.iterations,config.refine,config.pruneSplitPenalty,config.loop);
 	}
 
-	public static PointsToPolyline splitMerge(ConfigPolylineSplitMerge config ) {
+	public static PointsToPolyline splitMerge(@Nullable ConfigPolylineSplitMerge config ) {
 		if( config == null )
 			config = new ConfigPolylineSplitMerge();
 		config.checkValidity();

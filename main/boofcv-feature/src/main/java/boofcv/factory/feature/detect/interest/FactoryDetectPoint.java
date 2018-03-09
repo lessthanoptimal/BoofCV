@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,7 @@ import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import com.sun.istack.internal.Nullable;
 
 /**
  * <p>
@@ -59,8 +60,8 @@ public class FactoryDetectPoint {
 	 * @see boofcv.alg.feature.detect.intensity.HarrisCornerIntensity
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createHarris(ConfigGeneralDetector configDetector,
-											  boolean weighted, Class<D> derivType) {
+	GeneralFeatureDetector<T, D> createHarris( @Nullable ConfigGeneralDetector configDetector,
+											   boolean weighted, Class<D> derivType) {
 		if( configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
@@ -78,8 +79,8 @@ public class FactoryDetectPoint {
 	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createShiTomasi(ConfigGeneralDetector configDetector,
-												 boolean weighted, Class<D> derivType) {
+	GeneralFeatureDetector<T, D> createShiTomasi( @Nullable ConfigGeneralDetector configDetector,
+												  boolean weighted, Class<D> derivType) {
 		if( configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
@@ -96,7 +97,7 @@ public class FactoryDetectPoint {
 	 * @see boofcv.alg.feature.detect.intensity.KitRosCornerIntensity
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createKitRos(ConfigGeneralDetector configDetector, Class<D> derivType) {
+	GeneralFeatureDetector<T, D> createKitRos(@Nullable ConfigGeneralDetector configDetector, Class<D> derivType) {
 		if( configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
@@ -114,7 +115,7 @@ public class FactoryDetectPoint {
 	 */
 	@SuppressWarnings("UnnecessaryLocalVariable")
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createFast( ConfigFast configFast ,
+	GeneralFeatureDetector<T, D> createFast( @Nullable ConfigFast configFast ,
 											 ConfigGeneralDetector configDetector , Class<T> imageType) {
 
 		if( configFast == null )
@@ -138,7 +139,7 @@ public class FactoryDetectPoint {
 	 * @see boofcv.alg.feature.detect.intensity.MedianCornerIntensity
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createMedian(ConfigGeneralDetector configDetector, Class<T> imageType) {
+	GeneralFeatureDetector<T, D> createMedian(@Nullable ConfigGeneralDetector configDetector, Class<T> imageType) {
 
 		if( configDetector == null)
 			configDetector = new ConfigGeneralDetector();
@@ -158,7 +159,7 @@ public class FactoryDetectPoint {
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createHessian(HessianBlobIntensity.Type type,
-											   ConfigGeneralDetector configDetector, Class<D> derivType) {
+											   @Nullable ConfigGeneralDetector configDetector, Class<D> derivType) {
 		if( configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,6 +35,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
+import com.sun.istack.internal.Nullable;
 
 /**
  * Creates implementations of {@link DenseOpticalFlow}.
@@ -57,7 +58,7 @@ public class FactoryDenseOpticalFlow {
 	 * @return DenseOpticalFlow
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	DenseOpticalFlow<I> flowKlt( PkltConfig configKlt, int radius , Class<I> inputType , Class<D> derivType ) {
+	DenseOpticalFlow<I> flowKlt(@Nullable PkltConfig configKlt, int radius , Class<I> inputType , Class<D> derivType ) {
 
 		if( configKlt == null )
 			configKlt = new PkltConfig();
@@ -90,7 +91,7 @@ public class FactoryDenseOpticalFlow {
 	 * @return
 	 */
 	public static <T extends ImageGray<T>>
-	DenseOpticalFlow<T> region( ConfigOpticalFlowBlockPyramid config , Class<T> imageType )
+	DenseOpticalFlow<T> region( @Nullable ConfigOpticalFlowBlockPyramid config , Class<T> imageType )
 	{
 		if( config == null )
 			config = new ConfigOpticalFlowBlockPyramid();
@@ -118,7 +119,7 @@ public class FactoryDenseOpticalFlow {
 	 * @return dense optical flow
 	 */
 	public static <T extends ImageGray<T>,D extends ImageGray<D>>
-	DenseOpticalFlow<T> hornSchunck( ConfigHornSchunck config , Class<T> imageType )
+	DenseOpticalFlow<T> hornSchunck( @Nullable ConfigHornSchunck config , Class<T> imageType )
 	{
 		if( config == null )
 			config = new ConfigHornSchunck();
@@ -144,7 +145,7 @@ public class FactoryDenseOpticalFlow {
 	 * @return Dense optical flow implementation of HornSchunckPyramid
 	 */
 	public static <T extends ImageGray<T>>
-	DenseOpticalFlow<T> hornSchunckPyramid( ConfigHornSchunckPyramid config , Class<T> imageType )
+	DenseOpticalFlow<T> hornSchunckPyramid( @Nullable ConfigHornSchunckPyramid config , Class<T> imageType )
 	{
 		if( config == null )
 			config = new ConfigHornSchunckPyramid();

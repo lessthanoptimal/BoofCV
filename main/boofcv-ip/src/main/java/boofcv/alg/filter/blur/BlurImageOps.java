@@ -30,6 +30,7 @@ import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
+import com.sun.istack.internal.Nullable;
 
 /**
  * Catch all class for function which "blur" an image, typically used to "reduce" the amount
@@ -48,7 +49,7 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayU8 mean(GrayU8 input, GrayU8 output, int radius, GrayU8 storage) {
+	public static GrayU8 mean(GrayU8 input, @Nullable GrayU8 output, int radius, @Nullable GrayU8 storage) {
 
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
@@ -75,7 +76,7 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayF32 mean(GrayF32 input, GrayF32 output, int radius, GrayF32 storage) {
+	public static GrayF32 mean(GrayF32 input, @Nullable GrayF32 output, int radius, @Nullable GrayF32 storage) {
 
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
@@ -102,7 +103,7 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayF64 mean(GrayF64 input, GrayF64 output, int radius, GrayF64 storage) {
+	public static GrayF64 mean(GrayF64 input, @Nullable GrayF64 output, int radius, @Nullable GrayF64 storage) {
 
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
@@ -131,7 +132,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageGray<T>>
-	Planar<T> mean(Planar<T> input, Planar<T> output, int radius , T storage ) {
+	Planar<T> mean(Planar<T> input, @Nullable Planar<T> output, int radius , @Nullable T storage ) {
 
 		if( storage == null )
 			storage = GeneralizedImageOps.createSingleBand(input.getBandType(),input.width,input.height);
@@ -152,7 +153,7 @@ public class BlurImageOps {
 	 * @param radius Radius of the median blur function.
 	 * @return Output blurred image.
 	 */
-	public static GrayU8 median(GrayU8 input, GrayU8 output, int radius) {
+	public static GrayU8 median(GrayU8 input, @Nullable GrayU8 output, int radius) {
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -180,7 +181,7 @@ public class BlurImageOps {
 	 * @param radius Radius of the median blur function.
 	 * @return Output blurred image.
 	 */
-	public static GrayF32 median(GrayF32 input, GrayF32 output, int radius) {
+	public static GrayF32 median(GrayF32 input, @Nullable GrayF32 output, int radius) {
 
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
@@ -205,7 +206,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageGray<T>>
-	Planar<T> median(Planar<T> input, Planar<T> output, int radius ) {
+	Planar<T> median(Planar<T> input, @Nullable Planar<T> output, int radius ) {
 
 		if( output == null )
 			output = input.createNew(input.width,input.height);
@@ -226,8 +227,8 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayU8 gaussian(GrayU8 input, GrayU8 output, double sigma , int radius,
-								  GrayU8 storage ) {
+	public static GrayU8 gaussian(GrayU8 input, @Nullable GrayU8 output, double sigma , int radius,
+								  @Nullable GrayU8 storage ) {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage,GrayU8.class);
 
@@ -242,8 +243,9 @@ public class BlurImageOps {
 		return output;
 	}
 
-	public static InterleavedU8 gaussian(InterleavedU8 input, InterleavedU8 output, double sigma , int radius,
-								  InterleavedU8 storage ) {
+	public static InterleavedU8 gaussian(InterleavedU8 input, @Nullable InterleavedU8 output,
+										 double sigma , int radius,
+										 InterleavedU8 storage ) {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
@@ -268,9 +270,9 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayF32 gaussian(GrayF32 input, GrayF32 output,
+	public static GrayF32 gaussian(GrayF32 input, @Nullable GrayF32 output,
 								   double sigma , int radius,
-								   GrayF32 storage ) {
+								   @Nullable GrayF32 storage ) {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
@@ -295,9 +297,9 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayF64 gaussian(GrayF64 input, GrayF64 output,
+	public static GrayF64 gaussian(GrayF64 input, @Nullable GrayF64 output,
 								   double sigma , int radius,
-								   GrayF64 storage ) {
+								   @Nullable GrayF64 storage ) {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
@@ -312,8 +314,8 @@ public class BlurImageOps {
 		return output;
 	}
 
-	public static InterleavedF32 gaussian(InterleavedF32 input, InterleavedF32 output, double sigma , int radius,
-										  InterleavedF32 storage ) {
+	public static InterleavedF32 gaussian(InterleavedF32 input, @Nullable InterleavedF32 output,
+										  double sigma , int radius, @Nullable InterleavedF32 storage ) {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
@@ -328,8 +330,8 @@ public class BlurImageOps {
 		return output;
 	}
 
-	public static InterleavedF64 gaussian(InterleavedF64 input, InterleavedF64 output, double sigma , int radius,
-										  InterleavedF64 storage ) {
+	public static InterleavedF64 gaussian(InterleavedF64 input, @Nullable InterleavedF64 output,
+										  double sigma , int radius, @Nullable InterleavedF64 storage ) {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
@@ -356,7 +358,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageGray<T>>
-	Planar<T> gaussian(Planar<T> input, Planar<T> output, double sigma , int radius, T storage ) {
+	Planar<T> gaussian(Planar<T> input, @Nullable Planar<T> output, double sigma , int radius, @Nullable T storage ) {
 
 		if( storage == null )
 			storage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);

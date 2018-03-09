@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.filter.blur;
 
 import boofcv.struct.image.*;
+import com.sun.istack.internal.Nullable;
 
 
 /**
@@ -41,7 +42,7 @@ public class GBlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase<T>>
-	T mean(T input, T output, int radius, ImageBase storage ) {
+	T mean(T input, @Nullable T output, int radius, @Nullable ImageBase storage ) {
 		if( input instanceof GrayU8) {
 			return (T)BlurImageOps.mean((GrayU8)input,(GrayU8)output,radius,(GrayU8)storage);
 		} else if( input instanceof GrayF32) {
@@ -65,7 +66,7 @@ public class GBlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase<T>>
-	T median(T input, T output, int radius ) {
+	T median(T input, @Nullable T output, int radius ) {
 		if( input instanceof GrayU8) {
 			return (T)BlurImageOps.median((GrayU8) input, (GrayU8) output, radius);
 		} else if( input instanceof GrayF32) {
@@ -89,7 +90,7 @@ public class GBlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase<T>>
-	T gaussian(T input, T output, double sigma , int radius, ImageBase storage ) {
+	T gaussian(T input, @Nullable T output, double sigma , int radius, @Nullable ImageBase storage ) {
 		switch( input.getImageType().getFamily() ) {
 			case GRAY: {
 				if (input instanceof GrayU8) {

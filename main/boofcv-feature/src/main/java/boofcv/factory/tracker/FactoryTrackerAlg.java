@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
+import com.sun.istack.internal.Nullable;
 
 /**
  * Factory for creating feature trackers algorithms.
@@ -52,7 +53,7 @@ public class FactoryTrackerAlg {
 	 * @return Tracker
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	KltTracker<I, D> klt( KltConfig config, Class<I> imageType , Class<D> derivType )
+	KltTracker<I, D> klt(@Nullable KltConfig config, Class<I> imageType , Class<D> derivType )
 	{
 		if( config == null )
 			config = new KltConfig();
@@ -78,7 +79,7 @@ public class FactoryTrackerAlg {
 	 * @return Tracker
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	PyramidKltTracker<I, D> kltPyramid( KltConfig config,
+	PyramidKltTracker<I, D> kltPyramid( @Nullable KltConfig config,
 										Class<I> imageType ,
 										Class<D> derivType )
 	{
@@ -107,9 +108,9 @@ public class FactoryTrackerAlg {
 	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
 	CombinedTrackerScalePoint<I,D,Desc> combined(DetectDescribePoint<I, Desc> detector,
 												 AssociateDescription<Desc> associate,
-												 PkltConfig kltConfig ,
+												 @Nullable PkltConfig kltConfig ,
 												 Class<I> imageType,
-												 Class<D> derivType)
+												 @Nullable Class<D> derivType)
 	{
 		if( kltConfig == null)
 			kltConfig = new PkltConfig();

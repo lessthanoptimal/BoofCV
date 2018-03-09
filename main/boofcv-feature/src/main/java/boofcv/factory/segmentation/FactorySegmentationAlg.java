@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,8 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 
 /**
  * Factory for low level segmentation algorithms.
@@ -78,7 +80,7 @@ public class FactorySegmentationAlg {
 	 * @return SegmentMeanShift
 	 */
 	public static<T extends ImageBase<T>>
-	SegmentMeanShift<T> meanShift( ConfigSegmentMeanShift config,  ImageType<T> imageType )
+	SegmentMeanShift<T> meanShift(@Nullable ConfigSegmentMeanShift config, ImageType<T> imageType )
 	{
 		if( config == null )
 			config = new ConfigSegmentMeanShift();
@@ -152,7 +154,7 @@ public class FactorySegmentationAlg {
 	}
 
 	public static<T extends ImageBase<T>>
-	SegmentFelzenszwalbHuttenlocher04<T> fh04(ConfigFh04 config, ImageType<T> imageType)
+	SegmentFelzenszwalbHuttenlocher04<T> fh04(@Nullable ConfigFh04 config, ImageType<T> imageType)
 	{
 
 		if( config == null )
@@ -171,7 +173,7 @@ public class FactorySegmentationAlg {
 	}
 
 	public static<T extends ImageBase<T>>
-	SegmentSlic<T> slic( ConfigSlic config , ImageType<T> imageType )
+	SegmentSlic<T> slic(@NotNull ConfigSlic config , ImageType<T> imageType )
 	{
 		if( config == null )
 			throw new IllegalArgumentException("No default configuration since the number of segments must be specified.");

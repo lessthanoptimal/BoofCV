@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import com.sun.istack.internal.Nullable;
 
 
 /**
@@ -42,7 +43,7 @@ import boofcv.struct.image.ImageGray;
 public class FactoryDescribePointAlgs {
 
 	public static <T extends ImageGray<T>>
-	DescribePointSurf<T> surfSpeed(ConfigSurfDescribe.Speed config, Class<T> imageType) {
+	DescribePointSurf<T> surfSpeed(@Nullable ConfigSurfDescribe.Speed config, Class<T> imageType) {
 		if( config == null )
 			config = new ConfigSurfDescribe.Speed();
 		config.checkValidity();
@@ -53,7 +54,7 @@ public class FactoryDescribePointAlgs {
 	}
 
 	public static <T extends ImageGray<T>>
-	DescribePointSurfMod<T> surfStability(ConfigSurfDescribe.Stability config, Class<T> imageType) {
+	DescribePointSurfMod<T> surfStability(@Nullable ConfigSurfDescribe.Stability config, Class<T> imageType) {
 		if( config == null )
 			config = new ConfigSurfDescribe.Stability();
 		config.checkValidity();
@@ -96,7 +97,7 @@ public class FactoryDescribePointAlgs {
 	}
 
 	public static <T extends ImageGray<T>>
-	DescribePointSift<T> sift(ConfigSiftDescribe config , Class<T> derivType ) {
+	DescribePointSift<T> sift(@Nullable ConfigSiftDescribe config , Class<T> derivType ) {
 		if( config == null )
 			config = new ConfigSiftDescribe();
 

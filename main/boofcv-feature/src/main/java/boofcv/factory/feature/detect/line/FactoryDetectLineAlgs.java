@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.ImageGray;
+import com.sun.istack.internal.Nullable;
 import georegression.fitting.line.ModelManagerLinePolar2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
 import org.ddogleg.fitting.modelset.ModelMatcher;
@@ -103,7 +104,7 @@ public class FactoryDetectLineAlgs {
 	 * @return Line detector.
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	DetectLineHoughFoot<I,D> houghFoot(ConfigHoughFoot config ,
+	DetectLineHoughFoot<I,D> houghFoot(@Nullable ConfigHoughFoot config ,
 									   Class<I> imageType ,
 									   Class<D> derivType ) {
 
@@ -130,7 +131,7 @@ public class FactoryDetectLineAlgs {
 	 * @return Line detector.
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	DetectLineHoughFootSubimage<I,D> houghFootSub(ConfigHoughFootSubimage config ,
+	DetectLineHoughFootSubimage<I,D> houghFootSub(@Nullable ConfigHoughFootSubimage config ,
 												  Class<I> imageType ,
 												  Class<D> derivType ) {
 
