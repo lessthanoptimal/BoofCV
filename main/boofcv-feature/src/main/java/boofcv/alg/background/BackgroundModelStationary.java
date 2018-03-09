@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,18 @@ public abstract class BackgroundModelStationary<T extends ImageBase<T>> extends 
 	 *  Updates the background with new image information.
 	 */
 	public abstract void updateBackground( T frame );
+
+	// TODO remove the regular update function? Just updating the background is a not very common task
+	// how much effort is it to implement both for GMM?
+
+	/**
+	 * Updates the background and segments it at the same time. Segmentation is performed using the model
+	 * which it has prior to the update.
+	 */
+	public void updateBackground( T frame , GrayU8 segment ) {
+		updateBackground(frame);
+		segment(frame,segment);
+	}
 
 	/**
 	 * Invoke to segment input image into background and foreground pixels. If 'segmented' isn't the
