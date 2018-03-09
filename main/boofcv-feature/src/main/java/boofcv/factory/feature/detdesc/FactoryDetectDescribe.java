@@ -49,7 +49,8 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
-import com.sun.istack.internal.Nullable;
+
+import javax.annotation.Nullable;
 
 /**
  * Creates instances of {@link DetectDescribePoint} for different feature detectors/describers.

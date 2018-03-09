@@ -24,8 +24,9 @@ import boofcv.alg.background.stationary.*;
 import boofcv.struct.distort.Point2Transform2Model_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import com.sun.istack.internal.NotNull;
 import georegression.struct.InvertibleTransform;
+
+import javax.annotation.Nonnull;
 
 /**
  * Factory for creating implementations of {@link BackgroundModelStationary} and {@link boofcv.alg.background.BackgroundModelMoving}
@@ -43,7 +44,7 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase<T>>
-	BackgroundStationaryBasic<T> stationaryBasic(@NotNull ConfigBackgroundBasic config , ImageType<T> imageType ) {
+	BackgroundStationaryBasic<T> stationaryBasic(@Nonnull ConfigBackgroundBasic config , ImageType<T> imageType ) {
 
 		config.checkValidity();
 
@@ -69,7 +70,7 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase<T>, Motion extends InvertibleTransform<Motion>>
-	BackgroundMovingBasic<T,Motion> movingBasic(@NotNull ConfigBackgroundBasic config ,
+	BackgroundMovingBasic<T,Motion> movingBasic(@Nonnull ConfigBackgroundBasic config ,
 												Point2Transform2Model_F32<Motion> transform, ImageType<T> imageType ) {
 
 		config.checkValidity();
@@ -99,7 +100,7 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase<T>>
-	BackgroundStationaryGaussian<T> stationaryGaussian(@NotNull ConfigBackgroundGaussian config , ImageType<T> imageType ) {
+	BackgroundStationaryGaussian<T> stationaryGaussian(@Nonnull ConfigBackgroundGaussian config , ImageType<T> imageType ) {
 
 		config.checkValidity();
 
@@ -136,7 +137,7 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase<T>,Motion extends InvertibleTransform<Motion>>
-	BackgroundMovingGaussian<T,Motion> movingGaussian( @NotNull ConfigBackgroundGaussian config ,
+	BackgroundMovingGaussian<T,Motion> movingGaussian( @Nonnull ConfigBackgroundGaussian config ,
 													   Point2Transform2Model_F32<Motion> transform,
 													   ImageType<T> imageType ) {
 

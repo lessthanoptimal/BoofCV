@@ -25,7 +25,8 @@ import boofcv.alg.segmentation.slic.SegmentSlic;
 import boofcv.alg.segmentation.watershed.WatershedVincentSoille1991;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import com.sun.istack.internal.Nullable;
+
+import javax.annotation.Nullable;
 
 /**
  * Factory for {@link ImageSuperpixels} algorithms, which are used to segment the image into super pixels.

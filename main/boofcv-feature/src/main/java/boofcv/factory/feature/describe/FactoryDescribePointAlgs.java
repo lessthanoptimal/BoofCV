@@ -31,7 +31,8 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import com.sun.istack.internal.Nullable;
+
+import javax.annotation.Nullable;
 
 
 /**

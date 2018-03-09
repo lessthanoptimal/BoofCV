@@ -30,8 +30,8 @@ import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.*;
 import boofcv.struct.image.*;
-import com.sun.istack.internal.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.Random;
 
 

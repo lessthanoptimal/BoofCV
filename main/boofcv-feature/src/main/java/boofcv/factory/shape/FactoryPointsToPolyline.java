@@ -20,8 +20,9 @@ package boofcv.factory.shape;
 
 import boofcv.abst.shapes.polyline.*;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFit;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Factory for creating instances of {@link PointsToPolyline}
@@ -33,7 +34,7 @@ public class FactoryPointsToPolyline {
 	/**
 	 * Generic function for create polyline algorithms based on configuration type
 	 */
-	public static PointsToPolyline create( @NotNull ConfigPolyline config ) {
+	public static PointsToPolyline create( @Nonnull ConfigPolyline config ) {
 		if( config instanceof ConfigSplitMergeLineFit ) {
 			return splitMerge((ConfigSplitMergeLineFit)config);
 		} else if( config instanceof ConfigPolylineSplitMerge ) {

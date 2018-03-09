@@ -27,8 +27,9 @@ import boofcv.alg.shapes.ellipse.SnapToEllipseEdge;
 import boofcv.alg.shapes.polygon.*;
 import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
 import boofcv.struct.image.ImageGray;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Factory for detecting higher level shapes
@@ -104,7 +105,7 @@ public class FactoryShapeDetector {
 	}
 
 	public static <T extends ImageGray<T>>
-	DetectPolygonFromContour<T> polygonContour(@NotNull ConfigPolygonFromContour config, Class<T> imageType)
+	DetectPolygonFromContour<T> polygonContour(@Nonnull ConfigPolygonFromContour config, Class<T> imageType)
 	{
 		config.checkValidity();
 
@@ -122,7 +123,7 @@ public class FactoryShapeDetector {
 	}
 
 	public static <T extends ImageGray<T>>
-	RefinePolygonToGray<T> refinePolygon(@NotNull ConfigRefinePolygonLineToImage config , Class<T> imageType ) {
+	RefinePolygonToGray<T> refinePolygon(@Nonnull ConfigRefinePolygonLineToImage config , Class<T> imageType ) {
 		return new RefinePolygonToGrayLine<>(
 				config.cornerOffset, config.lineSamples,
 				config.sampleRadius, config.maxIterations,

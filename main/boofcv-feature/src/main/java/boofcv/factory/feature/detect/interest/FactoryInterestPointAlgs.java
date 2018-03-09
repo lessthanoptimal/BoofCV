@@ -37,7 +37,8 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.derivative.FactoryDerivativeSparse;
 import boofcv.struct.image.ImageGray;
-import com.sun.istack.internal.Nullable;
+
+import javax.annotation.Nullable;
 
 /**
  * Factory for non-generic specific implementations of interest point detection algorithms.

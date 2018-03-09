@@ -26,7 +26,8 @@ import boofcv.struct.RArray2D_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import com.sun.istack.internal.Nullable;
+
+import javax.annotation.Nullable;
 
 /**
  * Implementation of {@link BackgroundAlgorithmGmm} for {@link ImageGray}.

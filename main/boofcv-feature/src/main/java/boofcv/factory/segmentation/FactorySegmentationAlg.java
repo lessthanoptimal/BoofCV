@@ -33,8 +33,9 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Factory for low level segmentation algorithms.
@@ -173,7 +174,7 @@ public class FactorySegmentationAlg {
 	}
 
 	public static<T extends ImageBase<T>>
-	SegmentSlic<T> slic(@NotNull ConfigSlic config , ImageType<T> imageType )
+	SegmentSlic<T> slic(@Nonnull ConfigSlic config , ImageType<T> imageType )
 	{
 		if( config == null )
 			throw new IllegalArgumentException("No default configuration since the number of segments must be specified.");

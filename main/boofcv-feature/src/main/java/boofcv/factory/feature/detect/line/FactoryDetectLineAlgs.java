@@ -31,11 +31,12 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.ImageGray;
-import com.sun.istack.internal.Nullable;
 import georegression.fitting.line.ModelManagerLinePolar2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
+
+import javax.annotation.Nullable;
 
 /**
  * Factory for creating line and line segment detectors.

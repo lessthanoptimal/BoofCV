@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -299,7 +299,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 * Nothing was detected.  make sure it doesn't return null.
 	 */
 	@Test
-	public void checkDetectionsNotNull() {
+	public void checkDetectionsNonnull() {
 		for( Object layout : targetConfigs) {
 			DetectorFiducialCalibration detector = createDetector(layout);
 
