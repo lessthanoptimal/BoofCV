@@ -5,7 +5,7 @@ apply plugin: 'org.boofcv.gradletools'
 booftools {
     gversion_file_path = "main/boofcv-ip/src/main/java/boofcv"
     gversion_package = "boofcv"
-    javadoc_links = [ 'http://docs.oracle.com/javase/7/docs/api/',
+    javadoc_links = [ 'http://docs.oracle.com/javase/8/docs/api/',
                       'http://ejml.org/javadoc/',
                       'http://georegression.org/javadoc/',
                       'http://ddogleg.org/javadoc/']
@@ -97,7 +97,7 @@ subprojects {
 
     dependencies {
         compile group: 'org.georegression', name: 'georegression', version: '0.15'
-        compile 'com.google.code.findbugs:jsr305:3.0.2'
+        compile 'com.google.code.findbugs:jsr305:3.0.2' // @Nullable
 
         testCompile group: 'junit', name: 'junit', version: '4.12'
 
@@ -277,7 +277,7 @@ task alljavadoc(type: Javadoc) {
     configure(options) {
         failOnError = false
         docTitle = "BoofCV JavaDoc ($project.version)"
-        links = [ 'http://docs.oracle.com/javase/7/docs/api/',
+        links = [ 'http://docs.oracle.com/javase/8/docs/api/',
                   'http://ejml.org/javadoc/',
                   'http://georegression.org/javadoc/',
                   'http://ddogleg.org/javadoc/']

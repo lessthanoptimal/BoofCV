@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,9 @@ import boofcv.struct.image.InterleavedS64;
 /**
  * @author Peter Abeles
  */
-public class ImageBorder1D_IL_S64 extends ImageBorder_IL_S64 {
+public class ImageBorder1D_IL_S64 extends ImageBorder_IL_S64
+		implements ImageBorder1D
+{
 	BorderIndex1D rowWrap;
 	BorderIndex1D colWrap;
 
@@ -42,10 +44,12 @@ public class ImageBorder1D_IL_S64 extends ImageBorder_IL_S64 {
 		this.colWrap = colWrap;
 	}
 
+	@Override
 	public BorderIndex1D getRowWrap() {
 		return rowWrap;
 	}
 
+	@Override
 	public BorderIndex1D getColWrap() {
 		return colWrap;
 	}

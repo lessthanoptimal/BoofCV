@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class ImageBorderValue {
 	}
 
 	public static class Value_I64 extends ImageBorder_S64 {
-		long value;
+		public long value;
 
 		public Value_I64(GrayS64 image , long value ) {
 			super(image);
@@ -96,7 +96,7 @@ public class ImageBorderValue {
 	}
 
 	public static class Value_F64 extends ImageBorder_F64 {
-		double value;
+		public double value;
 
 		public Value_F64(GrayF64 image , double value ) {
 			super(image);
@@ -119,7 +119,7 @@ public class ImageBorderValue {
 	}
 
 	public static class Value_F32 extends ImageBorder_F32 {
-		float value;
+		public float value;
 
 		public Value_F32(GrayF32 image , float value ) {
 			super(image);
@@ -142,7 +142,7 @@ public class ImageBorderValue {
 	}
 
 	public static class Value_I extends ImageBorder_S32 {
-		int value;
+		public int value;
 
 		public Value_I(GrayI image , int value ) {
 			super(image);
@@ -165,7 +165,7 @@ public class ImageBorderValue {
 	}
 
 	public static class Value_IL_F32 extends ImageBorder_IL_F32 {
-		float value;
+		public float value;
 
 		public Value_IL_F32(InterleavedF32 image, float value) {super(image); this.value = value; }
 
@@ -181,7 +181,7 @@ public class ImageBorderValue {
 	}
 
 	public static class Value_IL_F64 extends ImageBorder_IL_F64 {
-		double value;
+		public double value;
 
 		public Value_IL_F64(InterleavedF64 image, double value) {super(image); this.value = value; }
 
@@ -197,7 +197,7 @@ public class ImageBorderValue {
 	}
 
 	public static class Value_IL_S32 extends ImageBorder_IL_S32 {
-		int value;
+		public int value;
 
 		public Value_IL_S32(InterleavedInteger image, int value) {super(image); this.value = value; }
 
@@ -213,7 +213,7 @@ public class ImageBorderValue {
 	}
 
 	public static class Value_IL_S64 extends ImageBorder_IL_S64 {
-		long value;
+		public long value;
 
 		public Value_IL_S64(InterleavedS64 image, long value) {super(image); this.value = value; }
 
