@@ -20,10 +20,11 @@ package boofcv.alg.background.stationary;
 
 import boofcv.alg.background.BackgroundAlgorithmGmm;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.FactoryGImageGray;
-import boofcv.core.image.GImageGray;
+import boofcv.core.image.FactoryGImageMultiBand;
+import boofcv.core.image.GImageMultiBand;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.ImageType;
 
 import javax.annotation.Nullable;
@@ -33,12 +34,13 @@ import javax.annotation.Nullable;
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryGmm_SB<T extends ImageGray<T>>
+public class BackgroundStationaryGmm_IL<T extends ImageInterleaved<T>>
 		extends BackgroundStationaryGmm<T>
 {
-
 	// wrappers which provide abstraction across image types
-	protected GImageGray inputWrapper;
+	protected GImageMultiBand inputWrapper;
+
+	float inputPixel[];
 
 	/**
 	 *
@@ -47,14 +49,20 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>>
 	 * @param maxGaussians Maximum number of Gaussians in a mixture for a pixel
 	 * @param imageType Type of image it's processing.
 	 */
-	public BackgroundStationaryGmm_SB(float learningPeriod, float decayCoef,
+	public BackgroundStationaryGmm_IL(float learningPeriod, float decayCoef,
 									  int maxGaussians, ImageType<T> imageType )
 	{
 		super(learningPeriod, decayCoef, maxGaussians, imageType);
 
-		inputWrapper = FactoryGImageGray.create(imageType.getImageClass());
+		inputWrapper = FactoryGImageMultiBand.create(imageType);
+
+		inputPixel = new float[imageType.numBands];
 	}
 
+	/**
+	 *
+	 * @param mask If null then the background mask is ignored
+	 */
 	@Override
 	public void updateBackground( T frame , @Nullable GrayU8 mask ) {
 		super.updateBackground(frame, mask);
@@ -65,46 +73,48 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>>
 			float[] dataRow = model.data[row];
 
 			if( mask == null ) {
-				for (int col = 0; col < imageWidth; col++) {
-					float pixelValue = inputWrapper.getF(inputIndex++);
+				for (int col = 0; col < imageWidth; col++, inputIndex+=numBands) {
+					inputWrapper.getF(inputIndex,inputPixel);
 					int modelIndex = col * pixelStride;
 
-					updateMixture(pixelValue, dataRow, modelIndex);
+					updateMixture(inputPixel, dataRow, modelIndex);
 				}
 			} else {
 				int indexMask = mask.startIndex + row*mask.stride;
-				for (int col = 0; col < imageWidth; col++) {
-					float pixelValue = inputWrapper.getF(inputIndex++);
+				for (int col = 0; col < imageWidth; col++, inputIndex+=numBands) {
+					inputWrapper.getF(inputIndex,inputPixel);
 					int modelIndex = col * pixelStride;
 
-					mask.data[indexMask++] = updateMixture(pixelValue, dataRow, modelIndex) ? (byte)0 : (byte)1;
+					mask.data[indexMask++] = updateMixture(inputPixel, dataRow, modelIndex) ? (byte)0 : (byte)1;
 				}
 			}
 		}
 	}
-
 	/**
 	 * Updates the mixtures of gaussian and determines if the pixel matches the background model
 	 * @return true if it matches the background or false if not
 	 */
-	boolean updateMixture( float pixelValue , float[] dataRow , int modelIndex ) {
+	boolean updateMixture( float[] pixelValue , float[] dataRow , int modelIndex ) {
 
 		// see which gaussian is the best fit based on Mahalanobis distance
 		int index = modelIndex;
-		float bestDistance = maxDistance;
+		float bestDistance = maxDistance*numBands;
 		int bestIndex=-1;
 
 		int ng; // number of gaussians in use
-		for (ng = 0; ng < maxGaussians; ng++, index += 3) {
+		for (ng = 0; ng < maxGaussians; ng++, index += gaussianStride) {
 			float variance = dataRow[index+1];
-			float mean = dataRow[index+2];
-
 			if( variance <= 0 ) {
 				break;
 			}
 
-			float delta = pixelValue-mean;
-			float mahalanobis = delta*delta/variance;
+			float mahalanobis = 0;
+			for (int i = 0; i < numBands; i++) {
+				float mean = dataRow[index+2+i];
+				float delta = pixelValue[i]-mean;
+				mahalanobis += delta*delta/variance;
+			}
+
 			if( mahalanobis < bestDistance ) {
 				bestDistance = mahalanobis;
 				bestIndex = index;
@@ -113,27 +123,35 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>>
 
 		// Update the model for the best gaussian
 		float bestWeight = 0;
-		if( bestDistance != maxDistance ) {
+		if( bestIndex != -1 ) {
 			// If there is a good fit update the model
 			float weight = dataRow[bestIndex];
 			float variance = dataRow[bestIndex+1];
-			float mean = dataRow[bestIndex+2];
-
-			float delta = pixelValue-mean;
 
 			bestWeight = weight + learningRate*(1f-weight-decay);
 			dataRow[bestIndex]   = 1; // set to one so that it can't possible go negative
-			dataRow[bestIndex+1] = variance + (learningRate /bestWeight)*(delta*delta - variance);
-			dataRow[bestIndex+2] = mean + delta* learningRate /bestWeight;
+
+			float sumDeltaSq = 0;
+			for (int i = 0; i < numBands; i++) {
+				float mean = dataRow[bestIndex+2+i];
+				float delta = pixelValue[i]-mean;
+				dataRow[bestIndex+2+i] = mean + delta*learningRate/bestWeight;
+				sumDeltaSq += delta*delta;
+			}
+			sumDeltaSq /= numBands;
+			dataRow[bestIndex+1] = variance + (learningRate /bestWeight)*(sumDeltaSq - variance);
+
 
 		} else if( ng < maxGaussians ) {
 			// if there is no good fit then create a new model, if there is room
 
 			bestWeight = learningRate;
-			bestIndex = modelIndex + ng*3;
+			bestIndex = modelIndex + ng*gaussianStride;
 			dataRow[bestIndex]   = 1;
 			dataRow[bestIndex+1] = initialVariance;
-			dataRow[bestIndex+2] = pixelValue;
+			for (int i = 0; i < numBands; i++) {
+				dataRow[bestIndex+2+i] = pixelValue[i];
+			}
 			ng += 1;
 		}
 
@@ -154,10 +172,10 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>>
 			weight = weight - learningRate*(weight + decay);
 			if( weight <= 0 ) {
 				// copy the last Gaussian into this location
-				int indexLast = modelIndex + (ng-1)*3;
-				dataRow[index] = dataRow[indexLast];
-				dataRow[index+1] = dataRow[indexLast+1];
-				dataRow[index+2] = dataRow[indexLast+2];
+				int indexLast = modelIndex + (ng-1)*gaussianStride;
+				for (int j = 0; j < gaussianStride; j++) {
+					dataRow[index+j] = dataRow[indexLast+j];
+				}
 
 				// see if the best Gaussian just got moved to here
 				if( indexLast == bestIndex )
@@ -171,7 +189,7 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>>
 			} else {
 				dataRow[index] = weight;
 				weightTotal += weight;
-				index += 3;
+				index += gaussianStride;
 				i++;
 			}
 		}
@@ -186,7 +204,7 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>>
 
 		// Normalize the weight so that it sums up to one
 		index = modelIndex;
-		for (int i = 0; i < ng; i++, index += 3) {
+		for (int i = 0; i < ng; i++, index += gaussianStride) {
 			dataRow[index] /= weightTotal;
 		}
 	}
@@ -205,11 +223,11 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>>
 			int indexOut = segmented.startIndex + row*segmented.stride;
 			float[] dataRow = model.data[row];
 
-			for (int col = 0; col < imageWidth; col++) {
-				float pixelValue = inputWrapper.getF(indexIn++);
+			for (int col = 0; col < imageWidth; col++, indexIn += numBands) {
+				inputWrapper.getF(indexIn,inputPixel);
 				int modelIndex = col * pixelStride;
 
-				segmented.data[indexOut++] = checkBackground(pixelValue, dataRow, modelIndex) ? (byte)0 : (byte)1;
+				segmented.data[indexOut++] = checkBackground(inputPixel, dataRow, modelIndex) ? (byte)0 : (byte)1;
 			}
 		}
 	}
@@ -219,24 +237,27 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>>
 	 *
 	 * @return true for background or false for foreground
 	 */
-	boolean checkBackground( float pixelValue , float[] dataRow , int modelIndex ) {
+	boolean checkBackground( float[] pixelValue , float[] dataRow , int modelIndex ) {
 
 		// see which gaussian is the best fit based on Mahalanobis distance
 		int index = modelIndex;
-		float bestDistance = maxDistance;
+		float bestDistance = maxDistance*numBands;
 		float bestWeight = 0;
 
 		int ng; // number of gaussians in use
-		for (ng = 0; ng < maxGaussians; ng++, index += 3) {
+		for (ng = 0; ng < maxGaussians; ng++, index += gaussianStride) {
 			float variance = dataRow[index + 1];
-			float mean = dataRow[index + 2];
-
 			if (variance <= 0) {
 				break;
 			}
 
-			float delta = pixelValue - mean;
-			float mahalanobis = delta * delta / variance;
+			float mahalanobis = 0;
+			for (int i = 0; i < numBands; i++) {
+				float mean = dataRow[index + 2+i];
+				float delta = pixelValue[i] - mean;
+				mahalanobis += delta * delta / variance;
+			}
+
 			if (mahalanobis < bestDistance) {
 				bestDistance = mahalanobis;
 				bestWeight = dataRow[index];

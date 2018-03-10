@@ -170,4 +170,44 @@ public class FactoryBackgroundModel {
 
 		return ret;
 	}
+
+	/**
+	 * Creates an instance of {@link BackgroundStationaryGmm}.
+	 *
+	 * @param config Configures the background model
+	 * @param imageType Type of input image
+	 * @return new instance of the background model
+	 */
+	public static <T extends ImageBase<T>>
+	BackgroundStationaryGmm<T> stationaryGmm(@Nonnull ConfigBackgroundGmm config , ImageType<T> imageType ) {
+
+		config.checkValidity();
+
+		BackgroundStationaryGmm<T> ret;
+
+		switch( imageType.getFamily() ) {
+			case GRAY:
+				ret = new BackgroundStationaryGmm_SB(config.learningPeriod,config.decayCoefient,
+						config.numberOfGaussian,imageType);
+				break;
+
+//			case PLANAR:
+//				ret =  new BackgroundStationaryGmm_PL(config.learningPeriod,config.decayCoefient,
+//						config.numberOfGaussian,imageType);
+//				break;
+
+			case INTERLEAVED:
+				ret =  new BackgroundStationaryGmm_IL(config.learningPeriod,config.decayCoefient,
+						config.numberOfGaussian,imageType);
+				break;
+
+			default:
+				throw new IllegalArgumentException("Unknown image type");
+		}
+
+		ret.setInitialVariance(config.initialVariance);
+		ret.setMaxDistance(config.maxDistance);
+
+		return ret;
+	}
 }

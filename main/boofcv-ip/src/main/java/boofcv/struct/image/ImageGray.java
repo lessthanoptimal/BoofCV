@@ -140,6 +140,8 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	 */
 	@Override
 	public void reshape(int width, int height) {
+		if( this.width == width && this.height == height )
+			return;
 		if( isSubimage() )
 			throw new IllegalArgumentException("Can't reshape sub-images");
 		

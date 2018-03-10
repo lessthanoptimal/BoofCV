@@ -35,8 +35,9 @@ package boofcv.alg.background;
  * </ul>
  *
  * <p>
- * [1] Benezeth, Y., Jodoin, P. M., Emile, B., Laurent, H., & Rosenberger, C. (2010).
- * Comparative study of background subtraction algorithms. Journal of Electronic Imaging, 19(3), 033003-033003.
+ * [1] Zivkovic, Zoran. "Improved adaptive Gaussian mixture model for background subtraction."
+ * In Pattern Recognition, 2004. ICPR 2004. Proceedings of the 17th International Conference on,
+ * vol. 2, pp. 28-31. IEEE, 2004.
  * </p>
  *
  * @author Peter Abeles

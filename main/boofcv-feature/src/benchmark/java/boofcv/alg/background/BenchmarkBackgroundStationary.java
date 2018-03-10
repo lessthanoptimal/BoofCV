@@ -18,9 +18,9 @@
 
 package boofcv.alg.background;
 
-import boofcv.alg.background.stationary.BackgroundStationaryGmm_SB;
 import boofcv.factory.background.ConfigBackgroundBasic;
 import boofcv.factory.background.ConfigBackgroundGaussian;
+import boofcv.factory.background.ConfigBackgroundGmm;
 import boofcv.factory.background.FactoryBackgroundModel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
@@ -28,6 +28,7 @@ import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedU8;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -81,10 +82,11 @@ public class BenchmarkBackgroundStationary {
 	}
 
 	public class GMM extends BackgroundBase {
-
 		@Override
 		public BackgroundModelStationary create() {
-			return new BackgroundStationaryGmm_SB(1000,0.001f,10,imageType);
+			ConfigBackgroundGmm config = new ConfigBackgroundGmm();
+
+			return FactoryBackgroundModel.stationaryGmm(config,imageType);
 		}
 	}
 
@@ -96,8 +98,6 @@ public class BenchmarkBackgroundStationary {
 		int frames;
 
 		GrayU8 background = new GrayU8(1,1);
-
-
 
 		public abstract BackgroundModelStationary create();
 
@@ -133,8 +133,16 @@ public class BenchmarkBackgroundStationary {
 	public static void main(String[] args) {
 		File file = new File(UtilIO.pathExample("background/street_intersection.mp4"));
 
-		BenchmarkBackgroundStationary b = new BenchmarkBackgroundStationary(file,ImageType.single(GrayU8.class));
+		List<ImageType> imageTypes = new ArrayList<>();
+		imageTypes.add(ImageType.single(GrayU8.class));
+		imageTypes.add(ImageType.il(3,InterleavedU8.class));
+//		imageTypes.add(ImageType.pl(3,GrayU8.class));
 
-		b.benchmark();
+
+		for( ImageType type : imageTypes ) {
+			System.out.println("Image Type: "+type.toString());
+			BenchmarkBackgroundStationary b = new BenchmarkBackgroundStationary(file, type);
+			b.benchmark();
+		}
 	}
 }

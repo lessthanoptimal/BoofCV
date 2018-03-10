@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,7 +76,6 @@ public abstract class BackgroundModelMoving<T extends ImageBase<T>,MotionModel e
 	protected Point2D_F32 corners[] = new Point2D_F32[4];
 	// storage for transformed coordinate
 	protected Point2D_F32 work = new Point2D_F32();
-
 
 	/**
 	 * Constructor which provides the motion model and image type

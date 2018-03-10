@@ -81,7 +81,7 @@ public class ConfigBackgroundGaussian implements Configuration {
 			throw new IllegalArgumentException("Don't set initialVariance to zero, set it to Float.MIN_VALUE instead");
 		if( initialVariance < 0 )
 			throw new IllegalArgumentException("Variance must be set to a value larger than zero");
-		if( initialVariance < 0 )
+		if( minimumDifference < 0 )
 			throw new IllegalArgumentException("minimumDifference must be >= 0");
 	}
 }
