@@ -86,7 +86,7 @@ public abstract class BackgroundStationaryGmm< T extends ImageBase<T>>
 		this.decay = decayCoef;
 		this.maxGaussians = maxGaussians;
 
-		this.significantWeight = Math.min(0.2f, 5 * learningRate);
+		this.significantWeight = Math.min(0.2f, 100 * learningRate);
 	}
 
 	@Override

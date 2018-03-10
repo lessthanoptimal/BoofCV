@@ -207,6 +207,7 @@ public class FactoryBackgroundModel {
 
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMaxDistance(config.maxDistance);
+		ret.setSignificantWeight(config.significantWeight);
 
 		return ret;
 	}
