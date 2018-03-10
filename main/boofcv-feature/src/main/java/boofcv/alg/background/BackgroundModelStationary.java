@@ -40,11 +40,9 @@ public abstract class BackgroundModelStationary<T extends ImageBase<T>> extends 
 	 */
 	public abstract void updateBackground( T frame );
 
-	// TODO remove the regular update function? Just updating the background is a not very common task
-	// how much effort is it to implement both for GMM?
-
 	/**
-	 * Updates the background and segments it at the same time. Segmentation is performed using the model
+	 * Updates the background and segments it at the same time. In some implementations this can be
+	 * significantly faster than doing it with separate function calls. Segmentation is performed using the model
 	 * which it has prior to the update.
 	 */
 	public void updateBackground( T frame , GrayU8 segment ) {

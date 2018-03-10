@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -130,6 +130,16 @@ public class FactoryGImageMultiBand {
 		public int getNumberOfBands() {return image.getNumBands();}
 
 		@Override
+		public int getPixelStride() {
+			return 1;
+		}
+
+		@Override
+		public int getIndex(int x, int y) {
+			return this.image.getIndex(x,y);
+		}
+
+		@Override
 		public void set(int x, int y, float[] value) {
 			int index = this.image.getIndex(x,y);
 			setF(index,value);
@@ -193,6 +203,16 @@ public class FactoryGImageMultiBand {
 		public int getNumberOfBands() {return 1;}
 
 		@Override
+		public int getPixelStride() {
+			return 1;
+		}
+
+		@Override
+		public int getIndex(int x, int y) {
+			return sb.getImage().getIndex(x,y);
+		}
+
+		@Override
 		public void set(int x, int y, float[] value) {
 			sb.set(x,y,value[0]);
 		}
@@ -239,6 +259,16 @@ public class FactoryGImageMultiBand {
 
 		@Override
 		public int getNumberOfBands() {return image.getNumBands();}
+
+		@Override
+		public int getPixelStride() {
+			return image.getNumBands();
+		}
+
+		@Override
+		public int getIndex(int x, int y) {
+			return image.getIndex(x,y);
+		}
 
 		@Override
 		public <T extends ImageBase<T>> T getImage() {
@@ -652,6 +682,16 @@ public class FactoryGImageMultiBand {
 		@Override
 		public ImageMultiBand getImage() {
 			return (ImageMultiBand)image.getImage();
+		}
+
+		@Override
+		public int getPixelStride() {
+			throw new RuntimeException("Not supported");
+		}
+
+		@Override
+		public int getIndex(int x, int y) {
+			throw new RuntimeException("Not supported");
 		}
 
 		public void setF(int index, float[] value) {throw new RuntimeException("Not supported");}

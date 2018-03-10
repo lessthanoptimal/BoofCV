@@ -67,7 +67,7 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>>
 			if( mask == null ) {
 				for (int col = 0; col < imageWidth; col++) {
 					float pixelValue = inputWrapper.getF(inputIndex++);
-					int modelIndex = col * pixelStride;
+					int modelIndex = col * modelStride;
 
 					updateMixture(pixelValue, dataRow, modelIndex);
 				}
@@ -75,7 +75,7 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>>
 				int indexMask = mask.startIndex + row*mask.stride;
 				for (int col = 0; col < imageWidth; col++) {
 					float pixelValue = inputWrapper.getF(inputIndex++);
-					int modelIndex = col * pixelStride;
+					int modelIndex = col * modelStride;
 
 					mask.data[indexMask++] = updateMixture(pixelValue, dataRow, modelIndex) ? (byte)0 : (byte)1;
 				}
@@ -122,7 +122,7 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>>
 			float delta = pixelValue-mean;
 
 			bestWeight = weight + learningRate*(1f-weight-decay);
-			dataRow[bestIndex]   = 1; // set to one so that it can't possible go negative
+			dataRow[bestIndex]   = 1; // set to one so that it can't possible go negative. changed later
 			dataRow[bestIndex+1] = variance + (learningRate /bestWeight)*(delta*delta - variance);
 			dataRow[bestIndex+2] = mean + delta* learningRate /bestWeight;
 
@@ -131,7 +131,7 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>>
 
 			bestWeight = learningRate;
 			bestIndex = modelIndex + ng*3;
-			dataRow[bestIndex]   = 1;
+			dataRow[bestIndex]   = 1; // changed later
 			dataRow[bestIndex+1] = initialVariance;
 			dataRow[bestIndex+2] = pixelValue;
 			ng += 1;
@@ -207,7 +207,7 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>>
 
 			for (int col = 0; col < imageWidth; col++) {
 				float pixelValue = inputWrapper.getF(indexIn++);
-				int modelIndex = col * pixelStride;
+				int modelIndex = col * modelStride;
 
 				segmented.data[indexOut++] = checkBackground(pixelValue, dataRow, modelIndex) ? (byte)0 : (byte)1;
 			}

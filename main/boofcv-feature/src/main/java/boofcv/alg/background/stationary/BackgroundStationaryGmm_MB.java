@@ -23,24 +23,23 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.FactoryGImageMultiBand;
 import boofcv.core.image.GImageMultiBand;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageInterleaved;
+import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
 
 import javax.annotation.Nullable;
 
 /**
- * Implementation of {@link BackgroundAlgorithmGmm} for {@link ImageGray}.
+ * Implementation of {@link BackgroundAlgorithmGmm} for {@link ImageMultiBand}.
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryGmm_IL<T extends ImageInterleaved<T>>
+public class BackgroundStationaryGmm_MB<T extends ImageMultiBand<T>>
 		extends BackgroundStationaryGmm<T>
 {
 	// wrappers which provide abstraction across image types
 	protected GImageMultiBand inputWrapper;
 
-	float inputPixel[];
+	private float inputPixel[];
 
 	/**
 	 *
@@ -49,7 +48,7 @@ public class BackgroundStationaryGmm_IL<T extends ImageInterleaved<T>>
 	 * @param maxGaussians Maximum number of Gaussians in a mixture for a pixel
 	 * @param imageType Type of image it's processing.
 	 */
-	public BackgroundStationaryGmm_IL(float learningPeriod, float decayCoef,
+	public BackgroundStationaryGmm_MB(float learningPeriod, float decayCoef,
 									  int maxGaussians, ImageType<T> imageType )
 	{
 		super(learningPeriod, decayCoef, maxGaussians, imageType);
@@ -68,22 +67,23 @@ public class BackgroundStationaryGmm_IL<T extends ImageInterleaved<T>>
 		super.updateBackground(frame, mask);
 
 		inputWrapper.wrap(frame);
+		final int pixelStride = inputWrapper.getPixelStride();
 		for (int row = 0; row < imageHeight; row++) {
-			int inputIndex = frame.startIndex + row*frame.stride;
+			int inputIndex = frame.getIndex(0,row);
 			float[] dataRow = model.data[row];
 
 			if( mask == null ) {
-				for (int col = 0; col < imageWidth; col++, inputIndex+=numBands) {
+				for (int col = 0; col < imageWidth; col++, inputIndex += pixelStride) {
 					inputWrapper.getF(inputIndex,inputPixel);
-					int modelIndex = col * pixelStride;
+					int modelIndex = col * modelStride;
 
 					updateMixture(inputPixel, dataRow, modelIndex);
 				}
 			} else {
 				int indexMask = mask.startIndex + row*mask.stride;
-				for (int col = 0; col < imageWidth; col++, inputIndex+=numBands) {
+				for (int col = 0; col < imageWidth; col++, inputIndex += pixelStride) {
 					inputWrapper.getF(inputIndex,inputPixel);
-					int modelIndex = col * pixelStride;
+					int modelIndex = col * modelStride;
 
 					mask.data[indexMask++] = updateMixture(inputPixel, dataRow, modelIndex) ? (byte)0 : (byte)1;
 				}
@@ -218,14 +218,15 @@ public class BackgroundStationaryGmm_IL<T extends ImageInterleaved<T>>
 		}
 
 		inputWrapper.wrap(frame);
+		final int pixelStride = inputWrapper.getPixelStride();
 		for (int row = 0; row < imageHeight; row++) {
-			int indexIn = frame.startIndex + row*frame.stride;
+			int indexIn = frame.getIndex(0,row);
 			int indexOut = segmented.startIndex + row*segmented.stride;
 			float[] dataRow = model.data[row];
 
-			for (int col = 0; col < imageWidth; col++, indexIn += numBands) {
+			for (int col = 0; col < imageWidth; col++, indexIn += pixelStride) {
 				inputWrapper.getF(indexIn,inputPixel);
-				int modelIndex = col * pixelStride;
+				int modelIndex = col * modelStride;
 
 				segmented.data[indexOut++] = checkBackground(inputPixel, dataRow, modelIndex) ? (byte)0 : (byte)1;
 			}

@@ -36,7 +36,7 @@ public class ConfigBackgroundGmm implements Configuration {
 	 * The initial variance assigned to a new pixel.  Larger values to reduce false positives due to
 	 * under sampling.  Don't set to zero since that can cause divided by zero errors.
 	 */
-	public float initialVariance = 900;
+	public float initialVariance = 100;
 
 	/**
 	 * Determines how quickly a model is forgotten. Smaller values means they last longer.
@@ -51,7 +51,7 @@ public class ConfigBackgroundGmm implements Configuration {
 	/**
 	 * Maximum number of gaussians that can be in a single mixture
 	 */
-	public int numberOfGaussian = 20;
+	public int numberOfGaussian = 5;
 
 	/**
 	 * Once the weight for a Gaussian becomes greater than this amount it is no longer considered part of the

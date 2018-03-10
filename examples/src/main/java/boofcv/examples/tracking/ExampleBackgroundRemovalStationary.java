@@ -80,8 +80,7 @@ public class ExampleBackgroundRemovalStationary {
 			ImageBase input = video.next();
 
 			long before = System.nanoTime();
-			background.segment(input,segmented);
-			background.updateBackground(input);
+			background.updateBackground(input,segmented);
 			long after = System.nanoTime();
 
 			fps = (1.0-alpha)*fps + alpha*(1.0/((after-before)/1e9));

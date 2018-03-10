@@ -191,13 +191,9 @@ public class FactoryBackgroundModel {
 						config.numberOfGaussian,imageType);
 				break;
 
-//			case PLANAR:
-//				ret =  new BackgroundStationaryGmm_PL(config.learningPeriod,config.decayCoefient,
-//						config.numberOfGaussian,imageType);
-//				break;
-
+			case PLANAR:
 			case INTERLEAVED:
-				ret =  new BackgroundStationaryGmm_IL(config.learningPeriod,config.decayCoefient,
+				ret =  new BackgroundStationaryGmm_MB(config.learningPeriod,config.decayCoefient,
 						config.numberOfGaussian,imageType);
 				break;
 

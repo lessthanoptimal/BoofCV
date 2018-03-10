@@ -25,10 +25,7 @@ import boofcv.factory.background.FactoryBackgroundModel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.InterleavedU8;
+import boofcv.struct.image.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -136,7 +133,10 @@ public class BenchmarkBackgroundStationary {
 		List<ImageType> imageTypes = new ArrayList<>();
 		imageTypes.add(ImageType.single(GrayU8.class));
 		imageTypes.add(ImageType.il(3,InterleavedU8.class));
-//		imageTypes.add(ImageType.pl(3,GrayU8.class));
+		imageTypes.add(ImageType.pl(3,GrayU8.class));
+		imageTypes.add(ImageType.single(GrayF32.class));
+		imageTypes.add(ImageType.il(3,InterleavedF32.class));
+		imageTypes.add(ImageType.pl(3,GrayF32.class));
 
 
 		for( ImageType type : imageTypes ) {

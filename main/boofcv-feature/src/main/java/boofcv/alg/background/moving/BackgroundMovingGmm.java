@@ -16,26 +16,28 @@
  * limitations under the License.
  */
 
-package boofcv.alg.background.stationary;
+package boofcv.alg.background.moving;
 
 import boofcv.alg.background.BackgroundAlgorithmGmm;
-import boofcv.alg.background.BackgroundModelStationary;
+import boofcv.alg.background.BackgroundModelMoving;
 import boofcv.struct.RArray2D_F32;
+import boofcv.struct.distort.Point2Transform2Model_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.struct.InvertibleTransform;
 
 import javax.annotation.Nullable;
 
 /**
- * <p>Implementation of {@link BackgroundAlgorithmGmm} for stationary images.</p>
+ * <p>Implementation of {@link BackgroundAlgorithmGmm} for moving images.</p>
  *
- * @see BackgroundModelStationary
+ * @see BackgroundModelMoving
  *
  * @author Peter Abeles
  */
-public abstract class BackgroundStationaryGmm< T extends ImageBase<T>>
-		extends BackgroundModelStationary<T> implements BackgroundAlgorithmGmm
+public abstract class BackgroundMovingGmm<T extends ImageBase<T>, Motion extends InvertibleTransform<Motion>>
+		extends BackgroundModelMoving<T,Motion> implements BackgroundAlgorithmGmm
 {
 	// Storage for estimated models
 	//
@@ -72,9 +74,9 @@ public abstract class BackgroundStationaryGmm< T extends ImageBase<T>>
 	protected float initialVariance = 100;
 
 
-	public BackgroundStationaryGmm(float learningPeriod, float decayCoef,
-								   int maxGaussians, ImageType<T> imageType) {
-		super(imageType);
+	public BackgroundMovingGmm(float learningPeriod, float decayCoef, int maxGaussians,
+							   Point2Transform2Model_F32<Motion> transformImageType, ImageType<T> imageType) {
+		super(transformImageType,imageType);
 		if (learningPeriod <= 0)
 			throw new IllegalArgumentException("Must be greater than zero");
 		if (maxGaussians >= 256 || maxGaussians <= 0)
@@ -93,16 +95,7 @@ public abstract class BackgroundStationaryGmm< T extends ImageBase<T>>
 		imageWidth = imageHeight = 0;
 	}
 
-	@Override
-	public void updateBackground( T frame ) {
-		updateBackground(frame,null);
-	}
 
-	/**
-	 *
-	 * @param mask If null then the background mask is ignored
-	 */
-	@Override
 	public void updateBackground( T frame , @Nullable GrayU8 mask ) {
 
 		int channels = frame.getImageType().getNumBands();

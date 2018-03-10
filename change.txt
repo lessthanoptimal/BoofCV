@@ -50,6 +50,10 @@ Version : 0.29
   * Correctly handles NaN in equiToCam transform
 - Started using @Nullable and @Nonnull
   * Primarily in factories where if a config can be null is confusing
+- BackgroundModel
+  * Added a combined function for update and segment
+  * Added new algorithm. Gaussian Mixture Models
+  * TODO Added new example video. Fixed camera with moving trees
 - TODO Consider providing access to point features inside of FiducialDetector
 
 TODO
