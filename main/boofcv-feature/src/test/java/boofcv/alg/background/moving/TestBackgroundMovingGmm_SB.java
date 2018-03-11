@@ -16,28 +16,30 @@
  * limitations under the License.
  */
 
-package boofcv.alg.background.stationary;
+package boofcv.alg.background.moving;
 
-import boofcv.alg.background.BackgroundModelStationary;
+import boofcv.alg.background.BackgroundModelMoving;
+import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.struct.homography.Homography2D_F32;
 
 /**
  * @author Peter Abeles
  */
-public class TestBackgroundStationaryGmm_SB extends GenericBackgroundModelStationaryChecks {
-
-	ImageType<GrayU8> imageType = ImageType.single(GrayU8.class);
-
-	public TestBackgroundStationaryGmm_SB() {
+public class TestBackgroundMovingGmm_SB extends GenericBackgroundMovingGaussianChecks
+{
+	public TestBackgroundMovingGmm_SB() {
 		imageTypes.add(ImageType.single(GrayU8.class));
 		imageTypes.add(ImageType.single(GrayF32.class));
 	}
 
 	@Override
-	public <T extends ImageBase<T>> BackgroundModelStationary<T> create(ImageType<T> imageType) {
-		return new BackgroundStationaryGmm_SB(1000.0f,0.001f,10,imageType);
+	public <T extends ImageBase<T>> BackgroundModelMoving<T,Homography2D_F32>
+	create(ImageType<T> imageType) {
+		PointTransformHomography_F32 transform = new PointTransformHomography_F32();
+		return new BackgroundMovingGmm_SB(1000F,0.001F,10,transform,imageType);
 	}
 }

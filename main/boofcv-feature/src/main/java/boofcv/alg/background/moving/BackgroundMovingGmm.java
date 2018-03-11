@@ -19,15 +19,12 @@
 package boofcv.alg.background.moving;
 
 import boofcv.alg.background.BackgroundAlgorithmGmm;
+import boofcv.alg.background.BackgroundGmmCommon;
 import boofcv.alg.background.BackgroundModelMoving;
-import boofcv.struct.RArray2D_F32;
 import boofcv.struct.distort.Point2Transform2Model_F32;
-import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.InvertibleTransform;
-
-import javax.annotation.Nullable;
 
 /**
  * <p>Implementation of {@link BackgroundAlgorithmGmm} for moving images.</p>
@@ -39,116 +36,68 @@ import javax.annotation.Nullable;
 public abstract class BackgroundMovingGmm<T extends ImageBase<T>, Motion extends InvertibleTransform<Motion>>
 		extends BackgroundModelMoving<T,Motion> implements BackgroundAlgorithmGmm
 {
-	// Storage for estimated models
-	//
-	// [2*i+0] = weight for gaussian i
-	// [2*i+1] = variance for gaussian i. variance <= 0 means the Gaussian is unused
-	// [2*i+2] = mean for gaussian i
-	// The first N gaussians are always in use
-	protected RArray2D_F32 model = new RArray2D_F32(1, 1);
-
-	// Shape of expected input image
-	protected int imageWidth, imageHeight, numBands;
-
-	// number of elements needed to describe a pixel's model. 3*number of gaussians
-	protected int modelStride;
-	// number of elements in a single gausian description
-	protected int gaussianStride;
-
-	// Determines how quickly it learns/accepts changes to a model
-	protected float learningRate; // \alpha in the paper
-	// decay subtracted from weights to prune old models
-	protected float decay; // \alpha_{CT} in the paper
-	// The maximum number of gaussian models for a pixel
-	protected int maxGaussians;
-
-	// Maximum Mahanolobis distance
-	protected float maxDistance = 3 * 3; // standard deviations squared away
-
-	// if the weight of the best fit Gaussian is more than this value it is considered to belong to the background
-	// the foreground could have small values as it moves around, which is why simply matching a model
-	// isn't enough
-	protected float significantWeight;
-
-	// initial variance assigned to a new Gaussian
-	protected float initialVariance = 100;
+	BackgroundGmmCommon common;
 
 
 	public BackgroundMovingGmm(float learningPeriod, float decayCoef, int maxGaussians,
 							   Point2Transform2Model_F32<Motion> transformImageType, ImageType<T> imageType) {
 		super(transformImageType,imageType);
-		if (learningPeriod <= 0)
-			throw new IllegalArgumentException("Must be greater than zero");
-		if (maxGaussians >= 256 || maxGaussians <= 0)
-			throw new IllegalArgumentException("Maximum number of gaussians per pixel is 255");
 
-		setLearningPeriod(learningPeriod);
-		this.decay = decayCoef;
-		this.maxGaussians = maxGaussians;
-
-		this.significantWeight = Math.min(0.2f, 100 * learningRate);
+		common = new BackgroundGmmCommon(learningPeriod,decayCoef,maxGaussians,imageType);
 	}
 
 	@Override
 	public void reset() {
-		model.reshape(0, 0);
-		imageWidth = imageHeight = 0;
+		common.model.zero();
 	}
 
+	@Override
+	public void initialize(int backgroundWidth, int backgroundHeight, Motion homeToWorld) {
+		common.model.reshape(backgroundHeight,backgroundWidth*common.modelStride);
+		common.model.zero();
 
-	public void updateBackground( T frame , @Nullable GrayU8 mask ) {
+		this.homeToWorld.set(homeToWorld);
+		this.homeToWorld.invert(worldToHome);
 
-		int channels = frame.getImageType().getNumBands();
-		this.gaussianStride = 2 + channels; // 1 weight, 1 variance, N means
-		this.modelStride = maxGaussians * gaussianStride;
-
-
-		// if the image size has changed it's safe to assume it needs to be re-initialized
-		if( imageWidth != frame.width || imageHeight != frame.height || numBands != channels ) {
-			numBands = channels;
-			imageWidth = frame.width;
-			imageHeight = frame.height;
-
-			model.reshape(frame.height, frame.width* modelStride);
-			model.zero();
-		}
-
-		if( mask != null ) {
-			mask.reshape(frame.width,frame.height);
-		}
+		this.backgroundWidth = backgroundWidth;
+		this.backgroundHeight = backgroundHeight;
 	}
 
 
 	@Override
 	public float getInitialVariance() {
-		return initialVariance;
+		return common.initialVariance;
 	}
 
 	@Override
 	public void setInitialVariance(float initialVariance) {
-		this.initialVariance = initialVariance;
+		common.initialVariance = initialVariance;
 	}
 
 	@Override
 	public float getLearningPeriod() {
-		return 1.0f / learningRate;
+		return 1.0f / common.learningRate;
 	}
 
 	@Override
 	public void setLearningPeriod(float period) {
-		learningRate = 1.0f / period;
+		common.learningRate = 1.0f / period;
 	}
 
 	@Override
 	public void setSignificantWeight(float value) {
-		significantWeight = value;
+		common.significantWeight = value;
 	}
 
 	public float getMaxDistance() {
-		return maxDistance;
+		return common.maxDistance;
 	}
 
 	public void setMaxDistance(float maxDistance) {
-		this.maxDistance = maxDistance;
+		common.maxDistance = maxDistance;
+	}
+
+	public BackgroundGmmCommon getCommon() {
+		return common;
 	}
 }

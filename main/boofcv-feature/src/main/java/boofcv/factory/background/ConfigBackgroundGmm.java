@@ -56,7 +56,7 @@ public class ConfigBackgroundGmm implements Configuration {
 	/**
 	 * Once the weight for a Gaussian becomes greater than this amount it is no longer considered part of the
 	 * foreground and is the the background model. Strongly influences how long it takes an object that was moving
-	 * to fade into the background
+	 * to fade into the background. Probably one of the first tuning variables you should mess with.
 	 */
 	public float significantWeight = 0.03f;
 
