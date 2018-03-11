@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.transform.ii;
 
+import boofcv.alg.filter.convolve.ConvolveImage;
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
-import boofcv.alg.filter.convolve.ConvolveWithBorder;
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
@@ -59,7 +59,7 @@ public class TestDerivativeIntegralImage {
 			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivX(r,null);
 			Kernel2D_F32 kernel = createDerivX(r);
 
-			ConvolveWithBorder.convolve(kernel,orig,expected,border);
+			ConvolveImage.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
 
 			BoofTesting.assertEquals(expected,found,1e-2);
@@ -85,7 +85,7 @@ public class TestDerivativeIntegralImage {
 			Kernel2D_F32 kernel = createDerivX(r);
 			kernel = KernelMath.transpose(kernel);
 
-			ConvolveWithBorder.convolve(kernel,orig,expected,border);
+			ConvolveImage.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
 
 			BoofTesting.assertEquals(expected,found,1e-2);
@@ -110,7 +110,7 @@ public class TestDerivativeIntegralImage {
 			IntegralKernel kernelI = DerivativeIntegralImage.kernelHaarX(r,null);
 			Kernel2D_F32 kernel = createHaarX(r);
 
-			ConvolveWithBorder.convolve(kernel,orig,expected,border);
+			ConvolveImage.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
 
 			BoofTesting.assertEquals(expected,found,1e-2);
@@ -137,7 +137,7 @@ public class TestDerivativeIntegralImage {
 			Kernel2D_F32 kernel = createHaarX(size);
 			kernel = KernelMath.transpose(kernel);
 
-			ConvolveWithBorder.convolve(kernel,orig,expected,border);
+			ConvolveImage.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
 
 			BoofTesting.assertEquals(expected,found,1e-2);
@@ -163,7 +163,7 @@ public class TestDerivativeIntegralImage {
 			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivXX(size,null);
 			Kernel2D_F32 kernel = createDerivXX(size);
 
-			ConvolveWithBorder.convolve(kernel,orig,expected,border);
+			ConvolveImage.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
 
 			BoofTesting.assertEquals(expected,found,1e-2);
@@ -216,7 +216,7 @@ public class TestDerivativeIntegralImage {
 			Kernel2D_F32 kernel = createDerivXX(size);
 			kernel = KernelMath.transpose(kernel);
 
-			ConvolveWithBorder.convolve(kernel,orig,expected,border);
+			ConvolveImage.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
 
 			BoofTesting.assertEquals(expected,found,1e-2);
@@ -270,7 +270,7 @@ public class TestDerivativeIntegralImage {
 			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivXY(size,null);
 			Kernel2D_F32 kernel = createDerivXY(size);
 
-			ConvolveWithBorder.convolve(kernel,orig,expected,border);
+			ConvolveImage.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
 
 			BoofTesting.assertEquals(expected,found,1e-2);

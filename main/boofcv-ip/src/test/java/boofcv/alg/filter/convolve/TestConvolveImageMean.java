@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 	static int kernelRadius2 = 6; // kernel will be larger than the image
 
 	public TestConvolveImageMean() {
-		super(ConvolveImageMean.class, ConvolveNormalized.class);
+		super(ConvolveImageMean.class, ConvolveImageNormalized.class);
 	}
 
 	@Test

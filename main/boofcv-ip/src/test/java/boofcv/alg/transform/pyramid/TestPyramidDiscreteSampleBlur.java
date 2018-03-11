@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.transform.pyramid;
 
-import boofcv.alg.filter.convolve.ConvolveNormalized;
+import boofcv.alg.filter.convolve.ConvolveImageNormalized;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayF32;
@@ -55,8 +55,8 @@ public class TestPyramidDiscreteSampleBlur extends GenericPyramidTests<GrayF32> 
 
 		GrayF32 storage = new GrayF32(width, height);
 
-		ConvolveNormalized.horizontal(kernel,input,storage);
-		ConvolveNormalized.vertical(kernel,storage,convImg);
+		ConvolveImageNormalized.horizontal(kernel,input,storage);
+		ConvolveImageNormalized.vertical(kernel,storage,convImg);
 
 		PyramidDiscreteSampleBlur<GrayF32> alg =
 				new PyramidDiscreteSampleBlur<>(kernel,3, ImageType.single(GrayF32.class),true,new int[]{1,2,4});
@@ -77,8 +77,8 @@ public class TestPyramidDiscreteSampleBlur extends GenericPyramidTests<GrayF32> 
 		}
 
 		storage.reshape(width/2,height/2);
-		ConvolveNormalized.horizontal(kernel,alg.getLayer(1),storage);
-		ConvolveNormalized.vertical(kernel,storage,convImg2);
+		ConvolveImageNormalized.horizontal(kernel,alg.getLayer(1),storage);
+		ConvolveImageNormalized.vertical(kernel,storage,convImg2);
 		// second layer should have the same values as the second convolved image
 		for (int i = 0; i < height/2; i += 2) {
 			for (int j = 0; j < width/2; j += 2) {

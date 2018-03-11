@@ -50,6 +50,9 @@ Version : 0.29
   * Correctly handles NaN in equiToCam transform
 - Started using @Nullable and @Nonnull
   * Primarily in factories where if a config can be null is confusing
+- ConvolveImage* refactoring
+  * Removed WithBorder from class name for simplicity
+  * Made naming more consistent in general
 - BackgroundModel
   * Added a combined function for update and segment
   * Added new algorithm. Gaussian Mixture Models (GMM)

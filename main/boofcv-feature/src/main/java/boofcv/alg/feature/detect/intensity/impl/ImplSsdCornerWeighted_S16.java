@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
-import boofcv.alg.filter.convolve.ConvolveNormalized;
+import boofcv.alg.filter.convolve.ConvolveImageNormalized;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.GrayF32;
@@ -95,8 +95,8 @@ public abstract class ImplSsdCornerWeighted_S16 implements GradientCornerIntensi
 	protected abstract float computeResponse();
 
 	private void blur(GrayS32 image , GrayS32 temp ) {
-		ConvolveNormalized.horizontal(kernel, image, temp);
-		ConvolveNormalized.vertical(kernel,temp,image);
+		ConvolveImageNormalized.horizontal(kernel, image, temp);
+		ConvolveImageNormalized.vertical(kernel,temp,image);
 	}
 
 	@Override

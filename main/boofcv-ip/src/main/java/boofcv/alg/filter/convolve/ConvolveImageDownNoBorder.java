@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import boofcv.struct.image.*;
  * 
  * @author Peter Abeles
  */
-public class ConvolveDownNoBorder {
+public class ConvolveImageDownNoBorder {
 
 	public static void horizontal(Kernel1D_F32 kernel , GrayF32 input, GrayF32 output , int skip ) {
 		checkParametersH(input,output,skip);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ public class TestConvolveImageBox extends CompareEquivalentFunctions {
 	static int kernelRadius = 2;
 
 	public TestConvolveImageBox() {
-		super(ConvolveImageBox.class, ConvolveWithBorder.class);
+		super(ConvolveImageBox.class, ConvolveImage.class);
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-public class ConvolveNormalizedSparse {
+public class ConvolveImageNormalizedSparse {
 
 	/**
 	 * Convolves around the specified point in the horizontal and vertical direction.  When at the border of

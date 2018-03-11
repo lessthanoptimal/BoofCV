@@ -23,7 +23,7 @@ import boofcv.alg.filter.blur.impl.ImplMedianHistogramInner;
 import boofcv.alg.filter.blur.impl.ImplMedianSortEdgeNaive;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.filter.convolve.ConvolveImageMean;
-import boofcv.alg.filter.convolve.ConvolveNormalized;
+import boofcv.alg.filter.convolve.ConvolveImageNormalized;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -237,8 +237,8 @@ public class BlurImageOps {
 
 		if( !processed ) {
 			Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class, sigma, radius);
-			ConvolveNormalized.horizontal(kernel, input, storage);
-			ConvolveNormalized.vertical(kernel, storage, output);
+			ConvolveImageNormalized.horizontal(kernel, input, storage);
+			ConvolveImageNormalized.vertical(kernel, storage, output);
 		}
 
 		return output;
@@ -254,8 +254,8 @@ public class BlurImageOps {
 
 		if( !processed ) {
 			Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,sigma,radius);
-			ConvolveNormalized.horizontal(kernel, input, storage);
-			ConvolveNormalized.vertical(kernel, storage, output);
+			ConvolveImageNormalized.horizontal(kernel, input, storage);
+			ConvolveImageNormalized.vertical(kernel, storage, output);
 		}
 
 		return output;
@@ -281,8 +281,8 @@ public class BlurImageOps {
 
 		if( !processed ) {
 			Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,sigma, radius);
-			ConvolveNormalized.horizontal(kernel, input, storage);
-			ConvolveNormalized.vertical(kernel, storage, output);
+			ConvolveImageNormalized.horizontal(kernel, input, storage);
+			ConvolveImageNormalized.vertical(kernel, storage, output);
 		}
 
 		return output;
@@ -308,8 +308,8 @@ public class BlurImageOps {
 
 		if( !processed ) {
 			Kernel1D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F64.class,sigma, radius);
-			ConvolveNormalized.horizontal(kernel, input, storage);
-			ConvolveNormalized.vertical(kernel, storage, output);
+			ConvolveImageNormalized.horizontal(kernel, input, storage);
+			ConvolveImageNormalized.vertical(kernel, storage, output);
 		}
 
 		return output;
@@ -324,8 +324,8 @@ public class BlurImageOps {
 
 		if( !processed ) {
 			Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,sigma,radius);
-			ConvolveNormalized.horizontal(kernel, input, storage);
-			ConvolveNormalized.vertical(kernel, storage, output);
+			ConvolveImageNormalized.horizontal(kernel, input, storage);
+			ConvolveImageNormalized.vertical(kernel, storage, output);
 		}
 
 		return output;
@@ -340,8 +340,8 @@ public class BlurImageOps {
 
 		if( !processed ) {
 			Kernel1D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F64.class,sigma,radius);
-			ConvolveNormalized.horizontal(kernel, input, storage);
-			ConvolveNormalized.vertical(kernel, storage, output);
+			ConvolveImageNormalized.horizontal(kernel, input, storage);
+			ConvolveImageNormalized.vertical(kernel, storage, output);
 		}
 
 		return output;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,10 +25,10 @@ import org.junit.Test;
 /**
  * @author Peter Abeles
  */
-public class TestConvolveDownNoBorder {
+public class TestConvolveImageDownNoBorder {
 	@Test
 	public void compareToStandard() {
-		CompareToStandardConvolveDownNoBorder test = new CompareToStandardConvolveDownNoBorder(ConvolveDownNoBorder.class);
+		CompareToStandardConvolveDownNoBorder test = new CompareToStandardConvolveDownNoBorder(ConvolveImageDownNoBorder.class);
 		test.setSkip(2);
 
 		for( int i = 0; i < 2; i++ ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.abst.filter.convolve;
 
 import boofcv.abst.filter.FilterImageInterface;
-import boofcv.alg.filter.convolve.ConvolveDownNoBorder;
-import boofcv.alg.filter.convolve.ConvolveDownNormalized;
+import boofcv.alg.filter.convolve.ConvolveImageDownNoBorder;
+import boofcv.alg.filter.convolve.ConvolveImageDownNormalized;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.convolve.FactoryConvolveDown;
@@ -65,7 +65,7 @@ public class TestFactoryConvolveDown {
 		// CHECK NO BORDER
 		conv = FactoryConvolveDown.convolveSB( kernel, BorderType.SKIP, true, skip, GrayF32.class,GrayF32.class);
 		conv.process(input,found);
-		ConvolveDownNoBorder.horizontal(kernel,input,expected,skip);
+		ConvolveImageDownNoBorder.horizontal(kernel,input,expected,skip);
 		BoofTesting.assertEquals(expected,found,1e-4f);
 
 		// CHECK EXTENDED
@@ -77,7 +77,7 @@ public class TestFactoryConvolveDown {
 		// CHECK NORMALIZED
 		conv = FactoryConvolveDown.convolveSB( kernel, BorderType.NORMALIZED, true, skip, GrayF32.class,GrayF32.class);
 		conv.process(input,found);
-		ConvolveDownNormalized.horizontal(kernel,input,expected,skip);
+		ConvolveImageDownNormalized.horizontal(kernel,input,expected,skip);
 		BoofTesting.assertEquals(expected,found,1e-4f);
 	}
 
@@ -97,7 +97,7 @@ public class TestFactoryConvolveDown {
 		// CHECK NO BORDER
 		conv = FactoryConvolveDown.convolveSB( kernel, BorderType.SKIP, true, skip, GrayU8.class,GrayI16.class);
 		conv.process(input,found);
-		ConvolveDownNoBorder.horizontal(kernel,input,expected,skip);
+		ConvolveImageDownNoBorder.horizontal(kernel,input,expected,skip);
 		BoofTesting.assertEquals(expected,found,0);
 
 		// CHECK EXTENDED
@@ -111,7 +111,7 @@ public class TestFactoryConvolveDown {
 		GrayU8 expected8 = new GrayU8(width/skip,height);
 		conv = FactoryConvolveDown.convolveSB( kernel, BorderType.NORMALIZED, true, skip, GrayU8.class, GrayI8.class);
 		conv.process(input,found8);
-		ConvolveDownNormalized.horizontal(kernel,input,expected8,skip);
+		ConvolveImageDownNormalized.horizontal(kernel,input,expected8,skip);
 		BoofTesting.assertEquals(expected8,found8,0);
 	}
 
@@ -130,7 +130,7 @@ public class TestFactoryConvolveDown {
 		// CHECK NO BORDER
 		conv = FactoryConvolveDown.convolveSB( kernel, BorderType.SKIP, skip, GrayF32.class,GrayF32.class);
 		conv.process(input,found);
-		ConvolveDownNoBorder.convolve(kernel,input,expected,skip);
+		ConvolveImageDownNoBorder.convolve(kernel,input,expected,skip);
 		BoofTesting.assertEquals(expected,found,1e-4f);
 
 		// CHECK EXTENDED
@@ -142,7 +142,7 @@ public class TestFactoryConvolveDown {
 		// CHECK NORMALIZED
 		conv = FactoryConvolveDown.convolveSB( kernel, BorderType.NORMALIZED, skip, GrayF32.class,GrayF32.class);
 		conv.process(input,found);
-		ConvolveDownNormalized.convolve(kernel,input,expected,skip);
+		ConvolveImageDownNormalized.convolve(kernel,input,expected,skip);
 		BoofTesting.assertEquals(expected,found,1e-4f);
 	}
 
@@ -162,7 +162,7 @@ public class TestFactoryConvolveDown {
 		// CHECK NO BORDER
 		conv = FactoryConvolveDown.convolveSB( kernel, BorderType.SKIP, skip, GrayU8.class,GrayI16.class);
 		conv.process(input,found);
-		ConvolveDownNoBorder.convolve(kernel,input,expected,skip);
+		ConvolveImageDownNoBorder.convolve(kernel,input,expected,skip);
 		BoofTesting.assertEquals(expected,found,0);
 
 		// CHECK EXTENDED
@@ -176,7 +176,7 @@ public class TestFactoryConvolveDown {
 		GrayU8 expected8 = new GrayU8(width/skip,height/skip);
 		conv = FactoryConvolveDown.convolveSB( kernel, BorderType.NORMALIZED, skip, GrayU8.class,GrayU8.class);
 		conv.process(input,found8);
-		ConvolveDownNormalized.convolve(kernel,input,expected8,skip);
+		ConvolveImageDownNormalized.convolve(kernel,input,expected8,skip);
 		BoofTesting.assertEquals(expected8,found8,0);
 	}
 }

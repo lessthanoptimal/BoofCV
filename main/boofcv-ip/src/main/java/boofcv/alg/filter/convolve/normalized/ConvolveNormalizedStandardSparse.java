@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.convolve.normalized;
 
+import boofcv.alg.filter.convolve.ConvolveImageNormalizedSparse;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.GrayF32;
@@ -26,7 +27,7 @@ import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
- * Straight forward implementation of {@link boofcv.alg.filter.convolve.ConvolveNormalizedSparse} with minimal
+ * Straight forward implementation of {@link ConvolveImageNormalizedSparse} with minimal
  * optimizations.
  * </p>
  *

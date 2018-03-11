@@ -52,7 +52,7 @@ public class ConvolveImageMean {
 		if( !processed ) {
 			Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius, true);
 			if (kernel.width > input.width) {
-				ConvolveNormalized.horizontal(kernel, input, output);
+				ConvolveImageNormalized.horizontal(kernel, input, output);
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
@@ -76,7 +76,7 @@ public class ConvolveImageMean {
 		if( !processed ) {
 			Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius, true);
 			if (kernel.width > input.height) {
-				ConvolveNormalized.vertical(kernel, input, output);
+				ConvolveImageNormalized.vertical(kernel, input, output);
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
@@ -100,7 +100,7 @@ public class ConvolveImageMean {
 		if( !processed ) {
 			Kernel1D_F64 kernel = FactoryKernel.table1D_F64(radius, true);
 			if (kernel.width > input.width) {
-				ConvolveNormalized.horizontal(kernel, input, output);
+				ConvolveImageNormalized.horizontal(kernel, input, output);
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
@@ -124,7 +124,7 @@ public class ConvolveImageMean {
 		if( !processed ) {
 			Kernel1D_F64 kernel = FactoryKernel.table1D_F64(radius, true);
 			if (kernel.width > input.height) {
-				ConvolveNormalized.vertical(kernel, input, output);
+				ConvolveImageNormalized.vertical(kernel, input, output);
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
@@ -148,7 +148,7 @@ public class ConvolveImageMean {
 		if( !processed ) {
 			Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 			if (kernel.width > input.width) {
-				ConvolveNormalized.horizontal(kernel, input, output);
+				ConvolveImageNormalized.horizontal(kernel, input, output);
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
@@ -172,7 +172,7 @@ public class ConvolveImageMean {
 		if( !processed ) {
 			Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 			if (kernel.width > input.height) {
-				ConvolveNormalized.vertical(kernel, input, output);
+				ConvolveImageNormalized.vertical(kernel, input, output);
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
@@ -196,7 +196,7 @@ public class ConvolveImageMean {
 		if( !processed ) {
 			Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 			if (kernel.width > input.width) {
-				ConvolveNormalized.horizontal(kernel, input, output);
+				ConvolveImageNormalized.horizontal(kernel, input, output);
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
@@ -220,7 +220,7 @@ public class ConvolveImageMean {
 		if( !processed ) {
 			Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 			if (kernel.width > input.height) {
-				ConvolveNormalized.vertical(kernel, input, output);
+				ConvolveImageNormalized.vertical(kernel, input, output);
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);

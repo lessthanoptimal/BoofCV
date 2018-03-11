@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.*;
 
-import static boofcv.alg.filter.convolve.ConvolveDownNoBorder.checkParameters;
+import static boofcv.alg.filter.convolve.ConvolveImageDownNoBorder.checkParameters;
 
 
 /**
@@ -39,7 +39,7 @@ import static boofcv.alg.filter.convolve.ConvolveDownNoBorder.checkParameters;
  * 
  * @author Peter Abeles
  */
-public class ConvolveDownNormalized {
+public class ConvolveImageDownNormalized {
 
 	/**
 	 * Performs a horizontal 1D down convolution across the image while re-normalizing the kernel depending on its
@@ -55,7 +55,7 @@ public class ConvolveDownNormalized {
 		if( kernel.width >= image.width ) {
 			ConvolveDownNormalizedNaive.horizontal(kernel,image,dest,skip);
 		} else {
-			ConvolveDownNoBorder.horizontal(kernel,image,dest,skip);
+			ConvolveImageDownNoBorder.horizontal(kernel,image,dest,skip);
 			ConvolveDownNormalized_JustBorder.horizontal(kernel,image,dest,skip);
 		}
 	}
@@ -74,7 +74,7 @@ public class ConvolveDownNormalized {
 		if( kernel.width >= image.width ) {
 			ConvolveDownNormalizedNaive.vertical(kernel,image,dest,skip);
 		} else {
-			ConvolveDownNoBorder.vertical(kernel,image,dest,skip);
+			ConvolveImageDownNoBorder.vertical(kernel,image,dest,skip);
 			ConvolveDownNormalized_JustBorder.vertical(kernel,image,dest,skip);
 		}
 	}
@@ -93,7 +93,7 @@ public class ConvolveDownNormalized {
 		if( kernel.width >= image.width ) {
 			ConvolveDownNormalizedNaive.convolve(kernel,image,dest,skip);
 		} else {
-			ConvolveDownNoBorder.convolve(kernel,image,dest,skip);
+			ConvolveImageDownNoBorder.convolve(kernel,image,dest,skip);
 			ConvolveDownNormalized_JustBorder.convolve(kernel,image,dest,skip);
 		}
 	}
@@ -112,7 +112,7 @@ public class ConvolveDownNormalized {
 		if( kernel.width >= image.width ) {
 			ConvolveDownNormalizedNaive.horizontal(kernel,image,dest,skip);
 		} else {
-			ConvolveDownNoBorder.horizontal(kernel,image,dest,skip,kernel.computeSum());
+			ConvolveImageDownNoBorder.horizontal(kernel,image,dest,skip,kernel.computeSum());
 			ConvolveDownNormalized_JustBorder.horizontal(kernel,image,dest,skip);
 		}
 	}
@@ -131,7 +131,7 @@ public class ConvolveDownNormalized {
 		if( kernel.width >= image.width ) {
 			ConvolveDownNormalizedNaive.vertical(kernel,image,dest,skip);
 		} else {
-			ConvolveDownNoBorder.vertical(kernel,image,dest,skip,kernel.computeSum());
+			ConvolveImageDownNoBorder.vertical(kernel,image,dest,skip,kernel.computeSum());
 			ConvolveDownNormalized_JustBorder.vertical(kernel,image,dest,skip);
 		}
 	}
@@ -150,7 +150,7 @@ public class ConvolveDownNormalized {
 		if( kernel.width >= image.width ) {
 			ConvolveDownNormalizedNaive.convolve(kernel,image,dest,skip);
 		} else {
-			ConvolveDownNoBorder.convolve(kernel,image,dest,skip,kernel.computeSum());
+			ConvolveImageDownNoBorder.convolve(kernel,image,dest,skip,kernel.computeSum());
 			ConvolveDownNormalized_JustBorder.convolve(kernel,image,dest,skip);
 		}
 	}
@@ -169,7 +169,7 @@ public class ConvolveDownNormalized {
 		if( kernel.width >= image.width ) {
 			ConvolveDownNormalizedNaive.horizontal(kernel,image,dest,skip);
 		} else {
-			ConvolveDownNoBorder.horizontal(kernel,image,dest,skip,kernel.computeSum());
+			ConvolveImageDownNoBorder.horizontal(kernel,image,dest,skip,kernel.computeSum());
 			ConvolveDownNormalized_JustBorder.horizontal(kernel,image,dest,skip);
 		}
 	}
@@ -188,7 +188,7 @@ public class ConvolveDownNormalized {
 		if( kernel.width >= image.width ) {
 			ConvolveDownNormalizedNaive.vertical(kernel,image,dest,skip);
 		} else {
-			ConvolveDownNoBorder.vertical(kernel,image,dest,skip,kernel.computeSum());
+			ConvolveImageDownNoBorder.vertical(kernel,image,dest,skip,kernel.computeSum());
 			ConvolveDownNormalized_JustBorder.vertical(kernel,image,dest,skip);
 		}
 	}
@@ -207,7 +207,7 @@ public class ConvolveDownNormalized {
 		if( kernel.width >= image.width ) {
 			ConvolveDownNormalizedNaive.convolve(kernel,image,dest,skip);
 		} else {
-			ConvolveDownNoBorder.convolve(kernel,image,dest,skip,kernel.computeSum());
+			ConvolveImageDownNoBorder.convolve(kernel,image,dest,skip,kernel.computeSum());
 			ConvolveDownNormalized_JustBorder.convolve(kernel,image,dest,skip);
 		}
 	}

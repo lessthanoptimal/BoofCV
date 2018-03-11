@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.transform.ii.impl;
 
-import boofcv.alg.filter.convolve.ConvolveWithBorder;
+import boofcv.alg.filter.convolve.ConvolveImage;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.alg.transform.ii.IntegralKernel;
@@ -106,7 +106,7 @@ public class TestImplIntegralImageOps {
 		GrayS32 expected = new GrayS32(width,height);
 		GImageMiscOps.fillUniform(input, rand, 0, 10);
 		ImageBorder_S32 border = FactoryImageBorderAlgs.value( input, 0);
-		ConvolveWithBorder.convolve(kernel,input,expected,border);
+		ConvolveImage.convolve(kernel,input,expected,border);
 
 		Class paramType[] = m.getParameterTypes();
 		Class inputType = paramType[0];
@@ -145,7 +145,7 @@ public class TestImplIntegralImageOps {
 		GrayS32 expected = new GrayS32(width,height);
 		GImageMiscOps.fillUniform(input, rand, 0, 10);
 		ImageBorder_S32 border = FactoryImageBorderAlgs.value( input, 0);
-		ConvolveWithBorder.convolve(kernel,input,expected,border);
+		ConvolveImage.convolve(kernel,input,expected,border);
 
 		Class paramType[] = m.getParameterTypes();
 		Class inputType = paramType[0];

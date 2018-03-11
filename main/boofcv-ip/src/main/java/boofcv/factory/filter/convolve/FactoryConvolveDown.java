@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.factory.filter.convolve;
 import boofcv.abst.filter.convolve.ConvolveDown;
 import boofcv.abst.filter.convolve.GenericConvolveDown;
 import boofcv.abst.filter.convolve.PlanarConvolveDown;
-import boofcv.alg.filter.convolve.ConvolveDownNoBorder;
-import boofcv.alg.filter.convolve.ConvolveDownNormalized;
+import boofcv.alg.filter.convolve.ConvolveImageDownNoBorder;
+import boofcv.alg.filter.convolve.ConvolveImageDownNormalized;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
@@ -97,7 +97,7 @@ public class FactoryConvolveDown {
 		try {
 			switch( border ) {
 				case SKIP:
-					m = ConvolveDownNoBorder.class.
+					m = ConvolveImageDownNoBorder.class.
 							getMethod(direction,kernel.getClass(),inputType,outputType,int.class);
 					break;
 
@@ -105,7 +105,7 @@ public class FactoryConvolveDown {
 					throw new IllegalArgumentException("Extended border is currently not supported.");
 
 				case NORMALIZED:
-					m = ConvolveDownNormalized.class.
+					m = ConvolveImageDownNormalized.class.
 							getMethod(direction,kernel.getClass(),inputType,outputType,int.class);
 					break;
 
@@ -139,7 +139,7 @@ public class FactoryConvolveDown {
 		try {
 			switch( border ) {
 				case SKIP:
-					m = ConvolveDownNoBorder.class.getMethod(
+					m = ConvolveImageDownNoBorder.class.getMethod(
 							"convolve",kernel.getClass(),inputType,outputType,int.class);
 					break;
 
@@ -147,7 +147,7 @@ public class FactoryConvolveDown {
 					throw new IllegalArgumentException("Extended border is currently not supported.");
 
 				case NORMALIZED:
-					m = ConvolveDownNormalized.class.getMethod(
+					m = ConvolveImageDownNormalized.class.getMethod(
 							"convolve",kernel.getClass(),inputType,outputType,int.class);
 					break;
 

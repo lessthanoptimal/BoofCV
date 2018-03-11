@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,37 +88,37 @@ public class BenchmarkConvolveNormalizeEdge {
 
 	public int timeHorizontal_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveNormalized.horizontal(kernelF32,imgFloat32,out_F32);
+			ConvolveImageNormalized.horizontal(kernelF32,imgFloat32,out_F32);
 		return 0;
 	}
 
 	public int timeHorizontal_I8(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveNormalized.horizontal(kernelI32,imgInt8,out_I8);
+			ConvolveImageNormalized.horizontal(kernelI32,imgInt8,out_I8);
 		return 0;
 	}
 
 	public int timeHorizontal_I16(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveNormalized.horizontal(kernelI32,imgInt16,out_I16);
+			ConvolveImageNormalized.horizontal(kernelI32,imgInt16,out_I16);
 		return 0;
 	}
 
 	public int timeVertical_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveNormalized.vertical(kernelF32, imgFloat32, out_F32);
+			ConvolveImageNormalized.vertical(kernelF32, imgFloat32, out_F32);
 		return 0;
 	}
 
 	public int timeVertical_I8(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveNormalized.vertical(kernelI32,imgInt8,out_I8);
+			ConvolveImageNormalized.vertical(kernelI32,imgInt8,out_I8);
 		return 0;
 	}
 
 	public int timeVertical_I16(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveNormalized.vertical(kernelI32,imgInt16,out_I16);
+			ConvolveImageNormalized.vertical(kernelI32,imgInt16,out_I16);
 		return 0;
 	}
 

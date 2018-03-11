@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,63 +105,63 @@ public class BenchmarkConvolveWithBorder {
 	public static class Horizontal_SB_U8 extends PerformerBase {
 		@Override
 		public void process() {
-			ConvolveWithBorder.horizontal(kernelI32, src_SB_U8, out_SB_I16,border_I32);
+			ConvolveImage.horizontal(kernelI32, src_SB_U8, out_SB_I16,border_I32);
 		}
 	}
 
 	public static class Vertical_SB_U8 extends PerformerBase {
 		@Override
 		public void process() {
-			ConvolveWithBorder.vertical(kernelI32, src_SB_U8, out_SB_I16,border_I32);
+			ConvolveImage.vertical(kernelI32, src_SB_U8, out_SB_I16,border_I32);
 		}
 	}
 
 	public static class Horizontal_SB_U16 extends PerformerBase {
 		@Override
 		public void process() {
-			ConvolveWithBorder.horizontal(kernelI32, src_SB_S16, out_SB_I16,border_I32);
+			ConvolveImage.horizontal(kernelI32, src_SB_S16, out_SB_I16,border_I32);
 		}
 	}
 
 	public static class Vertical_SB_U16 extends PerformerBase {
 		@Override
 		public void process() {
-			ConvolveWithBorder.vertical(kernelI32, src_SB_S16, out_SB_I16,border_I32);
+			ConvolveImage.vertical(kernelI32, src_SB_S16, out_SB_I16,border_I32);
 		}
 	}
 
 	public static class Horizontal_SB_F32 extends PerformerBase {
 		@Override
 		public void process() {
-			ConvolveWithBorder.horizontal(kernelF32, src_SB_F32, dst_SB_F32,border_F32);
+			ConvolveImage.horizontal(kernelF32, src_SB_F32, dst_SB_F32,border_F32);
 		}
 	}
 
 	public static class Convolve2D_SB_F32 extends PerformerBase {
 		@Override
 		public void process() {
-			ConvolveWithBorder.convolve(kernel2D_F32, src_SB_F32, dst_SB_F32,border_F32);
+			ConvolveImage.convolve(kernel2D_F32, src_SB_F32, dst_SB_F32,border_F32);
 		}
 	}
 
 	public static class Horizontal_IL_F32 extends PerformerBase {
 		@Override
 		public void process() {
-			ConvolveWithBorder.horizontal(kernelF32,src_IL_F32,dst_IL_F32,border_IL_F32);
+			ConvolveImage.horizontal(kernelF32,src_IL_F32,dst_IL_F32,border_IL_F32);
 		}
 	}
 
 	public static class Vertical_IL_F32 extends PerformerBase {
 		@Override
 		public void process() {
-			ConvolveWithBorder.vertical(kernelF32,src_IL_F32,dst_IL_F32,border_IL_F32);
+			ConvolveImage.vertical(kernelF32,src_IL_F32,dst_IL_F32,border_IL_F32);
 		}
 	}
 
 	public static class Convolve2D_IL_F32 extends PerformerBase {
 		@Override
 		public void process() {
-			ConvolveWithBorder.convolve(kernel2D_F32,src_IL_F32,dst_IL_F32,border_IL_F32);
+			ConvolveImage.convolve(kernel2D_F32,src_IL_F32,dst_IL_F32,border_IL_F32);
 		}
 	}
 

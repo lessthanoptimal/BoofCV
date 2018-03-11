@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import boofcv.struct.convolve.Kernel2D_S32;
  * 
  * @author Peter Abeles
  */
-public class ConvolveWithBorderSparse {
+public class ConvolveImageSparse {
 
 	public static float horizontal( Kernel1D_F32 kernel, ImageBorder_F32 input , int x , int y ) {
 		final int r = kernel.getRadius();

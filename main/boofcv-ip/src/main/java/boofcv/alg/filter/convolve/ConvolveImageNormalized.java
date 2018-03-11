@@ -36,7 +36,7 @@ import boofcv.struct.image.*;
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach", "unchecked"})
-public class ConvolveNormalized {
+public class ConvolveImageNormalized {
 
 	/**
 	 * Performs a horizontal 1D normalized convolution across the image.
@@ -48,7 +48,7 @@ public class ConvolveNormalized {
 	public static void horizontal(Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst ) {
 		InputSanityCheck.checkSameShape(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeHorizontal(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width ) {
@@ -75,7 +75,7 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst ) {
 		InputSanityCheck.checkSameShape(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeVertical(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.height ) {
@@ -102,7 +102,7 @@ public class ConvolveNormalized {
 	public static void convolve(Kernel2D_F32 kernel, GrayF32 src, GrayF32 dst ) {
 		InputSanityCheck.checkSameShape(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeConvolve(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width || kernel.width >= src.height ) {
@@ -129,7 +129,7 @@ public class ConvolveNormalized {
 	public static void horizontal(Kernel1D_F32 kernel, InterleavedF32 src, InterleavedF32 dst ) {
 		InputSanityCheck.checkSameShapeB(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeHorizontal(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width ) {
@@ -156,7 +156,7 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_F32 kernel, InterleavedF32 src, InterleavedF32 dst ) {
 		InputSanityCheck.checkSameShapeB(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeVertical(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.height ) {
@@ -183,7 +183,7 @@ public class ConvolveNormalized {
 	public static void convolve(Kernel2D_F32 kernel, InterleavedF32 src, InterleavedF32 dst ) {
 		InputSanityCheck.checkSameShapeB(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeConvolve(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width || kernel.width >= src.height ) {
@@ -210,7 +210,7 @@ public class ConvolveNormalized {
 	public static void horizontal(Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst ) {
 		InputSanityCheck.checkSameShape(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeHorizontal(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width ) {
@@ -237,7 +237,7 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst ) {
 		InputSanityCheck.checkSameShape(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeVertical(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.height ) {
@@ -264,7 +264,7 @@ public class ConvolveNormalized {
 	public static void convolve(Kernel2D_F64 kernel, GrayF64 src, GrayF64 dst ) {
 		InputSanityCheck.checkSameShape(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeConvolve(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width || kernel.width >= src.height ) {
@@ -291,7 +291,7 @@ public class ConvolveNormalized {
 	public static void horizontal(Kernel1D_F64 kernel, InterleavedF64 src, InterleavedF64 dst ) {
 		InputSanityCheck.checkSameShapeB(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeHorizontal(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width ) {
@@ -318,7 +318,7 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_F64 kernel, InterleavedF64 src, InterleavedF64 dst ) {
 		InputSanityCheck.checkSameShapeB(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeVertical(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.height ) {
@@ -345,7 +345,7 @@ public class ConvolveNormalized {
 	public static void convolve(Kernel2D_F64 kernel, InterleavedF64 src, InterleavedF64 dst ) {
 		InputSanityCheck.checkSameShapeB(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeConvolve(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width || kernel.width >= src.height ) {
@@ -372,7 +372,7 @@ public class ConvolveNormalized {
 	public static void horizontal(Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst ) {
 		InputSanityCheck.checkSameShape(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeHorizontal(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width ) {
@@ -394,7 +394,7 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst ) {
 		InputSanityCheck.checkSameShape(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeVertical(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.height ) {
@@ -416,7 +416,7 @@ public class ConvolveNormalized {
 	public static void convolve(Kernel2D_S32 kernel, GrayU8 src, GrayI8 dst ) {
 		InputSanityCheck.checkSameShape(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeConvolve(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width || kernel.width >= src.height ) {
@@ -438,7 +438,7 @@ public class ConvolveNormalized {
 	public static void horizontal(Kernel1D_S32 kernel, InterleavedU8 src, InterleavedI8 dst ) {
 		InputSanityCheck.checkSameShapeB(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeHorizontal(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width ) {
@@ -460,7 +460,7 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_S32 kernel, InterleavedU8 src, InterleavedI8 dst ) {
 		InputSanityCheck.checkSameShapeB(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeVertical(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.height ) {
@@ -482,7 +482,7 @@ public class ConvolveNormalized {
 	public static void convolve(Kernel2D_S32 kernel, InterleavedU8 src, InterleavedI8 dst ) {
 		InputSanityCheck.checkSameShapeB(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeConvolve(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width || kernel.width >= src.height ) {
@@ -504,7 +504,7 @@ public class ConvolveNormalized {
 	public static void horizontal(Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst ) {
 		InputSanityCheck.checkSameShape(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeHorizontal(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width ) {
@@ -526,7 +526,7 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst ) {
 		InputSanityCheck.checkSameShape(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeVertical(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.height ) {
@@ -548,7 +548,7 @@ public class ConvolveNormalized {
 	public static void convolve(Kernel2D_S32 kernel, GrayS16 src, GrayI16 dst ) {
 		InputSanityCheck.checkSameShape(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeConvolve(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width || kernel.width >= src.height ) {
@@ -570,7 +570,7 @@ public class ConvolveNormalized {
 	public static void horizontal(Kernel1D_S32 kernel, InterleavedS16 src, InterleavedI16 dst ) {
 		InputSanityCheck.checkSameShapeB(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeHorizontal(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width ) {
@@ -592,7 +592,7 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_S32 kernel, InterleavedS16 src, InterleavedI16 dst ) {
 		InputSanityCheck.checkSameShapeB(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeVertical(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.height ) {
@@ -614,7 +614,7 @@ public class ConvolveNormalized {
 	public static void convolve(Kernel2D_S32 kernel, InterleavedS16 src, InterleavedI16 dst ) {
 		InputSanityCheck.checkSameShapeB(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeConvolve(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width || kernel.width >= src.height ) {
@@ -636,7 +636,7 @@ public class ConvolveNormalized {
 	public static void horizontal(Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst ) {
 		InputSanityCheck.checkSameShape(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeHorizontal(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width ) {
@@ -658,7 +658,7 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst ) {
 		InputSanityCheck.checkSameShape(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeVertical(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.height ) {
@@ -680,7 +680,7 @@ public class ConvolveNormalized {
 	public static void convolve(Kernel2D_S32 kernel, GrayS32 src, GrayS32 dst ) {
 		InputSanityCheck.checkSameShape(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeConvolve(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width || kernel.width >= src.height ) {
@@ -702,7 +702,7 @@ public class ConvolveNormalized {
 	public static void horizontal(Kernel1D_S32 kernel, InterleavedS32 src, InterleavedS32 dst ) {
 		InputSanityCheck.checkSameShapeB(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeHorizontal(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width ) {
@@ -724,7 +724,7 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_S32 kernel, InterleavedS32 src, InterleavedS32 dst ) {
 		InputSanityCheck.checkSameShapeB(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeVertical(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.height ) {
@@ -746,7 +746,7 @@ public class ConvolveNormalized {
 	public static void convolve(Kernel2D_S32 kernel, InterleavedS32 src, InterleavedS32 dst ) {
 		InputSanityCheck.checkSameShapeB(src, dst);
 
-		boolean processed = BOverrideConvolveNormalized.invokeNativeConvolve(kernel,src,dst);
+		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
 		if( !processed ) {
 			if( kernel.width >= src.width || kernel.width >= src.height ) {

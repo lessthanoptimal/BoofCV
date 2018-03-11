@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,9 @@ package boofcv.factory.filter.convolve;
 
 import boofcv.abst.filter.convolve.ConvolveInterface;
 import boofcv.abst.filter.convolve.GenericConvolve;
+import boofcv.alg.filter.convolve.ConvolveImage;
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
-import boofcv.alg.filter.convolve.ConvolveNormalized;
-import boofcv.alg.filter.convolve.ConvolveWithBorder;
+import boofcv.alg.filter.convolve.ConvolveImageNormalized;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.convolve.Kernel1D;
@@ -72,19 +72,19 @@ public class FactoryConvolve {
 					break;
 
 				case EXTENDED:
-					m = BoofTesting.findMethod(ConvolveWithBorder.class,direction,kernel.getClass(),_inputType,_outputType,borderClassType);
+					m = BoofTesting.findMethod(ConvolveImage.class,direction,kernel.getClass(),_inputType,_outputType,borderClassType);
 					break;
 
 				case REFLECT:
-					m = BoofTesting.findMethod(ConvolveWithBorder.class,direction,kernel.getClass(),_inputType,_outputType,borderClassType);
+					m = BoofTesting.findMethod(ConvolveImage.class,direction,kernel.getClass(),_inputType,_outputType,borderClassType);
 					break;
 
 				case WRAP:
-					m = BoofTesting.findMethod(ConvolveWithBorder.class,direction,kernel.getClass(),_inputType,_outputType,borderClassType);
+					m = BoofTesting.findMethod(ConvolveImage.class,direction,kernel.getClass(),_inputType,_outputType,borderClassType);
 					break;
 
 				case NORMALIZED:
-					m = ConvolveNormalized.class.getMethod(direction,kernel.getClass(),_inputType,_outputType);
+					m = ConvolveImageNormalized.class.getMethod(direction,kernel.getClass(),_inputType,_outputType);
 					break;
 
 				default:
@@ -123,19 +123,19 @@ public class FactoryConvolve {
 					break;
 
 				case EXTENDED:
-					m = BoofTesting.findMethod(ConvolveWithBorder.class,"convolve",kernel.getClass(),inputType,outputType,borderClassType);
+					m = BoofTesting.findMethod(ConvolveImage.class,"convolve",kernel.getClass(),inputType,outputType,borderClassType);
 					break;
 
 				case REFLECT:
-					m = BoofTesting.findMethod(ConvolveWithBorder.class,"convolve",kernel.getClass(),inputType,outputType,borderClassType);
+					m = BoofTesting.findMethod(ConvolveImage.class,"convolve",kernel.getClass(),inputType,outputType,borderClassType);
 					break;
 
 				case WRAP:
-					m = BoofTesting.findMethod(ConvolveWithBorder.class,"convolve",kernel.getClass(),inputType,outputType,borderClassType);
+					m = BoofTesting.findMethod(ConvolveImage.class,"convolve",kernel.getClass(),inputType,outputType,borderClassType);
 					break;
 
 				case NORMALIZED:
-					m = ConvolveNormalized.class.
+					m = ConvolveImageNormalized.class.
 							getMethod("convolve",kernel.getClass(),inputType,outputType);
 					break;
 

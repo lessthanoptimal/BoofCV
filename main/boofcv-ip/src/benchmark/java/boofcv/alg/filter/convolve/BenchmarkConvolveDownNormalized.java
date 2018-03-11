@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,13 +94,13 @@ public class BenchmarkConvolveDownNormalized {
 
 	public int timeHorizontal_NoBorder_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveDownNoBorder.horizontal(kernelF32,imgFloat32,out_F32,skip);
+			ConvolveImageDownNoBorder.horizontal(kernelF32,imgFloat32,out_F32,skip);
 		return 0;
 	}
 
 	public int timeHorizontal_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveDownNormalized.horizontal(kernelF32,imgFloat32,out_F32,skip);
+			ConvolveImageDownNormalized.horizontal(kernelF32,imgFloat32,out_F32,skip);
 		return 0;
 	}
 
@@ -112,13 +112,13 @@ public class BenchmarkConvolveDownNormalized {
 
 	public int timeVertical_NoBorder_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveDownNoBorder.vertical(kernelF32,imgFloat32,out_F32,skip);
+			ConvolveImageDownNoBorder.vertical(kernelF32,imgFloat32,out_F32,skip);
 		return 0;
 	}
 
 	public int timeVertical_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveDownNormalized.vertical(kernelF32,imgFloat32,out_F32,skip);
+			ConvolveImageDownNormalized.vertical(kernelF32,imgFloat32,out_F32,skip);
 		return 0;
 	}
 
@@ -130,13 +130,13 @@ public class BenchmarkConvolveDownNormalized {
 
 	public int timeConvolve_NoBorder_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveDownNoBorder.convolve(kernel2D_F32,imgFloat32,out_F32,skip);
+			ConvolveImageDownNoBorder.convolve(kernel2D_F32,imgFloat32,out_F32,skip);
 		return 0;
 	}
 
 	public int timeConvolve_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveDownNormalized.convolve(kernel2D_F32,imgFloat32,out_F32,skip);
+			ConvolveImageDownNormalized.convolve(kernel2D_F32,imgFloat32,out_F32,skip);
 		return 0;
 	}
 

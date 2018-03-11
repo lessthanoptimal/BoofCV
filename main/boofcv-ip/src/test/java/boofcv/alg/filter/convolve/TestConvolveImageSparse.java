@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestConvolveWithBorderSparse {
+public class TestConvolveImageSparse {
 
 	Random rand = new Random(234);
 	int width = 20;
@@ -46,7 +46,7 @@ public class TestConvolveWithBorderSparse {
 	public void testHorizontal() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
 		int numFound = 0;
 
-		Method methods[] = ConvolveWithBorderSparse.class.getMethods();
+		Method methods[] = ConvolveImageSparse.class.getMethods();
 
 		for( Method m : methods ) {
 			if( !m.getName().equals("horizontal"))
@@ -63,7 +63,7 @@ public class TestConvolveWithBorderSparse {
 	public void testVertical() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
 		int numFound = 0;
 
-		Method methods[] = ConvolveWithBorderSparse.class.getMethods();
+		Method methods[] = ConvolveImageSparse.class.getMethods();
 
 		for( Method m : methods ) {
 			if( !m.getName().equals("vertical"))
@@ -80,7 +80,7 @@ public class TestConvolveWithBorderSparse {
 	public void testConvolve() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
 		int numFound = 0;
 
-		Method methods[] = ConvolveWithBorderSparse.class.getMethods();
+		Method methods[] = ConvolveImageSparse.class.getMethods();
 
 		for( Method m : methods ) {
 			if( !m.getName().equals("convolve"))
@@ -107,7 +107,7 @@ public class TestConvolveWithBorderSparse {
 		Object kernel = createKernel(kernelType,2);
 		ImageBorder border = createBorder(borderType);
 
-		Method checkM = BoofTesting.findMethod(ConvolveWithBorder.class,m.getName(),kernelType,inputType,outputType,borderType);
+		Method checkM = BoofTesting.findMethod(ConvolveImage.class,m.getName(),kernelType,inputType,outputType,borderType);
 		checkM.invoke(null,kernel,input,expected,border);
 
 		Number v = (Number)m.invoke(null,kernel,border,3,6);

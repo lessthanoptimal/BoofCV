@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestConvolveNormalizedSparse {
+public class TestConvolveImageNormalizedSparse {
 	Random rand = new Random(0xFF);
 
 	int width = 10;
@@ -63,7 +63,7 @@ public class TestConvolveNormalizedSparse {
 	public class CompareToStandard extends CompareIdenticalFunctions
 	{
 		protected CompareToStandard() {
-			super(ConvolveNormalizedSparse.class, ConvolveNormalizedStandardSparse.class);
+			super(ConvolveImageNormalizedSparse.class, ConvolveNormalizedStandardSparse.class);
 		}
 
 		@Override

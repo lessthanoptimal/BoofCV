@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.convolve;
 
+import boofcv.core.image.border.ImageBorder;
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
 import boofcv.struct.convolve.Kernel1D;
@@ -25,14 +26,12 @@ import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.ImageBase;
 
 /**
- * Override for normalized convolutions
- * 
  * @author Peter Abeles
  */
-public class BOverrideConvolveNormalized extends BOverrideClass {
+public class BOverrideConvolveImage extends BOverrideClass {
 
 	static {
-		BOverrideManager.register(BOverrideConvolveNormalized.class);
+		BOverrideManager.register(BOverrideConvolveImage.class);
 	}
 
 	public static Horizontal horizontal;
@@ -40,47 +39,48 @@ public class BOverrideConvolveNormalized extends BOverrideClass {
 	public static Convolve convolve;
 
 	public interface Horizontal {
-		void horizontal(Kernel1D kernel, ImageBase input, ImageBase output);
+		void horizontal(Kernel1D kernel, ImageBase input, ImageBase output , ImageBorder border);
 	}
 
 	public interface Vertical {
-		void vertical(Kernel1D kernel, ImageBase input, ImageBase output);
+		void vertical(Kernel1D kernel, ImageBase input, ImageBase output , ImageBorder border);
 	}
 
 	public interface Convolve {
-		void convolve(Kernel2D kernel, ImageBase input, ImageBase output);
+		void convolve(Kernel2D kernel, ImageBase input, ImageBase output , ImageBorder border);
 	}
 
-	public static boolean invokeNativeHorizontal(Kernel1D kernel, ImageBase input, ImageBase output) {
+	public static boolean invokeNativeHorizontal(Kernel1D kernel, ImageBase input, ImageBase output , ImageBorder border) {
 		boolean processed = false;
-		if( BOverrideConvolveNormalized.horizontal != null ) {
+		if( horizontal != null ) {
 			try {
-				BOverrideConvolveNormalized.horizontal.horizontal(kernel,input,output);
+				horizontal.horizontal(kernel, input, output, border);
 				processed = true;
 			} catch( RuntimeException ignore ) {}
 		}
 		return processed;
 	}
 
-	public static boolean invokeNativeVertical(Kernel1D kernel, ImageBase input, ImageBase output) {
+	public static boolean invokeNativeVertical(Kernel1D kernel, ImageBase input, ImageBase output , ImageBorder border) {
 		boolean processed = false;
-		if( BOverrideConvolveNormalized.vertical != null ) {
+		if( vertical != null ) {
 			try {
-				BOverrideConvolveNormalized.vertical.vertical(kernel,input,output);
+				vertical.vertical(kernel, input, output, border);
 				processed = true;
 			} catch( RuntimeException ignore ) {}
 		}
 		return processed;
 	}
 
-	public static boolean invokeNativeConvolve(Kernel2D kernel, ImageBase input, ImageBase output) {
+	public static boolean invokeNativeConvolve(Kernel2D kernel, ImageBase input, ImageBase output , ImageBorder border) {
 		boolean processed = false;
-		if( BOverrideConvolveNormalized.convolve != null ) {
+		if( convolve != null ) {
 			try {
-				BOverrideConvolveNormalized.convolve.convolve(kernel,input,output);
+				convolve.convolve(kernel, input, output, border);
 				processed = true;
 			} catch( RuntimeException ignore ) {}
 		}
 		return processed;
 	}
 }
+

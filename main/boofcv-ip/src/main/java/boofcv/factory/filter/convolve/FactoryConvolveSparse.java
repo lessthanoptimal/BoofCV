@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.factory.filter.convolve;
 
 import boofcv.abst.filter.convolve.ImageConvolveSparse;
-import boofcv.alg.filter.convolve.ConvolveWithBorderSparse;
+import boofcv.alg.filter.convolve.ConvolveImageSparse;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_S32;
@@ -71,7 +71,7 @@ public class FactoryConvolveSparse {
 
 		@Override
 		public double compute(int x, int y) {
-			return ConvolveWithBorderSparse.convolve(kernel,(ImageBorder_F32)image,x,y);
+			return ConvolveImageSparse.convolve(kernel,(ImageBorder_F32)image,x,y);
 		}
 	}
 
@@ -83,7 +83,7 @@ public class FactoryConvolveSparse {
 
 		@Override
 		public double compute(int x, int y) {
-			return ConvolveWithBorderSparse.convolve(kernel,(ImageBorder_S32)image,x,y);
+			return ConvolveImageSparse.convolve(kernel,(ImageBorder_S32)image,x,y);
 		}
 	}
 
@@ -95,7 +95,7 @@ public class FactoryConvolveSparse {
 
 		@Override
 		public double compute(int x, int y) {
-			return ConvolveWithBorderSparse.horizontal(kernel, (ImageBorder_F32) image, x, y);
+			return ConvolveImageSparse.horizontal(kernel, (ImageBorder_F32) image, x, y);
 		}
 	}
 
@@ -107,7 +107,7 @@ public class FactoryConvolveSparse {
 
 		@Override
 		public double compute(int x, int y) {
-			return ConvolveWithBorderSparse.horizontal(kernel, (ImageBorder_S32) image, x, y);
+			return ConvolveImageSparse.horizontal(kernel, (ImageBorder_S32) image, x, y);
 		}
 	}
 
@@ -119,7 +119,7 @@ public class FactoryConvolveSparse {
 
 		@Override
 		public double compute(int x, int y) {
-			return ConvolveWithBorderSparse.vertical(kernel, (ImageBorder_F32) image, x, y);
+			return ConvolveImageSparse.vertical(kernel, (ImageBorder_F32) image, x, y);
 		}
 	}
 
@@ -131,7 +131,7 @@ public class FactoryConvolveSparse {
 
 		@Override
 		public double compute(int x, int y) {
-			return ConvolveWithBorderSparse.vertical(kernel,(ImageBorder_S32)image,x,y);
+			return ConvolveImageSparse.vertical(kernel,(ImageBorder_S32)image,x,y);
 		}
 	}
 }

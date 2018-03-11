@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.abst.filter.convolve;
 
+import boofcv.alg.filter.convolve.ConvolveImage;
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
-import boofcv.alg.filter.convolve.ConvolveNormalized;
-import boofcv.alg.filter.convolve.ConvolveWithBorder;
+import boofcv.alg.filter.convolve.ConvolveImageNormalized;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.BorderType;
@@ -73,13 +73,13 @@ public class TestFactoryConvolve {
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,input.imageType,found.imageType,BorderType.EXTENDED,true);
 		conv.process(input,found);
-		ConvolveWithBorder.horizontal(kernel,input,expected,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+		ConvolveImage.horizontal(kernel,input,expected,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 		BoofTesting.assertEquals(expected,found,1e-4f);
 
 		// CHECK NORMALIZED
 		conv = FactoryConvolve.convolve( kernel,input.imageType,found.imageType,BorderType.NORMALIZED,true);
 		conv.process(input,found);
-		ConvolveNormalized.horizontal(kernel,input,expected);
+		ConvolveImageNormalized.horizontal(kernel,input,expected);
 		BoofTesting.assertEquals(expected,found,1e-4f);
 	}
 
@@ -105,7 +105,7 @@ public class TestFactoryConvolve {
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,input.imageType,found.imageType,BorderType.EXTENDED,true);
 		conv.process(input,found);
-		ConvolveWithBorder.horizontal(kernel,input,expected,new ImageBorder1D_S32(BorderIndex1D_Extend.class));
+		ConvolveImage.horizontal(kernel,input,expected,new ImageBorder1D_S32(BorderIndex1D_Extend.class));
 		BoofTesting.assertEquals(expected,found,0);
 
 		// CHECK NORMALIZED
@@ -113,7 +113,7 @@ public class TestFactoryConvolve {
 		GrayU8 expected8 = new GrayU8(width,height);
 		conv = FactoryConvolve.convolve( kernel,input.imageType,ImageType.single(GrayI8.class),BorderType.NORMALIZED,true);
 		conv.process(input,found8);
-		ConvolveNormalized.horizontal(kernel,input,expected8);
+		ConvolveImageNormalized.horizontal(kernel,input,expected8);
 		BoofTesting.assertEquals(expected8,found8,0);
 	}
 
@@ -138,13 +138,13 @@ public class TestFactoryConvolve {
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,GrayF32.class,GrayF32.class,BorderType.EXTENDED);
 		conv.process(input,found);
-		ConvolveWithBorder.convolve(kernel,input,expected,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+		ConvolveImage.convolve(kernel,input,expected,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 		BoofTesting.assertEquals(expected,found,1e-4f);
 
 		// CHECK NORMALIZED
 		conv = FactoryConvolve.convolve( kernel,GrayF32.class,GrayF32.class,BorderType.NORMALIZED);
 		conv.process(input,found);
-		ConvolveNormalized.convolve(kernel,input,expected);
+		ConvolveImageNormalized.convolve(kernel,input,expected);
 		BoofTesting.assertEquals(expected,found,1e-4f);
 	}
 
@@ -170,7 +170,7 @@ public class TestFactoryConvolve {
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,GrayU8.class,GrayI16.class,BorderType.EXTENDED);
 		conv.process(input,found);
-		ConvolveWithBorder.convolve(kernel,input,expected,new ImageBorder1D_S32(BorderIndex1D_Extend.class));
+		ConvolveImage.convolve(kernel,input,expected,new ImageBorder1D_S32(BorderIndex1D_Extend.class));
 		BoofTesting.assertEquals(expected,found,0);
 
 		// CHECK NORMALIZED
@@ -178,7 +178,7 @@ public class TestFactoryConvolve {
 		GrayU8 expected8 = new GrayU8(width,height);
 		conv = FactoryConvolve.convolve( kernel,GrayU8.class,GrayU8.class,BorderType.NORMALIZED);
 		conv.process(input,found8);
-		ConvolveNormalized.convolve(kernel,input,expected8);
+		ConvolveImageNormalized.convolve(kernel,input,expected8);
 		BoofTesting.assertEquals(expected8,found8,0);
 	}
 }

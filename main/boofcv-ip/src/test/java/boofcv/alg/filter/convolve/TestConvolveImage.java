@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,13 +41,13 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class TestConvolveWithBorder extends CompareImageBorder {
+public class TestConvolveImage extends CompareImageBorder {
 
 	private int kernelWidth;
 	private int kernelOffset;
 
-	public TestConvolveWithBorder() {
-		super(ConvolveWithBorder.class);
+	public TestConvolveImage() {
+		super(ConvolveImage.class);
 	}
 
 	@Override

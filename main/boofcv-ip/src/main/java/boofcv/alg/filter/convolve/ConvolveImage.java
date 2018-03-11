@@ -40,7 +40,7 @@ import boofcv.struct.image.*;
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach", "unchecked"})
-public class ConvolveWithBorder {
+public class ConvolveImage {
 
 	/**
 	 * Performs a horizontal 1D convolution across the image.
@@ -54,7 +54,7 @@ public class ConvolveWithBorder {
 								  GrayF32 input, GrayF32 output , ImageBorder_F32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -75,7 +75,7 @@ public class ConvolveWithBorder {
 								  GrayF32 input, GrayF32 output , ImageBorder_F32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -96,7 +96,7 @@ public class ConvolveWithBorder {
 								  GrayF32 input, GrayF32 output , ImageBorder_F32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -117,7 +117,7 @@ public class ConvolveWithBorder {
 								  InterleavedF32 input, InterleavedF32 output , ImageBorder_IL_F32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -138,7 +138,7 @@ public class ConvolveWithBorder {
 								  InterleavedF32 input, InterleavedF32 output , ImageBorder_IL_F32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -159,7 +159,7 @@ public class ConvolveWithBorder {
 								  InterleavedF32 input, InterleavedF32 output , ImageBorder_IL_F32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -180,7 +180,7 @@ public class ConvolveWithBorder {
 								  GrayU8 input, GrayI16 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -201,7 +201,7 @@ public class ConvolveWithBorder {
 								  GrayU8 input, GrayI16 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -222,7 +222,7 @@ public class ConvolveWithBorder {
 								  GrayU8 input, GrayI16 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -243,7 +243,7 @@ public class ConvolveWithBorder {
 								  InterleavedU8 input, InterleavedI16 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -264,7 +264,7 @@ public class ConvolveWithBorder {
 								  InterleavedU8 input, InterleavedI16 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -285,7 +285,7 @@ public class ConvolveWithBorder {
 								  InterleavedU8 input, InterleavedI16 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -306,7 +306,7 @@ public class ConvolveWithBorder {
 								  GrayU8 input, GrayS32 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -327,7 +327,7 @@ public class ConvolveWithBorder {
 								  GrayU8 input, GrayS32 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -348,7 +348,7 @@ public class ConvolveWithBorder {
 								  GrayU8 input, GrayS32 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -369,7 +369,7 @@ public class ConvolveWithBorder {
 								  InterleavedU8 input, InterleavedS32 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -390,7 +390,7 @@ public class ConvolveWithBorder {
 								  InterleavedU8 input, InterleavedS32 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -411,7 +411,7 @@ public class ConvolveWithBorder {
 								  InterleavedU8 input, InterleavedS32 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -432,7 +432,7 @@ public class ConvolveWithBorder {
 								  GrayS16 input, GrayI16 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -453,7 +453,7 @@ public class ConvolveWithBorder {
 								  GrayS16 input, GrayI16 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -474,7 +474,7 @@ public class ConvolveWithBorder {
 								  GrayS16 input, GrayI16 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -495,7 +495,7 @@ public class ConvolveWithBorder {
 								  InterleavedS16 input, InterleavedI16 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -516,7 +516,7 @@ public class ConvolveWithBorder {
 								  InterleavedS16 input, InterleavedI16 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -537,7 +537,7 @@ public class ConvolveWithBorder {
 								  InterleavedS16 input, InterleavedI16 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -558,7 +558,7 @@ public class ConvolveWithBorder {
 								  GrayS32 input, GrayS32 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -579,7 +579,7 @@ public class ConvolveWithBorder {
 								  GrayS32 input, GrayS32 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -600,7 +600,7 @@ public class ConvolveWithBorder {
 								  GrayS32 input, GrayS32 output , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -621,7 +621,7 @@ public class ConvolveWithBorder {
 								  InterleavedS32 input, InterleavedS32 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeHorizontal(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -642,7 +642,7 @@ public class ConvolveWithBorder {
 								  InterleavedS32 input, InterleavedS32 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeVertical(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);
@@ -663,7 +663,7 @@ public class ConvolveWithBorder {
 								  InterleavedS32 input, InterleavedS32 output , ImageBorder_IL_S32 border ) {
 		InputSanityCheck.checkSameShapeB(input, output);
 
-		boolean processed = BOverrideConvolveWidthBorder.invokeNativeConvolve(kernel,input,output,border);
+		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
 
 		if( !processed ) {
 			border.setImage(input);

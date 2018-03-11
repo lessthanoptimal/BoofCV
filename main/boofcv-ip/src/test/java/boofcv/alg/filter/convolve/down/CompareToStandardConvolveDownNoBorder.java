@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.filter.convolve.down;
 
 import boofcv.alg.filter.convolve.ConvolutionTestHelper;
-import boofcv.alg.filter.convolve.ConvolveDownNoBorder;
+import boofcv.alg.filter.convolve.ConvolveImageDownNoBorder;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.image.ImageBase;
@@ -29,7 +29,7 @@ import java.lang.reflect.Method;
 import java.util.Random;
 
 /**
- * Compares the target class to functions in {@link ConvolveDownNoBorder}.
+ * Compares the target class to functions in {@link ConvolveImageDownNoBorder}.
  *
  * @author Peter Abeles
  */

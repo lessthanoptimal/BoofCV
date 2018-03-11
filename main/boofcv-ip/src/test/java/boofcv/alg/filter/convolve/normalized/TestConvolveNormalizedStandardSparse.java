@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.convolve.normalized;
 
-import boofcv.alg.filter.convolve.ConvolveNormalized;
+import boofcv.alg.filter.convolve.ConvolveImageNormalized;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
@@ -142,8 +142,8 @@ public class TestConvolveNormalizedStandardSparse {
 		GrayF32 temp = new GrayF32(image.width,image.height);
 		GrayF32 temp2 = new GrayF32(image.width,image.height);
 
-		ConvolveNormalized.horizontal(kernelF32,image,temp);
-		ConvolveNormalized.vertical(kernelF32,temp,temp2);
+		ConvolveImageNormalized.horizontal(kernelF32,image,temp);
+		ConvolveImageNormalized.vertical(kernelF32,temp,temp2);
 
 		return temp2.get(targetX,targetY);
 	}
@@ -152,8 +152,8 @@ public class TestConvolveNormalizedStandardSparse {
 		GrayU8 temp = new GrayU8(image.width,image.height);
 		GrayU8 temp2 = new GrayU8(image.width,image.height);
 
-		ConvolveNormalized.horizontal(kernelI32,image,temp);
-		ConvolveNormalized.vertical(kernelI32,temp,temp2);
+		ConvolveImageNormalized.horizontal(kernelI32,image,temp);
+		ConvolveImageNormalized.vertical(kernelI32,temp,temp2);
 
 		return temp2.get(targetX,targetY);
 	}
@@ -162,8 +162,8 @@ public class TestConvolveNormalizedStandardSparse {
 		GrayS16 temp = new GrayS16(image.width,image.height);
 		GrayS16 temp2 = new GrayS16(image.width,image.height);
 
-		ConvolveNormalized.horizontal(kernelI32,image,temp);
-		ConvolveNormalized.vertical(kernelI32,temp,temp2);
+		ConvolveImageNormalized.horizontal(kernelI32,image,temp);
+		ConvolveImageNormalized.vertical(kernelI32,temp,temp2);
 
 		return temp2.get(targetX,targetY);
 	}

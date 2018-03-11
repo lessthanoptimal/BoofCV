@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.convolve.down;
 
+import boofcv.alg.filter.convolve.ConvolveImageDownNoBorder;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
@@ -27,7 +28,7 @@ import boofcv.struct.image.*;
 
 /**
  * <p>
- * Standard implementation of {@link boofcv.alg.filter.convolve.ConvolveDownNoBorder} where no special
+ * Standard implementation of {@link ConvolveImageDownNoBorder} where no special
  * optimization has been done.
  * </p>
  *
