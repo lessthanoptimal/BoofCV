@@ -22,6 +22,8 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import org.junit.Test;
 
+import java.util.Random;
+
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
@@ -30,7 +32,64 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestBackgroundGmmCommon {
 
+	Random rand = new Random(234);
+
 	ImageType imageType = ImageType.single(GrayU8.class);
+
+	/**
+	 * Alternates between two values and see if two stable gaussians form
+	 */
+	@Test
+	public void createTwoModels() {
+		int maxGaussians = 2;
+
+		BackgroundGmmCommon alg = new BackgroundGmmCommon(1000,0.0f,maxGaussians,imageType);
+		alg.setSignificantWeight(1e-4f);
+		alg.setMaxDistance(5);
+		alg.setInitialVariance(12);
+
+		int startIndex = 24;
+		float data[] = new float[50];
+
+		float stdev = 10f;
+		float variance = stdev*stdev;
+
+		for (int i = 0; i < 100000; i++) {
+			float pixelValue = i%2==0?10 : 100;
+
+			float adjusted = pixelValue + (float)(rand.nextGaussian()*stdev);
+			if( Math.abs(pixelValue-adjusted) > 3*stdev ) {
+				adjusted = pixelValue;
+			}
+			alg.updateMixture(adjusted,data,startIndex);
+		}
+		int ng = 0;
+		for( ;ng <maxGaussians; ng++ ) {
+			if( 0 == data[startIndex+ng*3+1])
+				break;
+		}
+
+		// there should be just two pixtures
+		assertEquals(2,ng);
+
+		float weight0 = data[startIndex];
+		float weight1 = data[startIndex+3];
+		float variance0 = data[startIndex+1];
+		float variance1 = data[startIndex+3+1];
+		float mean0 = data[startIndex+2];
+		float mean1 = data[startIndex+3+2];
+
+		assertEquals(10,mean0,0.5);
+		assertEquals(100,mean1,0.5);
+
+		assertEquals(0.5f,weight0,0.2);
+		assertEquals(0.5f,weight1,0.2);
+
+		float varianceTol = variance/4;
+		assertEquals(variance,variance0,varianceTol);
+		assertEquals(variance,variance1,varianceTol);
+
+	}
 
 	@Test
 	public void updateMixture() {

@@ -30,18 +30,18 @@ public class ConfigBackgroundGmm implements Configuration {
 	/**
 	 * Specifies how fast it will adjust to changes in the image. Must be greater than zero.
 	 */
-	public float learningPeriod = 5000f;
+	public float learningPeriod = 1000f;
 
 	/**
 	 * The initial variance assigned to a new pixel.  Larger values to reduce false positives due to
 	 * under sampling.  Don't set to zero since that can cause divided by zero errors.
 	 */
-	public float initialVariance = 100;
+	public float initialVariance = 400;
 
 	/**
 	 * Determines how quickly a model is forgotten. Smaller values means they last longer.
 	 */
-	public float decayCoefient = 0.0001f;
+	public float decayCoefient = 0.1f;
 
 	/**
 	 * Maximum Mahalanobis a value can be from a Gaussian to be considered a member of the gaussian
@@ -58,7 +58,7 @@ public class ConfigBackgroundGmm implements Configuration {
 	 * foreground and is the the background model. Strongly influences how long it takes an object that was moving
 	 * to fade into the background. Probably one of the first tuning variables you should mess with.
 	 */
-	public float significantWeight = 0.03f;
+	public float significantWeight = 0.1f;
 
 	@Override
 	public void checkValidity() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.background.ConfigBackgroundBasic;
 import boofcv.factory.background.ConfigBackgroundGaussian;
+import boofcv.factory.background.ConfigBackgroundGmm;
 import boofcv.factory.background.FactoryBackgroundModel;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryMotion2D;
@@ -89,11 +90,16 @@ public class ExampleBackgroundRemovalMoving {
 		configGaussian.initialVariance = 64;
 		configGaussian.minimumDifference = 5;
 
+		// Note that GMM doesn't interpolate the input image. Making it harder to model object edges.
+		// However it runs faster because of this.
+		ConfigBackgroundGmm configGmm = new ConfigBackgroundGmm();
+		configGmm.initialVariance = 1600;
+
 		// Comment/Uncomment to switch background mode
 		BackgroundModelMoving background =
 				FactoryBackgroundModel.movingBasic(configBasic, new PointTransformHomography_F32(), imageType);
 //				FactoryBackgroundModel.movingGaussian(configGaussian, new PointTransformHomography_F32(), imageType);
-
+//				FactoryBackgroundModel.movingGmm(configGmm,new PointTransformHomography_F32(), imageType);
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		SimpleImageSequence video =

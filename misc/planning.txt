@@ -83,7 +83,6 @@ Future
 - Look at OpenCV's watershed example.  It's actually a useful technique!
 
 - Background Model
-  * GMM model
   * Shadow removal
   * remove support for Planar once Interleaved is supported enough
 

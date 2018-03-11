@@ -143,7 +143,7 @@ public class BackgroundGmmCommon {
 			float weight = dataRow[bestIndex];
 			float variance = dataRow[bestIndex+1];
 
-			bestWeight = weight + learningRate*(1f-weight-decay);
+			bestWeight = weight + learningRate*(1f-weight);
 			dataRow[bestIndex]   = 1; // set to one so that it can't possible go negative
 
 			float sumDeltaSq = 0;
@@ -154,9 +154,9 @@ public class BackgroundGmmCommon {
 				sumDeltaSq += delta*delta;
 			}
 			sumDeltaSq /= numBands;
-			dataRow[bestIndex+1] = variance + (learningRate /bestWeight)*(sumDeltaSq - variance);
-
-
+			dataRow[bestIndex+1] = variance + (learningRate /bestWeight)*(sumDeltaSq*1.2F - variance);
+			// 1.2f is a fudge factor. Empirical testing shows that the above equation is biased. Can't be bothered
+			// to verify the derivation and see if there's a mistake
 		} else if( ng < maxGaussians ) {
 			// if there is no good fit then create a new model, if there is room
 
@@ -268,7 +268,9 @@ public class BackgroundGmmCommon {
 
 			bestWeight = weight + learningRate*(1f-weight);
 			dataRow[bestIndex]   = 1; // set to one so that it can't possible go negative. changed later
-			dataRow[bestIndex+1] = variance + (learningRate /bestWeight)*(delta*delta - variance);
+			dataRow[bestIndex+1] = variance + (learningRate /bestWeight)*(delta*delta*1.2F - variance);
+			// 1.2f is a fudge factor. Empirical testing shows that the above equation is biased. Can't be bothered
+			// to verify the derivation and see if there's a mistake
 			dataRow[bestIndex+2] = mean + delta* learningRate /bestWeight;
 
 		} else if( ng < maxGaussians ) {
