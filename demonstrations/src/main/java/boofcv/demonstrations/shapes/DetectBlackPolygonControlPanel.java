@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,9 +55,6 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 	JCheckBox setRefineGray;
 	JCheckBox setRemoveBias;
 
-	JSpinner spinnerMinSides;
-	JSpinner spinnerMaxSides;
-
 	JSpinner spinnerLineSamples;
 	JSpinner spinnerCornerOffset;
 	JSpinner spinnerSampleRadius;
@@ -66,9 +63,6 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 	JSpinner spinnerMaxCornerChange;
 
 	public ConfigPolygonDetector config;
-
-	public int minSides;
-	public int maxSides;
 
 	// todo add back control for min/max sides
 
@@ -83,8 +77,6 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		this.config = configPolygon;
 		configPolygon.detector.maximumSides = Math.min(50,configPolygon.detector.maximumSides);
 
-		minSides = configPolygon.detector.minimumSides;
-		maxSides = configPolygon.detector.maximumSides;
 		refineGray = configPolygon.refineGray != null ? configPolygon.refineGray : new ConfigRefinePolygonLineToImage();
 		spinnerContourConnect = spinner(configPolygon.detector.contourRule.ordinal(), ConnectRule.values());
 
@@ -98,12 +90,11 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 			spinnerMinContourSize = spinner(configPolygon.detector.minimumContour.fraction,0, 1.0,0.05,1,2);
 		}
 
-		spinnerMinSides = spinner(minSides, 3, 50, 1);
-		spinnerMaxSides = spinner(maxSides, 3, 50, 1);
 		spinnerMinEdgeD = spinner(configPolygon.detector.minimumEdgeIntensity, 0.0,255.0,1.0);
 		spinnerMinEdgeR = spinner(configPolygon.minimumRefineEdgeIntensity, 0.0,255.0,1.0);
 
 		polylinePanel = new PolylineControlPanel(owner,configPolygon.detector.contourToPoly);
+		polylinePanel.disableLoopingCheckBox(); // looping must always be true
 
 		setBorder = new JCheckBox("Image Border");
 		setBorder.addActionListener(this);
@@ -139,8 +130,6 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		addLabeled(spinnerMinContourSize, "Min Contour Size: ");
 		addLabeled(spinnerMinEdgeD, "Edge Intensity D: ");
 		addLabeled(spinnerMinEdgeR, "Edge Intensity R: ");
-		addLabeled(spinnerMinSides,"Min Sides");
-		addLabeled(spinnerMaxSides,"Max Sides");
 
 		addAlignLeft(setBorder, this);
 		add(tabbedPane);
@@ -153,9 +142,6 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 	 * can actually be tuned. ONLY CALL BEFORE DISPLAYED OR INSIDE THE UI THREAD.
 	 */
 	public void removeControlNumberOfSides() {
-		removeChildInsidePanel(this,spinnerMinSides);
-		removeChildInsidePanel(this,spinnerMaxSides);
-		validate();
 		polylinePanel.removeControlNumberOfSides();
 	}
 
@@ -180,20 +166,6 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 	public void stateChanged(ChangeEvent e) {
 		if( e.getSource() == spinnerMinEdgeD) {
 			config.detector.minimumEdgeIntensity = ((Number) spinnerMinEdgeD.getValue()).doubleValue();
-		} else if( e.getSource() == spinnerMinSides ) {
-			minSides = ((Number) spinnerMinSides.getValue()).intValue();
-			if( minSides > maxSides ) {
-				maxSides = minSides;
-				spinnerMaxSides.setValue(minSides);
-			}
-			updateSidesInConfig();
-		} else if( e.getSource() == spinnerMaxSides ) {
-			maxSides = ((Number) spinnerMaxSides.getValue()).intValue();
-			if (maxSides < minSides) {
-				minSides = maxSides;
-				spinnerMinSides.setValue(minSides);
-			}
-			updateSidesInConfig();
 		} else if( e.getSource() == spinnerMinEdgeR) {
 			config.minimumRefineEdgeIntensity = ((Number) spinnerMinEdgeR.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerMinContourSize ) {
@@ -219,10 +191,6 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		owner.configUpdate();
 	}
 
-	private void updateSidesInConfig() {
-		config.detector.minimumSides = minSides;
-		config.detector.maximumSides = maxSides;
-	}
 
 	public ThresholdControlPanel getThresholdPanel() {
 		return thresholdPanel;
@@ -234,6 +202,10 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		} else {
 			config.detector.contourToPoly = polylinePanel.getConfigSplitMergeOld();
 		}
+		config.detector.minimumSides = polylinePanel.minSides;
+		config.detector.maximumSides = polylinePanel.maxSides;
+		config.detector.convex = polylinePanel.convex;
+
 		if( bRefineGray ) {
 			config.refineGray = refineGray;
 		} else {

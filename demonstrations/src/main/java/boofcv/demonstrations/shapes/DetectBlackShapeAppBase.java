@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -165,19 +165,16 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 			} else {
 				milliBinary = 0.95*milliBinary+0.05*a;
 			}
-			System.out.printf(" binary %7.2f ",milliBinary);
+//			System.out.printf(" binary %7.2f ",milliBinary);
 
 			detectorProcess((T)input, binary);
 			long after = System.nanoTime();
 			timeInSeconds = (after-before)*1e-9;
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				controls.setProcessingTime(timeInSeconds);
-				viewUpdated();
-			}
+		SwingUtilities.invokeLater(() -> {
+			controls.setProcessingTime(timeInSeconds);
+			viewUpdated();
 		});
 	}
 
