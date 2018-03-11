@@ -41,7 +41,7 @@ Version : 0.29
   * PolylineSplitMerge now has all of its functionality and out performs it
 - FFMPEG
   * Suppressed warning message that has been smalling stderr
--Camera Calibration
+- Camera Calibration
   * Fixed bug where width and height was not assigned to intrinsic during calibration
   * For universal omni the undistorted window is automatically scaled based on image size
 - ImageConvert
@@ -52,7 +52,7 @@ Version : 0.29
   * Primarily in factories where if a config can be null is confusing
 - BackgroundModel
   * Added a combined function for update and segment
-  * Added new algorithm. Gaussian Mixture Models
+  * Added new algorithm. Gaussian Mixture Models (GMM)
   * TODO Added new example video. Fixed camera with moving trees
 - TODO Consider providing access to point features inside of FiducialDetector
 

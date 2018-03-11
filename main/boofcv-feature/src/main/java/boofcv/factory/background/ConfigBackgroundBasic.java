@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,14 +19,13 @@
 package boofcv.factory.background;
 
 import boofcv.alg.interpolate.InterpolationType;
-import boofcv.struct.Configuration;
 
 /**
  * Configuration for {@link ConfigBackgroundBasic}.
  *
  * @author Peter Abeles
  */
-public class ConfigBackgroundBasic implements Configuration {
+public class ConfigBackgroundBasic extends ConfigBackground {
 
 	/**
 	 * Specifies how fast it will adapt to changes in the background. From 0 to 1, inclusive.  0 = static  1.0 = instant.

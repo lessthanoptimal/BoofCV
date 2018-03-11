@@ -115,10 +115,9 @@ public class FactoryShapeDetector {
 		BinaryContourFinder contour = FactoryBinaryContourFinder.linearChang2004();
 		contour.setConnectRule(config.contourRule);
 
-		return new DetectPolygonFromContour<>(
-				config.minimumSides, config.maximumSides, contourToPolygon,
+		return new DetectPolygonFromContour<>(contourToPolygon,
 				config.minimumContour,
-				config.clockwise, config.convex, config.canTouchBorder,
+				config.clockwise, config.canTouchBorder,
 				config.minimumEdgeIntensity, config.tangentEdgeIntensity,contour, imageType);
 	}
 

@@ -64,8 +64,8 @@ public class ExampleDetectBlackPolygon {
 		processImages(imagesConvex, detector, panel);
 
 		// now lets detect concave shapes with many sides
-		config.detector.maximumSides = 12;
-		config.detector.convex = false;
+		config.detector.contourToPoly.maximumSides = 12;
+		config.detector.contourToPoly.convex = false;
 		detector = FactoryShapeDetector.polygon(config, GrayU8.class);
 
 		processImages(imagesConcave, detector, panel);

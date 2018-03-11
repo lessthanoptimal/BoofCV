@@ -16,32 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.abst.shapes.polyline;
+package boofcv.factory.background;
 
 import boofcv.struct.Configuration;
 
 /**
- * Common class for all polyline algorithms. All variables here can also be set using the
- * {@link PointsToPolyline} interface.
+ * Common configuration for all {@link boofcv.alg.background.BackgroundModel}
+ *
+ * @author Peter Abeles
  */
-public abstract class ConfigPolyline implements Configuration {
-	/**
-	 * If true then the polyline forms a loops. Otherwise the end points are disconnected from each other.
-	 */
-	public boolean loops = true;
+public abstract class ConfigBackground implements Configuration {
 
 	/**
-	 * Minimum number of sides. Inclusive
+	 * Specifies what value a pixel should be assigned if no statistical information is available.
 	 */
-	public int minimumSides = 3;
-
-	/**
-	 * Maximum number of sides. Inclusive
-	 */
-	public int maximumSides = Integer.MAX_VALUE;
-
-	/**
-	 * Does it require that the found polygons be convex?
-	 */
-	public boolean convex = true;
+	public int unknownValue = 0;
 }

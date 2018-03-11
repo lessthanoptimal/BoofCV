@@ -75,21 +75,30 @@ public class FactoryBackgroundModel {
 
 		config.checkValidity();
 
+		BackgroundMovingBasic<T,Motion> ret;
+
 		switch( imageType.getFamily() ) {
 			case GRAY:
-				return new BackgroundMovingBasic_SB(config.learnRate,config.threshold,
+				ret= new BackgroundMovingBasic_SB(config.learnRate,config.threshold,
 						transform,config.interpolation,imageType.getImageClass());
+				break;
 
 			case PLANAR:
-				return new BackgroundMovingBasic_PL(config.learnRate,config.threshold,
+				ret= new BackgroundMovingBasic_PL(config.learnRate,config.threshold,
 						transform,config.interpolation,imageType);
+				break;
 
 			case INTERLEAVED:
-				return new BackgroundMovingBasic_IL(config.learnRate,config.threshold,
+				ret= new BackgroundMovingBasic_IL(config.learnRate,config.threshold,
 						transform,config.interpolation,imageType);
+				break;
+
+			default:
+				throw new IllegalArgumentException("Unknown image type");
 		}
 
-		throw new IllegalArgumentException("Unknown image type");
+		ret.setUnknownValue(config.unknownValue);
+		return ret;
 	}
 
 	/**
@@ -125,6 +134,7 @@ public class FactoryBackgroundModel {
 
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMinimumDifference(config.minimumDifference);
+		ret.setUnknownValue(config.unknownValue);
 
 		return ret;
 	}
@@ -167,6 +177,7 @@ public class FactoryBackgroundModel {
 
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMinimumDifference(config.minimumDifference);
+		ret.setUnknownValue(config.unknownValue);
 
 		return ret;
 	}
@@ -179,9 +190,12 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase<T>>
-	BackgroundStationaryGmm<T> stationaryGmm(@Nonnull ConfigBackgroundGmm config , ImageType<T> imageType ) {
+	BackgroundStationaryGmm<T> stationaryGmm(ConfigBackgroundGmm config , ImageType<T> imageType ) {
 
-		config.checkValidity();
+		if( config == null )
+			config = new ConfigBackgroundGmm();
+		else
+			config.checkValidity();
 
 		BackgroundStationaryGmm<T> ret;
 
@@ -204,6 +218,50 @@ public class FactoryBackgroundModel {
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMaxDistance(config.maxDistance);
 		ret.setSignificantWeight(config.significantWeight);
+		ret.setUnknownValue(config.unknownValue);
+
+		return ret;
+	}
+
+	/**
+	 * Creates an instance of {@link BackgroundMovingGmm}.
+	 *
+	 * @param config Configures the background model
+	 * @param imageType Type of input image
+	 * @return new instance of the background model
+	 */
+	public static <T extends ImageBase<T>,Motion extends InvertibleTransform<Motion>>
+	BackgroundMovingGmm<T,Motion> movingGmm(ConfigBackgroundGmm config ,
+											Point2Transform2Model_F32<Motion> transform ,
+											ImageType<T> imageType )
+	{
+		if( config == null )
+			config = new ConfigBackgroundGmm();
+		else
+			config.checkValidity();
+
+		BackgroundMovingGmm<T,Motion> ret;
+
+		switch( imageType.getFamily() ) {
+			case GRAY:
+				ret = new BackgroundMovingGmm_SB(config.learningPeriod,config.decayCoefient,
+						config.numberOfGaussian,transform,imageType);
+				break;
+
+			case PLANAR:
+			case INTERLEAVED:
+				ret = new BackgroundMovingGmm_MB(config.learningPeriod,config.decayCoefient,
+						config.numberOfGaussian,transform,imageType);
+				break;
+
+			default:
+				throw new IllegalArgumentException("Unknown image type");
+		}
+
+		ret.setInitialVariance(config.initialVariance);
+		ret.setMaxDistance(config.maxDistance);
+		ret.setSignificantWeight(config.significantWeight);
+		ret.setUnknownValue(config.unknownValue);
 
 		return ret;
 	}

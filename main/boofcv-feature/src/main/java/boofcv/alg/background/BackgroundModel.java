@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,11 +55,11 @@ public abstract class BackgroundModel<T extends ImageBase<T>> {
 
 	/**
 	 * Specify the value of a segmented pixel which has no corresponding pixel in the background image.
-	 * @param unknownValue Value for pixels with out a background pixel. 2 to 255, inclusive.
+	 * @param unknownValue Value for pixels with out a background pixel. 0 to 255, inclusive.
 	 */
 	public void setUnknownValue(int unknownValue) {
-		if( unknownValue < 2 || unknownValue > 255 )
-			throw new IllegalArgumentException("out of range. 2 to 255");
+		if( unknownValue < 0 || unknownValue > 255 )
+			throw new IllegalArgumentException("out of range. 0 to 255");
 		this.unknownValue = (byte)unknownValue;
 	}
 

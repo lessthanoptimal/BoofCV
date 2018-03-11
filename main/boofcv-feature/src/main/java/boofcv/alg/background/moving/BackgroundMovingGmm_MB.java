@@ -21,6 +21,7 @@ package boofcv.alg.background.moving;
 import boofcv.struct.distort.Point2Transform2Model_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
 import georegression.struct.InvertibleTransform;
 
@@ -29,10 +30,10 @@ import georegression.struct.InvertibleTransform;
  *
  * @author Peter Abeles
  */
-public class BackgroundMovingGmm_SB <T extends ImageGray<T>, Motion extends InvertibleTransform<Motion>>
+public class BackgroundMovingGmm_MB<T extends ImageMultiBand<T>, Motion extends InvertibleTransform<Motion>>
 	extends BackgroundMovingGmm<T,Motion>
 {
-	public BackgroundMovingGmm_SB(float learningPeriod, float decayCoef, int maxGaussians,
+	public BackgroundMovingGmm_MB(float learningPeriod, float decayCoef, int maxGaussians,
 								  Point2Transform2Model_F32<Motion> transformImageType, ImageType<T> imageType)
 	{
 		super(learningPeriod, decayCoef, maxGaussians, transformImageType, imageType);
@@ -41,7 +42,7 @@ public class BackgroundMovingGmm_SB <T extends ImageGray<T>, Motion extends Inve
 	@Override
 	protected void updateBackground(int x0, int y0, int x1, int y1, T frame) {
 
-		common.inputWrapperG.wrap(frame);
+		common.inputWrapperMB.wrap(frame);
 		transform.setModel(worldToCurrent);
 
 		for (int y = y0; y < y1; y++) {
@@ -55,9 +56,9 @@ public class BackgroundMovingGmm_SB <T extends ImageGray<T>, Motion extends Inve
 
 				if( work.x >= 0 && xx < frame.width && work.y >= 0 && yy < frame.height) {
 
-					float pixelValue = common.inputWrapperG.unsafe_getF(xx,yy);
+					common.inputWrapperMB.get(xx,yy,common.inputPixel);
 
-					common.updateMixture(pixelValue,modelRow,indexModel); // TODO assigned mask here
+					common.updateMixture(common.inputPixel,modelRow,indexModel); // TODO assigned mask here
 				}
 			}
 		}
@@ -65,7 +66,7 @@ public class BackgroundMovingGmm_SB <T extends ImageGray<T>, Motion extends Inve
 
 	@Override
 	protected void _segment(Motion currentToWorld, T frame, GrayU8 segmented) {
-		common.inputWrapperG.wrap(frame);
+		common.inputWrapperMB.wrap(frame);
 		transform.setModel(currentToWorld);
 		common.unknownValue = unknownValue;
 
@@ -80,12 +81,12 @@ public class BackgroundMovingGmm_SB <T extends ImageGray<T>, Motion extends Inve
 
 				if( work.x >= 0 && xx < backgroundWidth && work.y >= 0 && yy < backgroundHeight) {
 
-					float pixelValue = common.inputWrapperG.unsafe_getF(x,y);
+					common.inputWrapperMB.get(x,y,common.inputPixel);
 
 					float modelRow[] = common.model.data[yy];
 					int indexModel = xx*common.modelStride;
 
-					segmented.data[indexOut] = (byte)common.checkBackground(pixelValue, modelRow, indexModel);
+					segmented.data[indexOut] = (byte)common.checkBackground(common.inputPixel, modelRow, indexModel);
 				}else {
 					// there is no background here.  Just mark it as not moving to avoid false positives
 					segmented.data[indexOut] = unknownValue;

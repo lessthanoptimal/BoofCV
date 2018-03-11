@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.background.ConfigBackgroundBasic;
 import boofcv.factory.background.ConfigBackgroundGaussian;
+import boofcv.factory.background.ConfigBackgroundGmm;
 import boofcv.factory.background.FactoryBackgroundModel;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryMotion2D;
@@ -58,9 +59,9 @@ public class ExampleBackgroundRemovalMoving {
 	public static void main(String[] args) {
 
 		// Example with a moving camera.  Highlights why motion estimation is sometimes required
-		String fileName = UtilIO.pathExample("tracking/chipmunk.mjpeg");
+//		String fileName = UtilIO.pathExample("tracking/chipmunk.mjpeg");
 		// Camera has a bit of jitter in it.  Static kinda works but motion reduces false positives
-//		String fileName = UtilIO.pathExample("background/horse_jitter.mp4");
+		String fileName = UtilIO.pathExample("background/horse_jitter.mp4");
 
 		// Comment/Uncomment to switch input image type
 		ImageType imageType = ImageType.single(GrayF32.class);
@@ -89,11 +90,17 @@ public class ExampleBackgroundRemovalMoving {
 		configGaussian.initialVariance = 64;
 		configGaussian.minimumDifference = 5;
 
+		// Note that GMM doesn't interpolate the input image. Making it harder to model object edges.
+		// However it runs faster because of this.
+		ConfigBackgroundGmm configGmm = new ConfigBackgroundGmm();
+
 		// Comment/Uncomment to switch background mode
 		BackgroundModelMoving background =
-				FactoryBackgroundModel.movingBasic(configBasic, new PointTransformHomography_F32(), imageType);
+//				FactoryBackgroundModel.movingBasic(configBasic, new PointTransformHomography_F32(), imageType);
 //				FactoryBackgroundModel.movingGaussian(configGaussian, new PointTransformHomography_F32(), imageType);
+				FactoryBackgroundModel.movingGmm(configGmm,new PointTransformHomography_F32(), imageType);
 
+		background.setUnknownValue(1);
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		SimpleImageSequence video =

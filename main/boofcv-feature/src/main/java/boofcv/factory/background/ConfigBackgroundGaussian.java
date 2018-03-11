@@ -19,14 +19,13 @@
 package boofcv.factory.background;
 
 import boofcv.alg.interpolate.InterpolationType;
-import boofcv.struct.Configuration;
 
 /**
  * Configuration for {@link ConfigBackgroundGaussian}.
  *
  * @author Peter Abeles
  */
-public class ConfigBackgroundGaussian implements Configuration {
+public class ConfigBackgroundGaussian extends ConfigBackground {
 
 	/**
 	 * Specifies how fast it will adapt to changes in the background. From 0 to 1, inclusive.  0 = static  1.0 = instant.

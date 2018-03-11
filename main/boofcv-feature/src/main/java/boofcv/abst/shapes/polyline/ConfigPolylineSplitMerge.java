@@ -75,11 +75,6 @@ public class ConfigPolylineSplitMerge extends ConfigPolyline {
 	 */
 	public int refineIterations = 10;
 
-	/**
-	 * If true then the polyline forms a loops. Otherwise the end points are disconnected from each other.
-	 */
-	public boolean loops = true;
-
 	@Override
 	public void checkValidity() {
 		extraConsider.checkValidity();
@@ -97,6 +92,9 @@ public class ConfigPolylineSplitMerge extends ConfigPolyline {
 				", maxSideError=" + maxSideError +
 				", refineIterations=" + refineIterations +
 				", loops=" + loops +
+				", minimumSides=" + minimumSides +
+				", maximumSides=" + maximumSides +
+				", convex=" + convex +
 				'}';
 	}
 }

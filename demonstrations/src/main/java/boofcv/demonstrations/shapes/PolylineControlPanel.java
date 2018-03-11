@@ -97,12 +97,9 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		sideCountPanel.add(Box.createRigidArea(new Dimension(10,10)));
 		sideCountPanel.add(spinnerMaxSides);
 
-		checkConvex = new JCheckBox("Convex");
-		checkConvex.addActionListener(this);
-		checkConvex.setSelected(convex);
-		checkLooping = new JCheckBox("Looping");
-		checkLooping.addActionListener(this);
-		checkLooping.setSelected(looping);
+		checkConvex = checkbox("Convex",convex);
+		checkLooping = checkbox("Looping",looping);
+
 		JPanel flagsPanel = new JPanel();
 		flagsPanel.setLayout(new BoxLayout(flagsPanel,BoxLayout.X_AXIS));
 		flagsPanel.add(checkConvex);
@@ -173,6 +170,10 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		owner.configUpdate();
 	}
 
+	public void disableLoopingCheckBox() {
+		checkLooping.setEnabled(false);
+	}
+
 	class SplitMergePanel extends StandardAlgConfigPanel
 		implements ChangeListener, JConfigLength.Listener
 	{
@@ -183,7 +184,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		JSpinner spinnerCornerPenalty;
 		JSpinner spinnerSideSplitScore;
 		JSpinner spinnerConvexTest;
-		JConfigLength contorlMaxSideError;
+		JConfigLength controlMaxSideError;
 
 		JSpinner spinnerSideSamples;
 		JSpinner spinnerRefine;
@@ -197,7 +198,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 			this.config = config;
 
 			setBorder(BorderFactory.createEmptyBorder());
-			contorlMaxSideError = configLength(config.maxSideError,0,1000);
+			controlMaxSideError = configLength(config.maxSideError,0,1000);
 			controlExtraConsider = configLength(config.extraConsider,0,100);
 			spinnerMinSideLength  = spinner(config.minimumSideLength, 1, 1000, 1);
 			spinnerCornerPenalty  = spinner(config.cornerScorePenalty,0,100,0.1);
@@ -206,7 +207,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 			spinnerConvexTest     = spinner(config.convexTest, 0.0, 20.0, 0.25,2,2);
 			spinnerRefine         = spinner(config.refineIterations, 0, 20, 1);
 
-			addLabeled(contorlMaxSideError, "Max Side Error", this);
+			addLabeled(controlMaxSideError, "Max Side Error", this);
 			addLabeled(controlExtraConsider, "Extra Side Consider", this);
 			addLabeled(spinnerMinSideLength, "Min Side Length", this);
 			addLabeled(spinnerCornerPenalty, "Corner Penalty", this);
@@ -241,7 +242,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 			if( source == controlExtraConsider) {
 				config.extraConsider.fraction = fraction;
 				config.extraConsider.length = length;
-			} else if( source == contorlMaxSideError ) {
+			} else if( source == controlMaxSideError) {
 				config.maxSideError.fraction = fraction;
 				config.maxSideError.length = length;
 			}
@@ -299,6 +300,9 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 	public ConfigPolylineSplitMerge getConfigSplitMerge() {
 		ConfigPolylineSplitMerge config = panelSplitMerge.config;
 		config.loops = looping;
+		config.minimumSides = minSides;
+		config.maximumSides = maxSides;
+		config.convex = convex;
 		return config;
 	}
 
@@ -306,6 +310,9 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 	public ConfigSplitMergeLineFit getConfigSplitMergeOld() {
 		ConfigSplitMergeLineFit config = panelOldSplitMerge.config;
 		config.loop = looping;
+		config.minimumSides = minSides;
+		config.maximumSides = maxSides;
+		config.convex = convex;
 		return config;
 	}
 }
