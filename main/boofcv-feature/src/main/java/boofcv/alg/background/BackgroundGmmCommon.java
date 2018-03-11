@@ -173,7 +173,8 @@ public class BackgroundGmmCommon {
 		// Update Gaussian weights and prune models
 		updateWeightAndPrune(dataRow, modelIndex, ng, bestIndex, bestWeight);
 
-		// number of models can't be 0 so it can't ever be unknown
+		if( ng == 0 )
+			return unknownValue;
 		return bestWeight >= significantWeight ? 0 : 1;
 	}
 
@@ -287,6 +288,8 @@ public class BackgroundGmmCommon {
 		// Update Gaussian weights and prune models
 		updateWeightAndPrune(dataRow, modelIndex, ng, bestIndex, bestWeight);
 
+		if( ng == 0 )
+			return unknownValue;
 		return bestWeight >= significantWeight ? 0 : 1;
 	}
 

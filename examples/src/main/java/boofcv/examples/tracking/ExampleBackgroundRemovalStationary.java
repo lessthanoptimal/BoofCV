@@ -19,7 +19,6 @@
 package boofcv.examples.tracking;
 
 import boofcv.alg.background.BackgroundModelStationary;
-import boofcv.factory.background.ConfigBackgroundBasic;
 import boofcv.factory.background.ConfigBackgroundGmm;
 import boofcv.factory.background.FactoryBackgroundModel;
 import boofcv.gui.binary.VisualizeBinaryData;
@@ -57,11 +56,12 @@ public class ExampleBackgroundRemovalStationary {
 
 		ConfigBackgroundGmm configGmm = new ConfigBackgroundGmm();
 		configGmm.initialVariance = 900;
+		configGmm.significantWeight = 0.1f;
 
 		// Comment/Uncomment to switch algorithms
 		BackgroundModelStationary background =
-				FactoryBackgroundModel.stationaryBasic(new ConfigBackgroundBasic(35, 0.005f), imageType);
-//				FactoryBackgroundModel.stationaryGmm(configGmm, imageType);
+//				FactoryBackgroundModel.stationaryBasic(new ConfigBackgroundBasic(35, 0.005f), imageType);
+				FactoryBackgroundModel.stationaryGmm(configGmm, imageType);
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		SimpleImageSequence video =

@@ -75,21 +75,30 @@ public class FactoryBackgroundModel {
 
 		config.checkValidity();
 
+		BackgroundMovingBasic<T,Motion> ret;
+
 		switch( imageType.getFamily() ) {
 			case GRAY:
-				return new BackgroundMovingBasic_SB(config.learnRate,config.threshold,
+				ret= new BackgroundMovingBasic_SB(config.learnRate,config.threshold,
 						transform,config.interpolation,imageType.getImageClass());
+				break;
 
 			case PLANAR:
-				return new BackgroundMovingBasic_PL(config.learnRate,config.threshold,
+				ret= new BackgroundMovingBasic_PL(config.learnRate,config.threshold,
 						transform,config.interpolation,imageType);
+				break;
 
 			case INTERLEAVED:
-				return new BackgroundMovingBasic_IL(config.learnRate,config.threshold,
+				ret= new BackgroundMovingBasic_IL(config.learnRate,config.threshold,
 						transform,config.interpolation,imageType);
+				break;
+
+			default:
+				throw new IllegalArgumentException("Unknown image type");
 		}
 
-		throw new IllegalArgumentException("Unknown image type");
+		ret.setUnknownValue(config.unknownValue);
+		return ret;
 	}
 
 	/**
@@ -125,6 +134,7 @@ public class FactoryBackgroundModel {
 
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMinimumDifference(config.minimumDifference);
+		ret.setUnknownValue(config.unknownValue);
 
 		return ret;
 	}
@@ -167,6 +177,7 @@ public class FactoryBackgroundModel {
 
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMinimumDifference(config.minimumDifference);
+		ret.setUnknownValue(config.unknownValue);
 
 		return ret;
 	}
@@ -207,6 +218,7 @@ public class FactoryBackgroundModel {
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMaxDistance(config.maxDistance);
 		ret.setSignificantWeight(config.significantWeight);
+		ret.setUnknownValue(config.unknownValue);
 
 		return ret;
 	}
@@ -249,6 +261,7 @@ public class FactoryBackgroundModel {
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMaxDistance(config.maxDistance);
 		ret.setSignificantWeight(config.significantWeight);
+		ret.setUnknownValue(config.unknownValue);
 
 		return ret;
 	}
