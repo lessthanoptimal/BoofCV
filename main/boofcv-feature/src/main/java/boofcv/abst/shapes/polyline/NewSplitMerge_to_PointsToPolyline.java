@@ -38,14 +38,13 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 
 	public NewSplitMerge_to_PointsToPolyline( ConfigPolylineSplitMerge config ){
 
-		// ignore parameters which are specified in the PointsToPolyline interface
 		alg = new PolylineSplitMerge();
 		alg.setMinimumSideLength(config.minimumSideLength);
 		alg.setMaxNumberOfSideSamples(config.maxNumberOfSideSamples);
-		alg.setMaxSides(Integer.MAX_VALUE);
-		alg.setMinSides(3);
+		alg.setMaxSides(config.maximumSides);
+		alg.setMinSides(config.minimumSides);
 		alg.setExtraConsider(config.extraConsider);
-		alg.setConvex(true);
+		alg.setConvex(config.convex);
 		alg.setThresholdSideSplitScore(config.thresholdSideSplitScore);
 		alg.setCornerScorePenalty(config.cornerScorePenalty);
 		alg.setConvexTest(config.convexTest);

@@ -139,11 +139,9 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 * @param contourEdgeThreshold Polygons with an edge intensity less than this are discarded.
 	 * @param inputType Type of input image it's processing
 	 */
-	public DetectPolygonFromContour(int minSides, int maxSides,
-									PointsToPolyline contourToPolyline,
+	public DetectPolygonFromContour(PointsToPolyline contourToPolyline,
 									ConfigLength minimumContour,
 									boolean outputClockwise,
-									boolean convex,
 									boolean touchBorder,
 									double contourEdgeThreshold,
 									double tangentEdgeIntensity,
@@ -160,10 +158,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 		if( !this.contourToPolyline.isLoop() )
 			throw new IllegalArgumentException("ContourToPolygon must be configured for loops");
-
-		// configure the polyline fitter
-		setNumberOfSides(minSides,maxSides);
-		this.contourToPolyline.setConvex(convex);
 
 		if( contourEdgeThreshold > 0 ) {
 			this.contourEdgeIntensity = new ContourEdgeIntensity<>(30, 1, tangentEdgeIntensity, inputType);

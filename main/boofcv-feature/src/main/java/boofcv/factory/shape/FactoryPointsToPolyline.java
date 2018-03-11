@@ -57,8 +57,7 @@ public class FactoryPointsToPolyline {
 		if( config == null )
 			config = new ConfigSplitMergeLineFit();
 		config.checkValidity();
-		return new SplitMergeLineRefine_to_PointsToPolyline(
-				config.splitFraction, config.minimumSide,config.iterations,config.refine,config.pruneSplitPenalty,config.loop);
+		return new SplitMergeLineRefine_to_PointsToPolyline(config);
 	}
 
 	public static PointsToPolyline splitMerge(@Nullable ConfigPolylineSplitMerge config ) {

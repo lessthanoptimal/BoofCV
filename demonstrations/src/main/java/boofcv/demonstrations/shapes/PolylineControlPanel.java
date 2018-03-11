@@ -300,6 +300,9 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 	public ConfigPolylineSplitMerge getConfigSplitMerge() {
 		ConfigPolylineSplitMerge config = panelSplitMerge.config;
 		config.loops = looping;
+		config.minimumSides = minSides;
+		config.maximumSides = maxSides;
+		config.convex = convex;
 		return config;
 	}
 
@@ -307,6 +310,9 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 	public ConfigSplitMergeLineFit getConfigSplitMergeOld() {
 		ConfigSplitMergeLineFit config = panelOldSplitMerge.config;
 		config.loop = looping;
+		config.minimumSides = minSides;
+		config.maximumSides = maxSides;
+		config.convex = convex;
 		return config;
 	}
 }

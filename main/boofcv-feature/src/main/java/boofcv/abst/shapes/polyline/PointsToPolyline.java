@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,7 +74,8 @@ public interface PointsToPolyline {
 	boolean isLoop();
 
 	/**
-	 * Specifies if the found polygons will be convex or not. Default is true.
+	 * Specifies if the found polygons will be convex or not. If the polyline doesn't sloop this should
+	 * be set to false. Default is true.
 	 */
 	void setConvex( boolean convex );
 

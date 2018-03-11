@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,16 +31,6 @@ import boofcv.struct.ConnectRule;
  * @author Peter Abeles
  */
 public class ConfigPolygonFromContour implements Configuration {
-
-	/**
-	 * Minimum number of sides
-	 */
-	public int minimumSides;
-
-	/**
-	 * Maximum number of sides
-	 */
-	public int maximumSides;
 
 	/**
 	 * If false then polygons which touch the image border are pruned
@@ -86,21 +76,16 @@ public class ConfigPolygonFromContour implements Configuration {
 	public boolean clockwise = true;
 
 	/**
-	 * Does it require that the found polygons be convex?
-	 */
-	public boolean convex = true;
-
-	/**
 	 * Specifies the number of sides in the polygon and uses default settings for everything else
 	 */
 	public ConfigPolygonFromContour(int minimumSides, int maximumSides) {
-		this.minimumSides = minimumSides;
-		this.maximumSides = maximumSides;
+		contourToPoly.minimumSides = minimumSides;
+		contourToPoly.maximumSides = maximumSides;
 	}
 
 	public ConfigPolygonFromContour(boolean clockwise, int minimumSides, int maximumSides) {
-		this.minimumSides = minimumSides;
-		this.maximumSides = maximumSides;
+		contourToPoly.minimumSides = minimumSides;
+		contourToPoly.maximumSides = maximumSides;
 
 		this.clockwise = clockwise;
 	}
@@ -113,15 +98,11 @@ public class ConfigPolygonFromContour implements Configuration {
 	@Override
 	public String toString() {
 		return "ConfigPolygonFromContour{" +
-				"minimumSides=" + minimumSides +
-				", maximumSides=" + maximumSides +
-				", canTouchBorder=" + canTouchBorder +
-				", contourToPoly=" + contourToPoly +
+				" contourToPoly=" + contourToPoly +
 				", minimumEdgeIntensity=" + minimumEdgeIntensity +
 				", tangentEdgeIntensity=" + tangentEdgeIntensity +
 				", minimumContour=" + minimumContour +
 				", clockwise=" + clockwise +
-				", convex=" + convex +
 				'}';
 	}
 }

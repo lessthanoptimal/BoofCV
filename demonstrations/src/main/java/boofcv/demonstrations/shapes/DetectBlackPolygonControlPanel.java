@@ -21,6 +21,7 @@ package boofcv.demonstrations.shapes;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
+import boofcv.gui.JConfigLength;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.ConnectRule;
 
@@ -34,7 +35,7 @@ import java.awt.event.ActionListener;
  * @author Peter Abeles
  */
 public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
-		implements ActionListener, ChangeListener
+		implements ActionListener, ChangeListener, JConfigLength.Listener
 {
 	ShapeGuiListener owner;
 	JSpinner spinnerContourConnect;
@@ -44,7 +45,7 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 
 	public ThresholdControlPanel thresholdPanel;
 
-	JSpinner spinnerMinContourSize;
+	JConfigLength spinnerMinContourSize;
 	JSpinner spinnerMinEdgeD; // threshold for detect
 	JSpinner spinnerMinEdgeR; // threshold for refine
 	JCheckBox setBorder;
@@ -64,8 +65,6 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 
 	public ConfigPolygonDetector config;
 
-	// todo add back control for min/max sides
-
 	public DetectBlackPolygonControlPanel(ShapeGuiListener owner) {
 		this(owner,new ConfigPolygonDetector(3,6),null);
 	}
@@ -75,7 +74,6 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		setBorder(BorderFactory.createEmptyBorder());
 		this.owner = owner;
 		this.config = configPolygon;
-		configPolygon.detector.maximumSides = Math.min(50,configPolygon.detector.maximumSides);
 
 		refineGray = configPolygon.refineGray != null ? configPolygon.refineGray : new ConfigRefinePolygonLineToImage();
 		spinnerContourConnect = spinner(configPolygon.detector.contourRule.ordinal(), ConnectRule.values());
@@ -84,11 +82,7 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 				new ThresholdControlPanel(owner) :
 				new ThresholdControlPanel(owner,configThreshold);
 
-		if( configPolygon.detector.minimumContour.isFixed()) {
-			spinnerMinContourSize = spinner(configPolygon.detector.minimumContour.getLengthI(),5, 10000, 2);
-		} else {
-			spinnerMinContourSize = spinner(configPolygon.detector.minimumContour.fraction,0, 1.0,0.05,1,2);
-		}
+		spinnerMinContourSize = configLength(configPolygon.detector.minimumContour,5,99999);
 
 		spinnerMinEdgeD = spinner(configPolygon.detector.minimumEdgeIntensity, 0.0,255.0,1.0);
 		spinnerMinEdgeR = spinner(configPolygon.minimumRefineEdgeIntensity, 0.0,255.0,1.0);
@@ -168,11 +162,6 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 			config.detector.minimumEdgeIntensity = ((Number) spinnerMinEdgeD.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerMinEdgeR) {
 			config.minimumRefineEdgeIntensity = ((Number) spinnerMinEdgeR.getValue()).doubleValue();
-		} else if( e.getSource() == spinnerMinContourSize ) {
-			if( config.detector.minimumContour.isRelative())
-				config.detector.minimumContour.fraction = ((Number) spinnerMinContourSize.getValue()).doubleValue();
-			else
-				config.detector.minimumContour.length = ((Number) spinnerMinContourSize.getValue()).intValue();
 		} else if (e.getSource() == spinnerLineSamples) {
 			refineGray.lineSamples = ((Number) spinnerLineSamples.getValue()).intValue();
 		} else if (e.getSource() == spinnerCornerOffset) {
@@ -202,9 +191,6 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		} else {
 			config.detector.contourToPoly = polylinePanel.getConfigSplitMergeOld();
 		}
-		config.detector.minimumSides = polylinePanel.minSides;
-		config.detector.maximumSides = polylinePanel.maxSides;
-		config.detector.convex = polylinePanel.convex;
 
 		if( bRefineGray ) {
 			config.refineGray = refineGray;
@@ -212,5 +198,14 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 			config.refineGray = null;
 		}
 		return config;
+	}
+
+	@Override
+	public void changeConfigLength(JConfigLength source, double fraction, double length) {
+		if( source == spinnerMinContourSize ) {
+			config.detector.minimumContour.fraction = fraction;
+			config.detector.minimumContour.length = length;
+		}
+		owner.configUpdate();
 	}
 }

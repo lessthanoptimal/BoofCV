@@ -23,6 +23,7 @@ import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFit;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitLoop;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitSegment;
+import boofcv.factory.shape.ConfigSplitMergeLineFit;
 import boofcv.struct.ConfigLength;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -55,27 +56,26 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 
 	Polygon2D_F64 tmp = new Polygon2D_F64();
 
-	public SplitMergeLineRefine_to_PointsToPolyline(double splitFraction,
-													ConfigLength minimumSplit,
-													int maxIterations,
-													int refineIterations,
-													double pruneSplitPentially,
-													boolean loop )
+	public SplitMergeLineRefine_to_PointsToPolyline(ConfigSplitMergeLineFit config)
 	{
-		minimumSplit = minimumSplit.copy();
-		if( loop ) {
-			splitMerge = new SplitMergeLineFitLoop(splitFraction, minimumSplit, maxIterations);
+		ConfigLength minimumSplit = config.minimumSide.copy();
+		if( config.loop ) {
+			splitMerge = new SplitMergeLineFitLoop(config.splitFraction, minimumSplit, config.iterations);
 		} else {
-			splitMerge = new SplitMergeLineFitSegment(splitFraction, minimumSplit, maxIterations);
+			splitMerge = new SplitMergeLineFitSegment(config.splitFraction, minimumSplit, config.iterations);
 		}
 
-		if( refineIterations > 0 ) {
-			refine = new RefinePolyLineCorner(loop,refineIterations);
+		if( config.refine > 0 ) {
+			refine = new RefinePolyLineCorner(config.loop,config.refine);
 		}
 
-		if( pruneSplitPentially > 0 ) {
-			pruner = new MinimizeEnergyPrune(pruneSplitPentially);
+		if( config.pruneSplitPenalty > 0 ) {
+			pruner = new MinimizeEnergyPrune(config.pruneSplitPenalty);
 		}
+
+		convex = config.convex;
+		minVertexes = config.minimumSides;
+		maxVertexes = config.maximumSides;
 	}
 
 
