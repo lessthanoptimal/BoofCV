@@ -288,8 +288,8 @@ public class BackgroundGmmCommon {
 		// Update Gaussian weights and prune models
 		updateWeightAndPrune(dataRow, modelIndex, ng, bestIndex, bestWeight);
 
-		if( ng == 0 )
-			return unknownValue;
+		if( ng == 0 ) // doesn't match models. Must be foreground. weight would be 0
+			return 1;
 		return bestWeight >= significantWeight ? 0 : 1;
 	}
 
@@ -325,8 +325,8 @@ public class BackgroundGmmCommon {
 			}
 		}
 
-		if( ng == 0 ) {
-			return unknownValue;
+		if( ng == 0 ) {// doesn't match models. Must be foreground. weight would be 0
+			return 1;
 		}
 		return bestWeight >= significantWeight ? 0 : 1;
 	}

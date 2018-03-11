@@ -64,11 +64,6 @@ public class ConfigBackgroundGmm extends ConfigBackground {
 	 */
 	public float significantWeight = 0.05f;
 
-	public ConfigBackgroundGmm() {
-		// If something doesn't match any of the Gaussians it's probably the foreground.
-		super.unknownValue = 1;
-	}
-
 	@Override
 	public void checkValidity() {
 		if( learningPeriod <= 0 )
