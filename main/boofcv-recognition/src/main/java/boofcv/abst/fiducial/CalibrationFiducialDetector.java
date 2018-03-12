@@ -223,17 +223,22 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	}
 
 	@Override
-	public List<Point2D_F64> getBounds(int which, @Nullable FastQueue<Point2D_F64> storage) {
+	public Polygon2D_F64 getBounds(int which, @Nullable Polygon2D_F64 storage) {
 		if( storage == null )
-			storage = new FastQueue<>(Point2D_F64.class,true);
+			storage = new Polygon2D_F64();
 		else
-			storage.reset();
+			storage.vertexes.reset();
 
-		for (int i = 0; i < 4; i++) {
-			storage.grow().set( getCalibrationPoints().get( boundaryIndexes[i]));
+		List<PointIndex2D_F64> control = getDetectedControl(which);
+		for (int i = 0; i < boundaryIndexes.length; i++) {
+			PointIndex2D_F64 p = control.get(boundaryIndexes[i]);
+			if( p.index == boundaryIndexes[i])
+				storage.vertexes.grow().set(p);
+			else
+				System.out.println("control points are out of order or not detected");
 		}
 
-		return storage.toList();
+		return storage;
 	}
 
 	@Override

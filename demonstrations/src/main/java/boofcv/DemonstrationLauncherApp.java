@@ -46,7 +46,7 @@ import boofcv.demonstrations.feature.disparity.VisualizeStereoDisparity;
 import boofcv.demonstrations.feature.flow.DenseFlowApp;
 import boofcv.demonstrations.feature.orientation.ShowFeatureOrientationApp;
 import boofcv.demonstrations.fiducial.DetectQrCodeApp;
-import boofcv.demonstrations.fiducial.FiducialTrackerApp;
+import boofcv.demonstrations.fiducial.FiducialTrackerDemoApp;
 import boofcv.demonstrations.fiducial.VisualizeSquareBinaryFiducial;
 import boofcv.demonstrations.fiducial.VisualizeSquareFiducial;
 import boofcv.demonstrations.filter.DisplayGaussianKernelApp;
@@ -158,7 +158,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				VisualizeStereoVisualOdometryApp.class);
 
 		createNodes(root,"Fiducial / Markers",
-				FiducialTrackerApp.class,
+				FiducialTrackerDemoApp.class,
 				DetectQrCodeApp.class,
 				VisualizeSquareBinaryFiducial.class,
 				VisualizeSquareFiducial.class);

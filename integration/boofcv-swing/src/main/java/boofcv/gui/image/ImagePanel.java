@@ -184,13 +184,10 @@ public class ImagePanel extends JPanel {
 	 * @param image The new image which will be displayed.
 	 */
 	public void setImageUI(final BufferedImage image) {
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				repaintJustImage(ImagePanel.this.img,adjustmentGUI);
-				ImagePanel.this.img = image;
-				repaintJustImage(ImagePanel.this.img,adjustmentGUI);
-			}
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			repaintJustImage(ImagePanel.this.img,adjustmentGUI);
+			ImagePanel.this.img = image;
+			repaintJustImage(ImagePanel.this.img,adjustmentGUI);
 		});
 	}
 

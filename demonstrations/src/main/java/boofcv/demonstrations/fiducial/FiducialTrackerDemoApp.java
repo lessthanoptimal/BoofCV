@@ -31,24 +31,27 @@ import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.BoofSwingUtil;
-import boofcv.gui.VideoProcessAppBase;
+import boofcv.gui.DemonstrationBase;
+import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.feature.VisualizeFeatures;
+import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.Planar;
+import boofcv.struct.image.*;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -64,8 +67,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FiducialTrackerApp<I extends ImageGray<I>>
-		extends VideoProcessAppBase<Planar<I>>
+public class FiducialTrackerDemoApp<I extends ImageGray<I>>
+		extends DemonstrationBase
 {
 	private static final String SQUARE_NUMBER = "Square Number";
 	private static final String SQUARE_PICTURE = "Square Picture";
@@ -79,18 +82,14 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 
 	private Class<I> imageClass;
 
-	private ImagePanel panel = new ImagePanel();
+	private VisualPanel panel = new VisualPanel();
+	private ControlPanel controls = new ControlPanel();
 
 	private I gray;
 
 	private FiducialDetector detector;
 
 	private CameraPinholeRadial intrinsic;
-
-	private boolean processedInputImage = false;
-	private boolean firstFrame = true;
-
-	private JCheckBox computeStability = new JCheckBox("Stability");
 
 	private FiducialStability stability = new FiducialStability();
 
@@ -99,8 +98,8 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 
 	private BufferedImage imageCopy;
 
-	public FiducialTrackerApp(Class<I> imageType) {
-		super(0, ImageType.pl(3, imageType));
+	public FiducialTrackerDemoApp(List<PathLabel> examples, Class<I> imageType) {
+		super(false,false,examples, ImageType.pl(3, imageType));
 		this.imageClass = imageType;
 
 		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
@@ -110,7 +109,7 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 		panel.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				isPaused = !isPaused;
+				streamPaused = !streamPaused;
 			}
 
 			@Override public void mousePressed(MouseEvent e) {}
@@ -118,94 +117,66 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 			@Override public void mouseEntered(MouseEvent e) {}
 			@Override public void mouseExited(MouseEvent e) {}
 		});
-		addToToolbar(computeStability);
-		computeStability.addActionListener(this);
-		computeStability.setSelected(true);
 
-		setMainGUI(panel);
-
-		periodSpinner.setValue(33);
+		add(BorderLayout.CENTER, panel);
+		add(BorderLayout.WEST, controls);
 	}
 
 	@Override
-	public void process( final SimpleImageSequence<Planar<I>> sequence ) {
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 
-		// stop the image processing code
-		stopWorker();
 
-		this.sequence = sequence;
-		sequence.setLoop(true);
-		setPause(false);
-		if( !sequence.hasNext() )
-			throw new IllegalArgumentException("Empty sequence");
 
-		// start everything up and resume processing
-		doRefreshAll();
-	}
-
-	@Override
-	public void refreshAll(Object[] cookies) {
-
-		firstFrame = true;
-		setPause(false);
-
-		startWorkerThread();
-	}
-
-	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		stopWorker();
-
-		sequence.reset();
-		refreshAll(null);
-	}
-
-	@Override
-	protected void updateAlg(Planar<I> frame, BufferedImage buffImage) {
+		Planar<I> planar = (Planar<I>)input;
 
 		if( detector.getInputType().getFamily() == ImageType.Family.GRAY) {
-			gray.reshape(frame.width, frame.height);
-			GConvertImage.average(frame, gray);
+			gray.reshape(input.width, input.height);
+			GConvertImage.average(planar, gray);
 		}
 
 		detector.detect(gray);
 
-//		if( detector.totalFound() == 0 ) {
-//			System.out.println("Failed on "+sequence.getFrameNumber());
-//		}
-
-		processedInputImage = true;
-	}
-
-	@Override
-	protected void updateAlgGUI(Planar<I> frame, BufferedImage imageGUI, double fps) {
-		if( firstFrame ) {
-			panel.setPreferredSize(new Dimension(imageGUI.getWidth(),imageGUI.getHeight()));
-			firstFrame = false;
-
-			imageCopy = new BufferedImage(imageGUI.getWidth(),imageGUI.getHeight(),BufferedImage.TYPE_INT_RGB);
-		}
-
-		int height = getHeight();
-
+		imageCopy = ConvertBufferedImage.checkCopy(buffered,imageCopy);
 		Graphics2D g2 = imageCopy.createGraphics();
-		g2.drawImage(imageGUI,0,0,null);
+
 		Se3_F64 targetToSensor = new Se3_F64();
+		Point2D_F64 center = new Point2D_F64();
+		Polygon2D_F64 polygon = new Polygon2D_F64();
 		for (int i = 0; i < detector.totalFound(); i++) {
-			detector.getFiducialToCamera(i, targetToSensor);
-			double width = detector.getWidth(i);
 			long id = detector.getId(i);
 
-			VisualizeFiducial.drawLabelCenter(targetToSensor, intrinsic, ""+id, g2);
-			VisualizeFiducial.drawCube(targetToSensor, intrinsic, width, 5, g2);
-
-			if( computeStability.isSelected() ) {
-				handleStability(height, g2, i, id);
+			if( controls.showBoundary ) {
+				detector.getBounds(i,polygon);
+				g2.setStroke(new BasicStroke(11));
+				g2.setColor(Color.BLUE);
+				VisualizeShapes.drawPolygon(polygon,true,g2,true);
 			}
+
+			if( controls.showCenter ) {
+				detector.getCenter(i,center);
+				VisualizeFeatures.drawPoint(g2,center.x,center.y,10,Color.MAGENTA,true);
+			}
+
+			if( controls.show3D ) {
+				detector.getFiducialToCamera(i, targetToSensor);
+				double width = detector.getWidth(i);
+				VisualizeFiducial.drawLabelCenter(targetToSensor, intrinsic, "" + id, g2);
+				VisualizeFiducial.drawCube(targetToSensor, intrinsic, width, 5, g2);
+			}
+
+			if( controls.showStability ) {
+				handleStability(input.height, g2, i, id);
+			}
+
 		}
 
 		panel.setImageUI(imageCopy);
 		panel.repaint();
+	}
+
+	@Override
+	protected void configureVideo( int which , SimpleImageSequence sequence ) {
+		sequence.setLoop(true);
 	}
 
 	/**
@@ -262,12 +233,15 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 	}
 
 	@Override
-	public void changeInput(String name, int index) {
+	public void openExample( Object o ) {
+		// stop everything because all the data structures about about to be changed
+		stopAllInputProcessing();
 
-		stopWorker();
-		processedInputImage = false;
+		PathLabel example = (PathLabel)o;
 
-		String videoName = inputRefs.get(index).getPath();
+		String name = example.label;
+
+		String videoName = example.getPath();
 		String seperator = System.getProperty("file.separator");
 		String path = videoName.substring(0, videoName.lastIndexOf(seperator.charAt(0)));
 
@@ -317,14 +291,7 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}
-
-		final boolean _stability = stability;
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				computeStability.setSelected(_stability);
-			}
-		});
+		controls.setShowStability(stability);
 
 		intrinsic = CalibrationIO.load(media.openFile(path+"/intrinsic.yaml"));
 
@@ -335,27 +302,65 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 		stabilityMax.location = 0.01;
 		stabilityMax.orientation = 0.02;
 
-		SimpleImageSequence<Planar<I>> video = media.openVideo(videoName, ImageType.pl(3, imageClass));
+		openVideo(false,videoName);
+	}
 
-		if( video == null ) {
-			System.err.println("Can't find video "+videoName);
-			System.exit(1);
+	@Override
+	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+		panel.setPreferredSize(new Dimension(width,height));
+	}
+
+	class VisualPanel extends ImagePanel {
+		@Override
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			if( detector == null )
+				return;
+		}
+	}
+
+	class ControlPanel extends StandardAlgConfigPanel implements ActionListener {
+		private JCheckBox checkStability;
+		private JCheckBox check3D;
+		private JCheckBox checkBoundary;
+		private JCheckBox checkCenter;
+
+		// TODO add text info box
+
+		boolean showStability = true;
+		boolean show3D = true;
+		boolean showBoundary = false;
+		boolean showCenter = false;
+
+		public ControlPanel() {
+			checkStability = checkbox("Stability",showStability);
+			check3D = checkbox("Box 3D",show3D);
+			checkBoundary = checkbox("Boundary",showBoundary);
+			checkCenter = checkbox("center",showCenter);
+
+			addAlignLeft(checkStability);
+			addAlignLeft(check3D);
+			addAlignLeft(checkBoundary);
+			addAlignLeft(checkCenter);
 		}
 
-		process(video);
-	}
+		public void setShowStability(boolean value ) {
+			showStability = value;
+			BoofSwingUtil.invokeNowOrLater(()->checkStability.setSelected(value));
+		}
 
-	@Override
-	protected void handleRunningStatus(int status) {
-
-	}
-
-	@Override
-	public void loadConfigurationFile(String fileName) {}
-
-	@Override
-	public boolean getHasProcessedImage() {
-		return processedInputImage;
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if( e.getSource() == checkStability ) {
+				showStability = checkStability.isSelected();
+			} else if( e.getSource() == check3D ) {
+				show3D = check3D.isSelected();
+			} else if( e.getSource() == checkBoundary ) {
+				showBoundary = checkBoundary.isSelected();
+			} else if( e.getSource() == checkCenter ) {
+				showCenter = checkCenter.isSelected();
+			}
+		}
 	}
 
 	private class FiducialInfo {
@@ -368,11 +373,6 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 //		Class type = GrayF32.class;
 		Class type = GrayU8.class;
 
-		FiducialTrackerApp app = new FiducialTrackerApp(type);
-
-//		app.setBaseDirectory(UtilIO.pathExample("fiducial/"));
-//		app.loadInputData(UtilIO.pathExample("fiducial/fiducial.txt"));
-
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel(SQUARE_NUMBER, UtilIO.pathExample("fiducial/binary/movie.mjpeg")));
 		inputs.add(new PathLabel(SQUARE_PICTURE, UtilIO.pathExample("fiducial/image/video/movie.mjpeg")));
@@ -383,13 +383,9 @@ public class FiducialTrackerApp<I extends ImageGray<I>>
 		inputs.add(new PathLabel(CALIB_CIRCLE_REGULAR_GRID, UtilIO.pathExample("fiducial/circle_regular/movie.mp4")));
 
 
-		app.setInputList(inputs);
+		FiducialTrackerDemoApp app = new FiducialTrackerDemoApp(inputs,type);
 
-		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
-		}
-
-		ShowImages.showWindow(app, "Detecting Fiducials", true);
+		app.openExample(inputs.get(0));
+		app.display("Fiducial Demonstrations");
 	}
 }

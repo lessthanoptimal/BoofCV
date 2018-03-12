@@ -23,10 +23,9 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
+import georegression.struct.shapes.Polygon2D_F64;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
 /**
  * Interface for detecting fiducial markers and their location in the image.  Optionally, some implementations can produce
@@ -70,7 +69,7 @@ public interface FiducialDetector<T extends ImageBase<T>>
 	 * @param storage (Optional) Storage for markers.
 	 * @return Found marker. Points are owned by the caller and will not be modified in the future.
 	 */
-	List<Point2D_F64> getBounds(int which , @Nullable FastQueue<Point2D_F64> storage );
+	Polygon2D_F64 getBounds(int which , @Nullable Polygon2D_F64 storage );
 
 	/**
 	 * If applicable, returns the ID of the fiducial found.  Call {@link #hasUniqueID()} to see if this function

@@ -153,12 +153,7 @@ public abstract class DemonstrationBase extends JPanel {
 
 			JMenuItem menuItemNext = new JMenuItem("Open Next File");
 			BoofSwingUtil.setMenuItemKeys(menuItemNext,KeyEvent.VK_N,KeyEvent.VK_I);
-			menuItemNext.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					openNextFile();
-				}
-			});
+			menuItemNext.addActionListener(e -> openNextFile());
 			menuFile.add(menuItemNext);
 
 
@@ -195,12 +190,7 @@ public abstract class DemonstrationBase extends JPanel {
 					name = o.toString();
 				}
 				JMenuItem menuItem = new JMenuItem(name);
-				menuItem.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						openExample(o);
-					}
-				});
+				menuItem.addActionListener(e -> openExample(o));
 				menuExamples.add(menuItem);
 			}
 		}
@@ -380,7 +370,7 @@ public abstract class DemonstrationBase extends JPanel {
 	}
 
 	/**
-	 * Before invoking this function make sure waitingToOpenImage is false AND that the previous input has beens topped
+	 * Before invoking this function make sure waitingToOpenImage is false AND that the previous input has been stopped
 	 */
 	protected void openVideo(boolean reopen , String ...filePaths) {
 		synchronized (lockStartingProcess) {

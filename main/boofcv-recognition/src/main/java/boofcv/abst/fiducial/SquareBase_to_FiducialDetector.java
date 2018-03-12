@@ -33,8 +33,8 @@ import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
-import org.ddogleg.struct.FastQueue;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -198,19 +198,19 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Dete
 	}
 
 	@Override
-	public List<Point2D_F64> getBounds(int which, @Nullable FastQueue<Point2D_F64> storage) {
+	public Polygon2D_F64 getBounds(int which, @Nullable Polygon2D_F64 storage) {
 		if( storage == null )
-			storage = new FastQueue<>(Point2D_F64.class,true);
+			storage = new Polygon2D_F64();
 		else
-			storage.reset();
+			storage.vertexes.reset();
 
 		FoundFiducial found = getAlgorithm().getFound().get(which);
-		storage.grow().set(found.distortedPixels.a);
-		storage.grow().set(found.distortedPixels.b);
-		storage.grow().set(found.distortedPixels.c);
-		storage.grow().set(found.distortedPixels.d);
+		storage.vertexes.grow().set(found.distortedPixels.a);
+		storage.vertexes.grow().set(found.distortedPixels.b);
+		storage.vertexes.grow().set(found.distortedPixels.c);
+		storage.vertexes.grow().set(found.distortedPixels.d);
 
-		return storage.toList();
+		return storage;
 	}
 
 }

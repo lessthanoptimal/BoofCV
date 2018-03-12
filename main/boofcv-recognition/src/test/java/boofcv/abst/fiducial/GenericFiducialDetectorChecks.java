@@ -30,7 +30,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
@@ -388,14 +387,14 @@ public abstract class GenericFiducialDetectorChecks {
 		if( !supportsBounds )
 			return;
 
-		FastQueue<Point2D_F64> queue = new FastQueue<>(Point2D_F64.class,true);
+		Polygon2D_F64 queue = new Polygon2D_F64();
 		for (int i = 0; i < detector.totalFound(); i++) {
 
 			// make sure it handles null correctly
-			List<Point2D_F64> listA = detector.getBounds(i,null);
-			List<Point2D_F64> listB = detector.getBounds(i,queue);
+			Polygon2D_F64 listA = detector.getBounds(i,null);
+			Polygon2D_F64 listB = detector.getBounds(i,queue);
 
-			assertTrue(listB == queue.toList());
+			assertTrue(listB == queue);
 			assertEquals(listA.size(),listB.size());
 
 			Polygon2D_F64 polygon = new Polygon2D_F64(listA.size());
