@@ -20,7 +20,6 @@ package boofcv.abst.fiducial;
 
 import boofcv.abst.fiducial.calib.*;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
-import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
@@ -29,7 +28,9 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 
 import javax.annotation.Nullable;
@@ -63,7 +64,8 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	// average of width and height
 	private double width;
 
-	TargetBounds boundExtractor;
+	// The 4 corners which are selected to be the boundary
+	int boundaryIndexes[];
 
 	/**
 	 * Configure it to detect chessboard style targets
@@ -77,21 +79,6 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		width = (sideWidth+sideHeight)/2.0;
 
 		init(detector, width, imageType);
-
-		boundExtractor = new TargetBounds() {
-			@Override
-			public void bounds(FastQueue<Point2D_F64> list) {
-				int c = config.numCols;
-				int r = config.numRows;
-				list.grow().set(get(0,0));
-				list.grow().set(get(0,c-1));
-				list.grow().set(get(r-1,c-1));
-				list.grow().set(get(r-1,0));
-			}
-			private Point2D_F64 get(int row , int col ) {
-				return detector.getDetectedPoints().get(row*config.numCols+col);
-			}
-		};
 	}
 
 	/**
@@ -108,21 +95,6 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		double width = (sideWidth+sideHeight)/2.0;
 
 		init(detector, width, imageType);
-
-		boundExtractor = new TargetBounds() {
-			@Override
-			public void bounds(FastQueue<Point2D_F64> list) {
-				int c = config.numCols;
-				int r = config.numRows;
-				list.grow().set(get(0,0));
-				list.grow().set(get(0,c-1));
-				list.grow().set(get(r-1,c-1));
-				list.grow().set(get(r-1,0));
-			}
-			private Point2D_F64 get(int row , int col ) {
-				return detector.getDetectedPoints().get(row*config.numCols+col);
-			}
-		};
 	}
 
 	/**
@@ -139,21 +111,6 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		double width = (sideWidth+sideHeight)/2.0;
 
 		init(detector, width, imageType);
-
-		boundExtractor = new TargetBounds() {
-			@Override
-			public void bounds(FastQueue<Point2D_F64> list) {
-				int c = config.numCols;
-				int r = config.numRows;
-				list.grow().set(get(0,0));
-				list.grow().set(get(0,c-1));
-				list.grow().set(get(r-1,c-1));
-				list.grow().set(get(r-1,0));
-			}
-			private Point2D_F64 get(int row , int col ) {
-				return detector.getDetectedPoints().get(row*config.numCols+col);
-			}
-		};
 	}
 
 	public CalibrationFiducialDetector(ConfigCircleHexagonalGrid config,
@@ -167,27 +124,6 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		double width = (sideWidth+sideHeight)/2.0;
 
 		init(detector, width, imageType);
-
-		boundExtractor = new TargetBounds() {
-			EllipseClustersIntoGrid.Grid grid;
-			@Override
-			public void bounds(FastQueue<Point2D_F64> list) {
-				List<EllipseClustersIntoGrid.Grid> grids = detector.getDetector().getGrids();
-				if( grids.size() != 1 )
-					return;
-				this.grid = grids.get(0);
-
-				int c = config.numCols;
-				int r = config.numRows;
-				list.grow().set(get(0,0));
-				list.grow().set(get(0,c-1));
-				list.grow().set(get(r-1,c-1));
-				list.grow().set(get(r-1,0));
-			}
-			private Point2D_F64 get(int row , int col ) {
-				return grid.get(row,col).center;
-			}
-		};
 	}
 
 	public CalibrationFiducialDetector(ConfigCircleRegularGrid config,
@@ -217,6 +153,35 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 
 			points2D3D.add(p);
 		}
+
+		selectBoundaryCorners();
+	}
+
+	/**
+	 * Selects points which will be the corners in the boundary. Finds the convex hull.
+	 */
+	protected void selectBoundaryCorners() {
+		List<Point2D_F64> layout = detector.getLayout();
+
+		Polygon2D_F64 hull = new Polygon2D_F64();
+		UtilPolygons2D_F64.convexHull(layout,hull);
+		UtilPolygons2D_F64.removeAlmostParallel(hull,0.02);
+
+		boundaryIndexes = new int[hull.size()];
+		for (int i = 0; i < hull.size(); i++) {
+			Point2D_F64 h = hull.get(i);
+			boolean matched = false;
+			for (int j = 0; j < layout.size(); j++) {
+				if( h.isIdentical(layout.get(j),1e-6)) {
+					matched = true;
+					boundaryIndexes[i] = j;
+					break;
+				}
+			}
+			if( !matched )
+				throw new RuntimeException("Bug!");
+		}
+
 	}
 
 	@Override
@@ -264,7 +229,9 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		else
 			storage.reset();
 
-		boundExtractor.bounds(storage);
+		for (int i = 0; i < 4; i++) {
+			storage.grow().set( getCalibrationPoints().get( boundaryIndexes[i]));
+		}
 
 		return storage.toList();
 	}
