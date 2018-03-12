@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,7 +94,7 @@ public class ExampleFiducialImage {
 		Se3_F64 targetToSensor = new Se3_F64();
 		Point2D_F64 locationPixel = new Point2D_F64();
 		for (int i = 0; i < detector.totalFound(); i++) {
-			detector.getImageLocation(i, locationPixel);
+			detector.getCenter(i, locationPixel);
 
 			if( detector.hasUniqueID() )
 				System.out.println("Target ID = "+detector.getId(i));

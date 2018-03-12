@@ -34,7 +34,9 @@ import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
+import org.ddogleg.struct.FastQueue;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,7 +98,7 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Dete
 	 * @param location (output) Storage for the transform. modified.
 	 */
 	@Override
-	public void getImageLocation(int which, Point2D_F64 location) {
+	public void getCenter(int which, Point2D_F64 location) {
 		FoundFiducial f = alg.getFound().get(which);
 
 		distToUndist.compute(f.distortedPixels.a.x,f.distortedPixels.a.y, undistQuad.a);
@@ -194,4 +196,21 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Dete
 	protected List<Point2D3D> getControl3D(int which) {
 		return points2D3D;
 	}
+
+	@Override
+	public List<Point2D_F64> getBounds(int which, @Nullable FastQueue<Point2D_F64> storage) {
+		if( storage == null )
+			storage = new FastQueue<>(Point2D_F64.class,true);
+		else
+			storage.reset();
+
+		FoundFiducial found = getAlgorithm().getFound().get(which);
+		storage.grow().set(found.distortedPixels.a);
+		storage.grow().set(found.distortedPixels.b);
+		storage.grow().set(found.distortedPixels.c);
+		storage.grow().set(found.distortedPixels.d);
+
+		return storage.toList();
+	}
+
 }

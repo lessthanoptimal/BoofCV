@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,10 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.FastQueue;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * Interface for detecting fiducial markers and their location in the image.  Optionally, some implementations can produce
@@ -56,7 +60,17 @@ public interface FiducialDetector<T extends ImageBase<T>>
 	 * @param which Fiducial's index
 	 * @param location (output) Storage for the transform. modified.
 	 */
-	void getImageLocation(int which , Point2D_F64 location );
+	void getCenter(int which , Point2D_F64 location );
+
+	/**
+	 * Used to retrieve the bounds around a marker in the image. How the bounds are defined is left up the
+	 * implementation. It could be a simple rectangle or it could be corner features.
+	 *
+	 * @param which Which fiducial.
+	 * @param storage (Optional) Storage for markers.
+	 * @return Found marker. Points are owned by the caller and will not be modified in the future.
+	 */
+	List<Point2D_F64> getBounds(int which , @Nullable FastQueue<Point2D_F64> storage );
 
 	/**
 	 * If applicable, returns the ID of the fiducial found.  Call {@link #hasUniqueID()} to see if this function

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,13 @@ import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
+import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.shapes.Polygon2D_F64;
+import org.ddogleg.struct.FastQueue;
+import org.ejml.UtilEjml;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
@@ -43,6 +47,9 @@ public abstract class GenericFiducialDetectorChecks {
 
 	// tolerance for difference between pixel location and geometric center from reprojection
 	protected double pixelAndProjectedTol = 3.0;
+
+	// true if it supports the getBounds() function
+	protected boolean supportsBounds = true;
 
 	protected List<ImageType> types = new ArrayList<>();
 
@@ -70,12 +77,14 @@ public abstract class GenericFiducialDetectorChecks {
 			detector.detect(image);
 
 			assertTrue(detector.totalFound()>= 1);
+			checkBounds(detector);
 
 			Results results = extractResults(detector);
 
 			// run it again with a changed intrinsic that's incorrect
 			detector.setLensDistortion(loadDistortion(false));
 			detector.detect(image);
+			checkBounds(detector);
 
 			// results should have changed
 			if( results.id.length == detector.totalFound()) {
@@ -85,7 +94,7 @@ public abstract class GenericFiducialDetectorChecks {
 					Se3_F64 pose = new Se3_F64();
 					Point2D_F64 pixel = new Point2D_F64();
 					detector.getFiducialToCamera(i, pose);
-					detector.getImageLocation(i, pixel);
+					detector.getCenter(i, pixel);
 					assertTrue(pose.getT().distance(results.pose.get(i).T) > 1e-4);
 					assertFalse(MatrixFeatures_DDRM.isIdentical(pose.getR(), results.pose.get(i).R, 1e-4));
 					// pixel location is based on the observed location, thus changing the intrinsics should not
@@ -127,6 +136,7 @@ public abstract class GenericFiducialDetectorChecks {
 			assertFalse(detector.is3D());
 			assertTrue(detector.totalFound() >= 1);
 			Results expected = extractResults(detector);
+			checkBounds(detector);
 
 			// detect with intrinsics
 			detector.setLensDistortion(loadDistortion(true));
@@ -315,7 +325,7 @@ public abstract class GenericFiducialDetectorChecks {
 				Se3_F64 fidToCam = new Se3_F64();
 				Point2D_F64 pixel = new Point2D_F64();
 				detector.getFiducialToCamera(i, fidToCam);
-				detector.getImageLocation(i, pixel);
+				detector.getCenter(i, pixel);
 
 				Point2D_F64 rendered = new Point2D_F64();
 				WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(distortion, fidToCam);
@@ -374,6 +384,42 @@ public abstract class GenericFiducialDetectorChecks {
 		}
 	}
 
+	public void checkBounds(FiducialDetector detector) {
+		if( !supportsBounds )
+			return;
+
+		FastQueue<Point2D_F64> queue = new FastQueue<>(Point2D_F64.class,true);
+		for (int i = 0; i < detector.totalFound(); i++) {
+
+			// make sure it handles null correctly
+			List<Point2D_F64> listA = detector.getBounds(i,null);
+			List<Point2D_F64> listB = detector.getBounds(i,queue);
+
+			assertTrue(listB == queue.toList());
+			assertEquals(listA.size(),listB.size());
+
+			Polygon2D_F64 polygon = new Polygon2D_F64(listA.size());
+			for (int j = 0; j < listA.size(); j++) {
+				Point2D_F64 pa = listA.get(j);
+				Point2D_F64 pb = listB.get(j);
+
+				assertTrue(pa.x == pb.x);
+				assertTrue(pa.y == pb.y);
+
+				// very simple sanity check on the results
+				assertFalse(UtilEjml.isUncountable(pa.x));
+				assertFalse(UtilEjml.isUncountable(pa.y));
+
+				polygon.get(j).set(pa);
+			}
+
+			// in almost all cases the center should be inside
+			Point2D_F64 center = new Point2D_F64();
+			detector.getCenter(i,center);
+			Intersection2D_F64.containConvex(polygon,center);
+		}
+	}
+
 	private Results extractResults( FiducialDetector detector ) {
 		Results out = new Results(detector.totalFound());
 
@@ -381,7 +427,7 @@ public abstract class GenericFiducialDetectorChecks {
 			Se3_F64 pose = new Se3_F64();
 			Point2D_F64 pixel = new Point2D_F64();
 			detector.getFiducialToCamera(i, pose);
-			detector.getImageLocation(i, pixel);
+			detector.getCenter(i, pixel);
 
 			out.id[i] = detector.getId(i);
 			out.pose.add(pose);
