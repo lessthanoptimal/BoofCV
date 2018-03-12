@@ -192,6 +192,15 @@ public class BoofSwingUtil {
 		JOptionPane.showMessageDialog(component, e.getMessage());
 	}
 
+	/**
+	 * Sets rendering hints that will enable antialiasing and make sub pixel rendering look good
+	 * @param g2
+	 */
+	public static void antialiasing( Graphics2D g2 ) {
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	}
+
 	public enum FileTypes
 	{
 		IMAGES,VIDEOS

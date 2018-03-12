@@ -23,8 +23,6 @@ import boofcv.abst.fiducial.FiducialStability;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.*;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
-import boofcv.core.image.GConvertImage;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
@@ -43,7 +41,10 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.image.*;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -52,8 +53,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -82,10 +83,8 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 
 	private Class<I> imageClass;
 
-	private VisualPanel panel = new VisualPanel();
+	private ImagePanel panel = new ImagePanel();
 	private ControlPanel controls = new ControlPanel();
-
-	private I gray;
 
 	private FiducialDetector detector;
 
@@ -99,23 +98,16 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 	private BufferedImage imageCopy;
 
 	public FiducialTrackerDemoApp(List<PathLabel> examples, Class<I> imageType) {
-		super(false,false,examples, ImageType.pl(3, imageType));
+		super(false,false,examples, ImageType.single(imageType));
 		this.imageClass = imageType;
-
-		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
 		panel.setPreferredSize(new Dimension(640, 480));
 		panel.setFocusable(true);
-		panel.addMouseListener(new MouseListener() {
+		panel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				streamPaused = !streamPaused;
 			}
-
-			@Override public void mousePressed(MouseEvent e) {}
-			@Override public void mouseReleased(MouseEvent e) {}
-			@Override public void mouseEntered(MouseEvent e) {}
-			@Override public void mouseExited(MouseEvent e) {}
 		});
 
 		add(BorderLayout.CENTER, panel);
@@ -123,21 +115,11 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input)
+	{
+		detector.detect((I)input);
 
-
-
-		Planar<I> planar = (Planar<I>)input;
-
-		if( detector.getInputType().getFamily() == ImageType.Family.GRAY) {
-			gray.reshape(input.width, input.height);
-			GConvertImage.average(planar, gray);
-		}
-
-		detector.detect(gray);
-
-		imageCopy = ConvertBufferedImage.checkCopy(buffered,imageCopy);
-		Graphics2D g2 = imageCopy.createGraphics();
+		Graphics2D g2 = buffered.createGraphics();
 
 		Se3_F64 targetToSensor = new Se3_F64();
 		Point2D_F64 center = new Point2D_F64();
@@ -170,8 +152,8 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 
 		}
 
+		imageCopy = ConvertBufferedImage.checkCopy(buffered,imageCopy);
 		panel.setImageUI(imageCopy);
-		panel.repaint();
 	}
 
 	@Override
@@ -308,15 +290,6 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 	@Override
 	protected void handleInputChange(int source, InputMethod method, int width, int height) {
 		panel.setPreferredSize(new Dimension(width,height));
-	}
-
-	class VisualPanel extends ImagePanel {
-		@Override
-		public void paintComponent(Graphics g) {
-			super.paintComponent(g);
-			if( detector == null )
-				return;
-		}
 	}
 
 	class ControlPanel extends StandardAlgConfigPanel implements ActionListener {

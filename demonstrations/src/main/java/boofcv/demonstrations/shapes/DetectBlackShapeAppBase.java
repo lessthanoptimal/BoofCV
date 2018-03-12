@@ -32,7 +32,10 @@ import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -63,12 +66,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 
 
 		JMenuItem menuSaveInput = new JMenuItem("Save Input");
-		menuSaveInput.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				requestSaveInputImage();
-			}
-		});
+		menuSaveInput.addActionListener(e -> requestSaveInputImage());
 		BoofSwingUtil.setMenuItemKeys(menuSaveInput,KeyEvent.VK_S,KeyEvent.VK_Y);
 
 		JMenu menu = new JMenu("Data");
@@ -103,6 +101,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 			}
 		});
 
+
 		guiImage.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -120,18 +119,15 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 	@Override
 	protected void handleInputChange( int source , InputMethod method , final int width , final int height ) {
 		// reset the scaling and ensure the entire new image is visible
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				double zoom = BoofSwingUtil.selectZoomToShowAll(guiImage,width,height);
-				controls.setImageSize(width,height);
-				controls.setZoom(zoom);
-				milliBinary = 0;
-				guiImage.setScale(zoom);
-				guiImage.updateSize(width,height);
-				guiImage.getHorizontalScrollBar().setValue(0);
-				guiImage.getVerticalScrollBar().setValue(0);
-			}
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			double zoom = BoofSwingUtil.selectZoomToShowAll(guiImage,width,height);
+			controls.setImageSize(width,height);
+			controls.setZoom(zoom);
+			milliBinary = 0;
+			guiImage.setScale(zoom);
+			guiImage.updateSize(width,height);
+			guiImage.getHorizontalScrollBar().setValue(0);
+			guiImage.getVerticalScrollBar().setValue(0);
 		});
 	}
 
@@ -188,11 +184,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 		saveRequested = false;
 		switch( inputMethod ) {
 			case IMAGE:
-				new Thread() {
-					public void run() {
-						saveInputImage();
-					}
-				}.start();
+				new Thread(() -> saveInputImage()).start();
 				break;
 
 			case VIDEO:

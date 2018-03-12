@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,6 +46,9 @@ public class SaveImageOnClick extends MouseAdapter {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		boolean clicked = SwingUtilities.isMiddleMouseButton(e);
+
+		// This is for Mac OS X. Checks to see if control-command are held down with the mouse press
+		clicked |= e.isControlDown() && ((e.getModifiersEx() & 256) != 0);
 
 		if( clicked ) {
 			String fileName = String.format("saved_image%03d.png",saveCounter++);

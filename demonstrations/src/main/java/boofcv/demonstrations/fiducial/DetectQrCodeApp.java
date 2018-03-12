@@ -280,13 +280,10 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 		final double _width = width;
 
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				double scale = 0.75*Math.min(gui.getWidth(),gui.getHeight())/_width;
-				gui.setScaleAndCenter(scale,center.x,center.y);
-				controlPanel.setZoom(scale);
-			}
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			double scale = 0.75*Math.min(gui.getWidth(),gui.getHeight())/_width;
+			gui.setScaleAndCenter(scale,center.x,center.y);
+			controlPanel.setZoom(scale);
 		});
 
 	}

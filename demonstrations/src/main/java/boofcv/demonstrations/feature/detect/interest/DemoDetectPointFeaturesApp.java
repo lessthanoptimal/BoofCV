@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,13 +24,12 @@ import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.VisualizeFeatures;
-import boofcv.gui.image.ImageZoomPanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
@@ -48,8 +47,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -78,12 +77,11 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	// END OWNED BY LOCK
 
 	public DemoDetectPointFeaturesApp(List<?> exampleInputs, Class<T> imageClass ) {
-		super(exampleInputs, ImageType.single(imageClass));
+		super(true,true,exampleInputs, ImageType.single(imageClass));
 		this.imageClass = imageClass;
 		this.derivClass = GImageDerivativeOps.getDerivativeType(imageClass);
 
 		imagePanel.setPreferredSize(new Dimension(800,800));
-
 		imagePanel.addMouseWheelListener(new MouseAdapter() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -152,13 +150,10 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 			}
 		}
 
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				controls.setProcessingTime(seconds);
-				imagePanel.setBufferedImage(buffered);
-				imagePanel.repaint();
-			}
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			controls.setProcessingTime(seconds);
+			imagePanel.setBufferedImage(buffered);
+			imagePanel.repaint();
 		});
 	}
 
@@ -174,17 +169,21 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		imagePanel.repaint();
 	}
 
-	class VisualizePanel extends ImageZoomPanel {
+	class VisualizePanel extends ShapeVisualizePanel {
+		Ellipse2D.Double circle = new Ellipse2D.Double();
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+			BoofSwingUtil.antialiasing(g2);
+
 			synchronized (featureLock) {
+				double r = 5;
 				for (int i = 0; i < positive.size; i++) {
 					Point2D_I16 c = positive.get(i);
-					VisualizeFeatures.drawPoint(g2,(int)((c.x+0.5)*scale),(int)((c.y+0.5)*scale),Color.RED);
+					VisualizeFeatures.drawPoint(g2,c.x*scale,c.y*scale,r,Color.RED,true,circle);
 				}
 				for (int i = 0; i < negative.size; i++) {
 					Point2D_I16 c = negative.get(i);
-					VisualizeFeatures.drawPoint(g2,(int)((c.x+0.5)*scale),(int)((c.y+0.5)*scale),Color.BLUE);
+					VisualizeFeatures.drawPoint(g2,c.x*scale,c.y*scale,r,Color.BLUE,true,circle);
 				}
 			}
 		}
@@ -226,33 +225,16 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 			comboAlgorithms.setSelectedIndex(0);
 			comboAlgorithms.setMaximumSize(comboAlgorithms.getPreferredSize());
 
-			selectZoom = new JSpinner(new SpinnerNumberModel(zoom,MIN_ZOOM,MAX_ZOOM,1));
-			selectZoom.addChangeListener(this);
-			selectZoom.setMaximumSize(selectZoom.getPreferredSize());
-
-			spinnerRadius = new JSpinner(new SpinnerNumberModel(configExtract.radius,1,200,1));
-			spinnerRadius.addChangeListener(this);
-			spinnerRadius.setMaximumSize(spinnerRadius.getPreferredSize());
-
-			spinnerThreshold = new JSpinner(new SpinnerNumberModel(configExtract.threshold,0,1000000,100f));
-			spinnerThreshold.addChangeListener(this);
-			spinnerThreshold.setMaximumSize(spinnerThreshold.getPreferredSize());
-
-			spinnerMaxFeatures = new JSpinner(new SpinnerNumberModel(configExtract.maxFeatures,-1,1000000,10));
-			spinnerMaxFeatures.addChangeListener(this);
-			spinnerMaxFeatures.setMaximumSize(spinnerMaxFeatures.getPreferredSize());
-
-			spinnerFastTol = new JSpinner(new SpinnerNumberModel(fastPixelTol,1,255,1));
-			spinnerFastTol.addChangeListener(this);
-			spinnerFastTol.setMaximumSize(spinnerFastTol.getPreferredSize());
+			selectZoom = spinner(zoom,MIN_ZOOM,MAX_ZOOM,1);
+			spinnerRadius = spinner(configExtract.radius,1,200,1);
+			spinnerThreshold = spinner(configExtract.threshold,0,1000000,100f);
+			spinnerMaxFeatures = spinner(configExtract.maxFeatures,-1,1000000,10);
+			spinnerFastTol = spinner(fastPixelTol,1,255,1);
 
 			checkWeighted.setSelected(weighted);
-			checkWeighted.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent actionEvent) {
-					weighted = checkWeighted.isSelected();
-					handleSettingsChanged();
-				}
+			checkWeighted.addActionListener(actionEvent -> {
+				weighted = checkWeighted.isSelected();
+				handleSettingsChanged();
 			});
 			checkWeighted.setMaximumSize(checkWeighted.getPreferredSize());
 
@@ -268,13 +250,13 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		}
 
 		private void addAlgorithms() {
-			addAlgorithm("Harris", new Runnable() { public void run() { createHarris(); } });
-			addAlgorithm("Shi-Tomasi", new Runnable() { public void run() { createShiTomasi(); } });
-			addAlgorithm("Fast", new Runnable() { public void run() { createFast(); } });
-			addAlgorithm("KitRos", new Runnable() { public void run() { createKitRos(); } });
-			addAlgorithm("Median", new Runnable() { public void run() { createMedian(); } });
-			addAlgorithm("Hessian", new Runnable() { public void run() { createHessian(); } });
-			addAlgorithm("Laplace", new Runnable() { public void run() { createLaplace(); } });
+			addAlgorithm("Harris", () -> createHarris());
+			addAlgorithm("Shi-Tomasi", () -> createShiTomasi());
+			addAlgorithm("Fast", () -> createFast());
+			addAlgorithm("KitRos", () -> createKitRos());
+			addAlgorithm("Median", () -> createMedian());
+			addAlgorithm("Hessian", () -> createHessian());
+			addAlgorithm("Laplace", () -> createLaplace());
 		}
 
 		public void adjustControls( final boolean usesWeighted , final boolean usesFastTol ) {
@@ -380,11 +362,8 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		examples.add("scale/beach02.jpg");
 
 		DemoDetectPointFeaturesApp app = new DemoDetectPointFeaturesApp(examples,GrayF32.class);
-
-		app.openFile(new File(examples.get(0)));
-
+		app.openExample(examples.get(0));
 		app.waitUntilInputSizeIsKnown();
-
-		ShowImages.showWindow(app,"Point Feature Detectors",true);
+		app.display("Point Feature Detectors");
 	}
 }
