@@ -61,6 +61,8 @@ Version : 0.29
 - FiducialDetector
   * Added an optional function which can return the fiducial's boundary
   * Updated demo app to visualize all the information it can return
+- ThresholdLocalOtsu
+  * Fixed bug where it was always trying to use a region of size 0
 
 Fiducials
 - TODO FiducialDetector.setLensDistortion() add width and height parameters

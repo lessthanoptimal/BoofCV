@@ -72,7 +72,7 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 	public void process(GrayU8 input , GrayU8 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		int regionWidth = regionWidthLength.computeI(Math.min(input.width,input.height));
+		regionWidth = regionWidthLength.computeI(Math.min(input.width,input.height));
 
 		if (input.width < regionWidth || input.height < regionWidth) {
 			throw new IllegalArgumentException("Image is smaller than region size");

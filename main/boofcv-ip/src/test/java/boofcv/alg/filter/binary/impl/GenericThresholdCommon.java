@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.filter.binary.impl;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -46,6 +47,25 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>>
 	public abstract InputToBinary<T> createAlg(int requestedBlockWidth,
 											   double scale , boolean down );
 
+	/**
+	 * Make sure it's doing something resembling a proper thresholding of a random image. About 1/2 the pixels should
+	 * be true or false. There was a bug where this wasn't happening and wasn't caught
+	 */
+	@Test
+	public void sanityCheckThreshold() {
+		T input = GeneralizedImageOps.createSingleBand(imageType,100,120);
+		GImageMiscOps.fillUniform(input,rand,0,255);
+
+		GrayU8 down = new GrayU8(100,120);
+		GrayU8 up = new GrayU8(100,120);
+
+		// turn off texture so that the output's can be the inverse of each other
+		createAlg(6,1.0,true).process(input,down);
+		createAlg(6,1.0,false).process(input,up);
+
+		assertTrue(ImageStatistics.sum(down)>down.data.length/4);
+		assertTrue(ImageStatistics.sum(up)>down.data.length/4);
+	}
 
 	@Test
 	public void toggleDown() {
