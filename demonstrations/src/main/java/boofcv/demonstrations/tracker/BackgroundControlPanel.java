@@ -20,6 +20,7 @@ package boofcv.demonstrations.tracker;
 
 import boofcv.factory.background.ConfigBackgroundBasic;
 import boofcv.factory.background.ConfigBackgroundGaussian;
+import boofcv.factory.background.ConfigBackgroundGmm;
 import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
@@ -33,7 +34,6 @@ import java.awt.event.ActionListener;
  *
  * @author Peter Abeles
  */
-// TODO Display FPS
 public class BackgroundControlPanel extends StandardAlgConfigPanel
 	implements ActionListener, ChangeListener
 {
@@ -52,13 +52,22 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 
 	// gaussian specific
 	JSpinner spinMinDifference;
+	JSpinner spinVariance;
+
+	// gmm specific
+	JSpinner spinNumberOfGaussians;
+	JSpinner spinSignificant;
 
 	int model = 0;
 //	boolean stationary = true;
 	double threshold;
 	double learnRate;
+	double initVariance;
 	double minimumDifference;
+	int numberOfGaussians;
+	double significantWeight;
 
+	ConfigBackgroundGmm configGmm = new ConfigBackgroundGmm();
 	ConfigBackgroundGaussian configGaussian = new ConfigBackgroundGaussian(12,0.0005f);
 	ConfigBackgroundBasic configBasic = new ConfigBackgroundBasic(35, 0.005f);
 
@@ -68,18 +77,24 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 		configGaussian.initialVariance = 100;
 		configGaussian.minimumDifference = 10;
 
-		comboModel = combo(model,"Basic","Gaussian");
+		comboModel = combo(model,"Basic","Gaussian","GMM");
 //		checkStationary = checkbox("Stationary",stationary);
 		spinThreshold = spinner(0,0.0,255.0,1.0);
 		spinLearn = spinner(0,0.0,1.0,0.001,1,6);
 		spinMinDifference = spinner(0,0.0,255.0,1.0);
+		spinVariance = spinner(10,1,255*255,10);
+		spinNumberOfGaussians = spinner(1,1,100,1);
+		spinSignificant = spinner(0.0,0.0,2,0.001,1,6);
 
 		addLabeled(processingTimeLabel,"FPS");
 		addLabeled(comboModel,"Model");
 //		add(checkStationary);
 		addLabeled(spinThreshold,"Threshold");
 		addLabeled(spinLearn,"Learn Rate");
+		addLabeled(spinVariance,"Init Variance");
 		addLabeled(spinMinDifference,"Min Diff.");
+		addLabeled(spinNumberOfGaussians,"Num. Gauss.");
+		addLabeled(spinSignificant,"Significant");
 
 		changeModel(0);
 		updateListener();
@@ -92,29 +107,67 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 	private void changeModel( int model ) {
 		this.model = model;
 
-		spinMinDifference.setEnabled(model==1);
 
 		spinThreshold.removeChangeListener(this);
 		spinLearn.removeChangeListener(this);
 		spinMinDifference.removeChangeListener(this);
+		spinVariance.removeChangeListener(this);
+		spinNumberOfGaussians.removeChangeListener(this);
+		spinSignificant.removeChangeListener(this);
 
 		if( model == 0 ) {
 			threshold = configBasic.threshold;
 			learnRate = configBasic.learnRate;
 			spinThreshold.setValue(configBasic.threshold);
 			spinLearn.setValue(configBasic.learnRate);
+
+			spinThreshold.setEnabled(true);
+			spinLearn.setEnabled(true);
+			spinMinDifference.setEnabled(false);
+			spinVariance.setEnabled(false);
+			spinNumberOfGaussians.setEnabled(false);
+			spinSignificant.setEnabled(false);
+
 		} else if( model == 1 ) {
 			threshold = configGaussian.threshold;
 			learnRate = configGaussian.learnRate;
+			initVariance = configGaussian.initialVariance;
 			minimumDifference = configGaussian.minimumDifference;
 			spinThreshold.setValue(configGaussian.threshold);
 			spinLearn.setValue(configGaussian.learnRate);
 			spinMinDifference.setValue(configGaussian.minimumDifference);
+			spinVariance.setValue(initVariance);
+
+			spinThreshold.setEnabled(true);
+			spinLearn.setEnabled(true);
+			spinMinDifference.setEnabled(true);
+			spinVariance.setEnabled(true);
+			spinNumberOfGaussians.setEnabled(false);
+			spinSignificant.setEnabled(false);
+		} else if( model == 2 ) {
+			learnRate = 1.0/configGmm.learningPeriod;
+			initVariance = configGmm.initialVariance;
+			numberOfGaussians = configGmm.numberOfGaussian;
+			significantWeight = configGmm.significantWeight;
+			spinLearn.setValue(learnRate);
+			spinVariance.setValue(initVariance);
+			spinNumberOfGaussians.setValue(numberOfGaussians);
+			spinSignificant.setValue(significantWeight);
+
+			spinThreshold.setEnabled(false);
+			spinLearn.setEnabled(true);
+			spinMinDifference.setEnabled(false);
+			spinVariance.setEnabled(true);
+			spinNumberOfGaussians.setEnabled(true);
+			spinSignificant.setEnabled(true);
 		}
 
 		spinThreshold.addChangeListener(this);
 		spinLearn.addChangeListener(this);
 		spinMinDifference.addChangeListener(this);
+		spinVariance.addChangeListener(this);
+		spinNumberOfGaussians.addChangeListener(this);
+		spinSignificant.addChangeListener(this);
 	}
 
 	private void updateListener() {
@@ -126,9 +179,18 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 				break;
 			case 1:
 				configGaussian.threshold = (float)threshold;
+				configGaussian.initialVariance = (float)initVariance;
 				configGaussian.learnRate = (float)learnRate;
 				configGaussian.minimumDifference = (float)minimumDifference;
 				listener.modelChanged(configGaussian,true);
+				break;
+
+			case 2:
+				configGmm.initialVariance = (float)initVariance;
+				configGmm.learningPeriod = (float)(1.0/learnRate);
+				configGmm.numberOfGaussian = numberOfGaussians;
+				configGmm.significantWeight = (float)significantWeight;
+				listener.modelChanged(configGmm,true);
 				break;
 		}
 	}
@@ -154,6 +216,12 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 			minimumDifference = ((Number)spinMinDifference.getValue()).doubleValue();
 		} else if( e.getSource() == spinThreshold ) {
 			threshold = ((Number)spinThreshold.getValue()).doubleValue();
+		} else if( e.getSource() == spinVariance ) {
+			initVariance = ((Number)spinVariance.getValue()).doubleValue();
+		} else if( e.getSource() == spinNumberOfGaussians ) {
+			numberOfGaussians = ((Number)spinNumberOfGaussians.getValue()).intValue();
+		} else if( e.getSource() == spinSignificant ) {
+			significantWeight = ((Number)spinSignificant.getValue()).doubleValue();
 		}
 		updateListener();
 	}
@@ -162,5 +230,6 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 	{
 		void modelChanged( ConfigBackgroundGaussian config , boolean stationary );
 		void modelChanged( ConfigBackgroundBasic config , boolean stationary );
+		void modelChanged( ConfigBackgroundGmm config , boolean stationary );
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.gui.image;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 /**
@@ -32,6 +33,9 @@ public class ImageGridPanel extends JPanel {
 
 	int numRows;
 	int numCols;
+
+	boolean scaleToFit = false;
+	AffineTransform affine = new AffineTransform();
 
 	public ImageGridPanel( int numRows , int numCols ) {
 		images = new BufferedImage[numRows*numCols];
@@ -52,6 +56,10 @@ public class ImageGridPanel extends JPanel {
 	}
 
 	public synchronized void autoSetPreferredSize() {
+		setPreferredSize(computePreferredSize());
+	}
+
+	public Dimension computePreferredSize() {
 		int width = 0;
 		int height = 0;
 
@@ -70,13 +78,22 @@ public class ImageGridPanel extends JPanel {
 			height += h;
 		}
 
-		setPreferredSize( new Dimension(width,height));
+		return new Dimension(width,height);
 	}
 
 	@Override
 	public synchronized void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
+
+		double scale = 1;
+
+		if( scaleToFit ) {
+			Dimension preferred = computePreferredSize();
+			double scaleX = getWidth() / preferred.getWidth();
+			double scaleY = getHeight() / preferred.getHeight();
+			scale = Math.min(1, Math.min(scaleX, scaleY));
+		}
 
 		int y = 0;
 		for( int row = 0; row < numRows; row++ ) {
@@ -88,7 +105,8 @@ public class ImageGridPanel extends JPanel {
 				if( img == null )
 					continue;
 
-				g2.drawImage(img, x,y,null);
+				affine.setTransform(scale,0,0,scale,x*scale,y*scale);
+				g2.drawImage(img, affine,null);
 
 				x += img.getWidth();
 
@@ -98,7 +116,11 @@ public class ImageGridPanel extends JPanel {
 		}
 	}
 
-	public synchronized void setImage( int row , int col , BufferedImage image ) {
+	public void setScaleToFit(boolean scaleToFit) {
+		this.scaleToFit = scaleToFit;
+	}
+
+	public synchronized void setImage(int row , int col , BufferedImage image ) {
 		this.images[row*numCols+col] = image;
 	}
 

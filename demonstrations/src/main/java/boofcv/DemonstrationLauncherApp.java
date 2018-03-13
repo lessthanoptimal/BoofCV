@@ -66,9 +66,9 @@ import boofcv.demonstrations.shapes.DetectBlackEllipseApp;
 import boofcv.demonstrations.shapes.DetectBlackPolygonApp;
 import boofcv.demonstrations.shapes.DetectPolylineApp;
 import boofcv.demonstrations.shapes.ShapeFitContourApp;
-import boofcv.demonstrations.tracker.DemoBackgroundRemoval;
 import boofcv.demonstrations.tracker.VideoTrackerObjectQuadApp;
 import boofcv.demonstrations.tracker.VideoTrackerPointFeaturesApp;
+import boofcv.demonstrations.tracker.VisualizeBackgroundModelApp;
 import boofcv.demonstrations.tracker.VisualizeCirculantTrackerApp;
 import boofcv.demonstrations.transform.fft.FourierVisualizeApp;
 import boofcv.demonstrations.transform.pyramid.EdgeIntensitiesApp;
@@ -180,7 +180,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				ShapeFitContourApp.class);
 
 		createNodes(root, "Trackers",
-				DemoBackgroundRemoval.class,
+				VisualizeBackgroundModelApp.class,
 				VideoTrackerObjectQuadApp.class,
 				VideoTrackerPointFeaturesApp.class,
 				VisualizeCirculantTrackerApp.class);

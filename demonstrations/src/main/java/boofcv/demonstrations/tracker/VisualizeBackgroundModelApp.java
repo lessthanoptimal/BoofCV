@@ -21,6 +21,7 @@ package boofcv.demonstrations.tracker;
 import boofcv.alg.background.BackgroundModelStationary;
 import boofcv.factory.background.ConfigBackgroundBasic;
 import boofcv.factory.background.ConfigBackgroundGaussian;
+import boofcv.factory.background.ConfigBackgroundGmm;
 import boofcv.factory.background.FactoryBackgroundModel;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
@@ -43,7 +44,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DemoBackgroundRemoval extends DemonstrationBase
+public class VisualizeBackgroundModelApp extends DemonstrationBase
 	implements BackgroundControlPanel.Listener
 {
 	GrayU8 segmented = new GrayU8(1,1);
@@ -56,12 +57,14 @@ public class DemoBackgroundRemoval extends DemonstrationBase
 	BackgroundControlPanel controls = new BackgroundControlPanel(this);
 	ImageGridPanel imagePanels = new ImageGridPanel(1,2);
 
-	public DemoBackgroundRemoval(List<?> exampleInputs ) {
+	public VisualizeBackgroundModelApp(List<?> exampleInputs ) {
 		super(exampleInputs, ImageType.single(GrayU8.class));
 		super.allowImages = false;
 
 		add(BorderLayout.WEST,controls);
 		add(BorderLayout.CENTER,imagePanels);
+
+		imagePanels.setScaleToFit(true);
 	}
 
 	@Override
@@ -69,6 +72,7 @@ public class DemoBackgroundRemoval extends DemonstrationBase
 		synchronized (lockBackground) {
 			background.reset();
 		}
+		imagePanels.setPreferredSize(new Dimension(width*2,height));
 	}
 
 	@Override
@@ -76,37 +80,25 @@ public class DemoBackgroundRemoval extends DemonstrationBase
 
 		visualized = ConvertBufferedImage.checkDeclare(buffered, visualized);
 		original = ConvertBufferedImage.checkCopy(buffered, original);
-		imagePanels.setPreferredSize(new Dimension(visualized.getWidth()*2,visualized.getHeight()));
 
 		segmented.reshape(input.width,input.height);
 
 		final double fps;
 		synchronized (lockBackground) {
 			long timeBefore = System.nanoTime();
-			background.segment((GrayU8) input, segmented);
-			background.updateBackground((GrayU8) input);
+			background.updateBackground((GrayU8) input, segmented);
 			long timeAfter = System.nanoTime();
 			fps = 1000.0/((timeAfter-timeBefore)*1e-6);
 		}
 
 		VisualizeBinaryData.renderBinary(segmented, false, visualized);
 
-		imagePanels.setImage(0,0,visualized);
-		imagePanels.setImage(0,1,original);
-
-		imagePanels.repaint();
-
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				controls.setFPS(fps);
-			}
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			imagePanels.setImage(0,0,visualized);
+			imagePanels.setImage(0,1,original);
+			imagePanels.repaint();
+			controls.setFPS(fps);
 		});
-	}
-
-	private BackgroundModelStationary<GrayU8> createAlgorithm() {
-		return FactoryBackgroundModel.stationaryBasic(new ConfigBackgroundBasic(35, 0.005f),
-				ImageType.single(GrayU8.class));
 	}
 
 	@Override
@@ -123,6 +115,13 @@ public class DemoBackgroundRemoval extends DemonstrationBase
 		}
 	}
 
+	@Override
+	public void modelChanged(ConfigBackgroundGmm config, boolean stationary) {
+		synchronized (lockBackground) {
+			background = FactoryBackgroundModel.stationaryGmm(config, ImageType.single(GrayU8.class));
+		}
+	}
+
 	public static void main(String[] args) {
 
 		List<String> examples = new ArrayList<>();
@@ -130,7 +129,7 @@ public class DemoBackgroundRemoval extends DemonstrationBase
 		examples.add(UtilIO.pathExample("background/horse_jitter.mp4"));
 		examples.add(UtilIO.pathExample("tracking/chipmunk.mjpeg"));
 
-		DemoBackgroundRemoval app = new DemoBackgroundRemoval(examples);
+		VisualizeBackgroundModelApp app = new VisualizeBackgroundModelApp(examples);
 
 		app.openFile(new File(examples.get(0)));
 		app.waitUntilInputSizeIsKnown();
