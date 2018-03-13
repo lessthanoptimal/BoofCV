@@ -18,6 +18,7 @@ Version : 0.29
 - Demonstrations
   * Moved menubar to the correct location
   * Tweaks for Mac OS X
+  * Improved several applications
 - Images
   * Gray images new support createSameShape(type)
   * Added matchShape() to replace the more verbose reshape(image.width,image.height)
@@ -68,7 +69,6 @@ Fiducials
 
 OTHER ITEMS
 - TODO Binary blob demonstration
-- TODO Update IntensityPointFeatureApp. Let it select image to open
 
 ---------------------------------------------
 Date    : 2018/01/20

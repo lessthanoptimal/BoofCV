@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,27 +21,33 @@ package boofcv.demonstrations.feature.detect.intensity;
 import boofcv.abst.feature.detect.intensity.*;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
-import boofcv.gui.SelectAlgorithmAndInputPanel;
-import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
+import boofcv.gui.DemonstrationBase;
+import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.*;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseWheelEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Displays the intensity of detected features inside an image
@@ -49,124 +55,174 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGray<D>>
-		extends SelectAlgorithmAndInputPanel
+		extends DemonstrationBase
 {
 	// displays intensity image
-	ImagePanel gui;
+	DisplayPanel imagePanel = new DisplayPanel();
+	ControlPanel controlPanel;
 
-	// original input image
-	BufferedImage input;
 	// intensity image is rendered here
-	BufferedImage temp;
-	// converted input image
-	T workImage;
+	BufferedImage visualized;
+	BufferedImage original;
+
+	Class<D> derivType;
 	// type of image the input image is
 	Class<T> imageType;
 	// computes image derivative
 	AnyImageDerivative<T,D> deriv;
-	// if it has processed an image or not
-	boolean processImage = false;
 
-	public IntensityPointFeatureApp( Class<T> imageType , Class<D> derivType ) {
-		super(1);
+	// used to compute feature intensity
+	GeneralFeatureIntensity<T,D> intensity;
+
+	public IntensityPointFeatureApp( List<String> examples , Class<T> imageType ) {
+		super(true,true,examples,ImageType.single(imageType));
 		this.imageType = imageType;
 
 		boolean isInteger = !GeneralizedImageOps.isFloatingPoint(imageType);
+
+		derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		deriv = new AnyImageDerivative<>(GradientThree.getKernelX(isInteger), imageType, derivType);
 
-		addAlgorithm(0, "Laplacian", new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.TRACE,derivType));
-		addAlgorithm(0, "Hessian Det", new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));
-		addAlgorithm(0, "Harris",new WrapperGradientCornerIntensity<T,D>(FactoryIntensityPointAlg.harris(2, 0.4f, false, derivType)));
-		addAlgorithm(0, "Harris Weighted",new WrapperGradientCornerIntensity<T,D>(FactoryIntensityPointAlg.harris(2, 0.4f, true, derivType)));
-		addAlgorithm(0, "Shi Tomasi",new WrapperGradientCornerIntensity<T,D>( FactoryIntensityPointAlg.shiTomasi(2, false, derivType)));
-		addAlgorithm(0, "Shi Tomasi Weighted",new WrapperGradientCornerIntensity<T,D>( FactoryIntensityPointAlg.shiTomasi(2, true, derivType)));
-		addAlgorithm(0, "FAST",new WrapperFastCornerIntensity<T,D>(FactoryIntensityPointAlg.fast(5, 11, imageType)));
-		addAlgorithm(0, "KitRos",new WrapperKitRosCornerIntensity<T,D>(derivType));
-		addAlgorithm(0, "Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(imageType,2),imageType));
+		controlPanel = new ControlPanel();
+		add(BorderLayout.WEST,controlPanel);
+		add(BorderLayout.CENTER,imagePanel);
 
-		gui = new ImagePanel();
-		setMainGUI(gui);
+		imagePanel.addMouseWheelListener(new MouseAdapter() {
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+
+				double curr =imagePanel.getScale();
+
+				if( e.getWheelRotation() > 0 )
+					curr *= 1.1;
+				else
+					curr /= 1.1;
+				imagePanel.setScale(curr);
+			}
+		});
 	}
 
 	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if( workImage == null )
-			return;
+	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+		visualized = ConvertBufferedImage.checkDeclare(width,height, visualized,BufferedImage.TYPE_INT_RGB);
+		imagePanel.setPreferredSize(new Dimension(width,height));
+	}
 
-		GeneralFeatureIntensity<T,D> intensity = (GeneralFeatureIntensity<T,D>)cookie;
+	@Override
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 
-		deriv.setInput(workImage);
+		original = ConvertBufferedImage.checkCopy(buffered, original);
+
+		T gray = (T) input;
+		deriv.setInput(gray);
 
 		D derivX = deriv.getDerivative(true);
 		D derivY = deriv.getDerivative(false);
-		D derivXX = deriv.getDerivative(true,true);
-		D derivYY = deriv.getDerivative(false,false);
-		D derivXY = deriv.getDerivative(true,false);
+		D derivXX = deriv.getDerivative(true, true);
+		D derivYY = deriv.getDerivative(false, false);
+		D derivXY = deriv.getDerivative(true, false);
 
-		intensity.process(workImage,derivX,derivY,derivXX,derivYY,derivXY);
+		intensity.process(gray, derivX, derivY, derivXX, derivYY, derivXY);
 
 		GrayF32 featureImg = intensity.getIntensity();
-		VisualizeImageData.colorizeSign(featureImg,temp, ImageStatistics.maxAbs(featureImg));
-		gui.setImage(temp);
-		gui.repaint();
-		gui.requestFocusInWindow();
+
+		VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
+
+		SwingUtilities.invokeLater(() -> {
+			imagePanel.setBufferedImageNoChange(visualized);
+			imagePanel.repaint();
+		});
 	}
 
-	public void process( final BufferedImage input ) {
-		setInputImage(input);
-		this.input = input;
-		workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
-		temp = new BufferedImage(workImage.width,workImage.height,BufferedImage.TYPE_INT_BGR);
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
-				processImage = true;
-			}});
-		doRefreshAll();
-	}
+	class DisplayPanel extends ShapeVisualizePanel {
+		@Override
+		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+			super.paintInPanel(tran, g2);
 
-	@Override
-	public void loadConfigurationFile(String fileName) {}
-
-	@Override
-	public void refreshAll(Object[] cookies) {
-		setActiveAlgorithm(0,null,cookies[0]);
-	}
-
-	@Override
-	public void changeInput(String name, int index) {
-		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
-
-		if( image != null ) {
-			process(image);
+			if( controlPanel.showInput ) {
+				// this requires some explaining
+				// for some reason it was decided that the transform would apply a translation, but not a scale
+				// so this scale will be concatted on top of the translation in the g2
+				tran.setTransform(scale,0,0,scale,0,0);
+				AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f);
+				g2.setComposite(ac);
+				g2.drawImage(original,tran,null);
+			}
 		}
 	}
 
-	@Override
-	public boolean getHasProcessedImage() {
-		return processImage;
+	class ControlPanel extends StandardAlgConfigPanel implements ActionListener , ChangeListener {
+		JComboBox<String> comboAlgorithm;
+		JCheckBox checkShowInput;
+		JSpinner spinnerRadius;
+
+		List<GeneralFeatureIntensity<T,D>> algorithms = new ArrayList<>();
+		
+		boolean showInput = false;
+		int radius = 2;
+
+		public ControlPanel() {
+			comboAlgorithm = new JComboBox<>();
+
+			checkShowInput = checkbox("Show Input",showInput);
+			spinnerRadius = spinner(radius,1,100,1);
+
+			addAlgorithm( "Laplacian", new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.TRACE,derivType));
+			addAlgorithm( "Hessian Det", new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));
+			addAlgorithm( "Harris",new WrapperGradientCornerIntensity<T,D>(FactoryIntensityPointAlg.harris(2, 0.4f, false, derivType)));
+			addAlgorithm( "Harris Weighted",new WrapperGradientCornerIntensity<T,D>(FactoryIntensityPointAlg.harris(2, 0.4f, true, derivType)));
+			addAlgorithm( "Shi Tomasi",new WrapperGradientCornerIntensity<T,D>( FactoryIntensityPointAlg.shiTomasi(2, false, derivType)));
+			addAlgorithm( "Shi Tomasi Weighted",new WrapperGradientCornerIntensity<T,D>( FactoryIntensityPointAlg.shiTomasi(2, true, derivType)));
+			addAlgorithm( "FAST",new WrapperFastCornerIntensity<T,D>(FactoryIntensityPointAlg.fast(5, 11, imageType)));
+			addAlgorithm( "KitRos",new WrapperKitRosCornerIntensity<T,D>(derivType));
+			addAlgorithm( "Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(imageType,2),imageType));
+			comboAlgorithm.addActionListener(this);
+			comboAlgorithm.setMaximumSize(comboAlgorithm.getPreferredSize());
+			intensity = algorithms.get(comboAlgorithm.getSelectedIndex());
+
+			addAlignCenter(comboAlgorithm);
+			addAlignLeft(checkShowInput);
+//			addLabeled(spinnerRadius,"Radius");
+
+		}
+		
+		private void addAlgorithm( String name , GeneralFeatureIntensity algorithm ) {
+			comboAlgorithm.addItem(name);
+			algorithms.add(algorithm);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if( e.getSource() == comboAlgorithm ) {
+				intensity = algorithms.get(comboAlgorithm.getSelectedIndex());
+				reprocessInput();
+			} else if( e.getSource() == checkShowInput ) {
+				showInput = checkShowInput.isSelected();
+				imagePanel.repaint();
+			}
+		}
+
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			if( e.getSource() == spinnerRadius ) {
+
+			}
+		}
 	}
 
 	public static void main( String args[] ) {
-//		IntensityPointFeatureApp<GrayF32,GrayF32> app =
-//				new IntensityPointFeatureApp<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
+		java.util.List<PathLabel> examples = new ArrayList<>();
 
-		IntensityPointFeatureApp<GrayU8, GrayS16> app =
-				new IntensityPointFeatureApp<>(GrayU8.class, GrayS16.class);
+		examples.add(new PathLabel("Chessboard",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame06.jpg")));
+		examples.add(new PathLabel("Square Grid",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
+		examples.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
+		examples.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
+		examples.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
 
-		java.util.List<PathLabel> inputs = new ArrayList<>();
+		IntensityPointFeatureApp<GrayU8, GrayS16> app = new IntensityPointFeatureApp(examples,GrayU8.class);
 
-		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
-		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
-		inputs.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
-
-		app.setInputList(inputs);
-
-		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
-		}
-
-		ShowImages.showWindow(app,"Feature Intensity",true);
+		app.openExample(examples.get(0));
+		app.waitUntilInputSizeIsKnown();
+		app.display("Feature Intensity");
 	}
 }
