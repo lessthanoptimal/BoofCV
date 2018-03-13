@@ -85,17 +85,24 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 		int x0 = regionWidth/2;
 		int x1 = input.width-(regionWidth-x0);
 
+		final byte a,b;
+		if( otsu.down ) {
+			a = 1; b = 0;
+		} else {
+			a = 0; b = 1;
+		}
+
 		// handle the inner portion first
 		for (int y = y0; y < y1; y++) {
 			int indexInput = input.startIndex + y*input.stride + x0;
 			int indexOutput = output.startIndex + y*output.stride + x0;
 
 			computeHistogram(0,y-y0,input);
-			output.data[indexOutput++] = otsu.down == (input.data[indexInput++]&0xFF) <= otsu.threshold ? (byte)1 : 0;
+			output.data[indexOutput++] = (input.data[indexInput++]&0xFF) <= otsu.threshold ? a : b;
 
 			for (int x = x0+1; x < x1; x++) {
 				updateHistogramX(x-x0,y-y0,input);
-				output.data[indexOutput++] =otsu. down == (input.data[indexInput++]&0xFF) <= otsu.threshold ? (byte)1 : 0;
+				output.data[indexOutput++] = (input.data[indexInput++]&0xFF) <= otsu.threshold ? a : b;
 			}
 		}
 
@@ -187,10 +194,11 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 	}
 
 	protected void updateHistogramX(int x0, int y0, GrayU8 input) {
+		int indexInput = input.startIndex + y0*input.stride + x0-1;
 		for (int y = 0; y < regionWidth; y++) {
-			int indexInput = input.startIndex + (y0+y)*input.stride + x0-1;
 			histogram[input.data[indexInput] & 0xFF]--;
 			histogram[input.data[indexInput+regionWidth] & 0xFF]++;
+			indexInput += input.stride;
 		}
 		otsu.compute(histogram,histogram.length,numPixels);
 	}
