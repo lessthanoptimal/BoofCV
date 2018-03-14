@@ -50,7 +50,7 @@ Version : 0.29
 - MultiCameraToEquirectangular
   * Correctly handles NaN in equiToCam transform
 - Started using @Nullable and @Nonnull
-  * Primarily in factories where if a config can be null is confusing
+  * Primarily in factories where if a config can be null or not is confusing
 - ConvolveImage* refactoring
   * Removed WithBorder from class name for simplicity
   * Made naming more consistent in general

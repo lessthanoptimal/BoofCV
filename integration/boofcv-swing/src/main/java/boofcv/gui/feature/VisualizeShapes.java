@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,8 @@ import georegression.struct.shapes.Rectangle2D_I32;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
 import java.util.List;
 
 import static boofcv.gui.fiducial.VisualizeFiducial.drawLine;
@@ -219,18 +219,21 @@ public class VisualizeShapes {
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-			Line2D.Double l = new Line2D.Double();
+			Path2D path = new Path2D.Double();
 
-			for( int i = 0; i < polygon.size()-1; i++ ) {
-				Point2D_F64 p0 = polygon.get(i);
-				Point2D_F64 p1 = polygon.get(i+1);
-				drawLine(g2, l, p0.x,  p0.y,  p1.x,  p1.y);
+			for( int i = 0; i < polygon.size(); i++ ) {
+				Point2D_F64 p = polygon.get(i);
+				if( i == 0 )
+					path.moveTo(p.x,p.y);
+				else
+					path.lineTo(p.x,p.y);
+
 			}
 			if( loop && polygon.size() > 0) {
-				Point2D_F64 p0 = polygon.get(0);
-				Point2D_F64 p1 = polygon.get(polygon.size()-1);
-				drawLine(g2, l, p0.x, p0.y, p1.x, p1.y);
+				path.closePath();
 			}
+
+			g2.draw(path);
 
 		} else {
 			drawPolygon(polygon, loop, g2);
@@ -241,17 +244,18 @@ public class VisualizeShapes {
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		Line2D.Double l = new Line2D.Double();
+		Path2D path = new Path2D.Double();
 
-		for( int i = 0; i < polygon.size()-1; i++ ) {
-			Point2D_F64 p0 = polygon.get(i);
-			Point2D_F64 p1 = polygon.get(i+1);
-			drawLine(g2, l, scale*p0.x,  scale*p0.y,  scale*p1.x,  scale*p1.y);
+		for( int i = 0; i < polygon.size(); i++ ) {
+			Point2D_F64 p = polygon.get(i);
+			if( i == 0 )
+				path.moveTo(scale*p.x,scale*p.y);
+			else
+				path.lineTo(scale*p.x,scale*p.y);
+
 		}
 		if( loop && polygon.size() > 0) {
-			Point2D_F64 p0 = polygon.get(0);
-			Point2D_F64 p1 = polygon.get(polygon.size()-1);
-			drawLine(g2, l, scale*p0.x, scale*p0.y, scale*p1.x,scale* p1.y);
+			path.closePath();
 		}
 	}
 
@@ -259,7 +263,7 @@ public class VisualizeShapes {
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		GeneralPath path = new GeneralPath();
+		Path2D path = new Path2D.Double();
 
 		Point2D_F64 p = polygon.get(0);
 		path.moveTo(p.x*scale,p.y*scale);
