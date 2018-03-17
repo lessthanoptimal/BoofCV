@@ -41,10 +41,10 @@ Version : 0.29
   * Deprecated and will be removed soon
   * PolylineSplitMerge now has all of its functionality and out performs it
 - FFMPEG
-  * Suppressed warning message that has been smalling stderr
+  * Suppressed warning message that has been spamming stderr
 - Camera Calibration
   * Fixed bug where width and height was not assigned to intrinsic during calibration
-  * For universal omni the undistorted window is automatically scaled based on image size
+  * GUI: For universal omni the undistorted window is automatically scaled based on image size
 - ImageConvert
   * Faster technique to convert between interleaved and planar
 - MultiCameraToEquirectangular
@@ -57,7 +57,6 @@ Version : 0.29
 - BackgroundModel
   * Added a combined function for update and segment
   * Added new algorithm. Gaussian Mixture Models (GMM)
-  * TODO Added new example video. Fixed camera with moving trees
 - FiducialDetector
   * Added an optional function which can return the fiducial's boundary
   * Updated demo app to visualize all the information it can return

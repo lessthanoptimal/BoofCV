@@ -59,9 +59,9 @@ public class ExampleBackgroundRemovalMoving {
 	public static void main(String[] args) {
 
 		// Example with a moving camera.  Highlights why motion estimation is sometimes required
-//		String fileName = UtilIO.pathExample("tracking/chipmunk.mjpeg");
+		String fileName = UtilIO.pathExample("tracking/chipmunk.mjpeg");
 		// Camera has a bit of jitter in it.  Static kinda works but motion reduces false positives
-		String fileName = UtilIO.pathExample("background/horse_jitter.mp4");
+//		String fileName = UtilIO.pathExample("background/horse_jitter.mp4");
 
 		// Comment/Uncomment to switch input image type
 		ImageType imageType = ImageType.single(GrayF32.class);
@@ -93,12 +93,14 @@ public class ExampleBackgroundRemovalMoving {
 		// Note that GMM doesn't interpolate the input image. Making it harder to model object edges.
 		// However it runs faster because of this.
 		ConfigBackgroundGmm configGmm = new ConfigBackgroundGmm();
+		configGmm.initialVariance = 1600;
+		configGmm.significantWeight = 1e-1f;
 
 		// Comment/Uncomment to switch background mode
 		BackgroundModelMoving background =
-//				FactoryBackgroundModel.movingBasic(configBasic, new PointTransformHomography_F32(), imageType);
+				FactoryBackgroundModel.movingBasic(configBasic, new PointTransformHomography_F32(), imageType);
 //				FactoryBackgroundModel.movingGaussian(configGaussian, new PointTransformHomography_F32(), imageType);
-				FactoryBackgroundModel.movingGmm(configGmm,new PointTransformHomography_F32(), imageType);
+//				FactoryBackgroundModel.movingGmm(configGmm,new PointTransformHomography_F32(), imageType);
 
 		background.setUnknownValue(1);
 

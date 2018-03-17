@@ -57,6 +57,7 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 	// gmm specific
 	JSpinner spinNumberOfGaussians;
 	JSpinner spinSignificant;
+	JSpinner spinDecay;
 
 	int model = 0;
 //	boolean stationary = true;
@@ -66,6 +67,7 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 	double minimumDifference;
 	int numberOfGaussians;
 	double significantWeight;
+	double decayRate;
 
 	ConfigBackgroundGmm configGmm = new ConfigBackgroundGmm();
 	ConfigBackgroundGaussian configGaussian = new ConfigBackgroundGaussian(12,0.0005f);
@@ -84,7 +86,8 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 		spinMinDifference = spinner(0,0.0,255.0,1.0);
 		spinVariance = spinner(10,1,255*255,10);
 		spinNumberOfGaussians = spinner(1,1,100,1);
-		spinSignificant = spinner(0.0,0.0,2,0.001,1,6);
+		spinSignificant = spinner(0.0,0.0,2,0.001,"0.0E0",10);
+		spinDecay = spinner(0.0,0.0,1.0,0.001,"0.0E0",10);
 
 		addLabeled(processingTimeLabel,"FPS");
 		addLabeled(comboModel,"Model");
@@ -95,6 +98,7 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 		addLabeled(spinMinDifference,"Min Diff.");
 		addLabeled(spinNumberOfGaussians,"Num. Gauss.");
 		addLabeled(spinSignificant,"Significant");
+		addLabeled(spinDecay,"Decay Rate");
 
 		changeModel(0);
 		updateListener();
@@ -114,6 +118,7 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 		spinVariance.removeChangeListener(this);
 		spinNumberOfGaussians.removeChangeListener(this);
 		spinSignificant.removeChangeListener(this);
+		spinDecay.removeChangeListener(this);
 
 		if( model == 0 ) {
 			threshold = configBasic.threshold;
@@ -127,6 +132,7 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 			spinVariance.setEnabled(false);
 			spinNumberOfGaussians.setEnabled(false);
 			spinSignificant.setEnabled(false);
+			spinDecay.setEnabled(false);
 
 		} else if( model == 1 ) {
 			threshold = configGaussian.threshold;
@@ -144,15 +150,19 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 			spinVariance.setEnabled(true);
 			spinNumberOfGaussians.setEnabled(false);
 			spinSignificant.setEnabled(false);
+			spinDecay.setEnabled(false);
 		} else if( model == 2 ) {
 			learnRate = 1.0/configGmm.learningPeriod;
 			initVariance = configGmm.initialVariance;
 			numberOfGaussians = configGmm.numberOfGaussian;
 			significantWeight = configGmm.significantWeight;
+			decayRate = configGmm.decayCoefient;
+
 			spinLearn.setValue(learnRate);
 			spinVariance.setValue(initVariance);
 			spinNumberOfGaussians.setValue(numberOfGaussians);
 			spinSignificant.setValue(significantWeight);
+			spinDecay.setValue(decayRate);
 
 			spinThreshold.setEnabled(false);
 			spinLearn.setEnabled(true);
@@ -160,6 +170,7 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 			spinVariance.setEnabled(true);
 			spinNumberOfGaussians.setEnabled(true);
 			spinSignificant.setEnabled(true);
+			spinDecay.setEnabled(true);
 		}
 
 		spinThreshold.addChangeListener(this);
@@ -168,6 +179,7 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 		spinVariance.addChangeListener(this);
 		spinNumberOfGaussians.addChangeListener(this);
 		spinSignificant.addChangeListener(this);
+		spinDecay.addChangeListener(this);
 	}
 
 	private void updateListener() {
@@ -190,6 +202,8 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 				configGmm.learningPeriod = (float)(1.0/learnRate);
 				configGmm.numberOfGaussian = numberOfGaussians;
 				configGmm.significantWeight = (float)significantWeight;
+				configGmm.decayCoefient = (float)decayRate;
+				System.out.println(configGmm);
 				listener.modelChanged(configGmm,true);
 				break;
 		}
@@ -222,6 +236,8 @@ public class BackgroundControlPanel extends StandardAlgConfigPanel
 			numberOfGaussians = ((Number)spinNumberOfGaussians.getValue()).intValue();
 		} else if( e.getSource() == spinSignificant ) {
 			significantWeight = ((Number)spinSignificant.getValue()).doubleValue();
+		} else if( e.getSource() == spinDecay ) {
+			decayRate = ((Number)spinDecay.getValue()).doubleValue();
 		}
 		updateListener();
 	}

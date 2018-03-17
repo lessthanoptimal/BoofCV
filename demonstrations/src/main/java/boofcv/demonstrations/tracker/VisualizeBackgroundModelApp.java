@@ -126,6 +126,7 @@ public class VisualizeBackgroundModelApp extends DemonstrationBase
 
 		List<String> examples = new ArrayList<>();
 		examples.add(UtilIO.pathExample("background/street_intersection.mp4"));
+		examples.add(UtilIO.pathExample("background/rubixfire.mp4"));
 		examples.add(UtilIO.pathExample("background/horse_jitter.mp4"));
 		examples.add(UtilIO.pathExample("tracking/chipmunk.mjpeg"));
 

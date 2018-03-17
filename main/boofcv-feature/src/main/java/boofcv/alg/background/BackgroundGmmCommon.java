@@ -137,31 +137,30 @@ public class BackgroundGmmCommon {
 		}
 
 		// Update the model for the best gaussian
-		float bestWeight = 0;
 		if( bestIndex != -1 ) {
 			// If there is a good fit update the model
 			float weight = dataRow[bestIndex];
 			float variance = dataRow[bestIndex+1];
 
-			bestWeight = weight + learningRate*(1f-weight);
+			weight += learningRate*(1f-weight);
 			dataRow[bestIndex]   = 1; // set to one so that it can't possible go negative
 
 			float sumDeltaSq = 0;
 			for (int i = 0; i < numBands; i++) {
 				float mean = dataRow[bestIndex+2+i];
 				float delta = pixelValue[i]-mean;
-				dataRow[bestIndex+2+i] = mean + delta*learningRate/bestWeight;
+				dataRow[bestIndex+2+i] = mean + delta*learningRate/weight;
 				sumDeltaSq += delta*delta;
 			}
 			sumDeltaSq /= numBands;
-			dataRow[bestIndex+1] = variance + (learningRate /bestWeight)*(sumDeltaSq*1.2F - variance);
+			dataRow[bestIndex+1] = variance + (learningRate /weight)*(sumDeltaSq*1.2F - variance);
 			// 1.2f is a fudge factor. Empirical testing shows that the above equation is biased. Can't be bothered
 			// to verify the derivation and see if there's a mistake
 
 			// Update Gaussian weights and prune models
-			updateWeightAndPrune(dataRow, modelIndex, ng, bestIndex, bestWeight);
+			updateWeightAndPrune(dataRow, modelIndex, ng, bestIndex, weight);
 
-			return bestWeight >= significantWeight ? 0 : 1;
+			return weight >= significantWeight ? 0 : 1;
 		} else if( ng < maxGaussians ) {
 			// if there is no good fit then create a new model, if there is room
 
@@ -263,7 +262,6 @@ public class BackgroundGmmCommon {
 		}
 
 		// Update the model for the best gaussian
-		float bestWeight = 0;
 		if( bestDistance != maxDistance ) {
 			// If there is a good fit update the model
 			float weight = dataRow[bestIndex];
@@ -272,17 +270,17 @@ public class BackgroundGmmCommon {
 
 			float delta = pixelValue-mean;
 
-			bestWeight = weight + learningRate*(1f-weight);
+			weight += learningRate*(1f-weight);
 			dataRow[bestIndex]   = 1; // set to one so that it can't possible go negative. changed later
-			dataRow[bestIndex+1] = variance + (learningRate /bestWeight)*(delta*delta*1.2F - variance);
+			dataRow[bestIndex+1] = variance + (learningRate /weight)*(delta*delta*1.2F - variance);
 			// 1.2f is a fudge factor. Empirical testing shows that the above equation is biased. Can't be bothered
 			// to verify the derivation and see if there's a mistake
-			dataRow[bestIndex+2] = mean + delta* learningRate /bestWeight;
+			dataRow[bestIndex+2] = mean + delta* learningRate /weight;
 
 			// Update Gaussian weights and prune models
-			updateWeightAndPrune(dataRow, modelIndex, ng, bestIndex, bestWeight);
+			updateWeightAndPrune(dataRow, modelIndex, ng, bestIndex, weight);
 
-			return bestWeight >= significantWeight ? 0 : 1;
+			return weight >= significantWeight ? 0 : 1;
 		} else if( ng < maxGaussians ) {
 			// if there is no good fit then create a new model, if there is room
 			bestIndex = modelIndex + ng*3;

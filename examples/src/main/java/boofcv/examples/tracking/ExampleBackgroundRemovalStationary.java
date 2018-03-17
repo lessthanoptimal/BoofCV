@@ -19,6 +19,7 @@
 package boofcv.examples.tracking;
 
 import boofcv.alg.background.BackgroundModelStationary;
+import boofcv.factory.background.ConfigBackgroundBasic;
 import boofcv.factory.background.ConfigBackgroundGmm;
 import boofcv.factory.background.FactoryBackgroundModel;
 import boofcv.gui.binary.VisualizeBinaryData;
@@ -46,6 +47,7 @@ public class ExampleBackgroundRemovalStationary {
 	public static void main(String[] args) {
 
 		String fileName = UtilIO.pathExample("background/street_intersection.mp4");
+//		String fileName = UtilIO.pathExample("background/rubixfire.mp4"); // dynamic background
 //		String fileName = UtilIO.pathExample("background/horse_jitter.mp4"); // degraded performance because of jitter
 //		String fileName = UtilIO.pathExample("tracking/chipmunk.mjpeg"); // Camera moves.  Stationary will fail here
 
@@ -55,13 +57,11 @@ public class ExampleBackgroundRemovalStationary {
 //		ImageType imageType = ImageType.il(3, InterleavedU8.class);
 
 		ConfigBackgroundGmm configGmm = new ConfigBackgroundGmm();
-		configGmm.initialVariance = 900;
-		configGmm.significantWeight = 0.1f;
 
 		// Comment/Uncomment to switch algorithms
 		BackgroundModelStationary background =
-//				FactoryBackgroundModel.stationaryBasic(new ConfigBackgroundBasic(35, 0.005f), imageType);
-				FactoryBackgroundModel.stationaryGmm(configGmm, imageType);
+				FactoryBackgroundModel.stationaryBasic(new ConfigBackgroundBasic(35, 0.005f), imageType);
+//				FactoryBackgroundModel.stationaryGmm(configGmm, imageType);
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		SimpleImageSequence video =

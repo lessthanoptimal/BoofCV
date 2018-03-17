@@ -39,13 +39,13 @@ public class ConfigBackgroundGmm extends ConfigBackground {
 	 * The initial variance assigned to a new pixel.  Larger values to reduce false positives due to
 	 * under sampling.  Don't set to zero since that can cause divided by zero errors.
 	 */
-	public float initialVariance = 1600;
+	public float initialVariance = 400;
 
 	/**
 	 * Determines how quickly a model is forgotten. Smaller values means they last longer. Values equal to
 	 * or greater than one might cause new Gaussians to be immediately removed.
 	 */
-	public float decayCoefient = 0.2f;
+	public float decayCoefient = 0.005f;
 
 	/**
 	 * Maximum Mahalanobis a value can be from a Gaussian to be considered a member of the gaussian
@@ -55,14 +55,14 @@ public class ConfigBackgroundGmm extends ConfigBackground {
 	/**
 	 * Maximum number of gaussians that can be in a single mixture
 	 */
-	public int numberOfGaussian = 3;
+	public int numberOfGaussian = 5;
 
 	/**
 	 * Once the weight for a Gaussian becomes greater than this amount it is no longer considered part of the
 	 * foreground and is the the background model. Strongly influences how long it takes an object that was moving
 	 * to fade into the background. Probably one of the first tuning variables you should mess with.
 	 */
-	public float significantWeight = 0.05f;
+	public float significantWeight = 0.01f;
 
 	@Override
 	public void checkValidity() {
@@ -76,5 +76,18 @@ public class ConfigBackgroundGmm extends ConfigBackground {
 			throw new IllegalArgumentException("Variance must be set to a value larger than zero");
 		if( initialVariance < 0 )
 			throw new IllegalArgumentException("minimumDifference must be >= 0");
+	}
+
+	@Override
+	public String toString() {
+		return "ConfigBackgroundGmm{" +
+				"learningPeriod=" + learningPeriod +
+				", initialVariance=" + initialVariance +
+				", decayCoefient=" + decayCoefient +
+				", maxDistance=" + maxDistance +
+				", numberOfGaussian=" + numberOfGaussian +
+				", significantWeight=" + significantWeight +
+				", unknownValue=" + unknownValue +
+				'}';
 	}
 }
