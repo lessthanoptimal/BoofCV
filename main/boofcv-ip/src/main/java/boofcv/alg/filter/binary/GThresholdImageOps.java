@@ -392,6 +392,23 @@ public class GThresholdImageOps {
 	}
 
 	/**
+	 *
+	 * @see FactoryThresholdBinary#localOtsu(boolean, ConfigLength, double, double, boolean, Class)
+	 */
+	public static <T extends ImageGray<T>>
+	GrayU8 localOtsu(T input, GrayU8 output, boolean otsu2, ConfigLength width, double tuning , double scale, boolean down)
+	{
+		InputToBinary<T> alg = FactoryThresholdBinary.localOtsu(otsu2,width,tuning,scale,down,input.getImageType().getImageClass());
+
+		if( output == null )
+			output = new GrayU8(input.width,input.height);
+
+		alg.process(input,output);
+
+		return output;
+	}
+
+	/**
 	 * Applies {@link boofcv.alg.filter.binary.impl.ThresholdSauvola Sauvola} thresholding to the input image.
 	 * Intended for use with text image.
 	 *
@@ -436,7 +453,7 @@ public class GThresholdImageOps {
 	 * @return Binary image
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localBlockMinMax(T input, GrayU8 output, ConfigLength width, double scale , boolean down, double textureThreshold)
+	GrayU8 blockMinMax(T input, GrayU8 output, ConfigLength width, double scale , boolean down, double textureThreshold)
 	{
 		InputToBinary<T> alg = FactoryThresholdBinary.blockMinMax(
 				width,scale,down,textureThreshold,true,(Class)input.getClass());
@@ -461,7 +478,7 @@ public class GThresholdImageOps {
 	 * @return Binary image
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localBlockMean(T input, GrayU8 output, ConfigLength width, double scale , boolean down)
+	GrayU8 blockMean(T input, GrayU8 output, ConfigLength width, double scale , boolean down)
 	{
 		InputToBinary<T> alg = FactoryThresholdBinary.blockMean(width, scale, down,true,
 				(Class<T>) input.getClass());
@@ -486,7 +503,7 @@ public class GThresholdImageOps {
 	 * @return Binary image
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localBlockOtsu(T input, GrayU8 output, boolean otsu2, ConfigLength width, double tuning , double scale, boolean down)
+	GrayU8 blockOtsu(T input, GrayU8 output, boolean otsu2, ConfigLength width, double tuning , double scale, boolean down)
 	{
 		InputToBinary<T> alg = FactoryThresholdBinary.blockOtsu(otsu2,width, tuning,
 				scale,down,true, (Class)input.getClass());
