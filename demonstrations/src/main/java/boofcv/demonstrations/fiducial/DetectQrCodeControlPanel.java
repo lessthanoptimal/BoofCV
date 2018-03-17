@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,13 +75,9 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		messagePanel = new DetectQrCodeMessagePanel(owner);
 
 		polygonPanel = new DetectBlackPolygonControlPanel(owner,config.polygon,config.threshold);
+		polygonPanel.thresholdPanel.addHistogramGraph();
 
-		bRunAgain.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent actionEvent) {
-				DetectQrCodeControlPanel.this.owner.reprocessImageOnly();
-			}
-		});
+		bRunAgain.addActionListener(actionEvent -> DetectQrCodeControlPanel.this.owner.reprocessImageOnly());
 		bRunAgain.setMaximumSize(bRunAgain.getPreferredSize());
 		bRunAgain.setBorder(BorderFactory.createEmptyBorder(1,4,1,4));
 

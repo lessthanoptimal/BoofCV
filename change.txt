@@ -69,9 +69,6 @@ Fiducials
   TODO * Unit test with heavy lens distortion and see if it fixes it
 - Have square fiducials call init if lens distortion is set.
 
-OTHER ITEMS
-- TODO Binary blob demonstration
-
 ---------------------------------------------
 Date    : 2018/01/20
 Version : 0.28

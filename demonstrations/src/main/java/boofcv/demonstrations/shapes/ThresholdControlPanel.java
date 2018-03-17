@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,11 @@ import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ConfigThresholdBlockMinMax;
 import boofcv.factory.filter.binary.ConfigThresholdLocalOtsu;
 import boofcv.factory.filter.binary.ThresholdType;
+import boofcv.gui.ImageHistogramPanel;
 import boofcv.gui.JConfigLength;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.ConfigLength;
+import boofcv.struct.image.ImageGray;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -32,6 +34,8 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 
 /**
@@ -56,6 +60,11 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 
 	public ThresholdType type;
 
+	// Displays a histogram and let's the use manually select a threshold
+	// empty panel that the histogram is inserted into
+	public JPanel histogramHolder = new JPanel(new BorderLayout());
+	public ImageHistogramPanel histogramPanel;
+
 	public double scale = -1;
 	public boolean down = true;
 	public ConfigLength regionWidth = ConfigLength.fixed(21);
@@ -67,7 +76,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 
 	// toggle value of threshold
 	public double minimumSpread = new ConfigThresholdBlockMinMax().minimumSpread;
-	public int globalThreshold = 50;
+	public int fixedThreshold = 50;
 
 	public boolean thresholdLocalBlocks;
 
@@ -101,7 +110,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		comboType.setMaximumSize(comboType.getPreferredSize());
 		comboType.setSelectedIndex(this.type.ordinal());
 
-		spinnerThreshold = spinner(globalThreshold,0,1000,1);
+		spinnerThreshold = spinner(fixedThreshold,0,1000,1);
 		controlWidth.setValue(regionWidth);
 		controlWidth.setMaximumSize(controlWidth.getPreferredSize());
 		controlWidth.setLengthBounds(5,10000);
@@ -129,6 +138,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		togglePanels.add(checkOtsu2);
 		togglePanels.setMaximumSize(togglePanels.getPreferredSize());
 
+		add(histogramHolder);
 		addLabeled(comboType, "Type", this);
 		addLabeled(spinnerThreshold, "Threshold", this);
 		addLabeled(buttonUpDown,"Direction");
@@ -136,6 +146,44 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		addAlignCenter(togglePanels, this);
 
 		updateEnabledByType();
+	}
+
+	public void updateHistogram(ImageGray gray ) {
+		if( histogramPanel == null ) {
+			throw new IllegalArgumentException("Must call addHistogramGraph first");
+		}
+		histogramPanel.updateSafe(gray);
+		histogramPanel.repaint();
+	}
+
+	public void addHistogramGraph() {
+		if( histogramPanel != null )
+			throw new IllegalArgumentException("Already called");
+
+		histogramPanel = new ImageHistogramPanel(255,256);
+		histogramHolder.add( BorderLayout.CENTER,histogramPanel );
+		histogramHolder.setPreferredSize(new Dimension(0,60));
+		histogramHolder.setMaximumSize(new Dimension(100000,60));
+		histogramHolder.validate();
+
+		MouseAdapter mouse = new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if( type != ThresholdType.FIXED ) {
+					return;
+				}
+
+				int where = 255*e.getX()/(histogramPanel.getWidth()-1);
+				spinnerThreshold.setValue(where);
+			}
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				mousePressed(e);
+			}
+		};
+
+		histogramPanel.addMouseListener(mouse);
+		histogramPanel.addMouseMotionListener(mouse);
 	}
 
 	public void setOtsuTuning(int otsuTuning) {
@@ -146,7 +194,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	private void updateThresholdValue() {
 		spinnerThreshold.removeChangeListener(this);
 		if( type == ThresholdType.FIXED ) {
-			spinnerThreshold.setValue(globalThreshold);
+			spinnerThreshold.setValue(fixedThreshold);
 		} else if( type == ThresholdType.BLOCK_MIN_MAX) {
 			spinnerThreshold.setValue((int)minimumSpread);
 		} else if( type == ThresholdType.BLOCK_OTSU ||
@@ -196,6 +244,14 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	}
 
 	private void updateEnabledByType() {
+		if( histogramPanel != null ) {
+			if( type == ThresholdType.FIXED ) {
+				histogramPanel.setMarker(fixedThreshold);
+			} else {
+				histogramPanel.setMarker(-1);
+			}
+		}
+
 		switch( type ) {
 			case FIXED:
 				isAdaptive = false;
@@ -270,7 +326,10 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 					type == ThresholdType.LOCAL_OTSU ) {
 				otsuTuning = value;
 			} else {
-				globalThreshold = value;
+				fixedThreshold = value;
+				if( histogramPanel != null ) {
+					histogramPanel.setMarker(fixedThreshold);
+				}
 			}
 			updateThresholdValue();
 			listener.imageThresholdUpdated();
@@ -297,7 +356,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		scale = configuration.scale;
 		down = configuration.down;
 		if( type == ThresholdType.FIXED ) {
-			globalThreshold = (int)configuration.fixedThreshold;
+			fixedThreshold = (int)configuration.fixedThreshold;
 		} else if( type == ThresholdType.BLOCK_MIN_MAX) {
 			minimumSpread = ((ConfigThresholdBlockMinMax)configuration).minimumSpread;
 		} else if( type == ThresholdType.BLOCK_OTSU ||
@@ -345,7 +404,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 			config = _config;
 		} else {
 			config = new ConfigThreshold();
-			config.fixedThreshold = globalThreshold;
+			config.fixedThreshold = fixedThreshold;
 		}
 
 		config.type = type;

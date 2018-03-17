@@ -228,16 +228,14 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 //				System.out.println("  cause "+qr.failureCause);
 //			}
 		}
+		controlPanel.polygonPanel.thresholdPanel.updateHistogram((T)input);
 
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				controls.setProcessingTime(timeInSeconds);
-				viewUpdated();
-				synchronized (detected) {
-					controlPanel.messagePanel.updateList(detected.toList(),failures.toList());
-				}
+		SwingUtilities.invokeLater(() -> {
+			controls.setProcessingTime(timeInSeconds);
+			viewUpdated();
+			synchronized (detected) {
+				controlPanel.messagePanel.updateList(detected.toList(),failures.toList());
 			}
 		});
 	}

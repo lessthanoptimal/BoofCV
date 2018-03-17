@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,12 @@ import java.awt.*;
  * Draws a histogram of the image's pixel intensity level
  */
 public class ImageHistogramPanel extends JPanel {
+	private final Object lock = new Object();
 	protected int totalBins;
 	protected double maxValue;
 	protected int bins[];
+
+	public int marker = -1;
 
 	public ImageHistogramPanel(int totalBins, double maxValue) {
 		this.totalBins = totalBins;
@@ -39,6 +42,19 @@ public class ImageHistogramPanel extends JPanel {
 		this.bins = new int[ totalBins ];
 	}
 
+	/**
+	 * Update that can be called at any time. Will lock UI thread until it's done
+	 * @param image
+	 */
+	public void updateSafe( ImageGray image ) {
+		synchronized (lock) {
+			update(image);
+		}
+	}
+
+	/**
+	 * Update's the histogram. Must only be called in UI thread
+	 */
 	public void update( ImageGray image ) {
 
 		for( int i = 0; i < bins.length; i++ )
@@ -56,10 +72,7 @@ public class ImageHistogramPanel extends JPanel {
 		for( int y = 0; y < image.height; y++ ) {
 			for( int x = 0; x < image.width; x++ ) {
 				int index = (int)(totalBins*(image.get(x,y)/maxValue));
-				if( index >= totalBins || index < 0 )
-					System.err.println("Bad index in ImageHistogramPanel");
-				else
-					bins[index]++;
+				bins[index]++;
 			}
 		}
 	}
@@ -69,10 +82,7 @@ public class ImageHistogramPanel extends JPanel {
 		for( int y = 0; y < image.height; y++ ) {
 			for( int x = 0; x < image.width; x++ ) {
 				int index = totalBins*image.unsafe_get(x,y)/max;
-				if( index >= totalBins || index < 0 )
-					System.err.println("Bad index in ImageHistogramPanel");
-				else
-					bins[index]++;
+				bins[index]++;
 			}
 		}
 	}
@@ -85,25 +95,38 @@ public class ImageHistogramPanel extends JPanel {
 		g2.setColor(Color.white);
 		g2.fillRect(0,0,getWidth(),getHeight());
 
-		int maxCount = 0;
-		for( int i = 0; i < totalBins; i++ )  {
-			if( bins[i] > maxCount )
-				maxCount = bins[i];
-		}
-
-		if( maxCount == 0 )
-			return;
-
-		g2.setColor(Color.BLACK);
-
 		int w = getWidth();
 		int h = getHeight();
 
-		for( int i = 0; i < totalBins; i++ ) {
-			int x1 = w*i/totalBins;
-			int x2 = w*(i+1)/totalBins;
-			int y =  h-h*bins[i]/maxCount;
-			g2.fillRect(x1,y,(x2-x1),h-y);
+		synchronized (lock) {
+			int maxCount = 0;
+			for (int i = 0; i < totalBins; i++) {
+				if (bins[i] > maxCount)
+					maxCount = bins[i];
+			}
+
+			if (maxCount == 0)
+				return;
+
+			g2.setColor(Color.BLACK);
+
+			for (int i = 0; i < totalBins; i++) {
+				int x1 = w * i / totalBins;
+				int x2 = w * (i + 1) / totalBins;
+				int y = h - h * bins[i] / maxCount;
+				g2.fillRect(x1, y, (x2 - x1), h - y);
+			}
 		}
+
+		int marker = this.marker;
+		if( marker >= 0 ) {
+			int x = marker*w/totalBins;
+			g2.setColor(Color.RED);
+			g2.fillRect(x-1,0,3,h);
+		}
+	}
+
+	public void setMarker(int marker) {
+		this.marker = marker;
 	}
 }

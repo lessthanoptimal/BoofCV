@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ import java.util.Random;
 /**
  * Demonstrates the affects of different binary operations on an image.
  */
-public class DemoBinaryImageLabelOpsApp<T extends ImageGray<T>> extends SelectAlgorithmAndInputPanel
+public class DemoBinaryBlobLabelOpsApp<T extends ImageGray<T>> extends SelectAlgorithmAndInputPanel
 		implements SelectHistogramThresholdPanel.Listener {
 
 	Random rand = new Random(234234);
@@ -73,7 +73,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageGray<T>> extends SelectAl
 	SelectHistogramThresholdPanel selectThresh;
 	ImagePanel gui = new ImagePanel();
 
-	public DemoBinaryImageLabelOpsApp(Class<T> imageType) {
+	public DemoBinaryBlobLabelOpsApp(Class<T> imageType) {
 		super(3);
 
 		this.imageType = imageType;
@@ -256,7 +256,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageGray<T>> extends SelectAl
 	}
 
 	public static void main( String args[] ) {
-		DemoBinaryImageLabelOpsApp app = new DemoBinaryImageLabelOpsApp(GrayF32.class);
+		DemoBinaryBlobLabelOpsApp app = new DemoBinaryBlobLabelOpsApp(GrayF32.class);
 
 		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));

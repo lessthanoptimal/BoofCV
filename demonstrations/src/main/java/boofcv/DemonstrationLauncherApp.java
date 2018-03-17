@@ -18,7 +18,7 @@
 
 package boofcv;
 
-import boofcv.demonstrations.binary.DemoBinaryImageLabelOpsApp;
+import boofcv.demonstrations.binary.DemoBinaryBlobLabelOpsApp;
 import boofcv.demonstrations.binary.DemoBinaryImageOpsApp;
 import boofcv.demonstrations.binary.DemoImageThresholdingApp;
 import boofcv.demonstrations.calibration.*;
@@ -96,7 +96,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 	protected void createTree( DefaultMutableTreeNode root ) {
 		createNodes(root,"Binary",
 				DemoImageThresholdingApp.class,
-				DemoBinaryImageLabelOpsApp.class,
+				DemoBinaryBlobLabelOpsApp.class,
 				DemoBinaryImageOpsApp.class);
 
 		createNodes(root,"Calibration",

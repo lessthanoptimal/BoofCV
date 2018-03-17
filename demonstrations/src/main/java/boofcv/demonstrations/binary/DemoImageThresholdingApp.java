@@ -29,6 +29,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.*;
 
 import javax.swing.*;
@@ -68,6 +69,12 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 	}
 
 	@Override
+	protected void configureVideo(int which, SimpleImageSequence sequence) {
+		super.configureVideo(which, sequence);
+		sequence.setLoop(true);
+	}
+
+	@Override
 	protected void handleInputChange(int source, InputMethod method, int width, int height)
 	{
 		imageBinary.reshape(width, height);
@@ -75,9 +82,8 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
-
-
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input)
+	{
 		inputCopy = ConvertBufferedImage.checkCopy(buffered,inputCopy);
 		ConfigThreshold config = controlPanel.threshold.createConfig();
 		InputToBinary inputToBinary = FactoryThresholdBinary.threshold(config,input.imageType.getImageClass());
@@ -86,6 +92,7 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 		VisualizeBinaryData.renderBinary(imageBinary, false, visualizedBinary);
 
 		SwingUtilities.invokeLater(() -> {
+			controlPanel.threshold.updateHistogram((ImageGray)input);
 			changeView();
 		});
 	}
@@ -114,6 +121,7 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 			imageView = combo(view,"Input","Binary");
 
 			threshold.setBorder(BorderFactory.createEmptyBorder());
+			threshold.addHistogramGraph();
 
 			addLabeled(imageView,"View");
 			add(threshold);
