@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -555,7 +555,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		ImagePanel gui = new ImagePanel();
 		gui.setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));
 		ShowImages.showWindow(gui,"Fiducial Detector",true);
-		detector.setLensDistortion(new LensDistortionRadialTangential(intrinsic));
+		detector.setLensDistortion(new LensDistortionRadialTangential(intrinsic),intrinsic.width,intrinsic.height);
 
 		if( sequence != null ) {
 			processStream(intrinsic,sequence,gui,pause);

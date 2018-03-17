@@ -71,7 +71,7 @@ public abstract class GenericFiducialDetectorChecks {
 			ImageBase image = loadImage(type);
 			FiducialDetector detector = createDetector(type);
 
-			detector.setLensDistortion(loadDistortion(true));
+			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
 
 			detector.detect(image);
 
@@ -81,7 +81,7 @@ public abstract class GenericFiducialDetectorChecks {
 			Results results = extractResults(detector);
 
 			// run it again with a changed intrinsic that's incorrect
-			detector.setLensDistortion(loadDistortion(false));
+			detector.setLensDistortion(loadDistortion(false),image.width,image.height);
 			detector.detect(image);
 			checkBounds(detector);
 
@@ -105,7 +105,7 @@ public abstract class GenericFiducialDetectorChecks {
 			}
 
 			// then reproduce original
-			detector.setLensDistortion(loadDistortion(true));
+			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
 			detector.detect(image);
 
 			// see if it produced exactly the same results
@@ -138,12 +138,12 @@ public abstract class GenericFiducialDetectorChecks {
 			checkBounds(detector);
 
 			// detect with intrinsics
-			detector.setLensDistortion(loadDistortion(true));
+			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
 			assertTrue(detector.is3D());
 			assertTrue(detector.totalFound() >= 1);
 
 			// detect without intrinsics again
-			detector.setLensDistortion(null);
+			detector.setLensDistortion(null,0,0);
 			assertFalse(detector.is3D());
 			assertTrue(detector.totalFound() >= 1);
 			Results found = extractResults(detector);
@@ -170,7 +170,7 @@ public abstract class GenericFiducialDetectorChecks {
 			ImageBase orig = image.clone();
 			FiducialDetector detector = createDetector(type);
 
-			detector.setLensDistortion(loadDistortion(true));
+			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
 
 			detector.detect(image);
 
@@ -186,7 +186,7 @@ public abstract class GenericFiducialDetectorChecks {
 			ImageBase image = loadImage(type);
 			FiducialDetector detector = createDetector(type);
 
-			detector.setLensDistortion(loadDistortion(true));
+			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
 
 			detector.detect(image);
 
@@ -217,7 +217,7 @@ public abstract class GenericFiducialDetectorChecks {
 			ImageBase image = loadImage(type);
 			FiducialDetector detector = createDetector(type);
 
-			detector.setLensDistortion(loadDistortion(true));
+			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
 
 			detector.detect(image);
 
@@ -261,7 +261,7 @@ public abstract class GenericFiducialDetectorChecks {
 			ImageBase image = loadImage(type);
 			FiducialDetector detector = createDetector(type);
 
-			detector.setLensDistortion(loadDistortion(true));
+			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
 
 			detector.detect(image);
 			assertTrue(detector.totalFound() >= 1);
@@ -313,25 +313,28 @@ public abstract class GenericFiducialDetectorChecks {
 			ImageBase image = loadImage(type);
 			FiducialDetector detector = createDetector(type);
 
-			LensDistortionNarrowFOV distortion = loadDistortion(true);
-			detector.setLensDistortion(distortion);
+			// It's not specified if the center should be undistorted or distorted. Just make it easier by
+			// using undistorted
+			LensDistortionNarrowFOV distortion = loadDistortion(false);
+			detector.setLensDistortion(distortion,image.width,image.height);
 
 			detector.detect(image);
 
 			assertTrue(detector.totalFound() >= 1);
+			assertTrue(detector.is3D());
 
 			for (int i = 0; i < detector.totalFound(); i++) {
 				Se3_F64 fidToCam = new Se3_F64();
-				Point2D_F64 pixel = new Point2D_F64();
+				Point2D_F64 found = new Point2D_F64();
 				detector.getFiducialToCamera(i, fidToCam);
-				detector.getCenter(i, pixel);
+				detector.getCenter(i, found);
 
 				Point2D_F64 rendered = new Point2D_F64();
 				WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(distortion, fidToCam);
 				worldToPixel.transform(new Point3D_F64(0,0,0),rendered);
 
 				// see if the reprojected is near the pixel location
-				assertTrue( rendered.distance(pixel) <= pixelAndProjectedTol);
+				assertTrue( rendered.distance(found) <= pixelAndProjectedTol);
 			}
 		}
 	}
@@ -357,18 +360,18 @@ public abstract class GenericFiducialDetectorChecks {
 			FiducialDetector detector = createDetector(type);
 
 			// save the results
-			detector.setLensDistortion(loadDistortion(false));
+			detector.setLensDistortion(loadDistortion(false),image.width,image.height);
 			detector.detect(image);
 			assertTrue(detector.totalFound() >= 1);
 
 			Results before = extractResults(detector);
 
 			// run with lens distortion
-			detector.setLensDistortion(loadDistortion(true));
+			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
 			detector.detect(image);
 
 			// remove lens distortion
-			detector.setLensDistortion(loadDistortion(false));
+			detector.setLensDistortion(loadDistortion(false),image.width,image.height);
 			detector.detect(image);
 
 			Results after = extractResults(detector);

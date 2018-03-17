@@ -157,25 +157,30 @@ public class BackgroundGmmCommon {
 			dataRow[bestIndex+1] = variance + (learningRate /bestWeight)*(sumDeltaSq*1.2F - variance);
 			// 1.2f is a fudge factor. Empirical testing shows that the above equation is biased. Can't be bothered
 			// to verify the derivation and see if there's a mistake
+
+			// Update Gaussian weights and prune models
+			updateWeightAndPrune(dataRow, modelIndex, ng, bestIndex, bestWeight);
+
+			return bestWeight >= significantWeight ? 0 : 1;
 		} else if( ng < maxGaussians ) {
 			// if there is no good fit then create a new model, if there is room
 
-			bestWeight = learningRate;
 			bestIndex = modelIndex + ng*gaussianStride;
-			dataRow[bestIndex]   = 1;
+			dataRow[bestIndex]   = 1; // weight is changed later or it's the only model
 			dataRow[bestIndex+1] = initialVariance;
 			for (int i = 0; i < numBands; i++) {
 				dataRow[bestIndex+2+i] = pixelValue[i];
 			}
-			ng += 1;
+			// There are no models. Return unknown
+			if( ng == 0 )
+				return unknownValue;
+
+			updateWeightAndPrune(dataRow, modelIndex, ng+1, bestIndex, learningRate);
+			return 1;
+		} else {
+			// didn't match any models and can't create a new model
+			return 1;
 		}
-
-		// Update Gaussian weights and prune models
-		updateWeightAndPrune(dataRow, modelIndex, ng, bestIndex, bestWeight);
-
-		if( ng == 0 )
-			return unknownValue;
-		return bestWeight >= significantWeight ? 0 : 1;
 	}
 
 	/**
@@ -274,23 +279,30 @@ public class BackgroundGmmCommon {
 			// to verify the derivation and see if there's a mistake
 			dataRow[bestIndex+2] = mean + delta* learningRate /bestWeight;
 
+			// Update Gaussian weights and prune models
+			updateWeightAndPrune(dataRow, modelIndex, ng, bestIndex, bestWeight);
+
+			return bestWeight >= significantWeight ? 0 : 1;
 		} else if( ng < maxGaussians ) {
 			// if there is no good fit then create a new model, if there is room
-
-			bestWeight = learningRate;
 			bestIndex = modelIndex + ng*3;
-			dataRow[bestIndex]   = 1; // changed later
+			dataRow[bestIndex]   = 1; // weight is changed later or it's the only model
 			dataRow[bestIndex+1] = initialVariance;
 			dataRow[bestIndex+2] = pixelValue;
-			ng += 1;
-		}
 
-		// Update Gaussian weights and prune models
-		updateWeightAndPrune(dataRow, modelIndex, ng, bestIndex, bestWeight);
+			// There are no models. Return unknown
+			// weight was set to one above, so that's correct since there's only one model
+			if( ng == 0 )
+				return unknownValue;
 
-		if( ng == 0 ) // doesn't match models. Must be foreground. weight would be 0
+			// Update Gaussian weights and prune models
+			updateWeightAndPrune(dataRow, modelIndex, ng+1, bestIndex, learningRate);
+
+			return 1; // must be foreground since it didn't match any background
+		} else {
+			// didn't match any models and can't create a new model
 			return 1;
-		return bestWeight >= significantWeight ? 0 : 1;
+		}
 	}
 
 	/**
@@ -325,9 +337,8 @@ public class BackgroundGmmCommon {
 			}
 		}
 
-		if( ng == 0 ) {// doesn't match models. Must be foreground. weight would be 0
-			return 1;
-		}
+		if( ng == 0 ) // There are no models. Return unknown
+			return unknownValue;
 		return bestWeight >= significantWeight ? 0 : 1;
 	}
 
@@ -360,10 +371,8 @@ public class BackgroundGmmCommon {
 			}
 		}
 
-		if( ng == 0 ) {
+		if( ng == 0 ) // There are no models. Return unknown
 			return unknownValue;
-		}
-
 		return bestWeight >= significantWeight ? 0 : 1;
 	}
 

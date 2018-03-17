@@ -97,17 +97,18 @@ public class TestBackgroundGmmCommon {
 
 		BackgroundGmmCommon alg = new BackgroundGmmCommon(1000,0.001f,maxGaussians,imageType);
 		alg.setSignificantWeight(1e-4f);
+		alg.unknownValue = 5;
 
 		int startIndex = 24;
 		float data[] = new float[50];
 
 		// No models. it should create one
-		alg.updateMixture(50,data,startIndex);
+		assertEquals(5,alg.updateMixture(50,data,startIndex));
 		assertTrue(data[startIndex]>0);
 		assertEquals(0,data[startIndex+3],1e-4f);
 
 		// add another model
-		alg.updateMixture(150,data,startIndex);
+		assertEquals(1,alg.updateMixture(150,data,startIndex));
 		assertTrue(data[startIndex+3]>0);
 		assertEquals(0,data[startIndex+6],1e-4f);
 
@@ -117,7 +118,7 @@ public class TestBackgroundGmmCommon {
 		float oldVar0 = data[startIndex+1];
 		float oldVar1 = data[startIndex+4];
 
-		alg.updateMixture(51,data,startIndex);
+		assertEquals(0,alg.updateMixture(51,data,startIndex));
 		assertTrue(data[startIndex]>oldWeight0);
 		assertTrue(data[startIndex+3]<oldWeight1);
 		assertTrue(data[startIndex+1]<oldVar0);

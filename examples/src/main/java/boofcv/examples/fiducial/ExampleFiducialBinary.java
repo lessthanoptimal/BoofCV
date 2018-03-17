@@ -66,7 +66,7 @@ public class ExampleFiducialBinary {
 				new ConfigFiducialBinary(0.1), ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21), GrayF32.class);
 //				new ConfigFiducialBinary(0.1), ConfigThreshold.fixed(100),GrayF32.class);
 
-		detector.setLensDistortion(lensDistortion);
+		detector.setLensDistortion(lensDistortion,param.width,param.height);
 		detector.detect(original);
 
 		// print the results

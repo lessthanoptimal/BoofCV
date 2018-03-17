@@ -94,8 +94,10 @@ public interface FiducialDetector<T extends ImageBase<T>>
 	 *
 	 * @param distortion Lens distortion model.  null if you want to remove a lens distortion model that had previously
 	 *                   been set.
+	 * @param width Input image's width.
+	 * @param height Input image's height
 	 */
-	void setLensDistortion(LensDistortionNarrowFOV distortion );
+	void setLensDistortion( @Nullable LensDistortionNarrowFOV distortion , int width , int height );
 
 	/**
 	 * Returns the intrinsic parameters that it
@@ -141,7 +143,7 @@ public interface FiducialDetector<T extends ImageBase<T>>
 
 	/**
 	 * If true then 3D information is available for the fiducial.  In general a len distortion model must be
-	 * provided by invoking {@link #setLensDistortion(LensDistortionNarrowFOV)}. The following functions are then
+	 * provided by invoking {@link #setLensDistortion(LensDistortionNarrowFOV,int,int)}. The following functions are then
 	 * enabled:
 	 * <ol>
 	 *     <li>{@link #computeStability}</li>

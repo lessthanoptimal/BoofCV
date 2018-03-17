@@ -22,8 +22,6 @@ import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
 import boofcv.alg.fiducial.square.FoundFiducial;
 import boofcv.alg.fiducial.square.QuadPoseEstimator;
-import boofcv.struct.distort.DoNothing2Transform2_F64;
-import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.ImageGray;
@@ -53,16 +51,9 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Dete
 	// type of image it can process
 	ImageType<T> type;
 
-	// storage for undistorted fiducial corner quadrilateral
-	Quadrilateral_F64 undistQuad = new Quadrilateral_F64();
-
 	// Used for finding the center of the square
 	private LineGeneral2D_F64 line02 = new LineGeneral2D_F64();
 	private LineGeneral2D_F64 line13 = new LineGeneral2D_F64();
-
-	// convert to and from distorted and undistorted pixels
-	protected Point2Transform2_F64 distToUndist = new DoNothing2Transform2_F64();
-	protected Point2Transform2_F64 undistToDist = new DoNothing2Transform2_F64();
 
 	// used to compute 3D pose of target
 	QuadPoseEstimator poseEstimator = new QuadPoseEstimator(1e-6,200);
@@ -99,22 +90,14 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Dete
 	 */
 	@Override
 	public void getCenter(int which, Point2D_F64 location) {
-		FoundFiducial f = alg.getFound().get(which);
-
-		distToUndist.compute(f.distortedPixels.a.x,f.distortedPixels.a.y, undistQuad.a);
-		distToUndist.compute(f.distortedPixels.b.x,f.distortedPixels.b.y, undistQuad.b);
-		distToUndist.compute(f.distortedPixels.c.x,f.distortedPixels.c.y, undistQuad.c);
-		distToUndist.compute(f.distortedPixels.d.x,f.distortedPixels.d.y, undistQuad.d);
+		Quadrilateral_F64 q = alg.getFound().get(which).distortedPixels;
 
 		// compute intersection in undistorted pixels so that the intersection is the true
-		// geometric center of the square
-		UtilLine2D_F64.convert(undistQuad.a, undistQuad.c,line02);
-		UtilLine2D_F64.convert(undistQuad.b, undistQuad.d,line13);
+		// geometric center of the square. Since distorted pixels are being used this will only be approximate
+		UtilLine2D_F64.convert(q.a, q.c,line02);
+		UtilLine2D_F64.convert(q.b, q.d,line13);
 
 		Intersection2D_F64.intersection(line02,line13,location);
-
-		// apply lens distortion to the point so that it appears in the correct location
-		undistToDist.compute(location.x,location.y, location);
 	}
 
 	@Override
@@ -137,16 +120,10 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Dete
 	}
 
 	@Override
-	public void setLensDistortion(LensDistortionNarrowFOV distortion) {
-		super.setLensDistortion(distortion);
-		if( distortion == null ) {
-			distToUndist = new DoNothing2Transform2_F64();
-			undistToDist = new DoNothing2Transform2_F64();
-		} else {
+	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height ) {
+		super.setLensDistortion(distortion,width,height);
+		if( distortion != null )
 			poseEstimator.setLensDistoriton(distortion);
-			distToUndist = distortion.undistort_F64(true, true);
-			undistToDist = distortion.distort_F64(true, true);
-		}
 	}
 
 	@Override

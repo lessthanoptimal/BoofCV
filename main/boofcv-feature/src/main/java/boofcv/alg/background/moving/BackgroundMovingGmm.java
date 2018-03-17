@@ -38,7 +38,6 @@ public abstract class BackgroundMovingGmm<T extends ImageBase<T>, Motion extends
 {
 	BackgroundGmmCommon common;
 
-
 	public BackgroundMovingGmm(float learningPeriod, float decayCoef, int maxGaussians,
 							   Point2Transform2Model_F32<Motion> transformImageType, ImageType<T> imageType) {
 		super(transformImageType,imageType);

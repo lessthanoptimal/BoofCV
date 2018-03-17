@@ -277,7 +277,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 
 		intrinsic = CalibrationIO.load(media.openFile(path+"/intrinsic.yaml"));
 
-		detector.setLensDistortion(new LensDistortionRadialTangential(intrinsic));
+		detector.setLensDistortion(new LensDistortionRadialTangential(intrinsic),intrinsic.width,intrinsic.height);
 
 		fiducialInfo.clear();
 		// give it some initial values so that it doesn't look like there is huge errors right off the bat

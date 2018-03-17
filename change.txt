@@ -61,13 +61,9 @@ Version : 0.29
 - FiducialDetector
   * Added an optional function which can return the fiducial's boundary
   * Updated demo app to visualize all the information it can return
+  * setLensDistortion() now takes in image width and height. This is done to enable precomputing of distortion
 - ThresholdLocalOtsu
   * Fixed bug where it was always trying to use a region of size 0
-
-Fiducials
-- TODO FiducialDetector.setLensDistortion() add width and height parameters
-  TODO * Unit test with heavy lens distortion and see if it fixes it
-- Have square fiducials call init if lens distortion is set.
 
 ---------------------------------------------
 Date    : 2018/01/20

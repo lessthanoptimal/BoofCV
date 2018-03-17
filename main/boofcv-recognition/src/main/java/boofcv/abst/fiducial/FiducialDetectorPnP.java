@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -135,7 +135,7 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 	}
 
 	@Override
-	public void setLensDistortion(LensDistortionNarrowFOV distortion) {
+	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width , int height ) {
 		if( distortion != null ) {
 			this.hasCameraModel = true;
 			this.lensDistortion = distortion;

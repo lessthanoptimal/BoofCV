@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,7 +80,7 @@ public class ExamplePoseOfCalibrationTarget {
 		CalibrationFiducialDetector<GrayF32> detector =
 				FactoryFiducial.calibChessboard(new ConfigChessboard(4, 5, 0.03),GrayF32.class);
 
-		detector.setLensDistortion(lensDistortion);
+		detector.setLensDistortion(lensDistortion,intrinsic.width,intrinsic.height);
 
 		// Get the 2D coordinate of calibration points for visualization purposes
 		List<Point2D_F64> calibPts = detector.getCalibrationPoints();

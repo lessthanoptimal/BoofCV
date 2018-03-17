@@ -85,7 +85,7 @@ public class ExampleFiducialImage {
 		detector.addPatternImage(loadImage(patternPath , "h2o.png",         GrayF32.class), 100, width);
 		detector.addPatternImage(loadImage(patternPath , "yinyang.png",     GrayF32.class), 100, width);
 
-		detector.setLensDistortion(lensDistortion);
+		detector.setLensDistortion(lensDistortion,param.width,param.height);
 
 		detector.detect(original);
 
