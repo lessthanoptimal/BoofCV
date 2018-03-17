@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,129 +19,126 @@
 package boofcv.demonstrations.binary;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
-import boofcv.gui.SelectInputPanel;
+import boofcv.gui.DemonstrationBase;
+import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Demonstrates different ways to threshold an image
  *
  * @author Peter Abeles
  */
-public class DemoImageThresholdingApp<T extends ImageGray<T>> extends SelectInputPanel
-	implements ThresholdControlPanel.Listener
+public class DemoImageThresholdingApp<T extends ImageGray<T>>
+		extends DemonstrationBase
+		implements ThresholdControlPanel.Listener
 {
-
-	Class<T> imageType;
-	T imageInput;
 	GrayU8 imageBinary = new GrayU8(1,1);
-	BufferedImage work;
+	BufferedImage visualizedBinary;
+	BufferedImage inputCopy;
 
 	ImagePanel gui = new ImagePanel();
-	ThresholdControlPanel controlPanel = new ThresholdControlPanel(this);
+	ControlPanel controlPanel = new ControlPanel();
 
-	boolean processedImage = false;
+	public DemoImageThresholdingApp(List<String> examples, Class<T> imageType) {
+		super(examples, ImageType.single(imageType));
 
-	// which algorithm is being used
-	int which=0;
+		gui.setPreferredSize(new Dimension(800,600));
+		gui.setCentering(true);
 
-	public DemoImageThresholdingApp(Class<T> imageType) {
-		this.imageType = imageType;
+		add(controlPanel,BorderLayout.WEST);
+		add(gui,BorderLayout.CENTER);
 
-		imageInput = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
-		JPanel body = new JPanel();
-		body.setLayout(new BorderLayout());
-
-		body.add(controlPanel,BorderLayout.WEST);
-		body.add(gui,BorderLayout.CENTER);
-
-		setMainGUI(body);
 	}
 
-	protected void process() {
+	@Override
+	protected void handleInputChange(int source, InputMethod method, int width, int height)
+	{
+		imageBinary.reshape(width, height);
+		visualizedBinary = ConvertBufferedImage.checkDeclare(width, height, visualizedBinary,BufferedImage.TYPE_INT_BGR);
+	}
 
-		ConfigThreshold config = controlPanel.createConfig();
-		InputToBinary inputToBinary = FactoryThresholdBinary.threshold(config,imageInput.imageType.getImageClass());
+	@Override
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 
-		inputToBinary.process(imageInput,imageBinary);
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				if (work == null || work.getWidth() != imageInput.width || work.getHeight() != imageInput.height) {
-					work = new BufferedImage(imageInput.width, imageInput.height, BufferedImage.TYPE_INT_BGR);
-				}
-				VisualizeBinaryData.renderBinary(imageBinary, false, work);
-				gui.setImage(work);
-				gui.setPreferredSize(new Dimension(imageInput.width, imageInput.height));
-				processedImage = true;
-				gui.repaint();
-			}
+		inputCopy = ConvertBufferedImage.checkCopy(buffered,inputCopy);
+		ConfigThreshold config = controlPanel.threshold.createConfig();
+		InputToBinary inputToBinary = FactoryThresholdBinary.threshold(config,input.imageType.getImageClass());
+
+		inputToBinary.process(input,imageBinary);
+		VisualizeBinaryData.renderBinary(imageBinary, false, visualizedBinary);
+
+		SwingUtilities.invokeLater(() -> {
+			changeView();
 		});
 	}
 
-	@Override
-	public void changeInput(String name, int index) {
-		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
-		if( image != null ) {
-			setInputImage(image);
-			imageInput.reshape(image.getWidth(),image.getHeight());
-			imageBinary.reshape(image.getWidth(),image.getHeight());
-
-			ConvertBufferedImage.convertFrom(image, imageInput, true);
-
-			process();
+	public void changeView() {
+		switch( controlPanel.view ) {
+			case 0: gui.setImage(inputCopy); break;
+			case 1: gui.setImage(visualizedBinary); break;
 		}
-	}
-
-	@Override
-	public void loadConfigurationFile(String fileName) {}
-
-	@Override
-	public boolean getHasProcessedImage() {
-		return processedImage;
-	}
-
-	public static void main( String args[] ) {
-		DemoImageThresholdingApp app = new DemoImageThresholdingApp(GrayF32.class);
-
-		java.util.List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));
-		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
-		inputs.add(new PathLabel("stained",UtilIO.pathExample("segment/stained_handwriting.jpg")));
-
-		app.setInputList(inputs);
-
-		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
-		}
-
-		ShowImages.showWindow(app, "Thresholding Demo", true);
-
-		System.out.println("Done");
+		gui.repaint();
 	}
 
 	@Override
 	public void imageThresholdUpdated() {
-		new Thread() {
-			public void run() { process(); }
-		}.start();
+		reprocessInput();
 	}
+
+	class ControlPanel extends StandardAlgConfigPanel implements ActionListener {
+		// selects which image to view
+		JComboBox imageView;
+		ThresholdControlPanel threshold = new ThresholdControlPanel(DemoImageThresholdingApp.this);
+
+		int view = 1;
+
+		public ControlPanel() {
+			imageView = combo(view,"Input","Binary");
+
+			threshold.setBorder(BorderFactory.createEmptyBorder());
+
+			addLabeled(imageView,"View");
+			add(threshold);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			view = imageView.getSelectedIndex();
+			changeView();
+		}
+	}
+
+	public static void main( String args[] )
+	{
+		java.util.List<PathLabel> examples = new ArrayList<>();
+		examples.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));
+		examples.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
+		examples.add(new PathLabel("stained",UtilIO.pathExample("segment/stained_handwriting.jpg")));
+		examples.add(new PathLabel("Chessboard Movie",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
+
+		DemoImageThresholdingApp app = new DemoImageThresholdingApp(examples,GrayF32.class);
+
+		app.openExample(examples.get(0));
+		app.display("Thresholding Demo");
+	}
+
+
 }

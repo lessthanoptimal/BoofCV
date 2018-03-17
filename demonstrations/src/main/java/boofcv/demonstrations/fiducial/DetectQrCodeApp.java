@@ -59,7 +59,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -148,7 +147,6 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					}
 				});
 
-
 		setPreferredSize(new Dimension(1200,800));
 	}
 
@@ -174,7 +172,6 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			detector.setProfilerState(true);
 		}
 	}
-
 
 	@Override
 	public void configUpdate() {
@@ -508,7 +505,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 		DetectQrCodeApp app = new DetectQrCodeApp(examples,GrayF32.class);
 
-		app.openFile(new File(examples.get(0)));
+		app.openExample(examples.get(0));
 		app.display("QR-Code Detector");
 	}
 

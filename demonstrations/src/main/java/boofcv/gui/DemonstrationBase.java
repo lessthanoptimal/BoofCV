@@ -273,7 +273,9 @@ public abstract class DemonstrationBase extends JPanel {
 
 	/**
 	 * Override to be notified when the input has changed.  This is also a good location to change the default
-	 * max FPS for streaming data.  It will be 0 for webcam and 30 FPS for videos
+	 * max FPS for streaming data.  It will be 0 for webcam and 30 FPS for videos.
+	 *
+	 * If overloaded you don't need to call the super
 	 *
 	 * @param method Type of input source
 	 * @param width Width of input image
