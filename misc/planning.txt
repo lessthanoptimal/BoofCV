@@ -53,6 +53,9 @@ Less High Priority Next Release
 
 - Fiducials
   * Detection:  Return bounding polygon in pixel coordinates (undistorted and distorted)?
+  * Testing: Change generic unit tests to render the marker
+             Render a marker with a lot of distortion.
+             So much that it should fail if not corrected properly
   * Black Border:   See comment below
 
 - Regression
@@ -61,13 +64,6 @@ Less High Priority Next Release
     - This should enable easy automated checks for significant change
   * Automate fault detection from regression tests
   * Split runtime regression off from stability
-
-- BinaryPolygonConvexDetector
-  * Reject a shape if after optimization contour points are really far away from it on average
-  * New binarization.  Run square binary twice with scale 0.9 and 1.1 .  Then output binary is the AND of the two
-    - Should suppress noisy regions?
-  * Figure out a way to get it to work with smaller splits.  Like the contour around the letter F
-    - The initial polygon fit is the weak point
 
 - Improve pose estimate for calibration fiducials
 
