@@ -64,7 +64,7 @@ public class ShapeFitContourPanel extends StandardAlgConfigPanel
 		this.owner = owner;
 
 		algorithmCombo = new JComboBox();
-		algorithmCombo.addItem("Info");
+		algorithmCombo.addItem("Polyline");
 		algorithmCombo.addItem("Oval");
 		algorithmCombo.addActionListener(this);
 		algorithmCombo.setMaximumSize(algorithmCombo.getPreferredSize());
@@ -100,7 +100,7 @@ public class ShapeFitContourPanel extends StandardAlgConfigPanel
 
 
 
-		addLabeled(algorithmCombo, "Type of Shape", this);
+		addLabeled(algorithmCombo, "Shape", this);
 		addSeparator(200);
 		addLabeled(imageView, "Background", this);
 		addLabeled(selectZoom,"Zoom",this);

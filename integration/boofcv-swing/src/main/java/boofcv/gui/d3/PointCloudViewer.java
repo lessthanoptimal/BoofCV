@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.gui.d3;
 
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinhole;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.EulerType;
@@ -93,7 +93,7 @@ public class PointCloudViewer extends JPanel
 		configure(K);
 	}
 
-	public PointCloudViewer(CameraPinholeRadial intrinsic, double keyStepSize) {
+	public PointCloudViewer(CameraPinhole intrinsic, double keyStepSize) {
 		this(keyStepSize);
 		configure(PerspectiveOps.calibrationMatrix(intrinsic,(DMatrixRMaj)null));
 		setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));
@@ -159,6 +159,9 @@ public class PointCloudViewer extends JPanel
 
 		int N = w*h;
 
+		double centerAdjustX = w/2-centerX;
+		double centerAdjustY = h/2-centerY;
+
 		if( data.length < N ) {
 			data = new Pixel[ N ];
 			for( int i = 0; i < N; i++ )
@@ -180,8 +183,8 @@ public class PointCloudViewer extends JPanel
 
 			GeometryMath_F64.mult(K,pixel,pixel);
 
-			int x = (int)(pixel.x+0.5);
-			int y = (int)(pixel.y+0.5);
+			int x = (int)(pixel.x+centerAdjustX+0.5);
+			int y = (int)(pixel.y+centerAdjustY+0.5);
 
 			if( x < 0 || y < 0 || x >= w || y >= h )
 				continue;

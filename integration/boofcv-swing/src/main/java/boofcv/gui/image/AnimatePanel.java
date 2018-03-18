@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class AnimatePanel extends JPanel {
 	public AnimatePanel( int period , BufferedImage... images) {
 		this.period = period;
 		this.images = images;
-		if( images != null )
+		if( images != null && images.length > 0)
 			setPreferredSize(new Dimension(images[0].getWidth(),images[1].getHeight()));
 	}
 

@@ -24,6 +24,7 @@ import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.MousePauseHelper;
+import boofcv.gui.PanelGridPanel;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -43,7 +44,6 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DMatrixRMaj;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -86,13 +86,14 @@ public class ExamplePoseOfCalibrationTarget {
 		List<Point2D_F64> calibPts = detector.getCalibrationPoints();
 
 		// Set up visualization
-		JPanel gui = new JPanel();
 		PointCloudViewer viewer = new PointCloudViewer(intrinsic, 0.01);
 		// make the view more interest.  From the side.
 		DMatrixRMaj rotY = ConvertRotation3D_F64.rotY(-Math.PI/2.0,null);
 		viewer.setWorldToCamera(new Se3_F64(rotY,new Vector3D_F64(0.75,0,1.25)));
 		ImagePanel imagePanel = new ImagePanel(intrinsic.width, intrinsic.height);
-		gui.add(BorderLayout.WEST, imagePanel); gui.add(BorderLayout.CENTER, viewer);
+		viewer.setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));
+		PanelGridPanel gui = new PanelGridPanel(1,imagePanel,viewer);
+		gui.setMaximumSize(gui.getPreferredSize());
 		ShowImages.showWindow(gui,"Calibration Target Pose",true);
 
 		// Allows the user to click on the image and pause
