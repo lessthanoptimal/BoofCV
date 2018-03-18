@@ -72,7 +72,7 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 	}
 
 	public void printLocal(AutoTypeImage imageIn) {
-		printLocalSquare(imageIn);
+		printLocalMean(imageIn);
 		printLocalGaussian(imageIn);
 	}
 
@@ -117,7 +117,7 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public void printLocalSquare(AutoTypeImage imageIn) {
+	public void printLocalMean(AutoTypeImage imageIn) {
 
 		String imageName = imageIn.getSingleBandName();
 		String sumType = imageIn.getSumType();
@@ -138,7 +138,7 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.\n" +
 				"\t * @return Thresholded image.\n" +
 				"\t */\n" +
-				"\tpublic static GrayU8 localSquare( "+imageName+" input , GrayU8 output ,\n" +
+				"\tpublic static GrayU8 localMean( "+imageName+" input , GrayU8 output ,\n" +
 				"\t\t\t\t\t\t\t\t\t\t\t ConfigLength width , float scale , boolean down ,\n" +
 				"\t\t\t\t\t\t\t\t\t\t\t "+imageName+" storage1 , "+imageName+" storage2 ) {\n" +
 				"\n" +

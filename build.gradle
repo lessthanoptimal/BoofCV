@@ -311,6 +311,10 @@ task wrapper(type: Wrapper) {
     gradleVersion = '4.3'
 }
 
+
+
+project(':main:boofcv-ip').compileJava.dependsOn(checkForVersionFile)
+
 // Build the build info file every time it builds
 assemble.dependsOn(createVersionFile)
 

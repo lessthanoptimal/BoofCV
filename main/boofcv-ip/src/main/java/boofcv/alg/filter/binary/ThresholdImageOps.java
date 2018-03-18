@@ -284,9 +284,9 @@ public class ThresholdImageOps {
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
-	public static GrayU8 localSquare( GrayU8 input , GrayU8 output ,
-											 ConfigLength width , float scale , boolean down ,
-											 GrayU8 storage1 , GrayU8 storage2 ) {
+	public static GrayU8 localMean(GrayU8 input , GrayU8 output ,
+								   ConfigLength width , float scale , boolean down ,
+								   GrayU8 storage1 , GrayU8 storage2 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayU8.class);
@@ -412,9 +412,9 @@ public class ThresholdImageOps {
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
-	public static GrayU8 localSquare( GrayF32 input , GrayU8 output ,
-											 ConfigLength width , float scale , boolean down ,
-											 GrayF32 storage1 , GrayF32 storage2 ) {
+	public static GrayU8 localMean(GrayF32 input , GrayU8 output ,
+								   ConfigLength width , float scale , boolean down ,
+								   GrayF32 storage1 , GrayF32 storage2 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayF32.class);

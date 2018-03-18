@@ -343,10 +343,10 @@ public class GThresholdImageOps {
 					 ConfigLength width, double scale, boolean down, T work1, T work2)
 	{
 		if( input instanceof GrayF32) {
-			return ThresholdImageOps.localSquare((GrayF32) input, output, width, (float) scale, down,
+			return ThresholdImageOps.localMean((GrayF32) input, output, width, (float) scale, down,
 					(GrayF32) work1, (GrayF32) work2);
 		} else if( input instanceof GrayU8) {
-			return ThresholdImageOps.localSquare((GrayU8) input, output, width, (float) scale, down,
+			return ThresholdImageOps.localMean((GrayU8) input, output, width, (float) scale, down,
 					(GrayU8) work1, (GrayU8) work2);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());

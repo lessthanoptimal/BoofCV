@@ -27,6 +27,7 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.InvertibleTransform;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Factory for creating implementations of {@link BackgroundModelStationary} and {@link boofcv.alg.background.BackgroundModelMoving}
@@ -190,7 +191,7 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase<T>>
-	BackgroundStationaryGmm<T> stationaryGmm(ConfigBackgroundGmm config , ImageType<T> imageType ) {
+	BackgroundStationaryGmm<T> stationaryGmm(@Nullable ConfigBackgroundGmm config , ImageType<T> imageType ) {
 
 		if( config == null )
 			config = new ConfigBackgroundGmm();
@@ -231,7 +232,7 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase<T>,Motion extends InvertibleTransform<Motion>>
-	BackgroundMovingGmm<T,Motion> movingGmm(ConfigBackgroundGmm config ,
+	BackgroundMovingGmm<T,Motion> movingGmm(@Nullable ConfigBackgroundGmm config ,
 											Point2Transform2Model_F32<Motion> transform ,
 											ImageType<T> imageType )
 	{

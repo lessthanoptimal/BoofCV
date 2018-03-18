@@ -106,6 +106,15 @@ class BoofGradleTools implements Plugin<Project> {
             }
         }
 
+        project.task('checkForVersionFile') {
+            doLast {
+                def f = new File(extension.gversion_file_path,"GVersion.java")
+                if( !f.exists() ) {
+                    throw new RuntimeException("GVersion.java does not exist. Call assemble, e.g. ./gradlew assemble")
+                }
+            }
+        }
+
         // Creates a resource file containing build information
         project.task('createVersionFile'){
             doLast {

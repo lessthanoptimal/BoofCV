@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,10 +67,10 @@ public class BenchmarkThresholding {
 		}
 	}
 
-	public static class LocalSquare extends PerformerBase {
+	public static class LocalMean extends PerformerBase {
 		@Override
 		public void process() {
-			ThresholdImageOps.localSquare(input, output_U8, adaptiveWidth, 0, true, work, work2);
+			ThresholdImageOps.localMean(input, output_U8, adaptiveWidth, 0, true, work, work2);
 		}
 	}
 
@@ -119,7 +119,7 @@ public class BenchmarkThresholding {
 		System.out.println();
 
 		ProfileOperation.printOpsPerSec(new Threshold(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new LocalSquare(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new LocalMean(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new LocalGaussian(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new LocalSauvola(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new LocalSauvola2(), TEST_TIME);
