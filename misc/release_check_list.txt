@@ -3,7 +3,7 @@
 - Update Version
    * README.md
    * Android example should reference latest BoofCV
-   * Gradle
+   * build.gradle
 - Set release data in change.txt
 - Make sure all examples work
 - Make sure all applications in evaluation work
@@ -15,13 +15,15 @@
   * OpenKinect
 - Fresh Checkout
   * Create source zip
+  * ./gradlew assemble
   * ./gradlew testReport   <--- make sure everything passes
   * scp boofcv-vXXX-libs.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv/vXXX/
 - Create javadoc for websites
   ./gradlew alljavadocWeb
 - Create jars
+  * ./gradlew assemble
   * ./gradlew createLibraryDirectory
-  * zip -r boofcv-vXXXX-libs.zip boofcv-v0.27-libs
+  * zip -r boofcv-vXXXX-libs.zip boofcv-vXXXX-libs
   * scp boofcv-vXXX-src.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv/vXXX/
 - Tag git
 - Update version on website
@@ -35,6 +37,7 @@ To post a SNAPSHOT or full release:
 1) uncomment the following line in build.gradle so that it creates javadoc. Commented out to speed up build
    archives javadocJar
 2) Upload to Sonatype
+   ./gradlew assemble
    ./gradlew uploadArchives
 
 A SNAPSHOT is created if SNAPSHOT is in its name.

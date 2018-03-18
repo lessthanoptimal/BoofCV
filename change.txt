@@ -19,7 +19,7 @@ Version : 0.29
   * Tweaks for Mac OS X
   * Improved several applications
 - Images
-  * Gray images new support createSameShape(type)
+  * Gray images support createSameShape(type)
   * Added matchShape() to replace the more verbose reshape(image.width,image.height)
 - Contours
   * Created an interface for finding contours in a binary image
