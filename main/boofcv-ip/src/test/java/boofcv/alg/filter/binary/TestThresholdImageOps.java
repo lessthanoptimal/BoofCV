@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,7 @@ public class TestThresholdImageOps {
 		Method[] list = ThresholdImageOps.class.getMethods();
 
 		for( Method m : list ) {
-			if( !m.getName().equals("localSquare"))
+			if( !m.getName().equals("localMean"))
 				continue;
 
 			Class param[] = m.getParameterTypes();
@@ -64,14 +64,14 @@ public class TestThresholdImageOps {
 
 			GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-			BoofTesting.checkSubImage(this,"performLocalSquare",true,m,input,output);
+			BoofTesting.checkSubImage(this,"performLocalMean",true,m,input,output);
 			total++;
 		}
 
 		assertEquals(2, total);
 	}
 
-	public void performLocalSquare(Method m , ImageGray input , GrayU8 output )
+	public void performLocalMean(Method m , ImageGray input , GrayU8 output )
 			throws InvocationTargetException, IllegalAccessException
 	{
 		GrayU8 expected = new GrayU8(output.width,output.height);
