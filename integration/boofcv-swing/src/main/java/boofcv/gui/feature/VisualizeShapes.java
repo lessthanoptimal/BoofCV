@@ -257,6 +257,7 @@ public class VisualizeShapes {
 		if( loop && polygon.size() > 0) {
 			path.closePath();
 		}
+		g2.draw(path);
 	}
 
 	public static void fillPolygon( Polygon2D_F64 polygon, double scale,  Graphics2D g2 ) {
