@@ -62,6 +62,10 @@ Version : 0.29
   * setLensDistortion() now takes in image width and height. This is done to enable precomputing of distortion
 - ThresholdLocalOtsu
   * Fixed bug where it was always trying to use a region of size 0
+- BOverride
+  * Added more overrides and improved API
+  * Used by BoofCPP to call C++ Code
+  * https://github.com/lessthanoptimal/BoofCPP
 
 ---------------------------------------------
 Date    : 2018/01/20
