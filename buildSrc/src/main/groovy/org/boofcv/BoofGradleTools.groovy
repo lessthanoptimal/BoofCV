@@ -122,13 +122,23 @@ class BoofGradleTools implements Plugin<Project> {
                 if(extension.gversion_file_path == null )
                     throw new RuntimeException("Must set gversion_file_path")
 
-                def git_revision = "UNKNOWN"
-                def git_sha = "UNKNOWN"
+                def git_revision
+                def git_sha
 
                 try {
-                    git_revision = 'git rev-list --count HEAD'.execute().text.trim()
-                    git_sha = 'git rev-parse HEAD'.execute().text.trim()
+                    def proc = 'git rev-list --count HEAD'.execute()
+                    proc.consumeProcessErrorStream(new StringBuffer())
+                    if( proc.exitValue() != 0 )
+                        throw new IOException();
+                    git_revision = proc.text.trim()
+                    proc = 'git rev-parse HEAD'.execute()
+                    proc.consumeProcessErrorStream(new StringBuffer())
+                    if( proc.exitValue() != 0 )
+                        throw new IOException()
+                    git_sha = proc.text.trim()
                 } catch (IOException ignore) {
+                    git_revision = -1
+                    git_sha = "UNKNOWN"
                 }
 
                 def f = new File(extension.gversion_file_path,"GVersion.java")
