@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
 
     defaultConfig {
         applicationId "org.boofcv.video"
-        minSdkVersion 13
-        targetSdkVersion 25
+        minSdkVersion 24
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -23,8 +23,8 @@ android {
         abortOnError false
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -35,16 +35,9 @@ configurations {
 }
 
 dependencies {
-    ['boofcv-android', 'boofcv-core'].each { String a -> compile group: 'org.boofcv', name: a, version: '0.29' }
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:25.0.1'
-    testCompile 'junit:junit:4.12'
-//    testCompile 'org.powermock:powermock-api-mockito:1.6.1'
-//    testCompile 'org.powermock:powermock-module-junit4-rule-agent:1.6.1'
-//    testCompile 'org.powermock:powermock-module-junit4-rule:1.6.1'
-//    testCompile 'org.powermock:powermock-module-junit4:1.6.1'
-//    testCompile 'org.json:json:20140107' // it's in android and this causes problems
-    androidTestCompile 'com.android.support:support-annotations:25.0.1'
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support.test:rules:0.5'
+    ['boofcv-android', 'boofcv-core'].each { String a -> api group: 'org.boofcv', name: a, version: '0.29' }
+    api fileTree(include: ['*.jar'], dir: 'libs')
+    api 'com.android.support:appcompat-v7:26.1.0'
+    api 'com.android.support:support-v4:26.1.0'
+    testApi 'junit:junit:4.12'
 }
