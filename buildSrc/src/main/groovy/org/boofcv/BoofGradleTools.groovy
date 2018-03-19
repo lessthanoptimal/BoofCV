@@ -128,11 +128,13 @@ class BoofGradleTools implements Plugin<Project> {
                 try {
                     def proc = 'git rev-list --count HEAD'.execute()
                     proc.consumeProcessErrorStream(new StringBuffer())
+                    proc.waitFor()
                     if( proc.exitValue() != 0 )
                         throw new IOException();
                     git_revision = proc.text.trim()
                     proc = 'git rev-parse HEAD'.execute()
                     proc.consumeProcessErrorStream(new StringBuffer())
+                    proc.waitFor()
                     if( proc.exitValue() != 0 )
                         throw new IOException()
                     git_sha = proc.text.trim()
