@@ -33,11 +33,11 @@ Gradle
 
 To post a SNAPSHOT or full release:
 
-1) In gradle.properties comment out "org.gradle.parallel=true"
-1) uncomment the following line in build.gradle so that it creates javadoc. Commented out to speed up build
+1) ./gradlew assemble
+2) In gradle.properties comment out "org.gradle.parallel=true"
+3) uncomment the following line in build.gradle so that it creates javadoc. Commented out to speed up build
    archives javadocJar
-2) Upload to Sonatype
-   ./gradlew assemble
+4) Upload to Sonatype
    ./gradlew uploadArchives
 
 A SNAPSHOT is created if SNAPSHOT is in its name.

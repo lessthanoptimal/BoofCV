@@ -3,6 +3,15 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2018/
+Version : 0.30
+
+- TODO face detector
+- TODO Rename linear homography to include DLT to make it easier for people to find
+- TODO QR Code regression images
+- TODO Android Camera2 API
+
+---------------------------------------------
 Date    : 2018/03/18
 Version : 0.29
 
