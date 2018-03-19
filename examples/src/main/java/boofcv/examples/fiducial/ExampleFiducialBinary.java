@@ -25,6 +25,7 @@ import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
+import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -36,6 +37,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -73,8 +75,14 @@ public class ExampleFiducialBinary {
 		Graphics2D g2 = input.createGraphics();
 		Se3_F64 targetToSensor = new Se3_F64();
 		Point2D_F64 locationPixel = new Point2D_F64();
+		Polygon2D_F64 bounds = new Polygon2D_F64();
 		for (int i = 0; i < detector.totalFound(); i++) {
 			detector.getCenter(i, locationPixel);
+			detector.getBounds(i, bounds);
+
+			g2.setColor(new Color(50,50,255));
+			g2.setStroke(new BasicStroke(10));
+			VisualizeShapes.drawPolygon(bounds,true,1.0,g2);
 
 			if( detector.hasUniqueID() )
 				System.out.println("Target ID = "+detector.getId(i));
@@ -94,6 +102,5 @@ public class ExampleFiducialBinary {
 		}
 
 		ShowImages.showWindow(input,"Fiducials",true);
-
 	}
 }
