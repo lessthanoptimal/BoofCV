@@ -52,6 +52,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 	JSpinner spinnerMaximumVersion;
 
 	JCheckBox showMarkers;
+	JCheckBox showFailures;
 	JCheckBox showBits;
 	JCheckBox showSquares;
 	JCheckBox showPositionPattern;
@@ -64,6 +65,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 	boolean bShowPositionPattern = true;
 	boolean bShowAlignmentPattern = true;
 	boolean bShowContour = false;
+	boolean bShowFailures = true;
 
 	DetectBlackPolygonControlPanel polygonPanel;
 
@@ -96,6 +98,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		spinnerMaximumVersion = spinner(config.versionMaximum,1,40,1);
 
 		showMarkers = checkbox("Markers",bShowMarkers);
+		showFailures = checkbox("Failures",bShowFailures);
 		showBits = checkbox("Bits",bShowBits);
 		showSquares = checkbox("Squares", bShowSquares);
 		showPositionPattern = checkbox("Pos. Pattern",bShowPositionPattern);
@@ -104,6 +107,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 
 		JPanel togglePanel = new JPanel( new GridLayout(0,2));
 		togglePanel.add(showMarkers);
+		togglePanel.add(showFailures);
 		togglePanel.add(showSquares);
 		togglePanel.add(showPositionPattern);
 		togglePanel.add(showAlignmentPattern);
@@ -135,6 +139,9 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 	public void actionPerformed(ActionEvent e) {
 		if( e.getSource() == showMarkers ) {
 			bShowMarkers = showMarkers.isSelected();
+			owner.viewUpdated();
+		} else if( e.getSource() == showFailures ) {
+			bShowFailures = showFailures.isSelected();
 			owner.viewUpdated();
 		} else if( e.getSource() == showBits ) {
 			bShowBits = showBits.isSelected();

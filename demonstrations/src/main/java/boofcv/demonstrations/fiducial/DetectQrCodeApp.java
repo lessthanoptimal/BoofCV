@@ -303,8 +303,9 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					VisualizeBinaryData.render(contours, null, Color.CYAN, scale, g2);
 				}
 
-				if( controls.bShowMarkers ) {
-					synchronized (detected) {
+
+				synchronized (detected) {
+					if (controls.bShowMarkers) {
 						for (int i = 0; i < detected.size(); i++) {
 							g2.setColor(new Color(0x5011FF00, true));
 							QrCode qr = detected.get(i);
@@ -313,7 +314,9 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 							if (controls.bShowBits)
 								renderBinaryValues(g2, qr);
 						}
+					}
 
+					if (controls.bShowFailures) {
 						for (int i = 0; i < failures.size(); i++) {
 							QrCode qr = failures.get(i);
 							if (qr.failureCause.ordinal() < ALIGNMENT.ordinal())
