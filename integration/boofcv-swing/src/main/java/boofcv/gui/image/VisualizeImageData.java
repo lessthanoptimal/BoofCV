@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -396,7 +396,8 @@ public class VisualizeImageData {
 	private static BufferedImage checkInputs(ImageBase src, BufferedImage dst) {
 		if (dst != null) {
 			if (dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight()) {
-				throw new IllegalArgumentException("image dimension are different");
+				throw new IllegalArgumentException("image dimension are different. src="
+						+src.width+"x"+src.height+"  dst="+dst.getWidth()+"x"+dst.getHeight());
 			}
 		} else {
 			dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);

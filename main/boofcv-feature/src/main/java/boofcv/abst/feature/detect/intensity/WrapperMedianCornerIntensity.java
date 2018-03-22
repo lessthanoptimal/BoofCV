@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,9 +40,9 @@ public class WrapperMedianCornerIntensity<I extends ImageGray<I>, D extends Imag
 	BlurStorageFilter<I> medianFilter;
 	I medianImage;
 
-	public WrapperMedianCornerIntensity(BlurStorageFilter<I> medianFilter ,
-										Class<I> imageType ) {
+	public WrapperMedianCornerIntensity(BlurStorageFilter<I> medianFilter) {
 		this.medianFilter = medianFilter;
+		Class<I> imageType = medianFilter.getInputType().getImageClass();
 		try {
 			m = MedianCornerIntensity.class.getMethod("process",GrayF32.class,imageType,imageType);
 		} catch (NoSuchMethodException e) {

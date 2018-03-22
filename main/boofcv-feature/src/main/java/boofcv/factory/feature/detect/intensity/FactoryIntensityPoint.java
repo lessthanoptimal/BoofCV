@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -112,7 +112,7 @@ public class FactoryIntensityPoint {
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureIntensity<I,D>  median( int radius , Class<I> imageType ) {
 		BlurStorageFilter<I> filter = FactoryBlurFilter.median(ImageType.single(imageType),radius);
-		return new WrapperMedianCornerIntensity<>(filter, imageType);
+		return new WrapperMedianCornerIntensity<>(filter);
 	}
 
 	/**

@@ -146,7 +146,7 @@ public class FactoryDetectPoint {
 			configDetector = new ConfigGeneralDetector();
 
 		BlurStorageFilter<T> medianFilter = FactoryBlurFilter.median(ImageType.single(imageType), configDetector.radius);
-		GeneralFeatureIntensity<T, D> intensity = new WrapperMedianCornerIntensity<>(medianFilter, imageType);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperMedianCornerIntensity<>(medianFilter);
 		return createGeneral(intensity, configDetector);
 	}
 

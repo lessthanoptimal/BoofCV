@@ -28,6 +28,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.image.VisualizeImageData;
@@ -73,6 +74,9 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 
 	// used to compute feature intensity
 	GeneralFeatureIntensity<T,D> intensity;
+	final Object lock = new Object();
+
+	String[] names = new String[]{"Laplacian","Hessian Det","Harris","Shi Tomasi","FAST","KitRos","Median"};
 
 	public IntensityPointFeatureApp( List<String> examples , Class<T> imageType ) {
 		super(true,true,examples,ImageType.single(imageType));
@@ -84,6 +88,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		deriv = new AnyImageDerivative<>(GradientThree.getKernelX(isInteger), imageType, derivType);
 
 		controlPanel = new ControlPanel();
+		controlPanel.comboAlgorithm.setSelectedIndex(0);
 		add(BorderLayout.WEST,controlPanel);
 		add(BorderLayout.CENTER,imagePanel);
 
@@ -106,6 +111,9 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 	protected void handleInputChange(int source, InputMethod method, int width, int height) {
 		visualized = ConvertBufferedImage.checkDeclare(width,height, visualized,BufferedImage.TYPE_INT_RGB);
 		imagePanel.setPreferredSize(new Dimension(width,height));
+
+		double scale = BoofSwingUtil.selectZoomToShowAll(imagePanel,width,height);
+		imagePanel.setScaleAndCenter(scale,width/2,height/2);
 	}
 
 	@Override
@@ -122,11 +130,11 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		D derivYY = deriv.getDerivative(false, false);
 		D derivXY = deriv.getDerivative(true, false);
 
-		intensity.process(gray, derivX, derivY, derivXX, derivYY, derivXY);
-
-		GrayF32 featureImg = intensity.getIntensity();
-
-		VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
+		synchronized (lock) {
+			intensity.process(gray, derivX, derivY, derivXX, derivYY, derivXY);
+			GrayF32 featureImg = intensity.getIntensity();
+			VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
+		}
 
 		SwingUtilities.invokeLater(() -> {
 			imagePanel.setBufferedImageNoChange(visualized);
@@ -151,51 +159,83 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		}
 	}
 
+	private void handleAlgorithmChanged() {
+		synchronized (lock) {
+			switch (controlPanel.selected) {
+				case "Laplacian":
+					intensity = new WrapperHessianBlobIntensity<>(HessianBlobIntensity.Type.TRACE, derivType);
+					break;
+				case "Hessian Det":
+					intensity = new WrapperHessianBlobIntensity<>(HessianBlobIntensity.Type.DETERMINANT, derivType);
+					break;
+				case "Harris":
+					intensity = new WrapperGradientCornerIntensity<>(FactoryIntensityPointAlg.harris(
+							controlPanel.radius, 0.4f,
+							controlPanel.weighted, derivType));
+					break;
+				case "Shi Tomasi":
+					intensity = new WrapperGradientCornerIntensity<>(
+							FactoryIntensityPointAlg.shiTomasi(controlPanel.radius, controlPanel.weighted, derivType));
+					break;
+				case "FAST":
+					intensity = new WrapperFastCornerIntensity<>(FactoryIntensityPointAlg.fast(5, 11, imageType));
+					break;
+				case "KitRos":
+					intensity = new WrapperKitRosCornerIntensity<>(derivType);
+					break;
+				case "Median":
+					intensity = new WrapperMedianCornerIntensity<>(FactoryBlurFilter.median(imageType, controlPanel.radius));
+					break;
+
+				default:
+					throw new RuntimeException("Unknown exception");
+			}
+		}
+
+		reprocessImageOnly();
+	}
+
 	class ControlPanel extends StandardAlgConfigPanel implements ActionListener , ChangeListener {
 		JComboBox<String> comboAlgorithm;
 		JCheckBox checkShowInput;
 		JSpinner spinnerRadius;
+		JCheckBox checkWeighted;
 
 		List<GeneralFeatureIntensity<T,D>> algorithms = new ArrayList<>();
-		
+
+		String selected = null;
 		boolean showInput = false;
 		int radius = 2;
+		boolean weighted=false;
 
 		public ControlPanel() {
 			comboAlgorithm = new JComboBox<>();
 
-			checkShowInput = checkbox("Show Input",showInput);
-			spinnerRadius = spinner(radius,1,100,1);
+			checkShowInput = checkbox("Show Input", showInput);
+			spinnerRadius = spinner(radius, 1, 100, 1);
+			checkWeighted = checkbox("weighted", weighted);
 
-			addAlgorithm( "Laplacian", new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.TRACE,derivType));
-			addAlgorithm( "Hessian Det", new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));
-			addAlgorithm( "Harris",new WrapperGradientCornerIntensity<T,D>(FactoryIntensityPointAlg.harris(2, 0.4f, false, derivType)));
-			addAlgorithm( "Harris Weighted",new WrapperGradientCornerIntensity<T,D>(FactoryIntensityPointAlg.harris(2, 0.4f, true, derivType)));
-			addAlgorithm( "Shi Tomasi",new WrapperGradientCornerIntensity<T,D>( FactoryIntensityPointAlg.shiTomasi(2, false, derivType)));
-			addAlgorithm( "Shi Tomasi Weighted",new WrapperGradientCornerIntensity<T,D>( FactoryIntensityPointAlg.shiTomasi(2, true, derivType)));
-			addAlgorithm( "FAST",new WrapperFastCornerIntensity<T,D>(FactoryIntensityPointAlg.fast(5, 11, imageType)));
-			addAlgorithm( "KitRos",new WrapperKitRosCornerIntensity<T,D>(derivType));
-			addAlgorithm( "Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(imageType,2),imageType));
+			for (String name : names) {
+				comboAlgorithm.addItem(name);
+			}
 			comboAlgorithm.addActionListener(this);
 			comboAlgorithm.setMaximumSize(comboAlgorithm.getPreferredSize());
-			intensity = algorithms.get(comboAlgorithm.getSelectedIndex());
 
 			addAlignCenter(comboAlgorithm);
+			addAlignLeft(checkWeighted);
+			addLabeled(spinnerRadius,"Radius");
 			addAlignLeft(checkShowInput);
-//			addLabeled(spinnerRadius,"Radius");
-
-		}
-		
-		private void addAlgorithm( String name , GeneralFeatureIntensity algorithm ) {
-			comboAlgorithm.addItem(name);
-			algorithms.add(algorithm);
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if( e.getSource() == comboAlgorithm ) {
-				intensity = algorithms.get(comboAlgorithm.getSelectedIndex());
-				reprocessInput();
+				selected = (String)comboAlgorithm.getSelectedItem();
+				updateEnabledControls();
+				handleAlgorithmChanged();
+			} else if( e.getSource() == checkWeighted ) {
+				weighted = checkWeighted.isSelected();
+				handleAlgorithmChanged();
 			} else if( e.getSource() == checkShowInput ) {
 				showInput = checkShowInput.isSelected();
 				imagePanel.repaint();
@@ -205,8 +245,29 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			if( e.getSource() == spinnerRadius ) {
-
+				radius = ((Number)spinnerRadius.getValue()).intValue();
+				handleAlgorithmChanged();
 			}
+		}
+
+		private void updateEnabledControls() {
+			boolean activeRadius = false;
+			boolean activeWeighted = false;
+
+			switch( selected ) {
+				case "Harris":
+				case "Shi Tomasi":
+					activeRadius = true;
+					activeWeighted = true;
+					break;
+
+				case "Median":
+					activeRadius = true;
+					break;
+			}
+
+			spinnerRadius.setEnabled(activeRadius);
+			checkWeighted.setEnabled(activeWeighted);
 		}
 	}
 

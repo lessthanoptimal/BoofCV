@@ -30,6 +30,8 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.VisualizeFeatures;
+import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
@@ -355,11 +357,13 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 
 
 	public static void main(String[] args) {
-		List<String> examples = new ArrayList<>();
-		examples.add("shapes/shapes01.png");
-		examples.add("amoeba_shapes.jpg");
-		examples.add("sunflowers.jpg");
-		examples.add("scale/beach02.jpg");
+		List<PathLabel> examples = new ArrayList<>();
+		examples.add(new PathLabel("Chessboard", UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame06.jpg")));
+		examples.add(new PathLabel("Square Grid",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
+		examples.add(new PathLabel("Shapes 01","shapes/shapes01.png"));
+		examples.add(new PathLabel("Amoeba Shapes","amoeba_shapes.jpg"));
+		examples.add(new PathLabel("Sunflowers","sunflowers.jpg"));
+		examples.add(new PathLabel("Beach","scale/beach02.jpg"));
 
 		DemoDetectPointFeaturesApp app = new DemoDetectPointFeaturesApp(examples,GrayF32.class);
 		app.openExample(examples.get(0));
