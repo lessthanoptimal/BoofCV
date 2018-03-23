@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -142,7 +142,7 @@ public class TestDetectChessboardSquarePoints {
 		GrayU8 binary = new GrayU8(w,h);
 
 		SimpleMatrix a = new SimpleMatrix(1,2);
-		a.set(5);
+		a.fill(5);
 
 		// create the grid
 		for(int y = 0; y < rows; y += 2) {

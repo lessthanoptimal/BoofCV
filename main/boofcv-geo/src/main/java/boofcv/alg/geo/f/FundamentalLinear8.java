@@ -22,8 +22,6 @@ package boofcv.alg.geo.f;
 import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.SingularOps_DDRM;
-import org.ejml.dense.row.SpecializedOps_DDRM;
 
 import java.util.List;
 
@@ -92,17 +90,11 @@ public class FundamentalLinear8 extends FundamentalLinear {
 	 * Computes the SVD of A and extracts the essential/fundamental matrix from its null space
 	 */
 	protected boolean process(DMatrixRMaj A, DMatrixRMaj F ) {
-		if( !svdNull.decompose(A) )
+		if( !solverNull.process(A,1,F) )
 			return true;
 
-		if( A.numRows > 8 )
-			SingularOps_DDRM.nullVector(svdNull,true,F);
-		else {
-			// handle a special case since the matrix only has 8 singular values and won't select
-			// the correct column
-			DMatrixRMaj V = svdNull.getV(null,false);
-			SpecializedOps_DDRM.subvector(V, 0, 8, V.numCols, false, 0, F);
-		}
+		F.numRows = 3;
+		F.numCols = 3;
 
 		return false;
 	}

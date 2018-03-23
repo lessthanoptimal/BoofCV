@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,9 +28,8 @@ import org.ddogleg.struct.FastQueue;
 import org.ejml.data.Complex_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
-import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition;
+import org.ejml.dense.row.linsol.qr.SolveNullSpaceQR_DDRM;
 import org.ejml.interfaces.linsol.LinearSolverDense;
 
 import java.util.List;
@@ -64,9 +63,8 @@ public class EssentialNister5 {
 	// Linear system describing p'*E*q = 0
 	private DMatrixRMaj Q = new DMatrixRMaj(5,9);
 	// contains the span of A
-	private DMatrixRMaj V = new DMatrixRMaj(9,9);
-	// TODO Try using QR-Factorization as in the paper
-	private SingularValueDecomposition<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(5,9,false,true,false);
+	private DMatrixRMaj nullspace = new DMatrixRMaj(9,9);
+	private SolveNullSpaceQR_DDRM solverNull = new SolveNullSpaceQR_DDRM();
 
 	// where all the ugly equations go
 	private HelperNister5 helper = new HelperNister5();
@@ -169,19 +167,15 @@ public class EssentialNister5 {
 			Q.data[index++] =  1;
 		}
 
-		if( !svd.decompose(Q) )
-			throw new RuntimeException("SVD should never fail, probably bad input");
-
-		// While the order of the singular values isn't guaranteed in this implementation, since the system is
-		// under determined the solution is always contained in the last 4 rows of V
-		svd.getV(V,true);
+		if( !solverNull.process(Q,4,nullspace) )
+			throw new RuntimeException("Nullspace solver should never fail, probably bad input");
 
 		// extract the span of solutions for E from the null space
 		for( int i = 0; i < 9; i++ ) {
-			X[i] = V.unsafe_get(5,i);
-			Y[i] = V.unsafe_get(6,i);
-			Z[i] = V.unsafe_get(7,i);
-			W[i] = V.unsafe_get(8,i);
+			X[i] = nullspace.unsafe_get(i,0);
+			Y[i] = nullspace.unsafe_get(i,1);
+			Z[i] = nullspace.unsafe_get(i,2);
+			W[i] = nullspace.unsafe_get(i,3);
 		}
 	}
 

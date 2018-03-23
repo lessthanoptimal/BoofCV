@@ -96,7 +96,7 @@ subprojects {
     }
 
     dependencies {
-        compile group: 'org.georegression', name: 'georegression', version: '0.15'
+        compile group: 'org.georegression', name: 'georegression', version: '0.16-SNAPSHOT'
         compile 'com.google.code.findbugs:jsr305:3.0.2' // @Nullable
 
         testCompile group: 'junit', name: 'junit', version: '4.12'

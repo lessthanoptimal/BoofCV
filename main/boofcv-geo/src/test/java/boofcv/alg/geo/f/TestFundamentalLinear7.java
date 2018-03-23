@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,8 +60,8 @@ public class TestFundamentalLinear7 {
 
 	@Test
 	public void computeCoefficients() {
-		SimpleMatrix F1 = SimpleMatrix.random64(3, 3, 0.1, 2, rand);
-		SimpleMatrix F2 = SimpleMatrix.random64(3, 3, 0.1, 2, rand);
+		SimpleMatrix F1 = SimpleMatrix.random_DDRM(3, 3, 0.1, 2, rand);
+		SimpleMatrix F2 = SimpleMatrix.random_DDRM(3, 3, 0.1, 2, rand);
 
 		double coefs[] = new double[4];
 

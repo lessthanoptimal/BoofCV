@@ -24,10 +24,7 @@ import boofcv.alg.geo.NormalizationPoint2D;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.SingularOps_DDRM;
-import org.ejml.dense.row.SpecializedOps_DDRM;
-import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
+import org.ejml.dense.row.linsol.qr.SolveNullSpaceQR_DDRM;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.List;
@@ -56,9 +53,9 @@ public class HomographyDirectLinearTransform {
 
 	// contains the set of equations that are solved
 	protected DMatrixRMaj A = new DMatrixRMaj(1,9);
-	protected SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(0, 0, true, true, false);
+	protected SolveNullSpaceQR_DDRM solverNullspace = new SolveNullSpaceQR_DDRM();
 
-	// matrix used to normalize results
+	// Used to normalize input points
 	protected NormalizationPoint2D N1 = new NormalizationPoint2D();
 	protected NormalizationPoint2D N2 = new NormalizationPoint2D();
 
@@ -80,7 +77,7 @@ public class HomographyDirectLinearTransform {
 	/**
 	 * <p>
 	 * Computes the homography matrix given a set of observed points in two images.  A set of {@link AssociatedPair}
-	 * is passed in.  The computed homography 'H' is found such that the attributes 'keyLoc' and 'currLoc' in {@link AssociatedPair}
+	 * is passed in.  The computed homography 'H' is found such that the attributes 'p1' and 'p2' in {@link AssociatedPair}
 	 * refers to x1 and x2, respectively, in the equation  below:<br>
 	 * x<sub>2</sub> = H*x<sub>1</sub>
 	 * </p>
@@ -119,17 +116,11 @@ public class HomographyDirectLinearTransform {
 	 * Computes the SVD of A and extracts the homography matrix from its null space
 	 */
 	protected boolean computeH(DMatrixRMaj A, DMatrixRMaj H) {
-		if( !svd.decompose(A) )
+		if( !solverNullspace.process(A,1,H) )
 			return true;
 
-		if( A.numRows > 8 )
-			SingularOps_DDRM.nullVector(svd,true,H);
-		else {
-			// handle a special case since the matrix only has 8 singular values and won't select
-			// the correct column
-			DMatrixRMaj V = svd.getV(null,false);
-			SpecializedOps_DDRM.subvector(V, 0, 8, V.numCols, false, 0, H);
-		}
+		H.numRows = 3;
+		H.numCols = 3;
 
 		return false;
 	}

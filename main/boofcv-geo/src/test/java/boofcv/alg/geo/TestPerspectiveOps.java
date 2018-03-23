@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -343,11 +343,11 @@ public class TestPerspectiveOps {
 
 	@Test
 	public void createCameraMatrix() {
-		SimpleMatrix R = SimpleMatrix.random64(3, 3, -1, 1, rand);
+		SimpleMatrix R = SimpleMatrix.random_DDRM(3, 3, -1, 1, rand);
 		Vector3D_F64 T = new Vector3D_F64(2,3,-4);
 		SimpleMatrix K = SimpleMatrix.wrap(RandomMatrices_DDRM.triangularUpper(3, 0, -1, 1, rand));
 
-		SimpleMatrix T_ = new SimpleMatrix(3,1,true,T.x,T.y,T.z);
+		SimpleMatrix T_ = new SimpleMatrix(3,1,true,new double[]{T.x,T.y,T.z});
 
 		// test calibrated camera
 		DMatrixRMaj found = PerspectiveOps.createCameraMatrix(R.getDDRM(), T, null, null);

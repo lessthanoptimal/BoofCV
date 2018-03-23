@@ -9,7 +9,9 @@ Version : 0.30
 - Renamed HomographyLinear4 to HomographyDirectLinearTransform
   * More consistent with the literature
 - TODO Added HomographyTotalLeastSquares
-  * Mathew Harker and Paul O'Leary, "Computation of Homogrpahies"
+  * Mathew Harker and Paul O'Leary, "Computation of Homographies"
+- Several algorithms which were computing null space from SVD are now using QR
+  * This is much faster
 
 - TODO face detector
 - TODO QR Code regression images

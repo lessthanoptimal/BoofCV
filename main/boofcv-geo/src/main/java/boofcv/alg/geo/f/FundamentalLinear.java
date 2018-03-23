@@ -25,6 +25,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.SingularOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
+import org.ejml.dense.row.linsol.qr.SolveNullSpaceQR_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 
 import java.util.List;
@@ -47,7 +48,7 @@ public abstract class FundamentalLinear {
 	// contains the set of equations that are solved
 	protected DMatrixRMaj A = new DMatrixRMaj(1,9);
 	// svd used to extract the null space
-	protected SingularValueDecomposition_F64<DMatrixRMaj> svdNull = DecompositionFactory_DDRM.svd(9, 9, false, true, false);
+	protected SolveNullSpaceQR_DDRM solverNull = new SolveNullSpaceQR_DDRM();
 	// svd used to enforce constraings on 3x3 matrix
 	protected SingularValueDecomposition_F64<DMatrixRMaj> svdConstraints = DecompositionFactory_DDRM.svd(3, 3, true, true, false);
 
