@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -102,8 +102,8 @@ public class FundamentalLinear7 extends FundamentalLinear {
 		if (!process(A))
 			return false;
 
-		undoNormalizationF(F1,N1,N2);
-		undoNormalizationF(F2,N1,N2);
+		undoNormalizationF(F1,N1.matrix(),N2.matrix());
+		undoNormalizationF(F2,N1.matrix(),N2.matrix());
 
 		// compute polynomial coefficients
 		computeCoefficients(F1, F2, poly.c);

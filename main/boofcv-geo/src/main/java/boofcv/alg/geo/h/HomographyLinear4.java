@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.geo.h;
 
 
 import boofcv.alg.geo.LowLevelMultiViewOps;
+import boofcv.alg.geo.NormalizationPoint2D;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -58,8 +59,8 @@ public class HomographyLinear4 {
 	protected SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(0, 0, true, true, false);
 
 	// matrix used to normalize results
-	protected DMatrixRMaj N1 = new DMatrixRMaj(3,3);
-	protected DMatrixRMaj N2 = new DMatrixRMaj(3,3);
+	protected NormalizationPoint2D N1 = new NormalizationPoint2D();
+	protected NormalizationPoint2D N2 = new NormalizationPoint2D();
 
 	// pick a reasonable scale and sign
 	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
@@ -136,12 +137,12 @@ public class HomographyLinear4 {
 	/**
 	 * Undoes normalization for a homography matrix.
 	 */
-	protected void undoNormalizationH(DMatrixRMaj M, DMatrixRMaj N1, DMatrixRMaj N2) {
+	protected void undoNormalizationH(DMatrixRMaj M, NormalizationPoint2D N1, NormalizationPoint2D N2) {
 		SimpleMatrix a = SimpleMatrix.wrap(M);
-		SimpleMatrix b = SimpleMatrix.wrap(N1);
-		SimpleMatrix c = SimpleMatrix.wrap(N2);
+		SimpleMatrix b = SimpleMatrix.wrap(N1.matrix());
+		SimpleMatrix c_inv = SimpleMatrix.wrap(N2.matrixInv());
 
-		SimpleMatrix result = c.invert().mult(a).mult(b);
+		SimpleMatrix result = c_inv.mult(a).mult(b);
 
 		M.set(result.getDDRM());
 	}
@@ -166,8 +167,8 @@ public class HomographyLinear4 {
 			Point2D_F64 s = p.p2;
 
 			// normalize the points
-			LowLevelMultiViewOps.applyPixelNormalization(N1, f, f_norm);
-			LowLevelMultiViewOps.applyPixelNormalization(N2, s, s_norm);
+			N1.apply(f, f_norm);
+			N2.apply(s, s_norm);
 
 			A.set(i*2   , 3 , -f_norm.x);
 			A.set(i*2   , 4 , -f_norm.y);

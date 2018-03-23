@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,12 +19,12 @@
 package boofcv.alg.geo.trifocal;
 
 import boofcv.alg.geo.LowLevelMultiViewOps;
+import boofcv.alg.geo.NormalizationPoint2D;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.SingularOps_DDRM;
 import org.ejml.dense.row.decomposition.svd.SafeSvd_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
@@ -57,9 +57,9 @@ public class TrifocalLinearPoint7 {
 	protected TrifocalTensor solutionN = new TrifocalTensor();
 
 	// normalization matrices for points
-	protected DMatrixRMaj N1 = new DMatrixRMaj(3,3);
-	protected DMatrixRMaj N2 = new DMatrixRMaj(3,3);
-	protected DMatrixRMaj N3 = new DMatrixRMaj(3,3);
+	protected NormalizationPoint2D N1 = new NormalizationPoint2D();
+	protected NormalizationPoint2D N2 = new NormalizationPoint2D();
+	protected NormalizationPoint2D N3 = new NormalizationPoint2D();
 
 	// the linear system which is solved for
 	protected DMatrixRMaj A = new DMatrixRMaj(7,27);
@@ -133,9 +133,9 @@ public class TrifocalLinearPoint7 {
 		for( int i = 0; i < N; i++ ) {
 			AssociatedTriple t = observations.get(i);
 
-			LowLevelMultiViewOps.applyPixelNormalization(N1, t.p1, p1_norm);
-			LowLevelMultiViewOps.applyPixelNormalization(N2, t.p2, p2_norm);
-			LowLevelMultiViewOps.applyPixelNormalization(N3, t.p3, p3_norm);
+			N1.apply(t.p1,p1_norm);
+			N2.apply(t.p2,p2_norm);
+			N3.apply(t.p3,p3_norm);
 
 			int index2 = index1+9;
 			int index3 = index1+18;
@@ -230,11 +230,10 @@ public class TrifocalLinearPoint7 {
 	 * Translates the trifocal tensor back into regular coordinate system
 	 */
 	protected void removeNormalization( TrifocalTensor solution ) {
-		DMatrixRMaj N2_inv = new DMatrixRMaj(3,3);
-		DMatrixRMaj N3_inv = new DMatrixRMaj(3,3);
+		DMatrixRMaj N2_inv = N2.matrixInv();
+		DMatrixRMaj N3_inv = N3.matrixInv();
 
-		CommonOps_DDRM.invert(N2,N2_inv);
-		CommonOps_DDRM.invert(N3,N3_inv);
+		DMatrixRMaj N1 = this.N1.matrix();
 
 		for( int i = 0; i < 3; i++ ) {
 			DMatrixRMaj T = solution.getT(i);

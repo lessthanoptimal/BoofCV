@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.f;
 
-import boofcv.alg.geo.LowLevelMultiViewOps;
+import boofcv.alg.geo.NormalizationPoint2D;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -59,8 +59,8 @@ public abstract class FundamentalLinear {
 	protected DMatrixRMaj temp0 = new DMatrixRMaj(3,3);
 
 	// matrix used to normalize results
-	protected DMatrixRMaj N1 = new DMatrixRMaj(3,3);
-	protected DMatrixRMaj N2 = new DMatrixRMaj(3,3);
+	protected NormalizationPoint2D N1 = new NormalizationPoint2D();
+	protected NormalizationPoint2D N2 = new NormalizationPoint2D();
 
 	// should it compute a fundamental (true) or essential (false) matrix?
 	boolean computeFundamental;
@@ -166,8 +166,8 @@ public abstract class FundamentalLinear {
 			Point2D_F64 s = p.p2;
 
 			// normalize the points
-			LowLevelMultiViewOps.applyPixelNormalization(N1, f, f_norm);
-			LowLevelMultiViewOps.applyPixelNormalization(N2, s, s_norm);
+			N1.apply(f, f_norm);
+			N2.apply(s, s_norm);
 
 			// perform the Kronecker product with the two points being in
 			// homogeneous coordinates (z=1)
