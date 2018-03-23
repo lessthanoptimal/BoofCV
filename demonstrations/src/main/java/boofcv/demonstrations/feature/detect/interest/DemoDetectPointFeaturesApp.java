@@ -32,6 +32,7 @@ import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
+import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
@@ -100,6 +101,11 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, imagePanel);
+	}
+
+	@Override
+	protected void configureVideo(int which, SimpleImageSequence sequence) {
+		sequence.setLoop(true);
 	}
 
 	@Override
@@ -364,6 +370,7 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		examples.add(new PathLabel("Amoeba Shapes","amoeba_shapes.jpg"));
 		examples.add(new PathLabel("Sunflowers","sunflowers.jpg"));
 		examples.add(new PathLabel("Beach","scale/beach02.jpg"));
+		examples.add(new PathLabel("Chessboard Movie",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 
 		DemoDetectPointFeaturesApp app = new DemoDetectPointFeaturesApp(examples,GrayF32.class);
 		app.openExample(examples.get(0));

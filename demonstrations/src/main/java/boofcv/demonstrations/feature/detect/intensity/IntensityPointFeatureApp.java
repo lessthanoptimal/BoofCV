@@ -18,24 +18,28 @@
 
 package boofcv.demonstrations.feature.detect.intensity;
 
-import boofcv.abst.feature.detect.intensity.*;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
-import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
-import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.SimpleImageSequence;
+import boofcv.struct.QueueCorner;
 import boofcv.struct.image.*;
+import georegression.struct.point.Point2D_I16;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -46,6 +50,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,10 +78,14 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 	AnyImageDerivative<T,D> deriv;
 
 	// used to compute feature intensity
-	GeneralFeatureIntensity<T,D> intensity;
-	final Object lock = new Object();
+	GeneralFeatureDetector<T,D> detector;
+	final Object lockAlgorithm = new Object();
 
-	String[] names = new String[]{"Laplacian","Hessian Det","Harris","Shi Tomasi","FAST","KitRos","Median"};
+	final Object lockCorners = new Object();
+	QueueCorner minimums = new QueueCorner();
+	QueueCorner maximums = new QueueCorner();
+
+	String[] names = new String[]{"Harris","Shi Tomasi","FAST","KitRos","Median","Laplacian","Hessian Det"};
 
 	public IntensityPointFeatureApp( List<String> examples , Class<T> imageType ) {
 		super(true,true,examples,ImageType.single(imageType));
@@ -108,6 +117,11 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 	}
 
 	@Override
+	protected void configureVideo(int which, SimpleImageSequence sequence) {
+		sequence.setLoop(true);
+	}
+
+	@Override
 	protected void handleInputChange(int source, InputMethod method, int width, int height) {
 		visualized = ConvertBufferedImage.checkDeclare(width,height, visualized,BufferedImage.TYPE_INT_RGB);
 		imagePanel.setPreferredSize(new Dimension(width,height));
@@ -130,61 +144,104 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		D derivYY = deriv.getDerivative(false, false);
 		D derivXY = deriv.getDerivative(true, false);
 
-		synchronized (lock) {
-			intensity.process(gray, derivX, derivY, derivXX, derivYY, derivXY);
-			GrayF32 featureImg = intensity.getIntensity();
+		GrayF32 featureImg;
+		synchronized (lockAlgorithm) {
+			detector.process(gray, derivX, derivY, derivXX, derivYY, derivXY);
+			featureImg = detector.getIntensity();
 			VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
+
+			synchronized (lockCorners) {
+				minimums.reset();
+				minimums.addAll(detector.getMinimums());
+
+				maximums.reset();
+				maximums.addAll(detector.getMaximums());
+			}
 		}
 
+
 		SwingUtilities.invokeLater(() -> {
-			imagePanel.setBufferedImageNoChange(visualized);
+			changeViewImage();
 			imagePanel.repaint();
 		});
 	}
 
+	private void changeViewImage() {
+		if( controlPanel.view == 0 || controlPanel.view == 2 ) {
+			imagePanel.setBufferedImageNoChange(visualized);
+		} else if( controlPanel.view == 1 ) {
+			imagePanel.setBufferedImageNoChange(original);
+		}
+	}
+
 	class DisplayPanel extends ShapeVisualizePanel {
+		Ellipse2D.Double circle = new Ellipse2D.Double();
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 			super.paintInPanel(tran, g2);
+			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-			if( controlPanel.showInput ) {
+			if(  controlPanel.view == 2 ) {
 				// this requires some explaining
 				// for some reason it was decided that the transform would apply a translation, but not a scale
 				// so this scale will be concatted on top of the translation in the g2
 				tran.setTransform(scale,0,0,scale,0,0);
+				Composite beforeAC = g2.getComposite();
 				AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f);
 				g2.setComposite(ac);
 				g2.drawImage(original,tran,null);
+				g2.setComposite(beforeAC);
+			}
+
+			if( controlPanel.showPeaks ) {
+				synchronized (lockCorners) {
+					g2.setStroke(new BasicStroke(3));
+					g2.setColor(Color.ORANGE);
+					for (int i = 0; i < minimums.size; i++) {
+						Point2D_I16 c = minimums.get(i);
+						VisualizeFeatures.drawCircle(g2, (c.x + 0.5) * scale, (c.y + 0.5) * scale, 5, circle);
+					}
+					g2.setColor(Color.BLUE);
+					for (int i = 0; i < maximums.size; i++) {
+						Point2D_I16 c = maximums.get(i);
+						VisualizeFeatures.drawCircle(g2, (c.x + 0.5) * scale, (c.y + 0.5) * scale, 5, circle);
+					}
+				}
 			}
 		}
 	}
 
 	private void handleAlgorithmChanged() {
-		synchronized (lock) {
+		ConfigGeneralDetector config = new ConfigGeneralDetector();
+		config.radius = controlPanel.radius;
+		config.maxFeatures = 200;
+
+		synchronized (lockAlgorithm) {
 			switch (controlPanel.selected) {
 				case "Laplacian":
-					intensity = new WrapperHessianBlobIntensity<>(HessianBlobIntensity.Type.TRACE, derivType);
+					config.detectMinimums = true;
+					detector = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE,config,derivType);
 					break;
 				case "Hessian Det":
-					intensity = new WrapperHessianBlobIntensity<>(HessianBlobIntensity.Type.DETERMINANT, derivType);
+					detector = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT,config,derivType);
 					break;
+
 				case "Harris":
-					intensity = new WrapperGradientCornerIntensity<>(FactoryIntensityPointAlg.harris(
-							controlPanel.radius, 0.4f,
-							controlPanel.weighted, derivType));
+					detector = FactoryDetectPoint.createHarris(config,controlPanel.weighted,derivType);
 					break;
+
 				case "Shi Tomasi":
-					intensity = new WrapperGradientCornerIntensity<>(
-							FactoryIntensityPointAlg.shiTomasi(controlPanel.radius, controlPanel.weighted, derivType));
+					detector = FactoryDetectPoint.createShiTomasi(config,controlPanel.weighted,derivType);
 					break;
 				case "FAST":
-					intensity = new WrapperFastCornerIntensity<>(FactoryIntensityPointAlg.fast(5, 11, imageType));
+					detector = FactoryDetectPoint.createFast(null,config,imageType);
 					break;
 				case "KitRos":
-					intensity = new WrapperKitRosCornerIntensity<>(derivType);
+					detector = FactoryDetectPoint.createKitRos(config,derivType);
 					break;
 				case "Median":
-					intensity = new WrapperMedianCornerIntensity<>(FactoryBlurFilter.median(imageType, controlPanel.radius));
+					detector = FactoryDetectPoint.createMedian(config,imageType);
 					break;
 
 				default:
@@ -196,35 +253,39 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 	}
 
 	class ControlPanel extends StandardAlgConfigPanel implements ActionListener , ChangeListener {
+		JComboBox<String> comboView;
 		JComboBox<String> comboAlgorithm;
-		JCheckBox checkShowInput;
 		JSpinner spinnerRadius;
 		JCheckBox checkWeighted;
-
-		List<GeneralFeatureIntensity<T,D>> algorithms = new ArrayList<>();
+		JCheckBox checkShowLocalMax;
 
 		String selected = null;
-		boolean showInput = false;
 		int radius = 2;
 		boolean weighted=false;
+		boolean showPeaks =false;
+		int view = 0;
 
 		public ControlPanel() {
 			comboAlgorithm = new JComboBox<>();
 
-			checkShowInput = checkbox("Show Input", showInput);
+			comboView = combo(view,"Intensity","Image","Both");
 			spinnerRadius = spinner(radius, 1, 100, 1);
 			checkWeighted = checkbox("weighted", weighted);
+			checkShowLocalMax = checkbox("Show Maximums", showPeaks);
 
 			for (String name : names) {
 				comboAlgorithm.addItem(name);
 			}
 			comboAlgorithm.addActionListener(this);
+			comboView.setPreferredSize(comboAlgorithm.getPreferredSize());
+			comboView.setMaximumSize(comboAlgorithm.getPreferredSize());
 			comboAlgorithm.setMaximumSize(comboAlgorithm.getPreferredSize());
 
-			addAlignCenter(comboAlgorithm);
+			addLabeled(comboView,"View");
+			addLabeled(comboAlgorithm,"Detector");
+			addAlignLeft(checkShowLocalMax);
 			addAlignLeft(checkWeighted);
 			addLabeled(spinnerRadius,"Radius");
-			addAlignLeft(checkShowInput);
 		}
 
 		@Override
@@ -236,8 +297,12 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 			} else if( e.getSource() == checkWeighted ) {
 				weighted = checkWeighted.isSelected();
 				handleAlgorithmChanged();
-			} else if( e.getSource() == checkShowInput ) {
-				showInput = checkShowInput.isSelected();
+			} else if( e.getSource() == comboView ) {
+				view = comboView.getSelectedIndex();
+				changeViewImage();
+				imagePanel.repaint();
+			} else if( e.getSource() == checkShowLocalMax ) {
+				showPeaks = checkShowLocalMax.isSelected();
 				imagePanel.repaint();
 			}
 		}
@@ -279,6 +344,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		examples.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		examples.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
 		examples.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
+		examples.add(new PathLabel("Chessboard Movie",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 
 		IntensityPointFeatureApp<GrayU8, GrayS16> app = new IntensityPointFeatureApp(examples,GrayU8.class);
 
