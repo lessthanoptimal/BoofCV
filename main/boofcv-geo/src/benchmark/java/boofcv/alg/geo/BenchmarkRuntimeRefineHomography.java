@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.alg.geo.h.HomographyLinear4;
+import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.factory.geo.EpipolarError;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.Performer;
@@ -65,7 +65,7 @@ public class BenchmarkRuntimeRefineHomography extends ArtificialStereoScene{
 
 	public class Linear4 extends PerformerBase {
 
-		HomographyLinear4 alg = new HomographyLinear4(true);
+		HomographyDirectLinearTransform alg = new HomographyDirectLinearTransform(true);
 
 		@Override
 		public void process() {

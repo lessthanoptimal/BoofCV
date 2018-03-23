@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.factory.geo;
 import boofcv.alg.geo.f.EssentialNister5;
 import boofcv.alg.geo.f.FundamentalLinear7;
 import boofcv.alg.geo.f.FundamentalLinear8;
-import boofcv.alg.geo.h.HomographyLinear4;
+import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.alg.geo.pose.PnPLepetitEPnP;
 
 /**
@@ -56,11 +56,11 @@ public class FactoryGeometryAlgs {
 	}
 
 	/**
-	 * Creates a new instance of {@link HomographyLinear4}.  See class documentation
+	 * Creates a new instance of {@link HomographyDirectLinearTransform}.  See class documentation
 	 * for information on parameters.
 	 */
-	public static HomographyLinear4 homography4( boolean normalize ) {
-		return new HomographyLinear4(normalize);
+	public static HomographyDirectLinearTransform homography4(boolean normalize ) {
+		return new HomographyDirectLinearTransform(normalize);
 	}
 
 	/**

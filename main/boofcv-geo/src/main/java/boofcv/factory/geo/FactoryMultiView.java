@@ -29,7 +29,7 @@ import boofcv.abst.geo.trifocal.WrapTrifocalAlgebraicPoint7;
 import boofcv.abst.geo.trifocal.WrapTrifocalLinearPoint7;
 import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.alg.geo.f.DistanceEpipolarConstraint;
-import boofcv.alg.geo.h.HomographyLinear4;
+import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.alg.geo.h.HomographyResidualSampson;
 import boofcv.alg.geo.h.HomographyResidualTransfer;
 import boofcv.alg.geo.pose.P3PFinsterwalder;
@@ -70,13 +70,13 @@ public class FactoryMultiView {
 	 * Returns an algorithm for estimating a homography matrix given a set of
 	 * {@link AssociatedPair}.
 	 *
-	 * @see HomographyLinear4
+	 * @see HomographyDirectLinearTransform
 	 *
 	 * @param normalizeInput If input is in pixel coordinates set to true.  False if in normalized image coordinates.
 	 * @return Homography estimator.
 	 */
 	public static Estimate1ofEpipolar computeHomography( boolean normalizeInput ) {
-		HomographyLinear4 alg = new HomographyLinear4(normalizeInput);
+		HomographyDirectLinearTransform alg = new HomographyDirectLinearTransform(normalizeInput);
 		return new WrapHomographyLinear(alg);
 	}
 

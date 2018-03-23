@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.geo.h.HomographyLinear4;
+import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class Zhang99ComputeTargetHomography {
 
-	HomographyLinear4 linear = new HomographyLinear4(true);
+	HomographyDirectLinearTransform linear = new HomographyDirectLinearTransform(true);
 	DMatrixRMaj found = new DMatrixRMaj(3,3);
 
 	// location of calibration points in the target frame's in world units.

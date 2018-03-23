@@ -52,7 +52,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class HomographyLinear4 {
+public class HomographyDirectLinearTransform {
 
 	// contains the set of equations that are solved
 	protected DMatrixRMaj A = new DMatrixRMaj(1,9);
@@ -73,7 +73,7 @@ public class HomographyLinear4 {
 	 *
 	 * @param normalizeInput Should image coordinate be normalized?  Needed when coordinates are in units of pixels.
 	 */
-	public HomographyLinear4(boolean normalizeInput) {
+	public HomographyDirectLinearTransform(boolean normalizeInput) {
 		this.normalize = normalizeInput;
 	}
 

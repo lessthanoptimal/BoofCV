@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,20 +31,20 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestHomographyLinear4 extends CommonHomographyChecks{
-
+public class TestHomographyDirectLinearTransform extends CommonHomographyChecks
+{
 	@Test
 	public void perfectCalibrated() {
 		// test the minimum number of points
-		checkHomography(4, false, new HomographyLinear4(false));
+		checkHomography(4, false, new HomographyDirectLinearTransform(false));
 		// test with extra points
-		checkHomography(10, false, new HomographyLinear4(false));
+		checkHomography(10, false, new HomographyDirectLinearTransform(false));
 	}
 
 	@Test
 	public void perfectPixels() {
-		checkHomography(4, true, new HomographyLinear4(true));
-		checkHomography(10, true, new HomographyLinear4(true));
+		checkHomography(4, true, new HomographyDirectLinearTransform(true));
+		checkHomography(10, true, new HomographyDirectLinearTransform(true));
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class TestHomographyLinear4 extends CommonHomographyChecks{
 	 * @param isPixels Pixel or calibrated coordinates
 	 * @param alg Algorithm being evaluated
 	 */
-	private void checkHomography(int N, boolean isPixels, HomographyLinear4 alg) {
+	private void checkHomography(int N, boolean isPixels, HomographyDirectLinearTransform alg) {
 		createScene(N,isPixels);
 
 		// compute essential

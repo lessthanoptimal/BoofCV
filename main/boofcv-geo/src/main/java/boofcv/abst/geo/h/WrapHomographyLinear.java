@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,22 +19,22 @@
 package boofcv.abst.geo.h;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.alg.geo.h.HomographyLinear4;
+import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
 /**
- * Wrapper around {@link HomographyLinear4} for {@link boofcv.abst.geo.Estimate1ofEpipolar}.
+ * Wrapper around {@link HomographyDirectLinearTransform} for {@link boofcv.abst.geo.Estimate1ofEpipolar}.
  * 
  * @author Peter Abeles
  */
 public class WrapHomographyLinear implements Estimate1ofEpipolar
 {
-	HomographyLinear4 alg;
+	HomographyDirectLinearTransform alg;
 
-	public WrapHomographyLinear(HomographyLinear4 alg) {
+	public WrapHomographyLinear(HomographyDirectLinearTransform alg) {
 		this.alg = alg;
 	}
 

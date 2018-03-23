@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo.robust;
 
 
-import boofcv.alg.geo.h.HomographyLinear4;
+import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.homography.UtilHomography_F64;
@@ -39,11 +39,11 @@ public class GenerateHomographyLinear implements
 		ModelFitter<Homography2D_F64,AssociatedPair>
 {
 
-	HomographyLinear4 alg;
+	HomographyDirectLinearTransform alg;
 	DMatrixRMaj H = new DMatrixRMaj(3,3);
 
 	public GenerateHomographyLinear( boolean normalizeInput ) {
-		alg = new HomographyLinear4(normalizeInput);
+		alg = new HomographyDirectLinearTransform(normalizeInput);
 	}
 
 	@Override

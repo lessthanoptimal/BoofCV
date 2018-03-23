@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.geo;
 
 import boofcv.alg.geo.h.CommonHomographyChecks;
-import boofcv.alg.geo.h.HomographyLinear4;
+import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ejml.data.DMatrixRMaj;
@@ -44,7 +44,7 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		createScene(30,false);
 
 		// use the linear algorithm to compute the homography
-		HomographyLinear4 estimator = new HomographyLinear4(true);
+		HomographyDirectLinearTransform estimator = new HomographyDirectLinearTransform(true);
 		estimator.process(pairs,H);
 
 		ModelFitter<DMatrixRMaj,AssociatedPair> alg = createAlgorithm();
@@ -64,7 +64,7 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		createScene(30,false);
 
 		// use the linear algorithm to compute the homography
-		HomographyLinear4 estimator = new HomographyLinear4(true);
+		HomographyDirectLinearTransform estimator = new HomographyDirectLinearTransform(true);
 		estimator.process(pairs,H);
 
 		ModelFitter<DMatrixRMaj,AssociatedPair> alg = createAlgorithm();
