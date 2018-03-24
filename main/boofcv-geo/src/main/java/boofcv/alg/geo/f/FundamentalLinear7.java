@@ -65,9 +65,6 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	private Polynomial poly = new Polynomial(4);
 	private PolynomialRoots rootFinder = PolynomialSolver.createRootFinder(RootFinderType.EVD,4);
 
-	// Matrix from SVD
-	private DMatrixRMaj V = new DMatrixRMaj(9,9);
-
 	/**
 	 * When computing the essential matrix normalization is optional because pixel coordinates
 	 *

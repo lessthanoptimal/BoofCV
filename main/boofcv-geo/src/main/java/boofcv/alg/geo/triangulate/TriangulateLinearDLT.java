@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,8 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.SingularOps_DDRM;
-import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
+import org.ejml.dense.row.linsol.qr.SolveNullSpaceQR_DDRM;
+import org.ejml.interfaces.SolveNullSpace;
 
 import java.util.List;
 
@@ -43,9 +42,9 @@ import java.util.List;
  */
 public class TriangulateLinearDLT {
 
-	SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(4, 4,true,true,false);
-	DMatrixRMaj v = new DMatrixRMaj(4,1);
-	DMatrixRMaj A = new DMatrixRMaj(4,4);
+	private SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceQR_DDRM();
+	private DMatrixRMaj nullspace = new DMatrixRMaj(4,1);
+	private DMatrixRMaj A = new DMatrixRMaj(4,4);
 
 	/**
 	 * <p>
@@ -76,15 +75,13 @@ public class TriangulateLinearDLT {
 			index = addView(worldToView.get(i),observations.get(i),index);
 		}
 
-		if( !svd.decompose(A) )
+		if( !solverNull.process(A,1, nullspace) )
 			throw new RuntimeException("SVD failed!?!?");
 
-		SingularOps_DDRM.nullVector(svd,true,v);
-
-		double w = v.get(3);
-		found.x = v.get(0)/w;
-		found.y = v.get(1)/w;
-		found.z = v.get(2)/w;
+		double w = nullspace.get(3);
+		found.x = nullspace.get(0)/w;
+		found.y = nullspace.get(1)/w;
+		found.z = nullspace.get(2)/w;
 	}
 	
 	/**
@@ -119,16 +116,14 @@ public class TriangulateLinearDLT {
 		A.data[index++] = -1;
 		A.data[index++] = a.y;
 		A.data[index  ] = 0;
-		
-		if( !svd.decompose(A) )
-			throw new RuntimeException("SVD failed!?!?");
 
-		SingularOps_DDRM.nullVector(svd,true,v);
+		if( !solverNull.process(A,1, nullspace) )
+			throw new RuntimeException("SVD failed!?!?");
 		
-		double w = v.get(3);
-		foundInA.x = v.get(0)/w;
-		foundInA.y = v.get(1)/w;
-		foundInA.z = v.get(2)/w;
+		double w = nullspace.get(3);
+		foundInA.x = nullspace.get(0)/w;
+		foundInA.y = nullspace.get(1)/w;
+		foundInA.z = nullspace.get(2)/w;
 	}
 	
 	private int addView( Se3_F64 motion , Point2D_F64 a , int index ) {

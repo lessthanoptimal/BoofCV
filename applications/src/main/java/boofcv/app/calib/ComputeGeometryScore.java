@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,7 +55,7 @@ public class ComputeGeometryScore {
 		try {
 			computeCalib.process(homographies);
 
-			double values[] = computeCalib.getSvd().getSingularValues();
+			double values[] = computeCalib.getSolverNull().getSingularValues();
 			Arrays.sort(values,0,3);
 
 			System.out.println("raw singularity score = "+(values[1]/values[2]));

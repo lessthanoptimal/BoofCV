@@ -30,6 +30,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.dense.row.linsol.qr.SolveNullSpaceQR_DDRM;
+import org.ejml.interfaces.SolveNullSpace;
 import org.ejml.interfaces.linsol.LinearSolverDense;
 
 import java.util.List;
@@ -64,7 +65,7 @@ public class EssentialNister5 {
 	private DMatrixRMaj Q = new DMatrixRMaj(5,9);
 	// contains the span of A
 	private DMatrixRMaj nullspace = new DMatrixRMaj(9,9);
-	private SolveNullSpaceQR_DDRM solverNull = new SolveNullSpaceQR_DDRM();
+	private SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceQR_DDRM();
 
 	// where all the ugly equations go
 	private HelperNister5 helper = new HelperNister5();
@@ -179,35 +180,32 @@ public class EssentialNister5 {
 		}
 	}
 
+	DMatrixRMaj tmpA = new DMatrixRMaj(3,2);
+	DMatrixRMaj tmpY = new DMatrixRMaj(3,1);
+	DMatrixRMaj tmpX = new DMatrixRMaj(2,1);
 	/**
 	 * Once z is known then x and y can be solved for using the B matrix
 	 */
 	private void solveForXandY( double z ) {
 		this.z = z;
 
-		DMatrixRMaj A = new DMatrixRMaj(3,2);
-		DMatrixRMaj Y = new DMatrixRMaj(3,1);
-
 		// solve for x and y using the first two rows of B
-		A.data[0] = ((helper.K00*z + helper.K01)*z + helper.K02)*z + helper.K03;
-		A.data[1] = ((helper.K04*z + helper.K05)*z + helper.K06)*z + helper.K07;
-		Y.data[0] = (((helper.K08*z + helper.K09)*z + helper.K10)*z + helper.K11)*z + helper.K12;
+		tmpA.data[0] = ((helper.K00*z + helper.K01)*z + helper.K02)*z + helper.K03;
+		tmpA.data[1] = ((helper.K04*z + helper.K05)*z + helper.K06)*z + helper.K07;
+		tmpY.data[0] = (((helper.K08*z + helper.K09)*z + helper.K10)*z + helper.K11)*z + helper.K12;
 
-		A.data[2] = ((helper.L00*z + helper.L01)*z + helper.L02)*z + helper.L03;
-		A.data[3] = ((helper.L04*z + helper.L05)*z + helper.L06)*z + helper.L07;
-		Y.data[1] = (((helper.L08*z + helper.L09)*z + helper.L10)*z + helper.L11)*z + helper.L12;
+		tmpA.data[2] = ((helper.L00*z + helper.L01)*z + helper.L02)*z + helper.L03;
+		tmpA.data[3] = ((helper.L04*z + helper.L05)*z + helper.L06)*z + helper.L07;
+		tmpY.data[1] = (((helper.L08*z + helper.L09)*z + helper.L10)*z + helper.L11)*z + helper.L12;
 
-		A.data[4] = ((helper.M00*z + helper.M01)*z + helper.M02)*z + helper.M03;
-		A.data[5] = ((helper.M04*z + helper.M05)*z + helper.M06)*z + helper.M07;
-		Y.data[2] = (((helper.M08*z + helper.M09)*z + helper.M10)*z + helper.M11)*z + helper.M12;
+		tmpA.data[4] = ((helper.M00*z + helper.M01)*z + helper.M02)*z + helper.M03;
+		tmpA.data[5] = ((helper.M04*z + helper.M05)*z + helper.M06)*z + helper.M07;
+		tmpY.data[2] = (((helper.M08*z + helper.M09)*z + helper.M10)*z + helper.M11)*z + helper.M12;
 
-		CommonOps_DDRM.scale(-1,Y);
+		CommonOps_DDRM.scale(-1,tmpY);
+		CommonOps_DDRM.solve(tmpA,tmpY,tmpX);
 
-		DMatrixRMaj x = new DMatrixRMaj(2,1);
-
-		CommonOps_DDRM.solve(A,Y,x);
-
-		this.x = x.get(0,0);
-		this.y = x.get(1,0);
+		this.x = tmpX.get(0,0);
+		this.y = tmpX.get(1,0);
 	}
 }

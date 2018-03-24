@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -151,9 +151,9 @@ public class BenchmarkStabilityPnP extends ArtificialStereoScene {
 
 		app.evaluateAllMinimal();
 
-//		app.target = FactoryMultiView.computePnPwithEPnP(0, 1);
-//		app.evaluateObservationNoise(0,max,20,planar);
-//		app.target = FactoryMultiView.computePnPwithEPnP(10, 0.1);
-//		app.evaluateObservationNoise(0,max,20,planar);
+		app.target = FactoryMultiView.computePnPwithEPnP(0, 1);
+		app.evaluateObservationNoise(0,max,20,planar);
+		app.target = FactoryMultiView.computePnPwithEPnP(10, 0.1);
+		app.evaluateObservationNoise(0,max,20,planar);
 	}
 }

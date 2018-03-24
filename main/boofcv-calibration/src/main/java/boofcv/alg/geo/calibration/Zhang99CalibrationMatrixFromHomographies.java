@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,10 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
-import org.ejml.dense.row.SingularOps_DDRM;
-import org.ejml.dense.row.SpecializedOps_DDRM;
-import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
+import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
 
 import java.util.List;
 
@@ -59,8 +56,8 @@ public class Zhang99CalibrationMatrixFromHomographies {
 
 	// system of equations
 	private DMatrixRMaj A = new DMatrixRMaj(1,1);
-	// computes the SVD of the A matrix
-	private SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(0, 0,true,true,false);
+
+	private SolveNullSpaceSvd_DDRM solverNull = new SolveNullSpaceSvd_DDRM();
 
 	// a vectorized description of the B = A^-T * A^-1 matrix.
 	private DMatrixRMaj b;
@@ -102,20 +99,13 @@ public class Zhang99CalibrationMatrixFromHomographies {
 
 		if( assumeZeroSkew ) {
 			setupA_NoSkew(homographies);
-			if( !svd.decompose(A) )
+			if( !solverNull.process(A,1,b) )
 				throw new RuntimeException("SVD failed");
-			if( homographies.size() == 2 ) {
-				DMatrixRMaj V = svd.getV(null,false);
-				SpecializedOps_DDRM.subvector(V, 0, 4, V.numRows, false, 0, b);
-			} else {
-				SingularOps_DDRM.nullVector(svd,true,b);
-			}
 			computeParam_ZeroSkew();
 		} else {
 			setupA(homographies);
-			if( !svd.decompose(A) )
+			if( !solverNull.process(A,1,b) )
 				throw new RuntimeException("SVD failed");
-			SingularOps_DDRM.nullVector(svd,true,b);
 			computeParam();
 		}
 	}
@@ -330,7 +320,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 		return K;
 	}
 
-	public SingularValueDecomposition_F64<DMatrixRMaj> getSvd() {
-		return svd;
+	public SolveNullSpaceSvd_DDRM getSolverNull() {
+		return solverNull;
 	}
 }

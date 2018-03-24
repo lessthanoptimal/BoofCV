@@ -24,7 +24,8 @@ import boofcv.alg.geo.NormalizationPoint2D;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.linsol.qr.SolveNullSpaceQR_DDRM;
+import org.ejml.dense.row.linsol.qr.SolveNullSpaceQRP_DDRM;
+import org.ejml.interfaces.SolveNullSpace;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.List;
@@ -53,7 +54,7 @@ public class HomographyDirectLinearTransform {
 
 	// contains the set of equations that are solved
 	protected DMatrixRMaj A = new DMatrixRMaj(1,9);
-	protected SolveNullSpaceQR_DDRM solverNullspace = new SolveNullSpaceQR_DDRM();
+	protected SolveNullSpace<DMatrixRMaj> solverNullspace = new SolveNullSpaceQRP_DDRM();
 
 	// Used to normalize input points
 	protected NormalizationPoint2D N1 = new NormalizationPoint2D();
@@ -116,7 +117,8 @@ public class HomographyDirectLinearTransform {
 	 * Computes the SVD of A and extracts the homography matrix from its null space
 	 */
 	protected boolean computeH(DMatrixRMaj A, DMatrixRMaj H) {
-		if( !solverNullspace.process(A,1,H) )
+
+		if( !solverNullspace.process(A.copy(),1,H) )
 			return true;
 
 		H.numRows = 3;

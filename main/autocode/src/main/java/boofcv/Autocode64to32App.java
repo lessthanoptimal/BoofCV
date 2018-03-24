@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,18 +38,16 @@ public class Autocode64to32App extends RecursiveConvert {
     public static void main(String args[] ) {
         // test directories are automatically added
         String directories[] = new String[]{
-                "main/boofcv-geo/src/boofcv/alg",
-                "main/boofcv-geo/src/boofcv/struct/geo",
-                "main/boofcv-ip/src/boofcv/alg/distort",
-                "main/boofcv-ip/src/boofcv/struct/distort",
+                "main/boofcv-geo/src/main/java/boofcv/alg",
+                "main/boofcv-geo/src/main/java/boofcv/struct/geo",
+                "main/boofcv-ip/src/main/java/boofcv/alg/distort",
+                "main/boofcv-ip/src/main/java/boofcv/struct/distort",
                 };
 
         ConvertFile32From64 converter = new ConvertFile32From64(false);
 
-        converter.replacePattern("/\\*\\*/double", "FIXED_DOUBLE");
         converter.replacePattern("double", "float");
         converter.replacePattern("Double", "Float");
-        converter.replacePattern("/\\*\\*/Affine2D_F64", "ASASDASDA_AFFINE_2D");
         converter.replacePattern("_F64", "_F32");
         converter.replacePattern("64-bit", "32-bit");
         converter.replacePattern("64F", "32F");
@@ -62,15 +60,11 @@ public class Autocode64to32App extends RecursiveConvert {
         converter.replaceStartsWith("Math.", "(float)Math.");
         converter.replaceStartsWith("-Math.", "(float)-Math.");
 
-        converter.replacePatternAfter("ASASDASDA_AFFINE_2D", "/**/Affine2D_F64");
-        converter.replacePatternAfter("FIXED_DOUBLE", "/\\*\\*/double");
-
-
         Autocode64to32App app = new Autocode64to32App(converter);
         for( String dir : directories ) {
             app.process(new File(dir) );
             if( dir.contains("/src/")) {
-                app.process(new File(dir.replace("/src/","/test/")) );
+                app.process(new File(dir.replace("/src/main","/src/test/")) );
             }
         }
     }
