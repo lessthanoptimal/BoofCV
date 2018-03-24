@@ -23,7 +23,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.linsol.qr.SolveNullSpaceQR_DDRM;
+import org.ejml.dense.row.linsol.qr.SolveNullSpaceQRP_DDRM;
 import org.ejml.interfaces.SolveNullSpace;
 
 import java.util.List;
@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class TriangulateLinearDLT {
 
-	private SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceQR_DDRM();
+	private SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceQRP_DDRM();
 	private DMatrixRMaj nullspace = new DMatrixRMaj(4,1);
 	private DMatrixRMaj A = new DMatrixRMaj(4,4);
 

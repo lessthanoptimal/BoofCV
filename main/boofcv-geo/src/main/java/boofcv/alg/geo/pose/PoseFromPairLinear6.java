@@ -27,7 +27,8 @@ import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
-import org.ejml.dense.row.linsol.qr.SolveNullSpaceQR_DDRM;
+import org.ejml.dense.row.linsol.qr.SolveNullSpaceQRP_DDRM;
+import org.ejml.interfaces.SolveNullSpace;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 
 import java.util.List;
@@ -67,7 +68,7 @@ public class PoseFromPairLinear6 {
 	// The rank 11 linear system
 	private DMatrixRMaj A = new DMatrixRMaj(1,12);
 
-	private SolveNullSpaceQR_DDRM solveNullspace = new SolveNullSpaceQR_DDRM();
+	private SolveNullSpace<DMatrixRMaj> solveNullspace = new SolveNullSpaceQRP_DDRM();
 	private SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(0, 0, true, true, false);
 
 	// parameterized rotation and translation
