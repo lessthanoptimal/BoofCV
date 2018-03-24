@@ -392,7 +392,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			System.exit(0);
 		}
 		List<File> files = Arrays.asList(directory.listFiles());
-		BoofMiscOps.sortImageFiles(files);
+		BoofMiscOps.sortFilesByName(files);
 
 		if( files.isEmpty() ) {
 			System.err.println("No image files found!");

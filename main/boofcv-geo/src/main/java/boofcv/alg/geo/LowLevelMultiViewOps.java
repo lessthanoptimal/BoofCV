@@ -21,6 +21,8 @@ package boofcv.alg.geo;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.data.DMatrix1Row;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
@@ -89,7 +91,7 @@ public class LowLevelMultiViewOps {
 		double meanX2 = 0; double meanY2 = 0;
 
 		for( AssociatedPair p : points ) {
-			meanX1 += p.p1.x;  meanY1 += p.p1.y;
+			meanX1 += p.p1.x; meanY1 += p.p1.y;
 			meanX2 += p.p2.x; meanY2 += p.p2.y;
 		}
 
@@ -169,5 +171,25 @@ public class LowLevelMultiViewOps {
 		N1.stdX = Math.sqrt(stdX1/points.size()); N1.stdY = Math.sqrt(stdY1/points.size());
 		N2.stdX = Math.sqrt(stdX2/points.size()); N2.stdY = Math.sqrt(stdY2/points.size());
 		N3.stdX = Math.sqrt(stdX3/points.size()); N3.stdY = Math.sqrt(stdY3/points.size());
+	}
+
+	public static void applyNormalization(List<AssociatedPair> points,
+										  NormalizationPoint2D N1, NormalizationPoint2D N2,
+										  DMatrix1Row X1 , DMatrixRMaj X2 )
+	{
+		final int size = points.size();
+
+		X1.reshape(size,2);
+		X2.reshape(size,2);
+
+		for (int i = 0,index = 0; i < size; i++,index+=2) {
+			AssociatedPair pair = points.get(i);
+
+			X1.data[index]   = (pair.p1.x - N1.meanX)/N1.stdX;
+			X1.data[index+1] = (pair.p1.y - N1.meanY)/N1.stdY;
+
+			X2.data[index]   = (pair.p2.x - N2.meanX)/N2.stdX;
+			X2.data[index+1] = (pair.p2.y - N2.meanY)/N2.stdY;
+		}
 	}
 }

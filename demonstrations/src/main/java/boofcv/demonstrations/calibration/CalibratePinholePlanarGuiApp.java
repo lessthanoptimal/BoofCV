@@ -75,7 +75,7 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 		this.detector = detector;
 		if( images.size() == 0 )
 			throw new IllegalArgumentException("No images!");
-		BoofMiscOps.sortImageNames(images);
+		BoofMiscOps.sortFileNames(images);
 		calibrator = new CalibrateMonoPlanar(detector.getLayout());
 		calibrator.configurePinhole(true,numRadial,includeTangential);
 		this.images = images;
