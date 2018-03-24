@@ -29,7 +29,7 @@ import org.ejml.data.Complex_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
-import org.ejml.dense.row.linsol.qr.SolveNullSpaceQR_DDRM;
+import org.ejml.dense.row.linsol.qr.SolveNullSpaceQRP_DDRM;
 import org.ejml.interfaces.SolveNullSpace;
 import org.ejml.interfaces.linsol.LinearSolverDense;
 
@@ -65,7 +65,7 @@ public class EssentialNister5 {
 	private DMatrixRMaj Q = new DMatrixRMaj(5,9);
 	// contains the span of A
 	private DMatrixRMaj nullspace = new DMatrixRMaj(9,9);
-	private SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceQR_DDRM();
+	private SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceQRP_DDRM();
 
 	// where all the ugly equations go
 	private HelperNister5 helper = new HelperNister5();
