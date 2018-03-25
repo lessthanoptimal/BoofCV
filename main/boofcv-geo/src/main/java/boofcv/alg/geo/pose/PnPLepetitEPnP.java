@@ -30,7 +30,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.SingularOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
-import org.ejml.dense.row.linsol.qr.SolveNullSpaceQRP_DDRM;
+import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
 import org.ejml.dense.row.mult.MatrixVectorMult_DDRM;
 import org.ejml.interfaces.SolveNullSpace;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
@@ -108,7 +108,7 @@ import java.util.List;
 public class PnPLepetitEPnP {
 
 	// used to solve various linear problems
-	private SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceQRP_DDRM();
+	private SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceSvd_DDRM();
 	DMatrixRMaj nullspace = new DMatrixRMaj(1,1);
 	private SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(12, 12, false, true, false);
 	private LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(6, 4);

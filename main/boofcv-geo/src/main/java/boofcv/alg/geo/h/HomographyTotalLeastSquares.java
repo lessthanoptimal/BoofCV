@@ -24,7 +24,7 @@ import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DMatrix2x2;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.fixed.CommonOps_DDF2;
-import org.ejml.dense.row.linsol.qr.SolveNullSpaceQRP_DDRM;
+import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
 import org.ejml.interfaces.SolveNullSpace;
 
 import java.util.List;
@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class HomographyTotalLeastSquares {
 	// Solver for null space
-	SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceQRP_DDRM();
+	SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceSvd_DDRM();
 	DMatrixRMaj nullspace = new DMatrixRMaj(3,1);
 
 	// Used to normalize input points
