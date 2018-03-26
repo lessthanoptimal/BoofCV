@@ -52,7 +52,7 @@ public class HomographyTotalLeastSquares {
 	DMatrixRMaj X1 = new DMatrixRMaj(1,1);
 	DMatrixRMaj X2 = new DMatrixRMaj(1,1);
 
-	DMatrixRMaj A = new DMatrixRMaj();
+	DMatrixRMaj A = new DMatrixRMaj(1,1);
 
 	/**
 	 * <p>
@@ -70,18 +70,18 @@ public class HomographyTotalLeastSquares {
 		if (points.size() < 4)
 			throw new IllegalArgumentException("Must be at least 4 points.");
 
-		final int N = points.size();
-
 		// Have to normalize the points. Being zero mean is essential in its derivation
 		LowLevelMultiViewOps.computeNormalization(points, N1, N2);
 		LowLevelMultiViewOps.applyNormalization(points,N1,N2,X1,X2);
 		// X1 = (x[i],y[i]; ... ) and X2 = (x[i]',y[i]'; ... )
-
-		constructA79(N);
+		// X1 = hat{P}                X2 = X'  <-- paper notation
+		constructA79();
 
 		// Solve for elements H_7 to H_9
 		if( !solverNull.process(A,1,nullspace))
 			return false;
+
+		nullspace.print();
 
 		// Determine H_1 to H_6
 		backSubstitution();
@@ -89,7 +89,12 @@ public class HomographyTotalLeastSquares {
 		return false;
 	}
 
-	private void constructA79(int n) {
+	/**
+	 * Constructs equation for elements 7 to 9 in H
+	 */
+	void constructA79() {
+		final int N = X1.numRows;
+
 		// Pseudo-inverse of hat(p)
 		DMatrixRMaj P_plus = new DMatrixRMaj(1,1);
 		computePseudo(X1,P_plus);
@@ -105,43 +110,41 @@ public class HomographyTotalLeastSquares {
 		computePPpX(X1,P_plus,X2,1,PPpY);
 
 		//============ Equations 20
-		double XP_bar[] = new double[2];
-		double YP_bar[] = new double[2];
-		computeEq20(X1,X2,0, n,XP_bar);
-		computeEq20(X1,X2,1, n,YP_bar);
+		double XP_bar[] = new double[4];
+		computeEq20(X2,X1,XP_bar);
 
 		//============ Equation 21
-		DMatrixRMaj A = new DMatrixRMaj(n *2,3);
+		A.reshape(N *2,3);
 		double XP_bar_x = XP_bar[0];
 		double XP_bar_y = XP_bar[1];
-		double YP_bar_x = YP_bar[0];
-		double YP_bar_y = YP_bar[1];
+		double YP_bar_x = XP_bar[2];
+		double YP_bar_y = XP_bar[3];
 
 		// Compute the top half of A
-		for (int i = 0, index = 0, indexA = 0; i < n; i++, index+=2) {
-			double x = -X1.data[i*2];
-			double x_hat = X2.data[index];
-			double y_hat = X2.data[index+1];
+		for (int i = 0, index = 0, indexA = 0; i < N; i++, index+=2) {
+			double x = -X2.data[i*2];        // X'
+			double P_hat_x = X1.data[index];   // hat{P}[0]
+			double P_hat_y = X1.data[index+1]; // hat{P}[1]
 
 			// x'*hat{p} - bar{X*P} - PPpXP
-			A.data[indexA++] = x*x_hat - XP_bar_x - PPpXP.data[index];
-			A.data[indexA++] = x*y_hat - XP_bar_y - PPpXP.data[index+1];
+			A.data[indexA++] = x*P_hat_x - XP_bar_x - PPpXP.data[index];
+			A.data[indexA++] = x*P_hat_y - XP_bar_y - PPpXP.data[index+1];
 
 			// X'*1 - PPx1
 			A.data[indexA++] = x - PPpX.data[i];
 		}
 		// Compute the bottom half of A
-		for (int i = 0, index = 0, indexA = 0; i < n; i++, index+=2) {
-			double y = -X1.data[i*2+1];
-			double x_hat = X2.data[index];
-			double y_hat = X2.data[index+1];
+		for (int i = 0, index = 0, indexA = N*3; i < N; i++, index+=2) {
+			double x = -X2.data[i*2+1];
+			double P_hat_x = X1.data[index];
+			double P_hat_y = X1.data[index+1];
 
 			// x'*hat{p} - bar{X*P} - PPpXP
-			A.data[indexA++] = y*x_hat - YP_bar_x - PPpYP.data[index];
-			A.data[indexA++] = y*y_hat - YP_bar_y - PPpYP.data[index+1];
+			A.data[indexA++] = x*P_hat_x - YP_bar_x - PPpYP.data[index];
+			A.data[indexA++] = x*P_hat_y - YP_bar_y - PPpYP.data[index+1];
 
 			// X'*1 - PPx1
-			A.data[indexA++] = y - PPpY.data[i];
+			A.data[indexA++] = x - PPpY.data[i];
 		}
 	}
 
@@ -152,15 +155,25 @@ public class HomographyTotalLeastSquares {
 
 	}
 
-	static void computeEq20( DMatrixRMaj A , DMatrixRMaj B , int offset, final int N , double output[]) {
-		double a00=0,a01=0;
-		for (int i = 0, index = 0; i < N; i++) {
-			double xi = A.data[index+offset];
-			a00 += xi*B.data[index++];
-			a01 += xi*B.data[index++];
+	static void computeEq20( DMatrixRMaj X , DMatrixRMaj P , double output[]) {
+		final int N = X.numRows;
+
+		double a00=0,a01=0,a10=0,a11=0;
+		for (int i = 0, index = 0; i < N; i++,index+=2) {
+			double x1 = X.data[index];
+			double x2 = X.data[index+1];
+			double p1 = P.data[index];
+			double p2 = P.data[index+1];
+
+			a00 += x1*p1;
+			a01 += x1*p2;
+			a10 += x2*p1;
+			a11 += x2*p2;
 		}
 		output[0] = -a00/N;
 		output[1] = -a01/N;
+		output[2] = -a10/N;
+		output[3] = -a11/N;
 	}
 
 	/**
@@ -172,24 +185,23 @@ public class HomographyTotalLeastSquares {
 		DMatrix2x2 m = new DMatrix2x2();
 		DMatrix2x2 m_inv = new DMatrix2x2();
 
-		for (int i = 0, index = 0; i < N; i++) {
-			double a_i0 = A.data[index];
-			double a_i1 = A.data[index+1];
-
-			m.a11 += a_i0*a_i0;
-			m.a12 += a_i0*a_i1;
-			m.a22 += a_i1*a_i1;
+		for (int i = 0, index=0; i < N; i++) {
+			double a_i1 = A.data[index++];
+			double a_i2 = A.data[index++];
+			m.a11 += a_i1*a_i1;
+			m.a12 += a_i1*a_i2;
+			m.a22 += a_i2*a_i2;
 		}
 		m.a21 = m.a12;
 		CommonOps_DDF2.invert(m,m_inv);
 
 		output.reshape(2,N);
-		for (int i = 0,index=0; i < N; i++,index+=2) {
-			output.data[i] = A.data[index]*m_inv.a12 + A.data[index+1]*m_inv.a11;
+		for (int i = 0,index=0; i < N; i++) {
+			output.data[i] = A.data[index++]*m_inv.a11 + A.data[index++]*m_inv.a12;
 		}
 		int end = 2*N;
-		for (int i = N,A_index=0; i < end; i++,A_index+=2) {
-			output.data[i] = A.data[A_index]*m_inv.a22 + A.data[A_index+1]*m_inv.a21;
+		for (int i = N,A_index=0; i < end; i++) {
+			output.data[i] = A.data[A_index++]*m_inv.a21 + A.data[A_index++]*m_inv.a22;
 		}
 	}
 
@@ -215,10 +227,10 @@ public class HomographyTotalLeastSquares {
 		// A = P_plus*( diag(x)*P ) <-- 2 x 2
 		double a00=0,a01=0,a10=0,a11=0;
 		for (int i = 0, index=0; i < N; i++, index += 2) {
-			a00 += P_plus.data[index]*output.data[index];
-			a01 += P_plus.data[index]*output.data[index+1];
-			a10 += P_plus.data[index+1]*output.data[index];
-			a11 += P_plus.data[index+1]*output.data[index+1];
+			a00 += P_plus.data[i]*output.data[index];
+			a01 += P_plus.data[i]*output.data[index+1];
+			a10 += P_plus.data[i+N]*output.data[index];
+			a11 += P_plus.data[i+N]*output.data[index+1];
 		}
 
 		// P*A <-- N x 2
@@ -228,6 +240,9 @@ public class HomographyTotalLeastSquares {
 		}
 	}
 
+	/**
+	 * P*P_plus*X*1
+	 */
 	static void computePPpX( DMatrixRMaj P , DMatrixRMaj P_plus, DMatrixRMaj X , int offsetX,  DMatrixRMaj output ) {
 		final int N = P.numRows;
 		output.reshape(N,1);
