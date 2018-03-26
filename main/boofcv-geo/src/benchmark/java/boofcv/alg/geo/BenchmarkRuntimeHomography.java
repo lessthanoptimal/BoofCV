@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,12 +73,14 @@ public class BenchmarkRuntimeHomography extends ArtificialStereoScene {
 			pairs4.add(pairs.get(i));
 		}
 
-		System.out.println("Minimum Number");
-		ProfileOperation.printOpsPerSec(new Estimate("Linear 4 Norm", FactoryMultiView.computeHomography(true), pairs4), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Estimate("Linear 4 Unorm", FactoryMultiView.computeHomography(false),pairs4), TEST_TIME);
+		System.out.println("4 pairs");
+		ProfileOperation.printOpsPerSec(new Estimate("DLT Norm", FactoryMultiView.computeHomographyDLT(true), pairs4), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("DLT Unorm", FactoryMultiView.computeHomographyDLT(false),pairs4), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("TLS", FactoryMultiView.computeHomographyTLS(),pairs4), TEST_TIME);
 
-		System.out.println("N");
-		ProfileOperation.printOpsPerSec(new Estimate("Linear 4", FactoryMultiView.computeHomography(true),pairs), TEST_TIME);
+		System.out.println(pairs.size()+" pairs");
+		ProfileOperation.printOpsPerSec(new Estimate("DLT Norm", FactoryMultiView.computeHomographyDLT(true),pairs), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("TLS", FactoryMultiView.computeHomographyTLS(),pairs), TEST_TIME);
 
 	}
 	

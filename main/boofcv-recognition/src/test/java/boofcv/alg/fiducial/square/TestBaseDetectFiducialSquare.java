@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -312,7 +312,7 @@ public class TestBaseDetectFiducialSquare {
 		associatedPairs.add(new AssociatedPair(where.c,new Point2D_F64(w,h)));
 		associatedPairs.add(new AssociatedPair(where.d,new Point2D_F64(0,h)));
 
-		Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomography(true);
+		Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomographyDLT(true);
 
 		DMatrixRMaj H = new DMatrixRMaj(3,3);
 		computeHomography.process(associatedPairs, H);

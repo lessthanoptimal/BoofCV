@@ -19,28 +19,28 @@
 package boofcv.abst.geo.h;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.alg.geo.h.HomographyDirectLinearTransform;
+import boofcv.alg.geo.h.HomographyTotalLeastSquares;
 import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
 /**
- * Wrapper around {@link HomographyDirectLinearTransform} for {@link boofcv.abst.geo.Estimate1ofEpipolar}.
- * 
+ * Wrapper around {@link HomographyTotalLeastSquares} for {@link Estimate1ofEpipolar}.
+ *
  * @author Peter Abeles
  */
-public class WrapHomographyLinear implements Estimate1ofEpipolar
+public class HomographyTLS_to_Epipolar implements Estimate1ofEpipolar
 {
-	HomographyDirectLinearTransform alg;
+	HomographyTotalLeastSquares alg;
 
-	public WrapHomographyLinear(HomographyDirectLinearTransform alg) {
+	public HomographyTLS_to_Epipolar(HomographyTotalLeastSquares alg) {
 		this.alg = alg;
 	}
 
 	@Override
-	public boolean process(List<AssociatedPair> points, DMatrixRMaj estimatedModel) {
-		return alg.process(points,estimatedModel);
+	public boolean process(List<AssociatedPair> points, DMatrixRMaj H) {
+		return alg.process(points,H);
 	}
 
 	@Override
