@@ -130,7 +130,7 @@ public class HomographyDirectLinearTransform {
 	/**
 	 * Undoes normalization for a homography matrix.
 	 */
-	protected void undoNormalizationH(DMatrixRMaj M, NormalizationPoint2D N1, NormalizationPoint2D N2) {
+	public static void undoNormalizationH(DMatrixRMaj M, NormalizationPoint2D N1, NormalizationPoint2D N2) {
 		SimpleMatrix a = SimpleMatrix.wrap(M);
 		SimpleMatrix b = SimpleMatrix.wrap(N1.matrix());
 		SimpleMatrix c_inv = SimpleMatrix.wrap(N2.matrixInv());
