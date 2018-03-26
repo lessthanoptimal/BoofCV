@@ -58,8 +58,9 @@ public class HomographyTotalLeastSquares {
 	// Reduced matrix for solving for 6,7,8
 	DMatrixRMaj A = new DMatrixRMaj(1,1);
 
-	DMatrixRMaj P_plus = new DMatrixRMaj(1,1);
-	double XP_bar[] = new double[4];
+	// Storage for intermediate steps
+	private DMatrixRMaj P_plus = new DMatrixRMaj(1,1);
+	private double XP_bar[] = new double[4];
 
 	/**
 	 * <p>
@@ -82,7 +83,7 @@ public class HomographyTotalLeastSquares {
 		LowLevelMultiViewOps.applyNormalization(points,N1,N2,X1,X2);
 
 		//  Construct the linear system which is used to solve for H[6] to H[8]
-		constructA79();
+		constructA678();
 
 		// Solve for those elements using the null space
 		if( !solverNull.process(A,1,nullspace))
@@ -94,13 +95,13 @@ public class HomographyTotalLeastSquares {
 		H.data[8] = nullspace.data[2];
 
 		// Determine H[0] to H[5]
-		H.data[2] = -XP_bar[0]*H.data[6] - XP_bar[1]*H.data[7];
-		H.data[5] = -XP_bar[2]*H.data[6] - XP_bar[3]*H.data[7];
+		H.data[2] = -(XP_bar[0]*H.data[6] + XP_bar[1]*H.data[7]);
+		H.data[5] = -(XP_bar[2]*H.data[6] + XP_bar[3]*H.data[7]);
 
 		backsubstitution0134(P_plus,X1,X2,H.data);
 
 		// Remove the normalization
-		HomographyDirectLinearTransform.undoNormalizationH(foundH,N2,N1);
+		HomographyDirectLinearTransform.undoNormalizationH(foundH,N1,N2);
 
 		CommonOps_DDRM.scale(1.0/foundH.get(2,2),foundH);
 
@@ -108,9 +109,48 @@ public class HomographyTotalLeastSquares {
 	}
 
 	/**
-	 * Constructs equation for elements 7 to 9 in H
+	 * Backsubstitution for solving for 0,1 and 3,4 using solution for 6,7,8
 	 */
-	void constructA79() {
+	static void backsubstitution0134(DMatrixRMaj P_plus, DMatrixRMaj P , DMatrixRMaj X ,
+									 double H[] ) {
+		final int N = P.numRows;
+		DMatrixRMaj tmp = new DMatrixRMaj(N*2, 1);
+
+		double H6 = H[6];
+		double H7 = H[7];
+		double H8 = H[8];
+
+		for (int i = 0, index = 0; i < N; i++) {
+			double x = -X.data[index],y = -X.data[index+1];
+			double sum = P.data[index++] * H6 + P.data[index++] * H7 + H8;
+			tmp.data[i] = x * sum;
+			tmp.data[i+N] = y * sum;
+		}
+
+		double h0=0,h1=0,h3=0,h4=0;
+		for (int i = 0; i < N; i++) {
+			double P_pls_0 = P_plus.data[i];
+			double P_pls_1 = P_plus.data[i+N];
+
+			double tmp_i = tmp.data[i];
+			double tmp_j = tmp.data[i+N];
+
+			h0 += P_pls_0*tmp_i;
+			h1 += P_pls_1*tmp_i;
+			h3 += P_pls_0*tmp_j;
+			h4 += P_pls_1*tmp_j;
+		}
+
+		H[0] = -h0;
+		H[1] = -h1;
+		H[3] = -h3;
+		H[4] = -h4;
+	}
+
+	/**
+	 * Constructs equation for elements 6 to 8 in H
+	 */
+	void constructA678() {
 		final int N = X1.numRows;
 
 		// Pseudo-inverse of hat(p)
@@ -164,45 +204,6 @@ public class HomographyTotalLeastSquares {
 		}
 	}
 
-	/**
-	 * Backsubstitution for solving for 0,1 and 3,4 using solution for 6,7,8
-	 */
-	static void backsubstitution0134(DMatrixRMaj P_plus, DMatrixRMaj P , DMatrixRMaj X ,
-									 double H[] ) {
-		final int N = P.numRows;
-		DMatrixRMaj tmp = new DMatrixRMaj(N*2, 1);
-
-		double H6 = H[6];
-		double H7 = H[7];
-		double H8 = H[8];
-
-		for (int i = 0, index = 0; i < N; i++) {
-			double x = X.data[index],y = X.data[index+1];
-			double sum = P.data[index++] * H6 + P.data[index++] * H7 + H8;
-			tmp.data[i] = x * sum;
-			tmp.data[i+N] = y * sum;
-		}
-
-		double h0=0,h1=0,h3=0,h4=0;
-		for (int i = 0; i < N; i++) {
-			double P_pls_0 = P_plus.data[i];
-			double P_pls_1 = P_plus.data[i+N];
-
-			double tmp_i = tmp.data[i];
-			double tmp_j = tmp.data[i+N];
-
-			h0 += P_pls_0*tmp_i;
-			h1 += P_pls_1*tmp_i;
-			h3 += P_pls_0*tmp_j;
-			h4 += P_pls_1*tmp_j;
-		}
-
-		H[0] = -h0;
-		H[1] = -h1;
-		H[3] = -h3;
-		H[4] = -h4;
-	}
-
 	static void computeEq20( DMatrixRMaj X , DMatrixRMaj P , double output[]) {
 		final int N = X.numRows;
 
@@ -254,12 +255,9 @@ public class HomographyTotalLeastSquares {
 	}
 
 	/**
-	 * Computes P*P_plus*X*P. Takes in account the size of each matrix and does the multiplcation in an order
+	 * Computes P*P_plus*X*P. Takes in account the size of each matrix and does the multiplication in an order
 	 * to minimize memory requirements. A naive implementation requires a temporary array of NxN
-	 * @param P
-	 * @param P_plus
 	 * @param X A diagonal matrix
-	 * @param output
 	 */
 	static void computePPXP( DMatrixRMaj P , DMatrixRMaj P_plus, DMatrixRMaj X , int offsetX,  DMatrixRMaj output ) {
 		final int N = P.numRows;

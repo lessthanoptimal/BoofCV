@@ -23,6 +23,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.equation.Equation;
@@ -40,7 +41,7 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public class TestHomographyTotalLeastSquares extends CommonHomographyChecks{
-	Random rand = new Random(234);
+	private Random rand = new Random(234);
 
 	@Test
 	public void perfect() {
@@ -48,6 +49,7 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks{
 
 		checkHomography(4, alg );
 		checkHomography(10, alg );
+		checkHomography(500, alg );
 	}
 
 	/**
@@ -78,9 +80,11 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks{
 
 	@Test
 	public void checkAgainstKnownH() {
-		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1.5,0,0.5},{0,2,0.2},{0.05,0,1.5}});
+		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1.5,0,0.5},{0.2,2,0.2},{0.05,0,1.5}});
+//		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1,0,0},{0,1,0},{0,0,1}});
+//		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1,0,0},{0,1,0},{0,0,2.0}});
 
-		int N = 20;
+		int N = 10000;
 		List<AssociatedPair> list = new ArrayList<>();
 
 		for (int i = 0; i < N; i++) {
@@ -90,20 +94,20 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks{
 			GeometryMath_F64.mult(H,p.p1,p.p2);
 			list.add(p);
 		}
-		SimpleMatrix Hinv = new SimpleMatrix(H).invert();
-		Hinv=Hinv.scale(1.0/Hinv.get(2,2));
-		Hinv.print();
-		H.print();
+
+		CommonOps_DDRM.scale(1.0/H.get(2,2),H);
+//		H.print();
 		DMatrixRMaj found = new DMatrixRMaj(3,3);
 		HomographyTotalLeastSquares alg = new HomographyTotalLeastSquares();
 		alg.process(list,found);
 
-		System.out.println("\n\nFound");
-		found.print();
+//		System.out.println("\n\nFound");
+//		found.print();
+		assertTrue(MatrixFeatures_DDRM.isIdentical(found,H,UtilEjml.TEST_F64));
 	}
 
 	@Test
-	public void constructA79() {
+	public void constructA678() {
 		int N = 10;
 		SimpleMatrix P = SimpleMatrix.random_DDRM(N,2,-1,1,rand);
 		SimpleMatrix X = SimpleMatrix.random_DDRM(N,2,-1,1,rand);
@@ -123,13 +127,12 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks{
 		HomographyTotalLeastSquares alg = new HomographyTotalLeastSquares();
 		alg.X1.set(P.getDDRM());
 		alg.X2.set(X.getDDRM());
-		alg.constructA79();
+		alg.constructA678();
 		assertTrue(MatrixFeatures_DDRM.isIdentical(eq.lookupDDRM("A"),alg.A,UtilEjml.TEST_F64));
-
 	}
 
 	@Test
-	public void backsubstitution678() {
+	public void backsubstitution0134() {
 		int N = 10;
 		SimpleMatrix Pp = SimpleMatrix.random_DDRM(2,N,-1,1,rand);
 		SimpleMatrix P = SimpleMatrix.random_DDRM(N,2,-1,1,rand);
@@ -144,8 +147,8 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks{
 		eq.alias(P.copy(),"P",Pp.copy(),"Pp",X.copy(),"X",N,"N");
 
 		eq.process("H=[0.4;0.8;-0.3]");
-		eq.process("Ax = -Pp*diag(X(:,0))*[P,ones(N,1)]*H");
-		eq.process("Ay = -Pp*diag(X(:,1))*[P,ones(N,1)]*H");
+		eq.process("Ax = -Pp*diag(-X(:,0))*[P,ones(N,1)]*H");
+		eq.process("Ay = -Pp*diag(-X(:,1))*[P,ones(N,1)]*H");
 
 		HomographyTotalLeastSquares.backsubstitution0134(Pp.getMatrix(),P.getMatrix(),X.getMatrix(),H);
 
@@ -164,10 +167,10 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks{
 		SimpleMatrix A = SimpleMatrix.random_DDRM(10,2,-1,1,rand);
 		SimpleMatrix B = SimpleMatrix.random_DDRM(10,2,-1,1,rand);
 
-		SimpleMatrix expected = A.transpose().mult(B).scale(1.0/10.0).negative();
+		SimpleMatrix expected = A.transpose().mult(B).scale(-1.0/10.0);
 		double[] found = new double[4];
 
-		HomographyTotalLeastSquares.computeEq20(A.copy().getDDRM(),B.getDDRM(),found);
+		HomographyTotalLeastSquares.computeEq20(A.getDDRM(),B.getDDRM(),found);
 		assertEquals(expected.get(0,0),found[0],UtilEjml.TEST_F64);
 		assertEquals(expected.get(0,1),found[1],UtilEjml.TEST_F64);
 		assertEquals(expected.get(1,0),found[2],UtilEjml.TEST_F64);

@@ -8,7 +8,8 @@ Version : 0.30
 
 - Renamed HomographyLinear4 to HomographyDirectLinearTransform
   * More consistent with the literature
-- TODO Added HomographyTotalLeastSquares
+- Added HomographyTotalLeastSquares
+  * Computes the homography gives a set of associated 2D points
   * Mathew Harker and Paul O'Leary, "Computation of Homographies"
 - Several algorithms which were computing null space from SVD are now using QR
   * This is much faster
