@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,9 +34,9 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkRuntimePose extends ArtificialStereoScene {
+public class BenchmarkRuntimePnP extends ArtificialStereoScene {
 	static final long TEST_TIME = 1000;
-	static final int NUM_POINTS = 5;
+	static final int NUM_POINTS = 4;
 	static final boolean FUNDAMENTAL = false;
 
 	Se3_F64 found = new Se3_F64();
@@ -73,7 +73,8 @@ public class BenchmarkRuntimePose extends ArtificialStereoScene {
 
 		@Override
 		public void process() {
-			alg.process(obs,found);
+			if( !alg.process(obs,found) )
+				throw new RuntimeException("Failed!");
 		}
 
 		@Override
@@ -113,7 +114,7 @@ public class BenchmarkRuntimePose extends ArtificialStereoScene {
 	}
 	
 	public static void main( String args[] ) {
-		BenchmarkRuntimePose alg = new BenchmarkRuntimePose();
+		BenchmarkRuntimePnP alg = new BenchmarkRuntimePnP();
 
 		alg.runAll();
 	}

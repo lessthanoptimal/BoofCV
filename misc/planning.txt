@@ -13,7 +13,6 @@ TOP ITEMS
 
 - TODO Visualization tools for Direct VO
 -      Show warped image
-- TODO ExampleRectifyUncalibratedStereo is upside down.  Adjust the math to avoid that
 - TODO Tutorial on image features?  Sparse and dense?
 - TODO Look at AKAZE feature
 - TODO Clarify how you calibrate the camera in Processing
@@ -50,6 +49,13 @@ Less High Priority Next Release
 
 - SFM
   * Naive implementation of DLS
+    http://www-users.cs.umn.edu/~stergios/papers/ICCV-11-DLS-PnP.pdf
+    https://code.google.com/archive/p/dls-pnp-python/downloads
+  * RPnP
+    A Robust O(n) Solution to the Perspective-n-Point Problem
+    https://xuchi.weebly.com/rpnp.html
+  * MLPNP - A REAL-TIME MAXIMUM LIKELIHOOD SOLUTION TO THE PERSPECTIVE-N-POINT PROBLEM
+
 
 - Fiducials
   * Detection:  Return bounding polygon in pixel coordinates (undistorted and distorted)?
