@@ -94,10 +94,6 @@ import java.util.List;
  * </p>
  *
  * <p>
- * TODO consider revising documentation. A bug was found in SVD where the incorrect number of singular values was
- * extracted.</p>
- *
- * <p>
  * [1]  Vincent Lepetit, Francesc Moreno-Noguer, and Pascal Fua, "EPnP: An Accurate O(n) Solution to the PnP Problem"
  * Int. J. Comput. Visionm, vol 81, issue 2, 2009
  * </p>
@@ -213,6 +209,8 @@ public class PnPLepetitEPnP {
 	 */
 	public void process( List<Point3D_F64> worldPts , List<Point2D_F64> observed , Se3_F64 solutionModel )
 	{
+		if( worldPts.size() < 4 )
+			throw new IllegalArgumentException("Must provide at least 4 points");
 		if( worldPts.size() != observed.size() )
 			throw new IllegalArgumentException("Must have the same number of observations and world points");
 
