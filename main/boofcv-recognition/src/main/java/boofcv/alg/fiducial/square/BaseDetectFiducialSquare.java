@@ -20,9 +20,9 @@ package boofcv.alg.fiducial.square;
 
 import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.RefineEpipolar;
 import boofcv.alg.distort.*;
-import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
@@ -87,7 +87,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	protected GrayU8 binary = new GrayU8(1,1);
 
 	// Used to compute/remove perspective distortion
-	private HomographyDirectLinearTransform computeHomography = new HomographyDirectLinearTransform(true);
+	private Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomographyDLT(true);
 	private RefineEpipolar refineHomography = FactoryMultiView.refineHomography(1e-4,100, EpipolarError.SAMPSON);
 	private DMatrixRMaj H = new DMatrixRMaj(3,3);
 	private DMatrixRMaj H_refined = new DMatrixRMaj(3,3);

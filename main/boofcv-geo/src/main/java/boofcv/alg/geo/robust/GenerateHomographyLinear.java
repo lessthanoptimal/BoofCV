@@ -19,7 +19,8 @@
 package boofcv.alg.geo.robust;
 
 
-import boofcv.alg.geo.h.HomographyDirectLinearTransform;
+import boofcv.abst.geo.Estimate1ofEpipolar;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.homography.UtilHomography_F64;
@@ -39,11 +40,12 @@ public class GenerateHomographyLinear implements
 		ModelFitter<Homography2D_F64,AssociatedPair>
 {
 
-	HomographyDirectLinearTransform alg;
+	Estimate1ofEpipolar alg;
 	DMatrixRMaj H = new DMatrixRMaj(3,3);
 
 	public GenerateHomographyLinear( boolean normalizeInput ) {
-		alg = new HomographyDirectLinearTransform(normalizeInput);
+		alg = FactoryMultiView.computeHomographyDLT(normalizeInput);
+//		alg = FactoryMultiView.computeHomographyTLS();
 	}
 
 	@Override

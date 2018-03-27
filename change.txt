@@ -10,13 +10,15 @@ Version : 0.30
   * More consistent with the literature
 - Added HomographyTotalLeastSquares
   * Computes the homography gives a set of associated 2D points
-  * Mathew Harker and Paul O'Leary, "Computation of Homographies"
-- Several algorithms which were computing null space from SVD are now using QR
-  * This is much faster
+  * About 4x faster than DLT
+  * Mathew Harker and Paul O'Leary "Computation of Homographies"
 
 - TODO face detector
 - TODO QR Code regression images
 - TODO Android Camera2 API
+
+- TODO determine why solving for nullspace with causes decoding regression to get worse
+- TODO create regression for homography estimation
 
 ---------------------------------------------
 Date    : 2018/03/18
