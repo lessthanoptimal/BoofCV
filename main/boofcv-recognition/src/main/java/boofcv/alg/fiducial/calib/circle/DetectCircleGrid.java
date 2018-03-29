@@ -23,8 +23,8 @@ import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;

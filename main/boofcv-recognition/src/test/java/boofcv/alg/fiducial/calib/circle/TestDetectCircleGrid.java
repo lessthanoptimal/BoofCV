@@ -20,7 +20,7 @@ package boofcv.alg.fiducial.calib.circle;
 
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.struct.image.ImageGray;
-import georegression.struct.shapes.EllipseRotated_F64;
+import georegression.struct.curve.EllipseRotated_F64;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 

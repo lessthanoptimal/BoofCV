@@ -20,7 +20,7 @@ package boofcv.alg.fiducial.calib.circle;
 
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector.EllipseInfo;
 import georegression.misc.GrlConstants;
-import georegression.struct.shapes.EllipseRotated_F64;
+import georegression.struct.curve.EllipseRotated_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;

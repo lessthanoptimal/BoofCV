@@ -29,8 +29,8 @@ import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
 import java.io.File;
