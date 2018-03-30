@@ -18,11 +18,14 @@
 
 package boofcv.alg.geo.pose;
 
+import georegression.geometry.GeometryMath_F64;
+import georegression.struct.point.Vector3D_F64;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix2x2;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.equation.Equation;
+import org.ejml.equation.VariableMatrix;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
@@ -50,9 +53,27 @@ public class TestPnPInfinitesimalPlanePoseEstimation {
 	@Test
 	public void constructR() {
 		Equation eq = new Equation();
+		eq.getFunctions().add("cross", (inputs, manager) -> {
+			DMatrixRMaj output = manager.createMatrix().matrix;
+			DMatrixRMaj m1 = ((VariableMatrix)inputs.get(0)).matrix;
+			DMatrixRMaj m2 = ((VariableMatrix)inputs.get(1)).matrix;
+
+			output.reshape(3,1);
+			Vector3D_F64 v1 = new Vector3D_F64(m1.data[0],m1.data[1],m1.data[2]);
+			Vector3D_F64 v2 = new Vector3D_F64(m2.data[0],m2.data[1],m2.data[2]);
+			Vector3D_F64 c = new Vector3D_F64();
+
+			GeometryMath_F64.cross(v1,v2,c);
+			output.data[0] = c.x;
+			output.data[1] = c.y;
+			output.data[2] = c.z;
+		});
 		eq.process("R_v=randn(3,3)");
 		eq.process("R22=[1 2;3 4]");
 		eq.process("b=[5;6]");
+		eq.process("ca=cross([R22;b']*[1;0] , [R22;b']*[0;1])");
+
+		eq.print("ca");
 
 //		PnPInfinitesimalPlanePoseEstimation.constructR();
 
