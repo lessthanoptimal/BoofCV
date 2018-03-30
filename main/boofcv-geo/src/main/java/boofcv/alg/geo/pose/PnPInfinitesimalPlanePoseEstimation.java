@@ -24,6 +24,7 @@ import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix2x2;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
@@ -196,7 +197,15 @@ public class PnPInfinitesimalPlanePoseEstimation {
 	 */
 	protected void IPPE( DMatrixRMaj R1 , DMatrixRMaj R2 ) {
 		// Equation 23 - Compute R_v from v
-		compute_Kv();
+		double norm_v = Math.sqrt(v1*v1 + v2*v2);
+
+		if( norm_v <= UtilEjml.EPS ) {
+			// the plane is fronto-parallel to the camera, so set the corrective rotation Rv to identity.
+			// There will be only one solution to pose.
+			CommonOps_DDRM.setIdentity(R_v);
+		} else {
+			compute_Rv();
+		}
 
 		// [B|0] = [I2|-v]*R_v
 		compute_B(B,R_v,v1,v2);
@@ -207,7 +216,7 @@ public class PnPInfinitesimalPlanePoseEstimation {
 		CommonOps_DDF2.mult(B,J,A);
 
 		// Find the largest singular value of A
-		double gamma = largestSingularValue(A);
+		double gamma = largestSingularValue2x2(A);
 
 		// Compute R22 from A
 		CommonOps_DDF2.scale(1.0/gamma,A,R22);
@@ -223,8 +232,9 @@ public class PnPInfinitesimalPlanePoseEstimation {
 		l0.set(R22.a11,R22.a12,b1);
 		l1.set(R22.a21,R22.a22,b2);
 
-		l0.cross(l1,ca);
+		l0.cross(l1,ca); // ca = [c;a]
 
+		// This will be the solution for the two rotation matrices
 		// R1 = R_v*[R22, +c; b^T , a ]
 		constructR(R1,R_v,R22,b1,b2,ca,1,tmp);
 		constructR(R2,R_v,R22,b1,b2,ca,1,tmp);
@@ -262,18 +272,28 @@ public class PnPInfinitesimalPlanePoseEstimation {
 		B.a22 = R_v.data[4]+R_v.data[7]*-v2;
 	}
 
-	double largestSingularValue( DMatrix2x2 A ) {
-		CommonOps_DDF2.mult(A,A,AA);
+	double largestSingularValue2x2(DMatrix2x2 A ) {
+		// Possible more numerically stable version found online
+//		double a = A.a11,b = A.a12, c = A.a21, d = A.a22;
+//		double Theta = 0.5 * Math.atan2(2*a*c + 2*b*d, a*a + b*b - c*c - d*d);
+//		double Phi = 0.5 * Math.atan2(2*a*b + 2*c*d, a*a - b*b + c*c - d*d);
+//		double s11 = ( a* cos(Theta) + c*sin(Theta))*cos(Phi) + ( b*cos(Theta) + d*sin(Theta))*sin(Phi);
+//		double s22 = ( a*sin(Theta) - c*cos(Theta))*sin(Phi) + (-b*sin(Theta) + d*cos(Theta))*cos(Phi);
+//		return s11;
 
-		double a11_m_a22 = AA.a11-AA.a22;
-		return 0.5*(AA.a11 + AA.a22 + Math.sqrt(a11_m_a22*a11_m_a22 - 4.0*AA.a12*AA.a12));
+		// Equation 22 in the paper is incorrect. It's missing the outer square root.
+		// When trying to figure out what was going on people mentioned that this form of the equation is prone
+		// to numerical cancellation
+		CommonOps_DDF2.multTransB(A,A,AA);
+		double d = AA.a11-AA.a22;
+		return Math.sqrt(0.5*(AA.a11+AA.a22+Math.sqrt(d*d + 4*AA.a12*AA.a12)));
 	}
 
 	/**
 	 *  R_v is a 3x3 matrix
 	 *  R_v = I + sin(theta)*[k]_x + (1-cos(theta))[k]_x^2
 	 */
-	void compute_Kv() {
+	void compute_Rv() {
 		double t = Math.sqrt(v1*v1 + v2*v2);
 		double s = Math.sqrt(t*t + 1);
 		double cosT = 1.0/s;
@@ -282,7 +302,7 @@ public class PnPInfinitesimalPlanePoseEstimation {
 		K_x.data[0] = 0;   K_x.data[1] = 0;   K_x.data[2] = v1;
 		K_x.data[3] = 0;   K_x.data[4] = 0;   K_x.data[5] = v2;
 		K_x.data[6] = -v1; K_x.data[7] = -v2; K_x.data[8] = 0;
-		CommonOps_DDRM.divide(t,K_x);
+		CommonOps_DDRM.divide(K_x,t);
 		CommonOps_DDRM.setIdentity(R_v);
 		CommonOps_DDRM.addEquals(R_v,sinT,K_x);
 		CommonOps_DDRM.multAdd(1.0-cosT,K_x,K_x,R_v);
