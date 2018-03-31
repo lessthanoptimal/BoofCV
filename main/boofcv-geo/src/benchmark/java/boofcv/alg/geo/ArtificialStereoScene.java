@@ -59,13 +59,13 @@ public class ArtificialStereoScene {
 		// define the camera's motion
 		motion = new Se3_F64();
 		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.5 , -0.2, 0.15,null));
-		motion.getT().set(0.1,-0.2,0.01);
+		motion.getT().set(0.1,-0.2,5);
 
 		// randomly generate points in space
 		if( planar )
 			worldPoints = createPlanarScene(N);
 		else
-			worldPoints = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
+			worldPoints = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, -0.5, 1.5, N, rand);
 
 		// transform points into second camera's reference frame
 		pairs = new ArrayList<>();
@@ -121,7 +121,7 @@ public class ArtificialStereoScene {
 			double x = (rand.nextDouble()-0.5)*2;
 			double y = (rand.nextDouble()-0.5)*2;
 
-			ret.add( new Point3D_F64(x,y,3));
+			ret.add( new Point3D_F64(x,y,0));
 		}
 
 		return ret;

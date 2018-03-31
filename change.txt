@@ -12,12 +12,16 @@ Version : 0.30
   * Computes the homography gives a set of associated 2D points
   * About 4x faster than DLT
   * Mathew Harker and Paul O'Leary "Computation of Homographies"
+- PNP
+  * Added IPPE; Collins, Toby, and Adrien Bartoli. "Infinitesimal plane-based pose estimation."
 
-- TODO face detector
+- TODO PNP regression and benchmark
+- TODO Compare BoofCV's IPPE against original
+
 - TODO QR Code regression images
 - TODO Android Camera2 API
 
-- TODO determine why solving for nullspace with causes decoding regression to get worse
+- TODO determine why solving for nullspace with QRP causes decoding regression to get worse
 - TODO create regression for homography estimation
 
 ---------------------------------------------

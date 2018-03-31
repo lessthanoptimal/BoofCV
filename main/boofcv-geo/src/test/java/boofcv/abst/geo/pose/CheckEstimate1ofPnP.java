@@ -73,7 +73,6 @@ public abstract class CheckEstimate1ofPnP extends BaseChecksPnP {
 		Se3_F64 found = new Se3_F64();
 		assertTrue(alg.process(inputs,found));
 
-
 		assertTrue(MatrixFeatures_DDRM.isIdentical(worldToCamera.getR(), found.getR(), 1e-8));
 		assertTrue(found.getT().isIdentical(worldToCamera.getT(), 1e-8));
 	}

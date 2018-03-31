@@ -294,8 +294,8 @@ public class PnPInfinitesimalPlanePoseEstimation {
 		double b2 = Math.signum(B.a12)*Math.sqrt(B.a22);
 
 		// [c;a] = [R22;b^T]*[1;0] cross [R22;b^T]*[0;1]
-		l0.set(R22.a11,R22.a12,b1);
-		l1.set(R22.a21,R22.a22,b2);
+		l0.set(R22.a11,R22.a21,b1);
+		l1.set(R22.a12,R22.a22,b2);
 
 		ca.cross(l0,l1); // ca = [c;a]
 
