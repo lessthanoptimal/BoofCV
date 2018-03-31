@@ -25,13 +25,13 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
-import georegression.fitting.ellipse.ClosestPointEllipseAngle_F64;
-import georegression.fitting.ellipse.FitEllipseAlgebraic_F64;
+import georegression.fitting.curves.ClosestPointEllipseAngle_F64;
+import georegression.fitting.curves.FitEllipseAlgebraic_F64;
 import georegression.geometry.UtilEllipse_F64;
+import georegression.struct.curve.EllipseQuadratic_F64;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
-import georegression.struct.shapes.EllipseQuadratic_F64;
-import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.List;

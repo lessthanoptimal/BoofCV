@@ -46,7 +46,7 @@ public enum EnumPNP {
 	P3P_FINSTERWALDER,
 	/**
 	 * <ul>
-	 *     <li> Four or more points.
+	 *     <li> Four or more points. Really five points since 4 is unstable.
 	 *     <li> Single solution
 	 *     <li> Requires iteration.  See class JavaDoc for recommendations and peculiarities.
 	 *     <li> Efficient algorithm for many sample points
@@ -54,5 +54,17 @@ public enum EnumPNP {
 	 *
 	 * @see boofcv.alg.geo.pose.PnPLepetitEPnP
 	 */
-	EPNP
+	EPNP,
+
+	/**
+	 * <ul>
+	 *     <li> Four or more points.
+	 *     <li> Single solution
+	 *     <li> Points must lie on a plane and have z=0.
+	 *     <li> Efficient algorithm for many sample points
+	 * </ul>
+	 *
+	 * @see boofcv.alg.geo.pose.PnPInfinitesimalPlanePoseEstimation
+	 */
+	IPPE
 }

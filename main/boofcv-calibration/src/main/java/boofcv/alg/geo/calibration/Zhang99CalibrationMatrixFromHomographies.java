@@ -20,6 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
 
 import java.util.List;
@@ -107,6 +108,9 @@ public class Zhang99CalibrationMatrixFromHomographies {
 			if( !solverNull.process(A,1,b) )
 				throw new RuntimeException("SVD failed");
 			computeParam();
+		}
+		if(MatrixFeatures_DDRM.hasUncountable(K)) {
+			throw new RuntimeException("Failed!");
 		}
 	}
 

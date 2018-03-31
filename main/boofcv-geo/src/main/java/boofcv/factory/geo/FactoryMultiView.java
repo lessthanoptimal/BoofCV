@@ -324,6 +324,10 @@ public class FactoryMultiView {
 			case EPNP:
 				Estimate1ofPnP epnp = computePnP_1(which,numIterations,0);
 				return new Estimate1toNofPnP(epnp);
+
+			case IPPE:
+				Estimate1ofEpipolar H = FactoryMultiView.computeHomographyTLS();
+				return new Estimate1toNofPnP(new IPPE_to_EstimatePnP(H));
 		}
 
 		throw new IllegalArgumentException("Type "+which+" not known");
@@ -353,6 +357,9 @@ public class FactoryMultiView {
 			PnPLepetitEPnP alg = new PnPLepetitEPnP(0.1);
 			alg.setNumIterations(numIterations);
 			return new WrapPnPLepetitEPnP(alg);
+		} else if( which == EnumPNP.IPPE ) {
+			Estimate1ofEpipolar H = FactoryMultiView.computeHomographyTLS();
+			return new IPPE_to_EstimatePnP(H);
 		}
 
 		FastQueue<Se3_F64> solutions = new FastQueue<>(4, Se3_F64.class, true);

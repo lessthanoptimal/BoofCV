@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,9 +34,9 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkRuntimePnP extends ArtificialStereoScene {
+public class BenchmarkRuntimePose extends ArtificialStereoScene {
 	static final long TEST_TIME = 1000;
-	static final int NUM_POINTS = 4;
+	static final int NUM_POINTS = 200;
 	static final boolean FUNDAMENTAL = false;
 
 	Se3_F64 found = new Se3_F64();
@@ -56,14 +56,14 @@ public class BenchmarkRuntimePnP extends ArtificialStereoScene {
 		}
 	}
 
-	public class InterfacePNP extends PerformerBase {
+	public class InterfacePNP_Min extends PerformerBase {
 
 		Estimate1ofPnP alg;
 		String name;
 
 		List<Point2D3D> obs = new ArrayList<>();
 
-		public InterfacePNP(String name , Estimate1ofPnP alg) {
+		public InterfacePNP_Min(String name , Estimate1ofPnP alg) {
 			this.alg = alg;
 			this.name = name;
 
@@ -73,8 +73,7 @@ public class BenchmarkRuntimePnP extends ArtificialStereoScene {
 
 		@Override
 		public void process() {
-			if( !alg.process(obs,found) )
-				throw new RuntimeException("Failed!");
+			alg.process(obs,found);
 		}
 
 		@Override
@@ -83,6 +82,26 @@ public class BenchmarkRuntimePnP extends ArtificialStereoScene {
 		}
 	}
 
+	public class InterfacePNP extends PerformerBase {
+
+		Estimate1ofPnP alg;
+		String name;
+
+		public InterfacePNP(String name , Estimate1ofPnP alg) {
+			this.alg = alg;
+			this.name = name;
+		}
+
+		@Override
+		public void process() {
+			alg.process(observationPose,found);
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
+	}
 
 	public class PairLinear extends PerformerBase {
 
@@ -98,23 +117,27 @@ public class BenchmarkRuntimePnP extends ArtificialStereoScene {
 		System.out.println("=========  Profile numFeatures "+NUM_POINTS);
 		System.out.println();
 
-		init(NUM_POINTS, FUNDAMENTAL, false);
+		boolean planar = false;
+		init(NUM_POINTS, FUNDAMENTAL, planar);
 
 		Estimate1ofPnP grunert = FactoryMultiView.computePnP_1(EnumPNP.P3P_GRUNERT,-1,1);
 		Estimate1ofPnP finster = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,1);
+		Estimate1ofPnP ippe = FactoryMultiView.computePnP_1(EnumPNP.IPPE,-1,1);
 
 		ProfileOperation.printOpsPerSec(new EPnP(0), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new EPnP(5), TEST_TIME);
 //		ProfileOperation.printOpsPerSec(new PairLinear(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new InterfacePNP("grunert",grunert), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new InterfacePNP("finster",finster), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new InterfacePNP_Min("grunert",grunert), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new InterfacePNP_Min("finster",finster), TEST_TIME);
+		if( planar )
+			ProfileOperation.printOpsPerSec(new InterfacePNP("IPPE",ippe), TEST_TIME);
 
 		System.out.println();
 		System.out.println("Done");
 	}
 	
 	public static void main( String args[] ) {
-		BenchmarkRuntimePnP alg = new BenchmarkRuntimePnP();
+		BenchmarkRuntimePose alg = new BenchmarkRuntimePose();
 
 		alg.runAll();
 	}

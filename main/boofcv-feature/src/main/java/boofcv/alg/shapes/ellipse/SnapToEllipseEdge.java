@@ -20,11 +20,11 @@ package boofcv.alg.shapes.ellipse;
 
 import boofcv.alg.shapes.edge.BaseIntegralEdge;
 import boofcv.struct.image.ImageGray;
-import georegression.fitting.ellipse.FitEllipseWeightedAlgebraic_F64;
+import georegression.fitting.curves.FitEllipseWeightedAlgebraic_F64;
 import georegression.geometry.UtilEllipse_F64;
 import georegression.metric.UtilAngle;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 

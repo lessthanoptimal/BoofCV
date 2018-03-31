@@ -21,8 +21,8 @@ package boofcv.alg.fiducial.calib.circle;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.KeyPointsCircleHexagonalGrid.Tangents;
 import georegression.misc.GrlConstants;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.EllipseRotated_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

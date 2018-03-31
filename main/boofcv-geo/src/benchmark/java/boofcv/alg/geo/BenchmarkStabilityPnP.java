@@ -70,13 +70,12 @@ public class BenchmarkStabilityPnP extends ArtificialStereoScene {
 			}
 			errorEuler = 100*Math.sqrt(errorEuler)/Math.sqrt(sum);
 
-			System.out.printf("%3d angle %6.2f%% translation %6.2e\n", i,errorEuler, errorTran);
+			System.out.printf("%10s Err=%4.1f %3d angle %6.2f%% translation %6.2e\n", name,mag,i,errorEuler, errorTran);
 		}
 	}
 
-	public void evaluateAllMinimal() {
+	public void evaluateAllMinimal(boolean isPlanar) {
 		double pixelSigma = 0.5;
-		boolean isPlanar = false;
 		int numTrials = 1000;
 		int numTestPoints = 1;
 
@@ -91,6 +90,13 @@ public class BenchmarkStabilityPnP extends ArtificialStereoScene {
 		target = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,numTestPoints);
 		name = "Finsterwalder";
 		evaluateMinimal(pixelSigma,isPlanar,numTrials);
+
+		if( !isPlanar )
+			return;
+
+		target = FactoryMultiView.computePnP_1(EnumPNP.IPPE, -1, numTestPoints);
+		name = "IPPE";
+		evaluateMinimal(pixelSigma, true, numTrials);
 	}
 
 	public void evaluateMinimal( double pixelSigma , boolean isPlanar , int numTrials ) {
@@ -149,11 +155,18 @@ public class BenchmarkStabilityPnP extends ArtificialStereoScene {
 
 		BenchmarkStabilityPnP app = new BenchmarkStabilityPnP();
 
-		app.evaluateAllMinimal();
+		app.evaluateAllMinimal(planar);
 
+		app.name = "EPNP";
 		app.target = FactoryMultiView.computePnPwithEPnP(0, 1);
 		app.evaluateObservationNoise(0,max,20,planar);
 		app.target = FactoryMultiView.computePnPwithEPnP(10, 0.1);
+		app.evaluateObservationNoise(0,max,20,planar);
+
+		if( !planar )
+			return;
+		app.name = "IPPE";
+		app.target = FactoryMultiView.computePnP_1(EnumPNP.IPPE,-1,-1);
 		app.evaluateObservationNoise(0,max,20,planar);
 	}
 }

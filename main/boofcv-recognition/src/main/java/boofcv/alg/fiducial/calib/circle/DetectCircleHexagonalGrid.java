@@ -23,7 +23,7 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.struct.image.ImageGray;
-import georegression.struct.shapes.EllipseRotated_F64;
+import georegression.struct.curve.EllipseRotated_F64;
 
 /**
  * <p>Detects a hexagonal circle grid. Circles are spaced such that center of each circle is the same distance from

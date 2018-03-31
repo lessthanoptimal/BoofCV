@@ -37,9 +37,9 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPolygons2D_F64;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
 import javax.swing.*;

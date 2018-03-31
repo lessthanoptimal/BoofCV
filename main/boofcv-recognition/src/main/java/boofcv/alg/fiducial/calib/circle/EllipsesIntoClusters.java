@@ -19,7 +19,7 @@
 package boofcv.alg.fiducial.calib.circle;
 
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector.EllipseInfo;
-import georegression.struct.shapes.EllipseRotated_F64;
+import georegression.struct.curve.EllipseRotated_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;

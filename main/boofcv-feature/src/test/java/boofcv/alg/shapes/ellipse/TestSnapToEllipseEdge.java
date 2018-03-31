@@ -21,7 +21,7 @@ package boofcv.alg.shapes.ellipse;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.PixelMath;
 import boofcv.struct.image.GrayU8;
-import georegression.struct.shapes.EllipseRotated_F64;
+import georegression.struct.curve.EllipseRotated_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;

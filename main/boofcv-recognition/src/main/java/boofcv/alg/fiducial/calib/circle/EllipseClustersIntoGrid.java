@@ -20,8 +20,8 @@ package boofcv.alg.fiducial.calib.circle;
 
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters.Node;
 import georegression.metric.UtilAngle;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.sorting.QuickSortComparator;
 import org.ddogleg.struct.FastQueue;
 
