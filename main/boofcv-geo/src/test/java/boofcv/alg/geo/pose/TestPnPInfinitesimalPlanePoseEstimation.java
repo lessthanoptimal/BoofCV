@@ -18,66 +18,135 @@
 
 package boofcv.alg.geo.pose;
 
-import georegression.geometry.GeometryMath_F64;
+import boofcv.struct.geo.AssociatedPair;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
+import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix2x2;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
+import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.equation.Equation;
-import org.ejml.equation.VariableMatrix;
+import org.ejml.ops.ConvertDMatrixStruct;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestPnPInfinitesimalPlanePoseEstimation {
+	Random rand = new Random(234);
+
 	@Test
-	public void simpleTest() {
-		fail("Implement");
+	public void perfectObservations() {
+		Se3_F64 actual = new Se3_F64();
+
+		for (int i = 0; i < 100; i++) {
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
+					0.2+rand.nextGaussian()*0.05,
+					0.1+rand.nextGaussian()*0.05,
+					0.05+rand.nextGaussian()*0.001,actual.R);
+			actual.T.set(rand.nextGaussian(),1+rand.nextGaussian(),20+rand.nextGaussian()*2);
+
+			List<AssociatedPair> observation = createRandomInputs(20,actual);
+
+			PnPInfinitesimalPlanePoseEstimation alg = new PnPInfinitesimalPlanePoseEstimation();
+
+			assertTrue(alg.process(observation));
+
+			assertTrue(alg.getError0()<alg.getError1());
+
+			double error0 = computeModelError(alg.getWorldToCamera0(),actual);
+			double error1 = computeModelError(alg.getWorldToCamera1(),actual);
+
+			assertTrue(error0<error1);
+			assertTrue(error0 < 0.006);
+		}
+
+	}
+
+	public double computeModelError( Se3_F64 found , Se3_F64 expected ) {
+		Se3_F64 d = found.concat(expected.invert(null),null);
+
+		// it should be identity
+		d.R.data[0] -= 1;
+		d.R.data[4] -= 1;
+		d.R.data[8] -= 1;
+
+		return NormOps_DDRM.normF(d.R)/9 + d.T.norm()/3;
 	}
 
 	@Test
 	public void estimateTranslation() {
-		fail("Implement");
+		Se3_F64 actual = new Se3_F64();
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,0.05,0,actual.R);
+		actual.T.set(0.1,0,3);
+
+		List<AssociatedPair> observation = createRandomInputs(20,actual);
+
+		PnPInfinitesimalPlanePoseEstimation alg = new PnPInfinitesimalPlanePoseEstimation();
+
+		Vector3D_F64 found = new Vector3D_F64();
+		alg.estimateTranslation(actual.R,observation,found);
+
+		assertTrue(actual.T.isIdentical(found,UtilEjml.TEST_F64));
 	}
 
-	@Test
-	public void IPPE() {
-		fail("Implement");
+	private List<AssociatedPair> createRandomInputs( int N , Se3_F64 worldToCamera ) {
+		List<AssociatedPair> list = new ArrayList<>();
+
+		for (int i = 0; i < N; i++) {
+			Point3D_F64 world = new Point3D_F64();
+			world.x = rand.nextGaussian();
+			world.y = rand.nextGaussian();
+			world.z = 0;
+
+			Point3D_F64 camera = new Point3D_F64();
+			SePointOps_F64.transform(worldToCamera,world,camera);
+
+			AssociatedPair pair = new AssociatedPair();
+			pair.p1.set(world.x,world.y);
+			pair.p2.set(camera.x/camera.z,camera.y/camera.z);
+
+			list.add( pair );
+		}
+		return list;
 	}
 
 	@Test
 	public void constructR() {
 		Equation eq = new Equation();
-		eq.getFunctions().add("cross", (inputs, manager) -> {
-			DMatrixRMaj output = manager.createMatrix().matrix;
-			DMatrixRMaj m1 = ((VariableMatrix)inputs.get(0)).matrix;
-			DMatrixRMaj m2 = ((VariableMatrix)inputs.get(1)).matrix;
 
-			output.reshape(3,1);
-			Vector3D_F64 v1 = new Vector3D_F64(m1.data[0],m1.data[1],m1.data[2]);
-			Vector3D_F64 v2 = new Vector3D_F64(m2.data[0],m2.data[1],m2.data[2]);
-			Vector3D_F64 c = new Vector3D_F64();
-
-			GeometryMath_F64.cross(v1,v2,c);
-			output.data[0] = c.x;
-			output.data[1] = c.y;
-			output.data[2] = c.z;
-		});
 		eq.process("R_v=randn(3,3)");
 		eq.process("R22=[1 2;3 4]");
-		eq.process("b=[5;6]");
-		eq.process("ca=cross([R22;b']*[1;0] , [R22;b']*[0;1])");
+		eq.process("c=[1.1;2.1]");
+		eq.process("a=3.1");
+		eq.process("b=[-0.4;0.2]");
+		eq.process("R1=R_v*[R22 c;b' a]");
+		eq.process("R2=R_v*[R22, -c;-b', a]");
 
-		eq.print("ca");
+		DMatrixRMaj found = new DMatrixRMaj(3,3);
+		DMatrixRMaj R_v = eq.lookupDDRM("R_v");
+		DMatrix2x2 R22 = new DMatrix2x2();
+		ConvertDMatrixStruct.convert(eq.lookupDDRM("R22"),R22);
+		Vector3D_F64 ca = new Vector3D_F64(1.1,2.1,3.1);
 
-//		PnPInfinitesimalPlanePoseEstimation.constructR();
+		PnPInfinitesimalPlanePoseEstimation.constructR(found,R_v,R22,-0.4,0.2,ca,1,new DMatrixRMaj(3,3));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(eq.lookupDDRM("R1"),found,UtilEjml.TEST_F64));
 
-		fail("Implement");
+		PnPInfinitesimalPlanePoseEstimation.constructR(found,R_v,R22,-0.4,0.2,ca,-1,new DMatrixRMaj(3,3));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(eq.lookupDDRM("R2"),found,UtilEjml.TEST_F64));
 	}
 
 	@Test
