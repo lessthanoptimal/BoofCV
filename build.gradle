@@ -1,5 +1,5 @@
 plugins {
-    id "com.peterabeles.gversion" version "1.0"
+    id "com.peterabeles.gversion" version "1.0.1"
 }
 
 ext.libpath = file('./').absolutePath
