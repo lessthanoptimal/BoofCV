@@ -7,7 +7,7 @@ ext.libpath = file('./').absolutePath
 gversion {
     gversion_file_path = "main/boofcv-ip/src/main/java"
     gversion_package = "boofcv"
-//    gversion_class_name = "BoofVersion"
+    gversion_class_name = "BoofGVersion"
 //    javadoc_links = [ 'http://docs.oracle.com/javase/8/docs/api/',
 //                      'http://ejml.org/javadoc/',
 //                      'http://georegression.org/javadoc/',
