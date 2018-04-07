@@ -1,16 +1,18 @@
-ext.libpath = file('./').absolutePath
-
-apply plugin: 'org.boofcv.gradletools'
-
-booftools {
-    gversion_file_path = "main/boofcv-ip/src/main/java/boofcv"
-    gversion_package = "boofcv"
-    javadoc_links = [ 'http://docs.oracle.com/javase/8/docs/api/',
-                      'http://ejml.org/javadoc/',
-                      'http://georegression.org/javadoc/',
-                      'http://ddogleg.org/javadoc/']
+plugins {
+    id "com.peterabeles.gversion" version "1.0"
 }
 
+ext.libpath = file('./').absolutePath
+
+gversion {
+    gversion_file_path = "main/boofcv-ip/src/main/java"
+    gversion_package = "boofcv"
+//    gversion_class_name = "BoofVersion"
+//    javadoc_links = [ 'http://docs.oracle.com/javase/8/docs/api/',
+//                      'http://ejml.org/javadoc/',
+//                      'http://georegression.org/javadoc/',
+//                      'http://ddogleg.org/javadoc/']
+}
 allprojects {
     apply plugin: 'idea'
     apply plugin: 'eclipse'
@@ -311,12 +313,7 @@ task wrapper(type: Wrapper) {
     gradleVersion = '4.3'
 }
 
-
-
-project(':main:boofcv-ip').compileJava.dependsOn(checkForVersionFile)
-
-// Build the build info file every time it builds
-assemble.dependsOn(createVersionFile)
+project(':main:boofcv-ip').compileJava.dependsOn(createVersionFile)
 
 // Disable the creation of jars for distribution.  If you don't do this it will crash
 [':main',':examples',':main:checks',':main:autocode',':integration'].each {String a ->
