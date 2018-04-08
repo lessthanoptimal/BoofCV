@@ -38,6 +38,7 @@ public class TestQrCodeBinaryGridReader {
 	@Test
 	public void simpleChecks() {
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+		int border = generator.borderModule*4;
 		QrCode qr = new QrCodeEncoder().addAlphanumeric("HI1234").fixate();
 		generator.render(qr);
 		QrCodeBinaryGridReader<GrayU8> reader = new QrCodeBinaryGridReader<>(GrayU8.class);
@@ -49,13 +50,13 @@ public class TestQrCodeBinaryGridReader {
 		Point2D_F32 pixel = new Point2D_F32();
 		Point2D_F32 grid = new Point2D_F32();
 
-		reader.imageToGrid(4*6+1,4*10+1,grid);
+		reader.imageToGrid(border+4*6+1,border+4*10+1,grid);
 		assertEquals(10.25,grid.y,0.1);
 		assertEquals(6.25,grid.x,0.1);
 
 		reader.gridToImage(10,6,pixel);
-		assertEquals(10*4,pixel.y,0.1);
-		assertEquals(6*4,pixel.x,0.1);
+		assertEquals(border+10*4,pixel.y,0.1);
+		assertEquals(border+6*4,pixel.x,0.1);
 
 		// check reading of bits
 		QrCodeMaskPattern mask = qr.mask;

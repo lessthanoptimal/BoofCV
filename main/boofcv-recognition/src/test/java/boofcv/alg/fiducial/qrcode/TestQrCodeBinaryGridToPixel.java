@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,15 +33,16 @@ public class TestQrCodeBinaryGridToPixel {
 		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("12340324").fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+		int border = generator.borderModule*4;
 		generator.render(qr);
 
 		QrCodeBinaryGridToPixel alg = new QrCodeBinaryGridToPixel();
 		alg.addAllFeatures(qr);
 		alg.computeTransform();
 
-		check(alg,0,0,0,0);
-		check(alg,7,0,7*4,0);
-		check(alg,7,7,7*4,7*4);
+		check(alg,0,0,border,border);
+		check(alg,7,0,border+7*4,border);
+		check(alg,7,7,border+7*4,border+7*4);
 
 	}
 

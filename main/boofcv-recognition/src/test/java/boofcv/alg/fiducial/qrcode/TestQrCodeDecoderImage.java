@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -200,6 +200,7 @@ public class TestQrCodeDecoderImage {
 				addNumeric("01234567").fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+		int border = generator.borderModule*4;
 //		generator.renderData = false;
 		generator.render(expected);
 
@@ -230,9 +231,9 @@ public class TestQrCodeDecoderImage {
 			assertEquals(7*4,found.ppRight.getSideLength(i),0.01);
 			assertEquals(7*4,found.ppDown.getSideLength(i),0.01);
 		}
-		assertTrue(found.ppCorner.get(0).distance(0,0) < 1e-4);
-		assertTrue(found.ppRight.get(0).distance((numModules-7)*4,0) < 1e-4);
-		assertTrue(found.ppDown.get(0).distance(0,(numModules-7)*4) < 1e-4);
+		assertTrue(found.ppCorner.get(0).distance(border,border) < 1e-4);
+		assertTrue(found.ppRight.get(0).distance(border+(numModules-7)*4,border) < 1e-4);
+		assertTrue(found.ppDown.get(0).distance(border,border+(numModules-7)*4) < 1e-4);
 
 		// Check alignment patterns
 		int alignment[] =  QrCode.VERSION_INFO[version].alignment;

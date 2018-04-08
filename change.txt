@@ -14,6 +14,8 @@ Version : 0.30
   * Mathew Harker and Paul O'Leary "Computation of Homographies"
 - PNP
   * Added IPPE; Collins, Toby, and Adrien Bartoli. "Infinitesimal plane-based pose estimation."
+- QR Code
+  * QrCodeGeneratorImage automatically has a white border
 
 - TODO PNP regression and benchmark
 - TODO Compare BoofCV's IPPE against original

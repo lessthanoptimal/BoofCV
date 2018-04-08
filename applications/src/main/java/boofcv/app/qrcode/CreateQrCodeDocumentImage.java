@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,6 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayU8;
 import org.apache.commons.io.FilenameUtils;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -49,7 +48,7 @@ public class CreateQrCodeDocumentImage {
 
 		for( int i = 0; i < markers.size(); i++ ) {
 			QrCodeGeneratorImage generator = new QrCodeGeneratorImage(moduleWidthPixels);
-
+			generator.setBorderModule(2);
 			generator.render(markers.get(i));
 
 			String name;
@@ -67,14 +66,8 @@ public class CreateQrCodeDocumentImage {
 			}
 
 			GrayU8 gray = generator.getGray();
-			BufferedImage tmp = new BufferedImage(gray.width,gray.height,BufferedImage.TYPE_INT_RGB);
-			ConvertBufferedImage.convertTo(gray,tmp);
-			BufferedImage output = new BufferedImage(gray.width+4*moduleWidthPixels,gray.height+4*moduleWidthPixels,BufferedImage.TYPE_INT_RGB);
-
-			Graphics2D g2 = output.createGraphics();
-			g2.setColor(Color.WHITE);
-			g2.fillRect(0,0,output.getWidth(),output.getHeight());
-			g2.drawImage(tmp,moduleWidthPixels*2,moduleWidthPixels*2,tmp.getWidth(),tmp.getHeight(),null);
+			BufferedImage output = new BufferedImage(gray.width,gray.height,BufferedImage.TYPE_INT_RGB);
+			ConvertBufferedImage.convertTo(gray,output);
 
 			System.out.println("Saving "+name);
 			UtilImageIO.saveImage(output,name);

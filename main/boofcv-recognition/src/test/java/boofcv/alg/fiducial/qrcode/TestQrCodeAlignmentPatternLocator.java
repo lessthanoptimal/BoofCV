@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,6 +58,7 @@ public class TestQrCodeAlignmentPatternLocator {
 
 	public void centerOnSquare( QrCode qr, int scale ) {
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(scale);
+		generator.setBorderModule(0);
 		generator.render(qr);
 		qr.alignment.reset(); // need to clear the alignment so that it doesn't mess up the reader
 
@@ -93,6 +94,7 @@ public class TestQrCodeAlignmentPatternLocator {
 
 	private void localize(QrCode qr, int scale) {
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(scale);
+		generator.setBorderModule(0);
 		generator.render(qr);
 
 		QrCodeAlignmentPatternLocator<GrayU8> alg = new QrCodeAlignmentPatternLocator<>(GrayU8.class);
