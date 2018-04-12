@@ -52,7 +52,7 @@ public abstract class DemonstrationBase extends JPanel {
 	JMenu menuRecent;
 
 	// Window the application is shown in
-	JFrame window;
+	protected JFrame window;
 
 	// name of the application
 	String appName;

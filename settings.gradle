@@ -1,6 +1,7 @@
 include 'examples','demonstrations','applications',
 
-        'main:boofcv-ip','main:boofcv-io','main:boofcv-feature','main:boofcv-geo','main:boofcv-calibration',
+        'main:boofcv-ip','main:boofcv-io','main:boofcv-feature','main:boofcv-geo',
+        'main:boofcv-calibration',
         'main:boofcv-sfm','main:boofcv-recognition','main:boofcv-simulation',
         'main:checks','main:autocode','main:boofcv-learning',
         'integration:boofcv-all','main:boofcv-core',

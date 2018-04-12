@@ -39,6 +39,7 @@ import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
+import org.ddogleg.fitting.modelset.ransac.RansacMulti;
 
 /**
  * Factory for creating robust false-positive tolerant estimation algorithms in multi-view geometry.  These

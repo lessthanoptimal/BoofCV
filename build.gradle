@@ -37,15 +37,15 @@ subprojects {
     apply plugin: 'maven'
     apply plugin: 'signing'
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = 1.9
+    targetCompatibility = 1.9
 
     // Fail on jar conflict
-    configurations.all {
-        resolutionStrategy {
-            failOnVersionConflict()
-        }
-    }
+//    configurations.all {
+//        resolutionStrategy {
+//            failOnVersionConflict()
+//        }
+//    }
 
     // Enable incremental compile. Should make single file changes faster
     tasks.withType(JavaCompile) {
@@ -99,7 +99,8 @@ subprojects {
 
     dependencies {
         compile group: 'org.georegression', name: 'georegression', version: '0.16-SNAPSHOT'
-        compile 'com.google.code.findbugs:jsr305:3.0.2' // @Nullable
+        //compile 'com.google.code.findbugs:jsr305:3.0.2' // @Nullable
+        compile 'javax.annotation:javax.annotation-api:1.3.2'
 
         testCompile group: 'junit', name: 'junit', version: '4.12'
 
@@ -141,7 +142,7 @@ subprojects {
     }
 
     // Force the release build to fail if it depends on a SNAPSHOT
-    jar.dependsOn checkDependsOnSNAPSHOT
+    //jar.dependsOn checkDependsOnSNAPSHOT
 
     // if Maven central isn't setup in ~/.gradle/gradle.properties skip all of this
     if( project.hasProperty('ossrhUsername') ) {
