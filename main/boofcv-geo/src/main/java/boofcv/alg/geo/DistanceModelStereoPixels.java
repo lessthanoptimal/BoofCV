@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo;
 
+import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 /**
@@ -41,4 +42,6 @@ public interface DistanceModelStereoPixels<Model,Point> extends DistanceFromMode
 	 */
 	public void setIntrinsic(double cam1_fx, double cam1_fy , double cam1_skew ,
 							 double cam2_fx, double cam2_fy , double cam2_skew );
+
+
 }

@@ -19,7 +19,9 @@
 package boofcv.gui;
 
 import boofcv.io.calibration.CalibrationIO;
+import boofcv.io.image.DelayedImageSequence;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.io.wrapper.DynamicWebcamInterface;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -112,10 +114,17 @@ public abstract class StereoVideoAppBase <I extends ImageGray<I>>
 				line2 = path+"/"+line2;
 
 			config = CalibrationIO.load(media.openFile(lineConfig));
-			SimpleImageSequence<I> video1 = media.openVideo(line1, ImageType.single(imageType));
-			SimpleImageSequence<I> video2 = media.openVideo(line2, ImageType.single(imageType));
+			//SimpleImageSequence<I> video1 = media.openVideo(line1, ImageType.single(imageType));
+			//SimpleImageSequence<I> video2 = media.openVideo(line2, ImageType.single(imageType));
+
+			SimpleImageSequence<I> video1 = new DynamicWebcamInterface().open(null,
+					config.left.width, config.left.height,
+					//640, 480,
+					ImageType.single(imageType));
+			SimpleImageSequence<I> video2 = new DelayedImageSequence(video1);
 
 			process(video1,video2);
+
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

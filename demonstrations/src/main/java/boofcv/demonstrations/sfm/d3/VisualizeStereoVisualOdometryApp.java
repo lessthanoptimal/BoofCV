@@ -197,7 +197,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 	@Override
 	protected void updateAlg(I frame1, BufferedImage buffImage1, I frame2, BufferedImage buffImage2) {
 		if( config.left.width != frame1.width || config.left.height != frame1.height )
-			throw new IllegalArgumentException("Miss match between calibration and actual image size");
+			throw new IllegalArgumentException("Miss match between calibration and actual image size: " + config);
 
 		noFault = alg.process(frame1,frame2);
 	}
@@ -434,6 +434,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Stereo Visual Odometry",true);
+		JFrame w = ShowImages.showWindow(app, "Stereo Visual Odometry", true);
+
 	}
 }

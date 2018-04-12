@@ -124,7 +124,7 @@ public class VisualizeDepthVisualOdometryApp
 	JComboBox selectAlgorithm;
 
 	public VisualizeDepthVisualOdometryApp(List<PathLabel> examples ) {
-		super(true,false,examples);
+		super(false,true,examples);
 
 
 		selectAlgorithm = new JComboBox();
@@ -136,6 +136,8 @@ public class VisualizeDepthVisualOdometryApp
 		selectAlgorithm.addActionListener(this);
 		selectAlgorithm.setMaximumSize(selectAlgorithm.getPreferredSize());
 		menuBar.add(selectAlgorithm);
+
+
 
 		statusPanel = new VisualOdometryPanel2(VisualOdometryPanel2.Type.DEPTH);
 		guiLeft = new ImagePanel();
@@ -608,6 +610,7 @@ public class VisualizeDepthVisualOdometryApp
 		app.openFile(new File(inputs.get(0).getPath()));
 		app.waitUntilInputSizeIsKnown();
 
-		ShowImages.showWindow(app, "Depth Visual Odometry",true);
+		JFrame w = ShowImages.showWindow(app, "Depth Visual Odometry", true);
+		w.setJMenuBar(app.menuBar);
 	}
 }

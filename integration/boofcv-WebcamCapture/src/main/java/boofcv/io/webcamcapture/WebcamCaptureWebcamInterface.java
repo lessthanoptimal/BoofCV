@@ -110,6 +110,10 @@ public class WebcamCaptureWebcamInterface implements WebcamInterface {
 			return output;
 		}
 
+		@Override public T current() {
+			return output;
+		}
+
 		@Override
 		public void close() {
 			webcam.close();
@@ -121,7 +125,9 @@ public class WebcamCaptureWebcamInterface implements WebcamInterface {
 		}
 
 		@Override
-		public void setLoop(boolean loop) {}
+		public void setLoop(boolean loop) {
+			//..
+		}
 
 		@Override
 		public ImageType<T> getImageType() {
@@ -130,7 +136,7 @@ public class WebcamCaptureWebcamInterface implements WebcamInterface {
 
 		@Override
 		public void reset() {
-			throw new RuntimeException("Not supported");
+			//throw new RuntimeException("Not supported");
 		}
 
 		@Override

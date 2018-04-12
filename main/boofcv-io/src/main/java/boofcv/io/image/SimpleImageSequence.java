@@ -62,6 +62,10 @@ public interface SimpleImageSequence<T extends ImageBase<T>> {
 	 */
 	<InternalImage> InternalImage getGuiImage();
 
+	default T current() {
+		throw new UnsupportedOperationException("TODO");
+	}
+
 	/**
 	 * Call when done reading the image sequence.
 	 */
@@ -90,4 +94,5 @@ public interface SimpleImageSequence<T extends ImageBase<T>> {
 	 * Start reading the sequence from the start
 	 */
 	void reset();
+
 }

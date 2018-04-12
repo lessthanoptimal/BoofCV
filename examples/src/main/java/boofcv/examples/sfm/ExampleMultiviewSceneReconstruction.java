@@ -52,7 +52,7 @@ import org.ddogleg.struct.GrowQueue_I32;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -73,10 +73,12 @@ public class ExampleMultiviewSceneReconstruction {
 	Point2Transform2_F64 pixelToNorm;
 
 	// ratio of matching features to unmatched features for two images to be considered connected
-	double connectThreshold = 0.3;
+	// TODO dynamically compute this by minimum necessary to maintain a connected graph of all frames, w/ possible centrality heuristic
+	// use the frame connection weight to weight the resulting 3d point computation
+	double connectThreshold = 0.15;
 
 	// tolerance for inliers in pixels
-	double inlierTol = 1.5;
+	double inlierTol = 1;
 
 	// Detects and describes image interest points
 	DetectDescribePoint<GrayF32, BrightFeature> detDesc = FactoryDetectDescribe.surfStable(null, null, null, GrayF32.class);
@@ -94,7 +96,7 @@ public class ExampleMultiviewSceneReconstruction {
 	// Color of the pixel at each feature location
 	List<GrowQueue_I32> imageColors = new ArrayList<>();
 	// List of 3D features in each image
-	List<List<Feature3D>> imageFeature3D = new ArrayList<>();
+	List<Map<Long, Feature3D>> imageFeature3D = new ArrayList<>();
 
 	// Transform from world to each camera image
 	Se3_F64 motionWorldToCamera[];
@@ -110,20 +112,45 @@ public class ExampleMultiviewSceneReconstruction {
 	// used to provide initial estimate of the 3D scene
 	ModelMatcher<Se3_F64, AssociatedPair> estimateEssential;
 	ModelMatcher<Se3_F64, Point2D3D> estimatePnP;
-	ModelFitter<Se3_F64, Point2D3D> refinePnP = FactoryMultiView.refinePnP(1e-12,40);
+	ModelFitter<Se3_F64, Point2D3D> refinePnP =
+			FactoryMultiView.refinePnP(1e-12, 1600);
+
+	private int images;
+	private final int minMotionFeatures = 15;
+
+	public static void main(String[] args) {
+
+		String directory = UtilIO.pathExample("sfm/chair");
+
+		CameraPinholeRadial intrinsic = CalibrationIO.load(
+				new File(directory, "/intrinsic_DSC-HX5_3648x2736_to_640x480.yaml"));
+
+		List<BufferedImage> images = UtilImageIO.loadImages(directory, ".*jpg");
+		//images = images.subList(0, 8);
+
+		ExampleMultiviewSceneReconstruction example = new ExampleMultiviewSceneReconstruction();
+
+		long before = System.currentTimeMillis();
+		example.process(intrinsic, images);
+		long after = System.currentTimeMillis();
+
+		System.out.println("Elapsed time " + (after - before) / 1000.0 + " (s)");
+	}
 
 	/**
 	 * Process the images and reconstructor the scene as a point cloud using matching interest points between
 	 * images.
 	 */
-	public void process(CameraPinholeRadial intrinsic , List<BufferedImage> colorImages ) {
+	public void process(CameraPinholeRadial intrinsic, List<BufferedImage> colorImages) {
 
-		pixelToNorm = LensDistortionOps.narrow(intrinsic).undistort_F64(true,false);
+		images = colorImages.size();
+
+		pixelToNorm = LensDistortionOps.narrow(intrinsic).undistort_F64(true, false);
 
 		estimateEssential = FactoryMultiViewRobust.essentialRansac(
-				new ConfigEssential(intrinsic),new ConfigRansac(4000,inlierTol));
+				new ConfigEssential(intrinsic), new ConfigRansac(8000, inlierTol));
 		estimatePnP = FactoryMultiViewRobust.pnpRansac(
-				new ConfigPnP(intrinsic),new ConfigRansac(4000,inlierTol));
+				new ConfigPnP(intrinsic), new ConfigRansac(4000, inlierTol));
 
 		// find features in each image
 		detectImageFeatures(colorImages);
@@ -149,13 +176,14 @@ public class ExampleMultiviewSceneReconstruction {
 		// implementation is too slow for a large number of points
 
 		// display a point cloud from the 3D features
-		PointCloudViewer gui = new PointCloudViewer(intrinsic,1);
+		PointCloudViewer gui = new PointCloudViewer(intrinsic, 1);
 
-		for( Feature3D t : featuresAll) {
-			gui.addPoint(t.worldPt.x,t.worldPt.y,t.worldPt.z,t.color);
+		for (Feature3D t : featuresAll) {
+			gui.addPoint(t.x, t.y, t.z, t.color);
 		}
+		System.out.println(featuresAll.size() + " features");
 
-		gui.setPreferredSize(new Dimension(500,500));
+		gui.setPreferredSize(new Dimension(500, 500));
 		ShowImages.showWindow(gui, "Points");
 	}
 
@@ -174,12 +202,12 @@ public class ExampleMultiviewSceneReconstruction {
 		motionWorldToCamera = new Se3_F64[colorImages.size()];
 		for (int i = 0; i < colorImages.size(); i++) {
 			motionWorldToCamera[i] = new Se3_F64();
-			imageFeature3D.add(new ArrayList<Feature3D>());
+			imageFeature3D.add(new HashMap<>());
 		}
 
 		// pick the image most similar to the original image to initialize pose estimation
 		int firstChild = findBestFit(matrix, bestImage);
-		initialize(bestImage, firstChild);
+		initialize((short)bestImage, (short)firstChild, matrix[bestImage][firstChild]);
 	}
 
 	/**
@@ -192,12 +220,12 @@ public class ExampleMultiviewSceneReconstruction {
 		for (int i = 0; i < colorImages.size(); i++) {
 			int count = 0;
 			for (int j = 0; j < colorImages.size(); j++) {
-				if( matrix[i][j] > connectThreshold ) {
+				if (matrix[i][j] > connectThreshold) {
 					count++;
 				}
 			}
 			System.out.println(i + "  count " + count);
-			if( count > bestCount ) {
+			if (count > bestCount) {
 				bestCount = count;
 				bestImage = i;
 			}
@@ -209,7 +237,7 @@ public class ExampleMultiviewSceneReconstruction {
 	 * Detect image features in all the images.  Save location, description, and color
 	 */
 	private void detectImageFeatures(List<BufferedImage> colorImages) {
-		System.out.println("Detecting Features in each image.  Total "+colorImages.size());
+		System.out.println("Detecting Features in each image.  Total " + colorImages.size());
 		for (int i = 0; i < colorImages.size(); i++) {
 			System.out.print("*");
 			BufferedImage colorImage = colorImages.get(i);
@@ -232,16 +260,16 @@ public class ExampleMultiviewSceneReconstruction {
 		double matrix[][] = new double[imageVisualFeatures.size()][imageVisualFeatures.size()];
 
 		for (int i = 0; i < imageVisualFeatures.size(); i++) {
-			for (int j = i+1; j < imageVisualFeatures.size(); j++) {
-				System.out.printf("Associated %02d %02d ",i,j);
+			for (int j = i + 1; j < imageVisualFeatures.size(); j++) {
+				System.out.printf("Associated %02d %02d ", i, j);
 				associate.setSource(imageVisualFeatures.get(i));
 				associate.setDestination(imageVisualFeatures.get(j));
 				associate.associate();
 
-				matrix[i][j] = associate.getMatches().size()/(double) imageVisualFeatures.get(i).size();
-				matrix[j][i] = associate.getMatches().size()/(double) imageVisualFeatures.get(j).size();
+				matrix[i][j] = associate.getMatches().size() / (double) imageVisualFeatures.get(i).size();
+				matrix[j][i] = associate.getMatches().size() / (double) imageVisualFeatures.get(j).size();
 
-				System.out.println(" = "+matrix[i][j]);
+				System.out.println(" = " + matrix[i][j]);
 			}
 		}
 		return matrix;
@@ -250,10 +278,10 @@ public class ExampleMultiviewSceneReconstruction {
 	/**
 	 * Prints out which frames are connected to each other
 	 */
-	private void printConnectionMatrix( double[][] matrix) {
+	private void printConnectionMatrix(double[][] matrix) {
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix.length; j++) {
-				if( matrix[i][j] >= connectThreshold )
+				if (matrix[i][j] >= connectThreshold)
 					System.out.print("#");
 				else
 					System.out.print(".");
@@ -267,7 +295,7 @@ public class ExampleMultiviewSceneReconstruction {
 	 */
 	private void detectFeatures(BufferedImage colorImage,
 								FastQueue<BrightFeature> features, FastQueue<Point2D_F64> pixels,
-								GrowQueue_I32 colors ) {
+								GrowQueue_I32 colors) {
 
 		GrayF32 image = ConvertBufferedImage.convertFrom(colorImage, (GrayF32) null);
 
@@ -282,14 +310,14 @@ public class ExampleMultiviewSceneReconstruction {
 			// store pixels are normalized image coordinates
 			pixelToNorm.compute(p.x, p.y, pixels.grow());
 
-			colors.add( colorImage.getRGB((int)p.x,(int)p.y) );
+			colors.add(colorImage.getRGB((int) p.x, (int) p.y));
 		}
 	}
 
 	/**
 	 * Finds the frame which is the best match for the given target frame
 	 */
-	private int findBestFit( double matrix[][] , int target ) {
+	private int findBestFit(double matrix[][], int target) {
 
 		// find the image which is the closest fit
 		int bestIndex = -1;
@@ -297,7 +325,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		for (int i = 0; i < estimatedImage.length; i++) {
 			double ratio = matrix[target][i];
-			if( ratio > bestRatio ) {
+			if (ratio > bestRatio) {
 				bestRatio = ratio;
 				bestIndex = i;
 			}
@@ -309,14 +337,14 @@ public class ExampleMultiviewSceneReconstruction {
 	/**
 	 * Initialize the 3D world given these two images.  imageA is assumed to be the origin of the world.
 	 */
-	private void initialize( int imageA , int imageB ) {
-		System.out.println("Initializing 3D world using "+imageA+" and "+imageB);
+	private void initialize(short imageA, short imageB, double weight) {
+		System.out.println("Initializing 3D world using " + imageA + " and " + imageB);
 
 		// Compute the 3D pose and find valid image features
 		Se3_F64 motionAtoB = new Se3_F64();
 		List<AssociatedIndex> inliers = new ArrayList<>();
 
-		if( !estimateStereoPose(imageA, imageB, motionAtoB, inliers))
+		if (!estimateStereoPose(imageA, imageB, motionAtoB, inliers))
 			throw new RuntimeException("The first image pair is a bad keyframe!");
 
 		motionWorldToCamera[imageB].set(motionAtoB);
@@ -326,8 +354,8 @@ public class ExampleMultiviewSceneReconstruction {
 		// create tracks for only those features in the inlier list
 		FastQueue<Point2D_F64> pixelsA = imagePixels.get(imageA);
 		FastQueue<Point2D_F64> pixelsB = imagePixels.get(imageB);
-		List<Feature3D> tracksA = imageFeature3D.get(imageA);
-		List<Feature3D> tracksB = imageFeature3D.get(imageB);
+		Map<Long,Feature3D> tracksA = imageFeature3D.get(imageA);
+		Map<Long,Feature3D> tracksB = imageFeature3D.get(imageB);
 
 		GrowQueue_I32 colorsA = imageColors.get(imageA);
 
@@ -336,26 +364,24 @@ public class ExampleMultiviewSceneReconstruction {
 
 			Feature3D t = new Feature3D();
 			t.color = colorsA.get(a.src);
-			t.obs.grow().set( pixelsA.get(a.src) );
-			t.obs.grow().set( pixelsB.get(a.dst) );
-			t.frame.add(imageA);
-			t.frame.add(imageB);
+			long keyA = t.add(imageA, pixelsA.get(a.src));
+			long keyB = t.add(imageB, pixelsB.get(a.dst));
 			// compute the 3D coordinate of the feature
 			Point2D_F64 pa = pixelsA.get(a.src);
 			Point2D_F64 pb = pixelsB.get(a.dst);
 
-			if( !triangulate.triangulate(pa, pb, motionAtoB, t.worldPt) )
+			if (!triangulate.triangulate(pa, pb, motionAtoB, t))
 				continue;
 			// the feature has to be in front of the camera
-			if (t.worldPt.z > 0) {
+			if (t.z > 0) {
 				featuresAll.add(t);
-				tracksA.add(t);
-				tracksB.add(t);
+				tracksA.put(keyA, t);
+				tracksB.put(keyB, t);
 			}
 		}
 
 		// adjust the scale so that it's not excessively large or small
-		normalizeScale(motionWorldToCamera[imageB],tracksA);
+		normalizeScale(motionWorldToCamera[imageB], tracksA);
 	}
 
 	/**
@@ -363,25 +389,26 @@ public class ExampleMultiviewSceneReconstruction {
 	 */
 	private void performReconstruction(List<Integer> parents, int childAdd, double matrix[][]) {
 
-		System.out.println("--------- Total Parents "+parents.size());
+		System.out.println("--------- Total Parents " + parents.size());
 
 		List<Integer> children = new ArrayList<>();
 
-		if( childAdd != -1 ) {
+		if (childAdd != -1) {
 			children.add(childAdd);
 		}
 
-		for( int parent : parents ) {
+		for (int parent : parents) {
 			for (int i = 0; i < estimatedImage.length; i++) {
 				// see if it is connected to the target and has not had its motion estimated
-				if( matrix[parent][i] > connectThreshold && !processedImage[i] ) {
-					estimateMotionPnP(parent,i);
+				double weight = matrix[parent][i];
+				if (weight >= connectThreshold && !processedImage[i]) {
+					estimateMotionPnP((short)parent, (short)i, weight);
 					children.add(i);
 				}
 			}
 		}
 
-		if( !children.isEmpty() )
+		if (!children.isEmpty())
 			performReconstruction(children, -1, matrix);
 	}
 
@@ -389,23 +416,23 @@ public class ExampleMultiviewSceneReconstruction {
 	 * Estimate the motion between two images.  Image A is assumed to have known features with 3D coordinates already
 	 * and image B is an unprocessed image with no 3D features yet.
 	 */
-	private void estimateMotionPnP( int imageA , int imageB ) {
+	private void estimateMotionPnP(short imageA, short imageB, double weight) {
 		// Mark image B as processed so that it isn't processed a second time.
 		processedImage[imageB] = true;
 
-		System.out.println("Estimating PnP motion between "+imageA+" and "+imageB);
+		System.out.println("Estimating PnP motion between " + imageA + " and " + imageB);
 
 		// initially prune features using essential matrix
 		Se3_F64 dummy = new Se3_F64();
 		List<AssociatedIndex> inliers = new ArrayList<>();
 
-		if( !estimateStereoPose(imageA, imageB, dummy, inliers))
+		if (!estimateStereoPose(imageA, imageB, dummy, inliers))
 			throw new RuntimeException("The first image pair is a bad keyframe!");
 
 		FastQueue<Point2D_F64> pixelsA = imagePixels.get(imageA);
 		FastQueue<Point2D_F64> pixelsB = imagePixels.get(imageB);
-		List<Feature3D> featuresA = imageFeature3D.get(imageA);
-		List<Feature3D> featuresB = imageFeature3D.get(imageB); // this should be empty
+		Map<Long,Feature3D> featuresA = imageFeature3D.get(imageA);
+		Map<Long,Feature3D> featuresB = imageFeature3D.get(imageB); // this should be empty
 
 		// create the associated pair for motion estimation
 		List<Point2D3D> features = new ArrayList<>();
@@ -413,10 +440,10 @@ public class ExampleMultiviewSceneReconstruction {
 		List<AssociatedIndex> unmatched = new ArrayList<>();
 		for (int i = 0; i < inliers.size(); i++) {
 			AssociatedIndex a = inliers.get(i);
-			Feature3D t = lookupFeature(featuresA, imageA, pixelsA.get(a.src));
-			if( t != null ) {
+			Feature3D t = featuresA.get(Feature3D.key(imageA, pixelsA.get(a.src)));
+			if (t != null) {
 				Point2D_F64 p = pixelsB.get(a.dst);
-				features.add(new Point2D3D(p, t.worldPt));
+				features.add(new Point2D3D(p, t));
 				inputRansac.add(a);
 			} else {
 				unmatched.add(a);
@@ -424,18 +451,18 @@ public class ExampleMultiviewSceneReconstruction {
 		}
 
 		// make sure there are enough features to estimate motion
-		if( features.size() < 15 ) {
-			System.out.println("  Too few features for PnP!!  "+features.size());
+		if (features.size() < minMotionFeatures) {
+			System.out.println("  Too few features for PnP!!  " + features.size());
 			return;
 		}
 
 		// estimate the motion between the two images
-		if( !estimatePnP.process(features))
+		if (!estimatePnP.process(features))
 			throw new RuntimeException("Motion estimation failed");
 
 		// refine the motion estimate using non-linear optimization
 		Se3_F64 motionWorldToB = new Se3_F64();
-		if( !refinePnP.fitModel(estimatePnP.getMatchSet(), estimatePnP.getModelParameters(), motionWorldToB) )
+		if (!refinePnP.fitModel(estimatePnP.getMatchSet(), estimatePnP.getModelParameters(), motionWorldToB))
 			throw new RuntimeException("Refine failed!?!?");
 
 		motionWorldToCamera[imageB].set(motionWorldToB);
@@ -449,43 +476,41 @@ public class ExampleMultiviewSceneReconstruction {
 			AssociatedIndex a = inputRansac.get(index);
 
 			// find the track that this was associated with and add it to B
-			Feature3D t = lookupFeature(featuresA, imageA, pixelsA.get(a.src));
-			featuresB.add(t);
-			t.frame.add(imageB);
-			t.obs.grow().set( pixelsB.get(a.dst) );
-			inlierPnP[index] = true;
+			Feature3D t = featuresA.get(Feature3D.key(imageA, pixelsA.get(a.src)));
+			if (t!=null) {
+				featuresB.put(t.add(imageB, pixelsB.get(a.dst)), t);
+				inlierPnP[index] = true;
+			}
 		}
 
 		// Create new tracks for all features which were a member of essential matrix but not used to estimate
 		// the motion using PnP.
 		Se3_F64 motionBtoWorld = motionWorldToB.invert(null);
 		Se3_F64 motionWorldToA = motionWorldToCamera[imageA];
-		Se3_F64 motionBtoA =  motionBtoWorld.concat(motionWorldToA, null);
+		Se3_F64 motionBtoA = motionBtoWorld.concat(motionWorldToA, null);
 		Point3D_F64 pt_in_b = new Point3D_F64();
 
 		int totalAdded = 0;
 		GrowQueue_I32 colorsA = imageColors.get(imageA);
-		for( AssociatedIndex a : unmatched ) {
+		for (AssociatedIndex a : unmatched) {
 
-			if( !triangulate.triangulate(pixelsB.get(a.dst),pixelsA.get(a.src),motionBtoA,pt_in_b) )
+			if (!triangulate.triangulate(pixelsB.get(a.dst), pixelsA.get(a.src), motionBtoA, pt_in_b))
 				continue;
 
 			// the feature has to be in front of the camera
-			if( pt_in_b.z > 0 ) {
+			if (pt_in_b.z > 0) {
 				Feature3D t = new Feature3D();
 
 				// transform from B back to world frame
-				SePointOps_F64.transform(motionBtoWorld, pt_in_b, t.worldPt);
+				SePointOps_F64.transform(motionBtoWorld, pt_in_b, t);
 
 				t.color = colorsA.get(a.src);
-				t.obs.grow().set( pixelsA.get(a.src) );
-				t.obs.grow().set( pixelsB.get(a.dst) );
-				t.frame.add(imageA);
-				t.frame.add(imageB);
+				long ka = t.add(imageA, pixelsA.get(a.src));
+				long kb = t.add(imageB, pixelsB.get(a.dst));
 
 				featuresAll.add(t);
-				featuresA.add(t);
-				featuresB.add(t);
+				featuresA.put(ka, t);
+				featuresB.put(kb, t);
 
 				totalAdded++;
 			}
@@ -494,28 +519,26 @@ public class ExampleMultiviewSceneReconstruction {
 		// create new tracks for existing tracks which were not in the inlier set.  Maybe things will work
 		// out better if the 3D coordinate is re-triangulated as a new feature
 		for (int i = 0; i < features.size(); i++) {
-			if( inlierPnP[i] )
+			if (inlierPnP[i])
 				continue;
 
 			AssociatedIndex a = inputRansac.get(i);
 
-			if( !triangulate.triangulate(pixelsB.get(a.dst),pixelsA.get(a.src),motionBtoA,pt_in_b) )
+			if (!triangulate.triangulate(pixelsB.get(a.dst), pixelsA.get(a.src), motionBtoA, pt_in_b))
 				continue;
 
 			// the feature has to be in front of the camera
-			if( pt_in_b.z > 0 ) {
+			if (pt_in_b.z > 0) {
 				Feature3D t = new Feature3D();
 
 				// transform from B back to world frame
-				SePointOps_F64.transform(motionBtoWorld, pt_in_b, t.worldPt);
+				SePointOps_F64.transform(motionBtoWorld, pt_in_b, t);
 
 				// only add this feature to image B since a similar one already exists in A.
 				t.color = colorsA.get(a.src);
-				t.obs.grow().set(pixelsB.get(a.dst));
-				t.frame.add(imageB);
 
 				featuresAll.add(t);
-				featuresB.add(t);
+				featuresB.put(t.add(imageB, pixelsB.get(a.dst)), t);
 
 				totalAdded++;
 			}
@@ -528,19 +551,13 @@ public class ExampleMultiviewSceneReconstruction {
 	 * Given a list of 3D features, find the feature which was observed at the specified frame at the
 	 * specified location.  If no feature is found return null.
 	 */
-	private Feature3D lookupFeature(List<Feature3D> features, int frameIndex, Point2D_F64 pixel) {
+	private Feature3D lookupFeature(Map<Long,Feature3D> features, short  frameIndex, Point2D_F64 pixel) {
+		short px = Feature3D.keyCoordinate(pixel.x);
+		short py = Feature3D.keyCoordinate(pixel.y);
 		for (int i = 0; i < features.size(); i++) {
 			Feature3D t = features.get(i);
-			for (int j = 0; j < t.frame.size(); j++) {
-				if( t.frame.get(j) == frameIndex ) {
-					Point2D_F64 o = t.obs.get(j);
-					if( o.x == pixel.x && o.y == pixel.y ) {
-						return t;
-					} else {
-						break;
-					}
-				}
-			}
+			if (t.contains(frameIndex, px, py))
+				return t;
 		}
 		return null;
 	}
@@ -549,8 +566,7 @@ public class ExampleMultiviewSceneReconstruction {
 	 * Given two images compute the relative location of each image using the essential matrix.
 	 */
 	protected boolean estimateStereoPose(int imageA, int imageB, Se3_F64 motionAtoB,
-										 List<AssociatedIndex> inliers)
-	{
+										 List<AssociatedIndex> inliers) {
 		// associate the features together
 		associate.setSource(imageVisualFeatures.get(imageA));
 		associate.setDestination(imageVisualFeatures.get(imageB));
@@ -561,13 +577,14 @@ public class ExampleMultiviewSceneReconstruction {
 		// create the associated pair for motion estimation
 		FastQueue<Point2D_F64> pixelsA = imagePixels.get(imageA);
 		FastQueue<Point2D_F64> pixelsB = imagePixels.get(imageB);
-		List<AssociatedPair> pairs = new ArrayList<>();
-		for (int i = 0; i < matches.size(); i++) {
+		int mm = matches.size();
+		List<AssociatedPair> pairs = new ArrayList<>(mm);
+		for (int i = 0; i < mm; i++) {
 			AssociatedIndex a = matches.get(i);
 			pairs.add(new AssociatedPair(pixelsA.get(a.src), pixelsB.get(a.dst)));
 		}
 
-		if( !estimateEssential.process(pairs) )
+		if (!estimateEssential.process(pairs))
 			throw new RuntimeException("Motion estimation failed");
 
 		List<AssociatedPair> inliersEssential = estimateEssential.getMatchSet();
@@ -575,9 +592,7 @@ public class ExampleMultiviewSceneReconstruction {
 		motionAtoB.set(estimateEssential.getModelParameters());
 
 		for (int i = 0; i < inliersEssential.size(); i++) {
-			int index = estimateEssential.getInputIndex(i);
-
-			inliers.add( matches.get(index));
+			inliers.add(matches.get(estimateEssential.getInputIndex(i)));
 		}
 
 		return true;
@@ -587,46 +602,52 @@ public class ExampleMultiviewSceneReconstruction {
 	 * Scale can only be estimated up to a scale factor.  Might as well set the distance to 1 since it is
 	 * less likely to have overflow/underflow issues.  This step is not strictly necessary.
 	 */
-	public void normalizeScale( Se3_F64 transform , List<Feature3D> features) {
+	public void normalizeScale(Se3_F64 transform, Map<Long, Feature3D> features) {
 
 		double T = transform.T.norm();
-		double scale = 1.0/T;
+		double scale = 1.0 / T;
 
-		for( Se3_F64 m : motionWorldToCamera) {
+		for (Se3_F64 m : motionWorldToCamera) {
 			m.T.timesIP(scale);
 		}
 
-		for( Feature3D t : features) {
-			t.worldPt.timesIP(scale);
+		for (Feature3D t : features.values()) {
+			t.timesIP(scale);
 		}
 	}
 
-	public static class Feature3D {
+	public static class Feature3D extends Point3D_F64 {
+
+		//TODO float weight;
+
 		// color of the pixel first found int
 		int color;
-		// estimate 3D position of the feature
-		Point3D_F64 worldPt = new Point3D_F64();
-		// observations in each frame that it's visible
-		FastQueue<Point2D_F64> obs = new FastQueue<>(Point2D_F64.class, true);
-		// index of each frame its visible in
-		GrowQueue_I32 frame = new GrowQueue_I32();
-	}
 
-	public static void main(String[] args) {
+		//TODO use primitive Set
+		final Set<Long> obs = new HashSet<>(2);
 
-		String directory = UtilIO.pathExample("sfm/chair");
+		public static short keyCoordinate(double c) {
+			assert(Math.abs(c) <= 1);
+			return (short)Math.round(c*(Short.MAX_VALUE-1));
+		}
 
-		CameraPinholeRadial intrinsic = CalibrationIO.load(
-				new File(directory,"/intrinsic_DSC-HX5_3648x2736_to_640x480.yaml"));
+		static long key(short frame, short px, short py) {
+			return (frame << 32) | (px << 16) | py;
+		}
 
-		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
+		public boolean contains(short frame, short px, short py) {
+			return obs.contains(key(frame, px, py));
+		}
 
-		ExampleMultiviewSceneReconstruction example = new ExampleMultiviewSceneReconstruction();
+		private static long key(short frame, Point2D_F64 p) {
+			return key(frame, keyCoordinate(p.x), keyCoordinate(p.y));
+		}
 
-		long before = System.currentTimeMillis();
-		example.process(intrinsic,images);
-		long after = System.currentTimeMillis();
+		public long add(short frame, Point2D_F64 p) {
+			long k = key(frame, p);
+			obs.add(k);
+			return k;
+		}
 
-		System.out.println("Elapsed time "+(after-before)/1000.0+" (s)");
 	}
 }

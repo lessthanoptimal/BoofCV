@@ -140,6 +140,28 @@ public class DistanceSe3SymmetricSq implements DistanceModelStereoPixels<Se3_F64
 		return error;
 	}
 
+	public double computeDistance(AssociatedPair obs, double maxError) {
+
+		// triangulate the point in 3D space
+		triangulate.triangulate(obs.p1,obs.p2,keyToCurr,p);
+
+		if( p.z < 0 )
+			return Double.MAX_VALUE;
+
+		// compute observational error in each view
+		double error = errorCam1.errorSq(obs.p1.x,obs.p1.y,p.x/p.z,p.y/p.z);
+		if (error > maxError)
+			return Double.MAX_VALUE;
+
+		SePointOps_F64.transform(keyToCurr,p,p);
+		if( p.z < 0 )
+			return Double.MAX_VALUE;
+
+		error += errorCam2.errorSq(obs.p2.x,obs.p2.y, p.x/p.z , p.y/p.z);
+
+		return error;
+	}
+
 	@Override
 	public void computeDistance(List<AssociatedPair> associatedPairs, double[] distance) {
 		for( int i = 0; i < associatedPairs.size(); i++ ) {
