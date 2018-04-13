@@ -260,4 +260,8 @@ public class CalibrateMonoPlanar {
 	public <T extends CameraModel>T getIntrinsic() {
 		return (T)foundIntrinsic;
 	}
+
+	public CalibrationPlanarGridZhang99 getZhang99() {
+		return zhang99;
+	}
 }

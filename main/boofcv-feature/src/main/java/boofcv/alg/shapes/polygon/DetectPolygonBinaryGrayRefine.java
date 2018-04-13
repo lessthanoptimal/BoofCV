@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -242,8 +243,8 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	 * @param storageInfo Optional storage for info associated with polygons. Pruning is done so the info list
 	 *                    and the returned polygon list are not in synch with each other
 	 */
-	public List<Polygon2D_F64> getPolygons( List<Polygon2D_F64> storage ,
-											List<DetectPolygonFromContour.Info> storageInfo ) {
+	public List<Polygon2D_F64> getPolygons( @Nullable List<Polygon2D_F64> storage ,
+											@Nullable List<DetectPolygonFromContour.Info> storageInfo ) {
 		if( storage == null )
 			storage = new ArrayList<>();
 		else
