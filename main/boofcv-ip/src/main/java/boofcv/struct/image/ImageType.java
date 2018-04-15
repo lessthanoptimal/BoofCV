@@ -185,6 +185,16 @@ public class ImageType<T extends ImageBase> implements Serializable {
 		return true;
 	}
 
+	/**
+	 * Sets 'this' to be identical to 'o'
+	 * @param o What is to be copied.
+	 */
+	public void setTo( ImageType o ) {
+		this.family = o.family;
+		this.dataType = o.dataType;
+		this.numBands = o.numBands;
+	}
+
 	public static enum Family
 	{
 		GRAY,

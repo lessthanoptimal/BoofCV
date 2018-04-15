@@ -16,6 +16,8 @@ Version : 0.30
   * Added IPPE; Collins, Toby, and Adrien Bartoli. "Infinitesimal plane-based pose estimation."
 - QR Code
   * QrCodeGeneratorImage automatically has a white border
+- ImageType
+  * Added setTo() and isSameType()
 
 - TODO PNP regression and benchmark
 - TODO Compare BoofCV's IPPE against original
