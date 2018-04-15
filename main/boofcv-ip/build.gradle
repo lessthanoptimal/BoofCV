@@ -1,11 +1,3 @@
-
-gversion {
-    srcDir = "main/boofcv-ip/src/main/java"
-    classPackage = "boofcv"
-    className = "BoofVersion"
-}
-project.compileJava.dependsOn(createVersionFile)
-
 dependencies {
 
 }

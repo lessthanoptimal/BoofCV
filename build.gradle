@@ -23,6 +23,12 @@ if( project.hasProperty("native_arch")) {
     project.ext.native_arch = [ "linux-x86_64", "macosx-x86_64", "windows-x86_64"]
 }
 
+gversion {
+    srcDir = "main/boofcv-ip/src/main/java"
+    classPackage = "boofcv"
+    className = "BoofVersion"
+}
+
 subprojects {
     apply plugin: 'java'
 //    apply plugin: 'osgi'
@@ -38,6 +44,10 @@ subprojects {
             failOnVersionConflict()
         }
     }
+
+    createVersionFile.enabled = false // only want this to run once in the root project
+
+    project.compileJava.dependsOn(createVersionFile)
 
     // Enable incremental compile. Should make single file changes faster
     tasks.withType(JavaCompile) {
