@@ -1,21 +1,21 @@
 
 dependencies {
-    implementation project(':main:boofcv-core')
+    compile project(':main:boofcv-core')
 
-    implementation project(':integration:boofcv-swing')
-    implementation project(':integration:boofcv-jcodec')
-    implementation project(':integration:boofcv-WebcamCapture')
-    implementation project(':integration:boofcv-javacv')
-    implementation project(':integration:boofcv-ffmpeg')
+    compile project(':integration:boofcv-swing')
+    compile project(':integration:boofcv-jcodec')
+    compile project(':integration:boofcv-WebcamCapture')
+    compile project(':integration:boofcv-javacv')
+    compile project(':integration:boofcv-ffmpeg')
 
     try {
-        implementation project(':integration:boofcv-android')
+        compile project(':integration:boofcv-android')
     } catch( UnknownProjectException ignore){}
     try {
-        implementation project(':integration:boofcv-openkinect')
+        compile project(':integration:boofcv-openkinect')
     } catch( UnknownProjectException ignore){}
     try {
-        implementation project(':integration:boofcv-javafx')
+        compile project(':integration:boofcv-javafx')
     } catch( UnknownProjectException ignore){}
 
 }

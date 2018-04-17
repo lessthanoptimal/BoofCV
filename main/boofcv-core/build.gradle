@@ -1,11 +1,11 @@
 
 dependencies {
-    implementation project(':main:boofcv-calibration')
-    implementation project(':main:boofcv-feature')
-    implementation project(':main:boofcv-geo')
-    implementation project(':main:boofcv-io')
-    implementation project(':main:boofcv-ip')
-    implementation project(':main:boofcv-learning')
-    implementation project(':main:boofcv-recognition')
-    implementation project(':main:boofcv-sfm')
+    compile project(':main:boofcv-calibration')
+    compile project(':main:boofcv-feature')
+    compile project(':main:boofcv-geo')
+    compile project(':main:boofcv-io')
+    compile project(':main:boofcv-ip')
+    compile project(':main:boofcv-learning')
+    compile project(':main:boofcv-recognition')
+    compile project(':main:boofcv-sfm')
 }
