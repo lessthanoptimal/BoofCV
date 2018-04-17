@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -198,7 +198,7 @@ public class ConvertBitmap {
 	 */
 	public static void boofToBitmap( ImageBase input , Bitmap output , byte[] storage) {
 		if( input instanceof Planar ) {
-			multiToBitmap((Planar)input,output,storage);
+			planarToBitmap((Planar)input,output,storage);
 		} else if( input instanceof ImageGray ) {
 			grayToBitmap((ImageGray)input,output,storage);
 		} else if( input instanceof ImageInterleaved ) {
@@ -278,7 +278,7 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static <T extends ImageGray<T>>
-	void multiToBitmap(  Planar<T> input , Bitmap output , byte[] storage ) {
+	void planarToBitmap(Planar<T> input , Bitmap output , byte[] storage ) {
 		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
