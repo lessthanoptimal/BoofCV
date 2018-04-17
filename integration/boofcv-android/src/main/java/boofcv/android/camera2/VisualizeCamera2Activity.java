@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  * requested. If multiple threads are being used the user can toggle if they want visualization
  * to be shown if an old image finished being processed after a newer one.
  *
- * Must call {@link #startCamera(ViewGroup, TextureView)} in the constructor.
+ * Must call {@link #startCamera(ViewGroup, TextureView)} in onCreate().
  *
  * To customize it's behavior override the following functions:
  * <ul>
