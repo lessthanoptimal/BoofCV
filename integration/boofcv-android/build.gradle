@@ -44,5 +44,5 @@ dependencies {
     // This imports files as aar which require extra work to import
     // instead I modified the code to not require them
 //    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:support-v4:27.1.1'
+    compileOnly 'com.android.support:support-v4:27.1.1'
 }
