@@ -78,7 +78,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
     protected final Object imageLock = new Object();
     protected ImageType imageType = ImageType.single(GrayU8.class);
     protected Stack<ImageBase> stackImages = new Stack<>(); // images which are available for use
-    byte[] convertWork = new byte[1]; // work space for converting images
+    protected byte[] convertWork = new byte[1]; // work space for converting images
     //---- END
 
     //---- START owned by bitmapLock
@@ -87,11 +87,11 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
     protected byte[] bitmapTmp =  new byte[1];
     //---- END
 
-    LinkedBlockingQueue threadQueue = new LinkedBlockingQueue();
-    ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1,1,50, TimeUnit.MILLISECONDS,
+    protected LinkedBlockingQueue threadQueue = new LinkedBlockingQueue();
+    protected ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1,1,50, TimeUnit.MILLISECONDS,
             threadQueue);
 
-    Matrix imageToView = new Matrix();
+    protected Matrix imageToView = new Matrix();
 
     // number of pixels it searches for when choosing camera resolution
     protected int targetResolution = 640*480;
