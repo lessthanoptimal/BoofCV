@@ -1,8 +1,9 @@
 dependencies {
-    compile project(':main:boofcv-ip')
-    compile project(':main:boofcv-feature')
-    compile project(':main:boofcv-geo')
-    compile project(':main:boofcv-sfm')
+    implementation project(':main:boofcv-ip')
+    implementation project(':main:boofcv-feature')
+    implementation project(':main:boofcv-geo')
+    implementation project(':main:boofcv-sfm')
+    implementation project(':main:boofcv-calibration')
 
     ['main','models'].each {String a ->
         compile( group: 'org.deepboof', name: a, version: project.deepboof_version) {
@@ -12,9 +13,9 @@ dependencies {
             exclude group: 'org.ejml'
         }}
 
-    benchmarkCompile project(':main:boofcv-io')
+    benchmarkImplementation project(':main:boofcv-io')
     
-    testCompile project(':main:boofcv-io')
-    testCompile project(':main:boofcv-simulation')
-    testCompile project(':integration:boofcv-swing')
+    testImplementation project(':main:boofcv-io')
+    testImplementation project(':main:boofcv-simulation')
+    testImplementation project(':integration:boofcv-swing')
 }

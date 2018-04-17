@@ -103,12 +103,12 @@ subprojects {
 
         testCompile group: 'junit', name: 'junit', version: '4.12'
 
-        testCompile project.sourceSets.generate.output
-        testCompile project.sourceSets.benchmark.output
-        testCompile project.sourceSets.experimental.output
+        testImplementation project.sourceSets.generate.output
+        testImplementation project.sourceSets.benchmark.output
+        testImplementation project.sourceSets.experimental.output
 
-        benchmarkCompile project.sourceSets.experimental.output
-        benchmarkCompile project.sourceSets.generate.output
+        benchmarkImplementation project.sourceSets.experimental.output
+        benchmarkImplementation project.sourceSets.generate.output
 
         ['core','generator-annprocess'].each { String a->
             benchmarkCompile('org.openjdk.jmh:jmh-'+a+':1.19')
@@ -310,7 +310,7 @@ task testReport(type: TestReport) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.3'
+    gradleVersion = '4.4'
 }
 
 // Disable the creation of jars for distribution.  If you don't do this it will crash
