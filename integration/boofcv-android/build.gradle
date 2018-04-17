@@ -21,6 +21,14 @@ println "Android version is $ext.ANDROID_VERSION"
 // disable tests since they can't be run on a regular desktop
 test.enabled = false
 
+repositories {
+    jcenter()
+    maven {
+        url 'https://maven.google.com/'
+        name 'Google'
+    }
+}
+
 dependencies {
     implementation project(':main:boofcv-ip')
     implementation project(':main:boofcv-feature')
@@ -33,6 +41,8 @@ dependencies {
     implementation fileTree(dir: ANDROID_PATH, include: '*.jar')
     implementation fileTree(dir: ANDROID_PATH+'data/', include: '*.jar')
 
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    // This imports files as aar which require extra work to import
+    // instead I modified the code to not require them
+//    implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:support-v4:27.1.1'
 }

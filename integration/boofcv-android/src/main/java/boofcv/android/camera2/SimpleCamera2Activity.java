@@ -18,6 +18,7 @@
 
 package boofcv.android.camera2;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
@@ -28,7 +29,6 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Size;
 import android.util.SizeF;
@@ -71,7 +71,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author Peter Abeles
  */
-public abstract class SimpleCamera2Activity extends AppCompatActivity {
+public abstract class SimpleCamera2Activity extends Activity {
     private static final String TAG = "SimpleCamera2";
 
     private CameraDevice mCameraDevice;

@@ -31,6 +31,7 @@ import android.util.Log;
 import android.util.Size;
 import android.view.*;
 import boofcv.android.ConvertBitmap;
+import boofcv.android.ConvertYuv420_888;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -112,7 +113,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
             Log.i(TAG,"onCreate()");
 
         // Free up more screen space
-        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        android.app.ActionBar actionBar = getActionBar();
         if( actionBar != null ) {
             actionBar.hide();
         }
