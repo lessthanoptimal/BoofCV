@@ -18,6 +18,8 @@ Version : 0.30
   * QrCodeGeneratorImage automatically has a white border
 - ImageType
   * Added setTo() and isSameType()
+- Android
+  * Support for camera2 API
 
 - TODO PNP regression and benchmark
 - TODO Compare BoofCV's IPPE against original

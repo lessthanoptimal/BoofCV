@@ -22,11 +22,17 @@ println "Android version is $ext.ANDROID_VERSION"
 test.enabled = false
 
 dependencies {
-    compile project(':main:boofcv-ip')
-    compile project(':main:boofcv-feature')
-    compile project(':main:boofcv-calibration')
-    compile project(':main:boofcv-geo')
+    implementation project(':main:boofcv-ip')
+    implementation project(':main:boofcv-feature')
+    implementation project(':main:boofcv-calibration')
+    implementation project(':main:boofcv-geo')
 
-    compile fileTree(dir: ANDROID_PATH, include: '*.jar')
-    compile fileTree(dir: ANDROID_PATH+'data/', include: '*.jar')
+    // Google doesn't provide access to an android.jar
+    // A proper android library could be built but that seems to make
+    // the build become wonky and IntelliJ doesn't like it. This is less error prone
+    implementation fileTree(dir: ANDROID_PATH, include: '*.jar')
+    implementation fileTree(dir: ANDROID_PATH+'data/', include: '*.jar')
+
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:support-v4:27.1.1'
 }
