@@ -57,6 +57,15 @@ import java.util.concurrent.TimeUnit;
  *     <li>{@link #setImageType}</li>
  * </ul>
  *
+ * Useful variables
+ * <ul>
+ *     <li><b>imageToView</b>: Matrix that converts a pixel in video frame to view frame</li>
+ *     <li><b>targetResolution</b>: Specifies how many pixels you want in the video frame</li>
+ *     <li><b>stretchToFill</b>: true to stretch the video frame to fill the entire view</li>
+ *     <li><b>showBitmap</b>: If it should handle convert the video frame into a bitmap and rendering it</li>
+ *     <li><b>visualizeOnlyMostRecent</b>: If more than one thread is enabled should it show old results</li>
+ * </ul>
+ *
  * Configuration variables
  * <ul>
  *     <li>targetResolution</li>
@@ -91,6 +100,10 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
     protected ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1,1,50, TimeUnit.MILLISECONDS,
             threadQueue);
 
+    /**
+     * Stores the transform from the video image to the view it is displayed on. Handles
+     * All those annoying rotations.
+     */
     protected Matrix imageToView = new Matrix();
 
     // number of pixels it searches for when choosing camera resolution
