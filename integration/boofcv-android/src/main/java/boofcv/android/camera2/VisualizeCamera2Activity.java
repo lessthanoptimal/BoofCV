@@ -119,6 +119,9 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
     protected boolean visualizeOnlyMostRecent = true;
     protected volatile long timeOfLastUpdated;
 
+    // An identity matrix
+    private Matrix identity = new Matrix();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -153,7 +156,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
      */
     protected void startCamera(@NonNull ViewGroup layout, @Nullable TextureView view ) {
         if( verbose )
-            Log.i(TAG,"startCamera(layout,view="+(view!=null)+")");
+            Log.i(TAG,"startCamera(layout , view="+(view!=null)+")");
         displayView = new DisplayView(this);
         layout.addView(displayView,layout.getChildCount(),
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -216,55 +219,60 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
     }
 
     @Override
-    protected void onCameraResolutionChange(int width, int height) {
+    protected void onCameraResolutionChange(int cameraWidth, int cameraHeight) {
         // predeclare bitmap image used for display
         if( showBitmap ) {
             synchronized (bitmapLock) {
-                if (bitmap.getWidth() != width || bitmap.getHeight() != height)
-                    bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                if (bitmap.getWidth() != cameraWidth || bitmap.getHeight() != cameraHeight)
+                    bitmap = Bitmap.createBitmap(cameraWidth, cameraHeight, Bitmap.Config.ARGB_8888);
                 bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
             }
         }
         // Compute transform from bitmap to view coordinates
-        int rotatedWidth = width;
-        int rotatedHeight = height;
+        int rotatedWidth = cameraWidth;
+        int rotatedHeight = cameraHeight;
 
         int rotation = getWindowManager().getDefaultDisplay().getRotation();
         int offsetX=0,offsetY=0;
 
-        if (Surface.ROTATION_0 == rotation || Surface.ROTATION_180 == rotation) {
-            rotatedWidth = height;
-            rotatedHeight = width;
+        if( verbose )
+            Log.i(TAG,"camera rotation = "+mSensorOrientation+" display rotation = "+rotation);
+
+        boolean needToRotateView = (Surface.ROTATION_0 == rotation || Surface.ROTATION_180 == rotation) !=
+                (mSensorOrientation == 0 || mSensorOrientation == 180);
+
+        if (needToRotateView) {
+            rotatedWidth = cameraHeight;
+            rotatedHeight = cameraWidth;
             offsetX = (rotatedWidth-rotatedHeight)/2;
             offsetY = (rotatedHeight-rotatedWidth)/2;
         }
 
         imageToView.reset();
         float scale = Math.min(
-                (float)displayView.getWidth()/rotatedWidth,
-                (float)displayView.getHeight()/rotatedHeight);
+                (float)viewWidth/rotatedWidth,
+                (float)viewHeight/rotatedHeight);
         if( scale == 0 ) {
             Log.e(TAG,"displayView has zero width and height");
             return;
         }
 
-
-        imageToView.postRotate(-90*rotation + mSensorOrientation, width/2, height/2);
+        imageToView.postRotate(-90*rotation + mSensorOrientation, cameraWidth/2, cameraHeight/2);
         imageToView.postTranslate(offsetX,offsetY);
         imageToView.postScale(scale,scale);
         if( stretchToFill ) {
             imageToView.postScale(
-                    displayView.getWidth()/(rotatedWidth*scale),
-                    displayView.getHeight()/(rotatedHeight*scale));
+                    viewWidth/(rotatedWidth*scale),
+                    viewHeight/(rotatedHeight*scale));
         } else {
             imageToView.postTranslate(
-                    (displayView.getWidth() - rotatedWidth*scale) / 2,
-                    (displayView.getHeight() - rotatedHeight*scale) / 2);
+                    (viewWidth - rotatedWidth*scale) / 2,
+                    (viewHeight - rotatedHeight*scale) / 2);
         }
 
         Log.i(TAG,imageToView.toString());
         Log.i(TAG,"scale = "+scale);
-        Log.i(TAG,"camera resolution cam="+width+"x"+height+" view="+displayView.getWidth()+"x"+displayView.getHeight());
+        Log.i(TAG,"camera resolution cam="+ cameraWidth +"x"+ cameraHeight +" view="+viewWidth+"x"+viewHeight);
     }
 
     /**
@@ -337,14 +345,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 
         // Put the image into the stack if the image type has not changed
         synchronized (imageLock) {
-            // TODO replace with imageType.isSameType() on next release
-            if( imageType.getFamily() != image.getImageType().getFamily() )
-                return;
-            if( imageType.getDataType() != image.getImageType().getDataType() )
-                return;
-            if( imageType.getNumBands() != image.getImageType().getNumBands() )
-                return;
-            stackImages.add(image);
+            if( imageType.isSameType(image.getImageType()))
+                stackImages.add(image);
         }
     }
 
@@ -352,6 +354,16 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
      * Renders the visualizations. Override and invoke super to add your own
      */
     protected void onDrawFrame( SurfaceView view , Canvas canvas ) {
+
+        // On an older Android phone it was discovered that the behavior of drawCanvas was different than
+        // on more recent phones. The transform would be concat on top of the canvas' existing transform.
+        // wihle the behavior of canvas.setTransform() was the same as on more recent phones.
+        // The existing transform would be a transform from screen to view! Below is a hack to make graphics
+        // line up. On the older phone the graphics will be shifted upwards towards the action bar since that
+        // separation is no longer taken in account. Know of a better way to fix this? this just makes no sense
+        // and looks like a bug.
+        canvas.setMatrix(identity);
+
         if( showBitmap ) {
             synchronized (bitmapLock) {
                 canvas.drawBitmap(bitmap, imageToView, null);

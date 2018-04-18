@@ -204,9 +204,9 @@ public abstract class SimpleCamera2Activity extends Activity {
     /**
      * Called when the camera's resolution has changed.
      */
-    protected void onCameraResolutionChange( int width , int height ) {
+    protected void onCameraResolutionChange( int cameraWidth , int cameraHeight ) {
         if( verbose )
-            Log.i(TAG,"onCameraResolutionChange( "+width+" , "+height+")");
+            Log.i(TAG,"onCameraResolutionChange( "+cameraWidth+" , "+cameraHeight+")");
 
     }
 
@@ -244,7 +244,7 @@ public abstract class SimpleCamera2Activity extends Activity {
     @SuppressWarnings("MissingPermission")
     private void openCamera(int widthTexture, int heightTexture) {
         if( verbose )
-            Log.i(TAG,"openCamera( texture: "+widthTexture+" , "+heightTexture+")");
+            Log.i(TAG,"openCamera( texture: "+widthTexture+"x"+heightTexture+")");
         if (isFinishing()) {
             return;
         }
@@ -448,6 +448,8 @@ public abstract class SimpleCamera2Activity extends Activity {
         {
             int width = right-left;
             int height = bottom-top;
+            if( verbose )
+                Log.i(TAG,"onLayoutChange() TL="+top+"x"+left+" view="+width+"x"+height+" mCameraSize="+(mCameraSize!=null));
             if( mCameraSize == null ) {
                 openCamera(width,height);
             }
@@ -461,12 +463,16 @@ public abstract class SimpleCamera2Activity extends Activity {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture,
                                               int width, int height) {
+            if( verbose )
+                Log.i(TAG,"onSurfaceTextureAvailable() view="+width+"x"+height+" mCameraSize="+(mCameraSize!=null));
             openCamera(width, height);
         }
 
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture,
                                                 int width, int height) {
+            if( verbose )
+                Log.i(TAG,"onSurfaceTextureSizeChanged() view="+width+"x"+height);
             configureTransform(width, height);
         }
 
