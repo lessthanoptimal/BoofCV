@@ -28,6 +28,8 @@ import android.hardware.camera2.*;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.Size;
@@ -97,8 +99,15 @@ public abstract class SimpleCamera2Activity extends Activity {
     // width and height of the view the camera is displayed in
     protected int viewWidth,viewHeight;
 
-    // If true there will be verbose outpput to Log
+    // If true there will be verbose output to Log
     protected boolean verbose = true;
+
+
+    /**
+     * An additional thread for running tasks that shouldn't block the UI.
+     */
+    private HandlerThread mBackgroundThread;
+    private Handler mBackgroundHandler;
 
     /**
      * After this function is called the camera will be start. It might not start immediately
@@ -129,6 +138,29 @@ public abstract class SimpleCamera2Activity extends Activity {
         runOnUiThread(()->openCamera(0,0));
     }
 
+    /**
+     * Starts a background thread and its {@link Handler}.
+     */
+    private void startBackgroundThread() {
+        mBackgroundThread = new HandlerThread("CameraBackground");
+        mBackgroundThread.start();
+        mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
+    }
+
+    /**
+     * Stops the background thread and its {@link Handler}.
+     */
+    private void stopBackgroundThread() {
+        mBackgroundThread.quitSafely();
+        try {
+            mBackgroundThread.join();
+            mBackgroundThread = null;
+            mBackgroundHandler = null;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onResume() {
         if( verbose )
@@ -136,6 +168,7 @@ public abstract class SimpleCamera2Activity extends Activity {
         super.onResume();
 
         // TODO this hasn't been well tested yet
+        startBackgroundThread();
         if( mTextureView != null ) {
             if (mTextureView.isAvailable()) {
                 openCamera(mTextureView.getWidth(), mTextureView.getHeight());
@@ -158,6 +191,7 @@ public abstract class SimpleCamera2Activity extends Activity {
         if( verbose )
             Log.i(TAG,"onPause()");
         closeCamera();
+        stopBackgroundThread();
         super.onPause();
     }
 
@@ -292,7 +326,9 @@ public abstract class SimpleCamera2Activity extends Activity {
                     mPreviewReader = ImageReader.newInstance(
                             mCameraSize.getWidth(), mCameraSize.getHeight(),
                             ImageFormat.YUV_420_888, 2);
-                    mPreviewReader.setOnImageAvailableListener(onAvailableListener, null);
+                    // Do the processing inside the the handler thread instead of the looper thread to avoid
+                    // grinding the UI to a halt
+                    mPreviewReader.setOnImageAvailableListener(onAvailableListener, mBackgroundHandler);
                     configureTransform(widthTexture, heightTexture);
                     manager.openCamera(cameraId, mStateCallback, null);
                 } catch( IllegalArgumentException e ) {
@@ -393,7 +429,7 @@ public abstract class SimpleCamera2Activity extends Activity {
             return;
         }
         try {
-            mPreviewSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null, null);
+            mPreviewSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null, mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -539,6 +575,7 @@ public abstract class SimpleCamera2Activity extends Activity {
         }
     }
 
+    // This is run in the background handler and not the looper
     private ImageReader.OnImageAvailableListener onAvailableListener = imageReader -> {
         Image image = imageReader.acquireLatestImage();
         if (image == null)
@@ -546,6 +583,8 @@ public abstract class SimpleCamera2Activity extends Activity {
 
         processFrame(image);
         image.close();
+        // WARNING: It's not documented if Image is thread safe or not. it's implied that it because
+        // Google's examples show it being closed and processed in a thread other than looper.
     };
 
     public void setVerbose(boolean verbose) {
