@@ -43,6 +43,9 @@ public class ConvertYuv420_888
 
 	public static void yuvToBoof( Image yuv , ImageBase output , byte work[] )
 	{
+		if( BOverrideConvertAndroid.invokeYuv420ToBoof(yuv,output,work))
+			return;
+
 		if( output instanceof GrayU8 ) {
 			yuvToGray(yuv.getPlanes()[0],yuv.getWidth(),yuv.getHeight(),(GrayU8)output);
 		} else if( output instanceof  GrayF32 ) {

@@ -60,6 +60,9 @@ public class ConvertBitmap {
 	public static <T extends ImageBase<T>>
 	void bitmapToBoof( Bitmap input , T output , byte[] storage) {
 
+		if( BOverrideConvertAndroid.invokeBitmapToBoof(input,output,storage))
+			return;
+
 		switch( output.getImageType().getFamily() ) {
 			case GRAY: {
 				if( output.getClass() == GrayF32.class )
@@ -197,6 +200,9 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static void boofToBitmap( ImageBase input , Bitmap output , byte[] storage) {
+		if( BOverrideConvertAndroid.invokeBoofToBitmap(input,output,storage))
+			return;
+
 		if( input instanceof Planar ) {
 			planarToBitmap((Planar)input,output,storage);
 		} else if( input instanceof ImageGray ) {
