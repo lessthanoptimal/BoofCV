@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,7 +61,7 @@ public class TestConvertImage {
 			// make sure the return type equals the output type
 			assertTrue(outputType == m.getReturnType());
 
-			if( m.getName().contains("convert") ) {
+			if( m.getName().startsWith("convert") ) {
 				if( inputTypes.length == 5 ) {
 					checkConvertIntegerRange(m,inputTypes);
 				} else {
@@ -69,14 +69,14 @@ public class TestConvertImage {
 				}
 			} else {
 				if( inputType == Planar.class )
-					checkMultiAverage(m, inputType, outputType);
+					checkPlanarAverage(m, inputType, outputType);
 				else
 					checkInterleavedAverage(m, inputType, outputType);
 			}
 			count++;
 		}
 
-		assertEquals(8*7 + 8*7 +8+8+8+8+8,count);
+		assertEquals(8*7 + 8*7 +8+8+8+8+8+4,count);
 	}
 
 	private void checkConvert( Method m , Class inputType , Class outputType ) {
@@ -86,9 +86,9 @@ public class TestConvertImage {
 			if( ImageInterleaved.class.isAssignableFrom(outputType) )
 				checkConvertInterleaved(m, inputType, outputType);
 			else
-				checkConvertInterleavedToMulti(m, inputType, outputType);
+				checkConvertInterleavedToPlanar(m, inputType, outputType);
 		} else {
-			checkConvertMultiToInterleaved(m,inputType,outputType);
+			checkConvertPlanarToInterleaved(m,inputType,outputType);
 		}
 	}
 
@@ -237,28 +237,49 @@ public class TestConvertImage {
 		}
 	}
 
-	private void checkConvertInterleavedToMulti( Method m , Class inputType , Class outputType ) {
-		ImageInterleaved input = GeneralizedImageOps.createInterleaved(inputType, imgWidth, imgHeight,2);
+	private void checkConvertInterleavedToPlanar(Method m , Class inputType , Class outputType ) {
+		String methodName = m.getName();
+		ImageDataType dataIn,dataOut;
 
-		Class bandType = ImageDataType.typeToSingleClass(input.getDataType());
+		if( methodName.equals("convert")) {
+			dataIn = dataOut = ImageDataType.classToType(inputType);
+		} else if( methodName.endsWith("U8F32")){
+			dataIn = ImageDataType.U8;
+			dataOut = ImageDataType.F32;
+		} else if( methodName.endsWith("F32U8")) {
+			dataIn = ImageDataType.F32;
+			dataOut = ImageDataType.U8;
+		} else {
+			throw new RuntimeException("Unexpected method name "+methodName);
+		}
+
+		ImageInterleaved input = GeneralizedImageOps.createInterleaved(dataIn, imgWidth, imgHeight,2);
+
+		Class bandType = ImageDataType.typeToSingleClass(dataOut);
 		Planar output = new Planar(bandType,imgWidth, imgHeight, 2);
 
-		boolean inputSigned = true;
+		boolean inputSigned = false;
 
-		if( input.getImageType().getDataType().isInteger() )
-			inputSigned = input.getDataType().isSigned();
+		if( dataIn.isInteger() )
+			inputSigned = dataIn.isSigned() && dataOut.isSigned();
 
 		// only provide signed numbers of both data types can handle them
 		if( inputSigned ) {
 			GImageMiscOps.fillUniform(input, rand, -10, 10);
+		} else {
+			GImageMiscOps.fillUniform(input, rand, 5, 200);
 		}
 
-		BoofTesting.checkSubImage(this, "checkConvertInterleavedToMulti", true, m, input, output);
+		BoofTesting.checkSubImage(this, "checkConvertInterleavedToPlanar", true, m, input, output);
 	}
 
-	public void checkConvertInterleavedToMulti( Method m , ImageInterleaved<?> input , Planar<?> output ) {
+	public void checkConvertInterleavedToPlanar(Method m , ImageInterleaved<?> input , Planar<?> output ) {
 		try {
-			double tol = 1e-4;
+			double tol;
+			if( !input.getImageType().getDataType().isInteger() && !output.getImageType().getDataType().isInteger())
+				tol = 1e-4;
+			else
+				tol = 1;
 
 			// check it with a non-null output
 			Planar<?> ret = (Planar<?>)m.invoke(null,input,output);
@@ -274,28 +295,48 @@ public class TestConvertImage {
 		}
 	}
 
-	private void checkConvertMultiToInterleaved( Method m , Class inputType , Class outputType ) {
-		ImageInterleaved output = GeneralizedImageOps.createInterleaved(outputType, imgWidth, imgHeight,2);
+	private void checkConvertPlanarToInterleaved(Method m , Class inputType , Class outputType ) {
+		String methodName = m.getName();
+		ImageDataType dataIn,dataOut;
 
-		Class bandType = ImageDataType.typeToSingleClass(output.getDataType());
+		if( methodName.equals("convert")) {
+			dataIn = dataOut = ImageDataType.classToType(outputType);
+		} else if( methodName.endsWith("U8F32")){
+			dataIn = ImageDataType.U8;
+			dataOut = ImageDataType.F32;
+		} else if( methodName.endsWith("F32U8")) {
+			dataIn = ImageDataType.F32;
+			dataOut = ImageDataType.U8;
+		} else {
+			throw new RuntimeException("Unexpected method name "+methodName);
+		}
+		ImageInterleaved output = GeneralizedImageOps.createInterleaved(dataOut, imgWidth, imgHeight,2);
+
+		Class bandType = ImageDataType.typeToSingleClass(dataIn);
 		Planar input = new Planar(bandType,imgWidth, imgHeight, 2);
 
-		boolean signed = true;
+		boolean inputSigned = false;
 
-		if( input.getImageType().getDataType().isInteger() )
-			signed = output.getDataType().isSigned();
+		if( dataIn.isInteger() )
+			inputSigned = dataIn.isSigned() && dataOut.isSigned();
 
 		// only provide signed numbers of both data types can handle them
-		if( signed ) {
+		if( inputSigned ) {
 			GImageMiscOps.fillUniform(input, rand, -10, 10);
+		} else {
+			GImageMiscOps.fillUniform(input, rand, 5, 200);
 		}
 
-		BoofTesting.checkSubImage(this, "checkConvertMultiToInterleaved", true, m, input, output);
+		BoofTesting.checkSubImage(this, "checkConvertPlanarToInterleaved", true, m, input, output);
 	}
 
-	public void checkConvertMultiToInterleaved(Method m , Planar<?> input , ImageInterleaved<?> output ) {
+	public void checkConvertPlanarToInterleaved(Method m , Planar<?> input , ImageInterleaved<?> output ) {
 		try {
-			double tol = 1e-4;
+			double tol;
+			if( !input.getImageType().getDataType().isInteger() && !output.getImageType().getDataType().isInteger())
+				tol = 1e-4;
+			else
+				tol = 1;
 
 			// check it with a non-null output
 			ImageInterleaved<?> ret = (ImageInterleaved<?>)m.invoke(null,input,output);
@@ -311,7 +352,7 @@ public class TestConvertImage {
 		}
 	}
 
-	private void checkMultiAverage(Method m, Class inputType, Class outputType) {
+	private void checkPlanarAverage(Method m, Class inputType, Class outputType) {
 		if( inputType != Planar.class )
 			fail("Expected Planar image");
 
@@ -332,27 +373,27 @@ public class TestConvertImage {
 				GImageMiscOps.fillUniform(input, rand, 0, 20);
 			}
 
-			BoofTesting.checkSubImage(this,"checkMultiAverage",true,m,input,output);
+			BoofTesting.checkSubImage(this,"checkPlanarAverage",true,m,input,output);
 		}
 	}
 
-	public void checkMultiAverage(Method m, Planar<?> input, ImageGray<?> output) {
+	public void checkPlanarAverage(Method m, Planar<?> input, ImageGray<?> output) {
 		try {
 			// check it with a non-null output
 			ImageGray<?> ret = (ImageGray<?>)m.invoke(null,input,output);
 			assertTrue(ret == output);
-			checkMultiAverage(input, ret);
+			checkPlanarAverage(input, ret);
 
 			// check it with a null output
 			ret = (ImageGray<?>)m.invoke(null,input,null);
-			checkMultiAverage(input, ret);
+			checkPlanarAverage(input, ret);
 
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private void checkMultiAverage(Planar<?> input, ImageGray<?> found) {
+	private void checkPlanarAverage(Planar<?> input, ImageGray<?> found) {
 		int numBands = input.getNumBands();
 		for( int y = 0; y < imgHeight; y++ ){
 			for( int x = 0; x < imgWidth; x++ ) {

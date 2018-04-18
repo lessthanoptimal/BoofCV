@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,12 +26,12 @@ import java.io.FileNotFoundException;
 /**
  * @author Peter Abeles
  */
-public class GenerateImplConvertMsToSingle extends CodeGeneratorBase {
+public class GenerateImplConvertPlanarToSingle extends CodeGeneratorBase {
 
-	String className = "ImplConvertMsToSingle";
+	String className = "ImplConvertPlanarToGray";
 
 
-	public GenerateImplConvertMsToSingle() throws FileNotFoundException {
+	public GenerateImplConvertPlanarToSingle() throws FileNotFoundException {
 		setOutputFile(className);
 	}
 
@@ -114,7 +114,7 @@ public class GenerateImplConvertMsToSingle extends CodeGeneratorBase {
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
-		GenerateImplConvertMsToSingle app = new GenerateImplConvertMsToSingle();
+		GenerateImplConvertPlanarToSingle app = new GenerateImplConvertPlanarToSingle();
 
 		app.generate();
 	}

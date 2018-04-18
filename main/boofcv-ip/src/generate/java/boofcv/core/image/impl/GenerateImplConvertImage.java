@@ -41,9 +41,15 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 				printConvertSingle(in, out);
 				printConvertInterleaved(in, out);
 			}
-			printInterleaveToMulti(in);
-			printMultiToInterleaved(in);
+			printInterleaveToPlanar(in);
+			printPlanarToInterleaved(in);
 		}
+
+		// Add a few common special cases so that a temporary image doesn't need to be created
+		printInterleaveToPlanar(AutoTypeImage.U8,AutoTypeImage.F32);
+		printInterleaveToPlanar(AutoTypeImage.F32,AutoTypeImage.U8);
+		printPlanarToInterleaved(AutoTypeImage.U8,AutoTypeImage.F32);
+		printPlanarToInterleaved(AutoTypeImage.F32,AutoTypeImage.U8);
 
 		out.print("}\n");
 	}
@@ -152,7 +158,7 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-		private void printInterleaveToMulti(AutoTypeImage imageIn) {
+	private void printInterleaveToPlanar(AutoTypeImage imageIn) {
 		String inputName = imageIn.getInterleavedName();
 		String bandName = imageIn.getSingleBandName();
 
@@ -176,7 +182,36 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printMultiToInterleaved(AutoTypeImage imageIn) {
+	private void printInterleaveToPlanar(AutoTypeImage imageIn, AutoTypeImage imageOut) {
+		String inputName = imageIn.getInterleavedName();
+		String bandName = imageOut.getSingleBandName();
+		String bitWise = imageIn.getBitWise();
+		String type=imageIn.getAbbreviatedType()+""+imageOut.getAbbreviatedType();
+		String typecast = "";
+		if( imageOut.isInteger() ) {
+			typecast = "("+imageOut.getDataType()+")";
+		}
+		out.print(
+				"\tpublic static void convert"+type+"( "+inputName+" input , Planar<"+bandName+"> output ) {\n" +
+						"\n" +
+						"\t\tfinal int numBands = input.numBands;\n" +
+						"\t\tfor (int i = 0; i < numBands; i++) {\n" +
+						"\t\t\t"+bandName+" band = output.bands[i];\n" +
+						"\n" +
+						"\t\t\tfor (int y = 0; y < input.height; y++) {\n" +
+						"\t\t\t\tint indexSrc = y*input.stride + input.startIndex + i;\n" +
+						"\t\t\t\tint indexDst = y*output.stride + output.startIndex;\n" +
+						"\t\t\t\tint end = indexDst + input.width;\n" +
+						"\t\t\t\twhile( indexDst != end ) {\n" +
+						"\t\t\t\t\tband.data[indexDst++] = "+typecast+"(input.data[indexSrc]"+bitWise+");\n" +
+						"\t\t\t\t\tindexSrc += numBands;\n" +
+						"\t\t\t\t}\n" +
+						"\t\t\t}\n" +
+						"\t\t}\n" +
+						"\t}\n\n");
+	}
+
+	private void printPlanarToInterleaved(AutoTypeImage imageIn) {
 		String outputName = imageIn.getInterleavedName();
 		String bandName = imageIn.getSingleBandName();
 
@@ -198,6 +233,37 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
+	}
+
+	private void printPlanarToInterleaved(AutoTypeImage imageIn, AutoTypeImage imageOut) {
+		String outputName = imageOut.getInterleavedName();
+		String bandName = imageIn.getSingleBandName();
+		String bitwise = imageIn.getBitWise();
+
+		String type=imageIn.getAbbreviatedType()+""+imageOut.getAbbreviatedType();
+		String typecast = "";
+		if( imageOut.isInteger() ) {
+			typecast = "("+imageOut.getDataType()+")";
+		}
+
+		out.print(
+				"\tpublic static void convert"+type+"( Planar<"+bandName+"> input , "+outputName+" output ) {\n" +
+						"\n" +
+						"\t\tfinal int numBands = input.getNumBands();\n" +
+						"\t\tfor (int i = 0; i < numBands; i++) {\n" +
+						"\t\t\t"+bandName+" band = input.bands[i];\n" +
+						"\t\t\tfor (int y = 0; y < input.height; y++) {\n" +
+						"\t\t\t\tint indexSrc = y * input.stride + input.startIndex;\n" +
+						"\t\t\t\tint indexDst = y * output.stride + output.startIndex + i;\n" +
+						"\t\t\t\tint end = indexSrc + input.width;\n" +
+						"\t\t\t\t\n" +
+						"\t\t\t\twhile( indexSrc != end ) { \n" +
+						"\t\t\t\t\toutput.data[indexDst] = "+typecast+"(band.data[indexSrc++]"+bitwise+");\n" +
+						"\t\t\t\t\tindexDst += numBands;\n" +
+						"\t\t\t\t}\n" +
+						"\t\t\t}\n" +
+						"\t\t}\n" +
+						"\t}\n\n");
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
