@@ -58,6 +58,8 @@ import java.util.concurrent.locks.ReentrantLock;
  *     <li>{@link #configureCamera}</li>
  *     <li>{@link #selectCamera}</li>
  *     <li>{@link #processFrame}</li>
+ *     <li>{@link #onCameraOpened}</li>
+ *     <li>{@link #onCameraDisconnected}</li>
  * </ul>
  *
  * Configuration variables
@@ -99,6 +101,10 @@ public abstract class SimpleCamera2Activity extends Activity {
 
 	// width and height of the view the camera is displayed in
 	protected int viewWidth,viewHeight;
+
+	// Is this the first frame being processed. Sanity checks are done on the first frame
+	private volatile boolean firstFrame;
+	private volatile boolean canProcessImages;
 
 	// If true there will be verbose output to Log
 	protected boolean verbose = true;
@@ -238,12 +244,12 @@ public abstract class SimpleCamera2Activity extends Activity {
 	}
 
 	/**
-	 * Called when the camera's resolution has changed.
+	 * Called when the camera's resolution has changed. This function can be called more than once
+	 * each time a camera is opened, e.g. requested resolution does not match actual.
 	 */
 	protected void onCameraResolutionChange( int cameraWidth , int cameraHeight ) {
 		if( verbose )
 			Log.i(TAG,"onCameraResolutionChange( "+cameraWidth+" , "+cameraHeight+")");
-
 	}
 
 	/**
@@ -253,6 +259,8 @@ public abstract class SimpleCamera2Activity extends Activity {
 	 * @param captureRequestBuilder used to configure the camera
 	 */
 	protected void configureCamera( CaptureRequest.Builder captureRequestBuilder ) {
+		if( verbose )
+			Log.i(TAG,"configureCamera() default function");
 		captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
 	}
 
@@ -260,6 +268,8 @@ public abstract class SimpleCamera2Activity extends Activity {
 	 * By default this will select the backfacing camera. override to change the camera it selects.
 	 */
 	protected boolean selectCamera( CameraCharacteristics characteristics ) {
+		if( verbose )
+			Log.i(TAG,"selectCamera() default function");
 		Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
 		return facing == null || facing != CameraCharacteristics.LENS_FACING_FRONT;
 	}
@@ -278,7 +288,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 	 * Tries to open a {@link CameraDevice}. The result is listened by `mStateCallback`.
 	 */
 	@SuppressWarnings("MissingPermission")
-	private void openCamera(int widthTexture, int heightTexture) {
+	protected void openCamera(int widthTexture, int heightTexture) {
 		if( verbose )
 			Log.i(TAG,"openCamera( texture: "+widthTexture+"x"+heightTexture+")");
 
@@ -292,6 +302,10 @@ public abstract class SimpleCamera2Activity extends Activity {
 			return;
 		}
 
+		if( mCameraDevice != null ) {
+			throw new RuntimeException("Tried to open camera with one already open");
+		}
+
 		if (isFinishing()) {
 			return;
 		}
@@ -302,6 +316,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 		// Save the size of the component the camera feed is being displayed inside of
 		this.viewWidth = widthTexture;
 		this.viewHeight = heightTexture;
+		this.firstFrame = true;
 
 		try {
 			if( verbose )
@@ -368,11 +383,65 @@ public abstract class SimpleCamera2Activity extends Activity {
 		}
 	}
 
-	private void closeCamera() {
+	/**
+	 * Re-opens the camera with the same settings at the specified resolution. It is assumed that you know
+	 * what you're doing and that this is a valid resolution.
+	 *
+	 * WARNING: UNTESTED
+	 */
+	protected void reopenCameraAtResolution(int cameraWidth, int cameraHeight) {
+
+		mCameraOpenCloseLock.lock();
+		if( verbose )
+			Log.i(TAG,"  camera is null == "+(mCameraDevice==null));
+		closePreviewSession();
+		if (null != mCameraDevice) {
+			mCameraDevice.close();
+			mCameraDevice = null;
+		}
+		mCameraSize = null;
+		mCameraCharacterstics = null;
+		firstFrame = true;
+
+		CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+		if( manager == null )
+			throw new RuntimeException("Null camera manager");
+
+		try {
+			mPreviewReader = ImageReader.newInstance(
+					cameraWidth,cameraHeight,
+					ImageFormat.YUV_420_888, 2);
+			// Do the processing inside the the handler thread instead of the looper thread to avoid
+			// grinding the UI to a halt
+			mPreviewReader.setOnImageAvailableListener(onAvailableListener, mBackgroundHandler);
+			configureTransform(viewWidth, viewHeight);
+			manager.openCamera(cameraId, mStateCallback, null);
+		} catch( IllegalArgumentException e ) {
+			Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+			finish();
+		} catch (CameraAccessException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Closes the camera. Returns true if the camera was not already closed and it closed it
+	 * @return
+	 */
+	protected boolean closeCamera() {
 		if( verbose )
 			Log.i(TAG,"closeCamera()");
 		if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
 			throw new RuntimeException("Attempted to close camera not on the main looper thread!");
+		}
+
+		boolean closed = false;
+
+		if( verbose ) {
+			StackTraceElement[] trace = new RuntimeException().getStackTrace();
+			for (int i = 0; i < Math.min(trace.length, 3); i++) {
+				System.out.println("[ " + i + " ] = " + trace[i].toString());
+			}
 		}
 		try {
 			mCameraOpenCloseLock.lock();
@@ -380,6 +449,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 				Log.i(TAG,"  camera is null == "+(mCameraDevice==null));
 			closePreviewSession();
 			if (null != mCameraDevice) {
+				closed = true;
 				mCameraDevice.close();
 				mCameraDevice = null;
 			}
@@ -388,6 +458,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 		} finally {
 			mCameraOpenCloseLock.unlock();
 		}
+		return closed;
 	}
 
 	/**
@@ -401,6 +472,10 @@ public abstract class SimpleCamera2Activity extends Activity {
 		// that's fine just be careful nothing assumes it's on the main looper
 		if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
 			throw new RuntimeException("Not on main looper! Modify code to remove assumptions");
+		}
+
+		if( verbose ) {
+			Log.i(TAG,"startPreview()");
 		}
 
 		try {
@@ -559,6 +634,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			if (null != mTextureView) {
 				configureTransform(mTextureView.getWidth(), mTextureView.getHeight());
 			}
+			onCameraOpened(cameraDevice);
 		}
 
 		@Override
@@ -568,7 +644,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			mCameraDevice = null;
 			mCameraOpenCloseLock.unlock();
 			cameraDevice.close();
-
+			onCameraDisconnected(cameraDevice);
 		}
 
 		@Override
@@ -581,6 +657,16 @@ public abstract class SimpleCamera2Activity extends Activity {
 			finish();
 		}
 	};
+
+	/**
+	 * Invoked when the camera has been opened
+	 */
+	protected void onCameraOpened( @NonNull CameraDevice cameraDevice ){}
+
+	/**
+	 * Invoked when the camera has been disconnected
+	 */
+	protected void onCameraDisconnected( @NonNull CameraDevice cameraDevice ){}
 
 	/**
 	 * Estimates the camera's horizontal and vertical FOV by picking a nominal value.
@@ -607,10 +693,30 @@ public abstract class SimpleCamera2Activity extends Activity {
 		if (image == null)
 			return;
 
-		processFrame(image);
+		if( firstFrame ) {
+			firstFrame = false;
+			canProcessImages = false;
+			// sometimes we request a resolution and Android say's f-you and gives us something else even if it's
+			// in the valid list. Re-adjust everything to what the actual resolution is
+			if( mCameraSize.getWidth() != image.getWidth() || mCameraSize.getHeight() != image.getHeight() ) {
+				Log.e(TAG,"Android broke resolution contract. Actual="+image.getWidth()+"x"+image.getHeight()+
+				"  Expected="+mCameraSize.getWidth()+"x"+mCameraSize.getHeight());
+				mCameraSize = new Size(image.getWidth(), image.getHeight());
+				runOnUiThread(() -> {
+					configureTransform(viewWidth, viewHeight);
+					onCameraResolutionChange(mCameraSize.getWidth(), mCameraSize.getHeight());
+					canProcessImages = true;
+				});
+			} else {
+				canProcessImages = true;
+			}
+		}
+		if( canProcessImages ) {
+			processFrame(image);
+			// WARNING: It's not documented if Image is thread safe or not. it's implied that it because
+			// Google's examples show it being closed and processed in a thread other than looper.
+		}
 		image.close();
-		// WARNING: It's not documented if Image is thread safe or not. it's implied that it because
-		// Google's examples show it being closed and processed in a thread other than looper.
 	};
 
 	public void setVerbose(boolean verbose) {

@@ -316,6 +316,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 			convertWork = ConvertYuv420_888.declareWork(image, convertWork);
 			ConvertYuv420_888.yuvToBoof(image,converted, convertWork);
 			long after = System.nanoTime();
+//			Log.i(TAG,"processFrame() image="+image.getWidth()+"x"+image.getHeight()+
+//					"  boof="+converted.width+"x"+converted.height);
 
 			// record how long it took to convert the image for diagnostic reasons
 			synchronized (lockTiming) {
@@ -358,6 +360,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 			// Copy this frame
 			if (showBitmap) {
 				synchronized (bitmapLock) {
+//					Log.i(TAG,"boofToBitmap image="+image.width+"x"+image.height+
+//							" bitmap="+bitmap.getWidth()+"x"+bitmap.getHeight());
 					ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
 				}
 			}
