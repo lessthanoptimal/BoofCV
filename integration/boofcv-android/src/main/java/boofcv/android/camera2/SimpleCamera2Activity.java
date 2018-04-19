@@ -30,6 +30,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.Size;
@@ -127,7 +128,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			Log.i(TAG,"startCamera(View="+(view!=null)+")");
 		this.mView = view;
 		this.mTextureView = null;
-		view.addOnLayoutChangeListener(mViewLayoutChangeListeneer);
+		view.addOnLayoutChangeListener(mViewLayoutChangeListener);
 	}
 
 	protected void startCamera() {
@@ -167,7 +168,8 @@ public abstract class SimpleCamera2Activity extends Activity {
 			Log.i(TAG,"onResume()");
 		super.onResume();
 
-		// TODO this hasn't been well tested yet
+		// When attached to a change listener below it's possible for the activity to but shutdown and a change
+		// in layout be broadcast after that. In that situation we don't want the camera to be opened!
 		startBackgroundThread();
 		if( mTextureView != null ) {
 			if (mTextureView.isAvailable()) {
@@ -179,7 +181,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			if( mView.getWidth() != 0 && mView.getHeight() != 0 ) {
 				openCamera(mView.getWidth(), mView.getHeight());
 			} else {
-				mView.addOnLayoutChangeListener(mViewLayoutChangeListeneer);
+				mView.addOnLayoutChangeListener(mViewLayoutChangeListener);
 			}
 		} else if( mCameraSize == null ) {
 			startCamera();
@@ -279,6 +281,17 @@ public abstract class SimpleCamera2Activity extends Activity {
 	private void openCamera(int widthTexture, int heightTexture) {
 		if( verbose )
 			Log.i(TAG,"openCamera( texture: "+widthTexture+"x"+heightTexture+")");
+
+		if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
+			throw new RuntimeException("Attempted to openCamera() when not in the main looper thread!");
+		}
+
+		if( mBackgroundHandler == null ) {
+			if( verbose )
+				Log.i(TAG,"Background handler is null. Aborting. Activity should be shutdown already");
+			return;
+		}
+
 		if (isFinishing()) {
 			return;
 		}
@@ -358,8 +371,13 @@ public abstract class SimpleCamera2Activity extends Activity {
 	private void closeCamera() {
 		if( verbose )
 			Log.i(TAG,"closeCamera()");
+		if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
+			throw new RuntimeException("Attempted to close camera not on the main looper thread!");
+		}
 		try {
 			mCameraOpenCloseLock.lock();
+			if( verbose )
+				Log.i(TAG,"  camera is null == "+(mCameraDevice==null));
 			closePreviewSession();
 			if (null != mCameraDevice) {
 				mCameraDevice.close();
@@ -379,6 +397,12 @@ public abstract class SimpleCamera2Activity extends Activity {
 		if (null == mCameraDevice || null == mCameraSize) {
 			return;
 		}
+		// Sanity check. Parts of this code assume it's on this thread. If it has been put into a handle
+		// that's fine just be careful nothing assumes it's on the main looper
+		if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
+			throw new RuntimeException("Not on main looper! Modify code to remove assumptions");
+		}
+
 		try {
 			closePreviewSession();
 			List<Surface> surfaces = new ArrayList<>();
@@ -413,6 +437,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 
 						@Override
 						public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+							Log.i(TAG,"CameraCaptureSession.onConfigureFailed()");
 							Toast.makeText(SimpleCamera2Activity.this, "Failed", Toast.LENGTH_SHORT).show();
 						}
 					}, null);
@@ -475,7 +500,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 		}
 	}
 
-	private View.OnLayoutChangeListener mViewLayoutChangeListeneer
+	private View.OnLayoutChangeListener mViewLayoutChangeListener
 			= new View.OnLayoutChangeListener() {
 
 		@Override
@@ -540,19 +565,19 @@ public abstract class SimpleCamera2Activity extends Activity {
 		public void onDisconnected(@NonNull CameraDevice cameraDevice) {
 			if( verbose )
 				Log.i(TAG,"CameraDevice Callback onDisconnected() id="+cameraDevice.getId());
-			mCameraOpenCloseLock.unlock();
 			mCameraDevice = null;
+			mCameraOpenCloseLock.unlock();
 			cameraDevice.close();
 
 		}
 
 		@Override
 		public void onError(@NonNull CameraDevice cameraDevice, int error) {
-			if( verbose )
-				Log.e(TAG,"CameraDevice Callback onError() error="+error);
+//			if( verbose )
+			Log.e(TAG,"CameraDevice Callback onError() error="+error);
+			mCameraDevice = null;
 			mCameraOpenCloseLock.unlock();
 			cameraDevice.close();
-			mCameraDevice = null;
 			finish();
 		}
 	};

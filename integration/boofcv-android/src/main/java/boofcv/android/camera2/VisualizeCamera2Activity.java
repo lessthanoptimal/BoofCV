@@ -32,6 +32,7 @@ import android.util.Size;
 import android.view.*;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.ConvertYuv420_888;
+import boofcv.misc.MovingAverage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -121,6 +122,13 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 
 	// An identity matrix
 	private Matrix identity = new Matrix();
+
+	//START Lock for timing structures
+	protected static final int TIMING_WARM_UP = 3; // number of frames that must be processed before it starts
+	protected final Object lockTiming = new Object();
+	protected int totalConverted; // counter for frames converted since data type was set
+	protected final MovingAverage periodConvert = new MovingAverage(0.8); // milliseconds
+	//END
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -283,6 +291,11 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 			this.imageType = type;
 			// todo check to see if the type is the same or not before clearing
 			this.stackImages.clear();
+
+			synchronized (lockTiming) {
+				totalConverted = 0;
+				periodConvert.reset();
+			}
 		}
 	}
 
@@ -299,8 +312,18 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 			} else {
 				converted = stackImages.pop();
 			}
+			long before = System.nanoTime();
 			convertWork = ConvertYuv420_888.declareWork(image, convertWork);
 			ConvertYuv420_888.yuvToBoof(image,converted, convertWork);
+			long after = System.nanoTime();
+
+			// record how long it took to convert the image for diagnostic reasons
+			synchronized (lockTiming) {
+				totalConverted++;
+				if( totalConverted >= TIMING_WARM_UP ) {
+					periodConvert.update((after - before) * 1e-6);
+				}
+			}
 
 			threadPool.execute(()->processImageOuter(converted));
 		}
