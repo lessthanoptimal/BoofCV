@@ -13,17 +13,6 @@ dependencies {
     implementation project(':integration:boofcv-WebcamCapture')
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir 'src'
-        }
-        resources {
-            srcDir 'resources'
-        }
-    }
-}
-
 // Create a jar which contains all the applications
 task demonstrations(type: Jar) {
     manifest {
