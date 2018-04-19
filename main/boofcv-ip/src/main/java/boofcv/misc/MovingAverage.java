@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,14 +36,14 @@ public class MovingAverage {
 	}
 
 	public MovingAverage( double decay ) {
-		if( decay < 0 || decay > 1 )
-			throw new IllegalArgumentException("Decay must be 0 to 1, inclusive");
+		setDecay(decay);
 		this.decay = decay;
 		reset();
 	}
 
 	public void reset() {
 		first = true;
+		average = 0;
 	}
 
 	public double update( double sample ) {
@@ -58,5 +58,19 @@ public class MovingAverage {
 
 	public double getAverage() {
 		return average;
+	}
+
+	public double getDecay() {
+		return decay;
+	}
+
+	public void setDecay(double decay) {
+		if( decay < 0 || decay > 1.0 )
+			throw new IllegalArgumentException("Decay must be from 0 to 1, inclusive");
+		this.decay = decay;
+	}
+
+	public boolean isFirst() {
+		return first;
 	}
 }
