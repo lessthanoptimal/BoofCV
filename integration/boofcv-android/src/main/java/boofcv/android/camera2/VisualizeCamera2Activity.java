@@ -121,7 +121,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	protected volatile long timeOfLastUpdated;
 
 	// An identity matrix
-	private Matrix identity = new Matrix();
+	protected final Matrix identity = new Matrix();
 
 	//START Lock for timing structures
 	protected static final int TIMING_WARM_UP = 3; // number of frames that must be processed before it starts

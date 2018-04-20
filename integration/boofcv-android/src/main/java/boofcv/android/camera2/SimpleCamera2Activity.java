@@ -109,7 +109,6 @@ public abstract class SimpleCamera2Activity extends Activity {
 	// If true there will be verbose output to Log
 	protected boolean verbose = true;
 
-
 	/**
 	 * An additional thread for running tasks that shouldn't block the UI.
 	 */
@@ -261,7 +260,8 @@ public abstract class SimpleCamera2Activity extends Activity {
 	protected void configureCamera( CaptureRequest.Builder captureRequestBuilder ) {
 		if( verbose )
 			Log.i(TAG,"configureCamera() default function");
-		captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
+		captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO);
+		captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
 	}
 
 	/**
