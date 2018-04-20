@@ -236,18 +236,27 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 				bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
 			}
 		}
+		int rotation = getWindowManager().getDefaultDisplay().getRotation();
+		if( verbose )
+			Log.i(TAG,"camera rotation = "+mSensorOrientation+" display rotation = "+rotation);
+
+		videoToDisplayMatrix(cameraWidth, cameraHeight,mSensorOrientation,
+				viewWidth,viewHeight,rotation*90, stretchToFill,imageToView);
+
+	}
+
+	protected static void videoToDisplayMatrix(int cameraWidth, int cameraHeight , int cameraRotation,
+											   int displayWidth , int displayHeight, int displayRotation ,
+											   boolean stretchToFill, Matrix imageToView )
+	{
 		// Compute transform from bitmap to view coordinates
 		int rotatedWidth = cameraWidth;
 		int rotatedHeight = cameraHeight;
 
-		int rotation = getWindowManager().getDefaultDisplay().getRotation();
 		int offsetX=0,offsetY=0;
 
-		if( verbose )
-			Log.i(TAG,"camera rotation = "+mSensorOrientation+" display rotation = "+rotation);
-
-		boolean needToRotateView = (Surface.ROTATION_0 == rotation || Surface.ROTATION_180 == rotation) !=
-				(mSensorOrientation == 0 || mSensorOrientation == 180);
+		boolean needToRotateView = (0 == displayRotation || 180 == displayRotation) !=
+				(cameraRotation == 0 || cameraRotation == 180);
 
 		if (needToRotateView) {
 			rotatedWidth = cameraHeight;
@@ -258,29 +267,25 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 
 		imageToView.reset();
 		float scale = Math.min(
-				(float)viewWidth/rotatedWidth,
-				(float)viewHeight/rotatedHeight);
+				(float)displayWidth/rotatedWidth,
+				(float)displayHeight/rotatedHeight);
 		if( scale == 0 ) {
 			Log.e(TAG,"displayView has zero width and height");
 			return;
 		}
 
-		imageToView.postRotate(-90*rotation + mSensorOrientation, cameraWidth/2, cameraHeight/2);
+		imageToView.postRotate(-displayRotation + cameraRotation, cameraWidth/2, cameraHeight/2);
 		imageToView.postTranslate(offsetX,offsetY);
 		imageToView.postScale(scale,scale);
 		if( stretchToFill ) {
 			imageToView.postScale(
-					viewWidth/(rotatedWidth*scale),
-					viewHeight/(rotatedHeight*scale));
+					displayWidth/(rotatedWidth*scale),
+					displayHeight/(rotatedHeight*scale));
 		} else {
 			imageToView.postTranslate(
-					(viewWidth - rotatedWidth*scale) / 2,
-					(viewHeight - rotatedHeight*scale) / 2);
+					(displayWidth - rotatedWidth*scale) / 2,
+					(displayHeight - rotatedHeight*scale) / 2);
 		}
-
-		Log.i(TAG,imageToView.toString());
-		Log.i(TAG,"scale = "+scale);
-		Log.i(TAG,"camera resolution cam="+ cameraWidth +"x"+ cameraHeight +" view="+viewWidth+"x"+viewHeight);
 	}
 
 	/**

@@ -16,6 +16,7 @@ Version : 0.30
   * Added IPPE; Collins, Toby, and Adrien Bartoli. "Infinitesimal plane-based pose estimation."
 - QR Code
   * QrCodeGeneratorImage automatically has a white border
+  * Fixed crash bug if it estimated a version 0 QR
 - ImageType
   * Added setTo() and isSameType()
 - Android

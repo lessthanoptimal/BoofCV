@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -358,6 +358,8 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 			} else {
 				version = version0;
 			}
+		} else if( version <= 0 ) {
+			qr.version = -1;
 		}
 
 		qr.version = version;
