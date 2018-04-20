@@ -267,7 +267,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 	/**
 	 * By default this will select the backfacing camera. override to change the camera it selects.
 	 */
-	protected boolean selectCamera( CameraCharacteristics characteristics ) {
+	protected boolean selectCamera( String id , CameraCharacteristics characteristics ) {
 		if( verbose )
 			Log.i(TAG,"selectCamera() default function");
 		Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
@@ -328,7 +328,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			String[] cameras = manager.getCameraIdList();
 			for( String cameraId : cameras ) {
 				CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-				if(!selectCamera(characteristics))
+				if(!selectCamera(cameraId,characteristics))
 					continue;
 
 				StreamConfigurationMap map = characteristics.
@@ -337,7 +337,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 					continue;
 				}
 
-				Size[] sizes = map.getOutputSizes(SurfaceTexture.class);
+				Size[] sizes = map.getOutputSizes(ImageFormat.YUV_420_888);
 				int which = selectResolution(widthTexture, heightTexture,sizes);
 				if( which < 0 || which >= sizes.length )
 					continue;
