@@ -25,8 +25,7 @@ import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -321,5 +320,28 @@ public class TestQrCodeDecoderImage {
 		assertTrue(qr.bounds.get(1).distance(3,0) < UtilEjml.TEST_F64);
 		assertTrue(qr.bounds.get(2).distance(3,3) < UtilEjml.TEST_F64);
 		assertTrue(qr.bounds.get(3).distance(0,3) < UtilEjml.TEST_F64);
+	}
+
+	/**
+	 * There was a bug where version 0 QR code was returned
+	 */
+	@Test
+	public void extractVersionInfo_version0() {
+		QrCodeDecoderImage<GrayU8> mock = new QrCodeDecoderImage(GrayU8.class){
+			@Override
+			int estimateVersionBySize(QrCode qr) {
+				return 0;
+			}
+
+			@Override
+			int decodeVersion() {
+				return 8;
+			}
+		};
+
+		QrCode qr = new QrCode();
+		qr.version = 8;
+		assertFalse(mock.extractVersionInfo(qr));
+		assertEquals(-1,qr.version);
 	}
 }
