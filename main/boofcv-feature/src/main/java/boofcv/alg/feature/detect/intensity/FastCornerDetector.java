@@ -85,6 +85,12 @@ public abstract class FastCornerDetector<T extends ImageGray<T>> implements Feat
 	protected FastHelper<T> helper;
 
 	/**
+	 * Maximum number of pixels that can be considered corners. Some times it can go a bit bonkers and
+	 * label so many pixels that on low memory systems it uses up all the memory!
+	 */
+	protected double maxFeaturesFraction = 0.01;
+
+	/**
 	 * Constructor
 	 *
 	 * @param helper Provide the image type specific helper.
@@ -115,6 +121,7 @@ public abstract class FastCornerDetector<T extends ImageGray<T>> implements Feat
 	 * used
 	 */
 	public void process( T image , GrayF32 intensity ) {
+		int maxFeatures = (int)(maxFeaturesFraction*image.width*image.height);
 		candidatesLow.reset();
 		candidatesHigh.reset();
 		this.image = image;
@@ -142,6 +149,9 @@ public abstract class FastCornerDetector<T extends ImageGray<T>> implements Feat
 					intensity.data[indexIntensity] = 0;
 				}
 			}
+			// check on a per row basis to reduce impact on performance
+			if( candidatesLow.size + candidatesHigh.size >= maxFeatures )
+				break;
 		}
 	}
 
@@ -149,6 +159,7 @@ public abstract class FastCornerDetector<T extends ImageGray<T>> implements Feat
 	 * Computes fast corner features
 	 */
 	public void process( T image ) {
+		int maxFeatures = (int)(maxFeaturesFraction*image.width*image.height);
 		candidatesLow.reset();
 		candidatesHigh.reset();
 		this.image = image;
@@ -171,6 +182,10 @@ public abstract class FastCornerDetector<T extends ImageGray<T>> implements Feat
 					candidatesHigh.add(x,y);
 				}
 			}
+			// check on a per row basis to reduce impact on performance
+			if( candidatesLow.size + candidatesHigh.size >= maxFeatures )
+				break;
+
 		}
 	}
 
@@ -183,4 +198,14 @@ public abstract class FastCornerDetector<T extends ImageGray<T>> implements Feat
 	 * Checks to see if the specified pixel qualifies as a corner with upper values
 	 */
 	protected abstract boolean checkUpper( int index );
+
+	public double getMaxFeaturesFraction() {
+		return maxFeaturesFraction;
+	}
+
+	public void setMaxFeaturesFraction(double maxFeaturesFraction) {
+		if( maxFeaturesFraction <= 0 || maxFeaturesFraction > 1 )
+			throw new IllegalArgumentException("0 to 1");
+		this.maxFeaturesFraction = maxFeaturesFraction;
+	}
 }

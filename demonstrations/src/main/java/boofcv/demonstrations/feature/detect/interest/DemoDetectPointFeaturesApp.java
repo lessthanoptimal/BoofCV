@@ -324,7 +324,8 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	}
 	private void createFast() {
 		controls.adjustControls(false,true);
-		changeDetector(FactoryDetectPoint.createFast(null,imageClass));
+		ConfigFastCorner configFast = new ConfigFastCorner(controls.fastPixelTol,9);
+		changeDetector(FactoryDetectPoint.createFast(configFast,imageClass));
 	}
 
 	private void createKitRos() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.misc.Stoppable;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
@@ -54,7 +55,9 @@ import org.ddogleg.struct.GrowQueue_I32;
  * </p>
  * @author Peter Abeles
  */
-public class SegmentMeanShift<T extends ImageBase<T>> {
+public class SegmentMeanShift<T extends ImageBase<T>>
+		implements Stoppable
+{
 	// finds mean shift modes
 	SegmentMeanShiftSearch<T> search;
 	// Combines similar regions together
@@ -63,6 +66,9 @@ public class SegmentMeanShift<T extends ImageBase<T>> {
 	ClusterLabeledImage segment;
 	// Prunes and merges smaller regions together
 	MergeSmallRegions<T> prune;
+
+	// If a request to stop running hsa been requested
+	volatile boolean stopRequested=false;
 
 	// contains resegmented image after enforcing all points be connected
 //	GrayS32 pixelToRegion2 = new GrayS32(1,1);
@@ -95,10 +101,12 @@ public class SegmentMeanShift<T extends ImageBase<T>> {
 	 */
 	public void process( T image , GrayS32 output ) {
 		InputSanityCheck.checkSameShape(image,output);
+		stopRequested = false;
 
 //		long time0 = System.currentTimeMillis();
 
 		search.process(image);
+		if( stopRequested ) return;
 
 //		long time1 = System.currentTimeMillis();
 
@@ -108,10 +116,12 @@ public class SegmentMeanShift<T extends ImageBase<T>> {
 		FastQueue<Point2D_I32> modeLocation = search.getModeLocation();
 
 		merge.process(pixelToRegion,regionPixelCount,regionColor,modeLocation);
+		if( stopRequested ) return;
 
 //		long time2 = System.currentTimeMillis();
 
 		segment.process(pixelToRegion, output, regionPixelCount);
+		if( stopRequested ) return;
 
 //		long time3 = System.currentTimeMillis();
 
@@ -148,5 +158,17 @@ public class SegmentMeanShift<T extends ImageBase<T>> {
 
 	public ImageType<T> getImageType() {
 		return search.getImageType();
+	}
+
+	@Override
+	public void requestStop() {
+		stopRequested = true;
+		search.requestStop();
+		merge.requestStop();
+	}
+
+	@Override
+	public boolean isStopRequested() {
+		return stopRequested;
 	}
 }

@@ -40,6 +40,11 @@ public class ConfigFastCorner implements Configuration {
 	 */
 	public int minContinuous=9;
 
+	/**
+	 * Maximum fraction of pixels which can be marked as corners. 0 to 1
+	 */
+	public double maxFeatures=0.01;
+
 	public ConfigFastCorner(int pixelTol, int minContinuous) {
 		this.pixelTol = pixelTol;
 		this.minContinuous = minContinuous;

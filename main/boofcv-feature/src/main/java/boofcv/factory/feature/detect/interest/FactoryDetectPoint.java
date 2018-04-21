@@ -127,6 +127,7 @@ public class FactoryDetectPoint {
 		configFast.checkValidity();
 
 		FastCornerDetector<T> alg = FactoryIntensityPointAlg.fast(configFast.pixelTol, configFast.minContinuous, imageType);
+		alg.setMaxFeaturesFraction(configFast.maxFeatures);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperFastCornerIntensity<>(alg);
 		return createGeneral(intensity, configDetector);
 	}
@@ -145,6 +146,7 @@ public class FactoryDetectPoint {
 		configFast.checkValidity();
 
 		FastCornerDetector<T> alg = FactoryIntensityPointAlg.fast(configFast.pixelTol, configFast.minContinuous, imageType);
+		alg.setMaxFeaturesFraction(configFast.maxFeatures);
 
 		return new WrapFastToPointDetector<>(alg);
 	}

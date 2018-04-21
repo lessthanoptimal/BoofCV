@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.segmentation;
 
 import boofcv.alg.segmentation.ms.SegmentMeanShift;
+import boofcv.misc.Stoppable;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
@@ -28,7 +29,7 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public class MeanShift_to_ImageSuperpixels<T extends ImageBase<T>>
-		implements ImageSuperpixels<T>
+		implements ImageSuperpixels<T> , Stoppable
 {
 	SegmentMeanShift<T> ms;
 	ConnectRule rule;
@@ -56,5 +57,15 @@ public class MeanShift_to_ImageSuperpixels<T extends ImageBase<T>>
 	@Override
 	public ImageType<T> getImageType() {
 		return ms.getImageType();
+	}
+
+	@Override
+	public void requestStop() {
+		ms.requestStop();
+	}
+
+	@Override
+	public boolean isStopRequested() {
+		return ms.isStopRequested();
 	}
 }

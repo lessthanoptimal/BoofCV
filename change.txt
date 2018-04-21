@@ -25,6 +25,9 @@ Version : 0.30
   * Added convert between planar and interleaved of different data types
 - Fast Corner
   * Added a more faithful non-intensity based Fast Corner feature
+- Stoppable
+  * An interface for gracefully exiting a long running process
+  * MeanShiftSuperPixel, SLIC
 
 - TODO PNP regression and benchmark
 - TODO Compare BoofCV's IPPE against original
