@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,16 +18,17 @@
 
 package boofcv.abst.feature.detect.interest;
 
+import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.struct.Configuration;
 
 /**
  * Configuration for FAST feature detector.
  *
- * @see boofcv.alg.feature.detect.intensity.FastCornerIntensity
+ * @see FastCornerDetector
  *
  * @author Peter Abeles
  */
-public class ConfigFast implements Configuration {
+public class ConfigFastCorner implements Configuration {
 
 	/**
 	 * How different pixels need to be to be considered part of a corner. Image dependent.  Try 20 to start.
@@ -39,12 +40,12 @@ public class ConfigFast implements Configuration {
 	 */
 	public int minContinuous=9;
 
-	public ConfigFast(int pixelTol, int minContinuous) {
+	public ConfigFastCorner(int pixelTol, int minContinuous) {
 		this.pixelTol = pixelTol;
 		this.minContinuous = minContinuous;
 	}
 
-	public ConfigFast() {
+	public ConfigFastCorner() {
 	}
 
 	@Override

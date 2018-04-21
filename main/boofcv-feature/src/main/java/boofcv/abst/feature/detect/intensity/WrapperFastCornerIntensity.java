@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,21 +18,21 @@
 
 package boofcv.abst.feature.detect.intensity;
 
-import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
+import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageGray;
 
 /**
- * Wrapper around children of {@link boofcv.alg.feature.detect.intensity.FastCornerIntensity}.
+ * Wrapper around children of {@link FastCornerDetector}.
  * 
  * @author Peter Abeles
  */
 public class WrapperFastCornerIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
 		extends BaseGeneralFeatureIntensity<I,D>
 {
-	FastCornerIntensity<I> alg;
+	FastCornerDetector<I> alg;
 
-	public WrapperFastCornerIntensity(FastCornerIntensity<I> alg) {
+	public WrapperFastCornerIntensity(FastCornerDetector<I> alg) {
 		this.alg = alg;
 	}
 
@@ -44,12 +44,12 @@ public class WrapperFastCornerIntensity<I extends ImageGray<I>, D extends ImageG
 
 	@Override
 	public QueueCorner getCandidatesMin() {
-		return null;
+		return alg.getCornersLow();
 	}
 
 	@Override
 	public QueueCorner getCandidatesMax() {
-		return alg.getCandidates();
+		return alg.getCornersHigh();
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class WrapperFastCornerIntensity<I extends ImageGray<I>, D extends ImageG
 
 	@Override
 	public boolean localMinimums() {
-		return false;
+		return true;
 	}
 
 	@Override

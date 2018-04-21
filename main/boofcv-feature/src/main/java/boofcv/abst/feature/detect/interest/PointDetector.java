@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,13 +16,22 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.intensity.impl;
+package boofcv.abst.feature.detect.interest;
+
+import boofcv.struct.QueueCorner;
+import boofcv.struct.image.ImageBase;
 
 /**
+ * General interface for point features. If multiple types of point features are detected
+ * then they are segmented into different sets which can be requested independently.
+ *
  * @author Peter Abeles
  */
-public class TestImplFastIntensity11 extends GenericImplFastIntensity {
-	public TestImplFastIntensity11() {
-		super(new ImplFastIntensity11<>(new ImplFastHelper_U8(20)), 11, 20);
-	}
+public interface PointDetector<T extends ImageBase<T>> {
+
+	void process( T image );
+
+	int totalSets();
+
+	QueueCorner getPointSet(int which );
 }

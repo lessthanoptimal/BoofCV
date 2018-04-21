@@ -23,6 +23,8 @@ Version : 0.30
   * Support for camera2 API
 - ImageConvert
   * Added convert between planar and interleaved of different data types
+- Fast Corner
+  * Added a more faithful non-intensity based Fast Corner feature
 
 - TODO PNP regression and benchmark
 - TODO Compare BoofCV's IPPE against original

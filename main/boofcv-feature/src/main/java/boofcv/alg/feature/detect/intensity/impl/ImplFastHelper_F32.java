@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,7 @@ public class ImplFastHelper_F32 implements FastHelper<GrayF32> {
 		if( count == 0 )
 			return 0;
 
-		return centerValue*count - total;
+		return total - centerValue*count;
 	}
 
 	@Override

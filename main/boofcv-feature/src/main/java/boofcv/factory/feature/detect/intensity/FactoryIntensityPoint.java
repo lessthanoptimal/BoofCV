@@ -20,7 +20,7 @@ package boofcv.factory.feature.detect.intensity;
 
 import boofcv.abst.feature.detect.intensity.*;
 import boofcv.abst.filter.blur.BlurStorageFilter;
-import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
+import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
@@ -39,7 +39,7 @@ import boofcv.struct.image.ImageType;
 public class FactoryIntensityPoint {
 
 	/**
-	 * Feature intensity for Fast corner detector.  See {@link FastCornerIntensity} for more details.
+	 * Feature intensity for Fast corner detector.  See {@link FastCornerDetector} for more details.
 	 *
 	 * @param pixelTol How different pixels need to be to be considered part of a corner. Image dependent.  Try 20 to start.
 	 * @param minCont Minimum number of continue pixels in a circle for it ot be a corner.  Can be 9,10,11 or 12.
@@ -50,7 +50,7 @@ public class FactoryIntensityPoint {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureIntensity<I,D>  fast( int pixelTol, int minCont, Class<I> imageType ) {
-		FastCornerIntensity<I> alg =  FactoryIntensityPointAlg.fast(pixelTol, minCont, imageType);
+		FastCornerDetector<I> alg =  FactoryIntensityPointAlg.fast(pixelTol, minCont, imageType);
 		return new WrapperFastCornerIntensity<>(alg);
 	}
 

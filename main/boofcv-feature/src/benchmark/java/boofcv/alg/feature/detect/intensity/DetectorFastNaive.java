@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,8 @@ public class DetectorFastNaive {
 	private int b;
 
 	// list of pixels that might be corners.
-	private QueueCorner candidates = new QueueCorner(10);
+	private QueueCorner candidatesLow = new QueueCorner(10);
+	private QueueCorner candidatesHigh = new QueueCorner(10);
 
 	public DetectorFastNaive(int radius, int minCont, int b) {
 		this.radius = radius;
@@ -46,7 +47,8 @@ public class DetectorFastNaive {
 	}
 
 	public void process( GrayU8 image ) {
-		candidates.reset();
+		candidatesLow.reset();
+		candidatesHigh.reset();
 
 		// relative offsets of pixel locations in a circle
 		int []offsets = DiscretizedCircle.imageOffsets(radius, image.stride);
@@ -77,6 +79,10 @@ public class DetectorFastNaive {
 						}
 					}
 				}
+				if( isCorner ) {
+					candidatesLow.add(x,y);
+					continue;
+				}
 
 				for( int i = 0; i < offsets.length && !isCorner; i++ ) {
 					int v = image.data[index+offsets[i]] & 0xFF;
@@ -95,13 +101,17 @@ public class DetectorFastNaive {
 				}
 
 				if( isCorner ) {
-					candidates.grow().set(x,y);
+					candidatesHigh.add(x,y);
 				}
 			}
 		}
 	}
 
-	public QueueCorner getCandidates() {
-		return candidates;
+	public QueueCorner getCandidatesLow() {
+		return candidatesLow;
+	}
+
+	public QueueCorner getCandidatesHigh() {
+		return candidatesHigh;
 	}
 }

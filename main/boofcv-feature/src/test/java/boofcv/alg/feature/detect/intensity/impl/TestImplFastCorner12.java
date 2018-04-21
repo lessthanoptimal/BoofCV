@@ -18,38 +18,11 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.struct.image.ImageGray;
-
 /**
  * @author Peter Abeles
  */
-public interface FastHelper<T extends ImageGray<T>> {
-
-	void setImage( T image , int offsets[] );
-
-	/**
-	 * Sets the lower and upper thresholds relative to the current pixel value
-	 */
-	void setThresholds( int index );
-
-	// TODO remove scoreLower and just have score
-	/**
-	 * Scores the pixel as a corner with lower values
-	 */
-	float scoreLower( int index );
-
-	/**
-	 * Scores the pixel as a corner with upper values
-	 */
-	float scoreUpper( int index );
-
-	/**
-	 * Checks to see if the specified pixel is below the lower threshold
-	 */
-	boolean checkPixelLower( int index );
-
-	/**
-	 * Checks to see if the specified pixel is above the upper threshold
-	 */
-	boolean checkPixelUpper( int index );
+public class TestImplFastCorner12 extends GenericImplFastCorner {
+	public TestImplFastCorner12() {
+		super(new ImplFastIntensity12<>(new ImplFastHelper_U8(20)), 12, 20);
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class FastCornerIntensity<T extends ImageGray<T>> implements FeatureIntensity<T> {
+public abstract class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntensity<T> {
 
 	// radius of the circle being sampled
 	protected static final int radius = 3;
@@ -75,7 +75,8 @@ public abstract class FastCornerIntensity<T extends ImageGray<T>> implements Fea
 	private int stride = 0;
 
 	// list of pixels that might be corners.
-	private QueueCorner candidates = new QueueCorner(10);
+	private QueueCorner candidatesLow = new QueueCorner(10);
+	private QueueCorner candidatesHigh = new QueueCorner(10);
 
 	// reference to the input image
 	protected T image;
@@ -88,12 +89,15 @@ public abstract class FastCornerIntensity<T extends ImageGray<T>> implements Fea
 	 *
 	 * @param helper Provide the image type specific helper.
 	 */
-	protected FastCornerIntensity(FastHelper<T> helper) {
+	protected FastCornerDetector(FastHelper<T> helper) {
 		this.helper = helper;
 	}
 
-	public QueueCorner getCandidates() {
-		return candidates;
+	public QueueCorner getCornersLow() {
+		return candidatesLow;
+	}
+	public QueueCorner getCornersHigh() {
+		return candidatesHigh;
 	}
 
 	@Override
@@ -106,8 +110,13 @@ public abstract class FastCornerIntensity<T extends ImageGray<T>> implements Fea
 		return radius;
 	}
 
+	/**
+	 * Computes fast corner features and their intensity. The intensity is needed if non-max suppression is
+	 * used
+	 */
 	public void process( T image , GrayF32 intensity ) {
-		candidates.reset();
+		candidatesLow.reset();
+		candidatesHigh.reset();
 		this.image = image;
 
 		if( stride != image.stride ) {
@@ -125,12 +134,41 @@ public abstract class FastCornerIntensity<T extends ImageGray<T>> implements Fea
 
 				if( checkLower(index) ) {
 					intensity.data[indexIntensity] = helper.scoreLower(index);
-					candidates.add(x,y);
+					candidatesLow.add(x,y);
 				} else if( checkUpper(index)) {
 					intensity.data[indexIntensity] = helper.scoreUpper(index);
-					candidates.add(x,y);
+					candidatesHigh.add(x,y);
 				} else {
 					intensity.data[indexIntensity] = 0;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Computes fast corner features
+	 */
+	public void process( T image ) {
+		candidatesLow.reset();
+		candidatesHigh.reset();
+		this.image = image;
+
+		if( stride != image.stride ) {
+			stride = image.stride;
+			offsets = DiscretizedCircle.imageOffsets(radius, image.stride);
+		}
+		helper.setImage(image,offsets);
+
+		for (int y = radius; y < image.height-radius; y++) {
+			int index = image.startIndex + y*image.stride + radius;
+			for (int x = radius; x < image.width-radius; x++, index++) {
+
+				helper.setThresholds(index);
+
+				if( checkLower(index) ) {
+					candidatesLow.add(x,y);
+				} else if( checkUpper(index)) {
+					candidatesHigh.add(x,y);
 				}
 			}
 		}

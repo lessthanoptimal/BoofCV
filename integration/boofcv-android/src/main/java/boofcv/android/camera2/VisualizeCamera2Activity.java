@@ -61,6 +61,7 @@ import java.util.concurrent.TimeUnit;
  * Useful variables
  * <ul>
  *     <li><b>imageToView</b>: Matrix that converts a pixel in video frame to view frame</li>
+ *     <li><b>displayView</b>: Where visualizations are rendered in.</li>
  *     <li><b>targetResolution</b>: Specifies how many pixels you want in the video frame</li>
  *     <li><b>stretchToFill</b>: true to stretch the video frame to fill the entire view</li>
  *     <li><b>showBitmap</b>: If it should handle convert the video frame into a bitmap and rendering it</li>

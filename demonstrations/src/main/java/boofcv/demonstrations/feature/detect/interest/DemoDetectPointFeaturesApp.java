@@ -18,10 +18,11 @@
 
 package boofcv.demonstrations.feature.detect.interest;
 
-import boofcv.abst.feature.detect.interest.ConfigFast;
+import boofcv.abst.feature.detect.interest.ConfigFastCorner;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.GeneralToPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
-import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
@@ -39,7 +40,6 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I16;
-import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -71,12 +71,11 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	VisualizePanel imagePanel = new VisualizePanel();
 	ControlPanel controls = new ControlPanel();
 
-	EasyGeneralFeatureDetector detector;
+	PointDetector<T> detector;
 	boolean detectorChanged = true;
 
 	final Object featureLock = new Object();
-	FastQueue<Point2D_I16> positive = new FastQueue<>(Point2D_I16.class,true);
-	FastQueue<Point2D_I16> negative = new FastQueue<>(Point2D_I16.class,true);
+	List<QueueCorner> sets = new ArrayList<>();
 	// END OWNED BY LOCK
 
 	public DemoDetectPointFeaturesApp(List<?> exampleInputs, Class<T> imageClass ) {
@@ -133,28 +132,16 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 
 		final double seconds;
 		long timeBefore = System.nanoTime();
-		detector.detect((ImageGray)input,null);
+		detector.process((T)input);
 		long timeAfter = System.nanoTime();
 		seconds = (timeAfter-timeBefore)*1e-9;
 
 		synchronized (featureLock) {
-			positive.reset();
-			negative.reset();
-			if (detector.getDetector().isDetectMinimums()) {
-				QueueCorner l = detector.getMinimums();
-				negative.growArray(l.size);
-				negative.size = 0;
-				for (int i = 0; i < l.size; i++) {
-					negative.grow().set(l.get(i));
-				}
-			}
-			if (detector.getDetector().isDetectMaximums()) {
-				QueueCorner l = detector.getMaximums();
-				positive.growArray(l.size);
-				positive.size = 0;
-				for (int i = 0; i < l.size; i++) {
-					positive.grow().set(l.get(i));
-				}
+			for (int i = 0; i < detector.totalSets(); i++) {
+				QueueCorner src = detector.getPointSet(i);
+				QueueCorner dst = sets.get(i);
+				dst.reset();
+				dst.addAll(src);
 			}
 		}
 
@@ -185,13 +172,13 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 
 			synchronized (featureLock) {
 				double r = 5;
-				for (int i = 0; i < positive.size; i++) {
-					Point2D_I16 c = positive.get(i);
-					VisualizeFeatures.drawPoint(g2,c.x*scale,c.y*scale,r,Color.RED,true,circle);
-				}
-				for (int i = 0; i < negative.size; i++) {
-					Point2D_I16 c = negative.get(i);
-					VisualizeFeatures.drawPoint(g2,c.x*scale,c.y*scale,r,Color.BLUE,true,circle);
+				for (int setIndex = 0; setIndex < sets.size(); setIndex++) {
+					Color color = setIndex == 0 ? Color.RED : Color.BLUE;
+					QueueCorner points = sets.get(setIndex);
+					for (int i = 0; i < points.size; i++) {
+						Point2D_I16 c = points.get(i);
+						VisualizeFeatures.drawPoint(g2,c.x*scale,c.y*scale,r,color,true,circle);
+					}
 				}
 			}
 		}
@@ -260,6 +247,7 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		private void addAlgorithms() {
 			addAlgorithm("Harris", () -> createHarris());
 			addAlgorithm("Shi-Tomasi", () -> createShiTomasi());
+			addAlgorithm("Fast Intensity", () -> createFastIntensity());
 			addAlgorithm("Fast", () -> createFast());
 			addAlgorithm("KitRos", () -> createKitRos());
 			addAlgorithm("Median", () -> createMedian());
@@ -328,12 +316,17 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		controls.adjustControls(true,false);
 		changeDetector(FactoryDetectPoint.createShiTomasi(controls.configExtract, controls.weighted, derivClass));
 	}
-	private void createFast() {
-		controls.configExtract.detectMinimums = false;
+	private void createFastIntensity() {
+		controls.configExtract.detectMinimums = true;
 		controls.adjustControls(false,true);
 		changeDetector(FactoryDetectPoint.createFast(
-				new ConfigFast(controls.fastPixelTol,9),controls.configExtract, imageClass));
+				new ConfigFastCorner(controls.fastPixelTol,9),controls.configExtract, imageClass));
 	}
+	private void createFast() {
+		controls.adjustControls(false,true);
+		changeDetector(FactoryDetectPoint.createFast(null,imageClass));
+	}
+
 	private void createKitRos() {
 		controls.configExtract.detectMinimums = false;
 		controls.adjustControls(false,false);
@@ -358,7 +351,21 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	}
 
 	private void changeDetector(GeneralFeatureDetector fd) {
-		detector = new EasyGeneralFeatureDetector<>(fd, imageClass, derivClass);
+		detector = new GeneralToPointDetector(fd,imageClass, derivClass);
+
+		sets.clear();
+		for (int i = 0; i < detector.totalSets(); i++) {
+			sets.add( new QueueCorner());
+		}
+	}
+
+	private void changeDetector(PointDetector fd) {
+		detector = fd;
+
+		sets.clear();
+		for (int i = 0; i < detector.totalSets(); i++) {
+			sets.add( new QueueCorner());
+		}
 	}
 
 

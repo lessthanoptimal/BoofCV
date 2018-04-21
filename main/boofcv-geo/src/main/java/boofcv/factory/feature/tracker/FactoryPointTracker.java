@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.describe.WrapDescribePixelRegionNCC;
 import boofcv.abst.feature.detdesc.DetectDescribeFusion;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.feature.detect.interest.ConfigFast;
+import boofcv.abst.feature.detect.interest.ConfigFastCorner;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
@@ -40,7 +40,7 @@ import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
-import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
+import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
@@ -253,7 +253,7 @@ public class FactoryPointTracker {
 	/**
 	 * Creates a tracker which detects FAST corner features and describes them with BRIEF.
 	 *
-	 * @see FastCornerIntensity
+	 * @see FastCornerDetector
 	 * @see DescribePointBrief
 	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
 	 *
@@ -263,7 +263,7 @@ public class FactoryPointTracker {
 	 * @param imageType           Type of image being processed.
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	PointTracker<I> dda_FAST_BRIEF(ConfigFast configFast,
+	PointTracker<I> dda_FAST_BRIEF(ConfigFastCorner configFast,
 								   ConfigGeneralDetector configExtract,
 								   int maxAssociationError,
 								   Class<I> imageType )

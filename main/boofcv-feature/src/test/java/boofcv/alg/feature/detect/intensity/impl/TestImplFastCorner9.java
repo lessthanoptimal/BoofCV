@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.feature.detect.intensity.impl;
 /**
  * @author Peter Abeles
  */
-public class TestImplFastIntensity12 extends GenericImplFastIntensity {
-	public TestImplFastIntensity12() {
-		super(new ImplFastIntensity12<>(new ImplFastHelper_U8(20)), 12, 20);
+public class TestImplFastCorner9 extends GenericImplFastCorner {
+	public TestImplFastCorner9() {
+		super(new ImplFastIntensity9<>(new ImplFastHelper_U8(20)), 9, 20);
 	}
 }

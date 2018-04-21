@@ -235,6 +235,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 					detector = FactoryDetectPoint.createShiTomasi(config,controlPanel.weighted,derivType);
 					break;
 				case "FAST":
+					config.detectMinimums = true;
 					detector = FactoryDetectPoint.createFast(null,config,imageType);
 					break;
 				case "KitRos":

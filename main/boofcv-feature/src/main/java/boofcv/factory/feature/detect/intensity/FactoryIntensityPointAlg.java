@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.factory.feature.detect.intensity;
 
-import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
+import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
 import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.alg.feature.detect.intensity.impl.*;
@@ -38,7 +38,7 @@ import boofcv.struct.image.ImageGray;
 public class FactoryIntensityPointAlg {
 
 	/**
-	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.FastCornerIntensity} from different image types.
+	 * Common interface for creating a {@link FastCornerDetector} from different image types.
 	 *
 	 * @param pixelTol How different pixels need to be to be considered part of a corner. Image dependent.  Try 20 to start.
 	 * @param minCont Minimum number of continue pixels in a circle for it ot be a corner.  Can be 9,10,11 or 12.
@@ -46,7 +46,7 @@ public class FactoryIntensityPointAlg {
 	 * @return Fast corner
 	 */
 	public static <T extends ImageGray<T>>
-	FastCornerIntensity<T> fast(int pixelTol, int minCont, Class<T> imageType)
+	FastCornerDetector<T> fast(int pixelTol, int minCont, Class<T> imageType)
 	{
 		FastHelper<T> helper;
 

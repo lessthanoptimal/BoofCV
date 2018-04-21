@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.DetectorFastNaive;
-import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
+import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.misc.DiscretizedCircle;
 import boofcv.struct.image.GrayF32;
@@ -35,15 +35,15 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericImplFastIntensity {
+public abstract class GenericImplFastCorner {
 	Random rand = new Random(234);
 
 	int minContinuous;
 	int detectDifference ;
 
-	FastCornerIntensity<GrayU8> alg;
+	FastCornerDetector<GrayU8> alg;
 
-	public GenericImplFastIntensity(FastCornerIntensity<GrayU8> alg, int minContinuous, int detectDifference ) {
+	public GenericImplFastCorner(FastCornerDetector<GrayU8> alg, int minContinuous, int detectDifference ) {
 		this.alg = alg;
 		this.minContinuous = minContinuous;
 		this.detectDifference = detectDifference;
@@ -61,11 +61,19 @@ public abstract class GenericImplFastIntensity {
 
 		alg.process(input,intensity);
 
-		assertEquals(validator.getCandidates().size,alg.getCandidates().size);
+		assertEquals(validator.getCandidatesLow().size,alg.getCornersLow().size);
+		assertEquals(validator.getCandidatesHigh().size,alg.getCornersHigh().size);
 
-		for( int i = 0; i < validator.getCandidates().size(); i++ ) {
-			Point2D_I16 v = validator.getCandidates().get(i);
-			Point2D_I16 a = alg.getCandidates().get(i);
+		for( int i = 0; i < validator.getCandidatesLow().size(); i++ ) {
+			Point2D_I16 v = validator.getCandidatesLow().get(i);
+			Point2D_I16 a = alg.getCornersLow().get(i);
+
+			assertEquals(v.x,a.x);
+			assertEquals(v.y,a.y);
+		}
+		for( int i = 0; i < validator.getCandidatesHigh().size(); i++ ) {
+			Point2D_I16 v = validator.getCandidatesHigh().get(i);
+			Point2D_I16 a = alg.getCornersHigh().get(i);
 
 			assertEquals(v.x,a.x);
 			assertEquals(v.y,a.y);

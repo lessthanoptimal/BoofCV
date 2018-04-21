@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.feature.detect.interest;
 
-import boofcv.abst.feature.detect.interest.ConfigFast;
+import boofcv.abst.feature.detect.interest.ConfigFastCorner;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
@@ -87,8 +87,11 @@ public class DetectPointsWithNoiseApp<T extends ImageGray<T>, D extends ImageGra
 		addAlgorithm(0, "Shi-Tomasi", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		alg = FactoryDetectPoint.createShiTomasi(configExtract, true, derivType);
 		addAlgorithm(0, "Shi-Tomasi Weighted", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
-		alg = FactoryDetectPoint.createFast(
-				new ConfigFast(10,9),new ConfigGeneralDetector(maxFeatures,radius,10), imageType);
+		configExtract.detectMinimums = true;
+		configExtract.threshold = 10;
+		alg = FactoryDetectPoint.createFast(new ConfigFastCorner(10,9),configExtract, imageType);
+		configExtract.detectMinimums = false;
+		configExtract.threshold = thresh;
 		addAlgorithm(0, "Fast", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		alg = FactoryDetectPoint.createKitRos(configExtract, derivType);
 		addAlgorithm(0, "KitRos", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
