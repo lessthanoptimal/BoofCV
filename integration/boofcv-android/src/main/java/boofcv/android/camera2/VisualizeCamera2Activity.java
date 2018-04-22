@@ -30,6 +30,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.Size;
 import android.view.*;
+import boofcv.alg.color.ColorFormat;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.ConvertYuv420_888;
 import boofcv.misc.MovingAverage;
@@ -88,6 +89,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	//---- START Owned By imagLock
 	protected final Object imageLock = new Object();
 	protected ImageType imageType = ImageType.single(GrayU8.class);
+	protected ColorFormat colorFormat = ColorFormat.RGB;
 	protected Stack<ImageBase> stackImages = new Stack<>(); // images which are available for use
 	protected byte[] convertWork = new byte[1]; // work space for converting images
 	//---- END
@@ -107,6 +109,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	 * All those annoying rotations.
 	 */
 	protected Matrix imageToView = new Matrix();
+	protected Matrix viewToImage = new Matrix();
 
 	// number of pixels it searches for when choosing camera resolution
 	protected int targetResolution = 640*480;
@@ -243,6 +246,9 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 
 		videoToDisplayMatrix(cameraWidth, cameraHeight,mSensorOrientation,
 				viewWidth,viewHeight,rotation*90, stretchToFill,imageToView);
+		if( !imageToView.invert(viewToImage) ) {
+			throw new RuntimeException("WTF can't invert the matrix?");
+		}
 
 	}
 
@@ -292,9 +298,10 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	/**
 	 * Changes the type of image the camera frame is converted to
 	 */
-	protected void setImageType( ImageType type ) {
+	protected void setImageType( ImageType type , ColorFormat colorFormat ) {
 		synchronized (imageLock){
 			this.imageType = type;
+			this.colorFormat = colorFormat;
 			// todo check to see if the type is the same or not before clearing
 			this.stackImages.clear();
 
@@ -320,7 +327,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 			}
 			long before = System.nanoTime();
 			convertWork = ConvertYuv420_888.declareWork(image, convertWork);
-			ConvertYuv420_888.yuvToBoof(image,converted, convertWork);
+			ConvertYuv420_888.yuvToBoof(image, colorFormat, converted, convertWork);
 			long after = System.nanoTime();
 //			Log.i(TAG,"processFrame() image="+image.getWidth()+"x"+image.getHeight()+
 //					"  boof="+converted.width+"x"+converted.height);

@@ -28,6 +28,7 @@ Version : 0.30
 - Stoppable
   * An interface for gracefully exiting a long running process
   * MeanShiftSuperPixel, SLIC
+- ColorFormat added to specify different formats for visible light
 
 - TODO PNP regression and benchmark
 - TODO Compare BoofCV's IPPE against original

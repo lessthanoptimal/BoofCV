@@ -1052,4 +1052,95 @@ public class ImplConvertBitmap {
 			throw new RuntimeException("Isn't 4444 deprecated?");
 		}
 	}
+
+	public static void interleavedYuvToArgb8888(InterleavedU8 input, byte[] output)
+	{
+		final int width = input.width;
+		final int height = input.height;
+
+		int indexDst = 0;
+		for( int row = 0; row < height; row++ ) {
+			int indexSrc = input.startIndex + input.stride*row;
+
+			for( int col = 0; col < width; col++ ) {
+				int y = 1191*((input.data[indexSrc++] & 0xFF) - 16);
+				int cr = (input.data[ indexSrc++ ] & 0xFF) - 128;
+				int cb = (input.data[ indexSrc++] & 0xFF) - 128;
+
+//				if( y < 0 ) y = 0;
+				y = ((y >>> 31)^1)*y;
+
+				int r = (y + 1836*cr) >> 10;
+				int g = (y - 547*cr - 218*cb) >> 10;
+				int b = (y + 2165*cb) >> 10;
+
+//				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
+//				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
+//				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+
+				r *= ((r >>> 31)^1);
+				g *= ((g >>> 31)^1);
+				b *= ((b >>> 31)^1);
+
+				// The bitwise code below isn't faster than than the if statement below
+//				r |= (((255-r) >>> 31)*0xFF);
+//				g |= (((255-g) >>> 31)*0xFF);
+//				b |= (((255-b) >>> 31)*0xFF);
+
+				if( r > 255 ) r = 255;
+				if( g > 255 ) g = 255;
+				if( b > 255 ) b = 255;
+
+				output[indexDst++] = (byte)r;
+				output[indexDst++] = (byte)g;
+				output[indexDst++] = (byte)b;
+				output[indexDst++] = (byte)0xFF;
+			}
+		}
+	}
+
+	public static void interleavedYuvToRGB565(InterleavedU8 input, byte[] output)
+	{
+		final int width = input.width;
+		final int height = input.height;
+
+		int indexDst = 0;
+		for( int row = 0; row < height; row++ ) {
+			int indexSrc = input.startIndex + input.stride*row;
+
+			for( int col = 0; col < width; col++ ) {
+				int y = 1191*((input.data[indexSrc++] & 0xFF) - 16);
+				int cr = (input.data[ indexSrc++ ] & 0xFF) - 128;
+				int cb = (input.data[ indexSrc++] & 0xFF) - 128;
+
+//				if( y < 0 ) y = 0;
+				y = ((y >>> 31)^1)*y;
+
+				int r = (y + 1836*cr) >> 10;
+				int g = (y - 547*cr - 218*cb) >> 10;
+				int b = (y + 2165*cb) >> 10;
+
+//				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
+//				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
+//				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+
+				r *= ((r >>> 31)^1);
+				g *= ((g >>> 31)^1);
+				b *= ((b >>> 31)^1);
+
+				// The bitwise code below isn't faster than than the if statement below
+//				r |= (((255-r) >>> 31)*0xFF);
+//				g |= (((255-g) >>> 31)*0xFF);
+//				b |= (((255-b) >>> 31)*0xFF);
+
+				if( r > 255 ) r = 255;
+				if( g > 255 ) g = 255;
+				if( b > 255 ) b = 255;
+
+				output[indexDst++] = (byte)table5[r];
+				output[indexDst++] = (byte)table6[g];
+				output[indexDst++] = (byte)table5[b];
+			}
+		}
+	}
 }

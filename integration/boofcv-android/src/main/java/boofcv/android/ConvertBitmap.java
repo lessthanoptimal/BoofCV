@@ -19,6 +19,7 @@
 package boofcv.android;
 
 import android.graphics.Bitmap;
+import boofcv.alg.color.ColorFormat;
 import boofcv.struct.image.*;
 
 import java.nio.ByteBuffer;
@@ -200,7 +201,7 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static void boofToBitmap( ImageBase input , Bitmap output , byte[] storage) {
-		if( BOverrideConvertAndroid.invokeBoofToBitmap(input,output,storage))
+		if( BOverrideConvertAndroid.invokeBoofToBitmap(ColorFormat.RGB,input,output,storage))
 			return;
 
 		if( input instanceof Planar ) {
@@ -212,6 +213,30 @@ public class ConvertBitmap {
 		} else {
 			throw new IllegalArgumentException("Unsupported input image type");
 		}
+	}
+
+	public static void boofToBitmap(ColorFormat color, ImageBase input , Bitmap output , byte[] storage) {
+		if( BOverrideConvertAndroid.invokeBoofToBitmap(color,input,output,storage))
+			return;
+
+		if( input instanceof ImageGray ) {
+			grayToBitmap((ImageGray)input,output,storage);
+		}
+
+		switch( color ) {
+			case RGB:{
+				boofToBitmap(input,output,storage);
+			}return;
+
+			case YUV:{
+				if( input instanceof ImageInterleaved ) {
+					interleavedYuvToBitmap((ImageInterleaved)input, output, storage);
+					return;
+				}
+			}break;
+		}
+		throw new IllegalArgumentException("Unsupported input image type");
+
 	}
 
 	/**
@@ -326,6 +351,30 @@ public class ConvertBitmap {
 		else
 			throw new IllegalArgumentException("Unsupported BoofCV Type");
 		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+	}
+
+	public static <T extends ImageInterleaved<T>>
+	void interleavedYuvToBitmap(T input, Bitmap output, byte[] storage) {
+		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
+			throw new IllegalArgumentException("Image shapes are not the same");
+		}
+
+		if( storage == null )
+			storage = declareStorage(output,null);
+
+		if( input.getImageType().getDataType() == ImageDataType.U8 ) {
+			switch( output.getConfig() ) {
+				case ARGB_8888:
+					ImplConvertBitmap.interleavedYuvToArgb8888((InterleavedU8) input, storage);
+					output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+					return;
+				case RGB_565:
+					ImplConvertBitmap.interleavedYuvToRGB565((InterleavedU8) input, storage);
+					output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+					return;
+			}
+		}
+		throw new IllegalArgumentException("Unsupported BoofCV Type");
 	}
 	
 	/**

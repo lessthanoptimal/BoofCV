@@ -19,6 +19,7 @@
 package boofcv.android;
 
 import android.media.Image;
+import boofcv.alg.color.ColorFormat;
 import boofcv.struct.image.*;
 
 import java.nio.ByteBuffer;
@@ -41,42 +42,61 @@ public class ConvertYuv420_888
 		return work;
 	}
 
-	public static void yuvToBoof( Image yuv , ImageBase output , byte work[] )
+	public static void yuvToBoof(Image yuv, ColorFormat colorOutput, ImageBase output, byte[] work)
 	{
-		if( BOverrideConvertAndroid.invokeYuv420ToBoof(yuv,output,work))
+		if( BOverrideConvertAndroid.invokeYuv420ToBoof(yuv,colorOutput,output,work))
 			return;
 
 		if( output instanceof GrayU8 ) {
 			yuvToGray(yuv.getPlanes()[0],yuv.getWidth(),yuv.getHeight(),(GrayU8)output);
+			return;
 		} else if( output instanceof  GrayF32 ) {
 			yuvToGray(yuv.getPlanes()[0],yuv.getWidth(),yuv.getHeight(),(GrayF32)output, work);
+			return;
 		} else if( output.getImageType().getFamily() == ImageType.Family.PLANAR ) {
-			switch( output.getImageType().getDataType()) {
-				case U8:
-					yuvToPlanarRgbU8(yuv,(Planar<GrayU8>)output,work);
-					break;
-				case F32:
-					yuvToPlanarRgbF32(yuv,(Planar<GrayF32>)output,work);
-					break;
-				default:
-					throw new RuntimeException("Not yet supported");
+			switch (colorOutput) {
+				case RGB:{
+					switch( output.getImageType().getDataType()) {
+						case U8:
+							yuvToPlanarRgbU8(yuv,(Planar<GrayU8>)output,work);
+							return;
+						case F32:
+							yuvToPlanarRgbF32(yuv,(Planar<GrayF32>)output,work);
+							return;
+					}
+				}break;
 
+				case YUV:{
+					switch( output.getImageType().getDataType()) {
+						case U8:
+							yuvToPlanarYuvU8(yuv,(Planar<GrayU8>)output,work);
+							return;
+					}
+				}break;
 			}
 		} else if( output.getImageType().getFamily() == ImageType.Family.INTERLEAVED ) {
-			switch( output.getImageType().getDataType()) {
-				case U8:
-					yuvToInterleavedRgbU8(yuv,(InterleavedU8)output,work);
-					break;
-				case F32:
-					yuvToInterleavedRgbF32(yuv,(InterleavedF32)output,work);
-					break;
-				default:
-					throw new RuntimeException("Not yet supported");
+			switch (colorOutput) {
+				case RGB:{
+					switch( output.getImageType().getDataType()) {
+						case U8:
+							yuvToInterleavedRgbU8(yuv, (InterleavedU8) output, work);
+							return;
+						case F32:
+							yuvToInterleavedRgbF32(yuv, (InterleavedF32) output, work);
+							return;
+					}
+				}break;
 
+				case YUV:{
+					switch( output.getImageType().getDataType()) {
+						case U8:
+							yuvToInterleavedYuvU8(yuv,(InterleavedU8)output,work);
+							return;
+					}
+				}break;
 			}
-		} else {
-			throw new RuntimeException("Not yet supported");
 		}
+		throw new RuntimeException("Not yet supported. format="+colorOutput+" out="+output.getImageType());
 	}
 
 
@@ -513,6 +533,133 @@ public class ConvertYuv420_888
 				output.data[indexOut++] = r;
 				output.data[indexOut++] = g;
 				output.data[indexOut++] = b;
+			}
+		}
+
+		return output;
+	}
+
+	public static Planar<GrayU8> yuvToPlanarYuvU8(Image yuv , Planar<GrayU8> output , byte work[] )
+	{
+		int width = yuv.getWidth();
+		int height = yuv.getHeight();
+
+		if( output != null ) {
+			output.setNumberOfBands(3);
+			output.reshape(width,height);
+		} else {
+			output = new Planar(GrayU8.class,width,height,3);
+		}
+
+		Image.Plane planes[] = yuv.getPlanes();
+
+		int workLength = planes[0].getRowStride() + planes[1].getRowStride() + planes[2].getRowStride();
+		if( work.length < workLength )
+			throw new IllegalArgumentException("Work must be at least "+workLength);
+
+		ByteBuffer bufferY = planes[0].getBuffer();
+		ByteBuffer bufferU = planes[2].getBuffer();
+		ByteBuffer bufferV = planes[1].getBuffer();
+
+		bufferY.position(0);
+		bufferU.position(0);
+		bufferV.position(0);
+
+		int strideY = planes[0].getRowStride();
+		int strideU = planes[1].getRowStride();
+		int strideV = planes[2].getRowStride();
+
+		int offsetU = strideY;
+		int offsetV = strideY + offsetU;
+
+		int stridePixelUV = planes[1].getPixelStride();
+
+		GrayU8 bandY = output.getBand(0);
+		GrayU8 bandU = output.getBand(1);
+		GrayU8 bandV = output.getBand(2);
+
+		for (int y = 0, indexOut = 0; y < height; y++) {
+			// Read all the data for this row from each plane
+			bufferY.get(work,0,strideY);
+			if( y%stridePixelUV == 0) {
+				bufferU.get(work, offsetU, Math.min(bufferU.remaining(),strideU));
+				bufferV.get(work, offsetV, Math.min(bufferV.remaining(),strideV));
+			}
+
+			int indexY = 0;
+			int indexU = offsetU;
+			int indexV = offsetV;
+
+			for (int x = 0; x < width; x++, indexY++, indexOut++ )
+			{
+				bandY.data[indexOut] = work[ indexY ];
+				bandU.data[indexOut] = work[ indexU ];
+				bandV.data[indexOut] = work[ indexV ];
+
+				int stepUV = stridePixelUV*(((x+stridePixelUV-1)%stridePixelUV)^1);
+				indexU += stepUV;
+				indexV += stepUV;
+			}
+		}
+
+		return output;
+	}
+
+	public static InterleavedU8 yuvToInterleavedYuvU8(Image yuv , InterleavedU8 output , byte work[] )
+	{
+		int width = yuv.getWidth();
+		int height = yuv.getHeight();
+
+		if( output != null ) {
+			output.setNumberOfBands(3);
+			output.reshape(width,height);
+		} else {
+			output = new InterleavedU8(width,height,3);
+		}
+
+		Image.Plane planes[] = yuv.getPlanes();
+
+		int workLength = planes[0].getRowStride() + planes[1].getRowStride() + planes[2].getRowStride();
+		if( work.length < workLength )
+			throw new IllegalArgumentException("Work must be at least "+workLength);
+
+		ByteBuffer bufferY = planes[0].getBuffer();
+		ByteBuffer bufferU = planes[2].getBuffer();
+		ByteBuffer bufferV = planes[1].getBuffer();
+
+		bufferY.position(0);
+		bufferU.position(0);
+		bufferV.position(0);
+
+		int strideY = planes[0].getRowStride();
+		int strideU = planes[1].getRowStride();
+		int strideV = planes[2].getRowStride();
+
+		int offsetU = strideY;
+		int offsetV = strideY + offsetU;
+
+		int stridePixelUV = planes[1].getPixelStride();
+
+		for (int y = 0, indexOut = 0; y < height; y++) {
+			// Read all the data for this row from each plane
+			bufferY.get(work,0,strideY);
+			if( y%stridePixelUV == 0) {
+				bufferU.get(work, offsetU, Math.min(bufferU.remaining(),strideU));
+				bufferV.get(work, offsetV, Math.min(bufferV.remaining(),strideV));
+			}
+
+			int indexY = 0;
+			int indexU = offsetU;
+			int indexV = offsetV;
+
+			for (int x = 0; x < width; x++, indexY++ ) {
+				output.data[indexOut++] = work[indexY];
+				output.data[indexOut++] = work[indexU];
+				output.data[indexOut++] = work[indexV];
+
+				int stepUV = stridePixelUV * (((x + stridePixelUV - 1) % stridePixelUV) ^ 1);
+				indexU += stepUV;
+				indexV += stepUV;
 			}
 		}
 

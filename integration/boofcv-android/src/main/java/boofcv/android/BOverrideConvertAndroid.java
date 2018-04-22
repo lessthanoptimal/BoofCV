@@ -20,6 +20,7 @@ package boofcv.android;
 
 import android.graphics.Bitmap;
 import android.media.Image;
+import boofcv.alg.color.ColorFormat;
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
 import boofcv.struct.image.ImageBase;
@@ -37,16 +38,11 @@ public class BOverrideConvertAndroid extends BOverrideClass {
 	}
 
 	public static YuvToBoof_420888 yuv420ToBoof;
-	public static BoofToYuv_420888 boofToYuv420;
 	public static BitmapToBoof bitmapToBoof;
 	public static BoofToBitmap boofToBitmap;
 
 	public interface YuvToBoof_420888<T extends ImageBase<T>> {
-		void yuvToBoof420(Image input, ImageBase output, byte[] work );
-	}
-
-	public interface BoofToYuv_420888<T extends ImageBase<T>> {
-		void boofToYuv420(ImageBase input, Image output, byte[] work );
+		void yuvToBoof420(Image input, ColorFormat color, ImageBase output, byte[] work );
 	}
 
 	public interface BitmapToBoof<T extends ImageBase<T>> {
@@ -54,30 +50,20 @@ public class BOverrideConvertAndroid extends BOverrideClass {
 	}
 
 	public interface BoofToBitmap<T extends ImageBase<T>> {
-		void boofToBitmap(ImageBase input, Bitmap output, byte[] work );
+		void boofToBitmap(ColorFormat color, ImageBase input, Bitmap output, byte[] work );
 	}
 
-	public static boolean invokeYuv420ToBoof(Image input, ImageBase output, byte[] work) {
+	public static boolean invokeYuv420ToBoof(Image input, ColorFormat color, ImageBase output, byte[] work) {
 		boolean processed = false;
 		if( BOverrideConvertAndroid.yuv420ToBoof != null ) {
 			try {
-				BOverrideConvertAndroid.yuv420ToBoof.yuvToBoof420(input,output,work);
+				BOverrideConvertAndroid.yuv420ToBoof.yuvToBoof420(input,color,output,work);
 				processed = true;
 			} catch( RuntimeException ignore ) {}
 		}
 		return processed;
 	}
 
-	public static boolean invokeBoofToYuv420(ImageBase input, Image output, byte[] work) {
-		boolean processed = false;
-		if( BOverrideConvertAndroid.boofToYuv420 != null ) {
-			try {
-				BOverrideConvertAndroid.boofToYuv420.boofToYuv420(input,output,work);
-				processed = true;
-			} catch( RuntimeException ignore ) {}
-		}
-		return processed;
-	}
 
 	public static boolean invokeBitmapToBoof(Bitmap input, ImageBase output, byte[] work) {
 		boolean processed = false;
@@ -90,11 +76,11 @@ public class BOverrideConvertAndroid extends BOverrideClass {
 		return processed;
 	}
 
-	public static boolean invokeBoofToBitmap(ImageBase input, Bitmap output, byte[] work) {
+	public static boolean invokeBoofToBitmap(ColorFormat color, ImageBase input, Bitmap output, byte[] work) {
 		boolean processed = false;
 		if( BOverrideConvertAndroid.boofToBitmap != null ) {
 			try {
-				BOverrideConvertAndroid.boofToBitmap.boofToBitmap(input,output,work);
+				BOverrideConvertAndroid.boofToBitmap.boofToBitmap(color,input,output,work);
 				processed = true;
 			} catch( RuntimeException ignore ) {}
 		}
