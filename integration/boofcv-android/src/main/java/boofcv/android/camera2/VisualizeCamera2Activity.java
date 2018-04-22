@@ -124,9 +124,6 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	protected boolean visualizeOnlyMostRecent = true;
 	protected volatile long timeOfLastUpdated;
 
-	// An identity matrix
-	protected final Matrix identity = new Matrix();
-
 	//START Lock for timing structures
 	protected static final int TIMING_WARM_UP = 3; // number of frames that must be processed before it starts
 	protected final Object lockTiming = new Object();
@@ -395,14 +392,18 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	 */
 	protected void onDrawFrame( SurfaceView view , Canvas canvas ) {
 
-		// On an older Android phone it was discovered that the behavior of drawCanvas was different than
-		// on more recent phones. The transform would be concat on top of the canvas' existing transform.
-		// wihle the behavior of canvas.setTransform() was the same as on more recent phones.
-		// The existing transform would be a transform from screen to view! Below is a hack to make graphics
-		// line up. On the older phone the graphics will be shifted upwards towards the action bar since that
-		// separation is no longer taken in account. Know of a better way to fix this? this just makes no sense
-		// and looks like a bug.
-		canvas.setMatrix(identity);
+		// Code below is usefull when debugging display issues
+//		Paint paintFill = new Paint();
+//		paintFill.setColor(Color.RED);
+//		paintFill.setStyle(Paint.Style.FILL);
+//		Paint paintBorder = new Paint();
+//		paintBorder.setColor(Color.BLUE);
+//		paintBorder.setStyle(Paint.Style.STROKE);
+//		paintBorder.setStrokeWidth(6*displayMetrics.density);
+//
+//		Rect r = new Rect(0,0,view.getWidth(),view.getHeight());
+//		canvas.drawRect(r,paintFill);
+//		canvas.drawRect(r,paintBorder);
 
 		if( showBitmap ) {
 			synchronized (bitmapLock) {
