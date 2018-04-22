@@ -19,9 +19,9 @@
 package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
-import boofcv.misc.Stoppable;
 import boofcv.struct.image.GrayS32;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.Stoppable;
 
 /**
  * Merges regions together quickly and efficiently using a directed tree graph.  To merge two segments together

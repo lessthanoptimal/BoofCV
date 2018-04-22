@@ -19,7 +19,6 @@
 package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.misc.Stoppable;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
@@ -27,6 +26,7 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.Stoppable;
 
 /**
  * <p>

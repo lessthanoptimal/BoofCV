@@ -23,7 +23,6 @@ import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.alg.segmentation.ms.ClusterLabeledImage;
 import boofcv.alg.segmentation.ms.MergeSmallRegions;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
-import boofcv.misc.Stoppable;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.GrayS32;
@@ -31,6 +30,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.Stoppable;
 
 import java.util.Arrays;
 

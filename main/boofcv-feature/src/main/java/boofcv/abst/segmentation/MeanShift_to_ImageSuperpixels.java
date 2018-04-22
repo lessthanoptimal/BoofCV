@@ -19,11 +19,11 @@
 package boofcv.abst.segmentation;
 
 import boofcv.alg.segmentation.ms.SegmentMeanShift;
-import boofcv.misc.Stoppable;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.ddogleg.struct.Stoppable;
 
 /**
  * @author Peter Abeles
