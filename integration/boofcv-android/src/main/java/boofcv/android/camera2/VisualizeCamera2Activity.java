@@ -231,7 +231,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	}
 
 	@Override
-	protected void onCameraResolutionChange(int cameraWidth, int cameraHeight) {
+	protected void onCameraResolutionChange(int cameraWidth, int cameraHeight, int sensorOrientation ) {
 		// predeclare bitmap image used for display
 		if( showBitmap ) {
 			synchronized (bitmapLock) {
@@ -242,9 +242,9 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 		}
 		int rotation = getWindowManager().getDefaultDisplay().getRotation();
 		if( verbose )
-			Log.i(TAG,"camera rotation = "+mSensorOrientation+" display rotation = "+rotation);
+			Log.i(TAG,"camera rotation = "+sensorOrientation+" display rotation = "+rotation);
 
-		videoToDisplayMatrix(cameraWidth, cameraHeight,mSensorOrientation,
+		videoToDisplayMatrix(cameraWidth, cameraHeight,sensorOrientation,
 				viewWidth,viewHeight,rotation*90, stretchToFill,imageToView);
 		if( !imageToView.invert(viewToImage) ) {
 			throw new RuntimeException("WTF can't invert the matrix?");
