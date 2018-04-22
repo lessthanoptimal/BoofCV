@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class ConfigChessboard implements Configuration {
 	/**
 	 * Configuration for thresholding the image
 	 */
-//	public ConfigThreshold thresholding = new ConfigThresholdBlockMinMax(21,35,true);
+//	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, ConfigLength.fixed(20));
 	public ConfigThreshold thresholding = new ConfigThresholdLocalOtsu(ConfigLength.relative(0.05,10),10);
 
 	/**
@@ -81,7 +81,7 @@ public class ConfigChessboard implements Configuration {
 		((ConfigPolylineSplitMerge)square.detector.contourToPoly).thresholdSideSplitScore = 0;
 		// max side error is increased for  shapes which are parially outside of the image, but the local threshold
 		// makes them concave
-		((ConfigPolylineSplitMerge)square.detector.contourToPoly).maxSideError = new ConfigLength(2,0.5);
+		((ConfigPolylineSplitMerge)square.detector.contourToPoly).maxSideError = ConfigLength.relative(0.5,4);
 //		((ConfigPolylineSplitMerge)square.detector.contourToPoly).convexTest = 1000;
 		square.detector.tangentEdgeIntensity = 2.5; // the initial contour is the result of being eroded
 		square.detector.minimumContour = ConfigLength.fixed(10);

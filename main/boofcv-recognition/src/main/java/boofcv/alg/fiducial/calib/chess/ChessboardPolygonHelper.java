@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,14 +59,15 @@ public class ChessboardPolygonHelper<T extends ImageGray<T>> implements PolygonH
 									  GrowQueue_B touches, boolean touchesBorder) {
 
 		if( touchesBorder ) {
-			if( distorted.size() > 7 || distorted.size() < 3)
+			if( distorted.size() < 3)
 				return false;
 			int totalRegular = distorted.size();
 			for (int i = 0; i < distorted.size(); i++) {
 				if( touches.get(i) )
 					totalRegular--;
 			}
-			return totalRegular > 0 && totalRegular <= 4; // should be 3, but noise/imprecision in corner can make it 4
+			return totalRegular > 0;
+			// Would be 3 if it was filled in, but local binary can cause external contour to be concave
 		} else {
 			return distorted.size() == 4;
 		}

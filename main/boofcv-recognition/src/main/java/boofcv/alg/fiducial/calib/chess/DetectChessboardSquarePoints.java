@@ -91,13 +91,8 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 			detectorSquare.getDetector().setOutputClockwise(true);
 			detectorSquare.getDetector().setConvex(true);
 //			detectorSquare.getDetector().setNumberOfSides(3,8);  <--- this is handled by the helper
-			this.detectorSquare.setFunctionAdjust(new DetectPolygonBinaryGrayRefine.AdjustBeforeRefineEdge() {
-				@Override
-				public void adjust(DetectPolygonFromContour.Info info, boolean clockwise) {
-					DetectChessboardSquarePoints.this.adjustBeforeOptimize(info.polygon, info.borderCorners,clockwise);
-				}
-			});
-
+			this.detectorSquare.setFunctionAdjust((info, clockwise) ->
+					DetectChessboardSquarePoints.this.adjustBeforeOptimize(info.polygon, info.borderCorners,clockwise));
 		}
 
 		s2c = new SquaresIntoCrossClusters(-1,-1);
@@ -167,6 +162,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	 */
 	private void configureContourDetector(T gray) {
 		// determine the maximum possible size of a square when viewed head on
+		// also take in account shapes touching the edge will be concave
 		int maxContourSize = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
 		BinaryContourFinder contourFinder = detectorSquare.getDetector().getContourFinder();
 		contourFinder.setMaxContour(maxContourSize*4*2); // fisheye distortion can let one square go larger
