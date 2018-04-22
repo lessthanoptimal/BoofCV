@@ -681,23 +681,37 @@ public abstract class SimpleCamera2Activity extends Activity {
 		public void onDisconnected(@NonNull CameraDevice cameraDevice) {
 			if( verbose )
 				Log.i(TAG,"CameraDevice Callback onDisconnected() id="+cameraDevice.getId());
-			if( !mCameraOpenLock.isLocked() )
-				throw new RuntimeException("Camera not locked!");
+
+			boolean unexpected = !mCameraOpenLock.isLocked();
+			if( unexpected ) {
+				mCameraOpenLock.lock();
+			}
 			open.mCameraDevice = null;
-			mCameraOpenLock.unlock();
 			cameraDevice.close();
+			mCameraOpenLock.unlock();
 			onCameraDisconnected(cameraDevice);
+			if( unexpected) {
+				// the camera disconnected and no request to disconnect it was made by
+				// the application. not really sure what to do here. Restarting the activity
+				// seems reasonable
+				Log.e(TAG,"  Camera disconnection was unexpected. Restarting activity");
+				recreate();
+			}
 		}
 
 		@Override
 		public void onError(@NonNull CameraDevice cameraDevice, int error) {
 			if( verbose )
 				Log.e(TAG,"CameraDevice Callback onError() error="+error);
-			if( !mCameraOpenLock.isLocked() )
-				throw new RuntimeException("Camera not locked!");
+			boolean unexpected = !mCameraOpenLock.isLocked();
+			if( unexpected ) {
+				mCameraOpenLock.lock();
+			}
 			open.mCameraDevice = null;
 			cameraDevice.close();
-			mCameraOpenLock.unlock();
+			// If the camera was locked that means it has an error when trying to open it
+			if( unexpected )
+				Log.e(TAG,"   No lock applied to the camera. Unexpected problem?");
 			finish();
 		}
 	};
