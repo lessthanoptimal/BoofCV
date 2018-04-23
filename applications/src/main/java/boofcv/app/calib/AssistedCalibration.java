@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -128,6 +128,9 @@ public class AssistedCalibration {
 	// Selects which image to save
 	ImageSelectorAndSaver saver;
 
+	// number of debug images saved
+	int totalDebugSave = 0;
+
 	// if true then there was sufficient geometric diversity at least once
 	boolean geometryTrigger = false;
 
@@ -195,8 +198,9 @@ public class AssistedCalibration {
 		actions.update(success,detector.getDetectedPoints());
 
 		if( gui.getInfoPanel().forceSaveImage ) {
-			System.out.println("Saved image forced");
-			UtilImageIO.saveImage(image,"debug_save.png");
+			String name = String.format("debug_save_%03d.png",totalDebugSave++);
+			System.out.println("Saved image forced. "+name);
+			UtilImageIO.saveImage(image,name);
 			gui.getInfoPanel().resetForceSave();
 		}
 

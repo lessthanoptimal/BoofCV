@@ -129,12 +129,9 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 	/**
 	 * Configures the detector.
-	 * @param minSides minimum number of sides
-	 * @param maxSides maximum number of sides
 	 * @param contourToPolyline Fits a crude polygon to the shape's binary contour
 	 * @param minimumContour Minimum allowed length of a contour.  Copy stored internally. Try 50 pixels.
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
-	 * @param convex If true it will only return convex shapes
 	 * @param touchBorder if true then shapes which touch the image border are allowed
 	 * @param contourEdgeThreshold Polygons with an edge intensity less than this are discarded.
 	 * @param inputType Type of input image it's processing

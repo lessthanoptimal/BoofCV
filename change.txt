@@ -29,6 +29,8 @@ Version : 0.30
   * An interface for gracefully exiting a long running process
   * MeanShiftSuperPixel, SLIC
 - ColorFormat added to specify different formats for visible light
+- Calibration
+  * Fixed issue with chessboard patterns when they are very close
 
 - TODO PNP regression and benchmark
 - TODO Compare BoofCV's IPPE against original
