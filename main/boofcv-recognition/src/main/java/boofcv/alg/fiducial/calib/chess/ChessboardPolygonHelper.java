@@ -76,9 +76,11 @@ public class ChessboardPolygonHelper<T extends ImageGray<T>> implements PolygonH
 	@Override
 	public void configureBeforePolyline(PointsToPolyline contourToPolyline, boolean touchesBorder) {
 		if( touchesBorder ) {
+			contourToPolyline.setConvex(false);
 			contourToPolyline.setMinimumSides(3);
 			contourToPolyline.setMaximumSides(8);
 		} else {
+			contourToPolyline.setConvex(true);
 			contourToPolyline.setMinimumSides(4);
 			contourToPolyline.setMaximumSides(4);
 		}
