@@ -198,6 +198,12 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 			double dy = b.y - a.y;
 
 			double l = Math.sqrt(dx * dx + dy * dy);
+
+			// The input polygon has two identical corners. This is bad. We will just skip over the first corner
+			if( l == 0 ) {
+				throw new RuntimeException("Input polygon has two identical corners. You need to fix that.");
+			}
+
 			dx *= 1.5 / l;
 			dy *= 1.5 / l;
 

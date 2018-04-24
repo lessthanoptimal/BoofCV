@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.shapes.polygon;
 
 import georegression.geometry.UtilLine2D_F64;
+import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
@@ -65,6 +66,9 @@ public class AdjustPolygonForThresholdBias {
 			double dx = b.x - a.x;
 			double dy = b.y - a.y;
 			double l = Math.sqrt(dx * dx + dy * dy);
+			if( l == 0) {
+				throw new RuntimeException("Two identical corners!");
+			}
 
 			// only needs to be shifted in two directions
 			if( dx < 0 )
@@ -98,5 +102,10 @@ public class AdjustPolygonForThresholdBias {
 				}
 			}
 		}
+
+		// if two corners have a distance of 1 there are some conditions which exist where the corners can be shifted
+		// such that two points will now be equal. Avoiding the shift isn't a good idea shift the shift should happen
+		// there might be a more elegant solution to this problem but this is probably the simplest
+		UtilPolygons2D_F64.removeAdjacentDuplicates(polygon,1e-8);
 	}
 }

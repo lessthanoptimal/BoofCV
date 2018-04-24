@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.io.image.UtilImageIO;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -154,7 +155,12 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 			grayPrev.setTo((GrayF32)gray);
 		}
 
-		processFrame();
+		try {
+			processFrame();
+		} catch( RuntimeException e ) {
+			e.printStackTrace();
+			UtilImageIO.saveImage(buffered,"crash_image.png");
+		}
 	}
 
 	protected void renderGraph( Graphics2D g2 , double scale ) {

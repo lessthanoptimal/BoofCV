@@ -31,6 +31,8 @@ Version : 0.30
 - ColorFormat added to specify different formats for visible light
 - Calibration
   * Fixed issue with chessboard patterns when they are very close
+- AdjustPolygonForThresholdBias
+  * Handles case where a point is shifted and becomes a duplicate
 
 - TODO PNP regression and benchmark
 - TODO Compare BoofCV's IPPE against original
@@ -40,6 +42,8 @@ Version : 0.30
 
 - TODO determine why solving for nullspace with QRP causes decoding regression to get worse
 - TODO create regression for homography estimation
+- TODO Remove chessboard detector with something much simpler and less error prone
+
 
 ---------------------------------------------
 Date    : 2018/03/18
