@@ -2,6 +2,7 @@ dependencies {
     implementation project(':main:boofcv-ip')
     
     benchmarkImplementation project(':main:boofcv-io')
+    benchmarkImplementation project(':main:boofcv-ip')
     benchmarkImplementation project(':integration:boofcv-ffmpeg')
 
     testImplementation project(':main:boofcv-io')

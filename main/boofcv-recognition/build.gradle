@@ -14,6 +14,7 @@ dependencies {
         }}
 
     benchmarkImplementation project(':main:boofcv-io')
+    benchmarkImplementation project(':main:boofcv-ip')
     
     testImplementation project(':main:boofcv-io')
     testImplementation project(':main:boofcv-simulation')

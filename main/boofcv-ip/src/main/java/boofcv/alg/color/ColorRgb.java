@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,7 @@ public class ColorRgb {
 	}
 
 	public static void rgbToGray_Weighted( ImageMultiBand rgb , ImageGray gray ) {
+		gray.reshape(rgb.width,rgb.height);
 		if( rgb instanceof Planar ) {
 			Planar p = (Planar)rgb;
 			if( p.getBandType() == GrayU8.class ) {
