@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -158,7 +158,7 @@ public class ImageZoomPanel extends JScrollPane {
 
 	public class ImagePanel extends JPanel
 	{
-		SaveImageOnClick mouseListener = new SaveImageOnClick(this);
+		SaveImageOnClick mouseListener = new SaveImageOnClick(ImageZoomPanel.this.getViewport());
 
 		BufferedImage buffer = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
 

@@ -56,6 +56,9 @@ Less High Priority Next Release
     https://xuchi.weebly.com/rpnp.html
   * MLPNP - A REAL-TIME MAXIMUM LIKELIHOOD SOLUTION TO THE PERSPECTIVE-N-POINT PROBLEM
 
+- Contour
+  * Encode the direction of the next pixel in the contour instead of the pixel directly.
+    Reduces memory overhead and is useful for shape analysis
 
 - Fiducials
   * Detection:  Return bounding polygon in pixel coordinates (undistorted and distorted)?
