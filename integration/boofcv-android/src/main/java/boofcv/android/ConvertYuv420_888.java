@@ -171,17 +171,52 @@ public class ConvertYuv420_888
 		return output;
 	}
 
-	public static Planar<GrayU8> yuvToPlanarRgbU8(Image yuv , Planar<GrayU8> output , byte work[] )
+	interface ProcessorYuv
+	{
+		void processYUV(int y , int u , int v );
+	}
+
+	abstract static class ProcessorYuvRgb implements ProcessorYuv
+	{
+		public void processYUV(int y , int u , int v ) {
+			int Y = 1191*(y - 16);
+			int CR = u - 128;
+			int CB = v - 128;
+
+			// if( y < 0 ) y = 0;
+			Y = ((Y >>> 31)^1)*Y;
+
+			int r = (Y + 1836*CR) >> 10;
+			int g = (Y - 547*CR - 218*CB) >> 10;
+			int b = (Y + 2165*CB) >> 10;
+
+//				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
+//				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
+//				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+
+			r *= ((r >>> 31)^1);
+			g *= ((g >>> 31)^1);
+			b *= ((b >>> 31)^1);
+
+			// The bitwise code below isn't faster than than the if statement below
+//				r |= (((255-r) >>> 31)*0xFF);
+//				g |= (((255-g) >>> 31)*0xFF);
+//				b |= (((255-b) >>> 31)*0xFF);
+
+			if( r > 255 ) r = 255;
+			if( g > 255 ) g = 255;
+			if( b > 255 ) b = 255;
+
+			processRGB(r,g,b);
+		}
+
+		public abstract void processRGB( int r , int g , int b );
+	}
+
+	public static void processYuv(Image yuv , byte work[], ProcessorYuv processor )
 	{
 		int width = yuv.getWidth();
 		int height = yuv.getHeight();
-
-		if( output != null ) {
-			output.setNumberOfBands(3);
-			output.reshape(width,height);
-		} else {
-			output = new Planar(GrayU8.class,width,height,3);
-		}
 
 		Image.Plane planes[] = yuv.getPlanes();
 
@@ -206,11 +241,7 @@ public class ConvertYuv420_888
 
 		int stridePixelUV = planes[1].getPixelStride();
 
-		GrayU8 R = output.getBand(0);
-		GrayU8 G = output.getBand(1);
-		GrayU8 B = output.getBand(2);
-
-		for (int y = 0, indexOut = 0; y < height; y++) {
+		for (int y = 0; y < height; y++) {
 			// Read all the data for this row from each plane
 			bufferY.get(work,0,strideY);
 			if( y%stridePixelUV == 0) {
@@ -222,45 +253,45 @@ public class ConvertYuv420_888
 			int indexU = offsetU;
 			int indexV = offsetV;
 
-			for (int x = 0; x < width; x++, indexY++, indexOut++ )
+			for (int x = 0; x < width; x++, indexY++ )
 			{
-				int Y = 1191*((work[indexY] & 0xFF) - 16);
-				int CR = (work[ indexU ] & 0xFF) - 128;
-				int CB = (work[ indexV] & 0xFF) - 128;
+				processor.processYUV(work[indexY]&0xFF,work[indexU]&0xFF, work[indexV]&0xFF);
 
 				int stepUV = stridePixelUV*(((x+stridePixelUV-1)%stridePixelUV)^1);
 				indexU += stepUV;
 				indexV += stepUV;
 
-//				if( y < 0 ) y = 0;
-				Y = ((Y >>> 31)^1)*Y;
-
-				int r = (Y + 1836*CR) >> 10;
-				int g = (Y - 547*CR - 218*CB) >> 10;
-				int b = (Y + 2165*CB) >> 10;
-
-//				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
-//				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
-//				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
-
-				r *= ((r >>> 31)^1);
-				g *= ((g >>> 31)^1);
-				b *= ((b >>> 31)^1);
-
-				// The bitwise code below isn't faster than than the if statement below
-//				r |= (((255-r) >>> 31)*0xFF);
-//				g |= (((255-g) >>> 31)*0xFF);
-//				b |= (((255-b) >>> 31)*0xFF);
-
-				if( r > 255 ) r = 255;
-				if( g > 255 ) g = 255;
-				if( b > 255 ) b = 255;
-
-				R.data[indexOut] = (byte)r;
-				G.data[indexOut] = (byte)g;
-				B.data[indexOut] = (byte)b;
 			}
 		}
+	}
+
+	public static Planar<GrayU8> yuvToPlanarRgbU8(Image yuv , Planar<GrayU8> output , byte work[] )
+	{
+		int width = yuv.getWidth();
+		int height = yuv.getHeight();
+
+		if( output != null ) {
+			output.setNumberOfBands(3);
+			output.reshape(width,height);
+		} else {
+			output = new  Planar<>(GrayU8.class,width,height,3);
+		}
+		GrayU8 red = output.getBand(0);
+		GrayU8 green = output.getBand(1);
+		GrayU8 blue = output.getBand(2);
+
+		ProcessorYuv processor = new ProcessorYuvRgb() {
+			int indexOut = 0;
+
+			@Override
+			public void processRGB( int r , int g , int b ) {
+				red.data[indexOut] = (byte)r;
+				green.data[indexOut] = (byte)g;
+				blue.data[indexOut++] = (byte)b;
+			}
+		};
+
+		processYuv(yuv,work,processor);
 
 		return output;
 	}
@@ -274,87 +305,24 @@ public class ConvertYuv420_888
 			output.setNumberOfBands(3);
 			output.reshape(width,height);
 		} else {
-			output = new Planar(GrayF32.class,width,height,3);
+			output = new  Planar<>(GrayF32.class,width,height,3);
 		}
+		GrayF32 red = output.getBand(0);
+		GrayF32 green = output.getBand(1);
+		GrayF32 blue = output.getBand(2);
 
-		Image.Plane planes[] = yuv.getPlanes();
+		ProcessorYuv processor = new ProcessorYuvRgb() {
+			int indexOut = 0;
 
-		int strideY = planes[0].getRowStride();
-		int strideU = planes[2].getRowStride();
-		int strideV = planes[1].getRowStride();
-
-		int workLength = strideY + strideU + strideV;
-		if( work.length < workLength )
-			throw new IllegalArgumentException("Work must be at least "+workLength);
-
-		ByteBuffer bufferY = planes[0].getBuffer();
-		ByteBuffer bufferU = planes[2].getBuffer();
-		ByteBuffer bufferV = planes[1].getBuffer();
-
-		bufferY.position(0);
-		bufferU.position(0);
-		bufferV.position(0);
-
-		int offsetU = strideY;
-		int offsetV = strideY + strideU;
-
-		int stridePixelUV = planes[1].getPixelStride();
-
-		GrayF32 R = output.getBand(0);
-		GrayF32 G = output.getBand(1);
-		GrayF32 B = output.getBand(2);
-
-		for (int y = 0, indexOut = 0; y < height; y++) {
-			// Read all the data for this row from each plane
-			bufferY.get(work,0,strideY);
-			if( y%stridePixelUV == 0) {
-				bufferU.get(work, offsetU, Math.min(bufferU.remaining(),strideU));
-				bufferV.get(work, offsetV, Math.min(bufferV.remaining(),strideV));
+			@Override
+			public void processRGB( int r , int g , int b ) {
+				red.data[indexOut] = r;
+				green.data[indexOut] = g;
+				blue.data[indexOut++] = b;
 			}
+		};
 
-			int indexY = 0;
-			int indexU = offsetU;
-			int indexV = offsetV;
-
-			for (int x = 0; x < width; x++, indexY++, indexOut++ )
-			{
-				int Y = 1191*((work[indexY] & 0xFF) - 16);
-				int CR = (work[ indexU ] & 0xFF) - 128;
-				int CB = (work[ indexV] & 0xFF) - 128;
-
-				int stepUV = stridePixelUV*(((x+stridePixelUV-1)%stridePixelUV)^1);
-				indexU += stepUV;
-				indexV += stepUV;
-
-//				if( y < 0 ) y = 0;
-				Y = ((Y >>> 31)^1)*Y;
-
-				int r = (Y + 1836*CR) >> 10;
-				int g = (Y - 547*CR - 218*CB) >> 10;
-				int b = (Y + 2165*CB) >> 10;
-
-//				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
-//				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
-//				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
-
-				r *= ((r >>> 31)^1);
-				g *= ((g >>> 31)^1);
-				b *= ((b >>> 31)^1);
-
-				// The bitwise code below isn't faster than than the if statement below
-//				r |= (((255-r) >>> 31)*0xFF);
-//				g |= (((255-g) >>> 31)*0xFF);
-//				b |= (((255-b) >>> 31)*0xFF);
-
-				if( r > 255 ) r = 255;
-				if( g > 255 ) g = 255;
-				if( b > 255 ) b = 255;
-
-				R.data[indexOut] = r;
-				G.data[indexOut] = g;
-				B.data[indexOut] = b;
-			}
-		}
+		processYuv(yuv,work,processor);
 
 		return output;
 	}
@@ -370,81 +338,20 @@ public class ConvertYuv420_888
 		} else {
 			output = new InterleavedU8(width,height,3);
 		}
+		InterleavedU8 _output = output;
 
-		Image.Plane planes[] = yuv.getPlanes();
+		ProcessorYuv processor = new ProcessorYuvRgb() {
+			int indexOut = 0;
 
-		int strideY = planes[0].getRowStride();
-		int strideU = planes[2].getRowStride();
-		int strideV = planes[1].getRowStride();
-
-		int workLength = strideY + strideU + strideV;
-		if( work.length < workLength )
-			throw new IllegalArgumentException("Work must be at least "+workLength);
-
-		ByteBuffer bufferY = planes[0].getBuffer();
-		ByteBuffer bufferU = planes[2].getBuffer();
-		ByteBuffer bufferV = planes[1].getBuffer();
-
-		bufferY.position(0);
-		bufferU.position(0);
-		bufferV.position(0);
-
-		int offsetU = strideY;
-		int offsetV = strideY + strideU;
-
-		int stridePixelUV = planes[1].getPixelStride();
-
-		for (int y = 0, indexOut = 0; y < height; y++) {
-			// Read all the data for this row from each plane
-			bufferY.get(work,0,strideY);
-			if( y%stridePixelUV == 0) {
-				bufferU.get(work, offsetU, Math.min(bufferU.remaining(),strideU));
-				bufferV.get(work, offsetV, Math.min(bufferV.remaining(),strideV));
+			@Override
+			public void processRGB( int r , int g , int b ) {
+				_output.data[indexOut++] = (byte)r;
+				_output.data[indexOut++] = (byte)g;
+				_output.data[indexOut++] = (byte)b;
 			}
+		};
 
-			int indexY = 0;
-			int indexU = offsetU;
-			int indexV = offsetV;
-
-			for (int x = 0; x < width; x++, indexY++ )
-			{
-				int Y = 1191*((work[indexY] & 0xFF) - 16);
-				int CR = (work[ indexU ] & 0xFF) - 128;
-				int CB = (work[ indexV] & 0xFF) - 128;
-
-				int stepUV = stridePixelUV*(((x+stridePixelUV-1)%stridePixelUV)^1);
-				indexU += stepUV;
-				indexV += stepUV;
-
-//				if( y < 0 ) y = 0;
-				Y = ((Y >>> 31)^1)*Y;
-
-				int r = (Y + 1836*CR) >> 10;
-				int g = (Y - 547*CR - 218*CB) >> 10;
-				int b = (Y + 2165*CB) >> 10;
-
-//				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
-//				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
-//				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
-
-				r *= ((r >>> 31)^1);
-				g *= ((g >>> 31)^1);
-				b *= ((b >>> 31)^1);
-
-				// The bitwise code below isn't faster than than the if statement below
-//				r |= (((255-r) >>> 31)*0xFF);
-//				g |= (((255-g) >>> 31)*0xFF);
-//				b |= (((255-b) >>> 31)*0xFF);
-
-				if( r > 255 ) r = 255;
-				if( g > 255 ) g = 255;
-				if( b > 255 ) b = 255;
-
-				output.data[indexOut++] = (byte)r;
-				output.data[indexOut++] = (byte)g;
-				output.data[indexOut++] = (byte)b;
-			}
-		}
+		processYuv(yuv,work,processor);
 
 		return output;
 	}
@@ -460,81 +367,20 @@ public class ConvertYuv420_888
 		} else {
 			output = new InterleavedF32(width,height,3);
 		}
+		InterleavedF32 _output = output;
 
-		Image.Plane planes[] = yuv.getPlanes();
+		ProcessorYuv processor = new ProcessorYuvRgb() {
+			int indexOut = 0;
 
-		int strideY = planes[0].getRowStride();
-		int strideU = planes[2].getRowStride();
-		int strideV = planes[1].getRowStride();
-
-		int workLength = strideY + strideU + strideV;
-		if( work.length < workLength )
-			throw new IllegalArgumentException("Work must be at least "+workLength);
-
-		ByteBuffer bufferY = planes[0].getBuffer();
-		ByteBuffer bufferU = planes[2].getBuffer();
-		ByteBuffer bufferV = planes[1].getBuffer();
-
-		bufferY.position(0);
-		bufferU.position(0);
-		bufferV.position(0);
-
-		int offsetU = strideY;
-		int offsetV = strideY + strideU;
-
-		int stridePixelUV = planes[1].getPixelStride();
-
-		for (int y = 0, indexOut = 0; y < height; y++) {
-			// Read all the data for this row from each plane
-			bufferY.get(work,0,strideY);
-			if( y%stridePixelUV == 0) {
-				bufferU.get(work, offsetU, Math.min(bufferU.remaining(),strideU));
-				bufferV.get(work, offsetV, Math.min(bufferV.remaining(),strideV));
+			@Override
+			public void processRGB( int r , int g , int b ) {
+				_output.data[indexOut++] = r;
+				_output.data[indexOut++] = g;
+				_output.data[indexOut++] = b;
 			}
+		};
 
-			int indexY = 0;
-			int indexU = offsetU;
-			int indexV = offsetV;
-
-			for (int x = 0; x < width; x++, indexY++ )
-			{
-				int Y = 1191*((work[indexY] & 0xFF) - 16);
-				int CR = (work[ indexU ] & 0xFF) - 128;
-				int CB = (work[ indexV] & 0xFF) - 128;
-
-				int stepUV = stridePixelUV*(((x+stridePixelUV-1)%stridePixelUV)^1);
-				indexU += stepUV;
-				indexV += stepUV;
-
-//				if( y < 0 ) y = 0;
-				Y = ((Y >>> 31)^1)*Y;
-
-				int r = (Y + 1836*CR) >> 10;
-				int g = (Y - 547*CR - 218*CB) >> 10;
-				int b = (Y + 2165*CB) >> 10;
-
-//				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
-//				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
-//				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
-
-				r *= ((r >>> 31)^1);
-				g *= ((g >>> 31)^1);
-				b *= ((b >>> 31)^1);
-
-				// The bitwise code below isn't faster than than the if statement below
-//				r |= (((255-r) >>> 31)*0xFF);
-//				g |= (((255-g) >>> 31)*0xFF);
-//				b |= (((255-b) >>> 31)*0xFF);
-
-				if( r > 255 ) r = 255;
-				if( g > 255 ) g = 255;
-				if( b > 255 ) b = 255;
-
-				output.data[indexOut++] = r;
-				output.data[indexOut++] = g;
-				output.data[indexOut++] = b;
-			}
-		}
+		processYuv(yuv,work,processor);
 
 		return output;
 	}
@@ -551,56 +397,21 @@ public class ConvertYuv420_888
 			output = new Planar(GrayU8.class,width,height,3);
 		}
 
-		Image.Plane planes[] = yuv.getPlanes();
-
-		int strideY = planes[0].getRowStride();
-		int strideU = planes[2].getRowStride();
-		int strideV = planes[1].getRowStride();
-
-		int workLength = strideY + strideU + strideV;
-		if( work.length < workLength )
-			throw new IllegalArgumentException("Work must be at least "+workLength);
-
-		ByteBuffer bufferY = planes[0].getBuffer();
-		ByteBuffer bufferU = planes[2].getBuffer();
-		ByteBuffer bufferV = planes[1].getBuffer();
-
-		bufferY.position(0);
-		bufferU.position(0);
-		bufferV.position(0);
-
-		int offsetU = strideY;
-		int offsetV = strideY + strideU;
-
-		int stridePixelUV = planes[1].getPixelStride();
-
 		GrayU8 bandY = output.getBand(0);
 		GrayU8 bandU = output.getBand(1);
 		GrayU8 bandV = output.getBand(2);
 
-		for (int y = 0, indexOut = 0; y < height; y++) {
-			// Read all the data for this row from each plane
-			bufferY.get(work,0,strideY);
-			if( y%stridePixelUV == 0) {
-				bufferU.get(work, offsetU, Math.min(bufferU.remaining(),strideU));
-				bufferV.get(work, offsetV, Math.min(bufferV.remaining(),strideV));
+		ProcessorYuv processor = new ProcessorYuv() {
+			int indexOut = 0;
+			@Override
+			public void processYUV(int y, int u, int v) {
+				bandY.data[indexOut] = (byte)y;
+				bandU.data[indexOut] = (byte)u;
+				bandV.data[indexOut++] = (byte)v;
 			}
+		};
 
-			int indexY = 0;
-			int indexU = offsetU;
-			int indexV = offsetV;
-
-			for (int x = 0; x < width; x++, indexY++, indexOut++ )
-			{
-				bandY.data[indexOut] = work[ indexY ];
-				bandU.data[indexOut] = work[ indexU ];
-				bandV.data[indexOut] = work[ indexV ];
-
-				int stepUV = stridePixelUV*(((x+stridePixelUV-1)%stridePixelUV)^1);
-				indexU += stepUV;
-				indexV += stepUV;
-			}
-		}
+		processYuv(yuv,work,processor);
 
 		return output;
 	}
@@ -617,51 +428,19 @@ public class ConvertYuv420_888
 			output = new InterleavedU8(width,height,3);
 		}
 
-		Image.Plane planes[] = yuv.getPlanes();
+		InterleavedU8 _output = output;
 
-		int strideY = planes[0].getRowStride();
-		int strideU = planes[2].getRowStride();
-		int strideV = planes[1].getRowStride();
-
-		int workLength = strideY + strideU + strideV;
-		if( work.length < workLength )
-			throw new IllegalArgumentException("Work must be at least "+workLength);
-
-		ByteBuffer bufferY = planes[0].getBuffer();
-		ByteBuffer bufferU = planes[2].getBuffer();
-		ByteBuffer bufferV = planes[1].getBuffer();
-
-		bufferY.position(0);
-		bufferU.position(0);
-		bufferV.position(0);
-
-		int offsetU = strideY;
-		int offsetV = strideY + strideU;
-
-		int stridePixelUV = planes[1].getPixelStride();
-
-		for (int y = 0, indexOut = 0; y < height; y++) {
-			// Read all the data for this row from each plane
-			bufferY.get(work,0,strideY);
-			if( y%stridePixelUV == 0) {
-				bufferU.get(work, offsetU, Math.min(bufferU.remaining(),strideU));
-				bufferV.get(work, offsetV, Math.min(bufferV.remaining(),strideV));
+		ProcessorYuv processor = new ProcessorYuv() {
+			int indexOut = 0;
+			@Override
+			public void processYUV(int y, int u, int v) {
+				_output.data[indexOut++] = (byte)y;
+				_output.data[indexOut++] = (byte)u;
+				_output.data[indexOut++] = (byte)v;
 			}
+		};
 
-			int indexY = 0;
-			int indexU = offsetU;
-			int indexV = offsetV;
-
-			for (int x = 0; x < width; x++, indexY++ ) {
-				output.data[indexOut++] = work[indexY];
-				output.data[indexOut++] = work[indexU];
-				output.data[indexOut++] = work[indexV];
-
-				int stepUV = stridePixelUV * (((x + stridePixelUV - 1) % stridePixelUV) ^ 1);
-				indexU += stepUV;
-				indexV += stepUV;
-			}
-		}
+		processYuv(yuv,work,processor);
 
 		return output;
 	}
