@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,8 @@ public class ContourTracer {
 	private int maxContourSize=Integer.MAX_VALUE;
 
 	// which connectivity rule is being used. 4 and 8 supported
-	private ConnectRule rule;
-	private int ruleN;
+	private final ConnectRule rule;
+	private final int ruleN;
 
 	// storage for contour points.
 	private PackedSetsPoint2D_I32 storagePoints;

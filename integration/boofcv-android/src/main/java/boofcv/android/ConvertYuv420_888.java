@@ -185,7 +185,11 @@ public class ConvertYuv420_888
 
 		Image.Plane planes[] = yuv.getPlanes();
 
-		int workLength = planes[0].getRowStride() + planes[1].getRowStride() + planes[2].getRowStride();
+		int strideY = planes[0].getRowStride();
+		int strideU = planes[2].getRowStride();
+		int strideV = planes[1].getRowStride();
+
+		int workLength = strideY + strideU + strideV;
 		if( work.length < workLength )
 			throw new IllegalArgumentException("Work must be at least "+workLength);
 
@@ -197,12 +201,8 @@ public class ConvertYuv420_888
 		bufferU.position(0);
 		bufferV.position(0);
 
-		int strideY = planes[0].getRowStride();
-		int strideU = planes[1].getRowStride();
-		int strideV = planes[2].getRowStride();
-
 		int offsetU = strideY;
-		int offsetV = strideY + offsetU;
+		int offsetV = strideY + strideU;
 
 		int stridePixelUV = planes[1].getPixelStride();
 
@@ -279,7 +279,11 @@ public class ConvertYuv420_888
 
 		Image.Plane planes[] = yuv.getPlanes();
 
-		int workLength = planes[0].getRowStride() + planes[1].getRowStride() + planes[2].getRowStride();
+		int strideY = planes[0].getRowStride();
+		int strideU = planes[2].getRowStride();
+		int strideV = planes[1].getRowStride();
+
+		int workLength = strideY + strideU + strideV;
 		if( work.length < workLength )
 			throw new IllegalArgumentException("Work must be at least "+workLength);
 
@@ -291,12 +295,8 @@ public class ConvertYuv420_888
 		bufferU.position(0);
 		bufferV.position(0);
 
-		int strideY = planes[0].getRowStride();
-		int strideU = planes[1].getRowStride();
-		int strideV = planes[2].getRowStride();
-
 		int offsetU = strideY;
-		int offsetV = strideY + offsetU;
+		int offsetV = strideY + strideU;
 
 		int stridePixelUV = planes[1].getPixelStride();
 
@@ -373,7 +373,11 @@ public class ConvertYuv420_888
 
 		Image.Plane planes[] = yuv.getPlanes();
 
-		int workLength = planes[0].getRowStride() + planes[1].getRowStride() + planes[2].getRowStride();
+		int strideY = planes[0].getRowStride();
+		int strideU = planes[2].getRowStride();
+		int strideV = planes[1].getRowStride();
+
+		int workLength = strideY + strideU + strideV;
 		if( work.length < workLength )
 			throw new IllegalArgumentException("Work must be at least "+workLength);
 
@@ -385,12 +389,8 @@ public class ConvertYuv420_888
 		bufferU.position(0);
 		bufferV.position(0);
 
-		int strideY = planes[0].getRowStride();
-		int strideU = planes[1].getRowStride();
-		int strideV = planes[2].getRowStride();
-
 		int offsetU = strideY;
-		int offsetV = strideY + offsetU;
+		int offsetV = strideY + strideU;
 
 		int stridePixelUV = planes[1].getPixelStride();
 
@@ -463,7 +463,11 @@ public class ConvertYuv420_888
 
 		Image.Plane planes[] = yuv.getPlanes();
 
-		int workLength = planes[0].getRowStride() + planes[1].getRowStride() + planes[2].getRowStride();
+		int strideY = planes[0].getRowStride();
+		int strideU = planes[2].getRowStride();
+		int strideV = planes[1].getRowStride();
+
+		int workLength = strideY + strideU + strideV;
 		if( work.length < workLength )
 			throw new IllegalArgumentException("Work must be at least "+workLength);
 
@@ -475,12 +479,8 @@ public class ConvertYuv420_888
 		bufferU.position(0);
 		bufferV.position(0);
 
-		int strideY = planes[0].getRowStride();
-		int strideU = planes[1].getRowStride();
-		int strideV = planes[2].getRowStride();
-
 		int offsetU = strideY;
-		int offsetV = strideY + offsetU;
+		int offsetV = strideY + strideU;
 
 		int stridePixelUV = planes[1].getPixelStride();
 
@@ -553,7 +553,11 @@ public class ConvertYuv420_888
 
 		Image.Plane planes[] = yuv.getPlanes();
 
-		int workLength = planes[0].getRowStride() + planes[1].getRowStride() + planes[2].getRowStride();
+		int strideY = planes[0].getRowStride();
+		int strideU = planes[2].getRowStride();
+		int strideV = planes[1].getRowStride();
+
+		int workLength = strideY + strideU + strideV;
 		if( work.length < workLength )
 			throw new IllegalArgumentException("Work must be at least "+workLength);
 
@@ -565,12 +569,8 @@ public class ConvertYuv420_888
 		bufferU.position(0);
 		bufferV.position(0);
 
-		int strideY = planes[0].getRowStride();
-		int strideU = planes[1].getRowStride();
-		int strideV = planes[2].getRowStride();
-
 		int offsetU = strideY;
-		int offsetV = strideY + offsetU;
+		int offsetV = strideY + strideU;
 
 		int stridePixelUV = planes[1].getPixelStride();
 
@@ -619,7 +619,11 @@ public class ConvertYuv420_888
 
 		Image.Plane planes[] = yuv.getPlanes();
 
-		int workLength = planes[0].getRowStride() + planes[1].getRowStride() + planes[2].getRowStride();
+		int strideY = planes[0].getRowStride();
+		int strideU = planes[2].getRowStride();
+		int strideV = planes[1].getRowStride();
+
+		int workLength = strideY + strideU + strideV;
 		if( work.length < workLength )
 			throw new IllegalArgumentException("Work must be at least "+workLength);
 
@@ -631,12 +635,8 @@ public class ConvertYuv420_888
 		bufferU.position(0);
 		bufferV.position(0);
 
-		int strideY = planes[0].getRowStride();
-		int strideU = planes[1].getRowStride();
-		int strideV = planes[2].getRowStride();
-
 		int offsetU = strideY;
-		int offsetV = strideY + offsetU;
+		int offsetV = strideY + strideU;
 
 		int stridePixelUV = planes[1].getPixelStride();
 
