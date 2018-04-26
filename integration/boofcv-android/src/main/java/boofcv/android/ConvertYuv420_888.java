@@ -221,10 +221,10 @@ public class ConvertYuv420_888
 		Image.Plane planes[] = yuv.getPlanes();
 
 		int strideY = planes[0].getRowStride();
-		int strideU = planes[2].getRowStride();
-		int strideV = planes[1].getRowStride();
+		int strideUV = planes[1].getRowStride();
+		// U and V stride are the same by 420_888 specification
 
-		int workLength = strideY + strideU + strideV;
+		int workLength = strideY + strideUV + strideUV;
 		if( work.length < workLength )
 			throw new IllegalArgumentException("Work must be at least "+workLength);
 
@@ -237,16 +237,35 @@ public class ConvertYuv420_888
 		bufferV.position(0);
 
 		int offsetU = strideY;
-		int offsetV = strideY + strideU;
+		int offsetV = strideY + strideUV;
 
+		// pixel stride for U and V are the same by specification
 		int stridePixelUV = planes[1].getPixelStride();
+
+		// Sanity check to help debug what's going on with some devices
+		if( bufferU.remaining()%strideUV != 0 ) {
+			int extra = bufferU.remaining()%strideUV;
+			extra = extra/stridePixelUV + ((extra%stridePixelUV) != 0 ? 1 : 0);
+			if( extra < width/stridePixelUV ) {
+				throw new RuntimeException("Buggy image. Last row is too small. sizeU="+bufferU.slice()+
+				" strideUV="+strideUV+" stridePixelUV="+stridePixelUV+" image width "+width);
+			}
+		}
+		if( bufferV.remaining()%strideUV != 0 ) {
+			int extra = bufferV.remaining()%strideUV;
+			extra = extra/stridePixelUV + ((extra%stridePixelUV) != 0 ? 1 : 0);
+			if( extra < width/stridePixelUV ) {
+				throw new RuntimeException("Buggy image. Last row is too small. sizeV="+bufferV.slice()+
+						" strideUV="+strideUV+" stridePixelUV="+stridePixelUV+" image width "+width);
+			}
+		}
 
 		for (int y = 0; y < height; y++) {
 			// Read all the data for this row from each plane
 			bufferY.get(work,0,strideY);
 			if( y%stridePixelUV == 0) {
-				bufferU.get(work, offsetU, Math.min(bufferU.remaining(),strideU));
-				bufferV.get(work, offsetV, Math.min(bufferV.remaining(),strideV));
+				bufferU.get(work, offsetU, Math.min(bufferU.remaining(),strideUV));
+				bufferV.get(work, offsetV, Math.min(bufferV.remaining(),strideUV));
 			}
 
 			int indexY = 0;
@@ -257,7 +276,8 @@ public class ConvertYuv420_888
 			{
 				processor.processYUV(work[indexY]&0xFF,work[indexU]&0xFF, work[indexV]&0xFF);
 
-				int stepUV = stridePixelUV*(((x+stridePixelUV-1)%stridePixelUV)^1);
+				// this is intended to be a fast way to do if a == 0 ? 1 : 0
+				int stepUV = stridePixelUV*( 1/(1+((x+1)%stridePixelUV)));
 				indexU += stepUV;
 				indexV += stepUV;
 
