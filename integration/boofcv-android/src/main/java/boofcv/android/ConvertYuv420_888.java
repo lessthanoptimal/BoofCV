@@ -277,7 +277,7 @@ public class ConvertYuv420_888
 				processor.processYUV(work[indexY]&0xFF,work[indexU]&0xFF, work[indexV]&0xFF);
 
 				// this is intended to be a fast way to do if a == 0 ? 1 : 0
-				int stepUV = stridePixelUV*( 1/(1+((x+1)%stridePixelUV)));
+				int stepUV = stridePixelUV*( (x+1)%stridePixelUV==0?1:0);
 				indexU += stepUV;
 				indexV += stepUV;
 
