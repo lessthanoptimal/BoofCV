@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 public class BenchmarkYuv420_888 {
 	static final int width = 640, height = 480;
 
-	final Image image = new MockImage_420_888(new Random(234),width,height,2);
+	final Image image = new MockImage_420_888(new Random(234),width,height,2,0);
 
 	final GrayU8 grayU8 = new GrayU8(width, height);
 	final GrayF32 grayF32 = new GrayF32(width, height);

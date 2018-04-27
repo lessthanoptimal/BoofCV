@@ -29,11 +29,19 @@ repositories {
     }
 }
 
+task unzipJar(type: Copy) {
+    from zipTree('commons-collections-3.2.jar')
+    into ("$buildDir/libs/commons-collection")
+    include "**/*.class"
+    exclude "**/Unmodifiable.class"
+}
+
 dependencies {
     implementation project(':main:boofcv-ip')
     implementation project(':main:boofcv-feature')
     implementation project(':main:boofcv-calibration')
     implementation project(':main:boofcv-geo')
+
 
     // Google doesn't provide access to an android.jar
     // A proper android library could be built but that seems to make

@@ -24,6 +24,13 @@ import boofcv.struct.image.*;
 
 import java.nio.ByteBuffer;
 
+// TODO comment out current conversion code and unroll it. Runs significantly faster, see below.
+// maybe autogenerate the code some how so that fixes are propagated throughout the code base
+//		Benchmark                              Mode  Cnt  Score   Error  Units
+//		BenchmarkYuv420_888.yuvToPlanarRgbU8   avgt   10  4.023 ± 0.323  ms/op
+//		BenchmarkYuv420_888.yuvToPlanarRgbU8A  avgt   10  3.460 ± 0.141  ms/op
+// A = original code that was unrolled.
+
 /**
  * Functions for convertin {@link Image} into BoofCV imgae types.
  *
@@ -173,12 +180,12 @@ public class ConvertYuv420_888
 
 	interface ProcessorYuv
 	{
-		void processYUV(int y , int u , int v );
+		void processYUV(final int y , final int u ,final int v );
 	}
 
 	abstract static class ProcessorYuvRgb implements ProcessorYuv
 	{
-		public void processYUV(int y , int u , int v ) {
+		final public void processYUV(final int y , final int u ,final int v ) {
 			int Y = 1191*(y - 16);
 			int CR = u - 128;
 			int CB = v - 128;
@@ -210,7 +217,7 @@ public class ConvertYuv420_888
 			processRGB(r,g,b);
 		}
 
-		public abstract void processRGB( int r , int g , int b );
+		public abstract void processRGB( final int r ,final int g , final int b );
 	}
 
 	public static void processYuv(Image yuv , byte work[], ProcessorYuv processor )
@@ -296,18 +303,18 @@ public class ConvertYuv420_888
 		} else {
 			output = new  Planar<>(GrayU8.class,width,height,3);
 		}
-		GrayU8 red = output.getBand(0);
-		GrayU8 green = output.getBand(1);
-		GrayU8 blue = output.getBand(2);
+		final byte[] red = output.getBand(0).data;
+		final byte[] green = output.getBand(1).data;
+		final byte[] blue = output.getBand(2).data;
 
 		ProcessorYuv processor = new ProcessorYuvRgb() {
 			int indexOut = 0;
 
 			@Override
-			public void processRGB( int r , int g , int b ) {
-				red.data[indexOut] = (byte)r;
-				green.data[indexOut] = (byte)g;
-				blue.data[indexOut++] = (byte)b;
+			public void processRGB( final int r , final int g , final int b ) {
+				red[indexOut] = (byte)r;
+				green[indexOut] = (byte)g;
+				blue[indexOut++] = (byte)b;
 			}
 		};
 
@@ -327,18 +334,18 @@ public class ConvertYuv420_888
 		} else {
 			output = new  Planar<>(GrayF32.class,width,height,3);
 		}
-		GrayF32 red = output.getBand(0);
-		GrayF32 green = output.getBand(1);
-		GrayF32 blue = output.getBand(2);
+		final float[] red = output.getBand(0).data;
+		final float[] green = output.getBand(1).data;
+		final float[] blue = output.getBand(2).data;
 
 		ProcessorYuv processor = new ProcessorYuvRgb() {
 			int indexOut = 0;
 
 			@Override
-			public void processRGB( int r , int g , int b ) {
-				red.data[indexOut] = r;
-				green.data[indexOut] = g;
-				blue.data[indexOut++] = b;
+			public void processRGB( final int r , final int g , final int b ) {
+				red[indexOut] = r;
+				green[indexOut] = g;
+				blue[indexOut++] = b;
 			}
 		};
 
@@ -364,7 +371,7 @@ public class ConvertYuv420_888
 			int indexOut = 0;
 
 			@Override
-			public void processRGB( int r , int g , int b ) {
+			public void processRGB( final int r , final int g , final int b ) {
 				_output.data[indexOut++] = (byte)r;
 				_output.data[indexOut++] = (byte)g;
 				_output.data[indexOut++] = (byte)b;
@@ -393,7 +400,7 @@ public class ConvertYuv420_888
 			int indexOut = 0;
 
 			@Override
-			public void processRGB( int r , int g , int b ) {
+			public void processRGB( final int r , final int g , final int b ) {
 				_output.data[indexOut++] = r;
 				_output.data[indexOut++] = g;
 				_output.data[indexOut++] = b;
@@ -417,17 +424,17 @@ public class ConvertYuv420_888
 			output = new Planar(GrayU8.class,width,height,3);
 		}
 
-		GrayU8 bandY = output.getBand(0);
-		GrayU8 bandU = output.getBand(1);
-		GrayU8 bandV = output.getBand(2);
+		final byte[] dataY = output.getBand(0).data;
+		final byte[] dataU = output.getBand(1).data;
+		final byte[] dataV = output.getBand(2).data;
 
 		ProcessorYuv processor = new ProcessorYuv() {
 			int indexOut = 0;
 			@Override
-			public void processYUV(int y, int u, int v) {
-				bandY.data[indexOut] = (byte)y;
-				bandU.data[indexOut] = (byte)u;
-				bandV.data[indexOut++] = (byte)v;
+			final public void processYUV(final int y, final int u, final int v) {
+				dataY[indexOut] = (byte)y;
+				dataU[indexOut] = (byte)u;
+				dataV[indexOut++] = (byte)v;
 			}
 		};
 
@@ -448,15 +455,15 @@ public class ConvertYuv420_888
 			output = new InterleavedU8(width,height,3);
 		}
 
-		InterleavedU8 _output = output;
+		final byte[] data = output.data;
 
 		ProcessorYuv processor = new ProcessorYuv() {
 			int indexOut = 0;
 			@Override
-			public void processYUV(int y, int u, int v) {
-				_output.data[indexOut++] = (byte)y;
-				_output.data[indexOut++] = (byte)u;
-				_output.data[indexOut++] = (byte)v;
+			final public void processYUV(final int y, final int u, final int v) {
+				data[indexOut++] = (byte)y;
+				data[indexOut++] = (byte)u;
+				data[indexOut++] = (byte)v;
 			}
 		};
 

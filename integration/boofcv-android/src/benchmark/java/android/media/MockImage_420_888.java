@@ -31,20 +31,20 @@ public class MockImage_420_888 extends Image {
 
 	Plane[] planes = new Plane[3];
 
-	public MockImage_420_888(Random rand , int width , int height , int pixelStrideUV ) {
+	public MockImage_420_888(Random rand , int width , int height , int pixelStrideUV , int extra ) {
 		this();
 		this.pixelStrideUV = pixelStrideUV;
 		this.width = width;
 		this.height = height;
 
-		gray = new byte[width*height];
-		bandUV = new byte[2*(width/pixelStrideUV)*(height/pixelStrideUV)];
+		gray = new byte[(width+extra)*height];
+		int rowStrideUV = 2*(width/pixelStrideUV)+extra;
 
-		int rowStrideUV = 2*(width/pixelStrideUV);
+		bandUV = new byte[rowStrideUV*(height/pixelStrideUV)];
 
-		planes[0] = new DummyPlane(1,width,0,width*height,gray);
-		planes[1] = new DummyPlane(pixelStrideUV,rowStrideUV,0,bandUV.length,gray);
-		planes[2] = new DummyPlane(pixelStrideUV,rowStrideUV,1,bandUV.length-1,gray);
+		planes[0] = new DummyPlane(1,width+extra,0,gray.length,gray);
+		planes[1] = new DummyPlane(pixelStrideUV,rowStrideUV,0,bandUV.length,bandUV);
+		planes[2] = new DummyPlane(pixelStrideUV,rowStrideUV,1,bandUV.length-1,bandUV);
 
 		rand.nextBytes(gray);
 		rand.nextBytes(bandUV);
