@@ -157,8 +157,8 @@ public class ContourTracer {
 		indexLabel = labeled.getIndex(x-1,y-1);
 		add(x,y);
 
-		// find the next black pixel.  handle case where its an isolated point
-		if( !searchBlack() ) {
+		// find the next one pixel.  handle case where its an isolated point
+		if( !searchOne() ) {
 			return;
 		} else {
 			initialDir = dir;
@@ -168,7 +168,7 @@ public class ContourTracer {
 
 		for( ;; ) {
 			// search in clockwise direction around the current pixel for next black pixel
-			searchBlack();
+			searchOne();
 			if( x == initialX && y == initialY && dir == initialDir ) {
 				// returned to the initial state again. search is finished
 				return;
@@ -183,7 +183,7 @@ public class ContourTracer {
 	/**
 	 * Searches in a circle around the current point in a clock-wise direction for the first black pixel.
 	 */
-	private boolean searchBlack() {
+	private boolean searchOne() {
 //		for( int i = 0; i < ruleN; i++ ) {
 //			if( checkBlack(indexBinary + offsetsBinary[dir]))
 //				return true;
@@ -193,50 +193,50 @@ public class ContourTracer {
 
 		// Unrolling here results in about a 10% speed up
 		if( ruleN == 4 )
-			return searchBlack4();
+			return searchOne4();
 		else
-			return searchBlack8();
+			return searchOne8();
 	}
 
-	private boolean searchBlack4() {
-		if( checkBlack(indexBinary + offsetsBinary[dir]))
+	private boolean searchOne4() {
+		if( checkOne(indexBinary + offsetsBinary[dir]))
 			return true;
 		dir = (dir+1)%4;
-		if( checkBlack(indexBinary + offsetsBinary[dir]))
+		if( checkOne(indexBinary + offsetsBinary[dir]))
 			return true;
 		dir = (dir+1)%4;
-		if( checkBlack(indexBinary + offsetsBinary[dir]))
+		if( checkOne(indexBinary + offsetsBinary[dir]))
 			return true;
 		dir = (dir+1)%4;
-		if( checkBlack(indexBinary + offsetsBinary[dir]))
+		if( checkOne(indexBinary + offsetsBinary[dir]))
 			return true;
 		dir = (dir+1)%4;
 		return false;
 	}
 
-	private boolean searchBlack8() {
-		if( checkBlack(indexBinary + offsetsBinary[dir]))
+	private boolean searchOne8() {
+		if( checkOne(indexBinary + offsetsBinary[dir]))
 			return true;
 		dir = (dir+1)%8;
-		if( checkBlack(indexBinary + offsetsBinary[dir]))
+		if( checkOne(indexBinary + offsetsBinary[dir]))
 			return true;
 		dir = (dir+1)%8;
-		if( checkBlack(indexBinary + offsetsBinary[dir]))
+		if( checkOne(indexBinary + offsetsBinary[dir]))
 			return true;
 		dir = (dir+1)%8;
-		if( checkBlack(indexBinary + offsetsBinary[dir]))
+		if( checkOne(indexBinary + offsetsBinary[dir]))
 			return true;
 		dir = (dir+1)%8;
-		if( checkBlack(indexBinary + offsetsBinary[dir]))
+		if( checkOne(indexBinary + offsetsBinary[dir]))
 			return true;
 		dir = (dir+1)%8;
-		if( checkBlack(indexBinary + offsetsBinary[dir]))
+		if( checkOne(indexBinary + offsetsBinary[dir]))
 			return true;
 		dir = (dir+1)%8;
-		if( checkBlack(indexBinary + offsetsBinary[dir]))
+		if( checkOne(indexBinary + offsetsBinary[dir]))
 			return true;
 		dir = (dir+1)%8;
-		if( checkBlack(indexBinary + offsetsBinary[dir]))
+		if( checkOne(indexBinary + offsetsBinary[dir]))
 			return true;
 		dir = (dir+1)%8;
 		return false;
@@ -246,11 +246,11 @@ public class ContourTracer {
 	 * Checks to see if the specified pixel is black (1).  If not the pixel is marked so that it
 	 * won't be searched again
 	 */
-	private boolean checkBlack( int index ) {
+	private boolean checkOne(int index ) {
 		if( binary.data[index] == 1 ) {
 			return true;
 		} else {
-			// mark white pixels as negative numbers to avoid retracing this contour in the future
+			// mark this pixel with a not one value so that it isn't searched again in the future
 			binary.data[index] = -1;
 			return false;
 		}

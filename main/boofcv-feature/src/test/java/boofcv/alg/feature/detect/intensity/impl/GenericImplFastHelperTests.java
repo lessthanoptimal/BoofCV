@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,9 +64,9 @@ public abstract class GenericImplFastHelperTests<T extends ImageGray<T>> {
 		setCircle(10,11,30-threshold-5);
 		float valueB = alg.scoreLower(image.getIndex(10,11));
 
-		assertTrue(valueA > 0 );
-		assertTrue(valueB > 0 );
-		assertTrue(valueB > valueA);
+		assertTrue(valueA < 0 );
+		assertTrue(valueB < 0 );
+		assertTrue(valueB < valueA);
 	}
 
 	@Test

@@ -208,7 +208,7 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 			return;
 
 		if( isSubimage() )
-			throw new RuntimeException("Can't reshape subimage");
+			throw new IllegalArgumentException("Can't reshape subimage");
 
 		for( int i = 0; i < bands.length; i++ ) {
 			bands[i].reshape(width,height);
