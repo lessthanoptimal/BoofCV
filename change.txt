@@ -19,6 +19,8 @@ Version : 0.30
   * Fixed crash bug if it estimated a version 0 QR
 - ImageType
   * Added setTo() and isSameType()
+- ImageMultiBand
+  * Added reshape(width,height,numberOfBands)
 - Android
   * Support for camera2 API
 - ImageConvert

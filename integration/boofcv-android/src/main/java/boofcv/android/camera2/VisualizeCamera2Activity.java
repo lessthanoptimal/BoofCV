@@ -86,13 +86,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	protected TextureView textureView; // used to display camera preview directly to screen
 	protected DisplayView displayView; // used to render visuals
 
-	//---- START Owned By imagLock
-	protected final Object imageLock = new Object();
-	protected ImageType imageType = ImageType.single(GrayU8.class);
-	protected ColorFormat colorFormat = ColorFormat.RGB;
-	protected Stack<ImageBase> stackImages = new Stack<>(); // images which are available for use
-	protected byte[] convertWork = new byte[1]; // work space for converting images
-	//---- END
+	// Data used for converting from Image to a BoofCV image type
+	private final BoofImage boofImage = new BoofImage();
 
 	//---- START owned by bitmapLock
 	protected final Object bitmapLock = new Object();
@@ -296,11 +291,12 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	 * Changes the type of image the camera frame is converted to
 	 */
 	protected void setImageType( ImageType type , ColorFormat colorFormat ) {
-		synchronized (imageLock){
-			this.imageType = type;
-			this.colorFormat = colorFormat;
-			// todo check to see if the type is the same or not before clearing
-			this.stackImages.clear();
+		synchronized (boofImage.imageLock){
+			boofImage.colorFormat = colorFormat;
+			if( !boofImage.imageType.isSameType( type ) ) {
+				boofImage.imageType = type;
+				boofImage.stackImages.clear();
+			}
 
 			synchronized (lockTiming) {
 				totalConverted = 0;
@@ -315,16 +311,17 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 		if( threadQueue.size() > 0 )
 			return;
 
-		synchronized (imageLock) {
+		synchronized (boofImage.imageLock) {
+			// When the image is removed from the stack it's no longer controlled by this class
 			ImageBase converted;
-			if( stackImages.empty()) {
-				converted = imageType.createImage(1,1);
+			if( boofImage.stackImages.empty()) {
+				converted = boofImage.imageType.createImage(1,1);
 			} else {
-				converted = stackImages.pop();
+				converted = boofImage.stackImages.pop();
 			}
 			long before = System.nanoTime();
-			convertWork = ConvertYuv420_888.declareWork(image, convertWork);
-			ConvertYuv420_888.yuvToBoof(image, colorFormat, converted, convertWork);
+			boofImage.convertWork = ConvertYuv420_888.declareWork(image, boofImage.convertWork);
+			ConvertYuv420_888.yuvToBoof(image, boofImage.colorFormat, converted, boofImage.convertWork);
 			long after = System.nanoTime();
 //			Log.i(TAG,"processFrame() image="+image.getWidth()+"x"+image.getHeight()+
 //					"  boof="+converted.width+"x"+converted.height);
@@ -381,9 +378,9 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 		}
 
 		// Put the image into the stack if the image type has not changed
-		synchronized (imageLock) {
-			if( imageType.isSameType(image.getImageType()))
-				stackImages.add(image);
+		synchronized (boofImage.imageLock) {
+			if( boofImage.imageType.isSameType(image.getImageType()))
+				boofImage.stackImages.add(image);
 		}
 	}
 
@@ -445,5 +442,22 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 
 		@Override
 		public void surfaceDestroyed(SurfaceHolder surfaceHolder) {}
+	}
+
+	/**
+	 * Data related to converting between Image and BoofCV data types
+	 *
+	 * All class data is owned by the lock
+	 */
+	protected static class BoofImage {
+		protected final Object imageLock = new Object();
+		protected ImageType imageType = ImageType.single(GrayU8.class);
+		protected ColorFormat colorFormat = ColorFormat.RGB;
+		/**
+		 * Images available for use, When inside the stack they must not be referenced anywhere else.
+		 * When removed they are owned by the thread in which they were removed.
+		 */
+		protected Stack<ImageBase> stackImages = new Stack<>();
+		protected byte[] convertWork = new byte[1]; // work space for converting images
 	}
 }

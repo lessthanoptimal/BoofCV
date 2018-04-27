@@ -281,7 +281,11 @@ public class ConvertYuv420_888
 
 			for (int x = 0; x < width; x++, indexY++ )
 			{
-				processor.processYUV(work[indexY]&0xFF,work[indexU]&0xFF, work[indexV]&0xFF);
+				// one line per access to work so that the line number in exception will be more specific
+				processor.processYUV(
+						work[indexY]&0xFF,
+						work[indexU]&0xFF,
+						work[indexV]&0xFF);
 
 				// this is intended to be a fast way to do if a == 0 ? 1 : 0
 				int stepUV = stridePixelUV*( (x+1)%stridePixelUV==0?1:0);

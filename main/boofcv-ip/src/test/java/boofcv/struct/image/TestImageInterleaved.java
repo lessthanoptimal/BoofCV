@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class TestImageInterleaved {
 	}
 
 	@Test
-	public void reshape() {
+	public void reshape_wh() {
 		DummyImage a = new DummyImage(10, 20, 3);
 
 		a.reshape(5,10);
@@ -74,6 +74,33 @@ public class TestImageInterleaved {
 
 		a.reshape(30,25);
 		assertTrue(30*25 <= a.data.length);
+		assertEquals(30,a.width);
+		assertEquals(25,a.height);
+		assertEquals(3,a.numBands);
+		assertEquals(30*3,a.stride);
+	}
+
+	@Test
+	public void reshape_whb() {
+		DummyImage a = new DummyImage(10, 20, 3);
+
+		a.reshape(5,10,3);
+		assertTrue(5*10*3 <= a.data.length);
+		assertEquals(5,a.width);
+		assertEquals(10,a.height);
+		assertEquals(3,a.numBands);
+		assertEquals(5*3,a.stride);
+
+		a.reshape(5,10,2);
+		assertTrue(5*10*2 <= a.data.length);
+		assertEquals(5,a.width);
+		assertEquals(10,a.height);
+		assertEquals(2,a.numBands);
+		assertEquals(5*2,a.stride);
+
+
+		a.reshape(30,25,3);
+		assertTrue(30*25*3 <= a.data.length);
 		assertEquals(30,a.width);
 		assertEquals(25,a.height);
 		assertEquals(3,a.numBands);

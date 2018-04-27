@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -110,6 +110,20 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 		this.width = width;
 		this.height = height;
 		this.stride = width*numBands;
+	}
+
+	@Override
+	public void reshape(int width, int height, int numberOfBands) {
+		if( this.numBands != numberOfBands ) {
+			if (isSubimage())
+				throw new IllegalArgumentException("Can't reshape sub-images");
+			this.numBands = -1; // force it to redeclare memory
+			this.width = width;
+			this.height = height;
+			setNumberOfBands(numberOfBands);
+		} else {
+			reshape(width, height);
+		}
 	}
 
 	@Override

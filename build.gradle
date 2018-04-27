@@ -103,12 +103,14 @@ subprojects {
 
         testCompile group: 'junit', name: 'junit', version: '4.12'
 
-        testImplementation project.sourceSets.generate.output
+        experimentalImplementation project.sourceSets.main.compileClasspath
+
         testImplementation project.sourceSets.benchmark.output
-        testImplementation project.sourceSets.experimental.output
+        testImplementation project.sourceSets.benchmark.compileClasspath
 
         benchmarkImplementation project.sourceSets.experimental.output
         benchmarkImplementation project.sourceSets.generate.output
+        benchmarkImplementation project.sourceSets.main.compileClasspath
 
         ['core','generator-annprocess'].each { String a->
             benchmarkCompile('org.openjdk.jmh:jmh-'+a+':1.19')
