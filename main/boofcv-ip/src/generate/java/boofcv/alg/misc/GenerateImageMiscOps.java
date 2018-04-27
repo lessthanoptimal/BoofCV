@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,6 @@ import java.io.FileNotFoundException;
  */
 public class GenerateImageMiscOps extends CodeGeneratorBase {
 
-	String className = "ImageMiscOps";
-
 	private AutoTypeImage imageType;
 	private String imageName;
 	private String dataType;
@@ -45,11 +43,11 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		out.println("}");
 	}
 
-	private void printPreamble() throws FileNotFoundException {
-		setOutputFile(className);
+	private void printPreamble() {
 		out.print("import boofcv.struct.image.*;\n" +
 				"\n" +
 				"import java.util.Random;\n" +
+				"import java.util.Arrays;\n" +
 				"\n" +
 				"\n" +
 				"/**\n" +
@@ -152,9 +150,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\tint index = input.getStartIndex() + y * input.getStride();\n" +
-				"\t\t\tfor (int x = 0; x < input.width; x++) {\n" +
-				"\t\t\t\tinput.data[index++] = "+typeCast+"value;\n" +
-				"\t\t\t}\n" +
+				"\t\t\tArrays.fill(input.data,index,index+input.width, "+typeCast+"value);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
@@ -174,9 +170,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\tint index = input.getStartIndex() + y * input.getStride();\n" +
 				"\t\t\tint end = index + input.width*input.numBands;\n" +
-				"\t\t\tfor (; index < end; index++ ) {\n" +
-				"\t\t\t\tinput.data[index] = "+typeCast+"value;\n" +
-				"\t\t\t}\n" +
+				"\t\t\tArrays.fill(input.data,index,end, "+typeCast+"value);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
