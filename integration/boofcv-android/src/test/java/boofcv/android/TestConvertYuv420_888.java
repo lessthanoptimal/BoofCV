@@ -24,10 +24,12 @@
 //
 //import java.util.Random;
 //
-//import static org.junit.Assert.*;
 //
 ///**
 // * Current units mostly check to see if an exception is thrown when processing these different images
+// *
+// * NOTE: To get this test to work you need ot move junit 4.x to the top and android.benchmark to the top in
+// * your dependencies
 // *
 // * @author Peter Abeles
 // */
@@ -39,7 +41,11 @@
 //	MockImage_420_888 inputs[] = new MockImage_420_888[]{
 //			new MockImage_420_888(rand,width,height,1,0),
 //			new MockImage_420_888(rand,width,height,2,0),
-//			new MockImage_420_888(rand,width,height,2,1)
+//			new MockImage_420_888(rand,width,height,2,1),
+//			new MockImage_420_888(rand,width+1,height,1,0),
+//			new MockImage_420_888(rand,width,height+1,1,0),
+//			new MockImage_420_888(rand,width+1,height,2,0),
+//			new MockImage_420_888(rand,width,height+1,2,0),
 //	};
 //
 //	@Test

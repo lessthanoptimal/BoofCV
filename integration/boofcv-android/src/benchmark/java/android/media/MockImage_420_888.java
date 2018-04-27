@@ -38,7 +38,7 @@ public class MockImage_420_888 extends Image {
 		this.height = height;
 
 		gray = new byte[(width+extra)*height];
-		int rowStrideUV = 2*(width/pixelStrideUV)+extra;
+		int rowStrideUV = 2*(width/pixelStrideUV + (width%pixelStrideUV))+extra;
 
 		bandUV = new byte[rowStrideUV*(height/pixelStrideUV)];
 
