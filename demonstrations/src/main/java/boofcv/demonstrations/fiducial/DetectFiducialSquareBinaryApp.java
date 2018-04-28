@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.fiducial;
 
-import boofcv.abst.filter.binary.BinaryLabelContourFinder;
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.square.FoundFiducial;
@@ -222,9 +222,9 @@ public class DetectFiducialSquareBinaryApp
 
 			synchronized ( lockProcessing ) {
 
-				if (controls.bShowContour) {
-
-					BinaryLabelContourFinder contour = detector.getSquareDetector().getDetector().getContourFinder();
+				if (controls.bShowContour)
+				{
+					BinaryContourFinder contour = detector.getSquareDetector().getDetector().getContourFinder();
 					List<Contour> contours = BinaryImageOps.convertContours(contour);
 					g2.setStroke(new BasicStroke(1));
 					VisualizeBinaryData.render(contours, null,Color.CYAN, scale, g2);

@@ -21,7 +21,7 @@ package boofcv.abst.filter.binary;
 /**
  * @author Peter Abeles
  */
-public class TestBinaryContourFinderChange2004 extends GenericBinaryContourFinder{
+public class TestBinaryLabelContourFinderChange2004 extends GenericBinaryLabelContourFinder {
 
 	@Override
 	protected BinaryLabelContourFinder create() {

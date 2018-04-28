@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -316,7 +316,8 @@ public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
 		List<Point2D_I32> contour = new ArrayList<>();
 
 		DetectPolygonFromContour alg = createDetector(GrayU8.class, 4,4);
-		alg.getLabeled().reshape(20,30);
+		alg.imageWidth = 20;
+		alg.imageHeight = 30;
 		assertFalse(alg.touchesBorder(contour));
 
 		contour.add(new Point2D_I32(10,1));
@@ -355,7 +356,8 @@ public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
 	@Test
 	public void determineCornersOnBorder() {
 		DetectPolygonFromContour alg = createDetector(GrayU8.class, 4,4);
-		alg.getLabeled().reshape(width,height);
+		alg.imageWidth = width;
+		alg.imageHeight = height;
 
 		Polygon2D_F64 poly = new Polygon2D_F64(0,0, 10,0, 10,10, 0,10);
 

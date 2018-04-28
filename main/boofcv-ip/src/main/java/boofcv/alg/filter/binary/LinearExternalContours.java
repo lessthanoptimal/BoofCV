@@ -108,6 +108,7 @@ public class LinearExternalContours {
 						if( N < minContourLength || N >= maxContourLength)
 							storagePoints.removeTail();
 					}
+					binary.print();
 				}
 
 				// It's now inside a ones blob. Move forward until it hits a 0 pixel
@@ -123,6 +124,7 @@ public class LinearExternalContours {
 				if( v == 1 ) {
 					tracer.maxContourLength = 0;
 					tracer.trace(x-1,y,false);
+					binary.print();
 				}
 			}
 		}
@@ -188,10 +190,10 @@ public class LinearExternalContours {
 				dir = nextDirection[dir];
 			}
 
-//			System.out.println("    $ initial "+initialX+" "+initialY+" dir "+initialDir);
+			System.out.println("    $ initial "+initialX+" "+initialY+" dir "+initialDir+"  external="+external);
 			while( true ) {
 				searchNotZero();
-//				System.out.println("    $ loop decision "+x+" "+y+" dir "+dir+"  data "+binary.data[indexBinary]);
+				System.out.println("    $ loop decision "+x+" "+y+" dir "+dir+"  data "+binary.data[indexBinary]);
 
 				if( binary.data[indexBinary] != -2 ) {
 					binary.data[indexBinary] = -1;

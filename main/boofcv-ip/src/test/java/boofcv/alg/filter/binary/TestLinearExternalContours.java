@@ -28,16 +28,18 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestContourExternalOnly {
+public class TestLinearExternalContours {
 	public static GrayU8 TEST1 = new GrayU8(new byte[][]
-			{{0,0,0,0,0,0,0,1,0,0,0,1,1},
-			 {0,0,0,0,0,0,0,1,0,0,0,1,1},
-			 {0,0,0,0,0,0,0,1,0,0,1,1,0},
-			 {0,0,0,0,0,0,0,0,1,1,1,1,0},
-			 {0,0,1,0,0,0,0,0,1,1,1,0,0},
-			 {0,0,1,0,0,0,1,1,1,1,1,0,0},
-			 {1,1,1,1,1,1,1,1,1,1,0,0,0},
-			 {0,0,0,1,1,1,1,1,0,0,0,0,0}});
+			{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			 {0,0,0,0,0,0,0,0,1,0,0,0,1,1,0},
+			 {0,0,0,0,0,0,0,0,1,0,0,0,1,1,0},
+			 {0,0,0,0,0,0,0,0,1,0,0,1,1,0,0},
+			 {0,0,0,0,0,0,0,0,0,1,1,1,1,0,0},
+			 {0,0,0,1,0,0,0,0,0,1,1,1,0,0,0},
+			 {0,0,0,1,0,0,0,1,1,1,1,1,0,0,0},
+			 {0,1,1,1,1,1,1,1,1,1,1,0,0,0,0},
+			 {0,0,0,0,1,1,1,1,1,0,0,0,0,0,0},
+			 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}});
 
 
 	public static GrayU8 TEST2 = new GrayU8(new byte[][]
@@ -61,17 +63,17 @@ public class TestContourExternalOnly {
 			 {0,0,0,0,0}});
 
 	public static GrayU8 TEST4 = new GrayU8(new byte[][]
-			{{0,0,0,0,0,0,0},
-			 {0,0,1,1,1,1,1},
-			 {0,1,0,1,1,1,1},
-			 {0,1,1,1,0,1,1},
-			 {0,1,1,1,1,1,1},
-			 {0,1,1,1,1,1,1},
-			 {0,1,1,1,1,1,1},
-			 {0,0,0,0,0,0,0}});
+			{{0,0,0,0,0,0,0,0},
+			 {0,0,1,1,1,1,1,0},
+			 {0,1,0,1,1,1,1,0},
+			 {0,1,1,1,0,1,1,0},
+			 {0,1,1,1,1,1,1,0},
+			 {0,1,1,1,1,1,1,0},
+			 {0,1,1,1,1,1,1,0},
+			 {0,0,0,0,0,0,0,0}});
 
 	@Test
-	public void test1() {
+	public void test1_4() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
 
 		GrayU8 binary = TEST1.clone();
@@ -83,7 +85,19 @@ public class TestContourExternalOnly {
 	}
 
 	@Test
-	public void test2() {
+	public void test1_8() {
+		LinearExternalContours alg = new LinearExternalContours(ConnectRule.EIGHT);
+
+		GrayU8 binary = TEST1.clone();
+
+		alg.process(binary,1,1);
+
+		PackedSetsPoint2D_I32 contours = alg.getExternalContours();
+		assertEquals(1,contours.size());
+	}
+
+	@Test
+	public void test2_4() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
 
 		GrayU8 binary = TEST2.clone();
@@ -95,7 +109,19 @@ public class TestContourExternalOnly {
 	}
 
 	@Test
-	public void test3() {
+	public void test2_8() {
+		LinearExternalContours alg = new LinearExternalContours(ConnectRule.EIGHT);
+
+		GrayU8 binary = TEST2.clone();
+
+		alg.process(binary,1,1);
+
+		PackedSetsPoint2D_I32 contours = alg.getExternalContours();
+		assertEquals(5,contours.size());
+	}
+
+	@Test
+	public void test3_4() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
 
 		GrayU8 binary = TEST3.clone();
@@ -107,8 +133,34 @@ public class TestContourExternalOnly {
 	}
 
 	@Test
-	public void test4() {
+	public void test3_8() {
+		LinearExternalContours alg = new LinearExternalContours(ConnectRule.EIGHT);
+
+		GrayU8 binary = TEST3.clone();
+
+		alg.process(binary,1,1);
+
+		PackedSetsPoint2D_I32 contours = alg.getExternalContours();
+		assertEquals(1,contours.size());
+	}
+
+	@Test
+	public void test4_4() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
+
+		GrayU8 binary = TEST4.clone();
+
+		alg.process(binary,1,1);
+
+		binary.print();
+
+		PackedSetsPoint2D_I32 contours = alg.getExternalContours();
+		assertEquals(1,contours.size());
+	}
+
+	@Test
+	public void test4_8() {
+		LinearExternalContours alg = new LinearExternalContours(ConnectRule.EIGHT);
 
 		GrayU8 binary = TEST4.clone();
 

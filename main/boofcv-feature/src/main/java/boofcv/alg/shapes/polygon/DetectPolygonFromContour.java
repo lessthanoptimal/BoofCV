@@ -18,7 +18,7 @@
 
 package boofcv.alg.shapes.polygon;
 
-import boofcv.abst.filter.binary.BinaryLabelContourFinder;
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.abst.shapes.polyline.PointsToPolyline;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.ContourPacked;
@@ -27,7 +27,6 @@ import boofcv.misc.MovingAverage;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform2_F32;
-import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_I32;
@@ -78,8 +77,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private int minimumContour;
 	private double minimumArea; // computed from minimumContour
 
-	private BinaryLabelContourFinder contourFinder;
-	private GrayS32 labeled = new GrayS32(1,1);
+	private BinaryContourFinder contourFinder;
+	int imageWidth,imageHeight; // input image shape
 
 	// finds the initial polygon around a target candidate
 	private PointsToPolyline contourToPolyline;
@@ -144,7 +143,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 									boolean touchBorder,
 									double contourEdgeThreshold,
 									double tangentEdgeIntensity,
-									BinaryLabelContourFinder contourFinder,
+									BinaryContourFinder contourFinder,
 									Class<T> inputType) {
 
 		this.minimumContourConfig = minimumContour.copy(); // local copy so that external can be modified
@@ -205,7 +204,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		if( verbose ) System.out.println("ENTER  DetectPolygonFromContour.process()");
 		InputSanityCheck.checkSameShape(binary, gray);
 
-		if( labeled.width != gray.width || labeled.height != gray.height )
+		if( imageWidth != gray.width || imageHeight != gray.height )
 			configure(gray.width,gray.height);
 
 		// reset storage for output. Call reset individually here to ensure that all references
@@ -221,8 +220,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		long time0 = System.nanoTime();
 
 		// find all the contours
-		hack.process(binary,1,1);
-//		contourFinder.process(binary, labeled);
+		contourFinder.process(binary);
 
 		long time1 = System.nanoTime();
 
@@ -248,11 +246,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 */
 	private void configure( int width , int height ) {
 
-//		milliContour = 0;
-//		milliShapes = 0;
-
-		// resize storage images
-		labeled.reshape(width, height);
+		this.imageWidth = width;
+		this.imageHeight = height;
 
 		// adjust size based parameters based on image size
 		this.minimumContour = minimumContourConfig.computeI(Math.min(width,height));
@@ -432,7 +427,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		for (int i = 0; i < polygon.size(); i++) {
 			Point2D_F64 p = polygon.get(i);
 
-			onImageBorder.add( p.x <= 1 || p.y <= 1 || p.x >= labeled.width-2 || p.y >= labeled.height-2);
+			onImageBorder.add( p.x <= 1 || p.y <= 1 || p.x >= imageWidth-2 || p.y >= imageHeight-2);
 		}
 	}
 
@@ -504,8 +499,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 * Checks to see if some part of the contour touches the image border.  Most likely cropped
 	 */
 	protected final boolean touchesBorder( List<Point2D_I32> contour ) {
-		int endX = labeled.width-1;
-		int endY = labeled.height-1;
+		int endX = imageWidth-1;
+		int endY = imageHeight-1;
 
 		for (int j = 0; j < contour.size(); j++) {
 			Point2D_I32 p = contour.get(j);
@@ -528,10 +523,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 	public void setConvex(boolean convex) {
 		contourToPolyline.setConvex(convex);
-	}
-
-	public GrayS32 getLabeled() {
-		return labeled;
 	}
 
 	public boolean isOutputClockwise() {
@@ -593,7 +584,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		return foundInfo;
 	}
 
-	public BinaryLabelContourFinder getContourFinder() {
+	public BinaryContourFinder getContourFinder() {
 		return contourFinder;
 	}
 

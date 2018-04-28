@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
-import boofcv.abst.filter.binary.BinaryLabelContourFinder;
+import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.distort.RemovePerspectiveDistortion;
 import boofcv.alg.fiducial.calib.squares.SquareGraph;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
@@ -164,7 +164,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		// contour size is maximum when viewed head one. Assume the smallest qrcode is 3x this width
 		// 4 side in a square
 		int maxContourSize = Math.min(gray.width,gray.height)*4/3;
-		BinaryLabelContourFinder contourFinder = squareDetector.getDetector().getContourFinder();
+		BinaryContourFinder contourFinder = squareDetector.getDetector().getContourFinder();
 		contourFinder.setMaxContour(maxContourSize);
 		contourFinder.setSaveInnerContour(false);
 	}

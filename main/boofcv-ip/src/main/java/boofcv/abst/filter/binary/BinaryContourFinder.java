@@ -27,10 +27,8 @@ import boofcv.struct.image.GrayU8;
  * the ID of the contour you wish to load. Adjusting the max contour size is useful in
  * situations were memory is limited. Same for turning off inner contours.
  *
- * NOTE: Contours which are too small or too large are still included in the list
- * of contours, but their contour points will not be stored. To see if it was excluded
- * you need to load the contour and see if it has zero points. This is done because
- * the blobs the contours came from will still be in the labeled image.
+ * NOTE: Contours which are too small or too large are filtered out. This is different from the labeled
+ * variant of this class. The difference is because there is no labeled image.
  *
  * Defaults:
  * <ul>

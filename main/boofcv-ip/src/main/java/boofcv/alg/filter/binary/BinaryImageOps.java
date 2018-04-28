@@ -18,6 +18,8 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryContourInterface;
 import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.impl.BinaryThinning;
@@ -441,7 +443,21 @@ public class BinaryImageOps {
 		return convertContours(alg);
 	}
 
-	public static List<Contour> convertContours(BinaryLabelContourFinder alg ) {
+	/**
+	 * Finds the external contours only in the image
+	 * @param input Input binary image.  Not modified.
+	 * @param rule Connectivity rule.  Can be 4 or 8.  8 is more commonly used.
+	 * @return List of found contours for each blob.
+	 */
+	public static List<Contour> contourExternal(GrayU8 input, ConnectRule rule ) {
+		BinaryContourFinder alg = FactoryBinaryContourFinder.linearExternal();
+		alg.setConnectRule(rule);
+		alg.process(input);
+
+		return convertContours(alg);
+	}
+
+	public static List<Contour> convertContours(BinaryContourInterface alg ) {
 
 		List<ContourPacked> contours = alg.getContours();
 
@@ -449,10 +465,10 @@ public class BinaryImageOps {
 		for (int i = 0; i < contours.size(); i++) {
 			ContourPacked p = contours.get(i);
 			Contour c = new Contour();
-			c.external = BinaryLabelContourFinder.copyContour(alg,p.externalIndex);
+			c.external = BinaryContourInterface.copyContour(alg,p.externalIndex);
 
 			for (int j = 0; j < p.internalIndexes.size; j++) {
-				c.internal.add( BinaryLabelContourFinder.copyContour(alg,p.internalIndexes.get(j)));
+				c.internal.add( BinaryContourInterface.copyContour(alg,p.internalIndexes.get(j)));
 			}
 			ret.add(c);
 		}
