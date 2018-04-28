@@ -61,7 +61,6 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 		config.thresholding = ((DetectCalibrationPolygonPanel)controlPanel).polygonPanel.getThresholdPanel().createConfig();
 		config.square = ((DetectCalibrationPolygonPanel)controlPanel).polygonPanel.getConfigPolygon();
 
-
 		config.numRows = controlPanel.getGridRows();
 		config.numCols = controlPanel.getGridColumns();
 

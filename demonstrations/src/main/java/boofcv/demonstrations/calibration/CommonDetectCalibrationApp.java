@@ -161,6 +161,14 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 			e.printStackTrace();
 			UtilImageIO.saveImage(buffered,"crash_image.png");
 		}
+
+		if( controlPanel instanceof DetectCalibrationPolygonPanel ) {
+			DetectCalibrationPolygonPanel c = (DetectCalibrationPolygonPanel)controlPanel;
+			c.polygonPanel.getThresholdPanel().updateHistogram(grayPrev);
+		} else {
+			if( controlPanel.threshold != null )
+				controlPanel.threshold.updateHistogram(grayPrev);
+		}
 	}
 
 	protected void renderGraph( Graphics2D g2 , double scale ) {

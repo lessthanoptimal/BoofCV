@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -38,7 +40,7 @@ import java.awt.event.ItemListener;
  * @author Peter Abeles
  */
 public class DetectCalibrationPanel extends StandardAlgConfigPanel
-		implements ChangeListener, ItemListener
+		implements ChangeListener, ActionListener, ItemListener
 {
 	ViewedImageInfoPanel viewInfo = new ViewedImageInfoPanel();
 
@@ -90,12 +92,7 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		this.gridRows = gridRows;
 		this.gridColumns = gridColumns;
 
-		viewInfo.setListener(new ViewedImageInfoPanel.Listener() {
-			@Override
-			public void zoomChanged(double zoom) {
-				listener.calibEventGUI();
-			}
-		});
+		viewInfo.setListener(zoom -> listener.calibEventGUI());
 
 		viewSelector = new JComboBox();
 		viewSelector.addItem("Original");
@@ -105,40 +102,13 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 
 		successIndicator = new JLabel();
 
-		showPoints = new JCheckBox("Show Points");
-		showPoints.setSelected(doShowPoints);
-		showPoints.addItemListener(this);
-		showPoints.setMaximumSize(showPoints.getPreferredSize());
-
-		showNumbers = new JCheckBox("Show Numbers");
-		showNumbers.setSelected(doShowNumbers);
-		showNumbers.addItemListener(this);
-		showNumbers.setMaximumSize(showNumbers.getPreferredSize());
-
-		showGraph = new JCheckBox("Show Graphs");
-		showGraph.setSelected(doShowGraph);
-		showGraph.addItemListener(this);
-		showGraph.setMaximumSize(showGraph.getPreferredSize());
-
-		showGrids = new JCheckBox("Show Grids");
-		showGrids.setSelected(doShowGrids);
-		showGrids.addItemListener(this);
-		showGrids.setMaximumSize(showGrids.getPreferredSize());
-
-		showOrder = new JCheckBox("Show Order");
-		showOrder.setSelected(doShowOrder);
-		showOrder.addItemListener(this);
-		showOrder.setMaximumSize(showOrder.getPreferredSize());
-
-		showShapes = new JCheckBox("Show Shapes");
-		showShapes.setSelected(doShowShapes);
-		showShapes.addItemListener(this);
-		showShapes.setMaximumSize(showShapes.getPreferredSize());
-
-		showContour = new JCheckBox("Show Contour");
-		showContour.setSelected(doShowContour);
-		showContour.addItemListener(this);
-		showContour.setMaximumSize(showContour.getPreferredSize());
+		showPoints = checkbox("Show Points",doShowPoints);
+		showNumbers = checkbox("Show Numbers",doShowNumbers);
+		showGraph = checkbox("Show Graphs",doShowGraph);
+		showGrids = checkbox("Show Grids",doShowGrids);
+		showOrder = checkbox("Show Order",doShowOrder);
+		showShapes = checkbox("Show Shapes",doShowShapes);
+		showContour = checkbox("Show Contour",doShowContour);
 
 		selectRows = new JSpinner(new SpinnerNumberModel(gridRows,2, 100, 1));
 		selectRows.addChangeListener(this);
@@ -148,31 +118,30 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		selectColumns.addChangeListener(this);
 		selectColumns.setMaximumSize(selectColumns.getPreferredSize());
 
-		threshold = new ThresholdControlPanel(new ThresholdControlPanel.Listener() {
-			@Override
-			public void imageThresholdUpdated() {
-				listener.calibEventDetectorModified();
-			}
-		}, ConfigThreshold.local(ThresholdType.BLOCK_OTSU,81));
+		threshold = new ThresholdControlPanel(() -> listener.calibEventDetectorModified(), ConfigThreshold.local(ThresholdType.BLOCK_OTSU,81));
+		threshold.addHistogramGraph();
 
 		if( addComponents )
 			addComponents();
 	}
 
 	protected void addComponents() {
+		JPanel togglePanel = new JPanel( new GridLayout(0,2));
+		togglePanel.add(showPoints);
+		togglePanel.add(showNumbers);
+		togglePanel.add(showGraph);
+		togglePanel.add(showGrids);
+		togglePanel.add(showOrder);
+		togglePanel.add(showShapes);
+		togglePanel.add(showContour);
+
 		addLabeled(successIndicator, "Found:", this);
 		add(viewInfo);
 		addLabeled(viewSelector, "View ", this);
 		addLabeled(selectRows, "Rows", this);
 		addLabeled(selectColumns, "Cols", this);
-		addAlignLeft(threshold,this);
-		addAlignLeft(showPoints, this);
-		addAlignLeft(showNumbers,this);
-		addAlignLeft(showGraph,this);
-		addAlignLeft(showGrids,this);
-		addAlignLeft(showOrder,this);
-		addAlignLeft(showShapes, this);
-		addAlignLeft(showContour, this);
+
+		add(togglePanel);
 	}
 
 	public void addView( String name ) {
@@ -237,16 +206,34 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 
 	public void setCursor( final double x , final double y ) {
 		BoofSwingUtil.invokeNowOrLater(
-				new Runnable() {
-					@Override
-					public void run() {
-						viewInfo.setCursor(x,y);
-					}
-				});
+				() -> viewInfo.setCursor(x,y));
 	}
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
+		if( listener == null )
+			return;
+
+		if( e.getSource() == viewSelector ) {
+			selectedView = viewSelector.getSelectedIndex();
+			listener.calibEventGUI();
+		}
+	}
+
+	public int getGridRows() {
+		return gridRows;
+	}
+
+	public int getGridColumns() {
+		return gridColumns;
+	}
+
+	public ViewedImageInfoPanel getViewInfo() {
+		return viewInfo;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
 		if( listener == null )
 			return;
 
@@ -277,16 +264,9 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		}
 	}
 
-	public int getGridRows() {
-		return gridRows;
-	}
 
-	public int getGridColumns() {
-		return gridColumns;
-	}
-
-	public ViewedImageInfoPanel getViewInfo() {
-		return viewInfo;
+	public ThresholdControlPanel getThreshold() {
+		return threshold;
 	}
 
 	public interface Listener
