@@ -37,6 +37,10 @@ Version : 0.30
   * Handles case where a point is shifted and becomes a duplicate
 - ImageZoomPanel
   * Saving the view saves what you see exactly now
+- Binary Contour
+  * New external only contour algorithm
+  * About 1.35x faster on average and in some situations 10x faster
+  * Contour finding now has two high level interfaces
 
 - TODO Demo - Switch to thread pool for processing images?
 
