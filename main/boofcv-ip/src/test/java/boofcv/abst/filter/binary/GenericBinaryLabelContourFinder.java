@@ -149,4 +149,46 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		alg.process(input,labeled);
 		checkExpectedExternal(new int[]{19},alg);
 	}
+
+	@Test
+	public void testCase5() {
+		BinaryLabelContourFinder alg = create();
+		GrayS32 labeled = TEST7.createSameShape(GrayS32.class);
+
+		alg.setConnectRule(ConnectRule.FOUR);
+		alg.process(TEST5.clone(),labeled);
+		checkExpectedExternal(new int[]{20},alg);
+
+		alg.setConnectRule(ConnectRule.EIGHT);
+		alg.process(TEST5.clone(),labeled);
+		checkExpectedExternal(new int[]{20},alg);
+	}
+
+	@Test
+	public void test6() {
+		BinaryLabelContourFinder alg = create();
+		GrayS32 labeled = TEST7.createSameShape(GrayS32.class);
+
+		alg.setConnectRule(ConnectRule.FOUR);
+		alg.process(TEST6.clone(),labeled);
+		checkExpectedExternal(new int[]{20},alg);
+
+		alg.setConnectRule(ConnectRule.EIGHT);
+		alg.process(TEST6.clone(),labeled);
+		checkExpectedExternal(new int[]{20},alg);
+	}
+
+	@Test
+	public void test7() {
+		BinaryLabelContourFinder alg = create();
+		GrayS32 labeled = TEST7.createSameShape(GrayS32.class);
+
+		alg.setConnectRule(ConnectRule.FOUR);
+		alg.process(TEST7.clone(),labeled);
+		checkExpectedExternal(new int[]{4,20},alg);
+
+		alg.setConnectRule(ConnectRule.EIGHT);
+		alg.process(TEST7.clone(),labeled);
+		checkExpectedExternal(new int[]{20},alg);
+	}
 }

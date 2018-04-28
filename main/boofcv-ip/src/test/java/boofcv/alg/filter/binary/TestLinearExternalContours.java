@@ -21,9 +21,12 @@ package boofcv.alg.filter.binary;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayU8;
+import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -72,6 +75,36 @@ public class TestLinearExternalContours {
 			 {0,1,1,1,1,1,1,0},
 			 {0,0,0,0,0,0,0,0}});
 
+	public static GrayU8 TEST5 = new GrayU8(new byte[][]
+			{{0,0,0,0,0,0,0,0},
+			 {0,1,1,1,1,1,1,0},
+			 {0,1,0,0,0,0,1,0},
+			 {0,1,0,1,1,0,1,0},
+			 {0,1,0,1,1,0,1,0},
+			 {0,1,0,1,1,0,1,0},
+			 {0,1,1,1,1,1,1,0},
+			 {0,0,0,0,0,0,0,0}});
+
+	public static GrayU8 TEST6 = new GrayU8(new byte[][]
+			{{0,0,0,0,0,0,0,0},
+		 	 {0,1,1,1,1,1,1,0},
+			 {0,1,0,0,1,0,1,0},
+			 {0,1,0,1,1,0,1,0},
+			 {0,1,0,1,1,0,1,0},
+			 {0,1,0,1,1,0,1,0},
+			 {0,1,1,1,1,1,1,0},
+			 {0,0,0,0,0,0,0,0}});
+
+	public static GrayU8 TEST7 = new GrayU8(new byte[][]
+			{{0,0,0,0,0,0,0,0},
+			 {0,1,1,1,1,1,1,0},
+			 {0,1,0,0,0,0,1,0},
+			 {0,1,0,1,1,0,1,0},
+			 {0,1,0,1,1,0,1,0},
+			 {0,1,0,0,0,1,1,0},
+			 {0,1,1,1,1,1,1,0},
+			 {0,0,0,0,0,0,0,0}});
+
 	@Test
 	public void test1_4() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
@@ -117,7 +150,7 @@ public class TestLinearExternalContours {
 		alg.process(binary,1,1);
 
 		PackedSetsPoint2D_I32 contours = alg.getExternalContours();
-		assertEquals(5,contours.size());
+		assertEquals(4,contours.size());
 	}
 
 	@Test
@@ -145,28 +178,71 @@ public class TestLinearExternalContours {
 	}
 
 	@Test
-	public void test4_4() {
+	public void test4() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
+		alg.process(TEST4.clone(),1,1);
+		checkExpectedExternal(new int[]{24},alg);
 
-		GrayU8 binary = TEST4.clone();
-
-		alg.process(binary,1,1);
-
-		binary.print();
-
-		PackedSetsPoint2D_I32 contours = alg.getExternalContours();
-		assertEquals(1,contours.size());
+		alg = new LinearExternalContours(ConnectRule.EIGHT);
+		alg.process(TEST4.clone(),1,1);
+		checkExpectedExternal(new int[]{19},alg);
 	}
 
 	@Test
-	public void test4_8() {
-		LinearExternalContours alg = new LinearExternalContours(ConnectRule.EIGHT);
+	public void test5() {
+		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
+		alg.process(TEST5.clone(),1,1);
+		checkExpectedExternal(new int[]{20},alg);
 
-		GrayU8 binary = TEST4.clone();
+		alg = new LinearExternalContours(ConnectRule.EIGHT);
+		alg.process(TEST5.clone(),1,1);
+		checkExpectedExternal(new int[]{20},alg);
+	}
 
-		alg.process(binary,1,1);
+	@Test
+	public void test6() {
+		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
+		alg.process(TEST6.clone(),1,1);
+		checkExpectedExternal(new int[]{20},alg);
 
+		alg = new LinearExternalContours(ConnectRule.EIGHT);
+		alg.process(TEST6.clone(),1,1);
+		checkExpectedExternal(new int[]{20},alg);
+	}
+
+	@Test
+	public void test7() {
+		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
+		alg.process(TEST7.clone(),1,1);
+		checkExpectedExternal(new int[]{4,20},alg);
+
+		alg = new LinearExternalContours(ConnectRule.EIGHT);
+		alg.process(TEST7.clone(),1,1);
+		checkExpectedExternal(new int[]{20},alg);
+	}
+
+	public static void checkExpectedExternal(int expected[] , LinearExternalContours alg ) {
 		PackedSetsPoint2D_I32 contours = alg.getExternalContours();
-		assertEquals(1,contours.size());
+		assertEquals(expected.length, contours.size());
+
+		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32.class,true);
+
+		boolean matched[] = new boolean[ expected.length ];
+
+		for (int i = 0; i < expected.length; i++) {
+			int e = expected[i];
+			boolean foo = false;
+			for (int j = 0; j < contours.size(); j++) {
+				if( matched[j])
+					continue;
+				contours.getSet(j,points);
+				if( points.size == e ) {
+					matched[j] = true;
+					foo = true;
+					break;
+				}
+			}
+			assertTrue(foo);
+		}
 	}
 }

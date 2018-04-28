@@ -190,9 +190,11 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		for (int i = 0; i < infoList.size(); i++) {
 			DetectPolygonFromContour.Info info = infoList.get(i);
 
+			// The test below has been commented out because the new external only contour
+			// detector discards all information related to internal contours
 			// squares with no internal contour cannot possibly be a finder pattern
-			if( !info.hasInternal() )
-				continue;
+//			if( !info.hasInternal() )
+//				continue;
 
 			// See if the appearance matches a finder pattern
 			double grayThreshold = (info.edgeInside+info.edgeOutside)/2;

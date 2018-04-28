@@ -40,6 +40,8 @@ import boofcv.struct.image.GrayU8;
  *     <li>Iterate from "Begin Row" until the end of the row has been reached</li>
  *     <li>Move to the next row starting at point (1,y+1)</li>
  * </ol>
+ * Look at the code for all the details. There are a couple of important points which are glosed over
+ * in the description above.
  *
  * To get the external contours after processing call {@link #getExternalContours()}.
  *
@@ -100,15 +102,14 @@ public class LinearExternalContours {
 				// If this pixel has NOT already been labeled then trace until it runs into a labeled pixel or it
 				// completes the trace. If a labeled pixel is not encountered then it must be an external contour
 				if( binaryData[indexBinary] == 1 ) {
-					tracer.maxContourLength = maxContourLength;
-					if( !tracer.trace(x,y,true) ) {
-						throw new RuntimeException("Bug");
-					} else {
+					if( tracer.trace(x,y,true) ) {
 						int N = storagePoints.sizeOfTail();
 						if( N < minContourLength || N >= maxContourLength)
 							storagePoints.removeTail();
+					} else {
+						// it was really an internal contour
+						storagePoints.removeTail();
 					}
-					binary.print();
 				}
 
 				// It's now inside a ones blob. Move forward until it hits a 0 pixel
@@ -121,9 +122,8 @@ public class LinearExternalContours {
 				// If this pixel has NOT already been labeled trace until it completes a loop or it encounters a
 				// labeled pixel. This is always an internal contour
 				if( binaryData[indexBinary-1] == 1 ) {
-					tracer.maxContourLength = 0;
 					tracer.trace(x-1,y,false);
-					binary.print();
+					storagePoints.removeTail();
 				} else {
 					// Can't be sure if it's entering a hole or leaving the blob. This marker will let the
 					// tracer know it just traced an internal contour and not an external contour
@@ -165,12 +165,37 @@ public class LinearExternalContours {
 
 		public boolean trace( int initialX , int initialY , boolean external )
 		{
+			// TODO determine if it's ambigous or not. The number of times this test is
+			// done could be reduced I think.
+			// verify that it's external. If there are ones above it then it can't possibly be external
+			if( external ) {
+				indexBinary = binary.getIndex(initialX,initialY);
+				if( rule == ConnectRule.EIGHT ) {
+					if( binary.data[indexBinary+offsetsBinary[5]] != 0 ||
+							binary.data[indexBinary+offsetsBinary[6]] != 0 ||
+							binary.data[indexBinary+offsetsBinary[7]] != 0 )
+					{
+						external = false;
+					}
+				} else {
+					if( binary.data[indexBinary+offsetsBinary[3]] != 0  ) {
+						external = false;
+					}
+				}
+			}
+
+			if( external ) {
+				this.maxContourLength = LinearExternalContours.this.maxContourLength;
+			} else {
+				this.maxContourLength = -1;
+			}
+
 			// start a contour here
 			storagePoints.grow();
 			if( rule == ConnectRule.EIGHT )
-				dir = external ? 7 : 3;
+				dir = external ? 7 : 6;
 			else
-				dir = external ? 0 : 2;
+				dir = external ? 0 : 3;
 
 			x = initialX;
 			y = initialY;
@@ -190,10 +215,8 @@ public class LinearExternalContours {
 			moveToNext();
 			dir = nextDirection[dir];
 
-			System.out.println("    $ initial "+initialX+" "+initialY+" dir "+initialDir+"  external="+external);
 			while( true ) {
 				searchNotZero();
-				System.out.println("    $ loop decision "+x+" "+y+" dir "+dir+"  data "+binary.data[indexBinary]);
 
 				if( binary.data[indexBinary] != -2 ) {
 					binary.data[indexBinary] = -1;
@@ -203,7 +226,7 @@ public class LinearExternalContours {
 						// or internal region of zeros
 						return false;
 					} else if( dir == initialDir ) {
-						return true;
+						return external;
 					}
 				}
 				if( storagePoints.sizeOfTail() <= maxContourLength )

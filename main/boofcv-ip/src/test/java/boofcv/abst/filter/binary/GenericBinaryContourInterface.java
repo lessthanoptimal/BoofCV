@@ -76,6 +76,31 @@ public abstract class GenericBinaryContourInterface {
 					 {0,1,1,1,1,1,1},
 					 {0,0,0,0,0,0,0}});
 
+
+	public static GrayU8 TEST5 = new GrayU8(new byte[][]
+			{{1,1,1,1,1,1},
+			 {1,0,0,0,0,1},
+			 {1,0,1,1,0,1},
+			 {1,0,1,1,0,1},
+			 {1,0,1,1,0,1},
+			 {1,1,1,1,1,1}});
+
+	public static GrayU8 TEST6 = new GrayU8(new byte[][]
+			{{1,1,1,1,1,1},
+			 {1,0,0,1,0,1},
+			 {1,0,1,1,0,1},
+			 {1,0,1,1,0,1},
+			 {1,0,1,1,0,1},
+			 {1,1,1,1,1,1}});
+
+	public static GrayU8 TEST7 = new GrayU8(new byte[][]
+			{{1,1,1,1,1,1},
+			 {1,0,0,0,0,1},
+			 {1,0,1,1,0,1},
+			 {1,0,1,1,0,1},
+			 {1,0,0,0,1,1},
+			 {1,1,1,1,1,1}});
+
 	protected abstract BinaryContourInterface create();
 
 	@Test
@@ -118,7 +143,7 @@ public abstract class GenericBinaryContourInterface {
 		}
 	}
 
-	static void checkExpectedExternal(int expected[] , BinaryContourInterface alg ) {
+	public static void checkExpectedExternal(int expected[] , BinaryContourInterface alg ) {
 		List<ContourPacked> contours = alg.getContours();
 		assertEquals(expected.length, contours.size());
 

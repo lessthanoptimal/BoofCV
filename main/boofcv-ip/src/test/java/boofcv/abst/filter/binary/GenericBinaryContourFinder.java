@@ -141,4 +141,43 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 		alg.process(input);
 		checkExpectedExternal(new int[]{19},alg);
 	}
+
+	@Test
+	public void testCase5() {
+		BinaryContourFinder alg = create();
+
+		alg.setConnectRule(ConnectRule.FOUR);
+		alg.process(TEST5.clone());
+		checkExpectedExternal(new int[]{20},alg);
+
+		alg.setConnectRule(ConnectRule.EIGHT);
+		alg.process(TEST5.clone());
+		checkExpectedExternal(new int[]{20},alg);
+	}
+
+	@Test
+	public void test6() {
+		BinaryContourFinder alg = create();
+
+		alg.setConnectRule(ConnectRule.FOUR);
+		alg.process(TEST6.clone());
+		checkExpectedExternal(new int[]{20},alg);
+
+		alg.setConnectRule(ConnectRule.EIGHT);
+		alg.process(TEST6.clone());
+		checkExpectedExternal(new int[]{20},alg);
+	}
+
+	@Test
+	public void test7() {
+		BinaryContourFinder alg = create();
+
+		alg.setConnectRule(ConnectRule.FOUR);
+		alg.process(TEST7.clone());
+		checkExpectedExternal(new int[]{4,20},alg);
+
+		alg.setConnectRule(ConnectRule.EIGHT);
+		alg.process(TEST7.clone());
+		checkExpectedExternal(new int[]{20},alg);
+	}
 }
