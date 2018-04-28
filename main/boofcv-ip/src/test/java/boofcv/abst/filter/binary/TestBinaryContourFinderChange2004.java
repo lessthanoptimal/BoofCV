@@ -24,7 +24,7 @@ package boofcv.abst.filter.binary;
 public class TestBinaryContourFinderChange2004 extends GenericBinaryContourFinder{
 
 	@Override
-	protected BinaryContourFinder create() {
-		return new BinaryContourFinderChang2004();
+	protected BinaryLabelContourFinder create() {
+		return new BinaryLabelContourFinderChang2004();
 	}
 }

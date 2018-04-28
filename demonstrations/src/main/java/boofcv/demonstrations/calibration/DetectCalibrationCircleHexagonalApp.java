@@ -20,7 +20,7 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.ConfigCircleHexagonalGrid;
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
 import boofcv.alg.fiducial.calib.circle.KeyPointsCircleHexagonalGrid.Tangents;
@@ -225,7 +225,7 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 
 	@Override
 	protected List<Contour> getContours() {
-		BinaryContourFinder contour = detector.getDetector().getEllipseDetector().getEllipseDetector().getContourFinder();
+		BinaryLabelContourFinder contour = detector.getDetector().getEllipseDetector().getEllipseDetector().getContourFinder();
 
 		return BinaryImageOps.convertContours(contour);
 	}

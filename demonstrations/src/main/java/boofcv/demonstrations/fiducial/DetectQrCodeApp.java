@@ -19,7 +19,7 @@
 package boofcv.demonstrations.fiducial;
 
 import boofcv.abst.fiducial.QrCodePreciseDetector;
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.fiducial.calib.squares.SquareEdge;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
@@ -297,7 +297,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 				if (controls.bShowContour) {
 					// todo copy after process() to avoid thread issues. or lock
-					BinaryContourFinder contour = detector.getSquareDetector().getDetector().getContourFinder();
+					BinaryLabelContourFinder contour = detector.getSquareDetector().getDetector().getContourFinder();
 					List<Contour> contours = BinaryImageOps.convertContours(contour);
 					g2.setStroke(new BasicStroke(1));
 					VisualizeBinaryData.render(contours, null, Color.CYAN, scale, g2);

@@ -18,7 +18,7 @@
 
 package boofcv.alg.shapes.ellipse;
 
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
 import boofcv.struct.ConnectRule;
@@ -80,7 +80,7 @@ public class BinaryEllipseDetectorPixel {
 
 	private boolean internalContour = false;
 
-	private BinaryContourFinder contourFinder;
+	private BinaryLabelContourFinder contourFinder;
 	private GrayS32 labeled = new GrayS32(1,1);
 
 	private FitEllipseAlgebraic_F64 algebraic = new FitEllipseAlgebraic_F64();
@@ -280,7 +280,7 @@ public class BinaryEllipseDetectorPixel {
 		return true;
 	}
 
-	public BinaryContourFinder getContourFinder() {
+	public BinaryLabelContourFinder getContourFinder() {
 		return contourFinder;
 	}
 

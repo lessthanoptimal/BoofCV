@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.binary;
 
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
@@ -51,7 +51,7 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 	VisualizePanel guiImage;
 	ContourControlPanel controls = new ContourControlPanel(this);
 
-	BinaryContourFinder contourAlg;
+	BinaryLabelContourFinder contourAlg;
 	InputToBinary<T> inputToBinary;
 
 	GrayU8 binary = new GrayU8(1,1);

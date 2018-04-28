@@ -19,7 +19,7 @@
 package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
@@ -91,7 +91,7 @@ public class DetectCalibrationChessboardApp
 
 	@Override
 	protected List<Contour> getContours() {
-		BinaryContourFinder contour = alg.getFindSeeds().getDetectorSquare().getDetector().getContourFinder();
+		BinaryLabelContourFinder contour = alg.getFindSeeds().getDetectorSquare().getDetector().getContourFinder();
 
 		return BinaryImageOps.convertContours(contour);
 	}

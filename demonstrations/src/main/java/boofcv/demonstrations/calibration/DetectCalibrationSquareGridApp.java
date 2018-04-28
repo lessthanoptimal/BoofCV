@@ -19,7 +19,7 @@
 package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
@@ -92,7 +92,7 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 	@Override
 	protected List<Contour> getContours() {
 
-		BinaryContourFinder contour = alg.getDetectorSquare().getDetector().getContourFinder();
+		BinaryLabelContourFinder contour = alg.getDetectorSquare().getDetector().getContourFinder();
 
 		List<Contour> contours = BinaryImageOps.convertContours(contour);
 

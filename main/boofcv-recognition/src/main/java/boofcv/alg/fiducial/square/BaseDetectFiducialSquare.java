@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.square;
 
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.RefineEpipolar;
@@ -326,7 +326,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	private void configureContourDetector(T gray) {
 		// determine the maximum possible size of a square based on image size
 		int maxContourSize = Math.min(gray.width,gray.height)*4;
-		BinaryContourFinder contourFinder = squareDetector.getDetector().getContourFinder();
+		BinaryLabelContourFinder contourFinder = squareDetector.getDetector().getContourFinder();
 		contourFinder.setMaxContour(maxContourSize);
 		contourFinder.setSaveInnerContour(false);
 	}

@@ -19,11 +19,12 @@
 package boofcv.abst.filter.binary;
 
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 
 /**
- * Interface for finding contours around binary blobs.
- * To get the points in a contour invoke {@link #loadContour} with
+ * Interface for finding contours around binary blobs and labeling the image
+ * at the same time. To get the points in a contour invoke {@link #loadContour} with
  * the ID of the contour you wish to load. Adjusting the max contour size is useful in
  * situations were memory is limited. Same for turning off inner contours.
  *
@@ -39,18 +40,17 @@ import boofcv.struct.image.GrayU8;
  *     <li>Infinite Contour Size</li>
  * </ul>
  *
- * @see boofcv.alg.filter.binary.LinearExternalContours
+ * @see boofcv.alg.filter.binary.LinearContourLabelChang2004
  *
  * @author Peter Abeles
  */
-public interface BinaryContourFinder extends BinaryContourInterface {
+public interface BinaryLabelContourFinder extends BinaryContourInterface {
 
 	/**
-	 * Processes the binary image to find the contour. If you let the input be modified you really need to read up
-	 * on how the contour algorithm works. Setting the outside border to zero is typical
+	 * Processes the binary image to find the contour of and label blobs.
 	 *
 	 * @param binary Input binary image. Not modified.
+	 * @param labeled Output. Labeled image.  Modified.
 	 */
-	void process(GrayU8 binary);
+	void process(GrayU8 binary , GrayS32 labeled );
 }
-

@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.calib.grid;
 
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.squares.*;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
@@ -169,7 +169,7 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 		// determine the maximum possible size of a square when viewed head on
 		// this doesn't take in account the spacing between squares and will be an over estimate
 		int maxContourSize = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
-		BinaryContourFinder contourFinder = detectorSquare.getDetector().getContourFinder();
+		BinaryLabelContourFinder contourFinder = detectorSquare.getDetector().getContourFinder();
 		contourFinder.setMaxContour(maxContourSize*4*2);
 		contourFinder.setSaveInnerContour(false);
 	}

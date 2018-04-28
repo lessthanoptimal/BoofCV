@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.calib.chess;
 
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.fiducial.calib.squares.*;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
@@ -164,7 +164,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 		// determine the maximum possible size of a square when viewed head on
 		// also take in account shapes touching the edge will be concave
 		int maxContourSize = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
-		BinaryContourFinder contourFinder = detectorSquare.getDetector().getContourFinder();
+		BinaryLabelContourFinder contourFinder = detectorSquare.getDetector().getContourFinder();
 		contourFinder.setMaxContour(maxContourSize*4*2); // fisheye distortion can let one square go larger
 		contourFinder.setSaveInnerContour(false);
 	}

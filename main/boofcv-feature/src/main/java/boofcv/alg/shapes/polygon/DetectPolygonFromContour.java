@@ -18,12 +18,14 @@
 
 package boofcv.alg.shapes.polygon;
 
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.abst.shapes.polyline.PointsToPolyline;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.ContourPacked;
+import boofcv.alg.filter.binary.LinearExternalContours;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.ConfigLength;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
@@ -76,7 +78,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private int minimumContour;
 	private double minimumArea; // computed from minimumContour
 
-	private BinaryContourFinder contourFinder;
+	private BinaryLabelContourFinder contourFinder;
 	private GrayS32 labeled = new GrayS32(1,1);
 
 	// finds the initial polygon around a target candidate
@@ -142,7 +144,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 									boolean touchBorder,
 									double contourEdgeThreshold,
 									double tangentEdgeIntensity,
-									BinaryContourFinder contourFinder,
+									BinaryLabelContourFinder contourFinder,
 									Class<T> inputType) {
 
 		this.minimumContourConfig = minimumContour.copy(); // local copy so that external can be modified
@@ -192,6 +194,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		this.undistToDist = null;
 	}
 
+	LinearExternalContours hack = new LinearExternalContours(ConnectRule.FOUR);
+
 	/**
 	 * Examines the undistorted gray scake input image for squares.
 	 *
@@ -217,7 +221,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		long time0 = System.nanoTime();
 
 		// find all the contours
-		contourFinder.process(binary, labeled);
+		hack.process(binary,1,1);
+//		contourFinder.process(binary, labeled);
 
 		long time1 = System.nanoTime();
 
@@ -588,7 +593,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		return foundInfo;
 	}
 
-	public BinaryContourFinder getContourFinder() {
+	public BinaryLabelContourFinder getContourFinder() {
 		return contourFinder;
 	}
 

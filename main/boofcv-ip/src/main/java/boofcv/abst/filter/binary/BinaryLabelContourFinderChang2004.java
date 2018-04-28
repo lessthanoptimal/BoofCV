@@ -30,11 +30,11 @@ import java.util.List;
 
 /**
  * Wrapper around {@link boofcv.alg.filter.binary.LinearContourLabelChang2004} for
- * {@link BinaryContourFinder}
+ * {@link BinaryLabelContourFinder}
  *
  * @author Peter Abeles
  */
-public class BinaryContourFinderChang2004 implements BinaryContourFinder {
+public class BinaryLabelContourFinderChang2004 implements BinaryLabelContourFinder {
 
 	LinearContourLabelChang2004 finder = new LinearContourLabelChang2004(ConnectRule.FOUR);
 

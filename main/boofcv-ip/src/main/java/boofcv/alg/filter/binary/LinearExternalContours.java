@@ -273,6 +273,14 @@ public class LinearExternalContours {
 		}
 	}
 
+	public ConnectRule getConnectRule() {
+		return tracer.rule;
+	}
+
+	public void setConnectRule( ConnectRule rule ) {
+		tracer = new Tracer(rule);
+	}
+
 	public PackedSetsPoint2D_I32 getExternalContours() {
 		return storagePoints;
 	}

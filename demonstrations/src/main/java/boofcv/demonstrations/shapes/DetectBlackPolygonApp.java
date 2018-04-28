@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.shapes;
 
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
@@ -116,7 +116,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 				if (controls.bShowContour) {
 					g2.setStroke(new BasicStroke(1));
 
-					BinaryContourFinder contour = detector.getDetector().getContourFinder();
+					BinaryLabelContourFinder contour = detector.getDetector().getContourFinder();
 
 					List<Contour> contours = BinaryImageOps.convertContours(contour);
 

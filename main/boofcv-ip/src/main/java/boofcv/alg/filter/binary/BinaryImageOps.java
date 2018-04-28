@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.impl.BinaryThinning;
 import boofcv.alg.filter.binary.impl.ImplBinaryBorderOps;
@@ -434,14 +434,14 @@ public class BinaryImageOps {
 			InputSanityCheck.checkSameShape(input,output);
 		}
 
-		BinaryContourFinder alg = FactoryBinaryContourFinder.linearChang2004();
+		BinaryLabelContourFinder alg = FactoryBinaryContourFinder.linearChang2004();
 		alg.setConnectRule(rule);
 		alg.process(input,output);
 
 		return convertContours(alg);
 	}
 
-	public static List<Contour> convertContours(BinaryContourFinder alg ) {
+	public static List<Contour> convertContours(BinaryLabelContourFinder alg ) {
 
 		List<ContourPacked> contours = alg.getContours();
 
@@ -449,10 +449,10 @@ public class BinaryImageOps {
 		for (int i = 0; i < contours.size(); i++) {
 			ContourPacked p = contours.get(i);
 			Contour c = new Contour();
-			c.external = BinaryContourFinder.copyContour(alg,p.externalIndex);
+			c.external = BinaryLabelContourFinder.copyContour(alg,p.externalIndex);
 
 			for (int j = 0; j < p.internalIndexes.size; j++) {
-				c.internal.add( BinaryContourFinder.copyContour(alg,p.internalIndexes.get(j)));
+				c.internal.add( BinaryLabelContourFinder.copyContour(alg,p.internalIndexes.get(j)));
 			}
 			ret.add(c);
 		}

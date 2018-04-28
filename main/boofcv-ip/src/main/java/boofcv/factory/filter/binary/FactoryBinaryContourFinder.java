@@ -19,10 +19,12 @@
 package boofcv.factory.filter.binary;
 
 import boofcv.abst.filter.binary.BinaryContourFinder;
-import boofcv.abst.filter.binary.BinaryContourFinderChang2004;
+import boofcv.abst.filter.binary.BinaryContourFinderLinearExternal;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinderChang2004;
 
 /**
- * Creates instances of {@link BinaryContourFinder}
+ * Creates instances of {@link BinaryLabelContourFinder}
  *
  * @author Peter Abeles
  */
@@ -33,11 +35,18 @@ public class FactoryBinaryContourFinder {
 	 *
 	 * @return new instance
 	 */
-	public static BinaryContourFinder linearChang2004() {
+	public static BinaryLabelContourFinder linearChang2004() {
 		if( BOverrideFactoryBinaryContourFinder.chang2004 != null ) {
 			return BOverrideFactoryBinaryContourFinder.chang2004.createChang2004();
 		} else {
-			return new BinaryContourFinderChang2004();
+			return new BinaryLabelContourFinderChang2004();
 		}
+	}
+
+	/**
+	 * Binary contour finder for external contours only
+	 */
+	public static BinaryContourFinder linearExternal() {
+		return new BinaryContourFinderLinearExternal();
 	}
 }

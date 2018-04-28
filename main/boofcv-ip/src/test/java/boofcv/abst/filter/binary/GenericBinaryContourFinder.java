@@ -41,11 +41,11 @@ public abstract class GenericBinaryContourFinder {
 					 {0,1,1,1,0},
 					 {0,0,0,0,0}});
 
-	protected abstract BinaryContourFinder create();
+	protected abstract BinaryLabelContourFinder create();
 
 	@Test
 	public void checkDefaults() {
-		BinaryContourFinder alg = create();
+		BinaryLabelContourFinder alg = create();
 
 		assertEquals(ConnectRule.FOUR,alg.getConnectRule());
 		assertTrue(alg.isSaveInternalContours());
@@ -58,7 +58,7 @@ public abstract class GenericBinaryContourFinder {
 		GrayU8 input = TEST3.clone();
 		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
-		BinaryContourFinder alg = create();
+		BinaryLabelContourFinder alg = create();
 
 		alg.setMinContour(1000);
 		alg.process(input,labeled);
@@ -72,7 +72,7 @@ public abstract class GenericBinaryContourFinder {
 		GrayU8 input = TEST3.clone();
 		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
-		BinaryContourFinder alg = create();
+		BinaryLabelContourFinder alg = create();
 
 		alg.setMaxContour(1);
 		alg.process(input,labeled);
@@ -86,7 +86,7 @@ public abstract class GenericBinaryContourFinder {
 		GrayU8 input = TEST3.clone();
 		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
-		BinaryContourFinder alg = create();
+		BinaryLabelContourFinder alg = create();
 
 		alg.process(input,labeled);
 		checkExternalSize(alg,0,10);
@@ -101,7 +101,7 @@ public abstract class GenericBinaryContourFinder {
 		GrayU8 input = TEST3.clone();
 		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
-		BinaryContourFinder alg = create();
+		BinaryLabelContourFinder alg = create();
 
 		alg.process(input,labeled);
 		checkInternalSize(alg,0,0,8);
@@ -111,14 +111,14 @@ public abstract class GenericBinaryContourFinder {
 		checkInternalSize(alg,0,0,0);
 	}
 
-	private void checkExternalSize( BinaryContourFinder alg , int which , int expected )
+	private void checkExternalSize(BinaryLabelContourFinder alg , int which , int expected )
 	{
 		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32.class,true);
 		alg.loadContour(alg.getContours().get(which).externalIndex,points);
 		assertEquals(expected,points.size);
 	}
 
-	private void checkInternalSize( BinaryContourFinder alg , int blob, int which , int expected )
+	private void checkInternalSize(BinaryLabelContourFinder alg , int blob, int which , int expected )
 	{
 		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32.class,true);
 		alg.loadContour(alg.getContours().get(blob).internalIndexes.get(which),points);
