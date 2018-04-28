@@ -120,11 +120,14 @@ public class LinearExternalContours {
 
 				// If this pixel has NOT already been labeled trace until it completes a loop or it encounters a
 				// labeled pixel. This is always an internal contour
-				byte v = binaryData[indexBinary-1];
-				if( v == 1 ) {
+				if( binaryData[indexBinary-1] == 1 ) {
 					tracer.maxContourLength = 0;
 					tracer.trace(x-1,y,false);
 					binary.print();
+				} else {
+					// Can't be sure if it's entering a hole or leaving the blob. This marker will let the
+					// tracer know it just traced an internal contour and not an external contour
+					binaryData[indexBinary-1] = -2;
 				}
 			}
 		}
@@ -164,13 +167,11 @@ public class LinearExternalContours {
 		{
 			// start a contour here
 			storagePoints.grow();
-			int initialDir;
 			if( rule == ConnectRule.EIGHT )
-				initialDir = external ? 7 : 3;
+				dir = external ? 7 : 3;
 			else
-				initialDir = external ? 0 : 2;
+				dir = external ? 0 : 2;
 
-			this.dir = initialDir;
 			x = initialX;
 			y = initialY;
 
@@ -184,11 +185,10 @@ public class LinearExternalContours {
 			// find the next one pixel.  handle case where its an isolated point
 			if( !searchNotZero() ) {
 				return true;
-			} else {
-				initialDir = dir;
-				moveToNext();
-				dir = nextDirection[dir];
 			}
+			int initialDir = dir;
+			moveToNext();
+			dir = nextDirection[dir];
 
 			System.out.println("    $ initial "+initialX+" "+initialY+" dir "+initialDir+"  external="+external);
 			while( true ) {
@@ -197,8 +197,14 @@ public class LinearExternalContours {
 
 				if( binary.data[indexBinary] != -2 ) {
 					binary.data[indexBinary] = -1;
-				} else if( dir == initialDir ) {
-					break;
+				} else {
+					if( x != initialX || y != initialY ) {
+						// found an marker that was left when leaving a blob and it was ambiguous if it was external
+						// or internal region of zeros
+						return false;
+					} else if( dir == initialDir ) {
+						return true;
+					}
 				}
 				if( storagePoints.sizeOfTail() <= maxContourLength )
 					storagePoints.addPointToTail(x - adjustX, y - adjustY);
@@ -206,8 +212,6 @@ public class LinearExternalContours {
 				moveToNext();
 				dir = nextDirection[dir];
 			}
-
-			return true;
 		}
 
 		/**
