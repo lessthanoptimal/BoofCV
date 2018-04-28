@@ -18,8 +18,8 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.struct.ConnectRule;
 import boofcv.struct.PackedSetsPoint2D_I32;
-import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
@@ -54,30 +54,29 @@ public class TestContourExternalOnly {
 
 	public static GrayU8 TEST3 = new GrayU8(new byte[][]
 			{{0,0,0,0,0},
-					{0,1,1,1,0},
-					{0,1,1,1,0},
-					{0,1,0,1,0},
-					{0,1,1,1,0},
-					{0,0,0,0,0}});
+			 {0,1,1,1,0},
+			 {0,1,1,1,0},
+			 {0,1,0,1,0},
+			 {0,1,1,1,0},
+			 {0,0,0,0,0}});
 
 	public static GrayU8 TEST4 = new GrayU8(new byte[][]
 			{{0,0,0,0,0,0,0},
-					{0,0,1,1,1,1,1},
-					{0,1,0,1,1,1,1},
-					{0,1,1,1,0,1,1},
-					{0,1,1,1,1,1,1},
-					{0,1,1,1,1,1,1},
-					{0,1,1,1,1,1,1},
-					{0,0,0,0,0,0,0}});
+			 {0,0,1,1,1,1,1},
+			 {0,1,0,1,1,1,1},
+			 {0,1,1,1,0,1,1},
+			 {0,1,1,1,1,1,1},
+			 {0,1,1,1,1,1,1},
+			 {0,1,1,1,1,1,1},
+			 {0,0,0,0,0,0,0}});
 
 	@Test
 	public void test1() {
-		ContourExternalOnly alg = new ContourExternalOnly();
+		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
 
 		GrayU8 binary = TEST1.clone();
-		GrayS32 labeled = new GrayS32(1,1);
 
-		alg.process(binary,labeled);
+		alg.process(binary,1,1);
 
 		PackedSetsPoint2D_I32 contours = alg.getExternalContours();
 		assertEquals(2,contours.size());
@@ -85,12 +84,11 @@ public class TestContourExternalOnly {
 
 	@Test
 	public void test2() {
-		ContourExternalOnly alg = new ContourExternalOnly();
+		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
 
 		GrayU8 binary = TEST2.clone();
-		GrayS32 labeled = new GrayS32(1,1);
 
-		alg.process(binary,labeled);
+		alg.process(binary,1,1);
 
 		PackedSetsPoint2D_I32 contours = alg.getExternalContours();
 		assertEquals(14,contours.size());
@@ -98,12 +96,11 @@ public class TestContourExternalOnly {
 
 	@Test
 	public void test3() {
-		ContourExternalOnly alg = new ContourExternalOnly();
+		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
 
 		GrayU8 binary = TEST3.clone();
-		GrayS32 labeled = new GrayS32(1,1);
 
-		alg.process(binary,labeled);
+		alg.process(binary,1,1);
 
 		PackedSetsPoint2D_I32 contours = alg.getExternalContours();
 		assertEquals(1,contours.size());
@@ -111,12 +108,11 @@ public class TestContourExternalOnly {
 
 	@Test
 	public void test4() {
-		ContourExternalOnly alg = new ContourExternalOnly();
+		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
 
 		GrayU8 binary = TEST4.clone();
-		GrayS32 labeled = new GrayS32(1,1);
 
-		alg.process(binary,labeled);
+		alg.process(binary,1,1);
 
 		PackedSetsPoint2D_I32 contours = alg.getExternalContours();
 		assertEquals(1,contours.size());

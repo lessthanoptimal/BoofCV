@@ -19,7 +19,6 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 
 /**
@@ -32,8 +31,6 @@ public class ContourTracerBase {
 
 	// binary image being traced
 	protected GrayU8 binary;
-	// label image being marked
-	protected GrayS32 labeled;
 
 	// coordinate of pixel being examined (x,y)
 	protected int x,y;
@@ -43,15 +40,11 @@ public class ContourTracerBase {
 	protected int dir;
 	// index of the pixel in the image's internal array
 	protected int indexBinary;
-	protected int indexLabel;
 
 	// the pixel index offset to each neighbor
 	protected int offsetsBinary[];
-	protected int offsetsLabeled[];
 	// lookup table for which direction it should search next given the direction it traveled into the current pixel
 	protected int nextDirection[];
-
-	int offset0,offset1,offset2,offset3;
 
 	/**
 	 * Specifies connectivity rule
@@ -78,29 +71,19 @@ public class ContourTracerBase {
 		}
 
 		offsetsBinary = new int[ruleN];
-		offsetsLabeled = new int[ruleN];
 	}
 
 	/**
 	 *
 	 * @param binary Binary image with a border of zeros added to the outside.
-	 * @param labeled Labeled image.  Size is the same as the original binary image without border.
 	 */
-	public void setInputs(GrayU8 binary , GrayS32 labeled ) {
+	public void setInputs(GrayU8 binary ) {
 		this.binary = binary;
-		this.labeled = labeled;
 
 		if( rule == ConnectRule.EIGHT ) {
 			setOffsets8(offsetsBinary,binary.stride);
-			setOffsets8(offsetsLabeled,labeled.stride);
 		} else {
 			setOffsets4(offsetsBinary,binary.stride);
-			setOffsets4(offsetsLabeled,labeled.stride);
-
-			offset0 = offsetsBinary[0];
-			offset1 = offsetsBinary[1];
-			offset2 = offsetsBinary[2];
-			offset3 = offsetsBinary[3];
 		}
 	}
 
