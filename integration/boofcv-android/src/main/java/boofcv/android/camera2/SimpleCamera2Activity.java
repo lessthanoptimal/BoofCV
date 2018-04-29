@@ -87,7 +87,6 @@ public abstract class SimpleCamera2Activity extends Activity {
 	protected View mView;
 
 	//######## START  Variables owned by lock
-	private ReentrantLock mCameraOpenLock = new ReentrantLock();
 	private CameraOpen open = new CameraOpen();
 	//######## END
 
@@ -321,7 +320,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 		try {
 			if( verbose )
 				Log.d(TAG, "before tryAcquire mCameraOpenCloseLock");
-			if (!mCameraOpenLock.tryLock(2500, TimeUnit.MILLISECONDS)) {
+			if (!open.mLock.tryLock(2500, TimeUnit.MILLISECONDS)) {
 				throw new RuntimeException("Time out waiting to lock camera opening.");
 			}
 
@@ -397,7 +396,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			throw new RuntimeException("Interrupted while trying to lock camera opening.");
 		} finally {
 			if( releaseCamera )
-				mCameraOpenLock.unlock();
+				open.mLock.unlock();
 		}
 	}
 
@@ -411,7 +410,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 
 		boolean releaseLock = true;
 		try {
-			mCameraOpenLock.lock();
+			open.mLock.lock();
 			if (verbose)
 				Log.i(TAG, "  camera is null == " + (open.mCameraDevice == null));
 			if (null == open. mCameraDevice) {
@@ -444,7 +443,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			}
 		} finally {
 			if(releaseLock)
-				mCameraOpenLock.unlock();
+				open.mLock.unlock();
 		}
 	}
 
@@ -468,7 +467,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			}
 		}
 		try {
-			mCameraOpenLock.lock();
+			open.mLock.lock();
 			if( verbose )
 				Log.i(TAG,"  camera is null == "+(open.mCameraDevice==null));
 			closePreviewSession();
@@ -480,7 +479,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			open.mCameraSize = null;
 			open.mCameraCharacterstics = null;
 		} finally {
-			mCameraOpenLock.unlock();
+			open.mLock.unlock();
 		}
 		return closed;
 	}
@@ -500,7 +499,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 		}
 
 		try {
-			mCameraOpenLock.lock();
+			open.mLock.lock();
 
 			if (null == open.mCameraDevice || null == open.mCameraSize) {
 				return;
@@ -546,7 +545,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 		} catch (CameraAccessException e) {
 			e.printStackTrace();
 		} finally {
-			mCameraOpenLock.unlock();
+			open.mLock.unlock();
 		}
 	}
 
@@ -575,14 +574,14 @@ public abstract class SimpleCamera2Activity extends Activity {
 	private void configureTransform(int viewWidth, int viewHeight) {
 		int cameraWidth,cameraHeight;
 		try {
-			mCameraOpenLock.lock();
+			open.mLock.lock();
 			if (null == mTextureView || null == open.mCameraSize) {
 				return;
 			}
 			cameraWidth = open.mCameraSize.getWidth();
 			cameraHeight = open.mCameraSize.getHeight();
 		} finally {
-			mCameraOpenLock.unlock();
+			open.mLock.unlock();
 		}
 
 		int rotation = getWindowManager().getDefaultDisplay().getRotation();
@@ -666,14 +665,14 @@ public abstract class SimpleCamera2Activity extends Activity {
 		public void onOpened(@NonNull CameraDevice cameraDevice) {
 			if( verbose )
 				Log.i(TAG,"CameraDevice Callback onOpened() id="+cameraDevice.getId());
-			if( !mCameraOpenLock.isLocked() )
+			if( !open.mLock.isLocked() )
 				throw new RuntimeException("Camera not locked!");
 			open.mCameraDevice = cameraDevice;
 			startPreview();
 			if (null != mTextureView) {
 				configureTransform(mTextureView.getWidth(), mTextureView.getHeight());
 			}
-			mCameraOpenLock.unlock();
+			open.mLock.unlock();
 			onCameraOpened(cameraDevice);
 		}
 
@@ -682,13 +681,13 @@ public abstract class SimpleCamera2Activity extends Activity {
 			if( verbose )
 				Log.i(TAG,"CameraDevice Callback onDisconnected() id="+cameraDevice.getId());
 
-			boolean unexpected = !mCameraOpenLock.isLocked();
+			boolean unexpected = !open.mLock.isLocked();
 			if( unexpected ) {
-				mCameraOpenLock.lock();
+				open.mLock.lock();
 			}
 			open.mCameraDevice = null;
 			cameraDevice.close();
-			mCameraOpenLock.unlock();
+			open.mLock.unlock();
 			onCameraDisconnected(cameraDevice);
 			if( unexpected) {
 				// the camera disconnected and no request to disconnect it was made by
@@ -703,9 +702,9 @@ public abstract class SimpleCamera2Activity extends Activity {
 		public void onError(@NonNull CameraDevice cameraDevice, int error) {
 			if( verbose )
 				Log.e(TAG,"CameraDevice Callback onError() error="+error);
-			boolean unexpected = !mCameraOpenLock.isLocked();
+			boolean unexpected = !open.mLock.isLocked();
 			if( unexpected ) {
-				mCameraOpenLock.lock();
+				open.mLock.lock();
 			}
 			open.mCameraDevice = null;
 			cameraDevice.close();
@@ -731,22 +730,35 @@ public abstract class SimpleCamera2Activity extends Activity {
 	 * Determining the actual FOV is a much more complex process.
 	 */
 	public double[] cameraNominalFov() {
-		mCameraOpenLock.lock();
+		open.mLock.lock();
 		try {
-			SizeF sensorSize = open.mCameraCharacterstics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);
-			float[] focalLengths = open.mCameraCharacterstics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
+			SizeF sensorSize = null;
+			float[] focalLengths = null;
 
-			if (focalLengths == null || sensorSize == null) {
+			// This might be called before the camera is open
+			if( open.mCameraCharacterstics != null ) {
+				sensorSize = open.mCameraCharacterstics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);
+				focalLengths = open.mCameraCharacterstics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
+			}
+
+			if (focalLengths == null || sensorSize == null ) {
+				// 60 degrees seems reasonable for a random guess
 				double hfov = UtilAngle.radian(60);
-				double vfov = hfov * open.mCameraSize.getHeight() / open.mCameraSize.getWidth();
-				return new double[]{hfov, vfov};
+				if( open.mCameraSize == null ) {
+					Log.w(TAG,"Requesting FOV when the camera isn't open yet!");
+					return new double[]{hfov, hfov};
+				} else {
+
+					double vfov = hfov * open.mCameraSize.getHeight() / open.mCameraSize.getWidth();
+					return new double[]{hfov, vfov};
+				}
 			} else {
 				double hfov = 2 * Math.atan(sensorSize.getWidth() / (2 * focalLengths[0]));
 				double vfov = 2 * Math.atan(sensorSize.getHeight() / (2 * focalLengths[0]));
 				return new double[]{hfov, vfov};
 			}
 		} finally {
-			mCameraOpenLock.unlock();
+			open.mLock.unlock();
 		}
 	}
 
@@ -762,7 +774,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 		try {
 			// safely acquire the camera resolution
 			int cameraWidth, cameraHeight, cameraOrientation;
-			mCameraOpenLock.lock();
+			open.mLock.lock();
 			try {
 				if (open.mCameraSize == null)
 					return;
@@ -770,7 +782,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 				cameraHeight = open.mCameraSize.getHeight();
 				cameraOrientation = open.mSensorOrientation;
 			} finally {
-				mCameraOpenLock.unlock();
+				open.mLock.unlock();
 			}
 
 			if (firstFrame) {
@@ -781,13 +793,13 @@ public abstract class SimpleCamera2Activity extends Activity {
 				if (cameraWidth != image.getWidth() || cameraHeight != image.getHeight()) {
 					Log.e(TAG, "Android broke resolution contract. Actual=" + image.getWidth() + "x" + image.getHeight() +
 							"  Expected=" + cameraWidth + "x" + cameraHeight);
-					mCameraOpenLock.lock();
+					open.mLock.lock();
 					try {
 						if (open.mCameraSize == null)
 							return;
 						open.mCameraSize = new Size(image.getWidth(), image.getHeight());
 					} finally {
-						mCameraOpenLock.unlock();
+						open.mLock.unlock();
 					}
 					runOnUiThread(() -> {
 						configureTransform(viewWidth, viewHeight);
@@ -813,7 +825,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 	 * but then gets scaled to image resolution. This compensates for that.
 	 */
 	private float displayDensityAdjusted() {
-		mCameraOpenLock.lock();
+		open.mLock.lock();
 		try {
 			if (open.mCameraSize == null)
 				return displayMetrics.density;
@@ -825,7 +837,19 @@ public abstract class SimpleCamera2Activity extends Activity {
 
 			return displayMetrics.density * cameraWidth / screenWidth;
 		} finally {
-			mCameraOpenLock.unlock();
+			open.mLock.unlock();
+		}
+	}
+
+	/**
+	 * Returns true if the camera has been initialized already
+	 */
+	protected boolean isCameraInitialized() {
+		open.mLock.lock();
+		try {
+			return open.mCameraDevice != null;
+		} finally {
+			open.mLock.unlock();
 		}
 	}
 
@@ -834,6 +858,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 	 */
 	protected static class CameraOpen
 	{
+		protected ReentrantLock mLock = new ReentrantLock();
 		protected CameraDevice mCameraDevice;
 		protected Size mCameraSize; // size of camera preview
 		protected String cameraId; // the camera that was selected to view
