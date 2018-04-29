@@ -39,13 +39,15 @@
 //	int width = 320,height=240;
 //
 //	MockImage_420_888 inputs[] = new MockImage_420_888[]{
-//			new MockImage_420_888(rand,width,height,1,0),
-//			new MockImage_420_888(rand,width,height,2,0),
-//			new MockImage_420_888(rand,width,height,2,1),
-//			new MockImage_420_888(rand,width+1,height,1,0),
-//			new MockImage_420_888(rand,width,height+1,1,0),
-//			new MockImage_420_888(rand,width+1,height,2,0),
-//			new MockImage_420_888(rand,width,height+1,2,0),
+//			new MockImage_420_888(rand,width,height,1,1,0),
+//			new MockImage_420_888(rand,width,height,1,2,0),
+//			new MockImage_420_888(rand,width,height,2,1,0),
+//			new MockImage_420_888(rand,width,height,2,2,0),
+//			new MockImage_420_888(rand,width,height,2,2,1),
+//			new MockImage_420_888(rand,width+1,height,1,1,0),
+//			new MockImage_420_888(rand,width,height+1,1,1,0),
+//			new MockImage_420_888(rand,width+1,height,2,2,0),
+//			new MockImage_420_888(rand,width,height+1,2,2,0),
 //	};
 //
 //	@Test

@@ -18,6 +18,8 @@
 
 package android.media;
 
+import android.graphics.ImageFormat;
+
 import java.nio.ByteBuffer;
 import java.util.Random;
 
@@ -25,22 +27,24 @@ public class MockImage_420_888 extends Image {
 
 	int width,height;
 	int pixelStrideUV;
+	int periodUV;
 
 	byte gray[];
 	byte bandUV[];
 
 	Plane[] planes = new Plane[3];
 
-	public MockImage_420_888(Random rand , int width , int height , int pixelStrideUV , int extra ) {
+	public MockImage_420_888(Random rand , int width , int height , int pixelStrideUV , int periodUV, int extra ) {
 		this();
 		this.pixelStrideUV = pixelStrideUV;
+		this.periodUV = periodUV;
 		this.width = width;
 		this.height = height;
 
 		gray = new byte[(width+extra)*height];
-		int rowStrideUV = 2*(width/pixelStrideUV + (width%pixelStrideUV))+extra;
+		int rowStrideUV = pixelStrideUV*(width/periodUV + (width%periodUV))+extra;
 
-		bandUV = new byte[rowStrideUV*(height/pixelStrideUV)];
+		bandUV = new byte[2*rowStrideUV*(height/periodUV)];
 
 		planes[0] = new DummyPlane(1,width+extra,0,gray.length,gray);
 		planes[1] = new DummyPlane(pixelStrideUV,rowStrideUV,0,bandUV.length,bandUV);
@@ -54,7 +58,7 @@ public class MockImage_420_888 extends Image {
 
 	@Override
 	public int getFormat() {
-		return 0;
+		return ImageFormat.YUV_420_888;
 	}
 
 	@Override

@@ -18,6 +18,7 @@
 
 package boofcv.android;
 
+import android.graphics.ImageFormat;
 import android.media.Image;
 import boofcv.alg.color.ColorFormat;
 import boofcv.struct.image.*;
@@ -229,7 +230,12 @@ public class ConvertYuv420_888
 
 		int strideY = planes[0].getRowStride();
 		int strideUV = planes[1].getRowStride();
+		int stridePixelUV = planes[1].getPixelStride();
 		// U and V stride are the same by 420_888 specification
+
+		// not sure the best way to compute this. The width of a plane should be used here and not the stride
+		// but the plane's width isn't specified.
+		int periodUV = (int)Math.round(width/(strideUV/(double)stridePixelUV));
 
 		int workLength = strideY + strideUV + strideUV;
 		if( work.length < workLength )
@@ -246,49 +252,44 @@ public class ConvertYuv420_888
 		int offsetU = strideY;
 		int offsetV = strideY + strideUV;
 
-		// pixel stride for U and V are the same by specification
-		int stridePixelUV = planes[1].getPixelStride();
+		if(ImageFormat.YUV_420_888 != yuv.getFormat() )
+			throw new RuntimeException("Unexpected format");
 
-		// Sanity check to help debug what's going on with some devices
-		if( bufferU.remaining()%strideUV != 0 ) {
-			int extra = bufferU.remaining()%strideUV;
-			extra = extra/stridePixelUV + ((extra%stridePixelUV) != 0 ? 1 : 0);
-			if( extra < width/stridePixelUV ) {
-				throw new RuntimeException("Buggy image. Last row is too small. sizeU="+bufferU.slice()+
-				" strideUV="+strideUV+" stridePixelUV="+stridePixelUV+" image width "+width);
+		int totalBytesY = bufferY.remaining();
+		int totalBytesU = bufferU.remaining();
+		int totalBytesV = bufferV.remaining();
+
+		int x=-1,y=-1,indexY=-1,indexU=-1,indexV=-1;
+		try {
+			for (y = 0; y < height; y++) {
+				// Read all the data for this row from each plane
+				bufferY.get(work, 0, strideY);
+				if (y % periodUV == 0) {
+					bufferU.get(work, offsetU, Math.min(bufferU.remaining(), strideUV));
+					bufferV.get(work, offsetV, Math.min(bufferV.remaining(), strideUV));
+				}
+
+				indexY = 0;
+				indexU = offsetU;
+				indexV = offsetV;
+
+				for (x = 0; x < width; x++, indexY++) {
+					processor.processYUV(work[indexY] & 0xFF, work[indexU] & 0xFF, work[indexV] & 0xFF);
+
+					// this is intended to be a fast way to do if a == 0 ? 1 : 0
+					int stepUV = stridePixelUV * ((x + 1) % periodUV == 0 ? 1 : 0);
+					indexU += stepUV;
+					indexV += stepUV;
+				}
 			}
-		}
-		if( bufferV.remaining()%strideUV != 0 ) {
-			int extra = bufferV.remaining()%strideUV;
-			extra = extra/stridePixelUV + ((extra%stridePixelUV) != 0 ? 1 : 0);
-			if( extra < width/stridePixelUV ) {
-				throw new RuntimeException("Buggy image. Last row is too small. sizeV="+bufferV.slice()+
-						" strideUV="+strideUV+" stridePixelUV="+stridePixelUV+" image width "+width);
-			}
-		}
+		} catch( RuntimeException e ) {
+			e.printStackTrace();
 
-		for (int y = 0; y < height; y++) {
-			// Read all the data for this row from each plane
-			bufferY.get(work,0,strideY);
-			if( y%stridePixelUV == 0) {
-				bufferU.get(work, offsetU, Math.min(bufferU.remaining(),strideUV));
-				bufferV.get(work, offsetV, Math.min(bufferV.remaining(),strideUV));
-			}
-
-			int indexY = 0;
-			int indexU = offsetU;
-			int indexV = offsetV;
-
-			for (int x = 0; x < width; x++, indexY++ )
-			{
-				processor.processYUV(work[indexY]&0xFF, work[indexU]&0xFF, work[indexV]&0xFF);
-
-				// this is intended to be a fast way to do if a == 0 ? 1 : 0
-				int stepUV = stridePixelUV*( (x+1)%stridePixelUV==0?1:0);
-				indexU += stepUV;
-				indexV += stepUV;
-
-			}
+			String message = "Crashed in YUV. "+e.getMessage()+" bytes Y="+totalBytesY+" U="+totalBytesU+
+					" V="+totalBytesV+" width="+width+" height="+height+" work.length="+work.length+
+					" strideY="+strideY+" strideUV="+strideUV+" stridePixelUV="+stridePixelUV+" periodUV="+periodUV+
+					" x="+x+" y="+y+" indexY="+indexY+" indexU="+indexU+" indexV="+indexV;
+			throw new RuntimeException(message);
 		}
 	}
 
@@ -298,8 +299,7 @@ public class ConvertYuv420_888
 		int height = yuv.getHeight();
 
 		if( output != null ) {
-			output.setNumberOfBands(3);
-			output.reshape(width,height);
+			output.reshape(width,height,3);
 		} else {
 			output = new  Planar<>(GrayU8.class,width,height,3);
 		}
@@ -329,8 +329,7 @@ public class ConvertYuv420_888
 		int height = yuv.getHeight();
 
 		if( output != null ) {
-			output.setNumberOfBands(3);
-			output.reshape(width,height);
+			output.reshape(width,height,3);
 		} else {
 			output = new  Planar<>(GrayF32.class,width,height,3);
 		}
@@ -360,8 +359,7 @@ public class ConvertYuv420_888
 		int height = yuv.getHeight();
 
 		if( output != null ) {
-			output.setNumberOfBands(3);
-			output.reshape(width,height);
+			output.reshape(width,height,3);
 		} else {
 			output = new InterleavedU8(width,height,3);
 		}
@@ -389,8 +387,7 @@ public class ConvertYuv420_888
 		int height = yuv.getHeight();
 
 		if( output != null ) {
-			output.setNumberOfBands(3);
-			output.reshape(width,height);
+			output.reshape(width,height,3);
 		} else {
 			output = new InterleavedF32(width,height,3);
 		}
@@ -418,8 +415,7 @@ public class ConvertYuv420_888
 		int height = yuv.getHeight();
 
 		if( output != null ) {
-			output.setNumberOfBands(3);
-			output.reshape(width,height);
+			output.reshape(width,height,3);
 		} else {
 			output = new Planar(GrayU8.class,width,height,3);
 		}
@@ -449,8 +445,7 @@ public class ConvertYuv420_888
 		int height = yuv.getHeight();
 
 		if( output != null ) {
-			output.setNumberOfBands(3);
-			output.reshape(width,height);
+			output.reshape(width,height,3);
 		} else {
 			output = new InterleavedU8(width,height,3);
 		}
