@@ -263,7 +263,7 @@ public class ConvertYuv420_888
 		try {
 			for (y = 0; y < height; y++) {
 				// Read all the data for this row from each plane
-				bufferY.get(work, 0, strideY);
+				bufferY.get(work, 0, Math.min(bufferY.remaining(),strideY));
 				if (y % periodUV == 0) {
 					bufferU.get(work, offsetU, Math.min(bufferU.remaining(), strideUV));
 					bufferV.get(work, offsetV, Math.min(bufferV.remaining(), strideUV));
