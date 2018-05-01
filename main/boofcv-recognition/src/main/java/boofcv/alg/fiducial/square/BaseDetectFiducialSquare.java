@@ -118,22 +118,21 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 
 	/**
 	 * Configures the detector.
-	 *  @param inputToBinary Converts input image into a binary image
+	 * @param inputToBinary Converts input image into a binary image
 	 * @param squareDetector Detects the quadrilaterals in the image
 	 * @param binaryCopy If true a copy is created of the binary image and it's not modified.
+	 * @param borderWidthFraction Fraction of the fiducial's width that the border occupies. 0.25 is recommended.
 	 * @param minimumBorderBlackFraction Minimum fraction of pixels inside the border which must be black.  Try 0.65
 	 * @param squarePixels  Number of pixels wide the undistorted square image of the fiducial's interior is.
- *                      This will include the black border.
+*                      This will include the black border.
 	 * @param inputType Type of input image it's processing
-	 * @param borderWidthFraction Fraction of the fiducial's width that the border occupies. 0.25 is recommended.
 	 */
 	protected BaseDetectFiducialSquare(InputToBinary<T> inputToBinary,
 									   DetectPolygonBinaryGrayRefine<T> squareDetector,
 									   boolean binaryCopy,
-									   double minimumBorderBlackFraction,
+									   double borderWidthFraction, double minimumBorderBlackFraction,
 									   int squarePixels,
-									   Class<T> inputType,
-									   double borderWidthFraction) {
+									   Class<T> inputType) {
 
 		squareDetector.getDetector().setOutputClockwise(false);
 		squareDetector.getDetector().setConvex(true);

@@ -91,7 +91,7 @@ public class DetectFiducialSquareImage<T extends ImageGray<T>>
 									 double borderWidthFraction ,
 									 double minimumBlackBorderFraction ,
 									 double matchThreshold, Class<T> inputType) {
-		super(inputToBinary,quadDetector, false, minimumBlackBorderFraction, (int)Math.round(squareLength/(1-2.0*borderWidthFraction)), inputType, borderWidthFraction
+		super(inputToBinary,quadDetector, false, borderWidthFraction, minimumBlackBorderFraction, (int)Math.round(squareLength/(1-2.0*borderWidthFraction)), inputType
 		);
 
 		hammingThreshold = (int)(squareLength*squareLength*matchThreshold);

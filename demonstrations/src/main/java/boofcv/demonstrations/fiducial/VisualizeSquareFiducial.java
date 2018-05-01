@@ -143,7 +143,7 @@ public class VisualizeSquareFiducial {
 
 		protected Detector() {
 			super(inputToBinary,FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4), GrayF32.class),
-					true, 0.65, 200, GrayF32.class, 0.25);
+					true, 0.25, 0.65, 200, GrayF32.class);
 		}
 
 		@Override

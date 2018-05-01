@@ -22,7 +22,8 @@ import boofcv.struct.image.GrayU8;
 
 /**
  * Helper function that makes it easier to adjust the size of the binary image when working with a padded or unpadded
- * contour finding algorithm
+ * contour finding algorithm. Creating a copy of the input image can be avoided when finding contours if
+ * the binary image is expanded to have a contour in advance. Slight speed improvement and lower memory usage.
  *
  * @author Peter Abeles
  */
