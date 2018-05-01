@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.square;
 
 import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryContourHelper;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.RefineEpipolar;
@@ -78,13 +79,13 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	// converts input image into a binary image
 	InputToBinary<T> inputToBinary;
 	// Detects the squares
-	private DetectPolygonBinaryGrayRefine<T> squareDetector;
+	DetectPolygonBinaryGrayRefine<T> squareDetector;
+
+	// Helps adjust the binary image for input into the contour finding algorithm
+	BinaryContourHelper contourHelper;
 
 	// image with lens and perspective distortion removed from it
 	GrayF32 square;
-
-	// storage for binary image
-	protected GrayU8 binary = new GrayU8(1,1);
 
 	// Used to compute/remove perspective distortion
 	private Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomographyDLT(true);
@@ -117,21 +118,22 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 
 	/**
 	 * Configures the detector.
-	 *
-	 * @param inputToBinary Converts input image into a binary image
+	 *  @param inputToBinary Converts input image into a binary image
 	 * @param squareDetector Detects the quadrilaterals in the image
-	 * @param borderWidthFraction Fraction of the fiducial's width that the border occupies. 0.25 is recommended.
+	 * @param binaryCopy If true a copy is created of the binary image and it's not modified.
 	 * @param minimumBorderBlackFraction Minimum fraction of pixels inside the border which must be black.  Try 0.65
 	 * @param squarePixels  Number of pixels wide the undistorted square image of the fiducial's interior is.
-	 *                      This will include the black border.
+ *                      This will include the black border.
 	 * @param inputType Type of input image it's processing
+	 * @param borderWidthFraction Fraction of the fiducial's width that the border occupies. 0.25 is recommended.
 	 */
 	protected BaseDetectFiducialSquare(InputToBinary<T> inputToBinary,
 									   DetectPolygonBinaryGrayRefine<T> squareDetector,
-									   double borderWidthFraction ,
-									   double minimumBorderBlackFraction ,
+									   boolean binaryCopy,
+									   double minimumBorderBlackFraction,
 									   int squarePixels,
-									   Class<T> inputType) {
+									   Class<T> inputType,
+									   double borderWidthFraction) {
 
 		squareDetector.getDetector().setOutputClockwise(false);
 		squareDetector.getDetector().setConvex(true);
@@ -160,6 +162,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 
 		// if no camera parameters is specified default to this
 		removePerspective.setModel(new PointToPixelTransform_F32(transformHomography));
+
+		BinaryContourFinder contourFinder = squareDetector.getDetector().getContourFinder();
+		contourHelper = new BinaryContourHelper(contourFinder,binaryCopy);
 	}
 
 	/**
@@ -207,10 +212,11 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	 */
 	public void process( T gray ) {
 		configureContourDetector(gray);
-		binary.reshape(gray.width,gray.height);
 
-		inputToBinary.process(gray,binary);
-		squareDetector.process(gray,binary);
+		contourHelper.reshape(gray.width,gray.height);
+
+		inputToBinary.process(gray,contourHelper.withoutPadding());
+		squareDetector.process(gray,contourHelper.padded());
 		squareDetector.refineAll();
 		// These are in undistorted pixels
 		squareDetector.getPolygons(candidates,candidatesInfo);
@@ -441,7 +447,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	}
 
 	public GrayU8 getBinary() {
-		return binary;
+		return contourHelper.withoutPadding();
 	}
 
 	public Class<T> getInputType() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,8 +103,9 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 		// The number of pixels for each square is held constant and the total pixels for the inner region
 		// is determined by the size of the grid
 		// The number of pixels in the undistorted image (squarePixels) is selected using the above information
-		super(inputToBinary,quadDetector,borderWidthFraction,minimumBlackBorderFraction,
-				(int)Math.round((w * gridWidth) /(1.0-borderWidthFraction*2.0)) ,inputType);
+		super(inputToBinary,quadDetector, false,
+				minimumBlackBorderFraction, (int)Math.round((w * gridWidth) /(1.0-borderWidthFraction*2.0)),
+				inputType, borderWidthFraction);
 
 		if( gridWidth < 3 || gridWidth > 8)
 			throw new IllegalArgumentException("The grid must be at least 3 and at most 8 elements wide");

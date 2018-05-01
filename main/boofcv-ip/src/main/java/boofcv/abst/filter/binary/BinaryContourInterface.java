@@ -94,4 +94,25 @@ public interface BinaryContourInterface {
 		}
 		return list;
 	}
+
+	/**
+	 * Many contour algorithms require that the binary image has an outside border of all zeros. To avoid discarding
+	 * those pixels a copy of the input image is created with a 1 pixel border added. This interface can be
+	 * used to toggle that copy on and off. If turned off then the input image is modified in some implementation
+	 * specific way.
+	 */
+	interface Padded {
+		/**
+		 * If this is set o true then internally it will create a copy of the input image with a 1-pixel border added.
+		 *
+		 */
+		void setCreatePaddedCopy(boolean hasPadding );
+
+		boolean isCreatePaddedCopy();
+
+		/**
+		 * Adjustment applied to pixel coordinate of contour points. Only used if a padded copy is NOT done.
+		 */
+		void setCoordinateAdjustment(int x, int y);
+	}
 }

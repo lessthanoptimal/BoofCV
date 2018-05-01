@@ -195,7 +195,7 @@ public class DetectFiducialSquareBinaryApp
 			active = original;
 		} else if( controls.selectedView == 1 ) {
 			synchronized (lockProcessing) {
-				VisualizeBinaryData.renderBinary(detector.getBinaryImage(), false, work);
+				VisualizeBinaryData.renderBinary(detector.getBinary(), false, work);
 			}
 			active = work;
 			work.setRGB(0, 0, work.getRGB(0, 0)); // hack so that Swing knows it's been modified
@@ -292,10 +292,6 @@ public class DetectFiducialSquareBinaryApp
 			}
 
 			return false;
-		}
-
-		public GrayU8 getBinaryImage() {
-			return binary;
 		}
 	}
 

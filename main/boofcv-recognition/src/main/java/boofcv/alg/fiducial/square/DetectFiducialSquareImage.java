@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,8 +91,8 @@ public class DetectFiducialSquareImage<T extends ImageGray<T>>
 									 double borderWidthFraction ,
 									 double minimumBlackBorderFraction ,
 									 double matchThreshold, Class<T> inputType) {
-		super(inputToBinary,quadDetector,borderWidthFraction, minimumBlackBorderFraction,
-				(int)Math.round(squareLength/(1-2.0*borderWidthFraction)), inputType);
+		super(inputToBinary,quadDetector, false, minimumBlackBorderFraction, (int)Math.round(squareLength/(1-2.0*borderWidthFraction)), inputType, borderWidthFraction
+		);
 
 		hammingThreshold = (int)(squareLength*squareLength*matchThreshold);
 

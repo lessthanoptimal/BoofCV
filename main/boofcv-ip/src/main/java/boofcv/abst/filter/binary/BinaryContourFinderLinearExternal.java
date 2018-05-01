@@ -34,9 +34,12 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BinaryContourFinderLinearExternal implements BinaryContourFinder
+public class BinaryContourFinderLinearExternal implements BinaryContourFinder, BinaryContourInterface.Padded
 {
 	LinearExternalContours alg;
+
+	boolean copyForPadding = true;
+	int adjustX,adjustY;
 
 	GrayU8 work = new GrayU8(1,1);
 
@@ -49,9 +52,13 @@ public class BinaryContourFinderLinearExternal implements BinaryContourFinder
 	@Override
 	public void process(GrayU8 binary) {
 
-		work.reshape(binary.width+2,binary.height+2);
-		ImageMiscOps.copy(0,0,1,1,binary.width,binary.height,binary,work);
-		alg.process(work,1,1);
+		if(copyForPadding) {
+			work.reshape(binary.width + 2, binary.height + 2);
+			ImageMiscOps.copy(0, 0, 1, 1, binary.width, binary.height, binary, work);
+			alg.process(work,1,1);
+		} else {
+			alg.process(binary,adjustX,adjustY);
+		}
 
 		// create the contours list
 		contours.reset();
@@ -116,5 +123,21 @@ public class BinaryContourFinderLinearExternal implements BinaryContourFinder
 	@Override
 	public ConnectRule getConnectRule() {
 		return alg.getConnectRule();
+	}
+
+	@Override
+	public void setCreatePaddedCopy(boolean padded) {
+		this.copyForPadding = padded;
+	}
+
+	@Override
+	public boolean isCreatePaddedCopy() {
+		return copyForPadding;
+	}
+
+	@Override
+	public void setCoordinateAdjustment(int x, int y) {
+		this.adjustX = x;
+		this.adjustY = y;
 	}
 }

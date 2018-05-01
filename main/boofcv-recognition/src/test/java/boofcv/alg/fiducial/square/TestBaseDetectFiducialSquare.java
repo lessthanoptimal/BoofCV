@@ -336,7 +336,7 @@ public class TestBaseDetectFiducialSquare {
 
 		protected Dummy() {
 			super(FactoryThresholdBinary.globalFixed(50,true,GrayU8.class),
-					FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4),GrayU8.class),0.25,0.65,100, GrayU8.class);
+					FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4),GrayU8.class), true, 0.65, 100, GrayU8.class, 0.25);
 		}
 
 		@Override
@@ -352,7 +352,7 @@ public class TestBaseDetectFiducialSquare {
 	public static class DetectCorner extends BaseDetectFiducialSquare<GrayU8> {
 		protected DetectCorner() {
 			super(FactoryThresholdBinary.globalFixed(50, true, GrayU8.class),
-					FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4),GrayU8.class),0.25,0.65,100, GrayU8.class);
+					FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4),GrayU8.class), true, 0.65, 100, GrayU8.class, 0.25);
 		}
 
 		@Override

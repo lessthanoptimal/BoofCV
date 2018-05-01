@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class VisualizeImageData {
 			for (int y = 0; y < binary.height; y++) {
 				int indexSrc = binary.startIndex + y * binary.stride;
 				for (int x = 0; x < binary.width; x++) {
-					int value = (1-binary.data[indexSrc++]) * 255;
+					int value = binary.data[indexSrc++]==0?255:0;
 
 					storage[indexDst++] = (byte) value;
 					storage[indexDst++] = (byte) value;
@@ -74,7 +74,7 @@ public class VisualizeImageData {
 			for (int y = 0; y < binary.height; y++) {
 				int indexSrc = binary.startIndex + y * binary.stride;
 				for (int x = 0; x < binary.width; x++) {
-					int value = binary.data[indexSrc++] * 255;
+					int value = binary.data[indexSrc++]==0?0:255;
 
 					storage[indexDst++] = (byte) value;
 					storage[indexDst++] = (byte) value;
@@ -591,7 +591,7 @@ public class VisualizeImageData {
 		int indexOut = 0;
 		for( int y = 0; y < binary.height; y++ ) {
 			for( int x = 0; x < binary.width; x++ ) {
-				if( binary.unsafe_get(x,y) == 1 )  {
+				if( binary.unsafe_get(x,y) != 0 )  {
 					storage[indexOut++] = (byte)(borderColor & 0xFF);
 					storage[indexOut++] = (byte)((borderColor >> 8) & 0xFF);
 					storage[indexOut++] = (byte)((borderColor >> 16) & 0xFF);

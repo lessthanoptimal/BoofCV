@@ -19,13 +19,12 @@
 package boofcv.alg.shapes.polygon;
 
 import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryContourInterface;
 import boofcv.abst.shapes.polyline.PointsToPolyline;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.ContourPacked;
-import boofcv.alg.filter.binary.LinearExternalContours;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.ConfigLength;
-import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -78,6 +77,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private double minimumArea; // computed from minimumContour
 
 	private BinaryContourFinder contourFinder;
+	private BinaryContourInterface.Padded contourPadded;
 	int imageWidth,imageHeight; // input image shape
 
 	// finds the initial polygon around a target candidate
@@ -154,6 +154,10 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		this.contourFinder = contourFinder;
 		this.inputType = inputType;
 
+		if( contourFinder instanceof BinaryContourInterface.Padded) {
+			contourPadded = (BinaryContourInterface.Padded)contourFinder;
+		}
+
 		if( !this.contourToPolyline.isLoop() )
 			throw new IllegalArgumentException("ContourToPolygon must be configured for loops");
 
@@ -193,17 +197,23 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		this.undistToDist = null;
 	}
 
-	LinearExternalContours hack = new LinearExternalContours(ConnectRule.FOUR);
-
 	/**
-	 * Examines the undistorted gray scake input image for squares.
+	 * Examines the undistorted gray scale input image for squares. If p
 	 *
 	 * @param gray Input image
 	 */
 	public void process(T gray, GrayU8 binary) {
 		if( verbose ) System.out.println("ENTER  DetectPolygonFromContour.process()");
-		InputSanityCheck.checkSameShape(binary, gray);
 
+		if( contourPadded != null && !contourPadded.isCreatePaddedCopy() ) {
+			int padding = 2;
+			if( gray.width+padding != binary.width || gray.height+padding != binary.height ) {
+				throw new IllegalArgumentException("Including padding, expected a binary image with shape "
+				+ (gray.width+padding)+"x"+(gray.height+padding));
+			}
+		} else {
+			InputSanityCheck.checkSameShape(binary, gray);
+		}
 		if( imageWidth != gray.width || imageHeight != gray.height )
 			configure(gray.width,gray.height);
 
