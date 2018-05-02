@@ -168,6 +168,8 @@ public abstract class SimpleCamera2Activity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		if( verbose )
+			Log.i(TAG,"onCreate()");
 		super.onCreate(savedInstanceState);
 		displayMetrics = Resources.getSystem().getDisplayMetrics();
 	}
@@ -324,6 +326,12 @@ public abstract class SimpleCamera2Activity extends Activity {
 				throw new RuntimeException("Time out waiting to lock camera opening.");
 			}
 
+			if( open.state != CameraState.CLOSED ) {
+				throw new RuntimeException("Attempted to open camera when not closed already");
+			} else {
+				open.state = CameraState.OPENING;
+			}
+
 			if( mBackgroundHandler == null ) {
 				if( verbose )
 					Log.i(TAG,"Background handler is null. Aborting. Activity should be shutdown already");
@@ -408,11 +416,18 @@ public abstract class SimpleCamera2Activity extends Activity {
 	 */
 	protected void reopenCameraAtResolution(int cameraWidth, int cameraHeight) {
 
+		if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
+			throw new RuntimeException("Attempted to reopenCameraAtResolution main looper thread!");
+		}
+
 		boolean releaseLock = true;
+		open.mLock.lock();
 		try {
-			open.mLock.lock();
 			if (verbose)
-				Log.i(TAG, "  camera is null == " + (open.mCameraDevice == null));
+				Log.i(TAG, "Reopening camera is null == " + (open.mCameraDevice == null)+" state="+open.state);
+			if( open.state != CameraState.OPEN )
+				throw new RuntimeException("BUG! Attempted to re-open camera when not open");
+
 			if (null == open. mCameraDevice) {
 				throw new RuntimeException("Can't re-open a closed camera");
 			}
@@ -466,18 +481,30 @@ public abstract class SimpleCamera2Activity extends Activity {
 				System.out.println("[ " + i + " ] = " + trace[i].toString());
 			}
 		}
+
+		// NOTE: Since open can only be called in the main looper this won't be enough to prevent
+		// it from closing before it opens. That's why open.state exists
+		open.mLock.lock();
 		try {
-			open.mLock.lock();
 			if( verbose )
-				Log.i(TAG,"  camera is null == "+(open.mCameraDevice==null));
+				Log.i(TAG,"  camera is null == "+(open.mCameraDevice==null)+" camera="+open.state);
 			closePreviewSession();
-			if (null != open.mCameraDevice) {
-				closed = true;
-				open.mCameraDevice.close();
-				open.mCameraDevice = null;
+			// close has been called while trying to open the camera!
+			if( open.state == CameraState.OPENING ) {
+				open.state = CameraState.CLOSING; // tell it to immediately close
+				if( open.mCameraDevice != null ) {
+					throw new RuntimeException("BUG! Camera is opening and should be null until opened");
+				}
+			} else {
+				if (null != open.mCameraDevice) {
+					closed = true;
+					open.mCameraDevice.close();
+					open.mCameraDevice = null;
+				}
+				open.state = CameraState.CLOSED;
+				open.mCameraSize = null;
+				open.mCameraCharacterstics = null;
 			}
-			open.mCameraSize = null;
-			open.mCameraCharacterstics = null;
 		} finally {
 			open.mLock.unlock();
 		}
@@ -664,16 +691,30 @@ public abstract class SimpleCamera2Activity extends Activity {
 		@Override
 		public void onOpened(@NonNull CameraDevice cameraDevice) {
 			if( verbose )
-				Log.i(TAG,"CameraDevice Callback onOpened() id="+cameraDevice.getId());
+				Log.i(TAG,"CameraDevice Callback onOpened() id="+cameraDevice.getId()+" camera="+open.state);
 			if( !open.mLock.isLocked() )
 				throw new RuntimeException("Camera not locked!");
-			open.mCameraDevice = cameraDevice;
-			startPreview();
-			if (null != mTextureView) {
-				configureTransform(mTextureView.getWidth(), mTextureView.getHeight());
+			if( open.mCameraDevice != null )
+				throw new RuntimeException("onOpen() and mCameraDevice is not null");
+
+			boolean success = false;
+			if( open.state == CameraState.OPENING ) {
+				open.state = CameraState.OPEN;
+				open.mCameraDevice = cameraDevice;
+				startPreview();
+				if (null != mTextureView) {
+					configureTransform(mTextureView.getWidth(), mTextureView.getHeight());
+				}
+				success = true;
+			} else if( open.state == CameraState.CLOSING ) {
+				// Closed was called when trying to open the camera
+				// abort opening and immediately close it
+				cameraDevice.close();
+				open.state = CameraState.CLOSED;
 			}
 			open.mLock.unlock();
-			onCameraOpened(cameraDevice);
+			if( success )
+				onCameraOpened(cameraDevice);
 		}
 
 		@Override
@@ -685,6 +726,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			if( unexpected ) {
 				open.mLock.lock();
 			}
+			open.state = CameraState.CLOSED;
 			open.mCameraDevice = null;
 			cameraDevice.close();
 			open.mLock.unlock();
@@ -706,6 +748,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			if( unexpected ) {
 				open.mLock.lock();
 			}
+			open.state = CameraState.CLOSED;
 			open.mCameraDevice = null;
 			cameraDevice.close();
 			// If the camera was locked that means it has an error when trying to open it
@@ -842,29 +885,25 @@ public abstract class SimpleCamera2Activity extends Activity {
 	}
 
 	/**
-	 * Returns true if the camera has been initialized already
-	 */
-	protected boolean isCameraInitialized() {
-		open.mLock.lock();
-		try {
-			return open.mCameraDevice != null;
-		} finally {
-			open.mLock.unlock();
-		}
-	}
-
-	/**
 	 * All these variables are owned by the camera open lock
 	 */
-	protected static class CameraOpen
+	static class CameraOpen
 	{
-		protected ReentrantLock mLock = new ReentrantLock();
-		protected CameraDevice mCameraDevice;
-		protected Size mCameraSize; // size of camera preview
-		protected String cameraId; // the camera that was selected to view
-		protected int mSensorOrientation; // sensor's orientation
+		ReentrantLock mLock = new ReentrantLock();
+		CameraState state = CameraState.CLOSED;
+		CameraDevice mCameraDevice;
+		Size mCameraSize; // size of camera preview
+		String cameraId; // the camera that was selected to view
+		int mSensorOrientation; // sensor's orientation
 		// describes physical properties of the camera
-		protected CameraCharacteristics mCameraCharacterstics;
+		CameraCharacteristics mCameraCharacterstics;
+	}
+
+	protected enum CameraState {
+		CLOSED,
+		OPENING,
+		OPEN,
+		CLOSING
 	}
 
 	public void setVerbose(boolean verbose) {
