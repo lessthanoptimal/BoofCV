@@ -90,10 +90,6 @@ public abstract class SimpleCamera2Activity extends Activity {
 	private CameraOpen open = new CameraOpen();
 	//######## END
 
-	// Image reader for capturing the preview
-	private ImageReader mPreviewReader;
-	private CaptureRequest.Builder mPreviewRequestBuilder;
-
 	// width and height of the view the camera is displayed in
 	protected int viewWidth,viewHeight;
 	// ratio of image and screen density
@@ -180,9 +176,44 @@ public abstract class SimpleCamera2Activity extends Activity {
 			Log.i(TAG,"onResume()");
 		super.onResume();
 
-		// When attached to a change listener below it's possible for the activity to but shutdown and a change
+		// When attached to a change listener below it's possible for the activity to be shutdown and a change
 		// in layout be broadcast after that. In that situation we don't want the camera to be opened!
 		startBackgroundThread();
+		// At this point in time the camera should be closed. It might not be due to rapid transitions between
+		// onResume() and onPause(). Not sure why that happens but it's in the error reports.
+		open.mLock.lock();
+		try {
+			switch (open.state) {
+				// not sure how to recover from this. This means there's an asynch task that will execute sometime
+				// in the future. It might have out of date information so I can't just let it be.
+				case OPENING:
+					throw new RuntimeException("Camera shouldn't be in opening state when starting onResume()");
+
+				// It wants to be closed so let's just finish that
+				case CLOSING:{
+					if( verbose )
+						Log.i(TAG, " camera is closing. Going to just close it now. device="+
+								(open.mCameraDevice==null));
+					if( open.mCameraDevice != null ) {
+						open.closeCamera();
+					}
+				} break;
+
+				case OPEN:
+					throw new RuntimeException("Camera is opened. Was not cleaned up correctly onPause()");
+
+				case CLOSED: // the state it should be in!
+					break;
+
+				default:
+					throw new RuntimeException("New state was added and this needs to be updated. "+open.state);
+			}
+			// If everything went well above it's now in the opening state. This is set now because some of the options
+			// might finish up later on. It's possible for a close request to come in before that has happened.
+			open.state = CameraState.OPENING;
+		} finally {
+			open.mLock.unlock();
+		}
 		if( mTextureView != null ) {
 			if (mTextureView.isAvailable()) {
 				openCamera(mTextureView.getWidth(), mTextureView.getHeight());
@@ -298,7 +329,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 	@SuppressWarnings("MissingPermission")
 	protected void openCamera(int widthTexture, int heightTexture) {
 		if( verbose )
-			Log.i(TAG,"openCamera( texture: "+widthTexture+"x"+heightTexture+")");
+			Log.i(TAG,"openCamera( texture: "+widthTexture+"x"+heightTexture+") activity="+getClass().getSimpleName());
 
 		if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
 			throw new RuntimeException("Attempted to openCamera() when not in the main looper thread!");
@@ -311,36 +342,45 @@ public abstract class SimpleCamera2Activity extends Activity {
 		if( manager == null )
 			throw new RuntimeException("Null camera manager");
 
-		// Save the size of the component the camera feed is being displayed inside of
-		this.viewWidth = widthTexture;
-		this.viewHeight = heightTexture;
-		this.cameraToDisplayDensity = 0;
-		this.firstFrame = true;
-
-		// The camera should be released here untill a camera has been successfully initialized
-		boolean releaseCamera = true;
+		// The camera should be released here until a camera has been successfully initialized
+		boolean releaseLock = true;
 		try {
-			if( verbose )
-				Log.d(TAG, "before tryAcquire mCameraOpenCloseLock");
 			if (!open.mLock.tryLock(2500, TimeUnit.MILLISECONDS)) {
 				throw new RuntimeException("Time out waiting to lock camera opening.");
 			}
 
-			if( open.state != CameraState.CLOSED ) {
-				throw new RuntimeException("Attempted to open camera when not closed already");
-			} else {
+			if( open.state == CameraState.CLOSING) {
+				if( verbose )
+					Log.d(TAG, "Close request was made after the open request. Aborting and closing. device="
+					+(open.mCameraDevice==null));
+				if( open.mCameraDevice != null ) {
+					open.closeCamera();
+				}
+				open.state = CameraState.CLOSED;
+				open.clearCamera();
+				return;
+			} else if( open.state == CameraState.CLOSED || open.state == CameraState.OPENING) {
+				// These are the two states it should be in. if it wasn't opening before it is now
 				open.state = CameraState.OPENING;
+			} else {
+				throw new RuntimeException("Unexpected state="+open.state);
 			}
 
 			if( mBackgroundHandler == null ) {
 				if( verbose )
-					Log.i(TAG,"Background handler is null. Aborting. Activity should be shutdown already");
+					Log.i(TAG,"Background handler is null. Aborting.");
 				return;
 			}
 
 			if( open.mCameraDevice != null ) {
 				throw new RuntimeException("Tried to open camera with one already open");
 			}
+
+			// Save the size of the component the camera feed is being displayed inside of
+			this.viewWidth = widthTexture;
+			this.viewHeight = heightTexture;
+			this.cameraToDisplayDensity = 0;
+			this.firstFrame = true;
 
 			String[] cameras = manager.getCameraIdList();
 			for( String cameraId : cameras ) {
@@ -365,47 +405,66 @@ public abstract class SimpleCamera2Activity extends Activity {
 				this.cameraToDisplayDensity = displayDensityAdjusted();
 
 				if( verbose )
-					Log.i(TAG,"selected cameraId="+cameraId+" orientation="+open.mSensorOrientation);
+					Log.i(TAG,"selected cameraId="+cameraId+" orientation="+open.mSensorOrientation+
+							" res="+open.mCameraSize.getWidth()+"x"+open.mCameraSize.getHeight());
 
 				open.mCameraCharacterstics = characteristics;
 				onCameraResolutionChange(
 						open.mCameraSize.getWidth(), open.mCameraSize.getHeight(),
 						open.mSensorOrientation);
-				try {
-					mPreviewReader = ImageReader.newInstance(
-							open.mCameraSize.getWidth(), open.mCameraSize.getHeight(),
-							ImageFormat.YUV_420_888, 2);
-					// Do the processing inside the the handler thread instead of the looper thread to avoid
-					// grinding the UI to a halt
-					mPreviewReader.setOnImageAvailableListener(onAvailableListener, mBackgroundHandler);
-					configureTransform(widthTexture, heightTexture);
-					manager.openCamera(cameraId, mStateCallback, null);
-					releaseCamera = false;
-				} catch( IllegalArgumentException e ) {
-					Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-					finish();
-				}
+
+				open.mPreviewReader = ImageReader.newInstance(
+						open.mCameraSize.getWidth(), open.mCameraSize.getHeight(),
+						ImageFormat.YUV_420_888, 2);
+				// Do the processing inside the the handler thread instead of the looper thread to avoid
+				// grinding the UI to a halt
+				open.mPreviewReader.setOnImageAvailableListener(onAvailableListener, mBackgroundHandler);
+				configureTransform(widthTexture, heightTexture);
+				manager.openCamera(cameraId, mStateCallback, null);
+				releaseLock = false;
 				return;
 			}
 
-			Toast.makeText(this,"No camera selected!",Toast.LENGTH_LONG).show();
-			finish();
+			if( handleNoCameraSelected() ) {
+				Toast.makeText(this, "No camera selected!", Toast.LENGTH_LONG).show();
+				finish();
+			}
 		} catch (CameraAccessException e) {
 			Toast.makeText(this, "Cannot access the camera.", Toast.LENGTH_SHORT).show();
-			finish();
+			if( handleCameraOpenException(e)) {
+				finish();
+			}
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 			Log.e(TAG,"Null pointer in openCamera()");
-			// Currently an NPE is thrown when the Camera2API is used but not supported on the
-			// device this code runs.
-			Toast.makeText(this,"Null pointer. Camera2 API not supported?",Toast.LENGTH_LONG).show();
-			finish();
+			if( handleCameraOpenException(e)) {
+				// Currently an NPE is thrown when the Camera2API is used but not supported on the
+				// device this code runs.
+				Toast.makeText(this, "Null pointer. Camera2 API not supported?", Toast.LENGTH_LONG).show();
+				finish();
+			}
 		} catch (InterruptedException e) {
 			throw new RuntimeException("Interrupted while trying to lock camera opening.");
 		} finally {
-			if( releaseCamera )
+			if( releaseLock )
 				open.mLock.unlock();
 		}
+	}
+
+	/**
+	 * Called if no camera was selected when trying to open a camera
+	 * @return true means finish() the activity and show toast
+	 */
+	protected boolean handleNoCameraSelected() {
+		return true;
+	}
+
+	/**
+	 * An exception happened while trying to open the camera
+	 * @return true means finish() the activity and show toast
+	 */
+	protected boolean handleCameraOpenException( Exception e ) {
+		return true;
 	}
 
 	/**
@@ -424,7 +483,9 @@ public abstract class SimpleCamera2Activity extends Activity {
 		open.mLock.lock();
 		try {
 			if (verbose)
-				Log.i(TAG, "Reopening camera is null == " + (open.mCameraDevice == null)+" state="+open.state);
+				Log.i(TAG, "Reopening camera is null == " + (open.mCameraDevice == null)+" state="+open.state+
+				" activity="+getClass().getSimpleName());
+
 			if( open.state != CameraState.OPEN )
 				throw new RuntimeException("BUG! Attempted to re-open camera when not open");
 
@@ -440,12 +501,12 @@ public abstract class SimpleCamera2Activity extends Activity {
 				throw new RuntimeException("Null camera manager");
 
 			try {
-				mPreviewReader = ImageReader.newInstance(
+				open.mPreviewReader = ImageReader.newInstance(
 						cameraWidth, cameraHeight,
 						ImageFormat.YUV_420_888, 2);
 				// Do the processing inside the the handler thread instead of the looper thread to avoid
 				// grinding the UI to a halt
-				mPreviewReader.setOnImageAvailableListener(onAvailableListener, mBackgroundHandler);
+				open.mPreviewReader.setOnImageAvailableListener(onAvailableListener, mBackgroundHandler);
 				configureTransform(viewWidth, viewHeight);
 				manager.openCamera(open.cameraId, mStateCallback, null);
 				releaseLock = false;
@@ -467,42 +528,42 @@ public abstract class SimpleCamera2Activity extends Activity {
 	 */
 	protected boolean closeCamera() {
 		if( verbose )
-			Log.i(TAG,"closeCamera()");
+			Log.i(TAG,"closeCamera() activity="+getClass().getSimpleName());
 		if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
 			throw new RuntimeException("Attempted to close camera not on the main looper thread!");
 		}
 
 		boolean closed = false;
 
-		if( verbose ) {
-			StackTraceElement[] trace = new RuntimeException().getStackTrace();
-			for (int i = 0; i < Math.min(trace.length, 3); i++) {
-				System.out.println("[ " + i + " ] = " + trace[i].toString());
-			}
-		}
+//		if( verbose ) {
+//			StackTraceElement[] trace = new RuntimeException().getStackTrace();
+//			for (int i = 0; i < Math.min(trace.length, 3); i++) {
+//				System.out.println("[ " + i + " ] = " + trace[i].toString());
+//			}
+//		}
 
 		// NOTE: Since open can only be called in the main looper this won't be enough to prevent
 		// it from closing before it opens. That's why open.state exists
 		open.mLock.lock();
 		try {
 			if( verbose )
-				Log.i(TAG,"  camera is null == "+(open.mCameraDevice==null)+" camera="+open.state);
+				Log.i(TAG,"closeCamera: camera="+(open.mCameraDevice==null)+" state="+open.state);
 			closePreviewSession();
 			// close has been called while trying to open the camera!
 			if( open.state == CameraState.OPENING ) {
-				open.state = CameraState.CLOSING; // tell it to immediately close
+				// If it's in this state that means an asych task is opening the camera. By changing the state
+				// to closing it will not abort that process when the task is called.
+				open.state = CameraState.CLOSING;
 				if( open.mCameraDevice != null ) {
 					throw new RuntimeException("BUG! Camera is opening and should be null until opened");
 				}
 			} else {
 				if (null != open.mCameraDevice) {
 					closed = true;
-					open.mCameraDevice.close();
-					open.mCameraDevice = null;
+					open.closeCamera();
 				}
 				open.state = CameraState.CLOSED;
-				open.mCameraSize = null;
-				open.mCameraCharacterstics = null;
+				open.clearCamera();
 			}
 		} finally {
 			open.mLock.unlock();
@@ -528,12 +589,13 @@ public abstract class SimpleCamera2Activity extends Activity {
 			open.mLock.lock();
 
 			if (null == open.mCameraDevice || null == open.mCameraSize) {
+				Log.i(TAG,"  aborting startPreview. Camera not open yet.");
 				return;
 			}
 
 			closePreviewSession();
 			List<Surface> surfaces = new ArrayList<>();
-			mPreviewRequestBuilder = open.mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+			open.mPreviewRequestBuilder = open.mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 
 			if( mTextureView != null && mTextureView.isAvailable() ) {
 				SurfaceTexture texture = mTextureView.getSurfaceTexture();
@@ -543,15 +605,15 @@ public abstract class SimpleCamera2Activity extends Activity {
 				// Display the camera preview into this texture
 				Surface previewSurface = new Surface(texture);
 				surfaces.add(previewSurface);
-				mPreviewRequestBuilder.addTarget(previewSurface);
+				open.mPreviewRequestBuilder.addTarget(previewSurface);
 			}
 
 			// This is where the image for processing is extracted from
-			Surface readerSurface = mPreviewReader.getSurface();
+			Surface readerSurface = open.mPreviewReader.getSurface();
 			surfaces.add(readerSurface);
-			mPreviewRequestBuilder.addTarget(readerSurface);
+			open.mPreviewRequestBuilder.addTarget(readerSurface);
 
-			configureCamera(mPreviewRequestBuilder);
+			configureCamera(open.mPreviewRequestBuilder);
 
 			open.mCameraDevice.createCaptureSession(surfaces,
 					new CameraCaptureSession.StateCallback() {
@@ -582,11 +644,15 @@ public abstract class SimpleCamera2Activity extends Activity {
 		if (null == open.mCameraDevice) {
 			return;
 		}
+		open.mLock.lock();
 		try {
-			mPreviewSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null, mBackgroundHandler);
+			mPreviewSession.setRepeatingRequest(open.mPreviewRequestBuilder.build(), null, mBackgroundHandler);
 		} catch (CameraAccessException e) {
 			e.printStackTrace();
+		} finally {
+			open.mLock.unlock();
 		}
+
 	}
 
 	/**
@@ -697,21 +763,26 @@ public abstract class SimpleCamera2Activity extends Activity {
 				throw new RuntimeException("onOpen() and mCameraDevice is not null");
 
 			boolean success = false;
-			if( open.state == CameraState.OPENING ) {
-				open.state = CameraState.OPEN;
+			try {
 				open.mCameraDevice = cameraDevice;
-				startPreview();
-				if (null != mTextureView) {
-					configureTransform(mTextureView.getWidth(), mTextureView.getHeight());
+				if (open.state == CameraState.OPENING) {
+					open.state = CameraState.OPEN;
+					startPreview();
+					if (null != mTextureView) {
+						configureTransform(mTextureView.getWidth(), mTextureView.getHeight());
+					}
+					success = true;
+				} else if (open.state == CameraState.CLOSING) {
+					// Closed was called when trying to open the camera
+					// abort opening and immediately close it
+					open.closeCamera();
+				} else {
+					open.mCameraDevice = null;
+					throw new RuntimeException("Unexpected camera state "+open.state);
 				}
-				success = true;
-			} else if( open.state == CameraState.CLOSING ) {
-				// Closed was called when trying to open the camera
-				// abort opening and immediately close it
-				cameraDevice.close();
-				open.state = CameraState.CLOSED;
+			} finally {
+				open.mLock.unlock();
 			}
-			open.mLock.unlock();
 			if( success )
 				onCameraOpened(cameraDevice);
 		}
@@ -725,10 +796,12 @@ public abstract class SimpleCamera2Activity extends Activity {
 			if( unexpected ) {
 				open.mLock.lock();
 			}
-			open.state = CameraState.CLOSED;
-			open.mCameraDevice = null;
-			cameraDevice.close();
-			open.mLock.unlock();
+			try {
+				open.mCameraDevice = cameraDevice;
+				open.closeCamera();
+			} finally {
+				open.mLock.unlock();
+			}
 			onCameraDisconnected(cameraDevice);
 			if( unexpected) {
 				// the camera disconnected and no request to disconnect it was made by
@@ -747,9 +820,12 @@ public abstract class SimpleCamera2Activity extends Activity {
 			if( unexpected ) {
 				open.mLock.lock();
 			}
-			open.state = CameraState.CLOSED;
-			open.mCameraDevice = null;
-			cameraDevice.close();
+			try {
+				open.mCameraDevice = cameraDevice;
+				open.closeCamera();
+			} finally {
+				open.mLock.unlock();
+			}
 			// If the camera was locked that means it has an error when trying to open it
 			if( unexpected )
 				Log.e(TAG,"   No lock applied to the camera. Unexpected problem?");
@@ -896,12 +972,45 @@ public abstract class SimpleCamera2Activity extends Activity {
 		int mSensorOrientation; // sensor's orientation
 		// describes physical properties of the camera
 		CameraCharacteristics mCameraCharacterstics;
+
+		// Image reader for capturing the preview
+		private ImageReader mPreviewReader;
+		private CaptureRequest.Builder mPreviewRequestBuilder;
+
+
+		public void closeCamera() {
+			state = CameraState.CLOSED;
+			mCameraDevice.close();
+			mPreviewReader.close();
+			// TODO do targets need to be removed from mPreviewRequestBuilder?
+
+			clearCamera();
+		}
+
+		public void clearCamera() {
+			mCameraCharacterstics = null;
+			mCameraDevice = null;
+			mCameraSize = null;
+			cameraId = null;
+			mSensorOrientation = 0;
+			mPreviewReader = null;
+			mPreviewRequestBuilder = null;
+		}
 	}
 
 	protected enum CameraState {
 		CLOSED,
+		/**
+		 * The camera enters into this state the second a request is made to open the camera. At this point
+		 * none of the device isn't known.
+		 */
 		OPENING,
 		OPEN,
+		/**
+		 * When in the closing state that means the camera was in the opening state when a close request was
+		 * sent. At various points in the opening process it should see if its in this state. If the camera
+		 * device is not null then the camera should be shut down. If null then just set the state to closed.
+		 */
 		CLOSING
 	}
 
