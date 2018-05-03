@@ -433,7 +433,6 @@ public abstract class SimpleCamera2Activity extends Activity {
 			}
 			closePreviewSession();
 			open.mCameraSize = null;
-			open.mCameraCharacterstics = null;
 			firstFrame = true;
 
 			CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);

@@ -171,10 +171,10 @@ public class ConvertBitmap {
 	public static <T extends ImageGray<T>>
 	Planar<T> bitmapToPlanar(Bitmap input , Planar<T> output , Class<T> type , byte[] storage ) {
 		if( output == null ) {
-			output = new Planar<>(type, input.getWidth(), input.getHeight(), 4);
+			output = new Planar<>(type, input.getWidth(), input.getHeight(), 3);
 		} else {
-			output.reshape(input.getWidth(), input.getHeight());
-			output.setNumberOfBands(4);
+			int numBands = Math.min(4,Math.max(3,output.getNumBands()));
+			output.reshape(input.getWidth(), input.getHeight(),numBands);
 		}
 
 		if( storage == null )
