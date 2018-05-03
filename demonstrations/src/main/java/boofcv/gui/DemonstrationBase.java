@@ -40,6 +40,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Provides some common basic functionality for demonstrations
@@ -69,6 +72,10 @@ public abstract class DemonstrationBase extends JPanel {
 	private final List<CacheSequenceStream> inputStreams = new ArrayList<>();
 
 	private ProcessThread threadProcess; // controls by synchronized(inputStreams)
+	// threadpool is used mostly for profiling purposes. This way there isn't a million threads being created
+	protected LinkedBlockingQueue threadQueue = new LinkedBlockingQueue();
+	protected ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1,1,50, TimeUnit.MILLISECONDS,
+			threadQueue);
 
 	// lock to ensure it doesn't try to start multiple processes at the same time
 	private final Object lockStartingProcess = new Object();
@@ -425,7 +432,7 @@ public abstract class DemonstrationBase extends JPanel {
 					handleInputChange(i, inputMethod, stream.getWidth(), stream.getHeight());
 				}
 			}
-			threadProcess.start();
+			threadPool.execute(threadProcess);
 		} else {
 			synchronized (inputStreams) {
 				inputMethod = InputMethod.NONE;
@@ -473,7 +480,7 @@ public abstract class DemonstrationBase extends JPanel {
 			setInputName(new File(filePath).getName());
 			handleInputChange(0, inputMethod, buffered.getWidth(), buffered.getHeight());
 		}
-		threadProcess.start();
+		threadPool.execute(threadProcess);
 	}
 
 	public void openWebcam() {
@@ -521,7 +528,7 @@ public abstract class DemonstrationBase extends JPanel {
 				setInputName("Webcam");
 				handleInputChange(0, inputMethod, sequence.getNextWidth(), sequence.getNextHeight());
 				threadProcess = new SynchronizedStreamsThread();
-				threadProcess.start();
+				threadPool.execute(threadProcess);
 			}
 		}
 	}
@@ -592,7 +599,7 @@ public abstract class DemonstrationBase extends JPanel {
 		};
 	}
 
-	class ProcessThread extends Thread {
+	abstract class ProcessThread implements Runnable {
 		volatile boolean requestStop = false;
 		volatile boolean running = true;
 	}

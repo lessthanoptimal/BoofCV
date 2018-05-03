@@ -50,7 +50,7 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localSauvola(ImageGray, GrayU8, int, float, boolean)
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localSauvola(ImageGray, GrayU8, ConfigLength, float, boolean)
 	 *
 	 * @param width Width of square region.
 	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
@@ -63,11 +63,11 @@ public class FactoryThresholdBinary {
 	{
 		if( BOverrideFactoryThresholdBinary.localSauvola != null )
 			return BOverrideFactoryThresholdBinary.localSauvola.handle(width, k, down, inputType);
-		return new InputToBinarySwitchF32<T>(new ThresholdSauvola(width, k, down),inputType);
+		return new InputToBinarySwitch<T>(new ThresholdSauvola(width, k, down),inputType);
 	}
 
 	/**
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localMean(ImageGray, GrayU8, int, double, boolean, ImageGray, ImageGray)
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localMean(ImageGray, GrayU8, ConfigLength, double, boolean, ImageGray, ImageGray)
 	 *
 	 * @param width Width of square region.
 	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
@@ -97,7 +97,7 @@ public class FactoryThresholdBinary {
 	InputToBinary<T> localOtsu(boolean otsu2, ConfigLength regionWidth , double tuning, double scale, boolean down, Class<T> inputType) {
 		if( BOverrideFactoryThresholdBinary.localOtsu != null )
 			return BOverrideFactoryThresholdBinary.localOtsu.handle(otsu2,regionWidth, tuning, scale, down, inputType);
-		return new InputToBinarySwitchU8<>(new ThresholdLocalOtsu(otsu2,regionWidth,tuning,scale,down),inputType);
+		return new InputToBinarySwitch<>(new ThresholdLocalOtsu(otsu2,regionWidth,tuning,scale,down),inputType);
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class FactoryThresholdBinary {
 		if( BOverrideFactoryThresholdBinary.blockOtsu != null )
 			return BOverrideFactoryThresholdBinary.blockOtsu.handle(otsu2,regionWidth, tuning, scale, down,
 					thresholdFromLocalBlocks, inputType);
-		return new InputToBinarySwitchU8<>(new ThresholdBlockOtsu(otsu2,regionWidth,tuning,scale,down,
+		return new InputToBinarySwitch<>(new ThresholdBlockOtsu(otsu2,regionWidth,tuning,scale,down,
 				thresholdFromLocalBlocks),inputType);
 	}
 

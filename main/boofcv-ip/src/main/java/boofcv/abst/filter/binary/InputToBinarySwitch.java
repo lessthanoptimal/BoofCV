@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,44 +21,43 @@ package boofcv.abst.filter.binary;
 import boofcv.alg.filter.binary.ThresholdBlockOtsu;
 import boofcv.core.image.GConvertImage;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
- * Wrapper around {@link ThresholdBlockOtsu}
+ * {@link InputToBinary} which will convert the input image into the specified type prior to processing.
  *
  * @author Peter Abeles
  */
-public class InputToBinarySwitchU8<T extends ImageGray<T>> implements InputToBinary<T> {
+public class InputToBinarySwitch<T extends ImageGray<T>> implements InputToBinary<T> {
 
 	ImageType<T> inputType;
 
-	InputToBinary<GrayU8> alg;
-	GrayU8 input;
+	InputToBinary alg;
+	ImageGray work;
 
 	/**
 	 * @see ThresholdBlockOtsu
 	 */
-	public InputToBinarySwitchU8(InputToBinary<GrayU8> alg,
-								 Class<T> inputType) {
+	public InputToBinarySwitch(InputToBinary alg,
+							   Class<T> inputType) {
 
 		this.alg = alg;
 		this.inputType = ImageType.single(inputType);
 
-		if( this.inputType.getDataType() != ImageDataType.U8 ) {
-			input = new GrayU8(1,1);
+		if( !alg.getInputType().isSameType(this.inputType)) {
+			work = (ImageGray)alg.getInputType().createImage(1,1);
 		}
 	}
 
 	@Override
 	public void process(T input, GrayU8 output) {
-		if( this.input == null )
-			alg.process((GrayU8)input,output);
+		if( this.work == null )
+			alg.process(input,output);
 		else {
-			this.input.reshape(input.width,input.height);
-			GConvertImage.convert(input,this.input);
-			alg.process(this.input,output);
+			this.work.reshape(input.width,input.height);
+			GConvertImage.convert(input,this.work);
+			alg.process(this.work,output);
 		}
 	}
 
