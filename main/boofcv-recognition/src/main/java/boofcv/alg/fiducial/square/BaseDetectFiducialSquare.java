@@ -242,7 +242,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			// see if it returns the same undistorted image each time
 			double best=Double.MAX_VALUE;
 			for (int j = 0; j < 4; j++) {
-				double found = p.get(0).normSq();
+				double found = p.get(j).normSq();
 				if( found < best ) {
 					best = found;
 					interpolationHack.set(p);
