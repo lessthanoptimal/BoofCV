@@ -197,6 +197,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 		this.undistToDist = distortion.distort_F64(true,true);
 	}
 
+	private Polygon2D_F64 interpolationHack = new Polygon2D_F64(4);
+
 	List<Polygon2D_F64> candidates = new ArrayList<>();
 	List<DetectPolygonFromContour.Info> candidatesInfo = new ArrayList<>();
 
@@ -231,6 +233,23 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 				if( verbose ) System.out.println("  rejected side aspect ratio or size");
 				continue;
 			}
+
+			// REMOVE EVENTUALLY  This is a hack around how interpolation is performed
+			// Using a surface integral instead would remove the need for this.  Basically by having it start
+			// interpolating from the lower extent it samples inside the image more
+			// A good unit test to see if this hack is no longer needed is to rotate the order of the polygon and
+			// see if it returns the same undistorted image each time
+			double best=Double.MAX_VALUE;
+			for (int j = 0; j < 4; j++) {
+				double found = p.get(0).normSq();
+				if( found < best ) {
+					best = found;
+					interpolationHack.set(p);
+				}
+				UtilPolygons2D_F64.shiftDown(p);
+			}
+
+			p.set(interpolationHack);
 
 			// remember, visual clockwise isn't the same as math clockwise, hence
 			// counter clockwise visual to the clockwise quad
