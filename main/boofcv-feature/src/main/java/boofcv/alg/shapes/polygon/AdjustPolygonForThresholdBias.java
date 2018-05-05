@@ -42,7 +42,8 @@ public class AdjustPolygonForThresholdBias {
 	private Point2D_F64 intersection = new Point2D_F64();
 
 	/**
-	 * Processes and adjusts the polygon
+	 * Processes and adjusts the polygon. If after adjustment a corner needs to be removed because two sides are
+	 * parallel then the size of the polygon can be changed.
 	 *
 	 * @param polygon The polygon that is to be adjusted. Modified.
 	 * @param clockwise Is the polygon in a lockwise orientation?

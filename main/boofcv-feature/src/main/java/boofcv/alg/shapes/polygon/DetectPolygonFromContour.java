@@ -88,7 +88,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private ContourEdgeIntensity<T> contourEdgeIntensity;
 
 	// extera information for found shapes
-	private FastQueue<Info> foundInfo = new FastQueue<>(Info.class, true);
+	FastQueue<Info> foundInfo = new FastQueue<>(Info.class, true);
 
 	// true if points touching the border are NOT pruned
 	private boolean canTouchBorder;
@@ -167,6 +167,11 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 		polygonWork = new Polygon2D_F64(1);
 	}
+
+	/**
+	 * For unit testing
+	 */
+	protected DetectPolygonFromContour(){}
 
 	/**
 	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted and the opposite

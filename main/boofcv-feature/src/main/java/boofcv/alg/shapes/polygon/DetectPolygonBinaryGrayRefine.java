@@ -26,6 +26,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.ddogleg.struct.FastQueue;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -41,9 +42,9 @@ import java.util.List;
 public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 
 	// Detects the polygons using a contour from a binary image
-	private DetectPolygonFromContour<T> detector;
+	DetectPolygonFromContour<T> detector;
 
-	private AdjustPolygonForThresholdBias adjustForBias;
+	AdjustPolygonForThresholdBias adjustForBias;
 
 	// Refines the edges using the contour alone
 	private RefinePolygonToContour refineContour;
@@ -149,11 +150,18 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		edgeIntensity.setImage(gray);
 
 		long time0 = System.nanoTime();
-		List<DetectPolygonFromContour.Info> detections = detector.getFound().toList();
+		FastQueue<DetectPolygonFromContour.Info> detections = detector.getFound();
 
 		if( adjustForBias != null ) {
-			for (int i = 0; i < detections.size(); i++) {
-				adjustForBias.process(detections.get(i).polygon, detector.isOutputClockwise());
+			int minSides = getMinimumSides();
+			for (int i = detections.size()-1; i >= 0; i-- ) {
+				Polygon2D_F64 p = detections.get(i).polygon;
+				adjustForBias.process(p, detector.isOutputClockwise());
+
+				// When the polygon is adjusted for bias a point might need to be removed because it's
+				// almost parallel. This could cause the shape to have too few corners and needs to be removed.
+				if( p.size() < minSides)
+					detections.remove(i);
 			}
 		}
 		long time1 = System.nanoTime();
