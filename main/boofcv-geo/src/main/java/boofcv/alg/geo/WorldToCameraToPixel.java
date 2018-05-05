@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,9 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
@@ -51,6 +53,10 @@ public class WorldToCameraToPixel {
 	 */
 	public void configure(CameraPinholeRadial intrinsic , Se3_F64 worldToCamera ) {
 		configure( new LensDistortionRadialTangential(intrinsic), worldToCamera);
+	}
+
+	public void configure(CameraPinhole intrinsic , Se3_F64 worldToCamera ) {
+		configure( new LensDistortionPinhole(intrinsic), worldToCamera);
 	}
 
 	/**
