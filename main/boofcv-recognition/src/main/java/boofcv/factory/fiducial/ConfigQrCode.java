@@ -71,6 +71,17 @@ public class ConfigQrCode implements Configuration {
 		polygon.detector.tangentEdgeIntensity = 1.5;
 	}
 
+	/**
+	 * Default configuration for a QR Code detector which is optimized for speed
+	 */
+	public static ConfigQrCode fast() {
+		// A global threshold is faster than any local algorithm
+		// plus it will generate a simpler set of internal contours speeding up that process
+		ConfigQrCode config = new ConfigQrCode();
+		config.threshold = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
+		return config;
+	}
+
 	@Override
 	public void checkValidity() {
 		// this is now manually set by the detector. previous settings don't matter
