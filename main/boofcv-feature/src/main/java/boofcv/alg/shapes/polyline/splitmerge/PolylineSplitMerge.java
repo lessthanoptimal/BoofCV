@@ -552,7 +552,7 @@ public class PolylineSplitMerge {
 		// Note: the corner is "lost" until the next contour is fit. Not worth the effort to recycle
 		Element<Corner> p = previous(corner);
 
-		// go through the hastle of passing in this value instead of recomputing it
+		// go through the hassle of passing in this value instead of recomputing it
 		// since recomputing it isn't trivial
 		p.object.sideError = sideErrorAfterRemoved;
 		list.remove(corner);
@@ -676,7 +676,18 @@ public class PolylineSplitMerge {
 	 * ensure that the polyline will be convex still.
 	 */
 	void setSplitVariables(List<Point2D_I32> contour, Element<Corner> e0, Element<Corner> e1) {
-		splitter.selectSplitPoint(contour, e0.object.index, e1.object.index, resultsA);
+
+		int distance0 = CircularIndex.distanceP(e0.object.index, e1.object.index, contour.size());
+
+		int index0 = CircularIndex.plusPOffset(e0.object.index,minimumSideLength,contour.size());
+		int index1 = CircularIndex.minusPOffset(e1.object.index,minimumSideLength,contour.size());
+
+		int distance1 = CircularIndex.distanceP(index0,index1, contour.size());
+
+		if( distance1 != distance0-2*minimumSideLength)
+			throw new RuntimeException("Egads");
+
+		splitter.selectSplitPoint(contour, index0, index1, resultsA);
 
 		// if convex only perform the split if it would result in a convex polygon
 		if( convex ) {
@@ -688,6 +699,12 @@ public class PolylineSplitMerge {
 				e0.object.splitable = false;
 				return;
 			}
+		}
+
+		// see if this would result in a side that's too small
+		int dist0 = CircularIndex.distanceP(e0.object.index,resultsA.index, contour.size());
+		if( dist0 < minimumSideLength || (contour.size()-dist0) < minimumSideLength ) {
+			throw new RuntimeException("Should be impossible");
 		}
 
 		// this function is only called if splitable is set to true so no need to set it again
@@ -715,7 +732,8 @@ public class PolylineSplitMerge {
 		int length = CircularIndex.distanceP(e0.object.index, e1.object.index, contour.size());
 
 		// needs to be <= to prevent it from trying to split a side less than 1
-		if (length <= minimumSideLength) {
+		// times two because the two new sides would have to have a length of at least min
+		if (length <= 2*minimumSideLength) {
 			return false;
 		}
 
