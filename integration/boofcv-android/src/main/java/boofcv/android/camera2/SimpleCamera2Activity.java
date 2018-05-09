@@ -886,6 +886,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			Log.e(TAG,"No images available. Has image.close() not been called?");
 			return;
 		}
+
 		Image image = imageReader.acquireLatestImage();
 		if (image == null)
 			return;
@@ -894,7 +895,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			int cameraWidth, cameraHeight, cameraOrientation;
 			open.mLock.lock();
 			try {
-				if (open.mCameraSize == null)
+				if (open.mCameraSize == null || open.state != CameraState.OPEN)
 					return;
 				cameraWidth = open.mCameraSize.getWidth();
 				cameraHeight = open.mCameraSize.getHeight();
@@ -931,12 +932,25 @@ public abstract class SimpleCamera2Activity extends Activity {
 			if (canProcessImages) {
 				processFrame(image);
 			}
+		} catch( IllegalStateException e ) {
+			// Looks like there are situations where a camera is closed and the images
+			// freed but this function gets called anyways. if that happens any access to
+			// the image will cause an IllegalStateException be thrown.
+			if( verbose ) {
+				Log.e(TAG,"OnImageAvailableListener exception="+e.getMessage());
+			}
+			handleOnImageAvailableException(e);
 		} finally {
 			// WARNING: It's not documented if Image is thread safe or not. it's implied that it because
 			// Google's examples show it being closed and processed in a thread other than looper.
 			image.close();
 		}
 	};
+
+	/**
+	 * An exception was thrown inside of OnImageAvailableListener. See code comments for details
+	 */
+	protected void handleOnImageAvailableException( RuntimeException e ) {}
 
 	/**
 	 * Some times the size of a font of stroke needs to be specified in the input image
