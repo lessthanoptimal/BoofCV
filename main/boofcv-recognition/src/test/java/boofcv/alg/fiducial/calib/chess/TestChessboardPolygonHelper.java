@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,14 +56,8 @@ public class TestChessboardPolygonHelper {
 		distorted.vertexes.resize(3);
 		touches.add(false);
 		assertTrue(alg.filterPixelPolygon(null,distorted,touches,true));
-		// these should all fail because there are too many corners inside not touching the border
-		for (int i = 0; i < 3; i++) {
-			distorted.vertexes.resize(4+i+1);
-			touches.add(false);
-			assertFalse(alg.filterPixelPolygon(null,distorted,touches,true));
-		}
 
-		// this should pass because only 1 or 3 corners are inside
+		// this should pass because more than one corner is inside
 		for (int i = 0; i < touches.size(); i++) {
 			touches.set(i,true);
 		}
