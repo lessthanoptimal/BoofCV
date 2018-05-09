@@ -682,11 +682,6 @@ public class PolylineSplitMerge {
 		int index0 = CircularIndex.plusPOffset(e0.object.index,minimumSideLength,contour.size());
 		int index1 = CircularIndex.minusPOffset(e1.object.index,minimumSideLength,contour.size());
 
-		int distance1 = CircularIndex.distanceP(index0,index1, contour.size());
-
-		if( distance1 != distance0-2*minimumSideLength)
-			throw new RuntimeException("Egads");
-
 		splitter.selectSplitPoint(contour, index0, index1, resultsA);
 
 		// if convex only perform the split if it would result in a convex polygon
