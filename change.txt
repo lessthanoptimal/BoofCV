@@ -48,6 +48,11 @@ Version : 0.30
 - PolylineSplitMerge
   * Minimum side length is enforced fully now
 
+- TODO Fast
+  * have one decision tree for detecting all above or all below
+  * seperate code for float and int. no helper function
+  * use same fast score as in offical implementation
+
 - TODO New chessboard detector (current is too brittle)
   * binary, contour, line segments
   * look for line segments which have end points that are close to each other
