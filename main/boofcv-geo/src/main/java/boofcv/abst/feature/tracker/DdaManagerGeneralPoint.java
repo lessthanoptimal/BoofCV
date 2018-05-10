@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,11 +66,15 @@ public class DdaManagerGeneralPoint<I extends ImageGray<I>, D extends ImageGray<
 		detector.detect(input,null);
 		describe.setImage(input);
 
-		QueueCorner found = detector.getMaximums();
-
-		// compute descriptors and populate results list
 		descriptors.reset();
 		locations.reset();
+
+		// compute descriptors and populate results list
+		computeDescriptions(locDst, featDst, detector.getMaximums());
+		computeDescriptions(locDst, featDst, detector.getMinimums());
+	}
+
+	private void computeDescriptions(FastQueue<Point2D_F64> locDst, FastQueue<Desc> featDst, QueueCorner found) {
 		for( int i = 0; i < found.size; i++ ) {
 			Point2D_I16 p = found.get(i);
 			Desc desc = descriptors.grow();

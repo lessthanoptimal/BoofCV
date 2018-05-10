@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,4 +42,6 @@ public interface DdaFeatureManager<I extends ImageGray<I>, Desc extends TupleDes
 	 * @param featDst Description of each detected feature.  Add references to list.
 	 */
 	void detectFeatures( I input , FastQueue<Point2D_F64> locDst , FastQueue<Desc> featDst );
+
+	// TODO allow different types of features to be uniquely extracted, e.g. minimums, maximums, corner, blob
 }
