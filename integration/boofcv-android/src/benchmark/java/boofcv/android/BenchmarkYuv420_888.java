@@ -20,6 +20,7 @@ package boofcv.android;
 
 import android.media.Image;
 import android.media.MockImage_420_888;
+import boofcv.core.encoding.ConvertYuv420_888;
 import boofcv.struct.image.*;
 import org.openjdk.jmh.annotations.*;
 
