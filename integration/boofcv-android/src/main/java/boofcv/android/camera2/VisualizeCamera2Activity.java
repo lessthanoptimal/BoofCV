@@ -32,7 +32,7 @@ import android.util.Size;
 import android.view.*;
 import boofcv.alg.color.ColorFormat;
 import boofcv.android.ConvertBitmap;
-import boofcv.android.ConvertYuv420_888;
+import boofcv.android.ConvertCameraImage;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -320,8 +320,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 				converted = boofImage.stackImages.pop();
 			}
 			long before = System.nanoTime();
-			boofImage.convertWork = ConvertYuv420_888.declareWork(image, boofImage.convertWork);
-			ConvertYuv420_888.yuvToBoof(image, boofImage.colorFormat, converted, boofImage.convertWork);
+			boofImage.convertWork = ConvertCameraImage.declareWork(image, boofImage.convertWork);
+			ConvertCameraImage.imageToBoof(image, boofImage.colorFormat, converted, boofImage.convertWork);
 			long after = System.nanoTime();
 //			Log.i(TAG,"processFrame() image="+image.getWidth()+"x"+image.getHeight()+
 //					"  boof="+converted.width+"x"+converted.height);
