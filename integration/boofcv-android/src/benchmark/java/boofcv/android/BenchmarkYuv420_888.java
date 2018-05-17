@@ -20,7 +20,7 @@ package boofcv.android;
 
 import android.media.Image;
 import android.media.MockImage_420_888;
-import boofcv.core.encoding.ConvertYuv420_888;
+import boofcv.alg.color.ColorFormat;
 import boofcv.struct.image.*;
 import org.openjdk.jmh.annotations.*;
 
@@ -45,35 +45,35 @@ public class BenchmarkYuv420_888 {
 	final InterleavedU8 interleavedU8 = new InterleavedU8(width, height, 3);
 	final InterleavedF32 interleavedF32 = new InterleavedF32(width, height, 3);
 
-	byte work[] = ConvertYuv420_888.declareWork(image,null);
+	byte work[] = ConvertCameraImage.declareWork(image,null);
 
 	@Benchmark
 	public void yuvToGray_U8() {
-		ConvertYuv420_888.yuvToGray(image.getPlanes()[0], width, height, grayU8);
+		ConvertCameraImage.imageToBoof(image, ColorFormat.RGB, grayU8, work);
 	}
 
 	@Benchmark
 	public void yuvToGray_F32() {
-		ConvertYuv420_888.yuvToGray(image.getPlanes()[0], width, height, grayF32,work);
+		ConvertCameraImage.imageToBoof(image, ColorFormat.RGB, grayF32, work);
 	}
 
 	@Benchmark
 	public void yuvToInterleavedRgbU8() {
-		ConvertYuv420_888.yuvToInterleavedRgbU8(image, interleavedU8,work);
+		ConvertCameraImage.imageToBoof(image, ColorFormat.RGB, interleavedU8, work);
 	}
 
 	@Benchmark
 	public void yuvToInterleavedRgbF32() {
-		ConvertYuv420_888.yuvToInterleavedRgbF32(image, interleavedF32,work);
+		ConvertCameraImage.imageToBoof(image, ColorFormat.RGB, interleavedF32, work);
 	}
 
 	@Benchmark
 	public void yuvToPlanarRgbU8() {
-		ConvertYuv420_888.yuvToPlanarRgbU8(image, planarU8,work);
+		ConvertCameraImage.imageToBoof(image, ColorFormat.RGB, planarU8, work);
 	}
 
 	@Benchmark
 	public void yuvToPlanarRgbF32() {
-		ConvertYuv420_888.yuvToPlanarRgbF32(image, planarF32,work);
+		ConvertCameraImage.imageToBoof(image, ColorFormat.RGB, planarF32, work);
 	}
 }
