@@ -63,11 +63,11 @@ public abstract class GenericImplFastCorner {
 			GImageMiscOps.fill(input,99);
 
 			int center = input.getIndex(w/2,h/2);
-			for (int j = 0; j < minContinuous; j++) {
-				int index = center+offsets[(i+j)%16];
-				input.data[index] = (byte)255;
-			}
-			input.data[center] = 100;
+//			for (int j = 0; j < minContinuous; j++) {
+//				int index = center+offsets[(i+j)%16];
+//				input.data[index] = (byte)255;
+//			}
+//			input.data[center] = 100;
 
 			input.print();
 			alg.process(input,intensity);

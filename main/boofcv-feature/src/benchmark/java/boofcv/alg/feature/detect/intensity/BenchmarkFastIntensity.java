@@ -44,9 +44,6 @@ public class BenchmarkFastIntensity<T extends ImageGray<T>> {
 	public BenchmarkFastIntensity(Class<T> imageType) {
 		input = GeneralizedImageOps.createSingleBand(imageType,imgWidth,imgHeight);
 		intensity = new GrayF32(input.width,input.height);
-
-		Random rand = new Random(234);
-		GImageMiscOps.fillUniform(input, rand, 0, 255);
 	}
 
 	public class FAST_NAIVE_9 extends PerformerBase {
@@ -77,9 +74,22 @@ public class BenchmarkFastIntensity<T extends ImageGray<T>> {
 	}
 
 	public void evaluate() {
+		Random rand = new Random(234);
+
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
+		System.out.println("           Random");
 		System.out.println();
 
+		GImageMiscOps.fillUniform(input, rand, 0, 255);
+		ProfileOperation.printOpsPerSec(new FAST_NAIVE_9(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new FAST9(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new FAST12(), TEST_TIME);
+
+		System.out.println();
+		System.out.println("           Single Value");
+		System.out.println();
+
+		GImageMiscOps.fill(input,125);
 		ProfileOperation.printOpsPerSec(new FAST_NAIVE_9(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new FAST9(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new FAST12(), TEST_TIME);

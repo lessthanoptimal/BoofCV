@@ -28,6 +28,13 @@ import java.util.List;
 import java.util.Stack;
 
 /**
+ * Generates a FAST corner detector. A heuristic is used to automatically select which pixels on the circle to sample
+ * by trying to eliminate the number of possible solutions as fast as possible. This is done by selecting the bit
+ * in which the greatest number of corners could contain it.
+ *
+ * This produces code which should be functionally identical to what's described in the paper by very different
+ * from what the original author posted online. Appear to be much smaller.
+ *
  * @author Peter Abeles
  */
 public class GenerateImplFastCorner extends CodeGeneratorBase {
@@ -48,10 +55,6 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 	// used to compute the score. For each possible corner given the current samples incremenet by one
 	int possibleUp[] = new int[TOTAL_CIRCLE];
 	int possibleDown[] = new int[TOTAL_CIRCLE];
-
-	// if the first bit in a corner would have already been detected then it's index is set to true
-	boolean detectedUp[] = new boolean[TOTAL_CIRCLE];
-	boolean detectedDown[] = new boolean[TOTAL_CIRCLE];
 
 	int tabs;
 
@@ -96,6 +99,10 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		System.out.println("Done");
 	}
 
+	// TODO in each branch exhaust all
+
+	// TODO keep a list of bits which are finished and there's a direct path from the root which does not reply on other bits
+	// TODO only be considered finished when that list is exhausted
 	private void generateSamples() {
 		out.print(
 				"\t/**\n" +
@@ -110,8 +117,6 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		for (int i = 0; i < samples.length; i++) {
 			samples[i].clear();
 		}
-		Arrays.fill(detectedUp,false);
-		Arrays.fill(detectedDown,false);
 
 		tabs = 2;
 
@@ -123,7 +128,6 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 			}
 			Action action = actions.peek();
 			System.out.println("Action bit="+action.bit+" up="+action.sampleUp+" n="+action.consider+" TOTAL="+actions.size());
-			printDetected();
 			printSampleState();
 
 			if( action.consider == 0 ) {
@@ -157,15 +161,6 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 				// If a solution hsa been found return and mark the first bit as being found so that
 				// it won't detect the same corner twice
 				printReturn(tabs--,solution.up?1:-1);
-				if( solution.up ) {
-//					if( detectedUp[solution.firstBit])
-//						throw new RuntimeException("BUG! Already detected");
-					detectedUp[solution.firstBit] = true;
-				} else {
-//					if( detectedDown[solution.firstBit])
-//						throw new RuntimeException("BUG! Already detected");
-					detectedDown[solution.firstBit] = true;
-				}
 				// Don't add a new action. Instead consider other outcomes from previous action
 			} else {
 				// Wasn't able to find a solution. Sample another bit
@@ -180,15 +175,6 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		}
 
 		printCloseIf(1);
-	}
-
-	private void printDetected() {
-		System.out.print("  D=");
-		for (int i = 0; i < TOTAL_CIRCLE; i++) {
-			int v = ((detectedUp[i]?1:0) << 1) | ((detectedDown[i]?1:0));
-			System.out.print(v);
-		}
-		System.out.println();
 	}
 
 	private void printSampleState() {
@@ -341,10 +327,6 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 	private void updatePossible( int possibles[], boolean up ) {
 		Arrays.fill(possibles,0);
 		for (int i = 0; i < TOTAL_CIRCLE; i++) {
-			// see if the corner being considered has already been detected. If so skip it
-			boolean detected[] = up? detectedUp : detectedDown;
-			if( detected[i] )
-				continue;
 			boolean possible = true;
 			for (int j = 0; j < minContinuous; j++) {
 				int index = (i+j)%TOTAL_CIRCLE;
