@@ -48,26 +48,35 @@ public class FactoryIntensityPointAlg {
 	public static <T extends ImageGray<T>>
 	FastCornerDetector<T> fast(int pixelTol, int minCont, Class<T> imageType)
 	{
-		FastHelper<T> helper;
-
-		if( imageType == GrayF32.class )
-			helper = (FastHelper)new ImplFastHelper_F32(pixelTol);
-		else if( imageType == GrayU8.class )
-			helper = (FastHelper)new ImplFastHelper_U8(pixelTol);
-		else
-			throw new IllegalArgumentException("Unsupported image type "+imageType);
-
-		if( minCont == 9 ) {
-			return new ImplFastIntensity9<>(helper);
-		} else if( minCont == 10 ) {
-			return new ImplFastIntensity10<>(helper);
-		} else if( minCont == 11 ) {
-			return new ImplFastIntensity11<>(helper);
-		} else if( minCont == 12 ) {
-			return new ImplFastIntensity12<>(helper);
+		FastHelper helper;
+		if( imageType == GrayF32.class ) {
+			if (minCont == 9) {
+				helper = new ImplFastCorner9_F32(pixelTol);
+			} else if (minCont == 10) {
+				helper = new ImplFastCorner10_F32(pixelTol);
+			} else if (minCont == 11) {
+				helper = new ImplFastCorner11_F32(pixelTol);
+			} else if (minCont == 12) {
+				helper = new ImplFastCorner12_F32(pixelTol);
+			} else {
+				throw new IllegalArgumentException("Specified minCont is not supported");
+			}
+		} else if( imageType == GrayU8.class ){
+			if (minCont == 9) {
+				helper = new ImplFastCorner9_U8(pixelTol);
+			} else if (minCont == 10) {
+				helper = new ImplFastCorner10_U8(pixelTol);
+			} else if (minCont == 11) {
+				helper = new ImplFastCorner11_U8(pixelTol);
+			} else if (minCont == 12) {
+				helper = new ImplFastCorner12_U8(pixelTol);
+			} else {
+				throw new IllegalArgumentException("Specified minCont is not supported");
+			}
 		} else {
-			throw new IllegalArgumentException("Specified minCont is not supported");
+			throw new IllegalArgumentException("Unknown image type");
 		}
+		return new FastCornerDetector(helper);
 	}
 
 	/**

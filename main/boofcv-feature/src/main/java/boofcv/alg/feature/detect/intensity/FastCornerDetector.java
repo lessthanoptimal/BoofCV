@@ -64,7 +64,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntensity<T> {
+public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntensity<T> {
 
 	// radius of the circle being sampled
 	protected static final int radius = 3;
@@ -95,7 +95,7 @@ public abstract class FastCornerDetector<T extends ImageGray<T>> implements Feat
 	 *
 	 * @param helper Provide the image type specific helper.
 	 */
-	protected FastCornerDetector(FastHelper<T> helper) {
+	public FastCornerDetector(FastHelper<T> helper) {
 		this.helper = helper;
 	}
 
@@ -137,12 +137,12 @@ public abstract class FastCornerDetector<T extends ImageGray<T>> implements Feat
 			int index = image.startIndex + y*image.stride + radius;
 			for (int x = radius; x < image.width-radius; x++, index++,indexIntensity++) {
 
-				helper.setThresholds(index);
+				int result = helper.checkPixel(index);
 
-				if( checkLower(index) ) {
+				if( result < 0 ) {
 					intensity.data[indexIntensity] = helper.scoreLower(index);
 					candidatesLow.add(x,y);
-				} else if( checkUpper(index)) {
+				} else if( result > 0) {
 					intensity.data[indexIntensity] = helper.scoreUpper(index);
 					candidatesHigh.add(x,y);
 				} else {
@@ -150,8 +150,8 @@ public abstract class FastCornerDetector<T extends ImageGray<T>> implements Feat
 				}
 			}
 			// check on a per row basis to reduce impact on performance
-			if( candidatesLow.size + candidatesHigh.size >= maxFeatures )
-				break;
+//			if( candidatesLow.size + candidatesHigh.size >= maxFeatures )
+//				break;
 		}
 	}
 
@@ -174,30 +174,20 @@ public abstract class FastCornerDetector<T extends ImageGray<T>> implements Feat
 			int index = image.startIndex + y*image.stride + radius;
 			for (int x = radius; x < image.width-radius; x++, index++) {
 
-				helper.setThresholds(index);
+				int result = helper.checkPixel(index);
 
-				if( checkLower(index) ) {
+				if( result < 0 ) {
 					candidatesLow.add(x,y);
-				} else if( checkUpper(index)) {
+				} else if( result > 0 ) {
 					candidatesHigh.add(x,y);
 				}
 			}
 			// check on a per row basis to reduce impact on performance
-			if( candidatesLow.size + candidatesHigh.size >= maxFeatures )
-				break;
+//			if( candidatesLow.size + candidatesHigh.size >= maxFeatures )
+//				break;
 
 		}
 	}
-
-	/**
-	 * Checks to see if the specified pixel qualifies as a corner with lower values
-	 */
-	protected abstract boolean checkLower( int index );
-
-	/**
-	 * Checks to see if the specified pixel qualifies as a corner with upper values
-	 */
-	protected abstract boolean checkUpper( int index );
 
 	public double getMaxFeaturesFraction() {
 		return maxFeaturesFraction;

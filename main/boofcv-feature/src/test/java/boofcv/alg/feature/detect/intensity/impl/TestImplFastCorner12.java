@@ -18,11 +18,13 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
+import boofcv.alg.feature.detect.intensity.FastCornerDetector;
+
 /**
  * @author Peter Abeles
  */
 public class TestImplFastCorner12 extends GenericImplFastCorner {
 	public TestImplFastCorner12() {
-		super(new ImplFastIntensity12<>(new ImplFastHelper_U8(20)), 12, 20);
+		super(new FastCornerDetector<>(new ImplFastCorner12_U8(20)), 12, 20);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,13 @@ import boofcv.struct.image.GrayU8;
 public class TestImplFastHelper_U8 extends GenericImplFastHelperTests<GrayU8> {
 
 	public TestImplFastHelper_U8() {
-		super(GrayU8.class, new ImplFastHelper_U8(10), 10);
+		super(GrayU8.class, new ImplFastHelper_U8(10) {
+
+			@Override
+			public int checkPixel(int index) {
+				return 0;
+			}
+		}, 10);
 	}
 
 }

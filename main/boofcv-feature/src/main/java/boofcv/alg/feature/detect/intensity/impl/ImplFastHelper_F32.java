@@ -23,35 +23,25 @@ import boofcv.struct.image.GrayF32;
 /**
  * @author Peter Abeles
  */
-public class ImplFastHelper_F32 implements FastHelper<GrayF32> {
-	private GrayF32 image;
-
+public abstract class ImplFastHelper_F32 implements FastHelper<GrayF32> {
 	// how similar do the pixel in the circle need to be to the center pixel
-	private float pixelTol;
-
-	// lower and upper threshold
-	private float lower,upper;
-	// value of the center pixel
-	private float centerValue;
+	protected float tol;
 
 	// pixel index offsets for circle
-	private int offsets[];
+	protected int offsets[];
+	protected float[] data;
 
-	public ImplFastHelper_F32(int pixelTol) {
-		this.pixelTol = pixelTol;
+	float centerValue;
+	float lower,upper;
+
+	public ImplFastHelper_F32(float pixelTol) {
+		this.tol = pixelTol;
 	}
 
 	@Override
 	public void setImage(GrayF32 image , int offsets[] ) {
-		this.image = image;
+		this.data = image.data;
 		this.offsets = offsets;
-	}
-
-	@Override
-	public void setThresholds(int index) {
-		centerValue = image.data[index];
-		lower = centerValue - pixelTol;
-		upper = centerValue + pixelTol;
 	}
 
 	@Override
@@ -59,7 +49,7 @@ public class ImplFastHelper_F32 implements FastHelper<GrayF32> {
 		int total = 0;
 		int count = 0;
 		for( int i = 0; i < offsets.length; i++ ) {
-			float v = image.data[index+offsets[i]];
+			float v = data[index+offsets[i]];
 			if( v < lower ) {
 				total += v;
 				count++;
@@ -77,7 +67,7 @@ public class ImplFastHelper_F32 implements FastHelper<GrayF32> {
 		int total = 0;
 		int count = 0;
 		for( int i = 0; i < offsets.length; i++ ) {
-			float v = image.data[index+offsets[i]];
+			float v = data[index+offsets[i]];
 			if( v > upper ) {
 				total += v;
 				count++;
@@ -91,14 +81,9 @@ public class ImplFastHelper_F32 implements FastHelper<GrayF32> {
 	}
 
 	@Override
-	public boolean checkPixelLower( int index )
-	{
-		return (image.data[index] ) < lower;
-	}
-
-	@Override
-	public boolean checkPixelUpper( int index )
-	{
-		return (image.data[index] ) > upper;
+	public void setThreshold( int index ) {
+		centerValue = data[index];
+		lower = centerValue - tol;
+		upper = centerValue + tol;
 	}
 }

@@ -23,35 +23,25 @@ import boofcv.struct.image.GrayU8;
 /**
  * @author Peter Abeles
  */
-public class ImplFastHelper_U8 implements FastHelper<GrayU8> {
-	private GrayU8 image;
-
+public abstract class ImplFastHelper_U8 implements FastHelper<GrayU8> {
 	// how similar do the pixel in the circle need to be to the center pixel
-	private int pixelTol;
-
-	// lower and upper threshold
-	private int lower,upper;
-	// value of the center pixel
-	private int centerValue;
+	protected int tol;
 
 	// pixel index offsets for circle
-	private int offsets[];
+	protected int offsets[];
+	protected byte[] data;
+
+	int centerValue;
+	int lower,upper;
 
 	public ImplFastHelper_U8(int pixelTol  ) {
-		this.pixelTol = pixelTol;
+		this.tol = pixelTol;
 	}
 
 	@Override
 	public void setImage(GrayU8 image , int offsets[] ) {
-		this.image = image;
+		this.data = image.data;
 		this.offsets = offsets;
-	}
-
-	@Override
-	public void setThresholds(int index) {
-		centerValue = image.data[index] & 0xFF;
-		lower = centerValue - pixelTol;
-		upper = centerValue + pixelTol;
 	}
 
 	@Override
@@ -59,7 +49,7 @@ public class ImplFastHelper_U8 implements FastHelper<GrayU8> {
 		int total = 0;
 		int count = 0;
 		for( int i = 0; i < offsets.length; i++ ) {
-			int v = image.data[index+offsets[i]] & 0xFF;
+			int v = data[index+offsets[i]] & 0xFF;
 			if( v < lower ) {
 				total += v;
 				count++;
@@ -77,7 +67,7 @@ public class ImplFastHelper_U8 implements FastHelper<GrayU8> {
 		int total = 0;
 		int count = 0;
 		for( int i = 0; i < offsets.length; i++ ) {
-			int v = image.data[index+offsets[i]] & 0xFF;
+			int v = data[index+offsets[i]] & 0xFF;
 			if( v > upper ) {
 				total += v;
 				count++;
@@ -91,14 +81,9 @@ public class ImplFastHelper_U8 implements FastHelper<GrayU8> {
 	}
 
 	@Override
-	public boolean checkPixelLower( int index )
-	{
-		return (image.data[index] & 0xFF) < lower;
-	}
-
-	@Override
-	public boolean checkPixelUpper( int index )
-	{
-		return (image.data[index] & 0xFF) > upper;
+	public void setThreshold( int index ) {
+		centerValue = data[index]& 0xFF;
+		lower = centerValue - tol;
+		upper = centerValue + tol;
 	}
 }

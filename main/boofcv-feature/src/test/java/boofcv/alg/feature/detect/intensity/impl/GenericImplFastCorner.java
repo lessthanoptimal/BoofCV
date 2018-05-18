@@ -50,6 +50,39 @@ public abstract class GenericImplFastCorner {
 	}
 
 	@Test
+	public void perfectCircleHigh() {
+		int w=12;
+		int h=14;
+		GrayU8 input = new GrayU8(w,h);
+		GrayF32 intensity = new GrayF32(input.width,input.height);
+
+		int[] offsets = DiscretizedCircle.imageOffsets(3, input.stride);
+
+		for (int i = 1; i < 16; i++) {
+			System.out.println("i = "+i);
+			GImageMiscOps.fill(input,99);
+
+			int center = input.getIndex(w/2,h/2);
+			for (int j = 0; j < minContinuous; j++) {
+				int index = center+offsets[(i+j)%16];
+				input.data[index] = (byte)255;
+			}
+			input.data[center] = 100;
+
+			input.print();
+			alg.process(input,intensity);
+
+			assertEquals(1,alg.getCornersHigh().size);
+//			assertEquals(0,alg.getCornersLow().size);
+
+			Point2D_I16 found = alg.getCornersHigh().get(0);
+			assertEquals(w/2,found.x);
+			assertEquals(h/2,found.y);
+		}
+
+	}
+
+	@Test
 	public void compareToNaiveDetection() {
 
 		GrayU8 input = new GrayU8(40,50);

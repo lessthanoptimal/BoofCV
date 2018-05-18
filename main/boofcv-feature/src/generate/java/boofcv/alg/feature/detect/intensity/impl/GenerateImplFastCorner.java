@@ -65,11 +65,11 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 
 	@Override
 	public void generate() throws FileNotFoundException {
-//		int n[] = {9,10,11,12};
-//		AutoTypeImage d[] = {AutoTypeImage.U8,AutoTypeImage.F32};
+		int n[] = {9,10,11,12};
+		AutoTypeImage d[] = {AutoTypeImage.U8,AutoTypeImage.F32};
 
-		int n[] = {9};
-		AutoTypeImage d[] = {AutoTypeImage.U8};
+//		int n[] = {9};
+//		AutoTypeImage d[] = {AutoTypeImage.U8};
 
 		for( int minContinuous : n ) {
 			for( AutoTypeImage imageType : d ) {
@@ -111,7 +111,7 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 			samples[i].clear();
 		}
 		Arrays.fill(detectedUp,false);
-		Arrays.fill(detectedDown,true);
+		Arrays.fill(detectedDown,false);
 
 		tabs = 2;
 
@@ -119,10 +119,13 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		actions.add(selectNextSample());
 		while( !actions.empty() ) {
 			if( actions.size() == 9 ) {
-				System.out.println("Foo");
+//				System.out.println("Foo");
 			}
 			Action action = actions.peek();
 			System.out.println("Action bit="+action.bit+" up="+action.sampleUp+" n="+action.consider+" TOTAL="+actions.size());
+			printDetected();
+			printSampleState();
+
 			if( action.consider == 0 ) {
 				// First time this action is considered assume it's outcome is true
 				printSample(tabs++,action);
@@ -134,9 +137,11 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 				}
 			} else if( action.consider == 1 ){
 				// Second time consider what to do if it's outcome is false
-				printSample(tabs++,action);
+				printElse(tabs++);
 				action.consider++;
 				removeSample(action.bit);
+				System.out.println("removed sample");
+				printSampleState();
 				updateSamples(action);
 			} else {
 				// Remove consideration of this action and reconsider the previous one
@@ -153,8 +158,12 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 				// it won't detect the same corner twice
 				printReturn(tabs--,solution.up?1:-1);
 				if( solution.up ) {
+//					if( detectedUp[solution.firstBit])
+//						throw new RuntimeException("BUG! Already detected");
 					detectedUp[solution.firstBit] = true;
 				} else {
+//					if( detectedDown[solution.firstBit])
+//						throw new RuntimeException("BUG! Already detected");
 					detectedDown[solution.firstBit] = true;
 				}
 				// Don't add a new action. Instead consider other outcomes from previous action
@@ -171,6 +180,23 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		}
 
 		printCloseIf(1);
+	}
+
+	private void printDetected() {
+		System.out.print("  D=");
+		for (int i = 0; i < TOTAL_CIRCLE; i++) {
+			int v = ((detectedUp[i]?1:0) << 1) | ((detectedDown[i]?1:0));
+			System.out.print(v);
+		}
+		System.out.println();
+	}
+
+	private void printSampleState() {
+		System.out.print("  S=");
+		for (int i = 0; i < samples.length; i++) {
+			System.out.print(sampleAt(i).ordinal());
+		}
+		System.out.println();
 	}
 
 	private void updateSamples(Action action) {
@@ -235,6 +261,10 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 	private void printCloseIf( int numTabs ) {
 		out.println(tabs(numTabs)+"}");
 	}
+	private void printElse( int numTabs ) {
+		out.println(tabs(numTabs)+"} else {");
+	}
+
 	private void printSample( int numTabs , Action action ) {
 		String comparison =  action.sampleUp ? "> upper" : "< lower";
 		String strElse = action.consider==1 ? "} else " : "";
@@ -242,7 +272,7 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 	}
 
 	private void printReturn( int numTabs , int value ) {
-		out.println(tabs(numTabs + 1) + "return " + value + ";");
+		out.println(tabs(numTabs) + "return " + value + ";");
 	}
 
 	private String readBit( int bit ) {
@@ -311,6 +341,10 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 	private void updatePossible( int possibles[], boolean up ) {
 		Arrays.fill(possibles,0);
 		for (int i = 0; i < TOTAL_CIRCLE; i++) {
+			// see if the corner being considered has already been detected. If so skip it
+			boolean detected[] = up? detectedUp : detectedDown;
+			if( detected[i] )
+				continue;
 			boolean possible = true;
 			for (int j = 0; j < minContinuous; j++) {
 				int index = (i+j)%TOTAL_CIRCLE;

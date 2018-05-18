@@ -30,26 +30,11 @@ public interface FastHelper<T extends ImageGray<T>> {
 	/**
 	 * Sets the lower and upper thresholds relative to the current pixel value
 	 */
-	void setThresholds( int index );
+	int checkPixel( int index );
 
-	// TODO remove scoreLower and just have score
-	/**
-	 * Scores the pixel as a corner with lower values
-	 */
 	float scoreLower( int index );
 
-	/**
-	 * Scores the pixel as a corner with upper values
-	 */
 	float scoreUpper( int index );
 
-	/**
-	 * Checks to see if the specified pixel is below the lower threshold
-	 */
-	boolean checkPixelLower( int index );
-
-	/**
-	 * Checks to see if the specified pixel is above the upper threshold
-	 */
-	boolean checkPixelUpper( int index );
+	void setThreshold( int index );
 }
