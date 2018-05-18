@@ -88,7 +88,7 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 	 * Maximum number of pixels that can be considered corners. Some times it can go a bit bonkers and
 	 * label so many pixels that on low memory systems it uses up all the memory!
 	 */
-	protected double maxFeaturesFraction = 0.01;
+	protected double maxFeaturesFraction = 1.0;
 
 	/**
 	 * Constructor
@@ -150,8 +150,8 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 				}
 			}
 			// check on a per row basis to reduce impact on performance
-//			if( candidatesLow.size + candidatesHigh.size >= maxFeatures )
-//				break;
+			if( candidatesLow.size + candidatesHigh.size >= maxFeatures )
+				break;
 		}
 	}
 
@@ -183,9 +183,8 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 				}
 			}
 			// check on a per row basis to reduce impact on performance
-//			if( candidatesLow.size + candidatesHigh.size >= maxFeatures )
-//				break;
-
+			if( candidatesLow.size + candidatesHigh.size >= maxFeatures )
+				break;
 		}
 	}
 

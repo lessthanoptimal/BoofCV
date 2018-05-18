@@ -44,6 +44,9 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 
 	private static final int TOTAL_CIRCLE = 16;
 
+	// generate inner functions up to this depth
+	private static final int MAX_FUNCTION_DEPTH = 2;
+
 	// minimum number of edge points in a row to make a corner
 	private int minContinuous;
 
@@ -100,8 +103,13 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 			samples[i].clear();
 		}
 
+		List<String> codes  = new ArrayList<>();
+		List<String> names = new ArrayList<>();
+
 		// Need to split the code into smaller function to help the JVM optize the code
-		List<String> functions = splitIntoFunctions(generateSamples());
+		codes.add(generateSamples());
+		names.add("DUMMY");
+		splitIntoFunctions(codes,names,0,0);
 
 		out.print(
 				"\t/**\n" +
@@ -112,28 +120,43 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 						"\t{\n" +
 						"\t\tsetThreshold(index);\n"+
 						"\n");
-		out.println(functions.get(0));
+		out.println(codes.get(0));
 		out.println("\t}\n");
 
-		for (int i = 1; i < functions.size(); i++) {
-			out.println(functions.get(i));
+		for (int i = 1; i < codes.size(); i++) {
+			String inside = codes.get(i);
+			inside = "\tpublic final int "+names.get(i)+"( int index ) {\n" + inside + "\n\t}\n";
+			out.println(inside);
 		}
 
 		out.println("}");
 		System.out.println("Done");
 	}
 
-	private List<String> splitIntoFunctions( String code ) {
+	private void splitIntoFunctions( List<String> codes , List<String> names, int depth , int which ) {
+
+		if( depth >= MAX_FUNCTION_DEPTH ) {
+			return;
+		}
+
+		int N = codes.size();
+		String code = codes.get(which);
+
+		String functionNameA = "function"+(N+1);
+		String functionNameB = "function"+(N+2);
+
 		int index0 = code.indexOf(") {\n")+4;
 		int index1 = code.indexOf("\n\t\t} else {");
 		int index2 = index1 + 12;
 		int index3 = code.length()-4;
 
 		String mainFunction = code.substring(0,index0);
-		mainFunction += "\t\t\treturn function0( index );";
+		mainFunction += "\t\t\treturn "+functionNameA+"( index );";
 		mainFunction += code.substring(index1,index2);
-		mainFunction += "\t\t\treturn function1( index );\n";
-		mainFunction += code.substring(index3,code.length()-1);
+		mainFunction += "\t\t\treturn "+functionNameB+"( index );\n";
+		mainFunction += "\t\t}\n";
+
+		codes.set(which,mainFunction);
 
 		String inside0 = code.substring(index0,index1);
 		String inside1 = code.substring(index2,index3);
@@ -143,16 +166,12 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		inside1 = inside1.replaceAll("^\\t\\t\\t","\t\t");
 		inside1 = inside1.replaceAll("\\n\\t\\t\\t","\n\t\t");
 
-
-		inside0 = "\tpublic final int function0( int index ) {\n" + inside0 + "\n\t}\n";
-		inside1 = "\tpublic final int function1( int index ) {\n" + inside1 + "\t}\n";
-
-		List<String> functionStrings = new ArrayList<>();
-		functionStrings.add(mainFunction);
-		functionStrings.add(inside0);
-		functionStrings.add(inside1);
-
-		return functionStrings;
+		int indexA = names.size();
+		int indexB = indexA+1;
+		names.add( functionNameA); codes.add(inside0);
+		names.add( functionNameB); codes.add(inside1);
+		splitIntoFunctions(codes,names,depth+1,indexA);
+		splitIntoFunctions(codes,names,depth+1,indexB);
 	}
 
 	// TODO in each branch exhaust all

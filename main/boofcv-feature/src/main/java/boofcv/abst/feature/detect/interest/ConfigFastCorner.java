@@ -43,7 +43,7 @@ public class ConfigFastCorner implements Configuration {
 	/**
 	 * Maximum fraction of pixels which can be marked as corners. 0 to 1
 	 */
-	public double maxFeatures=0.01;
+	public double maxFeatures=0.1;
 
 	public ConfigFastCorner(int pixelTol, int minContinuous) {
 		this.pixelTol = pixelTol;
@@ -55,6 +55,9 @@ public class ConfigFastCorner implements Configuration {
 
 	@Override
 	public void checkValidity() {
+		if( maxFeatures < 0 || maxFeatures > 1 )
+			throw new IllegalArgumentException("maxfeatures must be from 0 to 1, inclusive");
+
 		if( minContinuous < 9 || minContinuous > 12 )
 			throw new IllegalArgumentException("minContinuous must be from 9 to 12, inclusive");
 	}
