@@ -22,6 +22,7 @@ import boofcv.alg.feature.detect.intensity.DetectorFastNaive;
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.misc.DiscretizedCircle;
+import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I16;
@@ -50,7 +51,13 @@ public abstract class GenericImplFastCorner {
 	}
 
 	@Test
-	public void perfectCircleHigh() {
+	public void perfectCircle() {
+		perfectCircle(true);
+		perfectCircle(false);
+
+	}
+
+	public void perfectCircle( boolean high ) {
 		int w=12;
 		int h=14;
 		GrayU8 input = new GrayU8(w,h);
@@ -58,24 +65,23 @@ public abstract class GenericImplFastCorner {
 
 		int[] offsets = DiscretizedCircle.imageOffsets(3, input.stride);
 
-		for (int i = 1; i < 16; i++) {
-			System.out.println("i = "+i);
+		for (int i = 0; i < 16; i++) {
+//			System.out.println("i = "+i);
 			GImageMiscOps.fill(input,99);
 
 			int center = input.getIndex(w/2,h/2);
-//			for (int j = 0; j < minContinuous; j++) {
-//				int index = center+offsets[(i+j)%16];
-//				input.data[index] = (byte)255;
-//			}
-//			input.data[center] = 100;
+			for (int j = 0; j < minContinuous; j++) {
+				int index = center+offsets[(i+j)%16];
+				input.data[index] = (byte)(high?255:0);
+			}
+			input.data[center] = 100;
 
-			input.print();
+//			input.print();
 			alg.process(input,intensity);
 
-			assertEquals(1,alg.getCornersHigh().size);
-//			assertEquals(0,alg.getCornersLow().size);
-
-			Point2D_I16 found = alg.getCornersHigh().get(0);
+			QueueCorner corners = high?alg.getCornersHigh():alg.getCornersLow();
+			assertEquals(1,corners.size);
+			Point2D_I16 found = corners.get(0);
 			assertEquals(w/2,found.x);
 			assertEquals(h/2,found.y);
 		}

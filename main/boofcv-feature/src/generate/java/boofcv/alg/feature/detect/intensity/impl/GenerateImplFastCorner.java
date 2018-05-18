@@ -35,6 +35,9 @@ import java.util.Stack;
  * This produces code which should be functionally identical to what's described in the paper by very different
  * from what the original author posted online. Appear to be much smaller.
  *
+ * The code has been optimized for the JVM by splitting it into functions. if a function is too large/complex
+ * the JIT appears to have problems optimizing the code.
+ *
  * @author Peter Abeles
  */
 public class GenerateImplFastCorner extends CodeGeneratorBase {
@@ -93,17 +96,13 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		initFile();
 		printPreamble();
 
-		generateSamples();
+		for (int i = 0; i < samples.length; i++) {
+			samples[i].clear();
+		}
 
-		out.println("}");
-		System.out.println("Done");
-	}
+		// Need to split the code into smaller function to help the JVM optize the code
+		List<String> functions = splitIntoFunctions(generateSamples());
 
-	// TODO in each branch exhaust all
-
-	// TODO keep a list of bits which are finished and there's a direct path from the root which does not reply on other bits
-	// TODO only be considered finished when that list is exhausted
-	private void generateSamples() {
 		out.print(
 				"\t/**\n" +
 						"\t * @return 1 = positive corner, 0 = no corner, -1 = negative corner\n" +
@@ -113,26 +112,68 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 						"\t{\n" +
 						"\t\tsetThreshold(index);\n"+
 						"\n");
+		out.println(functions.get(0));
+		out.println("\t}\n");
 
-		for (int i = 0; i < samples.length; i++) {
-			samples[i].clear();
+		for (int i = 1; i < functions.size(); i++) {
+			out.println(functions.get(i));
 		}
+
+		out.println("}");
+		System.out.println("Done");
+	}
+
+	private List<String> splitIntoFunctions( String code ) {
+		int index0 = code.indexOf(") {\n")+4;
+		int index1 = code.indexOf("\n\t\t} else {");
+		int index2 = index1 + 12;
+		int index3 = code.length()-4;
+
+		String mainFunction = code.substring(0,index0);
+		mainFunction += "\t\t\treturn function0( index );";
+		mainFunction += code.substring(index1,index2);
+		mainFunction += "\t\t\treturn function1( index );\n";
+		mainFunction += code.substring(index3,code.length()-1);
+
+		String inside0 = code.substring(index0,index1);
+		String inside1 = code.substring(index2,index3);
+
+		inside0 = inside0.replaceAll("^\\t\\t\\t","\t\t");
+		inside0 = inside0.replaceAll("\\n\\t\\t\\t","\n\t\t");
+		inside1 = inside1.replaceAll("^\\t\\t\\t","\t\t");
+		inside1 = inside1.replaceAll("\\n\\t\\t\\t","\n\t\t");
+
+
+		inside0 = "\tpublic final int function0( int index ) {\n" + inside0 + "\n\t}\n";
+		inside1 = "\tpublic final int function1( int index ) {\n" + inside1 + "\t}\n";
+
+		List<String> functionStrings = new ArrayList<>();
+		functionStrings.add(mainFunction);
+		functionStrings.add(inside0);
+		functionStrings.add(inside1);
+
+		return functionStrings;
+	}
+
+	// TODO in each branch exhaust all
+
+	// TODO keep a list of bits which are finished and there's a direct path from the root which does not reply on other bits
+	// TODO only be considered finished when that list is exhausted
+	private String generateSamples() {
+		String output = "";
 
 		tabs = 2;
 
 		Stack<Action> actions = new Stack<>();
 		actions.add(selectNextSample());
 		while( !actions.empty() ) {
-			if( actions.size() == 9 ) {
-//				System.out.println("Foo");
-			}
 			Action action = actions.peek();
 			System.out.println("Action bit="+action.bit+" up="+action.sampleUp+" n="+action.consider+" TOTAL="+actions.size());
-			printSampleState();
+			debugSampleState();
 
 			if( action.consider == 0 ) {
 				// First time this action is considered assume it's outcome is true
-				printSample(tabs++,action);
+				output += strSample(tabs++,action);
 				action.consider++;
 				if( action.sampleUp ) {
 					samples[action.bit].add(Sample.UP);
@@ -141,16 +182,16 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 				}
 			} else if( action.consider == 1 ){
 				// Second time consider what to do if it's outcome is false
-				printElse(tabs++);
+				output += strElse(tabs++);
 				action.consider++;
 				removeSample(action.bit);
 				System.out.println("removed sample");
-				printSampleState();
+				debugSampleState();
 				updateSamples(action);
 			} else {
 				// Remove consideration of this action and reconsider the previous one
 				removeSample(action.bit);
-				printCloseIf(tabs--);
+				output += strCloseIf(tabs--);
 				actions.pop();
 				continue;
 			}
@@ -160,24 +201,24 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 			if( solution != null ) {
 				// If a solution hsa been found return and mark the first bit as being found so that
 				// it won't detect the same corner twice
-				printReturn(tabs--,solution.up?1:-1);
+				output += strReturn(tabs--,solution.up?1:-1);
 				// Don't add a new action. Instead consider other outcomes from previous action
 			} else {
 				// Wasn't able to find a solution. Sample another bit
 				action = selectNextSample();
 				if( action == null ) {
 					// No need to sample since it has proven that there is no pixel
-					printReturn(tabs--,0);
+					output += strReturn(tabs--,0);
 				} else {
 					actions.add(action);
 				}
 			}
 		}
 
-		printCloseIf(1);
+		return output;
 	}
 
-	private void printSampleState() {
+	private void debugSampleState() {
 		System.out.print("  S=");
 		for (int i = 0; i < samples.length; i++) {
 			System.out.print(sampleAt(i).ordinal());
@@ -244,21 +285,21 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		return null;
 	}
 
-	private void printCloseIf( int numTabs ) {
-		out.println(tabs(numTabs)+"}");
+	private String strCloseIf(int numTabs ) {
+		return tabs(numTabs)+"}\n";
 	}
-	private void printElse( int numTabs ) {
-		out.println(tabs(numTabs)+"} else {");
+	private String strElse(int numTabs ) {
+		return tabs(numTabs)+"} else {\n";
 	}
 
-	private void printSample( int numTabs , Action action ) {
+	private String strSample(int numTabs , Action action ) {
 		String comparison =  action.sampleUp ? "> upper" : "< lower";
 		String strElse = action.consider==1 ? "} else " : "";
-		out.println(tabs(numTabs)+strElse+"if( "+readBit(action.bit)+" "+comparison+" ) {");
+		return tabs(numTabs)+strElse+"if( "+readBit(action.bit)+" "+comparison+" ) {\n";
 	}
 
-	private void printReturn( int numTabs , int value ) {
-		out.println(tabs(numTabs) + "return " + value + ";");
+	private String strReturn(int numTabs , int value ) {
+		return tabs(numTabs) + "return " + value + ";\n";
 	}
 
 	private String readBit( int bit ) {
