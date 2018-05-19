@@ -23,7 +23,7 @@ import boofcv.struct.image.GrayF32;
 /**
  * @author Peter Abeles
  */
-public class TestImplFastHelper_F32 extends GenericImplFastHelperTests<GrayF32> {
+public class TestImplFastHelper_F32 extends GenericImplFastCornerInterfaceTests<GrayF32> {
 
 	public TestImplFastHelper_F32() {
 		super(GrayF32.class, new ImplFastHelper_F32(10){

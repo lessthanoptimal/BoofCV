@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageGray;
 /**
  * @author Peter Abeles
  */
-public interface FastHelper<T extends ImageGray<T>> {
+public interface FastCornerInterface<T extends ImageGray<T>> {
 
 	void setImage( T image , int offsets[] );
 

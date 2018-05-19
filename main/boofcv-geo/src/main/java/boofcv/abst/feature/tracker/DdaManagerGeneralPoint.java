@@ -49,6 +49,8 @@ public class DdaManagerGeneralPoint<I extends ImageGray<I>, D extends ImageGray<
 	private FastQueue<Desc> descriptors;
 	private FastQueue<Point2D_F64> locations = new FastQueue<>(100, Point2D_F64.class, true);
 
+	int numSets;
+
 	public DdaManagerGeneralPoint(EasyGeneralFeatureDetector<I, D> detector,
 								  DescribeRegionPoint<I, Desc> describe,
 								  double scale) {
@@ -56,22 +58,40 @@ public class DdaManagerGeneralPoint<I extends ImageGray<I>, D extends ImageGray<
 		this.describe = describe;
 		this.scale = scale;
 
+		numSets = detector.getDetector().isDetectMinimums() ? 1 : 0;
+		numSets += detector.getDetector().isDetectMaximums() ? 1 : 0;
+
 		descriptors = UtilFeature.createQueue(describe,100);
 	}
 
 	@Override
-	public void detectFeatures(I input, FastQueue<Point2D_F64> locDst, FastQueue<Desc> featDst) {
-
+	public void detectFeatures(I input) {
 		// detect features in the image
 		detector.detect(input,null);
 		describe.setImage(input);
 
 		descriptors.reset();
 		locations.reset();
+	}
 
-		// compute descriptors and populate results list
-		computeDescriptions(locDst, featDst, detector.getMaximums());
-		computeDescriptions(locDst, featDst, detector.getMinimums());
+	@Override
+	public void getFeatures(int set, FastQueue<Point2D_F64> locations, FastQueue<Desc> descriptions) {
+		if( numSets == 2 ) {
+			if( set == 0 ) {
+				computeDescriptions(locations, descriptions, detector.getMinimums());
+			} else if( set == 1 ) {
+				computeDescriptions(locations, descriptions, detector.getMaximums());
+			}
+		} else if( detector.getDetector().isDetectMinimums() ) {
+			computeDescriptions(locations, descriptions, detector.getMinimums());
+		} else {
+			computeDescriptions(locations, descriptions, detector.getMaximums());
+		}
+	}
+
+	@Override
+	public int getNumberOfSets() {
+		return numSets;
 	}
 
 	private void computeDescriptions(FastQueue<Point2D_F64> locDst, FastQueue<Desc> featDst, QueueCorner found) {
@@ -100,4 +120,6 @@ public class DdaManagerGeneralPoint<I extends ImageGray<I>, D extends ImageGray<
 	public Class<Desc> getDescriptionType() {
 		return describe.getDescriptionType();
 	}
+
+
 }

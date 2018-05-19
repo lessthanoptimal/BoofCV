@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,20 +66,26 @@ public class DetectDescribeAssociateTwoPass<I extends ImageGray<I>, Desc extends
 		tracksDropped.clear();
 		tracksNew.clear();
 
-		featDst.reset();
-		locDst.reset();
+		manager.detectFeatures(input);
 
-		manager.detectFeatures(input, locDst, featDst);
+		for (int setIndex = 0; setIndex < sets.length; setIndex++) {
+			SetTrackInfo<Desc> info = sets[setIndex];
 
-		// skip if there are no features
-		if( !tracksAll.isEmpty() ) {
-			putIntoSrcList();
+			info.featDst.reset();
+			info.locDst.reset();
+			manager.getFeatures(setIndex,info.locDst,info.featDst);
 
-			associate.setSource(locSrc, featSrc);
-			associate.setDestination(locDst, featDst);
-			associate.associate();
+			// skip if there are no features
+			if( !tracksAll.isEmpty() ) {
+				putIntoSrcList(info);
 
-			updateTrackLocation(associate.getMatches());
+				associate.setSource(info.locSrc, info.featSrc);
+				associate.setDestination(info.locDst, info.featDst);
+				associate.associate();
+
+				updateTrackLocation(info,associate.getMatches());
+			}
+
 		}
 	}
 
@@ -88,16 +94,23 @@ public class DetectDescribeAssociateTwoPass<I extends ImageGray<I>, Desc extends
 		if( tracksAll.isEmpty() )
 			return;
 
-		// minimize the number of times set source is called.  In some implementations of associate this is an
-		// expensive operation
-		if( associate2 != associate && !sourceSet2 ) {
+		boolean setSource = associate2 != associate && !sourceSet2 && sets.length==1;
+		if( setSource ) {
 			sourceSet2 = true;
-			associate.setSource(locSrc, featSrc);
 		}
-		associate2.setDestination(locDst, featDst);
-		associate2.associate();
+		for (int setIndex = 0; setIndex < sets.length; setIndex++) {
+			SetTrackInfo<Desc> info = sets[setIndex];
+			// minimize the number of times set source is called.  In some implementations of associate this is an
+			// expensive operation
+			if (setSource) {
+				associate.setSource(info.locSrc, info.featSrc);
+			}
+			associate2.setDestination(info.locDst, info.featDst);
+			associate2.associate();
 
-		updateTrackLocation(associate2.getMatches());
+			updateTrackLocation(info,associate2.getMatches());
+		}
+
 	}
 
 	@Override
@@ -107,28 +120,36 @@ public class DetectDescribeAssociateTwoPass<I extends ImageGray<I>, Desc extends
 
 		// Update the track state using association information
 		tracksActive.clear();
-		updateTrackState(matches);
 
-		// add unassociated to the list
-		for( int i = 0; i < tracksAll.size(); i++ ) {
-			if( !isAssociated[i] )
-				tracksInactive.add(tracksAll.get(i));
+		for (int setIndex = 0; setIndex < sets.length; setIndex++) {
+			SetTrackInfo<Desc> info = sets[setIndex];
+			updateTrackState(info);
+
+			// add unassociated to the list
+			for (int i = 0; i < info.tracks.size(); i++) {
+				if (!info.isAssociated[i])
+					tracksInactive.add(info.tracks.get(i));
+			}
 		}
 	}
 
 	/**
 	 * Update each track's location only and not its description.  Update the active list too
 	 */
-	protected void updateTrackLocation( FastQueue<AssociatedIndex> matches ) {
+	protected void updateTrackLocation( SetTrackInfo<Desc> info, FastQueue<AssociatedIndex> matches) {
+		info.matches.resize(matches.size);
+		for (int i = 0; i < matches.size; i++) {
+			info.matches.get(i).set(matches.get(i));
+		}
+
 		tracksActive.clear();
-		for( int i = 0; i < matches.size; i++ ) {
-			AssociatedIndex indexes = matches.data[i];
-			PointTrack track = tracksAll.get(indexes.src);
-			Point2D_F64 loc = locDst.data[indexes.dst];
+		for( int i = 0; i < info.matches.size; i++ ) {
+			AssociatedIndex indexes = info.matches.data[i];
+			PointTrack track = info.tracks.get(indexes.src);
+			Point2D_F64 loc = info.locDst.data[indexes.dst];
 			track.set(loc.x, loc.y);
 			tracksActive.add(track);
 		}
-		this.matches = matches;
 	}
 
 	@Override

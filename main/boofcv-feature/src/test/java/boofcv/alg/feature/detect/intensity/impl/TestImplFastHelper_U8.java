@@ -23,7 +23,7 @@ import boofcv.struct.image.GrayU8;
 /**
  * @author Peter Abeles
  */
-public class TestImplFastHelper_U8 extends GenericImplFastHelperTests<GrayU8> {
+public class TestImplFastHelper_U8 extends GenericImplFastCornerInterfaceTests<GrayU8> {
 
 	public TestImplFastHelper_U8() {
 		super(GrayU8.class, new ImplFastHelper_U8(10) {

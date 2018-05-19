@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.alg.feature.detect.intensity.impl.FastHelper;
+import boofcv.alg.feature.detect.intensity.impl.FastCornerInterface;
 import boofcv.misc.DiscretizedCircle;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
@@ -56,7 +56,7 @@ import boofcv.struct.image.ImageGray;
  * </table>
  * </p>
  *
- * @see FastHelper
+ * @see FastCornerInterface
  *
  * <p>
  * [1] Edward Rosten, Reid Porter and Tom Drummond. "Faster and better: a machine learning approach to corner detection"
@@ -82,7 +82,7 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 	protected T image;
 
 	// Used to sample the image and compute the score
-	protected FastHelper<T> helper;
+	protected FastCornerInterface<T> helper;
 
 	/**
 	 * Maximum number of pixels that can be considered corners. Some times it can go a bit bonkers and
@@ -95,7 +95,7 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 	 *
 	 * @param helper Provide the image type specific helper.
 	 */
-	public FastCornerDetector(FastHelper<T> helper) {
+	public FastCornerDetector(FastCornerInterface<T> helper) {
 		this.helper = helper;
 	}
 

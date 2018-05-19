@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,12 +46,7 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	// Detects features and manages descriptions
 	protected DdaFeatureManager<I,Desc> manager;
 
-	// location of interest points
-	protected FastQueue<Point2D_F64> locDst = new FastQueue<>(10, Point2D_F64.class, false);
-	protected FastQueue<Point2D_F64> locSrc = new FastQueue<>(10, Point2D_F64.class, true);
-	// description of interest points
-	protected FastQueue<Desc> featSrc;
-	protected FastQueue<Desc> featDst;
+	protected SetTrackInfo sets[];
 
 	// all tracks
 	protected List<PointTrack> tracksAll = new ArrayList<>();
@@ -67,17 +62,11 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	// previously declared tracks which are being recycled
 	protected List<PointTrack> unused = new ArrayList<>();
 
-	// Data returned by associate
-	protected FastQueue<AssociatedIndex> matches;
-
 	// number of features created.  Used to assign unique IDs
 	protected long featureID = 0;
 
 	// should it update the feature description after each association?
 	boolean updateDescription;
-
-	// indicates if a feature was associated or not
-	protected boolean isAssociated[] = new boolean[1];
 
 	/**
 	 * Configures tracker
@@ -93,8 +82,14 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		this.associate = associate;
 		this.updateDescription = updateDescription;
 
-		featSrc = new FastQueue<>(10, manager.getDescriptionType(), false);
-		featDst = new FastQueue<>(10, manager.getDescriptionType(), false);
+		sets = new SetTrackInfo[manager.getNumberOfSets()];
+
+		for (int i = 0; i < sets.length; i++) {
+			sets[i] = new SetTrackInfo();
+			sets[i].featSrc = new FastQueue<>(10, manager.getDescriptionType(), false);
+			sets[i].featDst = new FastQueue<>(10, manager.getDescriptionType(), false);
+		}
+
 	}
 
 	protected DetectDescribeAssociate() {
@@ -115,9 +110,11 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	public void reset() {
 		dropAllTracks();
 		featureID = 0;
-		featDst.reset();
-		locDst.reset();
-		matches = null;
+		for (int i = 0; i < sets.length; i++) {
+			sets[i].featDst.reset();
+			sets[i].locDst.reset();
+			sets[i].matches.reset();
+		}
 	}
 
 	@Override
@@ -128,83 +125,97 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		tracksDropped.clear();
 		tracksNew.clear();
 
-		featDst.reset();
-		locDst.reset();
+		manager.detectFeatures(input);
+		for (int setIndex = 0; setIndex < sets.length; setIndex++) {
+			SetTrackInfo<Desc> info = sets[setIndex];
 
-		manager.detectFeatures(input, locDst, featDst);
+			info.featDst.reset();
+			info.locDst.reset();
+			manager.getFeatures(setIndex,info.locDst,info.featDst);
 
-		// skip if there are no features
-		if( !tracksAll.isEmpty() ) {
+			// skip if there are no features
+			if( !info.tracks.isEmpty() ) {
 
-			performTracking();
+				performTracking(info);
 
-			// add unassociated to the list
-			for( int i = 0; i < tracksAll.size(); i++ ) {
-				if( !isAssociated[i] )
-					tracksInactive.add(tracksAll.get(i));
+				// add unassociated to the list
+				for( int j = 0; j < info.tracks.size(); j++ ) {
+					if( !info.isAssociated[j] )
+						tracksInactive.add(info.tracks.get(j));
+				}
+
+				// clean up
+				for (int j = 0; j < sets.length; j++) {
+					sets[j].featSrc.reset();
+					sets[j].locSrc.reset();
+				}
 			}
-
-			// clean up
-			featSrc.reset();
-			locSrc.reset();
 		}
+
+
+
 	}
 
-	protected void performTracking() {
+	protected void performTracking( SetTrackInfo<Desc> info ) {
 		// create source list
-		putIntoSrcList();
+		putIntoSrcList(info);
 
 		// associate features together
-		associate.setSource(locSrc, featSrc);
-		associate.setDestination(locDst, featDst);
+		associate.setSource(info.locSrc, info.featSrc);
+		associate.setDestination(info.locDst, info.featDst);
 		associate.associate();
 
 		// used in spawn tracks.  if null then no tracking data is assumed
-		matches = associate.getMatches();
+		FastQueue<AssociatedIndex> matches = associate.getMatches();
+		// create a copy since the data will be recycled if there are multiple sets of points
+		info.matches.resize(matches.size);
+		for (int i = 0; i < matches.size; i++) {
+			info.matches.get(i).set(matches.get(i));
+		}
 
 		// Update the track state using association information
-		updateTrackState(matches);
+		updateTrackState(info);
 	}
 
 	/**
 	 * Put existing tracks into source list for association
 	 */
-	protected void putIntoSrcList() {
+	protected void putIntoSrcList( SetTrackInfo<Desc> info ) {
 		// make sure isAssociated is large enough
-		if( isAssociated.length < tracksAll.size() ) {
-			isAssociated = new boolean[ tracksAll.size() ];
+		if( info.isAssociated.length < info.tracks.size() ) {
+			info.isAssociated = new boolean[ info.tracks.size() ];
 		}
 
-		featSrc.reset();
-		locSrc.reset();
+		info.featSrc.reset();
+		info.locSrc.reset();
 
-		for( int i = 0; i < tracksAll.size(); i++ ) {
-			PointTrack t = tracksAll.get(i);
+		for( int i = 0; i < info.tracks.size(); i++ ) {
+			PointTrack t = info.tracks.get(i);
 			Desc desc = t.getDescription();
-			featSrc.add(desc);
-			locSrc.add(t);
-			isAssociated[i] = false;
+			info.featSrc.add(desc);
+			info.locSrc.add(t);
+			info.isAssociated[i] = false;
 		}
 	}
 
 	/**
 	 * Update each track's location and description (if configured to do so) mark tracks as being associated.
 	 */
-	protected void updateTrackState( FastQueue<AssociatedIndex> matches ) {
+	protected void updateTrackState( SetTrackInfo<Desc> info ) {
 		// update tracks
-		for( int i = 0; i < matches.size; i++ ) {
-			AssociatedIndex indexes = matches.data[i];
-			PointTrack track = tracksAll.get(indexes.src);
-			Point2D_F64 loc = locDst.data[indexes.dst];
+		for( int i = 0; i < info.matches.size; i++ ) {
+			AssociatedIndex indexes = info.matches.data[i];
+			PointTrack track = info.tracks.get(indexes.src);
+			Point2D_F64 loc = info.locDst.data[indexes.dst];
 			track.set(loc.x, loc.y);
 			tracksActive.add(track);
 
 			// update the description
 			if(updateDescription) {
-				((Desc)track.getDescription()).setTo(featDst.get(indexes.dst));
+				((Desc)track.getDescription()).setTo(info.featDst.get(indexes.dst));
 			}
 
-			isAssociated[indexes.src] = true;
+			info.isAssociated[indexes.src] = true;
 		}
 	}
 
@@ -213,42 +224,47 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	 */
 	@Override
 	public void spawnTracks() {
-		// setup data structures
-		if( isAssociated.length < featDst.size ) {
-			isAssociated = new boolean[ featDst.size ];
-		}
+		for (int setIndex = 0; setIndex < sets.length; setIndex++) {
+			SetTrackInfo<Desc> info = sets[setIndex];
 
-		// see which features are associated in the dst list
-		for( int i = 0; i < featDst.size; i++ ) {
-			isAssociated[i] = false;
-		}
+			// setup data structures
+			if( info.isAssociated.length < info.featDst.size ) {
+				info.isAssociated = new boolean[ info.featDst.size ];
+			}
 
-		if( matches != null ) {
-			for( int i = 0; i < matches.size; i++ ) {
-				isAssociated[matches.data[i].dst] = true;
+			// see which features are associated in the dst list
+			for( int i = 0; i < info.featDst.size; i++ ) {
+				info.isAssociated[i] = false;
+			}
+
+			for( int i = 0; i < info.matches.size; i++ ) {
+				info.isAssociated[info.matches.data[i].dst] = true;
+			}
+
+			// create new tracks from latest unassociated detected features
+			for( int i = 0; i < info.featDst.size; i++ ) {
+				if( info.isAssociated[i] )
+					continue;
+
+				Point2D_F64 loc = info.locDst.get(i);
+				addNewTrack(setIndex, loc.x,loc.y,info.featDst.get(i));
 			}
 		}
 
-		// create new tracks from latest unassociated detected features
-		for( int i = 0; i < featDst.size; i++ ) {
-			if( isAssociated[i] )
-				continue;
-
-			Point2D_F64 loc = locDst.get(i);
-			addNewTrack(loc.x,loc.y,featDst.get(i));
-		}
 	}
 
 	/**
 	 * Adds a new track given its location and description
 	 */
-	protected PointTrack addNewTrack( double x , double y , Desc desc ) {
+	protected PointTrack addNewTrack( int setIndex, double x , double y , Desc desc ) {
 		PointTrack p = getUnused();
 		p.set(x, y);
 		((Desc)p.getDescription()).setTo(desc);
-		if( checkValidSpawn(p) ) {
+		if( checkValidSpawn(setIndex,p) ) {
+			p.setId = setIndex;
 			p.featureId = featureID++;
 
+			sets[setIndex].tracks.add(p);
 			tracksNew.add(p);
 			tracksActive.add(p);
 			tracksAll.add(p);
@@ -262,7 +278,7 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	/**
 	 * Returns true if a new track can be spawned here.  Intended to be overloaded
 	 */
-	protected boolean checkValidSpawn( PointTrack p ) {
+	protected boolean checkValidSpawn( int setIndex, PointTrack p ) {
 		return true;
 	}
 
@@ -287,6 +303,11 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		tracksInactive.clear();
 		tracksAll.clear();
 		tracksNew.clear();
+
+		for (int setIndex = 0; setIndex < sets.length; setIndex++) {
+			SetTrackInfo<Desc> info = sets[setIndex];
+			info.tracks.clear();
+		}
 	}
 
 	/**
@@ -298,6 +319,10 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	public boolean dropTrack(PointTrack track) {
 		if( !tracksAll.remove(track) )
 			return false;
+
+		if( !sets[track.setId].tracks.remove(track) ) {
+			return false;
+		}
 		// the track may or may not be in the active list
 		tracksActive.remove(track);
 		tracksInactive.remove(track);
@@ -350,5 +375,22 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 
 		list.addAll(tracksInactive);
 		return list;
+	}
+
+	protected static class SetTrackInfo<Desc> {
+		// location of interest points
+		protected FastQueue<Point2D_F64> locDst = new FastQueue<>(10, Point2D_F64.class, false);
+		protected FastQueue<Point2D_F64> locSrc = new FastQueue<>(10, Point2D_F64.class, true);
+		// description of interest points
+		protected FastQueue<Desc> featSrc;
+		protected FastQueue<Desc> featDst;
+
+		// indicates if a feature was associated or not
+		protected boolean isAssociated[] = new boolean[1];
+
+		protected List<PointTrack> tracks = new ArrayList<>();
+
+		// Data returned by associate
+		protected FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex.class,true);
 	}
 }

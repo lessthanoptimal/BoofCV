@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericImplFastCorner {
+public abstract class GenericFastCorner {
 	Random rand = new Random(234);
 
 	int minContinuous;
@@ -44,7 +44,7 @@ public abstract class GenericImplFastCorner {
 
 	FastCornerDetector<GrayU8> alg;
 
-	public GenericImplFastCorner(FastCornerDetector<GrayU8> alg, int minContinuous, int detectDifference ) {
+	public GenericFastCorner(FastCornerDetector<GrayU8> alg, int minContinuous, int detectDifference ) {
 		this.alg = alg;
 		this.minContinuous = minContinuous;
 		this.detectDifference = detectDifference;

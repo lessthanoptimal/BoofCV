@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,11 +42,14 @@ public class TestDetectDescribeAssociate {
 		dat.tracksAll.add(dat.getUnused());
 		dat.tracksAll.add(dat.getUnused());
 		dat.tracksAll.add(dat.getUnused());
+		for (int i = 0; i < dat.tracksAll.size(); i++) {
+			dat.sets[0].tracks.add(dat.tracksAll.get(i));
+		}
 
 		PointTrack a = dat.tracksAll.get(1);
 
 		assertEquals(0,dat.unused.size());
-		dat.dropTrack(a);
+		assertTrue(dat.dropTrack(a));
 		assertEquals(1,dat.unused.size());
 
 		assertEquals(2,dat.tracksAll.size());
@@ -75,8 +78,8 @@ public class TestDetectDescribeAssociate {
 		TupleDesc_F64 desc = dat.manager.createDescription();
 		desc.value[0] = 5;
 
-		PointTrack found0 = dat.addNewTrack(5,10,desc);
-		PointTrack found1 = dat.addNewTrack(8,23,desc);
+		PointTrack found0 = dat.addNewTrack(0,5,10,desc);
+		PointTrack found1 = dat.addNewTrack(0,8,23,desc);
 
 		// unique featureId should be assigned
 		assertTrue(found0.featureId != found1.featureId);
@@ -92,22 +95,18 @@ public class TestDetectDescribeAssociate {
 
 		private Helper() {
 			manager = new HelpManager();
+			sets = new SetTrackInfo[1];
+			sets[0] = new SetTrackInfo();
 		}
 
-		protected boolean checkValidSpawn( PointTrack p ) {
+		@Override
+		protected boolean checkValidSpawn( int set, PointTrack p ) {
 			validCalled = true;
 			return true;
 		}
 	}
 
 	private static class HelpManager implements DdaFeatureManager<GrayF32,TupleDesc_F64> {
-
-		@Override
-		public void detectFeatures(GrayF32 input,
-								   FastQueue<Point2D_F64> locDst,
-								   FastQueue<TupleDesc_F64> featDst) {
-
-		}
 
 		@Override
 		public TupleDesc_F64 createDescription() {
@@ -117,6 +116,21 @@ public class TestDetectDescribeAssociate {
 		@Override
 		public Class<TupleDesc_F64> getDescriptionType() {
 			return TupleDesc_F64.class;
+		}
+
+		@Override
+		public void detectFeatures(GrayF32 input) {
+
+		}
+
+		@Override
+		public void getFeatures(int set, FastQueue<Point2D_F64> locations, FastQueue<TupleDesc_F64> descriptions) {
+
+		}
+
+		@Override
+		public int getNumberOfSets() {
+			return 1;
 		}
 	}
 }

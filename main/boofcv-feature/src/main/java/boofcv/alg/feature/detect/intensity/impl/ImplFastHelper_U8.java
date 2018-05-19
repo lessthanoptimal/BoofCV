@@ -23,7 +23,7 @@ import boofcv.struct.image.GrayU8;
 /**
  * @author Peter Abeles
  */
-public abstract class ImplFastHelper_U8 implements FastHelper<GrayU8> {
+public abstract class ImplFastHelper_U8 implements FastCornerInterface<GrayU8> {
 	// how similar do the pixel in the circle need to be to the center pixel
 	protected int tol;
 

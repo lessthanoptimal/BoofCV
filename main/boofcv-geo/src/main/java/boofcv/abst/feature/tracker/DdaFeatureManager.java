@@ -38,10 +38,17 @@ public interface DdaFeatureManager<I extends ImageGray<I>, Desc extends TupleDes
 	 * are assumed to have been reset prior to this function being called.
 	 *
 	 * @param input Input image.
-	 * @param locDst Location of detected feature.  Add references to list.
-	 * @param featDst Description of each detected feature.  Add references to list.
 	 */
-	void detectFeatures( I input , FastQueue<Point2D_F64> locDst , FastQueue<Desc> featDst );
+	void detectFeatures( I input );
 
-	// TODO allow different types of features to be uniquely extracted, e.g. minimums, maximums, corner, blob
+	/**
+	 * Used to get features from one set
+	 *
+	 * @param set Which set of features should it retrieve
+	 * @param locations Location of each feature
+	 * @param descriptions Description of each feature
+	 */
+	void getFeatures( int set , FastQueue<Point2D_F64> locations , FastQueue<Desc> descriptions );
+
+	int getNumberOfSets();
 }

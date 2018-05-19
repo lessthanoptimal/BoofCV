@@ -48,7 +48,7 @@ public class FactoryIntensityPointAlg {
 	public static <T extends ImageGray<T>>
 	FastCornerDetector<T> fast(int pixelTol, int minCont, Class<T> imageType)
 	{
-		FastHelper helper;
+		FastCornerInterface helper;
 		if( imageType == GrayF32.class ) {
 			if (minCont == 9) {
 				helper = new ImplFastCorner9_F32(pixelTol);

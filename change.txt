@@ -29,7 +29,10 @@ Version : 0.30
 - ImageConvert
   * Added convert between planar and interleaved of different data types
 - Fast Corner
-  * Added a more faithful non-intensity based Fast Corner feature
+  * Improved efficiency by changing how points are sampled
+  * Added a variant which doesn't compute feature intensity
+- PointTracker
+  * Can handle multiple sets of detected features, e.g. min and max features
 - Stoppable
   * An interface for gracefully exiting a long running process
   * MeanShiftSuperPixel, SLIC

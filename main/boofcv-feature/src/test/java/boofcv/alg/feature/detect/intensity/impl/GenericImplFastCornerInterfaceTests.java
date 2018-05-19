@@ -24,20 +24,21 @@ import boofcv.misc.DiscretizedCircle;
 import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public abstract class GenericImplFastHelperTests<T extends ImageGray<T>> {
+public abstract class GenericImplFastCornerInterfaceTests<T extends ImageGray<T>> {
 
 	Class<T> imageType;
-	FastHelper<T> alg;
+	FastCornerInterface<T> alg;
 	T image;
 	int[] offsets;
 	int threshold;
 
-	public GenericImplFastHelperTests(Class<T> imageType, FastHelper<T> alg , int threshold ) {
+	public GenericImplFastCornerInterfaceTests(Class<T> imageType, FastCornerInterface<T> alg , int threshold ) {
 		this.imageType = imageType;
 		this.alg = alg;
 		this.threshold = threshold;
@@ -91,40 +92,6 @@ public abstract class GenericImplFastHelperTests<T extends ImageGray<T>> {
 		assertTrue(valueA > 0 );
 		assertTrue(valueB > 0 );
 		assertTrue(valueB > valueA);
-	}
-
-	@Test
-	public void checkPixelLower() {
-		GImageMiscOps.fill(image, 0);
-
-		alg.setImage(image,offsets);
-		GeneralizedImageOps.set(image,10,11,30);
-		GeneralizedImageOps.set(image,10,12,30-threshold-1);
-		GeneralizedImageOps.set(image,10,13,30+threshold+1);
-		GeneralizedImageOps.set(image,10,14,30);
-
-		alg.setThreshold(image.getIndex(10,11));
-
-		assertTrue(alg.checkPixel(image.getIndex(10,12)) < 0);
-		assertFalse(alg.checkPixel(image.getIndex(10,13)) < 0);
-		assertFalse(alg.checkPixel(image.getIndex(10,14)) < 0);
-	}
-
-	@Test
-	public void checkPixelUpper() {
-		GImageMiscOps.fill(image, 0);
-
-		alg.setImage(image,offsets);
-		GeneralizedImageOps.set(image,10,11,30);
-		GeneralizedImageOps.set(image,10,12,30-threshold-1);
-		GeneralizedImageOps.set(image,10,13,30+threshold+1);
-		GeneralizedImageOps.set(image,10,14,30);
-
-		alg.setThreshold(image.getIndex(10,11));
-
-		assertFalse(alg.checkPixel(image.getIndex(10, 12))>0);
-		assertTrue(alg.checkPixel(image.getIndex(10, 13))>0);
-		assertFalse(alg.checkPixel(image.getIndex(10,14))>0);
 	}
 
 	private void setCircle( int x , int y , int value ) {
