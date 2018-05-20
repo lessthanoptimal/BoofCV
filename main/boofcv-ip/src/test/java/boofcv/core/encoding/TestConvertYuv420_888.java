@@ -78,7 +78,7 @@ public class TestConvertYuv420_888 {
 		strideUV = stridePixelUV*(width/shape.periodUV + (width%shape.periodUV))+shape.extra;
 
 		byte[] gray = new byte[strideY*height];
-		byte[] bandUV = new byte[2*stridePixelUV*(height/shape.periodUV)];
+		byte[] bandUV = new byte[2*strideUV*(height/shape.periodUV)];
 
 		rand.nextBytes(gray);
 		rand.nextBytes(bandUV);
