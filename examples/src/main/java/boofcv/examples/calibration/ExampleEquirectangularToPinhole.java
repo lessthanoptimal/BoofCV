@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.examples.calibration;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.spherical.PinholeToEquirectangular_F32;
+import boofcv.alg.distort.spherical.CameraToEquirectangular_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.border.BorderType;
@@ -68,9 +68,9 @@ public class ExampleEquirectangularToPinhole {
 				FactoryDistort.distort(false,interp,equiImage.getImageType());
 
 		// This is where the magic is done.  It defines the transform rfom equirectangular to pinhole
-		PinholeToEquirectangular_F32 pinholeToEqui = new PinholeToEquirectangular_F32();
+		CameraToEquirectangular_F32 pinholeToEqui = new CameraToEquirectangular_F32();
 		pinholeToEqui.setEquirectangularShape(equiImage.width,equiImage.height);
-		pinholeToEqui.setPinhole(pinholeModel);
+		pinholeToEqui.setCameraModel(pinholeModel);
 
 		// Pass in the transform to the image distorter
 		distorter.setModel(pinholeToEqui);

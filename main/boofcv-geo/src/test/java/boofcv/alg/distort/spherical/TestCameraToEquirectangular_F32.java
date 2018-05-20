@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestPinholeRadialToEquirectangular_F32 {
-
+public class TestCameraToEquirectangular_F32 {
 	private int equiWidth = 600;
 	private int equiHeight = 400;
 
@@ -45,9 +44,9 @@ public class TestPinholeRadialToEquirectangular_F32 {
 		CameraPinholeRadial intrinsic = new CameraPinholeRadial(400,400,0,imgWidth/2,imgHeight/2,imgWidth,imgHeight);
 		intrinsic.setRadial(0.1f,0.2f);
 
-		PinholeRadialToEquirectangular_F32 alg = new PinholeRadialToEquirectangular_F32();
+		CameraToEquirectangular_F32 alg = new CameraToEquirectangular_F32();
 
-		alg.setPinhole(intrinsic);
+		alg.setCameraModel(intrinsic);
 		alg.setEquirectangularShape(equiWidth,equiHeight);
 
 		assertPointing(alg,imgWidth/2,imgHeight/2,0,0,1);
@@ -61,16 +60,16 @@ public class TestPinholeRadialToEquirectangular_F32 {
 		CameraPinholeRadial intrinsic = new CameraPinholeRadial(400,400,0,imgWidth/2,imgHeight/2,imgWidth,imgHeight);
 		intrinsic.setRadial(0.1f,0.2f);
 
-		PinholeRadialToEquirectangular_F32 alg = new PinholeRadialToEquirectangular_F32();
+		CameraToEquirectangular_F32 alg = new CameraToEquirectangular_F32();
 
-		alg.setPinhole(intrinsic);
+		alg.setCameraModel(intrinsic);
 		alg.setEquirectangularShape(equiWidth,equiHeight);
 		alg.setDirection(0, (float)Math.PI/2, 0);
 
 		assertPointing(alg,imgWidth/2,imgHeight/2,1,0,0);
 	}
 
-	private void assertPointing(PinholeRadialToEquirectangular_F32 alg , int x , int y , float nx , float ny , float nz )
+	private void assertPointing(CameraToEquirectangular_F32 alg , int x , int y , float nx , float ny , float nz )
 	{
 		EquirectangularTools_F32 tools = new EquirectangularTools_F32();
 

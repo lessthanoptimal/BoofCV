@@ -50,11 +50,7 @@ Version : 0.30
   * Optional interface for implementations which provide access to padding settings.
 - PolylineSplitMerge
   * Minimum side length is enforced fully now
-
-- TODO Fast
-  * have one decision tree for detecting all above or all below
-  * seperate code for float and int. no helper function
-  * use same fast score as in offical implementation
+- Simplified transforms to equirectangular images
 
 - TODO New chessboard detector (current is too brittle)
   * binary, contour, line segments
