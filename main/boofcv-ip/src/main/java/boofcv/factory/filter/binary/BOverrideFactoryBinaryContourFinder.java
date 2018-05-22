@@ -18,7 +18,7 @@
 
 package boofcv.factory.filter.binary;
 
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
 
@@ -37,7 +37,7 @@ public class BOverrideFactoryBinaryContourFinder extends BOverrideClass {
 	}
 
 	public interface Chang2004 {
-		BinaryContourFinder createChang2004();
+		BinaryLabelContourFinder createChang2004();
 	}
 
 }

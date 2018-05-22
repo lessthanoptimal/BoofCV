@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,10 +20,7 @@ package boofcv.alg.geo;
 
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
-import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -51,13 +48,13 @@ public class TestLowLevelMultiViewOps {
 			list.add(p);
 		}
 
-		DMatrixRMaj N = new DMatrixRMaj(3,3);
+		NormalizationPoint2D N = new NormalizationPoint2D();
 		LowLevelMultiViewOps.computeNormalization(list, N);
 
 		List<Point2D_F64> transformed = new ArrayList<>();
 		for( Point2D_F64 p : list ) {
 			Point2D_F64 t = new Point2D_F64();
-			GeometryMath_F64.mult(N, p, t);
+			N.apply(p, t);
 			transformed.add(t);
 		}
 
@@ -113,19 +110,19 @@ public class TestLowLevelMultiViewOps {
 
 		PerspectiveOps.splitAssociated(list,list1,list2);
 
-		DMatrixRMaj expected1 = new DMatrixRMaj(3,3);
-		DMatrixRMaj expected2 = new DMatrixRMaj(3,3);
+		NormalizationPoint2D expected1 = new NormalizationPoint2D();
+		NormalizationPoint2D expected2 = new NormalizationPoint2D();
 
 		LowLevelMultiViewOps.computeNormalization(list1, expected1);
 		LowLevelMultiViewOps.computeNormalization(list2, expected2);
 
-		DMatrixRMaj found1 = new DMatrixRMaj(3,3);
-		DMatrixRMaj found2 = new DMatrixRMaj(3,3);
+		NormalizationPoint2D found1 = new NormalizationPoint2D();
+		NormalizationPoint2D found2 = new NormalizationPoint2D();
 
 		LowLevelMultiViewOps.computeNormalization(list, found1, found2);
 
-		assertTrue(MatrixFeatures_DDRM.isIdentical(expected1, found1, 1e-8));
-		assertTrue(MatrixFeatures_DDRM.isIdentical(expected2,found2,1e-8));
+		assertTrue(expected1.isEquals(found1,1e-8));
+		assertTrue(expected2.isEquals(found2,1e-8));
 	}
 
 	/**
@@ -151,43 +148,22 @@ public class TestLowLevelMultiViewOps {
 
 		PerspectiveOps.splitAssociated(list,list1,list2,list3);
 
-		DMatrixRMaj expected1 = new DMatrixRMaj(3,3);
-		DMatrixRMaj expected2 = new DMatrixRMaj(3,3);
-		DMatrixRMaj expected3 = new DMatrixRMaj(3,3);
+		NormalizationPoint2D expected1 = new NormalizationPoint2D();
+		NormalizationPoint2D expected2 = new NormalizationPoint2D();
+		NormalizationPoint2D expected3 = new NormalizationPoint2D();
 
 		LowLevelMultiViewOps.computeNormalization(list1, expected1);
 		LowLevelMultiViewOps.computeNormalization(list2, expected2);
 		LowLevelMultiViewOps.computeNormalization(list3, expected3);
 
-		DMatrixRMaj found1 = new DMatrixRMaj(3,3);
-		DMatrixRMaj found2 = new DMatrixRMaj(3,3);
-		DMatrixRMaj found3 = new DMatrixRMaj(3,3);
+		NormalizationPoint2D found1 = new NormalizationPoint2D();
+		NormalizationPoint2D found2 = new NormalizationPoint2D();
+		NormalizationPoint2D found3 = new NormalizationPoint2D();
 
 		LowLevelMultiViewOps.computeNormalization(list, found1, found2, found3);
 
-		assertTrue(MatrixFeatures_DDRM.isIdentical(expected1,found1,1e-8));
-		assertTrue(MatrixFeatures_DDRM.isIdentical(expected2,found2,1e-8));
-		assertTrue(MatrixFeatures_DDRM.isIdentical(expected3,found3,1e-8));
-	}
-
-	/**
-	 * Test it against a simple test case
-	 */
-	@Test
-	public void applyPixelNormalization() {
-		DMatrixRMaj N = new DMatrixRMaj(3,3,true,1,2,3,4,5,6,7,8,9);
-
-		Point2D_F64 a = new Point2D_F64(3,4);
-		Point2D_F64 found = new Point2D_F64(3,4);
-		Point2D_F64 expected = new Point2D_F64(3,4);
-
-		expected.x = a.x * N.get(0,0) + N.get(0,2);
-		expected.y = a.y * N.get(1,1) + N.get(1,2);
-
-
-		LowLevelMultiViewOps.applyPixelNormalization(N, a, found);
-
-		assertEquals(found.x,expected.x,1e-8);
-		assertEquals(found.y,expected.y,1e-8);
+		assertTrue(expected1.isEquals(found1,1e-8));
+		assertTrue(expected2.isEquals(found2,1e-8));
+		assertTrue(expected3.isEquals(found3,1e-8));
 	}
 }

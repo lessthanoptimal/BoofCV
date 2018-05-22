@@ -1,22 +1,16 @@
-ext.libpath = file('./').absolutePath
-
-apply plugin: 'org.boofcv.gradletools'
-
-booftools {
-    gversion_file_path = "main/boofcv-ip/src/main/java/boofcv"
-    gversion_package = "boofcv"
-    javadoc_links = [ 'http://docs.oracle.com/javase/8/docs/api/',
-                      'http://ejml.org/javadoc/',
-                      'http://georegression.org/javadoc/',
-                      'http://ddogleg.org/javadoc/']
+plugins {
+    id "com.peterabeles.gversion" version "1.2" apply false
 }
+
+ext.libpath = file('./').absolutePath
 
 allprojects {
     apply plugin: 'idea'
     apply plugin: 'eclipse'
+    apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '0.29'
+    version = '0.30'
 }
 
 project.ext.set("deepboof_version", '0.4')
@@ -27,6 +21,12 @@ if( project.hasProperty("native_arch")) {
     project.ext.native_arch = [project.native_arch]
 } else {
     project.ext.native_arch = [ "linux-x86_64", "macosx-x86_64", "windows-x86_64"]
+}
+
+gversion {
+    srcDir = "main/boofcv-ip/src/main/java"
+    classPackage = "boofcv"
+    className = "BoofVersion"
 }
 
 subprojects {
@@ -44,6 +44,8 @@ subprojects {
             failOnVersionConflict()
         }
     }
+
+    createVersionFile.enabled = false // only want this to run once in the root project
 
     // Enable incremental compile. Should make single file changes faster
     tasks.withType(JavaCompile) {
@@ -72,7 +74,6 @@ subprojects {
             resources {
                 srcDir 'src/benchmark/resources'
             }
-            compileClasspath += sourceSets.main.runtimeClasspath
         }
         generate {
             java {
@@ -81,7 +82,6 @@ subprojects {
             resources {
                 srcDir 'src/generate/resources'
             }
-            compileClasspath += sourceSets.main.runtimeClasspath
         }
 
         experimental {
@@ -91,22 +91,28 @@ subprojects {
             resources {
                 srcDir 'src/experimental/resources'
             }
-            compileClasspath += sourceSets.main.runtimeClasspath
         }
     }
 
     dependencies {
-        compile group: 'org.georegression', name: 'georegression', version: '0.15'
+        compile group: 'org.georegression', name: 'georegression', version: '0.16'
         compile 'com.google.code.findbugs:jsr305:3.0.2' // @Nullable
 
         testCompile group: 'junit', name: 'junit', version: '4.12'
 
-        testCompile project.sourceSets.generate.output
-        testCompile project.sourceSets.benchmark.output
-        testCompile project.sourceSets.experimental.output
+        experimentalImplementation project.sourceSets.main.compileClasspath
+        experimentalImplementation project.sourceSets.main.runtimeClasspath
 
-        benchmarkCompile project.sourceSets.experimental.output
-        benchmarkCompile project.sourceSets.generate.output
+        generateImplementation project(':main:boofcv-ip')
+
+        testImplementation project.sourceSets.benchmark.output
+        testImplementation project.sourceSets.benchmark.compileClasspath
+        testImplementation project.sourceSets.benchmark.runtimeClasspath
+
+        benchmarkImplementation project.sourceSets.experimental.output
+        benchmarkImplementation project.sourceSets.generate.output
+        benchmarkImplementation project.sourceSets.main.runtimeClasspath
+        benchmarkImplementation project.sourceSets.main.compileClasspath
 
         ['core','generator-annprocess'].each { String a->
             benchmarkCompile('org.openjdk.jmh:jmh-'+a+':1.19')
@@ -308,15 +314,8 @@ task testReport(type: TestReport) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.3'
+    gradleVersion = '4.4'
 }
-
-
-
-project(':main:boofcv-ip').compileJava.dependsOn(checkForVersionFile)
-
-// Build the build info file every time it builds
-assemble.dependsOn(createVersionFile)
 
 // Disable the creation of jars for distribution.  If you don't do this it will crash
 [':main',':examples',':main:checks',':main:autocode',':integration'].each {String a ->

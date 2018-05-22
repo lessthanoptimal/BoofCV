@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,6 +68,8 @@ public class SimulatePlanarWorld {
 	Point3D_F64 p3 = new Point3D_F64();
 	float[] pointing = new float[0];
 
+	float background = 0;
+
 	public void setCamera( CameraUniversalOmni model ) {
 		output.reshape(model.width,model.height);
 		depthMap.reshape(model.width,model.height);
@@ -134,7 +136,7 @@ public class SimulatePlanarWorld {
 
 		LineParametric3D_F64 ray = new LineParametric3D_F64();
 
-		ImageMiscOps.fill(output,0);
+		ImageMiscOps.fill(output,background);
 		for (int y = 0; y < output.height; y++) {
 			for (int x = 0; x < output.width; x++) {
 				if( Float.isNaN(depthMap.unsafe_get(x,y)))
@@ -196,6 +198,10 @@ public class SimulatePlanarWorld {
 
 	public ImageRect getImageRect( int which ) {
 		return scene.get(which);
+	}
+
+	public void setBackground(float background) {
+		this.background = background;
 	}
 
 	/**

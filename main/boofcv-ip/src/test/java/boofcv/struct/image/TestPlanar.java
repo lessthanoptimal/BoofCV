@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -87,7 +87,7 @@ public class TestPlanar {
 	}
 
 	@Test
-	public void reshape() {
+	public void reshape_wh() {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,5, 10, 3);
 
 		// reshape to something smaller
@@ -99,6 +99,43 @@ public class TestPlanar {
 		img.reshape(15, 21);
 		assertEquals(15,img.getWidth());
 		assertEquals(21, img.getHeight());
+	}
+
+	@Test
+	public void reshape_whb() {
+		Planar<GrayU8> img = new Planar<>(GrayU8.class,5, 10, 3);
+
+		// reshape to something smaller
+		img.reshape(5,4, 2);
+		assertEquals(5,img.getWidth());
+		assertEquals(4,img.getHeight());
+		assertEquals(5,img.getBand(0).getWidth());
+		assertEquals(4,img.getBand(0).getHeight());
+		assertEquals(2,img.getNumBands());
+
+		// number of bands constant
+		img.reshape(5,5, 2);
+		assertEquals(5, img.getWidth());
+		assertEquals(5, img.getHeight());
+		assertEquals(5, img.getBand(0).getWidth());
+		assertEquals(5, img.getBand(0).getHeight());
+		assertEquals(2, img.getNumBands());
+
+		// reshape to something larger
+		img.reshape(15, 21);
+		assertEquals(15, img.getWidth());
+		assertEquals(21, img.getHeight());
+		assertEquals(15, img.getBand(0).getWidth());
+		assertEquals(21, img.getBand(0).getHeight());
+		assertEquals(2,  img.getNumBands());
+
+		// increase number of bands
+		img.reshape(15, 21,3);
+		assertEquals(15, img.getWidth());
+		assertEquals(21, img.getHeight());
+		assertEquals(15, img.getBand(0).getWidth());
+		assertEquals(21, img.getBand(0).getHeight());
+		assertEquals(3,  img.getNumBands());
 	}
 
 	@Test

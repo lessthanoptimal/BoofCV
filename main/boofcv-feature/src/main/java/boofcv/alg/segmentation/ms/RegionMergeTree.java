@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.segmentation.ms;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.struct.image.GrayS32;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.Stoppable;
 
 /**
  * Merges regions together quickly and efficiently using a directed tree graph.  To merge two segments together
@@ -33,7 +34,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-public class RegionMergeTree {
+public class RegionMergeTree implements Stoppable {
 
 	// list used to convert the original region ID's into their new compacted ones
 	// The values indicate which region a region is to be merged into
@@ -46,6 +47,8 @@ public class RegionMergeTree {
 
 	// the new ID of the root nodes (segments)
 	protected GrowQueue_I32 rootID = new GrowQueue_I32();
+
+	protected boolean stopRequested=false;
 
 	/**
 	 * Must call before any other functions.
@@ -167,5 +170,15 @@ public class RegionMergeTree {
 		mergeList.data[regionA] = rootA;
 		mergeList.data[regionB] = rootA;
 		mergeList.data[rootB] = rootA;
+	}
+
+	@Override
+	public void requestStop() {
+		stopRequested = true;
+	}
+
+	@Override
+	public boolean isStopRequested() {
+		return stopRequested;
 	}
 }

@@ -69,20 +69,44 @@ public class ImageHistogramPanel extends JPanel {
 	}
 
 	private void update( GrayF32 image ) {
-		for( int y = 0; y < image.height; y++ ) {
-			for( int x = 0; x < image.width; x++ ) {
-				int index = (int)(totalBins*(image.get(x,y)/maxValue));
-				bins[index]++;
+		if( image.width*image.height < 200*200 ) {
+			for (int y = 0; y < image.height; y++) {
+				for (int x = 0; x < image.width; x++) {
+					int index = (int) (totalBins * (image.unsafe_get(x, y) / maxValue));
+					bins[index]++;
+				}
+			}
+		} else {
+			int periodX = (int)Math.ceil(image.width/250.0);
+			int periodY = (int)Math.ceil(image.width/250.0);
+
+			for (int y = 0; y < image.height; y += periodY) {
+				for (int x = 0; x < image.width; x += periodX ) {
+					int index = (int) (totalBins * (image.unsafe_get(x, y) / maxValue));
+					bins[index]++;
+				}
 			}
 		}
 	}
 
 	private void update( GrayI image ) {
 		int max = (int)maxValue;
-		for( int y = 0; y < image.height; y++ ) {
-			for( int x = 0; x < image.width; x++ ) {
-				int index = totalBins*image.unsafe_get(x,y)/max;
-				bins[index]++;
+		if( image.width*image.height < 200*200 ) {
+			for (int y = 0; y < image.height; y++) {
+				for (int x = 0; x < image.width; x++) {
+					int index = totalBins * (image.unsafe_get(x, y) / max);
+					bins[index]++;
+				}
+			}
+		} else {
+			int periodX = (int)Math.ceil(image.width/250.0);
+			int periodY = (int)Math.ceil(image.width/250.0);
+
+			for (int y = 0; y < image.height; y += periodY) {
+				for (int x = 0; x < image.width; x += periodX ) {
+					int index = totalBins * (image.unsafe_get(x, y) / max);
+					bins[index]++;
+				}
 			}
 		}
 	}

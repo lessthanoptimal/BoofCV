@@ -369,7 +369,7 @@ public class VisualizeBinaryData {
 			for (int y = 0; y < h; y++) {
 				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
 				for (int x = 0; x < w; x++) {
-					int rgb = binaryImage.data[indexSrc++] > 0 ? 0 : 0x00FFFFFF;
+					int rgb = binaryImage.data[indexSrc++] != 0 ? 0 : 0x00FFFFFF;
 					out.setRGB(x, y, rgb);
 				}
 			}
@@ -377,7 +377,7 @@ public class VisualizeBinaryData {
 			for (int y = 0; y < h; y++) {
 				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
 				for (int x = 0; x < w; x++) {
-					int rgb = binaryImage.data[indexSrc++] > 0 ? 0x00FFFFFF : 0;
+					int rgb = binaryImage.data[indexSrc++] != 0 ? 0x00FFFFFF : 0;
 					out.setRGB(x, y, rgb);
 				}
 			}
@@ -398,14 +398,14 @@ public class VisualizeBinaryData {
 				for (int y = 0; y < h; y++) {
 					int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
 					for (int x = 0; x < w; x++) {
-						data[rasterIndex++] = (byte) ((1 - binaryImage.data[indexSrc++]) * 255);
+						data[rasterIndex++] = (byte) (binaryImage.data[indexSrc++]==0?255:0);
 					}
 				}
 			} else {
 				for (int y = 0; y < h; y++) {
 					int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
 					for (int x = 0; x < w; x++) {
-						data[rasterIndex++] = (byte) (binaryImage.data[indexSrc++] * 255);
+						data[rasterIndex++] = (byte) (binaryImage.data[indexSrc++]==0?0:255);
 					}
 				}
 			}
@@ -414,7 +414,7 @@ public class VisualizeBinaryData {
 				for (int y = 0; y < h; y++) {
 					int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
 					for (int x = 0; x < w; x++) {
-						byte val = (byte) ((1 - binaryImage.data[indexSrc++]) * 255);
+						byte val = (byte) (binaryImage.data[indexSrc++]==0?255:0);
 						for (int i = 0; i < numBands; i++) {
 							data[rasterIndex++] = val;
 						}
@@ -424,7 +424,7 @@ public class VisualizeBinaryData {
 				for (int y = 0; y < h; y++) {
 					int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
 					for (int x = 0; x < w; x++) {
-						byte val = (byte) (binaryImage.data[indexSrc++] * 255);
+						byte val = (byte) (binaryImage.data[indexSrc++]==0?0:255);
 						for (int i = 0; i < numBands; i++) {
 							data[rasterIndex++] = val;
 						}
@@ -432,30 +432,30 @@ public class VisualizeBinaryData {
 				}
 			}
 		} else if( numBands == 4) {
-		if (invert) {
-			for (int y = 0; y < h; y++) {
-				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
-				for (int x = 0; x < w; x++) {
-					byte val = (byte) ((1 - binaryImage.data[indexSrc++]) * 255);
-					data[rasterIndex++] = (byte)0xFF;
-					for (int i = 1; i < 4; i++) {
-						data[rasterIndex++] = val;
+			if (invert) {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
+					for (int x = 0; x < w; x++) {
+						byte val = (byte) (binaryImage.data[indexSrc++]==0?255:0);
+						data[rasterIndex++] = (byte)0xFF;
+						for (int i = 1; i < 4; i++) {
+							data[rasterIndex++] = val;
+						}
 					}
 				}
-			}
-		} else {
-			for (int y = 0; y < h; y++) {
-				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
-				for (int x = 0; x < w; x++) {
-					byte val = (byte) (binaryImage.data[indexSrc++] * 255);
-					data[rasterIndex++] = (byte)0xFF;
-					for (int i = 1; i < 4; i++) {
-						data[rasterIndex++] = val;
+			} else {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
+					for (int x = 0; x < w; x++) {
+						byte val = (byte) (binaryImage.data[indexSrc++]==0?0:255);
+						data[rasterIndex++] = (byte)0xFF;
+						for (int i = 1; i < 4; i++) {
+							data[rasterIndex++] = val;
+						}
 					}
 				}
 			}
 		}
-	}
 	}
 
 	private static void renderBinary(GrayU8 binaryImage, boolean invert,
@@ -470,14 +470,14 @@ public class VisualizeBinaryData {
 			for (int y = 0; y < h; y++) {
 				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
 				for (int x = 0; x < w; x++) {
-					data[rasterIndex++] = binaryImage.data[indexSrc++] > 0 ? 0 : 0xFFFFFFFF;
+					data[rasterIndex++] = binaryImage.data[indexSrc++] != 0 ? 0 : 0xFFFFFFFF;
 				}
 			}
 		} else {
 			for (int y = 0; y < h; y++) {
 				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
 				for (int x = 0; x < w; x++) {
-					data[rasterIndex++] = binaryImage.data[indexSrc++] > 0 ? 0xFFFFFFFF : 0;
+					data[rasterIndex++] = binaryImage.data[indexSrc++] != 0 ? 0xFFFFFFFF : 0;
 				}
 			}
 		}

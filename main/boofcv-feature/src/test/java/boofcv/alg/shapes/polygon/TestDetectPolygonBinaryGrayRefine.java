@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.UtilAffine;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -164,6 +165,20 @@ public class TestDetectPolygonBinaryGrayRefine extends CommonFitPolygonChecks {
 		assertTrue( errorRefined*5 < errorContour);
 	}
 
+	/**
+	 * See if it removes a polygon when bias reduces its size below the minimum
+	 */
+	@Test
+	public void removePolygonWhenAdjustMakesTooSmall() {
+		DetectPolygonBinaryGrayRefine alg = createAlg(GrayU8.class, 4,4);
+		alg.detector = new MockDetector();
+		alg.adjustForBias = new MockAdjustBias();
+
+		alg.process(new GrayU8(1,1),new GrayU8(1,1));
+
+		assertEquals(4,alg.getPolygonInfo().size());
+	}
+
 	@Override
 	public void renderPolygons(List<Polygon2D_F64> polygons, Class imageType ) {
 		super.renderPolygons(polygons,imageType);
@@ -194,6 +209,35 @@ public class TestDetectPolygonBinaryGrayRefine extends CommonFitPolygonChecks {
 
 	DetectPolygonBinaryGrayRefine createAlg( Class imageType, int minSides, int maxSides ) {
 		return FactoryShapeDetector.polygon(new ConfigPolygonDetector(minSides,maxSides),imageType);
+	}
+
+	class MockDetector<T extends ImageGray<T>> extends DetectPolygonFromContour<T> {
+
+		@Override
+		public void process(T gray, GrayU8 binary) {
+			foundInfo.reset();
+			for (int i = 0; i < 5; i++) {
+				Info info = foundInfo.grow();
+				info.polygon.vertexes.resize(4);
+			}
+		}
+
+		@Override
+		public int getMinimumSides() {
+			return 4;
+		}
+	}
+
+	class MockAdjustBias extends AdjustPolygonForThresholdBias {
+
+		int counter = 0;
+
+		@Override
+		public void process( Polygon2D_F64 polygon, boolean clockwise) {
+			if( counter++ == 2 ) {
+				polygon.vertexes.resize(3);
+			}
+		}
 	}
 
 }

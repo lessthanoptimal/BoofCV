@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -205,7 +205,7 @@ public class TestPnPLepetitEPnP {
 	@Test
 	public void extractNullPoints() {
 		// create a singular matrix
-		SimpleMatrix M = SimpleMatrix.wrap(RandomMatrices_DDRM.singleValues(12, 40, rand, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0));
+		SimpleMatrix M = SimpleMatrix.wrap(RandomMatrices_DDRM.singular(12, 40, rand, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0));
 
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 		alg.numControl = 4;

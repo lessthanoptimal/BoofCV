@@ -72,7 +72,7 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 		this.detector = detector;
 		if( images.size() == 0 )
 			throw new IllegalArgumentException("No images!");
-		BoofMiscOps.sortImageNames(images);
+		BoofMiscOps.sortFileNames(images);
 		calibrator = new CalibrateMonoPlanar(detector.getLayout());
 		this.images = images;
 		return calibrator;

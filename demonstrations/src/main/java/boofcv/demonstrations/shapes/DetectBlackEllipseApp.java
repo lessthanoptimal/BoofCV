@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.shapes;
 
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
@@ -97,7 +97,7 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 				if (controls.bShowContour) {
-					BinaryContourFinder contour = detector.getEllipseDetector().getContourFinder();
+					BinaryLabelContourFinder contour = detector.getEllipseDetector().getContourFinder();
 					List<Contour> contours = BinaryImageOps.convertContours(contour);
 
 					g2.setStroke(new BasicStroke(1));

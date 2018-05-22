@@ -19,13 +19,13 @@
 package boofcv.alg.shapes.polygon;
 
 import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryContourInterface;
 import boofcv.abst.shapes.polyline.PointsToPolyline;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.distort.PixelTransform2_F32;
-import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_I32;
@@ -77,7 +77,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private double minimumArea; // computed from minimumContour
 
 	private BinaryContourFinder contourFinder;
-	private GrayS32 labeled = new GrayS32(1,1);
+	private BinaryContourInterface.Padded contourPadded;
+	int imageWidth,imageHeight; // input image shape
 
 	// finds the initial polygon around a target candidate
 	private PointsToPolyline contourToPolyline;
@@ -87,7 +88,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private ContourEdgeIntensity<T> contourEdgeIntensity;
 
 	// extera information for found shapes
-	private FastQueue<Info> foundInfo = new FastQueue<>(Info.class, true);
+	FastQueue<Info> foundInfo = new FastQueue<>(Info.class, true);
 
 	// true if points touching the border are NOT pruned
 	private boolean canTouchBorder;
@@ -129,12 +130,9 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 	/**
 	 * Configures the detector.
-	 * @param minSides minimum number of sides
-	 * @param maxSides maximum number of sides
 	 * @param contourToPolyline Fits a crude polygon to the shape's binary contour
 	 * @param minimumContour Minimum allowed length of a contour.  Copy stored internally. Try 50 pixels.
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
-	 * @param convex If true it will only return convex shapes
 	 * @param touchBorder if true then shapes which touch the image border are allowed
 	 * @param contourEdgeThreshold Polygons with an edge intensity less than this are discarded.
 	 * @param inputType Type of input image it's processing
@@ -156,6 +154,10 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		this.contourFinder = contourFinder;
 		this.inputType = inputType;
 
+		if( contourFinder instanceof BinaryContourInterface.Padded) {
+			contourPadded = (BinaryContourInterface.Padded)contourFinder;
+		}
+
 		if( !this.contourToPolyline.isLoop() )
 			throw new IllegalArgumentException("ContourToPolygon must be configured for loops");
 
@@ -165,6 +167,11 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 		polygonWork = new Polygon2D_F64(1);
 	}
+
+	/**
+	 * For unit testing
+	 */
+	protected DetectPolygonFromContour(){}
 
 	/**
 	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted and the opposite
@@ -196,15 +203,23 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Examines the undistorted gray scake input image for squares.
+	 * Examines the undistorted gray scale input image for squares. If p
 	 *
 	 * @param gray Input image
 	 */
 	public void process(T gray, GrayU8 binary) {
 		if( verbose ) System.out.println("ENTER  DetectPolygonFromContour.process()");
-		InputSanityCheck.checkSameShape(binary, gray);
 
-		if( labeled.width != gray.width || labeled.height != gray.height )
+		if( contourPadded != null && !contourPadded.isCreatePaddedCopy() ) {
+			int padding = 2;
+			if( gray.width+padding != binary.width || gray.height+padding != binary.height ) {
+				throw new IllegalArgumentException("Including padding, expected a binary image with shape "
+				+ (gray.width+padding)+"x"+(gray.height+padding));
+			}
+		} else {
+			InputSanityCheck.checkSameShape(binary, gray);
+		}
+		if( imageWidth != gray.width || imageHeight != gray.height )
 			configure(gray.width,gray.height);
 
 		// reset storage for output. Call reset individually here to ensure that all references
@@ -220,7 +235,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		long time0 = System.nanoTime();
 
 		// find all the contours
-		contourFinder.process(binary, labeled);
+		contourFinder.process(binary);
 
 		long time1 = System.nanoTime();
 
@@ -246,11 +261,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 */
 	private void configure( int width , int height ) {
 
-//		milliContour = 0;
-//		milliShapes = 0;
-
-		// resize storage images
-		labeled.reshape(width, height);
+		this.imageWidth = width;
+		this.imageHeight = height;
 
 		// adjust size based parameters based on image size
 		this.minimumContour = minimumContourConfig.computeI(Math.min(width,height));
@@ -430,7 +442,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		for (int i = 0; i < polygon.size(); i++) {
 			Point2D_F64 p = polygon.get(i);
 
-			onImageBorder.add( p.x <= 1 || p.y <= 1 || p.x >= labeled.width-2 || p.y >= labeled.height-2);
+			onImageBorder.add( p.x <= 1 || p.y <= 1 || p.x >= imageWidth-2 || p.y >= imageHeight-2);
 		}
 	}
 
@@ -502,8 +514,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 * Checks to see if some part of the contour touches the image border.  Most likely cropped
 	 */
 	protected final boolean touchesBorder( List<Point2D_I32> contour ) {
-		int endX = labeled.width-1;
-		int endY = labeled.height-1;
+		int endX = imageWidth-1;
+		int endY = imageHeight-1;
 
 		for (int j = 0; j < contour.size(); j++) {
 			Point2D_I32 p = contour.get(j);
@@ -526,10 +538,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 	public void setConvex(boolean convex) {
 		contourToPolyline.setConvex(convex);
-	}
-
-	public GrayS32 getLabeled() {
-		return labeled;
 	}
 
 	public boolean isOutputClockwise() {

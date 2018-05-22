@@ -23,7 +23,7 @@ import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.affine.Affine2D_F32;
-import georegression.struct.shapes.EllipseRotated_F64;
+import georegression.struct.curve.EllipseRotated_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;

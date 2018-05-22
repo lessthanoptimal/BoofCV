@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -127,7 +127,7 @@ public class ImplRectifyImageOps_F32 {
 		float deltaY = -bound.y0*scale;
 
 		// adjustment matrix
-		SimpleMatrix A = new SimpleMatrix(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
+		SimpleMatrix A = new SimpleMatrix(3,3,true,new float[]{scale,0,deltaX,0,scale,deltaY,0,0,1});
 		SimpleMatrix rL = SimpleMatrix.wrap(rectifyLeft);
 		SimpleMatrix rR = SimpleMatrix.wrap(rectifyRight);
 		SimpleMatrix K = SimpleMatrix.wrap(rectifyK);
@@ -155,7 +155,7 @@ public class ImplRectifyImageOps_F32 {
 		float deltaY = -bound.y0*scale;
 
 		// adjustment matrix
-		SimpleMatrix A = new SimpleMatrix(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
+		SimpleMatrix A = new SimpleMatrix(3,3,true,new float[]{scale,0,deltaX,0,scale,deltaY,0,0,1});
 		SimpleMatrix rL = SimpleMatrix.wrap(rectifyLeft);
 		SimpleMatrix rR = SimpleMatrix.wrap(rectifyRight);
 

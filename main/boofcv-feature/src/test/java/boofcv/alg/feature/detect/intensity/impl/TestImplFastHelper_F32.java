@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,15 @@ import boofcv.struct.image.GrayF32;
 /**
  * @author Peter Abeles
  */
-public class TestImplFastHelper_F32 extends GenericImplFastHelperTests<GrayF32> {
+public class TestImplFastHelper_F32 extends GenericImplFastCornerInterfaceTests<GrayF32> {
 
 	public TestImplFastHelper_F32() {
-		super(GrayF32.class, new ImplFastHelper_F32(10), 10);
+		super(GrayF32.class, new ImplFastHelper_F32(10){
+			@Override
+			public int checkPixel(int index) {
+				return 0;
+			}
+		}, 10);
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,8 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-public class MergeRegionMeanShift extends RegionMergeTree {
+public class MergeRegionMeanShift extends RegionMergeTree
+{
 
 	// maximum distance squared in pixels that two nodes can be apart to be merged
 	private int maxSpacialDistanceSq;
@@ -65,9 +66,12 @@ public class MergeRegionMeanShift extends RegionMergeTree {
 						 GrowQueue_I32 regionMemberCount,
 						 FastQueue<float[]> regionColor ,
 						 FastQueue<Point2D_I32> modeLocation ) {
+		stopRequested = false;
 		initializeMerge(regionMemberCount.size);
 
 		markMergeRegions(regionColor,modeLocation,pixelToRegion);
+		if( stopRequested )
+			return;
 
 		performMerge(pixelToRegion, regionMemberCount);
 	}
@@ -80,7 +84,7 @@ public class MergeRegionMeanShift extends RegionMergeTree {
 	protected void markMergeRegions(FastQueue<float[]> regionColor,
 									FastQueue<Point2D_I32> modeLocation,
 									GrayS32 pixelToRegion  ) {
-		for( int targetId = 0; targetId < modeLocation.size; targetId++ ) {
+		for( int targetId = 0; targetId < modeLocation.size &&!stopRequested; targetId++ ) {
 
 			float[] color = regionColor.get(targetId);
 			Point2D_I32 location = modeLocation.get(targetId);

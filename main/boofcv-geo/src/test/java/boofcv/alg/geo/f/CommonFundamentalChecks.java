@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,7 @@ public abstract class CommonFundamentalChecks extends EpipolarTestSimulation {
 				boolean matchedAll = true;
 				for (AssociatedPair p : this.pairs) {
 					double val = GeometryMath_F64.innerProd(p.p2, F, p.p1);
-					if (val > zeroTol) {
+					if (Math.abs(val) > zeroTol) {
 						matchedAll = false;
 						break;
 					}

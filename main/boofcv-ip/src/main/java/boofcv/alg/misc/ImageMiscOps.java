@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.misc;
 
 import boofcv.struct.image.*;
 
+import java.util.Arrays;
 import java.util.Random;
 
 
@@ -45,8 +46,8 @@ public class ImageMiscOps {
 	 * @param input Input image
 	 * @param output output image
 	 */
-	public static void copy(int srcX , int srcY , int dstX , int dstY , int width , int height ,
-							GrayI8 input , GrayI8 output ) {
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 GrayI8 input , GrayI8 output ) {
 
 		if( input.width < srcX+width || input.height < srcY+height )
 			throw new IllegalArgumentException("Copy region must be contained input image");
@@ -73,9 +74,7 @@ public class ImageMiscOps {
 
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				input.data[index++] = (byte)value;
-			}
+			Arrays.fill(input.data,index,index+input.width, (byte)value);
 		}
 	}
 
@@ -90,9 +89,7 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			int end = index + input.width*input.numBands;
-			for (; index < end; index++ ) {
-				input.data[index] = (byte)value;
-			}
+			Arrays.fill(input.data,index,end, (byte)value);
 		}
 	}
 
@@ -143,7 +140,7 @@ public class ImageMiscOps {
 	 * @param band Which band the image is to be inserted into
 	 * @param output The multi-band image which the input image is to be inserted into
 	 */
-	public static void insertBand(GrayI8 input, int band , InterleavedI8 output) {
+	public static void insertBand( GrayI8 input, int band , InterleavedI8 output) {
 
 		final int numBands = output.numBands;
 		for (int y = 0; y < input.height; y++) {
@@ -242,7 +239,7 @@ public class ImageMiscOps {
 			}
 		}
 	}	/**
-	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X < max.
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
@@ -263,7 +260,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X < max.
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
@@ -414,7 +411,7 @@ public class ImageMiscOps {
 	/**
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
-	public static void rotateCW(GrayI8 input , GrayI8 output ) {
+	public static void rotateCW( GrayI8 input , GrayI8 output ) {
 		if( input.width != output.height || input.height != output.width )
 			throw new IllegalArgumentException("Incompatible shapes");
 
@@ -463,7 +460,7 @@ public class ImageMiscOps {
 	/**
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
-	public static void rotateCCW(GrayI8 input , GrayI8 output ) {
+	public static void rotateCCW( GrayI8 input , GrayI8 output ) {
 		if( input.width != output.height || input.height != output.width )
 			throw new IllegalArgumentException("Incompatible shapes");
 
@@ -490,8 +487,8 @@ public class ImageMiscOps {
 	 * @param input Input image
 	 * @param output output image
 	 */
-	public static void copy(int srcX , int srcY , int dstX , int dstY , int width , int height ,
-							GrayI16 input , GrayI16 output ) {
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 GrayI16 input , GrayI16 output ) {
 
 		if( input.width < srcX+width || input.height < srcY+height )
 			throw new IllegalArgumentException("Copy region must be contained input image");
@@ -518,9 +515,7 @@ public class ImageMiscOps {
 
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				input.data[index++] = (short)value;
-			}
+			Arrays.fill(input.data,index,index+input.width, (short)value);
 		}
 	}
 
@@ -535,9 +530,7 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			int end = index + input.width*input.numBands;
-			for (; index < end; index++ ) {
-				input.data[index] = (short)value;
-			}
+			Arrays.fill(input.data,index,end, (short)value);
 		}
 	}
 
@@ -588,7 +581,7 @@ public class ImageMiscOps {
 	 * @param band Which band the image is to be inserted into
 	 * @param output The multi-band image which the input image is to be inserted into
 	 */
-	public static void insertBand(GrayI16 input, int band , InterleavedI16 output) {
+	public static void insertBand( GrayI16 input, int band , InterleavedI16 output) {
 
 		final int numBands = output.numBands;
 		for (int y = 0; y < input.height; y++) {
@@ -687,7 +680,7 @@ public class ImageMiscOps {
 			}
 		}
 	}	/**
-	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X < max.
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
@@ -708,7 +701,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X < max.
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
@@ -859,7 +852,7 @@ public class ImageMiscOps {
 	/**
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
-	public static void rotateCW(GrayI16 input , GrayI16 output ) {
+	public static void rotateCW( GrayI16 input , GrayI16 output ) {
 		if( input.width != output.height || input.height != output.width )
 			throw new IllegalArgumentException("Incompatible shapes");
 
@@ -908,7 +901,7 @@ public class ImageMiscOps {
 	/**
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
-	public static void rotateCCW(GrayI16 input , GrayI16 output ) {
+	public static void rotateCCW( GrayI16 input , GrayI16 output ) {
 		if( input.width != output.height || input.height != output.width )
 			throw new IllegalArgumentException("Incompatible shapes");
 
@@ -935,8 +928,8 @@ public class ImageMiscOps {
 	 * @param input Input image
 	 * @param output output image
 	 */
-	public static void copy(int srcX , int srcY , int dstX , int dstY , int width , int height ,
-							GrayS32 input , GrayS32 output ) {
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 GrayS32 input , GrayS32 output ) {
 
 		if( input.width < srcX+width || input.height < srcY+height )
 			throw new IllegalArgumentException("Copy region must be contained input image");
@@ -963,9 +956,7 @@ public class ImageMiscOps {
 
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				input.data[index++] = value;
-			}
+			Arrays.fill(input.data,index,index+input.width, value);
 		}
 	}
 
@@ -980,9 +971,7 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			int end = index + input.width*input.numBands;
-			for (; index < end; index++ ) {
-				input.data[index] = value;
-			}
+			Arrays.fill(input.data,index,end, value);
 		}
 	}
 
@@ -1033,7 +1022,7 @@ public class ImageMiscOps {
 	 * @param band Which band the image is to be inserted into
 	 * @param output The multi-band image which the input image is to be inserted into
 	 */
-	public static void insertBand(GrayS32 input, int band , InterleavedS32 output) {
+	public static void insertBand( GrayS32 input, int band , InterleavedS32 output) {
 
 		final int numBands = output.numBands;
 		for (int y = 0; y < input.height; y++) {
@@ -1132,7 +1121,7 @@ public class ImageMiscOps {
 			}
 		}
 	}	/**
-	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X < max.
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
@@ -1153,7 +1142,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X < max.
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
@@ -1304,7 +1293,7 @@ public class ImageMiscOps {
 	/**
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
-	public static void rotateCW(GrayS32 input , GrayS32 output ) {
+	public static void rotateCW( GrayS32 input , GrayS32 output ) {
 		if( input.width != output.height || input.height != output.width )
 			throw new IllegalArgumentException("Incompatible shapes");
 
@@ -1353,7 +1342,7 @@ public class ImageMiscOps {
 	/**
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
-	public static void rotateCCW(GrayS32 input , GrayS32 output ) {
+	public static void rotateCCW( GrayS32 input , GrayS32 output ) {
 		if( input.width != output.height || input.height != output.width )
 			throw new IllegalArgumentException("Incompatible shapes");
 
@@ -1380,8 +1369,8 @@ public class ImageMiscOps {
 	 * @param input Input image
 	 * @param output output image
 	 */
-	public static void copy(int srcX , int srcY , int dstX , int dstY , int width , int height ,
-							GrayS64 input , GrayS64 output ) {
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 GrayS64 input , GrayS64 output ) {
 
 		if( input.width < srcX+width || input.height < srcY+height )
 			throw new IllegalArgumentException("Copy region must be contained input image");
@@ -1408,9 +1397,7 @@ public class ImageMiscOps {
 
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				input.data[index++] = value;
-			}
+			Arrays.fill(input.data,index,index+input.width, value);
 		}
 	}
 
@@ -1425,9 +1412,7 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			int end = index + input.width*input.numBands;
-			for (; index < end; index++ ) {
-				input.data[index] = value;
-			}
+			Arrays.fill(input.data,index,end, value);
 		}
 	}
 
@@ -1478,7 +1463,7 @@ public class ImageMiscOps {
 	 * @param band Which band the image is to be inserted into
 	 * @param output The multi-band image which the input image is to be inserted into
 	 */
-	public static void insertBand(GrayS64 input, int band , InterleavedS64 output) {
+	public static void insertBand( GrayS64 input, int band , InterleavedS64 output) {
 
 		final int numBands = output.numBands;
 		for (int y = 0; y < input.height; y++) {
@@ -1577,7 +1562,7 @@ public class ImageMiscOps {
 			}
 		}
 	}	/**
-	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X < max.
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
@@ -1598,7 +1583,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X < max.
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
@@ -1749,7 +1734,7 @@ public class ImageMiscOps {
 	/**
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
-	public static void rotateCW(GrayS64 input , GrayS64 output ) {
+	public static void rotateCW( GrayS64 input , GrayS64 output ) {
 		if( input.width != output.height || input.height != output.width )
 			throw new IllegalArgumentException("Incompatible shapes");
 
@@ -1798,7 +1783,7 @@ public class ImageMiscOps {
 	/**
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
-	public static void rotateCCW(GrayS64 input , GrayS64 output ) {
+	public static void rotateCCW( GrayS64 input , GrayS64 output ) {
 		if( input.width != output.height || input.height != output.width )
 			throw new IllegalArgumentException("Incompatible shapes");
 
@@ -1825,8 +1810,8 @@ public class ImageMiscOps {
 	 * @param input Input image
 	 * @param output output image
 	 */
-	public static void copy(int srcX , int srcY , int dstX , int dstY , int width , int height ,
-							GrayF32 input , GrayF32 output ) {
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 GrayF32 input , GrayF32 output ) {
 
 		if( input.width < srcX+width || input.height < srcY+height )
 			throw new IllegalArgumentException("Copy region must be contained input image");
@@ -1853,9 +1838,7 @@ public class ImageMiscOps {
 
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				input.data[index++] = value;
-			}
+			Arrays.fill(input.data,index,index+input.width, value);
 		}
 	}
 
@@ -1870,9 +1853,7 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			int end = index + input.width*input.numBands;
-			for (; index < end; index++ ) {
-				input.data[index] = value;
-			}
+			Arrays.fill(input.data,index,end, value);
 		}
 	}
 
@@ -1923,7 +1904,7 @@ public class ImageMiscOps {
 	 * @param band Which band the image is to be inserted into
 	 * @param output The multi-band image which the input image is to be inserted into
 	 */
-	public static void insertBand(GrayF32 input, int band , InterleavedF32 output) {
+	public static void insertBand( GrayF32 input, int band , InterleavedF32 output) {
 
 		final int numBands = output.numBands;
 		for (int y = 0; y < input.height; y++) {
@@ -2022,7 +2003,7 @@ public class ImageMiscOps {
 			}
 		}
 	}	/**
-	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X < max.
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
@@ -2043,7 +2024,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X < max.
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
@@ -2194,7 +2175,7 @@ public class ImageMiscOps {
 	/**
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
-	public static void rotateCW(GrayF32 input , GrayF32 output ) {
+	public static void rotateCW( GrayF32 input , GrayF32 output ) {
 		if( input.width != output.height || input.height != output.width )
 			throw new IllegalArgumentException("Incompatible shapes");
 
@@ -2243,7 +2224,7 @@ public class ImageMiscOps {
 	/**
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
-	public static void rotateCCW(GrayF32 input , GrayF32 output ) {
+	public static void rotateCCW( GrayF32 input , GrayF32 output ) {
 		if( input.width != output.height || input.height != output.width )
 			throw new IllegalArgumentException("Incompatible shapes");
 
@@ -2270,8 +2251,8 @@ public class ImageMiscOps {
 	 * @param input Input image
 	 * @param output output image
 	 */
-	public static void copy(int srcX , int srcY , int dstX , int dstY , int width , int height ,
-							GrayF64 input , GrayF64 output ) {
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 GrayF64 input , GrayF64 output ) {
 
 		if( input.width < srcX+width || input.height < srcY+height )
 			throw new IllegalArgumentException("Copy region must be contained input image");
@@ -2298,9 +2279,7 @@ public class ImageMiscOps {
 
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				input.data[index++] = value;
-			}
+			Arrays.fill(input.data,index,index+input.width, value);
 		}
 	}
 
@@ -2315,9 +2294,7 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			int end = index + input.width*input.numBands;
-			for (; index < end; index++ ) {
-				input.data[index] = value;
-			}
+			Arrays.fill(input.data,index,end, value);
 		}
 	}
 
@@ -2368,7 +2345,7 @@ public class ImageMiscOps {
 	 * @param band Which band the image is to be inserted into
 	 * @param output The multi-band image which the input image is to be inserted into
 	 */
-	public static void insertBand(GrayF64 input, int band , InterleavedF64 output) {
+	public static void insertBand( GrayF64 input, int band , InterleavedF64 output) {
 
 		final int numBands = output.numBands;
 		for (int y = 0; y < input.height; y++) {
@@ -2467,7 +2444,7 @@ public class ImageMiscOps {
 			}
 		}
 	}	/**
-	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X < max.
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
@@ -2488,7 +2465,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X < max.
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
@@ -2639,7 +2616,7 @@ public class ImageMiscOps {
 	/**
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
-	public static void rotateCW(GrayF64 input , GrayF64 output ) {
+	public static void rotateCW( GrayF64 input , GrayF64 output ) {
 		if( input.width != output.height || input.height != output.width )
 			throw new IllegalArgumentException("Incompatible shapes");
 
@@ -2688,7 +2665,7 @@ public class ImageMiscOps {
 	/**
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
-	public static void rotateCCW(GrayF64 input , GrayF64 output ) {
+	public static void rotateCCW( GrayF64 input , GrayF64 output ) {
 		if( input.width != output.height || input.height != output.width )
 			throw new IllegalArgumentException("Incompatible shapes");
 
@@ -2703,7 +2680,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayU8 input, Random rand , int min , int max) {
 		int range = max-min;
@@ -2723,7 +2700,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedU8 input, Random rand , int min , int max) {
 		int range = max-min;
@@ -2793,7 +2770,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayS8 input, Random rand , int min , int max) {
 		int range = max-min;
@@ -2813,7 +2790,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedS8 input, Random rand , int min , int max) {
 		int range = max-min;
@@ -2883,7 +2860,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayU16 input, Random rand , int min , int max) {
 		int range = max-min;
@@ -2903,7 +2880,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedU16 input, Random rand , int min , int max) {
 		int range = max-min;
@@ -2973,7 +2950,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayS16 input, Random rand , int min , int max) {
 		int range = max-min;
@@ -2993,7 +2970,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedS16 input, Random rand , int min , int max) {
 		int range = max-min;
@@ -3063,7 +3040,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayS32 input, Random rand , int min , int max) {
 		int range = max-min;
@@ -3080,7 +3057,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedS32 input, Random rand , int min , int max) {
 		int range = max-min;
@@ -3147,7 +3124,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayS64 input, Random rand , long min , long max) {
 		long range = max-min;
@@ -3164,7 +3141,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedS64 input, Random rand , long min , long max) {
 		long range = max-min;
@@ -3231,7 +3208,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayF32 input, Random rand , float min , float max) {
 		float range = max-min;
@@ -3248,7 +3225,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedF32 input, Random rand , float min , float max) {
 		float range = max-min;
@@ -3315,7 +3292,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayF64 input, Random rand , double min , double max) {
 		double range = max-min;
@@ -3332,7 +3309,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedF64 input, Random rand , double min , double max) {
 		double range = max-min;

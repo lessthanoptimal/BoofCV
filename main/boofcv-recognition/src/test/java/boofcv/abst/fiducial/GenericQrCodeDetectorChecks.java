@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeEncoder;
 import boofcv.alg.fiducial.qrcode.QrCodeGeneratorImage;
 import boofcv.alg.fiducial.qrcode.QrCodeMaskPattern;
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.ConvertImage;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.calibration.CalibrationIO;
@@ -175,15 +174,8 @@ public abstract class GenericQrCodeDetectorChecks {
 		generator.render(expected);
 
 		GrayU8 rendered = generator.getGray();
-		GrayU8 output = new GrayU8( rendered.width+50, rendered.height+50 );
 
-		ImageMiscOps.fill(output, 255);
-		output.subimage(25,25,output.width-25,output.height-25).setTo(rendered);
-
-		GrayF32 foo = new GrayF32(output.width,output.height);
-		ConvertImage.convert(output,foo);
-
-		return foo;
+		return ConvertImage.convert(rendered,(GrayF32)null);
 	}
 
 	private void renderAndCheck(QrCodeDetector<GrayF32> detector, SimulatePlanarWorld simulator) {

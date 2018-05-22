@@ -18,23 +18,28 @@
 
 package boofcv.demonstrations.feature.detect.intensity;
 
-import boofcv.abst.feature.detect.intensity.*;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
-import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
-import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.SimpleImageSequence;
+import boofcv.struct.QueueCorner;
 import boofcv.struct.image.*;
+import georegression.struct.point.Point2D_I16;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -45,6 +50,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +78,14 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 	AnyImageDerivative<T,D> deriv;
 
 	// used to compute feature intensity
-	GeneralFeatureIntensity<T,D> intensity;
+	GeneralFeatureDetector<T,D> detector;
+	final Object lockAlgorithm = new Object();
+
+	final Object lockCorners = new Object();
+	QueueCorner minimums = new QueueCorner();
+	QueueCorner maximums = new QueueCorner();
+
+	String[] names = new String[]{"Harris","Shi Tomasi","FAST","KitRos","Median","Laplacian","Hessian Det"};
 
 	public IntensityPointFeatureApp( List<String> examples , Class<T> imageType ) {
 		super(true,true,examples,ImageType.single(imageType));
@@ -84,6 +97,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		deriv = new AnyImageDerivative<>(GradientThree.getKernelX(isInteger), imageType, derivType);
 
 		controlPanel = new ControlPanel();
+		controlPanel.comboAlgorithm.setSelectedIndex(0);
 		add(BorderLayout.WEST,controlPanel);
 		add(BorderLayout.CENTER,imagePanel);
 
@@ -103,9 +117,17 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 	}
 
 	@Override
+	protected void configureVideo(int which, SimpleImageSequence sequence) {
+		sequence.setLoop(true);
+	}
+
+	@Override
 	protected void handleInputChange(int source, InputMethod method, int width, int height) {
 		visualized = ConvertBufferedImage.checkDeclare(width,height, visualized,BufferedImage.TYPE_INT_RGB);
 		imagePanel.setPreferredSize(new Dimension(width,height));
+
+		double scale = BoofSwingUtil.selectZoomToShowAll(imagePanel,width,height);
+		imagePanel.setScaleAndCenter(scale,width/2,height/2);
 	}
 
 	@Override
@@ -122,82 +144,166 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		D derivYY = deriv.getDerivative(false, false);
 		D derivXY = deriv.getDerivative(true, false);
 
-		intensity.process(gray, derivX, derivY, derivXX, derivYY, derivXY);
+		GrayF32 featureImg;
+		synchronized (lockAlgorithm) {
+			detector.process(gray, derivX, derivY, derivXX, derivYY, derivXY);
+			featureImg = detector.getIntensity();
+			VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
 
-		GrayF32 featureImg = intensity.getIntensity();
+			synchronized (lockCorners) {
+				minimums.reset();
+				minimums.addAll(detector.getMinimums());
 
-		VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
+				maximums.reset();
+				maximums.addAll(detector.getMaximums());
+			}
+		}
+
 
 		SwingUtilities.invokeLater(() -> {
-			imagePanel.setBufferedImageNoChange(visualized);
+			changeViewImage();
 			imagePanel.repaint();
 		});
 	}
 
+	private void changeViewImage() {
+		if( controlPanel.view == 0 || controlPanel.view == 2 ) {
+			imagePanel.setBufferedImageNoChange(visualized);
+		} else if( controlPanel.view == 1 ) {
+			imagePanel.setBufferedImageNoChange(original);
+		}
+	}
+
 	class DisplayPanel extends ShapeVisualizePanel {
+		Ellipse2D.Double circle = new Ellipse2D.Double();
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 			super.paintInPanel(tran, g2);
+			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-			if( controlPanel.showInput ) {
+			if(  controlPanel.view == 2 ) {
 				// this requires some explaining
 				// for some reason it was decided that the transform would apply a translation, but not a scale
 				// so this scale will be concatted on top of the translation in the g2
 				tran.setTransform(scale,0,0,scale,0,0);
+				Composite beforeAC = g2.getComposite();
 				AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f);
 				g2.setComposite(ac);
 				g2.drawImage(original,tran,null);
+				g2.setComposite(beforeAC);
+			}
+
+			if( controlPanel.showPeaks ) {
+				synchronized (lockCorners) {
+					g2.setStroke(new BasicStroke(3));
+					g2.setColor(Color.ORANGE);
+					for (int i = 0; i < minimums.size; i++) {
+						Point2D_I16 c = minimums.get(i);
+						VisualizeFeatures.drawCircle(g2, (c.x + 0.5) * scale, (c.y + 0.5) * scale, 5, circle);
+					}
+					g2.setColor(Color.BLUE);
+					for (int i = 0; i < maximums.size; i++) {
+						Point2D_I16 c = maximums.get(i);
+						VisualizeFeatures.drawCircle(g2, (c.x + 0.5) * scale, (c.y + 0.5) * scale, 5, circle);
+					}
+				}
 			}
 		}
 	}
 
-	class ControlPanel extends StandardAlgConfigPanel implements ActionListener , ChangeListener {
-		JComboBox<String> comboAlgorithm;
-		JCheckBox checkShowInput;
-		JSpinner spinnerRadius;
+	private void handleAlgorithmChanged() {
+		ConfigGeneralDetector config = new ConfigGeneralDetector();
+		config.radius = controlPanel.radius;
+		config.maxFeatures = 200;
 
-		List<GeneralFeatureIntensity<T,D>> algorithms = new ArrayList<>();
-		
-		boolean showInput = false;
+		synchronized (lockAlgorithm) {
+			switch (controlPanel.selected) {
+				case "Laplacian":
+					config.detectMinimums = true;
+					detector = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE,config,derivType);
+					break;
+				case "Hessian Det":
+					detector = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT,config,derivType);
+					break;
+
+				case "Harris":
+					detector = FactoryDetectPoint.createHarris(config,controlPanel.weighted,derivType);
+					break;
+
+				case "Shi Tomasi":
+					detector = FactoryDetectPoint.createShiTomasi(config,controlPanel.weighted,derivType);
+					break;
+				case "FAST":
+					config.detectMinimums = true;
+					detector = FactoryDetectPoint.createFast(null,config,imageType);
+					break;
+				case "KitRos":
+					detector = FactoryDetectPoint.createKitRos(config,derivType);
+					break;
+				case "Median":
+					detector = FactoryDetectPoint.createMedian(config,imageType);
+					break;
+
+				default:
+					throw new RuntimeException("Unknown exception");
+			}
+		}
+
+		reprocessImageOnly();
+	}
+
+	class ControlPanel extends StandardAlgConfigPanel implements ActionListener , ChangeListener {
+		JComboBox<String> comboView;
+		JComboBox<String> comboAlgorithm;
+		JSpinner spinnerRadius;
+		JCheckBox checkWeighted;
+		JCheckBox checkShowLocalMax;
+
+		String selected = null;
 		int radius = 2;
+		boolean weighted=false;
+		boolean showPeaks =false;
+		int view = 0;
 
 		public ControlPanel() {
 			comboAlgorithm = new JComboBox<>();
 
-			checkShowInput = checkbox("Show Input",showInput);
-			spinnerRadius = spinner(radius,1,100,1);
+			comboView = combo(view,"Intensity","Image","Both");
+			spinnerRadius = spinner(radius, 1, 100, 1);
+			checkWeighted = checkbox("weighted", weighted);
+			checkShowLocalMax = checkbox("Show Maximums", showPeaks);
 
-			addAlgorithm( "Laplacian", new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.TRACE,derivType));
-			addAlgorithm( "Hessian Det", new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));
-			addAlgorithm( "Harris",new WrapperGradientCornerIntensity<T,D>(FactoryIntensityPointAlg.harris(2, 0.4f, false, derivType)));
-			addAlgorithm( "Harris Weighted",new WrapperGradientCornerIntensity<T,D>(FactoryIntensityPointAlg.harris(2, 0.4f, true, derivType)));
-			addAlgorithm( "Shi Tomasi",new WrapperGradientCornerIntensity<T,D>( FactoryIntensityPointAlg.shiTomasi(2, false, derivType)));
-			addAlgorithm( "Shi Tomasi Weighted",new WrapperGradientCornerIntensity<T,D>( FactoryIntensityPointAlg.shiTomasi(2, true, derivType)));
-			addAlgorithm( "FAST",new WrapperFastCornerIntensity<T,D>(FactoryIntensityPointAlg.fast(5, 11, imageType)));
-			addAlgorithm( "KitRos",new WrapperKitRosCornerIntensity<T,D>(derivType));
-			addAlgorithm( "Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(imageType,2),imageType));
+			for (String name : names) {
+				comboAlgorithm.addItem(name);
+			}
 			comboAlgorithm.addActionListener(this);
+			comboView.setPreferredSize(comboAlgorithm.getPreferredSize());
+			comboView.setMaximumSize(comboAlgorithm.getPreferredSize());
 			comboAlgorithm.setMaximumSize(comboAlgorithm.getPreferredSize());
-			intensity = algorithms.get(comboAlgorithm.getSelectedIndex());
 
-			addAlignCenter(comboAlgorithm);
-			addAlignLeft(checkShowInput);
-//			addLabeled(spinnerRadius,"Radius");
-
-		}
-		
-		private void addAlgorithm( String name , GeneralFeatureIntensity algorithm ) {
-			comboAlgorithm.addItem(name);
-			algorithms.add(algorithm);
+			addLabeled(comboView,"View");
+			addLabeled(comboAlgorithm,"Detector");
+			addAlignLeft(checkShowLocalMax);
+			addAlignLeft(checkWeighted);
+			addLabeled(spinnerRadius,"Radius");
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if( e.getSource() == comboAlgorithm ) {
-				intensity = algorithms.get(comboAlgorithm.getSelectedIndex());
-				reprocessInput();
-			} else if( e.getSource() == checkShowInput ) {
-				showInput = checkShowInput.isSelected();
+				selected = (String)comboAlgorithm.getSelectedItem();
+				updateEnabledControls();
+				handleAlgorithmChanged();
+			} else if( e.getSource() == checkWeighted ) {
+				weighted = checkWeighted.isSelected();
+				handleAlgorithmChanged();
+			} else if( e.getSource() == comboView ) {
+				view = comboView.getSelectedIndex();
+				changeViewImage();
+				imagePanel.repaint();
+			} else if( e.getSource() == checkShowLocalMax ) {
+				showPeaks = checkShowLocalMax.isSelected();
 				imagePanel.repaint();
 			}
 		}
@@ -205,8 +311,29 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			if( e.getSource() == spinnerRadius ) {
-
+				radius = ((Number)spinnerRadius.getValue()).intValue();
+				handleAlgorithmChanged();
 			}
+		}
+
+		private void updateEnabledControls() {
+			boolean activeRadius = false;
+			boolean activeWeighted = false;
+
+			switch( selected ) {
+				case "Harris":
+				case "Shi Tomasi":
+					activeRadius = true;
+					activeWeighted = true;
+					break;
+
+				case "Median":
+					activeRadius = true;
+					break;
+			}
+
+			spinnerRadius.setEnabled(activeRadius);
+			checkWeighted.setEnabled(activeWeighted);
 		}
 	}
 
@@ -218,6 +345,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		examples.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		examples.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
 		examples.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
+		examples.add(new PathLabel("Chessboard Movie",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 
 		IntensityPointFeatureApp<GrayU8, GrayS16> app = new IntensityPointFeatureApp(examples,GrayU8.class);
 

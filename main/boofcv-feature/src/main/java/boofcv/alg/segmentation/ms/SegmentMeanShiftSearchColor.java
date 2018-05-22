@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,6 +77,7 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand<T>> extends Se
 	public void process( T image ) {
 		// initialize data structures
 		this.image = image;
+		this.stopRequested = false;
 
 		modeLocation.reset();
 		modeColor.reset();
@@ -93,7 +94,7 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand<T>> extends Se
 
 		// use mean shift to find the peak of each pixel in the image
 		int indexImg = 0;
-		for( int y = 0; y < image.height; y++ ) {
+		for( int y = 0; y < image.height && !stopRequested; y++ ) {
 			for( int x = 0; x < image.width; x++ , indexImg++ ) {
 				if( pixelToMode.data[indexImg] != -1 ) {
 					int peakIndex = pixelToMode.data[indexImg];

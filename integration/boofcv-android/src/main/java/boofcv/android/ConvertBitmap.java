@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.android;
 
 import android.graphics.Bitmap;
+import boofcv.alg.color.ColorFormat;
 import boofcv.struct.image.*;
 
 import java.nio.ByteBuffer;
@@ -59,6 +60,9 @@ public class ConvertBitmap {
 	 */
 	public static <T extends ImageBase<T>>
 	void bitmapToBoof( Bitmap input , T output , byte[] storage) {
+
+		if( BOverrideConvertAndroid.invokeBitmapToBoof(input,output,storage))
+			return;
 
 		switch( output.getImageType().getFamily() ) {
 			case GRAY: {
@@ -167,10 +171,10 @@ public class ConvertBitmap {
 	public static <T extends ImageGray<T>>
 	Planar<T> bitmapToPlanar(Bitmap input , Planar<T> output , Class<T> type , byte[] storage ) {
 		if( output == null ) {
-			output = new Planar<>(type, input.getWidth(), input.getHeight(), 4);
+			output = new Planar<>(type, input.getWidth(), input.getHeight(), 3);
 		} else {
-			output.reshape(input.getWidth(), input.getHeight());
-			output.setNumberOfBands(4);
+			int numBands = Math.min(4,Math.max(3,output.getNumBands()));
+			output.reshape(input.getWidth(), input.getHeight(),numBands);
 		}
 
 		if( storage == null )
@@ -197,8 +201,11 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static void boofToBitmap( ImageBase input , Bitmap output , byte[] storage) {
+		if( BOverrideConvertAndroid.invokeBoofToBitmap(ColorFormat.RGB,input,output,storage))
+			return;
+
 		if( input instanceof Planar ) {
-			multiToBitmap((Planar)input,output,storage);
+			planarToBitmap((Planar)input,output,storage);
 		} else if( input instanceof ImageGray ) {
 			grayToBitmap((ImageGray)input,output,storage);
 		} else if( input instanceof ImageInterleaved ) {
@@ -206,6 +213,30 @@ public class ConvertBitmap {
 		} else {
 			throw new IllegalArgumentException("Unsupported input image type");
 		}
+	}
+
+	public static void boofToBitmap(ColorFormat color, ImageBase input , Bitmap output , byte[] storage) {
+		if( BOverrideConvertAndroid.invokeBoofToBitmap(color,input,output,storage))
+			return;
+
+		if( input instanceof ImageGray ) {
+			grayToBitmap((ImageGray)input,output,storage);
+		}
+
+		switch( color ) {
+			case RGB:{
+				boofToBitmap(input,output,storage);
+			}return;
+
+			case YUV:{
+				if( input instanceof ImageInterleaved ) {
+					interleavedYuvToBitmap((ImageInterleaved)input, output, storage);
+					return;
+				}
+			}break;
+		}
+		throw new IllegalArgumentException("Unsupported input image type");
+
 	}
 
 	/**
@@ -278,7 +309,7 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static <T extends ImageGray<T>>
-	void multiToBitmap(  Planar<T> input , Bitmap output , byte[] storage ) {
+	void planarToBitmap(Planar<T> input , Bitmap output , byte[] storage ) {
 		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
@@ -320,6 +351,30 @@ public class ConvertBitmap {
 		else
 			throw new IllegalArgumentException("Unsupported BoofCV Type");
 		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+	}
+
+	public static <T extends ImageInterleaved<T>>
+	void interleavedYuvToBitmap(T input, Bitmap output, byte[] storage) {
+		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
+			throw new IllegalArgumentException("Image shapes are not the same");
+		}
+
+		if( storage == null )
+			storage = declareStorage(output,null);
+
+		if( input.getImageType().getDataType() == ImageDataType.U8 ) {
+			switch( output.getConfig() ) {
+				case ARGB_8888:
+					ImplConvertBitmap.interleavedYuvToArgb8888((InterleavedU8) input, storage);
+					output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+					return;
+				case RGB_565:
+					ImplConvertBitmap.interleavedYuvToRGB565((InterleavedU8) input, storage);
+					output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+					return;
+			}
+		}
+		throw new IllegalArgumentException("Unsupported BoofCV Type");
 	}
 	
 	/**

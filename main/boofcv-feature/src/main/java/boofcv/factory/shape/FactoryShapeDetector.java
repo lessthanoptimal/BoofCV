@@ -112,7 +112,7 @@ public class FactoryShapeDetector {
 		PointsToPolyline contourToPolygon =
 				FactoryPointsToPolyline.create(config.contourToPoly);
 
-		BinaryContourFinder contour = FactoryBinaryContourFinder.linearChang2004();
+		BinaryContourFinder contour = FactoryBinaryContourFinder.linearExternal();
 		contour.setConnectRule(config.contourRule);
 
 		return new DetectPolygonFromContour<>(contourToPolygon,

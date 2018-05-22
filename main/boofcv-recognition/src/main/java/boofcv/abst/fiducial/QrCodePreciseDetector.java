@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.abst.fiducial;
 
+import boofcv.abst.filter.binary.BinaryContourHelper;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeDecoderImage;
@@ -41,7 +42,7 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 	InputToBinary<T> inputToBinary;
 	Class<T> imageType;
 
-	GrayU8 binary = new GrayU8(1,1);
+	BinaryContourHelper contourHelper;
 
 	// runtime profiling
 	boolean profiler = false;
@@ -49,26 +50,27 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 	protected MovingAverage milliDecoding = new MovingAverage(0.8);
 
 	public QrCodePreciseDetector(InputToBinary<T> inputToBinary,
-								 QrCodePositionPatternDetector<T> detectPositionPatterns ,
-								 Class<T> imageType ) {
+								 QrCodePositionPatternDetector<T> detectPositionPatterns,
+								 boolean copyBinary, Class<T> imageType) {
 		this.inputToBinary = inputToBinary;
 		this.detectPositionPatterns = detectPositionPatterns;
 		this.decoder = new QrCodeDecoderImage<>(imageType);
 		this.imageType = imageType;
+		this.contourHelper = new BinaryContourHelper(detectPositionPatterns.getSquareDetector().getDetector().getContourFinder(),copyBinary);
 	}
 
 	@Override
 	public void process(T gray) {
 		long time0 = System.nanoTime();
-		binary.reshape(gray.width,gray.height);
-		inputToBinary.process(gray,binary);
+		contourHelper.reshape(gray.width,gray.height);
+		inputToBinary.process(gray,contourHelper.withoutPadding());
 		long time1 = System.nanoTime();
 		milliBinary.update((time1-time0)*1e-6);
 
 		if( profiler )
 			System.out.printf("qrcode: binary %5.2f ",milliBinary.getAverage());
 
-		detectPositionPatterns.process(gray,binary);
+		detectPositionPatterns.process(gray,contourHelper.padded());
 		time0 = System.nanoTime();
 		decoder.process(detectPositionPatterns.getPositionPatterns(),gray);
 		time1 = System.nanoTime();
@@ -89,7 +91,7 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 	}
 
 	public GrayU8 getBinary() {
-		return binary;
+		return contourHelper.withoutPadding();
 	}
 
 	public void setProfilerState( boolean active ) {

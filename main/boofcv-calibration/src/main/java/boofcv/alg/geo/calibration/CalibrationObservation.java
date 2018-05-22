@@ -75,6 +75,10 @@ public class CalibrationObservation {
 		points.add(new PointIndex2D_F64(observation, which));
 	}
 
+	public void add( double x , double y , int which ) {
+		points.add(new PointIndex2D_F64(x,y, which));
+	}
+
 	public void reset() {
 		points.clear();
 		this.width = 0;

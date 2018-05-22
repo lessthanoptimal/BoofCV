@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,9 +101,10 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 						 GrayS32 pixelToRegion ,
 						 GrowQueue_I32 regionMemberCount,
 						 FastQueue<float[]> regionColor ) {
+		stopRequested = false;
 
 		// iterate until no more regions need to be merged together
-		while( true ) {
+		while( !stopRequested ) {
 
 			// Update the color of each region
 			regionColor.resize(regionMemberCount.size);

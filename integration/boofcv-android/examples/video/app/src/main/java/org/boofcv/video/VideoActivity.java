@@ -19,118 +19,120 @@
 
 package org.boofcv.video;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.hardware.Camera;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.os.Bundle;
+import android.view.SurfaceView;
+import android.widget.FrameLayout;
 
-import java.util.List;
-
-import boofcv.android.camera.VideoDisplayActivity;
+import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.android.ConvertBitmap;
+import boofcv.android.VisualizeImageData;
+import boofcv.android.camera2.VisualizeCamera2Activity;
+import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 /**
- * Demonstration of how to process a video stream on an Android device using BoofCV.  Most of the drudgery of
- * video processing is handled by {@link VideoDisplayActivity}.  This class still needs to tell it which
- * camera to use and needs to select the optimal resolution.  The actual processing is done by {@link ShowGradient}
- * which is passed into the super class when {@link #onResume()} is called.
+ * Demonstrates how to use the visualize activity. This greatly simplifies
+ * the process of capturing and visualizing image data from a camera.
+ * Internally it uses the camera 2 API. You can customize its behavior by overriding
+ * different internal functions.
+ *
+ * @see VisualizeCamera2Activity
+ * @see boofcv.android.camera2.SimpleCamera2Activity
  *
  * @author Peter Abeles
  */
-public class VideoActivity extends VideoDisplayActivity
+public class VideoActivity extends VisualizeCamera2Activity
 {
-	@Override
-	protected void onResume() {
-		super.onResume();
-		setProcessing( new ShowGradient());
+	// Storage for the gradient
+	private GrayS16 derivX = new GrayS16(1,1);
+	private GrayS16 derivY = new GrayS16(1,1);
 
-		// for fun you can display the FPS by uncommenting the line below.
-		// The FPS will vary depending on processing time and shutter speed,
-		// which is dependent on lighting conditions
-//		setShowFPS(true);
+	// computes the image gradient
+	private ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.three(GrayU8.class, GrayS16.class);
+
+	public VideoActivity() {
+		// The default behavior for selecting the camera's resolution is to
+		// find the resolution which comes the closest to having this many
+		// pixels.
+		targetResolution = 640*480;
+		// This behavior can be changed as well as which camera is selected
+		// by overriding functions defined in SimpleCamera2Activity
+
+		// Tell the visualization activity that we want to handle
+		// rendering the bitmap. If this is set to false it will overwrite our
+		// changes
+		super.showBitmap = false;
 	}
 
 	@Override
-	protected Camera openConfigureCamera( Camera.CameraInfo cameraInfo )
-	{
-		Camera mCamera = selectAndOpenCamera(cameraInfo);
-		Camera.Parameters param = mCamera.getParameters();
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-		// Select the preview size closest to 320x240
-		// Smaller images are recommended because some computer vision operations are very expensive
-		List<Camera.Size> sizes = param.getSupportedPreviewSizes();
-		Camera.Size s = sizes.get(closest(sizes,320,240));
-		param.setPreviewSize(s.width,s.height);
-		mCamera.setParameters(param);
+		setContentView(R.layout.video);
+		FrameLayout surface = findViewById(R.id.camera_frame);
 
-		return mCamera;
+		// Tell it that a gray scale image is being processed. It will
+		// automatically convert the video frame into this format
+		// RGB is also supported
+		setImageType(ImageType.single(GrayU8.class));
+
+		// The bitmap modified below will be draw in the surface provided
+		// to start camera. A camera preview can also be shown by providing
+		// a texture view.
+		startCamera(surface,null);
 	}
 
 	/**
-	 * Step through the camera list and select a camera.  It is also possible that there is no camera.
-	 * The camera hardware requirement in AndroidManifest.xml was turned off so that devices with just
-	 * a front facing camera can be found.  Newer SDK's handle this in a more sane way, but with older devices
-	 * you need this work around.
+	 * This is called when the video resolution is known. Data structures
+	 * can be initialized now.
 	 */
-	private Camera selectAndOpenCamera(Camera.CameraInfo info) {
-		int numberOfCameras = Camera.getNumberOfCameras();
+	@Override
+	protected void onCameraResolutionChange( int width , int height ) {
+		super.onCameraResolutionChange(width, height);
 
-		int selected = -1;
+		derivX.reshape(width, height);
+		derivY.reshape(width, height);
 
-		for (int i = 0; i < numberOfCameras; i++) {
-			Camera.getCameraInfo(i, info);
-
-			if( info.facing == Camera.CameraInfo.CAMERA_FACING_BACK ) {
-				selected = i;
-				break;
-			} else {
-				// default to a front facing camera if a back facing one can't be found
-				selected = i;
-			}
-		}
-
-		if( selected == -1 ) {
-			dialogNoCamera();
-			return null; // won't ever be called
-		} else {
-			return Camera.open(selected);
+		// If showBitmap was set to false you wouldn't need to do this
+		synchronized (bitmapLock) {
+			if (bitmap.getWidth() != width || bitmap.getHeight() != height)
+				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+			bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
 		}
 	}
 
 	/**
-	 * Gracefully handle the situation where a camera could not be found
+	 * This function is invoked in its own thread and can take as long as you want.
 	 */
-	private void dialogNoCamera() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage("Your device has no cameras!")
-				.setCancelable(false)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						System.exit(0);
-					}
-				});
-		AlertDialog alert = builder.create();
-		alert.show();
+	@Override
+	protected void processImage(ImageBase image) {
+		// The image type for image was specified in onResume()
+		gradient.process((GrayU8)image,derivX,derivY);
+
+		// the bitmap will be rendered onto surface previded earlier
+		synchronized (bitmapLock) {
+			VisualizeImageData.colorizeGradient(derivX,derivY,-1, bitmap, bitmapTmp);
+		}
 	}
 
 	/**
-	 * Goes through the size list and selects the one which is the closest specified size
+	 * Invoked in the UI thread and must run very fast for a good user experience
 	 */
-	public static int closest( List<Camera.Size> sizes , int width , int height ) {
-		int best = -1;
-		int bestScore = Integer.MAX_VALUE;
+	@Override
+	protected void onDrawFrame(SurfaceView view , Canvas canvas ) {
+		super.onDrawFrame(view, canvas);
 
-		for( int i = 0; i < sizes.size(); i++ ) {
-			Camera.Size s = sizes.get(i);
-
-			int dx = s.width-width;
-			int dy = s.height-height;
-
-			int score = dx*dx + dy*dy;
-			if( score < bestScore ) {
-				best = i;
-				bestScore = score;
-			}
+		// The imageToView variable specifies the transform from a video frame pixel
+		// to a pixel in the view it's being displayed in. Sensor and camera rotations
+		// as well as scaling along x and y axises are all handled.
+		synchronized (bitmapLock) {
+			canvas.drawBitmap(bitmap, imageToView, null);
 		}
-
-		return best;
 	}
+
 }

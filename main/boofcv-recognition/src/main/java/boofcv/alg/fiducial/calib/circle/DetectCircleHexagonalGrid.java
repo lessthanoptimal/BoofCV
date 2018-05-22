@@ -18,12 +18,12 @@
 
 package boofcv.alg.fiducial.calib.circle;
 
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.struct.image.ImageGray;
-import georegression.struct.shapes.EllipseRotated_F64;
+import georegression.struct.curve.EllipseRotated_F64;
 
 /**
  * <p>Detects a hexagonal circle grid. Circles are spaced such that center of each circle is the same distance from
@@ -76,7 +76,7 @@ public class DetectCircleHexagonalGrid<T extends ImageGray<T>> extends DetectCir
 		// isn't correct
 		int diameter = Math.max(gray.width,gray.height)/(Math.max(numCols,numRows));
 
-		BinaryContourFinder contourFinder = ellipseDetector.getEllipseDetector().getContourFinder();
+		BinaryLabelContourFinder contourFinder = ellipseDetector.getEllipseDetector().getContourFinder();
 		contourFinder.setMaxContour((int)(Math.PI*diameter*3)+1);
 		contourFinder.setSaveInnerContour(false);
 	}

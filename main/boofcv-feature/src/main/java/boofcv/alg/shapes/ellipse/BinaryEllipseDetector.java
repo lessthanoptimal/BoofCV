@@ -22,8 +22,8 @@ import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_I32;
-import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;

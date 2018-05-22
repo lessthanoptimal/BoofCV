@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,4 +38,15 @@ public abstract class ImageMultiBand<T extends ImageMultiBand<T>> extends ImageB
 	 * @param bands number of bands
 	 */
 	public abstract void setNumberOfBands( int bands );
+
+	/**
+	 * Reshape for MultiBand images which allows the number of bands to be changed a the same time too
+	 * @param width Desired image width
+	 * @param height Desired image height
+	 * @param numberOfBands Desired number of bands
+	 */
+	public void reshape( int width , int height , int numberOfBands ) {
+		reshape(width, height);
+		setNumberOfBands(numberOfBands);
+	}
 }

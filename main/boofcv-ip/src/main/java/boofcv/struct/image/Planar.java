@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -204,6 +204,11 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	 */
 	@Override
 	public void reshape(int width, int height) {
+		if( this.width == width && this.height == height )
+			return;
+
+		if( isSubimage() )
+			throw new IllegalArgumentException("Can't reshape subimage");
 
 		for( int i = 0; i < bands.length; i++ ) {
 			bands[i].reshape(width,height);
@@ -213,6 +218,29 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 		this.stride = width;
 		this.width = width;
 		this.height = height;
+	}
+
+	@Override
+	public void reshape(int width, int height, int numberOfBands) {
+		if( getNumBands() != numberOfBands ) {
+			if( isSubimage() )
+				throw new RuntimeException("Can't reshape subimage");
+
+			T[] bands = (T[]) Array.newInstance(type, numberOfBands);
+			int N = Math.min(numberOfBands, this.bands.length );
+			for (int i = 0; i < N; i++) {
+				bands[i] = this.bands[i];
+				bands[i].reshape(width, height);
+			}
+			for (int i = N; i < bands.length; i++) {
+				bands[i] = GeneralizedImageOps.createSingleBand(type, width, height);
+			}
+			this.bands = bands;
+			this.width = width;
+			this.height = height;
+		} else {
+			reshape(width, height);
+		}
 	}
 
 	/**
@@ -282,6 +310,8 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	}
 
 	public void setBandType(Class<T> type) {
+		if( this.type != null && this.type != type )
+			throw new RuntimeException("Once the band type has been set you can't change it");
 		this.type = type;
 	}
 

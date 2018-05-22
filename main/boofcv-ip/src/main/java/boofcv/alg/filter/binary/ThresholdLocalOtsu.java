@@ -157,11 +157,6 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 		}
 	}
 
-	@Override
-	public ImageType<GrayU8> getInputType() {
-		return null;
-	}
-
 	private void applyToBlock( int x0 , int y0 , int x1 , int y1 , GrayU8 input , GrayU8 output ) {
 
 		final byte a,b;
@@ -212,7 +207,8 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 		otsu.compute(histogram,histogram.length,numPixels);
 	}
 
-	public ImageType<GrayU8> getImageType() {
+	@Override
+	public ImageType<GrayU8> getInputType() {
 		return imageType;
 	}
 

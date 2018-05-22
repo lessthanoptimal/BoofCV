@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.trifocal;
 
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.geo.NormalizationPoint2D;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -80,9 +81,9 @@ public class TestEnforceTrifocalGeometry extends CommonTrifocalChecks {
 		// create linear constraint matrix
 		TrifocalLinearPoint7 constructA = new TrifocalLinearPoint7();
 		// Make things easier by working in pixel coordinates
-		constructA.N1 = CommonOps_DDRM.identity(3);
-		constructA.N2 = CommonOps_DDRM.identity(3);
-		constructA.N3 = CommonOps_DDRM.identity(3);
+		constructA.N1 = new NormalizationPoint2D(0,1,0,1);
+		constructA.N2 = new NormalizationPoint2D(0,1,0,1);
+		constructA.N3 = new NormalizationPoint2D(0,1,0,1);
 
 		constructA.createLinearSystem(observations);
 

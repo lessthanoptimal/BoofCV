@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,14 +23,16 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.ddogleg.struct.Stoppable;
 
 /**
  * Wrapper around {@link SegmentSlic} for {@link ImageSuperpixels}.
  *
  * @author Peter Abeles
  */
-public class Slic_to_ImageSuperpixels<T extends ImageBase<T>> implements ImageSuperpixels<T> {
-
+public class Slic_to_ImageSuperpixels<T extends ImageBase<T>>
+		implements ImageSuperpixels<T> , Stoppable
+{
 	SegmentSlic<T> slic;
 
 	public Slic_to_ImageSuperpixels(SegmentSlic<T> slic) {
@@ -55,5 +57,15 @@ public class Slic_to_ImageSuperpixels<T extends ImageBase<T>> implements ImageSu
 	@Override
 	public ImageType<T> getImageType() {
 		return slic.getImageType();
+	}
+
+	@Override
+	public void requestStop() {
+		slic.requestStop();
+	}
+
+	@Override
+	public boolean isStopRequested() {
+		return slic.isStopRequested();
 	}
 }

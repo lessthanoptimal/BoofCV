@@ -21,17 +21,19 @@ package boofcv.factory.geo;
 import boofcv.abst.geo.*;
 import boofcv.abst.geo.bundle.BundleAdjustmentCalibratedDense;
 import boofcv.abst.geo.f.*;
+import boofcv.abst.geo.h.HomographyDLT_to_Epipolar;
+import boofcv.abst.geo.h.HomographyTLS_to_Epipolar;
 import boofcv.abst.geo.h.LeastSquaresHomography;
-import boofcv.abst.geo.h.WrapHomographyLinear;
 import boofcv.abst.geo.pose.*;
 import boofcv.abst.geo.triangulate.*;
 import boofcv.abst.geo.trifocal.WrapTrifocalAlgebraicPoint7;
 import boofcv.abst.geo.trifocal.WrapTrifocalLinearPoint7;
 import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.alg.geo.f.DistanceEpipolarConstraint;
-import boofcv.alg.geo.h.HomographyLinear4;
+import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.alg.geo.h.HomographyResidualSampson;
 import boofcv.alg.geo.h.HomographyResidualTransfer;
+import boofcv.alg.geo.h.HomographyTotalLeastSquares;
 import boofcv.alg.geo.pose.P3PFinsterwalder;
 import boofcv.alg.geo.pose.P3PGrunert;
 import boofcv.alg.geo.pose.PnPLepetitEPnP;
@@ -67,18 +69,30 @@ public class FactoryMultiView {
 	}
 
 	/**
-	 * Returns an algorithm for estimating a homography matrix given a set of
-	 * {@link AssociatedPair}.
+	 * Returns an algorithm for estimating a homography matrix given a set of {@link AssociatedPair}.
 	 *
-	 * @see HomographyLinear4
+	 * @see HomographyDirectLinearTransform
 	 *
 	 * @param normalizeInput If input is in pixel coordinates set to true.  False if in normalized image coordinates.
 	 * @return Homography estimator.
 	 */
-	public static Estimate1ofEpipolar computeHomography( boolean normalizeInput ) {
-		HomographyLinear4 alg = new HomographyLinear4(normalizeInput);
-		return new WrapHomographyLinear(alg);
+	public static Estimate1ofEpipolar computeHomographyDLT(boolean normalizeInput ) {
+		HomographyDirectLinearTransform alg = new HomographyDirectLinearTransform(normalizeInput);
+		return new HomographyDLT_to_Epipolar(alg);
 	}
+
+	/**
+	 * Returns an algorithm for estimating a homography matrix given a set of {@link AssociatedPair}.
+	 *
+	 * @see HomographyTotalLeastSquares
+	 *
+	 * @return Homography estimator.
+	 */
+	public static Estimate1ofEpipolar computeHomographyTLS() {
+		HomographyTotalLeastSquares alg = new HomographyTotalLeastSquares();
+		return new HomographyTLS_to_Epipolar(alg);
+	}
+
 
 	/**
 	 * Creates a non-linear optimizer for refining estimates of homography matrices.
@@ -310,6 +324,10 @@ public class FactoryMultiView {
 			case EPNP:
 				Estimate1ofPnP epnp = computePnP_1(which,numIterations,0);
 				return new Estimate1toNofPnP(epnp);
+
+			case IPPE:
+				Estimate1ofEpipolar H = FactoryMultiView.computeHomographyTLS();
+				return new Estimate1toNofPnP(new IPPE_to_EstimatePnP(H));
 		}
 
 		throw new IllegalArgumentException("Type "+which+" not known");
@@ -339,6 +357,9 @@ public class FactoryMultiView {
 			PnPLepetitEPnP alg = new PnPLepetitEPnP(0.1);
 			alg.setNumIterations(numIterations);
 			return new WrapPnPLepetitEPnP(alg);
+		} else if( which == EnumPNP.IPPE ) {
+			Estimate1ofEpipolar H = FactoryMultiView.computeHomographyTLS();
+			return new IPPE_to_EstimatePnP(H);
 		}
 
 		FastQueue<Se3_F64> solutions = new FastQueue<>(4, Se3_F64.class, true);

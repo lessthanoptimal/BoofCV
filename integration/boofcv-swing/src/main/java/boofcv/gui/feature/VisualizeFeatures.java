@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -128,6 +128,11 @@ public class VisualizeFeatures {
 
 	public static void drawCircle( Graphics2D g2 , double x , double y ,double r ) {
 		Ellipse2D.Double c = new Ellipse2D.Double();
+		c.setFrame(x - r, y - r, 2 * r, 2 * r);
+		g2.draw(c);
+	}
+
+	public static void drawCircle( Graphics2D g2 , double x , double y ,double r , Ellipse2D.Double c ) {
 		c.setFrame(x - r, y - r, 2 * r, 2 * r);
 		g2.draw(c);
 	}

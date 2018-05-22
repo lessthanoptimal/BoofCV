@@ -29,7 +29,7 @@ public class ConfigPolylineSplitMerge extends ConfigPolyline {
 	/**
 	 * The minimum length of a side
 	 */
-	public int minimumSideLength = 5;
+	public int minimumSideLength = 2;
 
 	/**
 	 * How many corners past the max it will fit a polygon to. This enables it to recover from mistakes.

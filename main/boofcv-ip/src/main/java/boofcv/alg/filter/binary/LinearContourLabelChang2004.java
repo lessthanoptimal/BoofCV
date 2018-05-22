@@ -118,13 +118,12 @@ public class LinearContourLabelChang2004 {
 			indexIn = binary.startIndex + y*binary.stride+1;
 			indexOut = labeled.startIndex + (y-1)*labeled.stride;
 
-			for( x = 1; x < enxX; x++ , indexIn++ , indexOut++) {
-				int bit = binary.data[indexIn];
-
-				// white pixels are ignored
-				if( bit != 1 )
-					continue;
-
+			x = 1;
+			int delta = scanForOne(binary.data,indexIn,indexIn+enxX-x)-indexIn;
+			x += delta;
+			indexIn += delta;
+			indexOut += delta;
+			while( x < enxX ) {
 				int label = labeled.data[indexOut];
 				boolean handled = false;
 				if( label == 0 && binary.data[indexIn - binary.stride ] != 1 ) {
@@ -138,10 +137,28 @@ public class LinearContourLabelChang2004 {
 					handled = true;
 				}
 				if( !handled ) {
-					handleStep3(labeled);
+					// Step 3: Must not be part of the contour but an inner pixel and the pixel to the left must be
+					// labeled
+					if( labeled.data[indexOut] == 0 )
+						labeled.data[indexOut] = labeled.data[indexOut-1];
 				}
+
+				delta = scanForOne(binary.data,indexIn+1,indexIn+enxX-x)-indexIn;
+				x += delta;
+				indexIn += delta;
+				indexOut += delta;
 			}
 		}
+	}
+
+	/**
+	 * Faster when there's a specialized function which searches for one pixels
+	 */
+	private int scanForOne(byte[] data , int index , int end ) {
+		while (index < end && data[index] != 1) {
+			index++;
+		}
+		return index;
 	}
 
 	public FastQueue<ContourPacked> getContours() {
@@ -149,7 +166,7 @@ public class LinearContourLabelChang2004 {
 	}
 
 	/**
-	 *  Step 1: If the pixel is unlabeled and the pixel above is white, then it
+	 *  Step 1: If the pixel is unlabeled and the pixel above is not one, then it
 	 *          must be an external contour of a newly encountered blob.
 	 */
 	private void handleStep1() {
@@ -190,15 +207,6 @@ public class LinearContourLabelChang2004 {
 			packedPoints.removeTail();
 			packedPoints.grow();
 		}
-	}
-
-	/**
-	 * Step 3: Must not be part of the contour but an inner pixel and the pixel to the left must be
-	 *         labeled
-	 */
-	private void handleStep3(GrayS32 labeled) {
-		if( labeled.data[indexOut] == 0 )
-			labeled.data[indexOut] = labeled.data[indexOut-1];
 	}
 
 	public PackedSetsPoint2D_I32 getPackedPoints() {

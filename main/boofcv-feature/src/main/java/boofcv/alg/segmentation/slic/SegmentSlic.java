@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.Stoppable;
 
 import java.util.Arrays;
 
@@ -62,7 +63,9 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public abstract class SegmentSlic<T extends ImageBase<T>> {
+public abstract class SegmentSlic<T extends ImageBase<T>>
+	implements Stoppable
+{
 	// border which ensures there is a 3x3 neighborhood around the initial clusters and that there are pixels
 	// which can be sampled when computing the gradient
 	public static final int BORDER = 2;
@@ -109,6 +112,8 @@ public abstract class SegmentSlic<T extends ImageBase<T>> {
 	// connectivity rule
 	protected ConnectRule connectRule;
 
+	private volatile boolean stopRequested=false;
+
 	public SegmentSlic( int numberOfRegions , float m , int totalIterations ,
 						ConnectRule connectRule , ImageType<T> imageType ) {
 		this.numberOfRegions = numberOfRegions;
@@ -135,6 +140,7 @@ public abstract class SegmentSlic<T extends ImageBase<T>> {
 	}
 
 	public void process( T input , GrayS32 output ) {
+		stopRequested = false;
 		InputSanityCheck.checkSameShape(input,output);
 		if( input.width < 2*BORDER || input.height < 2*BORDER)
 			throw new IllegalArgumentException(
@@ -147,10 +153,12 @@ public abstract class SegmentSlic<T extends ImageBase<T>> {
 		initializeClusters();
 
 		// Perform the modified k-means iterations
-		for( int i = 0; i < totalIterations; i++ ) {
+		for( int i = 0; i < totalIterations && !stopRequested; i++ ) {
 			computeClusterDistance();
 			updateClusters();
 		}
+		if( stopRequested )
+			return;
 
 		// Assign labels to each pixel based on how close it is to a cluster
 		computeClusterDistance();
@@ -267,7 +275,7 @@ public abstract class SegmentSlic<T extends ImageBase<T>> {
 			pixels.data[i].reset();
 		}
 
-		for( int i = 0; i < clusters.size; i++ ) {
+		for( int i = 0; i < clusters.size && !stopRequested; i++ ) {
 			Cluster c = clusters.data[i];
 
 			// compute search bounds
@@ -308,7 +316,7 @@ public abstract class SegmentSlic<T extends ImageBase<T>> {
 		}
 
 		int indexPixel = 0;
-		for( int y = 0; y < input.height; y++ ) {
+		for( int y = 0; y < input.height&& !stopRequested; y++ ) {
 			int indexInput = input.startIndex + y*input.stride;
 			for( int x =0; x < input.width; x++ , indexPixel++ , indexInput++) {
 				Pixel p = pixels.get(indexPixel);
@@ -472,5 +480,15 @@ public abstract class SegmentSlic<T extends ImageBase<T>> {
 
 	public ConnectRule getConnectRule() {
 		return connectRule;
+	}
+
+	@Override
+	public void requestStop() {
+		stopRequested = true;
+	}
+
+	@Override
+	public boolean isStopRequested() {
+		return stopRequested;
 	}
 }

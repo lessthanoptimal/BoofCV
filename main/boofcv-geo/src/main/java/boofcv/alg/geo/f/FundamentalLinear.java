@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,15 @@
 
 package boofcv.alg.geo.f;
 
-import boofcv.alg.geo.LowLevelMultiViewOps;
+import boofcv.alg.geo.NormalizationPoint2D;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.SingularOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
+import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
+import org.ejml.interfaces.SolveNullSpace;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 
 import java.util.List;
@@ -47,7 +49,7 @@ public abstract class FundamentalLinear {
 	// contains the set of equations that are solved
 	protected DMatrixRMaj A = new DMatrixRMaj(1,9);
 	// svd used to extract the null space
-	protected SingularValueDecomposition_F64<DMatrixRMaj> svdNull = DecompositionFactory_DDRM.svd(9, 9, false, true, false);
+	protected SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceSvd_DDRM();
 	// svd used to enforce constraings on 3x3 matrix
 	protected SingularValueDecomposition_F64<DMatrixRMaj> svdConstraints = DecompositionFactory_DDRM.svd(3, 3, true, true, false);
 
@@ -59,8 +61,8 @@ public abstract class FundamentalLinear {
 	protected DMatrixRMaj temp0 = new DMatrixRMaj(3,3);
 
 	// matrix used to normalize results
-	protected DMatrixRMaj N1 = new DMatrixRMaj(3,3);
-	protected DMatrixRMaj N2 = new DMatrixRMaj(3,3);
+	protected NormalizationPoint2D N1 = new NormalizationPoint2D();
+	protected NormalizationPoint2D N2 = new NormalizationPoint2D();
 
 	// should it compute a fundamental (true) or essential (false) matrix?
 	boolean computeFundamental;
@@ -166,8 +168,8 @@ public abstract class FundamentalLinear {
 			Point2D_F64 s = p.p2;
 
 			// normalize the points
-			LowLevelMultiViewOps.applyPixelNormalization(N1, f, f_norm);
-			LowLevelMultiViewOps.applyPixelNormalization(N2, s, s_norm);
+			N1.apply(f, f_norm);
+			N2.apply(s, s_norm);
 
 			// perform the Kronecker product with the two points being in
 			// homogeneous coordinates (z=1)

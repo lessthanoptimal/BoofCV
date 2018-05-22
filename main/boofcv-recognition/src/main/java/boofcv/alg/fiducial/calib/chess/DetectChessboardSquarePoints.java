@@ -91,13 +91,8 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 			detectorSquare.getDetector().setOutputClockwise(true);
 			detectorSquare.getDetector().setConvex(true);
 //			detectorSquare.getDetector().setNumberOfSides(3,8);  <--- this is handled by the helper
-			this.detectorSquare.setFunctionAdjust(new DetectPolygonBinaryGrayRefine.AdjustBeforeRefineEdge() {
-				@Override
-				public void adjust(DetectPolygonFromContour.Info info, boolean clockwise) {
-					DetectChessboardSquarePoints.this.adjustBeforeOptimize(info.polygon, info.borderCorners,clockwise);
-				}
-			});
-
+			this.detectorSquare.setFunctionAdjust((info, clockwise) ->
+					DetectChessboardSquarePoints.this.adjustBeforeOptimize(info.polygon, info.borderCorners,clockwise));
 		}
 
 		s2c = new SquaresIntoCrossClusters(-1,-1);
@@ -167,6 +162,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	 */
 	private void configureContourDetector(T gray) {
 		// determine the maximum possible size of a square when viewed head on
+		// also take in account shapes touching the edge will be concave
 		int maxContourSize = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
 		BinaryContourFinder contourFinder = detectorSquare.getDetector().getContourFinder();
 		contourFinder.setMaxContour(maxContourSize*4*2); // fisheye distortion can let one square go larger
@@ -202,6 +198,12 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 			double dy = b.y - a.y;
 
 			double l = Math.sqrt(dx * dx + dy * dy);
+
+			// The input polygon has two identical corners. This is bad. We will just skip over the first corner
+			if( l == 0 ) {
+				throw new RuntimeException("Input polygon has two identical corners. You need to fix that.");
+			}
+
 			dx *= 1.5 / l;
 			dy *= 1.5 / l;
 

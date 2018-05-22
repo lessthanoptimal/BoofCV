@@ -18,111 +18,166 @@
 
 package boofcv.abst.filter.binary;
 
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
-import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public abstract class GenericBinaryContourFinder {
+public abstract class GenericBinaryContourFinder extends GenericBinaryContourInterface{
 
-	public static GrayU8 TEST3 = new GrayU8(new byte[][]
-					{{0,0,0,0,0},
-					 {0,0,1,0,0},
-					 {0,1,1,1,0},
-					 {0,1,0,1,0},
-					 {0,1,1,1,0},
-					 {0,0,0,0,0}});
 
 	protected abstract BinaryContourFinder create();
 
 	@Test
-	public void checkDefaults() {
+	public void inputNotModified() {
+		GrayU8 input = TEST2.clone();
+
 		BinaryContourFinder alg = create();
 
-		assertEquals(ConnectRule.FOUR,alg.getConnectRule());
-		assertTrue(alg.isSaveInternalContours());
-		assertEquals(0,alg.getMinContour());
-		assertEquals(Integer.MAX_VALUE,alg.getMaxContour());
+		alg.process(input);
+
+		assertEquals(0,ImageStatistics.meanDiffSq(TEST2,input),1e-8);
 	}
 
 	@Test
 	public void minContour() {
 		GrayU8 input = TEST3.clone();
-		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
 		BinaryContourFinder alg = create();
 
 		alg.setMinContour(1000);
-		alg.process(input,labeled);
-		assertEquals(1,alg.getContours().size());
-		checkExternalSize(alg,0,0);
-
+		alg.process(input);
+		assertEquals(0,alg.getContours().size());
 	}
 
 	@Test
 	public void maxContour() {
 		GrayU8 input = TEST3.clone();
-		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
 		BinaryContourFinder alg = create();
 
 		alg.setMaxContour(1);
-		alg.process(input,labeled);
+		alg.process(input);
 
-		assertEquals(1,alg.getContours().size());
-		checkExternalSize(alg,0,0);
+		assertEquals(0,alg.getContours().size());
 	}
 
 	@Test
 	public void connectRule() {
 		GrayU8 input = TEST3.clone();
-		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
 		BinaryContourFinder alg = create();
 
-		alg.process(input,labeled);
+		alg.process(input);
 		checkExternalSize(alg,0,10);
 
 		alg.setConnectRule(ConnectRule.EIGHT);
-		alg.process(input,labeled);
+		alg.process(input);
 		checkExternalSize(alg,0,8);
 	}
 
 	@Test
 	public void saveInternal() {
+		if( !supportsInternalContour )
+			return;
+
 		GrayU8 input = TEST3.clone();
-		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
 		BinaryContourFinder alg = create();
 
-		alg.process(input,labeled);
+		alg.process(input);
 		checkInternalSize(alg,0,0,8);
 
 		alg.setSaveInnerContour(false);
-		alg.process(input,labeled);
+		alg.process(input);
 		checkInternalSize(alg,0,0,0);
 	}
 
-	private void checkExternalSize( BinaryContourFinder alg , int which , int expected )
-	{
-		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32.class,true);
-		alg.loadContour(alg.getContours().get(which).externalIndex,points);
-		assertEquals(expected,points.size);
+	@Test
+	public void testCase1() {
+		GrayU8 input = TEST1.clone();
+
+		BinaryContourFinder alg = create();
+
+		alg.setConnectRule(ConnectRule.FOUR);
+		alg.process(input);
+		checkExpectedExternal(new int[]{4,42},alg);
+
+		alg.setConnectRule(ConnectRule.EIGHT);
+		alg.process(input);
+		checkExpectedExternal(new int[]{37},alg);
 	}
 
-	private void checkInternalSize( BinaryContourFinder alg , int blob, int which , int expected )
-	{
-		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32.class,true);
-		alg.loadContour(alg.getContours().get(blob).internalIndexes.get(which),points);
-		assertEquals(expected,points.size);
+	@Test
+	public void testCase2() {
+		GrayU8 input = TEST2.clone();
+
+		BinaryContourFinder alg = create();
+
+		alg.setConnectRule(ConnectRule.FOUR);
+		alg.process(input);
+		checkExpectedExternal(new int[]{1,1,1,1,1,1,1,1,1,4,4,4,10,20},alg);
+
+		alg.setConnectRule(ConnectRule.EIGHT);
+		alg.process(input);
+		checkExpectedExternal(new int[]{1,3,4,32},alg);
 	}
 
+	@Test
+	public void testCase4() {
+		GrayU8 input = TEST4.clone();
+		BinaryContourFinder alg = create();
+
+		alg.setConnectRule(ConnectRule.FOUR);
+		alg.process(input);
+		checkExpectedExternal(new int[]{24},alg);
+
+		alg.setConnectRule(ConnectRule.EIGHT);
+		alg.process(input);
+		checkExpectedExternal(new int[]{19},alg);
+	}
+
+	@Test
+	public void testCase5() {
+		BinaryContourFinder alg = create();
+
+		alg.setConnectRule(ConnectRule.FOUR);
+		alg.process(TEST5.clone());
+		checkExpectedExternal(new int[]{20},alg);
+
+		alg.setConnectRule(ConnectRule.EIGHT);
+		alg.process(TEST5.clone());
+		checkExpectedExternal(new int[]{20},alg);
+	}
+
+	@Test
+	public void test6() {
+		BinaryContourFinder alg = create();
+
+		alg.setConnectRule(ConnectRule.FOUR);
+		alg.process(TEST6.clone());
+		checkExpectedExternal(new int[]{20},alg);
+
+		alg.setConnectRule(ConnectRule.EIGHT);
+		alg.process(TEST6.clone());
+		checkExpectedExternal(new int[]{20},alg);
+	}
+
+	@Test
+	public void test7() {
+		BinaryContourFinder alg = create();
+
+		alg.setConnectRule(ConnectRule.FOUR);
+		alg.process(TEST7.clone());
+		checkExpectedExternal(new int[]{4,20},alg);
+
+		alg.setConnectRule(ConnectRule.EIGHT);
+		alg.process(TEST7.clone());
+		checkExpectedExternal(new int[]{20},alg);
+	}
 }

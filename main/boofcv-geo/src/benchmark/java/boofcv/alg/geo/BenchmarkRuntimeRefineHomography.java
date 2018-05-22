@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.alg.geo.h.HomographyLinear4;
+import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.factory.geo.EpipolarError;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.Performer;
@@ -39,7 +39,7 @@ public class BenchmarkRuntimeRefineHomography extends ArtificialStereoScene{
 	static final int NUM_POINTS = 500;
 	static final boolean PIXELS = false;
 	
-	protected DMatrixRMaj initialF;
+	protected DMatrixRMaj H = new DMatrixRMaj(3,3);
 	DMatrixRMaj refinedF = new DMatrixRMaj(3,3);
 
 	public class Refine implements Performer {
@@ -54,7 +54,7 @@ public class BenchmarkRuntimeRefineHomography extends ArtificialStereoScene{
 
 		@Override
 		public void process() {
-			alg.fitModel(pairs, initialF, refinedF);
+			alg.fitModel(pairs, H, refinedF);
 		}
 
 		@Override
@@ -65,7 +65,7 @@ public class BenchmarkRuntimeRefineHomography extends ArtificialStereoScene{
 
 	public class Linear4 extends PerformerBase {
 
-		HomographyLinear4 alg = new HomographyLinear4(true);
+		HomographyDirectLinearTransform alg = new HomographyDirectLinearTransform(true);
 
 		@Override
 		public void process() {
@@ -82,11 +82,11 @@ public class BenchmarkRuntimeRefineHomography extends ArtificialStereoScene{
 
 		init(NUM_POINTS, PIXELS, true);
 
-		Estimate1ofEpipolar computeAlg = FactoryMultiView.computeHomography(true);
-		computeAlg.process(pairs,initialF);
-		initialF.data[0] += 0.1;
-		initialF.data[4] -= 0.15;
-		initialF.data[7] -= 0.2;
+		Estimate1ofEpipolar computeAlg = FactoryMultiView.computeHomographyDLT(true);
+		computeAlg.process(pairs, H);
+		H.data[0] += 0.1;
+		H.data[4] -= 0.15;
+		H.data[7] -= 0.2;
 
 
 		ProfileOperation.printOpsPerSec(new Refine("Simple",refineHomography(tol, MAX_ITER, EpipolarError.SIMPLE)), TEST_TIME);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public abstract class HomographyResidualTests extends CommonHomographyChecks {
 		createScene(20,false);
 
 		// use the linear algorithm to compute the homography
-		HomographyLinear4 estimator = new HomographyLinear4(true);
+		HomographyDirectLinearTransform estimator = new HomographyDirectLinearTransform(true);
 		estimator.process(pairs,solution);
 
 		ModelObservationResidualN<DMatrixRMaj,AssociatedPair> alg = createAlg();

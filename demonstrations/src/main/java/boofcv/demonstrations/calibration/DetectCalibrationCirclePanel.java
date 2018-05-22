@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.demonstrations.calibration;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 
 /**
@@ -62,6 +63,19 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 
 	@Override
 	protected void addComponents() {
+		JPanel togglePanel = new JPanel( new GridLayout(0,2));
+		togglePanel.add(showPoints);
+		togglePanel.add(showNumbers);
+		addAlignLeft(showClusters,this);
+		if( showGraphs )
+			addAlignLeft(showGraph,this);
+		togglePanel.add(showGrids);
+		togglePanel.add(showOrder);
+		togglePanel.add(showShapes);
+		togglePanel.add(showContour);
+
+		togglePanel.setMaximumSize(togglePanel.getMinimumSize());
+
 		addLabeled(successIndicator, "Found:", this);
 		add(viewInfo);
 		addLabeled(viewSelector, "View ", this);
@@ -69,16 +83,8 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 		addLabeled(selectColumns, "Cols", this);
 		addLabeled(selectDiameter, "Diameter", this);
 		addLabeled(selectSpacing, "Spacing", this);
+		add(togglePanel);
 		add(threshold);
-		addAlignLeft(showPoints, this);
-		addAlignLeft(showNumbers,this);
-		addAlignLeft(showClusters,this);
-		if( showGraphs )
-			addAlignLeft(showGraph,this);
-		addAlignLeft(showGrids,this);
-		addAlignLeft(showOrder,this);
-		addAlignLeft(showShapes, this);
-		addAlignLeft(showContour, this);
 	}
 
 	@Override

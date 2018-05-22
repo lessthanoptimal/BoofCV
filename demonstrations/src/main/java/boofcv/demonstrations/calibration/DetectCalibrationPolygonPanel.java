@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.demonstrations.shapes.ShapeGuiListener;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.shape.ConfigPolygonDetector;
 
-import javax.swing.event.ChangeListener;
-import java.awt.event.ItemListener;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Shows calibration grid detector status, configure display, and adjust parameters.
@@ -32,7 +32,6 @@ import java.awt.event.ItemListener;
  * @author Peter Abeles
  */
 public class DetectCalibrationPolygonPanel extends DetectCalibrationPanel
-		implements ChangeListener, ItemListener
 {
 	// selects threshold to create binary image from
 	DetectBlackPolygonControlPanel polygonPanel;
@@ -56,6 +55,7 @@ public class DetectCalibrationPolygonPanel extends DetectCalibrationPanel
 			}
 		},configPolygon,configThreshold);
 		polygonPanel.removeControlNumberOfSides();
+		polygonPanel.getThresholdPanel().addHistogramGraph();
 
 		threshold = null;
 		addComponents();
@@ -63,18 +63,22 @@ public class DetectCalibrationPolygonPanel extends DetectCalibrationPanel
 
 	@Override
 	protected void addComponents() {
+		JPanel togglePanel = new JPanel( new GridLayout(0,2));
+		togglePanel.add(showPoints);
+		togglePanel.add(showNumbers);
+		togglePanel.add(showGraph);
+		togglePanel.add(showGrids);
+		togglePanel.add(showOrder);
+		togglePanel.add(showShapes);
+		togglePanel.add(showContour);
+		togglePanel.setMaximumSize(togglePanel.getMinimumSize());
+
 		addLabeled(successIndicator, "Found");
 		add(viewInfo);
 		addLabeled(viewSelector, "View ");
 		addLabeled(selectRows, "Rows");
 		addLabeled(selectColumns, "Cols");
-		addAlignLeft(showPoints);
-		addAlignLeft(showNumbers);
-		addAlignLeft(showGraph);
-		addAlignLeft(showGrids);
-		addAlignLeft(showOrder);
-		addAlignLeft(showShapes);
-		addAlignLeft(showContour);
+		add(togglePanel);
 		addAlignLeft(polygonPanel);
 	}
 }

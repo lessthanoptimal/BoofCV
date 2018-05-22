@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 	FDistort distort;
 
 	// computes the homography
-	Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomography(true);
+	Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomographyDLT(true);
 
 //	RefineEpipolar refineHomography = FactoryMultiView.refineHomography(1e-8,20, EpipolarError.SIMPLE);
 

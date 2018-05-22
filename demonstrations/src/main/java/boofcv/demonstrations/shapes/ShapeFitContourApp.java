@@ -36,8 +36,8 @@ import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_I32;
-import georegression.struct.shapes.EllipseRotated_F64;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,7 @@ import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -200,6 +199,7 @@ public class TestQrCodeDecoderImage {
 				addNumeric("01234567").fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+		int border = generator.borderModule*4;
 //		generator.renderData = false;
 		generator.render(expected);
 
@@ -230,9 +230,9 @@ public class TestQrCodeDecoderImage {
 			assertEquals(7*4,found.ppRight.getSideLength(i),0.01);
 			assertEquals(7*4,found.ppDown.getSideLength(i),0.01);
 		}
-		assertTrue(found.ppCorner.get(0).distance(0,0) < 1e-4);
-		assertTrue(found.ppRight.get(0).distance((numModules-7)*4,0) < 1e-4);
-		assertTrue(found.ppDown.get(0).distance(0,(numModules-7)*4) < 1e-4);
+		assertTrue(found.ppCorner.get(0).distance(border,border) < 1e-4);
+		assertTrue(found.ppRight.get(0).distance(border+(numModules-7)*4,border) < 1e-4);
+		assertTrue(found.ppDown.get(0).distance(border,border+(numModules-7)*4) < 1e-4);
 
 		// Check alignment patterns
 		int alignment[] =  QrCode.VERSION_INFO[version].alignment;
@@ -320,5 +320,28 @@ public class TestQrCodeDecoderImage {
 		assertTrue(qr.bounds.get(1).distance(3,0) < UtilEjml.TEST_F64);
 		assertTrue(qr.bounds.get(2).distance(3,3) < UtilEjml.TEST_F64);
 		assertTrue(qr.bounds.get(3).distance(0,3) < UtilEjml.TEST_F64);
+	}
+
+	/**
+	 * There was a bug where version 0 QR code was returned
+	 */
+	@Test
+	public void extractVersionInfo_version0() {
+		QrCodeDecoderImage<GrayU8> mock = new QrCodeDecoderImage(GrayU8.class){
+			@Override
+			int estimateVersionBySize(QrCode qr) {
+				return 0;
+			}
+
+			@Override
+			int decodeVersion() {
+				return 8;
+			}
+		};
+
+		QrCode qr = new QrCode();
+		qr.version = 8;
+		assertFalse(mock.extractVersionInfo(qr));
+		assertEquals(-1,qr.version);
 	}
 }

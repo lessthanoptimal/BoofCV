@@ -20,10 +20,12 @@ package boofcv.factory.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.*;
-import boofcv.abst.feature.detect.interest.ConfigFast;
+import boofcv.abst.feature.detect.interest.ConfigFastCorner;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.PointDetector;
+import boofcv.abst.feature.detect.interest.WrapFastToPointDetector;
 import boofcv.abst.filter.blur.BlurStorageFilter;
-import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
+import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
@@ -107,29 +109,46 @@ public class FactoryDetectPoint {
 	}
 
 	/**
-	 * Creates a Fast corner detector.
+	 * Creates a Fast corner detector with feature intensity for additional pruning. Fast features
+	 * have minimums and maximums.
 	 *
 	 * @param configFast Configuration for FAST feature detector
 	 * @param configDetector Configuration for feature extractor.
-	 * @param imageType       Type of input image.
-	 * @see FastCornerIntensity
+	 * @param imageType ype of input image.
+	 * @see FastCornerDetector
 	 */
 	@SuppressWarnings("UnnecessaryLocalVariable")
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createFast( @Nullable ConfigFast configFast ,
+	GeneralFeatureDetector<T, D> createFast( @Nullable ConfigFastCorner configFast ,
 											 ConfigGeneralDetector configDetector , Class<T> imageType) {
 
 		if( configFast == null )
-			configFast = new ConfigFast();
+			configFast = new ConfigFastCorner();
 		configFast.checkValidity();
 
-		ConfigGeneralDetector d = configDetector;
-
-		FastCornerIntensity<T> alg = FactoryIntensityPointAlg.fast(configFast.pixelTol, configFast.minContinuous, imageType);
+		FastCornerDetector<T> alg = FactoryIntensityPointAlg.fast(configFast.pixelTol, configFast.minContinuous, imageType);
+		alg.setMaxFeaturesFraction(configFast.maxFeatures);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperFastCornerIntensity<>(alg);
-		ConfigGeneralDetector configExtract =
-				new ConfigGeneralDetector(d.maxFeatures,d.radius,d.threshold,0,true,false,true);
-		return createGeneral(intensity, configExtract);
+		return createGeneral(intensity, configDetector);
+	}
+
+	/**
+	 * Creates a Fast corner detector
+	 *
+	 * @param configFast Configuration for FAST feature detector
+	 * @param imageType ype of input image.
+	 * @see FastCornerDetector
+	 */
+	public static <T extends ImageGray<T>>
+	PointDetector<T> createFast( @Nullable ConfigFastCorner configFast , Class<T> imageType) {
+		if( configFast == null )
+			configFast = new ConfigFastCorner();
+		configFast.checkValidity();
+
+		FastCornerDetector<T> alg = FactoryIntensityPointAlg.fast(configFast.pixelTol, configFast.minContinuous, imageType);
+		alg.setMaxFeaturesFraction(configFast.maxFeatures);
+
+		return new WrapFastToPointDetector<>(alg);
 	}
 
 	/**
@@ -146,12 +165,12 @@ public class FactoryDetectPoint {
 			configDetector = new ConfigGeneralDetector();
 
 		BlurStorageFilter<T> medianFilter = FactoryBlurFilter.median(ImageType.single(imageType), configDetector.radius);
-		GeneralFeatureIntensity<T, D> intensity = new WrapperMedianCornerIntensity<>(medianFilter, imageType);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperMedianCornerIntensity<>(medianFilter);
 		return createGeneral(intensity, configDetector);
 	}
 
 	/**
-	 * Creates a Hessian based blob detector.
+	 * Creates a Hessian based blob detector. Minimums and Maximums.
 	 *
 	 * @param type            The type of Hessian based blob detector to use. DETERMINANT often works well.
 	 * @param configDetector Configuration for feature detector.
@@ -183,6 +202,10 @@ public class FactoryDetectPoint {
 		foo.setTo(config);
 		config = foo;
 		config.ignoreBorder += config.radius;
+		if( !intensity.localMaximums() )
+			config.detectMaximums = false;
+		if( !intensity.localMinimums() )
+			config.detectMinimums = false;
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(config);
 		GeneralFeatureDetector<T, D> det = new GeneralFeatureDetector<>(intensity, extractor);
 		det.setMaxFeatures(config.maxFeatures);

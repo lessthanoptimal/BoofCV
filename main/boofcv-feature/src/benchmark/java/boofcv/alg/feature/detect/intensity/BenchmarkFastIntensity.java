@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,8 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.alg.feature.detect.intensity.impl.ImplFastHelper_U8;
-import boofcv.alg.feature.detect.intensity.impl.ImplFastIntensity12;
-import boofcv.alg.feature.detect.intensity.impl.ImplFastIntensity9;
+import boofcv.alg.feature.detect.intensity.impl.ImplFastCorner12_U8;
+import boofcv.alg.feature.detect.intensity.impl.ImplFastCorner9_U8;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.PerformerBase;
@@ -45,9 +44,6 @@ public class BenchmarkFastIntensity<T extends ImageGray<T>> {
 	public BenchmarkFastIntensity(Class<T> imageType) {
 		input = GeneralizedImageOps.createSingleBand(imageType,imgWidth,imgHeight);
 		intensity = new GrayF32(input.width,input.height);
-
-		Random rand = new Random(234);
-		GImageMiscOps.fillUniform(input, rand, 0, 255);
 	}
 
 	public class FAST_NAIVE_9 extends PerformerBase {
@@ -60,7 +56,7 @@ public class BenchmarkFastIntensity<T extends ImageGray<T>> {
 	}
 
 	public class FAST9 extends PerformerBase {
-		ImplFastIntensity9<GrayU8> corner = new ImplFastIntensity9<>(new ImplFastHelper_U8(60));
+		FastCornerDetector<GrayU8> corner = new FastCornerDetector<>(new ImplFastCorner9_U8(60));
 
 		@Override
 		public void process() {
@@ -69,7 +65,7 @@ public class BenchmarkFastIntensity<T extends ImageGray<T>> {
 	}
 
 	public class FAST12 extends PerformerBase {
-		ImplFastIntensity12<GrayU8> corner = new ImplFastIntensity12<>(new ImplFastHelper_U8(60));
+		FastCornerDetector<GrayU8> corner = new FastCornerDetector<>(new ImplFastCorner12_U8(60));
 
 		@Override
 		public void process() {
@@ -78,9 +74,22 @@ public class BenchmarkFastIntensity<T extends ImageGray<T>> {
 	}
 
 	public void evaluate() {
+		Random rand = new Random(234);
+
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
+		System.out.println("           Random");
 		System.out.println();
 
+		GImageMiscOps.fillUniform(input, rand, 0, 255);
+		ProfileOperation.printOpsPerSec(new FAST_NAIVE_9(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new FAST9(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new FAST12(), TEST_TIME);
+
+		System.out.println();
+		System.out.println("           Single Value");
+		System.out.println();
+
+		GImageMiscOps.fill(input,125);
 		ProfileOperation.printOpsPerSec(new FAST_NAIVE_9(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new FAST9(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new FAST12(), TEST_TIME);

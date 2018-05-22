@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.shapes;
 
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.abst.shapes.polyline.PointsToPolyline;
 import boofcv.alg.filter.binary.BinaryImageOps;
@@ -54,7 +54,7 @@ import java.util.List;
 public class DetectPolylineApp<T extends ImageGray<T>>
 		extends DetectBlackShapeAppBase implements ShapeGuiListener
 {
-	BinaryContourFinder binaryToContour = FactoryBinaryContourFinder.linearChang2004();
+	BinaryLabelContourFinder binaryToContour = FactoryBinaryContourFinder.linearChang2004();
 	PointsToPolyline contourToPolyline;
 
 	List<List<Point2D_I32>> polylines = new ArrayList<>();

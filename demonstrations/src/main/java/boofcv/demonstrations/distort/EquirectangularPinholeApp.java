@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.demonstrations.distort;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.spherical.PinholeToEquirectangular_F32;
+import boofcv.alg.distort.spherical.CameraToEquirectangular_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.border.BorderType;
@@ -67,7 +67,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 	implements PinholeSimplifiedPanel.Listener
 {
 
-	PinholeToEquirectangular_F32 distorter = new PinholeToEquirectangular_F32();
+	CameraToEquirectangular_F32 distorter = new CameraToEquirectangular_F32();
 	ImageDistort<T,T> distortImage;
 
 	// output image fort pinhole and equirectangular image
@@ -94,7 +94,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 		super(exampleInputs, imageType);
 
 		updateIntrinsic();
-		distorter.setPinhole(cameraModel);
+		distorter.setCameraModel(cameraModel);
 
 		BorderType borderType = BorderType.EXTENDED;
 		InterpolatePixel<T> interp =
@@ -251,7 +251,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 				buffPinhole = new BufferedImage(camWidth,camHeight,BufferedImage.TYPE_INT_BGR);
 			}
 			updateIntrinsic();
-			distorter.setPinhole(cameraModel);
+			distorter.setCameraModel(cameraModel);
 			distortImage.setModel(distorter);
 
 			if( inputMethod == InputMethod.IMAGE ) {

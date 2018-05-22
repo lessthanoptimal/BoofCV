@@ -21,12 +21,36 @@ println "Android version is $ext.ANDROID_VERSION"
 // disable tests since they can't be run on a regular desktop
 test.enabled = false
 
-dependencies {
-    compile project(':main:boofcv-ip')
-    compile project(':main:boofcv-feature')
-    compile project(':main:boofcv-calibration')
-    compile project(':main:boofcv-geo')
+repositories {
+    jcenter()
+    maven {
+        url 'https://maven.google.com/'
+        name 'Google'
+    }
+}
 
-    compile fileTree(dir: ANDROID_PATH, include: '*.jar')
-    compile fileTree(dir: ANDROID_PATH+'data/', include: '*.jar')
+task unzipJar(type: Copy) {
+    from zipTree('commons-collections-3.2.jar')
+    into ("$buildDir/libs/commons-collection")
+    include "**/*.class"
+    exclude "**/Unmodifiable.class"
+}
+
+dependencies {
+    implementation project(':main:boofcv-ip')
+    implementation project(':main:boofcv-feature')
+    implementation project(':main:boofcv-calibration')
+    implementation project(':main:boofcv-geo')
+
+
+    // Google doesn't provide access to an android.jar
+    // A proper android library could be built but that seems to make
+    // the build become wonky and IntelliJ doesn't like it. This is less error prone
+    implementation fileTree(dir: ANDROID_PATH, include: '*.jar')
+    implementation fileTree(dir: ANDROID_PATH+'data/', include: '*.jar')
+
+    // This imports files as aar which require extra work to import
+    // instead I modified the code to not require them
+//    implementation 'com.android.support:appcompat-v7:27.1.1'
+    compileOnly 'com.android.support:support-v4:27.1.1'
 }

@@ -19,7 +19,7 @@
 package boofcv.alg.fiducial.calib.circle;
 
 import georegression.metric.UtilAngle;
-import georegression.struct.shapes.EllipseRotated_F64;
+import georegression.struct.curve.EllipseRotated_F64;
 
 import java.util.ArrayList;
 import java.util.List;

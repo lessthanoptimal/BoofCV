@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,100 +18,69 @@
 
 package boofcv.core.encoding;
 
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.*;
+import org.openjdk.jmh.annotations.*;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Peter Abeles
  */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value=2)
 public class BenchmarkConvertNV21 {
 
-	static int width=640,height=480;
+	static final int width = 640, height = 480;
 
-	static byte nv21[] = new byte[width*height*2];
+	byte nv21[] = new byte[width * height * 2];
 
-	static GrayU8 grayU8 = new GrayU8(width,height);
-	static GrayF32 grayF32 = new GrayF32(width,height);
-	static Planar<GrayU8> planarU8 = new Planar<GrayU8>(GrayU8.class,width,height,3);
-	static Planar<GrayF32> planarF32 = new Planar<GrayF32>(GrayF32.class,width,height,3);
-	static InterleavedU8 interleavedU8 = new InterleavedU8(width,height,3);
-	static InterleavedF32 interleavedF32 = new InterleavedF32(width,height,3);
+	GrayU8 grayU8 = new GrayU8(width, height);
+	GrayF32 grayF32 = new GrayF32(width, height);
+	Planar<GrayU8> planarU8 = new Planar<GrayU8>(GrayU8.class, width, height, 3);
+	Planar<GrayF32> planarF32 = new Planar<GrayF32>(GrayF32.class, width, height, 3);
+	InterleavedU8 interleavedU8 = new InterleavedU8(width, height, 3);
+	InterleavedF32 interleavedF32 = new InterleavedF32(width, height, 3);
 
-	static {
+	public BenchmarkConvertNV21() {
 		Random rand = new Random(234);
 		for (int i = 0; i < nv21.length; i++) {
-			nv21[i] = (byte)rand.nextInt(256);
+			nv21[i] = (byte) rand.nextInt(256);
 		}
 	}
 
-	public static class TGrayU8 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvertNV21.nv21ToGray(nv21,width,height,grayU8);
-		}
+	@Benchmark
+	public void nv21ToGray_U8() {
+		ConvertNV21.nv21ToGray(nv21, width, height, grayU8);
 	}
 
-	public static class TGrayF32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvertNV21.nv21ToGray(nv21,width,height,grayF32);
-		}
+	@Benchmark
+	public void nv21ToGray_F32() {
+		ConvertNV21.nv21ToGray(nv21, width, height, grayF32);
 	}
 
-	public static class PlanarU8 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvertNV21.nv21TPlanarRgb_U8(nv21,width,height,planarU8);
-		}
+	@Benchmark
+	public void nv21TPlanarRgb_U8() {
+		ConvertNV21.nv21TPlanarRgb_U8(nv21, width, height, planarU8);
 	}
 
-	public static class PlanarF32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvertNV21.nv21ToPlanarRgb_F32(nv21,width,height,planarF32);
-		}
+	@Benchmark
+	public void nv21ToPlanarRgb_F32() {
+		ConvertNV21.nv21ToPlanarRgb_F32(nv21, width, height, planarF32);
 	}
 
-	public static class InterU8 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvertNV21.nv21ToInterleaved(nv21,width,height,interleavedU8);
-		}
+	@Benchmark
+	public void nv21ToInterleaved_U8() {
+		ConvertNV21.nv21ToInterleaved(nv21, width, height, interleavedU8);
 	}
 
-	public static class InterF32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvertNV21.nv21ToInterleaved(nv21,width,height,interleavedF32);
-		}
-	}
-
-	public static void main( String args[] ) {
-
-		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");
-		System.out.println();
-
-		System.out.printf("nv21 to gray   U8              %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new TGrayU8(), 1000, false));
-		System.out.printf("nv21 to gray   F32             %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new TGrayF32(), 1000, false));
-		System.out.printf("nv21 to planar U8              %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new PlanarU8(), 1000, false));
-		System.out.printf("nv21 to planar F32             %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new PlanarF32(), 1000, false));
-		System.out.printf("nv21 to interleaved U8         %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new InterU8(), 1000, false));
-		System.out.printf("nv21 to interleaved F32        %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new InterF32(), 1000, false));
-
+	@Benchmark
+	public void nv21ToInterleaved_F32() {
+		ConvertNV21.nv21ToInterleaved(nv21, width, height, interleavedF32);
 	}
 }
+

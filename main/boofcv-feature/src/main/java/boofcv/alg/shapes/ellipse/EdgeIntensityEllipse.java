@@ -20,7 +20,7 @@ package boofcv.alg.shapes.ellipse;
 
 import boofcv.alg.shapes.edge.BaseIntegralEdge;
 import boofcv.struct.image.ImageGray;
-import georegression.struct.shapes.EllipseRotated_F64;
+import georegression.struct.curve.EllipseRotated_F64;
 
 /**
  * <p>Computes the edge intensity along the an ellipse.</p>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -337,7 +337,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	 * Otherwise the version is read from the image itself
 	 * @return true if version was successfully extracted or false if it failed
 	 */
-	private boolean extractVersionInfo(QrCode qr) {
+	boolean extractVersionInfo(QrCode qr) {
 		int version = estimateVersionBySize(qr);
 
 		// For version 7 and beyond use the version which has been encoded into the qr code
@@ -358,17 +358,19 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 			} else {
 				version = version0;
 			}
+		} else if( version <= 0 ) {
+			version = -1;
 		}
 
 		qr.version = version;
-		return version != -1;
+		return version >= 1 && version <= QrCode.MAX_VERSION;
 	}
 
 	/**
 	 * Decode version information from read in bits
 	 * @return The found version or -1 if it failed
 	 */
-	private int decodeVersion() {
+	int decodeVersion() {
 		int bitField = this.bits.read(0,18,false);
 		int message;
 		// see if there's any errors
@@ -388,7 +390,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	 * Attempts to estimate the qr-code's version based on distance between position patterns.
 	 * If it can't estimate it based on distance return -1
 	 */
-	private int estimateVersionBySize( QrCode qr ) {
+	int estimateVersionBySize( QrCode qr ) {
 		// Just need the homography for this corner square square
 		gridReader.setSquare(qr.ppCorner,0);
 

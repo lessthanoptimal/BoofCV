@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.core.image;
 import boofcv.alg.InputSanityCheck;
 import boofcv.core.image.impl.ConvertInterleavedToSingle;
 import boofcv.core.image.impl.ImplConvertImage;
-import boofcv.core.image.impl.ImplConvertMsToGray;
+import boofcv.core.image.impl.ImplConvertPlanarToGray;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
@@ -350,7 +350,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToGray.average(input, output);
+		ImplConvertPlanarToGray.average(input, output);
 
 		return output;
 	}
@@ -756,7 +756,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToGray.average(input, output);
+		ImplConvertPlanarToGray.average(input, output);
 
 		return output;
 	}
@@ -1162,7 +1162,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToGray.average(input, output);
+		ImplConvertPlanarToGray.average(input, output);
 
 		return output;
 	}
@@ -1568,7 +1568,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToGray.average(input, output);
+		ImplConvertPlanarToGray.average(input, output);
 
 		return output;
 	}
@@ -1974,7 +1974,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToGray.average(input, output);
+		ImplConvertPlanarToGray.average(input, output);
 
 		return output;
 	}
@@ -2380,7 +2380,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToGray.average(input, output);
+		ImplConvertPlanarToGray.average(input, output);
 
 		return output;
 	}
@@ -2786,7 +2786,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToGray.average(input, output);
+		ImplConvertPlanarToGray.average(input, output);
 
 		return output;
 	}
@@ -3192,7 +3192,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToGray.average(input, output);
+		ImplConvertPlanarToGray.average(input, output);
 
 		return output;
 	}
@@ -3289,5 +3289,80 @@ public class ConvertImage {
 	return output;
 	}
 
+	/**
+	 * Converts a {@link InterleavedU8} into the equivalent {@link Planar} {@link GrayF32}
+	 *
+	 * @param input (Input) ImageInterleaved that is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static Planar<GrayF32> convertU8F32(InterleavedU8 input , Planar<GrayF32> output ) {
+		if (output == null) {
+			output = new Planar<GrayF32>(GrayF32.class,input.width, input.height,input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
 
+		ImplConvertImage.convertU8F32(input,output);
+
+		return output;
+	}
+
+	/**
+	 * Converts a {@link InterleavedF32} into the equivalent {@link Planar} {@link GrayU8}
+	 *
+	 * @param input (Input) ImageInterleaved that is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static Planar<GrayU8> convertF32U8(InterleavedF32 input , Planar<GrayU8> output ) {
+		if (output == null) {
+			output = new Planar<GrayU8>(GrayU8.class,input.width, input.height,input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convertF32U8(input,output);
+
+		return output;
+	}
+
+
+	/**
+	 * Converts a {@link Planar} {@link GrayF32} into the equivalent {@link InterleavedU8}
+	 *
+	 * @param input (Input) ImageInterleaved that is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU8 convertF32U8(Planar<GrayF32> input , InterleavedU8 output ) {
+		if (output == null) {
+			output = new InterleavedU8(input.width,input.height,input.getNumBands());
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convertF32U8(input,output);
+
+		return output;
+	}
+
+	/**
+	 * Converts a {@link Planar} {@link GrayU8} into the equivalent {@link InterleavedF32}
+	 *
+	 * @param input (Input) ImageInterleaved that is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF32 convertU8F32(Planar<GrayU8> input , InterleavedF32 output ) {
+		if (output == null) {
+			output = new InterleavedF32(input.width,input.height,input.getNumBands());
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convertU8F32(input,output);
+
+		return output;
+	}
 }

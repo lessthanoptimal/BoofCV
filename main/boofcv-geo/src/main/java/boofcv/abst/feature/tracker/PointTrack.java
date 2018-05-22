@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,10 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class PointTrack extends Point2D_F64 {
+	/**
+	 * The type of feature it belongs to
+	 */
+	public int setId;
 	/**
 	 * Unique ID associated with this feature
 	 */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,9 +84,9 @@ public class RectifyCalibrated {
 		SimpleMatrix R1 = SimpleMatrix.wrap(worldToCamera1.getR());
 		SimpleMatrix R2 = SimpleMatrix.wrap(worldToCamera2.getR());
 		SimpleMatrix T1 = new SimpleMatrix(3,1,true,
-				worldToCamera1.getT().x,worldToCamera1.getT().y,worldToCamera1.getT().z);
+				new double[]{worldToCamera1.getT().x,worldToCamera1.getT().y,worldToCamera1.getT().z});
 		SimpleMatrix T2 = new SimpleMatrix(3,1,true,
-				worldToCamera2.getT().x,worldToCamera2.getT().y,worldToCamera2.getT().z);
+				new double[]{worldToCamera2.getT().x,worldToCamera2.getT().y,worldToCamera2.getT().z});
 
 		//  P = K*[R|T]
 		SimpleMatrix KR1 = sK1.mult(R1);
@@ -103,9 +103,10 @@ public class RectifyCalibrated {
 		// new extrinsic parameters, rotation matrix with rows of camera 1's coordinate system in
 		// the world frame
 		SimpleMatrix RR = new SimpleMatrix(3,3,true,
+				new double[]{
 				v1.x,v1.y,v1.z,
 				v2.x,v2.y,v2.z,
-				v3.x,v3.y,v3.z);
+				v3.x,v3.y,v3.z});
 
 		// new calibration matrix that is an average of the original
 		K = sK1.plus(sK2).scale(0.5);

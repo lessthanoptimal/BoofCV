@@ -23,8 +23,8 @@ import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.NodeInfo;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters.Node;
 import georegression.metric.UtilAngle;
 import georegression.misc.GrlConstants;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.struct.Tuple2;
 import org.junit.Test;
 

@@ -48,12 +48,26 @@ public class BoofMiscOps {
 		return adjustment + (int)Math.log10(number)+1;
 	}
 
-	public static void sortImageNames(List<String> images ) {
-		images.sort(Comparator.naturalOrder());
+	public static void sortFileNames(List<String> images ) {
+		images.sort(new CompareStringNames());
 	}
 
-	public static void sortImageFiles(List<File> images ) {
+	public static void sortFilesByName(List<File> images ) {
 		images.sort(Comparator.comparing(File::getName));
+	}
+
+	private static class CompareStringNames implements Comparator<String> {
+
+		@Override
+		public int compare(String a, String b) {
+			if( a.length() < b.length() ) {
+				return -1;
+			} else if( a.length() > b.length() ) {
+				return 1;
+			} else {
+				return a.compareTo(b);
+			}
+		}
 	}
 
 	public static String toString( Reader r ) {

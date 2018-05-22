@@ -27,9 +27,9 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector3D_F64;
-import georegression.struct.shapes.EllipseRotated_F64;
 import org.junit.Test;
 
 import java.awt.*;

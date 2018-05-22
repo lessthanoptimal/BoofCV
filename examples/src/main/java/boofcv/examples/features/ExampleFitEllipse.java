@@ -32,7 +32,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import georegression.struct.shapes.EllipseRotated_F64;
+import georegression.struct.curve.EllipseRotated_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

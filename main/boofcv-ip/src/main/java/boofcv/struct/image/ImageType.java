@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -170,6 +170,29 @@ public class ImageType<T extends ImageBase> implements Serializable {
 	@Override
 	public String toString() {
 		return "ImageType( "+family+" "+dataType+" "+numBands+" )";
+	}
+
+	/**
+	 * Returns true if the passed in ImageType is the same as this image type
+	 */
+	public boolean isSameType( ImageType o ) {
+		if( family != o.family )
+			return false;
+		if( dataType != o.dataType)
+			return false;
+		if( numBands != o.numBands )
+			return false;
+		return true;
+	}
+
+	/**
+	 * Sets 'this' to be identical to 'o'
+	 * @param o What is to be copied.
+	 */
+	public void setTo( ImageType o ) {
+		this.family = o.family;
+		this.dataType = o.dataType;
+		this.numBands = o.numBands;
 	}
 
 	public static enum Family

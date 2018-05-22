@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,7 +76,7 @@ public class IntensityFeaturePyramidApp<T extends ImageGray<T>, D extends ImageG
 		addAlgorithm(0, "Shi Tomasi",new WrapperGradientCornerIntensity<T,D>( FactoryIntensityPointAlg.shiTomasi(2, false, derivType)));
 		addAlgorithm(0, "FAST",new WrapperFastCornerIntensity<T,D>(FactoryIntensityPointAlg.fast(5, 11, imageType)));
 		addAlgorithm(0, "KitRos",new WrapperKitRosCornerIntensity<T,D>(derivType));
-		addAlgorithm(0, "Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(ImageType.single(imageType),2),imageType));
+		addAlgorithm(0, "Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(ImageType.single(imageType),2)));
 
 		addAlgorithm(1 , "Pyramid", 0);
 		addAlgorithm(1 , "Scale-Space", 1);

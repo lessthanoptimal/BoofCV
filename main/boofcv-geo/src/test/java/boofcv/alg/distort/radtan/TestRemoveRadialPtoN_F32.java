@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class TestRemoveRadialPtoN_F32 {
 		float xc = 300;
 		float yc = 350;
 
-		/**/double radial[]= new /**/double[]{0.12f,-0.13f};
+		/**/double radial[]= new /**/double[]{0.12,-0.13};
 
 		Point2D_F32 point = new Point2D_F32();
 

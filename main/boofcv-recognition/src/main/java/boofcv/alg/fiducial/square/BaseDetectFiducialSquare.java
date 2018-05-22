@@ -19,10 +19,11 @@
 package boofcv.alg.fiducial.square;
 
 import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryContourHelper;
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.RefineEpipolar;
 import boofcv.alg.distort.*;
-import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
@@ -42,7 +43,6 @@ import georegression.struct.ConvertFloatType;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import georegression.struct.shapes.Quadrilateral_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.ops.ConvertDMatrixStruct;
@@ -78,16 +78,16 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	// converts input image into a binary image
 	InputToBinary<T> inputToBinary;
 	// Detects the squares
-	private DetectPolygonBinaryGrayRefine<T> squareDetector;
+	DetectPolygonBinaryGrayRefine<T> squareDetector;
+
+	// Helps adjust the binary image for input into the contour finding algorithm
+	BinaryContourHelper contourHelper;
 
 	// image with lens and perspective distortion removed from it
 	GrayF32 square;
 
-	// storage for binary image
-	protected GrayU8 binary = new GrayU8(1,1);
-
 	// Used to compute/remove perspective distortion
-	private HomographyLinear4 computeHomography = new HomographyLinear4(true);
+	private Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomographyDLT(true);
 	private RefineEpipolar refineHomography = FactoryMultiView.refineHomography(1e-4,100, EpipolarError.SAMPSON);
 	private DMatrixRMaj H = new DMatrixRMaj(3,3);
 	private DMatrixRMaj H_refined = new DMatrixRMaj(3,3);
@@ -117,9 +117,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 
 	/**
 	 * Configures the detector.
-	 *
 	 * @param inputToBinary Converts input image into a binary image
 	 * @param squareDetector Detects the quadrilaterals in the image
+	 * @param binaryCopy If true a copy is created of the binary image and it's not modified.
 	 * @param borderWidthFraction Fraction of the fiducial's width that the border occupies. 0.25 is recommended.
 	 * @param minimumBorderBlackFraction Minimum fraction of pixels inside the border which must be black.  Try 0.65
 	 * @param squarePixels  Number of pixels wide the undistorted square image of the fiducial's interior is.
@@ -128,8 +128,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	 */
 	protected BaseDetectFiducialSquare(InputToBinary<T> inputToBinary,
 									   DetectPolygonBinaryGrayRefine<T> squareDetector,
-									   double borderWidthFraction ,
-									   double minimumBorderBlackFraction ,
+									   boolean binaryCopy,
+									   double borderWidthFraction, double minimumBorderBlackFraction,
 									   int squarePixels,
 									   Class<T> inputType) {
 
@@ -160,6 +160,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 
 		// if no camera parameters is specified default to this
 		removePerspective.setModel(new PointToPixelTransform_F32(transformHomography));
+
+		BinaryContourFinder contourFinder = squareDetector.getDetector().getContourFinder();
+		contourHelper = new BinaryContourHelper(contourFinder,binaryCopy);
 	}
 
 	/**
@@ -195,7 +198,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	}
 
 	private Polygon2D_F64 interpolationHack = new Polygon2D_F64(4);
-	private Quadrilateral_F64 q = new Quadrilateral_F64(); // interpolation hack in quadrilateral format
 
 	List<Polygon2D_F64> candidates = new ArrayList<>();
 	List<DetectPolygonFromContour.Info> candidatesInfo = new ArrayList<>();
@@ -207,10 +209,11 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	 */
 	public void process( T gray ) {
 		configureContourDetector(gray);
-		binary.reshape(gray.width,gray.height);
 
-		inputToBinary.process(gray,binary);
-		squareDetector.process(gray,binary);
+		contourHelper.reshape(gray.width,gray.height);
+
+		inputToBinary.process(gray,contourHelper.withoutPadding());
+		squareDetector.process(gray,contourHelper.padded());
 		squareDetector.refineAll();
 		// These are in undistorted pixels
 		squareDetector.getPolygons(candidates,candidatesInfo);
@@ -221,6 +224,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 
 		for (int i = 0; i < candidates.size(); i++) {
 			// compute the homography from the input image to an undistorted square image
+			// If lens distortion has been specified this polygon will be in undistorted pixels
 			Polygon2D_F64 p = candidates.get(i);
 //			System.out.println(i+"  processing...  "+p.areaSimple()+" at "+p.get(0));
 
@@ -245,14 +249,14 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 				UtilPolygons2D_F64.shiftDown(p);
 			}
 
-			UtilPolygons2D_F64.convert(interpolationHack,q);
+			p.set(interpolationHack);
 
 			// remember, visual clockwise isn't the same as math clockwise, hence
 			// counter clockwise visual to the clockwise quad
-			pairsRemovePerspective.get(0).set(0, 0, q.a.x, q.a.y);
-			pairsRemovePerspective.get(1).set( square.width ,      0        , q.b.x , q.b.y );
-			pairsRemovePerspective.get(2).set( square.width , square.height , q.c.x , q.c.y );
-			pairsRemovePerspective.get(3).set( 0            , square.height , q.d.x , q.d.y );
+			pairsRemovePerspective.get(0).set(0, 0, p.get(0).x, p.get(0).y);
+			pairsRemovePerspective.get(1).set( square.width ,      0        , p.get(1).x , p.get(1).y );
+			pairsRemovePerspective.get(2).set( square.width , square.height , p.get(2).x , p.get(2).y );
+			pairsRemovePerspective.get(3).set( 0            , square.height , p.get(3).x , p.get(3).y );
 
 			if( !computeHomography.process(pairsRemovePerspective,H) ) {
 				if( verbose ) System.out.println("  rejected initial homography");
@@ -289,7 +293,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 				}
 			}
 			if( processSquare(square,result,info.edgeInside,info.edgeOutside)) {
-				prepareForOutput(q,result);
+				prepareForOutput(p,result);
 
 				if( verbose ) System.out.println("  accepted!");
 			} else {
@@ -374,39 +378,23 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	/**
 	 * Takes the found quadrilateral and the computed 3D information and prepares it for output
 	 */
-	private void prepareForOutput(Quadrilateral_F64 imageShape, Result result) {
+	private void prepareForOutput(Polygon2D_F64 imageShape, Result result) {
 		// the rotation estimate, apply in counter clockwise direction
 		// since result.rotation is a clockwise rotation in the visual sense, which
 		// is CCW on the grid
 		int rotationCCW = (4-result.rotation)%4;
 		for (int j = 0; j < rotationCCW; j++) {
-
-			rotateCounterClockwise(imageShape);
+			UtilPolygons2D_F64.shiftUp(imageShape);
 		}
 
 		// save the results for output
 		FoundFiducial f = found.grow();
 		f.id = result.which;
 
-		undistToDist.compute(imageShape.a.x, imageShape.a.y, f.distortedPixels.a);
-		undistToDist.compute(imageShape.b.x, imageShape.b.y, f.distortedPixels.b);
-		undistToDist.compute(imageShape.c.x, imageShape.c.y, f.distortedPixels.c);
-		undistToDist.compute(imageShape.d.x, imageShape.d.y, f.distortedPixels.d);
-	}
-
-	/**
-	 * Rotates the corners on the quad
-	 */
-	private void rotateCounterClockwise(Quadrilateral_F64 quad) {
-		Point2D_F64 a = quad.a;
-		Point2D_F64 b = quad.b;
-		Point2D_F64 c = quad.c;
-		Point2D_F64 d = quad.d;
-
-		quad.a = b;
-		quad.b = c;
-		quad.c = d;
-		quad.d = a;
+		for (int i = 0; i < 4; i++) {
+			Point2D_F64 a = imageShape.get(i);
+			undistToDist.compute(a.x, a.y, f.distortedPixels.get(i));
+		}
 	}
 
 	/**
@@ -441,7 +429,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	}
 
 	public GrayU8 getBinary() {
-		return binary;
+		return contourHelper.withoutPadding();
 	}
 
 	public Class<T> getInputType() {

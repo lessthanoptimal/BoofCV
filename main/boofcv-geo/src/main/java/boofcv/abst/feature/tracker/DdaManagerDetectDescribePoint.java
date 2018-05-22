@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,17 +49,6 @@ public class DdaManagerDetectDescribePoint<I extends ImageGray<I>, Desc extends 
 	}
 
 	@Override
-	public void detectFeatures(I input, FastQueue<Point2D_F64> locDst, FastQueue<Desc> featDst) {
-		detDesc.detect(input);
-
-		int N = detDesc.getNumberOfFeatures();
-		for( int i = 0; i < N; i++ ) {
-			locDst.add( detDesc.getLocation(i) );
-			featDst.add( detDesc.getDescription(i) );
-		}
-	}
-
-	@Override
 	public Desc createDescription() {
 		return detDesc.createDescription();
 	}
@@ -69,4 +58,25 @@ public class DdaManagerDetectDescribePoint<I extends ImageGray<I>, Desc extends 
 		return detDesc.getDescriptionType();
 	}
 
+	@Override
+	public void detectFeatures(I input) {
+		detDesc.detect(input);
+	}
+
+	@Override
+	public void getFeatures(int set, FastQueue<Point2D_F64> locations, FastQueue<Desc> descriptions) {
+		if( set != 0 )
+			throw new RuntimeException("Set must be 0");
+
+		int N = detDesc.getNumberOfFeatures();
+		for( int i = 0; i < N; i++ ) {
+			locations.add( detDesc.getLocation(i) );
+			descriptions.add( detDesc.getDescription(i) );
+		}
+	}
+
+	@Override
+	public int getNumberOfSets() {
+		return 1;
+	}
 }

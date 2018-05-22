@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 import org.ejml.UtilEjml;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -49,5 +50,22 @@ public class TestAdjustPolygonForThresholdBias {
 		assertTrue( shape.get(3).distance(10,41) <= UtilEjml.EPS );
 		assertTrue( shape.get(2).distance(36,41) <= UtilEjml.EPS );
 		assertTrue( shape.get(1).distance(36,10) <= UtilEjml.EPS );
+	}
+
+	/**
+	 * Create a situation where a point will be shifted on top of an existing one. See if that is caught
+	 * and removed. Not trivial to reproduce with real data but does happen.
+	 */
+	@Test
+	public void removeDuplicatePoint() {
+
+		AdjustPolygonForThresholdBias alg = new AdjustPolygonForThresholdBias();
+
+		Polygon2D_F64 original = new Polygon2D_F64(10,10, 10,9, 9,9, 20,9, 20,0, 11,0);
+		original.flip();
+		Polygon2D_F64 shape = original.copy();
+		alg.process(shape,true);
+
+		assertEquals(original.size()-1,shape.size());
 	}
 }

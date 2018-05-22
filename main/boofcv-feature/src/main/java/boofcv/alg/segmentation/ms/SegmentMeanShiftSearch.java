@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.Stoppable;
 
 /**
  * <p>
@@ -71,8 +72,9 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>> {
-
+public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>>
+		implements Stoppable
+{
 	// used to detect convergence of mean-shift
 	protected int maxIterations;
 	protected float convergenceTol;
@@ -113,6 +115,9 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>> {
 
 	// mode of mean-shift
 	protected float modeX, modeY;
+
+	// if a stop was requested
+	protected boolean stopRequested = false;
 
 	/**
 	 * Configures mean-shift segmentation
@@ -221,4 +226,14 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>> {
 	}
 
 	public abstract ImageType<T> getImageType();
+
+	@Override
+	public void requestStop() {
+		stopRequested = true;
+	}
+
+	@Override
+	public boolean isStopRequested() {
+		return stopRequested;
+	}
 }

@@ -1,9 +1,9 @@
 dependencies {
-    compile project(':main:boofcv-ip')
-    compile project(':main:boofcv-feature')
-    compile project(':main:boofcv-geo')
-    compile project(':main:boofcv-calibration')
+    implementation project(':main:boofcv-ip')
+    implementation project(':main:boofcv-feature')
+    implementation project(':main:boofcv-geo')
+    implementation project(':main:boofcv-calibration')
 
-    testCompile project(':main:boofcv-geo').sourceSets.test.output
-    testCompile project(':integration:boofcv-swing')
+    testImplementation project(':main:boofcv-geo').sourceSets.test.output
+    testImplementation project(':integration:boofcv-swing')
 }

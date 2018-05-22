@@ -667,6 +667,7 @@ public class TestPolylineSplitMerge {
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.setConvex(false); // make sure this test doesn't get triggered
+		alg.setMinimumSideLength(5);
 
 		// corners at 0,7,21,28
 		alg.addCorner(0);
@@ -739,7 +740,7 @@ public class TestPolylineSplitMerge {
 			alg.list.pushTail(c);
 		}
 
-		alg.setMinimumSideLength(4);
+		alg.setMinimumSideLength(2);
 		alg.setThresholdSideSplitScore(0); // turn off this test
 
 		assertTrue(alg.canBeSplit(contour,alg.list.getElement(5,true),false));
@@ -750,7 +751,7 @@ public class TestPolylineSplitMerge {
 		assertFalse(alg.canBeSplit(contour,alg.list.getElement(9,true),false));
 
 		// test side split score
-		alg.setMinimumSideLength(4);
+		alg.setMinimumSideLength(2);
 		alg.setThresholdSideSplitScore(1);
 
 		alg.list.getElement(5,true).object.sideError = 1.0000001;
@@ -765,7 +766,7 @@ public class TestPolylineSplitMerge {
 		assertFalse(alg.canBeSplit(contour,alg.list.getElement(5,true),true));
 
 		// Will it try to split a side with zero error if the min score is zero?
-		alg.setMinimumSideLength(4);
+		alg.setMinimumSideLength(2);
 		alg.setThresholdSideSplitScore(0);
 		alg.corners.get(0).sideError = 0;
 		assertFalse(alg.canBeSplit(contour,alg.list.getHead(),false));
@@ -787,16 +788,18 @@ public class TestPolylineSplitMerge {
 	public void canBeSplit_special_case() {
 		// only the contour's size matters
 		List<Point2D_I32> contour = new ArrayList<>();
-		for (int i = 0; i < 11; i++) {
+		for (int i = 0; i < 12; i++) {
 			contour.add( new Point2D_I32());
 		}
 
+		// if a side is split the two new sides must be at least 5 pixels long
+		// this the minimum seperation between two corners is 10 + 1 (see code for why +1)
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.setMinimumSideLength(5);
 		alg.setThresholdSideSplitScore(0);
 
 		alg.addCorner(0);
-		alg.addCorner(10);
+		alg.addCorner(11);
 		alg.list.getHead().object.sideError = 1e-6;
 		alg.list.getTail().object.sideError = 1e-6;
 

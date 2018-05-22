@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,12 +59,11 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	protected DMatrixRMaj F1 = new DMatrixRMaj(3,3);
 	protected DMatrixRMaj F2 = new DMatrixRMaj(3,3);
 
+	private DMatrixRMaj nullspace = new DMatrixRMaj(1,1);
+
 	// temporary storage for cubic coefficients
 	private Polynomial poly = new Polynomial(4);
 	private PolynomialRoots rootFinder = PolynomialSolver.createRootFinder(RootFinderType.EVD,4);
-
-	// Matrix from SVD
-	private DMatrixRMaj V = new DMatrixRMaj(9,9);
 
 	/**
 	 * When computing the essential matrix normalization is optional because pixel coordinates
@@ -102,8 +101,8 @@ public class FundamentalLinear7 extends FundamentalLinear {
 		if (!process(A))
 			return false;
 
-		undoNormalizationF(F1,N1,N2);
-		undoNormalizationF(F2,N1,N2);
+		undoNormalizationF(F1,N1.matrix(),N2.matrix());
+		undoNormalizationF(F2,N1.matrix(),N2.matrix());
 
 		// compute polynomial coefficients
 		computeCoefficients(F1, F2, poly.c);
@@ -118,14 +117,11 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 * Computes the SVD of A and extracts the essential/fundamental matrix from its null space
 	 */
 	private boolean process(DMatrixRMaj A) {
-		if( !svdNull.decompose(A) )
+		if( !solverNull.process(A,2,nullspace) )
 			return false;
 
-		// extract the two singular vectors
-		// no need to sort by singular values because the two automatic null spaces are being sampled
-		svdNull.getV(V,false);
-		SpecializedOps_DDRM.subvector(V, 0, 7, 9, false, 0, F1);
-		SpecializedOps_DDRM.subvector(V, 0, 8, 9, false, 0, F2);
+		SpecializedOps_DDRM.subvector(nullspace, 0, 0, 9, false, 0, F1);
+		SpecializedOps_DDRM.subvector(nullspace, 0, 1, 9, false, 0, F2);
 
 		return true;
 	}

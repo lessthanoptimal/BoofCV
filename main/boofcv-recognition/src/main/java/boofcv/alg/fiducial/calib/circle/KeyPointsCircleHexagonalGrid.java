@@ -24,9 +24,9 @@ import georegression.geometry.UtilVector2D_F64;
 import georegression.geometry.algs.TangentLinesTwoEllipses_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.misc.GrlConstants;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.struct.FastQueue;
 
 /**

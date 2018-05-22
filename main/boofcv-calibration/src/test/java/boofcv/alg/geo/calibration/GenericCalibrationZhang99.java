@@ -52,7 +52,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel>
 		for( Zhang99IntrinsicParam intrinsic : createParameters(rand) ) {
 //			System.out.println("Full Test : partial = "+partial);
 
-			Zhang99AllParam expected = GenericCalibrationGrid.createStandardParam(intrinsic, 10, rand);
+			Zhang99AllParam expected = GenericCalibrationGrid.createStandardParam(intrinsic, 15, rand);
 			List<CalibrationObservation> observations = GenericCalibrationGrid.createObservations(expected, grid);
 
 			if (partial) {
@@ -72,7 +72,6 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel>
 
 			double after = GenericCalibrationGrid.computeErrors(expected,grid,found);
 
-//			System.out.println("After pixel error after: "+after);
 			assertTrue(after < 0.001 );
 
 //			checkIntrinsicOnly(

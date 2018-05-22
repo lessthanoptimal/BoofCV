@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,6 +53,9 @@ public class GConvertImage {
 	 */
 	public static void convert( ImageBase input , ImageBase output ) {
 
+		ImageType typeIn = input.getImageType();
+		ImageType typeOut = output.getImageType();
+
 		if( input instanceof ImageGray) {
 			ImageGray sb = (ImageGray)input;
 			if( output instanceof ImageGray) {
@@ -104,12 +107,18 @@ public class GConvertImage {
 				average(mi,so);
 			}
 		} else if( input instanceof Planar && output instanceof ImageInterleaved )  {
+			String functionName;
+			if( typeIn.getDataType() == typeOut.getDataType()) {
+				functionName = "convert";
+			} else {
+				functionName = "convert"+typeIn.getDataType()+typeOut.getDataType();
+			}
 			try {
-				Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
+				Method m = ConvertImage.class.getMethod(functionName, input.getClass(), output.getClass());
 				m.invoke(null, input, output);
 			} catch (Exception e) {
-				throw new IllegalArgumentException("Unknown conversion. "+
-						input.getClass().getSimpleName()+" to "+output.getClass().getSimpleName());
+				throw new IllegalArgumentException("Unknown conversion. " +
+						input.getClass().getSimpleName() + " to " + output.getClass().getSimpleName());
 			}
 		} else if( input instanceof Planar && output instanceof Planar) {
 			Planar mi = (Planar) input;
@@ -123,8 +132,14 @@ public class GConvertImage {
 				}
 			}
 		} else if( input instanceof ImageInterleaved && output instanceof Planar)  {
+			String functionName;
+			if( typeIn.getDataType() == typeOut.getDataType()) {
+				functionName = "convert";
+			} else {
+				functionName = "convert"+typeIn.getDataType()+typeOut.getDataType();
+			}
 			try {
-				Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
+				Method m = ConvertImage.class.getMethod(functionName, input.getClass(), output.getClass());
 				m.invoke(null, input, output);
 			} catch (Exception e) {
 				throw new IllegalArgumentException("Unknown conversion. "+

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.geo;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.data.DMatrix1Row;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
@@ -32,63 +33,51 @@ import java.util.List;
  */
 public class LowLevelMultiViewOps {
 	/**
-	 * <p>
-	 * Computes a normalization matrix used to reduce numerical errors inside of linear estimation algorithms.
-	 * Pixels coordinates are poorly scaled for linear algebra operations resulting in excessive numerical error.
-	 * This function computes a transform which will minimize numerical error by properly scaling the pixels.
+	 * <p>Computes a transform which will normalize the points such that they have zero mean and a standard
+	 * deviation of one
 	 * </p>
-	 *
-	 * <pre>
-	 * N = [ 1/&sigma;_x     0      -&mu;_x/&sigma;_x ]
-	 *     [    0   1/&sigma;_y 0   -&mu;_y/&sigma;_y ]
-	 *     [    0      0          1    ]
-	 * </pre>
 	 *
 	 * <p>
 	 * Y. Ma, S. Soatto, J. Kosecka, and S. S. Sastry, "An Invitation to 3-D Vision" Springer-Verlad, 2004
 	 * </p>
 	 *
 	 * @param points Input: List of observed points. Not modified.
-	 * @param N Output: 3x3 normalization matrix for first set of points. Modified.
+	 * @param normalize Output: 3x3 normalization matrix for first set of points. Modified.
 	 */
-	public static void computeNormalization(List<Point2D_F64> points, DMatrixRMaj N )
+	public static void computeNormalization(List<Point2D_F64> points, NormalizationPoint2D normalize )
 	{
-		double meanX1 = 0;
-		double meanY1 = 0;
+		double meanX = 0;
+		double meanY = 0;
 
 		for( Point2D_F64 p : points ) {
-			meanX1 += p.x;
-			meanY1 += p.y;
+			meanX += p.x;
+			meanY += p.y;
 		}
 
-		meanX1 /= points.size();
-		meanY1 /= points.size();
+		meanX /= points.size();
+		meanY /= points.size();
 
-		double stdX1 = 0;
-		double stdY1 = 0;
+		double stdX = 0;
+		double stdY = 0;
 
 		for( Point2D_F64 p : points ) {
-			double dx = p.x - meanX1;
-			double dy = p.y - meanY1;
-			stdX1 += dx*dx;
-			stdY1 += dy*dy;
+			double dx = p.x - meanX;
+			double dy = p.y - meanY;
+			stdX += dx*dx;
+			stdY += dy*dy;
 		}
 
-		stdX1 = Math.sqrt(stdX1/points.size());
-		stdY1 = Math.sqrt(stdY1/points.size());
-		N.zero();
+		normalize.meanX = meanX;
+		normalize.meanY = meanY;
 
-		N.set(0, 0, 1.0 / stdX1);
-		N.set(1, 1, 1.0 / stdY1);
-		N.set(0, 2, -meanX1 / stdX1);
-		N.set(1, 2, -meanY1 / stdY1);
-		N.set(2, 2, 1.0);
+		normalize.stdX = Math.sqrt(stdX/points.size());
+		normalize.stdY = Math.sqrt(stdY/points.size());
 	}
 
 	/**
 	 * <p>
 	 * Computes two normalization matrices for each set of point correspondences in the list of
-	 * {@link boofcv.struct.geo.AssociatedPair}.  Same as {@link #computeNormalization(java.util.List, org.ejml.data.DMatrixRMaj)},
+	 * {@link boofcv.struct.geo.AssociatedPair}.  Same as {@link #computeNormalization(java.util.List, NormalizationPoint2D)},
 	 * but for two views.
 	 * </p>
 	 *
@@ -96,13 +85,13 @@ public class LowLevelMultiViewOps {
 	 * @param N1 Output: 3x3 normalization matrix for first set of points. Modified.
 	 * @param N2 Output: 3x3 normalization matrix for second set of points. Modified.
 	 */
-	public static void computeNormalization(List<AssociatedPair> points, DMatrixRMaj N1, DMatrixRMaj N2)
+	public static void computeNormalization(List<AssociatedPair> points, NormalizationPoint2D N1, NormalizationPoint2D N2)
 	{
 		double meanX1 = 0; double meanY1 = 0;
 		double meanX2 = 0; double meanY2 = 0;
 
 		for( AssociatedPair p : points ) {
-			meanX1 += p.p1.x;  meanY1 += p.p1.y;
+			meanX1 += p.p1.x; meanY1 += p.p1.y;
 			meanX2 += p.p2.x; meanY2 += p.p2.y;
 		}
 
@@ -124,28 +113,17 @@ public class LowLevelMultiViewOps {
 			stdY2 += dy*dy;
 		}
 
-		stdX1 = Math.sqrt(stdX1/points.size()); stdY1 = Math.sqrt(stdY1/points.size());
-		stdX2 = Math.sqrt(stdX2/points.size()); stdY2 = Math.sqrt(stdY2/points.size());
+		N1.meanX = meanX1; N1.meanY = meanY1;
+		N2.meanX = meanX2; N2.meanY = meanY2;
 
-		N1.zero(); N2.zero();
-
-		N1.set(0,0,1.0/stdX1);
-		N1.set(1,1,1.0/stdY1);
-		N1.set(0,2,-meanX1/stdX1);
-		N1.set(1,2,-meanY1/stdY1);
-		N1.set(2,2,1.0);
-
-		N2.set(0,0,1.0/stdX2);
-		N2.set(1,1,1.0/stdY2);
-		N2.set(0,2,-meanX2/stdX2);
-		N2.set(1,2,-meanY2/stdY2);
-		N2.set(2,2,1.0);
+		N1.stdX = Math.sqrt(stdX1/points.size()); N1.stdY = Math.sqrt(stdY1/points.size());
+		N2.stdX = Math.sqrt(stdX2/points.size()); N2.stdY = Math.sqrt(stdY2/points.size());
 	}
 
 	/**
 	 * <p>
 	 * Computes three normalization matrices for each set of point correspondences in the list of
-	 * {@link boofcv.struct.geo.AssociatedTriple}.  Same as {@link #computeNormalization(java.util.List, org.ejml.data.DMatrixRMaj)},
+	 * {@link boofcv.struct.geo.AssociatedTriple}.  Same as {@link #computeNormalization(java.util.List, NormalizationPoint2D)},
 	 * but for three views.
 	 * </p>
 	 *
@@ -155,7 +133,7 @@ public class LowLevelMultiViewOps {
 	 * @param N3 Output: 3x3 normalization matrix for third set of points. Modified.
 	 */
 	public static void computeNormalization( List<AssociatedTriple> points,
-											 DMatrixRMaj N1, DMatrixRMaj N2, DMatrixRMaj N3 )
+											 NormalizationPoint2D N1, NormalizationPoint2D N2, NormalizationPoint2D N3 )
 	{
 		double meanX1 = 0; double meanY1 = 0;
 		double meanX2 = 0; double meanY2 = 0;
@@ -186,41 +164,32 @@ public class LowLevelMultiViewOps {
 			stdX3 += dx*dx; stdY3 += dy*dy;
 		}
 
-		stdX1 = Math.sqrt(stdX1/points.size()); stdY1 = Math.sqrt(stdY1/points.size());
-		stdX2 = Math.sqrt(stdX2/points.size()); stdY2 = Math.sqrt(stdY2/points.size());
-		stdX3 = Math.sqrt(stdX3/points.size()); stdY3 = Math.sqrt(stdY3/points.size());
+		N1.meanX = meanX1; N1.meanY = meanY1;
+		N2.meanX = meanX2; N2.meanY = meanY2;
+		N3.meanX = meanX3; N3.meanY = meanY3;
 
-		N1.zero(); N2.zero(); N3.zero();
-
-		N1.set(0,0,1.0/stdX1);
-		N1.set(1,1,1.0/stdY1);
-		N1.set(0,2,-meanX1/stdX1);
-		N1.set(1,2,-meanY1/stdY1);
-		N1.set(2,2,1.0);
-
-		N2.set(0,0,1.0/stdX2);
-		N2.set(1,1,1.0/stdY2);
-		N2.set(0,2,-meanX2/stdX2);
-		N2.set(1,2,-meanY2/stdY2);
-		N2.set(2,2,1.0);
-
-		N3.set(0,0,1.0/stdX3);
-		N3.set(1,1,1.0/stdY3);
-		N3.set(0,2,-meanX3/stdX3);
-		N3.set(1,2,-meanY3/stdY3);
-		N3.set(2,2,1.0);
+		N1.stdX = Math.sqrt(stdX1/points.size()); N1.stdY = Math.sqrt(stdY1/points.size());
+		N2.stdX = Math.sqrt(stdX2/points.size()); N2.stdY = Math.sqrt(stdY2/points.size());
+		N3.stdX = Math.sqrt(stdX3/points.size()); N3.stdY = Math.sqrt(stdY3/points.size());
 	}
 
-	/**
-	 * Given the normalization matrix computed from {@link #computeNormalization(java.util.List, org.ejml.data.DMatrixRMaj)}
-	 * normalize the point.
-	 *
-	 * @param N Normalization matrix.
-	 * @param orig Unnormalized coordinate in pixels.
-	 * @param normed Normalized coordinate.
-	 */
-	public static void applyPixelNormalization(DMatrixRMaj N, Point2D_F64 orig, Point2D_F64 normed) {
-		normed.x = orig.x * N.data[0] + N.data[2];
-		normed.y = orig.y * N.data[4] + N.data[5];
+	public static void applyNormalization(List<AssociatedPair> points,
+										  NormalizationPoint2D N1, NormalizationPoint2D N2,
+										  DMatrix1Row X1 , DMatrixRMaj X2 )
+	{
+		final int size = points.size();
+
+		X1.reshape(size,2);
+		X2.reshape(size,2);
+
+		for (int i = 0,index = 0; i < size; i++,index+=2) {
+			AssociatedPair pair = points.get(i);
+
+			X1.data[index]   = (pair.p1.x - N1.meanX)/N1.stdX;
+			X1.data[index+1] = (pair.p1.y - N1.meanY)/N1.stdY;
+
+			X2.data[index]   = (pair.p2.x - N2.meanX)/N2.stdX;
+			X2.data[index+1] = (pair.p2.y - N2.meanY)/N2.stdY;
+		}
 	}
 }

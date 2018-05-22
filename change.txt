@@ -3,6 +3,56 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2018/05/21
+Version : 0.30
+
+- Renamed HomographyLinear4 to HomographyDirectLinearTransform
+  * More consistent with the literature
+- Added HomographyTotalLeastSquares
+  * Computes the homography gives a set of associated 2D points
+  * About 4x faster than DLT
+  * Mathew Harker and Paul O'Leary "Computation of Homographies"
+- PNP
+  * Added IPPE; Collins, Toby, and Adrien Bartoli. "Infinitesimal plane-based pose estimation."
+- QR Code
+  * QrCodeGeneratorImage automatically has a white border
+  * Fixed crash bug if it estimated a version 0 QR
+  * If possible, it will recycled binary image instead of creating a copy internally
+- Square Fiducials
+  * If possible, it will recycled binary image instead of creating a copy internally
+- ImageType
+  * Added setTo() and isSameType()
+- ImageMultiBand
+  * Added reshape(width,height,numberOfBands)
+- Android
+  * Support for camera2 API
+- ImageConvert
+  * Added convert between planar and interleaved of different data types
+- Fast Corner
+  * Improved efficiency by changing how points are sampled
+  * Added a variant which doesn't compute feature intensity
+- PointTracker
+  * Can handle multiple sets of detected features, e.g. min and max features
+- Stoppable
+  * An interface for gracefully exiting a long running process
+  * MeanShiftSuperPixel, SLIC
+- ColorFormat added to specify different formats for visible light
+- Calibration
+  * Fixed issue with chessboard patterns when they are very close
+- AdjustPolygonForThresholdBias
+  * Handles case where a point is shifted and becomes a duplicate
+- ImageZoomPanel
+  * Saving the view saves what you see exactly now
+- Binary Contour
+  * New external only contour algorithm
+  * About 1.35x faster on average and in some situations 10x faster
+  * Contour finding now has two high level interfaces
+  * Optional interface for implementations which provide access to padding settings.
+- PolylineSplitMerge
+  * Minimum side length is enforced fully now
+- Simplified transforms to equirectangular images
+
+---------------------------------------------
 Date    : 2018/03/18
 Version : 0.29
 

@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.feature.detect.edge;
 
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.feature.detect.edge.CannyEdge;
 import boofcv.alg.feature.detect.edge.EdgeContour;
 import boofcv.alg.filter.binary.BinaryImageOps;
@@ -74,7 +74,7 @@ public class ShowEdgeContourApp<T extends ImageGray<T>, D extends ImageGray<D>>
 
 	int previousBlur;
 	CannyEdge<T,D> canny;
-	BinaryContourFinder contour = FactoryBinaryContourFinder.linearChang2004();
+	BinaryLabelContourFinder contour = FactoryBinaryContourFinder.linearChang2004();
 
 	public ShowEdgeContourApp(Class<T> imageType, Class<D> derivType) {
 		super(1);

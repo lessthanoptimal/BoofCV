@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,15 +31,16 @@ import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.io.image.UtilImageIO;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPolygons2D_F64;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
 import javax.swing.*;
@@ -85,6 +86,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 
 		controlPanel.setListener(this);
 
+		imagePanel.setPreferredSize(new Dimension( 800,800));
 		imagePanel.setScale(controlPanel.getViewInfo().getZoom());
 		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override
@@ -119,24 +121,14 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 	@Override
 	protected void handleInputChange( int source , InputMethod method , final int width , final int height ) {
 		// adjust the scale if needed so that the entire image is visible when loaded
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				controlPanel.getViewInfo().setImageSize(width,height);
-				if (imagePanel.getWidth() > 0) {
-					double scaleX = (imagePanel.getWidth() + 5) / (double) width;
-					double scaleY = (imagePanel.getHeight() + 5) / (double) height;
-
-					final double scale = Math.min(scaleX, scaleY);
-					if (scale < 1.0) {
-						controlPanel.getViewInfo().setScale(scale);
-					} else {
-						controlPanel.getViewInfo().setScale(1);
-					}
-				} else {
-					imagePanel.setPreferredSize(new Dimension(width,height));
-				}
-			}
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			double zoom = BoofSwingUtil.selectZoomToShowAll(imagePanel,width,height);
+			controlPanel.getViewInfo().setImageSize(width,height);
+			controlPanel.getViewInfo().setScale(zoom);
+			imagePanel.setScale(zoom);
+			imagePanel.updateSize(width,height);
+			imagePanel.getHorizontalScrollBar().setValue(0);
+			imagePanel.getVerticalScrollBar().setValue(0);
 		});
 	}
 
@@ -154,7 +146,20 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 			grayPrev.setTo((GrayF32)gray);
 		}
 
-		processFrame();
+		try {
+			processFrame();
+		} catch( RuntimeException e ) {
+			e.printStackTrace();
+			UtilImageIO.saveImage(buffered,"crash_image.png");
+		}
+
+		if( controlPanel instanceof DetectCalibrationPolygonPanel ) {
+			DetectCalibrationPolygonPanel c = (DetectCalibrationPolygonPanel)controlPanel;
+			c.polygonPanel.getThresholdPanel().updateHistogram(grayPrev);
+		} else {
+			if( controlPanel.threshold != null )
+				controlPanel.threshold.updateHistogram(grayPrev);
+		}
 	}
 
 	protected void renderGraph( Graphics2D g2 , double scale ) {
@@ -188,6 +193,9 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 			for( SquareEdge e : edges ) {
 				Point2D_F64 a = e.a.center;
 				Point2D_F64 b = e.b.center;
+
+//				Point2D_F64 a = e.a.square.get(e.sideA);
+//				Point2D_F64 b = e.b.square.get(e.sideB);
 
 				l.setLine(a.x*scale,a.y*scale,b.x*scale,b.y*scale);
 

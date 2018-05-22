@@ -24,12 +24,22 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
 /**
+ * Renders a QR Code inside a gray scale image.
+ *
  * @author Peter Abeles
  */
 public class QrCodeGeneratorImage extends QrCodeGenerator {
 
 	GrayU8 gray = new GrayU8(1,1);
 	int pixelsPerModule;
+
+	// number of module wide the border/quite zone is around the qr code
+	int borderModule=2;
+
+	// number of pixels in the border
+	private int borderPixels;
+	// Width of the marker in pixels
+	private int markerPixels;
 
 	public QrCodeGeneratorImage( int pixelsPerModule) {
 		super(1.0);
@@ -38,7 +48,9 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 
 	@Override
 	public void init() {
-		int width = pixelsPerModule*numModules;
+		borderPixels = borderModule*pixelsPerModule;
+		markerPixels = pixelsPerModule*numModules;
+		int width = markerPixels +2*borderPixels;
 		gray.reshape(width,width);
 		ImageMiscOps.fill(gray,255);
 	}
@@ -53,8 +65,8 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 
 		for (int i = 0; i < qr.alignment.size(); i++) {
 			QrCode.Alignment a = qr.alignment.get(i);
-			a.pixel.x *= gray.width;
-			a.pixel.y *= gray.height;
+			a.pixel.x = borderPixels + a.pixel.x* markerPixels;
+			a.pixel.y = borderPixels + a.pixel.y* markerPixels;
 			a.threshold = 125;
 		}
 
@@ -66,16 +78,16 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 	private void adjustSize(Polygon2D_F64 poly) {
 		for (int i = 0; i < poly.size(); i++) {
 			Point2D_F64 p = poly.get(i);
-			p.x *= gray.width;
-			p.y *= gray.width;
+			p.x = borderPixels+p.x*markerPixels;
+			p.y = borderPixels+p.y*markerPixels;
 		}
 	}
 
 	@Override
 	public void square(double x0, double y0, double width) {
-		int pixelX = (int)(x0*gray.width+0.5);
-		int pixelY = (int)(y0*gray.width+0.5);
-		int pixelsWidth = (int)(width*gray.width+0.5);
+		int pixelX = borderPixels+(int)(x0* markerPixels +0.5);
+		int pixelY = borderPixels+(int)(y0* markerPixels +0.5);
+		int pixelsWidth = (int)(width* markerPixels +0.5);
 
 		ImageMiscOps.fillRectangle(gray,0,pixelX,pixelY,
 				pixelsWidth, pixelsWidth);
@@ -84,15 +96,27 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 	@Override
 	public void square(double x0, double y0, double width0, double thickness) {
 
-		int X0 = (int)(x0*gray.width+0.5);
-		int Y0 = (int)(y0*gray.width+0.5);
-		int WIDTH = (int)(width0*gray.width+0.5);
-		int THICKNESS = (int)(thickness *gray.width+0.5);
+		int X0 = borderPixels+(int)(x0* markerPixels +0.5);
+		int Y0 = borderPixels+(int)(y0* markerPixels +0.5);
+		int WIDTH = (int)(width0* markerPixels +0.5);
+		int THICKNESS = (int)(thickness * markerPixels +0.5);
 
 		ImageMiscOps.fillRectangle(gray,0,X0,Y0,WIDTH,THICKNESS);
 		ImageMiscOps.fillRectangle(gray,0,X0,Y0+WIDTH-THICKNESS,WIDTH,THICKNESS);
 		ImageMiscOps.fillRectangle(gray,0,X0,Y0+THICKNESS,THICKNESS,WIDTH-THICKNESS*2);
 		ImageMiscOps.fillRectangle(gray,0,X0+WIDTH-THICKNESS,Y0+THICKNESS,THICKNESS,WIDTH-THICKNESS*2);
+	}
+
+	public int getBorderModule() {
+		return borderModule;
+	}
+
+	/**
+	 * Used to change the white border's size.
+	 * @param borderModule Border size in units of modules
+	 */
+	public void setBorderModule(int borderModule) {
+		this.borderModule = borderModule;
 	}
 
 	public GrayU8 getGray() {

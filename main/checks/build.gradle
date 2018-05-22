@@ -1,3 +1,3 @@
 dependencies {
-    compile project(':main:boofcv-core')
+    implementation project(':main:boofcv-core')
 }
