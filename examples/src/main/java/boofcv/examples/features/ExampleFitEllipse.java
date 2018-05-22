@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,8 +62,8 @@ public class ExampleFitEllipse {
 		GrayU8 filtered = BinaryImageOps.erode8(binary, 1, null);
 		filtered = BinaryImageOps.dilate8(filtered, 1, null);
 
-		// Find the contour around the shapes
-		List<Contour> contours = BinaryImageOps.contour(filtered, ConnectRule.EIGHT,null);
+		// Find only external contours around each shape. Much faster than if internal + labeled images are considered.
+		List<Contour> contours = BinaryImageOps.contourExternal(filtered, ConnectRule.EIGHT);
 
 		// Fit an ellipse to each external contour and draw the results
 		Graphics2D g2 = image.createGraphics();

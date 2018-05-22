@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public class ExampleCannyEdge {
 		// The 'edgeContours' is a tree graph that can be difficult to process.  An alternative is to extract
 		// the contours from the binary image, which will produce a single loop for each connected cluster of pixels.
 		// Note that you are only interested in external contours.
-		List<Contour> contours = BinaryImageOps.contour(edgeImage, ConnectRule.EIGHT, null);
+		List<Contour> contours = BinaryImageOps.contourExternal(edgeImage, ConnectRule.EIGHT);
 
 		// display the results
 		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(edgeImage, false, null);

@@ -78,7 +78,7 @@ public class ExampleFitPolygon {
 		GrayU8 filtered = BinaryImageOps.erode8(binary, 1, null);
 		filtered = BinaryImageOps.dilate8(filtered, 1, null);
 
-		// Find the contour around the shapes
+		// Find internal and external contour around each shape
 		List<Contour> contours = BinaryImageOps.contour(filtered, ConnectRule.EIGHT,null);
 
 		// Fit a polygon to each shape and draw the results
@@ -154,7 +154,8 @@ public class ExampleFitPolygon {
 
 		canny.process(input,0.1f,0.3f,binary);
 
-		List<Contour> contours = BinaryImageOps.contour(binary, ConnectRule.EIGHT, null);
+		// Only external contours are relevant
+		List<Contour> contours = BinaryImageOps.contourExternal(binary, ConnectRule.EIGHT);
 
 		Graphics2D g2 = displayImage.createGraphics();
 		g2.setStroke(new BasicStroke(2));
@@ -163,7 +164,6 @@ public class ExampleFitPolygon {
 		Random rand = new Random(234);
 
 		for( Contour c : contours ) {
-			// Only the external contours are relevant.
 			List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external,true, minSide,cornerPenalty);
 
 			g2.setColor(new Color(rand.nextInt()));
@@ -178,11 +178,10 @@ public class ExampleFitPolygon {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("shapes/shapes02.png"));
 		GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);
 
-		gui.addImage(image,"Original");
-
 		fitCannyEdges(input);
 		fitCannyBinary(input);
 		fitBinaryImage(input);
+		gui.addImage(image,"Original");
 
 		ShowImages.showWindow(gui, "Polygon from Contour", true);
 	}
