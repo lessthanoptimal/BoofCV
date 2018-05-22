@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,9 @@ import java.util.Random;
  */
 public class AssociationPanel extends CompareTwoImagePanel implements MouseListener {
 
+	// lock for all the data structures below
+	final Object lock = new Object();
+
 	// which features are associated with each other
 	private int assocLeft[],assocRight[];
 
@@ -48,90 +51,82 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 		super(borderSize,true);
 	}
 
-	public synchronized void setAssociation( List<Point2D_F64> leftPts , List<Point2D_F64> rightPts,
-											 FastQueue<AssociatedIndex> matches ) {
+	public void setAssociation( List<Point2D_F64> leftPts , List<Point2D_F64> rightPts,
+											 FastQueue<AssociatedIndex> matches )
+	{
+		synchronized ( lock) {
+			List<Point2D_F64> allLeft = new ArrayList<>();
+			List<Point2D_F64> allRight = new ArrayList<>();
 
-		List<Point2D_F64> allLeft = new ArrayList<>();
-		List<Point2D_F64> allRight = new ArrayList<>();
+			assocLeft = new int[matches.size()];
+			assocRight = new int[matches.size()];
 
-		assocLeft = new int[ matches.size() ];
-		assocRight = new int[ matches.size() ];
+			for (int i = 0; i < matches.size(); i++) {
+				AssociatedIndex a = matches.get(i);
 
-		for (int i = 0; i < matches.size(); i++) {
-			AssociatedIndex a = matches.get(i);
+				allLeft.add(leftPts.get(a.src));
+				allRight.add(rightPts.get(a.dst));
 
-			allLeft.add( leftPts.get(a.src));
-			allRight.add( rightPts.get(a.dst));
+				assocLeft[i] = i;
+				assocRight[i] = i;
+			}
 
-			assocLeft[i] = i;
-			assocRight[i] = i;
-		}
+			setLocation(allLeft, allRight);
 
-		setLocation(allLeft,allRight);
-
-//		assocLeft = new int[ leftPts.size() ];
-//		assocRight = new int[ rightPts.size() ];
-//
-//		for( int i = 0; i < assocLeft.length; i++ )
-//			assocLeft[i] = -1;
-//		for( int i = 0; i < assocRight.length; i++ )
-//			assocRight[i] = -1;
-//
-//		for( int i = 0; i < matches.size; i++ ) {
-//			AssociatedIndex a = matches.get(i);
-//			assocLeft[a.src] = a.dst;
-//			assocRight[a.dst] = a.src;
-//		}
-
-		Random rand = new Random(234);
-		colors = new Color[ leftPts.size() ];
-		for( int i = 0; i < colors.length; i++ ) {
-			colors[i] = new Color(rand.nextInt() | 0xFF000000 );
+			Random rand = new Random(234);
+			colors = new Color[matches.size()];
+			for (int i = 0; i < matches.size(); i++) {
+				colors[i] = new Color(rand.nextInt() | 0xFF000000);
+			}
 		}
 	}
 
-	public synchronized void setAssociation( List<AssociatedPair> matches ) {
-		List<Point2D_F64> leftPts = new ArrayList<>();
-		List<Point2D_F64> rightPts = new ArrayList<>();
+	public void setAssociation( List<AssociatedPair> matches ) {
+		synchronized ( lock) {
+			List<Point2D_F64> leftPts = new ArrayList<>();
+			List<Point2D_F64> rightPts = new ArrayList<>();
 
-		for( AssociatedPair p : matches ) {
-			leftPts.add(p.p1);
-			rightPts.add(p.p2);
-		}
+			for (AssociatedPair p : matches) {
+				leftPts.add(p.p1);
+				rightPts.add(p.p2);
+			}
 
-		setLocation(leftPts,rightPts);
+			setLocation(leftPts, rightPts);
 
-		assocLeft = new int[ leftPts.size() ];
-		assocRight = new int[ rightPts.size() ];
+			assocLeft = new int[leftPts.size()];
+			assocRight = new int[rightPts.size()];
 
-		for( int i = 0; i < assocLeft.length; i++ ) {
-			assocLeft[i] = i;
-			assocRight[i] = i;
-		}
+			for (int i = 0; i < assocLeft.length; i++) {
+				assocLeft[i] = i;
+				assocRight[i] = i;
+			}
 
-		Random rand = new Random(234);
-		colors = new Color[ leftPts.size() ];
-		for( int i = 0; i < colors.length; i++ ) {
-			colors[i] = new Color(rand.nextInt() | 0xFF000000 );
+			Random rand = new Random(234);
+			colors = new Color[matches.size()];
+			for (int i = 0; i < colors.length; i++) {
+				colors[i] = new Color(rand.nextInt() | 0xFF000000);
+			}
 		}
 	}
 
-	public synchronized void setAssociation( List<Point2D_F64> leftPts , List<Point2D_F64> rightPts ) {
+	public void setAssociation( List<Point2D_F64> leftPts , List<Point2D_F64> rightPts ) {
 
-		setLocation(leftPts,rightPts);
+		synchronized ( lock) {
+			setLocation(leftPts, rightPts);
 
-		assocLeft = new int[ leftPts.size() ];
-		assocRight = new int[ rightPts.size() ];
+			assocLeft = new int[leftPts.size()];
+			assocRight = new int[rightPts.size()];
 
-		for( int i = 0; i < assocLeft.length; i++ ) {
-			assocLeft[i] = i;
-			assocRight[i] = i;
-		}
+			for (int i = 0; i < assocLeft.length; i++) {
+				assocLeft[i] = i;
+				assocRight[i] = i;
+			}
 
-		Random rand = new Random(234);
-		colors = new Color[ leftPts.size() ];
-		for( int i = 0; i < colors.length; i++ ) {
-			colors[i] = new Color(rand.nextInt() | 0xFF000000 );
+			Random rand = new Random(234);
+			colors = new Color[leftPts.size()];
+			for (int i = 0; i < colors.length; i++) {
+				colors[i] = new Color(rand.nextInt() | 0xFF000000);
+			}
 		}
 	}
 
@@ -139,37 +134,41 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 	protected void drawFeatures(Graphics2D g2 ,
 								double scaleLeft, int leftX, int leftY,
 								double scaleRight, int rightX, int rightY) {
-		if( selected.isEmpty() )
-			drawAllFeatures(g2, scaleLeft,scaleRight,rightX);
-		else {
+		synchronized ( lock) {
+			if (selected.isEmpty())
+				drawAllFeatures(g2, scaleLeft, scaleRight, rightX);
+			else {
 
-			for( int selectedIndex : selected ) {
-				// draw just an individual feature pair
-				Point2D_F64 l,r;
-				Color color;
+				for (int selectedIndex : selected) {
+					// draw just an individual feature pair
+					Point2D_F64 l, r;
+					Color color;
 
-				if( selectedIsLeft ) {
-					l = leftPts.get(selectedIndex);
-					if( assocLeft[selectedIndex] < 0 ) {
-						r = null; color = null;
+					if (selectedIsLeft) {
+						l = leftPts.get(selectedIndex);
+						if (assocLeft[selectedIndex] < 0) {
+							r = null;
+							color = null;
+						} else {
+							r = rightPts.get(assocLeft[selectedIndex]);
+							color = colors[selectedIndex];
+						}
 					} else {
-						r = rightPts.get(assocLeft[selectedIndex]);
-						color = colors[selectedIndex];
+						r = rightPts.get(selectedIndex);
+						if (assocRight[selectedIndex] < 0) {
+							l = null;
+							color = null;
+						} else {
+							l = leftPts.get(assocRight[selectedIndex]);
+							color = colors[assocRight[selectedIndex]];
+						}
 					}
-				} else {
-					r = rightPts.get(selectedIndex);
-					if( assocRight[selectedIndex] < 0 ) {
-						l = null; color = null;
-					} else {
-						l = leftPts.get(assocRight[selectedIndex]);
-						color = colors[assocRight[selectedIndex]];
-					}
+
+					if (color == null) // clicking on something with no association is annoying
+						drawAllFeatures(g2, scaleLeft, scaleRight, rightX);
+					else
+						drawAssociation(g2, scaleLeft, scaleRight, rightX, l, r, color);
 				}
-
-				if( color == null ) // clicking on something with no association is annoying
-					drawAllFeatures(g2, scaleLeft,scaleRight,rightX);
-				else
-					drawAssociation(g2, scaleLeft,scaleRight,rightX, l, r, color);
 			}
 		}
 	}
