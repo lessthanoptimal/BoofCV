@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,12 +32,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 /**
  * @author Peter Abeles
  */
-public class CirculantVisualizationPanel extends JPanel implements MouseListener{
+public class CirculantVisualizationPanel extends JPanel
+		implements MouseListener, MouseMotionListener  {
 
 	BufferedImage frame;
 	CenterPanel centerPanel = new CenterPanel();
@@ -69,6 +71,7 @@ public class CirculantVisualizationPanel extends JPanel implements MouseListener
 		add(right, BorderLayout.EAST);
 
 		centerPanel.addMouseListener(this);
+		centerPanel.addMouseMotionListener(this);
 		centerPanel.grabFocus();
 	}
 
@@ -126,6 +129,20 @@ public class CirculantVisualizationPanel extends JPanel implements MouseListener
 		numClicks = 0;
 	}
 
+	@Override
+	public void mouseDragged(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		if( numClicks == 1 ) {
+			selected.x1 = e.getX();
+			selected.y1 = e.getY();
+			centerPanel.repaint();
+		}
+	}
+
 	private class CenterPanel extends JPanel {
 		@Override
 		protected synchronized void paintComponent(Graphics g) {
@@ -134,10 +151,11 @@ public class CirculantVisualizationPanel extends JPanel implements MouseListener
 
 			g2.drawImage(frame,0,0,null);
 
-			if( hasSelected ) {
-//			drawRectangle(g2,trackingRect,Color.GREEN,6);
+			 if( hasSelected ) {
 				drawRectangle(g2,selected,Color.RED,3);
-			}
+			} else if( numClicks == 1 ) {
+				 drawRectangle(g2,selected,Color.BLUE,3);
+			 }
 		}
 	}
 
@@ -184,8 +202,9 @@ public class CirculantVisualizationPanel extends JPanel implements MouseListener
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if( numClicks == 0 ) {
-			selected.x0 = e.getX();
-			selected.y0 = e.getY();
+			selected.x0 = selected.x1 =  e.getX();
+			selected.y0 = selected.y1 =  e.getY();
+			centerPanel.repaint();
 		} else if( numClicks == 1 ) {
 			selected.x1 = e.getX();
 			selected.y1 = e.getY();
