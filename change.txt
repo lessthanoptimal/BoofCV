@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2018/
+Date    : 2018/05/21
 Version : 0.30
 
 - Renamed HomographyLinear4 to HomographyDirectLinearTransform
@@ -51,16 +51,6 @@ Version : 0.30
 - PolylineSplitMerge
   * Minimum side length is enforced fully now
 - Simplified transforms to equirectangular images
-
-- TODO New chessboard detector (current is too brittle)
-  * binary, contour, line segments
-  * look for line segments which have end points that are close to each other
-
-- TODO PNP regression and benchmark
-- TODO Compare BoofCV's IPPE against original
-
-- TODO determine why solving for nullspace with QRP causes decoding regression to get worse
-- TODO create regression for homography estimation
 
 ---------------------------------------------
 Date    : 2018/03/18

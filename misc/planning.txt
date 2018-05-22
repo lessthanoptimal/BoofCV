@@ -1,15 +1,19 @@
 TOP ITEMS
+- TODO New chessboard detector (current is too brittle)
+  * binary, contour, line segments
+  * look for line segments which have end points that are close to each other
+
+- TODO PNP regression and benchmark
+- TODO Compare BoofCV's IPPE against original
+
+- TODO determine why solving for nullspace with QRP causes decoding regression to get worse
+- TODO create regression for homography estimation
+
 - TODO QR Code algorithm
   * Better rejection of finder patterns using graph
   * See if a better reading of mode bits is needed
   * Reading mode and version. For small qr codes use the lines connecting position patterns
     those will be more reliable than the sides
-- TODO QR Code Regrestion Test
-  * rotate around axis - different ranges
-  * Shadows going across the marker
-  * curved surfaces
-  * crinkled paper
-  * lots of qr codes right next to each other. Generate these
 
 - TODO Visualization tools for Direct VO
 -      Show warped image
