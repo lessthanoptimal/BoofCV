@@ -3,6 +3,19 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2018/
+Version : 0.31
+
+- TODO Sparse Bundle Adjustment
+- TODO update examples to use the new contour algorithm
+- TODO PNP regression and benchmark
+- TODO Compare BoofCV's IPPE against original
+
+- TODO determine why solving for nullspace with QRP causes decoding regression to get worse
+- TODO create regression for homography estimation
+
+
+---------------------------------------------
 Date    : 2018/05/21
 Version : 0.30
 

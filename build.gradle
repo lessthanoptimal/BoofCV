@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '0.30'
+    version = '0.31-SNAPSHOT'
 }
 
 project.ext.set("deepboof_version", '0.4')

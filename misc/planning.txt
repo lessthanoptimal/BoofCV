@@ -3,12 +3,6 @@ TOP ITEMS
   * binary, contour, line segments
   * look for line segments which have end points that are close to each other
 
-- TODO PNP regression and benchmark
-- TODO Compare BoofCV's IPPE against original
-
-- TODO determine why solving for nullspace with QRP causes decoding regression to get worse
-- TODO create regression for homography estimation
-
 - TODO QR Code algorithm
   * Better rejection of finder patterns using graph
   * See if a better reading of mode bits is needed
