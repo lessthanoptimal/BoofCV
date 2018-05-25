@@ -1,16 +1,16 @@
 
 dependencies {
-    implementation project(':main:boofcv-ip')
-    implementation project(':main:boofcv-io')
-    implementation project(':main:boofcv-feature')
-    implementation project(':main:boofcv-geo')
-    implementation project(':main:boofcv-calibration')
-    implementation project(':main:boofcv-sfm')
-    implementation project(':main:boofcv-learning')
-    implementation project(':main:boofcv-recognition')
-    implementation project(':integration:boofcv-swing')
-    implementation project(':integration:boofcv-ffmpeg')
-    implementation project(':integration:boofcv-WebcamCapture')
+    compile project(':main:boofcv-ip')
+    compile project(':main:boofcv-io')
+    compile project(':main:boofcv-feature')
+    compile project(':main:boofcv-geo')
+    compile project(':main:boofcv-calibration')
+    compile project(':main:boofcv-sfm')
+    compile project(':main:boofcv-learning')
+    compile project(':main:boofcv-recognition')
+    compile project(':integration:boofcv-swing')
+    compile project(':integration:boofcv-ffmpeg')
+    compile project(':integration:boofcv-WebcamCapture')
 
     compile 'org.reflections:reflections:0.9.10'
 }
@@ -31,7 +31,7 @@ task examples(type: Jar) {
 
     outputs.upToDateWhen { false }
 
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 
     doLast {

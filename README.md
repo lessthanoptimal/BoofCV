@@ -43,7 +43,6 @@ Know what you're doing and you just want to see something running?  Then run the
 
 ```bash
 cd boofcv
-./gradlew assemble
 ./gradlew examples
 java -jar examples/examples.jar
 ./gradlew demonstrations
