@@ -10,6 +10,9 @@ Version : 0.31
 - Fixed problem with Java applications
  * Can't use implementation when specifying dependency in this situation
  * Thanks Andy Thoma for reporting the problem
+- ImageMiscOps
+ * Added interleaved support for copy, rotateCW, rotateCCW
+ * Thanks Frank Jakop for the suggestion
 
 - TODO Sparse Bundle Adjustment
 - TODO update examples to use the new contour algorithm

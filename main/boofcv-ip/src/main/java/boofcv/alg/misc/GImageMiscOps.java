@@ -46,18 +46,34 @@ public class GImageMiscOps {
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
 							 ImageBase input , ImageBase output ) {
 		if( input instanceof ImageGray) {
-			if( GrayI8.class.isAssignableFrom(input.getClass()) ) {
+			if (GrayI8.class.isAssignableFrom(input.getClass())) {
 				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayI8) input, (GrayI8) output);
-			} else if( GrayI16.class.isAssignableFrom(input.getClass()) ) {
+			} else if (GrayI16.class.isAssignableFrom(input.getClass())) {
 				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayI16) input, (GrayI16) output);
-			} else if( GrayS32.class == input.getClass() ) {
+			} else if (GrayS32.class == input.getClass()) {
 				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayS32) input, (GrayS32) output);
-			} else if( GrayS64.class == input.getClass() ) {
+			} else if (GrayS64.class == input.getClass()) {
 				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayS64) input, (GrayS64) output);
-			} else if( GrayF32.class == input.getClass() ) {
+			} else if (GrayF32.class == input.getClass()) {
 				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayF32) input, (GrayF32) output);
-			} else if( GrayF64.class == input.getClass() ) {
+			} else if (GrayF64.class == input.getClass()) {
 				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayF64) input, (GrayF64) output);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
+			}
+		} else if( input instanceof ImageInterleaved) {
+			if( InterleavedI8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (InterleavedI8) input, (InterleavedI8) output);
+			} else if( InterleavedI16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (InterleavedI16) input, (InterleavedI16) output);
+			} else if( InterleavedS32.class == input.getClass() ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (InterleavedS32) input, (InterleavedS32) output);
+			} else if( InterleavedS64.class == input.getClass() ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (InterleavedS64) input, (InterleavedS64) output);
+			} else if( InterleavedF32.class == input.getClass() ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (InterleavedF32) input, (InterleavedF32) output);
+			} else if( InterleavedF64.class == input.getClass() ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (InterleavedF64) input, (InterleavedF64) output);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
@@ -634,20 +650,34 @@ public class GImageMiscOps {
 	 */
 	public static void rotateCW( ImageBase imageA , ImageBase imageB ) {
 		if( imageA instanceof ImageGray) {
-			if( GrayI8.class.isAssignableFrom(imageA.getClass()) ) {
+			if (GrayI8.class.isAssignableFrom(imageA.getClass())) {
 				ImageMiscOps.rotateCW((GrayI8) imageA, (GrayI8) imageB);
-			} else if( GrayI16.class.isAssignableFrom(imageA.getClass()) ) {
+			} else if (GrayI16.class.isAssignableFrom(imageA.getClass())) {
 				ImageMiscOps.rotateCW((GrayI16) imageA, (GrayI16) imageB);
-			} else if ( GrayS32.class.isAssignableFrom(imageA.getClass()) ) {
+			} else if (GrayS32.class.isAssignableFrom(imageA.getClass())) {
 				ImageMiscOps.rotateCW((GrayS32) imageA, (GrayS32) imageB);
-			} else if ( GrayS64.class.isAssignableFrom(imageA.getClass()) ) {
+			} else if (GrayS64.class.isAssignableFrom(imageA.getClass())) {
 				ImageMiscOps.rotateCW((GrayS64) imageA, (GrayS64) imageB);
-			} else if (GrayF32.class.isAssignableFrom(imageA.getClass()) ) {
+			} else if (GrayF32.class.isAssignableFrom(imageA.getClass())) {
 				ImageMiscOps.rotateCW((GrayF32) imageA, (GrayF32) imageB);
-			} else if (GrayF64.class.isAssignableFrom(imageA.getClass()) ) {
+			} else if (GrayF64.class.isAssignableFrom(imageA.getClass())) {
 				ImageMiscOps.rotateCW((GrayF64) imageA, (GrayF64) imageB);
-			} else if (GrayS64.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCW((GrayS64) imageA, (GrayS64) imageB);
+			} else {
+				throw new IllegalArgumentException("Unknown or incompatible image type: " + imageA.getClass().getSimpleName());
+			}
+		} else if( imageA instanceof ImageInterleaved) {
+			if( InterleavedI8.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((InterleavedI8) imageA, (InterleavedI8) imageB);
+			} else if( InterleavedI16.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((InterleavedI16) imageA, (InterleavedI16) imageB);
+			} else if ( InterleavedS32.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((InterleavedS32) imageA, (InterleavedS32) imageB);
+			} else if ( InterleavedS64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((InterleavedS64) imageA, (InterleavedS64) imageB);
+			} else if ( InterleavedF32.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((InterleavedF32) imageA, (InterleavedF32) imageB);
+			} else if ( InterleavedF64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((InterleavedF64) imageA, (InterleavedF64) imageB);
 			} else {
 				throw new IllegalArgumentException("Unknown or incompatible image type: " + imageA.getClass().getSimpleName());
 			}
@@ -667,20 +697,18 @@ public class GImageMiscOps {
 	 */
 	public static void rotateCCW( ImageBase image ) {
 		if( image instanceof ImageGray) {
-			if( GrayI8.class.isAssignableFrom(image.getClass()) ) {
+			if (GrayI8.class.isAssignableFrom(image.getClass())) {
 				ImageMiscOps.rotateCCW((GrayI8) image);
-			} else if( GrayI16.class.isAssignableFrom(image.getClass()) ) {
+			} else if (GrayI16.class.isAssignableFrom(image.getClass())) {
 				ImageMiscOps.rotateCCW((GrayI16) image);
-			} else if ( GrayS32.class.isAssignableFrom(image.getClass()) ) {
+			} else if (GrayS32.class.isAssignableFrom(image.getClass())) {
 				ImageMiscOps.rotateCCW((GrayS32) image);
-			} else if ( GrayS64.class.isAssignableFrom(image.getClass()) ) {
+			} else if (GrayS64.class.isAssignableFrom(image.getClass())) {
 				ImageMiscOps.rotateCCW((GrayS64) image);
-			} else if (GrayF32.class.isAssignableFrom(image.getClass()) ) {
+			} else if (GrayF32.class.isAssignableFrom(image.getClass())) {
 				ImageMiscOps.rotateCCW((GrayF32) image);
-			} else if (GrayF64.class.isAssignableFrom(image.getClass()) ) {
+			} else if (GrayF64.class.isAssignableFrom(image.getClass())) {
 				ImageMiscOps.rotateCCW((GrayF64) image);
-			} else if (GrayS64.class.isAssignableFrom(image.getClass()) ) {
-				ImageMiscOps.rotateCCW((GrayS64) image);
 			} else {
 				throw new IllegalArgumentException("Unknown or incompatible image type: " + image.getClass().getSimpleName());
 			}
@@ -710,8 +738,22 @@ public class GImageMiscOps {
 				ImageMiscOps.rotateCCW((GrayF32) imageA, (GrayF32) imageB);
 			} else if (GrayF64.class.isAssignableFrom(imageA.getClass()) ) {
 				ImageMiscOps.rotateCCW((GrayF64) imageA, (GrayF64) imageB);
-			} else if (GrayS64.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCCW((GrayS64) imageA,(GrayS64) imageB);
+			} else {
+				throw new IllegalArgumentException("Unknown or incompatible image type: " + imageA.getClass().getSimpleName());
+			}
+		} else if( imageA instanceof ImageInterleaved) {
+			if( InterleavedI8.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((InterleavedI8) imageA, (InterleavedI8) imageB);
+			} else if( InterleavedI16.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((InterleavedI16) imageA, (InterleavedI16) imageB);
+			} else if ( InterleavedS32.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((InterleavedS32) imageA, (InterleavedS32) imageB);
+			} else if ( InterleavedS64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((InterleavedS64) imageA, (InterleavedS64) imageB);
+			} else if ( InterleavedF32.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((InterleavedF32) imageA, (InterleavedF32) imageB);
+			} else if ( InterleavedF64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((InterleavedF64) imageA, (InterleavedF64) imageB);
 			} else {
 				throw new IllegalArgumentException("Unknown or incompatible image type: " + imageA.getClass().getSimpleName());
 			}

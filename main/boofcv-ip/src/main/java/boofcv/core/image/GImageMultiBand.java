@@ -43,6 +43,8 @@ public interface GImageMultiBand {
 
 	void get( int x , int y , float[]value );
 
+	Number get( int x , int y , int band );
+
 	void setF( int index , float[] value );
 	void getF( int index , float[] value );
 	float getF( int index );

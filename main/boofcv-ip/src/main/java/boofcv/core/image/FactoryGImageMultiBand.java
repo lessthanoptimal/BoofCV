@@ -152,6 +152,11 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
+		public Number get(int x, int y, int band) {
+			return bandWrappers[band].get(x,y);
+		}
+
+		@Override
 		public void setF(int index, float[] value) {
 			for( int i = 0; i < image.getNumBands(); i++ ) {
 				bandWrappers[i].set(index, value[i]);
@@ -220,6 +225,13 @@ public class FactoryGImageMultiBand {
 		@Override
 		public void get(int x, int y, float[] value) {
 			value[0]=sb.unsafe_getF(x,y);
+		}
+
+		@Override
+		public Number get(int x, int y, int band) {
+			if( band != 0 )
+				throw new IllegalArgumentException("Must be band 0");
+			return this.sb.get(x,y);
 		}
 
 		@Override
@@ -294,6 +306,11 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
+		public Number get(int x, int y, int band) {
+			return image.data[image.getIndex(x,y,band)]&0xFF;
+		}
+
+		@Override
 		public void setF(int index, float[] value) {
 			for( int i = 0; i < image.getNumBands(); i++ ) {
 				image.data[index++] = (byte)value[i];
@@ -328,6 +345,11 @@ public class FactoryGImageMultiBand {
 		@Override
 		public void get(int x, int y, float[] value) {
 			getF(image.getIndex(x,y), value);
+		}
+
+		@Override
+		public Number get(int x, int y, int band) {
+			return image.data[image.getIndex(x,y,band)];
 		}
 
 		@Override
@@ -368,6 +390,11 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
+		public Number get(int x, int y, int band) {
+			return image.data[image.getIndex(x,y,band)]&0xFFFF;
+		}
+
+		@Override
 		public void setF(int index, float[] value) {
 			for( int i = 0; i < image.getNumBands(); i++ ) {
 				image.data[index++] = (short)value[i];
@@ -402,6 +429,11 @@ public class FactoryGImageMultiBand {
 		@Override
 		public void get(int x, int y, float[] value) {
 			getF(image.getIndex(x,y), value);
+		}
+
+		@Override
+		public Number get(int x, int y, int band) {
+			return image.data[image.getIndex(x,y,band)];
 		}
 
 		@Override
@@ -442,6 +474,11 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
+		public Number get(int x, int y, int band) {
+			return image.data[image.getIndex(x,y,band)];
+		}
+
+		@Override
 		public void setF(int index, float[] value) {
 			for( int i = 0; i < image.getNumBands(); i++ ) {
 				image.data[index++] = (int)value[i];
@@ -476,6 +513,11 @@ public class FactoryGImageMultiBand {
 		@Override
 		public void get(int x, int y, float[] value) {
 			getF(image.getIndex(x,y), value);
+		}
+
+		@Override
+		public Number get(int x, int y, int band) {
+			return image.data[image.getIndex(x,y,band)];
 		}
 
 		@Override
@@ -516,6 +558,11 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
+		public Number get(int x, int y, int band) {
+			return image.data[image.getIndex(x,y,band)];
+		}
+
+		@Override
 		public void setF(int index, float[] value) {
 			for( int i = 0; i < image.getNumBands(); i++ ) {
 				image.data[index++] = value[i];
@@ -550,6 +597,11 @@ public class FactoryGImageMultiBand {
 		@Override
 		public void get(int x, int y, float[] value) {
 			getF(image.getIndex(x,y), value);
+		}
+
+		@Override
+		public Number get(int x, int y, int band) {
+			return image.data[image.getIndex(x,y,band)];
 		}
 
 		@Override
@@ -607,6 +659,13 @@ public class FactoryGImageMultiBand {
 			image.get(x,y,value_d);
 			BoofMiscOps.convertArray(value_d,value);
 		}
+
+		@Override
+		public Number get(int x, int y, int band) {
+			int value_d[] = new int[image.getImage().getImageType().numBands];
+			image.get(x,y,value_d);
+			return value_d[band];
+		}
 	}
 
 	public static class Border_IL_F32 extends GMultiBorder<ImageBorder_IL_F32> {
@@ -629,6 +688,15 @@ public class FactoryGImageMultiBand {
 		public void get(int x, int y, float[] value) {
 			image.get(x,y,value);
 		}
+
+		@Override
+		public Number get(int x, int y, int band) {
+			float value_d[] = new float[image.getImage().getImageType().numBands];
+			image.get(x,y,value_d);
+			return value_d[band];
+		}
+
+
 	}
 
 	public static class Border_IL_F64 extends GMultiBorder<ImageBorder_IL_F64> {
@@ -653,6 +721,13 @@ public class FactoryGImageMultiBand {
 			double value_d[] = new double[value.length];
 			image.get(x,y,value_d);
 			BoofMiscOps.convertArray(value_d,value);
+		}
+
+		@Override
+		public Number get(int x, int y, int band) {
+			double value_d[] = new double[image.getImage().getImageType().numBands];
+			image.get(x,y,value_d);
+			return value_d[band];
 		}
 	}
 

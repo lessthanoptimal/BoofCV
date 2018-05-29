@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,7 @@
 
 package boofcv.alg.misc;
 
-import boofcv.core.image.FactoryGImageGray;
-import boofcv.core.image.GImageGray;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.*;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
@@ -46,7 +44,7 @@ public class TestImageMiscOps {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 19*6 + 4*8;
+		int numExpected = 22*6 + 4*8;
 		Method methods[] = ImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -115,6 +113,15 @@ public class TestImageMiscOps {
 
 	private void testCopy( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
+		if( ImageGray.class.isAssignableFrom(paramTypes[6])) {
+			testCopy_Gray(m);
+		} else {
+			testCopy_Interleaved(m);
+		}
+	}
+
+	private void testCopy_Gray( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
 		ImageGray src = GeneralizedImageOps.createSingleBand(paramTypes[6], width, height);
 		ImageGray dst = GeneralizedImageOps.createSingleBand(paramTypes[7], width, height);
 
@@ -131,6 +138,30 @@ public class TestImageMiscOps {
 		for( int i = 0; i < h; i++ ) {
 			for( int j = 0; j < w; j++ ) {
 				assertEquals(a.get(x0+j,y0+i).doubleValue(),b.get(x1+j,y1+i).doubleValue(),1e-4);
+			}
+		}
+	}
+
+	private void testCopy_Interleaved( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageInterleaved src = GeneralizedImageOps.createInterleaved(paramTypes[6], width, height, 2);
+		ImageInterleaved dst = GeneralizedImageOps.createInterleaved(paramTypes[7], width, height, 2);
+
+		GImageMiscOps.fillUniform(src, rand, 0,20);
+		GImageMiscOps.fillUniform(dst, rand, 0,20);
+
+		int w = 5,h=8;
+		int x0=1,y0=2;
+		int x1=3,y1=4;
+		m.invoke(null,1,2,3,4,w,h,src,dst);
+
+		GImageMultiBand a = FactoryGImageMultiBand.wrap(src);
+		GImageMultiBand b = FactoryGImageMultiBand.wrap(dst);
+		for( int i = 0; i < h; i++ ) {
+			for( int j = 0; j < w; j++ ) {
+				for (int k = 0; k < 2; k++) {
+					assertEquals(a.get(x0+j,y0+i, k).doubleValue(),b.get(x1+j,y1+i, k).doubleValue(),1e-4);
+				}
 			}
 		}
 	}
@@ -689,7 +720,11 @@ public class TestImageMiscOps {
 		if( paramTypes.length == 1 ) {
 			testRotateCW_one(m);
 		} else {
-			testRotateCW_two(m);
+			if( ImageGray.class.isAssignableFrom(paramTypes[0])) {
+				testRotateCW_two_single(m);
+			} else {
+				testRotateCW_two_interleaved(m);
+			}
 		}
 	}
 
@@ -716,7 +751,7 @@ public class TestImageMiscOps {
 		}
 	}
 
-	public void testRotateCW_two( Method m ) throws InvocationTargetException, IllegalAccessException {
+	public void testRotateCW_two_single( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageGray a = GeneralizedImageOps.createSingleBand(paramTypes[0], 3, 2);
 		ImageGray b = GeneralizedImageOps.createSingleBand(paramTypes[0], 2, 3);
@@ -735,12 +770,39 @@ public class TestImageMiscOps {
 		assertEquals(2,GeneralizedImageOps.get(b,1,2),1e-8);
 	}
 
+	public void testRotateCW_two_interleaved( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageInterleaved a = GeneralizedImageOps.createInterleaved(paramTypes[0], 3, 2,2);
+		ImageInterleaved b = GeneralizedImageOps.createInterleaved(paramTypes[0], 2, 3,2);
+
+		for (int i = 0; i < 6; i++) {
+			GeneralizedImageOps.setB(a,i%3,i/3,0,i);
+		}
+
+		m.invoke(null,a,b);
+
+		assertEquals(3,GeneralizedImageOps.get(b,0,0,0),1e-8);
+		assertEquals(0,GeneralizedImageOps.get(b,1,0,0),1e-8);
+		assertEquals(4,GeneralizedImageOps.get(b,0,1,0),1e-8);
+		assertEquals(1,GeneralizedImageOps.get(b,1,1,0),1e-8);
+		assertEquals(5,GeneralizedImageOps.get(b,0,2,0),1e-8);
+		assertEquals(2,GeneralizedImageOps.get(b,1,2,0),1e-8);
+
+		for (int i = 0; i < 6; i++) {
+			assertEquals(0,GeneralizedImageOps.get(b,i/3,i%3,1),1e-8);
+		}
+	}
+
 	public void testRotateCCW( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		if( paramTypes.length == 1 ) {
 			testRotateCCW_one(m);
 		} else {
-			testRotateCCW_two(m);
+			if( ImageGray.class.isAssignableFrom(paramTypes[0])) {
+				testRotateCCW_two_single(m);
+			} else {
+				testRotateCCW_two_interleaved(m);
+			}
 		}
 	}
 
@@ -766,7 +828,7 @@ public class TestImageMiscOps {
 		}
 	}
 
-	public void testRotateCCW_two( Method m ) throws InvocationTargetException, IllegalAccessException {
+	public void testRotateCCW_two_single( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageGray a = GeneralizedImageOps.createSingleBand(paramTypes[0], 3, 2);
 		ImageGray b = GeneralizedImageOps.createSingleBand(paramTypes[0], 2, 3);
@@ -783,5 +845,28 @@ public class TestImageMiscOps {
 		assertEquals(4,GeneralizedImageOps.get(b,1,1),1e-8);
 		assertEquals(0,GeneralizedImageOps.get(b,0,2),1e-8);
 		assertEquals(3,GeneralizedImageOps.get(b,1,2),1e-8);
+	}
+
+	public void testRotateCCW_two_interleaved( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageInterleaved a = GeneralizedImageOps.createInterleaved(paramTypes[0], 3, 2,2);
+		ImageInterleaved b = GeneralizedImageOps.createInterleaved(paramTypes[0], 2, 3,2);
+
+		for (int i = 0; i < 6; i++) {
+			GeneralizedImageOps.setB(a,i%3,i/3,0,i);
+		}
+
+		m.invoke(null,a,b);
+
+		assertEquals(2,GeneralizedImageOps.get(b,0,0,0),1e-8);
+		assertEquals(5,GeneralizedImageOps.get(b,1,0,0),1e-8);
+		assertEquals(1,GeneralizedImageOps.get(b,0,1,0),1e-8);
+		assertEquals(4,GeneralizedImageOps.get(b,1,1,0),1e-8);
+		assertEquals(0,GeneralizedImageOps.get(b,0,2,0),1e-8);
+		assertEquals(3,GeneralizedImageOps.get(b,1,2,0),1e-8);
+
+		for (int i = 0; i < 6; i++) {
+			assertEquals(0,GeneralizedImageOps.get(b,i/3,i%3,1),1e-8);
+		}
 	}
 }

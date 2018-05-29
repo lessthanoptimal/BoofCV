@@ -33,6 +33,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 
 	private AutoTypeImage imageType;
 	private String imageName;
+	private String imageNameI;
 	private String dataType;
 	private String bitWise;
 
@@ -66,8 +67,10 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		for( AutoTypeImage t : types ) {
 			imageType = t;
 			imageName = t.getSingleBandName();
+			imageNameI = t.getInterleavedName();
 			dataType = t.getDataType();
 			printCopy();
+			printCopy_Interleaved();
 			printFill();
 			printFillInterleaved();
 			printFillInterleaved_bands();
@@ -84,8 +87,10 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			printFlipHorizontal();
 			printRotateCW_one();
 			printRotateCW_two();
+			printRotateCW_two_interleaved();
 			printRotateCCW_one();
 			printRotateCCW_two();
+			printRotateCCW_two_interleaved();
 		}
 	}
 
@@ -133,6 +138,42 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t\t\tfor (int x = 0; x < width; x++) {\n" +
 				"\t\t\t\toutput.data[indexDst++] = input.data[indexSrc++];\n" +
 				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printCopy_Interleaved() {
+
+		out.print("\t/**\n" +
+				"\t * Copies a rectangular region from one image into another.<br>\n" +
+				"\t * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]\n" +
+				"\t *\n" +
+				"\t * @param srcX x-coordinate of corner in input image\n" +
+				"\t * @param srcY y-coordinate of corner in input image\n" +
+				"\t * @param dstX x-coordinate of corner in output image\n" +
+				"\t * @param dstY y-coordinate of corner in output image\n" +
+				"\t * @param width Width of region to be copied\n" +
+				"\t * @param height Height of region to be copied\n" +
+				"\t * @param input Input image\n" +
+				"\t * @param output output image\n" +
+				"\t */\n" +
+				"\tpublic static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,\n" +
+				"\t\t\t\t\t\t\t "+imageNameI+" input , "+imageNameI+" output ) {\n" +
+				"\n" +
+				"\t\tif( input.width < srcX+width || input.height < srcY+height )\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Copy region must be contained input image\");\n" +
+				"\t\tif( output.width < dstX+width || output.height < dstY+height )\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Copy region must be contained output image\");\n" +
+				"\t\tif( output.numBands != input.numBands )\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Number of bands must match. \"+input.numBands+\" != \"+output.numBands);\n" +
+				"\n" +
+				"\t\tfinal int numBands = input.numBands;\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < height; y++) {\n" +
+				"\t\t\tint indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;\n" +
+				"\t\t\tint indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;\n" +
+				"\n" +
+				"\t\t\tSystem.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
@@ -740,6 +781,30 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
+	public void printRotateCW_two_interleaved() {
+		out.print("\t/**\n" +
+				"\t * Rotates the image 90 degrees in the clockwise direction.\n" +
+				"\t */\n" +
+				"\tpublic static void rotateCW( "+imageNameI+" input , "+imageNameI+" output ) {\n" +
+				"\t\tif( input.width != output.height || input.height != output.width || input.numBands != output.numBands )\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Incompatible shapes\");\n" +
+				"\n" +
+				"\t\tint h = input.height-1;\n" +
+				"\n" +
+				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\tint indexSrc = input.startIndex + y*input.stride;\n" +
+				"\t\t\tfor (int x = 0; x < input.width; x++) {\n" +
+				"\t\t\t\tint indexDst = output.getIndex(h-y,x);\n" +
+				"\n" +
+				"\t\t\t\tint end = indexSrc + input.numBands;\n" +
+				"\t\t\t\twhile( indexSrc != end ) {\n" +
+				"\t\t\t\t\toutput.data[indexDst++] = input.data[indexSrc++];\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
 	public void printRotateCCW_one() {
 		String sumType = imageType.getSumType();
 		out.print("\t/**\n" +
@@ -789,6 +854,30 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
 				"\t\t\tfor (int x = 0; x < input.width; x++) {\n" +
 				"\t\t\t\toutput.unsafe_set(y,w-x,input.data[indexIn++]);\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printRotateCCW_two_interleaved() {
+		out.print("\t/**\n" +
+				"\t * Rotates the image 90 degrees in the counter-clockwise direction.\n" +
+				"\t */\n" +
+				"\tpublic static void rotateCCW( "+imageNameI+" input , "+imageNameI+" output ) {\n" +
+				"\t\tif( input.width != output.height || input.height != output.width || input.numBands != output.numBands )\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Incompatible shapes\");\n" +
+				"\n" +
+				"\t\tint w = input.width-1;\n" +
+				"\n" +
+				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\tint indexSrc = input.startIndex + y*input.stride;\n" +
+				"\t\t\tfor (int x = 0; x < input.width; x++) {\n" +
+				"\t\t\t\tint indexDst = output.getIndex(y,w-x);\n" +
+				"\n" +
+				"\t\t\t\tint end = indexSrc + input.numBands;\n" +
+				"\t\t\t\twhile( indexSrc != end ) {\n" +
+				"\t\t\t\t\toutput.data[indexDst++] = input.data[indexSrc++];\n" +
+				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

@@ -65,6 +65,39 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Copies a rectangular region from one image into another.<br>
+	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
+	 *
+	 * @param srcX x-coordinate of corner in input image
+	 * @param srcY y-coordinate of corner in input image
+	 * @param dstX x-coordinate of corner in output image
+	 * @param dstY y-coordinate of corner in output image
+	 * @param width Width of region to be copied
+	 * @param height Height of region to be copied
+	 * @param input Input image
+	 * @param output output image
+	 */
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 InterleavedI8 input , InterleavedI8 output ) {
+
+		if( input.width < srcX+width || input.height < srcY+height )
+			throw new IllegalArgumentException("Copy region must be contained input image");
+		if( output.width < dstX+width || output.height < dstY+height )
+			throw new IllegalArgumentException("Copy region must be contained output image");
+		if( output.numBands != input.numBands )
+			throw new IllegalArgumentException("Number of bands must match. "+input.numBands+" != "+output.numBands);
+
+		final int numBands = input.numBands;
+
+		for (int y = 0; y < height; y++) {
+			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
+			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
+
+			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
+		}
+	}
+
+	/**
 	 * Fills the whole image with the specified value
 	 *
 	 * @param input An image.
@@ -426,6 +459,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Rotates the image 90 degrees in the clockwise direction.
+	 */
+	public static void rotateCW( InterleavedI8 input , InterleavedI8 output ) {
+		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int h = input.height-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				int indexDst = output.getIndex(h-y,x);
+
+				int end = indexSrc + input.numBands;
+				while( indexSrc != end ) {
+					output.data[indexDst++] = input.data[indexSrc++];
+				}
+			}
+		}
+	}
+
+	/**
 	 * In-place 90 degree image rotation in the counter-clockwise direction.  Only works on
 	 * square images.
 	 */
@@ -475,6 +530,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Rotates the image 90 degrees in the counter-clockwise direction.
+	 */
+	public static void rotateCCW( InterleavedI8 input , InterleavedI8 output ) {
+		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int w = input.width-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				int indexDst = output.getIndex(y,w-x);
+
+				int end = indexSrc + input.numBands;
+				while( indexSrc != end ) {
+					output.data[indexDst++] = input.data[indexSrc++];
+				}
+			}
+		}
+	}
+
+	/**
 	 * Copies a rectangular region from one image into another.<br>
 	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
 	 *
@@ -502,6 +579,39 @@ public class ImageMiscOps {
 			for (int x = 0; x < width; x++) {
 				output.data[indexDst++] = input.data[indexSrc++];
 			}
+		}
+	}
+
+	/**
+	 * Copies a rectangular region from one image into another.<br>
+	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
+	 *
+	 * @param srcX x-coordinate of corner in input image
+	 * @param srcY y-coordinate of corner in input image
+	 * @param dstX x-coordinate of corner in output image
+	 * @param dstY y-coordinate of corner in output image
+	 * @param width Width of region to be copied
+	 * @param height Height of region to be copied
+	 * @param input Input image
+	 * @param output output image
+	 */
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 InterleavedI16 input , InterleavedI16 output ) {
+
+		if( input.width < srcX+width || input.height < srcY+height )
+			throw new IllegalArgumentException("Copy region must be contained input image");
+		if( output.width < dstX+width || output.height < dstY+height )
+			throw new IllegalArgumentException("Copy region must be contained output image");
+		if( output.numBands != input.numBands )
+			throw new IllegalArgumentException("Number of bands must match. "+input.numBands+" != "+output.numBands);
+
+		final int numBands = input.numBands;
+
+		for (int y = 0; y < height; y++) {
+			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
+			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
+
+			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
 		}
 	}
 
@@ -867,6 +977,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Rotates the image 90 degrees in the clockwise direction.
+	 */
+	public static void rotateCW( InterleavedI16 input , InterleavedI16 output ) {
+		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int h = input.height-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				int indexDst = output.getIndex(h-y,x);
+
+				int end = indexSrc + input.numBands;
+				while( indexSrc != end ) {
+					output.data[indexDst++] = input.data[indexSrc++];
+				}
+			}
+		}
+	}
+
+	/**
 	 * In-place 90 degree image rotation in the counter-clockwise direction.  Only works on
 	 * square images.
 	 */
@@ -916,6 +1048,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Rotates the image 90 degrees in the counter-clockwise direction.
+	 */
+	public static void rotateCCW( InterleavedI16 input , InterleavedI16 output ) {
+		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int w = input.width-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				int indexDst = output.getIndex(y,w-x);
+
+				int end = indexSrc + input.numBands;
+				while( indexSrc != end ) {
+					output.data[indexDst++] = input.data[indexSrc++];
+				}
+			}
+		}
+	}
+
+	/**
 	 * Copies a rectangular region from one image into another.<br>
 	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
 	 *
@@ -943,6 +1097,39 @@ public class ImageMiscOps {
 			for (int x = 0; x < width; x++) {
 				output.data[indexDst++] = input.data[indexSrc++];
 			}
+		}
+	}
+
+	/**
+	 * Copies a rectangular region from one image into another.<br>
+	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
+	 *
+	 * @param srcX x-coordinate of corner in input image
+	 * @param srcY y-coordinate of corner in input image
+	 * @param dstX x-coordinate of corner in output image
+	 * @param dstY y-coordinate of corner in output image
+	 * @param width Width of region to be copied
+	 * @param height Height of region to be copied
+	 * @param input Input image
+	 * @param output output image
+	 */
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 InterleavedS32 input , InterleavedS32 output ) {
+
+		if( input.width < srcX+width || input.height < srcY+height )
+			throw new IllegalArgumentException("Copy region must be contained input image");
+		if( output.width < dstX+width || output.height < dstY+height )
+			throw new IllegalArgumentException("Copy region must be contained output image");
+		if( output.numBands != input.numBands )
+			throw new IllegalArgumentException("Number of bands must match. "+input.numBands+" != "+output.numBands);
+
+		final int numBands = input.numBands;
+
+		for (int y = 0; y < height; y++) {
+			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
+			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
+
+			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
 		}
 	}
 
@@ -1308,6 +1495,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Rotates the image 90 degrees in the clockwise direction.
+	 */
+	public static void rotateCW( InterleavedS32 input , InterleavedS32 output ) {
+		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int h = input.height-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				int indexDst = output.getIndex(h-y,x);
+
+				int end = indexSrc + input.numBands;
+				while( indexSrc != end ) {
+					output.data[indexDst++] = input.data[indexSrc++];
+				}
+			}
+		}
+	}
+
+	/**
 	 * In-place 90 degree image rotation in the counter-clockwise direction.  Only works on
 	 * square images.
 	 */
@@ -1357,6 +1566,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Rotates the image 90 degrees in the counter-clockwise direction.
+	 */
+	public static void rotateCCW( InterleavedS32 input , InterleavedS32 output ) {
+		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int w = input.width-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				int indexDst = output.getIndex(y,w-x);
+
+				int end = indexSrc + input.numBands;
+				while( indexSrc != end ) {
+					output.data[indexDst++] = input.data[indexSrc++];
+				}
+			}
+		}
+	}
+
+	/**
 	 * Copies a rectangular region from one image into another.<br>
 	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
 	 *
@@ -1384,6 +1615,39 @@ public class ImageMiscOps {
 			for (int x = 0; x < width; x++) {
 				output.data[indexDst++] = input.data[indexSrc++];
 			}
+		}
+	}
+
+	/**
+	 * Copies a rectangular region from one image into another.<br>
+	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
+	 *
+	 * @param srcX x-coordinate of corner in input image
+	 * @param srcY y-coordinate of corner in input image
+	 * @param dstX x-coordinate of corner in output image
+	 * @param dstY y-coordinate of corner in output image
+	 * @param width Width of region to be copied
+	 * @param height Height of region to be copied
+	 * @param input Input image
+	 * @param output output image
+	 */
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 InterleavedS64 input , InterleavedS64 output ) {
+
+		if( input.width < srcX+width || input.height < srcY+height )
+			throw new IllegalArgumentException("Copy region must be contained input image");
+		if( output.width < dstX+width || output.height < dstY+height )
+			throw new IllegalArgumentException("Copy region must be contained output image");
+		if( output.numBands != input.numBands )
+			throw new IllegalArgumentException("Number of bands must match. "+input.numBands+" != "+output.numBands);
+
+		final int numBands = input.numBands;
+
+		for (int y = 0; y < height; y++) {
+			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
+			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
+
+			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
 		}
 	}
 
@@ -1749,6 +2013,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Rotates the image 90 degrees in the clockwise direction.
+	 */
+	public static void rotateCW( InterleavedS64 input , InterleavedS64 output ) {
+		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int h = input.height-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				int indexDst = output.getIndex(h-y,x);
+
+				int end = indexSrc + input.numBands;
+				while( indexSrc != end ) {
+					output.data[indexDst++] = input.data[indexSrc++];
+				}
+			}
+		}
+	}
+
+	/**
 	 * In-place 90 degree image rotation in the counter-clockwise direction.  Only works on
 	 * square images.
 	 */
@@ -1798,6 +2084,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Rotates the image 90 degrees in the counter-clockwise direction.
+	 */
+	public static void rotateCCW( InterleavedS64 input , InterleavedS64 output ) {
+		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int w = input.width-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				int indexDst = output.getIndex(y,w-x);
+
+				int end = indexSrc + input.numBands;
+				while( indexSrc != end ) {
+					output.data[indexDst++] = input.data[indexSrc++];
+				}
+			}
+		}
+	}
+
+	/**
 	 * Copies a rectangular region from one image into another.<br>
 	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
 	 *
@@ -1825,6 +2133,39 @@ public class ImageMiscOps {
 			for (int x = 0; x < width; x++) {
 				output.data[indexDst++] = input.data[indexSrc++];
 			}
+		}
+	}
+
+	/**
+	 * Copies a rectangular region from one image into another.<br>
+	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
+	 *
+	 * @param srcX x-coordinate of corner in input image
+	 * @param srcY y-coordinate of corner in input image
+	 * @param dstX x-coordinate of corner in output image
+	 * @param dstY y-coordinate of corner in output image
+	 * @param width Width of region to be copied
+	 * @param height Height of region to be copied
+	 * @param input Input image
+	 * @param output output image
+	 */
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 InterleavedF32 input , InterleavedF32 output ) {
+
+		if( input.width < srcX+width || input.height < srcY+height )
+			throw new IllegalArgumentException("Copy region must be contained input image");
+		if( output.width < dstX+width || output.height < dstY+height )
+			throw new IllegalArgumentException("Copy region must be contained output image");
+		if( output.numBands != input.numBands )
+			throw new IllegalArgumentException("Number of bands must match. "+input.numBands+" != "+output.numBands);
+
+		final int numBands = input.numBands;
+
+		for (int y = 0; y < height; y++) {
+			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
+			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
+
+			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
 		}
 	}
 
@@ -2190,6 +2531,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Rotates the image 90 degrees in the clockwise direction.
+	 */
+	public static void rotateCW( InterleavedF32 input , InterleavedF32 output ) {
+		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int h = input.height-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				int indexDst = output.getIndex(h-y,x);
+
+				int end = indexSrc + input.numBands;
+				while( indexSrc != end ) {
+					output.data[indexDst++] = input.data[indexSrc++];
+				}
+			}
+		}
+	}
+
+	/**
 	 * In-place 90 degree image rotation in the counter-clockwise direction.  Only works on
 	 * square images.
 	 */
@@ -2239,6 +2602,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Rotates the image 90 degrees in the counter-clockwise direction.
+	 */
+	public static void rotateCCW( InterleavedF32 input , InterleavedF32 output ) {
+		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int w = input.width-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				int indexDst = output.getIndex(y,w-x);
+
+				int end = indexSrc + input.numBands;
+				while( indexSrc != end ) {
+					output.data[indexDst++] = input.data[indexSrc++];
+				}
+			}
+		}
+	}
+
+	/**
 	 * Copies a rectangular region from one image into another.<br>
 	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
 	 *
@@ -2266,6 +2651,39 @@ public class ImageMiscOps {
 			for (int x = 0; x < width; x++) {
 				output.data[indexDst++] = input.data[indexSrc++];
 			}
+		}
+	}
+
+	/**
+	 * Copies a rectangular region from one image into another.<br>
+	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
+	 *
+	 * @param srcX x-coordinate of corner in input image
+	 * @param srcY y-coordinate of corner in input image
+	 * @param dstX x-coordinate of corner in output image
+	 * @param dstY y-coordinate of corner in output image
+	 * @param width Width of region to be copied
+	 * @param height Height of region to be copied
+	 * @param input Input image
+	 * @param output output image
+	 */
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 InterleavedF64 input , InterleavedF64 output ) {
+
+		if( input.width < srcX+width || input.height < srcY+height )
+			throw new IllegalArgumentException("Copy region must be contained input image");
+		if( output.width < dstX+width || output.height < dstY+height )
+			throw new IllegalArgumentException("Copy region must be contained output image");
+		if( output.numBands != input.numBands )
+			throw new IllegalArgumentException("Number of bands must match. "+input.numBands+" != "+output.numBands);
+
+		final int numBands = input.numBands;
+
+		for (int y = 0; y < height; y++) {
+			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
+			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
+
+			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
 		}
 	}
 
@@ -2631,6 +3049,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Rotates the image 90 degrees in the clockwise direction.
+	 */
+	public static void rotateCW( InterleavedF64 input , InterleavedF64 output ) {
+		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int h = input.height-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				int indexDst = output.getIndex(h-y,x);
+
+				int end = indexSrc + input.numBands;
+				while( indexSrc != end ) {
+					output.data[indexDst++] = input.data[indexSrc++];
+				}
+			}
+		}
+	}
+
+	/**
 	 * In-place 90 degree image rotation in the counter-clockwise direction.  Only works on
 	 * square images.
 	 */
@@ -2675,6 +3115,28 @@ public class ImageMiscOps {
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(y,w-x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
+	 * Rotates the image 90 degrees in the counter-clockwise direction.
+	 */
+	public static void rotateCCW( InterleavedF64 input , InterleavedF64 output ) {
+		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int w = input.width-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				int indexDst = output.getIndex(y,w-x);
+
+				int end = indexSrc + input.numBands;
+				while( indexSrc != end ) {
+					output.data[indexDst++] = input.data[indexSrc++];
+				}
 			}
 		}
 	}
