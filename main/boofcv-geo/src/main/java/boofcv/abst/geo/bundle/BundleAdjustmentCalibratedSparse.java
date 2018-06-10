@@ -21,19 +21,16 @@ package boofcv.abst.geo.bundle;
 import boofcv.abst.geo.BundleAdjustmentCalibrated;
 import boofcv.alg.geo.bundle.*;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.optimization.FactoryOptimization;
-import org.ddogleg.optimization.RegionStepType;
-import org.ddogleg.optimization.UnconstrainedLeastSquares;
-import org.ejml.data.DMatrixRMaj;
+import org.ddogleg.optimization.impl.LevenbergMarquardtSchur_DSCC;
 
 import java.util.List;
 
 /**
- * Performs bundle adjustment using less efficient, but easier to implement dense matrices.  
- * 
+ * TODO comment
+ *
  * @author Peter Abeles
  */
-public class BundleAdjustmentCalibratedDense 
+public class BundleAdjustmentCalibratedSparse
 		implements BundleAdjustmentCalibrated
 {
 	// converts to and from a parameterized version of the model
@@ -42,36 +39,38 @@ public class BundleAdjustmentCalibratedDense
 	double param[] = new double[0];
 
 	// minimization algorithm
-	UnconstrainedLeastSquares<DMatrixRMaj> minimizer;
+	LevenbergMarquardtSchur_DSCC minimizer;
 	// computes residuals for least-squares
-	CalibPoseAndPointResiduals func = new CalibPoseAndPointResiduals();
-	CalibPoseAndPointRodriguesJacobian jacobian = new CalibPoseAndPointRodriguesJacobian();
+	CalibPoseAndPointResiduals residuals = new CalibPoseAndPointResiduals();
+	CalibPoseAndPointRodriguesJacobianS jacobian = new CalibPoseAndPointRodriguesJacobianS();
 
 	int maxIterations;
 	double convergenceTol;
 
-	public BundleAdjustmentCalibratedDense(double convergenceTol,
-										   int maxIterations ) {
+	double errorBefore,errorAfter;
+
+
+	public BundleAdjustmentCalibratedSparse(double convergenceTol,
+											int maxIterations ) {
 		this.convergenceTol = convergenceTol;
-		minimizer = FactoryOptimization.leastSquaresTrustRegion(1, RegionStepType.DOG_LEG_F,false);
+		minimizer = new LevenbergMarquardtSchur_DSCC(1e-3);
 		codec = new CalibPoseAndPointRodriguesCodec();
 		this.maxIterations = maxIterations;
 	}
 
 	@Override
 	public boolean process(CalibratedPoseAndPoint initialModel,
-						   List<ViewPointObservations> observations) 
+						   List<ViewPointObservations> observations)
 	{
 		int numViews = initialModel.getNumViews();
 		int numPoints = initialModel.getNumPoints();
 		int numViewsUnknown = initialModel.getNumUnknownViews();
 
 		codec.configure(numViews,numPoints,numViewsUnknown,initialModel.getKnownArray());
-		
+
 		if( param.length < codec.getParamLength() )
 			param = new double[ codec.getParamLength() ];
 
-		
 		// TODO redesign to minimize memory creation
 		boolean known[] = initialModel.getKnownArray();
 		Se3_F64 extrinsic[] = new Se3_F64[initialModel.getNumViews()];
@@ -81,21 +80,33 @@ public class BundleAdjustmentCalibratedDense
 				extrinsic[i].set( initialModel.getWorldToCamera(i));
 			}
 		}
-		
+
 		codec.encode(initialModel,param);
-		func.configure(codec,initialModel,observations);
+		residuals.configure(codec,initialModel,observations);
 		jacobian.configure(observations,initialModel.getNumPoints(),extrinsic);
 
-		minimizer.setFunction(func,jacobian);
-		minimizer.initialize(param, 0, convergenceTol * observations.size());
+		minimizer.setFunction(residuals,jacobian);
+		minimizer.setConvergence(0, convergenceTol * observations.size());
+		minimizer.initialize(param);
+
+		errorBefore = minimizer.getFnorm();
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( minimizer.iterate() )
 				break;
 		}
 
+		errorAfter = minimizer.getFnorm();
 		codec.decode(minimizer.getParameters(), initialModel);
-		
+
 		return true;
+	}
+
+	public double getErrorBefore() {
+		return errorBefore;
+	}
+
+	public double getErrorAfter() {
+		return errorAfter;
 	}
 }

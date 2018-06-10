@@ -1,5 +1,5 @@
 plugins {
-    id "com.peterabeles.gversion" version "1.2.2" apply false
+    id "com.peterabeles.gversion" version "1.2.4" apply false
 }
 
 ext.libpath = file('./').absolutePath
@@ -95,7 +95,7 @@ subprojects {
     }
 
     dependencies {
-        compile group: 'org.georegression', name: 'georegression', version: '0.16'
+        compile group: 'org.georegression', name: 'georegression', version: '0.17-SNAPSHOT'
         compile 'com.google.code.findbugs:jsr305:3.0.2' // @Nullable
 
         testCompile group: 'junit', name: 'junit', version: '4.12'

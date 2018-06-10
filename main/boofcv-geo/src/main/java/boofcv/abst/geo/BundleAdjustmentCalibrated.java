@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,6 +40,5 @@ public interface BundleAdjustmentCalibrated {
 	 * @param observations Observation of image features in each frame. Normalized coordinates.
 	 * @return true if successful or false if it failed
 	 */
-	public boolean process( CalibratedPoseAndPoint initialModel ,
-							List<ViewPointObservations> observations );
+	boolean process( CalibratedPoseAndPoint initialModel , List<ViewPointObservations> observations );
 }

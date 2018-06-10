@@ -19,7 +19,7 @@
 package boofcv.factory.geo;
 
 import boofcv.abst.geo.*;
-import boofcv.abst.geo.bundle.BundleAdjustmentCalibratedDense;
+import boofcv.abst.geo.bundle.BundleAdjustmentCalibratedSparse;
 import boofcv.abst.geo.f.*;
 import boofcv.abst.geo.h.HomographyDLT_to_Epipolar;
 import boofcv.abst.geo.h.HomographyTLS_to_Epipolar;
@@ -65,7 +65,7 @@ public class FactoryMultiView {
 	 * @return Bundle Adjustment
 	 */
 	public static BundleAdjustmentCalibrated bundleCalibrated(double tol , int maxIterations) {
-		return new BundleAdjustmentCalibratedDense(tol,maxIterations);
+		return new BundleAdjustmentCalibratedSparse(tol,maxIterations);
 	}
 
 	/**

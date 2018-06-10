@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,10 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.abst.geo.bundle.BundleAdjustmentCalibratedSparse;
 import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.geo.bundle.CalibratedPoseAndPoint;
+import boofcv.alg.geo.bundle.ViewPointObservations;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.*;
@@ -43,7 +46,6 @@ import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.FastQueue;
@@ -61,6 +63,7 @@ import java.util.List;
  * structure from motion to understand.  In other words, this is not for beginners and requires good clean set of
  * images to work.
  *
+ * TODO Update comment
  * One key element it is missing is bundle adjustment to improve the estimated camera location and 3D points.  The
  * current bundle adjustment in BoofCV is too inefficient.   Better noise removal and numerous other improvements
  * are needed before it can compete with commercial equivalents.
@@ -76,7 +79,7 @@ public class ExampleMultiviewSceneReconstruction {
 	double connectThreshold = 0.3;
 
 	// tolerance for inliers in pixels
-	double inlierTol = 1.5;
+	double inlierTol = 2.5;
 
 	// Detects and describes image interest points
 	DetectDescribePoint<GrayF32, BrightFeature> detDesc = FactoryDetectDescribe.surfStable(null, null, null, GrayF32.class);
@@ -103,6 +106,9 @@ public class ExampleMultiviewSceneReconstruction {
 	boolean estimatedImage[];
 	// if true the image has been processed.  Estimation could have failed. so this can be true but estimated false
 	boolean processedImage[];
+
+	// The image which acts of the world coordinate system's origin
+	int originImage;
 
 	// List of all 3D features
 	List<Feature3D> featuresAll = new ArrayList<>();
@@ -145,8 +151,8 @@ public class ExampleMultiviewSceneReconstruction {
 		seed.add(bestImage);
 		performReconstruction(seed, -1, matrix);
 
-		// Bundle adjustment would normally be done at this point, but has been omitted since the current
-		// implementation is too slow for a large number of points
+		// Perform bundle adjustment to refine the initial estimates
+		performBundleAdjustment();
 
 		// display a point cloud from the 3D features
 		PointCloudViewer gui = new PointCloudViewer(intrinsic,1);
@@ -174,7 +180,7 @@ public class ExampleMultiviewSceneReconstruction {
 		motionWorldToCamera = new Se3_F64[colorImages.size()];
 		for (int i = 0; i < colorImages.size(); i++) {
 			motionWorldToCamera[i] = new Se3_F64();
-			imageFeature3D.add(new ArrayList<Feature3D>());
+			imageFeature3D.add(new ArrayList<>());
 		}
 
 		// pick the image most similar to the original image to initialize pose estimation
@@ -322,6 +328,11 @@ public class ExampleMultiviewSceneReconstruction {
 		motionWorldToCamera[imageB].set(motionAtoB);
 		estimatedImage[imageB] = true;
 		processedImage[imageB] = true;
+		// imageA will be the world coordinate system's origin and will be identity
+		motionWorldToCamera[imageA].reset(); // should already be identity. Just re-enforcing that fact
+		originImage = imageA;
+		estimatedImage[imageA] = true;
+		processedImage[imageA] = true;
 
 		// create tracks for only those features in the inlier list
 		FastQueue<Point2D_F64> pixelsA = imagePixels.get(imageA);
@@ -348,7 +359,6 @@ public class ExampleMultiviewSceneReconstruction {
 				continue;
 			// the feature has to be in front of the camera
 			if (t.worldPt.z > 0) {
-				featuresAll.add(t);
 				tracksA.add(t);
 				tracksB.add(t);
 			}
@@ -410,7 +420,6 @@ public class ExampleMultiviewSceneReconstruction {
 		// create the associated pair for motion estimation
 		List<Point2D3D> features = new ArrayList<>();
 		List<AssociatedIndex> inputRansac = new ArrayList<>();
-		List<AssociatedIndex> unmatched = new ArrayList<>();
 		for (int i = 0; i < inliers.size(); i++) {
 			AssociatedIndex a = inliers.get(i);
 			Feature3D t = lookupFeature(featuresA, imageA, pixelsA.get(a.src));
@@ -418,8 +427,6 @@ public class ExampleMultiviewSceneReconstruction {
 				Point2D_F64 p = pixelsB.get(a.dst);
 				features.add(new Point2D3D(p, t.worldPt));
 				inputRansac.add(a);
-			} else {
-				unmatched.add(a);
 			}
 		}
 
@@ -441,9 +448,10 @@ public class ExampleMultiviewSceneReconstruction {
 		motionWorldToCamera[imageB].set(motionWorldToB);
 		estimatedImage[imageB] = true;
 
+		int before = featuresAll.size();
+
 		// Add all tracks in the inlier list to the B's list of 3D features
 		int N = estimatePnP.getMatchSet().size();
-		boolean inlierPnP[] = new boolean[features.size()];
 		for (int i = 0; i < N; i++) {
 			int index = estimatePnP.getInputIndex(i);
 			AssociatedIndex a = inputRansac.get(index);
@@ -453,75 +461,13 @@ public class ExampleMultiviewSceneReconstruction {
 			featuresB.add(t);
 			t.frame.add(imageB);
 			t.obs.grow().set( pixelsB.get(a.dst) );
-			inlierPnP[index] = true;
-		}
 
-		// Create new tracks for all features which were a member of essential matrix but not used to estimate
-		// the motion using PnP.
-		Se3_F64 motionBtoWorld = motionWorldToB.invert(null);
-		Se3_F64 motionWorldToA = motionWorldToCamera[imageA];
-		Se3_F64 motionBtoA =  motionBtoWorld.concat(motionWorldToA, null);
-		Point3D_F64 pt_in_b = new Point3D_F64();
-
-		int totalAdded = 0;
-		GrowQueue_I32 colorsA = imageColors.get(imageA);
-		for( AssociatedIndex a : unmatched ) {
-
-			if( !triangulate.triangulate(pixelsB.get(a.dst),pixelsA.get(a.src),motionBtoA,pt_in_b) )
-				continue;
-
-			// the feature has to be in front of the camera
-			if( pt_in_b.z > 0 ) {
-				Feature3D t = new Feature3D();
-
-				// transform from B back to world frame
-				SePointOps_F64.transform(motionBtoWorld, pt_in_b, t.worldPt);
-
-				t.color = colorsA.get(a.src);
-				t.obs.grow().set( pixelsA.get(a.src) );
-				t.obs.grow().set( pixelsB.get(a.dst) );
-				t.frame.add(imageA);
-				t.frame.add(imageB);
-
+			if( !t.included ) {
 				featuresAll.add(t);
-				featuresA.add(t);
-				featuresB.add(t);
-
-				totalAdded++;
 			}
 		}
 
-		// create new tracks for existing tracks which were not in the inlier set.  Maybe things will work
-		// out better if the 3D coordinate is re-triangulated as a new feature
-		for (int i = 0; i < features.size(); i++) {
-			if( inlierPnP[i] )
-				continue;
-
-			AssociatedIndex a = inputRansac.get(i);
-
-			if( !triangulate.triangulate(pixelsB.get(a.dst),pixelsA.get(a.src),motionBtoA,pt_in_b) )
-				continue;
-
-			// the feature has to be in front of the camera
-			if( pt_in_b.z > 0 ) {
-				Feature3D t = new Feature3D();
-
-				// transform from B back to world frame
-				SePointOps_F64.transform(motionBtoWorld, pt_in_b, t.worldPt);
-
-				// only add this feature to image B since a similar one already exists in A.
-				t.color = colorsA.get(a.src);
-				t.obs.grow().set(pixelsB.get(a.dst));
-				t.frame.add(imageB);
-
-				featuresAll.add(t);
-				featuresB.add(t);
-
-				totalAdded++;
-			}
-		}
-
-		System.out.println("  New added " + totalAdded + "  tracksA.size = " + featuresA.size() + "  tracksB.size = " + featuresB.size());
+		System.out.println("     Added features: "+(featuresAll.size()-before)+"  out of "+inliers.size());
 	}
 
 	/**
@@ -583,6 +529,59 @@ public class ExampleMultiviewSceneReconstruction {
 		return true;
 	}
 
+	protected void performBundleAdjustment() {
+		long startTime = System.currentTimeMillis();
+		System.out.println("#########################################");
+		System.out.println("Starting bundle adjustment");
+		System.out.println("   structure="+motionWorldToCamera.length+"  points="+featuresAll.size());
+		BundleAdjustmentCalibratedSparse bundle = new BundleAdjustmentCalibratedSparse(1e-8,3);
+
+		CalibratedPoseAndPoint initialModel = new CalibratedPoseAndPoint();
+		List<ViewPointObservations> observations = new ArrayList<>();
+
+		initialModel.configure(motionWorldToCamera.length,featuresAll.size());
+
+		initialModel.setViewKnown(originImage,true);
+
+		for (int i = 0; i < motionWorldToCamera.length; i++) {
+			initialModel.getWorldToCamera(i).set(motionWorldToCamera[i]);
+		}
+
+		for (int i = 0; i < featuresAll.size(); i++) {
+			Feature3D t = featuresAll.get(i);
+
+			initialModel.getPoint(i).set(t.worldPt);
+		}
+
+		for( int frameIndex = 0; frameIndex < motionWorldToCamera.length; frameIndex++ ) {
+			ViewPointObservations o = new ViewPointObservations();
+
+			for (int j = 0; j < featuresAll.size(); j++) {
+				Feature3D t = featuresAll.get(j);
+				for (int k = 0; k < t.obs.size(); k++) {
+					int obsFrame = t.frame.get(k);
+
+					if( obsFrame == frameIndex ) {
+						Point2D_F64 p = t.obs.get(k);
+						o.getPoints().grow().set(j,p);
+					}
+				}
+			}
+
+			observations.add(o);
+		}
+
+
+		if( !bundle.process(initialModel,observations) )
+			throw new RuntimeException("Bundle adjustment failed!");
+
+		// TODO Copy results!
+		long elapsedTime = System.currentTimeMillis()-startTime;
+		System.out.println("    Error Before:  "+bundle.getErrorBefore());
+		System.out.println("    Error After:   "+bundle.getErrorAfter());
+		System.out.println("    Done with BA! ms="+(elapsedTime));
+	}
+
 	/**
 	 * Scale can only be estimated up to a scale factor.  Might as well set the distance to 1 since it is
 	 * less likely to have overflow/underflow issues.  This step is not strictly necessary.
@@ -610,6 +609,7 @@ public class ExampleMultiviewSceneReconstruction {
 		FastQueue<Point2D_F64> obs = new FastQueue<>(Point2D_F64.class, true);
 		// index of each frame its visible in
 		GrowQueue_I32 frame = new GrowQueue_I32();
+		boolean included=false;
 	}
 
 	public static void main(String[] args) {

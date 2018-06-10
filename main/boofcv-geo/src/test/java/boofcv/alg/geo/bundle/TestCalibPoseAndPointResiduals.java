@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static boofcv.alg.geo.bundle.TestCalibPoseAndPointRodiguesCodec.configure;
+import static boofcv.alg.geo.bundle.TestCalibPoseAndPointRodriguesCodec.configure;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
