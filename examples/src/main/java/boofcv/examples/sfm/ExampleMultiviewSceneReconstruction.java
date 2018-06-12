@@ -22,15 +22,13 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.abst.geo.bundle.BundleAdjustmentCalibratedSparse;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.geo.bundle.CalibratedPoseAndPoint;
-import boofcv.alg.geo.bundle.ViewPointObservations;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.factory.geo.*;
-import boofcv.gui.d3.PointCloudViewer;
-import boofcv.gui.image.ShowImages;
+import boofcv.factory.geo.ConfigEssential;
+import boofcv.factory.geo.ConfigRansac;
+import boofcv.factory.geo.FactoryMultiView;
+import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -41,17 +39,18 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.SurfFeatureQueue;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.GrayF32;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.fitting.modelset.ModelFitter;
+import georegression.struct.so.Rodrigues_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -75,8 +74,12 @@ public class ExampleMultiviewSceneReconstruction {
 	// Converts a point from pixel to normalized image coordinates
 	Point2Transform2_F64 pixelToNorm;
 
-	// ratio of matching features to unmatched features for two images to be considered connected
-	double connectThreshold = 0.3;
+	// Don't consider two images for possible matches if their features have less than this fraction
+	double FEATURE_MATCH_MINIMUM_FRACTION = 0.1;
+
+	// Number of remaining features after applying RANSAC and computing the essential matrix
+	double ESSENTIAL_MATCH_MINIMUM_FRACTION = 0.05;
+	double ESSENTIAL_MATCH_MINIMUM = 30;
 
 	// tolerance for inliers in pixels
 	double inlierTol = 2.5;
@@ -85,27 +88,13 @@ public class ExampleMultiviewSceneReconstruction {
 	DetectDescribePoint<GrayF32, BrightFeature> detDesc = FactoryDetectDescribe.surfStable(null, null, null, GrayF32.class);
 	// score ans association algorithm
 	ScoreAssociation<BrightFeature> scorer = FactoryAssociation.scoreEuclidean(BrightFeature.class, true);
-	AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(scorer, 1, true);
+	AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
 
 	// Triangulates the 3D coordinate of a point from two observations
 	TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 
-	// List of visual features (e.g. SURF) descriptions in each image
-	List<FastQueue<BrightFeature>> imageVisualFeatures = new ArrayList<>();
-	// List of visual feature locations as normalized image coordinates in each image
-	List<FastQueue<Point2D_F64>> imagePixels = new ArrayList<>();
-	// Color of the pixel at each feature location
-	List<GrowQueue_I32> imageColors = new ArrayList<>();
-	// List of 3D features in each image
-	List<List<Feature3D>> imageFeature3D = new ArrayList<>();
+	List<CameraView> cameras = new ArrayList<>();
 
-	// Transform from world to each camera image
-	Se3_F64 motionWorldToCamera[];
-
-	// indicates if an image has had its motion estimated yet
-	boolean estimatedImage[];
-	// if true the image has been processed.  Estimation could have failed. so this can be true but estimated false
-	boolean processedImage[];
 
 	// The image which acts of the world coordinate system's origin
 	int originImage;
@@ -115,8 +104,6 @@ public class ExampleMultiviewSceneReconstruction {
 
 	// used to provide initial estimate of the 3D scene
 	ModelMatcher<Se3_F64, AssociatedPair> estimateEssential;
-	ModelMatcher<Se3_F64, Point2D3D> estimatePnP;
-	ModelFitter<Se3_F64, Point2D3D> refinePnP = FactoryMultiView.refinePnP(1e-12,40);
 
 	/**
 	 * Process the images and reconstructor the scene as a point cloud using matching interest points between
@@ -128,87 +115,68 @@ public class ExampleMultiviewSceneReconstruction {
 
 		estimateEssential = FactoryMultiViewRobust.essentialRansac(
 				new ConfigEssential(intrinsic),new ConfigRansac(4000,inlierTol));
-		estimatePnP = FactoryMultiViewRobust.pnpRansac(
-				new ConfigPnP(intrinsic),new ConfigRansac(4000,inlierTol));
 
 		// find features in each image
 		detectImageFeatures(colorImages);
 
 		// see which images are the most similar to each o ther
-		double[][] matrix = computeConnections();
+		computeConnections();
 
-		printConnectionMatrix(matrix);
+		printConnectionMatrix();
 
+		System.out.println("Generating initial estimate of 3D structure");
 		// find the image which is connected to the most other images.  Use that as the origin of the arbitrary
 		// coordinate system
-		int bestImage = selectMostConnectFrame(colorImages, matrix);
+		CameraView seed = selectMostConnectFrame();
 
-		// Use two images to initialize the scene reconstruction
-		initializeReconstruction(colorImages, matrix, bestImage);
+		CameraView seedNext = estimateFeatureLocations(seed);
 
-		// Process rest of the images and compute 3D coordinates
-		List<Integer> seed = new ArrayList<>();
-		seed.add(bestImage);
-		performReconstruction(seed, -1, matrix);
+		estimateAllFeatures(seed,seedNext);
 
-		// Perform bundle adjustment to refine the initial estimates
-		performBundleAdjustment();
+		System.out.println("Pruning point features for speed");
+//		pruneFeaturesForBundleAdjustment();
 
-		// display a point cloud from the 3D features
-		PointCloudViewer gui = new PointCloudViewer(intrinsic,1);
+		System.out.println("Bundle Adjustment to refine estimate");
+//		performBundleAdjustment();
 
-		for( Feature3D t : featuresAll) {
-			gui.addPoint(t.worldPt.x,t.worldPt.y,t.worldPt.z,t.color);
-		}
-
-		gui.setPreferredSize(new Dimension(500,500));
-		ShowImages.showWindow(gui, "Points");
+		visualizeResults();
 	}
 
-	/**
-	 * Initialize the reconstruction by finding the image which is most similar to the "best" image.  Estimate
-	 * its pose up to a scale factor and create the initial set of 3D features
-	 */
-	private void initializeReconstruction(List<BufferedImage> colorImages, double[][] matrix, int bestImage) {
-		// Set all images, but the best one, as not having been estimated yet
-		estimatedImage = new boolean[colorImages.size()];
-		processedImage = new boolean[colorImages.size()];
-		estimatedImage[bestImage] = true;
-		processedImage[bestImage] = true;
-
-		// declare stored for found motion of each image
-		motionWorldToCamera = new Se3_F64[colorImages.size()];
-		for (int i = 0; i < colorImages.size(); i++) {
-			motionWorldToCamera[i] = new Se3_F64();
-			imageFeature3D.add(new ArrayList<>());
-		}
-
-		// pick the image most similar to the original image to initialize pose estimation
-		int firstChild = findBestFit(matrix, bestImage);
-		initialize(bestImage, firstChild);
+	private void visualizeResults() {
+		//		// Use two images to initialize the scene reconstruction
+//		initializeReconstruction(colorImages, matrix, bestImage);
+//
+//		// Process rest of the images and compute 3D coordinates
+//		List<Integer> seed = new ArrayList<>();
+//		seed.add(bestImage);
+//		performReconstruction(seed, -1, matrix);
+//
+//		// Perform bundle adjustment to refine the initial estimates
+//		performBundleAdjustment();
+//
+//		// display a point cloud from the 3D features
+//		PointCloudViewer gui = new PointCloudViewer(intrinsic,1);
+//
+//		for( Feature3D t : featuresAll) {
+//			gui.addPoint(t.worldPt.x,t.worldPt.y,t.worldPt.z,t.color);
+//		}
+//
+//		gui.setPreferredSize(new Dimension(500,500));
+//		ShowImages.showWindow(gui, "Points");
 	}
 
 	/**
 	 * Select the frame which has the most connections to all other frames.  The is probably a good location
 	 * to start since it will require fewer hops to estimate the motion of other frames
 	 */
-	private int selectMostConnectFrame(List<BufferedImage> colorImages, double[][] matrix) {
-		int bestImage = -1;
-		int bestCount = 0;
-		for (int i = 0; i < colorImages.size(); i++) {
-			int count = 0;
-			for (int j = 0; j < colorImages.size(); j++) {
-				if( matrix[i][j] > connectThreshold ) {
-					count++;
-				}
-			}
-			System.out.println(i + "  count " + count);
-			if( count > bestCount ) {
-				bestCount = count;
-				bestImage = i;
+	private CameraView selectMostConnectFrame() {
+		CameraView best = cameras.get(0);
+		for (int i = 1; i < cameras.size(); i++) {
+			if( cameras.get(i).connections.size() > best.connections.size() ) {
+				best = cameras.get(i);
 			}
 		}
-		return bestImage;
+		return best;
 	}
 
 	/**
@@ -219,14 +187,11 @@ public class ExampleMultiviewSceneReconstruction {
 		for (int i = 0; i < colorImages.size(); i++) {
 			System.out.print("*");
 			BufferedImage colorImage = colorImages.get(i);
-			FastQueue<BrightFeature> features = new SurfFeatureQueue(64);
-			FastQueue<Point2D_F64> pixels = new FastQueue<>(Point2D_F64.class, true);
-			GrowQueue_I32 colors = new GrowQueue_I32();
-			detectFeatures(colorImage, features, pixels, colors);
 
-			imageVisualFeatures.add(features);
-			imagePixels.add(pixels);
-			imageColors.add(colors);
+			CameraView camera = new CameraView(i);
+			detectFeatures(colorImage, camera.descriptions, camera.locations, camera.colors);
+			camera.features = new Feature3D[camera.locations.size];
+			cameras.add(camera);
 		}
 		System.out.println();
 	}
@@ -234,32 +199,73 @@ public class ExampleMultiviewSceneReconstruction {
 	/**
 	 * Compute connectivity matrix based on fraction of matching image features
 	 */
-	private double[][] computeConnections() {
-		double matrix[][] = new double[imageVisualFeatures.size()][imageVisualFeatures.size()];
+	private void computeConnections() {
+		for (int i = 0; i < cameras.size(); i++) {
+			CameraView cameraA = cameras.get(i);
 
-		for (int i = 0; i < imageVisualFeatures.size(); i++) {
-			for (int j = i+1; j < imageVisualFeatures.size(); j++) {
-				System.out.printf("Associated %02d %02d ",i,j);
-				associate.setSource(imageVisualFeatures.get(i));
-				associate.setDestination(imageVisualFeatures.get(j));
+			for (int j = i+1; j < cameras.size(); j++) {
+				CameraView cameraB = cameras.get(j);
+
+				// Associate features using their descriptors
+				associate.setSource(cameraA.descriptions);
+				associate.setDestination(cameraB.descriptions);
 				associate.associate();
 
-				matrix[i][j] = associate.getMatches().size()/(double) imageVisualFeatures.get(i).size();
-				matrix[j][i] = associate.getMatches().size()/(double) imageVisualFeatures.get(j).size();
+				double fractionAB = associate.getMatches().size()/(double) cameraA.descriptions.size();
+				double fractionBA = associate.getMatches().size()/(double) cameraB.descriptions.size();
 
-				System.out.println(" = "+matrix[i][j]);
+				if( fractionAB < FEATURE_MATCH_MINIMUM_FRACTION || fractionBA < FEATURE_MATCH_MINIMUM_FRACTION ) {
+					continue;
+				}
+
+				// Estimate an essential matrix to remove more false matches and provide an initial motion estimate
+				// This motion estimate will have an ambiguous scaling
+				Se3_F64 motionAtoB = new Se3_F64();
+				List<AssociatedIndex> inliers = new ArrayList<>();
+				if( !estimateStereoPose(i,j,motionAtoB,associate.getMatches(),inliers)) {
+					continue;
+				}
+
+				if( inliers.size() < ESSENTIAL_MATCH_MINIMUM )
+					continue;
+
+				fractionAB = inliers.size()/(double) cameraA.descriptions.size();
+				fractionBA = inliers.size()/(double) cameraB.descriptions.size();
+
+				if( fractionAB < ESSENTIAL_MATCH_MINIMUM_FRACTION || fractionBA < ESSENTIAL_MATCH_MINIMUM_FRACTION ) {
+					continue;
+				}
+
+				// Create an edge connecting these two images
+				CameraMotion motion = new CameraMotion();
+				motion.a_to_b.set(motionAtoB);
+				motion.viewSrc = cameraA;
+				motion.viewDst = cameraB;
+				motion.copyFeatures(inliers);
+				cameraA.connections.add(motion);
+				cameraB.connections.add(motion);
+
+				System.out.printf("Associated %02d %02d = %.3f %.3f | inliers=%d\n",i,j,fractionAB,fractionBA,inliers.size());
 			}
 		}
-		return matrix;
 	}
 
 	/**
 	 * Prints out which frames are connected to each other
 	 */
-	private void printConnectionMatrix( double[][] matrix) {
-		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix.length; j++) {
-				if( matrix[i][j] >= connectThreshold )
+	private void printConnectionMatrix() {
+		for (int i = 0; i < cameras.size(); i++) {
+			CameraView cameraA = cameras.get(i);
+			System.out.printf("%2d ",i);
+			for (int j = 0; j < cameras.size(); j++) {
+				boolean connected = false;
+				if( i != j ) {
+					for (CameraMotion m : cameraA.connections) {
+						connected |= m.viewSrc.index == j || m.viewDst.index == j;
+					}
+				}
+
+				if( connected )
 					System.out.print("#");
 				else
 					System.out.print(".");
@@ -292,221 +298,262 @@ public class ExampleMultiviewSceneReconstruction {
 		}
 	}
 
-	/**
-	 * Finds the frame which is the best match for the given target frame
-	 */
-	private int findBestFit( double matrix[][] , int target ) {
+	private CameraView estimateFeatureLocations(CameraView viewRoot) {
+		// Choice of world reference frame is important. This is where the translation scale will be determined
+		// We will select a view in which there are many connected features to this camera, but a large angle
+		// separating the two views.
+		CameraMotion best = null;
+		double bestScore = 0;
+		Rodrigues_F64 rod = new Rodrigues_F64();
 
-		// find the image which is the closest fit
-		int bestIndex = -1;
-		double bestRatio = 0;
+		// Using a large angle isn't actually that good of an idea in general, but works with the example images
+		// What you want is a view which maximizes translation and number of features, but the tranalations here
+		// don't have the same scale so that's tricky to determine
+		for( CameraMotion e : viewRoot.connections ) {
+			ConvertRotation3D_F64.matrixToRodrigues(e.a_to_b.R,rod);
+			double score = e.features.size()*rod.theta;
 
-		for (int i = 0; i < estimatedImage.length; i++) {
-			double ratio = matrix[target][i];
-			if( ratio > bestRatio ) {
-				bestRatio = ratio;
-				bestIndex = i;
+			System.out.println("score="+score+" features="+e.features.size()+" angle="+rod.theta);
+			if( score > bestScore ) {
+				bestScore = score;
+				best = e;
 			}
 		}
+		if( best == null )
+			throw new RuntimeException("BUG!");
 
-		return bestIndex;
+		// By defintion this transform is identity
+		viewRoot.cameraToWorld.reset();
+		viewRoot.distanceFromRoot = 0;
+
+		// Ensure the scale is some what reasonable
+		best.a_to_b.T.normalize();
+		CameraView viewB = best.destination(viewRoot);
+		viewB.cameraToWorld.set(best.motionSrcToDst(viewB));
+		viewB.distanceFromRoot = 1;
+
+		// Compute the 3D points. The world reference frame is now defined
+		triangulateMatchedFeatures(best);
+
+		return viewB;
 	}
 
 	/**
-	 * Initialize the 3D world given these two images.  imageA is assumed to be the origin of the world.
+	 * Perform a breath first search to find the structure of all the remaining camrea views
 	 */
-	private void initialize( int imageA , int imageB ) {
-		System.out.println("Initializing 3D world using "+imageA+" and "+imageB);
+	private void estimateAllFeatures(CameraView seedA, CameraView seedB ) {
+		List<CameraView> open = new ArrayList<>();
 
-		// Compute the 3D pose and find valid image features
-		Se3_F64 motionAtoB = new Se3_F64();
-		List<AssociatedIndex> inliers = new ArrayList<>();
+		// Add features for all the other views connected to the root view and determine the translation scale factor
+		addUnvistedToStack(seedA, open);
+		addUnvistedToStack(seedB, open);
 
-		if( !estimateStereoPose(imageA, imageB, motionAtoB, inliers))
-			throw new RuntimeException("The first image pair is a bad keyframe!");
+		// Do a breath first search. The queue is first in first out
+		while( !open.isEmpty() ) {
+			CameraView v = open.remove(0);
 
-		motionWorldToCamera[imageB].set(motionAtoB);
-		estimatedImage[imageB] = true;
-		processedImage[imageB] = true;
-		// imageA will be the world coordinate system's origin and will be identity
-		motionWorldToCamera[imageA].reset(); // should already be identity. Just re-enforcing that fact
-		originImage = imageA;
-		estimatedImage[imageA] = true;
-		processedImage[imageA] = true;
+			// Find the connection closest to the root to minimize compound error
+			int bestDistance = Integer.MAX_VALUE;
+			CameraMotion best = null;
+			for( CameraMotion m : v.connections ) {
+				CameraView o = m.destination(v);
+				if( o.distanceFromRoot >= 0 && o.distanceFromRoot < bestDistance ) {
+					best = m;
+					bestDistance = o.distanceFromRoot;
+				}
+			}
 
-		// create tracks for only those features in the inlier list
-		FastQueue<Point2D_F64> pixelsA = imagePixels.get(imageA);
-		FastQueue<Point2D_F64> pixelsB = imagePixels.get(imageB);
-		List<Feature3D> tracksA = imageFeature3D.get(imageA);
-		List<Feature3D> tracksB = imageFeature3D.get(imageB);
+			if( best == null )
+				throw new RuntimeException("BUG!");
 
-		GrowQueue_I32 colorsA = imageColors.get(imageA);
+			// Figure out it's 3D structure
+			triangulateAndDetermineScale(best);
 
-		for (int i = 0; i < inliers.size(); i++) {
-			AssociatedIndex a = inliers.get(i);
+			// Update the open list
+			addUnvistedToStack(v, open);
+		}
+	}
 
-			Feature3D t = new Feature3D();
-			t.color = colorsA.get(a.src);
-			t.obs.grow().set( pixelsA.get(a.src) );
-			t.obs.grow().set( pixelsB.get(a.dst) );
-			t.frame.add(imageA);
-			t.frame.add(imageB);
-			// compute the 3D coordinate of the feature
-			Point2D_F64 pa = pixelsA.get(a.src);
-			Point2D_F64 pb = pixelsB.get(a.dst);
+	/**
+	 * Looks to see which connections have yet to be visited and adds them to the open list
+	 */
+	private void addUnvistedToStack(CameraView viewed, List<CameraView> open) {
+		for (int i = 0; i < viewed.connections.size(); i++) {
+			CameraView other = viewed.connections.get(i).destination(viewed);
+			if( other.distanceFromRoot < 0) {
+				open.add(other);
+			}
+		}
+	}
 
-			if( !triangulate.triangulate(pa, pb, motionAtoB, t.worldPt) )
+	/**
+	 * Uses the previously found motion between the two cameras to estimate the scale and 3D point of common features.
+	 * If a feature already has a known 3D point that is not modified. Scale is found by computing the 3D coordinate
+	 * of all points with a 3D point again then dividing the two distances. New features are also triangulated
+	 * and have their location's update using this scale.
+	 *
+	 * A known feature has the current view added to its list of views.
+	 */
+	private void triangulateAndDetermineScale(CameraMotion edge ) {
+		// There are two views. See if src or dst is the known with a known transform to the world frame
+		CameraView viewA = edge.viewSrc;
+		CameraView viewB = edge.viewDst;
+
+		int distanceFromRoot;
+		boolean useA = viewA.distanceFromRoot >= 0;
+
+		Se3_F64 worldToView = new Se3_F64();
+		if( useA ) {
+			viewA.cameraToWorld.invert(worldToView);
+			distanceFromRoot = viewA.distanceFromRoot;
+		} else {
+			viewB.cameraToWorld.invert(worldToView);
+			distanceFromRoot = viewB.distanceFromRoot;
+		}
+
+		// Go through each point and see if it's known or not
+
+		List<Feature3D> featuresNew = new ArrayList<>();
+		Point3D_F64 local3D = new Point3D_F64();
+		Point3D_F64 found3D = new Point3D_F64();
+		Point2D_F64 normA = new Point2D_F64();
+		Point2D_F64 normB = new Point2D_F64();
+		GrowQueue_F64 scaleQueues = new GrowQueue_F64();
+		for (int i = 0; i < edge.features.size(); i++) {
+			AssociatedIndex f = edge.features.get(i);
+
+			Feature3D feature3D;
+			if( useA ) {
+				feature3D = viewA.features[f.src];
+			} else {
+				feature3D = viewB.features[f.dst];
+			}
+
+			Point2D_F64 pixelA = viewA.locations.get(f.src);
+			Point2D_F64 pixelB = viewB.locations.get(f.dst);
+
+			pixelToNorm.compute(pixelA.x, pixelA.y, normA);
+			pixelToNorm.compute(pixelB.x, pixelB.y, normB);
+
+			//triangulate using the previously found motion between the two cameras. The motion's translation
+			// still has an incorrect scale at this point
+			if( !triangulate.triangulate(normA,normB,edge.a_to_b,found3D) ) {
 				continue;
-			// the feature has to be in front of the camera
-			if (t.worldPt.z > 0) {
-				tracksA.add(t);
-				tracksB.add(t);
 			}
-		}
+			// put it in the coordinate system of the view with the known global transform
+			if (!useA) {
+				SePointOps_F64.transformReverse(edge.a_to_b, found3D, found3D);
+			}
 
-		// adjust the scale so that it's not excessively large or small
-		normalizeScale(motionWorldToCamera[imageB],tracksA);
-	}
+			if( feature3D != null  ) {
+				// convert the feature's known world 3D location and find it in the 'use' view
+				SePointOps_F64.transform(worldToView, feature3D.worldPt, local3D);
 
-	/**
-	 * Perform a breadth first search through connection graph until the motion to all images has been found
-	 */
-	private void performReconstruction(List<Integer> parents, int childAdd, double matrix[][]) {
+				scaleQueues.add(local3D.norm()/found3D.norm());
 
-		System.out.println("--------- Total Parents "+parents.size());
-
-		List<Integer> children = new ArrayList<>();
-
-		if( childAdd != -1 ) {
-			children.add(childAdd);
-		}
-
-		for( int parent : parents ) {
-			for (int i = 0; i < estimatedImage.length; i++) {
-				// see if it is connected to the target and has not had its motion estimated
-				if( matrix[parent][i] > connectThreshold && !processedImage[i] ) {
-					estimateMotionPnP(parent,i);
-					children.add(i);
+				// Add this view to the features list of views that have seen it
+				if( useA ) {
+					viewB.features[f.dst] = feature3D;
+					feature3D.obs.grow().set(normB);
+					feature3D.frame.add(viewB.index);
+				} else {
+					viewA.features[f.src] = feature3D;
+					feature3D.obs.grow().set(normA);
+					feature3D.frame.add(viewA.index);
 				}
+			} else {
+				// Save the results for later when the scale is known
+				if( viewA.features[f.src] != null || viewB.features[f.dst] != null)
+					throw new RuntimeException("BUG!");
+
+				// Create a new feature
+				feature3D = new Feature3D();
+				feature3D.worldPt.set(found3D); // current a local point, but that will be fixed later
+				feature3D.obs.grow().set(normA);
+				feature3D.obs.grow().set(normB);
+
+				// mark this feature3D as being associated with these image features
+				viewA.features[f.src] = feature3D;
+				viewB.features[f.dst] = feature3D;
+
+				// record which frame the feature was seen in
+				feature3D.frame.add(f.src);
+				feature3D.frame.add(f.dst);
+
+				featuresNew.add(feature3D);
 			}
 		}
 
-		if( !children.isEmpty() )
-			performReconstruction(children, -1, matrix);
+		// use the median value to represent the scale offset
+		scaleQueues.sort();
+		double scale = scaleQueues.get( scaleQueues.size/2 );
+
+		// Fix the scale along this edge
+		edge.a_to_b.T.scale(scale);
+
+		if( useA ) {
+			edge.a_to_b.invert(null).concat(viewA.cameraToWorld,viewB.cameraToWorld);
+			viewB.distanceFromRoot = distanceFromRoot + 1;
+		} else {
+			edge.a_to_b.concat(viewB.cameraToWorld, viewA.cameraToWorld);
+			viewA.distanceFromRoot = distanceFromRoot + 1;
+		}
+
+		// The scale is now known, let's fix all the newly created features
+		for( Feature3D f : featuresNew ) {
+			f.worldPt.scale(scale);
+			featuresAll.add(f);
+		}
 	}
 
 	/**
-	 * Estimate the motion between two images.  Image A is assumed to have known features with 3D coordinates already
-	 * and image B is an unprocessed image with no 3D features yet.
+	 * For the two seed views just triangulate all the common features. The motion already has its translation
+	 * normalized to one
 	 */
-	private void estimateMotionPnP( int imageA , int imageB ) {
-		// Mark image B as processed so that it isn't processed a second time.
-		processedImage[imageB] = true;
+	private void triangulateMatchedFeatures( CameraMotion edge ) {
 
-		System.out.println("Estimating PnP motion between "+imageA+" and "+imageB);
+		CameraView viewA = edge.viewSrc;
+		CameraView viewB = edge.viewDst;
 
-		// initially prune features using essential matrix
-		Se3_F64 dummy = new Se3_F64();
-		List<AssociatedIndex> inliers = new ArrayList<>();
+		for (int i = 0; i < edge.features.size(); i++) {
+			AssociatedIndex f = edge.features.get(i);
 
-		if( !estimateStereoPose(imageA, imageB, dummy, inliers))
-			throw new RuntimeException("The first image pair is a bad keyframe!");
+			Point2D_F64 pixelA = viewA.locations.get(f.src);
+			Point2D_F64 pixelB = viewB.locations.get(f.dst);
 
-		FastQueue<Point2D_F64> pixelsA = imagePixels.get(imageA);
-		FastQueue<Point2D_F64> pixelsB = imagePixels.get(imageB);
-		List<Feature3D> featuresA = imageFeature3D.get(imageA);
-		List<Feature3D> featuresB = imageFeature3D.get(imageB); // this should be empty
+			Feature3D feature3D = new Feature3D();
 
-		// create the associated pair for motion estimation
-		List<Point2D3D> features = new ArrayList<>();
-		List<AssociatedIndex> inputRansac = new ArrayList<>();
-		for (int i = 0; i < inliers.size(); i++) {
-			AssociatedIndex a = inliers.get(i);
-			Feature3D t = lookupFeature(featuresA, imageA, pixelsA.get(a.src));
-			if( t != null ) {
-				Point2D_F64 p = pixelsB.get(a.dst);
-				features.add(new Point2D3D(p, t.worldPt));
-				inputRansac.add(a);
+			Point2D_F64 normA = feature3D.obs.grow();
+			Point2D_F64 normB = feature3D.obs.grow();
+
+			pixelToNorm.compute(pixelA.x, pixelA.y, normA);
+			pixelToNorm.compute(pixelB.x, pixelB.y, normB);
+
+			if( !triangulate.triangulate(normA,normB,edge.a_to_b,feature3D.worldPt) ) {
+				continue;
 			}
+			// mark this feature3D as being associated with these image features
+			viewA.features[f.src] = feature3D;
+			viewB.features[f.dst] = feature3D;
+
+			// record which frame the feature was seen in
+			feature3D.frame.add(f.src);
+			feature3D.frame.add(f.dst);
+
+			// Add it to the overall list
+			featuresAll.add(feature3D);
 		}
-
-		// make sure there are enough features to estimate motion
-		if( features.size() < 15 ) {
-			System.out.println("  Too few features for PnP!!  "+features.size());
-			return;
-		}
-
-		// estimate the motion between the two images
-		if( !estimatePnP.process(features))
-			throw new RuntimeException("Motion estimation failed");
-
-		// refine the motion estimate using non-linear optimization
-		Se3_F64 motionWorldToB = new Se3_F64();
-		if( !refinePnP.fitModel(estimatePnP.getMatchSet(), estimatePnP.getModelParameters(), motionWorldToB) )
-			throw new RuntimeException("Refine failed!?!?");
-
-		motionWorldToCamera[imageB].set(motionWorldToB);
-		estimatedImage[imageB] = true;
-
-		int before = featuresAll.size();
-
-		// Add all tracks in the inlier list to the B's list of 3D features
-		int N = estimatePnP.getMatchSet().size();
-		for (int i = 0; i < N; i++) {
-			int index = estimatePnP.getInputIndex(i);
-			AssociatedIndex a = inputRansac.get(index);
-
-			// find the track that this was associated with and add it to B
-			Feature3D t = lookupFeature(featuresA, imageA, pixelsA.get(a.src));
-			featuresB.add(t);
-			t.frame.add(imageB);
-			t.obs.grow().set( pixelsB.get(a.dst) );
-
-			if( !t.included ) {
-				featuresAll.add(t);
-			}
-		}
-
-		System.out.println("     Added features: "+(featuresAll.size()-before)+"  out of "+inliers.size());
-	}
-
-	/**
-	 * Given a list of 3D features, find the feature which was observed at the specified frame at the
-	 * specified location.  If no feature is found return null.
-	 */
-	private Feature3D lookupFeature(List<Feature3D> features, int frameIndex, Point2D_F64 pixel) {
-		for (int i = 0; i < features.size(); i++) {
-			Feature3D t = features.get(i);
-			for (int j = 0; j < t.frame.size(); j++) {
-				if( t.frame.get(j) == frameIndex ) {
-					Point2D_F64 o = t.obs.get(j);
-					if( o.x == pixel.x && o.y == pixel.y ) {
-						return t;
-					} else {
-						break;
-					}
-				}
-			}
-		}
-		return null;
 	}
 
 	/**
 	 * Given two images compute the relative location of each image using the essential matrix.
 	 */
 	protected boolean estimateStereoPose(int imageA, int imageB, Se3_F64 motionAtoB,
-										 List<AssociatedIndex> inliers)
+										 FastQueue<AssociatedIndex> matches, List<AssociatedIndex> inliers)
 	{
-		// associate the features together
-		associate.setSource(imageVisualFeatures.get(imageA));
-		associate.setDestination(imageVisualFeatures.get(imageB));
-		associate.associate();
-
-		FastQueue<AssociatedIndex> matches = associate.getMatches();
-
 		// create the associated pair for motion estimation
-		FastQueue<Point2D_F64> pixelsA = imagePixels.get(imageA);
-		FastQueue<Point2D_F64> pixelsB = imagePixels.get(imageB);
+		FastQueue<Point2D_F64> pixelsA = cameras.get(imageA).locations;
+		FastQueue<Point2D_F64> pixelsB = cameras.get(imageB).locations;
 		List<AssociatedPair> pairs = new ArrayList<>();
 		for (int i = 0; i < matches.size(); i++) {
 			AssociatedIndex a = matches.get(i);
@@ -514,7 +561,7 @@ public class ExampleMultiviewSceneReconstruction {
 		}
 
 		if( !estimateEssential.process(pairs) )
-			throw new RuntimeException("Motion estimation failed");
+			return false;
 
 		List<AssociatedPair> inliersEssential = estimateEssential.getMatchSet();
 
@@ -529,83 +576,82 @@ public class ExampleMultiviewSceneReconstruction {
 		return true;
 	}
 
-	protected void performBundleAdjustment() {
-		long startTime = System.currentTimeMillis();
-		System.out.println("#########################################");
-		System.out.println("Starting bundle adjustment");
-		System.out.println("   structure="+motionWorldToCamera.length+"  points="+featuresAll.size());
-		BundleAdjustmentCalibratedSparse bundle = new BundleAdjustmentCalibratedSparse(1e-8,3);
+	public static class CameraView {
+		int index;
+		Se3_F64 cameraToWorld = new Se3_F64();
+		int distanceFromRoot = -1;
 
-		CalibratedPoseAndPoint initialModel = new CalibratedPoseAndPoint();
-		List<ViewPointObservations> observations = new ArrayList<>();
+		List<CameraMotion> connections = new ArrayList<>();
 
-		initialModel.configure(motionWorldToCamera.length,featuresAll.size());
+		// feature descriptor of all features in this image
+		FastQueue<BrightFeature> descriptions = new SurfFeatureQueue(64);
+		// observed location of all features in pixels
+		FastQueue<Point2D_F64> locations = new FastQueue<>(Point2D_F64.class, true);
+		// RGB color of each feature
+		GrowQueue_I32 colors = new GrowQueue_I32();
+		// Estimated 3D location for SOME of the features
+		Feature3D[] features;
 
-		initialModel.setViewKnown(originImage,true);
-
-		for (int i = 0; i < motionWorldToCamera.length; i++) {
-			initialModel.getWorldToCamera(i).set(motionWorldToCamera[i]);
+		public CameraView(int index) {
+			this.index = index;
 		}
-
-		for (int i = 0; i < featuresAll.size(); i++) {
-			Feature3D t = featuresAll.get(i);
-
-			initialModel.getPoint(i).set(t.worldPt);
-		}
-
-		for( int frameIndex = 0; frameIndex < motionWorldToCamera.length; frameIndex++ ) {
-			ViewPointObservations o = new ViewPointObservations();
-
-			for (int j = 0; j < featuresAll.size(); j++) {
-				Feature3D t = featuresAll.get(j);
-				for (int k = 0; k < t.obs.size(); k++) {
-					int obsFrame = t.frame.get(k);
-
-					if( obsFrame == frameIndex ) {
-						Point2D_F64 p = t.obs.get(k);
-						o.getPoints().grow().set(j,p);
-					}
-				}
-			}
-
-			observations.add(o);
-		}
-
-
-		if( !bundle.process(initialModel,observations) )
-			throw new RuntimeException("Bundle adjustment failed!");
-
-		// TODO Copy results!
-		long elapsedTime = System.currentTimeMillis()-startTime;
-		System.out.println("    Error Before:  "+bundle.getErrorBefore());
-		System.out.println("    Error After:   "+bundle.getErrorAfter());
-		System.out.println("    Done with BA! ms="+(elapsedTime));
 	}
 
-	/**
-	 * Scale can only be estimated up to a scale factor.  Might as well set the distance to 1 since it is
-	 * less likely to have overflow/underflow issues.  This step is not strictly necessary.
-	 */
-	public void normalizeScale( Se3_F64 transform , List<Feature3D> features) {
+	public static class CameraMotion {
+		// if the transform of both views is known then this will be scaled to be in world units
+		// otherwise it's in arbitrary units
+		Se3_F64 a_to_b = new Se3_F64();
 
-		double T = transform.T.norm();
-		double scale = 1.0/T;
+		// index
+		List<AssociatedIndex> features = new ArrayList<>();
 
-		for( Se3_F64 m : motionWorldToCamera) {
-			m.T.timesIP(scale);
+		CameraView viewSrc;
+		CameraView viewDst;
+
+		public void copyFeatures( List<AssociatedIndex> list ) {
+			features.clear();
+			for (int i = 0; i < list.size(); i++) {
+				features.add( list.get(i).copy() );
+			}
 		}
 
-		for( Feature3D t : features) {
-			t.worldPt.timesIP(scale);
+		public Se3_F64 motionSrcToDst( CameraView src ) {
+			if( src == viewSrc) {
+				return a_to_b.copy();
+			} else if( src == viewDst){
+				return a_to_b.invert(null);
+			} else {
+				throw new RuntimeException("BUG!");
+			}
+		}
+
+		public CameraView destination( CameraView src ) {
+			if( src == viewSrc) {
+				return viewDst;
+			} else if( src == viewDst){
+				return viewSrc;
+			} else {
+				throw new RuntimeException("BUG!");
+			}
+		}
+
+		public int featureIndex( CameraView view , int index  ) {
+			if( view == viewSrc) {
+				return features.get(index).src;
+			} else if( view == viewDst) {
+				return features.get(index).dst;
+			} else {
+				throw new RuntimeException("BUG!");
+			}
 		}
 	}
 
 	public static class Feature3D {
 		// color of the pixel first found int
 		int color;
-		// estimate 3D position of the feature
+		// estimate 3D position of the feature in world frame
 		Point3D_F64 worldPt = new Point3D_F64();
-		// observations in each frame that it's visible
+		// observations in each frame that it's visible. These are in
 		FastQueue<Point2D_F64> obs = new FastQueue<>(Point2D_F64.class, true);
 		// index of each frame its visible in
 		GrowQueue_I32 frame = new GrowQueue_I32();
@@ -620,6 +666,10 @@ public class ExampleMultiviewSceneReconstruction {
 				new File(directory,"/intrinsic_DSC-HX5_3648x2736_to_640x480.yaml"));
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
+
+		while( images.size() > 5 ) {
+			images.remove(5);
+		}
 
 		ExampleMultiviewSceneReconstruction example = new ExampleMultiviewSceneReconstruction();
 

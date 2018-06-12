@@ -33,6 +33,13 @@ public class AssociatedIndex {
 	/** The association score.  Meaning will very depending on implementation */
 	public double fitScore;
 
+	public AssociatedIndex(AssociatedIndex original ) {
+		set(original);
+	}
+
+	public AssociatedIndex() {
+	}
+
 	public void setAssociation(int src , int dst , double fitScore ) {
 		this.src = src;
 		this.dst = dst;
@@ -67,5 +74,9 @@ public class AssociatedIndex {
 
 	public void setFitScore(double fitScore) {
 		this.fitScore = fitScore;
+	}
+
+	public AssociatedIndex copy() {
+		return new AssociatedIndex(this);
 	}
 }
