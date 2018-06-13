@@ -92,7 +92,7 @@ public class ExampleMultiviewSceneReconstruction {
 	final int ESSENTIAL_MATCH_MINIMUM = 40;
 
 	// How many features in each edge it tries to have. Can be used to limit the number of features optimized in SBA
-	int TARGET_FEATURE_EDGE = 10;
+	int TARGET_FEATURE_EDGE = 40;
 
 	// tolerance for inliers in pixels
 	final double inlierTol = 2.5;
@@ -153,7 +153,7 @@ public class ExampleMultiviewSceneReconstruction {
 		System.out.println("   "+featuresAll.size()+"  after   "+featuresPruned.size());
 
 		System.out.println("Bundle Adjustment to refine estimate");
-//		performBundleAdjustment(seed);
+		performBundleAdjustment(seed);
 
 		visualizeResults(intrinsic);
 		System.out.println("Done!");
@@ -618,7 +618,7 @@ public class ExampleMultiviewSceneReconstruction {
 		// some number
 		List<Feature3D> candidates = new ArrayList<>();
 		for( CameraMotion m : graphEdges ) {
-			// create a list of 3D features which can be removed still
+			// create a list of 3D features which can be added for this edge specially
 			candidates.clear();
 			for (int i = 0; i < m.features.size(); i++) {
 				AssociatedIndex a = m.features.get(i);
@@ -778,9 +778,9 @@ public class ExampleMultiviewSceneReconstruction {
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 
-		while( images.size() > 12 ) {
-			images.remove(12);
-		}
+//		while( images.size() > 10 ) {
+//			images.remove(10);
+//		}
 
 		ExampleMultiviewSceneReconstruction example = new ExampleMultiviewSceneReconstruction();
 
