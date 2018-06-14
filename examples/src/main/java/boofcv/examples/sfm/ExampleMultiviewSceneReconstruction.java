@@ -623,7 +623,7 @@ public class ExampleMultiviewSceneReconstruction {
 			for (int i = 0; i < m.features.size(); i++) {
 				AssociatedIndex a = m.features.get(i);
 				Feature3D f = m.viewSrc.features3D[a.src];
-				if( f!=null && !f.included ) {
+				if( f!=null && !f.included && f.frame.size >= 3 ) {
 					candidates.add(f);
 				}
 			}
