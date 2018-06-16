@@ -22,10 +22,10 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.abst.geo.bundle.BundleAdjustmentCalibratedSparse;
+import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
+import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
+import boofcv.abst.geo.bundle.BundleAdjustmentShur_DSCC;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.geo.bundle.CalibratedPoseAndPoint;
-import boofcv.alg.geo.bundle.ViewPointObservations;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.ConfigEssential;
@@ -148,12 +148,10 @@ public class ExampleMultiviewSceneReconstruction {
 		pruneFeatures();
 //		featuresPruned.addAll(featuresAll);
 
-		// TODO sanity check structure
-
 		System.out.println("   "+featuresAll.size()+"  after   "+featuresPruned.size());
 
 		System.out.println("Bundle Adjustment to refine estimate");
-		performBundleAdjustment(seed);
+		performBundleAdjustment(seed,intrinsic);
 
 		visualizeResults(intrinsic);
 		System.out.println("Done!");
@@ -460,10 +458,12 @@ public class ExampleMultiviewSceneReconstruction {
 				// Add this view to the features list of views that have seen it
 				if( useA ) {
 					viewB.features3D[f.dst] = feature3D;
+					feature3D.pixelObs.grow().set(viewB.featurePixels.get(f.dst));
 					feature3D.normObs.grow().set(normB);
 					feature3D.frame.add(viewB.index);
 				} else {
 					viewA.features3D[f.src] = feature3D;
+					feature3D.pixelObs.grow().set(viewA.featurePixels.get(f.src));
 					feature3D.normObs.grow().set(normA);
 					feature3D.frame.add(viewA.index);
 				}
@@ -477,6 +477,8 @@ public class ExampleMultiviewSceneReconstruction {
 				feature3D = new Feature3D();
 				feature3D.color = viewA.colors.get(f.src);
 				feature3D.worldPt.set(found3D); // current a local point, but that will be fixed later
+				feature3D.pixelObs.grow().set(viewA.featurePixels.get(f.src));
+				feature3D.pixelObs.grow().set(viewB.featurePixels.get(f.dst));
 				feature3D.normObs.grow().set(normA);
 				feature3D.normObs.grow().set(normB);
 
@@ -540,6 +542,8 @@ public class ExampleMultiviewSceneReconstruction {
 			Feature3D feature3D = new Feature3D();
 
 			feature3D.color = viewA.colors.get(f.src);
+			feature3D.pixelObs.grow().set(viewA.featurePixels.get(f.src));
+			feature3D.pixelObs.grow().set(viewB.featurePixels.get(f.dst));
 			feature3D.normObs.grow().set(normA);
 			feature3D.normObs.grow().set(normB);
 
@@ -645,44 +649,49 @@ public class ExampleMultiviewSceneReconstruction {
 		}
 	}
 
-	private void performBundleAdjustment( CameraView seed ) {
-		BundleAdjustmentCalibratedSparse alg = new BundleAdjustmentCalibratedSparse(1e-6,50);
+	private void performBundleAdjustment( CameraView seed , CameraPinholeRadial intrinsic ) {
+		BundleAdjustmentShur_DSCC sba = new BundleAdjustmentShur_DSCC(1e-3);
 
-		CalibratedPoseAndPoint parameters = new CalibratedPoseAndPoint();
-		List<ViewPointObservations> observations = new ArrayList<>();
+		sba.configure(1e-4,1e-4,20);
 
-		parameters.configure(graphNodes.size(),featuresPruned.size());
+		BundleAdjustmentSceneStructure structure = new BundleAdjustmentSceneStructure();
+		BundleAdjustmentObservations observations = new BundleAdjustmentObservations(graphNodes.size());
+
+		structure.initialize(1,graphNodes.size(),featuresPruned.size());
+
+		structure.setCamera(0,true,intrinsic);
 
 		for( int i = 0; i < graphNodes.size(); i++ ) {
 			CameraView v = graphNodes.get(i);
-			parameters.getWorldToCamera(v.index).set(v.cameraToWorld.invert(null));
-			parameters.setViewKnown(v.index,false);
-
-			observations.add(  new ViewPointObservations() );
+			structure.setView(i,v==seed,v.cameraToWorld.invert(null));
 		}
-		parameters.setViewKnown(seed.index,true);
 
-		for (int i = 0; i < featuresPruned.size(); i++) {
-			Feature3D f = featuresPruned.get(i);
-			parameters.getPoint(i).set(f.worldPt);
+		for (int indexPoint = 0; indexPoint < featuresPruned.size(); indexPoint++) {
+			Feature3D f = featuresPruned.get(indexPoint);
+
+			structure.setPoint(indexPoint,f.worldPt.x,f.worldPt.y,f.worldPt.z);
 
 			for (int j = 0; j < f.frame.size; j++) {
-				ViewPointObservations o = observations.get( f.frame.get(j));
-				o.getPoints().grow().set(i, f.normObs.get(j));
+				int indexView = f.frame.get(j);
+				Point2D_F64 pixel = f.pixelObs.get(j);
+				BundleAdjustmentObservations.View v = observations.getView(indexView);
+
+				structure.connectPointToView(indexPoint,indexView);
+				v.add(indexPoint,(float)pixel.x,(float)pixel.y);
 			}
 		}
 
-		if( !alg.process(parameters,observations) ) {
+		if( !sba.optimize(structure,observations) ) {
 			throw new RuntimeException("Bundle adjustment failed!");
 		}
-		System.out.println("Score before: "+alg.getErrorBefore()+"  After: "+alg.getErrorAfter());
+		System.out.println("Score before: "+sba.getErrorBefore()+"  After: "+sba.getErrorAfter());
 
 		// Copy the results into the scene
 		for( int i = 0; i < graphNodes.size(); i++ ) {
-			graphNodes.get(i).cameraToWorld.set( parameters.getWorldToCamera(i));
+			structure.views[i].worldToView.invert(graphNodes.get(i).cameraToWorld);
 		}
 		for (int i = 0; i < featuresPruned.size(); i++) {
-			featuresPruned.get(i).worldPt.set( parameters.getPoint(i));
+			featuresPruned.get(i).worldPt.set( structure.points[i]);
 		}
 	}
 
@@ -764,6 +773,7 @@ public class ExampleMultiviewSceneReconstruction {
 		Point3D_F64 worldPt = new Point3D_F64();
 		// observations in each frame that it's visible. These are in normalized image coordinates
 		FastQueue<Point2D_F64> normObs = new FastQueue<>(Point2D_F64.class, true);
+		FastQueue<Point2D_F64> pixelObs = new FastQueue<>(Point2D_F64.class, true);
 		// index of each frame its visible in
 		GrowQueue_I32 frame = new GrowQueue_I32();
 		boolean included=false;
@@ -778,9 +788,9 @@ public class ExampleMultiviewSceneReconstruction {
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 
-//		while( images.size() > 10 ) {
-//			images.remove(10);
-//		}
+		while( images.size() > 4 ) {
+			images.remove(4);
+		}
 
 		ExampleMultiviewSceneReconstruction example = new ExampleMultiviewSceneReconstruction();
 

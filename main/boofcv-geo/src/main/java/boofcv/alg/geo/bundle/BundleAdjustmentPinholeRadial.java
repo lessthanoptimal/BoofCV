@@ -20,32 +20,45 @@ package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * Formulas for {@link boofcv.struct.calib.CameraPinhole}.
+ * Formulas for {@link CameraPinhole}.
  *
  * @author Peter Abeles
  */
-public class BundleAdjustmentPinhole extends BundleAdjustmentCamera {
+public class BundleAdjustmentPinholeRadial extends BundleAdjustmentCamera {
 
 	// parameters for the camera model
 	private boolean zeroSkew=true;
 	private double fx,fy,skew,cx,cy;
+	private double r1,r2;
+	private double t1,t2;
 
-	public BundleAdjustmentPinhole(boolean zeroSkew) {
+	public BundleAdjustmentPinholeRadial(boolean zeroSkew) {
 		this.zeroSkew = zeroSkew;
 	}
 
-	public BundleAdjustmentPinhole() {
+	public BundleAdjustmentPinholeRadial() {
 	}
 
-	public BundleAdjustmentPinhole(CameraPinhole intrinsic ) {
+	public BundleAdjustmentPinholeRadial(CameraPinholeRadial intrinsic ) {
+		if( intrinsic.radial.length > 2 )
+			throw new RuntimeException("Radial is too long");
+
 		zeroSkew = intrinsic.skew == 0;
 		fx = intrinsic.fx;
 		fy = intrinsic.fy;
 		cx = intrinsic.cx;
 		cy = intrinsic.cy;
+		r1=r2=0;
+		if( intrinsic.radial.length > 0 )
+			r1 = intrinsic.radial[0];
+		if( intrinsic.radial.length > 1 )
+			r2 = intrinsic.radial[1];
+		t1 = intrinsic.t1;
+		t2 = intrinsic.t2;
 		skew = intrinsic.skew;
 	}
 
@@ -55,9 +68,13 @@ public class BundleAdjustmentPinhole extends BundleAdjustmentCamera {
 		fy = parameters[offset+1];
 		cx = parameters[offset+2];
 		cy = parameters[offset+3];
+		r1 = parameters[offset+4];
+		r2 = parameters[offset+5];
+		t1 = parameters[offset+6];
+		t2 = parameters[offset+7];
 
 		if( !zeroSkew ) {
-			skew = parameters[offset+4];
+			skew = parameters[offset+8];
 		} else {
 			skew = 0;
 		}
@@ -69,18 +86,34 @@ public class BundleAdjustmentPinhole extends BundleAdjustmentCamera {
 		parameters[offset+1] = fy;
 		parameters[offset+2] = cx;
 		parameters[offset+3] = cy;
+		parameters[offset+4] = r1;
+		parameters[offset+5] = r2;
+		parameters[offset+6] = t1;
+		parameters[offset+7] = t2;
 		if( !zeroSkew ) {
-			parameters[offset+4] = skew;
+			parameters[offset+8] = skew;
 		}
 	}
 
 	@Override
 	public void project(double camX, double camY, double camZ, Point2D_F64 output) {
+		// compute normalized image coordinates
 		double nx = camX/camZ;
 		double ny = camY/camZ;
 
-		output.x = fx*nx + skew*ny + cx;
-		output.y = fy*ny + cy;
+		// Apply radial distortion
+		double rr = nx*nx + ny*ny;
+		double sum = (r1 + r2*rr)*rr;
+		double x = nx*( 1 + sum);
+		double y = ny*( 1 + sum);
+
+		// Apply tangential distortion
+		x += 2*t1*nx*ny + t2*(r2 + 2*nx*nx);
+		y += t1*(r2 + 2*ny*ny) + 2*t2*nx*ny;
+
+		// Convert to pixels
+		output.x = fx*x + skew*y + cx;
+		output.y = fy*y + cy;
 	}
 
 	@Override
@@ -88,12 +121,24 @@ public class BundleAdjustmentPinhole extends BundleAdjustmentCamera {
 		double nx = camX/camZ;
 		double ny = camY/camZ;
 
-		calibX[0] = nx; calibY[0] = 0;
-		calibX[1] = 0;  calibY[1] = ny;
+		// Apply radial distortion
+		double rr = nx*nx + ny*ny;
+		double sum = (r1 + r2*rr)*rr;
+		double x = nx*( 1 + sum);
+		double y = ny*( 1 + sum);
+
+		// Apply tangential distortion
+		x += 2*t1*nx*ny + t2*(r2 + 2*nx*nx);
+		y += t1*(r2 + 2*ny*ny) + 2*t2*nx*ny;
+
+		calibX[0] = x;  calibY[0] = 0;
+		calibX[1] = 0;  calibY[1] = y;
 		calibX[2] = 1;  calibY[2] = 0;
 		calibX[3] = 0;  calibY[3] = 1;
+		calibX[0] = x;  calibY[0] = 0;
+
 		if( !zeroSkew ) {
-			calibX[4] = ny; calibY[4] = 0;
+			calibX[8] = ny; calibY[8] = 0;
 		}
 
 		inputX[0] = fx/camZ;           inputY[0] = 0;
