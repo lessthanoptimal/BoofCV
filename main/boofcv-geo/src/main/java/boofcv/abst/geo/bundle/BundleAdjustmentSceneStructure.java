@@ -18,7 +18,6 @@
 
 package boofcv.abst.geo.bundle;
 
-import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -63,14 +62,15 @@ public class BundleAdjustmentSceneStructure {
 
 	}
 
-	public void setCamera( int which ,  boolean fixed , CameraPinholeRadial parameters ) {
-		cameras[which].fixed = fixed;
-		cameras[which].model = parameters;
+	public void setCamera( int which ,  boolean fixed , BudleAdjustmentCamera model , double[] parameters ) {
+		cameras[which].known = fixed;
+		cameras[which].model = model;
+		cameras[which].parameters = parameters;
 	}
 
 	public void setView(int which , boolean fixed , Se3_F64 viewToWorld ) {
-		views[which].fixed = fixed;
-		views[which].viewToWorld.set(viewToWorld);
+		views[which].known = fixed;
+		views[which].worldToView.set(viewToWorld);
 
 	}
 
@@ -95,6 +95,49 @@ public class BundleAdjustmentSceneStructure {
 		p.views.add(viewIndex);
 	}
 
+	/**
+	 * Returns the number of cameras with parameters that are not fixed
+	 * @return non-fixed camera count
+	 */
+	public int getUnknownCameraCount() {
+		int total = 0;
+		for (int i = 0; i < cameras.length; i++) {
+			if( !cameras[i].known) {
+				total++;
+			}
+		}
+		return total;
+	}
+
+	/**
+	 * Returns the number of view with parameters that are not fixed
+	 * @return non-fixed view count
+	 */
+	public int getUnknownViewCount() {
+		int total = 0;
+		for (int i = 0; i < views.length; i++) {
+			if( !views[i].known) {
+				total++;
+			}
+		}
+		return total;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public int getUnknownCameraParameterCount() {
+		int total = 0;
+		for (int i = 0; i < cameras.length; i++) {
+			if( !cameras[i].known) {
+				total += cameras[i].model.getParameterCount();
+			}
+		}
+		return total;
+	}
+
+
 	public Camera[] getCameras() {
 		return cameras;
 	}
@@ -109,21 +152,22 @@ public class BundleAdjustmentSceneStructure {
 
 	public static class Camera {
 		/**
-		 * If the parameters are fixed or not
+		 * If the parameters are assumed to be known and should not be optimised.
 		 */
-		public boolean fixed = true;
-		public Object model;
+		public boolean known = true;
+		public BudleAdjustmentCamera model;
+		public double parameters[];
 	}
 
 	public static class View {
 		/**
-		 * If the parameters are fixed or not
+		 * If the parameters are assumed to be known and should not be optimised.
 		 */
-		public boolean fixed = true;
+		public boolean known = true;
 		/**
 		 * Transform from this view to the world
 		 */
-		public Se3_F64 viewToWorld = new Se3_F64();
+		public Se3_F64 worldToView = new Se3_F64();
 		/**
 		 * The camera associated with this view
 		 */

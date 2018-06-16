@@ -29,7 +29,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  * @author Peter Abeles
  */
 public class BundleAdjustmentObservations {
-	View views[];
+	public View views[];
 
 	public BundleAdjustmentObservations( int numViews ) {
 		views = new View[numViews];
@@ -38,13 +38,25 @@ public class BundleAdjustmentObservations {
 		}
 	}
 
+	/**
+	 * Returns the total number of observations across all views
+	 * @return number of observations
+	 */
+	public int getObservationCount() {
+		int total = 0;
+		for (int i = 0; i < views.length; i++) {
+			total += views[i].feature.size;
+		}
+		return views.length;
+	}
+
 	public View getView( int which ) {
 		return views[which];
 	}
 
 	public static class View {
-		GrowQueue_I32 feature = new GrowQueue_I32();
-		GrowQueue_F32 observations = new GrowQueue_F32();
+		public GrowQueue_I32 feature = new GrowQueue_I32();
+		public GrowQueue_F32 observations = new GrowQueue_F32();
 
 		public int size() {
 			return feature.size;
