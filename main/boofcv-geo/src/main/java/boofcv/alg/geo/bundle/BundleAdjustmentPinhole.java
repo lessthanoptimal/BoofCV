@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.BudleAdjustmentCamera;
+import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.point.Point2D_F64;
 
@@ -27,20 +27,20 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class BudleAdjustmentPinhole extends BudleAdjustmentCamera {
+public class BundleAdjustmentPinhole extends BundleAdjustmentCamera {
 
-	// paremters for the camera model
+	// parameters for the camera model
 	private boolean zeroSkew=true;
 	private double fx,fy,skew,cx,cy;
 
-	public BudleAdjustmentPinhole(boolean zeroSkew) {
+	public BundleAdjustmentPinhole(boolean zeroSkew) {
 		this.zeroSkew = zeroSkew;
 	}
 
-	public BudleAdjustmentPinhole() {
+	public BundleAdjustmentPinhole() {
 	}
 
-	public BudleAdjustmentPinhole(CameraPinhole intrinsic ) {
+	public BundleAdjustmentPinhole(CameraPinhole intrinsic ) {
 		zeroSkew = false;
 		fx = intrinsic.fx;
 		fy = intrinsic.fy;
@@ -73,7 +73,7 @@ public class BudleAdjustmentPinhole extends BudleAdjustmentCamera {
 	}
 
 	@Override
-	public void gradient(double camX, double camY, double camZ, double[] inputX, double[] inputY, double[] calibX, double[] calibY) {
+	public void jacobian(double camX, double camY, double camZ, double[] inputX, double[] inputY, double[] calibX, double[] calibY) {
 		double nx = camX/camZ;
 		double ny = camY/camZ;
 
@@ -92,7 +92,7 @@ public class BudleAdjustmentPinhole extends BudleAdjustmentCamera {
 	}
 
 	@Override
-	public void gradient(double camX, double camY, double camZ, double[] inputX, double[] inputY)
+	public void jacobian(double camX, double camY, double camZ, double[] inputX, double[] inputY)
 	{
 		inputX[0] = fx/camZ;           inputY[0] = 0;
 		inputX[1] = skew/camZ;         inputY[1] = fy/camZ;

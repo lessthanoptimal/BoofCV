@@ -172,14 +172,14 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 				//============ Partial of camera parameters
 				if( !camera.known ) {
 					int N = camera.model.getParameterCount();
-					camera.model.gradient(cameraPt.x, cameraPt.y, cameraPt.z, pointGradX, pointGradY, calibGradX, calibGradY);
+					camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z, pointGradX, pointGradY, calibGradX, calibGradY);
 
 					for (int j = 0; j < N; j++) {
 						tripletPoint.addItem(jacRowX,cameraParamStartIndex+j,calibGradX[j]);
 						tripletPoint.addItem(jacRowY,cameraParamStartIndex+j,calibGradY[j]);
 					}
 				} else {
-					camera.model.gradient(cameraPt.x, cameraPt.y, cameraPt.z, pointGradX, pointGradY);
+					camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z, pointGradX, pointGradY);
 				}
 				//============ Partial of worldPt
 				// partial of (R*X + T) with respect to X is a 3 by 3 matrix

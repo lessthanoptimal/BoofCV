@@ -26,7 +26,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public abstract class BudleAdjustmentCamera {
+public abstract class BundleAdjustmentCamera {
 
 	/**
 	 * Specifies the input parameters.
@@ -44,7 +44,6 @@ public abstract class BudleAdjustmentCamera {
 	 */
 	public abstract void project(double camX , double camY , double camZ , Point2D_F64 output );
 
-
 	/**
 	 * Computes the gradient for the input (a.k.a. cam point) parameters as well as calibration parameters.
 	 *
@@ -56,9 +55,9 @@ public abstract class BudleAdjustmentCamera {
 	 * @param calibX Array to store the gradient of X with respect to calibration parameters. length N
 	 * @param calibY Array to store the gradient of Y with respect to calibration parameters. length N
 	 */
-	public abstract void gradient( double camX , double camY , double camZ,
-								   double inputX[] , double inputY[] ,
-								   double calibX[] , double calibY[] );
+	public abstract void jacobian(double camX , double camY , double camZ,
+								  double inputX[] , double inputY[] ,
+								  double calibX[] , double calibY[] );
 
 	/**
 	 * Computes the gradient for input variables only. Used when camera parameters is assumed to be known
@@ -69,8 +68,8 @@ public abstract class BudleAdjustmentCamera {
 	 * @param inputX Array to store the gradient of X with respect to input point. length 3
 	 * @param inputY Array to store the gradient of Y with respect to input point. length 3
 	 */
-	public abstract void gradient( double camX , double camY , double camZ,
-								   double inputX[] , double inputY[] );
+	public abstract void jacobian(double camX , double camY , double camZ,
+								  double inputX[] , double inputY[] );
 
 	/**
 	 * Returns the number of parameters in this model.

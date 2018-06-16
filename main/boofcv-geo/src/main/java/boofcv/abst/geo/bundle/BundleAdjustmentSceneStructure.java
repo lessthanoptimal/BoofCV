@@ -62,7 +62,7 @@ public class BundleAdjustmentSceneStructure {
 
 	}
 
-	public void setCamera( int which ,  boolean fixed , BudleAdjustmentCamera model , double[] parameters ) {
+	public void setCamera(int which , boolean fixed , BundleAdjustmentCamera model , double[] parameters ) {
 		cameras[which].known = fixed;
 		cameras[which].model = model;
 		cameras[which].parameters = parameters;
@@ -155,7 +155,7 @@ public class BundleAdjustmentSceneStructure {
 		 * If the parameters are assumed to be known and should not be optimised.
 		 */
 		public boolean known = true;
-		public BudleAdjustmentCamera model;
+		public BundleAdjustmentCamera model;
 		public double parameters[];
 	}
 

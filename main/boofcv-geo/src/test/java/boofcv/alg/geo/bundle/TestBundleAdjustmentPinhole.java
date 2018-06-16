@@ -20,14 +20,25 @@ package boofcv.alg.geo.bundle;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
-
 /**
  * @author Peter Abeles
  */
-public class TestBudleAdjustmentPinhole {
+public class TestBundleAdjustmentPinhole
+{
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void withSkew() {
+		double[][]parameters = new double[][]{{300,200,400,400,0.1},{400,600,1000,1000,2}};
+		new GenericChecksBundleAdjustmentCamera(new BundleAdjustmentPinhole(false)){}
+				.setParameters(parameters)
+				.checkAll();
 	}
+
+	@Test
+	public void withoutSkew() {
+		double[][]parameters = new double[][]{{300,200,400,400},{400,600,1000,1000}};
+		new GenericChecksBundleAdjustmentCamera(new BundleAdjustmentPinhole(true)){}
+				.setParameters(parameters)
+				.checkAll();
+	}
+
 }
