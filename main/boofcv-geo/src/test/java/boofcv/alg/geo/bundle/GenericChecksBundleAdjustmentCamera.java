@@ -28,6 +28,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -63,8 +64,11 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 
 		for (double p[] : parameters)
 		{
-			DerivativeChecker.jacobian(new FunctionOfPoint(p),new JacobianOfPoint(p),X, 1e-4);
-			DerivativeChecker.jacobian(new FunctionOfParameters(X),new JacobianOfParameters(X),p, 1e-4);
+//			DerivativeChecker.jacobianPrint(new FunctionOfPoint(p),new JacobianOfPoint(p),X, 1e-4);
+//			DerivativeChecker.jacobianPrint(new FunctionOfParameters(X),new JacobianOfParameters(X),p, 1e-4);
+
+			assertTrue(DerivativeChecker.jacobian(new FunctionOfPoint(p),new JacobianOfPoint(p),X, 1e-4));
+			assertTrue(DerivativeChecker.jacobian(new FunctionOfParameters(X),new JacobianOfParameters(X),p, 1e-4));
 		}
 	}
 

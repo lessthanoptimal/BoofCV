@@ -93,7 +93,7 @@ public class BundleAdjustmentPinhole extends BundleAdjustmentCamera {
 		calibX[2] = 1;  calibY[2] = 0;
 		calibX[3] = 0;  calibY[3] = 1;
 		if( !zeroSkew ) {
-			calibX[3] = ny; calibY[3] = 0;
+			calibX[4] = ny; calibY[4] = 0;
 		}
 
 		inputX[0] = fx/camZ;           inputY[0] = 0;

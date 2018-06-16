@@ -18,16 +18,43 @@
 
 package boofcv.alg.geo.bundle;
 
+import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
+import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
+import org.ddogleg.optimization.DerivativeChecker;
+import org.ddogleg.optimization.functions.FunctionNtoMxN;
+import org.ddogleg.optimization.wrap.SchurJacobian_to_NtoMxN;
+import org.ejml.data.DMatrixSparseCSC;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.Random;
+
+import static boofcv.alg.geo.bundle.TestBundleAdjustmentResidualFunction.createObservations;
+import static boofcv.alg.geo.bundle.TestCodecBundleAdjustmentSceneStructure.createScene;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestBundleAdjustmentShurJacobian_DSCC {
+	Random rand = new Random(48854);
+
 	@Test
-	public void foo() {
-		fail("Implement");
+	public void compareToNumerical() {
+		BundleAdjustmentSceneStructure structure = createScene(rand);
+		BundleAdjustmentObservations observations = createObservations(rand,structure);
+
+		double param[] = new double[structure.getParameterCount()];
+		new CodecBundleAdjustmentSceneStructure().encode(structure,param);
+
+		BundleAdjustmentShurJacobian_DSCC alg = new BundleAdjustmentShurJacobian_DSCC();
+
+		FunctionNtoMxN<DMatrixSparseCSC> jac = new SchurJacobian_to_NtoMxN(alg);
+		BundleAdjustmentResidualFunction func = new BundleAdjustmentResidualFunction();
+
+		alg.configure(structure,observations);
+		func.configure(structure,observations);
+
+//		DerivativeChecker.jacobianPrintR(func, jac, param, 1e-3);
+		assertTrue(DerivativeChecker.jacobianR(func, jac, param, 1e-3));
 	}
 }

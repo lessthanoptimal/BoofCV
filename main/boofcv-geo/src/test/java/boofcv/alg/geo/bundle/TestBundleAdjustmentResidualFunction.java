@@ -41,7 +41,7 @@ public class TestBundleAdjustmentResidualFunction {
 	@Test
 	public void multipleCalls() {
 		BundleAdjustmentSceneStructure structure = createScene(rand);
-		BundleAdjustmentObservations obs = createObservations(structure);
+		BundleAdjustmentObservations obs = createObservations(rand,structure);
 
 		double param[] = new double[structure.getParameterCount()];
 
@@ -70,7 +70,7 @@ public class TestBundleAdjustmentResidualFunction {
 		new CodecBundleAdjustmentSceneStructure().encode(structure,param);
 
 		// Create random observations
-		BundleAdjustmentObservations obs = createObservations(structure);
+		BundleAdjustmentObservations obs = createObservations(rand,structure);
 
 		BundleAdjustmentResidualFunction alg = new BundleAdjustmentResidualFunction();
 		alg.configure(structure,obs);
@@ -96,7 +96,7 @@ public class TestBundleAdjustmentResidualFunction {
 		}
 	}
 
-	private BundleAdjustmentObservations createObservations(BundleAdjustmentSceneStructure structure) {
+	public static BundleAdjustmentObservations createObservations( Random rand , BundleAdjustmentSceneStructure structure) {
 		BundleAdjustmentObservations obs = new BundleAdjustmentObservations(structure.views.length);
 
 		for (int j = 0; j < structure.points.length; j++) {
