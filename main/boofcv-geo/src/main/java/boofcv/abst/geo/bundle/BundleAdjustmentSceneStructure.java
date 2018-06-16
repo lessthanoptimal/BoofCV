@@ -18,6 +18,8 @@
 
 package boofcv.abst.geo.bundle;
 
+import boofcv.alg.geo.bundle.BundleAdjustmentPinhole;
+import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -62,10 +64,15 @@ public class BundleAdjustmentSceneStructure {
 
 	}
 
-	public void setCamera(int which , boolean fixed , BundleAdjustmentCamera model , double[] parameters ) {
+	public void setCamera(int which , boolean fixed , BundleAdjustmentCamera model  ) {
 		cameras[which].known = fixed;
 		cameras[which].model = model;
-		cameras[which].parameters = parameters;
+	}
+
+	public void setCamera( int which , boolean fixed , CameraPinhole intrinsic ) {
+		BundleAdjustmentPinhole model = new BundleAdjustmentPinhole(intrinsic);
+		cameras[which].known = fixed;
+		cameras[which].model = model;
 	}
 
 	public void setView(int which , boolean fixed , Se3_F64 viewToWorld ) {
@@ -137,6 +144,9 @@ public class BundleAdjustmentSceneStructure {
 		return total;
 	}
 
+	public int getParameterCount() {
+		return getUnknownViewCount()*6 + points.length*3 + getUnknownCameraParameterCount();
+	}
 
 	public Camera[] getCameras() {
 		return cameras;
@@ -156,7 +166,6 @@ public class BundleAdjustmentSceneStructure {
 		 */
 		public boolean known = true;
 		public BundleAdjustmentCamera model;
-		public double parameters[];
 	}
 
 	public static class View {

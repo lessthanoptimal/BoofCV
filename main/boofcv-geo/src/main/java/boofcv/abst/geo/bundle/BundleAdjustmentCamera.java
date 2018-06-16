@@ -36,6 +36,11 @@ public abstract class BundleAdjustmentCamera {
 	public abstract void setParameters( double parameters[] , int offset );
 
 	/**
+	 * Returns the current intrinsic camera parameters
+	 */
+	public abstract void getParameters( double parameters[] , int offset );
+
+	/**
 	 * Project the 3D point in the camera reference frame onto the camera's image plane.
 	 * @param camX 3D point in camera reference frame
 	 * @param camY 3D point in camera reference frame

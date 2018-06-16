@@ -64,6 +64,17 @@ public class BundleAdjustmentPinhole extends BundleAdjustmentCamera {
 	}
 
 	@Override
+	public void getParameters(double[] parameters, int offset) {
+		parameters[offset] = fx;
+		parameters[offset+1] = fy;
+		parameters[offset+2] = cx;
+		parameters[offset+3] = cy;
+		if( !zeroSkew ) {
+			parameters[offset+4] = skew;
+		}
+	}
+
+	@Override
 	public void project(double camX, double camY, double camZ, Point2D_F64 output) {
 		double nx = camX/camZ;
 		double ny = camY/camZ;

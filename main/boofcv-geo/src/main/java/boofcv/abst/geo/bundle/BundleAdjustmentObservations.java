@@ -18,7 +18,8 @@
 
 package boofcv.abst.geo.bundle;
 
-import boofcv.alg.geo.bundle.PointIndexObservation;
+import boofcv.struct.geo.PointIndex2D_F64;
+import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -47,7 +48,7 @@ public class BundleAdjustmentObservations {
 		for (int i = 0; i < views.length; i++) {
 			total += views[i].feature.size;
 		}
-		return views.length;
+		return total;
 	}
 
 	public View getView( int which ) {
@@ -62,10 +63,16 @@ public class BundleAdjustmentObservations {
 			return feature.size;
 		}
 
-		public void get(int index , PointIndexObservation observation ) {
-			observation.pointIndex = feature.data[index];
+		public void get(int index , Point2D_F64 p ) {
 			index *= 2;
-			observation.obs.set( observations.data[index], observations.data[index+1]);
+			p.x = observations.data[index];
+			p.y = observations.data[index+1];
+		}
+
+		public void get(int index , PointIndex2D_F64 observation ) {
+			observation.index = feature.data[index];
+			index *= 2;
+			observation.set( observations.data[index], observations.data[index+1]);
 		}
 
 		public void add( int featureIndex , float x , float y ) {

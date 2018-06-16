@@ -33,7 +33,8 @@ import org.ejml.data.DMatrixSparseTriplet;
 import org.ejml.ops.ConvertDMatrixStruct;
 
 /**
- * Computes the Jacobian for {@link CalibPoseAndPointResiduals}.
+ * Computes the Jacobian for {@link CalibPoseAndPointResiduals} using sparse matrices
+ * in EJML. Parameterization is done using the format in {@link CodecBundleAdjustmentSceneStructure}.
  *
  * @author Peter Abeles
  */
@@ -48,9 +49,6 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 	// total number of parameters being optimized
 	private int numParameters;
 
-	// first index in input/parameters vector for each camera
-	private int cameraParameterIndexes[];
-
 	// used to compute the Jacobian from Rodrigues coordinates
 	private RodriguesRotationJacobian rodJacobian = new RodriguesRotationJacobian();
 	private Se3_F64 worldToView = new Se3_F64();
@@ -64,6 +62,8 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 
 	// index in parameters of the first point
 	private int indexFirstPoint;
+	// first index in input/parameters vector for each camera
+	private int cameraParameterIndexes[];
 
 	// Jacobian matrix index of x and y partial
 	private int jacRowX,jacRowY;
@@ -82,13 +82,11 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 		this.structure = structure;
 		this.observations = observations;
 
-		int numCamerasUnknown = structure.getUnknownCameraCount();
 		numViewsUnknown = structure.getUnknownViewCount();
-
 		int numCameraParameters = structure.getUnknownCameraParameterCount();
 
-		indexFirstPoint = numCamerasUnknown*6;
-		numParameters = numCamerasUnknown*6 + structure.points.length*3 + numCameraParameters;
+		indexFirstPoint = numViewsUnknown*6;
+		numParameters = indexFirstPoint + structure.points.length*3 + numCameraParameters;
 
 		// Create a lookup table for each camera. Camera ID to location in parameter vector
 		cameraParameterIndexes = new int[structure.cameras.length];
@@ -126,7 +124,7 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 		tripletView.reshape(numRows,numViewParam);
 		tripletPoint.reshape(numRows,numPointParam);
 
-		int countPointObs = 0;
+		int observationCount = 0;
 
 		// first decode the transformation
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
@@ -166,7 +164,7 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 
 				SePointOps_F64.transform(worldToView,worldPt,cameraPt);
 
-				jacRowX = countPointObs*2;
+				jacRowX = observationCount*2;
 				jacRowY = jacRowX+1;
 
 				//============ Partial of camera parameters
@@ -204,7 +202,7 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 					tripletView.addItem(jacRowY,col+5, pointGradY[2]);
 				}
 
-				countPointObs++;
+				observationCount++;
 			}
 		}
 
