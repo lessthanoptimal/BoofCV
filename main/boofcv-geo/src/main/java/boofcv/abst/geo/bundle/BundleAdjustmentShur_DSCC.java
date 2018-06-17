@@ -68,7 +68,7 @@ public class BundleAdjustmentShur_DSCC
 		if( parameters.length < N) {
 			parameters = new double[N];
 		}
-
+		codec.encode(structure,parameters);
 		minimizer.initialize(parameters);
 
 		errorBefore = minimizer.getFnorm();

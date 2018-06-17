@@ -162,17 +162,16 @@ public class BundleAdjustmentPinholeRadial extends BundleAdjustmentCamera {
 		}
 
 		// X
-		inputX[0] = (fx*(2*nx*(nx*r2*rr + (r2*rr + r1)*nx) + ((r2*rr + r1)*rr + 1) + 2*ny*t1 + 6*nx*t2) + 2*skew*(ny*(nx*r2*rr + (r2*rr + r1)*nx) + nx*t1 + ny*t2))/camZ;
+		inputX[0] = (fx*(2*nx*(nx*r2*rr + (r2*rr + r1)*nx) + (sum + 1) + 2*ny*t1 + 6*nx*t2) + 2*skew*(ny*(nx*r2*rr + (r2*rr + r1)*nx) + nx*t1 + ny*t2))/camZ;
 		inputY[0] = 2*fy*(ny*(nx*r2*rr + (r2*rr + r1)*nx) + nx*t1 + ny*t2)/camZ;
 
 		// Y
-		inputX[1] = 2*fx*(X*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + X*t1/ZZ + Y*t2/ZZ) + skew*(2*Y*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + ((r2*rr + r1)*rr + 1)/Z + 6*Y*t1/ZZ + 2*X*t2/ZZ);
-		inputY[1] = fy*(2*Y*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + ((r2*rr + r1)*rr + 1)/Z + 6*Y*t1/ZZ + 2*X*t2/ZZ);
+		inputX[1] = 2*fx*(nx*(ny*r2*rr + (r2*rr + r1)*ny) + nx*t1 + ny*t2)/Z + skew*(2*ny*(ny*r2*rr + (r2*rr + r1)*ny)/Z + (sum + 1)/Z + 6*ny*t1 + 2*nx*t2);
+		inputY[1] = fy*(2*Y*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + (sum + 1)/Z + 6*Y*t1/ZZ + 2*X*t2/ZZ);
 
 		// Z
-		inputX[2] = -(2*t2*(3*nx*nx/Z + ny*ny/Z) + 2*(r2*rr*(nx*nx/Z + ny*ny/Z) + (r2*rr + r1)*(nx*nx/Z + ny*ny/Z))*X/Z + ((r2*rr + r1)*rr + 1)*X/ZZ + 4*nx*ny*t1/Z)*fx - (2*t1*(nx*nx/Z + 3*ny*ny/Z) + 2*(r2*rr*(nx*nx/Z + ny*ny/Z) + (r2*rr + r1)*(nx*nx/Z + ny*ny/Z))*Y/Z + ((r2*rr + r1)*rr + 1)*Y/ZZ + 4*nx*ny*t2/Z)*skew;
-		inputY[2] = -(2*t1*(nx*nx/Z + 3*ny*ny/Z) + 2*(r2*rr*(nx*nx/Z + ny*ny/Z) + (r2*rr + r1)*(nx*nx/Z + ny*ny/Z))*Y/Z + ((r2*rr + r1)*rr + 1)*Y/ZZ + 4*nx*ny*t2/Z)*fy;
-
+		inputX[2] = -(2*t2*(2*nx*nx + rr) + 2*(r2*rr*rr + sum)*nx + (sum + 1)*nx + 4*nx*ny*t1)*fx/Z - (2*t1*(nx*nx + 3*ny*ny) + 2*(r2*rr*rr/Z + sum)*ny + (sum + 1)*ny + 4*nx*ny*t2)*skew/Z;
+		inputY[2] = -(2*t1*(rr + 2*ny*ny)/Z + 2*(r2*rr + (r2*rr + r1))*rr*Y/ZZ + (sum + 1)*ny/Z + 4*nx*ny*t2/Z)*fy;
 	}
 
 	@Override
@@ -183,6 +182,7 @@ public class BundleAdjustmentPinholeRadial extends BundleAdjustmentCamera {
 
 		// Apply radial distortion
 		double rr = nx*nx + ny*ny;
+		double sum = (r1 + r2*rr)*rr;
 
 		double X = camX;
 		double Y = camY;
@@ -190,16 +190,16 @@ public class BundleAdjustmentPinholeRadial extends BundleAdjustmentCamera {
 		double ZZ = Z*Z;
 
 		// X
-		inputX[0] = (fx*(2*nx*(nx*r2*rr + (r2*rr + r1)*nx) + ((r2*rr + r1)*rr + 1) + 2*ny*t1 + 6*nx*t2) + 2*skew*(ny*(nx*r2*rr + (r2*rr + r1)*nx) + nx*t1 + ny*t2))/camZ;
+		inputX[0] = (fx*(2*nx*(nx*r2*rr + (r2*rr + r1)*nx) + (sum + 1) + 2*ny*t1 + 6*nx*t2) + 2*skew*(ny*(nx*r2*rr + (r2*rr + r1)*nx) + nx*t1 + ny*t2))/camZ;
 		inputY[0] = 2*fy*(ny*(nx*r2*rr + (r2*rr + r1)*nx) + nx*t1 + ny*t2)/camZ;
 
 		// Y
-		inputX[1] = 2*fx*(X*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + X*t1/ZZ + Y*t2/ZZ) + skew*(2*Y*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + ((r2*rr + r1)*rr + 1)/Z + 6*Y*t1/ZZ + 2*X*t2/ZZ);
-		inputY[1] = fy*(2*Y*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + ((r2*rr + r1)*rr + 1)/Z + 6*Y*t1/ZZ + 2*X*t2/ZZ);
+		inputX[1] = 2*fx*(nx*(ny*r2*rr + (r2*rr + r1)*ny) + nx*t1 + ny*t2)/Z + skew*(2*ny*(ny*r2*rr + (r2*rr + r1)*ny)/Z + (sum + 1)/Z + 6*ny*t1 + 2*nx*t2);
+		inputY[1] = fy*(2*Y*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + (sum + 1)/Z + 6*Y*t1/ZZ + 2*X*t2/ZZ);
 
 		// Z
-		inputX[2] = -(2*t2*(3*nx*nx/Z + ny*ny/Z) + 2*(r2*rr*(nx*nx/Z + ny*ny/Z) + (r2*rr + r1)*(nx*nx/Z + ny*ny/Z))*X/Z + ((r2*rr + r1)*rr + 1)*X/ZZ + 4*nx*ny*t1/Z)*fx - (2*t1*(nx*nx/Z + 3*ny*ny/Z) + 2*(r2*rr*(nx*nx/Z + ny*ny/Z) + (r2*rr + r1)*(nx*nx/Z + ny*ny/Z))*Y/Z + ((r2*rr + r1)*rr + 1)*Y/ZZ + 4*nx*ny*t2/Z)*skew;
-		inputY[2] = -(2*t1*(nx*nx/Z + 3*ny*ny/Z) + 2*(r2*rr*(nx*nx/Z + ny*ny/Z) + (r2*rr + r1)*(nx*nx/Z + ny*ny/Z))*Y/Z + ((r2*rr + r1)*rr + 1)*Y/ZZ + 4*nx*ny*t2/Z)*fy;
+		inputX[2] = -(2*t2*(2*nx*nx + rr) + 2*(r2*rr*rr + sum)*nx + (sum + 1)*nx + 4*nx*ny*t1)*fx/Z - (2*t1*(nx*nx + 3*ny*ny) + 2*(r2*rr*rr/Z + sum)*ny + (sum + 1)*ny + 4*nx*ny*t2)*skew/Z;
+		inputY[2] = -(2*t1*(rr + 2*ny*ny)/Z + 2*(r2*rr + (r2*rr + r1))*rr*Y/ZZ + (sum + 1)*ny/Z + 4*nx*ny*t2/Z)*fy;
 	}
 
 
