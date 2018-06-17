@@ -44,7 +44,8 @@ public interface BundleAdjustment extends Stoppable {
 	 *
 	 * @param structure Input: Initial parameters. Output: Optimized parameters
 	 * @param observations Observation of features in each image.
-	 * @return true if successful or false if it failed
+	 * @return true If the cost function has been improved. If the data is perfect to start with this
+	 * will return false since it has not improved
 	 */
 	boolean optimize( BundleAdjustmentSceneStructure structure , BundleAdjustmentObservations observations );
 }

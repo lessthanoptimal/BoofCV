@@ -79,9 +79,9 @@ public class BundleAdjustmentSceneStructure {
 		setCamera(which,fixed,new BundleAdjustmentPinholeRadial(intrinsic));
 	}
 
-	public void setView(int which , boolean fixed , Se3_F64 viewToWorld ) {
+	public void setView(int which , boolean fixed , Se3_F64 worldToView ) {
 		views[which].known = fixed;
-		views[which].worldToView.set(viewToWorld);
+		views[which].worldToView.set(worldToView);
 	}
 
 	public void setPoint( int which , double x , double y , double z ) {

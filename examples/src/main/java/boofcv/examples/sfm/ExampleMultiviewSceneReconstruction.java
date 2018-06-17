@@ -26,6 +26,8 @@ import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
 import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
 import boofcv.abst.geo.bundle.BundleAdjustmentShur_DSCC;
 import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.geo.WorldToCameraToPixel;
+import boofcv.alg.geo.triangulate.TriangulateLinearDLT;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.ConfigEssential;
@@ -144,11 +146,16 @@ public class ExampleMultiviewSceneReconstruction {
 
 		estimateAllFeatures(seed,seedNext);
 
+		System.out.println("Refining initial estimate");
+
+//		retriangulateFeatures(intrinsic);
+
 		System.out.println("Pruning point features for speed");
 		pruneFeatures();
 //		featuresPruned.addAll(featuresAll);
 
 		System.out.println("   "+featuresAll.size()+"  after   "+featuresPruned.size());
+
 
 		System.out.println("Bundle Adjustment to refine estimate");
 		performBundleAdjustment(seed,intrinsic);
@@ -332,13 +339,13 @@ public class ExampleMultiviewSceneReconstruction {
 			throw new RuntimeException("BUG!");
 
 		// By definition this transform is identity
-		viewRoot.cameraToWorld.reset();
+		viewRoot.viewToWorld.reset();
 		viewRoot.distanceFromRoot = 0;
 
 		// Ensure the scale is some what reasonable
 		best.a_to_b.T.normalize();
 		CameraView viewB = best.destination(viewRoot);
-		viewB.cameraToWorld.set(best.motionSrcToDst(viewB));
+		viewB.viewToWorld.set(best.motionSrcToDst(viewB));
 		viewB.distanceFromRoot = 1;
 
 		// Compute the 3D points. The world reference frame is now defined
@@ -376,8 +383,12 @@ public class ExampleMultiviewSceneReconstruction {
 				throw new RuntimeException("BUG!");
 
 			// Figure out it's 3D structure
-			triangulateAndDetermineScale(best);
-
+			if( !triangulateAndDetermineScale(best) ) {
+				// Edge hsa too few valid connections. Disconnect
+				best.destination(v).connections.remove(best);
+				v.connections.remove(best);
+				graphEdges.remove(best);
+			}
 			// Update the open list
 			addUnvistedToStack(v, open);
 		}
@@ -403,7 +414,7 @@ public class ExampleMultiviewSceneReconstruction {
 	 *
 	 * A known feature has the current view added to its list of views.
 	 */
-	private void triangulateAndDetermineScale(CameraMotion edge ) {
+	private boolean triangulateAndDetermineScale(CameraMotion edge ) {
 		// There are two views. See if src or dst is the known with a known transform to the world frame
 		CameraView viewA = edge.viewSrc;
 		CameraView viewB = edge.viewDst;
@@ -413,10 +424,10 @@ public class ExampleMultiviewSceneReconstruction {
 
 		Se3_F64 worldToView = new Se3_F64();
 		if( useA ) {
-			viewA.cameraToWorld.invert(worldToView);
+			viewA.viewToWorld.invert(worldToView);
 			distanceFromRoot = viewA.distanceFromRoot;
 		} else {
-			viewB.cameraToWorld.invert(worldToView);
+			viewB.viewToWorld.invert(worldToView);
 			distanceFromRoot = viewB.distanceFromRoot;
 		}
 
@@ -457,42 +468,61 @@ public class ExampleMultiviewSceneReconstruction {
 
 				// Add this view to the features list of views that have seen it
 				if( useA ) {
-					viewB.features3D[f.dst] = feature3D;
-					feature3D.pixelObs.grow().set(viewB.featurePixels.get(f.dst));
-					feature3D.normObs.grow().set(normB);
-					feature3D.frame.add(viewB.index);
+					if( viewB.features3D[f.dst] == null ) {
+						// see if this feature has already been associated with this frame. If it has been
+						// do nothing and don't create a connection
+						if( feature3D.views.contains(viewB.index)) {
+							continue;
+						}
+						viewB.features3D[f.dst] = feature3D;
+						feature3D.feature.add(f.dst);
+						feature3D.views.add(viewB.index);
+					} else {
+//						mergeFeatures( viewB.features3D[f.dst], feature3D);
+					}
 				} else {
-					viewA.features3D[f.src] = feature3D;
-					feature3D.pixelObs.grow().set(viewA.featurePixels.get(f.src));
-					feature3D.normObs.grow().set(normA);
-					feature3D.frame.add(viewA.index);
+					if( viewA.features3D[f.src] == null ) {
+						if( feature3D.views.contains(viewA.index))
+							continue;
+						viewA.features3D[f.src] = feature3D;
+						feature3D.feature.add(f.src);
+						feature3D.views.add(viewA.index);
+					} else {
+//						mergeFeatures( viewA.features3D[f.src], feature3D);
+					}
 				}
 			} else {
 				// Just skip. It might have been assigned from another image not being considered yet
 				if( viewA.features3D[f.src] != null || viewB.features3D[f.dst] != null) {
-					continue;
+					continue; // TODO should it add to the feature's track instead?
 				}
 
 				// Create a new feature
 				feature3D = new Feature3D();
 				feature3D.color = viewA.colors.get(f.src);
 				feature3D.worldPt.set(found3D); // current a local point, but that will be fixed later
-				feature3D.pixelObs.grow().set(viewA.featurePixels.get(f.src));
-				feature3D.pixelObs.grow().set(viewB.featurePixels.get(f.dst));
-				feature3D.normObs.grow().set(normA);
-				feature3D.normObs.grow().set(normB);
 
 				// mark this feature3D as being associated with these image features
 				viewA.features3D[f.src] = feature3D;
 				viewB.features3D[f.dst] = feature3D;
 
+				if( feature3D.views.contains(viewA.index))
+					throw new RuntimeException("Egads");
+				if( feature3D.views.contains(viewB.index))
+					throw new RuntimeException("Egads");
+
 				// record which frame the feature was seen in
-				feature3D.frame.add(viewA.index);
-				feature3D.frame.add(viewB.index);
+				feature3D.feature.add( f.src );
+				feature3D.feature.add( f.dst );
+				feature3D.views.add(viewA.index);
+				feature3D.views.add(viewB.index);
 
 				featuresNew.add(feature3D);
 			}
 		}
+
+		if( scaleQueues.size < 5 )
+			return false;
 
 		// use the median value to represent the scale offset
 		scaleQueues.sort();
@@ -502,10 +532,10 @@ public class ExampleMultiviewSceneReconstruction {
 		edge.a_to_b.T.scale(scale);
 
 		if( useA ) {
-			edge.a_to_b.invert(null).concat(viewA.cameraToWorld,viewB.cameraToWorld);
+			edge.a_to_b.invert(null).concat(viewA.viewToWorld,viewB.viewToWorld);
 			viewB.distanceFromRoot = distanceFromRoot + 1;
 		} else {
-			edge.a_to_b.concat(viewB.cameraToWorld, viewA.cameraToWorld);
+			edge.a_to_b.concat(viewB.viewToWorld, viewA.viewToWorld);
 			viewA.distanceFromRoot = distanceFromRoot + 1;
 		}
 
@@ -514,6 +544,39 @@ public class ExampleMultiviewSceneReconstruction {
 			f.worldPt.scale(scale);
 			featuresAll.add(f);
 		}
+
+		return true;
+	}
+
+	private void mergeFeatures( Feature3D a , Feature3D b ) {
+		if( a == b )
+			return;
+
+		int sizeB = b.views.size;
+		for (int i = 0; i < a.views.size; i++) {
+			int frameA = a.views.get(i);
+			boolean matched = false;
+			for (int j = 0; j < sizeB; j++) {
+				int frameB = b.views.get(j);
+				if( frameA == frameB ) {
+					matched = true;
+					break;
+				}
+			}
+			CameraView view = graphNodes.get(frameA);
+			if( view.features3D[a.feature.get(i)] != a )
+				throw new RuntimeException("BUG!");
+			else if( matched ){
+				// there's a conflict. Resolve the ambiguity by removing one of the features arbitrarily
+				view.features3D[a.feature.get(i)] = null;
+			} else {
+				view.features3D[a.feature.get(i)] = b; // change the 3D feature it points to
+				b.views.add( frameA );
+				b.feature.add( a.feature.get(i) );
+			}
+		}
+
+		featuresAll.remove(a);
 	}
 
 	/**
@@ -542,10 +605,8 @@ public class ExampleMultiviewSceneReconstruction {
 			Feature3D feature3D = new Feature3D();
 
 			feature3D.color = viewA.colors.get(f.src);
-			feature3D.pixelObs.grow().set(viewA.featurePixels.get(f.src));
-			feature3D.pixelObs.grow().set(viewB.featurePixels.get(f.dst));
-			feature3D.normObs.grow().set(normA);
-			feature3D.normObs.grow().set(normB);
+			feature3D.feature.add( f.src );
+			feature3D.feature.add( f.dst );
 
 			// the more parallel a line is worse the triangulation. Get rid of bad ideas early here
 			arrowA.set(normA.x,normA.y,1);
@@ -564,8 +625,12 @@ public class ExampleMultiviewSceneReconstruction {
 			viewB.features3D[f.dst] = feature3D;
 
 			// record which frame the feature was seen in
-			feature3D.frame.add(viewA.index);
-			feature3D.frame.add(viewB.index);
+			if( feature3D.views.contains(viewA.index))
+				throw new RuntimeException("Egads");
+			if( feature3D.views.contains(viewB.index))
+				throw new RuntimeException("Egads");
+			feature3D.views.add(viewA.index);
+			feature3D.views.add(viewB.index);
 
 			// Add it to the overall list
 			featuresAll.add(feature3D);
@@ -627,7 +692,7 @@ public class ExampleMultiviewSceneReconstruction {
 			for (int i = 0; i < m.features.size(); i++) {
 				AssociatedIndex a = m.features.get(i);
 				Feature3D f = m.viewSrc.features3D[a.src];
-				if( f!=null && !f.included && f.frame.size >= 3 ) {
+				if( f!=null && !f.included && f.views.size >= 3 ) {
 					candidates.add(f);
 				}
 			}
@@ -649,6 +714,50 @@ public class ExampleMultiviewSceneReconstruction {
 		}
 	}
 
+	private void retriangulateFeatures( CameraPinholeRadial intrinsic ) {
+
+		TriangulateLinearDLT triangulate = new TriangulateLinearDLT();
+
+		List<Point2D_F64> observations = new ArrayList<>();
+		List<Se3_F64> worldToView = new ArrayList<>();
+
+		WorldToCameraToPixel wcp = new WorldToCameraToPixel();
+		Point2D_F64 pixel = new Point2D_F64();
+
+		int removedCount = 0;
+		for (int i = featuresAll.size()-1; i >= 0; i--) {
+			Feature3D f = featuresAll.get(i);
+
+			if( f.views.size < 3 )
+				continue;
+			observations.clear();
+			worldToView.clear();
+
+			for (int j = 0; j < f.views.size; j++) {
+				CameraView v = graphNodes.get(f.views.get(j));
+
+				worldToView.add( v.viewToWorld.invert(null));
+				observations.add( v.featureNorm.get( f.feature.get(j)));
+			}
+
+			triangulate.triangulate(observations,worldToView,f.worldPt);
+
+			for (int j = 0; j < f.views.size; j++) {
+				CameraView v = graphNodes.get(f.views.get(j));
+				wcp.configure(intrinsic,worldToView.get(j));
+				wcp.transform(f.worldPt,pixel);
+
+				Point2D_F64 observed = v.featurePixels.get(f.feature.get(j));
+				if( observed.distance(pixel) > 20 ) {
+					removedCount++;
+					featuresAll.remove(i);
+					break;
+				}
+			}
+		}
+		System.out.println("  Second triangulate removed "+removedCount);
+	}
+
 	private void performBundleAdjustment( CameraView seed , CameraPinholeRadial intrinsic ) {
 		BundleAdjustmentShur_DSCC sba = new BundleAdjustmentShur_DSCC(1e-3);
 
@@ -659,11 +768,13 @@ public class ExampleMultiviewSceneReconstruction {
 
 		structure.initialize(1,graphNodes.size(),featuresPruned.size());
 
+		// There is only one camera with known calibration
 		structure.setCamera(0,true,intrinsic);
 
 		for( int i = 0; i < graphNodes.size(); i++ ) {
 			CameraView v = graphNodes.get(i);
-			structure.setView(i,v==seed,v.cameraToWorld.invert(null));
+			structure.setView(i,v==seed,v.viewToWorld.invert(null));
+			structure.connectViewToCamera(i,0);
 		}
 
 		for (int indexPoint = 0; indexPoint < featuresPruned.size(); indexPoint++) {
@@ -671,13 +782,12 @@ public class ExampleMultiviewSceneReconstruction {
 
 			structure.setPoint(indexPoint,f.worldPt.x,f.worldPt.y,f.worldPt.z);
 
-			for (int j = 0; j < f.frame.size; j++) {
-				int indexView = f.frame.get(j);
-				Point2D_F64 pixel = f.pixelObs.get(j);
-				BundleAdjustmentObservations.View v = observations.getView(indexView);
-
+			for (int j = 0; j < f.views.size; j++) {
+				int indexView = f.views.get(j);
 				structure.connectPointToView(indexPoint,indexView);
-				v.add(indexPoint,(float)pixel.x,(float)pixel.y);
+
+				Point2D_F64 pixel = graphNodes.get(indexView).featurePixels.get(f.feature.get(j));
+				observations.getView(indexView).add(indexPoint,(float)pixel.x,(float)pixel.y);
 			}
 		}
 
@@ -688,7 +798,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		// Copy the results into the scene
 		for( int i = 0; i < graphNodes.size(); i++ ) {
-			structure.views[i].worldToView.invert(graphNodes.get(i).cameraToWorld);
+			structure.views[i].worldToView.invert(graphNodes.get(i).viewToWorld);
 		}
 		for (int i = 0; i < featuresPruned.size(); i++) {
 			featuresPruned.get(i).worldPt.set( structure.points[i]);
@@ -697,7 +807,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 	public static class CameraView {
 		int index;
-		Se3_F64 cameraToWorld = new Se3_F64();
+		Se3_F64 viewToWorld = new Se3_F64();
 		int distanceFromRoot = -1;
 
 		List<CameraMotion> connections = new ArrayList<>();
@@ -772,10 +882,11 @@ public class ExampleMultiviewSceneReconstruction {
 		// estimate 3D position of the feature in world frame
 		Point3D_F64 worldPt = new Point3D_F64();
 		// observations in each frame that it's visible. These are in normalized image coordinates
-		FastQueue<Point2D_F64> normObs = new FastQueue<>(Point2D_F64.class, true);
-		FastQueue<Point2D_F64> pixelObs = new FastQueue<>(Point2D_F64.class, true);
+//		FastQueue<Point2D_F64> normObs = new FastQueue<>(Point2D_F64.class, true);
+//		FastQueue<Point2D_F64> pixelObs = new FastQueue<>(Point2D_F64.class, true);
 		// index of each frame its visible in
-		GrowQueue_I32 frame = new GrowQueue_I32();
+		GrowQueue_I32 feature = new GrowQueue_I32();
+		GrowQueue_I32 views = new GrowQueue_I32();
 		boolean included=false;
 	}
 
@@ -788,8 +899,8 @@ public class ExampleMultiviewSceneReconstruction {
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 
-		while( images.size() > 4 ) {
-			images.remove(4);
+		while( images.size() > 8 ) {
+			images.remove(8);
 		}
 
 		ExampleMultiviewSceneReconstruction example = new ExampleMultiviewSceneReconstruction();

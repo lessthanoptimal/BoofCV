@@ -18,16 +18,15 @@
 
 package boofcv.abst.geo.bundle;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
-
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentShur_DSCC {
-	@Test
-	public void stuff() {
-		fail("implement");
+public class TestBundleAdjustmentShur_DSCC extends GenericBundleAdjustmentChecks {
+
+	@Override
+	public BundleAdjustment createAlg() {
+		BundleAdjustment ret = new BundleAdjustmentShur_DSCC(1e-4);
+		ret.configure(1e-5,1e-5,20);
+		return ret;
 	}
 }
