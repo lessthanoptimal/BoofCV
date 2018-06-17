@@ -161,22 +161,27 @@ public class BundleAdjustmentPinholeRadial extends BundleAdjustmentCamera {
 			calibX[8] = ny; calibY[8] = 0;
 		}
 
+		double A0 = r1 + r2*rr;
+		double B0 = nx*(r2*rr + A0);
+		double B1 = ny*(r2*rr + A0);
+
 		// X
-		inputX[0] = (fx*(2*nx*(nx*r2*rr + (r2*rr + r1)*nx) + (sum + 1) + 2*ny*t1 + 6*nx*t2) + 2*skew*(ny*(nx*r2*rr + (r2*rr + r1)*nx) + nx*t1 + ny*t2))/camZ;
-		inputY[0] = 2*fy*(ny*(nx*r2*rr + (r2*rr + r1)*nx) + nx*t1 + ny*t2)/camZ;
+		inputX[0] = (fx*(2*nx*B0 + (sum + 1) + 2*ny*t1 + 6*nx*t2) + 2*skew*(ny*B0 + nx*t1 + ny*t2))/Z;
+		inputY[0] = 2*fy*(ny*B0 + nx*t1 + ny*t2)/Z;
 
 		// Y
-		inputX[1] = 2*fx*(nx*(ny*r2*rr + (r2*rr + r1)*ny) + nx*t1 + ny*t2)/Z + skew*(2*ny*(ny*r2*rr + (r2*rr + r1)*ny)/Z + (sum + 1)/Z + 6*ny*t1 + 2*nx*t2);
-		inputY[1] = fy*(2*Y*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + (sum + 1)/Z + 6*Y*t1/ZZ + 2*X*t2/ZZ);
+		inputX[1] = 2*fx*(nx*B1 + nx*t1 + ny*t2)/Z + skew*((2*ny*B1 + sum + 1)/Z + 6*ny*t1 + 2*nx*t2);
+		inputY[1] = fy*(2*Y*Y*(r2*rr + A0)/Z + (sum + 1)*Z + 6*Y*t1 + 2*X*t2)/ZZ;
 
 		// Z
 		inputX[2] = -(2*t2*(2*nx*nx + rr) + 2*(r2*rr*rr + sum)*nx + (sum + 1)*nx + 4*nx*ny*t1)*fx/Z - (2*t1*(nx*nx + 3*ny*ny) + 2*(r2*rr*rr/Z + sum)*ny + (sum + 1)*ny + 4*nx*ny*t2)*skew/Z;
-		inputY[2] = -(2*t1*(rr + 2*ny*ny)/Z + 2*(r2*rr + (r2*rr + r1))*rr*Y/ZZ + (sum + 1)*ny/Z + 4*nx*ny*t2/Z)*fy;
+		inputY[2] = -(2*t1*(rr + 2*ny*ny) + 2*(r2*rr + A0)*rr*Y/Z + (sum + 1)*ny + 4*nx*ny*t2)*fy/Z;
 	}
 
 	@Override
 	public void jacobian(double camX, double camY, double camZ, double[] inputX, double[] inputY)
 	{
+		// compute normalized image coordinates
 		double nx = camX/camZ;
 		double ny = camY/camZ;
 
@@ -189,17 +194,21 @@ public class BundleAdjustmentPinholeRadial extends BundleAdjustmentCamera {
 		double Z = camZ;
 		double ZZ = Z*Z;
 
+		double A0 = r1 + r2*rr;
+		double B0 = nx*(r2*rr + A0);
+		double B1 = ny*(r2*rr + A0);
+
 		// X
-		inputX[0] = (fx*(2*nx*(nx*r2*rr + (r2*rr + r1)*nx) + (sum + 1) + 2*ny*t1 + 6*nx*t2) + 2*skew*(ny*(nx*r2*rr + (r2*rr + r1)*nx) + nx*t1 + ny*t2))/camZ;
-		inputY[0] = 2*fy*(ny*(nx*r2*rr + (r2*rr + r1)*nx) + nx*t1 + ny*t2)/camZ;
+		inputX[0] = (fx*(2*nx*B0 + (sum + 1) + 2*ny*t1 + 6*nx*t2) + 2*skew*(ny*B0 + nx*t1 + ny*t2))/Z;
+		inputY[0] = 2*fy*(ny*B0 + nx*t1 + ny*t2)/Z;
 
 		// Y
-		inputX[1] = 2*fx*(nx*(ny*r2*rr + (r2*rr + r1)*ny) + nx*t1 + ny*t2)/Z + skew*(2*ny*(ny*r2*rr + (r2*rr + r1)*ny)/Z + (sum + 1)/Z + 6*ny*t1 + 2*nx*t2);
-		inputY[1] = fy*(2*Y*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + (sum + 1)/Z + 6*Y*t1/ZZ + 2*X*t2/ZZ);
+		inputX[1] = 2*fx*(nx*B1 + nx*t1 + ny*t2)/Z + skew*((2*ny*B1 + sum + 1)/Z + 6*ny*t1 + 2*nx*t2);
+		inputY[1] = fy*(2*Y*Y*(r2*rr + A0)/Z + (sum + 1)*Z + 6*Y*t1 + 2*X*t2)/ZZ;
 
 		// Z
 		inputX[2] = -(2*t2*(2*nx*nx + rr) + 2*(r2*rr*rr + sum)*nx + (sum + 1)*nx + 4*nx*ny*t1)*fx/Z - (2*t1*(nx*nx + 3*ny*ny) + 2*(r2*rr*rr/Z + sum)*ny + (sum + 1)*ny + 4*nx*ny*t2)*skew/Z;
-		inputY[2] = -(2*t1*(rr + 2*ny*ny)/Z + 2*(r2*rr + (r2*rr + r1))*rr*Y/ZZ + (sum + 1)*ny/Z + 4*nx*ny*t2/Z)*fy;
+		inputY[2] = -(2*t1*(rr + 2*ny*ny) + 2*(r2*rr + A0)*rr*Y/Z + (sum + 1)*ny + 4*nx*ny*t2)*fy/Z;
 	}
 
 
