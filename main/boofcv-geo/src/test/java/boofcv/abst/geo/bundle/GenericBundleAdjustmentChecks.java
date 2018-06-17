@@ -58,7 +58,16 @@ public abstract class GenericBundleAdjustmentChecks {
 	 */
 	@Test
 	public void multipleCalls() {
-		fail("Implement");
+		BundleAdjustment alg = createAlg();
+
+		Tuple2<BundleAdjustmentSceneStructure,BundleAdjustmentObservations> a = createHorizontalMotion( 123,true);
+		Tuple2<BundleAdjustmentSceneStructure,BundleAdjustmentObservations> c = createHorizontalMotion( 234,true);
+		addNoiseToPoint3D(c);
+		alg.optimize(c.data0,c.data1);
+		alg.optimize(a.data0,a.data1);
+
+		Tuple2<BundleAdjustmentSceneStructure,BundleAdjustmentObservations> b = createHorizontalMotion( 123,true);
+		assertEquals(a.data0,b.data0,1e-6,1e-6,1e-6);
 	}
 
 	@Test
@@ -90,13 +99,7 @@ public abstract class GenericBundleAdjustmentChecks {
 		Tuple2<BundleAdjustmentSceneStructure,BundleAdjustmentObservations> a = createHorizontalMotion( 123,true);
 
 		// Add noise to every 3D point
-		BundleAdjustmentSceneStructure structure = a.data0;
-		for (int i = 0; i < structure.points.length; i++) {
-			BundleAdjustmentSceneStructure.Point p = structure.points[i];
-			p.x += rand.nextGaussian()*0.1;
-			p.y += rand.nextGaussian()*0.1;
-			p.z += rand.nextGaussian()*0.1;
-		}
+		addNoiseToPoint3D(a);
 
 		assertTrue(alg.optimize(a.data0,a.data1));
 
@@ -107,6 +110,16 @@ public abstract class GenericBundleAdjustmentChecks {
 		// close to the optimal one
 		Tuple2<BundleAdjustmentSceneStructure,BundleAdjustmentObservations> b = createHorizontalMotion( 123,true);
 		assertEquals(a.data0,b.data0,0,0.1,1e-3);
+	}
+
+	private void addNoiseToPoint3D(Tuple2<BundleAdjustmentSceneStructure, BundleAdjustmentObservations> a) {
+		BundleAdjustmentSceneStructure structure = a.data0;
+		for (int i = 0; i < structure.points.length; i++) {
+			BundleAdjustmentSceneStructure.Point p = structure.points[i];
+			p.x += rand.nextGaussian()*0.1;
+			p.y += rand.nextGaussian()*0.1;
+			p.z += rand.nextGaussian()*0.1;
+		}
 	}
 
 	@Test
@@ -134,11 +147,6 @@ public abstract class GenericBundleAdjustmentChecks {
 		// close to the optimal one
 		Tuple2<BundleAdjustmentSceneStructure,BundleAdjustmentObservations> b = createHorizontalMotion( 123,true);
 		assertEquals(a.data0,b.data0,1e-6,0.1,1e-3);
-	}
-
-	@Test
-	public void rotationNoisyPose() {
-		fail("Implement");
 	}
 
 	public void checkReprojectionError( BundleAdjustmentSceneStructure structure , BundleAdjustmentObservations observations , double tol ) {
