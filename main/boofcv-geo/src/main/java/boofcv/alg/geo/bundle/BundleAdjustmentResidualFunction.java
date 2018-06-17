@@ -97,9 +97,7 @@ public class BundleAdjustmentResidualFunction
 
 		// write the current parameters into the scene's structure
 		codec.decode(input,structure);
-
-		int outputIndex = 0;
-
+		int observationIndex = 0;
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
 			BundleAdjustmentSceneStructure.View view = structure.views[viewIndex];
 			BundleAdjustmentSceneStructure.Camera camera = structure.cameras[view.camera];
@@ -113,8 +111,10 @@ public class BundleAdjustmentResidualFunction
 
 				camera.model.project(cameraPt.x,cameraPt.y,cameraPt.z, predictedPixel);
 
-				output[outputIndex++] = predictedPixel.x - observedPixel.x;
-				output[outputIndex++] = predictedPixel.y - observedPixel.y;
+				int outputIndex = observationIndex*2;
+				output[outputIndex  ] = predictedPixel.x - observedPixel.x;
+				output[outputIndex+1] = predictedPixel.y - observedPixel.y;
+				observationIndex++;
 			}
 		}
 	}

@@ -158,8 +158,10 @@ public class ExampleMultiviewSceneReconstruction {
 
 
 		System.out.println("Bundle Adjustment to refine estimate");
+		long before = System.currentTimeMillis();
 		performBundleAdjustment(seed,intrinsic);
-
+		long after = System.currentTimeMillis();
+		System.out.println("  SBA processing time = "+(after-before)+" (ms)");
 		visualizeResults(intrinsic);
 		System.out.println("Done!");
 	}
@@ -899,9 +901,9 @@ public class ExampleMultiviewSceneReconstruction {
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 
-		while( images.size() > 8 ) {
-			images.remove(8);
-		}
+//		while( images.size() > 8 ) {
+//			images.remove(8);
+//		}
 
 		ExampleMultiviewSceneReconstruction example = new ExampleMultiviewSceneReconstruction();
 

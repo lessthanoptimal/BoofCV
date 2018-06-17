@@ -33,7 +33,7 @@ import org.ejml.data.DMatrixSparseTriplet;
 import org.ejml.ops.ConvertDMatrixStruct;
 
 /**
- * Computes the Jacobian for {@link CalibPoseAndPointResiduals} using sparse matrices
+ * Computes the Jacobian for {@link boofcv.abst.geo.bundle.BundleAdjustmentShur_DSCC} using sparse matrices
  * in EJML. Parameterization is done using the format in {@link CodecBundleAdjustmentSceneStructure}.
  *
  * @author Peter Abeles
@@ -61,8 +61,8 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 	private Point3D_F64 cameraPt = new Point3D_F64();
 
 	// index in parameters of the first point
-	private int indexFirstPoint;
-	private int indexLastPoint;
+	private int indexFirstView;
+	private int indexLastView;
 	// view to parameter index
 	private int viewParameterIndexes[];
 	// first index in input/parameters vector for each camera
@@ -72,8 +72,8 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 	private int jacRowX,jacRowY;
 
 	// reference to output Jacobian matrix
-	private DMatrixSparseTriplet tripletView = new DMatrixSparseTriplet();
 	private DMatrixSparseTriplet tripletPoint = new DMatrixSparseTriplet();
+	private DMatrixSparseTriplet tripletView = new DMatrixSparseTriplet();
 
 	// Storage for gradients
 	private double pointGradX[] = new double[3];
@@ -88,9 +88,9 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 		numViewsUnknown = structure.getUnknownViewCount();
 		int numCameraParameters = structure.getUnknownCameraParameterCount();
 
-		indexFirstPoint = numViewsUnknown*6;
-		indexLastPoint = indexFirstPoint + structure.points.length*3;
-		numParameters = indexLastPoint + numCameraParameters;
+		indexFirstView = structure.points.length*3;
+		indexLastView = indexFirstView + numViewsUnknown*6;
+		numParameters = indexLastView + numCameraParameters;
 
 		viewParameterIndexes = new int[structure.views.length];
 		int index = 0;
@@ -131,22 +131,20 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 	@Override
 	public void process( double[] input, DMatrixSparseCSC left, DMatrixSparseCSC right) {
 		int numRows = getNumOfOutputsM();
-		int numViewParam = numViewsUnknown*6;
-		int numPointParam = numParameters - numViewParam;
+		int numPointParam = structure.points.length*3;
+		int numViewParam = numParameters-numPointParam; // view + camera
 
-		tripletView.reshape(numRows,numViewParam);
 		tripletPoint.reshape(numRows,numPointParam);
+		tripletView.reshape(numRows,numViewParam);
 
-		int observationCount = 0;
-		int columnLastPointJac = structure.points.length*3;
-
+		int observationIndex = 0;
 		// first decode the transformation
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
 			BundleAdjustmentSceneStructure.View view = structure.views[viewIndex];
 			BundleAdjustmentSceneStructure.Camera camera = structure.cameras[view.camera];
 
 			if( !view.known ) {
-				int paramIndex = viewParameterIndexes[viewIndex];
+				int paramIndex = viewParameterIndexes[viewIndex]+indexFirstView;
 				double rodX = input[paramIndex];
 				double rodY = input[paramIndex+1];
 				double rodZ = input[paramIndex+2];
@@ -164,22 +162,22 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 			}
 			int cameraParamStartIndex = cameraParameterIndexes[view.camera];
 			if( !camera.known ) {
-				camera.model.setParameters(input,indexLastPoint+cameraParamStartIndex);
+				camera.model.setParameters(input,indexLastView+cameraParamStartIndex);
 			}
 
 			BundleAdjustmentObservations.View obsView = observations.views[viewIndex];
 
 			for (int i = 0; i < obsView.size(); i++) {
-				int columnOfPointInJac = obsView.feature.get(i)*3;
-				int indexOfPointInInput = indexFirstPoint + columnOfPointInJac;
+				int featureIndex = obsView.feature.get(i);
+				int columnOfPointInJac = featureIndex*3;
 
-				worldPt.x = input[indexOfPointInInput];
-				worldPt.y = input[indexOfPointInInput+1];
-				worldPt.z = input[indexOfPointInInput+2];
+				worldPt.x = input[columnOfPointInJac];
+				worldPt.y = input[columnOfPointInJac+1];
+				worldPt.z = input[columnOfPointInJac+2];
 
 				SePointOps_F64.transform(worldToView,worldPt,cameraPt);
 
-				jacRowX = observationCount*2;
+				jacRowX = observationIndex*2;
 				jacRowY = jacRowX+1;
 
 				//============ Partial of camera parameters
@@ -187,9 +185,10 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 					int N = camera.model.getParameterCount();
 					camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z, pointGradX, pointGradY, calibGradX, calibGradY);
 
+					int location = indexLastView-indexFirstView+cameraParamStartIndex;
 					for (int j = 0; j < N; j++) {
-						tripletPoint.addItem(jacRowX,columnLastPointJac+cameraParamStartIndex+j,calibGradX[j]);
-						tripletPoint.addItem(jacRowY,columnLastPointJac+cameraParamStartIndex+j,calibGradY[j]);
+						tripletView.addItemCheck(jacRowX,location+j,calibGradX[j]);
+						tripletView.addItemCheck(jacRowY,location+j,calibGradY[j]);
 					}
 				} else {
 					camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z, pointGradX, pointGradY);
@@ -209,17 +208,17 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 					addToJacobian(tripletView, col+2, pointGradX, pointGradY, rodJacobian.Rz,worldPt);
 
 					//============== Partial of view translation parameters
-					tripletView.addItem(jacRowX,col+3, pointGradX[0]); tripletView.addItem(jacRowY,col+3, pointGradY[0]);
-					tripletView.addItem(jacRowX,col+4, pointGradX[1]); tripletView.addItem(jacRowY,col+4, pointGradY[1]);
-					tripletView.addItem(jacRowX,col+5, pointGradX[2]); tripletView.addItem(jacRowY,col+5, pointGradY[2]);
+					tripletView.addItemCheck(jacRowX,col+3, pointGradX[0]); tripletView.addItem(jacRowY,col+3, pointGradY[0]);
+					tripletView.addItemCheck(jacRowX,col+4, pointGradX[1]); tripletView.addItem(jacRowY,col+4, pointGradY[1]);
+					tripletView.addItemCheck(jacRowX,col+5, pointGradX[2]); tripletView.addItem(jacRowY,col+5, pointGradY[2]);
 				}
 
-				observationCount++;
+				observationIndex++;
 			}
 		}
 
-		ConvertDMatrixStruct.convert(tripletView,left);
-		ConvertDMatrixStruct.convert(tripletPoint,right);
+		ConvertDMatrixStruct.convert(tripletPoint,left);
+		ConvertDMatrixStruct.convert(tripletView,right);
 
 //		left.print();
 //		right.print();

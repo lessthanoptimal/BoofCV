@@ -15,8 +15,6 @@ Version : 0.31
  * Thanks Frank Jakop for the suggestion
 
 - TODO Sparse Bundle Adjustment
-      - change parameter order
-         (point, view, camera)
       - switch to homogeous coordinates?
       - Get example working
       - Regression using public dataset

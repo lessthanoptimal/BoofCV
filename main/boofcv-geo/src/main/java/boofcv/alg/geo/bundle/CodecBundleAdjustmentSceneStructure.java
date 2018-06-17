@@ -26,8 +26,8 @@ import georegression.struct.so.Rodrigues_F64;
  * Encodes and decodes the values in a {@link BundleAdjustmentSceneStructure} using the following
  * parameterization:<br>
  * <pre>
- * [ (rodX rodY rodZ Tx Ty Tz)*N ][ (X Y Z)*M ][ intrinsic*O ]
- * [           views             ][ features  ][ camera      ]
+ * [ (X Y Z)*M ][ (rodX rodY rodZ Tx Ty Tz)*N ][ intrinsic*O ]
+ * [ features  ][           views             ][ camera      ]
  * </pre>
  * @author Peter Abeles
  */
@@ -38,6 +38,13 @@ public class CodecBundleAdjustmentSceneStructure {
 
 	public void decode(double[] input , BundleAdjustmentSceneStructure structure ) {
 		int index = 0;
+
+		for (int i = 0; i < structure.points.length; i++) {
+			BundleAdjustmentSceneStructure.Point p = structure.points[i];
+			p.x = input[index++];
+			p.y = input[index++];
+			p.z = input[index++];
+		}
 
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
 			BundleAdjustmentSceneStructure.View view = structure.views[viewIndex];
@@ -57,13 +64,6 @@ public class CodecBundleAdjustmentSceneStructure {
 			}
 		}
 
-		for (int i = 0; i < structure.points.length; i++) {
-			BundleAdjustmentSceneStructure.Point p = structure.points[i];
-			p.x = input[index++];
-			p.y = input[index++];
-			p.z = input[index++];
-		}
-
 		for (int i = 0; i < structure.cameras.length; i++) {
 			BundleAdjustmentSceneStructure.Camera camera = structure.cameras[i];
 			if( !camera.known ) {
@@ -75,6 +75,13 @@ public class CodecBundleAdjustmentSceneStructure {
 
 	public void encode(BundleAdjustmentSceneStructure structure , double[] output ) {
 		int index = 0;
+
+		for (int i = 0; i < structure.points.length; i++) {
+			BundleAdjustmentSceneStructure.Point p = structure.points[i];
+			output[index++] = p.x;
+			output[index++] = p.y;
+			output[index++] = p.z;
+		}
 
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
 			BundleAdjustmentSceneStructure.View view = structure.views[viewIndex];
@@ -90,13 +97,6 @@ public class CodecBundleAdjustmentSceneStructure {
 				output[index++] = view.worldToView.T.y;
 				output[index++] = view.worldToView.T.z;
 			}
-		}
-
-		for (int i = 0; i < structure.points.length; i++) {
-			BundleAdjustmentSceneStructure.Point p = structure.points[i];
-			output[index++] = p.x;
-			output[index++] = p.y;
-			output[index++] = p.z;
 		}
 
 		for (int i = 0; i < structure.cameras.length; i++) {
