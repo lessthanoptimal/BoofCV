@@ -108,8 +108,8 @@ public class BundleAdjustmentPinholeRadial extends BundleAdjustmentCamera {
 		double y = ny*( 1 + sum);
 
 		// Apply tangential distortion
-		x += 2*t1*nx*ny + t2*(r2 + 2*nx*nx);
-		y += t1*(r2 + 2*ny*ny) + 2*t2*nx*ny;
+		x += 2*t1*nx*ny + t2*(rr + 2*nx*nx);
+		y += t1*(rr + 2*ny*ny) + 2*t2*nx*ny;
 
 		// Convert to pixels
 		output.x = fx*x + skew*y + cx;
@@ -121,6 +121,11 @@ public class BundleAdjustmentPinholeRadial extends BundleAdjustmentCamera {
 		double nx = camX/camZ;
 		double ny = camY/camZ;
 
+		double X = camX;
+		double Y = camY;
+		double Z = camZ;
+		double ZZ = Z*Z;
+
 		// Apply radial distortion
 		double rr = nx*nx + ny*ny;
 		double sum = (r1 + r2*rr)*rr;
@@ -128,37 +133,78 @@ public class BundleAdjustmentPinholeRadial extends BundleAdjustmentCamera {
 		double y = ny*( 1 + sum);
 
 		// Apply tangential distortion
-		x += 2*t1*nx*ny + t2*(r2 + 2*nx*nx);
-		y += t1*(r2 + 2*ny*ny) + 2*t2*nx*ny;
+		x += 2*t1*nx*ny + t2*(rr + 2*nx*nx);
+		y += t1*(rr + 2*ny*ny) + 2*t2*nx*ny;
 
-		calibX[0] = x;  calibY[0] = 0;
-		calibX[1] = 0;  calibY[1] = y;
-		calibX[2] = 1;  calibY[2] = 0;
-		calibX[3] = 0;  calibY[3] = 1;
-		calibX[0] = x;  calibY[0] = 0;
+		calibX[0] = x;  calibY[0] = 0; // fx
+		calibX[1] = 0;  calibY[1] = y; // fy
+		calibX[2] = 1;  calibY[2] = 0; // cx
+		calibX[3] = 0;  calibY[3] = 1; // cy
+
+		// r1
+		calibX[4] = (nx*fx + ny*skew)*rr;
+		calibY[4] = ny*fy*rr;
+
+		// r2
+		calibX[5] = (nx*fx + ny*skew)*rr*rr;
+		calibY[5] = ny*fy*rr*rr;
+
+		// t1
+		calibX[6] = skew*(rr + 2*ny*ny) + 2*nx*ny*fx;
+		calibY[6] = fy*(rr + 2*ny*ny);
+
+		// t2
+		calibX[7] = fx*(rr + 2*nx*nx) + 2*nx*ny*skew;
+		calibY[7] = 2*nx*ny*fy;
 
 		if( !zeroSkew ) {
 			calibX[8] = ny; calibY[8] = 0;
 		}
 
-		inputX[0] = fx/camZ;           inputY[0] = 0;
-		inputX[1] = skew/camZ;         inputY[1] = fy/camZ;
-		inputX[2] = -(fx*camX + skew*camY)/(camZ*camZ);
-		inputY[2] = -fy*camY/(camZ*camZ);
+		// X
+		inputX[0] = (fx*(2*nx*(nx*r2*rr + (r2*rr + r1)*nx) + ((r2*rr + r1)*rr + 1) + 2*ny*t1 + 6*nx*t2) + 2*skew*(ny*(nx*r2*rr + (r2*rr + r1)*nx) + nx*t1 + ny*t2))/camZ;
+		inputY[0] = 2*fy*(ny*(nx*r2*rr + (r2*rr + r1)*nx) + nx*t1 + ny*t2)/camZ;
+
+		// Y
+		inputX[1] = 2*fx*(X*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + X*t1/ZZ + Y*t2/ZZ) + skew*(2*Y*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + ((r2*rr + r1)*rr + 1)/Z + 6*Y*t1/ZZ + 2*X*t2/ZZ);
+		inputY[1] = fy*(2*Y*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + ((r2*rr + r1)*rr + 1)/Z + 6*Y*t1/ZZ + 2*X*t2/ZZ);
+
+		// Z
+		inputX[2] = -(2*t2*(3*nx*nx/Z + ny*ny/Z) + 2*(r2*rr*(nx*nx/Z + ny*ny/Z) + (r2*rr + r1)*(nx*nx/Z + ny*ny/Z))*X/Z + ((r2*rr + r1)*rr + 1)*X/ZZ + 4*nx*ny*t1/Z)*fx - (2*t1*(nx*nx/Z + 3*ny*ny/Z) + 2*(r2*rr*(nx*nx/Z + ny*ny/Z) + (r2*rr + r1)*(nx*nx/Z + ny*ny/Z))*Y/Z + ((r2*rr + r1)*rr + 1)*Y/ZZ + 4*nx*ny*t2/Z)*skew;
+		inputY[2] = -(2*t1*(nx*nx/Z + 3*ny*ny/Z) + 2*(r2*rr*(nx*nx/Z + ny*ny/Z) + (r2*rr + r1)*(nx*nx/Z + ny*ny/Z))*Y/Z + ((r2*rr + r1)*rr + 1)*Y/ZZ + 4*nx*ny*t2/Z)*fy;
+
 	}
 
 	@Override
 	public void jacobian(double camX, double camY, double camZ, double[] inputX, double[] inputY)
 	{
-		inputX[0] = fx/camZ;           inputY[0] = 0;
-		inputX[1] = skew/camZ;         inputY[1] = fy/camZ;
-		inputX[2] = -(fx*camX + skew*camY)/(camZ*camZ);
-		inputY[2] = -fy*camY/(camZ*camZ);
+		double nx = camX/camZ;
+		double ny = camY/camZ;
+
+		// Apply radial distortion
+		double rr = nx*nx + ny*ny;
+
+		double X = camX;
+		double Y = camY;
+		double Z = camZ;
+		double ZZ = Z*Z;
+
+		// X
+		inputX[0] = (fx*(2*nx*(nx*r2*rr + (r2*rr + r1)*nx) + ((r2*rr + r1)*rr + 1) + 2*ny*t1 + 6*nx*t2) + 2*skew*(ny*(nx*r2*rr + (r2*rr + r1)*nx) + nx*t1 + ny*t2))/camZ;
+		inputY[0] = 2*fy*(ny*(nx*r2*rr + (r2*rr + r1)*nx) + nx*t1 + ny*t2)/camZ;
+
+		// Y
+		inputX[1] = 2*fx*(X*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + X*t1/ZZ + Y*t2/ZZ) + skew*(2*Y*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + ((r2*rr + r1)*rr + 1)/Z + 6*Y*t1/ZZ + 2*X*t2/ZZ);
+		inputY[1] = fy*(2*Y*(Y*r2*rr/ZZ + (r2*rr + r1)*Y/ZZ)/Z + ((r2*rr + r1)*rr + 1)/Z + 6*Y*t1/ZZ + 2*X*t2/ZZ);
+
+		// Z
+		inputX[2] = -(2*t2*(3*nx*nx/Z + ny*ny/Z) + 2*(r2*rr*(nx*nx/Z + ny*ny/Z) + (r2*rr + r1)*(nx*nx/Z + ny*ny/Z))*X/Z + ((r2*rr + r1)*rr + 1)*X/ZZ + 4*nx*ny*t1/Z)*fx - (2*t1*(nx*nx/Z + 3*ny*ny/Z) + 2*(r2*rr*(nx*nx/Z + ny*ny/Z) + (r2*rr + r1)*(nx*nx/Z + ny*ny/Z))*Y/Z + ((r2*rr + r1)*rr + 1)*Y/ZZ + 4*nx*ny*t2/Z)*skew;
+		inputY[2] = -(2*t1*(nx*nx/Z + 3*ny*ny/Z) + 2*(r2*rr*(nx*nx/Z + ny*ny/Z) + (r2*rr + r1)*(nx*nx/Z + ny*ny/Z))*Y/Z + ((r2*rr + r1)*rr + 1)*Y/ZZ + 4*nx*ny*t2/Z)*fy;
 	}
 
 
 	@Override
 	public int getParameterCount() {
-		return zeroSkew ? 4 : 5;
+		return zeroSkew ? 8 : 9;
 	}
 }

@@ -39,8 +39,15 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 	// set of parameters to test
 	double parameters[][];
 
+	double tol = 1e-4;
+
 	protected GenericChecksBundleAdjustmentCamera(BundleAdjustmentCamera model) {
 		this.model = model;
+	}
+
+	public GenericChecksBundleAdjustmentCamera(BundleAdjustmentCamera model, double tol) {
+		this.model = model;
+		this.tol = tol;
 	}
 
 	public GenericChecksBundleAdjustmentCamera setParameters(double[][] parameters) {
@@ -64,11 +71,11 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 
 		for (double p[] : parameters)
 		{
-//			DerivativeChecker.jacobianPrint(new FunctionOfPoint(p),new JacobianOfPoint(p),X, 1e-4);
-//			DerivativeChecker.jacobianPrint(new FunctionOfParameters(X),new JacobianOfParameters(X),p, 1e-4);
+//			DerivativeChecker.jacobianPrintR(new FunctionOfPoint(p),new JacobianOfPoint(p),X, tol);
+//			DerivativeChecker.jacobianPrintR(new FunctionOfParameters(X),new JacobianOfParameters(X),p, tol);
 
-			assertTrue(DerivativeChecker.jacobian(new FunctionOfPoint(p),new JacobianOfPoint(p),X, 1e-4));
-			assertTrue(DerivativeChecker.jacobian(new FunctionOfParameters(X),new JacobianOfParameters(X),p, 1e-4));
+			assertTrue(DerivativeChecker.jacobianR(new FunctionOfPoint(p),new JacobianOfPoint(p),X, tol));
+			assertTrue(DerivativeChecker.jacobianR(new FunctionOfParameters(X),new JacobianOfParameters(X),p, tol));
 		}
 	}
 
