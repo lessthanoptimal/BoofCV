@@ -19,7 +19,6 @@
 package boofcv.factory.geo;
 
 import boofcv.abst.geo.*;
-import boofcv.abst.geo.bundle.BundleAdjustmentCalibratedSparse;
 import boofcv.abst.geo.f.*;
 import boofcv.abst.geo.h.HomographyDLT_to_Epipolar;
 import boofcv.abst.geo.h.HomographyTLS_to_Epipolar;
@@ -56,17 +55,6 @@ import org.ddogleg.struct.FastQueue;
  * @author Peter Abeles
  */
 public class FactoryMultiView {
-
-	/**
-	 * Creates bundle adjustment for a camera with a know and fixed intrinsic calibration
-	 *
-	 * @param tol Convergence tolerance.  Try 1e-8
-	 * @param maxIterations Maximum number of iterations. Try 200 or more
-	 * @return Bundle Adjustment
-	 */
-	public static BundleAdjustmentCalibrated bundleCalibrated(double tol , int maxIterations) {
-		return new BundleAdjustmentCalibratedSparse(tol,maxIterations);
-	}
 
 	/**
 	 * Returns an algorithm for estimating a homography matrix given a set of {@link AssociatedPair}.
