@@ -15,8 +15,15 @@ Version : 0.31
  * Thanks Frank Jakop for the suggestion
 
 - TODO Sparse Bundle Adjustment
-      - Add class for doing it in pixels and not normalized image coordinates
-      - Make camera parameters optimizable
+      - change parameter order
+         (point, view, camera)
+      - switch to homogeous coordinates?
+      - Get example working
+      - Regression using public dataset
+         * SBA as what looks like a good set in their repo
+      - Improve LM implementation
+      - Future: quaternion implementation
+      - Future: sparse block math
 - TODO update examples to use the new contour algorithm
 - TODO PNP regression and benchmark
 - TODO Compare BoofCV's IPPE against original
