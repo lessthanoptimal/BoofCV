@@ -593,7 +593,7 @@ public class ExampleMultiviewSceneReconstruction {
 				continue;
 			}
 
-			if( viewB == viewA ) {
+			if( viewB == origin ) {
 				SePointOps_F64.transformReverse(edge.a_to_b,feature3D.worldPt,feature3D.worldPt);
 			}
 
