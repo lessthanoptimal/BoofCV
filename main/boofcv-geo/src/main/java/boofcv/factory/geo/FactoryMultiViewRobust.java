@@ -40,6 +40,8 @@ import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 
+import javax.annotation.Nonnull;
+
 /**
  * Factory for creating robust false-positive tolerant estimation algorithms in multi-view geometry.  These
  * algorithms tend to have a lot of boilerplate associated with them and the goal of this factory
@@ -86,18 +88,20 @@ public class FactoryMultiViewRobust {
 
 	/**
 	 * Robust solution to PnP problem using {@link Ransac}.  Input observations are in normalized
-	 * image coordinates.
+	 * image coordinates. Found transform is from world to camera.
 	 *
 	 * <p>NOTE: Observations are in normalized image coordinates NOT pixels.</p>
 	 *
 	 * <p>See code for all the details.</p>
 	 *
+	 * @see Estimate1ofPnP
+	 *
 	 * @param pnp PnP parameters.  Can't be null.
 	 * @param ransac Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static Ransac<Se3_F64, Point2D3D> pnpRansac( ConfigPnP pnp,
-														ConfigRansac ransac)
+	public static Ransac<Se3_F64, Point2D3D> pnpRansac( @Nonnull ConfigPnP pnp,
+														@Nonnull ConfigRansac ransac)
 	{
 		pnp.checkValidity();
 		ransac.checkValidity();
