@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,8 @@ import java.awt.image.*;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -70,16 +72,17 @@ public class UtilImageIO {
 	 */
 	public static List<BufferedImage> loadImages( String directory , final String regex ) {
 
-		File[] files = new File(directory).listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.matches(regex);
-			}
-		});
-
+		File[] files = new File(directory).listFiles((dir, name) -> name.matches(regex));
 		List<BufferedImage> ret = new ArrayList<>();
 
-		for( File f : files ) {
+		if( files == null )
+			return ret;
+
+		// Sort so that the order is deterministic
+		List<File> sorted = Arrays.asList(files);
+		Collections.sort(sorted);
+
+		for( File f : sorted ) {
 			BufferedImage img = loadImage(f.getAbsolutePath());
 			if( img != null )
 				ret.add( img );
