@@ -45,14 +45,12 @@ import boofcv.struct.feature.SurfFeatureQueue;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.GrayF32;
-import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilVector3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.struct.so.Rodrigues_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
@@ -95,7 +93,7 @@ public class ExampleMultiviewSceneReconstruction {
 	int TARGET_FEATURE_EDGE = 50;
 
 	// tolerance for inliers in pixels
-	final double inlierTol = 5;
+	final double inlierTol = 2.5;
 
 	// minimum angle apart that two features need to be for triangulation. If the angle is too small triangulation
 	// won't be reliable
@@ -150,6 +148,7 @@ public class ExampleMultiviewSceneReconstruction {
 		// find the image which is connected to the most other images.  Use that as the origin of the arbitrary
 		// coordinate system
 		CameraView seed = selectMostConnectFrame();
+		System.out.println("   Selected view "+seed.index+" as origin");
 
 		CameraView seedNext = estimateFeatureLocations(seed);
 
@@ -193,8 +192,14 @@ public class ExampleMultiviewSceneReconstruction {
 	 */
 	private CameraView selectMostConnectFrame() {
 		CameraView best = graphNodes.get(0);
+		double bestScore = computeTriangulationGoodness(best);
+
 		for (int i = 1; i < graphNodes.size(); i++) {
-			if( graphNodes.get(i).connections.size() > best.connections.size() ) {
+			double score = computeTriangulationGoodness(graphNodes.get(i)  );
+			System.out.println("  frame="+i+"  score="+score);
+
+			if( score > bestScore ) {
+				bestScore = score;
 				best = graphNodes.get(i);
 			}
 		}
@@ -331,16 +336,10 @@ public class ExampleMultiviewSceneReconstruction {
 		// separating the two views.
 		CameraMotion best = null;
 		double bestScore = 0;
-		Rodrigues_F64 rod = new Rodrigues_F64();
 
-		// Using a large angle isn't actually that good of an idea in general, but works with the example images
-		// What you want is a view which maximizes translation and number of features, but the tranalations here
-		// don't have the same scale so that's tricky to determine
 		for( CameraMotion e : viewRoot.connections ) {
-			ConvertRotation3D_F64.matrixToRodrigues(e.a_to_b.R,rod);
-			double score = e.features.size()*rod.theta;
-
-			System.out.println("score="+score+" features="+e.features.size()+" angle="+rod.theta);
+			double score = computeTriangulationGoodness(e);
+			System.out.println(e.viewSrc.index+"x"+e.viewDst.index+"  triangleGoodness="+score);
 			if( score > bestScore ) {
 				bestScore = score;
 				best = e;
@@ -371,6 +370,43 @@ public class ExampleMultiviewSceneReconstruction {
 		return viewB;
 	}
 
+	private double computeTriangulationGoodness( CameraView camera ) {
+		double total = 0;
+
+		for (int i = 0; i < camera.connections.size(); i++) {
+			total += computeTriangulationGoodness(camera.connections.get(i));
+		}
+
+		return total;
+	}
+
+	private double computeTriangulationGoodness( CameraMotion e ) {
+
+		Vector3D_F64 arrowA = new Vector3D_F64();
+		Vector3D_F64 arrowB = new Vector3D_F64();
+
+		CameraView viewA = e.viewSrc;
+		CameraView viewB = e.viewDst;
+
+		double sum = 0;
+		for (int i = 0; i < e.features.size(); i++) {
+			AssociatedIndex f = e.features.get(i);
+
+			Point2D_F64 normA = viewA.featureNorm.get(f.src);
+			Point2D_F64 normB = viewB.featureNorm.get(f.dst);
+
+
+			// the more parallel a line is worse the triangulation. Get rid of bad ideas early here
+			arrowA.set(normA.x,normA.y,1);
+			arrowB.set(normB.x,normB.y,1);
+			GeometryMath_F64.mult(e.a_to_b.R,arrowA,arrowA); // put them into the same reference frame
+
+			sum += UtilVector3D_F64.acute(arrowA,arrowB);
+		}
+
+		return sum;
+	}
+
 	/**
 	 * Perform a breath first search to find the structure of all the remaining camrea views
 	 */
@@ -383,9 +419,23 @@ public class ExampleMultiviewSceneReconstruction {
 
 		// Do a breath first search. The queue is first in first out
 		while( !open.isEmpty() ) {
+			// TODO out of open list select the view which has the most known points in view
 			System.out.println("### open.size="+open.size());
-			CameraView v = open.remove(0);
-			System.out.println("   processing view "+v.index);
+
+			// select the view with the 3D features
+			int bestCount = countFeaturesWith3D(open.get(0));
+			int bestIndex = 0;
+
+			for (int i = 1; i < open.size(); i++) {
+				int count = countFeaturesWith3D(open.get(i));
+				if( count > bestCount ) {
+					bestCount = count;
+					bestIndex = i;
+				}
+			}
+
+			CameraView v = open.remove(bestIndex);
+			System.out.println("   processing view="+v.index+" | 3D Features="+bestCount);
 
 			// Figure out it's 3D structure
 			if( !determinePose(v) ) {
@@ -411,6 +461,29 @@ public class ExampleMultiviewSceneReconstruction {
 			// Update the open list
 			addUnvistedToStack(v, open);
 		}
+	}
+
+	private int countFeaturesWith3D(CameraView v ) {
+
+		int count = 0;
+
+		for (int i = 0; i < v.connections.size(); i++) {
+			CameraMotion m = v.connections.get(i);
+
+			boolean isSrc = m.viewSrc == v;
+
+			for (int j = 0; j < m.features.size(); j++) {
+				AssociatedIndex a = m.features.get(j);
+
+				if( isSrc ) {
+					count += m.viewDst.features3D[a.dst] != null ? 1 : 0;
+				} else {
+					count += m.viewSrc.features3D[a.src] != null ? 1 : 0;
+				}
+			}
+		}
+
+		return count;
 	}
 
 	/**
@@ -444,6 +517,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		int closestDistance = Integer.MAX_VALUE;
 
+		// TODO mark need to handle casees where the target's index hsa changed due to node removal
 		// Find all the known 3D features which are visible in this view
 		for( CameraMotion c : target.connections ) {
 			boolean isSrc = c.viewSrc == target;
@@ -484,7 +558,7 @@ public class ExampleMultiviewSceneReconstruction {
 		for (int i = 0; i < N; i++) {
 			int which = estimatePnP.getInputIndex(i);
 			Feature3D f = features.get(which);
-			if( f.views.contains(target.index))
+			if( f.views.contains(target))
 				continue;
 			f.views.add(target);
 			f.feature.add(featureIndexes.get(which));
@@ -612,7 +686,7 @@ public class ExampleMultiviewSceneReconstruction {
 			// Add it to the overall list
 			featuresAll.add(feature3D);
 		}
-		System.out.println("Initialized features from views "+viewA.index+" and "+viewB.index+" total="+featuresAll.size()+"  edges.size="+edge.features.size());
+		System.out.println("Initialized features from views "+viewA.index+" and "+viewB.index+" featuresAll="+featuresAll.size()+"  edges.size="+edge.features.size());
 	}
 
 	/**
@@ -982,9 +1056,9 @@ public class ExampleMultiviewSceneReconstruction {
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 
-		while( images.size() > 12 ) {
-			images.remove(12);
-		}
+//		while( images.size() > 12 ) {
+//			images.remove(12);
+//		}
 
 		ExampleMultiviewSceneReconstruction example = new ExampleMultiviewSceneReconstruction();
 

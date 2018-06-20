@@ -13,10 +13,11 @@ Version : 0.31
 - ImageMiscOps
  * Added interleaved support for copy, rotateCW, rotateCCW
  * Thanks Frank Jakop for the suggestion
+- Sparse Bundle Adjustment
+ * Most basic version using DDogleg and EJML sparse LM solver
 
 - TODO Sparse Bundle Adjustment
       - switch to homogeous coordinates?
-      - Get example working
       - Regression using public dataset
          * SBA as what looks like a good set in their repo
       - Improve LM implementation
