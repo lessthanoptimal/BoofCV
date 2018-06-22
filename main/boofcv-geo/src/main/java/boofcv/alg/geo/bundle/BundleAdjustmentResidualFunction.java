@@ -66,6 +66,7 @@ public class BundleAdjustmentResidualFunction
 	// Used to write the "unknown" paramters into the scene
 	CodecBundleAdjustmentSceneStructure codec = new CodecBundleAdjustmentSceneStructure();
 
+	Point3D_F64 p3 = new Point3D_F64();
 	/**
 	 * Specifies the scenes structure and observed feature locations
 	 */
@@ -106,8 +107,9 @@ public class BundleAdjustmentResidualFunction
 			for (int i = 0; i < obsView.size(); i++) {
 				obsView.get(i,observedPixel);
 				BundleAdjustmentSceneStructure.Point worldPt = structure.points[observedPixel.index];
+				worldPt.get(p3);
 
-				SePointOps_F64.transform(view.worldToView,worldPt,cameraPt);
+				SePointOps_F64.transform(view.worldToView,p3,cameraPt);
 
 				camera.model.project(cameraPt.x,cameraPt.y,cameraPt.z, predictedPixel);
 

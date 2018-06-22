@@ -727,7 +727,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		sba.configure(1e-4,1e-4,20);
 
-		BundleAdjustmentSceneStructure structure = new BundleAdjustmentSceneStructure();
+		BundleAdjustmentSceneStructure structure = new BundleAdjustmentSceneStructure(false);
 		BundleAdjustmentObservations observations = new BundleAdjustmentObservations(viewsAdded.size());
 
 		structure.initialize(1,viewsAdded.size(),features.size());
@@ -795,7 +795,7 @@ public class ExampleMultiviewSceneReconstruction {
 				structure.views[i].worldToView.invert(graphNodes.get(reverseTable[i]).viewToWorld);
 			}
 			for (int i = 0; i < features.size(); i++) {
-				features.get(i).worldPt.set(structure.points[i]);
+				structure.points[i].get(features.get(i).worldPt);
 			}
 			return true;
 		} finally {
@@ -906,7 +906,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		sba.configure(1e-4,1e-4,20);
 
-		BundleAdjustmentSceneStructure structure = new BundleAdjustmentSceneStructure();
+		BundleAdjustmentSceneStructure structure = new BundleAdjustmentSceneStructure(false);
 		BundleAdjustmentObservations observations = new BundleAdjustmentObservations(graphNodes.size());
 
 		structure.initialize(1,graphNodes.size(),featuresPruned.size());
@@ -950,7 +950,7 @@ public class ExampleMultiviewSceneReconstruction {
 			structure.views[i].worldToView.invert(graphNodes.get(i).viewToWorld);
 		}
 		for (int i = 0; i < featuresPruned.size(); i++) {
-			featuresPruned.get(i).worldPt.set( structure.points[i]);
+			structure.points[i].get(featuresPruned.get(i).worldPt);
 		}
 
 		intrinsic.fx *= scale;

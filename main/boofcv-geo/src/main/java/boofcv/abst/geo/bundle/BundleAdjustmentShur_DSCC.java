@@ -32,19 +32,22 @@ public class BundleAdjustmentShur_DSCC
 		implements BundleAdjustment
 {
 	// minimization algorithm
-	LevenbergMarquardtSchur_DSCC minimizer;
+	private LevenbergMarquardtSchur_DSCC minimizer;
 
-	BundleAdjustmentResidualFunction function = new BundleAdjustmentResidualFunction();
-	BundleAdjustmentShurJacobian_DSCC jacobian = new BundleAdjustmentShurJacobian_DSCC();
+	private BundleAdjustmentResidualFunction function = new BundleAdjustmentResidualFunction();
+	private BundleAdjustmentShurJacobian_DSCC jacobian = new BundleAdjustmentShurJacobian_DSCC();
 
-	int maxIterations;
-	double parameters[]=new double[0];
+	private int maxIterations;
+	private double parameters[]=new double[0];
 
-	volatile boolean stopRequested = false;
+	private volatile boolean stopRequested = false;
 
-	double errorBefore,errorAfter;
+	/**
+	 * Fit error before and after optimization
+	 */
+	private double errorBefore,errorAfter;
 
-	CodecBundleAdjustmentSceneStructure codec = new CodecBundleAdjustmentSceneStructure();
+	private CodecBundleAdjustmentSceneStructure codec = new CodecBundleAdjustmentSceneStructure();
 
 	public BundleAdjustmentShur_DSCC( double initialDampParam) {
 		this.minimizer = new LevenbergMarquardtSchur_DSCC(initialDampParam);

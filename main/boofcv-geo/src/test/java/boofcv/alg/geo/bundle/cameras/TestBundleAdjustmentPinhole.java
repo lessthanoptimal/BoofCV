@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,26 +16,29 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.bundle;
+package boofcv.alg.geo.bundle.cameras;
 
-import org.ddogleg.struct.FastQueue;
+import org.junit.Test;
 
 /**
- * A set of observations for a single view.
- *
  * @author Peter Abeles
  */
-public class ViewPointObservations {
-
-
-	FastQueue<PointIndexObservation> points;
-
-	public ViewPointObservations() {
-		points = new FastQueue<>(
-				10, PointIndexObservation.class, true);
+public class TestBundleAdjustmentPinhole
+{
+	@Test
+	public void withSkew() {
+		double[][]parameters = new double[][]{{300,200,400,400,0.1},{400,600,1000,1000,2}};
+		new GenericChecksBundleAdjustmentCamera(new BundleAdjustmentPinhole(false)){}
+				.setParameters(parameters)
+				.checkAll();
 	}
 
-	public FastQueue<PointIndexObservation> getPoints() {
-		return points;
+	@Test
+	public void withoutSkew() {
+		double[][]parameters = new double[][]{{300,200,400,400},{400,600,1000,1000}};
+		new GenericChecksBundleAdjustmentCamera(new BundleAdjustmentPinhole(true)){}
+				.setParameters(parameters)
+				.checkAll();
 	}
+
 }

@@ -116,9 +116,9 @@ public abstract class GenericBundleAdjustmentChecks {
 		BundleAdjustmentSceneStructure structure = a.data0;
 		for (int i = 0; i < structure.points.length; i++) {
 			BundleAdjustmentSceneStructure.Point p = structure.points[i];
-			p.x += rand.nextGaussian()*0.1;
-			p.y += rand.nextGaussian()*0.1;
-			p.z += rand.nextGaussian()*0.1;
+			p.coordinate[0] += rand.nextGaussian()*0.1;
+			p.coordinate[1] += rand.nextGaussian()*0.1;
+			p.coordinate[2] += rand.nextGaussian()*0.1;
 		}
 	}
 
@@ -158,13 +158,15 @@ public abstract class GenericBundleAdjustmentChecks {
 
 		PointIndex2D_F64 o = new PointIndex2D_F64();
 		Point2D_F64 predicted = new Point2D_F64();
+		Point3D_F64 p3 = new Point3D_F64();
 		for (int indexView = 0; indexView < observations.views.length; indexView++) {
 			BundleAdjustmentObservations.View v = observations.views[indexView];
 
 			wcp.configure(intrinsic,structure.views[indexView].worldToView);
 			for (int j = 0; j < v.feature.size; j++) {
 				v.get(j,o);
-				wcp.transform(structure.points[o.index],predicted);
+				structure.points[o.index].get(p3);
+				wcp.transform(p3,predicted);
 				double residual = o.distance(predicted);
 				if( Math.abs(residual) > tol )
 					fail("Error is too large. "+residual);
@@ -199,7 +201,7 @@ public abstract class GenericBundleAdjustmentChecks {
 		int numViews = 5;
 		int numFeatures = 200;
 
-		BundleAdjustmentSceneStructure structure = new BundleAdjustmentSceneStructure();
+		BundleAdjustmentSceneStructure structure = new BundleAdjustmentSceneStructure(false);
 		BundleAdjustmentObservations observations = new BundleAdjustmentObservations(numViews);
 
 		structure.initialize(1,numViews,numFeatures);

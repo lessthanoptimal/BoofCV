@@ -41,9 +41,9 @@ public class CodecBundleAdjustmentSceneStructure {
 
 		for (int i = 0; i < structure.points.length; i++) {
 			BundleAdjustmentSceneStructure.Point p = structure.points[i];
-			p.x = input[index++];
-			p.y = input[index++];
-			p.z = input[index++];
+			p.coordinate[0] = input[index++];
+			p.coordinate[1] = input[index++];
+			p.coordinate[2] = input[index++];
 		}
 
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
@@ -78,9 +78,9 @@ public class CodecBundleAdjustmentSceneStructure {
 
 		for (int i = 0; i < structure.points.length; i++) {
 			BundleAdjustmentSceneStructure.Point p = structure.points[i];
-			output[index++] = p.x;
-			output[index++] = p.y;
-			output[index++] = p.z;
+			output[index++] = p.coordinate[0];
+			output[index++] = p.coordinate[1];
+			output[index++] = p.coordinate[2];
 		}
 
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {

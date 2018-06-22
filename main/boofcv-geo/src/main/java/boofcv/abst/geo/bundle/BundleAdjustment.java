@@ -21,7 +21,8 @@ package boofcv.abst.geo.bundle;
 import org.ddogleg.struct.Stoppable;
 
 /**
- * Interface for bundle adjustment.
+ * High level interface for bundle adjustment. Bundle adjustment is the process of optimizing in batch parameters
+ * for the scene's structure, camera pose, and intrinsic camera parameters.
  *
  * @author Peter Abeles
  */

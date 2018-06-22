@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.bundle;
+package boofcv.alg.geo.bundle.cameras;
 
 import org.junit.Test;
 

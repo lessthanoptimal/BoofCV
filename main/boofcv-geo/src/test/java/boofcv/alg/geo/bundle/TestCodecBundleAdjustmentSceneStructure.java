@@ -80,7 +80,7 @@ public class TestCodecBundleAdjustmentSceneStructure {
 	}
 
 	public static BundleAdjustmentSceneStructure createScene( Random rand ) {
-		BundleAdjustmentSceneStructure out = new BundleAdjustmentSceneStructure();
+		BundleAdjustmentSceneStructure out = new BundleAdjustmentSceneStructure(false);
 
 		out.initialize(2,4,5);
 
