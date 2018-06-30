@@ -79,6 +79,8 @@ public class DistanceHomographyCalibratedSq implements DistanceFromModelMultiVie
 	public void setIntrinsic( int view , CameraPinhole intrinsic) {
 		if( view == 1 )
 			errorCam2.set(intrinsic.fx,intrinsic.fy, intrinsic.skew);
+		else if( view != 0)
+			throw new IllegalArgumentException("View must be 0 or 1");
 	}
 
 	@Override

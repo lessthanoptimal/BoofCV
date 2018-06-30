@@ -199,7 +199,7 @@ public class TestDistanceSe3SymmetricSq {
 
 		DistanceSe3SymmetricSq alg = new DistanceSe3SymmetricSq(triangulate);
 		alg.setIntrinsic(0,PerspectiveOps.matrixToParam(K,0,0,null));
-		alg.setIntrinsic(1,PerspectiveOps.matrixToParam(K,0,0,null));
+		alg.setIntrinsic(1,PerspectiveOps.matrixToParam(K2,0,0,null));
 		alg.setModel(keyToCurr);
 		assertEquals(error, alg.computeDistance(obsP), 1e-8);
 	}

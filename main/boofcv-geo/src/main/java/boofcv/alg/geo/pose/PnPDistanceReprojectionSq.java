@@ -50,7 +50,7 @@ public class PnPDistanceReprojectionSq implements DistanceFromModelMultiView<Se3
 	private Point3D_F64 X = new Point3D_F64();
 
 	// computes the error in units of pixels
-	private NormalizedToPixelError pixelError;
+	private NormalizedToPixelError pixelError = new NormalizedToPixelError(1,1,0);
 
 	@Override
 	public void setModel(Se3_F64 worldToCamera) {
