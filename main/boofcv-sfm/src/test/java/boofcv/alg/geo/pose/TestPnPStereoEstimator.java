@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.abst.geo.EstimateNofPnP;
-import boofcv.alg.geo.DistanceModelMonoPixels;
+import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.Point2D3D;
@@ -45,7 +45,7 @@ public class TestPnPStereoEstimator extends CommonStereoMotionNPoint {
 
 	private void perfectData(int numExtra) {
 		EstimateNofPnP pnp = FactoryMultiView.computePnP_N(EnumPNP.P3P_FINSTERWALDER, -1);
-		DistanceModelMonoPixels<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
+		DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
 
 		PnPStereoEstimator alg = new PnPStereoEstimator(pnp,distanceMono,numExtra);
 

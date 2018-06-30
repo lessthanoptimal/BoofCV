@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,9 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.alg.geo.DistanceModelStereoPixels;
+import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.NormalizedToPixelError;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -56,7 +57,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistanceSe3SymmetricSq implements DistanceModelStereoPixels<Se3_F64,AssociatedPair> {
+public class DistanceSe3SymmetricSq implements DistanceFromModelMultiView<Se3_F64,AssociatedPair> {
 
 	// transform from key frame to current frame
 	private Se3_F64 keyToCurr;
@@ -74,38 +75,8 @@ public class DistanceSe3SymmetricSq implements DistanceModelStereoPixels<Se3_F64
 	 *
 	 * @param triangulate Triangulates the intersection of two observations
 	 */
-	public DistanceSe3SymmetricSq(TriangulateTwoViewsCalibrated triangulate ,
-								  double key_fx, double key_fy , double key_skew ,
-								  double curr_fx, double curr_fy , double curr_skew ) {
-		this.triangulate = triangulate;
-		setIntrinsic(key_fx,key_fy,key_skew,curr_fx,curr_fy,curr_skew);
-	}
-
-	/**
-	 * Configure distance calculation.
-	 *
-	 * @param triangulate Triangulates the intersection of two observations
-	 */
 	public DistanceSe3SymmetricSq(TriangulateTwoViewsCalibrated triangulate ) {
 		this.triangulate = triangulate;
-	}
-
-	/**
-	 * Specifies intrinsic parameters   See comment above about how to specify error units using
-	 * intrinsic parameters.
-	 *
-	 * @param cam1_fx intrinsic parameter: focal length x for camera 1
-	 * @param cam1_fy intrinsic parameter: focal length y for camera 1
-	 * @param cam1_skew intrinsic parameter: skew for camera  1 (usually zero)
-	 * @param cam2_fx intrinsic parameter: focal length x for camera 2
-	 * @param cam2_fy intrinsic parameter: focal length y for camera 2
-	 * @param cam2_skew intrinsic parameter: skew for camera 2 (usually zero)
-	 */
-	@Override
-	public void setIntrinsic(double cam1_fx, double cam1_fy , double cam1_skew ,
-							 double cam2_fx, double cam2_fy , double cam2_skew) {
-		errorCam1.set(cam1_fx,cam1_fy,cam1_skew);
-		errorCam2.set(cam2_fx,cam2_fy, cam2_skew);
 	}
 
 	@Override
@@ -157,4 +128,18 @@ public class DistanceSe3SymmetricSq implements DistanceModelStereoPixels<Se3_F64
 	public Class<Se3_F64> getModelType() {
 		return Se3_F64.class;
 	}
+
+	@Override
+	public void setIntrinsic( int view, CameraPinhole intrinsic) {
+		if( view == 0 )
+			errorCam1.set(intrinsic.fx,intrinsic.fy,intrinsic.skew);
+		else if( view == 1 )
+			errorCam2.set(intrinsic.fx,intrinsic.fy,intrinsic.skew);
+	}
+
+	@Override
+	public int getNumberOfViews() {
+		return 2;
+	}
+
 }

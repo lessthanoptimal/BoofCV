@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.sfm.d3;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.alg.feature.associate.AssociateStereo2D;
-import boofcv.alg.geo.DistanceModelMonoPixels;
+import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.pose.PnPStereoDistanceReprojectionSq;
 import boofcv.alg.geo.pose.PnPStereoEstimator;
 import boofcv.alg.geo.pose.RefinePnPStereo;
@@ -48,7 +48,7 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 {
 	RefinePnPStereo refine;
 	PnPStereoEstimator pnp;
-	DistanceModelMonoPixels<Se3_F64,Point2D3D> distanceMono;
+	DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono;
 	PnPStereoDistanceReprojectionSq distanceStereo;
 	AssociateStereo2D<?> assoc;
 
@@ -59,7 +59,7 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 	boolean success;
 
 	public WrapVisOdomDualTrackPnP(PnPStereoEstimator pnp,
-								   DistanceModelMonoPixels<Se3_F64, Point2D3D> distanceMono,
+								   DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono,
 								   PnPStereoDistanceReprojectionSq distanceStereo,
 								   AssociateStereo2D<?> assoc,
 								   VisOdomDualTrackPnP<T, ?> alg,
@@ -118,8 +118,10 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 		alg.setCalibration(parameters);
 
 		CameraPinholeRadial left = parameters.left;
-		distanceMono.setIntrinsic(left.fx,left.fy,left.skew);
-		distanceStereo.setStereoParameters(parameters);
+		distanceMono.setIntrinsic(0,left);
+		distanceStereo.setLeftToRight(parameters.rightToLeft.invert(null));
+		distanceStereo.setIntrinsic(0,parameters.left);
+		distanceStereo.setIntrinsic(1,parameters.right);
 		assoc.setCalibration(parameters);
 	}
 

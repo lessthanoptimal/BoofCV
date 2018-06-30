@@ -21,26 +21,27 @@ package boofcv.factory.geo;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.alg.geo.DistanceModelMonoPixels;
+import boofcv.abst.geo.fitting.DistanceFromModelResidual;
+import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
+import boofcv.abst.geo.fitting.ModelManagerEpipolarMatrix;
+import boofcv.alg.geo.DistanceFromModelMultiView;
+import boofcv.alg.geo.f.FundamentalResidualSampson;
 import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
-import boofcv.alg.geo.robust.DistanceHomographySq;
-import boofcv.alg.geo.robust.DistanceSe3SymmetricSq;
-import boofcv.alg.geo.robust.GenerateHomographyLinear;
-import boofcv.alg.geo.robust.Se3FromEssentialGenerator;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.alg.geo.robust.*;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.Point2D3D;
 import georegression.fitting.homography.ModelManagerHomography2D_F64;
 import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
+import org.ejml.data.DMatrixRMaj;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Factory for creating robust false-positive tolerant estimation algorithms in multi-view geometry.  These
@@ -66,22 +67,22 @@ public class FactoryMultiViewRobust {
 	 * @param configLMedS Parameters for LMedS.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static LeastMedianOfSquares<Se3_F64, Point2D3D> pnpLMedS( ConfigPnP configPnP,
-																	 ConfigLMedS configLMedS)
+	public static LeastMedianOfSquaresMultiView<Se3_F64, Point2D3D> pnpLMedS(@Nullable ConfigPnP configPnP,
+																			 @Nonnull ConfigLMedS configLMedS)
 	{
+		if( configPnP == null )
+			configPnP = new ConfigPnP();
 		configPnP.checkValidity();
 		configLMedS.checkValidity();
 
 		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1( configPnP.which , configPnP.epnpIterations, configPnP.numResolve);
 
-		DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
-		distance.setIntrinsic(configPnP.intrinsic.fx,configPnP.intrinsic.fy,configPnP.intrinsic.skew);
+		DistanceFromModelMultiView<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
-				new EstimatorToGenerator<>(estimatorPnP);
+		EstimatorToGenerator<Se3_F64,Point2D3D> generator = new EstimatorToGenerator<>(estimatorPnP);
 
-		LeastMedianOfSquares<Se3_F64, Point2D3D>  lmeds =
-				new LeastMedianOfSquares<>(configLMedS.randSeed, configLMedS.totalCycles, manager, generator, distance);
+		LeastMedianOfSquaresMultiView<Se3_F64, Point2D3D> lmeds =
+				new LeastMedianOfSquaresMultiView<>(configLMedS.randSeed, configLMedS.totalCycles, manager, generator, distance);
 		lmeds.setErrorFraction(configLMedS.errorFraction);
 		return lmeds;
 	}
@@ -100,15 +101,16 @@ public class FactoryMultiViewRobust {
 	 * @param ransac Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static Ransac<Se3_F64, Point2D3D> pnpRansac( @Nonnull ConfigPnP pnp,
-														@Nonnull ConfigRansac ransac)
+	public static RansacMultiView<Se3_F64, Point2D3D> pnpRansac( @Nullable ConfigPnP pnp,
+																 @Nonnull ConfigRansac ransac )
 	{
+		if( pnp == null )
+			pnp = new ConfigPnP();
 		pnp.checkValidity();
 		ransac.checkValidity();
 
 		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1(pnp.which, pnp.epnpIterations, pnp.numResolve);
-		DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
-		distance.setIntrinsic(pnp.intrinsic.fx,pnp.intrinsic.fy,pnp.intrinsic.skew);
+		DistanceFromModelMultiView<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
 				new EstimatorToGenerator<>(estimatorPnP);
@@ -116,7 +118,7 @@ public class FactoryMultiViewRobust {
 		// convert from pixels to pixels squared
 		double threshold = ransac.inlierThreshold*ransac.inlierThreshold;
 
-		return new Ransac<>(ransac.randSeed, manager, generator, distance, ransac.maxIterations, threshold);
+		return new RansacMultiView<>(ransac.randSeed, manager, generator, distance, ransac.maxIterations, threshold);
 	}
 
 	/**
@@ -133,46 +135,47 @@ public class FactoryMultiViewRobust {
 	 * @param lmeds Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static LeastMedianOfSquares<Se3_F64, AssociatedPair> essentialLMedS( ConfigEssential essential,
-																				ConfigLMedS lmeds ) {
+	public static LeastMedianOfSquaresMultiView<Se3_F64, AssociatedPair> essentialLMedS( @Nullable ConfigEssential essential,
+																						 @Nonnull ConfigLMedS lmeds )
+	{
+		if( essential == null )
+			essential = new ConfigEssential();
+		else
+			essential.checkValidity();
 
-		essential.checkValidity();
-
-		Estimate1ofEpipolar essentialAlg = FactoryMultiView.
+		Estimate1ofEpipolar epipolar = FactoryMultiView.
 				computeEssential_1(essential.which, essential.numResolve);
 
-		return epipolarLMedS(essentialAlg, essential.intrinsic, lmeds);
-
-	}
-
-	public static LeastMedianOfSquares<Se3_F64, AssociatedPair> fundamentalLMedS( ConfigEssential fundamental,
-																				  ConfigLMedS lmeds ) {
-
-		fundamental.checkValidity();
-
-		Estimate1ofEpipolar essentialAlg = FactoryMultiView.
-				computeEssential_1(fundamental.which, fundamental.numResolve);
-
-		return epipolarLMedS(essentialAlg, fundamental.intrinsic, lmeds);
-	}
-
-	private static LeastMedianOfSquares<Se3_F64, AssociatedPair> epipolarLMedS( Estimate1ofEpipolar epipolar,
-																				CameraPinholeRadial intrinsic,
-																				ConfigLMedS configLMedS ) {
 		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(epipolar, triangulate);
 
-		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate,
-						intrinsic.fx, intrinsic.fy, intrinsic.skew,
-						intrinsic.fx, intrinsic.fy, intrinsic.skew);
+		DistanceFromModelMultiView<Se3_F64, AssociatedPair> distanceSe3 = new DistanceSe3SymmetricSq(triangulate);
 
+		LeastMedianOfSquaresMultiView<Se3_F64, AssociatedPair> config = new LeastMedianOfSquaresMultiView<>
+				(lmeds.randSeed, lmeds.totalCycles, manager, generateEpipolarMotion, distanceSe3);
+		config.setErrorFraction(lmeds.errorFraction);
+		return config;
+	}
 
-		LeastMedianOfSquares<Se3_F64, AssociatedPair> config = new LeastMedianOfSquares<>
-				(configLMedS.randSeed, configLMedS.totalCycles, manager, generateEpipolarMotion, distanceSe3);
-		config.setErrorFraction(configLMedS.errorFraction);
+	public static LeastMedianOfSquares<DMatrixRMaj, AssociatedPair> fundamentalLMedS( @Nonnull ConfigFundamental fundamental,
+																					  @Nonnull ConfigLMedS lmeds ) {
+
+		fundamental.checkValidity();
+
+		ModelManager<DMatrixRMaj> managerF = new ModelManagerEpipolarMatrix();
+		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(fundamental.which,
+				fundamental.numResolve);
+		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
+
+		// How the error is measured
+		DistanceFromModelResidual<DMatrixRMaj,AssociatedPair> errorMetric =
+				new DistanceFromModelResidual<>(new FundamentalResidualSampson());
+
+		LeastMedianOfSquares<DMatrixRMaj, AssociatedPair> config = new LeastMedianOfSquares<>
+				(lmeds.randSeed, lmeds.totalCycles, managerF, generateF, errorMetric);
+		config.setErrorFraction(lmeds.errorFraction);
 		return config;
 	}
 
@@ -186,48 +189,50 @@ public class FactoryMultiViewRobust {
 	 * @param ransac Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static Ransac<Se3_F64, AssociatedPair> essentialRansac( ConfigEssential essential,
-																   ConfigRansac ransac ) {
-
-		essential.checkValidity();
+	public static RansacMultiView<Se3_F64, AssociatedPair> essentialRansac( @Nullable ConfigEssential essential,
+																			@Nonnull ConfigRansac ransac )
+	{
+		if( essential == null )
+			essential = new ConfigEssential();
+		else
+			essential.checkValidity();
 		ransac.checkValidity();
 
-		Estimate1ofEpipolar essentialAlg = FactoryMultiView.
+		Estimate1ofEpipolar epipolar = FactoryMultiView.
 				computeEssential_1(essential.which, essential.numResolve);
-
-		return epipolarRansac(essentialAlg, essential.intrinsic, ransac);
-	}
-
-	public static Ransac<Se3_F64, AssociatedPair> fundamentalRansac( ConfigFundamental essential,
-																	 ConfigRansac ransac ) {
-
-		essential.checkValidity();
-		ransac.checkValidity();
-
-		Estimate1ofEpipolar essentialAlg = FactoryMultiView.
-				computeFundamental_1(essential.which, essential.numResolve);
-
-		return epipolarRansac(essentialAlg, essential.intrinsic, ransac);
-	}
-
-	private static Ransac<Se3_F64, AssociatedPair> epipolarRansac(Estimate1ofEpipolar epipolar,
-																 CameraPinholeRadial intrinsic,
-																 ConfigRansac ransac ) {
 
 		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(epipolar, triangulate);
 
-		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate,
-						intrinsic.fx, intrinsic.fy, intrinsic.skew,
-						intrinsic.fx, intrinsic.fy, intrinsic.skew);
+		DistanceFromModelMultiView<Se3_F64, AssociatedPair> distanceSe3 =
+				new DistanceSe3SymmetricSq(triangulate);
 
 		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold * 2.0;
 
-		return new Ransac<>(ransac.randSeed, manager, generateEpipolarMotion, distanceSe3,
+		return new RansacMultiView<>(ransac.randSeed, manager, generateEpipolarMotion, distanceSe3,
 				ransac.maxIterations, ransacTOL);
+	}
+
+	public static Ransac<DMatrixRMaj, AssociatedPair> fundamentalRansac(@Nonnull ConfigFundamental fundamental,
+																		@Nonnull ConfigRansac ransac ) {
+
+		fundamental.checkValidity();
+		ransac.checkValidity();
+
+		ModelManager<DMatrixRMaj> managerF = new ModelManagerEpipolarMatrix();
+		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(fundamental.which,
+				fundamental.numResolve);
+		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
+
+		// How the error is measured
+		DistanceFromModelResidual<DMatrixRMaj,AssociatedPair> errorMetric =
+				new DistanceFromModelResidual<>(new FundamentalResidualSampson());
+
+		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold;
+
+		return new Ransac<>(ransac.randSeed, managerF, generateF, errorMetric, ransac.maxIterations, ransacTOL);
 	}
 
 	/**
@@ -246,7 +251,7 @@ public class FactoryMultiViewRobust {
 	 * @return Homography estimator
 	 */
 	public static LeastMedianOfSquares<Homography2D_F64,AssociatedPair>
-	homographyLMedS( ConfigHomography homography , ConfigLMedS configLMedS )
+	homographyLMedS(@Nullable ConfigHomography homography , @Nonnull ConfigLMedS configLMedS )
 	{
 		if( homography == null )
 			homography = new ConfigHomography();
@@ -277,7 +282,7 @@ public class FactoryMultiViewRobust {
 	 * @return Homography estimator
 	 */
 	public static Ransac<Homography2D_F64,AssociatedPair>
-	homographyRansac( ConfigHomography homography , ConfigRansac ransac )
+	homographyRansac( @Nullable ConfigHomography homography , @Nonnull ConfigRansac ransac )
 	{
 		if( homography == null )
 			homography = new ConfigHomography();
@@ -288,7 +293,28 @@ public class FactoryMultiViewRobust {
 
 		double ransacTol = ransac.inlierThreshold*ransac.inlierThreshold;
 
-		return new Ransac<>
+		return new Ransac<>(ransac.randSeed, manager, modelFitter, distance, ransac.maxIterations, ransacTol);
+	}
+
+	/**
+	 * Estimates a homography from normalized image coordinates but computes the error in pixel coordinates
+	 *
+	 * @see GenerateHomographyLinear
+	 * @see DistanceHomographyCalibratedSq
+	 *
+	 * @param ransac RANSAC configuration
+	 * @return Ransac
+	 */
+	public static RansacMultiView<Homography2D_F64,AssociatedPair>
+	homographyCalibratedRansac( @Nonnull ConfigRansac ransac )
+	{
+		ModelManager<Homography2D_F64> manager = new ModelManagerHomography2D_F64();
+		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(false);
+		DistanceHomographyCalibratedSq distance = new DistanceHomographyCalibratedSq();
+
+		double ransacTol = ransac.inlierThreshold*ransac.inlierThreshold;
+
+		return new RansacMultiView<>
 				(ransac.randSeed, manager, modelFitter, distance, ransac.maxIterations, ransacTol);
 	}
 }

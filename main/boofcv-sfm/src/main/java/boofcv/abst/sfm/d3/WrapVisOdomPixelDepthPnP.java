@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.sfm.AccessPointTracks3D;
-import boofcv.alg.geo.DistanceModelMonoPixels;
+import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -50,7 +50,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
 	// low level algorithm
 	VisOdomPixelDepthPnP<T> alg;
 	StereoSparse3D<T> stereo;
-	DistanceModelMonoPixels<Se3_F64,Point2D3D> distance;
+	DistanceFromModelMultiView<Se3_F64,Point2D3D> distance;
 	Class<T> imageType;
 	boolean success;
 
@@ -58,7 +58,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
 
 	public WrapVisOdomPixelDepthPnP(VisOdomPixelDepthPnP<T> alg,
 									StereoSparse3D<T> stereo,
-									DistanceModelMonoPixels<Se3_F64,Point2D3D> distance,
+									DistanceFromModelMultiView<Se3_F64,Point2D3D> distance,
 									Class<T> imageType) {
 		this.alg = alg;
 		this.stereo = stereo;
@@ -106,7 +106,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
 
 		alg.setPixelToNorm(leftPixelToNorm);
 		alg.setNormToPixel(leftNormToPixel);
-		distance.setIntrinsic(l.fx,l.fy,l.skew);
+		distance.setIntrinsic(0,l);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,23 +18,19 @@
 
 package boofcv.alg.geo;
 
+import boofcv.struct.calib.CameraPinhole;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 /**
- * Compute the distance between a model and an observation for a single camera in pixels
- * when the observations are in normalized image coordinates.
+ * Computes the observation errors in pixels when the input is in normalized image coordinates.
+ * The most basic camera model {@link CameraPinhole} is used because errors can be computed very quickly using
+ * this model. An approximate camera model should be used when the known one isn't a pinhole.
  *
  * @author Peter Abeles
  */
-public interface DistanceModelMonoPixels<Model,Point> extends DistanceFromModel<Model,Point>
-{
+public interface DistanceFromModelMultiView<Model,Point> extends DistanceFromModel<Model,Point> {
 
-	/**
-	 * Specifies intrinsic camera parameters.
-	 *
-	 * @param fx focal length x-axis
-	 * @param fy focal length y-axis
-	 * @param skew skew
-	 */
-	public void setIntrinsic( double fx, double fy, double skew );
+	void setIntrinsic( int view, CameraPinhole intrinsic );
+
+	int getNumberOfViews();
 }

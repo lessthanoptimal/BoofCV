@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,7 +65,8 @@ public class TestPnPDistanceReprojectionSq {
 		// convert to normalized image coordinates
 		PerspectiveOps.convertPixelToNorm(K,observed,observed);
 
-		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq(K.get(0,0),K.get(1,1),K.get(0,1));
+		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq();
+		alg.setIntrinsic(0, PerspectiveOps.matrixToParam(K,0,0,null));
 		alg.setModel(worldToCamera);
 
 		double found = alg.computeDistance(new Point2D3D(observed,X));
@@ -89,7 +90,8 @@ public class TestPnPDistanceReprojectionSq {
 
 		Point2D_F64 observed = PerspectiveOps.renderPixel(worldToCamera, K, X);
 
-		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq(K.get(0,0),K.get(1,1),K.get(0,1));
+		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq();
+		alg.setIntrinsic(0, PerspectiveOps.matrixToParam(K,0,0,null));
 		alg.setModel(worldToCamera);
 
 		double found = alg.computeDistance(new Point2D3D(observed,X));
@@ -131,7 +133,8 @@ public class TestPnPDistanceReprojectionSq {
 			expected[i] = deltaX*deltaX + deltaY*deltaY;
 		}
 
-		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq(K.get(0,0),K.get(1,1),K.get(0,1));
+		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq();
+		alg.setIntrinsic(0, PerspectiveOps.matrixToParam(K,0,0,null));
 		alg.setModel(worldToCamera);
 		double found[] = new double[5];
 		alg.computeDistance(obs,found);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,11 +20,10 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.alg.feature.associate.AssociateStereo2D;
-import boofcv.alg.geo.DistanceModelMonoPixels;
+import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.pose.PnPStereoDistanceReprojectionSq;
 import boofcv.alg.geo.pose.RefinePnPStereo;
 import boofcv.alg.sfm.d3.VisOdomQuadPnP;
-import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.Point2D3D;
@@ -52,14 +51,14 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	RefinePnPStereo refine;
 	AssociateStereo2D<TD> associateStereo;
 	PnPStereoDistanceReprojectionSq distance;
-	DistanceModelMonoPixels<Se3_F64,Point2D3D> distanceMono;
+	DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono;
 	Class<T> imageType;
 
 	public WrapVisOdomQuadPnP(VisOdomQuadPnP<T, TD> alg,
 							  RefinePnPStereo refine,
 							  AssociateStereo2D<TD> associateStereo,
 							  PnPStereoDistanceReprojectionSq distance,
-							  DistanceModelMonoPixels<Se3_F64,Point2D3D> distanceMono,
+							  DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono,
 							  Class<T> imageType)
 	{
 		this.alg = alg;
@@ -115,10 +114,11 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 		alg.setCalibration(parameters);
 		associateStereo.setCalibration(parameters);
-		distance.setStereoParameters(parameters);
+		distance.setLeftToRight(parameters.rightToLeft.invert(null));
+		distance.setIntrinsic(0,parameters.left);
+		distance.setIntrinsic(0,parameters.right);
 
-		CameraPinholeRadial left = parameters.left;
-		distanceMono.setIntrinsic(left.fx,left.fy,left.skew);
+		distanceMono.setIntrinsic(0,parameters.left);
 
 		if( refine != null )
 			refine.setLeftToRight(leftToRight);

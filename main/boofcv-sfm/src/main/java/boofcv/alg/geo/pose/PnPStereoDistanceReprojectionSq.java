@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,15 @@
 
 package boofcv.alg.geo.pose;
 
+import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.NormalizedToPixelError;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PnPStereoDistanceReprojectionSq implements DistanceFromModel<Se3_F64,Stereo2D3D> {
+public class PnPStereoDistanceReprojectionSq implements DistanceFromModelMultiView<Se3_F64,Stereo2D3D> {
 
 	// transform from world to left camera
 	private Se3_F64 worldToLeft;
@@ -56,15 +56,8 @@ public class PnPStereoDistanceReprojectionSq implements DistanceFromModel<Se3_F6
 	private NormalizedToPixelError leftPixelError;
 	private NormalizedToPixelError rightPixelError;
 
-	public void setStereoParameters(StereoParameters param)
-	{
-		this.leftToRight = param.getRightToLeft().invert(null);
-
-		CameraPinholeRadial left = param.left;
-		CameraPinholeRadial right = param.right;
-
-		leftPixelError = new NormalizedToPixelError(left.fx,left.fy,left.skew);
-		rightPixelError = new NormalizedToPixelError(right.fx,right.fy,right.skew);
+	public void setLeftToRight( Se3_F64 leftToRight ) {
+		this.leftToRight = leftToRight.copy();
 	}
 
 	@Override
@@ -112,5 +105,24 @@ public class PnPStereoDistanceReprojectionSq implements DistanceFromModel<Se3_F6
 	@Override
 	public Class<Se3_F64> getModelType() {
 		return Se3_F64.class;
+	}
+
+	@Override
+	public void setIntrinsic(int view, CameraPinhole intrinsic) {
+		if( view == 0 )
+			leftPixelError = new NormalizedToPixelError(intrinsic.fx,intrinsic.fy,intrinsic.skew);
+		else if( view == 1 )
+			rightPixelError = new NormalizedToPixelError(intrinsic.fx,intrinsic.fy,intrinsic.skew);
+	}
+
+	@Override
+	public int getNumberOfViews() {
+		return 2;
+	}
+
+	public void setStereoParameters(StereoParameters param) {
+		setLeftToRight(param.rightToLeft.invert(null));
+		setIntrinsic(0,param.left);
+		setIntrinsic(1,param.right);
 	}
 }

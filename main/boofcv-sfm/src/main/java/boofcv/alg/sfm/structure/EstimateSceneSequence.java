@@ -16,31 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.factory.geo;
-
-import boofcv.struct.Configuration;
+package boofcv.alg.sfm.structure;
 
 /**
- * Configuration parameters for estimating a fundamental matrix robustly.
- *
  * @author Peter Abeles
  */
-public class ConfigFundamental implements Configuration {
-
-	/**
-	 * Which algorithm should it use.
-	 */
-	public EnumFundamental which = EnumFundamental.LINEAR_7;
-
-	/**
-	 * How many points should be used to resolve ambiguity in the solutions?
-	 */
-	public int numResolve = 2;
-
-	public ConfigFundamental() {
-	}
-
-	@Override
-	public void checkValidity() {
-	}
+public class EstimateSceneSequence {
 }

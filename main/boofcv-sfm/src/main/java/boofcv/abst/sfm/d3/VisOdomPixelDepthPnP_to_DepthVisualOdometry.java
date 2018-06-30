@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.geo.DistanceModelMonoPixels;
+import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -55,7 +55,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	// low level algorithm
 	DepthSparse3D<Depth> sparse3D;
 	VisOdomPixelDepthPnP<Vis> alg;
-	DistanceModelMonoPixels<Se3_F64,Point2D3D> distance;
+	DistanceFromModelMultiView<Se3_F64,Point2D3D> distance;
 	ImageType<Vis> visualType;
 	Class<Depth> depthType;
 	boolean success;
@@ -63,7 +63,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	List<PointTrack> active = new ArrayList<>();
 
 	public VisOdomPixelDepthPnP_to_DepthVisualOdometry(DepthSparse3D<Depth> sparse3D, VisOdomPixelDepthPnP<Vis> alg,
-													   DistanceModelMonoPixels<Se3_F64, Point2D3D> distance,
+													   DistanceFromModelMultiView<Se3_F64, Point2D3D> distance,
 													   ImageType<Vis> visualType, Class<Depth> depthType) {
 		this.sparse3D = sparse3D;
 		this.alg = alg;
@@ -116,7 +116,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 		alg.setPixelToNorm(leftPixelToNorm);
 		alg.setNormToPixel(leftNormToPixel);
 
-		distance.setIntrinsic(paramVisual.fx,paramVisual.fy,paramVisual.skew);
+		distance.setIntrinsic(0,paramVisual);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,8 @@ public class TestDistanceHomographyPixelSq extends StandardDistanceTest<Homograp
 
 	@Override
 	public DistanceFromModel<Homography2D_F64, AssociatedPair> create() {
-		DistanceHomographyPixelSq alg = new DistanceHomographyPixelSq();
-		alg.setIntrinsic(K.get(0,0),K.get(1,1),K.get(0,1));
+		DistanceHomographyCalibratedSq alg = new DistanceHomographyCalibratedSq();
+		alg.setIntrinsic(0,PerspectiveOps.matrixToParam(K,500,300,null));
 		return alg;
 	}
 

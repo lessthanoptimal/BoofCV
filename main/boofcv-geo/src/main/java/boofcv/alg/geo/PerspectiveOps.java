@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,10 @@ import boofcv.alg.geo.impl.ImplPerspectiveOps_F64;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
+import georegression.geometry.UtilVector3D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
@@ -231,6 +233,46 @@ public class PerspectiveOps {
 	public static <C extends CameraPinhole>C matrixToParam(FMatrixRMaj K , int width , int height , C param )
 	{
 		return ImplPerspectiveOps_F32.matrixToParam(K, width, height, param);
+	}
+
+	/**
+	 * Given the transform from pixels to normalized image coordinates, create an approximate pinhole model
+	 * for this camera.
+	 *
+	 * @param pixelToNorm Pixel coordinates into normalized image coordinates
+	 * @param width Input image's width
+	 * @param height Input image's height
+	 * @return Approximate pinhole camera
+	 */
+	public static CameraPinhole estimatePinhole(Point2Transform2_F64 pixelToNorm , int width , int height ) {
+
+		Point2D_F64 normA = new Point2D_F64();
+		Point2D_F64 normB = new Point2D_F64();
+		Vector3D_F64 vectorA = new Vector3D_F64();
+		Vector3D_F64 vectorB = new Vector3D_F64();
+
+		pixelToNorm.compute(0,height/2,normA);
+		pixelToNorm.compute(width-1,height/2,normB);
+		vectorA.set(normA.x,normA.y,1);
+		vectorB.set(normB.x,normB.y,1);
+		double hfov = UtilVector3D_F64.acute(vectorA,vectorB);
+
+		pixelToNorm.compute(width/2,0,normA);
+		pixelToNorm.compute(width/2,height,normB);
+		vectorA.set(normA.x,normA.y,1);
+		vectorB.set(normB.x,normB.y,1);
+		double vfov = UtilVector3D_F64.acute(vectorA,vectorB);
+
+		CameraPinhole intrinsic = new CameraPinhole();
+		intrinsic.width = width;
+		intrinsic.height = height;
+		intrinsic.skew = 0;
+		intrinsic.cx = width/2;
+		intrinsic.cy = height/2;
+		intrinsic.fx = intrinsic.cx/Math.tan(hfov/2);
+		intrinsic.fy = intrinsic.cy/Math.tan(vfov/2);
+
+		return intrinsic;
 	}
 
 	/**

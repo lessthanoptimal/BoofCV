@@ -146,6 +146,11 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
+	public void estimatePinhole() {
+		fail("Implement");
+	}
+
+	@Test
 	public void convertNormToPixel_intrinsic_F64() {
 		CameraPinholeRadial intrinsic = new CameraPinholeRadial(100,150,0.1,120,209,500,600);
 

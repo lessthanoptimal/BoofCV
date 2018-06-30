@@ -19,7 +19,6 @@
 package boofcv.factory.geo;
 
 import boofcv.struct.Configuration;
-import boofcv.struct.calib.CameraPinholeRadial;
 
 /**
  * Configuration parameters for solving the PnP problem
@@ -42,15 +41,6 @@ public class ConfigPnP implements Configuration {
 	 * Number of iterations for EPNP. Ignored by everything else
 	 */
 	public int epnpIterations = 10;
-
-	/**
-	 * Intrinsic camera parameters.  Used to compute error in pixels.
-	 */
-	public CameraPinholeRadial intrinsic;
-
-	public ConfigPnP(CameraPinholeRadial intrinsic) {
-		this.intrinsic = intrinsic;
-	}
 
 	@Override
 	public void checkValidity() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
+import boofcv.alg.geo.robust.RansacMultiView;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
@@ -49,7 +50,6 @@ import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
@@ -150,8 +150,10 @@ public class ExampleStereoTwoViewsOneCamera {
 	public static Se3_F64 estimateCameraMotion(CameraPinholeRadial intrinsic,
 											   List<AssociatedPair> matchedNorm, List<AssociatedPair> inliers)
 	{
-		ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
-				FactoryMultiViewRobust.essentialRansac(new ConfigEssential(intrinsic),new ConfigRansac(200,0.5));
+		RansacMultiView<Se3_F64, AssociatedPair> epipolarMotion =
+				FactoryMultiViewRobust.essentialRansac(new ConfigEssential(),new ConfigRansac(200,0.5));
+		epipolarMotion.setIntrinsic(0,intrinsic);
+		epipolarMotion.setIntrinsic(1,intrinsic);
 
 		if (!epipolarMotion.process(matchedNorm))
 			throw new RuntimeException("Motion estimation failed");

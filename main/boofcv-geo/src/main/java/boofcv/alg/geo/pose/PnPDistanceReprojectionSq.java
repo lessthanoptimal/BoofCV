@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,9 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.alg.geo.DistanceModelMonoPixels;
+import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.NormalizedToPixelError;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.Point2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -40,7 +41,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PnPDistanceReprojectionSq implements DistanceModelMonoPixels<Se3_F64,Point2D3D> {
+public class PnPDistanceReprojectionSq implements DistanceFromModelMultiView<Se3_F64,Point2D3D> {
 
 	// transform from world to camera
 	private Se3_F64 worldToCamera;
@@ -50,26 +51,6 @@ public class PnPDistanceReprojectionSq implements DistanceModelMonoPixels<Se3_F6
 
 	// computes the error in units of pixels
 	private NormalizedToPixelError pixelError;
-
-	public PnPDistanceReprojectionSq() {
-		this(1,1,0);
-	}
-
-	/**
-	 * Computes reprojection error in pixels when provided to camera's intrinsic calibration.
-	 *
-	 * @param fx focal length x
-	 * @param fy focal length y
-	 * @param skew pixel skew
-	 */
-	public PnPDistanceReprojectionSq(double fx, double fy, double skew) {
-		setIntrinsic(fx,fy,skew);
-	}
-
-	@Override
-	public void setIntrinsic(double fx, double fy, double skew) {
-		pixelError = new NormalizedToPixelError(fx,fy,skew);
-	}
 
 	@Override
 	public void setModel(Se3_F64 worldToCamera) {
@@ -104,5 +85,15 @@ public class PnPDistanceReprojectionSq implements DistanceModelMonoPixels<Se3_F6
 	@Override
 	public Class<Se3_F64> getModelType() {
 		return Se3_F64.class;
+	}
+
+	@Override
+	public void setIntrinsic(int view, CameraPinhole intrinsic) {
+		pixelError = new NormalizedToPixelError(intrinsic.fx,intrinsic.fy,intrinsic.skew);
+	}
+
+	@Override
+	public int getNumberOfViews() {
+		return 1;
 	}
 }

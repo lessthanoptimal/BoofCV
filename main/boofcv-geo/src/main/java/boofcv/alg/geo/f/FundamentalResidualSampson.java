@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.alg.geo.ModelObservationResidual;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 
 /**
@@ -57,9 +56,9 @@ public class FundamentalResidualSampson
 		GeometryMath_F64.multTran(F, observation.p2, temp);
 		bottom += temp.x*temp.x + temp.y*temp.y;
 
-		bottom = Math.sqrt(bottom);
+//		bottom = Math.sqrt(bottom);
 
-		if( bottom <= UtilEjml.EPS) {
+		if( bottom == 0) {
 			return Double.MAX_VALUE;
 		} else {
 			GeometryMath_F64.multTran(F,observation.p2,temp);

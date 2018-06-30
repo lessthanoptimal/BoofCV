@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.factory.geo;
 
 import boofcv.struct.Configuration;
-import boofcv.struct.calib.CameraPinholeRadial;
 
 /**
  * Configuration parameters for estimating an essential matrix robustly.
@@ -37,15 +36,6 @@ public class ConfigEssential implements Configuration {
 	 * How many points should be used to resolve ambiguity in the solutions?
 	 */
 	public int numResolve = 2;
-
-	/**
-	 * Intrinsic camera parameters.  Used to compute error in pixels.
-	 */
-	public CameraPinholeRadial intrinsic;
-
-	public ConfigEssential(CameraPinholeRadial intrinsic) {
-		this.intrinsic = intrinsic;
-	}
 
 	public ConfigEssential() {
 	}

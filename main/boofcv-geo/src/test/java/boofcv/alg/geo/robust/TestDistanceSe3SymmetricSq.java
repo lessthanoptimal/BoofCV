@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,9 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
@@ -46,7 +48,8 @@ public class TestDistanceSe3SymmetricSq {
 	
 	public TestDistanceSe3SymmetricSq() {
 		alg = new DistanceSe3SymmetricSq(triangulate);
-		alg.setIntrinsic(1,1,0,1,1,0);
+		alg.setIntrinsic(0, new CameraPinhole(1,1,0,0,0,0,0));
+		alg.setIntrinsic(1, new CameraPinhole(1,1,0,0,0,0,0));
 	}
 	
 	@Test
@@ -195,8 +198,8 @@ public class TestDistanceSe3SymmetricSq {
 		GeometryMath_F64.mult(K2_inv,obsP.p2,obsP.p2);
 
 		DistanceSe3SymmetricSq alg = new DistanceSe3SymmetricSq(triangulate);
-		alg.setIntrinsic(K.get(0,0),K.get(1,1),K.get(0,1),
-				K2.get(0,0),K2.get(1,1),K2.get(0,1));
+		alg.setIntrinsic(0,PerspectiveOps.matrixToParam(K,0,0,null));
+		alg.setIntrinsic(1,PerspectiveOps.matrixToParam(K,0,0,null));
 		alg.setModel(keyToCurr);
 		assertEquals(error, alg.computeDistance(obsP), 1e-8);
 	}
