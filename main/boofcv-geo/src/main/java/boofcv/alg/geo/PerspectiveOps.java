@@ -291,6 +291,15 @@ public class PerspectiveOps {
 		return ImplPerspectiveOps_F64.convertNormToPixel(param, x, y, pixel);
 	}
 
+	public static Point2D_F64 convertNormToPixel( CameraPinhole param , double x , double y , Point2D_F64 pixel ) {
+		if( pixel == null )
+			pixel = new Point2D_F64();
+		pixel.x = param.fx * x + param.skew * y + param.cx;
+		pixel.y = param.fy * y + param.cy;
+
+		return pixel;
+	}
+
 	/**
 	 * <p>
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.

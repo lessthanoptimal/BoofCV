@@ -134,6 +134,7 @@ public class ExampleMultiviewSceneReconstruction {
 					continue;
 				int rgb = image.getRGB((int)pixel.x,(int)pixel.y);
 				gui.addPoint(world.x,world.y,world.z,rgb);
+				break;
 			}
 		}
 
@@ -150,7 +151,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 
-		int N = 2;
+		int N = 5;
 		while( images.size() > N ) {
 			images.remove(N);
 		}
