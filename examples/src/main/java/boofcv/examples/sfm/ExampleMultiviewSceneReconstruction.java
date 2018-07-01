@@ -138,7 +138,7 @@ public class ExampleMultiviewSceneReconstruction {
 		}
 
 		gui.setPreferredSize(new Dimension(500,500));
-		ShowImages.showWindow(gui, "Points", true);
+		ShowImages.showWindow(gui, "Reconstruction Points", true);
 	}
 
 	public static void main(String[] args) {
@@ -150,8 +150,9 @@ public class ExampleMultiviewSceneReconstruction {
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 
-		while( images.size() > 5 ) {
-			images.remove(5);
+		int N = 2;
+		while( images.size() > N ) {
+			images.remove(N);
 		}
 
 		ExampleMultiviewSceneReconstruction example = new ExampleMultiviewSceneReconstruction();

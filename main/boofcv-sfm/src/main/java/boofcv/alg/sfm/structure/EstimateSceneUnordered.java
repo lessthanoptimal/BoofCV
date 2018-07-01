@@ -100,7 +100,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 	List<CameraView> graphNodes = new ArrayList<>();
 	List<CameraMotion> graphEdges = new ArrayList<>();
-	List<Feature3D> featuresAll = new ArrayList<>();
+	List<Feature3D> features3D = new ArrayList<>();
 
 	// This are the views were actually added
 	List<CameraView> viewsAdded = new ArrayList<>();
@@ -117,6 +117,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
 		associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
 		configRansac.inlierThreshold = 3.0;
+		configRansac.maxIterations = 2000;
 	}
 
 	@Override
@@ -151,7 +152,14 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		if( cameraName == null || !camerasPixelToNorm.containsKey(cameraName))
 			throw new IllegalArgumentException("Must specify the camera first");
 
-		CameraView view = new CameraView(graphNodes.size());
+		CameraView view = new CameraView(graphNodes.size(),
+				new FastQueue<TupleDesc>(TupleDesc.class,true) {
+					@Override
+					protected TupleDesc createInstance() {
+						return detDesc.createDescription();
+					}
+				});
+
 		view.camera = cameraName;
 		graphNodes.add(view);
 
@@ -160,6 +168,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		// Pre-declare memory
 		view.descriptions.growArray(detDesc.getNumberOfFeatures());
 		view.featurePixels.growArray(detDesc.getNumberOfFeatures());
+		view.features3D = new Feature3D[detDesc.getNumberOfFeatures()];
 
 		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
 			Point2D_F64 p = detDesc.getLocation(i);
@@ -203,7 +212,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 					return false;
 			}
 		}
-		if( graphEdges.size() < 2 )
+		if( graphEdges.size() < 1 )
 			return false;
 
 		// Select the view which will act as the origin
@@ -231,7 +240,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		structure = new BundleAdjustmentSceneStructure(false);
 		observations = new BundleAdjustmentObservations(graphNodes.size());
 
-		structure.initialize(camerasPixelToNorm.size(),graphNodes.size(),featuresAll.size());
+		structure.initialize(camerasPixelToNorm.size(),graphNodes.size(), features3D.size());
 
 		for( int i = 0; i < graphNodes.size(); i++ ) {
 			CameraView v = graphNodes.get(i);
@@ -239,10 +248,13 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			structure.connectViewToCamera(i,0);
 		}
 
-		for (int indexPoint = 0; indexPoint < featuresAll.size(); indexPoint++) {
-			Feature3D f = featuresAll.get(indexPoint);
+		for (int indexPoint = 0; indexPoint < features3D.size(); indexPoint++) {
+			Feature3D f = features3D.get(indexPoint);
 
 			structure.setPoint(indexPoint,f.worldPt.x,f.worldPt.y,f.worldPt.z);
+
+			if( f.views.size() != f.feature.size )
+				throw new RuntimeException("BUG!");
 
 			for (int j = 0; j < f.views.size(); j++) {
 				CameraView view = f.views.get(j);
@@ -407,6 +419,9 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			f.views.add(target);
 			f.feature.add(featureIndexes.get(which));
 			target.features3D[featureIndexes.get(which)] = f;
+
+			if( f.views.size() != f.feature.size )
+				throw new RuntimeException("BUG!");
 		}
 
 		Se3_F64 worldToView = ransacPnP.getModelParameters();
@@ -424,13 +439,15 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 		Se3_F64 otherToTarget = new Se3_F64();
 
+		Se3_F64 worldToTarget = target.viewToWorld.invert(null);
+
 		for( CameraMotion c : target.connections ) {
 			boolean isSrc = c.viewSrc == target;
 			CameraView other = c.destination(target);
 			if( other.distanceFromRoot < 0 )
 				continue;
 
-			other.viewToWorld.concat(target.viewToWorld.invert(null),otherToTarget);
+			other.viewToWorld.concat(worldToTarget,otherToTarget);
 
 			for (int i = 0; i < c.features.size(); i++) {
 				AssociatedIndex a = c.features.get(i);
@@ -461,7 +478,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 				f.views.add( other );
 				f.feature.add( indexTarget );
 				f.feature.add( indexOther );
-				featuresAll.add(f);
+
+				features3D.add(f);
 				target.features3D[indexTarget] = f;
 				other.features3D[indexOther] = f;
 			}
@@ -483,20 +501,25 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		}
 	}
 
-	private void defineCoordinateSystem(CameraView origin, CameraMotion baseMotion) {
-		CameraView dst = baseMotion.destination(origin);
-		origin.viewToWorld.reset();
-		dst.viewToWorld.set(baseMotion.motionSrcToDst(dst));
-		dst.viewToWorld.T.normalize();
+	private void defineCoordinateSystem(CameraView viewA, CameraMotion baseMotion) {
+		CameraView viewB = baseMotion.destination(viewA);
+		viewA.viewToWorld.reset();
+		viewB.viewToWorld.set(baseMotion.motionSrcToDst(viewB));
+		viewB.viewToWorld.T.normalize();
 
-		viewsAdded.add(origin);
-		viewsAdded.add(dst);
+		viewsAdded.add(viewA);
+		viewsAdded.add(viewB);
+
+		viewA.distanceFromRoot = 0;
+		viewB.distanceFromRoot = 1;
 	}
 
 	CameraView selectOriginNode() {
 		double bestScore = 0;
 		CameraView best = null;
 
+		if( verbose )
+			System.out.println("selectOriginNode");
 		for (int i = 0; i < graphNodes.size(); i++) {
 			double maxEdgeScore = 0;
 			int totalEdgeFeatures = 0;
@@ -513,6 +536,9 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 				bestScore = score;
 				best = graphNodes.get(i);
 			}
+
+			if( verbose )
+				System.out.printf("  [%2d] score = %s\n",i,score);
 		}
 
 		return best;
@@ -525,10 +551,14 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		double bestScore = 0;
 		CameraMotion best = null;
 
+		if( verbose )
+			System.out.println("selectCoordinateBase");
 		for (int i = 0; i < view.connections.size(); i++) {
 			CameraMotion e = view.connections.get(i);
 
 			double s = e.scoreTriangulation();
+			if( verbose )
+				System.out.printf("  [%2d] score = %s\n",i,s);
 			if( s > bestScore ) {
 				bestScore = s;
 				best = e;
@@ -549,6 +579,10 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		Vector3D_F64 arrowA = new Vector3D_F64();
 		Vector3D_F64 arrowB = new Vector3D_F64();
 
+		Se3_F64 viewAtoB = new Se3_F64();
+		viewA.viewToWorld.concat(viewB.viewToWorld.invert(null),viewAtoB);
+
+
 		for (int i = 0; i < edge.features.size(); i++) {
 			AssociatedIndex f = edge.features.get(i);
 
@@ -567,19 +601,19 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			// the more parallel a line is worse the triangulation. Get rid of bad ideas early here
 			arrowA.set(normA.x,normA.y,1);
 			arrowB.set(normB.x,normB.y,1);
-			GeometryMath_F64.mult(edge.a_to_b.R,arrowA,arrowA); // put them into the same reference frame
+			GeometryMath_F64.mult(viewAtoB.R,arrowA,arrowA); // put them into the same reference frame
 
 			double angle = UtilVector3D_F64.acute(arrowA,arrowB);
 			if( angle < TRIANGULATE_MIN_ANGLE )
 				continue;
 
-			if( !triangulate.triangulate(normA,normB,edge.a_to_b,feature3D.worldPt) ) {
+			if( !triangulate.triangulate(normA,normB,viewAtoB,feature3D.worldPt) ) {
 				System.out.println("  triangulation failed??!");
 				continue;
 			}
 
 			if( viewB == origin ) {
-				SePointOps_F64.transformReverse(edge.a_to_b,feature3D.worldPt,feature3D.worldPt);
+				SePointOps_F64.transformReverse(viewAtoB,feature3D.worldPt,feature3D.worldPt);
 			}
 
 			// mark this feature3D as being associated with these image features
@@ -595,9 +629,10 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			feature3D.views.add(viewB);
 
 			// Add it to the overall list
-			featuresAll.add(feature3D);
+			features3D.add(feature3D);
 		}
-		System.out.println("Initialized features from views "+viewA.index+" and "+viewB.index+" featuresAll="+featuresAll.size()+"  edges.size="+edge.features.size());
+
+		System.out.println("Initialized features from views "+viewA.index+" and "+viewB.index+" features3D="+ features3D.size()+"  edges.size="+edge.features.size());
 	}
 
 	/**
@@ -614,24 +649,22 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 		FastQueue<AssociatedIndex> matches = associate.getMatches();
 
-		pairs.resize(matches.size);
-
 		CameraMotion edge = new CameraMotion();
-		edge.viewSrc = viewA;
-		edge.viewDst = viewB;
 
 		// Estimate fundamental/essential with RANSAC
 		int inliersEpipolar;
 		if( calibrated ) {
 			ransacEssential.setIntrinsic(0,camerasIntrinsc.get(viewA.camera));
 			ransacEssential.setIntrinsic(1,camerasIntrinsc.get(viewB.camera));
-			fitEpipolar(matches, viewA.featureNorm, viewB.featureNorm,ransacEssential,edge);
+			if( !fitEpipolar(matches, viewA.featureNorm, viewB.featureNorm,ransacEssential,edge) )
+				return;
 			inliersEpipolar = ransacEssential.getMatchSet().size();
 			edge.a_to_b.set( ransacEssential.getModelParameters() );
 			ransacHomography.setIntrinsic(0,camerasIntrinsc.get(viewA.camera));
 			ransacHomography.setIntrinsic(1,camerasIntrinsc.get(viewB.camera));
 		} else {
-			fitEpipolar(matches, viewA.featurePixels, viewB.featurePixels,ransacFundamental,edge);
+			if( !fitEpipolar(matches, viewA.featurePixels, viewB.featurePixels,ransacFundamental,edge) )
+				return;
 			inliersEpipolar = ransacFundamental.getMatchSet().size();
 			// TODO save rigid body estimate
 		}
@@ -645,31 +678,37 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 		// If the geometry is good for triangulation this number will be lower
 		edge.ratio_H_to_Epi = ransacHomography.getMatchSet().size()/(double)inliersEpipolar;
+		edge.viewSrc = viewA;
+		edge.viewDst = viewB;
 		viewA.connections.add(edge);
 		viewB.connections.add(edge);
-		for (int i = 0; i < ransacEssential.getMatchSet().size(); i++) {
-			edge.features.add( matches.get(ransacEssential.getInputIndex(i)).copy() );
+		List<AssociatedPair> inliersEssential = ransacEssential.getMatchSet();
+		for (int i = 0; i < inliersEssential.size(); i++) {
+			int index = ransacEssential.getInputIndex(i);
+			edge.features.add( matches.get(index).copy() );
 		}
 		graphEdges.add(edge);
 	}
 
-	void fitEpipolar( FastQueue<AssociatedIndex> matches ,
+	boolean fitEpipolar( FastQueue<AssociatedIndex> matches ,
 					  FastQueue<Point2D_F64> pointsA , FastQueue<Point2D_F64> PointsB ,
 					  Ransac<?,AssociatedPair> ransac ,
 					  CameraMotion edge )
 	{
+		pairs.resize(matches.size);
 		for (int i = 0; i < matches.size; i++) {
 			AssociatedIndex a = matches.get(i);
 			pairs.get(i).p1.set(pointsA.get(a.src));
 			pairs.get(i).p2.set(PointsB.get(a.dst));
 		}
 		if( !ransac.process(pairs.toList()) )
-			return;
+			return false;
 		int N = ransac.getMatchSet().size();
 		for (int i = 0; i < N; i++) {
 			AssociatedIndex a = matches.get(ransac.getInputIndex(i));
 			edge.features.add( a.copy() );
 		}
+		return true;
 	}
 
 	@Override
@@ -714,7 +753,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		this.verbose = verbose;
 	}
 
-	class CameraView {
+	static class CameraView {
 		String camera;
 		int index;
 		Se3_F64 viewToWorld = new Se3_F64();
@@ -734,19 +773,13 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		// Estimated 3D location for SOME of the features
 		Feature3D[] features3D;
 
-		public CameraView(int index) {
+		public CameraView(int index, FastQueue<TupleDesc> descriptions ) {
 			this.index = index;
-
-			descriptions = new FastQueue<TupleDesc>(TupleDesc.class,true) {
-				@Override
-				protected TupleDesc createInstance() {
-					return detDesc.createDescription();
-				}
-			};
+			this.descriptions = descriptions;
 		}
 	}
 
-	class CameraMotion {
+	static class CameraMotion {
 		// if the transform of both views is known then this will be scaled to be in world units
 		// otherwise it's in arbitrary units
 		Se3_F64 a_to_b = new Se3_F64();
@@ -791,13 +824,12 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		}
 	}
 
-	class Feature3D {
+	static class Feature3D {
 		// estimate 3D position of the feature in world frame
 		Point3D_F64 worldPt = new Point3D_F64();
 		// index of each frame its visible in
 		GrowQueue_I32 feature = new GrowQueue_I32();
 		List<CameraView> views = new ArrayList<>();
-		boolean included=false;
 		int mark = -1;
 	}
 }
