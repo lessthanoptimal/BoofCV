@@ -16,34 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.triangulate;
+package boofcv.alg.geo.robust;
 
-import georegression.struct.point.Point3D_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-/**
- * @author Peter Abeles
- */
-public class TestTriangulateGeometric extends CommonTriangulationChecks {
+public class TestSelectBestStereoTransform {
 
-	/**
-	 * Create 2 perfect observations and solve for the position
-	 */
 	@Test
-	public void triangulate_two() {
-		createScene();
-
-		TriangulateGeometric alg = new TriangulateGeometric();
-
-		Point3D_F64 found = new Point3D_F64();
-		for (int i = 1; i < N; i++) {
-			alg.triangulate(obsPts.get(0),obsPts.get(i), motionWorldToCamera.get(i),found);
-
-			assertEquals(worldPoint.x,found.x,1e-8);
-			assertEquals(worldPoint.y,found.y,1e-8);
-			assertEquals(worldPoint.z,found.z,1e-8);
-		}
+	public void stuff() {
+		fail("Implement");
 	}
 }

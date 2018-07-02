@@ -91,7 +91,11 @@ public class TestEstimateSceneUnordered extends GenericSceneStructureChecks {
 	}
 
 	@Test
-	public void connectViews() {
+	public void connectViews_calibrated()
+	{
+		createWorld(2,3);
+
+
 		fail("implement");
 	}
 

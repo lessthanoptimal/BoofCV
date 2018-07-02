@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.alg.geo.robust;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.geo.DecomposeEssential;
-import boofcv.alg.geo.PositiveDepthConstraintCheck;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelGenerator;
@@ -40,10 +39,11 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 
 	// Estimates essential matrix from observations
 	Estimate1ofEpipolar computeEssential;
+
+	SelectBestStereoTransform selectBest;
+
 	// decomposes essential matrix to extract motion
 	DecomposeEssential decomposeE = new DecomposeEssential();
-	// used to select best hypothesis
-	PositiveDepthConstraintCheck depthCheck;
 
 	DMatrixRMaj E = new DMatrixRMaj(3,3);
 
@@ -55,7 +55,8 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 	public Se3FromEssentialGenerator(Estimate1ofEpipolar computeEssential,
 									 TriangulateTwoViewsCalibrated triangulate ) {
 		this.computeEssential = computeEssential;
-		this.depthCheck = new PositiveDepthConstraintCheck(triangulate);
+
+		selectBest = new SelectBestStereoTransform(triangulate);
 	}
 
 	/**
@@ -72,27 +73,8 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 
 		// extract the possible motions
 		decomposeE.decompose(E);
-		List<Se3_F64> candidates = decomposeE.getSolutions();
+		selectBest.select(decomposeE.getSolutions(),dataSet,model);
 
-		// use positive depth constraint to select the best one
-		Se3_F64 bestModel = null;
-		int bestCount = -1;
-		for( int i = 0; i < candidates.size(); i++ ) {
-			Se3_F64 s = candidates.get(i);
-			int count = 0;
-			for( AssociatedPair p : dataSet ) {
-				if( depthCheck.checkConstraint(p.p1,p.p2,s)) {
-					count++;
-				}
-			}
-
-			if( count > bestCount ) {
-				bestCount = count;
-				bestModel = s;
-			}
-		}
-
-		model.set(bestModel);
 		return true;
 	}
 

@@ -21,12 +21,15 @@ package boofcv.alg.sfm.structure;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.geo.RefineEpipolar;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
 import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.robust.RansacMultiView;
+import boofcv.alg.geo.robust.SelectBestStereoTransform;
 import boofcv.alg.sfm.EstimateSceneStructure;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.geo.*;
@@ -39,7 +42,6 @@ import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilVector3D_F64;
-import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -47,13 +49,11 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Assumes the input images are in an arbitrary order and that any image can be connected to any other image.
@@ -64,13 +64,16 @@ import java.util.Map;
  *
  * @author Peter Abeles
  */
+// TODO This approach is very sensitive to the origin which is selected
+	//
 public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateSceneStructure<T>
 {
 	// Used to pre-maturely stop the scene estimation process
 	private volatile boolean stopRequested = false;
 
+	private double MIN_ASSOCIATE_FRACTION = 0.05;
 	private int MIN_FEATURE_ASSOCIATED = 30;
-	private double TRIANGULATE_MIN_ANGLE = 0.05;
+	private double TRIANGULATE_MIN_ANGLE = Math.PI/20.0;
 
 	ConfigEssential configEssential = new ConfigEssential();
 	ConfigFundamental configFundamental = new ConfigFundamental();
@@ -93,8 +96,9 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 	RansacMultiView<Se3_F64,AssociatedPair> ransacEssential;
 	Ransac<DMatrixRMaj,AssociatedPair> ransacFundamental;
-	RansacMultiView<Homography2D_F64,AssociatedPair> ransacHomography;
 	RansacMultiView<Se3_F64, Point2D3D> ransacPnP;
+
+	RefineEpipolar refineEpipolar;
 
 	// Temporary storage for feature pairs which are inliers
 	FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class,true);
@@ -108,6 +112,10 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 	// This are the views were actually added
 	List<CameraView> viewsAdded = new ArrayList<>();
+
+	// work space for feature angles
+	private Vector3D_F64 arrowA = new Vector3D_F64();
+	private Vector3D_F64 arrowB = new Vector3D_F64();
 
 	// Output
 	BundleAdjustmentSceneStructure structure;
@@ -127,8 +135,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	 * Constructor for unit tests
 	 */
 	EstimateSceneUnordered() {
-		configRansac.inlierThreshold = 3.0;
-		configRansac.maxIterations = 2000;
+		configRansac.inlierThreshold = 2.5;
+		configRansac.maxIterations = 4000;
 	}
 
 	@Override
@@ -200,6 +208,10 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			Point2D_F64 p = view.observationPixels.get(i);
 			pixelToNorm.compute(p.x,p.y,view.observationNorm.grow());
 		}
+
+		if( verbose ) {
+			System.out.println("Detected Features: "+detDesc.getNumberOfFeatures());
+		}
 	}
 
 	@Override
@@ -243,13 +255,12 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	protected void declareModelFitting() {
 		if( calibrated ) {
 			ransacEssential = FactoryMultiViewRobust.essentialRansac(configEssential, configRansac);
-			ransacHomography = FactoryMultiViewRobust.homographyCalibratedRansac(configRansac);
 			ransacPnP = FactoryMultiViewRobust.pnpRansac(null,configRansac);
 		} else {
 			ransacFundamental = FactoryMultiViewRobust.fundamentalRansac(configFundamental, configRansac);
-//			ransacHomography = FactoryMultiViewRobust.homographyRansac(new ConfigHomography(true),configRansac);
 			// TODO figure out how to do  PnP in uncalibrated case
 		}
+		refineEpipolar = FactoryMultiView.refineFundamental(1e-32,10,EpipolarError.SAMPSON);
 	}
 
 	/**
@@ -259,9 +270,17 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	 */
 	private void convertToOutput( CameraView origin ) {
 		structure = new BundleAdjustmentSceneStructure(false);
-		observations = new BundleAdjustmentObservations(graphNodes.size());
+		observations = new BundleAdjustmentObservations(viewsAdded.size());
 
-		structure.initialize(cameraToIndex.size(),graphNodes.size(), features3D.size());
+		structure.initialize(cameraToIndex.size(),viewsAdded.size(), features3D.size());
+
+		// look up table from old index to new index
+		int viewOldToView[] = new int[ graphNodes.size() ];
+		Arrays.fill(viewOldToView,-1);
+		for (int i = 0; i < viewsAdded.size(); i++) {
+			viewOldToView[ graphNodes.indexOf(viewsAdded.get(i))] = i;
+		}
+
 
 		for( int i = 0; i < viewsAdded.size(); i++ ) {
 			CameraView v = viewsAdded.get(i);
@@ -280,10 +299,11 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 			for (int j = 0; j < f.views.size(); j++) {
 				CameraView view = f.views.get(j);
-				structure.connectPointToView(indexPoint,view.index);
+				int viewIndex = viewOldToView[view.index];
+				structure.connectPointToView(indexPoint,viewIndex);
 
-				Point2D_F64 pixel = graphNodes.get(view.index).observationPixels.get(f.obsIdx.get(j));
-				observations.getView(view.index).add(indexPoint,(float)(pixel.x),(float)(pixel.y));
+				Point2D_F64 pixel = viewsAdded.get(viewIndex).observationPixels.get(f.obsIdx.get(j));
+				observations.getView(viewIndex).add(indexPoint,(float)(pixel.x),(float)(pixel.y));
 			}
 		}
 
@@ -326,7 +346,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			if( !determinePose(v) ) {
 				// The pose could not be determined, so remove it from the graph
 				if( verbose )
-					System.out.println("Removing connection");
+					System.out.println("   Removing connection");
 				for (CameraMotion m : v.connections) {
 					CameraView a = m.destination(v);
 					a.connections.remove(m);
@@ -343,9 +363,10 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 				triangulateNoLocation(v);
 
 				viewsAdded.add(v);
+
+				// Update the open list
+				addUnvistedToStack(v, open);
 			}
-			// Update the open list
-			addUnvistedToStack(v, open);
 		}
 	}
 
@@ -390,16 +411,14 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		List<Feature3D> features = new ArrayList<>();
 		GrowQueue_I32 featureIndexes = new GrowQueue_I32();
 
-		int closestDistance = Integer.MAX_VALUE;
 
-		// TODO mark need to handle casees where the target's index hsa changed due to node removal
+		// TODO mark need to handle casees where the target's index has changed due to node removal
 		// Find all the known 3D features which are visible in this view
 		for( CameraMotion c : target.connections ) {
 			boolean isSrc = c.viewSrc == target;
 			CameraView other = c.destination(target);
-			if( other.distanceFromRoot < 0 )
+			if( other.state != ViewState.PROCESSED )
 				continue;
-			closestDistance = Math.min(closestDistance,other.distanceFromRoot);
 
 			for (int i = 0; i < c.features.size(); i++) {
 				AssociatedIndex a = c.features.get(i);
@@ -423,16 +442,16 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		ransacPnP.setIntrinsic(0,camerasIntrinsc.get(target.camera));
 		if( list.size() < 100 || !ransacPnP.process(list) ) {
 			if (verbose)
-				System.out.println("View="+target.index+" RANSAC failed. list.size="+list.size());
+				System.out.println("   View="+target.index+" RANSAC failed. list.size="+list.size());
 			return false;
 		}
 
-		target.distanceFromRoot = closestDistance+1;
+		target.state = ViewState.PROCESSED;
 
 		// add inliers to the features
 		int N = ransacPnP.getMatchSet().size();
 		if( verbose )
-			System.out.println("View="+target.index+" PNP RANSAC "+N+"/"+list.size());
+			System.out.println("   View="+target.index+" PNP RANSAC "+N+"/"+list.size());
 		for (int i = 0; i < N; i++) {
 			int which = ransacPnP.getInputIndex(i);
 			Feature3D f = features.get(which);
@@ -454,9 +473,6 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 	private void triangulateNoLocation( CameraView target ) {
 
-		Vector3D_F64 arrowA = new Vector3D_F64();
-		Vector3D_F64 arrowB = new Vector3D_F64();
-
 		TriangulateTwoViewsCalibrated triangulator = FactoryMultiView.triangulateTwoGeometric();
 
 		Se3_F64 otherToTarget = new Se3_F64();
@@ -466,7 +482,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		for( CameraMotion c : target.connections ) {
 			boolean isSrc = c.viewSrc == target;
 			CameraView other = c.destination(target);
-			if( other.distanceFromRoot < 0 )
+			if( other.state != ViewState.PROCESSED )
 				continue;
 
 			other.viewToWorld.concat(worldToTarget,otherToTarget);
@@ -482,12 +498,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 				Point2D_F64 normOther = other.observationNorm.get( indexOther );
 				Point2D_F64 normTarget = target.observationNorm.get( indexTarget );
 
-				// the more parallel a line is worse the triangulation. Get rid of bad ideas early here
-				arrowA.set(normOther.x,normOther.y,1);
-				arrowB.set(normTarget.x,normTarget.y,1);
-				GeometryMath_F64.mult(otherToTarget.R,arrowA,arrowA); // put them into the same reference frame
-
-				double angle = UtilVector3D_F64.acute(arrowA,arrowB);
+				// Skip points with poor geometry
+				double angle = triangulationAngle(normOther,normTarget,otherToTarget);
 				if( angle < TRIANGULATE_MIN_ANGLE )
 					continue;
 
@@ -509,13 +521,26 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	}
 
 	/**
+	 * Computes the acture angle between two vectors. Larger this angle is the better the triangulation
+	 * of the features 3D location is in general
+	 */
+	private double triangulationAngle( Point2D_F64 normA , Point2D_F64 normB , Se3_F64 a_to_b ) {
+		// the more parallel a line is worse the triangulation. Get rid of bad ideas early here
+		arrowA.set(normA.x,normA.y,1);
+		arrowB.set(normB.x,normB.y,1);
+		GeometryMath_F64.mult(a_to_b.R,arrowA,arrowA); // put them into the same reference frame
+
+		return UtilVector3D_F64.acute(arrowA,arrowB);
+	}
+
+	/**
 	 * Looks to see which connections have yet to be visited and adds them to the open list
 	 */
 	private void addUnvistedToStack(CameraView viewed, List<CameraView> open) {
 		for (int i = 0; i < viewed.connections.size(); i++) {
 			CameraView other = viewed.connections.get(i).destination(viewed);
-			if( other.distanceFromRoot < -1) {
-				other.distanceFromRoot = -1; // mark it as in the open list
+			if( other.state == ViewState.UNPROCESSED) {
+				other.state = ViewState.PENDING;
 				open.add(other);
 				if( verbose)
 					System.out.println("  adding to open "+viewed.index+"->"+other.index);
@@ -524,16 +549,45 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	}
 
 	private void defineCoordinateSystem(CameraView viewA, CameraMotion baseMotion) {
+
+//		refineEpipolarMotion(baseMotion);
+
 		CameraView viewB = baseMotion.destination(viewA);
-		viewA.viewToWorld.reset();
+		viewA.viewToWorld.reset(); // identity since it's the origin
 		viewB.viewToWorld.set(baseMotion.motionSrcToDst(viewB));
-		viewB.viewToWorld.T.normalize();
+		viewB.viewToWorld.T.normalize(); // only known up to a scale factor
 
 		viewsAdded.add(viewA);
 		viewsAdded.add(viewB);
 
-		viewA.distanceFromRoot = 0;
-		viewB.distanceFromRoot = 1;
+		viewA.state = ViewState.PROCESSED;
+		viewB.state = ViewState.PROCESSED;
+
+		System.out.println("root  = "+viewA.index);
+		System.out.println("other = "+viewB.index);
+		System.out.println("-------------");
+
+	}
+
+	// TODO does this make a difference???
+	private void refineEpipolarMotion( CameraMotion motion ) {
+		CameraView viewA = motion.viewSrc;
+		CameraView viewB = motion.viewDst;
+
+		pairs.resize(motion.features.size());
+		for (int i = 0; i < pairs.size; i++) {
+			AssociatedIndex a = motion.features.get(i);
+			pairs.get(i).p1.set(viewA.observationNorm.get(a.src));
+			pairs.get(i).p2.set(viewB.observationNorm.get(a.dst));
+
+		}
+		motion.a_to_b.T.normalize();
+		DMatrixRMaj E = MultiViewOps.createEssential(motion.a_to_b.R,motion.a_to_b.T);
+		DMatrixRMaj refinedE = new DMatrixRMaj(3,3);
+		refineEpipolar.fitModel(pairs.toList(),E,refinedE);
+
+		List<Se3_F64> candidates = MultiViewOps.decomposeEssential(refinedE);
+		new SelectBestStereoTransform().select(candidates,pairs.toList(),motion.a_to_b);
 	}
 
 	CameraView selectOriginNode() {
@@ -543,17 +597,14 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		if( verbose )
 			System.out.println("selectOriginNode");
 		for (int i = 0; i < graphNodes.size(); i++) {
-			double maxEdgeScore = 0;
-			int totalEdgeFeatures = 0;
+			double score = 0;
 			List<CameraMotion> edges = graphNodes.get(i).connections;
 
 			for (int j = 0; j < edges.size(); j++) {
 				CameraMotion e = edges.get(j);
-				totalEdgeFeatures += e.features.size();
-				maxEdgeScore = Math.max(maxEdgeScore,e.scoreTriangulation());
+				score += e.scoreTriangulation();
 			}
 
-			double score = maxEdgeScore*Math.sqrt(totalEdgeFeatures);
 			if( score > bestScore ) {
 				bestScore = score;
 				best = graphNodes.get(i);
@@ -562,6 +613,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			if( verbose )
 				System.out.printf("  [%2d] score = %s\n",i,score);
 		}
+		if( verbose )
+			System.out.println("     selected = "+best.index);
 
 		return best;
 	}
@@ -598,12 +651,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		CameraView viewA = edge.viewSrc;
 		CameraView viewB = edge.viewDst;
 
-		Vector3D_F64 arrowA = new Vector3D_F64();
-		Vector3D_F64 arrowB = new Vector3D_F64();
-
 		Se3_F64 viewAtoB = new Se3_F64();
 		viewA.viewToWorld.concat(viewB.viewToWorld.invert(null),viewAtoB);
-
 
 		for (int i = 0; i < edge.features.size(); i++) {
 			AssociatedIndex f = edge.features.get(i);
@@ -620,12 +669,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			feature3D.obsIdx.add( f.src );
 			feature3D.obsIdx.add( f.dst );
 
-			// the more parallel a line is worse the triangulation. Get rid of bad ideas early here
-			arrowA.set(normA.x,normA.y,1);
-			arrowB.set(normB.x,normB.y,1);
-			GeometryMath_F64.mult(viewAtoB.R,arrowA,arrowA); // put them into the same reference frame
-
-			double angle = UtilVector3D_F64.acute(arrowA,arrowB);
+			double angle = triangulationAngle(normA,normB,viewAtoB);
 			if( angle < TRIANGULATE_MIN_ANGLE )
 				continue;
 
@@ -681,29 +725,51 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 				return;
 			inliersEpipolar = ransacEssential.getMatchSet().size();
 			edge.a_to_b.set( ransacEssential.getModelParameters() );
-			ransacHomography.setIntrinsic(0,camerasIntrinsc.get(viewA.camera));
-			ransacHomography.setIntrinsic(1,camerasIntrinsc.get(viewB.camera));
 		} else {
 			if( !fitEpipolar(matches, viewA.observationPixels.toList(), viewB.observationPixels.toList(),ransacFundamental,edge) )
 				return;
 			inliersEpipolar = ransacFundamental.getMatchSet().size();
 			// TODO save rigid body estimate
 		}
+
 		if( inliersEpipolar < MIN_FEATURE_ASSOCIATED )
 			return;
 
-		// Now fit a homography. If the motion is pure rotation the inlier sets should be the same
-		if( !ransacHomography.process(pairs.toList()) ){
+		// If only a very small number of features are associated do not consider the view
+		double fractionA = inliersEpipolar/(double)viewA.descriptions.size;
+		double fractionB = inliersEpipolar/(double)viewB.descriptions.size;
+
+		if( fractionA < MIN_ASSOCIATE_FRACTION | fractionB < MIN_ASSOCIATE_FRACTION )
 			return;
-		}
 
 		// If the geometry is good for triangulation this number will be lower
-		edge.ratio_H_to_Epi = ransacHomography.getMatchSet().size()/(double)inliersEpipolar;
 		edge.viewSrc = viewA;
 		edge.viewDst = viewB;
+		edge.triangulationAngle = medianTriangulationAngle(edge);
 		viewA.connections.add(edge);
 		viewB.connections.add(edge);
 		graphEdges.add(edge);
+
+		if( verbose )
+			System.out.println("Connected "+viewA.index+" -> "+viewB.index);
+	}
+
+	double medianTriangulationAngle( CameraMotion edge ) {
+
+		GrowQueue_F64 angles = new GrowQueue_F64(edge.features.size());
+		angles.size = edge.features.size();
+
+		for (int i = 0; i < edge.features.size(); i++) {
+			AssociatedIndex a = edge.features.get(i);
+			Point2D_F64 normA = edge.viewSrc.observationNorm.get( a.src );
+			Point2D_F64 normB = edge.viewDst.observationNorm.get( a.dst );
+
+			double acute = triangulationAngle(normA,normB,edge.a_to_b);
+			angles.data[i] = acute;
+		}
+
+		angles.sort();
+		return angles.getFraction(0.5);
 	}
 
 	/**
@@ -783,10 +849,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		String camera;
 		int index;
 		Se3_F64 viewToWorld = new Se3_F64();
-		// -2 = unvisited
-		// -1 = in open list
-		//  0 >= distance from root
-		int distanceFromRoot = -2;
+		ViewState state = ViewState.UNPROCESSED;
 
 		List<CameraMotion> connections = new ArrayList<>();
 
@@ -805,6 +868,12 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		}
 	}
 
+	enum ViewState {
+		UNPROCESSED,
+		PENDING,
+		PROCESSED
+	}
+
 	static class CameraMotion {
 		// if the transform of both views is known then this will be scaled to be in world units
 		// otherwise it's in arbitrary units
@@ -816,8 +885,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		CameraView viewSrc;
 		CameraView viewDst;
 
-		// number of inliers when fitting an epipolar model vs a homography
-		double ratio_H_to_Epi;
+		// Average angle of features in this motion for triangulation
+		double triangulationAngle;
 
 		/**
 		 * Score how well this motion can be used to provide an initial set of triangulated feature points.
@@ -826,7 +895,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		 * @return the score
 		 */
 		public double scoreTriangulation() {
-			return ratio_H_to_Epi == 0 ? 0 : Math.sqrt(features.size())/ratio_H_to_Epi;
+			return features.size()*triangulationAngle;
 		}
 
 		public Se3_F64 motionSrcToDst( CameraView src ) {
