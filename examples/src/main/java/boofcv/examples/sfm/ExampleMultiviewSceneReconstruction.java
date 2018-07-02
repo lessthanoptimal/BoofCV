@@ -22,24 +22,29 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
 import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
 import boofcv.abst.geo.bundle.BundleAdjustmentShur_DSCC;
+import boofcv.alg.cloud.PointCloudUtils;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.structure.EstimateSceneUnordered;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.javafx.PointCloudViewerFX;
+import boofcv.struct.Point3dRgbI;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.transform.se.SePointOps_F64;
+import javafx.application.Platform;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -105,8 +110,7 @@ public class ExampleMultiviewSceneReconstruction {
 	 */
 	private void visualizeResults( BundleAdjustmentSceneStructure structure, CameraPinholeRadial intrinsic ,
 								   List<BufferedImage> colorImages ) {
-		// display a point cloud from the 3D features
-		PointCloudViewer gui = new PointCloudViewer(intrinsic,1);
+		List<Point3dRgbI> cloud = new ArrayList<>();
 
 		Point3D_F64 world = new Point3D_F64();
 		Point3D_F64 camera = new Point3D_F64();
@@ -132,14 +136,22 @@ public class ExampleMultiviewSceneReconstruction {
 				// hopefully this isn't too common
 				if( x < 0 || y < 0 || x >= image.getWidth() || y >= image.getHeight() )
 					continue;
-				int rgb = image.getRGB((int)pixel.x,(int)pixel.y);
-				gui.addPoint(world.x,world.y,world.z,rgb);
+				cloud.add( new Point3dRgbI(world,image.getRGB((int)pixel.x,(int)pixel.y)) );
 				break;
 			}
 		}
 
-		gui.setPreferredSize(new Dimension(500,500));
-		ShowImages.showWindow(gui, "Reconstruction Points", true);
+		System.out.println("Pruning Cloud");
+		PointCloudUtils.prune(cloud,10,0.1);
+
+		SwingUtilities.invokeLater(()->{
+			PointCloudViewerFX gui = new PointCloudViewerFX();
+			gui.setPreferredSize(new Dimension(500,500));
+			Platform.runLater(() -> gui.setCloud(cloud));
+
+			ShowImages.showWindow(gui, "Reconstruction Points", true);
+		});
+
 	}
 
 	public static void main(String[] args) {

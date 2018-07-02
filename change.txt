@@ -23,6 +23,8 @@ Version : 0.31
 - TODO better point cloud visualization
 - Fundamential Matrix
  * TODO "Gold Standard" Euclidean error
+- Visualization
+ * JavaFX based point cloud viewer
 
 - TODO Sparse Bundle Adjustment
       - Regression using public dataset

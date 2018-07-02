@@ -11,6 +11,7 @@ dependencies {
     compile project(':integration:boofcv-swing')
     compile project(':integration:boofcv-ffmpeg')
     compile project(':integration:boofcv-WebcamCapture')
+    compile project(':integration:boofcv-javafx')
 
     compile 'org.reflections:reflections:0.9.10'
 }
