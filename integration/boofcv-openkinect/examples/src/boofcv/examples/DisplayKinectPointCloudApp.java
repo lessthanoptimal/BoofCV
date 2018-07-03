@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.examples;
 
 import boofcv.alg.depth.VisualDepthOps;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.gui.d3.PointCloudViewer;
+import boofcv.gui.d3.PointCloudViewerPanelSwing;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -66,7 +66,7 @@ public class DisplayKinectPointCloudApp {
 
 		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(param, (DMatrixRMaj)null);
 
-		PointCloudViewer viewer = new PointCloudViewer(K, 10.0);
+		PointCloudViewerPanelSwing viewer = new PointCloudViewerPanelSwing(K, 10.0);
 		viewer.setPreferredSize(new Dimension(rgb.width,rgb.height));
 
 		for( int i = 0; i < cloud.size; i++ ) {

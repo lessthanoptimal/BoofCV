@@ -31,14 +31,14 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.javafx.PointCloudViewerFX;
 import boofcv.struct.Point3dRgbI;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
+import boofcv.visualize.PointCloudViewer;
+import boofcv.visualize.VisualizeData;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.transform.se.SePointOps_F64;
-import javafx.application.Platform;
 
 import javax.swing.*;
 import java.awt.*;
@@ -144,10 +144,12 @@ public class ExampleMultiviewSceneReconstruction {
 		System.out.println("Pruning Cloud");
 		PointCloudUtils.prune(cloud,10,0.1);
 
+		PointCloudViewer viewer = VisualizeData.createPointCloudViewer();
+
 		SwingUtilities.invokeLater(()->{
-			PointCloudViewerFX gui = new PointCloudViewerFX();
+			JComponent gui = viewer.getComponent();
 			gui.setPreferredSize(new Dimension(500,500));
-			Platform.runLater(() -> gui.setCloud(cloud));
+			viewer.setCloudXyzRgbI32(cloud);
 
 			ShowImages.showWindow(gui, "Reconstruction Points", true);
 		});

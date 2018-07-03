@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.examples.stereo;
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.gui.d3.PointCloudViewer;
+import boofcv.gui.d3.PointCloudViewerPanelSwing;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
@@ -100,7 +100,7 @@ public class ExampleStereoDisparity3D {
 		DMatrixRMaj rectR = rectAlg.getRectifiedRotation();
 
 		// used to display the point cloud
-		PointCloudViewer viewer = new PointCloudViewer(rectK, 10);
+		PointCloudViewerPanelSwing viewer = new PointCloudViewerPanelSwing(rectK, 10);
 		viewer.setPreferredSize(new Dimension(rectLeft.width,rectLeft.height));
 
 		// extract intrinsic parameters from rectified camera

@@ -16,37 +16,28 @@
  * limitations under the License.
  */
 
-package boofcv.javafx;
+package boofcv.visualize;
 
 import boofcv.struct.Point3dRgbI;
-import boofcv.visualize.PointCloudViewer;
 import georegression.struct.se.Se3_F64;
-import javafx.application.Platform;
 
 import javax.swing.*;
 import java.util.List;
 
-public class PointCloudViewerFX implements PointCloudViewer {
+public interface PointCloudViewer {
+	void setCloudXyzRgbI32( List<Point3dRgbI> cloud );
 
-	PointCloudViewerPanelFX panel = new PointCloudViewerPanelFX();
+	/**
+	 * Specifies the camera's FOV in radians
+	 * @param radians FOV size
+	 */
+	void setCameraFov( double radians );
 
-	@Override
-	public void setCloudXyzRgbI32(List<Point3dRgbI> cloud) {
-		Platform.runLater(() -> panel.setCloud(cloud));
-	}
+	/**
+	 * Changes the camera location
+	 * @param cameraToWorld transform from camera to world coordinates
+	 */
+	void setCameraToWorld(Se3_F64 cameraToWorld );
 
-	@Override
-	public void setCameraFov(double radians) {
-
-	}
-
-	@Override
-	public void setCameraToWorld(Se3_F64 cameraToWorld) {
-
-	}
-
-	@Override
-	public JComponent getComponent() {
-		return panel;
-	}
+	JComponent getComponent();
 }

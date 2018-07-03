@@ -25,7 +25,7 @@ import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.MousePauseHelper;
 import boofcv.gui.PanelGridPanel;
-import boofcv.gui.d3.PointCloudViewer;
+import boofcv.gui.d3.PointCloudViewerPanelSwing;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -86,7 +86,7 @@ public class ExamplePoseOfCalibrationTarget {
 		List<Point2D_F64> calibPts = detector.getCalibrationPoints();
 
 		// Set up visualization
-		PointCloudViewer viewer = new PointCloudViewer(intrinsic, 0.01);
+		PointCloudViewerPanelSwing viewer = new PointCloudViewerPanelSwing(intrinsic, 0.01);
 		// make the view more interest.  From the side.
 		DMatrixRMaj rotY = ConvertRotation3D_F64.rotY(-Math.PI/2.0,null);
 		viewer.setWorldToCamera(new Se3_F64(rotY,new Vector3D_F64(0.75,0,1.25)));

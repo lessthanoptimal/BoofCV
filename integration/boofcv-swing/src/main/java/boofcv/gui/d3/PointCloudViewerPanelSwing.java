@@ -47,7 +47,7 @@ import java.awt.event.*;
  *
  * @author Peter Abeles
  */
-public class PointCloudViewer extends JPanel
+public class PointCloudViewerPanelSwing extends JPanel
 		implements MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
 	FastQueue<ColorPoint3D> cloud = new FastQueue<>(200, ColorPoint3D.class, true);
 
@@ -77,7 +77,7 @@ public class PointCloudViewer extends JPanel
 	int prevX;
 	int prevY;
 
-	public PointCloudViewer(  double keyStepSize ) {
+	public PointCloudViewerPanelSwing(double keyStepSize ) {
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -88,12 +88,12 @@ public class PointCloudViewer extends JPanel
 		this.stepSize = keyStepSize;
 	}
 
-   public PointCloudViewer(DMatrixRMaj K, double keyStepSize) {
+   public PointCloudViewerPanelSwing(DMatrixRMaj K, double keyStepSize) {
 		this(keyStepSize);
 		configure(K);
 	}
 
-	public PointCloudViewer(CameraPinhole intrinsic, double keyStepSize) {
+	public PointCloudViewerPanelSwing(CameraPinhole intrinsic, double keyStepSize) {
 		this(keyStepSize);
 		configure(PerspectiveOps.calibrationMatrix(intrinsic,(DMatrixRMaj)null));
 		setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));

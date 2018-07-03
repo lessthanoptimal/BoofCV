@@ -16,23 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.javafx;
+package boofcv.gui.d3;
 
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.Point3dRgbI;
 import boofcv.visualize.PointCloudViewer;
 import georegression.struct.se.Se3_F64;
-import javafx.application.Platform;
 
 import javax.swing.*;
 import java.util.List;
 
-public class PointCloudViewerFX implements PointCloudViewer {
-
-	PointCloudViewerPanelFX panel = new PointCloudViewerPanelFX();
+public class PointCloudViewerSwing implements PointCloudViewer {
+	PointCloudViewerPanelSwing panel = new PointCloudViewerPanelSwing(
+			PerspectiveOps.createIntrinsic(640,640,60),0.01 );
 
 	@Override
 	public void setCloudXyzRgbI32(List<Point3dRgbI> cloud) {
-		Platform.runLater(() -> panel.setCloud(cloud));
+		for (int i = 0; i < cloud.size(); i++) {
+			Point3dRgbI p = cloud.get(i);
+			panel.addPoint(p.x,p.y,p.z,p.rgb);
+		}
 	}
 
 	@Override

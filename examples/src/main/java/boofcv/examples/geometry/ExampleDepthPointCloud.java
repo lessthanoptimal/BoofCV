@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.examples.geometry;
 import boofcv.alg.depth.VisualDepthOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.gui.d3.PointCloudViewer;
+import boofcv.gui.d3.PointCloudViewerPanelSwing;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
@@ -68,7 +68,7 @@ public class ExampleDepthPointCloud {
 
 		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(param.visualParam, (DMatrixRMaj)null);
 
-		PointCloudViewer viewer = new PointCloudViewer(K, 15);
+		PointCloudViewerPanelSwing viewer = new PointCloudViewerPanelSwing(K, 15);
 		viewer.setPreferredSize(new Dimension(rgb.width,rgb.height));
 
 		for( int i = 0; i < cloud.size; i++ ) {
