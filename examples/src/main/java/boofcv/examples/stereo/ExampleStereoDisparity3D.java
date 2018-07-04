@@ -43,6 +43,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Expanding upon ExampleStereoDisparity, this example demonstrates how to rescale an image for stereo processing and
@@ -115,6 +117,9 @@ public class ExampleStereoDisparity3D {
 
 		// Iterate through each pixel in disparity image and compute its 3D coordinate
 		PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
+		pcv.setTranslationStep(1.5);
+
+		List<Point3D_F64> temp = new ArrayList<>();
 		Point3D_F64 pointRect = new Point3D_F64();
 		Point3D_F64 pointLeft = new Point3D_F64();
 		for( int y = 0; y < disparity.height; y++ ) {
@@ -130,7 +135,7 @@ public class ExampleStereoDisparity3D {
 				pointRect.x = pointRect.z*(x - cx)/fx;
 				pointRect.y = pointRect.z*(y - cy)/fy;
 
-				// prune points which are likely to be noice
+				// prune points which are likely to be noise
 				if( pointRect.z >= maxZ )
 					continue;
 
@@ -140,17 +145,19 @@ public class ExampleStereoDisparity3D {
 				// add pixel to the view for display purposes and sets its gray scale value
 				int v = rectLeft.unsafe_get(x, y);
 				pcv.addPoint(pointLeft.x,pointLeft.y,pointLeft.z,v << 16 | v << 8 | v);
+//				temp.add( pointLeft.copy() );
 			}
 		}
 
-		// move it back a bit to make the 3D structure easier to see
+		// move it back a bit to make the 3D structure more apparent
 		Se3_F64 cameraToWorld = new Se3_F64();
 		cameraToWorld.T.z = -baseline*5;
 		cameraToWorld.T.x = baseline*12;
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.4,0,cameraToWorld.R);
 
 		// Configure the display
-		pcv.setTranslationStep(1.5);
+//		pcv.addCloud(temp);
+//		pcv.setShowAxis(true);
 		pcv.setCameraHFov(PerspectiveOps.computeHFov(param.left));
 		pcv.setCameraToWorld(cameraToWorld);
 		JComponent viewer = pcv.getComponent();
@@ -158,7 +165,7 @@ public class ExampleStereoDisparity3D {
 
 		// display the results.  Click and drag to change point cloud camera
 		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,minDisparity, maxDisparity,0);
-		ShowImages.showWindow(visualized,"Disparity");
-		ShowImages.showWindow(viewer,"Point Cloud");
+		ShowImages.showWindow(visualized,"Disparity", true);
+		ShowImages.showWindow(viewer,"Point Cloud", true);
 	}
 }

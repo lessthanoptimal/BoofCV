@@ -18,19 +18,22 @@
 
 package boofcv.javafx;
 
-import boofcv.struct.Point3dRgbI;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
+import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.geometry.Point3D;
 import javafx.scene.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
+import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.GrowQueue_I32;
 
-import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Point cloud viewer written in JavaFX
@@ -48,12 +51,13 @@ public class PointCloudViewerPanelFX extends JFXPanel {
 	final Xform cameraXform3 = new Xform();
 	private static final double CAMERA_NEAR_CLIP = 0.1;
 	private static final double CAMERA_FAR_CLIP = 10000.0;
-	private static final double AXIS_LENGTH = 250.0;
 	private static final double CONTROL_MULTIPLIER = 0.1;
 	private static final double SHIFT_MULTIPLIER = 10.0;
 	private static final double MOUSE_SPEED = 0.1;
 	private static final double ROTATION_SPEED = 2.0;
 	private static final double TRACK_SPEED = 0.3;
+
+	float pointRadius=1f;
 
 	double mousePosX;
 	double mousePosY;
@@ -61,6 +65,14 @@ public class PointCloudViewerPanelFX extends JFXPanel {
 	double mouseOldY;
 	double mouseDeltaX;
 	double mouseDeltaY;
+
+	// Mesh for points added one at a time
+	TriangleMesh meshSingles = new TriangleMesh();
+	GrowQueue_F32 pointSingles = new GrowQueue_F32();
+	GrowQueue_I32 facesSingles = new GrowQueue_I32();
+	final Object lockSingles = new Object();
+	Timer timerSingles = null;
+	TimerTask taskSingles = null;
 
 	// description of the primitive shape
 	float[] templatePoints;
@@ -78,27 +90,38 @@ public class PointCloudViewerPanelFX extends JFXPanel {
 		scene.setFill(Color.GREY);
 //		handleKeyboard(scene, world);
 		handleMouse(scene, world);
-
+		setPointRadius(pointRadius);
 		scene.setCamera(camera);
 		setScene(scene);
-
-		declareTetrahedron(1f);
 	}
 
-	public void setCloud(List<Point3dRgbI> cloud ) {
+	public void showAxis( boolean active ) {
+		axisGroup.setVisible(active);
+	}
 
-		float[] points = new float[ templatePoints.length*cloud.size() ];
-		int[] faces = new int[ templateFaces.length*cloud.size() ];
+	public void setPointRadius( float radius ) {
+		this.pointRadius = radius;
+		declareTetrahedron(radius);
+	}
+
+	public void clearPoints() {
+		world.getChildren().clear();
+	}
+
+	public void addCloud(GrowQueue_F32 cloudXYZ) {
+		int N = cloudXYZ.size/3;
+
+		float[] points = new float[ templatePoints.length*N ];
+		int[] faces = new int[ templateFaces.length*N ];
 		int numPointsInShape = templatePoints.length/3;
 
-		for (int indexPoint = 0; indexPoint < cloud.size(); indexPoint++) {
-			Point3dRgbI p = cloud.get(indexPoint);
+		for (int indexPoint = 0; indexPoint < N; indexPoint++) {
 
-			float cx = (float)(p.x);
-			float cy = (float)(p.y);
-			float cz = (float)(p.z);
+			float cx = cloudXYZ.data[indexPoint*3];
+			float cy = cloudXYZ.data[indexPoint*3+1];
+			float cz = cloudXYZ.data[indexPoint*3+2];
 
-			int idx =  templatePoints.length*indexPoint;
+			int idx = templatePoints.length*indexPoint;
 			for (int j = 0; j < templatePoints.length; ) {
 				points[idx++] = templatePoints[j++] + cx;
 				points[idx++] = templatePoints[j++] + cy;
@@ -106,12 +129,11 @@ public class PointCloudViewerPanelFX extends JFXPanel {
 			}
 
 			idx = templateFaces.length*indexPoint;
-			for (int j = 0; j < templateFaces.length; j += 2, idx += 2) {
-				faces[idx] = templateFaces[j] + numPointsInShape*indexPoint;
+			for (int j = 0; j < templateFaces.length;) {
+				faces[idx++] = templateFaces[j++] + numPointsInShape*indexPoint;
+				faces[idx++] = templateFaces[j++];
 			}
 
-//			int rgb = p.rgb;
-//			Color color = Color.rgb((rgb>>16)&0xFF, (rgb>>8)&0xFF,rgb&0xFF);
 		}
 
 		TriangleMesh mesh = new TriangleMesh();
@@ -121,12 +143,6 @@ public class PointCloudViewerPanelFX extends JFXPanel {
 
 		final MeshView meshView = new MeshView(mesh);
 		meshView.setMaterial(new PhongMaterial(Color.RED));
-//		meshView.setRotationAxis(Rotate.Y_AXIS);
-//		meshView.setTranslateX(-mean.x*scale);
-//		meshView.setTranslateY(-mean.y*scale);
-//		meshView.setTranslateZ(-mean.z*scale);
-// try commenting this line out to see what it's effect is . . .
-//		meshView.setCullFace(CullFace.NONE);
 		meshView.setDepthTest(DepthTest.ENABLE);
 		meshView.setDrawMode(DrawMode.FILL);
 		meshView.setCullFace(CullFace.BACK);
@@ -134,12 +150,64 @@ public class PointCloudViewerPanelFX extends JFXPanel {
 		world.getChildren().addAll(meshView);
 	}
 
+	public void addPoint( float x , float y , float z ) {
+		synchronized (lockSingles) {
+			int indexPoint = pointSingles.size / templatePoints.length;
+			int numPointsInShape = templatePoints.length / 3;
+
+			for (int j = 0; j < templatePoints.length; ) {
+				pointSingles.add(templatePoints[j++] + x);
+				pointSingles.add(templatePoints[j++] + y);
+				pointSingles.add(templatePoints[j++] + z);
+			}
+
+			for (int j = 0; j < templateFaces.length; ) {
+				facesSingles.add(templateFaces[j++] + numPointsInShape * indexPoint);
+				facesSingles.add(templateFaces[j++]);
+			}
+		}
+
+		// for performance reasons we don't want to rapidly spam javafx. So we create
+		// a timer task where it is update only if no  point has been added in the last 20 MS
+		synchronized (lockSingles) {
+			if( timerSingles != null ) {
+				// already scheduled. Let it be
+				return;
+			}				// no task so create a new one
+			taskSingles = new TimerTask() {
+				@Override
+				public void run() {
+					Platform.runLater(()->{
+						synchronized (lockSingles) {
+							boolean firstPoint = meshSingles.getPoints().size() == 0;
+							meshSingles.getPoints().setAll(pointSingles.data, 0, pointSingles.size);
+							meshSingles.getFaces().setAll(facesSingles.data, 0, facesSingles.size);
+							if (firstPoint) {
+								meshSingles.getTexCoords().setAll(texCoords);
+								final MeshView meshView = new MeshView(meshSingles);
+								meshView.setMaterial(new PhongMaterial(Color.RED));
+								meshView.setDepthTest(DepthTest.ENABLE);
+								meshView.setDrawMode(DrawMode.FILL);
+								meshView.setCullFace(CullFace.BACK);
+
+								world.getChildren().addAll(meshView);
+							}
+							timerSingles = null;
+							taskSingles = null;
+						}
+					});
+				}
+			};
+			timerSingles = new Timer(true);
+			timerSingles.schedule(taskSingles,20);
+		}
+	}
+
 	private void buildCamera() {
 		root.getChildren().add(cameraXform);
 		cameraXform.getChildren().add(cameraXform2);
 		cameraXform2.getChildren().add(cameraXform3);
 		cameraXform3.getChildren().add(camera);
-//		cameraXform3.setRotateZ(180.0);
 
 		camera.setNearClip(CAMERA_NEAR_CLIP);
 		camera.setFarClip(CAMERA_FAR_CLIP);
@@ -176,16 +244,18 @@ public class PointCloudViewerPanelFX extends JFXPanel {
 		blueMaterial.setDiffuseColor(Color.DARKBLUE);
 		blueMaterial.setSpecularColor(Color.BLUE);
 
-		final Box xAxis = new Box(AXIS_LENGTH, 1, 1);
-		final Box yAxis = new Box(1, AXIS_LENGTH, 1);
-		final Box zAxis = new Box(1, 1, AXIS_LENGTH);
+		float axisLength = pointRadius*200;
+
+		final Box xAxis = new Box(axisLength, pointRadius, pointRadius);
+		final Box yAxis = new Box(pointRadius, axisLength, pointRadius);
+		final Box zAxis = new Box(pointRadius, pointRadius, axisLength);
 
 		xAxis.setMaterial(redMaterial);
 		yAxis.setMaterial(greenMaterial);
 		zAxis.setMaterial(blueMaterial);
 
 		axisGroup.getChildren().addAll(xAxis, yAxis, zAxis);
-		axisGroup.setVisible(true);
+		axisGroup.setVisible(false);
 		world.getChildren().addAll(axisGroup);
 	}
 

@@ -41,12 +41,12 @@ public class PointCloudViewerFX implements PointCloudViewer {
 
 	@Override
 	public void setShowAxis(boolean show) {
-
+		Platform.runLater(()->panel.showAxis(show));
 	}
 
 	@Override
 	public void setTranslationStep(double step) {
-
+		Platform.runLater(()->panel.setPointRadius((float)step*0.5f));
 	}
 
 	@Override
@@ -71,27 +71,36 @@ public class PointCloudViewerFX implements PointCloudViewer {
 
 	@Override
 	public void addCloud(List<Point3D_F64> cloudXyz, int[] colorsRgb) {
-
+		addCloud(cloudXyz);
 	}
 
 	@Override
 	public void addCloud(List<Point3D_F64> cloud) {
-
+		GrowQueue_F32 fcloud = new GrowQueue_F32();
+		fcloud.resize(cloud.size()*3);
+		int fidx = 0;
+		for (int i = 0; i < cloud.size(); i++) {
+			Point3D_F64 p = cloud.get(i);
+			fcloud.data[fidx++]=(float)p.x;
+			fcloud.data[fidx++]=(float)p.y;
+			fcloud.data[fidx++]=(float)p.z;
+		}
+		Platform.runLater(()->panel.addCloud(fcloud));
 	}
 
 	@Override
 	public void addCloud(GrowQueue_F32 cloudXYZ, GrowQueue_I32 colorRGB) {
-
+		Platform.runLater(()->panel.addCloud(cloudXYZ));
 	}
 
 	@Override
 	public void addPoint(double x, double y, double z, int rgb) {
-
+		Platform.runLater(()->panel.addPoint((float)x,(float)y,(float)z));
 	}
 
 	@Override
 	public void clearPoints() {
-
+		Platform.runLater(()->panel.clearPoints());
 	}
 
 	@Override

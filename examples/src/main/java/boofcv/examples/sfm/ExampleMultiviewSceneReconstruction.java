@@ -22,7 +22,6 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
 import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
 import boofcv.abst.geo.bundle.BundleAdjustmentShur_DSCC;
-import boofcv.alg.cloud.PointCloudUtils;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.structure.EstimateSceneUnordered;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
@@ -145,15 +144,12 @@ public class ExampleMultiviewSceneReconstruction {
 		}
 
 		System.out.println("Pruning Cloud");
-		PointCloudUtils.prune(cloudXyz,cloudRgb,10,0.1);
-
 		PointCloudViewer viewer = VisualizeData.createPointCloudViewer();
 		viewer.setTranslationStep(0.05);
+		viewer.addCloud(cloudXyz,cloudRgb.data);
 		viewer.setCameraHFov(UtilAngle.radian(60));
 
 		SwingUtilities.invokeLater(()->{
-			viewer.addCloud(cloudXyz,cloudRgb.data);
-
 			viewer.getComponent().setPreferredSize(new Dimension(500,500));
 			ShowImages.showWindow(viewer.getComponent(), "Reconstruction Points", true);
 		});
