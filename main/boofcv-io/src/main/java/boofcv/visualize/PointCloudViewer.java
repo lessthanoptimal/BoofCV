@@ -18,20 +18,72 @@
 
 package boofcv.visualize;
 
-import boofcv.struct.Point3dRgbI;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.swing.*;
 import java.util.List;
 
+/**
+ * High level interface for displaying point clouds
+ *
+ * @author Peter Abeles
+ */
 public interface PointCloudViewer {
-	void setCloudXyzRgbI32( List<Point3dRgbI> cloud );
+
+	/**
+	 * Render the XYZ axis on the screen
+	 * @param show
+	 */
+	void setShowAxis( boolean show );
+
+	void setTranslationStep( double step );
+
+	/**
+	 * Dot size when rendered. This is only valid if sprites are being used
+	 * @param pixels apparent size of a point
+	 */
+	void setDotSize( int pixels );
+
+	/**
+	 * Specifies the clipping distance. The default value will be infinity or some other very large value
+	 * @param distance maximum distance an object away from the camera can be seen
+	 */
+	void setClipDistance( double distance );
+
+	/**
+	 * If true then objects farther away will fade into the background color. Providing some sense of depth.
+	 * this is by default off.
+	 *
+	 * @param active true to turn on
+	 */
+	void setFog( boolean active );
+
+	void setBackgroundColor( int rgb );
+
+	void addCloud( List<Point3D_F64> cloudXyz , int colorsRgb[] );
+
+	void addCloud( List<Point3D_F64> cloud );
+
+	void addCloud(GrowQueue_F32 cloudXYZ , GrowQueue_I32 colorRGB );
+
+	/**
+	 * adds a single point to the point cloud. This method can be very slow compared to doing it in a batch
+	 */
+	void addPoint( double x , double y , double z , int rgb );
+
+	/**
+	 * Removes all points from the point cloud
+	 */
+	void clearPoints();
 
 	/**
 	 * Specifies the camera's FOV in radians
 	 * @param radians FOV size
 	 */
-	void setCameraFov( double radians );
+	void setCameraHFov(double radians );
 
 	/**
 	 * Changes the camera location

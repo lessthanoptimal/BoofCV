@@ -22,10 +22,10 @@ import boofcv.abst.fiducial.CalibrationFiducialDetector;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.MousePauseHelper;
 import boofcv.gui.PanelGridPanel;
-import boofcv.gui.d3.PointCloudViewerPanelSwing;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -36,6 +36,8 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import boofcv.visualize.PointCloudViewer;
+import boofcv.visualize.VisualizeData;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -44,6 +46,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DMatrixRMaj;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -86,13 +89,17 @@ public class ExamplePoseOfCalibrationTarget {
 		List<Point2D_F64> calibPts = detector.getCalibrationPoints();
 
 		// Set up visualization
-		PointCloudViewerPanelSwing viewer = new PointCloudViewerPanelSwing(intrinsic, 0.01);
+		PointCloudViewer viewer = VisualizeData.createPointCloudViewer();
+		viewer.setCameraHFov(PerspectiveOps.computeHFov(intrinsic));
+		viewer.setTranslationStep(0.01);
+		viewer.setBackgroundColor(0xFFFFFF); // white background
 		// make the view more interest.  From the side.
 		DMatrixRMaj rotY = ConvertRotation3D_F64.rotY(-Math.PI/2.0,null);
-		viewer.setWorldToCamera(new Se3_F64(rotY,new Vector3D_F64(0.75,0,1.25)));
+		viewer.setCameraToWorld(new Se3_F64(rotY,new Vector3D_F64(0.75,0,1.25)).invert(null));
 		ImagePanel imagePanel = new ImagePanel(intrinsic.width, intrinsic.height);
-		viewer.setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));
-		PanelGridPanel gui = new PanelGridPanel(1,imagePanel,viewer);
+		JComponent viewerComponent = viewer.getComponent();
+		viewerComponent.setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));
+		PanelGridPanel gui = new PanelGridPanel(1,imagePanel,viewerComponent);
 		gui.setMaximumSize(gui.getPreferredSize());
 		ShowImages.showWindow(gui,"Calibration Target Pose",true);
 
@@ -113,7 +120,7 @@ public class ExamplePoseOfCalibrationTarget {
 				detector.getFiducialToCamera(0, targetToCamera);
 
 				// Visualization.  Show a path with green points and the calibration points in black
-				viewer.reset();
+				viewer.clearPoints();
 
 				Point3D_F64 center = new Point3D_F64();
 				SePointOps_F64.transform(targetToCamera, center, center);
@@ -132,7 +139,7 @@ public class ExamplePoseOfCalibrationTarget {
 			}
 
 			imagePanel.setImage((BufferedImage) video.getGuiImage());
-			viewer.repaint();
+			viewerComponent.repaint();
 			imagePanel.repaint();
 
 			BoofMiscOps.pause(30);

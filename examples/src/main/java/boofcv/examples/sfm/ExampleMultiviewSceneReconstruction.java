@@ -31,14 +31,15 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.Point3dRgbI;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -110,8 +111,9 @@ public class ExampleMultiviewSceneReconstruction {
 	 */
 	private void visualizeResults( BundleAdjustmentSceneStructure structure, CameraPinholeRadial intrinsic ,
 								   List<BufferedImage> colorImages ) {
-		List<Point3dRgbI> cloud = new ArrayList<>();
 
+		List<Point3D_F64> cloudXyz = new ArrayList<>();
+		GrowQueue_I32 cloudRgb = new GrowQueue_I32();
 		Point3D_F64 world = new Point3D_F64();
 		Point3D_F64 camera = new Point3D_F64();
 		Point2D_F64 pixel = new Point2D_F64();
@@ -136,22 +138,24 @@ public class ExampleMultiviewSceneReconstruction {
 				// hopefully this isn't too common
 				if( x < 0 || y < 0 || x >= image.getWidth() || y >= image.getHeight() )
 					continue;
-				cloud.add( new Point3dRgbI(world,image.getRGB((int)pixel.x,(int)pixel.y)) );
+				cloudXyz.add( world.copy() );
+				cloudRgb.add(image.getRGB((int)pixel.x,(int)pixel.y));
 				break;
 			}
 		}
 
 		System.out.println("Pruning Cloud");
-		PointCloudUtils.prune(cloud,10,0.1);
+		PointCloudUtils.prune(cloudXyz,cloudRgb,10,0.1);
 
 		PointCloudViewer viewer = VisualizeData.createPointCloudViewer();
+		viewer.setTranslationStep(0.05);
+		viewer.setCameraHFov(UtilAngle.radian(60));
 
 		SwingUtilities.invokeLater(()->{
-			JComponent gui = viewer.getComponent();
-			gui.setPreferredSize(new Dimension(500,500));
-			viewer.setCloudXyzRgbI32(cloud);
+			viewer.addCloud(cloudXyz,cloudRgb.data);
 
-			ShowImages.showWindow(gui, "Reconstruction Points", true);
+			viewer.getComponent().setPreferredSize(new Dimension(500,500));
+			ShowImages.showWindow(viewer.getComponent(), "Reconstruction Points", true);
 		});
 
 	}

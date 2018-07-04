@@ -25,6 +25,7 @@ Version : 0.31
  * TODO "Gold Standard" Euclidean error
 - Visualization
  * JavaFX based point cloud viewer
+ * Greatly improved BoofCV's built in point cloud viewer. Runs better than JavaFX
 
 - TODO Sparse Bundle Adjustment
       - Regression using public dataset

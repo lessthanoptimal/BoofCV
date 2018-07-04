@@ -21,7 +21,6 @@ package boofcv.examples.geometry;
 import boofcv.alg.depth.VisualDepthOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.gui.d3.PointCloudViewerPanelSwing;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
@@ -33,9 +32,10 @@ import boofcv.struct.calib.VisualDepthParameters;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
+import boofcv.visualize.PointCloudViewer;
+import boofcv.visualize.VisualizeData;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DMatrixRMaj;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -66,10 +66,9 @@ public class ExampleDepthPointCloud {
 
 		VisualDepthOps.depthTo3D(param.visualParam, rgb, depth, cloud, cloudColor);
 
-		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(param.visualParam, (DMatrixRMaj)null);
-
-		PointCloudViewerPanelSwing viewer = new PointCloudViewerPanelSwing(K, 15);
-		viewer.setPreferredSize(new Dimension(rgb.width,rgb.height));
+		PointCloudViewer viewer = VisualizeData.createPointCloudViewer();
+		viewer.setCameraHFov(PerspectiveOps.computeHFov(param.visualParam));
+		viewer.setTranslationStep(15);
 
 		for( int i = 0; i < cloud.size; i++ ) {
 			Point3D_F64 p = cloud.get(i);
@@ -77,6 +76,7 @@ public class ExampleDepthPointCloud {
 			int c = (color[0] << 16 ) | (color[1] << 8) | color[2];
 			viewer.addPoint(p.x,p.y,p.z,c);
 		}
+		viewer.getComponent().setPreferredSize(new Dimension(rgb.width,rgb.height));
 
 		// ---------- Display depth image
 		// use the actual max value in the image to maximize its appearance
@@ -85,7 +85,7 @@ public class ExampleDepthPointCloud {
 		ShowImages.showWindow(depthOut,"Depth Image");
 
 		// ---------- Display colorized point cloud
-		ShowImages.showWindow(viewer,"Point Cloud");
+		ShowImages.showWindow(viewer.getComponent(),"Point Cloud");
 		System.out.println("Total points = "+cloud.size);
 	}
 }

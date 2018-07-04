@@ -21,7 +21,6 @@ package boofcv.examples.stereo;
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.gui.d3.PointCloudViewerPanelSwing;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
@@ -31,10 +30,16 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.visualize.PointCloudViewer;
+import boofcv.visualize.VisualizeData;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -99,18 +104,17 @@ public class ExampleStereoDisparity3D {
 		DMatrixRMaj rectK = rectAlg.getCalibrationMatrix();
 		DMatrixRMaj rectR = rectAlg.getRectifiedRotation();
 
-		// used to display the point cloud
-		PointCloudViewerPanelSwing viewer = new PointCloudViewerPanelSwing(rectK, 10);
-		viewer.setPreferredSize(new Dimension(rectLeft.width,rectLeft.height));
-
 		// extract intrinsic parameters from rectified camera
-		double baseline = param.getBaseline();
+		double baseline = param.getBaseline()*0.1;
 		double fx = rectK.get(0,0);
 		double fy = rectK.get(1,1);
 		double cx = rectK.get(0,2);
 		double cy = rectK.get(1,2);
 
+		double maxZ = baseline*100;
+
 		// Iterate through each pixel in disparity image and compute its 3D coordinate
+		PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
 		Point3D_F64 pointRect = new Point3D_F64();
 		Point3D_F64 pointLeft = new Point3D_F64();
 		for( int y = 0; y < disparity.height; y++ ) {
@@ -118,7 +122,7 @@ public class ExampleStereoDisparity3D {
 				double d = disparity.unsafe_get(x,y) + minDisparity;
 
 				// skip over pixels were no correspondence was found
-				if( d >= rangeDisparity )
+				if( d >= rangeDisparity || d <= 0 )
 					continue;
 
 				// Coordinate in rectified camera frame
@@ -126,14 +130,31 @@ public class ExampleStereoDisparity3D {
 				pointRect.x = pointRect.z*(x - cx)/fx;
 				pointRect.y = pointRect.z*(y - cy)/fy;
 
+				// prune points which are likely to be noice
+				if( pointRect.z >= maxZ )
+					continue;
+
 				// rotate into the original left camera frame
 				GeometryMath_F64.multTran(rectR, pointRect, pointLeft);
 
 				// add pixel to the view for display purposes and sets its gray scale value
 				int v = rectLeft.unsafe_get(x, y);
-				viewer.addPoint(pointLeft.x, pointLeft.y, pointLeft.z, v << 16 | v << 8 | v);
+				pcv.addPoint(pointLeft.x,pointLeft.y,pointLeft.z,v << 16 | v << 8 | v);
 			}
 		}
+
+		// move it back a bit to make the 3D structure easier to see
+		Se3_F64 cameraToWorld = new Se3_F64();
+		cameraToWorld.T.z = -baseline*5;
+		cameraToWorld.T.x = baseline*12;
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.4,0,cameraToWorld.R);
+
+		// Configure the display
+		pcv.setTranslationStep(1.5);
+		pcv.setCameraHFov(PerspectiveOps.computeHFov(param.left));
+		pcv.setCameraToWorld(cameraToWorld);
+		JComponent viewer = pcv.getComponent();
+		viewer.setPreferredSize(new Dimension(600,600*param.left.height/param.left.width));
 
 		// display the results.  Click and drag to change point cloud camera
 		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,minDisparity, maxDisparity,0);

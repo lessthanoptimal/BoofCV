@@ -19,65 +19,81 @@
 package boofcv.gui.d3;
 
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.CameraPinhole;
-import georegression.geometry.ConvertRotation3D_F64;
-import georegression.geometry.GeometryMath_F64;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
+import georegression.geometry.ConvertRotation3D_F32;
+import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.point.Vector3D_F64;
-import georegression.struct.se.Se3_F64;
-import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DMatrixRMaj;
+import georegression.struct.point.Point3D_F32;
+import georegression.struct.point.Vector3D_F32;
+import georegression.struct.se.Se3_F32;
+import georegression.transform.se.SePointOps_F32;
+import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.util.HashSet;
+import java.util.Set;
+
+import static java.awt.event.KeyEvent.VK_SHIFT;
 
 /**
  * <p>
- * Renders a 3D point cloud using a perspective pin hole camera model.
- * </p>
- *
- * <p>
- * Rendering speed is improved by first rendering onto a grid and only accepting the highest
- * (closest to viewing camera) point as being visible.
+ * Renders a 3D point cloud using a perspective pinhole camera model. Points are rendered as sprites which are
+ * always the same size. The image is then converted into a BufferedImage for output
  * </p>
  *
  * @author Peter Abeles
  */
 public class PointCloudViewerPanelSwing extends JPanel
 		implements MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
-	FastQueue<ColorPoint3D> cloud = new FastQueue<>(200, ColorPoint3D.class, true);
+
+	// TODO right-click or shift-click  perform a roll
+
+	// TODO Mouse rotation rotates so that the point clicked is moved to where the mouse is
+	// use vectors to figure out that rotation
+
+	// Storage for xyz coordinates of points in the count
+	GrowQueue_F32 cloudXyz = new GrowQueue_F32();
+	// Storage for rgb values of points in the cloud
+	GrowQueue_I32 cloudColor = new GrowQueue_I32();
+
+	// Maximum render distance
+	float maxRenderDistance = Float.MAX_VALUE;
+	// If true then fog is rendered. This makes points fade to background color at a distance
+	boolean fog;
 
 	// intrinsic camera parameters
-	DMatrixRMaj K;
+	float hfov = UtilAngle.radian(50);
 
 	// transform from world frame to camera frame
-	Se3_F64 worldToCamera = new Se3_F64();
-
-	double focalLengthX;
-	double focalLengthY;
-	double centerX;
-	double centerY;
+	Se3_F32 worldToCamera = new Se3_F32();
 
 	// how far it moves in the world frame for each key press
-	double stepSize;
+	float stepSize;
 
-	// Data structure that contains the visible point at each pixel
-	// size = width*height, row major format
-	Pixel data[] = new Pixel[0];
+	final Object imageLock = new Object();
+	GrayS32 imageRgb = new GrayS32(1,1);
+	GrayF32 imageDepth = new GrayF32(1,1);
 
-	// tilt angle in degrees
-	public int tiltAngle = 0;
-	public double radius = 5;
+	BufferedImage imageOutput = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
+
+	private int dotRadius = 2;
+
+	int backgroundColor = 0;
 
 	// previous mouse location
 	int prevX;
 	int prevY;
 
-	public PointCloudViewerPanelSwing(double keyStepSize ) {
+	public PointCloudViewerPanelSwing(float keyStepSize ) {
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -88,42 +104,42 @@ public class PointCloudViewerPanelSwing extends JPanel
 		this.stepSize = keyStepSize;
 	}
 
-   public PointCloudViewerPanelSwing(DMatrixRMaj K, double keyStepSize) {
+	public PointCloudViewerPanelSwing( float hfov, float keyStepSize) {
 		this(keyStepSize);
-		configure(K);
+		setHorizontalFieldOfView(hfov);
 	}
 
-	public PointCloudViewerPanelSwing(CameraPinhole intrinsic, double keyStepSize) {
-		this(keyStepSize);
-		configure(PerspectiveOps.calibrationMatrix(intrinsic,(DMatrixRMaj)null));
-		setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));
-	}
-
-	public void setWorldToCamera( Se3_F64 worldToCamera ) {
+	synchronized public void setWorldToCamera( Se3_F32 worldToCamera ) {
 		this.worldToCamera.set(worldToCamera);
 	}
 
-	/**
-	 * Specify camera parameters for rendering purposes
-	 *
-	 * @param K Intrinsic camera calibration matrix of rectified camera
-	 */
-	public void configure(DMatrixRMaj K) {
-		this.K = K;
-		this.focalLengthX = K.get(0,0);
-		this.focalLengthY = K.get(1,1);
-		this.centerX = K.get(0,2);
-		this.centerY = K.get(1,2);
+	public void setHorizontalFieldOfView( float radians ) {
+		this.hfov = radians;
 	}
 
-	public void reset() {
-		cloud.reset();
+	synchronized public void clearCloud() {
+		cloudXyz.reset();
+		cloudColor.reset();
 	}
 
-	public void addPoint( double x , double y , double z , int rgb ) {
-		ColorPoint3D p = cloud.grow();
-		p.set(x, y, z);
-		p.rgb = rgb;
+	synchronized public void addPoint( float x , float y , float z , int rgb ) {
+		cloudXyz.add(x);
+		cloudXyz.add(y);
+		cloudXyz.add(z);
+		cloudColor.add(rgb);
+	}
+	synchronized public void addPoints( float pointsXYZ[] , int pointsRGB[] , int length ) {
+		int idxSrc = cloudXyz.size*3;
+
+		cloudXyz.extend( cloudXyz.size + length*3 );
+		cloudColor.extend( cloudColor.size + length );
+
+		for (int i = 0, idx=0; i < length; i++) {
+			cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
+			cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
+			cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
+			cloudXyz.data[i] = pointsRGB[i];
+		}
 	}
 
 	@Override
@@ -131,68 +147,107 @@ public class PointCloudViewerPanelSwing extends JPanel
 		super.paintComponent(g);
 
 		projectScene();
-
-		int width = getWidth();
-		int h = getHeight();
-
-		int r = 2;
-		int w = r*2+1;
-
-		Graphics2D g2 = (Graphics2D)g;
-
-		int index = 0;
-		for( int y = 0; y < h; y++ ) {
-			for( int x = 0; x < width; x++ ) {
-				Pixel p = data[index++];
-				if( p.rgb == -1 )
-					continue;
-
-				g2.setColor(new Color(p.rgb));
-				g2.fillRect(x - r, y - r, w, w);
-			}
-		}
+		imageOutput = ConvertBufferedImage.checkDeclare(imageRgb.width,imageRgb.height,imageOutput,BufferedImage.TYPE_INT_RGB);
+		DataBufferInt buffer = (DataBufferInt)imageOutput.getRaster().getDataBuffer();
+		System.arraycopy(imageRgb.data,0,buffer.getData(),0,imageRgb.width*imageRgb.height);
+		g.drawImage(imageOutput,0,0,null);
 	}
 
-	private void projectScene() {
+	private Point3D_F32 worldPt = new Point3D_F32();
+	private Point3D_F32 cameraPt = new Point3D_F32();
+	private Point3D_F32 pixel = new Point3D_F32();
+	private synchronized void projectScene() {
 		int w = getWidth();
 		int h = getHeight();
 
-		int N = w*h;
+		imageDepth.reshape(w,h);
+		imageRgb.reshape(w,h);
 
-		double centerAdjustX = w/2-centerX;
-		double centerAdjustY = h/2-centerY;
+		CameraPinhole intrinsic = PerspectiveOps.createIntrinsic(w,h,UtilAngle.degree(hfov));
 
-		if( data.length < N ) {
-			data = new Pixel[ N ];
-			for( int i = 0; i < N; i++ )
-				data[i] = new Pixel();
-		} else {
-			for( int i = 0; i < N; i++ )
-				data[i].reset();
-		}
+		float fx = (float)intrinsic.fx;
+		float fy = (float)intrinsic.fy;
+		float cx = (float)intrinsic.cx;
+		float cy = (float)intrinsic.cy;
 
-		Point3D_F64 cameraPt = new Point3D_F64();
-		Point2D_F64 pixel = new Point2D_F64();
+		ImageMiscOps.fill(imageDepth,Float.MAX_VALUE);
+		ImageMiscOps.fill(imageRgb,backgroundColor);
 
-		for( int i = 0; i < cloud.size(); i++ ) {
-			ColorPoint3D p = cloud.get(i);
+		float maxDistanceSq = maxRenderDistance*maxRenderDistance;
+		if( Float.isInfinite(maxDistanceSq))
+			maxDistanceSq = Float.MAX_VALUE;
 
-			SePointOps_F64.transform(worldToCamera,p,cameraPt);
-			pixel.x = cameraPt.x/cameraPt.z;
-			pixel.y = cameraPt.y/cameraPt.z;
+		int totalPoints = cloudXyz.size/3;
+		for( int i = 0,pointIdx=0; i < totalPoints; i++ ) {
+			worldPt.x = cloudXyz.data[pointIdx++];
+			worldPt.y = cloudXyz.data[pointIdx++];
+			worldPt.z = cloudXyz.data[pointIdx++];
 
-			GeometryMath_F64.mult(K,pixel,pixel);
+			SePointOps_F32.transform(worldToCamera,worldPt,cameraPt);
 
-			int x = (int)(pixel.x+centerAdjustX+0.5);
-			int y = (int)(pixel.y+centerAdjustY+0.5);
-
-			if( x < 0 || y < 0 || x >= w || y >= h )
+			// can't render if it's behind the camera
+			if( cameraPt.z < 0 )
 				continue;
 
-			Pixel d = data[y*w+x];
-			if( d.height > cameraPt.z ) {
-				d.height = cameraPt.z;
-				d.rgb = p.rgb;
+			float r2 = cameraPt.normSq();
+			if( r2 > maxDistanceSq )
+				continue;
+
+			pixel.x = fx * cameraPt.x/cameraPt.z + cx;
+			pixel.y = fy * cameraPt.y/cameraPt.z + cy;
+
+
+			int x = (int)(pixel.x+0.5f);
+			int y = (int)(pixel.y+0.5f);
+
+			if( !imageDepth.isInBounds(x,y) )
+				continue;
+
+			int rgb = cloudColor.data[i];
+			if( fog ) {
+				rgb = applyFog(rgb, 1.0f-(float)Math.sqrt(r2)/maxRenderDistance );
+			}
+			renderDot(x,y,cameraPt.z,rgb);
+		}
+	}
+
+	/**
+	 * Fades color into background as a function of distance
+	 */
+	private int applyFog( int rgb , float fraction ) {
+		// avoid floating point math
+		int adjustment = (int)(1000*fraction);
+
+		int r = (rgb >> 16)&0xFF;
+		int g = (rgb >> 8)&0xFF;
+		int b = rgb & 0xFF;
+
+		r = (r * adjustment + ((backgroundColor>>16)&0xFF)*(1000-adjustment)) / 1000;
+		g = (g * adjustment + ((backgroundColor>>8)&0xFF)*(1000-adjustment)) / 1000;
+		b = (b * adjustment + (backgroundColor&0xFF)*(1000-adjustment)) / 1000;
+
+		return (r << 16) | (g << 8) | b;
+	}
+
+	/**
+	 * Renders a dot as a square sprite with the specified color
+	 */
+	private void renderDot( int cx , int cy , float Z , int rgb ) {
+		for (int i = -dotRadius; i <= dotRadius; i++) {
+			int y = cy+i;
+			if( y < 0 || y >= imageRgb.height )
+				continue;
+			for (int j = -dotRadius; j <= dotRadius; j++) {
+				int x = cx+j;
+				if( x < 0 || x >= imageRgb.width )
+					continue;
+
+				int pixelIndex = imageDepth.getIndex(x,y);
+				float depth = imageDepth.data[pixelIndex];
+				if( depth > Z ) {
+					imageDepth.data[pixelIndex] = Z;
+					imageRgb.data[pixelIndex] = rgb;
+				}
 			}
 		}
 	}
@@ -201,31 +256,50 @@ public class PointCloudViewerPanelSwing extends JPanel
 	public void keyTyped(KeyEvent e) {
 	}
 
+	boolean shiftPressed = false;
+	private final Set<Character> pressed = new HashSet<Character>();
+
 	@Override
 	public void keyPressed(KeyEvent e) {
-		Vector3D_F64 T = worldToCamera.getT();
+		Vector3D_F32 T = worldToCamera.getT();
 
-		if( e.getKeyChar() == 'w' ) {
-			T.z -= stepSize;
-		} else if( e.getKeyChar() == 's' ) {
-			T.z += stepSize;
-		} else if( e.getKeyChar() == 'a' ) {
-			T.x += stepSize;
-		} else if( e.getKeyChar() == 'd' ) {
-			T.x -= stepSize;
-		} else if( e.getKeyChar() == 'q' ) {
-			T.y -= stepSize;
-		} else if( e.getKeyChar() == 'e' ) {
-			T.y += stepSize;
-		} else if( e.getKeyChar() == 'h' ) {
-			worldToCamera.reset();
+		double multiplier = shiftPressed?5:1;
+
+		if( e.getKeyCode() == VK_SHIFT ) {
+			shiftPressed = true;
+		} else {
+			pressed.add(e.getKeyChar());
+		}
+
+		for( Character c : pressed ) {
+			if( c == 'w' ) {
+				T.z -= stepSize*multiplier;
+			} else if(c == 's' ) {
+				T.z += stepSize*multiplier;
+			} else if( c == 'a' ) {
+				T.x += stepSize*multiplier;
+			} else if( c == 'd' ) {
+				T.x -= stepSize*multiplier;
+			} else if( c == 'q' ) {
+				T.y -= stepSize*multiplier;
+			} else if( c == 'e' ) {
+				T.y += stepSize*multiplier;
+			} else if( c == 'h' ) {
+				worldToCamera.reset();
+			}
 		}
 
 		repaint();
 	}
 
 	@Override
-	public void keyReleased(KeyEvent e) {}
+	public void keyReleased(KeyEvent e) {
+		if( e.getKeyCode() == VK_SHIFT ) {
+			shiftPressed = false;
+		} else {
+			pressed.remove(e.getKeyChar());
+		}
+	}
 
 	/**
 	 * Contains information on visible pixels
@@ -274,16 +348,16 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 	@Override
 	public synchronized void mouseDragged(MouseEvent e) {
-		double rotX = 0;
-		double rotY = 0;
-		double rotZ = 0;
+		float rotX = 0;
+		float rotY = 0;
+		float rotZ = 0;
 
-		rotY += (e.getX() - prevX)*0.01;
-		rotX += (prevY - e.getY())*0.01;
+		rotY += (e.getX() - prevX)*0.002;
+		rotX += (prevY - e.getY())*0.002;
 
-		Se3_F64 rotTran = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,rotTran.getR());
-		Se3_F64 temp = worldToCamera.concat(rotTran,null);
+		Se3_F32 rotTran = new Se3_F32();
+		ConvertRotation3D_F32.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,rotTran.getR());
+		Se3_F32 temp = worldToCamera.concat(rotTran,null);
 		worldToCamera.set(temp);
 
 		prevX = e.getX();
@@ -295,4 +369,11 @@ public class PointCloudViewerPanelSwing extends JPanel
 	@Override
 	public void mouseMoved(MouseEvent e) {}
 
+	public int getDotRadius() {
+		return dotRadius;
+	}
+
+	public void setDotRadius(int dotRadius) {
+		this.dotRadius = dotRadius;
+	}
 }

@@ -25,10 +25,10 @@ public class VisualizeData {
 	public static PointCloudViewer createPointCloudViewer() {
 
 		PointCloudViewer viewer = null;
-		try {
-			viewer = loadGenerator("boofcv.javafx.PointCloudViewerFX");
-		} catch (RuntimeException e) {
-		}
+//		try {
+//			viewer = loadGenerator("boofcv.javafx.PointCloudViewerFX");
+//		} catch (RuntimeException e) {
+//		}
 
 		if (viewer == null) {
 			try {

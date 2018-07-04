@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class PanelGridPanel extends JPanel {
-	public PanelGridPanel( int numColumns , JPanel ...panels ) {
+	public PanelGridPanel( int numColumns , JComponent ...panels ) {
 
 		int numRows = panels.length/numColumns;
 
@@ -36,7 +36,7 @@ public class PanelGridPanel extends JPanel {
 
 		setLayout(experimentLayout);
 
-		for( JPanel p : panels )
+		for( JComponent p : panels )
 			add(p);
 	}
 

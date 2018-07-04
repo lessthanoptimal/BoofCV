@@ -18,31 +18,90 @@
 
 package boofcv.javafx;
 
-import boofcv.struct.Point3dRgbI;
 import boofcv.visualize.PointCloudViewer;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import javafx.application.Platform;
+import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.swing.*;
 import java.util.List;
 
+/**
+ * Point cloud viewer which uses JavaFX
+ */
 public class PointCloudViewerFX implements PointCloudViewer {
 
 	PointCloudViewerPanelFX panel = new PointCloudViewerPanelFX();
 
-	@Override
-	public void setCloudXyzRgbI32(List<Point3dRgbI> cloud) {
-		Platform.runLater(() -> panel.setCloud(cloud));
+	public PointCloudViewerFX() {
+		Platform.runLater(() -> panel.initialize());
 	}
 
 	@Override
-	public void setCameraFov(double radians) {
+	public void setShowAxis(boolean show) {
 
+	}
+
+	@Override
+	public void setTranslationStep(double step) {
+
+	}
+
+	@Override
+	public void setDotSize(int pixels) {
+
+	}
+
+	@Override
+	public void setClipDistance(double distance) {
+
+	}
+
+	@Override
+	public void setFog(boolean active) {
+
+	}
+
+	@Override
+	public void setBackgroundColor(int rgb) {
+
+	}
+
+	@Override
+	public void addCloud(List<Point3D_F64> cloudXyz, int[] colorsRgb) {
+
+	}
+
+	@Override
+	public void addCloud(List<Point3D_F64> cloud) {
+
+	}
+
+	@Override
+	public void addCloud(GrowQueue_F32 cloudXYZ, GrowQueue_I32 colorRGB) {
+
+	}
+
+	@Override
+	public void addPoint(double x, double y, double z, int rgb) {
+
+	}
+
+	@Override
+	public void clearPoints() {
+
+	}
+
+	@Override
+	public void setCameraHFov(double radians) {
+		Platform.runLater(() -> panel.setHorizontalFieldOfView(radians));
 	}
 
 	@Override
 	public void setCameraToWorld(Se3_F64 cameraToWorld) {
-
+		Platform.runLater(() -> panel.setCameraToWorld(cameraToWorld));
 	}
 
 	@Override

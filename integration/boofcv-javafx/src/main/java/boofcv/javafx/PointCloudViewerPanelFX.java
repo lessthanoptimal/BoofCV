@@ -19,13 +19,16 @@
 package boofcv.javafx;
 
 import boofcv.struct.Point3dRgbI;
-import georegression.struct.point.Point3D_F64;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.metric.UtilAngle;
+import georegression.struct.se.Se3_F64;
+import georegression.struct.so.Rodrigues_F64;
 import javafx.embed.swing.JFXPanel;
+import javafx.geometry.Point3D;
 import javafx.scene.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
-import javafx.scene.shape.Sphere;
+import javafx.scene.shape.*;
 
 import java.util.List;
 
@@ -43,9 +46,6 @@ public class PointCloudViewerPanelFX extends JFXPanel {
 	final Xform cameraXform = new Xform();
 	final Xform cameraXform2 = new Xform();
 	final Xform cameraXform3 = new Xform();
-	private static final double CAMERA_INITIAL_DISTANCE = -450;
-	private static final double CAMERA_INITIAL_X_ANGLE = 70.0;
-	private static final double CAMERA_INITIAL_Y_ANGLE = 320.0;
 	private static final double CAMERA_NEAR_CLIP = 0.1;
 	private static final double CAMERA_FAR_CLIP = 10000.0;
 	private static final double AXIS_LENGTH = 250.0;
@@ -62,15 +62,17 @@ public class PointCloudViewerPanelFX extends JFXPanel {
 	double mouseDeltaX;
 	double mouseDeltaY;
 
+	// description of the primitive shape
+	float[] templatePoints;
+	int[] templateFaces;
+	float[] texCoords;
 
-
-	public void setCloud(List<Point3dRgbI> cloud ) {
+	public void initialize() {
 		root.getChildren().add(world);
 		root.setDepthTest(DepthTest.ENABLE);
 
 		buildCamera();
 		buildAxes();
-		buildCloud(cloud);
 
 		Scene scene = new Scene(root, 1024, 768, true);
 		scene.setFill(Color.GREY);
@@ -79,6 +81,57 @@ public class PointCloudViewerPanelFX extends JFXPanel {
 
 		scene.setCamera(camera);
 		setScene(scene);
+
+		declareTetrahedron(1f);
+	}
+
+	public void setCloud(List<Point3dRgbI> cloud ) {
+
+		float[] points = new float[ templatePoints.length*cloud.size() ];
+		int[] faces = new int[ templateFaces.length*cloud.size() ];
+		int numPointsInShape = templatePoints.length/3;
+
+		for (int indexPoint = 0; indexPoint < cloud.size(); indexPoint++) {
+			Point3dRgbI p = cloud.get(indexPoint);
+
+			float cx = (float)(p.x);
+			float cy = (float)(p.y);
+			float cz = (float)(p.z);
+
+			int idx =  templatePoints.length*indexPoint;
+			for (int j = 0; j < templatePoints.length; ) {
+				points[idx++] = templatePoints[j++] + cx;
+				points[idx++] = templatePoints[j++] + cy;
+				points[idx++] = templatePoints[j++] + cz;
+			}
+
+			idx = templateFaces.length*indexPoint;
+			for (int j = 0; j < templateFaces.length; j += 2, idx += 2) {
+				faces[idx] = templateFaces[j] + numPointsInShape*indexPoint;
+			}
+
+//			int rgb = p.rgb;
+//			Color color = Color.rgb((rgb>>16)&0xFF, (rgb>>8)&0xFF,rgb&0xFF);
+		}
+
+		TriangleMesh mesh = new TriangleMesh();
+		mesh.getPoints().setAll(points);
+		mesh.getTexCoords().setAll(texCoords);
+		mesh.getFaces().setAll(faces);
+
+		final MeshView meshView = new MeshView(mesh);
+		meshView.setMaterial(new PhongMaterial(Color.RED));
+//		meshView.setRotationAxis(Rotate.Y_AXIS);
+//		meshView.setTranslateX(-mean.x*scale);
+//		meshView.setTranslateY(-mean.y*scale);
+//		meshView.setTranslateZ(-mean.z*scale);
+// try commenting this line out to see what it's effect is . . .
+//		meshView.setCullFace(CullFace.NONE);
+		meshView.setDepthTest(DepthTest.ENABLE);
+		meshView.setDrawMode(DrawMode.FILL);
+		meshView.setCullFace(CullFace.BACK);
+
+		world.getChildren().addAll(meshView);
 	}
 
 	private void buildCamera() {
@@ -90,9 +143,24 @@ public class PointCloudViewerPanelFX extends JFXPanel {
 
 		camera.setNearClip(CAMERA_NEAR_CLIP);
 		camera.setFarClip(CAMERA_FAR_CLIP);
-		camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
-//		cameraXform.ry.setAngle(CAMERA_INITIAL_Y_ANGLE);
-//		cameraXform.rx.setAngle(CAMERA_INITIAL_X_ANGLE);
+	}
+
+	public void setHorizontalFieldOfView( double radians ) {
+		camera.setFieldOfView(UtilAngle.degree(radians));
+	}
+
+	public void setCameraToWorld( Se3_F64 cameraToWorld ) {
+		camera.setTranslateX(cameraToWorld.T.x);
+		camera.setTranslateY(cameraToWorld.T.y);
+		camera.setTranslateZ(cameraToWorld.T.z);
+
+		Rodrigues_F64 rod = new Rodrigues_F64();
+		ConvertRotation3D_F64.matrixToRodrigues(cameraToWorld.R,rod);
+
+		Point3D V = new Point3D(rod.unitAxisRotation.x,rod.unitAxisRotation.y,rod.unitAxisRotation.z);
+
+		camera.setRotationAxis(V);
+		camera.setRotate(UtilAngle.degree(rod.theta));
 	}
 
 	private void buildAxes() {
@@ -121,60 +189,34 @@ public class PointCloudViewerPanelFX extends JFXPanel {
 		world.getChildren().addAll(axisGroup);
 	}
 
-	private void buildCloud( List<Point3dRgbI> cloud ) {
+	private void declareTetrahedron( float r ) {
+		templatePoints = new float[]{
+				0,-r,0,
+				-r,r,-r,
+				r,r,-r,
+				0,r,r,
+		};
 
-		Xform pointGroup = new Xform();
+		templateFaces = new int[]{
+				0,0,
+				1,1,
+				2,2,
+				0,0,
+				2,1,
+				3,2,
+				0,0,
+				3,1,
+				1,2,
+				3,0,
+				2,1,
+				1,2
+		};
 
-		Point3D_F64 mean = new Point3D_F64();
-		Point3D_F64 stdev = new Point3D_F64();
-
-		int N = cloud.size();
-		for (int i = 0; i < N; i++) {
-			Point3D_F64 p = cloud.get(i);
-			mean.x += p.x / N;
-			mean.y += p.y / N;
-			mean.z += p.z / N;
-		}
-
-		for (int i = 0; i < N; i++) {
-			Point3D_F64 p = cloud.get(i);
-			double dx = p.x-mean.x;
-			double dy = p.y-mean.y;
-			double dz = p.z-mean.z;
-
-			stdev.x += dx*dx/N;
-			stdev.y += dy*dy/N;
-			stdev.z += dz*dz/N;
-		}
-
-		float scale = (float)Math.max(Math.sqrt(stdev.x),Math.sqrt(stdev.y));
-		scale = (float)(0.1*AXIS_LENGTH/Math.max(scale,Math.sqrt(stdev.z)));
-		float radius =1f;
-
-		System.out.println("scale = "+scale+"  radius = "+radius);
-
-		for (int i = 0; i < cloud.size(); i++) {
-			PhongMaterial material = new PhongMaterial();
-
-			Point3dRgbI p = cloud.get(i);
-
-			int rgb = p.rgb;
-
-			Color color = Color.rgb((rgb>>16)&0xFF, (rgb>>8)&0xFF,rgb&0xFF);
-			material.setDiffuseColor(color);
-
-			Sphere pointBox = new Sphere(radius);
-			pointBox.setCache(true);
-			pointBox.setCacheHint(CacheHint.SPEED);
-
-			pointBox.setMaterial(material);
-			pointBox.setTranslateX((p.x-mean.x) * scale);
-			pointBox.setTranslateY((p.y-mean.y) * scale);
-			pointBox.setTranslateZ((p.z-mean.z) * scale);
-
-			pointGroup.getChildren().add(pointBox);
-		}
-		world.getChildren().addAll(pointGroup);
+		texCoords = new float[]{
+				0,0,
+				1,0,
+				0,1,
+		};
 	}
 
 	private void handleMouse(Scene scene, final Node root) {

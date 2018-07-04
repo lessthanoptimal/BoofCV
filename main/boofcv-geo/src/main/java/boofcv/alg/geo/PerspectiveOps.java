@@ -520,4 +520,12 @@ public class PerspectiveOps {
 		alg.configure(distortion,worldToCamera);
 		return alg;
 	}
+
+	public static double computeHFov(CameraPinhole intrinsic) {
+		return 2*Math.atan((intrinsic.width/2)/intrinsic.fx);
+	}
+
+	public static double computeVFov(CameraPinhole intrinsic) {
+		return 2*Math.atan((intrinsic.height/2)/intrinsic.fy);
+	}
 }
