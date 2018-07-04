@@ -143,7 +143,6 @@ public class ExampleMultiviewSceneReconstruction {
 			}
 		}
 
-		System.out.println("Pruning Cloud");
 		PointCloudViewer viewer = VisualizeData.createPointCloudViewer();
 		viewer.setTranslationStep(0.05);
 		viewer.addCloud(cloudXyz,cloudRgb.data);

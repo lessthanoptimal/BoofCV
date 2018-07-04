@@ -138,7 +138,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 			cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
 			cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
 			cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
-			cloudXyz.data[i] = pointsRGB[i];
+			cloudColor.data[i] = pointsRGB[i];
 		}
 	}
 

@@ -32,7 +32,7 @@ import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.ConfigEssential;
 import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.FactoryMultiViewRobust;
-import boofcv.gui.d3.PointCloudTiltPanel;
+import boofcv.gui.d3.DisparityToColorPointCloud;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
@@ -41,6 +41,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.DoNothing2Transform2_F64;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -49,7 +50,10 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.visualize.PointCloudViewer;
+import boofcv.visualize.VisualizeData;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
@@ -130,8 +134,8 @@ public class ExampleStereoTwoViewsOneCamera {
 		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectifiedLeft, null);
 		BufferedImage outRight = ConvertBufferedImage.convertTo(rectifiedRight, null);
 
-		ShowImages.showWindow(new RectifiedPairPanel(true, outLeft, outRight), "Rectification");
-		ShowImages.showWindow(visualized, "Disparity");
+		ShowImages.showWindow(new RectifiedPairPanel(true, outLeft, outRight), "Rectification",true);
+		ShowImages.showWindow(visualized, "Disparity",true);
 
 		showPointCloud(disparity, outLeft, leftToRight, rectifiedK, minDisparity, maxDisparity);
 
@@ -258,7 +262,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		panel.setAssociation(pixels);
 		panel.setImages(left, right);
 
-		ShowImages.showWindow(panel, "Inlier Features");
+		ShowImages.showWindow(panel, "Inlier Features", true);
 	}
 
 	/**
@@ -266,15 +270,25 @@ public class ExampleStereoTwoViewsOneCamera {
 	 */
 	public static void showPointCloud(ImageGray disparity, BufferedImage left,
 									  Se3_F64 motion, DMatrixRMaj rectifiedK ,
-									  int minDisparity, int maxDisparity) {
-		PointCloudTiltPanel gui = new PointCloudTiltPanel();
-
+									  int minDisparity, int maxDisparity)
+	{
+		DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 		double baseline = motion.getT().norm();
+		d2c.configure(baseline, rectifiedK, new DoNothing2Transform2_F64(), minDisparity, maxDisparity);
+		d2c.process(disparity,left);
 
-		gui.configure(baseline, rectifiedK, new DoNothing2Transform2_F64(), minDisparity, maxDisparity);
-		gui.process(disparity, left);
-		gui.setPreferredSize(new Dimension(left.getWidth(), left.getHeight()));
+		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToParam(rectifiedK,disparity.width,disparity.height,null);
 
-		ShowImages.showWindow(gui, "Point Cloud");
+		// skew the view to make the structure easier to see
+		Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.setEulerXYZ(0,0.3,0,-300,0,0,null);
+
+		PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
+		pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
+		pcv.setCameraToWorld(cameraToWorld);
+		pcv.setTranslationStep(5);
+		pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
+
+		pcv.getComponent().setPreferredSize(new Dimension(left.getWidth(), left.getHeight()));
+		ShowImages.showWindow(pcv.getComponent(), "Point Cloud", true);
 	}
 }

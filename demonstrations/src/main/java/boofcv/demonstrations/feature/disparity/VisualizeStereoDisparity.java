@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
-import boofcv.gui.d3.PointCloudTiltPanel;
+import boofcv.gui.d3.DisparityToColorPointCloud;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
@@ -37,11 +37,14 @@ import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.visualize.PointCloudViewer;
+import boofcv.visualize.VisualizeData;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
@@ -94,7 +97,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	private DisparityDisplayPanel control = new DisparityDisplayPanel();
 	private JPanel panel = new JPanel();
 	private ImagePanel gui = new ImagePanel();
-	private PointCloudTiltPanel cloudGui = new PointCloudTiltPanel();
+	private PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
 
 	// if true the point cloud has already been computed and does not need to be recomputed
 	private boolean computedCloud;
@@ -186,15 +189,24 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		} else {
 			if( !computedCloud ) {
 				computedCloud = true;
-				double baseline = calib.getRightToLeft().getT().norm();
+				DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 
-				cloudGui.configure(baseline,rectK,leftRectToPixel,control.minDisparity,control.maxDisparity);
-				cloudGui.process(activeAlg.getDisparity(),colorLeft);
+				double baseline = calib.getRightToLeft().getT().norm();
+				d2c.configure(baseline, rectK, leftRectToPixel, control.minDisparity,control.maxDisparity);
+				d2c.process(activeAlg.getDisparity(),colorLeft);
+
+				CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToParam(
+						rectK,colorLeft.getWidth(),colorLeft.getHeight(),null);
+				pcv.clearPoints();
+				pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
+				pcv.setTranslationStep(5);
+				pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
 			}
-			comp = cloudGui;
+			comp = pcv.getComponent();
+			comp.requestFocusInWindow();
 		}
 		panel.remove(gui);
-		panel.remove(cloudGui);
+		panel.remove(pcv.getComponent());
 		panel.add(comp,BorderLayout.CENTER);
 		panel.validate();
 		comp.repaint();
