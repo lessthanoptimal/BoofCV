@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
+import boofcv.alg.nn.KdTreePoint2D_F64;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -50,10 +51,10 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	double tooFarFraction = 0.3;
 
 	// used to search for neighbors that which are candidates for connecting
-	private NearestNeighbor<SquareNode> search = FactoryNearestNeighbor.kdtree();
-	private FastQueue<double[]> searchPoints;
+	private NearestNeighbor<Point2D_F64> search = FactoryNearestNeighbor.kdtree(new KdTreePoint2D_F64());
+	private List<Point2D_F64> searchPoints = new ArrayList<>();
 	private List<SquareNode> searchSquareList = new ArrayList<>();
-	private FastQueue<NnData<SquareNode>> searchResults = new FastQueue(NnData.class,true);
+	private FastQueue<NnData<Point2D_F64>> searchResults = new FastQueue(NnData.class,true);
 
 	/**
 	 * Declares data structures and configures algorithm
@@ -68,12 +69,6 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 		if( this.maxNeighbors == Integer.MAX_VALUE ) {
 			this.maxNeighbors = Integer.MAX_VALUE-1;
 		}
-		searchPoints = new FastQueue<double[]>(double[].class,true) {
-			@Override
-			protected double[] createInstance() {
-				return new double[2];
-			}
-		};
 
 		search.init(2);
 	}
@@ -151,20 +146,20 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 				if( n.touch.size > 0 && n.touch.get(indexLocal) )
 					continue;
 
-				double[] point = searchPoints.get(indexCornerList++);
 				// find it's neighbors
 				searchResults.reset();
-				search.findNearest(point, maxCornerDistance*maxCornerDistance, maxNeighbors + 1, searchResults);
+				search.findNearest(searchPoints.get(indexCornerList++), maxCornerDistance*maxCornerDistance, maxNeighbors + 1, searchResults);
 
 				for (int indexResults = 0; indexResults < searchResults.size(); indexResults++) {
-					NnData<SquareNode> neighborData = searchResults.get(indexResults);
-					SquareNode neighborNode = neighborData.data;
+					NnData<Point2D_F64> neighborData = searchResults.get(indexResults);
+					SquareNode neighborNode = searchSquareList.get(neighborData.index);
+					Point2D_F64 closestCorner = neighborData.point;
 
 					// if the neighbor corner is from the same node skip it
 					if( neighborNode == n )
 						continue;
 
-					int neighborCornerIndex = getCornerIndex(neighborNode,neighborData.point[0],neighborData.point[1]);
+					int neighborCornerIndex = getCornerIndex(neighborNode,closestCorner.x,closestCorner.y);
 
 					if( candidateIsMuchCloser(n, neighborNode, neighborData.distance))
 						graph.checkConnect(n, indexLocal, neighborNode, neighborCornerIndex, neighborData.distance);
@@ -190,7 +185,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	 * Sets up data structures for nearest-neighbor search used in {@link #connectNodes()}
 	 */
 	private void setupSearch() {
-		searchPoints.reset();
+		searchPoints.clear();
 		searchSquareList.clear();
 
 		for (int i = 0; i < nodes.size(); i++) {
@@ -199,16 +194,13 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			for (int j = 0; j < n.square.size(); j++) {
 				if( n.touch.size > 0 && n.touch.get(j) )
 					continue;
+				searchPoints.add( n.square.get(j));
 
-				Point2D_F64 c = n.square.get(j);
-				double[] point = searchPoints.grow();
-				point[0] = c.x;
-				point[1] = c.y;
 				// setup a list of squares for quick lookup
 				searchSquareList.add(n);
 			}
 		}
-		search.setPoints(searchPoints.toList(),searchSquareList);
+		search.setPoints(searchPoints,true);
 	}
 
 	/**
@@ -234,4 +226,5 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	public void setMaxCornerDistance(double maxCornerDistance) {
 		this.maxCornerDistance = maxCornerDistance;
 	}
+
 }

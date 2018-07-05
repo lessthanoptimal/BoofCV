@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import georegression.struct.curve.EllipseRotated_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
+import org.ddogleg.nn.alg.KdTreeDistance;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -51,9 +52,8 @@ public class EllipsesIntoClusters {
 	// minimum number of elements in a cluster
 	private int minimumClusterSize = 3;
 
-	private NearestNeighbor<Node> search = FactoryNearestNeighbor.kdtree();
-	private FastQueue<double[]> searchPoints;
-	private FastQueue<NnData<Node>> searchResults = new FastQueue(NnData.class,true);
+	private NearestNeighbor<EllipseInfo> search = FactoryNearestNeighbor.kdtree(new KdTreeEllipseInfo());
+	private FastQueue<NnData<EllipseInfo>> searchResults = new FastQueue(NnData.class,true);
 
 	FastQueue<Node> nodes = new FastQueue<>(Node.class,true);
 	FastQueue<List<Node>> clusters;
@@ -78,13 +78,6 @@ public class EllipsesIntoClusters {
 		this.edgeIntensitySimilarityTolerance = edgeIntensitySimilarityTolerance;
 
 		search.init(2);
-
-		searchPoints = new FastQueue<double[]>(double[].class,true) {
-			@Override
-			protected double[] createInstance() {
-				return new double[2];
-			}
-		};
 
 		clusters = new FastQueue(List.class,true) {
 			@Override
@@ -134,7 +127,7 @@ public class EllipsesIntoClusters {
 			maxDistance *= maxDistance;
 
 			searchResults.reset();
-			search.findNearest( searchPoints.get(i), maxDistance, Integer.MAX_VALUE, searchResults );
+			search.findNearest( ellipses.get(i), maxDistance, Integer.MAX_VALUE, searchResults );
 
 			// if this node already has a cluster look it up, otherwise create a new one
 			List<Node> cluster1;
@@ -152,14 +145,14 @@ public class EllipsesIntoClusters {
 
 			// only accept ellipses which have a similar size
 			for (int j = 0; j < searchResults.size(); j++) {
-				NnData<Node> d = searchResults.get(j);
-				EllipseInfo info2 = ellipses.get(d.data.which);
+				NnData<EllipseInfo> d = searchResults.get(j);
+				EllipseInfo info2 = ellipses.get(d.index);
 				EllipseRotated_F64 e2 = info2.ellipse;
 				if( e2 == e1 )
 					continue;
 
 				// see of they are already connected
-				if( node1.connections.indexOf(d.data.which) != -1 ) {
+				if( node1.connections.indexOf(d.index) != -1 ) {
 					continue;
 				}
 
@@ -200,7 +193,7 @@ public class EllipsesIntoClusters {
 						(edgeIntensitySimilarityTolerance/1.5+(1-ratioSimilarityTolerance)) )
 					continue;
 
-				int indexNode2 = d.data.which;
+				int indexNode2 = d.index;
 				Node node2 = nodes.get(indexNode2);
 
 				// node2 isn't in a cluster already.  Add it to this one
@@ -296,23 +289,17 @@ public class EllipsesIntoClusters {
 	 * Recycles and initializes all internal data structures
 	 */
 	void init(List<EllipseInfo> ellipses) {
-		searchPoints.resize(ellipses.size());
 		nodes.resize(ellipses.size());
 		clusters.reset();
 
 		for (int i = 0; i < ellipses.size(); i++) {
-			EllipseRotated_F64 e = ellipses.get(i).ellipse;
-			double[] p = searchPoints.get(i);
-			p[0] = e.center.x;
-			p[1] = e.center.y;
-
 			Node n = nodes.get(i);
 			n.connections.reset();
 			n.which = i;
 			n.cluster = -1;
 		}
 
-		search.setPoints(searchPoints.toList(),nodes.toList());
+		search.setPoints(ellipses,true);
 	}
 
 	/**
@@ -374,5 +361,22 @@ public class EllipsesIntoClusters {
 		 * connected to each other
 		 */
 		public GrowQueue_I32 connections = new GrowQueue_I32();
+	}
+
+	private static class KdTreeEllipseInfo implements KdTreeDistance<EllipseInfo> {
+
+		@Override
+		public double compute(EllipseInfo a, EllipseInfo b) {
+			return a.ellipse.center.distance2(b.ellipse.center);
+		}
+
+		@Override
+		public double valueAt(EllipseInfo point, int index) {
+			switch( index ) {
+				case 0: return point.ellipse.center.x;
+				case 1: return point.ellipse.center.y;
+			}
+			throw new IllegalArgumentException("Out of bounds. "+index);
+		}
 	}
 }

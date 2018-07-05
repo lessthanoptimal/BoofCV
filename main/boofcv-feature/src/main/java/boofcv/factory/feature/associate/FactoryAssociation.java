@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.factory.feature.associate;
 
 import boofcv.abst.feature.associate.*;
+import boofcv.alg.descriptor.KdTreeTuple_F64;
 import boofcv.alg.feature.associate.AssociateGreedy;
 import boofcv.struct.feature.*;
 import org.ddogleg.nn.FactoryNearestNeighbor;
@@ -61,14 +62,14 @@ public class FactoryAssociation {
 	 * order.
 	 *
 	 * @see AssociateNearestNeighbor
-	 * @see org.ddogleg.nn.alg.KdTreeSearch1Bbf
+	 * @see org.ddogleg.nn.alg.searches.KdTreeSearch1Bbf
 	 *
 	 * @param dimension Number of elements in the feature vector
 	 * @param maxNodesSearched  Maximum number of nodes it will search.  Controls speed and accuracy.
 	 * @return Association using approximate nearest neighbor
 	 */
 	public static AssociateDescription<TupleDesc_F64> kdtree( int dimension, int maxNodesSearched ) {
-		NearestNeighbor nn = FactoryNearestNeighbor.kdtree(maxNodesSearched);
+		NearestNeighbor nn = FactoryNearestNeighbor.kdtree(new KdTreeTuple_F64(),maxNodesSearched);
 
 		return new AssociateNearestNeighbor<>(nn, dimension);
 	}
@@ -94,6 +95,7 @@ public class FactoryAssociation {
 																	  int numConsiderSplit ,
 																	  long randomSeed) {
 		NearestNeighbor nn = FactoryNearestNeighbor.kdRandomForest(
+				new KdTreeTuple_F64(),
 				maxNodesSearched,numTrees,numConsiderSplit,randomSeed);
 
 		return new AssociateNearestNeighbor<>(nn, dimension);

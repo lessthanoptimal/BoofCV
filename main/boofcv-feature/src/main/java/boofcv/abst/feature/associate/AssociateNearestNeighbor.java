@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,13 +27,12 @@ import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Matches features using a {@link NearestNeighbor} search from DDogleg.  The source features are processed
- * as a lump using {@link NearestNeighbor#setPoints(java.util.List, java.util.List)} while destination features
- * are matched one at time using {@link NearestNeighbor#findNearest(double[], double, org.ddogleg.nn.NnData)}.
+ * as a lump using {@link NearestNeighbor#setPoints(java.util.List, boolean)} while destination features
+ * are matched one at time using {@link NearestNeighbor#findNearest(Object, double, org.ddogleg.nn.NnData)}.
  * Typically the processing of source features is more expensive and should be minimized while looking up
  * destination features is fast.  Multiple matches for source features are possible while there will only
  * be a unique match for each destination feature.
@@ -44,17 +43,13 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 		implements AssociateDescription<D>
 {
 	// Nearest Neighbor algorithm and storage for the results
-	private NearestNeighbor<Integer> alg;
-	private NnData<Integer> result = new NnData<>();
+	private NearestNeighbor<TupleDesc_F64> alg;
+	private NnData<TupleDesc_F64> result = new NnData<>();
 
 	// list of features in destination set that are to be searched for in the source list
 	private FastQueue<D> listDst;
 
-	// List of indexes.  Passed in as data associated with source points
-	private FastQueue<Integer> indexes = new FastQueue<>(0, Integer.class, false);
-
-	// storage for source points
-	private List<double[]> src = new ArrayList<>();
+	int sizeSrc;
 
 	// List of final associated points
 	private FastQueue<AssociatedIndex> matches = new FastQueue<>(100, AssociatedIndex.class, true);
@@ -65,33 +60,15 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 	// maximum distance away two points can be
 	private double maxDistanceSq = -1;
 
-	public AssociateNearestNeighbor(NearestNeighbor<Integer> alg , int featureDimension ) {
+	public AssociateNearestNeighbor(NearestNeighbor<TupleDesc_F64> alg , int featureDimension ) {
 		this.alg = alg;
 		alg.init(featureDimension);
 	}
 
 	@Override
 	public void setSource(FastQueue<D> listSrc) {
-		// grow the index list while copying over old values
-		if( indexes.data.length < listSrc.size() ) {
-			Integer a[] = new Integer[listSrc.size()];
-			System.arraycopy(indexes.data,0,a,0,indexes.data.length);
-			for( int i = indexes.data.length; i < a.length; i++ ) {
-				a[i] = i;
-			}
-			indexes.data = a;
-			indexes.size = a.length;
-		} else {
-			indexes.size = listSrc.size();
-		}
-
-		// put all the arrays into a list
-		src.clear();
-		for( int i = 0; i < listSrc.size; i++ ) {
-			src.add(listSrc.data[i].value);
-		}
-
-		alg.setPoints(src,indexes.toList());
+		this.sizeSrc = listSrc.size;
+		alg.setPoints((List)listSrc.toList(),true);
 	}
 
 	@Override
@@ -104,10 +81,10 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 
 		matches.reset();
 		for( int i = 0; i < listDst.size; i++ ) {
-			if( !alg.findNearest(listDst.data[i].value, maxDistanceSq,result) )
+			if( !alg.findNearest(listDst.data[i], maxDistanceSq,result) )
 				continue;
 			// get the index of the source feature
-			int indexSrc = result.data;
+			int indexSrc = result.index;
 			matches.grow().setAssociation(indexSrc,i,result.distance);
 		}
 
@@ -120,7 +97,7 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 
 	@Override
 	public GrowQueue_I32 getUnassociatedSource() {
-		return unassociated.checkSource(matches,src.size());
+		return unassociated.checkSource(matches,sizeSrc);
 	}
 
 	@Override

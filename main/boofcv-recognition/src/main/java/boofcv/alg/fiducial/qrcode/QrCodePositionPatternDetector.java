@@ -64,9 +64,8 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	SquareGraph graph = new SquareGraph();
 
 	// Nearst Neighbor Search related variables
-	private NearestNeighbor<PositionPatternNode> search = FactoryNearestNeighbor.kdtree();
-	private FastQueue<double[]> searchPoints;
-	private FastQueue<NnData<PositionPatternNode>> searchResults = new FastQueue(NnData.class,true);
+	private NearestNeighbor<SquareNode> search = FactoryNearestNeighbor.kdtree(new SquareNode.KdTreeSquareNode());
+	private FastQueue<NnData<SquareNode>> searchResults = new FastQueue(NnData.class,true);
 
 	// Computes a mapping to remove perspective distortion
 	private RemovePerspectiveDistortion<?> removePerspective = new RemovePerspectiveDistortion(70,70);
@@ -80,9 +79,6 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	// runtime profiling
 	protected MovingAverage milliGraph = new MovingAverage(0.8);
 	protected boolean profiler = false;
-
-	// storage for nearest neighbor
-	double point[] = new double[2];
 
 	/**
 	 * Configures the detector
@@ -101,12 +97,6 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 		// set up nearest neighbor search for 2-DOF
 		search.init(2);
-		searchPoints = new FastQueue<double[]>(double[].class,true) {
-			@Override
-			protected double[] createInstance() {
-				return new double[2];
-			}
-		};
 
 		interpolate = FactoryInterpolation.bilinearPixelS(squareDetector.getInputType(), BorderType.EXTENDED);
 	}
@@ -219,14 +209,8 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 */
 	private void createPositionPatternGraph() {
 		// Add items to NN search
-		searchPoints.resize(positionPatterns.size());
-		for (int i = 0; i < positionPatterns.size(); i++) {
-			PositionPatternNode f = positionPatterns.get(i);
-			double[] p = searchPoints.get(i);
-			p[0] = f.center.x;
-			p[1] = f.center.y;
-		}
-		search.setPoints(searchPoints.toList(),positionPatterns.toList());
+
+		search.setPoints((List)positionPatterns.toList(),false);
 
 		for (int i = 0; i < positionPatterns.size(); i++) {
 			PositionPatternNode f = positionPatterns.get(i);
@@ -238,19 +222,16 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 			double searchRadius = 1.2*maximumQrCodeWidth; // search 1/2 the width + some fudge factor
 			searchRadius*=searchRadius;
 
-			point[0] = f.center.x;
-			point[1] = f.center.y;
-
 			// Connect all the finder patterns which are near by each other together in a graph
-			search.findNearest(point,searchRadius,Integer.MAX_VALUE,searchResults);
+			search.findNearest(f,searchRadius,Integer.MAX_VALUE,searchResults);
 
 			if( searchResults.size > 1) {
 				for (int j = 0; j < searchResults.size; j++) {
-					NnData<PositionPatternNode> r = searchResults.get(j);
+					NnData<SquareNode> r = searchResults.get(j);
 
-					if( r.data == f ) continue; // skip over if it's the square that initiated the search
+					if( r.point == f ) continue; // skip over if it's the square that initiated the search
 
-					considerConnect(f,r.data);
+					considerConnect(f,r.point);
 				}
 			}
 		}

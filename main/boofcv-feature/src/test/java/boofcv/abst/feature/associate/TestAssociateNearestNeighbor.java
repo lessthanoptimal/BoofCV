@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.associate;
 
+import boofcv.alg.descriptor.KdTreeTuple_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
@@ -30,7 +31,6 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -44,9 +44,8 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 	@Override
 	public AssociateDescription<TupleDesc_F64> createAlg() {
 		// exhaustive algorithm will produce perfect results
-		NearestNeighbor<Integer> exhaustive = FactoryNearestNeighbor.exhaustive();
-		AssociateNearestNeighbor<TupleDesc_F64> alg = new AssociateNearestNeighbor<>(exhaustive, 1);
-		return alg;
+		NearestNeighbor<TupleDesc_F64> exhaustive = FactoryNearestNeighbor.exhaustive(new KdTreeTuple_F64());
+		return new AssociateNearestNeighbor<>(exhaustive, 1);
 	}
 
 	@Override
@@ -62,7 +61,7 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 	@Test
 	public void various() {
 
-		Dummy<Integer> nn = new Dummy<>();
+		Dummy<TupleDesc_F64> nn = new Dummy<>();
 		// src = assoc[i] where src is the index of the source feature and i is the index of the dst feature
 		nn.assoc = new int[]{2,0,1,-1,4,-1,-1,2,2,1};
 
@@ -85,7 +84,7 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 		alg.associate();
 
 		FastQueue<AssociatedIndex> matches = alg.getMatches();
-		assertTrue(nn.pointDimension == 10);
+		assertEquals(10, nn.pointDimension);
 
 		assertEquals(7,matches.size);
 		for( int i = 0, count = 0; i < nn.assoc.length; i++ ) {
@@ -111,8 +110,7 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 
 		public int pointDimension;
 
-		List<double[]> points;
-		List<D> data;
+		List<D> points;
 
 		public int assoc[];
 		int numCalls = 0;
@@ -123,18 +121,17 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 		}
 
 		@Override
-		public void setPoints(List<double[]> points, List<D> data) {
+		public void setPoints(List<D> points, boolean assad) {
 			this.points = points;
-			this.data = data;
 		}
 
 		@Override
-		public boolean findNearest(double[] point, double maxDistance, NnData<D> result) {
+		public boolean findNearest(D point, double maxDistance, NnData<D> result) {
 
 			int w = assoc[numCalls++];
 
 			if( w >= 0 ) {
-				result.data = data.get(w);
+				result.index = w;
 				result.point = points.get(w);
 				return true;
 			}
@@ -143,7 +140,7 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 		}
 
 		@Override
-		public void findNearest(double[] point, double maxDistance, int numNeighbors, FastQueue<NnData<D>> result) {
+		public void findNearest(D point, double maxDistance, int numNeighbors, FastQueue<NnData<D>> result) {
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.alg.bow.LearnSceneFromFiles;
 import boofcv.alg.scene.ClassifierKNearestNeighborsBow;
 import boofcv.alg.scene.FeatureToWordHistogram_F64;
 import boofcv.alg.scene.HistogramScene;
+import boofcv.alg.scene.KdTreeHistogramScene_F64;
 import boofcv.factory.feature.dense.*;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.learning.ConfusionMatrixPanel;
@@ -245,7 +246,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans_F64(null, MAX_KNN_ITERATIONS, 20, 1e-6);
 		clusterer.setVerbose(true);
 
-		NearestNeighbor<HistogramScene> nn = FactoryNearestNeighbor.exhaustive();
+		NearestNeighbor<HistogramScene> nn = FactoryNearestNeighbor.exhaustive(new KdTreeHistogramScene_F64());
 		ExampleClassifySceneKnn example = new ExampleClassifySceneKnn(desc,clusterer,nn);
 
 		File trainingDir = new File(UtilIO.pathExample("learning/scene/train"));

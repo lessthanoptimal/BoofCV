@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,6 +36,7 @@ import boofcv.struct.image.Planar;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
+import org.ddogleg.nn.alg.distance.KdTreeEuclideanSq_F64;
 import org.ddogleg.struct.FastQueue;
 
 import java.awt.image.BufferedImage;
@@ -218,11 +219,11 @@ public class ExampleColorHistogramLookup {
 		double[] targetPoint = points.get(target);
 
 		// Use a generic NN search algorithm.  This uses Euclidean distance as a distance metric.
-		NearestNeighbor<File> nn = FactoryNearestNeighbor.exhaustive();
-		FastQueue<NnData<File>> results = new FastQueue(NnData.class,true);
+		NearestNeighbor<double[]> nn = FactoryNearestNeighbor.exhaustive(new KdTreeEuclideanSq_F64());
+		FastQueue<NnData<double[]>> results = new FastQueue(NnData.class,true);
 
 		nn.init(targetPoint.length);
-		nn.setPoints(points, images);
+		nn.setPoints(points, true);
 		nn.findNearest(targetPoint, -1, 10, results);
 
 		ListDisplayPanel gui = new ListDisplayPanel();
@@ -246,7 +247,7 @@ public class ExampleColorHistogramLookup {
 
 		// Add images to GUI -- first match is always the target image, so skip it
 		for (int i = 1; i < results.size; i++) {
-			File file = results.get(i).data;
+			File file = images.get(results.get(i).index);
 			double error = results.get(i).distance;
 			BufferedImage image = UtilImageIO.loadImage(file.getPath());
 			gui.addImage(image, String.format("Error %6.3f", error), ScaleOptions.ALL);

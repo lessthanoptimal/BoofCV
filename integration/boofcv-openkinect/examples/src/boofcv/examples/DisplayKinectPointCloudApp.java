@@ -20,7 +20,6 @@ package boofcv.examples;
 
 import boofcv.alg.depth.VisualDepthOps;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.gui.d3.PointCloudViewerPanelSwing;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -31,9 +30,10 @@ import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
+import boofcv.visualize.PointCloudViewer;
+import boofcv.visualize.VisualizeData;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DMatrixRMaj;
 
 import java.awt.*;
 import java.io.File;
@@ -64,10 +64,10 @@ public class DisplayKinectPointCloudApp {
 
 		VisualDepthOps.depthTo3D(param, rgb, depth, cloud, cloudColor);
 
-		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(param, (DMatrixRMaj)null);
-
-		PointCloudViewerPanelSwing viewer = new PointCloudViewerPanelSwing(K, 10.0);
-		viewer.setPreferredSize(new Dimension(rgb.width,rgb.height));
+		PointCloudViewer viewer = VisualizeData.createPointCloudViewer();
+		viewer.setCameraHFov(PerspectiveOps.computeHFov(param));
+		viewer.setTranslationStep(10.0);
+		viewer.getComponent().setPreferredSize(new Dimension(rgb.width,rgb.height));
 
 		for( int i = 0; i < cloud.size; i++ ) {
 			Point3D_F64 p = cloud.get(i);
@@ -76,7 +76,7 @@ public class DisplayKinectPointCloudApp {
 			viewer.addPoint(p.x,p.y,p.z,c);
 		}
 
-		ShowImages.showWindow(viewer,"Point Cloud", true);
+		ShowImages.showWindow(viewer.getComponent(),"Point Cloud", true);
 		System.out.println("Total points = "+cloud.size);
 
 //		BufferedImage depthOut = VisualizeImageData.disparity(depth, null, 0, UtilOpenKinect.FREENECT_DEPTH_MM_MAX_VALUE, 0);

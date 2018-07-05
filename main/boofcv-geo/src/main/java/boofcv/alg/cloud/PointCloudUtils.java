@@ -18,6 +18,7 @@
 
 package boofcv.alg.cloud;
 
+import boofcv.alg.nn.KdTreePoint3D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
@@ -25,7 +26,6 @@ import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -73,20 +73,15 @@ public class PointCloudUtils {
 	}
 
 	public static void prune(List<Point3D_F64> cloud , int minNeighbors , double radius ) {
-		NearestNeighbor nn = FactoryNearestNeighbor.kdtree();
+		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64() );
 		nn.init(3);
 
-		List<double[]> points = new ArrayList<double[]>();
 
-		for( int i = 0; i < cloud.size(); i++ ) {
-			Point3D_F64 p = cloud.get(i);
-			points.add( new double[]{p.x,p.y,p.z});
-		}
-		nn.setPoints(points,null);
-		FastQueue<NnData> results = new FastQueue<>(NnData.class,true);
+		nn.setPoints(cloud,false);
+		FastQueue<NnData<Point3D_F64>> results = new FastQueue(NnData.class,true);
 
 		for( int i = cloud.size()-1; i >= 0; i-- ) {
-			nn.findNearest(points.get(i),radius,minNeighbors,results);
+			nn.findNearest(cloud.get(i),radius,minNeighbors,results);
 
 			if( results.size < minNeighbors ) {
 				cloud.remove(i);
@@ -95,20 +90,14 @@ public class PointCloudUtils {
 	}
 
 	public static void prune(List<Point3D_F64> cloud , GrowQueue_I32 colors, int minNeighbors , double radius ) {
-		NearestNeighbor nn = FactoryNearestNeighbor.kdtree();
+		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64());
 		nn.init(3);
 
-		List<double[]> points = new ArrayList<double[]>();
-
-		for( int i = 0; i < cloud.size(); i++ ) {
-			Point3D_F64 p = cloud.get(i);
-			points.add( new double[]{p.x,p.y,p.z});
-		}
-		nn.setPoints(points,null);
-		FastQueue<NnData> results = new FastQueue<>(NnData.class,true);
+		nn.setPoints(cloud,false);
+		FastQueue<NnData<Point3D_F64>> results = new FastQueue(NnData.class,true);
 
 		for( int i = cloud.size()-1; i >= 0; i-- ) {
-			nn.findNearest(points.get(i),radius,minNeighbors,results);
+			nn.findNearest(cloud.get(i),radius,minNeighbors,results);
 
 			if( results.size < minNeighbors ) {
 				cloud.remove(i);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,6 @@ import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastQueue;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -65,6 +64,8 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 	// used what the most frequent neighbor is
 	private double scenes[];
 
+	HistogramScene temp = new HistogramScene();
+
 	/**
 	 * Configures internal algorithms.
 	 *
@@ -93,15 +94,10 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 	 */
 	public void setClassificationData(List<HistogramScene> memory , int numScenes ) {
 
-		List<double[]> points = new ArrayList<>(memory.size());
-		for (int i = 0; i < memory.size(); i++) {
-			points.add( memory.get(i).getHistogram() );
-		}
-
 		int numWords = featureToHistogram.getTotalWords();
 
 		nn.init(numWords);
-		nn.setPoints(points, memory);
+		nn.setPoints(memory, false);
 
 		scenes = new double[ numScenes ];
 	}
@@ -126,17 +122,17 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 			featureToHistogram.addFeature(d);
 		}
 		featureToHistogram.process();
-		double[] hist = featureToHistogram.getHistogram();
+		temp.histogram = featureToHistogram.getHistogram();
 
 		// Find the N most similar image histograms
 		resultsNN.reset();
-		nn.findNearest(hist,-1,numNeighbors,resultsNN);
+		nn.findNearest(temp,-1,numNeighbors,resultsNN);
 
 		// Find the most common scene among those neighbors
 		Arrays.fill(scenes,0);
 		for (int i = 0; i < resultsNN.size; i++) {
 			NnData<HistogramScene> data = resultsNN.get(i);
-			HistogramScene n = data.data;
+			HistogramScene n = data.point;
 
 //			scenes[n.type]++;
 			scenes[n.type] += 1.0/(data.distance+0.005); // todo

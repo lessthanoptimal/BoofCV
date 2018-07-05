@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,8 +64,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	private Point2D_F64 intersection = new Point2D_F64();
 
 	// used to search for neighbors that which are candidates for connecting
-	private NearestNeighbor<SquareNode> search = FactoryNearestNeighbor.kdtree();
-	private FastQueue<double[]> searchPoints;
+	private NearestNeighbor<SquareNode> search = FactoryNearestNeighbor.kdtree(new SquareNode.KdTreeSquareNode());
 	private FastQueue<NnData<SquareNode>> searchResults = new FastQueue(NnData.class,true);
 
 	/**
@@ -83,13 +82,6 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 			this.maxNeighbors = Integer.MAX_VALUE-1;
 		}
 		this.maxNeighborDistanceRatio = maxNeighborDistanceRatio;
-
-		searchPoints = new FastQueue<double[]>(double[].class,true) {
-			@Override
-			protected double[] createInstance() {
-				return new double[2];
-			}
-		};
 
 		search.init(2);
 	}
@@ -141,7 +133,6 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 		for (int i = 0; i < nodes.size(); i++) {
 			SquareNode n = nodes.get(i);
 
-			double[] point = searchPoints.get(i);
 
 			// distance between center when viewed head on will be space + 0.5*2*width.
 			// when you factor in foreshortening this search will not be symmetric
@@ -150,13 +141,13 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 
 			// find it's neighbors
 			searchResults.reset();
-			search.findNearest(point, neighborDistance*neighborDistance, maxNeighbors + 1, searchResults);
+			search.findNearest(n, neighborDistance*neighborDistance, maxNeighbors + 1, searchResults);
 
 			// try to attach it's closest neighbors
 			for (int j = 0; j < searchResults.size(); j++) {
 				NnData<SquareNode> neighbor = searchResults.get(j);
-				if( neighbor.data != n )
-					considerConnect(n, neighbor.data);
+				if( neighbor.point != n )
+					considerConnect(n, neighbor.point);
 			}
 		}
 	}
@@ -205,15 +196,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	 * Sets up data structures for nearest-neighbor search used in {@link #connectNodes()}
 	 */
 	private void setupSearch() {
-		searchPoints.reset();
-		for (int i = 0; i < nodes.size(); i++) {
-			SquareNode n = nodes.get(i);
-
-			double[] point = searchPoints.grow();
-			point[0] = n.center.x;
-			point[1] = n.center.y;
-		}
-		search.setPoints(searchPoints.toList(), nodes.toList());
+		search.setPoints(nodes.toList(),false);
 	}
 
 	/**

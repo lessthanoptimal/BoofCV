@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,24 +90,24 @@ public class TestClassifierKNearestNeighborsBow {
 		}
 
 		@Override
-		public void setPoints(List<double[]> points, List<HistogramScene> data) {
+		public void setPoints(List<HistogramScene> points, boolean index) {
 			setPoints = true;
 		}
 
 		@Override
-		public boolean findNearest(double[] point, double maxDistance, NnData<HistogramScene> result) {
+		public boolean findNearest(HistogramScene point, double maxDistance, NnData<HistogramScene> result) {
 			throw new RuntimeException("Wasn't expecting this to be called!");
 		}
 
 		@Override
-		public void findNearest(double[] point, double maxDistance, int numNeighbors,
+		public void findNearest(HistogramScene point, double maxDistance, int numNeighbors,
 								FastQueue<NnData<HistogramScene>> result) {
 			assertTrue(result.size() == 0);
 
 			for (int i = 0; i < numNeighbors; i++) {
 				NnData<HistogramScene> d = result.grow();
-				d.data = new HistogramScene(NUM_WORDS);
-				d.data.type = 2;
+				d.point = new HistogramScene(NUM_WORDS);
+				d.point.type = 2;
 			}
 		}
 	}

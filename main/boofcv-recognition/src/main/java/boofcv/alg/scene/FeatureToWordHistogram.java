@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,28 +33,28 @@ public interface FeatureToWordHistogram<Desc extends TupleDesc> {
 	/**
 	 * Must be called before {@link #addFeature(boofcv.struct.feature.TupleDesc)} is called.
 	 */
-	public void reset();
+	void reset();
 
 	/**
 	 * Adds a feature to the histogram
 	 *
 	 * @param feature A feature which is to be matched to words.  Not modified.
 	 */
-	public void addFeature( Desc feature );
+	void addFeature( Desc feature );
 
 	/**
 	 * No more features are being added.  Normalized the computed histogram.
 	 */
-	public void process();
+	void process();
 
 	/**
 	 * Histogram of word frequencies.  Normalized such that the sum is equal to 1.
 	 * @return histogram
 	 */
-	public double[] getHistogram();
+	double[] getHistogram();
 
 	/**
 	 * Number of elements in the histogram.  Which is the number of words the features are assigned to.
 	 */
-	public int getTotalWords();
+	int getTotalWords();
 }

@@ -82,10 +82,10 @@ public class ExampleDepthPointCloud {
 		// use the actual max value in the image to maximize its appearance
 		int maxValue = ImageStatistics.max(depth);
 		BufferedImage depthOut = VisualizeImageData.disparity(depth, null, 0, maxValue, 0);
-		ShowImages.showWindow(depthOut,"Depth Image");
+		ShowImages.showWindow(depthOut,"Depth Image", true);
 
 		// ---------- Display colorized point cloud
-		ShowImages.showWindow(viewer.getComponent(),"Point Cloud");
+		ShowImages.showWindow(viewer.getComponent(),"Point Cloud", true);
 		System.out.println("Total points = "+cloud.size);
 	}
 }

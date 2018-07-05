@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.fiducial.calib.squares;
 
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.ddogleg.nn.alg.KdTreeDistance;
 import org.ddogleg.struct.GrowQueue_B;
 
 /**
@@ -130,5 +131,22 @@ public class SquareNode {
 			}
 		}
 		return -1;
+	}
+
+	public static class KdTreeSquareNode implements KdTreeDistance<SquareNode> {
+
+		@Override
+		public double compute(SquareNode a, SquareNode b) {
+			return a.center.distance2(b.center);
+		}
+
+		@Override
+		public double valueAt(SquareNode point, int index) {
+			switch( index ) {
+				case 0: return point.center.x;
+				case 1: return point.center.y;
+			}
+			throw new IllegalArgumentException("Out of bounds. "+index);
+		}
 	}
 }
