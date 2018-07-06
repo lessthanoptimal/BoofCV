@@ -28,7 +28,8 @@ import java.util.List;
 
 /**
  * Given a set of observations in normalized image coordinates and a set of possible
- * stereo transforms select the best view
+ * stereo transforms select the best view. Best in this case means meeting the positive depth constraint in
+ * both cameras
  *
  * @author Peter Abeles
  */
@@ -49,6 +50,12 @@ public class SelectBestStereoTransform {
 		this(FactoryMultiView.triangulateTwoGeometric() );
 	}
 
+	/**
+	 * Selects the transform which describes a view where observations appear in front of the camera the most
+	 * @param candidatesAtoB List of possible transforms
+	 * @param observations observations in both stereo cameras in normalized image coordinates
+	 * @param model (Output) the selected transform from a to b
+	 */
 	public void select(List<Se3_F64> candidatesAtoB,
 					   List<AssociatedPair> observations ,
 					   Se3_F64 model ) {
