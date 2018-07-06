@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,21 +49,21 @@ public class ImplPerspectiveOps_F64 {
 			adjustedParam = parameters.createLike();
 		adjustedParam.set(parameters);
 
-		DMatrixRMaj K = ImplPerspectiveOps_F64.calibrationMatrix(parameters, null);
+		DMatrixRMaj K = ImplPerspectiveOps_F64.pinholeToMatrix(parameters, null);
 		DMatrixRMaj K_adj = new DMatrixRMaj(3,3);
 		CommonOps_DDRM.mult(adjustMatrix, K, K_adj);
 
-		ImplPerspectiveOps_F64.matrixToParam(K_adj, parameters.width, parameters.height, adjustedParam);
+		ImplPerspectiveOps_F64.matrixToPinhole(K_adj, parameters.width, parameters.height, adjustedParam);
 
 		return adjustedParam;
 	}
 
-	public static DMatrixRMaj calibrationMatrix(double fx, double fy, double skew,
-												   double xc, double yc) {
+	public static DMatrixRMaj pinholeToMatrix(double fx, double fy, double skew,
+											  double xc, double yc) {
 		return new DMatrixRMaj(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
 	}
 
-	public static DMatrixRMaj calibrationMatrix(CameraPinhole param , DMatrixRMaj K ) {
+	public static DMatrixRMaj pinholeToMatrix(CameraPinhole param , DMatrixRMaj K ) {
 
 		if( K == null ) {
 			K = new DMatrixRMaj(3,3);
@@ -80,21 +80,21 @@ public class ImplPerspectiveOps_F64 {
 		return K;
 	}
 
-	public static <C extends CameraPinhole>C matrixToParam(DMatrixRMaj K , int width , int height , C param ) {
+	public static CameraPinhole matrixToPinhole(DMatrixRMaj K , int width , int height , CameraPinhole output ) {
 
-		if( param == null )
-			param = (C)new CameraPinhole();
+		if( output == null )
+			output = new CameraPinhole();
 
-		param.fx = K.get(0,0);
-		param.fy = K.get(1,1);
-		param.skew = K.get(0,1);
-		param.cx = K.get(0,2);
-		param.cy = K.get(1,2);
+		output.fx = K.get(0,0);
+		output.fy = K.get(1,1);
+		output.skew = K.get(0,1);
+		output.cx = K.get(0,2);
+		output.cy = K.get(1,2);
 
-		param.width = width;
-		param.height = height;
+		output.width = width;
+		output.height = height;
 
-		return param;
+		return output;
 	}
 
 	public static Point2D_F64 convertNormToPixel(CameraModel param , double x , double y , Point2D_F64 pixel ) {

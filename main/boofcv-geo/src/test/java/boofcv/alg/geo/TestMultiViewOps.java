@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -571,7 +571,7 @@ public class TestMultiViewOps {
 
 	@Test
 	public void canonicalCamera() {
-		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(200, 250, 0.0, 100, 110);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
@@ -606,7 +606,7 @@ public class TestMultiViewOps {
 	@Test
 	public void decomposeCameraMatrix() {
 		// compute an arbitrary projection matrix from known values
-		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(200, 250, 0.0, 100, 110);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 

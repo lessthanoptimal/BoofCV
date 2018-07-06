@@ -163,9 +163,9 @@ public class PerspectiveOps {
 	 * @param yc center center y-axis in pixels
 	 * @return Calibration matrix 3x3
 	 */
-	public static DMatrixRMaj calibrationMatrix(double fx, double fy, double skew,
-												   double xc, double yc) {
-		return ImplPerspectiveOps_F64.calibrationMatrix(fx, fy, skew, xc, yc);
+	public static DMatrixRMaj pinholeToMatrix(double fx, double fy, double skew,
+											  double xc, double yc) {
+		return ImplPerspectiveOps_F64.pinholeToMatrix(fx, fy, skew, xc, yc);
 	}
 
 	/**
@@ -178,9 +178,9 @@ public class PerspectiveOps {
 	 * @param yc center center y-axis in pixels
 	 * @return Calibration matrix 3x3
 	 */
-	public static FMatrixRMaj calibrationMatrix(float fx, float fy, float skew,
-												   float xc, float yc) {
-		return ImplPerspectiveOps_F32.calibrationMatrix(fx, fy, skew, xc, yc);
+	public static FMatrixRMaj pinholeToMatrix(float fx, float fy, float skew,
+											  float xc, float yc) {
+		return ImplPerspectiveOps_F32.pinholeToMatrix(fx, fy, skew, xc, yc);
 	}
 
 	/**
@@ -190,9 +190,9 @@ public class PerspectiveOps {
 	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
-	public static DMatrixRMaj calibrationMatrix(CameraPinhole param , DMatrixRMaj K )
+	public static DMatrixRMaj pinholeToMatrix(CameraPinhole param , DMatrixRMaj K )
 	{
-		return ImplPerspectiveOps_F64.calibrationMatrix(param, K);
+		return ImplPerspectiveOps_F64.pinholeToMatrix(param, K);
 	}
 
 	/**
@@ -202,9 +202,9 @@ public class PerspectiveOps {
 	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
-	public static FMatrixRMaj calibrationMatrix(CameraPinhole param , FMatrixRMaj K )
+	public static FMatrixRMaj pinholeToMatrix(CameraPinhole param , FMatrixRMaj K )
 	{
-		return ImplPerspectiveOps_F32.calibrationMatrix(param, K);
+		return ImplPerspectiveOps_F32.pinholeToMatrix(param, K);
 	}
 
 	/**
@@ -213,12 +213,12 @@ public class PerspectiveOps {
 	 * @param K Camera calibration matrix.
 	 * @param width Image width in pixels
 	 * @param height Image height in pixels
-	 * @param param Where the intrinsic parameter are written to.  If null then a new instance is declared.
+	 * @param output (Output) Where the intrinsic parameter are written to.  If null then a new instance is declared.
 	 * @return camera parameters
 	 */
-	public static <C extends CameraPinhole>C matrixToParam(DMatrixRMaj K , int width , int height , C param )
+	public static <C extends CameraPinhole>C matrixToPinhole(DMatrixRMaj K , int width , int height , C output )
 	{
-		return ImplPerspectiveOps_F64.matrixToParam(K, width, height, param);
+		return (C)ImplPerspectiveOps_F64.matrixToPinhole(K, width, height, output);
 	}
 
 	/**
@@ -227,17 +227,17 @@ public class PerspectiveOps {
 	 * @param K Camera calibration matrix.
 	 * @param width Image width in pixels
 	 * @param height Image height in pixels
-	 * @param param Where the intrinsic parameter are written to.  If null then a new instance is declared.
+	 * @param output (Output) Where the intrinsic parameter are written to.  If null then a new instance is declared.
 	 * @return camera parameters
 	 */
-	public static <C extends CameraPinhole>C matrixToParam(FMatrixRMaj K , int width , int height , C param )
+	public static <C extends CameraPinhole>C matrixToPinhole(FMatrixRMaj K , int width , int height , C output )
 	{
-		return ImplPerspectiveOps_F32.matrixToParam(K, width, height, param);
+		return (C)ImplPerspectiveOps_F32.matrixToParam(K, width, height, output);
 	}
 
 	/**
 	 * Given the transform from pixels to normalized image coordinates, create an approximate pinhole model
-	 * for this camera.
+	 * for this camera. Assumes (cx,cy) is the image center and that there is no skew.
 	 *
 	 * @param pixelToNorm Pixel coordinates into normalized image coordinates
 	 * @param width Input image's width
@@ -252,7 +252,7 @@ public class PerspectiveOps {
 		Vector3D_F64 vectorB = new Vector3D_F64();
 
 		pixelToNorm.compute(0,height/2,normA);
-		pixelToNorm.compute(width-1,height/2,normB);
+		pixelToNorm.compute(width,height/2,normB);
 		vectorA.set(normA.x,normA.y,1);
 		vectorB.set(normB.x,normB.y,1);
 		double hfov = UtilVector3D_F64.acute(vectorA,vectorB);

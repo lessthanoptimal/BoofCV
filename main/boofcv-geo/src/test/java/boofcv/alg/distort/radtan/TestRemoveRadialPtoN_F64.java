@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class TestRemoveRadialPtoN_F64 {
 		alg.compute(distX, distY, point);
 
 		/// go from calibrated coordinates to pixel
-		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(fx, fy, skew, xc, yc);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(fx, fy, skew, xc, yc);
 
 		GeometryMath_F64.mult(K,point,point);
 

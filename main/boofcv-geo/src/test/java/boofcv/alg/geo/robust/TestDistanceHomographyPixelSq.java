@@ -48,8 +48,8 @@ public class TestDistanceHomographyPixelSq extends StandardDistanceTest<Homograp
 	@Override
 	public DistanceFromModel<Homography2D_F64, AssociatedPair> create() {
 		DistanceHomographyCalibratedSq alg = new DistanceHomographyCalibratedSq();
-		alg.setIntrinsic(0,PerspectiveOps.matrixToParam(K,500,300,null));
-		alg.setIntrinsic(1,PerspectiveOps.matrixToParam(K,500,300,null));
+		alg.setIntrinsic(0,PerspectiveOps.matrixToPinhole(K,500,300,null));
+		alg.setIntrinsic(1,PerspectiveOps.matrixToPinhole(K,500,300,null));
 		return alg;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -147,7 +147,7 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 		camera.height = getHeight();
 		camera.cx = camera.width/2;
 		camera.cy = camera.height/2;
-		PerspectiveOps.calibrationMatrix(camera,K);
+		PerspectiveOps.pinholeToMatrix(camera,K);
 
 		synchronized (polygons) {
 			renderPolygons(g2);

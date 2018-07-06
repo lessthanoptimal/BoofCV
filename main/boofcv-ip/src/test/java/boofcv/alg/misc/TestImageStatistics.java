@@ -21,6 +21,7 @@ package boofcv.alg.misc;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import org.ejml.UtilEjml;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -186,8 +187,7 @@ public class TestImageStatistics {
 			}
 		}
 
-		double found = ((Number)result).doubleValue();
-		assertEquals(expected,found,1e-3);
+		assertEqualsAdjustTol(inputA, (Number) result, expected);
 	}
 
 	private void testMean( Method m ) throws InvocationTargetException, IllegalAccessException {
@@ -215,8 +215,7 @@ public class TestImageStatistics {
 
 		expected /= (width*height*numBands);
 
-		double found = ((Number)result).doubleValue();
-		assertEquals(expected,found,1e-3);
+		assertEqualsAdjustTol(inputA, (Number) result, expected);
 	}
 
 	private void testVariance( Method m ) throws InvocationTargetException, IllegalAccessException {
@@ -244,7 +243,7 @@ public class TestImageStatistics {
 
 		double var = total/(width*height);
 
-		assertEquals(var, ((Number) result).doubleValue(), 1e-4);
+		assertEqualsAdjustTol(inputA, (Number) result, var);
 	}
 
 	private void testMeanDiffSq(Method m) throws InvocationTargetException, IllegalAccessException {
@@ -277,7 +276,21 @@ public class TestImageStatistics {
 
 		double expected = total/(width*height*numBands);
 
-		assertEquals(expected, ((Number) result).doubleValue(), 1e-4);
+		assertEqualsAdjustTol(inputA, (Number) result, expected);
+	}
+
+	private void assertEqualsAdjustTol(ImageBase inputA, Number result, double expected) {
+		if( inputA.imageType.getDataType().isInteger() ) {
+			assertEquals( (int)expected, result.intValue());
+		} else {
+			double tol;
+			if( inputA.imageType.getDataType().getNumBits() == 32 ){
+				tol = UtilEjml.TEST_F32;
+			} else {
+				tol = UtilEjml.TEST_F64;
+			}
+			assertEquals(expected, result.doubleValue(), tol);
+		}
 	}
 
 	private void testMeanDiffAbs(Method m) throws InvocationTargetException, IllegalAccessException {
@@ -295,7 +308,6 @@ public class TestImageStatistics {
 			GImageMiscOps.fillUniform(inputB, rand, 0,20);
 		}
 
-
 		Object result = m.invoke(null,inputA,inputB);
 
 		double total = 0;
@@ -311,7 +323,7 @@ public class TestImageStatistics {
 
 		double expected = total/(width*height*numBands);
 
-		assertEquals(expected, ((Number) result).doubleValue(), 1e-4);
+		assertEqualsAdjustTol(inputA, (Number) result, expected);
 	}
 
 	private void testHistogram(Method m) throws InvocationTargetException, IllegalAccessException {

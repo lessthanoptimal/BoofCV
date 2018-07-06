@@ -64,7 +64,7 @@ public class TestRemoveRadialPtoN_F32 {
 		alg.compute(distX, distY, point);
 
 		/// go from calibrated coordinates to pixel
-		FMatrixRMaj K = PerspectiveOps.calibrationMatrix(fx, fy, skew, xc, yc);
+		FMatrixRMaj K = PerspectiveOps.pinholeToMatrix(fx, fy, skew, xc, yc);
 
 		GeometryMath_F32.mult(K,point,point);
 

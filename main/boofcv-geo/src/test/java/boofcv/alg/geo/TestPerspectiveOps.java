@@ -18,8 +18,10 @@
 
 package boofcv.alg.geo;
 
+import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -31,7 +33,9 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.RandomMatrices_DDRM;
@@ -79,13 +83,13 @@ public class TestPerspectiveOps {
 		Point3D_F64 X = new Point3D_F64(0.1,0.3,2);
 
 		CameraPinholeRadial param = new CameraPinholeRadial(200,300,2,250,260,200,300);
-		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(param, (DMatrixRMaj)null);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(param, (DMatrixRMaj)null);
 
 		// find the pixel location in the unscaled image
 		Point2D_F64 a = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
 
 		PerspectiveOps.scaleIntrinsic(param,0.5);
-		K = PerspectiveOps.calibrationMatrix(param,(DMatrixRMaj)null);
+		K = PerspectiveOps.pinholeToMatrix(param,(DMatrixRMaj)null);
 
 		// find the pixel location in the scaled image
 		Point2D_F64 b = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
@@ -102,31 +106,67 @@ public class TestPerspectiveOps {
 		CameraPinholeRadial param = new CameraPinholeRadial(200,300,2,250,260,200,300).fsetRadial(0.1,0.3);
 		CameraPinholeRadial found = PerspectiveOps.adjustIntrinsic(param, B, null);
 
-		DMatrixRMaj A = PerspectiveOps.calibrationMatrix(param, (DMatrixRMaj)null);
+		DMatrixRMaj A = PerspectiveOps.pinholeToMatrix(param, (DMatrixRMaj)null);
 
 		DMatrixRMaj expected = new DMatrixRMaj(3,3);
 		CommonOps_DDRM.mult(B, A, expected);
 
 		assertArrayEquals(param.radial, found.radial, 1e-8);
-		DMatrixRMaj foundM = PerspectiveOps.calibrationMatrix(found,(DMatrixRMaj)null);
+		DMatrixRMaj foundM = PerspectiveOps.pinholeToMatrix(found,(DMatrixRMaj)null);
 
 		assertTrue(MatrixFeatures_DDRM.isIdentical(expected,foundM,1e-8));
 	}
 
 	@Test
-	public void calibrationMatrix() {
-		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(1.0, 2, 3, 4, 5);
+	public void pinholeToMatrix_params_D() {
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(1.0, 2, 3, 4, 5);
 
-		assertEquals(1,K.get(0,0),1e-3);
-		assertEquals(2,K.get(1,1),1e-3);
-		assertEquals(3,K.get(0,1),1e-3);
-		assertEquals(4,K.get(0,2),1e-3);
-		assertEquals(5,K.get(1,2),1e-3);
-		assertEquals(1,K.get(2,2),1e-3);
+		assertEquals(1,K.get(0,0),UtilEjml.TEST_F64);
+		assertEquals(2,K.get(1,1),UtilEjml.TEST_F64);
+		assertEquals(3,K.get(0,1),UtilEjml.TEST_F64);
+		assertEquals(4,K.get(0,2),UtilEjml.TEST_F64);
+		assertEquals(5,K.get(1,2),UtilEjml.TEST_F64);
+		assertEquals(1,K.get(2,2),UtilEjml.TEST_F64);
 	}
 
 	@Test
-	public void matrixToParam() {
+	public void pinholeToMatrix_params_F() {
+		FMatrixRMaj K = PerspectiveOps.pinholeToMatrix(1.0f, 2f, 3f, 4, 5);
+
+		assertEquals(1,K.get(0,0),UtilEjml.TEST_F32);
+		assertEquals(2,K.get(1,1),UtilEjml.TEST_F32);
+		assertEquals(3,K.get(0,1),UtilEjml.TEST_F32);
+		assertEquals(4,K.get(0,2),UtilEjml.TEST_F32);
+		assertEquals(5,K.get(1,2),UtilEjml.TEST_F32);
+		assertEquals(1,K.get(2,2),UtilEjml.TEST_F32);
+	}
+
+	@Test
+	public void pinholeToMatrix_class_D() {
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(new CameraPinhole(1.0, 2, 3, 4, 5,400,500),(DMatrixRMaj)null);
+
+		assertEquals(1,K.get(0,0),UtilEjml.TEST_F64);
+		assertEquals(2,K.get(1,1),UtilEjml.TEST_F64);
+		assertEquals(3,K.get(0,1),UtilEjml.TEST_F64);
+		assertEquals(4,K.get(0,2),UtilEjml.TEST_F64);
+		assertEquals(5,K.get(1,2),UtilEjml.TEST_F64);
+		assertEquals(1,K.get(2,2),UtilEjml.TEST_F64);
+	}
+
+	@Test
+	public void pinholeToMatrix_class_F() {
+		FMatrixRMaj K = PerspectiveOps.pinholeToMatrix(new CameraPinhole(1.0, 2, 3, 4, 5,400,500),(FMatrixRMaj)null);
+
+		assertEquals(1,K.get(0,0),UtilEjml.TEST_F32);
+		assertEquals(2,K.get(1,1),UtilEjml.TEST_F32);
+		assertEquals(3,K.get(0,1),UtilEjml.TEST_F32);
+		assertEquals(4,K.get(0,2),UtilEjml.TEST_F32);
+		assertEquals(5,K.get(1,2),UtilEjml.TEST_F32);
+		assertEquals(1,K.get(2,2),UtilEjml.TEST_F32);
+	}
+
+	@Test
+	public void matrixToPinhole_D() {
 		double fx = 1;
 		double fy = 2;
 		double skew = 3;
@@ -134,27 +174,61 @@ public class TestPerspectiveOps {
 		double cy = 5;
 
 		DMatrixRMaj K = new DMatrixRMaj(3,3,true,fx,skew,cx,0,fy,cy,0,0,1);
-		CameraPinhole ret = PerspectiveOps.matrixToParam(K, 100, 200, null);
+		CameraPinhole ret = PerspectiveOps.matrixToPinhole(K, 100, 200, null);
 
-		assertTrue(ret.fx == fx);
-		assertTrue(ret.fy == fy);
-		assertTrue(ret.skew == skew);
-		assertTrue(ret.cx == cx);
-		assertTrue(ret.cy == cy);
-		assertTrue(ret.width == 100);
-		assertTrue(ret.height == 200);
+		assertEquals(ret.fx, fx, 0.0);
+		assertEquals(ret.fy, fy, 0.0);
+		assertEquals(ret.skew, skew, 0.0);
+		assertEquals(ret.cx, cx, 0.0);
+		assertEquals(ret.cy, cy, 0.0);
+		assertEquals(100, ret.width);
+		assertEquals(200, ret.height);
 	}
 
 	@Test
+	public void matrixToPinhole_F() {
+		float fx = 1;
+		float fy = 2;
+		float skew = 3;
+		float cx = 4;
+		float cy = 5;
+
+		FMatrixRMaj K = new FMatrixRMaj(3,3,true,fx,skew,cx,0,fy,cy,0,0,1);
+		CameraPinhole ret = PerspectiveOps.matrixToPinhole(K, 100, 200, null);
+
+		assertEquals(ret.fx, fx, 0.0);
+		assertEquals(ret.fy, fy, 0.0);
+		assertEquals(ret.skew, skew, 0.0);
+		assertEquals(ret.cx, cx, 0.0);
+		assertEquals(ret.cy, cy, 0.0);
+		assertEquals(100, ret.width);
+		assertEquals(200, ret.height);
+	}
+
+	/**
+	 * Test using a known pinhole model which fits its assumptions perfectly
+	 */
+	@Test
 	public void estimatePinhole() {
-		fail("Implement");
+		CameraPinhole expected = new CameraPinhole(500,550,0,600,700,1200,1400);
+		Point2Transform2_F64 pixelToNorm = new LensDistortionPinhole(expected).distort_F64(true,false);
+
+		CameraPinhole found = PerspectiveOps.estimatePinhole(pixelToNorm,expected.width,expected.height);
+
+		assertEquals(expected.fx,found.fx,UtilEjml.TEST_F64);
+		assertEquals(expected.fy,found.fy,UtilEjml.TEST_F64);
+		assertEquals(expected.cx,found.cx,UtilEjml.TEST_F64);
+		assertEquals(expected.cy,found.cy,UtilEjml.TEST_F64);
+		assertEquals(expected.skew,found.skew,UtilEjml.TEST_F64);
+		assertEquals(expected.width,found.width);
+		assertEquals(expected.height,found.height);
 	}
 
 	@Test
 	public void convertNormToPixel_intrinsic_F64() {
 		CameraPinholeRadial intrinsic = new CameraPinholeRadial(100,150,0.1,120,209,500,600);
 
-		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(intrinsic, (DMatrixRMaj)null);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
 
 		Point2D_F64 norm = new Point2D_F64(-0.1,0.25);
 		Point2D_F64 expected = new Point2D_F64();
@@ -186,7 +260,7 @@ public class TestPerspectiveOps {
 	public void convertPixelToNorm_intrinsic_F64() {
 		CameraPinholeRadial intrinsic = new CameraPinholeRadial(100,150,0.1,120,209,500,600);
 
-		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(intrinsic, (DMatrixRMaj)null);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
 		DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
 		CommonOps_DDRM.invert(K,K_inv);
 
@@ -376,4 +450,19 @@ public class TestPerspectiveOps {
 			}
 		}
 	}
+
+	@Test
+	public void computeHFov() {
+		CameraPinhole intrinsic = new CameraPinhole(500,600,0,500,500,1000,1000);
+
+		assertEquals(2*Math.atan(1.0),PerspectiveOps.computeHFov(intrinsic), UtilEjml.TEST_F64);
+	}
+
+	@Test
+	public void computeVFov() {
+		CameraPinhole intrinsic = new CameraPinhole(500,600,0,500,500,1000,1000);
+
+		assertEquals(2*Math.atan(500/600.0),PerspectiveOps.computeVFov(intrinsic), UtilEjml.TEST_F64);
+	}
+
 }

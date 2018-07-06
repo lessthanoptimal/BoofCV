@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public class TestPinholeNtoP_F32 {
 	public void basicTest() {
 		CameraPinholeRadial p = new CameraPinholeRadial().fsetK(1, 2, 3, 4, 5, 200, 300);
 
-		FMatrixRMaj K = PerspectiveOps.calibrationMatrix(p, (FMatrixRMaj)null);
+		FMatrixRMaj K = PerspectiveOps.pinholeToMatrix(p, (FMatrixRMaj)null);
 
 		Point2D_F32 pixel = new Point2D_F32(150, 200);
 		Point2D_F32 expected = new Point2D_F32();

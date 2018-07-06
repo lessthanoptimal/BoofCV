@@ -66,7 +66,7 @@ public class TestPnPDistanceReprojectionSq {
 		PerspectiveOps.convertPixelToNorm(K,observed,observed);
 
 		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq();
-		alg.setIntrinsic(0, PerspectiveOps.matrixToParam(K,0,0,null));
+		alg.setIntrinsic(0, PerspectiveOps.matrixToPinhole(K,0,0,null));
 		alg.setModel(worldToCamera);
 
 		double found = alg.computeDistance(new Point2D3D(observed,X));
@@ -91,7 +91,7 @@ public class TestPnPDistanceReprojectionSq {
 		Point2D_F64 observed = PerspectiveOps.renderPixel(worldToCamera, K, X);
 
 		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq();
-		alg.setIntrinsic(0, PerspectiveOps.matrixToParam(K,0,0,null));
+		alg.setIntrinsic(0, PerspectiveOps.matrixToPinhole(K,0,0,null));
 		alg.setModel(worldToCamera);
 
 		double found = alg.computeDistance(new Point2D3D(observed,X));
@@ -134,7 +134,7 @@ public class TestPnPDistanceReprojectionSq {
 		}
 
 		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq();
-		alg.setIntrinsic(0, PerspectiveOps.matrixToParam(K,0,0,null));
+		alg.setIntrinsic(0, PerspectiveOps.matrixToPinhole(K,0,0,null));
 		alg.setModel(worldToCamera);
 		double found[] = new double[5];
 		alg.computeDistance(obs,found);

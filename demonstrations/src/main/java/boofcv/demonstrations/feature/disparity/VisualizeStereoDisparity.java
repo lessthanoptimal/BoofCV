@@ -195,7 +195,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 				d2c.configure(baseline, rectK, leftRectToPixel, control.minDisparity,control.maxDisparity);
 				d2c.process(activeAlg.getDisparity(),colorLeft);
 
-				CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToParam(
+				CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(
 						rectK,colorLeft.getWidth(),colorLeft.getHeight(),null);
 				pcv.clearPoints();
 				pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
@@ -245,8 +245,8 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	 */
 	private void rectifyInputImages() {
 		// get intrinsic camera calibration matrices
-		DMatrixRMaj K1 = PerspectiveOps.calibrationMatrix(calib.left, (DMatrixRMaj)null);
-		DMatrixRMaj K2 = PerspectiveOps.calibrationMatrix(calib.right, (DMatrixRMaj)null);
+		DMatrixRMaj K1 = PerspectiveOps.pinholeToMatrix(calib.left, (DMatrixRMaj)null);
+		DMatrixRMaj K2 = PerspectiveOps.pinholeToMatrix(calib.right, (DMatrixRMaj)null);
 
 		// compute rectification matrices
 		rectifyAlg.process(K1,new Se3_F64(),K2,calib.getRightToLeft().invert(null));

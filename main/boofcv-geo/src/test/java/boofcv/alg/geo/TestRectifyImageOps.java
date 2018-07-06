@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class TestRectifyImageOps {
 		// do nothing rectification
 		FMatrixRMaj rect1 = CommonOps_FDRM.identity(3);
 		FMatrixRMaj rect2 = CommonOps_FDRM.identity(3);
-		FMatrixRMaj rectK = PerspectiveOps.calibrationMatrix(param, (FMatrixRMaj)null);
+		FMatrixRMaj rectK = PerspectiveOps.pinholeToMatrix(param, (FMatrixRMaj)null);
 
 		RectifyImageOps.fullViewLeft(param,rect1,rect2,rectK);
 
@@ -97,7 +97,7 @@ public class TestRectifyImageOps {
 		// do nothing rectification
 		FMatrixRMaj rect1 = CommonOps_FDRM.identity(3);
 		FMatrixRMaj rect2 = CommonOps_FDRM.identity(3);
-		FMatrixRMaj rectK = PerspectiveOps.calibrationMatrix(param, (FMatrixRMaj)null);
+		FMatrixRMaj rectK = PerspectiveOps.pinholeToMatrix(param, (FMatrixRMaj)null);
 
 		RectifyImageOps.allInsideLeft(param, rect1, rect2, rectK);
 
@@ -201,7 +201,7 @@ public class TestRectifyImageOps {
 						fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		DMatrixRMaj rect = new DMatrixRMaj(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
-		DMatrixRMaj rectK = PerspectiveOps.calibrationMatrix(param, (DMatrixRMaj)null);
+		DMatrixRMaj rectK = PerspectiveOps.pinholeToMatrix(param, (DMatrixRMaj)null);
 
 		DMatrixRMaj rectK_inv = new DMatrixRMaj(3,3);
 		CommonOps_DDRM.invert(rectK,rectK_inv);

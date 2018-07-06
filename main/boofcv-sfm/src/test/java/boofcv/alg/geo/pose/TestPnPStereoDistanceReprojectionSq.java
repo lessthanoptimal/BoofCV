@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,8 +43,8 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 		// Point location in world frame
 		Point3D_F64 X = new Point3D_F64(0.1,-0.04,2.3);
 
-		DMatrixRMaj K_left = PerspectiveOps.calibrationMatrix(param.left,(DMatrixRMaj)null);
-		DMatrixRMaj K_right = PerspectiveOps.calibrationMatrix(param.right,(DMatrixRMaj)null);
+		DMatrixRMaj K_left = PerspectiveOps.pinholeToMatrix(param.left,(DMatrixRMaj)null);
+		DMatrixRMaj K_right = PerspectiveOps.pinholeToMatrix(param.right,(DMatrixRMaj)null);
 
 		// errors
 		double deltaX0 = 0.1;
@@ -94,8 +94,8 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 			// Point location in world frame
 			Point3D_F64 X = new Point3D_F64(0.1,-0.04,Pz);
 
-			DMatrixRMaj K_left = PerspectiveOps.calibrationMatrix(param.left, (DMatrixRMaj)null);
-			DMatrixRMaj K_right = PerspectiveOps.calibrationMatrix(param.right, (DMatrixRMaj)null);
+			DMatrixRMaj K_left = PerspectiveOps.pinholeToMatrix(param.left, (DMatrixRMaj)null);
+			DMatrixRMaj K_right = PerspectiveOps.pinholeToMatrix(param.right, (DMatrixRMaj)null);
 
 			// create a noisy observed
 			Point2D_F64 obsLeft = PerspectiveOps.renderPixel(worldToLeft, K_left, X);
@@ -119,8 +119,8 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 
 	@Test
 	public void checkErrorArray() {
-		DMatrixRMaj K_left = PerspectiveOps.calibrationMatrix(param.left, (DMatrixRMaj)null);
-		DMatrixRMaj K_right = PerspectiveOps.calibrationMatrix(param.right, (DMatrixRMaj)null);
+		DMatrixRMaj K_left = PerspectiveOps.pinholeToMatrix(param.left, (DMatrixRMaj)null);
+		DMatrixRMaj K_right = PerspectiveOps.pinholeToMatrix(param.right, (DMatrixRMaj)null);
 
 		PnPStereoDistanceReprojectionSq alg = new PnPStereoDistanceReprojectionSq();
 		alg.setStereoParameters(param);

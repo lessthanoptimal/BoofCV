@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,8 +105,8 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 		Se3_F64 leftToRight = stereoParam.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		DMatrixRMaj K1 = PerspectiveOps.calibrationMatrix(left, (DMatrixRMaj)null);
-		DMatrixRMaj K2 = PerspectiveOps.calibrationMatrix(right, (DMatrixRMaj)null);
+		DMatrixRMaj K1 = PerspectiveOps.pinholeToMatrix(left, (DMatrixRMaj)null);
+		DMatrixRMaj K2 = PerspectiveOps.pinholeToMatrix(right, (DMatrixRMaj)null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 

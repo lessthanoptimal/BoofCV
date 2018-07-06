@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,8 +93,8 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		DMatrixRMaj K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), (DMatrixRMaj)null);
-		DMatrixRMaj K2 = PerspectiveOps.calibrationMatrix(param.getRight(),(DMatrixRMaj) null);
+		DMatrixRMaj K1 = PerspectiveOps.pinholeToMatrix(param.getLeft(), (DMatrixRMaj)null);
+		DMatrixRMaj K2 = PerspectiveOps.pinholeToMatrix(param.getRight(),(DMatrixRMaj) null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 

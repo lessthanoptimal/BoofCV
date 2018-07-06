@@ -210,7 +210,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 		// original camera calibration matrices
-		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(intrinsic, (DMatrixRMaj)null);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
 
 		rectifyAlg.process(K, new Se3_F64(), K, leftToRight);
 
@@ -277,7 +277,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		d2c.configure(baseline, rectifiedK, new DoNothing2Transform2_F64(), minDisparity, maxDisparity);
 		d2c.process(disparity,left);
 
-		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToParam(rectifiedK,disparity.width,disparity.height,null);
+		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK,disparity.width,disparity.height,null);
 
 		// skew the view to make the structure easier to see
 		Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.setEulerXYZ(0,0.3,0,-300,0,0,null);

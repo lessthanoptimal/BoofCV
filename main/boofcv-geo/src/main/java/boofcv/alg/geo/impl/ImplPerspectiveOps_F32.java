@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public class ImplPerspectiveOps_F32 {
 			adjustedParam = parameters.createLike();
 		adjustedParam.set(parameters);
 
-		FMatrixRMaj K = ImplPerspectiveOps_F32.calibrationMatrix(parameters, null);
+		FMatrixRMaj K = ImplPerspectiveOps_F32.pinholeToMatrix(parameters, null);
 		FMatrixRMaj K_adj = new FMatrixRMaj(3,3);
 		CommonOps_FDRM.mult(adjustMatrix, K, K_adj);
 
@@ -58,12 +58,12 @@ public class ImplPerspectiveOps_F32 {
 		return adjustedParam;
 	}
 
-	public static FMatrixRMaj calibrationMatrix(float fx, float fy, float skew,
-												   float xc, float yc) {
+	public static FMatrixRMaj pinholeToMatrix(float fx, float fy, float skew,
+											  float xc, float yc) {
 		return new FMatrixRMaj(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
 	}
 
-	public static FMatrixRMaj calibrationMatrix(CameraPinhole param , FMatrixRMaj K ) {
+	public static FMatrixRMaj pinholeToMatrix(CameraPinhole param , FMatrixRMaj K ) {
 
 		if( K == null ) {
 			K = new FMatrixRMaj(3,3);

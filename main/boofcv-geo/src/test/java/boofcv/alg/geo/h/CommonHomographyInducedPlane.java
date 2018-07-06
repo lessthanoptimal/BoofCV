@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class CommonHomographyInducedPlane {
 
-	public DMatrixRMaj K = PerspectiveOps.calibrationMatrix(500, 520, 0.1, 400, 450);
+	public DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(500, 520, 0.1, 400, 450);
 
 	public Se3_F64 rightToLeft = new Se3_F64();
 	public Se3_F64 leftToRight;

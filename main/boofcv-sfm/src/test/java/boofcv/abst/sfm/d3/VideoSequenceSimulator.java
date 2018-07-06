@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,7 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> {
 
 	public void setIntrinsic( CameraPinholeRadial param ) {
 		this.intrinsic = param;
-		K = PerspectiveOps.calibrationMatrix(param,(DMatrixRMaj)null);
+		K = PerspectiveOps.pinholeToMatrix(param,(DMatrixRMaj)null);
 	}
 
 	protected void createSquares( int total , double minZ, double maxZ ) {

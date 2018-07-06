@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,7 +82,7 @@ public class UtilOpenCV {
 		FileStorage fs = new FileStorage(
 				new File(fileName).getAbsolutePath(), FileStorage.WRITE);
 
-		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(model, (DMatrixRMaj)null);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(model, (DMatrixRMaj)null);
 
 		write(fs,"image_width", model.width);
 		write(fs,"image_height", model.height);
