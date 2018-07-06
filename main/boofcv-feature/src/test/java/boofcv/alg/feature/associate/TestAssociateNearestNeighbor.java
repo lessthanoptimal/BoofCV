@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.associate;
+package boofcv.alg.feature.associate;
 
+import boofcv.abst.feature.associate.AssociateDescription;
+import boofcv.abst.feature.associate.StandardAssociateDescriptionChecks;
 import boofcv.alg.descriptor.KdTreeTuple_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -31,6 +33,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -53,6 +56,11 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 		TupleDesc_F64 s = new TupleDesc_F64(1);
 		s.value[0] = value;
 		return s;
+	}
+
+	@Test
+	public void scoreRatio() {
+		fail("Implement");
 	}
 
 	/**

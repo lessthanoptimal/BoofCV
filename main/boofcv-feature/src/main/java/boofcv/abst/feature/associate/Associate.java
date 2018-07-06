@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,14 +48,14 @@ public interface Associate {
 	/**
 	 * Finds the best match for each item in the source list with an item in the destination list.
 	 */
-	public void associate();
+	void associate();
 
 	/**
 	 * List of associated features.  Indexes refer to the index inside the input lists.
 	 *
 	 * @return List of associated features.
 	 */
-	public FastQueue<AssociatedIndex> getMatches();
+	FastQueue<AssociatedIndex> getMatches();
 
 	/**
 	 * Indexes of features in the source set which are not associated.
@@ -65,7 +65,7 @@ public interface Associate {
 	 *
 	 * @return List of unassociated source features by index.
 	 */
-	public GrowQueue_I32 getUnassociatedSource();
+	GrowQueue_I32 getUnassociatedSource();
 
 	/**
 	 * Indexes of features in the destination set which are not associated.
@@ -75,7 +75,7 @@ public interface Associate {
 	 *
 	 * @return List of unassociated destination features by index.
 	 */
-	public GrowQueue_I32 getUnassociatedDestination();
+	GrowQueue_I32 getUnassociatedDestination();
 
 	/**
 	 * Associations are only considered if their score is less than or equal to the specified threshold.  To remove
@@ -83,26 +83,26 @@ public interface Associate {
 	 *
 	 * @param score The threshold.
 	 */
-	public void setThreshold( double score );
+	void setMaxScoreThreshold( double score );
 
 	/**
 	 * Specifies the type of score which is returned.
 	 *
 	 * @return Type of association score.
 	 */
-	public MatchScoreType getScoreType();
+	MatchScoreType getScoreType();
 
 	/**
 	 * If at most one match is returned for each source feature.
 	 *
 	 * @return true for unique source association
 	 */
-	public boolean uniqueSource();
+	boolean uniqueSource();
 
 	/**
 	 * If at most one match is returned for each destination feature.
 	 *
 	 * @return true for unique destination association
 	 */
-	public boolean uniqueDestination();
+	boolean uniqueDestination();
 }

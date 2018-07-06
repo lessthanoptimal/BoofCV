@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,7 +90,7 @@ public class BenchmarkAssociationSpeedRandom {
 
 		ProfileOperation.printOpsPerSec(new General("Greedy", FactoryAssociation.greedy(score, Double.MAX_VALUE, false)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new General("Greedy Backwards", FactoryAssociation.greedy(score, Double.MAX_VALUE, true)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new General("Random Forest", FactoryAssociation.kdRandomForest(DOF,500,15,5,1233445565)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new General("Random Forest", FactoryAssociation.kdRandomForest(null,DOF,500,15,5,1233445565)),TEST_TIME);
 		
 	}
 }

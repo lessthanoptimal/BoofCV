@@ -394,7 +394,7 @@ public class FactoryVisualOdometry {
 		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<>(scorer, epipolarPixelTol, descType);
 		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 
-		associateStereo.setThreshold(maxAssociationError);
+		associateStereo.setMaxScoreThreshold(maxAssociationError);
 
 		VisOdomQuadPnP<T,Desc> alg = new VisOdomQuadPnP<>(
 				detector, assocSame, associateStereo, triangulate, motion, refinePnP);

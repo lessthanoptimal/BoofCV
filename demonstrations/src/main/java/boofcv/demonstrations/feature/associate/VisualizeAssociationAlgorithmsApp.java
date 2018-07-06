@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,8 +84,8 @@ public class VisualizeAssociationAlgorithmsApp<T extends ImageGray<T>>
 
 		addAlgorithm(0, "Greedy", FactoryAssociation.greedy(score, Double.MAX_VALUE, false));
 		addAlgorithm(0, "Greedy Backwards", FactoryAssociation.greedy(score, Double.MAX_VALUE, true));
-		addAlgorithm(0, "K-D Tree BBF", FactoryAssociation.kdtree(DOF, 75));
-		addAlgorithm(0, "Random Forest", FactoryAssociation.kdRandomForest(DOF, 75, 10, 5, 1233445565));
+		addAlgorithm(0, "K-D Tree BBF", FactoryAssociation.kdtree(null,DOF, 75));
+		addAlgorithm(0, "Random Forest", FactoryAssociation.kdRandomForest(null,DOF, 75, 10, 5, 1233445565));
 
 		image0 = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		image1 = GeneralizedImageOps.createSingleBand(imageType, 1, 1);

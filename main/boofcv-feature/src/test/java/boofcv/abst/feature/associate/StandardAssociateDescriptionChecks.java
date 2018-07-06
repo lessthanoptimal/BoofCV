@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,7 +81,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 		init();
 
 		AssociateDescription<Desc> alg = createAlg();
-		alg.setThreshold(0.01);
+		alg.setMaxScoreThreshold(0.01);
 
 		for( int i = 0; i < numFeatures; i++ ) {
 			listSrc.add(c(i+1) );
@@ -149,22 +149,22 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 		alg.setDestination(listDst);
 
 		// no matches should be found since the error is too large
-		alg.setThreshold(0.01);
+		alg.setMaxScoreThreshold(0.01);
 		alg.associate();
 		assertEquals(0,alg.getMatches().size);
 
 		// Test edge case for threshold.  If it is exactly the distance away then should be included
-		alg.setThreshold(1.1-1);
+		alg.setMaxScoreThreshold(1.1-1);
 		alg.associate();
 		assertEquals(1,alg.getMatches().size);
 
 		// Threshold is greater than the assoc error
-		alg.setThreshold(0.2);
+		alg.setMaxScoreThreshold(0.2);
 		alg.associate();
 		assertEquals(1,alg.getMatches().size);
 
 		// Test no threshold case
-		alg.setThreshold(Double.MAX_VALUE);
+		alg.setMaxScoreThreshold(Double.MAX_VALUE);
 		alg.associate();
 		assertEquals(1,alg.getMatches().size);
 	}
@@ -184,7 +184,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 		listDst.add( c(20) );  // can't be paired with anything
 
 		// set threshold so that one pair won't be considered
-		alg.setThreshold(0.07);
+		alg.setMaxScoreThreshold(0.07);
 		alg.setSource(listSrc);
 		alg.setDestination(listDst);
 		alg.associate();

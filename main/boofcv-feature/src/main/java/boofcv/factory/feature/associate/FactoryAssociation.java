@@ -21,9 +21,12 @@ package boofcv.factory.feature.associate;
 import boofcv.abst.feature.associate.*;
 import boofcv.alg.descriptor.KdTreeTuple_F64;
 import boofcv.alg.feature.associate.AssociateGreedy;
+import boofcv.alg.feature.associate.AssociateNearestNeighbor;
 import boofcv.struct.feature.*;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
+
+import javax.annotation.Nullable;
 
 
 /**
@@ -68,10 +71,11 @@ public class FactoryAssociation {
 	 * @param maxNodesSearched  Maximum number of nodes it will search.  Controls speed and accuracy.
 	 * @return Association using approximate nearest neighbor
 	 */
-	public static AssociateDescription<TupleDesc_F64> kdtree( int dimension, int maxNodesSearched ) {
+	public static AssociateDescription<TupleDesc_F64> kdtree( ConfigAssociateNearestNeighbor configNN ,
+															  int dimension, int maxNodesSearched ) {
 		NearestNeighbor nn = FactoryNearestNeighbor.kdtree(new KdTreeTuple_F64(),maxNodesSearched);
 
-		return new AssociateNearestNeighbor<>(nn, dimension);
+		return associateNearestNeighbor(configNN,nn, dimension);
 	}
 
 	/**
@@ -89,7 +93,8 @@ public class FactoryAssociation {
 	 * @param randomSeed Seed used by random number generator
 	 * @return Association using approximate nearest neighbor
 	 */
-	public static AssociateDescription<TupleDesc_F64> kdRandomForest( int dimension,
+	public static AssociateDescription<TupleDesc_F64> kdRandomForest( ConfigAssociateNearestNeighbor configNN ,
+																	  int dimension,
 																	  int maxNodesSearched ,
 																	  int numTrees ,
 																	  int numConsiderSplit ,
@@ -98,7 +103,24 @@ public class FactoryAssociation {
 				new KdTreeTuple_F64(),
 				maxNodesSearched,numTrees,numConsiderSplit,randomSeed);
 
-		return new AssociateNearestNeighbor<>(nn, dimension);
+		return associateNearestNeighbor(configNN,nn, dimension);
+	}
+
+	public static AssociateNearestNeighbor<TupleDesc_F64>
+	associateNearestNeighbor( @Nullable ConfigAssociateNearestNeighbor config ,
+							  NearestNeighbor nn ,
+							  int dimension )
+	{
+		if( config == null )
+			config = new ConfigAssociateNearestNeighbor();
+
+		config.checkValidity();
+
+		AssociateNearestNeighbor<TupleDesc_F64> assoc = new AssociateNearestNeighbor<>(nn, dimension);
+		assoc.setRatioUsesSqrt(config.distanceIsSquared);
+		assoc.setMaxScoreThreshold(config.maxErrorThreshold);
+		assoc.setScoreRatioThreshold(config.scoreRatioThreshold);
+		return assoc;
 	}
 
 	/**

@@ -222,8 +222,14 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		declareModelFitting();
 
 		for (int i = 0; i < graphNodes.size(); i++) {
+			associate.setSource(graphNodes.get(i).descriptions);
 			for (int j = i+1; j < graphNodes.size(); j++) {
-				connectViews( graphNodes.get(i), graphNodes.get(j));
+				associate.setDestination(graphNodes.get(j).descriptions);
+				associate.associate();
+				if( associate.getMatches().size < MIN_FEATURE_ASSOCIATED )
+					continue;
+
+				connectViews(graphNodes.get(i),graphNodes.get(j),associate.getMatches());
 				if( stopRequested )
 					return false;
 			}
@@ -705,15 +711,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	 * Associate features between the two views. Then compute a homography and essential matrix using LSMed. Add
 	 * features to the edge if they an inlier in essential. Save fit score of homography vs essential.
 	 */
-	void connectViews( CameraView viewA , CameraView viewB ) {
-		associate.setSource(viewA.descriptions);
-		associate.setDestination(viewB.descriptions);
-		associate.associate();
+	void connectViews( CameraView viewA , CameraView viewB , FastQueue<AssociatedIndex> matches) {
 
-		if( associate.getMatches().size < MIN_FEATURE_ASSOCIATED )
-			return;
-
-		FastQueue<AssociatedIndex> matches = associate.getMatches();
 
 		// Estimate fundamental/essential with RANSAC
 		CameraMotion edge = new CameraMotion();

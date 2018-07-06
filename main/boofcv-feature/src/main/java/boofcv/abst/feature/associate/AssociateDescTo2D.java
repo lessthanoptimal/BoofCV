@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,8 +68,8 @@ public class AssociateDescTo2D<D> implements AssociateDescription2D<D> {
 	}
 
 	@Override
-	public void setThreshold(double score) {
-		alg.setThreshold(score);
+	public void setMaxScoreThreshold(double score) {
+		alg.setMaxScoreThreshold(score);
 	}
 
 	@Override

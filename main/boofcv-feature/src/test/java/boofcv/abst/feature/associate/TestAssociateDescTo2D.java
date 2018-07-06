@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class TestAssociateDescTo2D {
 		alg.setSource(null,listSrc);
 		alg.setDestination(null,listDst);
 		alg.associate();
-		alg.setThreshold(10.5);
+		alg.setMaxScoreThreshold(10.5);
 
 		assertTrue(listSrc == dummy.listSrc);
 		assertTrue(listDst == dummy.listDst);
@@ -96,7 +96,7 @@ public class TestAssociateDescTo2D {
 		}
 
 		@Override
-		public void setThreshold(double score) {
+		public void setMaxScoreThreshold(double score) {
 			threshold = score;
 		}
 
