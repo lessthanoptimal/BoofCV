@@ -73,9 +73,9 @@ public class FactoryAssociation {
 	 */
 	public static AssociateDescription<TupleDesc_F64> kdtree( ConfigAssociateNearestNeighbor configNN ,
 															  int dimension, int maxNodesSearched ) {
-		NearestNeighbor nn = FactoryNearestNeighbor.kdtree(new KdTreeTuple_F64(),maxNodesSearched);
+		NearestNeighbor nn = FactoryNearestNeighbor.kdtree(new KdTreeTuple_F64(dimension),maxNodesSearched);
 
-		return associateNearestNeighbor(configNN,nn, dimension);
+		return associateNearestNeighbor(configNN,nn);
 	}
 
 	/**
@@ -100,23 +100,22 @@ public class FactoryAssociation {
 																	  int numConsiderSplit ,
 																	  long randomSeed) {
 		NearestNeighbor nn = FactoryNearestNeighbor.kdRandomForest(
-				new KdTreeTuple_F64(),
+				new KdTreeTuple_F64(dimension),
 				maxNodesSearched,numTrees,numConsiderSplit,randomSeed);
 
-		return associateNearestNeighbor(configNN,nn, dimension);
+		return associateNearestNeighbor(configNN,nn);
 	}
 
 	public static AssociateNearestNeighbor<TupleDesc_F64>
 	associateNearestNeighbor( @Nullable ConfigAssociateNearestNeighbor config ,
-							  NearestNeighbor nn ,
-							  int dimension )
+							  NearestNeighbor nn )
 	{
 		if( config == null )
 			config = new ConfigAssociateNearestNeighbor();
 
 		config.checkValidity();
 
-		AssociateNearestNeighbor<TupleDesc_F64> assoc = new AssociateNearestNeighbor<>(nn, dimension);
+		AssociateNearestNeighbor<TupleDesc_F64> assoc = new AssociateNearestNeighbor<>(nn);
 		assoc.setRatioUsesSqrt(config.distanceIsSquared);
 		assoc.setMaxScoreThreshold(config.maxErrorThreshold);
 		assoc.setScoreRatioThreshold(config.scoreRatioThreshold);

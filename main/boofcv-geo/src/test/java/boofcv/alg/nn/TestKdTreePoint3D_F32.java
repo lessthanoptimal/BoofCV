@@ -19,29 +19,36 @@
 package boofcv.alg.nn;
 
 import georegression.struct.point.Point3D_F32;
-import org.ddogleg.nn.alg.KdTreeDistance;
+import org.ejml.UtilEjml;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class KdTreePoint3D_F32 implements KdTreeDistance<Point3D_F32> {
-	@Override
-	public double distance(Point3D_F32 a, Point3D_F32 b) {
-		return a.distance2(b);
+public class TestKdTreePoint3D_F32 {
+	KdTreePoint3D_F32 alg = new KdTreePoint3D_F32();
+
+	@Test
+	public void distance() {
+		Point3D_F32 a = new Point3D_F32(1,2,3);
+		Point3D_F32 b = new Point3D_F32(-2,2,9);
+
+		assertEquals(a.distance2(b),alg.distance(a,b), UtilEjml.TEST_F32);
 	}
 
-	@Override
-	public double valueAt(Point3D_F32 point, int index) {
-		switch( index ) {
-			case 0: return point.x;
-			case 1: return point.y;
-			case 2: return point.z;
-		}
-		throw new IllegalArgumentException("Out of bounds. "+index);
+	@Test
+	public void valueAt() {
+		Point3D_F32 b = new Point3D_F32(-2,2,9);
+
+		assertEquals(b.x, alg.valueAt(b,0),UtilEjml.TEST_F32);
+		assertEquals(b.y, alg.valueAt(b,1),UtilEjml.TEST_F32);
+		assertEquals(b.z, alg.valueAt(b,2),UtilEjml.TEST_F32);
 	}
 
-	@Override
-	public int length() {
-		return 3;
+	@Test
+	public void length() {
+		assertEquals(3,alg.length());
 	}
 }

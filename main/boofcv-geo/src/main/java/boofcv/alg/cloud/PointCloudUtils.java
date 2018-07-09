@@ -33,7 +33,13 @@ import java.util.List;
  */
 public class PointCloudUtils {
 
-	public static double autoScale(  List<Point3D_F64> cloud ) {
+	/**
+	 * Automatically rescales the point cloud based so that it has a standard deviation of 'target'
+	 * @param cloud The point cloud
+	 * @param target The desired standard deviation of the cloud. Try 100
+	 * @return The selected scale factor
+	 */
+	public static double autoScale(  List<Point3D_F64> cloud , double target ) {
 		Point3D_F64 mean = new Point3D_F64();
 		Point3D_F64 stdev = new Point3D_F64();
 
@@ -41,7 +47,7 @@ public class PointCloudUtils {
 
 		double scale = Math.sqrt(Math.max(Math.max(stdev.x,stdev.y),stdev.z));
 
-		scale /= 100;
+		scale /= target;
 
 		int N = cloud.size();
 		for (int i = 0; i < N ; i++) {
@@ -51,6 +57,12 @@ public class PointCloudUtils {
 		return scale;
 	}
 
+	/**
+	 * Computes the mean and standard deviation of each axis in the point cloud computed in dependently
+	 * @param cloud (Input) Cloud
+	 * @param mean (Output) mean of each axis
+	 * @param stdev (Output) standard deviation of each axis
+	 */
 	public static void statistics( List<Point3D_F64> cloud , Point3D_F64 mean , Point3D_F64 stdev ) {
 		final int N = cloud.size();
 		for (int i = 0; i < N; i++) {
@@ -72,10 +84,15 @@ public class PointCloudUtils {
 		}
 	}
 
+	/**
+	 * Prunes points from the point cloud if they have very few neighbors
+	 *
+	 * @param cloud Point cloud
+	 * @param minNeighbors Minimum number of neighbors for it to not be pruned
+	 * @param radius search distance for neighbors
+	 */
 	public static void prune(List<Point3D_F64> cloud , int minNeighbors , double radius ) {
 		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64() );
-		nn.init(3);
-
 
 		nn.setPoints(cloud,false);
 		FastQueue<NnData<Point3D_F64>> results = new FastQueue(NnData.class,true);
@@ -89,9 +106,16 @@ public class PointCloudUtils {
 		}
 	}
 
+	/**
+	 * Prunes points from the point cloud if they have very few neighbors
+	 *
+	 * @param cloud Point cloud
+	 * @param colors Color of each point.
+	 * @param minNeighbors Minimum number of neighbors for it to not be pruned
+	 * @param radius search distance for neighbors
+	 */
 	public static void prune(List<Point3D_F64> cloud , GrowQueue_I32 colors, int minNeighbors , double radius ) {
 		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64());
-		nn.init(3);
 
 		nn.setPoints(cloud,false);
 		FastQueue<NnData<Point3D_F64>> results = new FastQueue(NnData.class,true);

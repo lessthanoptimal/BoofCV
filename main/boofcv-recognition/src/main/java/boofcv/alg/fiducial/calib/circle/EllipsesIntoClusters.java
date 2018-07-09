@@ -77,8 +77,6 @@ public class EllipsesIntoClusters {
 		this.ratioSimilarityTolerance = sizeSimilarityTolerance;
 		this.edgeIntensitySimilarityTolerance = edgeIntensitySimilarityTolerance;
 
-		search.init(2);
-
 		clusters = new FastQueue(List.class,true) {
 			@Override
 			protected List<Node> createInstance() {
@@ -366,7 +364,7 @@ public class EllipsesIntoClusters {
 	private static class KdTreeEllipseInfo implements KdTreeDistance<EllipseInfo> {
 
 		@Override
-		public double compute(EllipseInfo a, EllipseInfo b) {
+		public double distance(EllipseInfo a, EllipseInfo b) {
 			return a.ellipse.center.distance2(b.ellipse.center);
 		}
 
@@ -377,6 +375,11 @@ public class EllipsesIntoClusters {
 				case 1: return point.ellipse.center.y;
 			}
 			throw new IllegalArgumentException("Out of bounds. "+index);
+		}
+
+		@Override
+		public int length() {
+			return 2;
 		}
 	}
 }

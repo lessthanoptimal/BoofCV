@@ -246,7 +246,8 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans_F64(null, MAX_KNN_ITERATIONS, 20, 1e-6);
 		clusterer.setVerbose(true);
 
-		NearestNeighbor<HistogramScene> nn = FactoryNearestNeighbor.exhaustive(new KdTreeHistogramScene_F64());
+		int pointDof = desc.createDescription().size();
+		NearestNeighbor<HistogramScene> nn = FactoryNearestNeighbor.exhaustive(new KdTreeHistogramScene_F64(pointDof));
 		ExampleClassifySceneKnn example = new ExampleClassifySceneKnn(desc,clusterer,nn);
 
 		File trainingDir = new File(UtilIO.pathExample("learning/scene/train"));

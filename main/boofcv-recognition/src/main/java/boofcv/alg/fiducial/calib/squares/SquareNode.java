@@ -136,7 +136,7 @@ public class SquareNode {
 	public static class KdTreeSquareNode implements KdTreeDistance<SquareNode> {
 
 		@Override
-		public double compute(SquareNode a, SquareNode b) {
+		public double distance(SquareNode a, SquareNode b) {
 			return a.center.distance2(b.center);
 		}
 
@@ -147,6 +147,11 @@ public class SquareNode {
 				case 1: return point.center.y;
 			}
 			throw new IllegalArgumentException("Out of bounds. "+index);
+		}
+
+		@Override
+		public int length() {
+			return 2;
 		}
 	}
 }

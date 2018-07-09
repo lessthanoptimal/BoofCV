@@ -85,11 +85,6 @@ public class TestClassifierKNearestNeighborsBow {
 		public int initDimension=-1;
 
 		@Override
-		public void init(int pointDimension) {
-			this.initDimension = pointDimension;
-		}
-
-		@Override
 		public void setPoints(List<HistogramScene> points, boolean index) {
 			setPoints = true;
 		}

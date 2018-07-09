@@ -47,8 +47,8 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 	@Override
 	public AssociateDescription<TupleDesc_F64> createAlg() {
 		// exhaustive algorithm will produce perfect results
-		NearestNeighbor<TupleDesc_F64> exhaustive = FactoryNearestNeighbor.exhaustive(new KdTreeTuple_F64());
-		return new AssociateNearestNeighbor<>(exhaustive, 1);
+		NearestNeighbor<TupleDesc_F64> exhaustive = FactoryNearestNeighbor.exhaustive(new KdTreeTuple_F64(1));
+		return new AssociateNearestNeighbor<>(exhaustive);
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 		// src = assoc[i] where src is the index of the source feature and i is the index of the dst feature
 		nn.assoc = new int[]{2,0,1,-1,4,-1,-1,2,2,1};
 
-		AssociateNearestNeighbor<TupleDesc_F64> alg = new AssociateNearestNeighbor<>(nn, 10);
+		AssociateNearestNeighbor<TupleDesc_F64> alg = new AssociateNearestNeighbor<>(nn);
 
 		FastQueue<TupleDesc_F64> src = new FastQueue<>(10, TupleDesc_F64.class, false);
 		FastQueue<TupleDesc_F64> dst = new FastQueue<>(10, TupleDesc_F64.class, false);
@@ -92,7 +92,6 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 		alg.associate();
 
 		FastQueue<AssociatedIndex> matches = alg.getMatches();
-		assertEquals(10, nn.pointDimension);
 
 		assertEquals(7,matches.size);
 		for( int i = 0, count = 0; i < nn.assoc.length; i++ ) {
@@ -116,17 +115,10 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 
 	public static class Dummy<D> implements NearestNeighbor<D> {
 
-		public int pointDimension;
-
 		List<D> points;
 
 		public int assoc[];
 		int numCalls = 0;
-
-		@Override
-		public void init(int pointDimension) {
-			this.pointDimension = pointDimension;
-		}
 
 		@Override
 		public void setPoints(List<D> points, boolean assad) {

@@ -73,9 +73,8 @@ public class AssociateNearestNeighbor<D>
 	// maximum distance away two points can be
 	private double maxDistanceSq = -1;
 
-	public AssociateNearestNeighbor(NearestNeighbor<D> alg , int featureDimension ) {
+	public AssociateNearestNeighbor(NearestNeighbor<D> alg) {
 		this.alg = alg;
-		alg.init(featureDimension);
 	}
 
 	@Override

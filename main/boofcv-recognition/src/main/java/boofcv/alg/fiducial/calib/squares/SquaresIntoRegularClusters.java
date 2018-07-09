@@ -82,8 +82,6 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 			this.maxNeighbors = Integer.MAX_VALUE-1;
 		}
 		this.maxNeighborDistanceRatio = maxNeighborDistanceRatio;
-
-		search.init(2);
 	}
 
 	/**

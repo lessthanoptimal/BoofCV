@@ -26,7 +26,7 @@ import org.ddogleg.nn.alg.KdTreeDistance;
  */
 public class KdTreePoint2D_F32 implements KdTreeDistance<Point2D_F32> {
 	@Override
-	public double compute(Point2D_F32 a, Point2D_F32 b) {
+	public double distance(Point2D_F32 a, Point2D_F32 b) {
 		return a.distance2(b);
 	}
 
@@ -37,5 +37,10 @@ public class KdTreePoint2D_F32 implements KdTreeDistance<Point2D_F32> {
 			case 1: return point.y;
 		}
 		throw new IllegalArgumentException("Out of bounds. "+index);
+	}
+
+	@Override
+	public int length() {
+		return 2;
 	}
 }

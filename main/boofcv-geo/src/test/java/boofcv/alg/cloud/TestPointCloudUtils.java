@@ -27,7 +27,22 @@ import static org.junit.Assert.fail;
  */
 public class TestPointCloudUtils {
 	@Test
-	public void stuff() {
+	public void autoScale() {
+		fail("implement");
+	}
+
+	@Test
+	public void statistics() {
+		fail("implement");
+	}
+
+	@Test
+	public void prune() {
+		fail("implement");
+	}
+
+	@Test
+	public void prune_color() {
 		fail("implement");
 	}
 }

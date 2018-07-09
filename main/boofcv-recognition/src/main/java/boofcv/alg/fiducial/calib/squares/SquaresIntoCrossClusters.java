@@ -69,8 +69,6 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 		if( this.maxNeighbors == Integer.MAX_VALUE ) {
 			this.maxNeighbors = Integer.MAX_VALUE-1;
 		}
-
-		search.init(2);
 	}
 
 	/**

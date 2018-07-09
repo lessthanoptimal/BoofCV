@@ -26,8 +26,14 @@ import org.ddogleg.nn.alg.KdTreeDistance;
  * @author Peter Abeles
  */
 public class KdTreeHistogramScene_F64 implements KdTreeDistance<HistogramScene> {
+	int N ;
+
+	public KdTreeHistogramScene_F64(int n) {
+		N = n;
+	}
+
 	@Override
-	public double compute(HistogramScene a, HistogramScene b) {
+	public double distance(HistogramScene a, HistogramScene b) {
 		final int N = a.histogram.length;
 		double total = 0;
 		for( int i = 0; i < N; i++ ) {
@@ -41,5 +47,10 @@ public class KdTreeHistogramScene_F64 implements KdTreeDistance<HistogramScene> 
 	@Override
 	public double valueAt(HistogramScene point, int index) {
 		return point.histogram[index];
+	}
+
+	@Override
+	public int length() {
+		return N;
 	}
 }

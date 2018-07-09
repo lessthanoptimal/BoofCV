@@ -95,9 +95,6 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		squareDetector.getDetector().setOutputClockwise(false);
 		squareDetector.getDetector().setNumberOfSides(4,4);
 
-		// set up nearest neighbor search for 2-DOF
-		search.init(2);
-
 		interpolate = FactoryInterpolation.bilinearPixelS(squareDetector.getInputType(), BorderType.EXTENDED);
 	}
 

@@ -94,9 +94,6 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 	 */
 	public void setClassificationData(List<HistogramScene> memory , int numScenes ) {
 
-		int numWords = featureToHistogram.getTotalWords();
-
-		nn.init(numWords);
 		nn.setPoints(memory, false);
 
 		scenes = new double[ numScenes ];
