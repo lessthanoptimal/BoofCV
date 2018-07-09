@@ -33,6 +33,8 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class StandardAssociateDescriptionChecks<Desc> {
 
+	// if true then the error used is squared
+	boolean distanceIsSquared = true;
 	FastQueue<Desc> listSrc;
 	FastQueue<Desc> listDst;
 
@@ -184,7 +186,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 		listDst.add( c(20) );  // can't be paired with anything
 
 		// set threshold so that one pair won't be considered
-		alg.setMaxScoreThreshold(0.07);
+		alg.setMaxScoreThreshold(distanceIsSquared?0.07*0.07:0.07);
 		alg.setSource(listSrc);
 		alg.setDestination(listDst);
 		alg.associate();

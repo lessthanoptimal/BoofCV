@@ -33,7 +33,6 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -58,9 +57,50 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 		return s;
 	}
 
+	/**
+	 * See if associations are skipped if the ratio is too low
+	 */
 	@Test
 	public void scoreRatio() {
-		fail("Implement");
+		Dummy<TupleDesc_F64> nn = new Dummy<>();
+		// src = assoc[i] where src is the index of the source feature and i is the index of the dst feature
+		nn.assoc = new int[]{2,0,1,-1,4,-1,-1,2,2,1};
+		nn.distanceScale = 2.0;
+
+		AssociateNearestNeighbor<TupleDesc_F64> alg = new AssociateNearestNeighbor<>(nn);
+
+		FastQueue<TupleDesc_F64> src = new FastQueue<>(10, TupleDesc_F64.class, false);
+		FastQueue<TupleDesc_F64> dst = new FastQueue<>(10, TupleDesc_F64.class, false);
+
+		for( int i = 0; i < 5; i++ ) {
+			src.add( new TupleDesc_F64(10));
+		}
+
+		for( int i = 0; i < 10; i++ ) {
+			dst.add( new TupleDesc_F64(10));
+		}
+
+		alg.setSource(src);
+		alg.setDestination(dst);
+
+		alg.setRatioUsesSqrt(false);
+		alg.setScoreRatioThreshold(0.49); // threshold should reject everything
+		alg.associate();
+		assertEquals(0,alg.getMatches().size);
+
+		alg.setScoreRatioThreshold(0.51); // everything should be accepted
+		alg.associate();
+		assertEquals(10,alg.getMatches().size);
+
+		alg.setRatioUsesSqrt(true);
+		alg.setScoreRatioThreshold(1.0/Math.sqrt(2.0)-0.001);
+		alg.associate();
+		assertEquals(0,alg.getMatches().size);
+
+		alg.setScoreRatioThreshold(1.0/Math.sqrt(2.0)+0.001);
+		alg.associate();
+		assertEquals(10,alg.getMatches().size);
+
 	}
 
 	/**
@@ -120,6 +160,8 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 		public int assoc[];
 		int numCalls = 0;
 
+		double distanceScale;
+
 		@Override
 		public void setPoints(List<D> points, boolean assad) {
 			this.points = points;
@@ -141,6 +183,19 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 
 		@Override
 		public void findNearest(D point, double maxDistance, int numNeighbors, FastQueue<NnData<D>> result) {
+			result.reset();
+			int w = assoc[numCalls];
+
+			if( w >= 0 ) {
+				NnData r1 = result.grow();
+				r1.index = w;
+				r1.point = points.get(w);
+				r1.distance = 2.0;
+				NnData r2 = result.grow();
+				r2.index = w;
+				r2.point = points.get(w);
+				r2.distance = 2.0*distanceScale;
+			}
 		}
 	}
 

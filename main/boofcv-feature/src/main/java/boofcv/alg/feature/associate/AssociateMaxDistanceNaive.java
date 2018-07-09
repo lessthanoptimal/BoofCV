@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,6 @@ public class AssociateMaxDistanceNaive<D> extends BaseAssociateLocation2DFilter<
 	// location of the source pixel
 	private Point2D_F64 src;
 
-	// max distance before being squared
-	protected double maxDistanceNotSquared;
 
 	/**
 	 * Specifies score mechanism
@@ -57,17 +55,6 @@ public class AssociateMaxDistanceNaive<D> extends BaseAssociateLocation2DFilter<
 	{
 		super(scoreAssociation,backwardsValidation,maxError);
 		setMaxDistance(maxDistance);
-	}
-
-	@Override
-	public double getMaxDistance() {
-		return maxDistanceNotSquared;
-	}
-
-	@Override
-	public void setMaxDistance(double maxDistance) {
-		super.setMaxDistance(maxDistance*maxDistance);
-		this.maxDistanceNotSquared = maxDistance;
 	}
 
 	@Override

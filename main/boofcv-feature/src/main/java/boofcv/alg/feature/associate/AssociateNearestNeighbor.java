@@ -71,7 +71,7 @@ public class AssociateNearestNeighbor<D>
 	private FindUnassociated unassociated = new FindUnassociated();
 
 	// maximum distance away two points can be
-	private double maxDistanceSq = -1;
+	private double maxDistance = -1;
 
 	public AssociateNearestNeighbor(NearestNeighbor<D> alg) {
 		this.alg = alg;
@@ -96,13 +96,13 @@ public class AssociateNearestNeighbor<D>
 		if( scoreRatioThreshold >= 1.0 ) {
 			// if score ratio is not turned on then just use the best match
 			for (int i = 0; i < listDst.size; i++) {
-				if (!alg.findNearest(listDst.data[i], maxDistanceSq, result))
+				if (!alg.findNearest(listDst.data[i], maxDistance, result))
 					continue;
 				matches.grow().setAssociation(result.index, i, result.distance);
 			}
 		} else {
 			for (int i = 0; i < listDst.size; i++) {
-				alg.findNearest(listDst.data[i], maxDistanceSq,2, result2);
+				alg.findNearest(listDst.data[i], maxDistance,2, result2);
 
 				if( result2.size == 1 ) {
 					NnData<D> r = result2.getTail();
@@ -147,7 +147,7 @@ public class AssociateNearestNeighbor<D>
 
 	@Override
 	public void setMaxScoreThreshold(double score) {
-		this.maxDistanceSq = score;
+		this.maxDistance = score;
 	}
 
 	@Override

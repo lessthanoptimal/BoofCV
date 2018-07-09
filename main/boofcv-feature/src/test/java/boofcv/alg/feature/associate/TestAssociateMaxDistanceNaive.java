@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,17 +52,5 @@ public class TestAssociateMaxDistanceNaive {
 
 		alg.setActiveSource(a1);
 		assertEquals(3*3,alg.computeDistanceToSource(b1),1e-8);
-	}
-
-	/**
-	 * Make sure the internal max distance is correctly mangled.
-	 */
-	@Test
-	public void checkMaxDistance() {
-		AssociateMaxDistanceNaive alg = new AssociateMaxDistanceNaive(null,false,Double.MAX_VALUE);
-
-		alg.setMaxDistance(2);
-		assertEquals(2,alg.getMaxDistance(),1e-8);
-		assertEquals(4,alg.maxDistance,1e-8);
 	}
 }

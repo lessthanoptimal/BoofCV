@@ -45,13 +45,12 @@ public class PointCloudUtils {
 
 		statistics(cloud, mean, stdev);
 
-		double scale = Math.sqrt(Math.max(Math.max(stdev.x,stdev.y),stdev.z));
+		double scale = target/(Math.max(Math.max(stdev.x,stdev.y),stdev.z));
 
-		scale /= target;
 
 		int N = cloud.size();
 		for (int i = 0; i < N ; i++) {
-			cloud.get(i).scale(1.0/scale);
+			cloud.get(i).scale(scale);
 		}
 
 		return scale;
@@ -82,6 +81,9 @@ public class PointCloudUtils {
 			stdev.y += dy*dy/N;
 			stdev.z += dz*dz/N;
 		}
+		stdev.x = Math.sqrt(stdev.x);
+		stdev.y = Math.sqrt(stdev.y);
+		stdev.z = Math.sqrt(stdev.z);
 	}
 
 	/**
@@ -92,10 +94,18 @@ public class PointCloudUtils {
 	 * @param radius search distance for neighbors
 	 */
 	public static void prune(List<Point3D_F64> cloud , int minNeighbors , double radius ) {
+		if( minNeighbors < 0 )
+			throw new IllegalArgumentException("minNeighbors must be >= 0");
 		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64() );
 
 		nn.setPoints(cloud,false);
 		FastQueue<NnData<Point3D_F64>> results = new FastQueue(NnData.class,true);
+
+		// It will always find itself
+		minNeighbors += 1;
+
+		// distance is Euclidean squared
+		radius *= radius;
 
 		for( int i = cloud.size()-1; i >= 0; i-- ) {
 			nn.findNearest(cloud.get(i),radius,minNeighbors,results);
@@ -115,10 +125,18 @@ public class PointCloudUtils {
 	 * @param radius search distance for neighbors
 	 */
 	public static void prune(List<Point3D_F64> cloud , GrowQueue_I32 colors, int minNeighbors , double radius ) {
+		if( minNeighbors < 0 )
+			throw new IllegalArgumentException("minNeighbors must be >= 0");
 		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64());
 
 		nn.setPoints(cloud,false);
 		FastQueue<NnData<Point3D_F64>> results = new FastQueue(NnData.class,true);
+
+		// It will always find itself
+		minNeighbors += 1;
+
+		// distance is Euclidean squared
+		radius *= radius;
 
 		for( int i = cloud.size()-1; i >= 0; i-- ) {
 			nn.findNearest(cloud.get(i),radius,minNeighbors,results);
