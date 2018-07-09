@@ -61,7 +61,6 @@ public class TestClassifierKNearestNeighborsBow {
 
 		assertEquals(2, bow.classify(new GrayU8(2, 3)));
 
-		assertEquals(NUM_WORDS, nn.initDimension);
 		assertTrue(nn.setPoints);
 		assertEquals(1, toWords.numReset);
 		assertEquals(FEATURES_IN_IMAGE, toWords.numAddFeature);
@@ -71,7 +70,6 @@ public class TestClassifierKNearestNeighborsBow {
 		// call one more time and see if stuff blows up
 		assertEquals(2, bow.classify(new GrayU8(2, 3)));
 
-		assertEquals(NUM_WORDS, nn.initDimension);
 		assertTrue(nn.setPoints);
 		assertEquals(2, toWords.numReset);
 		assertEquals(FEATURES_IN_IMAGE*2, toWords.numAddFeature);
@@ -82,7 +80,6 @@ public class TestClassifierKNearestNeighborsBow {
 	protected class DummyNN implements NearestNeighbor<HistogramScene> {
 
 		public boolean setPoints = false;
-		public int initDimension=-1;
 
 		@Override
 		public void setPoints(List<HistogramScene> points, boolean index) {
