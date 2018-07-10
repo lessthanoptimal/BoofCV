@@ -36,17 +36,17 @@ import java.util.List;
  */
 public class PairwiseImageGraph {
 
-	public List<CameraView> graphNodes = new ArrayList<>();
-	public List<CameraMotion> graphEdges = new ArrayList<>();
+	public List<CameraView> nodes = new ArrayList<>();
+	public List<CameraMotion> edges = new ArrayList<>();
 	public List<Feature3D> features3D = new ArrayList<>();
 
 	static class CameraView {
 		String camera;
 		int index;
 		Se3_F64 viewToWorld = new Se3_F64();
-		EstimateSceneUnordered.ViewState state = EstimateSceneUnordered.ViewState.UNPROCESSED;
+		ViewState state = ViewState.UNPROCESSED;
 
-		List<EstimateSceneUnordered.CameraMotion> connections = new ArrayList<>();
+		List<PairwiseImageGraph.CameraMotion> connections = new ArrayList<>();
 
 		// feature descriptor of all features in this image
 		FastQueue<TupleDesc> descriptions;
@@ -55,7 +55,7 @@ public class PairwiseImageGraph {
 		FastQueue<Point2D_F64> observationNorm = new FastQueue<>(Point2D_F64.class, true);
 
 		// Estimated 3D location for SOME of the features
-		EstimateSceneUnordered.Feature3D[] features3D;
+		Feature3D[] features3D;
 
 		public CameraView(int index, FastQueue<TupleDesc> descriptions ) {
 			this.index = index;
@@ -77,8 +77,8 @@ public class PairwiseImageGraph {
 		// index
 		List<AssociatedIndex> features = new ArrayList<>();
 
-		EstimateSceneUnordered.CameraView viewSrc;
-		EstimateSceneUnordered.CameraView viewDst;
+		PairwiseImageGraph.CameraView viewSrc;
+		PairwiseImageGraph.CameraView viewDst;
 
 		// Average angle of features in this motion for triangulation
 		double triangulationAngle;
@@ -93,7 +93,7 @@ public class PairwiseImageGraph {
 			return features.size()*triangulationAngle;
 		}
 
-		public Se3_F64 motionSrcToDst( EstimateSceneUnordered.CameraView src ) {
+		public Se3_F64 motionSrcToDst( PairwiseImageGraph.CameraView src ) {
 			if( src == viewSrc) {
 				return a_to_b.copy();
 			} else if( src == viewDst){
@@ -103,7 +103,7 @@ public class PairwiseImageGraph {
 			}
 		}
 
-		public EstimateSceneUnordered.CameraView destination(EstimateSceneUnordered.CameraView src ) {
+		public PairwiseImageGraph.CameraView destination(PairwiseImageGraph.CameraView src ) {
 			if( src == viewSrc) {
 				return viewDst;
 			} else if( src == viewDst){
@@ -120,7 +120,7 @@ public class PairwiseImageGraph {
 		// Index of the obsrevation in the corresponding view which the feature is visible in
 		GrowQueue_I32 obsIdx = new GrowQueue_I32();
 		// List of views this feature is visible in
-		List<EstimateSceneUnordered.CameraView> views = new ArrayList<>();
+		List<PairwiseImageGraph.CameraView> views = new ArrayList<>();
 		int mark = -1;
 	}
 }

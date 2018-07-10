@@ -65,6 +65,8 @@ public class SimulatePlanarWorld {
 	Point3Transform2_F64 sphereToPixel;
 	InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.ZERO);
 
+	Se3_F64 worldToCamera = new Se3_F64();
+
 	Point3D_F64 p3 = new Point3D_F64();
 	float[] pointing = new float[0];
 
@@ -90,6 +92,10 @@ public class SimulatePlanarWorld {
 		sphereToPixel = new SphereToNarrowPixel_F64(factory.distort_F64(false,true));
 
 		computeProjectionTable(model);
+	}
+
+	public void setWorldToCamera( Se3_F64 worldToCamera ) {
+		this.worldToCamera.set(worldToCamera);
 	}
 
 	private void computeProjectionTable(CameraPinhole model) {
@@ -170,7 +176,7 @@ public class SimulatePlanarWorld {
 					minDepth = depth;
 
 					// convert the point into rect coordinates
-					SePointOps_F64.transformReverse(r.rectToWorld, p3, p3);
+					SePointOps_F64.transformReverse(r.rectToCamera, p3, p3);
 
 					// now into image pixels
 					p3.x += r.width3D / 2;
@@ -211,7 +217,7 @@ public class SimulatePlanarWorld {
 		ImageRect r = scene.get(which);
 
 		Point3D_F64 p3 = new Point3D_F64(x,-y,0);
-		SePointOps_F64.transform(r.rectToWorld, p3, p3);
+		SePointOps_F64.transform(r.rectToCamera, p3, p3);
 
 		// unit sphere
 		p3.scale(1.0/p3.norm());
@@ -219,14 +225,16 @@ public class SimulatePlanarWorld {
 		sphereToPixel.compute(p3.x,p3.y,p3.z,output);
 	}
 
-	public static class ImageRect {
+	public class ImageRect {
 		Se3_F64 rectToWorld;
+		Se3_F64 rectToCamera = new Se3_F64();
 		GrayF32 image;
 		double width3D;
 		FastQueue<Point3D_F64> rect3D = new FastQueue<>(Point3D_F64.class,true);
 		Polygon2D_F64 rect2D = new Polygon2D_F64();
 
 		public void worldRect() {
+			rectToWorld.concat(worldToCamera,rectToCamera);
 			double imageRatio = image.height/(double)image.width;
 			double height3D = width3D*imageRatio;
 
@@ -236,7 +244,7 @@ public class SimulatePlanarWorld {
 			rect2D.set(2,width3D/2, height3D/2);
 			rect2D.set(3,width3D/2,-height3D/2);
 
-			UtilShape3D_F64.polygon2Dto3D(rect2D,rectToWorld,rect3D);
+			UtilShape3D_F64.polygon2Dto3D(rect2D,rectToCamera,rect3D);
 		}
 	}
 

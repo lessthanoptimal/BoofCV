@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,11 @@ public class TupleDesc_F64 implements TupleDesc<TupleDesc_F64> {
 
 	public TupleDesc_F64( int numFeatures ) {
 		this.value = new double[ numFeatures ];
+	}
+
+	public TupleDesc_F64( double values[] ) {
+		this.value = new double[values.length];
+		System.arraycopy(values,0,this.value,0,values.length);
 	}
 
 	protected TupleDesc_F64() {

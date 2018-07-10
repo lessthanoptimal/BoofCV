@@ -18,18 +18,9 @@
 
 package boofcv.alg.sfm.structure;
 
-import boofcv.struct.feature.AssociatedIndex;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -97,43 +88,6 @@ public class TestEstimateSceneUnordered extends GenericSceneStructureChecks {
 
 
 		fail("implement");
-	}
-
-	@Test
-	public void fitEpipolar() {
-		createWorld(2,3);
-
-		List<Point3D_F64> worldPoints = new ArrayList<>();
-		findViewable(new int[]{0,1},worldPoints);
-		Se3_F64 camera_a_to_b = cameraAtoB(0,1);
-
-		List<Point2D_F64> pointsA = new ArrayList<>();
-		List<Point2D_F64> pointsB = new ArrayList<>();
-		renderObservations(0,false,worldPoints,pointsA);
-		renderObservations(1,false,worldPoints,pointsB);
-
-		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex.class,true);
-		for (int i = 0; i < pointsA.size(); i++) {
-			matches.grow().setAssociation(i,i,0);
-		}
-
-		EstimateSceneUnordered<?> alg = new EstimateSceneUnordered<>();
-		alg.calibrated = true;
-		alg.declareModelFitting();
-
-		EstimateSceneUnordered.CameraMotion edge = new EstimateSceneUnordered.CameraMotion();
-		alg.fitEpipolar(matches,pointsA,pointsB,alg.ransacEssential,edge);
-
-		assertTrue(edge.features.size() >= matches.size*0.95 );
-		assertFalse(matches.contains(edge.features.get(0))); // it should be a copy and not have the same instance
-
-		Se3_F64 found_a_to_b = alg.ransacEssential.getModelParameters();
-
-		camera_a_to_b.T.normalize();
-		found_a_to_b.T.normalize();
-
-		assertTrue( camera_a_to_b.T.distance(found_a_to_b.T) < 1e-4 );
-		assertTrue(MatrixFeatures_DDRM.isIdentical(camera_a_to_b.R,found_a_to_b.R,1e-3));
 	}
 
 	@Test
