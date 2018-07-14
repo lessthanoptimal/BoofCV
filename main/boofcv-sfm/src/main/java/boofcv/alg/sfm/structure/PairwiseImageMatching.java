@@ -189,6 +189,8 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		declareModelFitting();
 
 		for (int i = 0; i < graph.nodes.size(); i++) {
+			if( verbose )
+				System.out.println("Matching node "+i);
 			associate.setSource(graph.nodes.get(i).descriptions);
 			for (int j = i+1; j < graph.nodes.size(); j++) {
 				associate.setDestination(graph.nodes.get(j).descriptions);
@@ -263,7 +265,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		graph.edges.add(edge);
 
 		if( verbose )
-			System.out.println("Connected "+viewA.index+" -> "+viewB.index);
+			System.out.println("  Connected "+viewA.index+" -> "+viewB.index);
 	}
 
 	/**

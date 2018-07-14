@@ -30,8 +30,8 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Makes it easy to remove outliers or features which don't meet certain criteria from the
- * scene.
+ * makes it easy to removing elements from the scene's structure. Different criteria can be specified for each
+ * type of element you wish to remove.
  *
  * @author Peter Abeles
  */
@@ -49,10 +49,10 @@ public class PruneStructureFromScene {
 
 	/**
 	 * Computes reprojection error for all features. Sorts the resulting residuals by magnitude.
-	 * Prunes observations which have the largest errors. Then searches for features with less
-	 * than two views and prunes them.
+	 * Prunes observations which have the largest errors first. After calling this function you should
+	 * call {@link #prunePoints(int)} and {@link #pruneViews(int)} to ensure the scene is still valid.
 	 *
-	 * @param inlierFraction
+	 * @param inlierFraction 0 to 1. 1 = no change. 0 = everything is pruned.
 	 */
 	public void pruneObservationsByErrorRank( double inlierFraction ) {
 
@@ -60,19 +60,20 @@ public class PruneStructureFromScene {
 		Point2D_F64 predicted = new Point2D_F64();
 		Point3D_F64 X = new Point3D_F64();
 
+		// Create a list of observation errors
 		List<Errors> errors = new ArrayList<>();
-
 		for (int viewIndex = 0; viewIndex < observations.views.length; viewIndex++) {
 			BundleAdjustmentObservations.View v = observations.views[viewIndex];
 			BundleAdjustmentSceneStructure.View view = structure.views[viewIndex];
 
-			for (int featureIndex = 0; featureIndex < v.feature.size; featureIndex++) {
-				BundleAdjustmentSceneStructure.Point f = structure.points[v.feature.data[featureIndex]];
+			for (int pointIndex = 0; pointIndex < v.point.size; pointIndex++) {
+				int pointID = v.point.data[pointIndex];
+				BundleAdjustmentSceneStructure.Point f = structure.points[pointID];
 
 				// Get feature location in world
 				f.get(X);
 				// Get observation in image pixels
-				v.get(featureIndex, observation);
+				v.get(pointIndex, observation);
 
 				// World to View
 				view.worldToView.transform(X, X);
@@ -83,7 +84,7 @@ public class PruneStructureFromScene {
 
 				Errors e = new Errors();
 				e.view = viewIndex;
-				e.feature = featureIndex;
+				e.pointIndexInView = pointIndex;
 				e.error = predicted.distance2(observation);
 				errors.add(e);
 			}
@@ -96,50 +97,101 @@ public class PruneStructureFromScene {
 			Errors e = errors.get(i);
 
 			BundleAdjustmentObservations.View v = observations.views[e.view];
-			v.set(e.feature, Float.NaN, Float.NaN);
+			v.set(e.pointIndexInView, Float.NaN, Float.NaN);
 		}
 
 		// Remove all marked features
+		removeMarkedObservations();
+	}
+
+	/**
+	 * Removes observations which have been marked with NaN
+	 */
+	private void removeMarkedObservations() {
+		Point2D_F64 observation = new Point2D_F64();
+
 		for (int viewIndex = 0; viewIndex < observations.views.length; viewIndex++) {
+//			System.out.println("ViewIndex="+viewIndex);
 			BundleAdjustmentObservations.View v = observations.views[viewIndex];
-
-			for( int featureIndex = v.feature.size-1; featureIndex >= 0; featureIndex-- ) {
-				BundleAdjustmentSceneStructure.Point f = structure.points[v.feature.data[featureIndex]];
-
-				v.get(featureIndex, observation);
+			for(int pointIndex = v.point.size-1; pointIndex >= 0; pointIndex-- ) {
+				int pointID = v.getPointId(pointIndex);
+				BundleAdjustmentSceneStructure.Point f = structure.points[pointID];
+//				System.out.println("   pointIndex="+pointIndex+" pointID="+pointID+" hash="+f.hashCode());
+				v.get(pointIndex, observation);
 
 				if( !Double.isNaN(observation.x))
 					continue;
 
+				if( !f.views.contains(viewIndex))
+					throw new RuntimeException("BUG!");
+
 				// Tell the feature it is no longer visible in this view
 				f.removeView(viewIndex);
 				// Remove the observation of this feature from the view
-				v.remove(featureIndex);
+				v.remove(pointIndex);
 			}
 		}
 	}
 
 	/**
-	 * Prunes features with less than 'count' observations
-	 * @param count
+	 * Check to see if a point is behind the camera which is viewing it. If it is remove that observation
+	 * since it can't possibly be observed.
 	 */
-	public void pruneFeatures( int count ) {
-		for (int viewIndex = observations.views.length-1; viewIndex >= 0; viewIndex--) {
+	public void pruneObservationsBehindCamera() {
+		Point3D_F64 X = new Point3D_F64();
+
+		for (int viewIndex = 0; viewIndex < observations.views.length; viewIndex++) {
 			BundleAdjustmentObservations.View v = observations.views[viewIndex];
+			BundleAdjustmentSceneStructure.View view = structure.views[viewIndex];
 
-			for( int featureIndex = v.feature.size-1; featureIndex >= 0; featureIndex-- ) {
-				BundleAdjustmentSceneStructure.Point f = structure.points[v.feature.data[featureIndex]];
+			for (int pointIndex = 0; pointIndex < v.point.size; pointIndex++) {
+				BundleAdjustmentSceneStructure.Point f = structure.points[v.getPointId(pointIndex)];
 
-				if( f.views.size < count ) {
-					v.remove(featureIndex);
+				// Get feature location in world
+				f.get(X);
+
+				if( !f.views.contains(viewIndex))
+					throw new RuntimeException("BUG!");
+
+				// World to View
+				view.worldToView.transform(X, X);
+
+				// Is the feature behind this view and can't be seen?
+				if( X.z <= 0 ) {
+					v.set(pointIndex, Float.NaN, Float.NaN);
 				}
 			}
 		}
 
+		removeMarkedObservations();
+	}
+
+	/**
+	 * Prunes Points/features with less than 'count' observations. Observations of the points are also removed.
+	 *
+	 * Call {@link #pruneViews(int)} to ensure that all views have points in view
+	 *
+	 * @param count Minimum number of observations
+	 */
+	public void prunePoints(int count ) {
+		// Remove all observations of the Points which are going to be removed
+		for (int viewIndex = observations.views.length-1; viewIndex >= 0; viewIndex--) {
+			BundleAdjustmentObservations.View v = observations.views[viewIndex];
+
+			for(int pointIndex = v.point.size-1; pointIndex >= 0; pointIndex-- ) {
+				BundleAdjustmentSceneStructure.Point p = structure.points[v.getPointId(pointIndex)];
+
+				if( p.views.size < count ) {
+					v.remove(pointIndex);
+				}
+			}
+		}
+
+		// Create a look up table containing from old to new indexes for each point
 		int oldToNew[] = new int[ structure.points.length ];
 		Arrays.fill(oldToNew,-1); // crash is bug
 
-		GrowQueue_I32 prune = new GrowQueue_I32();
+		GrowQueue_I32 prune = new GrowQueue_I32(); // List of point ID's which are to be removed.
 		for (int i = 0; i < structure.points.length; i++) {
 			if( structure.points[i].views.size < count ) {
 				prune.add(i);
@@ -149,29 +201,49 @@ public class PruneStructureFromScene {
 
 		}
 
+		// Remove the points from the structure
 		structure.removePoints(prune);
 
 		// Update the references from observation to features
 		for (int viewIndex = observations.views.length-1; viewIndex >= 0; viewIndex--) {
 			BundleAdjustmentObservations.View v = observations.views[viewIndex];
 
-			for( int featureIndex = v.feature.size-1; featureIndex >= 0; featureIndex-- ) {
-				v.feature.data[featureIndex] = oldToNew[v.feature.data[featureIndex]];
+			for(int featureIndex = v.point.size-1; featureIndex >= 0; featureIndex-- ) {
+				v.point.data[featureIndex] = oldToNew[v.point.data[featureIndex]];
 			}
 		}
 	}
 
 	/**
-	 * Removes views with less than 'count' features visible
+	 * Prune a feature it has fewer than X neighbors within Y distance. Observations
+	 * associated with this feature are also pruned.
+	 *
+	 * Call {@link #pruneViews(int)} to makes sure the graph is valid.
+	 *
+	 * @param neighbors Number of other features which need to be near by
+	 * @param distance Maximum distance a point can be to be considered a feature
+	 */
+	public void prunePoints(int neighbors , double distance ) {
+
+	}
+
+	/**
+	 * Removes views with less than 'count' features visible. Observations of features in removed views are also
+	 * removed.
+	 *
 	 * @param count minimum number of features
 	 */
 	public void pruneViews( int count ) {
 
 	}
 
+	public void pruneUnusedCameras() {
+
+	}
+
 	private static class Errors {
 		int view;
-		int feature;
+		int pointIndexInView;
 		double error;
 	}
 }

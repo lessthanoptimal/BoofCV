@@ -213,7 +213,7 @@ public class BundleAdjustmentSceneStructure {
 	}
 
 	/**
-	 * Removes the points specified in which from the list of points. 'which' must be ordered
+	 * Removes the points specified in 'which' from the list of points. 'which' must be ordered
 	 * from lowest to highest index.
 	 *
 	 * @param which Ordered list of point indexes to remove
@@ -280,7 +280,7 @@ public class BundleAdjustmentSceneStructure {
 		public void removeView( int which ) {
 			int index = views.indexOf(which);
 			if( index == -1 )
-				throw new RuntimeException("BUG");
+				throw new RuntimeException("BUG. Could not find in list of views. which="+which);
 			views.remove(index);
 		}
 

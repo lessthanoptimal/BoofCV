@@ -168,7 +168,7 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 			BundleAdjustmentObservations.View obsView = observations.views[viewIndex];
 
 			for (int i = 0; i < obsView.size(); i++) {
-				int featureIndex = obsView.feature.get(i);
+				int featureIndex = obsView.point.get(i);
 				int columnOfPointInJac = featureIndex*3;
 
 				worldPt.x = input[columnOfPointInJac];

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,6 +84,16 @@ public class CameraPinhole extends CameraModel {
 		this.cy = param.cy;
 		this.width = param.width;
 		this.height = param.height;
+	}
+
+	/**
+	 * Is the pixel coordinate inside the image
+	 * @param x pixel X
+	 * @param y pixel Y
+	 * @return true if inside or false if not
+	 */
+	public boolean inside(double x , double y ) {
+		return x >= 0 && y >= 0 && x < width-1 && y <= height-1;
 	}
 
 	public double getCx() {

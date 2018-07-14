@@ -44,7 +44,12 @@ public class BundleAdjustmentPinholeRadial extends BundleAdjustmentCamera {
 	}
 
 	public BundleAdjustmentPinholeRadial(CameraPinholeRadial intrinsic ) {
-		if( intrinsic.radial.length > 2 )
+		double radial[];
+		if( intrinsic.radial == null )
+			radial = new double[0];
+		else
+			radial = intrinsic.radial;
+		if( radial.length > 2 )
 			throw new RuntimeException("Radial is too long");
 
 		zeroSkew = intrinsic.skew == 0;
@@ -53,10 +58,10 @@ public class BundleAdjustmentPinholeRadial extends BundleAdjustmentCamera {
 		cx = intrinsic.cx;
 		cy = intrinsic.cy;
 		r1=r2=0;
-		if( intrinsic.radial.length > 0 )
-			r1 = intrinsic.radial[0];
-		if( intrinsic.radial.length > 1 )
-			r2 = intrinsic.radial[1];
+		if( radial.length > 0 )
+			r1 = radial[0];
+		if( radial.length > 1 )
+			r2 = radial[1];
 		t1 = intrinsic.t1;
 		t2 = intrinsic.t2;
 		skew = intrinsic.skew;

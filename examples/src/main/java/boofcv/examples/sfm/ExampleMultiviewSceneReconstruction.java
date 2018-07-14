@@ -99,7 +99,7 @@ public class ExampleMultiviewSceneReconstruction {
 		// Optimize the results
 		int pruneCycles=6;
 		for (int i = 0; i < pruneCycles; i++) {
-			System.out.println("BA + Prune iteration = "+i);
+			System.out.println("BA + Prune iteration = "+i+"  points="+structure.points.length+"  obs="+observations.getObservationCount());
 			if( !sba.optimize(structure,observations) ) {
 				throw new RuntimeException("Bundle adjustment failed!");
 			}
@@ -110,7 +110,7 @@ public class ExampleMultiviewSceneReconstruction {
 			PruneStructureFromScene pruner = new PruneStructureFromScene(structure,observations);
 
 			pruner.pruneObservationsByErrorRank(0.97);
-			pruner.pruneFeatures(2);
+			pruner.prunePoints(3);
 			pruner.pruneViews(5);
 		}
 
@@ -178,10 +178,10 @@ public class ExampleMultiviewSceneReconstruction {
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 
-		int N = 16;
-		while( images.size() > N ) {
-			images.remove(N);
-		}
+//		int N = 8;
+//		while( images.size() > N ) {
+//			images.remove(N);
+//		}
 
 		ExampleMultiviewSceneReconstruction example = new ExampleMultiviewSceneReconstruction();
 

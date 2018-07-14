@@ -807,6 +807,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 	public void setVerbose(boolean verbose) {
 		this.verbose = verbose;
+		imageMatching.setVerbose(verbose);
 	}
 
 	public PairwiseImageMatching<T> getImageMatching() {

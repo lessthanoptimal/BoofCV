@@ -43,9 +43,9 @@ public class TestBundleAdjustmentObservations {
 		v.remove(2);
 
 		assertEquals(3,v.size());
-		assertEquals(5,v.feature.get(0));
-		assertEquals(1,v.feature.get(1));
-		assertEquals(3,v.feature.get(2));
+		assertEquals(5,v.point.get(0));
+		assertEquals(1,v.point.get(1));
+		assertEquals(3,v.point.get(2));
 
 		Point2D_F64 p = new Point2D_F64();
 		v.get(0,p);
@@ -64,7 +64,7 @@ public class TestBundleAdjustmentObservations {
 		v.add(3,4,2);
 
 		v.set(2,-1,-2);
-		assertEquals(8,v.feature.get(2));
+		assertEquals(8,v.point.get(2));
 		Point2D_F64 p = new Point2D_F64();
 		v.get(2,p);
 		assertTrue(p.distance2(-1,-2) < 1e-7);

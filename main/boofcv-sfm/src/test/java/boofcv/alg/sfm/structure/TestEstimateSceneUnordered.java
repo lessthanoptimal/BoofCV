@@ -26,6 +26,7 @@ import boofcv.alg.sfm.structure.PairwiseImageGraph.CameraView;
 import boofcv.alg.sfm.structure.PairwiseImageGraph.Feature3D;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.feature.AssociatedIndex;
+import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -245,8 +246,9 @@ public class TestEstimateSceneUnordered extends GenericSceneStructureChecks {
 			WorldToCameraToPixel w2p = new WorldToCameraToPixel();
 			Point2D_F64 pixel = new Point2D_F64();
 			Point2D_F64 norm = new Point2D_F64();
+			Point3D_F64 center = new Point3D_F64(0,0,4);
 			for (int i = 0; i < N; i++) {
-				Point3D_F64 p3 = new Point3D_F64(1*rand.nextGaussian(),1*rand.nextGaussian(),rand.nextGaussian()+4);
+				Point3D_F64 p3 = UtilPoint3D_F64.noiseNormal(center,1,1,1,rand,null);
 
 				boolean visible[] = new boolean[graph.nodes.size()];
 				for( int j = 0; j < graph.nodes.size(); j++ ) {

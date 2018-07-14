@@ -104,7 +104,7 @@ public class TestBundleAdjustmentResidualFunction {
 
 			for (int i = 0; i < p.views.size; i++) {
 				BundleAdjustmentObservations.View v = obs.getView(p.views.get(i));
-				v.feature.add( j );
+				v.point.add( j );
 				v.observations.add( rand.nextInt(300)+20);
 				v.observations.add( rand.nextInt(300)+20);
 			}

@@ -80,7 +80,7 @@ public abstract class GenericBundleAdjustmentChecks {
 		BundleAdjustmentObservations observations = a.data1;
 		for (int i = 0; i < observations.views.length; i++) {
 			BundleAdjustmentObservations.View v = observations.views[i];
-			for (int j = 0; j < v.feature.size; j++) {
+			for (int j = 0; j < v.point.size; j++) {
 				v.observations.data[j*2+0] += rand.nextGaussian()*0.1;
 				v.observations.data[j*2+1] += rand.nextGaussian()*0.1;
 			}
@@ -163,7 +163,7 @@ public abstract class GenericBundleAdjustmentChecks {
 			BundleAdjustmentObservations.View v = observations.views[indexView];
 
 			wcp.configure(intrinsic,structure.views[indexView].worldToView);
-			for (int j = 0; j < v.feature.size; j++) {
+			for (int j = 0; j < v.point.size; j++) {
 				v.get(j,o);
 				structure.points[o.index].get(p3);
 				wcp.transform(p3,predicted);

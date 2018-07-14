@@ -46,7 +46,7 @@ public class BundleAdjustmentObservations {
 	public int getObservationCount() {
 		int total = 0;
 		for (int i = 0; i < views.length; i++) {
-			total += views[i].feature.size;
+			total += views[i].point.size;
 		}
 		return total;
 	}
@@ -56,18 +56,20 @@ public class BundleAdjustmentObservations {
 	}
 
 	public static class View {
-		public GrowQueue_I32 feature = new GrowQueue_I32();
+		// list of Point ID's which this view can see
+		public GrowQueue_I32 point = new GrowQueue_I32();
+		// The observation of the point in the view in an interleaved format
 		public GrowQueue_F32 observations = new GrowQueue_F32();
 
 		public int size() {
-			return feature.size;
+			return point.size;
 		}
 
 		/**
 		 * Removes the feature and observation at the specified element
 		 */
 		public void remove(int index ) {
-			feature.remove(index);
+			point.remove(index);
 			index *= 2;
 			observations.remove(index,index+1);
 		}
@@ -78,22 +80,58 @@ public class BundleAdjustmentObservations {
 			observations.data[index+1] = y;
 		}
 
+		public int getPointId( int index ) {
+			return point.get(index);
+		}
+
 		public void get(int index , Point2D_F64 p ) {
+			if( index >= point.size )
+				throw new IndexOutOfBoundsException(index+" >= "+point.size);
 			index *= 2;
 			p.x = observations.data[index];
 			p.y = observations.data[index+1];
 		}
 
 		public void get(int index , PointIndex2D_F64 observation ) {
-			observation.index = feature.data[index];
+			if( index >= point.size )
+				throw new IndexOutOfBoundsException(index+" >= "+point.size);
+			observation.index = point.data[index];
 			index *= 2;
 			observation.set( observations.data[index], observations.data[index+1]);
 		}
 
 		public void add( int featureIndex , float x , float y ) {
-			feature.add(featureIndex);
+			point.add(featureIndex);
 			observations.add(x);
 			observations.add(y);
+		}
+
+		public void checkDuplicatePoints() {
+			for (int i = 0; i < point.size; i++) {
+				int pa = point.get(i);
+				for (int j = i+1; j < point.size; j++) {
+					if( pa == point.get(j))
+						throw new RuntimeException("Duplicates");
+				}
+			}
+		}
+	}
+
+	/**
+	 * Makes sure that each feature is only observed in each view
+	 */
+	public void checkOneObservationPerView() {
+		for (int viewIdx = 0; viewIdx < views.length; viewIdx++) {
+			BundleAdjustmentObservations.View v = views[viewIdx];
+
+			for (int obsIdx = 0; obsIdx < v.size(); obsIdx++) {
+				int a = v.point.get(obsIdx);
+				for (int i = obsIdx+1; i < v.size(); i++) {
+					if( a == v.point.get(i)) {
+						new RuntimeException("Same point is viewed more than once in the same view");
+					}
+				}
+			}
 		}
 	}
 }
