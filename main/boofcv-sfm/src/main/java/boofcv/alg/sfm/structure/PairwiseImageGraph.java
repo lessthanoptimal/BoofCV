@@ -41,21 +41,21 @@ public class PairwiseImageGraph {
 	public List<Feature3D> features3D = new ArrayList<>();
 
 	static class CameraView {
-		String camera;
-		int index;
-		Se3_F64 viewToWorld = new Se3_F64();
-		ViewState state = ViewState.UNPROCESSED;
+		public String camera;
+		public int index;
+		public Se3_F64 viewToWorld = new Se3_F64();
+		public ViewState state = ViewState.UNPROCESSED;
 
-		List<PairwiseImageGraph.CameraMotion> connections = new ArrayList<>();
+		public List<PairwiseImageGraph.CameraMotion> connections = new ArrayList<>();
 
 		// feature descriptor of all features in this image
-		FastQueue<TupleDesc> descriptions;
+		public FastQueue<TupleDesc> descriptions;
 		// observed location of all features in pixels
-		FastQueue<Point2D_F64> observationPixels = new FastQueue<>(Point2D_F64.class, true);
-		FastQueue<Point2D_F64> observationNorm = new FastQueue<>(Point2D_F64.class, true);
+		public FastQueue<Point2D_F64> observationPixels = new FastQueue<>(Point2D_F64.class, true);
+		public FastQueue<Point2D_F64> observationNorm = new FastQueue<>(Point2D_F64.class, true);
 
 		// Estimated 3D location for SOME of the features
-		Feature3D[] features3D;
+		public Feature3D[] features3D;
 
 		public CameraView(int index, FastQueue<TupleDesc> descriptions ) {
 			this.index = index;
@@ -72,13 +72,16 @@ public class PairwiseImageGraph {
 	static class CameraMotion {
 		// if the transform of both views is known then this will be scaled to be in world units
 		// otherwise it's in arbitrary units
-		Se3_F64 a_to_b = new Se3_F64();
+		public Se3_F64 a_to_b = new Se3_F64();
 
-		// index
-		List<AssociatedIndex> features = new ArrayList<>();
+		// Which features are associated with each other and in the inlier set
+		public List<AssociatedIndex> associated = new ArrayList<>();
 
-		PairwiseImageGraph.CameraView viewSrc;
-		PairwiseImageGraph.CameraView viewDst;
+		// 3D features triangulated from this motion alone. Features are in reference frame src
+		public List<Feature3D> stereoTriangulations = new ArrayList<>();
+
+		public PairwiseImageGraph.CameraView viewSrc;
+		public PairwiseImageGraph.CameraView viewDst;
 
 		// Average angle of features in this motion for triangulation
 		double triangulationAngle;
@@ -90,7 +93,7 @@ public class PairwiseImageGraph {
 		 * @return the score
 		 */
 		public double scoreTriangulation() {
-			return features.size()*triangulationAngle;
+			return associated.size()*triangulationAngle;
 		}
 
 		public Se3_F64 motionSrcToDst( PairwiseImageGraph.CameraView src ) {
@@ -116,11 +119,13 @@ public class PairwiseImageGraph {
 
 	static class Feature3D {
 		// estimate 3D position of the feature in world frame
-		Point3D_F64 worldPt = new Point3D_F64();
-		// Index of the obsrevation in the corresponding view which the feature is visible in
-		GrowQueue_I32 obsIdx = new GrowQueue_I32();
+		public Point3D_F64 worldPt = new Point3D_F64();
+		// The acute angle between the two orientations it was triangulated from
+		public double triangulationAngle;
+		// Index of the observation in the corresponding view which the feature is visible in
+		public GrowQueue_I32 obsIdx = new GrowQueue_I32();
 		// List of views this feature is visible in
-		List<PairwiseImageGraph.CameraView> views = new ArrayList<>();
-		int mark = -1;
+		public List<PairwiseImageGraph.CameraView> views = new ArrayList<>();
+		public int mark = -1;
 	}
 }

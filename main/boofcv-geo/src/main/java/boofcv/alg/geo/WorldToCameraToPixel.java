@@ -88,6 +88,20 @@ public class WorldToCameraToPixel {
 		return true;
 	}
 
+	public boolean transform( Point3D_F64 worldPt , Point2D_F64 pixelPt , Point2D_F64 normPt ) {
+		SePointOps_F64.transform(worldToCamera,worldPt,cameraPt);
+
+		// can't see the point
+		if( cameraPt.z <= 0 )
+			return false;
+
+		normPt.x = cameraPt.x/cameraPt.z;
+		normPt.y = cameraPt.y/cameraPt.z;
+
+		normToPixel.compute(normPt.x, normPt.y, pixelPt);
+		return true;
+	}
+
 	/**
 	 * Computes location of 3D point in world as observed in the camera.  Point is returned if visible or null
 	 * if not visible.

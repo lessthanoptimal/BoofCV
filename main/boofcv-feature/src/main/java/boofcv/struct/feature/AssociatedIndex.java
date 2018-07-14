@@ -37,6 +37,12 @@ public class AssociatedIndex {
 		set(original);
 	}
 
+	public AssociatedIndex(int src, int dst, double fitScore) {
+		this.src = src;
+		this.dst = dst;
+		this.fitScore = fitScore;
+	}
+
 	public AssociatedIndex() {
 	}
 

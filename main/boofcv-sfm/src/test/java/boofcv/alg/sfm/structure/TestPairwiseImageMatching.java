@@ -174,8 +174,8 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		PairwiseImageGraph.CameraMotion edge = new PairwiseImageGraph.CameraMotion();
 		alg.fitEpipolar(matches,pointsA,pointsB,alg.ransacEssential,edge);
 
-		assertTrue(edge.features.size() >= matches.size*0.95 );
-		assertFalse(matches.contains(edge.features.get(0))); // it should be a copy and not have the same instance
+		assertTrue(edge.associated.size() >= matches.size*0.95 );
+		assertFalse(matches.contains(edge.associated.get(0))); // it should be a copy and not have the same instance
 
 		Se3_F64 found_a_to_b = alg.ransacEssential.getModelParameters();
 

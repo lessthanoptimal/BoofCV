@@ -43,6 +43,7 @@ import boofcv.struct.image.ImageBase;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilVector3D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -58,10 +59,12 @@ import java.util.*;
  *
  * All cameras must either be calibrated or uncalibrated.
  *
+ * Sensitivity to the selection of the origin view and the motion which defines the coordinate system is minimized
+ * by estimating the 3D coordinate of points using local information alone. An alternative and common approach uses
+ * information built up from sequential view poses and 3D point estimates which have unbounded error.
+ *
  * @author Peter Abeles
  */
-// TODO This approach is very sensitive to the origin which is selected
-	//
 public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateSceneStructure<T>
 {
 	// Used to pre-maturely stop the scene estimation process
@@ -113,6 +116,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		this( new PairwiseImageMatching<>(detDesc) );
 	}
 
+	EstimateSceneUnordered(){}
+
 	@Override
 	public void addCamera(String cameraName) {
 		if( camerasPixelToNorm.isEmpty() )
@@ -156,20 +161,33 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		graph = imageMatching.getGraph();
 
 		for (int i = 0; i < graph.edges.size(); i++) {
-			PairwiseImageGraph.CameraMotion e = graph.edges.get(i);
+			CameraMotion e = graph.edges.get(i);
 			e.triangulationAngle = medianTriangulationAngle(e);
 		}
 
+		System.out.println("Selecting root");
 		// Select the view which will act as the origin
 		CameraView origin = selectOriginNode();
 		// Select the motion which will define the coordinate system
 		CameraMotion baseMotion = selectCoordinateBase( origin );
+
+		System.out.println("Stereo triangulation");
+		// Triangulate features in all motions which exceed a certain angle
+		for (int i = 0; i < graph.edges.size() && !stopRequested ; i++) {
+			CameraMotion e = graph.edges.get(i);
+			if( e.triangulationAngle > Math.PI/10 || e == baseMotion) {
+				System.out.println("   Edge "+i+" / "+graph.edges.size());
+				triangulateStereoEdges(e);
+			}
+		}
+
+		System.out.println("Defining the coordinate system");
+		// Using the selecting coordinate frames and triangulated points define the coordinate system
 		defineCoordinateSystem(origin, baseMotion);
 		if( stopRequested )
 			return false;
-		// Triangulate initial points
-		triangulateInitialSeed(origin,baseMotion);
 
+		System.out.println("Estimate all features");
 		// Now estimate all the other view locations and 3D features
 		estimateAllFeatures(origin, baseMotion.destination(origin));
 		if( stopRequested )
@@ -183,11 +201,11 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 	double medianTriangulationAngle( CameraMotion edge ) {
 
-		GrowQueue_F64 angles = new GrowQueue_F64(edge.features.size());
-		angles.size = edge.features.size();
+		GrowQueue_F64 angles = new GrowQueue_F64(edge.associated.size());
+		angles.size = edge.associated.size();
 
-		for (int i = 0; i < edge.features.size(); i++) {
-			AssociatedIndex a = edge.features.get(i);
+		for (int i = 0; i < edge.associated.size(); i++) {
+			AssociatedIndex a = edge.associated.get(i);
 			Point2D_F64 normA = edge.viewSrc.observationNorm.get( a.src );
 			Point2D_F64 normB = edge.viewDst.observationNorm.get( a.dst );
 
@@ -226,7 +244,6 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			viewOldToView[ graph.nodes.indexOf(viewsAdded.get(i))] = i;
 		}
 
-
 		for( int i = 0; i < viewsAdded.size(); i++ ) {
 			CameraView v = viewsAdded.get(i);
 			int cameraIndex = cameraToIndex.get(v.camera);
@@ -252,6 +269,114 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			}
 		}
 
+	}
+
+	/**
+	 * Adds features which were triangulated using the stereo pair after the scale factor has been determined.
+	 * Don't mark the other view as being processed. It's 3D pose will be estimated later on using PNP with the
+	 * new features and features determined later on
+	 */
+	void addTriangulatedStereoFeatures( CameraView base , CameraMotion edge , double scale ) {
+		CameraView viewA = edge.viewSrc;
+		CameraView viewB = edge.viewDst;
+
+		boolean baseIsA = base == viewA;
+		CameraView other = baseIsA ? viewB : viewA;
+
+		// Determine transform from other to world
+		edge.a_to_b.T.scale(scale);
+		Se3_F64 otherToBase = baseIsA ? edge.a_to_b.invert(null) : edge.a_to_b.copy();
+		otherToBase.concat(base.viewToWorld, other.viewToWorld);
+
+		// Convert already computed stereo 3D features and turn them into real features
+		for (int i = 0; i < edge.stereoTriangulations.size(); i++) {
+			Feature3D edge3D = edge.stereoTriangulations.get(i);
+
+			int indexSrc = edge3D.obsIdx.get(0);
+			int indexDst = edge3D.obsIdx.get(1);
+
+			Feature3D world3D = baseIsA ? viewA.features3D[indexSrc] : viewB.features3D[indexDst];
+
+			// find the 3D location of the point in world frame
+			edge3D.worldPt.scale(scale);
+			if( baseIsA ) {
+				viewA.viewToWorld.transform(edge3D.worldPt, edge3D.worldPt);
+			} else {
+				edge.a_to_b.transform(edge3D.worldPt, edge3D.worldPt);
+				viewB.viewToWorld.transform(edge3D.worldPt, edge3D.worldPt);
+			}
+
+			// See if the feature is already known
+			if( world3D != null ) {
+				// Add the other view if another feature in the other view was not already associated with this feature
+				if( !world3D.views.contains(other) ) {
+					world3D.views.add(other);
+					world3D.obsIdx.add( baseIsA ? indexDst : indexSrc );
+				}
+
+				// Retriangulate the point if it appears that this stereo pair is better than the one which originally
+				// computed it
+				if( world3D.triangulationAngle >= edge3D.triangulationAngle ) {
+					continue;
+				}
+				world3D.worldPt.set(edge3D.worldPt);
+				world3D.triangulationAngle = edge3D.triangulationAngle;
+				other.features3D[baseIsA ? indexDst : indexSrc] = edge3D;
+			} else {
+				graph.features3D.add(edge3D);
+				viewA.features3D[indexSrc] = edge3D;
+				viewB.features3D[indexDst] = edge3D;
+			}
+		}
+
+		// free memory
+		edge.stereoTriangulations = new ArrayList<>();
+	}
+
+	/**
+	 * Determine scale factor difference between edge triangulation and world
+	 */
+	static double determineScale( CameraView base , CameraMotion edge )
+		throws Exception
+	{
+		CameraView viewA = edge.viewSrc;
+		CameraView viewB = edge.viewDst;
+
+		boolean baseIsA = base == viewA;
+
+		// determine the scale factor difference
+		Point3D_F64 worldInBase3D = new Point3D_F64();
+		Point3D_F64 localInBase3D = new Point3D_F64();
+		GrowQueue_F64 scales = new GrowQueue_F64();
+		for (int i = 0; i < edge.stereoTriangulations.size(); i++) {
+			// get the feature as triangulated in this edge.
+			Feature3D edge3D = edge.stereoTriangulations.get(i);
+
+			int indexSrc = edge3D.obsIdx.get(0);
+			int indexDst = edge3D.obsIdx.get(1);
+
+			Feature3D world3D = baseIsA ? viewA.features3D[indexSrc] : viewB.features3D[indexDst];
+			if( world3D == null )
+				continue;
+			// Find the world point in the local coordinate system
+			SePointOps_F64.transformReverse(base.viewToWorld,world3D.worldPt,worldInBase3D);
+
+			// put this point into the base frame
+			if( !baseIsA ) {
+				SePointOps_F64.transform(edge.a_to_b,edge3D.worldPt,localInBase3D);
+			} else {
+				localInBase3D.set(edge3D.worldPt);
+			}
+
+			scales.add(worldInBase3D.z / localInBase3D.z);
+		}
+
+		if( scales.size < 20 ) {
+			throw new Exception("Not enough matches with known points");
+		}
+		// Get the scale offset as the median value to make it robust to noise
+		scales.sort();
+		return scales.getFraction(0.5);
 	}
 
 	/**
@@ -287,7 +412,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			if( verbose )
 				System.out.println("   processing view="+v.index+" | 3D Features="+bestCount);
 
-			// Figure out it's 3D structure
+			// Determine the view's location in the 3D view. This might have been previously estimated using
+			// stereo and the estimated scale factor. That will be ignored and the new estimate used instead
 			if( !determinePose(v) ) {
 				// The pose could not be determined, so remove it from the graph
 				if( verbose )
@@ -305,12 +431,26 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 //				throw new RuntimeException("Crap handle this");
 			} else {
+				// If possible use triangulation from stereo
+				addTriangulatedFeaturesForAllEdges(v);
 				triangulateNoLocation(v);
 
 				viewsAdded.add(v);
 
 				// Update the open list
 				addUnvistedToStack(v, open);
+			}
+		}
+	}
+
+	private void addTriangulatedFeaturesForAllEdges(CameraView v) {
+		for (int i = 0; i < v.connections.size(); i++) {
+			CameraMotion e = v.connections.get(i);
+			if( !e.stereoTriangulations.isEmpty() ) {
+				try {
+					double scale = determineScale(v, e);
+					addTriangulatedStereoFeatures(v, e, scale);
+				} catch (Exception ignore) {}
 			}
 		}
 	}
@@ -327,8 +467,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 			boolean isSrc = m.viewSrc == v;
 
-			for (int j = 0; j < m.features.size(); j++) {
-				AssociatedIndex a = m.features.get(j);
+			for (int j = 0; j < m.associated.size(); j++) {
+				AssociatedIndex a = m.associated.get(j);
 
 				if( isSrc ) {
 					count += m.viewDst.features3D[a.dst] != null ? 1 : 0;
@@ -365,8 +505,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			if( other.state != ViewState.PROCESSED )
 				continue;
 
-			for (int i = 0; i < c.features.size(); i++) {
-				AssociatedIndex a = c.features.get(i);
+			for (int i = 0; i < c.associated.size(); i++) {
+				AssociatedIndex a = c.associated.get(i);
 
 				Feature3D f = other.features3D[isSrc?a.dst:a.src];
 				if( f == null || f.mark == target.index)
@@ -385,7 +525,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 		// Estimate the target's location using robust PNP
 		ransacPnP.setIntrinsic(0,camerasIntrinsc.get(target.camera));
-		if( list.size() < 100 || !ransacPnP.process(list) ) {
+		if( list.size() < 20 || !ransacPnP.process(list) ) {
 			if (verbose)
 				System.out.println("   View="+target.index+" RANSAC failed. list.size="+list.size());
 			return false;
@@ -432,8 +572,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 			other.viewToWorld.concat(worldToTarget,otherToTarget);
 
-			for (int i = 0; i < c.features.size(); i++) {
-				AssociatedIndex a = c.features.get(i);
+			for (int i = 0; i < c.associated.size(); i++) {
+				AssociatedIndex a = c.associated.get(i);
 
 				int indexTarget = isSrc ? a.src : a.dst;
 				int indexOther = isSrc ? a.dst : a.src;
@@ -452,7 +592,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 				if( !triangulator.triangulate(normOther,normTarget,otherToTarget,f.worldPt))
 					continue;
 
-				SePointOps_F64.transform(other.viewToWorld,f.worldPt,f.worldPt);
+				other.viewToWorld.transform(f.worldPt,f.worldPt);
 				f.views.add( target );
 				f.views.add( other );
 				f.obsIdx.add( indexTarget );
@@ -493,14 +633,20 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		}
 	}
 
-	private void defineCoordinateSystem(CameraView viewA, CameraMotion baseMotion) {
+	/**
+	 * Sets the origin and scale of the coordinate system
+	 *
+	 * @param viewA The origin of the coordinate system
+	 * @param motion Motion which will define the coordinate system's scale
+	 */
+	private void defineCoordinateSystem(CameraView viewA, CameraMotion motion) {
 
-//		refineEpipolarMotion(baseMotion);
-
-		CameraView viewB = baseMotion.destination(viewA);
+		CameraView viewB = motion.destination(viewA);
 		viewA.viewToWorld.reset(); // identity since it's the origin
-		viewB.viewToWorld.set(baseMotion.motionSrcToDst(viewB));
-		viewB.viewToWorld.T.normalize(); // only known up to a scale factor
+		viewB.viewToWorld.set(motion.motionSrcToDst(viewB));
+		// translation is only known up to a scale factor so pick a reasonable scale factor
+		double scale = viewB.viewToWorld.T.norm();
+		viewB.viewToWorld.T.scale(1.0/scale);
 
 		viewsAdded.add(viewA);
 		viewsAdded.add(viewB);
@@ -508,12 +654,43 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		viewA.state = ViewState.PROCESSED;
 		viewB.state = ViewState.PROCESSED;
 
+		// Take the already triangulated points and turn them into official 3D features
+		boolean originIsDst = viewA == motion.viewDst;
+		for (int i = 0; i < motion.stereoTriangulations.size(); i++) {
+			Feature3D f = motion.stereoTriangulations.get(i);
+
+			int indexSrc = f.obsIdx.get(0);
+			int indexDst = f.obsIdx.get(1);
+
+			motion.viewSrc.features3D[indexSrc] = f;
+			motion.viewDst.features3D[indexDst] = f;
+
+			if( originIsDst ) {
+				SePointOps_F64.transform(motion.a_to_b,f.worldPt,f.worldPt);
+			}
+
+			f.worldPt.scale(1.0/scale);
+			graph.features3D.add(f);
+		}
+
+		// free memory and mark as already processed
+		motion.stereoTriangulations = new ArrayList<>();
+
+		// All features which can be added using triangulation should now be added
+		addTriangulatedFeaturesForAllEdges(viewA);
+		addTriangulatedFeaturesForAllEdges(viewB);
+
 		System.out.println("root  = "+viewA.index);
 		System.out.println("other = "+viewB.index);
 		System.out.println("-------------");
 
 	}
 
+	/**
+	 * Select the view which will be coordinate system's origin. This should be a well connected node which have
+	 * favorable geometry to the other views it's connected to.
+	 * @return The selcted view
+	 */
 	CameraView selectOriginNode() {
 		double bestScore = 0;
 		CameraView best = null;
@@ -567,62 +744,38 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	}
 
 	/**
-	 * For the two seed views just triangulate all the common features. The motion already has its translation
-	 * normalized to one
+	 * An edge has been declared as defining a good stereo pair. All associated feature will now be
+	 * triangulated. It is assumed that there is no global coordinate system at this point.
 	 */
-	private void triangulateInitialSeed(CameraView origin, CameraMotion edge ) {
-
+	private void triangulateStereoEdges( CameraMotion edge ) {
 		CameraView viewA = edge.viewSrc;
 		CameraView viewB = edge.viewDst;
 
-		Se3_F64 viewAtoB = new Se3_F64();
-		viewA.viewToWorld.concat(viewB.viewToWorld.invert(null),viewAtoB);
-
-		for (int i = 0; i < edge.features.size(); i++) {
-			AssociatedIndex f = edge.features.get(i);
-
-			// some association algorithms allow multiple solutions. Just ignore that to keep the code simple
-			if( viewA.features3D[f.src]!=null || viewB.features3D[f.dst]!=null )
-				continue;
+		for (int i = 0; i < edge.associated.size(); i++) {
+			AssociatedIndex f = edge.associated.get(i);
 
 			Point2D_F64 normA = viewA.observationNorm.get(f.src);
 			Point2D_F64 normB = viewB.observationNorm.get(f.dst);
 
 			Feature3D feature3D = new Feature3D();
 
-			feature3D.obsIdx.add( f.src );
-			feature3D.obsIdx.add( f.dst );
-
-			double angle = triangulationAngle(normA,normB,viewAtoB);
+			double angle = triangulationAngle(normA,normB,edge.a_to_b);
 			if( angle < TRIANGULATE_MIN_ANGLE )
 				continue;
 
-			if( !triangulate.triangulate(normA,normB,viewAtoB,feature3D.worldPt) ) {
+			if( !triangulate.triangulate(normA,normB,edge.a_to_b,feature3D.worldPt) ) {
 				System.out.println("  triangulation failed??!");
 				continue;
 			}
 
-			if( viewB == origin ) {
-				SePointOps_F64.transform(viewAtoB,feature3D.worldPt,feature3D.worldPt);
-			}
-
-			// mark this feature3D as being associated with these image features
-			viewA.features3D[f.src] = feature3D;
-			viewB.features3D[f.dst] = feature3D;
-
-			// record which frame the feature was seen in
-			if( feature3D.views.contains(viewA))
-				throw new RuntimeException("Egads");
-			if( feature3D.views.contains(viewB))
-				throw new RuntimeException("Egads");
 			feature3D.views.add(viewA);
 			feature3D.views.add(viewB);
+			feature3D.obsIdx.add(f.src);
+			feature3D.obsIdx.add(f.dst);
+			feature3D.triangulationAngle = angle;
 
-			// Add it to the overall list
-			graph.features3D.add(feature3D);
+			edge.stereoTriangulations.add(feature3D);
 		}
-
-		System.out.println("Initialized features from views "+viewA.index+" and "+viewB.index+" features3D="+ graph.features3D.size()+"  edges.size="+edge.features.size());
 	}
 
 	@Override

@@ -88,9 +88,13 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	private boolean verbose;
 
 	public PairwiseImageMatching(DetectDescribePoint<T, TupleDesc> detDesc) {
+		this();
 		this.detDesc = detDesc;
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
 		associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
+	}
+
+	protected PairwiseImageMatching(){
 		configRansac.inlierThreshold = 2.5;
 		configRansac.maxIterations = 4000;
 	}
@@ -288,7 +292,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		int N = ransac.getMatchSet().size();
 		for (int i = 0; i < N; i++) {
 			AssociatedIndex a = matches.get(ransac.getInputIndex(i));
-			edge.features.add( a.copy() );
+			edge.associated.add( a.copy() );
 		}
 		return true;
 	}
