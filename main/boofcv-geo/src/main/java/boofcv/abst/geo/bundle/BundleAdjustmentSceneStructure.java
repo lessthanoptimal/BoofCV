@@ -212,6 +212,27 @@ public class BundleAdjustmentSceneStructure {
 		return points;
 	}
 
+	/**
+	 * Removes the points specified in which from the list of points. 'which' must be ordered
+	 * from lowest to highest index.
+	 *
+	 * @param which Ordered list of point indexes to remove
+	 */
+	public void removePoints( GrowQueue_I32 which ) {
+		Point results[] = new Point[points.length-which.size];
+
+		int indexWhich = 0;
+		for (int i = 0; i < points.length ; i++) {
+			if( indexWhich < which.size && which.data[indexWhich] == i ) {
+				indexWhich++;
+			} else {
+				results[i-indexWhich] = points[i];
+			}
+		}
+
+		points = results;
+	}
+
 	public static class Camera {
 		/**
 		 * If the parameters are assumed to be known and should not be optimised.
@@ -249,6 +270,18 @@ public class BundleAdjustmentSceneStructure {
 
 		public Point( int dof ) {
 			coordinate = new double[dof];
+		}
+
+		/**
+		 * Removes the specified view from the list of views. If it's not contained in the list
+		 * an exception is thrown
+		 * @param which Index of the view which is to be removed
+		 */
+		public void removeView( int which ) {
+			int index = views.indexOf(which);
+			if( index == -1 )
+				throw new RuntimeException("BUG");
+			views.remove(index);
 		}
 
 		public void set( double x , double y , double z ) {

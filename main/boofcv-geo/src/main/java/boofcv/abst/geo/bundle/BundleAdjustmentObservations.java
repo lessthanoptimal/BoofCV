@@ -63,6 +63,21 @@ public class BundleAdjustmentObservations {
 			return feature.size;
 		}
 
+		/**
+		 * Removes the feature and observation at the specified element
+		 */
+		public void remove(int index ) {
+			feature.remove(index);
+			index *= 2;
+			observations.remove(index,index+1);
+		}
+
+		public void set(int index, float x , float y ) {
+			index *= 2;
+			observations.data[index] = x;
+			observations.data[index+1] = y;
+		}
+
 		public void get(int index , Point2D_F64 p ) {
 			index *= 2;
 			p.x = observations.data[index];

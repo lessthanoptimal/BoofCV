@@ -65,6 +65,9 @@ public class TestEstimateSceneUnordered extends GenericSceneStructureChecks {
 		assertEquals(1,found.cameras.length);
 		assertEquals(3,found.views.length);
 		assertTrue(found.points.length > 350); // prefect data and all the points are in view
+
+		assertTrue(mock.equivalent(0,1,found.views[0].worldToView,found.views[1].worldToView));
+		assertTrue(mock.equivalent(0,2,found.views[0].worldToView,found.views[2].worldToView));
 	}
 
 	@Test
@@ -278,6 +281,19 @@ public class TestEstimateSceneUnordered extends GenericSceneStructureChecks {
 
 
 			return graph;
+		}
+
+		public boolean equivalent( int indexA , int indexB , Se3_F64 foundWorldToViewA , Se3_F64 foundWorldToViewB )
+		{
+			Se3_F64 expectedA2B = worldToCamera.get(indexA).invert(null).concat(worldToCamera.get(indexB),null);
+			Se3_F64 foundA2B = foundWorldToViewA.invert(null).concat(foundWorldToViewB,null);
+
+			double scale = expectedA2B.T.norm()/foundA2B.T.norm();
+			if( Math.abs(expectedA2B.T.z-scale*foundA2B.T.z) > 1e-8 )
+				scale *= -1;
+			foundA2B.T.scale(scale);
+
+			return SpecialEuclideanOps_F64.isIdentical(expectedA2B,foundA2B,1e-4,1e-4);
 		}
 
 		private void initializeEdge( CameraMotion e ,  int v0 , int v1 ) {

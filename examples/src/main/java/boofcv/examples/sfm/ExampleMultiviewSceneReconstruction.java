@@ -24,6 +24,7 @@ import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
 import boofcv.abst.geo.bundle.BundleAdjustmentShur_DSCC;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.structure.EstimateSceneUnordered;
+import boofcv.alg.sfm.structure.PruneStructureFromScene;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -96,8 +97,21 @@ public class ExampleMultiviewSceneReconstruction {
 		structure.setCamera(0,true,intrinsic);
 
 		// Optimize the results
-		if( !sba.optimize(structure,observations) ) {
-			throw new RuntimeException("Bundle adjustment failed!");
+		int pruneCycles=6;
+		for (int i = 0; i < pruneCycles; i++) {
+			System.out.println("BA + Prune iteration = "+i);
+			if( !sba.optimize(structure,observations) ) {
+				throw new RuntimeException("Bundle adjustment failed!");
+			}
+
+			if( i == pruneCycles-1 )
+				break;
+
+			PruneStructureFromScene pruner = new PruneStructureFromScene(structure,observations);
+
+			pruner.pruneObservationsByErrorRank(0.97);
+			pruner.pruneFeatures(2);
+			pruner.pruneViews(5);
 		}
 
 		visualizeResults(structure,intrinsic,colorImages);
@@ -164,7 +178,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 
-		int N = 8;
+		int N = 16;
 		while( images.size() > N ) {
 			images.remove(N);
 		}
