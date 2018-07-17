@@ -29,14 +29,16 @@ import georegression.struct.point.Point2D_F64;
 public interface BundleAdjustmentCamera {
 
 	/**
-	 * Specifies the input parameters.
+	 * Specifies the intrinsic camera parameters.
 	 * @param parameters Array containing the parameters
 	 * @param offset Location of first index in the array which the parameters are stored
 	 */
 	void setParameters(double parameters[], int offset);
 
 	/**
-	 * Returns the current intrinsic camera parameters
+	 * Copies the intrinsic camera into the array.
+	 * @param parameters Array containing the parameters
+	 * @param offset Location of first index in the array which the parameters are stored
 	 */
 	void getParameters(double parameters[], int offset);
 
@@ -50,31 +52,34 @@ public interface BundleAdjustmentCamera {
 	void project(double camX, double camY, double camZ, Point2D_F64 output);
 
 	/**
-	 * Computes the gradient for the input (a.k.a. cam point) parameters as well as calibration parameters.
+	 * Computes the gradient for the projected pixel coordinate with partials for the input 3D point in camera
+	 * reference frame and camera intrinsic parameters. <code>[x',y'] </code> is the projected pixel coordinate of
+	 * the 3D point in camera reference frame.
 	 *
-	 * @param camX 3D point in camera reference frame
-	 * @param camY 3D point in camera reference frame
-	 * @param camZ 3D point in camera reference frame
-	 * @param inputX Array to store the gradient of X with respect to input point. length 3
-	 * @param inputY Array to store the gradient of Y with respect to input point. length 3
-	 * @param calibX Array to store the gradient of X with respect to calibration parameters. length N
-	 * @param calibY Array to store the gradient of Y with respect to calibration parameters. length N
+	 * @param camX (Input) 3D point in camera reference frame
+	 * @param camY (Input) 3D point in camera reference frame
+	 * @param camZ (Input) 3D point in camera reference frame
+	 * @param pointX (Output) Partial of projected x' relative to input camera point.<code>[@x'/@camX, @ x' / @ camY, @ x' / @ camZ]</code> length 3
+	 * @param pointY (Output) Partial of projected y' relative to input camera point.<code>[@y'/@camX, @ y' / @ camY, @ y' / @ camZ]</code> length 3
+	 * @param calibX (Output) Partial of projected x' relative calibration parameters. length N
+	 * @param calibY (Output) Partial of projected y' relative  calibration parameters. length N
 	 */
 	void jacobian(double camX, double camY, double camZ,
-				  double inputX[], double inputY[],
+				  double pointX[], double pointY[],
 				  double calibX[], double calibY[]);
 
 	/**
-	 * Computes the gradient for input variables only. Used when camera parameters is assumed to be known
+	 * Computes the gradient for 3D camera point only. Used when camera parameters is assumed to be known.
+	 * <code>[x',y'] </code> is the projected pixel coordinate of the 3D point in camera reference frame.
 	 *
-	 * @param camX 3D point in camera reference frame
-	 * @param camY 3D point in camera reference frame
-	 * @param camZ 3D point in camera reference frame
-	 * @param inputX Array to store the gradient of X with respect to input point. length 3
-	 * @param inputY Array to store the gradient of Y with respect to input point. length 3
+	 * @param camX (Input) 3D point in camera reference frame
+	 * @param camY (Input) 3D point in camera reference frame
+	 * @param camZ (Input) 3D point in camera reference frame
+	 * @param pointX (Output) Partial of projected x' relative to input camera point.<code>[@x'/@camX, @ x' / @ camY, @ x' / @ camZ]</code> length 3
+	 * @param pointY (Output) Partial of projected y' relative to input camera point.<code>[@y'/@camX, @ y' / @ camY, @ y' / @ camZ]</code> length 3
 	 */
 	void jacobian(double camX, double camY, double camZ,
-				  double inputX[], double inputY[]);
+				  double pointX[], double pointY[]);
 
 	/**
 	 * Returns the number of parameters in this model.
