@@ -27,6 +27,8 @@ import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -40,6 +42,8 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 	double parameters[][];
 
 	double tol = 1e-4;
+
+	public boolean print=false;
 
 	protected GenericChecksBundleAdjustmentCamera(BundleAdjustmentCamera model) {
 		this.model = model;
@@ -71,8 +75,13 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 
 		for (double p[] : parameters)
 		{
-//			DerivativeChecker.jacobianPrintR(new FunctionOfPoint(p),new JacobianOfPoint(p),X, tol);
-//			DerivativeChecker.jacobianPrintR(new FunctionOfParameters(X),new JacobianOfParameters(X),p, tol);
+			if( print ) {
+				System.out.println("param[] "+ Arrays.toString(p));
+				System.out.println("Point");
+				DerivativeChecker.jacobianPrintR(new FunctionOfPoint(p), new JacobianOfPoint(p), X, tol);
+				System.out.println("Param");
+				DerivativeChecker.jacobianPrintR(new FunctionOfParameters(X), new JacobianOfParameters(X), p, tol);
+			}
 
 			assertTrue(DerivativeChecker.jacobianR(new FunctionOfPoint(p),new JacobianOfPoint(p),X, tol));
 			assertTrue(DerivativeChecker.jacobianR(new FunctionOfParameters(X),new JacobianOfParameters(X),p, tol));

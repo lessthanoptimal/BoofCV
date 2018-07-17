@@ -34,6 +34,15 @@ import java.util.List;
  */
 public class BoofMiscOps {
 
+	public static String milliToHuman( long milliseconds ) {
+		long second = (milliseconds / 1000) % 60;
+		long minute = (milliseconds / (1000 * 60)) % 60;
+		long hour = (milliseconds / (1000 * 60 * 60)) % 24;
+		long days = milliseconds / (1000 * 60 * 60 * 24);
+
+		return String.format("%03d:%02d:%02d:%02d (days:hrs:min:sec)", days, hour, minute, second);
+	}
+
 	/**
 	 * Returns the number of digits in a number. E.g. 345 = 3, -345 = 4, 0 = 1
 	 */

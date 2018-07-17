@@ -132,7 +132,28 @@ public class TestPruneStructureFromScene {
 
 	@Test
 	public void prunePoints_count() {
-		fail("Implement");
+		createPerfectScene();
+		int countPoints = structure.points.length;
+		int countObservations = observations.getObservationCount();
+
+		PruneStructureFromScene alg = new PruneStructureFromScene(structure,observations);
+
+		// no change expected
+		alg.prunePoints(1);
+		assertEquals(countPoints,structure.points.length);
+		assertEquals(countObservations,observations.getObservationCount());
+
+		// this should prune a bunch
+		int threshold = structure.views.length-2;
+		alg.prunePoints(threshold);
+		assertTrue(countPoints>structure.points.length);
+		assertTrue(countObservations>observations.getObservationCount());
+
+		for (int pointIdx = 0; pointIdx < structure.points.length; pointIdx++) {
+			if( structure.points[pointIdx].views.size < threshold )
+				fail("point with not enough views");
+		}
+		checkAllObservationsArePerfect();
 	}
 
 	@Test
@@ -147,7 +168,7 @@ public class TestPruneStructureFromScene {
 
 	@Test
 	public void pruneUnusedCameras() {
-
+		fail("Implement");
 	}
 
 	private void createPerfectScene() {
@@ -159,7 +180,7 @@ public class TestPruneStructureFromScene {
 
 		List<Point3D_F64> points = new ArrayList<>();
 		for (int i = 0; i < structure.points.length; i++) {
-			Point3D_F64 p = UtilPoint3D_F64.noiseNormal(center,1,1,1,rand,null);
+			Point3D_F64 p = UtilPoint3D_F64.noiseNormal(center,0.5,0.5,1,rand,null);
 			points.add(p);
 			structure.points[i].set(p.x,p.y,p.z);
 		}
@@ -197,6 +218,20 @@ public class TestPruneStructureFromScene {
 				observations.views[viewIdx].add(pointIdx,(float)pixel.x,(float)pixel.y);
 				structure.connectPointToView(pointIdx,viewIdx);
 			}
+		}
+
+		// sanity checks
+		for (int pointIdx = 0; pointIdx < structure.points.length; pointIdx++) {
+			if( structure.points[pointIdx].views.size == 0 ) {
+				Point3D_F64 p = new Point3D_F64();
+				structure.points[pointIdx].get(p);
+				throw new RuntimeException("Point with no views. "+p);
+			}
+		}
+
+		for (int viewIdx = 0; viewIdx < observations.views.length; viewIdx++) {
+			if( observations.views[viewIdx].size() == 0 )
+				throw new RuntimeException("View with no observations");
 		}
 
 		checkObservationAndStructureSync();

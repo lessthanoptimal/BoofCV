@@ -96,8 +96,13 @@ public class ExampleMultiviewSceneReconstruction {
 		sba.configure(1e-4,1e-4,20);
 		structure.setCamera(0,true,intrinsic);
 
+		PruneStructureFromScene pruner = new PruneStructureFromScene(structure,observations);
+		// Requiring 3 views per point reduces the number of outliers by a lot but also removes
+		// many valid points
+		pruner.prunePoints(3);
+
 		// Optimize the results
-		int pruneCycles=6;
+		int pruneCycles=5;
 		for (int i = 0; i < pruneCycles; i++) {
 			System.out.println("BA + Prune iteration = "+i+"  points="+structure.points.length+"  obs="+observations.getObservationCount());
 			if( !sba.optimize(structure,observations) ) {
@@ -107,11 +112,11 @@ public class ExampleMultiviewSceneReconstruction {
 			if( i == pruneCycles-1 )
 				break;
 
-			PruneStructureFromScene pruner = new PruneStructureFromScene(structure,observations);
-
-			pruner.pruneObservationsByErrorRank(0.97);
-			pruner.prunePoints(3);
-			pruner.pruneViews(5);
+			System.out.println("Pruning....");
+			pruner.pruneObservationsByErrorRank(0.97);  // Prune outlier observations
+			pruner.prunePoints(3,0.4);           // Prune stray points in 3D space
+			pruner.prunePoints(2);                           // Prune invalid points
+			pruner.pruneViews(10);                           // Prune views with too few observations
 		}
 
 		visualizeResults(structure,intrinsic,colorImages);

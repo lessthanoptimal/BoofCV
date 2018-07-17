@@ -26,19 +26,19 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public abstract class BundleAdjustmentCamera {
+public interface BundleAdjustmentCamera {
 
 	/**
 	 * Specifies the input parameters.
 	 * @param parameters Array containing the parameters
 	 * @param offset Location of first index in the array which the parameters are stored
 	 */
-	public abstract void setParameters( double parameters[] , int offset );
+	void setParameters(double parameters[], int offset);
 
 	/**
 	 * Returns the current intrinsic camera parameters
 	 */
-	public abstract void getParameters( double parameters[] , int offset );
+	void getParameters(double parameters[], int offset);
 
 	/**
 	 * Project the 3D point in the camera reference frame onto the camera's image plane.
@@ -47,7 +47,7 @@ public abstract class BundleAdjustmentCamera {
 	 * @param camZ 3D point in camera reference frame
 	 * @param output Storage for projected point.
 	 */
-	public abstract void project(double camX , double camY , double camZ , Point2D_F64 output );
+	void project(double camX, double camY, double camZ, Point2D_F64 output);
 
 	/**
 	 * Computes the gradient for the input (a.k.a. cam point) parameters as well as calibration parameters.
@@ -60,9 +60,9 @@ public abstract class BundleAdjustmentCamera {
 	 * @param calibX Array to store the gradient of X with respect to calibration parameters. length N
 	 * @param calibY Array to store the gradient of Y with respect to calibration parameters. length N
 	 */
-	public abstract void jacobian(double camX , double camY , double camZ,
-								  double inputX[] , double inputY[] ,
-								  double calibX[] , double calibY[] );
+	void jacobian(double camX, double camY, double camZ,
+				  double inputX[], double inputY[],
+				  double calibX[], double calibY[]);
 
 	/**
 	 * Computes the gradient for input variables only. Used when camera parameters is assumed to be known
@@ -73,12 +73,12 @@ public abstract class BundleAdjustmentCamera {
 	 * @param inputX Array to store the gradient of X with respect to input point. length 3
 	 * @param inputY Array to store the gradient of Y with respect to input point. length 3
 	 */
-	public abstract void jacobian(double camX , double camY , double camZ,
-								  double inputX[] , double inputY[] );
+	void jacobian(double camX, double camY, double camZ,
+				  double inputX[], double inputY[]);
 
 	/**
 	 * Returns the number of parameters in this model.
 	 * @return number of parameters.
 	 */
-	public abstract int getParameterCount();
+	int getParameterCount();
 }

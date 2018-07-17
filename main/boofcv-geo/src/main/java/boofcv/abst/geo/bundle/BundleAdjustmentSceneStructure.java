@@ -239,6 +239,10 @@ public class BundleAdjustmentSceneStructure {
 		 */
 		public boolean known = true;
 		public BundleAdjustmentCamera model;
+
+		public <T extends BundleAdjustmentCamera>T getModel() {
+			return (T)model;
+		}
 	}
 
 	public static class View {

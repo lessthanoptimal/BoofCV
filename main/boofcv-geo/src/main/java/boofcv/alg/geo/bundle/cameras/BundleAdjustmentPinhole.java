@@ -27,7 +27,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class BundleAdjustmentPinhole extends BundleAdjustmentCamera {
+public class BundleAdjustmentPinhole implements BundleAdjustmentCamera {
 
 	// parameters for the camera model
 	private boolean zeroSkew=true;
