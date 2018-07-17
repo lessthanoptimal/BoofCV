@@ -156,19 +156,154 @@ public class TestPruneStructureFromScene {
 		checkAllObservationsArePerfect();
 	}
 
+	/**
+	 * Qualitative test of prune by nearest neighbor.
+	 */
 	@Test
 	public void prunePoints_neighbors() {
-		fail("Implement");
+		createPerfectScene();
+		int countPoints0 = structure.points.length;
+		int countObservations0 = observations.getObservationCount();
+
+		PruneStructureFromScene alg = new PruneStructureFromScene(structure,observations);
+
+		// This should just prune the outliers far from the center
+		alg.prunePoints(2,0.5);
+
+		int countPoints1 = structure.points.length;
+		int countObservations1 = observations.getObservationCount();
+		assertTrue(countPoints0>countPoints1 && countPoints1>0.95*countPoints0);
+		assertTrue(countObservations0>countObservations1 && countObservations1>0.95*countObservations0);
+
+		// If run a second time it should have very similar results
+		alg.prunePoints(2,0.5);
+		assertEquals(countPoints1, structure.points.length,5);
+		assertEquals(countObservations1, observations.getObservationCount(),countObservations1*0.005);
+
+		// sanity check the modifications
+		checkAllObservationsArePerfect();
+	}
+
+	/**
+	 * Prunes and makes sure the distance and count are correctly implemented
+	 */
+	@Test
+	public void prunePoints_neighbors_exact() {
+		createPerfectScene(2,5);
+
+		PruneStructureFromScene alg = new PruneStructureFromScene(structure,observations);
+
+		// no pruning should occur
+		alg.prunePoints(1,5.01);
+		assertEquals(4, structure.points.length);
+
+		// everything should be pruned
+		alg.prunePoints(1,4.99);
+		assertEquals(0, structure.points.length);
+		assertEquals(0, observations.getObservationCount());
+
+		// Corners should get pruned but interior ones saved
+		createPerfectScene(3,5);
+		alg = new PruneStructureFromScene(structure,observations);
+		alg.prunePoints(3,5.01);
+		assertEquals(5, structure.points.length);
+
 	}
 
 	@Test
 	public void pruneViews() {
-		fail("Implement");
+		createPerfectScene();
+
+		// original point count
+		int pointCount = structure.points.length;
+		int observationCount = observations.getObservationCount();
+
+		// figure out the view with the least number of observations
+		int viewWithLeast = -1;
+		int leastCount = Integer.MAX_VALUE;
+		for (int viewIdx = 0; viewIdx < observations.views.length; viewIdx++) {
+			if( leastCount > observations.views[viewIdx].size()) {
+				leastCount = observations.views[viewIdx].size();
+				viewWithLeast = viewIdx;
+			}
+		}
+
+		// remove a point just in case there is a tie
+		observations.views[viewWithLeast].remove(8);
+		leastCount -= 1;
+
+		assertEquals(10,observations.views.length);
+
+		PruneStructureFromScene alg = new PruneStructureFromScene(structure,observations);
+
+		// no change
+		alg.pruneViews(leastCount-1);
+		assertEquals(10,observations.views.length);
+		assertEquals(structure.views.length,observations.views.length);
+
+		// Now prune views. Only one should be removed
+		alg.pruneViews(leastCount);
+		assertEquals(9,observations.views.length);
+		assertEquals(structure.views.length,observations.views.length);
+		// Points are not removed even if there is no view that can see them now
+		assertEquals(structure.points.length,pointCount);
+		// However the number of observations will be decreased
+		assertTrue( observations.getObservationCount() < observationCount);
+
+		// sanity check the modifications
+		checkAllObservationsArePerfect();
 	}
 
 	@Test
 	public void pruneUnusedCameras() {
-		fail("Implement");
+		createPerfectScene();
+
+		PruneStructureFromScene alg = new PruneStructureFromScene(structure,observations);
+
+		// no change
+		alg.pruneUnusedCameras();
+		assertEquals(2,structure.cameras.length);
+
+		// remove all references to the first camera
+		for (int i = 0; i < structure.views.length; i++) {
+			BundleAdjustmentSceneStructure.View v = structure.views[i];
+			v.camera = 1;
+		}
+
+		// First camera is removed
+		alg.pruneUnusedCameras();
+		assertEquals(1,structure.cameras.length);
+		// make sure references are updated
+		for (int i = 0; i < structure.views.length; i++) {
+			BundleAdjustmentSceneStructure.View v = structure.views[i];
+			assertEquals(0,v.camera);
+		}
+	}
+
+	/**
+	 * Creates a scene with points in a grid pattern. Useful when testing spacial filters
+	 * @param grid Number of points wide the pattern is
+	 * @param space Spacing between the points
+	 */
+	private void createPerfectScene( int grid , double space ) {
+		structure = new BundleAdjustmentSceneStructure(false);
+		structure.initialize(1,1,grid*grid);
+
+		structure.setCamera(0,true,intrinsic);
+
+		List<Point3D_F64> points = new ArrayList<>();
+		for (int i = 0; i < grid; i++) {
+			for (int j = 0; j < grid; j++) {
+				double x = (i-grid/2)*space;
+				double y = (j-grid/2)*space;
+
+				Point3D_F64 p = new Point3D_F64(center.x+x,center.y+y,center.z);
+				points.add(p);
+				structure.points[i*grid+j].set(p.x,p.y,p.z);
+			}
+		}
+
+		createRestOfTheScene(points, false);
 	}
 
 	private void createPerfectScene() {
@@ -180,13 +315,17 @@ public class TestPruneStructureFromScene {
 
 		List<Point3D_F64> points = new ArrayList<>();
 		for (int i = 0; i < structure.points.length; i++) {
-			Point3D_F64 p = UtilPoint3D_F64.noiseNormal(center,0.5,0.5,1,rand,null);
+			Point3D_F64 p = UtilPoint3D_F64.noiseNormal(center,0.75,0.5,1,rand,null);
 			points.add(p);
 			structure.points[i].set(p.x,p.y,p.z);
 		}
 
+		createRestOfTheScene(points, true);
+	}
+
+	private void createRestOfTheScene(List<Point3D_F64> points , boolean sanityCheck ) {
 		for (int i = 0; i < structure.views.length; i++) {
-			double x = -1.5 + 3*i/(structure.views.length-1);
+			double x = -1.5 + 3*i/Math.max(1,(structure.views.length-1));
 			structure.setView(i,false,SpecialEuclideanOps_F64.setEulerXYZ(0,0,0,x,0,0,null));
 			structure.connectViewToCamera(i,i%2);
 		}
@@ -219,6 +358,9 @@ public class TestPruneStructureFromScene {
 				structure.connectPointToView(pointIdx,viewIdx);
 			}
 		}
+
+		if( !sanityCheck )
+			return;
 
 		// sanity checks
 		for (int pointIdx = 0; pointIdx < structure.points.length; pointIdx++) {
@@ -266,11 +408,11 @@ public class TestPruneStructureFromScene {
 	}
 
 	private void checkObservationAndStructureSync() {
-		for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
-			BundleAdjustmentObservations.View v = observations.views[viewIdx];
-			for(int pointIndex = v.point.size-1; pointIndex >= 0; pointIndex-- ) {
-				BundleAdjustmentSceneStructure.Point structP = structure.points[ v.getPointId(pointIndex)];
-				if( !structP.views.contains(viewIdx))
+		for (int viewId = 0; viewId < structure.views.length; viewId++) {
+			BundleAdjustmentObservations.View v = observations.views[viewId];
+			for(int pointIdx = v.point.size-1; pointIdx >= 0; pointIdx-- ) {
+				BundleAdjustmentSceneStructure.Point structP = structure.points[ v.getPointId(pointIdx) ];
+				if( !structP.views.contains(viewId))
 					throw new RuntimeException("Miss match");
 			}
 		}

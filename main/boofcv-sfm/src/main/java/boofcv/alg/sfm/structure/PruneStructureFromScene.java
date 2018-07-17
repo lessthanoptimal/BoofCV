@@ -263,7 +263,7 @@ public class PruneStructureFromScene {
 			// distance is squared
 			nn.findNearest(cloud.get(pointId),distance*distance,neighbors+1,resultsNN);
 
-			// always finds itself
+			// Don't prune if it has enough neighbors. Remember that it will always find itself.
 			if( resultsNN.size() > neighbors ) {
 				oldToNew[pointId] = pointId-prunePointID.size;
 				continue;
@@ -273,9 +273,12 @@ public class PruneStructureFromScene {
 
 			// Remove observations of this point
 			for (int viewIdx = 0; viewIdx < structureP.views.size; viewIdx++) {
-				BundleAdjustmentObservations.View v = observations.getView(structureP.views.get(viewIdx));
+				BundleAdjustmentObservations.View v = observations.getView(structureP.views.data[viewIdx]);
 
 				int pointIdx = v.point.indexOf(pointId);
+				if( pointIdx < 0 )
+					throw new RuntimeException("Bad structure. Point not found in view's observation " +
+							"which was in its structure");
 				v.remove(pointIdx);
 			}
 		}
@@ -287,14 +290,75 @@ public class PruneStructureFromScene {
 	 * Removes views with less than 'count' features visible. Observations of features in removed views are also
 	 * removed.
 	 *
-	 * @param count minimum number of features
+	 * @param count Prune if it has this number of views or less
 	 */
 	public void pruneViews( int count ) {
 
+		List<BundleAdjustmentSceneStructure.View> remainingS = new ArrayList<>();
+		List<BundleAdjustmentObservations.View> remainingO = new ArrayList<>();
+
+		for (int viewId = 0; viewId < structure.views.length; viewId++) {
+			BundleAdjustmentObservations.View view = observations.views[viewId];
+			// See if has enough observations to not prune
+			if( view.size() > count ) {
+				remainingS.add(structure.views[viewId]);
+				remainingO.add(view);
+				continue;
+			}
+
+			// Go through list of points and remove this view from them
+			for (int pointIdx = 0; pointIdx < view.point.size; pointIdx++) {
+				int pointId = view.getPointId(pointIdx);
+
+				int viewIdx = structure.points[pointId].views.indexOf(viewId);
+				if( viewIdx < 0 )
+					throw new RuntimeException("Bug in structure. view has point but point doesn't have view");
+				structure.points[pointId].views.remove(viewIdx);
+			}
+		}
+
+		// Create new arrays with the views that were not pruned
+		structure.views = new BundleAdjustmentSceneStructure.View[remainingS.size()];
+		observations.views = new BundleAdjustmentObservations.View[remainingO.size()];
+
+		for (int i = 0; i < structure.views.length; i++) {
+			structure.views[i] = remainingS.get(i);
+			observations.views[i] = remainingO.get(i);
+		}
 	}
 
+	/**
+	 * Prunes cameras that are not referenced by any views.
+	 */
 	public void pruneUnusedCameras() {
+		// Count how many views are used by each camera
+		int histogram[] = new int[structure.cameras.length];
 
+		for (int i = 0; i < structure.views.length; i++) {
+			histogram[structure.views[i].camera]++;
+		}
+
+		// See which cameras need to be removed and create a look up table from old to new camera IDs
+		int oldToNew[] = new int[structure.cameras.length];
+		List<BundleAdjustmentSceneStructure.Camera> remaining = new ArrayList<>();
+		for (int i = 0; i < structure.cameras.length; i++) {
+			if( histogram[i] > 0 ) {
+				oldToNew[i] = remaining.size();
+				remaining.add(structure.cameras[i]);
+			}
+		}
+
+		// Create the new camera array without the unused cameras
+		structure.cameras = new BundleAdjustmentSceneStructure.Camera[remaining.size()];
+		for (int i = 0; i < remaining.size(); i++) {
+			structure.cameras[i] = remaining.get(i);
+		}
+
+		// Update the references to the cameras
+		for (int i = 0; i < structure.views.length; i++) {
+			BundleAdjustmentSceneStructure.View v = structure.views[i];
+			v.camera = oldToNew[v.camera];
+		}
 	}
 
 	private static class Errors {

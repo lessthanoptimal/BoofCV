@@ -75,7 +75,7 @@ public class BundleAdjustmentShur_DSCC
 		minimizer.initialize(parameters);
 
 		errorBefore = minimizer.getFnorm();
-		System.out.println("Error Before: "+errorBefore);
+//		System.out.println("Error Before: "+errorBefore);
 
 		for( int i = 0; i < maxIterations && !stopRequested; i++ ) {
 			if( minimizer.iterate() )
@@ -84,7 +84,7 @@ public class BundleAdjustmentShur_DSCC
 
 		errorAfter = minimizer.getFnorm();
 
-		System.out.println("Error Before: "+errorBefore+" After: "+errorAfter);
+//		System.out.println("Error Before: "+errorBefore+" After: "+errorAfter);
 
 		codec.decode(minimizer.getParameters(), structure);
 		return errorAfter < errorBefore;
