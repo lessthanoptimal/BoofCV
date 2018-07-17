@@ -68,7 +68,7 @@ public class BundleAdjustmentPinholeRadial implements BundleAdjustmentCamera {
 	}
 
 	@Override
-	public void setParameters(double[] parameters, int offset) {
+	public void setIntrinsic(double[] parameters, int offset) {
 		fx = parameters[offset];
 		fy = parameters[offset+1];
 		cx = parameters[offset+2];
@@ -86,7 +86,7 @@ public class BundleAdjustmentPinholeRadial implements BundleAdjustmentCamera {
 	}
 
 	@Override
-	public void getParameters(double[] parameters, int offset) {
+	public void getIntrinsic(double[] parameters, int offset) {
 		parameters[offset] = fx;
 		parameters[offset+1] = fy;
 		parameters[offset+2] = cx;
@@ -122,7 +122,8 @@ public class BundleAdjustmentPinholeRadial implements BundleAdjustmentCamera {
 	}
 
 	@Override
-	public void jacobian(double camX, double camY, double camZ, double[] inputX, double[] inputY, double[] calibX, double[] calibY) {
+	public void jacobian(double camX, double camY, double camZ, double[] inputX, double[] inputY,
+						 boolean computeIntrinsic, double[] calibX, double[] calibY) {
 		double nx = camX/camZ;
 		double ny = camY/camZ;
 
@@ -136,6 +137,25 @@ public class BundleAdjustmentPinholeRadial implements BundleAdjustmentCamera {
 		double sum = (r1 + r2*rr)*rr;
 		double x = nx*( 1 + sum);
 		double y = ny*( 1 + sum);
+
+		double A0 = r1 + r2*rr;
+		double B0 = nx*(r2*rr + A0);
+		double B1 = ny*(r2*rr + A0);
+
+		// X
+		inputX[0] = (fx*(2*nx*B0 + (sum + 1) + 2*ny*t1 + 6*nx*t2) + 2*skew*(ny*B0 + nx*t1 + ny*t2))/Z;
+		inputY[0] = 2*fy*(ny*B0 + nx*t1 + ny*t2)/Z;
+
+		// Y
+		inputX[1] = 2*fx*(nx*B1 + nx*t1 + ny*t2)/Z + skew*((2*ny*B1 + sum + 1)/Z + 6*ny*t1 + 2*nx*t2);
+		inputY[1] = fy*(2*Y*Y*(r2*rr + A0)/Z + (sum + 1)*Z + 6*Y*t1 + 2*X*t2)/ZZ;
+
+		// Z
+		inputX[2] = -(2*t2*(2*nx*nx + rr) + 2*(r2*rr*rr + sum)*nx + (sum + 1)*nx + 4*nx*ny*t1)*fx/Z - (2*t1*(nx*nx + 3*ny*ny) + 2*(r2*rr*rr/Z + sum)*ny + (sum + 1)*ny + 4*nx*ny*t2)*skew/Z;
+		inputY[2] = -(2*t1*(rr + 2*ny*ny) + 2*(r2*rr + A0)*rr*Y/Z + (sum + 1)*ny + 4*nx*ny*t2)*fy/Z;
+
+		if(!computeIntrinsic)
+			return;
 
 		// Apply tangential distortion
 		x += 2*t1*nx*ny + t2*(rr + 2*nx*nx);
@@ -165,60 +185,10 @@ public class BundleAdjustmentPinholeRadial implements BundleAdjustmentCamera {
 		if( !zeroSkew ) {
 			calibX[8] = ny; calibY[8] = 0;
 		}
-
-		double A0 = r1 + r2*rr;
-		double B0 = nx*(r2*rr + A0);
-		double B1 = ny*(r2*rr + A0);
-
-		// X
-		inputX[0] = (fx*(2*nx*B0 + (sum + 1) + 2*ny*t1 + 6*nx*t2) + 2*skew*(ny*B0 + nx*t1 + ny*t2))/Z;
-		inputY[0] = 2*fy*(ny*B0 + nx*t1 + ny*t2)/Z;
-
-		// Y
-		inputX[1] = 2*fx*(nx*B1 + nx*t1 + ny*t2)/Z + skew*((2*ny*B1 + sum + 1)/Z + 6*ny*t1 + 2*nx*t2);
-		inputY[1] = fy*(2*Y*Y*(r2*rr + A0)/Z + (sum + 1)*Z + 6*Y*t1 + 2*X*t2)/ZZ;
-
-		// Z
-		inputX[2] = -(2*t2*(2*nx*nx + rr) + 2*(r2*rr*rr + sum)*nx + (sum + 1)*nx + 4*nx*ny*t1)*fx/Z - (2*t1*(nx*nx + 3*ny*ny) + 2*(r2*rr*rr/Z + sum)*ny + (sum + 1)*ny + 4*nx*ny*t2)*skew/Z;
-		inputY[2] = -(2*t1*(rr + 2*ny*ny) + 2*(r2*rr + A0)*rr*Y/Z + (sum + 1)*ny + 4*nx*ny*t2)*fy/Z;
 	}
 
 	@Override
-	public void jacobian(double camX, double camY, double camZ, double[] inputX, double[] inputY)
-	{
-		// compute normalized image coordinates
-		double nx = camX/camZ;
-		double ny = camY/camZ;
-
-		// Apply radial distortion
-		double rr = nx*nx + ny*ny;
-		double sum = (r1 + r2*rr)*rr;
-
-		double X = camX;
-		double Y = camY;
-		double Z = camZ;
-		double ZZ = Z*Z;
-
-		double A0 = r1 + r2*rr;
-		double B0 = nx*(r2*rr + A0);
-		double B1 = ny*(r2*rr + A0);
-
-		// X
-		inputX[0] = (fx*(2*nx*B0 + (sum + 1) + 2*ny*t1 + 6*nx*t2) + 2*skew*(ny*B0 + nx*t1 + ny*t2))/Z;
-		inputY[0] = 2*fy*(ny*B0 + nx*t1 + ny*t2)/Z;
-
-		// Y
-		inputX[1] = 2*fx*(nx*B1 + nx*t1 + ny*t2)/Z + skew*((2*ny*B1 + sum + 1)/Z + 6*ny*t1 + 2*nx*t2);
-		inputY[1] = fy*(2*Y*Y*(r2*rr + A0)/Z + (sum + 1)*Z + 6*Y*t1 + 2*X*t2)/ZZ;
-
-		// Z
-		inputX[2] = -(2*t2*(2*nx*nx + rr) + 2*(r2*rr*rr + sum)*nx + (sum + 1)*nx + 4*nx*ny*t1)*fx/Z - (2*t1*(nx*nx + 3*ny*ny) + 2*(r2*rr*rr/Z + sum)*ny + (sum + 1)*ny + 4*nx*ny*t2)*skew/Z;
-		inputY[2] = -(2*t1*(rr + 2*ny*ny) + 2*(r2*rr + A0)*rr*Y/Z + (sum + 1)*ny + 4*nx*ny*t2)*fy/Z;
-	}
-
-
-	@Override
-	public int getParameterCount() {
+	public int getIntrinsicCount() {
 		return zeroSkew ? 8 : 9;
 	}
 }

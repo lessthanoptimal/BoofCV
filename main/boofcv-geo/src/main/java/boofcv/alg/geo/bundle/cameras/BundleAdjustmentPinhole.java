@@ -50,7 +50,7 @@ public class BundleAdjustmentPinhole implements BundleAdjustmentCamera {
 	}
 
 	@Override
-	public void setParameters(double[] parameters, int offset) {
+	public void setIntrinsic(double[] parameters, int offset) {
 		fx = parameters[offset];
 		fy = parameters[offset+1];
 		cx = parameters[offset+2];
@@ -64,7 +64,7 @@ public class BundleAdjustmentPinhole implements BundleAdjustmentCamera {
 	}
 
 	@Override
-	public void getParameters(double[] parameters, int offset) {
+	public void getIntrinsic(double[] parameters, int offset) {
 		parameters[offset] = fx;
 		parameters[offset+1] = fy;
 		parameters[offset+2] = cx;
@@ -84,9 +84,19 @@ public class BundleAdjustmentPinhole implements BundleAdjustmentCamera {
 	}
 
 	@Override
-	public void jacobian(double camX, double camY, double camZ, double[] inputX, double[] inputY, double[] calibX, double[] calibY) {
+	public void jacobian(double camX, double camY, double camZ,
+						 double[] inputX, double[] inputY, boolean computeIntrinsic,
+						 double[] calibX, double[] calibY) {
 		double nx = camX/camZ;
 		double ny = camY/camZ;
+
+		inputX[0] = fx/camZ;           inputY[0] = 0;
+		inputX[1] = skew/camZ;         inputY[1] = fy/camZ;
+		inputX[2] = -(fx*camX + skew*camY)/(camZ*camZ);
+		inputY[2] = -fy*camY/(camZ*camZ);
+
+		if(!computeIntrinsic)
+			return;
 
 		calibX[0] = nx; calibY[0] = 0;
 		calibX[1] = 0;  calibY[1] = ny;
@@ -96,24 +106,10 @@ public class BundleAdjustmentPinhole implements BundleAdjustmentCamera {
 			calibX[4] = ny; calibY[4] = 0;
 		}
 
-		inputX[0] = fx/camZ;           inputY[0] = 0;
-		inputX[1] = skew/camZ;         inputY[1] = fy/camZ;
-		inputX[2] = -(fx*camX + skew*camY)/(camZ*camZ);
-		inputY[2] = -fy*camY/(camZ*camZ);
 	}
 
 	@Override
-	public void jacobian(double camX, double camY, double camZ, double[] inputX, double[] inputY)
-	{
-		inputX[0] = fx/camZ;           inputY[0] = 0;
-		inputX[1] = skew/camZ;         inputY[1] = fy/camZ;
-		inputX[2] = -(fx*camX + skew*camY)/(camZ*camZ);
-		inputY[2] = -fy*camY/(camZ*camZ);
-	}
-
-
-	@Override
-	public int getParameterCount() {
+	public int getIntrinsicCount() {
 		return zeroSkew ? 4 : 5;
 	}
 }

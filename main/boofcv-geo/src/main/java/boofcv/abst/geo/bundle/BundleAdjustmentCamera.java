@@ -20,6 +20,9 @@ package boofcv.abst.geo.bundle;
 
 import georegression.struct.point.Point2D_F64;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Generalized camera model for bundle adjustment. By implementing this function you can swap in and out
  * arbitrary camera models.
@@ -33,14 +36,14 @@ public interface BundleAdjustmentCamera {
 	 * @param parameters Array containing the parameters
 	 * @param offset Location of first index in the array which the parameters are stored
 	 */
-	void setParameters(double parameters[], int offset);
+	void setIntrinsic(double parameters[], int offset);
 
 	/**
 	 * Copies the intrinsic camera into the array.
 	 * @param parameters Array containing the parameters
 	 * @param offset Location of first index in the array which the parameters are stored
 	 */
-	void getParameters(double parameters[], int offset);
+	void getIntrinsic(double parameters[], int offset);
 
 	/**
 	 * Project the 3D point in the camera reference frame onto the camera's image plane.
@@ -61,29 +64,19 @@ public interface BundleAdjustmentCamera {
 	 * @param camZ (Input) 3D point in camera reference frame
 	 * @param pointX (Output) Partial of projected x' relative to input camera point.<code>[@x'/@camX, @ x' / @ camY, @ x' / @ camZ]</code> length 3
 	 * @param pointY (Output) Partial of projected y' relative to input camera point.<code>[@y'/@camX, @ y' / @ camY, @ y' / @ camZ]</code> length 3
-	 * @param calibX (Output) Partial of projected x' relative calibration parameters. length N
-	 * @param calibY (Output) Partial of projected y' relative  calibration parameters. length N
+	 * @param computeIntrinsic If true the calibX and calibY is computed. Otherwise they are ignored and can be null
+	 * @param calibX (Output) Partial of projected x' relative to calibration parameters. length N
+	 * @param calibY (Output) Partial of projected y' relative to calibration parameters. length N
 	 */
 	void jacobian(double camX, double camY, double camZ,
-				  double pointX[], double pointY[],
-				  double calibX[], double calibY[]);
+				  @Nonnull double pointX[], @Nonnull double pointY[],
+				  boolean computeIntrinsic,
+				  @Nullable double calibX[], @Nullable double calibY[]);
 
 	/**
-	 * Computes the gradient for 3D camera point only. Used when camera parameters is assumed to be known.
-	 * <code>[x',y'] </code> is the projected pixel coordinate of the 3D point in camera reference frame.
-	 *
-	 * @param camX (Input) 3D point in camera reference frame
-	 * @param camY (Input) 3D point in camera reference frame
-	 * @param camZ (Input) 3D point in camera reference frame
-	 * @param pointX (Output) Partial of projected x' relative to input camera point.<code>[@x'/@camX, @ x' / @ camY, @ x' / @ camZ]</code> length 3
-	 * @param pointY (Output) Partial of projected y' relative to input camera point.<code>[@y'/@camX, @ y' / @ camY, @ y' / @ camZ]</code> length 3
+	 * Returns the number of intrinsic parameters for this model. If the camera is known then the number of parameters
+	 * is zero
+	 * @return number of intrinsic parameters.
 	 */
-	void jacobian(double camX, double camY, double camZ,
-				  double pointX[], double pointY[]);
-
-	/**
-	 * Returns the number of parameters in this model.
-	 * @return number of parameters.
-	 */
-	int getParameterCount();
+	int getIntrinsicCount();
 }

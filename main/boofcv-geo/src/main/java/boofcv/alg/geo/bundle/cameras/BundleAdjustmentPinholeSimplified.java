@@ -45,14 +45,14 @@ public class BundleAdjustmentPinholeSimplified implements BundleAdjustmentCamera
 	public double k1,k2;
 
 	@Override
-	public void setParameters(double[] parameters, int offset) {
+	public void setIntrinsic(double[] parameters, int offset) {
 		f = parameters[offset];
 		k1 = parameters[offset+1];
 		k2 = parameters[offset+2];
 	}
 
 	@Override
-	public void getParameters(double[] parameters, int offset) {
+	public void getIntrinsic(double[] parameters, int offset) {
 		parameters[offset] = f;
 		parameters[offset+1] = k1;
 		parameters[offset+2] = k2;
@@ -72,8 +72,8 @@ public class BundleAdjustmentPinholeSimplified implements BundleAdjustmentCamera
 	}
 
 	@Override
-	public void jacobian(double X, double Y, double Z, double[] inputX, double[] inputY, double[] calibX, double[] calibY) {
-
+	public void jacobian(double X, double Y, double Z,
+						 double[] inputX, double[] inputY, boolean computeIntrinsic, double[] calibX, double[] calibY) {
 
 		double normX = X/Z;
 		double normY = Y/Z;
@@ -101,6 +101,9 @@ public class BundleAdjustmentPinholeSimplified implements BundleAdjustmentCamera
 		// partial Z
 		inputX[2] = -f*r*normX/Z + f*normX*r_Z;
 		inputY[2] = -f*r*normY/Z + f*normY*r_Z;
+
+		if(!computeIntrinsic)
+			return;
 
 		// partial f
 		calibX[0] = r*normX;
@@ -117,37 +120,8 @@ public class BundleAdjustmentPinholeSimplified implements BundleAdjustmentCamera
 	}
 
 	@Override
-	public void jacobian(double X, double Y, double Z, double[] inputX, double[] inputY) {
-		double normX = X/Z;
-		double normY = Y/Z;
-
-		double n2 = normX*normX + normY*normY;
-
-		double n2_X = 2*normX/Z;
-		double n2_Y = 2*normY/Z;
-		double n2_Z = -2*n2/Z;
-
-
-		double r = 1.0 + (k1 + k2*n2)*n2;
-		double kk = k1 + 2*k2*n2;
-
-		double r_Z = n2_Z*kk;
-
-		// partial X
-		inputX[0] = (f/Z)*(r + 2*normX*normX*kk);
-		inputY[0] = f*normY*n2_X*kk;
-
-		// partial Y
-		inputX[1] = f*normX*n2_Y*kk;
-		inputY[1] = (f/Z)*(r + 2*normY*normY*kk);
-
-		// partial Z
-		inputX[2] = -f*r*normX/Z + f*normX*r_Z;
-		inputY[2] = -f*r*normY/Z + f*normY*r_Z;
-	}
-
-	@Override
-	public int getParameterCount() {
+	public int getIntrinsicCount() {
 		return 3;
 	}
+
 }

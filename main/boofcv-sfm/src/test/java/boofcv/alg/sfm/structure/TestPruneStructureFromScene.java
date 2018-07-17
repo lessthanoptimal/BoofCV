@@ -315,7 +315,7 @@ public class TestPruneStructureFromScene {
 
 		List<Point3D_F64> points = new ArrayList<>();
 		for (int i = 0; i < structure.points.length; i++) {
-			Point3D_F64 p = UtilPoint3D_F64.noiseNormal(center,0.75,0.5,1,rand,null);
+			Point3D_F64 p = UtilPoint3D_F64.noiseNormal(center,0.5,0.5,1,rand,null);
 			points.add(p);
 			structure.points[i].set(p.x,p.y,p.z);
 		}

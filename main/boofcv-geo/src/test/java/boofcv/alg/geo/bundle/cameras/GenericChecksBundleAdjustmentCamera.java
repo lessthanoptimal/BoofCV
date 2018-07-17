@@ -100,12 +100,12 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 		double found2[] = new double[3];
 		double found3[] = new double[3];
 
-		int N = model.getParameterCount();
+		int N = model.getIntrinsicCount();
 		for (double p[] : parameters)
 		{
-			model.setParameters(p,0);
-			model.jacobian(X[0],X[1],X[2],found0,found1,new double[N], new double[N]);
-			model.jacobian(X[0],X[1],X[2],found2,found3);
+			model.setIntrinsic(p,0);
+			model.jacobian(X[0],X[1],X[2],found0,found1,true,new double[N], new double[N]);
+			model.jacobian(X[0],X[1],X[2],found2,found3,false,null,null);
 
 			for (int i = 0; i < 3; i++) {
 				assertEquals(found0[i],found2[i], UtilEjml.TEST_F64);
@@ -119,7 +119,7 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 		Point2D_F64 p = new Point2D_F64();
 
 		public FunctionOfPoint( double []parameters ) {
-			model.setParameters(parameters,0);
+			model.setIntrinsic(parameters,0);
 		}
 
 		@Override
@@ -145,14 +145,14 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 		double gradX[],gradY[];
 
 		public JacobianOfPoint( double []parameters ) {
-			model.setParameters(parameters,0);
+			model.setIntrinsic(parameters,0);
 			gradX = new double[3];
 			gradY = new double[3];
 		}
 
 		@Override
 		public void process(double[] input, DMatrixRMaj output) {
-			model.jacobian(input[0],input[1],input[2],gradX,gradY);
+			model.jacobian(input[0],input[1],input[2],gradX,gradY,false,null,null);
 			for (int i = 0; i < 3; i++) {
 				output.data[i] = gradX[i];
 				output.data[3+i] = gradY[i];
@@ -186,7 +186,7 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 
 		@Override
 		public void process(double[] input, double[] output) {
-			model.setParameters(input,0);
+			model.setIntrinsic(input,0);
 			model.project(X[0],X[1],X[2],p);
 			output[0] = p.x;
 			output[1] = p.y;
@@ -194,7 +194,7 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 
 		@Override
 		public int getNumOfInputsN() {
-			return model.getParameterCount();
+			return model.getIntrinsicCount();
 		}
 
 		@Override
@@ -210,14 +210,14 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 
 		public JacobianOfParameters( double[] X ) {
 			this.X = X;
-			gradX = new double[model.getParameterCount()];
-			gradY = new double[model.getParameterCount()];
+			gradX = new double[model.getIntrinsicCount()];
+			gradY = new double[model.getIntrinsicCount()];
 		}
 
 		@Override
 		public void process(double[] input, DMatrixRMaj output) {
-			model.setParameters(input,0);
-			model.jacobian(X[0],X[1],X[2],new double[3],new double[3],gradX,gradY);
+			model.setIntrinsic(input,0);
+			model.jacobian(X[0],X[1],X[2],new double[3],new double[3],true,gradX,gradY);
 			int N = gradX.length;
 			for (int i = 0; i < N; i++) {
 				output.data[i] = gradX[i];
@@ -227,7 +227,7 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 
 		@Override
 		public int getNumOfInputsN() {
-			return model.getParameterCount();
+			return model.getIntrinsicCount();
 		}
 
 		@Override

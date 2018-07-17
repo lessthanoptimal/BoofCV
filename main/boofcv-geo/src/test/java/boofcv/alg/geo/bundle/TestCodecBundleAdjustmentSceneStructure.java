@@ -58,11 +58,11 @@ public class TestCodecBundleAdjustmentSceneStructure {
 			BundleAdjustmentSceneStructure.Camera o = original.cameras[i];
 			BundleAdjustmentSceneStructure.Camera f = found.cameras[i];
 
-			double po[] = new double[o.model.getParameterCount()];
-			double pf[] = new double[f.model.getParameterCount()];
+			double po[] = new double[o.model.getIntrinsicCount()];
+			double pf[] = new double[f.model.getIntrinsicCount()];
 
-			o.model.getParameters(po,0);
-			f.model.getParameters(pf,0);
+			o.model.getIntrinsic(po,0);
+			f.model.getIntrinsic(pf,0);
 
 			assertArrayEquals(po,pf, UtilEjml.TEST_F64 );
 		}

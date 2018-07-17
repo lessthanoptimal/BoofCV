@@ -108,7 +108,7 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 		for (int i = 0; i < structure.cameras.length; i++) {
 			if( !structure.cameras[i].known ) {
 				cameraParameterIndexes[i] = index;
-				int count = structure.cameras[i].model.getParameterCount();
+				int count = structure.cameras[i].model.getIntrinsicCount();
 				largestCameraSize = Math.max(largestCameraSize,count);
 				index += count;
 			}
@@ -162,7 +162,7 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 			}
 			int cameraParamStartIndex = cameraParameterIndexes[view.camera];
 			if( !camera.known ) {
-				camera.model.setParameters(input,indexLastView+cameraParamStartIndex);
+				camera.model.setIntrinsic(input,indexLastView+cameraParamStartIndex);
 			}
 
 			BundleAdjustmentObservations.View obsView = observations.views[viewIndex];
@@ -182,8 +182,9 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 
 				//============ Partial of camera parameters
 				if( !camera.known ) {
-					int N = camera.model.getParameterCount();
-					camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z, pointGradX, pointGradY, calibGradX, calibGradY);
+					int N = camera.model.getIntrinsicCount();
+					camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z,
+							pointGradX, pointGradY, true, calibGradX, calibGradY);
 
 					int location = indexLastView-indexFirstView+cameraParamStartIndex;
 					for (int j = 0; j < N; j++) {
@@ -191,7 +192,8 @@ public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixS
 						tripletView.addItemCheck(jacRowY,location+j,calibGradY[j]);
 					}
 				} else {
-					camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z, pointGradX, pointGradY);
+					camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z, pointGradX, pointGradY,
+							false, null, null);
 				}
 				//============ Partial of worldPt
 				// partial of (R*X + T) with respect to X is a 3 by 3 matrix

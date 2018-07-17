@@ -67,8 +67,8 @@ public class CodecBundleAdjustmentSceneStructure {
 		for (int i = 0; i < structure.cameras.length; i++) {
 			BundleAdjustmentSceneStructure.Camera camera = structure.cameras[i];
 			if( !camera.known ) {
-				camera.model.setParameters(input,index);
-				index += camera.model.getParameterCount();
+				camera.model.setIntrinsic(input,index);
+				index += camera.model.getIntrinsicCount();
 			}
 		}
 	}
@@ -102,8 +102,8 @@ public class CodecBundleAdjustmentSceneStructure {
 		for (int i = 0; i < structure.cameras.length; i++) {
 			BundleAdjustmentSceneStructure.Camera camera = structure.cameras[i];
 			if( !camera.known ) {
-				camera.model.getParameters(output,index);
-				index += camera.model.getParameterCount();
+				camera.model.getIntrinsic(output,index);
+				index += camera.model.getIntrinsicCount();
 			}
 		}
 	}

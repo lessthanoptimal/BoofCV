@@ -186,7 +186,7 @@ public class BundleAdjustmentSceneStructure {
 		int total = 0;
 		for (int i = 0; i < cameras.length; i++) {
 			if( !cameras[i].known) {
-				total += cameras[i].model.getParameterCount();
+				total += cameras[i].model.getIntrinsicCount();
 			}
 		}
 		return total;
