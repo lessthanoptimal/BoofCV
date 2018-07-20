@@ -44,7 +44,7 @@ public class TestImageMiscOps {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 22*6 + 4*8;
+		int numExpected = 23*6 + 4*8;
 		Method methods[] = ImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -62,6 +62,8 @@ public class TestImageMiscOps {
 					testFillBand(m);
 				} else if( m.getName().compareTo("insertBand") == 0 ) {
 					testInsertBand(m);
+				} else if( m.getName().compareTo("extractBand") == 0 ) {
+					testExtractBand(m);
 				} else if( m.getName().compareTo("fillBorder") == 0 ) {
 					testFillBorder(m);
 				} else if( m.getName().compareTo("fillRectangle") == 0 ) {
@@ -300,6 +302,37 @@ public class TestImageMiscOps {
 			assertFalse(numMatch > width * height * (numBands - 1) / 5);
 		}
 	}
+
+	private void testExtractBand(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageInterleaved input = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
+		ImageGray output = GeneralizedImageOps.createSingleBand(paramTypes[2], width, height);
+
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
+
+		for (int band = 0; band < numBands; band++) {
+			m.invoke(null, input,band, output);
+
+			int numMatch = 0;
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					double valueIn = GeneralizedImageOps.get(output,j,i);
+
+					for (int k = 0; k < numBands; k++) {
+						double valueOut = GeneralizedImageOps.get(input,j,i,k);
+						if( k == band ) {
+							assertEquals(valueIn,valueOut,1e-4);
+						} else {
+							if( valueIn == valueOut ) numMatch++;
+						}
+					}
+				}
+			}
+
+			assertFalse(numMatch > width * height * (numBands - 1) / 5);
+		}
+	}
+
 
 	private void testFillBorder( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();

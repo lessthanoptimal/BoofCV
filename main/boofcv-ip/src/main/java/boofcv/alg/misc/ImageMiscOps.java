@@ -167,7 +167,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Inserts a single band into into one of the bands in a multi-band image
+	 * Inserts a single band into a multi-band image overwriting the original band
 	 *
 	 * @param input Single band image
 	 * @param band Which band the image is to be inserted into
@@ -181,6 +181,26 @@ public class ImageMiscOps {
 			int indexOut = output.getStartIndex() + y * output.getStride() + band;
 			int end = indexOut + output.width*numBands - band;
 			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
+				output.data[indexOut] = input.data[indexIn];
+			}
+		}
+	}
+
+	/**
+	 * Extracts a single band from a multi-band image
+	 *
+	 * @param input Multi-band image
+	 * @param band which bad is to be extracted   
+	 * @param output The single band image
+	 */
+	public static void extractBand( InterleavedI8 input, int band , GrayI8 output) {
+
+		final int numBands = input.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int indexIn = input.getStartIndex() + y * input.getStride() + band;
+			int indexOut = output.getStartIndex() + y * output.getStride();
+			int end = indexOut + output.width;
+			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
 		}
@@ -685,7 +705,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Inserts a single band into into one of the bands in a multi-band image
+	 * Inserts a single band into a multi-band image overwriting the original band
 	 *
 	 * @param input Single band image
 	 * @param band Which band the image is to be inserted into
@@ -699,6 +719,26 @@ public class ImageMiscOps {
 			int indexOut = output.getStartIndex() + y * output.getStride() + band;
 			int end = indexOut + output.width*numBands - band;
 			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
+				output.data[indexOut] = input.data[indexIn];
+			}
+		}
+	}
+
+	/**
+	 * Extracts a single band from a multi-band image
+	 *
+	 * @param input Multi-band image
+	 * @param band which bad is to be extracted   
+	 * @param output The single band image
+	 */
+	public static void extractBand( InterleavedI16 input, int band , GrayI16 output) {
+
+		final int numBands = input.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int indexIn = input.getStartIndex() + y * input.getStride() + band;
+			int indexOut = output.getStartIndex() + y * output.getStride();
+			int end = indexOut + output.width;
+			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
 		}
@@ -1203,7 +1243,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Inserts a single band into into one of the bands in a multi-band image
+	 * Inserts a single band into a multi-band image overwriting the original band
 	 *
 	 * @param input Single band image
 	 * @param band Which band the image is to be inserted into
@@ -1217,6 +1257,26 @@ public class ImageMiscOps {
 			int indexOut = output.getStartIndex() + y * output.getStride() + band;
 			int end = indexOut + output.width*numBands - band;
 			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
+				output.data[indexOut] = input.data[indexIn];
+			}
+		}
+	}
+
+	/**
+	 * Extracts a single band from a multi-band image
+	 *
+	 * @param input Multi-band image
+	 * @param band which bad is to be extracted   
+	 * @param output The single band image
+	 */
+	public static void extractBand( InterleavedS32 input, int band , GrayS32 output) {
+
+		final int numBands = input.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int indexIn = input.getStartIndex() + y * input.getStride() + band;
+			int indexOut = output.getStartIndex() + y * output.getStride();
+			int end = indexOut + output.width;
+			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
 		}
@@ -1721,7 +1781,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Inserts a single band into into one of the bands in a multi-band image
+	 * Inserts a single band into a multi-band image overwriting the original band
 	 *
 	 * @param input Single band image
 	 * @param band Which band the image is to be inserted into
@@ -1735,6 +1795,26 @@ public class ImageMiscOps {
 			int indexOut = output.getStartIndex() + y * output.getStride() + band;
 			int end = indexOut + output.width*numBands - band;
 			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
+				output.data[indexOut] = input.data[indexIn];
+			}
+		}
+	}
+
+	/**
+	 * Extracts a single band from a multi-band image
+	 *
+	 * @param input Multi-band image
+	 * @param band which bad is to be extracted   
+	 * @param output The single band image
+	 */
+	public static void extractBand( InterleavedS64 input, int band , GrayS64 output) {
+
+		final int numBands = input.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int indexIn = input.getStartIndex() + y * input.getStride() + band;
+			int indexOut = output.getStartIndex() + y * output.getStride();
+			int end = indexOut + output.width;
+			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
 		}
@@ -2239,7 +2319,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Inserts a single band into into one of the bands in a multi-band image
+	 * Inserts a single band into a multi-band image overwriting the original band
 	 *
 	 * @param input Single band image
 	 * @param band Which band the image is to be inserted into
@@ -2253,6 +2333,26 @@ public class ImageMiscOps {
 			int indexOut = output.getStartIndex() + y * output.getStride() + band;
 			int end = indexOut + output.width*numBands - band;
 			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
+				output.data[indexOut] = input.data[indexIn];
+			}
+		}
+	}
+
+	/**
+	 * Extracts a single band from a multi-band image
+	 *
+	 * @param input Multi-band image
+	 * @param band which bad is to be extracted   
+	 * @param output The single band image
+	 */
+	public static void extractBand( InterleavedF32 input, int band , GrayF32 output) {
+
+		final int numBands = input.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int indexIn = input.getStartIndex() + y * input.getStride() + band;
+			int indexOut = output.getStartIndex() + y * output.getStride();
+			int end = indexOut + output.width;
+			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
 		}
@@ -2757,7 +2857,7 @@ public class ImageMiscOps {
 	}
 
 	/**
-	 * Inserts a single band into into one of the bands in a multi-band image
+	 * Inserts a single band into a multi-band image overwriting the original band
 	 *
 	 * @param input Single band image
 	 * @param band Which band the image is to be inserted into
@@ -2771,6 +2871,26 @@ public class ImageMiscOps {
 			int indexOut = output.getStartIndex() + y * output.getStride() + band;
 			int end = indexOut + output.width*numBands - band;
 			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
+				output.data[indexOut] = input.data[indexIn];
+			}
+		}
+	}
+
+	/**
+	 * Extracts a single band from a multi-band image
+	 *
+	 * @param input Multi-band image
+	 * @param band which bad is to be extracted   
+	 * @param output The single band image
+	 */
+	public static void extractBand( InterleavedF64 input, int band , GrayF64 output) {
+
+		final int numBands = input.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int indexIn = input.getStartIndex() + y * input.getStride() + band;
+			int indexOut = output.getStartIndex() + y * output.getStride();
+			int end = indexOut + output.width;
+			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
 		}

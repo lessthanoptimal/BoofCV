@@ -76,6 +76,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			printFillInterleaved_bands();
 			printFillBand_Interleaved();
 			printInsertBandInterleaved();
+			printExtractBandInterleaved();
 			printFillBorder();
 			printFillRectangle();
 			printFillRectangleInterleaved();
@@ -274,7 +275,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		String interleavedName = imageType.getInterleavedName();
 		out.print(
 				"\t/**\n" +
-				"\t * Inserts a single band into into one of the bands in a multi-band image\n" +
+				"\t * Inserts a single band into a multi-band image overwriting the original band\n" +
 				"\t *\n" +
 				"\t * @param input Single band image\n" +
 				"\t * @param band Which band the image is to be inserted into\n" +
@@ -292,6 +293,32 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
+	}
+
+	public void printExtractBandInterleaved()
+	{
+		String singleName = imageType.getSingleBandName();
+		String interleavedName = imageType.getInterleavedName();
+		out.print(
+				"\t/**\n" +
+						"\t * Extracts a single band from a multi-band image\n" +
+						"\t *\n" +
+						"\t * @param input Multi-band image\n" +
+						"\t * @param band which bad is to be extracted   \n" +
+						"\t * @param output The single band image\n" +
+						"\t */\n" +
+						"\tpublic static void extractBand( "+interleavedName+" input, int band , "+singleName+" output) {\n" +
+						"\n" +
+						"\t\tfinal int numBands = input.numBands;\n" +
+						"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+						"\t\t\tint indexIn = input.getStartIndex() + y * input.getStride() + band;\n" +
+						"\t\t\tint indexOut = output.getStartIndex() + y * output.getStride();\n" +
+						"\t\t\tint end = indexOut + output.width;\n" +
+						"\t\t\tfor (; indexOut < end; indexIn += numBands , indexOut++ ) {\n" +
+						"\t\t\t\toutput.data[indexOut] = input.data[indexIn];\n" +
+						"\t\t\t}\n" +
+						"\t\t}\n" +
+						"\t}\n\n");
 	}
 
 	public void printFillBorder()

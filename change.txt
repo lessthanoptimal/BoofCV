@@ -6,6 +6,8 @@ Date Format: year/month/day
 Date    : 2018/
 Version : 0.31
 
+- ImageMiscOps
+ * Added extractBand()
 - Updated gversion to fix problem when built from a directory other than project base
 - Fixed problem with Java applications
  * Can't use implementation when specifying dependency in this situation
