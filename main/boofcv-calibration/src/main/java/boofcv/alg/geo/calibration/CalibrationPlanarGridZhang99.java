@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -182,10 +182,7 @@ public class CalibrationPlanarGridZhang99 {
 								   UnconstrainedLeastSquares optimizer )
 	{
 		if( optimizer == null ) {
-//			optimizer = FactoryOptimization.leastSquaresTrustRegion(1,
-//					RegionStepType.DOG_LEG_FTF,true);
-			optimizer = FactoryOptimization.leastSquaresLM(1e-3,true);
-//			optimizer = FactoryOptimization.leastSquareLevenberg(1e-3);
+			optimizer = FactoryOptimization.levenbergMarquardt(null,true);
 		}
 
 		double model[] = new double[ initial.numParameters() ];

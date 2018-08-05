@@ -21,7 +21,13 @@ package boofcv.abst.geo.bundle;
 import boofcv.alg.geo.bundle.BundleAdjustmentResidualFunction;
 import boofcv.alg.geo.bundle.BundleAdjustmentShurJacobian_DSCC;
 import boofcv.alg.geo.bundle.CodecBundleAdjustmentSceneStructure;
-import org.ddogleg.optimization.impl.LevenbergMarquardtSchur_DSCC;
+import org.ddogleg.optimization.FactoryOptimizationSparse;
+import org.ddogleg.optimization.UnconstrainedLeastSquaresSchur;
+import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import org.ddogleg.optimization.trustregion.ConfigTrustRegion;
+import org.ejml.data.DMatrixSparseCSC;
+
+import javax.annotation.Nullable;
 
 /**
  * Implementation of bundle adjustment using Shur Complement and generic sparse matrices.
@@ -32,7 +38,7 @@ public class BundleAdjustmentShur_DSCC
 		implements BundleAdjustment
 {
 	// minimization algorithm
-	private LevenbergMarquardtSchur_DSCC minimizer;
+	private UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer;
 
 	private BundleAdjustmentResidualFunction function = new BundleAdjustmentResidualFunction();
 	private BundleAdjustmentShurJacobian_DSCC jacobian = new BundleAdjustmentShurJacobian_DSCC();
@@ -42,6 +48,8 @@ public class BundleAdjustmentShur_DSCC
 
 	private volatile boolean stopRequested = false;
 
+	private double ftol,gtol;
+
 	/**
 	 * Fit error before and after optimization
 	 */
@@ -49,13 +57,18 @@ public class BundleAdjustmentShur_DSCC
 
 	private CodecBundleAdjustmentSceneStructure codec = new CodecBundleAdjustmentSceneStructure();
 
-	public BundleAdjustmentShur_DSCC( double initialDampParam) {
-		this.minimizer = new LevenbergMarquardtSchur_DSCC(initialDampParam);
+	public BundleAdjustmentShur_DSCC( @Nullable ConfigTrustRegion config) {
+		this.minimizer = FactoryOptimizationSparse.doglegSchur(config);
+	}
+
+	public BundleAdjustmentShur_DSCC( @Nullable ConfigLevenbergMarquardt config) {
+		this.minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur(config);
 	}
 
 	@Override
 	public void configure(double ftol, double gtol, int maxIterations) {
-		this.minimizer.setConvergence(ftol,gtol);
+		this.ftol = ftol;
+		this.gtol = gtol;
 		this.maxIterations = maxIterations;
 	}
 
@@ -72,19 +85,19 @@ public class BundleAdjustmentShur_DSCC
 			parameters = new double[N];
 		}
 		codec.encode(structure,parameters);
-		minimizer.initialize(parameters);
+		this.minimizer.initialize(parameters,ftol,gtol);
 
-		errorBefore = minimizer.getFnorm();
-//		System.out.println("Error Before: "+errorBefore);
+		errorBefore = minimizer.getFunctionValue();
+		System.out.println("Error Before: "+errorBefore);
 
 		for( int i = 0; i < maxIterations && !stopRequested; i++ ) {
 			if( minimizer.iterate() )
 				break;
 		}
 
-		errorAfter = minimizer.getFnorm();
+		errorAfter = minimizer.getFunctionValue();
 
-//		System.out.println("Error Before: "+errorBefore+" After: "+errorAfter);
+		System.out.println("Error Before: "+errorBefore+" After: "+errorAfter);
 
 		codec.decode(minimizer.getParameters(), structure);
 		return errorAfter < errorBefore;

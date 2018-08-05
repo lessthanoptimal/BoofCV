@@ -276,7 +276,7 @@ public class FactoryMultiView {
 				return new WrapTrifocalLinearPoint7();
 
 			case ALGEBRAIC_7:
-				UnconstrainedLeastSquares optimizer = FactoryOptimization.leastSquaresLM(1e-3, false);
+				UnconstrainedLeastSquares optimizer = FactoryOptimization.levenbergMarquardt(null, false);
 				TrifocalAlgebraicPoint7 alg = new TrifocalAlgebraicPoint7(optimizer,iterations,1e-12,1e-12);
 
 				return new WrapTrifocalAlgebraicPoint7(alg);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 	 */
 	@Test
 	public void perfect() {
-		UnconstrainedLeastSquares optimizer = FactoryOptimization.leastSquareLevenberg(1e-3);
+		UnconstrainedLeastSquares optimizer = FactoryOptimization.levenbergMarquardt(null,false);
 		TrifocalAlgebraicPoint7 alg = new TrifocalAlgebraicPoint7(optimizer,300,1e-20,1e-20);
 
 		assertTrue(alg.process(observations, found));
@@ -76,7 +76,7 @@ public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 			noisyObs.add(n);
 		}
 
-		UnconstrainedLeastSquares optimizer = FactoryOptimization.leastSquareLevenberg(1e-3);
+		UnconstrainedLeastSquares optimizer = FactoryOptimization.levenbergMarquardt(null,false);
 		TrifocalAlgebraicPoint7 alg = new TrifocalAlgebraicPoint7(optimizer,300,1e-20,1e-20);
 
 		assertTrue(alg.process(noisyObs,found));

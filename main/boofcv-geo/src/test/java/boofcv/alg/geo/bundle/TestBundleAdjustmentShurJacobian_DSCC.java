@@ -48,7 +48,7 @@ public class TestBundleAdjustmentShurJacobian_DSCC {
 
 		BundleAdjustmentShurJacobian_DSCC alg = new BundleAdjustmentShurJacobian_DSCC();
 
-		FunctionNtoMxN<DMatrixSparseCSC> jac = new SchurJacobian_to_NtoMxN(alg);
+		FunctionNtoMxN<DMatrixSparseCSC> jac = new SchurJacobian_to_NtoMxN.DSCC(alg);
 		BundleAdjustmentResidualFunction func = new BundleAdjustmentResidualFunction();
 
 		alg.configure(structure,observations);

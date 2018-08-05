@@ -39,6 +39,8 @@ import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import org.ddogleg.optimization.trustregion.ConfigTrustRegion;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.swing.*;
@@ -92,8 +94,19 @@ public class ExampleMultiviewSceneReconstruction {
 		BundleAdjustmentObservations observations = estimateScene.getObservations();
 
 		// Configure bundle adjustment
-		BundleAdjustmentShur_DSCC sba = new BundleAdjustmentShur_DSCC(1e-3);
-		sba.configure(1e-4,1e-4,20);
+		ConfigTrustRegion configTR = new ConfigTrustRegion();
+		configTR.regionInitial = 1;
+		configTR.scalingMinimum=1e-5;
+		configTR.scalingMaximum=1e5;
+
+		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
+		configLM.dampeningInitial = 1e-12;
+		configLM.scalingMinimum=1e-5;
+		configLM.scalingMaximum=1e5;
+
+		BundleAdjustmentShur_DSCC sba = new BundleAdjustmentShur_DSCC(configTR);
+//		BundleAdjustmentShur_DSCC sba = new BundleAdjustmentShur_DSCC(configLM);
+		sba.configure(1e-10,1e-10,100);
 		structure.setCamera(0,true,intrinsic);
 
 		PruneStructureFromScene pruner = new PruneStructureFromScene(structure,observations);

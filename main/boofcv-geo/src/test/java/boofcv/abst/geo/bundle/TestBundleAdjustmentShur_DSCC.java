@@ -18,6 +18,8 @@
 
 package boofcv.abst.geo.bundle;
 
+import org.ddogleg.optimization.trustregion.ConfigTrustRegion;
+
 /**
  * @author Peter Abeles
  */
@@ -25,7 +27,8 @@ public class TestBundleAdjustmentShur_DSCC extends GenericBundleAdjustmentChecks
 
 	@Override
 	public BundleAdjustment createAlg() {
-		BundleAdjustment ret = new BundleAdjustmentShur_DSCC(1e-4);
+		ConfigTrustRegion config = new ConfigTrustRegion();
+		BundleAdjustment ret = new BundleAdjustmentShur_DSCC(config);
 		ret.configure(1e-5,1e-5,20);
 		return ret;
 	}
