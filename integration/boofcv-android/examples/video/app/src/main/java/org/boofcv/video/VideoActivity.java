@@ -21,11 +21,13 @@ package org.boofcv.video;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.hardware.camera2.CaptureRequest;
 import android.os.Bundle;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
 
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.color.ColorFormat;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.camera2.VisualizeCamera2Activity;
@@ -36,10 +38,13 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
- * Demonstrates how to use the visualize activity. This greatly simplifies
- * the process of capturing and visualizing image data from a camera.
+ * Demonstrates how to use the visualize activity. A video stream is opened and the image gradient
+ * is found. The gradient is then rendered into a format which can be visualized and displayed
+ * on the Android device's screen.
+ *
+ * This greatly simplifies the process of capturing and visualizing image data from a camera.
  * Internally it uses the camera 2 API. You can customize its behavior by overriding
- * different internal functions.
+ * different internal functions. For more details, see the JavaDoc of it's parent classes.
  *
  * @see VisualizeCamera2Activity
  * @see boofcv.android.camera2.SimpleCamera2Activity
@@ -52,7 +57,8 @@ public class VideoActivity extends VisualizeCamera2Activity
 	private GrayS16 derivX = new GrayS16(1,1);
 	private GrayS16 derivY = new GrayS16(1,1);
 
-	// computes the image gradient
+	// Storage for image gradient. In general you will want to precompute data structures due
+	// to the expense of garbage collection
 	private ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.three(GrayU8.class, GrayS16.class);
 
 	public VideoActivity() {
@@ -60,12 +66,11 @@ public class VideoActivity extends VisualizeCamera2Activity
 		// find the resolution which comes the closest to having this many
 		// pixels.
 		targetResolution = 640*480;
-		// This behavior can be changed as well as which camera is selected
-		// by overriding functions defined in SimpleCamera2Activity
+		// If this behavior is undesirable then override selectResolution() with your own logic
 
-		// Tell the visualization activity that we want to handle
-		// rendering the bitmap. If this is set to false it will overwrite our
-		// changes
+		// Tell the visualization activity that we want to handle declaring and reindering of
+		// the visualization bitmap. The default behavior is a straight forward conversion of the
+		// input image into a bitmap format
 		super.showBitmap = false;
 	}
 
@@ -76,29 +81,42 @@ public class VideoActivity extends VisualizeCamera2Activity
 		setContentView(R.layout.video);
 		FrameLayout surface = findViewById(R.id.camera_frame);
 
-		// Tell it that a gray scale image is being processed. It will
-		// automatically convert the video frame into this format
-		// RGB is also supported
+		// By calling this function you are telling the camera library that you wish to process
+		// images in a gray scale format. The video stream is typically in YUV420. Color
+		// image formats are supported as RGB, YUV, ... etc, color spaces.
 		setImageType(ImageType.single(GrayU8.class));
 
-		// The bitmap modified below will be draw in the surface provided
-		// to start camera. A camera preview can also be shown by providing
-		// a texture view.
+		// The camera stream will now start after this function is called.
 		startCamera(surface,null);
 	}
 
 	/**
-	 * This is called when the video resolution is known. Data structures
-	 * can be initialized now.
+	 * This is where you specify custom camera settings. See {@link boofcv.android.camera2.SimpleCamera2Activity}'s
+	 * JavaDoc for more funcitons which you can override.
+	 *
+	 * @param captureRequestBuilder Used to configure the camera.
 	 */
 	@Override
-	protected void onCameraResolutionChange( int width , int height ) {
-		super.onCameraResolutionChange(width, height);
+	protected void configureCamera( CaptureRequest.Builder captureRequestBuilder ) {
+		captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO);
+		captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
+	}
+
+	/**
+	 * During camera initialization this function is called once after the resolution is known.
+	 * This is a good function to override and predeclare data structres which are dependent
+	 * on the video feeds resolution.
+	 */
+	@Override
+	protected void onCameraResolutionChange( int width , int height, int sensorOrientation ) {
+		super.onCameraResolutionChange(width, height,sensorOrientation);
 
 		derivX.reshape(width, height);
 		derivY.reshape(width, height);
 
-		// If showBitmap was set to false you wouldn't need to do this
+		// If showBitmap was set to true then the video stream would be converted into a bitmap
+		// automatically for display purposes. However, we set it to false because a custom
+		// image is being rendered to visualize the gradient.
 		synchronized (bitmapLock) {
 			if (bitmap.getWidth() != width || bitmap.getHeight() != height)
 				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -111,17 +129,20 @@ public class VideoActivity extends VisualizeCamera2Activity
 	 */
 	@Override
 	protected void processImage(ImageBase image) {
-		// The image type for image was specified in onResume()
+		// The data type of 'image' was specified in onCreate() function
+		// The line below will compute the gradient and store it in two images. One for the
+		// gradient along the x-axis and the other along the y-axis
 		gradient.process((GrayU8)image,derivX,derivY);
 
-		// the bitmap will be rendered onto surface previded earlier
+		// Render the gradient into a single bitmap for visualization.
 		synchronized (bitmapLock) {
 			VisualizeImageData.colorizeGradient(derivX,derivY,-1, bitmap, bitmapTmp);
 		}
 	}
 
 	/**
-	 * Invoked in the UI thread and must run very fast for a good user experience
+	 * Invoked in the UI thread and must run very fast for a good user experience. DO NOT BLOCK
+	 * HERE.
 	 */
 	@Override
 	protected void onDrawFrame(SurfaceView view , Canvas canvas ) {

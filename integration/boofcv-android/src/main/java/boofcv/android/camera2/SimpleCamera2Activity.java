@@ -64,6 +64,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *     <li>{@link #onCameraOpened}</li>
  *     <li>{@link #onCameraDisconnected}</li>
  * </ul>
+ * See source code for a detailed description on what you can modify in each function.
  *
  * Configuration variables
  * <ul>

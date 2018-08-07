@@ -46,17 +46,18 @@ import java.util.concurrent.TimeUnit;
 /**
  * Extension of {@link SimpleCamera2Activity} which adds visualization and hooks for image
  * processing. Video frames are automatically converted into a format which can be processed by
- * computer vision. Optionally multiple threads can be generated so that video frames are
+ * BoofCV routines Optionally multiple threads can be generated so that video frames are
  * processed concurrently. The input image is automatically converted into a Bitmap image if
  * requested. If multiple threads are being used the user can toggle if they want visualization
  * to be shown if an old image finished being processed after a newer one.
  *
  * Must call {@link #startCamera(ViewGroup, TextureView)} in onCreate().
  *
- * To customize it's behavior override the following functions:
+ * Customize how images are processed with the following functions:
  * <ul>
- *     <li>{@link #setThreadPoolSize}</li>
- *     <li>{@link #setImageType}</li>
+ *     <li>{@link #setThreadPoolSize}: Changes the number of threads available for processing a video stream. Useful
+ *     when using expensive image processing routines.</li>
+ *     <li>{@link #setImageType}: Specifies image format passed to processImage() function/li>
  * </ul>
  *
  * Useful variables
@@ -285,6 +286,14 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 					(displayWidth - rotatedWidth*scale) / 2,
 					(displayHeight - rotatedHeight*scale) / 2);
 		}
+	}
+
+	/**
+	 * Same as {@link #setImageType(ImageType, ColorFormat)} but defaults to {@link ColorFormat#RGB RGB}.
+	 * @param type type of image you wish th convert the into to
+	 */
+	protected void setImageType( ImageType type ) {
+		this.setImageType(type,ColorFormat.RGB);
 	}
 
 	/**
