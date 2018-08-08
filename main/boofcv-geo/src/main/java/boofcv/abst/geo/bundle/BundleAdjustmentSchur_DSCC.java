@@ -50,6 +50,8 @@ public class BundleAdjustmentSchur_DSCC
 
 	private double ftol,gtol;
 
+	private boolean verbose = false;
+
 	/**
 	 * Fit error before and after optimization
 	 */
@@ -88,7 +90,8 @@ public class BundleAdjustmentSchur_DSCC
 		this.minimizer.initialize(parameters,ftol,gtol);
 
 		errorBefore = minimizer.getFunctionValue();
-		System.out.println("Error Before: "+errorBefore);
+		if( verbose )
+			System.out.println("Error Before: "+errorBefore);
 
 		for( int i = 0; i < maxIterations && !stopRequested; i++ ) {
 			if( minimizer.iterate() )
@@ -97,7 +100,8 @@ public class BundleAdjustmentSchur_DSCC
 
 		errorAfter = minimizer.getFunctionValue();
 
-		System.out.println("Error Before: "+errorBefore+" After: "+errorAfter+" fraction="+(errorAfter/errorBefore));
+		if( verbose )
+			System.out.printf("Error Before: %9.2E After: %9.2E  ratio=%.5f\n",errorBefore,errorAfter,errorAfter/errorBefore);
 
 		codec.decode(minimizer.getParameters(), structure);
 		return errorAfter < errorBefore;
@@ -113,6 +117,7 @@ public class BundleAdjustmentSchur_DSCC
 
 	@Override
 	public void setVerbose( boolean verbose ) {
+		this.verbose = verbose;
 		this.minimizer.setVerbose(verbose);
 	}
 
