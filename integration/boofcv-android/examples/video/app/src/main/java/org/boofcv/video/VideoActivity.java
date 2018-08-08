@@ -135,9 +135,12 @@ public class VideoActivity extends VisualizeCamera2Activity
 		gradient.process((GrayU8)image,derivX,derivY);
 
 		// Render the gradient into a single bitmap for visualization.
-		synchronized (bitmapLock) {
+		// The lock has been commented out since it can cause performance issues
+		// by not locking weird visual effects like image sheering could be visible
+		// a better appraoch is to double buffer.
+//		synchronized (bitmapLock) {
 			VisualizeImageData.colorizeGradient(derivX,derivY,-1, bitmap, bitmapTmp);
-		}
+//		}
 	}
 
 	/**
