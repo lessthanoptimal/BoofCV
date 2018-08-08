@@ -23,12 +23,12 @@ import org.ddogleg.optimization.trustregion.ConfigTrustRegion;
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentShur_DSCC extends GenericBundleAdjustmentChecks {
+public class TestBundleAdjustmentSchur_DSCC extends GenericBundleAdjustmentChecks {
 
 	@Override
 	public BundleAdjustment createAlg() {
 		ConfigTrustRegion config = new ConfigTrustRegion();
-		BundleAdjustment ret = new BundleAdjustmentShur_DSCC(config);
+		BundleAdjustment ret = new BundleAdjustmentSchur_DSCC(config);
 		ret.configure(1e-5,1e-5,20);
 		return ret;
 	}

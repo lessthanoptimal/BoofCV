@@ -19,7 +19,7 @@
 package boofcv.abst.geo.bundle;
 
 import boofcv.alg.geo.bundle.BundleAdjustmentResidualFunction;
-import boofcv.alg.geo.bundle.BundleAdjustmentShurJacobian_DSCC;
+import boofcv.alg.geo.bundle.BundleAdjustmentSchurJacobian_DSCC;
 import boofcv.alg.geo.bundle.CodecBundleAdjustmentSceneStructure;
 import org.ddogleg.optimization.FactoryOptimizationSparse;
 import org.ddogleg.optimization.UnconstrainedLeastSquaresSchur;
@@ -34,14 +34,14 @@ import javax.annotation.Nullable;
  *
  * @author Peter Abeles
  */
-public class BundleAdjustmentShur_DSCC
+public class BundleAdjustmentSchur_DSCC
 		implements BundleAdjustment
 {
 	// minimization algorithm
 	private UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer;
 
 	private BundleAdjustmentResidualFunction function = new BundleAdjustmentResidualFunction();
-	private BundleAdjustmentShurJacobian_DSCC jacobian = new BundleAdjustmentShurJacobian_DSCC();
+	private BundleAdjustmentSchurJacobian_DSCC jacobian = new BundleAdjustmentSchurJacobian_DSCC();
 
 	private int maxIterations;
 	private double parameters[]=new double[0];
@@ -57,11 +57,11 @@ public class BundleAdjustmentShur_DSCC
 
 	private CodecBundleAdjustmentSceneStructure codec = new CodecBundleAdjustmentSceneStructure();
 
-	public BundleAdjustmentShur_DSCC( @Nullable ConfigTrustRegion config) {
+	public BundleAdjustmentSchur_DSCC(@Nullable ConfigTrustRegion config) {
 		this.minimizer = FactoryOptimizationSparse.doglegSchur(config);
 	}
 
-	public BundleAdjustmentShur_DSCC( @Nullable ConfigLevenbergMarquardt config) {
+	public BundleAdjustmentSchur_DSCC(@Nullable ConfigLevenbergMarquardt config) {
 		this.minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur(config);
 	}
 
@@ -97,7 +97,7 @@ public class BundleAdjustmentShur_DSCC
 
 		errorAfter = minimizer.getFunctionValue();
 
-		System.out.println("Error Before: "+errorBefore+" After: "+errorAfter);
+		System.out.println("Error Before: "+errorBefore+" After: "+errorAfter+" fraction="+(errorAfter/errorBefore));
 
 		codec.decode(minimizer.getParameters(), structure);
 		return errorAfter < errorBefore;
@@ -109,6 +109,11 @@ public class BundleAdjustmentShur_DSCC
 
 	public double getErrorAfter() {
 		return errorAfter;
+	}
+
+	@Override
+	public void setVerbose( boolean verbose ) {
+		this.minimizer.setVerbose(verbose);
 	}
 
 	@Override

@@ -21,7 +21,7 @@ package boofcv.examples.sfm;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
 import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
-import boofcv.abst.geo.bundle.BundleAdjustmentShur_DSCC;
+import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.structure.EstimateSceneUnordered;
 import boofcv.alg.sfm.structure.PruneStructureFromScene;
@@ -104,7 +104,7 @@ public class ExampleMultiviewSceneReconstruction {
 		configLM.scalingMinimum=1e-5;
 		configLM.scalingMaximum=1e5;
 
-		BundleAdjustmentShur_DSCC sba = new BundleAdjustmentShur_DSCC(configTR);
+		BundleAdjustmentSchur_DSCC sba = new BundleAdjustmentSchur_DSCC(configTR);
 //		BundleAdjustmentShur_DSCC sba = new BundleAdjustmentShur_DSCC(configLM);
 		sba.configure(1e-10,1e-10,100);
 		structure.setCamera(0,true,intrinsic);

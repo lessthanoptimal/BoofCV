@@ -49,4 +49,10 @@ public interface BundleAdjustment extends Stoppable {
 	 * will return false since it has not improved
 	 */
 	boolean optimize( BundleAdjustmentSceneStructure structure , BundleAdjustmentObservations observations );
+
+	/**
+	 * if set to true it will print debugging messages to standard out
+	 * @param verbose true to print debugging messages
+	 */
+	void setVerbose( boolean verbose );
 }

@@ -20,6 +20,7 @@ package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
 import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
+import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
 import boofcv.alg.geo.RodriguesRotationJacobian;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -33,12 +34,12 @@ import org.ejml.data.DMatrixSparseTriplet;
 import org.ejml.ops.ConvertDMatrixStruct;
 
 /**
- * Computes the Jacobian for {@link boofcv.abst.geo.bundle.BundleAdjustmentShur_DSCC} using sparse matrices
+ * Computes the Jacobian for {@link BundleAdjustmentSchur_DSCC} using sparse matrices
  * in EJML. Parameterization is done using the format in {@link CodecBundleAdjustmentSceneStructure}.
  *
  * @author Peter Abeles
  */
-public class BundleAdjustmentShurJacobian_DSCC implements SchurJacobian<DMatrixSparseCSC>
+public class BundleAdjustmentSchurJacobian_DSCC implements SchurJacobian<DMatrixSparseCSC>
 {
 	private BundleAdjustmentSceneStructure structure;
 	private BundleAdjustmentObservations observations;

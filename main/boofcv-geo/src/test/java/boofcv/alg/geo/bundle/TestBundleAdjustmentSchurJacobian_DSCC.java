@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentShurJacobian_DSCC {
+public class TestBundleAdjustmentSchurJacobian_DSCC {
 	Random rand = new Random(48854);
 
 	@Test
@@ -46,7 +46,7 @@ public class TestBundleAdjustmentShurJacobian_DSCC {
 		double param[] = new double[structure.getParameterCount()];
 		new CodecBundleAdjustmentSceneStructure().encode(structure,param);
 
-		BundleAdjustmentShurJacobian_DSCC alg = new BundleAdjustmentShurJacobian_DSCC();
+		BundleAdjustmentSchurJacobian_DSCC alg = new BundleAdjustmentSchurJacobian_DSCC();
 
 		FunctionNtoMxN<DMatrixSparseCSC> jac = new SchurJacobian_to_NtoMxN.DSCC(alg);
 		BundleAdjustmentResidualFunction func = new BundleAdjustmentResidualFunction();
