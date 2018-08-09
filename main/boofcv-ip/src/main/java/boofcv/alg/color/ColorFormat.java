@@ -24,6 +24,7 @@ package boofcv.alg.color;
  * @author Peter Abeles
  */
 public enum ColorFormat {
+	GRAY,
 	HSV,
 	LAB,
 	RGB,
