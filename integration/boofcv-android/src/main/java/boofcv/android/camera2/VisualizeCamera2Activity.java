@@ -90,11 +90,9 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	// Data used for converting from Image to a BoofCV image type
 	private final BoofImage boofImage = new BoofImage();
 
-	//---- START owned by bitmapLock
-	protected final Object bitmapLock = new Object();
+	// Storage for bitmap and workspace
 	protected Bitmap bitmap = Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888);
 	protected byte[] bitmapTmp =  new byte[1];
-	//---- END
 
 	protected LinkedBlockingQueue threadQueue = new LinkedBlockingQueue();
 	protected ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1,1,50, TimeUnit.MILLISECONDS,
@@ -111,7 +109,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	protected int targetResolution = 640*480;
 
 	// If true the bitmap will be shown. otherwise the original preview image will be
-	protected boolean showBitmap = true;
+	protected boolean autoConvertToBitmap = true;
 
 	// if true it will sketch the bitmap to fill the view
 	protected boolean stretchToFill = false;
@@ -226,12 +224,10 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	@Override
 	protected void onCameraResolutionChange(int cameraWidth, int cameraHeight, int sensorOrientation ) {
 		// predeclare bitmap image used for display
-		if( showBitmap ) {
-			synchronized (bitmapLock) {
-				if (bitmap.getWidth() != cameraWidth || bitmap.getHeight() != cameraHeight)
-					bitmap = Bitmap.createBitmap(cameraWidth, cameraHeight, Bitmap.Config.ARGB_8888);
-				bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
-			}
+		if(autoConvertToBitmap) {
+			if (bitmap.getWidth() != cameraWidth || bitmap.getHeight() != cameraHeight)
+				bitmap = Bitmap.createBitmap(cameraWidth, cameraHeight, Bitmap.Config.ARGB_8888);
+			bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
 		}
 		int rotation = getWindowManager().getDefaultDisplay().getRotation();
 		if( verbose )
@@ -374,12 +370,18 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 			timeOfLastUpdated = startTime;
 
 			// Copy this frame
-			if (showBitmap) {
-				synchronized (bitmapLock) {
-//					Log.i(TAG,"boofToBitmap image="+image.width+"x"+image.height+
-//							" bitmap="+bitmap.getWidth()+"x"+bitmap.getHeight());
-					ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
+			if (autoConvertToBitmap) {
+				// This used to be synchronized but that was causing performance issues
+				// if the camera is shutdown and restarted the image and the buffered image might
+				// not be the same size.
+				try {
+					if( image.getWidth() == bitmap.getWidth() && image.getHeight() == bitmap.getHeight()  )
+						ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
+				} catch( Exception e ) {
+					Log.e(TAG,"Exception converting boofToBitmap. "+e.getMessage());
+					e.printStackTrace();
 				}
+
 			}
 
 			// Update the visualization
@@ -411,10 +413,11 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 //		canvas.drawRect(r,paintFill);
 //		canvas.drawRect(r,paintBorder);
 
-		if( showBitmap ) {
-			synchronized (bitmapLock) {
-				canvas.drawBitmap(bitmap, imageToView, null);
-			}
+		if(autoConvertToBitmap) {
+			// Not locking here. it's possible the bitmap is being
+			// written to while this is running. Locking causes a large performance
+			// hit and small visual artifacts are better than a sluggish UI
+			canvas.drawBitmap(this.bitmap, imageToView, null);
 		}
 	}
 

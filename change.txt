@@ -6,6 +6,9 @@ Date Format: year/month/day
 Date    : 2018/
 Version : 0.31
 
+- VisualizeCamera2Activity
+ * Fixed example
+ * Removed lock from bitmap in VisualizeCamera2Activity for performance
 - ImageMiscOps
  * Added extractBand()
 - Updated gversion to fix problem when built from a directory other than project base

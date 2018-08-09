@@ -68,10 +68,9 @@ public class VideoActivity extends VisualizeCamera2Activity
 		targetResolution = 640*480;
 		// If this behavior is undesirable then override selectResolution() with your own logic
 
-		// Tell the visualization activity that we want to handle declaring and reindering of
-		// the visualization bitmap. The default behavior is a straight forward conversion of the
-		// input image into a bitmap format
-		super.showBitmap = false;
+		// If true it will convert the input image into a bitmap automatically
+		// and render the bitmap to screen. We need to do some custom stuff
+		super.autoConvertToBitmap = false;
 	}
 
 	@Override
@@ -114,14 +113,10 @@ public class VideoActivity extends VisualizeCamera2Activity
 		derivX.reshape(width, height);
 		derivY.reshape(width, height);
 
-		// If showBitmap was set to true then the video stream would be converted into a bitmap
-		// automatically for display purposes. However, we set it to false because a custom
-		// image is being rendered to visualize the gradient.
-		synchronized (bitmapLock) {
-			if (bitmap.getWidth() != width || bitmap.getHeight() != height)
-				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-			bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
-		}
+		// We need to do this ourself because autoConvertToBitmap was set to false
+		if (bitmap.getWidth() != width || bitmap.getHeight() != height)
+			bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+		bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
 	}
 
 	/**
@@ -134,13 +129,12 @@ public class VideoActivity extends VisualizeCamera2Activity
 		// gradient along the x-axis and the other along the y-axis
 		gradient.process((GrayU8)image,derivX,derivY);
 
-		// Render the gradient into a single bitmap for visualization.
-		// The lock has been commented out since it can cause performance issues
-		// by not locking weird visual effects like image sheering could be visible
-		// a better appraoch is to double buffer.
-//		synchronized (bitmapLock) {
-			VisualizeImageData.colorizeGradient(derivX,derivY,-1, bitmap, bitmapTmp);
-//		}
+		// Render the gradient. This is why we set autoConvertToBitmap to false
+		try {
+			// if the resolution is changed and there's a slim chance of an exception being thrown
+			// I've yet to encounter that...
+			VisualizeImageData.colorizeGradient(derivX, derivY, -1, bitmap, bitmapTmp);
+		} catch( RuntimeException ignore){}
 	}
 
 	/**
@@ -150,13 +144,8 @@ public class VideoActivity extends VisualizeCamera2Activity
 	@Override
 	protected void onDrawFrame(SurfaceView view , Canvas canvas ) {
 		super.onDrawFrame(view, canvas);
-
-		// The imageToView variable specifies the transform from a video frame pixel
-		// to a pixel in the view it's being displayed in. Sensor and camera rotations
-		// as well as scaling along x and y axises are all handled.
-		synchronized (bitmapLock) {
-			canvas.drawBitmap(bitmap, imageToView, null);
-		}
+		// draw our custom view
+		canvas.drawBitmap(bitmap, imageToView, null);
 	}
 
 }
