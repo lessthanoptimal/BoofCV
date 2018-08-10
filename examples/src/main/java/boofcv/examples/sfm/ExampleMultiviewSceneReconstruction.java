@@ -20,6 +20,7 @@ package boofcv.examples.sfm;
 
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
+import boofcv.abst.geo.bundle.BundleAdjustmentScaleScene;
 import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
 import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
 import boofcv.alg.distort.LensDistortionOps;
@@ -107,9 +108,15 @@ public class ExampleMultiviewSceneReconstruction {
 		BundleAdjustmentSchur_DSCC sba = new BundleAdjustmentSchur_DSCC(configTR);
 //		BundleAdjustmentShur_DSCC sba = new BundleAdjustmentShur_DSCC(configLM);
 		sba.configure(1e-10,1e-10,100);
+//		sba.setVerbose(true);
 		structure.setCamera(0,true,intrinsic);
 
+		// Scale to improve numerical accuracy
+		BundleAdjustmentScaleScene bundleScale = new BundleAdjustmentScaleScene();
+
+
 		PruneStructureFromScene pruner = new PruneStructureFromScene(structure,observations);
+
 		// Requiring 3 views per point reduces the number of outliers by a lot but also removes
 		// many valid points
 		pruner.prunePoints(3);
@@ -118,16 +125,20 @@ public class ExampleMultiviewSceneReconstruction {
 		int pruneCycles=5;
 		for (int i = 0; i < pruneCycles; i++) {
 			System.out.println("BA + Prune iteration = "+i+"  points="+structure.points.length+"  obs="+observations.getObservationCount());
+			bundleScale.computeScale(structure);
+			bundleScale.applyScale(structure,observations);
 			if( !sba.optimize(structure,observations) ) {
 				throw new RuntimeException("Bundle adjustment failed!");
 			}
+
+			bundleScale.undoScale(structure,observations);
 
 			if( i == pruneCycles-1 )
 				break;
 
 			System.out.println("Pruning....");
 			pruner.pruneObservationsByErrorRank(0.97);  // Prune outlier observations
-			pruner.prunePoints(3,0.4);           // Prune stray points in 3D space
+			pruner.prunePoints(3,0.4);            // Prune stray points in 3D space
 			pruner.prunePoints(2);                           // Prune invalid points
 			pruner.pruneViews(10);                           // Prune views with too few observations
 		}
@@ -196,10 +207,10 @@ public class ExampleMultiviewSceneReconstruction {
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 
-//		int N = 8;
-//		while( images.size() > N ) {
-//			images.remove(N);
-//		}
+		int N = 8;
+		while( images.size() > N ) {
+			images.remove(N);
+		}
 
 		ExampleMultiviewSceneReconstruction example = new ExampleMultiviewSceneReconstruction();
 

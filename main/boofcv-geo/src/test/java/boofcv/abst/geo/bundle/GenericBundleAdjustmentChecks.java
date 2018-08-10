@@ -19,6 +19,7 @@
 package boofcv.abst.geo.bundle;
 
 import boofcv.alg.geo.WorldToCameraToPixel;
+import boofcv.alg.geo.bundle.cameras.BundleAdjustmentPinhole;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -149,10 +150,12 @@ public abstract class GenericBundleAdjustmentChecks {
 		assertEquals(a.data0,b.data0,1e-6,0.1,1e-3);
 	}
 
-	public void checkReprojectionError( BundleAdjustmentSceneStructure structure , BundleAdjustmentObservations observations , double tol ) {
+	public static void checkReprojectionError( BundleAdjustmentSceneStructure structure , BundleAdjustmentObservations observations , double tol ) {
 
-		// HACK
-		CameraPinhole intrinsic = new CameraPinhole(400,400,0,300,300,600,600);
+		BundleAdjustmentPinhole c = (BundleAdjustmentPinhole)structure.cameras[0].model;
+
+		// making a bunch of assumptions here...
+		CameraPinhole intrinsic = new CameraPinhole(c.fx,c.fy,c.skew,c.cx,c.cy,600,600);
 
 		WorldToCameraToPixel wcp = new WorldToCameraToPixel();
 
@@ -174,7 +177,7 @@ public abstract class GenericBundleAdjustmentChecks {
 		}
 	}
 
-	public void assertEquals( BundleAdjustmentSceneStructure a , BundleAdjustmentSceneStructure b ,
+	public static void assertEquals( BundleAdjustmentSceneStructure a , BundleAdjustmentSceneStructure b ,
 							  double tolCamera , double tolDistance , double tolRotation  ) {
 		for (int i = 0; i < a.points.length; i++) {
 			double error = a.points[i].distance(b.points[i]);
