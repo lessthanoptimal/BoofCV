@@ -91,6 +91,7 @@ public class BundleAdjustmentScaleScene {
 
 		System.out.println("Median P ="+ medianPoint);
 		System.out.println("Median R ="+ medianDistancePoint);
+		System.out.println("Scale    ="+ (desiredDistancePoint / medianDistancePoint));
 
 	}
 

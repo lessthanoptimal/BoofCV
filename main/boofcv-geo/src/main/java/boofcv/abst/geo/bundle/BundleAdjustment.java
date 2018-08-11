@@ -51,6 +51,12 @@ public interface BundleAdjustment extends Stoppable {
 	boolean optimize( BundleAdjustmentSceneStructure structure , BundleAdjustmentObservations observations );
 
 	/**
+	 * Returns the fit score. Meaning is implementation specific.
+	 * @return score
+	 */
+	double getFitScore();
+
+	/**
 	 * if set to true it will print debugging messages to standard out
 	 * @param verbose true to print debugging messages
 	 */

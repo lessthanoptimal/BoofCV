@@ -90,8 +90,6 @@ public class BundleAdjustmentSchur_DSCC
 		this.minimizer.initialize(parameters,ftol,gtol);
 
 		errorBefore = minimizer.getFunctionValue();
-		if( verbose )
-			System.out.println("Error Before: "+errorBefore);
 
 		for( int i = 0; i < maxIterations && !stopRequested; i++ ) {
 			if( minimizer.iterate() )
@@ -105,6 +103,11 @@ public class BundleAdjustmentSchur_DSCC
 
 		codec.decode(minimizer.getParameters(), structure);
 		return errorAfter < errorBefore;
+	}
+
+	@Override
+	public double getFitScore() {
+		return minimizer.getFunctionValue();
 	}
 
 	public double getErrorBefore() {
