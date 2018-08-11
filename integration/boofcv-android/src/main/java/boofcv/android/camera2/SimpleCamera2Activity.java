@@ -295,13 +295,17 @@ public abstract class SimpleCamera2Activity extends Activity {
 	 * Override to do custom configuration of the camera's settings. By default the camera
 	 * is put into auto mode.
 	 *
+	 * @param device The camera being configured
+	 * @param characteristics Used to get information on the device
 	 * @param captureRequestBuilder used to configure the camera
 	 */
-	protected void configureCamera( CaptureRequest.Builder captureRequestBuilder ) {
+	protected void configureCamera( CameraDevice device ,
+									CameraCharacteristics characteristics,
+									CaptureRequest.Builder captureRequestBuilder ) {
 		if( verbose )
 			Log.i(TAG,"configureCamera() default function");
-		captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO);
-		captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
+		captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO);
+		captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
 	}
 
 	/**
@@ -614,7 +618,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			surfaces.add(readerSurface);
 			open.mPreviewRequestBuilder.addTarget(readerSurface);
 
-			configureCamera(open.mPreviewRequestBuilder);
+			configureCamera(open.mCameraDevice,open.mCameraCharacterstics,open.mPreviewRequestBuilder);
 
 			open.mCameraDevice.createCaptureSession(surfaces,
 					new CameraCaptureSession.StateCallback() {
