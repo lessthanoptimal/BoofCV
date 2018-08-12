@@ -45,6 +45,8 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 
 	public boolean print=false;
 
+	protected double test_X[][] = new double[][]{{0.2,0.6,2},{-0.2,0.6,2},{0.2,-0.6,2},{0.2,-0.6,-2}};
+
 	protected GenericChecksBundleAdjustmentCamera(BundleAdjustmentCamera model) {
 		this.model = model;
 	}
@@ -71,20 +73,19 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 	public void jacobians() {
 
 		// pick a point which would be in front of the camera
-		double X[] = new double[]{0.2,0.6,2};
+		for( double X[] : test_X ) {
+			for (double p[] : parameters) {
+				if (print) {
+					System.out.println("param[] " + Arrays.toString(p));
+					System.out.println("Point");
+					DerivativeChecker.jacobianPrintR(new FunctionOfPoint(p), new JacobianOfPoint(p), X, tol);
+					System.out.println("Param");
+					DerivativeChecker.jacobianPrintR(new FunctionOfParameters(X), new JacobianOfParameters(X), p, tol);
+				}
 
-		for (double p[] : parameters)
-		{
-			if( print ) {
-				System.out.println("param[] "+ Arrays.toString(p));
-				System.out.println("Point");
-				DerivativeChecker.jacobianPrintR(new FunctionOfPoint(p), new JacobianOfPoint(p), X, tol);
-				System.out.println("Param");
-				DerivativeChecker.jacobianPrintR(new FunctionOfParameters(X), new JacobianOfParameters(X), p, tol);
+				assertTrue(DerivativeChecker.jacobianR(new FunctionOfPoint(p), new JacobianOfPoint(p), X, tol));
+				assertTrue(DerivativeChecker.jacobianR(new FunctionOfParameters(X), new JacobianOfParameters(X), p, tol));
 			}
-
-			assertTrue(DerivativeChecker.jacobianR(new FunctionOfPoint(p),new JacobianOfPoint(p),X, tol));
-			assertTrue(DerivativeChecker.jacobianR(new FunctionOfParameters(X),new JacobianOfParameters(X),p, tol));
 		}
 	}
 
@@ -93,23 +94,22 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 	 */
 	@Test
 	public void compare_input_jacobians() {
-		double X[] = new double[]{0.2,0.6,2};
+		for( double X[] : test_X ) {
+			double found0[] = new double[3];
+			double found1[] = new double[3];
+			double found2[] = new double[3];
+			double found3[] = new double[3];
 
-		double found0[] = new double[3];
-		double found1[] = new double[3];
-		double found2[] = new double[3];
-		double found3[] = new double[3];
+			int N = model.getIntrinsicCount();
+			for (double p[] : parameters) {
+				model.setIntrinsic(p, 0);
+				model.jacobian(X[0], X[1], X[2], found0, found1, true, new double[N], new double[N]);
+				model.jacobian(X[0], X[1], X[2], found2, found3, false, null, null);
 
-		int N = model.getIntrinsicCount();
-		for (double p[] : parameters)
-		{
-			model.setIntrinsic(p,0);
-			model.jacobian(X[0],X[1],X[2],found0,found1,true,new double[N], new double[N]);
-			model.jacobian(X[0],X[1],X[2],found2,found3,false,null,null);
-
-			for (int i = 0; i < 3; i++) {
-				assertEquals(found0[i],found2[i], UtilEjml.TEST_F64);
-				assertEquals(found1[i],found3[i], UtilEjml.TEST_F64);
+				for (int i = 0; i < 3; i++) {
+					assertEquals(found0[i], found2[i], UtilEjml.TEST_F64);
+					assertEquals(found1[i], found3[i], UtilEjml.TEST_F64);
+				}
 			}
 		}
 	}

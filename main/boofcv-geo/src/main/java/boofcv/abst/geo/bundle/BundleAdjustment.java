@@ -20,6 +20,9 @@ package boofcv.abst.geo.bundle;
 
 import org.ddogleg.struct.Stoppable;
 
+import javax.annotation.Nullable;
+import java.io.PrintStream;
+
 /**
  * High level interface for bundle adjustment. Bundle adjustment is the process of optimizing in batch parameters
  * for the scene's structure, camera pose, and intrinsic camera parameters.
@@ -65,8 +68,10 @@ public interface BundleAdjustment extends Stoppable {
 	double getFitScore();
 
 	/**
-	 * if set to true it will print debugging messages to standard out
-	 * @param verbose true to print debugging messages
+	 * If set to a non-null output then extra information will be printed to the specified stream.
+	 *
+	 * @param out Stream that is printed to. Set to null to disable
+	 * @param level (Future use) Parameter which can be used to specify level of verbose output. Set to zero for now.
 	 */
-	void setVerbose( boolean verbose );
+	void setVerbose(@Nullable PrintStream out , int level );
 }

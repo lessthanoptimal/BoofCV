@@ -28,6 +28,7 @@ import org.ddogleg.optimization.trustregion.ConfigTrustRegion;
 import org.ejml.data.DMatrixSparseCSC;
 
 import javax.annotation.Nullable;
+import java.io.PrintStream;
 
 /**
  * Implementation of bundle adjustment using Shur Complement and generic sparse matrices.
@@ -50,7 +51,7 @@ public class BundleAdjustmentSchur_DSCC
 
 	private double ftol,gtol;
 
-	private boolean verbose = false;
+	private PrintStream verbose;
 
 	/**
 	 * Fit error before and after optimization
@@ -102,8 +103,8 @@ public class BundleAdjustmentSchur_DSCC
 
 		errorAfter = minimizer.getFunctionValue();
 
-		if( verbose )
-			System.out.printf("Error Before: %9.2E After: %9.2E  ratio=%.5f\n",errorBefore,errorAfter,errorAfter/errorBefore);
+		if( verbose != null )
+			verbose.printf("Error Before: %9.2E After: %9.2E  ratio=%.5f\n",errorBefore,errorAfter,errorAfter/errorBefore);
 
 		codec.decode(minimizer.getParameters(), output);
 		return errorAfter < errorBefore;
@@ -123,9 +124,9 @@ public class BundleAdjustmentSchur_DSCC
 	}
 
 	@Override
-	public void setVerbose( boolean verbose ) {
-		this.verbose = verbose;
-		this.minimizer.setVerbose(verbose);
+	public void setVerbose(@Nullable PrintStream out, int level) {
+		this.verbose = out;
+		this.minimizer.setVerbose(out,level);
 	}
 
 	@Override
