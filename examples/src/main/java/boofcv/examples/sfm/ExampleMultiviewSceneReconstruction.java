@@ -97,13 +97,11 @@ public class ExampleMultiviewSceneReconstruction {
 		// Configure bundle adjustment
 		ConfigTrustRegion configTR = new ConfigTrustRegion();
 		configTR.regionInitial = 1;
-		configTR.scalingMinimum=1e-5;
-		configTR.scalingMaximum=1e5;
+		configTR.hessianScaling = true;
 
 		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
 		configLM.dampeningInitial = 1e-12;
-		configLM.scalingMinimum=1e-5;
-		configLM.scalingMaximum=1e5;
+		configLM.hessianScaling = true;
 
 		BundleAdjustmentSchur_DSCC sba = new BundleAdjustmentSchur_DSCC(configTR);
 //		BundleAdjustmentShur_DSCC sba = new BundleAdjustmentShur_DSCC(configLM);
