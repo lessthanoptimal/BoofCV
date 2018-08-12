@@ -75,9 +75,7 @@ public class BundleAdjustmentSchur_DSCC
 	}
 
 	@Override
-	public boolean optimize(BundleAdjustmentSceneStructure structure, BundleAdjustmentObservations observations) {
-		stopRequested = false;
-
+	public void setParameters(BundleAdjustmentSceneStructure structure, BundleAdjustmentObservations observations) {
 		this.function.configure(structure, observations);
 		this.jacobian.configure(structure, observations);
 		this.minimizer.setFunction(function,jacobian);
@@ -88,6 +86,12 @@ public class BundleAdjustmentSchur_DSCC
 		}
 		codec.encode(structure,parameters);
 		this.minimizer.initialize(parameters,ftol,gtol);
+
+	}
+
+	@Override
+	public boolean optimize( BundleAdjustmentSceneStructure output) {
+		stopRequested = false;
 
 		errorBefore = minimizer.getFunctionValue();
 
@@ -101,7 +105,7 @@ public class BundleAdjustmentSchur_DSCC
 		if( verbose )
 			System.out.printf("Error Before: %9.2E After: %9.2E  ratio=%.5f\n",errorBefore,errorAfter,errorAfter/errorBefore);
 
-		codec.decode(minimizer.getParameters(), structure);
+		codec.decode(minimizer.getParameters(), output);
 		return errorAfter < errorBefore;
 	}
 

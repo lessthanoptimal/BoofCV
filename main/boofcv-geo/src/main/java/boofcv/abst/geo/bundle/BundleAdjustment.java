@@ -40,15 +40,23 @@ public interface BundleAdjustment extends Stoppable {
 	void configure( double ftol , double gtol , int maxIterations );
 
 	/**
-	 * Optimises the parameters contained in 'structure' to minimize the error in the 'observations'. This function
-	 * call will block until complete. Output is written back into 'structure'
+	 * Specifies the optimization parameters. After this the initial fit score will return
+	 *  a valid value.
 	 *
 	 * @param structure Input: Initial parameters. Output: Optimized parameters
 	 * @param observations Observation of features in each image.
-	 * @return true If the cost function has been improved. If the data is perfect to start with this
-	 * will return false since it has not improved
 	 */
-	boolean optimize( BundleAdjustmentSceneStructure structure , BundleAdjustmentObservations observations );
+	void setParameters(BundleAdjustmentSceneStructure structure, BundleAdjustmentObservations observations);
+
+		/**
+		 * Optimises the parameters contained in 'structure' to minimize the error in the 'observations'. This function
+		 * call will block until complete. Output is written back into 'structure'
+		 *
+		 * @param output Storage for optimized parameters. Can be the same structure passed into {@link #setParameters}.
+		 * @return true If the cost function has been improved. If the data is perfect to start with this
+		 * will return false since it has not improved
+		 */
+	boolean optimize( BundleAdjustmentSceneStructure output );
 
 	/**
 	 * Returns the fit score. Meaning is implementation specific.

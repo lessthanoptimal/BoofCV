@@ -127,7 +127,8 @@ public class ExampleMultiviewSceneReconstruction {
 			System.out.println("BA + Prune iteration = "+i+"  points="+structure.points.length+"  obs="+observations.getObservationCount());
 			bundleScale.computeScale(structure);
 			bundleScale.applyScale(structure,observations);
-			if( !sba.optimize(structure,observations) ) {
+			sba.setParameters(structure,observations);
+			if( !sba.optimize(structure) ) {
 				throw new RuntimeException("Bundle adjustment failed!");
 			}
 

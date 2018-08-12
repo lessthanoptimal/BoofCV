@@ -48,7 +48,8 @@ public abstract class GenericBundleAdjustmentChecks {
 
 		Tuple2<BundleAdjustmentSceneStructure,BundleAdjustmentObservations> a = createHorizontalMotion( 123,true);
 
-		alg.optimize(a.data0,a.data1); // don't assertTrue() since it can fail
+		alg.setParameters(a.data0,a.data1);
+		alg.optimize(a.data0); // don't assertTrue() since it can fail
 
 		Tuple2<BundleAdjustmentSceneStructure,BundleAdjustmentObservations> b = createHorizontalMotion( 123,true);
 		assertEquals(a.data0,b.data0,1e-6,1e-6,1e-6);
@@ -64,8 +65,10 @@ public abstract class GenericBundleAdjustmentChecks {
 		Tuple2<BundleAdjustmentSceneStructure,BundleAdjustmentObservations> a = createHorizontalMotion( 123,true);
 		Tuple2<BundleAdjustmentSceneStructure,BundleAdjustmentObservations> c = createHorizontalMotion( 234,true);
 		addNoiseToPoint3D(c);
-		alg.optimize(c.data0,c.data1);
-		alg.optimize(a.data0,a.data1);
+		alg.setParameters(a.data0,a.data1);
+		alg.optimize(c.data0);
+		alg.setParameters(a.data0,a.data1);
+		alg.optimize(a.data0);
 
 		Tuple2<BundleAdjustmentSceneStructure,BundleAdjustmentObservations> b = createHorizontalMotion( 123,true);
 		assertEquals(a.data0,b.data0,1e-6,1e-6,1e-6);
@@ -87,7 +90,8 @@ public abstract class GenericBundleAdjustmentChecks {
 			}
 		}
 
-		assertTrue(alg.optimize(a.data0,a.data1));
+		alg.setParameters(a.data0,a.data1);
+		assertTrue(alg.optimize(a.data0));
 
 		Tuple2<BundleAdjustmentSceneStructure,BundleAdjustmentObservations> b = createHorizontalMotion( 123,true);
 		assertEquals(a.data0,b.data0,1e-6,0.01,0.01);
@@ -102,7 +106,8 @@ public abstract class GenericBundleAdjustmentChecks {
 		// Add noise to every 3D point
 		addNoiseToPoint3D(a);
 
-		assertTrue(alg.optimize(a.data0,a.data1));
+		alg.setParameters(a.data0,a.data1);
+		assertTrue(alg.optimize(a.data0));
 
 		// Since reprojection errors are perfect it should do a very good job reducing the residuals
 		checkReprojectionError(a.data0,a.data1,1e-4);
@@ -139,7 +144,8 @@ public abstract class GenericBundleAdjustmentChecks {
 			v.worldToView.T.z += rand.nextGaussian()*0.1;
 		}
 
-		assertTrue(alg.optimize(a.data0,a.data1));
+		alg.setParameters(a.data0,a.data1);
+		assertTrue(alg.optimize(a.data0));
 
 		// Since reprojection errors are perfect it should do a very good job reducing the residuals
 		checkReprojectionError(a.data0,a.data1,1e-4);
