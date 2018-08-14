@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,13 +43,19 @@ public class TestRodriguesRotationGradient {
 		RodToMatrix f = new RodToMatrix();
 		RodToGradient g = new RodToGradient();
 		
-		for( int i = 0; i < 20; i++ ) {
+		for( int i = 0; i < 100; i++ ) {
 			double param[] = new double[3];
-			param[0] = (rand.nextDouble()-0.5);
-			param[1] = (rand.nextDouble()-0.5);
-			param[2] = (rand.nextDouble()-0.5);
+			param[0] = 5*(rand.nextDouble()-0.5);
+			param[1] = 5*(rand.nextDouble()-0.5);
+			param[2] = 5*(rand.nextDouble()-0.5);
 
-			assertTrue(DerivativeChecker.jacobian(f, g, param, 1e-6));
+//			for (int j = 0; j < 3; j++) {
+//				System.out.print(param[j]+" ");
+//			}
+//			System.out.println();
+
+//			DerivativeChecker.jacobianPrintR(f, g, param, 1e-4);
+			assertTrue(DerivativeChecker.jacobianR(f, g, param, 1e-4));
 		}
 	}
 

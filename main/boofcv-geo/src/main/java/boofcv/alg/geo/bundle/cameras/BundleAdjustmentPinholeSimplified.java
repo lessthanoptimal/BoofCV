@@ -99,8 +99,8 @@ public class BundleAdjustmentPinholeSimplified implements BundleAdjustmentCamera
 		inputY[1] = (f/Z)*(r + 2*normY*normY*kk);
 
 		// partial Z
-		inputX[2] = -f*r*normX/Z + f*normX*r_Z;
-		inputY[2] = -f*r*normY/Z + f*normY*r_Z;
+		inputX[2] = f*normX*(r_Z - r/Z);
+		inputY[2] = f*normY*(r_Z - r/Z);
 
 		if(!computeIntrinsic)
 			return;
@@ -116,7 +116,6 @@ public class BundleAdjustmentPinholeSimplified implements BundleAdjustmentCamera
 		// partial k2
 		calibX[2] = f*normX*n2*n2;
 		calibY[2] = f*normY*n2*n2;
-
 	}
 
 	@Override
