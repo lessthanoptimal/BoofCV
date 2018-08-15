@@ -19,7 +19,7 @@
 package boofcv.abst.geo.bundle;
 
 import boofcv.alg.geo.WorldToCameraToPixel;
-import boofcv.alg.geo.bundle.cameras.BundleAdjustmentPinhole;
+import boofcv.alg.geo.bundle.cameras.BundlePinhole;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -158,7 +158,7 @@ public abstract class GenericBundleAdjustmentChecks {
 
 	public static void checkReprojectionError( BundleAdjustmentSceneStructure structure , BundleAdjustmentObservations observations , double tol ) {
 
-		BundleAdjustmentPinhole c = (BundleAdjustmentPinhole)structure.cameras[0].model;
+		BundlePinhole c = (BundlePinhole)structure.cameras[0].model;
 
 		// making a bunch of assumptions here...
 		CameraPinhole intrinsic = new CameraPinhole(c.fx,c.fy,c.skew,c.cx,c.cy,600,600);

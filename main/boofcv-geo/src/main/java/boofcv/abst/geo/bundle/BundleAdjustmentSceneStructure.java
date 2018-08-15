@@ -18,8 +18,8 @@
 
 package boofcv.abst.geo.bundle;
 
-import boofcv.alg.geo.bundle.cameras.BundleAdjustmentPinhole;
-import boofcv.alg.geo.bundle.cameras.BundleAdjustmentPinholeRadial;
+import boofcv.alg.geo.bundle.cameras.BundlePinhole;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeRadial;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.struct.point.Point3D_F64;
@@ -94,11 +94,11 @@ public class BundleAdjustmentSceneStructure {
 	}
 
 	public void setCamera( int which , boolean fixed , CameraPinhole intrinsic ) {
-		setCamera(which,fixed,new BundleAdjustmentPinhole(intrinsic));
+		setCamera(which,fixed,new BundlePinhole(intrinsic));
 	}
 
 	public void setCamera( int which , boolean fixed , CameraPinholeRadial intrinsic ) {
-		setCamera(which,fixed,new BundleAdjustmentPinholeRadial(intrinsic));
+		setCamera(which,fixed,new BundlePinholeRadial(intrinsic));
 	}
 
 	/**

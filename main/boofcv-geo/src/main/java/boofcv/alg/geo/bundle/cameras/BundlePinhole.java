@@ -27,20 +27,20 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class BundleAdjustmentPinhole implements BundleAdjustmentCamera {
+public class BundlePinhole implements BundleAdjustmentCamera {
 
 	// parameters for the camera model
 	public boolean zeroSkew=true;
 	public double fx,fy,skew,cx,cy;
 
-	public BundleAdjustmentPinhole(boolean zeroSkew) {
+	public BundlePinhole(boolean zeroSkew) {
 		this.zeroSkew = zeroSkew;
 	}
 
-	public BundleAdjustmentPinhole() {
+	public BundlePinhole() {
 	}
 
-	public BundleAdjustmentPinhole(CameraPinhole intrinsic ) {
+	public BundlePinhole(CameraPinhole intrinsic ) {
 		zeroSkew = intrinsic.skew == 0;
 		fx = intrinsic.fx;
 		fy = intrinsic.fy;

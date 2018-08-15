@@ -23,20 +23,22 @@ import org.junit.Test;
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentPinholeRadial {
+public class TestBundlePinhole
+{
 	@Test
 	public void withSkew() {
-		double[][]parameters = new double[][]{{300,200,400,400,0.01,0.02,-0.001,0.002,0.1},{400,600,1000,1000,0.01,0.02,-0.001,0.002,2}};
-		new GenericChecksBundleAdjustmentCamera(new BundleAdjustmentPinholeRadial(false),0.02){}
+		double[][]parameters = new double[][]{{300,200,400,400,0.1},{400,600,1000,1000,2}};
+		new GenericChecksBundleAdjustmentCamera(new BundlePinhole(false)){}
 				.setParameters(parameters)
 				.checkAll();
 	}
 
 	@Test
 	public void withoutSkew() {
-		double[][]parameters = new double[][]{{300,200,400,400,0.01,0.02,-0.001,0.002},{400,600,1000,1000,0.01,0.02,-0.001,0.002}};
-		new GenericChecksBundleAdjustmentCamera(new BundleAdjustmentPinholeRadial(true),0.02){}
+		double[][]parameters = new double[][]{{300,200,400,400},{400,600,1000,1000}};
+		new GenericChecksBundleAdjustmentCamera(new BundlePinhole(true)){}
 				.setParameters(parameters)
 				.checkAll();
 	}
+
 }

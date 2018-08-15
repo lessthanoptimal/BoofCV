@@ -41,7 +41,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
-import org.ddogleg.optimization.trustregion.ConfigTrustRegion;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.swing.*;
@@ -95,23 +94,17 @@ public class ExampleMultiviewSceneReconstruction {
 		BundleAdjustmentObservations observations = estimateScene.getObservations();
 
 		// Configure bundle adjustment
-		ConfigTrustRegion configTR = new ConfigTrustRegion();
-		configTR.regionInitial = 1;
-		configTR.hessianScaling = true;
-
 		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
 		configLM.dampeningInitial = 1e-12;
 		configLM.hessianScaling = true;
 
-		BundleAdjustmentSchur_DSCC sba = new BundleAdjustmentSchur_DSCC(configTR);
-//		BundleAdjustmentShur_DSCC sba = new BundleAdjustmentShur_DSCC(configLM);
+		BundleAdjustmentSchur_DSCC sba = new BundleAdjustmentSchur_DSCC(configLM);
 		sba.configure(1e-10,1e-10,100);
-//		sba.setVerbose(true);
+		sba.setVerbose(System.out,0);
 		structure.setCamera(0,true,intrinsic);
 
 		// Scale to improve numerical accuracy
 		BundleAdjustmentScaleScene bundleScale = new BundleAdjustmentScaleScene();
-
 
 		PruneStructureFromScene pruner = new PruneStructureFromScene(structure,observations);
 
@@ -142,7 +135,7 @@ public class ExampleMultiviewSceneReconstruction {
 			pruner.pruneViews(10);                           // Prune views with too few observations
 		}
 
-		visualizeResults(structure,intrinsic,colorImages);
+		visualizeResults(structure,colorImages);
 		System.out.println("Done!");
 	}
 
@@ -150,7 +143,7 @@ public class ExampleMultiviewSceneReconstruction {
 	 * Opens a window showing the found point cloud. Points are colorized using the pixel value inside
 	 * one of the input images
 	 */
-	private void visualizeResults( BundleAdjustmentSceneStructure structure, CameraPinholeRadial intrinsic ,
+	private void visualizeResults( BundleAdjustmentSceneStructure structure,
 								   List<BufferedImage> colorImages ) {
 
 		List<Point3D_F64> cloudXyz = new ArrayList<>();

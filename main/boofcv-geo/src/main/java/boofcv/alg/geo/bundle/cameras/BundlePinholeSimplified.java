@@ -38,7 +38,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class BundleAdjustmentPinholeSimplified implements BundleAdjustmentCamera {
+public class BundlePinholeSimplified implements BundleAdjustmentCamera {
 	// focal length
 	public double f;
 	// radial distortion parameters

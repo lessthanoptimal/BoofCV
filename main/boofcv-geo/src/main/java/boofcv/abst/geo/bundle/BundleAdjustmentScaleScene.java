@@ -89,10 +89,9 @@ public class BundleAdjustmentScaleScene {
 		}
 		medianDistancePoint = Math.sqrt(QuickSelect.select(v,length/2,length));
 
-		System.out.println("Median P ="+ medianPoint);
-		System.out.println("Median R ="+ medianDistancePoint);
-		System.out.println("Scale    ="+ (desiredDistancePoint / medianDistancePoint));
-
+//		System.out.println("Median P ="+ medianPoint);
+//		System.out.println("Median R ="+ medianDistancePoint);
+//		System.out.println("Scale    ="+ (desiredDistancePoint / medianDistancePoint));
 	}
 
 	public void applyScale( BundleAdjustmentSceneStructure structure ,

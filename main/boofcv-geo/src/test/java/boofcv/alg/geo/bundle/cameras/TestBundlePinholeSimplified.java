@@ -21,10 +21,10 @@ package boofcv.alg.geo.bundle.cameras;
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentPinholeSimplified extends GenericChecksBundleAdjustmentCamera
+public class TestBundlePinholeSimplified extends GenericChecksBundleAdjustmentCamera
 {
-	public TestBundleAdjustmentPinholeSimplified() {
-		super(new BundleAdjustmentPinholeSimplified());
+	public TestBundlePinholeSimplified() {
+		super(new BundlePinholeSimplified());
 		setParameters(new double[][]{{300,0,0},{300,1e-1,1e-2}});
 	}
 }

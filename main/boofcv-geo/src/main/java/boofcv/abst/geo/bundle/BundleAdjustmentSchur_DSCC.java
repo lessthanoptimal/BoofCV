@@ -53,11 +53,6 @@ public class BundleAdjustmentSchur_DSCC
 
 	private PrintStream verbose;
 
-	/**
-	 * Fit error before and after optimization
-	 */
-	private double errorBefore,errorAfter;
-
 	private CodecBundleAdjustmentSceneStructure codec = new CodecBundleAdjustmentSceneStructure();
 
 	public BundleAdjustmentSchur_DSCC(@Nullable ConfigTrustRegion config) {
@@ -94,33 +89,19 @@ public class BundleAdjustmentSchur_DSCC
 	public boolean optimize( BundleAdjustmentSceneStructure output) {
 		stopRequested = false;
 
-		errorBefore = minimizer.getFunctionValue();
-
+		double before = minimizer.getFunctionValue();
 		for( int i = 0; i < maxIterations && !stopRequested; i++ ) {
 			if( minimizer.iterate() )
 				break;
 		}
 
-		errorAfter = minimizer.getFunctionValue();
-
-		if( verbose != null )
-			verbose.printf("Error Before: %9.2E After: %9.2E  ratio=%.5f\n",errorBefore,errorAfter,errorAfter/errorBefore);
-
 		codec.decode(minimizer.getParameters(), output);
-		return errorAfter < errorBefore;
+		return minimizer.getFunctionValue() < before;
 	}
 
 	@Override
 	public double getFitScore() {
 		return minimizer.getFunctionValue();
-	}
-
-	public double getErrorBefore() {
-		return errorBefore;
-	}
-
-	public double getErrorAfter() {
-		return errorAfter;
 	}
 
 	@Override
