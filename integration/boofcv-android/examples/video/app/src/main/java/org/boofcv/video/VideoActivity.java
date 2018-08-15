@@ -21,6 +21,8 @@ package org.boofcv.video;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.os.Bundle;
 import android.view.SurfaceView;
@@ -66,11 +68,6 @@ public class VideoActivity extends VisualizeCamera2Activity
 		// find the resolution which comes the closest to having this many
 		// pixels.
 		targetResolution = 640*480;
-		// If this behavior is undesirable then override selectResolution() with your own logic
-
-		// If true it will convert the input image into a bitmap automatically
-		// and render the bitmap to screen. We need to do some custom stuff
-		super.autoConvertToBitmap = false;
 	}
 
 	@Override
@@ -96,9 +93,9 @@ public class VideoActivity extends VisualizeCamera2Activity
 	 * @param captureRequestBuilder Used to configure the camera.
 	 */
 	@Override
-	protected void configureCamera( CaptureRequest.Builder captureRequestBuilder ) {
-		captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO);
-		captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
+	protected void configureCamera(CameraDevice device, CameraCharacteristics characteristics, CaptureRequest.Builder captureRequestBuilder) {
+		captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO);
+		captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
 	}
 
 	/**
@@ -112,11 +109,6 @@ public class VideoActivity extends VisualizeCamera2Activity
 
 		derivX.reshape(width, height);
 		derivY.reshape(width, height);
-
-		// We need to do this ourself because autoConvertToBitmap was set to false
-		if (bitmap.getWidth() != width || bitmap.getHeight() != height)
-			bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-		bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
 	}
 
 	/**
@@ -128,24 +120,31 @@ public class VideoActivity extends VisualizeCamera2Activity
 		// The line below will compute the gradient and store it in two images. One for the
 		// gradient along the x-axis and the other along the y-axis
 		gradient.process((GrayU8)image,derivX,derivY);
-
-		// Render the gradient. This is why we set autoConvertToBitmap to false
-		try {
-			// if the resolution is changed and there's a slim chance of an exception being thrown
-			// I've yet to encounter that...
-			VisualizeImageData.colorizeGradient(derivX, derivY, -1, bitmap, bitmapTmp);
-		} catch( RuntimeException ignore){}
 	}
 
 	/**
-	 * Invoked in the UI thread and must run very fast for a good user experience. DO NOT BLOCK
-	 * HERE.
+	 * Override the default behavior and colorize gradient instead of converting input image.
 	 */
 	@Override
-	protected void onDrawFrame(SurfaceView view , Canvas canvas ) {
-		super.onDrawFrame(view, canvas);
-		// draw our custom view
-		canvas.drawBitmap(bitmap, imageToView, null);
-	}
+	protected void renderBitmapImage(BitmapMode mode, ImageBase image) {
+		switch( mode ) {
+			case UNSAFE: { // this application is configured to use double buffer and could ignore all other modes
+				VisualizeImageData.colorizeGradient(derivX, derivY, -1, bitmap, bitmapTmp);
+			} break;
 
+			case DOUBLE_BUFFER: {
+				VisualizeImageData.colorizeGradient(derivX, derivY, -1, bitmapWork, bitmapTmp);
+
+				if( bitmapLock.tryLock() ) {
+					try {
+						Bitmap tmp = bitmapWork;
+						bitmapWork = bitmap;
+						bitmap = tmp;
+					} finally {
+						bitmapLock.unlock();
+					}
+				}
+			} break;
+		}
+	}
 }

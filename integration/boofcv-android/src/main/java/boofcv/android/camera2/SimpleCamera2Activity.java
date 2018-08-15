@@ -304,7 +304,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 									CaptureRequest.Builder captureRequestBuilder ) {
 		if( verbose )
 			Log.i(TAG,"configureCamera() default function");
-		captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO);
+		captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO);
 		captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
 	}
 

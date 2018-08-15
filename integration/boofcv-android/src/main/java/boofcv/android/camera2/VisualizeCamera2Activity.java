@@ -42,6 +42,7 @@ import java.util.Stack;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Extension of {@link SimpleCamera2Activity} which adds visualization and hooks for image
@@ -76,6 +77,7 @@ import java.util.concurrent.TimeUnit;
  *     <li>showBitmap</li>
  *     <li>stretchToFill</li>
  *     <li>visualizeOnlyMostRecent</li>
+ *     <li>renderBitmapImage</li>
  * </ul>
  *
  * @see SimpleCamera2Activity
@@ -90,13 +92,18 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	// Data used for converting from Image to a BoofCV image type
 	private final BoofImage boofImage = new BoofImage();
 
-	// Storage for bitmap and workspace
+	// Storage for bitmap and workspace. The bitmap is used to render images to the display. There are different modes
+	// that can be used for handling threading. See BitmapMode for a description
+	protected final ReentrantLock bitmapLock = new ReentrantLock();
+	protected BitmapMode bitmapMode = BitmapMode.DOUBLE_BUFFER;
 	protected Bitmap bitmap = Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888);
+	protected Bitmap bitmapWork = Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888);
 	protected byte[] bitmapTmp =  new byte[1];
+	//---- END LOCK BITMAP
 
 	protected LinkedBlockingQueue threadQueue = new LinkedBlockingQueue();
-	protected ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1,1,50, TimeUnit.MILLISECONDS,
-			threadQueue);
+	protected ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1,1,50,
+			TimeUnit.MILLISECONDS, threadQueue);
 
 	/**
 	 * Stores the transform from the video image to the view it is displayed on. Handles
@@ -107,9 +114,6 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 
 	// number of pixels it searches for when choosing camera resolution
 	protected int targetResolution = 640*480;
-
-	// If true the bitmap will be shown. otherwise the original preview image will be
-	protected boolean autoConvertToBitmap = true;
 
 	// if true it will sketch the bitmap to fill the view
 	protected boolean stretchToFill = false;
@@ -124,6 +128,19 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	protected int totalConverted; // counter for frames converted since data type was set
 	protected final MovingAverage periodConvert = new MovingAverage(0.8); // milliseconds
 	//END
+
+	public VisualizeCamera2Activity() {
+	}
+
+	/**
+	 * Configures how it visualizes. By default it will render a bitmap to the main view. This can be disabled by
+	 * setting the bitmapMode to BitmapMode.NONE and overriding {@link #renderBitmapImage(BitmapMode, ImageBase)}.
+	 *
+	 * @param bitmapMode How the memory
+	 */
+	public VisualizeCamera2Activity( BitmapMode bitmapMode ) {
+		this.bitmapMode = bitmapMode;
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -223,11 +240,20 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 
 	@Override
 	protected void onCameraResolutionChange(int cameraWidth, int cameraHeight, int sensorOrientation ) {
-		// predeclare bitmap image used for display
-		if(autoConvertToBitmap) {
-			if (bitmap.getWidth() != cameraWidth || bitmap.getHeight() != cameraHeight)
-				bitmap = Bitmap.createBitmap(cameraWidth, cameraHeight, Bitmap.Config.ARGB_8888);
-			bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
+		// pre-declare bitmap image used for display
+		if( bitmapMode != BitmapMode.NONE) {
+			bitmapLock.lock();
+			try {
+				if (bitmap.getWidth() != cameraWidth || bitmap.getHeight() != cameraHeight) {
+					bitmap = Bitmap.createBitmap(cameraWidth, cameraHeight, Bitmap.Config.ARGB_8888);
+					if( bitmapMode == BitmapMode.DOUBLE_BUFFER ) {
+						bitmapWork = Bitmap.createBitmap(cameraWidth, cameraHeight, Bitmap.Config.ARGB_8888);
+					}
+				}
+				bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
+			} finally {
+				bitmapLock.unlock();
+			}
 		}
 		int rotation = getWindowManager().getDefaultDisplay().getRotation();
 		if( verbose )
@@ -370,19 +396,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 			timeOfLastUpdated = startTime;
 
 			// Copy this frame
-			if (autoConvertToBitmap) {
-				// This used to be synchronized but that was causing performance issues
-				// if the camera is shutdown and restarted the image and the buffered image might
-				// not be the same size.
-				try {
-					if( image.getWidth() == bitmap.getWidth() && image.getHeight() == bitmap.getHeight()  )
-						ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
-				} catch( Exception e ) {
-					Log.e(TAG,"Exception converting boofToBitmap. "+e.getMessage());
-					e.printStackTrace();
-				}
-
-			}
+			renderBitmapImage(bitmapMode,image);
 
 			// Update the visualization
 			runOnUiThread(() -> displayView.invalidate());
@@ -392,6 +406,37 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 		synchronized (boofImage.imageLock) {
 			if( boofImage.imageType.isSameType(image.getImageType()))
 				boofImage.stackImages.add(image);
+		}
+	}
+
+	/**
+	 * Renders the bitmap image to output. If you don't wish to have this behavior then override this function.
+	 * Jsut make sure you respect the bitmap mode or the image might not render as desired or you could crash the app.
+	 */
+	protected void renderBitmapImage( BitmapMode mode , ImageBase image ) {
+		switch( mode ) {
+			case UNSAFE: {
+				if (image.getWidth() == bitmap.getWidth() && image.getHeight() == bitmap.getHeight())
+					ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
+			} break;
+
+			case DOUBLE_BUFFER: {
+				// convert the image. this can be a slow operation
+				if (image.getWidth() == bitmapWork.getWidth() && image.getHeight() == bitmapWork.getHeight())
+					ConvertBitmap.boofToBitmap(image, bitmapWork, bitmapTmp);
+
+				// swap the two buffers. If it's locked don't swap. This will skip a frame but will not cause
+				// a significant slow down
+				if( bitmapLock.tryLock() ) {
+					try {
+						Bitmap tmp = bitmapWork;
+						bitmapWork = bitmap;
+						bitmap = tmp;
+					} finally {
+						bitmapLock.unlock();
+					}
+				}
+			} break;
 		}
 	}
 
@@ -412,12 +457,19 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 //		Rect r = new Rect(0,0,view.getWidth(),view.getHeight());
 //		canvas.drawRect(r,paintFill);
 //		canvas.drawRect(r,paintBorder);
+		switch( bitmapMode) {
+			case UNSAFE:
+				canvas.drawBitmap(this.bitmap, imageToView, null);
+				break;
 
-		if(autoConvertToBitmap) {
-			// Not locking here. it's possible the bitmap is being
-			// written to while this is running. Locking causes a large performance
-			// hit and small visual artifacts are better than a sluggish UI
-			canvas.drawBitmap(this.bitmap, imageToView, null);
+			case DOUBLE_BUFFER:
+				bitmapLock.lock();
+				try{
+					canvas.drawBitmap(this.bitmap, imageToView, null);
+				} finally {
+					bitmapLock.unlock();
+				}
+				break;
 		}
 	}
 
@@ -471,5 +523,25 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 		 */
 		protected Stack<ImageBase> stackImages = new Stack<>();
 		protected byte[] convertWork = new byte[1]; // work space for converting images
+	}
+
+	/**
+	 * How processing of the bitmap is managed when a new frame arrives
+	 */
+	public enum BitmapMode {
+		/**
+		 * Don't render a bitmap to the display
+		 */
+		NONE,
+		/**
+		 * A single buffer and no lock to prevent one thread from read and another writing at the same time. Fastest
+		 * and lowest memory but will result in multiple artifacts
+		 */
+		UNSAFE,
+		/**
+		 * Two buffers are used to avoid read and writing from occurring at the same time. No artifacts but
+		 * uses more memory.
+		 */
+		DOUBLE_BUFFER
 	}
 }
