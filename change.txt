@@ -21,26 +21,28 @@ Version : 0.31
 - Sparse Bundle Adjustment
  * Most basic version using DDogleg and EJML sparse LM solver
  * Works with calibrated pinhole camera
- * TODO Create generic image feature matching for unordered images
- * TODO Create generic image feature matching for sequence of images
- * TODO uncalibrated cameras
- * TODO homogeneous coordinates
-- TODO better point cloud visualization
-- Fundamential Matrix
- * TODO "Gold Standard" Euclidean error
+- Scene Reconstruction
+ * Matches images and provides an initial estimate of geomtry
+ * EstimateSceneUnordered for image sets which are unordered
 - Visualization
  * JavaFX based point cloud viewer
  * Greatly improved BoofCV's built in point cloud viewer. Runs better than JavaFX
-
-- TODO Sparse Bundle Adjustment
-      - Regression using public dataset
-         * SBA as what looks like a good set in their repo
-      - Improve LM implementation
-        * Scaling. See in the large paper
-      - Future: quaternion implementation
-      - Future: sparse block math
 - TODO update examples to use the new contour algorithm
 - TODO PNP regression and benchmark
+
+
+
+- TODO Scene Reconstruction
+   - TODO Create generic image feature matching for ordered sequences of images
+   - TODO homogeneous coordinates
+- Fundamential Matrix
+   - TODO "Gold Standard" Euclidean error
+- TODO Sparse Bundle Adjustment
+   - Future: Homogenoeus coordinates
+   - Future: quaternion implementation
+   - Future: sparse block math
+
+
 - TODO Compare BoofCV's IPPE against original
 
 - TODO determine why solving for nullspace with QRP causes decoding regression to get worse
