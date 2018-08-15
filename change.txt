@@ -23,6 +23,7 @@ Version : 0.31
  * Works with calibrated pinhole camera
 - Scene Reconstruction
  * Matches images and provides an initial estimate of geomtry
+ * Support for calibrated and TODO uncalibrated cameras
  * EstimateSceneUnordered for image sets which are unordered
 - Visualization
  * JavaFX based point cloud viewer

@@ -342,31 +342,35 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 		if( threadQueue.size() > 0 )
 			return;
 
+		ImageBase converted;
+
+		// When the image is removed from the stack it's no longer controlled by this class
 		synchronized (boofImage.imageLock) {
-			// When the image is removed from the stack it's no longer controlled by this class
-			ImageBase converted;
-			if( boofImage.stackImages.empty()) {
-				converted = boofImage.imageType.createImage(1,1);
+			if (boofImage.stackImages.empty()) {
+				converted = boofImage.imageType.createImage(1, 1);
 			} else {
 				converted = boofImage.stackImages.pop();
 			}
-			long before = System.nanoTime();
-			boofImage.convertWork = ConvertCameraImage.declareWork(image, boofImage.convertWork);
-			ConvertCameraImage.imageToBoof(image, boofImage.colorFormat, converted, boofImage.convertWork);
-			long after = System.nanoTime();
+		}
+		// below is an expensive operation so care is taken to do it safely outside of locks
+		// We are now safe to modify the image. I don't believe this function can be invoked multiple times at once
+		// so the convert work space should be safe from modifications
+		long before = System.nanoTime();
+		boofImage.convertWork = ConvertCameraImage.declareWork(image, boofImage.convertWork);
+		ConvertCameraImage.imageToBoof(image, boofImage.colorFormat, converted, boofImage.convertWork);
+		long after = System.nanoTime();
 //			Log.i(TAG,"processFrame() image="+image.getWidth()+"x"+image.getHeight()+
 //					"  boof="+converted.width+"x"+converted.height);
 
-			// record how long it took to convert the image for diagnostic reasons
-			synchronized (lockTiming) {
-				totalConverted++;
-				if( totalConverted >= TIMING_WARM_UP ) {
-					periodConvert.update((after - before) * 1e-6);
-				}
+		// record how long it took to convert the image for diagnostic reasons
+		synchronized (lockTiming) {
+			totalConverted++;
+			if( totalConverted >= TIMING_WARM_UP ) {
+				periodConvert.update((after - before) * 1e-6);
 			}
-
-			threadPool.execute(()->processImageOuter(converted));
 		}
+
+		threadPool.execute(()->processImageOuter(converted));
 	}
 
 	/**
@@ -421,6 +425,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 			} break;
 
 			case DOUBLE_BUFFER: {
+				// TODO if there are multiple processing threads bad stuff will happen here. Need one work buffer
+				// per thread
 				// convert the image. this can be a slow operation
 				if (image.getWidth() == bitmapWork.getWidth() && image.getHeight() == bitmapWork.getHeight())
 					ConvertBitmap.boofToBitmap(image, bitmapWork, bitmapTmp);
