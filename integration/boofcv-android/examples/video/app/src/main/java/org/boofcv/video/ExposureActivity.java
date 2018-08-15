@@ -5,7 +5,6 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.media.Image;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Range;
 import android.view.TextureView;
 import android.view.View;
@@ -16,6 +15,12 @@ import java.util.Locale;
 
 import boofcv.android.camera2.SimpleCamera2Activity;
 
+/**
+ * Demonstrates how to change the settings in a camera which is already open. In this case, each
+ * time you tap the screen it will change the exposure level. The camera preview is displayed in
+ * a TextureView to eliminate the need for any processing. A text view display info so you know
+ * whatt he current exposure level is.
+ */
 public class ExposureActivity extends SimpleCamera2Activity
         implements View.OnClickListener
 {
@@ -25,7 +30,9 @@ public class ExposureActivity extends SimpleCamera2Activity
     int level = 3, numLevels=7;
     int minEV,maxEV;
 
+    // Displays exposure information
     TextView textView;
+    // Time of last exposure change to prevent spamming
     long timeLastClick = 0;
 
     public ExposureActivity() {
@@ -65,7 +72,7 @@ public class ExposureActivity extends SimpleCamera2Activity
 
     @Override
     protected void processFrame(Image image) {
-//        Log.i("Exposure","got frame");
+        // Add image processing here
     }
 
     @Override
