@@ -24,6 +24,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -44,8 +45,13 @@ public class MainActivity extends Activity {
 		requestCameraPermission();
 	}
 
-	public void clickedVideo( View view ) {
+	public void clickedGradient( View view ) {
 		Intent intent = new Intent(this, GradientActivity.class);
+		startActivity(intent);
+	}
+
+	public void clickedExposure( View view ) {
+		Intent intent = new Intent(this, ExposureActivity.class);
 		startActivity(intent);
 	}
 

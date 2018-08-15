@@ -63,6 +63,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *     <li>{@link #processFrame}</li>
  *     <li>{@link #onCameraOpened}</li>
  *     <li>{@link #onCameraDisconnected}</li>
+ *     <li>{@link #changeCameraConfiguration}</li>
  * </ul>
  * See source code for a detailed description on what you can modify in each function.
  *
@@ -599,7 +600,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			}
 
 			closePreviewSession();
-			List<Surface> surfaces = new ArrayList<>();
+			open.surfaces = new ArrayList<>();
 			open.mPreviewRequestBuilder = open.mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 
 			if( mTextureView != null && mTextureView.isAvailable() ) {
@@ -609,32 +610,61 @@ public abstract class SimpleCamera2Activity extends Activity {
 
 				// Display the camera preview into this texture
 				Surface previewSurface = new Surface(texture);
-				surfaces.add(previewSurface);
+				open.surfaces.add(previewSurface);
 				open.mPreviewRequestBuilder.addTarget(previewSurface);
 			}
 
 			// This is where the image for processing is extracted from
 			Surface readerSurface = open.mPreviewReader.getSurface();
-			surfaces.add(readerSurface);
+			open.surfaces.add(readerSurface);
 			open.mPreviewRequestBuilder.addTarget(readerSurface);
 
-			configureCamera(open.mCameraDevice,open.mCameraCharacterstics,open.mPreviewRequestBuilder);
+			createCaptureSession();
+		} catch (CameraAccessException e) {
+			e.printStackTrace();
+		} finally {
+			open.mLock.unlock();
+		}
+	}
 
-			open.mCameraDevice.createCaptureSession(surfaces,
-					new CameraCaptureSession.StateCallback() {
+	private void createCaptureSession() throws CameraAccessException {
+		configureCamera(open.mCameraDevice,open.mCameraCharacterstics,open.mPreviewRequestBuilder);
 
-						@Override
-						public void onConfigured(@NonNull CameraCaptureSession session) {
-							mPreviewSession = session;
-							updatePreview();
-						}
+		open.mCameraDevice.createCaptureSession(open.surfaces,
+				new CameraCaptureSession.StateCallback() {
 
-						@Override
-						public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-							Log.i(TAG,"CameraCaptureSession.onConfigureFailed()");
-							Toast.makeText(SimpleCamera2Activity.this, "Failed", Toast.LENGTH_SHORT).show();
-						}
-					}, null);
+					@Override
+					public void onConfigured(@NonNull CameraCaptureSession session) {
+						Log.i(TAG,"CameraCaptureSession.onConfigured()");
+						mPreviewSession = session;
+						updatePreview();
+					}
+
+					@Override
+					public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+						Log.i(TAG,"CameraCaptureSession.onConfigureFailed()");
+						Toast.makeText(SimpleCamera2Activity.this, "Failed", Toast.LENGTH_SHORT).show();
+					}
+				}, null);
+	}
+
+	/**
+	 * Stops the capture session and allows you to reconfigure the camera, then starts it up again. You
+	 * reconfigure the camera when it calls the {@link #configureCamera}.
+	 */
+	protected void changeCameraConfiguration() {
+		Log.i(TAG,"CameraCaptureSession.changeCameraConfiguration()");
+		if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
+			throw new RuntimeException("Not on main looper! Modify code to remove assumptions");
+		}
+		if (null == open.mCameraDevice || null == open.mCameraSize) {
+			Log.i(TAG,"  aborting changeCameraConfiguration. Camera not open yet.");
+			return;
+		}
+
+		try {
+			open.mLock.lock();
+			createCaptureSession();
 		} catch (CameraAccessException e) {
 			e.printStackTrace();
 		} finally {
@@ -709,7 +739,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 		}
 	}
 
-	private View.OnLayoutChangeListener mViewLayoutChangeListener
+	private final View.OnLayoutChangeListener mViewLayoutChangeListener
 			= new View.OnLayoutChangeListener() {
 
 		@Override
@@ -727,7 +757,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 		}
 	};
 
-	private TextureView.SurfaceTextureListener mSurfaceTextureListener
+	private final TextureView.SurfaceTextureListener mSurfaceTextureListener
 			= new TextureView.SurfaceTextureListener() {
 
 		@Override
@@ -756,7 +786,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 		}
 	};
 
-	private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
+	private final CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
 
 		@Override
 		public void onOpened(@NonNull CameraDevice cameraDevice) {
@@ -986,6 +1016,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 		ReentrantLock mLock = new ReentrantLock();
 		CameraState state = CameraState.CLOSED;
 		CameraDevice mCameraDevice;
+		List<Surface> surfaces;
 		Size mCameraSize; // size of camera preview
 		String cameraId; // the camera that was selected to view
 		int mSensorOrientation; // sensor's orientation

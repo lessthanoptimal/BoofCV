@@ -5,10 +5,16 @@
 			  android:layout_height="fill_parent">
 
 	<Button
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:text="Video"
-			android:onClick="clickedVideo"
-			android:id="@+id/button_video"/>
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="Gradient"
+		android:onClick="clickedGradient"
+		android:id="@+id/button_gradient"/>
+	<Button
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="Exposure"
+		android:onClick="clickedExposure"
+		android:id="@+id/button_exposure"/>
 </LinearLayout>
 
