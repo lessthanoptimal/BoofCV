@@ -21,6 +21,8 @@ package org.boofcv.video;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
@@ -28,9 +30,9 @@ import android.os.Bundle;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
 
+import java.util.Locale;
+
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.color.ColorFormat;
-import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.camera2.VisualizeCamera2Activity;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -53,7 +55,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class VideoActivity extends VisualizeCamera2Activity
+public class GradientActivity extends VisualizeCamera2Activity
 {
 	// Storage for the gradient
 	private GrayS16 derivX = new GrayS16(1,1);
@@ -63,7 +65,10 @@ public class VideoActivity extends VisualizeCamera2Activity
 	// to the expense of garbage collection
 	private ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.three(GrayU8.class, GrayS16.class);
 
-	public VideoActivity() {
+	// Used to display text info on the display
+	private Paint paintText = new Paint();
+
+	public GradientActivity() {
 		// The default behavior for selecting the camera's resolution is to
 		// find the resolution which comes the closest to having this many
 		// pixels.
@@ -74,13 +79,20 @@ public class VideoActivity extends VisualizeCamera2Activity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.video);
+		setContentView(R.layout.gradient);
 		FrameLayout surface = findViewById(R.id.camera_frame);
 
 		// By calling this function you are telling the camera library that you wish to process
 		// images in a gray scale format. The video stream is typically in YUV420. Color
 		// image formats are supported as RGB, YUV, ... etc, color spaces.
 		setImageType(ImageType.single(GrayU8.class));
+
+		// Configure paint used to display FPS
+		paintText.setStrokeWidth(4*displayMetrics.density);
+		paintText.setTextSize(14*displayMetrics.density);
+		paintText.setTextAlign(Paint.Align.LEFT);
+		paintText.setARGB(0xFF,0xFF,0xB0,0);
+		paintText.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
 
 		// The camera stream will now start after this function is called.
 		startCamera(surface,null);
@@ -146,5 +158,25 @@ public class VideoActivity extends VisualizeCamera2Activity
 				}
 			} break;
 		}
+	}
+
+	/**
+	 * Demonstrates how to draw visuals
+	 */
+	@Override
+	protected void onDrawFrame(SurfaceView view, Canvas canvas) {
+		super.onDrawFrame(view, canvas);
+
+		// Display info on the image being process and how fast input camera
+		// stream (probably in YUV420) is converted into a BoofCV format
+		int width = bitmap.getWidth();
+		int height = bitmap.getHeight();
+		canvas.drawText(String.format(Locale.getDefault(),
+				"%d x %d Convert: %4.1f (ms)",
+				width,height,periodConvert.getAverage()),
+				0,120,paintText);
+
+		// Pro tip: Run in app fast or release mode for a dramatic speed up!
+		// In Android Studio expand "Build Variants" tab on left.
 	}
 }

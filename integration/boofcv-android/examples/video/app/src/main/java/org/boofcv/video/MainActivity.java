@@ -45,7 +45,7 @@ public class MainActivity extends Activity {
 	}
 
 	public void clickedVideo( View view ) {
-		Intent intent = new Intent(this, VideoActivity.class);
+		Intent intent = new Intent(this, GradientActivity.class);
 		startActivity(intent);
 	}
 
