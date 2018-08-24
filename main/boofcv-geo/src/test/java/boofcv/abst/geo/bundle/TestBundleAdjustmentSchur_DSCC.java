@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.bundle;
 
-import org.ddogleg.optimization.trustregion.ConfigTrustRegion;
+import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 
 /**
  * @author Peter Abeles
@@ -27,7 +27,7 @@ public class TestBundleAdjustmentSchur_DSCC extends GenericBundleAdjustmentCheck
 
 	@Override
 	public BundleAdjustment createAlg() {
-		ConfigTrustRegion config = new ConfigTrustRegion();
+		ConfigLevenbergMarquardt config = new ConfigLevenbergMarquardt();
 		BundleAdjustment ret = new BundleAdjustmentSchur_DSCC(config);
 		ret.configure(1e-5,1e-5,20);
 		return ret;

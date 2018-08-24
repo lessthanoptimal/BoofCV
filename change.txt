@@ -29,7 +29,6 @@ Version : 0.31
  * JavaFX based point cloud viewer
  * Greatly improved BoofCV's built in point cloud viewer. Runs better than JavaFX
 - TODO update examples to use the new contour algorithm
-- TODO PNP regression and benchmark
 
 
 
