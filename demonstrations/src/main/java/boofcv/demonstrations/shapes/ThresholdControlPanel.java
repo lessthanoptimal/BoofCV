@@ -69,6 +69,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	public boolean down = true;
 	public ConfigLength regionWidth = ConfigLength.fixed(21);
 	public float savolaK = -1;
+	public float nickK = -1;
 	public int otsuTuning = -1;
 	public boolean useOtsu2 = true;
 	public int minPixelValue = 0;
@@ -91,6 +92,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		this.down = configThreshold.down;
 		this.regionWidth = configThreshold.width.copy();
 		this.savolaK = configThreshold.savolaK;
+		this.nickK = configThreshold.nickK;
 		this.minPixelValue = configThreshold.minPixelValue;
 		this.maxPixelValue = configThreshold.maxPixelValue;
 		this.thresholdLocalBlocks = configThreshold.thresholdFromLocalBlocks;
@@ -412,6 +414,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		config.down = down;
 		config.width = regionWidth.copy();
 		config.savolaK = savolaK;
+		config.nickK = nickK;
 		config.minPixelValue = minPixelValue;
 		config.maxPixelValue = maxPixelValue;
 		config.thresholdFromLocalBlocks = thresholdLocalBlocks;

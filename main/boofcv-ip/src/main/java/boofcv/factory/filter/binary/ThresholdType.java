@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.factory.filter.binary;
 
 import boofcv.alg.filter.binary.*;
-import boofcv.struct.image.GrayU8;
 
 /**
  * Enum for all the types of thresholding provided in BoofCV
@@ -46,13 +45,13 @@ public enum ThresholdType {
 	/**
 	 * Locally adaptive computed using Guassian weights
 	 *
-	 * @see ThresholdImageOps#localGaussian(GrayU8, GrayU8, int, float, boolean, GrayU8, GrayU8)
+	 * @see ThresholdImageOps#localGaussian
 	 */
 	LOCAL_GAUSSIAN(true,false),
 	/**
 	 * Locally adaptive using an average
 	 *
-	 * @see ThresholdImageOps#localSquare(GrayU8, GrayU8, int, float, boolean, GrayU8, GrayU8)
+	 * @see ThresholdImageOps#localMean
 	 */
 	LOCAL_MEAN(true,false),
 	/**
@@ -88,7 +87,14 @@ public enum ThresholdType {
 	 *
 	 * @see boofcv.alg.filter.binary.impl.ThresholdSauvola
 	 */
-	LOCAL_SAVOLA(true,false);
+	LOCAL_SAVOLA(true,false),
+
+	/**
+	 * Locally adaptive computed using NICK method
+	 *
+	 * @see boofcv.alg.filter.binary.ThresholdNick
+	 */
+	LOCAL_NICK(true,false);
 
 	boolean adaptive;
 	boolean global;

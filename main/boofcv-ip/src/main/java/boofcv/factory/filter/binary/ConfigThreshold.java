@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,6 +61,13 @@ public class ConfigThreshold implements Configuration {
 	 * @see ThresholdType#LOCAL_SAVOLA
 	 */
 	public float savolaK = 0.3f;
+
+	/**
+	 * Threshold for NICK. -0.1 to -0.2 is recommended
+	 *
+	 * @see ThresholdType#LOCAL_NICK
+	 */
+	public float nickK = -0.2f;
 
 	/**
 	 * Minimum pixel value.  Only used for some algorithms.

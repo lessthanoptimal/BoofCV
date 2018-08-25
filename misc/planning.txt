@@ -109,8 +109,6 @@ Future
 
 - Multi camera calibration using square binary patterns.
 
-- Sparse Bundle Adjustment?
-
 - Look at OpenCV's watershed example.  It's actually a useful technique!
 
 - Background Model

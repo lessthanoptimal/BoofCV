@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 	boolean hasDivide;
 
 	@Override
-	public void generate()throws FileNotFoundException {
+	public void generate() throws FileNotFoundException {
 		printPreamble();
 		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false);
 //		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false, true);
@@ -91,8 +91,8 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 	{
 		typeCast = output.getTypeCastFromSum();
 		kernelType = input.getKernelType();
-		inputType = input.getInterleavedName();
-		outputType = output.getInterleavedName();
+		inputType = input.getSingleBandName();
+		outputType = output.getSingleBandName();
 		kernelData = input.getKernelDataType();
 		inputData = input.getDataType();
 		outputData = output.getDataType();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -140,7 +140,7 @@ public class GenerateConvolveImageNoBorder extends CodeGeneratorBase {
 				"\t\tInputSanityCheck.checkSameShape(input, output);\n" +
 				"\n");
 		if( singleBand ) {
-			out.print("\t\tif (!ConvolveImageUnrolled_"+typeIn+"_"+typeOut+divideSuf+"."+name+"(kernel, input, output"+divideInput+"))\n" +
+			out.print("\t\tif (!ConvolveImageUnrolled_SB_"+typeIn+"_"+typeOut+divideSuf+"."+name+"(kernel, input, output"+divideInput+"))\n" +
 					"\t\t\tConvolveImageStandard_SB."+name+"(kernel, input, output"+divideInput+");\n");
 		} else {
 			out.print("\t\tConvolveImageStandard_IL."+name+"(kernel, input, output"+divideInput+");\n");

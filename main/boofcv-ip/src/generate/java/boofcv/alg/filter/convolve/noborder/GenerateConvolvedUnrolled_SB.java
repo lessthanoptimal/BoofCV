@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,10 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 	String declareHalf;
 	String divide;
 
+	public GenerateConvolvedUnrolled_SB() {
+		super(false);
+	}
+
 	@Override
 	public void generate() throws FileNotFoundException {
 		create(AutoTypeImage.F32,AutoTypeImage.F32,false);
@@ -57,13 +61,14 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 	}
 
 	protected void create( AutoTypeImage inputImg , AutoTypeImage outputImg , boolean divided ) throws FileNotFoundException {
+		super.className = null; // need to do this to avoid sanity check
 		isInteger = inputImg.isInteger();
 
 		String name = "ConvolveImageUnrolled_SB_"+inputImg.getAbbreviatedType()+"_"+outputImg.getAbbreviatedType();
 		if( divided )
 			name += "_Div";
 
-		typeKernel = isInteger ? "I32" : "F"+inputImg.getNumBits();
+		typeKernel = isInteger ? "S32" : "F"+inputImg.getNumBits();
 		typeInput = inputImg.getSingleBandName();
 		typeOutput = outputImg.getSingleBandName();
 		dataKernel = inputImg.getSumType();

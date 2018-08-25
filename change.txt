@@ -28,6 +28,8 @@ Version : 0.31
 - Visualization
  * JavaFX based point cloud viewer
  * Greatly improved BoofCV's built in point cloud viewer. Runs better than JavaFX
+- Thresholding
+  * Added NICK thresholding for old documents
 - TODO update examples to use the new contour algorithm
 
 

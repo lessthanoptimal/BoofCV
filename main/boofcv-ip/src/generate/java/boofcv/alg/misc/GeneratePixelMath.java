@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -358,7 +358,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * </p>\n" +
 				"\t * @param imgA Input image. Not modified.\n" +
 				"\t * @param imgB Input image. Not modified.\n" +
-				"\t * @param diff Absolute value of difference image. Modified.\n" +
+				"\t * @param diff Absolute value of difference image. Can be either input. Modified.\n" +
 				"\t */\n" +
 				"\tpublic static void diffAbs( "+input.getSingleBandName()+" imgA , "+input.getSingleBandName()+" imgB , "+input.getSingleBandName()+" diff ) {\n" +
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,diff);\n" +
@@ -392,7 +392,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * </p>\n" +
 				"\t * @param imgA Input image. Not modified.\n" +
 				"\t * @param imgB Input image. Not modified.\n" +
-				"\t * @param output Output image. Modified.\n" +
+				"\t * @param output Output image. Can be either input. Modified.\n" +
 				"\t */\n" +
 				"\tpublic static void add( "+typeIn.getSingleBandName()+" imgA , "+typeIn.getSingleBandName()+" imgB , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,output);\n" +
@@ -426,7 +426,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * </p>\n" +
 				"\t * @param imgA Input image. Not modified.\n" +
 				"\t * @param imgB Input image. Not modified.\n" +
-				"\t * @param output Output image. Modified.\n" +
+				"\t * @param output Output image. Can be either input. Modified.\n" +
 				"\t */\n" +
 				"\tpublic static void subtract( "+typeIn.getSingleBandName()+" imgA , "+typeIn.getSingleBandName()+" imgB , "
 				+typeOut.getSingleBandName()+" output ) {\n" +
@@ -461,7 +461,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * </p>\n" +
 				"\t * @param imgA Input image. Not modified.\n" +
 				"\t * @param imgB Input image. Not modified.\n" +
-				"\t * @param output Output image. Modified.\n" +
+				"\t * @param output Output image. Can be either input. Modified.\n" +
 				"\t */\n" +
 				"\tpublic static void multiply( "+typeIn.getSingleBandName()+" imgA , "+typeIn.getSingleBandName()+" imgB , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,output);\n" +
@@ -518,7 +518,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * same instance." +
 				"\t *\n" +
 				"\t * @param input The input image. Not modified.\n" +
-				"\t * @param output Where the pow2 image is written to. Modified.\n" +
+				"\t * @param output Where the pow2 image is written to. Can be same as input. Modified.\n" +
 				"\t */\n" +
 				"\tpublic static void pow2( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\n" +
@@ -546,7 +546,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * same instance.\n" +
 				"\t *\n" +
 				"\t * @param input The input image. Not modified.\n" +
-				"\t * @param output Where the sqrt() image is written to. Modified.\n" +
+				"\t * @param output Where the sqrt() image is written to. Can be same as input. Modified.\n" +
 				"\t */\n" +
 				"\tpublic static void sqrt( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\n" +
@@ -576,7 +576,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * </p>\n" +
 				"\t * @param imgA Input image. Not modified.\n" +
 				"\t * @param imgB Input image. Not modified.\n" +
-				"\t * @param output Output image. Modified.\n" +
+				"\t * @param output Output image. Can be either input. Modified.\n" +
 				"\t */\n" +
 				"\tpublic static void divide( "+typeIn.getSingleBandName()+" imgA , "+typeIn.getSingleBandName()+" imgB , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,output);\n" +

@@ -142,10 +142,12 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 		examples.add(new PathLabel("stained",UtilIO.pathExample("segment/stained_handwriting.jpg")));
 		examples.add(new PathLabel("Chessboard Movie",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 
-		DemoImageThresholdingApp app = new DemoImageThresholdingApp(examples,GrayF32.class);
+		SwingUtilities.invokeLater(()->{
+			DemoImageThresholdingApp app = new DemoImageThresholdingApp(examples,GrayF32.class);
 
-		app.openExample(examples.get(0));
-		app.display("Thresholding Demo");
+			app.openExample(examples.get(0));
+			app.display("Thresholding Demo");
+		});
 	}
 
 

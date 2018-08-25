@@ -34,7 +34,7 @@ import boofcv.struct.image.ImageType;
 public class FactoryThresholdBinary {
 
 	/**
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localGaussian(ImageGray, GrayU8, int, double, boolean, ImageGray, ImageGray)
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localGaussian
 	 *
 	 * @param regionWidth Width of square region.
 	 * @param scale Threshold scale adjustment
@@ -64,6 +64,23 @@ public class FactoryThresholdBinary {
 		if( BOverrideFactoryThresholdBinary.localSauvola != null )
 			return BOverrideFactoryThresholdBinary.localSauvola.handle(width, k, down, inputType);
 		return new InputToBinarySwitch<T>(new ThresholdSauvola(width, k, down),inputType);
+	}
+
+	/**
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localSauvola(ImageGray, GrayU8, ConfigLength, float, boolean)
+	 *
+	 * @param width Width of square region.
+	 * @param k User specified threshold adjustment factor.  Must be positive. Try -0.2
+	 * @param down Should it threshold up or down.
+	 * @param inputType Type of input image
+	 * @return Filter to binary
+	 */
+	public static <T extends ImageGray<T>>
+	InputToBinary<T> localNick(ConfigLength width, float k, boolean down, Class<T> inputType)
+	{
+//		if( BOverrideFactoryThresholdBinary.localNick != null )
+//			return BOverrideFactoryThresholdBinary.localNick.handle(width, k, down, inputType);
+		return new InputToBinarySwitch<T>(new ThresholdNick(width, k, down),inputType);
 	}
 
 	/**
@@ -241,6 +258,9 @@ public class FactoryThresholdBinary {
 
 			case LOCAL_SAVOLA:
 				return localSauvola(config.width, config.savolaK, config.down, inputType);
+
+			case LOCAL_NICK:
+				return localNick(config.width, config.nickK, config.down, inputType);
 
 			case LOCAL_MEAN:
 				return localMean(config.width, config.scale, config.down, inputType);

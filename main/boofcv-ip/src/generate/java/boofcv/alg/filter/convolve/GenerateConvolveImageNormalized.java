@@ -26,7 +26,7 @@ import boofcv.misc.CodeGeneratorBase;
  *
  * @author Peter Abeles
  */
-public class GenerateConvolveNormalized extends CodeGeneratorBase {
+public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 
 	boolean isInteger;
 	String kernelType;
@@ -120,7 +120,7 @@ public class GenerateConvolveNormalized extends CodeGeneratorBase {
 		out.print("\tpublic static void "+name+"("+kernelTypeName+" kernel, "+inputName+" src, "+outputName+" dst ) {\n" +
 				"\t\tInputSanityCheck.checkSameShape"+suffice2+"(src, dst);\n" +
 				"\n" +
-				"\t\tboolean processed = BOverrideConvolveNormalized.invokeNative"+overrideName+"(kernel,src,dst);\n" +
+				"\t\tboolean processed = BOverrideConvolveImageNormalized.invokeNative"+overrideName+"(kernel,src,dst);\n" +
 				"\t\t\n" +
 				"\t\tif( !processed ) {\n");
 
@@ -158,7 +158,7 @@ public class GenerateConvolveNormalized extends CodeGeneratorBase {
 	}
 
 	public static void main(String[] args) {
-		GenerateConvolveNormalized gen = new GenerateConvolveNormalized();
+		GenerateConvolveImageNormalized gen = new GenerateConvolveImageNormalized();
 		gen.generate();
 	}
 }

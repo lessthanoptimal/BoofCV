@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,6 +74,24 @@ public class InputSanityCheck {
 		} else if (output.width != input.width || output.height != input.height)
 			throw new IllegalArgumentException("Width and/or height of input and output do not match. "+input.width+"x"+input.height+" "+output.width+"x"+output.height);
 		return output;
+	}
+
+	/**
+	 * Throws exception if two images are the same instance. Otherwise reshapes B to match A
+	 */
+	public static void checkReshape(ImageBase<?> imgA, ImageBase<?> imgB) {
+		if( imgA == imgB )
+			throw new IllegalArgumentException("Image's can't be the same instance");
+		imgB.reshape(imgA.width,imgA.height);
+	}
+
+	/**
+	 * Throws exception if two images are the same instance. Otherwise reshapes B to match A
+	 */
+	public static void checkReshapeB(ImageMultiBand<?> imgA, ImageMultiBand<?> imgB) {
+		if( imgA == imgB )
+			throw new IllegalArgumentException("Image's can't be the same instance");
+		imgB.reshape(imgA.width,imgA.height,imgA.getNumBands());
 	}
 
 	public static void checkSameShape(ImageBase<?> imgA, ImageBase<?> imgB) {
