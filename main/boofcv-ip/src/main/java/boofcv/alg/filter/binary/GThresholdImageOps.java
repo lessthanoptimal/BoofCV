@@ -441,6 +441,38 @@ public class GThresholdImageOps {
 	}
 
 	/**
+	 * Applies {@link boofcv.alg.filter.binary.ThresholdNick NICK} thresholding to the input image.
+	 * Intended for use with text image.
+	 *
+	 * @see boofcv.alg.filter.binary.ThresholdNick
+	 *
+	 * @param input Input image.
+	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param width Width of square region.
+	 * @param k Positive parameter used to tune threshold.  Try -0.1 to -0.2
+	 * @param down Should it threshold up or down.
+	 * @return binary image
+	 */
+	public static <T extends ImageGray<T>>
+	GrayU8 localNick(T input, GrayU8 output, ConfigLength width, float k, boolean down)
+	{
+		ThresholdNick alg = new ThresholdNick(width,k, down);
+
+		if( output == null )
+			output = new GrayU8(input.width,input.height);
+
+		if( input instanceof GrayF32) {
+			alg.process((GrayF32)input,output);
+		} else {
+			GrayF32 conv = new GrayF32(input.width,input.height);
+			GConvertImage.convert(input, conv);
+			alg.process(conv,output);
+		}
+
+		return output;
+	}
+
+	/**
 	 * Applies a threshold to an image by computing the min and max values in a regular grid across
 	 * the input image.  See {@link ThresholdBlockMinMax} for the details.
 	 *

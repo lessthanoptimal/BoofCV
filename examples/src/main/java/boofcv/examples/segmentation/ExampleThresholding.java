@@ -75,6 +75,8 @@ public class ExampleThresholding {
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Gaussian");
 		GThresholdImageOps.localSauvola(input, binary,  ConfigLength.fixed(11), 0.30f, true);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Sauvola");
+		GThresholdImageOps.localNick(input, binary,  ConfigLength.fixed(11), -0.2f, true);
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: NICK");
 
 		// Sauvola is tuned for text image.  Change radius to make it run better in others.
 

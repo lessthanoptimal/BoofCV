@@ -96,6 +96,13 @@ public class BenchmarkThresholding {
 		}
 	}
 
+	public static class LocalNick extends PerformerBase {
+		@Override
+		public void process() {
+			GThresholdImageOps.localNick(input, output_U8, adaptiveWidth, -0.2f, true);
+		}
+	}
+
 	public static class SquareBlockMinMax_F32 extends PerformerBase {
 		ThresholdBlockMinMax_F32 alg = new ThresholdBlockMinMax_F32(20,adaptiveWidth,0.95f,true, true);
 		@Override
@@ -123,6 +130,7 @@ public class BenchmarkThresholding {
 		ProfileOperation.printOpsPerSec(new LocalGaussian(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new LocalSauvola(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new LocalSauvola2(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new LocalNick(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new SquareBlockMinMax_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new SquareBlockMinMax_U8(), TEST_TIME);
 
