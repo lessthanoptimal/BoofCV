@@ -72,7 +72,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(null, null, null, GrayF32.class);
 		EstimateSceneUnordered<GrayF32>  estimateScene = new EstimateSceneUnordered<GrayF32>(detDesc);
-		estimateScene.setVerbose(true);
+		estimateScene.setVerbose(System.out);
 
 		String cameraName = "camera";
 		estimateScene.addCamera(cameraName,LensDistortionOps.narrow(intrinsic),intrinsic.width,intrinsic.height);

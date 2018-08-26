@@ -25,7 +25,6 @@ import boofcv.alg.geo.robust.RansacMultiView;
 import boofcv.alg.sfm.structure.PairwiseImageGraph.Feature3D;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.geo.ConfigEssential;
-import boofcv.factory.geo.ConfigFundamental;
 import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.struct.calib.CameraPinhole;
@@ -39,9 +38,8 @@ import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.Stoppable;
-import org.ejml.data.DMatrixRMaj;
 
-import java.util.HashMap;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 
@@ -57,35 +55,25 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	// Used to pre-maturely stop the scene estimation process
 	private volatile boolean stopRequested = false;
 
-	private double MIN_ASSOCIATE_FRACTION = 0.05;
-	private int MIN_FEATURE_ASSOCIATED = 30;
+	protected double MIN_ASSOCIATE_FRACTION = 0.05;
+	protected int MIN_FEATURE_ASSOCIATED = 30;
 
-	// Transform (including distortion terms) from pixel into normalized image coordinates
-	Map<String,Point2Transform2_F64> camerasPixelToNorm = new HashMap<>();
-	// Approximate camera model used to compute pixel errors
-	Map<String,CameraPinhole> camerasIntrinsc = new HashMap<>();
-
-	DetectDescribePoint<T,TupleDesc> detDesc;
-	AssociateDescription<TupleDesc> associate;
-
-	// If true then all cameras are calibrated. If false then all cameras are uncalibrated
-	boolean calibrated;
+	protected DetectDescribePoint<T,TupleDesc> detDesc;
+	protected AssociateDescription<TupleDesc> associate;
 
 	// Graph describing the relationship between images
-	private PairwiseImageGraph graph = new PairwiseImageGraph();
+	protected PairwiseImageGraph graph = new PairwiseImageGraph();
 
-	private ConfigEssential configEssential = new ConfigEssential();
-	private ConfigFundamental configFundamental = new ConfigFundamental();
-	private ConfigRansac configRansac = new ConfigRansac();
+	protected ConfigEssential configEssential = new ConfigEssential();
+	protected ConfigRansac configRansac = new ConfigRansac();
 
 	// Temporary storage for feature pairs which are inliers
-	private FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class,true);
+	protected FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class,true);
 
 	RansacMultiView<Se3_F64,AssociatedPair> ransacEssential;
-	Ransac<DMatrixRMaj,AssociatedPair> ransacFundamental;
 
 	// print is verbose or not
-	private boolean verbose;
+	protected PrintStream verbose;
 
 	public PairwiseImageMatching(DetectDescribePoint<T, TupleDesc> detDesc) {
 		this();
@@ -110,12 +98,19 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		this.MIN_FEATURE_ASSOCIATED = minFeatureAssociate;
 	}
 
+	public void addCamera( String cameraName  ) {
+		addCamera(cameraName,null,null);
+	}
+	public void addCamera( String cameraName , Point2Transform2_F64 pixelToNorm , CameraPinhole pinhole ) {
+		graph.cameras.put( cameraName, new PairwiseImageGraph.Camera(cameraName,pixelToNorm,pinhole));
+	}
+
 	/**
 	 * Adds a new observation from a camera. Detects features inside the and saves those.
 	 *
 	 * @param image The image
 	 */
-	public void addImage(T image , String cameraName , Point2Transform2_F64 pixelToNorm ) {
+	public void addImage(T image , String cameraName ) {
 
 		PairwiseImageGraph.CameraView view = new PairwiseImageGraph.CameraView(graph.nodes.size(),
 				new FastQueue<TupleDesc>(TupleDesc.class,true) {
@@ -125,7 +120,10 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 					}
 				});
 
-		view.camera = cameraName;
+		view.camera = graph.cameras.get(cameraName);
+		if( view.camera == null )
+			throw new IllegalArgumentException("Must have added the camera first");
+
 		graph.nodes.add(view);
 
 		detDesc.detect(image);
@@ -143,34 +141,21 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 			view.observationPixels.grow().set(p);
 		}
 
-		if( pixelToNorm == null ){
+		if( view.camera.pixelToNorm == null ){
 			return;
 		}
 
 		view.observationNorm.growArray(detDesc.getNumberOfFeatures());
 		for (int i = 0; i < view.observationPixels.size; i++) {
 			Point2D_F64 p = view.observationPixels.get(i);
-			pixelToNorm.compute(p.x,p.y,view.observationNorm.grow());
+			view.camera.pixelToNorm.compute(p.x,p.y,view.observationNorm.grow());
 		}
 
-		if( verbose ) {
-			System.out.println("Detected Features: "+detDesc.getNumberOfFeatures());
+		if( verbose != null ) {
+			verbose.println("Detected Features: "+detDesc.getNumberOfFeatures());
 		}
 	}
 
-	private void determineCalibrated() {
-		boolean first = true;
-		for( String key : camerasPixelToNorm.keySet() ) {
-			if( first ) {
-				first = false;
-				calibrated = camerasPixelToNorm.get(key) != null;
-			} else {
-				if(calibrated == (camerasPixelToNorm.get(key) == null)) {
-					throw new IllegalArgumentException("All cameras must be calibrated or uncalibrated");
-				}
-			}
-		}
-	}
 
 	/**
 	 * Determines connectivity between images. Results can be found by calling {@link #getGraph()}.
@@ -178,10 +163,6 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	 */
 	public boolean process( Map<String, Point2Transform2_F64> camerasPixelToNorm,
 							Map<String, CameraPinhole> camerasIntrinsc ) {
-		this.camerasPixelToNorm = camerasPixelToNorm;
-		this.camerasIntrinsc = camerasIntrinsc;
-		determineCalibrated();
-
 		if( graph.nodes.size() < 2 )
 			return false;
 		stopRequested = false;
@@ -189,8 +170,8 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		declareModelFitting();
 
 		for (int i = 0; i < graph.nodes.size(); i++) {
-			if( verbose )
-				System.out.println("Matching node "+i);
+			if( verbose != null )
+				verbose.println("Matching node "+i);
 			associate.setSource(graph.nodes.get(i).descriptions);
 			for (int j = i+1; j < graph.nodes.size(); j++) {
 				associate.setDestination(graph.nodes.get(j).descriptions);
@@ -207,12 +188,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	}
 
 	protected void declareModelFitting() {
-		if( calibrated ) {
-			ransacEssential = FactoryMultiViewRobust.essentialRansac(configEssential, configRansac);
-		} else {
-			ransacFundamental = FactoryMultiViewRobust.fundamentalRansac(configFundamental, configRansac);
-			// TODO figure out how to do  PnP in uncalibrated case
-		}
+		ransacEssential = FactoryMultiViewRobust.essentialRansac(configEssential, configRansac);
 	}
 
 	/**
@@ -226,14 +202,18 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	 * Associate features between the two views. Then compute a homography and essential matrix using LSMed. Add
 	 * features to the edge if they an inlier in essential. Save fit score of homography vs essential.
 	 */
-	void connectViews(PairwiseImageGraph.CameraView viewA , PairwiseImageGraph.CameraView viewB , FastQueue<AssociatedIndex> matches) {
+	protected void connectViews(PairwiseImageGraph.CameraView viewA , PairwiseImageGraph.CameraView viewB , FastQueue<AssociatedIndex> matches) {
 
 		// Estimate fundamental/essential with RANSAC
 		PairwiseImageGraph.CameraMotion edge = new PairwiseImageGraph.CameraMotion();
 		int inliersEpipolar;
-		if( calibrated ) {
-			ransacEssential.setIntrinsic(0,camerasIntrinsc.get(viewA.camera));
-			ransacEssential.setIntrinsic(1,camerasIntrinsc.get(viewB.camera));
+
+		CameraPinhole pinhole0 = viewA.camera.pinhole;
+		CameraPinhole pinhole1 = viewB.camera.pinhole;
+
+		if( pinhole0 != null && pinhole1 != null ) {
+			ransacEssential.setIntrinsic(0,pinhole0);
+			ransacEssential.setIntrinsic(1,pinhole1);
 			if( !fitEpipolar(matches, viewA.observationNorm.toList(), viewB.observationNorm.toList(),ransacEssential,edge) )
 				return;
 			inliersEpipolar = ransacEssential.getMatchSet().size();
@@ -241,10 +221,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 			// scale is arbitrary. Might as well pick something which won't cause the math to blow up later on
 			edge.a_to_b.T.normalize();
 		} else {
-			if( !fitEpipolar(matches, viewA.observationPixels.toList(), viewB.observationPixels.toList(),ransacFundamental,edge) )
-				return;
-			inliersEpipolar = ransacFundamental.getMatchSet().size();
-			// TODO save rigid body estimate
+			throw new RuntimeException("All cameras must be calibrated");
 		}
 
 		if( inliersEpipolar < MIN_FEATURE_ASSOCIATED )
@@ -264,8 +241,8 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		viewB.connections.add(edge);
 		graph.edges.add(edge);
 
-		if( verbose )
-			System.out.println("  Connected "+viewA.index+" -> "+viewB.index);
+		if( verbose != null )
+			verbose.println("  Connected "+viewA.index+" -> "+viewB.index);
 	}
 
 	/**
@@ -317,10 +294,6 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		return configEssential;
 	}
 
-	public ConfigFundamental getConfigFundamental() {
-		return configFundamental;
-	}
-
 	public ConfigRansac getConfigRansac() {
 		return configRansac;
 	}
@@ -329,11 +302,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		graph = new PairwiseImageGraph();
 	}
 
-	public boolean isVerbose() {
-		return verbose;
-	}
-
-	public void setVerbose(boolean verbose) {
+	public void setVerbose(PrintStream verbose) {
 		this.verbose = verbose;
 	}
 }

@@ -50,6 +50,7 @@ import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 
+import java.io.PrintStream;
 import java.util.*;
 
 /**
@@ -105,11 +106,10 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	BundleAdjustmentObservations observations;
 
 	// Verbose output to standard out
-	boolean verbose = false;
+	PrintStream verbose;
 
 	public EstimateSceneUnordered( PairwiseImageMatching<T> imageMatching ) {
 		this.imageMatching = imageMatching;
-		this.imageMatching.setVerbose(verbose);
 	}
 
 	public EstimateSceneUnordered( DetectDescribePoint<T, TupleDesc> detDesc ) {
@@ -125,6 +125,9 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		else if( calibrated )
 			throw new IllegalArgumentException("All cameras must be calibrated or uncalibrated");
 		camerasPixelToNorm.put( cameraName , null );
+
+		imageMatching.addCamera(cameraName);
+		cameraToIndex.put(cameraName,cameraToIndex.size());
 	}
 
 	@Override
@@ -138,7 +141,9 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 		camerasPixelToNorm.put( cameraName, pixelToNorm );
 		camerasIntrinsc.put(cameraName, PerspectiveOps.estimatePinhole(pixelToNorm,width,height));
-		cameraToIndex.put( cameraName , cameraToIndex.size() );
+
+		imageMatching.addCamera(cameraName,camerasPixelToNorm.get(cameraName),camerasIntrinsc.get(cameraName));
+		cameraToIndex.put(cameraName,cameraToIndex.size());
 	}
 
 	/**
@@ -148,7 +153,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	@Override
 	public void add(T image , String cameraName )
 	{
-		imageMatching.addImage(image,cameraName,camerasPixelToNorm.get(cameraName));
+		imageMatching.addImage(image,cameraName);
 	}
 
 	@Override
@@ -246,7 +251,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 		for( int i = 0; i < viewsAdded.size(); i++ ) {
 			CameraView v = viewsAdded.get(i);
-			int cameraIndex = cameraToIndex.get(v.camera);
+			int cameraIndex = cameraToIndex.get(v.camera.camera);
 			structure.setView(i,v==origin,v.viewToWorld.invert(null));
 			structure.connectViewToCamera(i,cameraIndex);
 		}
@@ -393,8 +398,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		while( !open.isEmpty() ) {
 			if( stopRequested )
 				return;
-			if( verbose )
-				System.out.println("### open.size="+open.size());
+			if( verbose != null )
+				verbose.println("### open.size="+open.size());
 
 			// select the view with the 3D features. This view can be estimated which the highest degree of confience
 			int bestCount = countFeaturesWith3D(open.get(0));
@@ -409,15 +414,15 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			}
 
 			CameraView v = open.remove(bestIndex);
-			if( verbose )
-				System.out.println("   processing view="+v.index+" | 3D Features="+bestCount);
+			if( verbose != null )
+				verbose.println("   processing view="+v.index+" | 3D Features="+bestCount);
 
 			// Determine the view's location in the 3D view. This might have been previously estimated using
 			// stereo and the estimated scale factor. That will be ignored and the new estimate used instead
 			if( !determinePose(v) ) {
 				// The pose could not be determined, so remove it from the graph
-				if( verbose )
-					System.out.println("   Removing connection");
+				if( verbose != null )
+					verbose.println("   Removing connection");
 				for (CameraMotion m : v.connections) {
 					CameraView a = m.destination(v);
 					a.connections.remove(m);
@@ -524,10 +529,10 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		}
 
 		// Estimate the target's location using robust PNP
-		ransacPnP.setIntrinsic(0,camerasIntrinsc.get(target.camera));
+		ransacPnP.setIntrinsic(0,target.camera.pinhole);
 		if( list.size() < 20 || !ransacPnP.process(list) ) {
-			if (verbose)
-				System.out.println("   View="+target.index+" RANSAC failed. list.size="+list.size());
+			if( verbose != null )
+				verbose.println("   View="+target.index+" RANSAC failed. list.size="+list.size());
 			return false;
 		}
 
@@ -535,8 +540,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 		// add inliers to the features
 		int N = ransacPnP.getMatchSet().size();
-		if( verbose )
-			System.out.println("   View="+target.index+" PNP RANSAC "+N+"/"+list.size());
+		if( verbose != null )
+			verbose.println("   View="+target.index+" PNP RANSAC "+N+"/"+list.size());
 		for (int i = 0; i < N; i++) {
 			int which = ransacPnP.getInputIndex(i);
 			Feature3D f = features.get(which);
@@ -627,8 +632,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			if( other.state == ViewState.UNPROCESSED) {
 				other.state = ViewState.PENDING;
 				open.add(other);
-				if( verbose)
-					System.out.println("  adding to open "+viewed.index+"->"+other.index);
+				if( verbose != null )
+					verbose.println("  adding to open "+viewed.index+"->"+other.index);
 			}
 		}
 	}
@@ -695,8 +700,8 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		double bestScore = 0;
 		CameraView best = null;
 
-		if( verbose )
-			System.out.println("selectOriginNode");
+		if( verbose != null )
+			verbose.println("selectOriginNode");
 		for (int i = 0; i < graph.nodes.size(); i++) {
 			double score = 0;
 			List<CameraMotion> edges = graph.nodes.get(i).connections;
@@ -711,11 +716,11 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 				best = graph.nodes.get(i);
 			}
 
-			if( verbose )
-				System.out.printf("  [%2d] score = %s\n",i,score);
+			if( verbose != null )
+				verbose.printf("  [%2d] score = %s\n",i,score);
 		}
-		if( verbose )
-			System.out.println("     selected = "+best.index);
+		if( verbose != null )
+			verbose.println("     selected = "+best.index);
 
 		return best;
 	}
@@ -727,14 +732,14 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		double bestScore = 0;
 		CameraMotion best = null;
 
-		if( verbose )
-			System.out.println("selectCoordinateBase");
+		if( verbose != null )
+			verbose.println("selectCoordinateBase");
 		for (int i = 0; i < view.connections.size(); i++) {
 			CameraMotion e = view.connections.get(i);
 
 			double s = e.scoreTriangulation();
-			if( verbose )
-				System.out.printf("  [%2d] score = %s\n",i,s);
+			if( verbose != null )
+				verbose.printf("  [%2d] score = %s\n",i,s);
 			if( s > bestScore ) {
 				bestScore = s;
 				best = e;
@@ -805,7 +810,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		return stopRequested;
 	}
 
-	public void setVerbose(boolean verbose) {
+	public void setVerbose(PrintStream verbose) {
 		this.verbose = verbose;
 		imageMatching.setVerbose(verbose);
 	}

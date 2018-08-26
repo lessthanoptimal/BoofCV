@@ -18,6 +18,8 @@
 
 package boofcv.alg.sfm.structure;
 
+import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import georegression.struct.point.Point2D_F64;
@@ -27,7 +29,9 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Graph describing the relationship between image features and 3D points.
@@ -39,9 +43,22 @@ public class PairwiseImageGraph {
 	public List<CameraView> nodes = new ArrayList<>();
 	public List<CameraMotion> edges = new ArrayList<>();
 	public List<Feature3D> features3D = new ArrayList<>();
+	public Map<String,Camera> cameras = new HashMap<>();
+
+	static class Camera {
+		public String camera;
+		public Point2Transform2_F64 pixelToNorm;
+		public CameraPinhole pinhole;
+
+		public Camera(String camera,Point2Transform2_F64 pixelToNorm,CameraPinhole pinhole) {
+			this.camera = camera;
+			this.pixelToNorm = pixelToNorm;
+			this.pinhole = pinhole;
+		}
+	}
 
 	static class CameraView {
-		public String camera;
+		Camera camera;
 		public int index;
 		public Se3_F64 viewToWorld = new Se3_F64();
 		public ViewState state = ViewState.UNPROCESSED;

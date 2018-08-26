@@ -82,12 +82,13 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 
 		camerasPixelToNorm.put(cameraName, new LensDistortionRadialTangential(intrinsic).undistort_F64(true,false));
 		camerasIntrinsc.put(cameraName,intrinsic);
+		alg.addCamera(cameraName,camerasPixelToNorm.get(cameraName),intrinsic);
 
 		for (int i = 0; i < 5; i++) {
 			Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.setEulerXYZ(0,0,0,-0.5*i,0,0,null);
 
 			detector.cameraToWorld.set(cameraToWorld);
-			alg.addImage(new GrayF32(intrinsic.width,intrinsic.height),cameraName,camerasPixelToNorm.get(cameraName));
+			alg.addImage(new GrayF32(intrinsic.width,intrinsic.height),cameraName);
 		}
 
 		assertTrue(alg.process(camerasPixelToNorm,camerasIntrinsc));
@@ -110,13 +111,14 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 
 		camerasPixelToNorm.put(cameraName, new LensDistortionRadialTangential(intrinsic).undistort_F64(true,false));
 		camerasIntrinsc.put(cameraName,intrinsic);
+		alg.addCamera(cameraName,camerasPixelToNorm.get(cameraName),intrinsic);
 
 		// there will be two independent set of views in the graph
 		for (int i = 0; i < 7; i++) {
 			double x = i < 5 ? 0 : 50+0.5*5;
 			Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.setEulerXYZ(0,0,0,x-0.5*i,0,0,null);
 			detector.cameraToWorld.set(cameraToWorld);
-			alg.addImage(new GrayF32(intrinsic.width,intrinsic.height),cameraName,camerasPixelToNorm.get(cameraName));
+			alg.addImage(new GrayF32(intrinsic.width,intrinsic.height),cameraName);
 		}
 
 		assertTrue(alg.process(camerasPixelToNorm,camerasIntrinsc));
@@ -168,7 +170,6 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		}
 
 		PairwiseImageMatching<?> alg = new PairwiseImageMatching(new MockDetector());
-		alg.calibrated = true;
 		alg.declareModelFitting();
 
 		PairwiseImageGraph.CameraMotion edge = new PairwiseImageGraph.CameraMotion();

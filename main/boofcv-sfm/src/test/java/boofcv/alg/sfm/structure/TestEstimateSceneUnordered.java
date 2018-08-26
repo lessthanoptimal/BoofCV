@@ -226,6 +226,9 @@ public class TestEstimateSceneUnordered extends GenericSceneStructureChecks {
 		public PairwiseImageGraph getGraph() {
 			int N = 400;
 
+			PairwiseImageGraph.Camera camera = new PairwiseImageGraph.Camera(cameraName,null,intrinsic);
+			graph.cameras.put(cameraName,camera);
+
 			// two of the frames have significant translation. The 3rd is very bad for stereo
 			worldToCamera.add(SpecialEuclideanOps_F64.setEulerXYZ(0.06,0.05,-0.04,0.5,1,2.4,null));
 			worldToCamera.add(SpecialEuclideanOps_F64.setEulerXYZ(0.03,0.025,-0.04,0.0,-0.1,3,null));
@@ -277,7 +280,7 @@ public class TestEstimateSceneUnordered extends GenericSceneStructureChecks {
 
 			for (int i = 0; i < graph.nodes.size(); i++) {
 				CameraView v = graph.nodes.get(i);
-				v.camera = cameraName;
+				v.camera = camera;
 				v.features3D = new Feature3D[v.observationNorm.size];
 			}
 
