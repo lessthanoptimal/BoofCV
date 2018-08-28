@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -773,8 +773,9 @@ public class MultiViewOps {
 
 	/**
 	 * <p>
-	 * Given a fundamental matrix a pair of projection matrices [R|T] can be extracted.  There are multiple
-	 * solutions which can be found, the canonical projection matrix is defined as: <br>
+	 * Given a fundamental matrix a pair of projection matrices [M|T] can be extracted.  The projection matrix will
+	 * be known up to a projective transform and there are multiple solutions, The canonical projection
+	 * matrix is defined as: <br>
 	 * <pre>
 	 * P=[I|0] and P'= [M|-M*t] = [[e']*F + e'*v^t | lambda*e']
 	 * </pre>
@@ -783,18 +784,21 @@ public class MultiViewOps {
 	 * </p>
 	 *
 	 * <p>
+	 *     NOTE: Additional information is needed to upgrade this projective transform into a metric transform.
+	 * </p>
+	 * <p>
 	 * Page 256 in R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003
 	 * </p>
 	 *
 	 * @see #extractEpipoles
 	 *
-	 * @param F A fundamental matrix
-	 * @param v Arbitrary 3-vector.  Just pick some value, say (1,1,1).
-	 * @param lambda A non zero scalar.  Try one.
-	 * @param e2 Left epipole of fundamental matrix, F<sup>T</sup>*e2 = 0.
-	 * @return The canonical camera matrix P'
+	 * @param F (Input) A fundamental matrix
+	 * @param e2 (Input) Left epipole of fundamental matrix, F<sup>T</sup>*e2 = 0.
+	 * @param v (Input) Arbitrary 3-vector.  Just pick some value, say (1,1,1).
+	 * @param lambda (Input) A non zero scalar.  Try one.
+	 * @return The canonical camera projection matrix P' (3 by 4) Known up to a projective transform.
 	 */
-	public static DMatrixRMaj canonicalCamera( DMatrixRMaj F , Point3D_F64 e2, Vector3D_F64 v , double lambda ) {
+	public static DMatrixRMaj fundamentalToProjective(DMatrixRMaj F , Point3D_F64 e2, Vector3D_F64 v , double lambda ) {
 
 		DMatrixRMaj crossMatrix = new DMatrixRMaj(3,3);
 		GeometryMath_F64.crossMatrix(e2, crossMatrix);
@@ -814,6 +818,21 @@ public class MultiViewOps {
 		P.set(2,3,lambda*e2.z);
 
 		return P;
+	}
+
+	/**
+	 * <p>
+	 * Given a fundamental matrix a pair of projection matrices [M|T] can be extracted.   Same
+	 * {@link #fundamentalToProjective(DMatrixRMaj, Point3D_F64, Vector3D_F64, double)} but with the suggested values
+	 * for all variables filled in for you.
+	 * </p>
+	 * @param F (Input) Fundamental Matrix
+	 * @return The canonical camera projection matrix P' (3 by 4) Known up to a projective transform.
+	 */
+	public static DMatrixRMaj fundamentalToProjective(DMatrixRMaj F ) {
+		Point3D_F64 e2 = new Point3D_F64();
+		MultiViewOps.extractEpipoles(F, null, e2);
+		return MultiViewOps.fundamentalToProjective(F, e2, new Vector3D_F64(1, 1, 1), 1);
 	}
 
 	/**

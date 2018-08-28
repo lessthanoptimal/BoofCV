@@ -570,7 +570,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void canonicalCamera() {
+	public void fundamentalToProjection() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
@@ -584,7 +584,7 @@ public class TestMultiViewOps {
 		CommonOps_DDRM.scale(-2.0/F.get(0,1),F);
 		MultiViewOps.extractEpipoles(F, e1, e2);
 
-		DMatrixRMaj P = MultiViewOps.canonicalCamera(F, e2, new Vector3D_F64(1, 1, 1), 2);
+		DMatrixRMaj P = MultiViewOps.fundamentalToProjective(F, e2, new Vector3D_F64(1, 1, 1), 2);
 
 		// recompose the fundamental matrix using the special equation for canonical cameras
 		DMatrixRMaj foundF = new DMatrixRMaj(3,3);

@@ -91,6 +91,9 @@ public class PairwiseImageGraph {
 		// otherwise it's in arbitrary units
 		public Se3_F64 a_to_b = new Se3_F64();
 
+		/** if this camera motion is known up to a metric transform. otherwise it will be projective */
+		public boolean metric;
+
 		// Which features are associated with each other and in the inlier set
 		public List<AssociatedIndex> associated = new ArrayList<>();
 

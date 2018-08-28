@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -203,7 +203,7 @@ public class RectifyFundamental {
 		Vector3D_F64 v = new Vector3D_F64(.1,0.5,.2);
 
 		// need to make sure M is not singular for this technique to work
-		SimpleMatrix P = SimpleMatrix.wrap(MultiViewOps.canonicalCamera(F, e2, v, 1));
+		SimpleMatrix P = SimpleMatrix.wrap(MultiViewOps.fundamentalToProjective(F, e2, v, 1));
 
 		SimpleMatrix M = P.extractMatrix(0, 3, 0, 3);
 

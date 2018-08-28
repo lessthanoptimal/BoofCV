@@ -38,6 +38,7 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.util.List;
 
@@ -499,6 +500,20 @@ public class PerspectiveOps {
 	public static DMatrixRMaj createCameraMatrix( DMatrixRMaj R , Vector3D_F64 T , DMatrixRMaj K ,
 													 DMatrixRMaj ret ) {
 		return ImplPerspectiveOps_F64.createCameraMatrix(R, T, K, ret);
+	}
+
+	/**
+	 * Splits the projection matrix into a 3x3 matrix and 3x1 vector.
+	 *
+	 * @param P (Input) 3x4 projection matirx
+	 * @param M (Output) M = P(:,0:2)
+	 * @param T (Output) T = P(:,3)
+	 */
+	public static void projectionSplit( DMatrixRMaj P , DMatrixRMaj M , Vector3D_F64 T ) {
+		CommonOps_DDRM.extract(M,0,0,0,0,P);
+		T.x = P.get(0,3);
+		T.y = P.get(1,3);
+		T.z = P.get(2,3);
 	}
 
 	/**

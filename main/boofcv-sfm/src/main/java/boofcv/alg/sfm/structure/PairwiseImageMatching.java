@@ -21,10 +21,13 @@ package boofcv.alg.sfm.structure;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.robust.RansacMultiView;
 import boofcv.alg.sfm.structure.PairwiseImageGraph.Feature3D;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.geo.ConfigEssential;
+import boofcv.factory.geo.ConfigFundamental;
 import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.struct.calib.CameraPinhole;
@@ -38,6 +41,7 @@ import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.Stoppable;
+import org.ejml.data.DMatrixRMaj;
 
 import java.io.PrintStream;
 import java.util.List;
@@ -66,11 +70,13 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 
 	protected ConfigEssential configEssential = new ConfigEssential();
 	protected ConfigRansac configRansac = new ConfigRansac();
+	protected ConfigFundamental configFundamental = new ConfigFundamental();
 
 	// Temporary storage for feature pairs which are inliers
 	protected FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class,true);
 
-	RansacMultiView<Se3_F64,AssociatedPair> ransacEssential;
+	protected RansacMultiView<Se3_F64,AssociatedPair> ransacEssential;
+	protected Ransac<DMatrixRMaj,AssociatedPair> ransacFundamental;
 
 	// print is verbose or not
 	protected PrintStream verbose;
@@ -85,6 +91,12 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	protected PairwiseImageMatching(){
 		configRansac.inlierThreshold = 2.5;
 		configRansac.maxIterations = 4000;
+		declareModelFitting();
+	}
+
+	protected void declareModelFitting() {
+		ransacEssential = FactoryMultiViewRobust.essentialRansac(configEssential, configRansac);
+		ransacFundamental = FactoryMultiViewRobust.fundamentalRansac(configFundamental, configRansac);
 	}
 
 	/**
@@ -167,8 +179,6 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 			return false;
 		stopRequested = false;
 
-		declareModelFitting();
-
 		for (int i = 0; i < graph.nodes.size(); i++) {
 			if( verbose != null )
 				verbose.println("Matching node "+i);
@@ -185,10 +195,6 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 			}
 		}
 		return graph.edges.size() >= 1;
-	}
-
-	protected void declareModelFitting() {
-		ransacEssential = FactoryMultiViewRobust.essentialRansac(configEssential, configRansac);
 	}
 
 	/**
@@ -216,13 +222,25 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 			ransacEssential.setIntrinsic(1,pinhole1);
 			if( !fitEpipolar(matches, viewA.observationNorm.toList(), viewB.observationNorm.toList(),ransacEssential,edge) )
 				return;
+			edge.metric = true;
 			inliersEpipolar = ransacEssential.getMatchSet().size();
 			edge.a_to_b.set( ransacEssential.getModelParameters() );
 			// scale is arbitrary. Might as well pick something which won't cause the math to blow up later on
 			edge.a_to_b.T.normalize();
+		} else if( fitEpipolar(matches,
+					viewA.observationPixels.toList(), viewB.observationPixels.toList(),
+					ransacFundamental,edge) ) {
+			// transform is only known up to a projective transform
+			edge.metric = false;
+			inliersEpipolar = ransacFundamental.getMatchSet().size();
+			// Extract the canonical projective transform
+			DMatrixRMaj F = ransacFundamental.getModelParameters();
+			DMatrixRMaj P = MultiViewOps.fundamentalToProjective(F);
+			PerspectiveOps.projectionSplit(P,edge.a_to_b.R,edge.a_to_b.T);
 		} else {
-			throw new RuntimeException("All cameras must be calibrated");
+			return;
 		}
+
 
 		if( inliersEpipolar < MIN_FEATURE_ASSOCIATED )
 			return;

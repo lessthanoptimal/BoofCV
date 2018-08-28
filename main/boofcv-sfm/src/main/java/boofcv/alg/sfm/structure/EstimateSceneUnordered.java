@@ -165,6 +165,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		
 		graph = imageMatching.getGraph();
 
+		// TODO how is triangulation angle handled for projective?
 		for (int i = 0; i < graph.edges.size(); i++) {
 			CameraMotion e = graph.edges.get(i);
 			e.triangulationAngle = medianTriangulationAngle(e);
@@ -182,9 +183,16 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			CameraMotion e = graph.edges.get(i);
 			if( e.triangulationAngle > Math.PI/10 || e == baseMotion) {
 				System.out.println("   Edge "+i+" / "+graph.edges.size());
-				triangulateStereoEdges(e);
+				if( e.metric ) {
+					triangulateMetricStereoEdges(e);
+				} else {
+					// TODO handle uncalibrated case
+//					triangulateProjectiveStereoEdges(e);
+				}
 			}
 		}
+
+		// TODO Upgrade all views to metric
 
 		System.out.println("Defining the coordinate system");
 		// Using the selecting coordinate frames and triangulated points define the coordinate system
@@ -752,7 +760,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	 * An edge has been declared as defining a good stereo pair. All associated feature will now be
 	 * triangulated. It is assumed that there is no global coordinate system at this point.
 	 */
-	private void triangulateStereoEdges( CameraMotion edge ) {
+	private void triangulateMetricStereoEdges(CameraMotion edge ) {
 		CameraView viewA = edge.viewSrc;
 		CameraView viewB = edge.viewDst;
 

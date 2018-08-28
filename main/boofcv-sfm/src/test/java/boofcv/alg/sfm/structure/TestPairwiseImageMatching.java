@@ -152,7 +152,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 	}
 
 	@Test
-	public void fitEpipolar() {
+	public void fitEpipolar_calibrated() {
 		createWorld(2,3);
 
 		List<Point3D_F64> worldPoints = new ArrayList<>();
@@ -188,6 +188,11 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 	}
 
 	@Test
+	public void fitEpipolar_uncalibrated() {
+		fail("Implement");
+	}
+
+		@Test
 	public void reset() {
 		MockDetector detector = new MockDetector();
 		PairwiseImageMatching alg = new PairwiseImageMatching(detector);
