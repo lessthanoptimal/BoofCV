@@ -543,4 +543,38 @@ public class PerspectiveOps {
 	public static double computeVFov(CameraPinhole intrinsic) {
 		return 2*Math.atan((intrinsic.height/2)/intrinsic.fy);
 	}
+
+	/**
+	 * Computes the cross-ratio between 4 points. This is an invariant under projective geometry.
+	 * @param a0 Point
+	 * @param a1 Point
+	 * @param a2 Point
+	 * @param a3 Point
+	 * @return cross ratio
+	 */
+	public static double crossRatios( Point3D_F64 a0 , Point3D_F64 a1 , Point3D_F64 a2 , Point3D_F64 a3) {
+		double d01 = a0.distance(a1);
+		double d23 = a2.distance(a3);
+		double d02 = a0.distance(a2);
+		double d13 = a1.distance(a3);
+
+		return (d01*d23)/(d02*d13);
+	}
+
+	/**
+	 * Computes the cross-ratio between 4 points. This is an invariant under projective geometry.
+	 * @param a0 Point
+	 * @param a1 Point
+	 * @param a2 Point
+	 * @param a3 Point
+	 * @return cross ratio
+	 */
+	public static double crossRatios( Point2D_F64 a0 , Point2D_F64 a1 , Point2D_F64 a2 , Point2D_F64 a3) {
+		double d01 = a0.distance(a1);
+		double d23 = a2.distance(a3);
+		double d02 = a0.distance(a2);
+		double d13 = a1.distance(a3);
+
+		return (d01*d23)/(d02*d13);
+	}
 }

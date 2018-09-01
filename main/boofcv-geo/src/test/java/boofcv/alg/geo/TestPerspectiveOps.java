@@ -464,5 +464,4 @@ public class TestPerspectiveOps {
 
 		assertEquals(2*Math.atan(500/600.0),PerspectiveOps.computeVFov(intrinsic), UtilEjml.TEST_F64);
 	}
-
 }

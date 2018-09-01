@@ -22,6 +22,7 @@ import boofcv.alg.geo.h.HomographyInducedStereo2Line;
 import boofcv.alg.geo.h.HomographyInducedStereo3Pts;
 import boofcv.alg.geo.h.HomographyInducedStereoLinePt;
 import boofcv.alg.geo.trifocal.TrifocalExtractEpipoles;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.PairLineNorm;
 import boofcv.struct.geo.TrifocalTensor;
@@ -655,6 +656,21 @@ public class MultiViewOps {
 	}
 
 	/**
+	 * Computes a Fundamental matrix given an Essential matrix and the camera's intrinsic
+	 * parameters.
+	 *
+	 * @see #createFundamental(DMatrixRMaj, DMatrixRMaj)
+	 *
+	 * @param E Essential matrix
+	 * @param intrinsic Intrinsic camera calibration
+	 * @return Fundamental matrix
+	 */
+	public static DMatrixRMaj createFundamental(DMatrixRMaj E, CameraPinhole intrinsic ) {
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic,(DMatrixRMaj)null);
+		return createFundamental(E,K);
+	}
+
+	/**
 	 * Computes a Fundamental matrix given an Essential matrix and the camera calibration matrix.
 	 *
 	 * F = (K2<sup>-1</sup>)<sup>T</sup>*E*K1<sup>-1</sup>
@@ -832,7 +848,7 @@ public class MultiViewOps {
 	public static DMatrixRMaj fundamentalToProjective(DMatrixRMaj F ) {
 		Point3D_F64 e2 = new Point3D_F64();
 		MultiViewOps.extractEpipoles(F, null, e2);
-		return MultiViewOps.fundamentalToProjective(F, e2, new Vector3D_F64(1, 1, 1), 1);
+		return MultiViewOps.fundamentalToProjective(F, e2, new Vector3D_F64(0, 0, 0), 1);
 	}
 
 	/**
