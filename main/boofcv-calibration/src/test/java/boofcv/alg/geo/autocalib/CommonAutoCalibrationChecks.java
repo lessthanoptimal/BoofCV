@@ -46,6 +46,7 @@ public class CommonAutoCalibrationChecks {
 	DMatrixRMaj Q;
 
 	public void renderTranslationOnly( CameraPinhole camera ) {
+		List<CameraPinhole> cameras = new ArrayList<>();
 		for (int i = 0; i < 11; i++) {
 			Se3_F64 R = new Se3_F64();
 			Se3_F64 axis = new Se3_F64();
@@ -57,12 +58,14 @@ public class CommonAutoCalibrationChecks {
 			R.concat(axis,cameraToWorld);
 
 			listCameraToWorld.add( cameraToWorld );
+			cameras.add(camera);
 		}
 
-		render(camera);
+		render(cameras);
 	}
 
 	public void renderRotationOnly( CameraPinhole camera ) {
+		List<CameraPinhole> cameras = new ArrayList<>();
 		for (int i = 0; i < 11; i++) {
 			double yaw = Math.PI*i/9.0;
 			double pitch = Math.PI*i/20.0;
@@ -77,13 +80,14 @@ public class CommonAutoCalibrationChecks {
 			R.concat(axis,cameraToWorld);
 
 			listCameraToWorld.add( cameraToWorld );
+			cameras.add(camera);
 		}
 
-		render(camera);
+		render(cameras);
 	}
 
-	public void renderGood( CameraPinhole camera ) {
-		for (int i = 0; i < 11; i++) {
+	public void renderGood( List<CameraPinhole> cameras ) {
+		for (int i = 0; i < cameras.size(); i++) {
 			double yaw = Math.PI*i/9.0;
 			double pitch = Math.PI*i/20.0;
 			double roll = rand.nextGaussian()*0.1;
@@ -101,13 +105,11 @@ public class CommonAutoCalibrationChecks {
 			listCameraToWorld.add( cameraToWorld );
 		}
 
-		render(camera);
+		render(cameras);
 	}
 
-	private void render(CameraPinhole camera) {
+	private void render(List<CameraPinhole> cameras) {
 		cloud = UtilPoint3D_F64.random(-1,1,200,rand);
-
-		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(camera,(DMatrixRMaj)null);
 
 		// make camera[0] origin. probably not needed
 		Se3_F64 a = listCameraToWorld.get(0).invert(null);
@@ -131,6 +133,8 @@ public class CommonAutoCalibrationChecks {
 //		eq.lookupDDRM("H").print();
 
 		for (int i = 1; i < listCameraToWorld.size(); i++) {
+			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(cameras.get(i),(DMatrixRMaj)null);
+
 			Se3_F64 b_to_a = listCameraToWorld.get(i);
 
 			eq.alias(K,"K",b_to_a.R,"R",b_to_a.T,"T");

@@ -25,6 +25,9 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -34,29 +37,39 @@ public class TestAutoCalibrationLinear extends CommonAutoCalibrationChecks {
 
 	@Test
 	public void solve_ZeroCP() {
-		CameraPinhole intrinsic = new CameraPinhole(400,420,0.1,0,0,0,0);
+		List<CameraPinhole> intrinsics = new ArrayList<>();
+		for (int i = 0; i < 10; i++) {
+			intrinsics.add(new CameraPinhole(400+i*5,420,0.1,0,0,0,0));
+		}
 
-		checkSolve(intrinsic, false,false,5);
+		checkSolve(intrinsics, false,false,5);
 	}
 
 	@Test
 	public void solve_ZeroCP_ZSkew() {
-		CameraPinhole intrinsic = new CameraPinhole(400,420,0,0,0,0,0);
+		List<CameraPinhole> intrinsics = new ArrayList<>();
+		for (int i = 0; i < 10; i++) {
+			intrinsics.add(new CameraPinhole(400+i*5,420,0,0,0,0,0));
+		}
 
-		checkSolve(intrinsic, false,true,4);
+		checkSolve(intrinsics, false,true,4);
 	}
 
 	@Test
 	public void solve_ZeroCP_ZSkew_Aspect() {
-		CameraPinhole intrinsic = new CameraPinhole(400,420,0,0,0,0,0);
-
-		checkSolve(intrinsic, true,true,3);
+		List<CameraPinhole> intrinsics = new ArrayList<>();
+		for (int i = 0; i < 10; i++) {
+			intrinsics.add(new CameraPinhole((400+i*5)*1.05,400+i*5,0,0,0,0,0));
+		}
+		checkSolve(intrinsics, true,true,3);
 	}
 
-	private void checkSolve(CameraPinhole intrinsic, boolean knownAspect, boolean zeroSkew, int numProjectives ) {
-		renderGood(intrinsic);
+	private void checkSolve(List<CameraPinhole> intrinsics, boolean knownAspect, boolean zeroSkew, int numProjectives ) {
+		renderGood(intrinsics);
 
-		double aspect = intrinsic.fy/intrinsic.fx;
+		CameraPinhole a = intrinsics.get(0);
+
+		double aspect = a.fy/a.fx;
 		AutoCalibrationLinear alg;
 		if( zeroSkew ) {
 			if( knownAspect ) {
@@ -74,11 +87,16 @@ public class TestAutoCalibrationLinear extends CommonAutoCalibrationChecks {
 
 		assertEquals(AutoCalibrationLinear.Result.SUCCESS,alg.solve());
 
-		assertEquals(intrinsic.cx, alg.getCx(), UtilEjml.TEST_F64);
-		assertEquals(intrinsic.cy, alg.getCy(), UtilEjml.TEST_F64);
-		assertEquals(intrinsic.fx, alg.getFx(), UtilEjml.TEST_F64);
-		assertEquals(intrinsic.fy, alg.getFy(), UtilEjml.TEST_F64);
-		assertEquals(intrinsic.skew, alg.getSkew(), UtilEjml.TEST_F64);
+		assertEquals(intrinsics.size()-1,alg.getSolutions().size());
+		for (int i = 1; i < intrinsics.size(); i++) {
+			CameraPinhole intrinsic = intrinsics.get(i);
+			AutoCalibrationLinear.Intrinsic found = alg.getSolutions().get(i-1);
+
+			assertEquals(intrinsic.fx,   found.fx,   UtilEjml.TEST_F64);
+			assertEquals(intrinsic.fy,   found.fy,   UtilEjml.TEST_F64);
+			assertEquals(intrinsic.skew, found.skew, UtilEjml.TEST_F64);
+
+		}
 	}
 
 	@Test
@@ -105,9 +123,12 @@ public class TestAutoCalibrationLinear extends CommonAutoCalibrationChecks {
 
 	@Test
 	public void constructMatrix() {
-		CameraPinhole intrinsic = new CameraPinhole(400,420,0,0,0,1000,1050);
+		List<CameraPinhole> intrinsics = new ArrayList<>();
+		for (int i = 0; i < 10; i++) {
+			intrinsics.add(new CameraPinhole(400+i*5,420,0.1,0,0,0,0));
+		}
 
-		renderGood(intrinsic);
+		renderGood(intrinsics);
 
 		AutoCalibrationLinear alg = new AutoCalibrationLinear(false);
 		addProjectives(alg);

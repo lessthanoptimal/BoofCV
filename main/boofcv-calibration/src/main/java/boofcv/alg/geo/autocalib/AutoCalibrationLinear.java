@@ -29,23 +29,25 @@ import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 import org.ejml.ops.ConvertDMatrixStruct;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * <p>Computes intrinsic calibration matrix using the absolute dual quadratic, projectives, and by assuming
- * different elements in the calibration matrix have a zero value. It is also assumed that
- * the calibration does not change from view to view. This approach is based off solving
- * for the null space derived from the linear constraints specified in:</p>
+ * <p>Computes intrinsic calibration matrix using the absolute dual quadratic, projective transforms, and by assuming
+ * different elements in the calibration matrix have a linear constraint. All camera parameters which are not
+ * constrained are allowed to vary from frame to frame. The solution is found by computing the null space of
+ * the constrained version of the system below:</p>
  * <p>w = P*Q*P<sup>T</sup></p>
+ * <p>On output, a list of intrinsic parameters is returned (fx,fy,skew) for every view which is provided.
  * For a complete discussion of the theory see the auto calibration section of [1] with missing equations
- * derived in [2].
+ * derived in [2].</p>
  *
- * Two types of constraints can be specified, zero skew and zero principle point. They can be specified together
- * or independently, but at least one needs to be specified. If zero principle point is specified then the
- * projection matrices and observed pixel coordinates needs to be adjusted for the change in coordinate system.
- * Between 4 and 10 projective matrices are required.
+ * <p>Two types of constraints can be specified; zero skew and fixed aspect ratio. Zero principle point is a mandatory
+ * constraint. Zero skew is required if fixed aspect ratio is a constraint.</p>
  *
- * A check for sufficient geometric diversity is done by looking at singular values. The nullity should be one,
+ * <p>A check for sufficient geometric diversity is done by looking at singular values. The nullity should be one,
  * but if its more than one then there is too much ambiguity. The tolerance can be adjusted by changing the
- * singularThreshold.
+ * {@link #setSingularThreshold(double) singular threshold}.</p>
  *
  * <ol>
  * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
@@ -70,8 +72,7 @@ public class AutoCalibrationLinear extends AutoCalibrationBase {
 	double aspectRatio;
 
 	// Found calibration parameters
-	double fx,fy,skew,cx,cy;
-
+	List<Intrinsic> solutions = new ArrayList<>();
 
 	// A singular value is considered zero if it is smaller than this number
 	double singularThreshold=1e-8;
@@ -90,7 +91,7 @@ public class AutoCalibrationLinear extends AutoCalibrationBase {
 	/**
 	 * Constructor for zero-principle point, zero-skew, and known fixed aspect ratio (fy/fx)
 	 *
-	 * @param aspectRatio if true zero is assumed to be zero
+	 * @param aspectRatio Specifies the known aspect ratio. fy/fx
 	 */
 	public AutoCalibrationLinear( double aspectRatio ) {
 		this(4);
@@ -132,18 +133,13 @@ public class AutoCalibrationLinear extends AutoCalibrationBase {
 			return Result.POOR_GEOMETRY;
 		}
 		// Examine the null space to find the values of Q
-		DMatrix4x4 Q = extractSolutionForQ();
+		// Then compute the solution for each view
+		computeSolutions(extractSolutionForQ());
 
-		// Compute average w across all projectives
-		DMatrixRMaj w = computeAverageW(Q);
-
-		// solve calibration matrix
-		solveForCalibration(w);
-
-		if( sanityCheck() ) {
-			return Result.SUCCESS;
-		} else {
+		if( solutions.size() != N ) {
 			return Result.SOLUTION_NAN;
+		} else {
+			return Result.SUCCESS;
 		}
 	}
 
@@ -173,14 +169,13 @@ public class AutoCalibrationLinear extends AutoCalibrationBase {
 	 * Computes average W across all projectives. The idea being that the average will
 	 * be a better estimate than selecting a random one.
 	 */
-	private DMatrixRMaj computeAverageW(DMatrix4x4 Q) {
+	private void computeSolutions(DMatrix4x4 Q) {
 		DMatrixRMaj _P = new DMatrixRMaj(3,4);
 		DMatrixRMaj _Q = new DMatrixRMaj(4,4);
 		ConvertDMatrixStruct.convert(Q,_Q);
 
 		DMatrixRMaj tmp = new DMatrixRMaj(3,4);
 		DMatrixRMaj w_i = new DMatrixRMaj(3,3);
-		DMatrixRMaj w = new DMatrixRMaj(3,3);
 
 		for (int i = 0; i < projectives.size; i++) {
 			convert(projectives.get(i), _P);
@@ -188,58 +183,55 @@ public class AutoCalibrationLinear extends AutoCalibrationBase {
 			CommonOps_DDRM.multTransB(tmp,_P,w_i);
 			CommonOps_DDRM.divide(w_i,w_i.get(2,2));
 
-			CommonOps_DDRM.add(w_i,w,w);
+			Intrinsic calib = solveForCalibration(w_i);
+			if( sanityCheck(calib)) {
+				solutions.add(calib);
+			}
 		}
-		CommonOps_DDRM.divide(w, projectives.size);
-		return w;
 	}
 
 	/**
 	 * Given the solution for w and the constraints solve for the remaining parameters
 	 */
-	private void solveForCalibration(DMatrixRMaj w) {
-		// zero principle point is mandatory
-		cx = cy = 0;
+	private Intrinsic solveForCalibration(DMatrixRMaj w) {
+		Intrinsic calib = new Intrinsic();
 
 		if( zeroSkew ) {
-			skew = 0;
-			fy = Math.sqrt(w.get(1,1));
+			calib.skew = 0;
+			calib.fy = Math.sqrt(w.get(1,1));
 
 			if( knownAspect ) {
-				fx = fy/aspectRatio;
+				calib.fx = calib.fy/aspectRatio;
 			} else {
-				fx = Math.sqrt(w.get(0,0));
+				calib.fx = Math.sqrt(w.get(0,0));
 			}
 		} else if( knownAspect ) {
-			fy = Math.sqrt(w.get(1,1));
-			fx = fy/aspectRatio;
-			skew = w.get(0,1)/fy;
+			calib.fy = Math.sqrt(w.get(1,1));
+			calib.fx = calib.fy/aspectRatio;
+			calib.skew = w.get(0,1)/calib.fy;
 		} else {
-			fy = Math.sqrt(w.get(1,1));
-			skew = w.get(0,1)/fy;
-			fx = Math.sqrt(w.get(0,0) - skew*skew);
+			calib.fy = Math.sqrt(w.get(1,1));
+			calib.skew = w.get(0,1)/calib.fy;
+			calib.fx = Math.sqrt(w.get(0,0) - calib.skew*calib.skew);
 		}
+		return calib;
 	}
 
 	/**
 	 * Makes sure that the found solution is valid and physically possible
 	 * @return true if valid
 	 */
-	boolean sanityCheck() {
-		if(UtilEjml.isUncountable(fx))
+	boolean sanityCheck(Intrinsic calib ) {
+		if(UtilEjml.isUncountable(calib.fx))
 			return false;
-		if(UtilEjml.isUncountable(fy))
+		if(UtilEjml.isUncountable(calib.fy))
 			return false;
-		if(UtilEjml.isUncountable(cx))
-			return false;
-		if(UtilEjml.isUncountable(cy))
-			return false;
-		if(UtilEjml.isUncountable(skew))
+		if(UtilEjml.isUncountable(calib.skew))
 			return false;
 
-		if( fx < 0 )
+		if( calib.fx < 0 )
 			return false;
-		if( fy < 0 )
+		if( calib.fy < 0 )
 			return false;
 
 		return true;
@@ -342,24 +334,12 @@ public class AutoCalibrationLinear extends AutoCalibrationBase {
 		this.singularThreshold = singularThreshold;
 	}
 
-	public double getFx() {
-		return fx;
+	public List<Intrinsic> getSolutions() {
+		return solutions;
 	}
 
-	public double getFy() {
-		return fy;
-	}
-
-	public double getSkew() {
-		return skew;
-	}
-
-	public double getCx() {
-		return cx;
-	}
-
-	public double getCy() {
-		return cy;
+	public static class Intrinsic {
+		public double fx,fy,skew;
 	}
 
 	public enum Result {
