@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.autocalib;
+package boofcv.alg.geo.selfcalib;
 
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ejml.data.DMatrix3;
@@ -40,7 +40,7 @@ import org.ejml.dense.fixed.NormOps_DDF3;
  *
  * @author Peter Abeles
  */
-public class AutoCalibrationConstantK extends AutoCalibrationBase {
+public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase {
 
 
 	public void solve() {

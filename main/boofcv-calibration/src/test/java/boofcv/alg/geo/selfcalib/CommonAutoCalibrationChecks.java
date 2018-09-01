@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.autocalib;
+package boofcv.alg.geo.selfcalib;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
@@ -149,7 +149,7 @@ public class CommonAutoCalibrationChecks {
 //		Q.print();
 	}
 
-	public void addProjectives(AutoCalibrationBase alg ) {
+	public void addProjectives(SelfCalibrationBase alg ) {
 		for (int i = 0; i < listP.size(); i++) {
 			alg.addProjective(listP.get(i));
 		}

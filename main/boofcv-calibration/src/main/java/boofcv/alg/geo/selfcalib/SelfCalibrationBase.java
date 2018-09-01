@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.autocalib;
+package boofcv.alg.geo.selfcalib;
 
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrix3;
 import org.ejml.data.DMatrix3x3;
+import org.ejml.data.DMatrix4x4;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.ops.ConvertDMatrixStruct;
@@ -40,12 +41,17 @@ import org.ejml.ops.ConvertDMatrixStruct;
  *
  * @author Peter Abeles
  */
-public class AutoCalibrationBase {
+public class SelfCalibrationBase {
 
 	FastQueue<Projective> projectives = new FastQueue<>(Projective.class,true);
 
 	// Minimum number of projective views to estimate the parameters
 	int minimumProjectives;
+
+	// workspace
+	DMatrixRMaj _P = new DMatrixRMaj(3,4);
+	DMatrixRMaj _Q = new DMatrixRMaj(4,4);
+	DMatrixRMaj tmp = new DMatrixRMaj(3,4);
 
 	/**
 	 * Adds a projective transform which describes the relationship between a 3D point viewed in
@@ -63,6 +69,43 @@ public class AutoCalibrationBase {
 		Projective pr = projectives.grow();
 		ConvertDMatrixStruct.convert(A,pr.A);
 		pr.a.set(P.get(0,3),P.get(1,3),P.get(2,3));
+	}
+
+	public static void encodeQ( DMatrix4x4 Q , double param[] ) {
+		Q.a11 = param[0];
+		Q.a12 = Q.a21 = param[1];
+		Q.a13 = Q.a31 = param[2];
+		Q.a14 = Q.a41 = param[3];
+		Q.a22 = param[4];
+		Q.a23 = Q.a32 = param[5];
+		Q.a24 = Q.a42 = param[6];
+		Q.a33 = param[7];
+		Q.a34 = Q.a43 = param[8];
+		Q.a44 = param[9];
+	}
+
+	public void computeW( Projective P , DMatrix4x4 Q , DMatrixRMaj w_i) {
+		ConvertDMatrixStruct.convert(Q,_Q);
+
+		convert(P, _P);
+		CommonOps_DDRM.mult(_P,_Q,tmp);
+		CommonOps_DDRM.multTransB(tmp,_P,w_i);
+		CommonOps_DDRM.divide(w_i,w_i.get(2,2));
+	}
+
+	static void convert( Projective P , DMatrixRMaj D ) {
+		D.data[0] = P.A.a11;
+		D.data[1] = P.A.a12;
+		D.data[2] = P.A.a13;
+		D.data[3] = P.a.a1;
+		D.data[4] = P.A.a21;
+		D.data[5] = P.A.a22;
+		D.data[6] = P.A.a23;
+		D.data[7] = P.a.a2;
+		D.data[8] = P.A.a31;
+		D.data[9] = P.A.a32;
+		D.data[10] = P.A.a33;
+		D.data[11] = P.a.a3;
 	}
 
 	/**

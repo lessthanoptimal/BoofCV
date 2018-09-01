@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.autocalib;
+package boofcv.alg.geo.selfcalib;
 
 import boofcv.struct.calib.CameraPinhole;
 import org.ejml.UtilEjml;
@@ -70,27 +70,27 @@ public class TestAutoCalibrationLinear extends CommonAutoCalibrationChecks {
 		CameraPinhole a = intrinsics.get(0);
 
 		double aspect = a.fy/a.fx;
-		AutoCalibrationLinear alg;
+		SelfCalibrationLinearDualQuadratic alg;
 		if( zeroSkew ) {
 			if( knownAspect ) {
-				alg = new AutoCalibrationLinear(aspect);
+				alg = new SelfCalibrationLinearDualQuadratic(aspect);
 			} else {
-				alg = new AutoCalibrationLinear(true);
+				alg = new SelfCalibrationLinearDualQuadratic(true);
 			}
 		} else {
-			alg = new AutoCalibrationLinear(false);
+			alg = new SelfCalibrationLinearDualQuadratic(false);
 		}
 
 		assertEquals(numProjectives,alg.getMinimumProjectives());
 
 		addProjectives(alg);
 
-		assertEquals(AutoCalibrationLinear.Result.SUCCESS,alg.solve());
+		assertEquals(SelfCalibrationLinearDualQuadratic.Result.SUCCESS,alg.solve());
 
 		assertEquals(intrinsics.size()-1,alg.getSolutions().size());
 		for (int i = 1; i < intrinsics.size(); i++) {
 			CameraPinhole intrinsic = intrinsics.get(i);
-			AutoCalibrationLinear.Intrinsic found = alg.getSolutions().get(i-1);
+			SelfCalibrationLinearDualQuadratic.Intrinsic found = alg.getSolutions().get(i-1);
 
 			assertEquals(intrinsic.fx,   found.fx,   UtilEjml.TEST_F64);
 			assertEquals(intrinsic.fy,   found.fy,   UtilEjml.TEST_F64);
@@ -104,10 +104,10 @@ public class TestAutoCalibrationLinear extends CommonAutoCalibrationChecks {
 		CameraPinhole intrinsic = new CameraPinhole(400,420,0.1,0,0,0,0);
 		renderTranslationOnly(intrinsic);
 
-		AutoCalibrationLinear alg = new AutoCalibrationLinear(false);
+		SelfCalibrationLinearDualQuadratic alg = new SelfCalibrationLinearDualQuadratic(false);
 		addProjectives(alg);
 
-		assertEquals(AutoCalibrationLinear.Result.POOR_GEOMETRY,alg.solve());
+		assertEquals(SelfCalibrationLinearDualQuadratic.Result.POOR_GEOMETRY,alg.solve());
 	}
 
 	@Test
@@ -115,10 +115,10 @@ public class TestAutoCalibrationLinear extends CommonAutoCalibrationChecks {
 		CameraPinhole intrinsic = new CameraPinhole(400,420,0.1,0,0,0,0);
 		renderRotationOnly(intrinsic);
 
-		AutoCalibrationLinear alg = new AutoCalibrationLinear(false);
+		SelfCalibrationLinearDualQuadratic alg = new SelfCalibrationLinearDualQuadratic(false);
 		addProjectives(alg);
 
-		assertEquals(AutoCalibrationLinear.Result.POOR_GEOMETRY,alg.solve());
+		assertEquals(SelfCalibrationLinearDualQuadratic.Result.POOR_GEOMETRY,alg.solve());
 	}
 
 	@Test
@@ -130,7 +130,7 @@ public class TestAutoCalibrationLinear extends CommonAutoCalibrationChecks {
 
 		renderGood(intrinsics);
 
-		AutoCalibrationLinear alg = new AutoCalibrationLinear(false);
+		SelfCalibrationLinearDualQuadratic alg = new SelfCalibrationLinearDualQuadratic(false);
 		addProjectives(alg);
 
 		DMatrixRMaj L = new DMatrixRMaj(3,3);

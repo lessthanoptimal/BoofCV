@@ -16,18 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.autocalib;
+package boofcv.alg.geo.selfcalib;
 
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix3;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrix4x4;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.SingularOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
-import org.ejml.ops.ConvertDMatrixStruct;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +35,7 @@ import java.util.List;
  * different elements in the calibration matrix have a linear constraint. All camera parameters which are not
  * constrained are allowed to vary from frame to frame. The solution is found by computing the null space of
  * the constrained version of the system below:</p>
- * <p>w = P*Q*P<sup>T</sup></p>
+ * <p>w<sup>*</sup><sub>i</sub> = P<sub>i</sub>*Q<sup>*</sup><sub>&infin;</sub>*P<sup>T</sup><sub>i</sub></p>
  * <p>On output, a list of intrinsic parameters is returned (fx,fy,skew) for every view which is provided.
  * For a complete discussion of the theory see the auto calibration section of [1] with missing equations
  * derived in [2].</p>
@@ -56,7 +54,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class AutoCalibrationLinear extends AutoCalibrationBase {
+public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 
 	SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(10,10,
 			false,true,true);
@@ -74,6 +72,9 @@ public class AutoCalibrationLinear extends AutoCalibrationBase {
 	// Found calibration parameters
 	List<Intrinsic> solutions = new ArrayList<>();
 
+	// The dual absolute quadratic
+	DMatrix4x4 Q = new DMatrix4x4();
+
 	// A singular value is considered zero if it is smaller than this number
 	double singularThreshold=1e-8;
 
@@ -82,7 +83,7 @@ public class AutoCalibrationLinear extends AutoCalibrationBase {
 	 *
 	 * @param zeroSkew if true zero is assumed to be zero
 	 */
-	public AutoCalibrationLinear( boolean zeroSkew ) {
+	public SelfCalibrationLinearDualQuadratic(boolean zeroSkew ) {
 		this(zeroSkew?3:2);
 		knownAspect = false;
 		this.zeroSkew = zeroSkew;
@@ -93,14 +94,14 @@ public class AutoCalibrationLinear extends AutoCalibrationBase {
 	 *
 	 * @param aspectRatio Specifies the known aspect ratio. fy/fx
 	 */
-	public AutoCalibrationLinear( double aspectRatio ) {
+	public SelfCalibrationLinearDualQuadratic(double aspectRatio ) {
 		this(4);
 		knownAspect = true;
 		this.zeroSkew = true;
 		this.aspectRatio = aspectRatio;
 	}
 
-	private AutoCalibrationLinear( int equations ) {
+	private SelfCalibrationLinearDualQuadratic(int equations ) {
 		eqs = equations;
 		minimumProjectives = (int)Math.ceil(10.0/eqs);
 	}
@@ -134,7 +135,8 @@ public class AutoCalibrationLinear extends AutoCalibrationBase {
 		}
 		// Examine the null space to find the values of Q
 		// Then compute the solution for each view
-		computeSolutions(extractSolutionForQ());
+		extractSolutionForQ(Q);
+		computeSolutions(Q);
 
 		if( solutions.size() != N ) {
 			return Result.SOLUTION_NAN;
@@ -146,23 +148,12 @@ public class AutoCalibrationLinear extends AutoCalibrationBase {
 	/**
 	 * Extracts the null space and converts it into the Q matrix
 	 */
-	private DMatrix4x4 extractSolutionForQ() {
+	private void extractSolutionForQ( DMatrix4x4 Q ) {
 		DMatrixRMaj nv = new DMatrixRMaj(10,1);
 		SingularOps_DDRM.nullVector(svd,true,nv);
 
 		// Convert the solution into a fixed sized matrix because it's easier to read
-		DMatrix4x4 Q = new DMatrix4x4();
-		Q.a11 = nv.data[0];
-		Q.a12 = Q.a21 = nv.data[1];
-		Q.a13 = Q.a31 = nv.data[2];
-		Q.a14 = Q.a41 = nv.data[3];
-		Q.a22 = nv.data[4];
-		Q.a23 = Q.a32 = nv.data[5];
-		Q.a24 = Q.a42 = nv.data[6];
-		Q.a33 = nv.data[7];
-		Q.a34 = Q.a43 = nv.data[8];
-		Q.a44 = nv.data[9];
-		return Q;
+		encodeQ(Q,nv.data);
 	}
 
 	/**
@@ -170,19 +161,10 @@ public class AutoCalibrationLinear extends AutoCalibrationBase {
 	 * be a better estimate than selecting a random one.
 	 */
 	private void computeSolutions(DMatrix4x4 Q) {
-		DMatrixRMaj _P = new DMatrixRMaj(3,4);
-		DMatrixRMaj _Q = new DMatrixRMaj(4,4);
-		ConvertDMatrixStruct.convert(Q,_Q);
-
-		DMatrixRMaj tmp = new DMatrixRMaj(3,4);
 		DMatrixRMaj w_i = new DMatrixRMaj(3,3);
 
 		for (int i = 0; i < projectives.size; i++) {
-			convert(projectives.get(i), _P);
-			CommonOps_DDRM.mult(_P,_Q,tmp);
-			CommonOps_DDRM.multTransB(tmp,_P,w_i);
-			CommonOps_DDRM.divide(w_i,w_i.get(2,2));
-
+			computeW(projectives.get(i),Q,w_i);
 			Intrinsic calib = solveForCalibration(w_i);
 			if( sanityCheck(calib)) {
 				solutions.add(calib);
@@ -235,22 +217,6 @@ public class AutoCalibrationLinear extends AutoCalibrationBase {
 			return false;
 
 		return true;
-	}
-
-
-	static void convert( Projective P , DMatrixRMaj D ) {
-		D.data[0] = P.A.a11;
-		D.data[1] = P.A.a12;
-		D.data[2] = P.A.a13;
-		D.data[3] = P.a.a1;
-		D.data[4] = P.A.a21;
-		D.data[5] = P.A.a22;
-		D.data[6] = P.A.a23;
-		D.data[7] = P.a.a2;
-		D.data[8] = P.A.a31;
-		D.data[9] = P.A.a32;
-		D.data[10] = P.A.a33;
-		D.data[11] = P.a.a3;
 	}
 
 	/**
