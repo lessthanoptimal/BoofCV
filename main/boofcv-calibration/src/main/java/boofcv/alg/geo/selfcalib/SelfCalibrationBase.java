@@ -84,6 +84,15 @@ public class SelfCalibrationBase {
 		Q.a44 = param[9];
 	}
 
+	public static void encodeK( DMatrix3x3 K , int offset, double param[] ) {
+		K.a11 = param[offset];
+		K.a12 = param[offset+1];
+		K.a13 = param[offset+2];
+		K.a22 = param[offset+3];
+		K.a23 = param[offset+4];
+		K.a33 = 1;
+	}
+
 	public void computeW( Projective P , DMatrix4x4 Q , DMatrixRMaj w_i) {
 		ConvertDMatrixStruct.convert(Q,_Q);
 

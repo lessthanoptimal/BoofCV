@@ -43,6 +43,7 @@ public class CommonAutoCalibrationChecks {
 	List<Se3_F64> listCameraToWorld = new ArrayList<>();
 
 	List<DMatrixRMaj> listP = new ArrayList<>();
+	DMatrixRMaj p=new DMatrixRMaj(3,1); // plane at infinity [p';1]
 	DMatrixRMaj Q;
 
 	public void renderTranslationOnly( CameraPinhole camera ) {
@@ -128,8 +129,14 @@ public class CommonAutoCalibrationChecks {
 
 		// Create a homography which will change the projections P from metric into a
 		// more general projective transform
-		eq.process("A = 1.5*eye(3)");
-		eq.process("H = [A, [0;0;0];[0.1,0.5,1.1,1.8]]");
+		{
+
+			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(cameras.get(0),(DMatrixRMaj)null);
+			eq.alias(K,"K",p,"p");
+			eq.process("p=[0.5,0.25,0.4]'");
+			eq.process("H = [K [0;0;0]; -p'*K 1]"); // projective to metric
+			eq.process("Hinv = inv(H)"); // metric to projective
+		}
 //		eq.lookupDDRM("H").print();
 
 		for (int i = 1; i < listCameraToWorld.size(); i++) {
@@ -138,13 +145,12 @@ public class CommonAutoCalibrationChecks {
 			Se3_F64 b_to_a = listCameraToWorld.get(i);
 
 			eq.alias(K,"K",b_to_a.R,"R",b_to_a.T,"T");
-			DMatrixRMaj P = eq.process("P = [K*R, K*T]*H").lookupDDRM("P").copy();
+			DMatrixRMaj P = eq.process("P = [K*R, K*T]*Hinv").lookupDDRM("P").copy();
 			listP.add(P);
 		}
 
 		// Compute Q_inf from its definition. See 19.8 in the Multi View Geometry Book
-		eq.process("H=inv(H)");
-		Q = eq.process("Q=H*diag([1 1 1 0])*H'").lookupDDRM("Q");
+		Q = eq.process("Q=H*diag([1 1 1 0])*H'").process("Q=Q/normF(Q)").lookupDDRM("Q");
 //		System.out.println("---------Q");
 //		Q.print();
 	}

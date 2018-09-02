@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestAutoCalibrationLinear extends CommonAutoCalibrationChecks {
+public class TestSelfCalibrationLinear extends CommonAutoCalibrationChecks {
 
 	@Test
 	public void solve_ZeroCP() {
@@ -92,9 +92,9 @@ public class TestAutoCalibrationLinear extends CommonAutoCalibrationChecks {
 			CameraPinhole intrinsic = intrinsics.get(i);
 			SelfCalibrationLinearDualQuadratic.Intrinsic found = alg.getSolutions().get(i-1);
 
-			assertEquals(intrinsic.fx,   found.fx,   UtilEjml.TEST_F64);
-			assertEquals(intrinsic.fy,   found.fy,   UtilEjml.TEST_F64);
-			assertEquals(intrinsic.skew, found.skew, UtilEjml.TEST_F64);
+			assertEquals(intrinsic.fx,   found.fx,   UtilEjml.TEST_F64_SQ);
+			assertEquals(intrinsic.fy,   found.fy,   UtilEjml.TEST_F64_SQ);
+			assertEquals(intrinsic.skew, found.skew, UtilEjml.TEST_F64_SQ);
 
 		}
 	}
@@ -157,6 +157,6 @@ public class TestAutoCalibrationLinear extends CommonAutoCalibrationChecks {
 
 		// See if it's the null space
 		CommonOps_DDRM.mult(L,q,found);
-		assertEquals(0,NormOps_DDRM.normF(found), UtilEjml.TEST_F64);
+		assertEquals(0,NormOps_DDRM.normF(found), 10*UtilEjml.TEST_F64);
 	}
 }
