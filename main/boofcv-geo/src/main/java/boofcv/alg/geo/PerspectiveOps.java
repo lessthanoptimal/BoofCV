@@ -36,6 +36,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -206,6 +207,18 @@ public class PerspectiveOps {
 	public static FMatrixRMaj pinholeToMatrix(CameraPinhole param , FMatrixRMaj K )
 	{
 		return ImplPerspectiveOps_F32.pinholeToMatrix(param, K);
+	}
+
+	/**
+	 * Given the intrinsic parameters create a calibration matrix
+	 *
+	 * @param param Intrinsic parameters structure that is to be converted into a matrix
+	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
+	 * @return Calibration matrix 3x3
+	 */
+	public static DMatrix3x3 pinholeToMatrix(CameraPinhole param , DMatrix3x3 K )
+	{
+		return ImplPerspectiveOps_F64.pinholeToMatrix(param, K);
 	}
 
 	/**

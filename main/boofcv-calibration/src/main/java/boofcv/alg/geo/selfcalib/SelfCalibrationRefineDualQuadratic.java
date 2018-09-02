@@ -34,31 +34,59 @@ import org.ejml.ops.ConvertDMatrixStruct;
 import java.util.List;
 
 /**
- * Performs auto-calibration when the camera matrix is assumed to be constant. All 6-calibration
- * parameters are solved for along with the plane at infinity.
- *
  * <p>
- * w<sup>*</sup> = P Q<sup>*</sup><sub>&infin;</sub>P<sup>T</sup>
+ * Non-linear optimization on camera parameters for each view and for the plane at infinity. The plane at infinity
+ * is used to compute a predicted camera parameter from projectives and that is then compared against the estimated
+ * camera parameter for each view. The error which is minimized is an algebraic error and this should be followed up
+ * with geometric error from bundle adjustment. See [1] for a complete description of the mathematics.
  * </p>
  *
- * TODO Describe
+ * <p>
+ *     w<sup>*</sup><sub>i</sub> = K<sub>i</sub> *K<sup>T</sup><sub>i</sub> <br>
+ *     w<sup>*</sup><sub>i</sub> = P<sub>i</sub>Q<sup>*</sup><sub>&infin;</sub>P<sup>T</sup><sub>i</sub>
+ * </p>
+ * where K<sub>i</sub>  is the 3x3 camera calibration matrix for view i. Q is a 4x4 symmetric matrix and is the absolute dual
+ * quadratic. P<sub>i</sub> is a projective transform from view i+1 to i.
  *
- * TODO constant internal parameters
- * TODO aspect ratio and known skew
- * TODO
+ * <p>
+ *     A[i] = P<sub>i</sub>Q<sup>*</sup><sub>&infin;</sub>P<sup>T</sup><sub>i</sub> <br>
+ *     residual[i] = w<sup>*</sup><sub>i</sub>/||w<sup>*</sup><sub>i</sub>|| - A[i]/||A[i]||
+ * </p>
+ * Residuals are computed for each projective. The F-norm of the residuals are what is minimized.
+ * w and A are normalized to ensure that they have the same scale.
+ *
+ * <p>Different restrictions on camera parameters can be turned on and off. Zero principle-point, zero-skew, and
+ * fixed aspect ratio. If fixed aspect ratio is true then the aspect ratio of the input
+ * parameters is used and kept constant.</p>
+ *
+ * <ol>
+ * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
+ * </ol>
  *
  * @author Peter Abeles
  */
-public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase {
-
+public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase
+{
+	// used to find null space of Q, which is plane at infinity
 	SolveNullSpace<DMatrixRMaj> nullspace = new SolveNullSpaceSvd_DDRM();
 	DMatrixRMaj _Q = new DMatrixRMaj(4,4);
-	DMatrixRMaj p = new DMatrixRMaj(3,1);
+	DMatrixRMaj p = new DMatrixRMaj(3,1); // plane at infinity
 
+	// non-linear optimization
+	UnconstrainedLeastSquares<DMatrixRMaj> optimizer =  FactoryOptimization.levenbergMarquardt(null,true);
+	ResidualK func;
 	DGrowArray param = new DGrowArray();
 
-	UnconstrainedLeastSquares<DMatrixRMaj> optimizer =  FactoryOptimization.levenbergMarquardt(null,true);
-	ResidualK func = new ResidualK();
+	// toggles for assumptions about calibration matrix
+	private boolean zeroPrinciplePoint=false;
+	private boolean zeroSkew=false;
+	private boolean fixedAspectRatio=false;
+
+	// storage of aspect ratio of each camera, if configured to save
+	DGrowArray aspect = new DGrowArray();
+
+	// number of calibration parameters being optimized
+	int calibParameters;
 
 	/**
 	 * Refine calibration matrix K given the dual absolute quadratic Q.
@@ -73,34 +101,58 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase {
 		if( projectives.size < 2 )
 			throw new IllegalArgumentException("At least 2 projectives are required. You should have more");
 
+		computeNumberOfCalibrationParameters();
+
+		// Declared new each time to ensure all variables are properly zeroed
+		func = new ResidualK();
+
 		// plane at infinity to the null space of Q
 		ConvertDMatrixStruct.convert(Q,_Q);
 		nullspace.process(_Q,1,p);
 		CommonOps_DDRM.divide(p,p.get(3));
 		p.numRows=3;
 
-		System.out.println("Calibration = "+calibration.size());
-		System.out.println("projectives = "+projectives.size());
-
+		// Convert input objects into an array which can be understood by optimization
 		encode(calibration,p,param);
 
-		optimizer.setVerbose(System.out,0);
-		optimizer.setFunction(func,null);
+		// Configure optimization
+//		optimizer.setVerbose(System.out,0);
+		optimizer.setFunction(func,null); // Compute using a numerical Jacobian
 		optimizer.initialize(param.data,1e-8,1e-8);
 
+		// Tell it to run for at most 100 iterations
 		if( !UtilOptimize.process(optimizer,100) )
 			return false;
 
+		// extract solution
 		decode(optimizer.getParameters(),calibration,p);
 		recomputeQ(p,Q);
 
 		return true;
 	}
 
+	private void computeNumberOfCalibrationParameters() {
+		calibParameters = 0;
+		if( !zeroPrinciplePoint )
+			calibParameters += 2;
+		if( !zeroSkew )
+			calibParameters++;
+		if( fixedAspectRatio )
+			calibParameters++;
+		else
+			calibParameters += 2;
+	}
+
+	/**
+	 * Compuets the absolute dual quadratic from the first camera parameters and
+	 * plane at infinity
+	 * @param p plane at infinity
+	 * @param Q (Output) ABQ
+	 */
 	void recomputeQ( DMatrixRMaj p , DMatrix4x4 Q ) {
 		Equation eq = new Equation();
 		DMatrix3x3 K = new DMatrix3x3();
-		encodeK(K,3,param.data);
+		encodeK(K,0,3,param.data);
 		eq.alias(p,"p",K,"K");
 		eq.process("w=K*K'");
 		eq.process("Q=[w , -w*p;-p'*w , p'*w*p]");
@@ -110,7 +162,8 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase {
 	}
 
 	void encode( List<CameraPinhole> calibration , DMatrixRMaj p , DGrowArray params) {
-		params.reshape(3+calibration.size()*5);
+		aspect.reshape(calibration.size());
+		params.reshape(3+calibration.size()*calibParameters);
 
 		int idx = 0;
 		params.data[idx++] = p.data[0];
@@ -119,11 +172,21 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase {
 
 		for (int i = 0; i < calibration.size(); i++) {
 			CameraPinhole K = calibration.get(i);
-			params.data[idx++] = K.fx;
-			params.data[idx++] = K.skew;
-			params.data[idx++] = K.cx;
-			params.data[idx++] = K.fy;
-			params.data[idx++] = K.cy;
+			if( fixedAspectRatio ) {
+				aspect.data[i] = K.fy/K.fx;
+				params.data[idx++] = K.fx;
+			} else {
+				params.data[idx++] = K.fx;
+				params.data[idx++] = K.fy;
+			}
+			if( !zeroSkew ) {
+				params.data[idx++] = K.skew;
+			}
+			if( !zeroPrinciplePoint ) {
+				params.data[idx++] = K.cx;
+				params.data[idx++] = K.cy;
+			}
+
 		}
 	}
 
@@ -136,14 +199,56 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase {
 
 		for (int i = 0; i < calibration.size(); i++) {
 			CameraPinhole K = calibration.get(i);
-			K.fx = params[idx++];
-			K.skew = params[idx++];
-			K.cx = params[idx++];
-			K.fy = params[idx++];
-			K.cy = params[idx++];
+			if( fixedAspectRatio ) {
+				K.fx = params[idx++];
+				K.fy = aspect.data[i]*K.fx;
+			} else {
+				K.fx = params[idx++];
+				K.fy = params[idx++];
+			}
+			if( !zeroSkew ){
+				K.skew = params[idx++];
+			} else {
+				K.skew = 0;
+			}
+			if( !zeroPrinciplePoint ) {
+				K.cx = params[idx++];
+				K.cy = params[idx++];
+			} else {
+				K.cx = K.cy = 0;
+			}
 		}
 	}
 
+	/**
+	 * Encode the calibration as a 3x3 matrix. K is assumed to zero initially or at
+	 * least all non-zero elements will align with values that are written to.
+	 */
+	public int encodeK( DMatrix3x3 K , int which, int offset, double params[] ) {
+
+		if( fixedAspectRatio ) {
+			K.a11 = params[offset++];
+			K.a22 = aspect.data[which]*K.a11;
+		} else {
+			K.a11 = params[offset++];
+			K.a22 = params[offset++];
+		}
+
+		if( !zeroSkew ) {
+			K.a12 = params[offset++];
+		}
+
+		if( !zeroPrinciplePoint ) {
+			K.a13 = params[offset++];
+			K.a23 = params[offset++];
+		}
+		K.a33 = 1;
+		return  offset;
+	}
+
+	/**
+	 * Computes difference between K and predicted K at each iteration.
+	 */
 	private class ResidualK implements FunctionNtoM {
 
 		Equation eq = new Equation();
@@ -156,19 +261,15 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase {
 		@Override
 		public void process(double[] input, double[] output) {
 			p.set(  input[0], input[1] , input[2] );
-			K.set(  input[3],input[4],input[5],
-					0,input[6],input[7],
-					0,0,1);
+			int indexInput = encodeK(K,0,3,input);
 
 			eq.alias(p,"p",K,"K");
 			eq.process("w0=K*K'");
 
-			int indexInput = 8;
 			int indexOut = 0;
 			for (int i = 0; i < projectives.size; i++) {
 				Projective P = projectives.get(i);
-				encodeK(K,indexInput,param.data);
-				indexInput += 5;
+				indexInput = encodeK(K,i+1,indexInput,param.data);
 
 				eq.alias(K,"K",P.A,"A",P.a,"a");
 				eq.process("AP = A-a*p'");
@@ -189,12 +290,36 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase {
 
 		@Override
 		public int getNumOfInputsN() {
-			return 3+5*(projectives.size+1);
+			return 3+calibParameters*(projectives.size+1);
 		}
 
 		@Override
 		public int getNumOfOutputsM() {
 			return 6*projectives.size;
 		}
+	}
+
+	public boolean isZeroPrinciplePoint() {
+		return zeroPrinciplePoint;
+	}
+
+	public void setZeroPrinciplePoint(boolean zeroPrinciplePoint) {
+		this.zeroPrinciplePoint = zeroPrinciplePoint;
+	}
+
+	public boolean isZeroSkew() {
+		return zeroSkew;
+	}
+
+	public void setZeroSkew(boolean zeroSkew) {
+		this.zeroSkew = zeroSkew;
+	}
+
+	public boolean isFixedAspectRatio() {
+		return fixedAspectRatio;
+	}
+
+	public void setFixedAspectRatio(boolean fixedAspectRatio) {
+		this.fixedAspectRatio = fixedAspectRatio;
 	}
 }
