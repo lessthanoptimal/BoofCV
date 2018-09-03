@@ -133,36 +133,36 @@ public class SelfCalibrationLinearPureRotation {
 		// Row 0
 		A.data[idx++] = H.a11*H.a11-1;
 		A.data[idx++] = 2*H.a11*H.a12;
-		A.data[idx++] = 2*H.a12*H.a13;
+		A.data[idx++] = 2*H.a11*H.a13;
 		A.data[idx++] = H.a12*H.a12;
 		A.data[idx++] = 2*H.a12*H.a13;
 		// Row 1
-		A.data[idx++] = H.a11*H.a12;
-		A.data[idx++] = H.a12*H.a12 + H.a11*H.a12-1;
-		A.data[idx++] = H.a12*H.a13 + H.a11*H.a23;
+		A.data[idx++] = H.a11*H.a21;
+		A.data[idx++] = H.a12*H.a21 + H.a11*H.a22-1;
+		A.data[idx++] = H.a13*H.a21 + H.a11*H.a23;
 		A.data[idx++] = H.a12*H.a22;
 		A.data[idx++] = H.a13*H.a22 + H.a12*H.a23;
 		// Row 2
-		A.data[idx++] = H.a11*H.a13;
-		A.data[idx++] = H.a12*H.a13 + H.a11*H.a23;
-		A.data[idx++] = H.a13*H.a13 + H.a11*H.a33-1;
-		A.data[idx++] = H.a12*H.a23;
-		A.data[idx++] = H.a13*H.a23 + H.a12*H.a33;
+		A.data[idx++] = H.a11*H.a31;
+		A.data[idx++] = H.a12*H.a31 + H.a11*H.a32;
+		A.data[idx++] = H.a13*H.a31 + H.a11*H.a33-1;
+		A.data[idx++] = H.a12*H.a32;
+		A.data[idx++] = H.a13*H.a32 + H.a12*H.a33;
 		// Row 3
-		A.data[idx++] = H.a12*H.a12;
-		A.data[idx++] = 2*H.a12*H.a22;
-		A.data[idx++] = 2*H.a12*H.a23;
+		A.data[idx++] = H.a21*H.a21;
+		A.data[idx++] = 2*H.a21*H.a22;
+		A.data[idx++] = 2*H.a21*H.a23;
 		A.data[idx++] = H.a22*H.a22 - 1;
 		A.data[idx++] = 2*H.a22*H.a23;
 		// Row 4
-		A.data[idx++] = H.a12*H.a13;
-		A.data[idx++] = H.a13*H.a22 + H.a12*H.a23;
-		A.data[idx++] = H.a13*H.a23 + H.a12*H.a33;
-		A.data[idx++] = H.a22*H.a23;
-		A.data[idx++] = H.a23*H.a23 + H.a23*H.a33-1;
+		A.data[idx++] = H.a21*H.a31;
+		A.data[idx++] = H.a22*H.a31 + H.a21*H.a32;
+		A.data[idx++] = H.a23*H.a31 + H.a21*H.a33;
+		A.data[idx++] = H.a22*H.a32;
+		A.data[idx++] = H.a23*H.a32 + H.a22*H.a33-1;
 
 		idx = which*5;
-		B.data[idx++] = -H.a13;
+		B.data[idx++] = -H.a13*H.a13;
 		B.data[idx++] = -H.a13*H.a23;
 		B.data[idx++] = -H.a13*H.a33;
 		B.data[idx++] = -H.a23*H.a23;

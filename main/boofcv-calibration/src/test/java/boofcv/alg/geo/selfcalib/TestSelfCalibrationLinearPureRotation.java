@@ -23,6 +23,7 @@ import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.homography.Homography2D_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.equation.Equation;
 import org.ejml.ops.ConvertDMatrixStruct;
 import org.junit.Test;
@@ -70,16 +71,18 @@ public class TestSelfCalibrationLinearPureRotation extends CommonAutoCalibration
 
 		DMatrixRMaj K = new DMatrixRMaj(3,3);
 		PerspectiveOps.pinholeToMatrix(intrinsic,K);
+		DMatrixRMaj w = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.multTransB(K,K,w);
 
 		// compute planes at infinity
 		List<Homography2D_F64> homographies = new ArrayList<>();
 		for (int i = 0; i < listP.size(); i++) {
+//			System.out.println("projective "+i);
 			DMatrixRMaj P = listP.get(i);
 
 			Equation eq = new Equation();
-			eq.alias(P,"P",p,"p",K,"K");
+			eq.alias(P,"P",p,"p",K,"K",w,"w");
 			eq.process("H = P(:,0:2) - P(:,3)*p'");
-			eq.process("w = K*K'");
 			eq.process("w2 = H*w*H'");
 
 //			System.out.println("w");
@@ -90,7 +93,7 @@ public class TestSelfCalibrationLinearPureRotation extends CommonAutoCalibration
 			Homography2D_F64 H = new Homography2D_F64();
 			ConvertDMatrixStruct.convert(eq.lookupDDRM("H"),H);
 			homographies.add(H);
-			H.print();
+//			H.print();
 		}
 
 		SelfCalibrationLinearPureRotation alg = new SelfCalibrationLinearPureRotation();
@@ -105,13 +108,13 @@ public class TestSelfCalibrationLinearPureRotation extends CommonAutoCalibration
 			alg.add(i,homographies.get(i),A,B);
 		}
 
-		X.data[0] = intrinsic.fx;
-		X.data[1] = intrinsic.skew;
-		X.data[2] = intrinsic.cx;
-		X.data[3] = intrinsic.fy;
-		X.data[4] = intrinsic.cy;
+		X.data[0] = w.data[0];
+		X.data[1] = w.data[1];
+		X.data[2] = w.data[2];
+		X.data[3] = w.data[4];
+		X.data[4] = w.data[5];
 
 		CommonOps_DDRM.mult(A,X,found);
-		found.print();
+		assertTrue(MatrixFeatures_DDRM.isIdentical(B,found, 1E-6));
 	}
 }
