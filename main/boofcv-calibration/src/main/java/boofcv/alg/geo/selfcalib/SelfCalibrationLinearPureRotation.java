@@ -50,21 +50,21 @@ public class SelfCalibrationLinearPureRotation {
 
 	/**
 	 * Assumes that the camera parameter are constant
-	 * @param homography0toI (Input) List of observed homographies
+	 * @param viewsI_to_view0 (Input) List of observed homographies
 	 * @param calibration (Output) found calibration
 	 * @return true if successful
 	 */
-	public boolean estimate(List<Homography2D_F64> homography0toI , CameraPinhole calibration ) {
+	public boolean estimate(List<Homography2D_F64> viewsI_to_view0 , CameraPinhole calibration ) {
 		singular = false;
-		int N = homography0toI.size();
+		int N = viewsI_to_view0.size();
 
-		ensureDeterminantOfOne(homography0toI);
+		ensureDeterminantOfOne(viewsI_to_view0);
 
 		A.reshape(N*5,N);
 		B.reshape(N*5,1);
 
 		for (int i = 0; i < N; i++) {
-			add(i,homography0toI.get(i),A,B);
+			add(i,viewsI_to_view0.get(i),A,B);
 		}
 
 		if( !solver.setA(A) )
@@ -81,8 +81,7 @@ public class SelfCalibrationLinearPureRotation {
 
 		solver.solve(B,x);
 
-		extractCalibration(calibration);
-		return true;
+		return extractCalibration(calibration);
 	}
 
 	private void ensureDeterminantOfOne(List<Homography2D_F64> homography0toI) {
@@ -120,30 +119,6 @@ public class SelfCalibrationLinearPureRotation {
 	 * @return true if successful or false if it failed once
 	 */
 	public boolean estimate(List<Homography2D_F64> homography0toI , List<CameraPinhole> calibration ) {
-		singular = false;
-		int N = homography0toI.size();
-		ensureDeterminantOfOne(homography0toI);
-
-		A.reshape(N,N);
-		B.reshape(N,1);
-
-		for (int i = 0; i < N; i++) {
-			add(0,homography0toI.get(i),A,B);
-			if( !solver.setA(A) )
-				return false;
-
-			double sv[] = solver.getDecomposition().getSingularValues();
-			singularRatio = SingularOps_DDRM.ratioSmallestOverLargest(sv);
-
-			if( singularRatio < singularThreshold ) {
-				singular = true;
-				return false;
-			}
-
-			solver.solve(B,x);
-
-			extractCalibration(calibration.get(i));
-		}
 
 		return true;
 	}

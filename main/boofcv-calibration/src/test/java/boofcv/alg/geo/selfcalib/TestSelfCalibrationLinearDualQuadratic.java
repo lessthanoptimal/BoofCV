@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestSelfCalibrationLinear extends CommonAutoCalibrationChecks {
+public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibrationChecks {
 
 	@Test
 	public void solve_ZeroCP() {

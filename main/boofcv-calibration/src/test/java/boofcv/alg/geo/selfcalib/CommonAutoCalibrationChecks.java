@@ -72,13 +72,8 @@ public class CommonAutoCalibrationChecks {
 			double pitch = Math.PI*i/20.0;
 			double roll = rand.nextGaussian()*0.1;
 
-			Se3_F64 R = new Se3_F64();
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,R.R);
-			Se3_F64 axis = new Se3_F64();
-			axis.T.z = -2;
-
 			Se3_F64 cameraToWorld = new Se3_F64();
-			R.concat(axis,cameraToWorld);
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,cameraToWorld.R);
 
 			listCameraToWorld.add( cameraToWorld );
 			cameras.add(camera);
@@ -131,10 +126,13 @@ public class CommonAutoCalibrationChecks {
 		// more general projective transform
 		{
 
+			// random scale, positive or negative, that isn't zero
+			double scale = (rand.nextDouble()+0.1) * rand.nextGaussian() < 0 ? -1 : 1;
+
 			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(cameras.get(0),(DMatrixRMaj)null);
-			eq.alias(K,"K",p,"p");
+			eq.alias(K,"K",p,"p",scale,"scale");
 			eq.process("p=[0.5,0.25,0.4]'");
-			eq.process("H = [K [0;0;0]; -p'*K 1]"); // projective to metric
+			eq.process("H = scale*[K [0;0;0]; -p'*K 1]"); // projective to metric
 			eq.process("Hinv = inv(H)"); // metric to projective
 		}
 //		eq.lookupDDRM("H").print();

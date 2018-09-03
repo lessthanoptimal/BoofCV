@@ -28,6 +28,7 @@ import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -76,7 +77,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	DMatrix4x4 Q = new DMatrix4x4();
 
 	// A singular value is considered zero if it is smaller than this number
-	double singularThreshold=1e-8;
+	double singularThreshold=1e-7;
 
 	/**
 	 * Constructor for zero-principle point and (optional) zero-skew
@@ -128,15 +129,18 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 			return Result.SVD_FAILED;
 		}
 
-		// if the geometry is sufficient the null space will be only 1 vector
-		int nullity = SingularOps_DDRM.nullity(svd,singularThreshold);
-		if( nullity > 1 ) {
-			return Result.POOR_GEOMETRY;
-		}
 		// Examine the null space to find the values of Q
 		// Then compute the solution for each view
 		extractSolutionForQ(Q);
 		computeSolutions(Q);
+
+		// determine if the solution is good by looking at two smallest singular values
+		// If there isn't a steep drop it either isn't singular or more there is more than 1 singular value
+		double sv[] = svd.getSingularValues();
+		Arrays.sort(sv);
+		if( singularThreshold*sv[1] <= sv[0] )  {
+			return Result.POOR_GEOMETRY;
+		}
 
 		if( solutions.size() != N ) {
 			return Result.SOLUTION_NAN;
