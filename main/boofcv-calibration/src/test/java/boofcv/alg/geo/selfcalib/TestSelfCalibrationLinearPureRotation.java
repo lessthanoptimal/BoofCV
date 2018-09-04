@@ -21,9 +21,10 @@ package boofcv.alg.geo.selfcalib;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.homography.Homography2D_F64;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
-import org.ejml.dense.row.MatrixFeatures_DDRM;
+import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.equation.Equation;
 import org.ejml.ops.ConvertDMatrixStruct;
 import org.junit.Test;
@@ -31,7 +32,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -42,7 +43,17 @@ public class TestSelfCalibrationLinearPureRotation extends CommonAutoCalibration
 	public void perfect() {
 		CameraPinhole intrinsic = new CameraPinhole(400,420,0.1,450,475,0,0);
 		renderRotationOnly(intrinsic);
+		performTest(intrinsic);
+	}
 
+	@Test
+	public void two_axis() {
+		CameraPinhole intrinsic = new CameraPinhole(400,420,0.1,450,475,0,0);
+		renderRotateTwoAxis(intrinsic);
+		performTest(intrinsic);
+	}
+
+	private void performTest(CameraPinhole intrinsic) {
 		// compute planes at infinity
 		List<Homography2D_F64> homographies = new ArrayList<>();
 		for (int i = 0; i < listP.size(); i++) {
@@ -56,12 +67,54 @@ public class TestSelfCalibrationLinearPureRotation extends CommonAutoCalibration
 			homographies.add(H);
 		}
 
-		SelfCalibrationLinearPureRotation alg = new SelfCalibrationLinearPureRotation();
+		SelfCalibrationLinearRotationSingle alg = new SelfCalibrationLinearRotationSingle();
 		CameraPinhole found = new CameraPinhole();
 		assertTrue(alg.estimate(homographies,found));
 
-		found.print();
-		System.out.println("Egads");
+		assertEquals(intrinsic.fx,   found.fx,   UtilEjml.TEST_F64_SQ);
+		assertEquals(intrinsic.fy,   found.fy,   UtilEjml.TEST_F64_SQ);
+		assertEquals(intrinsic.cx,   found.cx,   UtilEjml.TEST_F64_SQ);
+		assertEquals(intrinsic.cy,   found.cy,   UtilEjml.TEST_F64_SQ);
+		assertEquals(intrinsic.skew, found.skew, UtilEjml.TEST_F64_SQ);
+	}
+
+	/**
+	 * This should fail because there isn't enough visual motion
+	 */
+	@Test
+	public void stationary() {
+		CameraPinhole intrinsic = new CameraPinhole(400,420,0.1,450,475,0,0);
+		renderStationary(intrinsic);
+		checkFailure();
+	}
+
+	/**
+	 * One axis rotation will fail
+	 */
+	@Test
+	public void one_axis() {
+		CameraPinhole intrinsic = new CameraPinhole(400,420,0.1,450,475,0,0);
+		renderRotateOneAxis(intrinsic);
+		checkFailure();
+	}
+
+	private void checkFailure() {
+		// compute planes at infinity
+		List<Homography2D_F64> homographies = new ArrayList<>();
+		for (int i = 0; i < listP.size(); i++) {
+			DMatrixRMaj P = listP.get(i);
+
+			Equation eq = new Equation();
+			eq.alias(P,"P",p,"p");
+			eq.process("H = P(:,0:2) - P(:,3)*p'");
+			Homography2D_F64 H = new Homography2D_F64();
+			ConvertDMatrixStruct.convert(eq.lookupDDRM("H"),H);
+			homographies.add(H);
+		}
+
+		SelfCalibrationLinearRotationSingle alg = new SelfCalibrationLinearRotationSingle();
+		CameraPinhole found = new CameraPinhole();
+		assertFalse(alg.estimate(homographies,found));
 	}
 
 	@Test
@@ -83,7 +136,8 @@ public class TestSelfCalibrationLinearPureRotation extends CommonAutoCalibration
 			Equation eq = new Equation();
 			eq.alias(P,"P",p,"p",K,"K",w,"w");
 			eq.process("H = P(:,0:2) - P(:,3)*p'");
-			eq.process("w2 = H*w*H'");
+//			eq.process("w2 = H*w*H'");
+//			eq.process("w2 = w2 - w");
 
 //			System.out.println("w");
 //			eq.lookupDDRM("w").print();
@@ -96,16 +150,16 @@ public class TestSelfCalibrationLinearPureRotation extends CommonAutoCalibration
 //			H.print();
 		}
 
-		SelfCalibrationLinearPureRotation alg = new SelfCalibrationLinearPureRotation();
+		SelfCalibrationLinearRotationSingle alg = new SelfCalibrationLinearRotationSingle();
+		alg.ensureDeterminantOfOne(homographies);
 
 		int N = homographies.size();
-		DMatrixRMaj A = new DMatrixRMaj(5*N,5);
-		DMatrixRMaj B = new DMatrixRMaj(A.numRows,1);
-		DMatrixRMaj X = new DMatrixRMaj(5,1);
+		DMatrixRMaj A = new DMatrixRMaj(6*N,6);
+		DMatrixRMaj X = new DMatrixRMaj(6,1);
 		DMatrixRMaj found = new DMatrixRMaj(A.numRows,1);
 
 		for (int i = 0; i < homographies.size(); i++) {
-			alg.add(i,homographies.get(i),A,B);
+			alg.add(i,homographies.get(i),A);
 		}
 
 		X.data[0] = w.data[0];
@@ -113,8 +167,9 @@ public class TestSelfCalibrationLinearPureRotation extends CommonAutoCalibration
 		X.data[2] = w.data[2];
 		X.data[3] = w.data[4];
 		X.data[4] = w.data[5];
+		X.data[5] = w.data[8];
 
 		CommonOps_DDRM.mult(A,X,found);
-		assertTrue(MatrixFeatures_DDRM.isIdentical(B,found, 1E-6));
+		assertEquals(0, NormOps_DDRM.normF(found), UtilEjml.TEST_F64);
 	}
 }

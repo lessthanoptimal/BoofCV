@@ -82,6 +82,48 @@ public class CommonAutoCalibrationChecks {
 		render(cameras);
 	}
 
+	public void renderRotateOneAxis( CameraPinhole camera ) {
+		List<CameraPinhole> cameras = new ArrayList<>();
+		for (int i = 0; i < 4; i++) {
+			double pitch = Math.PI*i/20.0;
+
+			Se3_F64 cameraToWorld = new Se3_F64();
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,0,0,pitch,cameraToWorld.R);
+
+			listCameraToWorld.add( cameraToWorld );
+			cameras.add(camera);
+		}
+
+		render(cameras);
+	}
+
+	public void renderRotateTwoAxis( CameraPinhole camera ) {
+		List<CameraPinhole> cameras = new ArrayList<>();
+		for (int i = 0; i < 11; i++) {
+			double yaw = Math.PI*i/9.0;
+			double pitch = Math.PI*i/20.0;
+
+			Se3_F64 cameraToWorld = new Se3_F64();
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,yaw,0,pitch,cameraToWorld.R);
+
+			listCameraToWorld.add( cameraToWorld );
+			cameras.add(camera);
+		}
+
+		render(cameras);
+	}
+
+	public void renderStationary( CameraPinhole camera ) {
+		List<CameraPinhole> cameras = new ArrayList<>();
+		for (int i = 0; i < 11; i++) {
+			Se3_F64 cameraToWorld = new Se3_F64();
+			listCameraToWorld.add( cameraToWorld );
+			cameras.add(camera);
+		}
+
+		render(cameras);
+	}
+
 	public void renderGood( List<CameraPinhole> cameras ) {
 		for (int i = 0; i < cameras.size(); i++) {
 			double yaw = Math.PI*i/9.0;
@@ -127,7 +169,7 @@ public class CommonAutoCalibrationChecks {
 		{
 
 			// random scale, positive or negative, that isn't zero
-			double scale = (rand.nextDouble()+0.1) * rand.nextGaussian() < 0 ? -1 : 1;
+			double scale = (rand.nextDouble()+0.1) * (rand.nextGaussian() < 0 ? -1 : 1);
 
 			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(cameras.get(0),(DMatrixRMaj)null);
 			eq.alias(K,"K",p,"p",scale,"scale");
@@ -138,12 +180,13 @@ public class CommonAutoCalibrationChecks {
 //		eq.lookupDDRM("H").print();
 
 		for (int i = 1; i < listCameraToWorld.size(); i++) {
+			double scale = (rand.nextDouble()+0.1) *( rand.nextGaussian() < 0 ? -1 : 1);
 			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(cameras.get(i),(DMatrixRMaj)null);
 
 			Se3_F64 b_to_a = listCameraToWorld.get(i);
 
-			eq.alias(K,"K",b_to_a.R,"R",b_to_a.T,"T");
-			DMatrixRMaj P = eq.process("P = [K*R, K*T]*Hinv").lookupDDRM("P").copy();
+			eq.alias(K,"K",b_to_a.R,"R",b_to_a.T,"T",scale,"scale");
+			DMatrixRMaj P = eq.process("P = scale*[K*R, K*T]*Hinv").lookupDDRM("P").copy();
 			listP.add(P);
 		}
 
