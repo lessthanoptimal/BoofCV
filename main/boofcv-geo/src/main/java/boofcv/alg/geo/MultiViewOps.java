@@ -789,8 +789,9 @@ public class MultiViewOps {
 
 	/**
 	 * <p>
-	 * Given a fundamental matrix a pair of projection matrices [M|T] can be extracted.  The projection matrix will
-	 * be known up to a projective transform and there are multiple solutions, The canonical projection
+	 * Given a fundamental matrix a pair of camera matrices P and P1' are extracted. The camera matrices
+	 * are 3 by 4 and used to project a 3D homogenous point onto the image plane. These camera matrices will only
+	 * be known up to a projective transform, thus there are multiple solutions, The canonical camera
 	 * matrix is defined as: <br>
 	 * <pre>
 	 * P=[I|0] and P'= [M|-M*t] = [[e']*F + e'*v^t | lambda*e']
@@ -812,7 +813,7 @@ public class MultiViewOps {
 	 * @param e2 (Input) Left epipole of fundamental matrix, F<sup>T</sup>*e2 = 0.
 	 * @param v (Input) Arbitrary 3-vector.  Just pick some value, say (1,1,1).
 	 * @param lambda (Input) A non zero scalar.  Try one.
-	 * @return The canonical camera projection matrix P' (3 by 4) Known up to a projective transform.
+	 * @return The canonical camera (projection) matrix P' (3 by 4) Known up to a projective transform.
 	 */
 	public static DMatrixRMaj fundamentalToProjective(DMatrixRMaj F , Point3D_F64 e2, Vector3D_F64 v , double lambda ) {
 
@@ -838,12 +839,12 @@ public class MultiViewOps {
 
 	/**
 	 * <p>
-	 * Given a fundamental matrix a pair of projection matrices [M|T] can be extracted.   Same
+	 * Given a fundamental matrix a pair of camera matrices P0 and P1 can be extracted. Same
 	 * {@link #fundamentalToProjective(DMatrixRMaj, Point3D_F64, Vector3D_F64, double)} but with the suggested values
 	 * for all variables filled in for you.
 	 * </p>
 	 * @param F (Input) Fundamental Matrix
-	 * @return The canonical camera projection matrix P' (3 by 4) Known up to a projective transform.
+	 * @return The canonical camera (projection) matrix P' (3 by 4) Known up to a projective transform.
 	 */
 	public static DMatrixRMaj fundamentalToProjective(DMatrixRMaj F ) {
 		Point3D_F64 e2 = new Point3D_F64();

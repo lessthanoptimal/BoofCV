@@ -37,6 +37,8 @@ import boofcv.alg.geo.pose.P3PFinsterwalder;
 import boofcv.alg.geo.pose.P3PGrunert;
 import boofcv.alg.geo.pose.PnPLepetitEPnP;
 import boofcv.alg.geo.pose.PoseFromPairLinear6;
+import boofcv.alg.geo.triangulate.TriangulateCalibratedLinearDLT;
+import boofcv.alg.geo.triangulate.TriangulateUncalibratedLinearDLT;
 import boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.fitting.MotionTransformPoint;
@@ -404,25 +406,47 @@ public class FactoryMultiView {
 	}
 
 	/**
-	 * Triangulate two view using the Discrete Linear Transform (DLT)
+	 * Triangulate two view using the Discrete Linear Transform (DLT) with a calibrated camera.
 	 *
-	 * @see boofcv.alg.geo.triangulate.TriangulateLinearDLT
+	 * @see TriangulateCalibratedLinearDLT
 	 *
 	 * @return Two view triangulation algorithm
 	 */
-	public static TriangulateTwoViewsCalibrated triangulateTwoDLT() {
-		return new WrapTwoViewsTriangulateDLT();
+	public static TriangulateTwoViewsCalibrated triangulateCalibratedTwoDLT() {
+		return new WrapTwoViewsTriangulateCalibratedDLT();
 	}
 
 	/**
-	 * Triangulate N views using the Discrete Linear Transform (DLT)
+	 * Triangulate two view using the Discrete Linear Transform (DLT) with an uncalibrated camera.
 	 *
-	 * @see boofcv.alg.geo.triangulate.TriangulateLinearDLT
+	 * @see boofcv.alg.geo.triangulate.TriangulateUncalibratedLinearDLT
 	 *
 	 * @return Two view triangulation algorithm
 	 */
-	public static TriangulateNViewsCalibrated triangulateNDLT() {
-		return new WrapNViewsTriangulateDLT();
+	public static TriangulateTwoViews triangulateTwoDLT() {
+		return new WrapTwoViewsTriangulateUncalibratedDLT();
+	}
+
+	/**
+	 * Triangulate N views using the Discrete Linear Transform (DLT) with a calibrated camera
+	 *
+	 * @see TriangulateCalibratedLinearDLT
+	 *
+	 * @return Two view triangulation algorithm
+	 */
+	public static TriangulateNViewsCalibrated triangulateCalibratedNViewDLT() {
+		return new WrapNViewsTriangulateCalibratedDLT();
+	}
+
+	/**
+	 * Triangulate N views using the Discrete Linear Transform (DLT) with an uncalibrated camera
+	 *
+	 * @see TriangulateUncalibratedLinearDLT
+	 *
+	 * @return Two view triangulation algorithm
+	 */
+	public static TriangulateNViews triangulateNViewDLT() {
+		return new WrapNViewsTriangulateUncalibratedDLT();
 	}
 
 	/**

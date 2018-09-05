@@ -590,4 +590,21 @@ public class PerspectiveOps {
 
 		return (d01*d23)/(d02*d13);
 	}
+
+	/**
+	 * Converts the SE3 into  a 3x4 matrix. [R|T]
+	 * @param m (Input) transform
+	 * @param A (Output) equivalent 3x4 matrix represenation
+	 */
+	public static DMatrixRMaj convertToMatrix( Se3_F64 m , DMatrixRMaj A ) {
+		if( A == null )
+			A = new DMatrixRMaj(3,4);
+		else
+			A.reshape(3,4);
+		CommonOps_DDRM.insert(m.R,A,0,0);
+		A.data[3] = m.T.x;
+		A.data[7] = m.T.y;
+		A.data[11] = m.T.z;
+		return A;
+	}
 }

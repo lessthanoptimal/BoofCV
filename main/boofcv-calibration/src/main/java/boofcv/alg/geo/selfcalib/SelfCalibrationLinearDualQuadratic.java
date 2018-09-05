@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.selfcalib;
 
+import boofcv.alg.geo.GeometricResult;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix3;
 import org.ejml.data.DMatrix3x3;
@@ -113,7 +114,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	 *
 	 * @return Indicates if it was successful or not. If it fails it says why
 	 */
-	public Result solve() {
+	public GeometricResult solve() {
 		if( projectives.size < minimumProjectives )
 			throw new IllegalArgumentException("You need at least "+minimumProjectives+" motions");
 
@@ -126,7 +127,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 
 		// Compute the SVD for its null space
 		if( !svd.decompose(L)) {
-			return Result.SVD_FAILED;
+			return GeometricResult.SOLVE_FAILED;
 		}
 
 		// Examine the null space to find the values of Q
@@ -139,13 +140,13 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 		double sv[] = svd.getSingularValues();
 		Arrays.sort(sv);
 		if( singularThreshold*sv[1] <= sv[0] )  {
-			return Result.POOR_GEOMETRY;
+			return GeometricResult.GEOMETRY_POOR;
 		}
 
 		if( solutions.size() != N ) {
-			return Result.SOLUTION_NAN;
+			return GeometricResult.SOLUTION_NAN;
 		} else {
-			return Result.SUCCESS;
+			return GeometricResult.SUCCESS;
 		}
 	}
 

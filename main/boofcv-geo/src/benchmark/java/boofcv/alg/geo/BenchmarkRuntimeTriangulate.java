@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,11 +19,12 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.geo.triangulate.PixelDepthLinear;
+import boofcv.alg.geo.triangulate.TriangulateCalibratedLinearDLT;
 import boofcv.alg.geo.triangulate.TriangulateGeometric;
-import boofcv.alg.geo.triangulate.TriangulateLinearDLT;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 
 /**
  * @author Peter Abeles
@@ -35,11 +36,11 @@ public class BenchmarkRuntimeTriangulate extends ArtificialStereoScene {
 
 	public class DLT2 extends PerformerBase {
 
-		TriangulateLinearDLT alg;
-		Point3D_F64 found = new Point3D_F64();
+		TriangulateCalibratedLinearDLT alg;
+		Point4D_F64 found = new Point4D_F64();
 
 		public DLT2() {
-			alg = new TriangulateLinearDLT();
+			alg = new TriangulateCalibratedLinearDLT();
 		}
 
 		@Override

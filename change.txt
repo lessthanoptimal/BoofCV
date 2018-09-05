@@ -18,6 +18,8 @@ Version : 0.31
 - ImageMiscOps
  * Added interleaved support for copy, rotateCW, rotateCCW
  * Thanks Frank Jakop for the suggestion
+- Geometry
+ * Projective triangulation for uncalibrated cameras
 - Sparse Bundle Adjustment
  * Most basic version using DDogleg and EJML sparse LM solver
  * Works with calibrated pinhole camera

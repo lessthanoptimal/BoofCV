@@ -18,20 +18,22 @@
 
 package boofcv.alg.geo.triangulate;
 
+import boofcv.alg.geo.GeometricResult;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
-import org.ejml.interfaces.SolveNullSpace;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * <p>
  * Triangulates the location of a 3D point given two or more views of the point using the
- * Discrete Linear Transform (DLT).
+ * Discrete Linear Transform (DLT). Modified to work only with a calibrated camera. The second singular value
+ * is checked to see if a solution was possible.
  * </p>
  *
  * <p>
@@ -40,11 +42,14 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class TriangulateLinearDLT {
+public class TriangulateCalibratedLinearDLT {
 
-	private SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceSvd_DDRM();
+	private SolveNullSpaceSvd_DDRM solverNull = new SolveNullSpaceSvd_DDRM();
 	private DMatrixRMaj nullspace = new DMatrixRMaj(4,1);
 	private DMatrixRMaj A = new DMatrixRMaj(4,4);
+
+	// used in geometry test
+	public double singularThreshold = 1;
 
 	/**
 	 * <p>
@@ -57,11 +62,11 @@ public class TriangulateLinearDLT {
 	 *
 	 * @param observations Observation in each view in normalized coordinates. Not modified.
 	 * @param worldToView Transformations from world to the view.  Not modified.
-	 * @param found Output, the found 3D position of the point.  Modified.
+	 * @param found (Output) 3D point in homogenous coordinates.  Modified.
 	 */
-	public void triangulate( List<Point2D_F64> observations ,
-							 List<Se3_F64> worldToView ,
-							 Point3D_F64 found ) {
+	public GeometricResult triangulate( List<Point2D_F64> observations ,
+										List<Se3_F64> worldToView ,
+										Point4D_F64 found ) {
 		if( observations.size() != worldToView.size() )
 			throw new IllegalArgumentException("Number of observations must match the number of motions");
 		
@@ -75,13 +80,7 @@ public class TriangulateLinearDLT {
 			index = addView(worldToView.get(i),observations.get(i),index);
 		}
 
-		if( !solverNull.process(A,1, nullspace) )
-			throw new RuntimeException("SVD failed!?!?");
-
-		double w = nullspace.get(3);
-		found.x = nullspace.get(0)/w;
-		found.y = nullspace.get(1)/w;
-		found.z = nullspace.get(2)/w;
+		return finishSolving(found);
 	}
 	
 	/**
@@ -98,10 +97,10 @@ public class TriangulateLinearDLT {
 	 * @param fromAtoB Transformation from camera view 'a' to 'b'  Not modified.
 	 * @param foundInA Output, the found 3D position of the point.  Modified.
 	 */
-	public void triangulate( Point2D_F64 a , Point2D_F64 b ,
-							 Se3_F64 fromAtoB ,
-							 Point3D_F64 foundInA ) {
-		A.reshape(4, 4, false);
+	public GeometricResult triangulate( Point2D_F64 a , Point2D_F64 b ,
+										Se3_F64 fromAtoB ,
+										Point4D_F64 foundInA ) {
+		A.reshape(4, 4);
 
 		int index = addView(fromAtoB,b,0);
 
@@ -117,15 +116,30 @@ public class TriangulateLinearDLT {
 		A.data[index++] = a.y;
 		A.data[index  ] = 0;
 
-		if( !solverNull.process(A,1, nullspace) )
-			throw new RuntimeException("SVD failed!?!?");
-		
-		double w = nullspace.get(3);
-		foundInA.x = nullspace.get(0)/w;
-		foundInA.y = nullspace.get(1)/w;
-		foundInA.z = nullspace.get(2)/w;
+		return finishSolving(foundInA);
 	}
-	
+
+	private GeometricResult finishSolving(Point4D_F64 foundInA) {
+		TriangulateUncalibratedLinearDLT.normalizeRows(A);
+
+		if (!solverNull.process(A, 1, nullspace))
+			return GeometricResult.SOLVE_FAILED;
+
+		// if the second smallest singular value is the same size as the smallest there's problem
+		double sv[] = solverNull.getSingularValues();
+		Arrays.sort(sv);
+		if (sv[1] * singularThreshold <= sv[0]) {
+			return GeometricResult.GEOMETRY_POOR;
+		}
+
+		foundInA.x = nullspace.get(0);
+		foundInA.y = nullspace.get(1);
+		foundInA.z = nullspace.get(2);
+		foundInA.w = nullspace.get(3);
+
+		return GeometricResult.SUCCESS;
+	}
+
 	private int addView( Se3_F64 motion , Point2D_F64 a , int index ) {
 
 		DMatrixRMaj R = motion.getR();
@@ -135,8 +149,6 @@ public class TriangulateLinearDLT {
 		double r21 = R.data[3], r22 = R.data[4], r23 = R.data[5];
 		double r31 = R.data[6], r32 = R.data[7], r33 = R.data[8];
 
-		// no normalization of observations are needed since they are in normalized coordinates
-		
 		// first row
 		A.data[index++] = a.x*r31-r11;
 		A.data[index++] = a.x*r32-r12;
@@ -150,5 +162,13 @@ public class TriangulateLinearDLT {
 		A.data[index++] = a.y*T.z-T.y;
 		
 		return index;
+	}
+
+	public double getSingularThreshold() {
+		return singularThreshold;
+	}
+
+	public void setSingularThreshold(double singularThreshold) {
+		this.singularThreshold = singularThreshold;
 	}
 }

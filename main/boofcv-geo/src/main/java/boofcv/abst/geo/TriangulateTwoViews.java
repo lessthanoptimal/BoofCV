@@ -19,26 +19,28 @@
 package boofcv.abst.geo;
 
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
+import georegression.struct.point.Point4D_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
- * Triangulate the location of a point from two views of a feature given a calibrated
- * camera and known camera motion.
+ * Triangulates the 3D location of a point given two uncalibrated observations of the point. Uncalibrated
+ * observations are in pixel coordinates.
  *
  * @author Peter Abeles
  */
-public interface TriangulateTwoViewsCalibrated {
+public interface TriangulateTwoViews {
 
 	/**
-	 * Triangulate the points location.
+	 * Triangulate the points 3D location from pixel observations given two views.
 	 *
-	 * @param obsA View from position A in normalized image coordinates.
-	 * @param obsB View from position B in normalized image coordinates.
-	 * @param fromAtoB Transform from camera location A to location B
+	 * @param obsA View from position A in pixels.
+	 * @param obsB View from position B in pixels
+	 * @param projectionA Camera matrix for view A. x = P*X
+	 * @param projectionB Camera matrix for view B. x = P*X
 	 * @param foundInA The found triangulated 3D point in A's reference frame.
 	 * @return true if successful, false otherwise.
 	 */
-	boolean triangulate( Point2D_F64 obsA , Point2D_F64 obsB ,
-						 Se3_F64 fromAtoB, Point3D_F64 foundInA );
+	boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB,
+						DMatrixRMaj projectionA, DMatrixRMaj projectionB,
+						Point4D_F64 foundInA);
 }

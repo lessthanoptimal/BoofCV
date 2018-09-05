@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,26 +19,42 @@
 package boofcv.abst.geo.triangulate;
 
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.alg.geo.triangulate.TriangulateLinearDLT;
+import boofcv.alg.geo.GeometricResult;
+import boofcv.alg.geo.triangulate.TriangulateCalibratedLinearDLT;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 
 /**
- * Wrapper around {@link TriangulateLinearDLT} for {@link boofcv.abst.geo.TriangulateTwoViewsCalibrated}.
+ * Wrapper around {@link TriangulateCalibratedLinearDLT} for {@link boofcv.abst.geo.TriangulateTwoViewsCalibrated}.
  * 
  * @author Peter Abeles
  */
-public class WrapTwoViewsTriangulateDLT implements TriangulateTwoViewsCalibrated {
+public class WrapTwoViewsTriangulateCalibratedDLT implements TriangulateTwoViewsCalibrated {
 
-	TriangulateLinearDLT alg = new TriangulateLinearDLT();
+	TriangulateCalibratedLinearDLT alg = new TriangulateCalibratedLinearDLT();
+	Point4D_F64 pointH = new Point4D_F64();
 
 	@Override
 	public boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB,
 							   Se3_F64 fromAtoB, Point3D_F64 foundInA) {
 
-		alg.triangulate(obsA,obsB, fromAtoB, foundInA);
+		if(GeometricResult.SUCCESS == alg.triangulate(obsA,obsB, fromAtoB,pointH) ) {
+			// can't handle points at infinity with this interface
+			if( pointH.w == 0 )
+				return false;
+			foundInA.x = pointH.x/pointH.w;
+			foundInA.y = pointH.y/pointH.w;
+			foundInA.z = pointH.z/pointH.w;
+			return true;
+		}
 
-		return true;
+		return false;
 	}
+
+	public TriangulateCalibratedLinearDLT getAlgorithm() {
+		return alg;
+	}
+
 }

@@ -26,6 +26,8 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.ops.ConvertDMatrixStruct;
 
+import java.util.List;
+
 /**
  * view[0] is assumed to the located at coordinate system's origin.
  *
@@ -69,6 +71,12 @@ public class SelfCalibrationBase {
 		Projective pr = projectives.grow();
 		ConvertDMatrixStruct.convert(A,pr.A);
 		pr.a.set(P.get(0,3),P.get(1,3),P.get(2,3));
+	}
+
+	public void addProjectives(List<DMatrixRMaj> viewI_to_view0 ) {
+		for (int i = 0; i < viewI_to_view0.size(); i++) {
+			addProjective(viewI_to_view0.get(i));
+		}
 	}
 
 	public static void encodeQ( DMatrix4x4 Q , double param[] ) {

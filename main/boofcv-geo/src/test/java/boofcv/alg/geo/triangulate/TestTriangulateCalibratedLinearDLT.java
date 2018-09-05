@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,8 @@
 
 package boofcv.alg.geo.triangulate;
 
-import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
+import org.ejml.UtilEjml;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -26,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestTriangulateLinearDLT extends CommonTriangulationChecks {
+public class TestTriangulateCalibratedLinearDLT extends CommonTriangulationChecks {
 
 	/**
 	 * Create 3 perfect observations and solve for the position
@@ -35,15 +36,15 @@ public class TestTriangulateLinearDLT extends CommonTriangulationChecks {
 	public void triangulate_N() {
 		createScene();
 
-		TriangulateLinearDLT alg = new TriangulateLinearDLT();
+		TriangulateCalibratedLinearDLT alg = new TriangulateCalibratedLinearDLT();
 
-		Point3D_F64 found = new Point3D_F64();
+		Point4D_F64 found = new Point4D_F64();
 
 		alg.triangulate(obsPts, motionWorldToCamera,found);
 
-		assertEquals(worldPoint.x,found.x,1e-8);
-		assertEquals(worldPoint.y,found.y,1e-8);
-		assertEquals(worldPoint.z,found.z,1e-8);
+		assertEquals(worldPoint.x,found.x/found.w,UtilEjml.TEST_F64);
+		assertEquals(worldPoint.y,found.y/found.w,UtilEjml.TEST_F64);
+		assertEquals(worldPoint.z,found.z/found.w,UtilEjml.TEST_F64);
 	}
 
 	/**
@@ -53,13 +54,14 @@ public class TestTriangulateLinearDLT extends CommonTriangulationChecks {
 	public void triangulate_two() {
 		createScene();
 
-		TriangulateLinearDLT alg = new TriangulateLinearDLT();
+		TriangulateCalibratedLinearDLT alg = new TriangulateCalibratedLinearDLT();
 
-		Point3D_F64 found = new Point3D_F64();
+		Point4D_F64 found = new Point4D_F64();
+		
 		alg.triangulate(obsPts.get(0),obsPts.get(1), motionWorldToCamera.get(1),found);
 
-		assertEquals(worldPoint.x,found.x,1e-8);
-		assertEquals(worldPoint.y,found.y,1e-8);
-		assertEquals(worldPoint.z,found.z,1e-8);
+		assertEquals(worldPoint.x,found.x/found.w,UtilEjml.TEST_F64);
+		assertEquals(worldPoint.y,found.y/found.w,UtilEjml.TEST_F64);
+		assertEquals(worldPoint.z,found.z/found.w,UtilEjml.TEST_F64);
 	}
 }
