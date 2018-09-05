@@ -23,6 +23,7 @@ import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.TriangulateTwoViews;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
@@ -131,7 +132,7 @@ public class ExampleCalibrationSelfVsRegular {
 		SelfCalibrationLinearDualQuadratic estimateK = new SelfCalibrationLinearDualQuadratic(1.0);
 		estimateK.addProjectives(projectives);
 
-		SelfCalibrationLinearDualQuadratic.Result result = estimateK.solve();
+		GeometricResult result = estimateK.solve();
 		switch( result ) {
 			case SUCCESS: break;
 			default: throw new RuntimeException("Self calibration failed. Reason="+result);
