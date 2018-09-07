@@ -16,31 +16,24 @@
  * limitations under the License.
  */
 
-package boofcv.struct.geo;
+package boofcv.abst.geo.pose;
 
-import java.util.List;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * <p>
- * Creates a single hypothesis for the parameters in a model a set of sample points/observations.
- * </p>
- *
  * @author Peter Abeles
  */
-public interface GeoModelEstimator1<Model,Sample> {
-	/**
-	 * Estimates the model given a set of observations.
-	 *
-	 * @param points Input: Set of observations. Not modified.
-	 * @param estimatedModel Output: Storage for the estimated model.  Modified.
-	 * @return true if successful
-	 */
-	boolean process( List<Sample> points , Model estimatedModel );
+public class TestProjectiveReconstructionByFactorization {
+	@Test
+	public void perfect() {
+		fail("Implement");
+	}
 
-	/**
-	 * Minimum number of points required to estimate the model.
-	 *
-	 * @return Minimum number of points.
-	 */
-	int getMinimumPoints();
+	@Test
+	public void noisy() {
+		fail("Implement");
+	}
+
 }
