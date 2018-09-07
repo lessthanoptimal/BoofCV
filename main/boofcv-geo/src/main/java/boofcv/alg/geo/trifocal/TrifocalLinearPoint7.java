@@ -97,7 +97,8 @@ public class TrifocalLinearPoint7 {
 	public boolean process( List<AssociatedTriple> observations , TrifocalTensor solution ) {
 
 		if( observations.size() < 7 )
-			throw new IllegalArgumentException("At least 7 correspondences must be provided");
+			throw new IllegalArgumentException(
+					"At least 7 correspondences must be provided. Found "+observations.size());
 
 		// compute normalization to reduce numerical errors
 		LowLevelMultiViewOps.computeNormalization(observations, N1, N2, N3);

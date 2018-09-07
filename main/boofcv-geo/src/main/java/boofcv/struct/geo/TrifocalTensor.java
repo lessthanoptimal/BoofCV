@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -127,7 +127,7 @@ public class TrifocalTensor {
 
 	@Override
 	public String toString() {
-		return "TrifocalTensor {\nT1:\n"+T1+"\nT2:\n"+T2+"\nT3\n"+T3+"}";
+		return "TrifocalTensor {\nT1:\n"+T1+"\nT2:\n"+T2+"\nT3:\n"+T3+"}";
 	}
 
 	public void print() {
