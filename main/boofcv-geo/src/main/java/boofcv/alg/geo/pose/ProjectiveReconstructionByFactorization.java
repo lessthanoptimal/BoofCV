@@ -20,8 +20,10 @@ package boofcv.alg.geo.pose;
 
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.SingularOps_DDRM;
 import org.ejml.dense.row.SpecializedOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
@@ -40,6 +42,8 @@ import java.util.List;
  * [                                 ...                 ]  = [ ...  ]
  * [ &lambda;[N,1]*x[1,1] , &lambda;[N,2]*x[1,2] , ... , &lambda;[N,M]*x[N,M] ]  = [ P[M] ]
  * </pre>
+ * where &lambda; is the depth, x is homogenous pixel coordinate, P is 3x4 projective, X is 3D feature location in
+ * world coordinate system.
  *
  * Procedure:
  * <ol>
@@ -47,7 +51,13 @@ import java.util.List;
  *     <li>Set initial pixel depths</li>
  *     <li>Set pixel observations for each view</li>
  *     <li>Call {@link #process()}</li>
+ *     <li>Get results with {@link #getFeature3D} and {@link #getCameraMatrix}</li>
  * </ol>
+ *
+ * <p>
+ *     Internally depth and pixel values are scaled so that they are close to unity then undo for output. This ensures
+ *     better approximation of errors and has other desirable numerical properties.
+ * </p>
  *
  * <p>
  * [1] Page 444 in R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
@@ -64,13 +74,19 @@ public class ProjectiveReconstructionByFactorization {
 	// Depth for each feature in each view. rows = view, cols = features
 	DMatrixRMaj depths = new DMatrixRMaj(1,1);
 	DMatrixRMaj pixels = new DMatrixRMaj(1,1);
+	// used to improve numerics. Pixel coordinate should be of an oder of magnitude of 1
+	double pixelScale; // See discussion in 18.4.4. By scaling pixels the algebraic error is closer to geometric
 
 	// Left side of equation = depth*[x,y,1]'
 	DMatrixRMaj A = new DMatrixRMaj(1,1);
 	DMatrixRMaj B = new DMatrixRMaj(1,1);
+	// matrix which stores projections
+	DMatrixRMaj P = new DMatrixRMaj(1,4);
+	// matrix which stores the points
+	DMatrixRMaj X = new DMatrixRMaj(3,1);
 
 	// SVD work spacce
-	SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(10,10,true,true,false);
+	SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(10,10,true,true,true);
 	DMatrixRMaj U = new DMatrixRMaj(1,1);
 	DMatrixRMaj Vt = new DMatrixRMaj(1,1);
 
@@ -82,6 +98,7 @@ public class ProjectiveReconstructionByFactorization {
 	public void initialize( int numFeatures , int numViews ) {
 		depths.reshape(numViews,numFeatures);
 		pixels.reshape(numViews*2,numFeatures);
+		pixelScale = 0;
 	}
 
 	/**
@@ -98,6 +115,7 @@ public class ProjectiveReconstructionByFactorization {
 			Point2D_F64 p = pixelsInView.get(i);
 			pixels.set(row,i,p.x);
 			pixels.set(row+1,i,p.y);
+			pixelScale = Math.max(Math.abs(p.x),Math.abs(p.y));
 		}
 	}
 
@@ -145,11 +163,21 @@ public class ProjectiveReconstructionByFactorization {
 	 * @return true if no exception was thrown. Does not mean it converged to a valid solution
 	 */
 	public boolean process() {
-		A.reshape(depths.numRows*3,depths.numCols);
-		B.reshape(depths.numRows*3,depths.numCols);
+		int numViews = depths.numRows;
+		int numFeatures = depths.numCols;
+		P.reshape(3*numViews,4);
+		X.reshape(4,numFeatures);
+
+		A.reshape(numViews*3,numFeatures);
+		B.reshape(numViews*3,numFeatures);
+
+		// Scale depths so that they are close to unity
+		normalizeDepths(depths);
+
+		// Compute the initial A matirx
+		assignValuesToA(A);
 
 		for (int iter = 0; iter < maxIterations; iter++) {
-			assignValuesToA(A);
 			if( !svd.decompose(A) )
 				return false;
 
@@ -157,11 +185,19 @@ public class ProjectiveReconstructionByFactorization {
 			svd.getV(Vt,true);
 			double sv[] = svd.getSingularValues();
 
-			CommonOps_DDRM.multCols(U,sv);
+			SingularOps_DDRM.descendingOrder(U,false,sv,A.numCols,Vt,true);
 
-			CommonOps_DDRM.mult(U,Vt,B);
+			// This is equivalent to forcing the rank to be 4
+			CommonOps_DDRM.extract(U,0,0,P);
+			CommonOps_DDRM.multCols(P,sv);
+			CommonOps_DDRM.extract(Vt,0,0,X);
 
+			// Compute the new value of A
+			CommonOps_DDRM.mult(P,X,B);
+
+			// See how much change there is
 			double delta = SpecializedOps_DDRM.diffNormF(A,B)/(A.numCols*A.numRows);
+
 			// swap arrays for the next iteration
 			DMatrixRMaj tmp = A;
 			A = B;
@@ -176,26 +212,36 @@ public class ProjectiveReconstructionByFactorization {
 	}
 
 	/**
-	 * Used to get found projective for a view
+	 * Used to get found camera matrix for a view
 	 * @param view Which view
-	 * @param P storage for 3x4 projective matrix
+	 * @param cameraMatrix storage for 3x4 projective camera matrix
 	 */
-	public void getProjective( int view , DMatrixRMaj P ) {
-		P.reshape(3,4);
-		CommonOps_DDRM.extract(A,view*3,0,P);
+	public void getCameraMatrix(int view , DMatrixRMaj cameraMatrix ) {
+		cameraMatrix.reshape(3,4);
+		CommonOps_DDRM.extract(P,view*3,0,cameraMatrix);
+
+		for (int col = 0; col < 4; col++) {
+			cameraMatrix.data[cameraMatrix.getIndex(0,col)] *= pixelScale;
+			cameraMatrix.data[cameraMatrix.getIndex(1,col)] *= pixelScale;
+		}
 	}
 
 	/**
 	 * Returns location of 3D feature for a view
-	 * @param feature which feature to retrieve
-	 * @param X Storage for 3D feature
+	 * @param feature Index of feature to retrieve
+	 * @param out (Output) Storage for 3D feature. homogenous coordinates
 	 */
-	public void getFeature3D( int feature , Point3D_F64 X ) {
-		X.x = Vt.get(0,feature);
-		X.y = Vt.get(1,feature);
-		X.z = Vt.get(2,feature);
+	public void getFeature3D( int feature , Point4D_F64 out ) {
+		out.x = X.get(0,feature);
+		out.y = X.get(1,feature);
+		out.z = X.get(2,feature);
+		out.w = X.get(3,feature);
 	}
 
+	/**
+	 * A[:,0] = depth*[x,y,1]'
+	 *
+	 */
 	public void assignValuesToA( DMatrixRMaj A ) {
 		for (int viewIdx = 0; viewIdx < depths.numRows; viewIdx++) {
 			int rowA = viewIdx*3;
@@ -205,9 +251,45 @@ public class ProjectiveReconstructionByFactorization {
 				double depth = depths.get(viewIdx,pointIdx);
 
 				// pixels are in homogenous coordinates A(:,i) = depth*(x,y,1)
-				A.set(rowA,pointIdx, depth*pixels.get(rowPixels,pointIdx));
-				A.set(rowA+1,pointIdx, depth*pixels.get(rowPixels+1,pointIdx));
+				A.set(rowA,pointIdx, depth*pixels.get(rowPixels,pointIdx)/pixelScale);
+				A.set(rowA+1,pointIdx, depth*pixels.get(rowPixels+1,pointIdx)/pixelScale);
 				A.set(rowA+2,pointIdx, depth);
+			}
+		}
+	}
+
+	/**
+	 * <p>Rescale A so that its rows and columns have a value of approximately 1. This is done to try to get
+	 * everything set to unity for desirable numerical properties</p>
+	 *
+	 * (&alpha; &beta; &lambda;) x = (&alpha;P)(&beta;X)
+	 */
+	public void normalizeDepths( DMatrixRMaj depths ) {
+		// normalize rows first
+		for (int row = 0; row < depths.numRows; row++) {
+			int idx = row*depths.numCols;
+			double sum = 0;
+			for (int col = 0; col < depths.numCols; col++) {
+				double v = depths.data[idx++];
+				sum += v*v;
+			}
+			double norm = Math.sqrt(sum)/depths.numCols;
+			idx = row*depths.numCols;
+			for (int j = 0; j < depths.numCols; j++) {
+				depths.data[idx++] /= norm;
+			}
+		}
+
+		// normalize columns
+		for (int col = 0; col < depths.numCols; col++) {
+			double norm = 0;
+			for (int row = 0; row < depths.numRows; row++) {
+				double v = depths.get(row,col);
+				norm += v*v;
+			}
+			norm = Math.sqrt(norm);
+			for (int row = 0; row < depths.numRows; row++) {
+				depths.data[depths.getIndex(row,col)] /= norm;
 			}
 		}
 	}

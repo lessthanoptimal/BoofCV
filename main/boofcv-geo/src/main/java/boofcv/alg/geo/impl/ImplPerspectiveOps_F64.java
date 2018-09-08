@@ -28,6 +28,7 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -37,6 +38,8 @@ import org.ejml.data.FMatrix3x3;
 import org.ejml.dense.fixed.CommonOps_DDF3;
 import org.ejml.dense.fixed.CommonOps_FDF3;
 import org.ejml.dense.row.CommonOps_DDRM;
+
+import javax.annotation.Nullable;
 
 /**
  * Implementation of {@link PerspectiveOps} functions for 64-bit floats
@@ -218,8 +221,17 @@ public class ImplPerspectiveOps_F64 {
 		return pixel;
 	}
 
-	public static DMatrixRMaj createCameraMatrix( DMatrixRMaj R , Vector3D_F64 T , DMatrixRMaj K ,
-													 DMatrixRMaj ret ) {
+	public static void renderPixel(DMatrixRMaj cameraMatrix , Point4D_F64 X , @Nullable Point3D_F64 pixelH) {
+		DMatrixRMaj P = cameraMatrix;
+
+		pixelH.x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3]*X.w;
+		pixelH.y = P.data[4]*X.x + P.data[5]*X.y + P.data[6]*X.z + P.data[7]*X.w;
+		pixelH.z = P.data[8]*X.x + P.data[9]*X.y + P.data[10]*X.z + P.data[11]*X.w;
+	}
+
+	public static DMatrixRMaj createCameraMatrix( DMatrixRMaj R , Vector3D_F64 T ,
+												  @Nullable DMatrixRMaj K ,
+												  @Nullable DMatrixRMaj ret ) {
 		if( ret == null )
 			ret = new DMatrixRMaj(3,4);
 

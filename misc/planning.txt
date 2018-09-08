@@ -49,6 +49,9 @@ Less High Priority Next Release
 - Stereo Disparity
   * make float images contain actual disparity, not offset.  negative values for invalid
 
+- Monocular Reconstruction
+  * "Live Dense Reconstruction with a Single Moving Camera" is probably a good starting point
+
 - SFM
   * Naive implementation of DLS
     http://www-users.cs.umn.edu/~stergios/papers/ICCV-11-DLS-PnP.pdf

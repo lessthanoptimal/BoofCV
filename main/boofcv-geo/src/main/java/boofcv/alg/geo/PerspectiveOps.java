@@ -31,16 +31,14 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.UtilVector3D_F64;
 import georegression.metric.UtilAngle;
-import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.point.Vector3D_F64;
+import georegression.struct.point.*;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -470,6 +468,20 @@ public class PerspectiveOps {
 	}
 
 	/**
+	 * Render a pixel in homogeneous coordinates from a 3x4 camera matrix and a 3D homogeneous point.
+	 * @param cameraMatrix (Input) 3x4 camera matrix
+	 * @param X (Input) 3D point in homogeneous coordinates
+	 * @param x (Output) Rendered 2D point in homogeneous coordinates
+	 * @return Rendered 2D point in homogeneous coordinates
+	 */
+	public static Point3D_F64 renderPixel( DMatrixRMaj cameraMatrix , Point4D_F64 X , @Nullable Point3D_F64 x) {
+		if( x == null )
+			x = new Point3D_F64();
+		ImplPerspectiveOps_F64.renderPixel(cameraMatrix, X, x);
+		return x;
+	}
+
+	/**
 	 * Takes a list of {@link AssociatedPair} as input and breaks it up into two lists for each view.
 	 *
 	 * @param pairs Input: List of associated pairs.
@@ -510,8 +522,9 @@ public class PerspectiveOps {
 	 * @param ret Storage for camera calibration matrix. If null a new instance will be created.
 	 * @return Camera calibration matrix.
 	 */
-	public static DMatrixRMaj createCameraMatrix( DMatrixRMaj R , Vector3D_F64 T , DMatrixRMaj K ,
-													 DMatrixRMaj ret ) {
+	public static DMatrixRMaj createCameraMatrix( DMatrixRMaj R , Vector3D_F64 T ,
+												  @Nullable DMatrixRMaj K ,
+												  @Nullable DMatrixRMaj ret ) {
 		return ImplPerspectiveOps_F64.createCameraMatrix(R, T, K, ret);
 	}
 
