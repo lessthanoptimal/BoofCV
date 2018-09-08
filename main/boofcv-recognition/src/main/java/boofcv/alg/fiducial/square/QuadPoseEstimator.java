@@ -66,7 +66,7 @@ public class QuadPoseEstimator {
 	// iterative refinement
 	private RefinePnP refine;
 
-	private Estimate1ofPnP epnp = FactoryMultiView.computePnP_1(EnumPNP.EPNP,50,0);
+	private Estimate1ofPnP epnp = FactoryMultiView.pnp_1(EnumPNP.EPNP,50,0);
 
 	// transforms from distorted pixel observation normalized image coordinates
 	protected Point2Transform2_F64 pixelToNorm;
@@ -110,8 +110,8 @@ public class QuadPoseEstimator {
 	 * @param refineIterations Number of refinement iterations.  Try 200
 	 */
 	public QuadPoseEstimator( double refineTol , int refineIterations ) {
-		this(FactoryMultiView.computePnP_N(EnumPNP.P3P_GRUNERT, -1),
-				FactoryMultiView.refinePnP(refineTol,refineIterations));
+		this(FactoryMultiView.pnp_N(EnumPNP.P3P_GRUNERT, -1),
+				FactoryMultiView.pnpRefine(refineTol,refineIterations));
 	}
 
 	/**

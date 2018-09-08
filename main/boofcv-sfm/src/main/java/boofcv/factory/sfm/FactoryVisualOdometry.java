@@ -195,7 +195,7 @@ public class FactoryVisualOdometry {
 		// Range from sparse disparity
 		StereoSparse3D<T> pixelTo3D = new StereoSparse3D<>(sparseDisparity, imageType);
 
-		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
+		Estimate1ofPnP estimator = FactoryMultiView.pnp_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
 		final DistanceFromModelMultiView<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
@@ -211,7 +211,7 @@ public class FactoryVisualOdometry {
 		RefinePnP refine = null;
 
 		if( refineIterations > 0 ) {
-			refine = FactoryMultiView.refinePnP(1e-12,refineIterations);
+			refine = FactoryMultiView.pnpRefine(1e-12,refineIterations);
 		}
 
 		VisOdomPixelDepthPnP<T> alg =
@@ -248,7 +248,7 @@ public class FactoryVisualOdometry {
 		// Range from sparse disparity
 		ImagePixelTo3D pixelTo3D = new DepthSparse3D_to_PixelTo3D<>(sparseDepth);
 
-		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
+		Estimate1ofPnP estimator = FactoryMultiView.pnp_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
 		final DistanceFromModelMultiView<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
@@ -263,7 +263,7 @@ public class FactoryVisualOdometry {
 		RefinePnP refine = null;
 
 		if( refineIterations > 0 ) {
-			refine = FactoryMultiView.refinePnP(1e-12,refineIterations);
+			refine = FactoryMultiView.pnpRefine(1e-12,refineIterations);
 		}
 
 		VisOdomPixelDepthPnP<Vis> alg = new VisOdomPixelDepthPnP<>
@@ -299,7 +299,7 @@ public class FactoryVisualOdometry {
 												 DescribeRegionPoint<T,Desc> descriptor,
 												 Class<T> imageType)
 	{
-		EstimateNofPnP pnp = FactoryMultiView.computePnP_N(EnumPNP.P3P_FINSTERWALDER, -1);
+		EstimateNofPnP pnp = FactoryMultiView.pnp_N(EnumPNP.P3P_FINSTERWALDER, -1);
 		DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
 		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
 		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);
@@ -362,7 +362,7 @@ public class FactoryVisualOdometry {
 										   DetectDescribeMulti<T,Desc> detector,
 										   Class<T> imageType )
 	{
-		EstimateNofPnP pnp = FactoryMultiView.computePnP_N(EnumPNP.P3P_FINSTERWALDER, -1);
+		EstimateNofPnP pnp = FactoryMultiView.pnp_N(EnumPNP.P3P_FINSTERWALDER, -1);
 		DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
 		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
 		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);

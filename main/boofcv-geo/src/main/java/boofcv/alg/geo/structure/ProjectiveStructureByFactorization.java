@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.pose;
+package boofcv.alg.geo.structure;
 
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -65,7 +65,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ProjectiveReconstructionByFactorization {
+public class ProjectiveStructureByFactorization {
 
 	// Convergence tolerances
 	int maxIterations = 10;

@@ -120,9 +120,9 @@ public class BenchmarkRuntimePnP extends ArtificialStereoScene {
 		boolean planar = false;
 		init(NUM_POINTS, FUNDAMENTAL, planar);
 
-		Estimate1ofPnP grunert = FactoryMultiView.computePnP_1(EnumPNP.P3P_GRUNERT,-1,1);
-		Estimate1ofPnP finster = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,1);
-		Estimate1ofPnP ippe = FactoryMultiView.computePnP_1(EnumPNP.IPPE,-1,1);
+		Estimate1ofPnP grunert = FactoryMultiView.pnp_1(EnumPNP.P3P_GRUNERT,-1,1);
+		Estimate1ofPnP finster = FactoryMultiView.pnp_1(EnumPNP.P3P_FINSTERWALDER,-1,1);
+		Estimate1ofPnP ippe = FactoryMultiView.pnp_1(EnumPNP.IPPE,-1,1);
 
 		ProfileOperation.printOpsPerSec(new EPnP(0), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new EPnP(5), TEST_TIME);

@@ -44,7 +44,7 @@ public class TestPnPStereoEstimator extends CommonStereoMotionNPoint {
 	}
 
 	private void perfectData(int numExtra) {
-		EstimateNofPnP pnp = FactoryMultiView.computePnP_N(EnumPNP.P3P_FINSTERWALDER, -1);
+		EstimateNofPnP pnp = FactoryMultiView.pnp_N(EnumPNP.P3P_FINSTERWALDER, -1);
 		DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
 
 		PnPStereoEstimator alg = new PnPStereoEstimator(pnp,distanceMono,numExtra);

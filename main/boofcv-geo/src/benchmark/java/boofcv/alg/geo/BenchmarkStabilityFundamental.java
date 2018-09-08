@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -234,12 +234,12 @@ public class BenchmarkStabilityFundamental {
 		app.motionTranslate();
 		app.createObservations();
 		if( isPixels ){
-			app.evaluateMinimal(FactoryMultiView.computeFundamental_N(EnumFundamental.LINEAR_8));
-			app.evaluateMinimal(FactoryMultiView.computeFundamental_N(EnumFundamental.LINEAR_7));
+			app.evaluateMinimal(FactoryMultiView.fundamental_N(EnumFundamental.LINEAR_8));
+			app.evaluateMinimal(FactoryMultiView.fundamental_N(EnumFundamental.LINEAR_7));
 		} else {
-			app.evaluateMinimal(FactoryMultiView.computeEssential_N(EnumEssential.LINEAR_8));
-			app.evaluateMinimal(FactoryMultiView.computeEssential_N(EnumEssential.LINEAR_7));
-			app.evaluateMinimal(FactoryMultiView.computeEssential_N(EnumEssential.NISTER_5));
+			app.evaluateMinimal(FactoryMultiView.essential_N(EnumEssential.LINEAR_8));
+			app.evaluateMinimal(FactoryMultiView.essential_N(EnumEssential.LINEAR_7));
+			app.evaluateMinimal(FactoryMultiView.essential_N(EnumEssential.NISTER_5));
 		}
 
 //		app.evaluateMinimal(FactoryMultiView.computeFundamental(8));

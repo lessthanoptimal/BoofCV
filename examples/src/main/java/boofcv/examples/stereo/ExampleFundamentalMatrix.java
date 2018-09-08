@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,7 +83,7 @@ public class ExampleFundamentalMatrix {
 		// used to create and copy new instances of the fit model
 		ModelManager<DMatrixRMaj> managerF = new ModelManagerEpipolarMatrix();
 		// Select which linear algorithm is to be used.  Try playing with the number of remove ambiguity points
-		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(EnumFundamental.LINEAR_7, 2);
+		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(EnumFundamental.LINEAR_7, 2);
 		// Wrapper so that this estimator can be used by the robust estimator
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
 
@@ -105,7 +105,7 @@ public class ExampleFundamentalMatrix {
 		// Improve the estimate of the fundamental matrix using non-linear optimization
 		DMatrixRMaj F = new DMatrixRMaj(3,3);
 		ModelFitter<DMatrixRMaj,AssociatedPair> refine =
-				FactoryMultiView.refineFundamental(1e-8, 400, EpipolarError.SAMPSON);
+				FactoryMultiView.fundamentalRefine(1e-8, 400, EpipolarError.SAMPSON);
 		if( !refine.fitModel(inliers, robustF.getModelParameters(), F) )
 			throw new IllegalArgumentException("Failed");
 
@@ -120,7 +120,7 @@ public class ExampleFundamentalMatrix {
 	 */
 	public static DMatrixRMaj simpleFundamental( List<AssociatedPair> matches ) {
 		// Use the 8-point algorithm since it will work with an arbitrary number of points
-		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(EnumFundamental.LINEAR_8, 0);
+		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(EnumFundamental.LINEAR_8, 0);
 
 		DMatrixRMaj F = new DMatrixRMaj(3,3);
 		if( !estimateF.process(matches,F) )

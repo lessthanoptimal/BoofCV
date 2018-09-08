@@ -63,7 +63,7 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 
 	// non-linear refinement of pose estimate
 	private Estimate1ofPnP estimatePnP = FactoryMultiView.computePnPwithEPnP(10, 0.2);
-	private RefinePnP refinePnP = FactoryMultiView.refinePnP(1e-8,100);
+	private RefinePnP refinePnP = FactoryMultiView.pnpRefine(1e-8,100);
 
 	// when computing the pose, this is the initial estimate before non-linear refinement
 	private Se3_F64 initialEstimate = new Se3_F64();

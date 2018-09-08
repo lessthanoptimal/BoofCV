@@ -75,7 +75,7 @@ public class FactoryMultiViewRobust {
 		configPnP.checkValidity();
 		configLMedS.checkValidity();
 
-		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1( configPnP.which , configPnP.epnpIterations, configPnP.numResolve);
+		Estimate1ofPnP estimatorPnP = FactoryMultiView.pnp_1( configPnP.which , configPnP.epnpIterations, configPnP.numResolve);
 
 		DistanceFromModelMultiView<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
@@ -109,7 +109,7 @@ public class FactoryMultiViewRobust {
 		pnp.checkValidity();
 		ransac.checkValidity();
 
-		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1(pnp.which, pnp.epnpIterations, pnp.numResolve);
+		Estimate1ofPnP estimatorPnP = FactoryMultiView.pnp_1(pnp.which, pnp.epnpIterations, pnp.numResolve);
 		DistanceFromModelMultiView<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
@@ -144,7 +144,7 @@ public class FactoryMultiViewRobust {
 			essential.checkValidity();
 
 		Estimate1ofEpipolar epipolar = FactoryMultiView.
-				computeEssential_1(essential.which, essential.numResolve);
+				essential_1(essential.which, essential.numResolve);
 
 		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
@@ -165,7 +165,7 @@ public class FactoryMultiViewRobust {
 		fundamental.checkValidity();
 
 		ModelManager<DMatrixRMaj> managerF = new ModelManagerEpipolarMatrix();
-		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(fundamental.which,
+		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(fundamental.which,
 				fundamental.numResolve);
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
 
@@ -199,7 +199,7 @@ public class FactoryMultiViewRobust {
 		ransac.checkValidity();
 
 		Estimate1ofEpipolar epipolar = FactoryMultiView.
-				computeEssential_1(essential.which, essential.numResolve);
+				essential_1(essential.which, essential.numResolve);
 
 		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
@@ -222,7 +222,7 @@ public class FactoryMultiViewRobust {
 		ransac.checkValidity();
 
 		ModelManager<DMatrixRMaj> managerF = new ModelManagerEpipolarMatrix();
-		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(fundamental.which,
+		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(fundamental.which,
 				fundamental.numResolve);
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
 

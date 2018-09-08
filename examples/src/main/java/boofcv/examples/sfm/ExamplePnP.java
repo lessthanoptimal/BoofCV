@@ -95,13 +95,13 @@ public class ExamplePnP {
 		// Compute a single solution using EPNP
 		// 10 iterations is what JavaDoc recommends, but might need to be tuned.
 		// 0 test points.  This parameters is actually ignored because EPNP only returns a single solution
-		Estimate1ofPnP pnp = FactoryMultiView.computePnP_1(EnumPNP.EPNP, 10, 0);
+		Estimate1ofPnP pnp = FactoryMultiView.pnp_1(EnumPNP.EPNP, 10, 0);
 
 		Se3_F64 worldToCamera = new Se3_F64();
 		pnp.process(observations,worldToCamera);
 
 		// For some applications the EPNP solution might be good enough, but let's refine it
-		RefinePnP refine = FactoryMultiView.refinePnP(1e-8,200);
+		RefinePnP refine = FactoryMultiView.pnpRefine(1e-8,200);
 
 		Se3_F64 refinedWorldToCamera = new Se3_F64();
 
@@ -129,7 +129,7 @@ public class ExamplePnP {
 		Se3_F64 worldToCamera = ransac.getModelParameters();
 
 		// You will most likely want to refine this solution too.  Can make a difference with real world data
-		RefinePnP refine = FactoryMultiView.refinePnP(1e-8,200);
+		RefinePnP refine = FactoryMultiView.pnpRefine(1e-8,200);
 
 		Se3_F64 refinedWorldToCamera = new Se3_F64();
 

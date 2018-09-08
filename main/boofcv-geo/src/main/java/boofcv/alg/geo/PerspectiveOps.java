@@ -464,7 +464,14 @@ public class PerspectiveOps {
 	 * @return 2D Render point on image plane.
 	 */
 	public static Point2D_F64 renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X ) {
-		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, X);
+		return renderPixel(worldToCamera,X,null);
+	}
+
+	public static Point2D_F64 renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X , @Nullable Point2D_F64 pixel ) {
+		if( pixel == null )
+			pixel = new Point2D_F64();
+		ImplPerspectiveOps_F64.renderPixel(worldToCamera, X, pixel);
+		return pixel;
 	}
 
 	/**

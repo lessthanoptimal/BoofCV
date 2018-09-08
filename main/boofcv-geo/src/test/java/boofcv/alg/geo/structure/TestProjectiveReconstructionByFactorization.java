@@ -16,41 +16,22 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.pose;
+package boofcv.alg.geo.structure;
 
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.geo.WorldToCameraToPixel;
-import boofcv.struct.calib.CameraPinhole;
-import georegression.geometry.ConvertRotation3D_F64;
-import georegression.geometry.UtilPoint3D_F64;
-import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
-import georegression.struct.se.Se3_F64;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestProjectiveReconstructionByFactorization {
-
-	Random rand = new Random(234);
-
-	CameraPinhole pinhole = new CameraPinhole(400,420,0.1,500,490,-1,-1);
-
-	List<Point3D_F64> features3D;
-	List<Se3_F64> worldToViews;
-	List<DMatrixRMaj> projections;
-	List<List<Point2D_F64>> observations;
+public class TestProjectiveReconstructionByFactorization extends CommonStructure {
 
 	/**
 	 * Perfect observations and perfect input, Output should be just perfect
@@ -59,9 +40,9 @@ public class TestProjectiveReconstructionByFactorization {
 	public void perfect_input() {
 		int numViews = 8;
 		int numFeatures = 10;
-		simulate(numViews,numFeatures);
+		simulate(numViews,numFeatures,false);
 
-		ProjectiveReconstructionByFactorization alg = new ProjectiveReconstructionByFactorization();
+		ProjectiveStructureByFactorization alg = new ProjectiveStructureByFactorization();
 		alg.initialize(features3D.size(),projections.size());
 
 		// Perfect depths. It should only need 1 iteration
@@ -99,9 +80,9 @@ public class TestProjectiveReconstructionByFactorization {
 	public void perfect_input_badDepths() {
 		int numViews = 8;
 		int numFeatures = 10;
-		simulate(numViews,numFeatures);
+		simulate(numViews,numFeatures,false);
 
-		ProjectiveReconstructionByFactorization alg = new ProjectiveReconstructionByFactorization();
+		ProjectiveStructureByFactorization alg = new ProjectiveStructureByFactorization();
 		alg.initialize(features3D.size(),projections.size());
 
 		// depth isn't known so just set it to 1. it could easily converge to a poor local optimal
@@ -136,7 +117,7 @@ public class TestProjectiveReconstructionByFactorization {
 		assertTrue( total >= 0.95*numViews*numFeatures );
 	}
 
-	private void setPerfectDepths(int numFeatures, ProjectiveReconstructionByFactorization alg) {
+	private void setPerfectDepths(int numFeatures, ProjectiveStructureByFactorization alg) {
 		double depths[] = new double[numFeatures];
 		Point3D_F64 X = new Point3D_F64();
 		for (int viewIdx = 0; viewIdx < projections.size(); viewIdx++) {
@@ -148,45 +129,5 @@ public class TestProjectiveReconstructionByFactorization {
 		}
 	}
 
-	public void simulate( int numViews , int numFeatures ) {
-		worldToViews = new ArrayList<>();
-		projections = new ArrayList<>();
-		observations = new ArrayList<>();
-
-		// Randomly generate structure in front of the cameras
-		features3D = UtilPoint3D_F64.random(new Point3D_F64(0,0,2),-0.5,0.5,numFeatures,rand);
-
-		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(pinhole,(DMatrixRMaj)null);
-
-		// Generate views the adjust all 6-DOF but and distinctive while pointing at the points
-		for (int i = 0; i < numViews; i++) {
-			Se3_F64 worldToView = new Se3_F64();
-			worldToView.T.x = -1 + 0.1*i;
-			worldToView.T.y = rand.nextGaussian()*0.05;
-			worldToView.T.z = -0.5 + 0.05*i + rand.nextGaussian()*0.01;
-
-			double rotX = rand.nextGaussian()*0.1;
-			double rotY = rand.nextGaussian()*0.1;
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,0,worldToView.R);
-
-			DMatrixRMaj P = new DMatrixRMaj(3,4);
-			PerspectiveOps.createCameraMatrix(worldToView.R,worldToView.T,K,P);
-
-			worldToViews.add(worldToView);
-			projections.add(P);
-		}
-
-		// generate observations
-		WorldToCameraToPixel w2p = new WorldToCameraToPixel();
-		for (int i = 0; i < numViews; i++) {
-			List<Point2D_F64> viewObs = new ArrayList<>();
-
-			w2p.configure(pinhole,worldToViews.get(i));
-			for (int j = 0; j < numFeatures; j++) {
-				viewObs.add(w2p.transform(features3D.get(j)));
-			}
-			observations.add(viewObs);
-		}
-	}
 
 }

@@ -87,8 +87,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	GrayF32 square;
 
 	// Used to compute/remove perspective distortion
-	private Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomographyDLT(true);
-	private RefineEpipolar refineHomography = FactoryMultiView.refineHomography(1e-4,100, EpipolarError.SAMPSON);
+	private Estimate1ofEpipolar computeHomography = FactoryMultiView.homographyDLT(true);
+	private RefineEpipolar refineHomography = FactoryMultiView.homographyRefine(1e-4,100, EpipolarError.SAMPSON);
 	private DMatrixRMaj H = new DMatrixRMaj(3,3);
 	private DMatrixRMaj H_refined = new DMatrixRMaj(3,3);
 	private Homography2D_F64 H_fixed = new Homography2D_F64();

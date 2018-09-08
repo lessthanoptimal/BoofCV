@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class TestSe3FromEssentialGenerator {
 		}
 
 		// create alg
-		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeFundamental_1(EnumFundamental.LINEAR_8, 0);
+		Estimate1ofEpipolar essentialAlg = FactoryMultiView.fundamental_1(EnumFundamental.LINEAR_8, 0);
 		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 
 		Se3FromEssentialGenerator alg = new Se3FromEssentialGenerator(essentialAlg,triangulate);

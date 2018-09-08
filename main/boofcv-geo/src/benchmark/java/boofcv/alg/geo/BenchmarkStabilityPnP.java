@@ -83,18 +83,18 @@ public class BenchmarkStabilityPnP extends ArtificialStereoScene {
 		name = "EPnP";
 		evaluateMinimal(pixelSigma,isPlanar,numTrials);
 
-		target = FactoryMultiView.computePnP_1(EnumPNP.P3P_GRUNERT, -1, numTestPoints);
+		target = FactoryMultiView.pnp_1(EnumPNP.P3P_GRUNERT, -1, numTestPoints);
 		name = "Grunert";
 		evaluateMinimal(pixelSigma, isPlanar, numTrials);
 
-		target = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,numTestPoints);
+		target = FactoryMultiView.pnp_1(EnumPNP.P3P_FINSTERWALDER,-1,numTestPoints);
 		name = "Finsterwalder";
 		evaluateMinimal(pixelSigma,isPlanar,numTrials);
 
 		if( !isPlanar )
 			return;
 
-		target = FactoryMultiView.computePnP_1(EnumPNP.IPPE, -1, numTestPoints);
+		target = FactoryMultiView.pnp_1(EnumPNP.IPPE, -1, numTestPoints);
 		name = "IPPE";
 		evaluateMinimal(pixelSigma, true, numTrials);
 	}
@@ -166,7 +166,7 @@ public class BenchmarkStabilityPnP extends ArtificialStereoScene {
 		if( !planar )
 			return;
 		app.name = "IPPE";
-		app.target = FactoryMultiView.computePnP_1(EnumPNP.IPPE,-1,-1);
+		app.target = FactoryMultiView.pnp_1(EnumPNP.IPPE,-1,-1);
 		app.evaluateObservationNoise(0,max,20,planar);
 	}
 }

@@ -43,7 +43,7 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 	FDistort distort;
 
 	// computes the homography
-	Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomographyDLT(true);
+	Estimate1ofEpipolar computeHomography = FactoryMultiView.homographyDLT(true);
 
 //	RefineEpipolar refineHomography = FactoryMultiView.refineHomography(1e-8,20, EpipolarError.SIMPLE);
 

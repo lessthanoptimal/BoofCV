@@ -236,7 +236,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		} else {
 			// TODO figure out how to do  PnP in uncalibrated case
 		}
-		refineEpipolar = FactoryMultiView.refineFundamental(1e-32,10,EpipolarError.SAMPSON);
+		refineEpipolar = FactoryMultiView.fundamentalRefine(1e-32,10,EpipolarError.SAMPSON);
 	}
 
 	/**

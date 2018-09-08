@@ -66,7 +66,7 @@ public class FactoryMultiView {
 	 * @param normalizeInput If input is in pixel coordinates set to true.  False if in normalized image coordinates.
 	 * @return Homography estimator.
 	 */
-	public static Estimate1ofEpipolar computeHomographyDLT(boolean normalizeInput ) {
+	public static Estimate1ofEpipolar homographyDLT(boolean normalizeInput ) {
 		HomographyDirectLinearTransform alg = new HomographyDirectLinearTransform(normalizeInput);
 		return new HomographyDLT_to_Epipolar(alg);
 	}
@@ -78,7 +78,7 @@ public class FactoryMultiView {
 	 *
 	 * @return Homography estimator.
 	 */
-	public static Estimate1ofEpipolar computeHomographyTLS() {
+	public static Estimate1ofEpipolar homographyTLS() {
 		HomographyTotalLeastSquares alg = new HomographyTotalLeastSquares();
 		return new HomographyTLS_to_Epipolar(alg);
 	}
@@ -94,7 +94,7 @@ public class FactoryMultiView {
 	 * @param maxIterations Maximum number of iterations it will perform.  Try 100 or more.
 	 * @return Homography refinement
 	 */
-	public static RefineEpipolar refineHomography( double tol , int maxIterations , EpipolarError type ) {
+	public static RefineEpipolar homographyRefine(double tol , int maxIterations , EpipolarError type ) {
 		ModelObservationResidualN residuals;
 		switch( type ) {
 			case SIMPLE:
@@ -102,7 +102,7 @@ public class FactoryMultiView {
 				break;
 
 			case SAMPSON:
-				residuals = new HomographyResidualSampson();;
+				residuals = new HomographyResidualSampson();
 				break;
 
 			default:
@@ -150,7 +150,7 @@ public class FactoryMultiView {
 	 * @param which Specifies which algorithm is to be created
 	 * @return Fundamental or essential estimation algorithm that returns multiple hypotheses.
 	 */
-	public static EstimateNofEpipolar computeFundamental_N( EnumFundamental which )
+	public static EstimateNofEpipolar fundamental_N(EnumFundamental which )
 	{
 		switch( which ) {
 			case LINEAR_8:
@@ -163,7 +163,7 @@ public class FactoryMultiView {
 		throw new IllegalArgumentException("Unknown algorithm "+which);
 	}
 
-	public static EstimateNofEpipolar computeEssential_N( EnumEssential which )
+	public static EstimateNofEpipolar essential_N(EnumEssential which )
 	{
 		switch( which ) {
 			case LINEAR_8:
@@ -181,7 +181,7 @@ public class FactoryMultiView {
 
 	/**
 	 * <p>
-	 * Similar to {@link #computeFundamental_N}, but it returns only a single hypothesis.  If
+	 * Similar to {@link #fundamental_N}, but it returns only a single hypothesis.  If
 	 * the underlying algorithm generates multiple hypotheses they are resolved by considering additional
 	 * sample points. For example, if you are using the 7 point algorithm at least one additional sample point
 	 * is required to resolve that ambiguity.  So 8 or more sample points are now required.
@@ -193,7 +193,7 @@ public class FactoryMultiView {
 	 * </p>
 	 *
 	 * <p>
-	 * See {@link #computeFundamental_N} for a description of the algorithms and what 'minimumSamples'
+	 * See {@link #fundamental_N} for a description of the algorithms and what 'minimumSamples'
 	 * and 'isFundamental' do.
 	 * </p>
 	 *
@@ -211,7 +211,7 @@ public class FactoryMultiView {
 	 * @param numRemoveAmbiguity Number of sample points used to prune hypotheses. Ignored if only a single solution.
 	 * @return Fundamental or essential estimation algorithm that returns a single hypothesis.
 	 */
-	public static Estimate1ofEpipolar computeFundamental_1( EnumFundamental which, int numRemoveAmbiguity)
+	public static Estimate1ofEpipolar fundamental_1(EnumFundamental which, int numRemoveAmbiguity)
 	{
 		switch( which ) {
 			case LINEAR_8:
@@ -221,13 +221,13 @@ public class FactoryMultiView {
 		if( numRemoveAmbiguity <= 0 )
 			throw new IllegalArgumentException("numRemoveAmbiguity must be greater than zero");
 
-		EstimateNofEpipolar alg = computeFundamental_N(which);
+		EstimateNofEpipolar alg = fundamental_N(which);
 		DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
 
 		return new EstimateNto1ofEpipolar(alg,distance,numRemoveAmbiguity);
 	}
 
-	public static Estimate1ofEpipolar computeEssential_1( EnumEssential which, int numRemoveAmbiguity)
+	public static Estimate1ofEpipolar essential_1(EnumEssential which, int numRemoveAmbiguity)
 	{
 		switch( which ) {
 			case LINEAR_8:
@@ -237,7 +237,7 @@ public class FactoryMultiView {
 		if( numRemoveAmbiguity <= 0 )
 			throw new IllegalArgumentException("numRemoveAmbiguity must be greater than zero");
 
-		EstimateNofEpipolar alg = computeEssential_N(which);
+		EstimateNofEpipolar alg = essential_N(which);
 		DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
 
 		return new EstimateNto1ofEpipolar(alg,distance,numRemoveAmbiguity);
@@ -253,7 +253,7 @@ public class FactoryMultiView {
 	 * @param maxIterations Maximum number of iterations it will perform.  Try 100 or more.
 	 * @return RefineEpipolar
 	 */
-	public static RefineEpipolar refineFundamental( double tol , int maxIterations , EpipolarError type )
+	public static RefineEpipolar fundamentalRefine(double tol , int maxIterations , EpipolarError type )
 	{
 		switch( type ) {
 			case SAMPSON:
@@ -272,7 +272,7 @@ public class FactoryMultiView {
 	 * @param iterations If the algorithm is iterative, then this is the number of iterations.  Try 200
 	 * @return Trifocal tensor estimator
 	 */
-	public static Estimate1ofTrifocalTensor estimateTrifocal_1(EnumTrifocal type, int iterations) {
+	public static Estimate1ofTrifocalTensor trifocal_1(EnumTrifocal type, int iterations) {
 		switch( type ) {
 			case LINEAR_7:
 				return new WrapTrifocalLinearPoint7();
@@ -298,7 +298,7 @@ public class FactoryMultiView {
 	 *                      significantly by algorithm.
 	 * @return An estimator which can return multiple estimates.
 	 */
-	public static EstimateNofPnP computePnP_N(EnumPNP which , int numIterations ) {
+	public static EstimateNofPnP pnp_N(EnumPNP which , int numIterations ) {
 
 		MotionTransformPoint<Se3_F64, Point3D_F64> motionFit = FitSpecialEuclideanOps_F64.fitPoints3D();
 
@@ -312,11 +312,11 @@ public class FactoryMultiView {
 				return new WrapP3PLineDistance(finster,motionFit);
 
 			case EPNP:
-				Estimate1ofPnP epnp = computePnP_1(which,numIterations,0);
+				Estimate1ofPnP epnp = pnp_1(which,numIterations,0);
 				return new Estimate1toNofPnP(epnp);
 
 			case IPPE:
-				Estimate1ofEpipolar H = FactoryMultiView.computeHomographyTLS();
+				Estimate1ofEpipolar H = FactoryMultiView.homographyTLS();
 				return new Estimate1toNofPnP(new IPPE_to_EstimatePnP(H));
 		}
 
@@ -341,20 +341,20 @@ public class FactoryMultiView {
 	 *                if only a single solution is found.
 	 * @return An estimator which returns a single estimate.
 	 */
-	public static Estimate1ofPnP computePnP_1(EnumPNP which, int numIterations , int numTest) {
+	public static Estimate1ofPnP pnp_1(EnumPNP which, int numIterations , int numTest) {
 
 		if( which == EnumPNP.EPNP ) {
 			PnPLepetitEPnP alg = new PnPLepetitEPnP(0.1);
 			alg.setNumIterations(numIterations);
 			return new WrapPnPLepetitEPnP(alg);
 		} else if( which == EnumPNP.IPPE ) {
-			Estimate1ofEpipolar H = FactoryMultiView.computeHomographyTLS();
+			Estimate1ofEpipolar H = FactoryMultiView.homographyTLS();
 			return new IPPE_to_EstimatePnP(H);
 		}
 
 		FastQueue<Se3_F64> solutions = new FastQueue<>(4, Se3_F64.class, true);
 
-		return new EstimateNto1ofPnP(computePnP_N(which,-1),solutions,numTest);
+		return new EstimateNto1ofPnP(pnp_N(which,-1),solutions,numTest);
 	}
 
 	/**
@@ -381,7 +381,7 @@ public class FactoryMultiView {
 	 * @param tol Convergence tolerance. Try 1e-8
 	 * @param maxIterations Maximum number of iterations.  Try 200
 	 */
-	public static RefinePnP refinePnP( double tol , int maxIterations ) {
+	public static RefinePnP pnpRefine(double tol , int maxIterations ) {
 		return new PnPRefineRodrigues(tol,maxIterations);
 	}
 

@@ -43,7 +43,7 @@ import java.util.List;
  */
 public class Zhang99ComputeTargetHomography {
 
-	private Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomographyDLT(true);
+	private Estimate1ofEpipolar computeHomography = FactoryMultiView.homographyDLT(true);
 	private DMatrixRMaj found = new DMatrixRMaj(3,3);
 
 	// location of calibration points in the target frame's in world units.

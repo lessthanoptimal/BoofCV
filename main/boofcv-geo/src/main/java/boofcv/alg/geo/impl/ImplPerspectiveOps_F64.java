@@ -206,19 +206,15 @@ public class ImplPerspectiveOps_F64 {
 		return GeometryMath_F64.mult(K, norm, norm);
 	}
 
-	public static Point2D_F64 renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X ) {
+	public static void renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X , Point2D_F64 pixel ) {
 		DMatrixRMaj P = worldToCamera;
 
 		double x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3];
 		double y = P.data[4]*X.x + P.data[5]*X.y + P.data[6]*X.z + P.data[7];
 		double z = P.data[8]*X.x + P.data[9]*X.y + P.data[10]*X.z + P.data[11];
 
-		Point2D_F64 pixel = new Point2D_F64();
-
 		pixel.x = x/z;
 		pixel.y = y/z;
-
-		return pixel;
 	}
 
 	public static void renderPixel(DMatrixRMaj cameraMatrix , Point4D_F64 X , @Nullable Point3D_F64 pixelH) {

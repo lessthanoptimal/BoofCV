@@ -71,7 +71,7 @@ public class ExampleCalibrationSelfVsRegular {
 	public static CameraPinholeRadial performSelfCalibration(List<CalibrationObservation> observations ) {
 		List<DMatrixRMaj> projectives = new ArrayList<>();
 
-		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(EnumFundamental.LINEAR_8,0);
+		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(EnumFundamental.LINEAR_8,0);
 		DMatrixRMaj F = new DMatrixRMaj(3,3);
 
 		List<AssociatedPair> associated = new ArrayList<>();

@@ -29,7 +29,7 @@ import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ejml.data.DMatrixRMaj;
 
-import static boofcv.factory.geo.FactoryMultiView.refineHomography;
+import static boofcv.factory.geo.FactoryMultiView.homographyRefine;
 
 /**
  * @author Peter Abeles
@@ -82,15 +82,15 @@ public class BenchmarkRuntimeRefineHomography extends ArtificialStereoScene{
 
 		init(NUM_POINTS, PIXELS, true);
 
-		Estimate1ofEpipolar computeAlg = FactoryMultiView.computeHomographyDLT(true);
+		Estimate1ofEpipolar computeAlg = FactoryMultiView.homographyDLT(true);
 		computeAlg.process(pairs, H);
 		H.data[0] += 0.1;
 		H.data[4] -= 0.15;
 		H.data[7] -= 0.2;
 
 
-		ProfileOperation.printOpsPerSec(new Refine("Simple",refineHomography(tol, MAX_ITER, EpipolarError.SIMPLE)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Refine("Sampson",refineHomography(tol, MAX_ITER, EpipolarError.SAMPSON)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Refine("Simple", homographyRefine(tol, MAX_ITER, EpipolarError.SIMPLE)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Refine("Sampson", homographyRefine(tol, MAX_ITER, EpipolarError.SAMPSON)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Linear4(), TEST_TIME);
 
 		

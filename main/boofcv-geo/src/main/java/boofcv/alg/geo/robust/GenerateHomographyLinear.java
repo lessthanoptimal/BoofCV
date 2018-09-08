@@ -44,7 +44,7 @@ public class GenerateHomographyLinear implements
 	DMatrixRMaj H = new DMatrixRMaj(3,3);
 
 	public GenerateHomographyLinear( boolean normalizeInput ) {
-		alg = FactoryMultiView.computeHomographyDLT(normalizeInput);
+		alg = FactoryMultiView.homographyDLT(normalizeInput);
 //		alg = FactoryMultiView.computeHomographyTLS();
 	}
 

@@ -101,7 +101,7 @@ public class PnPInfinitesimalPlanePoseEstimation {
 	}
 
 	public PnPInfinitesimalPlanePoseEstimation() {
-		this(FactoryMultiView.computeHomographyTLS());
+		this(FactoryMultiView.homographyTLS());
 	}
 
 	/**

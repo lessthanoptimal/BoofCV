@@ -74,13 +74,13 @@ public class BenchmarkRuntimeHomography extends ArtificialStereoScene {
 		}
 
 		System.out.println("4 pairs");
-		ProfileOperation.printOpsPerSec(new Estimate("DLT Norm", FactoryMultiView.computeHomographyDLT(true), pairs4), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Estimate("DLT Unorm", FactoryMultiView.computeHomographyDLT(false),pairs4), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Estimate("TLS", FactoryMultiView.computeHomographyTLS(),pairs4), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("DLT Norm", FactoryMultiView.homographyDLT(true), pairs4), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("DLT Unorm", FactoryMultiView.homographyDLT(false),pairs4), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("TLS", FactoryMultiView.homographyTLS(),pairs4), TEST_TIME);
 
 		System.out.println(pairs.size()+" pairs");
-		ProfileOperation.printOpsPerSec(new Estimate("DLT Norm", FactoryMultiView.computeHomographyDLT(true),pairs), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Estimate("TLS", FactoryMultiView.computeHomographyTLS(),pairs), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("DLT Norm", FactoryMultiView.homographyDLT(true),pairs), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("TLS", FactoryMultiView.homographyTLS(),pairs), TEST_TIME);
 
 	}
 	
