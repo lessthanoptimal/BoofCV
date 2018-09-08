@@ -19,6 +19,7 @@
 package boofcv.alg.geo;
 
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DMatrixRMaj;
 
 /**
@@ -39,8 +40,9 @@ import org.ejml.data.DMatrixRMaj;
  * @author Peter Abeles
  */
 public class NormalizationPoint2D {
-	public double meanX,stdX;
-	public double meanY,stdY;
+	// default value is do nothing
+	public double meanX=0,stdX=1;
+	public double meanY=0,stdY=1;
 
 	public NormalizationPoint2D() {
 	}
@@ -52,9 +54,52 @@ public class NormalizationPoint2D {
 		this.stdY = stdY;
 	}
 
+	/**
+	 * Applies normalization to a H=3xN matrix
+	 *
+	 * out = Norm*H
+	 * @param H 3xN matrix. Can be same as input matrix
+	 */
+	public void apply( DMatrixRMaj H , DMatrixRMaj output ) {
+		output.reshape(3,H.numCols);
+		int stride = H.numCols;
+		for (int col = 0; col < H.numCols; col++) {
+			// This column in H
+			double h1 = H.data[col], h2 = H.data[col+stride], h3 = H.data[col+2*stride];
+
+			output.data[col] = h1/stdX - meanX*h3/stdX;
+			output.data[col+stride] = h2/stdY - meanY*h3/stdY;
+			output.data[col+2*stride] = h3;
+		}
+	}
+
+	/**
+	 * Applies normalization to a H=3xN matrix
+	 *
+	 * out = Norm*H
+	 * @param H 3xN matrix. Can be same as input matrix
+	 */
+	public void remove( DMatrixRMaj H , DMatrixRMaj output ) {
+		output.reshape(3,H.numCols);
+		int stride = H.numCols;
+		for (int col = 0; col < H.numCols; col++) {
+			// This column in H
+			double h1 = H.data[col], h2 = H.data[col+stride], h3 = H.data[col+2*stride];
+
+			output.data[col] = h1*stdX + h3*meanX;
+			output.data[col+stride] = h2*stdY + h3*meanY;
+			output.data[col+2*stride] = h3;
+		}
+	}
+
 	public void apply(Point2D_F64 p) {
 		p.x = (p.x - meanX)/ stdX;
 		p.y = (p.y - meanY)/ stdY;
+	}
+
+	public void apply(Point3D_F64 p) {
+		p.x = (p.x - p.z*meanX)/ stdX;
+		p.y = (p.y - p.z*meanY)/ stdY;
 	}
 
 	public void apply(Point2D_F64 input, Point2D_F64 output) {
@@ -70,6 +115,12 @@ public class NormalizationPoint2D {
 	public void remove(Point2D_F64 input, Point2D_F64 output ) {
 		output.x = input.x*stdX + meanX;
 		output.y = input.y*stdY + meanY;
+	}
+
+	public void remove(Point3D_F64 p) {
+		p.x = p.x*stdX + p.z*meanX;
+		p.y = p.y*stdY + p.z*meanY;
+//		p.z = p.z;
 	}
 
 	public DMatrixRMaj matrix() {

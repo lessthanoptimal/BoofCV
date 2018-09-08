@@ -21,6 +21,7 @@ package boofcv.alg.geo;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.UtilEjml;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -86,7 +87,31 @@ public class TestLowLevelMultiViewOps {
 
 		assertEquals(1,sigmaX0,1e-8);
 		assertEquals(1,sigmaY0,1e-8);
+	}
 
+	@Test
+	public void computeNormalizationLL() {
+		List<List<Point2D_F64>> LL = new ArrayList<>();
+		List<Point2D_F64> list = new ArrayList<>();
+
+		for (int i = 0; i < 5; i++) {
+			List<Point2D_F64> l = new ArrayList<>();
+			for (int j = 0; j < 6; j++) {
+				Point2D_F64 p = new Point2D_F64();
+
+				p.set(rand.nextDouble()*5,rand.nextDouble()*5);
+				l.add(p);
+				list.add(p);
+			}
+			LL.add(l);
+		}
+		NormalizationPoint2D Na = new NormalizationPoint2D();
+		NormalizationPoint2D Nb = new NormalizationPoint2D();
+
+		LowLevelMultiViewOps.computeNormalization(list, Na);
+		LowLevelMultiViewOps.computeNormalizationLL(LL, Nb);
+
+		assertTrue(Na.isEquals(Nb, UtilEjml.TEST_F64));
 	}
 
 	/**

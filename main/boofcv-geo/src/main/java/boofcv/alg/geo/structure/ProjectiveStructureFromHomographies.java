@@ -18,8 +18,11 @@
 
 package boofcv.alg.geo.structure;
 
+import boofcv.alg.geo.LowLevelMultiViewOps;
+import boofcv.alg.geo.NormalizationPoint2D;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.geometry.GeometryMath_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
@@ -52,6 +55,11 @@ import java.util.List;
  * observation x = P*X generates 2 equations. See [1] for derivation. Vector product of both sides is involved.
  *
  * <p>
+ *     Normalization is automatically applied to inputs and undo for output. Normalization matrix is computed using
+ *     {@link LowLevelMultiViewOps#computeNormalizationLL(List, NormalizationPoint2D)}
+ * </p>
+ *
+ * <p>
  * [1] 18.5.1 Page 448 in R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
  * </p>
  *
@@ -59,20 +67,24 @@ import java.util.List;
  */
 public class ProjectiveStructureFromHomographies {
 
-	// TODO normalize pixels? Create a matrix N
-	// N*x = N*[H,t]*X = N*H*X + N*t*X
-	// Apply N to x and H. When solved apply inv(N) to found t
-
-
+	// used for null space computation
 	SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(false,true,true);
+
+	// list of points after points that are on plane at infinity have been removed
 	List<List<PointIndex2D_F64>> filtered = new ArrayList<>();
 
-	List<DMatrixRMaj> homographies = new ArrayList<>();
+	// reference to input homographies
+	List<DMatrixRMaj> homographies;
 
+	// storage for linear system being solved
 	DMatrixRMaj A = new DMatrixRMaj(1,1);
 	DMatrixRMaj B = new DMatrixRMaj(1,1);
 
+	// work space
 	Point3D_F64 tmp = new Point3D_F64();
+
+	// normalize pixel coordinates
+	NormalizationPoint2D N = new NormalizationPoint2D();
 
 	// Threshold used to see if a point lines on the plane at infinity
 	double infinityThreshold = UtilEjml.EPS;
@@ -101,15 +113,18 @@ public class ProjectiveStructureFromHomographies {
 			throw new IllegalArgumentException("Number of homographies and observations do not match");
 		}
 
+		LowLevelMultiViewOps.computeNormalizationLL((List)observations,N);
+
+		// Apply normalization to homographies
 		this.homographies = homographies_view0_to_viewI;
-		filterPointsOnPlaneAtInfinity(homographies_view0_to_viewI, observations,totalFeatures);
+		filterPointsOnPlaneAtInfinity(homographies, observations,totalFeatures);
 
 		// compute some internal working variables and determine if there are enough observations to compute a
 		// solution
 		computeConstants(homographies_view0_to_viewI, filtered, totalFeatures);
 
 		// Solve the problem
-		constructLinearSystem(homographies_view0_to_viewI, filtered);
+		constructLinearSystem(homographies, filtered);
 
 		if( !svd.decompose(A))
 			return false;
@@ -145,21 +160,23 @@ public class ProjectiveStructureFromHomographies {
 
 		A.reshape(numEquations,numUnknown);
 
+		DMatrixRMaj H = new DMatrixRMaj(3,3);
+		Point2D_F64 p = new Point2D_F64();
+
 		int row = 0;
 		for (int viewIdx = 0; viewIdx < homographies.size(); viewIdx++) {
-			DMatrixRMaj H = homographies.get(viewIdx);
+			N.apply(homographies.get(viewIdx),H);
 
 			int colView = startView + viewIdx*3;
 
 			List<PointIndex2D_F64> obs = observations.get(viewIdx);
 			for (int i = 0; i < obs.size(); i++) {
-				PointIndex2D_F64 p = obs.get(i);
+				PointIndex2D_F64 p_pixel = obs.get(i);
+
+				N.apply(p_pixel,p);
 
 				// column this feature is at
-				int col = p.index*3;
-
-				if( !A.isInBounds(row,col))
-					throw new RuntimeException("Egads");
+				int col = p_pixel.index*3;
 
 				// x component of pixel
 				// A(row,colView) =  ...
@@ -226,10 +243,17 @@ public class ProjectiveStructureFromHomographies {
 
 		int row = totalFeatures*3 + viewIdx*3;
 
+		tmp.x = B.unsafe_get(row,0);
+		tmp.y = B.unsafe_get(row+1,0);
+		tmp.z = B.unsafe_get(row+2,0);
+
+		N.remove(tmp);
+
 		CommonOps_DDRM.insert(H,P,0,0);
-		P.set(0,3, B.unsafe_get(row,0));
-		P.set(1,3, B.unsafe_get(row+1,0));
-		P.set(2,3, B.unsafe_get(row+2,0));
+		P.set(0,3, tmp.x);
+		P.set(1,3, tmp.y);
+		P.set(2,3, tmp.z);
+
 	}
 
 	public void getFeature3D(int featureIdx, Point3D_F64 X) {

@@ -75,6 +75,52 @@ public class LowLevelMultiViewOps {
 	}
 
 	/**
+	 * Computes normalization when points are contained in a list of lists
+	 * @param points Input: List of observed points. Not modified.
+	 * @param normalize Output: 3x3 normalization matrix for first set of points. Modified.
+	 */
+	public static void computeNormalizationLL(List<List<Point2D_F64>> points, NormalizationPoint2D normalize )
+	{
+		double meanX = 0;
+		double meanY = 0;
+
+		int count = 0;
+
+		for (int i = 0; i < points.size(); i++) {
+			List<Point2D_F64> l = points.get(i);
+			for (int j = 0; j < l.size(); j++) {
+				Point2D_F64 p = l.get(j);
+				meanX += p.x;
+				meanY += p.y;
+			}
+			count += l.size();
+		}
+
+		meanX /= count;
+		meanY /= count;
+
+		double stdX = 0;
+		double stdY = 0;
+
+		for (int i = 0; i < points.size(); i++) {
+			List<Point2D_F64> l = points.get(i);
+			for (int j = 0; j < l.size(); j++) {
+				Point2D_F64 p = l.get(j);
+				double dx = p.x - meanX;
+				double dy = p.y - meanY;
+				stdX += dx*dx;
+				stdY += dy*dy;
+			}
+		}
+
+		normalize.meanX = meanX;
+		normalize.meanY = meanY;
+
+		normalize.stdX = Math.sqrt(stdX/count);
+		normalize.stdY = Math.sqrt(stdY/count);
+	}
+
+	/**
 	 * <p>
 	 * Computes two normalization matrices for each set of point correspondences in the list of
 	 * {@link boofcv.struct.geo.AssociatedPair}.  Same as {@link #computeNormalization(java.util.List, NormalizationPoint2D)},

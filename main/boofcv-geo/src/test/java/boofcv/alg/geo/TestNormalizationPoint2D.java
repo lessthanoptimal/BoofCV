@@ -20,6 +20,8 @@ package boofcv.alg.geo;
 
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
@@ -42,6 +44,40 @@ public class TestNormalizationPoint2D {
 
 		assertEquals(1,a.x, GrlConstants.TEST_F64);
 		assertEquals(2,a.y, GrlConstants.TEST_F64);
+	}
+
+	@Test
+	public void apply_one_3D() {
+		NormalizationPoint2D n = new NormalizationPoint2D(1,2,3,4);
+
+		Point3D_F64 a = new Point3D_F64(1,2,3.5);
+
+		n.apply(a);
+		n.remove(a);
+
+		assertEquals(1,a.x, GrlConstants.TEST_F64);
+		assertEquals(2,a.y, GrlConstants.TEST_F64);
+		assertEquals(3.5,a.z, GrlConstants.TEST_F64);
+	}
+
+	@Test
+	public void apply_matrix() {
+		NormalizationPoint2D n = new NormalizationPoint2D(1,2,3,4);
+
+		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1,2,3,9},{3,4,5,8},{5,6,7,7}});
+		DMatrixRMaj H_orig = H.copy();
+		DMatrixRMaj N = n.matrix();
+
+		DMatrixRMaj expected = new DMatrixRMaj(3,4);
+		CommonOps_DDRM.mult(N,H,expected);
+
+		n.apply(H,H);
+
+		assertTrue(MatrixFeatures_DDRM.isIdentical(expected,H, UtilEjml.TEST_F64));
+
+		// see if remove works
+		n.remove(H,H);
+		assertTrue(MatrixFeatures_DDRM.isIdentical(H_orig,H, UtilEjml.TEST_F64));
 	}
 
 	@Test
