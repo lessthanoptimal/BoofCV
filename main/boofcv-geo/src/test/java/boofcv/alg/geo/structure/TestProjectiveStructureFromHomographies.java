@@ -36,7 +36,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -73,11 +74,37 @@ public class TestProjectiveStructureFromHomographies extends CommonStructure {
 	}
 
 	/**
-	 * See if it correctly detects points on plane at infinity
+	 * See if it correctly detects points on plane at infinity.
 	 */
 	@Test
 	public void filterPointsOnPlaneAtInfinity() {
-		fail("Implement");
+		// hand construct a 3x3 matrix to make the z for a specific point zero
+
+		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1,2,3},{4,5,6},{2,-1,-1}});
+
+		List<DMatrixRMaj> homographies = new ArrayList<>();
+		homographies.add(H);
+		homographies.add(H);
+		homographies.add(H);
+
+		List<List<PointIndex2D_F64>> points = new ArrayList<>();
+		for (int i = 0; i < 3; i++) {
+			points.add(new ArrayList<>());
+		}
+
+		points.get(0).add( new PointIndex2D_F64(1,1.5,0));
+		points.get(0).add( new PointIndex2D_F64(2,1.5,0));
+		points.get(0).add( new PointIndex2D_F64(8,1.5,0));
+		points.get(1).add( new PointIndex2D_F64(1,1,0));
+		points.get(2).add( new PointIndex2D_F64(4,1.5,0));
+
+		ProjectiveStructureFromHomographies alg = new ProjectiveStructureFromHomographies();
+
+		alg.filterPointsOnPlaneAtInfinity(homographies,points,3);
+
+		assertEquals(3,alg.filtered.get(0).size());
+		assertEquals(0,alg.filtered.get(1).size());
+		assertEquals(1,alg.filtered.get(2).size());
 	}
 
 	/**

@@ -263,4 +263,12 @@ public class ProjectiveStructureFromHomographies {
 		X.y = B.unsafe_get(row+1,0);
 		X.z = B.unsafe_get(row+2,0);
 	}
+
+	public double getInfinityThreshold() {
+		return infinityThreshold;
+	}
+
+	public void setInfinityThreshold(double infinityThreshold) {
+		this.infinityThreshold = infinityThreshold;
+	}
 }
