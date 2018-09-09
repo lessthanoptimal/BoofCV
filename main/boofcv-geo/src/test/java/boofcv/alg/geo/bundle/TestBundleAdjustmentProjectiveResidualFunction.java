@@ -26,6 +26,7 @@ import org.junit.Test;
 import java.util.Random;
 
 import static boofcv.alg.geo.bundle.TestCodecSceneStructureProjective.createScene3D;
+import static boofcv.alg.geo.bundle.TestCodecSceneStructureProjective.createSceneH;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -40,7 +41,12 @@ public class TestBundleAdjustmentProjectiveResidualFunction {
 	 */
 	@Test
 	public void multipleCalls() {
-		SceneStructureProjective structure = createScene3D(rand);
+		multipleCalls(false);
+		multipleCalls(true);
+	}
+
+	public void multipleCalls( boolean homogenous ) {
+		SceneStructureProjective structure = homogenous?createSceneH(rand) : createScene3D(rand);
 		BundleAdjustmentObservations obs = createObservations(rand,structure);
 
 		double param[] = new double[structure.getParameterCount()];
@@ -64,7 +70,12 @@ public class TestBundleAdjustmentProjectiveResidualFunction {
 	 */
 	@Test
 	public void changeInParamChangesOutput() {
-		SceneStructureProjective structure = createScene3D(rand);
+		changeInParamChangesOutput(false);
+		changeInParamChangesOutput(true);
+	}
+
+	public void changeInParamChangesOutput( boolean homogenous ) {
+		SceneStructureProjective structure = homogenous?createSceneH(rand) : createScene3D(rand);
 		double param[] = new double[structure.getParameterCount()];
 
 		new CodecSceneStructureProjective().encode(structure,param);
@@ -92,8 +103,6 @@ public class TestBundleAdjustmentProjectiveResidualFunction {
 				}
 			}
 
-			if( identical )
-				System.out.println("Foo");
 			assertFalse(identical);
 			param[paramIndex] = v;
 		}
