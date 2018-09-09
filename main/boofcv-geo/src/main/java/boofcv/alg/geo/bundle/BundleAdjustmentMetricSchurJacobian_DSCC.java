@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentMetricSchur_DSCC;
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
+import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.RodriguesRotationJacobian;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -27,19 +27,19 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.optimization.functions.SchurJacobian;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.data.DMatrixSparseTriplet;
 import org.ejml.ops.ConvertDMatrixStruct;
 
 /**
- * Computes the Jacobian for {@link BundleAdjustmentMetricSchur_DSCC} using sparse matrices
+ * Computes the Jacobian for {@link BundleAdjustmentSchur_DSCC} using sparse matrices
  * in EJML. Parameterization is done using the format in {@link CodecSceneStructureMetric}.
  *
  * @author Peter Abeles
  */
-public class BundleAdjustmentMetricSchurJacobian_DSCC implements SchurJacobian<DMatrixSparseCSC>
+public class BundleAdjustmentMetricSchurJacobian_DSCC
+		implements BundleAdjustmentSchur_DSCC.Jacobian<SceneStructureMetric>
 {
 	private SceneStructureMetric structure;
 	private BundleAdjustmentObservations observations;
@@ -82,6 +82,7 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC implements SchurJacobian<D
 	private double calibGradX[] = null;
 	private double calibGradY[] = null;
 
+	@Override
 	public void configure(SceneStructureMetric structure , BundleAdjustmentObservations observations ) {
 		this.structure = structure;
 		this.observations = observations;

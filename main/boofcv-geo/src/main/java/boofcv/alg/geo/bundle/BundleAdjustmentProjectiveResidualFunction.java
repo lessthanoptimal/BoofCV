@@ -21,66 +21,63 @@ package boofcv.alg.geo.bundle;
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
 import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.abst.geo.bundle.SceneStructureProjective;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import georegression.transform.se.SePointOps_F64;
+import georegression.struct.point.Point4D_F64;
 
 /**
  * <p>
- * Computes observations errors/residuals for metric bundle adjustment as implemented using
+ * Computes observations errors/residuals for projective bundle adjustment as implemented using
  * {@link org.ddogleg.optimization.UnconstrainedLeastSquares}. Parameterization is done using
- * the format in {@link CodecSceneStructureMetric}.
+ * the format in {@link CodecSceneStructureProjective}.
  * </p>
  *
  * <p>
- * cost(P) = (1/(m*n))*&sum;<sub>i</sub> &sum;<sub>j</sub> ||x<sub>j</sub> - (1/z)*[R<sub>i</sub>|T<sub>i</sub>]*X<sub>j</sub>||<sup>2</sup>
+ * cost(P) = (1/(m*n))*&sum;<sub>i</sub> &sum;<sub>j</sub> ||x<sub>j</sub> - (1/z)*P<sub>i</sub>*X<sub>j</sub>||<sup>2</sup>
  * </p>
  *
- * @see SceneStructureMetric
+ * @see SceneStructureProjective
  * @see BundleAdjustmentObservations
  *
  * @author Peter Abeles
  */
-public class BundleAdjustmentMetricResidualFunction
-		implements BundleAdjustmentSchur_DSCC.FunctionResiduals<SceneStructureMetric>
-
+public class BundleAdjustmentProjectiveResidualFunction
+	implements BundleAdjustmentSchur_DSCC.FunctionResiduals<SceneStructureProjective>
 {
-	private SceneStructureMetric structure;
+	private SceneStructureProjective structure;
 	private BundleAdjustmentObservations observations;
 
-	// feature location in world coordinates
-	private Point3D_F64 worldPt = new Point3D_F64();
 
 	// number of parameters being optimised
 	private int numParameters;
 	// number of observations.  2 for each point in each view
 	private int numObservations;
 
-	// local variable which stores the predicted location of the feature in the camera frame
-	private Point3D_F64 cameraPt = new Point3D_F64();
 
 	// Storage for rendered output
 	private Point2D_F64 predictedPixel = new Point2D_F64();
 	private PointIndex2D_F64 observedPixel = new PointIndex2D_F64();
 
 	// Used to write the "unknown" paramters into the scene
-	CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
+	CodecSceneStructureProjective codec = new CodecSceneStructureProjective();
 
 	Point3D_F64 p3 = new Point3D_F64();
+	Point4D_F64 p4 = new Point4D_F64();
 
 	/**
 	 * Specifies the scenes structure and observed feature locations
 	 */
 	@Override
-	public void configure(SceneStructureMetric structure ,
+	public void configure(SceneStructureProjective structure ,
 						  BundleAdjustmentObservations observations )
 	{
 		this.structure = structure;
 		this.observations = observations;
 
 		numObservations = observations.getObservationCount();
-
 		numParameters = structure.getParameterCount();
 	}
 
@@ -101,19 +98,19 @@ public class BundleAdjustmentMetricResidualFunction
 		codec.decode(input,structure);
 		int observationIndex = 0;
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			SceneStructureMetric.View view = structure.views[viewIndex];
-			SceneStructureMetric.Camera camera = structure.cameras[view.camera];
+			SceneStructureProjective.View view = structure.views[viewIndex];
 			BundleAdjustmentObservations.View obsView = observations.views[viewIndex];
 
 			for (int i = 0; i < obsView.size(); i++) {
 				obsView.get(i,observedPixel);
 				SceneStructureMetric.Point worldPt = structure.points[observedPixel.index];
-				worldPt.get(p3);
-
-				SePointOps_F64.transform(view.worldToView,p3,cameraPt);
-
-				camera.model.project(cameraPt.x,cameraPt.y,cameraPt.z, predictedPixel);
-
+				if( structure.homogenous ) {
+					worldPt.get(p4);
+					PerspectiveOps.renderPixel(view.worldToView, p4, predictedPixel);
+				} else {
+					worldPt.get(p3);
+					PerspectiveOps.renderPixel(view.worldToView, p3, predictedPixel);
+				}
 				int outputIndex = observationIndex*2;
 				output[outputIndex  ] = predictedPixel.x - observedPixel.x;
 				output[outputIndex+1] = predictedPixel.y - observedPixel.y;

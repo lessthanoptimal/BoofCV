@@ -87,7 +87,7 @@ public class SceneStructureProjective extends SceneStructureCommon
 	 */
 	@Override
 	public int getParameterCount() {
-		return getUnknownViewCount()*12 + points.length*3;
+		return getUnknownViewCount()*12 + points.length*pointSize;
 	}
 
 	public View[] getViews() {

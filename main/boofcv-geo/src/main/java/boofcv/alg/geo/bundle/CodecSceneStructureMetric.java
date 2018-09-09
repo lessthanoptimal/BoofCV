@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.bundle;
 
+import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.so.Rodrigues_F64;
@@ -31,11 +32,12 @@ import georegression.struct.so.Rodrigues_F64;
  * </pre>
  * @author Peter Abeles
  */
-public class CodecSceneStructureMetric {
-
+public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Codec<SceneStructureMetric>
+{
 	// local variable which stores the predicted location of the feature in the camera frame
 	private Rodrigues_F64 rodrigues = new Rodrigues_F64();
 
+	@Override
 	public void decode(double[] input , SceneStructureMetric structure ) {
 		int index = 0;
 
@@ -44,6 +46,8 @@ public class CodecSceneStructureMetric {
 			p.coordinate[0] = input[index++];
 			p.coordinate[1] = input[index++];
 			p.coordinate[2] = input[index++];
+			if( structure.isHomogenous() )
+				p.coordinate[3] = input[index++];
 		}
 
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
@@ -73,6 +77,7 @@ public class CodecSceneStructureMetric {
 		}
 	}
 
+	@Override
 	public void encode(SceneStructureMetric structure , double[] output ) {
 		int index = 0;
 
@@ -81,6 +86,8 @@ public class CodecSceneStructureMetric {
 			output[index++] = p.coordinate[0];
 			output[index++] = p.coordinate[1];
 			output[index++] = p.coordinate[2];
+			if( structure.isHomogenous() )
+				output[index++] = p.coordinate[3];
 		}
 
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {

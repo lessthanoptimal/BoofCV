@@ -19,6 +19,10 @@
 package boofcv.factory.geo;
 
 import boofcv.abst.geo.*;
+import boofcv.abst.geo.bundle.BundleAdjustment;
+import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.abst.geo.f.*;
 import boofcv.abst.geo.h.HomographyDLT_to_Epipolar;
 import boofcv.abst.geo.h.HomographyTLS_to_Epipolar;
@@ -28,6 +32,7 @@ import boofcv.abst.geo.triangulate.*;
 import boofcv.abst.geo.trifocal.WrapTrifocalAlgebraicPoint7;
 import boofcv.abst.geo.trifocal.WrapTrifocalLinearPoint7;
 import boofcv.alg.geo.ModelObservationResidualN;
+import boofcv.alg.geo.bundle.*;
 import boofcv.alg.geo.f.DistanceEpipolarConstraint;
 import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.alg.geo.h.HomographyResidualSampson;
@@ -46,10 +51,17 @@ import georegression.fitting.se.FitSpecialEuclideanOps_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.optimization.FactoryOptimization;
+import org.ddogleg.optimization.FactoryOptimizationSparse;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
+import org.ddogleg.optimization.UnconstrainedLeastSquaresSchur;
+import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import org.ddogleg.optimization.trustregion.ConfigTrustRegion;
 import org.ddogleg.solver.PolynomialOps;
 import org.ddogleg.solver.RootFinderType;
 import org.ddogleg.struct.FastQueue;
+import org.ejml.data.DMatrixSparseCSC;
+
+import javax.annotation.Nullable;
 
 /**
  * Factory for creating abstracted algorithms related to multi-view geometry
@@ -57,6 +69,42 @@ import org.ddogleg.struct.FastQueue;
  * @author Peter Abeles
  */
 public class FactoryMultiView {
+
+	public static BundleAdjustment<SceneStructureMetric> bundleAdjustmentMetric( @Nullable ConfigTrustRegion config ) {
+		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer = FactoryOptimizationSparse.doglegSchur(config);
+
+		return new BundleAdjustmentSchur_DSCC<>(minimizer,
+				new BundleAdjustmentMetricResidualFunction(),
+				new BundleAdjustmentMetricSchurJacobian_DSCC(),
+				new CodecSceneStructureMetric());
+	}
+
+	public static BundleAdjustment<SceneStructureMetric> bundleAdjustmentMetric( @Nullable ConfigLevenbergMarquardt config ) {
+		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur(config);
+
+		return new BundleAdjustmentSchur_DSCC<>(minimizer,
+				new BundleAdjustmentMetricResidualFunction(),
+				new BundleAdjustmentMetricSchurJacobian_DSCC(),
+				new CodecSceneStructureMetric());
+	}
+
+	public static BundleAdjustment<SceneStructureProjective> bundleAdjustmentProjective(@Nullable ConfigTrustRegion config ) {
+		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer = FactoryOptimizationSparse.doglegSchur(config);
+
+		return new BundleAdjustmentSchur_DSCC<>(minimizer,
+				new BundleAdjustmentProjectiveResidualFunction(),
+				new BundleAdjustmentProjectiveSchurJacobian_DSCC(),
+				new CodecSceneStructureProjective());
+	}
+
+	public static BundleAdjustment<SceneStructureProjective> bundleAdjustmentProjective( @Nullable ConfigLevenbergMarquardt config ) {
+		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur(config);
+
+		return new BundleAdjustmentSchur_DSCC<>(minimizer,
+				new BundleAdjustmentProjectiveResidualFunction(),
+				new BundleAdjustmentProjectiveSchurJacobian_DSCC(),
+				new CodecSceneStructureProjective());
+	}
 
 	/**
 	 * Returns an algorithm for estimating a homography matrix given a set of {@link AssociatedPair}.

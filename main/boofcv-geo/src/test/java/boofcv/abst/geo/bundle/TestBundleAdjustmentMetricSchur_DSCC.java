@@ -28,7 +28,7 @@ public class TestBundleAdjustmentMetricSchur_DSCC extends GenericBundleAdjustmen
 	@Override
 	public BundleAdjustment<SceneStructureMetric> createAlg() {
 		ConfigLevenbergMarquardt config = new ConfigLevenbergMarquardt();
-		BundleAdjustmentMetricSchur_DSCC ret = new BundleAdjustmentMetricSchur_DSCC(config);
+		BundleAdjustmentSchur_DSCC ret = new BundleAdjustmentSchur_DSCC(config);
 		ret.configure(1e-5,1e-5,20);
 		return ret;
 	}

@@ -54,6 +54,18 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	}
 
 	/**
+	 * Specifies the location of a point as a 3D homogenous coordinate
+	 * @param which Which point is being specified
+	 * @param x coordinate along x-axis
+	 * @param y coordinate along y-axis
+	 * @param z coordinate along z-axis
+	 * @param w w-coordinate
+	 */
+	public void setPoint( int which , double x , double y , double z , double w) {
+		points[which].set(x,y,z,w);
+	}
+
+	/**
 	 * Specifies that the point was observed in this view.
 	 * @param pointIndex index of point
 	 * @param viewIndex index of view

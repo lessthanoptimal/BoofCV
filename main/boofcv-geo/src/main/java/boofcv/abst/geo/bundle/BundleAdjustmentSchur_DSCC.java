@@ -18,11 +18,10 @@
 
 package boofcv.abst.geo.bundle;
 
-import boofcv.alg.geo.bundle.BundleAdjustmentMetricResidualFunction;
-import boofcv.alg.geo.bundle.BundleAdjustmentMetricSchurJacobian_DSCC;
-import boofcv.alg.geo.bundle.CodecSceneStructureMetric;
 import org.ddogleg.optimization.FactoryOptimizationSparse;
 import org.ddogleg.optimization.UnconstrainedLeastSquaresSchur;
+import org.ddogleg.optimization.functions.FunctionNtoM;
+import org.ddogleg.optimization.functions.SchurJacobian;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ddogleg.optimization.trustregion.ConfigTrustRegion;
 import org.ejml.data.DMatrixSparseCSC;
@@ -35,14 +34,14 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
-public class BundleAdjustmentMetricSchur_DSCC
-		implements BundleAdjustment<SceneStructureMetric>
+public class BundleAdjustmentSchur_DSCC<Structure extends SceneStructure>
+		implements BundleAdjustment<Structure>
 {
 	// minimization algorithm
 	private UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer;
 
-	private BundleAdjustmentMetricResidualFunction function = new BundleAdjustmentMetricResidualFunction();
-	private BundleAdjustmentMetricSchurJacobian_DSCC jacobian = new BundleAdjustmentMetricSchurJacobian_DSCC();
+	private FunctionResiduals<Structure> function;
+	private Jacobian<Structure> jacobian;
 
 	private int maxIterations;
 	private double parameters[]=new double[0];
@@ -53,13 +52,23 @@ public class BundleAdjustmentMetricSchur_DSCC
 
 	private PrintStream verbose;
 
-	private CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
+	private Codec<Structure> codec;
 
-	public BundleAdjustmentMetricSchur_DSCC(@Nullable ConfigTrustRegion config) {
+	public BundleAdjustmentSchur_DSCC(UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer,
+									  FunctionResiduals<Structure> function,
+									  Jacobian<Structure> jacobian,
+									  Codec<Structure> codec) {
+		this.minimizer = minimizer;
+		this.function = function;
+		this.jacobian = jacobian;
+		this.codec = codec;
+	}
+
+	public BundleAdjustmentSchur_DSCC(@Nullable ConfigTrustRegion config) {
 		this.minimizer = FactoryOptimizationSparse.doglegSchur(config);
 	}
 
-	public BundleAdjustmentMetricSchur_DSCC(@Nullable ConfigLevenbergMarquardt config) {
+	public BundleAdjustmentSchur_DSCC(@Nullable ConfigLevenbergMarquardt config) {
 		this.minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur(config);
 	}
 
@@ -71,7 +80,7 @@ public class BundleAdjustmentMetricSchur_DSCC
 	}
 
 	@Override
-	public void setParameters(SceneStructureMetric structure, BundleAdjustmentObservations observations) {
+	public void setParameters(Structure structure, BundleAdjustmentObservations observations) {
 		this.function.configure(structure, observations);
 		this.jacobian.configure(structure, observations);
 		this.minimizer.setFunction(function,jacobian);
@@ -86,7 +95,7 @@ public class BundleAdjustmentMetricSchur_DSCC
 	}
 
 	@Override
-	public boolean optimize( SceneStructureMetric output) {
+	public boolean optimize( Structure output) {
 		stopRequested = false;
 
 		double before = minimizer.getFunctionValue();
@@ -118,5 +127,22 @@ public class BundleAdjustmentMetricSchur_DSCC
 	@Override
 	public boolean isStopRequested() {
 		return stopRequested;
+	}
+
+	public interface Codec<Structure extends SceneStructure>
+	{
+		void decode(double[] input , Structure structure );
+
+		void encode(Structure structure , double[] output );
+	}
+
+	public interface FunctionResiduals<Structure extends SceneStructure> extends FunctionNtoM {
+		void configure(Structure structure ,
+					   BundleAdjustmentObservations observations );
+	}
+
+	public interface Jacobian<Structure extends SceneStructure> extends SchurJacobian<DMatrixSparseCSC>  {
+		void configure(Structure structure ,
+					   BundleAdjustmentObservations observations );
 	}
 }

@@ -206,6 +206,14 @@ public class ImplPerspectiveOps_F64 {
 		return GeometryMath_F64.mult(K, norm, norm);
 	}
 
+	public static void renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X , Point3D_F64 pixelH ) {
+		DMatrixRMaj P = worldToCamera;
+
+		pixelH.x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3];
+		pixelH.y = P.data[4]*X.x + P.data[5]*X.y + P.data[6]*X.z + P.data[7];
+		pixelH.z = P.data[8]*X.x + P.data[9]*X.y + P.data[10]*X.z + P.data[11];
+	}
+
 	public static void renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X , Point2D_F64 pixel ) {
 		DMatrixRMaj P = worldToCamera;
 
@@ -224,6 +232,18 @@ public class ImplPerspectiveOps_F64 {
 		pixelH.y = P.data[4]*X.x + P.data[5]*X.y + P.data[6]*X.z + P.data[7]*X.w;
 		pixelH.z = P.data[8]*X.x + P.data[9]*X.y + P.data[10]*X.z + P.data[11]*X.w;
 	}
+
+	public static void renderPixel(DMatrixRMaj cameraMatrix , Point4D_F64 X , @Nullable Point2D_F64 pixel) {
+		DMatrixRMaj P = cameraMatrix;
+
+		double x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3]*X.w;
+		double y = P.data[4]*X.x + P.data[5]*X.y + P.data[6]*X.z + P.data[7]*X.w;
+		double z = P.data[8]*X.x + P.data[9]*X.y + P.data[10]*X.z + P.data[11]*X.w;
+
+		pixel.x = x/z;
+		pixel.y = y/z;
+	}
+
 
 	public static DMatrixRMaj createCameraMatrix( DMatrixRMaj R , Vector3D_F64 T ,
 												  @Nullable DMatrixRMaj K ,

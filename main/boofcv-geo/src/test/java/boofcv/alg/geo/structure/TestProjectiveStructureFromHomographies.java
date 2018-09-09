@@ -61,7 +61,7 @@ public class TestProjectiveStructureFromHomographies extends CommonStructure {
 				alg.getFeature3D(featureIdx,X);
 
 				Point2D_F64 expected = observations.get(viewIdx).get(featureIdx);
-				Point2D_F64 x = PerspectiveOps.renderPixel(P,X,null);
+				Point2D_F64 x = PerspectiveOps.renderPixel(P,X,(Point2D_F64)null);
 
 				assertTrue( expected.distance(x) < UtilEjml.TEST_F64_SQ );
 			}

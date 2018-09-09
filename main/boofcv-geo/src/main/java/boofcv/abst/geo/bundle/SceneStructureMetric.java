@@ -159,7 +159,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 */
 	@Override
 	public int getParameterCount() {
-		return getUnknownViewCount()*6 + points.length*3 + getUnknownCameraParameterCount();
+		return getUnknownViewCount()*6 + points.length*pointSize + getUnknownCameraParameterCount();
 	}
 
 	public Camera[] getCameras() {

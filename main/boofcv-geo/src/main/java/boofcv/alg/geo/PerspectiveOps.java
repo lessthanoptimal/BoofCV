@@ -464,12 +464,19 @@ public class PerspectiveOps {
 	 * @return 2D Render point on image plane.
 	 */
 	public static Point2D_F64 renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X ) {
-		return renderPixel(worldToCamera,X,null);
+		return renderPixel(worldToCamera,X,(Point2D_F64)null);
 	}
 
 	public static Point2D_F64 renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X , @Nullable Point2D_F64 pixel ) {
 		if( pixel == null )
 			pixel = new Point2D_F64();
+		ImplPerspectiveOps_F64.renderPixel(worldToCamera, X, pixel);
+		return pixel;
+	}
+
+	public static Point3D_F64 renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X , @Nullable Point3D_F64 pixel ) {
+		if( pixel == null )
+			pixel = new Point3D_F64();
 		ImplPerspectiveOps_F64.renderPixel(worldToCamera, X, pixel);
 		return pixel;
 	}
@@ -484,6 +491,20 @@ public class PerspectiveOps {
 	public static Point3D_F64 renderPixel( DMatrixRMaj cameraMatrix , Point4D_F64 X , @Nullable Point3D_F64 x) {
 		if( x == null )
 			x = new Point3D_F64();
+		ImplPerspectiveOps_F64.renderPixel(cameraMatrix, X, x);
+		return x;
+	}
+
+	/**
+	 * Render a pixel in homogeneous coordinates from a 3x4 camera matrix and a 2D point.
+	 * @param cameraMatrix (Input) 3x4 camera matrix
+	 * @param X (Input) 3D point in homogeneous coordinates
+	 * @param x (Output) Rendered 2D point coordinates
+	 * @return Rendered 2D point coordinates
+	 */
+	public static Point2D_F64 renderPixel( DMatrixRMaj cameraMatrix , Point4D_F64 X , @Nullable Point2D_F64 x) {
+		if( x == null )
+			x = new Point2D_F64();
 		ImplPerspectiveOps_F64.renderPixel(cameraMatrix, X, x);
 		return x;
 	}

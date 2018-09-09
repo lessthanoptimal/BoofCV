@@ -64,7 +64,7 @@ public class TestProjectiveReconstructionByFactorization extends CommonStructure
 				alg.getFeature3D(featureIdx,X);
 
 				Point2D_F64 expected = observations.get(viewIdx).get(featureIdx);
-				Point3D_F64 xh = PerspectiveOps.renderPixel(P,X,null);
+				Point3D_F64 xh = PerspectiveOps.renderPixel(P,X,(Point3D_F64)null);
 
 				Point2D_F64 found = new Point2D_F64(xh.x/xh.z, xh.y/xh.z);
 
@@ -104,7 +104,7 @@ public class TestProjectiveReconstructionByFactorization extends CommonStructure
 				alg.getFeature3D(featureIdx,X);
 
 				Point2D_F64 expected = observations.get(viewIdx).get(featureIdx);
-				Point3D_F64 xh = PerspectiveOps.renderPixel(P,X,null);
+				Point3D_F64 xh = PerspectiveOps.renderPixel(P,X,(Point3D_F64)null);
 
 				Point2D_F64 found = new Point2D_F64(xh.x/xh.z, xh.y/xh.z);
 

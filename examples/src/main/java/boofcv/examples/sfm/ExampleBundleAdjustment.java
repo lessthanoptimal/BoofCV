@@ -18,9 +18,10 @@
 
 package boofcv.examples.sfm;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentMetricSchur_DSCC;
+import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.ScaleMetricScene;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.geo.CodecBundleAdjustmentInTheLarge;
@@ -83,7 +84,7 @@ public class ExampleBundleAdjustment {
 		configLM.hessianScaling = true;
 
 		// Create and configure the bundle adjustment solver
-		BundleAdjustmentMetricSchur_DSCC bundleAdjustment = new BundleAdjustmentMetricSchur_DSCC(configLM);
+		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleAdjustmentMetric(configLM);
 		// prints out useful debugging information that lets you know how well it's converging
 		bundleAdjustment.setVerbose(System.out,0);
 		// Specifies convergence criteria
