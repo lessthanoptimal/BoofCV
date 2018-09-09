@@ -16,20 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.bundle;
+package boofcv.alg.geo.selfcalib;
 
-import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentSchur_DSCC extends GenericBundleAdjustmentChecks {
-
-	@Override
-	public BundleAdjustment createAlg() {
-		ConfigLevenbergMarquardt config = new ConfigLevenbergMarquardt();
-		BundleAdjustment ret = new BundleAdjustmentSchur_DSCC(config);
-		ret.configure(1e-5,1e-5,20);
-		return ret;
+public class TestSelfCalibrationLinearRotationMulti {
+	@Test
+	public void foo() {
+		fail("Implement");
 	}
 }

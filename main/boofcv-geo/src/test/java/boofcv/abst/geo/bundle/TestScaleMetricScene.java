@@ -36,14 +36,14 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentScaleScene {
+public class TestScaleMetricScene {
 
 	@Test
 	public void computePointStatistics() {
-		BundleAdjustmentSceneStructure scene = new BundleAdjustmentSceneStructure(false);
+		SceneStructureMetric scene = new SceneStructureMetric(false);
 		BundleAdjustmentObservations obs = createScene(scene,0xBEEF);
 
-		BundleAdjustmentScaleScene alg = new BundleAdjustmentScaleScene();
+		ScaleMetricScene alg = new ScaleMetricScene();
 		alg.computeScale(scene);
 
 		// See if it's near the center of the distribution, crudely
@@ -53,19 +53,19 @@ public class TestBundleAdjustmentScaleScene {
 
 	@Test
 	public void apply_undo() {
-		BundleAdjustmentScaleScene alg = new BundleAdjustmentScaleScene();
+		ScaleMetricScene alg = new ScaleMetricScene();
 
 		alg.medianPoint.set(0.5,0.9,1.3);
 		alg.medianDistancePoint = 1.2;
 
-		BundleAdjustmentSceneStructure expected = new BundleAdjustmentSceneStructure(false);
-		BundleAdjustmentSceneStructure found = new BundleAdjustmentSceneStructure(false);
+		SceneStructureMetric expected = new SceneStructureMetric(false);
+		SceneStructureMetric found = new SceneStructureMetric(false);
 
 		BundleAdjustmentObservations obs = createScene(found,0xBEEF);
 		createScene(expected,0xBEEF);
 
 		// Should have perfect observations
-		GenericBundleAdjustmentChecks.checkReprojectionError(found,obs,1e-4);
+		GenericBundleAdjustmentMetricChecks.checkReprojectionError(found,obs,1e-4);
 
 		alg.applyScale(found,obs);
 
@@ -75,16 +75,16 @@ public class TestBundleAdjustmentScaleScene {
 		}
 
 		// Must still have perfect observations if scaling was correctly applied. Otherwise solution will be changed when optimizing
-		GenericBundleAdjustmentChecks.checkReprojectionError(found,obs,1e-4);
+		GenericBundleAdjustmentMetricChecks.checkReprojectionError(found,obs,1e-4);
 
 		// Undo scaling and see if it got the original parameters back
 		alg.undoScale(found,obs);
 
-		GenericBundleAdjustmentChecks.assertEquals(expected,found,1e-4,1e-8,1e-8);
-		GenericBundleAdjustmentChecks.checkReprojectionError(found,obs,1e-4);
+		GenericBundleAdjustmentMetricChecks.assertEquals(expected,found,1e-4,1e-8,1e-8);
+		GenericBundleAdjustmentMetricChecks.checkReprojectionError(found,obs,1e-4);
 	}
 
-	public static BundleAdjustmentObservations createScene( BundleAdjustmentSceneStructure scene ,
+	public static BundleAdjustmentObservations createScene( SceneStructureMetric scene ,
 															long seed ) {
 		Random rand = new Random(seed);
 

@@ -29,7 +29,7 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
-public interface BundleAdjustment extends Stoppable {
+public interface BundleAdjustment<Structure extends SceneStructure> extends Stoppable {
 
 	/**
 	 * Configures optimization parameters. meaning of all of these parameters is implementation dependent. They
@@ -49,7 +49,7 @@ public interface BundleAdjustment extends Stoppable {
 	 * @param structure Input: Initial parameters. Output: Optimized parameters
 	 * @param observations Observation of features in each image.
 	 */
-	void setParameters(BundleAdjustmentSceneStructure structure, BundleAdjustmentObservations observations);
+	void setParameters( Structure structure, BundleAdjustmentObservations observations);
 
 		/**
 		 * Optimises the parameters contained in 'structure' to minimize the error in the 'observations'. This function
@@ -59,7 +59,7 @@ public interface BundleAdjustment extends Stoppable {
 		 * @return true If the cost function has been improved. If the data is perfect to start with this
 		 * will return false since it has not improved
 		 */
-	boolean optimize( BundleAdjustmentSceneStructure output );
+	boolean optimize( Structure output );
 
 	/**
 	 * Returns the fit score. Meaning is implementation specific.

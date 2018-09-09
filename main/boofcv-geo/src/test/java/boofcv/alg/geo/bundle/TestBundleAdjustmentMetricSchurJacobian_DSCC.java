@@ -19,7 +19,7 @@
 package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ddogleg.optimization.wrap.SchurJacobian_to_NtoMxN;
@@ -28,28 +28,28 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static boofcv.alg.geo.bundle.TestBundleAdjustmentResidualFunction.createObservations;
-import static boofcv.alg.geo.bundle.TestCodecBundleAdjustmentSceneStructure.createScene;
+import static boofcv.alg.geo.bundle.TestBundleAdjustmentMetricResidualFunction.createObservations;
+import static boofcv.alg.geo.bundle.TestCodecSceneStructureMetric.createScene;
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentSchurJacobian_DSCC {
+public class TestBundleAdjustmentMetricSchurJacobian_DSCC {
 	Random rand = new Random(48854);
 
 	@Test
 	public void compareToNumerical() {
-		BundleAdjustmentSceneStructure structure = createScene(rand);
+		SceneStructureMetric structure = createScene(rand);
 		BundleAdjustmentObservations observations = createObservations(rand,structure);
 
 		double param[] = new double[structure.getParameterCount()];
-		new CodecBundleAdjustmentSceneStructure().encode(structure,param);
+		new CodecSceneStructureMetric().encode(structure,param);
 
-		BundleAdjustmentSchurJacobian_DSCC alg = new BundleAdjustmentSchurJacobian_DSCC();
+		BundleAdjustmentMetricSchurJacobian_DSCC alg = new BundleAdjustmentMetricSchurJacobian_DSCC();
 
 		FunctionNtoMxN<DMatrixSparseCSC> jac = new SchurJacobian_to_NtoMxN.DSCC(alg);
-		BundleAdjustmentResidualFunction func = new BundleAdjustmentResidualFunction();
+		BundleAdjustmentMetricResidualFunction func = new BundleAdjustmentMetricResidualFunction();
 
 		alg.configure(structure,observations);
 		func.configure(structure,observations);

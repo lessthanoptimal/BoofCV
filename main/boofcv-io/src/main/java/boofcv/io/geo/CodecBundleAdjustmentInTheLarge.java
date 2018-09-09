@@ -20,7 +20,7 @@ package boofcv.io.geo;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations.View;
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSnavely;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -36,7 +36,7 @@ import java.io.*;
  * @author Peter Abeles
  */
 public class CodecBundleAdjustmentInTheLarge {
-    public BundleAdjustmentSceneStructure scene;
+    public SceneStructureMetric scene;
     public BundleAdjustmentObservations observations;
 
     public void parse( File file ) throws IOException {
@@ -51,7 +51,7 @@ public class CodecBundleAdjustmentInTheLarge {
         int numPoints = Integer.parseInt(words[1]);
         int numObservations = Integer.parseInt(words[2]);
 
-        scene = new BundleAdjustmentSceneStructure(false);
+        scene = new SceneStructureMetric(false);
         scene.initialize(numCameras,numCameras,numPoints);
 
         observations = new BundleAdjustmentObservations(numCameras);
@@ -143,7 +143,7 @@ public class CodecBundleAdjustmentInTheLarge {
 
         Rodrigues_F64 axisAngle = new Rodrigues_F64();
         for (int viewIdx = 0; viewIdx < scene.views.length; viewIdx++) {
-            BundleAdjustmentSceneStructure.View view = scene.views[viewIdx];
+            SceneStructureMetric.View view = scene.views[viewIdx];
             BundlePinholeSnavely camera = scene.cameras[view.camera].getModel();
 
             ConvertRotation3D_F64.matrixToRodrigues(view.worldToView.R,axisAngle);
@@ -158,7 +158,7 @@ public class CodecBundleAdjustmentInTheLarge {
         }
 
         for (int pointId = 0; pointId < scene.points.length; pointId++) {
-            BundleAdjustmentSceneStructure.Point p = scene.points[pointId];
+            SceneStructureMetric.Point p = scene.points[pointId];
             writer.printf("%.10f\n%.10f\n%.10f\n",p.coordinate[0],p.coordinate[1],p.coordinate[2]);
         }
         writer.close();

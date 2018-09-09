@@ -18,9 +18,9 @@
 
 package boofcv.examples.sfm;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentScaleScene;
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
-import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
+import boofcv.abst.geo.bundle.BundleAdjustmentMetricSchur_DSCC;
+import boofcv.abst.geo.bundle.ScaleMetricScene;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.geo.CodecBundleAdjustmentInTheLarge;
@@ -61,9 +61,9 @@ public class ExampleBundleAdjustment {
 
 		// Because the Bundle Adjustment in the Large data set is popular, a file reader and writer is included
 		// with BoofCV.  BoofCV uses two data types to describe the parameters in a bundle adjustment problem
-		// BundleAdjustmentSceneStructure is used for camera pameters, camera locations, and 3D points
+		// BundleAdjustmentSceneStructure is used for camera parameters, camera locations, and 3D points
 		// BundleAdjustmentObservations for image observations of 3D points
-		// ExampleMultiviewSceneReconstruction gives a better feel for these data structures or you can look
+		// ExampleMultiViewSceneReconstruction gives a better feel for these data structures or you can look
 		// at the source code of CodecBundleAdjustmentInTheLarge
 		CodecBundleAdjustmentInTheLarge parser = new CodecBundleAdjustmentInTheLarge();
 
@@ -83,7 +83,7 @@ public class ExampleBundleAdjustment {
 		configLM.hessianScaling = true;
 
 		// Create and configure the bundle adjustment solver
-		BundleAdjustmentSchur_DSCC bundleAdjustment = new BundleAdjustmentSchur_DSCC(configLM);
+		BundleAdjustmentMetricSchur_DSCC bundleAdjustment = new BundleAdjustmentMetricSchur_DSCC(configLM);
 		// prints out useful debugging information that lets you know how well it's converging
 		bundleAdjustment.setVerbose(System.out,0);
 		// Specifies convergence criteria
@@ -91,7 +91,7 @@ public class ExampleBundleAdjustment {
 
 		// Scaling each variable type so that it takes on a similar numerical value. This aids in optimization
 		// Not important for this problem but is for others
-		BundleAdjustmentScaleScene bundleScale = new BundleAdjustmentScaleScene();
+		ScaleMetricScene bundleScale = new ScaleMetricScene();
 		bundleScale.computeScale(parser.scene);
 		bundleScale.applyScale(parser.scene, parser.observations);
 		bundleAdjustment.setParameters(parser.scene, parser.observations);
@@ -115,7 +115,7 @@ public class ExampleBundleAdjustment {
 		visualizeInPointCloud(parser.scene);
 	}
 
-	private static void visualizeInPointCloud(BundleAdjustmentSceneStructure structure ) {
+	private static void visualizeInPointCloud(SceneStructureMetric structure ) {
 
 		List<Point3D_F64> cloudXyz = new ArrayList<>();
 		Point3D_F64 world = new Point3D_F64();
@@ -123,7 +123,7 @@ public class ExampleBundleAdjustment {
 
 		for( int i = 0; i < structure.points.length; i++ ) {
 			// Get 3D location
-			BundleAdjustmentSceneStructure.Point p = structure.points[i];
+			SceneStructureMetric.Point p = structure.points[i];
 			p.get(world);
 
 			// Project point into an arbitrary view

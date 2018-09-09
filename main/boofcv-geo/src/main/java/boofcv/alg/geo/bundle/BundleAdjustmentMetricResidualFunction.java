@@ -19,7 +19,7 @@
 package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -30,22 +30,22 @@ import org.ddogleg.optimization.functions.FunctionNtoM;
  * <p>
  * Computes observations errors/residuals for bundle adjustment as implemented using
  * {@link org.ddogleg.optimization.UnconstrainedLeastSquares}. Parameterization is done using
- * the format in {@link CodecBundleAdjustmentSceneStructure}.
+ * the format in {@link CodecSceneStructureMetric}.
  * </p>
  *
  * <p>
  * cost(P) = (1/(m*n))*&sum;<sub>i</sub> &sum;<sub>j</sub> ||x<sub>j</sub> - (1/z)*[R<sub>i</sub>|T<sub>i</sub>]*X<sub>j</sub>||<sup>2</sup>
  * </p>
  *
- * @see BundleAdjustmentSceneStructure
+ * @see SceneStructureMetric
  * @see BundleAdjustmentObservations
  *
  * @author Peter Abeles
  */
-public class BundleAdjustmentResidualFunction
+public class BundleAdjustmentMetricResidualFunction
 	implements FunctionNtoM
 {
-	private BundleAdjustmentSceneStructure structure;
+	private SceneStructureMetric structure;
 	private BundleAdjustmentObservations observations;
 
 	// feature location in world coordinates
@@ -64,13 +64,13 @@ public class BundleAdjustmentResidualFunction
 	private PointIndex2D_F64 observedPixel = new PointIndex2D_F64();
 
 	// Used to write the "unknown" paramters into the scene
-	CodecBundleAdjustmentSceneStructure codec = new CodecBundleAdjustmentSceneStructure();
+	CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
 
 	Point3D_F64 p3 = new Point3D_F64();
 	/**
 	 * Specifies the scenes structure and observed feature locations
 	 */
-	public void configure(BundleAdjustmentSceneStructure structure ,
+	public void configure(SceneStructureMetric structure ,
 						  BundleAdjustmentObservations observations )
 	{
 		this.structure = structure;
@@ -100,13 +100,13 @@ public class BundleAdjustmentResidualFunction
 		codec.decode(input,structure);
 		int observationIndex = 0;
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			BundleAdjustmentSceneStructure.View view = structure.views[viewIndex];
-			BundleAdjustmentSceneStructure.Camera camera = structure.cameras[view.camera];
+			SceneStructureMetric.View view = structure.views[viewIndex];
+			SceneStructureMetric.Camera camera = structure.cameras[view.camera];
 			BundleAdjustmentObservations.View obsView = observations.views[viewIndex];
 
 			for (int i = 0; i < obsView.size(); i++) {
 				obsView.get(i,observedPixel);
-				BundleAdjustmentSceneStructure.Point worldPt = structure.points[observedPixel.index];
+				SceneStructureMetric.Point worldPt = structure.points[observedPixel.index];
 				worldPt.get(p3);
 
 				SePointOps_F64.transform(view.worldToView,p3,cameraPt);

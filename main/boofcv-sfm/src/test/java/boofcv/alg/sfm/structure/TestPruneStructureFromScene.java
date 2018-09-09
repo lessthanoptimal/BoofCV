@@ -20,8 +20,8 @@ package boofcv.alg.sfm.structure;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure.Point;
+import boofcv.abst.geo.bundle.SceneStructureCommon.Point;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
  * @author Peter Abeles
  */
 public class TestPruneStructureFromScene {
-	BundleAdjustmentSceneStructure structure;
+	SceneStructureMetric structure;
 	BundleAdjustmentObservations observations;
 
 	Random rand = new Random(234);
@@ -266,7 +266,7 @@ public class TestPruneStructureFromScene {
 
 		// remove all references to the first camera
 		for (int i = 0; i < structure.views.length; i++) {
-			BundleAdjustmentSceneStructure.View v = structure.views[i];
+			SceneStructureMetric.View v = structure.views[i];
 			v.camera = 1;
 		}
 
@@ -275,7 +275,7 @@ public class TestPruneStructureFromScene {
 		assertEquals(1,structure.cameras.length);
 		// make sure references are updated
 		for (int i = 0; i < structure.views.length; i++) {
-			BundleAdjustmentSceneStructure.View v = structure.views[i];
+			SceneStructureMetric.View v = structure.views[i];
 			assertEquals(0,v.camera);
 		}
 	}
@@ -286,7 +286,7 @@ public class TestPruneStructureFromScene {
 	 * @param space Spacing between the points
 	 */
 	private void createPerfectScene( int grid , double space ) {
-		structure = new BundleAdjustmentSceneStructure(false);
+		structure = new SceneStructureMetric(false);
 		structure.initialize(1,1,grid*grid);
 
 		structure.setCamera(0,true,intrinsic);
@@ -307,7 +307,7 @@ public class TestPruneStructureFromScene {
 	}
 
 	private void createPerfectScene() {
-		structure = new BundleAdjustmentSceneStructure(false);
+		structure = new SceneStructureMetric(false);
 		structure.initialize(2,10,500);
 
 		structure.setCamera(0,true,intrinsic);
@@ -411,7 +411,7 @@ public class TestPruneStructureFromScene {
 		for (int viewId = 0; viewId < structure.views.length; viewId++) {
 			BundleAdjustmentObservations.View v = observations.views[viewId];
 			for(int pointIdx = v.point.size-1; pointIdx >= 0; pointIdx-- ) {
-				BundleAdjustmentSceneStructure.Point structP = structure.points[ v.getPointId(pointIdx) ];
+				SceneStructureMetric.Point structP = structure.points[ v.getPointId(pointIdx) ];
 				if( !structP.views.contains(viewId))
 					throw new RuntimeException("Miss match");
 			}

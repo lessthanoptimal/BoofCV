@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure.Point;
+import boofcv.abst.geo.bundle.SceneStructureCommon.Point;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
@@ -28,11 +28,11 @@ import static org.junit.Assert.assertSame;
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentSceneStructure {
+public class TestSceneStructureCommon {
 	@Test
 	public void removePoints() {
 
-		BundleAdjustmentSceneStructure structure = new BundleAdjustmentSceneStructure(false);
+		MockSceneStructureCommon structure = new MockSceneStructureCommon(false);
 
 		Point original[] = structure.points = new Point[20];
 		for (int i = 0; i < structure.points.length; i++) {
@@ -72,5 +72,17 @@ public class TestBundleAdjustmentSceneStructure {
 		assertEquals(3,p.views.get(2));
 		assertEquals(4,p.views.get(3));
 
+	}
+
+	private static class MockSceneStructureCommon extends SceneStructureCommon {
+
+		public MockSceneStructureCommon(boolean homogenous) {
+			super(homogenous);
+		}
+
+		@Override
+		public int getParameterCount() {
+			return 0;
+		}
 	}
 }

@@ -37,7 +37,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestSelfCalibrationLinearPureRotation extends CommonAutoCalibrationChecks
+public class TestSelfCalibrationLinearRotationSingle extends CommonAutoCalibrationChecks
 {
 	@Test
 	public void perfect() {

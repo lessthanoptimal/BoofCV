@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.struct.calib.CameraPinhole;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
@@ -34,20 +34,20 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestCodecBundleAdjustmentSceneStructure {
+public class TestCodecSceneStructureMetric {
 	Random rand = new Random(234);
 
 	@Test
 	public void encode_decode() {
-		BundleAdjustmentSceneStructure original = createScene(rand);
+		SceneStructureMetric original = createScene(rand);
 
-		CodecBundleAdjustmentSceneStructure codec = new CodecBundleAdjustmentSceneStructure();
+		CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
 
 		int N = original.getUnknownViewCount()*6 + original.points.length*3 + original.getUnknownCameraParameterCount();
 		double param[] = new double[N];
 		codec.encode(original,param);
 
-		BundleAdjustmentSceneStructure found = createScene(rand);
+		SceneStructureMetric found = createScene(rand);
 		codec.decode(param,found);
 
 		for (int i = 0; i < original.points.length; i++) {
@@ -55,8 +55,8 @@ public class TestCodecBundleAdjustmentSceneStructure {
 		}
 
 		for (int i = 0; i < original.cameras.length; i++) {
-			BundleAdjustmentSceneStructure.Camera o = original.cameras[i];
-			BundleAdjustmentSceneStructure.Camera f = found.cameras[i];
+			SceneStructureMetric.Camera o = original.cameras[i];
+			SceneStructureMetric.Camera f = found.cameras[i];
 
 			double po[] = new double[o.model.getIntrinsicCount()];
 			double pf[] = new double[f.model.getIntrinsicCount()];
@@ -68,8 +68,8 @@ public class TestCodecBundleAdjustmentSceneStructure {
 		}
 
 		for (int i = 0; i < original.views.length; i++) {
-			BundleAdjustmentSceneStructure.View o = original.views[i];
-			BundleAdjustmentSceneStructure.View f = found.views[i];
+			SceneStructureMetric.View o = original.views[i];
+			SceneStructureMetric.View f = found.views[i];
 
 			assertTrue(MatrixFeatures_DDRM.isIdentical(o.worldToView.R,
 					f.worldToView.R, UtilEjml.TEST_F64));
@@ -79,8 +79,8 @@ public class TestCodecBundleAdjustmentSceneStructure {
 		}
 	}
 
-	public static BundleAdjustmentSceneStructure createScene( Random rand ) {
-		BundleAdjustmentSceneStructure out = new BundleAdjustmentSceneStructure(false);
+	public static SceneStructureMetric createScene(Random rand ) {
+		SceneStructureMetric out = new SceneStructureMetric(false);
 
 		out.initialize(2,4,5);
 

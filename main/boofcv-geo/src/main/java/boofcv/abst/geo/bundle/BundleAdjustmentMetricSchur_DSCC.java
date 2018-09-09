@@ -18,9 +18,9 @@
 
 package boofcv.abst.geo.bundle;
 
-import boofcv.alg.geo.bundle.BundleAdjustmentResidualFunction;
-import boofcv.alg.geo.bundle.BundleAdjustmentSchurJacobian_DSCC;
-import boofcv.alg.geo.bundle.CodecBundleAdjustmentSceneStructure;
+import boofcv.alg.geo.bundle.BundleAdjustmentMetricResidualFunction;
+import boofcv.alg.geo.bundle.BundleAdjustmentMetricSchurJacobian_DSCC;
+import boofcv.alg.geo.bundle.CodecSceneStructureMetric;
 import org.ddogleg.optimization.FactoryOptimizationSparse;
 import org.ddogleg.optimization.UnconstrainedLeastSquaresSchur;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
@@ -35,14 +35,14 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
-public class BundleAdjustmentSchur_DSCC
-		implements BundleAdjustment
+public class BundleAdjustmentMetricSchur_DSCC
+		implements BundleAdjustment<SceneStructureMetric>
 {
 	// minimization algorithm
 	private UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer;
 
-	private BundleAdjustmentResidualFunction function = new BundleAdjustmentResidualFunction();
-	private BundleAdjustmentSchurJacobian_DSCC jacobian = new BundleAdjustmentSchurJacobian_DSCC();
+	private BundleAdjustmentMetricResidualFunction function = new BundleAdjustmentMetricResidualFunction();
+	private BundleAdjustmentMetricSchurJacobian_DSCC jacobian = new BundleAdjustmentMetricSchurJacobian_DSCC();
 
 	private int maxIterations;
 	private double parameters[]=new double[0];
@@ -53,13 +53,13 @@ public class BundleAdjustmentSchur_DSCC
 
 	private PrintStream verbose;
 
-	private CodecBundleAdjustmentSceneStructure codec = new CodecBundleAdjustmentSceneStructure();
+	private CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
 
-	public BundleAdjustmentSchur_DSCC(@Nullable ConfigTrustRegion config) {
+	public BundleAdjustmentMetricSchur_DSCC(@Nullable ConfigTrustRegion config) {
 		this.minimizer = FactoryOptimizationSparse.doglegSchur(config);
 	}
 
-	public BundleAdjustmentSchur_DSCC(@Nullable ConfigLevenbergMarquardt config) {
+	public BundleAdjustmentMetricSchur_DSCC(@Nullable ConfigLevenbergMarquardt config) {
 		this.minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur(config);
 	}
 
@@ -71,7 +71,7 @@ public class BundleAdjustmentSchur_DSCC
 	}
 
 	@Override
-	public void setParameters(BundleAdjustmentSceneStructure structure, BundleAdjustmentObservations observations) {
+	public void setParameters(SceneStructureMetric structure, BundleAdjustmentObservations observations) {
 		this.function.configure(structure, observations);
 		this.jacobian.configure(structure, observations);
 		this.minimizer.setFunction(function,jacobian);
@@ -86,7 +86,7 @@ public class BundleAdjustmentSchur_DSCC
 	}
 
 	@Override
-	public boolean optimize( BundleAdjustmentSceneStructure output) {
+	public boolean optimize( SceneStructureMetric output) {
 		stopRequested = false;
 
 		double before = minimizer.getFunctionValue();

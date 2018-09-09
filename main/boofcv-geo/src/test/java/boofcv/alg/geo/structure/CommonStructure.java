@@ -18,21 +18,30 @@
 
 package boofcv.alg.geo.structure;
 
+import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.geometry.ConvertRotation3D_F64;
+import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -94,5 +103,58 @@ public class CommonStructure {
 			}
 			observations.add(viewObs);
 		}
+	}
+
+	public List<List<PointIndex2D_F64>> convertToPointIndex() {
+		List<List<PointIndex2D_F64>> ret = new ArrayList<>();
+
+		for (int i = 0; i < observations.size(); i++) {
+			List<Point2D_F64> view = observations.get(i);
+
+			List<PointIndex2D_F64> indexes = new ArrayList<>();
+
+			for (int j = 0; j < view.size(); j++) {
+				Point2D_F64 p = view.get(j);
+				indexes.add( new PointIndex2D_F64(p.x,p.y,j));
+			}
+
+			// order shouldn't matter
+			Collections.shuffle(indexes,rand);
+
+			ret.add( indexes );
+		}
+
+		return ret;
+	}
+
+	public List<DMatrixRMaj> computeHomographies() {
+		List<DMatrixRMaj> ret = new ArrayList<>();
+
+		Estimate1ofEpipolar estimateH = FactoryMultiView.homographyDLT(true);
+
+		Point2D_F64 sanity = new Point2D_F64();
+
+		for (int i = 0; i < observations.size(); i++) {
+			List<Point2D_F64> view0 = observations.get(0);
+			List<Point2D_F64> viewI = observations.get(i);
+
+			List<AssociatedPair> matches = new ArrayList<>();
+
+			for (int j = 0; j < view0.size(); j++) {
+				matches.add( new AssociatedPair(view0.get(j),viewI.get(j)));
+			}
+
+			DMatrixRMaj H = new DMatrixRMaj(3,3);
+			if( !estimateH.process(matches,H) )
+				throw new RuntimeException("EGads");
+			ret.add(H);
+
+			// make sure the homography is from view 0 to view i
+			GeometryMath_F64.mult(H,view0.get(0),sanity);
+			double error = viewI.get(0).distance(sanity);
+			assertEquals(0,error, UtilEjml.TEST_F64);
+		}
+
+		return ret;
 	}
 }

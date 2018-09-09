@@ -19,7 +19,7 @@
 package boofcv.alg.sfm;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.struct.image.ImageBase;
 import org.ddogleg.struct.Stoppable;
@@ -57,7 +57,7 @@ public interface EstimateSceneStructure<T extends ImageBase<T>> extends Stoppabl
 	 *
 	 * @return scene
 	 */
-	BundleAdjustmentSceneStructure getSceneStructure();
+	SceneStructureMetric getSceneStructure();
 
 	/**
 	 * Observations from each view

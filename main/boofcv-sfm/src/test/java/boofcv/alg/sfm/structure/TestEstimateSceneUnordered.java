@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.structure;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.alg.sfm.structure.PairwiseImageGraph.CameraMotion;
@@ -61,7 +61,7 @@ public class TestEstimateSceneUnordered extends GenericSceneStructureChecks {
 
 		assertTrue(alg.estimate());
 
-		BundleAdjustmentSceneStructure found = alg.getSceneStructure();
+		SceneStructureMetric found = alg.getSceneStructure();
 
 		assertEquals(1,found.cameras.length);
 		assertEquals(3,found.views.length);

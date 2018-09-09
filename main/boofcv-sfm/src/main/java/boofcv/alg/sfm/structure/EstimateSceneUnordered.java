@@ -22,7 +22,7 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.RefineEpipolar;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.robust.RansacMultiView;
@@ -102,7 +102,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	private Vector3D_F64 arrowB = new Vector3D_F64();
 
 	// Output
-	BundleAdjustmentSceneStructure structure;
+	SceneStructureMetric structure;
 	BundleAdjustmentObservations observations;
 
 	// Verbose output to standard out
@@ -245,7 +245,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	 * @param origin The origin of the coordinate system
 	 */
 	private void convertToOutput( CameraView origin ) {
-		structure = new BundleAdjustmentSceneStructure(false);
+		structure = new SceneStructureMetric(false);
 		observations = new BundleAdjustmentObservations(viewsAdded.size());
 
 		structure.initialize(cameraToIndex.size(),viewsAdded.size(), graph.features3D.size());
@@ -792,7 +792,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	}
 
 	@Override
-	public BundleAdjustmentSceneStructure getSceneStructure() {
+	public SceneStructureMetric getSceneStructure() {
 		return structure;
 	}
 

@@ -19,10 +19,10 @@
 package boofcv.examples.sfm;
 
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.geo.bundle.BundleAdjustmentMetricSchur_DSCC;
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
-import boofcv.abst.geo.bundle.BundleAdjustmentScaleScene;
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
-import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
+import boofcv.abst.geo.bundle.ScaleMetricScene;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.structure.EstimateSceneUnordered;
 import boofcv.alg.sfm.structure.PruneStructureFromScene;
@@ -90,7 +90,7 @@ public class ExampleMultiviewSceneReconstruction {
 		}
 
 		// get the results
-		BundleAdjustmentSceneStructure structure = estimateScene.getSceneStructure();
+		SceneStructureMetric structure = estimateScene.getSceneStructure();
 		BundleAdjustmentObservations observations = estimateScene.getObservations();
 
 		// Configure bundle adjustment
@@ -98,13 +98,13 @@ public class ExampleMultiviewSceneReconstruction {
 		configLM.dampeningInitial = 1e-12;
 		configLM.hessianScaling = true;
 
-		BundleAdjustmentSchur_DSCC sba = new BundleAdjustmentSchur_DSCC(configLM);
+		BundleAdjustmentMetricSchur_DSCC sba = new BundleAdjustmentMetricSchur_DSCC(configLM);
 		sba.configure(1e-10,1e-10,100);
 		sba.setVerbose(System.out,0);
 		structure.setCamera(0,true,intrinsic);
 
 		// Scale to improve numerical accuracy
-		BundleAdjustmentScaleScene bundleScale = new BundleAdjustmentScaleScene();
+		ScaleMetricScene bundleScale = new ScaleMetricScene();
 
 		PruneStructureFromScene pruner = new PruneStructureFromScene(structure,observations);
 
@@ -143,7 +143,7 @@ public class ExampleMultiviewSceneReconstruction {
 	 * Opens a window showing the found point cloud. Points are colorized using the pixel value inside
 	 * one of the input images
 	 */
-	private void visualizeResults( BundleAdjustmentSceneStructure structure,
+	private void visualizeResults( SceneStructureMetric structure,
 								   List<BufferedImage> colorImages ) {
 
 		List<Point3D_F64> cloudXyz = new ArrayList<>();
@@ -153,7 +153,7 @@ public class ExampleMultiviewSceneReconstruction {
 		Point2D_F64 pixel = new Point2D_F64();
 		for( int i = 0; i < structure.points.length; i++ ) {
 			// Get 3D location
-			BundleAdjustmentSceneStructure.Point p = structure.points[i];
+			SceneStructureMetric.Point p = structure.points[i];
 			p.get(world);
 
 			// Project point into an arbitrary view

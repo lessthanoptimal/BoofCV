@@ -19,20 +19,20 @@
 package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import org.ejml.UtilEjml;
 import org.junit.Test;
 
 import java.util.Random;
 
-import static boofcv.alg.geo.bundle.TestCodecBundleAdjustmentSceneStructure.createScene;
+import static boofcv.alg.geo.bundle.TestCodecSceneStructureMetric.createScene;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentResidualFunction {
+public class TestBundleAdjustmentMetricResidualFunction {
 	Random rand = new Random(234);
 
 	/**
@@ -40,14 +40,14 @@ public class TestBundleAdjustmentResidualFunction {
 	 */
 	@Test
 	public void multipleCalls() {
-		BundleAdjustmentSceneStructure structure = createScene(rand);
+		SceneStructureMetric structure = createScene(rand);
 		BundleAdjustmentObservations obs = createObservations(rand,structure);
 
 		double param[] = new double[structure.getParameterCount()];
 
-		new CodecBundleAdjustmentSceneStructure().encode(structure,param);
+		new CodecSceneStructureMetric().encode(structure,param);
 
-		BundleAdjustmentResidualFunction alg = new BundleAdjustmentResidualFunction();
+		BundleAdjustmentMetricResidualFunction alg = new BundleAdjustmentMetricResidualFunction();
 		alg.configure(structure,obs);
 
 		double []expected = new double[alg.getNumOfOutputsM()];
@@ -64,15 +64,15 @@ public class TestBundleAdjustmentResidualFunction {
 	 */
 	@Test
 	public void changeInParamChangesOutput() {
-		BundleAdjustmentSceneStructure structure = createScene(rand);
+		SceneStructureMetric structure = createScene(rand);
 		double param[] = new double[structure.getParameterCount()];
 
-		new CodecBundleAdjustmentSceneStructure().encode(structure,param);
+		new CodecSceneStructureMetric().encode(structure,param);
 
 		// Create random observations
 		BundleAdjustmentObservations obs = createObservations(rand,structure);
 
-		BundleAdjustmentResidualFunction alg = new BundleAdjustmentResidualFunction();
+		BundleAdjustmentMetricResidualFunction alg = new BundleAdjustmentMetricResidualFunction();
 		alg.configure(structure,obs);
 
 		double []original = new double[alg.getNumOfOutputsM()];
@@ -96,11 +96,11 @@ public class TestBundleAdjustmentResidualFunction {
 		}
 	}
 
-	public static BundleAdjustmentObservations createObservations( Random rand , BundleAdjustmentSceneStructure structure) {
+	public static BundleAdjustmentObservations createObservations( Random rand , SceneStructureMetric structure) {
 		BundleAdjustmentObservations obs = new BundleAdjustmentObservations(structure.views.length);
 
 		for (int j = 0; j < structure.points.length; j++) {
-			BundleAdjustmentSceneStructure.Point p = structure.points[j];
+			SceneStructureMetric.Point p = structure.points[j];
 
 			for (int i = 0; i < p.views.size; i++) {
 				BundleAdjustmentObservations.View v = obs.getView(p.views.get(i));

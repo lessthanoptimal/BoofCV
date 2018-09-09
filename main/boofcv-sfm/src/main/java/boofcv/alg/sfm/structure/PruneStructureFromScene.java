@@ -19,7 +19,7 @@
 package boofcv.alg.sfm.structure;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.nn.KdTreePoint3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -42,10 +42,10 @@ import java.util.List;
  */
 public class PruneStructureFromScene {
 
-	BundleAdjustmentSceneStructure structure;
+	SceneStructureMetric structure;
 	BundleAdjustmentObservations observations;
 
-	public PruneStructureFromScene(BundleAdjustmentSceneStructure structure,
+	public PruneStructureFromScene(SceneStructureMetric structure,
 								   BundleAdjustmentObservations observations)
 	{
 		this.structure = structure;
@@ -69,11 +69,11 @@ public class PruneStructureFromScene {
 		List<Errors> errors = new ArrayList<>();
 		for (int viewIndex = 0; viewIndex < observations.views.length; viewIndex++) {
 			BundleAdjustmentObservations.View v = observations.views[viewIndex];
-			BundleAdjustmentSceneStructure.View view = structure.views[viewIndex];
+			SceneStructureMetric.View view = structure.views[viewIndex];
 
 			for (int pointIndex = 0; pointIndex < v.point.size; pointIndex++) {
 				int pointID = v.point.data[pointIndex];
-				BundleAdjustmentSceneStructure.Point f = structure.points[pointID];
+				SceneStructureMetric.Point f = structure.points[pointID];
 
 				// Get feature location in world
 				f.get(X);
@@ -84,7 +84,7 @@ public class PruneStructureFromScene {
 				view.worldToView.transform(X, X);
 
 				// predicted pixel
-				BundleAdjustmentSceneStructure.Camera camera = structure.cameras[view.camera];
+				SceneStructureMetric.Camera camera = structure.cameras[view.camera];
 				camera.model.project(X.x, X.y, X.z, predicted);
 
 				Errors e = new Errors();
@@ -120,7 +120,7 @@ public class PruneStructureFromScene {
 			BundleAdjustmentObservations.View v = observations.views[viewIndex];
 			for(int pointIndex = v.point.size-1; pointIndex >= 0; pointIndex-- ) {
 				int pointID = v.getPointId(pointIndex);
-				BundleAdjustmentSceneStructure.Point f = structure.points[pointID];
+				SceneStructureMetric.Point f = structure.points[pointID];
 //				System.out.println("   pointIndex="+pointIndex+" pointID="+pointID+" hash="+f.hashCode());
 				v.get(pointIndex, observation);
 
@@ -147,10 +147,10 @@ public class PruneStructureFromScene {
 
 		for (int viewIndex = 0; viewIndex < observations.views.length; viewIndex++) {
 			BundleAdjustmentObservations.View v = observations.views[viewIndex];
-			BundleAdjustmentSceneStructure.View view = structure.views[viewIndex];
+			SceneStructureMetric.View view = structure.views[viewIndex];
 
 			for (int pointIndex = 0; pointIndex < v.point.size; pointIndex++) {
-				BundleAdjustmentSceneStructure.Point f = structure.points[v.getPointId(pointIndex)];
+				SceneStructureMetric.Point f = structure.points[v.getPointId(pointIndex)];
 
 				// Get feature location in world
 				f.get(X);
@@ -184,7 +184,7 @@ public class PruneStructureFromScene {
 			BundleAdjustmentObservations.View v = observations.views[viewIndex];
 
 			for(int pointIndex = v.point.size-1; pointIndex >= 0; pointIndex-- ) {
-				BundleAdjustmentSceneStructure.Point p = structure.points[v.getPointId(pointIndex)];
+				SceneStructureMetric.Point p = structure.points[v.getPointId(pointIndex)];
 
 				if( p.views.size < count ) {
 					v.remove(pointIndex);
@@ -240,7 +240,7 @@ public class PruneStructureFromScene {
 		Point3D_F64 worldX = new Point3D_F64();
 		List<Point3D_F64> cloud = new ArrayList<>();
 		for (int i = 0; i < structure.points.length; i++) {
-			BundleAdjustmentSceneStructure.Point structureP = structure.points[i];
+			SceneStructureMetric.Point structureP = structure.points[i];
 			structureP.get(worldX);
 			cloud.add(worldX.copy());
 		}
@@ -257,7 +257,7 @@ public class PruneStructureFromScene {
 
 		// identify points which need to be pruned
 		for (int pointId = 0; pointId < structure.points.length; pointId++) {
-			BundleAdjustmentSceneStructure.Point structureP = structure.points[pointId];
+			SceneStructureMetric.Point structureP = structure.points[pointId];
 			structureP.get(worldX);
 
 			// distance is squared
@@ -294,7 +294,7 @@ public class PruneStructureFromScene {
 	 */
 	public void pruneViews( int count ) {
 
-		List<BundleAdjustmentSceneStructure.View> remainingS = new ArrayList<>();
+		List<SceneStructureMetric.View> remainingS = new ArrayList<>();
 		List<BundleAdjustmentObservations.View> remainingO = new ArrayList<>();
 
 		for (int viewId = 0; viewId < structure.views.length; viewId++) {
@@ -318,7 +318,7 @@ public class PruneStructureFromScene {
 		}
 
 		// Create new arrays with the views that were not pruned
-		structure.views = new BundleAdjustmentSceneStructure.View[remainingS.size()];
+		structure.views = new SceneStructureMetric.View[remainingS.size()];
 		observations.views = new BundleAdjustmentObservations.View[remainingO.size()];
 
 		for (int i = 0; i < structure.views.length; i++) {
@@ -340,7 +340,7 @@ public class PruneStructureFromScene {
 
 		// See which cameras need to be removed and create a look up table from old to new camera IDs
 		int oldToNew[] = new int[structure.cameras.length];
-		List<BundleAdjustmentSceneStructure.Camera> remaining = new ArrayList<>();
+		List<SceneStructureMetric.Camera> remaining = new ArrayList<>();
 		for (int i = 0; i < structure.cameras.length; i++) {
 			if( histogram[i] > 0 ) {
 				oldToNew[i] = remaining.size();
@@ -349,14 +349,14 @@ public class PruneStructureFromScene {
 		}
 
 		// Create the new camera array without the unused cameras
-		structure.cameras = new BundleAdjustmentSceneStructure.Camera[remaining.size()];
+		structure.cameras = new SceneStructureMetric.Camera[remaining.size()];
 		for (int i = 0; i < remaining.size(); i++) {
 			structure.cameras[i] = remaining.get(i);
 		}
 
 		// Update the references to the cameras
 		for (int i = 0; i < structure.views.length; i++) {
-			BundleAdjustmentSceneStructure.View v = structure.views[i];
+			SceneStructureMetric.View v = structure.views[i];
 			v.camera = oldToNew[v.camera];
 		}
 	}

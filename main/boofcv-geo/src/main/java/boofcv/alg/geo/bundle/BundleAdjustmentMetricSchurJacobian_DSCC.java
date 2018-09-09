@@ -18,9 +18,9 @@
 
 package boofcv.alg.geo.bundle;
 
+import boofcv.abst.geo.bundle.BundleAdjustmentMetricSchur_DSCC;
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
-import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.RodriguesRotationJacobian;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -34,14 +34,14 @@ import org.ejml.data.DMatrixSparseTriplet;
 import org.ejml.ops.ConvertDMatrixStruct;
 
 /**
- * Computes the Jacobian for {@link BundleAdjustmentSchur_DSCC} using sparse matrices
- * in EJML. Parameterization is done using the format in {@link CodecBundleAdjustmentSceneStructure}.
+ * Computes the Jacobian for {@link BundleAdjustmentMetricSchur_DSCC} using sparse matrices
+ * in EJML. Parameterization is done using the format in {@link CodecSceneStructureMetric}.
  *
  * @author Peter Abeles
  */
-public class BundleAdjustmentSchurJacobian_DSCC implements SchurJacobian<DMatrixSparseCSC>
+public class BundleAdjustmentMetricSchurJacobian_DSCC implements SchurJacobian<DMatrixSparseCSC>
 {
-	private BundleAdjustmentSceneStructure structure;
+	private SceneStructureMetric structure;
 	private BundleAdjustmentObservations observations;
 
 	// number of views with parameters that are going to be adjusted
@@ -82,7 +82,7 @@ public class BundleAdjustmentSchurJacobian_DSCC implements SchurJacobian<DMatrix
 	private double calibGradX[] = null;
 	private double calibGradY[] = null;
 
-	public void configure( BundleAdjustmentSceneStructure structure , BundleAdjustmentObservations observations ) {
+	public void configure(SceneStructureMetric structure , BundleAdjustmentObservations observations ) {
 		this.structure = structure;
 		this.observations = observations;
 
@@ -141,8 +141,8 @@ public class BundleAdjustmentSchurJacobian_DSCC implements SchurJacobian<DMatrix
 		int observationIndex = 0;
 		// first decode the transformation
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			BundleAdjustmentSceneStructure.View view = structure.views[viewIndex];
-			BundleAdjustmentSceneStructure.Camera camera = structure.cameras[view.camera];
+			SceneStructureMetric.View view = structure.views[viewIndex];
+			SceneStructureMetric.Camera camera = structure.cameras[view.camera];
 
 			if( !view.known ) {
 				int paramIndex = viewParameterIndexes[viewIndex]+indexFirstView;

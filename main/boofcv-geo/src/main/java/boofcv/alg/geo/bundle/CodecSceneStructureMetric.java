@@ -18,12 +18,12 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.so.Rodrigues_F64;
 
 /**
- * Encodes and decodes the values in a {@link BundleAdjustmentSceneStructure} using the following
+ * Encodes and decodes the values in a {@link SceneStructureMetric} using the following
  * parameterization:<br>
  * <pre>
  * [ (X Y Z)*M ][ (rodX rodY rodZ Tx Ty Tz)*N ][ intrinsic*O ]
@@ -31,23 +31,23 @@ import georegression.struct.so.Rodrigues_F64;
  * </pre>
  * @author Peter Abeles
  */
-public class CodecBundleAdjustmentSceneStructure {
+public class CodecSceneStructureMetric {
 
 	// local variable which stores the predicted location of the feature in the camera frame
 	private Rodrigues_F64 rodrigues = new Rodrigues_F64();
 
-	public void decode(double[] input , BundleAdjustmentSceneStructure structure ) {
+	public void decode(double[] input , SceneStructureMetric structure ) {
 		int index = 0;
 
 		for (int i = 0; i < structure.points.length; i++) {
-			BundleAdjustmentSceneStructure.Point p = structure.points[i];
+			SceneStructureMetric.Point p = structure.points[i];
 			p.coordinate[0] = input[index++];
 			p.coordinate[1] = input[index++];
 			p.coordinate[2] = input[index++];
 		}
 
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			BundleAdjustmentSceneStructure.View view = structure.views[viewIndex];
+			SceneStructureMetric.View view = structure.views[viewIndex];
 			// Decode the rigid body transform from world to view
 			if( !view.known ) {
 				double rodX = input[index++];
@@ -65,7 +65,7 @@ public class CodecBundleAdjustmentSceneStructure {
 		}
 
 		for (int i = 0; i < structure.cameras.length; i++) {
-			BundleAdjustmentSceneStructure.Camera camera = structure.cameras[i];
+			SceneStructureMetric.Camera camera = structure.cameras[i];
 			if( !camera.known ) {
 				camera.model.setIntrinsic(input,index);
 				index += camera.model.getIntrinsicCount();
@@ -73,18 +73,18 @@ public class CodecBundleAdjustmentSceneStructure {
 		}
 	}
 
-	public void encode(BundleAdjustmentSceneStructure structure , double[] output ) {
+	public void encode(SceneStructureMetric structure , double[] output ) {
 		int index = 0;
 
 		for (int i = 0; i < structure.points.length; i++) {
-			BundleAdjustmentSceneStructure.Point p = structure.points[i];
+			SceneStructureMetric.Point p = structure.points[i];
 			output[index++] = p.coordinate[0];
 			output[index++] = p.coordinate[1];
 			output[index++] = p.coordinate[2];
 		}
 
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			BundleAdjustmentSceneStructure.View view = structure.views[viewIndex];
+			SceneStructureMetric.View view = structure.views[viewIndex];
 			// Decode the rigid body transform from world to view
 			if( !view.known ) {
 				ConvertRotation3D_F64.matrixToRodrigues(view.worldToView.R,rodrigues);
@@ -100,7 +100,7 @@ public class CodecBundleAdjustmentSceneStructure {
 		}
 
 		for (int i = 0; i < structure.cameras.length; i++) {
-			BundleAdjustmentSceneStructure.Camera camera = structure.cameras[i];
+			SceneStructureMetric.Camera camera = structure.cameras[i];
 			if( !camera.known ) {
 				camera.model.getIntrinsic(output,index);
 				index += camera.model.getIntrinsicCount();

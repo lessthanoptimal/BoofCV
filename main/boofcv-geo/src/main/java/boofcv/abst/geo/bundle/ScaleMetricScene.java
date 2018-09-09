@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentSceneStructure.Point;
+import boofcv.abst.geo.bundle.SceneStructureCommon.Point;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.sorting.QuickSelect;
@@ -32,7 +32,7 @@ import org.ddogleg.struct.GrowQueue_F64;
  *
  * @author Peter Abeles
  */
-public class BundleAdjustmentScaleScene {
+public class ScaleMetricScene {
 
 	/**
 	 * This sets the order of magnitude for point coordinates
@@ -54,14 +54,14 @@ public class BundleAdjustmentScaleScene {
 	 * Configures how scaling is applied
 	 * @param desiredDistancePoint desired scale for points to have
 	 */
-	public BundleAdjustmentScaleScene(double desiredDistancePoint) {
+	public ScaleMetricScene(double desiredDistancePoint) {
 		this.desiredDistancePoint = desiredDistancePoint;
 	}
 
-	public BundleAdjustmentScaleScene() {
+	public ScaleMetricScene() {
 	}
 
-	public void computeScale(BundleAdjustmentSceneStructure structure ) {
+	public void computeScale(SceneStructureMetric structure ) {
 		computePointStatistics(structure.points);
 	}
 
@@ -94,7 +94,7 @@ public class BundleAdjustmentScaleScene {
 //		System.out.println("Scale    ="+ (desiredDistancePoint / medianDistancePoint));
 	}
 
-	public void applyScale( BundleAdjustmentSceneStructure structure ,
+	public void applyScale( SceneStructureMetric structure ,
 							BundleAdjustmentObservations observations ) {
 
 		double scale = desiredDistancePoint / medianDistancePoint;
@@ -108,7 +108,7 @@ public class BundleAdjustmentScaleScene {
 
 		Point3D_F64 c = new Point3D_F64();
 		for (int i = 0; i < structure.views.length; i++) {
-			BundleAdjustmentSceneStructure.View view = structure.views[i];
+			SceneStructureMetric.View view = structure.views[i];
 
 			// X_w = R'*(X_c - T) let X_c = 0 then X_w = -R'*T is center of camera in world
 			GeometryMath_F64.multTran(view.worldToView.R,view.worldToView.T,c);
@@ -126,7 +126,7 @@ public class BundleAdjustmentScaleScene {
 		// NOTE: No need to adjust observations since the scaling will be undone because it's a homogeneous coordinate
 	}
 
-	public void undoScale( BundleAdjustmentSceneStructure structure ,
+	public void undoScale( SceneStructureMetric structure ,
 						   BundleAdjustmentObservations observations ) {
 
 		double scale = desiredDistancePoint / medianDistancePoint;
@@ -140,7 +140,7 @@ public class BundleAdjustmentScaleScene {
 
 		Point3D_F64 c = new Point3D_F64();
 		for (int i = 0; i < structure.views.length; i++) {
-			BundleAdjustmentSceneStructure.View view = structure.views[i];
+			SceneStructureMetric.View view = structure.views[i];
 
 			// X_w = R'*(X_c - T) let X_c = 0 then X_w = -R'*T is center of camera in world
 			GeometryMath_F64.multTran(view.worldToView.R,view.worldToView.T,c);

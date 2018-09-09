@@ -6,4 +6,5 @@ dependencies {
     testCompile project(':main:boofcv-io')
     testCompile project(':main:boofcv-recognition')
     testCompile project(':integration:boofcv-swing')
+    testCompile project(':main:boofcv-geo').sourceSets.test.output
 }
