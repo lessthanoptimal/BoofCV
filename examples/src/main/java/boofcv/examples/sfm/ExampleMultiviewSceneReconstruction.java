@@ -27,6 +27,7 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.structure.EstimateSceneUnordered;
 import boofcv.alg.sfm.structure.PruneStructureFromScene;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -98,8 +99,10 @@ public class ExampleMultiviewSceneReconstruction {
 		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
 		configLM.dampeningInitial = 1e-12;
 		configLM.hessianScaling = true;
+		ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
+		configSBA.configOptimizer = configLM;
 
-		BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleAdjustmentMetric(configLM);
+		BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleAdjustmentMetric(configSBA);
 		sba.configure(1e-10,1e-10,100);
 		sba.setVerbose(System.out,0);
 		structure.setCamera(0,true,intrinsic);

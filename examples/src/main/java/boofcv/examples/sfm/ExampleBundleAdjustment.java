@@ -21,6 +21,7 @@ package boofcv.examples.sfm;
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.ScaleMetricScene;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -83,8 +84,11 @@ public class ExampleBundleAdjustment {
 		// Improves Jacobian matrix's condition. Recommended in general but not important in this problem
 		configLM.hessianScaling = true;
 
+		ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
+		configSBA.configOptimizer = configLM;
+
 		// Create and configure the bundle adjustment solver
-		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleAdjustmentMetric(configLM);
+		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleAdjustmentMetric(configSBA);
 		// prints out useful debugging information that lets you know how well it's converging
 		bundleAdjustment.setVerbose(System.out,0);
 		// Specifies convergence criteria

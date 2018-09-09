@@ -70,8 +70,16 @@ import javax.annotation.Nullable;
  */
 public class FactoryMultiView {
 
-	public static BundleAdjustment<SceneStructureMetric> bundleAdjustmentMetric( @Nullable ConfigTrustRegion config ) {
-		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer = FactoryOptimizationSparse.doglegSchur(config);
+	public static BundleAdjustment<SceneStructureMetric> bundleAdjustmentMetric( @Nullable ConfigBundleAdjustment config ) {
+		if( config == null )
+			config = new ConfigBundleAdjustment();
+
+		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer;
+
+		if( config.configOptimizer instanceof ConfigTrustRegion )
+			minimizer = FactoryOptimizationSparse.doglegSchur((ConfigTrustRegion)config.configOptimizer);
+		else
+			minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur((ConfigLevenbergMarquardt)config.configOptimizer);
 
 		return new BundleAdjustmentSchur_DSCC<>(minimizer,
 				new BundleAdjustmentMetricResidualFunction(),
@@ -79,26 +87,17 @@ public class FactoryMultiView {
 				new CodecSceneStructureMetric());
 	}
 
-	public static BundleAdjustment<SceneStructureMetric> bundleAdjustmentMetric( @Nullable ConfigLevenbergMarquardt config ) {
-		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur(config);
+	public static BundleAdjustment<SceneStructureProjective> bundleAdjustmentProjective( @Nullable ConfigBundleAdjustment config ) {
+		if( config == null )
+			config = new ConfigBundleAdjustment();
 
-		return new BundleAdjustmentSchur_DSCC<>(minimizer,
-				new BundleAdjustmentMetricResidualFunction(),
-				new BundleAdjustmentMetricSchurJacobian_DSCC(),
-				new CodecSceneStructureMetric());
-	}
+		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer;
 
-	public static BundleAdjustment<SceneStructureProjective> bundleAdjustmentProjective(@Nullable ConfigTrustRegion config ) {
-		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer = FactoryOptimizationSparse.doglegSchur(config);
+		if( config.configOptimizer instanceof ConfigTrustRegion )
+			minimizer = FactoryOptimizationSparse.doglegSchur((ConfigTrustRegion)config.configOptimizer);
+		else
+			minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur((ConfigLevenbergMarquardt)config.configOptimizer);
 
-		return new BundleAdjustmentSchur_DSCC<>(minimizer,
-				new BundleAdjustmentProjectiveResidualFunction(),
-				new BundleAdjustmentProjectiveSchurJacobian_DSCC(),
-				new CodecSceneStructureProjective());
-	}
-
-	public static BundleAdjustment<SceneStructureProjective> bundleAdjustmentProjective( @Nullable ConfigLevenbergMarquardt config ) {
-		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur(config);
 
 		return new BundleAdjustmentSchur_DSCC<>(minimizer,
 				new BundleAdjustmentProjectiveResidualFunction(),
