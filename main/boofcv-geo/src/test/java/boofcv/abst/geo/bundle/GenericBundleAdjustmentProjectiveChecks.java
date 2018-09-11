@@ -18,8 +18,7 @@
 
 package boofcv.abst.geo.bundle;
 
-import boofcv.alg.geo.WorldToCameraToPixel;
-import boofcv.alg.geo.bundle.cameras.BundlePinhole;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -27,7 +26,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.Tuple2;
-import org.ejml.dense.row.MatrixFeatures_DDRM;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,22 +38,22 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericBundleAdjustmentMetricChecks {
+public abstract class GenericBundleAdjustmentProjectiveChecks {
 	Random rand = new Random(234);
 
-	public abstract BundleAdjustment<SceneStructureMetric> createAlg();
+	public abstract BundleAdjustment<SceneStructureProjective> createAlg();
 
 	@Test
 	public void horizontalPerfect() {
-		BundleAdjustment<SceneStructureMetric> alg = createAlg();
+		BundleAdjustment<SceneStructureProjective> alg = createAlg();
 
-		Tuple2<SceneStructureMetric,BundleAdjustmentObservations> a = createHorizontalMotion( 123,true);
+		Tuple2<SceneStructureProjective,BundleAdjustmentObservations> a = createHorizontalMotion( 123);
 
 		alg.setParameters(a.data0,a.data1);
 		alg.optimize(a.data0); // don't assertTrue() since it can fail
 
-		Tuple2<SceneStructureMetric,BundleAdjustmentObservations> b = createHorizontalMotion( 123,true);
-		assertEquals(a.data0,b.data0,1e-6,1e-6,1e-6);
+		Tuple2<SceneStructureProjective,BundleAdjustmentObservations> b = createHorizontalMotion( 123);
+		assertEquals(a.data0,b.data0,1e-6);
 	}
 
 	/**
@@ -62,25 +61,25 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 	 */
 	@Test
 	public void multipleCalls() {
-		BundleAdjustment<SceneStructureMetric> alg = createAlg();
+		BundleAdjustment<SceneStructureProjective> alg = createAlg();
 
-		Tuple2<SceneStructureMetric,BundleAdjustmentObservations> a = createHorizontalMotion( 123,true);
-		Tuple2<SceneStructureMetric,BundleAdjustmentObservations> c = createHorizontalMotion( 234,true);
+		Tuple2<SceneStructureProjective,BundleAdjustmentObservations> a = createHorizontalMotion( 123);
+		Tuple2<SceneStructureProjective,BundleAdjustmentObservations> c = createHorizontalMotion( 234);
 		addNoiseToPoint3D(c);
 		alg.setParameters(a.data0,a.data1);
 		alg.optimize(c.data0);
 		alg.setParameters(a.data0,a.data1);
 		alg.optimize(a.data0);
 
-		Tuple2<SceneStructureMetric,BundleAdjustmentObservations> b = createHorizontalMotion( 123,true);
-		assertEquals(a.data0,b.data0,1e-6,1e-6,1e-6);
+		Tuple2<SceneStructureProjective,BundleAdjustmentObservations> b = createHorizontalMotion( 123);
+		assertEquals(a.data0,b.data0,1e-6);
 	}
 
 	@Test
 	public void horizontalNoisyObs() {
-		BundleAdjustment<SceneStructureMetric> alg = createAlg();
+		BundleAdjustment<SceneStructureProjective> alg = createAlg();
 
-		Tuple2<SceneStructureMetric,BundleAdjustmentObservations> a = createHorizontalMotion( 123,true);
+		Tuple2<SceneStructureProjective,BundleAdjustmentObservations> a = createHorizontalMotion( 123);
 
 		// Add noise to every observation
 		BundleAdjustmentObservations observations = a.data1;
@@ -95,15 +94,15 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 		alg.setParameters(a.data0,a.data1);
 		assertTrue(alg.optimize(a.data0));
 
-		Tuple2<SceneStructureMetric,BundleAdjustmentObservations> b = createHorizontalMotion( 123,true);
-		assertEquals(a.data0,b.data0,1e-6,0.01,0.01);
+		Tuple2<SceneStructureProjective,BundleAdjustmentObservations> b = createHorizontalMotion( 123);
+		assertEquals(a.data0,b.data0,0.02);
 	}
 
 	@Test
 	public void horizontalNoisyFeatures() {
-		BundleAdjustment<SceneStructureMetric> alg = createAlg();
+		BundleAdjustment<SceneStructureProjective> alg = createAlg();
 
-		Tuple2<SceneStructureMetric,BundleAdjustmentObservations> a = createHorizontalMotion( 123,true);
+		Tuple2<SceneStructureProjective,BundleAdjustmentObservations> a = createHorizontalMotion( 123);
 
 		// Add noise to every 3D point
 		addNoiseToPoint3D(a);
@@ -116,14 +115,14 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 
 		// even though observations are perfect it might have only converged towards a locally optimal solution thats
 		// close to the optimal one
-		Tuple2<SceneStructureMetric,BundleAdjustmentObservations> b = createHorizontalMotion( 123,true);
-		assertEquals(a.data0,b.data0,0,0.1,1e-3);
+		Tuple2<SceneStructureProjective,BundleAdjustmentObservations> b = createHorizontalMotion( 123);
+		assertEquals(a.data0,b.data0,0.1);
 	}
 
-	private void addNoiseToPoint3D(Tuple2<SceneStructureMetric, BundleAdjustmentObservations> a) {
-		SceneStructureMetric structure = a.data0;
+	private void addNoiseToPoint3D(Tuple2<SceneStructureProjective, BundleAdjustmentObservations> a) {
+		SceneStructureProjective structure = a.data0;
 		for (int i = 0; i < structure.points.length; i++) {
-			SceneStructureMetric.Point p = structure.points[i];
+			SceneStructureProjective.Point p = structure.points[i];
 			p.coordinate[0] += rand.nextGaussian()*0.1;
 			p.coordinate[1] += rand.nextGaussian()*0.1;
 			p.coordinate[2] += rand.nextGaussian()*0.1;
@@ -132,18 +131,18 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 
 	@Test
 	public void horizontalNoisyPose() {
-		BundleAdjustment<SceneStructureMetric> alg = createAlg();
+		BundleAdjustment<SceneStructureProjective> alg = createAlg();
 
-		Tuple2<SceneStructureMetric,BundleAdjustmentObservations> a = createHorizontalMotion( 123,true);
+		Tuple2<SceneStructureProjective,BundleAdjustmentObservations> a = createHorizontalMotion( 123);
 
 		// Add noise to every view pose estimate. Except 0 since that's the world coordinates and it's easier to check
 		// errors if that's unmolested
-		SceneStructureMetric structure = a.data0;
+		SceneStructureProjective structure = a.data0;
 		for (int i = 1; i < structure.views.length; i++) {
-			SceneStructureMetric.View v = structure.views[i];
-			v.worldToView.T.x += rand.nextGaussian()*0.1;
-			v.worldToView.T.y += rand.nextGaussian()*0.1;
-			v.worldToView.T.z += rand.nextGaussian()*0.1;
+			SceneStructureProjective.View v = structure.views[i];
+			v.worldToView.data[3 ] += rand.nextGaussian()*0.1;
+			v.worldToView.data[7 ] += rand.nextGaussian()*0.1;
+			v.worldToView.data[11] += rand.nextGaussian()*0.1;
 		}
 
 		alg.setParameters(a.data0,a.data1);
@@ -154,18 +153,12 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 
 		// even though observations are perfect it might have only converged towards a locally optimal solution thats
 		// close to the optimal one
-		Tuple2<SceneStructureMetric,BundleAdjustmentObservations> b = createHorizontalMotion( 123,true);
-		assertEquals(a.data0,b.data0,1e-6,0.1,1e-3);
+		Tuple2<SceneStructureProjective,BundleAdjustmentObservations> b = createHorizontalMotion( 123);
+		assertEquals(a.data0,b.data0,0.1);
 	}
 
-	public static void checkReprojectionError(SceneStructureMetric structure , BundleAdjustmentObservations observations , double tol ) {
+	public static void checkReprojectionError(SceneStructureProjective structure , BundleAdjustmentObservations observations , double tol ) {
 
-		BundlePinhole c = (BundlePinhole)structure.cameras[0].model;
-
-		// making a bunch of assumptions here...
-		CameraPinhole intrinsic = new CameraPinhole(c.fx,c.fy,c.skew,c.cx,c.cy,600,600);
-
-		WorldToCameraToPixel wcp = new WorldToCameraToPixel();
 
 		PointIndex2D_F64 o = new PointIndex2D_F64();
 		Point2D_F64 predicted = new Point2D_F64();
@@ -176,14 +169,13 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 			for (int indexView = 0; indexView < observations.views.length; indexView++) {
 				BundleAdjustmentObservations.View v = observations.views[indexView];
 
-				wcp.configure(intrinsic, structure.views[indexView].worldToView);
 				for (int j = 0; j < v.point.size; j++) {
 					v.get(j, o);
 					structure.points[o.index].get(p4);
 					p3.x = p4.x/p4.w;
 					p3.y = p4.y/p4.w;
 					p3.z = p4.z/p4.w;
-					wcp.transform(p3, predicted);
+					PerspectiveOps.renderPixel(structure.views[indexView].worldToView,p3,predicted);
 					double residual = o.distance(predicted);
 					if (Math.abs(residual) > tol)
 						fail("Error is too large. " + residual);
@@ -194,11 +186,10 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 			for (int indexView = 0; indexView < observations.views.length; indexView++) {
 				BundleAdjustmentObservations.View v = observations.views[indexView];
 
-				wcp.configure(intrinsic, structure.views[indexView].worldToView);
 				for (int j = 0; j < v.point.size; j++) {
 					v.get(j, o);
 					structure.points[o.index].get(p3);
-					wcp.transform(p3, predicted);
+					PerspectiveOps.renderPixel(structure.views[indexView].worldToView,p3,predicted);
 					double residual = o.distance(predicted);
 					if (Math.abs(residual) > tol)
 						fail("Error is too large. " + residual);
@@ -207,8 +198,8 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 		}
 	}
 
-	public static void assertEquals(SceneStructureMetric a , SceneStructureMetric b ,
-									double tolCamera , double tolDistance , double tolRotation  ) {
+	public static void assertEquals(SceneStructureProjective a , SceneStructureProjective b ,
+									double tolDistance ) {
 
 		Assert.assertEquals(a.homogenous, b.homogenous);
 
@@ -230,42 +221,36 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 			}
 		}
 
-		for (int i = 0; i < a.views.length; i++) {
-			double error = a.views[i].worldToView.T.distance(b.views[i].worldToView.T);
-			assertTrue( i+" error = "+error,error < tolDistance );
-			assertTrue(MatrixFeatures_DDRM.isIdentical(a.views[i].worldToView.R,
-					b.views[i].worldToView.R,tolRotation));
-		}
-
+		// don't compare camera matrices because there are infinite equivalent solutions
 	}
 
-	public Tuple2<SceneStructureMetric,BundleAdjustmentObservations>
-	createHorizontalMotion( long seed , boolean cameraFixed )
+	public Tuple2<SceneStructureProjective,BundleAdjustmentObservations>
+	createHorizontalMotion( long seed )
 	{
 		Random rand = new Random(seed);
 
 		int width = 600;
 		CameraPinhole intrinsic = new CameraPinhole(400,400,0,300,300,width,width);
-
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic,(DMatrixRMaj)null);
 		int numViews = 5;
 		int numFeatures = 200;
 
-		SceneStructureMetric structure = new SceneStructureMetric(false);
+		SceneStructureProjective structure = new SceneStructureProjective(false);
 		BundleAdjustmentObservations observations = new BundleAdjustmentObservations(numViews);
 
-		structure.initialize(1,numViews,numFeatures);
-
-		structure.setCamera(0,cameraFixed,intrinsic);
+		structure.initialize(numViews,numFeatures);
 
 		double minX = 0, maxX = 5;
 		for (int i = 0; i < numViews; i++) {
 			Se3_F64 worldToView = new Se3_F64();
 			worldToView.T.x = -((maxX-minX)*i/(numViews-1) + minX);
-			structure.setView(i,i==0,worldToView);
-			structure.connectViewToCamera(i,0);
+
+			DMatrixRMaj P = new DMatrixRMaj(3,4);
+			PerspectiveOps.createCameraMatrix(worldToView.R,worldToView.T,K,P);
+
+			structure.setView(i,i==0,P);
 		}
 
-		WorldToCameraToPixel wcp = new WorldToCameraToPixel();
 		Point2D_F64 pixel = new Point2D_F64();
 
 		for (int featureIndex = 0; featureIndex < numFeatures; featureIndex++) {
@@ -281,18 +266,16 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 				// see which views it's visible in
 				int count = 0;
 				for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
-					SceneStructureMetric.View v = structure.views[viewIndex];
-					wcp.configure(intrinsic, v.worldToView);
-					wcp.transform(P, pixel);
+					SceneStructureProjective.View v = structure.views[viewIndex];
+					PerspectiveOps.renderPixel(v.worldToView,P,pixel);
 					if (pixel.x >= 0 && pixel.x < width && pixel.y >= 0 && pixel.y < width) {
 						count++;
 					}
 				}
 				if (count >= 2) {
 					for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
-						SceneStructureMetric.View v = structure.views[viewIndex];
-						wcp.configure(intrinsic, v.worldToView);
-						wcp.transform(P, pixel);
+						SceneStructureProjective.View v = structure.views[viewIndex];
+						PerspectiveOps.renderPixel(v.worldToView,P,pixel);
 						if (pixel.x >= 0 && pixel.x < width && pixel.y >= 0 && pixel.y < width) {
 							observations.getView(viewIndex).add(featureIndex, (float) pixel.x, (float) pixel.y);
 							structure.connectPointToView(featureIndex, viewIndex);

@@ -31,6 +31,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.UtilVector3D_F64;
 import georegression.metric.UtilAngle;
+import georegression.struct.GeoTuple3D_F64;
 import georegression.struct.point.*;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrix3x3;
@@ -647,5 +648,23 @@ public class PerspectiveOps {
 		A.data[7] = m.T.y;
 		A.data[11] = m.T.z;
 		return A;
+	}
+
+	/**
+	 * Extracts a column from the camera matrix and puts it into the geometric 3-tuple.
+	 */
+	public static void extractColumn(DMatrixRMaj P, int col, GeoTuple3D_F64 a) {
+		a.x = P.unsafe_get(0,col);
+		a.y = P.unsafe_get(1,col);
+		a.z = P.unsafe_get(2,col);
+	}
+
+	/**
+	 * Inserts 3-tuple into the camera matrix's columns
+	 */
+	public static void insertColumn(DMatrixRMaj P, int col, GeoTuple3D_F64 a) {
+		P.unsafe_set(0,col,a.x);
+		P.unsafe_set(1,col,a.y);
+		P.unsafe_set(2,col,a.z);
 	}
 }

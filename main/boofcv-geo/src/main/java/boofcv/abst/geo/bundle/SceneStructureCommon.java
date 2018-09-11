@@ -180,6 +180,24 @@ public abstract class SceneStructureCommon implements SceneStructure {
 			return dx*dx + dy*dy + dz*dz;
 		}
 
+		/**
+		 * Normalize a point in homogenous coordinate so that it's f-norm is 1
+		 */
+		public void normalizeH() {
+			double n = 0;
+			n += coordinate[0]*coordinate[0];
+			n += coordinate[1]*coordinate[1];
+			n += coordinate[2]*coordinate[2];
+			n += coordinate[3]*coordinate[3];
+
+			n = Math.sqrt(n);
+
+			coordinate[0] /= n;
+			coordinate[1] /= n;
+			coordinate[2] /= n;
+			coordinate[3] /= n;
+		}
+
 		public double distance(Point3D_F64 p) {
 			return Math.sqrt(distance(p));
 		}

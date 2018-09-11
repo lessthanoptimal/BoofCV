@@ -18,12 +18,9 @@
 
 package boofcv.abst.geo.bundle;
 
-import org.ddogleg.optimization.FactoryOptimizationSparse;
 import org.ddogleg.optimization.UnconstrainedLeastSquaresSchur;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.SchurJacobian;
-import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
-import org.ddogleg.optimization.trustregion.ConfigTrustRegion;
 import org.ejml.data.DMatrixSparseCSC;
 
 import javax.annotation.Nullable;
@@ -62,14 +59,6 @@ public class BundleAdjustmentSchur_DSCC<Structure extends SceneStructure>
 		this.function = function;
 		this.jacobian = jacobian;
 		this.codec = codec;
-	}
-
-	public BundleAdjustmentSchur_DSCC(@Nullable ConfigTrustRegion config) {
-		this.minimizer = FactoryOptimizationSparse.doglegSchur(config);
-	}
-
-	public BundleAdjustmentSchur_DSCC(@Nullable ConfigLevenbergMarquardt config) {
-		this.minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur(config);
 	}
 
 	@Override

@@ -21,7 +21,7 @@ package boofcv.examples.sfm;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
-import boofcv.abst.geo.bundle.ScaleMetricScene;
+import boofcv.abst.geo.bundle.ScaleSceneStructure;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.structure.EstimateSceneUnordered;
@@ -108,7 +108,7 @@ public class ExampleMultiviewSceneReconstruction {
 		structure.setCamera(0,true,intrinsic);
 
 		// Scale to improve numerical accuracy
-		ScaleMetricScene bundleScale = new ScaleMetricScene();
+		ScaleSceneStructure bundleScale = new ScaleSceneStructure();
 
 		PruneStructureFromScene pruner = new PruneStructureFromScene(structure,observations);
 

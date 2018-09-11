@@ -19,7 +19,7 @@
 package boofcv.examples.sfm;
 
 import boofcv.abst.geo.bundle.BundleAdjustment;
-import boofcv.abst.geo.bundle.ScaleMetricScene;
+import boofcv.abst.geo.bundle.ScaleSceneStructure;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
@@ -96,7 +96,7 @@ public class ExampleBundleAdjustment {
 
 		// Scaling each variable type so that it takes on a similar numerical value. This aids in optimization
 		// Not important for this problem but is for others
-		ScaleMetricScene bundleScale = new ScaleMetricScene();
+		ScaleSceneStructure bundleScale = new ScaleSceneStructure();
 		bundleScale.computeScale(parser.scene);
 		bundleScale.applyScale(parser.scene, parser.observations);
 		bundleAdjustment.setParameters(parser.scene, parser.observations);

@@ -18,17 +18,16 @@
 
 package boofcv.abst.geo.bundle;
 
-import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import boofcv.factory.geo.FactoryMultiView;
 
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentMetricSchur_DSCC extends GenericBundleAdjustmentMetricChecks {
+public class TestBundleAdjustmentSchur_DSCC_Metric extends GenericBundleAdjustmentMetricChecks {
 
 	@Override
 	public BundleAdjustment<SceneStructureMetric> createAlg() {
-		ConfigLevenbergMarquardt config = new ConfigLevenbergMarquardt();
-		BundleAdjustmentSchur_DSCC ret = new BundleAdjustmentSchur_DSCC(config);
+		BundleAdjustment<SceneStructureMetric> ret = FactoryMultiView.bundleAdjustmentMetric(null);
 		ret.configure(1e-5,1e-5,20);
 		return ret;
 	}
