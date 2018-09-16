@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,17 @@
 
 package boofcv.alg.geo.pose;
 
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import java.util.List;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -52,6 +57,18 @@ public class TestPoseFromPairLinear6 extends ChecksMotionNPoint {
 
 		alg.process(obs,locations);
 
-		return alg.getMotion();
+		Se3_F64 se = new Se3_F64();
+
+		DMatrixRMaj P = alg.getProjective();
+		PerspectiveOps.projectionSplit(P,se.R,se.T);
+
+		// Need to do this so that it gives the best fit SE(3)
+		SpecialEuclideanOps_F64.bestFit(se);
+		return se;
+	}
+
+	@Test
+	public void stuff() {
+		fail("Test homogenous uncalibrated");
 	}
 }

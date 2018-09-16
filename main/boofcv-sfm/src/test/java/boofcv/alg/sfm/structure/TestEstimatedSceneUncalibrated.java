@@ -25,9 +25,9 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestEstimateSceneSequence {
+public class TestEstimatedSceneUncalibrated {
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void foo() {
+		fail("Implement");
 	}
 }

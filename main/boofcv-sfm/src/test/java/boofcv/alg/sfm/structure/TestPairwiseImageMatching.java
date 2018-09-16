@@ -21,7 +21,6 @@ package boofcv.alg.sfm.structure;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.geo.WorldToCameraToPixel;
-import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
@@ -34,7 +33,6 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
-import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -65,12 +63,8 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		for (int i = 0; i < graph.nodes.size(); i++) {
 			PairwiseImageGraph.CameraView n = graph.nodes.get(i);
 			assertEquals(4,n.connections.size());
-			assertTrue(n.features3D.length <= 400 && n.features3D.length >= 300);
-
-			for( PairwiseImageGraph.CameraMotion m : n.connections ) {
-				assertTrue(MatrixFeatures_DDRM.isIdentity(m.a_to_b.R,1e-8));
-				assertTrue(m.a_to_b.T.x > 0.99);
-			}
+			assertTrue(n.observationNorm.size <= 400 && n.observationNorm.size >= 300);
+			assertEquals(n.observationPixels.size,n.observationNorm.size);
 		}
 	}
 
@@ -78,10 +72,8 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		String cameraName = "camera";
 
 		Map<String, Point2Transform2_F64> camerasPixelToNorm = new HashMap<>();
-		Map<String, CameraPinhole> camerasIntrinsc = new HashMap<>();
 
 		camerasPixelToNorm.put(cameraName, new LensDistortionRadialTangential(intrinsic).undistort_F64(true,false));
-		camerasIntrinsc.put(cameraName,intrinsic);
 		alg.addCamera(cameraName,camerasPixelToNorm.get(cameraName),intrinsic);
 
 		for (int i = 0; i < 5; i++) {
@@ -91,7 +83,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 			alg.addImage(new GrayF32(intrinsic.width,intrinsic.height),cameraName);
 		}
 
-		assertTrue(alg.process(camerasPixelToNorm,camerasIntrinsc));
+		assertTrue(alg.process());
 
 		return alg.getGraph();
 	}
@@ -107,10 +99,8 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		String cameraName = "camera";
 
 		Map<String, Point2Transform2_F64> camerasPixelToNorm = new HashMap<>();
-		Map<String, CameraPinhole> camerasIntrinsc = new HashMap<>();
 
 		camerasPixelToNorm.put(cameraName, new LensDistortionRadialTangential(intrinsic).undistort_F64(true,false));
-		camerasIntrinsc.put(cameraName,intrinsic);
 		alg.addCamera(cameraName,camerasPixelToNorm.get(cameraName),intrinsic);
 
 		// there will be two independent set of views in the graph
@@ -121,7 +111,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 			alg.addImage(new GrayF32(intrinsic.width,intrinsic.height),cameraName);
 		}
 
-		assertTrue(alg.process(camerasPixelToNorm,camerasIntrinsc));
+		assertTrue(alg.process());
 
 		PairwiseImageGraph graph = alg.getGraph();
 
@@ -131,23 +121,13 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		for (int i = 0; i < 5; i++) {
 			PairwiseImageGraph.CameraView n = graph.nodes.get(i);
 			assertEquals(4,n.connections.size());
-			assertTrue(n.features3D.length <= 400 && n.features3D.length >= 300);
-
-			for( PairwiseImageGraph.CameraMotion m : n.connections ) {
-				assertTrue(MatrixFeatures_DDRM.isIdentity(m.a_to_b.R,1e-8));
-				assertTrue(m.a_to_b.T.x > 0.99);
-			}
+			assertTrue(n.observationNorm.size <= 400 && n.observationNorm.size >= 300);
 		}
 
 		for (int i = 5; i < 7; i++) {
 			PairwiseImageGraph.CameraView n = graph.nodes.get(i);
 			assertEquals(1,n.connections.size());
-			assertTrue(n.features3D.length <= 400 && n.features3D.length >= 300);
-
-			for( PairwiseImageGraph.CameraMotion m : n.connections ) {
-				assertTrue(MatrixFeatures_DDRM.isIdentity(m.a_to_b.R,1e-8));
-				assertTrue(m.a_to_b.T.x > 0.99);
-			}
+			assertTrue(n.observationNorm.size <= 400 && n.observationNorm.size >= 300);
 		}
 	}
 
@@ -157,7 +137,6 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 
 		List<Point3D_F64> worldPoints = new ArrayList<>();
 		findViewable(new int[]{0,1},worldPoints);
-		Se3_F64 camera_a_to_b = cameraAtoB(0,1);
 
 		List<Point2D_F64> pointsA = new ArrayList<>();
 		List<Point2D_F64> pointsB = new ArrayList<>();
@@ -177,14 +156,6 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 
 		assertTrue(edge.associated.size() >= matches.size*0.95 );
 		assertFalse(matches.contains(edge.associated.get(0))); // it should be a copy and not have the same instance
-
-		Se3_F64 found_a_to_b = alg.ransacEssential.getModelParameters();
-
-		camera_a_to_b.T.normalize();
-		found_a_to_b.T.normalize();
-
-		assertTrue( camera_a_to_b.T.distance(found_a_to_b.T) < 1e-4 );
-		assertTrue(MatrixFeatures_DDRM.isIdentical(camera_a_to_b.R,found_a_to_b.R,1e-3));
 	}
 
 	@Test
@@ -192,7 +163,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		fail("Implement");
 	}
 
-		@Test
+	@Test
 	public void reset() {
 		MockDetector detector = new MockDetector();
 		PairwiseImageMatching alg = new PairwiseImageMatching(detector);

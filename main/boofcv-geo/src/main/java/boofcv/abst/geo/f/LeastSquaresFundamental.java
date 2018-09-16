@@ -42,7 +42,7 @@ public class LeastSquaresFundamental implements RefineEpipolar {
 	ResidualsEpipolarMatrix func;
 	double param[];
 
-	UnconstrainedLeastSquares minimizer;
+	UnconstrainedLeastSquares<DMatrixRMaj> minimizer;
 
 	int maxIterations;
 	double convergenceTol;
@@ -92,5 +92,10 @@ public class LeastSquaresFundamental implements RefineEpipolar {
 		paramModel.decode(minimizer.getParameters(), refinedF);
 
 		return true;
+	}
+
+	@Override
+	public double getFitScore() {
+		return minimizer.getFunctionValue();
 	}
 }

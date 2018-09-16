@@ -68,4 +68,9 @@ public class LeastSquaresHomography implements RefineEpipolar {
 
 		return true;
 	}
+
+	@Override
+	public double getFitScore() {
+		return minimizer.getFunctionValue();
+	}
 }

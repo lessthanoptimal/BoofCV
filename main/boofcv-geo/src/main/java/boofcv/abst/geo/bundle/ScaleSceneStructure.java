@@ -24,13 +24,12 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ddogleg.sorting.QuickSelect;
-import org.ddogleg.struct.GrowQueue_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * Normalizes variables in the scene to improve optimization performance. Different normalization is applied
- * depending on the points being homogenous or not. Same goes for metric vs projective systems.
+ * depending on the points being homogenous or not, metric or projective.
  *
  * <p>
  *     Homogenous:<br>
@@ -42,9 +41,11 @@ import org.ejml.dense.row.CommonOps_DDRM;
  *     the set will have a mean of zero and a standard deviation of 1.
  * </p>
  *
- *
- * TODO describe scaling of scene points
- * TODO describe scaling of cameras
+ * How to use this class.
+ * <ol>
+ *     <li>Call applyScale() to compute and then apply the transform</li>
+ *     <li>Call undoScale() to revert back to the original coordinate system</li>
+ * </ol>
  *
  * @author Peter Abeles
  */
@@ -64,8 +65,6 @@ public class ScaleSceneStructure {
 	 */
 	double medianDistancePoint;
 
-	GrowQueue_F64 scaleCamera = new GrowQueue_F64();
-
 	/**
 	 * Configures how scaling is applied
 	 * @param desiredDistancePoint desired scale for points to have
@@ -77,12 +76,47 @@ public class ScaleSceneStructure {
 	public ScaleSceneStructure() {
 	}
 
-	public void computeScale(SceneStructureCommon structure ) {
-		if( !structure.isHomogenous() ) {
+	/**
+	 * Applies the scale transform to the input scene structure. Metric.
+	 * @param structure 3D scene
+	 * @param observations Observations of the scene
+	 */
+	public void applyScale( SceneStructureMetric structure ,
+							BundleAdjustmentObservations observations ) {
+
+		if( structure.homogenous ) {
+			applyScaleToPointsHomogenous(structure);
+			// can't normalize translation because w=1 is implicit and can't be changed
+		} else {
 			computePointStatistics(structure.points);
+			applyScaleToPoints3D(structure);
+			applyScaleTranslation3D(structure);
+			// NOTE: No need to adjust observations since the scaling will be undone because it's a homogeneous coordinate
+		}
+	}
+	/**
+	 * Applies the scale transform to the input scene structure. Metric.
+	 * @param structure 3D scene
+	 * @param observations Observations of the scene
+	 */
+
+	public void applyScale( SceneStructureProjective structure ,
+							BundleAdjustmentObservations observations ) {
+		if( structure.homogenous ) {
+			applyScaleToPointsHomogenous(structure);
+			// can't normalize 4th column because w=1 is implicit and can't be changed
+		} else {
+			computePointStatistics(structure.points);
+			applyScaleToPoints3D(structure);
+			applyScaleTranslation3D(structure);
+			// NOTE: No need to adjust observations since the scaling will be undone because it's a
+			// homogeneous coordinate, e.g. (x,y,1) the last row must be 1
 		}
 	}
 
+	/**
+	 * For 3D points, computes the median value and variance along each dimension.
+	 */
 	void computePointStatistics(Point[] points ) {
 		final int length = points.length;
 		double v[] = new double[length];
@@ -112,73 +146,6 @@ public class ScaleSceneStructure {
 //		System.out.println("Scale    ="+ (desiredDistancePoint / medianDistancePoint));
 	}
 
-	public void applyScale( SceneStructureMetric structure ,
-							BundleAdjustmentObservations observations ) {
-
-		if( structure.homogenous ) {
-			applyScaleToPointsHomogenous(structure);
-			// can't normalize translation because w=1 is implicit and can't be changed
-		} else {
-			applyScaleToPoints3D(structure);
-			applyScaleTranslation3D(structure);
-			// NOTE: No need to adjust observations since the scaling will be undone because it's a homogeneous coordinate
-		}
-	}
-
-	private void applyScaleTranslation3D(SceneStructureMetric structure) {
-		double scale = desiredDistancePoint / medianDistancePoint;
-
-		Point3D_F64 c = new Point3D_F64();
-		for (int i = 0; i < structure.views.length; i++) {
-			SceneStructureMetric.View view = structure.views[i];
-
-			// X_w = R'*(X_c - T) let X_c = 0 then X_w = -R'*T is center of camera in world
-			GeometryMath_F64.multTran(view.worldToView.R,view.worldToView.T,c);
-
-			// Apply transform
-			c.x = -scale*(c.x + medianPoint.x);
-			c.y = -scale*(c.y + medianPoint.y);
-			c.z = -scale*(c.z + medianPoint.z);
-
-			// -R*T
-			GeometryMath_F64.mult(view.worldToView.R,c,view.worldToView.T);
-			view.worldToView.T.scale(-1);
-		}
-	}
-
-	void applyScaleToPoints3D(SceneStructureCommon structure) {
-		double scale = desiredDistancePoint / medianDistancePoint;
-
-		for (int i = 0; i < structure.points.length; i++) {
-			Point p = structure.points[i];
-			p.coordinate[0] = scale*(p.coordinate[0] - medianPoint.x);
-			p.coordinate[1] = scale*(p.coordinate[1] - medianPoint.y);
-			p.coordinate[2] = scale*(p.coordinate[2] - medianPoint.z);
-		}
-	}
-
-	void applyScaleToPointsHomogenous(SceneStructureCommon structure) {
-
-		Point4D_F64 p = new Point4D_F64();
-		for (int i = 0; i < structure.points.length; i++) {
-			structure.points[i].get(p);
-			p.normalize();
-			structure.points[i].set(p.x,p.y,p.z,p.w);
-		}
-	}
-
-	public void applyScale( SceneStructureProjective structure ,
-							BundleAdjustmentObservations observations ) {
-		if( structure.homogenous ) {
-			applyScaleToPointsHomogenous(structure);
-			// can't normalize 4th column because w=1 is implicit and can't be changed
-		} else {
-			applyScaleToPoints3D(structure);
-			applyScaleTranslation3D(structure);
-			// NOTE: No need to adjust observations since the scaling will be undone because it's a
-			// homogeneous coordinate, e.g. (x,y,1) the last row must be 1
-		}
-	}
 
 	private void applyScaleTranslation3D(SceneStructureProjective structure) {
 		double scale = desiredDistancePoint / medianDistancePoint;
@@ -209,6 +176,12 @@ public class ScaleSceneStructure {
 		}
 	}
 
+	/**
+	 * Undoes scale transform for metric.
+	 *
+	 * @param structure scene's structure
+	 * @param observations observations of the scene
+	 */
 	public void undoScale( SceneStructureMetric structure ,
 						   BundleAdjustmentObservations observations ) {
 
@@ -237,6 +210,12 @@ public class ScaleSceneStructure {
 		}
 	}
 
+	/**
+	 * Undoes scale transform for projective scenes
+	 *
+	 * @param structure scene's structure
+	 * @param observations observations of the scene
+	 */
 	public void undoScale( SceneStructureProjective structure ,
 						   BundleAdjustmentObservations observations ) {
 
@@ -280,6 +259,48 @@ public class ScaleSceneStructure {
 			p.coordinate[0] = p.coordinate[0]/scale + medianPoint.x;
 			p.coordinate[1] = p.coordinate[1]/scale + medianPoint.y;
 			p.coordinate[2] = p.coordinate[2]/scale + medianPoint.z;
+		}
+	}
+
+	private void applyScaleTranslation3D(SceneStructureMetric structure) {
+		double scale = desiredDistancePoint / medianDistancePoint;
+
+		Point3D_F64 c = new Point3D_F64();
+		for (int i = 0; i < structure.views.length; i++) {
+			SceneStructureMetric.View view = structure.views[i];
+
+			// X_w = R'*(X_c - T) let X_c = 0 then X_w = -R'*T is center of camera in world
+			GeometryMath_F64.multTran(view.worldToView.R,view.worldToView.T,c);
+
+			// Apply transform
+			c.x = -scale*(c.x + medianPoint.x);
+			c.y = -scale*(c.y + medianPoint.y);
+			c.z = -scale*(c.z + medianPoint.z);
+
+			// -R*T
+			GeometryMath_F64.mult(view.worldToView.R,c,view.worldToView.T);
+			view.worldToView.T.scale(-1);
+		}
+	}
+
+	void applyScaleToPoints3D(SceneStructureCommon structure) {
+		double scale = desiredDistancePoint / medianDistancePoint;
+
+		for (int i = 0; i < structure.points.length; i++) {
+			Point p = structure.points[i];
+			p.coordinate[0] = scale*(p.coordinate[0] - medianPoint.x);
+			p.coordinate[1] = scale*(p.coordinate[1] - medianPoint.y);
+			p.coordinate[2] = scale*(p.coordinate[2] - medianPoint.z);
+		}
+	}
+
+	void applyScaleToPointsHomogenous(SceneStructureCommon structure) {
+
+		Point4D_F64 p = new Point4D_F64();
+		for (int i = 0; i < structure.points.length; i++) {
+			structure.points[i].get(p);
+			p.normalize();
+			structure.points[i].set(p.x,p.y,p.z,p.w);
 		}
 	}
 }

@@ -21,10 +21,6 @@ package boofcv.alg.sfm.structure;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.alg.geo.MultiViewOps;
-import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.geo.robust.RansacMultiView;
-import boofcv.alg.sfm.structure.PairwiseImageGraph.Feature3D;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.geo.ConfigEssential;
 import boofcv.factory.geo.ConfigFundamental;
@@ -37,7 +33,6 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.Stoppable;
@@ -45,7 +40,6 @@ import org.ejml.data.DMatrixRMaj;
 
 import java.io.PrintStream;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Determines connectivity between images by exhaustively considering all possible combination of views. Assocation
@@ -68,14 +62,14 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	// Graph describing the relationship between images
 	protected PairwiseImageGraph graph = new PairwiseImageGraph();
 
-	protected ConfigEssential configEssential = new ConfigEssential();
 	protected ConfigRansac configRansac = new ConfigRansac();
+	protected ConfigEssential configEssential = new ConfigEssential();
 	protected ConfigFundamental configFundamental = new ConfigFundamental();
 
 	// Temporary storage for feature pairs which are inliers
 	protected FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class,true);
 
-	protected RansacMultiView<Se3_F64,AssociatedPair> ransacEssential;
+	protected Ransac<DMatrixRMaj,AssociatedPair> ransacEssential;
 	protected Ransac<DMatrixRMaj,AssociatedPair> ransacFundamental;
 
 	// print is verbose or not
@@ -136,6 +130,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		if( view.camera == null )
 			throw new IllegalArgumentException("Must have added the camera first");
 
+		view.index = graph.nodes.size();
 		graph.nodes.add(view);
 
 		detDesc.detect(image);
@@ -143,7 +138,6 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		// Pre-declare memory
 		view.descriptions.growArray(detDesc.getNumberOfFeatures());
 		view.observationPixels.growArray(detDesc.getNumberOfFeatures());
-		view.features3D = new Feature3D[detDesc.getNumberOfFeatures()];
 
 		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
 			Point2D_F64 p = detDesc.getLocation(i);
@@ -173,8 +167,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	 * Determines connectivity between images. Results can be found by calling {@link #getGraph()}.
 	 * @return true if successful or false if it failed
 	 */
-	public boolean process( Map<String, Point2Transform2_F64> camerasPixelToNorm,
-							Map<String, CameraPinhole> camerasIntrinsc ) {
+	public boolean process() {
 		if( graph.nodes.size() < 2 )
 			return false;
 		stopRequested = false;
@@ -208,7 +201,8 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	 * Associate features between the two views. Then compute a homography and essential matrix using LSMed. Add
 	 * features to the edge if they an inlier in essential. Save fit score of homography vs essential.
 	 */
-	protected void connectViews(PairwiseImageGraph.CameraView viewA , PairwiseImageGraph.CameraView viewB , FastQueue<AssociatedIndex> matches) {
+	protected void connectViews(PairwiseImageGraph.CameraView viewA , PairwiseImageGraph.CameraView viewB ,
+								FastQueue<AssociatedIndex> matches) {
 
 		// Estimate fundamental/essential with RANSAC
 		PairwiseImageGraph.CameraMotion edge = new PairwiseImageGraph.CameraMotion();
@@ -218,25 +212,18 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		CameraPinhole pinhole1 = viewB.camera.pinhole;
 
 		if( pinhole0 != null && pinhole1 != null ) {
-			ransacEssential.setIntrinsic(0,pinhole0);
-			ransacEssential.setIntrinsic(1,pinhole1);
 			if( !fitEpipolar(matches, viewA.observationNorm.toList(), viewB.observationNorm.toList(),ransacEssential,edge) )
 				return;
 			edge.metric = true;
 			inliersEpipolar = ransacEssential.getMatchSet().size();
-			edge.a_to_b.set( ransacEssential.getModelParameters() );
-			// scale is arbitrary. Might as well pick something which won't cause the math to blow up later on
-			edge.a_to_b.T.normalize();
+			edge.F.set(ransacEssential.getModelParameters());
 		} else if( fitEpipolar(matches,
 					viewA.observationPixels.toList(), viewB.observationPixels.toList(),
 					ransacFundamental,edge) ) {
 			// transform is only known up to a projective transform
 			edge.metric = false;
 			inliersEpipolar = ransacFundamental.getMatchSet().size();
-			// Extract the canonical projective transform
-			DMatrixRMaj F = ransacFundamental.getModelParameters();
-			DMatrixRMaj P = MultiViewOps.fundamentalToProjective(F);
-			PerspectiveOps.projectionSplit(P,edge.a_to_b.R,edge.a_to_b.T);
+			edge.F.set(ransacFundamental.getModelParameters());
 		} else {
 			return;
 		}
@@ -255,6 +242,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		// If the geometry is good for triangulation this number will be lower
 		edge.viewSrc = viewA;
 		edge.viewDst = viewB;
+		edge.index = graph.edges.size();
 		viewA.connections.add(edge);
 		viewB.connections.add(edge);
 		graph.edges.add(edge);

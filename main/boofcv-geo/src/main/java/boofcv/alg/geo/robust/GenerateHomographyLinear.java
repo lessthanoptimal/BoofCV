@@ -72,4 +72,9 @@ public class GenerateHomographyLinear implements
 	public int getMinimumPoints() {
 		return 4;
 	}
+
+	@Override
+	public double getFitScore() {
+		return 0;
+	}
 }

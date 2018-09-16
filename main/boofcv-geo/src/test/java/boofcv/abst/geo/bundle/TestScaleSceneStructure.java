@@ -44,10 +44,10 @@ public class TestScaleSceneStructure {
 	@Test
 	public void computePointStatistics() {
 		SceneStructureMetric scene = new SceneStructureMetric(false);
-		BundleAdjustmentObservations obs = createProjectiveScene(scene,0xBEEF);
+		createProjectiveScene(scene,0xBEEF);
 
 		ScaleSceneStructure alg = new ScaleSceneStructure();
-		alg.computeScale(scene);
+		alg.computePointStatistics(scene.points);
 
 		// See if it's near the center of the distribution, crudely
 		assertTrue(alg.medianPoint.distance(new Point3D_F64(0,0,3)) < 1 );

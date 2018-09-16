@@ -32,7 +32,9 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.Tuple2;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
@@ -40,6 +42,7 @@ import org.ejml.interfaces.decomposition.QRDecomposition;
 import org.ejml.simple.SimpleMatrix;
 import org.ejml.simple.SimpleSVD;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -811,7 +814,7 @@ public class MultiViewOps {
 	 *
 	 * @param F (Input) A fundamental matrix
 	 * @param e2 (Input) Left epipole of fundamental matrix, F<sup>T</sup>*e2 = 0.
-	 * @param v (Input) Arbitrary 3-vector.  Just pick some value, say (1,1,1).
+	 * @param v (Input) Arbitrary 3-vector.  Just pick some value, say (0,0,0).
 	 * @param lambda (Input) A non zero scalar.  Try one.
 	 * @return The canonical camera (projection) matrix P' (3 by 4) Known up to a projective transform.
 	 */
@@ -940,5 +943,52 @@ public class MultiViewOps {
 
 
 		return ret;
+	}
+
+	/**
+	 * <p>Computes symmetric Euclidean error for each observation and puts it into the storage. If the homography
+	 * projects the point into the plane at infinity (z=0) then it is skipped</p>
+	 *
+	 * error[i] = (H*x1 - x2')**2 + (inv(H)*x2 - x1')**2<br>
+	 *
+	 * @param observations (Input) observations
+	 * @param H (Input) Homography
+	 * @param H_inv (Input) Inverse of homography. if null it will be computed internally
+	 * @param storage (Output) storage for found errors
+	 */
+	public static void errorsHomographySymm(List<AssociatedPair> observations ,
+											DMatrixRMaj H ,
+											@Nullable DMatrixRMaj H_inv ,
+											GrowQueue_F64 storage )
+	{
+		storage.reset();
+		if( H_inv == null )
+			H_inv = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.invert(H,H_inv);
+
+		Point3D_F64 tmp = new Point3D_F64();
+
+		for (int i = 0; i < observations.size(); i++) {
+			AssociatedPair p = observations.get(i);
+
+			double dx,dy;
+			double error = 0;
+
+			GeometryMath_F64.mult(H,p.p1,tmp);
+			if( Math.abs(tmp.z) <= UtilEjml.EPS )
+				continue;
+			dx = p.p2.x - tmp.x/tmp.z;
+			dy = p.p2.y - tmp.y/tmp.z;
+			error += dx*dx + dy*dy;
+
+			GeometryMath_F64.mult(H_inv,p.p2,tmp);
+			if( Math.abs(tmp.z) <= UtilEjml.EPS )
+				continue;
+			dx = p.p1.x - tmp.x/tmp.z;
+			dy = p.p1.y - tmp.y/tmp.z;
+			error += dx*dx + dy*dy;
+
+			storage.add(error);
+		}
 	}
 }

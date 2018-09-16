@@ -565,10 +565,24 @@ public class PerspectiveOps {
 	 * @param T (Output) T = P(:,3)
 	 */
 	public static void projectionSplit( DMatrixRMaj P , DMatrixRMaj M , Vector3D_F64 T ) {
-		CommonOps_DDRM.extract(M,0,0,0,0,P);
+		CommonOps_DDRM.extract(P,0,3,0,3,M,0,0);
 		T.x = P.get(0,3);
 		T.y = P.get(1,3);
 		T.z = P.get(2,3);
+	}
+
+	/**
+	 * P = [M|T]
+	 *
+	 * @param M (Input) 3x3 matrix
+	 * @param T (Input) 3x1 vector
+	 * @param P (Output) [M,T]
+	 */
+	public static void projectionCombine( DMatrixRMaj M , Vector3D_F64 T , DMatrixRMaj P ) {
+		CommonOps_DDRM.insert(M,P,0,0);
+		P.data[3] = T.x;
+		P.data[7] = T.y;
+		P.data[11] = T.z;
 	}
 
 	/**

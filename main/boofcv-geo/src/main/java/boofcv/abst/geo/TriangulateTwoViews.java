@@ -37,7 +37,7 @@ public interface TriangulateTwoViews {
 	 * @param obsB View from position B in pixels
 	 * @param projectionA Camera matrix for view A. x = P*X
 	 * @param projectionB Camera matrix for view B. x = P*X
-	 * @param foundInA The found triangulated 3D point in A's reference frame.
+	 * @param foundInA The found triangulated 3D point in A's reference frame. Homogenous coordinates.
 	 * @return true if successful, false otherwise.
 	 */
 	boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB,

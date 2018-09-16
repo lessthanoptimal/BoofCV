@@ -97,7 +97,7 @@ public class ExampleBundleAdjustment {
 		// Scaling each variable type so that it takes on a similar numerical value. This aids in optimization
 		// Not important for this problem but is for others
 		ScaleSceneStructure bundleScale = new ScaleSceneStructure();
-		bundleScale.computeScale(parser.scene);
+		bundleScale.applyScale(parser.scene, parser.observations);
 		bundleScale.applyScale(parser.scene, parser.observations);
 		bundleAdjustment.setParameters(parser.scene, parser.observations);
 

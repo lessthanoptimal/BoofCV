@@ -18,8 +18,18 @@
 
 package boofcv.alg.sfm.structure;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
+
 /**
  * @author Peter Abeles
  */
-public class EstimateSceneSequence {
+public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
+
+	@Test
+	public void perfectScene_calibrated() {
+		fail("Implement");
+	}
+
 }

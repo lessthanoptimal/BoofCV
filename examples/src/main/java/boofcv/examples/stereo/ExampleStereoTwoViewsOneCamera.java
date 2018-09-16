@@ -155,7 +155,7 @@ public class ExampleStereoTwoViewsOneCamera {
 											   List<AssociatedPair> matchedNorm, List<AssociatedPair> inliers)
 	{
 		RansacMultiView<Se3_F64, AssociatedPair> epipolarMotion =
-				FactoryMultiViewRobust.essentialRansac(new ConfigEssential(),new ConfigRansac(200,0.5));
+				FactoryMultiViewRobust.baselineRansac(new ConfigEssential(),new ConfigRansac(200,0.5));
 		epipolarMotion.setIntrinsic(0,intrinsic);
 		epipolarMotion.setIntrinsic(1,intrinsic);
 

@@ -19,9 +19,8 @@
 package boofcv.alg.sfm;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
-import boofcv.abst.geo.bundle.SceneStructureMetric;
-import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.struct.image.ImageBase;
+import boofcv.abst.geo.bundle.SceneStructure;
+import boofcv.alg.sfm.structure.PairwiseImageGraph;
 import org.ddogleg.struct.Stoppable;
 
 /**
@@ -29,27 +28,16 @@ import org.ddogleg.struct.Stoppable;
  *
  * @author Peter Abeles
  */
-public interface EstimateSceneStructure<T extends ImageBase<T>> extends Stoppable {
+public interface EstimateSceneStructure<Structure extends SceneStructure> extends Stoppable {
+
 
 	/**
-	 * Adds a camera with unknown intrinsic parameters.
-	 *
-	 * @param cameraName Camera identifier.
+	 * Estimte the 3D structure of each point and view location given the
+	 * graph connecting each view
+	 * @param graph Describes relationship of each feature between views and epipolar geometry
+	 * @return true if successful or false if it failed
 	 */
-	void addCamera( String cameraName );
-
-	/**
-	 * Adds a camera with known intrinsic parameters.
-	 * @param cameraName Identifier for this camera.
-	 * @param intrinsic If null then camera intrinsics is assumed to be unknown
-	 * @param width Camera's width and height
-	 * @param height Camera's width and height
-	 */
-	void addCamera( String cameraName , LensDistortionNarrowFOV intrinsic , int width, int height );
-
-	void add( T image , String cameraName );
-
-	boolean estimate();
+	boolean estimate( PairwiseImageGraph graph );
 
 	/**
 	 * Returns the scene structure. Camera models will not be specified since that requires additional information
@@ -57,7 +45,7 @@ public interface EstimateSceneStructure<T extends ImageBase<T>> extends Stoppabl
 	 *
 	 * @return scene
 	 */
-	SceneStructureMetric getSceneStructure();
+	Structure getSceneStructure();
 
 	/**
 	 * Observations from each view

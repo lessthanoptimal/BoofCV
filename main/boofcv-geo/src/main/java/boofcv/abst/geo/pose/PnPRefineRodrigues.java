@@ -91,4 +91,9 @@ public class PnPRefineRodrigues implements RefinePnP {
 
 		return updated;
 	}
+
+	@Override
+	public double getFitScore() {
+		return minimizer.getFunctionValue();
+	}
 }

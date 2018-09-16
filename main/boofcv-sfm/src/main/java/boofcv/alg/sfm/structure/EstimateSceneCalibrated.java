@@ -18,28 +18,24 @@
 
 package boofcv.alg.sfm.structure;
 
-import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.geo.RefineEpipolar;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
-import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.geo.PositiveDepthConstraintCheck;
 import boofcv.alg.geo.robust.RansacMultiView;
 import boofcv.alg.sfm.EstimateSceneStructure;
-import boofcv.alg.sfm.structure.PairwiseImageGraph.CameraMotion;
-import boofcv.alg.sfm.structure.PairwiseImageGraph.CameraView;
-import boofcv.alg.sfm.structure.PairwiseImageGraph.Feature3D;
-import boofcv.alg.sfm.structure.PairwiseImageGraph.ViewState;
-import boofcv.factory.geo.EpipolarError;
+import boofcv.alg.sfm.structure.MetricSceneGraph.CameraMotion;
+import boofcv.alg.sfm.structure.MetricSceneGraph.CameraView;
+import boofcv.alg.sfm.structure.MetricSceneGraph.Feature3D;
+import boofcv.alg.sfm.structure.MetricSceneGraph.ViewState;
+import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.Point2D3D;
-import boofcv.struct.image.ImageBase;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilVector3D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -66,7 +62,7 @@ import java.util.*;
  *
  * @author Peter Abeles
  */
-public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateSceneStructure<T>
+public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStructureMetric>
 {
 	// Used to pre-maturely stop the scene estimation process
 	private volatile boolean stopRequested = false;
@@ -80,19 +76,12 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	// camera name to index
 	Map<String,Integer> cameraToIndex = new HashMap<>();
 
-	// indicates if all the cameras are calibrated or uncalibrated
-	boolean calibrated;
-
-	PairwiseImageMatching<T> imageMatching;
-
 	RansacMultiView<Se3_F64, Point2D3D> ransacPnP;
-
-	RefineEpipolar refineEpipolar;
 
 	// Triangulates the 3D coordinate of a point from two observations
 	TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 
-	PairwiseImageGraph graph;
+	MetricSceneGraph graph;
 
 	// This are the views were actually added
 	List<CameraView> viewsAdded = new ArrayList<>();
@@ -108,62 +97,21 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	// Verbose output to standard out
 	PrintStream verbose;
 
-	public EstimateSceneUnordered( PairwiseImageMatching<T> imageMatching ) {
-		this.imageMatching = imageMatching;
-	}
+	ConfigRansac configRansac = new ConfigRansac();
 
-	public EstimateSceneUnordered( DetectDescribePoint<T, TupleDesc> detDesc ) {
-		this( new PairwiseImageMatching<>(detDesc) );
-	}
-
-	EstimateSceneUnordered(){}
-
-	@Override
-	public void addCamera(String cameraName) {
-		if( camerasPixelToNorm.isEmpty() )
-			calibrated = false;
-		else if( calibrated )
-			throw new IllegalArgumentException("All cameras must be calibrated or uncalibrated");
-		camerasPixelToNorm.put( cameraName , null );
-
-		imageMatching.addCamera(cameraName);
-		cameraToIndex.put(cameraName,cameraToIndex.size());
+	public EstimateSceneCalibrated(){
+		configRansac.inlierThreshold = 1;
 	}
 
 	@Override
-	public void addCamera(String cameraName, LensDistortionNarrowFOV intrinsic, int width, int height ) {
-		if( camerasPixelToNorm.isEmpty() )
-			calibrated = true;
-		else if( !calibrated )
-			throw new IllegalArgumentException("All cameras must be calibrated or uncalibrated");
+	public boolean estimate(PairwiseImageGraph pairwiseGraph ) {
+		this.graph = new MetricSceneGraph(pairwiseGraph);
 
-		Point2Transform2_F64 pixelToNorm = intrinsic.undistort_F64(true,false);
+		for (int i = 0; i < graph.edges.size(); i++) {
+			decomposeEssential(graph.edges.get(i));
+		}
 
-		camerasPixelToNorm.put( cameraName, pixelToNorm );
-		camerasIntrinsc.put(cameraName, PerspectiveOps.estimatePinhole(pixelToNorm,width,height));
-
-		imageMatching.addCamera(cameraName,camerasPixelToNorm.get(cameraName),camerasIntrinsc.get(cameraName));
-		cameraToIndex.put(cameraName,cameraToIndex.size());
-	}
-
-	/**
-	 * Detect features inside the image and save the results
-	 * @param image
-	 */
-	@Override
-	public void add(T image , String cameraName )
-	{
-		imageMatching.addImage(image,cameraName);
-	}
-
-	@Override
-	public boolean estimate() {
 		declareModelFitting();
-
-		if( !imageMatching.process(camerasPixelToNorm,camerasIntrinsc) )
-			return false;
-		
-		graph = imageMatching.getGraph();
 
 		// TODO how is triangulation angle handled for projective?
 		for (int i = 0; i < graph.edges.size(); i++) {
@@ -183,16 +131,9 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 			CameraMotion e = graph.edges.get(i);
 			if( e.triangulationAngle > Math.PI/10 || e == baseMotion) {
 				System.out.println("   Edge "+i+" / "+graph.edges.size());
-				if( e.metric ) {
-					triangulateMetricStereoEdges(e);
-				} else {
-					// TODO handle uncalibrated case
-//					triangulateProjectiveStereoEdges(e);
-				}
+				triangulateMetricStereoEdges(e);
 			}
 		}
-
-		// TODO Upgrade all views to metric
 
 		System.out.println("Defining the coordinate system");
 		// Using the selecting coordinate frames and triangulated points define the coordinate system
@@ -210,6 +151,38 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 		convertToOutput(origin);
 
 		return viewsAdded.size() >= 2;
+	}
+
+	/**
+	 * Sets the a_to_b transform for the motion given.
+	 */
+	private void decomposeEssential( MetricSceneGraph.CameraMotion motion ) {
+		List<Se3_F64> candidates = MultiViewOps.decomposeEssential(motion.F);
+
+		int bestScore = 0;
+		Se3_F64 best = null;
+
+		PositiveDepthConstraintCheck check = new PositiveDepthConstraintCheck();
+
+		for (int i = 0; i < candidates.size(); i++) {
+			Se3_F64 a_to_b = candidates.get(i);
+			int count = 0;
+			for (int j = 0; j < motion.associated.size(); j++) {
+				AssociatedIndex a = motion.associated.get(j);
+				Point2D_F64 p0 = motion.viewSrc.observationNorm.get(a.src);
+				Point2D_F64 p1 = motion.viewDst.observationNorm.get(a.dst);
+
+				if( check.checkConstraint(p0,p1,a_to_b)) {
+					count++;
+				}
+			}
+			if( count > bestScore ) {
+				bestScore = count;
+				best = a_to_b;
+			}
+		}
+
+		motion.a_to_b.set(best);
 	}
 
 	double medianTriangulationAngle( CameraMotion edge ) {
@@ -231,12 +204,7 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	}
 
 	protected void declareModelFitting() {
-		if( calibrated ) {
-			ransacPnP = FactoryMultiViewRobust.pnpRansac(null,imageMatching.getConfigRansac());
-		} else {
-			// TODO figure out how to do  PnP in uncalibrated case
-		}
-		refineEpipolar = FactoryMultiView.fundamentalRefine(1e-32,10,EpipolarError.SAMPSON);
+		ransacPnP = FactoryMultiViewRobust.pnpRansac(null,configRansac);
 	}
 
 	/**
@@ -804,12 +772,10 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 	@Override
 	public void reset() {
 		stopRequested = false;
-		imageMatching.reset();
 	}
 
 	@Override
 	public void requestStop() {
-		imageMatching.requestStop();
 		stopRequested = true;
 	}
 
@@ -820,10 +786,5 @@ public class EstimateSceneUnordered<T extends ImageBase<T>> implements EstimateS
 
 	public void setVerbose(PrintStream verbose) {
 		this.verbose = verbose;
-		imageMatching.setVerbose(verbose);
-	}
-
-	public PairwiseImageMatching<T> getImageMatching() {
-		return imageMatching;
 	}
 }

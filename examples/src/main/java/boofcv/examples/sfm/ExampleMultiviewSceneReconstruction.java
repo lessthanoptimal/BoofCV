@@ -24,7 +24,8 @@ import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
 import boofcv.abst.geo.bundle.ScaleSceneStructure;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.sfm.structure.EstimateSceneUnordered;
+import boofcv.alg.sfm.structure.EstimateSceneCalibrated;
+import boofcv.alg.sfm.structure.PairwiseImageMatching;
 import boofcv.alg.sfm.structure.PruneStructureFromScene;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.ConfigBundleAdjustment;
@@ -73,23 +74,28 @@ public class ExampleMultiviewSceneReconstruction {
 	public void process(CameraPinholeRadial intrinsic , List<BufferedImage> colorImages ) {
 
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(null, null, null, GrayF32.class);
-		EstimateSceneUnordered<GrayF32>  estimateScene = new EstimateSceneUnordered<GrayF32>(detDesc);
-		estimateScene.setVerbose(System.out);
+		PairwiseImageMatching<GrayF32> imageMatching = new PairwiseImageMatching<>(detDesc);
 
 		String cameraName = "camera";
-		estimateScene.addCamera(cameraName,LensDistortionOps.narrow(intrinsic),intrinsic.width,intrinsic.height);
+		imageMatching.addCamera(cameraName,LensDistortionOps.narrow(intrinsic).undistort_F64(true,false),intrinsic);
 
 		for (int i = 0; i < colorImages.size(); i++) {
 			BufferedImage colorImage = colorImages.get(i);
 			if( colorImage.getWidth() != intrinsic.width || colorImage.getHeight() != intrinsic.height )
 				throw new RuntimeException("Looks like you tried to hack this example and run it on random images. Please RTFM");
 			GrayF32 image = ConvertBufferedImage.convertFrom(colorImage, (GrayF32) null);
-			estimateScene.add(image,cameraName);
+			imageMatching.addImage(image,cameraName);
 		}
 
-		if( !estimateScene.estimate() ) {
-			throw new RuntimeException("Failed to generate an initiate estimate of the scene's structure!");
+		if( !imageMatching.process() ) {
+			throw new RuntimeException("Failed to match images!");
 		}
+
+		EstimateSceneCalibrated estimateScene = new EstimateSceneCalibrated();
+		estimateScene.setVerbose(System.out);
+
+		if( !estimateScene.estimate(imageMatching.getGraph()))
+			throw new RuntimeException("Scene estimation failed");
 
 		// get the results
 		SceneStructureMetric structure = estimateScene.getSceneStructure();
@@ -120,7 +126,6 @@ public class ExampleMultiviewSceneReconstruction {
 		int pruneCycles=5;
 		for (int i = 0; i < pruneCycles; i++) {
 			System.out.println("BA + Prune iteration = "+i+"  points="+structure.points.length+"  obs="+observations.getObservationCount());
-			bundleScale.computeScale(structure);
 			bundleScale.applyScale(structure,observations);
 			sba.setParameters(structure,observations);
 			if( !sba.optimize(structure) ) {

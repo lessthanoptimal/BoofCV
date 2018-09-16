@@ -100,4 +100,9 @@ public class PnPStereoRefineRodrigues implements RefinePnPStereo {
 
 		return true;
 	}
+
+	@Override
+	public double getFitScore() {
+		return minimizer.getFunctionValue();
+	}
 }

@@ -135,7 +135,7 @@ public class FactoryMultiViewRobust {
 	 * @param lmeds Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static LeastMedianOfSquaresMultiView<Se3_F64, AssociatedPair> essentialLMedS( @Nullable ConfigEssential essential,
+	public static LeastMedianOfSquaresMultiView<Se3_F64, AssociatedPair> baselineLMedS( @Nullable ConfigEssential essential,
 																						 @Nonnull ConfigLMedS lmeds )
 	{
 		if( essential == null )
@@ -180,7 +180,7 @@ public class FactoryMultiViewRobust {
 	}
 
 	/**
-	 * Robust solution for estimating {@link Se3_F64} using epipolar geometry from two views with
+	 * Robust solution for estimating the stereo baseline {@link Se3_F64} using epipolar geometry from two views with
 	 * {@link Ransac}.  Input observations are in normalized image coordinates.
 	 *
 	 * <p>See code for all the details.</p>
@@ -189,8 +189,8 @@ public class FactoryMultiViewRobust {
 	 * @param ransac Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static RansacMultiView<Se3_F64, AssociatedPair> essentialRansac( @Nullable ConfigEssential essential,
-																			@Nonnull ConfigRansac ransac )
+	public static RansacMultiView<Se3_F64, AssociatedPair> baselineRansac(@Nullable ConfigEssential essential,
+																		  @Nonnull ConfigRansac ransac )
 	{
 		if( essential == null )
 			essential = new ConfigEssential();
@@ -214,6 +214,30 @@ public class FactoryMultiViewRobust {
 		return new RansacMultiView<>(ransac.randSeed, manager, generateEpipolarMotion, distanceSe3,
 				ransac.maxIterations, ransacTOL);
 	}
+
+	public static Ransac<DMatrixRMaj, AssociatedPair> essentialRansac(@Nullable ConfigEssential essential,
+																	  @Nonnull ConfigRansac ransac ) {
+
+		if( essential == null )
+			essential = new ConfigEssential();
+		else
+			essential.checkValidity();
+		ransac.checkValidity();
+
+		ModelManager<DMatrixRMaj> managerF = new ModelManagerEpipolarMatrix();
+		Estimate1ofEpipolar estimateF = FactoryMultiView.essential_1(essential.which,
+				essential.numResolve);
+		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
+
+		// How the error is measured
+		DistanceFromModelResidual<DMatrixRMaj,AssociatedPair> errorMetric =
+				new DistanceFromModelResidual<>(new FundamentalResidualSampson());
+
+		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold;
+
+		return new Ransac<>(ransac.randSeed, managerF, generateF, errorMetric, ransac.maxIterations, ransacTOL);
+	}
+
 
 	public static Ransac<DMatrixRMaj, AssociatedPair> fundamentalRansac(@Nonnull ConfigFundamental fundamental,
 																		@Nonnull ConfigRansac ransac ) {

@@ -23,18 +23,17 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ejml.data.DMatrixRMaj;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Graph describing the relationship between image features and 3D points.
+ * Graph describing the relationship between image features using matching features from epipolar geometry.
  *
  * @author Peter Abeles
  */
@@ -42,7 +41,6 @@ public class PairwiseImageGraph {
 
 	public List<CameraView> nodes = new ArrayList<>();
 	public List<CameraMotion> edges = new ArrayList<>();
-	public List<Feature3D> features3D = new ArrayList<>();
 	public Map<String,Camera> cameras = new HashMap<>();
 
 	static class Camera {
@@ -57,13 +55,48 @@ public class PairwiseImageGraph {
 		}
 	}
 
+	/**
+	 * Finds all the views for this particular camera
+	 * @param target camera to look up
+	 * @return found views
+	 */
+	public List<CameraView> findViews( Camera target , @Nullable List<CameraView> storage ) {
+		if( storage == null )
+			storage = new ArrayList<>();
+
+		for (int i = 0; i < nodes.size(); i++) {
+			CameraView v = nodes.get(i);
+			if( v.camera == target )
+				storage.add(v);
+		}
+		return storage;
+	}
+
+	/**
+	 * Finds all motions which are observations of this camera entirely.
+	 * @param target
+	 * @param storage
+	 * @return
+	 */
+	public List<CameraMotion> findMotions( Camera target , @Nullable List<CameraMotion> storage ) {
+		if( storage == null )
+			storage = new ArrayList<>();
+
+		for (int i = 0; i < edges.size(); i++) {
+			CameraMotion m = edges.get(i);
+			if( m.viewSrc.camera == target && m.viewDst.camera == target ) {
+				storage.add(m);
+			}
+		}
+
+		return storage;
+	}
+
 	static class CameraView {
 		Camera camera;
 		public int index;
-		public Se3_F64 viewToWorld = new Se3_F64();
-		public ViewState state = ViewState.UNPROCESSED;
 
-		public List<PairwiseImageGraph.CameraMotion> connections = new ArrayList<>();
+		public List<CameraMotion> connections = new ArrayList<>();
 
 		// feature descriptor of all features in this image
 		public FastQueue<TupleDesc> descriptions;
@@ -71,25 +104,18 @@ public class PairwiseImageGraph {
 		public FastQueue<Point2D_F64> observationPixels = new FastQueue<>(Point2D_F64.class, true);
 		public FastQueue<Point2D_F64> observationNorm = new FastQueue<>(Point2D_F64.class, true);
 
-		// Estimated 3D location for SOME of the features
-		public Feature3D[] features3D;
-
 		public CameraView(int index, FastQueue<TupleDesc> descriptions ) {
 			this.index = index;
 			this.descriptions = descriptions;
 		}
-	}
 
-	enum ViewState {
-		UNPROCESSED,
-		PENDING,
-		PROCESSED
 	}
 
 	static class CameraMotion {
-		// if the transform of both views is known then this will be scaled to be in world units
-		// otherwise it's in arbitrary units
-		public Se3_F64 a_to_b = new Se3_F64();
+		/**
+		 * 3x3 matrix describing epipolar geometry. Fundamental or Essential
+		 */
+		public DMatrixRMaj F = new DMatrixRMaj(3,3);
 
 		/** if this camera motion is known up to a metric transform. otherwise it will be projective */
 		public boolean metric;
@@ -97,36 +123,12 @@ public class PairwiseImageGraph {
 		// Which features are associated with each other and in the inlier set
 		public List<AssociatedIndex> associated = new ArrayList<>();
 
-		// 3D features triangulated from this motion alone. Features are in reference frame src
-		public List<Feature3D> stereoTriangulations = new ArrayList<>();
+		public CameraView viewSrc;
+		public CameraView viewDst;
 
-		public PairwiseImageGraph.CameraView viewSrc;
-		public PairwiseImageGraph.CameraView viewDst;
+		public int index;
 
-		// Average angle of features in this motion for triangulation
-		double triangulationAngle;
-
-		/**
-		 * Score how well this motion can be used to provide an initial set of triangulated feature points.
-		 * More features the better but you want the epipolar estimate to be a better model than homography
-		 * since the epipolar includes translation.
-		 * @return the score
-		 */
-		public double scoreTriangulation() {
-			return associated.size()*triangulationAngle;
-		}
-
-		public Se3_F64 motionSrcToDst( PairwiseImageGraph.CameraView src ) {
-			if( src == viewSrc) {
-				return a_to_b.copy();
-			} else if( src == viewDst){
-				return a_to_b.invert(null);
-			} else {
-				throw new RuntimeException("BUG!");
-			}
-		}
-
-		public PairwiseImageGraph.CameraView destination(PairwiseImageGraph.CameraView src ) {
+		public CameraView destination( CameraView src ) {
 			if( src == viewSrc) {
 				return viewDst;
 			} else if( src == viewDst){
@@ -135,17 +137,5 @@ public class PairwiseImageGraph {
 				throw new RuntimeException("BUG!");
 			}
 		}
-	}
-
-	static class Feature3D {
-		// estimate 3D position of the feature in world frame
-		public Point3D_F64 worldPt = new Point3D_F64();
-		// The acute angle between the two orientations it was triangulated from
-		public double triangulationAngle;
-		// Index of the observation in the corresponding view which the feature is visible in
-		public GrowQueue_I32 obsIdx = new GrowQueue_I32();
-		// List of views this feature is visible in
-		public List<PairwiseImageGraph.CameraView> views = new ArrayList<>();
-		public int mark = -1;
 	}
 }
