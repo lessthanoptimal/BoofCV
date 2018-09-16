@@ -48,6 +48,13 @@ public class MetricSceneGraph {
 	 * @param pairwise
 	 */
 	public MetricSceneGraph( PairwiseImageGraph pairwise ) {
+		cameras = pairwise.cameras;
+
+		for ( String key : cameras.keySet() ) {
+			if( cameras.get(key).pixelToNorm == null )
+				throw new IllegalArgumentException("All cameras must be calibrated");
+		}
+
 		for (int i = 0; i < pairwise.nodes.size(); i++) {
 			nodes.add( new CameraView());
 		}
@@ -79,8 +86,6 @@ public class MetricSceneGraph {
 			m.viewDst = nodes.get( p.viewDst.index );
 			m.F = p.F;
 		}
-
-		cameras = pairwise.cameras;
 	}
 
 	class CameraView {

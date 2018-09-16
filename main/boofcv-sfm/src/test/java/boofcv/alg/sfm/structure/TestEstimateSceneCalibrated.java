@@ -32,4 +32,64 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 		fail("Implement");
 	}
 
+	@Test
+	public void decomposeEssential() {
+		fail("Implement");
+	}
+
+	@Test
+	public void medianTriangulationAngle() {
+		fail("Implement");
+	}
+
+	@Test
+	public void addTriangulatedStereoFeatures() {
+		fail("Implement");
+	}
+
+	@Test
+	public void determineScale() {
+		fail("Implement");
+	}
+
+	@Test
+	public void determinePose() {
+		fail("Implement");
+	}
+
+	@Test
+	public void triangulateNoLocation() {
+		fail("Implement");
+	}
+
+	@Test
+	public void triangulationAngle() {
+		fail("Implement");
+	}
+
+	@Test
+	public void addUnvistedToStack() {
+		fail("Implement");
+	}
+
+	@Test
+	public void defineCoordinateSystem() {
+		fail("Implement");
+	}
+
+	@Test
+	public void selectOriginNode() {
+		fail("Implement");
+	}
+
+	@Test
+	public void selectCoordinateBase() {
+		fail("Implement");
+	}
+
+	@Test
+	public void triangulateMetricStereoEdges() {
+		fail("Implement");
+	}
+
 }

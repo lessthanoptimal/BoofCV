@@ -113,7 +113,6 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 
 		declareModelFitting();
 
-		// TODO how is triangulation angle handled for projective?
 		for (int i = 0; i < graph.edges.size(); i++) {
 			CameraMotion e = graph.edges.get(i);
 			e.triangulationAngle = medianTriangulationAngle(e);

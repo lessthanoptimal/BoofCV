@@ -73,6 +73,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 
 	// print is verbose or not
 	protected PrintStream verbose;
+	protected int verboseLevel;
 
 	public PairwiseImageMatching(DetectDescribePoint<T, TupleDesc> detDesc,
 								 AssociateDescription<TupleDesc> associate ) {
@@ -82,7 +83,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	}
 
 	protected PairwiseImageMatching(){
-		configRansac.inlierThreshold = 1e-6;
+		configRansac.inlierThreshold = 2.5;
 		configRansac.maxIterations = 4000;
 	}
 
@@ -174,7 +175,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 
 		for (int i = 0; i < graph.nodes.size(); i++) {
 			if( verbose != null )
-				verbose.println("Matching node "+i);
+				verbose.print("Matching node "+i+" -> ");
 			associate.setSource(graph.nodes.get(i).descriptions);
 			for (int j = i+1; j < graph.nodes.size(); j++) {
 				associate.setDestination(graph.nodes.get(j).descriptions);
@@ -182,9 +183,19 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 				if( associate.getMatches().size < MIN_FEATURE_ASSOCIATED )
 					continue;
 
-				connectViews(graph.nodes.get(i),graph.nodes.get(j),associate.getMatches());
+				boolean connected = connectViews(graph.nodes.get(i),graph.nodes.get(j),associate.getMatches());
+				if( verbose != null ) {
+					if( connected )
+						verbose.print("+");
+					else
+						verbose.print("-");
+				}
+
 				if( stopRequested )
 					return false;
+			}
+			if( verbose != null ) {
+				verbose.println();
 			}
 		}
 		return graph.edges.size() >= 1;
@@ -201,7 +212,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	 * Associate features between the two views. Then compute a homography and essential matrix using LSMed. Add
 	 * features to the edge if they an inlier in essential. Save fit score of homography vs essential.
 	 */
-	protected void connectViews(PairwiseImageGraph.CameraView viewA , PairwiseImageGraph.CameraView viewB ,
+	protected boolean connectViews(PairwiseImageGraph.CameraView viewA , PairwiseImageGraph.CameraView viewB ,
 								FastQueue<AssociatedIndex> matches) {
 
 		// Estimate fundamental/essential with RANSAC
@@ -215,8 +226,12 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 			ransacEssential.setIntrinsic(0,pinhole0);
 			ransacEssential.setIntrinsic(1,pinhole1);
 
-			if( !fitEpipolar(matches, viewA.observationNorm.toList(), viewB.observationNorm.toList(),ransacEssential,edge) )
-				return;
+			if( !fitEpipolar(matches, viewA.observationNorm.toList(), viewB.observationNorm.toList(),ransacEssential,edge) ) {
+				if( verbose != null && verboseLevel >= 1 ) {
+					verbose.println(" fit essential failed");
+				}
+				return false;
+			}
 			edge.metric = true;
 			inliersEpipolar = ransacEssential.getMatchSet().size();
 			edge.F.set(ransacEssential.getModelParameters());
@@ -228,18 +243,26 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 			inliersEpipolar = ransacFundamental.getMatchSet().size();
 			edge.F.set(ransacFundamental.getModelParameters());
 		} else {
-			return;
+			if( verbose != null && verboseLevel >= 1 ) {
+				verbose.println(" fit fundamental failed");
+			}
+			return false;
 		}
 
-		if( inliersEpipolar < MIN_FEATURE_ASSOCIATED )
-			return;
+		if( inliersEpipolar < MIN_FEATURE_ASSOCIATED ) {
+			if( verbose != null && verboseLevel >= 1 ) {
+				verbose.println(" too too few inliers. "+inliersEpipolar+" min="+MIN_FEATURE_ASSOCIATED+
+						" obsA="+viewA.observationNorm.size+" obsB="+viewB.observationNorm.size);
+			}
+			return false;
+		}
 
 		// If only a very small number of features are associated do not consider the view
 		double fractionA = inliersEpipolar/(double)viewA.descriptions.size;
 		double fractionB = inliersEpipolar/(double)viewB.descriptions.size;
 
 		if( fractionA < MIN_ASSOCIATE_FRACTION | fractionB < MIN_ASSOCIATE_FRACTION )
-			return;
+			return false;
 
 		// If the geometry is good for triangulation this number will be lower
 		edge.viewSrc = viewA;
@@ -249,8 +272,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		viewB.connections.add(edge);
 		graph.edges.add(edge);
 
-		if( verbose != null )
-			verbose.println("  Connected "+viewA.index+" -> "+viewB.index);
+		return true;
 	}
 
 	/**
@@ -314,7 +336,8 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		graph = new PairwiseImageGraph();
 	}
 
-	public void setVerbose(PrintStream verbose) {
+	public void setVerbose(PrintStream verbose , int level ) {
 		this.verbose = verbose;
+		this.verboseLevel = level;
 	}
 }

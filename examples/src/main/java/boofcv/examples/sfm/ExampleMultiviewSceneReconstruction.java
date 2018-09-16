@@ -82,6 +82,7 @@ public class ExampleMultiviewSceneReconstruction {
 		AssociateDescription<TupleDesc> associate =
 				FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
 		PairwiseImageMatching<GrayF32> imageMatching = new PairwiseImageMatching<>(detDesc,associate);
+		imageMatching.setVerbose(System.out,0);
 
 		String cameraName = "camera";
 		imageMatching.addCamera(cameraName,LensDistortionOps.narrow(intrinsic).undistort_F64(true,false),intrinsic);

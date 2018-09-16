@@ -237,7 +237,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 	public PairwiseImageMatching create( MockDetector detector ) {
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detector.getDescriptionType());
 		AssociateDescription<TupleDesc> associate =
-				FactoryAssociation.greedy(scorer, 2, true);
+				FactoryAssociation.greedy(scorer, 0.5, true);
 		return new PairwiseImageMatching(detector,associate);
 	}
 
