@@ -18,12 +18,17 @@
 
 package boofcv.alg.sfm.structure;
 
+import boofcv.abst.feature.associate.AssociateDescription;
+import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
+import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
+import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import georegression.geometry.UtilPoint3D_F64;
@@ -52,7 +57,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 	public void fullyConnected_calibrated() {
 
 		MockDetector detector = new MockDetector();
-		PairwiseImageMatching alg = new PairwiseImageMatching(detector);
+		PairwiseImageMatching alg = create(detector);
 		alg.getConfigRansac().maxIterations = 100;
 
 		PairwiseImageGraph graph = computeGraphScenario0(detector, alg);
@@ -62,19 +67,66 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 
 		for (int i = 0; i < graph.nodes.size(); i++) {
 			PairwiseImageGraph.CameraView n = graph.nodes.get(i);
+
 			assertEquals(4,n.connections.size());
 			assertTrue(n.observationNorm.size <= 400 && n.observationNorm.size >= 300);
 			assertEquals(n.observationPixels.size,n.observationNorm.size);
+		}
+
+		for (int i = 0; i < graph.edges.size(); i++) {
+			PairwiseImageGraph.CameraMotion e = graph.edges.get(i);
+			assertTrue(e.metric);
 		}
 	}
 
 	private PairwiseImageGraph computeGraphScenario0(MockDetector detector, PairwiseImageMatching alg) {
 		String cameraName = "camera";
 
-		Map<String, Point2Transform2_F64> camerasPixelToNorm = new HashMap<>();
+		Point2Transform2_F64 p2n = new LensDistortionRadialTangential(intrinsic).undistort_F64(true,false);
+		alg.addCamera( cameraName , p2n , intrinsic );
 
-		camerasPixelToNorm.put(cameraName, new LensDistortionRadialTangential(intrinsic).undistort_F64(true,false));
-		alg.addCamera(cameraName,camerasPixelToNorm.get(cameraName),intrinsic);
+		for (int i = 0; i < 5; i++) {
+			Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.setEulerXYZ(0,0,0,-0.5*i,0,0,null);
+
+			detector.cameraToWorld.set(cameraToWorld);
+			alg.addImage(new GrayF32(intrinsic.width,intrinsic.height),cameraName);
+		}
+
+		assertTrue(alg.process());
+
+		return alg.getGraph();
+	}
+
+	@Test
+	public void fullyConnected_uncalibrated() {
+
+		MockDetector detector = new MockDetector();
+		PairwiseImageMatching alg = create(detector);
+		alg.getConfigRansac().maxIterations = 100;
+
+		PairwiseImageGraph graph = computeGraphScenario1(detector, alg);
+
+		assertEquals(5,graph.nodes.size());
+		assertEquals(4+3+2+1,graph.edges.size());
+
+		for (int i = 0; i < graph.nodes.size(); i++) {
+			PairwiseImageGraph.CameraView n = graph.nodes.get(i);
+			assertEquals(4,n.connections.size());
+			assertEquals( 0 , n.observationNorm.size);
+			assertTrue(n.observationPixels.size <= 400 && n.observationPixels.size >= 300);
+		}
+
+		for (int i = 0; i < graph.edges.size(); i++) {
+			PairwiseImageGraph.CameraMotion e = graph.edges.get(i);
+			assertFalse(e.metric);
+		}
+	}
+
+	private PairwiseImageGraph computeGraphScenario1(MockDetector detector, PairwiseImageMatching alg) {
+		String cameraName = "camera";
+
+
+		alg.addCamera(cameraName);
 
 		for (int i = 0; i < 5; i++) {
 			Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.setEulerXYZ(0,0,0,-0.5*i,0,0,null);
@@ -89,12 +141,12 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 	}
 
 	/**
-	 * The graph will not be fully connected in this scenario
+	 * The graph will not be fully connected in this scenario. There are two independent islands
 	 */
 	@Test
 	public void withIslands() {
 		MockDetector detector = new MockDetector();
-		PairwiseImageMatching alg = new PairwiseImageMatching(detector);
+		PairwiseImageMatching alg = create(detector);
 		alg.getConfigRansac().maxIterations = 100;
 		String cameraName = "camera";
 
@@ -105,7 +157,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 
 		// there will be two independent set of views in the graph
 		for (int i = 0; i < 7; i++) {
-			double x = i < 5 ? 0 : 50+0.5*5;
+			double x = i < 5 ? 0 : 10000+0.5*5;
 			Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.setEulerXYZ(0,0,0,x-0.5*i,0,0,null);
 			detector.cameraToWorld.set(cameraToWorld);
 			alg.addImage(new GrayF32(intrinsic.width,intrinsic.height),cameraName);
@@ -132,7 +184,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 	}
 
 	@Test
-	public void fitEpipolar_calibrated() {
+	public void fitEpipolar() {
 		createWorld(2,3);
 
 		List<Point3D_F64> worldPoints = new ArrayList<>();
@@ -140,33 +192,37 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 
 		List<Point2D_F64> pointsA = new ArrayList<>();
 		List<Point2D_F64> pointsB = new ArrayList<>();
-		renderObservations(0,false,worldPoints,pointsA);
-		renderObservations(1,false,worldPoints,pointsB);
+		renderObservations(0,true,worldPoints,pointsA);
+		renderObservations(1,true,worldPoints,pointsB);
 
 		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex.class,true);
 		for (int i = 0; i < pointsA.size(); i++) {
 			matches.grow().setAssociation(i,i,0);
 		}
 
-		PairwiseImageMatching<?> alg = new PairwiseImageMatching(new MockDetector());
+		PairwiseImageMatching alg = create(new MockDetector());
 		alg.declareModelFitting();
 
 		PairwiseImageGraph.CameraMotion edge = new PairwiseImageGraph.CameraMotion();
-		alg.fitEpipolar(matches,pointsA,pointsB,alg.ransacEssential,edge);
+		alg.fitEpipolar(matches,pointsA,pointsB,alg.ransacFundamental,edge);
 
 		assertTrue(edge.associated.size() >= matches.size*0.95 );
 		assertFalse(matches.contains(edge.associated.get(0))); // it should be a copy and not have the same instance
-	}
 
-	@Test
-	public void fitEpipolar_uncalibrated() {
-		fail("Implement");
+		// see if it computed the matrix correctly
+		for (int i = 0; i < edge.associated.size(); i++) {
+			AssociatedIndex a = edge.associated.get(i);
+			Point2D_F64 p1 = pointsA.get(a.src);
+			Point2D_F64 p2 = pointsB.get(a.dst);
+
+			assertEquals(0,MultiViewOps.constraint(edge.F,p1,p2),0.001);
+		}
 	}
 
 	@Test
 	public void reset() {
 		MockDetector detector = new MockDetector();
-		PairwiseImageMatching alg = new PairwiseImageMatching(detector);
+		PairwiseImageMatching alg = create(detector);
 		alg.getConfigRansac().maxIterations = 100;
 
 		PairwiseImageGraph graph0 = computeGraphScenario0(detector, alg);
@@ -176,6 +232,13 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		assertTrue(graph0 != graph1);
 		assertEquals(graph0.nodes.size(),graph1.nodes.size());
 		assertEquals(graph0.edges.size(),graph1.edges.size());
+	}
+
+	public PairwiseImageMatching create( MockDetector detector ) {
+		ScoreAssociation scorer = FactoryAssociation.defaultScore(detector.getDescriptionType());
+		AssociateDescription<TupleDesc> associate =
+				FactoryAssociation.greedy(scorer, 2, true);
+		return new PairwiseImageMatching(detector,associate);
 	}
 
 	public class MockDetector implements DetectDescribePoint<GrayF32,TupleDesc_F64>
@@ -191,12 +254,13 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		public MockDetector() {
 			// Two sets of points so that there can be a gap in the views
 			locations3D.addAll(UtilPoint3D_F64.random(new Point3D_F64(0,0,5),
-					-2,2,-2,2,-2,2,400,rand));
-			locations3D.addAll(UtilPoint3D_F64.random(new Point3D_F64(50,0,5),
-					-2,2,-2,2,-2,2,400,rand));
+					-2,2,400,rand));
+			locations3D.addAll(UtilPoint3D_F64.random(new Point3D_F64(10000,0,5),
+					-2,2,400,rand));
 
 			for (int i = 0; i < locations3D.size(); i++) {
-				descriptions.add( new TupleDesc_F64(new double[]{rand.nextGaussian(),rand.nextGaussian()}));
+				descriptions.add( new TupleDesc_F64(new double[]{
+						5*rand.nextGaussian(),5*rand.nextGaussian(),5*rand.nextGaussian()}));
 			}
 		}
 
@@ -207,7 +271,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 
 		@Override
 		public TupleDesc_F64 createDescription() {
-			return new TupleDesc_F64(2);
+			return new TupleDesc_F64(3);
 		}
 
 		@Override

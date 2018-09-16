@@ -27,7 +27,7 @@ import static org.junit.Assert.fail;
  */
 public class TestPairwiseImageGraph {
 	@Test
-	public void CameraMotion_motionSrcToDst() {
+	public void findMotions() {
 		fail("Implement");
 	}
 

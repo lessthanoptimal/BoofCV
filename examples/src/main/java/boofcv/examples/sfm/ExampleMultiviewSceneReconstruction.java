@@ -18,6 +18,8 @@
 
 package boofcv.examples.sfm;
 
+import boofcv.abst.feature.associate.AssociateDescription;
+import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
@@ -27,6 +29,7 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.structure.EstimateSceneCalibrated;
 import boofcv.alg.sfm.structure.PairwiseImageMatching;
 import boofcv.alg.sfm.structure.PruneStructureFromScene;
+import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
@@ -36,6 +39,7 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.GrayF32;
 import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
@@ -74,7 +78,10 @@ public class ExampleMultiviewSceneReconstruction {
 	public void process(CameraPinholeRadial intrinsic , List<BufferedImage> colorImages ) {
 
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(null, null, null, GrayF32.class);
-		PairwiseImageMatching<GrayF32> imageMatching = new PairwiseImageMatching<>(detDesc);
+		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
+		AssociateDescription<TupleDesc> associate =
+				FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
+		PairwiseImageMatching<GrayF32> imageMatching = new PairwiseImageMatching<>(detDesc,associate);
 
 		String cameraName = "camera";
 		imageMatching.addCamera(cameraName,LensDistortionOps.narrow(intrinsic).undistort_F64(true,false),intrinsic);

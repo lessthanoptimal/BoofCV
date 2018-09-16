@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.GeoTestingOps;
+import boofcv.alg.geo.PerspectiveOps;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
@@ -43,13 +45,15 @@ public abstract class EpipolarTestSimulation {
 	Random rand = new Random(234234);
 
 	// create a reasonable calibration matrix
-	DMatrixRMaj K = new DMatrixRMaj(3,3,true,60,0.01,-200,0,80,-150,0,0,1);
+	protected CameraPinhole intrinsic = new CameraPinhole(60,80,0.01,200,150,400,300);
+	DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic,(DMatrixRMaj)null);
 
 	protected Se3_F64 worldToCamera;
 	protected List<Point3D_F64> worldPts;
 	protected List<AssociatedPair> pairs;
 	protected List<Point2D_F64> currentObs;
-	
+
+
 	public void init( int N , boolean isFundamental ) {
 		// define the camera's motion
 		worldToCamera = new Se3_F64();
@@ -73,7 +77,7 @@ public abstract class EpipolarTestSimulation {
 
 			if( isFundamental ) {
 				GeometryMath_F64.mult(K, pair.p1, pair.p1);
-				GeometryMath_F64.mult(K,pair.p2,pair.p2);
+				GeometryMath_F64.mult(K, pair.p2, pair.p2);
 			}
 
 			currentObs.add(pair.p2);

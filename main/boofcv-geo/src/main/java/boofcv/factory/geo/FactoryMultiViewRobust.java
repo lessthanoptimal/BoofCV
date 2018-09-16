@@ -215,8 +215,8 @@ public class FactoryMultiViewRobust {
 				ransac.maxIterations, ransacTOL);
 	}
 
-	public static Ransac<DMatrixRMaj, AssociatedPair> essentialRansac(@Nullable ConfigEssential essential,
-																	  @Nonnull ConfigRansac ransac ) {
+	public static RansacMultiView<DMatrixRMaj, AssociatedPair> essentialRansac(@Nullable ConfigEssential essential,
+																			   @Nonnull ConfigRansac ransac ) {
 
 		if( essential == null )
 			essential = new ConfigEssential();
@@ -224,18 +224,19 @@ public class FactoryMultiViewRobust {
 			essential.checkValidity();
 		ransac.checkValidity();
 
-		ModelManager<DMatrixRMaj> managerF = new ModelManagerEpipolarMatrix();
+		ModelManager<DMatrixRMaj> managerE = new ModelManagerEpipolarMatrix();
 		Estimate1ofEpipolar estimateF = FactoryMultiView.essential_1(essential.which,
 				essential.numResolve);
-		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
+		GenerateEpipolarMatrix generateE = new GenerateEpipolarMatrix(estimateF);
 
 		// How the error is measured
-		DistanceFromModelResidual<DMatrixRMaj,AssociatedPair> errorMetric =
-				new DistanceFromModelResidual<>(new FundamentalResidualSampson());
+		DistanceFromModelMultiView<DMatrixRMaj,AssociatedPair> errorMetric =
+				new DistanceMultiView_EssentialSampson();
 
 		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold;
 
-		return new Ransac<>(ransac.randSeed, managerF, generateF, errorMetric, ransac.maxIterations, ransacTOL);
+		return new RansacMultiView<>(ransac.randSeed, managerE, generateE, errorMetric,
+				ransac.maxIterations, ransacTOL);
 	}
 
 

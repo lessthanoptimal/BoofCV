@@ -56,23 +56,6 @@ public class PairwiseImageGraph {
 	}
 
 	/**
-	 * Finds all the views for this particular camera
-	 * @param target camera to look up
-	 * @return found views
-	 */
-	public List<CameraView> findViews( Camera target , @Nullable List<CameraView> storage ) {
-		if( storage == null )
-			storage = new ArrayList<>();
-
-		for (int i = 0; i < nodes.size(); i++) {
-			CameraView v = nodes.get(i);
-			if( v.camera == target )
-				storage.add(v);
-		}
-		return storage;
-	}
-
-	/**
 	 * Finds all motions which are observations of this camera entirely.
 	 * @param target
 	 * @param storage

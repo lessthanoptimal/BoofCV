@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -129,5 +129,9 @@ public class AssociatedPair {
 
 	public Point2D_F64 getP2() {
 		return p2;
+	}
+
+	public AssociatedPair copy() {
+		return new AssociatedPair(p1,p2,true);
 	}
 }

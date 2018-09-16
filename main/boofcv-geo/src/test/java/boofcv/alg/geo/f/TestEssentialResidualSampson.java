@@ -19,6 +19,7 @@
 package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.geo.AssociatedPair;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
@@ -30,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestFundamentalResidualSampson extends EpipolarTestSimulation {
+public class TestEssentialResidualSampson extends EpipolarTestSimulation {
 
 	/**
 	 * First check to see if the error is very low for perfect parameters.  Then
@@ -38,32 +39,39 @@ public class TestFundamentalResidualSampson extends EpipolarTestSimulation {
 	 */
 	@Test
 	public void checkChangeInCost() {
-		init(30,true);
+		init(30,false);
 
 		// compute true essential matrix
 		DMatrixRMaj E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
-		DMatrixRMaj F = MultiViewOps.createFundamental(E,K);
 
-		FundamentalResidualSampson alg = new FundamentalResidualSampson();
-		
+		EssentialResidualSampson alg = new EssentialResidualSampson();
+
+		alg.setCalibration1(intrinsic);
+		alg.setCalibration2(intrinsic);
+
 		// see if it returns no error for the perfect model
-		alg.setModel(F);
+		alg.setModel(E);
 		for(AssociatedPair p : pairs ) {
 			assertEquals(0, alg.computeResidual(p), 1e-8);
 		}
 
-		// Make sure the point ordering is consistent, e.g. x2'*F*x1 and NOT x1'*F*x2
-		assertEquals(0,MultiViewOps.constraint(F,pairs.get(0).p1,pairs.get(0).p2), UtilEjml.TEST_F64);
+		// Make sure the point ordering is consistent, e.g. x2'*E*x1 and NOT x1'*E*x2
+		assertEquals(0,MultiViewOps.constraint(E,pairs.get(0).p1,pairs.get(0).p2), UtilEjml.TEST_F64);
 
 		// see if the error is in pixels or not
 		AssociatedPair tmpPair = pairs.get(0).copy();
+		PerspectiveOps.convertNormToPixel(intrinsic,tmpPair.p1,tmpPair.p1);
+		PerspectiveOps.convertNormToPixel(intrinsic,tmpPair.p2,tmpPair.p2);
 		tmpPair.p1.x+=2;
 		tmpPair.p1.y-=2;
+		PerspectiveOps.convertPixelToNorm(intrinsic,tmpPair.p1,tmpPair.p1);
+		PerspectiveOps.convertPixelToNorm(intrinsic,tmpPair.p2,tmpPair.p2);
+
 		assertTrue(Math.abs(alg.computeResidual(tmpPair)) > 1);
 		
 		// now make it a bit off
-		F.data[1] += 0.1;
-		alg.setModel(F);
+		E.data[1] += 0.1;
+		alg.setModel(E);
 		for(AssociatedPair p : pairs ) {
 			assertTrue(Math.abs(alg.computeResidual(p)) > 1e-8);
 		}

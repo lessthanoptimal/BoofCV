@@ -19,9 +19,8 @@
 package boofcv.alg.sfm.structure;
 
 import boofcv.abst.feature.associate.AssociateDescription;
-import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.factory.feature.associate.FactoryAssociation;
+import boofcv.alg.geo.robust.RansacMultiView;
 import boofcv.factory.geo.ConfigEssential;
 import boofcv.factory.geo.ConfigFundamental;
 import boofcv.factory.geo.ConfigRansac;
@@ -69,23 +68,22 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	// Temporary storage for feature pairs which are inliers
 	protected FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class,true);
 
-	protected Ransac<DMatrixRMaj,AssociatedPair> ransacEssential;
+	protected RansacMultiView<DMatrixRMaj,AssociatedPair> ransacEssential;
 	protected Ransac<DMatrixRMaj,AssociatedPair> ransacFundamental;
 
 	// print is verbose or not
 	protected PrintStream verbose;
 
-	public PairwiseImageMatching(DetectDescribePoint<T, TupleDesc> detDesc) {
+	public PairwiseImageMatching(DetectDescribePoint<T, TupleDesc> detDesc,
+								 AssociateDescription<TupleDesc> associate ) {
 		this();
 		this.detDesc = detDesc;
-		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
-		associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
+		this.associate = associate;
 	}
 
 	protected PairwiseImageMatching(){
-		configRansac.inlierThreshold = 2.5;
+		configRansac.inlierThreshold = 1e-6;
 		configRansac.maxIterations = 4000;
-		declareModelFitting();
 	}
 
 	protected void declareModelFitting() {
@@ -172,6 +170,8 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 			return false;
 		stopRequested = false;
 
+		declareModelFitting();
+
 		for (int i = 0; i < graph.nodes.size(); i++) {
 			if( verbose != null )
 				verbose.println("Matching node "+i);
@@ -212,6 +212,9 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		CameraPinhole pinhole1 = viewB.camera.pinhole;
 
 		if( pinhole0 != null && pinhole1 != null ) {
+			ransacEssential.setIntrinsic(0,pinhole0);
+			ransacEssential.setIntrinsic(1,pinhole1);
+
 			if( !fitEpipolar(matches, viewA.observationNorm.toList(), viewB.observationNorm.toList(),ransacEssential,edge) )
 				return;
 			edge.metric = true;
@@ -227,7 +230,6 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		} else {
 			return;
 		}
-
 
 		if( inliersEpipolar < MIN_FEATURE_ASSOCIATED )
 			return;
@@ -298,6 +300,10 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 
 	public ConfigEssential getConfigEssential() {
 		return configEssential;
+	}
+
+	public ConfigFundamental getConfigFundamental() {
+		return configFundamental;
 	}
 
 	public ConfigRansac getConfigRansac() {

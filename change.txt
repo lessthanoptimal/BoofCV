@@ -20,6 +20,7 @@ Version : 0.31
  * Thanks Frank Jakop for the suggestion
 - Geometry
  * Projective triangulation for uncalibrated cameras
+ * Added EssentialResidualSampson for computing sampson error in pixels for calibrated cameras
 - Sparse Bundle Adjustment
  * Most basic version using DDogleg and EJML sparse LM solver
  * Works with calibrated pinhole camera
