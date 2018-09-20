@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -117,7 +117,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 
 			undoRadial.apply(in,out);
 		}
-		undistorted = ConvertBufferedImage.checkDeclare(origMS.width,origMS.height,undistorted,BufferedImage.TYPE_INT_RGB);
+		undistorted = ConvertBufferedImage.checkDeclare(origMS.width,origMS.height,undistorted,image.getType());
 
 		ConvertBufferedImage.convertTo(correctedMS,undistorted,true);
 	}
