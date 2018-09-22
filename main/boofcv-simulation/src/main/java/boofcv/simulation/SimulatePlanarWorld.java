@@ -44,6 +44,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import georegression.struct.shapes.Rectangle2D_I32;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
@@ -74,7 +75,8 @@ public class SimulatePlanarWorld {
 
 	float background = 0;
 
-	CameraPinhole tmp;
+	// work space
+	Point2D_F64 pixel = new Point2D_F64();
 
 	public void setCamera( CameraUniversalOmni model ) {
 		LensDistortionWideFOV factory = new LensDistortionUniversalOmni(model);
@@ -88,7 +90,6 @@ public class SimulatePlanarWorld {
 	public void setCamera( CameraPinhole model ) {
 		LensDistortionNarrowFOV factory = new LensDistortionPinhole(model);
 		setCamera( factory, model.width, model.height );
-		tmp = model;
 	}
 
 	public void setCamera( CameraPinholeRadial model ) {
@@ -165,28 +166,39 @@ public class SimulatePlanarWorld {
 		scene.clear();
 	}
 
-	public void render() {
-
-		for (int i = 0; i < scene.size(); i++) {
-			SurfaceRect r = scene.get(i);
-
-			r.rectInCamera();
-		}
-
+	public void render()
+	{
 		LineParametric3D_F64 ray = new LineParametric3D_F64();
 
 		ImageMiscOps.fill(output,background);
-		int index = 0;
-		for (int y = 0; y < output.height; y++) {
-			for (int x = 0; x < output.width; x++, index += 3) {
-				if( Float.isNaN(depthMap.unsafe_get(x,y)))
+		ImageMiscOps.fill(depthMap,Float.MAX_VALUE);
+
+		for (int i = 0; i < scene.size(); i++) {
+			SurfaceRect r = scene.get(i);
+			r.rectInCamera();
+
+			if( !r.visible )
+				continue;
+
+			for (int y = r.pixelRect.y0; y < r.pixelRect.y1; y++) {
+				if( y < 0 || y >= output.height )
 					continue;
-				ray.slope.x = pointing[index  ];
-				ray.slope.y = pointing[index+1];
-				ray.slope.z = pointing[index+2];
-				renderPixel(ray,x,y);
+				for (int x = r.pixelRect.x0; x < r.pixelRect.x1; x++) {
+					if( x < 0 || x >= output.width )
+						continue;
+
+					if( Float.isNaN(depthMap.unsafe_get(x,y)))
+						continue;
+					int index = (y*output.width + x)*3;
+					ray.slope.x = pointing[index  ];
+					ray.slope.y = pointing[index+1];
+					ray.slope.z = pointing[index+2];
+					renderPixel(ray,r,x,y);
+				}
 			}
 		}
+
+
 	}
 
 	Vector3D_F64 _u = new Vector3D_F64();
@@ -194,49 +206,37 @@ public class SimulatePlanarWorld {
 	Vector3D_F64 _n = new Vector3D_F64();
 	Vector3D_F64 _w0 = new Vector3D_F64();
 
-	void renderPixel( LineParametric3D_F64 ray , int x , int y ) {
-		double minDepth = Double.MAX_VALUE;
+	void renderPixel( LineParametric3D_F64 ray , SurfaceRect r, int x , int y ) {
+		// See if it intersects at a unique point and is positive in value
+		if( 1 == Intersection3D_F64.intersectConvex(r.rect3D,ray,p3,_u,_v,_n,_w0)) {
 
-		for (int i = 0; i < scene.size(); i++) {
-			SurfaceRect r = scene.get(i);
+			// only care about intersections in front of the camera and closer that what was previously seen
+			double depth = p3.z;
+			if( depth <= 0 || depth >= depthMap.unsafe_get(x,y) )
+				return;
 
-			// see if the surface is facing the camera
-			if( r.normal.z >= 0 )
-				continue;
+			// convert the point into rect coordinates
+			SePointOps_F64.transformReverse(r.rectToCamera, p3, p3);
 
-			// See if it intersects at a unique point and is positive in value
-			if( 1 == Intersection3D_F64.intersectConvex(r.rect3D,ray,p3,_u,_v,_n,_w0)) {
+			if (Math.abs(p3.z) > 0.001)
+				throw new RuntimeException("BUG!");
 
-				// only care about intersections in front of the camera
-				double depth = p3.z;
-				if( depth >= minDepth) // is this necessary?
-					continue;
+			// now into surface pixels.
+			// but we have some weirdness due to image coordinate being +y down but normal coordinates +y up
+			p3.x += r.width3D / 2;
+			p3.y += r.height3D / 2;
 
-				minDepth = depth;
+			// pixel coordinate on the surface
+			double surfaceX = p3.x * r.texture.width / r.width3D;
+			double surfaceY = p3.y * r.texture.height / r.height3D;
 
-				// convert the point into rect coordinates
-				SePointOps_F64.transformReverse(r.rectToCamera, p3, p3);
-
-				if (Math.abs(p3.z) > 0.001)
-					throw new RuntimeException("BUG!");
-
-				// now into surface pixels.
-				// but we have some weirdness due to image coordinate being +y down but normal coordinates +y up
-				p3.x += r.width3D / 2;
-				p3.y += r.height3D / 2;
-
-				// pixel coordinate on the surface
-				double surfaceX = p3.x * r.texture.width / r.width3D;
-				double surfaceY = p3.y * r.texture.height / r.height3D;
-
-				if( surfaceX < r.texture.width && surfaceY < r.texture.height ) {
-					interp.setImage(r.texture);
-					float value = interp.get((float) surfaceX, (float) surfaceY);
-					output.unsafe_set(x, y, value);
-				}
+			if( surfaceX < r.texture.width && surfaceY < r.texture.height ) {
+				interp.setImage(r.texture);
+				float value = interp.get((float) surfaceX, (float) surfaceY);
+				output.unsafe_set(x, y, value);
+				depthMap.unsafe_set(x,y,(float)depth);
 			}
 		}
-		depthMap.unsafe_set(x,y,(float)minDepth);
 	}
 
 	public SurfaceRect getImageRect(int which ) {
@@ -271,8 +271,14 @@ public class SimulatePlanarWorld {
 		double width3D;
 		double height3D;
 
+		// 3D point of corners in camera frame
 		FastQueue<Point3D_F64> rect3D = new FastQueue<>(Point3D_F64.class,true);
+		// 2D point of corners in surface frame
 		Polygon2D_F64 rect2D = new Polygon2D_F64();
+		// bounding box of visible region in pixels
+		Rectangle2D_I32 pixelRect = new Rectangle2D_I32();
+		// true if its visible
+		boolean visible;
 
 		/**
 		 * Computes the location of the surface's rectangle in the camera reference frame
@@ -282,7 +288,9 @@ public class SimulatePlanarWorld {
 
 			// surface normal in world frame
 			normal.set(0,0,1);
-			GeometryMath_F64.mult(rectToWorld.R,normal,normal);
+			GeometryMath_F64.mult(rectToCamera.R,normal,normal);
+
+			visible = normal.z < 0;
 
 			double imageRatio = texture.height/(double) texture.width;
 			height3D = width3D*imageRatio;
@@ -294,6 +302,38 @@ public class SimulatePlanarWorld {
 			rect2D.set(3,width3D/2,-height3D/2);
 
 			UtilShape3D_F64.polygon2Dto3D(rect2D,rectToCamera,rect3D);
+
+			pixelRect.set(Integer.MAX_VALUE,Integer.MAX_VALUE,Integer.MIN_VALUE,Integer.MIN_VALUE);
+
+			for (int i = 0,j=3; i < 4; j=i,i++) {
+				Point3D_F64 a = rect3D.get(j);
+				Point3D_F64 b = rect3D.get(i);
+
+				for (int k = 0; k < 50; k++) {
+					double w = k/50.0;
+					p3.x = a.x*(1-w) + b.x*w;
+					p3.y = a.y*(1-w) + b.y*w;
+					p3.z = a.z*(1-w) + b.z*w;
+
+					p3.divideIP(p3.norm());
+
+					sphereToPixel.compute(p3.x,p3.y,p3.z,pixel);
+					int x = (int)Math.round(pixel.x);
+					int y = (int)Math.round(pixel.y);
+
+					pixelRect.x0 = Math.min(pixelRect.x0,x);
+					pixelRect.y0 = Math.min(pixelRect.y0,y);
+					pixelRect.x1 = Math.max(pixelRect.x1,x+1);
+					pixelRect.y1 = Math.max(pixelRect.y1,y+1);
+				}
+			}
+			// it's an approximation so add in some fudge room
+			pixelRect.x0 -= 2;
+			pixelRect.x1 += 2;
+			pixelRect.y0 -= 2;
+			pixelRect.y1 += 2;
+
+//			System.out.println("PixelRect "+pixelRect);
 		}
 	}
 

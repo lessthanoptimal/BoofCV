@@ -174,7 +174,6 @@ public class TestSimulatePlanarWorld {
 		int y1 = (int)Math.max(p0.y,p1.y);
 		int xm = (x0+x1)/2;
 		int ym = (y0+y1)/2;
-		double area = (x1-x0)*(y1-y0)/4.0;
 
 		double regionAA = image.get((x0+xm)/2,(y0+ym)/2);
 		double regionAB = image.get((x0+xm)/2,(ym+y1)/2);
