@@ -30,6 +30,7 @@ import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -66,8 +67,7 @@ public class TestBaseDetectFiducialSquare {
 		simulator.setCamera(intrinsic);
 
 		double simulatedTargetWidth = 0.4;
-		Se3_F64 markerToWorld = new Se3_F64();
-		markerToWorld.T.set(0,0,0.32);
+		Se3_F64 markerToWorld = SpecialEuclideanOps_F64.setEulerXYZ(0,Math.PI,0,0,0,0.32,null);
 
 
 		GrayF32 pattern = new GrayF32(100,100);
@@ -75,7 +75,7 @@ public class TestBaseDetectFiducialSquare {
 		ImageMiscOps.fillRectangle(pattern,255,25,25,50,50);
 		simulator.setBackground(255);
 		simulator.resetScene();
-		simulator.addTarget(markerToWorld, simulatedTargetWidth, pattern);
+		simulator.addSurface(markerToWorld, simulatedTargetWidth, pattern);
 		simulator.render();
 
 //		ShowImages.showWindow(simulator.getOutput(),"Simulated");

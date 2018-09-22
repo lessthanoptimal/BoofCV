@@ -33,6 +33,9 @@ Version : 0.31
  * Greatly improved BoofCV's built in point cloud viewer. Runs better than JavaFX
 - Thresholding
   * Added NICK thresholding for old documents
+- SimulatePlanarWorld
+  * Only renders surface when the normal is facing the camera
+  * Added unit tests to ensure that all flipping/mirroring is handled correctly
 - TODO update examples to use the new contour algorithm
 
 

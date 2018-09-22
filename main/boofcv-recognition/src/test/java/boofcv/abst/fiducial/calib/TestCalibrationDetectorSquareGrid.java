@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,6 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationDetectorChecks {
-
-	private final static ConfigSquareGrid config = new ConfigSquareGrid(3, 2, 30,30);
 
 	public TestCalibrationDetectorSquareGrid() {
 		targetConfigs.add(  new ConfigSquareGrid(3, 2, 30,30) );

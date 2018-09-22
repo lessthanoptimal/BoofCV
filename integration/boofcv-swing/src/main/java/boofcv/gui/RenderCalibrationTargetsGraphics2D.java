@@ -100,6 +100,22 @@ public class RenderCalibrationTargetsGraphics2D extends RenderCalibrationTargets
 		g2.fill(ellipse);
 	}
 
+	public double getWidthWorld() {
+		return bufferred.getWidth()/unitsToPixels;
+	}
+
+	public double getHeightWorld() {
+		return bufferred.getHeight()/unitsToPixels;
+	}
+
+	public int getOffsetX() {
+		return offsetX;
+	}
+
+	public int getOffsetY() {
+		return offsetY;
+	}
+
 	public GrayU8 getGrayU8() {
 		GrayU8 gray = new GrayU8(bufferred.getWidth(),bufferred.getHeight());
 		ConvertBufferedImage.convertFrom(bufferred,gray);

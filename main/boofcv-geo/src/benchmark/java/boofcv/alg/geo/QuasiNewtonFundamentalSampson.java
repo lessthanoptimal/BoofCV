@@ -57,7 +57,7 @@ public class QuasiNewtonFundamentalSampson implements RefineEpipolar {
 
 		param = new double[paramModel.getParamLength()];
 
-		minimizer = FactoryOptimization.unconstrained();
+		minimizer = FactoryOptimization.quasiNewtonBfgs(null);
 	}
 
 	@Override
