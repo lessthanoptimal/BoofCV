@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,17 +18,15 @@
 
 package boofcv.factory.fiducial;
 
-import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
-import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for {@link SquareBinary_to_FiducialDetector}.
+ * Configuration for {@link boofcv.abst.fiducial.SquareImage_to_FiducialDetector}.
  *
- * @see DetectFiducialSquareBinary
+ * @see boofcv.alg.fiducial.square.DetectFiducialSquareImage
  *
  * @author Peter Abeles
  */

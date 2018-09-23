@@ -31,6 +31,8 @@ import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageGray;
 
+import javax.annotation.Nullable;
+
 /**
  * Factory for creating fiducial detectors which implement {@link FiducialDetector}.
  *
@@ -50,7 +52,7 @@ public class FactoryFiducial {
 	 */
 	public static <T extends ImageGray<T>>
 	SquareBinary_to_FiducialDetector<T> squareBinary( ConfigFiducialBinary configFiducial,
-													  ConfigThreshold configThreshold,
+													  @Nullable ConfigThreshold configThreshold,
 													  Class<T> imageType ) {
 
 		if( configThreshold == null ) {
@@ -79,15 +81,19 @@ public class FactoryFiducial {
 	 *
 	 * @see DetectFiducialSquareImage DetectFiducialSquareImage for a description of this fiducial type.
 	 *
-	 * @param configFiducial Description of the fiducial.  Can't be null.
+	 * @param configFiducial Description of the fiducial. null for default.
 	 * @param configThreshold Threshold for binary image. null for default.
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
 	public static  <T extends ImageGray<T>>
-	SquareImage_to_FiducialDetector<T> squareImage( ConfigFiducialImage configFiducial,
-													ConfigThreshold configThreshold,
-													Class<T> imageType ) {
+	SquareImage_to_FiducialDetector<T> squareImage( @Nullable ConfigFiducialImage configFiducial,
+													@Nullable ConfigThreshold configThreshold,
+													Class<T> imageType )
+	{
+		if( configFiducial == null ) {
+			configFiducial = new ConfigFiducialImage();
+		}
 
 		if( configThreshold == null ) {
 			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,21);
