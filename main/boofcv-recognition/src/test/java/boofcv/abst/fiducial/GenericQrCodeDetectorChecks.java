@@ -76,13 +76,13 @@ public abstract class GenericQrCodeDetectorChecks {
 
 		simulator.resetScene();
 		Se3_F64 markerToWorld = new Se3_F64();
-		simulator.addTarget(markerToWorld, simulatedTargetWidth, generateMarker());
+		simulator.addSurface(markerToWorld, simulatedTargetWidth, generateMarker());
 
 		markerToWorld.T.set(0, 0, 0.5);
 
 		for (int i = 0; i < 30; i++) {
 			double roll = 2*Math.PI*i/30.0;
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,0,roll,markerToWorld.R);
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI,roll,markerToWorld.R);
 			renderAndCheck(detector, simulator);
 		}
 	}
@@ -100,14 +100,14 @@ public abstract class GenericQrCodeDetectorChecks {
 
 		simulator.resetScene();
 		Se3_F64 markerToWorld = new Se3_F64();
-		simulator.addTarget(markerToWorld, simulatedTargetWidth, generateMarker());
+		simulator.addSurface(markerToWorld, simulatedTargetWidth, generateMarker());
 
 		markerToWorld.T.set(0, 0, 0.5);
 
 		for (int i = 0; i < 30; i++) {
 			double roll = 2*Math.PI*i/30.0;
 			double pitch = Math.PI*0.3;
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,pitch,0,roll,markerToWorld.R);
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,pitch,Math.PI,roll,markerToWorld.R);
 			renderAndCheck(detector, simulator);
 		}
 	}
@@ -125,8 +125,9 @@ public abstract class GenericQrCodeDetectorChecks {
 
 		simulator.resetScene();
 		Se3_F64 markerToWorld = new Se3_F64();
-		simulator.addTarget(markerToWorld, simulatedTargetWidth, generateMarker());
+		simulator.addSurface(markerToWorld, simulatedTargetWidth, generateMarker());
 
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI,0,markerToWorld.R);
 		markerToWorld.T.set(0, 0, 0.3);
 
 		for (int i = 0; i < 30; i++) {
@@ -149,10 +150,12 @@ public abstract class GenericQrCodeDetectorChecks {
 		simulator.resetScene();
 		Se3_F64 markerToWorld0 = new Se3_F64();
 		Se3_F64 markerToWorld1 = new Se3_F64();
-		simulator.addTarget(markerToWorld0, simulatedTargetWidth, generateMarker());
-		simulator.addTarget(markerToWorld1, simulatedTargetWidth, generateMarker());
+		simulator.addSurface(markerToWorld0, simulatedTargetWidth, generateMarker());
+		simulator.addSurface(markerToWorld1, simulatedTargetWidth, generateMarker());
 
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI,0,markerToWorld0.R);
 		markerToWorld0.T.set(0.2, 0, 0.6);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI,0,markerToWorld1.R);
 		markerToWorld1.T.set(-0.2, 0, 0.6);
 
 		simulator.render();

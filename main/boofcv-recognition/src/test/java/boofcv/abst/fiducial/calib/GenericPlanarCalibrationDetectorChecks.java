@@ -35,6 +35,7 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.junit.Test;
 
 import java.awt.*;
@@ -56,8 +57,8 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	double simulatedTargetWidth = 0.3; // size of target in simulated world
 
-	boolean visualizeFailures = false;
-	long visualizeTime = 2000;
+	boolean visualizeFailures = true;
+	long visualizeTime = 20000;
 
 	int failedToDetect;
 	double fisheyeAllowedFails = 0;
@@ -71,28 +72,30 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	protected void createFisheyePoses() {
 		Se3_F64 markerToWorld = new Se3_F64();
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI+0.2,0,markerToWorld.R);
+
 		// up close exploding - center
-		markerToWorld.T.set(0,0,0.08);
+		markerToWorld.T.set(0,0,0.12);
 		fisheye_poses.add(markerToWorld.copy());
 
 		// up close exploding - left
-		markerToWorld.T.set(0.1,0,0.08);
+		markerToWorld.T.set(0.1,0,0.12);
 		fisheye_poses.add(markerToWorld.copy());
 
 		markerToWorld.T.set(0.25,0,0.2);
 		fisheye_poses.add(markerToWorld.copy());
 
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-0.2,0,markerToWorld.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI-0.2,0,markerToWorld.getR());
 		fisheye_poses.add(markerToWorld.copy());
 
-		markerToWorld.T.set(0.3,0,0.05);
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0,markerToWorld.getR());
+		markerToWorld.T.set(0.3,0,0.2);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI+.5,0,markerToWorld.getR());
 		fisheye_poses.add(markerToWorld.copy());
 
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0.5,markerToWorld.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI+.5,0.5,markerToWorld.getR());
 		fisheye_poses.add(markerToWorld.copy());
 
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0.7,markerToWorld.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI+.5,0.7,markerToWorld.getR());
 		fisheye_poses.add(markerToWorld.copy());
 	}
 
@@ -125,7 +128,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 			simulator.resetScene();
 			Se3_F64 markerToWorld = new Se3_F64();
-			simulator.addTarget(markerToWorld, simulatedTargetWidth,pattern);
+			simulator.addSurface(markerToWorld, simulatedTargetWidth,pattern);
 
 			failedToDetect = 0;
 			for( int j = 0; j < fisheye_poses.size(); j++ ) {
@@ -141,6 +144,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 									  SimulatePlanarWorld simulator ,
 									  List<Point2D_F64> locations2D )
 	{
+//		System.out.println("checkRendered");
 		simulator.render();
 
 //		visualize(simulator, locations2D, null);
@@ -238,7 +242,8 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 			simulator.resetScene();
 			Se3_F64 markerToWorld = new Se3_F64();
-			simulator.addTarget(markerToWorld, simulatedTargetWidth, pattern);
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI,0,markerToWorld.R);
+			simulator.addSurface(markerToWorld, simulatedTargetWidth, pattern);
 
 			// up close exploding - center
 			markerToWorld.T.set(0, 0, 0.5);
@@ -251,25 +256,25 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 			markerToWorld.T.set(-0.33, 0, 1);
 			checkRenderedResults(detector, simulator, locations2D);
 
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0,markerToWorld.getR());
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI-1,0,markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0.8,markerToWorld.getR());
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI-1,0.8,markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 
 			markerToWorld.T.set(-0.33, 0.33, 1);
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-1,0.8,markerToWorld.getR());
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI-1,0.8,markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 
 			markerToWorld.T.set(0, -0.20, 1);
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.8,-1,0.8,markerToWorld.getR());
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.8,Math.PI,0.8,markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.8,-1,1.8,markerToWorld.getR());
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.8,Math.PI,1.8,markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 
 			markerToWorld.T.set(0, -0.15, 1);
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.2,-1,2.4,markerToWorld.getR());
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.2,Math.PI,2.4,markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 		}
 		assertEquals(0,failedToDetect);
@@ -287,9 +292,8 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(model);
 
-		Se3_F64 markerToWorld = new Se3_F64();
-		markerToWorld.T.set(0, 0, 0.5);
-		simulator.addTarget(markerToWorld, simulatedTargetWidth, pattern);
+		Se3_F64 markerToWorld = SpecialEuclideanOps_F64.setEulerXYZ(0,Math.PI,0,0, 0, 0.5,null);
+		simulator.addSurface(markerToWorld, simulatedTargetWidth, pattern);
 		simulator.render();
 
 		return simulator.getOutput();
