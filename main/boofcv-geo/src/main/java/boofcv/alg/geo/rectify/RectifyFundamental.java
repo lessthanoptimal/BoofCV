@@ -34,7 +34,7 @@ import java.util.List;
  * Rectifies a stereo pair given a fundamental or essential matrix.  The rectification ensures that
  * the epipolar lines project to infinity along the x-axis. The computed transforms are designed to
  * minimize the range of disparity between the two images. For this technique to work
- * the epipoles must lie outside of both images.  See [1] for algorithmic details.
+ * the epipoles must lie outside of both images.  See [1,2] for algorithmic details.
  * </p>
  *
  * <p>
@@ -44,10 +44,11 @@ import java.util.List;
  * error.  Removing lens distortion from the image is recommended.
  * </p>
  *
- * <p>
- * [1] R. Hartley, "Theory and Practice of Projective Rectification", International Journal of Computer Vision,
- * vol 35, no 2, pages 115-127, 1999.
- * </p>
+ * <ol>
+ * <li> R. Hartley, "Theory and Practice of Projective Rectification", International Journal of Computer Vision,
+ * vol 35, no 2, pages 115-127, 1999.</li>
+ * <li>Page 305 in R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
+ * </ul>
  *
  * @author Peter Abeles
  */
@@ -125,9 +126,9 @@ public class RectifyFundamental {
 	}
 
 	/**
-	 * Apply a rotation such that the epipole  is equal to [f,0,1)\
+	 * Apply a rotation such that the epipole  is equal to [f,0,1]
 	 */
-	private SimpleMatrix rotateEpipole( Point3D_F64 epipole , int x0 , int y0 )
+	static SimpleMatrix rotateEpipole( Point3D_F64 epipole , int x0 , int y0 )
 	{
 		// compute rotation which will set
 		// x * sin(theta) + y * cos(theta) = 0
@@ -169,6 +170,7 @@ public class RectifyFundamental {
 	 */
 	private SimpleMatrix computeAffineH( List<AssociatedPair> observations ,
 										 DMatrixRMaj H , DMatrixRMaj Hzero ) {
+
 		SimpleMatrix A = new SimpleMatrix(observations.size(),3);
 		SimpleMatrix b = new SimpleMatrix(A.numRows(),1);
 

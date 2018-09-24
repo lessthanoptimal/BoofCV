@@ -23,16 +23,10 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.abst.geo.fitting.DistanceFromModelResidual;
-import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
-import boofcv.abst.geo.fitting.ModelManagerEpipolarMatrix;
-import boofcv.alg.geo.f.FundamentalResidualSampson;
 import boofcv.examples.features.ExampleAssociatePoints;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.factory.geo.EnumFundamental;
-import boofcv.factory.geo.EpipolarError;
-import boofcv.factory.geo.FactoryMultiView;
+import boofcv.factory.geo.*;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -42,11 +36,11 @@ import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import org.ddogleg.fitting.modelset.ModelFitter;
-import org.ddogleg.fitting.modelset.ModelManager;
-import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.NormOps_DDRM;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -80,33 +74,28 @@ public class ExampleFundamentalMatrix {
 	public static DMatrixRMaj robustFundamental( List<AssociatedPair> matches ,
 													List<AssociatedPair> inliers ) {
 
-		// used to create and copy new instances of the fit model
-		ModelManager<DMatrixRMaj> managerF = new ModelManagerEpipolarMatrix();
-		// Select which linear algorithm is to be used.  Try playing with the number of remove ambiguity points
-		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(EnumFundamental.LINEAR_7, 2);
-		// Wrapper so that this estimator can be used by the robust estimator
-		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
+		ConfigRansac configRansac = new ConfigRansac();
+		configRansac.inlierThreshold = 0.2;
+		configRansac.maxIterations = 2000;
+		ConfigFundamental configFundamental = new ConfigFundamental();
+		configFundamental.which = EnumFundamental.LINEAR_7;
+		configFundamental.numResolve = 2;
 
-		// How the error is measured
-		DistanceFromModelResidual<DMatrixRMaj,AssociatedPair> errorMetric =
-				new DistanceFromModelResidual<>(new FundamentalResidualSampson());
-
-		// Use RANSAC to estimate the Fundamental matrix
-		ModelMatcher<DMatrixRMaj,AssociatedPair> robustF =
-				new Ransac<>(123123, managerF, generateF, errorMetric, 6000, 0.1);
+		Ransac<DMatrixRMaj, AssociatedPair> ransac =
+				FactoryMultiViewRobust.fundamentalRansac(configFundamental,configRansac);
 
 		// Estimate the fundamental matrix while removing outliers
-		if( !robustF.process(matches) )
+		if( !ransac.process(matches) )
 			throw new IllegalArgumentException("Failed");
 
 		// save the set of features that were used to compute the fundamental matrix
-		inliers.addAll(robustF.getMatchSet());
+		inliers.addAll(ransac.getMatchSet());
 
 		// Improve the estimate of the fundamental matrix using non-linear optimization
 		DMatrixRMaj F = new DMatrixRMaj(3,3);
 		ModelFitter<DMatrixRMaj,AssociatedPair> refine =
 				FactoryMultiView.fundamentalRefine(1e-8, 400, EpipolarError.SAMPSON);
-		if( !refine.fitModel(inliers, robustF.getModelParameters(), F) )
+		if( !refine.fitModel(inliers, ransac.getModelParameters(), F) )
 			throw new IllegalArgumentException("Failed");
 
 		// Return the solution
@@ -141,7 +130,7 @@ public class ExampleFundamentalMatrix {
 //		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,200,5),null,null);
 
 		ScoreAssociation<BrightFeature> scorer = FactoryAssociation.scoreEuclidean(BrightFeature.class,true);
-		AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(scorer, 1, true);
+		AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(scorer, 0.1, true);
 
 		ExampleAssociatePoints<GrayF32,BrightFeature> findMatches =
 				new ExampleAssociatePoints<>(detDesc, associate, GrayF32.class);
@@ -179,10 +168,12 @@ public class ExampleFundamentalMatrix {
 		// Also note that the fundamental matrix is only defined up to a scale factor.
 		F = robustFundamental(matches, inliers);
 		System.out.println("Robust");
+		CommonOps_DDRM.divide(F, NormOps_DDRM.normF(F)); // scale to make comparision easier
 		F.print();
 
 		F = simpleFundamental(matches);
 		System.out.println("Simple");
+		CommonOps_DDRM.divide(F, NormOps_DDRM.normF(F));
 		F.print();
 
 		// display the inlier matches found using the robust estimator

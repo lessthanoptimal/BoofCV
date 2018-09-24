@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,9 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -49,6 +51,24 @@ public class TestRectifyFundamental {
 
 	Se3_F64 motion;
 	DMatrixRMaj F;
+
+	@Test
+	public void rotateEpipole() {
+		Point3D_F64 epipole = new Point3D_F64(1250,210,0.5);
+
+		int cx = 400,cy=350;
+		SimpleMatrix R = RectifyFundamental.rotateEpipole(epipole,cx,cy);
+
+		Point3D_F64 work = epipole.copy();
+		work.scale(1.0/work.z);
+
+		SimpleMatrix x = new SimpleMatrix(new double[][]{{work.x-cx},{work.y-cy},{1}});
+		SimpleMatrix found = R.mult(x);
+
+		assertTrue(Math.abs(found.get(0))>0);
+		assertEquals(0,Math.abs(found.get(1)), UtilEjml.TEST_F64);
+		assertEquals(1,Math.abs(found.get(2)), UtilEjml.TEST_F64);
+	}
 
 	/**
 	 * Checks to see that the epipoles go to infinity after applying the transforms

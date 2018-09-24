@@ -548,25 +548,39 @@ public class TestMultiViewOps {
 
 	@Test
 	public void extractEpipoles_stereo() {
-		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
-		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(400,400,0.1,410,399);
+		for (int i = 0; i < 100; i++) {
+			double rotX = rand.nextGaussian();
+			double rotY = rand.nextGaussian();
+			double rotZ = rand.nextGaussian();
 
-		DMatrixRMaj E = MultiViewOps.createEssential(R, T);
+			DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,null);
+			Vector3D_F64 T = new Vector3D_F64(rand.nextGaussian(),rand.nextGaussian(),rand.nextGaussian());
 
-		assertTrue(NormOps_DDRM.normF(E)!=0);
+			DMatrixRMaj E = MultiViewOps.createEssential(R, T);
 
-		Point3D_F64 e1 = new Point3D_F64();
-		Point3D_F64 e2 = new Point3D_F64();
+			assertTrue(NormOps_DDRM.normF(E)!=0);
 
-		MultiViewOps.extractEpipoles(E, e1, e2);
+			Point3D_F64 e1 = new Point3D_F64();
+			Point3D_F64 e2 = new Point3D_F64();
 
-		Point3D_F64 temp = new Point3D_F64();
+			MultiViewOps.extractEpipoles(E, e1, e2);
 
-		GeometryMath_F64.mult(E,e1,temp);
-		assertEquals(0,temp.norm(),1e-8);
+			Point3D_F64 temp = new Point3D_F64();
 
-		GeometryMath_F64.multTran(E,e2,temp);
-		assertEquals(0,temp.norm(),1e-8);
+			GeometryMath_F64.mult(E,e1,temp);
+			assertEquals(0,temp.norm(),1e-8);
+
+			GeometryMath_F64.multTran(E,e2,temp);
+			assertEquals(0,temp.norm(),1e-8);
+
+			DMatrixRMaj F = MultiViewOps.createFundamental(E,K);
+			MultiViewOps.extractEpipoles(F, e1, e2);
+			GeometryMath_F64.mult(F,e1,temp);
+			assertEquals(0,temp.norm(),1e-8);
+			GeometryMath_F64.multTran(F,e2,temp);
+			assertEquals(0,temp.norm(),1e-8);
+		}
 	}
 
 	@Test

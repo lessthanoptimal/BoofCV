@@ -37,10 +37,10 @@ import org.ddogleg.struct.Tuple2;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.SingularOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.QRDecomposition;
-import org.ejml.simple.SimpleMatrix;
-import org.ejml.simple.SimpleSVD;
+import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -778,11 +778,16 @@ public class MultiViewOps {
 	 * @param e2 Output: Left epipole in homogeneous coordinates. Can be null. Modified.
 	 */
 	public static void extractEpipoles( DMatrixRMaj F , Point3D_F64 e1 , Point3D_F64 e2 ) {
-		SimpleMatrix f = SimpleMatrix.wrap(F);
-		SimpleSVD<SimpleMatrix> svd = f.svd();
+		SingularValueDecomposition_F64<DMatrixRMaj> svd =
+				DecompositionFactory_DDRM.svd(true,true,false);
 
-		SimpleMatrix U = svd.getU();
-		SimpleMatrix V = svd.getV();
+		if( !svd.decompose(F) )
+			throw new RuntimeException("SVD Failed?!");
+
+		DMatrixRMaj U = svd.getU(null,false);
+		DMatrixRMaj V = svd.getV(null,false);
+		double singular[] = svd.getSingularValues();
+		SingularOps_DDRM.descendingOrder(U,false,singular,3,V,false);
 
 		if( e2 != null )
 			e2.set(U.get(0,2),U.get(1,2),U.get(2,2));
