@@ -326,7 +326,7 @@ public class TestPruneStructureFromScene {
 	private void createRestOfTheScene(List<Point3D_F64> points , boolean sanityCheck ) {
 		for (int i = 0; i < structure.views.length; i++) {
 			double x = -1.5 + 3*i/Math.max(1,(structure.views.length-1));
-			structure.setView(i,false,SpecialEuclideanOps_F64.setEulerXYZ(0,0,0,x,0,0,null));
+			structure.setView(i,false,SpecialEuclideanOps_F64.eulerXYZ(0,0,0,x,0,0,null));
 			structure.connectViewToCamera(i,i%2);
 		}
 

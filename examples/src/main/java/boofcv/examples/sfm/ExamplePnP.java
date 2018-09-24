@@ -160,6 +160,8 @@ public class ExamplePnP {
 			double x = rand.nextDouble()*intrinsic.width;
 			double y = rand.nextDouble()*intrinsic.height;
 
+			// Convert to normalized image coordinates because that's what PNP needs.
+			// it can't process pixel coordinates
 			pixelToNorm.compute(x,y,norm);
 
 			// Randomly pick a depth and compute 3D coordinate

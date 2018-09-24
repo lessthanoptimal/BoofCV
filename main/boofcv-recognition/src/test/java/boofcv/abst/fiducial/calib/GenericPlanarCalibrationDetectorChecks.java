@@ -292,7 +292,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(model);
 
-		Se3_F64 markerToWorld = SpecialEuclideanOps_F64.setEulerXYZ(0,Math.PI,0,0, 0, 0.5,null);
+		Se3_F64 markerToWorld = SpecialEuclideanOps_F64.eulerXYZ(0,Math.PI,0,0, 0, 0.5,null);
 		simulator.addSurface(markerToWorld, simulatedTargetWidth, pattern);
 		simulator.render();
 
