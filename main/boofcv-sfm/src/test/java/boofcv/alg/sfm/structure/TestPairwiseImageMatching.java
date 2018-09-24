@@ -86,7 +86,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		alg.addCamera( cameraName , p2n , intrinsic );
 
 		for (int i = 0; i < 5; i++) {
-			Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.setEulerXYZ(0,0,0,-0.5*i,0,0,null);
+			Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.eulerXYZ(0,0,0,-0.5*i,0,0,null);
 
 			detector.cameraToWorld.set(cameraToWorld);
 			alg.addImage(new GrayF32(intrinsic.width,intrinsic.height),cameraName);
@@ -129,7 +129,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		alg.addCamera(cameraName);
 
 		for (int i = 0; i < 5; i++) {
-			Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.setEulerXYZ(0,0,0,-0.5*i,0,0,null);
+			Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.eulerXYZ(0,0,0,-0.5*i,0,0,null);
 
 			detector.cameraToWorld.set(cameraToWorld);
 			alg.addImage(new GrayF32(intrinsic.width,intrinsic.height),cameraName);
@@ -158,7 +158,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		// there will be two independent set of views in the graph
 		for (int i = 0; i < 7; i++) {
 			double x = i < 5 ? 0 : 10000+0.5*5;
-			Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.setEulerXYZ(0,0,0,x-0.5*i,0,0,null);
+			Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.eulerXYZ(0,0,0,x-0.5*i,0,0,null);
 			detector.cameraToWorld.set(cameraToWorld);
 			alg.addImage(new GrayF32(intrinsic.width,intrinsic.height),cameraName);
 		}
