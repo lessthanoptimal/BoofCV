@@ -92,7 +92,7 @@ public class EstimateSceneUncalibrated
 			Camera camera = graph.cameras.get(cameraName);
 
 			// List all motions which belong to this camera and only this camera
-			List<CameraMotion> open = graph.findMotions(camera,null);
+			List<CameraMotion> open = graph.findCameraMotions(camera,null);
 
 			if( open.isEmpty() )
 				continue;

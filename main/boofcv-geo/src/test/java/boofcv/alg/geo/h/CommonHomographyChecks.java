@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -88,6 +89,25 @@ public class CommonHomographyChecks {
 			double y = (rand.nextDouble()-0.5)*2;
 
 			ret.add( new Point3D_F64(x,y,d));
+		}
+
+		return ret;
+	}
+
+	public static List<Point4D_F64> createRandomPlaneH(Random rand , double d , int N )
+	{
+		List<Point4D_F64> ret = new ArrayList<>();
+
+		for( int i = 0; i < N; i++ ) {
+			double x = (rand.nextDouble()-0.5)*2;
+			double y = (rand.nextDouble()-0.5)*2;
+
+			// make it more interesting by not haing the same W for all the point
+			double scale = rand.nextDouble()+0.1;
+			if( rand.nextBoolean() )
+				scale *= -1;
+
+			ret.add(new Point4D_F64(scale*x,scale*y,scale*d,scale));
 		}
 
 		return ret;

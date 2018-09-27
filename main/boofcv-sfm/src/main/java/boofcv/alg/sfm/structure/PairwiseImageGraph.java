@@ -56,12 +56,12 @@ public class PairwiseImageGraph {
 	}
 
 	/**
-	 * Finds all motions which are observations of this camera entirely.
-	 * @param target
-	 * @param storage
+	 * Finds all motions which are observations of the specified camera entirely, src and dst
+	 * @param target (Input) Camera being searched for
+	 * @param storage (Output) Optional storage for found camera motions
 	 * @return
 	 */
-	public List<CameraMotion> findMotions( Camera target , @Nullable List<CameraMotion> storage ) {
+	public List<CameraMotion> findCameraMotions(Camera target , @Nullable List<CameraMotion> storage ) {
 		if( storage == null )
 			storage = new ArrayList<>();
 

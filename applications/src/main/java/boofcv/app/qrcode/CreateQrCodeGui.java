@@ -33,8 +33,6 @@ import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -81,38 +79,18 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 		menuFile.setMnemonic(KeyEvent.VK_F);
 		JMenuItem menuSave = new JMenuItem("Save");
 		BoofSwingUtil.setMenuItemKeys(menuSave,KeyEvent.VK_S,KeyEvent.VK_S);
-		menuSave.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				saveFile(false);
-			}
-		});
+		menuSave.addActionListener(e -> saveFile(false));
 
 		JMenuItem menuPrint = new JMenuItem("Print...");
 		BoofSwingUtil.setMenuItemKeys(menuPrint,KeyEvent.VK_P,KeyEvent.VK_P);
-		menuPrint.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				saveFile(true);
-			}
-		});
+		menuPrint.addActionListener(e -> saveFile(true));
 
 		JMenuItem menuQuit = new JMenuItem("Quit");
 		BoofSwingUtil.setMenuItemKeys(menuQuit,KeyEvent.VK_Q,KeyEvent.VK_Q);
-		menuQuit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
-			}
-		});
+		menuQuit.addActionListener(e -> System.exit(0));
 
 		JMenuItem menuHelp = new JMenuItem("Help", KeyEvent.VK_H);
-		menuHelp.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				showHelp();
-			}
-		});
+		menuHelp.addActionListener(e -> showHelp());
 
 		menuFile.addSeparator();
 		menuFile.add(menuSave);
