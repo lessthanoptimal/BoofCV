@@ -21,54 +21,65 @@ package boofcv.alg.geo.pose;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ejml.data.DMatrixRMaj;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 /**
  * @author Peter Abeles
  */
-public class TestPoseFromPairLinear6 extends ChecksMotionNPoint {
+public class TestPoseFromPairLinear6 {
 
-	/**
-	 * Standard test using only the minimum number of observation
-	 */
-	@Test
-	public void minimalObservationTest() {
-		standardTest(6);
+	@Nested
+	class Calibrate extends ChecksMotionNPoint {
+		/**
+		 * Standard test using only the minimum number of observation
+		 */
+		@Test
+		void minimalObservationTest() {
+			standardTest(6);
+		}
+
+		/**
+		 * Standard test with an over determined system
+		 */
+		@Test
+		void overdetermined() {
+			standardTest(20);
+		}
+
+		@Override
+		public Se3_F64 compute(List<AssociatedPair> obs, List<Point3D_F64> locations) {
+			PoseFromPairLinear6 alg = new PoseFromPairLinear6();
+
+			alg.process(obs,locations);
+
+			Se3_F64 se = new Se3_F64();
+
+			DMatrixRMaj P = alg.getProjective();
+			PerspectiveOps.projectionSplit(P,se.R,se.T);
+
+			// Need to do this so that it gives the best fit SE(3)
+			SpecialEuclideanOps_F64.bestFit(se);
+			return se;
+		}
 	}
 
-	/**
-	 * Standard test with an over determined system
-	 */
-	@Test
-	public void overdetermined() {
-		standardTest(20);
-	}
+	@Nested
+	class Projective extends ChecksMotionNPointHomogenous
+	{
+		@Override
+		public DMatrixRMaj compute(List<AssociatedPair> obs, List<Point4D_F64> locations) {
+			PoseFromPairLinear6 alg = new PoseFromPairLinear6();
 
-	@Override
-	public Se3_F64 compute(List<AssociatedPair> obs, List<Point3D_F64> locations) {
-		PoseFromPairLinear6 alg = new PoseFromPairLinear6();
+			alg.processHomogenous(obs,locations);
 
-		alg.process(obs,locations);
-
-		Se3_F64 se = new Se3_F64();
-
-		DMatrixRMaj P = alg.getProjective();
-		PerspectiveOps.projectionSplit(P,se.R,se.T);
-
-		// Need to do this so that it gives the best fit SE(3)
-		SpecialEuclideanOps_F64.bestFit(se);
-		return se;
-	}
-
-	@Test
-	public void stuff() {
-		fail("Test homogenous uncalibrated");
+			return alg.getProjective();
+		}
 	}
 }
