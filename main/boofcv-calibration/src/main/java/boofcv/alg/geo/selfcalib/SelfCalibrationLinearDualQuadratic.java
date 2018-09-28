@@ -312,11 +312,4 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	public static class Intrinsic {
 		public double fx,fy,skew;
 	}
-
-	public enum Result {
-		SUCCESS,
-		POOR_GEOMETRY,
-		SVD_FAILED,
-		SOLUTION_NAN
-	}
 }

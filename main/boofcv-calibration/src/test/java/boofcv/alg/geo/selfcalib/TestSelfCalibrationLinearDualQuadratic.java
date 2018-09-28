@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.selfcalib;
 
+import boofcv.alg.geo.GeometricResult;
 import boofcv.struct.calib.CameraPinhole;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
@@ -85,7 +86,7 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 
 		addProjectives(alg);
 
-		assertEquals(SelfCalibrationLinearDualQuadratic.Result.SUCCESS,alg.solve());
+		assertEquals(GeometricResult.SUCCESS,alg.solve());
 
 		assertEquals(intrinsics.size()-1,alg.getSolutions().size());
 		for (int i = 1; i < intrinsics.size(); i++) {
@@ -107,7 +108,7 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 		SelfCalibrationLinearDualQuadratic alg = new SelfCalibrationLinearDualQuadratic(false);
 		addProjectives(alg);
 
-		assertEquals(SelfCalibrationLinearDualQuadratic.Result.POOR_GEOMETRY,alg.solve());
+		assertEquals(GeometricResult.GEOMETRY_POOR,alg.solve());
 	}
 
 	@Test
@@ -118,7 +119,7 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 		SelfCalibrationLinearDualQuadratic alg = new SelfCalibrationLinearDualQuadratic(false);
 		addProjectives(alg);
 
-		assertEquals(SelfCalibrationLinearDualQuadratic.Result.POOR_GEOMETRY,alg.solve());
+		assertEquals(GeometricResult.GEOMETRY_POOR,alg.solve());
 	}
 
 	@Test
