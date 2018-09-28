@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,11 +23,11 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.GrowQueue_I32;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -193,7 +193,7 @@ public class TestBinaryThinning {
 					if( img.get(j,i) == 1 ) {
 						boolean border = mask.borderMask(j, i);
 						boolean inner = mask.innerMask(img.getIndex(j, i));
-						assertEquals(i + " " + j, border, inner);
+						assertEquals(border, inner);
 					}
 				}
 			}

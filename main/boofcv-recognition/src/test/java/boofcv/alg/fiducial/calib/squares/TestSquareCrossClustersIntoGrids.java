@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,15 +20,12 @@ package boofcv.alg.fiducial.calib.squares;
 
 import boofcv.misc.CircularIndex;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -191,7 +188,7 @@ public class TestSquareCrossClustersIntoGrids {
 			assertEquals(bottom,found.size());
 
 			for (int j = 0; j < bottom; j++) {
-				assertTrue(j+"",cluster.get(top+j)==found.get(j));
+				assertTrue(cluster.get(top+j)==found.get(j));
 
 				// try adding a row below the bottom, which should fail, from any of the bottom nodes
 				assertFalse(alg.addNextRow(found.get(j),ordered));

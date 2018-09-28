@@ -28,11 +28,11 @@ import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Compares convolve extended against an inner convolution performed against a larger image
@@ -198,7 +198,7 @@ public class TestConvolveImage extends CompareImageBorder {
 				v.get(x,y, valueV);
 
 				for (int band = 0; band < valueT.length; band++) {
-					assertEquals("Failed at "+x+" "+y+" band "+band,valueV[band],valueT[band],1e-4f);
+					assertEquals(valueV[band],valueT[band],1e-4f,"Failed at "+x+" "+y+" band "+band);
 				}
 			}
 		}

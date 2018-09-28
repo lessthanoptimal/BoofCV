@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,11 +21,11 @@ package boofcv.core.encoding;
 import boofcv.alg.color.ColorYuv;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -80,7 +80,7 @@ public class TestConvertYV12 {
 						double found = GeneralizedImageOps.get(image,x,y,band);
 						int expected = rgb.getBand(band).get(x,y);
 
-						assertEquals(x+" "+y+" "+band,expected,found,1e-4);
+						assertEquals(expected,found,1e-4);
 					}
 				}
 			}

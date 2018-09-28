@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.bundle.cameras;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Peter Abeles

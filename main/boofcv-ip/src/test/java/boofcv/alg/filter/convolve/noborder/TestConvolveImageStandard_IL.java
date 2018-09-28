@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,14 +28,14 @@ import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageInterleaved;
 import boofcv.testing.BoofTesting;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
 import static boofcv.core.image.GeneralizedImageOps.get;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * To reduce the amount of code reflects are heavily used.  If any more functions are added reflections should be
@@ -415,10 +415,10 @@ public class TestConvolveImageStandard_IL {
 					if (i < kernel.offset || j < kernel.offset
 							|| i >= height-(kernel.width-kernel.offset-1)
 							|| j >= width-(kernel.width-kernel.offset-1))
-						assertEquals(j+"  "+i,0f, get(dest, j, i, band), tol);
+						assertEquals(0f, get(dest, j, i, band), tol);
 					else {
 						double expected = convolve(img, j, i, band, kernel);
-						assertEquals(j+"  "+i,expected, get(dest, j, i, band), tol);
+						assertEquals(expected, get(dest, j, i, band), tol);
 					}
 				}
 			}
@@ -474,10 +474,10 @@ public class TestConvolveImageStandard_IL {
 					if (i < kernel.offset || j < kernel.offset
 							|| i >= height-(kernel.width-kernel.offset-1)
 							|| j >= width-(kernel.width-kernel.offset-1))
-						assertEquals(j+"  "+i,0f, get(dest, j, i, band), tol);
+						assertEquals(0f, get(dest, j, i, band), tol);
 					else {
 						double expected = convolveDiv(img, j, i, band, kernel, divisor);
-						assertEquals(j+"  "+i,expected, get(dest, j, i, band), tol);
+						assertEquals(expected, get(dest, j, i, band), tol);
 					}
 				}
 			}

@@ -28,7 +28,7 @@ import org.ejml.dense.row.NormOps_DDRM;
 
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Standardized checks for computing fundamental matrices

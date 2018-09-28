@@ -21,12 +21,12 @@ package boofcv.abst.shapes.polyline;
 import boofcv.alg.shapes.polyline.splitmerge.TestPolylineSplitMerge;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.GrowQueue_I32;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static boofcv.alg.shapes.polyline.splitmerge.TestPolylineSplitMerge.line;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles

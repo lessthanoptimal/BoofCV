@@ -35,15 +35,15 @@ import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_B;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * @author Peter Abeles
@@ -220,7 +220,7 @@ public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
 			DetectPolygonFromContour alg = createDetector(GrayU8.class, i,i);
 
 			alg.process(gray,binary);
-			assertEquals("num sides = "+i,0,alg.getFound().size());
+			assertEquals(0,alg.getFound().size());
 		}
 	}
 

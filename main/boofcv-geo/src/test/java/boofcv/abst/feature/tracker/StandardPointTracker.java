@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,14 +22,14 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -52,7 +52,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		this.shouldDropTracks = shouldDropTracks;
 	}
 
-	@Before
+	@BeforeEach
 	public void initStandard() {
 		ImageMiscOps.fillUniform(image, rand, 0, 100);
 	}
@@ -136,10 +136,10 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		ImageMiscOps.addGaussian(image,rand,2,0,255);
 		processImage((T)image);
 
-		int beforeAll = tracker.getAllTracks(null).size();
+		int BeforeEach = tracker.getAllTracks(null).size();
 		int beforeActive = tracker.getActiveTracks(null).size();
 
-		assertTrue(beforeAll > 0);
+		assertTrue(BeforeEach > 0);
 		assertTrue(beforeActive>0);
 		assertEquals(0, tracker.getNewTracks(null).size());
 		checkInside(tracker.getAllTracks(null));
@@ -147,7 +147,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		// Call spawn again.  There should be more tracks now
 		tracker.spawnTracks();
 
-		assertTrue(beforeAll < tracker.getAllTracks(null).size());
+		assertTrue(BeforeEach < tracker.getAllTracks(null).size());
 		assertTrue(beforeActive < tracker.getActiveTracks(null).size());
 		checkInside(tracker.getAllTracks(null));
 
@@ -213,9 +213,9 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
-		int beforeAll = tracker.getAllTracks(null).size();
+		int BeforeEach = tracker.getAllTracks(null).size();
 		int beforeActive = tracker.getActiveTracks(null).size();
-		assertTrue(beforeAll > 0);
+		assertTrue(BeforeEach > 0);
 
 		assertEquals(0,tracker.getDroppedTracks(null).size());
 
@@ -234,10 +234,10 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		// algorithm specific checks
 		if( shouldDropTracks ) {
 			assertTrue(afterDropped>0);
-			assertTrue(afterAll < beforeAll );
+			assertTrue(afterAll < BeforeEach );
 		} else  {
 			assertEquals(0,afterDropped);
-			assertTrue(afterAll == beforeAll );
+			assertTrue(afterAll == BeforeEach );
 		}
 
 		if( shouldCreateInactive )
@@ -251,7 +251,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		assertTrue(afterDropped+afterInactive>0);
 		// note that some trackers will not add any features to the dropped list since
 		// it will try to respawn them
-		assertEquals(beforeAll-afterAll,tracker.getDroppedTracks(null).size());
+		assertEquals(BeforeEach-afterAll,tracker.getDroppedTracks(null).size());
 	}
 	
 	@Test

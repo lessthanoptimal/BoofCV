@@ -27,7 +27,7 @@ import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 

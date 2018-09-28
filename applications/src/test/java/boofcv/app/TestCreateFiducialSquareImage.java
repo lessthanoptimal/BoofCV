@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,16 +26,16 @@ import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayF32;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -59,7 +59,7 @@ public class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 		return gray;
 	}
 
-	@BeforeClass
+	@BeforeEach
 	public static void before() {
 		BufferedImage output = new BufferedImage(200,200,BufferedImage.TYPE_INT_RGB);
 
@@ -75,7 +75,7 @@ public class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 		UtilImageIO.saveImage(output, names[1]);
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void cleanUpImages() {
 		for( String s : names) {
 			new File(s).delete();

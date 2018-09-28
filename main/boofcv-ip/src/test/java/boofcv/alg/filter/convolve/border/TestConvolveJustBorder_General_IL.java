@@ -29,11 +29,11 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.InterleavedF32;
 import boofcv.struct.image.InterleavedInteger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -171,7 +171,7 @@ public class TestConvolveJustBorder_General_IL extends CompareImageBorder {
 				v.get(x,y,pixelV);
 
 				for (int band = 0; band < t.getNumberOfBands(); band++) {
-					assertEquals(x+" "+y,pixelV[band],pixelT[band],1e-4f);
+					assertEquals(pixelV[band],pixelT[band],1e-4f);
 				}
 			}
 		}

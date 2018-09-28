@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,13 +24,13 @@ import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters.Node;
 import georegression.struct.curve.EllipseRotated_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.Tuple2;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static boofcv.alg.fiducial.calib.circle.TestEllipseClustersIntoGrid.convertIntoGridOfLists;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles

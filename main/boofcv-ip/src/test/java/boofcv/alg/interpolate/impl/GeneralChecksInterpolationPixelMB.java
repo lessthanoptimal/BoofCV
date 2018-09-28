@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,11 +29,11 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.ImageMultiBand;
 import boofcv.testing.BoofTesting;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Several standardized tests that ensure correct implementations of {@link InterpolatePixelS}.
@@ -332,7 +332,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 				interpB.get(xx, yy, tmp1);
 
 				for (int i = 0; i < numBands; i++) {
-					assertTrue("( " + x + " , " + y + " )", tmp0[i] == tmp1[i]);
+					assertTrue(tmp0[i] == tmp1[i],"( " + x + " , " + y + " )");
 				}
 			}
 		}

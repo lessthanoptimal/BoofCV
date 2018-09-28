@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,12 +30,12 @@ import boofcv.struct.image.InterleavedF64;
 import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ejml.data.Complex_F64;
 import org.ejml.ops.ComplexMath_F64;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
 * @author Peter Abeles
@@ -154,7 +154,7 @@ public class TestCirculantTracker {
 
 				assertEquals(v0,v1,1e-4);
 				assertEquals(v0,v2,1e-4);
-				assertEquals(i+" "+j,v0,v3,1e-4);
+				assertEquals(v0,v3,1e-4);
 			}
 		}
 	}

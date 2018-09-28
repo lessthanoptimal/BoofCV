@@ -27,13 +27,13 @@ import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.Tuple2;
 import org.ejml.data.DMatrixRMaj;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -201,7 +201,7 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 	public static void assertEquals(SceneStructureProjective a , SceneStructureProjective b ,
 									double tolDistance ) {
 
-		Assert.assertEquals(a.homogenous, b.homogenous);
+		Assertions.assertEquals(a.homogenous, b.homogenous);
 
 		if( a.homogenous ) {
 			Point4D_F64 pa = new Point4D_F64();
@@ -212,12 +212,12 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 				a.points[i].normalizeH();
 				b.points[i].normalizeH();
 				double error = a.points[i].distance(b.points[i]);
-				assertTrue(i + " error = " + error + " " + a.points[i] + " " + b.points[i], error < tolDistance);
+				assertTrue( error < tolDistance);
 			}
 		} else {
 			for (int i = 0; i < a.points.length; i++) {
 				double error = a.points[i].distance(b.points[i]);
-				assertTrue(i + " error = " + error + " " + a.points[i] + " " + b.points[i], error < tolDistance);
+				assertTrue( error < tolDistance);
 			}
 		}
 

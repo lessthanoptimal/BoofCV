@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.denoise.wavelet.ShrinkThresholdSoft_F32;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 /**

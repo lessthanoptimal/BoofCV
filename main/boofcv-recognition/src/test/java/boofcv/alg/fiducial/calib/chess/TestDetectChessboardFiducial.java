@@ -32,16 +32,16 @@ import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -62,7 +62,7 @@ public class TestDetectChessboardFiducial {
 
 	boolean showRendered = false;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		offsetX = 15;
 		offsetY = 10;
@@ -128,8 +128,8 @@ public class TestDetectChessboardFiducial {
 				SePointOps_F64.transform(transform,e,e);
 			}
 
-			assertEquals("i = " + i,e.x,f.x,2);
-			assertEquals("i = " + i,e.y,f.y,2);
+			assertEquals(e.x,f.x,2);
+			assertEquals(e.y,f.y,2);
 		}
 	}
 
@@ -221,7 +221,7 @@ public class TestDetectChessboardFiducial {
 		}
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	public void touchedBorder_rotate() {
 		List<Se2_F64> transforms = new ArrayList<>();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,11 +23,12 @@ import boofcv.core.image.ConvertImage;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Peter Abeles
@@ -91,7 +92,7 @@ public class TestDescribePointSurfPlanar {
 		}
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void failNumBandMissMatch(){
 		Planar<GrayF32> input = new Planar<>(GrayF32.class,width,height,3);
 
@@ -102,10 +103,11 @@ public class TestDescribePointSurfPlanar {
 
 		GrayF32 gray = ConvertImage.average(input,null);
 
-		alg.setImage(gray,input);
+		assertThrows(IllegalArgumentException.class,
+				()->alg.setImage(gray,input));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void failShape(){
 		Planar<GrayF32> input = new Planar<>(GrayF32.class,width,height,3);
 
@@ -117,6 +119,7 @@ public class TestDescribePointSurfPlanar {
 		GrayF32 gray = ConvertImage.average(input,null);
 		gray.reshape(width-1,height);
 
-		alg.setImage(gray,input);
+		assertThrows(IllegalArgumentException.class,
+				()->alg.setImage(gray,input));
 	}
 }

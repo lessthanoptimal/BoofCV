@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,11 +26,11 @@ import boofcv.core.image.border.ImageBorder1D_F32;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -91,8 +91,8 @@ public class TestKltTracker {
 					System.out.println();
 
 				if( faultA == KltTrackFault.SUCCESS ) {
-					assertTrue(x+" "+y,featureA.x == featureB.x);
-					assertTrue(x+" "+y,featureA.y == featureB.y);
+					assertTrue(featureA.x == featureB.x);
+					assertTrue(featureA.y == featureB.y);
 				}
 			}
 		}

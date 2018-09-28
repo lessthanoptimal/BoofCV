@@ -26,12 +26,12 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -163,7 +163,7 @@ public class TestImplEnhanceHistogram {
 					int expected = subOut.get(x-x0,y-y0);
 					int found = output.get(x,y);
 
-					assertEquals(x+" "+y,expected,found);
+					assertEquals(expected,found,x+" "+y);
 				}
 			}
 		}
@@ -282,7 +282,7 @@ public class TestImplEnhanceHistogram {
 			if( y >= y0 && y < y1)
 				continue;
 			for( int x = 0; x < width; x ++ ) {
-				assertEquals(x+" "+y,0,image.get(x,y));
+				assertEquals(0,image.get(x,y),x+" "+y);
 			}
 		}
 	}
@@ -364,7 +364,7 @@ public class TestImplEnhanceHistogram {
 			for( int x = 0; x < width; x ++ ) {
 				if( x >= x0 && x < x1)
 					continue;
-				assertEquals(x+" "+y,0,image.get(x,y));
+				assertEquals(0,image.get(x,y),x+" "+y);
 			}
 		}
 	}

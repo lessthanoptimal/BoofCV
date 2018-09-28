@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,14 +24,14 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -109,11 +109,12 @@ public class TestConvertBufferedImage {
 		assertTrue(found.isSubimage());
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test
 	public void extractInterleavedInt8_indexed() {
 		BufferedImage origImg = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_BYTE_INDEXED);
 
-		ConvertBufferedImage.extractInterleavedU8(origImg);
+		assertThrows(IllegalArgumentException.class,
+				()->ConvertBufferedImage.extractInterleavedU8(origImg));
 	}
 
 	@Test
@@ -148,11 +149,12 @@ public class TestConvertBufferedImage {
 		assertEquals(6, found.height);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test
 	public void extractImageInt8_indexed() {
 		BufferedImage origImg = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_BYTE_INDEXED);
 
-		ConvertBufferedImage.extractGrayU8(origImg);
+		assertThrows(IllegalArgumentException.class,
+				()->ConvertBufferedImage.extractGrayU8(origImg));
 	}
 
 	@Test

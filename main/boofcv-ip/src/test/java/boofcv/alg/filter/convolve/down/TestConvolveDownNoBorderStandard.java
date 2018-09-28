@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,12 +28,12 @@ import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.CompareEquivalentFunctions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -212,7 +212,7 @@ public class TestConvolveDownNoBorderStandard {
 					if( sum > 0 ) {
 						// normalizing the magnitude is needed for floating point numbers
 						double diff = Math.abs(valV-valT)/sum;
-						assertTrue(valV+" "+valT+"  diff "+diff+"  at ( "+x+" "+y+" )",diff<=1e-4);
+						assertTrue(diff<=1e-4);
 					}
 				}
 			}

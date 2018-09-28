@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,11 +27,11 @@ import boofcv.factory.flow.ConfigHornSchunckPyramid;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.PyramidFloat;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -104,7 +104,7 @@ public class TestHornSchunckPyramid {
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
-				assertEquals(x+" "+y,1,alg.getFlowX().get(x,y),0.1f);
+				assertEquals(1,alg.getFlowX().get(x,y),0.1f);
 				assertEquals(0,alg.getFlowY().get(x,y),0.1f);
 			}
 		}

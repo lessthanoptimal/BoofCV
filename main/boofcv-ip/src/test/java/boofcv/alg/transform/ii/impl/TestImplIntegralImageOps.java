@@ -34,14 +34,13 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -56,7 +55,7 @@ public class TestImplIntegralImageOps {
 	@Test
 	public void transform() {
 		int numFound = BoofTesting.findMethodThenCall(this,"transform",ImplIntegralImageOps.class,"transform");
-		Assert.assertEquals(5, numFound);
+		assertEquals(5, numFound);
 	}
 
 	public void transform( Method m ) {
@@ -89,7 +88,7 @@ public class TestImplIntegralImageOps {
 					}
 				}
 
-				Assert.assertEquals(x+" "+y,total,bb.get(x,y).doubleValue(),1e-1);
+				assertEquals(total,bb.get(x,y).doubleValue(),1e-1,x+" "+y);
 			}
 		}
 	}

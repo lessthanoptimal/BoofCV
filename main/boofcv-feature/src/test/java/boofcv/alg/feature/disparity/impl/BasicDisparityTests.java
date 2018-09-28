@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageGray;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Provides a series of simple tests that check basic functionality at computing image disparity
@@ -86,17 +86,17 @@ public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends Ima
 			// borders should be zero since they are not modified
 			for( int x = 0; x < borderX; x++ ) {
 				double found = GeneralizedImageOps.get(output,x,y);
-				assertEquals("x = "+x+" y = "+y,0,found,1e-8);
+				assertEquals(0,found,1e-8);
 			}
 			for( int x = w-borderX; x < w; x++ ) {
 				double found = GeneralizedImageOps.get(output,x,y);
-				assertEquals("x = "+x+" y = "+y,0,found,1e-8);
+				assertEquals(0,found,1e-8);
 			}
 
 			// check the inside image
 			for( int x = borderX+disparity; x < w-borderX; x++ ) {
 				double found = GeneralizedImageOps.get(output,x,y);
-				assertEquals("x = "+x+" y = "+y,disparity,found,1e-8);
+				assertEquals(disparity,found,1e-8);
 			}
 		}
 	}
@@ -125,18 +125,18 @@ public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends Ima
 			// borders should be zero since they are not modified
 			for( int x = 0; x < borderX+minDisparity; x++ ) {
 				double found = GeneralizedImageOps.get(output,x,y);
-				assertEquals("x = "+x+" y = "+y,0,found,1e-8);
+				assertEquals(0,found,1e-8);
 			}
 			for( int x = w-borderX; x < w; x++ ) {
 				double found = GeneralizedImageOps.get(output,x,y);
-				assertEquals("x = "+x+" y = "+y,0,found,1e-8);
+				assertEquals(0,found,1e-8);
 			}
 
 			// check inside image
 			for( int x = borderX+minDisparity; x < w-borderX; x++ ) {
 				double found = GeneralizedImageOps.get(output,x,y) + minDisparity;
 				// the minimum disparity should  be the closest match
-				assertEquals("x = "+x+" y = "+y,minDisparity,found,1e-8);
+				assertEquals(minDisparity,found,1e-8);
 			}
 		}
 	}

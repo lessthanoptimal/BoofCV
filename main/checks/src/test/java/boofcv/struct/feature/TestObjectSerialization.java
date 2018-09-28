@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,13 +25,13 @@ import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests which check to see if specific objects can be serialized or not
@@ -45,7 +45,7 @@ public class TestObjectSerialization {
 
 	Random rand = new Random(234);
 
-	@After
+	@AfterAll
 	public void cleanup() {
 		File f = new File("temp.txt");
 

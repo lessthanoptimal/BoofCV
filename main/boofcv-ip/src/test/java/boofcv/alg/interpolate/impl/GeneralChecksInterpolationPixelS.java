@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,11 +24,11 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Several standardized tests that ensure correct implementations of {@link boofcv.alg.interpolate.InterpolatePixelS}.
@@ -291,7 +291,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 				if( yy < 0 ) yy = 0; else if( yy > 39 ) yy = 39;
 				if( xx < 0 ) xx = 0; else if( xx > 29 ) xx = 29;
 
-				assertTrue("( " + x + " , " + y + " )", interpA.get(xx, yy) == interpB.get(xx,yy));
+				assertTrue(interpA.get(xx, yy) == interpB.get(xx,yy),"( " + x + " , " + y + " )");
 			}
 		}
 	}

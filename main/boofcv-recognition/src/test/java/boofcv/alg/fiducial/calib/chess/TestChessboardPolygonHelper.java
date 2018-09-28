@@ -20,10 +20,10 @@ package boofcv.alg.fiducial.calib.chess;
 
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.GrowQueue_B;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles

@@ -20,7 +20,7 @@ package boofcv.core.encoding;
 
 import boofcv.alg.color.ColorFormat;
 import boofcv.struct.image.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 import java.util.Random;

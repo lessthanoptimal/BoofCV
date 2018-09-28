@@ -22,14 +22,14 @@ import boofcv.core.image.*;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -350,7 +350,7 @@ public class TestImageMiscOps {
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				if( j < r || i < r || j >= width-r || i >= height-r )
-					assertEquals(i+" "+j,5,a.get(j,i).doubleValue(),1e-4);
+					assertEquals(5,a.get(j,i).doubleValue(),1e-4,i+" "+j);
 				else
 					assertEquals(4,a.get(j,i).doubleValue(),1e-4);
 			}
@@ -385,7 +385,7 @@ public class TestImageMiscOps {
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				if( j < x0 || i < y0 || i >= (x0+width) || j >= (y0+height ))
-					assertEquals(j+" "+i,0.0,a.get(j,i).doubleValue(),1e-4);
+					assertEquals(0.0,a.get(j,i).doubleValue(),1e-4,j+" "+i);
 				else
 					assertEquals(10.0,a.get(j,i).doubleValue(),1e-4);
 			}
@@ -420,7 +420,7 @@ public class TestImageMiscOps {
 					double value = GeneralizedImageOps.get(orig,j,i,band);
 
 					if( j < x0 || i < y0 || i >= (x0+width) || j >= (y0+height ))
-						assertEquals(j+" "+i,0.0,value,1e-4);
+						assertEquals(0.0,value,1e-4,j+" "+i);
 					else
 						assertEquals(10.0,value,1e-4);
 				}
@@ -457,7 +457,7 @@ public class TestImageMiscOps {
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double value = a.get(j,i).doubleValue();
-				assertTrue("value = "+value,value>=-10 && value < 10);
+				assertTrue(value>=-10 && value < 10,"value = "+value);
 				if( value == 0 )
 					numZero++;
 			}
@@ -486,7 +486,7 @@ public class TestImageMiscOps {
 			for( int j = 0; j < width; j++ ) {
 				for( int band = 0; band < numBands; band++ ) {
 					double value = GeneralizedImageOps.get(orig,j,i,band);
-					assertTrue("value = "+value,value>=-10 && value < 10);
+					assertTrue(value>=-10 && value < 10,"value = "+value);
 					if( value == 0 )
 						numZero++;
 				}
@@ -523,9 +523,9 @@ public class TestImageMiscOps {
 				double value = a.get(j,i).doubleValue();
 
 				if( orig.getDataType().isSigned() ) {
-					assertTrue("value = "+value,value>=-2 && value <= 2);
+					assertTrue(value>=-2 && value <= 2,"value = "+value);
 				} else {
-					assertTrue("value = "+value,value>=0 && value <= 12);
+					assertTrue(value>=0 && value <= 12,"value = "+value);
 				}
 
 				if( value == 0 )
@@ -554,9 +554,9 @@ public class TestImageMiscOps {
 					double value = GeneralizedImageOps.get(orig,j,i,band);
 
 					if( orig.getDataType().isSigned() ) {
-						assertTrue("value = "+value,value>=-2 && value <= 2);
+						assertTrue(value>=-2 && value <= 2,"value = "+value);
 					} else {
-						assertTrue("value = "+value,value>=0 && value <= 12);
+						assertTrue(value>=0 && value <= 12,"value = "+value);
 					}
 
 					if( value == 0 )
@@ -778,7 +778,7 @@ public class TestImageMiscOps {
 					double expected = GeneralizedImageOps.get(orig,x,y);
 					double found = GeneralizedImageOps.get(rotated,w-y-1,x);
 
-					assertEquals(x+" "+y,expected,found,1e-8);
+					assertEquals(expected,found,1e-8,x+" "+y);
 				}
 			}
 		}

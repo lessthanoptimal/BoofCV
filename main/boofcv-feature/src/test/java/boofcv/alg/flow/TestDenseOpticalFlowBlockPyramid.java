@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,11 +21,11 @@ package boofcv.alg.flow;
 import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -114,7 +114,7 @@ public class TestDenseOpticalFlowBlockPyramid {
 					assertEquals(0,f.x,1e-4);
 					assertEquals(1,f.y,1e-4);
 				} else {
-					assertEquals(x+" "+y,5,alg.scores[y*20+x],1e-4);
+					assertEquals(5,alg.scores[y*20+x],1e-4);
 					assertEquals(-1,f.x,1e-4);
 					assertEquals(2,f.y,1e-4);
 				}

@@ -18,12 +18,12 @@
 
 package boofcv.struct.image;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static boofcv.struct.image.ImageDataType.*;
 import static boofcv.struct.image.ImageType.Family.GRAY;
 import static boofcv.struct.image.ImageType.Family.INTERLEAVED;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles

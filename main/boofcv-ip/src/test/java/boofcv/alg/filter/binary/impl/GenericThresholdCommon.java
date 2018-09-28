@@ -25,11 +25,12 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -81,18 +82,18 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>>
 
 		for (int y = 0; y < down.height; y++) {
 			for (int x = 0; x < down.width; x++) {
-				assertTrue(x+" "+y,(down.get(x,y)==0) == !(up.get(x,y)==0));
+				assertTrue((down.get(x,y)==0) == !(up.get(x,y)==0),x+" "+y);
 			}
 		}
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test
 	public void widthLargerThanImage() {
 		T input = GeneralizedImageOps.createSingleBand(imageType,10,12);
 		GrayU8 output = new GrayU8(10,12);
 
 		InputToBinary<T> alg = createAlg(20,1.0,true);
-		alg.process(input,output);
+		assertThrows(IllegalArgumentException.class,()->alg.process(input,output));
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,11 +22,11 @@ import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.GrayF32;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -103,9 +103,9 @@ public class TestImplSsdCorner_F32 {
 			float yy = sum(x,y,derivYY);
 
 			// take in account rounding error
-			assertEquals(x+" "+y,xx, totalXX, 1);
-			assertEquals(x+" "+y,xy, totalXY, 1);
-			assertEquals(x+" "+y,yy, totalYY, 1);
+			assertEquals(xx, totalXX, 1);
+			assertEquals(xy, totalXY, 1);
+			assertEquals(yy, totalYY, 1);
 
 			count++;
 			return 0;

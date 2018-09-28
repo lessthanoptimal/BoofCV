@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.filter.convolve.normalized;
 import boofcv.core.image.FactoryGImageMultiBand;
 import boofcv.core.image.GImageMultiBand;
 import boofcv.struct.image.ImageMultiBand;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -119,12 +119,12 @@ public class TestConvolveNormalized_JustBorder_IL {
 						v.get(x,y,pixelV);
 
 						for (int band = 0; band < t.getNumberOfBands(); band++) {
-							assertEquals( x+" "+y,pixelV[band] , pixelT[band] , 1e-4 );
+							assertEquals(pixelV[band] , pixelT[band] , 1e-4 , x+" "+y);
 						}
 					} else {
 						t.get(x,y,pixelT);
 						for (int band = 0; band < t.getNumberOfBands(); band++) {
-							assertEquals( x+" "+y,0 , pixelT[band] , 1e-4 );
+							assertEquals( 0 , pixelT[band] , 1e-4 , x+" "+y);
 						}
 					}
 				}

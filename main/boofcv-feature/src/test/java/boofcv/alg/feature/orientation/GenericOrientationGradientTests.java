@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
 import georegression.metric.UtilAngle;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -119,7 +119,7 @@ public class GenericOrientationGradientTests<D extends ImageGray<D>> {
 		alg.setImage(subX,subY);
 
 		double found = UtilAngle.bound(alg.compute(subX.width/2,subY.height/2));
-		assertTrue( angle+" "+found,UtilAngle.dist(angle,found) < angleTolerance );
+		assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
 	}
 
 	/**

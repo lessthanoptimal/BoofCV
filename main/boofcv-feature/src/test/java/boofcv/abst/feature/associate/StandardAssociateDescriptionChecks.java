@@ -21,10 +21,10 @@ package boofcv.abst.feature.associate;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import org.ddogleg.struct.FastQueue;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Standard tests for implementations of AssociateDescription
@@ -66,7 +66,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 	public void checkScoreType() {
 		AssociateDescription<Desc> alg = createAlg();
 
-		assertTrue("Test are designed for norm error",MatchScoreType.NORM_ERROR == alg.getScoreType());
+		assertTrue(MatchScoreType.NORM_ERROR == alg.getScoreType(),"Test are designed for norm error");
 	}
 
 	/**

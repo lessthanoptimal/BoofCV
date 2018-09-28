@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,11 +29,11 @@ import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.GrayF;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayF64;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -98,7 +98,7 @@ public class TestImageLocalNormalization {
 			for (int x = 0; x < width; x++) {
 				double f = GeneralizedImageOps.get(found,x,y);
 				double expected = compute(x,y,input,origKernel);
-				assertEquals(x+" "+y,expected,f,1e-4);
+				assertEquals(expected,f,1e-4);
 			}
 		}
 	}

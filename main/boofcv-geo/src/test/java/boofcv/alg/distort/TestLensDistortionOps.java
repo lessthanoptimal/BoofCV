@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,10 +29,10 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.RectangleLength2D_F32;
 import georegression.struct.shapes.RectangleLength2D_F64;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -216,9 +216,8 @@ public class TestLensDistortionOps {
 		float tol = 0.1f;
 
 		String s = x+" "+y+" -> "+ pf.x+" "+ pf.y;
-		assertTrue(s,
-				pf.x <= 1 + tol || pf.x >= width - 1 - tol ||
-						pf.y <= 1 + tol || pf.y >= height - 1 - tol);
+		assertTrue(pf.x <= 1 + tol || pf.x >= width - 1 - tol ||
+						pf.y <= 1 + tol || pf.y >= height - 1 - tol,s);
 
 		// check the inverse
 		tranInv.compute(pf.x, pf.y, pf);
@@ -233,7 +232,7 @@ public class TestLensDistortionOps {
 		double tol = 0.1;
 
 		String s = x+" "+y+" -> "+ pd.x+" "+ pd.y;
-		assertTrue(s, pd.x <= 1 + tol || pd.x >= width - 1 - tol || pd.y <= 1 + tol || pd.y >= height - 1 - tol);
+		assertTrue(pd.x <= 1 + tol || pd.x >= width - 1 - tol || pd.y <= 1 + tol || pd.y >= height - 1 - tol,s);
 
 		// check the inverse
 		tranInv.compute(pd.x, pd.y, pd);
@@ -308,8 +307,8 @@ public class TestLensDistortionOps {
 		float tol = 0.1f;
 
 		String s = x+" "+y+" -> "+ pf.x+" "+ pf.y;
-		assertTrue(s, pf.x >= -tol && pf.x < width + tol);
-		assertTrue(s, pf.y >= -tol && pf.y < height + tol);
+		assertTrue(pf.x >= -tol && pf.x < width + tol,s);
+		assertTrue(pf.y >= -tol && pf.y < height + tol,s);
 
 		// check the inverse
 		tranInv.compute(pf.x, pf.y, pf);
@@ -324,8 +323,8 @@ public class TestLensDistortionOps {
 		double tol = 0.1f;
 
 		String s = x+" "+y+" -> "+ pd.x+" "+ pd.y;
-		assertTrue(s, pd.x >= -tol && pd.x < width + tol);
-		assertTrue(s, pd.y >= -tol && pd.y < height + tol);
+		assertTrue(pd.x >= -tol && pd.x < width + tol,s);
+		assertTrue( pd.y >= -tol && pd.y < height + tol,s);
 
 		// check the inverse
 		tranInv.compute(pd.x, pd.y, pd);

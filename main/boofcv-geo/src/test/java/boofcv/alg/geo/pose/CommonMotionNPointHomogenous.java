@@ -18,10 +18,14 @@
 
 package boofcv.alg.geo.pose;
 
+import boofcv.alg.geo.GeoTestingOps;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.h.CommonHomographyChecks;
 import boofcv.struct.geo.AssociatedPair;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,38 +41,36 @@ public class CommonMotionNPointHomogenous {
 
 	protected Random rand = new Random(234);
 
-	// the true motion
-	protected DMatrixRMaj motion;
+	// Projection matrix 3x4
+	protected DMatrixRMaj projection;
 	// list of points in world reference frame
 	protected List<Point4D_F64> worldPts;
-	// list of points is camera reference frame
-	protected List<Point4D_F64> cameraPts;
 	// list of observation pairs in both reference frames
 	protected List<AssociatedPair> assocPairs;
 
-	protected void generateScene(int N, DMatrixRMaj motion, boolean planar) {
-		this.motion = motion;
+	protected void generateScene(int N, DMatrixRMaj P, boolean planar) {
+		this.projection = P;
 
 		// randomly generate points in space
 		if( planar ) {
 			worldPts = CommonHomographyChecks.createRandomPlaneH(rand, 3, N);
 		} else {
-//			worldPts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
+			worldPts = GeoTestingOps.randomPointsH_F64(-1, 1, N, rand);
 		}
 
-		cameraPts = new ArrayList<>();
+		DMatrixRMaj P0 = new DMatrixRMaj(3,4);
+		CommonOps_DDRM.setIdentity(P0);
 
 		// transform points into second camera's reference frame
 		assocPairs = new ArrayList<>();
 		for(Point4D_F64 X : worldPts ) {
-//			Point4D_F64 p2 = PerspectiveOps.renderPixel(motion, p1, null);
-//
-//			AssociatedPair pair = new AssociatedPair();
-//			pair.p1.set(p1.x/p1.z,p1.y/p1.z);
-//			pair.p2.set(p2.x/p2.z,p2.y/p2.z);
-//			assocPairs.add(pair);
-//
-//			cameraPts.add(p2);
+			Point2D_F64 p1 = PerspectiveOps.renderPixel(P0, X, (Point2D_F64)null);
+			Point2D_F64 p2 = PerspectiveOps.renderPixel(P, X, (Point2D_F64)null);
+
+			AssociatedPair pair = new AssociatedPair();
+			pair.p1.set(p1.x,p1.y);
+			pair.p2.set(p2.x,p2.y);
+			assocPairs.add(pair);
 		}
 	}
 }

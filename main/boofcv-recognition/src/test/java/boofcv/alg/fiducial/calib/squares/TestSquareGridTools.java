@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,14 +21,12 @@ package boofcv.alg.fiducial.calib.squares;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -59,7 +57,7 @@ public class TestSquareGridTools {
 					alg.rotateCCW(grid);
 				}
 				alg.putIntoCanonical(grid);
-				assertTrue(i+" "+j,grid.get(0,0).center.norm() < 1e-8);
+				assertTrue(grid.get(0,0).center.norm() < 1e-8);
 			}
 		}
 	}

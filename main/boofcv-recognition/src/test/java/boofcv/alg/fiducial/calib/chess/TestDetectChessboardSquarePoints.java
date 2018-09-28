@@ -35,14 +35,14 @@ import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.GrowQueue_B;
 import org.ejml.UtilEjml;
 import org.ejml.simple.SimpleMatrix;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
 
 import static boofcv.alg.fiducial.calib.squares.TestSquareCrossClustersIntoGrids.connect;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -57,7 +57,7 @@ public class TestDetectChessboardSquarePoints {
 	int w = 400;
 	int h = 500;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		offsetX = 15;
 		offsetY = 10;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,12 +26,11 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -82,34 +81,37 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageGray<T>> {
 	}
 
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test
 	public void outsideImageBorder() {
 		T img = createImage(width, height);
 		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
 
 		GrayF32 out = new GrayF32(20,20);
-		interp.region(width-1, height-1, out );
+		assertThrows(IllegalArgumentException.class,
+				()->interp.region(width-1, height-1, out ));
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test
 	public void outsideImageBorder1_barely() {
 		T img = createImage(20, 25);
 		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
 
 		GrayF32 out = new GrayF32(20,25);
-		interp.region(-0.1f, -0.1f, out );
+		assertThrows(IllegalArgumentException.class,
+				()->interp.region(-0.1f, -0.1f, out ));
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test
 	public void outsideImageBorder2_barely() {
 		T img = createImage(20, 25);
 		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
 
 		GrayF32 out = new GrayF32(20,25);
-		interp.region(0.1f, 0.1f, out );
+		assertThrows(IllegalArgumentException.class,
+				()->interp.region(0.1f, 0.1f, out ));
 	}
 
 
@@ -139,7 +141,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageGray<T>> {
 
 		for (int y = 0; y < regionHeight; y++) {
 			for (int x = 0; x < regionWidth; x++) {
-				assertTrue("( " + x + " , " + y + " )", outA.get(x, y) == outB.get(x, y));
+				assertTrue(outA.get(x, y) == outB.get(x, y),"( " + x + " , " + y + " )");
 			}
 		}
 	}
@@ -169,7 +171,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageGray<T>> {
 
 		for (int y = 0; y < regionHeight; y++) {
 			for (int x = 0; x < regionWidth; x++) {
-				assertEquals("( "+x+" , "+y+" )",interpPt.get(x + tl_x, y + tl_y), out.get(x,y), 1e-4);
+				assertEquals(interpPt.get(x + tl_x, y + tl_y), out.get(x,y), 1e-4,"( "+x+" , "+y+" )");
 			}
 		}
 	}

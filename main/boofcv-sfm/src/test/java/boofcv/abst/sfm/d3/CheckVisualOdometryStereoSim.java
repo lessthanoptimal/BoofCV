@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,9 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Performs empirical validation of stereo visual odometry algorithms using synthetic images.  Only a crude test
@@ -119,7 +119,7 @@ public abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 			right.setTo(render(worldToRight));
 
 			// process the images
-			assertTrue("iteration "+i,algorithm.process(left,right));
+			assertTrue(algorithm.process(left,right));
 
 			// Compare to truth.  Only go for a crude approximation
 			Se3_F64 foundWorldToLeft = algorithm.getCameraToWorld().invert(null);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,12 +28,12 @@ import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.CompareEquivalentFunctions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -182,7 +182,7 @@ Random rand = new Random(0xFF);
 					Number numT = t.get(x,y);
 					Number numV = v.get(x*ratioWidth,y*ratioHeight);
 
-					assertEquals( "("+x+" , "+y+")",numV.doubleValue() , numT.doubleValue() , 1e-4 );
+					assertEquals(numV.doubleValue() , numT.doubleValue() , 1e-4 );
 				}
 			}
 		}

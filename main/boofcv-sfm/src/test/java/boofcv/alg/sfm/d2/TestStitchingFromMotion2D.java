@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,9 +30,9 @@ import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.affine.Affine2D_F64;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -222,7 +222,7 @@ public class TestStitchingFromMotion2D {
 			for (int x = 0; x < image.width; x++) {
 				float v = image.get(x,y);
 				if( x >= x0 && x < x1 && y >= y0 && y < y1 ) {
-					assertEquals(x+" "+y,1,v,1e-5);
+					assertEquals(1,v,1e-5);
 				} else {
 					assertEquals(0,v,1e-5);
 				}

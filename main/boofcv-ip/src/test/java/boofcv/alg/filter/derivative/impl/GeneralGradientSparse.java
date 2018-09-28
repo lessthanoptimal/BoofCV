@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,12 +27,12 @@ import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseImageGradient;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -58,7 +58,7 @@ public abstract class GeneralGradientSparse {
 
 	public abstract ImageGradient createGradient();
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 		image = GeneralizedImageOps.createSingleBand(imageType,20,15);
 		derivX = GeneralizedImageOps.createSingleBand(derivType,20,15);
@@ -78,15 +78,15 @@ public abstract class GeneralGradientSparse {
 		for (int i = 0; i < image.height; i++) {
 			for (int j = 0; j < image.width; j++) {
 				if( i >= -lower && j >= -lower && i < image.height-upper && j < image.width-upper ) {
-					assertTrue(j + " " + i, image.isInBounds(j, i));
+					assertTrue(image.isInBounds(j, i),j + " " + i);
 					GradientValue g = alg.compute(j, i);
 					double expectedX = GeneralizedImageOps.get(derivX,j,i);
 					double expectedY = GeneralizedImageOps.get(derivY,j,i);
 
 					assertEquals(expectedX, g.getX(), 1e-4f);
-					assertEquals(j+" "+i,expectedY, g.getY(), 1e-4f);
+					assertEquals(expectedY, g.getY(), 1e-4f,j+" "+i);
 				} else {
-					assertFalse(j+" "+i,alg.isInBounds(j, i));
+					assertFalse(alg.isInBounds(j, i),j+" "+i);
 				}
 			}
 		}
@@ -107,7 +107,7 @@ public abstract class GeneralGradientSparse {
 
 		for (int i = 0; i < image.height; i++) {
 			for (int j = 0; j < image.width; j++) {
-				assertTrue(j + " " + i, image.isInBounds(j, i));
+				assertTrue( image.isInBounds(j, i) , j + " " + i);
 				GradientValue g = alg.compute(j, i);
 				double expectedX = GeneralizedImageOps.get(derivX,j,i);
 				double expectedY = GeneralizedImageOps.get(derivY, j, i);

@@ -22,13 +22,13 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import org.ejml.UtilEjml;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -356,7 +356,7 @@ public class TestImageStatistics {
 		}
 
 		for( int i = 0; i < 40; i++ ) {
-			assertEquals("index "+i,expected[i],histogram[i]);
+			assertEquals(expected[i],histogram[i],"index "+i);
 		}
 	}
 

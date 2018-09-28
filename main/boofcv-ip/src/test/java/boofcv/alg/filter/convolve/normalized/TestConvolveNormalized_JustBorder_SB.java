@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.filter.convolve.normalized;
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GImageGray;
 import boofcv.struct.image.ImageGray;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -110,7 +110,7 @@ public class TestConvolveNormalized_JustBorder_SB {
 						Number numT = t.get(x,y);
 						Number numV = v.get(x,y);
 
-						assertEquals( x+" "+y,numV.doubleValue() , numT.doubleValue() , 1e-4 );
+						assertEquals(numV.doubleValue() , numT.doubleValue() , 1e-4 );
 					}
 				}
 			}

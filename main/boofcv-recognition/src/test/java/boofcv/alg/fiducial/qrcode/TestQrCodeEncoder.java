@@ -18,11 +18,11 @@
 
 package boofcv.alg.fiducial.qrcode;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -152,14 +152,15 @@ public class TestQrCodeEncoder {
 		assertEquals(QrCode.Mode.NUMERIC,qr.mode);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void messageTooLong() {
-		QrCode qr = new QrCodeEncoder().setVersion(1).
+		assertThrows(IllegalArgumentException.class,
+				()->
+		new QrCodeEncoder().setVersion(1).
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				addAlphanumeric("01234567890123456789012345678901234567890123456789012345678901234567890123456789").fixate();
+				addAlphanumeric("01234567890123456789012345678901234567890123456789012345678901234567890123456789").fixate());
 
-		assertTrue(qr.rawbits.length==26);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,9 @@ package boofcv.abst.feature.disparity;
 
 import boofcv.alg.feature.disparity.DisparityScoreSadRect;
 import boofcv.struct.image.GrayF32;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -46,7 +46,7 @@ public class TestWrapDisparitySadRect {
 
 		for( int y = 0; y < found.height; y++ )
 			for( int x = 0; x < found.width; x++ )
-				assertTrue(x+" "+y,found.get(x,y) > range );
+				assertTrue(found.get(x,y) > range );
 	}
 
 	private static class Foo extends DisparityScoreSadRect<GrayF32,GrayF32>

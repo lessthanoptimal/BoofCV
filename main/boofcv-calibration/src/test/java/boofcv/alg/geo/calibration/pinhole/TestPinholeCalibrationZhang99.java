@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.ejml.UtilEjml.EPS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -110,11 +111,11 @@ public class TestPinholeCalibrationZhang99 extends GenericCalibrationZhang99<Cam
 	@Override
 	protected void checkIntrinsicOnly(CameraPinholeRadial expected, CameraPinholeRadial found,
 									  double tolK, double tolD, double tolT) {
-		assertEquals(expected.fx,found.fx,Math.abs(expected.fx)*tolK);
-		assertEquals(expected.fy,found.fy,Math.abs(expected.fy)*tolK);
-		assertEquals(expected.skew,found.skew,Math.abs(expected.skew)*tolK);
-		assertEquals(expected.cx,found.cx,Math.abs(expected.cx)*tolK);
-		assertEquals(expected.cy, found.cy, Math.abs(expected.cy) * tolK);
+		assertEquals(expected.fx,found.fx,Math.abs(expected.fx)*tolK + EPS);
+		assertEquals(expected.fy,found.fy,Math.abs(expected.fy)*tolK + EPS);
+		assertEquals(expected.skew,found.skew,Math.abs(expected.skew)*tolK + EPS);
+		assertEquals(expected.cx,found.cx,Math.abs(expected.cx)*tolK + EPS);
+		assertEquals(expected.cy, found.cy, Math.abs(expected.cy)*tolK + EPS);
 
 		for( int i = 0; i < expected.radial.length; i++ ) {
 			assertEquals(expected.radial[i],found.radial[i],tolD);

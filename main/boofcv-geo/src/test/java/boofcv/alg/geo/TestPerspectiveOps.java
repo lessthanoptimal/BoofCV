@@ -40,13 +40,13 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.RandomMatrices_DDRM;
 import org.ejml.simple.SimpleMatrix;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -176,11 +176,11 @@ public class TestPerspectiveOps {
 		DMatrixRMaj K = new DMatrixRMaj(3,3,true,fx,skew,cx,0,fy,cy,0,0,1);
 		CameraPinhole ret = PerspectiveOps.matrixToPinhole(K, 100, 200, null);
 
-		assertEquals(ret.fx, fx, 0.0);
-		assertEquals(ret.fy, fy, 0.0);
-		assertEquals(ret.skew, skew, 0.0);
-		assertEquals(ret.cx, cx, 0.0);
-		assertEquals(ret.cy, cy, 0.0);
+		assertEquals(ret.fx, fx,1.1);
+		assertEquals(ret.fy, fy);
+		assertEquals(ret.skew, skew);
+		assertEquals(ret.cx, cx);
+		assertEquals(ret.cy, cy);
 		assertEquals(100, ret.width);
 		assertEquals(200, ret.height);
 	}
@@ -196,11 +196,11 @@ public class TestPerspectiveOps {
 		FMatrixRMaj K = new FMatrixRMaj(3,3,true,fx,skew,cx,0,fy,cy,0,0,1);
 		CameraPinhole ret = PerspectiveOps.matrixToPinhole(K, 100, 200, null);
 
-		assertEquals(ret.fx, fx, 0.0);
-		assertEquals(ret.fy, fy, 0.0);
-		assertEquals(ret.skew, skew, 0.0);
-		assertEquals(ret.cx, cx, 0.0);
-		assertEquals(ret.cy, cy, 0.0);
+		assertEquals(ret.fx, fx);
+		assertEquals(ret.fy, fy);
+		assertEquals(ret.skew, skew);
+		assertEquals(ret.cx, cx);
+		assertEquals(ret.cy, cy);
 		assertEquals(100, ret.width);
 		assertEquals(200, ret.height);
 	}

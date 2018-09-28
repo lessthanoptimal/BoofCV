@@ -19,13 +19,13 @@
 package boofcv.alg.shapes.polyline.splitmerge;
 
 import georegression.struct.point.Point2D_I32;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static boofcv.alg.shapes.polyline.splitmerge.TestPolylineSplitMerge.rect;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles

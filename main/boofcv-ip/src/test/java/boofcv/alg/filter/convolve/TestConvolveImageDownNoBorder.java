@@ -19,7 +19,7 @@
 package boofcv.alg.filter.convolve;
 
 import boofcv.alg.filter.convolve.down.CompareToStandardConvolveDownNoBorder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 /**

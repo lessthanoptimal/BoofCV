@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,11 +21,11 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -61,7 +61,7 @@ public class TestSiftScaleSpace {
 
 				double averageError = compareImage(expected, alg.getImageScale(0), i);
 
-				assertTrue("first "+firstOctave+" oct "+i+" error = "+averageError,averageError<2);
+				assertTrue(averageError<2,"first "+firstOctave+" oct "+i+" error = "+averageError);
 				assertTrue(i < lastOctave == alg.computeNextOctave());
 			}
 		}
@@ -90,7 +90,7 @@ public class TestSiftScaleSpace {
 
 			double averageError = compareImage(expected, alg.getImageScale(i), 0);
 
-			assertTrue(" scale "+i+" error = "+averageError,averageError<2);
+			assertTrue(averageError<2," scale "+i+" error = "+averageError);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,9 @@ import boofcv.alg.feature.disparity.SelectRectStandard;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for implementers of {@link SelectRectStandardBase_S32}
@@ -157,7 +157,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 		assertEquals(4, getDisparity(4 + r + minDisparity, y), 1e-8);
 		// should be at 5 for the remainder
 		for( int i = r+minDisparity+5; i < w-r; i++ )
-			assertEquals("i = "+i,5, getDisparity(i, y), 1e-8);
+			assertEquals(5, getDisparity(i, y), 1e-8);
 
 		// sanity check, I now set the tolerance to zero
 		alg = createSelector(-1,0,-1);
@@ -223,7 +223,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 
 		// it should reject the solution
 		for( int i = r+minDisparity+3; i < w-r; i++)
-			assertEquals("i = "+i,reject, getDisparity(i, y), 1e-8);
+			assertEquals(reject, getDisparity(i, y), 1e-8);
 	}
 
 	public static <ArrayData> ArrayData copyToCorrectType( int scores[] , Class<ArrayData> arrayType ) {

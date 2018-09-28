@@ -22,13 +22,13 @@ import boofcv.struct.calib.CameraPinhole;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix4x4;
 import org.ejml.ops.ConvertDMatrixStruct;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles

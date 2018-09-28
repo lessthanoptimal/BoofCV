@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.app;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.junit.After;
+import org.junit.jupiter.api.AfterAll;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -43,7 +43,7 @@ public class CommonFiducialPdfChecks {
 		return output;
 	}
 
-	@After
+	@AfterAll
 	public void cleanup() {
 		new File(document_name+".pdf").delete();
 	}

@@ -28,13 +28,13 @@ import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.Tuple2;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -210,7 +210,7 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 	public static void assertEquals(SceneStructureMetric a , SceneStructureMetric b ,
 									double tolCamera , double tolDistance , double tolRotation  ) {
 
-		Assert.assertEquals(a.homogenous, b.homogenous);
+		Assertions.assertEquals(a.homogenous, b.homogenous);
 
 		if( a.homogenous ) {
 			Point4D_F64 pa = new Point4D_F64();
@@ -221,18 +221,18 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 				a.points[i].normalizeH();
 				b.points[i].normalizeH();
 				double error = a.points[i].distance(b.points[i]);
-				assertTrue(i + " error = " + error + " " + a.points[i] + " " + b.points[i], error < tolDistance);
+				assertTrue( error < tolDistance);
 			}
 		} else {
 			for (int i = 0; i < a.points.length; i++) {
 				double error = a.points[i].distance(b.points[i]);
-				assertTrue(i + " error = " + error + " " + a.points[i] + " " + b.points[i], error < tolDistance);
+				assertTrue( error < tolDistance);
 			}
 		}
 
 		for (int i = 0; i < a.views.length; i++) {
 			double error = a.views[i].worldToView.T.distance(b.views[i].worldToView.T);
-			assertTrue( i+" error = "+error,error < tolDistance );
+			assertTrue( error < tolDistance );
 			assertTrue(MatrixFeatures_DDRM.isIdentical(a.views[i].worldToView.R,
 					b.views[i].worldToView.R,tolRotation));
 		}

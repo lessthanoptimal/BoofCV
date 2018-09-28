@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,13 +28,13 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -106,7 +106,7 @@ public class TestDescribeImageDenseSift {
 			assertEquals(numCols*numRows,locations.size());
 
 			for( Point2D_I32 p : locations ) {
-				assertTrue(p.x+" "+p.y, p.x >= r && p.x <= width-r );
+				assertTrue(p.x >= r && p.x <= width-r );
 				assertTrue( p.y >= r && p.y <= height-r );
 			}
 		}

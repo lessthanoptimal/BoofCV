@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,8 @@ import org.ejml.dense.row.MatrixFeatures_DDRM;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -249,7 +249,7 @@ public class CommonFactoryWavelet {
 				double coef = Math.pow(j+offset,o);
 				total += coef*support[j];
 			}
-			assertEquals("Failed poly test at order "+o,0,total,1e-4);
+			assertEquals(0,total,1e-4,"Failed poly test at order "+o);
 		}
 	}
 
@@ -260,7 +260,7 @@ public class CommonFactoryWavelet {
 				double coef = Math.pow(j+offset,o);
 				total += coef*support[j];
 			}
-			assertEquals("Failed poly test at order "+o,0,total,1e-4);
+			assertEquals(0,total,1e-4,"Failed poly test at order "+o);
 		}
 	}
 }

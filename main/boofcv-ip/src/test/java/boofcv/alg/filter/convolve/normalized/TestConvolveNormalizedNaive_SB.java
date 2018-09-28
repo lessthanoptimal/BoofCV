@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,11 +25,11 @@ import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -56,7 +56,7 @@ public class TestConvolveNormalizedNaive_SB {
 			for (int x = 0; x < output.width; x++) {
 				int expected = horizontal(x,y,kernel,input);
 				int found = output.get(x,y);
-				assertEquals(x+"  "+y,expected,found);
+				assertEquals(expected,found);
 			}
 		}
 	}
@@ -96,7 +96,7 @@ public class TestConvolveNormalizedNaive_SB {
 			for (int x = 0; x < output.width; x++) {
 				int expected = vertical(x, y, kernel, input);
 				int found = output.get(x,y);
-				assertEquals(x+"  "+y,expected,found);
+				assertEquals(expected,found);
 			}
 		}
 	}
@@ -140,7 +140,7 @@ public class TestConvolveNormalizedNaive_SB {
 			for (int x = 0; x < output.width; x++) {
 				int expected = vertical2(x, y, kernelX, kernelY, input);
 				int found = output.get(x,y);
-				assertEquals(x+"  "+y,expected,found);
+				assertEquals(expected,found);
 			}
 		}
 	}
@@ -193,7 +193,7 @@ public class TestConvolveNormalizedNaive_SB {
 			for (int x = 0; x < output.width; x++) {
 				int expected = convolve(x, y, kernel, input);
 				int found = output.get(x,y);
-				assertEquals(x+"  "+y,expected,found);
+				assertEquals(expected,found);
 			}
 		}
 	}

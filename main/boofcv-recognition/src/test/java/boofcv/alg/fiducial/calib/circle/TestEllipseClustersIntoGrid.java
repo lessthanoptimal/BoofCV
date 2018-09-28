@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,13 +26,13 @@ import georegression.misc.GrlConstants;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.Tuple2;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.findClosestEdge;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
 /**
@@ -309,7 +309,7 @@ public class TestEllipseClustersIntoGrid {
 		for (int i = 0; i < totalEllipses; i++) {
 			int row = index[i]/g.columns;
 			int col = index[i]%g.columns;
-			assertEquals(row+" "+col, i , g.getIndexOfHexEllipse(row,col));
+			assertEquals(i , g.getIndexOfHexEllipse(row,col));
 		}
 	}
 

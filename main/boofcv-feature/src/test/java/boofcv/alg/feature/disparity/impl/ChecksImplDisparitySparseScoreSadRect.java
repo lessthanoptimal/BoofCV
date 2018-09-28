@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,11 +26,11 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -97,12 +97,12 @@ public abstract class ChecksImplDisparitySparseScoreSadRect<I extends ImageGray<
 			for( int x = 0; x < w; x++ ) {
 				alg.process(x,y);
 				if( !alg.process(x,y) )  {
-					assertEquals(x+" "+y,expected.get(x,y),0);
+					assertEquals(expected.get(x,y),0);
 				} else {
 					selectAlg.select(alg.getScore(),alg.getLocalMaxDisparity());
 					int found = (int)(alg.getMinDisparity()+selectAlg.getDisparity());
 
-					assertEquals(x+" "+y,minDisparity+expected.get(x,y),found);
+					assertEquals(minDisparity+expected.get(x,y),found);
 				}
 			}
 		}

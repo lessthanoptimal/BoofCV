@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,12 +25,12 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.FastQueue;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
 import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edge;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -139,9 +139,9 @@ public abstract class GenericFhEdgeWeightsChecks<T extends ImageBase<T>> {
 			Edge e0 = edges0.get(i);
 			Edge e1 = edges1.get(i);
 
-			assertEquals("i = "+i,e0.indexA,e1.indexA);
-			assertEquals("i = "+i,e0.indexB,e1.indexB);
-			assertEquals("i = "+i,e0.sortValue,e1.sortValue,1e-4f);
+			assertEquals(e0.indexA,e1.indexA);
+			assertEquals(e0.indexB,e1.indexB);
+			assertEquals(e0.sortValue,e1.sortValue,1e-4f);
 		}
 	}
 }

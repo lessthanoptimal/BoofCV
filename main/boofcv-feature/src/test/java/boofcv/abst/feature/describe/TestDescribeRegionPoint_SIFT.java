@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,13 +24,12 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -80,6 +79,10 @@ public class TestDescribeRegionPoint_SIFT {
 		assertTrue(alg.process(100,0,0.5,10,desc0));
 		assertTrue(alg.process(639,120,0.5,10,desc0));
 		assertTrue(alg.process(100,479,0.5,10,desc0));
+	}
+
+	public static void assertNotEquals( double a , double b , double tol ) {
+		assertTrue(Math.abs(a-b)>tol);
 	}
 
 	private DescribeRegionPoint_SIFT<GrayF32> declare() {

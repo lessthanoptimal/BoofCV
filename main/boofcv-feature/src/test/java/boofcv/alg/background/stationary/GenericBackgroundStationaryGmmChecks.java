@@ -19,8 +19,8 @@
 package boofcv.alg.background.stationary;
 
 import boofcv.struct.image.ImageType;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Peter Abeles
@@ -29,7 +29,7 @@ public abstract class GenericBackgroundStationaryGmmChecks extends GenericBackgr
 
 	float initialVariance;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		initialVariance = 12;
 	}

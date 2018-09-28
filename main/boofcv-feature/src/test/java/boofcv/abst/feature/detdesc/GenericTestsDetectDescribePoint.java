@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,11 +25,11 @@ import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_F64;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Very basic tests which check for conformance to {@link DetectDescribePoint}.
@@ -101,7 +101,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 
 				assertTrue(desc!=null);
 				assertTrue(p.x != 0 && p.y != 0);
-				assertTrue(p.x+" "+p.y,p.x >= 0 && p.y >= 0 && p.x < image.width && p.y < image.height );
+				assertTrue(p.x >= 0 && p.y >= 0 && p.x < image.width && p.y < image.height );
 
 				if( radius != 1 )
 					numScaleNotOne++;

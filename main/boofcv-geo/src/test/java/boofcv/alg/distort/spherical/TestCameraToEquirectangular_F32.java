@@ -21,9 +21,9 @@ package boofcv.alg.distort.spherical;
 import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point3D_F32;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles

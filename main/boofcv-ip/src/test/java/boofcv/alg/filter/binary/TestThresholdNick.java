@@ -22,7 +22,6 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.impl.GenericThresholdCommon;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
-import org.junit.Test;
 
 /**
  * @author Peter Abeles
@@ -37,9 +36,7 @@ public class TestThresholdNick extends GenericThresholdCommon<GrayF32> {
 		return new ThresholdNick(ConfigLength.fixed(requestedBlockWidth), -0.2f,down);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
 	public void widthLargerThanImage(){
 		// perfectly acceptable
-		throw new IllegalArgumentException();
 	}
 }

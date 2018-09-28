@@ -18,9 +18,9 @@
 
 package boofcv.struct.image;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -135,12 +135,13 @@ public class TestImageInterleaved {
 	/**
 	 * The two matrices do not have the same shape
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void setTo_mismatch_bands() {
 		DummyImage a = new DummyImage(10, 20, 3);
 		DummyImage b = new DummyImage(10, 20, 4);
 
-		a.setTo(b);
+		assertThrows(IllegalArgumentException.class,
+				()->a.setTo(b));
 	}
 
 	/**

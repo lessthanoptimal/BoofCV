@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,11 +22,12 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
-import org.junit.Test;
+import org.ejml.UtilEjml;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -114,7 +115,7 @@ public class TestColorXyz {
 	}
 
 	private static void check( double found[] , double a , double b , double c ) {
-		double tol = TestColorXyz.tol * Math.max(Math.max(a,b),c);
+		double tol = TestColorXyz.tol * Math.max(Math.max(a,b),c) + UtilEjml.EPS;
 
 		assertEquals(a,found[0],tol);
 		assertEquals(b,found[1],tol);
@@ -122,7 +123,7 @@ public class TestColorXyz {
 	}
 
 	private static void check( float found[] , float a , float b , float c ) {
-		double tol = TestColorXyz.tol * Math.max(Math.max(a,b),c);
+		double tol = TestColorXyz.tol * Math.max(Math.max(a,b),c) + UtilEjml.EPS;;
 
 		assertEquals(a,found[0],tol);
 		assertEquals(b,found[1],tol);

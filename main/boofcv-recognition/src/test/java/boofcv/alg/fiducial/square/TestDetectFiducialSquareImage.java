@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,13 +30,13 @@ import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -137,7 +137,7 @@ public class TestDetectFiducialSquareImage {
 	private void compare( short a[] , short b[] ) {
 		assertEquals(a.length, b.length);
 		for (int i = 0; i < a.length; i++) {
-			assertEquals("index = "+i,a[i],b[i]);
+			assertEquals(a[i],b[i]);
 		}
 	}
 

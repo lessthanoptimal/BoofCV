@@ -25,9 +25,9 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.testing.BoofTesting;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -85,7 +85,7 @@ public class TestPyramidDiscreteSampleBlur extends GenericPyramidTests<GrayF32> 
 				float a = convImg2.get(j, i);
 				float b = alg.getLayer(2).get(j / 2, i / 2);
 
-				assertEquals(j+" "+j,a, b, 1e-4);
+				assertEquals(a, b, 1e-4);
 			}
 		}
 	}

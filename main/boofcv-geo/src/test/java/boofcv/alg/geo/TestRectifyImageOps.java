@@ -29,10 +29,10 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.CommonOps_FDRM;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -84,8 +84,8 @@ public class TestRectifyImageOps {
 		float tol = 0.1f;
 
 		String s = x+" "+y+" -> "+p.x+" "+p.y;
-		assertTrue(s,p.x >= -tol && p.x < width+tol );
-		assertTrue(s, p.y >= -tol && p.y < height + tol);
+		assertTrue(p.x >= -tol && p.x < width + tol ,s);
+		assertTrue(p.y >= -tol && p.y < height + tol,s);
 	}
 
 	@Test

@@ -21,11 +21,11 @@ package boofcv.alg.sfm.structure;
 import boofcv.alg.sfm.structure.PairwiseImageGraph.CameraMotion;
 import boofcv.alg.sfm.structure.PairwiseImageGraph.CameraView;
 import boofcv.struct.calib.CameraPinhole;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles

@@ -29,11 +29,11 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -165,7 +165,7 @@ public class TestConvolveJustBorder_General_SB extends CompareImageBorder {
 				if( x >= borderX0 &&  x < targetOut.width-borderY1 )
 					continue;
 
-				assertEquals(x+" "+y,v.get(x,y).doubleValue(),t.get(x,y).doubleValue(),1e-4f);
+				assertEquals(v.get(x,y).doubleValue(),t.get(x,y).doubleValue(),1e-4f);
 			}
 		}
 	}

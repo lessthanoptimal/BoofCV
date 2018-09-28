@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 import georegression.transform.affine.AffinePointOps_F64;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -74,7 +74,7 @@ public class CommonFitPolygonChecks {
 
 	double matchError;
 
-	@Before
+	@BeforeEach
 	public void resetSettings() {
 		transform.reset();
 		width = 400; height = 500;

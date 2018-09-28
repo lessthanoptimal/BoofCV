@@ -34,12 +34,12 @@ import boofcv.struct.image.GrayU8;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Generic tests for qr codes under mild lens distortion
@@ -53,7 +53,7 @@ public abstract class GenericQrCodeDetectorChecks {
 
 	boolean display = false;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		expected = new QrCodeEncoder().setVersion(2).
 				setError(QrCode.ErrorLevel.H).

@@ -21,11 +21,11 @@ package boofcv.alg.fiducial.qrcode;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles

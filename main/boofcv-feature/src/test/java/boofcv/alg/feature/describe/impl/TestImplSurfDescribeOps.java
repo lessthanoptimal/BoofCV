@@ -27,12 +27,12 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.SparseScaleGradient;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -63,8 +63,8 @@ public class TestImplSurfDescribeOps {
 			ImplSurfDescribeOps.gradientInner(ii,8,9,scale,w, 4*scale, foundX,foundY);
 
 			for( int i = 0; i < foundX.length; i++ ) {
-				assertEquals("at "+i,expectedX[i],foundX[i],1e-4);
-				assertEquals("at "+i,expectedY[i],foundY[i],1e-4);
+				assertEquals(expectedX[i],foundX[i],1e-4);
+				assertEquals(expectedY[i],foundY[i],1e-4);
 			}
 
 			for( int i = 0; i < foundX.length; i++ ) {
@@ -91,8 +91,8 @@ public class TestImplSurfDescribeOps {
 			ImplSurfDescribeOps.gradientInner(ii,10,9,scale,w, 4*scale,foundX,foundY);
 
 			for( int i = 0; i < foundX.length; i++ ) {
-				assertEquals("at "+i,expectedX[i],foundX[i],1e-4);
-				assertEquals("at "+i,expectedY[i],foundY[i],1e-4);
+				assertEquals(expectedX[i],foundX[i],1e-4);
+				assertEquals(expectedY[i],foundY[i],1e-4);
 			}
 
 			for( int i = 0; i < foundX.length; i++ ) {

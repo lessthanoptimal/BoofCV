@@ -24,13 +24,13 @@ import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ddogleg.optimization.wrap.SchurJacobian_to_NtoMxN;
 import org.ejml.data.DMatrixSparseCSC;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
 import static boofcv.alg.geo.bundle.TestBundleAdjustmentMetricResidualFunction.createObservations;
 import static boofcv.alg.geo.bundle.TestCodecSceneStructureMetric.createScene;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles

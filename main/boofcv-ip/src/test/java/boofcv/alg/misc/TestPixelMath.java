@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,14 +22,14 @@ import boofcv.core.image.*;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -397,7 +397,7 @@ public class TestPixelMath {
 					if( expected < -10 ) expected = -10;
 					if( expected > 12 ) expected = 12;
 
-					assertEquals(i+" "+j+" "+k,expected,found, tol);
+					assertEquals(expected,found, tol);
 				}
 			}
 		}
@@ -447,7 +447,7 @@ public class TestPixelMath {
 					if( imageFirst )
 						assertEquals(pixelA[k]-val,pixelB[k],tol);
 					else
-						assertEquals(i+" "+j+" "+k,val-pixelA[k],pixelB[k],tol);
+						assertEquals(val-pixelA[k],pixelB[k],tol);
 				}
 			}
 		}

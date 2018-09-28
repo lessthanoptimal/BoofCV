@@ -1,5 +1,5 @@
 plugins {
-    id "com.peterabeles.gversion" version "1.2.5" apply false
+    id "com.peterabeles.gversion" version "1.2.6" apply false
 }
 
 ext.libpath = file('./').absolutePath
@@ -98,7 +98,12 @@ subprojects {
         compile group: 'org.georegression', name: 'georegression', version: '0.17-SNAPSHOT'
         compile 'com.google.code.findbugs:jsr305:3.0.2' // @Nullable
 
-        testCompile group: 'junit', name: 'junit', version: '4.12'
+        testImplementation(
+                'org.junit.jupiter:junit-jupiter-api:5.3.1'
+        )
+        testRuntimeOnly(
+                'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+        )
 
         experimentalImplementation project.sourceSets.main.compileClasspath
         experimentalImplementation project.sourceSets.main.runtimeClasspath

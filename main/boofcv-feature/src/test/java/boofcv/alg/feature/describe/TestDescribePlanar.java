@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,9 @@ import boofcv.struct.image.GrayS8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -39,7 +39,7 @@ public class TestDescribePlanar {
 	/**
 	 * Sanity check to see if input image and number of descriptors is the same
 	 */
-	@Test(expected=IllegalArgumentException.class)
+	@Test
 	public void checkNumBands() {
 
 		DescribeRegionPoint[] descs = new DummyDesc[3];
@@ -49,7 +49,8 @@ public class TestDescribePlanar {
 
 		DummyAlg alg = new DummyAlg(descs);
 
-		alg.setImage(new Planar(GrayS8.class,1,1,2));
+		assertThrows(IllegalArgumentException.class,
+				()->alg.setImage(new Planar(GrayS8.class,1,1,2)));
 	}
 
 	@Test

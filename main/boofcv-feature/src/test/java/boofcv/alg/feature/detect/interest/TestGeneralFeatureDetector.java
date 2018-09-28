@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,9 @@ import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -167,17 +167,13 @@ public class TestGeneralFeatureDetector {
 	/**
 	 * If an extractor requires candidates the intensity image needs to provide them.
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void candidatesMissMatch() {
 		HelperIntensity intensity = new HelperIntensity(false, false, false);
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
-		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, extractor);
-
-		detector.process(new GrayF32(width, height), null, null, null, null, null);
-
-		fail("exception should have been thrown");
+		assertThrows(IllegalArgumentException.class,
+				()->new GeneralFeatureDetector<>(intensity, extractor));
 	}
 
 	/**

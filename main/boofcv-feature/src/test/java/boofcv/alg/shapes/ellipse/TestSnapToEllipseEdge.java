@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,13 +22,14 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.PixelMath;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.curve.EllipseRotated_F64;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -129,6 +130,10 @@ public class TestSnapToEllipseEdge {
 		assertNotEquals(0,SnapToEllipseEdge.
 				change(new EllipseRotated_F64(1,2,3,4.5,-0.25), new EllipseRotated_F64(1,2,3,4,-0.2)),1e-8);;
 
+	}
+
+	public static void assertNotEquals( double a , double b , double tol ) {
+		assertTrue(Math.abs(a-b)>tol);
 	}
 
 	@Test

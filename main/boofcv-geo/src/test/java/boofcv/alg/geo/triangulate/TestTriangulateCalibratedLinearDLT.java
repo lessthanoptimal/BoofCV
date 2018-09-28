@@ -20,9 +20,9 @@ package boofcv.alg.geo.triangulate;
 
 import georegression.struct.point.Point4D_F64;
 import org.ejml.UtilEjml;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,13 +25,13 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 import boofcv.testing.BoofTesting;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -165,9 +165,9 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 				// see if the inner image is identical to the naive implementation
 				// the border should be unmodified, zeros
 				if( x >= begin && x < end )
-					assertEquals(quad+" ( "+x+" , "+y+" )",e.get(x,y).floatValue() , f.get(x,y).floatValue() , 1e-4f);
+					assertEquals(e.get(x,y).floatValue() , f.get(x,y).floatValue() , 1e-4f);
 				else
-					assertTrue(quad+" ( "+x+" , "+y+" ) 0 != "+f.get(x,y),0 == f.get(x,y).floatValue());
+					assertTrue(0 == f.get(x,y).floatValue());
 			}
 		}
 	}
@@ -196,11 +196,11 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 			// the border should be unmodified, zeros
 			if( y >= begin && y < end ) {
 				for( int x = 0; x < expected.width; x++ ) {
-					assertEquals(quad+" ( "+x+" , "+y+" )",e.get(x,y).floatValue() , f.get(x,y).floatValue() , 1e-4f);
+					assertEquals(e.get(x,y).floatValue() , f.get(x,y).floatValue() , 1e-4f);
 				}
 			} else {
 				for( int x = 0; x < expected.width; x++ ) {
-					assertTrue(quad+" ( "+x+" , "+y+" ) 0 != "+f.get(x,y),0 == f.get(x,y).floatValue());
+					assertTrue(0 == f.get(x,y).floatValue());
 				}
 			}
 		}

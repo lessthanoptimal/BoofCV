@@ -24,13 +24,13 @@ import boofcv.core.image.border.*;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles

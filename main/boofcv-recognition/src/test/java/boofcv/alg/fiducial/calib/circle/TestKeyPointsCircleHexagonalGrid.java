@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,9 @@ import boofcv.alg.fiducial.calib.circle.KeyPointsCircleHexagonalGrid.Tangents;
 import georegression.misc.GrlConstants;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -88,7 +88,7 @@ public class TestKeyPointsCircleHexagonalGrid {
 					if( col == 0 || col == grid.columns-1-(1-grid.columns%2))
 						assertEquals(2,alg.tangents.get(index).size);
 					else
-						assertEquals(row+" "+col,4,alg.tangents.get(index).size);
+						assertEquals(4,alg.tangents.get(index).size);
 				} else if( row%2 == 1 && col%2 == 1 ) {
 					if( col == 1 || col == grid.columns-1-(grid.columns%2))
 						assertEquals(2,alg.tangents.get(index).size);

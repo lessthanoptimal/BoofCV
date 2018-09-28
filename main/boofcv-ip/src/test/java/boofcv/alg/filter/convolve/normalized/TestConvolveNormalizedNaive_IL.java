@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,11 +25,11 @@ import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.InterleavedU16;
 import boofcv.struct.image.InterleavedU8;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -59,7 +59,7 @@ public class TestConvolveNormalizedNaive_IL {
 				for (int band = 0; band < numBands; band++) {
 					int expected = horizontal(x,y,band,kernel,input);
 					int found = output.getBand(x,y,band);
-					assertEquals(x+"  "+y,expected,found);
+					assertEquals(expected,found);
 				}
 			}
 		}
@@ -101,7 +101,7 @@ public class TestConvolveNormalizedNaive_IL {
 				for (int band = 0; band < numBands; band++) {
 					int expected = vertical(x, y,band, kernel, input);
 					int found = output.getBand(x,y, band);
-					assertEquals(x+"  "+y,expected,found);
+					assertEquals(expected,found);
 				}
 			}
 		}
@@ -147,7 +147,7 @@ public class TestConvolveNormalizedNaive_IL {
 				for (int band = 0; band < numBands; band++) {
 					int expected = vertical2(x, y, band, kernelX, kernelY, input);
 					int found = output.getBand(x,y, band);
-					assertEquals(x+"  "+y,expected,found);
+					assertEquals(expected,found);
 				}
 			}
 		}
@@ -202,7 +202,7 @@ public class TestConvolveNormalizedNaive_IL {
 				for (int band = 0; band < numBands; band++) {
 					int expected = convolve(x, y, band, kernel, input);
 					int found = output.getBand(x,y,band);
-					assertEquals(x+"  "+y,expected,found);
+					assertEquals(expected,found);
 				}
 			}
 		}
