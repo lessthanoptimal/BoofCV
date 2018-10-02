@@ -88,7 +88,7 @@ public class MetricSceneGraph {
 		}
 	}
 
-	class CameraView {
+	public static class CameraView {
 		public Se3_F64 viewToWorld = new Se3_F64();
 		public ViewState state = ViewState.UNPROCESSED;
 
@@ -120,7 +120,7 @@ public class MetricSceneGraph {
 		PROCESSED
 	}
 
-	class CameraMotion {
+	public static class CameraMotion {
 		// if the transform of both views is known then this will be scaled to be in world units
 		// otherwise it's in arbitrary units
 		public Se3_F64 a_to_b = new Se3_F64();
@@ -172,7 +172,7 @@ public class MetricSceneGraph {
 		}
 	}
 
-	static class Feature3D {
+	public static class Feature3D {
 		// estimate 3D position of the feature in world frame. homogenous coordinates
 		public Point3D_F64 worldPt = new Point3D_F64();
 		// The acute angle between the two orientations it was triangulated from

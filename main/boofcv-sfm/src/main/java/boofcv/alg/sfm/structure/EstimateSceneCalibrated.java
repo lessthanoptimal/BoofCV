@@ -589,7 +589,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	 * Computes the acture angle between two vectors. Larger this angle is the better the triangulation
 	 * of the features 3D location is in general
 	 */
-	private double triangulationAngle( Point2D_F64 normA , Point2D_F64 normB , Se3_F64 a_to_b ) {
+	double triangulationAngle( Point2D_F64 normA , Point2D_F64 normB , Se3_F64 a_to_b ) {
 		// the more parallel a line is worse the triangulation. Get rid of bad ideas early here
 		arrowA.set(normA.x,normA.y,1);
 		arrowB.set(normB.x,normB.y,1);
@@ -601,7 +601,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	/**
 	 * Looks to see which connections have yet to be visited and adds them to the open list
 	 */
-	private void addUnvistedToStack(CameraView viewed, List<CameraView> open) {
+	void addUnvistedToStack(CameraView viewed, List<CameraView> open) {
 		for (int i = 0; i < viewed.connections.size(); i++) {
 			CameraView other = viewed.connections.get(i).destination(viewed);
 			if( other.state == ViewState.UNPROCESSED) {
@@ -660,16 +660,17 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		addTriangulatedFeaturesForAllEdges(viewA);
 		addTriangulatedFeaturesForAllEdges(viewB);
 
-		System.out.println("root  = "+viewA.index);
-		System.out.println("other = "+viewB.index);
-		System.out.println("-------------");
-
+		if( verbose != null ) {
+			verbose.println("root  = " + viewA.index);
+			verbose.println("other = " + viewB.index);
+			verbose.println("-------------");
+		}
 	}
 
 	/**
 	 * Select the view which will be coordinate system's origin. This should be a well connected node which have
 	 * favorable geometry to the other views it's connected to.
-	 * @return The selcted view
+	 * @return The selected view
 	 */
 	CameraView selectOriginNode() {
 		double bestScore = 0;
@@ -678,13 +679,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		if( verbose != null )
 			verbose.println("selectOriginNode");
 		for (int i = 0; i < graph.nodes.size(); i++) {
-			double score = 0;
-			List<CameraMotion> edges = graph.nodes.get(i).connections;
-
-			for (int j = 0; j < edges.size(); j++) {
-				CameraMotion e = edges.get(j);
-				score += e.scoreTriangulation();
-			}
+			double score = scoreNode(graph.nodes.get(i));
 
 			if( score > bestScore ) {
 				bestScore = score;
@@ -694,16 +689,28 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 			if( verbose != null )
 				verbose.printf("  [%2d] score = %s\n",i,score);
 		}
-		if( verbose != null )
+		if( verbose != null && best != null )
 			verbose.println("     selected = "+best.index);
 
 		return best;
 	}
 
+	double scoreNode(CameraView node ) {
+		double score = 0;
+
+		List<CameraMotion> edges = node.connections;
+
+		for (int j = 0; j < edges.size(); j++) {
+			CameraMotion e = edges.get(j);
+			score += e.scoreTriangulation();
+		}
+		return score;
+	}
+
 	/**
 	 * Select motion which will define the coordinate system.
 	 */
-	CameraMotion selectCoordinateBase(CameraView view ) {
+	CameraMotion selectCoordinateBase( CameraView view ) {
 		double bestScore = 0;
 		CameraMotion best = null;
 
@@ -727,7 +734,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	 * An edge has been declared as defining a good stereo pair. All associated feature will now be
 	 * triangulated. It is assumed that there is no global coordinate system at this point.
 	 */
-	private void triangulateMetricStereoEdges(CameraMotion edge ) {
+	void triangulateMetricStereoEdges(CameraMotion edge ) {
 		CameraView viewA = edge.viewSrc;
 		CameraView viewB = edge.viewDst;
 
