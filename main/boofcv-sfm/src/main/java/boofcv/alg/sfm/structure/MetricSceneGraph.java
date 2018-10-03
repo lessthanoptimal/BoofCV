@@ -70,6 +70,7 @@ public class MetricSceneGraph {
 			m.observationNorm = p.observationNorm;
 			m.observationPixels = p.observationPixels;
 			m.index = p.index;
+			m.features3D = new Feature3D[m.observationNorm.size];
 
 			for (int j = 0; j < p.connections.size(); j++) {
 				m.connections.add( edges.get(pairwise.edges.get(j).index) );

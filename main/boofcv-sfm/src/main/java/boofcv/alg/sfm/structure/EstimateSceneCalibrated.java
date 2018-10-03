@@ -118,29 +118,36 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 			e.triangulationAngle = medianTriangulationAngle(e);
 		}
 
-		System.out.println("Selecting root");
+		if( verbose != null )
+			verbose.println("Selecting root");
 		// Select the view which will act as the origin
 		CameraView origin = selectOriginNode();
 		// Select the motion which will define the coordinate system
 		CameraMotion baseMotion = selectCoordinateBase( origin );
 
-		System.out.println("Stereo triangulation");
+		if( verbose != null )
+			verbose.println("Stereo triangulation");
 		// Triangulate features in all motions which exceed a certain angle
 		for (int i = 0; i < graph.edges.size() && !stopRequested ; i++) {
 			CameraMotion e = graph.edges.get(i);
 			if( e.triangulationAngle > Math.PI/10 || e == baseMotion) {
-				System.out.println("   Edge "+i+" / "+graph.edges.size());
+				if( verbose != null )
+					verbose.println("   Edge "+i+" / "+graph.edges.size());
 				triangulateMetricStereoEdges(e);
 			}
 		}
 
-		System.out.println("Defining the coordinate system");
+		if( verbose != null )
+			verbose.println("Defining the coordinate system");
+
 		// Using the selecting coordinate frames and triangulated points define the coordinate system
 		defineCoordinateSystem(origin, baseMotion);
 		if( stopRequested )
 			return false;
 
-		System.out.println("Estimate all features");
+		if( verbose != null )
+			verbose.println("Estimate all features");
+
 		// Now estimate all the other view locations and 3D features
 		estimateAllFeatures(origin, baseMotion.destination(origin));
 		if( stopRequested )
@@ -423,14 +430,14 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		}
 	}
 
-	private void addTriangulatedFeaturesForAllEdges(CameraView v) {
+	void addTriangulatedFeaturesForAllEdges(CameraView v) {
 		for (int i = 0; i < v.connections.size(); i++) {
 			CameraMotion e = v.connections.get(i);
 			if( !e.stereoTriangulations.isEmpty() ) {
 				try {
 					double scale = determineScale(v, e);
 					addTriangulatedStereoFeatures(v, e, scale);
-				} catch (Exception ignore) {}
+				} catch (Exception ignore) {} // exception is thrown if it can't determine the scale
 			}
 		}
 	}
@@ -438,7 +445,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	/**
 	 * Count how many 3D features are in view.
 	 */
-	private int countFeaturesWith3D(CameraView v ) {
+	int countFeaturesWith3D(CameraView v ) {
 
 		int count = 0;
 
@@ -619,7 +626,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	 * @param viewA The origin of the coordinate system
 	 * @param motion Motion which will define the coordinate system's scale
 	 */
-	private void defineCoordinateSystem(CameraView viewA, CameraMotion motion) {
+	void defineCoordinateSystem(CameraView viewA, CameraMotion motion) {
 
 		CameraView viewB = motion.destination(viewA);
 		viewA.viewToWorld.reset(); // identity since it's the origin
@@ -679,7 +686,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		if( verbose != null )
 			verbose.println("selectOriginNode");
 		for (int i = 0; i < graph.nodes.size(); i++) {
-			double score = scoreNode(graph.nodes.get(i));
+			double score = scoreNodeAsOrigin(graph.nodes.get(i));
 
 			if( score > bestScore ) {
 				bestScore = score;
@@ -695,7 +702,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		return best;
 	}
 
-	double scoreNode(CameraView node ) {
+	double scoreNodeAsOrigin(CameraView node ) {
 		double score = 0;
 
 		List<CameraMotion> edges = node.connections;

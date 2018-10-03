@@ -58,12 +58,105 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 
 	@Test
 	public void addTriangulatedStereoFeatures() {
-		fail("Implement");
+		int N = 10;
+
+		// create one good point and all the others will have an angle which is too small
+		final CameraMotion edge = new CameraMotion();
+		edge.viewSrc = new CameraView();
+		edge.viewDst = new CameraView();
+		edge.viewSrc.features3D = new Feature3D[N];
+		edge.viewDst.features3D = new Feature3D[N];
+		edge.triangulationAngle = 0;
+
+		double scale = 1.5;
+
+		for (int i = 0; i < N; i++) {
+			Feature3D f = new Feature3D();
+			f.worldPt.set(i,i,i);
+			f.views.add(edge.viewSrc);
+			f.obsIdx.add(i);
+			f.views.add(edge.viewDst);
+			f.obsIdx.add(i);
+			f.triangulationAngle = 10; // this will prevent it from triangulating again. I'm too lazy to deal with that
+			edge.stereoTriangulations.add(f);
+		}
+		edge.a_to_b.T.set(0,0,scale);
+
+		// make two of them known
+		edge.viewDst.features3D[8] = edge.stereoTriangulations.get(1);
+		edge.viewDst.features3D[9] = edge.stereoTriangulations.get(3);
+
+		edge.viewDst.viewToWorld.T.set(2,0,0);
+		edge.viewDst.connections.add(edge);
+
+		EstimateSceneCalibrated alg = new EstimateSceneCalibrated();
+		alg.graph = new MetricSceneGraph(new PairwiseImageGraph());
+
+		alg.addTriangulatedStereoFeatures(edge.viewDst,edge,1.0/scale);
+
+		// check to see if the transform to world was correctly computed
+		assertEquals(0,edge.viewDst.viewToWorld.T.distance(2,0,0), UtilEjml.TEST_F64);
+		assertEquals(0,edge.viewSrc.viewToWorld.T.distance(2,0,1), UtilEjml.TEST_F64);
+
+		// see if it moved all the points into the feature list
+		assertEquals(N-2,alg.graph.features3D.size()); // two are already known
+		assertEquals(0,edge.stereoTriangulations.size());
+
+		// see if scale was applied and transform from a_to_b since dst is the origin
+		for (int i = 0; i < N-2; i++) {
+			Feature3D f = alg.graph.features3D.get(i);
+			assertEquals(0, f.worldPt.distance(2+i/scale,i/scale,(i+scale)/scale), UtilEjml.TEST_F64);
+
+			assertSame(edge.viewSrc.features3D[i], f);
+			assertSame(edge.viewDst.features3D[i], f);
+
+			assertTrue(f.views.contains(edge.viewSrc));
+			assertTrue(f.views.contains(edge.viewDst));
+		}
+
+		assertSame(MetricSceneGraph.ViewState.UNPROCESSED,edge.viewSrc.state);
+		assertSame(MetricSceneGraph.ViewState.UNPROCESSED,edge.viewDst.state);
 	}
 
 	@Test
 	public void determineScale() {
-		fail("Implement");
+		determineScale(20,false);
+		determineScale(19,true);
+	}
+
+	public void determineScale( int N , boolean expectException ){
+
+		double scale = 1.5;
+
+		// create one good point and all the others will have an angle which is too small
+		final CameraMotion edge = new CameraMotion();
+		edge.viewSrc = new CameraView();
+		edge.viewDst = new CameraView();
+		edge.viewSrc.features3D = new Feature3D[N];
+		edge.viewDst.features3D = new Feature3D[N];
+
+		for (int i = 0; i < N; i++) {
+			Feature3D a = new Feature3D();
+			Feature3D b = new Feature3D();
+
+			double v = i+1;
+			a.worldPt.set(v,v,i);
+			b.worldPt.set(v/scale,v/scale,i/scale);
+
+			a.obsIdx.add(i);
+			a.obsIdx.add(i);
+			b.obsIdx.add(i);
+			b.obsIdx.add(i);
+
+			edge.viewDst.features3D[i] = a;
+			edge.stereoTriangulations.add(b);
+		}
+
+		try {
+			double found = EstimateSceneCalibrated.determineScale(edge.viewDst, edge);
+			assertEquals(scale, found, UtilEjml.TEST_F64);
+			assertFalse(expectException);
+		} catch( Exception ignore ){}
 	}
 
 	@Test
@@ -99,7 +192,64 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 
 	@Test
 	public void defineCoordinateSystem() {
-		fail("Implement");
+		int N = 10;
+
+		// create one good point and all the others will have an angle which is too small
+		final CameraMotion edge = new CameraMotion();
+		edge.viewSrc = new CameraView();
+		edge.viewDst = new CameraView();
+		edge.viewSrc.features3D = new Feature3D[N];
+		edge.viewDst.features3D = new Feature3D[N];
+
+		double scale = 1.5;
+
+		for (int i = 0; i < N; i++) {
+			Feature3D f = new Feature3D();
+			f.worldPt.set(i,i,i);
+			f.views.add(edge.viewSrc);
+			f.views.add(edge.viewDst);
+			f.obsIdx.add(i);
+			f.obsIdx.add(i);
+			edge.stereoTriangulations.add(f);
+		}
+		edge.a_to_b.T.set(0,0,scale);
+
+		edge.viewDst.connections.add(edge);
+
+		EstimateSceneCalibrated alg = new EstimateSceneCalibrated() {
+			// override this method since it's tested elsewhere
+			@Override
+			void addTriangulatedFeaturesForAllEdges(CameraView v) {
+				assertTrue(v==edge.viewSrc||v == edge.viewDst);
+			}
+		};
+		alg.graph = new MetricSceneGraph(new PairwiseImageGraph());
+
+		alg.defineCoordinateSystem(edge.viewDst,edge);
+
+		// see if it moved all the points into the feature list
+		assertEquals(N,alg.graph.features3D.size());
+		assertEquals(0,edge.stereoTriangulations.size());
+
+		// see if scale was applied and transform from a_to_b since dst is the origin
+		for (int i = 0; i < N; i++) {
+			Feature3D f = alg.graph.features3D.get(i);
+			assertEquals(0, f.worldPt.distance(i/scale,i/scale,(i+scale)/scale), UtilEjml.TEST_F64);
+
+			assertSame(edge.viewSrc.features3D[i], f);
+			assertSame(edge.viewDst.features3D[i], f);
+
+			assertTrue(f.views.contains(edge.viewSrc));
+			assertTrue(f.views.contains(edge.viewDst));
+		}
+
+		assertSame(MetricSceneGraph.ViewState.PROCESSED,edge.viewSrc.state);
+		assertSame(MetricSceneGraph.ViewState.PROCESSED,edge.viewDst.state);
+
+		// check to see if the set the transform to world correctly
+		assertEquals(1,edge.viewSrc.viewToWorld.T.z);
+		assertEquals(0,edge.viewDst.viewToWorld.T.z); // this should be the origin
+
 	}
 
 	@Test
@@ -107,7 +257,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 		// hack the score so that we know which one will be the best
 		EstimateSceneCalibrated alg = new EstimateSceneCalibrated() {
 			@Override
-			double scoreNode(CameraView node) {
+			double scoreNodeAsOrigin(CameraView node) {
 				return node.index;
 			}
 		};
@@ -187,6 +337,8 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 
 		Feature3D f = edge.stereoTriangulations.get(0);
 
+		assertEquals(2,f.obsIdx.size());
+		assertEquals(2,f.views.size());
 		assertEquals(1,f.obsIdx.get(0));
 		assertEquals(2,f.obsIdx.get(1));
 		assertEquals(edge.viewSrc,f.views.get(0));
