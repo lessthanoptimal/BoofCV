@@ -39,9 +39,13 @@ import java.util.Map;
  */
 public class PairwiseImageGraph {
 
-	public List<CameraView> nodes = new ArrayList<>();
-	public List<CameraMotion> edges = new ArrayList<>();
+	public List<View> nodes = new ArrayList<>();
+	public List<Motion> edges = new ArrayList<>();
 	public Map<String,Camera> cameras = new HashMap<>();
+
+	public void addCamera( Camera camera ) {
+		cameras.put(camera.camera,camera);
+	}
 
 	static class Camera {
 		public String camera;
@@ -61,12 +65,12 @@ public class PairwiseImageGraph {
 	 * @param storage (Output) Optional storage for found camera motions
 	 * @return
 	 */
-	public List<CameraMotion> findCameraMotions(Camera target , @Nullable List<CameraMotion> storage ) {
+	public List<Motion> findCameraMotions(Camera target , @Nullable List<Motion> storage ) {
 		if( storage == null )
 			storage = new ArrayList<>();
 
 		for (int i = 0; i < edges.size(); i++) {
-			CameraMotion m = edges.get(i);
+			Motion m = edges.get(i);
 			if( m.viewSrc.camera == target && m.viewDst.camera == target ) {
 				storage.add(m);
 			}
@@ -75,11 +79,11 @@ public class PairwiseImageGraph {
 		return storage;
 	}
 
-	static class CameraView {
+	static class View {
 		Camera camera;
 		public int index;
 
-		public List<CameraMotion> connections = new ArrayList<>();
+		public List<Motion> connections = new ArrayList<>();
 
 		// feature descriptor of all features in this image
 		public FastQueue<TupleDesc> descriptions;
@@ -87,14 +91,14 @@ public class PairwiseImageGraph {
 		public FastQueue<Point2D_F64> observationPixels = new FastQueue<>(Point2D_F64.class, true);
 		public FastQueue<Point2D_F64> observationNorm = new FastQueue<>(Point2D_F64.class, true);
 
-		public CameraView(int index, FastQueue<TupleDesc> descriptions ) {
+		public View(int index, FastQueue<TupleDesc> descriptions ) {
 			this.index = index;
 			this.descriptions = descriptions;
 		}
 
 	}
 
-	static class CameraMotion {
+	static class Motion {
 		/**
 		 * 3x3 matrix describing epipolar geometry. Fundamental or Essential
 		 */
@@ -106,12 +110,12 @@ public class PairwiseImageGraph {
 		// Which features are associated with each other and in the inlier set
 		public List<AssociatedIndex> associated = new ArrayList<>();
 
-		public CameraView viewSrc;
-		public CameraView viewDst;
+		public View viewSrc;
+		public View viewDst;
 
 		public int index;
 
-		public CameraView destination( CameraView src ) {
+		public View destination(View src ) {
 			if( src == viewSrc) {
 				return viewDst;
 			} else if( src == viewDst){

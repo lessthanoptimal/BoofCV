@@ -117,7 +117,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	 */
 	public void addImage(T image , String cameraName ) {
 
-		PairwiseImageGraph.CameraView view = new PairwiseImageGraph.CameraView(graph.nodes.size(),
+		PairwiseImageGraph.View view = new PairwiseImageGraph.View(graph.nodes.size(),
 				new FastQueue<TupleDesc>(TupleDesc.class,true) {
 					@Override
 					protected TupleDesc createInstance() {
@@ -212,11 +212,11 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	 * Associate features between the two views. Then compute a homography and essential matrix using LSMed. Add
 	 * features to the edge if they an inlier in essential. Save fit score of homography vs essential.
 	 */
-	protected boolean connectViews(PairwiseImageGraph.CameraView viewA , PairwiseImageGraph.CameraView viewB ,
-								FastQueue<AssociatedIndex> matches) {
+	protected boolean connectViews(PairwiseImageGraph.View viewA , PairwiseImageGraph.View viewB ,
+								   FastQueue<AssociatedIndex> matches) {
 
 		// Estimate fundamental/essential with RANSAC
-		PairwiseImageGraph.CameraMotion edge = new PairwiseImageGraph.CameraMotion();
+		PairwiseImageGraph.Motion edge = new PairwiseImageGraph.Motion();
 		int inliersEpipolar;
 
 		CameraPinhole pinhole0 = viewA.camera.pinhole;
@@ -288,7 +288,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	boolean fitEpipolar(FastQueue<AssociatedIndex> matches ,
 						List<Point2D_F64> pointsA , List<Point2D_F64> pointsB ,
 						Ransac<?,AssociatedPair> ransac ,
-						PairwiseImageGraph.CameraMotion edge )
+						PairwiseImageGraph.Motion edge )
 	{
 		pairs.resize(matches.size);
 		for (int i = 0; i < matches.size; i++) {

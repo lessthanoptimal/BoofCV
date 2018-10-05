@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,7 @@
 
 package boofcv.alg.descriptor;
 
-import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.abst.feature.detdesc.DetectDescribeMulti;
+import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -33,14 +32,13 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class UtilFeature {
-
 	/**
 	 * Creates a FastQueue and declares new instances of the descriptor using the provided
 	 * {@link DetectDescribePoint}.  The queue will have declareInstance set to true, otherwise
 	 * why would you be using this function?
 	 */
 	public static <TD extends TupleDesc>
-	FastQueue<TD> createQueue( final DescribeRegionPoint<?, TD> detDesc , int initialMax ) {
+	FastQueue<TD> createQueue(final DescriptorInfo<TD> detDesc , int initialMax ) {
 		return new FastQueue<TD>(initialMax,detDesc.getDescriptionType(),true) {
 			@Override
 			protected TD createInstance() {
@@ -49,32 +47,11 @@ public class UtilFeature {
 		};
 	}
 
-	/**
-	 * Creates a FastQueue and declares new instances of the descriptor using the provided
-	 * {@link DetectDescribePoint}.  The queue will have declareInstance set to true, otherwise
-	 * why would you be using this function?
-	 */
-	public static <TD extends TupleDesc>
-	FastQueue<TD> createQueue( final DetectDescribePoint<?, TD> detDesc , int initialMax ) {
-		return new FastQueue<TD>(initialMax,detDesc.getDescriptionType(),true) {
+	public static FastQueue<TupleDesc_F64> createQueueF64( final int length ) {
+		return new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
 			@Override
-			protected TD createInstance() {
-				return detDesc.createDescription();
-			}
-		};
-	}
-
-	/**
-	 * Creates a FastQueue and declares new instances of the descriptor using the provided
-	 * {@link DetectDescribePoint}.  The queue will have declareInstance set to true, otherwise
-	 * why would you be using this function?
-	 */
-	public static <TD extends TupleDesc>
-	FastQueue<TD> createQueue( final DetectDescribeMulti<?, TD> detDesc , int initialMax ) {
-		return new FastQueue<TD>(initialMax,detDesc.getDescriptionType(),true) {
-			@Override
-			protected TD createInstance() {
-				return detDesc.createDescription();
+			protected TupleDesc_F64 createInstance() {
+				return new TupleDesc_F64(length);
 			}
 		};
 	}

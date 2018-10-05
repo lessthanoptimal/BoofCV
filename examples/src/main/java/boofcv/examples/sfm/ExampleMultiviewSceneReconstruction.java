@@ -216,7 +216,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 
-		int N = 8;
+		int N = 4;
 		while( images.size() > N ) {
 			images.remove(N);
 		}

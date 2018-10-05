@@ -63,7 +63,7 @@ public class MetricSceneGraph {
 		}
 
 		for (int i = 0; i < pairwise.nodes.size(); i++) {
-			PairwiseImageGraph.CameraView p = pairwise.nodes.get(i);
+			PairwiseImageGraph.View p = pairwise.nodes.get(i);
 			CameraView m = nodes.get(i);
 
 			m.camera = p.camera;
@@ -78,7 +78,7 @@ public class MetricSceneGraph {
 		}
 
 		for (int i = 0; i < pairwise.edges.size(); i++) {
-			PairwiseImageGraph.CameraMotion p = pairwise.edges.get(i);
+			PairwiseImageGraph.Motion p = pairwise.edges.get(i);
 			CameraMotion m = edges.get(i);
 
 			m.index = p.index;

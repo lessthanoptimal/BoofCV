@@ -27,8 +27,8 @@ import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.sfm.EstimateSceneStructure;
 import boofcv.alg.sfm.structure.PairwiseImageGraph.Camera;
-import boofcv.alg.sfm.structure.PairwiseImageGraph.CameraMotion;
-import boofcv.alg.sfm.structure.PairwiseImageGraph.CameraView;
+import boofcv.alg.sfm.structure.PairwiseImageGraph.Motion;
+import boofcv.alg.sfm.structure.PairwiseImageGraph.View;
 import boofcv.factory.geo.EpipolarError;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.feature.AssociatedIndex;
@@ -83,7 +83,7 @@ public class EstimateSceneUncalibrated
 		features.reset();
 
 		for (int i = 0; i < graph.nodes.size(); i++) {
-			PairwiseImageGraph.CameraView v = graph.nodes.get(i);
+			View v = graph.nodes.get(i);
 			views.grow().initialize(v);
 		}
 
@@ -92,7 +92,7 @@ public class EstimateSceneUncalibrated
 			Camera camera = graph.cameras.get(cameraName);
 
 			// List all motions which belong to this camera and only this camera
-			List<CameraMotion> open = graph.findCameraMotions(camera,null);
+			List<Motion> open = graph.findCameraMotions(camera,null);
 
 			if( open.isEmpty() )
 				continue;
@@ -111,7 +111,7 @@ public class EstimateSceneUncalibrated
 
 			// Add all the other connected views
 			while( open.size() > 0 ) {
-				CameraMotion next = selectNextMotion(open);
+				Motion next = selectNextMotion(open);
 				if( next == null )
 					break;
 
@@ -142,15 +142,15 @@ public class EstimateSceneUncalibrated
 
 	}
 
-	CameraMotion selectNextMotion( List<CameraMotion> motions ) {
+	Motion selectNextMotion(List<Motion> motions ) {
 		double best = 0;
-		CameraMotion selected = null;
+		Motion selected = null;
 
 		for (int i = 0; i < motions.size(); i++) {
 			if( scores.data[i] <= 0 )
 				continue;
 
-			CameraMotion v = motions.get(i);
+			Motion v = motions.get(i);
 			ProjectiveView viewA = views.get( v.viewSrc.index );
 			ProjectiveView viewB = views.get( v.viewDst.index );
 
@@ -168,7 +168,7 @@ public class EstimateSceneUncalibrated
 	}
 
 
-	boolean initializeStructure( CameraMotion selected )
+	boolean initializeStructure( Motion selected )
 	{
 		ProjectiveView viewA = views.get(selected.viewSrc.index);
 		ProjectiveView viewB = views.get(selected.viewDst.index);
@@ -213,11 +213,11 @@ public class EstimateSceneUncalibrated
 	 * @param motion input
 	 * @return fit score. Larger is better.
 	 */
-	double scoreForTriangulation( CameraMotion motion ) {
+	double scoreForTriangulation( Motion motion ) {
 		DMatrixRMaj H = new DMatrixRMaj(3,3);
 
-		CameraView viewA = motion.viewSrc;
-		CameraView viewB = motion.viewDst;
+		View viewA = motion.viewSrc;
+		View viewB = motion.viewDst;
 
 		// Compute initial estimate for H
 		pairs.reset();
@@ -259,10 +259,10 @@ public class EstimateSceneUncalibrated
 
 	static class ProjectiveView {
 		public DMatrixRMaj P = new DMatrixRMaj(3, 4);
-		public PairwiseImageGraph.CameraView view;
+		public View view;
 		public boolean estimated;
 
-		public void initialize( PairwiseImageGraph.CameraView view )
+		public void initialize( View view )
 		{
 			CommonOps_DDRM.setIdentity(P);
 			this.view = view;
