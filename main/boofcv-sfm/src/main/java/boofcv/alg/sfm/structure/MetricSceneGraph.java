@@ -63,30 +63,50 @@ public class MetricSceneGraph {
 		}
 
 		for (int i = 0; i < pairwise.nodes.size(); i++) {
-			PairwiseImageGraph.View p = pairwise.nodes.get(i);
-			CameraView m = nodes.get(i);
+			PairwiseImageGraph.View pv = pairwise.nodes.get(i);
+			CameraView v = nodes.get(i);
 
-			m.camera = p.camera;
-			m.observationNorm = p.observationNorm;
-			m.observationPixels = p.observationPixels;
-			m.index = p.index;
-			m.features3D = new Feature3D[m.observationNorm.size];
+			v.camera = pv.camera;
+			v.observationNorm = pv.observationNorm;
+			v.observationPixels = pv.observationPixels;
+			v.index = pv.index;
+			v.features3D = new Feature3D[v.observationNorm.size];
 
-			for (int j = 0; j < p.connections.size(); j++) {
-				m.connections.add( edges.get(pairwise.edges.get(j).index) );
+			for (int j = 0; j < pv.connections.size(); j++) {
+				PairwiseImageGraph.Motion pm = pv.connections.get(j);
+				if( pm.viewDst.index != v.index && pm.viewSrc.index != v.index )
+					throw new RuntimeException("Invalid input");
+				v.connections.add( edges.get( pm.index) );
 			}
 		}
 
 		for (int i = 0; i < pairwise.edges.size(); i++) {
-			PairwiseImageGraph.Motion p = pairwise.edges.get(i);
+			PairwiseImageGraph.Motion pm = pairwise.edges.get(i);
 			CameraMotion m = edges.get(i);
 
-			m.index = p.index;
-			m.associated = p.associated;
-			m.viewSrc = nodes.get( p.viewSrc.index );
-			m.viewDst = nodes.get( p.viewDst.index );
-			m.F = p.F;
+			m.index = pm.index;
+			m.associated = pm.associated;
+			m.viewSrc = nodes.get( pm.viewSrc.index );
+			m.viewDst = nodes.get( pm.viewDst.index );
+			m.F = pm.F;
 		}
+	}
+
+	/**
+	 * Performs simple checks to see if the data structure is avlid
+	 */
+	public void sanityCheck() {
+		for( CameraView v : nodes ) {
+			for( CameraMotion m : v.connections ) {
+				if( m.viewDst != v && m.viewSrc != v )
+					throw new RuntimeException("Not member of connection");
+			}
+		}
+		for( CameraMotion m : edges ) {
+			if( m.viewDst != m.destination(m.viewSrc) )
+				throw new RuntimeException("Unexpected result");
+		}
+
 	}
 
 	public static class CameraView {

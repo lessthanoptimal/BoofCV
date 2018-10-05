@@ -107,6 +107,8 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	public boolean estimate(PairwiseImageGraph pairwiseGraph ) {
 		this.graph = new MetricSceneGraph(pairwiseGraph);
 
+		this.graph.sanityCheck();
+
 		for (int i = 0; i < graph.edges.size(); i++) {
 			decomposeEssential(graph.edges.get(i));
 		}
@@ -125,6 +127,8 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		// Select the motion which will define the coordinate system
 		CameraMotion baseMotion = selectCoordinateBase( origin );
 
+		this.graph.sanityCheck();
+
 		if( verbose != null )
 			verbose.println("Stereo triangulation");
 		// Triangulate features in all motions which exceed a certain angle
@@ -137,6 +141,9 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 			}
 		}
 
+		this.graph.sanityCheck();
+
+
 		if( verbose != null )
 			verbose.println("Defining the coordinate system");
 
@@ -144,6 +151,9 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		defineCoordinateSystem(origin, baseMotion);
 		if( stopRequested )
 			return false;
+
+		this.graph.sanityCheck();
+
 
 		if( verbose != null )
 			verbose.println("Estimate all features");
@@ -221,6 +231,12 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	private void convertToOutput( CameraView origin ) {
 		structure = new SceneStructureMetric(false);
 		observations = new BundleAdjustmentObservations(viewsAdded.size());
+
+		// TODO can this be simplified?
+		int idx = 0;
+		for( String key : graph.cameras.keySet() ) {
+			cameraToIndex.put(key,idx++);
+		}
 
 		structure.initialize(cameraToIndex.size(),viewsAdded.size(), graph.features3D.size());
 

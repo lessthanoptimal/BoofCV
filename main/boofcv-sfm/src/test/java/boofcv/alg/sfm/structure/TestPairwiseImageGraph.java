@@ -18,8 +18,8 @@
 
 package boofcv.alg.sfm.structure;
 
-import boofcv.alg.sfm.structure.PairwiseImageGraph.CameraMotion;
-import boofcv.alg.sfm.structure.PairwiseImageGraph.CameraView;
+import boofcv.alg.sfm.structure.PairwiseImageGraph.Motion;
+import boofcv.alg.sfm.structure.PairwiseImageGraph.View;
 import boofcv.struct.calib.CameraPinhole;
 import org.junit.jupiter.api.Test;
 
@@ -37,19 +37,19 @@ public class TestPairwiseImageGraph {
 		graph.cameras.put("cameraA",new PairwiseImageGraph.Camera("cameraA",null,new CameraPinhole()));
 		graph.cameras.put("cameraB",new PairwiseImageGraph.Camera("cameraB",null,new CameraPinhole()));
 
-		graph.nodes.add( new CameraView(0,null));
-		graph.nodes.add( new CameraView(0,null));
-		graph.nodes.add( new CameraView(0,null));
-		graph.nodes.add( new CameraView(0,null));
+		graph.nodes.add( new View(0,null));
+		graph.nodes.add( new View(0,null));
+		graph.nodes.add( new View(0,null));
+		graph.nodes.add( new View(0,null));
 
 		graph.nodes.get(0).camera = graph.cameras.get("cameraA");
 		graph.nodes.get(1).camera = graph.cameras.get("cameraA");
 		graph.nodes.get(2).camera = graph.cameras.get("cameraB");
 		graph.nodes.get(3).camera = graph.cameras.get("cameraB");
 
-		graph.edges.add( new CameraMotion());
-		graph.edges.add( new CameraMotion());
-		graph.edges.add( new CameraMotion());
+		graph.edges.add( new Motion());
+		graph.edges.add( new Motion());
+		graph.edges.add( new Motion());
 
 		graph.edges.get(0).viewSrc = graph.nodes.get(0);
 		graph.edges.get(0).viewDst = graph.nodes.get(2);
@@ -58,7 +58,7 @@ public class TestPairwiseImageGraph {
 		graph.edges.get(2).viewSrc = graph.nodes.get(3);
 		graph.edges.get(2).viewDst = graph.nodes.get(0);
 
-		List<CameraMotion> found =  graph.findCameraMotions(graph.cameras.get("cameraA"),null);
+		List<Motion> found =  graph.findCameraMotions(graph.cameras.get("cameraA"),null);
 		assertEquals(1,found.size());
 		assertTrue(graph.edges.get(1)==found.get(0));
 
@@ -69,10 +69,10 @@ public class TestPairwiseImageGraph {
 
 	@Test
 	public void CameraMotion_destination() {
-		CameraMotion motion = new CameraMotion();
-		CameraView viewA = new CameraView(0,null);
-		CameraView viewB = new CameraView(0,null);
-		CameraView viewC = new CameraView(0,null);
+		Motion motion = new Motion();
+		View viewA = new View(0,null);
+		View viewB = new View(0,null);
+		View viewC = new View(0,null);
 
 		motion.viewSrc = viewA;
 		motion.viewDst = viewB;

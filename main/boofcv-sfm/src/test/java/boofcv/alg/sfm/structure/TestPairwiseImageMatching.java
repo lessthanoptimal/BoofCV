@@ -66,7 +66,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		assertEquals(4+3+2+1,graph.edges.size());
 
 		for (int i = 0; i < graph.nodes.size(); i++) {
-			PairwiseImageGraph.CameraView n = graph.nodes.get(i);
+			PairwiseImageGraph.View n = graph.nodes.get(i);
 
 			assertEquals(4,n.connections.size());
 			assertTrue(n.observationNorm.size <= 400 && n.observationNorm.size >= 300);
@@ -74,7 +74,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		}
 
 		for (int i = 0; i < graph.edges.size(); i++) {
-			PairwiseImageGraph.CameraMotion e = graph.edges.get(i);
+			PairwiseImageGraph.Motion e = graph.edges.get(i);
 			assertTrue(e.metric);
 		}
 	}
@@ -110,14 +110,14 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		assertEquals(4+3+2+1,graph.edges.size());
 
 		for (int i = 0; i < graph.nodes.size(); i++) {
-			PairwiseImageGraph.CameraView n = graph.nodes.get(i);
+			PairwiseImageGraph.View n = graph.nodes.get(i);
 			assertEquals(4,n.connections.size());
 			assertEquals( 0 , n.observationNorm.size);
 			assertTrue(n.observationPixels.size <= 400 && n.observationPixels.size >= 300);
 		}
 
 		for (int i = 0; i < graph.edges.size(); i++) {
-			PairwiseImageGraph.CameraMotion e = graph.edges.get(i);
+			PairwiseImageGraph.Motion e = graph.edges.get(i);
 			assertFalse(e.metric);
 		}
 	}
@@ -171,13 +171,13 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		assertEquals(4+3+2+1+1,graph.edges.size());
 
 		for (int i = 0; i < 5; i++) {
-			PairwiseImageGraph.CameraView n = graph.nodes.get(i);
+			PairwiseImageGraph.View n = graph.nodes.get(i);
 			assertEquals(4,n.connections.size());
 			assertTrue(n.observationNorm.size <= 400 && n.observationNorm.size >= 300);
 		}
 
 		for (int i = 5; i < 7; i++) {
-			PairwiseImageGraph.CameraView n = graph.nodes.get(i);
+			PairwiseImageGraph.View n = graph.nodes.get(i);
 			assertEquals(1,n.connections.size());
 			assertTrue(n.observationNorm.size <= 400 && n.observationNorm.size >= 300);
 		}
@@ -203,7 +203,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		PairwiseImageMatching alg = create(new MockDetector());
 		alg.declareModelFitting();
 
-		PairwiseImageGraph.CameraMotion edge = new PairwiseImageGraph.CameraMotion();
+		PairwiseImageGraph.Motion edge = new PairwiseImageGraph.Motion();
 		alg.fitEpipolar(matches,pointsA,pointsB,alg.ransacFundamental,edge);
 
 		assertTrue(edge.associated.size() >= matches.size*0.95 );
