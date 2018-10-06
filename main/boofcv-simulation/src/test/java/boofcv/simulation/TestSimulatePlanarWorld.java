@@ -26,10 +26,10 @@ import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
+import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -49,7 +49,7 @@ public class TestSimulatePlanarWorld {
 		GrayF32 marker = new GrayF32(40,30);
 		GImageMiscOps.fill(marker,255);
 
-		Se3_F64 markerToWorld = SpecialEuclideanOps_F64.eulerXYZ(0,Math.PI,0,0,0,markerZ,null);
+		Se3_F64 markerToWorld = eulerXyz(0,0,markerZ,0,Math.PI,0,null);
 
 		SimulatePlanarWorld alg = new SimulatePlanarWorld();
 
@@ -141,7 +141,7 @@ public class TestSimulatePlanarWorld {
 		// fill the top left corner so that we can tell the orientation
 		GImageMiscOps.fillRectangle(marker,100,0,0,20,15);
 
-		Se3_F64 markerToWorld = SpecialEuclideanOps_F64.eulerXYZ(0,Math.PI,rotZ,0,0,markerZ,null);
+		Se3_F64 markerToWorld = eulerXyz(0,0,markerZ,0,Math.PI,rotZ,null);
 
 		SimulatePlanarWorld alg = new SimulatePlanarWorld();
 
@@ -195,7 +195,7 @@ public class TestSimulatePlanarWorld {
 		GrayF32 marker = new GrayF32(40,30);
 		GImageMiscOps.fill(marker,255);
 
-		Se3_F64 markerToWorld = SpecialEuclideanOps_F64.eulerXYZ(0,Math.PI,0,0,0,markerZ,null);
+		Se3_F64 markerToWorld = eulerXyz(0,0,markerZ,0,Math.PI,0,null);
 
 		SimulatePlanarWorld alg = new SimulatePlanarWorld();
 

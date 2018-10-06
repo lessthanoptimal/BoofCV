@@ -75,7 +75,7 @@ public class EstimateSceneUncalibrated
 	boolean stopRequested;
 
 	@Override
-	public boolean estimate( PairwiseImageGraph graph ) {
+	public boolean process(PairwiseImageGraph graph ) {
 		this.graph = graph;
 		this.stopRequested = false;
 

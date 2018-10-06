@@ -280,7 +280,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK,disparity.width,disparity.height,null);
 
 		// skew the view to make the structure easier to see
-		Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.eulerXYZ(0,0.3,0,-300,0,0,null);
+		Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.eulerXyz(-300,0,0,0,0.3,0,null);
 
 		PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
 		pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));

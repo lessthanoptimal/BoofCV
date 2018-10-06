@@ -37,7 +37,7 @@ public interface EstimateSceneStructure<Structure extends SceneStructure> extend
 	 * @param graph Describes relationship of each feature between views and epipolar geometry
 	 * @return true if successful or false if it failed
 	 */
-	boolean estimate( PairwiseImageGraph graph );
+	boolean process(PairwiseImageGraph graph );
 
 	/**
 	 * Returns the scene structure. Camera models will not be specified since that requires additional information

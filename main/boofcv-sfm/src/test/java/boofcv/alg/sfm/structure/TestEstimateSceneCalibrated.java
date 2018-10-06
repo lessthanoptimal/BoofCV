@@ -25,9 +25,9 @@ import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.sfm.structure.MetricSceneGraph.CameraMotion;
-import boofcv.alg.sfm.structure.MetricSceneGraph.CameraView;
 import boofcv.alg.sfm.structure.MetricSceneGraph.Feature3D;
+import boofcv.alg.sfm.structure.MetricSceneGraph.Motion;
+import boofcv.alg.sfm.structure.MetricSceneGraph.View;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
@@ -63,8 +63,8 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 		PairwiseImageGraph pairwise = createPerfectImageGraph();
 
 		EstimateSceneCalibrated alg = new EstimateSceneCalibrated();
-		alg.setVerbose(System.out);
-		alg.estimate(pairwise);
+//		alg.setVerbose(System.out);
+		alg.process(pairwise);
 
 		SceneObservations observations = alg.getObservations();
 		SceneStructureMetric structure = alg.getSceneStructure();
@@ -150,7 +150,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 		return pairwise;
 	}
 
-	private  void matchCommon( PairwiseImageGraph.View viewA , PairwiseImageGraph.View viewB,
+	private void matchCommon( PairwiseImageGraph.View viewA , PairwiseImageGraph.View viewB,
 							   List<AssociatedIndex> matches )
 	{
 		for (int i = 0; i < viewA.descriptions.size; i++) {
@@ -169,6 +169,12 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 
 	@Test
 	public void decomposeEssential() {
+		int N = 20;
+
+		final Motion edge = new Motion();
+		edge.viewSrc = new View();
+		edge.viewDst = new View();
+
 		fail("Implement");
 	}
 
@@ -182,9 +188,9 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 		int N = 10;
 
 		// create one good point and all the others will have an angle which is too small
-		final CameraMotion edge = new CameraMotion();
-		edge.viewSrc = new CameraView();
-		edge.viewDst = new CameraView();
+		final Motion edge = new Motion();
+		edge.viewSrc = new View();
+		edge.viewDst = new View();
 		edge.viewSrc.features3D = new Feature3D[N];
 		edge.viewDst.features3D = new Feature3D[N];
 		edge.triangulationAngle = 0;
@@ -250,9 +256,9 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 		double scale = 1.5;
 
 		// create one good point and all the others will have an angle which is too small
-		final CameraMotion edge = new CameraMotion();
-		edge.viewSrc = new CameraView();
-		edge.viewDst = new CameraView();
+		final Motion edge = new Motion();
+		edge.viewSrc = new View();
+		edge.viewDst = new View();
 		edge.viewSrc.features3D = new Feature3D[N];
 		edge.viewDst.features3D = new Feature3D[N];
 
@@ -283,12 +289,12 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	@Test
 	public void determinePose() {
 		int N = 40;
-		CameraMotion edge = new CameraMotion();
-		edge.viewSrc = new CameraView();
-		edge.viewDst = new CameraView();
+		Motion edge = new Motion();
+		edge.viewSrc = new View();
+		edge.viewDst = new View();
 
 		// define the camera's motion between the two views
-		Se3_F64 world_to_a = SpecialEuclideanOps_F64.eulerXYZ(0,0,0.05,0,0.5,0,null);
+		Se3_F64 world_to_a = SpecialEuclideanOps_F64.eulerXyz(0,0.5,0,0,0,0.05,null);
 
 		edge.a_to_b.set(0.5,0,0,EulerType.XYZ,0.05,0,0);
 
@@ -365,9 +371,9 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 		int N = 10;
 
 		// create one good point and all the others will have an angle which is too small
-		final CameraMotion edge = new CameraMotion();
-		edge.viewSrc = new CameraView();
-		edge.viewDst = new CameraView();
+		final Motion edge = new Motion();
+		edge.viewSrc = new View();
+		edge.viewDst = new View();
 		edge.viewSrc.features3D = new Feature3D[N];
 		edge.viewDst.features3D = new Feature3D[N];
 
@@ -389,7 +395,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 		EstimateSceneCalibrated alg = new EstimateSceneCalibrated() {
 			// override this method since it's tested elsewhere
 			@Override
-			void addTriangulatedFeaturesForAllEdges(CameraView v) {
+			void addTriangulatedFeaturesForAllEdges(View v) {
 				assertTrue(v==edge.viewSrc||v == edge.viewDst);
 			}
 		};
@@ -427,14 +433,14 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 		// hack the score so that we know which one will be the best
 		EstimateSceneCalibrated alg = new EstimateSceneCalibrated() {
 			@Override
-			double scoreNodeAsOrigin(CameraView node) {
+			double scoreNodeAsOrigin(View node) {
 				return node.index;
 			}
 		};
 		alg.graph = new MetricSceneGraph(new PairwiseImageGraph());
 
 		for (int i = 0; i < 4; i++) {
-			CameraView node = new CameraView();
+			View node = new View();
 			node.index = i;
 			alg.graph.nodes.add( node );
 		}
@@ -444,10 +450,10 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 
 	@Test
 	public void selectCoordinateBase() {
-		CameraView view = new CameraView();
+		View view = new View();
 
 		for (int i = 0; i < 4; i++) {
-			CameraMotion m = new CameraMotion();
+			Motion m = new Motion();
 			m.triangulationAngle = 0.1;
 			m.associated = new ArrayList<>();
 			m.associated.add( new AssociatedIndex() );
@@ -465,9 +471,9 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	public void triangulateMetricStereoEdges() {
 
 		// create one good point and all the others will have an angle which is too small
-		CameraMotion edge = new CameraMotion();
-		edge.viewSrc = new CameraView();
-		edge.viewDst = new CameraView();
+		Motion edge = new Motion();
+		edge.viewSrc = new View();
+		edge.viewDst = new View();
 
 		edge.viewSrc.observationNorm = new FastQueue<>(Point2D_F64.class,true);
 		edge.viewDst.observationNorm = new FastQueue<>(Point2D_F64.class,true);

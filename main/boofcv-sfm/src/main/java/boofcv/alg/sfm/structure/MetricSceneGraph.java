@@ -38,8 +38,8 @@ import java.util.Map;
  */
 public class MetricSceneGraph {
 
-	public List<CameraView> nodes = new ArrayList<>();
-	public List<CameraMotion> edges = new ArrayList<>();
+	public List<View> nodes = new ArrayList<>();
+	public List<Motion> edges = new ArrayList<>();
 	public List<Feature3D> features3D = new ArrayList<>();
 	public Map<String, Camera> cameras;
 	/**
@@ -56,15 +56,15 @@ public class MetricSceneGraph {
 		}
 
 		for (int i = 0; i < pairwise.nodes.size(); i++) {
-			nodes.add( new CameraView());
+			nodes.add( new View());
 		}
 		for (int i = 0; i < pairwise.edges.size(); i++) {
-			edges.add( new CameraMotion() );
+			edges.add( new Motion() );
 		}
 
 		for (int i = 0; i < pairwise.nodes.size(); i++) {
 			PairwiseImageGraph.View pv = pairwise.nodes.get(i);
-			CameraView v = nodes.get(i);
+			View v = nodes.get(i);
 
 			v.camera = pv.camera;
 			v.observationNorm = pv.observationNorm;
@@ -82,7 +82,7 @@ public class MetricSceneGraph {
 
 		for (int i = 0; i < pairwise.edges.size(); i++) {
 			PairwiseImageGraph.Motion pm = pairwise.edges.get(i);
-			CameraMotion m = edges.get(i);
+			Motion m = edges.get(i);
 
 			m.index = pm.index;
 			m.associated = pm.associated;
@@ -96,24 +96,24 @@ public class MetricSceneGraph {
 	 * Performs simple checks to see if the data structure is avlid
 	 */
 	public void sanityCheck() {
-		for( CameraView v : nodes ) {
-			for( CameraMotion m : v.connections ) {
+		for( View v : nodes ) {
+			for( Motion m : v.connections ) {
 				if( m.viewDst != v && m.viewSrc != v )
 					throw new RuntimeException("Not member of connection");
 			}
 		}
-		for( CameraMotion m : edges ) {
+		for( Motion m : edges ) {
 			if( m.viewDst != m.destination(m.viewSrc) )
 				throw new RuntimeException("Unexpected result");
 		}
 
 	}
 
-	public static class CameraView {
+	public static class View {
 		public Se3_F64 viewToWorld = new Se3_F64();
 		public ViewState state = ViewState.UNPROCESSED;
 
-		public List<CameraMotion> connections = new ArrayList<>();
+		public List<Motion> connections = new ArrayList<>();
 		public FastQueue<Point2D_F64> observationPixels;
 		public FastQueue<Point2D_F64> observationNorm;
 
@@ -141,7 +141,7 @@ public class MetricSceneGraph {
 		PROCESSED
 	}
 
-	public static class CameraMotion {
+	public static class Motion {
 		// if the transform of both views is known then this will be scaled to be in world units
 		// otherwise it's in arbitrary units
 		public Se3_F64 a_to_b = new Se3_F64();
@@ -159,8 +159,8 @@ public class MetricSceneGraph {
 		// Which features are associated with each other and in the inlier set
 		public List<AssociatedIndex> associated;
 
-		public CameraView viewSrc;
-		public CameraView viewDst;
+		public View viewSrc;
+		public View viewDst;
 
 		/**
 		 * Score how well this motion can be used to provide an initial set of triangulated feature points.
@@ -172,7 +172,7 @@ public class MetricSceneGraph {
 			return associated.size()*triangulationAngle;
 		}
 
-		public Se3_F64 motionSrcToDst( CameraView src ) {
+		public Se3_F64 motionSrcToDst( View src ) {
 			if( src == viewSrc) {
 				return a_to_b.copy();
 			} else if( src == viewDst){
@@ -182,7 +182,7 @@ public class MetricSceneGraph {
 			}
 		}
 
-		public CameraView destination( CameraView src ) {
+		public View destination(View src ) {
 			if( src == viewSrc) {
 				return viewDst;
 			} else if( src == viewDst){
@@ -201,7 +201,7 @@ public class MetricSceneGraph {
 		// Index of the observation in the corresponding view which the feature is visible in
 		public GrowQueue_I32 obsIdx = new GrowQueue_I32();
 		// List of views this feature is visible in
-		public List<MetricSceneGraph.CameraView> views = new ArrayList<>();
+		public List<View> views = new ArrayList<>();
 		public int mark = -1;
 	}
 }

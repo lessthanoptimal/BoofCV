@@ -67,7 +67,7 @@ public class TestBaseDetectFiducialSquare {
 		simulator.setCamera(intrinsic);
 
 		double simulatedTargetWidth = 0.4;
-		Se3_F64 markerToWorld = SpecialEuclideanOps_F64.eulerXYZ(0,Math.PI,0,0,0,0.32,null);
+		Se3_F64 markerToWorld = SpecialEuclideanOps_F64.eulerXyz(0,0,0.32,0,Math.PI,0,null);
 
 
 		GrayF32 pattern = new GrayF32(100,100);

@@ -22,8 +22,6 @@ import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.sfm.structure.MetricSceneGraph.ViewState;
 import boofcv.alg.sfm.structure.PairwiseImageGraph.Camera;
-import boofcv.alg.sfm.structure.PairwiseImageGraph.Motion;
-import boofcv.alg.sfm.structure.PairwiseImageGraph.View;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
@@ -61,7 +59,7 @@ public class TestMetricSceneGraph {
 		assertNotNull(camNoo);
 
 		for (int i = 0; i < graph.nodes.size(); i++) {
-			MetricSceneGraph.CameraView v = graph.nodes.get(i);
+			MetricSceneGraph.View v = graph.nodes.get(i);
 			assertEquals(i,v.index);
 			assertEquals(ViewState.UNPROCESSED,v.state);
 			assertTrue(v.observationNorm.size>0);
@@ -69,7 +67,7 @@ public class TestMetricSceneGraph {
 		}
 
 		for (int i = 0; i < graph.edges.size(); i++) {
-			MetricSceneGraph.CameraMotion v = graph.edges.get(i);
+			MetricSceneGraph.Motion v = graph.edges.get(i);
 			assertEquals(i,v.index);
 			assertTrue(0 != v.associated.size());
 			assertSame(graph.nodes.get(i/2),v.viewSrc);
@@ -88,9 +86,9 @@ public class TestMetricSceneGraph {
 
 		for (int i = 0; i < 5; i++) {
 			FastQueue<TupleDesc> descs =(FastQueue) UtilFeature.createQueueF64(8);
-			pairwise.nodes.add( new View(i,descs) );
+			pairwise.nodes.add( new PairwiseImageGraph.View(i,descs) );
 
-			View v = pairwise.nodes.get(i);
+			PairwiseImageGraph.View v = pairwise.nodes.get(i);
 			v.index = i;
 
 			if( i%2 == 0 )
@@ -107,7 +105,7 @@ public class TestMetricSceneGraph {
 		}
 
 		for (int i = 0; i < 10; i++) {
-			Motion e = new Motion();
+			PairwiseImageGraph.Motion e = new PairwiseImageGraph.Motion();
 			pairwise.edges.add( e );
 
 			e.index = i;
