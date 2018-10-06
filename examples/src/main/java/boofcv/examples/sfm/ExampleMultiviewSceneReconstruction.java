@@ -100,7 +100,7 @@ public class ExampleMultiviewSceneReconstruction {
 		}
 
 		EstimateSceneCalibrated estimateScene = new EstimateSceneCalibrated();
-		estimateScene.setVerbose(System.out);
+		estimateScene.setVerbose(System.out,0);
 
 		if( !estimateScene.process(imageMatching.getGraph()))
 			throw new RuntimeException("Scene estimation failed");

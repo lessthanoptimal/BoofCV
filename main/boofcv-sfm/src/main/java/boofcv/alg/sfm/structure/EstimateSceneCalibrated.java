@@ -24,6 +24,7 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PositiveDepthConstraintCheck;
 import boofcv.alg.geo.robust.RansacMultiView;
+import boofcv.alg.geo.triangulate.TriangulationError;
 import boofcv.alg.sfm.EstimateSceneStructure;
 import boofcv.alg.sfm.structure.MetricSceneGraph.Feature3D;
 import boofcv.alg.sfm.structure.MetricSceneGraph.Motion;
@@ -80,6 +81,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 
 	// Triangulates the 3D coordinate of a point from two observations
 	TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
+	TriangulationError triangulationError = new TriangulationError();
 
 	MetricSceneGraph graph;
 
@@ -97,7 +99,9 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	// Verbose output to standard out
 	PrintStream verbose;
 
-	ConfigRansac configRansac = new ConfigRansac(1000,2.5);
+	double maxPixelError = 5;
+
+	ConfigRansac configRansac = new ConfigRansac(5000,maxPixelError);
 
 	/**
 	 * Processes the paired up scene features and computes an initial estimate for the scene's
@@ -138,14 +142,18 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		for (int i = 0; i < graph.edges.size() && !stopRequested ; i++) {
 			Motion e = graph.edges.get(i);
 			if( e.triangulationAngle > Math.PI/10 || e == baseMotion) {
-				if( verbose != null )
-					verbose.println("   Edge "+i+" / "+graph.edges.size());
 				triangulateMetricStereoEdges(e);
+				if( verbose != null ) {
+					int a = e.viewSrc.index;
+					int b = e.viewDst.index;
+					verbose.println("   Edge[" + i + "] "+a+"->"+b+"  feat3D="+e.stereoTriangulations.size());
+				}
 			}
 		}
+		if( stopRequested )
+			return false;
 
 		this.graph.sanityCheck();
-
 
 		if( verbose != null )
 			verbose.println("Defining the coordinate system");
@@ -156,7 +164,6 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 			return false;
 
 		this.graph.sanityCheck();
-
 
 		if( verbose != null )
 			verbose.println("Estimate all features");
@@ -175,7 +182,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	/**
 	 * Sets the a_to_b transform for the motion given.
 	 */
-	private void decomposeEssential( Motion motion ) {
+	void decomposeEssential( Motion motion ) {
 		List<Se3_F64> candidates = MultiViewOps.decomposeEssential(motion.F);
 
 		int bestScore = 0;
@@ -207,6 +214,12 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		motion.a_to_b.set(best);
 	}
 
+	/**
+	 * Compares the angle that different observations form when their lines intersect. Returns
+	 * the median angle. Used to determine if this edge is good for triangulation
+	 * @param edge edge
+	 * @return median angle between observations in radians
+	 */
 	double medianTriangulationAngle( Motion edge ) {
 
 		GrowQueue_F64 angles = new GrowQueue_F64(edge.associated.size());
@@ -572,8 +585,6 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 
 	private void triangulateNoLocation( View target ) {
 
-		TriangulateTwoViewsCalibrated triangulator = FactoryMultiView.triangulateTwoGeometric();
-
 		Se3_F64 otherToTarget = new Se3_F64();
 
 		Se3_F64 worldToTarget = target.viewToWorld.invert(null);
@@ -585,6 +596,8 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 				continue;
 
 			other.viewToWorld.concat(worldToTarget,otherToTarget);
+
+			triangulationError.configure(target.camera.pinhole,other.camera.pinhole);
 
 			for (int i = 0; i < c.associated.size(); i++) {
 				AssociatedIndex a = c.associated.get(i);
@@ -603,7 +616,15 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 					continue;
 
 				Feature3D f = new Feature3D();
-				if( !triangulator.triangulate(normOther,normTarget,otherToTarget,f.worldPt))
+				if( !triangulate.triangulate(normOther,normTarget,otherToTarget,f.worldPt))
+					continue;
+
+				// must be in front of the camera
+				if( f.worldPt.z <= 0 )
+					continue;
+
+				double error = triangulationError.process(normOther,normTarget,otherToTarget,f.worldPt);
+				if( error > maxPixelError*maxPixelError )
 					continue;
 
 				other.viewToWorld.transform(f.worldPt,f.worldPt);
@@ -672,6 +693,9 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		boolean originIsDst = viewA == motion.viewDst;
 		for (int i = 0; i < motion.stereoTriangulations.size(); i++) {
 			Feature3D f = motion.stereoTriangulations.get(i);
+
+			if( f.obsIdx.size != 2 )
+				throw new RuntimeException("BUG");
 
 			int indexSrc = f.obsIdx.get(0);
 			int indexDst = f.obsIdx.get(1);
@@ -772,22 +796,32 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		View viewA = edge.viewSrc;
 		View viewB = edge.viewDst;
 
+		triangulationError.configure(viewA.camera.pinhole,viewB.camera.pinhole);
+
 		for (int i = 0; i < edge.associated.size(); i++) {
 			AssociatedIndex f = edge.associated.get(i);
 
 			Point2D_F64 normA = viewA.observationNorm.get(f.src);
 			Point2D_F64 normB = viewB.observationNorm.get(f.dst);
 
-			Feature3D feature3D = new Feature3D();
-
 			double angle = triangulationAngle(normA,normB,edge.a_to_b);
 			if( angle < TRIANGULATE_MIN_ANGLE )
 				continue;
 
+			Feature3D feature3D = new Feature3D();
+
 			if( !triangulate.triangulate(normA,normB,edge.a_to_b,feature3D.worldPt) ) {
-				System.out.println("  triangulation failed??!");
 				continue;
 			}
+
+			// must be in front of the camera
+			if( feature3D.worldPt.z <= 0 )
+				continue;
+
+			// can't have an excessively large reprojection error either
+			double error = triangulationError.process(normA,normB,edge.a_to_b,feature3D.worldPt);
+			if( error > maxPixelError*maxPixelError )
+				continue;
 
 			feature3D.views.add(viewA);
 			feature3D.views.add(viewB);
@@ -824,7 +858,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		return stopRequested;
 	}
 
-	public void setVerbose(PrintStream verbose) {
+	public void setVerbose(PrintStream verbose, int level ) {
 		this.verbose = verbose;
 	}
 }

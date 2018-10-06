@@ -120,7 +120,7 @@ public class MetricSceneGraph {
 		// Estimated 3D location for SOME of the features
 		public Feature3D[] features3D;
 
-		Camera camera;
+		public Camera camera;
 		public int index;
 
 		public int countFeatures3D() {

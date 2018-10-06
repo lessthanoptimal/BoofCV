@@ -223,6 +223,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		CameraPinhole pinhole1 = viewB.camera.pinhole;
 
 		if( pinhole0 != null && pinhole1 != null ) {
+			// Fully calibrated camera pair
 			ransacEssential.setIntrinsic(0,pinhole0);
 			ransacEssential.setIntrinsic(1,pinhole1);
 

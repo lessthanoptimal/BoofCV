@@ -42,6 +42,8 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -57,6 +59,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 
 	Random rand = new Random(234);
+	CameraPinhole pinhole = new CameraPinhole(400,400,0,500,500,1000,1000);
 
 	@Test
 	public void perfectScene() {
@@ -77,7 +80,6 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	}
 
 	private PairwiseImageGraph createPerfectImageGraph() {
-		CameraPinhole pinhole = new CameraPinhole(400,400,0,500,500,1000,1000);
 		List<Point3D_F64> cloud = UtilPoint3D_F64.random(new Point3D_F64(0,0,1.5),
 				-1.5,1.5,-0.5,0.5,-0.2,0.2,500,rand);
 
@@ -171,11 +173,44 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	public void decomposeEssential() {
 		int N = 20;
 
-		final Motion edge = new Motion();
-		edge.viewSrc = new View();
-		edge.viewDst = new View();
+		for (int trial = 0; trial < 10; trial++) {
+			final Motion edge = new Motion();
+			edge.viewSrc = new View();
+			edge.viewDst = new View();
+			edge.viewSrc.observationNorm = new FastQueue<>(Point2D_F64.class,true);
+			edge.viewDst.observationNorm = new FastQueue<>(Point2D_F64.class,true);
+			edge.associated = new ArrayList<>();
 
-		fail("Implement");
+			double rotX = rand.nextGaussian()*0.02;
+			double rotY = rand.nextGaussian()*0.02;
+			Se3_F64 a_to_b = SpecialEuclideanOps_F64.eulerXyz(rand.nextGaussian(),0,0,rotX,rotY,0,null);
+
+			List<Point3D_F64> sceneX = UtilPoint3D_F64.random(new Point3D_F64(0,0,1),-0.5,0.5,N,rand);
+			edge.viewDst.observationNorm.grow();
+			for (int i = 0; i < sceneX.size(); i++) {
+				Point3D_F64 X = sceneX.get(i);
+
+				edge.viewSrc.observationNorm.grow().set(X.x/X.z, X.y/X.z);
+				a_to_b.transform(X,X);
+				edge.viewDst.observationNorm.grow().set(X.x/X.z, X.y/X.z);
+
+				edge.associated.add( new AssociatedIndex(i,i+1,0));
+			}
+
+			edge.F = MultiViewOps.createEssential(a_to_b.R,a_to_b.T);
+			CommonOps_DDRM.scale(2.0,edge.F); // accurate up to a scale invariance
+
+			EstimateSceneCalibrated alg = new EstimateSceneCalibrated();
+			alg.decomposeEssential(edge);
+
+			// set to same scale
+			edge.a_to_b.T.divide(edge.a_to_b.T.norm());
+			a_to_b.T.divide(a_to_b.T.norm());
+
+			Se3_F64 a_to_a = edge.a_to_b.concat(a_to_b.invert(null),null);
+
+			assertTrue(MatrixFeatures_DDRM.isIdentity(a_to_a.R, UtilEjml.TEST_F64));
+		}
 	}
 
 	@Test
@@ -470,56 +505,57 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	@Test
 	public void triangulateMetricStereoEdges() {
 
+		int N = 20;
+
 		// create one good point and all the others will have an angle which is too small
 		Motion edge = new Motion();
 		edge.viewSrc = new View();
 		edge.viewDst = new View();
+		edge.viewSrc.camera = edge.viewDst.camera = camera("camera", pinhole);
 
 		edge.viewSrc.observationNorm = new FastQueue<>(Point2D_F64.class,true);
 		edge.viewDst.observationNorm = new FastQueue<>(Point2D_F64.class,true);
 		edge.associated = new ArrayList<>();
 
-		for (int i = 0; i < 5; i++) {
-			edge.viewSrc.observationNorm.grow();
-			edge.viewDst.observationNorm.grow();
+		edge.a_to_b.set(rand.nextGaussian(),0,0,EulerType.XYZ, 0.05, 0.1,0);
 
-			// have the indexes be different to make sure it's doing the look up correctly
-			edge.associated.add( new AssociatedIndex(i,i+1,0.1));
-		}
-		edge.viewDst.observationNorm.grow();
+		// Define the Points
+		List<Point3D_F64> sceneX = UtilPoint3D_F64.random(new Point3D_F64(0,0,1),-0.5,0.5,N,rand);
+		edge.viewDst.observationNorm.grow(); // offset by 1 to prevent indexes from being identical
+		for (int i = 0; i < sceneX.size(); i++) {
+			Point3D_F64 X = sceneX.get(i);
+			Point3D_F64 Xb = new Point3D_F64();
 
-		// define the camera's motion between the two views
-		edge.a_to_b.set(0.5,0,0,EulerType.XYZ,0.05,0,0);
+			edge.viewSrc.observationNorm.grow().set(X.x/X.z, X.y/X.z);
+			edge.a_to_b.transform(X,Xb);
+			edge.viewDst.observationNorm.grow().set(Xb.x/Xb.z, Xb.y/Xb.z);
 
-		// make the one point which will be triangulated
-		Point3D_F64 X = new Point3D_F64(0.1,0.9,1.5); // src
-		Point3D_F64 Y = new Point3D_F64();                      // dst
-		edge.a_to_b.transform(X,Y);
-		edge.viewSrc.observationNorm.get(1).set(X.x/X.z,X.y/X.z);
-		edge.viewDst.observationNorm.get(2).set(Y.x/Y.z,Y.y/Y.z);
-
-		// make things more interesting by applying a non-identity transformation
-
-		for (int i = 0; i < 5; i++) {
-			Point2D_F64 n = edge.viewSrc.observationNorm.get(i);
-			if( i != 1 )
-				GeometryMath_F64.multTran(edge.a_to_b.R,n,n);
+			edge.associated.add( new AssociatedIndex(i,i+1,0));
 		}
 
 		EstimateSceneCalibrated alg = new EstimateSceneCalibrated();
 		alg.triangulateMetricStereoEdges(edge);
 
-		assertEquals(1,edge.stereoTriangulations.size());
+		assertEquals(N,edge.stereoTriangulations.size());
 
-		Feature3D f = edge.stereoTriangulations.get(0);
+		for (int i = 0; i < N; i++) {
+			Point3D_F64 X = sceneX.get(i);
 
-		assertEquals(2,f.obsIdx.size());
-		assertEquals(2,f.views.size());
-		assertEquals(1,f.obsIdx.get(0));
-		assertEquals(2,f.obsIdx.get(1));
-		assertEquals(edge.viewSrc,f.views.get(0));
-		assertEquals(edge.viewDst,f.views.get(1));
-		assertEquals(0,X.distance(f.worldPt), UtilEjml.TEST_F64);
+			Feature3D f = edge.stereoTriangulations.get(i);
+
+			assertEquals(2,f.obsIdx.size());
+			assertEquals(2,f.views.size());
+			assertEquals(i,f.obsIdx.get(0));
+			assertEquals(i+1,f.obsIdx.get(1));
+			assertEquals(edge.viewSrc,f.views.get(0));
+			assertEquals(edge.viewDst,f.views.get(1));
+			assertEquals(0,X.distance(f.worldPt), UtilEjml.TEST_F64);
+		}
+	}
+
+	private static PairwiseImageGraph.Camera camera( String name , CameraPinhole intrinsic ) {
+		return new PairwiseImageGraph.Camera("camera",
+				new LensDistortionPinhole(intrinsic).undistort_F64(true,false),intrinsic);
 	}
 
 }

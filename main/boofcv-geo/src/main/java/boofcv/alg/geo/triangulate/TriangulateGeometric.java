@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,20 +46,20 @@ public class TriangulateGeometric {
 	 *
 	 * @param a Observation from camera view 'a' in normalized coordinates. Not modified.
 	 * @param b Observation from camera view 'b' in normalized coordinates. Not modified.
-	 * @param fromAtoB Transformation from camera view 'a' to 'b'  Not modified.
+	 * @param a_to_b Transformation from camera view 'a' to 'b'  Not modified.
 	 * @param foundInA (Output) Found 3D position of the point in reference frame 'a'.  Modified.
 	 */
 	public void triangulate( Point2D_F64 a , Point2D_F64 b ,
-							 Se3_F64 fromAtoB ,
+							 Se3_F64 a_to_b ,
 							 Point3D_F64 foundInA )
 	{
 		// set camera B's principle point
-		Vector3D_F64 t = fromAtoB.getT();
+		Vector3D_F64 t = a_to_b.getT();
 		rayB.p.set(-t.x, -t.y, -t.z);
 
 		// rotate observation in B into camera A's view
-		GeometryMath_F64.multTran(fromAtoB.getR(),rayB.p,rayB.p);
-		GeometryMath_F64.multTran(fromAtoB.getR(),b,rayB.slope);
+		GeometryMath_F64.multTran(a_to_b.getR(),rayB.p,rayB.p);
+		GeometryMath_F64.multTran(a_to_b.getR(),b,rayB.slope);
 
 		rayA.slope.set(a.x,a.y,1);
 
