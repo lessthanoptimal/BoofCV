@@ -18,8 +18,8 @@
 
 package boofcv.io.geo;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations.View;
+import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneObservations.View;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSnavely;
 import boofcv.struct.geo.PointIndex2D_F64;
@@ -37,7 +37,7 @@ import java.io.*;
  */
 public class CodecBundleAdjustmentInTheLarge {
     public SceneStructureMetric scene;
-    public BundleAdjustmentObservations observations;
+    public SceneObservations observations;
 
     public void parse( File file ) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -54,7 +54,7 @@ public class CodecBundleAdjustmentInTheLarge {
         scene = new SceneStructureMetric(false);
         scene.initialize(numCameras,numCameras,numPoints);
 
-        observations = new BundleAdjustmentObservations(numCameras);
+        observations = new SceneObservations(numCameras);
 
         for (int i = 0; i < numObservations; i++) {
             words = reader.readLine().split("\\s+");
@@ -133,7 +133,7 @@ public class CodecBundleAdjustmentInTheLarge {
 
         PointIndex2D_F64 o = new PointIndex2D_F64();
         for (int viewIdx = 0; viewIdx < observations.views.length; viewIdx++) {
-            BundleAdjustmentObservations.View view = observations.views[viewIdx];
+            SceneObservations.View view = observations.views[viewIdx];
 
             for (int obsIdx = 0; obsIdx < view.size(); obsIdx++) {
                 view.get(obsIdx,o);

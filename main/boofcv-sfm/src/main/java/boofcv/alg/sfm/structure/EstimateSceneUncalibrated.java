@@ -22,7 +22,7 @@ import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.RefineEpipolar;
 import boofcv.abst.geo.TriangulateTwoViews;
 import boofcv.abst.geo.bundle.BundleAdjustment;
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.sfm.EstimateSceneStructure;
@@ -133,7 +133,7 @@ public class EstimateSceneUncalibrated
 	}
 
 	@Override
-	public BundleAdjustmentObservations getObservations() {
+	public SceneObservations getObservations() {
 		return null;
 	}
 

@@ -29,10 +29,10 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-public class BundleAdjustmentObservations {
+public class SceneObservations {
 	public View views[];
 
-	public BundleAdjustmentObservations( int numViews ) {
+	public SceneObservations(int numViews ) {
 		views = new View[numViews];
 		for (int i = 0; i < numViews; i++) {
 			views[i] = new View();
@@ -122,7 +122,7 @@ public class BundleAdjustmentObservations {
 	 */
 	public void checkOneObservationPerView() {
 		for (int viewIdx = 0; viewIdx < views.length; viewIdx++) {
-			BundleAdjustmentObservations.View v = views[viewIdx];
+			SceneObservations.View v = views[viewIdx];
 
 			for (int obsIdx = 0; obsIdx < v.size(); obsIdx++) {
 				int a = v.point.get(obsIdx);

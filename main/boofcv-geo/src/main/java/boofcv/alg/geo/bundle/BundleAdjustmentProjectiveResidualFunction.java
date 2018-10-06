@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
 import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.alg.geo.PerspectiveOps;
@@ -40,7 +40,7 @@ import georegression.struct.point.Point4D_F64;
  * </p>
  *
  * @see SceneStructureProjective
- * @see BundleAdjustmentObservations
+ * @see SceneObservations
  *
  * @author Peter Abeles
  */
@@ -48,7 +48,7 @@ public class BundleAdjustmentProjectiveResidualFunction
 	implements BundleAdjustmentSchur_DSCC.FunctionResiduals<SceneStructureProjective>
 {
 	private SceneStructureProjective structure;
-	private BundleAdjustmentObservations observations;
+	private SceneObservations observations;
 
 
 	// number of parameters being optimised
@@ -72,7 +72,7 @@ public class BundleAdjustmentProjectiveResidualFunction
 	 */
 	@Override
 	public void configure(SceneStructureProjective structure ,
-						  BundleAdjustmentObservations observations )
+						  SceneObservations observations )
 	{
 		this.structure = structure;
 		this.observations = observations;
@@ -99,7 +99,7 @@ public class BundleAdjustmentProjectiveResidualFunction
 		int observationIndex = 0;
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
 			SceneStructureProjective.View view = structure.views[viewIndex];
-			BundleAdjustmentObservations.View obsView = observations.views[viewIndex];
+			SceneObservations.View obsView = observations.views[viewIndex];
 
 			for (int i = 0; i < obsView.size(); i++) {
 				obsView.get(i,observedPixel);

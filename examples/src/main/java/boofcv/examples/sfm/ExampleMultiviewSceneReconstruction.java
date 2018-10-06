@@ -22,8 +22,8 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.bundle.BundleAdjustment;
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
 import boofcv.abst.geo.bundle.ScaleSceneStructure;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.structure.EstimateSceneCalibrated;
@@ -107,7 +107,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		// get the results
 		SceneStructureMetric structure = estimateScene.getSceneStructure();
-		BundleAdjustmentObservations observations = estimateScene.getObservations();
+		SceneObservations observations = estimateScene.getObservations();
 
 		// Configure bundle adjustment
 		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
@@ -216,7 +216,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 
-		int N = 4;
+		int N = 8;
 		while( images.size() > N ) {
 			images.remove(N);
 		}

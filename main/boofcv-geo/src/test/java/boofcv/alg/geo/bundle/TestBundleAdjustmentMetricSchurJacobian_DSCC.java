@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
@@ -41,7 +41,7 @@ public class TestBundleAdjustmentMetricSchurJacobian_DSCC {
 	@Test
 	public void compareToNumerical() {
 		SceneStructureMetric structure = createScene(rand);
-		BundleAdjustmentObservations observations = createObservations(rand,structure);
+		SceneObservations observations = createObservations(rand,structure);
 
 		double param[] = new double[structure.getParameterCount()];
 		new CodecSceneStructureMetric().encode(structure,param);

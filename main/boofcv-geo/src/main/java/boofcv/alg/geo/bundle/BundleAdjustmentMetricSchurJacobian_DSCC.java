@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
 import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.RodriguesRotationJacobian;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -42,7 +42,7 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 		implements BundleAdjustmentSchur_DSCC.Jacobian<SceneStructureMetric>
 {
 	private SceneStructureMetric structure;
-	private BundleAdjustmentObservations observations;
+	private SceneObservations observations;
 
 	// number of views with parameters that are going to be adjusted
 	private int numViewsUnknown;
@@ -83,7 +83,7 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 	private double calibGradY[] = null;
 
 	@Override
-	public void configure(SceneStructureMetric structure , BundleAdjustmentObservations observations ) {
+	public void configure(SceneStructureMetric structure , SceneObservations observations ) {
 		this.structure = structure;
 		this.observations = observations;
 
@@ -167,7 +167,7 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 				camera.model.setIntrinsic(input,indexLastView+cameraParamStartIndex);
 			}
 
-			BundleAdjustmentObservations.View obsView = observations.views[viewIndex];
+			SceneObservations.View obsView = observations.views[viewIndex];
 
 			for (int i = 0; i < obsView.size(); i++) {
 				int featureIndex = obsView.point.get(i);

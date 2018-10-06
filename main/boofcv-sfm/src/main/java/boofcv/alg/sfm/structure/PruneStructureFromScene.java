@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.structure;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.nn.KdTreePoint3D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -43,10 +43,10 @@ import java.util.List;
 public class PruneStructureFromScene {
 
 	SceneStructureMetric structure;
-	BundleAdjustmentObservations observations;
+	SceneObservations observations;
 
 	public PruneStructureFromScene(SceneStructureMetric structure,
-								   BundleAdjustmentObservations observations)
+								   SceneObservations observations)
 	{
 		this.structure = structure;
 		this.observations = observations;
@@ -68,7 +68,7 @@ public class PruneStructureFromScene {
 		// Create a list of observation errors
 		List<Errors> errors = new ArrayList<>();
 		for (int viewIndex = 0; viewIndex < observations.views.length; viewIndex++) {
-			BundleAdjustmentObservations.View v = observations.views[viewIndex];
+			SceneObservations.View v = observations.views[viewIndex];
 			SceneStructureMetric.View view = structure.views[viewIndex];
 
 			for (int pointIndex = 0; pointIndex < v.point.size; pointIndex++) {
@@ -101,7 +101,7 @@ public class PruneStructureFromScene {
 		for (int i = (int) (errors.size() * inlierFraction); i < errors.size(); i++) {
 			Errors e = errors.get(i);
 
-			BundleAdjustmentObservations.View v = observations.views[e.view];
+			SceneObservations.View v = observations.views[e.view];
 			v.set(e.pointIndexInView, Float.NaN, Float.NaN);
 		}
 
@@ -117,7 +117,7 @@ public class PruneStructureFromScene {
 
 		for (int viewIndex = 0; viewIndex < observations.views.length; viewIndex++) {
 //			System.out.println("ViewIndex="+viewIndex);
-			BundleAdjustmentObservations.View v = observations.views[viewIndex];
+			SceneObservations.View v = observations.views[viewIndex];
 			for(int pointIndex = v.point.size-1; pointIndex >= 0; pointIndex-- ) {
 				int pointID = v.getPointId(pointIndex);
 				SceneStructureMetric.Point f = structure.points[pointID];
@@ -146,7 +146,7 @@ public class PruneStructureFromScene {
 		Point3D_F64 X = new Point3D_F64();
 
 		for (int viewIndex = 0; viewIndex < observations.views.length; viewIndex++) {
-			BundleAdjustmentObservations.View v = observations.views[viewIndex];
+			SceneObservations.View v = observations.views[viewIndex];
 			SceneStructureMetric.View view = structure.views[viewIndex];
 
 			for (int pointIndex = 0; pointIndex < v.point.size; pointIndex++) {
@@ -181,7 +181,7 @@ public class PruneStructureFromScene {
 	public void prunePoints(int count ) {
 		// Remove all observations of the Points which are going to be removed
 		for (int viewIndex = observations.views.length-1; viewIndex >= 0; viewIndex--) {
-			BundleAdjustmentObservations.View v = observations.views[viewIndex];
+			SceneObservations.View v = observations.views[viewIndex];
 
 			for(int pointIndex = v.point.size-1; pointIndex >= 0; pointIndex-- ) {
 				SceneStructureMetric.Point p = structure.points[v.getPointId(pointIndex)];
@@ -217,7 +217,7 @@ public class PruneStructureFromScene {
 
 		// Update the references from observation to features
 		for (int viewIndex = observations.views.length-1; viewIndex >= 0; viewIndex--) {
-			BundleAdjustmentObservations.View v = observations.views[viewIndex];
+			SceneObservations.View v = observations.views[viewIndex];
 
 			for(int featureIndex = v.point.size-1; featureIndex >= 0; featureIndex-- ) {
 				v.point.data[featureIndex] = oldToNew[v.point.data[featureIndex]];
@@ -273,7 +273,7 @@ public class PruneStructureFromScene {
 
 			// Remove observations of this point
 			for (int viewIdx = 0; viewIdx < structureP.views.size; viewIdx++) {
-				BundleAdjustmentObservations.View v = observations.getView(structureP.views.data[viewIdx]);
+				SceneObservations.View v = observations.getView(structureP.views.data[viewIdx]);
 
 				int pointIdx = v.point.indexOf(pointId);
 				if( pointIdx < 0 )
@@ -295,10 +295,10 @@ public class PruneStructureFromScene {
 	public void pruneViews( int count ) {
 
 		List<SceneStructureMetric.View> remainingS = new ArrayList<>();
-		List<BundleAdjustmentObservations.View> remainingO = new ArrayList<>();
+		List<SceneObservations.View> remainingO = new ArrayList<>();
 
 		for (int viewId = 0; viewId < structure.views.length; viewId++) {
-			BundleAdjustmentObservations.View view = observations.views[viewId];
+			SceneObservations.View view = observations.views[viewId];
 			// See if has enough observations to not prune
 			if( view.size() > count ) {
 				remainingS.add(structure.views[viewId]);
@@ -319,7 +319,7 @@ public class PruneStructureFromScene {
 
 		// Create new arrays with the views that were not pruned
 		structure.views = new SceneStructureMetric.View[remainingS.size()];
-		observations.views = new BundleAdjustmentObservations.View[remainingO.size()];
+		observations.views = new SceneObservations.View[remainingO.size()];
 
 		for (int i = 0; i < structure.views.length; i++) {
 			structure.views[i] = remainingS.get(i);

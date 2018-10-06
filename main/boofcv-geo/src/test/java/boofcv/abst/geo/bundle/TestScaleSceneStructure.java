@@ -68,7 +68,7 @@ public class TestScaleSceneStructure {
 			SceneStructureMetric expected = new SceneStructureMetric(homogenous);
 			SceneStructureMetric found = new SceneStructureMetric(homogenous);
 
-			BundleAdjustmentObservations obs = createProjectiveScene(found,0xBEEF);
+			SceneObservations obs = createProjectiveScene(found,0xBEEF);
 			createProjectiveScene(expected,0xBEEF);
 
 			// Should have perfect observations
@@ -104,7 +104,7 @@ public class TestScaleSceneStructure {
 			SceneStructureProjective expected = new SceneStructureProjective(homogenous);
 			SceneStructureProjective found = new SceneStructureProjective(homogenous);
 
-			BundleAdjustmentObservations obs = createProjectiveScene(found,0xBEEF);
+			SceneObservations obs = createProjectiveScene(found,0xBEEF);
 			createProjectiveScene(expected,0xBEEF);
 
 			// Should have perfect observations
@@ -132,12 +132,12 @@ public class TestScaleSceneStructure {
 		}
 	}
 
-	public static BundleAdjustmentObservations createProjectiveScene(SceneStructureMetric scene ,
-																	 long seed ) {
+	public static SceneObservations createProjectiveScene(SceneStructureMetric scene ,
+														  long seed ) {
 		Random rand = new Random(seed);
 
 		scene.initialize(2,5,20);
-		BundleAdjustmentObservations observations = new BundleAdjustmentObservations(scene.views.length);
+		SceneObservations observations = new SceneObservations(scene.views.length);
 
 		CameraPinhole camera0 = new CameraPinhole(500+rand.nextDouble()*10,510+rand.nextDouble()*10,0,450,400,900,800);
 //		CameraPinhole camera1 = new CameraPinhole(456+rand.nextDouble()*10,510+rand.nextDouble()*10,0,420,410,900,800);
@@ -189,12 +189,12 @@ public class TestScaleSceneStructure {
 	}
 
 
-	public static BundleAdjustmentObservations createProjectiveScene(SceneStructureProjective scene ,
-																	 long seed ) {
+	public static SceneObservations createProjectiveScene(SceneStructureProjective scene ,
+														  long seed ) {
 		Random rand = new Random(seed);
 
 		scene.initialize(5,20);
-		BundleAdjustmentObservations observations = new BundleAdjustmentObservations(scene.views.length);
+		SceneObservations observations = new SceneObservations(scene.views.length);
 
 		CameraPinhole camera0 = new CameraPinhole(500+rand.nextDouble()*10,510+rand.nextDouble()*10,0,450,400,900,800);
 

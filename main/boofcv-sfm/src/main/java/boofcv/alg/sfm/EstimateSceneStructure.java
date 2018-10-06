@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructure;
 import boofcv.alg.sfm.structure.PairwiseImageGraph;
 import org.ddogleg.struct.Stoppable;
@@ -51,7 +51,7 @@ public interface EstimateSceneStructure<Structure extends SceneStructure> extend
 	 * Observations from each view
 	 * @return observations
 	 */
-	BundleAdjustmentObservations getObservations();
+	SceneObservations getObservations();
 
 	/**
 	 * Forgets all added views and cameras

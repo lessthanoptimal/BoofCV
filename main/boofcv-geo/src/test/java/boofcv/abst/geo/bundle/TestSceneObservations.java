@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations.View;
+import boofcv.abst.geo.bundle.SceneObservations.View;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentObservations {
+public class TestSceneObservations {
 	@Test
 	public void View_remove() {
 		View v = new View();

@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ public class TestBundleAdjustmentProjectiveResidualFunction {
 
 	public void multipleCalls( boolean homogenous ) {
 		SceneStructureProjective structure = homogenous?createSceneH(rand) : createScene3D(rand);
-		BundleAdjustmentObservations obs = createObservations(rand,structure);
+		SceneObservations obs = createObservations(rand,structure);
 
 		double param[] = new double[structure.getParameterCount()];
 
@@ -81,7 +81,7 @@ public class TestBundleAdjustmentProjectiveResidualFunction {
 		new CodecSceneStructureProjective().encode(structure,param);
 
 		// Create random observations
-		BundleAdjustmentObservations obs = createObservations(rand,structure);
+		SceneObservations obs = createObservations(rand,structure);
 
 		BundleAdjustmentProjectiveResidualFunction alg = new BundleAdjustmentProjectiveResidualFunction();
 		alg.configure(structure,obs);
@@ -108,14 +108,14 @@ public class TestBundleAdjustmentProjectiveResidualFunction {
 		}
 	}
 
-	public static BundleAdjustmentObservations createObservations( Random rand , SceneStructureProjective structure) {
-		BundleAdjustmentObservations obs = new BundleAdjustmentObservations(structure.views.length);
+	public static SceneObservations createObservations(Random rand , SceneStructureProjective structure) {
+		SceneObservations obs = new SceneObservations(structure.views.length);
 
 		for (int j = 0; j < structure.points.length; j++) {
 			SceneStructureProjective.Point p = structure.points[j];
 
 			for (int i = 0; i < p.views.size; i++) {
-				BundleAdjustmentObservations.View v = obs.getView(p.views.get(i));
+				SceneObservations.View v = obs.getView(p.views.get(i));
 				v.point.add( j );
 				v.observations.add( rand.nextInt(300)+20);
 				v.observations.add( rand.nextInt(300)+20);

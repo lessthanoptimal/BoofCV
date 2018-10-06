@@ -18,22 +18,37 @@
 
 package boofcv.alg.sfm.structure;
 
+import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.descriptor.DescriptorDistance;
+import boofcv.alg.descriptor.UtilFeature;
+import boofcv.alg.distort.pinhole.LensDistortionPinhole;
+import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.sfm.structure.MetricSceneGraph.CameraMotion;
 import boofcv.alg.sfm.structure.MetricSceneGraph.CameraView;
 import boofcv.alg.sfm.structure.MetricSceneGraph.Feature3D;
+import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.TupleDesc_F64;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
+import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
+import static boofcv.abst.geo.bundle.GenericBundleAdjustmentMetricChecks.checkReprojectionError;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -41,9 +56,115 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 
+	Random rand = new Random(234);
+
 	@Test
-	public void perfectScene_calibrated() {
-		fail("Implement");
+	public void perfectScene() {
+		PairwiseImageGraph pairwise = createPerfectImageGraph();
+
+		EstimateSceneCalibrated alg = new EstimateSceneCalibrated();
+		alg.setVerbose(System.out);
+		alg.estimate(pairwise);
+
+		SceneObservations observations = alg.getObservations();
+		SceneStructureMetric structure = alg.getSceneStructure();
+
+		assertEquals(1,structure.cameras.length);
+		assertEquals(5,structure.views.length);
+		assertTrue(structure.points.length>495);
+
+		checkReprojectionError(structure,observations,1e-4);
+	}
+
+	private PairwiseImageGraph createPerfectImageGraph() {
+		CameraPinhole pinhole = new CameraPinhole(400,400,0,500,500,1000,1000);
+		List<Point3D_F64> cloud = UtilPoint3D_F64.random(new Point3D_F64(0,0,1.5),
+				-1.5,1.5,-0.5,0.5,-0.2,0.2,500,rand);
+
+		PairwiseImageGraph pairwise = new PairwiseImageGraph();
+
+		LensDistortionPinhole distortion = new LensDistortionPinhole(pinhole);
+		Point2Transform2_F64 n2n = distortion.distort_F64(false,false);
+
+		pairwise.addCamera(new PairwiseImageGraph.Camera("one",distortion.undistort_F64(true,false),pinhole));
+
+		List<Se3_F64> listViewToWorld = new ArrayList<>();
+
+
+		Point3D_F64 Xv = new Point3D_F64(); // 3D point in view reference frame
+		Point2D_F64 n = new Point2D_F64();  // normalized image coordinate
+		Point2D_F64 p = new Point2D_F64();  // pixel coordinate
+
+		for (int viewidx = 0; viewidx < 5; viewidx++) {
+			Se3_F64 viewToWorld = new Se3_F64();
+			viewToWorld.set(-1+2.0*viewidx/4.0,0,0, EulerType.XYZ,rand.nextGaussian()*0.1,0,0);
+			listViewToWorld.add(viewToWorld);
+
+			FastQueue descs = UtilFeature.createQueueF64(3);
+			PairwiseImageGraph.View view = new PairwiseImageGraph.View(viewidx,descs);
+
+			// add visible features to each view
+			for (int i = 0; i < cloud.size(); i++) {
+				Point3D_F64 X = cloud.get(i);
+				viewToWorld.transformReverse(X,Xv);
+				n2n.compute(Xv.x/Xv.z, Xv.y/Xv.z, n);
+				PerspectiveOps.convertNormToPixel(pinhole,n.x,n.y,p);
+
+				if( !pinhole.inside(p.x,p.y) )
+					continue;
+
+				((TupleDesc_F64)view.descriptions.grow()).set(X.x,X.y,X.z);
+				view.observationNorm.grow().set(n);
+				view.observationPixels.grow().set(p);
+			}
+
+			view.camera = pairwise.cameras.get("one");
+			pairwise.nodes.add(view);
+		}
+
+		// Connect every node to
+		for (int i = 0; i < pairwise.nodes.size(); i++) {
+			for (int j = i+1; j < pairwise.nodes.size(); j++) {
+				PairwiseImageGraph.Motion m = new PairwiseImageGraph.Motion();
+				m.viewSrc = pairwise.nodes.get(i);
+				m.viewDst = pairwise.nodes.get(j);
+				m.metric = true;
+				m.index= pairwise.edges.size();
+				pairwise.edges.add(m);
+				m.viewSrc.connections.add(m);
+				m.viewDst.connections.add(m);
+
+				Se3_F64 src_to_dst = new Se3_F64();
+				listViewToWorld.get(i).concat(listViewToWorld.get(j).invert(null),src_to_dst);
+				m.F = MultiViewOps.createEssential(src_to_dst.R,src_to_dst.T);
+
+				// find common features. Match as pairs
+				matchCommon(m.viewSrc,m.viewDst,m.associated);
+
+				// randomly remove a few to make everything not perfect
+				for (int k = 0; k < 5; k++) {
+					m.associated.remove( rand.nextInt(m.associated.size()));
+				}
+			}
+		}
+		return pairwise;
+	}
+
+	private  void matchCommon( PairwiseImageGraph.View viewA , PairwiseImageGraph.View viewB,
+							   List<AssociatedIndex> matches )
+	{
+		for (int i = 0; i < viewA.descriptions.size; i++) {
+			TupleDesc_F64 a = (TupleDesc_F64)viewA.descriptions.get(i);
+
+			for (int j = 0; j < viewB.descriptions.size; j++) {
+				TupleDesc_F64 b = (TupleDesc_F64)viewB.descriptions.get(j);
+
+				if(DescriptorDistance.euclidean(a,b) <= UtilEjml.EPS ) {
+					matches.add( new AssociatedIndex(i,j,0));
+					break;
+				}
+			}
+		}
 	}
 
 	@Test
@@ -161,7 +282,56 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 
 	@Test
 	public void determinePose() {
-		fail("Implement");
+		int N = 40;
+		CameraMotion edge = new CameraMotion();
+		edge.viewSrc = new CameraView();
+		edge.viewDst = new CameraView();
+
+		// define the camera's motion between the two views
+		Se3_F64 world_to_a = SpecialEuclideanOps_F64.eulerXYZ(0,0,0.05,0,0.5,0,null);
+
+		edge.a_to_b.set(0.5,0,0,EulerType.XYZ,0.05,0,0);
+
+		edge.viewSrc.observationNorm = new FastQueue<>(Point2D_F64.class,true);
+		edge.viewDst.observationNorm = new FastQueue<>(Point2D_F64.class,true);
+		edge.associated = new ArrayList<>();
+
+		CameraPinhole intrinsic = new CameraPinhole(400,400,0,500,500,1000,1000);
+		edge.viewSrc.camera = new PairwiseImageGraph.Camera("moo",null,intrinsic);
+		edge.viewDst.camera = edge.viewSrc.camera;
+		edge.viewSrc.features3D = new Feature3D[N];
+		edge.viewDst.features3D = new Feature3D[N];
+		edge.viewSrc.connections.add(edge);
+		edge.viewDst.connections.add(edge);
+
+		// make it so that its observations are not skipped
+		edge.viewDst.state = MetricSceneGraph.ViewState.PROCESSED;
+
+		for (int i = 0; i < N; i++) {
+			Point3D_F64 X = new Point3D_F64(rand.nextGaussian(),rand.nextGaussian(),2);
+
+			Feature3D f3 = new Feature3D();
+			f3.worldPt.set(X);
+
+			world_to_a.transform(X,X);
+			edge.viewSrc.features3D[i] = f3;
+			edge.viewSrc.observationNorm.grow().set(X.x/X.z,X.y/X.z);
+
+			edge.a_to_b.transform(X,X);
+			edge.viewDst.features3D[i] = f3;
+			edge.viewDst.observationNorm.grow().set(X.x/X.z,X.y/X.z);
+
+			edge.associated.add( new AssociatedIndex(i,i,0.1));
+		}
+
+
+		EstimateSceneCalibrated alg = new EstimateSceneCalibrated();
+		alg.declareModelFitting();
+
+		assertTrue(alg.determinePose(edge.viewSrc));
+
+		Se3_F64 a_to_a = edge.viewSrc.viewToWorld.concat(world_to_a,null);
+		assertEquals(0,a_to_a.T.norm(), 1e-8);
 	}
 
 	@Test

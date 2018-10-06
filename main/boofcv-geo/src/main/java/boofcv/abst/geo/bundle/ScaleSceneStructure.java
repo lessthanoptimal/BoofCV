@@ -82,7 +82,7 @@ public class ScaleSceneStructure {
 	 * @param observations Observations of the scene
 	 */
 	public void applyScale( SceneStructureMetric structure ,
-							BundleAdjustmentObservations observations ) {
+							SceneObservations observations ) {
 
 		if( structure.homogenous ) {
 			applyScaleToPointsHomogenous(structure);
@@ -101,7 +101,7 @@ public class ScaleSceneStructure {
 	 */
 
 	public void applyScale( SceneStructureProjective structure ,
-							BundleAdjustmentObservations observations ) {
+							SceneObservations observations ) {
 		if( structure.homogenous ) {
 			applyScaleToPointsHomogenous(structure);
 			// can't normalize 4th column because w=1 is implicit and can't be changed
@@ -183,7 +183,7 @@ public class ScaleSceneStructure {
 	 * @param observations observations of the scene
 	 */
 	public void undoScale( SceneStructureMetric structure ,
-						   BundleAdjustmentObservations observations ) {
+						   SceneObservations observations ) {
 
 		if( structure.homogenous )
 			return;
@@ -217,7 +217,7 @@ public class ScaleSceneStructure {
 	 * @param observations observations of the scene
 	 */
 	public void undoScale( SceneStructureProjective structure ,
-						   BundleAdjustmentObservations observations ) {
+						   SceneObservations observations ) {
 
 		if( structure.homogenous )
 			return;

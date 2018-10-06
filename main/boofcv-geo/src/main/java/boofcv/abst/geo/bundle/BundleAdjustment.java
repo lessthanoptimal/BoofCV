@@ -49,7 +49,7 @@ public interface BundleAdjustment<Structure extends SceneStructure> extends Stop
 	 * @param structure Input: Initial parameters. Output: Optimized parameters
 	 * @param observations Observation of features in each image.
 	 */
-	void setParameters( Structure structure, BundleAdjustmentObservations observations);
+	void setParameters( Structure structure, SceneObservations observations);
 
 		/**
 		 * Optimises the parameters contained in 'structure' to minimize the error in the 'observations'. This function

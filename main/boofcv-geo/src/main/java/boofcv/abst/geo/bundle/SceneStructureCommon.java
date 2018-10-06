@@ -75,7 +75,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 
 		for (int i = 0; i < p.views.size; i++) {
 			if( p.views.data[i] == viewIndex )
-				throw new IllegalArgumentException("Tried to add the same view twice");
+				throw new IllegalArgumentException("Tried to add the same view twice. viewIndex="+viewIndex);
 		}
 		p.views.add(viewIndex);
 	}

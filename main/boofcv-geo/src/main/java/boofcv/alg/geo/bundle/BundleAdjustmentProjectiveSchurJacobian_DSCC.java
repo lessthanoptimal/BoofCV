@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
 import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.alg.geo.PerspectiveOps;
 import georegression.struct.point.Point3D_F64;
@@ -41,7 +41,7 @@ public class BundleAdjustmentProjectiveSchurJacobian_DSCC
 		implements BundleAdjustmentSchur_DSCC.Jacobian<SceneStructureProjective>
 {
 	private SceneStructureProjective structure;
-	private BundleAdjustmentObservations observations;
+	private SceneObservations observations;
 
 	// work space for jacobian
 	private DMatrixRMaj worldToView = new DMatrixRMaj(3,4);
@@ -79,7 +79,7 @@ public class BundleAdjustmentProjectiveSchurJacobian_DSCC
 	private double camGradY[] = new double[12];
 
 	@Override
-	public void configure(SceneStructureProjective structure , BundleAdjustmentObservations observations ) {
+	public void configure(SceneStructureProjective structure , SceneObservations observations ) {
 		this.structure = structure;
 		this.observations = observations;
 
@@ -138,7 +138,7 @@ public class BundleAdjustmentProjectiveSchurJacobian_DSCC
 				worldToView.set(view.worldToView);
 			}
 
-			BundleAdjustmentObservations.View obsView = observations.views[viewIndex];
+			SceneObservations.View obsView = observations.views[viewIndex];
 
 			for (int i = 0; i < obsView.size(); i++) {
 				int featureIndex = obsView.point.get(i);

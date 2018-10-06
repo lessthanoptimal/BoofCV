@@ -69,7 +69,7 @@ public class BundleAdjustmentSchur_DSCC<Structure extends SceneStructure>
 	}
 
 	@Override
-	public void setParameters(Structure structure, BundleAdjustmentObservations observations) {
+	public void setParameters(Structure structure, SceneObservations observations) {
 		this.function.configure(structure, observations);
 		this.jacobian.configure(structure, observations);
 		this.minimizer.setFunction(function,jacobian);
@@ -127,11 +127,11 @@ public class BundleAdjustmentSchur_DSCC<Structure extends SceneStructure>
 
 	public interface FunctionResiduals<Structure extends SceneStructure> extends FunctionNtoM {
 		void configure(Structure structure ,
-					   BundleAdjustmentObservations observations );
+					   SceneObservations observations );
 	}
 
 	public interface Jacobian<Structure extends SceneStructure> extends SchurJacobian<DMatrixSparseCSC>  {
 		void configure(Structure structure ,
-					   BundleAdjustmentObservations observations );
+					   SceneObservations observations );
 	}
 }

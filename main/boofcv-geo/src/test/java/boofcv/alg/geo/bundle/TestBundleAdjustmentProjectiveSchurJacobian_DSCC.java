@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
@@ -42,7 +42,7 @@ public class TestBundleAdjustmentProjectiveSchurJacobian_DSCC {
 	@Test
 	public void compareToNumerical_3D() {
 		SceneStructureProjective structure = createScene3D(rand);
-		BundleAdjustmentObservations observations = createObservations(rand,structure);
+		SceneObservations observations = createObservations(rand,structure);
 
 		double param[] = new double[structure.getParameterCount()];
 		new CodecSceneStructureProjective().encode(structure,param);
@@ -62,7 +62,7 @@ public class TestBundleAdjustmentProjectiveSchurJacobian_DSCC {
 	@Test
 	public void compareToNumerical_Homogenous() {
 		SceneStructureProjective structure = createSceneH(rand);
-		BundleAdjustmentObservations observations = createObservations(rand,structure);
+		SceneObservations observations = createObservations(rand,structure);
 
 		double param[] = new double[structure.getParameterCount()];
 		new CodecSceneStructureProjective().encode(structure,param);

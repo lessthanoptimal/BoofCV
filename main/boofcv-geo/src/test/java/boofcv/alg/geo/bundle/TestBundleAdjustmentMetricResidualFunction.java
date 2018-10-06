@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ public class TestBundleAdjustmentMetricResidualFunction {
 	@Test
 	public void multipleCalls() {
 		SceneStructureMetric structure = createScene(rand);
-		BundleAdjustmentObservations obs = createObservations(rand,structure);
+		SceneObservations obs = createObservations(rand,structure);
 
 		double param[] = new double[structure.getParameterCount()];
 
@@ -70,7 +70,7 @@ public class TestBundleAdjustmentMetricResidualFunction {
 		new CodecSceneStructureMetric().encode(structure,param);
 
 		// Create random observations
-		BundleAdjustmentObservations obs = createObservations(rand,structure);
+		SceneObservations obs = createObservations(rand,structure);
 
 		BundleAdjustmentMetricResidualFunction alg = new BundleAdjustmentMetricResidualFunction();
 		alg.configure(structure,obs);
@@ -96,14 +96,14 @@ public class TestBundleAdjustmentMetricResidualFunction {
 		}
 	}
 
-	public static BundleAdjustmentObservations createObservations( Random rand , SceneStructureMetric structure) {
-		BundleAdjustmentObservations obs = new BundleAdjustmentObservations(structure.views.length);
+	public static SceneObservations createObservations(Random rand , SceneStructureMetric structure) {
+		SceneObservations obs = new SceneObservations(structure.views.length);
 
 		for (int j = 0; j < structure.points.length; j++) {
 			SceneStructureMetric.Point p = structure.points[j];
 
 			for (int i = 0; i < p.views.size; i++) {
-				BundleAdjustmentObservations.View v = obs.getView(p.views.get(i));
+				SceneObservations.View v = obs.getView(p.views.get(i));
 				v.point.add( j );
 				v.observations.add( rand.nextInt(300)+20);
 				v.observations.add( rand.nextInt(300)+20);

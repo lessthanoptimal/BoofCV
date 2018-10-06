@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
 import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -38,7 +38,7 @@ import georegression.transform.se.SePointOps_F64;
  * </p>
  *
  * @see SceneStructureMetric
- * @see BundleAdjustmentObservations
+ * @see SceneObservations
  *
  * @author Peter Abeles
  */
@@ -47,7 +47,7 @@ public class BundleAdjustmentMetricResidualFunction
 
 {
 	private SceneStructureMetric structure;
-	private BundleAdjustmentObservations observations;
+	private SceneObservations observations;
 
 	// feature location in world coordinates
 	private Point3D_F64 worldPt = new Point3D_F64();
@@ -74,7 +74,7 @@ public class BundleAdjustmentMetricResidualFunction
 	 */
 	@Override
 	public void configure(SceneStructureMetric structure ,
-						  BundleAdjustmentObservations observations )
+						  SceneObservations observations )
 	{
 		this.structure = structure;
 		this.observations = observations;
@@ -103,7 +103,7 @@ public class BundleAdjustmentMetricResidualFunction
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
 			SceneStructureMetric.View view = structure.views[viewIndex];
 			SceneStructureMetric.Camera camera = structure.cameras[view.camera];
-			BundleAdjustmentObservations.View obsView = observations.views[viewIndex];
+			SceneObservations.View obsView = observations.views[viewIndex];
 
 			for (int i = 0; i < obsView.size(); i++) {
 				obsView.get(i,observedPixel);

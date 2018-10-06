@@ -19,10 +19,11 @@
 package boofcv.alg.sfm.structure;
 
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PositiveDepthConstraintCheck;
+import boofcv.alg.geo.bundle.cameras.BundlePinhole;
 import boofcv.alg.geo.robust.RansacMultiView;
 import boofcv.alg.sfm.EstimateSceneStructure;
 import boofcv.alg.sfm.structure.MetricSceneGraph.CameraMotion;
@@ -92,16 +93,12 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 
 	// Output
 	SceneStructureMetric structure;
-	BundleAdjustmentObservations observations;
+	SceneObservations observations;
 
 	// Verbose output to standard out
 	PrintStream verbose;
 
-	ConfigRansac configRansac = new ConfigRansac();
-
-	public EstimateSceneCalibrated(){
-		configRansac.inlierThreshold = 1;
-	}
+	ConfigRansac configRansac = new ConfigRansac(1000,2.5);
 
 	@Override
 	public boolean estimate(PairwiseImageGraph pairwiseGraph ) {
@@ -198,6 +195,9 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 			}
 		}
 
+		if( best == null )
+			throw new RuntimeException("Problem!");
+
 		motion.a_to_b.set(best);
 	}
 
@@ -230,7 +230,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	 */
 	private void convertToOutput( CameraView origin ) {
 		structure = new SceneStructureMetric(false);
-		observations = new BundleAdjustmentObservations(viewsAdded.size());
+		observations = new SceneObservations(viewsAdded.size());
 
 		// TODO can this be simplified?
 		int idx = 0;
@@ -239,6 +239,12 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		}
 
 		structure.initialize(cameraToIndex.size(),viewsAdded.size(), graph.features3D.size());
+
+		for ( String key : graph.cameras.keySet() ) {
+			int i = cameraToIndex.get(key);
+			structure.cameras[i].known = false;
+			structure.cameras[i].model = new BundlePinhole(graph.cameras.get(key).pinhole);
+		}
 
 		// look up table from old index to new index
 		int viewOldToView[] = new int[ graph.nodes.size() ];
@@ -418,21 +424,22 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 			// Determine the view's location in the 3D view. This might have been previously estimated using
 			// stereo and the estimated scale factor. That will be ignored and the new estimate used instead
 			if( !determinePose(v) ) {
-				// The pose could not be determined, so remove it from the graph
-				if( verbose != null )
-					verbose.println("   Removing connection");
-				for (CameraMotion m : v.connections) {
-					CameraView a = m.destination(v);
-					a.connections.remove(m);
-					graph.edges.remove(m);
-				}
-				graph.nodes.remove(v);
+//				// The pose could not be determined, so remove it from the graph
+//				if( verbose != null )
+//					verbose.println("   Removing connection");
+//				for (CameraMotion m : v.connections) {
+//					CameraView a = m.destination(v);
+//					a.connections.remove(m);
+//					graph.edges.remove(m);
+//				}
+//				graph.nodes.remove(v);
+//
+//				for (int i = 0; i < graph.nodes.size(); i++) {
+//					graph.nodes.get(i).index = i;
+//				}
 
-				for (int i = 0; i < graph.nodes.size(); i++) {
-					graph.nodes.get(i).index = i;
-				}
-
-//				throw new RuntimeException("Crap handle this");
+				// TODO mark instead of remove? Need a unit test for remove
+				throw new RuntimeException("Crap handle this");
 			} else {
 				// If possible use triangulation from stereo
 				addTriangulatedFeaturesForAllEdges(v);
@@ -492,13 +499,12 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	 *
 	 * A known feature has the current view added to its list of views.
 	 */
-	private boolean determinePose(CameraView target ) {
+	boolean determinePose(CameraView target ) {
 
 		// Find all Features which are visible in this view and have a known 3D location
 		List<Point2D3D> list = new ArrayList<>();
 		List<Feature3D> features = new ArrayList<>();
 		GrowQueue_I32 featureIndexes = new GrowQueue_I32();
-
 
 		// TODO mark need to handle casees where the target's index has changed due to node removal
 		// Find all the known 3D features which are visible in this view
@@ -794,7 +800,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	}
 
 	@Override
-	public BundleAdjustmentObservations getObservations() {
+	public SceneObservations getObservations() {
 		return observations;
 	}
 

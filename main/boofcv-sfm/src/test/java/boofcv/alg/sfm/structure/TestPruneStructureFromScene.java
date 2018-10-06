@@ -19,7 +19,7 @@
 package boofcv.alg.sfm.structure;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
-import boofcv.abst.geo.bundle.BundleAdjustmentObservations;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon.Point;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestPruneStructureFromScene {
 	SceneStructureMetric structure;
-	BundleAdjustmentObservations observations;
+	SceneObservations observations;
 
 	Random rand = new Random(234);
 	CameraPinholeRadial intrinsic = new CameraPinholeRadial(300,300,0,250,200,500,400);
@@ -330,7 +330,7 @@ public class TestPruneStructureFromScene {
 			structure.connectViewToCamera(i,i%2);
 		}
 
-		observations = new BundleAdjustmentObservations(structure.views.length);
+		observations = new SceneObservations(structure.views.length);
 
 		// 3D point in camera coordinate system
 		Point3D_F64 cameraX = new Point3D_F64();
@@ -409,7 +409,7 @@ public class TestPruneStructureFromScene {
 
 	private void checkObservationAndStructureSync() {
 		for (int viewId = 0; viewId < structure.views.length; viewId++) {
-			BundleAdjustmentObservations.View v = observations.views[viewId];
+			SceneObservations.View v = observations.views[viewId];
 			for(int pointIdx = v.point.size-1; pointIdx >= 0; pointIdx-- ) {
 				SceneStructureMetric.Point structP = structure.points[ v.getPointId(pointIdx) ];
 				if( !structP.views.contains(viewId))
