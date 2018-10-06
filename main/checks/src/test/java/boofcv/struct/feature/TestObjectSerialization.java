@@ -25,7 +25,7 @@ import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -45,7 +45,7 @@ public class TestObjectSerialization {
 
 	Random rand = new Random(234);
 
-	@AfterAll
+	@AfterEach
 	public void cleanup() {
 		File f = new File("temp.txt");
 

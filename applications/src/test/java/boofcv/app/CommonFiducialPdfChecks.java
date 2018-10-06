@@ -21,7 +21,7 @@ package boofcv.app;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -43,7 +43,7 @@ public class CommonFiducialPdfChecks {
 		return output;
 	}
 
-	@AfterAll
+	@AfterEach
 	public void cleanup() {
 		new File(document_name+".pdf").delete();
 	}

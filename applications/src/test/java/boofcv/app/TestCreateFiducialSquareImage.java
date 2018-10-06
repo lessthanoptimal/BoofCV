@@ -26,7 +26,7 @@ import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayF32;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -60,7 +60,7 @@ public class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 	}
 
 	@BeforeEach
-	public static void before() {
+	public void before() {
 		BufferedImage output = new BufferedImage(200,200,BufferedImage.TYPE_INT_RGB);
 
 		Graphics2D g2 = output.createGraphics();
@@ -75,7 +75,7 @@ public class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 		UtilImageIO.saveImage(output, names[1]);
 	}
 
-	@AfterAll
+	@AfterEach
 	public static void cleanUpImages() {
 		for( String s : names) {
 			new File(s).delete();
