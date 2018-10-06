@@ -20,6 +20,7 @@ package boofcv.alg.sfm.structure;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.robust.RansacMultiView;
 import boofcv.factory.geo.ConfigEssential;
 import boofcv.factory.geo.ConfigFundamental;
@@ -32,6 +33,7 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.Stoppable;
@@ -68,7 +70,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	// Temporary storage for feature pairs which are inliers
 	protected FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class,true);
 
-	protected RansacMultiView<DMatrixRMaj,AssociatedPair> ransacEssential;
+	protected RansacMultiView<Se3_F64,AssociatedPair> ransacEssential;
 	protected Ransac<DMatrixRMaj,AssociatedPair> ransacFundamental;
 
 	// print is verbose or not
@@ -88,7 +90,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	}
 
 	protected void declareModelFitting() {
-		ransacEssential = FactoryMultiViewRobust.essentialRansac(configEssential, configRansac);
+		ransacEssential = FactoryMultiViewRobust.baselineRansac(configEssential, configRansac);
 		ransacFundamental = FactoryMultiViewRobust.fundamentalRansac(configFundamental, configRansac);
 	}
 
@@ -235,7 +237,9 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 			}
 			edge.metric = true;
 			inliersEpipolar = ransacEssential.getMatchSet().size();
-			edge.F.set(ransacEssential.getModelParameters());
+			Se3_F64 foo = ransacEssential.getModelParameters();
+
+			edge.F.set(MultiViewOps.createEssential(foo.R,foo.T));
 		} else if( fitEpipolar(matches,
 					viewA.observationPixels.toList(), viewB.observationPixels.toList(),
 					ransacFundamental,edge) ) {

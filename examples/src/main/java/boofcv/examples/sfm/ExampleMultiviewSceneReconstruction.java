@@ -127,29 +127,29 @@ public class ExampleMultiviewSceneReconstruction {
 
 		// Requiring 3 views per point reduces the number of outliers by a lot but also removes
 		// many valid points
-//		pruner.prunePoints(3);
+		pruner.prunePoints(3);
 
 		// Optimize the results
-//		int pruneCycles=1;
-//		for (int i = 0; i < pruneCycles; i++) {
-//			System.out.println("BA + Prune iteration = "+i+"  points="+structure.points.length+"  obs="+observations.getObservationCount());
-//			bundleScale.applyScale(structure,observations);
-//			sba.setParameters(structure,observations);
-//			if( !sba.optimize(structure) ) {
-//				throw new RuntimeException("Bundle adjustment failed!");
-//			}
-//
-//			bundleScale.undoScale(structure,observations);
-//
-//			if( i == pruneCycles-1 )
-//				break;
-//
-//			System.out.println("Pruning....");
-//			pruner.pruneObservationsByErrorRank(0.97);  // Prune outlier observations
-//			pruner.prunePoints(3,0.4);            // Prune stray points in 3D space
-//			pruner.prunePoints(2);                           // Prune invalid points
-//			pruner.pruneViews(10);                           // Prune views with too few observations
-//		}
+		int pruneCycles=5;
+		for (int i = 0; i < pruneCycles; i++) {
+			System.out.println("BA + Prune iteration = "+i+"  points="+structure.points.length+"  obs="+observations.getObservationCount());
+			bundleScale.applyScale(structure,observations);
+			sba.setParameters(structure,observations);
+			if( !sba.optimize(structure) ) {
+				throw new RuntimeException("Bundle adjustment failed!");
+			}
+
+			bundleScale.undoScale(structure,observations);
+
+			if( i == pruneCycles-1 )
+				break;
+
+			System.out.println("Pruning....");
+			pruner.pruneObservationsByErrorRank(0.97);  // Prune outlier observations
+			pruner.prunePoints(3,0.4);            // Prune stray points in 3D space
+			pruner.prunePoints(2);                           // Prune invalid points
+			pruner.pruneViews(10);                           // Prune views with too few observations
+		}
 
 		visualizeResults(structure,colorImages);
 		System.out.println("Done!");
@@ -215,7 +215,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 
-		int N = 2;
+		int N = 8;
 		while( images.size() > N ) {
 			images.remove(N);
 		}

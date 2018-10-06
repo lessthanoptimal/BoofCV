@@ -534,7 +534,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 		}
 
 		EstimateSceneCalibrated alg = new EstimateSceneCalibrated();
-		alg.triangulateMetricStereoEdges(edge);
+		alg.triangulateStereoEdges(edge);
 
 		assertEquals(N,edge.stereoTriangulations.size());
 

@@ -33,8 +33,6 @@ import boofcv.alg.sfm.structure.MetricSceneGraph.ViewState;
 import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryMultiViewRobust;
-import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.GeometryMath_F64;
@@ -70,14 +68,11 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 
 	private double TRIANGULATE_MIN_ANGLE = Math.PI/20.0;
 
-	// Transform (including distortion terms) from pixel into normalized image coordinates
-	Map<String,Point2Transform2_F64> camerasPixelToNorm = new HashMap<>();
-	// Approximate camera model used to compute pixel errors
-	Map<String,CameraPinhole> camerasIntrinsc = new HashMap<>();
 	// camera name to index
 	Map<String,Integer> cameraToIndex = new HashMap<>();
 
 	RansacMultiView<Se3_F64, Point2D3D> ransacPnP;
+	// TODO add back refine epipolar?
 
 	// Triangulates the 3D coordinate of a point from two observations
 	TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
@@ -99,9 +94,9 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	// Verbose output to standard out
 	PrintStream verbose;
 
-	double maxPixelError = 5;
+	double maxPixelError = 2.5;
 
-	ConfigRansac configRansac = new ConfigRansac(5000,maxPixelError);
+	ConfigRansac configRansac = new ConfigRansac(4000,maxPixelError);
 
 	/**
 	 * Processes the paired up scene features and computes an initial estimate for the scene's
@@ -113,9 +108,6 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	@Override
 	public boolean process(PairwiseImageGraph pairwiseGraph ) {
 		this.graph = new MetricSceneGraph(pairwiseGraph);
-
-		this.graph.sanityCheck(); // todo remove sanity checks
-
 		for (int i = 0; i < graph.edges.size(); i++) {
 			decomposeEssential(graph.edges.get(i));
 		}
@@ -142,7 +134,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		for (int i = 0; i < graph.edges.size() && !stopRequested ; i++) {
 			Motion e = graph.edges.get(i);
 			if( e.triangulationAngle > Math.PI/10 || e == baseMotion) {
-				triangulateMetricStereoEdges(e);
+				triangulateStereoEdges(e);
 				if( verbose != null ) {
 					int a = e.viewSrc.index;
 					int b = e.viewDst.index;
@@ -153,8 +145,6 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		if( stopRequested )
 			return false;
 
-		this.graph.sanityCheck();
-
 		if( verbose != null )
 			verbose.println("Defining the coordinate system");
 
@@ -162,8 +152,6 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		defineCoordinateSystem(origin, baseMotion);
 		if( stopRequested )
 			return false;
-
-		this.graph.sanityCheck();
 
 		if( verbose != null )
 			verbose.println("Estimate all features");
@@ -792,7 +780,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	 * An edge has been declared as defining a good stereo pair. All associated feature will now be
 	 * triangulated. It is assumed that there is no global coordinate system at this point.
 	 */
-	void triangulateMetricStereoEdges(Motion edge ) {
+	void triangulateStereoEdges(Motion edge ) {
 		View viewA = edge.viewSrc;
 		View viewB = edge.viewDst;
 
