@@ -66,7 +66,7 @@ public class SimulatePlanarWorld {
 
 	Point2Transform3_F64 pixelTo3;
 	Point3Transform2_F64 sphereToPixel;
-	InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.ZERO);
+	InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 
 	Se3_F64 worldToCamera = new Se3_F64();
 
@@ -291,6 +291,11 @@ public class SimulatePlanarWorld {
 			GeometryMath_F64.mult(rectToCamera.R,normal,normal);
 
 			visible = normal.z < 0;
+
+			if( !visible ) {
+				pixelRect.x0 = pixelRect.y0 = pixelRect.x1 = pixelRect.y1 = 0;
+				return;
+			}
 
 			double imageRatio = texture.height/(double) texture.width;
 			height3D = width3D*imageRatio;
