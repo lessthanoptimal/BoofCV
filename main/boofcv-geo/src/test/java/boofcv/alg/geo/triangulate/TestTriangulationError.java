@@ -18,16 +18,73 @@
 
 package boofcv.alg.geo.triangulate;
 
+import boofcv.alg.geo.PerspectiveOps;
+import boofcv.struct.calib.CameraPinhole;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
+import org.ejml.UtilEjml;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestTriangulationError {
+	// pick two very different cameras to make sure the error is being indpendently computed in image each image correctly
+	CameraPinhole cameraA = new CameraPinhole(400,400,0,500,500,1000,1000);
+	CameraPinhole cameraB = new CameraPinhole(600,400,0,200,250,600,700);
+
+	Se3_F64 a_to_b = SpecialEuclideanOps_F64.eulerXyz(-0.2,0,0,0,0,0,null);
+
+	Point3D_F64 Xa = new Point3D_F64(0,0,1);
+	Point3D_F64 Xb = new Point3D_F64();
+
+	Point2D_F64 na = new Point2D_F64();
+	Point2D_F64 nb = new Point2D_F64();
+
+	@BeforeEach
+	public void setup() {
+		a_to_b.transform(Xa,Xb);
+
+		na.set( Xa.x/Xa.z, Xa.y/Xa.z );
+		nb.set( Xb.x/Xb.z, Xb.y/Xb.z );
+	}
+
 	@Test
-	public void foo() {
-		fail("Implement");
+	public void perfect() {
+		TriangulationError alg = new TriangulationError();
+		alg.configure(cameraA,cameraB);
+
+		assertEquals(0,alg.process(na,nb,a_to_b,Xa), UtilEjml.TEST_F64);
+	}
+
+	@Test
+	public void errorInA() {
+		TriangulationError alg = new TriangulationError();
+		alg.configure(cameraA,cameraB);
+
+		Point2D_F64 pa = new Point2D_F64();
+		PerspectiveOps.convertNormToPixel(cameraA,na.x,na.y,pa);
+		pa.x += 0.5;
+		PerspectiveOps.convertPixelToNorm(cameraA,pa.x,pa.y,na);
+
+		assertEquals(0.5*0.5/2 , alg.process(na,nb,a_to_b,Xa), UtilEjml.TEST_F64);
+	}
+
+	@Test
+	public void errorInB() {
+		TriangulationError alg = new TriangulationError();
+		alg.configure(cameraA,cameraB);
+
+		Point2D_F64 pb = new Point2D_F64();
+		PerspectiveOps.convertNormToPixel(cameraB,nb.x,nb.y,pb);
+		pb.x += 0.5;
+		PerspectiveOps.convertPixelToNorm(cameraB,pb.x,pb.y,nb);
+
+		assertEquals(0.5*0.5/2 , alg.process(na,nb,a_to_b,Xa), UtilEjml.TEST_F64);
 	}
 }

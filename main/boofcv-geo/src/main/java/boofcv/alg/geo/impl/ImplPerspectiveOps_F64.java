@@ -187,6 +187,22 @@ public class ImplPerspectiveOps_F64 {
 		return norm;
 	}
 
+	public static Point2D_F64 convertPixelToNorm( CameraPinhole intrinsic , double pixelX, double pixelY, Point2D_F64 norm ) {
+		if( norm == null )
+			norm = new Point2D_F64();
+
+		double a11 = 1.0/intrinsic.fx;
+		double a12 = -intrinsic.skew/(intrinsic.fx*intrinsic.fy);
+		double a13 = (intrinsic.skew*intrinsic.cy - intrinsic.cx*intrinsic.fy)/(intrinsic.fx*intrinsic.fy);
+		double a22 = 1.0/intrinsic.fy;
+		double a23 = -intrinsic.cy/intrinsic.fy;
+
+		norm.x = a11*pixelX + a12*pixelY + a13;
+		norm.y = a22*pixelY + a23;
+
+		return norm;
+	}
+
 
 	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , DMatrixRMaj K , Point3D_F64 X ) {
 		Point3D_F64 X_cam = new Point3D_F64();

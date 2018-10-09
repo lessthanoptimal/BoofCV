@@ -432,6 +432,10 @@ public class PerspectiveOps {
 		return ImplPerspectiveOps_F32.convertPixelToNorm(K, pixel, norm);
 	}
 
+	public static Point2D_F64 convertPixelToNorm( CameraPinhole intrinsic , double x , double y, Point2D_F64 norm ) {
+		return ImplPerspectiveOps_F64.convertPixelToNorm(intrinsic, x,y, norm);
+	}
+
 	/**
 	 * Renders a point in world coordinates into the image plane in pixels or normalized image
 	 * coordinates.
