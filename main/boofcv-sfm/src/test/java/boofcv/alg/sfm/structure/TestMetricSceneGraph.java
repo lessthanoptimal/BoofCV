@@ -26,6 +26,7 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
@@ -37,13 +38,12 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestMetricSceneGraph {
+class TestMetricSceneGraph {
 
-	Random rand = new Random(234);
-
+	private Random rand = new Random(234);
 
 	@Test
-	public void initialize() {
+	void consturctor() {
 		PairwiseImageGraph pairwise = createPairwise();
 
 		MetricSceneGraph graph = new MetricSceneGraph(pairwise);
@@ -127,18 +127,26 @@ public class TestMetricSceneGraph {
 	}
 
 	@Test
-	public void motionSrcToDst() {
-		fail("Implement");
+	void motion_srcToDst() {
+		MetricSceneGraph.Motion m = new MetricSceneGraph.Motion();
+		m.viewSrc = new MetricSceneGraph.View();
+		m.viewDst = new MetricSceneGraph.View();
+		m.a_to_b = SpecialEuclideanOps_F64.eulerXyz(0,0,1,0,0,0,null);
 	}
 
 	@Test
-	public void motion_destination() {
-		fail("Implement");
-	}
+	void motion_destination() {
+		MetricSceneGraph.Motion m = new MetricSceneGraph.Motion();
+		m.viewSrc = new MetricSceneGraph.View();
+		m.viewDst = new MetricSceneGraph.View();
 
-	@Test
-	public void view_countFeatures3D() {
-		fail("Implement");
-	}
+		assertSame(m.viewDst,m.destination(m.viewSrc));
+		assertSame(m.viewSrc,m.destination(m.viewDst));
 
+		try {
+			MetricSceneGraph.View v = new MetricSceneGraph.View();
+			m.destination(v);
+			fail("exception should have been thrown");
+		} catch( RuntimeException ignore){}
+	}
 }

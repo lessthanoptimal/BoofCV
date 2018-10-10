@@ -8,6 +8,11 @@ TOP ITEMS
   * See if a better reading of mode bits is needed
   * Reading mode and version. For small qr codes use the lines connecting position patterns
     those will be more reliable than the sides
+- TODO Handle transposed data matrix in QR
+   - Add a flag to configuration to considered transposed markers
+   - Change code so that the matrix is read in and saved
+   - Note that the QR code is non compliant and complain
+   - Unit a test image or render it? Flip image? Add to regression
 
 - TODO Visualization tools for Direct VO
 -      Show warped image

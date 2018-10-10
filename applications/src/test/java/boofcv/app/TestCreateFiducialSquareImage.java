@@ -40,18 +40,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
+class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 
 	private final ConfigThreshold configThreshold = ConfigThreshold.fixed(125);
 
 	private final static String names[] =
 			new String[]{"temp0.jpg","temp1.jpg"};
 
-	public void createDocument( String args ) throws IOException, InterruptedException {
+	private void createDocument( String args ) throws IOException, InterruptedException {
 		CreateFiducialSquareImage.main(args.split("\\s+"));
 	}
 
-	public GrayF32 loadImageGray() throws IOException {
+	private GrayF32 loadImageGray() throws IOException {
 		BufferedImage image = loadImage();
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
@@ -60,7 +60,7 @@ public class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 	}
 
 	@BeforeEach
-	public void before() {
+	void before() {
 		BufferedImage output = new BufferedImage(200,200,BufferedImage.TYPE_INT_RGB);
 
 		Graphics2D g2 = output.createGraphics();
@@ -76,7 +76,7 @@ public class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 	}
 
 	@AfterEach
-	public static void cleanUpImages() {
+	void cleanUpImages() {
 		for( String s : names) {
 			new File(s).delete();
 		}
@@ -91,7 +91,7 @@ public class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 	}
 
 	@Test
-	public void single() throws IOException, InterruptedException {
+	void single() throws IOException, InterruptedException {
 		createDocument(String.format("-PrintInfo -PageSize=letter -OutputFile=%s 4 %s",
 				document_name+".pdf", names[0]));
 		GrayF32 gray = loadImageGray();
@@ -106,7 +106,7 @@ public class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 	}
 
 	@Test
-	public void grid() throws IOException, InterruptedException {
+	void grid() throws IOException, InterruptedException {
 		createDocument(String.format("-PrintInfo -Grid=fill -PageSize=letter -OutputFile=%s 3 %s %s",
 				document_name+".pdf", names[0], names[1]));
 		GrayF32 gray = loadImageGray();

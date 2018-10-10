@@ -122,17 +122,6 @@ public class MetricSceneGraph {
 
 		public Camera camera;
 		public int index;
-
-		public int countFeatures3D() {
-			int total = 0;
-
-			for (int i = 0; i < features3D.length; i++) {
-				if( features3D[i] != null )
-					total++;
-			}
-
-			return total;
-		}
 	}
 
 	enum ViewState {
@@ -150,7 +139,7 @@ public class MetricSceneGraph {
 		public List<Feature3D> stereoTriangulations = new ArrayList<>();
 
 		// Average angle of features in this motion for triangulation
-		double triangulationAngle;
+		public double triangulationAngle;
 
 		public int index;
 

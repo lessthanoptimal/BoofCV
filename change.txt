@@ -40,7 +40,6 @@ Version : 0.31
 - Switched to JUnit5
 
 
-
 - TODO Scene Reconstruction
    - TODO Create generic image feature matching for ordered sequences of images
    - TODO homogeneous coordinates

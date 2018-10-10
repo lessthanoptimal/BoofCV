@@ -18,6 +18,7 @@
 
 package boofcv.alg.sfm.structure;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Peter Abeles
  */
 public class TestEstimatedSceneUncalibrated {
+	@Ignore
 	@Test
 	public void foo() {
 		fail("Implement");
