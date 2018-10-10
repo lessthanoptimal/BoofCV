@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.selfcalib;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Peter Abeles
  */
 public class TestSelfCalibrationLinearRotationMulti {
-	@Ignore
+	@Disabled
 	@Test
 	public void foo() {
 		fail("Implement");

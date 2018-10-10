@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,9 +74,9 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 	@Override
 	public String defaultOutputFileName() {
 		if( numbers.size() == 1 )
-			return "Fiducial"+numbers.get(0)+".ps";
+			return "Fiducial"+numbers.get(0);
 		else
-			return "BinaryFiducials.ps";
+			return "BinaryFiducials";
 	}
 
 	@Override

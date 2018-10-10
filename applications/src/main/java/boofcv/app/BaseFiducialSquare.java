@@ -194,7 +194,7 @@ public abstract class BaseFiducialSquare {
 
 		String outputName;
 		if( this.outputFileName == null ) {
-			outputName = defaultOutputFileName();
+			outputName = defaultOutputFileName()+".pdf";
 		} else {
 			outputName = this.outputFileName;
 		}
@@ -321,7 +321,7 @@ public abstract class BaseFiducialSquare {
 	}
 
 	/**
-	 * Creates an EPS document from all the specifications in the class
+	 * Creates an document from all the specifications in the class
 	 */
 	private void generateDocument( float fiducialWidthUnit ) throws IOException {
 

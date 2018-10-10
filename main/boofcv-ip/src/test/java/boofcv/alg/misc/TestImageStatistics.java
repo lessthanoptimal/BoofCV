@@ -289,6 +289,10 @@ public class TestImageStatistics {
 			} else {
 				tol = UtilEjml.TEST_F64;
 			}
+
+			// adjust for the number's scale. Was getting false positives for 32
+			tol = Math.max(1,Math.abs(expected))*tol;
+
 			assertEquals(expected, result.doubleValue(), tol);
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,7 +103,7 @@ public class CreateFiducialSquareImage extends BaseFiducialSquare {
 		String inputPath = imagePaths.get(0);
 		File dir = new File(inputPath).getParentFile();
 		String outputName = new File(inputPath).getName();
-		outputName = outputName.substring(0,outputName.length()-3) + "pdf";
+		outputName = outputName.substring(0,outputName.length()-3);
 		try {
 			outputName = new File(dir,outputName).getCanonicalPath();
 		} catch (IOException e) {

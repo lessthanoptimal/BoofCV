@@ -44,8 +44,6 @@ public class CreateQrCodeDocumentPDF {
 
 	// objects for writing PDF document
 	PDDocument document;
-	PDPage page;
-	PDPageContentStream pcs;
 
 	PaperSize paper;
 	Unit units;
@@ -78,80 +76,94 @@ public class CreateQrCodeDocumentPDF {
 		document = new PDDocument();
 		pageWidth = (float)(paper.convertWidth(units)*UNIT_TO_POINTS);
 		pageHeight = (float)(paper.convertHeight(units)*UNIT_TO_POINTS);
-		PDRectangle rectangle = new PDRectangle(pageWidth, pageHeight);
-		page = new PDPage(rectangle);
-		document.addPage(page);
-		try {
-			pcs = new PDPageContentStream(document , page);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+
+		PDDocumentInformation info = document.getDocumentInformation();
+		info.setCreator("BoofCV");
+		info.setTitle(documentName);
 	}
 
 	public void render(java.util.List<QrCode> markers ) throws IOException {
 		if( markerWidth <= 0 || spaceBetween <= 0)
 			throw new RuntimeException("Must specify the marker's dimensions. Width and spacing");
 
-		printHeader();
 		float sizeBox = (markerWidth+spaceBetween)*UNIT_TO_POINTS;
 
 		int numRows = (int)Math.floor(pageHeight/sizeBox);
 		int numCols = (int)Math.floor(pageWidth/sizeBox);
 
-		if( !gridFill) {
-			numRows = Math.max(1,markers.size()/numCols);
-			if( numRows == 1 ) {
-				numCols = Math.max(1,markers.size()%numCols);
-			}
-		}
-
 		// offset used to center
 		float centerX = (pageHeight-sizeBox*numRows)/2f;
 		float centerY = (pageWidth-sizeBox*numCols)/2f;
 
-		int index = 0;
-		Generator g = new Generator(markerWidth*UNIT_TO_POINTS);
-		for (int row = 0; row < numRows; row++) {
-			g.offsetY = centerX + row*sizeBox + UNIT_TO_POINTS*spaceBetween/2f;
+		// see if multiple pages are required
+		int markersPerPage = numRows*numCols;
+		int numPages = (int)Math.ceil(markers.size()/(double)markersPerPage);
 
-			for (int col = 0; col < numCols; col++, index++) {
-				if( !gridFill && index >= markers.size() )
-					break;
-				QrCode qr = markers.get( index%markers.size());
-				g.offsetX = centerY + col*sizeBox + UNIT_TO_POINTS*spaceBetween/2f;
-				g.render(qr);
+		int markerIndex = 0;
+		for (int pageIdx = 0; pageIdx < numPages; pageIdx++) {
 
-				if( showInfo ) {
-					float offset = UNIT_TO_POINTS*spaceBetween/4f;
+			PDRectangle rectangle = new PDRectangle(pageWidth, pageHeight);
+			PDPage page = new PDPage(rectangle);
+			document.addPage(page);
+			PDPageContentStream pcs = new PDPageContentStream(document , page);
 
-					int maxLength = (int)(markerWidth*UNIT_TO_POINTS)/4;
-					String message = qr.message.toString();
-					if( message.length() > maxLength ) {
-						message = message.substring(0,maxLength);
+			Generator g = new Generator(pcs , markerWidth*UNIT_TO_POINTS);
+
+			if( showInfo ) {
+				float offX = Math.min(CM_TO_POINTS,spaceBetween*CM_TO_POINTS/2);
+				float offY = Math.min(CM_TO_POINTS,spaceBetween*CM_TO_POINTS/2);
+
+				pcs.beginText();
+				pcs.setFont(PDType1Font.TIMES_ROMAN,7);
+				pcs.newLineAtOffset( offX, offY );
+				pcs.showText(String.format("Created by BoofCV"));
+				pcs.endText();
+			}
+
+			for (int row = 0; row < numRows; row++) {
+				g.offsetY = centerX + row*sizeBox + UNIT_TO_POINTS*spaceBetween/2f;
+
+				for (int col = 0; col < numCols; col++, markerIndex++) {
+					if( !gridFill && markerIndex >= markers.size() )
+						break;
+					QrCode qr = markers.get( markerIndex%markers.size());
+					g.offsetX = centerY + col*sizeBox + UNIT_TO_POINTS*spaceBetween/2f;
+					g.render(qr);
+
+					if( showInfo ) {
+						float offset = UNIT_TO_POINTS*spaceBetween/4f;
+
+						int maxLength = (int)(markerWidth*UNIT_TO_POINTS)/4;
+						String message = qr.message.toString();
+						if( message.length() > maxLength ) {
+							message = message.substring(0,maxLength);
+						}
+
+						pcs.beginText();
+						pcs.setNonStrokingColor(Color.GRAY);
+						pcs.setFont(PDType1Font.TIMES_ROMAN,7);
+						pcs.newLineAtOffset( (float)g.offsetX, (float)g.offsetY-offset);
+						pcs.showText(message);
+						pcs.endText();
+						pcs.beginText();
+						pcs.newLineAtOffset( (float)g.offsetX, (float)g.offsetY+markerWidth*UNIT_TO_POINTS+offset-7);
+						pcs.showText(String.format("%4.1f %2s",markerWidth,units.getAbbreviation()));
+						pcs.endText();
 					}
-
-					pcs.beginText();
-					pcs.setNonStrokingColor(Color.GRAY);
-					pcs.setFont(PDType1Font.TIMES_ROMAN,7);
-					pcs.newLineAtOffset( (float)g.offsetX, (float)g.offsetY-offset);
-					pcs.showText(message);
-					pcs.endText();
-					pcs.beginText();
-					pcs.newLineAtOffset( (float)g.offsetX, (float)g.offsetY+markerWidth*UNIT_TO_POINTS+offset-7);
-					pcs.showText(String.format("%4.1f %2s",markerWidth,units.getAbbreviation()));
-					pcs.endText();
 				}
 			}
+			pcs.close();
 		}
-		pcs.close();
 	}
 
 	private class Generator extends QrCodeGenerator {
 
+		PDPageContentStream pcs;
 		public double offsetX,offsetY;
 
-		public Generator(double markerWidth ) {
+		public Generator(PDPageContentStream pcs , double markerWidth ) {
 			super(markerWidth);
+			this.pcs = pcs;
 		}
 
 		@Override
@@ -202,24 +214,6 @@ public class CreateQrCodeDocumentPDF {
 			return (float)(offsetY + markerWidth - y);
 		}
 
-	}
-
-	private void printHeader() throws IOException {
-
-		PDDocumentInformation info = document.getDocumentInformation();
-		info.setCreator("BoofCV");
-		info.setTitle(documentName);
-
-		if( showInfo ) {
-			float offX = Math.min(CM_TO_POINTS,spaceBetween*CM_TO_POINTS/2);
-			float offY = Math.min(CM_TO_POINTS,spaceBetween*CM_TO_POINTS/2);
-
-			pcs.beginText();
-			pcs.setFont(PDType1Font.TIMES_ROMAN,7);
-			pcs.newLineAtOffset( offX, offY );
-			pcs.showText(String.format("Created by BoofCV"));
-			pcs.endText();
-		}
 	}
 
 	public void sendToPrinter() throws PrinterException, IOException {
