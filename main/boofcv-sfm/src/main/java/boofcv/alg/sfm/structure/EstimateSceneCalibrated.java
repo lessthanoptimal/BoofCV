@@ -571,6 +571,10 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		return true;
 	}
 
+	/**
+	 * Go through all connections to the view and triangulate all features which have
+	 * not been triangulated already
+	 */
 	private void triangulateNoLocation( View target ) {
 
 		Se3_F64 otherToTarget = new Se3_F64();

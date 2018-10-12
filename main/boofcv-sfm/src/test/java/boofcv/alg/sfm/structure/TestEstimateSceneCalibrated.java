@@ -215,7 +215,36 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 
 	@Test
 	public void medianTriangulationAngle() {
-		fail("Implement");
+		int N = 20;
+		
+		final Motion edge = new Motion();
+		edge.viewSrc = new View();
+		edge.viewDst = new View();
+		edge.viewSrc.observationNorm = new FastQueue<>(Point2D_F64.class,true);
+		edge.viewDst.observationNorm = new FastQueue<>(Point2D_F64.class,true);
+		edge.associated = new ArrayList<>();
+		edge.a_to_b = SpecialEuclideanOps_F64.eulerXyz(-1,0,0,0,0,0,null);
+
+		Point3D_F64 Xa = new Point3D_F64(0,0,1);
+		Point3D_F64 Xb = new Point3D_F64();
+		edge.a_to_b.transform(Xa,Xb);
+
+		for (int i = 0; i < N; i++) {
+			edge.viewSrc.observationNorm.grow().set(Xa.x/Xa.z, Xa.y/Xa.z);
+			edge.viewDst.observationNorm.grow().set(Xb.x/Xb.z, Xb.y/Xb.z);
+			edge.associated.add( new AssociatedIndex(i,i,0));
+		}
+
+		EstimateSceneCalibrated alg = new EstimateSceneCalibrated();
+		double found = alg.medianTriangulationAngle(edge);
+
+		assertEquals(Math.PI/4.0, found, UtilEjml.TEST_F64);
+
+		// add a little bit of noise
+		edge.viewSrc.observationNorm.get(1).set(-2,1);
+		edge.viewSrc.observationNorm.get(6).set(-2,1);
+		found = alg.medianTriangulationAngle(edge);
+		assertEquals(Math.PI/4.0, found, UtilEjml.TEST_F64);
 	}
 
 	@Test
@@ -376,11 +405,6 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	}
 
 	@Test
-	public void triangulateNoLocation() {
-		fail("Implement");
-	}
-
-	@Test
 	public void triangulationAngle() {
 		Point2D_F64 normA = new Point2D_F64(-0.5,0);
 		Point2D_F64 normB = new Point2D_F64(0.5,0);
@@ -394,11 +418,6 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 		GeometryMath_F64.multTran(a_to_b.R,normA,normA);
 
 		assertEquals(2.0*Math.atan(0.5), alg.triangulationAngle(normA,normB,a_to_b), UtilEjml.TEST_F64);
-	}
-
-	@Test
-	public void addUnvistedToStack() {
-		fail("Implement");
 	}
 
 	@Test
