@@ -89,7 +89,7 @@ public class PnPDistanceReprojectionSq implements DistanceFromModelMultiView<Se3
 
 	@Override
 	public void setIntrinsic(int view, CameraPinhole intrinsic) {
-		pixelError = new NormalizedToPixelError(intrinsic.fx,intrinsic.fy,intrinsic.skew);
+		pixelError.set(intrinsic.fx,intrinsic.fy,intrinsic.skew);
 	}
 
 	@Override

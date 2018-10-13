@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
@@ -58,8 +57,10 @@ public class TestDetectDescribeAssociateTwoPass extends StandardPointTrackerTwoP
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		// use an association algorithm which uses the track's pose information
-		AssociateDescription2D<TupleDesc_B> association =
-				new AssociateMaxDistanceNaive<>(score, true, 400, 20);
+		AssociateMaxDistanceNaive<TupleDesc_B> association =
+				new AssociateMaxDistanceNaive<>(score, true, 400);
+		association.setSquaredDistance(true);
+		association.setMaxDistance(20);
 
 		DescribeRegionPoint<GrayF32,TupleDesc_B> describe =
 				new WrapDescribeBrief<>(brief,GrayF32.class);

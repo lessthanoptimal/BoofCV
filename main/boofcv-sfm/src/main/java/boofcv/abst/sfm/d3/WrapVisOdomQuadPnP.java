@@ -114,7 +114,7 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 		alg.setCalibration(parameters);
 		associateStereo.setCalibration(parameters);
-		distance.setLeftToRight(parameters.rightToLeft.invert(null));
+		distance.setLeftToRight(leftToRight);
 		distance.setIntrinsic(0,parameters.left);
 		distance.setIntrinsic(1,parameters.right);
 

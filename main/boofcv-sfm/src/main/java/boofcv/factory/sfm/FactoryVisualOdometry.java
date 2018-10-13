@@ -385,11 +385,16 @@ public class FactoryVisualOdometry {
 
 		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
 
+		// TODO need a better way to keep track of what error is squared and not
 		AssociateDescription2D<Desc> assocSame;
-		if( maxDistanceF2F > 0 )
-			assocSame = new AssociateMaxDistanceNaive<>(scorer, true, maxAssociationError, maxDistanceF2F);
-		else
+		if( maxDistanceF2F > 0 ) {
+			AssociateMaxDistanceNaive<Desc> a = new AssociateMaxDistanceNaive<>(scorer, true, maxAssociationError);
+			a.setSquaredDistance(true);
+			a.setMaxDistance(maxDistanceF2F);
+			assocSame = a;
+		} else {
 			assocSame = new AssociateDescTo2D<>(FactoryAssociation.greedy(scorer, maxAssociationError, true));
+		}
 
 		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<>(scorer, epipolarPixelTol, descType);
 		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();

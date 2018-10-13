@@ -35,6 +35,10 @@ public class AssociateMaxDistanceNaive<D> extends BaseAssociateLocation2DFilter<
 	// location of the source pixel
 	private Point2D_F64 src;
 
+	// max distance before being squared
+	protected double maxDistanceNotSquared;
+
+	boolean squaredDistance = true;
 
 	/**
 	 * Specifies score mechanism
@@ -48,13 +52,23 @@ public class AssociateMaxDistanceNaive<D> extends BaseAssociateLocation2DFilter<
 		super(scoreAssociation,backwardsValidation,maxError);
 	}
 
-	public AssociateMaxDistanceNaive(ScoreAssociation<D> scoreAssociation,
-									 boolean backwardsValidation,
-									 double maxError ,
-									 double maxDistance )
-	{
-		super(scoreAssociation,backwardsValidation,maxError);
-		setMaxDistance(maxDistance);
+	public void setSquaredDistance(boolean squaredError) {
+		this.squaredDistance = squaredError;
+	}
+
+	@Override
+	public double getMaxDistance() {
+		return maxDistanceNotSquared;
+	}
+
+	@Override
+	public void setMaxDistance(double maxDistance) {
+		if(squaredDistance) {
+			super.setMaxDistance(maxDistance * maxDistance);
+		} else {
+			super.setMaxDistance(maxDistance);
+		}
+		this.maxDistanceNotSquared = maxDistance;
 	}
 
 	@Override
