@@ -19,6 +19,7 @@
 package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.LowLevelMultiViewOps;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.solver.Polynomial;
 import org.ddogleg.solver.PolynomialRoots;
@@ -101,8 +102,9 @@ public class FundamentalLinear7 extends FundamentalLinear {
 		if (!process(A))
 			return false;
 
-		undoNormalizationF(F1,N1.matrix(),N2.matrix());
-		undoNormalizationF(F2,N1.matrix(),N2.matrix());
+		// Undo normalization on F
+		PerspectiveOps.multTranA(N2.matrix(),F1,N1.matrix(),F1);
+		PerspectiveOps.multTranA(N2.matrix(),F2,N1.matrix(),F2);
 
 		// compute polynomial coefficients
 		computeCoefficients(F1, F2, poly.c);

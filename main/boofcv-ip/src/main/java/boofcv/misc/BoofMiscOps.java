@@ -57,6 +57,14 @@ public class BoofMiscOps {
 		return adjustment + (int)Math.log10(number)+1;
 	}
 
+	public static double pow2( double v ) {
+		return v*v;
+	}
+
+	public static float pow2( float v ) {
+		return v*v;
+	}
+
 	public static void sortFileNames(List<String> images ) {
 		images.sort(new CompareStringNames());
 	}

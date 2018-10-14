@@ -131,21 +131,6 @@ public abstract class FundamentalLinear {
 	}
 
 	/**
-	 * Undo the normalization done to the input matrices for a Fundamental matrix.
-	 * <br>
-	 * M = N<sub>2</sub><sup>T</sup>*M*N<sub>1</sub>
-	 *
-	 * @param M Either the homography or fundamental matrix computed from normalized points.
-	 * @param N1 normalization matrix.
-	 * @param N2 normalization matrix.
-	 */
-	protected void undoNormalizationF(DMatrixRMaj M, DMatrixRMaj N1, DMatrixRMaj N2) {
-		// M = N2^T * M * N1
-		CommonOps_DDRM.multTransA(N2,M,temp0);
-		CommonOps_DDRM.mult(temp0,N1,M);
-	}
-
-	/**
 	 * Reorganizes the epipolar constraint equation (x<sup>T</sup><sub>2</sub>*F*x<sub>1</sub> = 0) such that it
 	 * is formulated as a standard linear system of the form Ax=0.  Where A contains the pixel locations and x is
 	 * the reformatted fundamental matrix.

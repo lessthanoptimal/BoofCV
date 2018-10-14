@@ -685,4 +685,74 @@ public class PerspectiveOps {
 		P.unsafe_set(1,col,a.y);
 		P.unsafe_set(2,col,a.z);
 	}
+
+	/**
+	 * Computes: D = A<sup>T</sup>*B*C
+	 *
+	 * @param A (Input) 3x3 matrix
+	 * @param B (Input) 3x3 matrix
+	 * @param C (Input) 3x3 matrix
+	 * @param output (Output) 3x3 matrix. Can be same instance A or B.
+	 */
+	public static void multTranA( DMatrixRMaj A , DMatrixRMaj B , DMatrixRMaj C , DMatrixRMaj output )
+	{
+		double t11 = A.data[0]*B.data[0] + A.data[3]*B.data[3] + A.data[6]*B.data[6];
+		double t12 = A.data[0]*B.data[1] + A.data[3]*B.data[4] + A.data[6]*B.data[7];
+		double t13 = A.data[0]*B.data[2] + A.data[3]*B.data[5] + A.data[6]*B.data[8];
+
+		double t21 = A.data[1]*B.data[0] + A.data[4]*B.data[3] + A.data[7]*B.data[6];
+		double t22 = A.data[1]*B.data[1] + A.data[4]*B.data[4] + A.data[7]*B.data[7];
+		double t23 = A.data[1]*B.data[2] + A.data[4]*B.data[5] + A.data[7]*B.data[8];
+
+		double t31 = A.data[2]*B.data[0] + A.data[5]*B.data[3] + A.data[8]*B.data[6];
+		double t32 = A.data[2]*B.data[1] + A.data[5]*B.data[4] + A.data[8]*B.data[7];
+		double t33 = A.data[2]*B.data[2] + A.data[5]*B.data[5] + A.data[8]*B.data[8];
+
+		output.data[0] = t11*C.data[0] + t12*C.data[3] + t13*C.data[6];
+		output.data[1] = t11*C.data[1] + t12*C.data[4] + t13*C.data[7];
+		output.data[2] = t11*C.data[2] + t12*C.data[5] + t13*C.data[8];
+
+		output.data[3] = t21*C.data[0] + t22*C.data[3] + t23*C.data[6];
+		output.data[4] = t21*C.data[1] + t22*C.data[4] + t23*C.data[7];
+		output.data[5] = t21*C.data[2] + t22*C.data[5] + t23*C.data[8];
+
+		output.data[6] = t31*C.data[0] + t32*C.data[3] + t33*C.data[6];
+		output.data[7] = t31*C.data[1] + t32*C.data[4] + t33*C.data[7];
+		output.data[8] = t31*C.data[2] + t32*C.data[5] + t33*C.data[8];
+	}
+
+	/**
+	 * Computes: D = A*B*C<sup>T</sup>
+	 *
+	 * @param A (Input) 3x3 matrix
+	 * @param B (Input) 3x3 matrix
+	 * @param C (Input) 3x3 matrix
+	 * @param output (Output) 3x3 matrix. Can be same instance A or B.
+	 */
+	public static void multTranC( DMatrixRMaj A , DMatrixRMaj B , DMatrixRMaj C , DMatrixRMaj output )
+	{
+		double t11 = A.data[0]*B.data[0] + A.data[1]*B.data[3] + A.data[2]*B.data[6];
+		double t12 = A.data[0]*B.data[1] + A.data[1]*B.data[4] + A.data[2]*B.data[7];
+		double t13 = A.data[0]*B.data[2] + A.data[1]*B.data[5] + A.data[2]*B.data[8];
+
+		double t21 = A.data[3]*B.data[0] + A.data[4]*B.data[3] + A.data[5]*B.data[6];
+		double t22 = A.data[3]*B.data[1] + A.data[4]*B.data[4] + A.data[5]*B.data[7];
+		double t23 = A.data[3]*B.data[2] + A.data[4]*B.data[5] + A.data[5]*B.data[8];
+
+		double t31 = A.data[6]*B.data[0] + A.data[7]*B.data[3] + A.data[8]*B.data[6];
+		double t32 = A.data[6]*B.data[1] + A.data[7]*B.data[4] + A.data[8]*B.data[7];
+		double t33 = A.data[6]*B.data[2] + A.data[7]*B.data[5] + A.data[8]*B.data[8];
+
+		output.data[0] = t11*C.data[0] + t12*C.data[1] + t13*C.data[2];
+		output.data[1] = t11*C.data[3] + t12*C.data[4] + t13*C.data[5];
+		output.data[2] = t11*C.data[6] + t12*C.data[7] + t13*C.data[8];
+
+		output.data[3] = t21*C.data[0] + t22*C.data[1] + t23*C.data[2];
+		output.data[4] = t21*C.data[3] + t22*C.data[4] + t23*C.data[5];
+		output.data[5] = t21*C.data[6] + t22*C.data[7] + t23*C.data[8];
+
+		output.data[6] = t31*C.data[0] + t32*C.data[1] + t33*C.data[2];
+		output.data[7] = t31*C.data[3] + t32*C.data[4] + t33*C.data[5];
+		output.data[8] = t31*C.data[6] + t32*C.data[7] + t33*C.data[8];
+	}
 }

@@ -20,6 +20,7 @@ package boofcv.alg.geo.f;
 
 
 import boofcv.alg.geo.LowLevelMultiViewOps;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DMatrixRMaj;
 
@@ -78,7 +79,8 @@ public class FundamentalLinear8 extends FundamentalLinear {
 		if (process(A,solution))
 			return false;
 
-		undoNormalizationF(solution,N1.matrix(),N2.matrix());
+		// undo normalization on F
+		PerspectiveOps.multTranA(N2.matrix(),solution,N1.matrix(),solution);
 
 		if( computeFundamental )
 			return projectOntoFundamentalSpace(solution);

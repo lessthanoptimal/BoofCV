@@ -39,6 +39,7 @@ import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.RandomMatrices_DDRM;
+import org.ejml.equation.Equation;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 
@@ -463,5 +464,37 @@ public class TestPerspectiveOps {
 		CameraPinhole intrinsic = new CameraPinhole(500,600,0,500,500,1000,1000);
 
 		assertEquals(2*Math.atan(500/600.0),PerspectiveOps.computeVFov(intrinsic), UtilEjml.TEST_F64);
+	}
+
+	@Test
+	public void multTranA_triple() {
+		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(3,3,rand);
+		DMatrixRMaj B = RandomMatrices_DDRM.rectangle(3,3,rand);
+		DMatrixRMaj C = RandomMatrices_DDRM.rectangle(3,3,rand);
+		DMatrixRMaj D = RandomMatrices_DDRM.rectangle(3,3,rand);
+
+		Equation eq = new Equation(A,"A",B,"B",C,"C");
+		eq.process("D=A'*B*C");
+		DMatrixRMaj expected = eq.lookupDDRM("D");
+
+		PerspectiveOps.multTranA(A,B,C,D);
+
+		assertTrue(MatrixFeatures_DDRM.isEquals(expected,D,UtilEjml.TEST_F64));
+	}
+
+	@Test
+	public void multTranC_triple() {
+		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(3,3,rand);
+		DMatrixRMaj B = RandomMatrices_DDRM.rectangle(3,3,rand);
+		DMatrixRMaj C = RandomMatrices_DDRM.rectangle(3,3,rand);
+		DMatrixRMaj D = RandomMatrices_DDRM.rectangle(3,3,rand);
+
+		Equation eq = new Equation(A,"A",B,"B",C,"C");
+		eq.process("D=A*B*C'");
+		DMatrixRMaj expected = eq.lookupDDRM("D");
+
+		PerspectiveOps.multTranC(A,B,C,D);
+
+		assertTrue(MatrixFeatures_DDRM.isEquals(expected,D,UtilEjml.TEST_F64));
 	}
 }
