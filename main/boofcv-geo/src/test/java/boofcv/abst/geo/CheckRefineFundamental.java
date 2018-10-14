@@ -50,7 +50,7 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 		init(30,false);
 
 		// compute true essential matrix
-		DMatrixRMaj E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
+		DMatrixRMaj E = MultiViewOps.createEssential(a_to_b.getR(), a_to_b.getT());
 
 		ModelFitter<DMatrixRMaj,AssociatedPair> alg = createAlgorithm();
 
@@ -69,12 +69,12 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 		init(30,false);
 
 		// compute true essential matrix
-		DMatrixRMaj E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
+		DMatrixRMaj E = MultiViewOps.createEssential(a_to_b.getR(), a_to_b.getT());
 
 		// create an alternative incorrect matrix
-		Vector3D_F64 T = worldToCamera.getT().copy();
+		Vector3D_F64 T = a_to_b.getT().copy();
 		T.x += 0.1;
-		DMatrixRMaj Emod = MultiViewOps.createEssential(worldToCamera.getR(), T);
+		DMatrixRMaj Emod = MultiViewOps.createEssential(a_to_b.getR(), T);
 
 		ModelFitter<DMatrixRMaj,AssociatedPair> alg = createAlgorithm();
 

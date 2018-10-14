@@ -22,12 +22,11 @@ import boofcv.alg.geo.GeoTestingOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
-import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DMatrixRMaj;
 
@@ -48,27 +47,25 @@ public abstract class EpipolarTestSimulation {
 	protected CameraPinhole intrinsic = new CameraPinhole(60,80,0.01,200,150,400,300);
 	DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic,(DMatrixRMaj)null);
 
-	protected Se3_F64 worldToCamera;
-	protected List<Point3D_F64> worldPts;
+	protected Se3_F64 a_to_b;
+	protected List<Point3D_F64> pointsInA;
 	protected List<AssociatedPair> pairs;
 	protected List<Point2D_F64> currentObs;
 
 
 	public void init( int N , boolean isFundamental ) {
 		// define the camera's motion
-		worldToCamera = new Se3_F64();
-		worldToCamera.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02,null));
-		worldToCamera.getT().set(0.1,-0.1,0.01);
+		a_to_b = define_a_to_b();
 
 		// randomly generate points in space
-		worldPts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
+		pointsInA = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
 
 		// transform points into second camera's reference frame
 		pairs = new ArrayList<>();
 		currentObs = new ArrayList<>();
 
-		for(Point3D_F64 p1 : worldPts) {
-			Point3D_F64 p2 = SePointOps_F64.transform(worldToCamera, p1, null);
+		for(Point3D_F64 p1 : pointsInA) {
+			Point3D_F64 p2 = SePointOps_F64.transform(a_to_b, p1, null);
 
 			AssociatedPair pair = new AssociatedPair();
 			pair.p1.set(p1.x/p1.z,p1.y/p1.z);
@@ -82,6 +79,10 @@ public abstract class EpipolarTestSimulation {
 
 			currentObs.add(pair.p2);
 		}
+	}
+
+	protected Se3_F64 define_a_to_b() {
+		return SpecialEuclideanOps_F64.eulerXyz(0.1,-0.1,0.01, 0.05, -0.03, 0.02,null);
 	}
 
 	public List<AssociatedPair> randomPairs( int N ) {

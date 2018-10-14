@@ -18,16 +18,75 @@
 
 package boofcv.alg.geo.f;
 
+import boofcv.alg.geo.MultiViewOps;
+import boofcv.struct.geo.AssociatedPair;
+import georegression.struct.point.Point2D_F64;
+import org.ejml.UtilEjml;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestEpipolarMinimizeGeometricError {
+public class TestEpipolarMinimizeGeometricError extends EpipolarTestSimulation {
+
+	/**
+	 * The perfect solution is passed in. it should no change
+	 */
 	@Test
-	public void foo() {
-		fail("Implement");
+	public void perfect() {
+		init(50,true);
+
+		DMatrixRMaj E = MultiViewOps.createEssential(a_to_b.R, a_to_b.T);
+		DMatrixRMaj F = MultiViewOps.createFundamental(E,intrinsic);
+
+		EpipolarMinimizeGeometricError alg = new EpipolarMinimizeGeometricError();
+
+		Point2D_F64 fa = new Point2D_F64();
+		Point2D_F64 fb = new Point2D_F64();
+
+		for (int i = 0; i < pairs.size(); i++) {
+			AssociatedPair p = pairs.get(i);
+
+			assertTrue(alg.process(F,p.p1.x,p.p1.y,p.p2.x,p.p2.y,fa,fb));
+
+			assertEquals(0,p.p1.distance(fa), UtilEjml.TEST_F64);
+			assertEquals(0,p.p2.distance(fb), UtilEjml.TEST_F64);
+		}
+	}
+
+	/**
+	 * Checks the solution given noisy pixel inputs. It should produce a solution which lies on the epipolar
+	 * line perfectly and is close to the input
+	 */
+	@Test
+	public void noisy() {
+		init(50,true);
+
+		DMatrixRMaj E = MultiViewOps.createEssential(a_to_b.R, a_to_b.T);
+		DMatrixRMaj F = MultiViewOps.createFundamental(E,intrinsic);
+
+		EpipolarMinimizeGeometricError alg = new EpipolarMinimizeGeometricError();
+
+		Point2D_F64 fa = new Point2D_F64();
+		Point2D_F64 fb = new Point2D_F64();
+
+		for (int i = 0; i < pairs.size(); i++) {
+			AssociatedPair p = pairs.get(i);
+
+			p.p1.x += rand.nextGaussian()*0.5;
+			p.p1.x += rand.nextGaussian()*0.5;
+			p.p2.y += rand.nextGaussian()*0.5;
+			p.p2.y += rand.nextGaussian()*0.5;
+
+			assertTrue(alg.process(F,p.p1.x,p.p1.y,p.p2.x,p.p2.y,fa,fb));
+
+			assertEquals(0, MultiViewOps.constraint(F,fa,fb), UtilEjml.TEST_F64);
+			assertEquals(0,p.p1.distance(fa), 2);
+			assertEquals(0,p.p2.distance(fb), 2);
+		}
 	}
 }

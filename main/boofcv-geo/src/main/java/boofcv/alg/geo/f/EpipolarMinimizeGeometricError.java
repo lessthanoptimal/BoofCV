@@ -29,7 +29,6 @@ import org.ddogleg.solver.PolynomialRoots;
 import org.ddogleg.solver.RootFinderType;
 import org.ejml.data.Complex_F64;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.util.List;
 
@@ -86,15 +85,12 @@ public class EpipolarMinimizeGeometricError {
 	 * @return true if a solution was found or false if it failed
 	 */
 	public boolean process(DMatrixRMaj F ,
-						double x1 , double y1, double x2, double y2,
-						Point2D_F64 p1 , Point2D_F64 p2 )
+						   double x1 , double y1, double x2, double y2,
+						   Point2D_F64 p1 , Point2D_F64 p2 )
 	{
 		// translations used to move points to the origin
-		assignT(T1,x1,y1);
-		assignT(T2,x2,y2);
-
-		CommonOps_DDRM.invert(T1);
-		CommonOps_DDRM.invert(T2);
+		assignTinv(T1,x1,y1);
+		assignTinv(T2,x2,y2);
 
 		// take F to the new coordinate system
 		// F1 = T2'*F*T1
@@ -151,7 +147,7 @@ public class EpipolarMinimizeGeometricError {
 
 	void originalCoordinates( DMatrixRMaj T , DMatrixRMaj R , Point3D_F64 p ) {
 		GeometryMath_F64.multTran(R,p,p);
-		GeometryMath_F64.multTran(T,p,p);
+		GeometryMath_F64.mult(T,p,p);
 	}
 
 	/**
@@ -217,27 +213,28 @@ public class EpipolarMinimizeGeometricError {
 			if(squaredDistance < best ) {
 				best = squaredDistance;
 				bestIndex = i;
+				solutionT = t;
 			}
 		}
-		solutionT = best;
+
 		return bestIndex != -1;
 	}
 
 
-	void assignT( DMatrixRMaj T , double x , double y )
+	static void assignTinv(DMatrixRMaj T , double x , double y )
 	{
 		T.data[0] = T.data[4] = T.data[8] = 1;
 		T.data[2] = x; T.data[5]= y;
 	}
 
-	void assignR( DMatrixRMaj R , Point3D_F64 e )
+	static void assignR( DMatrixRMaj R , Point3D_F64 e )
 	{
 		R.data[0] =  e.x; R.data[1] = e.y;
 		R.data[3] = -e.y; R.data[4] = e.x;
 		R.data[8] = 1;
 	}
 
-	void normalizeEpipole( Point3D_F64 e ) {
+	static void normalizeEpipole( Point3D_F64 e ) {
 		double n =e.x*e.x + e.y*e.y;
 		e.divideIP(Math.sqrt(n));
 	}

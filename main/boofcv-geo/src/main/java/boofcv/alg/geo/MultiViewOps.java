@@ -650,10 +650,7 @@ public class MultiViewOps {
 		CommonOps_DDRM.invert(K,K_inv);
 
 		DMatrixRMaj F = new DMatrixRMaj(3,3);
-		DMatrixRMaj temp = new DMatrixRMaj(3,3);
-
-		CommonOps_DDRM.multTransA(K_inv,E,temp);
-		CommonOps_DDRM.mult(temp,K_inv,F);
+		PerspectiveOps.multTranA(K_inv,E,K_inv,F);
 
 		return F;
 	}
