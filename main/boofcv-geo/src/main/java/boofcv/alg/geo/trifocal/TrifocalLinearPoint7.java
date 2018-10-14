@@ -77,7 +77,7 @@ public class TrifocalLinearPoint7 {
 
 	// enforces the geometry constraints
 	protected EnforceTrifocalGeometry enforce = new EnforceTrifocalGeometry();
-	protected TrifocalExtractEpipoles extractEpipoles = new TrifocalExtractEpipoles();
+	protected TrifocalExtractGeometries extractEpipoles = new TrifocalExtractGeometries();
 	// Epipoles needed to enforce the above constraints
 	protected Point3D_F64 e2 = new Point3D_F64();
 	protected Point3D_F64 e3 = new Point3D_F64();
@@ -110,7 +110,8 @@ public class TrifocalLinearPoint7 {
 		solveLinearSystem();
 
 		// enforce geometric constraints to improve solution
-		extractEpipoles.process(solutionN,e2,e3);
+		extractEpipoles.setTensor(solutionN);
+		extractEpipoles.extractEpipoles(e2,e3);
 		enforce.process(e2,e3,A);
 		enforce.extractSolution(solutionN);
 

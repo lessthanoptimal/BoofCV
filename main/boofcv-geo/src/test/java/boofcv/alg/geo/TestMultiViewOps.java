@@ -30,6 +30,7 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.Tuple2;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
@@ -707,5 +708,83 @@ public class TestMultiViewOps {
 		}
 
 		TestDecomposeHomography.checkHasOriginal(solutionsSE, solutionsN, R, T, d, N);
+	}
+
+	@Test
+	public void transfer13_PL() {
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
+
+		computeLines(X,line1,line2,line3);
+
+		// When the tensor was constructed the first view was assumed to be [I|0], which
+		// is why normalized image coordinates are used for the first view
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
+
+		Point3D_F64 found = MultiViewOps.transfer13(tensor,x1,line2,null);
+
+		found.x /= found.z;
+		found.y /= found.z;
+
+		assertEquals(x3.x,found.x, UtilEjml.TEST_F64);
+		assertEquals(x3.y,found.y, UtilEjml.TEST_F64);
+	}
+
+	@Test
+	public void transfer13_PP() {
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
+
+		// When the tensor was constructed the first view was assumed to be [I|0], which
+		// is why normalized image coordinates are used for the first view
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
+		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
+
+		Point3D_F64 found = MultiViewOps.transfer13(tensor,x1,x2,null);
+
+		found.x /= found.z;
+		found.y /= found.z;
+
+		assertEquals(x3.x,found.x, UtilEjml.TEST_F64);
+		assertEquals(x3.y,found.y, UtilEjml.TEST_F64);
+	}
+
+	@Test
+	public void transfer12_PL() {
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
+
+		computeLines(X,line1,line2,line3);
+
+		// When the tensor was constructed the first view was assumed to be [I|0], which
+		// is why normalized image coordinates are used for the first view
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
+
+		Point3D_F64 found = MultiViewOps.transfer12(tensor,x1,line3,null);
+
+		found.x /= found.z;
+		found.y /= found.z;
+
+		assertEquals(x2.x,found.x, UtilEjml.TEST_F64);
+		assertEquals(x2.y,found.y, UtilEjml.TEST_F64);
+	}
+
+	@Test
+	public void transfer12_PP() {
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
+
+		// When the tensor was constructed the first view was assumed to be [I|0], which
+		// is why normalized image coordinates are used for the first view
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
+		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
+
+		Point3D_F64 found = MultiViewOps.transfer12(tensor,x1,x3,null);
+
+		found.x /= found.z;
+		found.y /= found.z;
+
+		assertEquals(x2.x,found.x, UtilEjml.TEST_F64);
+		assertEquals(x2.y,found.y, UtilEjml.TEST_F64);
 	}
 }

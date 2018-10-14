@@ -18,10 +18,12 @@
 
 package boofcv.alg.geo;
 
+import boofcv.alg.geo.f.FundamentalExtractEpipoles;
 import boofcv.alg.geo.h.HomographyInducedStereo2Line;
 import boofcv.alg.geo.h.HomographyInducedStereo3Pts;
 import boofcv.alg.geo.h.HomographyInducedStereoLinePt;
-import boofcv.alg.geo.trifocal.TrifocalExtractEpipoles;
+import boofcv.alg.geo.trifocal.TrifocalExtractGeometries;
+import boofcv.alg.geo.trifocal.TrifocalTransfer;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.PairLineNorm;
@@ -37,10 +39,8 @@ import org.ddogleg.struct.Tuple2;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
-import org.ejml.dense.row.SingularOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.QRDecomposition;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -102,7 +102,7 @@ public class MultiViewOps {
 	 * </p>
 	 *
 	 * <p>
-	 * NOTE: View 1 is the world coordinate system.
+	 * NOTE: View 1 is the world coordinate system, i.e. [I|0]
 	 * </p>
 	 *
 	 * @param P2 Transform from view 1 to view 2.
@@ -503,16 +503,16 @@ public class MultiViewOps {
 	 * where F1i is a fundamental matrix from image 1 to i.
 	 * </p>
 	 *
-	 * @see TrifocalExtractEpipoles
+	 * @see TrifocalExtractGeometries
 	 *
 	 * @param tensor Trifocal tensor.  Not Modified
 	 * @param e2  Output: Epipole in image 2. Homogeneous coordinates. Modified
 	 * @param e3  Output: Epipole in image 3. Homogeneous coordinates. Modified
 	 */
 	public static void extractEpipoles( TrifocalTensor tensor , Point3D_F64 e2 , Point3D_F64 e3 ) {
-		TrifocalExtractEpipoles extract = new TrifocalExtractEpipoles();
-
-		extract.process(tensor,e2,e3);
+		TrifocalExtractGeometries e = new TrifocalExtractGeometries();
+		e.setTensor(tensor);
+		e.extractEpipoles(e2,e3);
 	}
 
 	/**
@@ -526,39 +526,16 @@ public class MultiViewOps {
 	 * the first camera will not meet the epipolar constraint when applied to the returned fundamental matrices.
 	 * </p>
 	 *
+	 * @see TrifocalExtractGeometries
+	 *
 	 * @param tensor Trifocal tensor.  Not modified.
-	 * @param F2 Output: Fundamental matrix for views 1 and 2. Modified.
-	 * @param F3 Output: Fundamental matrix for views 1 and 3. Modified.
+	 * @param F21 Output: Fundamental matrix for views 1 and 2. Modified.
+	 * @param F31 Output: Fundamental matrix for views 1 and 3. Modified.
 	 */
-	public static void extractFundamental( TrifocalTensor tensor , DMatrixRMaj F2 , DMatrixRMaj F3 ) {
-		// extract the epipoles
-		Point3D_F64 e2 = new Point3D_F64();
-		Point3D_F64 e3 = new Point3D_F64();
-
-		extractEpipoles(tensor, e2, e3);
-
-		// storage for intermediate results
-		Point3D_F64 temp0 = new Point3D_F64();
-		Point3D_F64 column = new Point3D_F64();
-
-		// compute the Fundamental matrices one column at a time
-		for( int i = 0; i < 3; i++ ) {
-			DMatrixRMaj T = tensor.getT(i);
-
-			GeometryMath_F64.mult(T,e3,temp0);
-			GeometryMath_F64.cross(e2,temp0,column);
-
-			F2.set(0,i,column.x);
-			F2.set(1,i,column.y);
-			F2.set(2,i,column.z);
-
-			GeometryMath_F64.multTran(T,e2,temp0);
-			GeometryMath_F64.cross(e3,temp0,column);
-
-			F3.set(0,i,column.x);
-			F3.set(1,i,column.y);
-			F3.set(2,i,column.z);
-		}
+	public static void extractFundamental( TrifocalTensor tensor , DMatrixRMaj F21 , DMatrixRMaj F31 ) {
+		TrifocalExtractGeometries e = new TrifocalExtractGeometries();
+		e.setTensor(tensor);
+		e.extractFundmental(F21,F31);
 	}
 
 	/**
@@ -570,47 +547,16 @@ public class MultiViewOps {
 	 * NOTE: The camera matrix for the first view is assumed to be P1 = [I|0].
 	 * </p>
 	 *
+	 * @see TrifocalExtractGeometries
+	 *
 	 * @param tensor Trifocal tensor.  Not modified.
 	 * @param P2 Output: 3x4 camera matrix for views 1 to 2. Modified.
 	 * @param P3 Output: 3x4 camera matrix for views 1 to 3. Modified.
 	 */
 	public static void extractCameraMatrices( TrifocalTensor tensor , DMatrixRMaj P2 , DMatrixRMaj P3 ) {
-		// extract the epipoles
-		Point3D_F64 e2 = new Point3D_F64();
-		Point3D_F64 e3 = new Point3D_F64();
-
-		extractEpipoles(tensor, e2, e3);
-
-		// storage for intermediate results
-		Point3D_F64 temp0 = new Point3D_F64();
-		Point3D_F64 column = new Point3D_F64();
-		// temp1 = [e3*e3^T -I]
-		DMatrixRMaj temp1 = new DMatrixRMaj(3,3);
-		for( int i = 0; i < 3; i++ ) {
-			for( int j = 0; j < 3; j++ ) {
-				temp1.set(i,j,e3.getIndex(i)*e3.getIndex(j));
-			}
-			temp1.set(i,i , temp1.get(i,i) - 1);
-		}
-
-		// compute the camera matrices one column at a time
-		for( int i = 0; i < 3; i++ ) {
-			DMatrixRMaj T = tensor.getT(i);
-
-			GeometryMath_F64.mult(T, e3, column);
-			P2.set(0,i,column.x);
-			P2.set(1,i,column.y);
-			P2.set(2,i,column.z);
-			P2.set(i,3,e2.getIndex(i));
-
-			GeometryMath_F64.multTran(T,e2,temp0);
-			GeometryMath_F64.mult(temp1, temp0, column);
-
-			P3.set(0,i,column.x);
-			P3.set(1,i,column.y);
-			P3.set(2,i,column.z);
-			P3.set(i,3,e3.getIndex(i));
-		}
+		TrifocalExtractGeometries e = new TrifocalExtractGeometries();
+		e.setTensor(tensor);
+		e.extractCamera(P2,P3);
 	}
 
 	/**
@@ -775,21 +721,8 @@ public class MultiViewOps {
 	 * @param e2 Output: Left epipole in homogeneous coordinates. Can be null. Modified.
 	 */
 	public static void extractEpipoles( DMatrixRMaj F , Point3D_F64 e1 , Point3D_F64 e2 ) {
-		SingularValueDecomposition_F64<DMatrixRMaj> svd =
-				DecompositionFactory_DDRM.svd(true,true,false);
-
-		if( !svd.decompose(F) )
-			throw new RuntimeException("SVD Failed?!");
-
-		DMatrixRMaj U = svd.getU(null,false);
-		DMatrixRMaj V = svd.getV(null,false);
-		double singular[] = svd.getSingularValues();
-		SingularOps_DDRM.descendingOrder(U,false,singular,3,V,false);
-
-		if( e2 != null )
-			e2.set(U.get(0,2),U.get(1,2),U.get(2,2));
-		if( e1 != null )
-			e1.set(V.get(0,2),V.get(1,2),V.get(2,2));
+		FundamentalExtractEpipoles alg = new FundamentalExtractEpipoles();
+		alg.process(F,e1,e2);
 	}
 
 	/**
@@ -992,5 +925,126 @@ public class MultiViewOps {
 
 			storage.add(error);
 		}
+	}
+
+	/**
+	 * Transfers a point from the first view to the third view using a plane induced by
+	 * a line in the second view.
+	 * @param x1 (Input) point (pixel) in first view
+	 * @param l2 (Input) line in second view
+	 * @param T (Input) Trifocal tensor
+	 * @param x3 (Output) Induced point (pixel) in third view. Homogenous coordinates.
+	 * @return induced point.
+	 */
+	public static Point3D_F64 transfer13(  TrifocalTensor T , Point2D_F64 x1 , Vector3D_F64 l2 ,
+										  @Nullable Point3D_F64 x3 )
+	{
+		if( x3 == null )
+			x3 = new Point3D_F64();
+
+		GeometryMath_F64.multTran(T.T1,l2,x3);
+		// storage solution here to avoid the need to declare a temporary variable
+		double xx = x3.x * x1.x;
+		double yy = x3.y * x1.x;
+		double zz = x3.z * x1.x;
+		GeometryMath_F64.multTran(T.T2,l2,x3);
+		xx += x3.x * x1.y;
+		yy += x3.y * x1.y;
+		zz += x3.z * x1.y;
+		GeometryMath_F64.multTran(T.T3,l2,x3);
+		x3.x = xx + x3.x;
+		x3.y = yy + x3.y;
+		x3.z = zz + x3.z;
+
+		return x3;
+		// Commented out code is closer to tensor notation. The above was derived from it
+//		for (int i = 0; i < 3; i++) {
+//			DMatrixRMaj t = T.T1;
+//
+//			double vx;
+//			switch( i ) {
+//				case 0: vx = x.x; break;
+//				case 1: vx = x.y; break;
+//				case 2: vx = 1; break;
+//				default: throw new RuntimeException("Egads");
+//			}
+
+//			sumX += vx*(l.x*t.get(0,0)+l.y*t.get(1,0)+l.z*t.get(2,0));
+//			sumY += vx*(l.x*t.get(0,1)+l.y*t.get(1,1)+l.z*t.get(2,1));
+//			sumZ += vx*(l.x*t.get(0,2)+l.y*t.get(1,2)+l.z*t.get(2,2));
+//		}
+	}
+
+	/**
+	 * Transfers a point from the first view to the third view using the observed location in the second view
+	 * @param x1 (Input) point (pixel) in first view
+	 * @param x2 (Input) point (pixel) in second view
+	 * @param T (Input) Trifocal tensor
+	 * @param x3 (Output) Induced point (pixel) in third view. Homogenous coordinates.
+	 * @return induced point.
+	 */
+	public static Point3D_F64 transfer13(  TrifocalTensor T , Point2D_F64 x1 , Point2D_F64 x2 ,
+										   @Nullable Point3D_F64 x3 )
+	{
+		if( x3 == null )
+			x3 = new Point3D_F64();
+
+		TrifocalTransfer transfer = new TrifocalTransfer();
+		transfer.setTrifocal(T);
+		transfer.transfer13(x1.x,x1.y,x2.x,x2.y,x3);
+
+		return x3;
+	}
+
+	/**
+	 * Transfers a point from the first view to the second view using a plane induced by
+	 * a line in the third view.
+	 * @param x1 (Input) point (pixel) in first view
+	 * @param l3 (Input) line in third view
+	 * @param T (Input) Trifocal tensor
+	 * @param x2 (Output) Induced point (pixel) in second view. Homogenous coordinates.
+	 * @return induced point.
+	 */
+	public static Point3D_F64 transfer12(  TrifocalTensor T , Point2D_F64 x1 , Vector3D_F64 l3 ,
+										   @Nullable Point3D_F64 x2 ) {
+		if (x2 == null)
+			x2 = new Point3D_F64();
+
+		GeometryMath_F64.mult(T.T1, l3, x2);
+		// storage solution here to avoid the need to declare a temporary variable
+		double xx = x2.x * x1.x;
+		double yy = x2.y * x1.x;
+		double zz = x2.z * x1.x;
+		GeometryMath_F64.mult(T.T2, l3, x2);
+		xx += x2.x * x1.y;
+		yy += x2.y * x1.y;
+		zz += x2.z * x1.y;
+		GeometryMath_F64.mult(T.T3, l3, x2);
+		x2.x = xx + x2.x;
+		x2.y = yy + x2.y;
+		x2.z = zz + x2.z;
+
+		return x2;
+	}
+
+	/**
+	 * Transfers a point from the first view to the third view using the observed location in the second view
+	 * @param x1 (Input) point (pixel) in first view
+	 * @param x3 (Input) point (pixel) in third view
+	 * @param T (Input) Trifocal tensor
+	 * @param x2 (Output) Induced point (pixel) in second view. Homogenous coordinates.
+	 * @return induced point.
+	 */
+	public static Point3D_F64 transfer12(  TrifocalTensor T , Point2D_F64 x1 , Point2D_F64 x3 ,
+										   @Nullable Point3D_F64 x2 )
+	{
+		if( x2 == null )
+			x2 = new Point3D_F64();
+
+		TrifocalTransfer transfer = new TrifocalTransfer();
+		transfer.setTrifocal(T);
+		transfer.transfer12(x1.x,x1.y,x3.x,x3.y,x2);
+
+		return x2;
 	}
 }

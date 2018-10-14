@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,7 +101,8 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 	 * Minimize the algebraic error using LM.  The two epipoles are the parameters being optimized.
 	 */
 	private void minimizeWithGeometricConstraints() {
-		extractEpipoles.process(solutionN, e2, e3);
+		extractEpipoles.setTensor(solutionN);
+		extractEpipoles.extractEpipoles(e2,e3);
 
 		// encode the parameters being optimized
 		param[0] = e2.x; param[1] = e2.y; param[2] = e2.z;

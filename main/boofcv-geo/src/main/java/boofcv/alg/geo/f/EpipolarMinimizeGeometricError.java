@@ -75,7 +75,7 @@ public class EpipolarMinimizeGeometricError {
 	/**
 	 * Minimizes the geometric error
 	 *
-	 * @param F (Input) Fundamental matrix x2 * F * x1 == 0
+	 * @param F21 (Input) Fundamental matrix x2 * F21 * x1 == 0
 	 * @param x1 (Input) Point 1 x-coordinate. Pixels
 	 * @param y1 (Input) Point 1 y-coordinate. Pixels
 	 * @param x2 (Input) Point 2 x-coordinate. Pixels
@@ -84,7 +84,7 @@ public class EpipolarMinimizeGeometricError {
 	 * @param p2 (Output) Point 2. Pixels
 	 * @return true if a solution was found or false if it failed
 	 */
-	public boolean process(DMatrixRMaj F ,
+	public boolean process(DMatrixRMaj F21 ,
 						   double x1 , double y1, double x2, double y2,
 						   Point2D_F64 p1 , Point2D_F64 p2 )
 	{
@@ -94,7 +94,7 @@ public class EpipolarMinimizeGeometricError {
 
 		// take F to the new coordinate system
 		// F1 = T2'*F*T1
-		PerspectiveOps.multTranA(T2,F,T1,Ft);
+		PerspectiveOps.multTranA(T2,F21,T1,Ft);
 
 		extract.process(Ft,e1,e2);
 
