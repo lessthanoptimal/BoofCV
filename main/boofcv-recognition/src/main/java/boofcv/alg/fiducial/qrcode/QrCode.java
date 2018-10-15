@@ -603,7 +603,14 @@ public class QrCode implements Cloneable {
 	 * final mode is set to when decoding a QR code.
 	 */
 	public enum Mode {
+		/**
+		 * Place holder
+		 */
 		UNKNOWN(-1),
+		/**
+		 * The message has been encoded using multiple modes
+		 */
+		MIXED(-2),
 		NUMERIC(0b0001),
 		ALPHANUMERIC(0b0010),
 		BYTE(0b0100),

@@ -40,6 +40,8 @@ Version : 0.31
   * Added unit tests to ensure that all flipping/mirroring is handled correctly
 - TODO update examples to use the new contour algorithm
 - Switched to JUnit5
+- QR Code
+  * When scanned it now indicates if multiple modes were used
 
 
 - TODO Scene Reconstruction

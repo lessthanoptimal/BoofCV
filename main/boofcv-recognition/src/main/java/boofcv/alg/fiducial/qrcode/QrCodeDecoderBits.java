@@ -166,14 +166,17 @@ public class QrCodeDecoderBits {
 	}
 
 	/**
-	 * Set the mode to the most complex character encoding.
+	 * If only one mode then that mode is used. If more than one mode is used then set to multiple
 	 */
 	private QrCode.Mode updateModeLogic( QrCode.Mode current , QrCode.Mode candidate )
 	{
-		if( candidate.ordinal() <= QrCode.Mode.KANJI.ordinal() ) {
-			current = current.ordinal() > candidate.ordinal() ? current : candidate;
+		if( current == candidate )
+			return current;
+		else if( current == QrCode.Mode.UNKNOWN ) {
+			return candidate;
+		} else {
+			return QrCode.Mode.MIXED;
 		}
-		return current;
 	}
 
 	public static int alignToBytes(int lengthBits) {
