@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2018/
+Date    : 2018/10/16
 Version : 0.31
 
 - VisualizeCamera2Activity
@@ -27,8 +27,8 @@ Version : 0.31
  * Most basic version using DDogleg and EJML sparse LM solver
  * Works with calibrated pinhole camera
 - Scene Reconstruction
- * Matches images and provides an initial estimate of geomtry
- * Support for calibrated and TODO uncalibrated cameras
+ * Matches images and provides an initial estimate of geometry
+ * Support for calibrated. Still a work in progress
  * EstimateSceneUnordered for image sets which are unordered
 - Visualization
  * JavaFX based point cloud viewer
@@ -38,28 +38,9 @@ Version : 0.31
 - SimulatePlanarWorld
   * Only renders surface when the normal is facing the camera
   * Added unit tests to ensure that all flipping/mirroring is handled correctly
-- TODO update examples to use the new contour algorithm
 - Switched to JUnit5
 - QR Code
   * When scanned it now indicates if multiple modes were used
-
-
-- TODO Scene Reconstruction
-   - TODO Create generic image feature matching for ordered sequences of images
-   - TODO homogeneous coordinates
-- Fundamential Matrix
-   - TODO "Gold Standard" Euclidean error
-- TODO Sparse Bundle Adjustment
-   - Future: Homogenoeus coordinates
-   - Future: quaternion implementation
-   - Future: sparse block math
-
-
-- TODO Compare BoofCV's IPPE against original
-
-- TODO determine why solving for nullspace with QRP causes decoding regression to get worse
-- TODO create regression for homography estimation
-
 
 ---------------------------------------------
 Date    : 2018/05/21

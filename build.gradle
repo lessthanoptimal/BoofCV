@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '0.31-SNAPSHOT'
+    version = '0.31'
 }
 
 project.ext.set("deepboof_version", '0.4')
@@ -95,7 +95,7 @@ subprojects {
     }
 
     dependencies {
-        compile group: 'org.georegression', name: 'georegression', version: '0.17-SNAPSHOT'
+        compile group: 'org.georegression', name: 'georegression', version: '0.17'
         compile 'com.google.code.findbugs:jsr305:3.0.2' // @Nullable
 
         testImplementation(

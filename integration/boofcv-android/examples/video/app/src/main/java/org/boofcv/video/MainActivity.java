@@ -55,6 +55,11 @@ public class MainActivity extends Activity {
 		startActivity(intent);
 	}
 
+	public void clickedQrCode( View view ) {
+		Intent intent = new Intent(this, QrCodeActivity.class);
+		startActivity(intent);
+	}
+
 	/**
 	 * Newer versions of Android require explicit permission from the user
 	 */

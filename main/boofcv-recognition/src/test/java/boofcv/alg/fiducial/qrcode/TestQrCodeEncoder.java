@@ -128,7 +128,7 @@ public class TestQrCodeEncoder {
 
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
-		assertEquals(QrCode.Mode.KANJI,qr.mode);
+		assertEquals(QrCode.Mode.MIXED,qr.mode);
 
 		encoder.reset();
 		qr = encoder.addAutomatic("123ASDdf").fixate();

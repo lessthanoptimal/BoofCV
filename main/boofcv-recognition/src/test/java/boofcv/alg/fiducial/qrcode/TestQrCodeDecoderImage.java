@@ -170,7 +170,7 @@ public class TestQrCodeDecoderImage {
 
 		assertEquals(expected.version,found.version);
 		assertEquals(expected.error,found.error);
-		assertEquals(QrCode.Mode.KANJI,found.mode);
+		assertEquals(QrCode.Mode.MIXED,found.mode);
 		assertEquals("阿ん鞠ぷへ≦Ｋ1235AFefg",new String(found.message));
 	}
 	/**

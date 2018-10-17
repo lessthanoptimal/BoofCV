@@ -13,18 +13,25 @@
 - Make sure external dependencies are meet and everything builds
   * Android
   * OpenKinect
-- Fresh Checkout
-  * Create source zip
-  * ./gradlew assemble
-  * ./gradlew testReport   <--- make sure everything passes
-  * scp boofcv-vXXX-libs.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv/vXXX/
-- Create javadoc for websites
-  ./gradlew alljavadocWeb
-- Create jars
-  * ./gradlew assemble
-  * ./gradlew createLibraryDirectory
-  * zip -r boofcv-vXXXX-libs.zip boofcv-vXXXX-libs
-  * scp boofcv-vXXX-src.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv/vXXX/
+--- Fresh Checkout ---
+
+VERSION=v0.XX
+git clone -b SNAPSHOT --recursive git@github.com:lessthanoptimal/BoofCV.git boofcv
+cd boofcv;./gradlew createVersionFile;rm -rf .git;cd ..;zip -r boofcv-$VERSION-src.zip boofcv
+cd boofcv;./gradlew createLibraryDirectory;mv boofcv-*-libs ..;cd ..;zip -r boofcv-$VERSION-libs.zip boofcv-*-libs
+
+-- Make Sure Tests Pass Again --
+./gradlew testReport
+
+-- Upload Files ---
+
+scp boofcv-$VERSION-libs.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv/$VERSION/
+scp boofcv-$VERSION-src.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv/$VERSION/
+
+--- Create javadoc for websites --
+  rm -rf build/doc/javadoc
+  ./gradlew javadocWeb;zip -r api.zip build/docs/javadoc
+
 - Tag git
 - Update version on website
 

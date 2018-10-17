@@ -16,5 +16,11 @@
 		android:text="Exposure"
 		android:onClick="clickedExposure"
 		android:id="@+id/button_exposure"/>
+	<Button
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="QR Code"
+		android:onClick="clickedQrCode"
+		android:id="@+id/button_qrcode"/>
 </LinearLayout>
 
