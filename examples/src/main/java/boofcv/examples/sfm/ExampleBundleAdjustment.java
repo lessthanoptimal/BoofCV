@@ -98,7 +98,6 @@ public class ExampleBundleAdjustment {
 		// Not important for this problem but is for others
 		ScaleSceneStructure bundleScale = new ScaleSceneStructure();
 		bundleScale.applyScale(parser.scene, parser.observations);
-		bundleScale.applyScale(parser.scene, parser.observations);
 		bundleAdjustment.setParameters(parser.scene, parser.observations);
 
 		// Runs the solver. This will take a few minutes. 7 iterations takes about 3 minutes on my computer
