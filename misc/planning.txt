@@ -1,23 +1,5 @@
-- TODO Self calibration
-   - scene reconstruction
-   - compared to regular
-   - rotation only
-- TODO Scene Reconstruction
-   - TODO Create generic image feature matching for ordered sequences of images
-   - TODO homogeneous coordinates
-- TODO revisit stereo from uncalibrated
-- Fundamential Matrix
-   - TODO "Gold Standard" Euclidean error
-- TODO Sparse Bundle Adjustment
-   - Future: Homogenoeus coordinates
-   - Future: quaternion implementation
-   - Future: sparse block math
-
-
-- TODO Compare BoofCV's IPPE against original
-
 - TODO determine why solving for nullspace with QRP causes decoding regression to get worse
-- TODO create regression for homography estimation
+
 
 TOP ITEMS
 - TODO New chessboard detector (current is too brittle)

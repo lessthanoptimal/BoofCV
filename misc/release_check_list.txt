@@ -29,8 +29,8 @@ scp boofcv-$VERSION-libs.zip pabeles@frs.sourceforge.net:/home/frs/project/boofc
 scp boofcv-$VERSION-src.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv/$VERSION/
 
 --- Create javadoc for websites --
-  rm -rf build/doc/javadoc
-  ./gradlew javadocWeb;zip -r api.zip build/docs/javadoc
+  rm -rf docs/api-web
+  ./gradlew alljavadocWeb;zip -r api.zip docs/api-web
 
 - Tag git
 - Update version on website
