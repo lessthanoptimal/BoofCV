@@ -25,7 +25,7 @@ import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.alg.geo.robust.RansacMultiView;
+import boofcv.alg.geo.robust.ModelMatcherMultiview;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
@@ -154,7 +154,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	public static Se3_F64 estimateCameraMotion(CameraPinholeRadial intrinsic,
 											   List<AssociatedPair> matchedNorm, List<AssociatedPair> inliers)
 	{
-		RansacMultiView<Se3_F64, AssociatedPair> epipolarMotion =
+		ModelMatcherMultiview<Se3_F64, AssociatedPair> epipolarMotion =
 				FactoryMultiViewRobust.baselineRansac(new ConfigEssential(),new ConfigRansac(200,0.5));
 		epipolarMotion.setIntrinsic(0,intrinsic);
 		epipolarMotion.setIntrinsic(1,intrinsic);

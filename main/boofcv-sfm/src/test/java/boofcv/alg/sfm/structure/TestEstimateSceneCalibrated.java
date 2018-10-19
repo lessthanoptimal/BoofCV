@@ -138,7 +138,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 
 				Se3_F64 src_to_dst = new Se3_F64();
 				listViewToWorld.get(i).concat(listViewToWorld.get(j).invert(null),src_to_dst);
-				m.F = MultiViewOps.createEssential(src_to_dst.R,src_to_dst.T);
+				m.F = MultiViewOps.createEssential(src_to_dst.R,src_to_dst.T, null);
 
 				// find common features. Match as pairs
 				matchCommon(m.viewSrc,m.viewDst,m.associated);
@@ -197,7 +197,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 				edge.associated.add( new AssociatedIndex(i,i+1,0));
 			}
 
-			edge.F = MultiViewOps.createEssential(a_to_b.R,a_to_b.T);
+			edge.F = MultiViewOps.createEssential(a_to_b.R,a_to_b.T, null);
 			CommonOps_DDRM.scale(2.0,edge.F); // accurate up to a scale invariance
 
 			EstimateSceneCalibrated alg = new EstimateSceneCalibrated();

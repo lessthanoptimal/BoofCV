@@ -87,9 +87,9 @@ public class TestMultiViewOps {
 		tensor = MultiViewOps.createTrifocal(P2, P3, null);
 		tensor.normalizeScale();
 
-		F2 = MultiViewOps.createEssential(worldToCam2.getR(), worldToCam2.getT());
+		F2 = MultiViewOps.createEssential(worldToCam2.getR(), worldToCam2.getT(), null);
 		F2 = MultiViewOps.createFundamental(F2, K);
-		F3 = MultiViewOps.createEssential(worldToCam3.getR(), worldToCam3.getT());
+		F3 = MultiViewOps.createEssential(worldToCam3.getR(), worldToCam3.getT(), null);
 		F3 = MultiViewOps.createFundamental(F3, K);
 	}
 
@@ -241,7 +241,7 @@ public class TestMultiViewOps {
 		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
 		Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 
-		DMatrixRMaj E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T);
+		DMatrixRMaj E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T, null);
 		DMatrixRMaj F = MultiViewOps.createFundamental(E, K);
 
 		assertEquals(0,MultiViewOps.constraint(F,p1,p2),1e-8);
@@ -460,7 +460,7 @@ public class TestMultiViewOps {
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 		T.normalize();
 
-		DMatrixRMaj E = MultiViewOps.createEssential(R, T);
+		DMatrixRMaj E = MultiViewOps.createEssential(R, T, null);
 
 		// Test using the following theorem:  x2^T*E*x1 = 0
 		Point3D_F64 X = new Point3D_F64(0.1,0.1,2);
@@ -474,7 +474,7 @@ public class TestMultiViewOps {
 
 	@Test
 	public void computeFundamental() {
-		DMatrixRMaj E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T);
+		DMatrixRMaj E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T, null);
 		DMatrixRMaj F = MultiViewOps.createFundamental(E, K);
 
 		Point3D_F64 X = new Point3D_F64(0.1,-0.1,2.5);
@@ -488,7 +488,7 @@ public class TestMultiViewOps {
 	public void computeFundamental2() {
 		DMatrixRMaj K2 = new DMatrixRMaj(3,3,true,80,0.02,190,0,30,170,0,0,1);
 
-		DMatrixRMaj E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T);
+		DMatrixRMaj E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T, null);
 		DMatrixRMaj F = MultiViewOps.createFundamental(E, K,K2);
 
 		Point3D_F64 X = new Point3D_F64(0.1,-0.1,2.5);
@@ -558,7 +558,7 @@ public class TestMultiViewOps {
 			DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,null);
 			Vector3D_F64 T = new Vector3D_F64(rand.nextGaussian(),rand.nextGaussian(),rand.nextGaussian());
 
-			DMatrixRMaj E = MultiViewOps.createEssential(R, T);
+			DMatrixRMaj E = MultiViewOps.createEssential(R, T, null);
 
 			assertTrue(NormOps_DDRM.normF(E)!=0);
 
@@ -590,7 +590,7 @@ public class TestMultiViewOps {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
-		DMatrixRMaj E = MultiViewOps.createEssential(R, T);
+		DMatrixRMaj E = MultiViewOps.createEssential(R, T, null);
 		DMatrixRMaj F = MultiViewOps.createFundamental(E, K);
 
 		Point3D_F64 e1 = new Point3D_F64();
@@ -656,7 +656,7 @@ public class TestMultiViewOps {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
-		DMatrixRMaj E = MultiViewOps.createEssential(R,T);
+		DMatrixRMaj E = MultiViewOps.createEssential(R,T, null);
 
 		List<Se3_F64> found = MultiViewOps.decomposeEssential(E);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class CommonTriangulationChecks {
 				tranWtoI.getT().set(0.2+rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, rand.nextGaussian()*0.01);
 			}
 
-			DMatrixRMaj E = MultiViewOps.createEssential(tranWtoI.getR(), tranWtoI.getT());
+			DMatrixRMaj E = MultiViewOps.createEssential(tranWtoI.getR(), tranWtoI.getT(), null);
 
 			SePointOps_F64.transform(tranWtoI, worldPoint,cameraPoint);
 			

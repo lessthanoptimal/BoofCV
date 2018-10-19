@@ -67,8 +67,8 @@ public class FactoryMultiViewRobust {
 	 * @param configLMedS Parameters for LMedS.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static LeastMedianOfSquaresMultiView<Se3_F64, Point2D3D> pnpLMedS(@Nullable ConfigPnP configPnP,
-																			 @Nonnull ConfigLMedS configLMedS)
+	public static ModelMatcherMultiview<Se3_F64, Point2D3D> pnpLMedS(@Nullable ConfigPnP configPnP,
+																	 @Nonnull ConfigLMedS configLMedS)
 	{
 		if( configPnP == null )
 			configPnP = new ConfigPnP();
@@ -101,8 +101,8 @@ public class FactoryMultiViewRobust {
 	 * @param ransac Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static RansacMultiView<Se3_F64, Point2D3D> pnpRansac( @Nullable ConfigPnP pnp,
-																 @Nonnull ConfigRansac ransac )
+	public static ModelMatcherMultiview<Se3_F64, Point2D3D> pnpRansac( @Nullable ConfigPnP pnp,
+																	   @Nonnull ConfigRansac ransac )
 	{
 		if( pnp == null )
 			pnp = new ConfigPnP();
@@ -135,8 +135,8 @@ public class FactoryMultiViewRobust {
 	 * @param lmeds Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static LeastMedianOfSquaresMultiView<Se3_F64, AssociatedPair> baselineLMedS( @Nullable ConfigEssential essential,
-																						 @Nonnull ConfigLMedS lmeds )
+	public static ModelMatcherMultiview<Se3_F64, AssociatedPair> baselineLMedS( @Nullable ConfigEssential essential,
+																				@Nonnull ConfigLMedS lmeds )
 	{
 		if( essential == null )
 			essential = new ConfigEssential();
@@ -181,22 +181,26 @@ public class FactoryMultiViewRobust {
 
 	/**
 	 * Robust solution for estimating the stereo baseline {@link Se3_F64} using epipolar geometry from two views with
-	 * {@link Ransac}.  Input observations are in normalized image coordinates.
+	 * {@link RansacMultiView}.  Input observations are in normalized image coordinates.
 	 *
 	 * <p>See code for all the details.</p>
 	 *
-	 * @param essential Essential matrix estimation parameters.  Can't be null.
+	 * @param essential Essential matrix estimation parameters.
 	 * @param ransac Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static RansacMultiView<Se3_F64, AssociatedPair> baselineRansac(@Nullable ConfigEssential essential,
-																		  @Nonnull ConfigRansac ransac )
+	public static ModelMatcherMultiview<Se3_F64, AssociatedPair> baselineRansac(@Nullable ConfigEssential essential,
+																				@Nonnull ConfigRansac ransac )
 	{
 		if( essential == null )
 			essential = new ConfigEssential();
 		else
 			essential.checkValidity();
 		ransac.checkValidity();
+
+		if( essential.error != ConfigEssential.ErrorModel.EUCLIDEAN ) {
+			throw new RuntimeException("Error model has to be Euclidean");
+		}
 
 		Estimate1ofEpipolar epipolar = FactoryMultiView.
 				essential_1(essential.which, essential.numResolve);
@@ -215,14 +219,20 @@ public class FactoryMultiViewRobust {
 				ransac.maxIterations, ransacTOL);
 	}
 
-	public static RansacMultiView<DMatrixRMaj, AssociatedPair> essentialRansac(@Nullable ConfigEssential essential,
-																			   @Nonnull ConfigRansac ransac ) {
-
+	public static ModelMatcherMultiview<DMatrixRMaj, AssociatedPair>  essentialRansac(@Nullable ConfigEssential essential,
+																					  @Nonnull ConfigRansac ransac )
+	{
 		if( essential == null )
 			essential = new ConfigEssential();
 		else
 			essential.checkValidity();
 		ransac.checkValidity();
+
+		if( essential.error == ConfigEssential.ErrorModel.EUCLIDEAN ) {
+			// The best error has been selected. Compute using the baseline algorithm then convert back into
+			// essential matrix
+			return new MmmvSe3ToEssential(baselineRansac(essential,ransac));
+		}
 
 		ModelManager<DMatrixRMaj> managerE = new ModelManagerEpipolarMatrix();
 		Estimate1ofEpipolar estimateF = FactoryMultiView.essential_1(essential.which,
@@ -232,7 +242,6 @@ public class FactoryMultiViewRobust {
 		// How the error is measured
 		DistanceFromModelMultiView<DMatrixRMaj,AssociatedPair> errorMetric =
 				new DistanceMultiView_EssentialSampson();
-
 		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold;
 
 		return new RansacMultiView<>(ransac.randSeed, managerE, generateE, errorMetric,

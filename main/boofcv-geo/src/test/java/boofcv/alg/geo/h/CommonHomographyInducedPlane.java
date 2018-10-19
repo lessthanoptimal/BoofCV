@@ -63,7 +63,7 @@ public class CommonHomographyInducedPlane {
 		p4 = render(leftToRight,K,X4);
 
 
-		E = MultiViewOps.createEssential(leftToRight.getR(), leftToRight.getT());
+		E = MultiViewOps.createEssential(leftToRight.getR(), leftToRight.getT(), null);
 		F = MultiViewOps.createFundamental(E,K);
 
 		MultiViewOps.extractEpipoles(F,new Point3D_F64(),e2);

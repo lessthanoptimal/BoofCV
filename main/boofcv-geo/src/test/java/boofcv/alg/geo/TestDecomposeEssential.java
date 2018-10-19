@@ -47,7 +47,7 @@ public class TestDecomposeEssential {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.4,0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 
-		DMatrixRMaj E = MultiViewOps.createEssential(R, T);
+		DMatrixRMaj E = MultiViewOps.createEssential(R, T, null);
 
 		DecomposeEssential alg = new DecomposeEssential();
 		alg.decompose(E);
@@ -69,7 +69,7 @@ public class TestDecomposeEssential {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.4,0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 
-		DMatrixRMaj E = MultiViewOps.createEssential(R, T);
+		DMatrixRMaj E = MultiViewOps.createEssential(R, T, null);
 
 		DecomposeEssential alg = new DecomposeEssential();
 		// call it twice and see if it breaks

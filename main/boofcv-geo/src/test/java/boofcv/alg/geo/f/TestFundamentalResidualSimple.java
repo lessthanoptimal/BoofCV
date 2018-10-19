@@ -40,7 +40,7 @@ public class TestFundamentalResidualSimple extends EpipolarTestSimulation {
 		init(30,false);
 
 		// compute true essential matrix
-		DMatrixRMaj E = MultiViewOps.createEssential(a_to_b.getR(), a_to_b.getT());
+		DMatrixRMaj E = MultiViewOps.createEssential(a_to_b.getR(), a_to_b.getT(), null);
 
 
 		FundamentalResidualSimple alg = new FundamentalResidualSimple();

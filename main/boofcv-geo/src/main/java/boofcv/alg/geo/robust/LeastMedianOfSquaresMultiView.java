@@ -30,7 +30,9 @@ import org.ddogleg.fitting.modelset.ransac.Ransac;
  *
  * @author Peter Abeles
  */
-public class LeastMedianOfSquaresMultiView<Model,Point> extends LeastMedianOfSquares<Model,Point> {
+public class LeastMedianOfSquaresMultiView<Model,Point> extends LeastMedianOfSquares<Model,Point>
+		implements ModelMatcherMultiview<Model,Point>
+{
 
 	private DistanceFromModelMultiView<Model,Point> modelDistance;
 
@@ -50,7 +52,13 @@ public class LeastMedianOfSquaresMultiView<Model,Point> extends LeastMedianOfSqu
 		this.modelDistance = errorMetric;
 	}
 
+	@Override
 	public void setIntrinsic( int view , CameraPinhole intrinsic ) {
 		this.modelDistance.setIntrinsic(view,intrinsic);
+	}
+
+	@Override
+	public int getNumberOfViews() {
+		return modelDistance.getNumberOfViews();
 	}
 }

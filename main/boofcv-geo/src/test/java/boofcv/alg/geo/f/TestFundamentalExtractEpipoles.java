@@ -53,7 +53,7 @@ public class TestFundamentalExtractEpipoles {
 			DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,null);
 			Vector3D_F64 T = new Vector3D_F64(rand.nextGaussian(),rand.nextGaussian(),rand.nextGaussian());
 
-			DMatrixRMaj E = MultiViewOps.createEssential(R, T);
+			DMatrixRMaj E = MultiViewOps.createEssential(R, T, null);
 
 			assertTrue(NormOps_DDRM.normF(E)!=0);
 

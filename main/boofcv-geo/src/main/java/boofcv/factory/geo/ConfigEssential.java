@@ -33,6 +33,11 @@ public class ConfigEssential implements Configuration {
 	public EnumEssential which = EnumEssential.NISTER_5;
 
 	/**
+	 * How to compute the error when fitting the essential.
+	 */
+	public ErrorModel error = ErrorModel.EUCLIDEAN;
+
+	/**
 	 * How many points should be used to resolve ambiguity in the solutions?
 	 */
 	public int numResolve = 2;
@@ -43,5 +48,17 @@ public class ConfigEssential implements Configuration {
 	@Override
 	public void checkValidity() {
 
+	}
+
+	public enum ErrorModel {
+		/**
+		 * Second order approximation of the Euclidean error function.
+		 */
+		SAMPSON,
+		/**
+		 * Uses a Euclidean error model. The 3D location of triangulated points are found and the pixel error resulting
+		 * from that.
+		 */
+		EUCLIDEAN
 	}
 }

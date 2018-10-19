@@ -570,11 +570,13 @@ public class MultiViewOps {
 	 *
 	 * @param R Rotation matrix.
 	 * @param T Translation vector.
+	 * @param E (Output) Storage for essential matrix. 3x3 matrix
 	 * @return Essential matrix
 	 */
-	public static DMatrixRMaj createEssential(DMatrixRMaj R, Vector3D_F64 T)
+	public static DMatrixRMaj createEssential(DMatrixRMaj R, Vector3D_F64 T, @Nullable DMatrixRMaj E)
 	{
-		DMatrixRMaj E = new DMatrixRMaj(3,3);
+		if( E == null )
+			E = new DMatrixRMaj(3,3);
 
 		DMatrixRMaj T_hat = GeometryMath_F64.crossMatrix(T, null);
 		CommonOps_DDRM.mult(T_hat, R, E);

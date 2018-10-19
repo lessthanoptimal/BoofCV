@@ -23,7 +23,7 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PositiveDepthConstraintCheck;
-import boofcv.alg.geo.robust.RansacMultiView;
+import boofcv.alg.geo.robust.ModelMatcherMultiview;
 import boofcv.alg.geo.triangulate.TriangulationError;
 import boofcv.alg.sfm.EstimateSceneStructure;
 import boofcv.alg.sfm.structure.MetricSceneGraph.Feature3D;
@@ -71,7 +71,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	// camera name to index
 	Map<String,Integer> cameraToIndex = new HashMap<>();
 
-	RansacMultiView<Se3_F64, Point2D3D> ransacPnP;
+	ModelMatcherMultiview<Se3_F64, Point2D3D> ransacPnP;
 	// TODO add back refine epipolar?
 
 	// Triangulates the 3D coordinate of a point from two observations

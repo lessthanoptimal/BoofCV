@@ -40,7 +40,7 @@ public class TestEpipolarMinimizeGeometricError extends EpipolarTestSimulation {
 	public void perfect() {
 		init(50,true);
 
-		DMatrixRMaj E = MultiViewOps.createEssential(a_to_b.R, a_to_b.T);
+		DMatrixRMaj E = MultiViewOps.createEssential(a_to_b.R, a_to_b.T, null);
 		DMatrixRMaj F = MultiViewOps.createFundamental(E,intrinsic);
 
 		EpipolarMinimizeGeometricError alg = new EpipolarMinimizeGeometricError();
@@ -66,7 +66,7 @@ public class TestEpipolarMinimizeGeometricError extends EpipolarTestSimulation {
 	public void noisy() {
 		init(50,true);
 
-		DMatrixRMaj E = MultiViewOps.createEssential(a_to_b.R, a_to_b.T);
+		DMatrixRMaj E = MultiViewOps.createEssential(a_to_b.R, a_to_b.T, null);
 		DMatrixRMaj F = MultiViewOps.createFundamental(E,intrinsic);
 
 		EpipolarMinimizeGeometricError alg = new EpipolarMinimizeGeometricError();

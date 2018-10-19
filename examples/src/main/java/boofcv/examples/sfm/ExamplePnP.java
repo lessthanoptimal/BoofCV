@@ -22,7 +22,7 @@ import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.geo.robust.RansacMultiView;
+import boofcv.alg.geo.robust.ModelMatcherMultiview;
 import boofcv.factory.geo.*;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -117,7 +117,7 @@ public class ExamplePnP {
 	public Se3_F64 estimateOutliers( List<Point2D3D> observations ) {
 		// We can no longer trust that each point is a real observation.  Let's use RANSAC to separate the points
 		// You will need to tune the number of iterations and inlier threshold!!!
-		RansacMultiView<Se3_F64,Point2D3D> ransac =
+		ModelMatcherMultiview<Se3_F64,Point2D3D> ransac =
 				FactoryMultiViewRobust.pnpRansac(new ConfigPnP(),new ConfigRansac(300,1.0));
 		ransac.setIntrinsic(0,intrinsic);
 

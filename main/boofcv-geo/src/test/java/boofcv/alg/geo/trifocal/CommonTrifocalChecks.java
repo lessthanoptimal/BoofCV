@@ -107,9 +107,9 @@ public abstract class CommonTrifocalChecks {
 		P3 = PerspectiveOps.createCameraMatrix(worldToCam3.R, worldToCam3.T, K, null);
 		tensor = MultiViewOps.createTrifocal(P2, P3, null);
 
-		F2 = MultiViewOps.createEssential(worldToCam2.getR(), worldToCam2.getT());
+		F2 = MultiViewOps.createEssential(worldToCam2.getR(), worldToCam2.getT(), null);
 		F2 = MultiViewOps.createFundamental(F2, K);
-		F3 = MultiViewOps.createEssential(worldToCam3.getR(), worldToCam3.getT());
+		F3 = MultiViewOps.createEssential(worldToCam3.getR(), worldToCam3.getT(), null);
 		F3 = MultiViewOps.createFundamental(F3, K);
 
 		for( int i = 0; i < 20; i++ ) {

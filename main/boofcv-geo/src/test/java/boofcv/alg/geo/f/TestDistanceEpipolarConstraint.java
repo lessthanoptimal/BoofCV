@@ -51,7 +51,7 @@ public class TestDistanceEpipolarConstraint {
 		p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
 		p2 = PerspectiveOps.renderPixel(worldToCamera,K,X);
 
-		E = MultiViewOps.createEssential(worldToCamera.getR(),worldToCamera.getT());
+		E = MultiViewOps.createEssential(worldToCamera.getR(),worldToCamera.getT(), null);
 		F = MultiViewOps.createFundamental(E,K);
 	}
 

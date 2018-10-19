@@ -135,7 +135,7 @@ public class TestRectifyFundamental {
 		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,-0.01, 0.1, 0.05, null));
 		motion.getT().set(-0.5,0.1,-0.05);
 
-		DMatrixRMaj E = MultiViewOps.createEssential(motion.getR(), motion.getT());
+		DMatrixRMaj E = MultiViewOps.createEssential(motion.getR(), motion.getT(), null);
 		F = MultiViewOps.createFundamental(E, K);
 
 		// randomly generate points in space

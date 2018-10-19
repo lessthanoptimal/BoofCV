@@ -39,7 +39,7 @@ public class TestParamFundamentalEpipolar {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1, 2, -0.5, null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
-		DMatrixRMaj E = MultiViewOps.createEssential(R, T);
+		DMatrixRMaj E = MultiViewOps.createEssential(R, T, null);
 		
 		double param[] = new double[7];
 		
