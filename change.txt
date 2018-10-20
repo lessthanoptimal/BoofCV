@@ -3,6 +3,33 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2018
+Version : 0.32
+
+TODO Remove dependency on OpenCV in Applications to reduce file size
+TODO Create GUI for running any application
+TODO Create installer for applications
+
+- TODO Self calibration
+   - scene reconstruction
+   - compared to regular
+   - rotation only
+- TODO Scene Reconstruction
+   - TODO handle situation where images are removed and exception is thrown
+   - TODO Create generic image feature matching for ordered sequences of images
+   - TODO homogeneous coordinates
+- TODO revisit stereo from uncalibrated
+- Fundamential Matrix
+   - TODO "Gold Standard" Euclidean error
+- TODO Sparse Bundle Adjustment
+   - Future: Homogenoeus coordinates
+   - Future: quaternion implementation
+   - Future: sparse block math
+- TODO create regression for homography estimation
+
+- TODO Compare BoofCV's IPPE against original
+
+---------------------------------------------
 Date    : 2018/10/16
 Version : 0.31
 
