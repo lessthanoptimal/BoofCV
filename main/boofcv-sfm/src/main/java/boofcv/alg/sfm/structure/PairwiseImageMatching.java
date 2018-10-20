@@ -33,7 +33,6 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.Stoppable;
 import org.ejml.data.DMatrixRMaj;
@@ -70,7 +69,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	protected FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class,true);
 
 	protected ModelMatcherMultiview<DMatrixRMaj,AssociatedPair> ransacEssential;
-	protected Ransac<DMatrixRMaj,AssociatedPair> ransacFundamental;
+	protected ModelMatcher<DMatrixRMaj,AssociatedPair> ransacFundamental;
 
 	// print is verbose or not
 	protected PrintStream verbose;

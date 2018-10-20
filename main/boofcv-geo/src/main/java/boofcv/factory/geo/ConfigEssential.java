@@ -33,9 +33,9 @@ public class ConfigEssential implements Configuration {
 	public EnumEssential which = EnumEssential.NISTER_5;
 
 	/**
-	 * How to compute the error when fitting the essential.
+	 * If computed robustly this specifies the error model that's used to prune outliers
 	 */
-	public ErrorModel error = ErrorModel.EUCLIDEAN;
+	public ErrorModel errorModel = ErrorModel.GEOMETRIC;
 
 	/**
 	 * How many points should be used to resolve ambiguity in the solutions?
@@ -59,6 +59,6 @@ public class ConfigEssential implements Configuration {
 		 * Uses a Euclidean error model. The 3D location of triangulated points are found and the pixel error resulting
 		 * from that.
 		 */
-		EUCLIDEAN
+		GEOMETRIC
 	}
 }

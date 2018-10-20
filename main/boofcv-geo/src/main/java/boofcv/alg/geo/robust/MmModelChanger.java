@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.robust;
 
-import boofcv.struct.calib.CameraPinhole;
+import org.ddogleg.fitting.modelset.ModelMatcher;
 
 import java.util.List;
 
@@ -27,54 +27,44 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class MmmvModelChanger<ModelA,ModelB,Point> implements ModelMatcherMultiview<ModelB,Point> {
+public abstract class MmModelChanger<ModelA,ModelB,Point> implements ModelMatcher<ModelB,Point> {
 
-	protected ModelMatcherMultiview<ModelA,Point> mmmv;
+	protected ModelMatcher<ModelA,Point> mm;
 
-	public MmmvModelChanger(ModelMatcherMultiview<ModelA, Point> mmmv) {
-		this.mmmv = mmmv;
+	public MmModelChanger(ModelMatcher<ModelA, Point> mm) {
+		this.mm = mm;
 	}
 
-	public MmmvModelChanger() {
-	}
-
-	@Override
-	public void setIntrinsic(int view, CameraPinhole intrinsic) {
-		mmmv.setIntrinsic(view,intrinsic);
-	}
-
-	@Override
-	public int getNumberOfViews() {
-		return mmmv.getNumberOfViews();
+	public MmModelChanger() {
 	}
 
 	@Override
 	public boolean process(List<Point> dataSet) {
-		return mmmv.process(dataSet);
+		return mm.process(dataSet);
 	}
 
 	@Override
 	public List<Point> getMatchSet() {
-		return mmmv.getMatchSet();
+		return mm.getMatchSet();
 	}
 
 	@Override
 	public int getInputIndex(int matchIndex) {
-		return mmmv.getInputIndex(matchIndex);
+		return mm.getInputIndex(matchIndex);
 	}
 
 	@Override
 	public double getFitQuality() {
-		return mmmv.getFitQuality();
+		return mm.getFitQuality();
 	}
 
 	@Override
 	public int getMinimumSize() {
-		return mmmv.getMinimumSize();
+		return mm.getMinimumSize();
 	}
 
 	@Override
 	public Class<Point> getPointType() {
-		return mmmv.getPointType();
+		return mm.getPointType();
 	}
 }

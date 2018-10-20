@@ -99,6 +99,11 @@ public class AssociatedPair {
 		}
 	}
 
+	public void set(AssociatedPair original ) {
+		this.p1.set(original.p1);
+		this.p2.set(original.p2);
+	}
+
 	/**
 	 * Sets the value of p1 and p2 to be equal to the values of the passed in objects
 	 */

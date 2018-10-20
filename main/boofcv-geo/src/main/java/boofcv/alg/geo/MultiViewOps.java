@@ -19,6 +19,7 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.geo.f.FundamentalExtractEpipoles;
+import boofcv.alg.geo.f.FundamentalToProjective;
 import boofcv.alg.geo.h.HomographyInducedStereo2Line;
 import boofcv.alg.geo.h.HomographyInducedStereo3Pts;
 import boofcv.alg.geo.h.HomographyInducedStereoLinePt;
@@ -748,6 +749,7 @@ public class MultiViewOps {
 	 * </p>
 	 *
 	 * @see #extractEpipoles
+	 * @see FundamentalToProjective
 	 *
 	 * @param F (Input) A fundamental matrix
 	 * @param e2 (Input) Left epipole of fundamental matrix, F<sup>T</sup>*e2 = 0.
@@ -757,23 +759,9 @@ public class MultiViewOps {
 	 */
 	public static DMatrixRMaj fundamentalToProjective(DMatrixRMaj F , Point3D_F64 e2, Vector3D_F64 v , double lambda ) {
 
-		DMatrixRMaj crossMatrix = new DMatrixRMaj(3,3);
-		GeometryMath_F64.crossMatrix(e2, crossMatrix);
-
-		DMatrixRMaj outer = new DMatrixRMaj(3,3);
-		GeometryMath_F64.outerProd(e2,v,outer);
-
-		DMatrixRMaj KR = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.mult(crossMatrix, F, KR);
-		CommonOps_DDRM.add(KR, outer, KR);
-
+		FundamentalToProjective f2p = new FundamentalToProjective();
 		DMatrixRMaj P = new DMatrixRMaj(3,4);
-		CommonOps_DDRM.insert(KR,P,0,0);
-
-		P.set(0,3,lambda*e2.x);
-		P.set(1,3,lambda*e2.y);
-		P.set(2,3,lambda*e2.z);
-
+		f2p.process(F,e2,v,lambda,P);
 		return P;
 	}
 
@@ -783,13 +771,17 @@ public class MultiViewOps {
 	 * {@link #fundamentalToProjective(DMatrixRMaj, Point3D_F64, Vector3D_F64, double)} but with the suggested values
 	 * for all variables filled in for you.
 	 * </p>
+	 *
+	 * @see FundamentalToProjective
+	 *
 	 * @param F (Input) Fundamental Matrix
 	 * @return The canonical camera (projection) matrix P' (3 by 4) Known up to a projective transform.
 	 */
 	public static DMatrixRMaj fundamentalToProjective(DMatrixRMaj F ) {
-		Point3D_F64 e2 = new Point3D_F64();
-		MultiViewOps.extractEpipoles(F, null, e2);
-		return MultiViewOps.fundamentalToProjective(F, e2, new Vector3D_F64(0, 0, 0), 1);
+		FundamentalToProjective f2p = new FundamentalToProjective();
+		DMatrixRMaj P = new DMatrixRMaj(3,4);
+		f2p.process(F,P);
+		return P;
 	}
 
 	/**

@@ -36,7 +36,7 @@ import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import org.ddogleg.fitting.modelset.ModelFitter;
-import org.ddogleg.fitting.modelset.ransac.Ransac;
+import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -75,13 +75,17 @@ public class ExampleFundamentalMatrix {
 													List<AssociatedPair> inliers ) {
 
 		ConfigRansac configRansac = new ConfigRansac();
-		configRansac.inlierThreshold = 0.2;
+		configRansac.inlierThreshold = 0.1;
 		configRansac.maxIterations = 2000;
 		ConfigFundamental configFundamental = new ConfigFundamental();
 		configFundamental.which = EnumFundamental.LINEAR_7;
 		configFundamental.numResolve = 2;
+		configFundamental.errorModel = ConfigFundamental.ErrorModel.GEOMETRIC;
+		// geometric error is the most accurate error metric, but also the slowest to compute. See how the
+		// results change if you switch to sampson and how much faster it is. You also should adjust
+		// the inlier threshold.
 
-		Ransac<DMatrixRMaj, AssociatedPair> ransac =
+		ModelMatcher<DMatrixRMaj, AssociatedPair> ransac =
 				FactoryMultiViewRobust.fundamentalRansac(configFundamental,configRansac);
 
 		// Estimate the fundamental matrix while removing outliers
@@ -126,7 +130,7 @@ public class ExampleFundamentalMatrix {
 	 */
 	public static List<AssociatedPair> computeMatches( BufferedImage left , BufferedImage right ) {
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
-				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, GrayF32.class);
+				new ConfigFastHessian(0, 2, 400, 1, 9, 4, 4), null,null, GrayF32.class);
 //		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,200,5),null,null);
 
 		ScoreAssociation<BrightFeature> scorer = FactoryAssociation.scoreEuclidean(BrightFeature.class,true);

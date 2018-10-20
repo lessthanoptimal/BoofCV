@@ -16,42 +16,50 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.f;
+package boofcv.alg.geo.robust;
 
+import boofcv.alg.geo.f.EpipolarMinimizeGeometricError;
 import boofcv.struct.geo.AssociatedPair;
-import georegression.geometry.GeometryMath_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.util.List;
 
 /**
- * Computes error using the epipolar constraint.  The input matrix is normalized so that different matrices
- * can be compared at the same scale.
+ * Computes geometric error in an uncalibrated stereo pair. This error is equivalent to
+ * computing the optimal 3D triangulation, reprojecting the point, and computing the symmetric error.
+ *
+ * @see EpipolarMinimizeGeometricError
  *
  * @author Peter Abeles
  */
-public class DistanceEpipolarConstraint implements DistanceFromModel<DMatrixRMaj,AssociatedPair> {
+public class DistanceFundamentalGeometric implements DistanceFromModel<DMatrixRMaj, AssociatedPair> {
 
-	DMatrixRMaj M = new DMatrixRMaj(3,3);
+	EpipolarMinimizeGeometricError adjuster = new EpipolarMinimizeGeometricError();
+	AssociatedPair adjusted = new AssociatedPair();
+
+	DMatrixRMaj F21;
 
 	@Override
-	public void setModel(DMatrixRMaj F )
-	{
-		// assume that each element in the matrix has equal weight
-		double v = CommonOps_DDRM.elementMaxAbs(F);
-		CommonOps_DDRM.scale(1.0/v,F,M);
+	public void setModel(DMatrixRMaj model) {
+		this.F21 = model;
 	}
 
 	@Override
-	public double computeDistance(AssociatedPair pt) {
-		return Math.abs(GeometryMath_F64.innerProd(pt.p2, M, pt.p1));
+	public double computeDistance(AssociatedPair original) {
+		if( !adjuster.process(F21,original.p1.x,original.p1.y,original.p2.x,original.p2.y,
+				adjusted.p1,adjusted.p2) ) {
+			return Double.MAX_VALUE;
+		}
+
+		// Since the adjusted observations will intersect perfectly there's no need to triangulate
+		// then reproject. This was verified empirically.
+		return original.p1.distance2(adjusted.p1) + original.p2.distance2(adjusted.p2);
 	}
 
 	@Override
 	public void computeDistance(List<AssociatedPair> associatedPairs, double[] distance) {
-		for( int i = 0; i < associatedPairs.size(); i++ ) {
+		for (int i = 0; i < associatedPairs.size(); i++) {
 			distance[i] = computeDistance(associatedPairs.get(i));
 		}
 	}

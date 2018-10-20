@@ -37,10 +37,27 @@ public class ConfigFundamental implements Configuration {
 	 */
 	public int numResolve = 2;
 
+	/**
+	 * If computed robustly this specifies the error model that's used to prune outliers
+	 */
+	public ErrorModel errorModel = ErrorModel.GEOMETRIC;
+
 	public ConfigFundamental() {
 	}
 
 	@Override
 	public void checkValidity() {
+	}
+
+	public enum ErrorModel {
+		/**
+		 * Second order approximation of the Euclidean error function.
+		 */
+		SAMPSON,
+		/**
+		 * Uses a Euclidean error model. The 3D location of triangulated points are found and the pixel error resulting
+		 * from that.
+		 */
+		GEOMETRIC
 	}
 }

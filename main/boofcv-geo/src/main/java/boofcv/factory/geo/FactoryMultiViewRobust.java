@@ -34,8 +34,10 @@ import georegression.fitting.homography.ModelManagerHomography2D_F64;
 import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.fitting.modelset.ModelManager;
+import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ejml.data.DMatrixRMaj;
@@ -159,10 +161,11 @@ public class FactoryMultiViewRobust {
 		return config;
 	}
 
-	public static LeastMedianOfSquares<DMatrixRMaj, AssociatedPair> fundamentalLMedS( @Nonnull ConfigFundamental fundamental,
-																					  @Nonnull ConfigLMedS lmeds ) {
+	public static ModelMatcher<DMatrixRMaj, AssociatedPair> fundamentalLMedS(@Nonnull ConfigFundamental fundamental,
+																			 @Nonnull ConfigLMedS lmeds ) {
 
 		fundamental.checkValidity();
+		lmeds.checkValidity();
 
 		ModelManager<DMatrixRMaj> managerF = new ModelManagerEpipolarMatrix();
 		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(fundamental.which,
@@ -170,8 +173,21 @@ public class FactoryMultiViewRobust {
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
 
 		// How the error is measured
-		DistanceFromModelResidual<DMatrixRMaj,AssociatedPair> errorMetric =
-				new DistanceFromModelResidual<>(new FundamentalResidualSampson());
+		DistanceFromModel<DMatrixRMaj,AssociatedPair> errorMetric;
+
+		switch( fundamental.errorModel ) {
+			case SAMPSON:
+				errorMetric = new DistanceFromModelResidual<>(new FundamentalResidualSampson());
+				break;
+
+			case GEOMETRIC:
+				errorMetric = new DistanceFundamentalGeometric();
+				break;
+
+			default:
+				throw new RuntimeException("Unknown");
+		}
+
 
 		LeastMedianOfSquares<DMatrixRMaj, AssociatedPair> config = new LeastMedianOfSquares<>
 				(lmeds.randSeed, lmeds.totalCycles, managerF, generateF, errorMetric);
@@ -198,7 +214,7 @@ public class FactoryMultiViewRobust {
 			essential.checkValidity();
 		ransac.checkValidity();
 
-		if( essential.error != ConfigEssential.ErrorModel.EUCLIDEAN ) {
+		if( essential.errorModel != ConfigEssential.ErrorModel.GEOMETRIC) {
 			throw new RuntimeException("Error model has to be Euclidean");
 		}
 
@@ -228,7 +244,7 @@ public class FactoryMultiViewRobust {
 			essential.checkValidity();
 		ransac.checkValidity();
 
-		if( essential.error == ConfigEssential.ErrorModel.EUCLIDEAN ) {
+		if( essential.errorModel == ConfigEssential.ErrorModel.GEOMETRIC) {
 			// The best error has been selected. Compute using the baseline algorithm then convert back into
 			// essential matrix
 			return new MmmvSe3ToEssential(baselineRansac(essential,ransac));
@@ -249,7 +265,7 @@ public class FactoryMultiViewRobust {
 	}
 
 
-	public static Ransac<DMatrixRMaj, AssociatedPair> fundamentalRansac(@Nonnull ConfigFundamental fundamental,
+	public static ModelMatcher<DMatrixRMaj, AssociatedPair> fundamentalRansac(@Nonnull ConfigFundamental fundamental,
 																		@Nonnull ConfigRansac ransac ) {
 
 		fundamental.checkValidity();
@@ -261,8 +277,20 @@ public class FactoryMultiViewRobust {
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
 
 		// How the error is measured
-		DistanceFromModelResidual<DMatrixRMaj,AssociatedPair> errorMetric =
-				new DistanceFromModelResidual<>(new FundamentalResidualSampson());
+		DistanceFromModel<DMatrixRMaj,AssociatedPair> errorMetric;
+
+		switch( fundamental.errorModel ) {
+			case SAMPSON:
+				errorMetric = new DistanceFromModelResidual<>(new FundamentalResidualSampson());
+				break;
+
+			case GEOMETRIC:
+				errorMetric = new DistanceFundamentalGeometric();
+				break;
+
+			default:
+				throw new RuntimeException("Unknown");
+		}
 
 		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold;
 

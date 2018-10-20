@@ -41,17 +41,16 @@ import java.util.Random;
  */
 public abstract class EpipolarTestSimulation {
 
-	Random rand = new Random(234234);
+	protected Random rand = new Random(234234);
 
 	// create a reasonable calibration matrix
 	protected CameraPinhole intrinsic = new CameraPinhole(60,80,0.01,200,150,400,300);
-	DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic,(DMatrixRMaj)null);
+	protected DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic,(DMatrixRMaj)null);
 
 	protected Se3_F64 a_to_b;
 	protected List<Point3D_F64> pointsInA;
 	protected List<AssociatedPair> pairs;
 	protected List<Point2D_F64> currentObs;
-
 
 	public void init( int N , boolean isFundamental ) {
 		// define the camera's motion
