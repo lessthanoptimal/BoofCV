@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public interface AssociateDescription<Desc> extends Associate {
 	 *
 	 * @param listSrc List of features
 	 */
-	public void setSource( FastQueue<Desc> listSrc );
+	void setSource( FastQueue<Desc> listSrc );
 
 	/**
 	 * Sets the list of destination features
@@ -57,5 +57,5 @@ public interface AssociateDescription<Desc> extends Associate {
 	 *
 	 * @param listDst List of features
 	 */
-	public void setDestination( FastQueue<Desc> listDst );
+	void setDestination( FastQueue<Desc> listDst );
 }

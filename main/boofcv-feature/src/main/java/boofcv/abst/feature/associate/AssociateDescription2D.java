@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public interface AssociateDescription2D<Desc> extends Associate {
 	 * @param location Feature locations.
 	 * @param descriptions Feature descriptions.
 	 */
-	public void setSource( FastQueue<Point2D_F64> location , FastQueue<Desc> descriptions );
+	void setSource( FastQueue<Point2D_F64> location , FastQueue<Desc> descriptions );
 
 	/**
 	 * Provide the location and descriptions for destination features.
@@ -46,5 +46,5 @@ public interface AssociateDescription2D<Desc> extends Associate {
 	 * @param location Feature locations.
 	 * @param descriptions Feature descriptions.
 	 */
-	public void setDestination( FastQueue<Point2D_F64> location , FastQueue<Desc> descriptions );
+	void setDestination( FastQueue<Point2D_F64> location , FastQueue<Desc> descriptions );
 }
