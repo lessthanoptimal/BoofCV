@@ -166,7 +166,13 @@ public class SimulatePlanarWorld {
 		scene.clear();
 	}
 
-	public void render()
+	/**
+	 * Render the scene and returns the rendered image.
+	 *
+	 * @see #getOutput()
+	 * @return rendered image
+	 */
+	public GrayF32 render()
 	{
 		LineParametric3D_F64 ray = new LineParametric3D_F64();
 
@@ -198,7 +204,7 @@ public class SimulatePlanarWorld {
 			}
 		}
 
-
+		return getOutput();
 	}
 
 	Vector3D_F64 _u = new Vector3D_F64();
