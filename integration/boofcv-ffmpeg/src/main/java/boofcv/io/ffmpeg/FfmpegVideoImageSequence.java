@@ -18,6 +18,7 @@
 
 package boofcv.io.ffmpeg;
 
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
@@ -28,6 +29,11 @@ import org.bytedeco.copiedstuff.FrameGrabber;
 import org.bytedeco.copiedstuff.Java2DFrameConverter;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 import static org.bytedeco.javacpp.avutil.AV_LOG_ERROR;
 import static org.bytedeco.javacpp.avutil.av_log_set_level;
@@ -129,6 +135,35 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 
 	@Override
 	public void reset() {
+
+		// InputStream can't be seeked. This is a problem. Hack around it is to write the file
+		// to a temporary file or see if it's a file  pass that in
+		URL url = UtilIO.ensureURL(filename);
+		if( url == null )
+			throw new RuntimeException("Invalid: "+finished);
+		if( !url.getProtocol().equals("file")) {
+			System.out.println("Copying the file from the jar to work around ffmpeg");
+			// copy the resource into a temporary file
+			try {
+				InputStream in = UtilIO.openStream(filename);
+				if( in == null ) throw new RuntimeException();
+				final File tempFile = File.createTempFile("demo", ".mp4");
+				tempFile.deleteOnExit();
+				FileOutputStream out = new FileOutputStream(tempFile);
+				byte buffer[] = new byte[1024*1024];
+				while( in.available() > 0 ) {
+					int amount = in.read(buffer,0,buffer.length);
+					out.write(buffer,0,amount);
+				}
+				out.close();
+				in.close();
+				filename = tempFile.getAbsolutePath();
+			} catch( IOException e ) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+		}
+
 		this.frameGrabber = new FFmpegFrameGrabber(filename);
 		try {
 			frameNumber = 0;

@@ -22,9 +22,16 @@ import boofcv.BoofVersion;
 
 import javax.swing.*;
 import java.io.*;
+import java.net.JarURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarFile;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
 
 /**
  * @author Peter Abeles
@@ -36,31 +43,73 @@ public class UtilIO {
 	 * @param path File path relative to root directory
 	 * @return Absolute path to file
 	 */
-	public static String pathExample( String path ) {
-		if( new File(path).isAbsolute() )
-			return path;
+	public static URL pathExampleURL( String path ) {
+		try {
+			File fpath = new File(path);
+			if (fpath.isAbsolute())
+				return fpath.toURL();
+			// Assume we are running inside of the project come
+			String pathToBase = getPathToBase();
+			if( pathToBase != null ) {
+				File pathExample = new File(pathToBase, "data/example/");
+				if (pathExample.exists()) {
+					return new File(pathExample.getPath(), path).getAbsoluteFile().toURL();
+				}
+			}
 
-		File pathExample = new File(getPathToBase(),"data/example/");
-		if( !pathExample.exists() ) {
-			System.err.println();
-			System.err.println("Can't find data/example directory!  There are three likely causes for this problem.");
-			System.err.println();
-			System.err.println("1) You checked out the source code from git and did not pull the data submodule too.");
-			System.err.println("2) You are trying to run an example from outside the BoofCV directory tree.");
-			System.err.println("3) You are trying to pass in your own image.");
-			System.err.println();
-			System.err.println("Solutions:");
-			System.err.println("1) Follow instructions in the boofcv/readme.md file to grab the data directory.");
-			System.err.println("2) Launch the example from inside BoofCV's directory tree!");
-			System.err.println("3) Don't use this function and just pass in the path directly");
-			System.exit(1);
+			System.out.println("-----------------------");
+			// maybe we are running inside an app and all data is stored inside as a resource
+//			String resourcePath = path.replace("/", ".");
+			System.out.println("Attempting to load resource "+path);
+			URL url = UtilIO.class.getClassLoader().getResource(path);
+
+			if (url == null) {
+				System.err.println();
+				System.err.println("Can't find data/example directory!  There are three likely causes for this problem.");
+				System.err.println();
+				System.err.println("1) You checked out the source code from git and did not pull the data submodule too.");
+				System.err.println("2) You are trying to run an example from outside the BoofCV directory tree.");
+				System.err.println("3) You are trying to pass in your own image.");
+				System.err.println();
+				System.err.println("Solutions:");
+				System.err.println("1) Follow instructions in the boofcv/readme.md file to grab the data directory.");
+				System.err.println("2) Launch the example from inside BoofCV's directory tree!");
+				System.err.println("3) Don't use this function and just pass in the path directly");
+				System.exit(1);
+			}
+			return url;
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
 		}
+	}
 
-		File f = new File(pathExample.getPath(),path);
-		if( f.isDirectory() )
-			return f.getAbsolutePath()+System.getProperty("file.separator");
-		else
-			return f.getAbsolutePath();
+	/**
+	 * Given a path which may or may not be a URL return a URL
+	 */
+	public static URL ensureURL(String path ) {
+		URL url;
+		try {
+			url = new URL(path);
+		} catch (MalformedURLException e) {
+			try {
+				url = new File(path).toURL();
+			} catch (MalformedURLException e1) {
+				throw new RuntimeException(e1);
+			}
+		}
+		return url;
+	}
+
+	public static InputStream openStream( String path ) {
+		try {
+			return ensureURL(path).openStream();
+		} catch (IOException e) {
+			return null;
+		}
+	}
+
+	public static String pathExample( String path ) {
+		return pathExampleURL(path).toString();
 	}
 
 	/**
@@ -84,7 +133,7 @@ public class UtilIO {
 	public static String getPathToBase() {
 		String path = new File(".").getAbsoluteFile().getParent();
 
-		while( true )  {
+		while( path != null )  {
 			File f = new File(path);
 			if( !f.exists() )
 				break;
@@ -111,7 +160,7 @@ public class UtilIO {
 
 			path = f.getParent();
 		}
-		throw new RuntimeException("Can't find path to base of project");
+		return null;
 	}
 
 	/**
@@ -367,8 +416,18 @@ public class UtilIO {
 
 		File d = new File(directory);
 
+		if( !d.isDirectory() ) {
+			try {
+				URL url = new URL(directory);
+				if( url.getProtocol().equals("file")) {
+					d = new File(url.getFile());
+				} else if( url.getProtocol().equals("jar")){
+					return listAllJar(url,prefix,null);
+				}
+			} catch( MalformedURLException ignore){}
+		}
 		if( !d.isDirectory() )
-			throw new IllegalArgumentException("Must specify an directory");
+			throw new IllegalArgumentException("Must specify an directory. "+directory);
 
 		File files[] = d.listFiles();
 
@@ -387,6 +446,19 @@ public class UtilIO {
 	public static List<String> listAll(String directory ) {
 		List<String> ret = new ArrayList<>();
 
+		try {
+			// see if it's a URL or not
+			URL url = new URL(directory);
+			if( url.getProtocol().equals("file") ) {
+				directory = url.getFile();
+			} else if( url.getProtocol().equals("jar") ) {
+				return listAllJar(url,null,null);
+			} else {
+				throw new RuntimeException("Not sure what to do with this url. "+url.toString());
+			}
+		} catch (MalformedURLException ignore) {
+		}
+
 		File d = new File(directory);
 
 		if( !d.isDirectory() )
@@ -402,6 +474,37 @@ public class UtilIO {
 		}
 
 		return ret;
+	}
+
+	private static List<String> listAllJar( URL url , String prefix , String suffix ) {
+		List<String> output = new ArrayList<>();
+
+		JarFile jarfile;
+		try {
+			JarURLConnection connection = (JarURLConnection)url.openConnection();
+			jarfile = connection.getJarFile();
+
+			String targetPath = connection.getEntryName()+"/";
+			if( prefix != null ) {
+				targetPath += prefix;
+			}
+
+			final Enumeration e = jarfile.entries();
+			while( e.hasMoreElements() ) {
+				final ZipEntry ze = (ZipEntry) e.nextElement();
+//				System.out.println("  ze.anme="+ze.getName());
+				if( ze.getName().startsWith(targetPath)) {
+					if( suffix == null || ze.getName().endsWith(suffix))  {
+						output.add("jar:file:"+jarfile.getName()+"!/"+ze.getName());
+					}
+				}
+			}
+
+			jarfile.close();
+			return output;
+		} catch (IOException e) {
+			return new ArrayList<>();
+		}
 	}
 
 	/**
@@ -425,5 +528,14 @@ public class UtilIO {
 				return p.matcher(file.getName()).matches();
 			}
 		});
+	}
+
+	public static boolean validURL( URL url ) {
+		try {
+			URLConnection c = url.openConnection();
+			return true;
+		} catch( IOException e ) {
+			return false;
+		}
 	}
 }

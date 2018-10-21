@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,12 @@ import boofcv.io.wrapper.images.JpegByteImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -53,38 +57,64 @@ public class DynamicVideoInterface implements VideoInterface {
 	@Override
 	public <T extends ImageBase<T>> SimpleImageSequence<T> load(String fileName, ImageType<T> imageType) {
 
-		// Use built in movie readers for these file types
-		if( fileName.endsWith("mjpeg") || fileName.endsWith("MJPEG") ||
-				fileName.endsWith("mjpg") || fileName.endsWith("MJPG") ) {
+		URL url;
+		try {
+			url = new URL(fileName);
+		} catch (MalformedURLException e) {
 			try {
-				VideoMjpegCodec codec = new VideoMjpegCodec();
-				List<byte[]> data = codec.read(new FileInputStream(fileName));
-				return new JpegByteImageSequence<>(imageType, data, false);
-			} catch (FileNotFoundException e) {
-				throw new RuntimeException(e);
-			}
-		} else if( fileName.endsWith("mpng") || fileName.endsWith("MPNG")) {
-			try {
-				return new ImageStreamSequence<>(fileName, true, imageType);
-			} catch (FileNotFoundException e) {
-				throw new RuntimeException(e);
+				url = new File(fileName).toURL();
+			} catch (MalformedURLException e1) {
+				throw new RuntimeException(e1);
 			}
 		}
 
+		InputStream stream=null;
 		try {
-			if( ffmpeg != null ) {
-				return ffmpeg.load(fileName, imageType);
-			}
-		} catch( RuntimeException ignore ){}
+			stream = url.openStream();
 
-		try {
-			if( jcodec != null ) {
-				if( fileName.endsWith(".mp4") || fileName.endsWith(".MP4")) {
-					return jcodec.load(fileName,imageType);
+			// Use built in movie readers for these file types
+			if( fileName.endsWith("mjpeg") || fileName.endsWith("MJPEG") ||
+					fileName.endsWith("mjpg") || fileName.endsWith("MJPG") ) {
+				VideoMjpegCodec codec = new VideoMjpegCodec();
+				List<byte[]> data = codec.read(stream);
+				return new JpegByteImageSequence<>(imageType, data, false);
+			} else if( fileName.endsWith("mpng") || fileName.endsWith("MPNG")) {
+				try {
+					return new ImageStreamSequence<>(fileName, true, imageType);
+				} catch (FileNotFoundException e) {
+					throw new RuntimeException(e);
 				}
 			}
-		} catch( RuntimeException ignore ){}
-		System.err.println("No working codec found for file: " + fileName);
+
+			try {
+				if( ffmpeg != null ) {
+					return ffmpeg.load(fileName, imageType);
+				}
+			} catch( RuntimeException ignore ){
+				ignore.printStackTrace();
+			}
+
+			try {
+				if( jcodec != null ) {
+					if( fileName.endsWith(".mp4") || fileName.endsWith(".MP4")) {
+						return jcodec.load(fileName,imageType);
+					}
+				}
+			} catch( RuntimeException ignore ){}
+			System.err.println("No working codec found for file: " + fileName);
+
+		} catch (IOException e) {
+			return null;
+		} finally {
+			if( stream != null ) {
+				try {
+					stream.close();
+				} catch (IOException e) {
+					return null;
+				}
+			}
+		}
+
 		return null;
 	}
 

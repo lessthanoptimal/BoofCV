@@ -6,6 +6,11 @@ Date Format: year/month/day
 Date    : 2018
 Version : 0.32
 
+- Internally using URL to load resources (e.g. images, videos) to enable running inside of jars
+
+
+TODO Attempt trifocal tensor based stereo
+
 TODO Remove dependency on OpenCV in Applications to reduce file size
 TODO Create GUI for running any application
 TODO Create installer for applications
@@ -19,8 +24,6 @@ TODO Create installer for applications
    - TODO Create generic image feature matching for ordered sequences of images
    - TODO homogeneous coordinates
 - TODO revisit stereo from uncalibrated
-- Fundamential Matrix
-   - TODO "Gold Standard" Euclidean error
 - TODO Sparse Bundle Adjustment
    - Future: Homogenoeus coordinates
    - Future: quaternion implementation

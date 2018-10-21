@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -307,10 +307,11 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 		infoBar.setPlay(!streamPaused);
 	}
 
-
 	private void parseQuad( String fileName ) throws FileNotFoundException {
-		Reader r = new FileReader(fileName);
-		BufferedReader in = new BufferedReader(r);
+		InputStream stream = UtilIO.openStream(fileName);
+		if( stream == null )
+			throw new RuntimeException("Can't open "+fileName);
+		BufferedReader in = new BufferedReader(new InputStreamReader(stream));
 
 		try {
 			String w[] = in.readLine().split(" ");

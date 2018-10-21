@@ -24,6 +24,7 @@ import org.ddogleg.struct.GrowQueue_I8;
 import javax.imageio.ImageIO;
 import java.awt.image.*;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,22 +44,21 @@ public class UtilImageIO {
 	 */
 	public static BufferedImage loadImage(String fileName) {
 		BufferedImage img;
+		InputStream stream = null;
+		URL url;
 		try {
-			img = ImageIO.read(new File(fileName));
-
-			if(  img == null) {
-				if( fileName.endsWith("ppm") || fileName.endsWith("PPM") ) {
-					return loadPPM(fileName,null);
-				} else if( fileName.endsWith("pgm") || fileName.endsWith("PGM") ) {
-					return loadPGM(fileName, null);
-				}
+			url = new URL(fileName);
+		} catch( MalformedURLException e1 ) {
+			// might just be a file reference
+			try {
+				url = new File(fileName).toURL();
+			} catch (MalformedURLException e2) {
+				return null;
 			}
-		} catch (IOException e) {
-			return null;
 		}
-
-		return img;
+		return loadImage(url);
 	}
+
 
 	public static BufferedImage loadImage(String directory , String fileName) {
 		return loadImage(new File(directory,fileName).getPath());
@@ -95,15 +95,22 @@ public class UtilImageIO {
 	 * A function that load the specified image.  If anything goes wrong it returns a
 	 * null.
 	 */
-	public static BufferedImage loadImage(URL fileName) {
-		BufferedImage img;
+	public static BufferedImage loadImage(URL url) {
 		try {
-			img = ImageIO.read(fileName);
+			return ImageIO.read(url);
 		} catch (IOException e) {
-			return null;
+			try {
+				InputStream stream = url.openStream();
+				String path = url.toString();
+				if( path.endsWith("ppm") || path.endsWith("PPM") ) {
+					return loadPPM(stream,null);
+				} else if( path.endsWith("pgm") || path.endsWith("PGM") ) {
+					return loadPGM(stream, null);
+				}
+				stream.close();
+			} catch (IOException ignore) {}
 		}
-
-		return img;
+		return null;
 	}
 
 	/**
