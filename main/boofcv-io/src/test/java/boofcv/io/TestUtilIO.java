@@ -53,6 +53,16 @@ public class TestUtilIO {
 	}
 
 	@Test
+	public void simplifyJarPath() throws MalformedURLException {
+		String input = "jar:file:/home/person/BoofApplications/demonstrations.jar!/fiducial/image/video/../patterns/chicken.png";
+		String expected = "jar:file:/home/person/BoofApplications/demonstrations.jar!/fiducial/image/patterns/chicken.png";
+
+		URL a = new URL(input);
+		URL b = UtilIO.simplifyJarPath(a);
+		assertEquals(expected,b.toString());
+	}
+
+	@Test
 	public void readAsString() throws IOException {
 		String expected = "This is\na string\n";
 		File tmp = File.createTempFile("readAsString",null);

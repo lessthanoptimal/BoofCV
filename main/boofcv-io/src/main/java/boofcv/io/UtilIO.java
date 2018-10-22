@@ -22,10 +22,7 @@ import boofcv.BoofVersion;
 
 import javax.swing.*;
 import java.io.*;
-import java.net.JarURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -83,6 +80,13 @@ public class UtilIO {
 		}
 	}
 
+	public static BufferedReader openBufferedReader(String fileName) throws FileNotFoundException {
+		InputStream stream = UtilIO.openStream(fileName);
+		if( stream == null )
+			throw new FileNotFoundException("Can't open "+fileName);
+		return new BufferedReader(new InputStreamReader(stream));
+	}
+
 	/**
 	 * Given a path which may or may not be a URL return a URL
 	 */
@@ -90,14 +94,32 @@ public class UtilIO {
 		URL url;
 		try {
 			url = new URL(path);
+			if( url.getProtocol().equals("jar")) {
+				return simplifyJarPath(url);
+			}
 		} catch (MalformedURLException e) {
+			// might just be a file reference.
 			try {
-				url = new File(path).toURL();
-			} catch (MalformedURLException e1) {
-				throw new RuntimeException(e1);
+				URI uri = new URI("file:/");
+				url = uri.resolve(path).toURL(); // simplify the path. "1/2/../3" = "1/3"
+			} catch (MalformedURLException | URISyntaxException e2) {
+				return null;
 			}
 		}
 		return url;
+	}
+
+	/**
+	 * Jar paths don't work if they include up directory. this wills trip those out.
+	 */
+	public static URL simplifyJarPath( URL url ) {
+		try {
+			String segments[] = url.toString().split(".jar!/");
+			String path = new URI("file:/").resolve(segments[1]).toString().replace("file:/","");
+			return new URL(segments[0]+".jar!/"+path);
+		} catch (IOException | URISyntaxException e) {
+			return url;
+		}
 	}
 
 	public static InputStream openStream( String path ) {

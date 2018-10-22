@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import georegression.struct.se.Se3_F64;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+import javax.annotation.Nullable;
 import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
@@ -204,7 +205,9 @@ public class CalibrationIO {
 		out.close();
 	}
 
-	public static <T> T load(URL path ) {
+	public static <T> T load( @Nullable URL path ) {
+		if( path == null )
+			throw new RuntimeException("Null path");
 		try {
 			return load( new InputStreamReader(path.openStream()) );
 		} catch (IOException e ) {

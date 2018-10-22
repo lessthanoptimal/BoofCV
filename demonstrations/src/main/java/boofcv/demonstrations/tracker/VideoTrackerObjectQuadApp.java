@@ -34,7 +34,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -308,10 +311,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 	}
 
 	private void parseQuad( String fileName ) throws FileNotFoundException {
-		InputStream stream = UtilIO.openStream(fileName);
-		if( stream == null )
-			throw new RuntimeException("Can't open "+fileName);
-		BufferedReader in = new BufferedReader(new InputStreamReader(stream));
+		BufferedReader in = UtilIO.openBufferedReader(fileName);
 
 		try {
 			String w[] = in.readLine().split(" ");

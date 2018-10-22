@@ -30,6 +30,7 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
@@ -248,9 +249,9 @@ public class ShapeFitContourApp
 	public static void main( String args[] ) {
 
 		List<String> examples = new ArrayList<>();
-		examples.add("particles01.jpg");
-		examples.add("shapes/shapes02.png");
-		examples.add("shapes/line_text_test_image.png");
+		examples.add(UtilIO.pathExample("particles01.jpg"));
+		examples.add(UtilIO.pathExample("shapes/shapes02.png"));
+		examples.add(UtilIO.pathExample("shapes/line_text_test_image.png"));
 
 		ShapeFitContourApp app = new ShapeFitContourApp(examples);
 

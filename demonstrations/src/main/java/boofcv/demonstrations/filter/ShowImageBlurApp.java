@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -232,8 +232,10 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 		ShowImageBlurApp<GrayU8> app = new ShowImageBlurApp<>(GrayU8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
+		inputs.add(new PathLabel("Horses", UtilIO.pathExample("segment/berkeley_horses.jpg")));
 		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
+		inputs.add(new PathLabel("Kangaroo", UtilIO.pathExample("segment/berkeley_kangaroo.jpg")));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
 
 		app.setInputList(inputs);

@@ -18,13 +18,13 @@
 
 package boofcv.io.image;
 
+import boofcv.io.UtilIO;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.GrowQueue_I8;
 
 import javax.imageio.ImageIO;
 import java.awt.image.*;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,20 +43,7 @@ public class UtilImageIO {
 	 * null.
 	 */
 	public static BufferedImage loadImage(String fileName) {
-		BufferedImage img;
-		InputStream stream = null;
-		URL url;
-		try {
-			url = new URL(fileName);
-		} catch( MalformedURLException e1 ) {
-			// might just be a file reference
-			try {
-				url = new File(fileName).toURL();
-			} catch (MalformedURLException e2) {
-				return null;
-			}
-		}
-		return loadImage(url);
+		return loadImage( UtilIO.ensureURL(fileName));
 	}
 
 
@@ -96,6 +83,8 @@ public class UtilImageIO {
 	 * null.
 	 */
 	public static BufferedImage loadImage(URL url) {
+		if( url == null )
+			return null;
 		try {
 			return ImageIO.read(url);
 		} catch (IOException e) {

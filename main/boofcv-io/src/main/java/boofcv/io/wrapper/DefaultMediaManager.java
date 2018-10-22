@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.io.wrapper;
 
 import boofcv.io.MediaManager;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.video.DynamicVideoInterface;
@@ -28,8 +29,8 @@ import boofcv.struct.image.ImageType;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,11 +48,10 @@ public class DefaultMediaManager implements MediaManager {
 
 	@Override
 	public Reader openFile(String fileName) {
-		try {
-			return new FileReader(fileName);
-		} catch (FileNotFoundException e) {
+		InputStream stream = UtilIO.openStream(fileName);
+		if( stream == null )
 			return null;
-		}
+		return new InputStreamReader(stream);
 	}
 
 	@Override

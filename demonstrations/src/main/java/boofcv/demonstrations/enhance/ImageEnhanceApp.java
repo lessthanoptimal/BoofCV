@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -268,8 +269,8 @@ public class ImageEnhanceApp extends DemonstrationBase {
 
 	public static void main(String[] args) {
 		List<String> examples = new ArrayList<>();
-		examples.add("enhance/dark.jpg");
-		examples.add("enhance/dull.jpg");
+		examples.add(UtilIO.pathExample("enhance/dark.jpg"));
+		examples.add(UtilIO.pathExample("enhance/dull.jpg"));
 
 		ImageEnhanceApp app = new ImageEnhanceApp(examples);
 

@@ -202,10 +202,11 @@ public class DetectPointsWithNoiseApp<T extends ImageGray<T>, D extends ImageGra
 //		DetectPointsWithNoiseApp app = new DetectPointsWithNoiseApp(GrayU8.class,GrayS16.class);
 
 		List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
-		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));
+		inputs.add(new PathLabel("Square Grid",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
 		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
+		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));
 		inputs.add(new PathLabel("beach", UtilIO.pathExample("scale/beach02.jpg")));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 
 		app.setInputList(inputs);
 

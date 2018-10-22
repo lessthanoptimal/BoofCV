@@ -374,10 +374,10 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("Chessboard", UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame06.jpg")));
 		examples.add(new PathLabel("Square Grid",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
-		examples.add(new PathLabel("Shapes 01","shapes/shapes01.png"));
-		examples.add(new PathLabel("Amoeba Shapes","amoeba_shapes.jpg"));
-		examples.add(new PathLabel("Sunflowers","sunflowers.jpg"));
-		examples.add(new PathLabel("Beach","scale/beach02.jpg"));
+		examples.add(new PathLabel("Shapes 01",UtilIO.pathExample("shapes/shapes01.png")));
+		examples.add(new PathLabel("Amoeba Shapes",UtilIO.pathExample("amoeba_shapes.jpg")));
+		examples.add(new PathLabel("Sunflowers",UtilIO.pathExample("sunflowers.jpg")));
+		examples.add(new PathLabel("Beach",UtilIO.pathExample("scale/beach02.jpg")));
 		examples.add(new PathLabel("Chessboard Movie",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 
 		DemoDetectPointFeaturesApp app = new DemoDetectPointFeaturesApp(examples,GrayF32.class);

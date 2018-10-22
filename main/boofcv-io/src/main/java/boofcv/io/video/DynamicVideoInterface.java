@@ -18,17 +18,15 @@
 
 package boofcv.io.video;
 
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.images.ImageStreamSequence;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
@@ -57,16 +55,9 @@ public class DynamicVideoInterface implements VideoInterface {
 	@Override
 	public <T extends ImageBase<T>> SimpleImageSequence<T> load(String fileName, ImageType<T> imageType) {
 
-		URL url;
-		try {
-			url = new URL(fileName);
-		} catch (MalformedURLException e) {
-			try {
-				url = new File(fileName).toURL();
-			} catch (MalformedURLException e1) {
-				throw new RuntimeException(e1);
-			}
-		}
+		URL url = UtilIO.ensureURL(fileName);
+		if( url == null )
+			throw new RuntimeException("Can't open "+fileName);
 
 		InputStream stream=null;
 		try {
@@ -79,11 +70,7 @@ public class DynamicVideoInterface implements VideoInterface {
 				List<byte[]> data = codec.read(stream);
 				return new JpegByteImageSequence<>(imageType, data, false);
 			} else if( fileName.endsWith("mpng") || fileName.endsWith("MPNG")) {
-				try {
-					return new ImageStreamSequence<>(fileName, true, imageType);
-				} catch (FileNotFoundException e) {
-					throw new RuntimeException(e);
-				}
+				return new ImageStreamSequence<>(stream, true, imageType);
 			}
 
 			try {
@@ -104,13 +91,14 @@ public class DynamicVideoInterface implements VideoInterface {
 			System.err.println("No working codec found for file: " + fileName);
 
 		} catch (IOException e) {
+			System.err.println("Error opening. "+e.getMessage());
 			return null;
 		} finally {
 			if( stream != null ) {
 				try {
 					stream.close();
 				} catch (IOException e) {
-					return null;
+					System.err.println("Failed to close stream. "+e.getMessage());
 				}
 			}
 		}

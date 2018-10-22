@@ -205,10 +205,10 @@ public class IntensityFeaturePyramidApp<T extends ImageGray<T>, D extends ImageG
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 
-		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
-		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));
 		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
+		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));
 		inputs.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 
 		app.setInputList(inputs);
 

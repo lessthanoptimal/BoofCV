@@ -28,6 +28,7 @@ import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
+import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -121,12 +122,12 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 	public static void main(String[] args) {
 
 		List<String> examples = new ArrayList<>();
-		examples.add("fiducial/circle_hexagonal/image00.jpg");
-		examples.add("shapes/polygons01.jpg");
-		examples.add("shapes/shapes01.png");
-		examples.add("shapes/shapes02.png");
-		examples.add("fiducial/circle_hexagonal/image01.jpg");
-		examples.add("fiducial/circle_hexagonal/movie.mp4");
+		examples.add(UtilIO.pathExample("fiducial/circle_hexagonal/image00.jpg"));
+		examples.add(UtilIO.pathExample("shapes/polygons01.jpg"));
+		examples.add(UtilIO.pathExample("shapes/shapes01.png"));
+		examples.add(UtilIO.pathExample("shapes/shapes02.png"));
+		examples.add(UtilIO.pathExample("fiducial/circle_hexagonal/image01.jpg"));
+		examples.add(UtilIO.pathExample("fiducial/circle_hexagonal/movie.mp4"));
 
 		DetectBlackEllipseApp app = new DetectBlackEllipseApp(examples,GrayF32.class);
 
