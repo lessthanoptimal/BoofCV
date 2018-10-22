@@ -18,6 +18,7 @@
 
 package boofcv.io.calibration;
 
+import boofcv.io.UtilIO;
 import boofcv.struct.calib.*;
 import georegression.struct.se.Se3_F64;
 import org.yaml.snakeyaml.DumperOptions;
@@ -216,19 +217,17 @@ public class CalibrationIO {
 	}
 
 	public static <T> T load(File path ) {
-		try {
-			return load( new FileReader(path));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
+		URL url = UtilIO.ensureURL(path.getPath());
+		if( url == null )
+			throw new RuntimeException("Can't find "+path.getPath());
+		return load(url);
 	}
 
 	public static <T> T load(String path ) {
-		try {
-			return load( new FileReader(path));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
+		URL url = UtilIO.ensureURL(path);
+		if( url == null )
+			throw new RuntimeException("Can't find "+path);
+		return load(url);
 	}
 
 	/**

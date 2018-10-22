@@ -131,6 +131,18 @@ public class UtilIO {
 	}
 
 	public static String pathExample( String path ) {
+		File fpath = new File(path);
+		if (fpath.isAbsolute())
+			return path;
+		// Assume we are running inside of the project come
+		String pathToBase = getPathToBase();
+		if( pathToBase != null ) {
+			File pathExample = new File(pathToBase, "data/example/");
+			if (pathExample.exists()) {
+				return new File(pathExample.getPath(), path).getAbsolutePath();
+			}
+		}
+
 		return pathExampleURL(path).toString();
 	}
 
