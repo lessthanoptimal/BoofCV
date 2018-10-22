@@ -152,7 +152,10 @@ public class UtilIO {
 	 * @return Absolute path to file
 	 */
 	public static String path( String path ) {
-		return new File(getPathToBase(),path).getAbsolutePath();
+		String pathToBase = getPathToBase();
+		if( pathToBase == null )
+			return path;
+		return new File(pathToBase,path).getAbsolutePath();
 	}
 
 	public static File getFileToBase() {
@@ -300,27 +303,12 @@ public class UtilIO {
 	 * Reads an entire file and converts it into a text string
 	 */
 	public static String readAsString( String path ) {
-		StringBuilder code = new StringBuilder();
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(path));
-			String line;
-			while ((line = reader.readLine()) != null)
-				code.append(line).append(System.lineSeparator());
-			reader.close();
-		} catch (IOException e) {
+		InputStream stream = openStream(path);
+		if( stream == null ) {
+			System.err.println("Failed to open "+path);
 			return null;
-//			throw new RuntimeException(e);
 		}
-
-		String output = code.toString();
-
-		// make windows strings appear the same as linux strings
-		String nl = System.getProperty("line.separator");
-		if( nl.compareTo("\n") != 0 ) {
-			output = output.replaceAll(nl,"\n");
-		}
-
-		return output;
+		return readAsString(stream);
 	}
 
 	/**
@@ -338,7 +326,15 @@ public class UtilIO {
 			return null;
 //			throw new RuntimeException(e);
 		}
-		return code.toString();
+		String output = code.toString();
+
+		// make windows strings appear the same as linux strings
+		String nl = System.getProperty("line.separator");
+		if( nl.compareTo("\n") != 0 ) {
+			output = output.replaceAll(nl,"\n");
+		}
+
+		return output;
 	}
 
 	/**
@@ -354,12 +350,24 @@ public class UtilIO {
 		if(pkg == null || app == null)
 			return path;
 
-		if(pkg.contains("examples"))
-			path = path("examples/src/main/java/" + pkg.replace('.','/') + "/" + app + ".java");
-		else if(pkg.contains("demonstrations"))
-			path = path("demonstrations/src/main/java/" + pkg.replace('.','/') + "/" + app + ".java");
 
-		return path;
+		String pathToBase = getPathToBase();
+		if( pathToBase != null ) {
+			if(pkg.contains("examples"))
+				path =  new File(pathToBase,"examples/src/main/java/").getAbsolutePath();
+			else if(pkg.contains("demonstrations"))
+				path =  new File(pathToBase,"demonstrations/src/main/java/").getAbsolutePath();
+			String pathToCode = pkg.replace('.','/') + "/" + app + ".java";
+			return new File(path,pathToCode).getPath();
+		} else {
+			// probably running inside a jar
+			String pathToCode = pkg.replace('.','/') + "/" + app + ".java";
+			URL url = UtilIO.class.getClassLoader().getResource(pathToCode);
+			if( url != null )
+				return url.toString();
+			else
+				return pathToCode;
+		}
 	}
 
 	public static String getGithubURL(String pkg, String app) {

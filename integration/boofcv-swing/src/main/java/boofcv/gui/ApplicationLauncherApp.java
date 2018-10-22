@@ -33,7 +33,9 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.URI;
 import java.util.*;
 import java.util.List;
@@ -340,31 +342,20 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		final AppInfo info = (AppInfo) node.getUserObject();
 
 		JMenuItem copyname = new JMenuItem("Copy Name");
-		copyname.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				clipboard.setContents(new StringSelection(info.app.getSimpleName()), null);
-			}
+		copyname.addActionListener(e -> {
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clipboard.setContents(new StringSelection(info.app.getSimpleName()), null);
 		});
 
 		JMenuItem copypath = new JMenuItem("Copy Path");
-		copypath.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String path = UtilIO.getSourcePath(info.app.getPackage().getName(), info.app.getSimpleName());
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				clipboard.setContents(new StringSelection(path), null);
-			}
+		copypath.addActionListener(e -> {
+			String path1 = UtilIO.getSourcePath(info.app.getPackage().getName(), info.app.getSimpleName());
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clipboard.setContents(new StringSelection(path1), null);
 		});
 
 		JMenuItem github = new JMenuItem("Go to Github");
-		github.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				openInGitHub(info);
-			}
-		});
+		github.addActionListener(e -> openInGitHub(info));
 
 		JPopupMenu submenu = new JPopupMenu();
 		submenu.add(copyname);
@@ -481,42 +472,29 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 		// first try loading it as a regular file
 		String path = UtilIO.getSourcePath(process.info.app.getPackage().getName(), process.info.app.getSimpleName());
-		File source = new File(path);
-		String code = null;
-		if( source.exists() && source.canRead() ) {
-			code = UtilIO.readAsString(path);
-		} else  {
-			// now try loading it as a resource.  This might be done if the application is created as a
-			// jar in the future
-			InputStream in = process.info.app.getResourceAsStream(process.info.app.getSimpleName()+".java");
-			code = UtilIO.readAsString(in);
+		String code = UtilIO.readAsString(path);
+		if( code == null ) {
+			code = "Failed to load "+path;
 		}
 
-		if ( code != null ) {
-			sourceTextArea.setText(code);
+		sourceTextArea.setText(code);
 
-			sourceTextArea.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mousePressed(MouseEvent e) {
-					super.mousePressed(e);
-					if (SwingUtilities.isRightMouseButton(e) && !sourceTextArea.getText().isEmpty()) {
-						JPopupMenu menu = new JPopupMenu();
-						JMenuItem copy = new JMenuItem("Copy");
-						copy.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-								clipboard.setContents(new StringSelection(sourceTextArea.getText()), null);
-							}
-						});
-						menu.add(copy);
-						menu.show(sourceTextArea, e.getX(), e.getY());
-					}
+		sourceTextArea.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				super.mousePressed(e);
+				if (SwingUtilities.isRightMouseButton(e) && !sourceTextArea.getText().isEmpty()) {
+					JPopupMenu menu = new JPopupMenu();
+					JMenuItem copy = new JMenuItem("Copy");
+					copy.addActionListener(e1 -> {
+						Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+						clipboard.setContents(new StringSelection(sourceTextArea.getText()), null);
+					});
+					menu.add(copy);
+					menu.show(sourceTextArea, e.getX(), e.getY());
 				}
-			});
-		} else {
-			sourceTextArea.setText("Source not found!");
-		}
+			}
+		});
 	}
 
 	private void addProcessTab(final ActiveProcess process, JTabbedPane pane) {
