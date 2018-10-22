@@ -7,7 +7,11 @@ Date    : 2018
 Version : 0.32
 
 - Internally using URL to load resources (e.g. images, videos) to enable running inside of jars
-
+- Demonstrations / Examples
+  * Colorized code
+  * TODO update detect line app demo
+  * TODO update image enhance
+  * TODO fix os x touch pad zoom
 
 TODO Attempt trifocal tensor based stereo
 

@@ -20,6 +20,8 @@ package boofcv.gui;
 
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -502,8 +504,10 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 		final ProcessTabPanel component = new ProcessTabPanel(process.getId());
 
-		final JTextArea sourceTextArea = new JTextArea();
+		final RSyntaxTextArea sourceTextArea = new RSyntaxTextArea();
+		sourceTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
 		sourceTextArea.setFont(new Font("monospaced", Font.PLAIN, 12));
+		sourceTextArea.setCodeFoldingEnabled(true);
 		sourceTextArea.setEditable(false);
 		sourceTextArea.setLineWrap(true);
 		sourceTextArea.setWrapStyleWord(true);
