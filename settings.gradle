@@ -10,12 +10,12 @@ include 'examples','demonstrations','applications',
         'integration:boofcv-ffmpeg'
 
 // JavaFX isn't installed universally yet.  If it exists on the system it will be built
-try {
-    Class.forName("javafx.scene.image.Image");
-    include 'integration:boofcv-javafx'
-} catch(Exception ignore) {
-    logger.warn('Skipping integration/javafx because JavaFX is not installed in this JDK')
-}
+//try {
+//    Class.forName("javafx.scene.image.Image");
+//    include 'integration:boofcv-javafx'
+//} catch(Exception ignore) {
+//    logger.warn('Skipping integration/javafx because JavaFX is not installed in this JDK')
+//}
 
 // these are packages which require external files that must be manually downloaded or configured to compile
 if (System.getenv()['ANDROID_HOME']) {

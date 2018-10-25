@@ -22,7 +22,10 @@ import boofcv.BoofVersion;
 
 import javax.swing.*;
 import java.io.*;
-import java.net.*;
+import java.net.JarURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -34,7 +37,6 @@ import java.util.zip.ZipEntry;
  * @author Peter Abeles
  */
 public class UtilIO {
-
 	/**
 	 * Returns an absolute path to the file that is relative to the example directory
 	 * @param path File path relative to root directory
@@ -44,7 +46,7 @@ public class UtilIO {
 		try {
 			File fpath = new File(path);
 			if (fpath.isAbsolute())
-				return fpath.toURL();
+				return fpath.toURI().toURL();
 			// Assume we are running inside of the project come
 			String pathToBase = getPathToBase();
 			if( pathToBase != null ) {
@@ -56,7 +58,6 @@ public class UtilIO {
 
 			System.out.println("-----------------------");
 			// maybe we are running inside an app and all data is stored inside as a resource
-//			String resourcePath = path.replace("/", ".");
 			System.out.println("Attempting to load resource "+path);
 			URL url = UtilIO.class.getClassLoader().getResource(path);
 
@@ -91,6 +92,7 @@ public class UtilIO {
 	 * Given a path which may or may not be a URL return a URL
 	 */
 	public static URL ensureURL(String path ) {
+		path = systemToUnix(path);
 		URL url;
 		try {
 			url = new URL(path);
@@ -100,9 +102,8 @@ public class UtilIO {
 		} catch (MalformedURLException e) {
 			// might just be a file reference.
 			try {
-				URI uri = new URI("file:/");
-				url = uri.resolve(path).toURL(); // simplify the path. "1/2/../3" = "1/3"
-			} catch (MalformedURLException | URISyntaxException e2) {
+				url = new File(path).toURI().toURL(); // simplify the path. "1/2/../3" = "1/3"
+			} catch (MalformedURLException e2) {
 				return null;
 			}
 		}
@@ -115,11 +116,47 @@ public class UtilIO {
 	public static URL simplifyJarPath( URL url ) {
 		try {
 			String segments[] = url.toString().split(".jar!/");
-			String path = new URI("file:/").resolve(segments[1]).toString().replace("file:/","");
+			String path = simplifyJarPath(segments[1]);
 			return new URL(segments[0]+".jar!/"+path);
-		} catch (IOException | URISyntaxException e) {
+		} catch (IOException e) {
 			return url;
 		}
+	}
+
+	public static String systemToUnix(String path) {
+		if (path==null) return null;
+		if (File.separatorChar=='\\') {
+			return path.replace('\\', '/');
+		} else {
+			return path;
+		}
+	}
+
+	public static String simplifyJarPath( String path ) {
+		List<String> elements = new ArrayList<>();
+		File f = new File(path);
+
+		boolean skip = false;
+		do {
+			if( !skip ) {
+				if( f.getName().equals("..")) {
+					skip = true;
+				} else {
+					elements.add(f.getName());
+				}
+ 			} else {
+				skip = false;
+			}
+			f = f.getParentFile();
+		}while( f != null );
+
+		path = "";
+		for (int i = elements.size()-1; i >=0; i--) {
+			path += elements.get(i);
+			if( i > 0 )
+				path+='/';
+		}
+		return path;
 	}
 
 	public static InputStream openStream( String path ) {
@@ -535,7 +572,8 @@ public class UtilIO {
 			while( e.hasMoreElements() ) {
 				final ZipEntry ze = (ZipEntry) e.nextElement();
 //				System.out.println("  ze.anme="+ze.getName());
-				if( ze.getName().startsWith(targetPath)) {
+				if( ze.getName().startsWith(targetPath) &&
+						ze.getName().length() != targetPath.length()) {
 					if( suffix == null || ze.getName().endsWith(suffix))  {
 						output.add("jar:file:"+jarfile.getName()+"!/"+ze.getName());
 					}

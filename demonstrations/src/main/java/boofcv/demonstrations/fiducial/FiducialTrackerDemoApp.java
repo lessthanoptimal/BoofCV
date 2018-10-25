@@ -224,8 +224,11 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		String name = example.label;
 
 		String videoName = example.getPath();
-		String seperator = System.getProperty("file.separator");
-		String path = videoName.substring(0, videoName.lastIndexOf(seperator.charAt(0)));
+		int location = videoName.lastIndexOf(File.separatorChar);
+		if( location == -1 ) { // windows vs unix issue
+			location = videoName.lastIndexOf('/');
+		}
+		String path = videoName.substring(0, location);
 
 		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21);
 

@@ -52,6 +52,18 @@ public class TestUtilIO {
 		assertTrue(found.toString().endsWith("dummy01.png"));
 	}
 
+	/**
+	 * See if it handles the URL after it has been messed up by being passed through File
+	 */
+	@Test
+	public void ensureURL_mangled() {
+		String input = "jar:file:/home/person/BoofApplications/demonstrations.jar!/fiducial/image/video/patterns/chicken.png";
+		URL url = UtilIO.ensureURL(new File(input).getPath());
+
+		assertNotNull(url);
+		assertEquals(input,url.toString());
+	}
+
 	@Test
 	public void simplifyJarPath() throws MalformedURLException {
 		String input = "jar:file:/home/person/BoofApplications/demonstrations.jar!/fiducial/image/video/../patterns/chicken.png";

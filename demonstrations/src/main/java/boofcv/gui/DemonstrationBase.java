@@ -46,6 +46,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static boofcv.io.UtilIO.systemToUnix;
+
 /**
  * Provides some common basic functionality for demonstrations
  *
@@ -314,42 +316,43 @@ public abstract class DemonstrationBase extends JPanel {
 	 * be stopped.
 	 */
 	public void openFile(File file) {
+		String path = systemToUnix(file.getPath());
+//		System.out.println("demo.openFile() = "+path);
 		URL url = null;
 
 		try {
-			url = new URL(file.getPath());
+			url = new URL(path);
 			if( !UtilIO.validURL(url)) {
+//				System.out.println("  invalid URL");
 				url = null;
 			}
 		} catch( MalformedURLException ignore ) {}
 
 		if( url == null ) {
+//			System.out.println("Invalid URL");
 			try {
-				url = file.toURL();
-
+				url = new File(UtilIO.pathExample(file.getPath())).toURI().toURL();
 				if (!UtilIO.validURL(url)) {
-					// maybe it's an example file
-					url = new File(UtilIO.pathExample(file.getPath())).toURL();
-					if (!UtilIO.validURL(url)) {
-						System.err.println("Can't open " + file.getPath());
-						return;
-					}
+					System.err.println("Can't open " + file.getPath());
+					return;
 				}
+				inputFilePath = url.toString();
 			} catch (MalformedURLException e) {
 				System.err.println(e.getMessage());
 				return;
 			}
+		} else {
+			// input URL was valid, so use it directly
+			inputFilePath = path;
+//			System.out.println("Valid URL using "+inputFilePath);
 		}
 
 		// update recent items menu
-		final URL _url = url;
+		final String _path = inputFilePath;
 		BoofSwingUtil.invokeNowOrLater(() -> {
-			BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,_url.getPath());
+			BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,_path);
 			updateRecentItems();
 		});
-
-		// mjpegs can be opened up as images.  so override the default behavior
-		inputFilePath = url.toString();
 
 		BufferedImage buffered = inputFilePath.endsWith("mjpeg") ? null : UtilImageIO.loadImage(inputFilePath);
 		if( buffered == null ) {

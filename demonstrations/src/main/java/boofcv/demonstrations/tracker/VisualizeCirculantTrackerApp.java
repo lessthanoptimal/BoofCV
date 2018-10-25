@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -116,8 +116,7 @@ public class VisualizeCirculantTrackerApp<T extends ImageGray<T>>
 	public static void main( String args[] ) {
 		VisualizeCirculantTrackerApp app = new VisualizeCirculantTrackerApp<>(GrayU8.class);
 
-//		String fileName = UtilIO.pathExample("tracking/track_peter.mjpeg");
-		String fileName = UtilIO.pathExample("tracking/snow_follow_car.mjpeg");
+		String fileName = UtilIO.pathExample("tracking/track_book.mjpeg");
 
 		SimpleImageSequence<GrayU8> sequence = DefaultMediaManager.INSTANCE.
 				openVideo(fileName, ImageType.single(GrayU8.class));
