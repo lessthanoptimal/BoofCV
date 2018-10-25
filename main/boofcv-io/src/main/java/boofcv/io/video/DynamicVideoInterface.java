@@ -54,7 +54,6 @@ public class DynamicVideoInterface implements VideoInterface {
 
 	@Override
 	public <T extends ImageBase<T>> SimpleImageSequence<T> load(String fileName, ImageType<T> imageType) {
-
 		URL url = UtilIO.ensureURL(fileName);
 		if( url == null )
 			throw new RuntimeException("Can't open "+fileName);
@@ -77,8 +76,8 @@ public class DynamicVideoInterface implements VideoInterface {
 				if( ffmpeg != null ) {
 					return ffmpeg.load(fileName, imageType);
 				}
-			} catch( RuntimeException ignore ){
-				ignore.printStackTrace();
+			} catch( RuntimeException e ){
+				e.printStackTrace();
 			}
 
 			try {

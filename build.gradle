@@ -11,6 +11,8 @@ allprojects {
 
     group = 'org.boofcv'
     version = '0.32-SNAPSHOT'
+
+    ext.COMMONS_IO_VERSION = '2.6'
 }
 
 project.ext.set("deepboof_version", '0.4')

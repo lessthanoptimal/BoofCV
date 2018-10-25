@@ -196,11 +196,11 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 //				FactoryFiducialCalibration.circleHexagonalGrid(new ConfigCircleHexagonalGrid(5, 8, 1, 6));
 
 		List<String> images;
-//		images = UtilIO.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square"),"frame");
+//		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square"),"frame");
 		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess"),"frame");
-//		images = UtilIO.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleHexagonal"),"image");
-//		images = UtilIO.directoryList(UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang"),"CalibIm");
-//		images = UtilIO.directoryList(UtilIO.pathExample("calibration//stereo/Bumblebee2_Square"),"left");
+//		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleHexagonal"),"image");
+//		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang"),"CalibIm");
+//		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration//stereo/Bumblebee2_Square"),"left");
 
 		CalibratePinholePlanarGuiApp app = new CalibratePinholePlanarGuiApp();
 		app.configure(detector,images,2,false);
