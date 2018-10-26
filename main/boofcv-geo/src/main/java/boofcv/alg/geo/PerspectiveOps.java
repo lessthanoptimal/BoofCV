@@ -50,6 +50,40 @@ import java.util.List;
 public class PerspectiveOps {
 
 	/**
+	 * Approximates a pinhole camera using the distoriton model
+	 * @param p2n Distorted pixel to undistorted normalized image coordinates
+	 * @return
+	 */
+	public static CameraPinhole approximatePinhole( Point2Transform2_F64 p2n ,
+													int width , int height )
+	{
+		Point2D_F64 na = new Point2D_F64();
+		Point2D_F64 nb = new Point2D_F64();
+
+		// determine horizontal FOV using dot product of (na.x, na.y, 1 ) and (nb.x, nb.y, 1)
+		p2n.compute(0,height/2,na);
+		p2n.compute(width-1,height/2,nb);
+
+		double abdot = na.x*nb.x + na.y*nb.y + 1;
+		double normA = Math.sqrt(na.x*na.x + na.y*na.y + 1);
+		double normB = Math.sqrt(nb.x*nb.x + nb.y*nb.y + 1);
+
+		double hfov = Math.acos( abdot/(normA*normB));
+
+		// vertical FOV
+		p2n.compute(width/2,0,na);
+		p2n.compute(width/2,height-1,nb);
+
+		abdot = na.x*nb.x + na.y*nb.y + 1;
+		normA = Math.sqrt(na.x*na.x + na.y*na.y + 1);
+		normB = Math.sqrt(nb.x*nb.x + nb.y*nb.y + 1);
+
+		double vfov = Math.acos( abdot/(normA*normB));
+
+		return createIntrinsic(width,height, UtilAngle.degree(hfov), UtilAngle.degree(vfov));
+	}
+
+	/**
 	 * Creates a set of intrinsic parameters, without distortion, for a camera with the specified characteristics
 	 *
 	 * @param width Image width

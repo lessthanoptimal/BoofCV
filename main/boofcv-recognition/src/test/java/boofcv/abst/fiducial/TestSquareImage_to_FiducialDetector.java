@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,6 @@ import java.awt.image.BufferedImage;
  */
 public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetectorChecks {
 
-	String directory = UtilIO.pathExample("fiducial/image/examples/");
-
 	public TestSquareImage_to_FiducialDetector() {
 		types.add( ImageType.single(GrayU8.class));
 		types.add( ImageType.single(GrayF32.class));
@@ -73,7 +71,7 @@ public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector
 				ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 13),
 				imageType.getImageClass());
 
-		ret.addPatternImage(UtilImageIO.loadImage(directory + "../patterns/chicken.png", imageType.getImageClass()), 125, 0.1);
+		ret.addPatternImage(UtilImageIO.loadImage(UtilIO.pathExample("fiducial/image/patterns/chicken.png"), imageType.getImageClass()), 125, 0.1);
 
 		return ret;
 	}

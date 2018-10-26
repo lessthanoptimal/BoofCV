@@ -57,6 +57,22 @@ public class TestPerspectiveOps {
 	Random rand = new Random(234);
 
 	@Test
+	public void approximatePinhole() {
+		CameraPinhole original = PerspectiveOps.createIntrinsic(640,480,75, 70);
+
+		LensDistortionPinhole distortion = new LensDistortionPinhole(original);
+
+		CameraPinhole found = PerspectiveOps.approximatePinhole(distortion.undistort_F64(true,false),
+				original.width,original.height);
+
+		assertEquals(original.width, found.width);
+		assertEquals(original.width, found.width);
+		assertEquals(original.skew, found.skew, UtilEjml.TEST_F64);
+		assertEquals(original.fx, found.fx, 1);
+		assertEquals(original.fy, found.fy, 1);
+	}
+
+	@Test
 	public void guessIntrinsic_two() {
 
 		double hfov = 30;

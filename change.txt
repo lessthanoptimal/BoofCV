@@ -12,6 +12,8 @@ Version : 0.32
   * TODO update detect line app demo
   * TODO update image enhance
   * TODO fix os x touch pad zoom
+- Added 3D Qr Code where you can estimate its 6-DOF pose
+- Changed Fiducial stability calculation to use 4 synthetic corners always to improve speed
 
 TODO Attempt trifocal tensor based stereo
 

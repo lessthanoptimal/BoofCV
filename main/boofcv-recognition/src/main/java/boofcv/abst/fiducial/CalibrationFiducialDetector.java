@@ -61,6 +61,10 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	// Known 3D location of points on calibration grid and current observations
 	private List<Point2D3D> points2D3D;
 
+	// actual width and height of the fiducial
+	double sideWidth;
+	double sideHeight;
+
 	// average of width and height
 	private double width;
 
@@ -73,8 +77,8 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	public CalibrationFiducialDetector(ConfigChessboard config,
 									   Class<T> imageType) {
 		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboard(config);
-		double sideWidth = config.numCols*config.squareWidth;
-		double sideHeight = config.numRows*config.squareWidth;
+		sideWidth = config.numCols*config.squareWidth;
+		sideHeight = config.numRows*config.squareWidth;
 
 		width = (sideWidth+sideHeight)/2.0;
 
@@ -89,8 +93,8 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		DetectorFiducialCalibration detector = FactoryFiducialCalibration.squareGrid(config);
 		int squareCols = config.numCols;
 		int squareRows = config.numRows;
-		double sideWidth = squareCols* config.squareWidth + (squareCols-1)*config.spaceWidth;
-		double sideHeight = squareRows*config.squareWidth + (squareRows-1)*config.spaceWidth;
+		sideWidth = squareCols* config.squareWidth + (squareCols-1)*config.spaceWidth;
+		sideHeight = squareRows*config.squareWidth + (squareRows-1)*config.spaceWidth;
 
 		double width = (sideWidth+sideHeight)/2.0;
 
@@ -105,8 +109,8 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		DetectorFiducialCalibration detector = FactoryFiducialCalibration.binaryGrid(config);
 		int squareCols = config.numCols;
 		int squareRows = config.numRows;
-		double sideWidth = squareCols*config.squareWidth + (squareCols-1)*config.spaceWidth;
-		double sideHeight = squareRows*config.squareWidth + (squareRows-1)*config.spaceWidth;
+		sideWidth = squareCols*config.squareWidth + (squareCols-1)*config.spaceWidth;
+		sideHeight = squareRows*config.squareWidth + (squareRows-1)*config.spaceWidth;
 
 		double width = (sideWidth+sideHeight)/2.0;
 
@@ -118,8 +122,8 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		CalibrationDetectorCircleHexagonalGrid detector = FactoryFiducialCalibration.circleHexagonalGrid(config);
 		int squareCols = config.numCols;
 		int squareRows = config.numRows;
-		double sideWidth = squareCols*config.centerDistance/2.0;
-		double sideHeight = squareRows*config.centerDistance/2.0;
+		sideWidth = squareCols*config.centerDistance/2.0;
+		sideHeight = squareRows*config.centerDistance/2.0;
 
 		double width = (sideWidth+sideHeight)/2.0;
 
@@ -129,8 +133,8 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	public CalibrationFiducialDetector(ConfigCircleRegularGrid config,
 									   Class<T> imageType) {
 		DetectorFiducialCalibration detector = FactoryFiducialCalibration.circleRegularGrid(config);
-		double sideWidth = (config.numCols-1)*config.centerDistance;
-		double sideHeight = (config.numRows-1)*config.centerDistance;
+		sideWidth = (config.numCols-1)*config.centerDistance;
+		sideHeight = (config.numRows-1)*config.centerDistance;
 
 		double width = (sideWidth+sideHeight)/2.0;
 
@@ -155,6 +159,17 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		}
 
 		selectBoundaryCorners();
+	}
+
+
+	@Override
+	public double getSideWidth(int which) {
+		return sideWidth;
+	}
+
+	@Override
+	public double getSideHeight(int which) {
+		return sideHeight;
 	}
 
 	/**
@@ -279,7 +294,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	}
 
 	@Override
-	public boolean hasUniqueID() {
+	public boolean hasID() {
 		return false;
 	}
 

@@ -152,6 +152,13 @@ public class FactoryFiducial {
 		return new CalibrationFiducialDetector<>(config, imageType);
 	}
 
+	/**
+	 * Returns a QR Code detector
+	 *
+	 * @param config Configuration
+	 * @param imageType type of input image
+	 * @return the detector
+	 */
 	public static <T extends ImageGray<T>>
 	QrCodePreciseDetector<T> qrcode(ConfigQrCode config, Class<T> imageType) {
 		if( config == null )
@@ -166,6 +173,19 @@ public class FactoryFiducial {
 				new QrCodePositionPatternDetector<>(squareDetector,config.versionMaximum);
 
 		return new QrCodePreciseDetector<>(inputToBinary,detectPositionPatterns, false, imageType);
+	}
+
+	/**
+	 * QR Code but with the ability to estimate it's 3D pose using PnP. Implements {@link FiducialDetector}.
+	 *
+	 * @param config
+	 * @param imageType
+	 * @param <T>
+	 * @return
+	 */
+	public static <T extends ImageGray<T>>
+	QrCodeDetectorPnP<T> qrcode3D(ConfigQrCode config, Class<T> imageType) {
+		return new QrCodeDetectorPnP<>(qrcode(config,imageType));
 	}
 
 }
