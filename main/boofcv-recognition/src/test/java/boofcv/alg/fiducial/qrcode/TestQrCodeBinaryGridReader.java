@@ -43,7 +43,7 @@ public class TestQrCodeBinaryGridReader {
 		generator.render(qr);
 		QrCodeBinaryGridReader<GrayU8> reader = new QrCodeBinaryGridReader<>(GrayU8.class);
 
-		reader.setImage(generator.gray);
+		reader.setImage(generator.getGray());
 		reader.setMarker(qr);
 
 		// check coordinate transforms

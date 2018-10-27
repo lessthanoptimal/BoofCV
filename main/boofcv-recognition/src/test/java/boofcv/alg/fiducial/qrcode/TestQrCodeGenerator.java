@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.alg.drawing.MockFiducialRenderer;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,7 +47,8 @@ public class TestQrCodeGenerator {
 	public void alignmentPosition() {
 		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("123345").fixate();
 
-		Generator alg = new Generator();
+		QrCodeGenerator alg = new QrCodeGenerator(1.0);
+		alg.setRender(new MockFiducialRenderer());
 
 		alg.render(qr);
 
@@ -60,29 +62,6 @@ public class TestQrCodeGenerator {
 		assertEquals(N-1-alignment[0],a.moduleY);
 		assertEquals((N-1-alignment[0]+0.5)/N,a.pixel.x, 1e-8);
 		assertEquals((N-1-alignment[0]+0.5)/N,a.pixel.y, 1e-8);
-
-
 	}
 
-	public class Generator extends QrCodeGenerator {
-
-		public Generator() {
-			super(1.0);
-		}
-
-		@Override
-		public void init() {
-
-		}
-
-		@Override
-		public void square(double x0, double y0, double width) {
-
-		}
-
-		@Override
-		public void square(double x0, double y0, double width0, double thickness) {
-
-		}
-	}
 }

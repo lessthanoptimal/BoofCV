@@ -52,7 +52,7 @@ public class TestQrCodeDecoderImage {
 //		BoofMiscOps.sleep(100000);
 
 			QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
-			decoder.process(pps,generator.gray);
+			decoder.process(pps,generator.getGray());
 
 			assertEquals(1,decoder.successes.size());
 			QrCode found = decoder.getFound().get(0);
@@ -79,11 +79,11 @@ public class TestQrCodeDecoderImage {
 			generator.render(expected);
 			FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
 
-//		ShowImages.showWindow(generator.gray,"QR Code", true);
+//		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
 			QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
-			decoder.process(pps, generator.gray);
+			decoder.process(pps, generator.getGray());
 
 			assertEquals(1, decoder.successes.size());
 			QrCode found = decoder.getFound().get(0);
@@ -106,11 +106,11 @@ public class TestQrCodeDecoderImage {
 		generator.render(expected);
 		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
 
-//		ShowImages.showWindow(generator.gray,"QR Code", true);
+//		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
 		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
-		decoder.process(pps,generator.gray);
+		decoder.process(pps,generator.getGray());
 
 		assertEquals(1,decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);
@@ -132,11 +132,11 @@ public class TestQrCodeDecoderImage {
 		generator.render(expected);
 		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
 
-//		ShowImages.showWindow(generator.gray,"QR Code", true);
+//		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
 		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
-		decoder.process(pps,generator.gray);
+		decoder.process(pps,generator.getGray());
 
 		assertEquals(1,decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);
@@ -159,11 +159,11 @@ public class TestQrCodeDecoderImage {
 		generator.render(expected);
 		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
 
-//		ShowImages.showWindow(generator.gray,"QR Code", true);
+//		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
 		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
-		decoder.process(pps,generator.gray);
+		decoder.process(pps,generator.getGray());
 
 		assertEquals(1,decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);
@@ -207,10 +207,10 @@ public class TestQrCodeDecoderImage {
 
 		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
 
-//		ShowImages.showWindow(generator.gray,"QR Code");
+//		ShowImages.showWindow(generator.getGray(),"QR Code");
 //		BoofMiscOps.sleep(100000);
 
-		decoder.process(pps,generator.gray);
+		decoder.process(pps,generator.getGray());
 
 		assertEquals(1,decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);

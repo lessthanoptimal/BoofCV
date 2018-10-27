@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.alg.drawing.FiducialRenderEngine;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 
@@ -29,7 +30,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class QrCodeGenerator {
+public class QrCodeGenerator {
 
 	QrCode qr;
 
@@ -45,8 +46,15 @@ public abstract class QrCodeGenerator {
 	// data mask
 	protected List<Point2D_I32> bitLocations;
 
+	// used to draw the fiducial
+	protected FiducialRenderEngine render;
+
 	public QrCodeGenerator( double markerWidth ) {
 		this.markerWidth = markerWidth;
+	}
+
+	public void setRender(FiducialRenderEngine render) {
+		this.render = render;
 	}
 
 	/**
@@ -54,12 +62,9 @@ public abstract class QrCodeGenerator {
 	 * too long to be encoded.
 	 */
 	public void render( QrCode qr ) {
-		this.qr = qr;
-		this.numModules = QrCode.totalModules(qr.version);
-		this.moduleWidth = markerWidth/numModules;
-		this.bitLocations = null;
+		initialize(qr);
 
-		init();
+		render.init();
 		positionPattern(0,0, qr.ppCorner);
 		positionPattern((numModules-7)*moduleWidth,0, qr.ppRight);
 		positionPattern(0,(numModules-7)*moduleWidth, qr.ppDown);
@@ -113,6 +118,13 @@ public abstract class QrCodeGenerator {
 		qr.bounds.set(3,0,markerWidth);
 	}
 
+	protected void initialize(QrCode qr) {
+		this.qr = qr;
+		this.numModules = QrCode.totalModules(qr.version);
+		this.moduleWidth = markerWidth/numModules;
+		this.bitLocations = null;
+	}
+
 	/**
 	 * Renders the raw data bit output while applying the selected mask
 	 */
@@ -141,10 +153,10 @@ public abstract class QrCodeGenerator {
 
 	private void positionPattern(double x , double y , Polygon2D_F64 where ) {
 		// draw the outside square
-		square(x,y,moduleWidth*7, moduleWidth);
+		render.square(x,y,moduleWidth*7, moduleWidth);
 
 		// draw the inside square
-		square(x+ moduleWidth *2,y+ moduleWidth *2, moduleWidth*3);
+		render.square(x+ moduleWidth *2,y+ moduleWidth *2, moduleWidth*3);
 
 		where.get(0).set(x,y);
 		where.get(1).set(x+moduleWidth*7,y);
@@ -156,7 +168,7 @@ public abstract class QrCodeGenerator {
 		int length = numModules-7*2;
 
 		for (int i = 1; i < length; i += 2) {
-			square(x+i*slopeX,y+i*slopeY,moduleWidth);
+			render.square(x+i*slopeX,y+i*slopeY,moduleWidth);
 		}
 	}
 
@@ -219,8 +231,8 @@ public abstract class QrCodeGenerator {
 		double x = (gridX-2)*moduleWidth;
 		double y = (gridY-2)*moduleWidth;
 
-		square(x,y,moduleWidth*5, moduleWidth);
-		square(x + moduleWidth*2,y + moduleWidth*2, moduleWidth);
+		render.square(x,y,moduleWidth*5, moduleWidth);
+		render.square(x + moduleWidth*2,y + moduleWidth*2, moduleWidth);
 
 		QrCode.Alignment a = qr.alignment.grow();
 		a.moduleX = gridX;
@@ -229,13 +241,7 @@ public abstract class QrCodeGenerator {
 	}
 
 	private void square( int row , int col ) {
-		square(col*moduleWidth,row*moduleWidth,moduleWidth);
+		render.square(col*moduleWidth,row*moduleWidth,moduleWidth);
 	}
-
-	public abstract void init();
-
-	public abstract void square(double x0 , double y0 , double width );
-
-	public abstract void square(double x0, double y0, double width0, double thickness);
 
 }
