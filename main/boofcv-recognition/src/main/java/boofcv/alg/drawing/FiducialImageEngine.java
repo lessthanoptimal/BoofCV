@@ -25,6 +25,8 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 
 /**
+ * Rendering engine for fiducials into a gray scale image.
+ *
  * @author Peter Abeles
  */
 public class FiducialImageEngine extends FiducialRenderEngine {
