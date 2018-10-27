@@ -279,8 +279,10 @@ public abstract class GenericFiducialDetectorChecks {
 				orientation[i] = results.orientation;
 			}
 
+			// by shrinking the image a small pixel error should result
+			// in a larger pose error, hence more unstable
 			ImageBase shrunk = image.createSameShape();
-			new FDistort(image,shrunk).affine(0.8,0,0,0.8,0,0).apply();
+			new FDistort(image,shrunk).affine(0.6,0,0,0.6,0,0).apply();
 
 			detector.detect(shrunk);
 

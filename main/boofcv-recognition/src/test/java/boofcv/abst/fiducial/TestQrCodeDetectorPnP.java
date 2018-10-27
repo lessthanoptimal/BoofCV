@@ -18,36 +18,28 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
-import boofcv.struct.image.ImageGray;
+import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 /**
- * Wrapper around {@link DetectFiducialSquareBinary} for {@link FiducialDetector}
- *
  * @author Peter Abeles
  */
-public class SquareBinary_to_FiducialDetector<T extends ImageGray<T>>
-	extends SquareBase_to_FiducialDetector<T,DetectFiducialSquareBinary<T>>
-{
-	private double targetWidth;
+public class TestQrCodeDetectorPnP extends GenericFiducialDetectorChecks {
 
-	public SquareBinary_to_FiducialDetector(DetectFiducialSquareBinary<T> detector, double targetWidth) {
-		super(detector);
-		this.targetWidth = targetWidth;
+
+	@Override
+	public ImageBase loadImage(ImageType imageType) {
+		return null;
 	}
 
 	@Override
-	public double getSideWidth(int which) {
-		return targetWidth;
+	public LensDistortionNarrowFOV loadDistortion(boolean distorted) {
+		return null;
 	}
 
 	@Override
-	public double getSideHeight(int which) {
-		return targetWidth;
-	}
-
-	@Override
-	public double getWidth(int which) {
-		return targetWidth;
+	public FiducialDetector createDetector(ImageType imageType) {
+		return null;
 	}
 }

@@ -18,6 +18,7 @@
 
 package boofcv.io.image;
 
+import boofcv.io.UtilIO;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.GrowQueue_I8;
 
@@ -42,23 +43,9 @@ public class UtilImageIO {
 	 * null.
 	 */
 	public static BufferedImage loadImage(String fileName) {
-		BufferedImage img;
-		try {
-			img = ImageIO.read(new File(fileName));
-
-			if(  img == null) {
-				if( fileName.endsWith("ppm") || fileName.endsWith("PPM") ) {
-					return loadPPM(fileName,null);
-				} else if( fileName.endsWith("pgm") || fileName.endsWith("PGM") ) {
-					return loadPGM(fileName, null);
-				}
-			}
-		} catch (IOException e) {
-			return null;
-		}
-
-		return img;
+		return loadImage( UtilIO.ensureURL(fileName));
 	}
+
 
 	public static BufferedImage loadImage(String directory , String fileName) {
 		return loadImage(new File(directory,fileName).getPath());
@@ -95,15 +82,24 @@ public class UtilImageIO {
 	 * A function that load the specified image.  If anything goes wrong it returns a
 	 * null.
 	 */
-	public static BufferedImage loadImage(URL fileName) {
-		BufferedImage img;
-		try {
-			img = ImageIO.read(fileName);
-		} catch (IOException e) {
+	public static BufferedImage loadImage(URL url) {
+		if( url == null )
 			return null;
+		try {
+			return ImageIO.read(url);
+		} catch (IOException e) {
+			try {
+				InputStream stream = url.openStream();
+				String path = url.toString();
+				if( path.endsWith("ppm") || path.endsWith("PPM") ) {
+					return loadPPM(stream,null);
+				} else if( path.endsWith("pgm") || path.endsWith("PGM") ) {
+					return loadPGM(stream, null);
+				}
+				stream.close();
+			} catch (IOException ignore) {}
 		}
-
-		return img;
+		return null;
 	}
 
 	/**

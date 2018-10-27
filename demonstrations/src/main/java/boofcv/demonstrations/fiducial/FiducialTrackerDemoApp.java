@@ -73,6 +73,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 {
 	private static final String SQUARE_NUMBER = "Square Number";
 	private static final String SQUARE_PICTURE = "Square Picture";
+	private static final String QR_CODE = "QR Code";
 	private static final String CALIB_CHESS = "Chessboard";
 	private static final String CALIB_SQUARE_GRID = "Square Grid";
 	private static final String CALIB_SQUARE_BINARY_GRID = "Square Binary Grid";
@@ -96,6 +97,8 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 	private FiducialStability stabilityMax = new FiducialStability();
 
 	private BufferedImage imageCopy;
+
+	boolean firstDetection = false;
 
 	public FiducialTrackerDemoApp(List<PathLabel> examples, Class<I> imageType) {
 		super(false,false,examples, ImageType.single(imageType));
@@ -127,6 +130,23 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		for (int i = 0; i < detector.totalFound(); i++) {
 			long id = detector.getId(i);
 
+			if( firstDetection ) {
+				// give it "reasonable" initial values based on the marker's size
+				stabilityMax.location = detector.getWidth(0)*0.1;
+				stabilityMax.orientation = 0.05;
+			}
+
+			String message;
+
+			if( detector.hasMessage() ) {
+				message = detector.getMessage(i);
+				if( message.length() > 4 ) {
+					message = message.substring(0, 4);
+				}
+			} else {
+				message = "" + id;
+			}
+
 			if( controls.showBoundary ) {
 				detector.getBounds(i,polygon);
 				g2.setStroke(new BasicStroke(11));
@@ -142,12 +162,13 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 			if( controls.show3D ) {
 				detector.getFiducialToCamera(i, targetToSensor);
 				double width = detector.getWidth(i);
-				VisualizeFiducial.drawLabelCenter(targetToSensor, intrinsic, "" + id, g2);
+
+				VisualizeFiducial.drawLabelCenter(targetToSensor, intrinsic, message, g2);
 				VisualizeFiducial.drawCube(targetToSensor, intrinsic, width, 5, g2);
 			}
 
 			if( controls.showStability ) {
-				handleStability(input.height, g2, i, id);
+				handleStability(input.height, g2, i, id,message);
 			}
 
 		}
@@ -164,7 +185,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 	/**
 	 * Computes and visualizes the stability
 	 */
-	private void handleStability(int height, Graphics2D g2, int index, long fiducialID) {
+	private void handleStability(int height, Graphics2D g2, int index, long fiducialID, String message ) {
 		FiducialInfo info = findFiducial(fiducialID);
 		info.totalObserved++;
 
@@ -194,7 +215,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 			g2.fillRect(x, y - h, 20, h);
 
 			g2.setColor(Color.RED);
-			g2.drawString("" + info.id, x - 20, y + 20);
+			g2.drawString(message, x - 20, y + 20);
 		}
 	}
 
@@ -224,12 +245,13 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		String name = example.label;
 
 		String videoName = example.getPath();
-		String seperator = System.getProperty("file.separator");
-		String path = videoName.substring(0, videoName.lastIndexOf(seperator.charAt(0)));
+		int location = videoName.lastIndexOf(File.separatorChar);
+		if( location == -1 ) { // windows vs unix issue
+			location = videoName.lastIndexOf('/');
+		}
+		String path = videoName.substring(0, location);
 
 		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21);
-
-		boolean stability = true;
 
 		if( name.compareTo(SQUARE_NUMBER) == 0 ) {
 			detector = FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1), configThreshold, imageClass);
@@ -250,7 +272,8 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 					throw new RuntimeException("Can't find file "+new File(pathImg,foo).getPath());
 				d.addPatternImage(ConvertBufferedImage.convertFromSingle(img, null, imageClass), 125, length);
 			}
-
+		} else if( name.compareTo(QR_CODE) == 0 ) {
+			detector = FactoryFiducial.qrcode3D(null, imageClass);
 		} else if( name.compareTo(CALIB_CHESS) == 0 ) {
 			detector = FactoryFiducial.calibChessboard(new ConfigChessboard(7, 5, 0.03), imageClass);
 		} else if( name.compareTo(CALIB_SQUARE_GRID) == 0 ) {
@@ -265,24 +288,20 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 				throw new RuntimeException(e);
 			}
 		} else if( name.compareTo(CALIB_CIRCLE_HEXAGONAL_GRID) == 0 ) {
-			stability = false;
 			detector = FactoryFiducial.calibCircleHexagonalGrid(new ConfigCircleHexagonalGrid(24, 28, 1, 1.2), imageClass);
 		} else if( name.compareTo(CALIB_CIRCLE_REGULAR_GRID) == 0 ) {
-			stability = false;
 			detector = FactoryFiducial.calibCircleRegularGrid(new ConfigCircleRegularGrid(10, 8, 1.5, 2.5), imageClass);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}
-		controls.setShowStability(stability);
+		controls.setShowStability(true);
 
 		intrinsic = CalibrationIO.load(media.openFile(path+"/intrinsic.yaml"));
 
 		detector.setLensDistortion(new LensDistortionRadialTangential(intrinsic),intrinsic.width,intrinsic.height);
 
 		fiducialInfo.clear();
-		// give it some initial values so that it doesn't look like there is huge errors right off the bat
-		stabilityMax.location = 0.01;
-		stabilityMax.orientation = 0.02;
+		firstDetection = true;
 
 		openVideo(false,videoName);
 	}
@@ -349,6 +368,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel(SQUARE_NUMBER, UtilIO.pathExample("fiducial/binary/movie.mjpeg")));
 		inputs.add(new PathLabel(SQUARE_PICTURE, UtilIO.pathExample("fiducial/image/video/movie.mjpeg")));
+		inputs.add(new PathLabel(QR_CODE, UtilIO.pathExample("fiducial/qrcode/movie.mp4")));
 		inputs.add(new PathLabel(CALIB_CHESS, UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 		inputs.add(new PathLabel(CALIB_SQUARE_GRID, UtilIO.pathExample("fiducial/square_grid/movie.mp4")));
 //		inputs.add(new PathLabel(CALIB_SQUARE_BINARY_GRID, UtilIO.pathExample("fiducial/binary_grid/movie.mp4")));

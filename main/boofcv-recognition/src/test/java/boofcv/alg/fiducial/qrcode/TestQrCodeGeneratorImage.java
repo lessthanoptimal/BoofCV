@@ -46,7 +46,7 @@ public class TestQrCodeGeneratorImage {
 
 		generator.render(qr);
 
-		BufferedImage output = ConvertBufferedImage.convertTo(generator.gray,null,true);
+		BufferedImage output = ConvertBufferedImage.convertTo(generator.getGray(),null,true);
 
 		// add a border so that qr code readers can decode what is shown
 		BufferedImage border = new BufferedImage(output.getWidth()+50,output.getHeight()+50,output.getType());

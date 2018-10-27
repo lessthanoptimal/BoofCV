@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.selfcalib;
+package boofcv.abst.fiducial;
 
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class TestSelfCalibrationLinearRotationMulti {
+public class TestFourPointSyntheticStability {
 	@Test
 	public void foo() {
 		fail("Implement");

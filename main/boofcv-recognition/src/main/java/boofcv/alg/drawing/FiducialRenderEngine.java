@@ -16,18 +16,28 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.selfcalib;
+package boofcv.alg.drawing;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import boofcv.struct.image.GrayU8;
 
 /**
+ * Interface for rendering fiducials to different document types. All units are in fractions
+ * of document units
+ *
  * @author Peter Abeles
  */
-public class TestSelfCalibrationLinearRotationMulti {
-	@Test
-	public void foo() {
-		fail("Implement");
+public abstract class FiducialRenderEngine {
+	public abstract void init();
+
+	public void square(double x0 , double y0 , double width ) {
+		rectangle(x0,y0,x0+width,y0+width);
 	}
+
+	public abstract void square(double x0, double y0, double width0, double thickness);
+
+	public abstract void rectangle( double x0 , double y0 , double x1 , double y1 );
+
+	public abstract void draw(GrayU8 image , double x0 , double y0 , double x1 , double y1);
 }
+
+

@@ -38,11 +38,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import static boofcv.io.UtilIO.systemToUnix;
 
 /**
  * Provides some common basic functionality for demonstrations
@@ -312,33 +316,50 @@ public abstract class DemonstrationBase extends JPanel {
 	 * be stopped.
 	 */
 	public void openFile(File file) {
-		// maybe it's an example file
-		if( !file.exists() ) {
-			file = new File(UtilIO.pathExample(file.getPath()));
-		}
-		if( !file.exists() ) {
-			System.err.println("Can't find file "+file.getPath());
-			return;
+		String path = systemToUnix(file.getPath());
+//		System.out.println("demo.openFile() = "+path);
+		URL url = null;
+
+		try {
+			url = new URL(path);
+			if( !UtilIO.validURL(url)) {
+//				System.out.println("  invalid URL");
+				url = null;
+			}
+		} catch( MalformedURLException ignore ) {}
+
+		if( url == null ) {
+//			System.out.println("Invalid URL");
+			try {
+				url = new File(UtilIO.pathExample(file.getPath())).toURI().toURL();
+				if (!UtilIO.validURL(url)) {
+					System.err.println("Can't open " + file.getPath());
+					return;
+				}
+				inputFilePath = url.toString();
+			} catch (MalformedURLException e) {
+				System.err.println(e.getMessage());
+				return;
+			}
+		} else {
+			// input URL was valid, so use it directly
+			inputFilePath = path;
+//			System.out.println("Valid URL using "+inputFilePath);
 		}
 
 		// update recent items menu
-		final File _file = file;
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,_file.getAbsolutePath());
-				updateRecentItems();
-			}
+		final String _path = inputFilePath;
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,_path);
+			updateRecentItems();
 		});
 
-		// mjpegs can be opened up as images.  so override the default behavior
-		inputFilePath = file.getPath();
 		BufferedImage buffered = inputFilePath.endsWith("mjpeg") ? null : UtilImageIO.loadImage(inputFilePath);
 		if( buffered == null ) {
 			if( allowVideos )
 				openVideo(false,inputFilePath);
 		} else if( allowImages ){
-			openImage(false,inputFilePath, buffered);
+			openImage(false,file.getName(), buffered);
 		}
 	}
 
@@ -445,7 +466,7 @@ public abstract class DemonstrationBase extends JPanel {
 		}
 	}
 
-	protected void openImage(boolean reopen , String filePath , BufferedImage buffered ) {
+	protected void openImage(boolean reopen , String name , BufferedImage buffered ) {
 		synchronized (lockStartingProcess) {
 			if( startingProcess ) {
 				System.out.println("Ignoring image request.  Detected spamming");
@@ -477,7 +498,7 @@ public abstract class DemonstrationBase extends JPanel {
 			threadProcess = new ProcessImageThread();
 		}
 		if( !reopen ) {
-			setInputName(new File(filePath).getName());
+			setInputName(name);
 			handleInputChange(0, inputMethod, buffered.getWidth(), buffered.getHeight());
 		}
 		threadPool.execute(threadProcess);
@@ -723,7 +744,7 @@ public abstract class DemonstrationBase extends JPanel {
 			openVideo(true,inputFilePath);
 		} else if( inputMethod == InputMethod.IMAGE ) {
 			BufferedImage buff = inputStreams.get(0).getBufferedImage();
-			openImage(true,inputFilePath,buff);// TODO still does a pointless image conversion
+			openImage(true,new File(inputFilePath).getName(),buff);// TODO still does a pointless image conversion
 		}
 	}
 

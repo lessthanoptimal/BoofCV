@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,7 @@ import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -126,12 +127,9 @@ public class VisualizeSquareBinaryFiducial {
 
 	public static void main(String[] args) {
 
-//		String directory = UtilIO.pathExample("fiducial/binary/");
-
 		VisualizeSquareBinaryFiducial app = new VisualizeSquareBinaryFiducial();
 
-		String directory = "/home/pja/projects/ValidationBoof/data/fiducials/square_border_binary/standard/distance_angle/";
-		app.process(directory+"image00007.png",null);
+		app.process(UtilIO.pathExample("fiducial/binary/image0001.jpg"),null);
 
 //		app.process(directory+"/image0000.jpg",directory+"/intrinsic.yaml");
 	}

@@ -104,7 +104,7 @@ public class ExampleFiducialImage {
 			g2.setStroke(new BasicStroke(10));
 			VisualizeShapes.drawPolygon(bounds,true,1.0,g2);
 
-			if( detector.hasUniqueID() )
+			if( detector.hasID() )
 				System.out.println("Target ID = "+detector.getId(i));
 			if( detector.hasMessage() )
 				System.out.println("Message   = "+detector.getMessage(i));

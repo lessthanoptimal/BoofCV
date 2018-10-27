@@ -6,4 +6,5 @@ dependencies {
     implementation project(':main:boofcv-geo')
     implementation project(':main:boofcv-sfm')
     implementation project(':main:boofcv-recognition')
+    compile 'com.fifesoft:rsyntaxtextarea:2.6.1'
 }

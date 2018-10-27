@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,26 +19,30 @@
 package boofcv.abst.fiducial;
 
 import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
+import boofcv.alg.drawing.FiducialImageEngine;
+import boofcv.alg.fiducial.square.FiducialSqareGenerator;
+import boofcv.core.image.GConvertImage;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
-import boofcv.io.calibration.CalibrationIO;
-import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
+import boofcv.simulation.SimulatePlanarWorld;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-
-import java.awt.image.BufferedImage;
+import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 
 /**
  * @author Peter Abeles
  */
 public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetectorChecks {
+
+	CameraPinholeRadial intrinsic = new CameraPinholeRadial(400,400,0,300,300,600,600).fsetRadial(-0.256,0.0999);
 
 	public TestSquareBinary_to_FiducialDetector() {
 		types.add( ImageType.single(GrayU8.class));
@@ -48,19 +52,39 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 
 	@Override
 	public ImageBase loadImage(ImageType imageType) {
+		FiducialImageEngine render = new FiducialImageEngine();
+		render.configure(0,200);
 
-		BufferedImage out = UtilImageIO.loadImage(getClass().getResource("test_square_binary.jpg"));
-		return ConvertBufferedImage.convertFrom(out,true,imageType);
-	}
+		FiducialSqareGenerator generator = new FiducialSqareGenerator(render);
+		generator.generate(345,4);
+
+		GrayF32 fiducial = render.getGrayF32();
+
+		Se3_F64 fidToWorld = SpecialEuclideanOps_F64.eulerXyz(0,0,0.7,0.3,Math.PI,0,null);
+
+		SimulatePlanarWorld sim = new SimulatePlanarWorld();
+		sim.setBackground(255);
+		sim.setCamera(intrinsic);
+		sim.addSurface(fidToWorld,0.3,fiducial);
+
+		sim.render();
+
+		GrayF32 simulated = sim.getOutput();
+
+		if( imageType.isSameType(simulated.imageType))
+			return simulated;
+
+		ImageBase out = imageType.createImage(simulated.width,simulated.height);
+		GConvertImage.convert(simulated,out);
+
+		return out;	}
 
 	@Override
 	public LensDistortionNarrowFOV loadDistortion(boolean distorted) {
-		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("intrinsic_binary.yaml"));
-		if( !distorted ) {
-			model.radial = null;
-			model.t1 = model.t2 = 0;
-		}
-		return new LensDistortionRadialTangential(model);
+		if( distorted )
+			return new LensDistortionRadialTangential(intrinsic);
+		else
+			return new LensDistortionPinhole(intrinsic);
 	}
 
 	@Override

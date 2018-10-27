@@ -72,7 +72,7 @@ public interface FiducialDetector<T extends ImageBase<T>>
 	Polygon2D_F64 getBounds(int which , @Nullable Polygon2D_F64 storage );
 
 	/**
-	 * If applicable, returns the ID of the fiducial found.  Call {@link #hasUniqueID()} to see if this function
+	 * If applicable, returns the ID of the fiducial found.  Call {@link #hasID()} to see if this function
 	 * returns a valid value.
 	 * @param which Detected fiducial's index
 	 * @return ID of the fiducial
@@ -158,7 +158,7 @@ public interface FiducialDetector<T extends ImageBase<T>>
 	 * If true then {@link #getId(int)} returns a valid unique number
 	 * @return boolean
 	 */
-	boolean hasUniqueID();
+	boolean hasID();
 
 	/**
 	 * If true then {@link #getMessage(int)} returns a valid message

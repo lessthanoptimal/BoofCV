@@ -27,8 +27,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -41,6 +40,39 @@ public class TestUtilIO {
 	private String validExamplePackage = "boofcv.examples.enhance";
 	private String validExampleClass = "ExampleImageEnhancement";
 
+
+	/**
+	 * See if it can get the URL for a resource correctly
+	 */
+	@Test
+	public void pathExampleURL_resource() {
+		URL found = UtilIO.pathExampleURL("boofcv/io/image/wrapper/images/dummy01.png");
+
+		assertNotNull(found);
+		assertTrue(found.toString().endsWith("dummy01.png"));
+	}
+
+	/**
+	 * See if it handles the URL after it has been messed up by being passed through File
+	 */
+	@Test
+	public void ensureURL_mangled() {
+		String input = "jar:file:/home/person/BoofApplications/demonstrations.jar!/fiducial/image/video/patterns/chicken.png";
+		URL url = UtilIO.ensureURL(new File(input).getPath());
+
+		assertNotNull(url);
+		assertEquals(input,url.toString());
+	}
+
+	@Test
+	public void simplifyJarPath() throws MalformedURLException {
+		String input = "jar:file:/home/person/BoofApplications/demonstrations.jar!/fiducial/image/video/../patterns/chicken.png";
+		String expected = "jar:file:/home/person/BoofApplications/demonstrations.jar!/fiducial/image/patterns/chicken.png";
+
+		URL a = new URL(input);
+		URL b = UtilIO.simplifyJarPath(a);
+		assertEquals(expected,b.toString());
+	}
 
 	@Test
 	public void readAsString() throws IOException {

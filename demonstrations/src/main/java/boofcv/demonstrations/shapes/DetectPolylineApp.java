@@ -32,6 +32,7 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
+import boofcv.io.UtilIO;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
@@ -193,15 +194,14 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 	public static void main(String[] args) {
 
 		List<String> examples = new ArrayList<>();
-		examples.add("shapes/polygons01.jpg");
-		examples.add("shapes/polygons_border_01.jpg");
-//		examples.add("shapes/shapes01.png"); This is a pathological case specifically design to screw up threshold algs
-		examples.add("shapes/shapes02.png");
-		examples.add("shapes/concave01.jpg");
-		examples.add("shapes/line_text_test_image.png");
-		examples.add("fiducial/binary/image0000.jpg");
-		examples.add("calibration/stereo/Bumblebee2_Square/left10.jpg");
-		examples.add("fiducial/square_grid/movie.mp4");
+		examples.add(UtilIO.pathExample("shapes/polygons01.jpg"));
+		examples.add(UtilIO.pathExample("shapes/polygons_border_01.jpg"));
+		examples.add(UtilIO.pathExample("shapes/shapes02.png"));
+		examples.add(UtilIO.pathExample("shapes/concave01.jpg"));
+		examples.add(UtilIO.pathExample("shapes/line_text_test_image.png"));
+		examples.add(UtilIO.pathExample("fiducial/binary/image0000.jpg"));
+		examples.add(UtilIO.pathExample("calibration/stereo/Bumblebee2_Square/left10.jpg"));
+		examples.add(UtilIO.pathExample("fiducial/square_grid/movie.mp4"));
 
 		DetectPolylineApp app = new DetectPolylineApp(examples,GrayF32.class);
 

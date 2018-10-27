@@ -40,7 +40,7 @@ public class TestQrCodeAlignmentPatternLocator {
 		generator.render(qr);
 
 		QrCodeAlignmentPatternLocator<GrayU8> alg = new QrCodeAlignmentPatternLocator<>(GrayU8.class);
-		assertTrue(alg.process(generator.gray,qr));
+		assertTrue(alg.process(generator.getGray(),qr));
 
 		assertEquals(6,qr.alignment.size);
 	}
@@ -63,7 +63,7 @@ public class TestQrCodeAlignmentPatternLocator {
 		qr.alignment.reset(); // need to clear the alignment so that it doesn't mess up the reader
 
 		QrCodeAlignmentPatternLocator<GrayU8> alg = new QrCodeAlignmentPatternLocator<>(GrayU8.class);
-		alg.reader.setImage(generator.gray);
+		alg.reader.setImage(generator.getGray());
 		alg.reader.setMarker(qr);
 		alg.initializePatterns(qr);
 
@@ -98,7 +98,7 @@ public class TestQrCodeAlignmentPatternLocator {
 		generator.render(qr);
 
 		QrCodeAlignmentPatternLocator<GrayU8> alg = new QrCodeAlignmentPatternLocator<>(GrayU8.class);
-		alg.reader.setImage(generator.gray);
+		alg.reader.setImage(generator.getGray());
 		alg.reader.setMarker(qr);
 		alg.initializePatterns(qr);
 

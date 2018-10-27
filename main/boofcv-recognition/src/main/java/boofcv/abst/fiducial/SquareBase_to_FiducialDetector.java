@@ -140,7 +140,7 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Dete
 	public String getMessage(int which) {return null;}
 
 	@Override
-	public boolean hasUniqueID() {
+	public boolean hasID() {
 		return true;
 	}
 

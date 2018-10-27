@@ -16,38 +16,33 @@
  * limitations under the License.
  */
 
-package boofcv.abst.fiducial;
+package boofcv.alg.drawing;
 
-import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.GrayU8;
 
 /**
- * Wrapper around {@link DetectFiducialSquareBinary} for {@link FiducialDetector}
+ * Fiducial Render for testing
  *
  * @author Peter Abeles
  */
-public class SquareBinary_to_FiducialDetector<T extends ImageGray<T>>
-	extends SquareBase_to_FiducialDetector<T,DetectFiducialSquareBinary<T>>
-{
-	private double targetWidth;
+public class MockFiducialRenderer extends FiducialRenderEngine {
+	@Override
+	public void init() {
 
-	public SquareBinary_to_FiducialDetector(DetectFiducialSquareBinary<T> detector, double targetWidth) {
-		super(detector);
-		this.targetWidth = targetWidth;
 	}
 
 	@Override
-	public double getSideWidth(int which) {
-		return targetWidth;
+	public void square(double x0, double y0, double width0, double thickness) {
+
 	}
 
 	@Override
-	public double getSideHeight(int which) {
-		return targetWidth;
+	public void rectangle(double x0, double y0, double x1, double y1) {
+
 	}
 
 	@Override
-	public double getWidth(int which) {
-		return targetWidth;
+	public void draw(GrayU8 image, double x0, double y0, double x1, double y1) {
+
 	}
 }

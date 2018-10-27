@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,6 +49,16 @@ public class SquareImage_to_FiducialDetector<T extends ImageGray<T>>
 		GrayU8 binary = new GrayU8(pattern.width,pattern.height);
 		GThresholdImageOps.threshold(pattern,binary,threshold,false);
 		alg.addPattern(binary, lengthSide);
+	}
+
+	@Override
+	public double getSideWidth(int which) {
+		return getWidth(which);
+	}
+
+	@Override
+	public double getSideHeight(int which) {
+		return getWidth(which);
 	}
 
 	/**

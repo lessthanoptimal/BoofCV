@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,13 @@
 
 package boofcv.io.calibration;
 
+import boofcv.io.UtilIO;
 import boofcv.struct.calib.*;
 import georegression.struct.se.Se3_F64;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+import javax.annotation.Nullable;
 import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
@@ -204,7 +206,9 @@ public class CalibrationIO {
 		out.close();
 	}
 
-	public static <T> T load(URL path ) {
+	public static <T> T load( @Nullable URL path ) {
+		if( path == null )
+			throw new RuntimeException("Null path");
 		try {
 			return load( new InputStreamReader(path.openStream()) );
 		} catch (IOException e ) {
@@ -213,19 +217,17 @@ public class CalibrationIO {
 	}
 
 	public static <T> T load(File path ) {
-		try {
-			return load( new FileReader(path));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
+		URL url = UtilIO.ensureURL(path.getPath());
+		if( url == null )
+			throw new RuntimeException("Can't find "+path.getPath());
+		return load(url);
 	}
 
 	public static <T> T load(String path ) {
-		try {
-			return load( new FileReader(path));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
+		URL url = UtilIO.ensureURL(path);
+		if( url == null )
+			throw new RuntimeException("Can't find "+path);
+		return load(url);
 	}
 
 	/**

@@ -21,6 +21,7 @@ package boofcv.app.qrcode;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeGenerator;
 import boofcv.app.PaperSize;
+import boofcv.app.drawing.PdfFiducialEngine;
 import boofcv.misc.Unit;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -107,7 +108,9 @@ public class CreateQrCodeDocumentPDF {
 			document.addPage(page);
 			PDPageContentStream pcs = new PDPageContentStream(document , page);
 
-			Generator g = new Generator(pcs , markerWidth*UNIT_TO_POINTS);
+			PdfFiducialEngine r = new PdfFiducialEngine(pcs,markerWidth*UNIT_TO_POINTS);
+			QrCodeGenerator g = new QrCodeGenerator(markerWidth*UNIT_TO_POINTS);
+			g.setRender(r);
 
 			if( showInfo ) {
 				float offX = Math.min(CM_TO_POINTS,spaceBetween*CM_TO_POINTS/2);
@@ -121,13 +124,13 @@ public class CreateQrCodeDocumentPDF {
 			}
 
 			for (int row = 0; row < numRows; row++) {
-				g.offsetY = centerX + row*sizeBox + UNIT_TO_POINTS*spaceBetween/2f;
+				r.offsetY = centerX + row*sizeBox + UNIT_TO_POINTS*spaceBetween/2f;
 
 				for (int col = 0; col < numCols; col++, markerIndex++) {
 					if( !gridFill && markerIndex >= markers.size() )
 						break;
 					QrCode qr = markers.get( markerIndex%markers.size());
-					g.offsetX = centerY + col*sizeBox + UNIT_TO_POINTS*spaceBetween/2f;
+					r.offsetX = centerY + col*sizeBox + UNIT_TO_POINTS*spaceBetween/2f;
 					g.render(qr);
 
 					if( showInfo ) {
@@ -142,11 +145,11 @@ public class CreateQrCodeDocumentPDF {
 						pcs.beginText();
 						pcs.setNonStrokingColor(Color.GRAY);
 						pcs.setFont(PDType1Font.TIMES_ROMAN,7);
-						pcs.newLineAtOffset( (float)g.offsetX, (float)g.offsetY-offset);
+						pcs.newLineAtOffset( (float)r.offsetX, (float)r.offsetY-offset);
 						pcs.showText(message);
 						pcs.endText();
 						pcs.beginText();
-						pcs.newLineAtOffset( (float)g.offsetX, (float)g.offsetY+markerWidth*UNIT_TO_POINTS+offset-7);
+						pcs.newLineAtOffset( (float)r.offsetX, (float)r.offsetY+markerWidth*UNIT_TO_POINTS+offset-7);
 						pcs.showText(String.format("%4.1f %2s",markerWidth,units.getAbbreviation()));
 						pcs.endText();
 					}
@@ -154,66 +157,6 @@ public class CreateQrCodeDocumentPDF {
 			}
 			pcs.close();
 		}
-	}
-
-	private class Generator extends QrCodeGenerator {
-
-		PDPageContentStream pcs;
-		public double offsetX,offsetY;
-
-		public Generator(PDPageContentStream pcs , double markerWidth ) {
-			super(markerWidth);
-			this.pcs = pcs;
-		}
-
-		@Override
-		public void init() {}
-
-		@Override
-		public void square(double x0, double y0, double width) {
-			try {
-				pcs.setNonStrokingColor(Color.BLACK);
-				pcs.addRect(adjustX(x0), adjustY(y0)-(float)width, (float)width, (float)width);
-				pcs.fill();
-			} catch( IOException e ) {
-				throw new RuntimeException(e);
-			}
-		}
-
-		@Override
-		public void square(double x0, double y0, double width0, double thickness) {
-			try {
-				pcs.setNonStrokingColor(Color.BLACK);
-
-				pcs.moveTo(adjustX(x0), adjustY(y0));
-				pcs.lineTo(adjustX(x0), adjustY(y0+width0));
-				pcs.lineTo(adjustX(x0+width0), adjustY(y0+width0));
-				pcs.lineTo(adjustX(x0+width0), adjustY(y0));
-				pcs.lineTo(adjustX(x0), adjustY(y0));
-
-				float x = (float)(x0+thickness);
-				float y = (float)(y0+thickness);
-				float w = (float)(width0-thickness*2);
-
-				pcs.moveTo(adjustX(x),adjustY(y));
-				pcs.lineTo(adjustX(x),adjustY(y+w));
-				pcs.lineTo(adjustX(x+w),adjustY(y+w));
-				pcs.lineTo(adjustX(x+w),adjustY(y));
-				pcs.lineTo(adjustX(x),adjustY(y));
-
-				pcs.fillEvenOdd();
-			} catch( IOException e ) {
-				throw new RuntimeException(e);
-			}
-		}
-
-		private float adjustX( double x ) {
-			return (float)(offsetX + x);
-		}
-		private float adjustY( double y ) {
-			return (float)(offsetY + markerWidth - y);
-		}
-
 	}
 
 	public void sendToPrinter() throws PrinterException, IOException {

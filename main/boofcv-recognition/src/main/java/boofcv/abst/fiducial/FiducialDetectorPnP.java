@@ -21,15 +21,16 @@ package boofcv.abst.fiducial;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.geo.WorldToCameraToPixel;
+import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.ImageBase;
-import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.struct.so.Rodrigues_F64;
+import org.ddogleg.struct.GrowQueue_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,88 +51,59 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 	private LensDistortionNarrowFOV lensDistortion;
 
 	// transform to remove lens distortion
-	private Point2Transform2_F64 pixelToNorm;
+	protected Point2Transform2_F64 pixelToNorm;
 
 	// 2D-3D pairs for just the detected points
 	private List<Point2D3D> detected2D3D = new ArrayList<>();
 	// list of the pixel observations for the most recently requested fiducial
 	private List<PointIndex2D_F64> detectedPixels;
-	private Point2D_F64 workPt = new Point2D_F64();
 
 	// if a lens distortion model was set or not
 	boolean hasCameraModel = false;
 
 	// non-linear refinement of pose estimate
-	private Estimate1ofPnP estimatePnP = FactoryMultiView.computePnPwithEPnP(10, 0.2);
+	private Estimate1ofPnP estimatePnP = FactoryMultiView.pnp_1(EnumPNP.IPPE,-1,-1);
 	private RefinePnP refinePnP = FactoryMultiView.pnpRefine(1e-8,100);
+	private WorldToCameraToPixel w2p = new WorldToCameraToPixel();
 
 	// when computing the pose, this is the initial estimate before non-linear refinement
 	private Se3_F64 initialEstimate = new Se3_F64();
 
-	// max found location and orientation error when computing stability
-	private double maxLocation;
-	private double maxOrientation;
-
 	// Work space for computing stability
+	private FourPointSyntheticStability stability = new FourPointSyntheticStability();
 	private Se3_F64 targetToCamera = new Se3_F64();
-	private Se3_F64 targetToCameraSample = new Se3_F64();
-	private Se3_F64 referenceCameraToTarget = new Se3_F64();
-	private Se3_F64 difference = new Se3_F64();
-	private Rodrigues_F64 rodrigues = new Rodrigues_F64();
+
+	// workspace for pose estimation
+	GrowQueue_F64 errors = new GrowQueue_F64();
+	Point2D_F64 predicted = new Point2D_F64();
+	List<Point2D3D> filtered = new ArrayList<>();
+
+	/**
+	 * Width of the fiducial. used to compute stability
+	 * @param which specifies which fiducial
+	 * @return the width
+	 */
+	public abstract double getSideWidth(int which );
+
+	/**
+	 * Height of the fiducial. used to compute stability
+	 * @param which specifies which fiducial
+	 * @return the height
+	 */
+	public abstract double getSideHeight(int which );
 
 	/**
 	 * Estimates the stability by perturbing each land mark by the specified number of pixels in the distorted image.
 	 */
 	@Override
 	public boolean computeStability(int which, double disturbance, FiducialStability results) {
+
 		if( !getFiducialToCamera(which, targetToCamera))
 			return false;
-		targetToCamera.invert(referenceCameraToTarget);
 
-		maxOrientation = 0;
-		maxLocation = 0;
+		stability.setShape(getSideWidth(which), getSideHeight(which));
 
-		for (int i = 0; i < detected2D3D.size(); i++) {
-			Point2D3D p23 = detected2D3D.get(i);
-			Point2D_F64 p = detectedPixels.get(i);
-			workPt.set(p);
-			perturb(which, disturbance, workPt, p, p23);
-		}
-
-		results.location = maxLocation;
-		results.orientation = maxOrientation;
-
-		return true;
-	}
-
-	private void perturb( int which, double disturbance ,
-						  Point2D_F64 pixel , Point2D_F64 original , Point2D3D p23 ) {
-		pixel.x = original.x + disturbance;
-		computeDisturbance(which, pixel, p23);
-		pixel.x = original.x - disturbance;
-		computeDisturbance(which, pixel, p23);
-		pixel.y = original.y;
-		pixel.y = original.y + disturbance;
-		computeDisturbance(which, pixel, p23);
-		pixel.y = original.y - disturbance;
-		computeDisturbance(which, pixel, p23);
-	}
-
-	private void computeDisturbance(int which, Point2D_F64 pixel, Point2D3D p23) {
-		pixelToNorm.compute(pixel.x,pixel.y,p23.observation);
-		if( estimatePose(which, detected2D3D, targetToCameraSample) ) {
-			referenceCameraToTarget.concat(targetToCameraSample, difference);
-
-			double d = difference.getT().norm();
-			ConvertRotation3D_F64.matrixToRodrigues(difference.getR(), rodrigues);
-			double theta = Math.abs(rodrigues.theta);
-			if (theta > maxOrientation) {
-				maxOrientation = theta;
-			}
-			if (d > maxLocation) {
-				maxLocation = d;
-			}
-		}
+		return( stability.computeStability(targetToCamera,disturbance,results));
 	}
 
 	@Override
@@ -140,6 +112,8 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 			this.hasCameraModel = true;
 			this.lensDistortion = distortion;
 			this.pixelToNorm = lensDistortion.undistort_F64(true, false);
+			Point2Transform2_F64 normToPixel = lensDistortion.distort_F64(false, true);
+			stability.setTransforms(pixelToNorm,normToPixel);
 		} else {
 			this.hasCameraModel = false;
 			this.lensDistortion = null;
@@ -185,10 +159,51 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 	/**
 	 * Given the mapping of 2D observations to known 3D points estimate the pose of the fiducial.
 	 * This solves the P-n-P problem.
+	 *
+	 * Do a simple form of robust estimation. Prune points which are greater than 3 standard deviations
+	 * and likely noise the recompute the pose
 	 */
 	protected boolean estimatePose( int which ,List<Point2D3D> points , Se3_F64 fiducialToCamera ) {
-		return estimatePnP.process(points, initialEstimate) &&
-				refinePnP.fitModel(points, initialEstimate, fiducialToCamera);
+		if( !estimatePnP.process(points, initialEstimate) ) {
+			return false;
+		}
+		filtered.clear();
+		// Don't bother if there are hardly any points to work with
+		if( points.size() > 6 ) {
+			w2p.configure(lensDistortion, initialEstimate);
+
+			// compute the error for each point in image pixels
+			errors.reset();
+			for (int idx = 0; idx < detectedPixels.size(); idx++) {
+				PointIndex2D_F64 foo = detectedPixels.get(idx);
+				w2p.transform(points.get(idx).location, predicted);
+				errors.add(predicted.distance2(foo));
+			}
+
+			// compute the prune threshold based on the standard deviation. well variance really
+			double stdev = 0;
+			for (int i = 0; i < errors.size; i++) {
+				stdev += errors.get(i);
+			}
+
+			// prune points 3 standard deviations away
+			double sigma3 = 9 * stdev;
+
+			for (int i = 0; i < points.size(); i++) {
+				if (errors.get(i) < sigma3) {
+					filtered.add(points.get(i));
+				}
+			}
+			// recompute pose esitmate without the outliers
+			if (filtered.size() != points.size()) {
+				if (!estimatePnP.process(filtered, initialEstimate)) {
+					return false;
+				}
+			}
+		} else {
+			filtered.addAll(points);
+		}
+		return refinePnP.fitModel(filtered, initialEstimate, fiducialToCamera);
 	}
 
 	/**

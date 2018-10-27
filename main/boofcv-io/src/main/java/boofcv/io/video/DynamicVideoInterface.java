@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,14 +18,16 @@
 
 package boofcv.io.video;
 
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.images.ImageStreamSequence;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -52,39 +54,54 @@ public class DynamicVideoInterface implements VideoInterface {
 
 	@Override
 	public <T extends ImageBase<T>> SimpleImageSequence<T> load(String fileName, ImageType<T> imageType) {
+		URL url = UtilIO.ensureURL(fileName);
+		if( url == null )
+			throw new RuntimeException("Can't open "+fileName);
 
-		// Use built in movie readers for these file types
-		if( fileName.endsWith("mjpeg") || fileName.endsWith("MJPEG") ||
-				fileName.endsWith("mjpg") || fileName.endsWith("MJPG") ) {
-			try {
+		InputStream stream=null;
+		try {
+			stream = url.openStream();
+
+			// Use built in movie readers for these file types
+			if( fileName.endsWith("mjpeg") || fileName.endsWith("MJPEG") ||
+					fileName.endsWith("mjpg") || fileName.endsWith("MJPG") ) {
 				VideoMjpegCodec codec = new VideoMjpegCodec();
-				List<byte[]> data = codec.read(new FileInputStream(fileName));
+				List<byte[]> data = codec.read(stream);
 				return new JpegByteImageSequence<>(imageType, data, false);
-			} catch (FileNotFoundException e) {
-				throw new RuntimeException(e);
+			} else if( fileName.endsWith("mpng") || fileName.endsWith("MPNG")) {
+				return new ImageStreamSequence<>(stream, true, imageType);
 			}
-		} else if( fileName.endsWith("mpng") || fileName.endsWith("MPNG")) {
+
 			try {
-				return new ImageStreamSequence<>(fileName, true, imageType);
-			} catch (FileNotFoundException e) {
-				throw new RuntimeException(e);
+				if( ffmpeg != null ) {
+					return ffmpeg.load(fileName, imageType);
+				}
+			} catch( RuntimeException e ){
+				e.printStackTrace();
+			}
+
+			try {
+				if( jcodec != null ) {
+					if( fileName.endsWith(".mp4") || fileName.endsWith(".MP4")) {
+						return jcodec.load(fileName,imageType);
+					}
+				}
+			} catch( RuntimeException ignore ){}
+			System.err.println("No working codec found for file: " + fileName);
+
+		} catch (IOException e) {
+			System.err.println("Error opening. "+e.getMessage());
+			return null;
+		} finally {
+			if( stream != null ) {
+				try {
+					stream.close();
+				} catch (IOException e) {
+					System.err.println("Failed to close stream. "+e.getMessage());
+				}
 			}
 		}
 
-		try {
-			if( ffmpeg != null ) {
-				return ffmpeg.load(fileName, imageType);
-			}
-		} catch( RuntimeException ignore ){}
-
-		try {
-			if( jcodec != null ) {
-				if( fileName.endsWith(".mp4") || fileName.endsWith(".MP4")) {
-					return jcodec.load(fileName,imageType);
-				}
-			}
-		} catch( RuntimeException ignore ){}
-		System.err.println("No working codec found for file: " + fileName);
 		return null;
 	}
 

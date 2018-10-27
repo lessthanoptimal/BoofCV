@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -147,10 +147,11 @@ public class DetectPointsInsidePyramidApp<T extends ImageGray<T>, D extends Imag
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 
-		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
-		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));
+		inputs.add(new PathLabel("Square Grid",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
 		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
+		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));
 		inputs.add(new PathLabel("beach", UtilIO.pathExample("scale/beach02.jpg")));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 
 		app.setInputList(inputs);
 

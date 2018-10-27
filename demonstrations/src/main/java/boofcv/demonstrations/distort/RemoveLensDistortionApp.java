@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,10 +80,10 @@ public class RemoveLensDistortionApp<T extends ImageBase<T>> extends Demonstrati
 
 		CameraPinholeRadial model = null;
 		for( File c : candidates ) {
-			if( c.exists() ) {
-				model = CalibrationIO.load(c);
+			try {
+				model = CalibrationIO.load(UtilIO.ensureURL(c.getPath()));
 				break;
-			}
+			} catch( RuntimeException ignore ) {}
 		}
 		if( model == null ) {
 			System.err.println("Can't find camera model for this image");
@@ -106,11 +106,9 @@ public class RemoveLensDistortionApp<T extends ImageBase<T>> extends Demonstrati
 		undist = (T)input.createSameShape();
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.reset();
-				gui.addItem(new ImagePanel(buffered), "Original");
-			}
+		SwingUtilities.invokeLater(() -> {
+			gui.reset();
+			gui.addItem(new ImagePanel(buffered), "Original");
 		});
 
 		// add different types of adjustments
