@@ -30,7 +30,6 @@ import org.bytedeco.copiedstuff.Java2DFrameConverter;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -147,16 +146,9 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 			try {
 				InputStream in = UtilIO.openStream(filename);
 				if( in == null ) throw new RuntimeException();
-				final File tempFile = File.createTempFile("demo", ".mp4");
+				final File tempFile = File.createTempFile("boofcv_ffmpeg_", ".mp4");
 				tempFile.deleteOnExit();
-				FileOutputStream out = new FileOutputStream(tempFile);
-				byte buffer[] = new byte[1024*1024];
-				while( in.available() > 0 ) {
-					int amount = in.read(buffer,0,buffer.length);
-					out.write(buffer,0,amount);
-				}
-				out.close();
-				in.close();
+				UtilIO.copyToFile(in,tempFile);
 				filename = tempFile.getAbsolutePath();
 			} catch( IOException e ) {
 				e.printStackTrace();

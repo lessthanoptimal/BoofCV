@@ -623,4 +623,21 @@ public class UtilIO {
 			return false;
 		}
 	}
+
+	public static void copyToFile( InputStream in , File file ) {
+		try {
+			if( in == null ) throw new RuntimeException("Input is null");
+			FileOutputStream out = new FileOutputStream(file);
+			byte buffer[] = new byte[1024*1024];
+			while( in.available() > 0 ) {
+				int amount = in.read(buffer,0,buffer.length);
+				out.write(buffer,0,amount);
+			}
+			out.close();
+			in.close();
+		} catch( IOException e ) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
 }
