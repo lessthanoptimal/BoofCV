@@ -140,20 +140,26 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 		URL url = UtilIO.ensureURL(filename);
 		if( url == null )
 			throw new RuntimeException("Invalid: "+finished);
-		if( !url.getProtocol().equals("file")) {
-			System.out.println("Copying the file from the jar to work around ffmpeg");
-			// copy the resource into a temporary file
-			try {
-				InputStream in = UtilIO.openStream(filename);
-				if( in == null ) throw new RuntimeException();
-				final File tempFile = File.createTempFile("boofcv_ffmpeg_", ".mp4");
-				tempFile.deleteOnExit();
-				UtilIO.copyToFile(in,tempFile);
-				filename = tempFile.getAbsolutePath();
-			} catch( IOException e ) {
-				e.printStackTrace();
-				throw new RuntimeException(e);
-			}
+		switch( url.getProtocol() ) {
+			case "file":
+				filename = url.toString().substring(6);
+				break;
+
+			case "jar":
+				System.out.println("Copying the file from the jar to work around ffmpeg");
+				// copy the resource into a temporary file
+				try {
+					InputStream in = UtilIO.openStream(filename);
+					if( in == null ) throw new RuntimeException();
+					final File tempFile = File.createTempFile("boofcv_ffmpeg_", ".mp4");
+					tempFile.deleteOnExit();
+					UtilIO.copyToFile(in,tempFile);
+					filename = tempFile.getAbsolutePath();
+				} catch( IOException e ) {
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
+				break;
 		}
 
 		this.frameGrabber = new FFmpegFrameGrabber(filename);
@@ -162,7 +168,7 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 			finished = false;
 			frameGrabber.start();
 		} catch (FrameGrabber.Exception e) {
-//			e.printStackTrace();
+			e.printStackTrace();
 			finished = true;
 			return;
 		}
