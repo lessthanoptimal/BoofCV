@@ -223,10 +223,12 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		examples.add(new PathLabel("Chessboard",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 		examples.add(new PathLabel("Apartment", UtilIO.pathExample("lines_indoors.mjpeg")));
 
-		DetectLineApp app = new DetectLineApp(examples,imageType,derivType);
+		SwingUtilities.invokeLater(()->{
+			DetectLineApp app = new DetectLineApp(examples,imageType,derivType);
 
-		app.openExample(examples.get(0));
-		app.display("Line Detector");
+			app.openExample(examples.get(0));
+			app.display("Line Detector");
+		});
 	}
 
 }

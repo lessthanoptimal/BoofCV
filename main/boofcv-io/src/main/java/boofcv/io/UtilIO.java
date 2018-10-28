@@ -411,7 +411,12 @@ public class UtilIO {
 		if(pkg == null || app == null)
 			return "";
 
-		String base = "https://github.com/lessthanoptimal/BoofCV/blob/v"+ BoofVersion.VERSION+"/";
+		String base;
+		if( BoofVersion.VERSION.contains("SNAPSHOT")) {
+			base = "https://github.com/lessthanoptimal/BoofCV/tree/" + BoofVersion.GIT_SHA + "/";
+		} else {
+			base = "https://github.com/lessthanoptimal/BoofCV/blob/v" + BoofVersion.VERSION + "/";
+		}
 		pkg = pkg.replace('.','/') + "/";
 
 		String dir;
