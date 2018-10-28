@@ -18,6 +18,7 @@
 
 package boofcv.gui;
 
+import boofcv.BoofVersion;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
@@ -153,16 +154,13 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		searchBox.getInputMap().put(up, "prevSearch");
 		searchBox.getActionMap().put("prevSearch", prevSearch);
 
-		searchBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//enter key goes to next match
-				DefaultMutableTreeNode selection = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-				if(selection != null) {
-					handleClick(selection);
-				}
-				System.out.println("action");
+		searchBox.addActionListener(e -> {
+			//enter key goes to next match
+			DefaultMutableTreeNode selection = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+			if(selection != null) {
+				handleClick(selection);
 			}
+			System.out.println("action");
 		});
 
 		MouseListener ml = new MouseAdapter() {
@@ -176,6 +174,12 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		};
 		tree.addMouseListener(ml);
 
+		JTextArea infoPanel = new JTextArea();
+		infoPanel.setLineWrap(true);
+		infoPanel.setEditable(false);
+		infoPanel.setPreferredSize(new Dimension(100,80));
+		infoPanel.setText("BoofCV "+BoofVersion.VERSION+"\nGIT SHA\n"+BoofVersion.GIT_SHA);
+
 		JPanel searchPanel = new JPanel();
 		searchPanel.setLayout(new BoxLayout(searchPanel,BoxLayout.X_AXIS));
 		searchPanel.add( new JLabel("Search"));
@@ -183,11 +187,12 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		searchPanel.add(searchBox);
 
 		JPanel leftPanel = new JPanel();
-		leftPanel.setLayout(new BorderLayout());
-		leftPanel.add(searchPanel, BorderLayout.NORTH);
+		leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+		leftPanel.add(searchPanel);
 		JScrollPane treeView = new JScrollPane(tree);
 		treeView.setPreferredSize(new Dimension(300, 600));
-		leftPanel.add(treeView, BorderLayout.CENTER);
+		leftPanel.add(treeView);
+		leftPanel.add(infoPanel);
 
 		JPanel actionPanel = new JPanel();
 		actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
@@ -235,8 +240,10 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 		// get the width of the monitor.  This should work in multi-monitor systems
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		// have it be a reasonable size of fill the display
+		int width = Math.min(1200,gd.getDisplayMode().getWidth());
 
-		setPreferredSize(new Dimension(gd.getDisplayMode().getWidth(),600));
+		setPreferredSize(new Dimension(width,600));
 	}
 
 
@@ -267,12 +274,9 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			processes.add(process);
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				listModel.addElement(process);
-				processList.invalidate();
-			}
+		SwingUtilities.invokeLater(() -> {
+			listModel.addElement(process);
+			processList.invalidate();
 		});
 
 		process.start();

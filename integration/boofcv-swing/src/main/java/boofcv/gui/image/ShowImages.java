@@ -115,13 +115,12 @@ public class ShowImages {
 		final JFrame frame = new JFrame(title);
 		frame.add(component, BorderLayout.CENTER);
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				frame.pack();
-				frame.setVisible(true);
-				if( closeOnExit )
-					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			}
+		SwingUtilities.invokeLater(() -> {
+			frame.pack();
+			frame.setLocationRelativeTo(null); // centers window in the monitor
+			frame.setVisible(true);
+			if( closeOnExit )
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		});
 
 		return frame;
