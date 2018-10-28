@@ -202,15 +202,17 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang"),"CalibIm");
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration//stereo/Bumblebee2_Square"),"left");
 
-		CalibratePinholePlanarGuiApp app = new CalibratePinholePlanarGuiApp();
-		app.configure(detector,images,2,false);
+		SwingUtilities.invokeLater(()-> {
+			CalibratePinholePlanarGuiApp app = new CalibratePinholePlanarGuiApp();
+			app.configure(detector, images, 2, false);
 
-		JFrame frame = new JFrame("Pinhole Calribation with Planar Targets");
-		frame.add(app, BorderLayout.CENTER);
-		frame.pack();
-		frame.setVisible(true);
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+			JFrame frame = new JFrame("Pinhole Calribation with Planar Targets");
+			frame.add(app, BorderLayout.CENTER);
+			frame.pack();
+			frame.setVisible(true);
+			frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-		app.process("intrinsic.yaml");
+			new Thread(() -> app.process("intrinsic.yaml")).start();
+		});
 	}
 }

@@ -37,6 +37,7 @@ import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.io.File;
@@ -253,10 +254,11 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 		}
 		examples.add(UtilIO.pathExample("fiducial/circle_regular/movie.mp4"));
 
+		SwingUtilities.invokeLater(()-> {
+			DetectCalibrationCircleRegularApp app = new DetectCalibrationCircleRegularApp(10, 8, 1.5, 2.5, examples);
 
-		DetectCalibrationCircleRegularApp app = new DetectCalibrationCircleRegularApp(10, 8, 1.5,2.5,examples);
-
-		app.openFile(new File(examples.get(0)));
-		app.display("Circle Regular Grid Detector");
+			app.openFile(new File(examples.get(0)));
+			app.display("Circle Regular Grid Detector");
+		});
 	}
 }

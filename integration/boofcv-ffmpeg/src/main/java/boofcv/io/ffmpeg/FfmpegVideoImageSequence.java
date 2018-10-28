@@ -67,7 +67,7 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 		converter = new Java2DFrameConverter();
 		reset();
 		if( finished )
-			throw new RuntimeException("FFMPEG failed to open file");
+			throw new RuntimeException("FFMPEG failed to open file. "+filename);
 	}
 
 	@Override

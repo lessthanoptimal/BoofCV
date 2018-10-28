@@ -425,16 +425,16 @@ public abstract class DemonstrationBase extends JPanel {
 			CacheSequenceStream cache = inputStreams.get(which);
 
 			SimpleImageSequence sequence = media.openVideo(filePaths[which], cache.getImageType());
-			configureVideo(which,sequence);
-
 			if( sequence == null ) {
 				failed = true;
+				System.out.println("Can't find file. "+filePaths[which]);
 				break;
-			} else {
-				synchronized (inputStreams) {
-					cache.reset();
-					cache.setSequence(sequence);
-				}
+			}
+			configureVideo(which,sequence);
+
+			synchronized (inputStreams) {
+				cache.reset();
+				cache.setSequence(sequence);
 			}
 		}
 

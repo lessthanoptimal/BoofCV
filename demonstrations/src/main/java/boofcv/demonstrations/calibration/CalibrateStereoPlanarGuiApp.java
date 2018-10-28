@@ -243,11 +243,13 @@ public class CalibrateStereoPlanarGuiApp extends JPanel {
 			rightFiles.add( new File(s));
 		}
 
-		CalibrateStereoPlanarGuiApp app = new CalibrateStereoPlanarGuiApp();
-		app.configure(detector,2,false,true, leftFiles,rightFiles);
+		SwingUtilities.invokeLater(()-> {
+			CalibrateStereoPlanarGuiApp app = new CalibrateStereoPlanarGuiApp();
+			app.configure(detector, 2, false, true, leftFiles, rightFiles);
 
-		ShowImages.showWindow(app,"Planar Stereo Calibration",true);
+			ShowImages.showWindow(app, "Planar Stereo Calibration", true);
 
-		app.process("stereo.yaml");
+			new Thread(() -> app.process("stereo.yaml")).start();
+		});
 	}
 }

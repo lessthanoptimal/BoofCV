@@ -38,6 +38,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.io.File;
@@ -254,9 +255,11 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 		}
 		examples.add(UtilIO.pathExample("fiducial/circle_hexagonal/movie.mp4"));
 
-		DetectCalibrationCircleHexagonalApp app = new DetectCalibrationCircleHexagonalApp(24, 28, 1,1.2,examples);
+		SwingUtilities.invokeLater(()-> {
+			DetectCalibrationCircleHexagonalApp app = new DetectCalibrationCircleHexagonalApp(24, 28, 1, 1.2, examples);
 
-		app.openFile(new File(examples.get(0)));
-		app.display("Circle Hexagonal Grid Detector");
+			app.openFile(new File(examples.get(0)));
+			app.display("Circle Hexagonal Grid Detector");
+		});
 	}
 }

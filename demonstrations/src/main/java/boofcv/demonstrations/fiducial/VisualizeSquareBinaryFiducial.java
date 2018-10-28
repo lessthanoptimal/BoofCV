@@ -44,6 +44,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -127,10 +128,10 @@ public class VisualizeSquareBinaryFiducial {
 
 	public static void main(String[] args) {
 
-		VisualizeSquareBinaryFiducial app = new VisualizeSquareBinaryFiducial();
-
-		app.process(UtilIO.pathExample("fiducial/binary/image0001.jpg"),null);
-
+		SwingUtilities.invokeLater(()-> {
+			VisualizeSquareBinaryFiducial app = new VisualizeSquareBinaryFiducial();
+			app.process(UtilIO.pathExample("fiducial/binary/image0001.jpg"), null);
+		});
 //		app.process(directory+"/image0000.jpg",directory+"/intrinsic.yaml");
 	}
 }

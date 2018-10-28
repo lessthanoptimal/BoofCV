@@ -303,10 +303,11 @@ public class DetectFiducialSquareBinaryApp
 		examples.add(UtilIO.pathExample("fiducial/binary/image0002.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/binary/movie.mjpeg"));
 
-		DetectFiducialSquareBinaryApp app = new DetectFiducialSquareBinaryApp(examples);
-
-		app.openFile(new File(examples.get(0)));
-		app.display("Fiducial Square Binary Detector");
+		SwingUtilities.invokeLater(()-> {
+			DetectFiducialSquareBinaryApp app = new DetectFiducialSquareBinaryApp(examples);
+			app.openFile(new File(examples.get(0)));
+			app.display("Fiducial Square Binary Detector");
+		});
 	}
 
 

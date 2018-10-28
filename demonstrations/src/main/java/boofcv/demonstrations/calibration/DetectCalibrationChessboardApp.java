@@ -33,6 +33,7 @@ import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -124,9 +125,11 @@ public class DetectCalibrationChessboardApp
 		}
 		examples.add(UtilIO.pathExample("fiducial/chessboard/movie.mjpeg"));
 
-		DetectCalibrationChessboardApp app = new DetectCalibrationChessboardApp(7,5,examples);
+		SwingUtilities.invokeLater(()-> {
+			DetectCalibrationChessboardApp app = new DetectCalibrationChessboardApp(7, 5, examples);
 
-		app.openFile(new File(examples.get(0)));
-		app.display("Calibration Target Detection");
+			app.openFile(new File(examples.get(0)));
+			app.display("Calibration Target Detection");
+		});
 	}
 }
