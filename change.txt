@@ -10,7 +10,7 @@ Version : 0.32
 - Demonstrations / Examples
   * Colorized code
   * Updated detect line demo
-  * Update image enhance demo
+  * Updated image enhance demo
   * TODO fix os x touch pad zoom
 - Added 3D Qr Code where you can estimate its 6-DOF pose
 - Changed Fiducial stability calculation to use 4 synthetic corners always to improve speed

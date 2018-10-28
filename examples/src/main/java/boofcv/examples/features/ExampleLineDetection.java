@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,7 +80,7 @@ public class ExampleLineDetection {
 
 		// display the results
 		ImageLinePanel gui = new ImageLinePanel();
-		gui.setBackground(image);
+		gui.setImage(image);
 		gui.setLines(found);
 		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 
@@ -109,7 +109,7 @@ public class ExampleLineDetection {
 
 		// display the results
 		ImageLinePanel gui = new ImageLinePanel();
-		gui.setBackground(image);
+		gui.setImage(image);
 		gui.setLineSegments(found);
 		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 
