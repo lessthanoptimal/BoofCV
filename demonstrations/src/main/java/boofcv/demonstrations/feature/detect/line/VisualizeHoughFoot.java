@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>> 
 				new ConfigHoughFoot(6, 12, 5, 25, 10), imageType, derivType);
 
 		ImageLinePanel gui = new ImageLinePanel();
-		gui.setBackground(image);
+		gui.setImage(image);
 		gui.setLines(alg.detect(blur));
 		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 

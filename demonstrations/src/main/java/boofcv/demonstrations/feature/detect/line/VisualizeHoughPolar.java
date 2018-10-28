@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class VisualizeHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>>
 		List<LineParametric2D_F32> lines = alg.detect(blur);
 
 		ImageLinePanel gui = new ImageLinePanel();
-		gui.setBackground(image);
+		gui.setImage(image);
 		gui.setLines(lines);
 		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 

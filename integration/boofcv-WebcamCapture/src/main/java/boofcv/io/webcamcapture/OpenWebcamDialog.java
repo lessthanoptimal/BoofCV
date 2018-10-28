@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -116,37 +116,31 @@ public class OpenWebcamDialog extends StandardAlgConfigPanel {
 		comboCameras = new JComboBox(names);
 		comboCameras.setPreferredSize(new Dimension(200,30));
 		comboCameras.setMaximumSize(comboCameras.getPreferredSize());
-		cameraListener = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Webcam w = cameras.get(comboCameras.getSelectedIndex());
-				selectedCamera = w;
-				Dimension s = w.getViewSize();
-				setCameraSize(s.width,s.height);
+		cameraListener = e -> {
+			Webcam w = cameras.get(comboCameras.getSelectedIndex());
+			selectedCamera = w;
+			Dimension s = w.getViewSize();
+			setCameraSize(s.width,s.height);
 
-				comboSizes.removeActionListener(sizeListener);
-				modelSizes.removeAllElements();
-				for( Dimension d : w.getViewSizes() ) {
-					modelSizes.addElement(d.width+" x "+d.height);
-				}
-				comboSizes.addActionListener(sizeListener);
+			comboSizes.removeActionListener(sizeListener);
+			modelSizes.removeAllElements();
+			for( Dimension d : w.getViewSizes() ) {
+				modelSizes.addElement(d.width+" x "+d.height);
 			}
+			comboSizes.addActionListener(sizeListener);
 		};
 		comboCameras.addActionListener(cameraListener);
 
-		sizeListener = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Webcam w = cameras.get(comboCameras.getSelectedIndex());
-				selectedCamera = w;
-				String text = (String)comboSizes.getSelectedItem();
-				if( text == null )
-					return;
-				String words[] = text.split(" x ");
-				int width = Integer.parseInt(words[0]);
-				int height = Integer.parseInt(words[1]);
-				setCameraSize(width,height);
-			}
+		sizeListener = e -> {
+			Webcam w = cameras.get(comboCameras.getSelectedIndex());
+			selectedCamera = w;
+			String text = (String)comboSizes.getSelectedItem();
+			if( text == null )
+				return;
+			String words[] = text.split(" x ");
+			int width = Integer.parseInt(words[0]);
+			int height = Integer.parseInt(words[1]);
+			setCameraSize(width,height);
 		};
 		comboSizes.addActionListener(sizeListener);
 
@@ -246,6 +240,11 @@ public class OpenWebcamDialog extends StandardAlgConfigPanel {
 
 	public static Selection showDialog( Window owner )
 	{
+		if( Webcam.getWebcams().size() == 0 ) {
+			JOptionPane.showMessageDialog(owner, "No webcams found!");
+			return null;
+		}
+
 		JDialog dialog = new JDialog(owner,"Select Webcam",Dialog.ModalityType.APPLICATION_MODAL);
 		final OpenWebcamDialog panel = new OpenWebcamDialog(dialog);
 

@@ -9,7 +9,7 @@ Version : 0.32
 - Internally using URL to load resources (e.g. images, videos) to enable running inside of jars
 - Demonstrations / Examples
   * Colorized code
-  * TODO update detect line app demo
+  * Updated detect line demo
   * TODO update image enhance
   * TODO fix os x touch pad zoom
 - Added 3D Qr Code where you can estimate its 6-DOF pose

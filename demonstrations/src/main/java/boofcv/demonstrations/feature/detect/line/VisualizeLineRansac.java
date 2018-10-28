@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -118,7 +118,7 @@ public class VisualizeLineRansac<I extends ImageGray<I>, D extends ImageGray<D>>
 		System.out.println("after size = "+found.size());
 
 		ImageLinePanel gui = new ImageLinePanel();
-		gui.setBackground(image);
+		gui.setImage(image);
 		gui.setLineSegments(found);
 		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 

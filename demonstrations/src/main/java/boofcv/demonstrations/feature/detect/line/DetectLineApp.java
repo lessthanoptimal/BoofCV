@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,24 +23,31 @@ import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.demonstrations.feature.detect.ImageCorruptPanel;
 import boofcv.factory.feature.detect.line.ConfigHoughFoot;
 import boofcv.factory.feature.detect.line.ConfigHoughFootSubimage;
 import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
-import boofcv.gui.SelectAlgorithmAndInputPanel;
+import boofcv.gui.DemonstrationBase;
+import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.ImageLinePanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
-import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
+import georegression.struct.line.LineParametric2D_F32;
+import georegression.struct.line.LineSegment2D_F32;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Shows detected lines inside of different images.
@@ -50,137 +57,176 @@ import java.util.ArrayList;
 // todo configure: blur, edge threshold, non-max radius,  min counts
 // todo show binary image, transform
 public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
-		extends SelectAlgorithmAndInputPanel implements ImageCorruptPanel.Listener
+		extends DemonstrationBase
 {
 	Class<T> imageType;
+	Class<D> derivType;
 
-	T input;
-	T inputCorrupted;
 	T blur;
+	T work;
 
 	float edgeThreshold = 25;
-	int maxLines = 10;
-	int blurRadius = 2;
 
-	ImageLinePanel gui = new ImageLinePanel();
-	boolean processedImage = false;
+	final ImageLinePanel gui = new ImageLinePanel();
+	final ControlPanel controls = new ControlPanel();
 
-	ImageCorruptPanel corruptPanel;
+	DetectLine<T> lineDetector;
+	DetectLineSegment<T> segmentDetector;
+	final Object lockDetector = new Object();
 
-	public DetectLineApp( Class<T> imageType , Class<D> derivType ) {
-		super(1);
+
+	public DetectLineApp( List<PathLabel> examples , Class<T> imageType , Class<D> derivType ) {
+		super(examples, ImageType.single(imageType));
 
 		this.imageType = imageType;
+		this.derivType = derivType;
 
-		addAlgorithm(0,"Hough Polar", FactoryDetectLineAlgs.houghPolar(
-				new ConfigHoughPolar(3, 30, 2, Math.PI / 180, edgeThreshold, maxLines), imageType, derivType));
-		addAlgorithm(0,"Hough Foot", FactoryDetectLineAlgs.houghFoot(
-				new ConfigHoughFoot(3, 8, 5, edgeThreshold, maxLines), imageType, derivType));
-		addAlgorithm(0,"Hough Foot Sub Image", FactoryDetectLineAlgs.houghFootSub(
-				new ConfigHoughFootSubimage(3, 8, 5, edgeThreshold, maxLines, 2, 2), imageType, derivType));
-		addAlgorithm(0,"Grid Line", FactoryDetectLineAlgs.lineRansac(40, 30, 2.36, true, imageType, derivType));
-
-		input = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
-		inputCorrupted = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		blur = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		work = blur.createSameShape();
 
-		JPanel viewArea = new JPanel(new BorderLayout());
-		corruptPanel = new ImageCorruptPanel();
-		corruptPanel.setListener(this);
+		add(controls,BorderLayout.WEST);
+		add(gui,BorderLayout.CENTER);
 
-		viewArea.add(corruptPanel,BorderLayout.WEST);
-		viewArea.add(gui,BorderLayout.CENTER);
-		setMainGUI(viewArea);
+		declareDetector();
 	}
 
-	public void process( final BufferedImage image ) {
-		input.reshape(image.getWidth(),image.getHeight());
-		inputCorrupted.reshape(image.getWidth(),image.getHeight());
-		blur.reshape(image.getWidth(),image.getHeight());
+	private void declareDetector() {
+		synchronized (lockDetector) {
+			lineDetector = null;
+			segmentDetector = null;
 
-		ConvertBufferedImage.convertFromSingle(image, input, imageType);
+			switch (controls.whichAlg) {
+				case 0:
+					lineDetector = FactoryDetectLineAlgs.houghPolar(
+							new ConfigHoughPolar(3, 30, 2,
+									Math.PI / 180, edgeThreshold, controls.maxLines), imageType, derivType);
+					break;
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.setBackground(image);
-				gui.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
-				doRefreshAll();
+				case 1:
+					lineDetector = FactoryDetectLineAlgs.houghFoot(
+							new ConfigHoughFoot(3, 8, 5, edgeThreshold,
+									controls.maxLines), imageType, derivType);
+					break;
+
+				case 2:
+					lineDetector = FactoryDetectLineAlgs.houghFootSub(
+							new ConfigHoughFootSubimage(3, 8, 5, edgeThreshold,
+									controls.maxLines, 2, 2), imageType, derivType);
+					break;
+
+				case 3:
+					segmentDetector = FactoryDetectLineAlgs.lineRansac(40, 30, 2.36, true, imageType, derivType);
+					break;
 			}
-		});
-	}
-
-	@Override
-	public void loadConfigurationFile(String fileName) {}
-
-	@Override
-	public boolean getHasProcessedImage() {
-		return processedImage;
-	}
-
-	@Override
-	public void refreshAll(Object[] cookies) {
-		setActiveAlgorithm(0, null, getAlgorithmCookie(0));
-	}
-
-	@Override
-	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		corruptPanel.corruptImage(input,inputCorrupted);
-		GBlurImageOps.gaussian(inputCorrupted, blur, -1,blurRadius, null);
-
-		if( cookie instanceof DetectLine ) {
-			final DetectLine<T> detector = (DetectLine<T>) cookie;
-
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					ConvertBufferedImage.convertTo(inputCorrupted, gui.background, true);
-					gui.setLines(detector.detect(blur));
-					gui.repaint();
-					processedImage = true;
-				}
-			});
-		} else if( cookie instanceof DetectLineSegment) {
-			final DetectLineSegment<T> detector = (DetectLineSegment<T>) cookie;
-
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					ConvertBufferedImage.convertTo(inputCorrupted,gui.background, true);
-					gui.setLineSegments(detector.detect(blur));
-					gui.repaint();
-					processedImage = true;
-				}
-			});
 		}
 	}
 
 	@Override
-	public void changeInput(String name, int index) {
-		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
-
-		process(image);
+	protected void handleInputChange( int source , InputMethod method , int width , int height ) {
+		blur.reshape(width,height);
+		work.reshape(width,height);
+		SwingUtilities.invokeLater(() -> {
+			gui.setPreferredSize(new Dimension(width,height));
+		});
 	}
 
 	@Override
-	public synchronized void corruptImageChange() {
-		doRefreshAll();
+	public void processImage(int sourceID, long frameID, final BufferedImage buffered , final ImageBase _input  )
+	{
+		T input = (T)_input;
+
+		if( controls.blurRadius >= 1 )
+			GBlurImageOps.gaussian(input, blur, -1, controls.blurRadius, work);
+		else
+			blur.setTo(input);
+
+		synchronized (lockDetector) {
+			if (lineDetector != null) {
+				List<LineParametric2D_F32> lines = lineDetector.detect(blur);
+				SwingUtilities.invokeLater(() -> {
+					gui.setImage(buffered);
+					gui.setLines(lines);
+					gui.repaint();
+				});
+			} else if (segmentDetector != null) {
+				List<LineSegment2D_F32> lines = segmentDetector.detect(blur);
+				SwingUtilities.invokeLater(() -> {
+					gui.setImage(buffered);
+					gui.setLineSegments(lines);
+					gui.repaint();
+				});
+			}
+		}
+	}
+
+	private class ControlPanel extends StandardAlgConfigPanel
+			implements ActionListener , ChangeListener {
+
+		JComboBox comboAlg;
+		JSpinner spinnerMaxLines;
+		JSpinner spinnerBlur;
+
+		int whichAlg = 0;
+		int maxLines = 10;
+		int blurRadius = 2;
+
+		public ControlPanel() {
+
+			comboAlg = combo(whichAlg,"Hough Polar","Hough Foot","Hough Foot Sub Image","Grid Line");
+			spinnerMaxLines = spinner(maxLines,1,100,1);
+			spinnerBlur = spinner(blurRadius,0,20,1);
+
+			addAlignCenter(comboAlg);
+			addLabeled(spinnerMaxLines,"Lines");
+			addLabeled(spinnerBlur,"Blur Radius");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if( e.getSource() == comboAlg ) {
+				whichAlg = comboAlg.getSelectedIndex();
+
+				switch (whichAlg) {
+					case 0:
+					case 1:
+					case 2:
+						spinnerMaxLines.setEnabled(true);
+						break;
+
+					default:
+						spinnerMaxLines.setEnabled(false);
+				}
+			}
+			declareDetector();
+			reprocessImageOnly();
+		}
+
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			if( e.getSource() == spinnerBlur ) {
+				blurRadius = ((Number)spinnerBlur.getValue()).intValue();
+			} else if( e.getSource() == spinnerMaxLines ) {
+				maxLines = ((Number)spinnerMaxLines.getValue()).intValue();
+			}
+			declareDetector();
+			reprocessImageOnly();
+		}
 	}
 
 	public static void main(String args[]) {
 		Class imageType = GrayF32.class;
 		Class derivType = GrayF32.class;
 
-		DetectLineApp app = new DetectLineApp(imageType,derivType);
+		java.util.List<PathLabel> examples = new ArrayList<>();
+		examples.add(new PathLabel("Objects", UtilIO.pathExample("simple_objects.jpg")));
+		examples.add(new PathLabel("Indoors",UtilIO.pathExample("lines_indoors.jpg")));
+		examples.add(new PathLabel("Chessboard",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
+		examples.add(new PathLabel("Apartment", UtilIO.pathExample("lines_indoors.mjpeg")));
 
-		java.util.List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("Objects", UtilIO.pathExample("simple_objects.jpg")));
-		inputs.add(new PathLabel("Indoors",UtilIO.pathExample("lines_indoors.jpg")));
-		app.setInputList(inputs);
+		DetectLineApp app = new DetectLineApp(examples,imageType,derivType);
 
-		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
-		}
-
-		ShowImages.showWindow(app,"Line Detection", true);
+		app.openExample(examples.get(0));
+		app.display("Line Detector");
 	}
 
 }
