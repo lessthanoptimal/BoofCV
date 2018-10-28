@@ -19,17 +19,19 @@
 package boofcv.demonstrations.enhance;
 
 import boofcv.alg.enhance.EnhanceImageOps;
+import boofcv.alg.enhance.GEnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.core.image.ConvertImage;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.image.ImageZoomPanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.Planar;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -40,7 +42,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -68,12 +69,14 @@ public class ImageEnhanceApp extends DemonstrationBase {
 	int histogram[] = new int[256];
 	int transform[] = new int[256];
 
-	GrayU8 enhanced = new GrayU8(1,1);
+	GrayU8 gray = new GrayU8(1,1);
+	GrayU8 enhancedGray = new GrayU8(1,1);
+	Planar<GrayU8> enhancedColor = new Planar<GrayU8>(GrayU8.class,1,1,3);
 
 	BufferedImage output = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
 
 	public ImageEnhanceApp(List<?> exampleInputs ) {
-		super(exampleInputs, ImageType.single(GrayU8.class));
+		super(exampleInputs, ImageType.pl(3,GrayU8.class));
 
 		imagePanel.setPreferredSize(new Dimension(800,800));
 		imagePanel.addMouseWheelListener(new MouseAdapter() {
@@ -100,7 +103,9 @@ public class ImageEnhanceApp extends DemonstrationBase {
 	protected void handleInputChange(int source, InputMethod method, final int width, final int height) {
 		super.handleInputChange(source, method, width, height);
 
-		enhanced.reshape(width, height);
+		gray.reshape(width, height);
+		enhancedGray.reshape(width, height);
+		enhancedColor.reshape(width, height);
 		output = ConvertBufferedImage.checkDeclare(width,height,output,output.getType());
 
 		BoofSwingUtil.invokeNowOrLater(new Runnable() {
@@ -116,36 +121,57 @@ public class ImageEnhanceApp extends DemonstrationBase {
 
 	@Override
 	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase _input) {
-		GrayU8 input = (GrayU8)_input;
+		Planar<GrayU8> color = (Planar<GrayU8>)_input;
+
+		ConvertImage.average(color,gray);
 
 		if( controls.showInput ) {
 			output.createGraphics().drawImage(buffered,0,0,null);
 		} else {
 			long before = System.nanoTime();
 			if( controls.activeAlgorithm.equals(HISTOGRAM_GLOBAL)) {
-				ImageStatistics.histogram(input,0,histogram);
+				ImageStatistics.histogram(gray,0,histogram);
 				EnhanceImageOps.equalize(histogram, transform);
-				EnhanceImageOps.applyTransform(input, transform, enhanced);
+				if( controls.color ){
+					for (int i = 0; i < color.getNumBands(); i++) {
+						EnhanceImageOps.applyTransform(color.getBand(i), transform,enhancedColor.getBand(i));
+					}
+				} else {
+					EnhanceImageOps.applyTransform(gray, transform, enhancedGray);
+				}
 			} else if( controls.activeAlgorithm.equals(HISTOGRAM_LOCAL)) {
-				EnhanceImageOps.equalizeLocal(input, controls.radius, enhanced, histogram, transform);
+				if( controls.color ){
+					GEnhanceImageOps.equalizeLocal(color, controls.radius, enhancedColor, histogram, transform);
+				} else {
+					EnhanceImageOps.equalizeLocal(gray, controls.radius, enhancedGray, histogram, transform);
+				}
 			} else if( controls.activeAlgorithm.equals(SHARPEN_4)) {
-				EnhanceImageOps.sharpen4(input, enhanced);
+				if( controls.color ){
+					GEnhanceImageOps.sharpen4(color, enhancedColor);
+				} else {
+					GEnhanceImageOps.sharpen4(gray, enhancedGray);
+				}
 			} else if( controls.activeAlgorithm.equals(SHARPEN_8)) {
-				EnhanceImageOps.sharpen8(input, enhanced);
+				if( controls.color ){
+					GEnhanceImageOps.sharpen8(color, enhancedColor);
+				} else {
+					GEnhanceImageOps.sharpen8(gray, enhancedGray);
+				}
 			}
 			long after = System.nanoTime();
 
 			controls.setProcessingTime((after-before)*1e-9);
 
-			ConvertBufferedImage.convertTo(enhanced, output);
+			if( controls.color ) {
+				ConvertBufferedImage.convertTo(enhancedColor, output, true);
+			} else {
+				ConvertBufferedImage.convertTo(enhancedGray, output);
+			}
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				imagePanel.setBufferedImage(output);
-				imagePanel.repaint();
-			}
+		SwingUtilities.invokeLater(() -> {
+			imagePanel.setBufferedImage(output);
+			imagePanel.repaint();
 		});
 	}
 
@@ -160,7 +186,7 @@ public class ImageEnhanceApp extends DemonstrationBase {
 		}
 	}
 
-	class ControlPanel extends StandardAlgConfigPanel implements ChangeListener {
+	class ControlPanel extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
 		protected JLabel processingTimeLabel = new JLabel();
 
 		Vector comboBoxItems = new Vector();
@@ -170,38 +196,30 @@ public class ImageEnhanceApp extends DemonstrationBase {
 		protected JSpinner selectZoom;
 		JSpinner spinnerRadius;
 		JCheckBox checkShowInput = new JCheckBox("Show Input");
+		JCheckBox checkColor = new JCheckBox("Color");
 
 		String activeAlgorithm;
 		protected double zoom = 1;
 		protected int radius = 50;
 		protected boolean showInput=false;
+		protected boolean color=false;
 
 		public ControlPanel() {
 			final DefaultComboBoxModel model = new DefaultComboBoxModel(comboBoxItems);
 			comboAlgorithms = new JComboBox(model);
-			comboAlgorithms.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent actionEvent) {
-					int selectedAlgorithm = comboAlgorithms.getSelectedIndex();
-					activeAlgorithm = (String)comboAlgorithms.getModel().getSelectedItem();
-					comboRunnable.get(selectedAlgorithm).run();
-					handleSettingsChanged();
-				}
+			comboAlgorithms.addActionListener(actionEvent -> {
+				int selectedAlgorithm = comboAlgorithms.getSelectedIndex();
+				activeAlgorithm = (String)comboAlgorithms.getModel().getSelectedItem();
+				comboRunnable.get(selectedAlgorithm).run();
+				handleSettingsChanged();
 			});
 
 			selectZoom = new JSpinner(new SpinnerNumberModel(zoom,MIN_ZOOM,MAX_ZOOM,1));
 			selectZoom.addChangeListener(this);
 			selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
-			checkShowInput.setSelected(showInput);
-			checkShowInput.setMaximumSize(checkShowInput.getPreferredSize());
-			checkShowInput.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					showInput = checkShowInput.isSelected();
-					handleSettingsChanged(); // doesn't need to reprocess but easiest way to show input or not
-				}
-			});
+			checkShowInput = checkbox("Show Input",showInput);
+			checkColor = checkbox("Color",color);
 
 			spinnerRadius = new JSpinner(new SpinnerNumberModel(radius,1,200,1));
 			spinnerRadius.addChangeListener(this);
@@ -211,10 +229,11 @@ public class ImageEnhanceApp extends DemonstrationBase {
 			comboAlgorithms.setSelectedIndex(0);
 			comboAlgorithms.setMaximumSize(comboAlgorithms.getPreferredSize());
 
-			addLabeled(processingTimeLabel,"Time (ms)", this);
 			add(comboAlgorithms);
+			addLabeled(processingTimeLabel,"Time (ms)", this);
+			addAlignLeft(checkShowInput);
+			addAlignLeft(checkColor);
 			addLabeled(selectZoom,"Zoom",this);
-			add(checkShowInput);
 			addLabeled(spinnerRadius,"Radius", this);
 			addVerticalGlue(this);
 		}
@@ -265,20 +284,31 @@ public class ImageEnhanceApp extends DemonstrationBase {
 			}
 			handleSettingsChanged();
 		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if( e.getSource() == checkShowInput ) {
+				showInput = checkShowInput.isSelected();
+				handleSettingsChanged(); // doesn't need to reprocess but easiest way to show input or not
+			} else if( e.getSource() == checkColor ) {
+				color = checkColor.isSelected();
+				handleSettingsChanged();
+			}
+		}
 	}
 
 	public static void main(String[] args) {
 		List<String> examples = new ArrayList<>();
 		examples.add(UtilIO.pathExample("enhance/dark.jpg"));
 		examples.add(UtilIO.pathExample("enhance/dull.jpg"));
+		examples.add(UtilIO.pathExample("fiducial/qrcode/image04.jpg"));
+		examples.add(UtilIO.pathExample("tracking/night_follow_car.mjpeg"));
 
-		ImageEnhanceApp app = new ImageEnhanceApp(examples);
+		SwingUtilities.invokeLater(()->{
+			ImageEnhanceApp app = new ImageEnhanceApp(examples);
 
-		app.openFile(new File(examples.get(0)));
-
-		app.waitUntilInputSizeIsKnown();
-
-		ShowImages.showWindow(app,"Image Enhancement",true);
+			app.openExample(examples.get(0));
+			app.display("Image Enhancement");
+		});
 	}
-
 }
