@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,8 @@ public class VisualizeFiducial {
 	 * Draws a flat cube to show where the square fiducial is on the image
 	 *
 	 */
-	public static void drawLabelCenter(Se3_F64 targetToCamera, CameraPinholeRadial intrinsic, String label, Graphics2D g2)
+	public static void drawLabelCenter(Se3_F64 targetToCamera, CameraPinholeRadial intrinsic, String label,
+									   Graphics2D g2 , double scale)
 	{
 		// Computer the center of the fiducial in pixel coordinates
 		Point2D_F64 p = new Point2D_F64();
@@ -48,17 +49,34 @@ public class VisualizeFiducial {
 		WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(intrinsic, targetToCamera);
 		worldToPixel.transform(c,p);
 
-		drawLabel(p,label,g2);
+		drawLabel(p,label,g2,scale);
+	}
+
+	public static void drawLabelCenter(Se3_F64 targetToCamera, CameraPinholeRadial intrinsic, String label,
+									   Graphics2D g2 )
+	{
+		drawLabelCenter(targetToCamera, intrinsic, label, g2, 1);
 	}
 
 	public static void drawLabel( Point2D_F64 locationPixel , String label, Graphics2D g2)
+	{
+		drawLabel(locationPixel, label, g2, 1);
+	}
+
+	public static void drawLabel( Point2D_F64 locationPixel , String label, Graphics2D g2, double scale )
 	{
 		// Draw the ID number approximately in the center
 		FontMetrics metrics = g2.getFontMetrics(font);
 		Rectangle2D r = metrics.getStringBounds(label,null);
 		g2.setColor(Color.ORANGE);
 		g2.setFont(font);
-		g2.drawString(label,(float)(locationPixel.x-r.getWidth()/2),(float)(locationPixel.y+r.getHeight()/2));
+		g2.drawString(label,(float)(scale*locationPixel.x-r.getWidth()/2),(float)(scale*locationPixel.y+r.getHeight()/2));
+	}
+
+	public static void drawCube(Se3_F64 targetToCamera, CameraPinholeRadial intrinsic, double width,
+								int lineThickness, Graphics2D g2)
+	{
+		drawCube(targetToCamera, intrinsic, width, lineThickness, g2,1);
 	}
 
 	/**
@@ -66,7 +84,7 @@ public class VisualizeFiducial {
 	 *
 	 */
 	public static void drawCube(Se3_F64 targetToCamera, CameraPinholeRadial intrinsic, double width,
-								int lineThickness, Graphics2D g2)
+								int lineThickness, Graphics2D g2, double scale )
 	{
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -97,29 +115,36 @@ public class VisualizeFiducial {
 		g2.setStroke(new BasicStroke(lineThickness));
 		g2.setColor(Color.RED);
 
-		drawLine(g2,l,pixel[0].x, pixel[0].y, pixel[1].x, pixel[1].y);
-		drawLine(g2,l,pixel[1].x, pixel[1].y, pixel[2].x, pixel[2].y);
-		drawLine(g2,l,pixel[2].x, pixel[2].y, pixel[3].x, pixel[3].y);
-		drawLine(g2,l,pixel[3].x, pixel[3].y, pixel[0].x, pixel[0].y);
+		drawLine(g2,l,pixel[0].x, pixel[0].y, pixel[1].x, pixel[1].y,scale);
+		drawLine(g2,l,pixel[1].x, pixel[1].y, pixel[2].x, pixel[2].y,scale);
+		drawLine(g2,l,pixel[2].x, pixel[2].y, pixel[3].x, pixel[3].y,scale);
+		drawLine(g2,l,pixel[3].x, pixel[3].y, pixel[0].x, pixel[0].y,scale);
 
 		g2.setColor(Color.BLACK);
-		drawLine(g2,l,pixel[0].x,pixel[0].y,pixel[4].x,pixel[4].y);
-		drawLine(g2,l,pixel[1].x,pixel[1].y,pixel[5].x,pixel[5].y);
-		drawLine(g2,l,pixel[2].x,pixel[2].y,pixel[6].x,pixel[6].y);
-		drawLine(g2,l,pixel[3].x,pixel[3].y,pixel[7].x,pixel[7].y);
+		drawLine(g2,l,pixel[0].x,pixel[0].y,pixel[4].x,pixel[4].y,scale);
+		drawLine(g2,l,pixel[1].x,pixel[1].y,pixel[5].x,pixel[5].y,scale);
+		drawLine(g2,l,pixel[2].x,pixel[2].y,pixel[6].x,pixel[6].y,scale);
+		drawLine(g2,l,pixel[3].x,pixel[3].y,pixel[7].x,pixel[7].y,scale);
 
 		g2.setColor(new Color(0x00,0xFF,0x00,255));
-		drawLine(g2,l,pixel[4].x,pixel[4].y,pixel[5].x,pixel[5].y);
+		drawLine(g2,l,pixel[4].x,pixel[4].y,pixel[5].x,pixel[5].y,scale);
 		g2.setColor(new Color(0xC0,0x10,0xC0,255));
-		drawLine(g2,l,pixel[5].x,pixel[5].y,pixel[6].x,pixel[6].y);
+		drawLine(g2,l,pixel[5].x,pixel[5].y,pixel[6].x,pixel[6].y,scale);
 		g2.setColor(new Color(0x00,0xA0,0xC0,255));
-		drawLine(g2,l,pixel[6].x,pixel[6].y,pixel[7].x,pixel[7].y);
+		drawLine(g2,l,pixel[6].x,pixel[6].y,pixel[7].x,pixel[7].y,scale);
 		g2.setColor(Color.BLUE);
-		drawLine(g2,l,pixel[7].x,pixel[7].y,pixel[4].x,pixel[4].y);
+		drawLine(g2,l,pixel[7].x,pixel[7].y,pixel[4].x,pixel[4].y,scale);
 	}
 
 	public static void drawLine( Graphics2D g2 , Line2D.Double line , double x0 , double y0 , double x1 , double y1 ) {
 		line.setLine(x0,y0,x1,y1);
+		g2.draw(line);
+	}
+
+	public static void drawLine( Graphics2D g2 , Line2D.Double line ,
+								 double x0 , double y0 , double x1 , double y1,
+								 double scale ) {
+		line.setLine(scale*x0,scale*y0,scale*x1,scale*y1);
 		g2.draw(line);
 	}
 

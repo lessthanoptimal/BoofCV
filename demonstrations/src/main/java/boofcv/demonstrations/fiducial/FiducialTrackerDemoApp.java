@@ -84,19 +84,17 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 
 	private Class<I> imageClass;
 
-	private ImagePanel panel = new ImagePanel();
+	private VisualizePanel panel = new VisualizePanel();
 	private ControlPanel controls = new ControlPanel();
 
 	private FiducialDetector detector;
 
 	private CameraPinholeRadial intrinsic;
 
-	private FiducialStability stability = new FiducialStability();
-
-	private List<FiducialInfo> fiducialInfo = new ArrayList<FiducialInfo>();
+	private final List<FiducialInfo> fiducialInfo = new ArrayList<>();
 	private FiducialStability stabilityMax = new FiducialStability();
 
-	private BufferedImage imageCopy;
+//	private BufferedImage imageCopy;
 
 	boolean firstDetection = false;
 
@@ -122,101 +120,53 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 	{
 		detector.detect((I)input);
 
-		Graphics2D g2 = buffered.createGraphics();
-
-		Se3_F64 targetToSensor = new Se3_F64();
-		Point2D_F64 center = new Point2D_F64();
-		Polygon2D_F64 polygon = new Polygon2D_F64();
-		for (int i = 0; i < detector.totalFound(); i++) {
-			long id = detector.getId(i);
-
-			if( firstDetection ) {
-				// give it "reasonable" initial values based on the marker's size
-				stabilityMax.location = detector.getWidth(0)*0.1;
-				stabilityMax.orientation = 0.05;
+		// copy the results for drawing in the GUI thread
+		synchronized (fiducialInfo) {
+			// mark all as not visible
+			for (int i = 0; i < fiducialInfo.size(); i++) {
+				fiducialInfo.get(i).visible = false;
 			}
 
-			String message;
+			// update info for visible markers
+			for (int i = 0; i < detector.totalFound(); i++) {
+				FiducialInfo info = findFiducial(detector.getId(i));
+				info.totalObserved++;
+				info.visible = true;
+				info.width = detector.getWidth(i);
 
-			if( detector.hasMessage() ) {
-				message = detector.getMessage(i);
-				if( message.length() > 4 ) {
-					message = message.substring(0, 4);
+				if( detector.hasMessage() ) {
+					info.message = detector.getMessage(i);
+					if( info.message.length() > 4 ) {
+						info.message = info.message.substring(0, 4);
+					}
+				} else {
+					info.message = "" + info.id;
 				}
-			} else {
-				message = "" + id;
+
+				detector.getFiducialToCamera(i,info.fidToCam);
+				detector.getBounds(i,info.polygon);
+				detector.getCenter(i,info.center);
+
+				if (detector.computeStability(i, 0.25, info.stability)) {
+					stabilityMax.location = Math.max(info.stability.location, stabilityMax.location);
+					stabilityMax.orientation = Math.max(info.stability.orientation, stabilityMax.orientation);
+				}
+
+				if( firstDetection ) {
+					// give it "reasonable" initial values based on the marker's size
+					stabilityMax.location = detector.getWidth(0)*0.1;
+					stabilityMax.orientation = 0.05;
+				}
 			}
-
-			if( controls.showBoundary ) {
-				detector.getBounds(i,polygon);
-				g2.setStroke(new BasicStroke(11));
-				g2.setColor(Color.BLUE);
-				VisualizeShapes.drawPolygon(polygon,true,g2,true);
-			}
-
-			if( controls.showCenter ) {
-				detector.getCenter(i,center);
-				VisualizeFeatures.drawPoint(g2,center.x,center.y,10,Color.MAGENTA,true);
-			}
-
-			if( controls.show3D ) {
-				detector.getFiducialToCamera(i, targetToSensor);
-				double width = detector.getWidth(i);
-
-				VisualizeFiducial.drawLabelCenter(targetToSensor, intrinsic, message, g2);
-				VisualizeFiducial.drawCube(targetToSensor, intrinsic, width, 5, g2);
-			}
-
-			if( controls.showStability ) {
-				handleStability(input.height, g2, i, id,message);
-			}
-
 		}
 
-		imageCopy = ConvertBufferedImage.checkCopy(buffered,imageCopy);
-		panel.setImageUI(imageCopy);
+//		imageCopy = ConvertBufferedImage.checkCopy(buffered,imageCopy);
+		panel.setImageUI(buffered);
 	}
 
 	@Override
 	protected void configureVideo( int which , SimpleImageSequence sequence ) {
 		sequence.setLoop(true);
-	}
-
-	/**
-	 * Computes and visualizes the stability
-	 */
-	private void handleStability(int height, Graphics2D g2, int index, long fiducialID, String message ) {
-		FiducialInfo info = findFiducial(fiducialID);
-		info.totalObserved++;
-
-		g2.setFont(font);
-		if (detector.computeStability(index, 0.25, stability)) {
-			stabilityMax.location = Math.max(stability.location, stabilityMax.location);
-			stabilityMax.orientation = Math.max(stability.orientation, stabilityMax.orientation);
-		}
-
-		if (info.totalObserved > 20) {
-
-			double fractionLocation = stability.location / stabilityMax.location;
-			double fractionOrientation = stability.orientation / stabilityMax.orientation;
-
-			int maxHeight = (int) (height * 0.15);
-
-			int x = info.grid * 60;
-			int y = 10 + maxHeight;
-
-			g2.setColor(Color.BLUE);
-			int h = (int) (fractionLocation * maxHeight);
-			g2.fillRect(x, y - h, 20, h);
-
-			g2.setColor(Color.CYAN);
-			x += 25;
-			h = (int) (fractionOrientation * maxHeight);
-			g2.fillRect(x, y - h, 20, h);
-
-			g2.setColor(Color.RED);
-			g2.drawString(message, x - 20, y + 20);
-		}
 	}
 
 	private FiducialInfo findFiducial( long id ) {
@@ -311,6 +261,84 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		panel.setPreferredSize(new Dimension(width,height));
 	}
 
+	class VisualizePanel extends ImagePanel {
+		@Override
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+
+			Graphics2D g2 = (Graphics2D)g;
+			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+
+			synchronized (fiducialInfo ) {
+				for (int i = 0; i < fiducialInfo.size(); i++) {
+					FiducialInfo info = fiducialInfo.get(i);
+
+					if( !info.visible )
+						continue;
+
+
+					if( controls.showBoundary ) {
+						g2.setStroke(new BasicStroke(11));
+						g2.setColor(Color.BLUE);
+						VisualizeShapes.drawPolygon(info.polygon,true,scale,g2);
+					}
+
+					if( controls.showCenter ) {
+						double x = info.center.x*scale + offsetX;
+						double y = info.center.y*scale + offsetY;
+
+						VisualizeFeatures.drawPoint(g2,x,y,10,Color.MAGENTA,true);
+					}
+
+					if( controls.show3D ) {
+						double width = detector.getWidth(i);
+
+						VisualizeFiducial.drawLabelCenter(info.fidToCam, intrinsic, info.message, g2, scale);
+						VisualizeFiducial.drawCube(info.fidToCam, intrinsic, width, 5, g2, scale);
+					}
+
+					if( controls.showStability )
+						handleStability(g2,info);
+				}
+			}
+
+		}
+
+		/**
+		 * Computes and visualizes the stability
+		 */
+		private void handleStability( Graphics2D g2, FiducialInfo info ) {
+			int height = getHeight();
+
+			g2.setFont(font);
+
+			if (info.totalObserved > 20) {
+
+				double fractionLocation = info.stability.location / stabilityMax.location;
+				double fractionOrientation = info.stability.orientation / stabilityMax.orientation;
+
+				int maxHeight = (int) (height * 0.15);
+
+				int x = info.grid * 60;
+				int y = 10 + maxHeight;
+
+				g2.setColor(Color.BLUE);
+				int h = (int) (fractionLocation * maxHeight);
+				g2.fillRect(x, y - h, 20, h);
+
+				g2.setColor(Color.CYAN);
+				x += 25;
+				h = (int) (fractionOrientation * maxHeight);
+				g2.fillRect(x, y - h, 20, h);
+
+				g2.setColor(Color.RED);
+				g2.drawString(info.message, x - 20, y + 20);
+			}
+		}
+	}
+
 	class ControlPanel extends StandardAlgConfigPanel implements ActionListener {
 		private JCheckBox checkStability;
 		private JCheckBox check3D;
@@ -359,6 +387,13 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		int totalObserved;
 		long id;
 		int grid;
+		FiducialStability stability = new FiducialStability();
+		String message;
+		boolean visible;
+		Se3_F64 fidToCam = new Se3_F64();
+		Polygon2D_F64 polygon = new Polygon2D_F64();
+		Point2D_F64 center = new Point2D_F64();
+		double width;
 	}
 
 	public static void main(String[] args) {
