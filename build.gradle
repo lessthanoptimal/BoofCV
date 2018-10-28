@@ -321,11 +321,12 @@ task testReport(type: TestReport) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.4'
+    distributionType = Wrapper.DistributionType.BIN
+    gradleVersion = '4.10.2'
 }
 
 // Disable the creation of jars for distribution.  If you don't do this it will crash
-[':main',':examples',':main:checks',':main:autocode',':integration'].each {String a ->
+[':main',':main:checks',':main:autocode',':integration'].each {String a ->
     project(a) {
         if( project.hasProperty('ossrhUsername') ) {
             signArchives.enabled = false

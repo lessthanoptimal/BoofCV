@@ -26,6 +26,7 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.image.ImageZoomPanel;
+import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
@@ -298,11 +299,14 @@ public class ImageEnhanceApp extends DemonstrationBase {
 	}
 
 	public static void main(String[] args) {
-		List<String> examples = new ArrayList<>();
-		examples.add(UtilIO.pathExample("enhance/dark.jpg"));
-		examples.add(UtilIO.pathExample("enhance/dull.jpg"));
-		examples.add(UtilIO.pathExample("fiducial/qrcode/image04.jpg"));
-		examples.add(UtilIO.pathExample("tracking/night_follow_car.mjpeg"));
+		List<PathLabel> examples = new ArrayList<>();
+		examples.add(new PathLabel("dark",UtilIO.pathExample("enhance/dark.jpg")));
+		examples.add(new PathLabel("dull",UtilIO.pathExample("enhance/dull.jpg")));
+		examples.add(new PathLabel("dark qr",UtilIO.pathExample("fiducial/qrcode/image04.jpg")));
+		examples.add(new PathLabel("rubix",UtilIO.pathExample("background/rubixfire.mp4")));
+		examples.add(new PathLabel("intersection",UtilIO.pathExample("background/street_intersection.mp4")));
+		examples.add(new PathLabel("night driving",UtilIO.pathExample("tracking/night_follow_car.mjpeg")));
+
 
 		SwingUtilities.invokeLater(()->{
 			ImageEnhanceApp app = new ImageEnhanceApp(examples);
