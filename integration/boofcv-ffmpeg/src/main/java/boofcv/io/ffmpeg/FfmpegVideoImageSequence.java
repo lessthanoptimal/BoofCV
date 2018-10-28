@@ -142,7 +142,11 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 			throw new RuntimeException("Invalid: "+finished);
 		switch( url.getProtocol() ) {
 			case "file":
-				filename = url.toString().substring(6);
+				filename = url.getPath();
+				// the filename will include an extra / in windows, this is fine
+				// in Java but FFMPEG can't handle it. So this will strip off the
+				// extra character and be cross platform
+				filename = new File(filename).getAbsolutePath();
 				break;
 
 			case "jar":
