@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.qrcode;
 
 import boofcv.alg.drawing.FiducialImageEngine;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -95,7 +96,15 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 		this.borderModule = borderModule;
 	}
 
+	public FiducialImageEngine getRenderer() {
+		return renderer;
+	}
+
 	public GrayU8 getGray() {
 		return renderer.getGray();
+	}
+
+	public GrayF32 getGrayF32() {
+		return renderer.getGrayF32();
 	}
 }
