@@ -161,10 +161,14 @@ public class UtilIO {
 
 	public static InputStream openStream( String path ) {
 		try {
-			return ensureURL(path).openStream();
-		} catch (IOException e) {
-			return null;
-		}
+			URL url = ensureURL(path);
+			if( url == null ) {
+				System.err.println("Unable to open "+path);
+			} else {
+				return url.openStream();
+			}
+		} catch (IOException ignore) {}
+		return null;
 	}
 
 	public static String pathExample( String path ) {

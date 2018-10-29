@@ -56,10 +56,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -246,7 +243,11 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		}
 		controls.setShowStability(true);
 
-		intrinsic = CalibrationIO.load(media.openFile(path+"/intrinsic.yaml"));
+		Reader reader = media.openFile(new File(path,"intrinsic.yaml").getPath());
+		if( reader == null ) {
+			throw new RuntimeException("BUG! can't open "+new File(path,"intrinsic.yaml").getPath());
+		}
+		intrinsic = CalibrationIO.load(reader);
 
 		detector.setLensDistortion(new LensDistortionRadialTangential(intrinsic),intrinsic.width,intrinsic.height);
 

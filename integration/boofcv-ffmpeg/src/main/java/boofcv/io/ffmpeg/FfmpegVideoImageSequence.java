@@ -154,7 +154,7 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 				// copy the resource into a temporary file
 				try {
 					InputStream in = UtilIO.openStream(filename);
-					if( in == null ) throw new RuntimeException();
+					if( in == null ) throw new RuntimeException("Failed to open "+filename);
 					final File tempFile = File.createTempFile("boofcv_ffmpeg_", ".mp4");
 					tempFile.deleteOnExit();
 					UtilIO.copyToFile(in,tempFile);
