@@ -22,6 +22,7 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneObservations.View;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSnavely;
+import boofcv.io.UtilIO;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -40,7 +41,8 @@ public class CodecBundleAdjustmentInTheLarge {
     public SceneObservations observations;
 
     public void parse( File file ) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
+        InputStream stream = UtilIO.openStream(file.getPath());
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
         String words[] = reader.readLine().split("\\s+");
 

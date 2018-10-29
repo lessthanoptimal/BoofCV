@@ -27,7 +27,6 @@ import java.awt.image.*;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,18 +58,18 @@ public class UtilImageIO {
 	 */
 	public static List<BufferedImage> loadImages( String directory , final String regex ) {
 
-		File[] files = new File(directory).listFiles((dir, name) -> name.matches(regex));
+		List<String> paths = UtilIO.listByRegex(directory,regex);
+
 		List<BufferedImage> ret = new ArrayList<>();
 
-		if( files == null )
+		if( paths.size() == 0 )
 			return ret;
 
 		// Sort so that the order is deterministic
-		List<File> sorted = Arrays.asList(files);
-		Collections.sort(sorted);
+		Collections.sort(paths);
 
-		for( File f : sorted ) {
-			BufferedImage img = loadImage(f.getAbsolutePath());
+		for( String path : paths ) {
+			BufferedImage img = loadImage(path);
 			if( img != null )
 				ret.add( img );
 		}

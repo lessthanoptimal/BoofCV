@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,6 +37,8 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
+import java.io.File;
+
 /**
  * Bare bones example showing how to estimate the camera's ego-motion using a single camera and a known
  * plane. Additional information on the scene can be optionally extracted from the algorithm,
@@ -53,8 +55,10 @@ public class ExampleVisualOdometryMonocularPlane {
 		String directory = UtilIO.pathExample("vo/drc/");
 
 		// load camera description and the video sequence
-		MonoPlaneParameters calibration = CalibrationIO.load(media.openFile(directory + "mono_plane.yaml"));
-		SimpleImageSequence<GrayU8> video = media.openVideo(directory + "left.mjpeg", ImageType.single(GrayU8.class));
+		MonoPlaneParameters calibration = CalibrationIO.load(
+				media.openFile(new File(directory , "mono_plane.yaml").getPath()));
+		SimpleImageSequence<GrayU8> video = media.openVideo(
+				new File(directory , "left.mjpeg").getPath(), ImageType.single(GrayU8.class));
 
 		// specify how the image features are going to be tracked
 		PkltConfig configKlt = new PkltConfig();

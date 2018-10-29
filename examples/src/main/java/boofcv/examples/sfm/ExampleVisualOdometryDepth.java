@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,6 +41,7 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -58,7 +59,8 @@ public class ExampleVisualOdometryDepth {
 		String directory = UtilIO.pathExample("kinect/straight");
 
 		// load camera description and the video sequence
-		VisualDepthParameters param = CalibrationIO.load(media.openFile(directory + "visualdepth.yaml"));
+		VisualDepthParameters param = CalibrationIO.load(
+				media.openFile(new File(directory , "visualdepth.yaml").getPath()));
 
 		// specify how the image features are going to be tracked
 		PkltConfig configKlt = new PkltConfig();
@@ -80,8 +82,10 @@ public class ExampleVisualOdometryDepth {
 		visualOdometry.setCalibration(param.visualParam,new DoNothing2Transform2_F32());
 
 		// Process the video sequence and output the location plus number of inliers
-		SimpleImageSequence<GrayU8> videoVisual = media.openVideo(directory+"rgb.mjpeg", ImageType.single(GrayU8.class));
-		SimpleImageSequence<GrayU16> videoDepth = media.openVideo(directory + "depth.mpng", ImageType.single(GrayU16.class));
+		SimpleImageSequence<GrayU8> videoVisual = media.openVideo(
+				new File(directory ,"rgb.mjpeg").getPath(), ImageType.single(GrayU8.class));
+		SimpleImageSequence<GrayU16> videoDepth = media.openVideo(
+				new File(directory , "depth.mpng").getPath(), ImageType.single(GrayU16.class));
 
 		while( videoVisual.hasNext() ) {
 			GrayU8 visual = videoVisual.next();

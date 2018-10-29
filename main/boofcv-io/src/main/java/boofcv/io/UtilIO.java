@@ -507,7 +507,7 @@ public class UtilIO {
 				if( url.getProtocol().equals("file")) {
 					d = new File(url.getFile());
 				} else if( url.getProtocol().equals("jar")){
-					return listAllJar(url,prefix,suffix);
+					return listJarPrefix(url,prefix,suffix);
 				}
 			} catch( MalformedURLException ignore){}
 		}
@@ -530,6 +530,38 @@ public class UtilIO {
 		return ret;
 	}
 
+	public static List<String> listByRegex(String directory, String regex ) {
+		List<String> ret = new ArrayList<>();
+
+		File d = new File(directory);
+
+		if( !d.isDirectory() ) {
+			try {
+				URL url = new URL(directory);
+				if( url.getProtocol().equals("file")) {
+					d = new File(url.getFile());
+				} else if( url.getProtocol().equals("jar")){
+					return listJarRegex(url,regex);
+				}
+			} catch( MalformedURLException ignore){}
+		}
+		if( !d.isDirectory() )
+			throw new IllegalArgumentException("Must specify an directory. "+directory);
+
+		File files[] = d.listFiles();
+
+		for( File f : files ) {
+			if( f.isDirectory() || f.isHidden() )
+				continue;
+
+			if( f.getName().matches(regex) ) {
+				ret.add(f.getAbsolutePath());
+			}
+		}
+
+		return ret;
+	}
+
 	public static List<String> listAll(String directory ) {
 		List<String> ret = new ArrayList<>();
 
@@ -539,7 +571,7 @@ public class UtilIO {
 			if( url.getProtocol().equals("file") ) {
 				directory = url.getFile();
 			} else if( url.getProtocol().equals("jar") ) {
-				return listAllJar(url,null,null);
+				return listJarPrefix(url,null,null);
 			} else {
 				throw new RuntimeException("Not sure what to do with this url. "+url.toString());
 			}
@@ -563,7 +595,7 @@ public class UtilIO {
 		return ret;
 	}
 
-	private static List<String> listAllJar( URL url , String prefix , String suffix ) {
+	private static List<String> listJarPrefix(URL url , String prefix , String suffix ) {
 		List<String> output = new ArrayList<>();
 
 		JarFile jarfile;
@@ -583,6 +615,36 @@ public class UtilIO {
 				if( ze.getName().startsWith(targetPath) &&
 						ze.getName().length() != targetPath.length()) {
 					if( suffix == null || ze.getName().endsWith(suffix))  {
+						output.add("jar:file:"+jarfile.getName()+"!/"+ze.getName());
+					}
+				}
+			}
+
+			jarfile.close();
+			return output;
+		} catch (IOException e) {
+			return new ArrayList<>();
+		}
+	}
+
+	private static List<String> listJarRegex(URL url , String regex ) {
+		List<String> output = new ArrayList<>();
+
+		JarFile jarfile;
+		try {
+			JarURLConnection connection = (JarURLConnection)url.openConnection();
+			jarfile = connection.getJarFile();
+
+			String targetPath = connection.getEntryName()+"/";
+
+			final Enumeration e = jarfile.entries();
+			while( e.hasMoreElements() ) {
+				final ZipEntry ze = (ZipEntry) e.nextElement();
+//				System.out.println("  ze.anme="+ze.getName());
+				if( ze.getName().startsWith(targetPath) &&
+						ze.getName().length() != targetPath.length()) {
+					String shortName = ze.getName().substring(targetPath.length());
+					if( shortName.matches(regex)) {
 						output.add("jar:file:"+jarfile.getName()+"!/"+ze.getName());
 					}
 				}

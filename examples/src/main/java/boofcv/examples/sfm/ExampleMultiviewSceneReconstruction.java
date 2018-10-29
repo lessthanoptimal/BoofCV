@@ -96,7 +96,7 @@ public class ExampleMultiviewSceneReconstruction {
 		}
 
 		if( !imageMatching.process() ) {
-			throw new RuntimeException("Failed to match images!");
+			throw new RuntimeException("Failed to match images! total="+colorImages.size());
 		}
 
 		EstimateSceneCalibrated estimateScene = new EstimateSceneCalibrated();

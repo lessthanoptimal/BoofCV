@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,8 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
+import java.io.File;
+
 /**
  * Bare bones example showing how to estimate the camera's ego-motion using a stereo camera system. Additional
  * information on the scene can be optionally extracted from the algorithm if it implements AccessPointTracks3D.
@@ -54,9 +56,11 @@ public class ExampleVisualOdometryStereo {
 		String directory = UtilIO.pathExample("vo/backyard/");
 
 		// load camera description and the video sequence
-		StereoParameters stereoParam = CalibrationIO.load(media.openFile(directory + "stereo.yaml"));
-		SimpleImageSequence<GrayU8> video1 = media.openVideo(directory + "left.mjpeg", ImageType.single(GrayU8.class));
-		SimpleImageSequence<GrayU8> video2 = media.openVideo(directory+"right.mjpeg", ImageType.single(GrayU8.class));
+		StereoParameters stereoParam = CalibrationIO.load(media.openFile(new File(directory , "stereo.yaml").getPath()));
+		SimpleImageSequence<GrayU8> video1 = media.openVideo(
+				new File(directory , "left.mjpeg").getPath(), ImageType.single(GrayU8.class));
+		SimpleImageSequence<GrayU8> video2 = media.openVideo(
+				new File(directory,"right.mjpeg").getPath(), ImageType.single(GrayU8.class));
 
 		// specify how the image features are going to be tracked
 		PkltConfig configKlt = new PkltConfig();
