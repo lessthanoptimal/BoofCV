@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,7 +78,7 @@ public class CombineFilesTogether {
 	}
 
 	public static void main( String args[] ) throws IOException {
-		List<String> fileNames = UtilIO.listByPrefix("log", "depth");
+		List<String> fileNames = UtilIO.listByPrefix("log", "depth", null);
 		Collections.sort(fileNames);
 		CombineFilesTogether.combine(fileNames,"combined.mpng");
 	}

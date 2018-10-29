@@ -493,9 +493,10 @@ public class UtilIO {
 	 *
 	 * @param directory Directory it looks inside of
 	 * @param prefix Prefix that the file must have
+	 * @param suffix
 	 * @return List of files that are in the directory and match the prefix.
 	 */
-	public static List<String> listByPrefix(String directory , String prefix ) {
+	public static List<String> listByPrefix(String directory, String prefix, String suffix) {
 		List<String> ret = new ArrayList<>();
 
 		File d = new File(directory);
@@ -506,7 +507,7 @@ public class UtilIO {
 				if( url.getProtocol().equals("file")) {
 					d = new File(url.getFile());
 				} else if( url.getProtocol().equals("jar")){
-					return listAllJar(url,prefix,null);
+					return listAllJar(url,prefix,suffix);
 				}
 			} catch( MalformedURLException ignore){}
 		}
@@ -519,8 +520,10 @@ public class UtilIO {
 			if( f.isDirectory() || f.isHidden() )
 				continue;
 
-			if( f.getName().contains(prefix )) {
-				ret.add(f.getAbsolutePath());
+			if( prefix == null || f.getName().startsWith(prefix )) {
+				if( suffix ==null || f.getName().endsWith(suffix)) {
+					ret.add(f.getAbsolutePath());
+				}
 			}
 		}
 
@@ -607,12 +610,7 @@ public class UtilIO {
 	 */
 	public static File[] findMatches( File directory , String regex ) {
 		final Pattern p = Pattern.compile(regex); // careful: could also throw an exception!
-		return directory.listFiles(new FileFilter(){
-			@Override
-			public boolean accept(File file) {
-				return p.matcher(file.getName()).matches();
-			}
-		});
+		return directory.listFiles(file -> p.matcher(file.getName()).matches());
 	}
 
 	public static boolean validURL( URL url ) {

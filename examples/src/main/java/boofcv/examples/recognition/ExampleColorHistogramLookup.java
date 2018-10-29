@@ -41,7 +41,10 @@ import org.ddogleg.struct.FastQueue;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Demonstration of how to find similar images using color histograms.  Image color histograms here are treated as
@@ -64,14 +67,14 @@ public class ExampleColorHistogramLookup {
 	 * HSV stores color information in Hue and Saturation while intensity is in Value.  This computes a 2D histogram
 	 * from hue and saturation only, which makes it lighting independent.
 	 */
-	public static List<double[]> coupledHueSat( List<File> images  ) {
+	public static List<double[]> coupledHueSat( List<String> images  ) {
 		List<double[]> points = new ArrayList<>();
 
 		Planar<GrayF32> rgb = new Planar<>(GrayF32.class,1,1,3);
 		Planar<GrayF32> hsv = new Planar<>(GrayF32.class,1,1,3);
 
-		for( File f : images ) {
-			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
+		for( String path : images ) {
+			BufferedImage buffered = UtilImageIO.loadImage(path);
 			if( buffered == null ) throw new RuntimeException("Can't load image!");
 
 			rgb.reshape(buffered.getWidth(), buffered.getHeight());
@@ -199,7 +202,7 @@ public class ExampleColorHistogramLookup {
 	public static void main(String[] args) {
 
 		String imagePath = UtilIO.pathExample("recognition/vacation");
-		List<File> images = Arrays.asList(UtilIO.findMatches(new File(imagePath),"\\w*.jpg"));
+		List<String> images = UtilIO.listByPrefix(imagePath,null,".jpg");
 		Collections.sort(images);
 
 		// Different color spaces you can try
@@ -228,27 +231,24 @@ public class ExampleColorHistogramLookup {
 		ListDisplayPanel gui = new ListDisplayPanel();
 
 		// Add the target which the other images are being matched against
-		gui.addImage(UtilImageIO.loadImage(images.get(target).getPath()), "Target", ScaleOptions.ALL);
+		gui.addImage(UtilImageIO.loadImage(images.get(target)), "Target", ScaleOptions.ALL);
 
 		// The results will be the 10 best matches, but their order can be arbitrary.  For display purposes
 		// it's better to do it from best fit to worst fit
-		Collections.sort(results.toList(), new Comparator<NnData>() {
-			@Override
-			public int compare(NnData o1, NnData o2) {
-				if( o1.distance < o2.distance)
-					return -1;
-				else if( o1.distance > o2.distance )
-					return 1;
-				else
-					return 0;
-			}
+		Collections.sort(results.toList(), (Comparator<NnData>) (o1, o2) -> {
+			if( o1.distance < o2.distance)
+				return -1;
+			else if( o1.distance > o2.distance )
+				return 1;
+			else
+				return 0;
 		});
 
 		// Add images to GUI -- first match is always the target image, so skip it
 		for (int i = 1; i < results.size; i++) {
-			File file = images.get(results.get(i).index);
+			String file = images.get(results.get(i).index);
 			double error = results.get(i).distance;
-			BufferedImage image = UtilImageIO.loadImage(file.getPath());
+			BufferedImage image = UtilImageIO.loadImage(file);
 			gui.addImage(image, String.format("Error %6.3f", error), ScaleOptions.ALL);
 		}
 

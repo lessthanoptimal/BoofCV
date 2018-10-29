@@ -69,7 +69,7 @@ public class ExampleCalibrateMonocular {
 
 		// Chessboard Example
 		detector = FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));
-		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"),"left");
+		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"),"left", null);
 
 		// Declare and setup the calibration algorithm
 		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());

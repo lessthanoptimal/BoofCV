@@ -197,7 +197,7 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 
 		List<String> images;
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square"),"frame");
-		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess"),"frame");
+		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess"),"frame", null);
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleHexagonal"),"image");
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang"),"CalibIm");
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration//stereo/Bumblebee2_Square"),"left");
