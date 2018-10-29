@@ -30,7 +30,6 @@ import org.bytedeco.copiedstuff.Java2DFrameConverter;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -67,7 +66,7 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 		converter = new Java2DFrameConverter();
 		reset();
 		if( finished )
-			throw new RuntimeException("FFMPEG failed to open file");
+			throw new RuntimeException("FFMPEG failed to open file. "+filename);
 	}
 
 	@Override
@@ -141,27 +140,30 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 		URL url = UtilIO.ensureURL(filename);
 		if( url == null )
 			throw new RuntimeException("Invalid: "+finished);
-		if( !url.getProtocol().equals("file")) {
-			System.out.println("Copying the file from the jar to work around ffmpeg");
-			// copy the resource into a temporary file
-			try {
-				InputStream in = UtilIO.openStream(filename);
-				if( in == null ) throw new RuntimeException();
-				final File tempFile = File.createTempFile("demo", ".mp4");
-				tempFile.deleteOnExit();
-				FileOutputStream out = new FileOutputStream(tempFile);
-				byte buffer[] = new byte[1024*1024];
-				while( in.available() > 0 ) {
-					int amount = in.read(buffer,0,buffer.length);
-					out.write(buffer,0,amount);
+		switch( url.getProtocol() ) {
+			case "file":
+				filename = url.getPath();
+				// the filename will include an extra / in windows, this is fine
+				// in Java but FFMPEG can't handle it. So this will strip off the
+				// extra character and be cross platform
+				filename = new File(filename).getAbsolutePath();
+				break;
+
+			case "jar":
+				System.out.println("Copying the file from the jar to work around ffmpeg");
+				// copy the resource into a temporary file
+				try {
+					InputStream in = UtilIO.openStream(filename);
+					if( in == null ) throw new RuntimeException();
+					final File tempFile = File.createTempFile("boofcv_ffmpeg_", ".mp4");
+					tempFile.deleteOnExit();
+					UtilIO.copyToFile(in,tempFile);
+					filename = tempFile.getAbsolutePath();
+				} catch( IOException e ) {
+					e.printStackTrace();
+					throw new RuntimeException(e);
 				}
-				out.close();
-				in.close();
-				filename = tempFile.getAbsolutePath();
-			} catch( IOException e ) {
-				e.printStackTrace();
-				throw new RuntimeException(e);
-			}
+				break;
 		}
 
 		this.frameGrabber = new FFmpegFrameGrabber(filename);
@@ -170,7 +172,7 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 			finished = false;
 			frameGrabber.start();
 		} catch (FrameGrabber.Exception e) {
-//			e.printStackTrace();
+			e.printStackTrace();
 			finished = true;
 			return;
 		}

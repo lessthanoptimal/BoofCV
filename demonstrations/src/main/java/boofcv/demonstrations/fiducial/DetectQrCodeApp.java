@@ -504,10 +504,12 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		examples.add(UtilIO.pathExample("fiducial/qrcode/image04.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/qrcode/movie.mp4"));
 
-		DetectQrCodeApp app = new DetectQrCodeApp(examples,GrayF32.class);
+		SwingUtilities.invokeLater(()->{
+			DetectQrCodeApp app = new DetectQrCodeApp(examples,GrayF32.class);
 
-		app.openExample(examples.get(0));
-		app.display("QR-Code Detector");
+			app.openExample(examples.get(0));
+			app.display("QR-Code Detector");
+		});
 	}
 
 

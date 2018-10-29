@@ -33,6 +33,7 @@ import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -122,9 +123,11 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 		}
 		examples.add(UtilIO.pathExample("fiducial/square_grid/movie.mp4"));
 
-		DetectCalibrationSquareGridApp app = new DetectCalibrationSquareGridApp(4, 3, 1,1,false,examples);
+		SwingUtilities.invokeLater(()-> {
+			DetectCalibrationSquareGridApp app = new DetectCalibrationSquareGridApp(4, 3, 1, 1, false, examples);
 
-		app.openFile(new File(examples.get(0)));
-		app.display("Square Grid Detector");
+			app.openFile(new File(examples.get(0)));
+			app.display("Square Grid Detector");
+		});
 	}
 }

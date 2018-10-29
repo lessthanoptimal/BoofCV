@@ -48,6 +48,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.ddogleg.struct.FastQueue;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -160,10 +161,12 @@ public class VisualizeSquareFiducial {
 //		String directory = UtilIO.pathExample("fiducial/binary");
 //		String directory = UtilIO.pathExample("fiducial/image");
 
-		VisualizeSquareFiducial app = new VisualizeSquareFiducial();
+		SwingUtilities.invokeLater(()-> {
+			VisualizeSquareFiducial app = new VisualizeSquareFiducial();
 
-		app.process(UtilIO.pathExample("fiducial/image/examples/image01.jpg"),null);
+			app.process(UtilIO.pathExample("fiducial/image/examples/image01.jpg"), null);
 //		app.process(directory+"/image0001.jpg",directory+"/intrinsic.yaml");
 //		app.process(directory+"/image0002.jpg",directory+"/intrinsic.yaml");
+		});
 	}
 }

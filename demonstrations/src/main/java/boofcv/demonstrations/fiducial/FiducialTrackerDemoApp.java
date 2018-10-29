@@ -410,10 +410,10 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		inputs.add(new PathLabel(CALIB_CIRCLE_HEXAGONAL_GRID, UtilIO.pathExample("fiducial/circle_hexagonal/movie.mp4")));
 		inputs.add(new PathLabel(CALIB_CIRCLE_REGULAR_GRID, UtilIO.pathExample("fiducial/circle_regular/movie.mp4")));
 
-
-		FiducialTrackerDemoApp app = new FiducialTrackerDemoApp(inputs,type);
-
-		app.openExample(inputs.get(0));
-		app.display("Fiducial Demonstrations");
+		SwingUtilities.invokeLater(()-> {
+			FiducialTrackerDemoApp app = new FiducialTrackerDemoApp(inputs, type);
+			app.openExample(inputs.get(0));
+			app.display("Fiducial Demonstrations");
+		});
 	}
 }

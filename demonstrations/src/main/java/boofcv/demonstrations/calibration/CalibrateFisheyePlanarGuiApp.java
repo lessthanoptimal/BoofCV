@@ -174,15 +174,17 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/chessboard"));
 //		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/square_grid"));
 
-		CalibrateFisheyePlanarGuiApp app = new CalibrateFisheyePlanarGuiApp();
-		app.configure(detector,images).configureUniversalOmni(true,2,false);
+		SwingUtilities.invokeLater(()-> {
+			CalibrateFisheyePlanarGuiApp app = new CalibrateFisheyePlanarGuiApp();
+			app.configure(detector, images).configureUniversalOmni(true, 2, false);
 
-		JFrame frame = new JFrame("Fisheye Calibration with Planar Targets");
-		frame.add(app, BorderLayout.CENTER);
-		frame.pack();
-		frame.setVisible(true);
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+			JFrame frame = new JFrame("Fisheye Calibration with Planar Targets");
+			frame.add(app, BorderLayout.CENTER);
+			frame.pack();
+			frame.setVisible(true);
+			frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-		app.process("intrinsic.yaml");
+			new Thread(() -> app.process("intrinsic.yaml")).start();
+		});
 	}
 }
