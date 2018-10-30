@@ -12,8 +12,8 @@ Version : 0.32
   * Updated detect line demo
   * Updated image enhance demo
   * TODO fix os x touch pad zoom
-- Added 3D Qr Code where you can estimate its 6-DOF pose
-- Changed Fiducial stability calculation to use 4 synthetic corners always to improve speed
+- Added 3D QR Code where you can estimate its 6-DOF pose
+- Changed Fiducial stability calculation to use 4 synthetic corners as way to improve speed
 
 TODO Attempt trifocal tensor based stereo
 

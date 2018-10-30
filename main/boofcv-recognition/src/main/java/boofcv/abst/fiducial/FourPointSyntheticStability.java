@@ -33,10 +33,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Computes the stability a marker by using four corners that form
- * a bounding box around the marker. This is intended to simulate
- * its sensitivity in the real world without requiring a ton
- * of computations if there are many control points.
+ * Computes the stability for a fiducial using 4 synthetic corners that are position based on the fiducial's
+ * width and height given the current estimated marker to camera transform. The 4 corners are placed symmetrically
+ * around the marker's origin at (-w/2,-h/2) (-w/2,h/2) (w/2,h/2) (w/2,-h/2). Stability is computed by varying
+ * the projected corners in pixel coordinates then recomputing the camera to fiducial pose and seeing how much
+ * it has changed.
  *
  * @author Peter Abeles
  */
@@ -52,7 +53,7 @@ public class FourPointSyntheticStability {
 	protected Point2Transform2_F64 pixelToNorm;
 	protected Point2Transform2_F64 normToPixel;
 
-	// Used to esetimate
+	// Used to estimate target to camera pose
 	private Estimate1ofPnP estimatePnP = FactoryMultiView.pnp_1(EnumPNP.IPPE,-1,-1);
 
 	Se3_F64 referenceCameraToTarget = new Se3_F64();
@@ -61,7 +62,9 @@ public class FourPointSyntheticStability {
 
 	Rodrigues_F64 rodrigues = new Rodrigues_F64();
 
+	// maximum difference in orientation found in radians
 	double maxOrientation = 0;
+	// maxium change in location that was found
 	double maxLocation = 0;
 
 	public FourPointSyntheticStability() {
@@ -72,6 +75,11 @@ public class FourPointSyntheticStability {
 		}
 	}
 
+	/**
+	 * Specifies how to convert to and from pixels
+	 * @param pixelToNorm
+	 * @param normToPixel
+	 */
 	public void setTransforms( Point2Transform2_F64 pixelToNorm ,
 							   Point2Transform2_F64 normToPixel )
 	{
@@ -79,6 +87,11 @@ public class FourPointSyntheticStability {
 		this.normToPixel = normToPixel;
 	}
 
+	/**
+	 * Specifes how big the fiducial is along two axises
+	 * @param width Length along x-axis
+	 * @param height Length along y-axis
+	 */
 	public void setShape(double width , double height ) {
 		points2D3D.get(0).location.set(-width/2,-height/2,0);
 		points2D3D.get(1).location.set(-width/2, height/2,0);
@@ -86,9 +99,16 @@ public class FourPointSyntheticStability {
 		points2D3D.get(3).location.set( width/2,-height/2,0);
 	}
 
-	public boolean computeStability(Se3_F64 targetToCamera ,
-									double disturbance,
-									FiducialStability results) {
+	/**
+	 * Estimate how sensitive this observation is to pixel noise
+	 * @param targetToCamera Observed target to camera pose estimate
+	 * @param disturbance How much the observation should be noised up, in pixels
+	 * @param results description how how sensitive the stability estimate is
+	 * @return true if stability could be computed
+	 */
+	public void computeStability(Se3_F64 targetToCamera ,
+								 double disturbance,
+								 FiducialStability results) {
 
 		targetToCamera.invert(referenceCameraToTarget);
 
@@ -117,10 +137,15 @@ public class FourPointSyntheticStability {
 
 		results.location = maxLocation;
 		results.orientation = maxOrientation;
-
-		return true;
 	}
 
+	/**
+	 * Perturb the observation in 4 different ways
+	 *
+	 * @param disturbance distance of pixel the observed point will be offset by
+	 * @param pixel observed pixel
+	 * @param p23 observation plugged into PnP
+	 */
 	private void perturb(double disturbance , Point2D_F64 pixel , Point2D3D p23 ) {
 		double x;
 		double y = pixel.y;

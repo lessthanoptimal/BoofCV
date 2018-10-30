@@ -18,16 +18,60 @@
 
 package boofcv.abst.fiducial;
 
+import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
+import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.distort.Point2Transform2_F64;
+import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestFourPointSyntheticStability {
+
+	CameraPinholeRadial intrinsic = new CameraPinholeRadial(300,300,0,300,300,600,600).fsetRadial(0.2,0.01);
+
+
+	/**
+	 * Try a few different known scenarios
+	 */
 	@Test
-	public void foo() {
-		fail("Implement");
+	void basic() {
+		Point2Transform2_F64 p2n = new LensDistortionRadialTangential(intrinsic).undistort_F64(true,false);
+		Point2Transform2_F64 n2p = new LensDistortionRadialTangential(intrinsic).distort_F64(false,true);
+
+		FourPointSyntheticStability alg = new FourPointSyntheticStability();
+
+		alg.setShape(0.2,0.2);
+		alg.setTransforms(p2n,n2p);
+
+		Se3_F64 f2c0 = SpecialEuclideanOps_F64.eulerXyz(0,0,1,0,0,0,null);
+		Se3_F64 f2c1 = SpecialEuclideanOps_F64.eulerXyz(0,0,3,0,0,0,null);
+		Se3_F64 f2c2 = SpecialEuclideanOps_F64.eulerXyz(0,0,1,0,0.5,0,null);
+
+		FiducialStability found0 = new FiducialStability();
+		FiducialStability found1 = new FiducialStability();
+		FiducialStability found2 = new FiducialStability();
+
+		alg.computeStability(f2c0,1,found0);
+		alg.computeStability(f2c1,1,found1);
+		alg.computeStability(f2c2,1,found2);
+
+		// farther away, errors result in large pose errors
+		assertTrue(found0.location*1.1 < found1.location);
+		assertTrue(found0.orientation*1.1 < found1.orientation);
+
+		// when viewed at an angle a small change results in a large change in pose, meaning its easier to estimate
+		// when viewed head on a small change in pixel results in a similar pose making it insensitive to changes
+		assertTrue(found0.location > 1.1*found2.location);
+		assertTrue(found0.orientation  > 1.1*found2.orientation);
+
+		// larger disturbance larger error
+		alg.computeStability(f2c0,2,found1);
+		assertTrue(found0.location*1.1 < found1.location);
+		assertTrue(found0.orientation*1.1 < found1.orientation);
 	}
 }

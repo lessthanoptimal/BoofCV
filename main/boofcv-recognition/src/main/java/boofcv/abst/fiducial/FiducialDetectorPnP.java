@@ -103,7 +103,8 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 
 		stability.setShape(getSideWidth(which), getSideHeight(which));
 
-		return( stability.computeStability(targetToCamera,disturbance,results));
+		stability.computeStability(targetToCamera,disturbance,results);
+		return true;
 	}
 
 	@Override
