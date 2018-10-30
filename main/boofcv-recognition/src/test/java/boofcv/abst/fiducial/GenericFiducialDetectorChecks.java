@@ -309,7 +309,7 @@ public abstract class GenericFiducialDetectorChecks {
 	}
 
 	@Test
-	public void checkImageLocation() {
+	public void checkCenter() {
 		for( ImageType type : types ) {
 
 			ImageBase image = loadImage(type);

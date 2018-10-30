@@ -23,7 +23,7 @@ import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import georegression.geometry.UtilPolygons2D_F64;
+import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
@@ -134,7 +134,16 @@ public class QrCodeDetectorPnP<T extends ImageGray<T>> extends FiducialDetectorP
 
 	@Override
 	public void getCenter(int which, Point2D_F64 location) {
-		UtilPolygons2D_F64.vertexAverage(detector.getDetections().get(which).bounds,location);
+		// use intersections being invariant under perspective distoriton
+		QrCode qr = detector.getDetections().get(which);
+
+		// find the intersection of two lines which are closer to the origin to reduce error
+		Intersection2D_F64.intersection(
+				qr.ppDown.get(0),qr.ppDown.get(1),
+				qr.ppRight.get(0),qr.ppRight.get(3),location);
+
+		// need one more intersection. again pick corners close to center
+		Intersection2D_F64.intersection(qr.ppCorner.get(2),location,qr.ppDown.get(1),qr.ppRight.get(3),location);
 	}
 
 	@Override
