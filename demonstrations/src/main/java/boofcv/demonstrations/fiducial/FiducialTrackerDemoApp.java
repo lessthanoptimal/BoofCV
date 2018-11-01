@@ -297,7 +297,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 						double width = detector.getWidth(i);
 
 						VisualizeFiducial.drawLabelCenter(info.fidToCam, intrinsic, info.message, g2, scale);
-						VisualizeFiducial.drawCube(info.fidToCam, intrinsic, width, 5, g2, scale);
+						VisualizeFiducial.drawCube(info.fidToCam, intrinsic, width, 0.5, 5, g2, scale);
 					}
 
 					if( controls.showStability )

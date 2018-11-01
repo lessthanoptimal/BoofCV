@@ -76,7 +76,7 @@ public class VisualizeFiducial {
 	public static void drawCube(Se3_F64 targetToCamera, CameraPinholeRadial intrinsic, double width,
 								int lineThickness, Graphics2D g2)
 	{
-		drawCube(targetToCamera, intrinsic, width, lineThickness, g2,1);
+		drawCube(targetToCamera, intrinsic, width, 0.5, lineThickness, g2,1);
 	}
 
 	/**
@@ -84,13 +84,13 @@ public class VisualizeFiducial {
 	 *
 	 */
 	public static void drawCube(Se3_F64 targetToCamera, CameraPinholeRadial intrinsic, double width,
-								int lineThickness, Graphics2D g2, double scale )
+								double heightScale, int lineThickness, Graphics2D g2, double scale)
 	{
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		double r = width/2.0;
-		double h = r;
+		double h = width*heightScale;
 
 		Point3D_F64 corners[] = new Point3D_F64[8];
 		corners[0] = new Point3D_F64(-r,-r,0);
