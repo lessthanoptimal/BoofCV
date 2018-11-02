@@ -23,6 +23,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
+import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
@@ -182,7 +183,9 @@ public class CalibrationPlanarGridZhang99 {
 								   UnconstrainedLeastSquares optimizer )
 	{
 		if( optimizer == null ) {
-			optimizer = FactoryOptimization.levenbergMarquardt(null,true);
+			ConfigLevenbergMarquardt config = new ConfigLevenbergMarquardt();
+			config.mixture = 0;
+			optimizer = FactoryOptimization.levenbergMarquardt(config,true);
 		}
 
 		double model[] = new double[ initial.numParameters() ];
