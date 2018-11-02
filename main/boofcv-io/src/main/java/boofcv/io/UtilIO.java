@@ -398,6 +398,10 @@ public class UtilIO {
 				path =  new File(pathToBase,"examples/src/main/java/").getAbsolutePath();
 			else if(pkg.contains("demonstrations"))
 				path =  new File(pathToBase,"demonstrations/src/main/java/").getAbsolutePath();
+			else {
+				System.err.println("pkg must be to examples or demonstrations. " + pkg);
+				return path;
+			}
 			String pathToCode = pkg.replace('.','/') + "/" + app + ".java";
 			return new File(path,pathToCode).getPath();
 		} else {
@@ -417,7 +421,7 @@ public class UtilIO {
 
 		String base;
 		if( BoofVersion.VERSION.contains("SNAPSHOT")) {
-			base = "https://github.com/lessthanoptimal/BoofCV/tree/" + BoofVersion.GIT_SHA + "/";
+			base = "https://github.com/lessthanoptimal/BoofCV/blob/" + BoofVersion.GIT_SHA + "/";
 		} else {
 			base = "https://github.com/lessthanoptimal/BoofCV/blob/v" + BoofVersion.VERSION + "/";
 		}

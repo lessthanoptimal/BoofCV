@@ -19,7 +19,6 @@ TODO Attempt trifocal tensor based stereo
 
 TODO Remove dependency on OpenCV in Applications to reduce file size
 TODO Create GUI for running any application
-TODO Create installer for applications
 
 - TODO Self calibration
    - scene reconstruction
