@@ -244,11 +244,11 @@ public class SelfCalibrationLinearRotationMulti {
 	}
 
 	/**
-	 * Converts W into a pinhole camera model by inverting W
-	 * and extracting the non-zero elements
+	 * Converts W into a pinhole camera model by finding the cholesky decomposition
 	 */
 	void convertW( Homography2D_F64 w , CameraPinhole c ) {
-		CommonOps_DDF3.invert(w,K); // TODO NOT INVERT BUT CHOLESKY
+		K.set(w);
+		CommonOps_DDF3.cholU(K);
 		CommonOps_DDF3.divide(K,K.a33);
 		c.fx = K.a11;
 		c.fy = K.a22;
