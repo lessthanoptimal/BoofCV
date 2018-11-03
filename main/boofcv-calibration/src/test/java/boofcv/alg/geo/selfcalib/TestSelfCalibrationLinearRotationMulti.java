@@ -27,7 +27,47 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class TestSelfCalibrationLinearRotationMulti {
 	@Test
-	public void foo() {
+	public void perfect_sk() {
+		fail("Implement");
+	}
+
+	@Test
+	public void perfect_pz() {
+		fail("Implement");
+	}
+
+	@Test
+	public void perfect_pz_ka() {
+		fail("Implement");
+	}
+
+	@Test
+	public void perfect_zk_pz_ka() {
+		fail("Implement");
+	}
+
+	@Test
+	public void numberOfConstraints() {
+		fail("Implement");
+	}
+
+	@Test
+	public void extractReferenceCalibration() {
+		fail("Implement");
+	}
+
+	@Test
+	public void convertW() {
+		fail("Implement");
+	}
+
+	@Test
+	public void extractCalibration() {
+		fail("Implement");
+	}
+
+	@Test
+	public void computeInverseH() {
 		fail("Implement");
 	}
 }
