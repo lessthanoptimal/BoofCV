@@ -54,7 +54,7 @@ public class InterleavedU8 extends InterleavedI8<InterleavedU8> {
 	 * @return 32 bit integer
 	 */
 	public int get32( int x , int y ) {
-		int i = y*stride+x*4;
+		int i = startIndex + y*stride+x*4;
 		return ((data[i]&0xFF) << 24) | ((data[i+1]&0xFF) << 16) | ((data[i+2]&0xFF) << 8) | (data[i+3]&0xFF);
 	}
 
@@ -66,19 +66,19 @@ public class InterleavedU8 extends InterleavedI8<InterleavedU8> {
 	 * @return 32 bit integer
 	 */
 	public int get24( int x , int y ) {
-		int i = y*stride+x*3;
+		int i = startIndex + y*stride+x*3;
 		return ((data[i]&0xFF) << 16) | ((data[i+1]&0xFF) << 8) | (data[i+2]&0xFF);
 	}
 
 	public void set24( int x , int y , int value ) {
-		int i = y*stride+x*3;
+		int i = startIndex + y*stride+x*3;
 		data[i++] = (byte)(value>>>16);
 		data[i++] = (byte)(value>>>8);
 		data[i]   = (byte)value;
 	}
 
 	public void set32( int x , int y , int value ) {
-		int i = y*stride+x*4;
+		int i = startIndex + y*stride+x*4;
 		data[i++] = (byte)(value>>>24);
 		data[i++] = (byte)(value>>>16);
 		data[i++] = (byte)(value>>>8);

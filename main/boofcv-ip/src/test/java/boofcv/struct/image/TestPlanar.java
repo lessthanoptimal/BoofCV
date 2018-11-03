@@ -245,4 +245,83 @@ public class TestPlanar {
 			assertEquals(10, img.getBand(i).height);
 		}
 	}
+
+	@Test
+	public void get24u8() {
+		Planar<GrayU8> img = new Planar<>(GrayU8.class,2,3,3);
+		img.getBand(0).set(0,1,233);
+		img.getBand(1).set(0,1,16);
+		img.getBand(2).set(0,1,128);
+		img.getBand(0).set(1,1,16);
+		img.getBand(1).set(1,1,0);
+		img.getBand(2).set(1,1,200);
+
+		int expected0 = (233<<16) | (16<<8) | (128);
+		int expected1 = (16<<16) | (0<<8) | (200);
+
+		assertEquals(expected0,img.get24u8(0,1));
+		assertEquals(expected1,img.get24u8(1,1));
+	}
+
+	@Test
+	public void get32u8() {
+		Planar<GrayU8> img = new Planar<>(GrayU8.class,2,3,4);
+		img.getBand(0).set(0,1,208);
+		img.getBand(1).set(0,1,233);
+		img.getBand(2).set(0,1,16);
+		img.getBand(3).set(0,1,128);
+
+		img.getBand(0).set(1,1,217);
+		img.getBand(1).set(1,1,16);
+		img.getBand(2).set(1,1,0);
+		img.getBand(3).set(1,1,200);
+
+		int expected0 = (208<<24) | (233<<16) | (16<<8) | (128);
+		int expected1 = (217<<24) | (16<<16)  | (0<<8)  | (200);
+
+		assertEquals(expected0,img.get32u8(0,1));
+		assertEquals(expected1,img.get32u8(1,1));
+	}
+
+	@Test
+	public void set32u8() {
+		Planar<GrayU8> img = new Planar<>(GrayU8.class,2,3,5);
+
+		int expected0 = (208<<24) | (233<<16) | (16<<8) | (128);
+		int expected1 = (217<<24) | (16<<16)  | (0<<8)  | (200);
+
+		img.set32u8(0,1,expected0);
+		img.set32u8(1,1,expected1);
+
+		assertEquals(208,img.getBand(0).get(0,1));
+		assertEquals(233,img.getBand(1).get(0,1));
+		assertEquals(16,img.getBand(2).get(0,1));
+		assertEquals(128,img.getBand(3).get(0,1));
+
+
+		assertEquals(217,img.getBand(0).get(1,1));
+		assertEquals(16,img.getBand(1).get(1,1));
+		assertEquals(0,img.getBand(2).get(1,1));
+		assertEquals(200,img.getBand(3).get(1,1));
+	}
+
+	@Test
+	public void set24u8() {
+		Planar<GrayU8> img = new Planar<>(GrayU8.class,2,3,3);
+
+		int expected0 = (233<<16) | (16<<8) | (128);
+		int expected1 = (16<<16)  | (0<<8)  | (200);
+
+		img.set24u8(0,1,expected0);
+		img.set24u8(1,1,expected1);
+
+		assertEquals(233,img.getBand(0).get(0,1));
+		assertEquals(16,img.getBand(1).get(0,1));
+		assertEquals(128,img.getBand(2).get(0,1));
+
+
+		assertEquals(16,img.getBand(0).get(1,1));
+		assertEquals(0,img.getBand(1).get(1,1));
+		assertEquals(200,img.getBand(2).get(1,1));
+	}
 }
