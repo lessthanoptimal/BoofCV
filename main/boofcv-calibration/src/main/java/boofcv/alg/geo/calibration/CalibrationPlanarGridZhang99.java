@@ -201,13 +201,13 @@ public class CalibrationPlanarGridZhang99 {
 
 //		System.out.println("Error before = "+optimizer.getFunctionValue());
 
-		for( int i = 0; i < 500; i++ ) {
+		for( int i = 0; i < 200; i++ ) {
 //			System.out.println("i = "+i);
 			if( optimizer.iterate() ) {
 				break;
-			} else {
-				if( i % 25 == 0 )
-					status("Progress "+(100*i/500.0)+"%");
+//			} else {
+//				if( i % 25 == 0 )
+//					status("Progress "+(100*i/500.0)+"%");
 			}
 		}
 

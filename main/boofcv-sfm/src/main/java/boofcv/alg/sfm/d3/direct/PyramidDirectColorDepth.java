@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import boofcv.struct.pyramid.ImagePyramid;
-import georegression.metric.UtilAngle;
 import georegression.struct.se.Se3_F32;
 
 /**
@@ -101,7 +100,7 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 			if( estimateMotion( input ) ) {
 				boolean keyframeTriggered = false;
 
-				System.out.printf("   d %6.2f  f %6.2f\n",UtilAngle.degree(diversity),fractionInBounds);
+//				System.out.printf("   d %6.2f  f %6.2f\n",UtilAngle.degree(diversity),fractionInBounds);
 
 //				System.out.println("  spartial density "+(diversity*fractionInBounds));
 				if( diversity < keyframeDiversity*diversityThreshold) {

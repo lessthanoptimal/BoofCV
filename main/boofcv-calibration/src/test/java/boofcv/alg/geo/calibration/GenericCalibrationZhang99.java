@@ -50,7 +50,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel>
 	public void fullTest( boolean partial ) {
 		List<Point2D_F64> grid = GenericCalibrationGrid.standardLayout();
 		for( Zhang99IntrinsicParam intrinsic : createParameters(rand) ) {
-			System.out.println("Full Test : partial = "+partial);
+//			System.out.println("Full Test : partial = "+partial);
 
 			Zhang99AllParam expected = GenericCalibrationGrid.createStandardParam(intrinsic, 15, rand);
 			List<CalibrationObservation> observations = GenericCalibrationGrid.createObservations(expected, grid);
