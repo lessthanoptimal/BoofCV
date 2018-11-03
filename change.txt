@@ -14,6 +14,8 @@ Version : 0.32
   * TODO fix os x touch pad zoom
 - Added 3D QR Code where you can estimate its 6-DOF pose
 - Changed Fiducial stability calculation to use 4 synthetic corners as way to improve speed
+- InterleavedU8
+  * Added set32/get32 and set24/get24
 
 TODO Attempt trifocal tensor based stereo
 
