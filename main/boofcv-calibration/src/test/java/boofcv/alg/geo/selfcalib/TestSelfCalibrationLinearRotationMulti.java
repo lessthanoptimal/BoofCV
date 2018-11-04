@@ -58,12 +58,12 @@ public class TestSelfCalibrationLinearRotationMulti {
 
 	@Test
 	public void convertW() {
-		fail("Implement");
+		fail("Implement"); // TODO first
 	}
 
 	@Test
 	public void extractCalibration() {
-		fail("Implement");
+		fail("Implement"); // TODO second
 	}
 
 	@Test

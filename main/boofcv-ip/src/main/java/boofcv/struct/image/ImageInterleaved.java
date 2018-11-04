@@ -143,10 +143,8 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	@SuppressWarnings({"SuspiciousSystemArraycopy"})
 	@Override
 	public void setTo(T orig) {
-		if (orig.width != width || orig.height != height)
-			reshape(orig.width,orig.height);
-		if (orig.numBands != numBands)
-			throw new IllegalArgumentException("The two images have different number of bands");
+		if (orig.width != width || orig.height != height || orig.numBands != numBands )
+			reshape(orig.width,orig.height,orig.numBands);
 
 		if (!orig.isSubimage() && !isSubimage()) {
 			System.arraycopy(orig._getData(), orig.startIndex, _getData(), startIndex, stride * height);

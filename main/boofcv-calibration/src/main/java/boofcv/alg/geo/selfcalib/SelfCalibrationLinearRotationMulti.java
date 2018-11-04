@@ -26,6 +26,7 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.fixed.CommonOps_DDF3;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.SingularOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
@@ -42,15 +43,6 @@ import java.util.List;
  * 1) Compute homographies between view i and reference frame, i.e. x<sup>i</sup> = H<sup>i</sup>x, ensure det(H)=1
  * 2) Uses equation w<sup>i</sup>=(H<sup>i</sup>)<sup>-T</sup>w(<sup>i</sup>)<sup>-1</sup> to express linear constraints
  * 3) Compute K using Cholesky decomposition w = U*U<sup>T</sup>. Actually implemented as an algebraic formula.
- * </pre>
- *
- * Sage Math code for symbolic manipulations
- * <pre>
- *  H = matrix(SR, 3, 3, var('H11,H12,H13,H21,H22,H23,H31,H32,H33'))
- *  var('W11,W12,W13,W22,W23,W33')
- *  W = matrix(SR, 3, 3, [W11,W12,W13,W12,W22,W23,W13,W23,W33])
- *  a=H.transpose()*W*H
- *  a[0,1].expand()
  * </pre>
  *
  * <ol>
@@ -84,6 +76,9 @@ public class SelfCalibrationLinearRotationMulti {
 	Matrix3x3_F64 tmp = new Matrix3x3_F64();
 
 	GrowQueue_I32 notZeros = new GrowQueue_I32();
+
+	// storage for null vector
+	DMatrixRMaj nv = new DMatrixRMaj(1,1);
 
 	FastQueue<Homography2D_F64> listHInv = new FastQueue<>(Homography2D_F64.class,true);
 
@@ -143,7 +138,7 @@ public class SelfCalibrationLinearRotationMulti {
 		// remove columns from A which are zero
 		for (int i = 5; i >= 0; i--) {
 			if( !notZeros.contains(i))
-				removeColumn(A,i);
+				CommonOps_DDRM.removeColumns(A,i,i);
 		}
 
 		// Compute the SVD for its null space
@@ -151,7 +146,8 @@ public class SelfCalibrationLinearRotationMulti {
 			return GeometricResult.SOLVE_FAILED;
 		}
 
-		extractReferenceCalibration();
+		SingularOps_DDRM.nullVector(svd,true,nv);
+		extractReferenceCalibration(nv);
 		convertW(W0,calibration.grow());
 		for (int i = 0; i < N; i++) {
 			extractCalibration(listHInv.get(i),calibration.grow());
@@ -176,6 +172,16 @@ public class SelfCalibrationLinearRotationMulti {
 
 	/**
 	 * Fill in A using all the constraints
+	 *
+	 * Sage Math used for derivation
+	 * <pre>
+	 *  H = matrix(SR, 3, 3, var('H11,H12,H13,H21,H22,H23,H31,H32,H33'))
+	 *  var('W11,W12,W13,W22,W23,W33')
+	 *  W = matrix(SR, 3, 3, [W11,W12,W13,W12,W22,W23,W13,W23,W33])
+	 *  a=H.transpose()*W*H
+	 *  a[0,1].expand()
+	 * </pre>
+	 *
 	 */
 	void fillInConstraintMatrix( )
 	{
@@ -222,11 +228,7 @@ public class SelfCalibrationLinearRotationMulti {
 	/**
 	 * Extracts calibration for the reference frame
 	 */
-	void extractReferenceCalibration() {
-		int N = 6-A.numCols;
-		DMatrixRMaj nv = new DMatrixRMaj(N,1);
-		SingularOps_DDRM.nullVector(svd,true,nv);
-		
+	void extractReferenceCalibration( DMatrixRMaj nv ) {
 		double w11,w12=0,w13=0,w22,w23=0,w33;
 
 		int idx = 0;
@@ -265,18 +267,6 @@ public class SelfCalibrationLinearRotationMulti {
 		CommonOps_DDF3.multTransB(tmp,Hinv,Wi);
 
 		convertW(Wi,c);
-	}
-
-	// TODO remove when updated to latest EJML
-	private static void removeColumn( DMatrixRMaj A , int column ) {
-		for (int i = 0; i < A.numRows; i++) {
-			int idx0 = A.numCols*i;
-			int idx1 = idx0+A.numCols;
-			for( int idx = idx0+column+1; idx < idx1; idx++ ) {
-				A.data[idx-1] = A.data[idx];
-			}
-		}
-		A.numCols--;
 	}
 
 	/**

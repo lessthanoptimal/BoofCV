@@ -50,7 +50,7 @@ public class ConvertInterleavedToSingle {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
-				
+
 				while( indexTo < indexEndTo ) {
 //				for (int x = 0; x < from.width; x++ ) {
 					int sum = from.data[indexFrom++]& 0xFF;
