@@ -309,6 +309,51 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 		this.bands = bands;
 	}
 
+	/**
+	 * Returns an integer formed from 4 bands. band[0]<<24 | band[1] << 16 | band[2]<<8 | band[3]. Assumes
+	 * arrays are U8 type.
+	 *
+	 * @param x column
+	 * @param y row
+	 * @return 32 bit integer
+	 */
+	public int get32u8( int x , int y ) {
+		int i = startIndex + y*stride+x;
+		return ((((GrayU8)bands[0]).data[i]&0xFF) << 24) |
+				((((GrayU8)bands[1]).data[i]&0xFF) << 16) |
+				((((GrayU8)bands[2]).data[i]&0xFF) << 8) |
+				(((GrayU8)bands[3]).data[i]&0xFF);
+	}
+
+	/**
+	 * Returns an integer formed from 3 bands. band[0]<<16| band[1] << 8 | band[2]
+	 *
+	 * @param x column
+	 * @param y row
+	 * @return 32 bit integer
+	 */
+	public int get24u8( int x , int y ) {
+		int i = startIndex + y*stride+x;
+		return ((((GrayU8)bands[0]).data[i]&0xFF) << 16) |
+				((((GrayU8)bands[1]).data[i]&0xFF) << 8) |
+				(((GrayU8)bands[2]).data[i]&0xFF);
+	}
+
+	public void set24u8( int x , int y , int value ) {
+		int i = startIndex + y*stride+x;
+		((GrayU8)bands[0]).data[i] = (byte)(value>>>16);
+		((GrayU8)bands[1]).data[i] = (byte)(value>>>8);
+		((GrayU8)bands[2]).data[i]   = (byte)value;
+	}
+
+	public void set32u8( int x , int y , int value ) {
+		int i = startIndex + y*stride+x;
+		((GrayU8)bands[0]).data[i] = (byte)(value>>>24);
+		((GrayU8)bands[1]).data[i] = (byte)(value>>>16);
+		((GrayU8)bands[2]).data[i] = (byte)(value>>>8);
+		((GrayU8)bands[3]).data[i]   = (byte)value;
+	}
+
 	public void setBandType(Class<T> type) {
 		if( this.type != null && this.type != type )
 			throw new RuntimeException("Once the band type has been set you can't change it");

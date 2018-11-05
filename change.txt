@@ -14,12 +14,16 @@ Version : 0.32
   * TODO fix os x touch pad zoom
 - Added 3D QR Code where you can estimate its 6-DOF pose
 - Changed Fiducial stability calculation to use 4 synthetic corners as way to improve speed
+- InterleavedU8 and Planar<GrayU8>
+  * Added set32/get32 and set24/get24
+- ConvertImage reshapes output instead of throwing an exception
+- ImageInterleaved setTo() changes number of bands if needed
+- Improved speed of Interleaved to Gray average
 
 TODO Attempt trifocal tensor based stereo
 
 TODO Remove dependency on OpenCV in Applications to reduce file size
 TODO Create GUI for running any application
-TODO Create installer for applications
 
 - TODO Self calibration
    - scene reconstruction

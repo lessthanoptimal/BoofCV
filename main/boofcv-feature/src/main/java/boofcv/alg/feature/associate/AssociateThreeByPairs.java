@@ -71,12 +71,12 @@ public class AssociateThreeByPairs<Desc> implements AssociateThreeDescription<De
 	}
 
 	@Override
-	public void setFeaturesC(FastQueue<Desc> features) {
+	public void setFeaturesB(FastQueue<Desc> features) {
 		this.featuresB = features;
 	}
 
 	@Override
-	public void setFeaturesB(FastQueue<Desc> features) {
+	public void setFeaturesC(FastQueue<Desc> features) {
 		this.featuresC = features;
 	}
 
@@ -94,7 +94,7 @@ public class AssociateThreeByPairs<Desc> implements AssociateThreeDescription<De
 		for (int i = 0; i < pairs.size; i++) {
 			AssociatedIndex p = pairs.get(i);
 			matches.grow().set(p.src,p.dst,-1);
-			// indxes of tmp lists will be the same as matches
+			// indexes of tmp lists will be the same as matches
 			tmpA.add(featuresA.data[p.src]);
 			tmpB.add(featuresB.data[p.dst]);
 		}
@@ -114,6 +114,12 @@ public class AssociateThreeByPairs<Desc> implements AssociateThreeDescription<De
 			tmpC.add(featuresC.data[p.dst]);
 			srcToC.data[i] = p.dst;           // save mapping back to original input index
 		}
+		// mark the unmatched as unmatched
+		GrowQueue_I32 unsrc = associator.getUnassociatedSource();
+		for (int i = 0; i < unsrc.size; i++) {
+			int idx = unsrc.get(i);
+			matches.get(idx).c = -1;
+		}
 
 		// Associate view C to view A but only consider features which are currently in the triple
 		associator.setSource(tmpC);
@@ -129,6 +135,11 @@ public class AssociateThreeByPairs<Desc> implements AssociateThreeDescription<De
 				t.c = -1;// mark it so that it will be pruned
 			}
 		}
+		GrowQueue_I32 undst = associator.getUnassociatedDestination();
+		for (int i = 0; i < undst.size; i++) {
+			int idx = undst.get(i);
+			matches.get(idx).c = -1;
+		}
 
 		// Prune triplets which don't match
 		pruneMatches();
@@ -143,7 +154,8 @@ public class AssociateThreeByPairs<Desc> implements AssociateThreeDescription<De
 			AssociatedTripleIndex a = matches.get(index);
 			// not matched. Remove it from the list by copying that last element over it
 			if( a.c == -1 ) {
-				a.set(matches.get(matches.size--));
+				a.set(matches.get(matches.size-1));
+				matches.size--;
 			} else {
 				index++;
 			}

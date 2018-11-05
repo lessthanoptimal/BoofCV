@@ -33,7 +33,18 @@ import java.util.List;
 /**
  * Camera calibration for when the camera's motion is purely rotational and has no translational
  * component and camera parameters are assumed to be constant. All five camera parameters are estimated and no
- * constraints can be specified.
+ * constraints can be specified. Based off of constant calibration Algorithm 19.3 on page 482 in [1].
+ *
+ * <pre>
+ * Steps:
+ * 1) Compute homographies between view i and reference frame, i.e. x<sup>i</sup> = H<sup>i</sup>x, ensure det(H)=1
+ * 2) Write equation w=(H<sup>i</sup>)<sup>-T</sup>w(<sup>i</sup>)<sup>-1</sup> as A*x=0, where A = 6m by 6 matrix.
+ * 3) Compute K using Cholesky decomposition w = U*U<sup>T</sup>. Actually implemented as an algebraic formula.
+ * </pre>
+ *
+ * <ol>
+ * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
+ * </ol>
  *
  * @author Peter Abeles
  */
@@ -52,7 +63,7 @@ public class SelfCalibrationLinearRotationSingle {
 
 	/**
 	 * Assumes that the camera parameter are constant
-	 * @param viewsI_to_view0 (Input) List of observed homographies
+	 * @param viewsI_to_view0 (Input) List of observed homographies. Modified so that determinant is one.
 	 * @param calibration (Output) found calibration
 	 * @return true if successful
 	 */
@@ -93,7 +104,7 @@ public class SelfCalibrationLinearRotationSingle {
 	 * Scales all homographies so that their determinants are equal to one
 	 * @param homography0toI
 	 */
-	void ensureDeterminantOfOne(List<Homography2D_F64> homography0toI) {
+	public static void ensureDeterminantOfOne(List<Homography2D_F64> homography0toI) {
 		int N = homography0toI.size();
 		for (int i = 0; i < N; i++) {
 			Homography2D_F64 H = homography0toI.get(i);

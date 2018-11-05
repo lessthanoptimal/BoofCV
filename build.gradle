@@ -97,7 +97,11 @@ subprojects {
     }
 
     dependencies {
-        compile group: 'org.georegression', name: 'georegression', version: '0.17'
+        compile (group: 'org.georegression', name: 'georegression', version: '0.17') {
+            exclude group: 'org.ejml'
+        }
+        ['ejml-core','ejml-fdense','ejml-ddense','ejml-simple','ejml-dsparse'].each { String a ->
+            compile group: 'org.ejml', name: a, version: '0.37-SNAPSHOT'}
         compile 'com.google.code.findbugs:jsr305:3.0.2' // @Nullable
 
         testImplementation(

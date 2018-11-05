@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,11 +55,9 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 	private void printPreamble() {
 		out.print("import boofcv.alg.InputSanityCheck;\n" +
 				"import boofcv.core.image.impl.ImplConvertImage;\n" +
-				"import boofcv.core.image.impl.ImplConvertMsToSingle;\n" +
+				"import boofcv.core.image.impl.ImplConvertPlanarToGray;\n" +
 				"import boofcv.core.image.impl.ConvertInterleavedToSingle;\n" +
 				"import boofcv.struct.image.*;\n" +
-				"\n" +
-				"import javax.annotation.Generated;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -73,7 +71,6 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"@Generated(\""+getClass().getCanonicalName()+"\")\n" +
 				"public class "+className+" {\n\n");
 	}
 
@@ -92,7 +89,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new "+imageOut.getSingleBandName()+"(input.width, input.height);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tInputSanityCheck.checkSameShape(input, output);\n" +
+				"\t\t\toutput.reshape(input.width,input.height);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\tImplConvertImage.convert(input, output);\n" +
@@ -116,7 +113,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new "+imageOut.getInterleavedName()+"(input.width, input.height, input.numBands);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tInputSanityCheck.checkSameShape(input, output);\n" +
+				"\t\t\toutput.reshape(input.width,input.height,input.numBands);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\tImplConvertImage.convert(input, output);\n" +
@@ -141,10 +138,10 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new "+imageName+"(input.width, input.height);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tInputSanityCheck.checkSameShape(input, output);\n" +
+				"\t\t\toutput.reshape(input.width,input.height);\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\tImplConvertMsToSingle.average(input, output);\n" +
+				"\t\tImplConvertPlanarToGray.average(input, output);\n" +
 				"\n" +
 				"\t\treturn output;\n" +
 				"\t}\n\n");
@@ -167,7 +164,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new "+outputName+"(input.width, input.height);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tInputSanityCheck.checkSameShape(input, output);\n" +
+				"\t\t\toutput.reshape(input.width,input.height);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\tConvertInterleavedToSingle.average(input, output);\n" +
@@ -191,7 +188,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new Planar<"+bandName+">("+bandName+".class,input.width, input.height,input.numBands);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tInputSanityCheck.checkSameShape(input, output);\n" +
+				"\t\t\toutput.reshape(input.width,input.height,input.numBands);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\tImplConvertImage.convert(input,output);\n" +
@@ -215,7 +212,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new "+outputName+"(input.width, input.height,input.getNumBands());\n" +
 				"\t\t} else {\n" +
-				"\t\t\tInputSanityCheck.checkSameShape(input, output);\n" +
+				"\t\t\toutput.reshape(input.width,input.height,input.getNumBands());\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\tImplConvertImage.convert(input,output);\n" +
@@ -244,7 +241,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new GrayU8(input.width, input.height);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tInputSanityCheck.checkSameShape(input, output);\n" +
+				"\t\t\toutput.reshape(input.width,input.height);\n" +
 				"\t\t}\n" +
 				"\t\tif( numValues < 0 || numValues > 256 )\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"0 <= numValues <= 256\");\n" +

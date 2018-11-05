@@ -101,11 +101,11 @@ public class TestUtilIO {
 
 		String invalidPackage = "adfs";
 		String invalidClass = "asdf";
-		assertEquals(UtilIO.getSourcePath(invalidPackage, invalidClass), "");
+		assertEquals("" ,UtilIO.getSourcePath(invalidPackage, invalidClass));
 
 		String nullPackage = null;
 		String nullClass = null;
-		assertEquals(UtilIO.getSourcePath(nullPackage, nullClass), "");
+		assertEquals("",UtilIO.getSourcePath(nullPackage, nullClass));
 	}
 
 	@Test
@@ -115,6 +115,7 @@ public class TestUtilIO {
 		HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
 		con.setRequestMethod("HEAD");
 		con.setConnectTimeout(2000);
+//		System.out.println(con.getResponseMessage());
 		assertEquals(HttpURLConnection.HTTP_OK,con.getResponseCode());
 
 		String url2 = UtilIO.getGithubURL(validExamplePackage, validExampleClass);
