@@ -29,7 +29,9 @@ import boofcv.struct.calib.CameraModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -38,10 +40,19 @@ import java.util.regex.PatternSyntaxException;
  *
  * @author Peter Abeles
  */
-public class BatchRemoveLensDistortionGui extends JPanel {
+public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveLensDistortion.Listener {
+
+	public static final String KEY_INTRINSIC = "intrinsic";
+	public static final String KEY_INPUT = "input";
+	public static final String KEY_OUTPUT = "output";
+	public static final String KEY_REGEX = "regex";
+
 
 	ControlPanel control = new ControlPanel();
 	ImagePanel imagePanel = new ImagePanel();
+
+	boolean processing = false;
+	BatchRemoveLensDistortion undistorter;
 
 	public BatchRemoveLensDistortionGui() {
 		super(new BorderLayout());
@@ -56,12 +67,23 @@ public class BatchRemoveLensDistortionGui extends JPanel {
 	public boolean spawn( String pathIntrinsic , String pathInput , String pathOutput ,
 						  String regex , boolean rename , boolean recursive , AdjustmentType adjustment )
 	{
+		if( processing )
+			return false;
+
+		System.out.println("point A");
+
 		BoofSwingUtil.checkGuiThread();
+
+		if( !new File(pathIntrinsic).exists() ) {
+			JOptionPane.showMessageDialog(this, "Intrinsic path does not exist");
+			return false;
+		}
 
 		CameraModel model;
 		try {
 			model = CalibrationIO.load(pathIntrinsic);
 		} catch( RuntimeException e ) {
+			e.printStackTrace();
 			BoofSwingUtil.warningDialog(this,e);
 			return false;
 		}
@@ -84,12 +106,35 @@ public class BatchRemoveLensDistortionGui extends JPanel {
 			return false;
 		}
 
-		// TODO Spawn process
-		// TODO Listen to images
+		Preferences prefs = Preferences.userRoot().node(getClass().getSimpleName());
+		prefs.put(KEY_INTRINSIC,pathIntrinsic);
+		prefs.put(KEY_INPUT,pathInput);
+		prefs.put(KEY_OUTPUT,pathOutput);
+		prefs.put(KEY_REGEX,regex);
+
+		control.bAction.setText("Cancel");
+		processing = true;
+		System.out.println("point B");
+		String _pathOutput = pathOutput;
+		undistorter = new BatchRemoveLensDistortion(pathIntrinsic,pathInput,_pathOutput,
+				regex,rename,recursive,adjustment,this);
+		new Thread(()->{undistorter.process();}).start();
 
 		return true;
 	}
 
+	@Override
+	public void loadedImage(BufferedImage image, String name) {
+		imagePanel.setImageRepaint(image);
+	}
+
+	@Override
+	public void finishedConverting() {
+		SwingUtilities.invokeLater(()->{
+			control.bAction.setText("Start");
+			processing = false;
+		});
+	}
 
 	private class ControlPanel extends StandardAlgConfigPanel {
 		JTextField textIntrinsic = new JTextField();
@@ -105,6 +150,8 @@ public class BatchRemoveLensDistortionGui extends JPanel {
 			int textWidth = 200;
 			int textHeight = 30;
 
+			Preferences prefs = Preferences.userRoot().node(BatchRemoveLensDistortionGui.class.getSimpleName());
+
 			textIntrinsic.setPreferredSize(new Dimension(textWidth,textHeight));
 			textIntrinsic.setMaximumSize(textIntrinsic.getPreferredSize());
 			textInputDirectory.setPreferredSize(new Dimension(textWidth,textHeight));
@@ -116,6 +163,12 @@ public class BatchRemoveLensDistortionGui extends JPanel {
 			textRegex.setText("([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)");
 			checkRecursive.setSelected(false);
 			comboResize.setMaximumSize(comboResize.getPreferredSize());
+
+			textIntrinsic.setText(prefs.get(KEY_INTRINSIC,""));
+			textInputDirectory.setText(prefs.get(KEY_INPUT,""));
+			textOutputDirectory.setText(prefs.get(KEY_OUTPUT,""));
+
+			bAction.addActionListener(a-> handleStart());
 
 			addLabeled(createTextSelect(textIntrinsic,"Intrinsic",false),"Intrinsic");
 			addLabeled(createTextSelect(textInputDirectory,"Input Directory",true),"Input");
@@ -157,6 +210,39 @@ public class BatchRemoveLensDistortionGui extends JPanel {
 
 			if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 				field.setText(chooser.getSelectedFile().getAbsolutePath());
+			}
+		}
+
+		private void handleStart() {
+			if( processing ) {
+				undistorter.cancel = true;
+			} else {
+				System.out.println("Handle Start");
+				String pathIntrinsic = textIntrinsic.getText();
+				String pathInput = textInputDirectory.getText();
+				String pathOutput = textOutputDirectory.getText();
+
+				String regex = textRegex.getText();
+				boolean rename = checkRename.isSelected();
+				boolean recursive = checkRecursive.isSelected();
+
+				AdjustmentType adjustment;
+				switch (comboResize.getSelectedIndex()) {
+					case 0:
+						adjustment = AdjustmentType.NONE;
+						break;
+					case 1:
+						adjustment = AdjustmentType.FULL_VIEW;
+						break;
+					case 2:
+						adjustment = AdjustmentType.EXPAND;
+						break;
+					default:
+						throw new RuntimeException("Unknown");
+				}
+
+				System.out.println("before spawn");
+				spawn(pathIntrinsic, pathInput, pathOutput, regex, rename, recursive, adjustment);
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,9 @@ import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -46,57 +49,79 @@ import java.util.List;
  */
 public class BatchRemoveLensDistortion {
 
-	public static void printHelpAndExit(String[] args) {
-		System.out.println("Expected 1 flag and 3 arguments, had "+args.length+" instead");
-		System.out.println();
-		System.out.println("<path to directory> <file name regex> <path to intrinsic.yaml> <output directory>");
-		System.out.println("path/to/input/image\\d*.jpg path/to/intrinsic.yaml");
-		System.out.println();
-		System.out.println("Flags:");
-		System.out.println("-rename  Rename files on output to image%0d.png");
-		System.out.println("-EXPAND  Output image will be expanded until there are no dark regions");
-		System.out.println("-FULL_VIEW  Output image will contain the entire undistorted image");
-		System.out.println();
-		System.out.println("Default is FULL_VIEW and it doesn't rename the images");
+	@Option(name = "-c", aliases = {"--Camera"},
+			usage="Path to camera intrinsics yaml")
+	String pathIntrinsic;
+	@Option(name = "-i", aliases = {"--Input"},
+			usage="Path to input directory")
+	String pathInput;
+	@Option(name = "-o", aliases = {"--Output"}, usage="Path to output directory")
+	String pathOutput;
+	@Option(name = "-r", aliases = {"--Regex"}, usage="Regex. Example: \\d*.jpg")
+	String regex;
+	@Option(name = "--Rename", usage="Rename files")
+	boolean rename;
+	@Option(name = "--Recursive", usage="Should input directory be recursively searched")
+	boolean recursive;
+	@Option(name = "-a", aliases = {"--Adjustment"}, usage="none, expand, full_view")
+	String adjustmentName;
+	AdjustmentType adjustmentType;
+	@Option(name="--GUI", usage="Ignore all other command line arguments and switch to GUI mode")
+	private boolean guiMode = false;
+
+	boolean cancel = false;
+	Listener listener;
+
+	public BatchRemoveLensDistortion() {
 	}
 
-	public static void main(String[] args) {
-		String inputPath,regex,pathIntrinsic,outputDir;
-		AdjustmentType adjustmentType = AdjustmentType.FULL_VIEW;
-		boolean rename = false;
+	public BatchRemoveLensDistortion(String pathIntrinsic, String pathInput, String pathOutput,
+									 String regex, boolean rename,
+									 boolean recursive, AdjustmentType adjustmentType,
+									 Listener listener ) {
+		this.pathIntrinsic = pathIntrinsic;
+		this.pathInput = pathInput;
+		this.pathOutput = pathOutput;
+		this.regex = regex;
+		this.rename = rename;
+		this.recursive = recursive;
+		this.adjustmentType = adjustmentType;
+		this.listener = listener;
+	}
 
-		if( args.length >= 4 ) {
-			int numFlags = args.length-4;
-			for (int i = 0; i < numFlags; i++) {
-				if( args[i].compareToIgnoreCase("-rename") == 0 ) {
-					rename = true;
-				} else if( args[i].compareToIgnoreCase("-EXPAND") == 0 ) {
-					adjustmentType = AdjustmentType.EXPAND;
-				} else if( args[i].compareToIgnoreCase("-FULL_VIEW") == 0 ) {
-					adjustmentType = AdjustmentType.FULL_VIEW;
-				} else {
-					System.err.println("Unknown flag "+args[i]);
-				}
-			}
+	private static void printHelpExit(CmdLineParser parser ) {
+		parser.getProperties().withUsageWidth(120);
+		parser.printUsage(System.out);
 
-			inputPath = args[numFlags];
-			regex = args[numFlags+1];
-			pathIntrinsic = args[numFlags+2];
-			outputDir = args[numFlags+3];
-		}else {
-			printHelpAndExit(args);
-			System.exit(0);
-			return;
+		System.out.println();
+		System.out.println("Examples:");
+		System.out.println();
+
+		System.exit(1);
+	}
+
+	public void finishParsing() {
+		if( adjustmentName.compareToIgnoreCase("none")==0) {
+			adjustmentType = AdjustmentType.NONE;
+		} else if( adjustmentName.compareToIgnoreCase("expand")==0) {
+			adjustmentType = AdjustmentType.EXPAND;
+		} else if( adjustmentName.compareToIgnoreCase("full_view")==0) {
+			adjustmentType = AdjustmentType.FULL_VIEW;
+		} else {
+			throw new RuntimeException("Unknown adjustment "+adjustmentName);
 		}
+	}
 
-		System.out.println("AdjustmentType = "+adjustmentType);
-		System.out.println("rename         = "+rename);
-		System.out.println("input path     = "+inputPath);
-		System.out.println("name regex     = "+regex);
-		System.out.println("output dir     = "+outputDir);
+	public void process() {
+		cancel = false;
+		System.out.println("AdjustmentType = "+ adjustmentType);
+		System.out.println("rename         = "+ rename);
+		System.out.println("input path     = "+ pathInput);
+		System.out.println("name regex     = "+ regex);
+		System.out.println("output dir     = "+ pathOutput);
 
 
-		File fileOutputDir = new File(outputDir);
+		File fileOutputDir = new File(pathOutput);
 		if( !fileOutputDir.exists() ) {
 			if( !fileOutputDir.mkdirs() ) {
 				throw new RuntimeException("Output directory did not exist and failed to create it");
@@ -108,7 +133,7 @@ public class BatchRemoveLensDistortion {
 		CameraPinholeRadial param = CalibrationIO.load(pathIntrinsic);
 		CameraPinholeRadial paramAdj = new CameraPinholeRadial();
 
-		List<File> files = Arrays.asList(UtilIO.findMatches(new File(inputPath),regex));
+		List<File> files = Arrays.asList(UtilIO.findMatches(new File(pathInput),regex));
 		Collections.sort(files);
 
 		System.out.println("Found a total of "+files.size()+" matching files");
@@ -118,7 +143,7 @@ public class BatchRemoveLensDistortion {
 
 		ImageDistort distort = LensDistortionOps.changeCameraModel(adjustmentType, BorderType.ZERO, param,
 				new CameraPinhole(param), paramAdj, (ImageType) distoredImg.getImageType());
-		CalibrationIO.save(paramAdj,new File(outputDir,"intrinsicUndistorted.yaml").getAbsolutePath());
+		CalibrationIO.save(paramAdj,new File(pathOutput,"intrinsicUndistorted.yaml").getAbsolutePath());
 
 		BufferedImage out = new BufferedImage(param.width,param.height,BufferedImage.TYPE_INT_RGB);
 
@@ -137,6 +162,9 @@ public class BatchRemoveLensDistortion {
 				System.exit(-1);
 			}
 
+			if( listener != null )
+				listener.loadedImage(orig,file.getName());
+
 			ConvertBufferedImage.convertFromPlanar(orig, distoredImg, true, GrayF32.class);
 			distort.apply(distoredImg,undistoredImg);
 			ConvertBufferedImage.convertTo(undistoredImg,out,true);
@@ -148,7 +176,43 @@ public class BatchRemoveLensDistortion {
 				nameOut = file.getName().split("\\.")[0]+"_undistorted.png";
 			}
 
-			UtilImageIO.saveImage(out,new File(outputDir,nameOut).getAbsolutePath());
+			UtilImageIO.saveImage(out,new File(pathOutput,nameOut).getAbsolutePath());
+
+			if( cancel ) {
+				break;
+			}
 		}
+		if( listener != null )
+			listener.finishedConverting();
+	}
+
+	public interface Listener {
+		void loadedImage( BufferedImage image , String name );
+
+		void finishedConverting();
+	}
+
+	public static void main(String[] args) {
+		BatchRemoveLensDistortion generator = new BatchRemoveLensDistortion();
+		CmdLineParser parser = new CmdLineParser(generator);
+
+		if( args.length == 0 ) {
+			printHelpExit(parser);
+		}
+
+		try {
+			parser.parseArgument(args);
+			if( generator.guiMode ) {
+				new BatchRemoveLensDistortionGui();
+			} else {
+				generator.finishParsing();
+				generator.process();
+			}
+		} catch (CmdLineException e) {
+			// handling of wrong arguments
+			System.err.println(e.getMessage());
+			printHelpExit(parser);
+		}
+
 	}
 }
