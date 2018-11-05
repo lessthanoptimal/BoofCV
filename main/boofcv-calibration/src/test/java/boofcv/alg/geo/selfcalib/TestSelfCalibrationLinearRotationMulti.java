@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.selfcalib;
 
+import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
@@ -61,11 +62,18 @@ public class TestSelfCalibrationLinearRotationMulti
 
 		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
 		alg.setConstraints(true,false,false,-1);
-		alg.estimate(viewsI_to_view0);
+		assertSame(alg.estimate(viewsI_to_view0), GeometricResult.SUCCESS);
 
 		FastQueue<CameraPinhole> found = alg.getFound();
 
-		fail("Implement");
+		for (int i = 0; i < found.size; i++) {
+			CameraPinhole f = found.get(i);
+			assertEquals(camera.fx,f.fx, UtilEjml.TEST_F64);
+			assertEquals(camera.fy,f.fy, UtilEjml.TEST_F64);
+			assertEquals(camera.skew,f.skew, UtilEjml.TEST_F64);
+			assertEquals(camera.cx,f.cx, UtilEjml.TEST_F64);
+			assertEquals(camera.cy,f.cy, UtilEjml.TEST_F64);
+		}
 	}
 
 	private List<Homography2D_F64> computeHomographies() {
@@ -74,10 +82,11 @@ public class TestSelfCalibrationLinearRotationMulti
 		for (int i = 1; i < listCameraToWorld.size(); i++) {
 			Se3_F64 c2w = listCameraToWorld.get(i);
 			Vector3D_F64 V = new Vector3D_F64();
-			V.x = rand.nextGaussian();
-			V.y = rand.nextGaussian();
-			V.z = rand.nextGaussian();
-			V.normalize();
+//			V.x = rand.nextGaussian();
+//			V.y = rand.nextGaussian();
+//			V.z = rand.nextGaussian();
+//			V.normalize();
+			V.z = 1;
 
 			DMatrixRMaj H = MultiViewOps.createHomography(c2w.R,c2w.T,1.1,V,K);
 			Homography2D_F64 HH = new Homography2D_F64();
@@ -110,6 +119,7 @@ public class TestSelfCalibrationLinearRotationMulti
 		alg.setConstraints(true,false,false,1);
 		alg.computeInverseH(viewsI_to_view0);
 		alg.fillInConstraintMatrix();
+		alg.A.print();
 
 		// Compute 'w' which should be in the null space
 		DMatrixRMaj w = new DMatrixRMaj(3,3);
@@ -219,9 +229,10 @@ public class TestSelfCalibrationLinearRotationMulti
 	public void extractCalibration() {
 		// camera calibration matrix
 		Homography2D_F64 K1 = new Homography2D_F64(300,1,320,0,305,330,0,0,1);
-		// W = K'*K
+		// W = K*K'
 		Homography2D_F64 W1 = new Homography2D_F64();
 		CommonOps_DDF3.multTransA(K1,K1,W1);
+		CommonOps_DDF3.invert(W1,W1);
 
 		Se3_F64 v1_to_v0 = SpecialEuclideanOps_F64.eulerXyz(1,0,0.1,0.1,0.05,-0.09,null);
 		DMatrixRMaj H = MultiViewOps.createHomography(v1_to_v0.R,v1_to_v0.T,1,new Vector3D_F64(0,0,1));
@@ -242,10 +253,11 @@ public class TestSelfCalibrationLinearRotationMulti
 		CameraPinhole found = new CameraPinhole();
 		alg.extractCalibration(H1_inv,found);
 
-		assertEquals(K1.a11,found.fx, UtilEjml.TEST_F64_SQ);
-		assertEquals(K1.a12,found.skew, UtilEjml.TEST_F64_SQ);
-		assertEquals(K1.a13,found.cx, UtilEjml.TEST_F64_SQ);
-		assertEquals(K1.a22,found.fy, UtilEjml.TEST_F64_SQ);
-		assertEquals(K1.a23,found.cy, UtilEjml.TEST_F64_SQ);
+		double tol = 0.001;
+		assertEquals(K1.a11,found.fx, tol);
+		assertEquals(K1.a12,found.skew, tol);
+		assertEquals(K1.a13,found.cx, tol);
+		assertEquals(K1.a22,found.fy, tol);
+		assertEquals(K1.a23,found.cy, tol);
 	}
 }

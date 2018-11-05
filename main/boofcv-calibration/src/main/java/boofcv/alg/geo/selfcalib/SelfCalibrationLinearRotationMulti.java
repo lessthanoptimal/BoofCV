@@ -26,7 +26,6 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.fixed.CommonOps_DDF3;
-import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.SingularOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
@@ -128,7 +127,7 @@ public class SelfCalibrationLinearRotationMulti {
 			return GeometricResult.SOLVE_FAILED;
 
 		fillInConstraintMatrix();
-		removeColumnsOfZero();
+		A.print();
 
 		// Compute the SVD for its null space
 		if( !svd.decompose(A)) {
@@ -136,6 +135,7 @@ public class SelfCalibrationLinearRotationMulti {
 		}
 
 		SingularOps_DDRM.nullVector(svd,true,nv);
+		nv.print();
 		extractReferenceW(nv);
 		convertW(W0,calibration.grow());
 		for (int i = 0; i < N; i++) {
@@ -143,14 +143,6 @@ public class SelfCalibrationLinearRotationMulti {
 		}
 
 		return GeometricResult.SUCCESS;
-	}
-
-	void removeColumnsOfZero() {
-		// remove columns from A which are zero
-		for (int i = 5; i >= 0; i--) {
-			if( !notZeros.contains(i))
-				CommonOps_DDRM.removeColumns(A,i,i);
-		}
 	}
 
 	/**
@@ -232,20 +224,12 @@ public class SelfCalibrationLinearRotationMulti {
 	 * Extracts calibration for the reference frame
 	 */
 	void extractReferenceW(DMatrixRMaj nv ) {
-		double w11,w12=0,w13=0,w22,w23=0,w33;
-
-		int idx = 0;
-		w11 = nv.data[idx++];
-		if( !zeroSkew )
-			w12 = nv.data[idx++];
-		if( !principlePointOrigin )
-			w13 = nv.data[idx++];
-		w22 = nv.data[idx++];
-		if( !principlePointOrigin )
-			w23 = nv.data[idx++];
-		w33 = nv.data[idx];
-
-		W0.set(w11,w12,w13,w12,w22,w23,w13,w23,w33);
+		W0.a11 = nv.data[0];
+		W0.a12 = zeroSkew ? 0 : nv.data[1];
+		W0.a13 = principlePointOrigin ? 0 : nv.data[2];
+		W0.a22 = nv.data[3];
+		W0.a23 = principlePointOrigin ? 0 : nv.data[4];
+		W0.a33 = nv.data[5];
 	}
 
 	/**
@@ -255,10 +239,12 @@ public class SelfCalibrationLinearRotationMulti {
 	 */
 	void convertW( Homography2D_F64 w , CameraPinhole c ) {
 		// inv(w) = K*K'
+		w.print();
 		CommonOps_DDF3.divide(w,w.a33);
 		CommonOps_DDF3.invert(w,K);
 		CommonOps_DDF3.cholU(K);
 		CommonOps_DDF3.divide(K,K.a33);
+		K.print();
 		c.fx = K.a11;
 		c.fy = knownAspectRatio ? c.fx/aspectRatio : K.a22;
 		c.skew = zeroSkew ? 0 : K.a12;
@@ -268,6 +254,8 @@ public class SelfCalibrationLinearRotationMulti {
 
 	/**
 	 * Extracts calibration for the non-reference frames
+	 *
+	 * w = H^-T*w*H^-1
 	 */
 	void extractCalibration( Homography2D_F64 Hinv , CameraPinhole c ) {
 		CommonOps_DDF3.multTransA(Hinv,W0,tmp);
@@ -288,7 +276,6 @@ public class SelfCalibrationLinearRotationMulti {
 
 			// Ensure the determinant is one
 			double d = CommonOps_DDF3.det(H);
-//			System.out.println("Before = "+d);
 			if( d < 0 )
 				CommonOps_DDF3.divide(H,-Math.pow(-d,1.0/3),Hinv);
 			else

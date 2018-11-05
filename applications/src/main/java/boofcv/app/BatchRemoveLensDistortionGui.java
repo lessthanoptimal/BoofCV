@@ -163,6 +163,6 @@ public class BatchRemoveLensDistortionGui extends JPanel {
 
 	public static void main(String[] args) {
 		BatchRemoveLensDistortionGui app = new BatchRemoveLensDistortionGui();
-		ShowImages.showWindow(app,"Remove Lens Distortion", true);
+		ShowImages.showWindow(app,"Batch Remove Lens Distortion", true);
 	}
 }
