@@ -39,6 +39,8 @@ public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.
 	public static final String KEY_WIDTH = "width";
 	public static final String KEY_HEIGHT = "height";
 
+	Preferences prefs = Preferences.userRoot().node(BatchDownsizeImageGui.class.getSimpleName());
+
 	BatchDownsizeImage downsizer = new BatchDownsizeImage();
 	boolean processing = false;
 
@@ -75,13 +77,11 @@ public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.
 		JSpinner spinnerHeight;
 
 		public ControlPanel() {
-			Preferences prefs = Preferences.userRoot().node(BatchDownsizeImageGui.class.getSimpleName());
-
 			int width = Integer.parseInt(prefs.get(KEY_WIDTH,"640"));
 			int height = Integer.parseInt(prefs.get(KEY_HEIGHT,"480"));
 
-			if( width <= 10 ) width = 640;
-			if( height <= 10 ) height = 480;
+			if( width < 0 ) width = 640;
+			if( height < 0 ) height = 480;
 
 			spinnerWidth = spinner(width,0,10000,20);
 			spinnerHeight = spinner(height,0,10000,20);
@@ -106,6 +106,11 @@ public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.
 				downsizer.rename = checkRename.isSelected();
 				downsizer.recursive = checkRecursive.isSelected();
 
+				if( downsizer.width == 0 && downsizer.height == 0 ) {
+					JOptionPane.showMessageDialog(this, "Width and Height can't be zero");
+					return;
+				}
+
 				try {
 					Pattern.compile(downsizer.regex);
 				} catch (PatternSyntaxException exception) {
@@ -113,7 +118,6 @@ public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.
 					return;
 				}
 
-				Preferences prefs = Preferences.userRoot().node(BatchDownsizeImageGui.class.getSimpleName());
 				prefs.put(KEY_INPUT,downsizer.pathInput);
 				prefs.put(KEY_OUTPUT,downsizer.pathOutput);
 				prefs.put(KEY_WIDTH,downsizer.width+"");
