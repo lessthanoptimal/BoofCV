@@ -57,7 +57,7 @@ public class BatchRemoveLensDistortion {
 	String pathInput;
 	@Option(name = "-o", aliases = {"--Output"}, usage="Path to output directory")
 	String pathOutput;
-	@Option(name = "-r", aliases = {"--Regex"}, usage="Regex. Example: \\d*.jpg")
+	@Option(name = "-r", aliases = {"--Regex"}, usage="Regex. Example: .*\\.jpg")
 	String regex;
 	@Option(name = "--Rename", usage="Rename files")
 	boolean rename;
@@ -96,6 +96,7 @@ public class BatchRemoveLensDistortion {
 		System.out.println();
 		System.out.println("Examples:");
 		System.out.println();
+		System.out.println("-c /path/to/intrinsic.yaml -i ~/path/to/input/ -o /path/to/output -a full_view -r .*\\.jpg");
 
 		System.exit(1);
 	}
@@ -203,7 +204,7 @@ public class BatchRemoveLensDistortion {
 		try {
 			parser.parseArgument(args);
 			if( generator.guiMode ) {
-				new BatchRemoveLensDistortionGui();
+				BatchRemoveLensDistortionGui.main(args);
 			} else {
 				generator.finishParsing();
 				generator.process();

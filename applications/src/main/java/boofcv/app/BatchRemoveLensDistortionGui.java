@@ -19,8 +19,8 @@
 package boofcv.app;
 
 import boofcv.alg.distort.AdjustmentType;
+import boofcv.app.batch.BatchControlPanel;
 import boofcv.gui.BoofSwingUtil;
-import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
@@ -35,6 +35,9 @@ import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import static boofcv.app.batch.BatchControlPanel.KEY_INPUT;
+import static boofcv.app.batch.BatchControlPanel.KEY_OUTPUT;
+
 /**
  * GUI For batch removal of lens distortion
  *
@@ -43,8 +46,6 @@ import java.util.regex.PatternSyntaxException;
 public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveLensDistortion.Listener {
 
 	public static final String KEY_INTRINSIC = "intrinsic";
-	public static final String KEY_INPUT = "input";
-	public static final String KEY_OUTPUT = "output";
 	public static final String KEY_REGEX = "regex";
 
 
@@ -136,15 +137,9 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 		});
 	}
 
-	private class ControlPanel extends StandardAlgConfigPanel {
+	private class ControlPanel extends BatchControlPanel {
 		JTextField textIntrinsic = new JTextField();
-		JTextField textInputDirectory = new JTextField();
-		JTextField textOutputDirectory = new JTextField();
-		JTextField textRegex = new JTextField();
-		JCheckBox checkRecursive = new JCheckBox("Recursive");
-		JCheckBox checkRename = new JCheckBox("Rename");
 		JComboBox<String> comboResize = new JComboBox<>(new String[]{"None","Expand","Full View"});
-		JButton bAction = new JButton("Start");
 
 		public ControlPanel() {
 			int textWidth = 200;
@@ -154,66 +149,18 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 
 			textIntrinsic.setPreferredSize(new Dimension(textWidth,textHeight));
 			textIntrinsic.setMaximumSize(textIntrinsic.getPreferredSize());
-			textInputDirectory.setPreferredSize(new Dimension(textWidth,textHeight));
-			textInputDirectory.setMaximumSize(textInputDirectory.getPreferredSize());
-			textOutputDirectory.setPreferredSize(new Dimension(textWidth,textHeight));
-			textOutputDirectory.setMaximumSize(textOutputDirectory.getPreferredSize());
-			textRegex.setPreferredSize(new Dimension(textWidth+40,textHeight));
-			textRegex.setMaximumSize(textRegex.getPreferredSize());
-			textRegex.setText("([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)");
-			checkRecursive.setSelected(false);
 			comboResize.setMaximumSize(comboResize.getPreferredSize());
 
 			textIntrinsic.setText(prefs.get(KEY_INTRINSIC,""));
-			textInputDirectory.setText(prefs.get(KEY_INPUT,""));
-			textOutputDirectory.setText(prefs.get(KEY_OUTPUT,""));
-
-			bAction.addActionListener(a-> handleStart());
 
 			addLabeled(createTextSelect(textIntrinsic,"Intrinsic",false),"Intrinsic");
-			addLabeled(createTextSelect(textInputDirectory,"Input Directory",true),"Input");
-			addLabeled(createTextSelect(textOutputDirectory,"Output Directory",true),"Output");
-			addAlignLeft(checkRecursive);
-			addAlignLeft(checkRename);
-			addLabeled(textRegex,"Regex");
 			addLabeled(comboResize,"Adjust");
-			addVerticalGlue();
-			addAlignCenter(bAction);
+
+			addStandardControls(prefs);
 		}
 
-		private JPanel createTextSelect( final JTextField field , final String message , boolean directory ) {
-			JButton bOpen = new JButton("S");
-			bOpen.addActionListener(a->{
-				selectPath(field,message,directory);
-			});
-
-			JPanel panel = new JPanel();
-			panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
-			panel.add(field);
-			panel.add(bOpen);
-			return panel;
-		}
-
-		private void selectPath(JTextField field , String message , boolean directory) {
-			File current = new File(field.getText());
-			if( !current.exists() )
-				current = new File(".");
-
-			JFileChooser chooser = new JFileChooser();
-			chooser.setCurrentDirectory(current);
-			chooser.setDialogTitle(message);
-			if( directory )
-				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			else
-				chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			chooser.setAcceptAllFileFilterUsed(false);
-
-			if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-				field.setText(chooser.getSelectedFile().getAbsolutePath());
-			}
-		}
-
-		private void handleStart() {
+		@Override
+		protected void handleStart() {
 			if( processing ) {
 				undistorter.cancel = true;
 			} else {
