@@ -630,6 +630,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 	private void createCaptureSession() throws CameraAccessException {
 		configureCamera(open.mCameraDevice,open.mCameraCharacterstics,open.mPreviewRequestBuilder);
 
+		mPreviewSession = null;
 		open.mCameraDevice.createCaptureSession(open.surfaces,
 				new CameraCaptureSession.StateCallback() {
 
@@ -651,25 +652,31 @@ public abstract class SimpleCamera2Activity extends Activity {
 	/**
 	 * Stops the capture session and allows you to reconfigure the camera, then starts it up again. You
 	 * reconfigure the camera when it calls the {@link #configureCamera}.
+	 *
+	 * @return true if the change was processed or rejected for some reason
 	 */
-	protected void changeCameraConfiguration() {
+	protected boolean changeCameraConfiguration() {
 		Log.i(TAG,"CameraCaptureSession.changeCameraConfiguration()");
 		if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
 			throw new RuntimeException("Not on main looper! Modify code to remove assumptions");
 		}
 		if (null == open.mCameraDevice || null == open.mCameraSize) {
 			Log.i(TAG,"  aborting changeCameraConfiguration. Camera not open yet.");
-			return;
+			return false;
 		}
 
 		try {
 			open.mLock.lock();
+			// configuration change still in progress
+			if( null == mPreviewSession )
+				return false;
 			createCaptureSession();
 		} catch (CameraAccessException e) {
 			e.printStackTrace();
 		} finally {
 			open.mLock.unlock();
 		}
+		return true;
 	}
 
 	/**
@@ -681,7 +688,8 @@ public abstract class SimpleCamera2Activity extends Activity {
 		}
 		open.mLock.lock();
 		try {
-			mPreviewSession.setRepeatingRequest(open.mPreviewRequestBuilder.build(), null, mBackgroundHandler);
+			if( mPreviewSession != null )
+				mPreviewSession.setRepeatingRequest(open.mPreviewRequestBuilder.build(), null, mBackgroundHandler);
 		} catch (CameraAccessException e) {
 			e.printStackTrace();
 		} finally {
@@ -733,10 +741,15 @@ public abstract class SimpleCamera2Activity extends Activity {
 		if( verbose )
 			Log.i(TAG,"closePreviewSession");
 
+		boolean alreadyLocked = open.mLock.isLocked();
+		if( !alreadyLocked )
+			open.mLock.lock();
 		if (mPreviewSession != null) {
 			mPreviewSession.close();
 			mPreviewSession = null;
 		}
+		if( !alreadyLocked )
+			open.mLock.unlock();
 	}
 
 	private final View.OnLayoutChangeListener mViewLayoutChangeListener
