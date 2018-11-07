@@ -67,6 +67,13 @@ public class StandardAlgConfigPanel extends JPanel {
 		return spinner;
 	}
 
+	protected JSpinner spinner(int initial , int minimum , int maximum, int stepSize , ChangeListener listener ) {
+		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
+		spinner.setMaximumSize(spinner.getPreferredSize());
+		spinner.addChangeListener(listener);
+		return spinner;
+	}
+
 	protected JSpinner spinner(int initial , int minimum , int maximum, int stepSize ) {
 		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
 		spinner.setMaximumSize(spinner.getPreferredSize());

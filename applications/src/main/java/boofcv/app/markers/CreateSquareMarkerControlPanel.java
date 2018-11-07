@@ -36,7 +36,7 @@ import java.text.ParseException;
  *
  * @author Peter Abeles
  */
-public class CreateSquareMarkerControlPanel extends StandardAlgConfigPanel implements ActionListener
+public abstract class CreateSquareMarkerControlPanel extends StandardAlgConfigPanel implements ActionListener
 {
 
 	JComboBox<String> comboOutputFormat = new JComboBox<>(new String[]{"pdf","png","bmp","jpg","ppm","pgm"});
@@ -48,15 +48,14 @@ public class CreateSquareMarkerControlPanel extends StandardAlgConfigPanel imple
 	JFormattedTextField fieldBorderFraction = BoofSwingUtil.createTextField(0.25,0.0,1.0);
 	JFormattedTextField fieldMarkerWidth = BoofSwingUtil.createTextField(10,0.0,Double.NaN);
 
+	public PaperSize paperSize;
+	public boolean fillGrid=false;
+	public boolean hideInfo=false;
+	public String format;
 
-	PaperSize paperSize;
-	boolean fillGrid=false;
-	boolean hideInfo=false;
-	String format;
-
-	Unit documentUnits = Unit.CENTIMETER;
-	double markerWidth = 10;
-	double borderFraction = 0.25;
+	public Unit documentUnits = Unit.CENTIMETER;
+	public double markerWidth = 10;
+	public double borderFraction = 0.25;
 
 	Listener listener;
 
@@ -65,12 +64,12 @@ public class CreateSquareMarkerControlPanel extends StandardAlgConfigPanel imple
 	}
 
 	protected void layoutComponents() {
-		configureTextField(fieldBorderFraction,borderFraction,a->borderFraction=a);
+		configureTextField(fieldBorderFraction,borderFraction,a->{borderFraction=a;listener.controlsUpdates();});
 		configureTextField(fieldMarkerWidth,markerWidth,a->markerWidth=a);
 
+		comboOutputFormat.setMaximumSize(comboOutputFormat.getPreferredSize());
 		format = (String)comboOutputFormat.getSelectedItem();
 		comboOutputFormat.addActionListener(this);
-
 
 		comboPaper.setSelectedItem(PaperSize.LETTER);
 		comboPaper.addActionListener(this);
@@ -80,13 +79,14 @@ public class CreateSquareMarkerControlPanel extends StandardAlgConfigPanel imple
 		checkFillGrid = checkbox("Fill Grid",fillGrid);
 		checkHideInfo = checkbox("Hide Info",hideInfo);
 
-
+		add(createButtonListPanel());
 		add(new JSeparator());
 		addLabeled(comboOutputFormat,"Output Format");
 		addLabeled(comboPaper,"Paper Size");
 		addLabeled(fieldBorderFraction,"Border");
 		add(createMarkerWidthPanel());
 		add(createFlagPanel());
+		addVerticalGlue();
 	}
 
 	private void configureTextField(JFormattedTextField field , double value , FieldTextChange action ) {
@@ -115,8 +115,10 @@ public class CreateSquareMarkerControlPanel extends StandardAlgConfigPanel imple
 	}
 
 	private JPanel createFlagPanel() {
-		JPanel panel = new JPanel(new GridLayout(0,2));
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
 		panel.add(checkFillGrid);
+		panel.add(Box.createHorizontalGlue());
 		panel.add(checkHideInfo);
 		return panel;
 	}
@@ -133,6 +135,21 @@ public class CreateSquareMarkerControlPanel extends StandardAlgConfigPanel imple
 		panel.add(Box.createRigidArea(new Dimension(10,10)));
 		panel.add(fieldMarkerWidth);
 		panel.add(comboUnits);
+		return panel;
+	}
+	private JPanel createButtonListPanel()
+	{
+		JButton bAdd = new JButton("Add");
+		bAdd.addActionListener(e->handleAddPattern());
+
+		JButton bRemove = new JButton("Remove");
+		bRemove.addActionListener(e->handleRemovePattern());
+
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
+		panel.add(bRemove);
+		panel.add(Box.createHorizontalGlue());
+		panel.add(bAdd);
 		return panel;
 	}
 
@@ -157,6 +174,10 @@ public class CreateSquareMarkerControlPanel extends StandardAlgConfigPanel imple
 			fieldMarkerWidth.setEnabled(enable);
 		}
 	}
+
+	public abstract void handleAddPattern();
+
+	public abstract void handleRemovePattern();
 
 	public interface FieldTextChange {
 		void changed( double value );

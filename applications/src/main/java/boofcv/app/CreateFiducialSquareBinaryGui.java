@@ -18,16 +18,21 @@
 
 package boofcv.app;
 
+import boofcv.alg.drawing.FiducialImageEngine;
+import boofcv.alg.fiducial.square.FiducialSqareGenerator;
 import boofcv.app.markers.CreateSquareMarkerControlPanel;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.ConvertBufferedImage;
+import org.ddogleg.struct.GrowQueue_I64;
 
 import javax.swing.*;
 import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 
 /**
  * GUI for printing square binary fiducials
@@ -43,11 +48,19 @@ public class CreateFiducialSquareBinaryGui extends JPanel implements CreateSquar
 	ImagePanel imagePanel = new ImagePanel();
 	JFrame frame;
 
+	FiducialImageEngine render = new FiducialImageEngine();
+	FiducialSqareGenerator generator = new FiducialSqareGenerator(render);
+	BufferedImage buffered;
+
 	public CreateFiducialSquareBinaryGui() {
 		super(new BorderLayout());
 
+		render.configure(20,300);
+		buffered = new BufferedImage(render.getGray().width,render.getGray().height,BufferedImage.TYPE_INT_RGB);
+
 		imagePanel.setPreferredSize(new Dimension(400,400));
 		imagePanel.setScaling(ScaleOptions.DOWN);
+		imagePanel.setCentering(true);
 
 		add(controls,BorderLayout.WEST);
 		add(imagePanel,BorderLayout.CENTER);
@@ -113,20 +126,87 @@ public class CreateFiducialSquareBinaryGui extends JPanel implements CreateSquar
 	}
 
 	private void renderPreview() {
-
+		long pattern = controls.selectedPattern;
+		if( pattern <= 0 ) {
+			imagePanel.setImageRepaint(null);
+		} else {
+			generator.setBlackBorder(controls.borderFraction);
+			generator.generate(controls.selectedPattern,controls.gridWidth);
+			ConvertBufferedImage.convertTo(render.getGray(),buffered,true);
+			imagePanel.setImageRepaint(buffered);
+		}
 	}
 
 	@Override
 	public void controlsUpdates() {
-
+		renderPreview();
 	}
 
 	class ControlPanel extends CreateSquareMarkerControlPanel {
 
+		DefaultListModel<Long> listModel = new DefaultListModel<>();
+		JList<Long> listPatterns = new JList<>(listModel);
+		GrowQueue_I64 patterns = new GrowQueue_I64();
+		JSpinner spinnerGridWidth;
+
+		long selectedPattern =-1;
+		int gridWidth = 4;
+
 		public ControlPanel(Listener listener) {
 			super(listener);
 
+			listPatterns.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			listPatterns.setLayoutOrientation(JList.VERTICAL);
+//			listPatterns.setVisibleRowCount(-1);
+			listPatterns.addListSelectionListener(e -> {
+				int s = listPatterns.getSelectedIndex();
+				if( s >= 0 ) {
+					selectedPattern = patterns.get(s);
+				} else {
+					selectedPattern = -1;
+				}
+				renderPreview();
+			});
+
+			spinnerGridWidth = spinner(gridWidth,2,8,1,
+					e->{
+						gridWidth=((Number)spinnerGridWidth.getValue()).intValue();
+						if( listener != null )
+							listener.controlsUpdates();
+					});
+
+			add( new JScrollPane(listPatterns));
+			addLabeled(spinnerGridWidth,"Grid Width");
 			layoutComponents();
+		}
+
+		@Override
+		public void handleAddPattern() {
+			String text = JOptionPane.showInputDialog("Enter ID","1234");
+			try {
+				long lvalue = Long.parseLong(text);
+
+				long maxValue = (long)(Math.pow(2,gridWidth*gridWidth)-4);
+				if( lvalue > maxValue )
+					lvalue = maxValue;
+				else if( lvalue < 0 )
+					lvalue = 0;
+
+				listModel.add(listModel.size(), lvalue);
+				patterns.add(lvalue);
+				listPatterns.setSelectedIndex(listModel.size()-1);
+			} catch( NumberFormatException e ) {
+				JOptionPane.showMessageDialog(this,"Must be an integer!");
+			}
+		}
+
+		@Override
+		public void handleRemovePattern() {
+			int selected = listPatterns.getSelectedIndex();
+			if( selected >= 0 ) {
+				listModel.removeElementAt(selected);
+				patterns.remove(selected);
+			}
 		}
 	}
 
