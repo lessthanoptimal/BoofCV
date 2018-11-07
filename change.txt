@@ -20,6 +20,10 @@ Version : 0.32
 - ImageInterleaved setTo() changes number of bands if needed
 - Improved speed of Interleaved to Gray average
 
+Application GUIs
+- Print Binary Fiducial
+- Print Image Fiducial
+
 TODO Attempt trifocal tensor based stereo
 
 TODO Remove dependency on OpenCV in Applications to reduce file size

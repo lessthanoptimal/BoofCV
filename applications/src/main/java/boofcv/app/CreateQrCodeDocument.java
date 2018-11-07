@@ -24,6 +24,7 @@ import boofcv.alg.fiducial.qrcode.QrCodeMaskPattern;
 import boofcv.app.qrcode.CreateQrCodeDocumentImage;
 import boofcv.app.qrcode.CreateQrCodeDocumentPDF;
 import boofcv.app.qrcode.CreateQrCodeGui;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.misc.LengthUnit;
 import boofcv.misc.Unit;
 import org.apache.commons.io.FilenameUtils;
@@ -266,7 +267,7 @@ public class CreateQrCodeDocument {
 		try {
 			parser.parseArgument(args);
 			if( generator.guiMode ) {
-				new CreateQrCodeGui();
+				BoofSwingUtil.invokeNowOrLater(CreateQrCodeGui::new);
 			} else {
 				generator.finishParsing();
 				generator.run();

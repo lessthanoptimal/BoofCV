@@ -19,6 +19,7 @@
 package boofcv.gui.image;
 
 import boofcv.alg.misc.GImageStatistics;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
@@ -122,6 +123,23 @@ public class ShowImages {
 			if( closeOnExit )
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		});
+
+		return frame;
+	}
+
+	/**
+	 * Sets up the window but doesn't show it. Must be called in a GUI thread
+	 */
+	public static JFrame setupWindow( final JComponent component , String title, final boolean closeOnExit ) {
+		BoofSwingUtil.checkGuiThread();
+
+		final JFrame frame = new JFrame(title);
+		frame.add(component, BorderLayout.CENTER);
+
+		frame.pack();
+		frame.setLocationRelativeTo(null); // centers window in the monitor
+		if( closeOnExit )
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		return frame;
 	}

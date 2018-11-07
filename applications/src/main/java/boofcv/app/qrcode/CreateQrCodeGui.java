@@ -57,19 +57,13 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 
 		add(BorderLayout.WEST,controls);
 		add(BorderLayout.CENTER,imagePanel);
-		createMenuBar();
 
 		setPreferredSize(new Dimension(700,500));
+		frame = ShowImages.setupWindow(this,"QR Code Document Creator",true);
+		createMenuBar();
 
-		frame = ShowImages.showWindow(this,"QR Code Document Creator",true);
-
-		// Render the QR Code
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				renderPreview();
-			}
-		});
+		renderPreview();
+		frame.setVisible(true);
 	}
 
 	void createMenuBar() {
@@ -113,7 +107,7 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 		editMenu.add(menuPaste);
 		menuBar.add(editMenu);
 
-		add(BorderLayout.NORTH,menuBar);
+		frame.setJMenuBar(menuBar);
 	}
 
 	private void showHelp() {
