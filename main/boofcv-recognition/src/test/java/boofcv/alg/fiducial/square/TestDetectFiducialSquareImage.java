@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.square;
 
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.PixelMath;
@@ -55,11 +56,7 @@ public class TestDetectFiducialSquareImage {
 		ImageMiscOps.fillUniform(pattern, rand, 0, 2);
 		PixelMath.multiply(pattern,255,pattern);
 
-		// add a border around it
-		GrayU8 border = new GrayU8(16*8,16*8);
-		border.subimage(16*2,16*2,16*6,16*6,null).setTo(pattern);
-		GrayF32 input = new GrayF32(border.width,border.height);
-		ConvertImage.convert(border,input);
+		GrayF32 input = render(pattern,16*8,0.25);
 
 //		BufferedImage foo = ConvertBufferedImage.convertTo(input,null);
 //		ShowImages.showWindow(foo,"target");
@@ -92,9 +89,21 @@ public class TestDetectFiducialSquareImage {
 		// give it a random input that shouldn't match
 		ImageMiscOps.fillUniform(pattern, rand, 0, 2);
 		PixelMath.multiply(pattern, 255, pattern);
-		border.subimage(16*2,16*2,16*6,16*6,null).setTo(pattern);
-		ConvertImage.convert(border,input);
+		input = render(pattern,16*8,0.25);
 		assertFalse(alg.processSquare(input, result,0,0));
+	}
+
+	private GrayF32 render( GrayU8 pattern , int width , double borderFraction ) {
+
+		FiducialImageEngine render = new FiducialImageEngine();
+		render.configure(0,width);
+
+		FiducialSquareGenerator generator = new FiducialSquareGenerator(render);
+		generator.setMarkerWidth(width);
+		generator.setBlackBorder(borderFraction);
+		generator.generate(pattern);
+
+		return render.getGrayF32();
 	}
 
 	@Test
