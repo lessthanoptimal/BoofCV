@@ -63,6 +63,8 @@ public class CreateSquareMarkerDocumentPDF {
 
 	float pageWidth,pageHeight;
 
+	public float blackBorderFractionalWidth;
+
 	int totalMarkers;
 	GrowQueue_I64 binaryPatterns;
 	int gridWidth;
@@ -136,6 +138,7 @@ public class CreateSquareMarkerDocumentPDF {
 			PDPageContentStream pcs = new PDPageContentStream(document , page);
 			PdfFiducialEngine r = new PdfFiducialEngine(pcs,markerWidth*UNIT_TO_POINTS);
 			FiducialSquareGenerator g = new FiducialSquareGenerator(r);
+			g.setBlackBorder(blackBorderFractionalWidth);
 			g.setMarkerWidth(markerWidth*UNIT_TO_POINTS);
 
 			if( showInfo ) {
@@ -204,6 +207,10 @@ public class CreateSquareMarkerDocumentPDF {
 	public void saveToDisk() throws IOException {
 		document.save(documentName);
 		document.close();
+	}
+
+	public void setBlackBorderFractionalWidth(float blackBorderFractionalWidth) {
+		this.blackBorderFractionalWidth = blackBorderFractionalWidth;
 	}
 
 	public void setShowInfo(boolean showInfo) {

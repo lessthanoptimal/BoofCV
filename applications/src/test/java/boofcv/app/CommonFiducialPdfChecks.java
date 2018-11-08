@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import boofcv.io.image.UtilImageIO;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -26,6 +27,8 @@ import org.junit.jupiter.api.AfterEach;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Peter Abeles
@@ -33,18 +36,33 @@ import java.io.IOException;
 public class CommonFiducialPdfChecks {
 	String document_name = "target";
 
-	public BufferedImage loadImage() throws IOException {
-		PDDocument document = PDDocument.load(new File(document_name+".pdf"));
+	List<File> opened = new ArrayList<>();
+
+	public BufferedImage loadPDF() throws IOException {
+		File f = new File(document_name+".pdf");
+		opened.add(f);
+
+		PDDocument document = PDDocument.load(f);
 		PDFRenderer pdfRenderer = new PDFRenderer(document);
 		if( document.getNumberOfPages() != 1 )
 			throw new RuntimeException("Egads");
 		BufferedImage output = pdfRenderer.renderImageWithDPI(0, 150, ImageType.RGB);
 		document.close();
+
 		return output;
+	}
+
+	public BufferedImage loadImage( String name )  {
+		File f = new File(document_name+name+".png");
+		opened.add(f);
+		return UtilImageIO.loadImage(f.getAbsolutePath());
 	}
 
 	@AfterEach
 	public void cleanup() {
-		new File(document_name+".pdf").delete();
+		for (int i = 0; i < opened.size(); i++) {
+			opened.get(i).delete();
+		}
+		opened.clear();
 	}
 }

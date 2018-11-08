@@ -46,7 +46,7 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 	@Test
 	public void chessboard() throws IOException, InterruptedException {
 		createDocument("-r 7 -c 5 -o target -t CHESSBOARD -u cm -w 3 -p LETTER");
-		BufferedImage image = loadImage();
+		BufferedImage image = loadPDF();
 
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
@@ -60,7 +60,7 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 	@Test
 	public void square_grid() throws IOException, InterruptedException {
 		createDocument("-r 4 -c 3 -o target -t SQUARE_GRID -u cm -w 3 -s 3 -p LETTER\n");
-		BufferedImage image = loadImage();
+		BufferedImage image = loadPDF();
 
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
@@ -74,7 +74,7 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 	@Test
 	public void circle_hexagonal() throws IOException, InterruptedException {
 		createDocument("-r 8 -c 7 -o target -t CIRCLE_HEXAGONAL -u cm -w 2 -d 3 -p LETTER");
-		BufferedImage image = loadImage();
+		BufferedImage image = loadPDF();
 
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
@@ -88,7 +88,7 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 	@Test
 	public void circle_regular() throws IOException, InterruptedException {
 		createDocument("-r 8 -c 6 -o target -t CIRCLE_GRID -u cm -w 2 -d 3 -p LETTER");
-		BufferedImage image = loadImage();
+		BufferedImage image = loadPDF();
 
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);

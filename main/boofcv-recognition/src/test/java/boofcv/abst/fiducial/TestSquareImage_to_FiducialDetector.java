@@ -63,6 +63,7 @@ public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector
 		render.configure(0,200);
 
 		FiducialSquareGenerator generator = new FiducialSquareGenerator(render);
+		generator.setMarkerWidth(200);
 		generator.generate(chicken);
 
 		GrayF32 fiducial = render.getGrayF32();

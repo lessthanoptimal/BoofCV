@@ -52,7 +52,7 @@ class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 	}
 
 	private GrayF32 loadImageGray() throws IOException {
-		BufferedImage image = loadImage();
+		BufferedImage image = loadPDF();
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
 

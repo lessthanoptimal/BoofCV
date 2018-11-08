@@ -48,7 +48,7 @@ public class TestCreateQrCodeDocument extends CommonFiducialPdfChecks {
 	@Test
 	public void single() throws IOException, InterruptedException {
 		createDocument("-t http://boofcv.org -p LETTER -w 5 -o target.pdf");
-		BufferedImage image = loadImage();
+		BufferedImage image = loadPDF();
 
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
@@ -68,7 +68,7 @@ public class TestCreateQrCodeDocument extends CommonFiducialPdfChecks {
 	@Test
 	public void two() throws IOException, InterruptedException {
 		createDocument("-t http://boofcv.org -t second -p LETTER -w 5 -o target.pdf");
-		BufferedImage image = loadImage();
+		BufferedImage image = loadPDF();
 
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
@@ -90,7 +90,7 @@ public class TestCreateQrCodeDocument extends CommonFiducialPdfChecks {
 	@Test
 	public void gridAndCustomDocument() throws IOException, InterruptedException {
 		createDocument("-t http://boofcv.org -t second -p 14cm:14cm --GridFill -w 5 -o target.pdf");
-		BufferedImage image = loadImage();
+		BufferedImage image = loadPDF();
 
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);

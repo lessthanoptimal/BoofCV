@@ -53,6 +53,9 @@ public class QrCodeGenerator {
 		this.markerWidth = markerWidth;
 	}
 
+	public QrCodeGenerator() {
+	}
+
 	public void setRender(FiducialRenderEngine render) {
 		this.render = render;
 	}

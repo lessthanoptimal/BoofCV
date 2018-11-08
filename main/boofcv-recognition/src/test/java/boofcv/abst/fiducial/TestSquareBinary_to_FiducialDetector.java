@@ -56,6 +56,7 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 		render.configure(0,200);
 
 		FiducialSquareGenerator generator = new FiducialSquareGenerator(render);
+		generator.setMarkerWidth(200);
 		generator.generate(345,4);
 
 		GrayF32 fiducial = render.getGrayF32();

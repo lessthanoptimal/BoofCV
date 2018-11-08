@@ -101,7 +101,7 @@ public class FiducialSquareGenerator {
 		double bw = (1.0-2*X0)/gridWidth;
 
 		// Draw the black corner used to ID the orientation
-		square(X0,Y0,bw);
+		square(X0,1.0-whiteBorder-blackBorder-bw,bw);
 
 		final int bitCount = gridWidth*gridWidth - 4;
 		for (int j = 0; j < bitCount; j++) {
@@ -109,6 +109,27 @@ public class FiducialSquareGenerator {
 				box(bw,j,gridWidth);
 			}
 		}
+
+		//		int s2 = (int)Math.round(ret.width*borderFraction);
+//		int s5 = s2+square*(gridWidth-1);
+//
+//		int N = gridWidth*gridWidth-4;
+//		for (int i = 0; i < N; i++) {
+//			if( (value& (1<<i)) != 0 )
+//				continue;
+//
+//			int where = index(i, gridWidth);
+//			int x = where%gridWidth;
+//			int y = gridWidth-1-(where/gridWidth);
+//
+//			x = s2 + square*x;
+//			y = s2 + square*y;
+//
+//			ImageMiscOps.fillRectangle(ret,0xFF,x,y,square,square);
+//		}
+//		ImageMiscOps.fillRectangle(ret,0xFF,s2,s2,square,square);
+//		ImageMiscOps.fillRectangle(ret,0xFF,s5,s5,square,square);
+//		ImageMiscOps.fillRectangle(ret,0xFF,s5,s2,square,square);
 	}
 
 	private void box( double boxWidth , final int bit , int gridWidth) {
@@ -132,7 +153,7 @@ public class FiducialSquareGenerator {
 			throw new RuntimeException("Bit must be between 0 and " + transitionBit2);
 
 		int x = adjustedBit % gridWidth;
-		int y = adjustedBit / gridWidth;
+		int y = gridWidth - (adjustedBit / gridWidth)-1;
 		square(X0+x*boxWidth,Y0+y*boxWidth,boxWidth);
 	}
 

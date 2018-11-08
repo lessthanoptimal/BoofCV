@@ -67,10 +67,13 @@ public abstract class BaseFiducialSquare {
 	@Option(name = "-w", aliases = {"--MarkerWidth"}, usage = "Width of each marker.  In document units.")
 	public float markerWidth = -1;
 
+	@Option(name = "-bw", aliases = {"--BlackBorder"}, usage = "Fractional width of black border")
+	public float blackBorderFractionalWidth = 0.25f;
+
 	@Option(name = "-s", aliases = {"--Space"}, usage = "Spacing between the markers.  In document units.")
 	public float spaceBetween = 0;
 
-	@Option(name = "-o", aliases = {"--OutputName"}, usage = "Name of output file. Extension determines file type. E.g. qrcode.pdf. " +
+	@Option(name = "-o", aliases = {"--OutputFile"}, usage = "Name of output file. Extension determines file type. E.g. qrcode.pdf. " +
 			"Valid extensions are pdf, png, jpg, gif, bmp")
 	public String fileName = "qrcode";
 
@@ -91,8 +94,6 @@ public abstract class BaseFiducialSquare {
 	// specifies the file type
 	public String fileType;
 
-	// how wide the fiducial's black border is relative to its total width
-	public float blackBorderFractionalWidth;
 
 	public Unit getUnit() {
 		return unit;
@@ -100,10 +101,6 @@ public abstract class BaseFiducialSquare {
 
 	public void setUnit(Unit unit) {
 		this.unit = unit;
-	}
-
-	public void setBlackBorderFractionalWidth(float blackBorderFractionalWidth) {
-		this.blackBorderFractionalWidth = blackBorderFractionalWidth;
 	}
 
 	public void run() throws IOException {
@@ -124,6 +121,7 @@ public abstract class BaseFiducialSquare {
 		switch (fileType) {
 			case "pdf": {
 				CreateSquareMarkerDocumentPDF renderer = new CreateSquareMarkerDocumentPDF(fileName, paperSize, unit);
+				renderer.blackBorderFractionalWidth = blackBorderFractionalWidth;
 				renderer.markerWidth = markerWidth;
 				renderer.spaceBetween = spaceBetween;
 				renderer.gridFill = gridFill;
@@ -142,6 +140,7 @@ public abstract class BaseFiducialSquare {
 
 			default: {
 				CreateSquareMarkerDocumentImage renderer = new CreateSquareMarkerDocumentImage(fileName);
+				renderer.setBlackBorderFractionalWidth(blackBorderFractionalWidth);
 				renderer.setWhiteBorder((int)spaceBetween);
 				renderer.setMarkerWidth((int)markerWidth);
 				callRenderImage(renderer);
@@ -222,6 +221,8 @@ public abstract class BaseFiducialSquare {
 			if (markerWidth < 0) {
 				throw new RuntimeException("Must specify markerWidth");
 			}
+			if( spaceBetween == 0 )
+				spaceBetween = markerWidth/4;
 
 			unit = unit == null ? Unit.lookup(_unit) : unit;
 			if (unit == null) {

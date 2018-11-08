@@ -42,6 +42,8 @@ public class CreateSquareMarkerDocumentImage {
 	FiducialImageEngine render = new FiducialImageEngine();
 	int whiteBorderPixels;
 
+	double blackBorderFractionalWidth;
+
 	public CreateSquareMarkerDocumentImage(String documentName ) {
 		this.documentName = documentName;
 		this.generator = new FiducialSquareGenerator(render);
@@ -52,6 +54,7 @@ public class CreateSquareMarkerDocumentImage {
 	}
 
 	public void render( java.util.List<String> names , GrowQueue_I64 patterns , int gridWidth ) {
+		generator.setBlackBorder(blackBorderFractionalWidth);
 		render.configure(whiteBorderPixels,(int)generator.getMarkerWidth());
 		for (int i = 0; i < patterns.size; i++) {
 			generator.generate(patterns.get(i),gridWidth);
@@ -93,4 +96,7 @@ public class CreateSquareMarkerDocumentImage {
 		whiteBorderPixels = pixels;
 	}
 
+	public void setBlackBorderFractionalWidth(double blackBorderFractionalWidth) {
+		this.blackBorderFractionalWidth = blackBorderFractionalWidth;
+	}
 }

@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.square;
 
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
@@ -170,31 +171,44 @@ public class TestDetectFiducialSquareBinary {
 
 		int width = (int)Math.round((square*gridWidth)/(1-2.0*borderFraction));
 
-		GrayF32 ret = new GrayF32(width,width);
+		FiducialImageEngine render = new FiducialImageEngine();
+		render.configure(0,width);
 
-		int s2 = (int)Math.round(ret.width*borderFraction);
-		int s5 = s2+square*(gridWidth-1);
+		FiducialSquareGenerator generator = new FiducialSquareGenerator(render);
+		generator.setMarkerWidth(width);
+		generator.setBlackBorder(borderFraction);
+		generator.generate(value,gridWidth);
 
-		int N = gridWidth*gridWidth-4;
-		for (int i = 0; i < N; i++) {
-			if( (value& (1<<i)) != 0 )
-				continue;
-
-			int where = index(i, gridWidth);
-			int x = where%gridWidth;
-			int y = gridWidth-1-(where/gridWidth);
-
-			x = s2 + square*x;
-			y = s2 + square*y;
-
-			ImageMiscOps.fillRectangle(ret,0xFF,x,y,square,square);
-		}
-		ImageMiscOps.fillRectangle(ret,0xFF,s2,s2,square,square);
-		ImageMiscOps.fillRectangle(ret,0xFF,s5,s5,square,square);
-		ImageMiscOps.fillRectangle(ret,0xFF,s5,s2,square,square);
-
-		return ret;
+		return render.getGrayF32();
 	}
+
+//	private static void renderOldWay(int square, int value, int gridWidth , double borderFraction)  {
+//		int width = (int)Math.round((square*gridWidth)/(1-2.0*borderFraction));
+//
+//		GrayF32 ret = new GrayF32(width,width);
+//
+//		int s2 = (int)Math.round(ret.width*borderFraction);
+//		int s5 = s2+square*(gridWidth-1);
+//
+//		int N = gridWidth*gridWidth-4;
+//		for (int i = 0; i < N; i++) {
+//			if( (value& (1<<i)) != 0 )
+//				continue;
+//
+//			int where = index(i, gridWidth);
+//			int x = where%gridWidth;
+//			int y = gridWidth-1-(where/gridWidth);
+//
+//			x = s2 + square*x;
+//			y = s2 + square*y;
+//
+//			ImageMiscOps.fillRectangle(ret,0xFF,x,y,square,square);
+//		}
+//		ImageMiscOps.fillRectangle(ret,0xFF,s2,s2,square,square);
+//		ImageMiscOps.fillRectangle(ret,0xFF,s5,s5,square,square);
+//		ImageMiscOps.fillRectangle(ret,0xFF,s5,s2,square,square);
+//		ShowImages.showWindow(ret,"OLD");
+//	}
 
 	private static int index( int bit , int gridWidth ) {
 		int transitionBit0 = gridWidth-3;
