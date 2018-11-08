@@ -88,7 +88,7 @@ public class CreateQrCodeDocument {
 			"Valid extensions are pdf, png, jpg, gif, bmp")
 	public String fileName = "qrcode";
 
-	@Option(name="-i",aliases = {"--DisablePrintInfo"}, usage="Disable printing information about the calibration target")
+	@Option(name="--DisablePrintInfo", usage="Disable printing information about the calibration target")
 	public boolean disablePrintInfo = false;
 
 	@Option(name="--GridFill", usage="Flag to turn on filling the entire document with a grid of qr codes")

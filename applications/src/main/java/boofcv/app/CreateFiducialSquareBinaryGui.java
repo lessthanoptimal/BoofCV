@@ -19,7 +19,7 @@
 package boofcv.app;
 
 import boofcv.alg.drawing.FiducialImageEngine;
-import boofcv.alg.fiducial.square.FiducialSqareGenerator;
+import boofcv.alg.fiducial.square.FiducialSquareGenerator;
 import boofcv.app.markers.CreateSquareMarkerControlPanel;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ImagePanel;
@@ -29,10 +29,13 @@ import boofcv.io.image.ConvertBufferedImage;
 import org.ddogleg.struct.GrowQueue_I64;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * GUI for printing square binary fiducials
@@ -49,13 +52,14 @@ public class CreateFiducialSquareBinaryGui extends JPanel implements CreateSquar
 	JFrame frame;
 
 	FiducialImageEngine render = new FiducialImageEngine();
-	FiducialSqareGenerator generator = new FiducialSqareGenerator(render);
+	FiducialSquareGenerator generator = new FiducialSquareGenerator(render);
 	BufferedImage buffered;
 
 	public CreateFiducialSquareBinaryGui() {
 		super(new BorderLayout());
 
 		render.configure(20,300);
+		generator.setMarkerWidth(300);
 		buffered = new BufferedImage(render.getGray().width,render.getGray().height,BufferedImage.TYPE_INT_RGB);
 
 		imagePanel.setPreferredSize(new Dimension(400,400));
@@ -118,7 +122,48 @@ public class CreateFiducialSquareBinaryGui extends JPanel implements CreateSquar
 	}
 
 	private void saveFile( boolean sendToPrinter ) {
+		if( controls.patterns.size == 0 )
+			return;
+		CreateFiducialSquareBinary c = new CreateFiducialSquareBinary();
+		c.sendToPrinter = sendToPrinter;
+		c.unit = controls.documentUnits;
+		c.paperSize = controls.paperSize;
+		c.markerWidth = (float)controls.markerWidth;
+		c.spaceBetween = c.markerWidth/4;
+		c.gridWidth = controls.gridWidth;
+		c.gridFill = controls.fillGrid;
+		c.hideInfo = controls.hideInfo;
+		c.numbers = new Long[controls.patterns.size];
+		for (int i = 0; i < controls.patterns.size; i++) {
+			c.numbers[i] = controls.patterns.get(i);
+		}
 
+		if( sendToPrinter ) {
+			if (controls.format.compareToIgnoreCase("pdf") != 0) {
+				JOptionPane.showMessageDialog(this, "Must select PDF document type to print");
+				return;
+			}
+		} else {
+			File f = FileSystemView.getFileSystemView().getHomeDirectory();
+			f = new File(f,"binary."+controls.format);
+
+			f = BoofSwingUtil.fileChooser(this,false,f.getPath());
+			if (f == null) {
+				return;
+			}
+			if (f.isDirectory()) {
+				JOptionPane.showMessageDialog(this, "Can't save to a directory!");
+				return;
+			}
+			c.fileName = f.getAbsolutePath();
+		}
+
+		c.finishParsing();
+		try {
+			c.run();
+		} catch (IOException e) {
+			BoofSwingUtil.warningDialog(this,e);
+		}
 	}
 
 	private void showHelp() {

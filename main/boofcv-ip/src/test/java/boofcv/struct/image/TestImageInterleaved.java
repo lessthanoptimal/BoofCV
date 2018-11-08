@@ -129,7 +129,7 @@ public class TestImageInterleaved {
 		a.setTo(b);
 
 		assertEquals(a.width, 11);
-		assertEquals(b.height, 21);
+		assertEquals(a.height, 21);
 	}
 
 	/**
@@ -137,11 +137,13 @@ public class TestImageInterleaved {
 	 */
 	@Test
 	public void setTo_mismatch_bands() {
-		DummyImage a = new DummyImage(10, 20, 3);
+		DummyImage a = new DummyImage(11, 21, 3);
 		DummyImage b = new DummyImage(10, 20, 4);
+		a.setTo(b);
 
-		assertThrows(IllegalArgumentException.class,
-				()->a.setTo(b));
+		assertEquals(a.width, 10);
+		assertEquals(a.height, 20);
+		assertEquals(a.numBands, 4);
 	}
 
 	/**

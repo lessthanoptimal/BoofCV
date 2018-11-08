@@ -29,7 +29,7 @@ import java.lang.reflect.Method;
 public class Help {
 
 	static Class []options = new Class[]{
-			CreateFiducialSquareImage.class,
+//			CreateFiducialSquareImage.class,
 			CreateFiducialSquareBinary.class,
 			BatchRemoveLensDistortion.class,
 			BatchDownsizeImage.class,

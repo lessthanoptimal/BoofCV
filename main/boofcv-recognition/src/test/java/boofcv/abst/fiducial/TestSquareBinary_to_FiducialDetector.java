@@ -22,7 +22,7 @@ import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.drawing.FiducialImageEngine;
-import boofcv.alg.fiducial.square.FiducialSqareGenerator;
+import boofcv.alg.fiducial.square.FiducialSquareGenerator;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.FactoryFiducial;
@@ -55,7 +55,7 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 		FiducialImageEngine render = new FiducialImageEngine();
 		render.configure(0,200);
 
-		FiducialSqareGenerator generator = new FiducialSqareGenerator(render);
+		FiducialSquareGenerator generator = new FiducialSquareGenerator(render);
 		generator.generate(345,4);
 
 		GrayF32 fiducial = render.getGrayF32();

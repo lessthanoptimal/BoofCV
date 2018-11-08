@@ -18,9 +18,17 @@
 
 package boofcv.app;
 
+import boofcv.app.markers.CreateSquareMarkerDocumentImage;
+import boofcv.app.markers.CreateSquareMarkerDocumentPDF;
+import boofcv.gui.BoofSwingUtil;
 import org.ddogleg.struct.GrowQueue_I64;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Outputs an EPS document describing a binary square fiducial that encodes the specified number
@@ -29,102 +37,85 @@ import java.io.IOException;
  */
 public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 
-	// list of the fiducial ID's it will print
-	GrowQueue_I64 numbers = new GrowQueue_I64();
+	@Option(name = "-n",aliases = {"--Numbers"},usage = "Specifies the numbers to encode", handler = LongArrayOptionHandler.class)
+	public Long[] numbers;
 
-	private int gridWidth = 4;
+	@Option(name = "--PatternGridWidth", usage = "Size of grid in the pattern")
+	public int gridWidth = 4;
 
 	@Override
-	protected void drawPattern( int patternID ) throws IOException {
+	protected void callRenderPdf(CreateSquareMarkerDocumentPDF renderer) {
+		List<String> names = new ArrayList<>();
+		GrowQueue_I64 numbers = new GrowQueue_I64();
 
-		float bw = innerWidth/gridWidth;
+		for (int i = 0; i < this.numbers.length; i++) {
+			names.add( this.numbers[i].toString() );
+			numbers.add( this.numbers[i]);
+		}
 
-		// Draw the black corner used to ID the orientation
-		pcs.addRect(0,0,bw,bw);pcs.fill();
-
-		long patternNumber = numbers.get(patternID);
-
-		final int bitCount = numberOfElements() - 4;
-		for (int j = 0; j < bitCount; j++) {
-			if( (patternNumber & (1L<<j)) != 0 ) {
-				box(bw,j);
-			}
+		try {
+			renderer.render(names, numbers, gridWidth);
+		} catch( IOException e ) {
+			e.printStackTrace();
 		}
 	}
 
 	@Override
-	protected int totalPatterns() {
-		return numbers.size();
+	protected void callRenderImage(CreateSquareMarkerDocumentImage renderer) {
+		List<String> names = new ArrayList<>();
+		GrowQueue_I64 numbers = new GrowQueue_I64();
+
+		for (int i = 0; i < this.numbers.length; i++) {
+			names.add( this.numbers[i].toString() );
+			numbers.add( this.numbers[i]);
+		}
+
+		renderer.render(names, numbers, gridWidth);
 	}
 
 	@Override
-	protected void addPattern(String name) {
-		final long maxValue = (long) Math.pow(2, numberOfElements() - 4) - 1;
-		long value = Long.parseLong(name);
-		if( value < 0 || value > maxValue)
-			throw new IllegalArgumentException("Values must be tween 0 and " +maxValue + ", inclusive");
-		numbers.add( value );
+	protected void printHelp(CmdLineParser parser) {
+		super.printHelp(parser);
+
+		System.out.println("Creates three images in PNG format 220x220 pixels, 20 pixel white border");
+		System.out.println("-n 101 -n 4932 -n 944 -w 200 -s 20 -o binary.png");
+		System.out.println();
+		System.out.println("Creates a PDF document the fills in a grid from these three markers");
+		System.out.println("5cm with 2cm space between markers.");
+		System.out.println("-n 101 -n 4932 -n 944 -u cm -w 5 -s 2 --GridFill -o binary.pdf");
+		System.out.println();
+		System.out.println("Opens a GUI");
+		System.out.println("--GUI");
+
+		System.exit(-1);
 	}
 
-	@Override
-	protected String getPatternName(int num) {
-		return "grid: "+gridWidth+", value: "+numbers.get(num);
+	public static void main(String[] args) {
+		CreateFiducialSquareBinary generator = new CreateFiducialSquareBinary();
+		CmdLineParser parser = new CmdLineParser(generator);
+
+		if( args.length == 0 ) {
+			generator.printHelp(parser);
+		}
+
+		try {
+			parser.parseArgument(args);
+			if( generator.guiMode ) {
+				BoofSwingUtil.invokeNowOrLater(CreateFiducialSquareBinaryGui::new);
+			} else {
+				if( generator.numbers == null ) {
+					System.err.println("Must specify at least one number");
+					System.exit(1);
+				}
+				generator.finishParsing();
+				generator.run();
+			}
+		} catch (CmdLineException e) {
+			// handling of wrong arguments
+			generator.printHelp(parser);
+			System.err.println(e.getMessage());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
-
-	@Override
-	public String defaultOutputFileName() {
-		if( numbers.size() == 1 )
-			return "Fiducial"+numbers.get(0);
-		else
-			return "BinaryFiducials";
-	}
-
-	@Override
-	public String selectDocumentName() {
-		if( numbers.size() == 1 )
-			return ""+numbers.get(0);
-		else
-			return numbers.get(0)+" and more";
-	}
-
-	private void box( float boxWidth , final int bit ) throws IOException {
-
-		int transitionBit0 = gridWidth-3;
-		int transitionBit1 = transitionBit0 + gridWidth*(gridWidth-2);
-		int transitionBit2 = transitionBit1 + gridWidth-2;
-
-		final int adjustedBit;
-		if( bit <= transitionBit0 )
-			adjustedBit = bit + 1;
-		else if( bit <= transitionBit1 )
-			adjustedBit = bit + 2;
-		else if( bit <= transitionBit2 )
-			adjustedBit = bit + 3;
-		else
-			throw new RuntimeException("Bit must be between 0 and " + transitionBit2);
-
-		int x = adjustedBit % gridWidth;
-		int y = adjustedBit / gridWidth;
-		pcs.addRect(x*boxWidth,y*boxWidth,boxWidth,boxWidth);pcs.fill();
-	}
-
-	private int numberOfElements() {
-		return gridWidth*gridWidth;
-	}
-
-
-	public void setGridSize(int gridWidth) {
-		this.gridWidth = gridWidth;
-	}
-
-	public static void main(String[] args) throws IOException {
-
-		CommandParserFiducialSquare parser = new CommandParserFiducialSquare("number");
-		parser.setIsBinary(true);
-		parser.setExampleNames("284","845");
-		parser.applicationDescription = "Generates postscript documents for square binary fiducials.";
-		parser.execute(args,new CreateFiducialSquareBinary());
-	}
-
-
 }

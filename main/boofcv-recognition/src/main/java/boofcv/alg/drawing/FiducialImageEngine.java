@@ -57,10 +57,10 @@ public class FiducialImageEngine extends FiducialRenderEngine {
 
 	@Override
 	public void rectangle(double x0, double y0, double x1 , double y1) {
-		int pixelX0 = borderPixels+(int)(x0* markerPixels +0.5);
-		int pixelY0 = borderPixels+(int)(y0* markerPixels +0.5);
-		int pixelX1 = borderPixels+(int)(x1* markerPixels +0.5);
-		int pixelY1 = borderPixels+(int)(y1* markerPixels +0.5);
+		int pixelX0 = borderPixels+(int)(x0+0.5);
+		int pixelY0 = borderPixels+(int)(y0+0.5);
+		int pixelX1 = borderPixels+(int)(x1+0.5);
+		int pixelY1 = borderPixels+(int)(y1+0.5);
 
 		ImageMiscOps.fillRectangle(gray,0,pixelX0,pixelY0,pixelX1-pixelX0,pixelY1-pixelY0);
 	}
@@ -68,10 +68,10 @@ public class FiducialImageEngine extends FiducialRenderEngine {
 	@Override
 	public void square(double x0, double y0, double width0, double thickness) {
 
-		int X0 = borderPixels+(int)(x0* markerPixels +0.5);
-		int Y0 = borderPixels+(int)(y0* markerPixels +0.5);
-		int WIDTH = (int)(width0* markerPixels +0.5);
-		int THICKNESS = (int)(thickness * markerPixels +0.5);
+		int X0 = borderPixels+(int)(x0+0.5);
+		int Y0 = borderPixels+(int)(y0 +0.5);
+		int WIDTH = (int)(width0 +0.5);
+		int THICKNESS = (int)(thickness +0.5);
 
 		ImageMiscOps.fillRectangle(gray,0,X0,Y0,WIDTH,THICKNESS);
 		ImageMiscOps.fillRectangle(gray,0,X0,Y0+WIDTH-THICKNESS,WIDTH,THICKNESS);
@@ -81,10 +81,10 @@ public class FiducialImageEngine extends FiducialRenderEngine {
 
 	@Override
 	public void draw(GrayU8 image, double x0, double y0, double x1, double y1) {
-		int X0 = borderPixels+(int)(x0* markerPixels +0.5);
-		int Y0 = borderPixels+(int)(y0* markerPixels +0.5);
-		int X1 = borderPixels+(int)(x1* markerPixels +0.5);
-		int Y1 = borderPixels+(int)(y1* markerPixels +0.5);
+		int X0 = borderPixels+(int)(x0 +0.5);
+		int Y0 = borderPixels+(int)(y0 +0.5);
+		int X1 = borderPixels+(int)(x1 +0.5);
+		int Y1 = borderPixels+(int)(y1 +0.5);
 
 		GrayU8 out = new GrayU8(X1-X0,Y1-Y0);
 		new FDistort(image,out).scale().apply();

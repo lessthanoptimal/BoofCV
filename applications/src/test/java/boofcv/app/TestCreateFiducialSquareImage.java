@@ -48,7 +48,7 @@ class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 			new String[]{"temp0.jpg","temp1.jpg"};
 
 	private void createDocument( String args ) throws IOException, InterruptedException {
-		CreateFiducialSquareImage.main(args.split("\\s+"));
+//		CreateFiducialSquareImage.main(args.split("\\s+"));
 	}
 
 	private GrayF32 loadImageGray() throws IOException {
