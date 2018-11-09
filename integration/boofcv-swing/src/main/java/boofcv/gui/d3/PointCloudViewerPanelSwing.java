@@ -42,8 +42,6 @@ import java.awt.image.DataBufferInt;
 import java.util.HashSet;
 import java.util.Set;
 
-import static java.awt.event.KeyEvent.VK_SHIFT;
-
 /**
  * <p>
  * Renders a 3D point cloud using a perspective pinhole camera model. Points are rendered as sprites which are
@@ -53,7 +51,7 @@ import static java.awt.event.KeyEvent.VK_SHIFT;
  * @author Peter Abeles
  */
 public class PointCloudViewerPanelSwing extends JPanel
-		implements MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
+		implements MouseMotionListener, MouseListener, MouseWheelListener {
 
 	// TODO right-click or shift-click  perform a roll
 
@@ -93,15 +91,30 @@ public class PointCloudViewerPanelSwing extends JPanel
 	int prevX;
 	int prevY;
 
+	Keyboard keyboard = new Keyboard();
+
 	public PointCloudViewerPanelSwing(float keyStepSize ) {
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
-		addKeyListener(this);
 		setFocusable(true);
 		requestFocus();
 		this.stepSize = keyStepSize;
+
+		addFocusListener(new FocusListener(){
+			@Override
+			public void focusGained(FocusEvent e) {
+//				System.out.println("focus gained");
+				KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyboard);
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+//				System.out.println("focus lost");
+				KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(keyboard);
+			}
+		});
 	}
 
 	public PointCloudViewerPanelSwing( float hfov, float keyStepSize) {
@@ -252,74 +265,55 @@ public class PointCloudViewerPanelSwing extends JPanel
 		}
 	}
 
-	@Override
-	public void keyTyped(KeyEvent e) {
+	boolean shiftPressed = false;
+	private final Set<Integer> pressed = new HashSet<>();
+
+	private class Keyboard implements KeyEventDispatcher {
+
+		@Override
+		public boolean dispatchKeyEvent(KeyEvent e) {
+			switch (e.getID()) {
+
+				case KeyEvent.KEY_PRESSED:
+//					System.out.println("Key pressed "+e.getKeyChar());
+					switch( e.getKeyCode() ) {
+						case KeyEvent.VK_SHIFT: shiftPressed=true; break;
+						default:pressed.add(e.getKeyCode());break;
+
+					}
+					break;
+
+				case KeyEvent.KEY_RELEASED:
+//					System.out.println("Key released "+e.getKeyChar());
+					switch( e.getKeyCode() ) {
+						case KeyEvent.VK_SHIFT: shiftPressed=false; break;
+						default:pressed.remove(e.getKeyCode());break;
+					}
+					break;
+			}
+			handleKeyPress();
+			return false;
+		}
 	}
 
-	boolean shiftPressed = false;
-	private final Set<Character> pressed = new HashSet<Character>();
-
-	@Override
-	public void keyPressed(KeyEvent e) {
+	private void handleKeyPress() {
 		Vector3D_F32 T = worldToCamera.getT();
 
 		double multiplier = shiftPressed?5:1;
+		Integer[] keys = pressed.toArray(new Integer[0]);
 
-		if( e.getKeyCode() == VK_SHIFT ) {
-			shiftPressed = true;
-		} else {
-			pressed.add(e.getKeyChar());
-		}
-
-		for( Character c : pressed ) {
-			c = Character.toLowerCase(c);
-			if( c == 'w' ) {
-				T.z -= stepSize*multiplier;
-			} else if(c == 's' ) {
-				T.z += stepSize*multiplier;
-			} else if( c == 'a' ) {
-				T.x += stepSize*multiplier;
-			} else if( c == 'd' ) {
-				T.x -= stepSize*multiplier;
-			} else if( c == 'q' ) {
-				T.y -= stepSize*multiplier;
-			} else if( c == 'e' ) {
-				T.y += stepSize*multiplier;
-			} else if( c == 'h' ) {
-				worldToCamera.reset();
+		for( int k : keys ) {
+			switch( k ) {
+				case KeyEvent.VK_W:T.z -= stepSize*multiplier; break;
+				case KeyEvent.VK_S:T.z += stepSize*multiplier; break;
+				case KeyEvent.VK_A:T.x += stepSize*multiplier; break;
+				case KeyEvent.VK_D:T.x -= stepSize*multiplier; break;
+				case KeyEvent.VK_Q:T.y -= stepSize*multiplier; break;
+				case KeyEvent.VK_E:T.y += stepSize*multiplier; break;
+				case KeyEvent.VK_H:worldToCamera.reset(); break;
 			}
 		}
-
 		repaint();
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		if( e.getKeyCode() == VK_SHIFT ) {
-			shiftPressed = false;
-		} else {
-			pressed.remove(e.getKeyChar());
-		}
-	}
-
-	/**
-	 * Contains information on visible pixels
-	 */
-	private static class Pixel
-	{
-		// the pixel's height.  used to see if it is closer to the  camera or not
-		public double height;
-		// Color of the pixel
-		public int rgb;
-
-		private Pixel() {
-			reset();
-		}
-
-		public void reset() {
-			height = Double.MAX_VALUE;
-			rgb = -1;
-		}
 	}
 
 	@Override
