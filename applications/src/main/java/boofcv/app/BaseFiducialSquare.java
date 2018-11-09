@@ -83,6 +83,9 @@ public abstract class BaseFiducialSquare {
 	@Option(name = "--GridFill", usage = "Flag to turn on filling the entire document with a grid of qr codes")
 	public boolean gridFill = false;
 
+	@Option(name = "--DrawGrid", usage = "Draws a line showing the grid")
+	public boolean drawGrid = false;
+
 	@Option(name = "--HideInfo", usage = "Flag that's used to turn off the printing of extra information")
 	public boolean hideInfo = false;
 
@@ -128,6 +131,7 @@ public abstract class BaseFiducialSquare {
 				renderer.markerWidth = markerWidth;
 				renderer.spaceBetween = spaceBetween;
 				renderer.gridFill = gridFill;
+				renderer.drawGrid = drawGrid;
 				renderer.showInfo = !hideInfo;
 				callRenderPdf(renderer);
 				if (sendToPrinter) {
@@ -156,53 +160,6 @@ public abstract class BaseFiducialSquare {
 
 	protected abstract void callRenderImage(CreateSquareMarkerDocumentImage renderer);
 
-	/**
-	 * Draws the grid in light grey on the document
-	 */
-//	private void printGrid() throws IOException {
-//		float pageWidth = (float)paper.convertWidth(unit)*UNIT_TO_POINTS;
-//		float pageHeight = (float)paper.convertHeight(unit)*UNIT_TO_POINTS;
-//
-////		pcs.setLineCapStyle(1);
-//		pcs.setStrokingColor(0.75);
-//
-//		for (int i = 0; i <= numCols; i++) {
-//			float x = offsetX + i*fiducialTotalWidth;
-//			pcs.moveTo(x,0);
-//			pcs.lineTo(x,pageHeight);
-//		}
-//		for (int i = 0; i <= numRows; i++) {
-//			float y = offsetY + i*fiducialTotalWidth;
-//			pcs.moveTo(0,y);
-//			pcs.lineTo(pageWidth,y);
-//		}
-//		pcs.closeAndStroke();
-//	}
-
-//	public static String binaryToHex( GrayU8 binary ) {
-//
-//		if( binary.width%8 != 0 )
-//			throw new RuntimeException("Width must be divisible by 8");
-//
-//		StringBuilder s = new StringBuilder(binary.width*binary.height/4);
-//
-//		for (int y = binary.height-1; y >= 0 ; y--) {
-//			int i = y*binary.width;
-//			for (int x = 0; x < binary.width; x += 8, i+= 8) {
-//				int value = 0;
-//				for (int j = 0; j < 8; j++) {
-//					value |= binary.data[i+j] << (7-j);
-//				}
-//
-//				String hex = Integer.toHexString(value);
-//				if( hex.length() == 1 )
-//					hex = "0"+hex;
-//				s.append(hex);
-//			}
-//		}
-//
-//		return s.toString();
-//	}
 	private void getFileTypeFromFileName() {
 		fileType = FilenameUtils.getExtension(fileName);
 		if (fileType.length() == 0) {

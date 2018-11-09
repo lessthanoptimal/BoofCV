@@ -52,6 +52,7 @@ public class CreateSquareMarkerDocumentPDF {
 
 	public boolean showInfo = true;
 	public boolean gridFill = false;
+	public boolean drawGrid = false;
 
 	public float markerWidth;
 	public float spaceBetween;
@@ -121,6 +122,16 @@ public class CreateSquareMarkerDocumentPDF {
 		int numRows = (int)Math.floor(pageHeight/sizeBox);
 		int numCols = (int)Math.floor(pageWidth/sizeBox);
 
+		// center the marker better if it doesn't fill the entire page
+		if( !gridFill && totalMarkers < numCols*numRows) {
+			int minRows = totalMarkers/numCols;
+			if( totalMarkers%numCols>0)
+				minRows++;
+
+			numCols = Math.min(totalMarkers,numCols);
+			numRows = Math.min(minRows,numRows);
+		}
+
 		// offset used to center
 		float centerX = (pageHeight-sizeBox*numRows)/2f;
 		float centerY = (pageWidth-sizeBox*numCols)/2f;
@@ -183,8 +194,39 @@ public class CreateSquareMarkerDocumentPDF {
 					}
 				}
 			}
+
+			if( drawGrid ) {
+				printGrid(pcs,
+						centerY ,
+						centerX ,numRows,numCols,sizeBox);
+			}
+
 			pcs.close();
 		}
+	}
+
+	/**
+	 * Draws the grid in light grey on the document
+	 */
+	private void printGrid(PDPageContentStream pcs, float offsetX , float offsetY,
+						   int numRows, int numCols , float sizeBox ) throws IOException {
+		float pageWidth = (float)paper.convertWidth(units)*UNIT_TO_POINTS;
+		float pageHeight = (float)paper.convertHeight(units)*UNIT_TO_POINTS;
+
+//		pcs.setLineCapStyle(1);
+		pcs.setStrokingColor(0.75);
+
+		for (int i = 0; i <= numCols; i++) {
+			float x = offsetX + i*sizeBox;
+			pcs.moveTo(x,0);
+			pcs.lineTo(x,pageHeight);
+		}
+		for (int i = 0; i <= numRows; i++) {
+			float y = offsetY + i*sizeBox;
+			pcs.moveTo(0,y);
+			pcs.lineTo(pageWidth,y);
+		}
+		pcs.closeAndStroke();
 	}
 
 	private void render( FiducialSquareGenerator g , int index ) {
