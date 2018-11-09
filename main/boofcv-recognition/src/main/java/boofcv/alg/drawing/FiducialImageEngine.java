@@ -34,8 +34,6 @@ public class FiducialImageEngine extends FiducialRenderEngine {
 
 	// number of pixels in the border
 	private int borderPixels;
-	// Width of the marker in pixels
-	private int markerPixels;
 
 	/**
 	 *
@@ -44,7 +42,6 @@ public class FiducialImageEngine extends FiducialRenderEngine {
 	 */
 	public void configure( int borderPixels , int markerPixels ) {
 		this.borderPixels = borderPixels;
-		this.markerPixels = markerPixels;
 
 		int width = markerPixels +2*borderPixels;
 		gray.reshape(width,width);
@@ -96,9 +93,6 @@ public class FiducialImageEngine extends FiducialRenderEngine {
 		return borderPixels;
 	}
 
-	public int getMarkerPixels() {
-		return markerPixels;
-	}
 
 	public GrayU8 getGray() {
 		return gray;

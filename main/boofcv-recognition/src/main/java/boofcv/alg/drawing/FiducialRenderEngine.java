@@ -21,8 +21,8 @@ package boofcv.alg.drawing;
 import boofcv.struct.image.GrayU8;
 
 /**
- * Interface for rendering fiducials to different document types. All units are in fractions
- * of document units
+ * Interface for rendering fiducials to different document types. All units are in
+ * document specific units.
  *
  * @author Peter Abeles
  */

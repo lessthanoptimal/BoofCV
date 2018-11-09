@@ -37,7 +37,6 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 	int borderModule=2;
 
 	FiducialImageEngine renderer = new FiducialImageEngine();
-	int borderPixels,markerPixels;
 
 	public QrCodeGeneratorImage( int pixelsPerModule) {
 		this.pixelsPerModule = pixelsPerModule;
@@ -48,19 +47,18 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 	public void render(QrCode qr ) {
 		super.render(qr);
 
-		borderPixels = renderer.getBorderPixels();
-		markerPixels = renderer.getMarkerPixels();
+		int borderPixels = renderer.getBorderPixels();
 
 		// adjust the location to match what's in the image
-		adjustSize(qr.ppRight);
-		adjustSize(qr.ppCorner);
-		adjustSize(qr.ppDown);
-		adjustSize(qr.bounds);
+		adjustSize(borderPixels,qr.ppRight);
+		adjustSize(borderPixels,qr.ppCorner);
+		adjustSize(borderPixels,qr.ppDown);
+		adjustSize(borderPixels,qr.bounds);
 
 		for (int i = 0; i < qr.alignment.size(); i++) {
 			QrCode.Alignment a = qr.alignment.get(i);
-			a.pixel.x = borderPixels + a.pixel.x* markerPixels;
-			a.pixel.y = borderPixels + a.pixel.y* markerPixels;
+			a.pixel.x += borderPixels;
+			a.pixel.y += borderPixels;
 			a.threshold = 125;
 		}
 
@@ -74,13 +72,14 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 		this.markerWidth = pixelsPerModule*QrCode.totalModules(qr.version);;
 		super.initialize(qr);
 		renderer.configure( borderModule*pixelsPerModule, pixelsPerModule*numModules);
+		renderer.init();
 	}
 
-	private void adjustSize(Polygon2D_F64 poly) {
+	private void adjustSize( int borderPixels , Polygon2D_F64 poly) {
 		for (int i = 0; i < poly.size(); i++) {
 			Point2D_F64 p = poly.get(i);
-			p.x = borderPixels+p.x*markerPixels;
-			p.y = borderPixels+p.y*markerPixels;
+			p.x += borderPixels;
+			p.y += borderPixels;
 		}
 	}
 	public int getBorderModule() {
