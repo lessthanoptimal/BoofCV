@@ -11,7 +11,9 @@ Version : 0.32
   * Colorized code
   * Updated detect line demo
   * Updated image enhance demo
-  * TODO fix os x touch pad zoom
+- Applications
+  * All applications have a GUI
+  * Centralized GUI for launching
 - Added 3D QR Code where you can estimate its 6-DOF pose
 - Changed Fiducial stability calculation to use 4 synthetic corners as way to improve speed
 - InterleavedU8 and Planar<GrayU8>

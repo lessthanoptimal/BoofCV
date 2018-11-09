@@ -63,6 +63,7 @@ public abstract class CreateSquareFiducialGui extends JPanel implements CreateSq
 		imagePanel.setPreferredSize(new Dimension(400,400));
 		imagePanel.setScaling(ScaleOptions.DOWN);
 		imagePanel.setCentering(true);
+		imagePanel.setBackground(Color.GRAY);
 
 		add(controls,BorderLayout.WEST);
 		add(imagePanel,BorderLayout.CENTER);
