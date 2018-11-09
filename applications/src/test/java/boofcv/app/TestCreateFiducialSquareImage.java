@@ -36,7 +36,6 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -124,8 +123,19 @@ class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 	}
 
 	@Test
-	void multiple_png() {
-		fail("Implement");
+	void multiple_png() throws IOException {
+		createDocument(String.format("--OutputFile %s -w 200 -s 20 -i %s -i %s",
+				document_name+".png",names[0],names[1]));
+
+		ConfigFiducialImage config = new ConfigFiducialImage();
+		FiducialDetector<GrayF32> detector = createDetector(config);
+		for (int i = 0; i < names.length; i++) {
+			GrayF32 gray = loadPngAsGray(document_name+names[i]+".png");
+
+			detector.detect(gray);
+			assertEquals(1,detector.totalFound());
+			assertEquals(i,detector.getId(0));
+		}
 	}
 
 }

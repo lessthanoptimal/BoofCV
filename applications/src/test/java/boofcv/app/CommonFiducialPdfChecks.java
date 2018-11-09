@@ -18,7 +18,9 @@
 
 package boofcv.app;
 
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.image.GrayF32;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -52,8 +54,22 @@ public class CommonFiducialPdfChecks {
 		return output;
 	}
 
+	public GrayF32 loadPdfAsGray() throws IOException {
+		BufferedImage image = loadPDF();
+		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
+		ConvertBufferedImage.convertFrom(image,gray);
+		return gray;
+	}
+
+	public GrayF32 loadPngAsGray( String name ) {
+		BufferedImage image = loadImage(name);
+		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
+		ConvertBufferedImage.convertFrom(image,gray);
+		return gray;
+	}
+
 	public BufferedImage loadImage( String name )  {
-		File f = new File(document_name+name+".png");
+		File f = new File(name);
 		opened.add(f);
 		return UtilImageIO.loadImage(f.getAbsolutePath());
 	}
