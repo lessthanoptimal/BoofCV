@@ -36,11 +36,12 @@ import java.text.ParseException;
  *
  * @author Peter Abeles
  */
-public abstract class CreateSquareMarkerControlPanel extends StandardAlgConfigPanel implements ActionListener
+public abstract class CreateSquareFiducialControlPanel extends StandardAlgConfigPanel implements ActionListener
 {
 
 	JComboBox<String> comboOutputFormat = new JComboBox<>(new String[]{"pdf","png","bmp","jpg","ppm","pgm"});
 	JCheckBox checkFillGrid;
+	JCheckBox checkShowGrid;
 	JCheckBox checkHideInfo;
 	JComboBox<PaperSize> comboPaper = new JComboBox<>(PaperSize.values().toArray(new PaperSize[0]));
 
@@ -51,6 +52,7 @@ public abstract class CreateSquareMarkerControlPanel extends StandardAlgConfigPa
 	public PaperSize paperSize;
 	public boolean fillGrid=false;
 	public boolean hideInfo=false;
+	public boolean drawGrid =false;
 	public String format;
 
 	public Unit documentUnits = Unit.CENTIMETER;
@@ -59,7 +61,7 @@ public abstract class CreateSquareMarkerControlPanel extends StandardAlgConfigPa
 
 	Listener listener;
 
-	public CreateSquareMarkerControlPanel(final Listener listener ) {
+	public CreateSquareFiducialControlPanel(final Listener listener ) {
 		this.listener = listener;
 	}
 
@@ -77,6 +79,7 @@ public abstract class CreateSquareMarkerControlPanel extends StandardAlgConfigPa
 		paperSize = comboPaper.getItemAt(comboPaper.getSelectedIndex());
 
 		checkFillGrid = checkbox("Fill Grid",fillGrid);
+		checkShowGrid = checkbox("Draw Grid", drawGrid);
 		checkHideInfo = checkbox("Hide Info",hideInfo);
 
 		add(createButtonListPanel());
@@ -118,8 +121,9 @@ public abstract class CreateSquareMarkerControlPanel extends StandardAlgConfigPa
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
 		panel.add(checkFillGrid);
-		panel.add(Box.createHorizontalGlue());
+		panel.add(checkShowGrid);
 		panel.add(checkHideInfo);
+		panel.add(Box.createHorizontalGlue());
 		return panel;
 	}
 
@@ -161,6 +165,8 @@ public abstract class CreateSquareMarkerControlPanel extends StandardAlgConfigPa
 			hideInfo = checkHideInfo.isSelected();
 		} else if( e.getSource() == checkFillGrid ) {
 			fillGrid = checkFillGrid.isSelected();
+		} else if( e.getSource() == checkShowGrid ) {
+			drawGrid = checkShowGrid.isSelected();
 		} else if( e.getSource() == comboUnits ) {
 			documentUnits = (Unit) comboUnits.getSelectedItem();
 		} else if( e.getSource() == comboOutputFormat ) {

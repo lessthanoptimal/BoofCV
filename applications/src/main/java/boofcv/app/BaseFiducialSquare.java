@@ -18,8 +18,8 @@
 
 package boofcv.app;
 
-import boofcv.app.markers.CreateSquareMarkerDocumentImage;
-import boofcv.app.markers.CreateSquareMarkerDocumentPDF;
+import boofcv.app.markers.CreateSquareFiducialDocumentImage;
+import boofcv.app.markers.CreateSquareFiducialDocumentPDF;
 import boofcv.misc.LengthUnit;
 import boofcv.misc.Unit;
 import org.apache.commons.io.FilenameUtils;
@@ -126,7 +126,7 @@ public abstract class BaseFiducialSquare {
 
 		switch (fileType) {
 			case "pdf": {
-				CreateSquareMarkerDocumentPDF renderer = new CreateSquareMarkerDocumentPDF(fileName, paperSize, unit);
+				CreateSquareFiducialDocumentPDF renderer = new CreateSquareFiducialDocumentPDF(fileName, paperSize, unit);
 				renderer.blackBorderFractionalWidth = blackBorderFractionalWidth;
 				renderer.markerWidth = markerWidth;
 				renderer.spaceBetween = spaceBetween;
@@ -146,7 +146,7 @@ public abstract class BaseFiducialSquare {
 			break;
 
 			default: {
-				CreateSquareMarkerDocumentImage renderer = new CreateSquareMarkerDocumentImage(fileName);
+				CreateSquareFiducialDocumentImage renderer = new CreateSquareFiducialDocumentImage(fileName);
 				renderer.setBlackBorderFractionalWidth(blackBorderFractionalWidth);
 				renderer.setWhiteBorder((int)spaceBetween);
 				renderer.setMarkerWidth((int)markerWidth);
@@ -156,9 +156,9 @@ public abstract class BaseFiducialSquare {
 		}
 	}
 
-	protected abstract void callRenderPdf(CreateSquareMarkerDocumentPDF renderer);
+	protected abstract void callRenderPdf(CreateSquareFiducialDocumentPDF renderer);
 
-	protected abstract void callRenderImage(CreateSquareMarkerDocumentImage renderer);
+	protected abstract void callRenderImage(CreateSquareFiducialDocumentImage renderer);
 
 	private void getFileTypeFromFileName() {
 		fileType = FilenameUtils.getExtension(fileName);

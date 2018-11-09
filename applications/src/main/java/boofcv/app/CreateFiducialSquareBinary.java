@@ -18,8 +18,8 @@
 
 package boofcv.app;
 
-import boofcv.app.markers.CreateSquareMarkerDocumentImage;
-import boofcv.app.markers.CreateSquareMarkerDocumentPDF;
+import boofcv.app.markers.CreateSquareFiducialDocumentImage;
+import boofcv.app.markers.CreateSquareFiducialDocumentPDF;
 import boofcv.gui.BoofSwingUtil;
 import org.ddogleg.struct.GrowQueue_I64;
 import org.kohsuke.args4j.CmdLineException;
@@ -44,7 +44,7 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 	public int gridWidth = 4;
 
 	@Override
-	protected void callRenderPdf(CreateSquareMarkerDocumentPDF renderer) {
+	protected void callRenderPdf(CreateSquareFiducialDocumentPDF renderer) {
 		List<String> names = new ArrayList<>();
 		GrowQueue_I64 numbers = new GrowQueue_I64();
 
@@ -61,7 +61,7 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 	}
 
 	@Override
-	protected void callRenderImage(CreateSquareMarkerDocumentImage renderer) {
+	protected void callRenderImage(CreateSquareFiducialDocumentImage renderer) {
 		List<String> names = new ArrayList<>();
 		GrowQueue_I64 numbers = new GrowQueue_I64();
 

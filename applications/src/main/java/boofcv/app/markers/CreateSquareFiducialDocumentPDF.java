@@ -42,7 +42,7 @@ import java.io.IOException;
  *
  * @author Peter Abeles
  */
-public class CreateSquareMarkerDocumentPDF {
+public class CreateSquareFiducialDocumentPDF {
 
 	// objects for writing PDF document
 	PDDocument document;
@@ -74,7 +74,7 @@ public class CreateSquareMarkerDocumentPDF {
 	// name of each pattern
 	java.util.List<String> names;
 
-	public CreateSquareMarkerDocumentPDF(String documentName , PaperSize paper, Unit units ) {
+	public CreateSquareFiducialDocumentPDF(String documentName , PaperSize paper, Unit units ) {
 		this.paper = paper;
 		this.units = units;
 		this.documentName = documentName;
@@ -111,7 +111,6 @@ public class CreateSquareMarkerDocumentPDF {
 		totalMarkers = imagePatterns.size();
 		render();
 	}
-
 
 	public void render() throws IOException {
 		if( markerWidth <= 0 || spaceBetween <= 0)

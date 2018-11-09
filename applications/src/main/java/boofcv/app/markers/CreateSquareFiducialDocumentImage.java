@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CreateSquareMarkerDocumentImage {
+public class CreateSquareFiducialDocumentImage {
 
 	String documentName;
 	FiducialSquareGenerator generator;
@@ -44,7 +44,7 @@ public class CreateSquareMarkerDocumentImage {
 
 	double blackBorderFractionalWidth;
 
-	public CreateSquareMarkerDocumentImage(String documentName ) {
+	public CreateSquareFiducialDocumentImage(String documentName ) {
 		this.documentName = documentName;
 		this.generator = new FiducialSquareGenerator(render);
 	}

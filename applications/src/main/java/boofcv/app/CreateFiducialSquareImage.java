@@ -21,8 +21,8 @@ package boofcv.app;
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.misc.PixelMath;
-import boofcv.app.markers.CreateSquareMarkerDocumentImage;
-import boofcv.app.markers.CreateSquareMarkerDocumentPDF;
+import boofcv.app.markers.CreateSquareFiducialDocumentImage;
+import boofcv.app.markers.CreateSquareFiducialDocumentPDF;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayU8;
@@ -51,7 +51,7 @@ public class CreateFiducialSquareImage extends BaseFiducialSquare {
 	int threshold = 128;
 
 	@Override
-	protected void callRenderPdf(CreateSquareMarkerDocumentPDF renderer) {
+	protected void callRenderPdf(CreateSquareFiducialDocumentPDF renderer) {
 		try {
 			renderer.render(getNames(), loadPatterns());
 		} catch( IOException e ) {
@@ -60,7 +60,7 @@ public class CreateFiducialSquareImage extends BaseFiducialSquare {
 	}
 
 	@Override
-	protected void callRenderImage(CreateSquareMarkerDocumentImage renderer) {
+	protected void callRenderImage(CreateSquareFiducialDocumentImage renderer) {
 		renderer.render(getNames(), loadPatterns());
 	}
 

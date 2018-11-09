@@ -18,14 +18,115 @@
 
 package boofcv.app;
 
+import boofcv.app.markers.CreateSquareFiducialControlPanel;
+import boofcv.app.markers.CreateSquareFiducialGui;
+import boofcv.gui.BoofSwingUtil;
+import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.UtilImageIO;
+import boofcv.struct.image.GrayU8;
+
 import javax.swing.*;
-import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.ArrayList;
 
 /**
  * @author Peter Abeles
  */
-public class CreateFiducialSquareImageGui extends JPanel {
+public class CreateFiducialSquareImageGui extends CreateSquareFiducialGui {
+	ControlPanel controls;
 	public CreateFiducialSquareImageGui() {
-		super(new BorderLayout());
+		controls = new ControlPanel(this);
+		setupGui(controls,"Square Image Fiducial");
+
+	}
+
+	@Override
+	protected void saveFile(boolean sendToPrinter) {
+		if( controls.patterns.size() == 0 )
+			return;
+		CreateFiducialSquareImage c = new CreateFiducialSquareImage();
+		c.sendToPrinter = sendToPrinter;
+		c.unit = controls.documentUnits;
+		c.paperSize = controls.paperSize;
+		c.markerWidth = (float)controls.markerWidth;
+		c.spaceBetween = c.markerWidth/4;
+		c.gridFill = controls.fillGrid;
+		c.hideInfo = controls.hideInfo;
+		c.imagePaths.addAll(controls.patterns);
+
+		saveFile(sendToPrinter, c);
+	}
+
+	@Override
+	protected void showHelp() {
+
+	}
+
+	@Override
+	protected void renderPreview() {
+		String path = controls.selectedPattern;
+		if( path == null ) {
+			imagePanel.setImageRepaint(null);
+		} else {
+			BufferedImage buffered = UtilImageIO.loadImage(path);
+			GrayU8 gray = ConvertBufferedImage.convertFrom(buffered,(GrayU8)null);
+			generator.setBlackBorder(controls.borderFraction);
+			generator.generate(gray);
+			buffered = ConvertBufferedImage.convertTo(render.getGray(),null,true);
+			imagePanel.setImageRepaint(buffered);
+		}
+	}
+
+	class ControlPanel extends CreateSquareFiducialControlPanel {
+
+		DefaultListModel<String> listModel = new DefaultListModel<>();
+		JList<String> listPatterns = new JList<>(listModel);
+		java.util.List<String> patterns = new ArrayList<>();
+
+		String selectedPattern = null;
+
+		public ControlPanel(Listener listener) {
+			super(listener);
+
+			listPatterns.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			listPatterns.setLayoutOrientation(JList.VERTICAL);
+//			listPatterns.setVisibleRowCount(-1);
+			listPatterns.addListSelectionListener(e -> {
+				int s = listPatterns.getSelectedIndex();
+				if( s >= 0 ) {
+					selectedPattern = patterns.get(s);
+				} else {
+					selectedPattern = null;
+				}
+				renderPreview();
+			});
+
+			add( new JScrollPane(listPatterns));
+			layoutComponents();
+		}
+
+		@Override
+		public void handleAddPattern() {
+			File path = BoofSwingUtil.openFileChooser(this, BoofSwingUtil.FileTypes.IMAGES);
+			if( path == null )
+				return;
+			listModel.add(listModel.size(), path.getName());
+			patterns.add(path.getAbsolutePath());
+			listPatterns.setSelectedIndex(listModel.size()-1);
+		}
+
+		@Override
+		public void handleRemovePattern() {
+			int selected = listPatterns.getSelectedIndex();
+			if( selected >= 0 ) {
+				listModel.removeElementAt(selected);
+				patterns.remove(selected);
+			}
+		}
+	}
+
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(CreateFiducialSquareImageGui::new);
 	}
 }
