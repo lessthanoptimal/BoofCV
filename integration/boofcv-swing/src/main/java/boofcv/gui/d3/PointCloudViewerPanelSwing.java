@@ -272,6 +272,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 		}
 
 		for( Character c : pressed ) {
+			c = Character.toLowerCase(c);
 			if( c == 'w' ) {
 				T.z -= stepSize*multiplier;
 			} else if(c == 's' ) {
@@ -333,6 +334,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		requestFocus();
 		prevX = e.getX();
 		prevY = e.getY();
 	}
