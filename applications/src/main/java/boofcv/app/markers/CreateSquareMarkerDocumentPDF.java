@@ -136,7 +136,7 @@ public class CreateSquareMarkerDocumentPDF {
 			PDPage page = new PDPage(rectangle);
 			document.addPage(page);
 			PDPageContentStream pcs = new PDPageContentStream(document , page);
-			PdfFiducialEngine r = new PdfFiducialEngine(pcs,markerWidth*UNIT_TO_POINTS);
+			PdfFiducialEngine r = new PdfFiducialEngine(document,pcs,markerWidth*UNIT_TO_POINTS);
 			FiducialSquareGenerator g = new FiducialSquareGenerator(r);
 			g.setBlackBorder(blackBorderFractionalWidth);
 			g.setMarkerWidth(markerWidth*UNIT_TO_POINTS);

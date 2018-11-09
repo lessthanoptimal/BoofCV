@@ -108,7 +108,7 @@ public class CreateQrCodeDocumentPDF {
 			document.addPage(page);
 			PDPageContentStream pcs = new PDPageContentStream(document , page);
 
-			PdfFiducialEngine r = new PdfFiducialEngine(pcs,markerWidth*UNIT_TO_POINTS);
+			PdfFiducialEngine r = new PdfFiducialEngine(document,pcs,markerWidth*UNIT_TO_POINTS);
 			QrCodeGenerator g = new QrCodeGenerator(markerWidth*UNIT_TO_POINTS);
 			g.setRender(r);
 

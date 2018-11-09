@@ -107,6 +107,7 @@ public abstract class BaseFiducialSquare {
 
 		getFileTypeFromFileName();
 
+		System.out.println("   File Name    : "+fileName);
 		if (fileType.equals("pdf")) {
 			System.out.println("   Document     : PDF");
 			System.out.println("   paper        : " + paperSize);
@@ -114,7 +115,9 @@ public abstract class BaseFiducialSquare {
 			System.out.println("   units        : " + unit);
 			System.out.println("   marker width : " + markerWidth + " (" + unit.abbreviation + ")");
 		} else {
-			System.out.println("   Document  : Image");
+			System.out.println("   Document     : Image");
+			System.out.println("   marker width : " + markerWidth + " (pixels)");
+			System.out.println("   white border : " + spaceBetween + " (pixels)");
 		}
 		System.out.println();
 

@@ -44,9 +44,6 @@ import java.io.IOException;
  */
 public class CreateFiducialSquareBinaryGui extends JPanel implements CreateSquareMarkerControlPanel.Listener {
 
-	// TODO list with fiducials by ID
-	// TODO Add and Remove buttons
-
 	ControlPanel controls = new ControlPanel(this);
 	ImagePanel imagePanel = new ImagePanel();
 	JFrame frame;

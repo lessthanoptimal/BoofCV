@@ -19,10 +19,15 @@
 package boofcv.app.drawing;
 
 import boofcv.alg.drawing.FiducialRenderEngine;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 /**
@@ -30,11 +35,13 @@ import java.io.IOException;
  */
 public class PdfFiducialEngine extends FiducialRenderEngine {
 
+	public PDDocument document;
 	public PDPageContentStream pcs;
 	public double offsetX,offsetY;
 	public double markerWidth;
 
-	public PdfFiducialEngine(PDPageContentStream pcs, double markerWidth) {
+	public PdfFiducialEngine(PDDocument document, PDPageContentStream pcs, double markerWidth) {
+		this.document = document;
 		this.pcs = pcs;
 		this.markerWidth = markerWidth;
 	}
@@ -87,7 +94,15 @@ public class PdfFiducialEngine extends FiducialRenderEngine {
 
 	@Override
 	public void draw(GrayU8 image, double x0, double y0, double x1, double y1) {
+		BufferedImage buffered = new BufferedImage(image.width,image.height, BufferedImage.TYPE_BYTE_GRAY);
+		ConvertBufferedImage.convertTo(image,buffered,true);
 
+		try {
+			PDImageXObject pdImage = JPEGFactory.createFromImage(document,buffered);
+			pcs.drawImage(pdImage, adjustX(x0), (float)(offsetY+y0),(float)(x1-x0),(float)(y1-y0));
+		} catch( IOException e ) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private float adjustX( double x ) {

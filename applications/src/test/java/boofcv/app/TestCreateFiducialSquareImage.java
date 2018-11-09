@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -47,8 +48,8 @@ class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 	private final static String names[] =
 			new String[]{"temp0.jpg","temp1.jpg"};
 
-	private void createDocument( String args ) throws IOException, InterruptedException {
-//		CreateFiducialSquareImage.main(args.split("\\s+"));
+	private void createDocument( String args ) throws IOException {
+		CreateFiducialSquareImage.main(args.split("\\s+"));
 	}
 
 	private GrayF32 loadImageGray() throws IOException {
@@ -91,8 +92,8 @@ class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 	}
 
 	@Test
-	void single() throws IOException, InterruptedException {
-		createDocument(String.format("-PrintInfo -PageSize=letter -OutputFile=%s 4 %s",
+	void single_pdf() throws IOException {
+		createDocument(String.format("--PaperSize letter --OutputFile %s -w 6 -i %s",
 				document_name+".pdf", names[0]));
 		GrayF32 gray = loadImageGray();
 
@@ -106,8 +107,8 @@ class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 	}
 
 	@Test
-	void grid() throws IOException, InterruptedException {
-		createDocument(String.format("-PrintInfo -Grid=fill -PageSize=letter -OutputFile=%s 3 %s %s",
+	void grid_pdf() throws IOException {
+		createDocument(String.format("--PaperSize letter --GridFill --OutputFile %s -w 5 -s 2 -i %s -i %s",
 				document_name+".pdf", names[0], names[1]));
 		GrayF32 gray = loadImageGray();
 
@@ -120,6 +121,11 @@ class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 		for (int i = 0; i < detector.totalFound(); i++) {
 			assertEquals(i%2,detector.getId(i));
 		}
+	}
+
+	@Test
+	void multiple_png() {
+		fail("Implement");
 	}
 
 }
