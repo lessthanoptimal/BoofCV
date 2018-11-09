@@ -370,13 +370,13 @@ public abstract class DemonstrationBase extends JPanel {
 		if( inputFilePath == null || inputMethod != InputMethod.IMAGE )
 			return;
 
-		File current = new File(inputFilePath);
+		File current = new File(UtilIO.ensureURL(inputFilePath).getFile());
 		File parent = current.getParentFile();
 		if( parent == null )
 			return;
 
 		File[] files = parent.listFiles();
-		if( files.length <= 1 )
+		if( files == null || files.length <= 1 )
 			return;
 		File closest = null;
 
