@@ -56,9 +56,9 @@ public class UtilIO {
 				}
 			}
 
-			System.out.println("-----------------------");
+//			System.out.println("-----------------------");
 			// maybe we are running inside an app and all data is stored inside as a resource
-			System.out.println("Attempting to load resource "+path);
+//			System.out.println("Attempting to load resource "+path);
 			URL url = UtilIO.class.getClassLoader().getResource(path);
 
 			if (url == null) {
