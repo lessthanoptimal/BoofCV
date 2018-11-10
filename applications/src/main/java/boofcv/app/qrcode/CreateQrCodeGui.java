@@ -54,6 +54,7 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 
 		imagePanel.setCentering(true);
 		imagePanel.setScaling(ScaleOptions.DOWN);
+		imagePanel.setBackground(Color.GRAY);
 
 		add(BorderLayout.WEST,controls);
 		add(BorderLayout.CENTER,imagePanel);

@@ -203,7 +203,7 @@ public class CreateQrCodeDocument {
 			QrCodeEncoder encoder = new QrCodeEncoder();
 			if( mask != null )
 				encoder.setMask(mask);
-			encoder.setError(error!=null?error: QrCode.ErrorLevel.M);
+			encoder.setError(error);
 			if( version > 0 )
 				encoder.setVersion(version);
 

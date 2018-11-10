@@ -22,6 +22,7 @@ import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.GrowQueue_I8;
 import org.ejml.ops.CommonOps_BDRM;
 
+import javax.annotation.Nullable;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
@@ -97,8 +98,8 @@ public class QrCodeEncoder {
 		return this;
 	}
 
-	public QrCodeEncoder setError(QrCode.ErrorLevel level) {
-		autoErrorCorrection = false;
+	public QrCodeEncoder setError( @Nullable QrCode.ErrorLevel level) {
+		autoErrorCorrection = level == null;
 		qr.error = level;
 		return this;
 	}
@@ -671,6 +672,13 @@ public class QrCodeEncoder {
 							"all error correction levels at version " + qr.version + ". Total Data " + (packed.size / 8));
 				}
 			}
+		}
+		// Sanity check
+		int dataBits = bitsAtVersion(qr.version);
+		int totalBytes = dataBits / 8 + (dataBits % 8) % 8;
+		QrCode.VersionInfo v = QrCode.VERSION_INFO[qr.version];
+		if (totalBytes > v.totalDataBytes(qr.error)) {
+			throw new IllegalArgumentException("Version and error level can't encode all the data");
 		}
 	}
 

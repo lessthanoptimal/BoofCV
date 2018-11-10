@@ -21,8 +21,7 @@ Version : 0.32
 - ConvertImage reshapes output instead of throwing an exception
 - ImageInterleaved setTo() changes number of bands if needed
 - Improved speed of Interleaved to Gray average
-
-TODO Create Application Launch Screen
+- QR Code encoder does a better job of rejecting invalid QR configurations
 
 TODO Attempt trifocal tensor based stereo
 

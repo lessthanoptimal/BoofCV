@@ -107,10 +107,11 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 		comboVersion.addActionListener(this);
 		comboVersion.setMaximumSize(comboVersion.getPreferredSize());
 
+		comboError.addItem("AUTOMATIC");
 		for (QrCode.ErrorLevel e : QrCode.ErrorLevel.values() ) {
 			comboError.addItem(e.name());
 		}
-		comboError.setSelectedIndex(QrCode.ErrorLevel.M.ordinal());
+		comboError.setSelectedIndex(0);
 		comboError.addActionListener(this);
 		comboError.setMaximumSize(comboError.getPreferredSize());
 
@@ -205,7 +206,11 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 			version = comboVersion.getSelectedIndex();
 			listener.controlsUpdates();
 		} else if( e.getSource() == comboError ) {
-			error = QrCode.ErrorLevel.lookup(comboError.getSelectedIndex());
+			if( comboError.getSelectedIndex() == 0 ) {
+				error = null;
+			} else {
+				error = QrCode.ErrorLevel.lookup(comboError.getSelectedIndex() - 1);
+			}
 			listener.controlsUpdates();
 		} else if( e.getSource() == comboPattern ) {
 			if( comboPattern.getSelectedIndex() == 0 ) {
