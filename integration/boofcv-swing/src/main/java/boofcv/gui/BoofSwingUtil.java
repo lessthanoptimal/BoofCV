@@ -20,10 +20,14 @@ package boofcv.gui;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.prefs.Preferences;
@@ -199,6 +203,90 @@ public class BoofSwingUtil {
 	public static void antialiasing( Graphics2D g2 ) {
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	}
+
+	public static JButton createButtonIcon(String path, int width, int height, boolean opaque) {
+		try {
+
+			BufferedImage b;
+//			if( path.endsWith("svg")) {
+//				ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+//				SVGUniverse svg = new SVGUniverse();
+//				URI uri = svg.loadSVG(classloader.getResource( path));
+//				SVGDiagram diagram = svg.getDiagram(uri);
+//				diagram.setIgnoringClipHeuristic(true);
+//
+//				double scale = computeButtonScale(width,height,diagram.getWidth(),diagram.getHeight());
+//				width = (int) (diagram.getWidth() * scale);
+//				height = (int) (diagram.getHeight() * scale);
+//
+//				b = new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB);
+//				Graphics2D g2 = b.createGraphics();
+//				g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+//				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//				g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+//
+//				// scale and center
+//				double offX = (width-diagram.getWidth()*scale)/2;
+//				double offY = (height-diagram.getHeight()*scale)/2;
+//
+//				AffineTransform transform = new AffineTransform(scale,0,0,scale,offX,offY);
+//				g2.setTransform(transform);
+//				diagram.render(g2);
+//			} else {
+				URL url = ClassLoader.getSystemResource( path );
+				if( url != null ) {
+					b = ImageIO.read(url);
+					double scale = computeButtonScale(width, height, b.getWidth(), b.getHeight());
+					if (scale != 1.0) {
+						width = (int) (b.getWidth() * scale);
+						height = (int) (b.getHeight() * scale);
+
+						BufferedImage a = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+						Graphics2D g2 = a.createGraphics();
+						g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+						g2.drawImage(b, 0, 0,width,height,null);
+						b = a;
+					}
+				} else {
+					JButton button = new JButton(path);
+					int bWidth = button.getPreferredSize().width;
+					int bHeight = button.getPreferredSize().height;
+
+					double scale = computeButtonScale(width, height, bWidth, bHeight);
+
+					button.setPreferredSize(new Dimension((int)(scale*bWidth),(int)(scale*bHeight)));
+					return button;
+				}
+//			}
+			JButton button = new JButton(new ImageIcon (b));
+
+			if( !opaque ) {
+				button.setOpaque(false);
+				button.setBackground(new Color(0,0,0,0));
+				button.setBorder(new EmptyBorder(0,0,0,0));
+			}
+
+			button.setPreferredSize(new Dimension(width,height));
+			return button;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static double computeButtonScale( int width , int height,
+											  double imageWidth , double imageHeight ) {
+		double scale = 1;
+		if( width > 0 || height > 0 ) {
+			if( width <= 0 ) {
+				scale = height/ imageHeight;
+			} else if( height <= 0 ) {
+				scale = width/ imageWidth;
+			} else {
+				scale = Math.min(width/ imageWidth,height/ imageHeight);
+			}
+		}
+		return scale;
 	}
 
 	public enum FileTypes

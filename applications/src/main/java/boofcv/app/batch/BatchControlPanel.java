@@ -68,7 +68,9 @@ public abstract class BatchControlPanel extends StandardAlgConfigPanel {
 	}
 
 	protected JPanel createTextSelect( final JTextField field , final String message , boolean directory ) {
-		JButton bOpen = new JButton("S");
+		JButton bOpen = new JButton(UIManager.getIcon("FileView.fileIcon"));
+		bOpen.setPreferredSize(new Dimension(30,30));
+		bOpen.setMaximumSize(bOpen.getPreferredSize());
 		bOpen.addActionListener(a->{
 			selectPath(field,message,directory);
 		});

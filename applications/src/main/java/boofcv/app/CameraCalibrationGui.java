@@ -74,13 +74,26 @@ public class CameraCalibrationGui extends JPanel
 		this.app = new CameraCalibration();
 		this.app.visualize = true;
 
-		File outputFile = FileSystemView.getFileSystemView().getHomeDirectory();
-		outputFile = new File(outputFile,"camera_calibration.yaml");
+		final File outputFile = new File(FileSystemView.getFileSystemView().getHomeDirectory(),"camera_calibration.yaml");
 
 		textOutput = new JTextField();
 		textOutput.setColumns(20);
 		textOutput.setText(outputFile.getAbsolutePath());
-		textOutput.setMaximumSize(textOutput.getPreferredSize());
+		textOutput.setMaximumSize(new Dimension(textOutput.getPreferredSize().width,30));
+		JButton bOutput = new JButton(UIManager.getIcon("FileView.fileIcon"));
+		bOutput.setPreferredSize(new Dimension(30,30));
+		bOutput.setMaximumSize(bOutput.getPreferredSize());
+		bOutput.addActionListener(a->{
+			File f = BoofSwingUtil.fileChooser(this,false,textOutput.getText());
+			if( f != null ) {
+				textOutput.setText(f.getAbsolutePath());
+			}
+		});
+
+		JPanel panelOutput = new JPanel();
+		panelOutput.setLayout(new BoxLayout(panelOutput,BoxLayout.X_AXIS));
+		panelOutput.add(textOutput);
+		panelOutput.add(bOutput);
 
 		comboOutputFormat = new JComboBox<>(CameraCalibration.FormatType.values());
 		comboOutputFormat.setSelectedIndex(outputFormat.ordinal());
@@ -90,7 +103,7 @@ public class CameraCalibrationGui extends JPanel
 		JPanel controlsPanel = new JPanel();
 		controlsPanel.setLayout(new BoxLayout(controlsPanel,BoxLayout.Y_AXIS) );
 		controlsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-		addLabeled(textOutput,"Output",controlsPanel);
+		addLabeled(panelOutput,"Output",controlsPanel);
 		addLabeled(comboOutputFormat,"Format",controlsPanel);
 		controlsPanel.add(Box.createRigidArea(new Dimension(5,5)));
 		controlsPanel.add(controlsTarget);
