@@ -164,7 +164,7 @@ public class BatchDownsizeImage {
 		try {
 			parser.parseArgument(args);
 			if( generator.guiMode ) {
-				BatchDownsizeImageGui.main(args);
+				new BatchDownsizeImageGui();
 			} else {
 				generator.process();
 			}

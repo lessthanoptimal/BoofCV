@@ -57,6 +57,8 @@ public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.
 
 		add(control,BorderLayout.WEST);
 		add(imagePanel,BorderLayout.CENTER);
+
+		ShowImages.showWindow(this,"Batch Downsize Images", true);
 	}
 
 	@Override
@@ -136,7 +138,6 @@ public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.
 	}
 
 	public static void main(String[] args) {
-		BatchDownsizeImageGui app = new BatchDownsizeImageGui();
-		ShowImages.showWindow(app,"Batch Downsize Images", true);
+		new BatchDownsizeImageGui();
 	}
 }

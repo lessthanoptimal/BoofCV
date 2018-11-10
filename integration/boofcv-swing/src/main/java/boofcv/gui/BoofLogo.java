@@ -41,8 +41,8 @@ public class BoofLogo extends JPanel {
     public static final String NAME = "BOOFCV";
     public static final int MAX_RADIUS = 40;
 
-    int radius = MAX_RADIUS;
-    boolean reverse = false;
+    public int radius = MAX_RADIUS;
+    public boolean reverse = false;
 
     public BoofLogo() {
         setBackground(Color.WHITE);

@@ -29,7 +29,7 @@ import java.lang.reflect.Method;
 public class Help {
 
 	static Class []options = new Class[]{
-//			CreateFiducialSquareImage.class,
+			CreateFiducialSquareImage.class,
 			CreateFiducialSquareBinary.class,
 			BatchRemoveLensDistortion.class,
 			BatchDownsizeImage.class,
@@ -51,6 +51,12 @@ public class Help {
 	}
 
 	public static void main(String[] args) {
+		if( args.length == 2 ) {
+			if( args[1].equals("--GUI")) {
+				new ApplicationLauncherGui();
+				return;
+			}
+		}
 		if( args.length > 0 ) {
 			String truncated[] = new String[args.length-1];
 			System.arraycopy(args, 1, truncated, 0, truncated.length);
@@ -77,6 +83,7 @@ public class Help {
 			}
 			System.out.println("Example:");
 			System.out.println("java -jar applications.jar " + options[0].getSimpleName());
+			System.out.println("java -jar applications.jar --GUI");
 		}
 	}
 }

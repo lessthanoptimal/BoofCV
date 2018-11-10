@@ -43,7 +43,7 @@ public class TestCalibrationDetectorCircleRegularGrid extends GenericPlanarCalib
 	}
 
 	/**
-	 * Reduce the intensity of fisheye distortion by moving the markers away from the border
+	 * Reduce the intensity of fisheye distortion by moving the fiducials away from the border
 	 */
 	@Override
 	protected void createFisheyePoses() {

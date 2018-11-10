@@ -28,7 +28,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 import javax.annotation.Nullable;
 
 /**
- * Interface for detecting fiducial markers and their location in the image.  Optionally, some implementations can produce
+ * Interface for detecting fiducial fiducials and their location in the image.  Optionally, some implementations can produce
  * a unique ID for each fiducial and their 3D pose in the world.  If the fiducial supports 3D information then
  *
  *
@@ -66,7 +66,7 @@ public interface FiducialDetector<T extends ImageBase<T>>
 	 * implementation. It could be a simple rectangle or it could be corner features.
 	 *
 	 * @param which Which fiducial.
-	 * @param storage (Optional) Storage for markers.
+	 * @param storage (Optional) Storage for fiducials.
 	 * @return Found marker. Points are owned by the caller and will not be modified in the future.
 	 */
 	Polygon2D_F64 getBounds(int which , @Nullable Polygon2D_F64 storage );

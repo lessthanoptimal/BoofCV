@@ -137,7 +137,7 @@ public abstract class GenericQrCodeDetectorChecks {
 	}
 
 	/**
-	 * See if it can detect multiple markers in the image at the same time
+	 * See if it can detect multiple fiducials in the image at the same time
 	 */
 	@Test
 	public void multipleMarkers() {

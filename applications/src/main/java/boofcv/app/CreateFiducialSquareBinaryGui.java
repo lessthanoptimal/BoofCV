@@ -18,8 +18,8 @@
 
 package boofcv.app;
 
-import boofcv.app.markers.CreateSquareFiducialControlPanel;
-import boofcv.app.markers.CreateSquareFiducialGui;
+import boofcv.app.fiducials.CreateSquareFiducialControlPanel;
+import boofcv.app.fiducials.CreateSquareFiducialGui;
 import boofcv.io.image.ConvertBufferedImage;
 import org.ddogleg.struct.GrowQueue_I64;
 

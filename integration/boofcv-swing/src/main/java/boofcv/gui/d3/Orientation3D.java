@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -85,7 +85,7 @@ public class Orientation3D extends JPanel {
 		g2.setStroke(new BasicStroke(3));
 		g2.setColor(Color.BLACK);
 		g2.drawLine(xc,a,xc,a+b);
-		// draw top, bottom, middle markers
+		// draw top, bottom, middle fiducials
 		g2.drawLine(xc-3,a,xc+3,a);
 		g2.drawLine(xc-3,a+b,xc+3,a+b);
 		g2.drawLine(xc-3,a+b/2,xc+3,a+b/2);

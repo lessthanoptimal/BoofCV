@@ -22,7 +22,7 @@ import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeGenerator;
 import boofcv.app.PaperSize;
 import boofcv.app.drawing.PdfFiducialEngine;
-import boofcv.app.markers.CreateFiducialDocumentPDF;
+import boofcv.app.fiducials.CreateFiducialDocumentPDF;
 import boofcv.misc.Unit;
 
 import java.io.IOException;

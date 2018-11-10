@@ -63,6 +63,8 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 
 		add(control,BorderLayout.WEST);
 		add(imagePanel,BorderLayout.CENTER);
+
+		ShowImages.showWindow(this,"Batch Remove Lens Distortion", true);
 	}
 
 	public boolean spawn( String pathIntrinsic , String pathInput , String pathOutput ,
@@ -195,7 +197,6 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 	}
 
 	public static void main(String[] args) {
-		BatchRemoveLensDistortionGui app = new BatchRemoveLensDistortionGui();
-		ShowImages.showWindow(app,"Batch Remove Lens Distortion", true);
+		new BatchRemoveLensDistortionGui();
 	}
 }

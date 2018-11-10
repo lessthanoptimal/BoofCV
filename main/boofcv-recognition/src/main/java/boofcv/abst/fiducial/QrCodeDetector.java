@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,20 +31,20 @@ import java.util.List;
 public interface QrCodeDetector<T extends ImageGray<T>> {
 
 	/**
-	 * Processes the image and searches for markers
+	 * Processes the image and searches for fiducials
 	 * @param image The image being processed
 	 */
 	void process( T image );
 
 	/**
-	 * List of detected markers
+	 * List of detected fiducials
 	 *
 	 * @return List of detected QR-Codes. WARNING: Data might be recycled on next call to {@link #process}
 	 */
 	List<QrCode> getDetections();
 
 	/**
-	 * List of likely markers that were rejected.
+	 * List of likely fiducials that were rejected.
 	 *
 	 * @return List of rejected candidate QR-Codes. WARNING: Data might be recycled on next call to {@link #process}
 	 */

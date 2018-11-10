@@ -18,8 +18,8 @@
 
 package boofcv.app;
 
-import boofcv.app.markers.CreateSquareFiducialDocumentImage;
-import boofcv.app.markers.CreateSquareFiducialDocumentPDF;
+import boofcv.app.fiducials.CreateSquareFiducialDocumentImage;
+import boofcv.app.fiducials.CreateSquareFiducialDocumentPDF;
 import boofcv.gui.BoofSwingUtil;
 import org.ddogleg.struct.GrowQueue_I64;
 import org.kohsuke.args4j.CmdLineException;
@@ -80,8 +80,8 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 		System.out.println("Creates three images in PNG format 220x220 pixels, 20 pixel white border");
 		System.out.println("-n 101 -n 4932 -n 944 -w 200 -s 20 -o binary.png");
 		System.out.println();
-		System.out.println("Creates a PDF document the fills in a grid from these three markers");
-		System.out.println("5cm with 2cm space between markers.");
+		System.out.println("Creates a PDF document the fills in a grid from these three fiducials");
+		System.out.println("5cm with 2cm space between fiducials.");
 		System.out.println("-n 101 -n 4932 -n 944 -u cm -w 5 -s 2 --GridFill -o binary.pdf");
 		System.out.println();
 		System.out.println("Opens a GUI");

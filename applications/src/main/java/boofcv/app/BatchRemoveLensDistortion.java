@@ -204,7 +204,7 @@ public class BatchRemoveLensDistortion {
 		try {
 			parser.parseArgument(args);
 			if( generator.guiMode ) {
-				BatchRemoveLensDistortionGui.main(args);
+				new BatchRemoveLensDistortionGui();
 			} else {
 				generator.finishParsing();
 				generator.process();

@@ -18,8 +18,8 @@
 
 package boofcv.app;
 
-import boofcv.app.markers.CreateSquareFiducialDocumentImage;
-import boofcv.app.markers.CreateSquareFiducialDocumentPDF;
+import boofcv.app.fiducials.CreateSquareFiducialDocumentImage;
+import boofcv.app.fiducials.CreateSquareFiducialDocumentPDF;
 import boofcv.misc.LengthUnit;
 import boofcv.misc.Unit;
 import org.apache.commons.io.FilenameUtils;
@@ -70,7 +70,7 @@ public abstract class BaseFiducialSquare {
 	@Option(name = "-bw", aliases = {"--BlackBorder"}, usage = "Fractional width of black border")
 	public float blackBorderFractionalWidth = 0.25f;
 
-	@Option(name = "-s", aliases = {"--Space"}, usage = "Spacing between the markers.  In document units.")
+	@Option(name = "-s", aliases = {"--Space"}, usage = "Spacing between the fiducials.  In document units.")
 	public float spaceBetween = 0;
 
 	@Option(name = "-o", aliases = {"--OutputFile"}, usage = "Name of output file. Extension determines file type. E.g. qrcode.pdf. " +

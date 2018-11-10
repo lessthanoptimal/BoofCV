@@ -18,8 +18,8 @@
 
 package boofcv.app;
 
-import boofcv.app.markers.CreateSquareFiducialControlPanel;
-import boofcv.app.markers.CreateSquareFiducialGui;
+import boofcv.app.fiducials.CreateSquareFiducialControlPanel;
+import boofcv.app.fiducials.CreateSquareFiducialGui;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;

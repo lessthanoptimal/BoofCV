@@ -124,7 +124,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 				fiducialInfo.get(i).visible = false;
 			}
 
-			// update info for visible markers
+			// update info for visible fiducials
 			for (int i = 0; i < detector.totalFound(); i++) {
 				FiducialInfo info = findFiducial(detector.getId(i));
 				info.totalObserved++;

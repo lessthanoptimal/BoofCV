@@ -81,7 +81,7 @@ public class CreateQrCodeDocument {
 	@Option(name="-mw",aliases = {"--ModuleWidth"}, usage="Specify size of QR Code by its module/cells.  In document units.")
 	public float moduleWidth=-1;
 
-	@Option(name="-s",aliases = {"--Space"}, usage="Spacing between the markers.  In document units.")
+	@Option(name="-s",aliases = {"--Space"}, usage="Spacing between the fiducials.  In document units.")
 	public float spaceBetween =2;
 
 	@Option(name="-o",aliases = {"--OutputName"}, usage="Name of output file. Extension determines file type. E.g. qrcode.pdf. " +

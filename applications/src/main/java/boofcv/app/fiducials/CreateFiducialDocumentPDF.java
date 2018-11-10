@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.app.markers;
+package boofcv.app.fiducials;
 
 import boofcv.app.PaperSize;
 import boofcv.app.drawing.PdfFiducialEngine;
