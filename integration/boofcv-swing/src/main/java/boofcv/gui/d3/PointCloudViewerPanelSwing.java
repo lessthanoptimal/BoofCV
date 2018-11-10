@@ -41,6 +41,9 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -92,6 +95,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 	int prevY;
 
 	Keyboard keyboard = new Keyboard();
+	ScheduledExecutorService pressedTask;
 
 	public PointCloudViewerPanelSwing(float keyStepSize ) {
 
@@ -107,12 +111,18 @@ public class PointCloudViewerPanelSwing extends JPanel
 			public void focusGained(FocusEvent e) {
 //				System.out.println("focus gained");
 				KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyboard);
+
+				// start a timed task which checks current key presses. Less OS dependent this way
+				pressedTask = Executors.newScheduledThreadPool(1);
+				pressedTask.scheduleAtFixedRate(new KeypressedTask(),100,30, TimeUnit.MILLISECONDS);
 			}
 
 			@Override
 			public void focusLost(FocusEvent e) {
 //				System.out.println("focus lost");
 				KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(keyboard);
+				pressedTask.shutdown();
+				pressedTask = null;
 			}
 		});
 	}
@@ -287,11 +297,15 @@ public class PointCloudViewerPanelSwing extends JPanel
 //					System.out.println("Key released "+e.getKeyChar());
 					switch( e.getKeyCode() ) {
 						case KeyEvent.VK_SHIFT: shiftPressed=false; break;
-						default:pressed.remove(e.getKeyCode());break;
+						default:
+							if( !pressed.remove(e.getKeyCode()) ) {
+								System.err.println("Possible Java / Mac OS X bug related to 'character accent menu'" +
+										" if using Java 1.8 try upgrading to 11");
+							}
+							break;
 					}
 					break;
 			}
-			handleKeyPress();
 			return false;
 		}
 	}
@@ -299,21 +313,33 @@ public class PointCloudViewerPanelSwing extends JPanel
 	private void handleKeyPress() {
 		Vector3D_F32 T = worldToCamera.getT();
 
-		double multiplier = shiftPressed?5:1;
-		Integer[] keys = pressed.toArray(new Integer[0]);
+		synchronized (pressed) {
+			double multiplier = shiftPressed?5:1;
+			Integer[] keys = pressed.toArray(new Integer[0]);
 
-		for( int k : keys ) {
-			switch( k ) {
-				case KeyEvent.VK_W:T.z -= stepSize*multiplier; break;
-				case KeyEvent.VK_S:T.z += stepSize*multiplier; break;
-				case KeyEvent.VK_A:T.x += stepSize*multiplier; break;
-				case KeyEvent.VK_D:T.x -= stepSize*multiplier; break;
-				case KeyEvent.VK_Q:T.y -= stepSize*multiplier; break;
-				case KeyEvent.VK_E:T.y += stepSize*multiplier; break;
-				case KeyEvent.VK_H:worldToCamera.reset(); break;
+			for( int k : keys ) {
+				switch( k ) {
+					case KeyEvent.VK_W:T.z -= stepSize*multiplier; break;
+					case KeyEvent.VK_S:T.z += stepSize*multiplier; break;
+					case KeyEvent.VK_A:T.x += stepSize*multiplier; break;
+					case KeyEvent.VK_D:T.x -= stepSize*multiplier; break;
+					case KeyEvent.VK_Q:T.y -= stepSize*multiplier; break;
+					case KeyEvent.VK_E:T.y += stepSize*multiplier; break;
+					case KeyEvent.VK_H:worldToCamera.reset(); break;
+				}
 			}
 		}
 		repaint();
+	}
+
+	private class KeypressedTask implements Runnable {
+
+		@Override
+		public void run() {
+			synchronized (pressed) {
+				handleKeyPress();
+			}
+		}
 	}
 
 	@Override
