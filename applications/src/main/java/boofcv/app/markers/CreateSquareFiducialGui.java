@@ -50,8 +50,11 @@ public abstract class CreateSquareFiducialGui extends JPanel implements CreateSq
 	protected FiducialSquareGenerator generator = new FiducialSquareGenerator(render);
 	protected BufferedImage buffered;
 
-	public CreateSquareFiducialGui() {
+	String defaultSaveName;
+
+	public CreateSquareFiducialGui(String defaultSaveName) {
 		super(new BorderLayout());
+		this.defaultSaveName = defaultSaveName;
 	}
 
 	public void setupGui( CreateSquareFiducialControlPanel controls , String title ) {
@@ -128,7 +131,7 @@ public abstract class CreateSquareFiducialGui extends JPanel implements CreateSq
 			}
 		} else {
 			File f = FileSystemView.getFileSystemView().getHomeDirectory();
-			f = new File(f,"binary."+controls.format);
+			f = new File(f,defaultSaveName+"."+controls.format);
 
 			f = BoofSwingUtil.fileChooser(this,false,f.getPath());
 			if (f == null) {

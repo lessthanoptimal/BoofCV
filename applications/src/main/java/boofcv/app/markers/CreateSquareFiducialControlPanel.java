@@ -41,7 +41,7 @@ public abstract class CreateSquareFiducialControlPanel extends StandardAlgConfig
 
 	JComboBox<String> comboOutputFormat = new JComboBox<>(new String[]{"pdf","png","bmp","jpg","ppm","pgm"});
 	JCheckBox checkFillGrid;
-	JCheckBox checkShowGrid;
+	JCheckBox checkDrawGrid;
 	JCheckBox checkHideInfo;
 	JComboBox<PaperSize> comboPaper = new JComboBox<>(PaperSize.values().toArray(new PaperSize[0]));
 
@@ -51,8 +51,8 @@ public abstract class CreateSquareFiducialControlPanel extends StandardAlgConfig
 
 	public PaperSize paperSize;
 	public boolean fillGrid=false;
-	public boolean hideInfo=false;
 	public boolean drawGrid =false;
+	public boolean hideInfo=false;
 	public String format;
 
 	public Unit documentUnits = Unit.CENTIMETER;
@@ -79,7 +79,7 @@ public abstract class CreateSquareFiducialControlPanel extends StandardAlgConfig
 		paperSize = comboPaper.getItemAt(comboPaper.getSelectedIndex());
 
 		checkFillGrid = checkbox("Fill Grid",fillGrid);
-		checkShowGrid = checkbox("Draw Grid", drawGrid);
+		checkDrawGrid = checkbox("Draw Grid", drawGrid);
 		checkHideInfo = checkbox("Hide Info",hideInfo);
 
 		add(createButtonListPanel());
@@ -121,7 +121,7 @@ public abstract class CreateSquareFiducialControlPanel extends StandardAlgConfig
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
 		panel.add(checkFillGrid);
-		panel.add(checkShowGrid);
+		panel.add(checkDrawGrid);
 		panel.add(checkHideInfo);
 		panel.add(Box.createHorizontalGlue());
 		return panel;
@@ -165,8 +165,8 @@ public abstract class CreateSquareFiducialControlPanel extends StandardAlgConfig
 			hideInfo = checkHideInfo.isSelected();
 		} else if( e.getSource() == checkFillGrid ) {
 			fillGrid = checkFillGrid.isSelected();
-		} else if( e.getSource() == checkShowGrid ) {
-			drawGrid = checkShowGrid.isSelected();
+		} else if( e.getSource() == checkDrawGrid) {
+			drawGrid = checkDrawGrid.isSelected();
 		} else if( e.getSource() == comboUnits ) {
 			documentUnits = (Unit) comboUnits.getSelectedItem();
 		} else if( e.getSource() == comboOutputFormat ) {

@@ -36,6 +36,7 @@ import java.util.ArrayList;
 public class CreateFiducialSquareImageGui extends CreateSquareFiducialGui {
 	ControlPanel controls;
 	public CreateFiducialSquareImageGui() {
+		super("square_image");
 		controls = new ControlPanel(this);
 		setupGui(controls,"Square Image Fiducial");
 

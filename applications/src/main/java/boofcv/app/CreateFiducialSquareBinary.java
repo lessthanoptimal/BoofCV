@@ -38,7 +38,7 @@ import java.util.List;
 public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 
 	@Option(name = "-n",aliases = {"--Numbers"},usage = "Specifies the numbers to encode", handler = LongArrayOptionHandler.class)
-	public Long[] numbers;
+	public Long[] numbers = new Long[0];
 
 	@Option(name = "--PatternGridWidth", usage = "Size of grid in the pattern")
 	public int gridWidth = 4;
