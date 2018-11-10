@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.Zhang99AllParam;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.gui.ViewedImageInfoPanel;
 import boofcv.struct.calib.CameraPinholeRadial;
 
 import javax.swing.*;
@@ -54,12 +53,7 @@ public class MonoPlanarPanel extends CalibratedPlanarPanel<CameraPinholeRadial>
 	JTextArea paramTangental;
 
 	public MonoPlanarPanel() {
-		viewInfo.setListener(new ViewedImageInfoPanel.Listener() {
-			@Override
-			public void zoomChanged(double zoom) {
-				mainView.setScale(zoom);
-			}
-		});
+		viewInfo.setListener(zoom -> mainView.setScale(zoom));
 
 		mainView = new DisplayPinholeCalibrationPanel();
 		mainView.getImagePanel().addMouseListener(new MouseAdapter() {

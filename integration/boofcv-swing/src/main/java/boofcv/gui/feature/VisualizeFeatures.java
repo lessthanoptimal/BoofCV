@@ -78,6 +78,12 @@ public class VisualizeFeatures {
 	}
 
 	public static void drawPoint( Graphics2D g2 , double x , double y ,double r,
+								  Color colorInside ,  Color colorBorder ) {
+		drawPoint(g2, x, y, r, colorInside, colorBorder,new Ellipse2D.Double());
+	}
+
+
+	public static void drawPoint( Graphics2D g2 , double x , double y ,double r,
 								  Color color , boolean hasBorder, Ellipse2D.Double c )
 	{
 		double w = r*2;
@@ -92,6 +98,23 @@ public class VisualizeFeatures {
 		}
 
 		g2.setColor(color);
+		c.setFrame(x - r, y - r, w, w);
+		g2.fill(c);
+	}
+
+	public static void drawPoint( Graphics2D g2 , double x , double y ,double r,
+								  Color colorInside ,  Color colorBorder, Ellipse2D.Double c )
+	{
+		double w = r*2;
+
+		double r2 = r+2;
+		double w2 = r2*2;
+
+		g2.setColor(colorBorder);
+		c.setFrame(x - r2, y - r2, w2, w2);
+		g2.fill(c);
+
+		g2.setColor(colorInside);
 		c.setFrame(x - r, y - r, w, w);
 		g2.fill(c);
 	}

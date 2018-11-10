@@ -49,6 +49,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -192,6 +193,7 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel<Came
 
 		CalibrationObservation set = features;
 
+		Ellipse2D.Double ellipse = new Ellipse2D.Double();
 		Point2D_F32 adj = new Point2D_F32();
 
 		if( showOrder ) {
@@ -217,7 +219,7 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel<Came
 			for( CalibrationObservation l : allFeatures ) {
 				for( PointIndex2D_F64 p : l.points ) {
 					adj.set((float)p.x,(float)p.y);
-					VisualizeFeatures.drawPoint(g2,adj.x*scale,adj.y*scale,2,Color.BLUE,false);
+					VisualizeFeatures.drawPoint(g2,adj.x*scale,adj.y*scale,3,Color.BLUE,Color.WHITE,ellipse);
 				}
 			}
 		}
@@ -238,7 +240,7 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel<Came
 				if( r < 1 )
 					continue;
 
-				VisualizeFeatures.drawCircle(g2, adj.x * scale, adj.y * scale, r);
+				VisualizeFeatures.drawCircle(g2, adj.x * scale, adj.y * scale, r,ellipse);
 			}
 
 			g2.setStroke(new BasicStroke(2.5f));

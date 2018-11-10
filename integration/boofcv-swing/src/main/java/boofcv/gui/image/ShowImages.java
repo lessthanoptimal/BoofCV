@@ -117,8 +117,20 @@ public class ShowImages {
 		frame.add(component, BorderLayout.CENTER);
 
 		SwingUtilities.invokeLater(() -> {
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
 			frame.pack();
 			frame.setLocationRelativeTo(null); // centers window in the monitor
+
+			// prevent it from creating a window larger than the screen
+			int width = frame.getWidth();
+			int height = frame.getHeight();
+			if( width > screenSize.width || height > screenSize.height ) {
+				width = Math.min(width,screenSize.width);
+				height = Math.min(height,screenSize.height);
+				frame.setSize(width,height);
+			}
+
 			frame.setVisible(true);
 			if( closeOnExit )
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

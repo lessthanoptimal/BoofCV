@@ -41,6 +41,7 @@ import org.ejml.ops.ConvertMatrixData;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -129,6 +130,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 
 		CalibrationObservation set = features;
 
+		Ellipse2D.Double ellipse = new Ellipse2D.Double();
 		Point2D_F32 adj = new Point2D_F32();
 
 		if( showOrder ) {
@@ -176,7 +178,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 					} else {
 						adj.set((float)p.x,(float)p.y);
 					}
-					VisualizeFeatures.drawPoint(g2,adj.x*scale,adj.y*scale,2,Color.BLUE,false);
+					VisualizeFeatures.drawPoint(g2,adj.x*scale,adj.y*scale,3,Color.BLUE,Color.WHITE,ellipse);
 				}
 			}
 		}
@@ -206,11 +208,11 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 
 				g2.setStroke(new BasicStroke(4));
 				g2.setColor(Color.BLACK);
-				VisualizeFeatures.drawCircle(g2, adj.x * scale, adj.y * scale, r);
+				VisualizeFeatures.drawCircle(g2, adj.x * scale, adj.y * scale, r,ellipse);
 
 				g2.setStroke(new BasicStroke(2.5f));
 				g2.setColor(Color.ORANGE);
-				VisualizeFeatures.drawCircle(g2, adj.x * scale, adj.y * scale, r);
+				VisualizeFeatures.drawCircle(g2, adj.x * scale, adj.y * scale, r,ellipse);
 			}
 		}
 	}
