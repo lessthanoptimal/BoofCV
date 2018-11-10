@@ -158,6 +158,7 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 		generator.version = controls.version;
 		generator.paperSize = controls.paperSize;
 		generator.gridFill = controls.fillGrid;
+		generator.drawGrid = controls.drawGrid;
 		generator.hideInfo = controls.hideInfo;
 		generator.messages = new ArrayList<>();
 		generator.messages.add( controls.message );
@@ -226,11 +227,7 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 
 	@Override
 	public void controlsUpdates() {
-		new Thread() {
-			public void run() {
-				renderPreview();
-			}
-		}.start();
+		new Thread(() -> renderPreview()).start();
 	}
 
 	public static void main(String[] args) {

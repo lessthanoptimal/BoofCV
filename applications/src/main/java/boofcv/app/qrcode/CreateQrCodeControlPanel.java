@@ -47,6 +47,7 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 	JComboBox<String> comboPattern = new JComboBox<>();
 	JComboBox<String> comboMode = new JComboBox<>();
 	JCheckBox checkFillGrid;
+	JCheckBox checkDrawGrid;
 	JCheckBox checkHideInfo;
 	JComboBox<PaperSize> comboPaper = new JComboBox<>(PaperSize.values().toArray(new PaperSize[0]));
 
@@ -60,6 +61,7 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 	QrCode.Mode mode = null;
 	PaperSize paperSize;
 	boolean fillGrid=false;
+	public boolean drawGrid =false;
 	boolean hideInfo=false;
 	String format;
 
@@ -133,6 +135,7 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 		paperSize = comboPaper.getItemAt(comboPaper.getSelectedIndex());
 
 		checkFillGrid = checkbox("Fill Grid",fillGrid);
+		checkDrawGrid = checkbox("Draw Grid", drawGrid);
 		checkHideInfo = checkbox("Hide Info",hideInfo);
 
 		add(new JScrollPane(messageField));
@@ -148,8 +151,10 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 	}
 
 	private JPanel createFlagPanel() {
-		JPanel panel = new JPanel(new GridLayout(0,2));
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
 		panel.add(checkFillGrid);
+		panel.add(checkDrawGrid);
 		panel.add(checkHideInfo);
 		return panel;
 	}
@@ -222,6 +227,8 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 			hideInfo = checkHideInfo.isSelected();
 		} else if( e.getSource() == checkFillGrid ) {
 			fillGrid = checkFillGrid.isSelected();
+		} else if( e.getSource() == checkDrawGrid) {
+			drawGrid = checkDrawGrid.isSelected();
 		} else if( e.getSource() == comboUnits ) {
 			documentUnits = (Unit) comboUnits.getSelectedItem();
 		} else if( e.getSource() == comboOutputFormat ) {

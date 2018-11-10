@@ -94,6 +94,9 @@ public class CreateQrCodeDocument {
 	@Option(name="--GridFill", usage="Flag to turn on filling the entire document with a grid of qr codes")
 	public boolean gridFill = false;
 
+	@Option(name = "--DrawGrid", usage = "Draws a line showing the grid")
+	public boolean drawGrid = false;
+
 	@Option(name="--HideInfo", usage="Flag that's used to turn off the printing of extra information")
 	public boolean hideInfo = false;
 
@@ -181,6 +184,7 @@ public class CreateQrCodeDocument {
 
 		getFileTypeFromFileName();
 
+		System.out.println("   File Name    : "+fileName);
 		if( fileType.equals("pdf") ) {
 			System.out.println("   Document     : PDF");
 			System.out.println("   paper        : "+paperSize);
@@ -189,6 +193,8 @@ public class CreateQrCodeDocument {
 			System.out.println("   marker width : "+markerWidth+" ("+unit.abbreviation+")");
 		} else {
 			System.out.println("   Document  : Image");
+//			System.out.println("   marker width : " + markerWidth + " (pixels)");
+//			System.out.println("   white border : " + spaceBetween + " (pixels)");
 		}
 		System.out.println();
 
@@ -228,6 +234,7 @@ public class CreateQrCodeDocument {
 				renderer.markerWidth = markerWidth;
 				renderer.spaceBetween = spaceBetween;
 				renderer.gridFill = gridFill;
+				renderer.drawGrid = drawGrid;
 				renderer.showInfo = !hideInfo;
 				renderer.render(markers);
 				if( sendToPrinter ) {
@@ -241,7 +248,10 @@ public class CreateQrCodeDocument {
 			} break;
 
 			default: {
+				// TODO support the ability to specify how large the QR code is in pixels
 				CreateQrCodeDocumentImage renderer = new CreateQrCodeDocumentImage(fileName,20);
+//				renderer.setWhiteBorder((int)spaceBetween);
+//				renderer.setMarkerWidth((int)markerWidth);
 				renderer.render(markers);
 			} break;
 		}

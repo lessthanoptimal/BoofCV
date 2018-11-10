@@ -35,6 +35,7 @@ public class CreateFiducialSquareBinaryGui extends CreateSquareFiducialGui {
 	ControlPanel controls = new ControlPanel(this);
 
 	public CreateFiducialSquareBinaryGui() {
+		super("binary");
 		setupGui(controls,"Fiducial Square Binary");
 	}
 
