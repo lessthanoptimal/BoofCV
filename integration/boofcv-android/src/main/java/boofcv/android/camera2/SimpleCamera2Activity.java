@@ -637,8 +637,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 					@Override
 					public void onConfigured(@NonNull CameraCaptureSession session) {
 						Log.i(TAG,"CameraCaptureSession.onConfigured()");
-						mPreviewSession = session;
-						updatePreview();
+						updatePreview(session);
 					}
 
 					@Override
@@ -668,8 +667,10 @@ public abstract class SimpleCamera2Activity extends Activity {
 		try {
 			open.mLock.lock();
 			// configuration change still in progress
-			if( null == mPreviewSession )
+			if( null == mPreviewSession ) {
+				Log.i(TAG," Abort camera configuration change. Not ready yet");
 				return false;
+			}
 			createCaptureSession();
 		} catch (CameraAccessException e) {
 			e.printStackTrace();
@@ -680,16 +681,29 @@ public abstract class SimpleCamera2Activity extends Activity {
 	}
 
 	/**
+	 * Is the camera ready to change configurations again after the last requeset?
+	 * @return true if ready and false if not
+	 */
+	protected boolean isCameraReadyReconfiguration() {
+		try {
+			open.mLock.lock();
+			return mPreviewSession != null;
+		} finally {
+			open.mLock.unlock();
+		}
+	}
+
+	/**
 	 * Update the camera preview. {@link #startPreview()} needs to be called in advance.
 	 */
-	private void updatePreview() {
+	private void updatePreview(CameraCaptureSession session ) {
 		if (null == open.mCameraDevice) {
 			return;
 		}
 		open.mLock.lock();
 		try {
-			if( mPreviewSession != null )
-				mPreviewSession.setRepeatingRequest(open.mPreviewRequestBuilder.build(), null, mBackgroundHandler);
+			mPreviewSession = session;
+			mPreviewSession.setRepeatingRequest(open.mPreviewRequestBuilder.build(), null, mBackgroundHandler);
 		} catch (CameraAccessException e) {
 			e.printStackTrace();
 		} finally {
