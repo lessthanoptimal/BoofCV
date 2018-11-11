@@ -125,6 +125,7 @@ public class TestSelfCalibrationLinearRotationMulti
 
 	@Test
 	public void perfect_AllLinear() {
+
 		// set the principle point to zero
 		camera = new CameraPinhole(400,420,0,510,540,0,0);
 		PerspectiveOps.pinholeToMatrix(camera,K);

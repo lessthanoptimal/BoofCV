@@ -141,6 +141,32 @@ public class InputSanityCheck {
 			throw new IllegalArgumentException("Image heights do not match.");
 	}
 
+	public static void reshapeOneIn(ImageBase<?> input,
+									ImageBase<?> outputA) {
+		outputA.reshape(input.width,input.height);
+	}
+
+	public static void reshapeOneIn(ImageBase<?> input,
+									ImageBase<?> outputA, ImageBase<?> outputB ) {
+		outputA.reshape(input.width,input.height);
+		outputB.reshape(input.width,input.height);
+	}
+
+	public static void reshapeOneIn(ImageBase<?> input,
+									ImageBase<?> outputA, ImageBase<?> outputB , ImageBase<?> outputC) {
+		outputA.reshape(input.width,input.height);
+		outputB.reshape(input.width,input.height);
+		outputC.reshape(input.width,input.height);
+	}
+
+	public static void reshapeOneIn(ImageBase<?> input,
+									ImageBase<?> outputA, ImageBase<?> outputB , ImageBase<?> outputC, ImageBase<?> outputD) {
+		outputA.reshape(input.width,input.height);
+		outputB.reshape(input.width,input.height);
+		outputC.reshape(input.width,input.height);
+		outputD.reshape(input.width,input.height);
+	}
+
 	/**
 	 * Makes sure the input image is not a sub-image
 	 */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.filter.derivative;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
@@ -67,7 +66,7 @@ public class LaplacianEdge {
 	 * @param deriv Where the Laplacian is written to. Modified.
 	 */
 	public static void process(GrayU8 orig, GrayS16 deriv) {
-		InputSanityCheck.checkSameShape(orig, deriv);
+		deriv.reshape(orig.width,orig.height);
 
 		final byte[] data = orig.data;
 		final short[] out = deriv.data;
@@ -95,7 +94,7 @@ public class LaplacianEdge {
 	}
 
 	public static void process(GrayU8 orig, GrayF32 deriv) {
-		InputSanityCheck.checkSameShape(orig, deriv);
+		deriv.reshape(orig.width,orig.height);
 
 		final byte[] data = orig.data;
 		final float[] out = deriv.data;
@@ -129,7 +128,7 @@ public class LaplacianEdge {
 	 * @param deriv Where the Laplacian is written to. Modified.
 	 */
 	public static void process(GrayF32 orig, GrayF32 deriv) {
-		InputSanityCheck.checkSameShape(orig, deriv);
+		deriv.reshape(orig.width,orig.height);
 
 		final float[] data = orig.data;
 		final float[] out = deriv.data;

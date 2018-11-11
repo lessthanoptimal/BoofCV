@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,7 +71,7 @@ public class GradientTwo1 {
 	 */
 	public static void process(GrayU8 orig,
 							   GrayS16 derivX, GrayS16 derivY, ImageBorder_S32 border ) {
-		InputSanityCheck.checkSameShape(orig, derivX, derivY);
+		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 		GradientTwo1_Standard.process(orig, derivX, derivY);
 
 		if( border != null ) {

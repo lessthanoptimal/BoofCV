@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,8 @@ public class GradientReduceToSingle {
 	public static void maxf(Planar<GrayF32> inX , Planar<GrayF32> inY , GrayF32 outX , GrayF32 outY )
 	{
 		// input and output should be the same shape
-		InputSanityCheck.checkSameShape(inX,inY,outX,outY);
+		InputSanityCheck.checkSameShape(inX,inY);
+		InputSanityCheck.reshapeOneIn(inX,outX,outY);
 
 		// make sure that the pixel index is the same
 		InputSanityCheck.checkIndexing(inX,inY);
@@ -88,7 +89,8 @@ public class GradientReduceToSingle {
 							GrayU8 outX , GrayU8 outY )
 	{
 		// input and output should be the same shape
-		InputSanityCheck.checkSameShape(inX,inY,outX,outY);
+		InputSanityCheck.checkSameShape(inX,inY);
+		InputSanityCheck.reshapeOneIn(inX,outX,outY);
 
 		// make sure that the pixel index is the same
 		InputSanityCheck.checkIndexing(inX,inY);

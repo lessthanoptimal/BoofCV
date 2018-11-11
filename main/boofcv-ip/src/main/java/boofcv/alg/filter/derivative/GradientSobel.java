@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -89,7 +89,7 @@ public class GradientSobel {
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void process(GrayU8 orig, GrayS16 derivX, GrayS16 derivY, ImageBorder_S32<GrayU8> border ) {
-		InputSanityCheck.checkSameShape(orig, derivX, derivY);
+		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
 
 		if( border != null ) {
@@ -108,7 +108,7 @@ public class GradientSobel {
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void process(GrayS16 orig, GrayS16 derivX, GrayS16 derivY, ImageBorder_S32<GrayS16> border ) {
-		InputSanityCheck.checkSameShape(orig, derivX, derivY);
+		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
 
 		if( border != null ) {
@@ -127,7 +127,7 @@ public class GradientSobel {
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void process(GrayF32 orig, GrayF32 derivX, GrayF32 derivY, ImageBorder_F32 border) {
-		InputSanityCheck.checkSameShape(orig, derivX, derivY);
+		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 
 //		GradientSobel_Outer.process_F32(orig, derivX, derivY);
 		GradientSobel_UnrolledOuter.process_F32_sub(orig, derivX, derivY);

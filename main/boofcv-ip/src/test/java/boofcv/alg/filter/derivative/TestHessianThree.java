@@ -37,9 +37,10 @@ public class TestHessianThree {
 	int width = 20;
 	int height = 25;
 
+	// TODO update to handle image border parameter
 //	@Test
 //	public void checkInputShape() {
-//		GenericDerivativeTests.checkImageDimensionValidation(new HessianThree(), 2);
+//		BoofTesting.checkImageDimensionReshape(new HessianThree(), 3);
 //	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,7 +114,7 @@ public class HessianSobel {
 	public static void process(GrayU8 orig,
 							   GrayS16 derivXX, GrayS16 derivYY, GrayS16 derivXY ,
 							   ImageBorder_S32 border ) {
-		InputSanityCheck.checkSameShape(orig, derivXX, derivYY, derivXY);
+		InputSanityCheck.reshapeOneIn(orig, derivXX, derivYY, derivXY);
 		HessianSobel_Shared.process(orig, derivXX, derivYY, derivXY);
 
 		if( border != null ) {
@@ -137,7 +137,7 @@ public class HessianSobel {
 	public static void process(GrayF32 orig,
 							   GrayF32 derivXX, GrayF32 derivYY, GrayF32 derivXY ,
 							   ImageBorder_F32 border ) {
-		InputSanityCheck.checkSameShape(orig, derivXX, derivYY, derivXY);
+		InputSanityCheck.reshapeOneIn(orig, derivXX, derivYY, derivXY);
 		HessianSobel_Shared.process(orig, derivXX, derivYY, derivXY);
 
 		if( border != null ) {

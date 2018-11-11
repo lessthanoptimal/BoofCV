@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -181,6 +181,61 @@ public class BoofTesting {
 
 		if (count != numFunctions)
 			throw new RuntimeException("Unexpected number of functions");
+	}
+
+	/**
+	 * Searches for functions that accept only images and makes sure they only accept
+	 * images which have he same width and height.
+	 *
+	 * @param testClass Instance of the class being tested
+	 */
+	public static void checkImageDimensionReshape(Object testClass, int numFunctions) {
+		int count = 0;
+		Method methods[] = testClass.getClass().getMethods();
+
+		for (Method m : methods) {
+			// see if the inputs are all images
+			if (!areAllInputsImages(m))
+				continue;
+
+			// test a positive case
+			Class params[] = m.getParameterTypes();
+			Object[] inputs = new Object[params.length];
+			for (int i = 0; i < params.length; i++) {
+				inputs[i] = GeneralizedImageOps.createSingleBand(params[i], 10, 20);
+			}
+
+			try {
+				m.invoke(testClass, inputs);
+			} catch (IllegalAccessException | InvocationTargetException e) {
+				throw new RuntimeException(e);
+			}
+
+			// test negative cases
+			// skip input which will be fixed size
+			for (int target = 1; target < params.length; target++) {
+				for (int i = 0; i < params.length; i++) {
+					if (i != target)
+						inputs[i] = GeneralizedImageOps.createSingleBand(params[i], 10, 20);
+					else
+						inputs[i] = GeneralizedImageOps.createSingleBand(params[i], 11, 22);
+				}
+
+				try {
+					m.invoke(testClass, inputs);
+				} catch (IllegalAccessException | InvocationTargetException e) {
+					throw new RuntimeException(e);
+				}
+				for (int i = 1; i < params.length; i++) {
+					if(10 !=((ImageBase)inputs[i]).width || 20 != ((ImageBase)inputs[i]).height)
+						throw new RuntimeException("Wasn't reshaped");
+				}
+			}
+			count++;
+		}
+
+		if (count != numFunctions)
+			throw new RuntimeException("Unexpected number of functions. cnt="+count+" funcs="+numFunctions);
 	}
 
 	private static boolean areAllInputsImages(Method m) {

@@ -56,7 +56,7 @@ public class HessianFromGradient {
 	public static void hessianPrewitt(GrayS16 inputDerivX , GrayS16 inputDerivY ,
 									  GrayS16 derivXX, GrayS16 derivYY, GrayS16 derivXY ,
 									  ImageBorder_S32 border ) {
-		InputSanityCheck.checkSameShape(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
+		InputSanityCheck.reshapeOneIn(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
 
 		GradientPrewitt.process(inputDerivX,derivXX,derivXY,border);
 
@@ -79,7 +79,7 @@ public class HessianFromGradient {
 	public static void hessianPrewitt(GrayF32 inputDerivX , GrayF32 inputDerivY,
 									  GrayF32 derivXX, GrayF32 derivYY, GrayF32 derivXY ,
 									  ImageBorder_F32 border ) {
-		InputSanityCheck.checkSameShape(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
+		InputSanityCheck.reshapeOneIn(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
 
 		GradientPrewitt.process(inputDerivX,derivXX,derivXY,border);
 
@@ -102,7 +102,7 @@ public class HessianFromGradient {
 	public static void hessianSobel(GrayS16 inputDerivX , GrayS16 inputDerivY ,
 									GrayS16 derivXX, GrayS16 derivYY, GrayS16 derivXY ,
 									ImageBorder_S32 border ) {
-		InputSanityCheck.checkSameShape(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
+		InputSanityCheck.reshapeOneIn(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
 
 		GradientSobel.process(inputDerivX,derivXX,derivXY,border);
 
@@ -126,7 +126,7 @@ public class HessianFromGradient {
 	public static void hessianSobel(GrayF32 inputDerivX , GrayF32 inputDerivY,
 									GrayF32 derivXX, GrayF32 derivYY, GrayF32 derivXY ,
 									ImageBorder_F32 border ) {
-		InputSanityCheck.checkSameShape(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
+		InputSanityCheck.reshapeOneIn(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
 
 		GradientSobel.process(inputDerivX,derivXX,derivXY,border);
 
@@ -150,7 +150,7 @@ public class HessianFromGradient {
 	public static void hessianThree(GrayS16 inputDerivX , GrayS16 inputDerivY ,
 									GrayS16 derivXX, GrayS16 derivYY, GrayS16 derivXY ,
 									ImageBorder_S32 border ) {
-		InputSanityCheck.checkSameShape(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
+		InputSanityCheck.reshapeOneIn(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
 
 		GradientThree.process(inputDerivX,derivXX,derivXY,border);
 
@@ -174,7 +174,7 @@ public class HessianFromGradient {
 	public static void hessianThree(GrayF32 inputDerivX , GrayF32 inputDerivY,
 									GrayF32 derivXX, GrayF32 derivYY, GrayF32 derivXY ,
 									ImageBorder_F32 border ) {
-		InputSanityCheck.checkSameShape(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
+		InputSanityCheck.reshapeOneIn(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
 
 		GradientThree.process(inputDerivX,derivXX,derivXY,border);
 

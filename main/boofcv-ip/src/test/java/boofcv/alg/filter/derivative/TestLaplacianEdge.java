@@ -41,7 +41,7 @@ public class TestLaplacianEdge {
 
 	@Test
 	public void checkInputShape() {
-		BoofTesting.checkImageDimensionValidation(new LaplacianEdge(), 3);
+		BoofTesting.checkImageDimensionReshape(new LaplacianEdge(), 3);
 	}
 
 	@Test
