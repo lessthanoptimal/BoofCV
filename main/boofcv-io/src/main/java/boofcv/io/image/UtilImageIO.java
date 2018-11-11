@@ -85,19 +85,21 @@ public class UtilImageIO {
 		if( url == null )
 			return null;
 		try {
-			return ImageIO.read(url);
-		} catch (IOException e) {
-			try {
-				InputStream stream = url.openStream();
-				String path = url.toString();
-				if( path.endsWith("ppm") || path.endsWith("PPM") ) {
-					return loadPPM(stream,null);
-				} else if( path.endsWith("pgm") || path.endsWith("PGM") ) {
-					return loadPGM(stream, null);
-				}
-				stream.close();
-			} catch (IOException ignore) {}
-		}
+			BufferedImage buffered = ImageIO.read(url);
+			if( buffered != null )
+				return buffered;
+		} catch (IOException ignore) {}
+		try {
+			InputStream stream = url.openStream();
+			String path = url.toString();
+			if( path.toLowerCase().endsWith("ppm")) {
+				return loadPPM(stream,null);
+			} else if( path.toLowerCase().endsWith("pgm") ) {
+				return loadPGM(stream, null);
+			}
+			stream.close();
+		} catch (IOException ignore) {}
+
 		return null;
 	}
 
