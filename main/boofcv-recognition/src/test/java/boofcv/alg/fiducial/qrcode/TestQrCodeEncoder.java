@@ -209,7 +209,7 @@ public class TestQrCodeEncoder {
 		QrCodeEncoder encoder = new QrCodeEncoder()
 				.setVersion(2).setError(QrCode.ErrorLevel.M).
 						setMask(QrCodeMaskPattern.M011).
-						addAlphanumeric("ASDASDJASd983405983094580sdfkl");
+						addAlphanumeric("ASDASDJASD983405983094580SDF:LOEFLAWEQ");
 		assertThrows(RuntimeException.class, encoder::fixate);
 	}
 
