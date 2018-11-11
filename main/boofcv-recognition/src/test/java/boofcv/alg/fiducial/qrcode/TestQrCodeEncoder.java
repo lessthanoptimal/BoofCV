@@ -106,7 +106,7 @@ public class TestQrCodeEncoder {
 	@Test
 	public void kanji() {
 		QrCodeEncoder encoder = new QrCodeEncoder();
-		encoder.setVersion(1).setError(QrCode.ErrorLevel.M).
+		encoder.setVersion(2).setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
 				addKanji("阿ん鞠ぷへ≦Ｋ").fixate();
 
@@ -198,10 +198,19 @@ public class TestQrCodeEncoder {
 	@Test
 	public void multipleModes() {
 		new QrCodeEncoder()
-				.setVersion(1).setError(QrCode.ErrorLevel.M).
+				.setVersion(2).setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
 				addNumeric("1234").
 				addKanji("阿ん鞠ぷへ≦Ｋ").fixate();
+	}
+
+	@Test
+	public void tooMuchData() {
+		QrCodeEncoder encoder = new QrCodeEncoder()
+				.setVersion(2).setError(QrCode.ErrorLevel.M).
+						setMask(QrCodeMaskPattern.M011).
+						addAlphanumeric("ASDASDJASd983405983094580sdfkl");
+		assertThrows(RuntimeException.class, encoder::fixate);
 	}
 
 	@Test
