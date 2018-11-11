@@ -32,10 +32,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.simulation.SimulatePlanarWorld;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.*;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 
@@ -101,7 +98,7 @@ public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector
 		SquareImage_to_FiducialDetector ret = FactoryFiducial.squareImage (
 				new ConfigFiducialImage(),
 				ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 13),
-				imageType.getImageClass());
+				(Class<ImageGray>)imageType.getImageClass());
 
 		ret.addPatternImage(UtilImageIO.loadImage(UtilIO.pathExample("fiducial/image/patterns/chicken.png"), imageType.getImageClass()), 125, 0.1);
 

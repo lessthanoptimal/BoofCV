@@ -30,10 +30,7 @@ import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.simulation.SimulatePlanarWorld;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.*;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 
@@ -92,6 +89,6 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 	public FiducialDetector createDetector(ImageType imageType) {
 		return FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1),
 				ConfigThreshold.local(ThresholdType.LOCAL_MEAN,13),
-				imageType.getImageClass());
+				(Class<ImageGray>)imageType.getImageClass());
 	}
 }
