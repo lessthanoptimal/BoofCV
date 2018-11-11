@@ -127,7 +127,6 @@ public class SelfCalibrationLinearRotationMulti {
 			return GeometricResult.SOLVE_FAILED;
 
 		fillInConstraintMatrix();
-		A.print();
 
 		// Compute the SVD for its null space
 		if( !svd.decompose(A)) {
@@ -135,7 +134,6 @@ public class SelfCalibrationLinearRotationMulti {
 		}
 
 		SingularOps_DDRM.nullVector(svd,true,nv);
-		nv.print();
 		extractReferenceW(nv);
 		convertW(W0,calibration.grow());
 		for (int i = 0; i < N; i++) {
@@ -225,10 +223,10 @@ public class SelfCalibrationLinearRotationMulti {
 	 */
 	void extractReferenceW(DMatrixRMaj nv ) {
 		W0.a11 = nv.data[0];
-		W0.a12 = zeroSkew ? 0 : nv.data[1];
-		W0.a13 = principlePointOrigin ? 0 : nv.data[2];
+		W0.a12 = W0.a21 = nv.data[1];
+		W0.a13 = W0.a31 = nv.data[2];
 		W0.a22 = nv.data[3];
-		W0.a23 = principlePointOrigin ? 0 : nv.data[4];
+		W0.a23 = W0.a32 = nv.data[4];
 		W0.a33 = nv.data[5];
 	}
 
@@ -239,12 +237,12 @@ public class SelfCalibrationLinearRotationMulti {
 	 */
 	void convertW( Homography2D_F64 w , CameraPinhole c ) {
 		// inv(w) = K*K'
-		w.print();
-		CommonOps_DDF3.divide(w,w.a33);
-		CommonOps_DDF3.invert(w,K);
-		CommonOps_DDF3.cholU(K);
+		tmp.set(w);
+		CommonOps_DDF3.divide(tmp,tmp.a33);
+		CommonOps_DDF3.cholU(tmp);
+		CommonOps_DDF3.invert(tmp,K);
 		CommonOps_DDF3.divide(K,K.a33);
-		K.print();
+
 		c.fx = K.a11;
 		c.fy = knownAspectRatio ? c.fx/aspectRatio : K.a22;
 		c.skew = zeroSkew ? 0 : K.a12;
