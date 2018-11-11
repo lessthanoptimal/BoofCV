@@ -57,7 +57,7 @@ public class TestSelfCalibrationLinearRotationMulti
 	}
 
 	@Test
-	public void perfect_sk() {
+	public void perfect_zeroSkew() {
 		renderRotationOnly(camera);
 
 		List<Homography2D_F64> viewsI_to_view0 = computeHomographies();
@@ -98,7 +98,7 @@ public class TestSelfCalibrationLinearRotationMulti
 	}
 
 	@Test
-	public void perfect_pz() {
+	public void perfect_PrincipleZero() {
 		// set the principle point to zero
 		camera = new CameraPinhole(400,410,0.5,0,0,0,0);
 		PerspectiveOps.pinholeToMatrix(camera,K);
@@ -124,13 +124,29 @@ public class TestSelfCalibrationLinearRotationMulti
 	}
 
 	@Test
-	public void perfect_pz_ka() {
-		fail("Implement");
-	}
+	public void perfect_AllLinear() {
+		// set the principle point to zero
+		camera = new CameraPinhole(400,420,0,510,540,0,0);
+		PerspectiveOps.pinholeToMatrix(camera,K);
 
-	@Test
-	public void perfect_zk_pz_ka() {
-		fail("Implement");
+		renderRotationOnly(camera);
+
+		List<Homography2D_F64> viewsI_to_view0 = computeHomographies();
+
+		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
+		alg.setConstraints(true,false,true,camera.fy/camera.fx);
+		assertSame(alg.estimate(viewsI_to_view0), GeometricResult.SUCCESS);
+
+		FastQueue<CameraPinhole> found = alg.getFound();
+
+		for (int i = 0; i < found.size; i++) {
+			CameraPinhole f = found.get(i);
+			assertEquals(camera.fx,f.fx, UtilEjml.TEST_F64);
+			assertEquals(camera.fy,f.fy, UtilEjml.TEST_F64);
+			assertEquals(camera.skew,f.skew, UtilEjml.TEST_F64);
+			assertEquals(camera.cx,f.cx, UtilEjml.TEST_F64);
+			assertEquals(camera.cy,f.cy, UtilEjml.TEST_F64);
+		}
 	}
 
 	@Test
@@ -146,7 +162,7 @@ public class TestSelfCalibrationLinearRotationMulti
 
 	@Test
 	public void fillInConstraintMatrix_ZeroPP() {
-		camera = new CameraPinhole(400,410,0.5,0,0,0,0);
+		camera = new CameraPinhole(400,420,0.5,0,0,0,0);
 		PerspectiveOps.pinholeToMatrix(camera,K);
 
 		renderRotationOnly(camera);
@@ -159,14 +175,28 @@ public class TestSelfCalibrationLinearRotationMulti
 	}
 
 	@Test
-	public void fillInConstraintMatrix_ZeroPP_KnownAspect() {
-		camera = new CameraPinhole(400,410,0.5,0,0,0,0);
+	public void fillInConstraintMatrix_ZeroSkew_KnownAspect() {
+		camera = new CameraPinhole(400,420,0,450,460,0,0);
 		PerspectiveOps.pinholeToMatrix(camera,K);
 
 		renderRotationOnly(camera);
 		List<Homography2D_F64> viewsI_to_view0 = computeHomographies();
 		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
-		alg.setConstraints(false,true,true,camera.fx/camera.fy);
+		alg.setConstraints(true,false,true,camera.fy/camera.fx);
+		alg.computeInverseH(viewsI_to_view0);
+		alg.fillInConstraintMatrix();
+		checkFillInConstraintMatrix(alg);
+	}
+
+	@Test
+	public void fillInConstraintMatrix_AllLinear() {
+		camera = new CameraPinhole(400,420,0,0,0,0,0);
+		PerspectiveOps.pinholeToMatrix(camera,K);
+
+		renderRotationOnly(camera);
+		List<Homography2D_F64> viewsI_to_view0 = computeHomographies();
+		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
+		alg.setConstraints(true,true,true,camera.fy/camera.fx);
 		alg.computeInverseH(viewsI_to_view0);
 		alg.fillInConstraintMatrix();
 		checkFillInConstraintMatrix(alg);
@@ -209,8 +239,8 @@ public class TestSelfCalibrationLinearRotationMulti
 		alg.setConstraints(false,true,false,0);
 		assertEquals(2,alg.numberOfConstraints());
 
-		alg.setConstraints(false,true,true,1);
-		assertEquals(3,alg.numberOfConstraints());
+		alg.setConstraints(true,false,true,1);
+		assertEquals(2,alg.numberOfConstraints());
 
 		alg.setConstraints(true,true,true,1);
 		assertEquals(4,alg.numberOfConstraints());
@@ -313,7 +343,7 @@ public class TestSelfCalibrationLinearRotationMulti
 		assertEquals(0,found.cy, tol);
 
 		// Add known aspect ratio
-		double aspect = K.a11/K.a22;
+		double aspect = K.a22/K.a11;
 		CommonOps_DDF3.multTransB(K,K,W);
 		CommonOps_DDF3.invert(W,W);
 		alg.setConstraints(true,true,true,aspect);

@@ -60,6 +60,7 @@ public class SelfCalibrationLinearRotationMulti {
 	boolean principlePointOrigin;
 	boolean knownAspectRatio;
 
+	// fy/fx
 	double aspectRatio;
 
 	//----------- Working space variables
@@ -85,16 +86,22 @@ public class SelfCalibrationLinearRotationMulti {
 
 	/**
 	 * Specifies linear constraints
+	 *
+	 * Known aspect ratio constraint can only be used if zero skew is also assumped.
+	 *
 	 * @param zeroSkew Assume that skew is zero
 	 * @param principlePointOrigin Principle point is at the origin
 	 * @param knownAspect that the aspect ratio is known
-	 * @param aspect If aspect is known then this is the aspect. ratio=fx/fy Ignored otherwise.
+	 * @param aspect If aspect is known then this is the aspect. ratio=fy/fx Ignored otherwise.
 	 */
 	public void setConstraints( boolean zeroSkew ,
 								boolean principlePointOrigin ,
 								boolean knownAspect,
 								double aspect )
 	{
+		if( knownAspect && !zeroSkew )
+			throw new IllegalArgumentException("If aspect is known then skew must be zero");
+
 		this.zeroSkew = zeroSkew;
 		this.principlePointOrigin = principlePointOrigin;
 		this.knownAspectRatio = knownAspect;
@@ -199,7 +206,7 @@ public class SelfCalibrationLinearRotationMulti {
 				A.data[idx++] = H.a23*H.a31 + H.a21*H.a33;
 				A.data[idx++] = H.a31*H.a33;
 
-				A.data[idx++] = H.a12;
+				A.data[idx++] = H.a12*H.a13;
 				A.data[idx++] = H.a13*H.a22 + H.a12*H.a23;
 				A.data[idx++] = H.a13*H.a32 + H.a12*H.a33;
 				A.data[idx++] = H.a22*H.a23;
@@ -244,7 +251,7 @@ public class SelfCalibrationLinearRotationMulti {
 		CommonOps_DDF3.divide(K,K.a33);
 
 		c.fx = K.a11;
-		c.fy = knownAspectRatio ? c.fx/aspectRatio : K.a22;
+		c.fy = knownAspectRatio ? (K.a22 + c.fx*aspectRatio)/2.0 : K.a22;
 		c.skew = zeroSkew ? 0 : K.a12;
 		c.cx = principlePointOrigin ? 0 : K.a13;
 		c.cy = principlePointOrigin ? 0 : K.a23;

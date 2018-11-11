@@ -22,6 +22,8 @@ Version : 0.32
 - ImageInterleaved setTo() changes number of bands if needed
 - Improved speed of Interleaved to Gray average
 - QR Code encoder does a better job of rejecting invalid QR configurations
+- Self Calibration
+  * Linear rotation with different values in each frame
 
 TODO Attempt trifocal tensor based stereo
 
