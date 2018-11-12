@@ -101,7 +101,7 @@ subprojects {
             exclude group: 'org.ejml'
         }
         ['ejml-core','ejml-fdense','ejml-ddense','ejml-simple','ejml-dsparse'].each { String a ->
-            compile group: 'org.ejml', name: a, version: '0.37-SNAPSHOT'}
+            compile group: 'org.ejml', name: a, version: '0.37'}
         compile 'com.google.code.findbugs:jsr305:3.0.2' // @Nullable
 
         testImplementation(
