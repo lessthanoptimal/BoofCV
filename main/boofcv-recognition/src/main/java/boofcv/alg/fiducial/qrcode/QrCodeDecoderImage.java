@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Intersection2D_F64;
@@ -91,6 +92,20 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 				}
 			}
 		}
+	}
+
+	/**
+	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted and the opposite
+	 * coordinates.  The undistorted image is never explicitly created.</p>
+	 *
+	 * @param width Input image width.  Used in sanity check only.
+	 * @param height Input image height.  Used in sanity check only.
+	 * @param distToUndist Transform from distorted to undistorted image.
+	 * @param undistToDist Transform from undistorted to distorted image.
+	 */
+	public void setLensDistortion(int width , int height ,
+								  PixelTransform2_F32 distToUndist , PixelTransform2_F32 undistToDist ) {
+		// TODO implement
 	}
 
 	static void setPositionPatterns(PositionPatternNode ppn,

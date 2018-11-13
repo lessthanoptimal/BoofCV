@@ -67,6 +67,14 @@ public class TestQrCodePositionPatternDetector {
 		checkNode(40+35,150+35,1,list);
 	}
 
+	@Test
+	public void withLensDistortion() {
+		// TODO fail without
+
+		// TODO pass with distortion is passed to it
+		fail("Implement");
+	}
+
 	private void checkNode( double cx , double cy , int numEdges ,
 							List<PositionPatternNode> list )
 	{

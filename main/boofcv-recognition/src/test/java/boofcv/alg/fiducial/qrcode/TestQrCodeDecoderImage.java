@@ -32,6 +32,11 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestQrCodeDecoderImage {
 
+	@Test
+	public void withLensDistortion() {
+		fail("Implement");
+	}
+
 	/**
 	 * Run the entire algorithm on a rendered image but just care about the message
 	 */

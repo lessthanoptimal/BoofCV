@@ -25,6 +25,7 @@ import boofcv.alg.fiducial.qrcode.QrCodeDecoderImage;
 import boofcv.alg.fiducial.qrcode.QrCodePositionPatternDetector;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.misc.MovingAverage;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 
@@ -88,6 +89,21 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 	@Override
 	public List<QrCode> getFailures() {
 		return decoder.getFailures();
+	}
+
+	/**
+	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted and the opposite
+	 * coordinates.  The undistorted image is never explicitly created.</p>
+	 *
+	 * @param width Input image width.  Used in sanity check only.
+	 * @param height Input image height.  Used in sanity check only.
+	 * @param distToUndist Transform from distorted to undistorted image.
+	 * @param undistToDist Transform from undistorted to distorted image.
+	 */
+	public void setLensDistortion(int width , int height ,
+								  PixelTransform2_F32 distToUndist , PixelTransform2_F32 undistToDist ) {
+		detectPositionPatterns.setLensDistortion(width, height, distToUndist, undistToDist);
+		decoder.setLensDistortion(width, height, distToUndist, undistToDist);
 	}
 
 	public GrayU8 getBinary() {

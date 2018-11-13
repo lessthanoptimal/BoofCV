@@ -28,6 +28,7 @@ import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.MovingAverage;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilLine2D_F64;
@@ -134,12 +135,26 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 		milliGraph.update(milli);
 
-		DetectPolygonFromContour<T> detectorPoly = squareDetector.getDetector();
 		if( profiler ) {
+			DetectPolygonFromContour<T> detectorPoly = squareDetector.getDetector();
 			System.out.printf(" contour %5.1f shapes %5.1f adjust_bias %5.2f PosPat %6.2f",
 					detectorPoly.getMilliContour(), detectorPoly.getMilliShapes(), squareDetector.getMilliAdjustBias(),
 					milliGraph.getAverage());
 		}
+	}
+
+	/**
+	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted and the opposite
+	 * coordinates.  The undistorted image is never explicitly created.</p>
+	 *
+	 * @param width Input image width.  Used in sanity check only.
+	 * @param height Input image height.  Used in sanity check only.
+	 * @param distToUndist Transform from distorted to undistorted image.
+	 * @param undistToDist Transform from undistorted to distorted image.
+	 */
+	public void setLensDistortion(int width , int height ,
+								  PixelTransform2_F32 distToUndist , PixelTransform2_F32 undistToDist ) {
+		squareDetector.setLensDistortion(width, height, distToUndist, undistToDist);
 	}
 
 	/**
@@ -296,6 +311,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		return( checkLine(square,grayThreshold,0) || checkLine(square,grayThreshold,1));
 	}
 
+	// TODO Use undistorted coordinates if possible
 	LineSegment2D_F64 segment = new LineSegment2D_F64();
 	LineParametric2D_F64 parametric = new LineParametric2D_F64();
 	float[] samples = new float[9*5+1];
