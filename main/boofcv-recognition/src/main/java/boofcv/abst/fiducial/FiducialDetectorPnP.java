@@ -22,7 +22,6 @@ import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.geo.WorldToCameraToPixel;
-import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
@@ -62,7 +61,8 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 	boolean hasCameraModel = false;
 
 	// non-linear refinement of pose estimate
-	private Estimate1ofPnP estimatePnP = FactoryMultiView.pnp_1(EnumPNP.IPPE,-1,-1);
+	private Estimate1ofPnP estimatePnP = FactoryMultiView.computePnPwithEPnP(10,0.2);
+//	private Estimate1ofPnP estimatePnP = FactoryMultiView.pnp_1(EnumPNP.IPPE,0,0);
 	private RefinePnP refinePnP = FactoryMultiView.pnpRefine(1e-8,100);
 	private WorldToCameraToPixel w2p = new WorldToCameraToPixel();
 
@@ -188,7 +188,9 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 			}
 
 			// prune points 3 standard deviations away
-			double sigma3 = 9 * stdev;
+			// Don't prune if 3 standard deviations is less than 1.5 pixels since that's about what
+			// you would expect and you might make the solution worse
+			double sigma3 = Math.max(1.5,4 * stdev);
 
 			for (int i = 0; i < points.size(); i++) {
 				if (errors.get(i) < sigma3) {
@@ -204,7 +206,7 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 		} else {
 			filtered.addAll(points);
 		}
-		return refinePnP.fitModel(filtered, initialEstimate, fiducialToCamera);
+		return refinePnP.fitModel(points, initialEstimate, fiducialToCamera);
 	}
 
 	/**
