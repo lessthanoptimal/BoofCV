@@ -24,6 +24,9 @@ Version : 0.32
 - QR Code encoder does a better job of rejecting invalid QR configurations
 - Self Calibration
   * Linear rotation with different values in each frame
+- Android
+  * Bunch of bug fixes
+  * Extracts the full pinhole calibration matrix from camera characteristics
 
 TODO Attempt trifocal tensor based stereo
 
@@ -33,7 +36,6 @@ TODO Create GUI for running any application
 - TODO Self calibration
    - scene reconstruction
    - compared to regular
-   - rotation only
 - TODO Scene Reconstruction
    - TODO handle situation where images are removed and exception is thrown
    - TODO Create generic image feature matching for ordered sequences of images

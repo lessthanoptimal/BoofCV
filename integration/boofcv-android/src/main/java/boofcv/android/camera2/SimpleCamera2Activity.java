@@ -21,10 +21,7 @@ package boofcv.android.camera2;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.ImageFormat;
-import android.graphics.Matrix;
-import android.graphics.RectF;
-import android.graphics.SurfaceTexture;
+import android.graphics.*;
 import android.hardware.camera2.*;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
@@ -42,6 +39,8 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Toast;
+import boofcv.alg.geo.PerspectiveOps;
+import boofcv.struct.calib.CameraPinhole;
 import georegression.metric.UtilAngle;
 
 import java.util.ArrayList;
@@ -906,37 +905,39 @@ public abstract class SimpleCamera2Activity extends Activity {
 	protected void onCameraDisconnected( @NonNull CameraDevice cameraDevice ){}
 
 	/**
-	 * Estimates the camera's horizontal and vertical FOV by picking a nominal value.
-	 * Determining the actual FOV is a much more complex process.
+	 * Returns the camera intrinsic parameters estimated from the physical parameters returned by
+	 * the camera2 API
 	 */
-	public double[] cameraNominalFov() {
+	public void cameraIntrinsicNominal(CameraPinhole intrinsic ) {
 		open.mLock.lock();
 		try {
-			SizeF sensorSize = null;
-			float[] focalLengths = null;
-
 			// This might be called before the camera is open
-			if( open.mCameraCharacterstics != null ) {
-				sensorSize = open.mCameraCharacterstics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);
-				focalLengths = open.mCameraCharacterstics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
-			}
+			if (open.mCameraCharacterstics != null) {
+				SizeF physicalSize = open.mCameraCharacterstics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);
+				Rect activeSize = open.mCameraCharacterstics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+				Size pixelSize = open.mCameraCharacterstics.get(CameraCharacteristics.SENSOR_INFO_PIXEL_ARRAY_SIZE);
+				float[] focalLengths = open.mCameraCharacterstics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
+				if (focalLengths != null && focalLengths.length > 0 && physicalSize != null && activeSize != null && pixelSize != null ) {
+					float fl = focalLengths[0];
 
-			if (focalLengths == null || sensorSize == null ) {
-				// 60 degrees seems reasonable for a random guess
-				double hfov = UtilAngle.radian(60);
-				if( open.mCameraSize == null ) {
-					Log.w(TAG,"Requesting FOV when the camera isn't open yet!");
-					return new double[]{hfov, hfov};
-				} else {
+					float widthToPixel = pixelSize.getWidth() / physicalSize.getWidth();
+					float heightToPixel = pixelSize.getHeight() / physicalSize.getHeight();
 
-					double vfov = hfov * open.mCameraSize.getHeight() / open.mCameraSize.getWidth();
-					return new double[]{hfov, vfov};
+					float s = open.mCameraSize.getWidth()/(float)activeSize.width();
+
+					intrinsic.fx = fl*widthToPixel*s;
+					intrinsic.fy = fl*heightToPixel*s;
+					intrinsic.skew = 0;
+					intrinsic.cx = activeSize.centerX()*s;
+					intrinsic.cy = activeSize.centerY()*s;
+					intrinsic.width = open.mCameraSize.getWidth();
+					intrinsic.height = open.mCameraSize.getHeight();
+					return;
 				}
-			} else {
-				double hfov = 2 * Math.atan(sensorSize.getWidth() / (2 * focalLengths[0]));
-				double vfov = 2 * Math.atan(sensorSize.getHeight() / (2 * focalLengths[0]));
-				return new double[]{hfov, vfov};
 			}
+			// 60 degrees seems reasonable for a random guess
+			PerspectiveOps.createIntrinsic(open.mCameraSize.getWidth(),open.mCameraSize.hashCode(),
+					UtilAngle.radian(60));
 		} finally {
 			open.mLock.unlock();
 		}
