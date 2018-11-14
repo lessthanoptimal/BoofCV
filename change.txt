@@ -22,9 +22,9 @@ Version : 0.32
 - InterleavedU8 and Planar<GrayU8>
   * Added set32/get32 and set24/get24
 - ConvertImage reshapes output instead of throwing an exception
-- ImageInterleaved setTo() changes number of bands if needed
-- Improved speed of Interleaved to Gray average
-- QR Code encoder does a better job of rejecting invalid QR configurations
+- ImageInterleaved
+  * setTo() changes number of bands if needed
+  * Improved speed of Interleaved to Gray average
 - Self Calibration
   * Linear rotation with different values in each frame
 - Android

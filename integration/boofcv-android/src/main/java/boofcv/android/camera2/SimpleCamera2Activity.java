@@ -68,8 +68,14 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * Configuration variables
  * <ul>
- *     <li>verbose</li>
+ *     <li>verbose: turns on and off verbose printing to logs</li>
  * </ul>
+ *
+ * To customize the camera settings you need to override {@link #configureCamera}. If after opening the camera
+ * you want to change the camera settings you need to then first call {@link #isCameraReadyReconfiguration}
+ * and make sure the camera is in a state that it can be reconfigured. If that returns truen then you're
+ * free to call {@link #changeCameraConfiguration} which will eventually result in {@link #configureCamera}
+ * being called again.
  *
  * Specify the following permissions and features in AndroidManifest.xml
  * <pre>
