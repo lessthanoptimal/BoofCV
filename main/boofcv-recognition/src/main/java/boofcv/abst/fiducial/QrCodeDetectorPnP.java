@@ -18,7 +18,9 @@
 
 package boofcv.abst.fiducial;
 
+import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.fiducial.qrcode.QrCode;
+import boofcv.alg.fiducial.qrcode.QrPose3DUtils;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.ImageGray;
@@ -28,7 +30,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,82 +45,39 @@ public class QrCodeDetectorPnP<T extends ImageGray<T>> extends FiducialDetectorP
 	QrCodeDetector<T> detector;
 	ImageType<T> imageType;
 
-	List<PointIndex2D_F64> pixelControl = new ArrayList<>();
-	List<Point2D3D> point23 = new ArrayList<>();
-
-	double markerWidth = 1.0;
+	QrPose3DUtils poseUtils = new QrPose3DUtils();
 
 	public QrCodeDetectorPnP(QrCodeDetector<T> detector) {
 		this.detector = detector;
 		imageType = ImageType.single(detector.getImageType());
-
-		for (int i = 0; i < 12; i++) {
-			pixelControl.add( new PointIndex2D_F64(0,0,i) );
-			point23.add( new Point2D3D() );
-		}
 	}
 
-	private void setPair(int which, int row, int col, int N , Point2D_F64 pixel ) {
-		double gridX = col*markerWidth/N-markerWidth/2;
-		double gridY = markerWidth/2-row*markerWidth/N;
-
-		point23.get(which).location.set(gridX,gridY,0);
-		pixelToNorm.compute(pixel.x,pixel.y,point23.get(which).observation);
+	@Override
+	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height) {
+		super.setLensDistortion(distortion, width, height);
+		poseUtils.setPixelToNorm(pixelToNorm);
 	}
 
 	@Override
 	public double getSideWidth(int which) {
-		return markerWidth;
+		return poseUtils.getMarkerWidth();
 	}
 
 	@Override
 	public double getSideHeight(int which) {
-		return markerWidth;
+		return poseUtils.getMarkerWidth();
 	}
 
 	@Override
 	public List<PointIndex2D_F64> getDetectedControl(int which) {
 		QrCode qr = detector.getDetections().get(which);
-
-		pixelControl.get(0).set(qr.ppCorner.get(0));
-		pixelControl.get(1).set(qr.ppCorner.get(1));
-		pixelControl.get(2).set(qr.ppCorner.get(2));
-		pixelControl.get(3).set(qr.ppCorner.get(3));
-
-		pixelControl.get(4).set(qr.ppRight.get(0));
-		pixelControl.get(5).set(qr.ppRight.get(1));
-		pixelControl.get(6).set(qr.ppRight.get(2));
-		pixelControl.get(7).set(qr.ppRight.get(3));
-
-		pixelControl.get(8).set(qr.ppDown.get(0));
-		pixelControl.get(9).set(qr.ppDown.get(1));
-		pixelControl.get(10).set(qr.ppDown.get(2));
-		pixelControl.get(11).set(qr.ppDown.get(3));
-
-		return pixelControl;
+		return poseUtils.getLandmarkByIndex(qr);
 	}
 
 	@Override
 	protected List<Point2D3D> getControl3D(int which) {
 		QrCode qr = detector.getDetections().get(which);
-		int N = qr.getNumberOfModules();
-
-		setPair(0, 0,0,N,qr.ppCorner.get(0));
-		setPair(1, 0,7,N,qr.ppCorner.get(1));
-		setPair(2, 7,7,N,qr.ppCorner.get(2));
-		setPair(3, 7,0,N,qr.ppCorner.get(3));
-
-		setPair(4, 0,N-7,N,qr.ppRight.get(0));
-		setPair(5, 0,N,N,qr.ppRight.get(1));
-		setPair(6, 7,N,N,qr.ppRight.get(2));
-		setPair(7, 7,N-7,N,qr.ppRight.get(3));
-
-		setPair(8, N-7,0,N,qr.ppDown.get(0));
-		setPair(9, N-7,7,N,qr.ppDown.get(1));
-		setPair(10, N,7,N,qr.ppDown.get(2));
-		setPair(11, N,0,N,qr.ppDown.get(3));
-
-		return point23;
+		return poseUtils.getLandmark2D3D(qr);
 	}
 
 	@Override
@@ -166,11 +124,11 @@ public class QrCodeDetectorPnP<T extends ImageGray<T>> extends FiducialDetectorP
 
 	@Override
 	public double getWidth(int which) {
-		return markerWidth;
+		return poseUtils.getMarkerWidth();
 	}
 
 	public void setMarkerWidth(double markerWidth) {
-		this.markerWidth = markerWidth;
+		poseUtils.setMarkerWidth(markerWidth);
 	}
 
 	@Override
