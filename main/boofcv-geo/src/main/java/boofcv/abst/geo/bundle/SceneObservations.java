@@ -58,7 +58,7 @@ public class SceneObservations {
 	public static class View {
 		// list of Point ID's which this view can see
 		public GrowQueue_I32 point = new GrowQueue_I32();
-		// The observation of the point in the view in an interleaved format
+		// The observation of the point in the view in an interleaved format. In image pixels.
 		public GrowQueue_F32 observations = new GrowQueue_F32();
 
 		public int size() {
@@ -100,6 +100,12 @@ public class SceneObservations {
 			observation.set( observations.data[index], observations.data[index+1]);
 		}
 
+		/**
+		 * Adds an observation of the specified feature.
+		 * @param featureIndex Feature index
+		 * @param x pixel x-coordinate
+		 * @param y pixel y-coordinate
+		 */
 		public void add( int featureIndex , float x , float y ) {
 			point.add(featureIndex);
 			observations.add(x);
