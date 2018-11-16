@@ -19,9 +19,11 @@
 package boofcv.alg.fiducial.qrcode;
 
 import boofcv.abst.filter.binary.BinaryContourFinder;
-import boofcv.alg.distort.RemovePerspectiveDistortion;
+import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.fiducial.calib.squares.SquareGraph;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
+import boofcv.alg.interpolate.InterpolatePixelDistortS;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
@@ -29,6 +31,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilLine2D_F64;
@@ -42,17 +45,20 @@ import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastQueue;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
  * Detects position patterns for a QR code inside an image and forms a graph of ones which can potentially
  * be connected together. Squares are detected in the image and position patterns are found based on their appearance.
  *
+ * <p>If a lens distortion model is provided the returned pixel coordinates will be in an undistorted image</p>
  *
  * @author Peter Abeles
  */
 public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
+	// used to subsample the input image
 	InterpolatePixelS<T> interpolate;
 
 	// maximum QR code version that it can detect
@@ -67,9 +73,6 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	// Nearst Neighbor Search related variables
 	private NearestNeighbor<SquareNode> search = FactoryNearestNeighbor.kdtree(new SquareNode.KdTreeSquareNode());
 	private FastQueue<NnData<SquareNode>> searchResults = new FastQueue(NnData.class,true);
-
-	// Computes a mapping to remove perspective distortion
-	private RemovePerspectiveDistortion<?> removePerspective = new RemovePerspectiveDistortion(70,70);
 
 	// Workspace for checking to see if two squares should be connected
 	protected LineSegment2D_F64 lineA = new LineSegment2D_F64();
@@ -149,12 +152,26 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 *
 	 * @param width Input image width.  Used in sanity check only.
 	 * @param height Input image height.  Used in sanity check only.
-	 * @param distToUndist Transform from distorted to undistorted image.
-	 * @param undistToDist Transform from undistorted to distorted image.
+	 * @param model distortion model. Null to remove a distortion model.
 	 */
 	public void setLensDistortion(int width , int height ,
-								  PixelTransform2_F32 distToUndist , PixelTransform2_F32 undistToDist ) {
-		squareDetector.setLensDistortion(width, height, distToUndist, undistToDist);
+								  @Nullable LensDistortionNarrowFOV model )
+	{
+		interpolate = FactoryInterpolation.bilinearPixelS(
+				squareDetector.getInputType(), BorderType.EXTENDED);
+
+		if( model != null ) {
+			PixelTransform2_F32 distToUndist = new PointToPixelTransform_F32(model.undistort_F32(true,true));
+			PixelTransform2_F32 undistToDist = new PointToPixelTransform_F32(model.distort_F32(true,true));
+
+			squareDetector.setLensDistortion(width, height, distToUndist, undistToDist);
+
+			// needs to sample the original image when the
+			Point2Transform2_F32 u2d = model.distort_F32(true,true);
+			this.interpolate = new InterpolatePixelDistortS<>(this.interpolate,u2d);
+		} else {
+			squareDetector.setLensDistortion(width, height, null, null);
+		}
 	}
 
 	/**
@@ -306,12 +323,13 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 * Determines if the found polygon looks like a position pattern. A horizontal and vertical line are sampled.
 	 * At each sample point it is marked if it is above or below the binary threshold for this square. Location
 	 * of sample points is found by "removing" perspective distortion.
+	 *
+	 * @param square Position pattern square.
 	 */
 	boolean checkPositionPatternAppearance( Polygon2D_F64 square , float grayThreshold ) {
 		return( checkLine(square,grayThreshold,0) || checkLine(square,grayThreshold,1));
 	}
 
-	// TODO Use undistorted coordinates if possible
 	LineSegment2D_F64 segment = new LineSegment2D_F64();
 	LineParametric2D_F64 parametric = new LineParametric2D_F64();
 	float[] samples = new float[9*5+1];
@@ -411,6 +429,9 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 	/**
 	 * Returns a list of all the detected position pattern squares and the other PP that they are connected to.
+	 *
+	 * If a lens distortion model is provided then coordinates will be in an undistorted image.
+	 *
 	 * @return List of PP
 	 */
 	public FastQueue<PositionPatternNode> getPositionPatterns() {

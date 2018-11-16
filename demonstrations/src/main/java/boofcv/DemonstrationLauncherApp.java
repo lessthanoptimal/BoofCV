@@ -71,7 +71,6 @@ import boofcv.demonstrations.tracker.VideoTrackerPointFeaturesApp;
 import boofcv.demonstrations.tracker.VisualizeBackgroundModelApp;
 import boofcv.demonstrations.tracker.VisualizeCirculantTrackerApp;
 import boofcv.demonstrations.transform.fft.FourierVisualizeApp;
-import boofcv.demonstrations.transform.pyramid.EdgeIntensitiesApp;
 import boofcv.demonstrations.transform.pyramid.VisualizePyramidDiscreteApp;
 import boofcv.demonstrations.transform.pyramid.VisualizePyramidFloatApp;
 import boofcv.demonstrations.transform.pyramid.VisualizeScaleSpacePyramidApp;
@@ -124,11 +123,12 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				ImageEnhanceApp.class,
 				DenoiseVisualizeApp.class);
 
-		createNodes(root,"Feature",
+		createNodes(root,"Feature Association",
 				VisualizeAssociationAlgorithmsApp.class,
 				VisualizeAssociationMatchesApp.class,
-				VisualizeAssociationScoreApp.class,
-//				CompareConvertedDescriptionsApp.class,
+				VisualizeAssociationScoreApp.class);
+
+		createNodes(root,"Feature",
 				VisualizeHogDescriptorApp.class,
 				VisualizeImageHogCellApp.class,
 				VisualizeRegionDescriptionApp.class,
@@ -139,13 +139,8 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 //				DetectPointsWithNoiseApp.class,
 				DetectPointScaleOriWithNoiseApp.class,
 				DetectPointsInsidePyramidApp.class,
-				DetectLineApp.class,
-				VisualizeHoughFoot.class,
-				VisualizeHoughPolar.class,
-				VisualizeLineRansac.class,
-				DenseFlowApp.class,
-				ShowFeatureOrientationApp.class,
-				EdgeIntensitiesApp.class);
+				ShowFeatureOrientationApp.class);
+//				EdgeIntensitiesApp.class);
 
 		createNodes(root,"SFM 2D",
 				VideoMosaicSequentialPointApp.class,
@@ -171,13 +166,18 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				DemonstrationInterpolateScaleApp.class,
 				VisualizeFlipRotate.class,
 				VisualizeImageSegmentationApp.class,
-				VisualizeWatershedApp.class);
+				VisualizeWatershedApp.class,
+				DenseFlowApp.class);
 
 		createNodes(root, "Shapes",
 				DetectPolylineApp.class,
 				DetectBlackPolygonApp.class,
 				DetectBlackEllipseApp.class,
-				ShapeFitContourApp.class);
+				ShapeFitContourApp.class,
+				DetectLineApp.class,
+				VisualizeHoughFoot.class,
+				VisualizeHoughPolar.class,
+				VisualizeLineRansac.class);
 
 		createNodes(root, "Trackers",
 				VisualizeBackgroundModelApp.class,

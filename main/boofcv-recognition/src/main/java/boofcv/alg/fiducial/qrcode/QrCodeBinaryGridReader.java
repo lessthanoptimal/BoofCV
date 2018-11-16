@@ -18,10 +18,13 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.interpolate.InterpolatePixelDistortS;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
@@ -55,6 +58,17 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 		interpolate.setImage(image);
 		imageWidth = image.width;
 		imageHeight = image.height;
+	}
+
+	public void setLensDistortion(int width , int height ,
+								  LensDistortionNarrowFOV model )
+	{
+		interpolate = FactoryInterpolation.bilinearPixelS(
+				this.interpolate.getImageType().getImageClass(), BorderType.EXTENDED);
+		if( model != null ) {
+			Point2Transform2_F32 u2d = model.distort_F32(true,true);
+			this.interpolate = new InterpolatePixelDistortS<>(interpolate,u2d);
+		}
 	}
 
 	public void setMarker( QrCode qr ) {

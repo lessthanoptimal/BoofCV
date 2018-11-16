@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.struct.image.ImageGray;
 import org.ddogleg.struct.FastQueue;
 
@@ -44,9 +45,9 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
 	float threshold;
 
-	public QrCodeAlignmentPatternLocator( Class<T> imageType ) {
-
-		reader = new QrCodeBinaryGridReader<T>(imageType);
+	public QrCodeAlignmentPatternLocator( Class<T> imageType )
+	{
+		reader = new QrCodeBinaryGridReader<>(imageType);
 	}
 
 	/**
@@ -68,6 +69,12 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		if( qr.version <= 1 )
 			return true;
 		return localizePositionPatterns(QrCode.VERSION_INFO[qr.version].alignment);
+	}
+
+	public void setLensDistortion(int width , int height ,
+								  LensDistortionNarrowFOV model )
+	{
+		reader.setLensDistortion(width, height, model);
 	}
 
 	/**

@@ -116,7 +116,9 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	 * @param undistToDist Transform from undistorted to distorted image.
 	 */
 	public void setLensDistortion(int width , int height ,
-								  PixelTransform2_F32 distToUndist , PixelTransform2_F32 undistToDist ) {
+								  @Nullable PixelTransform2_F32 distToUndist ,
+								  @Nullable PixelTransform2_F32 undistToDist )
+	{
 		detector.setLensDistortion(width, height, distToUndist, undistToDist);
 		if( refineGray != null )
 			refineGray.setLensDistortion(width, height, distToUndist, undistToDist);

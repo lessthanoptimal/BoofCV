@@ -20,15 +20,16 @@ package boofcv.abst.fiducial;
 
 import boofcv.abst.filter.binary.BinaryContourHelper;
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeDecoderImage;
 import boofcv.alg.fiducial.qrcode.QrCodePositionPatternDetector;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.misc.MovingAverage;
-import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -97,13 +98,12 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 	 *
 	 * @param width Input image width.  Used in sanity check only.
 	 * @param height Input image height.  Used in sanity check only.
-	 * @param distToUndist Transform from distorted to undistorted image.
-	 * @param undistToDist Transform from undistorted to distorted image.
+	 * @param model distortion model. Null to remove a distortion model.
 	 */
 	public void setLensDistortion(int width , int height ,
-								  PixelTransform2_F32 distToUndist , PixelTransform2_F32 undistToDist ) {
-		detectPositionPatterns.setLensDistortion(width, height, distToUndist, undistToDist);
-		decoder.setLensDistortion(width, height, distToUndist, undistToDist);
+								  @Nullable LensDistortionNarrowFOV model) {
+		detectPositionPatterns.setLensDistortion(width, height,model);
+		decoder.setLensDistortion(width, height, model);
 	}
 
 	public GrayU8 getBinary() {

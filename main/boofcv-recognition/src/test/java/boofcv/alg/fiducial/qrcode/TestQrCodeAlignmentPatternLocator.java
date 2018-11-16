@@ -21,8 +21,7 @@ package boofcv.alg.fiducial.qrcode;
 import boofcv.struct.image.GrayU8;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -44,6 +43,12 @@ public class TestQrCodeAlignmentPatternLocator {
 
 		assertEquals(6,qr.alignment.size);
 	}
+
+	@Test
+	public void withLensDistortion() {
+		fail("Implement");
+	}
+
 
 	/**
 	 * Give it bad guess but all within the white or black dot

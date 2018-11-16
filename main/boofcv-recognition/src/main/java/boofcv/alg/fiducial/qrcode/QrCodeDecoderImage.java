@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Intersection2D_F64;
@@ -27,6 +27,7 @@ import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,12 +101,13 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	 *
 	 * @param width Input image width.  Used in sanity check only.
 	 * @param height Input image height.  Used in sanity check only.
-	 * @param distToUndist Transform from distorted to undistorted image.
-	 * @param undistToDist Transform from undistorted to distorted image.
+	 * @param model distortion model. Null to remove a distortion model.
 	 */
 	public void setLensDistortion(int width , int height ,
-								  PixelTransform2_F32 distToUndist , PixelTransform2_F32 undistToDist ) {
-		// TODO implement
+								  @Nullable LensDistortionNarrowFOV model )
+	{
+		alignmentLocator.setLensDistortion(width, height, model);
+		gridReader.setLensDistortion(width, height, model);
 	}
 
 	static void setPositionPatterns(PositionPatternNode ppn,
