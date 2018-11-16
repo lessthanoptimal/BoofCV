@@ -63,7 +63,8 @@ public class BoofSwingUtil {
 		JFileChooser chooser = new JFileChooser(previousPath);
 		chooser.setSelectedFile(new File(previousPath));
 
-		for( FileTypes t : filters ) {
+		boolean selectDirectories = false;
+		escape:for( FileTypes t : filters ) {
 			FileNameExtensionFilter ff;
 			switch( t ) {
 				case IMAGES:
@@ -72,12 +73,22 @@ public class BoofSwingUtil {
 				case VIDEOS:
 					ff = new FileNameExtensionFilter("Videos","mpg","mp4","mov","avi","wmv");
 					break;
+
+				case DIRECTORIES:
+					selectDirectories = true;
+					break escape;
 				default:
 					throw new RuntimeException("Unknown file type");
 			}
 			chooser.addChoosableFileFilter(ff);
 		}
-		if( filters.length > 0 ) {
+
+		if( selectDirectories && filters.length > 1 ) {
+			throw new IllegalArgumentException("specified directories and other filters. Can only just do directories");
+		}
+		if( selectDirectories ) {
+			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		} else if( filters.length > 0 ) {
 			chooser.setFileFilter(chooser.getChoosableFileFilters()[1]);
 		}
 
@@ -291,6 +302,6 @@ public class BoofSwingUtil {
 
 	public enum FileTypes
 	{
-		IMAGES,VIDEOS
+		IMAGES,VIDEOS,DIRECTORIES
 	}
 }
