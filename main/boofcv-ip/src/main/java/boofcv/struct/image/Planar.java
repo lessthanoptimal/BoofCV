@@ -235,7 +235,9 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 			for (int i = N; i < bands.length; i++) {
 				bands[i] = GeneralizedImageOps.createSingleBand(type, width, height);
 			}
+			this.startIndex = 0;
 			this.bands = bands;
+			this.stride = width;
 			this.width = width;
 			this.height = height;
 		} else {
