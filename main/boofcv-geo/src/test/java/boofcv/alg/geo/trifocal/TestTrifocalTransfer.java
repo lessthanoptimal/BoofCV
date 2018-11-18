@@ -37,20 +37,20 @@ public class TestTrifocalTransfer extends CommonTrifocalChecks {
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
 		// is why normalized image coordinates are used for the first view
-		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
 		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
 
 		Point3D_F64 found = new Point3D_F64();
 		TrifocalTransfer alg = new TrifocalTransfer();
 		alg.setTrifocal(tensor);
-		alg.transfer13(x1.x,x1.y,x2.x,x2.y,found);
+		alg.transfer13into2(x1.x,x1.y,x3.x,x3.y,found);
 
 		found.x /= found.z;
 		found.y /= found.z;
 
-		assertEquals(x3.x,found.x, UtilEjml.TEST_F64);
-		assertEquals(x3.y,found.y, UtilEjml.TEST_F64);
+		assertEquals(x2.x,found.x, UtilEjml.TEST_F64);
+		assertEquals(x2.y,found.y, UtilEjml.TEST_F64);
 	}
 
 	@Test
@@ -59,19 +59,19 @@ public class TestTrifocalTransfer extends CommonTrifocalChecks {
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
 		// is why normalized image coordinates are used for the first view
-		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
 		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
 
 		Point3D_F64 found = new Point3D_F64();
 		TrifocalTransfer alg = new TrifocalTransfer();
 		alg.setTrifocal(tensor);
-		alg.transfer12(x1.x,x1.y,x3.x,x3.y,found);
+		alg.transfer12into3(x1.x,x1.y,x2.x,x2.y,found);
 
 		found.x /= found.z;
 		found.y /= found.z;
 
-		assertEquals(x2.x,found.x, UtilEjml.TEST_F64);
-		assertEquals(x2.y,found.y, UtilEjml.TEST_F64);
+		assertEquals(x3.x,found.x, UtilEjml.TEST_F64);
+		assertEquals(x3.y,found.y, UtilEjml.TEST_F64);
 	}
 }

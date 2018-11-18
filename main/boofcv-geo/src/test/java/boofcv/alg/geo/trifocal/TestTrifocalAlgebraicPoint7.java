@@ -18,15 +18,12 @@
 
 package boofcv.alg.geo.trifocal;
 
-import boofcv.alg.geo.MultiViewOps;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
-import georegression.geometry.GeometryMath_F64;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Vector3D_F64;
+import georegression.struct.point.Point3D_F64;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
-import org.ejml.data.DMatrixRMaj;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -51,7 +48,7 @@ public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 		assertTrue(alg.process(observations, found));
 
 		checkTrifocalWithConstraint(found, 1e-8);
-		checkInducedErrors(found,observations,1e-8);
+		assertEquals(0, computeTransferError(found,observations), UtilEjml.TEST_F64);
 	}
 
 	/**
@@ -62,8 +59,8 @@ public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 		List<AssociatedTriple> noisyObs = new ArrayList<>();
 
 		// create a noisy set of observations
-		double noiseLevel = 0.25;
-		for( AssociatedTriple p : observations ) {
+		double noiseLevel = 0.5;
+		for( AssociatedTriple p : observationsPixels ) {
 			AssociatedTriple n = p.copy();
 
 			n.p1.x += rand.nextGaussian()*noiseLevel;
@@ -76,49 +73,41 @@ public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 			noisyObs.add(n);
 		}
 
-		UnconstrainedLeastSquares optimizer = FactoryOptimization.levenbergMarquardt(null,false);
+		TrifocalLinearPoint7 linear = new TrifocalLinearPoint7();
+		linear.process(noisyObs,found);
+		double errorLinear = computeTransferError(found,noisyObs);
+
+		UnconstrainedLeastSquares optimizer = FactoryOptimization.levenbergMarquardt(null,true);
 		TrifocalAlgebraicPoint7 alg = new TrifocalAlgebraicPoint7(optimizer,300,1e-20,1e-20);
 
 		assertTrue(alg.process(noisyObs,found));
 
-		found.normalizeScale();
-
 		// only the induced error is tested since the constraint error has unknown units and is quite large
-		checkInducedErrors(found,noisyObs,2);
+		double errorsAlg = computeTransferError(found,noisyObs);
+
+		// it appears that the linear estimate is very accurate. This is a really a test to see if it made
+		// the solution significantly worse
+		assertTrue(errorsAlg<=errorLinear*1.2);
 	}
 
 	/**
 	 * Computes the error using induced homographies.
 	 */
-	public void checkInducedErrors( TrifocalTensor tensor , List<AssociatedTriple> observations , double tol )
+	public double computeTransferError(TrifocalTensor tensor , List<AssociatedTriple> observations )
 	{
+		TrifocalTransfer transfer = new TrifocalTransfer();
+		transfer.setTrifocal(tensor);
+
+		double errors = 0;
 		for( AssociatedTriple o : observations ) {
 
-			// homogeneous vector for observations in views 2 and 3
-			Vector3D_F64 obs2 = new Vector3D_F64(o.p2.x,o.p2.y,1);
-			Vector3D_F64 obs3 = new Vector3D_F64(o.p3.x,o.p3.y,1);
-
-			// compute lines which pass through the observations
-			Vector3D_F64 axisY = new Vector3D_F64(0,1,0);
-
-			Vector3D_F64 line2 = new Vector3D_F64();
-			Vector3D_F64 line3 = new Vector3D_F64();
-
-			GeometryMath_F64.cross(obs2,axisY,line2);
-			GeometryMath_F64.cross(obs3,axisY,line3);
-
-			// compute induced homographies
-			DMatrixRMaj H12 = MultiViewOps.inducedHomography12(tensor,line3,null);
-			DMatrixRMaj H13 = MultiViewOps.inducedHomography13(tensor, line2, null);
-
-			Point2D_F64 induced2 = new Point2D_F64();
-			Point2D_F64 induced3 = new Point2D_F64();
-
-			GeometryMath_F64.mult(H12,o.p1,induced2);
-			GeometryMath_F64.mult(H13,o.p1,induced3);
-
-			assertEquals(0,induced2.distance(o.p2),tol);
-			assertEquals(0,induced3.distance(o.p3),tol);
+			Point3D_F64 p = new Point3D_F64();
+			transfer.transfer12into3(o.p1.x,o.p1.y,o.p2.x,o.p2.y,p);
+			errors += o.p3.distance(p.x/p.z,p.y/p.z);
+			transfer.transfer13into2(o.p1.x,o.p1.y,o.p3.x,o.p3.y,p);
+			errors += o.p2.distance(p.x/p.z,p.y/p.z);
 		}
+
+		return errors/(2*observations.size());
 	}
 }

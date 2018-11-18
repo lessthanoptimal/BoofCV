@@ -53,7 +53,7 @@ public class TestNormalizedToPixelError {
 
 		Point3D_F64 X = new Point3D_F64(0.1,-0.02,3);
 
-		n0 = PerspectiveOps.renderPixel(worldToCamera,null,X);
+		n0 = PerspectiveOps.renderPixel(worldToCamera,X);
 		p0 = PerspectiveOps.renderPixel(worldToCamera,K,X);
 
 		p1 = p0.copy();

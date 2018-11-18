@@ -126,9 +126,9 @@ public class CommonAutoCalibrationChecks {
 
 	public void renderGood( List<CameraPinhole> cameras ) {
 		for (int i = 0; i < cameras.size(); i++) {
-			double yaw = Math.PI*i/9.0;
-			double pitch = Math.PI*i/20.0;
-			double roll = rand.nextGaussian()*0.1;
+			double yaw = Math.PI*i/18.0;
+			double pitch = Math.PI*i/30.0;
+			double roll = rand.nextGaussian()*0.05;
 
 			Se3_F64 R = new Se3_F64();
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,R.R);
@@ -179,7 +179,7 @@ public class CommonAutoCalibrationChecks {
 		}
 //		eq.lookupDDRM("H").print();
 
-		for (int i = 1; i < listCameraToWorld.size(); i++) {
+		for (int i = 0; i < listCameraToWorld.size(); i++) {
 			double scale = (rand.nextDouble()+0.1) *( rand.nextGaussian() < 0 ? -1 : 1);
 			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(cameras.get(i),(DMatrixRMaj)null);
 
@@ -187,6 +187,7 @@ public class CommonAutoCalibrationChecks {
 
 			eq.alias(K,"K",b_to_a.R,"R",b_to_a.T,"T",scale,"scale");
 			DMatrixRMaj P = eq.process("P = scale*[K*R, K*T]*Hinv").lookupDDRM("P").copy();
+//			DMatrixRMaj P = eq.process("P = [K*R, K*T]").lookupDDRM("P").copy();
 			listP.add(P);
 		}
 
@@ -198,7 +199,7 @@ public class CommonAutoCalibrationChecks {
 
 	public void addProjectives(SelfCalibrationBase alg ) {
 		for (int i = 0; i < listP.size(); i++) {
-			alg.addProjective(listP.get(i));
+			alg.addCameraMatrix(listP.get(i));
 		}
 	}
 }

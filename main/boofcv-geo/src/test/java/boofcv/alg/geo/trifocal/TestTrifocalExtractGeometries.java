@@ -42,7 +42,7 @@ public class TestTrifocalExtractGeometries extends CommonTrifocalChecks {
 	 * Randomly general several scenarios and see if it produces the correct solution
 	 */
 	@Test
-	public void epipoles_basic() {
+	public void extractEpipoles() {
 		TrifocalExtractGeometries alg = new TrifocalExtractGeometries();
 
 		for( int i = 0; i < 5; i++ ) {
@@ -72,7 +72,7 @@ public class TestTrifocalExtractGeometries extends CommonTrifocalChecks {
 	}
 
 	@Test
-	public void camera_basic() {
+	public void extractCamera() {
 
 		TrifocalExtractGeometries alg = new TrifocalExtractGeometries();
 		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
@@ -81,13 +81,12 @@ public class TestTrifocalExtractGeometries extends CommonTrifocalChecks {
 		for( int trial = 0; trial < 5; trial++ ) {
 			createRandomScenario();
 
-			TrifocalTensor input = tensor.copy();
-			alg.setTensor(input);
-			alg.extractCamera(P2, P3);
+			// solve for the tensor to make this more realistic
+			TrifocalLinearPoint7 linear = new TrifocalLinearPoint7();
+			linear.process(observationsPixels,found);
 
-			// make sure the input was not modified
-			for( int i = 0; i < 3; i++ )
-				assertTrue(MatrixFeatures_DDRM.isIdentical(tensor.getT(i),input.getT(i),1e-8));
+			alg.setTensor(found);
+			alg.extractCamera(P2, P3);
 
 			// Using found camera matrices render the point's location
 			Point3D_F64 X = new Point3D_F64(0.1,0.05,2);
@@ -98,7 +97,7 @@ public class TestTrifocalExtractGeometries extends CommonTrifocalChecks {
 
 			// validate correctness by testing a constraint on the points
 			DMatrixRMaj A = new DMatrixRMaj(3,3);
-			MultiViewOps.constraint(tensor, x1, x2, x3, A);
+			MultiViewOps.constraint(found, x1, x2, x3, A);
 
 			for( int i = 0; i < 3; i++ ) {
 				for( int j = 0; j < 3; j++ ) {
@@ -109,7 +108,7 @@ public class TestTrifocalExtractGeometries extends CommonTrifocalChecks {
 	}
 
 	@Test
-	public void fundamental_basic() {
+	public void extractFundmental() {
 		TrifocalExtractGeometries alg = new TrifocalExtractGeometries();
 
 		DMatrixRMaj found2 = new DMatrixRMaj(3,3);
@@ -131,7 +130,7 @@ public class TestTrifocalExtractGeometries extends CommonTrifocalChecks {
 			Point3D_F64 X = new Point3D_F64(0.1,0.05,2);
 
 			// remember the first view is assumed to have a projection matrix of [I|0]
-			Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(), null, X);
+			Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(), X);
 			Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2, K, X);
 			Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3, K, X);
 

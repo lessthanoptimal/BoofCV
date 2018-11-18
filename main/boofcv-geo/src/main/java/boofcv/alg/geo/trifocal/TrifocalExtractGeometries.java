@@ -91,17 +91,29 @@ public class TrifocalExtractGeometries {
 	 */
 	public void setTensor( TrifocalTensor tensor ) {
 		this.tensor = tensor;
-		svd.decompose(tensor.T1);
+		if( !svd.decompose(tensor.T1) )
+			throw new RuntimeException("SVD failed?!");
+
 		SingularOps_DDRM.nullVector(svd, true, v1);
 		SingularOps_DDRM.nullVector(svd, false,u1);
 
-		svd.decompose(tensor.T2);
+//		DMatrixRMaj zero = new DMatrixRMaj(3,1);
+//		CommonOps_DDRM.mult(tensor.T1,v1,zero);zero.print();
+//		CommonOps_DDRM.multTransA(u1,tensor.T1,zero);zero.print();
+
+		if( !svd.decompose(tensor.T2) )
+			throw new RuntimeException("SVD failed?!");
 		SingularOps_DDRM.nullVector(svd,true,v2);
 		SingularOps_DDRM.nullVector(svd,false,u2);
+//		CommonOps_DDRM.mult(tensor.T2,v2,zero);zero.print();
+//		CommonOps_DDRM.multTransA(u2,tensor.T2,zero);zero.print();
 
-		svd.decompose(tensor.T3);
+		if( !svd.decompose(tensor.T3) )
+			throw new RuntimeException("SVD failed?!");
 		SingularOps_DDRM.nullVector(svd,true,v3);
 		SingularOps_DDRM.nullVector(svd,false,u3);
+//		CommonOps_DDRM.mult(tensor.T3,v3,zero);zero.print();
+//		CommonOps_DDRM.multTransA(u3,tensor.T3,zero);zero.print();
 
 		for( int i = 0; i < 3; i++ ) {
 			U.set(i,0,u1.get(i));
@@ -145,8 +157,8 @@ public class TrifocalExtractGeometries {
 	 * NOTE: The camera matrix for the first view is assumed to be P1 = [I|0].
 	 * </p>
 	 *
-	 * @param P2 Output: 3x4 camera matrix for views 1 to 2. Modified.
-	 * @param P3 Output: 3x4 camera matrix for views 1 to 3. Modified.
+	 * @param P2 Output: 3x4 camera matrix for views 2. Modified.
+	 * @param P3 Output: 3x4 camera matrix for views 3. Modified.
 	 */
 	public void extractCamera( DMatrixRMaj P2 , DMatrixRMaj P3 ) {
 		// temp1 = [e3*e3^T -I]

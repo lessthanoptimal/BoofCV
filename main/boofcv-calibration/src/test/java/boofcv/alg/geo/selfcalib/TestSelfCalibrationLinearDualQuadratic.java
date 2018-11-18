@@ -18,8 +18,17 @@
 
 package boofcv.alg.geo.selfcalib;
 
+import boofcv.abst.geo.Estimate1ofTrifocalTensor;
 import boofcv.alg.geo.GeometricResult;
+import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic.Intrinsic;
+import boofcv.factory.geo.EnumTrifocal;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.geo.AssociatedTriple;
+import boofcv.struct.geo.TrifocalTensor;
+import georegression.struct.point.Point3D_F64;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -30,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -39,7 +49,7 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 	@Test
 	public void solve_ZeroCP() {
 		List<CameraPinhole> intrinsics = new ArrayList<>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 5; i++) {
 			intrinsics.add(new CameraPinhole(400+i*5,420,0.1,0,0,0,0));
 		}
 
@@ -49,7 +59,7 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 	@Test
 	public void solve_ZeroCP_ZSkew() {
 		List<CameraPinhole> intrinsics = new ArrayList<>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 4; i++) {
 			intrinsics.add(new CameraPinhole(400+i*5,420,0,0,0,0,0));
 		}
 
@@ -59,10 +69,63 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 	@Test
 	public void solve_ZeroCP_ZSkew_Aspect() {
 		List<CameraPinhole> intrinsics = new ArrayList<>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 3; i++) {
 			intrinsics.add(new CameraPinhole((400+i*5)*1.05,400+i*5,0,0,0,0,0));
 		}
 		checkSolve(intrinsics, true,true,3);
+	}
+
+	/**
+	 * Create a trifocal tensor, extract camera matrices, and see if it can find the solution
+	 */
+	@Test
+	public void solveWithTrificalInput() {
+		CameraPinhole intrinsic = new CameraPinhole(500,500,0,0,0,0,0);
+
+		List<CameraPinhole> intrinsics = new ArrayList<>();
+		for (int i = 0; i < 3; i++) {
+			intrinsics.add(intrinsic);
+		}
+
+		renderGood(intrinsics);
+		List<AssociatedTriple> obs = new ArrayList<>();
+		for (int i = 0; i < cloud.size(); i++) {
+			Point3D_F64 X = cloud.get(i);
+
+			AssociatedTriple t = new AssociatedTriple();
+			t.p1 = PerspectiveOps.renderPixel(listCameraToWorld.get(0),intrinsic,X);
+			t.p2 = PerspectiveOps.renderPixel(listCameraToWorld.get(1),intrinsic,X);
+			t.p3 = PerspectiveOps.renderPixel(listCameraToWorld.get(2),intrinsic,X);
+
+			obs.add(t);
+		}
+
+		Estimate1ofTrifocalTensor estimate = FactoryMultiView.trifocal_1(EnumTrifocal.LINEAR_7,-1);
+		TrifocalTensor tensor = new TrifocalTensor();
+		assertTrue(estimate.process(obs,tensor));
+
+		DMatrixRMaj P1 = CommonOps_DDRM.identity(3,4);
+		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
+		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
+
+		MultiViewOps.extractCameraMatrices(tensor,P2,P3);
+
+		SelfCalibrationLinearDualQuadratic alg = new SelfCalibrationLinearDualQuadratic(1.0);
+		alg.addCameraMatrix(P1);
+		alg.addCameraMatrix(P2);
+		alg.addCameraMatrix(P3);
+
+		assertEquals(GeometricResult.SUCCESS,alg.solve());
+
+		List<Intrinsic> found = alg.getSolutions();
+		assertEquals(3,found.size());
+		for (int i = 0; i < found.size(); i++) {
+			Intrinsic f = found.get(i);
+			assertEquals(500,f.fx, UtilEjml.TEST_F64_SQ);
+			assertEquals(500,f.fy, UtilEjml.TEST_F64_SQ);
+			assertEquals(0,f.skew, UtilEjml.TEST_F64_SQ);
+
+		}
 	}
 
 	private void checkSolve(List<CameraPinhole> intrinsics, boolean knownAspect, boolean zeroSkew, int numProjectives ) {
@@ -88,15 +151,14 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 
 		assertEquals(GeometricResult.SUCCESS,alg.solve());
 
-		assertEquals(intrinsics.size()-1,alg.getSolutions().size());
-		for (int i = 1; i < intrinsics.size(); i++) {
+		assertEquals(intrinsics.size(),alg.getSolutions().size());
+		for (int i = 0; i < intrinsics.size(); i++) {
 			CameraPinhole intrinsic = intrinsics.get(i);
-			SelfCalibrationLinearDualQuadratic.Intrinsic found = alg.getSolutions().get(i-1);
+			Intrinsic found = alg.getSolutions().get(i);
 
 			assertEquals(intrinsic.fx,   found.fx,   UtilEjml.TEST_F64_SQ);
 			assertEquals(intrinsic.fy,   found.fy,   UtilEjml.TEST_F64_SQ);
 			assertEquals(intrinsic.skew, found.skew, UtilEjml.TEST_F64_SQ);
-
 		}
 	}
 

@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -46,9 +47,7 @@ public abstract class CommonTrifocalChecks {
 	// camera calibration matrix
 	DMatrixRMaj K = new DMatrixRMaj(3,3,true,60,0.01,200,0,80,150,0,0,1);
 
-
-
-	Se3_F64 worldToCam2, worldToCam3;
+	Se3_F64 worldToCam1,worldToCam2, worldToCam3;
 	DMatrixRMaj P2,P3;
 	TrifocalTensor tensor;
 	// storage for the found solution
@@ -57,25 +56,21 @@ public abstract class CommonTrifocalChecks {
 	DMatrixRMaj F2,F3;
 
 	List<Point3D_F64> worldPts = new ArrayList<>();
-	// observation in pixels for all views
+	// Observation 1 is normalized and 2 and 3 are pixels. This reflects p1=[I|0]
 	List<AssociatedTriple> observations = new ArrayList<>();
-	// observations where the first view is in normalized image coordinates
-	List<AssociatedTriple> observationsSpecial = new ArrayList<>();
+	// All observations in pixels
+	List<AssociatedTriple> observationsPixels = new ArrayList<>();
 	// All observations are in normalized image coordinates
 	List<AssociatedTriple> observationsNorm = new ArrayList<>();
 
+	protected int numFeatures = 20;
+
 	public CommonTrifocalChecks() {
-		worldToCam2 = new Se3_F64();
-		worldToCam3 = new Se3_F64();
-
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.05, 0.05, -0.02, worldToCam2.R);
-		worldToCam2.getT().set(0.3,0,0.05);
-
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.2,0.05, worldToCam3.R);
-		worldToCam3.getT().set(0.6, 0.2, -0.02);
+		worldToCam1 = new Se3_F64();
+		worldToCam2 = eulerXyz(0.3,0,0.05,0.05, 0.05, -0.02,null);
+		worldToCam3 = eulerXyz(0.6, 0.2, -0.02,0.1,-0.2,0.05,null);
 
 		computeStuffFromPose();
-
 	}
 
 	public void checkTrifocalWithConstraint( TrifocalTensor tensor , double tol ) {
@@ -103,6 +98,7 @@ public abstract class CommonTrifocalChecks {
 	}
 
 	private void computeStuffFromPose() {
+		// P1 = [I|0]
 		P2 = PerspectiveOps.createCameraMatrix(worldToCam2.R, worldToCam2.T, K, null);
 		P3 = PerspectiveOps.createCameraMatrix(worldToCam3.R, worldToCam3.T, K, null);
 		tensor = MultiViewOps.createTrifocal(P2, P3, null);
@@ -112,7 +108,11 @@ public abstract class CommonTrifocalChecks {
 		F3 = MultiViewOps.createEssential(worldToCam3.getR(), worldToCam3.getT(), null);
 		F3 = MultiViewOps.createFundamental(F3, K);
 
-		for( int i = 0; i < 20; i++ ) {
+		observations = new ArrayList<>();
+		observationsPixels = new ArrayList<>();
+		observationsNorm = new ArrayList<>();
+
+		for(int i = 0; i < numFeatures; i++ ) {
 			Point3D_F64 p = new Point3D_F64();
 			p.x = rand.nextGaussian()*0.5;
 			p.y = rand.nextGaussian()*0.5;
@@ -121,20 +121,22 @@ public abstract class CommonTrifocalChecks {
 			worldPts.add(p);
 
 			AssociatedTriple o = new AssociatedTriple();
-			o.p1 = PerspectiveOps.renderPixel(new Se3_F64(), K, p);
-			o.p2 = PerspectiveOps.renderPixel(worldToCam2,K,p);
-			o.p3 = PerspectiveOps.renderPixel(worldToCam3,K,p);
+			o.p1 = PerspectiveOps.renderPixel(new Se3_F64(), p);
+			o.p2 = PerspectiveOps.renderPixel(P2,p);
+			o.p3 = PerspectiveOps.renderPixel(P3,p);
 
-			AssociatedTriple oS = o.copy();
-			oS.p1 = PerspectiveOps.renderPixel(new Se3_F64(), null, p);
+			AssociatedTriple oP = new AssociatedTriple();
+			oP.p1 = PerspectiveOps.renderPixel(new Se3_F64(), K, p);
+			oP.p2 = PerspectiveOps.renderPixel(P2,p);
+			oP.p3 = PerspectiveOps.renderPixel(P3,p);
 
 			AssociatedTriple oN = new AssociatedTriple();
-			oN.p1 = PerspectiveOps.renderPixel(new Se3_F64(), null, p);
-			oN.p2 = PerspectiveOps.renderPixel(worldToCam2,null,p);
-			oN.p3 = PerspectiveOps.renderPixel(worldToCam3,null,p);
+			oN.p1 = PerspectiveOps.renderPixel(new Se3_F64(), p);
+			oN.p2 = PerspectiveOps.renderPixel(worldToCam2,p);
+			oN.p3 = PerspectiveOps.renderPixel(worldToCam3,p);
 
 			observations.add(o);
-			observationsSpecial.add(oS);
+			observationsPixels.add(oP);
 			observationsNorm.add(oN);
 		}
 	}

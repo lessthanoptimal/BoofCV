@@ -131,7 +131,6 @@ public class TrifocalLinearPoint7 {
 		A.reshape(4*N,27);
 		A.zero();
 
-		int index1 = 0;
 		for( int i = 0; i < N; i++ ) {
 			AssociatedTriple t = observations.get(i);
 
@@ -139,79 +138,50 @@ public class TrifocalLinearPoint7 {
 			N2.apply(t.p2,p2_norm);
 			N3.apply(t.p3,p3_norm);
 
-			int index2 = index1+9;
-			int index3 = index1+18;
-
-			// i = 1, j = 1
-			A.data[index1+8] =  p1_norm.x*p2_norm.x*p3_norm.x;
-			A.data[index1+2] = -p1_norm.x*p3_norm.x;
-			A.data[index1+6] = -p1_norm.x*p2_norm.x;
-			A.data[index1]   =  p1_norm.x;
-			A.data[index2+8] =  p1_norm.y*p2_norm.x*p3_norm.x;
-			A.data[index2+2] = -p1_norm.y*p3_norm.x;
-			A.data[index2+6] = -p1_norm.y*p2_norm.x;
-			A.data[index2]   =  p1_norm.y;
-			A.data[index3+8] =  p2_norm.x*p3_norm.x;
-			A.data[index3+2] = -p3_norm.x;
-			A.data[index3+6] = -p2_norm.x;
-			A.data[index3]   =  1;
-
-			// i = 1, j = 2;
-			index1 += 27;
-			index2 = index1+9;
-			index3 = index1+18;
-
-			A.data[index1+8] =  p1_norm.x*p2_norm.x*p3_norm.y;
-			A.data[index1+2] = -p1_norm.x*p3_norm.y;
-			A.data[index1+7] = -p1_norm.x*p2_norm.x;
-			A.data[index1+1] =  p1_norm.x;
-			A.data[index2+8] =  p1_norm.y*p2_norm.x*p3_norm.y;
-			A.data[index2+2] = -p1_norm.y*p3_norm.y;
-			A.data[index2+7] = -p1_norm.y*p2_norm.x;
-			A.data[index2+1] =  p1_norm.y;
-			A.data[index3+8] =  p2_norm.x*p3_norm.y;
-			A.data[index3+2] = -p3_norm.y;
-			A.data[index3+7] = -p2_norm.x;
-			A.data[index3+1] =  1;
-
-			// i = 2, j = 2;
-			index1 += 27;
-			index2 = index1+9;
-			index3 = index1+18;
-
-			A.data[index1+8] =  p1_norm.x*p2_norm.y*p3_norm.y;
-			A.data[index1+5] = -p1_norm.x*p3_norm.y;
-			A.data[index1+7] = -p1_norm.x*p2_norm.y;
-			A.data[index1+4] =  p1_norm.x;
-			A.data[index2+8] =  p1_norm.y*p2_norm.y*p3_norm.y;
-			A.data[index2+5] = -p1_norm.y*p3_norm.y;
-			A.data[index2+7] = -p1_norm.y*p2_norm.y;
-			A.data[index2+4] =  p1_norm.y;
-			A.data[index3+8] =  p2_norm.y*p3_norm.y;
-			A.data[index3+5] = -p3_norm.y;
-			A.data[index3+7] = -p2_norm.y;
-			A.data[index3+4] =  1;
-
-			// i = 2, j = 1;
-			index1 += 27;
-			index2 = index1+9;
-			index3 = index1+18;
-
-			A.data[index1+8] =  p1_norm.x*p2_norm.y*p3_norm.x;
-			A.data[index1+5] = -p1_norm.x*p3_norm.x;
-			A.data[index1+6] = -p1_norm.x*p2_norm.y;
-			A.data[index1+3] =  p1_norm.x;
-			A.data[index2+8] =  p1_norm.y*p2_norm.y*p3_norm.x;
-			A.data[index2+5] = -p1_norm.y*p3_norm.x;
-			A.data[index2+6] = -p1_norm.y*p2_norm.y;
-			A.data[index2+3] =  p1_norm.y;
-			A.data[index3+8] =  p2_norm.y*p3_norm.x;
-			A.data[index3+5] = -p3_norm.x;
-			A.data[index3+6] = -p2_norm.y;
-			A.data[index3+3] =  1;
-
-			index1 += 27;
+			insert(i,0 , p1_norm.x); // tensor 1
+			insert(i,1 , p1_norm.y); // tensor 2
+			insert(i,2 ,1); // tensor 3
 		}
+	}
+
+	private void insert( int indexObs , int K , double xk ) {
+		int start = 27*4*indexObs + 9*K;
+
+		// i = 1, l = 1
+		int indexT33 = 8;
+		int indexTi3 = 2;
+		int indexT3l = 6;
+		int indexTil = 0;
+		A.data[start+indexT33] = xk*p2_norm.x*p3_norm.x;
+		A.data[start+indexTi3] = -xk*p3_norm.x;
+		A.data[start+indexT3l] = -xk*p2_norm.x;
+		A.data[start+indexTil] = xk;
+		// i = 1, l = 2
+		start += 27;
+		indexT3l = 7;
+		indexTil = 1;
+		A.data[start+indexT33] = xk*p2_norm.x*p3_norm.y;
+		A.data[start+indexTi3] = -xk*p3_norm.y;
+		A.data[start+indexT3l] = -xk*p2_norm.x;
+		A.data[start+indexTil] = xk;
+		// i = 2, l = 1
+		start += 27;
+		indexTi3 = 5;
+		indexT3l = 6;
+		indexTil = 3;
+		A.data[start+indexT33] = xk*p2_norm.y*p3_norm.x;
+		A.data[start+indexTi3] = -xk*p3_norm.x;
+		A.data[start+indexT3l] = -xk*p2_norm.y;
+		A.data[start+indexTil] = xk;
+		// i = 2, l = 2
+		start += 27;
+		indexTi3 = 5;
+		indexT3l = 7;
+		indexTil = 4;
+		A.data[start+indexT33] = xk*p2_norm.y*p3_norm.y;
+		A.data[start+indexTi3] = -xk*p3_norm.y;
+		A.data[start+indexT3l] = -xk*p2_norm.y;
+		A.data[start+indexTil] = xk;
 	}
 
 	/**

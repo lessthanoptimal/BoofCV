@@ -68,7 +68,7 @@ public class TestPnPJacobianRodrigues {
 			p.location.set( rand.nextGaussian()*0.1,
 					rand.nextGaussian()*0.2 , 3 + rand.nextGaussian() );
 
-			p.observation = PerspectiveOps.renderPixel(worldToCamera, null, p.location);
+			p.observation = PerspectiveOps.renderPixel(worldToCamera, p.location);
 
 			p.observation.x += rand.nextGaussian()*noise;
 			p.observation.y += rand.nextGaussian()*noise;

@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * <p>
  * Non-linear optimization on camera parameters for each view and for the plane at infinity. The plane at infinity
- * is used to compute a predicted camera parameter from projectives and that is then compared against the estimated
+ * is used to compute a predicted camera parameter from cameras and that is then compared against the estimated
  * camera parameter for each view. The error which is minimized is an algebraic error and this should be followed up
  * with geometric error from bundle adjustment. See [1] for a complete description of the mathematics.
  * </p>
@@ -95,11 +95,11 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase
 	 * @param Q (Input) Initial estimate of absolute quadratic (Output) refined estimate.
 	 */
 	public boolean refine(List<CameraPinhole> calibration , DMatrix4x4 Q ) {
-		if( calibration.size()-1 != projectives.size )
-			throw new RuntimeException("Calibration and projectives do not match");
+		if( calibration.size()-1 != cameras.size )
+			throw new RuntimeException("Calibration and cameras do not match");
 
-		if( projectives.size < 2 )
-			throw new IllegalArgumentException("At least 2 projectives are required. You should have more");
+		if( cameras.size < 2 )
+			throw new IllegalArgumentException("At least 2 cameras are required. You should have more");
 
 		computeNumberOfCalibrationParameters();
 
@@ -267,8 +267,8 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase
 			eq.process("w0=K*K'");
 
 			int indexOut = 0;
-			for (int i = 0; i < projectives.size; i++) {
-				Projective P = projectives.get(i);
+			for (int i = 0; i < cameras.size; i++) {
+				Projective P = cameras.get(i);
 				indexInput = encodeK(K,i+1,indexInput,param.data);
 
 				eq.alias(K,"K",P.A,"A",P.a,"a");
@@ -290,12 +290,12 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase
 
 		@Override
 		public int getNumOfInputsN() {
-			return 3+calibParameters*(projectives.size+1);
+			return 3+calibParameters*(cameras.size+1);
 		}
 
 		@Override
 		public int getNumOfOutputsM() {
-			return 6*projectives.size;
+			return 6* cameras.size;
 		}
 	}
 

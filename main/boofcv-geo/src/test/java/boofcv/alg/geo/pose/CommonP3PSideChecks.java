@@ -46,9 +46,9 @@ public abstract class CommonP3PSideChecks {
 		Point3D_F64 P2 = new Point3D_F64(0.5,0,2.6);
 		Point3D_F64 P3 = new Point3D_F64(-0.4,-0.3,3);
 
-		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(), null, P1);
-		Point2D_F64 p2 = PerspectiveOps.renderPixel(new Se3_F64(),null,P2);
-		Point2D_F64 p3 = PerspectiveOps.renderPixel(new Se3_F64(),null,P3);
+		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),P1);
+		Point2D_F64 p2 = PerspectiveOps.renderPixel(new Se3_F64(),P2);
+		Point2D_F64 p3 = PerspectiveOps.renderPixel(new Se3_F64(),P3);
 
 		double length12 = P1.distance(P2);
 		double length23 = P2.distance(P3);

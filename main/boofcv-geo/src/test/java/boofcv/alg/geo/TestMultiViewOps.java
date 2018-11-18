@@ -170,7 +170,7 @@ public class TestMultiViewOps {
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
 		// is why normalized image coordinates are used for the first view
-		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
 
 		double found = MultiViewOps.constraint(tensor,x1,line2,line3);
 
@@ -185,7 +185,7 @@ public class TestMultiViewOps {
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
 		// is why normalized image coordinates are used for the first view
-		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
 		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
 
 		Vector3D_F64 found = MultiViewOps.constraint(tensor,x1,line2,x3,null);
@@ -203,7 +203,7 @@ public class TestMultiViewOps {
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
 		// is why normalized image coordinates are used for the first view
-		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
 		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 
 		Vector3D_F64 found = MultiViewOps.constraint(tensor,x1,x2,line3,null);
@@ -220,7 +220,7 @@ public class TestMultiViewOps {
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
 		// is why normalized image coordinates are used for the first view
-		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
 		Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 		Point2D_F64 p3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
 
@@ -257,8 +257,8 @@ public class TestMultiViewOps {
 
 		DMatrixRMaj H = MultiViewOps.createHomography(worldToCam2.getR(),worldToCam2.getT(),d,N);
 
-		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
-		Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCam2,null,X);
+		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
+		Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCam2,X);
 
 		Point2D_F64 found = MultiViewOps.constraintHomography(H,p1,null);
 
@@ -274,7 +274,7 @@ public class TestMultiViewOps {
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
 		// is why normalized image coordinates are used for the first view
-		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
 		Point2D_F64 p3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
 
 		DMatrixRMaj H13 = MultiViewOps.inducedHomography13(tensor,line2,null);
@@ -295,7 +295,7 @@ public class TestMultiViewOps {
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
 		// is why normalized image coordinates are used for the first view
-		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
 		Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 
 		DMatrixRMaj H12 = MultiViewOps.inducedHomography12(tensor, line3, null);
@@ -416,7 +416,7 @@ public class TestMultiViewOps {
 		Point3D_F64 X = new Point3D_F64(0.1,0.05,2);
 
 		// remember the first view is assumed to have a projection matrix of [I|0]
-		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(), null, X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(), X);
 		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2, K, X);
 		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3, K, X);
 
@@ -465,8 +465,8 @@ public class TestMultiViewOps {
 		// Test using the following theorem:  x2^T*E*x1 = 0
 		Point3D_F64 X = new Point3D_F64(0.1,0.1,2);
 
-		Point2D_F64 x0 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
-		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(R,T),null,X);
+		Point2D_F64 x0 = PerspectiveOps.renderPixel(new Se3_F64(),X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(R,T),X);
 
 		double val = GeometryMath_F64.innerProd(x1,E,x0);
 		assertEquals(0,val,1e-8);
@@ -718,7 +718,7 @@ public class TestMultiViewOps {
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
 		// is why normalized image coordinates are used for the first view
-		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
 		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
 
 		Point3D_F64 found = MultiViewOps.transfer13(tensor,x1,line2,null);
@@ -736,17 +736,17 @@ public class TestMultiViewOps {
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
 		// is why normalized image coordinates are used for the first view
-		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
 		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
 
-		Point3D_F64 found = MultiViewOps.transfer13(tensor,x1,x2,null);
+		Point3D_F64 found = MultiViewOps.transfer13(tensor,x1,x3,null);
 
 		found.x /= found.z;
 		found.y /= found.z;
 
-		assertEquals(x3.x,found.x, UtilEjml.TEST_F64);
-		assertEquals(x3.y,found.y, UtilEjml.TEST_F64);
+		assertEquals(x2.x,found.x, UtilEjml.TEST_F64);
+		assertEquals(x2.y,found.y, UtilEjml.TEST_F64);
 	}
 
 	@Test
@@ -757,7 +757,7 @@ public class TestMultiViewOps {
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
 		// is why normalized image coordinates are used for the first view
-		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
 		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 
 		Point3D_F64 found = MultiViewOps.transfer12(tensor,x1,line3,null);
@@ -775,16 +775,16 @@ public class TestMultiViewOps {
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
 		// is why normalized image coordinates are used for the first view
-		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
 		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
 
-		Point3D_F64 found = MultiViewOps.transfer12(tensor,x1,x3,null);
+		Point3D_F64 found = MultiViewOps.transfer12(tensor,x1,x2,null);
 
 		found.x /= found.z;
 		found.y /= found.z;
 
-		assertEquals(x2.x,found.x, UtilEjml.TEST_F64);
-		assertEquals(x2.y,found.y, UtilEjml.TEST_F64);
+		assertEquals(x3.x,found.x, UtilEjml.TEST_F64);
+		assertEquals(x3.y,found.y, UtilEjml.TEST_F64);
 	}
 }

@@ -63,7 +63,8 @@ public class MultiViewOps {
 
 	/**
 	 * <p>
-	 * Creates a trifocal tensor from two camera matrices.
+	 * Creates a trifocal tensor from two camera matrices. T<sub>i</sub><sup>jk</sup> = a[j,i]*b[k,3] - a[j,3]*b[k,i],
+	 * where a=P2 and b=P3.
 	 * </p>
 	 *
 	 * <p>
@@ -71,8 +72,8 @@ public class MultiViewOps {
 	 * where I is an identify matrix.
 	 * </p>
 	 *
-	 * @param P2 Camera matrix from view 1 to view 2
-	 * @param P3 Camera matrix from view 1 to view 3
+	 * @param P2 Camera matrix for view 2
+	 * @param P3 Camera matrix for view 3
 	 * @param ret Storage for trifocal tensor.  If null a new instance will be created.
 	 * @return The trifocal tensor
 	 */
@@ -80,16 +81,16 @@ public class MultiViewOps {
 		if( ret == null )
 			ret = new TrifocalTensor();
 
-		for( int col = 0; col < 3; col++ ) {
-			DMatrixRMaj T = ret.getT(col);
+		for( int i = 0; i < 3; i++ ) {
+			DMatrixRMaj T = ret.getT(i);
 
 			int index = 0;
-			for( int i = 0; i < 3; i++ ) {
-				double a_left = P2.get(i,col);
-				double a_right = P2.get(i,3);
+			for( int j = 0; j < 3; j++ ) {
+				double a_left = P2.get(j,i);
+				double a_right = P2.get(j,3);
 
-				for( int j = 0; j < 3; j++ ) {
-					T.data[index++] = a_left*P3.get(j,3) - a_right*P3.get(j,col);
+				for( int k = 0; k < 3; k++ ) {
+					T.data[index++] = a_left*P3.get(k,3) - a_right*P3.get(k,i);
 				}
 			}
 		}
@@ -970,24 +971,24 @@ public class MultiViewOps {
 	}
 
 	/**
-	 * Transfers a point from the first view to the third view using the observed location in the second view
+	 * Transfers a point from the first view to the second view using the observed location in the third view
 	 * @param x1 (Input) point (pixel) in first view
 	 * @param x2 (Input) point (pixel) in second view
 	 * @param T (Input) Trifocal tensor
 	 * @param x3 (Output) Induced point (pixel) in third view. Homogenous coordinates.
 	 * @return induced point.
 	 */
-	public static Point3D_F64 transfer13(  TrifocalTensor T , Point2D_F64 x1 , Point2D_F64 x2 ,
-										   @Nullable Point3D_F64 x3 )
+	public static Point3D_F64 transfer13(  TrifocalTensor T , Point2D_F64 x1 , Point2D_F64 x3 ,
+										   @Nullable Point3D_F64 x2 )
 	{
-		if( x3 == null )
-			x3 = new Point3D_F64();
+		if( x2 == null )
+			x2 = new Point3D_F64();
 
 		TrifocalTransfer transfer = new TrifocalTransfer();
 		transfer.setTrifocal(T);
-		transfer.transfer13(x1.x,x1.y,x2.x,x2.y,x3);
+		transfer.transfer13into2(x1.x,x1.y,x3.x,x3.y,x2);
 
-		return x3;
+		return x2;
 	}
 
 	/**
@@ -1022,23 +1023,23 @@ public class MultiViewOps {
 	}
 
 	/**
-	 * Transfers a point from the first view to the third view using the observed location in the second view
+	 * Transfers a point from the first view to the second view using the observed location in the third view
 	 * @param x1 (Input) point (pixel) in first view
 	 * @param x3 (Input) point (pixel) in third view
 	 * @param T (Input) Trifocal tensor
 	 * @param x2 (Output) Induced point (pixel) in second view. Homogenous coordinates.
 	 * @return induced point.
 	 */
-	public static Point3D_F64 transfer12(  TrifocalTensor T , Point2D_F64 x1 , Point2D_F64 x3 ,
-										   @Nullable Point3D_F64 x2 )
+	public static Point3D_F64 transfer12(  TrifocalTensor T , Point2D_F64 x1 , Point2D_F64 x2 ,
+										   @Nullable Point3D_F64 x3 )
 	{
-		if( x2 == null )
-			x2 = new Point3D_F64();
+		if( x3 == null )
+			x3 = new Point3D_F64();
 
 		TrifocalTransfer transfer = new TrifocalTransfer();
 		transfer.setTrifocal(T);
-		transfer.transfer12(x1.x,x1.y,x3.x,x3.y,x2);
+		transfer.transfer12into3(x1.x,x1.y,x2.x,x2.y,x3);
 
-		return x2;
+		return x3;
 	}
 }

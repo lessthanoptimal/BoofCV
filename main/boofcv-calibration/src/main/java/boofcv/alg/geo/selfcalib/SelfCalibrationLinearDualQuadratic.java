@@ -115,11 +115,10 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	 * @return Indicates if it was successful or not. If it fails it says why
 	 */
 	public GeometricResult solve() {
-		if( projectives.size < minimumProjectives )
+		if( cameras.size < minimumProjectives )
 			throw new IllegalArgumentException("You need at least "+minimumProjectives+" motions");
 
-
-		int N = projectives.size;
+		int N = cameras.size;
 		DMatrixRMaj L = new DMatrixRMaj(N*eqs,10);
 
 		// Convert constraints into a (N*eqs) by 10 matrix. Null space is Q
@@ -162,14 +161,14 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	}
 
 	/**
-	 * Computes average W across all projectives. The idea being that the average will
+	 * Computes average W across all cameras. The idea being that the average will
 	 * be a better estimate than selecting a random one.
 	 */
 	private void computeSolutions(DMatrix4x4 Q) {
 		DMatrixRMaj w_i = new DMatrixRMaj(3,3);
 
-		for (int i = 0; i < projectives.size; i++) {
-			computeW(projectives.get(i),Q,w_i);
+		for (int i = 0; i < cameras.size; i++) {
+			computeW(cameras.get(i),Q,w_i);
 			Intrinsic calib = solveForCalibration(w_i);
 			if( sanityCheck(calib)) {
 				solutions.add(calib);
@@ -182,6 +181,12 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	 */
 	private Intrinsic solveForCalibration(DMatrixRMaj w) {
 		Intrinsic calib = new Intrinsic();
+
+//		CholeskyDecomposition_F64<DMatrixRMaj> chol = DecompositionFactory_DDRM.chol(false);
+//
+//		chol.decompose(w.copy());
+//		DMatrixRMaj R = chol.getT(w);
+//		R.print();
 
 		if( zeroSkew ) {
 			calib.skew = 0;
@@ -228,7 +233,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	 * Constructs the linear system by applying specified constraints
 	 */
 	void constructMatrix(DMatrixRMaj L) {
-		L .reshape(projectives.size*eqs,10);
+		L.reshape(cameras.size*eqs,10);
 
 		// Known aspect ratio constraint makes more sense as a square
 		double RR = this.aspectRatio *this.aspectRatio;
@@ -236,8 +241,8 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 		// F = P*Q*P'
 		// F is an arbitrary variable name and not fundamental matrix
 		int index = 0;
-		for (int i = 0; i < projectives.size; i++) {
-			Projective P = projectives.get(i);
+		for (int i = 0; i < cameras.size; i++) {
+			Projective P = cameras.get(i);
 			DMatrix3x3 A = P.A;
 			DMatrix3 B = P.a;
 

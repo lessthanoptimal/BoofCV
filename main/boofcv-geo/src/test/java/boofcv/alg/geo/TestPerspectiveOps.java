@@ -323,7 +323,7 @@ public class TestPerspectiveOps {
 		Point2D_F64 found;
 
 		// calibrated case
-		found = PerspectiveOps.renderPixel(worldToCamera,null,X);
+		found = PerspectiveOps.renderPixel(worldToCamera,X);
 		assertEquals(X_cam.x/X_cam.z,found.x,1e-8);
 		assertEquals(X_cam.y/X_cam.z,found.y,1e-8);
 

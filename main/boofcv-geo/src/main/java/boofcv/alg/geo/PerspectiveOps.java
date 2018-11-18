@@ -480,7 +480,21 @@ public class PerspectiveOps {
 	 * @return 2D Render point on image plane or null if it's behind the camera
 	 */
 	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , DMatrixRMaj K , Point3D_F64 X ) {
-		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, K, X);
+//		return ImplPerspectiveOps_F64.renderPixel(worldToCamera,K,X);
+		if( K == null )
+			return renderPixel(worldToCamera,X);
+		return ImplPerspectiveOps_F64.renderPixel(worldToCamera,
+				K.data[0], K.data[1], K.data[2], K.data[4], K.data[5], X);
+	}
+
+	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , CameraPinhole K , Point3D_F64 X ) {
+		return ImplPerspectiveOps_F64.renderPixel(worldToCamera,
+				K.fy, K.skew, K.cx, K.fy, K.cy, X);
+	}
+
+	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , Point3D_F64 X ) {
+		return ImplPerspectiveOps_F64.renderPixel(worldToCamera,
+				1, 0, 0, 1, 0, X);
 	}
 
 	/**

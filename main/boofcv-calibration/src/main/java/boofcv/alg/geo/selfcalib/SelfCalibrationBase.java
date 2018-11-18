@@ -45,7 +45,8 @@ import java.util.List;
  */
 public class SelfCalibrationBase {
 
-	FastQueue<Projective> projectives = new FastQueue<>(Projective.class,true);
+	// 3x4 camera matrices
+	FastQueue<Projective> cameras = new FastQueue<>(Projective.class,true);
 
 	// Minimum number of projective views to estimate the parameters
 	int minimumProjectives;
@@ -61,21 +62,21 @@ public class SelfCalibrationBase {
 	 *
 	 * The projective is defined as P[i]=[A[i] | a[i]] where P is 3 by 4 matrix.
 	 *
-	 * @param viewI_to_view0 projective matrix representing the transform from the current camera
+	 * @param viewI projective matrix representing the transform from the current camera
 	 *                       to the coordinate system's origin. 3 x 4
 	 */
-	public void addProjective( DMatrixRMaj viewI_to_view0 ) {
-		DMatrixRMaj P = viewI_to_view0;
+	public void addCameraMatrix(DMatrixRMaj viewI ) {
+		DMatrixRMaj P = viewI;
 		DMatrixRMaj A = new DMatrixRMaj(3,3);
 		CommonOps_DDRM.extract(P,0,3,0,3,A);
-		Projective pr = projectives.grow();
+		Projective pr = cameras.grow();
 		ConvertDMatrixStruct.convert(A,pr.A);
 		pr.a.set(P.get(0,3),P.get(1,3),P.get(2,3));
 	}
 
-	public void addProjectives(List<DMatrixRMaj> viewI_to_view0 ) {
+	public void addCameraMatrix(List<DMatrixRMaj> viewI_to_view0 ) {
 		for (int i = 0; i < viewI_to_view0.size(); i++) {
-			addProjective(viewI_to_view0.get(i));
+			addCameraMatrix(viewI_to_view0.get(i));
 		}
 	}
 
@@ -117,7 +118,7 @@ public class SelfCalibrationBase {
 	}
 
 	/**
-	 * Minimum number of projectives required to estimate the parameters.
+	 * Minimum number of cameras required to estimate the parameters.
 	 */
 	public int getMinimumProjectives() {
 		return minimumProjectives;

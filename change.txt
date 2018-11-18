@@ -22,6 +22,8 @@ Version : 0.32
 - InterleavedU8 and Planar<GrayU8>
   * Added set32/get32 and set24/get24
 - ConvertImage reshapes output instead of throwing an exception
+- Geometry
+  * Fixed bug in Linear Trifocal Tensor estimator
 - ImageInterleaved
   * setTo() changes number of bands if needed
   * Improved speed of Interleaved to Gray average
@@ -30,6 +32,10 @@ Version : 0.32
 - Android
   * Bunch of bug fixes
   * Extracts the full pinhole calibration matrix from camera characteristics
+
+TODO Given F21 F31 F32 return  a concistent P1 P2
+     P301 yellow book
+TODO compute camera matrices directly from trilinear constraint? P 274
 
 TODO Attempt trifocal tensor based stereo
 

@@ -71,8 +71,8 @@ public class TrifocalTransfer {
 	 * @param y2 (Input) Observation in view 2. pixels.
 	 * @param p3 (Output) Estimated location in view 3.
 	 */
-	public void transfer13(double x1 , double y1 ,
-						   double x2 , double y2 , Point3D_F64 p3)
+	public void transfer12into3(double x1 , double y1 ,
+								double x2 , double y2 , Point3D_F64 p3)
 	{
 		// Adjust the observations so that they lie on the epipolar lines exactly
 		adjuster.process(F21,x1,y1,x2,y2,pa,pb);
@@ -96,8 +96,8 @@ public class TrifocalTransfer {
 	 * @param y3 (Input) Observation in view 3. pixels.
 	 * @param p2 (Output) Estimated location in view 2.
 	 */
-	public void transfer12(double x1 , double y1 ,
-						   double x3 , double y3 , Point3D_F64 p2)
+	public void transfer13into2(double x1 , double y1 ,
+								double x3 , double y3 , Point3D_F64 p2)
 	{
 		// Adjust the observations so that they lie on the epipolar lines exactly
 		adjuster.process(F31,x1,y1,x3,y3,pa,pb);
