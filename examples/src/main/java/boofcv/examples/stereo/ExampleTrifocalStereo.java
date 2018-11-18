@@ -18,10 +18,12 @@
 
 package boofcv.examples.stereo;
 
+import boofcv.abst.distort.FDistort;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
+import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.abst.geo.Estimate1ofTrifocalTensor;
 import boofcv.abst.geo.TriangulateNViewsCalibrated;
 import boofcv.abst.geo.bundle.BundleAdjustment;
@@ -29,6 +31,7 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.feature.associate.AssociateThreeByPairs;
+import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
@@ -40,16 +43,25 @@ import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic.Intrinsic;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.factory.feature.disparity.DisparityAlgorithms;
+import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.EnumTrifocal;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.gui.image.ShowImages;
+import boofcv.gui.image.VisualizeImageData;
+import boofcv.gui.stereo.RectifiedPairPanel;
 import boofcv.io.UtilIO;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -63,13 +75,59 @@ import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+
+import static boofcv.examples.stereo.ExampleStereoTwoViewsOneCamera.rectifyImages;
+import static boofcv.examples.stereo.ExampleStereoTwoViewsOneCamera.showPointCloud;
 
 /**
  * @author Peter Abeles
  */
 public class ExampleTrifocalStereo {
+
+	public static void computeStereoCloud( GrayU8 distortedLeft, GrayU8 distortedRight ,
+										   CameraPinholeRadial intrinsic ,
+										   Se3_F64 leftToRight ,
+										   int minDisparity , int maxDisparity) {
+
+//		drawInliers(origLeft, origRight, intrinsic, inliers);
+
+		// Rectify and remove lens distortion for stereo processing
+		DMatrixRMaj rectifiedK = new DMatrixRMaj(3, 3);
+		GrayU8 rectifiedLeft = distortedLeft.createSameShape();
+		GrayU8 rectifiedRight = distortedRight.createSameShape();
+
+		rectifyImages(distortedLeft, distortedRight, leftToRight, intrinsic, rectifiedLeft, rectifiedRight, rectifiedK);
+
+		// compute disparity
+		StereoDisparity<GrayS16, GrayF32> disparityAlg =
+				FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
+						minDisparity, maxDisparity, 6, 6, 30, 20, 0.01, GrayS16.class);
+
+		// Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
+		GrayS16 derivLeft = new GrayS16(rectifiedLeft.width,rectifiedLeft.height);
+		GrayS16 derivRight = new GrayS16(rectifiedLeft.width,rectifiedLeft.height);
+		LaplacianEdge.process(rectifiedLeft, derivLeft);
+		LaplacianEdge.process(rectifiedRight,derivRight);
+
+		// process and return the results
+		disparityAlg.process(derivLeft, derivRight);
+		GrayF32 disparity = disparityAlg.getDisparity();
+
+		// show results
+		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, minDisparity, maxDisparity, 0);
+
+		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectifiedLeft, new BufferedImage(400,300, BufferedImage.TYPE_INT_RGB));
+		BufferedImage outRight = ConvertBufferedImage.convertTo(rectifiedRight, new BufferedImage(400,300, BufferedImage.TYPE_INT_RGB));
+
+		ShowImages.showWindow(new RectifiedPairPanel(true, outLeft, outRight), "Rectification",true);
+		ShowImages.showWindow(visualized, "Disparity",true);
+
+		showPointCloud(disparity, outLeft, leftToRight, rectifiedK, minDisparity, maxDisparity);
+	}
+
 	public static void main(String[] args) {
 		GrayU8 image01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_01.png"),GrayU8.class);
 		GrayU8 image02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_02.png"),GrayU8.class);
@@ -253,7 +311,7 @@ public class ExampleTrifocalStereo {
 			bp.f = cp.fx;
 
 			structure.setCamera(i,false,bp);
-			structure.setView(i,false,worldToView.get(i));
+			structure.setView(i,i==0,worldToView.get(i));
 			structure.connectViewToCamera(i,i);
 		}
 		for (int i = 0; i < inliers.size(); i++) {
@@ -295,6 +353,23 @@ public class ExampleTrifocalStereo {
 			System.out.println(structure.views[i].worldToView.toString());
 		}
 
+		// TODO take initial structure estimate and reconsider all points. See if it can be improved
 
+		System.out.println("\n\nComputing Stereo Disparity");
+		BundlePinholeSimplified cp = structure.getCameras()[0].getModel();
+		CameraPinholeRadial intrinsicR = new CameraPinholeRadial();
+		intrinsicR.fsetK(cp.f,cp.f,0,image01.width/2,image01.height/2,image01.width,image01.height);
+		intrinsicR.fsetRadial(cp.k1,cp.k2);
+
+		Se3_F64 leftToRight = structure.views[1].worldToView;
+
+		PerspectiveOps.scaleIntrinsic(intrinsicR,0.5);
+		GrayU8 scaled01 = new GrayU8(image01.width/2,image01.height/2);
+		GrayU8 scaled02 = new GrayU8(image01.width/2,image01.height/2);
+
+		new FDistort(image01,scaled01).scale().apply();
+		new FDistort(image02,scaled02).scale().apply();
+
+		computeStereoCloud(scaled01,scaled02,intrinsicR,leftToRight,0,50);
 	}
 }
