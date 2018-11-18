@@ -95,11 +95,11 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase
 	 * @param Q (Input) Initial estimate of absolute quadratic (Output) refined estimate.
 	 */
 	public boolean refine(List<CameraPinhole> calibration , DMatrix4x4 Q ) {
-		if( calibration.size()-1 != cameras.size )
+		if( calibration.size() != cameras.size )
 			throw new RuntimeException("Calibration and cameras do not match");
 
-		if( cameras.size < 2 )
-			throw new IllegalArgumentException("At least 2 cameras are required. You should have more");
+		if( cameras.size < 3 )
+			throw new IllegalArgumentException("At least 3 cameras are required. You should have more");
 
 		computeNumberOfCalibrationParameters();
 
@@ -267,9 +267,9 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase
 			eq.process("w0=K*K'");
 
 			int indexOut = 0;
-			for (int i = 0; i < cameras.size; i++) {
+			for (int i = 1; i < cameras.size; i++) {
 				Projective P = cameras.get(i);
-				indexInput = encodeK(K,i+1,indexInput,param.data);
+				indexInput = encodeK(K,i,indexInput,param.data);
 
 				eq.alias(K,"K",P.A,"A",P.a,"a");
 				eq.process("AP = A-a*p'");
@@ -290,7 +290,7 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase
 
 		@Override
 		public int getNumOfInputsN() {
-			return 3+calibParameters*(cameras.size+1);
+			return 3+calibParameters*cameras.size;
 		}
 
 		@Override

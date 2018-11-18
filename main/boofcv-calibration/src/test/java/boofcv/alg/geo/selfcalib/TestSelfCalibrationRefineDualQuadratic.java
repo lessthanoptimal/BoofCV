@@ -53,7 +53,7 @@ public class TestSelfCalibrationRefineDualQuadratic extends CommonAutoCalibratio
 	public void solveNoise() {
 		List<CameraPinhole> expected = new ArrayList<>();
 		List<CameraPinhole> found = new ArrayList<>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 30; i++) {
 			expected.add(new CameraPinhole(400+i*5,420,0.1,410,420,0,0));
 
 			found.add(new CameraPinhole(expected.get(i)));
@@ -72,7 +72,7 @@ public class TestSelfCalibrationRefineDualQuadratic extends CommonAutoCalibratio
 	public void solveNoise_ZeroSkew() {
 		List<CameraPinhole> expected = new ArrayList<>();
 		List<CameraPinhole> found = new ArrayList<>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 30; i++) {
 			expected.add(new CameraPinhole(400+i*5,420,0,410,420,0,0));
 
 			found.add(new CameraPinhole(expected.get(i)));
@@ -92,7 +92,7 @@ public class TestSelfCalibrationRefineDualQuadratic extends CommonAutoCalibratio
 	public void solveNoise_ZeroPrinciplePoint() {
 		List<CameraPinhole> expected = new ArrayList<>();
 		List<CameraPinhole> found = new ArrayList<>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 30; i++) {
 			expected.add(new CameraPinhole(400+i*5,420,0.1,0,0,0,0));
 
 			found.add(new CameraPinhole(expected.get(i)));
@@ -110,7 +110,7 @@ public class TestSelfCalibrationRefineDualQuadratic extends CommonAutoCalibratio
 	public void solveFixedAspect() {
 		List<CameraPinhole> expected = new ArrayList<>();
 		List<CameraPinhole> found = new ArrayList<>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 30; i++) {
 			expected.add(new CameraPinhole(400+i*5,420,0.1,410,420,0,0));
 
 			found.add(new CameraPinhole(expected.get(i)));
