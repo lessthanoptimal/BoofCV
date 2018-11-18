@@ -123,4 +123,12 @@ public class BundlePinholeSimplified implements BundleAdjustmentCamera {
 		return 3;
 	}
 
+	@Override
+	public String toString() {
+		return "BundlePinholeSimplified{" +
+				"f=" + f +
+				", k1=" + k1 +
+				", k2=" + k2 +
+				'}';
+	}
 }

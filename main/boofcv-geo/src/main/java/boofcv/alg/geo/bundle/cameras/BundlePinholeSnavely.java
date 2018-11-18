@@ -80,4 +80,13 @@ public class BundlePinholeSnavely extends BundlePinholeSimplified {
         calibX[2] = f*normX*n2*n2;
         calibY[2] = f*normY*n2*n2;
     }
+
+    @Override
+    public String toString() {
+        return "BundlePinholeSnavely{" +
+                "f=" + f +
+                ", k1=" + k1 +
+                ", k2=" + k2 +
+                '}';
+    }
 }

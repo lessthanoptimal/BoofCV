@@ -78,7 +78,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	DMatrix4x4 Q = new DMatrix4x4();
 
 	// A singular value is considered zero if it is smaller than this number
-	double singularThreshold=1e-7;
+	double singularThreshold=1e-3;
 
 	/**
 	 * Constructor for zero-principle point and (optional) zero-skew
@@ -139,6 +139,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 		double sv[] = svd.getSingularValues();
 		Arrays.sort(sv);
 		if( singularThreshold*sv[1] <= sv[0] )  {
+			System.out.println("ratio = "+(sv[0]/sv[1]));
 			return GeometricResult.GEOMETRY_POOR;
 		}
 
@@ -312,6 +313,14 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 
 	public List<Intrinsic> getSolutions() {
 		return solutions;
+	}
+
+	/**
+	 * Returns the absolute quadratic
+	 * @return 4x4 quadratic
+	 */
+	public DMatrix4x4 getQ() {
+		return Q;
 	}
 
 	public static class Intrinsic {

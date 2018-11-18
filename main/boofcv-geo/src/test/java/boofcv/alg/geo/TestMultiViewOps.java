@@ -42,8 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -619,7 +618,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void decomposeCameraMatrix() {
+	public void decomposeMetricCamera() {
 		// compute an arbitrary projection matrix from known values
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
@@ -637,7 +636,7 @@ public class TestMultiViewOps {
 		// decompose the projection matrix
 		DMatrixRMaj foundK = new DMatrixRMaj(3,3);
 		Se3_F64 foundPose = new Se3_F64();
-		MultiViewOps.decomposeCameraMatrix(KP, foundK, foundPose);
+		MultiViewOps.decomposeMetricCamera(KP, foundK, foundPose);
 
 		// recompute the projection matrix found the found results
 		DMatrixRMaj foundKP = new DMatrixRMaj(3,4);
@@ -649,6 +648,8 @@ public class TestMultiViewOps {
 
 		// see if the two projection matrices are the same
 		assertTrue(MatrixFeatures_DDRM.isEquals(foundKP,KP,1e-8));
+
+		fail("check for det == 1");
 	}
 
 	@Test
@@ -786,5 +787,10 @@ public class TestMultiViewOps {
 
 		assertEquals(x3.x,found.x, UtilEjml.TEST_F64);
 		assertEquals(x3.y,found.y, UtilEjml.TEST_F64);
+	}
+
+	@Test
+	public void projectiveToMetric() {
+		fail("implement");
 	}
 }

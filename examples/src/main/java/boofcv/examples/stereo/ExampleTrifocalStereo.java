@@ -23,12 +23,16 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.geo.Estimate1ofTrifocalTensor;
+import boofcv.abst.geo.TriangulateNViewsCalibrated;
+import boofcv.abst.geo.bundle.BundleAdjustment;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.feature.associate.AssociateThreeByPairs;
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.robust.DistanceTrifocalTransferSq;
 import boofcv.alg.geo.robust.GenerateTrifocalTensor;
 import boofcv.alg.geo.robust.ManagerTrifocalTensor;
@@ -36,6 +40,7 @@ import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic.Intrinsic;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.EnumTrifocal;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.io.UtilIO;
@@ -47,14 +52,18 @@ import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
+import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -146,6 +155,8 @@ public class ExampleTrifocalStereo {
 		// estimate using all the inliers
 		generator.generate(inliers,model);
 
+		System.out.println("Estimating calib");
+
 		DMatrixRMaj P1 = CommonOps_DDRM.identity(3,4);
 		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
 		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
@@ -156,32 +167,134 @@ public class ExampleTrifocalStereo {
 		selfcalib.addCameraMatrix(P2);
 		selfcalib.addCameraMatrix(P3);
 
+		System.out.println("Refining auto calib");
 		GeometricResult result = selfcalib.solve();
 		if(GeometricResult.SOLVE_FAILED == result)
 			throw new RuntimeException("Egads "+result);
 
-		List<Intrinsic> calibration = selfcalib.getSolutions();
-		for( Intrinsic c : calibration ) {
-			System.out.println("fx="+c.fx+" fy="+c.fy+" skew="+c.skew);
+		List<CameraPinhole> listPinhole = new ArrayList<>();
+		for (int i = 0; i < 3; i++) {
+			Intrinsic c = selfcalib.getSolutions().get(i);
+			CameraPinhole p = new CameraPinhole(c.fx,c.fy,0,0,0,image01.width,image01.height);
+			listPinhole.add(p);
 		}
 
-		// change it from projective to metric
+		// TODO figure out what's wrong with refine
+//		SelfCalibrationRefineDualQuadratic refineDual = new SelfCalibrationRefineDualQuadratic();
+//		refineDual.setZeroPrinciplePoint(true);
+//		refineDual.setFixedAspectRatio(true);
+//		refineDual.setZeroSkew(true);
+//		refineDual.addCameraMatrix(P1);
+//		refineDual.addCameraMatrix(P2);
+//		refineDual.addCameraMatrix(P3);
+//
+//		if( !refineDual.refine(listPinhole,selfcalib.getQ()) )
+//			throw new RuntimeException("Refine failed!");
 
-		// TODO estimate point 3D locations
+		List<Intrinsic> calibration = selfcalib.getSolutions();
+		for (int i = 0; i < 3; i++) {
+			Intrinsic c = calibration.get(i);
+			System.out.println("init   fx="+c.fx+" fy="+c.fy+" skew="+c.skew);
+			CameraPinhole r = listPinhole.get(i);
+			System.out.println("refine fx="+r.fx+" fy="+r.fy+" skew="+r.skew);
+		}
 
-		// TODO set up Bundle Adjustment
+		// convert camera matrix from projective to metric
+		DMatrixRMaj H = new DMatrixRMaj(4,4);
+		PerspectiveOps.decomposeAbsDualQuadratic(selfcalib.getQ(),H);
 
-		// Estimate camera parameters with the assumption that the camera has a 60 degree FOV
-		CameraPinhole intrisic = PerspectiveOps.createIntrinsic(image01.width,image01.height,60);
+		DMatrixRMaj K = new DMatrixRMaj(3,3);
+		List<Se3_F64> worldToView = new ArrayList<>();
+		for (int i = 0; i < 3; i++) {
+			worldToView.add( new Se3_F64());
+		}
+		// ignore K since we already have that
+		MultiViewOps.projectiveToMetric(P1,H,worldToView.get(0),K);
+		MultiViewOps.projectiveToMetric(P2,H,worldToView.get(1),K);
+		MultiViewOps.projectiveToMetric(P3,H,worldToView.get(2),K);
 
+		// scale is arbitrary. Set max translation to 1
+		double maxT = 0;
+		for( Se3_F64 p : worldToView ) {
+			maxT = Math.max(maxT,p.T.norm());
+		}
+		for( Se3_F64 p : worldToView ) {
+			p.T.scale(1.0/maxT);
+//			p.print();
+		}
+		// Triangulate points in 3D in metric space
+		List<Point3D_F64> points3D = new ArrayList<>();
+		TriangulateNViewsCalibrated triangulation = FactoryMultiView.triangulateCalibratedNViewDLT();
+
+		List<Point2D_F64> normObs = new ArrayList<>();
+		for (int i = 0; i < worldToView.size(); i++) {
+			normObs.add( new Point2D_F64());
+		}
+		for (int i = 0; i < inliers.size(); i++) {
+			AssociatedTriple t = inliers.get(i);
+			PerspectiveOps.convertPixelToNorm(listPinhole.get(0),t.p1,normObs.get(0));
+			PerspectiveOps.convertPixelToNorm(listPinhole.get(1),t.p2,normObs.get(1));
+			PerspectiveOps.convertPixelToNorm(listPinhole.get(2),t.p3,normObs.get(2));
+
+			Point3D_F64 X = new Point3D_F64();
+			triangulation.triangulate(normObs,worldToView,X);
+			points3D.add(X);
+		}
+
+		// Construct bundle adjustment data structure
 		SceneStructureMetric structure = new SceneStructureMetric(false);
-		structure.initialize(1,3,inliers.size());
+		SceneObservations observations = new SceneObservations(3);
+
+		structure.initialize(3,3,inliers.size());
+		for (int i = 0; i < listPinhole.size(); i++) {
+			CameraPinhole cp = listPinhole.get(i);
+			BundlePinholeSimplified bp = new BundlePinholeSimplified();
+
+			bp.f = cp.fx;
+
+			structure.setCamera(i,false,bp);
+			structure.setView(i,false,worldToView.get(i));
+			structure.connectViewToCamera(i,i);
+		}
+		for (int i = 0; i < inliers.size(); i++) {
+			AssociatedTriple t = inliers.get(i);
+			Point3D_F64 X = points3D.get(i);
+
+			observations.getView(0).add(i,(float)t.p1.x,(float)t.p1.y);
+			observations.getView(1).add(i,(float)t.p2.x,(float)t.p2.y);
+			observations.getView(2).add(i,(float)t.p3.x,(float)t.p3.y);
+
+			structure.setPoint(i,X.x,X.y,X.z);
+			structure.connectPointToView(i,0);
+			structure.connectPointToView(i,1);
+			structure.connectPointToView(i,2);
+		}
+
+		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
+		configLM.dampeningInitial = 1e-3;
+		configLM.hessianScaling = false;
+		ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
+		configSBA.configOptimizer = configLM;
+
+		// Create and configure the bundle adjustment solver
+		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleAdjustmentMetric(configSBA);
+		// prints out useful debugging information that lets you know how well it's converging
+		bundleAdjustment.setVerbose(System.out,0);
+		// Specifies convergence criteria
+		bundleAdjustment.configure(1e-6, 1e-6, 100);
+
+		bundleAdjustment.setParameters(structure,observations);
+		bundleAdjustment.optimize(structure);
+
+		System.out.println("\nCamera");
+		for (int i = 0; i < structure.cameras.length; i++) {
+			System.out.println(structure.cameras[i].getModel().toString());
+		}
+		System.out.println("\n\nworldToView");
+		for (int i = 0; i < structure.cameras.length; i++) {
+			System.out.println(structure.views[i].worldToView.toString());
+		}
 
 
-		// TODO estimate calibration
-
-		// TODO Bundle adjustment
-
-		// TODO Stereo
 	}
 }

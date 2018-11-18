@@ -787,7 +787,7 @@ public class MultiViewOps {
 
 	/**
 	 * <p>
-	 * Decomposes a camera matrix P=A*[R|T], where A is an upper triangular camera calibration
+	 * Decomposes a metric camera matrix P=A*[R|T], where A is an upper triangular camera calibration
 	 * matrix, R is a rotation matrix, and T is a translation vector.
 	 *
 	 * <ul>
@@ -800,7 +800,7 @@ public class MultiViewOps {
 	 * @param K Output: Camera calibration matrix, 3 by 3.
 	 * @param pose Output: The rotation and translation.
 	 */
-	public static void decomposeCameraMatrix(DMatrixRMaj P, DMatrixRMaj K, Se3_F64 pose) {
+	public static void decomposeMetricCamera(DMatrixRMaj P, DMatrixRMaj K, Se3_F64 pose) {
 		DMatrixRMaj KR = new DMatrixRMaj(3,3);
 		CommonOps_DDRM.extract(P, 0, 3, 0, 3, KR, 0, 0);
 
@@ -817,6 +817,10 @@ public class MultiViewOps {
 
 		if( !CommonOps_DDRM.invert(U,pose.getR()) )
 			throw new RuntimeException("Inverse failed!  Bad input?");
+
+		if( CommonOps_DDRM.det(pose.R) < 0 ) {
+			CommonOps_DDRM.scale(-1,pose.R);
+		}
 
 		Point3D_F64 KT = new Point3D_F64(P.get(0,3),P.get(1,3),P.get(2,3));
 		GeometryMath_F64.mult(B, KT, pose.getT());
@@ -1041,5 +1045,22 @@ public class MultiViewOps {
 		transfer.transfer12into3(x1.x,x1.y,x2.x,x2.y,x3);
 
 		return x3;
+	}
+
+	/**
+	 * Elevates a projective camera matrix into a metric one. Extracts calibration and Se3 pose.
+	 *
+	 * @param cameraMatrix (Input) camera matrix. 3x4
+	 * @param H (Input) Rectifying homography. 4x4
+	 * @param worldToCam (Output) Transform from world to camera
+	 * @param K (Output) Camera calibration matrix
+	 */
+	public static void projectiveToMetric( DMatrixRMaj cameraMatrix , DMatrixRMaj H ,
+										   Se3_F64 worldToCam , DMatrixRMaj K )
+	{
+		DMatrixRMaj tmp = new DMatrixRMaj(3,4);
+		CommonOps_DDRM.mult(cameraMatrix,H,tmp);
+
+		MultiViewOps.decomposeMetricCamera(tmp,K,worldToCam);
 	}
 }

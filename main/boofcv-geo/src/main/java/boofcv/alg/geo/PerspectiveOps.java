@@ -23,6 +23,7 @@ import boofcv.alg.distort.pinhole.PinholeNtoP_F64;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
 import boofcv.alg.geo.impl.ImplPerspectiveOps_F32;
 import boofcv.alg.geo.impl.ImplPerspectiveOps_F64;
+import boofcv.alg.geo.structure.DecomposeAbsoluteDualQuadratic;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -35,6 +36,7 @@ import georegression.struct.GeoTuple3D_F64;
 import georegression.struct.point.*;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrix3x3;
+import org.ejml.data.DMatrix4x4;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -802,5 +804,30 @@ public class PerspectiveOps {
 		output.data[6] = t31*C.data[0] + t32*C.data[1] + t33*C.data[2];
 		output.data[7] = t31*C.data[3] + t32*C.data[4] + t33*C.data[5];
 		output.data[8] = t31*C.data[6] + t32*C.data[7] + t33*C.data[8];
+	}
+
+	/**
+	 * Decomposes the absolute quadratic to extract the rectifying homogrpahy H. This is used to go from
+	 * a projective to metric (calibrated) geometry. See pg 464 in [1].
+	 *
+	 * <p>Q = H*I*H<sup>T</sup></p>
+	 *
+	 * <ol>
+	 * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
+	 * </ol>
+	 *
+	 * @see DecomposeAbsoluteDualQuadratic
+	 *
+	 * @param Q (Input) Absolute quadratic. Typically found in auto calibration
+	 * @param H (Output) 4x4 rectifying homography. Optional.
+	 */
+	public static boolean decomposeAbsDualQuadratic(DMatrix4x4 Q , DMatrixRMaj H ) {
+		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
+		if( !alg.decompose(Q) )
+			return false;
+
+		H.set(alg.getH());
+
+		return true;
 	}
 }

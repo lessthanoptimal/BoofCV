@@ -116,9 +116,9 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase
 		encode(calibration,p,param);
 
 		// Configure optimization
-//		optimizer.setVerbose(System.out,0);
+		optimizer.setVerbose(System.out,0);
 		optimizer.setFunction(func,null); // Compute using a numerical Jacobian
-		optimizer.initialize(param.data,1e-8,1e-8);
+		optimizer.initialize(param.data,1e-6,1e-5);
 
 		// Tell it to run for at most 100 iterations
 		if( !UtilOptimize.process(optimizer,100) )

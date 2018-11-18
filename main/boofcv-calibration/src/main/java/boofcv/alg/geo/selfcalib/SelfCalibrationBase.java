@@ -48,7 +48,7 @@ public class SelfCalibrationBase {
 	// 3x4 camera matrices
 	FastQueue<Projective> cameras = new FastQueue<>(Projective.class,true);
 
-	// Minimum number of projective views to estimate the parameters
+	// Minimum number of projective views/camera matrices to estimate the parameters
 	int minimumProjectives;
 
 	// workspace

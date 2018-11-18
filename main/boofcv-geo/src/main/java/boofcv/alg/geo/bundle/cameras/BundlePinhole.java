@@ -112,4 +112,15 @@ public class BundlePinhole implements BundleAdjustmentCamera {
 	public int getIntrinsicCount() {
 		return zeroSkew ? 4 : 5;
 	}
+
+	@Override
+	public String toString() {
+		return "BundlePinhole{" +
+				"fx=" + fx +
+				", fy=" + fy +
+				", skew=" + skew +
+				", cx=" + cx +
+				", cy=" + cy +
+				'}';
+	}
 }
