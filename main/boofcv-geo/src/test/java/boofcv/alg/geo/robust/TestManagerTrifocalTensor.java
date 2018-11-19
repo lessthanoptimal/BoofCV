@@ -18,16 +18,40 @@
 
 package boofcv.alg.geo.robust;
 
+import boofcv.struct.geo.TrifocalTensor;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 /**
  * @author Peter Abeles
  */
 class TestManagerTrifocalTensor {
 	@Test
-	public void implement() {
-		fail("implement");
+	public void newInstance() {
+		ManagerTrifocalTensor alg = new ManagerTrifocalTensor();
+		TrifocalTensor a = alg.createModelInstance();
+		TrifocalTensor b = alg.createModelInstance();
+
+		assertNotSame(a, b);
+	}
+
+	@Test
+	public void copy() {
+		ManagerTrifocalTensor alg = new ManagerTrifocalTensor();
+
+		TrifocalTensor a = new TrifocalTensor();
+		a.T1.set(0,0,1);
+		a.T2.set(1,0,2);
+		a.T3.set(0,2,3);
+
+		TrifocalTensor b = new TrifocalTensor();
+		alg.copyModel(a,b);
+
+		assertEquals(1,b.T1.get(0,0), UtilEjml.TEST_F64);
+		assertEquals(2,b.T2.get(1,0), UtilEjml.TEST_F64);
+		assertEquals(3,b.T3.get(0,2), UtilEjml.TEST_F64);
 	}
 }

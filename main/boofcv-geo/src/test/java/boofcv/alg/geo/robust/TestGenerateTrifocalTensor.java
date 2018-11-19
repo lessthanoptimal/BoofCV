@@ -18,16 +18,51 @@
 
 package boofcv.alg.geo.robust;
 
+import boofcv.abst.geo.Estimate1ofTrifocalTensor;
+import boofcv.struct.geo.AssociatedTriple;
+import boofcv.struct.geo.TrifocalTensor;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 class TestGenerateTrifocalTensor {
 	@Test
-	public void implement() {
-		fail("implement");
+	public void generate() {
+		Estimator estimator = new Estimator();
+		GenerateTrifocalTensor alg = new GenerateTrifocalTensor(estimator);
+
+		assertTrue(alg.generate(new ArrayList<>(),new TrifocalTensor()));
+
+		assertTrue(estimator.called);
+	}
+
+	@Test
+	public void getMinimumPoints() {
+		Estimator estimator = new Estimator();
+		GenerateTrifocalTensor alg = new GenerateTrifocalTensor(estimator);
+		assertEquals(9,alg.getMinimumPoints());
+	}
+
+	public class Estimator implements Estimate1ofTrifocalTensor {
+
+		boolean called= false;
+
+		@Override
+		public boolean process(List<AssociatedTriple> points, TrifocalTensor estimatedModel) {
+			called = true;
+			return true;
+		}
+
+		@Override
+		public int getMinimumPoints() {
+			return 9;
+		}
 	}
 }
