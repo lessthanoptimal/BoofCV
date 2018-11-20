@@ -18,7 +18,6 @@
 
 package boofcv.examples.stereo;
 
-import boofcv.abst.distort.FDistort;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
@@ -42,6 +41,7 @@ import boofcv.alg.geo.robust.ManagerTrifocalTensor;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic.Intrinsic;
 import boofcv.alg.sfm.structure.PruneStructureFromScene;
+import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
@@ -61,9 +61,7 @@ import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
-import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -88,30 +86,63 @@ import static boofcv.examples.stereo.ExampleStereoTwoViewsOneCamera.showPointClo
  */
 public class ExampleTrifocalStereo {
 
+	/**
+	 * Show results as a point cloud
+	 */
+//	public static void showPointCloud(ImageGray disparity, BufferedImage left,
+//									  Se3_F64 motion, DMatrixRMaj rectifiedK ,
+//									  int minDisparity, int maxDisparity)
+//	{
+//		DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
+//		double baseline = motion.getT().norm();
+//		d2c.configure(baseline, rectifiedK, new DoNothing2Transform2_F64(), minDisparity, maxDisparity);
+//		d2c.process(disparity,left);
+//
+//		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK,disparity.width,disparity.height,null);
+//
+//		PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
+//		pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
+//		pcv.setTranslationStep(baseline/3);
+//		pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
+//		pcv.setDotSize(1);
+//
+//		pcv.getComponent().setPreferredSize(new Dimension(left.getWidth(), left.getHeight()));
+//		ShowImages.showWindow(pcv.getComponent(), "Point Cloud", true);
+//	}
+
 	public static void computeStereoCloud( GrayU8 distortedLeft, GrayU8 distortedRight ,
+										   Planar<GrayU8> colorLeft, Planar<GrayU8> colorRight,
 										   CameraPinholeRadial intrinsicLeft ,
 										   CameraPinholeRadial intrinsicRight ,
 										   Se3_F64 leftToRight ,
 										   int minDisparity , int maxDisparity) {
 
 //		drawInliers(origLeft, origRight, intrinsic, inliers);
+		int width = distortedLeft.width;
+		int height = distortedRight.height;
 
 		// Rectify and remove lens distortion for stereo processing
 		DMatrixRMaj rectifiedK = new DMatrixRMaj(3, 3);
+
+		// rectify a colored image
+		Planar<GrayU8> rectColorLeft = colorLeft.createSameShape();
+		Planar<GrayU8> rectColorRight = colorLeft.createSameShape();
+		rectifyImages(colorLeft, colorRight, leftToRight, intrinsicLeft,intrinsicRight,
+				rectColorLeft, rectColorRight, rectifiedK);
+
 		GrayU8 rectifiedLeft = distortedLeft.createSameShape();
 		GrayU8 rectifiedRight = distortedRight.createSameShape();
-
-		rectifyImages(distortedLeft, distortedRight, leftToRight, intrinsicLeft,intrinsicRight,
-				rectifiedLeft, rectifiedRight, rectifiedK);
+		ConvertImage.average(rectColorLeft,rectifiedLeft);
+		ConvertImage.average(rectColorRight,rectifiedRight);
 
 		// compute disparity
 		StereoDisparity<GrayS16, GrayF32> disparityAlg =
 				FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-						minDisparity, maxDisparity, 6, 6, 30, 10, 0.05, GrayS16.class);
+						minDisparity, maxDisparity, 6, 6, 30, 3, 0.05, GrayS16.class);
 
 		// Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
-		GrayS16 derivLeft = new GrayS16(rectifiedLeft.width,rectifiedLeft.height);
-		GrayS16 derivRight = new GrayS16(rectifiedLeft.width,rectifiedLeft.height);
+		GrayS16 derivLeft = new GrayS16(width,height);
+		GrayS16 derivRight = new GrayS16(width,height);
 		LaplacianEdge.process(rectifiedLeft, derivLeft);
 		LaplacianEdge.process(rectifiedRight,derivRight);
 
@@ -122,8 +153,8 @@ public class ExampleTrifocalStereo {
 		// show results
 		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, minDisparity, maxDisparity, 0);
 
-		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectifiedLeft, new BufferedImage(400,300, BufferedImage.TYPE_INT_RGB));
-		BufferedImage outRight = ConvertBufferedImage.convertTo(rectifiedRight, new BufferedImage(400,300, BufferedImage.TYPE_INT_RGB));
+		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectColorLeft, new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB),true);
+		BufferedImage outRight = ConvertBufferedImage.convertTo(rectColorRight, new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB),true);
 
 		ShowImages.showWindow(new RectifiedPairPanel(true, outLeft, outRight), "Rectification",true);
 		ShowImages.showWindow(visualized, "Disparity",true);
@@ -132,9 +163,17 @@ public class ExampleTrifocalStereo {
 	}
 
 	public static void main(String[] args) {
-		GrayU8 image01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_01.png"),GrayU8.class);
-		GrayU8 image02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_02.png"),GrayU8.class);
-		GrayU8 image03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_03.png"),GrayU8.class);
+		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_01.png"));
+		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_02.png"));
+		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_03.png"));
+
+		Planar<GrayU8> color01 = ConvertBufferedImage.convertFrom(buff01,true,ImageType.pl(3,GrayU8.class));
+		Planar<GrayU8> color02 = ConvertBufferedImage.convertFrom(buff02,true,ImageType.pl(3,GrayU8.class));
+		Planar<GrayU8> color03 = ConvertBufferedImage.convertFrom(buff03,true,ImageType.pl(3,GrayU8.class));
+
+		GrayU8 image01 = ConvertImage.average(color01,null);
+		GrayU8 image02 = ConvertImage.average(color02,null);
+		GrayU8 image03 = ConvertImage.average(color03,null);
 
 //		GrayU8 image01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_01.png"),GrayU8.class);
 //		GrayU8 image02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_02.png"),GrayU8.class);
@@ -388,14 +427,14 @@ public class ExampleTrifocalStereo {
 
 		Se3_F64 leftToRight = structure.views[1].worldToView;
 
-		GrayU8 scaled01 = new GrayU8(width/2,height/2);
-		GrayU8 scaled02 = new GrayU8(width/2,height/2);
+//		GrayU8 scaled01 = new GrayU8(width/2,height/2);
+//		GrayU8 scaled02 = new GrayU8(width/2,height/2);
+//
+//		PerspectiveOps.scaleIntrinsic(intrinsic01,0.5);
+//		PerspectiveOps.scaleIntrinsic(intrinsic02,0.5);
+//		new FDistort(image01,scaled01).scale().apply();
+//		new FDistort(image02,scaled02).scale().apply();
 
-		PerspectiveOps.scaleIntrinsic(intrinsic01,0.5);
-		PerspectiveOps.scaleIntrinsic(intrinsic02,0.5);
-		new FDistort(image01,scaled01).scale().apply();
-		new FDistort(image02,scaled02).scale().apply();
-
-		computeStereoCloud(scaled01,scaled02,intrinsic01,intrinsic02,leftToRight,0,50);
+		computeStereoCloud(image01,image02,color01,color02,intrinsic01,intrinsic02,leftToRight,0,50);
 	}
 }

@@ -46,10 +46,7 @@ import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.DoNothing2Transform2_F64;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.*;
 import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
 import georegression.struct.se.Se3_F64;
@@ -200,14 +197,15 @@ public class ExampleStereoTwoViewsOneCamera {
 	 * @param rectifiedRight Output rectified image for right camera.
 	 * @param rectifiedK     Output camera calibration matrix for rectified camera
 	 */
-	public static void rectifyImages(GrayU8 distortedLeft,
-									 GrayU8 distortedRight,
-									 Se3_F64 leftToRight,
-									 CameraPinholeRadial intrinsicLeft,
-									 CameraPinholeRadial intrinsicRight,
-									 GrayU8 rectifiedLeft,
-									 GrayU8 rectifiedRight,
-									 DMatrixRMaj rectifiedK) {
+	public static <T extends ImageBase<T>>
+	void rectifyImages(T distortedLeft,
+					   T distortedRight,
+					   Se3_F64 leftToRight,
+					   CameraPinholeRadial intrinsicLeft,
+					   CameraPinholeRadial intrinsicRight,
+					   T rectifiedLeft,
+					   T rectifiedRight,
+					   DMatrixRMaj rectifiedK) {
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 		// original camera calibration matrices
@@ -232,9 +230,9 @@ public class ExampleStereoTwoViewsOneCamera {
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
-		ImageDistort<GrayU8,GrayU8> distortLeft =
+		ImageDistort<T,T> distortLeft =
 				RectifyImageOps.rectifyImage(intrinsicLeft, rect1_F32, BorderType.SKIP, distortedLeft.getImageType());
-		ImageDistort<GrayU8,GrayU8> distortRight =
+		ImageDistort<T,T> distortRight =
 				RectifyImageOps.rectifyImage(intrinsicRight, rect2_F32, BorderType.SKIP, distortedRight.getImageType());
 
 		distortLeft.apply(distortedLeft, rectifiedLeft);
@@ -282,7 +280,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK,disparity.width,disparity.height,null);
 
 		// skew the view to make the structure easier to see
-		Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.eulerXyz(-20,0,0,0,0.2,0,null);
+		Se3_F64 cameraToWorld = SpecialEuclideanOps_F64.eulerXyz(-baseline*5,0,0,0,0.2,0,null);
 
 		PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
 		pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
