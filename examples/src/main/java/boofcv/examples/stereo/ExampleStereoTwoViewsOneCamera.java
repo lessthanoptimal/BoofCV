@@ -287,6 +287,8 @@ public class ExampleStereoTwoViewsOneCamera {
 		pcv.setCameraToWorld(cameraToWorld);
 		pcv.setTranslationStep(baseline/3);
 		pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
+		pcv.setDotSize(1);
+		pcv.setTranslationStep(baseline/10);
 
 		pcv.getComponent().setPreferredSize(new Dimension(left.getWidth(), left.getHeight()));
 		ShowImages.showWindow(pcv.getComponent(), "Point Cloud", true);
