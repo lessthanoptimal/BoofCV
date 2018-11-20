@@ -287,7 +287,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
 		pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
 		pcv.setCameraToWorld(cameraToWorld);
-		pcv.setTranslationStep(5);
+		pcv.setTranslationStep(baseline/3);
 		pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
 
 		pcv.getComponent().setPreferredSize(new Dimension(left.getWidth(), left.getHeight()));

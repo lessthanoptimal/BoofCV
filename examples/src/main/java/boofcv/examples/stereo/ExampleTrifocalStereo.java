@@ -41,6 +41,7 @@ import boofcv.alg.geo.robust.GenerateTrifocalTensor;
 import boofcv.alg.geo.robust.ManagerTrifocalTensor;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic.Intrinsic;
+import boofcv.alg.sfm.structure.PruneStructureFromScene;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
@@ -100,14 +101,13 @@ public class ExampleTrifocalStereo {
 		GrayU8 rectifiedLeft = distortedLeft.createSameShape();
 		GrayU8 rectifiedRight = distortedRight.createSameShape();
 
-		// TODO process distortion for lefta nd righ camera
 		rectifyImages(distortedLeft, distortedRight, leftToRight, intrinsicLeft,intrinsicRight,
 				rectifiedLeft, rectifiedRight, rectifiedK);
 
 		// compute disparity
 		StereoDisparity<GrayS16, GrayF32> disparityAlg =
 				FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-						minDisparity, maxDisparity, 6, 6, 30, 20, 0.01, GrayS16.class);
+						minDisparity, maxDisparity, 6, 6, 30, 10, 0.05, GrayS16.class);
 
 		// Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
 		GrayS16 derivLeft = new GrayS16(rectifiedLeft.width,rectifiedLeft.height);
@@ -195,7 +195,7 @@ public class ExampleTrifocalStereo {
 
 		System.out.println("Total Matched Triples = "+associateThree.getMatches().size);
 
-		double fitTol = 10;
+		double fitTol = 20;
 		int totalIterations = 2_000;
 
 		Estimate1ofTrifocalTensor trifocal = FactoryMultiView.trifocal_1(EnumTrifocal.LINEAR_7,0);
@@ -211,7 +211,7 @@ public class ExampleTrifocalStereo {
 
 			associated.grow().set(locations01.get(p.a),locations02.get(p.b),locations03.get(p.c));
 		}
-		ransac.setSampleSize(12);
+		ransac.setSampleSize(20);
 		ransac.process(associated.toList());
 
 		List<AssociatedTriple> inliers = ransac.getMatchSet();
@@ -275,9 +275,13 @@ public class ExampleTrifocalStereo {
 			worldToView.add( new Se3_F64());
 		}
 		// ignore K since we already have that
-		MultiViewOps.projectiveToMetric(P1,H,worldToView.get(0),K);
-		MultiViewOps.projectiveToMetric(P2,H,worldToView.get(1),K);
-		MultiViewOps.projectiveToMetric(P3,H,worldToView.get(2),K);
+		Se3_F64 viewToWorld = new Se3_F64(); // TODO check this
+		MultiViewOps.projectiveToMetric(P1,H,viewToWorld,K);
+		viewToWorld.invert(worldToView.get(0));
+		MultiViewOps.projectiveToMetric(P2,H,viewToWorld,K);
+		viewToWorld.invert(worldToView.get(1));
+		MultiViewOps.projectiveToMetric(P3,H,viewToWorld,K);
+		viewToWorld.invert(worldToView.get(2));
 
 		// scale is arbitrary. Set max translation to 1
 		double maxT = 0;
@@ -348,6 +352,14 @@ public class ExampleTrifocalStereo {
 		bundleAdjustment.setVerbose(System.out,0);
 		// Specifies convergence criteria
 		bundleAdjustment.configure(1e-6, 1e-6, 100);
+
+		bundleAdjustment.setParameters(structure,observations);
+		bundleAdjustment.optimize(structure);
+
+		PruneStructureFromScene pruner = new PruneStructureFromScene(structure,observations);
+		pruner.pruneObservationsByErrorRank(0.7);
+		pruner.pruneViews(10);
+		pruner.prunePoints(1);
 
 		bundleAdjustment.setParameters(structure,observations);
 		bundleAdjustment.optimize(structure);
