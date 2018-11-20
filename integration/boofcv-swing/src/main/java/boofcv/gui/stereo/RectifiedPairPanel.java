@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,13 +73,7 @@ public class RectifiedPairPanel extends JPanel implements MouseListener {
 
 		double scale = 1;
 		if( scaleToWindow ) {
-			int h = Math.max(image1.getHeight(),image2.getHeight());
-			int w = image1.getWidth() + image2.getWidth();
-
-			double scaleX = getWidth()/(double)w;
-			double scaleY = getHeight()/(double)h;
-			scale = Math.min(scaleX,scaleY);
-			if( scale > 1 ) scale = 1;
+			scale = computeScale();
 
 			AffineTransform orig = g2.getTransform();
 			AffineTransform combined = (AffineTransform)orig.clone();
@@ -100,20 +94,33 @@ public class RectifiedPairPanel extends JPanel implements MouseListener {
 			g2.setStroke(new BasicStroke(1));
 			g2.setColor(Color.RED);
 			g2.drawLine(x,0,x,getHeight());
-			x += image1.getWidth();
+			x += scale*image1.getWidth();
 			g2.drawLine(x,0,x,getHeight());
 		}
 
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(3));
 
-		g2.drawLine(0,mouseY,getWidth(),mouseY);
+		g2.drawLine(0,(int)(scale*mouseY+0.5),getWidth(),(int)(scale*mouseY+0.5));
+	}
+
+	private double computeScale() {
+		double scale;
+		int h = Math.max(image1.getHeight(),image2.getHeight());
+		int w = image1.getWidth() + image2.getWidth();
+
+		double scaleX = getWidth()/(double)w;
+		double scaleY = getHeight()/(double)h;
+		scale = Math.min(scaleX,scaleY);
+		if( scale > 1 ) scale = 1;
+		return scale;
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		mouseY = e.getY();
-		mouseX = e.getX();
+		double scale = scaleToWindow ? computeScale() : 1;
+		mouseY = (int)(e.getY()/scale+0.5);
+		mouseX = (int)(e.getX()/scale+0.5);
 		repaint();
 	}
 

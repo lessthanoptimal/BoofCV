@@ -88,7 +88,8 @@ import static boofcv.examples.stereo.ExampleStereoTwoViewsOneCamera.showPointClo
 public class ExampleTrifocalStereo {
 
 	public static void computeStereoCloud( GrayU8 distortedLeft, GrayU8 distortedRight ,
-										   CameraPinholeRadial intrinsic ,
+										   CameraPinholeRadial intrinsicLeft ,
+										   CameraPinholeRadial intrinsicRight ,
 										   Se3_F64 leftToRight ,
 										   int minDisparity , int maxDisparity) {
 
@@ -99,7 +100,9 @@ public class ExampleTrifocalStereo {
 		GrayU8 rectifiedLeft = distortedLeft.createSameShape();
 		GrayU8 rectifiedRight = distortedRight.createSameShape();
 
-		rectifyImages(distortedLeft, distortedRight, leftToRight, intrinsic, rectifiedLeft, rectifiedRight, rectifiedK);
+		// TODO process distortion for lefta nd righ camera
+		rectifyImages(distortedLeft, distortedRight, leftToRight, intrinsicLeft,intrinsicRight,
+				rectifiedLeft, rectifiedRight, rectifiedK);
 
 		// compute disparity
 		StereoDisparity<GrayS16, GrayF32> disparityAlg =
@@ -133,6 +136,10 @@ public class ExampleTrifocalStereo {
 		GrayU8 image02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_02.png"),GrayU8.class);
 		GrayU8 image03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_03.png"),GrayU8.class);
 
+//		GrayU8 image01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_01.png"),GrayU8.class);
+//		GrayU8 image02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_02.png"),GrayU8.class);
+//		GrayU8 image03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_03.png"),GrayU8.class);
+
 		// TODO don't use scale invariant and see how it goes
 		DetectDescribePoint<GrayU8,BrightFeature> detDesc = FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(0, 4, 1000, 1, 9, 4, 2), null,null, GrayU8.class);
@@ -147,9 +154,10 @@ public class ExampleTrifocalStereo {
 
 		detDesc.detect(image01);
 
-		System.out.println("Image Shape "+image01.width+" x "+image01.height);
-		double cx = image01.width/2;
-		double cy = image01.height/2;
+		int width = image01.width, height = image01.height;
+		System.out.println("Image Shape "+width+" x "+height);
+		double cx = width/2;
+		double cy = height/2;
 
 		// COMMENT ON center point zero
 		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
@@ -233,7 +241,7 @@ public class ExampleTrifocalStereo {
 		List<CameraPinhole> listPinhole = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
 			Intrinsic c = selfcalib.getSolutions().get(i);
-			CameraPinhole p = new CameraPinhole(c.fx,c.fy,0,0,0,image01.width,image01.height);
+			CameraPinhole p = new CameraPinhole(c.fx,c.fy,0,0,0,width,height);
 			listPinhole.add(p);
 		}
 
@@ -357,19 +365,25 @@ public class ExampleTrifocalStereo {
 
 		System.out.println("\n\nComputing Stereo Disparity");
 		BundlePinholeSimplified cp = structure.getCameras()[0].getModel();
-		CameraPinholeRadial intrinsicR = new CameraPinholeRadial();
-		intrinsicR.fsetK(cp.f,cp.f,0,image01.width/2,image01.height/2,image01.width,image01.height);
-		intrinsicR.fsetRadial(cp.k1,cp.k2);
+		CameraPinholeRadial intrinsic01 = new CameraPinholeRadial();
+		intrinsic01.fsetK(cp.f,cp.f,0,cx,cy,width,height);
+		intrinsic01.fsetRadial(cp.k1,cp.k2);
+
+		cp = structure.getCameras()[1].getModel();
+		CameraPinholeRadial intrinsic02 = new CameraPinholeRadial();
+		intrinsic02.fsetK(cp.f,cp.f,0,cx,cy,width,height);
+		intrinsic02.fsetRadial(cp.k1,cp.k2);
 
 		Se3_F64 leftToRight = structure.views[1].worldToView;
 
-		PerspectiveOps.scaleIntrinsic(intrinsicR,0.5);
-		GrayU8 scaled01 = new GrayU8(image01.width/2,image01.height/2);
-		GrayU8 scaled02 = new GrayU8(image01.width/2,image01.height/2);
+		GrayU8 scaled01 = new GrayU8(width/2,height/2);
+		GrayU8 scaled02 = new GrayU8(width/2,height/2);
 
+		PerspectiveOps.scaleIntrinsic(intrinsic01,0.5);
+		PerspectiveOps.scaleIntrinsic(intrinsic02,0.5);
 		new FDistort(image01,scaled01).scale().apply();
 		new FDistort(image02,scaled02).scale().apply();
 
-		computeStereoCloud(scaled01,scaled02,intrinsicR,leftToRight,0,50);
+		computeStereoCloud(scaled01,scaled02,intrinsic01,intrinsic02,leftToRight,0,50);
 	}
 }

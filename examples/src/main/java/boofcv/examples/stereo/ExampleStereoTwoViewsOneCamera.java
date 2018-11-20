@@ -111,7 +111,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		GrayU8 rectifiedLeft = distortedLeft.createSameShape();
 		GrayU8 rectifiedRight = distortedRight.createSameShape();
 
-		rectifyImages(distortedLeft, distortedRight, leftToRight, intrinsic, rectifiedLeft, rectifiedRight, rectifiedK);
+		rectifyImages(distortedLeft, distortedRight, leftToRight, intrinsic,intrinsic, rectifiedLeft, rectifiedRight, rectifiedK);
 
 		// compute disparity
 		StereoDisparity<GrayS16, GrayF32> disparityAlg =
@@ -195,7 +195,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	 * @param distortedLeft  Input distorted image from left camera.
 	 * @param distortedRight Input distorted image from right camera.
 	 * @param leftToRight    Camera motion from left to right
-	 * @param intrinsic      Intrinsic camera parameters
+	 * @param intrinsicLeft  Intrinsic camera parameters
 	 * @param rectifiedLeft  Output rectified image for left camera.
 	 * @param rectifiedRight Output rectified image for right camera.
 	 * @param rectifiedK     Output camera calibration matrix for rectified camera
@@ -203,16 +203,18 @@ public class ExampleStereoTwoViewsOneCamera {
 	public static void rectifyImages(GrayU8 distortedLeft,
 									 GrayU8 distortedRight,
 									 Se3_F64 leftToRight,
-									 CameraPinholeRadial intrinsic,
+									 CameraPinholeRadial intrinsicLeft,
+									 CameraPinholeRadial intrinsicRight,
 									 GrayU8 rectifiedLeft,
 									 GrayU8 rectifiedRight,
 									 DMatrixRMaj rectifiedK) {
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 		// original camera calibration matrices
-		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
+		DMatrixRMaj K1 = PerspectiveOps.pinholeToMatrix(intrinsicLeft, (DMatrixRMaj)null);
+		DMatrixRMaj K2 = PerspectiveOps.pinholeToMatrix(intrinsicRight, (DMatrixRMaj)null);
 
-		rectifyAlg.process(K, new Se3_F64(), K, leftToRight);
+		rectifyAlg.process(K1, new Se3_F64(), K2, leftToRight);
 
 		// rectification matrix for each image
 		DMatrixRMaj rect1 = rectifyAlg.getRect1();
@@ -222,7 +224,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
 
 		// Adjust the rectification to make the view area more useful
-		RectifyImageOps.allInsideLeft(intrinsic, rect1, rect2, rectifiedK);
+		RectifyImageOps.allInsideLeft(intrinsicLeft, rect1, rect2, rectifiedK);
 
 		// undistorted and rectify images
 		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3);
@@ -231,9 +233,9 @@ public class ExampleStereoTwoViewsOneCamera {
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
 		ImageDistort<GrayU8,GrayU8> distortLeft =
-				RectifyImageOps.rectifyImage(intrinsic, rect1_F32, BorderType.SKIP, distortedLeft.getImageType());
+				RectifyImageOps.rectifyImage(intrinsicLeft, rect1_F32, BorderType.SKIP, distortedLeft.getImageType());
 		ImageDistort<GrayU8,GrayU8> distortRight =
-				RectifyImageOps.rectifyImage(intrinsic, rect2_F32, BorderType.SKIP, distortedRight.getImageType());
+				RectifyImageOps.rectifyImage(intrinsicRight, rect2_F32, BorderType.SKIP, distortedRight.getImageType());
 
 		distortLeft.apply(distortedLeft, rectifiedLeft);
 		distortRight.apply(distortedRight, rectifiedRight);

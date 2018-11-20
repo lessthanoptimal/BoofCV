@@ -89,6 +89,11 @@ public class BatchDownsizeImage {
 		List<File> files = Arrays.asList(UtilIO.findMatches(new File(pathInput),regex));
 		Collections.sort(files);
 
+		// Create the output directory if it doesn't exist
+		if( !new File(pathOutput).exists() ) {
+			new File(pathOutput).mkdirs();
+		}
+
 		Planar<GrayU8> planar = new Planar<>(GrayU8.class,1,1,1);
 		Planar<GrayU8> small = new Planar<>(GrayU8.class,1,1,1);
 		int numDigits = BoofMiscOps.numDigits(files.size()-1);
