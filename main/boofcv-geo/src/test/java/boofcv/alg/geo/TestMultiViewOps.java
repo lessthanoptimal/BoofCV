@@ -621,35 +621,43 @@ public class TestMultiViewOps {
 	public void decomposeMetricCamera() {
 		// compute an arbitrary projection matrix from known values
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
-		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
-		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
-		DMatrixRMaj P = new DMatrixRMaj(3,4);
-		DMatrixRMaj KP = new DMatrixRMaj(3,4);
-		CommonOps_DDRM.insert(R,P,0,0);
-		P.set(0,3,T.x);
-		P.set(1,3,T.y);
-		P.set(2,3,T.z);
+		// try a bunch of different matrices to try to exercise all possible options
+		for (int i = 0; i < 50; i++) {
+			System.out.println("i = "+i);
+			DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
+					rand.nextGaussian(),rand.nextGaussian(),rand.nextGaussian(),null);
+			Vector3D_F64 T = new Vector3D_F64(rand.nextGaussian(),rand.nextGaussian(),rand.nextGaussian());
 
-		CommonOps_DDRM.mult(K,P,KP);
+			DMatrixRMaj P = new DMatrixRMaj(3,4);
+			DMatrixRMaj KP = new DMatrixRMaj(3,4);
+			CommonOps_DDRM.insert(R,P,0,0);
+			P.set(0,3,T.x);
+			P.set(1,3,T.y);
+			P.set(2,3,T.z);
 
-		// decompose the projection matrix
-		DMatrixRMaj foundK = new DMatrixRMaj(3,3);
-		Se3_F64 foundPose = new Se3_F64();
-		MultiViewOps.decomposeMetricCamera(KP, foundK, foundPose);
+			CommonOps_DDRM.mult(K,P,KP);
 
-		// recompute the projection matrix found the found results
-		DMatrixRMaj foundKP = new DMatrixRMaj(3,4);
-		CommonOps_DDRM.insert(foundPose.getR(),P,0,0);
-		P.set(0,3,foundPose.T.x);
-		P.set(1,3,foundPose.T.y);
-		P.set(2,3,foundPose.T.z);
-		CommonOps_DDRM.mult(foundK,P,foundKP);
+			// The camera matrix is often only recovered up to a scale factor
+			CommonOps_DDRM.scale(rand.nextGaussian(),KP);
 
-		// see if the two projection matrices are the same
-		assertTrue(MatrixFeatures_DDRM.isEquals(foundKP,KP,1e-8));
+			// decompose the projection matrix
+			DMatrixRMaj foundK = new DMatrixRMaj(3,3);
+			Se3_F64 foundPose = new Se3_F64();
+			MultiViewOps.decomposeMetricCamera(KP, foundK, foundPose);
 
-		fail("check for det == 1");
+			// see if it extract the input
+			assertEquals(1,CommonOps_DDRM.det(foundPose.R), UtilEjml.TEST_F64);
+			assertTrue(MatrixFeatures_DDRM.isIdentical(K,foundK, UtilEjml.TEST_F64));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(R,foundPose.R, UtilEjml.TEST_F64));
+
+			double sT = T.norm();
+			double sTp = foundPose.T.norm();
+
+			assertEquals(T.x, foundPose.T.x*sT/sTp, UtilEjml.TEST_F64);
+			assertEquals(T.y, foundPose.T.y*sT/sTp, UtilEjml.TEST_F64);
+			assertEquals(T.z, foundPose.T.z*sT/sTp, UtilEjml.TEST_F64);
+		}
 	}
 
 	@Test

@@ -40,6 +40,7 @@ import org.ddogleg.struct.Tuple2;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.SpecializedOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.QRDecomposition;
 
@@ -787,7 +788,7 @@ public class MultiViewOps {
 
 	/**
 	 * <p>
-	 * Decomposes a metric camera matrix P=A*[R|T], where A is an upper triangular camera calibration
+	 * Decomposes a metric camera matrix P=K*[R|T], where A is an upper triangular camera calibration
 	 * matrix, R is a rotation matrix, and T is a translation vector.
 	 *
 	 * <ul>
@@ -796,40 +797,75 @@ public class MultiViewOps {
 	 * </ul>
 	 * </p>
 	 *
-	 * @param P Input: Camera matrix, 3 by 4
+	 * @param cameraMatrix Input: Camera matrix, 3 by 4
 	 * @param K Output: Camera calibration matrix, 3 by 3.
 	 * @param pose Output: The rotation and translation.
 	 */
-	public static void decomposeMetricCamera(DMatrixRMaj P, DMatrixRMaj K, Se3_F64 pose) {
-		DMatrixRMaj KR = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.extract(P, 0, 3, 0, 3, KR, 0, 0);
+	public static void decomposeMetricCamera(DMatrixRMaj cameraMatrix, DMatrixRMaj K, Se3_F64 pose) {
+		DMatrixRMaj A = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.extract(cameraMatrix, 0, 3, 0, 3, A, 0, 0);
+		pose.T.set(cameraMatrix.get(0,3),cameraMatrix.get(1,3),cameraMatrix.get(2,3));
 
 		QRDecomposition<DMatrixRMaj> qr = DecompositionFactory_DDRM.qr(3, 3);
 
-		if( !CommonOps_DDRM.invert(KR) )
-			throw new RuntimeException("Inverse failed!  Bad input?");
-
-		if( !qr.decompose(KR) )
+		// Need to do an RQ decomposition, but we only have QR
+		// by permuting the rows in KR we can get the desired result
+		DMatrixRMaj Pv = SpecializedOps_DDRM.pivotMatrix(null,new int[]{2,1,0},3,false);
+		DMatrixRMaj A_p = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.mult(Pv,A,A_p);
+		CommonOps_DDRM.transpose(A_p);
+		if( !qr.decompose(A_p) )
 			throw new RuntimeException("QR decomposition failed!  Bad input?");
 
-		DMatrixRMaj U = qr.getQ(null,false);
-		DMatrixRMaj B = qr.getR(null, false);
+		// extract the rotation
+		qr.getQ(A,false);
+		CommonOps_DDRM.multTransB(Pv,A,pose.R);
 
-		if( !CommonOps_DDRM.invert(U,pose.getR()) )
-			throw new RuntimeException("Inverse failed!  Bad input?");
+		// extract the calibration matrix
+		qr.getR(K,false);
+		CommonOps_DDRM.multTransB(Pv,K,A);
+		CommonOps_DDRM.mult(A,Pv,K);
 
-		if( CommonOps_DDRM.det(pose.R) < 0 ) {
-			CommonOps_DDRM.scale(-1,pose.R);
+		// there are four solutions, massage it so that it's the correct one.
+		// each of these row/column negations produces the same camera matrix
+		for (int i = 0; i < 3; i++) {
+			if( K.get(i,i) < 0) {
+				scaleCol(K,i,-1);
+				scaleRow(pose.R,i,-1);
+			}
 		}
 
-		Point3D_F64 KT = new Point3D_F64(P.get(0,3),P.get(1,3),P.get(2,3));
-		GeometryMath_F64.mult(B, KT, pose.getT());
+		// rotation matrices have det() == 1
+		if( CommonOps_DDRM.det(pose.R) < 0 ) {
+			CommonOps_DDRM.scale(-1,pose.R);
+			pose.T.scale(-1);
+		}
 
-		if( !CommonOps_DDRM.invert(B,K) )
+		// make sure it's a proper camera matrix
+		CommonOps_DDRM.divide(K,K.get(2,2));
+
+		// could do a very fast triangule inverse. EJML doesn't have one for upper triangle, yet.
+		if( !CommonOps_DDRM.invert(K,A) )
 			throw new RuntimeException("Inverse failed!  Bad input?");
 
-		CommonOps_DDRM.scale(1.0/K.get(2,2),K);
+		GeometryMath_F64.mult(A, pose.T, pose.T);
 	}
+
+	// TODO move to EJML
+	public static void scaleRow( DMatrixRMaj A , int row , double scale ) {
+		int idx = row*A.numCols;
+		for (int col = 0; col < A.numCols; col++) {
+			A.data[idx++] *= scale;
+		}
+	}
+
+	public static void scaleCol( DMatrixRMaj A , int col , double scale ) {
+		int idx = col;
+		for (int row = 0; row < A.numRows; row++, idx += A.numCols) {
+			A.data[idx] *= scale;
+		}
+	}
+
 
 	/**
 	 * Decomposes an essential matrix into the rigid body motion which it was constructed from.  Due to ambiguities

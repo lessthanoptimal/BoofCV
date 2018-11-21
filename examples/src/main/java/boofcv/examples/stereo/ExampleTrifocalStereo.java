@@ -167,6 +167,10 @@ public class ExampleTrifocalStereo {
 		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_02.png"));
 		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_03.png"));
 
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_03.png"));
+
 		Planar<GrayU8> color01 = ConvertBufferedImage.convertFrom(buff01,true,ImageType.pl(3,GrayU8.class));
 		Planar<GrayU8> color02 = ConvertBufferedImage.convertFrom(buff02,true,ImageType.pl(3,GrayU8.class));
 		Planar<GrayU8> color03 = ConvertBufferedImage.convertFrom(buff03,true,ImageType.pl(3,GrayU8.class));
@@ -174,10 +178,6 @@ public class ExampleTrifocalStereo {
 		GrayU8 image01 = ConvertImage.average(color01,null);
 		GrayU8 image02 = ConvertImage.average(color02,null);
 		GrayU8 image03 = ConvertImage.average(color03,null);
-
-//		GrayU8 image01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_01.png"),GrayU8.class);
-//		GrayU8 image02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_02.png"),GrayU8.class);
-//		GrayU8 image03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_03.png"),GrayU8.class);
 
 		// TODO don't use scale invariant and see how it goes
 		DetectDescribePoint<GrayU8,BrightFeature> detDesc = FactoryDetectDescribe.surfStable(
@@ -280,7 +280,7 @@ public class ExampleTrifocalStereo {
 		List<CameraPinhole> listPinhole = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
 			Intrinsic c = selfcalib.getSolutions().get(i);
-			CameraPinhole p = new CameraPinhole(c.fx,c.fy,0,0,0,width,height);
+			CameraPinhole p = new CameraPinhole(650,650,0,0,0,width,height);
 			listPinhole.add(p);
 		}
 
@@ -313,14 +313,11 @@ public class ExampleTrifocalStereo {
 		for (int i = 0; i < 3; i++) {
 			worldToView.add( new Se3_F64());
 		}
+
 		// ignore K since we already have that
-		Se3_F64 viewToWorld = new Se3_F64(); // TODO check this
-		MultiViewOps.projectiveToMetric(P1,H,viewToWorld,K);
-		viewToWorld.invert(worldToView.get(0));
-		MultiViewOps.projectiveToMetric(P2,H,viewToWorld,K);
-		viewToWorld.invert(worldToView.get(1));
-		MultiViewOps.projectiveToMetric(P3,H,viewToWorld,K);
-		viewToWorld.invert(worldToView.get(2));
+		MultiViewOps.projectiveToMetric(P1,H,worldToView.get(0),K);
+		MultiViewOps.projectiveToMetric(P2,H,worldToView.get(1),K);
+		MultiViewOps.projectiveToMetric(P3,H,worldToView.get(2),K);
 
 		// scale is arbitrary. Set max translation to 1
 		double maxT = 0;
@@ -329,8 +326,9 @@ public class ExampleTrifocalStereo {
 		}
 		for( Se3_F64 p : worldToView ) {
 			p.T.scale(1.0/maxT);
-//			p.print();
+			p.print();
 		}
+
 		// Triangulate points in 3D in metric space
 		List<Point3D_F64> points3D = new ArrayList<>();
 		TriangulateNViewsCalibrated triangulation = FactoryMultiView.triangulateCalibratedNViewDLT();
