@@ -215,4 +215,12 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	public boolean isHomogenous() {
 		return homogenous;
 	}
+
+	public int getObservationCount() {
+		int total = 0;
+		for (int i = 0; i < points.length; i++) {
+			total += points[i].views.size;
+		}
+		return total;
+	}
 }
