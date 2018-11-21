@@ -28,6 +28,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.Tuple2;
 import org.ejml.UtilEjml;
@@ -42,7 +43,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -586,10 +588,9 @@ public class TestMultiViewOps {
 	@Test
 	public void fundamentalToProjection() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
-		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
-		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
+		Se3_F64 T = SpecialEuclideanOps_F64.eulerXyz(0.5,0.7,-0.3,EulerType.XYZ,1,2,-0.5,null);
 
-		DMatrixRMaj E = MultiViewOps.createEssential(R, T, null);
+		DMatrixRMaj E = MultiViewOps.createEssential(T.R, T.T, null);
 		DMatrixRMaj F = MultiViewOps.createFundamental(E, K);
 
 		Point3D_F64 e1 = new Point3D_F64();
@@ -624,7 +625,6 @@ public class TestMultiViewOps {
 
 		// try a bunch of different matrices to try to exercise all possible options
 		for (int i = 0; i < 50; i++) {
-			System.out.println("i = "+i);
 			DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
 					rand.nextGaussian(),rand.nextGaussian(),rand.nextGaussian(),null);
 			Vector3D_F64 T = new Vector3D_F64(rand.nextGaussian(),rand.nextGaussian(),rand.nextGaussian());
@@ -799,6 +799,27 @@ public class TestMultiViewOps {
 
 	@Test
 	public void projectiveToMetric() {
-		fail("implement");
+		// Construct a projective camera matrix from its definition
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
+		Se3_F64 T = SpecialEuclideanOps_F64.eulerXyz(0.5,0.7,-0.3,EulerType.XYZ,1,2,-0.5,null);
+
+		DMatrixRMaj P = PerspectiveOps.createCameraMatrix(T.R,T.T,K,null);
+
+		// Apply an arbitrary homography to it
+		DMatrixRMaj H = CommonOps_DDRM.diag(0.1,-2.1,1.2,3);
+		DMatrixRMaj H_inv = H.createLike();
+		CommonOps_DDRM.invert(H,H_inv);
+		DMatrixRMaj PH = P.createLike();
+		CommonOps_DDRM.mult(P,H,PH);
+
+		// extract the metric parameters
+		DMatrixRMaj foundK = new DMatrixRMaj(3,3);
+		Se3_F64 foundT = new Se3_F64();
+
+		MultiViewOps.projectiveToMetric(PH,H_inv,foundT,foundK);
+
+		assertTrue(MatrixFeatures_DDRM.isIdentical(K,foundK,UtilEjml.TEST_F64));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(T.R,foundT.R,UtilEjml.TEST_F64));
+		assertEquals(0,T.T.distance(foundT.T), UtilEjml.TEST_F64);
 	}
 }

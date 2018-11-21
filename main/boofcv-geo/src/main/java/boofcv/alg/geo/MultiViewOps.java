@@ -1084,7 +1084,18 @@ public class MultiViewOps {
 	}
 
 	/**
-	 * Elevates a projective camera matrix into a metric one. Extracts calibration and Se3 pose.
+	 * Elevates a projective camera matrix into a metric one using the rectifying homography.
+	 * Extracts calibration and Se3 pose.
+	 *
+	 * <pre>
+	 * P'=P*H
+	 * K,R,t = decompose(P')
+	 * </pre>
+	 * where P is the camera matrix, H is the homography, (K,R,t) are the intrinsic calibration matrix, rotation,
+	 * and translation
+	 *
+	 * @see PerspectiveOps#decomposeAbsDualQuadratic
+	 * @see #decomposeMetricCamera(DMatrixRMaj, DMatrixRMaj, Se3_F64)
 	 *
 	 * @param cameraMatrix (Input) camera matrix. 3x4
 	 * @param H (Input) Rectifying homography. 4x4
