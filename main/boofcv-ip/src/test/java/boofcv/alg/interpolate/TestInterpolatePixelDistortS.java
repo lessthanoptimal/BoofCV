@@ -18,16 +18,85 @@
 
 package boofcv.alg.interpolate;
 
+import boofcv.core.image.border.ImageBorder;
+import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_F32;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Peter Abeles
  */
 public class TestInterpolatePixelDistortS {
 	@Test
-	public void foo() {
-		fail("Implement");
+	public void simple() {
+		MockTransform transform = new MockTransform(1,2);
+		MockInterp interp = new MockInterp();
+
+		InterpolatePixelDistortS alg = new InterpolatePixelDistortS(interp,transform);
+
+		assertEquals(73,alg.get(2,5), UtilEjml.TEST_F32);
+		assertEquals(74,alg.get_fast(2,5), UtilEjml.TEST_F32);
+		assertNotNull(alg.getImageType());
+
+	}
+
+	public class MockTransform implements Point2Transform2_F32 {
+
+		float tx,ty;
+
+		public MockTransform(float tx, float ty) {
+			this.tx = tx;
+			this.ty = ty;
+		}
+
+		@Override
+		public void compute(float x, float y, Point2D_F32 out) {
+			out.x = x + tx;
+			out.y = y + ty;
+		}
+	}
+
+	public class MockInterp implements InterpolatePixelS {
+
+		@Override
+		public float get(float x, float y) {
+			return y*10+x;
+		}
+
+		@Override
+		public float get_fast(float x, float y) {
+			return get(x,y)+1;
+		}
+
+		@Override
+		public void setBorder(ImageBorder border) {}
+
+		@Override
+		public ImageBorder getBorder() {return null;}
+
+		@Override
+		public void setImage(ImageBase image) {}
+
+		@Override
+		public ImageBase getImage() {return null;}
+
+		@Override
+		public boolean isInFastBounds(float x, float y) {return false;}
+
+		@Override
+		public int getFastBorderX() {return 0;}
+
+		@Override
+		public int getFastBorderY() {return 0;}
+
+		@Override
+		public ImageType getImageType() {return ImageType.single(GrayU8.class);}
 	}
 }
