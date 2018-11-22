@@ -163,13 +163,13 @@ public class ExampleTrifocalStereo {
 	}
 
 	public static void main(String[] args) {
-		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_01.png"));
-		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_02.png"));
-		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_03.png"));
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_03.png"));
 
-//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_01.png"));
-//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_02.png"));
-//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_03.png"));
+		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_01.png"));
+		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_02.png"));
+		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_03.png"));
 
 		Planar<GrayU8> color01 = ConvertBufferedImage.convertFrom(buff01,true,ImageType.pl(3,GrayU8.class));
 		Planar<GrayU8> color02 = ConvertBufferedImage.convertFrom(buff02,true,ImageType.pl(3,GrayU8.class));
@@ -234,7 +234,7 @@ public class ExampleTrifocalStereo {
 
 		System.out.println("Total Matched Triples = "+associateThree.getMatches().size);
 
-		double fitTol = 20;
+		double fitTol = 2;
 		int totalIterations = 2_000;
 
 		Estimate1ofTrifocalTensor trifocal = FactoryMultiView.trifocal_1(EnumTrifocal.LINEAR_7,0);
@@ -250,12 +250,13 @@ public class ExampleTrifocalStereo {
 
 			associated.grow().set(locations01.get(p.a),locations02.get(p.b),locations03.get(p.c));
 		}
-		ransac.setSampleSize(20);
+		ransac.setSampleSize(generator.getMinimumPoints());
 		ransac.process(associated.toList());
 
 		List<AssociatedTriple> inliers = ransac.getMatchSet();
 		TrifocalTensor model = ransac.getModelParameters();
 		System.out.println("Remaining after RANSAC "+inliers.size());
+		model.print();
 
 		// estimate using all the inliers
 		generator.generate(inliers,model);
@@ -280,7 +281,8 @@ public class ExampleTrifocalStereo {
 		List<CameraPinhole> listPinhole = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
 			Intrinsic c = selfcalib.getSolutions().get(i);
-			CameraPinhole p = new CameraPinhole(650,650,0,0,0,width,height);
+//			c.fx = c.fy = 720;
+			CameraPinhole p = new CameraPinhole(c.fx,c.fy,0,0,0,width,height);
 			listPinhole.add(p);
 		}
 
@@ -318,6 +320,7 @@ public class ExampleTrifocalStereo {
 		MultiViewOps.projectiveToMetric(P1,H,worldToView.get(0),K);
 		MultiViewOps.projectiveToMetric(P2,H,worldToView.get(1),K);
 		MultiViewOps.projectiveToMetric(P3,H,worldToView.get(2),K);
+		K.print();
 
 		// scale is arbitrary. Set max translation to 1
 		double maxT = 0;
@@ -327,6 +330,15 @@ public class ExampleTrifocalStereo {
 		for( Se3_F64 p : worldToView ) {
 			p.T.scale(1.0/maxT);
 			p.print();
+		}
+
+		// TODO is there a bug and its choosing this solution or are there really two possible?
+		// TODO change it so that the bottom on the photo is +y
+		// there are two possible solution. force it to be the one I want it to be
+		if( worldToView.get(1).T.x > 0 ) {
+			for (int i = 1; i < 3; i++) {
+				worldToView.get(i).T.scale(-1);
+			}
 		}
 
 		// Triangulate points in 3D in metric space
@@ -352,16 +364,16 @@ public class ExampleTrifocalStereo {
 		SceneStructureMetric structure = new SceneStructureMetric(false);
 		SceneObservations observations = new SceneObservations(3);
 
-		structure.initialize(3,3,inliers.size());
+		structure.initialize(1,3,inliers.size());
 		for (int i = 0; i < listPinhole.size(); i++) {
 			CameraPinhole cp = listPinhole.get(i);
 			BundlePinholeSimplified bp = new BundlePinholeSimplified();
 
 			bp.f = cp.fx;
 
-			structure.setCamera(i,false,bp);
+			structure.setCamera(0,false,bp);
 			structure.setView(i,i==0,worldToView.get(i));
-			structure.connectViewToCamera(i,i);
+			structure.connectViewToCamera(i,0);
 		}
 		for (int i = 0; i < inliers.size(); i++) {
 			AssociatedTriple t = inliers.get(i);
@@ -406,7 +418,7 @@ public class ExampleTrifocalStereo {
 			System.out.println(structure.cameras[i].getModel().toString());
 		}
 		System.out.println("\n\nworldToView");
-		for (int i = 0; i < structure.cameras.length; i++) {
+		for (int i = 0; i < structure.views.length; i++) {
 			System.out.println(structure.views[i].worldToView.toString());
 		}
 
@@ -418,7 +430,7 @@ public class ExampleTrifocalStereo {
 		intrinsic01.fsetK(cp.f,cp.f,0,cx,cy,width,height);
 		intrinsic01.fsetRadial(cp.k1,cp.k2);
 
-		cp = structure.getCameras()[1].getModel();
+		cp = structure.getCameras()[0].getModel();
 		CameraPinholeRadial intrinsic02 = new CameraPinholeRadial();
 		intrinsic02.fsetK(cp.f,cp.f,0,cx,cy,width,height);
 		intrinsic02.fsetRadial(cp.k1,cp.k2);
@@ -427,12 +439,18 @@ public class ExampleTrifocalStereo {
 
 //		GrayU8 scaled01 = new GrayU8(width/2,height/2);
 //		GrayU8 scaled02 = new GrayU8(width/2,height/2);
+//		Planar<GrayU8> scolor01 = new Planar<>(GrayU8.class,scaled01.width,scaled01.height,3);
+//		Planar<GrayU8> scolor02 = new Planar<>(GrayU8.class,scaled01.width,scaled01.height,3);
 //
 //		PerspectiveOps.scaleIntrinsic(intrinsic01,0.5);
 //		PerspectiveOps.scaleIntrinsic(intrinsic02,0.5);
 //		new FDistort(image01,scaled01).scale().apply();
 //		new FDistort(image02,scaled02).scale().apply();
+//		new FDistort(color01,scolor01).scale().apply();
+//		new FDistort(color02,scolor02).scale().apply();
+//		image01 = scaled01;image02 = scaled02;color01 = scolor01; color02 = scolor02;
 
-		computeStereoCloud(image01,image02,color01,color02,intrinsic01,intrinsic02,leftToRight,0,50);
+		// TODO dynamic max disparity
+		computeStereoCloud(image01,image02,color01,color02,intrinsic01,intrinsic02,leftToRight,0,200);
 	}
 }

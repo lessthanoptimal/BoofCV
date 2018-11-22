@@ -46,11 +46,11 @@ public class DistanceTrifocalTransferSq implements DistanceFromModel<TrifocalTen
 
 	@Override
 	public double computeDistance(AssociatedTriple pt) {
-		transfer.transfer12into3(pt.p1.x,pt.p1.y,pt.p3.x,pt.p2.y,c);
+		transfer.transfer12into3(pt.p1.x,pt.p1.y,pt.p2.x,pt.p2.y,c);
 		double error = UtilPoint2D_F64.distanceSq(c.x/c.z, c.y/c.z, pt.p3.x, pt.p3.y);
 
 		transfer.transfer13into2(pt.p1.x,pt.p1.y,pt.p3.x,pt.p3.y,c);
-		error += UtilPoint2D_F64.distanceSq(c.x/c.z, c.y/c.z, pt.p3.x, pt.p3.y);
+		error += UtilPoint2D_F64.distanceSq(c.x/c.z, c.y/c.z, pt.p2.x, pt.p2.y);
 		return error;
 	}
 

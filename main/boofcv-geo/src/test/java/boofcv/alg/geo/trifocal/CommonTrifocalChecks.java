@@ -42,26 +42,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public abstract class CommonTrifocalChecks {
-	Random rand = new Random(234);
+	protected Random rand = new Random(234);
 
 	// camera calibration matrix
-	DMatrixRMaj K = new DMatrixRMaj(3,3,true,60,0.01,200,0,80,150,0,0,1);
+	protected DMatrixRMaj K = new DMatrixRMaj(3,3,true,60,0.01,200,0,80,150,0,0,1);
 
-	Se3_F64 worldToCam1,worldToCam2, worldToCam3;
-	DMatrixRMaj P2,P3;
-	TrifocalTensor tensor;
+	protected Se3_F64 worldToCam1,worldToCam2, worldToCam3;
+	protected DMatrixRMaj P2,P3;
+	protected TrifocalTensor tensor;
 	// storage for the found solution
-	TrifocalTensor found = new TrifocalTensor();
+	protected TrifocalTensor found = new TrifocalTensor();
 
-	DMatrixRMaj F2,F3;
+	protected DMatrixRMaj F2,F3;
 
-	List<Point3D_F64> worldPts = new ArrayList<>();
+	protected List<Point3D_F64> worldPts = new ArrayList<>();
 	// Observation 1 is normalized and 2 and 3 are pixels. This reflects p1=[I|0]
-	List<AssociatedTriple> observations = new ArrayList<>();
+	protected List<AssociatedTriple> observations = new ArrayList<>();
 	// All observations in pixels
-	List<AssociatedTriple> observationsPixels = new ArrayList<>();
+	protected List<AssociatedTriple> observationsPixels = new ArrayList<>();
 	// All observations are in normalized image coordinates
-	List<AssociatedTriple> observationsNorm = new ArrayList<>();
+	protected List<AssociatedTriple> observationsNorm = new ArrayList<>();
 
 	protected int numFeatures = 20;
 
