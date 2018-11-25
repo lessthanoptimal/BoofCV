@@ -109,7 +109,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 		addFocusListener(new FocusListener(){
 			@Override
 			public void focusGained(FocusEvent e) {
-				System.out.println("focus gained");
+//				System.out.println("focus gained");
 				KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyboard);
 
 				// start a timed task which checks current key presses. Less OS dependent this way
@@ -119,7 +119,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 			@Override
 			public void focusLost(FocusEvent e) {
-				System.out.println("focus lost");
+//				System.out.println("focus lost");
 				KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(keyboard);
 				pressedTask.shutdown();
 				pressedTask = null;
