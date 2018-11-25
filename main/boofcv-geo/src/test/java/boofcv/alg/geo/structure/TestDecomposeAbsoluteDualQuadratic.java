@@ -27,23 +27,37 @@ import org.ejml.ops.ConvertDMatrixStruct;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
 class TestDecomposeAbsoluteDualQuadratic {
+
+	@Test
+	public void decompose() {
+		fail("Implement");
+	}
+
+	@Test
+	public void recomputeQ() {
+		fail("Implement");
+	}
+
 	/**
-	 * Create a dual qquadratic from its definition and see if its correctly decomposed
+	 * Create a dual quadratic from its definition and see if its correctly decomposed
 	 */
 	@Test
-	public void definition() {
+	public void computeRectifyingHomography() {
 		DMatrixRMaj K = new DMatrixRMaj(new double[][]{{400,1.1,450},{0,420,460},{0,0,1}});
 
 		Equation eq =  new Equation(K,"K");
 		DMatrixRMaj Q = eq.process("I=diag([1,1,1,0])").
 				process("p=[2.1;0.4;-0.3]").
 				process("H=[K [0;0;0];-p'*K 1]").
-				process("Q=H*I*H'").lookupDDRM("Q");
+				process("Q=H*I*H'").
+				process("Q=Q*1e-3"). // change scale of Q to make it more interesting
+				lookupDDRM("Q");
 		DMatrixRMaj H = eq.lookupDDRM("H");
 
 		DMatrix4x4 _Q = new DMatrix4x4();
@@ -52,6 +66,8 @@ class TestDecomposeAbsoluteDualQuadratic {
 		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
 		assertTrue(alg.decompose(_Q));
 
-		assertTrue(MatrixFeatures_DDRM.isIdentical(H,alg.getH(), UtilEjml.TEST_F64));
+		DMatrixRMaj foundH = new DMatrixRMaj(4,4);
+		assertTrue(alg.computeRectifyingHomography(foundH));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(H,foundH, UtilEjml.TEST_F64));
 	}
 }

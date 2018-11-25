@@ -23,6 +23,7 @@ import boofcv.alg.geo.f.FundamentalToProjective;
 import boofcv.alg.geo.h.HomographyInducedStereo2Line;
 import boofcv.alg.geo.h.HomographyInducedStereo3Pts;
 import boofcv.alg.geo.h.HomographyInducedStereoLinePt;
+import boofcv.alg.geo.structure.DecomposeAbsoluteDualQuadratic;
 import boofcv.alg.geo.trifocal.TrifocalExtractGeometries;
 import boofcv.alg.geo.trifocal.TrifocalTransfer;
 import boofcv.struct.calib.CameraPinhole;
@@ -38,6 +39,9 @@ import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.Tuple2;
 import org.ejml.UtilEjml;
+import org.ejml.data.DMatrix3;
+import org.ejml.data.DMatrix3x3;
+import org.ejml.data.DMatrix4x4;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.SpecializedOps_DDRM;
@@ -1094,7 +1098,7 @@ public class MultiViewOps {
 	 * where P is the camera matrix, H is the homography, (K,R,t) are the intrinsic calibration matrix, rotation,
 	 * and translation
 	 *
-	 * @see PerspectiveOps#decomposeAbsDualQuadratic
+	 * @see MultiViewOps#computeRectifyingHomography
 	 * @see #decomposeMetricCamera(DMatrixRMaj, DMatrixRMaj, Se3_F64)
 	 *
 	 * @param cameraMatrix (Input) camera matrix. 3x4
@@ -1109,5 +1113,85 @@ public class MultiViewOps {
 		CommonOps_DDRM.mult(cameraMatrix,H,tmp);
 
 		MultiViewOps.decomposeMetricCamera(tmp,K,worldToCam);
+	}
+
+	/**
+	 * If the solution to the absolute quadratic was computed using a linear methods it will not exactly have
+	 * the required structure. This forces the structure to match.
+	 *
+	 * NOTE: Some of them modifications goes against the advice in [1], such as forcing 'w' to be positive definite.
+	 * In test images this appears to work well and enables auto calibration to work.
+	 *
+	 * <ol>
+	 * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
+	 * </ol>
+	 *
+	 * @param Q Approximate solution to absolute quadratic
+	 */
+	public static boolean enforceAbsoluteQuadraticConstraints( DMatrix4x4 Q , boolean zeroCenter, boolean zeroSkew ) {
+
+		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
+		if( !alg.decompose(Q) )
+			return false;
+
+		// force positive definite
+		DMatrix3x3 w = alg.getW();
+		w.a11 = Math.abs(w.a11);
+		w.a22 = Math.abs(w.a22);
+		w.a33 = Math.abs(w.a33);
+
+		if( zeroCenter ) {
+			w.a13 = w.a31 = 0;
+			w.a23 = w.a32 = 0;
+		}
+
+		if( zeroSkew ) {
+			w.a12 = w.a21 = 0;
+		}
+
+		alg.recomputeQ(Q);
+		return true;
+	}
+
+	/**
+	 * Decomposes the absolute quadratic to extract the rectifying homogrpahy H. This is used to go from
+	 * a projective to metric (calibrated) geometry. See pg 464 in [1].
+	 *
+	 * <p>Q = H*I*H<sup>T</sup></p>
+	 *
+	 * <ol>
+	 * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
+	 * </ol>
+	 *
+	 * @see DecomposeAbsoluteDualQuadratic
+	 *
+	 * @param Q (Input) Absolute quadratic. Typically found in auto calibration. Not modified.
+	 * @param H (Output) 4x4 rectifying homography.
+	 */
+	public static boolean computeRectifyingHomography(DMatrix4x4 Q , DMatrixRMaj H ) {
+		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
+		if( !alg.decompose(Q) )
+			return false;
+
+		return alg.computeRectifyingHomography(H);
+	}
+
+	/**
+	 * Decomposes the absolute dual quadratic into the following submatrices: Q=[w -w*p;-p'*w p'*w*p]
+	 *
+	 * @see DecomposeAbsoluteDualQuadratic
+	 *
+	 * @param Q (Input) Absolute quadratic. Typically found in auto calibration. Not modified.
+	 * @param w (Output) 3x3 symmetric matrix
+	 * @param p (Output) 3x1 vector
+	 * @return true if successful or false if it failed
+	 */
+	public static boolean decomposeAbsDualQuadratic( DMatrix4x4 Q , DMatrix3x3 w , DMatrix3 p ) {
+		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
+		if( !alg.decompose(Q) )
+			return false;
+		w.set(alg.getW());
+		p.set(alg.getP());
+		return true;
 	}
 }

@@ -43,8 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -821,5 +820,20 @@ public class TestMultiViewOps {
 		assertTrue(MatrixFeatures_DDRM.isIdentical(K,foundK,UtilEjml.TEST_F64));
 		assertTrue(MatrixFeatures_DDRM.isIdentical(T.R,foundT.R,UtilEjml.TEST_F64));
 		assertEquals(0,T.T.distance(foundT.T), UtilEjml.TEST_F64);
+	}
+
+	@Test
+	public void enforceAbsoluteQuadraticConstraints() {
+		fail("Implement");
+	}
+
+	@Test
+	public void decomposeAbsDualQuadratic() {
+		fail("Implement");
+	}
+
+	@Test
+	public void computeRectifyingHomography() {
+		fail("Implement");
 	}
 }

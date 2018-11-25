@@ -19,6 +19,7 @@
 package boofcv.alg.geo.selfcalib;
 
 import boofcv.alg.geo.GeometricResult;
+import boofcv.alg.geo.MultiViewOps;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix3;
 import org.ejml.data.DMatrix3x3;
@@ -132,6 +133,9 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 		// Examine the null space to find the values of Q
 		// Then compute the solution for each view
 		extractSolutionForQ(Q);
+		if( !MultiViewOps.enforceAbsoluteQuadraticConstraints(Q,true,zeroSkew) ) {
+			return GeometricResult.SOLVE_FAILED;
+		}
 		computeSolutions(Q);
 
 		// determine if the solution is good by looking at two smallest singular values
@@ -139,7 +143,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 		double sv[] = svd.getSingularValues();
 		Arrays.sort(sv);
 		if( singularThreshold*sv[1] <= sv[0] )  {
-			System.out.println("ratio = "+(sv[0]/sv[1]));
+//			System.out.println("ratio = "+(sv[0]/sv[1]));
 			return GeometricResult.GEOMETRY_POOR;
 		}
 
@@ -159,6 +163,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 
 		// Convert the solution into a fixed sized matrix because it's easier to read
 		encodeQ(Q,nv.data);
+		// TODO enforce structure
 	}
 
 	/**

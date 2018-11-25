@@ -109,6 +109,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	// camera calibration matrix of rectified images
 	private DMatrixRMaj rectK;
+	private DMatrixRMaj rectR;
 
 	// makes sure process has been called before render disparity is done
 	// There was a threading issue where disparitySettingChange() created a new alg() but render was called before
@@ -192,7 +193,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 				DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 
 				double baseline = calib.getRightToLeft().getT().norm();
-				d2c.configure(baseline, rectK, leftRectToPixel, control.minDisparity,control.maxDisparity);
+				d2c.configure(baseline, rectK,rectR, leftRectToPixel, control.minDisparity,control.maxDisparity);
 				d2c.process(activeAlg.getDisparity(),colorLeft);
 
 				CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(
@@ -254,6 +255,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		DMatrixRMaj rect1 = rectifyAlg.getRect1();
 		DMatrixRMaj rect2 = rectifyAlg.getRect2();
 		rectK = rectifyAlg.getCalibrationMatrix();
+		rectR = rectifyAlg.getRectifiedRotation();
 
 		// adjust view to maximize viewing area while not including black regions
 		RectifyImageOps.allInsideLeft(calib.left, rect1, rect2, rectK);

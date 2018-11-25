@@ -171,7 +171,8 @@ public class RectifyCalibrated {
 	}
 
 	/**
-	 * Rotation matrix of rectified coordinate system
+	 * Rotation matrix of rectified coordinate system. To convert back into left camera reference frame multiply
+	 * the triangulated point by the transpose of this matrix
 	 *
 	 * @return Rotation matrix
 	 */

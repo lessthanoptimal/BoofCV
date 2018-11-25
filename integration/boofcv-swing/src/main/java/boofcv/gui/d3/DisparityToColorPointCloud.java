@@ -24,10 +24,14 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F32;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.ops.ConvertMatrixData;
 
 import java.awt.image.BufferedImage;
 
@@ -53,6 +57,7 @@ public class DisparityToColorPointCloud {
 	float focalLengthY;
 	float centerX;
 	float centerY;
+	FMatrixRMaj rectifiedR = new FMatrixRMaj(3,3);
 
 	// minimum disparity
 	int minDisparity;
@@ -75,6 +80,8 @@ public class DisparityToColorPointCloud {
 	// storage for color image coordinate
 	Point2D_F64 colorPt = new Point2D_F64();
 
+	Point3D_F32 p = new Point3D_F32();
+
 	/**
 	 * Stereo and intrinsic camera parameters
 	 * @param baseline Stereo baseline (world units)
@@ -84,10 +91,11 @@ public class DisparityToColorPointCloud {
 	 * @param maxDisparity Maximum disparity that's computed (pixels)
 	 */
 	public void configure(double baseline,
-						  DMatrixRMaj K,
+						  DMatrixRMaj K, DMatrixRMaj rectifiedR,
 						  Point2Transform2_F64 rectifiedToColor,
 						  int minDisparity, int maxDisparity) {
 		this.K = K;
+		ConvertMatrixData.convert(rectifiedR,this.rectifiedR);
 		this.rectifiedToColor = rectifiedToColor;
 		this.baseline = (float)baseline;
 		this.focalLengthX = (float)K.get(0,0);
@@ -120,7 +128,6 @@ public class DisparityToColorPointCloud {
 
 	private void process(GrayU8 disparity , BufferedImage color ) {
 
-
 		for( int pixelY = 0; pixelY < disparity.height; pixelY++ ) {
 			int index = disparity.startIndex + disparity.stride*pixelY;
 
@@ -137,14 +144,17 @@ public class DisparityToColorPointCloud {
 
 				// Note that this will be in the rectified left camera's reference frame.
 				// An additional rotation is needed to put it into the original left camera frame.
-				float z = baseline*focalLengthX/value;
-				float x = z*(pixelX - centerX)/focalLengthX;
-				float y = z*(pixelY - centerY)/focalLengthY;
+				p.z = baseline*focalLengthX/value;
+				p.x = p.z*(pixelX - centerX)/focalLengthX;
+				p.y = p.z*(pixelY - centerY)/focalLengthY;
+
+				// Bring it back into left camera frame
+				GeometryMath_F32.multTran(rectifiedR,p,p);
 
 				cloudRgb.add(getColor(disparity, color, pixelX, pixelY));
-				cloudXyz.add(x);
-				cloudXyz.add(y);
-				cloudXyz.add(z);
+				cloudXyz.add(p.x);
+				cloudXyz.add(p.y);
+				cloudXyz.add(p.z);
 			}
 		}
 	}
@@ -165,14 +175,17 @@ public class DisparityToColorPointCloud {
 				if( value == 0 )
 					continue;
 
-				float z = baseline*focalLengthX/value;
-				float x = z*(pixelX - centerX)/focalLengthX;
-				float y = z*(pixelY - centerY)/focalLengthY;
+				p.z = baseline*focalLengthX/value;
+				p.x = p.z*(pixelX - centerX)/focalLengthX;
+				p.y = p.z*(pixelY - centerY)/focalLengthY;
+
+				// Bring it back into left camera frame
+				GeometryMath_F32.multTran(rectifiedR,p,p);
 
 				cloudRgb.add(getColor(disparity, color, pixelX, pixelY));
-				cloudXyz.add(x);
-				cloudXyz.add(y);
-				cloudXyz.add(z);
+				cloudXyz.add(p.x);
+				cloudXyz.add(p.y);
+				cloudXyz.add(p.z);
 			}
 		}
 	}

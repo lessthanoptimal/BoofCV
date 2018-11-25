@@ -115,12 +115,13 @@ public class ExampleTrifocalStereo {
 
 		// Rectify and remove lens distortion for stereo processing
 		DMatrixRMaj rectifiedK = new DMatrixRMaj(3, 3);
+		DMatrixRMaj rectifiedR = new DMatrixRMaj(3, 3);
 
 		// rectify a colored image
 		Planar<GrayU8> rectColorLeft = colorLeft.createSameShape();
 		Planar<GrayU8> rectColorRight = colorLeft.createSameShape();
 		rectifyImages(colorLeft, colorRight, leftToRight, intrinsicLeft,intrinsicRight,
-				rectColorLeft, rectColorRight, rectifiedK);
+				rectColorLeft, rectColorRight, rectifiedK,rectifiedR);
 
 		GrayU8 rectifiedLeft = distortedLeft.createSameShape();
 		GrayU8 rectifiedRight = distortedRight.createSameShape();
@@ -151,17 +152,13 @@ public class ExampleTrifocalStereo {
 		ShowImages.showWindow(new RectifiedPairPanel(true, outLeft, outRight), "Rectification",true);
 		ShowImages.showWindow(visualized, "Disparity",true);
 
-		showPointCloud(disparity, outLeft, leftToRight, rectifiedK, minDisparity, maxDisparity);
+		showPointCloud(disparity, outLeft, leftToRight, rectifiedK,rectifiedR, minDisparity, maxDisparity);
 	}
 
 	public static void main(String[] args) {
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_03.png"));
-
-//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bowl_01.png"));
-//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bowl_02.png"));
-//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bowl_03.png"));
 
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/chicken01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/chicken02.png"));
@@ -171,76 +168,81 @@ public class ExampleTrifocalStereo {
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/books02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/books03.png"));
 
-		// TODO debug this situation. I think rectification is messing it up and breaking stereo
-//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview01.png"));
-//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview02.png"));
-//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview03.png"));
-
-		// todo same deal with this one
-//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip01.png"));
-//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip02.png"));
-//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip03.png"));
-
-		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/turkey01.png"));
-		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/turkey02.png"));
-		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/turkey03.png"));
-//
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/pumpkintop01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/pumpkintop02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/pumpkintop03.png"));
+
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bowl_01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bowl_02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bowl_03.png"));
+
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/triflowers01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/triflowers02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/triflowers03.png"));
 
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/pebbles01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/pebbles02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/pebbles03.png"));
 
-		// TODO failed on this
-//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/deer01.png"));
-//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/deer02.png"));
-//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/deer03.png"));
-
-		// TODO Failed!
-//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/seal01.png"));
-//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/seal02.png"));
-//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/seal03.png"));
-
-		// TODO Failed!
-//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/skull01.png"));
-//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/skull02.png"));
-//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/skull03.png"));
-
-		// TODO Failed
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bobcats01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bobcats02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bobcats03.png"));
 
-		// TODO Poor 3D
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/deer01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/deer02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/deer03.png"));
+
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/seal01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/seal02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/seal03.png"));
+
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/puddle01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/puddle02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/puddle03.png"));
 
-		// TODO failed
-//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/barrel01.png"));
-//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/barrel02.png"));
-//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/barrel03.png"));
+		// TODO bad focal length
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_03.png"));
 
-		// TODO Poor Rectification
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/turkey01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/turkey02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/turkey03.png"));
+
+		// TODO Rectified shifted wrong direction
+		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview01.png"));
+		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview02.png"));
+		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview03.png"));
+
+		// TODO Rectified shifted wrong direction
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip03.png"));
+
+		// TODO Rectified shifted wrong direction
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/skull01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/skull02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/skull03.png"));
+
+		// TODO Rectified shifted wrong direction
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/library01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/library02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/library03.png"));
 
-		// TODO Failed
+		// TODO Rectified shifted wrong direction
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/pelican01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/pelican02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/pelican03.png"));
 
-		// TODO rectification swapped sides!
+		// TODO Rectified shifted wrong direction
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/eggs01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/eggs02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/eggs03.png"));
 
-//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/triflowers01.png"));
-//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/triflowers02.png"));
-//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/triflowers03.png"));
+		// TODO Rectified shifted wrong direction
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/barrel01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/barrel02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/barrel03.png"));
 
 		Planar<GrayU8> color01 = ConvertBufferedImage.convertFrom(buff01,true,ImageType.pl(3,GrayU8.class));
 		Planar<GrayU8> color02 = ConvertBufferedImage.convertFrom(buff02,true,ImageType.pl(3,GrayU8.class));
@@ -314,7 +316,6 @@ public class ExampleTrifocalStereo {
 		FastQueue<AssociatedTriple> associated = new FastQueue<>(AssociatedTriple.class,true);
 		for (int i = 0; i < assoiatedIdx.size; i++) {
 			AssociatedTripleIndex p = assoiatedIdx.get(i);
-
 			associated.grow().set(locations01.get(p.a),locations02.get(p.b),locations03.get(p.c));
 		}
 		ransac.process(associated.toList());
@@ -326,7 +327,8 @@ public class ExampleTrifocalStereo {
 
 		// estimate using all the inliers
 		Estimate1ofTrifocalTensor trifocalEstimator = FactoryMultiView.trifocal_1(EnumTrifocal.LINEAR_7,-1);
-		trifocalEstimator.process(inliers,model);
+		if( !trifocalEstimator.process(inliers,model) )
+			throw new RuntimeException("Estimator failed");
 
 		System.out.println("Estimating calib");
 
@@ -375,7 +377,7 @@ public class ExampleTrifocalStereo {
 
 		// convert camera matrix from projective to metric
 		DMatrixRMaj H = new DMatrixRMaj(4,4);
-		PerspectiveOps.decomposeAbsDualQuadratic(selfcalib.getQ(),H);
+		MultiViewOps.computeRectifyingHomography(selfcalib.getQ(),H);
 
 		DMatrixRMaj K = new DMatrixRMaj(3,3);
 		List<Se3_F64> worldToView = new ArrayList<>();
@@ -497,7 +499,7 @@ public class ExampleTrifocalStereo {
 		intrinsic01.fsetK(cp.f,cp.f,0,cx,cy,width,height);
 		intrinsic01.fsetRadial(cp.k1,cp.k2);
 
-		cp = structure.getCameras()[0].getModel();
+		cp = structure.getCameras()[1].getModel();
 		CameraPinholeRadial intrinsic02 = new CameraPinholeRadial();
 		intrinsic02.fsetK(cp.f,cp.f,0,cx,cy,width,height);
 		intrinsic02.fsetRadial(cp.k1,cp.k2);
