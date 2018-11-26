@@ -11,6 +11,7 @@ Version : 0.32
   * Colorized code
   * Updated detect line demo
   * Updated image enhance demo
+  * Three view stereo and self calibration
 - Applications
   * All applications have a GUI
   * Centralized GUI for launching
@@ -26,7 +27,7 @@ Version : 0.32
   * Fixed bug in Linear Trifocal Tensor estimator
   * Decompose absolute quadratic
   * Convert projective to metric camera matrix
-  * fixed bug in decomposeMetricCamera
+  * Fixed bug in decomposeMetricCamera
 - ImageInterleaved
   * setTo() changes number of bands if needed
   * Improved speed of Interleaved to Gray average
@@ -36,17 +37,13 @@ Version : 0.32
   * Bunch of bug fixes
   * Extracts the full pinhole calibration matrix from camera characteristics
 
-TODO Uncalibrated scene reconstruction
-
 TODO Given F21 F31 F32 return  a concistent P1 P2
      P301 yellow book
 TODO compute camera matrices directly from trilinear constraint? P 274
 
-TODO Attempt trifocal tensor based stereo
-
 TODO Remove dependency on OpenCV in Applications to reduce file size
 
-- TODO Self calibration
+- TODO Self calibration example
    - scene reconstruction
    - compared to regular
 - TODO Scene Reconstruction
