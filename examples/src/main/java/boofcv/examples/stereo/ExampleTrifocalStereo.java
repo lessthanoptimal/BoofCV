@@ -172,10 +172,6 @@ public class ExampleTrifocalStereo {
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/pumpkintop02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/pumpkintop03.png"));
 
-//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bowl_01.png"));
-//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bowl_02.png"));
-//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bowl_03.png"));
-
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/triflowers01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/triflowers02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/triflowers03.png"));
@@ -200,6 +196,14 @@ public class ExampleTrifocalStereo {
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/puddle02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/puddle03.png"));
 
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/barrel01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/barrel02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/barrel03.png"));
+
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview03.png"));
+
 		// TODO bad focal length
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_02.png"));
@@ -209,17 +213,20 @@ public class ExampleTrifocalStereo {
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/turkey02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/turkey03.png"));
 
-		// TODO Rectified shifted wrong direction
-		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview01.png"));
-		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview02.png"));
-		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview03.png"));
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bowl_01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bowl_02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bowl_03.png"));
+
+		// The bad rectification appears to be because of bad pose estimation
 
 		// TODO Rectified shifted wrong direction
-//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip01.png"));
-//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip02.png"));
-//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip03.png"));
+		//      transposing R fixes this one, plus giving a better estimate for f
+		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip01.png"));
+		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip02.png"));
+		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip03.png"));
 
 		// TODO Rectified shifted wrong direction
+		//      again transposing R
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/skull01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/skull02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/skull03.png"));
@@ -234,15 +241,10 @@ public class ExampleTrifocalStereo {
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/pelican02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/pelican03.png"));
 
-		// TODO Rectified shifted wrong direction
+		// TODO Distorted Reconstruction
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/eggs01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/eggs02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/eggs03.png"));
-
-		// TODO Rectified shifted wrong direction
-//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/barrel01.png"));
-//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/barrel02.png"));
-//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/barrel03.png"));
 
 		Planar<GrayU8> color01 = ConvertBufferedImage.convertFrom(buff01,true,ImageType.pl(3,GrayU8.class));
 		Planar<GrayU8> color02 = ConvertBufferedImage.convertFrom(buff02,true,ImageType.pl(3,GrayU8.class));
@@ -342,7 +344,6 @@ public class ExampleTrifocalStereo {
 		selfcalib.addCameraMatrix(P2);
 		selfcalib.addCameraMatrix(P3);
 
-		System.out.println("Refining auto calib");
 		GeometricResult result = selfcalib.solve();
 		if(GeometricResult.SOLVE_FAILED == result)
 			throw new RuntimeException("Egads "+result);
@@ -356,6 +357,7 @@ public class ExampleTrifocalStereo {
 		}
 
 		// TODO figure out what's wrong with refine
+//		System.out.println("Refining auto calib");
 //		SelfCalibrationRefineDualQuadratic refineDual = new SelfCalibrationRefineDualQuadratic();
 //		refineDual.setZeroPrinciplePoint(true);
 //		refineDual.setFixedAspectRatio(true);
@@ -375,9 +377,11 @@ public class ExampleTrifocalStereo {
 			System.out.println("refine fx="+r.fx+" fy="+r.fy+" skew="+r.skew);
 		}
 
+		System.out.println("Projective to metric");
 		// convert camera matrix from projective to metric
 		DMatrixRMaj H = new DMatrixRMaj(4,4);
-		MultiViewOps.computeRectifyingHomography(selfcalib.getQ(),H);
+		if( !MultiViewOps.computeRectifyingHomography(selfcalib.getQ(),H) )
+			throw new RuntimeException("Projective to metric failed");
 
 		DMatrixRMaj K = new DMatrixRMaj(3,3);
 		List<Se3_F64> worldToView = new ArrayList<>();

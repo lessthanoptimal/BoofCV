@@ -624,38 +624,32 @@ public class TestMultiViewOps {
 
 		// try a bunch of different matrices to try to exercise all possible options
 		for (int i = 0; i < 50; i++) {
-			DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
+			Se3_F64 worldToView = SpecialEuclideanOps_F64.eulerXyz(
+					rand.nextGaussian(),rand.nextGaussian(),rand.nextGaussian(),
 					rand.nextGaussian(),rand.nextGaussian(),rand.nextGaussian(),null);
-			Vector3D_F64 T = new Vector3D_F64(rand.nextGaussian(),rand.nextGaussian(),rand.nextGaussian());
 
-			DMatrixRMaj P = new DMatrixRMaj(3,4);
-			DMatrixRMaj KP = new DMatrixRMaj(3,4);
-			CommonOps_DDRM.insert(R,P,0,0);
-			P.set(0,3,T.x);
-			P.set(1,3,T.y);
-			P.set(2,3,T.z);
-
-			CommonOps_DDRM.mult(K,P,KP);
+			DMatrixRMaj P = PerspectiveOps.createCameraMatrix(worldToView.R,worldToView.T,K,null);
 
 			// The camera matrix is often only recovered up to a scale factor
-			CommonOps_DDRM.scale(rand.nextGaussian(),KP);
+			CommonOps_DDRM.scale(rand.nextGaussian(),P);
 
 			// decompose the projection matrix
 			DMatrixRMaj foundK = new DMatrixRMaj(3,3);
-			Se3_F64 foundPose = new Se3_F64();
-			MultiViewOps.decomposeMetricCamera(KP, foundK, foundPose);
+			Se3_F64 foundWorldToView = new Se3_F64();
+			MultiViewOps.decomposeMetricCamera(P, foundK, foundWorldToView);
 
 			// see if it extract the input
-			assertEquals(1,CommonOps_DDRM.det(foundPose.R), UtilEjml.TEST_F64);
+			assertEquals(1,CommonOps_DDRM.det(foundWorldToView.R), UtilEjml.TEST_F64);
 			assertTrue(MatrixFeatures_DDRM.isIdentical(K,foundK, UtilEjml.TEST_F64));
-			assertTrue(MatrixFeatures_DDRM.isIdentical(R,foundPose.R, UtilEjml.TEST_F64));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(worldToView.R,foundWorldToView.R, UtilEjml.TEST_F64));
 
+			Vector3D_F64 T = worldToView.T;
 			double sT = T.norm();
-			double sTp = foundPose.T.norm();
+			double sTp = foundWorldToView.T.norm();
 
-			assertEquals(T.x, foundPose.T.x*sT/sTp, UtilEjml.TEST_F64);
-			assertEquals(T.y, foundPose.T.y*sT/sTp, UtilEjml.TEST_F64);
-			assertEquals(T.z, foundPose.T.z*sT/sTp, UtilEjml.TEST_F64);
+			assertEquals(T.x, foundWorldToView.T.x*sT/sTp, UtilEjml.TEST_F64);
+			assertEquals(T.y, foundWorldToView.T.y*sT/sTp, UtilEjml.TEST_F64);
+			assertEquals(T.z, foundWorldToView.T.z*sT/sTp, UtilEjml.TEST_F64);
 		}
 	}
 
