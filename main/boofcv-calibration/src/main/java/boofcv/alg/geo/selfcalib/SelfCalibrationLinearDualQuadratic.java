@@ -131,12 +131,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 		}
 
 		// Examine the null space to find the values of Q
-		// Then compute the solution for each view
 		extractSolutionForQ(Q);
-		if( !MultiViewOps.enforceAbsoluteQuadraticConstraints(Q,true,zeroSkew) ) {
-			return GeometricResult.SOLVE_FAILED;
-		}
-		computeSolutions(Q);
 
 		// determine if the solution is good by looking at two smallest singular values
 		// If there isn't a steep drop it either isn't singular or more there is more than 1 singular value
@@ -146,6 +141,12 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 //			System.out.println("ratio = "+(sv[0]/sv[1]));
 			return GeometricResult.GEOMETRY_POOR;
 		}
+
+		// Enforce constraints and solve for each view
+		if( !MultiViewOps.enforceAbsoluteQuadraticConstraints(Q,true,zeroSkew) ) {
+			return GeometricResult.SOLVE_FAILED;
+		}
+		computeSolutions(Q);
 
 		if( solutions.size() != N ) {
 			return GeometricResult.SOLUTION_NAN;
