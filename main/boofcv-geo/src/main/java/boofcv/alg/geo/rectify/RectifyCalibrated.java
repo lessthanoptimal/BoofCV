@@ -98,7 +98,7 @@ public class RectifyCalibrated {
 		SimpleMatrix c2 = R2.transpose().mult(T2.scale(-1));
 
 		// new coordinate system axises
-		selectAxises(R1, c1, c2);
+		selectAxises(R1,R2, c1, c2);
 
 		// new extrinsic parameters, rotation matrix with rows of camera 1's coordinate system in
 		// the world frame
@@ -125,7 +125,7 @@ public class RectifyCalibrated {
 	/**
 	 * Selects axises of new coordinate system
 	 */
-	private void selectAxises(SimpleMatrix R, SimpleMatrix c1, SimpleMatrix c2) {
+	private void selectAxises(SimpleMatrix R1, SimpleMatrix R2, SimpleMatrix c1, SimpleMatrix c2) {
 		// --------- Compute the new x-axis
 		v1.set(c2.get(0) - c1.get(0), c2.get(1) - c1.get(1), c2.get(2) - c1.get(2));
 		v1.normalize();
@@ -137,7 +137,10 @@ public class RectifyCalibrated {
 		// would be to make it perpendicular, resulting in an unusable rectification.
 
 		// extract old z-axis from rotation matrix
-		Vector3D_F64 oldZ = new Vector3D_F64(R.get(2,0), R.get(2,1), R.get(2,2));
+		Vector3D_F64 oldZ = new Vector3D_F64(
+				R1.get(2,0)+R2.get(2,0),
+				R1.get(2,1)+R2.get(2,1),
+				R1.get(2,2)+R2.get(2,2));
 		GeometryMath_F64.cross(oldZ, v1, v2);
 		v2.normalize();
 
@@ -171,7 +174,8 @@ public class RectifyCalibrated {
 	}
 
 	/**
-	 * Rotation matrix of rectified coordinate system
+	 * Rotation matrix of rectified coordinate system. To convert back into left camera reference frame multiply
+	 * the triangulated point by the transpose of this matrix
 	 *
 	 * @return Rotation matrix
 	 */

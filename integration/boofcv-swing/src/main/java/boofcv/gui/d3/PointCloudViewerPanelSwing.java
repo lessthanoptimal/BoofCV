@@ -123,6 +123,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 				KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(keyboard);
 				pressedTask.shutdown();
 				pressedTask = null;
+				resetKey();
 			}
 		});
 	}
@@ -130,6 +131,11 @@ public class PointCloudViewerPanelSwing extends JPanel
 	public PointCloudViewerPanelSwing( float hfov, float keyStepSize) {
 		this(keyStepSize);
 		setHorizontalFieldOfView(hfov);
+	}
+
+	public void resetKey() {
+		pressed.clear();
+		shiftPressed = false;
 	}
 
 	synchronized public void setWorldToCamera( Se3_F32 worldToCamera ) {

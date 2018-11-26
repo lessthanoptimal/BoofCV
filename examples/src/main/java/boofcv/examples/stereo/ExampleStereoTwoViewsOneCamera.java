@@ -105,10 +105,12 @@ public class ExampleStereoTwoViewsOneCamera {
 
 		// Rectify and remove lens distortion for stereo processing
 		DMatrixRMaj rectifiedK = new DMatrixRMaj(3, 3);
+		DMatrixRMaj rectifiedR = new DMatrixRMaj(3, 3);
 		GrayU8 rectifiedLeft = distortedLeft.createSameShape();
 		GrayU8 rectifiedRight = distortedRight.createSameShape();
 
-		rectifyImages(distortedLeft, distortedRight, leftToRight, intrinsic,intrinsic, rectifiedLeft, rectifiedRight, rectifiedK);
+		rectifyImages(distortedLeft, distortedRight, leftToRight, intrinsic,intrinsic,
+				rectifiedLeft, rectifiedRight, rectifiedK,rectifiedR);
 
 		// compute disparity
 		StereoDisparity<GrayS16, GrayF32> disparityAlg =
@@ -134,7 +136,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		ShowImages.showWindow(new RectifiedPairPanel(true, outLeft, outRight), "Rectification",true);
 		ShowImages.showWindow(visualized, "Disparity",true);
 
-		showPointCloud(disparity, outLeft, leftToRight, rectifiedK, minDisparity, maxDisparity);
+		showPointCloud(disparity, outLeft, leftToRight, rectifiedK,rectifiedR, minDisparity, maxDisparity);
 
 		System.out.println("Total found " + matchedCalibrated.size());
 		System.out.println("Total Inliers " + inliers.size());
@@ -205,7 +207,8 @@ public class ExampleStereoTwoViewsOneCamera {
 					   CameraPinholeRadial intrinsicRight,
 					   T rectifiedLeft,
 					   T rectifiedRight,
-					   DMatrixRMaj rectifiedK) {
+					   DMatrixRMaj rectifiedK,
+					   DMatrixRMaj rectifiedR) {
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 		// original camera calibration matrices
@@ -217,6 +220,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		// rectification matrix for each image
 		DMatrixRMaj rect1 = rectifyAlg.getRect1();
 		DMatrixRMaj rect2 = rectifyAlg.getRect2();
+		rectifiedR.set(rectifyAlg.getRectifiedRotation());
 
 		// New calibration matrix,
 		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
@@ -269,12 +273,12 @@ public class ExampleStereoTwoViewsOneCamera {
 	 * Show results as a point cloud
 	 */
 	public static void showPointCloud(ImageGray disparity, BufferedImage left,
-									  Se3_F64 motion, DMatrixRMaj rectifiedK ,
+									  Se3_F64 motion, DMatrixRMaj rectifiedK , DMatrixRMaj rectifiedR,
 									  int minDisparity, int maxDisparity)
 	{
 		DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 		double baseline = motion.getT().norm();
-		d2c.configure(baseline, rectifiedK, new DoNothing2Transform2_F64(), minDisparity, maxDisparity);
+		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(), minDisparity, maxDisparity);
 		d2c.process(disparity,left);
 
 		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK,disparity.width,disparity.height,null);

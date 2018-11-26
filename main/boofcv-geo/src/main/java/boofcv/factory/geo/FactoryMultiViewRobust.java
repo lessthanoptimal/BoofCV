@@ -20,6 +20,7 @@ package boofcv.factory.geo;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.Estimate1ofPnP;
+import boofcv.abst.geo.Estimate1ofTrifocalTensor;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.geo.fitting.DistanceFromModelResidual;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
@@ -29,7 +30,9 @@ import boofcv.alg.geo.f.FundamentalResidualSampson;
 import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
 import boofcv.alg.geo.robust.*;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.Point2D3D;
+import boofcv.struct.geo.TrifocalTensor;
 import georegression.fitting.homography.ModelManagerHomography2D_F64;
 import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.homography.Homography2D_F64;
@@ -378,5 +381,40 @@ public class FactoryMultiViewRobust {
 
 		return new RansacMultiView<>
 				(ransac.randSeed, manager, modelFitter, distance, ransac.maxIterations, ransacTol);
+	}
+
+	/**
+	 * Robust RANSAC based estimator for
+	 *
+	 * @see FactoryMultiView#trifocal_1(EnumTrifocal, int)
+	 *
+	 * @param trifocal Configuration for trifocal tensor calculation
+	 * @param ransac Configuration for RANSAC
+	 * @return RANSAC
+	 */
+	public static Ransac<TrifocalTensor, AssociatedTriple>
+	trifocalRansac( @Nullable ConfigTrifocal trifocal , @Nonnull ConfigRansac ransac ) {
+		if( trifocal == null )
+			trifocal = new ConfigTrifocal();
+		else
+			trifocal.checkValidity();
+
+		double ransacTol;
+		DistanceFromModel<TrifocalTensor,AssociatedTriple> distance;
+
+		switch( trifocal.error ) {
+			case POINT_TRANSFER:
+				ransacTol = 2.0*ransac.inlierThreshold*ransac.inlierThreshold;
+				distance = new DistanceTrifocalTransferSq();
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown error model "+trifocal.error);
+		}
+
+		Estimate1ofTrifocalTensor estimator = FactoryMultiView.trifocal_1(trifocal.which,trifocal.maxIterations);
+		ModelManager<TrifocalTensor> manager = new ManagerTrifocalTensor();
+		ModelGenerator<TrifocalTensor,AssociatedTriple> generator = new GenerateTrifocalTensor(estimator);
+
+		return new Ransac<>(ransac.randSeed, manager, generator, distance, ransac.maxIterations, ransacTol);
 	}
 }
