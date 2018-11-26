@@ -22,6 +22,7 @@ import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_F32;
 
 /**
  * Applies distortion to a coordinate then samples the image
@@ -35,6 +36,8 @@ public class InterpolatePixelDistortS<T extends ImageGray<T>>
 	protected InterpolatePixelS<T> interpolate;
 	protected Point2Transform2_F32 distorter;
 
+	Point2D_F32 p = new Point2D_F32();
+
 	public InterpolatePixelDistortS(InterpolatePixelS<T> interpolate,
 									Point2Transform2_F32 distorter)
 	{
@@ -44,12 +47,14 @@ public class InterpolatePixelDistortS<T extends ImageGray<T>>
 
 	@Override
 	public float get(float x, float y) {
-		return interpolate.get(x,y);
+		distorter.compute(x,y,p);
+		return interpolate.get(p.x,p.y);
 	}
 
 	@Override
 	public float get_fast(float x, float y) {
-		return interpolate.get_fast(x, y);
+		distorter.compute(x,y,p);
+		return interpolate.get_fast(p.x,p.y);
 	}
 
 	@Override
