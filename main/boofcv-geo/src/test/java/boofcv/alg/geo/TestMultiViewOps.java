@@ -817,6 +817,11 @@ public class TestMultiViewOps {
 	}
 
 	@Test
+	public void projectiveToMetricKnownK() {
+		fail("Implement");
+	}
+
+	@Test
 	public void enforceAbsoluteQuadraticConstraints() {
 		fail("Implement");
 	}

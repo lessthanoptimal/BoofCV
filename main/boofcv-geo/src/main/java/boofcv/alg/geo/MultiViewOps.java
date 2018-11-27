@@ -43,10 +43,12 @@ import org.ejml.data.DMatrix3;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrix4x4;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.fixed.CommonOps_DDF4;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.SpecializedOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.QRDecomposition;
+import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -1112,7 +1114,50 @@ public class MultiViewOps {
 		DMatrixRMaj tmp = new DMatrixRMaj(3,4);
 		CommonOps_DDRM.mult(cameraMatrix,H,tmp);
 
+		tmp.print();
 		MultiViewOps.decomposeMetricCamera(tmp,K,worldToView);
+	}
+
+	/**
+	 * Convert the projective camera matrix into a metric transform given the rectifying homography and a
+	 * known calibration matrix.
+	 * @param cameraMatrix (Input) camera matrix. 3x4
+	 * @param H (Input) Rectifying homography. 4x4
+	 * @param K (Input) Known calibration matrix
+	 * @param worldToView (Output) transform from world to camera view
+	 */
+	public static void projectiveToMetricKnownK( DMatrixRMaj cameraMatrix ,
+												 DMatrixRMaj H , DMatrixRMaj K,
+												 Se3_F64 worldToView )
+	{
+		DMatrixRMaj tmp = new DMatrixRMaj(3,4);
+		CommonOps_DDRM.mult(cameraMatrix,H,tmp);
+
+		DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.invert(K,K_inv);
+
+		DMatrixRMaj P = new DMatrixRMaj(3,4);
+		CommonOps_DDRM.mult(K_inv,tmp,P);
+
+		CommonOps_DDRM.extract(P,0,0,worldToView.R);
+		worldToView.T.x = P.get(0,3);
+		worldToView.T.y = P.get(1,3);
+		worldToView.T.z = P.get(2,3);
+
+		SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(true,true,true);
+
+		DMatrixRMaj R = worldToView.R;
+		if( !svd.decompose(R))
+			throw new RuntimeException("SVD Failed");
+
+		CommonOps_DDRM.multTransB(svd.getU(null,false),svd.getV(null,false),R);
+
+		// determinant should be +1
+		double det = CommonOps_DDRM.det(R);
+		if( det < 0 ) {
+			CommonOps_DDRM.scale(-1,R);
+			worldToView.T.scale(-1);
+		}
 	}
 
 	/**
@@ -1129,6 +1174,10 @@ public class MultiViewOps {
 	 * @param Q Approximate solution to absolute quadratic
 	 */
 	public static boolean enforceAbsoluteQuadraticConstraints( DMatrix4x4 Q , boolean zeroCenter, boolean zeroSkew ) {
+
+		// see if it's potentially just off by a sign
+		if( Q.a33 < 0 )
+			CommonOps_DDF4.scale(-1,Q);
 
 		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
 		if( !alg.decompose(Q) )

@@ -69,6 +69,7 @@ Less High Priority Next Release
     https://xuchi.weebly.com/rpnp.html
   * MLPNP - A REAL-TIME MAXIMUM LIKELIHOOD SOLUTION TO THE PERSPECTIVE-N-POINT PROBLEM
   * P4P-L A general solution to the P4P problem for camera with unknown focal length
+  * 6-point trifocal tensor p401
 
 - Contour
   * Encode the direction of the next pixel in the contour instead of the pixel directly.

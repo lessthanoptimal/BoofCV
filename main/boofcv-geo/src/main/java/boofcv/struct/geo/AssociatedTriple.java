@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,6 +71,25 @@ public class AssociatedTriple {
 		AssociatedTriple r = new AssociatedTriple();
 		r.set(this);
 		return r;
+	}
+
+	public Point2D_F64 get( int i ) {
+		switch(i) {
+			case 0: return p1;
+			case 1: return p2;
+			case 2: return p3;
+		}
+		throw new IllegalArgumentException("index must be 0,1,2");
+	}
+
+	public void set( int i , double x , double y ) {
+		switch(i) {
+			case 0: p1.set(x,y);break;
+			case 1: p2.set(x,y);break;
+			case 2: p3.set(x,y);break;
+			default:
+				throw new IllegalArgumentException("index must be 0,1,2");
+		}
 	}
 
 	public void print() {
