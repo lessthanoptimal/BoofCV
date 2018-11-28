@@ -39,10 +39,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestScaleSceneStructure {
+class TestScaleSceneStructure {
 
 	@Test
-	public void computePointStatistics() {
+	void computePointStatistics() {
 		SceneStructureMetric scene = new SceneStructureMetric(false);
 		createProjectiveScene(scene,0xBEEF);
 
@@ -54,9 +54,8 @@ public class TestScaleSceneStructure {
 		assertTrue( alg.medianDistancePoint > 0 && alg.medianDistancePoint < 2);
 	}
 
-
 	@Test
-	public void apply_undo_metric() {
+	void apply_undo_metric() {
 		for (int h = 0; h < 2; h++) {
 			boolean homogenous = h == 1;
 
@@ -93,7 +92,7 @@ public class TestScaleSceneStructure {
 	}
 
 	@Test
-	public void apply_undo_projective() {
+	void apply_undo_projective() {
 		for (int h = 0; h < 2; h++) {
 			boolean homogenous = h == 1;
 			ScaleSceneStructure alg = new ScaleSceneStructure();
@@ -130,6 +129,30 @@ public class TestScaleSceneStructure {
 			GenericBundleAdjustmentProjectiveChecks.assertEquals(expected,found,1e-8);
 			GenericBundleAdjustmentProjectiveChecks.checkReprojectionError(found,obs,1e-4);
 		}
+	}
+
+	/**
+	 * Very basic check to see if observations are scaled from -0.5 to 0.5
+	 */
+	@Test
+	void applyScaleToPixelsAndCameraMatrix() {
+		// homogenous or not doesn't matter
+		SceneStructureProjective structure = new SceneStructureProjective(false);
+
+		SceneObservations obs = createProjectiveScene(structure,0xBEEF);
+
+		ScaleSceneStructure alg = new ScaleSceneStructure();
+		alg.applyScaleToPixelsAndCameraMatrix(structure,obs);
+
+		for (int viewIdx = 0; viewIdx < obs.views.length; viewIdx++) {
+			SceneObservations.View v = obs.views[viewIdx];
+			for (int i = 0; i < v.observations.size; i++) {
+				float o = v.observations.data[i];
+				// the real bounds is -0.5 to 0.5 but this scene can have pixels outside the image's bounds...
+				assertTrue(o>=-2 && o <=2);
+			}
+		}
+
 	}
 
 	public static SceneObservations createProjectiveScene(SceneStructureMetric scene ,
@@ -189,7 +212,7 @@ public class TestScaleSceneStructure {
 	}
 
 
-	public static SceneObservations createProjectiveScene(SceneStructureProjective scene ,
+	static SceneObservations createProjectiveScene(SceneStructureProjective scene ,
 														  long seed ) {
 		Random rand = new Random(seed);
 
@@ -215,7 +238,7 @@ public class TestScaleSceneStructure {
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,worldToView.R);
 			PerspectiveOps.createCameraMatrix(worldToView.R,worldToView.T,K0,P);
 
-			scene.setView(i,false,P);
+			scene.setView(i,false,P,camera0.width,camera0.height);
 		}
 
 		Point2D_F64 pixel = new Point2D_F64();

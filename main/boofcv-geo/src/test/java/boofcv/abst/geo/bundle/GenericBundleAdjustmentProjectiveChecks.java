@@ -248,7 +248,7 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 			DMatrixRMaj P = new DMatrixRMaj(3,4);
 			PerspectiveOps.createCameraMatrix(worldToView.R,worldToView.T,K,P);
 
-			structure.setView(i,i==0,P);
+			structure.setView(i,i==0,P,width,width);
 		}
 
 		Point2D_F64 pixel = new Point2D_F64();

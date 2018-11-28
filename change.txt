@@ -37,6 +37,9 @@ Version : 0.32
   * Bunch of bug fixes
   * Extracts the full pinhole calibration matrix from camera characteristics
 
+TODO Schur complement dense
+TODO RefineProjectiveStructureAllVisible redo as a schur complement
+
 TODO Given F21 F31 F32 return  a concistent P1 P2
      P301 yellow book
 TODO compute camera matrices directly from trilinear constraint? P 274

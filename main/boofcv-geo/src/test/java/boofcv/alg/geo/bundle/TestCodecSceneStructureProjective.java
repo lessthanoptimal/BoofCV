@@ -35,6 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestCodecSceneStructureProjective {
 	Random rand = new Random(234);
 
+	final static int width=300,height=200;
+
 	@Test
 	public void encode_decode() {
 		SceneStructureProjective original = createScene3D(rand);
@@ -80,7 +82,7 @@ public class TestCodecSceneStructureProjective {
 				}
 			} else
 				RandomMatrices_DDRM.fillUniform(P,rand);
-			out.setView(i,fixed,P);
+			out.setView(i,fixed,P,width,height);
 		}
 
 		// Assign first point to all views then the other points to just one view
@@ -114,7 +116,7 @@ public class TestCodecSceneStructureProjective {
 				}
 			} else
 				RandomMatrices_DDRM.fillUniform(P,rand);
-			out.setView(i,fixed,P);
+			out.setView(i,fixed,P,width,height);
 		}
 
 		// Assign first point to all views then the other points to just one view

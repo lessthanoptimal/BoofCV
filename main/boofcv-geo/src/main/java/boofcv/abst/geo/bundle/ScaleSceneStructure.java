@@ -21,6 +21,7 @@ package boofcv.abst.geo.bundle;
 import boofcv.abst.geo.bundle.SceneStructureCommon.Point;
 import boofcv.alg.geo.PerspectiveOps;
 import georegression.geometry.GeometryMath_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ddogleg.sorting.QuickSelect;
@@ -65,6 +66,9 @@ public class ScaleSceneStructure {
 	 */
 	double medianDistancePoint;
 
+	// work space variables
+	Point2D_F64 tmp2 = new Point2D_F64();
+
 	/**
 	 * Configures how scaling is applied
 	 * @param desiredDistancePoint desired scale for points to have
@@ -86,31 +90,76 @@ public class ScaleSceneStructure {
 
 		if( structure.homogenous ) {
 			applyScaleToPointsHomogenous(structure);
-			// can't normalize translation because w=1 is implicit and can't be changed
 		} else {
 			computePointStatistics(structure.points);
 			applyScaleToPoints3D(structure);
 			applyScaleTranslation3D(structure);
-			// NOTE: No need to adjust observations since the scaling will be undone because it's a homogeneous coordinate
 		}
+		// NOTE: Observations can't be centered/scaled here because that changes the camera model.
+		//       That requires knowledge this class can't have access to and must be done externally
 	}
 	/**
 	 * Applies the scale transform to the input scene structure. Metric.
 	 * @param structure 3D scene
 	 * @param observations Observations of the scene
 	 */
-
 	public void applyScale( SceneStructureProjective structure ,
 							SceneObservations observations ) {
 		if( structure.homogenous ) {
 			applyScaleToPointsHomogenous(structure);
-			// can't normalize 4th column because w=1 is implicit and can't be changed
 		} else {
 			computePointStatistics(structure.points);
 			applyScaleToPoints3D(structure);
 			applyScaleTranslation3D(structure);
-			// NOTE: No need to adjust observations since the scaling will be undone because it's a
-			// homogeneous coordinate, e.g. (x,y,1) the last row must be 1
+		}
+
+		// scale and translate observations, which changes camera matrix
+		applyScaleToPixelsAndCameraMatrix(structure, observations);
+	}
+
+	void applyScaleToPixelsAndCameraMatrix(SceneStructureProjective structure ,
+										   SceneObservations observations )
+	{
+		for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
+			SceneStructureProjective.View v = structure.views[viewIdx];
+			// centering and scaling
+			float cx = v.width/2;
+			float cy = v.height/2;
+			// [1/cx 0 -0.5;0 1/cy -0.5; 0 0 1] is the scaling matrix
+
+			SceneObservations.View ov = observations.views[viewIdx];
+			for (int pixelIdx = 0; pixelIdx < ov.size(); pixelIdx++) {
+				int i = pixelIdx*2;
+				float x = ov.observations.data[i];
+				float y = ov.observations.data[i+1];
+				ov.observations.data[i] = x/cx - 0.5f;
+				ov.observations.data[i+1] = y/cy - 0.5f;
+			}
+
+			PerspectiveOps.inplaceAdjustCameraMatrix(1.0/cx,1.0/cy,-0.5,-0.5,v.worldToView);
+		}
+	}
+
+	void undoScaleToPixelsAndCameraMatrix(SceneStructureProjective structure ,
+										   SceneObservations observations )
+	{
+		for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
+			SceneStructureProjective.View v = structure.views[viewIdx];
+			// centering and scaling
+			float cx = v.width/2;
+			float cy = v.height/2;
+			// [cx 0 cx;0 cy cy; 0 0 1] is the scaling matrix
+
+			SceneObservations.View ov = observations.views[viewIdx];
+			for (int pixelIdx = 0; pixelIdx < ov.size(); pixelIdx++) {
+				int i = pixelIdx*2;
+				float x = ov.observations.data[i];
+				float y = ov.observations.data[i+1];
+				ov.observations.data[i] = x*cx + cx;
+				ov.observations.data[i+1] = y*cy + cy;
+			}
+
+			PerspectiveOps.inplaceAdjustCameraMatrix(cx,cy,cx,cy,v.worldToView);
 		}
 	}
 
@@ -219,38 +268,39 @@ public class ScaleSceneStructure {
 	public void undoScale( SceneStructureProjective structure ,
 						   SceneObservations observations ) {
 
-		if( structure.homogenous )
-			return;
+		if( !structure.homogenous ) {
 
-		double scale = desiredDistancePoint / medianDistancePoint;
+			double scale = desiredDistancePoint / medianDistancePoint;
 
-		undoNormPoints3D(structure, scale);
+			undoNormPoints3D(structure, scale);
 
-		DMatrixRMaj A = new DMatrixRMaj(3,3);
-		DMatrixRMaj A_inv = new DMatrixRMaj(3,3);
-		Point3D_F64 a = new Point3D_F64();
-		Point3D_F64 c = new Point3D_F64();
+			DMatrixRMaj A = new DMatrixRMaj(3, 3);
+			DMatrixRMaj A_inv = new DMatrixRMaj(3, 3);
+			Point3D_F64 a = new Point3D_F64();
+			Point3D_F64 c = new Point3D_F64();
 
-		for (int i = 0; i < structure.views.length; i++) {
-			SceneStructureProjective.View view = structure.views[i];
+			for (int i = 0; i < structure.views.length; i++) {
+				SceneStructureProjective.View view = structure.views[i];
 
-			// X_w = inv(A)*(X_c - T) let X_c = 0 then X_w = -inv(A)*T is center of camera in world
-			CommonOps_DDRM.extract(view.worldToView,0,0,A);
-			PerspectiveOps.extractColumn(view.worldToView,3,a);
-			CommonOps_DDRM.invert(A,A_inv);
-			GeometryMath_F64.mult(A_inv,a,c);
+				// X_w = inv(A)*(X_c - T) let X_c = 0 then X_w = -inv(A)*T is center of camera in world
+				CommonOps_DDRM.extract(view.worldToView, 0, 0, A);
+				PerspectiveOps.extractColumn(view.worldToView, 3, a);
+				CommonOps_DDRM.invert(A, A_inv);
+				GeometryMath_F64.mult(A_inv, a, c);
 
 
-			// Apply transform
-			c.x = (-c.x/scale + medianPoint.x);
-			c.y = (-c.y/scale + medianPoint.y);
-			c.z = (-c.z/scale + medianPoint.z);
+				// Apply transform
+				c.x = (-c.x / scale + medianPoint.x);
+				c.y = (-c.y / scale + medianPoint.y);
+				c.z = (-c.z / scale + medianPoint.z);
 
-			// -A*T
-			GeometryMath_F64.mult(A,c,a);
-			a.scale(-1);
-			PerspectiveOps.insertColumn(view.worldToView,3,a);
+				// -A*T
+				GeometryMath_F64.mult(A, c, a);
+				a.scale(-1);
+				PerspectiveOps.insertColumn(view.worldToView, 3, a);
+			}
 		}
+		undoScaleToPixelsAndCameraMatrix(structure, observations);
 	}
 
 	private void undoNormPoints3D(SceneStructureCommon structure, double scale) {

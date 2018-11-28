@@ -52,12 +52,12 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestPerspectiveOps {
+class TestPerspectiveOps {
 
 	Random rand = new Random(234);
 
 	@Test
-	public void approximatePinhole() {
+	void approximatePinhole() {
 		CameraPinhole original = PerspectiveOps.createIntrinsic(640,480,75, 70);
 
 		LensDistortionPinhole distortion = new LensDistortionPinhole(original);
@@ -73,7 +73,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void guessIntrinsic_two() {
+	void guessIntrinsic_two() {
 
 		double hfov = 30;
 		double vfov = 35;
@@ -85,7 +85,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void guessIntrinsic_one() {
+	void guessIntrinsic_one() {
 
 		double hfov = 30;
 
@@ -96,7 +96,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void scaleIntrinsic() {
+	void scaleIntrinsic() {
 		Point3D_F64 X = new Point3D_F64(0.1,0.3,2);
 
 		CameraPinholeRadial param = new CameraPinholeRadial(200,300,2,250,260,200,300);
@@ -116,7 +116,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void adjustIntrinsic() {
+	void adjustIntrinsic() {
 
 		DMatrixRMaj B = new DMatrixRMaj(3,3,true,2,0,1,0,3,2,0,0,1);
 
@@ -135,7 +135,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void pinholeToMatrix_params_D() {
+	void pinholeToMatrix_params_D() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(1.0, 2, 3, 4, 5);
 
 		assertEquals(1,K.get(0,0),UtilEjml.TEST_F64);
@@ -147,7 +147,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void pinholeToMatrix_params_F() {
+	void pinholeToMatrix_params_F() {
 		FMatrixRMaj K = PerspectiveOps.pinholeToMatrix(1.0f, 2f, 3f, 4, 5);
 
 		assertEquals(1,K.get(0,0),UtilEjml.TEST_F32);
@@ -159,7 +159,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void pinholeToMatrix_class_D() {
+	void pinholeToMatrix_class_D() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(new CameraPinhole(1.0, 2, 3, 4, 5,400,500),(DMatrixRMaj)null);
 
 		assertEquals(1,K.get(0,0),UtilEjml.TEST_F64);
@@ -171,7 +171,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void pinholeToMatrix_class_F() {
+	void pinholeToMatrix_class_F() {
 		FMatrixRMaj K = PerspectiveOps.pinholeToMatrix(new CameraPinhole(1.0, 2, 3, 4, 5,400,500),(FMatrixRMaj)null);
 
 		assertEquals(1,K.get(0,0),UtilEjml.TEST_F32);
@@ -183,7 +183,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void matrixToPinhole_D() {
+	void matrixToPinhole_D() {
 		double fx = 1;
 		double fy = 2;
 		double skew = 3;
@@ -203,7 +203,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void matrixToPinhole_F() {
+	void matrixToPinhole_F() {
 		float fx = 1;
 		float fy = 2;
 		float skew = 3;
@@ -226,7 +226,7 @@ public class TestPerspectiveOps {
 	 * Test using a known pinhole model which fits its assumptions perfectly
 	 */
 	@Test
-	public void estimatePinhole() {
+	void estimatePinhole() {
 		CameraPinhole expected = new CameraPinhole(500,550,0,600,700,1200,1400);
 		Point2Transform2_F64 pixelToNorm = new LensDistortionPinhole(expected).distort_F64(true,false);
 
@@ -242,7 +242,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void convertNormToPixel_intrinsic_F64() {
+	void convertNormToPixel_intrinsic_F64() {
 		CameraPinholeRadial intrinsic = new CameraPinholeRadial(100,150,0.1,120,209,500,600);
 
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
@@ -259,7 +259,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void convertNormToPixel_matrix() {
+	void convertNormToPixel_matrix() {
 		DMatrixRMaj K = new DMatrixRMaj(3,3,true,100,0.1,120,0,150,209,0,0,1);
 
 		Point2D_F64 norm = new Point2D_F64(-0.1,0.25);
@@ -274,7 +274,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void convertPixelToNorm_intrinsic_F64() {
+	void convertPixelToNorm_intrinsic_F64() {
 		CameraPinholeRadial intrinsic = new CameraPinholeRadial(100,150,0.1,120,209,500,600);
 
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
@@ -293,7 +293,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void convertPixelToNorm_matrix() {
+	void convertPixelToNorm_matrix() {
 		DMatrixRMaj K = new DMatrixRMaj(3,3,true,100,0.1,120,0,150,209,0,0,1);
 		DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
 		CommonOps_DDRM.invert(K,K_inv);
@@ -310,7 +310,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void renderPixel_SE() {
+	void renderPixel_SE() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 
 		Se3_F64 worldToCamera = new Se3_F64();
@@ -339,7 +339,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void renderPixel_intrinsic() {
+	void renderPixel_intrinsic() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 
 		CameraPinholeRadial intrinsic = new CameraPinholeRadial(100,150,0.1,120,209,500,600);
@@ -357,7 +357,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void renderPixel_cameramatrix() {
+	void renderPixel_cameramatrix() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 
 		Se3_F64 worldToCamera = new Se3_F64();
@@ -382,7 +382,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void splitAssociated_pair() {
+	void splitAssociated_pair() {
 		List<AssociatedPair> list = new ArrayList<>();
 		for( int i = 0; i < 12; i++ ) {
 			AssociatedPair p = new AssociatedPair();
@@ -402,13 +402,13 @@ public class TestPerspectiveOps {
 		assertEquals(list.size(),list2.size());
 
 		for( int i = 0; i < list.size(); i++ ) {
-			assertTrue(list.get(i).p1 == list1.get(i));
-			assertTrue(list.get(i).p2 == list2.get(i));
+			assertSame(list.get(i).p1, list1.get(i));
+			assertSame(list.get(i).p2, list2.get(i));
 		}
 	}
 
 	@Test
-	public void splitAssociated_triple() {
+	void splitAssociated_triple() {
 		List<AssociatedTriple> list = new ArrayList<>();
 		for( int i = 0; i < 12; i++ ) {
 			AssociatedTriple p = new AssociatedTriple();
@@ -431,14 +431,14 @@ public class TestPerspectiveOps {
 		assertEquals(list.size(),list3.size());
 
 		for( int i = 0; i < list.size(); i++ ) {
-			assertTrue(list.get(i).p1 == list1.get(i));
-			assertTrue(list.get(i).p2 == list2.get(i));
-			assertTrue(list.get(i).p3 == list3.get(i));
+			assertSame(list.get(i).p1, list1.get(i));
+			assertSame(list.get(i).p2, list2.get(i));
+			assertSame(list.get(i).p3, list3.get(i));
 		}
 	}
 
 	@Test
-	public void createCameraMatrix() {
+	void createCameraMatrix() {
 		SimpleMatrix R = SimpleMatrix.random_DDRM(3, 3, -1, 1, rand);
 		Vector3D_F64 T = new Vector3D_F64(2,3,-4);
 		SimpleMatrix K = SimpleMatrix.wrap(RandomMatrices_DDRM.triangularUpper(3, 0, -1, 1, rand));
@@ -469,21 +469,21 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void computeHFov() {
+	void computeHFov() {
 		CameraPinhole intrinsic = new CameraPinhole(500,600,0,500,500,1000,1000);
 
 		assertEquals(2*Math.atan(1.0),PerspectiveOps.computeHFov(intrinsic), UtilEjml.TEST_F64);
 	}
 
 	@Test
-	public void computeVFov() {
+	void computeVFov() {
 		CameraPinhole intrinsic = new CameraPinhole(500,600,0,500,500,1000,1000);
 
 		assertEquals(2*Math.atan(500/600.0),PerspectiveOps.computeVFov(intrinsic), UtilEjml.TEST_F64);
 	}
 
 	@Test
-	public void multTranA_triple() {
+	void multTranA_triple() {
 		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(3,3,rand);
 		DMatrixRMaj B = RandomMatrices_DDRM.rectangle(3,3,rand);
 		DMatrixRMaj C = RandomMatrices_DDRM.rectangle(3,3,rand);
@@ -499,7 +499,7 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void multTranC_triple() {
+	void multTranC_triple() {
 		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(3,3,rand);
 		DMatrixRMaj B = RandomMatrices_DDRM.rectangle(3,3,rand);
 		DMatrixRMaj C = RandomMatrices_DDRM.rectangle(3,3,rand);
@@ -512,5 +512,21 @@ public class TestPerspectiveOps {
 		PerspectiveOps.multTranC(A,B,C,D);
 
 		assertTrue(MatrixFeatures_DDRM.isEquals(expected,D,UtilEjml.TEST_F64));
+	}
+
+	@Test
+	void inplaceAdjustCameraMatrix() {
+		DMatrixRMaj P = RandomMatrices_DDRM.rectangle(3,4,rand);
+
+		double sx = 0.3,sy=0.7,tx=0.9,ty=-0.5;
+		double[][] _A = {{sx,0,tx},{0,sy,ty},{0,0,1}};
+		DMatrixRMaj A = new DMatrixRMaj(_A);
+
+		DMatrixRMaj expected = new DMatrixRMaj(3,4);
+		CommonOps_DDRM.mult(A,P,expected);
+
+		PerspectiveOps.inplaceAdjustCameraMatrix(sx,sy,tx,ty,P);
+
+		assertTrue(MatrixFeatures_DDRM.isIdentical(expected,P, UtilEjml.TEST_F64));
 	}
 }

@@ -803,4 +803,18 @@ public class PerspectiveOps {
 		output.data[7] = t31*C.data[3] + t32*C.data[4] + t33*C.data[5];
 		output.data[8] = t31*C.data[6] + t32*C.data[7] + t33*C.data[8];
 	}
+
+	/**
+	 * Multiplies A*P, where A = [sx 0 tx; 0 sy ty; 0 0 1]
+	 */
+	public static void inplaceAdjustCameraMatrix( double sx , double sy , double tx , double ty , DMatrixRMaj P ) {
+		// multiply each column one at a time. Because of the zeros everything is decoupled
+		for (int col = 0; col < 4; col++) {
+			int row0 = col;
+			int row1 = 4 + row0;
+			int row2 = 4 + row1;
+			P.data[row0] = P.data[row0]*sx + tx*P.data[row2];
+			P.data[row1] = P.data[row1]*sy + ty*P.data[row2];
+		}
+	}
 }

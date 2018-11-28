@@ -50,7 +50,6 @@ public class BundleAdjustmentProjectiveResidualFunction
 	private SceneStructureProjective structure;
 	private SceneObservations observations;
 
-
 	// number of parameters being optimised
 	private int numParameters;
 	// number of observations.  2 for each point in each view
@@ -62,10 +61,10 @@ public class BundleAdjustmentProjectiveResidualFunction
 	private PointIndex2D_F64 observedPixel = new PointIndex2D_F64();
 
 	// Used to write the "unknown" paramters into the scene
-	CodecSceneStructureProjective codec = new CodecSceneStructureProjective();
+	private CodecSceneStructureProjective codec = new CodecSceneStructureProjective();
 
-	Point3D_F64 p3 = new Point3D_F64();
-	Point4D_F64 p4 = new Point4D_F64();
+	private Point3D_F64 p3 = new Point3D_F64();
+	private Point4D_F64 p4 = new Point4D_F64();
 
 	/**
 	 * Specifies the scenes structure and observed feature locations
@@ -96,21 +95,23 @@ public class BundleAdjustmentProjectiveResidualFunction
 
 		// write the current parameters into the scene's structure
 		codec.decode(input,structure);
+
+		if( structure.homogenous )
+			project4(output);
+		else
+			project3(output);
+	}
+
+	public void project3(double[] output) {
 		int observationIndex = 0;
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
 			SceneStructureProjective.View view = structure.views[viewIndex];
 			SceneObservations.View obsView = observations.views[viewIndex];
-
 			for (int i = 0; i < obsView.size(); i++) {
 				obsView.get(i,observedPixel);
 				SceneStructureMetric.Point worldPt = structure.points[observedPixel.index];
-				if( structure.homogenous ) {
-					worldPt.get(p4);
-					PerspectiveOps.renderPixel(view.worldToView, p4, predictedPixel);
-				} else {
-					worldPt.get(p3);
-					PerspectiveOps.renderPixel(view.worldToView, p3, predictedPixel);
-				}
+				worldPt.get(p3);
+				PerspectiveOps.renderPixel(view.worldToView, p3, predictedPixel);
 				int outputIndex = observationIndex*2;
 				output[outputIndex  ] = predictedPixel.x - observedPixel.x;
 				output[outputIndex+1] = predictedPixel.y - observedPixel.y;
@@ -119,4 +120,21 @@ public class BundleAdjustmentProjectiveResidualFunction
 		}
 	}
 
+	public void project4(double[] output) {
+		int observationIndex = 0;
+		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
+			SceneStructureProjective.View view = structure.views[viewIndex];
+			SceneObservations.View obsView = observations.views[viewIndex];
+			for (int i = 0; i < obsView.size(); i++) {
+				obsView.get(i,observedPixel);
+				SceneStructureMetric.Point worldPt = structure.points[observedPixel.index];
+				worldPt.get(p4);
+				PerspectiveOps.renderPixel(view.worldToView, p4, predictedPixel);
+				int outputIndex = observationIndex*2;
+				output[outputIndex  ] = predictedPixel.x - observedPixel.x;
+				output[outputIndex+1] = predictedPixel.y - observedPixel.y;
+				observationIndex++;
+			}
+		}
+	}
 }

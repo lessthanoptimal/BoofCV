@@ -61,10 +61,15 @@ public class SceneStructureProjective extends SceneStructureCommon
 	 * @param which Which view is being specified/
 	 * @param fixed If these parameters are fixed or not
 	 * @param worldToView The 3x4 projective camera matrix that converts a point in world to view pixels
+	 * @param width Image's width
+	 * @param height Image's height
 	 */
-	public void setView(int which , boolean fixed , DMatrixRMaj worldToView ) {
+	public void setView(int which , boolean fixed , DMatrixRMaj worldToView ,
+						int width , int height ) {
 		views[which].known = fixed;
 		views[which].worldToView.set(worldToView);
+		views[which].width = width;
+		views[which].height = height;
 	}
 
 	/**
@@ -111,6 +116,12 @@ public class SceneStructureProjective extends SceneStructureCommon
 		 * If the parameters are assumed to be known and should not be optimised.
 		 */
 		public boolean known = true;
+
+		/**
+		 * Images shape. Used to normalize points
+		 */
+		public int width,height;
+
 		/**
 		 * Projective camera matrix. x' = P*X. P is the projective matrix, x' are
 		 * pixel observations, and X is the 3D feature.
