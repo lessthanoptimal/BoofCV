@@ -55,7 +55,7 @@ public class RefineProjectiveStructureAllVisible {
 	FastQueue<View> views = new FastQueue<>(View.class,true);
 
 	// list of points in homogenous coordinates
-	List<Point4D_F64> points;
+	List<Point4D_F64> landmarks;
 
 	// total number of views which are not fixed
 	int totalNotFixed;
@@ -110,8 +110,8 @@ public class RefineProjectiveStructureAllVisible {
 	/**
 	 * Specifies the location of each point in homogenous space
 	 */
-	public void setPoints( List<Point4D_F64> list  ) {
-		points = list;
+	public void setLandmarks(List<Point4D_F64> list  ) {
+		landmarks = list;
 	}
 
 	/**
@@ -120,6 +120,11 @@ public class RefineProjectiveStructureAllVisible {
 	 * @return true if optimization was successful
 	 */
 	public boolean process() {
+		// sanity checks
+		for (int i = 0; i < views.size; i++) {
+			if( views.get(i).observations.size() != landmarks.size() )
+				throw new IllegalArgumentException("Observations in view "+i+" doesn't match number of landmarks");
+		}
 		// Encode passed in parameters into array for optimization
 		numberOfParameters = computeNumberOfParameters();
 		parameters.resize(numberOfParameters);
@@ -141,13 +146,13 @@ public class RefineProjectiveStructureAllVisible {
 	/**
 	 * Computes the number of parameters being optimized
 	 */
-	private int computeNumberOfParameters() {
+	int computeNumberOfParameters() {
 		totalNotFixed = 0;
 		for (int i = 0; i < views.size; i++) {
 			if( !views.get(i).fixed)
 				totalNotFixed++;
 		}
-		numberOfParameters = 12*totalNotFixed + 4*points.size();
+		numberOfParameters = 12*totalNotFixed + 4* landmarks.size();
 		return numberOfParameters;
 	}
 
@@ -159,8 +164,8 @@ public class RefineProjectiveStructureAllVisible {
 		return views.get(which).P;
 	}
 
-	public List<Point4D_F64> getPoints() {
-		return points;
+	public List<Point4D_F64> getLandmarks() {
+		return landmarks;
 	}
 
 	/**
@@ -177,8 +182,8 @@ public class RefineProjectiveStructureAllVisible {
 			}
 		}
 
-		for (int i = 0; i < points.size(); i++) {
-			Point4D_F64 p = points.get(i);
+		for (int i = 0; i < landmarks.size(); i++) {
+			Point4D_F64 p = landmarks.get(i);
 			parameters[n++] = p.x;
 			parameters[n++] = p.y;
 			parameters[n++] = p.z;
@@ -200,8 +205,8 @@ public class RefineProjectiveStructureAllVisible {
 			}
 		}
 
-		for (int i = 0; i < points.size(); i++) {
-			Point4D_F64 p = points.get(i);
+		for (int i = 0; i < landmarks.size(); i++) {
+			Point4D_F64 p = landmarks.get(i);
 			p.x = parameters[n++];
 			p.y = parameters[n++];
 			p.z = parameters[n++];
@@ -221,7 +226,11 @@ public class RefineProjectiveStructureAllVisible {
 		this.configConverge = configConverge;
 	}
 
-	static class View {
+	public double getErrorScore() {
+		return optimizer.getFunctionValue();
+	}
+
+	public static class View {
 		// if true then the camera matrix is optimized
 		boolean fixed;
 		// camera matrix
@@ -245,13 +254,13 @@ public class RefineProjectiveStructureAllVisible {
 				DMatrixRMaj P = views.get(viewIdx).P;
 				List<Point2D_F64> observations = views.get(viewIdx).observations;
 
-				for (int pointIdx = 0; pointIdx < points.size(); pointIdx++) {
-					Point4D_F64 X = points.get(pointIdx);
+				for (int pointIdx = 0; pointIdx < landmarks.size(); pointIdx++) {
+					Point4D_F64 X = landmarks.get(pointIdx);
 					Point2D_F64 x = observations.get(pointIdx);
 
 					PerspectiveOps.renderPixel(P,X,pixel);
-					output[outIdx++] = x.x - pixel.x;
-					output[outIdx++] = x.y - pixel.y;
+					output[outIdx++] = pixel.x - x.x;
+					output[outIdx++] = pixel.y - x.y;
 				}
 			}
 		}
@@ -263,7 +272,7 @@ public class RefineProjectiveStructureAllVisible {
 
 		@Override
 		public int getNumOfOutputsM() {
-			return views.size*points.size()*2;
+			return views.size* landmarks.size()*2;
 		}
 	}
 
@@ -288,12 +297,12 @@ public class RefineProjectiveStructureAllVisible {
 				double P21 = P.data[4], P22 = P.data[5], P23 = P.data[6],  P24 = P.data[7];
 				double P31 = P.data[8], P32 = P.data[9], P33 = P.data[10], P34 = P.data[11];
 
-				for (int pointIdx = 0; pointIdx < points.size(); pointIdx++) {
-					int row = viewIdx*points.size()*2 + pointIdx*2;
+				for (int pointIdx = 0; pointIdx < landmarks.size(); pointIdx++) {
+					int row = viewIdx* landmarks.size()*2 + pointIdx*2;
 					int outIdxX = row*numberOfParameters + totalNotFixed*12 + pointIdx*4;
 					int outIdxY = outIdxX + numberOfParameters;
 
-					Point4D_F64 X = points.get(pointIdx);
+					Point4D_F64 X = landmarks.get(pointIdx);
 
 					double pX = P11*X.x + P12*X.y + P13*X.z + P14*X.w;
 					double pY = P21*X.x + P22*X.y + P23*X.z + P24*X.w;
@@ -308,9 +317,9 @@ public class RefineProjectiveStructureAllVisible {
 					out[outIdxX++] = P14/pZ - pX/(pZ*pZ)*P34;
 
 					out[outIdxY++] = P21/pZ - pY/(pZ*pZ)*P31;
-					out[outIdxY++] = P23/pZ - pY/(pZ*pZ)*P33;
 					out[outIdxY++] = P22/pZ - pY/(pZ*pZ)*P32;
-					out[outIdxY++] = P14/pZ - pY/(pZ*pZ)*P34;
+					out[outIdxY++] = P23/pZ - pY/(pZ*pZ)*P33;
+					out[outIdxY++] = P24/pZ - pY/(pZ*pZ)*P34;
 				}
 			}
 		}
@@ -328,12 +337,12 @@ public class RefineProjectiveStructureAllVisible {
 				double P21 = P.data[4], P22 = P.data[5], P23 = P.data[6],  P24 = P.data[7];
 				double P31 = P.data[8], P32 = P.data[9], P33 = P.data[10], P34 = P.data[11];
 
-				for (int pointIdx = 0; pointIdx < points.size(); pointIdx++) {
-					int row = viewIdx*points.size()*2 + pointIdx*2;
+				for (int pointIdx = 0; pointIdx < landmarks.size(); pointIdx++) {
+					int row = viewIdx* landmarks.size()*2 + pointIdx*2;
 					int outIdxX = row*numberOfParameters + notFixedCount*12;
 					int outIdxY = outIdxX + numberOfParameters;
 
-					Point4D_F64 X = points.get(pointIdx);
+					Point4D_F64 X = landmarks.get(pointIdx);
 
 					double pX = P11*X.x + P12*X.y + P13*X.z + P14*X.w;
 					double pY = P21*X.x + P22*X.y + P23*X.z + P24*X.w;
@@ -377,7 +386,7 @@ public class RefineProjectiveStructureAllVisible {
 
 		@Override
 		public int getNumOfOutputsM() {
-			return views.size*points.size()*2;
+			return views.size* landmarks.size()*2;
 		}
 	}
 }
