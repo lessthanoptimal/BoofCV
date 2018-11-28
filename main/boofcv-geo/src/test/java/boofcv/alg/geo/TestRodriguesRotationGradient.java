@@ -23,6 +23,7 @@ import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.jupiter.api.Test;
@@ -55,7 +56,7 @@ public class TestRodriguesRotationGradient {
 //			System.out.println();
 
 //			DerivativeChecker.jacobianPrintR(f, g, param, 1e-4);
-			assertTrue(DerivativeChecker.jacobianR(f, g, param, 1e-4));
+			assertTrue(DerivativeChecker.jacobian(f, g, param, UtilEjml.TEST_F64_SQ));
 		}
 	}
 

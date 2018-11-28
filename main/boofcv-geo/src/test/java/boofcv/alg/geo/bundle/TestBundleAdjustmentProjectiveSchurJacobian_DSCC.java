@@ -23,6 +23,7 @@ import boofcv.abst.geo.bundle.SceneStructureProjective;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ddogleg.optimization.wrap.SchurJacobian_to_NtoMxN;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixSparseCSC;
 import org.junit.jupiter.api.Test;
 
@@ -75,7 +76,7 @@ public class TestBundleAdjustmentProjectiveSchurJacobian_DSCC {
 		alg.configure(structure,observations);
 		func.configure(structure,observations);
 
-//		DerivativeChecker.jacobianPrintR(func, jac, param, 1e-3);
-		assertTrue(DerivativeChecker.jacobianR(func, jac, param, 1e-3));
+//		DerivativeChecker.jacobianPrint(func, jac, param, UtilEjml.TEST_F64_SQ );
+		assertTrue(DerivativeChecker.jacobian(func, jac, param, UtilEjml.TEST_F64_SQ ));
 	}
 }
