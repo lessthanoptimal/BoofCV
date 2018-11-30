@@ -88,6 +88,12 @@ public class UtilImageIO {
 			BufferedImage buffered = ImageIO.read(url);
 			if( buffered != null )
 				return buffered;
+			if( url.getProtocol().equals("file")) {
+				if( !new File(url.getPath()).exists() ) {
+					System.err.println("File does not exist: "+url.getPath());
+					return null;
+				}
+			}
 		} catch (IOException ignore) {}
 		try {
 			InputStream stream = url.openStream();
