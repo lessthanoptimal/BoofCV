@@ -44,7 +44,7 @@ public class TestTrifocalTransfer extends CommonTrifocalChecks {
 		Point3D_F64 found = new Point3D_F64();
 		TrifocalTransfer alg = new TrifocalTransfer();
 		alg.setTrifocal(tensor);
-		alg.transfer13into2(x1.x,x1.y,x3.x,x3.y,found);
+		alg.transfer_1_to_2(x1.x,x1.y,x3.x,x3.y,found);
 
 		found.x /= found.z;
 		found.y /= found.z;
@@ -66,7 +66,7 @@ public class TestTrifocalTransfer extends CommonTrifocalChecks {
 		Point3D_F64 found = new Point3D_F64();
 		TrifocalTransfer alg = new TrifocalTransfer();
 		alg.setTrifocal(tensor);
-		alg.transfer12into3(x1.x,x1.y,x2.x,x2.y,found);
+		alg.transfer_1_to_3(x1.x,x1.y,x2.x,x2.y,found);
 
 		found.x /= found.z;
 		found.y /= found.z;

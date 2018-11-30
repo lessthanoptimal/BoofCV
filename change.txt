@@ -25,9 +25,11 @@ Version : 0.32
 - ConvertImage reshapes output instead of throwing an exception
 - Geometry
   * Fixed bug in Linear Trifocal Tensor estimator
+  * Robust trifocal tensor estimation
   * Decompose absolute quadratic
   * Convert projective to metric camera matrix
   * Fixed bug in decomposeMetricCamera
+  * Refine triangulation for projective geometry TODO
 - ImageInterleaved
   * setTo() changes number of bands if needed
   * Improved speed of Interleaved to Gray average
@@ -37,8 +39,6 @@ Version : 0.32
   * Bunch of bug fixes
   * Extracts the full pinhole calibration matrix from camera characteristics
 
-TODO Schur complement dense
-TODO RefineProjectiveStructureAllVisible redo as a schur complement
 
 TODO Given F21 F31 F32 return  a concistent P1 P2
      P301 yellow book

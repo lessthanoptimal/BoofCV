@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
-public class ResidualsTriangulateSampson implements FunctionNtoM {
+public class ResidualsTriangulateEpipolarSampson implements FunctionNtoM {
 
 	// observations of the same feature in normalized coordinates
 	private List<Point2D_F64> observations;

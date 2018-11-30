@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,28 +16,24 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.triangulate;
+package boofcv.alg.geo.triangulate;
 
-import boofcv.abst.geo.GeneralTestRefineTriangulate;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DMatrixRMaj;
+import org.ddogleg.optimization.functions.FunctionNtoM;
 
 import java.util.List;
 
 /**
  * @author Peter Abeles
  */
-public class TestLeastSquaresTriangulateCalibrated extends GeneralTestRefineTriangulate {
-
-	LeastSquaresTriangulateCalibrated alg = new LeastSquaresTriangulateCalibrated(1e-8,200);
-
+public class TestResidualsTriangulateMetricSimple
+		extends ResidualTriangulateChecks
+{
 	@Override
-	public void triangulate(List<Point2D_F64> obsPts, List<Se3_F64> motion,
-							List<DMatrixRMaj> essential,
-							Point3D_F64 initial, Point3D_F64 found)
-	{
-		alg.process(obsPts,motion,initial,found);
+	public FunctionNtoM createAlg(List<Point2D_F64> observations, List<Se3_F64> motionGtoC) {
+		ResidualsTriangulateMetricSimple alg = new ResidualsTriangulateMetricSimple();
+		alg.setObservations(observations,motionGtoC);
+		return alg;
 	}
 }

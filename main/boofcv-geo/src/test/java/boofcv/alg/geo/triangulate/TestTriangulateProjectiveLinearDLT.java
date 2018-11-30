@@ -28,11 +28,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestTriangulateUncalibratedLinearDLT extends CommonTriangulationChecks {
+public class TestTriangulateProjectiveLinearDLT extends CommonTriangulationChecks {
 
 	/**
 	 * Create 3 perfect observations and solve for the position. Everything is in metric instead of an arbtirary
@@ -42,7 +43,7 @@ public class TestTriangulateUncalibratedLinearDLT extends CommonTriangulationChe
 	public void triangulate_metric_N() {
 		createScene();
 
-		TriangulateUncalibratedLinearDLT alg = new TriangulateUncalibratedLinearDLT();
+		TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
 
 		Point4D_F64 found = new Point4D_F64();
 
@@ -70,5 +71,18 @@ public class TestTriangulateUncalibratedLinearDLT extends CommonTriangulationChe
 			output.add(P);
 		}
 		return output;
+	}
+
+	/**
+	 * Test case with a true projective situation
+	 */
+	@Test
+	public void triangulate_projective() {
+		fail("implement");
+	}
+
+	@Test
+	public void triangulate_projective_noise() {
+		fail("Implement");
 	}
 }

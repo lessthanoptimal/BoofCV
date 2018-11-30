@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,13 +27,12 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class TestResidualsTriangulateSimple
-		extends ResidualTriangulateChecks
-{
+public class TestResidualsTriangulateEpipolarSampson extends ResidualTriangulateChecks {
+
 	@Override
 	public FunctionNtoM createAlg(List<Point2D_F64> observations, List<Se3_F64> motionGtoC) {
-		ResidualsTriangulateSimple alg = new ResidualsTriangulateSimple();
-		alg.setObservations(observations,motionGtoC);
+		ResidualsTriangulateEpipolarSampson alg = new ResidualsTriangulateEpipolarSampson();
+		alg.setObservations(observations, essential);
 		return alg;
 	}
 }

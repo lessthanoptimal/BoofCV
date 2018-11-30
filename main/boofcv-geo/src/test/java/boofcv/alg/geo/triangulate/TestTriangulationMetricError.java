@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestTriangulationError {
+public class TestTriangulationMetricError {
 	// pick two very different cameras to make sure the error is being indpendently computed in image each image correctly
 	CameraPinhole cameraA = new CameraPinhole(400,400,0,500,500,1000,1000);
 	CameraPinhole cameraB = new CameraPinhole(600,400,0,200,250,600,700);
@@ -56,7 +56,7 @@ public class TestTriangulationError {
 
 	@Test
 	public void perfect() {
-		TriangulationError alg = new TriangulationError();
+		TriangulationMetricError alg = new TriangulationMetricError();
 		alg.configure(cameraA,cameraB);
 
 		assertEquals(0,alg.process(na,nb,a_to_b,Xa), UtilEjml.TEST_F64);
@@ -64,7 +64,7 @@ public class TestTriangulationError {
 
 	@Test
 	public void errorInA() {
-		TriangulationError alg = new TriangulationError();
+		TriangulationMetricError alg = new TriangulationMetricError();
 		alg.configure(cameraA,cameraB);
 
 		Point2D_F64 pa = new Point2D_F64();
@@ -77,7 +77,7 @@ public class TestTriangulationError {
 
 	@Test
 	public void errorInB() {
-		TriangulationError alg = new TriangulationError();
+		TriangulationMetricError alg = new TriangulationMetricError();
 		alg.configure(cameraA,cameraB);
 
 		Point2D_F64 pb = new Point2D_F64();

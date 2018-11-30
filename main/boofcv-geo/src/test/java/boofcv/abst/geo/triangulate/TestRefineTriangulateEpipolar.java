@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,9 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class TestLeastSquaresTriangulateEpipolar extends GeneralTestRefineTriangulate {
+public class TestRefineTriangulateEpipolar extends GeneralTestRefineTriangulate {
 
-	LeastSquaresTriangulateEpipolar alg = new LeastSquaresTriangulateEpipolar(1e-8,200);
+	RefineTriangulateEpipolar alg = new RefineTriangulateEpipolar(1e-8,200);
 
 	@Override
 	public void triangulate(List<Point2D_F64> obsPts, List<Se3_F64> motion,

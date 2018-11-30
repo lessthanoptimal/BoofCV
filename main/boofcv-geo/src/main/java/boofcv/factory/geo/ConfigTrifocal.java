@@ -46,9 +46,18 @@ public class ConfigTrifocal implements Configuration
 
 	}
 
-	enum ErrorModel {
+	public enum ErrorModel {
 		/**
-		 * Point transfer from view 0,1 into 2 and 0,2 into 3 is used.
+		 * Computes camera matrices and triangulates a point in 3D space. Reprojects the points and returns the error
+		 *
+		 * inlier units: Pixels
+		 *
+		 * @see boofcv.alg.geo.robust.DistanceTrifocalReprojectionSq
+		 */
+		REPROJECTION,
+//		REPROJECTION_BETTER, // refine the triangulation
+		/**
+		 * Point transfer from view 0 into 2 and 0 into 3.
 		 *
 		 * inlier units: Pixels
 		 *

@@ -24,7 +24,7 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PositiveDepthConstraintCheck;
 import boofcv.alg.geo.robust.ModelMatcherMultiview;
-import boofcv.alg.geo.triangulate.TriangulationError;
+import boofcv.alg.geo.triangulate.TriangulationMetricError;
 import boofcv.alg.sfm.EstimateSceneStructure;
 import boofcv.alg.sfm.structure.MetricSceneGraph.Feature3D;
 import boofcv.alg.sfm.structure.MetricSceneGraph.Motion;
@@ -76,7 +76,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 
 	// Triangulates the 3D coordinate of a point from two observations
 	TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
-	TriangulationError triangulationError = new TriangulationError();
+	TriangulationMetricError triangulationError = new TriangulationMetricError();
 
 	MetricSceneGraph graph;
 

@@ -25,6 +25,7 @@ import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.abst.geo.Estimate1ofTrifocalTensor;
 import boofcv.abst.geo.TriangulateNViewsCalibrated;
+import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
@@ -37,7 +38,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic.Intrinsic;
-import boofcv.alg.sfm.structure.PruneStructureFromScene;
+import boofcv.alg.sfm.structure.PruneStructureFromSceneMetric;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
@@ -57,6 +58,7 @@ import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import boofcv.struct.image.*;
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -73,34 +75,12 @@ import java.util.List;
 import static boofcv.examples.stereo.ExampleStereoTwoViewsOneCamera.rectifyImages;
 import static boofcv.examples.stereo.ExampleStereoTwoViewsOneCamera.showPointCloud;
 
+// TODO Example images with significant lens distortion. BRIO?
+
 /**
  * @author Peter Abeles
  */
 public class ExampleTrifocalStereo {
-
-	/**
-	 * Show results as a point cloud
-	 */
-//	public static void showPointCloud(ImageGray disparity, BufferedImage left,
-//									  Se3_F64 motion, DMatrixRMaj rectifiedK ,
-//									  int minDisparity, int maxDisparity)
-//	{
-//		DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
-//		double baseline = motion.getT().norm();
-//		d2c.configure(baseline, rectifiedK, new DoNothing2Transform2_F64(), minDisparity, maxDisparity);
-//		d2c.process(disparity,left);
-//
-//		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK,disparity.width,disparity.height,null);
-//
-//		PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
-//		pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
-//		pcv.setTranslationStep(baseline/3);
-//		pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
-//		pcv.setDotSize(1);
-//
-//		pcv.getComponent().setPreferredSize(new Dimension(left.getWidth(), left.getHeight()));
-//		ShowImages.showWindow(pcv.getComponent(), "Point Cloud", true);
-//	}
 
 	public static void computeStereoCloud( GrayU8 distortedLeft, GrayU8 distortedRight ,
 										   Planar<GrayU8> colorLeft, Planar<GrayU8> colorRight,
@@ -184,9 +164,9 @@ public class ExampleTrifocalStereo {
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bobcats02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/bobcats03.png"));
 
-//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/deer01.png"));
-//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/deer02.png"));
-//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/deer03.png"));
+		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/deer01.png"));
+		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/deer02.png"));
+		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/deer03.png"));
 
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/seal01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/seal02.png"));
@@ -199,10 +179,6 @@ public class ExampleTrifocalStereo {
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/barrel01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/barrel02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/barrel03.png"));
-
-//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview01.png"));
-//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview02.png"));
-//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview03.png"));
 
 		// TODO bad focal length
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/power_01.png"));
@@ -221,9 +197,13 @@ public class ExampleTrifocalStereo {
 
 		// TODO Rectified shifted wrong direction
 		//      transposing R fixes this one, plus giving a better estimate for f
-		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip01.png"));
-		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip02.png"));
-		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip03.png"));
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rockview03.png"));
+
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/waterdrip03.png"));
 
 		// TODO Rectified shifted wrong direction
 		//      again transposing R
@@ -272,22 +252,26 @@ public class ExampleTrifocalStereo {
 		System.out.println("Image Shape "+width+" x "+height);
 		double cx = width/2;
 		double cy = height/2;
+//		double scale = Math.max(cx,cy);
 
 		// COMMENT ON center point zero
 		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
 			Point2D_F64 pixel = detDesc.getLocation(i);
+//			locations01.grow().set((pixel.x-cx)/scale,(pixel.y-cy)/scale);
 			locations01.grow().set(pixel.x-cx,pixel.y-cy);
 			features01.grow().setTo(detDesc.getDescription(i));
 		}
 		detDesc.detect(image02);
 		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
 			Point2D_F64 pixel = detDesc.getLocation(i);
+//			locations02.grow().set((pixel.x-cx)/scale,(pixel.y-cy)/scale);
 			locations02.grow().set(pixel.x-cx,pixel.y-cy);
 			features02.grow().setTo(detDesc.getDescription(i));
 		}
 		detDesc.detect(image03);
 		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
 			Point2D_F64 pixel = detDesc.getLocation(i);
+//			locations03.grow().set((pixel.x-cx)/scale,(pixel.y-cy)/scale);
 			locations03.grow().set(pixel.x-cx,pixel.y-cy);
 			features03.grow().setTo(detDesc.getDescription(i));
 		}
@@ -312,7 +296,11 @@ public class ExampleTrifocalStereo {
 		ConfigRansac configRansac = new ConfigRansac();
 		configRansac.maxIterations = 500;
 		configRansac.inlierThreshold = 2;
-		Ransac<TrifocalTensor,AssociatedTriple> ransac = FactoryMultiViewRobust.trifocalRansac(null,configRansac);
+
+		ConfigTrifocal configTri = new ConfigTrifocal();
+		configTri.error = ConfigTrifocal.ErrorModel.POINT_TRANSFER;
+
+		Ransac<TrifocalTensor,AssociatedTriple> ransac = FactoryMultiViewRobust.trifocalRansac(configTri,configRansac);
 
 		FastQueue<AssociatedTripleIndex> assoiatedIdx = associateThree.getMatches();
 		FastQueue<AssociatedTriple> associated = new FastQueue<>(AssociatedTriple.class,true);
@@ -328,17 +316,24 @@ public class ExampleTrifocalStereo {
 		model.print();
 
 		// estimate using all the inliers
+		// No need to re-scale the input because the estimator automatically adjusts the input on its own
 		Estimate1ofTrifocalTensor trifocalEstimator = FactoryMultiView.trifocal_1(EnumTrifocal.LINEAR_7,-1);
 		if( !trifocalEstimator.process(inliers,model) )
 			throw new RuntimeException("Estimator failed");
 
-		System.out.println("Estimating calib");
-
 		DMatrixRMaj P1 = CommonOps_DDRM.identity(3,4);
 		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
 		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
-
 		MultiViewOps.extractCameraMatrices(model,P2,P3);
+
+		// TODO things seem to go well until converted into P or F
+		//  Notes: Trifocal transfer has a very small error, but conversion into camera matrix or fundamental seems
+		//         to introduce large errors. Both P and F converge to same solutions
+		//         If RANSAC is run with triangulation hardly any matches occur due to massive errors
+		//  Recovering after finding P and F seems to be difficult because solutions are stuck in local minima
+		//
+		//  Noticed that when scaling pixels trifocal tensor produces very similar results, but P changed resulting
+		//         in very different calibration homography
 		SelfCalibrationLinearDualQuadratic selfcalib = new SelfCalibrationLinearDualQuadratic(1.0);
 		selfcalib.addCameraMatrix(P1);
 		selfcalib.addCameraMatrix(P2);
@@ -356,7 +351,7 @@ public class ExampleTrifocalStereo {
 			listPinhole.add(p);
 		}
 
-		// TODO figure out what's wrong with refine
+		// refine doesn't do very much
 //		System.out.println("Refining auto calib");
 //		SelfCalibrationRefineDualQuadratic refineDual = new SelfCalibrationRefineDualQuadratic();
 //		refineDual.setZeroPrinciplePoint(true);
@@ -393,7 +388,15 @@ public class ExampleTrifocalStereo {
 		MultiViewOps.projectiveToMetric(P1,H,worldToView.get(0),K);
 		MultiViewOps.projectiveToMetric(P2,H,worldToView.get(1),K);
 		MultiViewOps.projectiveToMetric(P3,H,worldToView.get(2),K);
-		K.print();
+
+//		K.print();
+//		// use the fact that K is already known
+//		PerspectiveOps.pinholeToMatrix(listPinhole.get(0),K);
+//		projectiveToMetricKnownK(K,P1,H,worldToView.get(0));
+//		PerspectiveOps.pinholeToMatrix(listPinhole.get(1),K);
+//		projectiveToMetricKnownK(K,P2,H,worldToView.get(1));
+//		PerspectiveOps.pinholeToMatrix(listPinhole.get(2),K);
+//		projectiveToMetricKnownK(K,P3,H,worldToView.get(2));
 
 		// scale is arbitrary. Set max translation to 1
 		double maxT = 0;
@@ -478,7 +481,7 @@ public class ExampleTrifocalStereo {
 		bundleAdjustment.setParameters(structure,observations);
 		bundleAdjustment.optimize(structure);
 
-		PruneStructureFromScene pruner = new PruneStructureFromScene(structure,observations);
+		PruneStructureFromSceneMetric pruner = new PruneStructureFromSceneMetric(structure,observations);
 		pruner.pruneObservationsByErrorRank(0.7);
 		pruner.pruneViews(10);
 		pruner.prunePoints(1);
@@ -525,5 +528,79 @@ public class ExampleTrifocalStereo {
 
 		// TODO dynamic max disparity
 		computeStereoCloud(image01,image02,color01,color02,intrinsic01,intrinsic02,leftToRight,0,250);
+	}
+
+	public static double computeReprojection( List<CameraPinhole> cameras,
+											  List<Se3_F64> listWorldToView ,
+											  List<AssociatedTriple> listObs )
+	{
+		double error = 0;
+		TriangulateNViewsCalibrated triangulation = FactoryMultiView.triangulateCalibratedNViewDLT();
+//		RefineTriangulationMetric refine = FactoryMultiView.triangulateRefine(1e-20,100);
+
+		List<Point2D_F64> normObs = new ArrayList<>();
+		for (int i = 0; i < listWorldToView.size(); i++) {
+			normObs.add( new Point2D_F64());
+		}
+
+//		Point3D_F64 XX = new Point3D_F64();
+		Point3D_F64 X = new Point3D_F64();
+		Point3D_F64 Y = new Point3D_F64();
+		Point2D_F64 pixel = new Point2D_F64();
+		for (int i = listObs.size()-1; i >= 0; i--) {
+			AssociatedTriple t = listObs.get(i);
+			for (int j = 0; j < listWorldToView.size(); j++) {
+				PerspectiveOps.convertPixelToNorm(cameras.get(j),t.get(j),normObs.get(j));
+			}
+
+			triangulation.triangulate(normObs,listWorldToView,X);
+//			refine.process(normObs,listWorldToView,XX,X);
+
+
+			for (int j = 0; j < listWorldToView.size(); j++) {
+				listWorldToView.get(j).transform(X,Y);
+				PerspectiveOps.convertNormToPixel(cameras.get(j),Y.x/Y.z,Y.y/Y.z,pixel);
+				double e = t.get(j).distance(pixel);
+				error += e;
+			}
+		}
+
+		// make the units easier to understand
+		return error/(listObs.size()*3);
+	}
+
+	public static List<Point3D_F64> triangulate( Se3_F64 a_to_b , DMatrixRMaj KA , DMatrixRMaj KB ,
+												 List<Point2D_F64> pixelsA , List<Point2D_F64> pixelsB)
+	{
+		if( pixelsA.size() != pixelsB.size() )
+			throw new IllegalArgumentException("Observation counts must match");
+
+		int N = pixelsA.size();
+
+		DMatrixRMaj KA_inv = new DMatrixRMaj(3,3);
+		DMatrixRMaj KB_inv = new DMatrixRMaj(3,3);
+
+		CommonOps_DDRM.invert(KA,KA_inv);
+		CommonOps_DDRM.invert(KB,KB_inv);
+
+		List<Point3D_F64> output = new ArrayList<>();
+
+		Point2D_F64 na = new Point2D_F64();
+		Point2D_F64 nb = new Point2D_F64();
+
+		TriangulateTwoViewsCalibrated triangulator = FactoryMultiView.triangulateTwoGeometric();
+
+		for (int i = 0; i < N; i++) {
+			GeometryMath_F64.mult(KA_inv,pixelsA.get(i),na);
+			GeometryMath_F64.mult(KB_inv,pixelsB.get(i),nb);
+
+			Point3D_F64 X = new Point3D_F64();
+			if( !triangulator.triangulate(na,nb,a_to_b,X) )
+				throw new RuntimeException("Triangulation failed?!");
+
+			output.add(X);
+		}
+
+		return output;
 	}
 }
