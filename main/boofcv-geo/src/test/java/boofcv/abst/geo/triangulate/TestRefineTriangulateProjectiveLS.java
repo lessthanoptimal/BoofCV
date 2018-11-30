@@ -18,16 +18,24 @@
 
 package boofcv.abst.geo.triangulate;
 
-import org.junit.jupiter.api.Test;
+import boofcv.abst.geo.GeneralTestRefineTriangulateProjective;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point4D_F64;
+import org.ejml.data.DMatrixRMaj;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.List;
 
 /**
  * @author Peter Abeles
  */
-class TestRefineTriangulateProjectiveLS {
-	@Test
-	public void implement() {
-		fail("implement");
+class TestRefineTriangulateProjectiveLS extends GeneralTestRefineTriangulateProjective {
+	RefineTriangulateProjectiveLS alg = new RefineTriangulateProjectiveLS(1e-8,200);
+
+	@Override
+	public void triangulate(List<Point2D_F64> obsPts,
+							List<DMatrixRMaj> cameraMatrices ,
+							Point4D_F64 initial , Point4D_F64 found )
+	{
+		alg.process(obsPts,cameraMatrices,initial,found);
 	}
 }

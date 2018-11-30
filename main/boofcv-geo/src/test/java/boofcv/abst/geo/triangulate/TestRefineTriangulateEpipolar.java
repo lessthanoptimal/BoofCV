@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.GeneralTestRefineTriangulate;
+import boofcv.abst.geo.GeneralTestRefineTriangulateMetric;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class TestRefineTriangulateEpipolar extends GeneralTestRefineTriangulate {
+public class TestRefineTriangulateEpipolar extends GeneralTestRefineTriangulateMetric {
 
 	RefineTriangulateEpipolar alg = new RefineTriangulateEpipolar(1e-8,200);
 

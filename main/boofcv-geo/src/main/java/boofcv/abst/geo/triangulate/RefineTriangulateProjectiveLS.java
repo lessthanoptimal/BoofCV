@@ -39,7 +39,7 @@ public class RefineTriangulateProjectiveLS implements RefineTriangulationProject
 
 	UnconstrainedLeastSquares<DMatrixRMaj> minimizer;
 
-	double param[] = new double[3];
+	double param[] = new double[4];
 	int maxIterations;
 	double convergenceTol;
 
