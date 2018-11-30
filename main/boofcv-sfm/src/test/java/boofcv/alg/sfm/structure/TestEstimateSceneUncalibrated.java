@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class TestEstimatedSceneUncalibrated {
+public class TestEstimateSceneUncalibrated {
 	@Disabled
 	@Test
 	public void foo() {
