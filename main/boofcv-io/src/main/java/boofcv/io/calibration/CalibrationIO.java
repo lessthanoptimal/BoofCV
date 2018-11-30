@@ -254,6 +254,8 @@ public class CalibrationIO {
 		int version = data.containsKey("version") ? (int)data.get("version") : 0;
 
 		String model = (String)data.get("model");
+		if( model == null )
+			throw new RuntimeException("Missing model parameter");
 
 		if( model.equals(MODEL_PINHOLE)) {
 			CameraPinhole parameters = new CameraPinhole();
