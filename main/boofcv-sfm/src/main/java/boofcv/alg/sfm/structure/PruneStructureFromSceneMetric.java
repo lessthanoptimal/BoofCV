@@ -40,13 +40,13 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PruneStructureFromScene {
+public class PruneStructureFromSceneMetric {
 
 	SceneStructureMetric structure;
 	SceneObservations observations;
 
-	public PruneStructureFromScene(SceneStructureMetric structure,
-								   SceneObservations observations)
+	public PruneStructureFromSceneMetric(SceneStructureMetric structure,
+										 SceneObservations observations)
 	{
 		this.structure = structure;
 		this.observations = observations;

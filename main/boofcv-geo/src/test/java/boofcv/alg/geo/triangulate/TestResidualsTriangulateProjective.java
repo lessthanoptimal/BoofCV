@@ -16,17 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.triangulate;
+package boofcv.alg.geo.triangulate;
 
-import boofcv.abst.geo.GeneralTestTriangulateTwoViewsUncalibrated;
-import boofcv.abst.geo.TriangulateTwoViews;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapTwoViewsTriangulateUncalibratedDLT extends GeneralTestTriangulateTwoViewsUncalibrated {
-
-	public TriangulateTwoViews createAlg() {
-		return new WrapTwoViewsTriangulateProjectiveDLT();
+class TestResidualsTriangulateProjective {
+	@Test
+	public void implement() {
+		fail("implement");
 	}
 }

@@ -28,7 +28,7 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.structure.EstimateSceneCalibrated;
 import boofcv.alg.sfm.structure.PairwiseImageMatching;
-import boofcv.alg.sfm.structure.PruneStructureFromScene;
+import boofcv.alg.sfm.structure.PruneStructureFromSceneMetric;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.ConfigBundleAdjustment;
@@ -123,7 +123,7 @@ public class ExampleMultiviewSceneReconstruction {
 		// Scale to improve numerical accuracy
 		ScaleSceneStructure bundleScale = new ScaleSceneStructure();
 
-		PruneStructureFromScene pruner = new PruneStructureFromScene(structure,observations);
+		PruneStructureFromSceneMetric pruner = new PruneStructureFromSceneMetric(structure,observations);
 
 		// Requiring 3 views per point reduces the number of outliers by a lot but also removes
 		// many valid points

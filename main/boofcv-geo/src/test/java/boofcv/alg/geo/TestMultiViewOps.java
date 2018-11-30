@@ -585,7 +585,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void fundamentalToProjection() {
+	public void fundamentalToProjective() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		Se3_F64 T = SpecialEuclideanOps_F64.eulerXyz(0.5,0.7,-0.3,EulerType.XYZ,1,2,-0.5,null);
 
@@ -615,6 +615,11 @@ public class TestMultiViewOps {
 		CommonOps_DDRM.scale(1.0 / F.get(0, 1), F);
 
 		assertTrue(MatrixFeatures_DDRM.isIdentical(F,foundF,1e-8));
+	}
+
+	@Test
+	public void fundamentalToEssential() {
+		fail("implement");
 	}
 
 	@Test
@@ -723,7 +728,7 @@ public class TestMultiViewOps {
 		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
 		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
 
-		Point3D_F64 found = MultiViewOps.transfer13(tensor,x1,line2,null);
+		Point3D_F64 found = MultiViewOps.transfer_1_to_3(tensor,x1,line2,null);
 
 		found.x /= found.z;
 		found.y /= found.z;
@@ -742,7 +747,7 @@ public class TestMultiViewOps {
 		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
 
-		Point3D_F64 found = MultiViewOps.transfer13(tensor,x1,x3,null);
+		Point3D_F64 found = MultiViewOps.transfer_1_to_3(tensor,x1,x3,null);
 
 		found.x /= found.z;
 		found.y /= found.z;
@@ -762,7 +767,7 @@ public class TestMultiViewOps {
 		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
 		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 
-		Point3D_F64 found = MultiViewOps.transfer12(tensor,x1,line3,null);
+		Point3D_F64 found = MultiViewOps.transfer_1_to_2(tensor,x1,line3,null);
 
 		found.x /= found.z;
 		found.y /= found.z;
@@ -781,7 +786,7 @@ public class TestMultiViewOps {
 		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
 
-		Point3D_F64 found = MultiViewOps.transfer12(tensor,x1,x2,null);
+		Point3D_F64 found = MultiViewOps.transfer_1_to_2(tensor,x1,x2,null);
 
 		found.x /= found.z;
 		found.y /= found.z;
@@ -835,4 +840,15 @@ public class TestMultiViewOps {
 	public void computeRectifyingHomography() {
 		fail("Implement");
 	}
+
+	@Test
+	public void split2() {
+		fail("implement");
+	}
+
+	@Test
+	public void split3() {
+		fail("implement");
+	}
+
 }

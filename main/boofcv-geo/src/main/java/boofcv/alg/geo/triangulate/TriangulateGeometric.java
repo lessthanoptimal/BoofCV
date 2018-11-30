@@ -53,6 +53,10 @@ public class TriangulateGeometric {
 							 Se3_F64 a_to_b ,
 							 Point3D_F64 foundInA )
 	{
+		// b_to_a = R'*(X_b-T)=X_a
+		// rayB should start at origin of B so X_b = 0
+		// Thus, rayB.p = -R'*T
+
 		// set camera B's principle point
 		Vector3D_F64 t = a_to_b.getT();
 		rayB.p.set(-t.x, -t.y, -t.z);

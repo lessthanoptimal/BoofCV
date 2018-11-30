@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestTriangulateCalibratedLinearDLT extends CommonTriangulationChecks {
+public class TestTriangulateMetricLinearDLT extends CommonTriangulationChecks {
 
 	/**
 	 * Create 3 perfect observations and solve for the position
@@ -36,7 +36,7 @@ public class TestTriangulateCalibratedLinearDLT extends CommonTriangulationCheck
 	public void triangulate_N() {
 		createScene();
 
-		TriangulateCalibratedLinearDLT alg = new TriangulateCalibratedLinearDLT();
+		TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
 
 		Point4D_F64 found = new Point4D_F64();
 
@@ -54,7 +54,7 @@ public class TestTriangulateCalibratedLinearDLT extends CommonTriangulationCheck
 	public void triangulate_two() {
 		createScene();
 
-		TriangulateCalibratedLinearDLT alg = new TriangulateCalibratedLinearDLT();
+		TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
 
 		Point4D_F64 found = new Point4D_F64();
 		

@@ -25,6 +25,7 @@ import org.ejml.data.DMatrix3;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrix4x4;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.fixed.CommonOps_DDF4;
 import org.ejml.dense.row.SingularOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
@@ -164,12 +165,17 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 
 		// Convert the solution into a fixed sized matrix because it's easier to read
 		encodeQ(Q,nv.data);
-		// TODO enforce structure
+
+		// diagonal elements must be positive because Q = [K*K' .. ; ... ]
+		// If they are a mix of positive and negative that's bad and can't be fixed
+		// All 3 are checked because technically they could be zero. Not a physically useful solution but...
+		if( Q.a11 < 0 || Q.a22 < 0 || Q.a33 < 0 ){
+			CommonOps_DDF4.scale(-1,Q);
+		}
 	}
 
 	/**
-	 * Computes average W across all cameras. The idea being that the average will
-	 * be a better estimate than selecting a random one.
+	 * Computes the calibration for each view..
 	 */
 	private void computeSolutions(DMatrix4x4 Q) {
 		DMatrixRMaj w_i = new DMatrixRMaj(3,3);
@@ -252,6 +258,11 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 			Projective P = cameras.get(i);
 			DMatrix3x3 A = P.A;
 			DMatrix3 B = P.a;
+
+			// hard to tell if this helped or hurt. Keeping commented out for future investigation on proper scaling
+//			double scale = NormOps_DDF3.normF(P.A);
+//			CommonOps_DDF3.divide(P.A,scale);
+//			CommonOps_DDF3.divide(P.a,scale);
 
 			// constraint for a zero principle point
 

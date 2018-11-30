@@ -73,6 +73,7 @@ public class TestTrifocalExtractGeometries extends CommonTrifocalChecks {
 
 	@Test
 	public void extractCamera() {
+		TrifocalLinearPoint7 linear = new TrifocalLinearPoint7();
 
 		TrifocalExtractGeometries alg = new TrifocalExtractGeometries();
 		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
@@ -82,7 +83,6 @@ public class TestTrifocalExtractGeometries extends CommonTrifocalChecks {
 			createRandomScenario();
 
 			// solve for the tensor to make this more realistic
-			TrifocalLinearPoint7 linear = new TrifocalLinearPoint7();
 			linear.process(observationsPixels,found);
 
 			alg.setTensor(found);

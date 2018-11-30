@@ -71,7 +71,7 @@ public class TrifocalTransfer {
 	 * @param y2 (Input) Observation in view 2. pixels.
 	 * @param p3 (Output) Estimated location in view 3.
 	 */
-	public void transfer12into3(double x1 , double y1 ,
+	public void transfer_1_to_3(double x1 , double y1 ,
 								double x2 , double y2 , Point3D_F64 p3)
 	{
 		// Adjust the observations so that they lie on the epipolar lines exactly
@@ -84,7 +84,7 @@ public class TrifocalTransfer {
 		l.y = -la.x;
 		l.z = -pb.x*la.y + pb.y*la.x;
 
-		MultiViewOps.transfer13(tensor,pa,l,p3);
+		MultiViewOps.transfer_1_to_3(tensor,pa,l,p3);
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class TrifocalTransfer {
 	 * @param y3 (Input) Observation in view 3. pixels.
 	 * @param p2 (Output) Estimated location in view 2.
 	 */
-	public void transfer13into2(double x1 , double y1 ,
+	public void transfer_1_to_2(double x1 , double y1 ,
 								double x3 , double y3 , Point3D_F64 p2)
 	{
 		// Adjust the observations so that they lie on the epipolar lines exactly
@@ -109,6 +109,6 @@ public class TrifocalTransfer {
 		l.y = -la.x;
 		l.z = -pb.x*la.y + pb.y*la.x;
 
-		MultiViewOps.transfer12(tensor,pa,l,p2);
+		MultiViewOps.transfer_1_to_2(tensor,pa,l,p2);
 	}
 }

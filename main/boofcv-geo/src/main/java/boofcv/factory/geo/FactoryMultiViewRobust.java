@@ -403,6 +403,10 @@ public class FactoryMultiViewRobust {
 		DistanceFromModel<TrifocalTensor,AssociatedTriple> distance;
 
 		switch( trifocal.error ) {
+			case REPROJECTION:
+				ransacTol = 3.0*ransac.inlierThreshold*ransac.inlierThreshold;
+				distance = new DistanceTrifocalReprojectionSq();
+				break;
 			case POINT_TRANSFER:
 				ransacTol = 2.0*ransac.inlierThreshold*ransac.inlierThreshold;
 				distance = new DistanceTrifocalTransferSq();

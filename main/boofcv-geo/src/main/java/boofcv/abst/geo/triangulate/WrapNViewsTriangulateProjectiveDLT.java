@@ -21,8 +21,8 @@ package boofcv.abst.geo.triangulate;
 import boofcv.abst.geo.TriangulateNViews;
 import boofcv.abst.geo.TriangulateTwoViews;
 import boofcv.alg.geo.GeometricResult;
-import boofcv.alg.geo.triangulate.TriangulateCalibratedLinearDLT;
-import boofcv.alg.geo.triangulate.TriangulateUncalibratedLinearDLT;
+import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
+import boofcv.alg.geo.triangulate.TriangulateProjectiveLinearDLT;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -30,13 +30,13 @@ import org.ejml.data.DMatrixRMaj;
 import java.util.List;
 
 /**
- * Wrapper around {@link TriangulateCalibratedLinearDLT} for {@link TriangulateTwoViews}.
+ * Wrapper around {@link TriangulateMetricLinearDLT} for {@link TriangulateTwoViews}.
  *
  * @author Peter Abeles
  */
-public class WrapNViewsTriangulateUncalibratedDLT implements TriangulateNViews {
+public class WrapNViewsTriangulateProjectiveDLT implements TriangulateNViews {
 
-	TriangulateUncalibratedLinearDLT alg = new TriangulateUncalibratedLinearDLT();
+	TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
 
 	@Override
 	public boolean triangulate(List<Point2D_F64> observations, List<DMatrixRMaj> cameraMatrices, Point4D_F64 location) {
@@ -47,7 +47,7 @@ public class WrapNViewsTriangulateUncalibratedDLT implements TriangulateNViews {
 		return false;
 	}
 
-	public TriangulateUncalibratedLinearDLT getAlgorithm() {
+	public TriangulateProjectiveLinearDLT getAlgorithm() {
 		return alg;
 	}
 }

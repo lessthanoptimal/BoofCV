@@ -28,6 +28,7 @@ public class TestBundleAdjustmentSchur_DSCC_Metric extends GenericBundleAdjustme
 	@Override
 	public BundleAdjustment<SceneStructureMetric> createAlg() {
 		BundleAdjustment<SceneStructureMetric> ret = FactoryMultiView.bundleAdjustmentMetric(null);
+//		ret.setVerbose(System.out,0);
 		ret.configure(1e-5,1e-5,20);
 		return ret;
 	}

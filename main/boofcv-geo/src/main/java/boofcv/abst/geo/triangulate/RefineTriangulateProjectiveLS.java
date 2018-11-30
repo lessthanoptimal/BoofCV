@@ -18,33 +18,33 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.RefineTriangulationCalibrated;
-import boofcv.alg.geo.triangulate.ResidualsTriangulateSimple;
+import boofcv.abst.geo.RefineTriangulationProjective;
+import boofcv.alg.geo.triangulate.ResidualsTriangulateProjective;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
+import georegression.struct.point.Point4D_F64;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
 /**
- * Nonlinear least-squares triangulation.
+ * Nonlinear least-squares triangulation for projective geometry in homogenous coordinates.
  *
  * @author Peter Abeles
  */
-public class LeastSquaresTriangulateCalibrated implements RefineTriangulationCalibrated {
+public class RefineTriangulateProjectiveLS implements RefineTriangulationProjective {
 
-	ResidualsTriangulateSimple func = new ResidualsTriangulateSimple();
+	ResidualsTriangulateProjective func = new ResidualsTriangulateProjective();
 
-	UnconstrainedLeastSquares minimizer;
+	UnconstrainedLeastSquares<DMatrixRMaj> minimizer;
 
 	double param[] = new double[3];
 	int maxIterations;
 	double convergenceTol;
 
-	public LeastSquaresTriangulateCalibrated( double convergenceTol,
-											  int maxIterations)
+	public RefineTriangulateProjectiveLS(double convergenceTol,
+										 int maxIterations)
 	{
 		this.convergenceTol = convergenceTol;
 		this.maxIterations = maxIterations;
@@ -52,16 +52,15 @@ public class LeastSquaresTriangulateCalibrated implements RefineTriangulationCal
 	}
 
 	@Override
-	public boolean process(List<Point2D_F64> observations, List<Se3_F64> worldToCamera,
-						Point3D_F64 worldPt, Point3D_F64 refinedPt)
-	{
-		func.setObservations(observations, worldToCamera);
+	public boolean process(List<Point2D_F64> observations, List<DMatrixRMaj> cameraMatrices,
+						   Point4D_F64 worldPt, Point4D_F64 refinedPt) {
+		func.setObservations(observations, cameraMatrices);
 		minimizer.setFunction(func,null);
 
 		param[0] = worldPt.x;
 		param[1] = worldPt.y;
 		param[2] = worldPt.z;
-
+		param[3] = worldPt.w;
 
 		minimizer.initialize(param,0,convergenceTol*observations.size());
 
@@ -74,6 +73,7 @@ public class LeastSquaresTriangulateCalibrated implements RefineTriangulationCal
 		refinedPt.x = found[0];
 		refinedPt.y = found[1];
 		refinedPt.z = found[2];
+		refinedPt.w = found[3];
 
 		return true;
 	}

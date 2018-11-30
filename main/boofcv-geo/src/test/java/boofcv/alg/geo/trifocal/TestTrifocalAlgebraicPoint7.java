@@ -102,9 +102,9 @@ public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 		for( AssociatedTriple o : observations ) {
 
 			Point3D_F64 p = new Point3D_F64();
-			transfer.transfer12into3(o.p1.x,o.p1.y,o.p2.x,o.p2.y,p);
+			transfer.transfer_1_to_3(o.p1.x,o.p1.y,o.p2.x,o.p2.y,p);
 			errors += o.p3.distance(p.x/p.z,p.y/p.z);
-			transfer.transfer13into2(o.p1.x,o.p1.y,o.p3.x,o.p3.y,p);
+			transfer.transfer_1_to_2(o.p1.x,o.p1.y,o.p3.x,o.p3.y,p);
 			errors += o.p2.distance(p.x/p.z,p.y/p.z);
 		}
 

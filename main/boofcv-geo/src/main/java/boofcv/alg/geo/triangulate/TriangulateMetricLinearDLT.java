@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class TriangulateCalibratedLinearDLT {
+public class TriangulateMetricLinearDLT {
 
 	private SolveNullSpaceSvd_DDRM solverNull = new SolveNullSpaceSvd_DDRM();
 	private DMatrixRMaj nullspace = new DMatrixRMaj(4,1);
@@ -120,7 +120,7 @@ public class TriangulateCalibratedLinearDLT {
 	}
 
 	private GeometricResult finishSolving(Point4D_F64 foundInA) {
-		TriangulateUncalibratedLinearDLT.normalizeRows(A);
+		TriangulateProjectiveLinearDLT.normalizeRows(A);
 
 		if (!solverNull.process(A, 1, nullspace))
 			return GeometricResult.SOLVE_FAILED;

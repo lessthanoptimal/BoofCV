@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,52 +18,52 @@
 
 package boofcv.alg.geo.triangulate;
 
+import boofcv.alg.geo.PerspectiveOps;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
-import georegression.transform.se.SePointOps_F64;
+import georegression.struct.point.Point4D_F64;
 import org.ddogleg.optimization.functions.FunctionNtoM;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
 /**
- * Basic error function for triangulation which only computes the residual between predicted and
- * actual observed point location.  Does not take in account the epipolar constraints.
+ * Residuals for a projective triangulation where the difference between predicted and observed pixels
+ * are minimized. The optimized point is in homogenous coordinates.
  * 
  * @author Peter Abeles
  */
-public class ResidualsTriangulateSimple implements FunctionNtoM  {
+public class ResidualsTriangulateProjective implements FunctionNtoM  {
 
 	// observations of the same feature in normalized coordinates
 	private List<Point2D_F64> observations;
 	// Known camera motion
-	private List<Se3_F64> motionGtoC;
+	private List<DMatrixRMaj> cameraMatrices;
 
-	private Point3D_F64 point = new Point3D_F64();
-	private Point3D_F64 transformed = new Point3D_F64();
-
+	// 3D point in homogenous coordinates
+	private Point4D_F64 point = new Point4D_F64();
+	private Point2D_F64 predicted = new Point2D_F64();
 	/**
 	 * Configures inputs.
 	 *
-	 * @param observations Observations of the feature at different locations. Normalized image coordinates.
-	 * @param motionGtoC Camera motion from global to camera frame..
+	 * @param observations Observations of the feature at different locations. Pixels.
+	 * @param cameraMatrices Camera matrices
 	 */
-	public void setObservations( List<Point2D_F64> observations , List<Se3_F64> motionGtoC ) {
-		if( observations.size() != motionGtoC.size() )
+	public void setObservations( List<Point2D_F64> observations , List<DMatrixRMaj> cameraMatrices ) {
+		if( observations.size() != cameraMatrices.size() )
 			throw new IllegalArgumentException("Different size lists");
 
 		this.observations = observations;
-		this.motionGtoC = motionGtoC;
+		this.cameraMatrices = cameraMatrices;
 	}
 	
 	@Override
 	public int getNumOfInputsN() {
-		return 3;
+		return 4;
 	}
 
 	@Override
 	public int getNumOfOutputsM() {
-		return observations.size();
+		return observations.size()*2;
 	}
 
 	@Override
@@ -72,17 +72,17 @@ public class ResidualsTriangulateSimple implements FunctionNtoM  {
 		point.x = input[0];
 		point.y = input[1];
 		point.z = input[2];
+		point.w = input[3];
 
+		int outputIdx = 0;
 		for( int i = 0; i < observations.size(); i++ ) {
 			Point2D_F64 p = observations.get(i);
-			Se3_F64 m = motionGtoC.get(i);
+			DMatrixRMaj m = cameraMatrices.get(i);
 
-			SePointOps_F64.transform(m,point,transformed);
-			
-			double dx = p.x-transformed.x/transformed.z;
-			double dy = p.y-transformed.y/transformed.z;
+			PerspectiveOps.renderPixel(m,point,predicted);
 
-			output[i] = dx*dx + dy*dy;
+			output[outputIdx++] = predicted.x-p.x;
+			output[outputIdx++] = predicted.y-p.y;
 		}
 	}
 }

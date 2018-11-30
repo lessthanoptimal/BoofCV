@@ -19,8 +19,8 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.geo.triangulate.PixelDepthLinear;
-import boofcv.alg.geo.triangulate.TriangulateCalibratedLinearDLT;
 import boofcv.alg.geo.triangulate.TriangulateGeometric;
+import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import georegression.struct.point.Point3D_F64;
@@ -36,11 +36,11 @@ public class BenchmarkRuntimeTriangulate extends ArtificialStereoScene {
 
 	public class DLT2 extends PerformerBase {
 
-		TriangulateCalibratedLinearDLT alg;
+		TriangulateMetricLinearDLT alg;
 		Point4D_F64 found = new Point4D_F64();
 
 		public DLT2() {
-			alg = new TriangulateCalibratedLinearDLT();
+			alg = new TriangulateMetricLinearDLT();
 		}
 
 		@Override

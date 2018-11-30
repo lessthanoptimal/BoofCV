@@ -20,7 +20,7 @@ package boofcv.abst.geo.triangulate;
 
 import boofcv.abst.geo.TriangulateNViewsCalibrated;
 import boofcv.alg.geo.GeometricResult;
-import boofcv.alg.geo.triangulate.TriangulateCalibratedLinearDLT;
+import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
@@ -29,13 +29,13 @@ import georegression.struct.se.Se3_F64;
 import java.util.List;
 
 /**
- * Wrapper around {@link TriangulateCalibratedLinearDLT} for {@link boofcv.abst.geo.TriangulateTwoViewsCalibrated}.
+ * Wrapper around {@link TriangulateMetricLinearDLT} for {@link boofcv.abst.geo.TriangulateTwoViewsCalibrated}.
  *
  * @author Peter Abeles
  */
-public class WrapNViewsTriangulateCalibratedDLT implements TriangulateNViewsCalibrated {
+public class WrapNViewsTriangulateMetricDLT implements TriangulateNViewsCalibrated {
 
-	TriangulateCalibratedLinearDLT alg = new TriangulateCalibratedLinearDLT();
+	TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
 
 	Point4D_F64 pointH = new Point4D_F64();
 
@@ -56,7 +56,7 @@ public class WrapNViewsTriangulateCalibratedDLT implements TriangulateNViewsCali
 		return false;
 	}
 
-	public TriangulateCalibratedLinearDLT getAlgorithm() {
+	public TriangulateMetricLinearDLT getAlgorithm() {
 		return alg;
 	}
 }

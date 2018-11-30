@@ -28,6 +28,7 @@ import boofcv.alg.geo.trifocal.TrifocalExtractGeometries;
 import boofcv.alg.geo.trifocal.TrifocalTransfer;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.PairLineNorm;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.geometry.GeometryMath_F64;
@@ -38,6 +39,7 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.Tuple2;
+import org.ddogleg.struct.Tuple3;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix3;
 import org.ejml.data.DMatrix3x3;
@@ -45,6 +47,7 @@ import org.ejml.data.DMatrix4x4;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.fixed.CommonOps_DDF4;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.SingularOps_DDRM;
 import org.ejml.dense.row.SpecializedOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.QRDecomposition;
@@ -793,6 +796,40 @@ public class MultiViewOps {
 	}
 
 	/**
+	 * Given the calibration matrix, convert the fundamental matrix into an essential matrix. E = K'*F*k
+	 *
+	 * @param F (Input) Fundamental matrix. 3x3
+	 * @param K (Input) Calibration matrix (3x3)
+	 * @param outputE (Output) Found essential matrix
+	 * @return Essential matrix
+	 */
+	public static DMatrixRMaj fundamentalToEssential( DMatrixRMaj F , DMatrixRMaj K , @Nullable DMatrixRMaj outputE ) {
+		if( outputE == null )
+			outputE = new DMatrixRMaj(3,3);
+
+		PerspectiveOps.multTranA(K,F,K,outputE);
+
+		// this is unlikely to be a perfect essential matrix. reduce the error by enforcing essential constraints
+		SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(true,true,false);
+
+		svd.decompose(outputE);
+		DMatrixRMaj U = svd.getU(null,false);
+		DMatrixRMaj W = svd.getW(null);
+		DMatrixRMaj V = svd.getV(null,false);
+
+		// settings value of singular values to be [1,1,0].  The first two singular values just need to be equal
+		// for it to be an essential matrix
+		SingularOps_DDRM.descendingOrder(U,false,W,V,false);
+		W.set(0,0,1);
+		W.set(1,1,1);
+		W.set(2,2,0);
+
+		PerspectiveOps.multTranC(U,W,V,outputE);
+
+		return outputE;
+	}
+
+	/**
 	 * <p>
 	 * Decomposes a metric camera matrix P=K*[R|T], where A is an upper triangular camera calibration
 	 * matrix, R is a rotation matrix, and T is a translation vector.
@@ -881,13 +918,13 @@ public class MultiViewOps {
 	 *
 	 * @see DecomposeEssential
 	 *
-	 * @param E An essential matrix.
-	 * @return Four possible motions
+	 * @param E21 An essential matrix.
+	 * @return Four possible motions. From view 1 to view 2.
 	 */
-	public static List<Se3_F64> decomposeEssential( DMatrixRMaj E ) {
+	public static List<Se3_F64> decomposeEssential( DMatrixRMaj E21 ) {
 		DecomposeEssential d = new DecomposeEssential();
 
-		d.decompose(E);
+		d.decompose(E21);
 
 		return d.getSolutions();
 	}
@@ -977,8 +1014,8 @@ public class MultiViewOps {
 	 * @param x3 (Output) Induced point (pixel) in third view. Homogenous coordinates.
 	 * @return induced point.
 	 */
-	public static Point3D_F64 transfer13(  TrifocalTensor T , Point2D_F64 x1 , Vector3D_F64 l2 ,
-										  @Nullable Point3D_F64 x3 )
+	public static Point3D_F64 transfer_1_to_3(TrifocalTensor T , Point2D_F64 x1 , Vector3D_F64 l2 ,
+											  @Nullable Point3D_F64 x3 )
 	{
 		if( x3 == null )
 			x3 = new Point3D_F64();
@@ -1024,15 +1061,15 @@ public class MultiViewOps {
 	 * @param x3 (Output) Induced point (pixel) in third view. Homogenous coordinates.
 	 * @return induced point.
 	 */
-	public static Point3D_F64 transfer13(  TrifocalTensor T , Point2D_F64 x1 , Point2D_F64 x3 ,
-										   @Nullable Point3D_F64 x2 )
+	public static Point3D_F64 transfer_1_to_3(TrifocalTensor T , Point2D_F64 x1 , Point2D_F64 x3 ,
+											  @Nullable Point3D_F64 x2 )
 	{
 		if( x2 == null )
 			x2 = new Point3D_F64();
 
 		TrifocalTransfer transfer = new TrifocalTransfer();
 		transfer.setTrifocal(T);
-		transfer.transfer13into2(x1.x,x1.y,x3.x,x3.y,x2);
+		transfer.transfer_1_to_2(x1.x,x1.y,x3.x,x3.y,x2);
 
 		return x2;
 	}
@@ -1046,8 +1083,8 @@ public class MultiViewOps {
 	 * @param x2 (Output) Induced point (pixel) in second view. Homogenous coordinates.
 	 * @return induced point.
 	 */
-	public static Point3D_F64 transfer12(  TrifocalTensor T , Point2D_F64 x1 , Vector3D_F64 l3 ,
-										   @Nullable Point3D_F64 x2 ) {
+	public static Point3D_F64 transfer_1_to_2(TrifocalTensor T , Point2D_F64 x1 , Vector3D_F64 l3 ,
+											  @Nullable Point3D_F64 x2 ) {
 		if (x2 == null)
 			x2 = new Point3D_F64();
 
@@ -1076,15 +1113,15 @@ public class MultiViewOps {
 	 * @param x2 (Output) Induced point (pixel) in second view. Homogenous coordinates.
 	 * @return induced point.
 	 */
-	public static Point3D_F64 transfer12(  TrifocalTensor T , Point2D_F64 x1 , Point2D_F64 x2 ,
-										   @Nullable Point3D_F64 x3 )
+	public static Point3D_F64 transfer_1_to_2(TrifocalTensor T , Point2D_F64 x1 , Point2D_F64 x2 ,
+											  @Nullable Point3D_F64 x3 )
 	{
 		if( x3 == null )
 			x3 = new Point3D_F64();
 
 		TrifocalTransfer transfer = new TrifocalTransfer();
 		transfer.setTrifocal(T);
-		transfer.transfer12into3(x1.x,x1.y,x2.x,x2.y,x3);
+		transfer.transfer_1_to_3(x1.x,x1.y,x2.x,x2.y,x3);
 
 		return x3;
 	}
@@ -1114,7 +1151,6 @@ public class MultiViewOps {
 		DMatrixRMaj tmp = new DMatrixRMaj(3,4);
 		CommonOps_DDRM.mult(cameraMatrix,H,tmp);
 
-		tmp.print();
 		MultiViewOps.decomposeMetricCamera(tmp,K,worldToView);
 	}
 
@@ -1247,5 +1283,43 @@ public class MultiViewOps {
 		w.set(alg.getW());
 		p.set(alg.getP());
 		return true;
+	}
+
+	/**
+	 * Splits the associated pairs into two lists
+	 * @param input List of associated features
+	 * @return two lists containing each set of features
+	 */
+	public static Tuple2<List<Point2D_F64>,List<Point2D_F64>> split2( List<AssociatedPair> input )
+	{
+		List<Point2D_F64> list1 = new ArrayList<>();
+		List<Point2D_F64> list2 = new ArrayList<>();
+
+		for (int i = 0; i < input.size(); i++) {
+			list1.add( input.get(i).p1 );
+			list2.add( input.get(i).p2 );
+		}
+
+		return new Tuple2<>(list1,list2);
+	}
+
+	/**
+	 * Splits the associated triple into three lists
+	 * @param input List of associated features
+	 * @return three lists containing each set of features
+	 */
+	public static Tuple3<List<Point2D_F64>,List<Point2D_F64>,List<Point2D_F64>> split3(List<AssociatedTriple> input )
+	{
+		List<Point2D_F64> list1 = new ArrayList<>();
+		List<Point2D_F64> list2 = new ArrayList<>();
+		List<Point2D_F64> list3 = new ArrayList<>();
+
+		for (int i = 0; i < input.size(); i++) {
+			list1.add( input.get(i).p1 );
+			list2.add( input.get(i).p2 );
+			list3.add( input.get(i).p3 );
+		}
+
+		return new Tuple3<>(list1,list2,list3);
 	}
 }

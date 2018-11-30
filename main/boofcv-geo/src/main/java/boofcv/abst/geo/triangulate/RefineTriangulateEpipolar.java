@@ -19,7 +19,7 @@
 package boofcv.abst.geo.triangulate;
 
 import boofcv.abst.geo.RefineTriangulationEpipolar;
-import boofcv.alg.geo.triangulate.ResidualsTriangulateSampson;
+import boofcv.alg.geo.triangulate.ResidualsTriangulateEpipolarSampson;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.optimization.FactoryOptimization;
@@ -33,9 +33,9 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class LeastSquaresTriangulateEpipolar implements RefineTriangulationEpipolar {
+public class RefineTriangulateEpipolar implements RefineTriangulationEpipolar {
 
-	ResidualsTriangulateSampson func = new ResidualsTriangulateSampson();
+	ResidualsTriangulateEpipolarSampson func = new ResidualsTriangulateEpipolarSampson();
 
 	UnconstrainedLeastSquares minimizer;
 
@@ -43,7 +43,7 @@ public class LeastSquaresTriangulateEpipolar implements RefineTriangulationEpipo
 	int maxIterations;
 	double convergenceTol;
 
-	public LeastSquaresTriangulateEpipolar(double convergenceTol, int maxIterations)
+	public RefineTriangulateEpipolar(double convergenceTol, int maxIterations)
 	{
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;

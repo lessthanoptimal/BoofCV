@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.structure;
+package boofcv.alg.geo.robust;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -26,10 +25,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class TestEstimatedSceneUncalibrated {
-	@Disabled
+class TestDistanceTrifocalReprojectionSq {
 	@Test
-	public void foo() {
-		fail("Implement");
+	public void implement() {
+		fail("implement");
 	}
 }

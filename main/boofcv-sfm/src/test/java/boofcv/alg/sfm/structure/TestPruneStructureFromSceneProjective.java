@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,24 +16,28 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.triangulate;
+package boofcv.alg.sfm.structure;
 
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.se.Se3_F64;
-import org.ddogleg.optimization.functions.FunctionNtoM;
+import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestResidualsTriangulateSimple
-		extends ResidualTriangulateChecks
-{
-	@Override
-	public FunctionNtoM createAlg(List<Point2D_F64> observations, List<Se3_F64> motionGtoC) {
-		ResidualsTriangulateSimple alg = new ResidualsTriangulateSimple();
-		alg.setObservations(observations,motionGtoC);
-		return alg;
+public class TestPruneStructureFromSceneProjective {
+	@Test
+	public void pruneObservationsByErrorRank() {
+		fail("Implement");
+	}
+
+	@Test
+	public void prunePoints() {
+		fail("Implement");
+	}
+
+	@Test
+	public void pruneViews() {
+		fail("Implement");
 	}
 }

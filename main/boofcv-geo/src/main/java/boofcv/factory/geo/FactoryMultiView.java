@@ -42,8 +42,10 @@ import boofcv.alg.geo.pose.P3PFinsterwalder;
 import boofcv.alg.geo.pose.P3PGrunert;
 import boofcv.alg.geo.pose.PnPLepetitEPnP;
 import boofcv.alg.geo.pose.PoseFromPairLinear6;
-import boofcv.alg.geo.triangulate.TriangulateCalibratedLinearDLT;
-import boofcv.alg.geo.triangulate.TriangulateUncalibratedLinearDLT;
+import boofcv.alg.geo.triangulate.ResidualsTriangulateEpipolarSampson;
+import boofcv.alg.geo.triangulate.ResidualsTriangulateMetricSimple;
+import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
+import boofcv.alg.geo.triangulate.TriangulateProjectiveLinearDLT;
 import boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.fitting.MotionTransformPoint;
@@ -455,45 +457,45 @@ public class FactoryMultiView {
 	/**
 	 * Triangulate two view using the Discrete Linear Transform (DLT) with a calibrated camera.
 	 *
-	 * @see TriangulateCalibratedLinearDLT
+	 * @see TriangulateMetricLinearDLT
 	 *
 	 * @return Two view triangulation algorithm
 	 */
 	public static TriangulateTwoViewsCalibrated triangulateCalibratedTwoDLT() {
-		return new WrapTwoViewsTriangulateCalibratedDLT();
+		return new WrapTwoViewsTriangulateMetricDLT();
 	}
 
 	/**
 	 * Triangulate two view using the Discrete Linear Transform (DLT) with an uncalibrated camera.
 	 *
-	 * @see boofcv.alg.geo.triangulate.TriangulateUncalibratedLinearDLT
+	 * @see TriangulateProjectiveLinearDLT
 	 *
 	 * @return Two view triangulation algorithm
 	 */
 	public static TriangulateTwoViews triangulateTwoDLT() {
-		return new WrapTwoViewsTriangulateUncalibratedDLT();
+		return new WrapTwoViewsTriangulateProjectiveDLT();
 	}
 
 	/**
 	 * Triangulate N views using the Discrete Linear Transform (DLT) with a calibrated camera
 	 *
-	 * @see TriangulateCalibratedLinearDLT
+	 * @see TriangulateMetricLinearDLT
 	 *
 	 * @return Two view triangulation algorithm
 	 */
 	public static TriangulateNViewsCalibrated triangulateCalibratedNViewDLT() {
-		return new WrapNViewsTriangulateCalibratedDLT();
+		return new WrapNViewsTriangulateMetricDLT();
 	}
 
 	/**
 	 * Triangulate N views using the Discrete Linear Transform (DLT) with an uncalibrated camera
 	 *
-	 * @see TriangulateUncalibratedLinearDLT
+	 * @see TriangulateProjectiveLinearDLT
 	 *
 	 * @return Two view triangulation algorithm
 	 */
 	public static TriangulateNViews triangulateNViewDLT() {
-		return new WrapNViewsTriangulateUncalibratedDLT();
+		return new WrapNViewsTriangulateProjectiveDLT();
 	}
 
 	/**
@@ -510,27 +512,31 @@ public class FactoryMultiView {
 	/**
 	 * Refine the triangulation using Sampson error.  Approximately takes in account epipolar constraints.
 	 *
-	 * @see boofcv.alg.geo.triangulate.ResidualsTriangulateSampson
+	 * @see ResidualsTriangulateEpipolarSampson
 	 *
 	 * @param convergenceTol Tolerance for finishing optimization
 	 * @param maxIterations Maximum number of allowed iterations
 	 * @return Triangulation refinement algorithm.
 	 */
 	public static RefineTriangulationEpipolar triangulateRefineEpipolar( double convergenceTol, int maxIterations ) {
-		return new LeastSquaresTriangulateEpipolar(convergenceTol,maxIterations);
+		return new RefineTriangulateEpipolar(convergenceTol,maxIterations);
 	}
 
 	/**
 	 * Refine the triangulation by computing the difference between predicted and actual pixel location.
 	 * Does not take in account epipolar constraints.
 	 *
-	 * @see boofcv.alg.geo.triangulate.ResidualsTriangulateSimple
+	 * @see ResidualsTriangulateMetricSimple
 	 *
 	 * @param convergenceTol Tolerance for finishing optimization
 	 * @param maxIterations Maximum number of allowed iterations
 	 * @return Triangulation refinement algorithm.
 	 */
-	public static RefineTriangulationCalibrated triangulateRefine( double convergenceTol, int maxIterations ) {
-		return new LeastSquaresTriangulateCalibrated(convergenceTol,maxIterations);
+	public static RefineTriangulationMetric triangulateRefineMetric(double convergenceTol, int maxIterations ) {
+		return new RefineTriangulateMetricEuclidean(convergenceTol,maxIterations);
+	}
+
+	public static RefineTriangulationProjective triangulateRefineProj(double convergenceTol, int maxIterations ) {
+		return new RefineTriangulateProjectiveLS(convergenceTol,maxIterations);
 	}
 }

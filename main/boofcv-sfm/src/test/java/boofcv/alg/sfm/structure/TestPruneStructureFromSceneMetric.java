@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestPruneStructureFromScene {
+public class TestPruneStructureFromSceneMetric {
 	SceneStructureMetric structure;
 	SceneObservations observations;
 
@@ -54,7 +54,7 @@ public class TestPruneStructureFromScene {
 		int N = observations.getObservationCount();
 		addCorruptObservations((int)(N*0.05));
 
-		PruneStructureFromScene alg = new PruneStructureFromScene(structure,observations);
+		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
 
 		// 5% of the observations are bad. This should remove them all
 		alg.pruneObservationsByErrorRank(0.95);
@@ -96,7 +96,7 @@ public class TestPruneStructureFromScene {
 		int N = observations.getObservationCount();
 		movePointBehindCameras((int)(N*0.1));
 
-		PruneStructureFromScene alg = new PruneStructureFromScene(structure,observations);
+		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
 
 		// 5% of the observations are bad. This should remove them all
 		alg.pruneObservationsBehindCamera();
@@ -136,7 +136,7 @@ public class TestPruneStructureFromScene {
 		int countPoints = structure.points.length;
 		int countObservations = observations.getObservationCount();
 
-		PruneStructureFromScene alg = new PruneStructureFromScene(structure,observations);
+		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
 
 		// no change expected
 		alg.prunePoints(1);
@@ -165,7 +165,7 @@ public class TestPruneStructureFromScene {
 		int countPoints0 = structure.points.length;
 		int countObservations0 = observations.getObservationCount();
 
-		PruneStructureFromScene alg = new PruneStructureFromScene(structure,observations);
+		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
 
 		// This should just prune the outliers far from the center
 		alg.prunePoints(2,0.5);
@@ -191,7 +191,7 @@ public class TestPruneStructureFromScene {
 	public void prunePoints_neighbors_exact() {
 		createPerfectScene(2,5);
 
-		PruneStructureFromScene alg = new PruneStructureFromScene(structure,observations);
+		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
 
 		// no pruning should occur
 		alg.prunePoints(1,5.01);
@@ -204,7 +204,7 @@ public class TestPruneStructureFromScene {
 
 		// Corners should get pruned but interior ones saved
 		createPerfectScene(3,5);
-		alg = new PruneStructureFromScene(structure,observations);
+		alg = new PruneStructureFromSceneMetric(structure,observations);
 		alg.prunePoints(3,5.01);
 		assertEquals(5, structure.points.length);
 
@@ -234,7 +234,7 @@ public class TestPruneStructureFromScene {
 
 		assertEquals(10,observations.views.length);
 
-		PruneStructureFromScene alg = new PruneStructureFromScene(structure,observations);
+		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
 
 		// no change
 		alg.pruneViews(leastCount-1);
@@ -258,7 +258,7 @@ public class TestPruneStructureFromScene {
 	public void pruneUnusedCameras() {
 		createPerfectScene();
 
-		PruneStructureFromScene alg = new PruneStructureFromScene(structure,observations);
+		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
 
 		// no change
 		alg.pruneUnusedCameras();

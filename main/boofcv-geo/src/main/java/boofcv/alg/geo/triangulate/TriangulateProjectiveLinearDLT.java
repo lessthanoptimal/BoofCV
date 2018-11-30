@@ -44,7 +44,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class TriangulateUncalibratedLinearDLT {
+public class TriangulateProjectiveLinearDLT {
 	private SolveNullSpaceSvd_DDRM solverNull = new SolveNullSpaceSvd_DDRM();
 	private DMatrixRMaj nullspace = new DMatrixRMaj(4,1);
 	private DMatrixRMaj A = new DMatrixRMaj(4,4);
@@ -79,7 +79,9 @@ public class TriangulateUncalibratedLinearDLT {
 			index = addView(cameraMatrices.get(i),observations.get(i),index);
 		}
 
-		// improve numerics
+		// improve numerics by scaling each row individually
+		// For future reviewers of this code, you can sanity check this by randomizing the scaling and seeing if
+		// unit tests still pass.
 		normalizeRows(A);
 
 		if( !solverNull.process(A,1, nullspace) )
@@ -101,7 +103,7 @@ public class TriangulateUncalibratedLinearDLT {
 	}
 
 	/**
-	 * Adds a view to the A matrix
+	 * Adds a view to the A matrix. Computed using cross product.
 	 */
 	private int addView( DMatrixRMaj P , Point2D_F64 a , int index ) {
 
