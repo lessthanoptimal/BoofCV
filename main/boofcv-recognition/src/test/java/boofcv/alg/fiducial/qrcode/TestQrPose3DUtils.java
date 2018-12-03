@@ -18,26 +18,120 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.struct.geo.Point2D3D;
+import boofcv.struct.geo.PointIndex2D_F64;
+import georegression.struct.point.Point3D_F64;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestQrPose3DUtils {
+
 	@Test
 	public void getLandmarkByIndex() {
-		fail("Implement");
+		QrCode qr = new QrCode();
+
+		// this version has a locator pattern, but we don't care about those. sanity check to see
+		// that it's ignored
+		qr.version = 2;
+
+		for (int i = 0; i < 4; i++) {
+			qr.ppCorner.get(i).set(i,i+1);
+			qr.ppRight.get(i).set(4+i,4+i+1);
+			qr.ppDown.get(i).set(8+i,8+i+1);
+		}
+
+		QrPose3DUtils alg = new QrPose3DUtils();
+		List<PointIndex2D_F64> list =  alg.getLandmarkByIndex(qr);
+
+		assertEquals(12,list.size());
+		for (int i = 0; i < 12; i++) {
+			assertEquals(0,list.get(i).distance(i,i+1), UtilEjml.TEST_F64);
+		}
 	}
 
 	@Test
 	public void getLandmark2D3D() {
-		fail("Implement");
+
+		QrCode qr = new QrCode();
+
+		// try different versions. This will change the coordinate of points in the marker frame
+		for( int v : new int[]{1,2,4,10}) {
+			int N = QrCode.totalModules(v);
+			double w = 2.0*7/(double)N;
+			qr.version = v;
+
+			for (int i = 0; i < 4; i++) {
+				qr.ppCorner.get(i).set(i, i + 1);
+				qr.ppRight.get(i).set(4 + i, 4 + i + 1);
+				qr.ppDown.get(i).set(8 + i, 8 + i + 1);
+			}
+
+			QrPose3DUtils alg = createAlg();
+
+			List<Point2D3D> list = alg.getLandmark2D3D(qr);
+			assertEquals(12, list.size());
+			for (int i = 0; i < 12; i++) {
+				// coordinate system is center (0,0) +x right +y up. normalized to have values -1 to 1
+				Point3D_F64 X = list.get(i).location;
+
+				assertTrue(X.x >= -1 && X.x <= 1);
+				assertTrue(X.y >= -1 && X.y <= 1);
+				assertEquals(0, X.z);
+				assertEquals(0, list.get(i).observation.distance(0.1 * i, 0.1 * (i + 1)), UtilEjml.TEST_F64);
+			}
+
+			// check a few hand computed points
+			assertEquals(0, list.get(0).location.distance(-1, 1, 0), UtilEjml.TEST_F64);
+			assertEquals(0, list.get(5).location.distance(1, 1, 0), UtilEjml.TEST_F64);
+			assertEquals(0, list.get(11).location.distance(-1, -1, 0), UtilEjml.TEST_F64);
+			assertEquals(0, list.get(1).location.distance(-1+w, 1, 0), UtilEjml.TEST_F64);
+		}
 	}
 
+	/**
+	 * Compare answer to what getLandmark2D3D() returns since the info is the same
+	 */
 	@Test
 	public void getLandmark3D() {
-		fail("Implement");
+		QrCode qr = new QrCode();
+
+		// try different versions. This will change the coordinate of points in the marker frame
+		for( int v : new int[]{1,2,4,10}) {
+			qr.version = v;
+
+			for (int i = 0; i < 4; i++) {
+				qr.ppCorner.get(i).set(i, i + 1);
+				qr.ppRight.get(i).set(4 + i, 4 + i + 1);
+				qr.ppDown.get(i).set(8 + i, 8 + i + 1);
+			}
+
+			QrPose3DUtils alg = createAlg();
+
+			List<Point2D3D> expected = alg.getLandmark2D3D(qr);
+			List<Point3D_F64> found = alg.getLandmark3D(qr.version);
+
+			assertEquals(expected.size(),found.size());
+			for (int i = 0; i < expected.size(); i++) {
+				assertEquals(0,expected.get(i).location.distance(found.get(i)), UtilEjml.TEST_F64);
+			}
+		}
+	}
+
+	private QrPose3DUtils createAlg() {
+		QrPose3DUtils alg = new QrPose3DUtils();
+		alg.setPixelToNorm((x, y, out) -> {
+			// just change the point's scale to make it easy to see if it was applied
+			out.x = x*0.1;
+			out.y = y*0.1;
+		});
+		return alg;
 	}
 }

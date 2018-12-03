@@ -29,7 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utilities when estimating the 3D pose of a QR Code
+ * Utilities when estimating the 3D pose of a QR Code. Each landmark (e.g. corner on a locator pattern) is assigned
+ * an ID. Functions are provided for accessing coordinates (of each landmark by ID. 3D coordinates in marker frame
+ * have values from -1 to 1 to make it more numerically favorable for linear estimators. This scale offset is easily
+ * fixed with a multiplication after the pose has been found.
  *
  * @author Peter Abeles
  */
@@ -43,8 +46,6 @@ public class QrPose3DUtils {
 	public List<Point3D_F64> point3D = new ArrayList<>();
 	// transform from pixel to normalzied image coordinates
 	protected Point2Transform2_F64 pixelToNorm = new DoNothing2Transform2_F64();
-	// width of QR code
-	public double markerWidth = 1.0;
 
 	public QrPose3DUtils() {
 		for (int i = 0; i < 12; i++) {
@@ -129,21 +130,38 @@ public class QrPose3DUtils {
 		return point3D;
 	}
 
+	/**
+	 * Specifies PNP parameters for a single feature
+	 *
+	 * @param which Landmark's index
+	 * @param row row in the QR code's grid coordinate system
+	 * @param col column in the QR code's grid coordinate system
+	 * @param N width of grid
+	 * @param pixel observed pixel coordinate of feature
+	 */
 	private void setPair(int which, int row, int col, int N , Point2D_F64 pixel ) {
-		double gridX = col*markerWidth/N-markerWidth/2;
-		double gridY = markerWidth/2-row*markerWidth/N;
-
-		point23.get(which).location.set(gridX,gridY,0);
+		set3D(row,col,N,point23.get(which).location);
 		pixelToNorm.compute(pixel.x,pixel.y,point23.get(which).observation);
 	}
 
+	/**
+	 * Specifies 3D location of landmark in marker coordinate system
+	 * @param row row in the QR code's grid coordinate system
+	 * @param col column in the QR code's grid coordinate system
+	 * @param N width of grid
+	 * @param location (Output) location of feature in marker reference frame
+	 */
 	private void set3D(int row, int col, int N , Point3D_F64 location ) {
-		double gridX = col*markerWidth/N-markerWidth/2;
-		double gridY = markerWidth/2-row*markerWidth/N;
+		double _N = N;
+		double gridX = 2.0*(col/_N-0.5);
+		double gridY = 2.0*(0.5-row/_N);
 
 		location.set(gridX,gridY,0);
 	}
 
+	/**
+	 * Specifies transform from pixel to normalize image coordinates
+	 */
 	public void setPixelToNorm(Point2Transform2_F64 pixelToNorm) {
 		if( pixelToNorm == null ) {
 			this.pixelToNorm = new DoNothing2Transform2_F64();
@@ -152,15 +170,7 @@ public class QrPose3DUtils {
 		}
 	}
 
-	public void setMarkerWidth(double markerWidth) {
-		this.markerWidth = markerWidth;
-	}
-
 	public Point2Transform2_F64 getPixelToNorm() {
 		return pixelToNorm;
-	}
-
-	public double getMarkerWidth() {
-		return markerWidth;
 	}
 }

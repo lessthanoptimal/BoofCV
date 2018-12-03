@@ -27,6 +27,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
 import javax.annotation.Nullable;
@@ -46,6 +47,7 @@ public class QrCodeDetectorPnP<T extends ImageGray<T>> extends FiducialDetectorP
 	ImageType<T> imageType;
 
 	QrPose3DUtils poseUtils = new QrPose3DUtils();
+	double sideWidth = 1.0;
 
 	public QrCodeDetectorPnP(QrCodeDetector<T> detector) {
 		this.detector = detector;
@@ -60,12 +62,24 @@ public class QrCodeDetectorPnP<T extends ImageGray<T>> extends FiducialDetectorP
 
 	@Override
 	public double getSideWidth(int which) {
-		return poseUtils.getMarkerWidth();
+		return sideWidth;
 	}
 
 	@Override
 	public double getSideHeight(int which) {
-		return poseUtils.getMarkerWidth();
+		return sideWidth;
+	}
+
+	@Override
+	public boolean getFiducialToCamera(int which, Se3_F64 fiducialToCamera) {
+		// need to scale solution since marker coordinates are scaled to
+		// gave values from -1 to 1, which is a width of 2.0
+		if( super.getFiducialToCamera(which,fiducialToCamera)) {
+			fiducialToCamera.T.scale(sideWidth/2.0);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
@@ -124,11 +138,11 @@ public class QrCodeDetectorPnP<T extends ImageGray<T>> extends FiducialDetectorP
 
 	@Override
 	public double getWidth(int which) {
-		return poseUtils.getMarkerWidth();
+		return sideWidth;
 	}
 
 	public void setMarkerWidth(double markerWidth) {
-		poseUtils.setMarkerWidth(markerWidth);
+		this.sideWidth = markerWidth;
 	}
 
 	@Override
