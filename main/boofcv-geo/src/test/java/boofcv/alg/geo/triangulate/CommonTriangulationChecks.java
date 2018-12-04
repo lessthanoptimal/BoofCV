@@ -19,6 +19,7 @@
 package boofcv.alg.geo.triangulate;
 
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.geo.PerspectiveOps;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
@@ -36,7 +37,7 @@ import java.util.Random;
  */
 public class CommonTriangulationChecks {
 
-	Random rand = new Random(234);
+	protected Random rand = new Random(234);
 	
 	int N = 30;
 
@@ -44,12 +45,14 @@ public class CommonTriangulationChecks {
 	protected List<Point2D_F64> obsPts;
 	protected List<Se3_F64> motionWorldToCamera;
 	protected List<DMatrixRMaj> essential;
+	protected List<DMatrixRMaj> cameraMatrices;
 	
 	public void createScene() {
 		worldPoint = new Point3D_F64(0.1,-0.2,4);
 		motionWorldToCamera = new ArrayList<>();
 		obsPts = new ArrayList<>();
 		essential = new ArrayList<>();
+		cameraMatrices = new ArrayList<>();
 		
 		Point3D_F64 cameraPoint = new Point3D_F64();
 		
@@ -71,6 +74,7 @@ public class CommonTriangulationChecks {
 			obsPts.add(o);
 			motionWorldToCamera.add(tranWtoI);
 			essential.add(E);
+			cameraMatrices.add(PerspectiveOps.createCameraMatrix(tranWtoI.R,tranWtoI.T,null,null));
 		}
 	}
 }
