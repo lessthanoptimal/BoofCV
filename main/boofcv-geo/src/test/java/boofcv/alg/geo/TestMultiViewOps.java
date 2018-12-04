@@ -19,6 +19,8 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.geo.h.CommonHomographyInducedPlane;
+import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.PairLineNorm;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -31,6 +33,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.Tuple2;
+import org.ddogleg.struct.Tuple3;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -843,12 +846,42 @@ public class TestMultiViewOps {
 
 	@Test
 	public void split2() {
-		fail("implement");
+		List<AssociatedPair> triples = new ArrayList<>();
+		for (int i = 0; i < 20; i++) {
+			triples.add( new AssociatedPair());
+		}
+
+		Tuple2<List<Point2D_F64>,List<Point2D_F64>> found = MultiViewOps.split2(triples);
+
+		assertEquals(triples.size(),found.data0.size());
+		assertEquals(triples.size(),found.data1.size());
+
+		for (int i = 0; i < triples.size(); i++) {
+			AssociatedPair t = triples.get(i);
+			assertSame(t.p1, found.data0.get(i));
+			assertSame(t.p2, found.data1.get(i));
+		}
 	}
 
 	@Test
 	public void split3() {
-		fail("implement");
+		List<AssociatedTriple> triples = new ArrayList<>();
+		for (int i = 0; i < 20; i++) {
+			triples.add( new AssociatedTriple());
+		}
+
+		Tuple3<List<Point2D_F64>,List<Point2D_F64>,List<Point2D_F64>> found = MultiViewOps.split3(triples);
+
+		assertEquals(triples.size(),found.d0.size());
+		assertEquals(triples.size(),found.d1.size());
+		assertEquals(triples.size(),found.d2.size());
+
+		for (int i = 0; i < triples.size(); i++) {
+			AssociatedTriple t = triples.get(i);
+			assertSame(t.p1, found.d0.get(i));
+			assertSame(t.p2, found.d1.get(i));
+			assertSame(t.p3, found.d2.get(i));
+		}
 	}
 
 }

@@ -3,6 +3,6 @@ dependencies {
     implementation project(':main:boofcv-geo')
     implementation project(':main:boofcv-calibration')
 
-    compile group: 'org.yaml', name: 'snakeyaml', version: '1.17'
+    compile group: 'org.yaml', name: 'snakeyaml', version: '1.23'
     compile group: 'commons-io', name: 'commons-io', version: COMMONS_IO_VERSION
 }
