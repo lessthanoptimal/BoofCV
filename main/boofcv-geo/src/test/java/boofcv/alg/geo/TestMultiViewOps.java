@@ -39,6 +39,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
+import org.ejml.equation.Equation;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 
@@ -622,7 +623,27 @@ public class TestMultiViewOps {
 
 	@Test
 	public void fundamentalToEssential() {
-		fail("implement");
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
+		for (int i = 0; i < 50; i++) {
+			double Tx = rand.nextGaussian();
+			double Ty = rand.nextGaussian();
+			double Tz = rand.nextGaussian();
+			double rotX = rand.nextGaussian();
+			double rotY = rand.nextGaussian();
+			double rotZ = rand.nextGaussian();
+
+			Se3_F64 m = SpecialEuclideanOps_F64.eulerXyz(Tx,Ty,Tz,rotX,rotY,rotZ,null);
+
+			DMatrixRMaj E = MultiViewOps.createEssential(m.R,m.T,null);
+			DMatrixRMaj F = MultiViewOps.createFundamental(E,K);
+
+			DMatrixRMaj found = MultiViewOps.fundamentalToEssential(F,K,null);
+
+			double scale = NormOps_DDRM.normF(E)/NormOps_DDRM.normF(found);
+			CommonOps_DDRM.scale(scale,found);
+
+			assertTrue(MatrixFeatures_DDRM.isIdentical(E,found,UtilEjml.TEST_F64));
+		}
 	}
 
 	@Test
@@ -826,7 +847,32 @@ public class TestMultiViewOps {
 
 	@Test
 	public void projectiveToMetricKnownK() {
-		fail("Implement");
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
+		for (int i = 0; i < 50; i++) {
+			double Tx = rand.nextGaussian();
+			double Ty = rand.nextGaussian();
+			double Tz = rand.nextGaussian();
+			double rotX = rand.nextGaussian();
+			double rotY = rand.nextGaussian();
+			double rotZ = rand.nextGaussian();
+
+			Se3_F64 m = SpecialEuclideanOps_F64.eulerXyz(Tx,Ty,Tz,rotX,rotY,rotZ,null);
+
+			DMatrixRMaj P = PerspectiveOps.createCameraMatrix(m.R,m.T,K,null);
+
+			Equation eq = new Equation(P,"P",K,"K");
+			eq.process("p=[-0.9,0.1,0.7]'").
+					process("H=[K zeros(3,1);-p'*K 1]").
+					process("P=P*H").process("H_inv=inv(H)");
+
+			DMatrixRMaj H_inv = eq.lookupDDRM("H_inv");
+
+			Se3_F64 found = new Se3_F64();
+
+			MultiViewOps.projectiveToMetricKnownK(P,H_inv,K,found);
+
+			assertEquals(0,m.T.distance(found.T), UtilEjml.TEST_F64);
+		}
 	}
 
 	@Test

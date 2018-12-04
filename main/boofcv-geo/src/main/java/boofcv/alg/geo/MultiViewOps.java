@@ -796,7 +796,8 @@ public class MultiViewOps {
 	}
 
 	/**
-	 * Given the calibration matrix, convert the fundamental matrix into an essential matrix. E = K'*F*k
+	 * Given the calibration matrix, convert the fundamental matrix into an essential matrix. E = K'*F*k. The
+	 * singular values of the resulting E matrix are forced to be [1,1,0]
 	 *
 	 * @param F (Input) Fundamental matrix. 3x3
 	 * @param K (Input) Calibration matrix (3x3)
@@ -1157,6 +1158,9 @@ public class MultiViewOps {
 	/**
 	 * Convert the projective camera matrix into a metric transform given the rectifying homography and a
 	 * known calibration matrix.
+	 *
+	 * {@code P = K*[R|T]*H} where H is the inverse of the rectifying homography.
+	 *
 	 * @param cameraMatrix (Input) camera matrix. 3x4
 	 * @param H (Input) Rectifying homography. 4x4
 	 * @param K (Input) Known calibration matrix
