@@ -41,7 +41,7 @@ public abstract class GeneralTestRefineTriangulateProjective extends CommonTrian
 
 	@Test
 	public void perfectInput() {
-		createScene();
+		createMetricScene();
 
 		Point4D_F64 initial = convert(worldPoint);
 		Point4D_F64 found = new Point4D_F64();
@@ -53,7 +53,7 @@ public abstract class GeneralTestRefineTriangulateProjective extends CommonTrian
 
 	@Test
 	public void incorrectInput() {
-		createScene();
+		createMetricScene();
 
 		Point4D_F64 initial = convert(worldPoint);
 		initial.x += 0.01;

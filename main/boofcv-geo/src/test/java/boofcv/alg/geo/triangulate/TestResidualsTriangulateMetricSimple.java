@@ -28,7 +28,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class TestResidualsTriangulateMetricSimple
-		extends ResidualTriangulateChecks
+		extends ResidualTriangulateMetricChecks
 {
 	@Override
 	public FunctionNtoM createAlg(List<Point2D_F64> observations, List<Se3_F64> motionGtoC) {

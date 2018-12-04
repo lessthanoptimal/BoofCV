@@ -18,16 +18,22 @@
 
 package boofcv.alg.geo.triangulate;
 
-import org.junit.jupiter.api.Test;
+import georegression.struct.point.Point2D_F64;
+import org.ddogleg.optimization.functions.FunctionNtoM;
+import org.ejml.data.DMatrixRMaj;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.List;
 
 /**
  * @author Peter Abeles
  */
-class TestResidualsTriangulateProjective {
-	@Test
-	public void implement() {
-		fail("implement");
+class TestResidualsTriangulateProjective
+	extends ResidualTriangulateProjectiveChecks
+{
+	@Override
+	public FunctionNtoM createAlg(List<Point2D_F64> observations, List<DMatrixRMaj> cameraMatrices) {
+		ResidualsTriangulateProjective alg = new ResidualsTriangulateProjective();
+		alg.setObservations(observations,cameraMatrices);
+		return alg;
 	}
 }

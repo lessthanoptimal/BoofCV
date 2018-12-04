@@ -41,7 +41,7 @@ public abstract class GeneralTestRefineTriangulateMetric extends CommonTriangula
 
 	@Test
 	public void perfectInput() {
-		createScene();
+		createMetricScene();
 
 		Point3D_F64 initial = worldPoint.copy();
 		Point3D_F64 found = new Point3D_F64();
@@ -52,7 +52,7 @@ public abstract class GeneralTestRefineTriangulateMetric extends CommonTriangula
 
 	@Test
 	public void incorrectInput() {
-		createScene();
+		createMetricScene();
 
 		Point3D_F64 initial = worldPoint.copy();
 		initial.x += 0.01;

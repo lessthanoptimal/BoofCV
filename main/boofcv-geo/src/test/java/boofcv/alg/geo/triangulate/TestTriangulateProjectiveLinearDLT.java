@@ -18,17 +18,14 @@
 
 package boofcv.alg.geo.triangulate;
 
+import georegression.geometry.GeometryMath_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
-import georegression.struct.se.Se3_F64;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -41,13 +38,13 @@ public class TestTriangulateProjectiveLinearDLT extends CommonTriangulationCheck
 	 */
 	@Test
 	public void triangulate_metric_N() {
-		createScene();
+		createMetricScene();
 
 		TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
 
 		Point4D_F64 found = new Point4D_F64();
 
-		alg.triangulate(obsPts, metricToProjective(motionWorldToCamera),found);
+		alg.triangulate(obsPts, cameraMatrices,found);
 
 		found.x /= found.w;
 		found.y /= found.w;
@@ -58,31 +55,56 @@ public class TestTriangulateProjectiveLinearDLT extends CommonTriangulationCheck
 		assertEquals(worldPoint.z,found.z,1e-8);
 	}
 
-	private List<DMatrixRMaj> metricToProjective(List<Se3_F64> motions ) {
-		List<DMatrixRMaj> output = new ArrayList<>();
-
-		for( Se3_F64 M : motions ) {
-			DMatrixRMaj P = new DMatrixRMaj(3,4);
-			CommonOps_DDRM.insert(M.R,P,0,0);
-			P.set(0,3, M.T.x);
-			P.set(1,3, M.T.y);
-			P.set(2,3, M.T.z);
-
-			output.add(P);
-		}
-		return output;
-	}
-
 	/**
 	 * Test case with a true projective situation
 	 */
 	@Test
 	public void triangulate_projective() {
-		fail("implement");
+		createProjectiveScene();
+
+		TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
+
+		Point4D_F64 foundX = new Point4D_F64();
+
+		alg.triangulate(obsPts, cameraMatrices,foundX);
+
+		// project the found coordinate back on to each image
+		Point2D_F64 foundPixel = new Point2D_F64();
+		for (int i = 0; i < cameraMatrices.size(); i++) {
+			DMatrixRMaj P = cameraMatrices.get(i);
+			Point2D_F64 expected = obsPts.get(i);
+
+			GeometryMath_F64.mult(P,foundX,foundPixel);
+
+			assertEquals(0,expected.distance(foundPixel), UtilEjml.TEST_F64);
+		}
 	}
 
+	/**
+	 * Add a tinny bit of noise and see if it blows up
+	 */
 	@Test
 	public void triangulate_projective_noise() {
-		fail("Implement");
+		createProjectiveScene();
+
+		TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
+
+		Point4D_F64 foundX = new Point4D_F64();
+
+		obsPts.get(0).x += 0.01;
+		obsPts.get(0).y -= 0.01;
+
+		alg.triangulate(obsPts, cameraMatrices,foundX);
+
+		// project the found coordinate back on to each image
+		Point2D_F64 foundPixel = new Point2D_F64();
+		for (int i = 0; i < cameraMatrices.size(); i++) {
+			DMatrixRMaj P = cameraMatrices.get(i);
+			Point2D_F64 expected = obsPts.get(i);
+
+			GeometryMath_F64.mult(P,foundX,foundPixel);
+
+			assertEquals(0,expected.distance(foundPixel), 0.03);
+		}
 	}
 }

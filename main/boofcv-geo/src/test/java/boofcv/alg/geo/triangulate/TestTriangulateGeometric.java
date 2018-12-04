@@ -33,7 +33,7 @@ public class TestTriangulateGeometric extends CommonTriangulationChecks {
 	 */
 	@Test
 	public void triangulate_two() {
-		createScene();
+		createMetricScene();
 
 		TriangulateGeometric alg = new TriangulateGeometric();
 

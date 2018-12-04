@@ -34,7 +34,7 @@ public class TestTriangulateMetricLinearDLT extends CommonTriangulationChecks {
 	 */
 	@Test
 	public void triangulate_N() {
-		createScene();
+		createMetricScene();
 
 		TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
 
@@ -52,7 +52,7 @@ public class TestTriangulateMetricLinearDLT extends CommonTriangulationChecks {
 	 */
 	@Test
 	public void triangulate_two() {
-		createScene();
+		createMetricScene();
 
 		TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
 

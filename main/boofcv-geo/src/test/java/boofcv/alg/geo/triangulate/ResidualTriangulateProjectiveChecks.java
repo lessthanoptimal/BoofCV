@@ -19,8 +19,8 @@
 package boofcv.alg.geo.triangulate;
 
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.se.Se3_F64;
 import org.ddogleg.optimization.functions.FunctionNtoM;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -31,19 +31,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class ResidualTriangulateChecks extends CommonTriangulationChecks {
+public abstract class ResidualTriangulateProjectiveChecks extends CommonTriangulationChecks {
 
-	public abstract FunctionNtoM createAlg( List<Point2D_F64> observations , List<Se3_F64> motionGtoC );
+	public abstract FunctionNtoM createAlg( List<Point2D_F64> observations , List<DMatrixRMaj> cameraMatrices );
 
 	/**
 	 * Give it perfect parameters and no noise in observations then try introducing some errors
 	 */
 	@Test
 	public void perfect() {
-		createScene();
-		FunctionNtoM alg = createAlg(obsPts, motionWorldToCamera);
+		createProjectiveScene();
+		FunctionNtoM alg = createAlg(obsPts, cameraMatrices);
 
-		double input[] = new double[]{worldPoint.x,worldPoint.y,worldPoint.z};
+		double input[] = new double[]{worldPoint.x,worldPoint.y,worldPoint.z,1};
 		double output[] = new double[ alg.getNumOfOutputsM() ];
 		
 		alg.process(input,output);

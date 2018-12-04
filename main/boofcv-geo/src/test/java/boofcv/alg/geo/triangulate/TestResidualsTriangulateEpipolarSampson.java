@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class TestResidualsTriangulateEpipolarSampson extends ResidualTriangulateChecks {
+public class TestResidualsTriangulateEpipolarSampson extends ResidualTriangulateMetricChecks {
 
 	@Override
 	public FunctionNtoM createAlg(List<Point2D_F64> observations, List<Se3_F64> motionGtoC) {
