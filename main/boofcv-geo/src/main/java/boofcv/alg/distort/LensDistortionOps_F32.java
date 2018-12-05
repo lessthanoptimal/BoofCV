@@ -65,7 +65,7 @@ public class LensDistortionOps_F32 {
 		LensDistortionNarrowFOV desired = LensDistortionFactory.narrow(paramDesired);
 
 		Point2Transform2_F32 ori_p_to_n = original.undistort_F32(true, false);
-		Point2Transform2_F32 des_n_to_p = desired.undistort_F32(false, true);
+		Point2Transform2_F32 des_n_to_p = desired.distort_F32(false, true);
 
 		Point2Transform2_F32 ori_to_des = new SequencePoint2Transform2_F32(ori_p_to_n,des_n_to_p);
 
@@ -136,34 +136,57 @@ public class LensDistortionOps_F32 {
 													   PixelTransform2_F32 transform)
 	{
 		List<Point2D_F32> points = computeBoundingPoints(srcWidth, srcHeight, transform);
-
 		Point2D_F32 center = new Point2D_F32();
 		UtilPoint2D_F32.mean(points,center);
 
 		float x0,x1,y0,y1;
-		x0 = y0 = -Float.MAX_VALUE;
-		x1 = y1 = Float.MAX_VALUE;
+		x0 = y0 = Float.MAX_VALUE;
+		x1 = y1 = -Float.MAX_VALUE;
+
+		for (int i = 0; i < points.size(); i++) {
+			Point2D_F32 p = points.get(i);
+			if( p.x < x0 )
+				x0 = p.x;
+			if( p.x > x1 )
+				x1 = p.x;
+			if( p.y < y0 )
+				y0 = p.y;
+			if( p.y > y1 )
+				y1 = p.y;
+		}
+
+		x0 -= center.x;
+		x1 -= center.x;
+		y0 -= center.y;
+		y1 -= center.y;
+
+		float ox0 = x0;
+		float oy0 = y0;
+		float ox1 = x1;
+		float oy1 = y1;
+
 
 		for (int i = 0; i < points.size(); i++) {
 			Point2D_F32 p = points.get(i);
 			float dx = p.x-center.x;
 			float dy = p.y-center.y;
-			float adx = (float)Math.abs(dx);
-			float ady = (float)Math.abs(dy);
 
-			if( dx >= x0 && dy >= y0 && dx <= x1 && dy <= y1 ) {
-				if( adx < ady ) {
-					if( dy < 0 ) {
-						y0 = dy;
-					} else {
-						y1 = dy;
-					}
+			// see if the point is inside the box
+			if( dx > x0 && dy > y0 && dx < x1 && dy < y1 ) {
+				// find smallest reduction in side length and closest to original rectangle
+				float d0 = (float) (float)Math.abs(dx - x0) + x0 - ox0;
+				float d1 = (float) (float)Math.abs(dx - x1) + ox1 - x1;
+				float d2 = (float) (float)Math.abs(dy - y0) + y0 - oy0;
+				float d3 = (float) (float)Math.abs(dy - y1) + oy1 - y1;
+
+				if ( d0 <= d1 && d0 <= d2 && d0 <= d3) {
+					x0 = dx;
+				} else if (d1 <= d2 && d1 <= d3) {
+					x1 = dx;
+				} else if (d2 <= d3) {
+					y0 = dy;
 				} else {
-					if( dx < 0 ) {
-						x0 = dx;
-					} else {
-						x1 = dx;
-					}
+					y1 = dy;
 				}
 			}
 		}

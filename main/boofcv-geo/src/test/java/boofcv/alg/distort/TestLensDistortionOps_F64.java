@@ -286,6 +286,9 @@ public class TestLensDistortionOps_F64 {
 		// inside as a compromise
 	}
 
+	/**
+	 * Tests to see if it correctly centers in a simple rectangular situations0
+	 */
 	@Test
 	public void centerBoxInside() {
 

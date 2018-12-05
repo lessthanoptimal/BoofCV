@@ -23,6 +23,10 @@ Version : 0.32
 - InterleavedU8 and Planar<GrayU8>
   * Added set32/get32 and set24/get24
 - ConvertImage reshapes output instead of throwing an exception
+- LensDistortion
+  * Fixed transformChangeModel() it was undistorting twice when it should have undist then dist
+  * Split some of the code between F32 and F64
+  * Bound now works on arbitrary distortions
 - Geometry
   * Fixed bug in Linear Trifocal Tensor estimator
   * Robust trifocal tensor estimation
