@@ -21,6 +21,7 @@ package boofcv.gui.calibration;
 import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.distort.LensDistortionOps_F32;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.core.image.border.BorderType;
@@ -247,7 +248,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 		CameraPinhole undistorted = new CameraPinhole(param);
 		this.undoRadial = LensDistortionOps.changeCameraModel(
 				AdjustmentType.FULL_VIEW, BorderType.ZERO, param, undistorted,null, ImageType.single(GrayF32.class));
-		this.remove_p_to_p = LensDistortionOps.transformChangeModel_F32(AdjustmentType.FULL_VIEW, param, undistorted, false,null);
+		this.remove_p_to_p = LensDistortionOps_F32.transformChangeModel(AdjustmentType.FULL_VIEW, param, undistorted, false,null);
 
 		undoRadialDistortion(distorted);
 	}

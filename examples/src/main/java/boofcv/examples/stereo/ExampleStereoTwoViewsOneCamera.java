@@ -20,13 +20,13 @@ package boofcv.examples.stereo;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.robust.ModelMatcherMultiview;
 import boofcv.core.image.border.BorderType;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.ConfigEssential;
@@ -172,7 +172,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	 */
 	public static List<AssociatedPair> convertToNormalizedCoordinates(List<AssociatedPair> matchedFeatures, CameraPinholeRadial intrinsic) {
 
-		Point2Transform2_F64 p_to_n = LensDistortionOps.narrow(intrinsic).undistort_F64(true, false);
+		Point2Transform2_F64 p_to_n = LensDistortionFactory.narrow(intrinsic).undistort_F64(true, false);
 
 		List<AssociatedPair> calibratedFeatures = new ArrayList<>();
 
@@ -248,7 +248,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	 */
 	public static void drawInliers(BufferedImage left, BufferedImage right, CameraPinholeRadial intrinsic,
 								   List<AssociatedPair> normalized) {
-		Point2Transform2_F64 n_to_p = LensDistortionOps.narrow(intrinsic).distort_F64(false,true);
+		Point2Transform2_F64 n_to_p = LensDistortionFactory.narrow(intrinsic).distort_F64(false,true);
 
 		List<AssociatedPair> pixels = new ArrayList<>();
 

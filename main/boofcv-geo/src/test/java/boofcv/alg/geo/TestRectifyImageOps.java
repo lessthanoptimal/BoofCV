@@ -39,7 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestRectifyImageOps {
 
-	Point2D_F32 p = new Point2D_F32();
+	Point2D_F32 p32 = new Point2D_F32();
+	Point2D_F64 p64 = new Point2D_F64();
+
 	int width = 300;
 	int height = 350;
 
@@ -78,18 +80,40 @@ public class TestRectifyImageOps {
 		}
 	}
 
+	private void checkInside(Point2Transform2_F64 tran) {
+		for( int y = 0; y < height; y++ ) {
+			checkInside(0,y,tran);
+			checkInside(width-1,y,tran);
+		}
+
+		for( int x = 0; x < width; x++ ) {
+			checkInside(x,0,tran);
+			checkInside(x,height-1,tran);
+		}
+	}
+
 	private void checkInside( int x , int y , Point2Transform2_F32 tran ) {
-		tran.compute(x, y, p);
+		tran.compute(x, y, p32);
 
 		float tol = 0.1f;
 
-		String s = x+" "+y+" -> "+p.x+" "+p.y;
-		assertTrue(p.x >= -tol && p.x < width + tol ,s);
-		assertTrue(p.y >= -tol && p.y < height + tol,s);
+		String s = x+" "+y+" -> "+ p32.x+" "+ p32.y;
+		assertTrue(p32.x >= -tol && p32.x < width + tol ,s);
+		assertTrue(p32.y >= -tol && p32.y < height + tol,s);
+	}
+
+	private void checkInside( int x , int y , Point2Transform2_F64 tran ) {
+		tran.compute(x, y, p64);
+
+		double tol = 0.1f;
+
+		String s = x+" "+y+" -> "+ p64.x+" "+ p64.y;
+		assertTrue(p64.x >= -tol && p64.x < width + tol ,s);
+		assertTrue(p64.y >= -tol && p64.y < height + tol,s);
 	}
 
 	@Test
-	public void allInsideLeft_calibrated() {
+	public void allInsideLeft_calibrated_F32() {
 
 		CameraPinholeRadial param = new CameraPinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
@@ -108,7 +132,26 @@ public class TestRectifyImageOps {
 	}
 
 	@Test
-	public void fullViewLeft_uncalibrated() {
+	public void allInsideLeft_calibrated_F64() {
+
+		CameraPinholeRadial param = new CameraPinholeRadial().
+				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
+
+		// do nothing rectification
+		DMatrixRMaj rect1 = CommonOps_DDRM.identity(3);
+		DMatrixRMaj rect2 = CommonOps_DDRM.identity(3);
+		DMatrixRMaj rectK = PerspectiveOps.pinholeToMatrix(param, (DMatrixRMaj)null);
+
+		RectifyImageOps.allInsideLeft(param, rect1, rect2, rectK);
+
+		// check left image
+		Point2Transform2_F64 tran = RectifyImageOps.transformRectToPixel(param, rect1);
+		checkInside(tran);
+		// the right view is not checked since it is not part of the contract
+	}
+
+	@Test
+	public void fullViewLeft_uncalibrated_F32() {
 		// do nothing rectification
 		FMatrixRMaj rect1 = CommonOps_FDRM.diag(2, 3, 1);
 		FMatrixRMaj rect2 = CommonOps_FDRM.diag(0.5f, 2, 1);

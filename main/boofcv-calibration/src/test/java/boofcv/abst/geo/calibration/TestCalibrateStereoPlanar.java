@@ -19,8 +19,8 @@
 package boofcv.abst.geo.calibration;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestCalibrateStereoPlanar {
 	CameraPinholeRadial intrinsic = new CameraPinholeRadial(200,210,0,320,240,640,480).
 			fsetRadial(0.01, -0.02).fsetTangental(0.03,0.03);
-	Point2Transform2_F64 normToPixel = LensDistortionOps.narrow(intrinsic).distort_F64(false, true);
+	Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false, true);
 
 	List<Se3_F64> targetToLeft = new ArrayList<>();
 

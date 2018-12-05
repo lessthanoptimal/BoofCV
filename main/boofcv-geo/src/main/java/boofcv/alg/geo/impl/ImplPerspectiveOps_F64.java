@@ -18,10 +18,10 @@
 
 package boofcv.alg.geo.impl;
 
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.pinhole.PinholeNtoP_F64;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -34,9 +34,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.data.FMatrix3x3;
 import org.ejml.dense.fixed.CommonOps_DDF3;
-import org.ejml.dense.fixed.CommonOps_FDF3;
 import org.ejml.dense.row.CommonOps_DDRM;
 
 import javax.annotation.Nullable;
@@ -77,11 +75,11 @@ public class ImplPerspectiveOps_F64 {
 		}
 		CommonOps_DDRM.fill(K, 0);
 
-		K.data[0] = param.fx;
-		K.data[1] = param.skew;
-		K.data[2] = param.cx;
-		K.data[4] = param.fy;
-		K.data[5] = param.cy;
+		K.data[0] = (double) param.fx;
+		K.data[1] = (double) param.skew;
+		K.data[2] = (double) param.cx;
+		K.data[4] = (double) param.fy;
+		K.data[5] = (double) param.cy;
 		K.data[8] = 1;
 
 		return K;
@@ -95,29 +93,11 @@ public class ImplPerspectiveOps_F64 {
 			CommonOps_DDF3.fill(K,0);
 		}
 
-		K.a11 = param.fx;
-		K.a12 = param.skew;
-		K.a13 = param.cx;
-		K.a22 = param.fy;
-		K.a23 = param.cy;
-		K.a33 = 1;
-
-		return K;
-	}
-
-	public static FMatrix3x3 pinholeToMatrix(CameraPinhole param , FMatrix3x3 K ) {
-
-		if( K == null ) {
-			K = new FMatrix3x3();
-		} else {
-			CommonOps_FDF3.fill(K,0);
-		}
-
-		K.a11 = (float)param.fx;
-		K.a12 = (float)param.skew;
-		K.a13 = (float)param.cx;
-		K.a22 = (float)param.fy;
-		K.a23 = (float)param.cy;
+		K.a11 = (double) param.fx;
+		K.a12 = (double) param.skew;
+		K.a13 = (double) param.cx;
+		K.a22 = (double) param.fy;
+		K.a23 = (double) param.cy;
 		K.a33 = 1;
 
 		return K;
@@ -145,7 +125,7 @@ public class ImplPerspectiveOps_F64 {
 		if( pixel == null )
 			pixel = new Point2D_F64();
 
-		Point2Transform2_F64 normToPixel = LensDistortionOps.narrow(param).distort_F64(false,true);
+		Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(param).distort_F64(false,true);
 
 		normToPixel.compute(x,y,pixel);
 
@@ -168,7 +148,7 @@ public class ImplPerspectiveOps_F64 {
 		if( norm == null )
 			norm = new Point2D_F64();
 
-		Point2Transform2_F64 pixelToNorm = LensDistortionOps.narrow(param).distort_F64(true, false);
+		Point2Transform2_F64 pixelToNorm = LensDistortionFactory.narrow(param).distort_F64(true, false);
 
 		pixelToNorm.compute(pixel.x,pixel.y,norm);
 
@@ -191,11 +171,11 @@ public class ImplPerspectiveOps_F64 {
 		if( norm == null )
 			norm = new Point2D_F64();
 
-		double a11 = 1.0/intrinsic.fx;
-		double a12 = -intrinsic.skew/(intrinsic.fx*intrinsic.fy);
-		double a13 = (intrinsic.skew*intrinsic.cy - intrinsic.cx*intrinsic.fy)/(intrinsic.fx*intrinsic.fy);
-		double a22 = 1.0/intrinsic.fy;
-		double a23 = -intrinsic.cy/intrinsic.fy;
+		double a11 = (double)( 1.0/intrinsic.fx);
+		double a12 = (double)(-intrinsic.skew/(intrinsic.fx*intrinsic.fy));
+		double a13 = (double)((intrinsic.skew*intrinsic.cy - intrinsic.cx*intrinsic.fy)/(intrinsic.fx*intrinsic.fy));
+		double a22 = (double)(1.0/intrinsic.fy);
+		double a23 = (double)(-intrinsic.cy/intrinsic.fy);
 
 		norm.x = a11*pixelX + a12*pixelY + a13;
 		norm.y = a22*pixelY + a23;

@@ -22,16 +22,18 @@ import georegression.struct.point.Point3D_F32;
 import org.ddogleg.nn.alg.KdTreeDistance;
 
 /**
+ * Computes the Euclidean distance squared of {@link Point3D_F32} for a {@link org.ddogleg.nn.alg.KdTree}.
+ *
  * @author Peter Abeles
  */
 public class KdTreePoint3D_F32 implements KdTreeDistance<Point3D_F32> {
 	@Override
-	public double distance(Point3D_F32 a, Point3D_F32 b) {
+	public /**/double distance(Point3D_F32 a, Point3D_F32 b) {
 		return a.distance2(b);
 	}
 
 	@Override
-	public double valueAt(Point3D_F32 point, int index) {
+	public /**/double valueAt(Point3D_F32 point, int index) {
 		switch( index ) {
 			case 0: return point.x;
 			case 1: return point.y;

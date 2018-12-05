@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.overhead;
 
-import boofcv.alg.distort.LensDistortionOps;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -86,7 +86,7 @@ public abstract class CreateSyntheticOverheadView<T extends ImageBase<T>>
 		this.overheadWidth = overheadWidth;
 		this.overheadHeight = overheadHeight;
 
-		Point2Transform2_F64 normToPixel = LensDistortionOps.narrow(intrinsic).distort_F64(false, true);
+		Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false, true);
 
 		// Declare storage for precomputed pixel locations
 		int overheadPixels = overheadHeight*overheadWidth;

@@ -19,7 +19,7 @@
 package boofcv.alg.geo.impl;
 
 import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.distort.LensDistortionOps_F32;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.distort.pinhole.PinholePtoN_F32;
@@ -31,7 +31,7 @@ import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_FDRM;
 import org.ejml.simple.SimpleMatrix;
 
-import static boofcv.alg.distort.LensDistortionOps.narrow;
+import static boofcv.factory.distort.LensDistortionFactory.narrow;
 
 /**
  * <p>
@@ -87,10 +87,10 @@ public class ImplRectifyImageOps_F32 {
 
 		Point2Transform2_F32 tranLeft = transformPixelToRect(paramLeft, rectifyLeft);
 
-		RectangleLength2D_F32 bound = LensDistortionOps.boundBoxInside(paramLeft.width, paramLeft.height,
+		RectangleLength2D_F32 bound = LensDistortionOps_F32.boundBoxInside(paramLeft.width, paramLeft.height,
 				new PointToPixelTransform_F32(tranLeft));
 
-		LensDistortionOps.roundInside(bound);
+		LensDistortionOps_F32.roundInside(bound);
 
 		float scaleX = paramLeft.width/(float)bound.width;
 		float scaleY = paramLeft.height/(float)bound.height;
@@ -105,7 +105,7 @@ public class ImplRectifyImageOps_F32 {
 	{
 		PointTransformHomography_F32 tranLeft = new PointTransformHomography_F32(rectifyLeft);
 
-		RectangleLength2D_F32 bound = LensDistortionOps.boundBoxInside(imageWidth, imageHeight,
+		RectangleLength2D_F32 bound = LensDistortionOps_F32.boundBoxInside(imageWidth, imageHeight,
 				new PointToPixelTransform_F32(tranLeft));
 
 		float scaleX = imageWidth/(float)bound.width;

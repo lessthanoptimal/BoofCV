@@ -23,7 +23,7 @@ import boofcv.abst.feature.detdesc.DetectDescribeMulti;
 import boofcv.abst.feature.detdesc.PointDescSet;
 import boofcv.abst.geo.TriangulateTwoViewsMetric;
 import boofcv.alg.descriptor.UtilFeature;
-import boofcv.alg.distort.LensDistortionOps;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
@@ -145,8 +145,8 @@ public class VisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc> {
 	public void setCalibration(StereoParameters param) {
 
 		param.rightToLeft.invert(leftToRight);
-		leftImageToNorm = LensDistortionOps.narrow(param.left).undistort_F64(true,false);
-		rightImageToNorm = LensDistortionOps.narrow(param.right).undistort_F64(true,false);
+		leftImageToNorm = LensDistortionFactory.narrow(param.left).undistort_F64(true,false);
+		rightImageToNorm = LensDistortionFactory.narrow(param.right).undistort_F64(true,false);
 	}
 
 	/**

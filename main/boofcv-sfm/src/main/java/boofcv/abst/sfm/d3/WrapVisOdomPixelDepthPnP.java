@@ -37,7 +37,7 @@ import georegression.struct.se.Se3_F64;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.alg.distort.LensDistortionOps.narrow;
+import static boofcv.factory.distort.LensDistortionFactory.narrow;
 
 /**
  * @author Peter Abeles

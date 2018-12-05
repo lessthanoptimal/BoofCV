@@ -18,21 +18,26 @@
 
 package boofcv.alg.geo.impl;
 
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.pinhole.PinholeNtoP_F32;
 import boofcv.alg.distort.pinhole.PinholePtoN_F32;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.Point2Transform2_F32;
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
+import georegression.struct.point.Point4D_F32;
 import georegression.struct.point.Vector3D_F32;
 import georegression.struct.se.Se3_F32;
 import georegression.transform.se.SePointOps_F32;
+import org.ejml.data.FMatrix3x3;
 import org.ejml.data.FMatrixRMaj;
+import org.ejml.dense.fixed.CommonOps_FDF3;
 import org.ejml.dense.row.CommonOps_FDRM;
+
+import javax.annotation.Nullable;
 
 /**
  * Implementation of {@link PerspectiveOps} functions for 32-bit floats
@@ -49,11 +54,11 @@ public class ImplPerspectiveOps_F32 {
 			adjustedParam = parameters.createLike();
 		adjustedParam.set(parameters);
 
-		FMatrixRMaj K = ImplPerspectiveOps_F32.pinholeToMatrix(parameters, null);
+		FMatrixRMaj K = ImplPerspectiveOps_F32.pinholeToMatrix(parameters, (FMatrixRMaj)null);
 		FMatrixRMaj K_adj = new FMatrixRMaj(3,3);
 		CommonOps_FDRM.mult(adjustMatrix, K, K_adj);
 
-		ImplPerspectiveOps_F32.matrixToParam(K_adj, parameters.width, parameters.height, adjustedParam);
+		ImplPerspectiveOps_F32.matrixToPinhole(K_adj, parameters.width, parameters.height, adjustedParam);
 
 		return adjustedParam;
 	}
@@ -70,31 +75,49 @@ public class ImplPerspectiveOps_F32 {
 		}
 		CommonOps_FDRM.fill(K, 0);
 
-		K.data[0] = (float)param.fx;
-		K.data[1] = (float)param.skew;
-		K.data[2] = (float)param.cx;
-		K.data[4] = (float)param.fy;
-		K.data[5] = (float)param.cy;
+		K.data[0] = (float) param.fx;
+		K.data[1] = (float) param.skew;
+		K.data[2] = (float) param.cx;
+		K.data[4] = (float) param.fy;
+		K.data[5] = (float) param.cy;
 		K.data[8] = 1;
 
 		return K;
 	}
 
-	public static <C extends CameraPinhole>C matrixToParam(FMatrixRMaj K , int width , int height , C param ) {
+	public static FMatrix3x3 pinholeToMatrix(CameraPinhole param , FMatrix3x3 K ) {
 
-		if( param == null )
-			param = (C)new CameraPinhole();
+		if( K == null ) {
+			K = new FMatrix3x3();
+		} else {
+			CommonOps_FDF3.fill(K,0);
+		}
 
-		param.fx = K.get(0,0);
-		param.fy = K.get(1,1);
-		param.skew = K.get(0,1);
-		param.cx = K.get(0,2);
-		param.cy = K.get(1,2);
+		K.a11 = (float) param.fx;
+		K.a12 = (float) param.skew;
+		K.a13 = (float) param.cx;
+		K.a22 = (float) param.fy;
+		K.a23 = (float) param.cy;
+		K.a33 = 1;
 
-		param.width = width;
-		param.height = height;
+		return K;
+	}
 
-		return param;
+	public static CameraPinhole matrixToPinhole(FMatrixRMaj K , int width , int height , CameraPinhole output ) {
+
+		if( output == null )
+			output = new CameraPinhole();
+
+		output.fx = K.get(0,0);
+		output.fy = K.get(1,1);
+		output.skew = K.get(0,1);
+		output.cx = K.get(0,2);
+		output.cy = K.get(1,2);
+
+		output.width = width;
+		output.height = height;
+
+		return output;
 	}
 
 	public static Point2D_F32 convertNormToPixel(CameraModel param , float x , float y , Point2D_F32 pixel ) {
@@ -102,7 +125,7 @@ public class ImplPerspectiveOps_F32 {
 		if( pixel == null )
 			pixel = new Point2D_F32();
 
-		Point2Transform2_F32 normToPixel = LensDistortionOps.narrow(param).distort_F32(false,true);
+		Point2Transform2_F32 normToPixel = LensDistortionFactory.narrow(param).distort_F32(false,true);
 
 		normToPixel.compute(x,y,pixel);
 
@@ -125,7 +148,7 @@ public class ImplPerspectiveOps_F32 {
 		if( norm == null )
 			norm = new Point2D_F32();
 
-		Point2Transform2_F32 pixelToNorm = LensDistortionOps.narrow(param).distort_F32(true, false);
+		Point2Transform2_F32 pixelToNorm = LensDistortionFactory.narrow(param).distort_F32(true, false);
 
 		pixelToNorm.compute(pixel.x,pixel.y,norm);
 
@@ -140,6 +163,22 @@ public class ImplPerspectiveOps_F32 {
 		alg.set(K.get(0,0),K.get(1,1),K.get(0,1),K.get(0,2),K.get(1,2));
 
 		alg.compute(pixel.x,pixel.y,norm);
+
+		return norm;
+	}
+
+	public static Point2D_F32 convertPixelToNorm( CameraPinhole intrinsic , float pixelX, float pixelY, Point2D_F32 norm ) {
+		if( norm == null )
+			norm = new Point2D_F32();
+
+		float a11 = (float)( 1.0f/intrinsic.fx);
+		float a12 = (float)(-intrinsic.skew/(intrinsic.fx*intrinsic.fy));
+		float a13 = (float)((intrinsic.skew*intrinsic.cy - intrinsic.cx*intrinsic.fy)/(intrinsic.fx*intrinsic.fy));
+		float a22 = (float)(1.0f/intrinsic.fy);
+		float a23 = (float)(-intrinsic.cy/intrinsic.fy);
+
+		norm.x = a11*pixelX + a12*pixelY + a13;
+		norm.y = a22*pixelY + a23;
 
 		return norm;
 	}
@@ -163,23 +202,69 @@ public class ImplPerspectiveOps_F32 {
 		return GeometryMath_F32.mult(K, norm, norm);
 	}
 
-	public static Point2D_F32 renderPixel( FMatrixRMaj worldToCamera , Point3D_F32 X ) {
+	public static Point2D_F32 renderPixel(Se3_F32 worldToCamera,
+										  float fx, float skew, float cx, float fy, float cy,
+										  Point3D_F32 X) {
+		Point3D_F32 X_cam = new Point3D_F32();
+
+		SePointOps_F32.transform(worldToCamera, X, X_cam);
+
+		// see if it's behind the camera
+		if( X_cam.z <= 0 )
+			return null;
+
+		float xx = X_cam.x/X_cam.z;
+		float yy = X_cam.y/X_cam.z;
+
+		Point2D_F32 pixel = new Point2D_F32();
+		pixel.x = fx*xx + skew*yy + cx;
+		pixel.y = fy*yy + cy;
+
+		return pixel;
+	}
+
+	public static void renderPixel( FMatrixRMaj worldToCamera , Point3D_F32 X , Point3D_F32 pixelH ) {
+		FMatrixRMaj P = worldToCamera;
+
+		pixelH.x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3];
+		pixelH.y = P.data[4]*X.x + P.data[5]*X.y + P.data[6]*X.z + P.data[7];
+		pixelH.z = P.data[8]*X.x + P.data[9]*X.y + P.data[10]*X.z + P.data[11];
+	}
+
+	public static void renderPixel( FMatrixRMaj worldToCamera , Point3D_F32 X , Point2D_F32 pixel ) {
 		FMatrixRMaj P = worldToCamera;
 
 		float x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3];
 		float y = P.data[4]*X.x + P.data[5]*X.y + P.data[6]*X.z + P.data[7];
 		float z = P.data[8]*X.x + P.data[9]*X.y + P.data[10]*X.z + P.data[11];
 
-		Point2D_F32 pixel = new Point2D_F32();
+		pixel.x = x/z;
+		pixel.y = y/z;
+	}
+
+	public static void renderPixel(FMatrixRMaj cameraMatrix , Point4D_F32 X , @Nullable Point3D_F32 pixelH) {
+		FMatrixRMaj P = cameraMatrix;
+
+		pixelH.x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3]*X.w;
+		pixelH.y = P.data[4]*X.x + P.data[5]*X.y + P.data[6]*X.z + P.data[7]*X.w;
+		pixelH.z = P.data[8]*X.x + P.data[9]*X.y + P.data[10]*X.z + P.data[11]*X.w;
+	}
+
+	public static void renderPixel(FMatrixRMaj cameraMatrix , Point4D_F32 X , @Nullable Point2D_F32 pixel) {
+		FMatrixRMaj P = cameraMatrix;
+
+		float x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3]*X.w;
+		float y = P.data[4]*X.x + P.data[5]*X.y + P.data[6]*X.z + P.data[7]*X.w;
+		float z = P.data[8]*X.x + P.data[9]*X.y + P.data[10]*X.z + P.data[11]*X.w;
 
 		pixel.x = x/z;
 		pixel.y = y/z;
-
-		return pixel;
 	}
 
-	public static FMatrixRMaj createCameraMatrix( FMatrixRMaj R , Vector3D_F32 T , FMatrixRMaj K ,
-													 FMatrixRMaj ret ) {
+
+	public static FMatrixRMaj createCameraMatrix( FMatrixRMaj R , Vector3D_F32 T ,
+												  @Nullable FMatrixRMaj K ,
+												  @Nullable FMatrixRMaj ret ) {
 		if( ret == null )
 			ret = new FMatrixRMaj(3,4);
 

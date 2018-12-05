@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.pose;
 
-import boofcv.alg.distort.LensDistortionOps;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
@@ -72,7 +72,7 @@ public class BaseChecksPnP {
 		Se3_F64 cameraToWorld = worldToCamera.invert(null);
 
 		// transform from pixel coordinates to normalized pixel coordinates, which removes lens distortion
-		Point2Transform2_F64 pixelToNorm = LensDistortionOps.narrow(intrinsic).undistort_F64(true,false);
+		Point2Transform2_F64 pixelToNorm = LensDistortionFactory.narrow(intrinsic).undistort_F64(true,false);
 
 		List<Point2D3D> observations = new ArrayList<>();
 

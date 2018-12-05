@@ -20,7 +20,7 @@ package boofcv.demonstrations.distort;
 
 import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.distort.LensDistortionOps_F32;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolationType;
@@ -112,12 +112,14 @@ public class RemoveLensDistortionApp<T extends ImageBase<T>> extends Demonstrati
 		});
 
 		// add different types of adjustments
-		Point2Transform2_F32 add_p_to_p = LensDistortionOps.transformChangeModel_F32(AdjustmentType.NONE, param,desired,true,null);
+		Point2Transform2_F32 add_p_to_p = LensDistortionOps_F32.transformChangeModel(AdjustmentType.NONE, param,desired,true,null);
 		addUndistorted("No Adjustment", add_p_to_p);
-		Point2Transform2_F32 expand = LensDistortionOps.transformChangeModel_F32(AdjustmentType.EXPAND, param,desired, true, null);
+		Point2Transform2_F32 expand = LensDistortionOps_F32.transformChangeModel(AdjustmentType.EXPAND, param,desired, true, null);
 		addUndistorted("Expand", expand);
-		Point2Transform2_F32 fullView = LensDistortionOps.transformChangeModel_F32(AdjustmentType.FULL_VIEW,param, desired,true, null);
+		Point2Transform2_F32 fullView = LensDistortionOps_F32.transformChangeModel(AdjustmentType.FULL_VIEW,param, desired,true, null);
 		addUndistorted("Full View", fullView);
+		Point2Transform2_F32 center = LensDistortionOps_F32.transformChangeModel(AdjustmentType.CENTER,param, desired,true, null);
+		addUndistorted("Center", center);
 	}
 
 	private void addUndistorted(final String name, final Point2Transform2_F32 model) {

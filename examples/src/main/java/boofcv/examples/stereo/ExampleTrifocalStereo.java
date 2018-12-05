@@ -145,9 +145,9 @@ public class ExampleTrifocalStereo {
 	}
 
 	public static void main(String[] args) {
-		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_01.png"));
-		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_02.png"));
-		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_03.png"));
+//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_01.png"));
+//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_02.png"));
+//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/rock_leaves_03.png"));
 
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/chicken01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/chicken02.png"));
@@ -173,9 +173,9 @@ public class ExampleTrifocalStereo {
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/deer02.png"));
 //		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/deer03.png"));
 
-//		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/seal01.png"));
-//		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/seal02.png"));
-//		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/seal03.png"));
+		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/seal01.png"));
+		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/seal02.png"));
+		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/seal03.png"));
 
 //		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/puddle01.png"));
 //		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/puddle02.png"));

@@ -18,10 +18,10 @@
 
 package boofcv.abst.sfm.d3;
 
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -78,7 +78,7 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> {
 		double t = 0.1;
 
 		Point2D_F64 n = new Point2D_F64();
-		Point2Transform2_F64 tranNorm = LensDistortionOps.narrow(intrinsic).undistort_F64(true,false);
+		Point2Transform2_F64 tranNorm = LensDistortionFactory.narrow(intrinsic).undistort_F64(true,false);
 
 		for( int i = 0; i < total; i++ ) {
 

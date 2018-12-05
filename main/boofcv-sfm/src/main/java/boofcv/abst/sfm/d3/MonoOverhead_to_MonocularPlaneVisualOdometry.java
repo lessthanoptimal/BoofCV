@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,9 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.AccessPointTracks3D;
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.d3.VisOdomMonoOverheadMotion2D;
 import boofcv.alg.sfm.overhead.OverheadView;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageBase;
@@ -68,7 +68,7 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 	public void setCalibration( MonoPlaneParameters param ) {
 		this.planeToCamera = param.planeToCamera;
 		alg.configureCamera(param.intrinsic, param.planeToCamera);
-		normToPixel = LensDistortionOps.narrow(param.intrinsic).distort_F64(false,true);
+		normToPixel = LensDistortionFactory.narrow(param.intrinsic).distort_F64(false,true);
 	}
 
 	@Override

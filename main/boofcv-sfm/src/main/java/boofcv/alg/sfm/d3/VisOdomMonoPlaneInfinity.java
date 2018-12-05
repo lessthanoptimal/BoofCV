@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.sfm.d3;
 
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.overhead.CameraPlaneProjection;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageBase;
@@ -173,8 +173,8 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	 */
 	public void setIntrinsic(CameraPinholeRadial intrinsic) {
 		planeProjection.setIntrinsic(intrinsic);
-		normToPixel = LensDistortionOps.narrow(intrinsic).distort_F64(false,true);
-		pixelToNorm = LensDistortionOps.narrow(intrinsic).undistort_F64(true,false);
+		normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false,true);
+		pixelToNorm = LensDistortionFactory.narrow(intrinsic).undistort_F64(true,false);
 
 		// Find the change in angle caused by a pixel error in the image center.  The same angle error will induce a
 		// larger change in pixel values towards the outside of the image edge.  For fish-eyes lenses this could

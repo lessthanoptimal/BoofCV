@@ -279,7 +279,7 @@ public class PerspectiveOps {
 	 */
 	public static <C extends CameraPinhole>C matrixToPinhole(FMatrixRMaj K , int width , int height , C output )
 	{
-		return (C)ImplPerspectiveOps_F32.matrixToParam(K, width, height, output);
+		return (C)ImplPerspectiveOps_F32.matrixToPinhole(K, width, height, output);
 	}
 
 	/**

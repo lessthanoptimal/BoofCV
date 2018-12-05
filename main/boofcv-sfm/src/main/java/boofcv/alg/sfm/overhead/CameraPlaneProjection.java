@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.overhead;
 
-import boofcv.alg.distort.LensDistortionOps;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.geometry.GeometryMath_F64;
@@ -65,8 +65,8 @@ public class CameraPlaneProjection {
 								  CameraPinholeRadial intrinsic )
 	{
 		this.planeToCamera = planeToCamera;
-		normToPixel = LensDistortionOps.narrow(intrinsic).distort_F64(false, true);
-		pixelToNorm = LensDistortionOps.narrow(intrinsic).undistort_F64(true, false);
+		normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false, true);
+		pixelToNorm = LensDistortionFactory.narrow(intrinsic).undistort_F64(true, false);
 
 		planeToCamera.invert(cameraToPlane);
 	}
@@ -77,8 +77,8 @@ public class CameraPlaneProjection {
 	 */
 	public void setIntrinsic(CameraPinholeRadial intrinsic )
 	{
-		normToPixel = LensDistortionOps.narrow(intrinsic).distort_F64(false, true);
-		pixelToNorm = LensDistortionOps.narrow(intrinsic).undistort_F64(true, false);
+		normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false, true);
+		pixelToNorm = LensDistortionFactory.narrow(intrinsic).undistort_F64(true, false);
 	}
 
 	/**

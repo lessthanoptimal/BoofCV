@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.depth;
 
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -45,7 +45,7 @@ public class VisualDepthOps {
 	public static void depthTo3D(CameraPinholeRadial param , GrayU16 depth , FastQueue<Point3D_F64> cloud ) {
 		cloud.reset();
 
-		Point2Transform2_F64 p2n = LensDistortionOps.narrow(param).undistort_F64(true,false);
+		Point2Transform2_F64 p2n = LensDistortionFactory.narrow(param).undistort_F64(true,false);
 
 		Point2D_F64 n = new Point2D_F64();
 

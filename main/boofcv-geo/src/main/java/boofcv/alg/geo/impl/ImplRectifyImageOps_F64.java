@@ -19,7 +19,7 @@
 package boofcv.alg.geo.impl;
 
 import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.distort.LensDistortionOps_F64;
 import boofcv.alg.distort.PointToPixelTransform_F64;
 import boofcv.alg.distort.PointTransformHomography_F64;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
@@ -31,7 +31,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
 
-import static boofcv.alg.distort.LensDistortionOps.narrow;
+import static boofcv.factory.distort.LensDistortionFactory.narrow;
 
 /**
  * <p>
@@ -87,10 +87,10 @@ public class ImplRectifyImageOps_F64 {
 
 		Point2Transform2_F64 tranLeft = transformPixelToRect(paramLeft, rectifyLeft);
 
-		RectangleLength2D_F64 bound = LensDistortionOps.boundBoxInside(paramLeft.width, paramLeft.height,
+		RectangleLength2D_F64 bound = LensDistortionOps_F64.boundBoxInside(paramLeft.width, paramLeft.height,
 				new PointToPixelTransform_F64(tranLeft));
 
-		LensDistortionOps.roundInside(bound);
+		LensDistortionOps_F64.roundInside(bound);
 
 		double scaleX = paramLeft.width/(double)bound.width;
 		double scaleY = paramLeft.height/(double)bound.height;
@@ -105,7 +105,7 @@ public class ImplRectifyImageOps_F64 {
 	{
 		PointTransformHomography_F64 tranLeft = new PointTransformHomography_F64(rectifyLeft);
 
-		RectangleLength2D_F64 bound = LensDistortionOps.boundBoxInside(imageWidth, imageHeight,
+		RectangleLength2D_F64 bound = LensDistortionOps_F64.boundBoxInside(imageWidth, imageHeight,
 				new PointToPixelTransform_F64(tranLeft));
 
 		double scaleX = imageWidth/(double)bound.width;

@@ -18,8 +18,8 @@
 
 package boofcv.alg.sfm;
 
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU16;
@@ -55,7 +55,7 @@ public class TestDepthSparse3D {
 		};
 
 		DepthSparse3D<GrayU16> alg = new DepthSparse3D.I<>(2.1);
-		alg.configure(LensDistortionOps.narrow(param),v2d);
+		alg.configure(LensDistortionFactory.narrow(param),v2d);
 
 		alg.setDepthImage(depth);
 

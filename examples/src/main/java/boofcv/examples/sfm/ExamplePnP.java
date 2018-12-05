@@ -20,9 +20,9 @@ package boofcv.examples.sfm;
 
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.RefinePnP;
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.robust.ModelMatcherMultiview;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.geo.*;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -150,7 +150,7 @@ public class ExamplePnP {
 		Se3_F64 cameraToWorld = worldToCamera.invert(null);
 
 		// transform from pixel coordinates to normalized pixel coordinates, which removes lens distortion
-		Point2Transform2_F64 pixelToNorm = LensDistortionOps.narrow(intrinsic).undistort_F64(true,false);
+		Point2Transform2_F64 pixelToNorm = LensDistortionFactory.narrow(intrinsic).undistort_F64(true,false);
 
 		List<Point2D3D> observations = new ArrayList<>();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,14 +19,12 @@
 package boofcv.abst.sfm.d3;
 
 import boofcv.abst.sfm.DepthSparse3D_to_PixelTo3D;
-import boofcv.alg.distort.AdjustmentType;
-import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.distort.PixelTransformCached_F32;
+import boofcv.alg.distort.*;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.d3.direct.PyramidDirectColorDepth;
 import boofcv.core.image.ConvertImageFilter;
 import boofcv.core.image.border.BorderType;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.PixelTransform2_F32;
@@ -123,7 +121,7 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageBase<
 		adjustImage = LensDistortionOps.changeCameraModel(
 				AdjustmentType.EXPAND, BorderType.ZERO, paramVisual,desired,paramAdjusted, algType);
 
-		Point2Transform2_F32 desiredToOriginal = LensDistortionOps.transformChangeModel_F32(
+		Point2Transform2_F32 desiredToOriginal = LensDistortionOps_F32.transformChangeModel(
 				AdjustmentType.EXPAND, paramVisual, desired, false, null);
 
 		// the adjusted undistorted image pixel to the depth image transform
@@ -134,7 +132,7 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageBase<
 				paramAdjusted.width, paramAdjusted.height,adjustedToDepth);
 
 		// adjusted pixels to normalized image coordinates in RGB frame
-		sparse3D.configure(LensDistortionOps.narrow(paramAdjusted), pixelAdjToDepth);
+		sparse3D.configure(LensDistortionFactory.narrow(paramAdjusted), pixelAdjToDepth);
 
 		undistorted.reshape(paramAdjusted.width, paramAdjusted.height);
 		if( convertInput != null ) {

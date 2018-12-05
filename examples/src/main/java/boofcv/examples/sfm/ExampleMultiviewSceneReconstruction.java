@@ -25,10 +25,10 @@ import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.ScaleSceneStructure;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.structure.EstimateSceneCalibrated;
 import boofcv.alg.sfm.structure.PairwiseImageMatching;
 import boofcv.alg.sfm.structure.PruneStructureFromSceneMetric;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.ConfigBundleAdjustment;
@@ -85,7 +85,7 @@ public class ExampleMultiviewSceneReconstruction {
 		imageMatching.setVerbose(System.out,0);
 
 		String cameraName = "camera";
-		imageMatching.addCamera(cameraName,LensDistortionOps.narrow(intrinsic).undistort_F64(true,false),intrinsic);
+		imageMatching.addCamera(cameraName, LensDistortionFactory.narrow(intrinsic).undistort_F64(true,false),intrinsic);
 
 		for (int i = 0; i < colorImages.size(); i++) {
 			BufferedImage colorImage = colorImages.get(i);

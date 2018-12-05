@@ -26,6 +26,7 @@ import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
 import boofcv.alg.fiducial.square.FoundFiducial;
 import boofcv.core.image.border.BorderType;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.filter.binary.ThresholdType;
@@ -103,7 +104,7 @@ public class VisualizeSquareFiducial {
 		g2.setStroke(new BasicStroke(2));
 
 		if( intrinsic != null ) {
-			Point2Transform2_F64 add_p_to_p = LensDistortionOps.narrow(intrinsic).distort_F64(true, true);
+			Point2Transform2_F64 add_p_to_p = LensDistortionFactory.narrow(intrinsic).distort_F64(true, true);
 
 			for (int i = 0; i < N; i++) {
 				// add back in lens distortion

@@ -26,12 +26,12 @@ import org.ddogleg.nn.alg.KdTreeDistance;
  */
 public class KdTreePoint2D_F32 implements KdTreeDistance<Point2D_F32> {
 	@Override
-	public double distance(Point2D_F32 a, Point2D_F32 b) {
+	public /**/double distance(Point2D_F32 a, Point2D_F32 b) {
 		return a.distance2(b);
 	}
 
 	@Override
-	public double valueAt(Point2D_F32 point, int index) {
+	public /**/double valueAt(Point2D_F32 point, int index) {
 		switch( index ) {
 			case 0: return point.x;
 			case 1: return point.y;

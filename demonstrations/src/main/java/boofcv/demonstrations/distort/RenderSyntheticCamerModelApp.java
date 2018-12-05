@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.demonstrations.distort;
 
 import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.distort.LensDistortionOps_F32;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolationType;
@@ -145,8 +145,8 @@ public class RenderSyntheticCamerModelApp<T extends ImageBase<T>> extends Demons
 			});
 		}
 
-		Point2Transform2_F32 add_p_to_p = LensDistortionOps.
-				transformChangeModel_F32(adjustment, origModel,desired,true,null);
+		Point2Transform2_F32 add_p_to_p = LensDistortionOps_F32.
+				transformChangeModel(adjustment, origModel,desired,true,null);
 		undistorter.setModel(new PointToPixelTransform_F32(add_p_to_p));
 
 		if( inputMethod == InputMethod.IMAGE )

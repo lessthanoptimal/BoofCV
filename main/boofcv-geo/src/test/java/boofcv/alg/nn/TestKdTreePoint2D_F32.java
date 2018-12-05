@@ -33,7 +33,7 @@ public class TestKdTreePoint2D_F32 {
 	@Test
 	public void distance() {
 		Point2D_F32 a = new Point2D_F32(1,2);
-		Point2D_F32 b = new Point2D_F32(-2,2);
+		Point2D_F32 b = new Point2D_F32(-2,9);
 
 		assertEquals(a.distance2(b),alg.distance(a,b), UtilEjml.TEST_F32);
 	}
