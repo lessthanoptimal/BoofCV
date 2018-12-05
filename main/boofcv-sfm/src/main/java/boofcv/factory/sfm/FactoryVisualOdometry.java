@@ -30,7 +30,7 @@ import boofcv.abst.feature.tracker.PointTrackerTwoPass;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.abst.geo.RefinePnP;
-import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.abst.geo.TriangulateTwoViewsMetric;
 import boofcv.abst.sfm.DepthSparse3D_to_PixelTo3D;
 import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.abst.sfm.d2.ImageMotion2D;
@@ -46,6 +46,7 @@ import boofcv.alg.sfm.d3.direct.PyramidDirectColorDepth;
 import boofcv.alg.sfm.robust.DistancePlane2DToPixelSq;
 import boofcv.alg.sfm.robust.GenerateSe2_PlanePtPixel;
 import boofcv.factory.feature.associate.FactoryAssociation;
+import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.EstimatorToGenerator;
 import boofcv.factory.geo.FactoryMultiView;
@@ -329,7 +330,8 @@ public class FactoryVisualOdometry {
 			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
 		}
 
-		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
+		TriangulateTwoViewsMetric triangulate = FactoryMultiView.triangulateTwoViewMetric(
+				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
 
 		VisOdomDualTrackPnP<T,Desc> alg = new VisOdomDualTrackPnP<>(thresholdAdd, thresholdRetire, epipolarPixelTol,
 				trackerLeft, trackerRight, descriptor, associateUnique, triangulate, motion, refinePnP);
@@ -397,7 +399,8 @@ public class FactoryVisualOdometry {
 		}
 
 		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<>(scorer, epipolarPixelTol, descType);
-		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
+		TriangulateTwoViewsMetric triangulate = FactoryMultiView.triangulateTwoViewMetric(
+				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
 
 		associateStereo.setMaxScoreThreshold(maxAssociationError);
 

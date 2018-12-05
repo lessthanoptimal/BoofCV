@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -205,8 +205,7 @@ public class LensDistortionOps {
 
 	/**
 	 * Finds the maximum area axis-aligned rectangle contained inside the transformed image which
-	 * does not include any pixels outside the sources border.  Assumes that the coordinates are not
-	 * flipped and some other stuff too.
+	 * does not include any pixels outside the sources border.
 	 *
 	 * @param srcWidth Width of the source image
 	 * @param srcHeight Height of the source image
@@ -219,29 +218,33 @@ public class LensDistortionOps {
 		float x0,y0,x1,y1;
 
 		transform.compute(0,0);
-		x0 = transform.distX;
-		y0 = transform.distY;
-
-		transform.compute(srcWidth,0);
-		x1=transform.distX;
-		transform.compute(0, srcHeight);
-		y1=transform.distY;
+		x0 = x1 = transform.distX;
+		y0 = y1 = transform.distY;
 
 		for( int x = 0; x < srcWidth; x++ ) {
 			transform.compute(x, 0);
-			if( transform.distY > y0 )
+			if( transform.distY < y0 )
 				y0 = transform.distY;
+			if( transform.distY > y1 )
+				y1 = transform.distY;
 			transform.compute(x,srcHeight);
-			if( transform.distY < y1 )
+			if( transform.distY < y0 )
+				y0 = transform.distY;
+			if( transform.distY > y1 )
 				y1 = transform.distY;
 		}
 
 		for( int y = 0; y < srcHeight; y++ ) {
 			transform.compute(0,y);
-			if( transform.distX > x0 )
+			if( transform.distX < x0 )
 				x0 = transform.distX;
+			if( transform.distX > x1 )
+				x1 = transform.distX;
+			y1 = transform.distY;
 			transform.compute(srcWidth,y);
-			if( transform.distX < x1 )
+			if( transform.distX < x0 )
+				x0 = transform.distX;
+			if( transform.distX > x1 )
 				x1 = transform.distX;
 		}
 
@@ -250,8 +253,7 @@ public class LensDistortionOps {
 
 	/**
 	 * Finds the maximum area axis-aligned rectangle contained inside the transformed image which
-	 * does not include any pixels outside the sources border.  Assumes that the coordinates are not
-	 * flipped and some other stuff too.
+	 * does not include any pixels outside the sources border.
 	 *
 	 * @param srcWidth Width of the source image
 	 * @param srcHeight Height of the source image
@@ -260,33 +262,36 @@ public class LensDistortionOps {
 	 */
 	public static RectangleLength2D_F64 boundBoxInside(int srcWidth, int srcHeight,
 													   PixelTransform2_F64 transform) {
-
 		double x0,y0,x1,y1;
 
 		transform.compute(0,0);
-		x0 = transform.distX;
-		y0 = transform.distY;
-
-		transform.compute(srcWidth,0);
-		x1=transform.distX;
-		transform.compute(0, srcHeight);
-		y1=transform.distY;
+		x0 = x1 = transform.distX;
+		y0 = y1 = transform.distY;
 
 		for( int x = 0; x < srcWidth; x++ ) {
 			transform.compute(x, 0);
-			if( transform.distY > y0 )
+			if( transform.distY < y0 )
 				y0 = transform.distY;
+			if( transform.distY > y1 )
+				y1 = transform.distY;
 			transform.compute(x,srcHeight);
-			if( transform.distY < y1 )
+			if( transform.distY < y0 )
+				y0 = transform.distY;
+			if( transform.distY > y1 )
 				y1 = transform.distY;
 		}
 
 		for( int y = 0; y < srcHeight; y++ ) {
 			transform.compute(0,y);
-			if( transform.distX > x0 )
+			if( transform.distX < x0 )
 				x0 = transform.distX;
+			if( transform.distX > x1 )
+				x1 = transform.distX;
+				y1 = transform.distY;
 			transform.compute(srcWidth,y);
-			if( transform.distX < x1 )
+			if( transform.distX < x0 )
+				x0 = transform.distX;
+			if( transform.distX > x1 )
 				x1 = transform.distX;
 		}
 

@@ -16,28 +16,44 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.triangulate;
+package boofcv.factory.geo;
 
-import boofcv.abst.geo.GeneralTestRefineTriangulateMetric;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
-import org.ejml.data.DMatrixRMaj;
-
-import java.util.List;
+import boofcv.misc.ConfigConverge;
 
 /**
  * @author Peter Abeles
  */
-public class TestRefineTriangulateMetricEuclidean extends GeneralTestRefineTriangulateMetric {
+public class ConfigTriangulation {
 
-	RefineTriangulateMetricLS alg = new RefineTriangulateMetricLS(1e-8,200);
+	/**
+	 * Which algorithm to use
+	 */
+	public Type type = Type.DLT;
 
-	@Override
-	public void triangulate(List<Point2D_F64> obsPts, List<Se3_F64> motion,
-							List<DMatrixRMaj> essential,
-							Point3D_F64 initial, Point3D_F64 found)
-	{
-		alg.process(obsPts,motion,initial,found);
+	/**
+	 * If an iterative technique is selected this is the convergence criteria
+	 */
+	public ConfigConverge optimization = new ConfigConverge(1e-8,1e-8,20);
+
+	public ConfigTriangulation() {
+	}
+
+	public ConfigTriangulation(Type type) {
+		this.type = type;
+	}
+
+	public enum Type {
+		/**
+		 * Discrete lienear transform
+		 */
+		DLT,
+		/**
+		 * Optimal solution for algebraic error
+		 */
+		ALGEBRAIC,
+		/**
+		 * Optimal solution for geometric error
+		 */
+		GEOMETRIC
 	}
 }

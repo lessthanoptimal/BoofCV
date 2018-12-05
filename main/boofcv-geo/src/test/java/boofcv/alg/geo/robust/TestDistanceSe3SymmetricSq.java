@@ -18,8 +18,9 @@
 
 package boofcv.alg.geo.robust;
 
-import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.abst.geo.TriangulateTwoViewsMetric;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
@@ -43,7 +44,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestDistanceSe3SymmetricSq {
 
-	TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
+	TriangulateTwoViewsMetric triangulate = FactoryMultiView.triangulateTwoViewMetric(
+			new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
 	DistanceSe3SymmetricSq alg;
 	
 	public TestDistanceSe3SymmetricSq() {

@@ -226,7 +226,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
 
 		// Adjust the rectification to make the view area more useful
-		RectifyImageOps.allInsideLeft(intrinsicLeft, rect1, rect2, rectifiedK);
+		RectifyImageOps.fullViewLeft(intrinsicLeft, rect1, rect2, rectifiedK);
 
 		// undistorted and rectify images
 		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3);

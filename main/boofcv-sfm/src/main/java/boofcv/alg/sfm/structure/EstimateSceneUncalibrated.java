@@ -20,7 +20,7 @@ package boofcv.alg.sfm.structure;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.RefineEpipolar;
-import boofcv.abst.geo.TriangulateTwoViews;
+import boofcv.abst.geo.TriangulateTwoViewsProjective;
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
@@ -67,7 +67,7 @@ public class EstimateSceneUncalibrated
 	FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class,true);
 	GrowQueue_F64 errors = new GrowQueue_F64();
 
-	TriangulateTwoViews triangulator = FactoryMultiView.triangulateTwoDLT();
+	TriangulateTwoViewsProjective triangulator = FactoryMultiView.triangulateTwoDLT();
 
 	// Verbose output to standard out
 	PrintStream verbose;

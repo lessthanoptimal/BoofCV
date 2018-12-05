@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,8 @@
 
 package boofcv.alg.geo;
 
-import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.abst.geo.TriangulateTwoViewsMetric;
+import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -42,17 +43,17 @@ import georegression.transform.se.SePointOps_F64;
  */
 public class PositiveDepthConstraintCheck {
 	// algorithm used to triangulate point location
-	TriangulateTwoViewsCalibrated triangulate;
+	TriangulateTwoViewsMetric triangulate;
 
 	// location of triangulated point in 3D space
 	Point3D_F64 P = new Point3D_F64();
 
-	public PositiveDepthConstraintCheck(TriangulateTwoViewsCalibrated triangulate) {
+	public PositiveDepthConstraintCheck(TriangulateTwoViewsMetric triangulate) {
 		this.triangulate = triangulate;
 	}
 
 	public PositiveDepthConstraintCheck() {
-		this(FactoryMultiView.triangulateTwoGeometric());
+		this(FactoryMultiView.triangulateTwoViewMetric(new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC)));
 	}
 
 	/**

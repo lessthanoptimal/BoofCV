@@ -19,7 +19,7 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.abst.geo.TriangulateTwoViewsMetric;
 import boofcv.alg.geo.DecomposeEssential;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.se.Se3_F64;
@@ -53,7 +53,7 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 	 * @param computeEssential Algorithm for computing the essential matrix
 	 */
 	public Se3FromEssentialGenerator(Estimate1ofEpipolar computeEssential,
-									 TriangulateTwoViewsCalibrated triangulate ) {
+									 TriangulateTwoViewsMetric triangulate ) {
 		this.computeEssential = computeEssential;
 
 		selectBest = new SelectBestStereoTransform(triangulate);

@@ -18,26 +18,47 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.GeneralTestRefineTriangulateMetric;
+import boofcv.abst.geo.TriangulateNViewsMetric;
+import boofcv.abst.geo.TriangulateRefineMetric;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
 /**
+ * Estimates the triangulated point then refines it
+ *
  * @author Peter Abeles
  */
-public class TestRefineTriangulateMetricEuclidean extends GeneralTestRefineTriangulateMetric {
+public class TriangulateThenRefineMetric implements TriangulateNViewsMetric {
 
-	RefineTriangulateMetricLS alg = new RefineTriangulateMetricLS(1e-8,200);
+	TriangulateNViewsMetric estimator;
+	TriangulateRefineMetric refiner;
+
+	public TriangulateThenRefineMetric(TriangulateNViewsMetric estimator,
+									   TriangulateRefineMetric refiner)
+	{
+		this.estimator = estimator;
+		this.refiner = refiner;
+	}
 
 	@Override
-	public void triangulate(List<Point2D_F64> obsPts, List<Se3_F64> motion,
-							List<DMatrixRMaj> essential,
-							Point3D_F64 initial, Point3D_F64 found)
-	{
-		alg.process(obsPts,motion,initial,found);
+	public boolean triangulate(List<Point2D_F64> observations,
+							   List<Se3_F64> worldToView,
+							   Point3D_F64 location) {
+
+		if( !estimator.triangulate(observations,worldToView,location))
+			return false;
+
+		return refiner.process(observations,worldToView,location,location);
+	}
+
+	public TriangulateNViewsMetric getEstimator() {
+		return estimator;
+	}
+
+	public TriangulateRefineMetric getRefiner() {
+		return refiner;
 	}
 }

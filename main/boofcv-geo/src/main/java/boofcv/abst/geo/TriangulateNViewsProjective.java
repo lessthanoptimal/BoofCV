@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface TriangulateNViews {
+public interface TriangulateNViewsProjective {
 
 	/**
 	 * Triangulate the points location.

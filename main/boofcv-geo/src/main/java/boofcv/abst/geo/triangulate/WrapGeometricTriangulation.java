@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,18 +18,18 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.abst.geo.TriangulateTwoViewsMetric;
 import boofcv.alg.geo.triangulate.TriangulateGeometric;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
 /**
- * Wrapper around {@link TriangulateGeometric} for {@link boofcv.abst.geo.TriangulateTwoViewsCalibrated}.
+ * Wrapper around {@link TriangulateGeometric} for {@link TriangulateTwoViewsMetric}.
  * 
  * @author Peter Abeles
  */
-public class WrapGeometricTriangulation implements TriangulateTwoViewsCalibrated {
+public class WrapGeometricTriangulation implements TriangulateTwoViewsMetric {
 
 	TriangulateGeometric alg = new TriangulateGeometric();
 

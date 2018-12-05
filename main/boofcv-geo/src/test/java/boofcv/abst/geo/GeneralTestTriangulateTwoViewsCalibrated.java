@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public abstract class GeneralTestTriangulateTwoViewsCalibrated {
 
-	public abstract TriangulateTwoViewsCalibrated createAlg();
+	public abstract TriangulateTwoViewsMetric createAlg();
 
 	/**
 	 * See if it can triangulate perfect observations
@@ -58,7 +58,7 @@ public abstract class GeneralTestTriangulateTwoViewsCalibrated {
 		viewB.y = pointB.y/pointB.z;
 
 		
-		TriangulateTwoViewsCalibrated alg = createAlg();
+		TriangulateTwoViewsMetric alg = createAlg();
 		Point3D_F64 found = new Point3D_F64();
 		
 		alg.triangulate(viewA,viewB,worldToB,found);

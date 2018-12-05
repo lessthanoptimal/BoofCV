@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.TriangulateTwoViews;
+import boofcv.abst.geo.TriangulateTwoViewsProjective;
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
 import boofcv.alg.geo.triangulate.TriangulateProjectiveLinearDLT;
@@ -30,11 +30,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper around {@link TriangulateMetricLinearDLT} for {@link TriangulateTwoViews}.
+ * Wrapper around {@link TriangulateMetricLinearDLT} for {@link TriangulateTwoViewsProjective}.
  *
  * @author Peter Abeles
  */
-public class WrapTwoViewsTriangulateProjectiveDLT implements TriangulateTwoViews {
+public class WrapTwoViewsTriangulateProjectiveDLT implements TriangulateTwoViewsProjective {
 
 	TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
 

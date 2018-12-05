@@ -18,7 +18,8 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.TriangulateNViewsCalibrated;
+import boofcv.abst.geo.TriangulateNViewsMetric;
+import boofcv.abst.geo.TriangulateTwoViewsMetric;
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
 import georegression.struct.point.Point2D_F64;
@@ -29,11 +30,11 @@ import georegression.struct.se.Se3_F64;
 import java.util.List;
 
 /**
- * Wrapper around {@link TriangulateMetricLinearDLT} for {@link boofcv.abst.geo.TriangulateTwoViewsCalibrated}.
+ * Wrapper around {@link TriangulateMetricLinearDLT} for {@link TriangulateTwoViewsMetric}.
  *
  * @author Peter Abeles
  */
-public class WrapNViewsTriangulateMetricDLT implements TriangulateNViewsCalibrated {
+public class WrapNViewsTriangulateMetricDLT implements TriangulateNViewsMetric {
 
 	TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
 

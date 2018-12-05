@@ -31,8 +31,7 @@ import georegression.struct.shapes.RectangleLength2D_F32;
 import georegression.struct.shapes.RectangleLength2D_F64;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -383,5 +382,13 @@ public class TestLensDistortionOps {
 		assertEquals(2 ,found.y0,1e-8);
 		assertEquals(20-9,found.width,1e-8);
 		assertEquals(10, found.height,1e-8);
+	}
+
+	/**
+	 * If rectification is rotated that can cause x1 < x0
+	 */
+	@Test
+	public void boundBoxInside_rotated() {
+		fail("Implement");
 	}
 }

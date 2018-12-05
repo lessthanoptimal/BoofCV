@@ -22,26 +22,23 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
-import java.util.List;
-
 /**
- * Refines the location of a triangulated point using non-linear optimization.  A calibrated
- * camera is assumed.  All observations are in normalized image coordinates.
+ * Triangulate the location of a point from two views of a feature given a calibrated
+ * camera and known camera motion.
  *
  * @author Peter Abeles
  */
-public interface RefineTriangulationMetric {
+public interface TriangulateTwoViewsMetric {
 
 	/**
-	 * Refines the triangulated point.
+	 * Triangulate the points location.
 	 *
-	 * @param observations Observations of feature in N views. Normalized image coordinates.
-	 * @param worldToCamera Camera transforms in each view.  World to Camera.
-	 * @param worldPt Initial estimate of point in world coordinates.
-	 * @param refinedPt The refined estimated point position.
-	 * @return if successful or not
+	 * @param obsA View from position A in normalized image coordinates.
+	 * @param obsB View from position B in normalized image coordinates.
+	 * @param fromAtoB Transform from camera location A to location B
+	 * @param foundInA The found triangulated 3D point in A's reference frame.
+	 * @return true if successful, false otherwise.
 	 */
-	boolean process( List<Point2D_F64> observations ,
-					 List<Se3_F64> worldToCamera ,
-					 Point3D_F64 worldPt , Point3D_F64 refinedPt );
+	boolean triangulate( Point2D_F64 obsA , Point2D_F64 obsB ,
+						 Se3_F64 fromAtoB, Point3D_F64 foundInA );
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
-import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.abst.geo.TriangulateTwoViewsMetric;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.feature.associate.StereoConsistencyCheck;
 import boofcv.struct.calib.StereoParameters;
@@ -83,7 +83,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 	// matches features between left and right images
 	private AssociateDescription2D<Desc> assocL2R;
 	// Estimates the 3D coordinate of a feature
-	private TriangulateTwoViewsCalibrated triangulate;
+	private TriangulateTwoViewsMetric triangulate;
 
 	// convert for original image pixels into normalized image coordinates
 	private Point2Transform2_F64 leftImageToNorm;
@@ -128,7 +128,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 							   PointTracker<T> trackerLeft, PointTracker<T> trackerRight,
 							   DescribeRegionPoint<T,Desc> describe,
 							   AssociateDescription2D<Desc> assocL2R,
-							   TriangulateTwoViewsCalibrated triangulate,
+							   TriangulateTwoViewsMetric triangulate,
 							   ModelMatcher<Se3_F64, Stereo2D3D> matcher,
 							   ModelFitter<Se3_F64, Stereo2D3D> modelRefiner)
 	{

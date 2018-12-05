@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.structure;
 
-import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.abst.geo.TriangulateTwoViewsMetric;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.MultiViewOps;
@@ -31,6 +31,7 @@ import boofcv.alg.sfm.structure.MetricSceneGraph.Motion;
 import boofcv.alg.sfm.structure.MetricSceneGraph.View;
 import boofcv.alg.sfm.structure.MetricSceneGraph.ViewState;
 import boofcv.factory.geo.ConfigRansac;
+import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.struct.feature.AssociatedIndex;
@@ -75,7 +76,8 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	// TODO add back refine epipolar?
 
 	// Triangulates the 3D coordinate of a point from two observations
-	TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
+	TriangulateTwoViewsMetric triangulate = FactoryMultiView.triangulateTwoViewMetric(
+			new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
 	TriangulationMetricError triangulationError = new TriangulationMetricError();
 
 	MetricSceneGraph graph;

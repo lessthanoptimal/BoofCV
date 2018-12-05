@@ -444,25 +444,26 @@ public class FactoryMultiView {
 	}
 
 	/**
-	 * Triangulate two view by finding the intersection of two rays.
-	 *
-	 * @see boofcv.alg.geo.triangulate.TriangulateGeometric
-	 *
-	 * @return Two view triangulation algorithm
-	 */
-	public static TriangulateTwoViewsCalibrated triangulateTwoGeometric() {
-		return new WrapGeometricTriangulation();
-	}
-
-	/**
 	 * Triangulate two view using the Discrete Linear Transform (DLT) with a calibrated camera.
 	 *
+	 * @see WrapGeometricTriangulation
 	 * @see TriangulateMetricLinearDLT
 	 *
 	 * @return Two view triangulation algorithm
 	 */
-	public static TriangulateTwoViewsCalibrated triangulateCalibratedTwoDLT() {
-		return new WrapTwoViewsTriangulateMetricDLT();
+	public static TriangulateTwoViewsMetric triangulateTwoViewMetric(@Nullable ConfigTriangulation config ) {
+		if( config == null )
+			config = new ConfigTriangulation();
+
+		switch ( config.type ) {
+			case DLT:
+				return new WrapTwoViewsTriangulateMetricDLT();
+
+			case GEOMETRIC:
+				return new WrapGeometricTriangulation();
+
+		}
+		throw new IllegalArgumentException("Unknown or unsupported type "+config.type);
 	}
 
 	/**
@@ -472,7 +473,7 @@ public class FactoryMultiView {
 	 *
 	 * @return Two view triangulation algorithm
 	 */
-	public static TriangulateTwoViews triangulateTwoDLT() {
+	public static TriangulateTwoViewsProjective triangulateTwoDLT() {
 		return new WrapTwoViewsTriangulateProjectiveDLT();
 	}
 
@@ -483,8 +484,19 @@ public class FactoryMultiView {
 	 *
 	 * @return Two view triangulation algorithm
 	 */
-	public static TriangulateNViewsCalibrated triangulateCalibratedNViewDLT() {
-		return new WrapNViewsTriangulateMetricDLT();
+	public static TriangulateNViewsMetric triangulateNViewCalibrated(@Nullable ConfigTriangulation config ) {
+		switch ( config.type ) {
+			case DLT:
+				return new WrapNViewsTriangulateMetricDLT();
+
+			case GEOMETRIC: {
+				TriangulateNViewsMetric estimator = new WrapNViewsTriangulateMetricDLT();
+				RefineTriangulateMetricLS refiner = new RefineTriangulateMetricLS(config.optimization.gtol,config.optimization.maxIterations);
+				return new TriangulateThenRefineMetric(estimator,refiner);
+			}
+
+		}
+		throw new IllegalArgumentException("Unknown or unsupported type "+config.type);
 	}
 
 	/**
@@ -494,7 +506,7 @@ public class FactoryMultiView {
 	 *
 	 * @return Two view triangulation algorithm
 	 */
-	public static TriangulateNViews triangulateNViewDLT() {
+	public static TriangulateNViewsProjective triangulateNViewDLT() {
 		return new WrapNViewsTriangulateProjectiveDLT();
 	}
 
@@ -505,7 +517,7 @@ public class FactoryMultiView {
 	 *
 	 * @return Two view triangulation algorithm
 	 */
-	public static TriangulateTwoViewsCalibrated triangulateTwoLinearDepth() {
+	public static TriangulateTwoViewsMetric triangulateTwoLinearDepth() {
 		return new WrapPixelDepthLinear();
 	}
 
@@ -532,8 +544,8 @@ public class FactoryMultiView {
 	 * @param maxIterations Maximum number of allowed iterations
 	 * @return Triangulation refinement algorithm.
 	 */
-	public static RefineTriangulationMetric triangulateRefineMetric(double convergenceTol, int maxIterations ) {
-		return new RefineTriangulateMetricEuclidean(convergenceTol,maxIterations);
+	public static TriangulateRefineMetric triangulateRefineMetric(double convergenceTol, int maxIterations ) {
+		return new RefineTriangulateMetricLS(convergenceTol,maxIterations);
 	}
 
 	public static RefineTriangulationProjective triangulateRefineProj(double convergenceTol, int maxIterations ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.sfm.d3;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.detdesc.DetectDescribeMulti;
 import boofcv.abst.feature.detdesc.PointDescSet;
-import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.abst.geo.TriangulateTwoViewsMetric;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.struct.calib.StereoParameters;
@@ -62,7 +62,7 @@ import org.ddogleg.struct.GrowQueue_I32;
 public class VisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc> {
 
 	// used to estimate each feature's 3D location using a stereo pair
-	private TriangulateTwoViewsCalibrated triangulate;
+	private TriangulateTwoViewsMetric triangulate;
 
 	// computes camera motion
 	private ModelMatcher<Se3_F64, Stereo2D3D> matcher;
@@ -120,7 +120,7 @@ public class VisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc> {
 	 */
 	public VisOdomQuadPnP(DetectDescribeMulti<T,TD> detector,
 						  AssociateDescription2D<TD> assocSame , AssociateDescription2D<TD> assocL2R ,
-						  TriangulateTwoViewsCalibrated triangulate,
+						  TriangulateTwoViewsMetric triangulate,
 						  ModelMatcher<Se3_F64, Stereo2D3D> matcher,
 						  ModelFitter<Se3_F64, Stereo2D3D> modelRefiner )
 	{
