@@ -1203,13 +1203,19 @@ public class MultiViewOps {
 	/**
 	 * If the solution to the absolute quadratic was computed using a linear methods it will not exactly have
 	 * the required structure. This forces the structure to match.
+	 * <ol>
+	 *     <li>Positive diagonal elements</li>
+	 *     <li>(Optional) zero principle point</li>
+	 *     <li>(Optional) zero skew</li>
+	 *     <li>Q = H*diag([1 1 1 0])*H<sup>T</sup> and H = [K 0; -p'*K 1]</li>
 	 *
-	 * NOTE: Some of them modifications goes against the advice in [1], such as forcing 'w' to be positive definite.
-	 * In test images this appears to work well and enables auto calibration to work.
+	 * </ol>
 	 *
 	 * <ol>
 	 * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
 	 * </ol>
+	 *
+	 * @see DecomposeAbsoluteDualQuadratic
 	 *
 	 * @param Q Approximate solution to absolute quadratic
 	 */
@@ -1224,23 +1230,14 @@ public class MultiViewOps {
 			return false;
 
 		// force positive definite
-		DMatrix3x3 w = alg.getW();
-
-//		if( w.a11 < 0 || w.a22 < 0 || w.a33 < 0 )
-//			System.out.println("Negative diagonals in w");
-
-		// I'm not sure if I flip these variables if others along the same row/col should be flipped too or not
-		w.a11 = Math.abs(w.a11);
-		w.a22 = Math.abs(w.a22);
-		w.a33 = Math.abs(w.a33);
+		DMatrix3x3 k = alg.getK();
 
 		if( zeroCenter ) {
-			w.a13 = w.a31 = 0;
-			w.a23 = w.a32 = 0;
+			k.a13 = k.a23 = 0;
 		}
 
 		if( zeroSkew ) {
-			w.a12 = w.a21 = 0;
+			k.a12 = 0;
 		}
 
 		alg.recomputeQ(Q);

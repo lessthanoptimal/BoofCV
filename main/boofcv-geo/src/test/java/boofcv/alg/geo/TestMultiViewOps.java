@@ -35,11 +35,17 @@ import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.Tuple2;
 import org.ddogleg.struct.Tuple3;
 import org.ejml.UtilEjml;
+import org.ejml.data.DMatrix3;
+import org.ejml.data.DMatrix3x3;
+import org.ejml.data.DMatrix4x4;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.fixed.CommonOps_DDF4;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.equation.Equation;
+import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.MatrixFeatures_D;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 
@@ -875,19 +881,103 @@ public class TestMultiViewOps {
 		}
 	}
 
+	/**
+	 * Give it a valid Q but have the sign be inverted
+	 */
 	@Test
-	public void enforceAbsoluteQuadraticConstraints() {
-		fail("Implement");
+	public void enforceAbsoluteQuadraticConstraints_negative() {
+		Equation eq = new Equation();
+		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
+		eq.process("p=rand(3,1)");
+		eq.process("u=-p'*K");
+		eq.process("H=[K [0;0;0]; u 1]");
+		eq.process("Q=H*diag([1 1 1 0])*H'");
+		DMatrixRMaj Q = eq.lookupDDRM("Q");
+		DMatrix4x4 Q_neg = new DMatrix4x4();
+		ConvertDMatrixStruct.convert(Q,Q_neg);
+		CommonOps_DDF4.scale(-0.045,Q_neg); // negative and non-standard scale
+
+		MultiViewOps.enforceAbsoluteQuadraticConstraints(Q_neg,false,false);
+
+		// change scale so that the test tolerance is reasonable
+		CommonOps_DDRM.scale(1.0/Math.abs(Q.get(3,3)),Q);
+		CommonOps_DDF4.scale(1.0/Math.abs(Q_neg.a44),Q_neg);
+
+		assertTrue(MatrixFeatures_D.isIdentical(Q,Q_neg, UtilEjml.TEST_F64));
+	}
+
+	/**
+	 * Give it a valid Q but request that zeros be constrained
+	 */
+	@Test
+	public void enforceAbsoluteQuadraticConstraints_zeros() {
+		Equation eq = new Equation();
+		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
+		eq.process("p=rand(3,1)");
+		eq.process("u=-p'*K");
+		eq.process("H=[K [0;0;0]; u 1]");
+		eq.process("Q=H*diag([1 1 1 0])*H'");
+		DMatrixRMaj Q = eq.lookupDDRM("Q");
+
+		DMatrix4x4 Q_in = new DMatrix4x4();
+		ConvertDMatrixStruct.convert(Q,Q_in);
+
+		assertTrue(MultiViewOps.enforceAbsoluteQuadraticConstraints(Q_in,true,true));
+
+		eq.process("K=[300 0 0;0 310 0; 0 0 1]");
+		eq.process("u=-p'*K");
+		eq.process("H=[K [0;0;0]; u 1]");
+		eq.process("Q=H*diag([1 1 1 0])*H'");
+
+		// change scale so that the test tolerance is reasonable
+		CommonOps_DDRM.scale(1.0/Math.abs(Q.get(3,3)),Q);
+		CommonOps_DDF4.scale(1.0/Math.abs(Q_in.a44),Q_in);
+
+		assertTrue(MatrixFeatures_D.isIdentical(Q,Q_in, UtilEjml.TEST_F64));
 	}
 
 	@Test
 	public void decomposeAbsDualQuadratic() {
-		fail("Implement");
+		Equation eq = new Equation();
+		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
+		eq.process("w=K*K'");
+		eq.process("p=rand(3,1)");
+		eq.process("u=-p'*K");
+		eq.process("H=[K [0;0;0]; u 1]");
+		eq.process("Q=H*diag([1 1 1 0])*H'");
+		DMatrixRMaj Q = eq.lookupDDRM("Q");
+		DMatrix4x4 Q_in = new DMatrix4x4();
+		ConvertDMatrixStruct.convert(Q,Q_in);
+		CommonOps_DDF4.scale(0.0394,Q_in);
+
+
+		DMatrix3x3 w = new DMatrix3x3();
+		DMatrix3 p = new DMatrix3();
+
+		assertTrue(MultiViewOps.decomposeAbsDualQuadratic(Q_in,w,p));
+
+		assertTrue(MatrixFeatures_D.isIdentical(eq.lookupDDRM("w"),w, UtilEjml.TEST_F64));
+		assertTrue(MatrixFeatures_D.isIdentical(eq.lookupDDRM("p"),p, UtilEjml.TEST_F64));
 	}
 
 	@Test
 	public void computeRectifyingHomography() {
-		fail("Implement");
+		Equation eq = new Equation();
+		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
+		eq.process("p=rand(3,1)");
+		eq.process("u=-p'*K");
+		eq.process("H=[K [0;0;0]; u 1]");
+		eq.process("Q=H*diag([1 1 1 0])*H'");
+		DMatrixRMaj Q = eq.lookupDDRM("Q");
+		DMatrix4x4 Q_in = new DMatrix4x4();
+		ConvertDMatrixStruct.convert(Q,Q_in);
+
+		DMatrixRMaj H = eq.lookupDDRM("H");
+		DMatrixRMaj foundH = new DMatrixRMaj(4,4);
+
+		assertTrue(MultiViewOps.computeRectifyingHomography(Q_in,foundH));
+
+		assertTrue(MatrixFeatures_D.isIdentical(H,foundH, UtilEjml.TEST_F64));
 	}
 
 	@Test
