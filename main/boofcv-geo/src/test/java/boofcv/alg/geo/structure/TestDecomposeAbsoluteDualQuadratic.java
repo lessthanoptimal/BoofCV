@@ -21,6 +21,7 @@ package boofcv.alg.geo.structure;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix4x4;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.equation.Equation;
 import org.ejml.ops.ConvertDMatrixStruct;
@@ -56,6 +57,9 @@ class TestDecomposeAbsoluteDualQuadratic {
 		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
 		assertTrue(alg.decompose(_Q));
 
+
+		CommonOps_DDRM.scale(1.0/w.get(2,2),w);
+
 		assertTrue(MatrixFeatures_D.isIdentical(w,alg.getW(), UtilEjml.TEST_F64));
 		assertTrue(MatrixFeatures_D.isIdentical(p,alg.getP(), UtilEjml.TEST_F64));
 	}
@@ -63,19 +67,20 @@ class TestDecomposeAbsoluteDualQuadratic {
 	@Test
 	public void recomputeQ() {
 		Equation eq = new Equation();
-		eq.process("w = rand(3,3)").
-				process("w = w'*w").
+		eq.process("k = [300 3, 204;0 230 400; 0 0 1]").
+				process("w = k*k'").
 				process("p=[2.1;0.4;-0.3]").process("Q=[w , -w*p;-p'*w, p'*w*p]");
 
 
 		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
-		ConvertDMatrixStruct.convert(eq.lookupDDRM("w"),alg.getW());
+		ConvertDMatrixStruct.convert(eq.lookupDDRM("k"),alg.getK());
 		ConvertDMatrixStruct.convert(eq.lookupDDRM("p"),alg.getP());
 
 		DMatrix4x4 found = new DMatrix4x4();
 		alg.recomputeQ(found);
 
 		DMatrixRMaj Q = eq.lookupDDRM("Q");
+
 		assertTrue(MatrixFeatures_D.isIdentical(Q,found, UtilEjml.TEST_F64));
 	}
 
