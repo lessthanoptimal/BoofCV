@@ -407,7 +407,10 @@ public class FactoryMultiViewRobust {
 		switch( trifocal.error ) {
 			case REPROJECTION:
 				ransacTol = 3.0*ransac.inlierThreshold*ransac.inlierThreshold;
-				distance = new DistanceTrifocalReprojectionSq();
+				if( trifocal.convergeError.maxIterations > 0 )
+					distance = new DistanceTrifocalReprojectionSq(trifocal.convergeError.gtol,trifocal.convergeError.maxIterations);
+				else
+					distance = new DistanceTrifocalReprojectionSq();
 				break;
 			case POINT_TRANSFER:
 				ransacTol = 2.0*ransac.inlierThreshold*ransac.inlierThreshold;
@@ -417,7 +420,7 @@ public class FactoryMultiViewRobust {
 				throw new IllegalArgumentException("Unknown error model "+trifocal.error);
 		}
 
-		Estimate1ofTrifocalTensor estimator = FactoryMultiView.trifocal_1(trifocal.which,trifocal.maxIterations);
+		Estimate1ofTrifocalTensor estimator = FactoryMultiView.trifocal_1(trifocal.which,trifocal.convergeEstimator.maxIterations);
 		ModelManager<TrifocalTensor> manager = new ManagerTrifocalTensor();
 		ModelGenerator<TrifocalTensor,AssociatedTriple> generator = new GenerateTrifocalTensor(estimator);
 

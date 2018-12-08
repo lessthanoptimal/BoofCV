@@ -957,8 +957,7 @@ public class TestMultiViewOps {
 		Equation eq = new Equation();
 		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("p=rand(3,1)");
-		eq.process("u=-p'*K");
-		eq.process("H=[K [0;0;0]; u 1]");
+		eq.process("H=[K [0;0;0]; -p'*K 1]");
 		eq.process("Q=H*diag([1 1 1 0])*H'");
 		DMatrixRMaj Q = eq.lookupDDRM("Q");
 
@@ -968,8 +967,7 @@ public class TestMultiViewOps {
 		assertTrue(MultiViewOps.enforceAbsoluteQuadraticConstraints(Q_in,true,true));
 
 		eq.process("K=[300 0 0;0 310 0; 0 0 1]");
-		eq.process("u=-p'*K");
-		eq.process("H=[K [0;0;0]; u 1]");
+		eq.process("H=[K [0;0;0]; -p'*K 1]");
 		eq.process("Q=H*diag([1 1 1 0])*H'");
 
 		// change scale so that the test tolerance is reasonable

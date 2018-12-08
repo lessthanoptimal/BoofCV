@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -132,8 +132,8 @@ public class DecomposeHomography {
 			double e1 = (a*V.get(i,0) + b*V.get(i,2))/div;
 			double e2 = (a*V.get(i,0) - b*V.get(i,2))/div;
 
-			u1.setIndex(i,e1);
-			u2.setIndex(i,e2);
+			u1.setIdx(i,e1);
+			u2.setIdx(i,e2);
 		}
 
 		setU(U1, v2, u1);

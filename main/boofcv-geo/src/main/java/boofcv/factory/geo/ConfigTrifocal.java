@@ -19,6 +19,7 @@
 package boofcv.factory.geo;
 
 import boofcv.alg.geo.robust.DistanceTrifocalTransferSq;
+import boofcv.misc.ConfigConverge;
 import boofcv.struct.Configuration;
 
 /**
@@ -37,9 +38,15 @@ public class ConfigTrifocal implements Configuration
 	public ErrorModel error = ErrorModel.POINT_TRANSFER;
 
 	/**
-	 * If an iterative method was selected, the number of iterations
+	 * If an iterative method was selected, this specifies the convergence criteria
 	 */
-	public int maxIterations = 10;
+	public ConfigConverge convergeEstimator = new ConfigConverge(1e-8,1e-8,10);
+
+	/**
+	 * If an iterative method was selected, this specifies the convergence criteria
+	 */
+	public ConfigConverge convergeError = new ConfigConverge(1e-8,1e-8,10);
+
 
 	@Override
 	public void checkValidity() {
@@ -55,7 +62,6 @@ public class ConfigTrifocal implements Configuration
 		 * @see boofcv.alg.geo.robust.DistanceTrifocalReprojectionSq
 		 */
 		REPROJECTION,
-//		REPROJECTION_BETTER, // refine the triangulation
 		/**
 		 * Point transfer from view 0 into 2 and 0 into 3.
 		 *

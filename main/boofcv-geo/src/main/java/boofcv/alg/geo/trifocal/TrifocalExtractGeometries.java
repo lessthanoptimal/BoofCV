@@ -164,7 +164,7 @@ public class TrifocalExtractGeometries {
 		// temp1 = [e3*e3^T -I]
 		for( int i = 0; i < 3; i++ ) {
 			for( int j = 0; j < 3; j++ ) {
-				temp1.set(i,j,e3.getIndex(i)*e3.getIndex(j));
+				temp1.set(i,j,e3.getIdx(i)*e3.getIdx(j));
 			}
 			temp1.set(i,i , temp1.get(i,i) - 1);
 		}
@@ -177,7 +177,7 @@ public class TrifocalExtractGeometries {
 			P2.set(0, i, column.x);
 			P2.set(1, i, column.y);
 			P2.set(2, i, column.z);
-			P2.set(i, 3, e2.getIndex(i));
+			P2.set(i, 3, e2.getIdx(i));
 
 			GeometryMath_F64.multTran(T, e2, temp0);
 			GeometryMath_F64.mult(temp1, temp0, column);
@@ -185,7 +185,7 @@ public class TrifocalExtractGeometries {
 			P3.set(0, i, column.x);
 			P3.set(1, i, column.y);
 			P3.set(2, i, column.z);
-			P3.set(i, 3, e3.getIndex(i));
+			P3.set(i, 3, e3.getIdx(i));
 		}
 	}
 
