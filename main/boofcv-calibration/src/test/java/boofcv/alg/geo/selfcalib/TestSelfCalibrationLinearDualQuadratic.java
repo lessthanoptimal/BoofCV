@@ -23,6 +23,7 @@ import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic.Intrinsic;
+import boofcv.factory.geo.ConfigTrifocal;
 import boofcv.factory.geo.EnumTrifocal;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinhole;
@@ -100,7 +101,9 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 			obs.add(t);
 		}
 
-		Estimate1ofTrifocalTensor estimate = FactoryMultiView.trifocal_1(EnumTrifocal.LINEAR_7,-1);
+		ConfigTrifocal config = new ConfigTrifocal();
+		config.which = EnumTrifocal.LINEAR_7;
+		Estimate1ofTrifocalTensor estimate = FactoryMultiView.trifocal_1(config);
 		TrifocalTensor tensor = new TrifocalTensor();
 		assertTrue(estimate.process(obs,tensor));
 

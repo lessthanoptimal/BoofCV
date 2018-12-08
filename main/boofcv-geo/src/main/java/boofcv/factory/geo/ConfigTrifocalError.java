@@ -18,19 +18,21 @@
 
 package boofcv.factory.geo;
 
+import boofcv.alg.geo.robust.DistanceTrifocalTransferSq;
 import boofcv.misc.ConfigConverge;
 import boofcv.struct.Configuration;
 
 /**
+ * Configuration for trifocal error computation
+ *
  * @author Peter Abeles
  */
-public class ConfigTrifocal implements Configuration
-{
-	/**
-	 * Which method to use
-	 */
-	public EnumTrifocal which = EnumTrifocal.LINEAR_7;
+public class ConfigTrifocalError implements Configuration {
 
+	/**
+	 * How to compute the error
+	 */
+	public Model model = Model.REPROJECTION;
 
 	/**
 	 * If an iterative method was selected, this specifies the convergence criteria
@@ -40,5 +42,24 @@ public class ConfigTrifocal implements Configuration
 	@Override
 	public void checkValidity() {
 
+	}
+
+	public enum Model {
+		/**
+		 * Computes camera matrices and triangulates a point in 3D space. Reprojects the points and returns the error
+		 *
+		 * inlier units: Pixels
+		 *
+		 * @see boofcv.alg.geo.robust.DistanceTrifocalReprojectionSq
+		 */
+		REPROJECTION,
+		/**
+		 * Point transfer from view 0 into 2 and 0 into 3.
+		 *
+		 * inlier units: Pixels
+		 *
+		 * @see DistanceTrifocalTransferSq
+		 */
+		POINT_TRANSFER
 	}
 }

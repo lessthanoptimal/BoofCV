@@ -47,6 +47,7 @@ import boofcv.alg.geo.triangulate.ResidualsTriangulateMetricSimple;
 import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
 import boofcv.alg.geo.triangulate.TriangulateProjectiveLinearDLT;
 import boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7;
+import boofcv.misc.ConfigConverge;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.fitting.MotionTransformPoint;
 import georegression.fitting.se.FitSpecialEuclideanOps_F64;
@@ -317,23 +318,28 @@ public class FactoryMultiView {
 	/**
 	 * Creates a trifocal tensor estimation algorithm.
 	 *
-	 * @param type Which algorithm.
-	 * @param iterations If the algorithm is iterative, then this is the number of iterations.  Try 200
+	 * @param config configuration for the estimator
 	 * @return Trifocal tensor estimator
 	 */
-	public static Estimate1ofTrifocalTensor trifocal_1(EnumTrifocal type, int iterations) {
-		switch( type ) {
+	public static Estimate1ofTrifocalTensor trifocal_1( @Nullable ConfigTrifocal config ) {
+		if( config == null ) {
+			config = new ConfigTrifocal();
+		}
+
+		switch( config.which ) {
 			case LINEAR_7:
 				return new WrapTrifocalLinearPoint7();
 
 			case ALGEBRAIC_7:
+				ConfigConverge cc = config.converge;
 				UnconstrainedLeastSquares optimizer = FactoryOptimization.levenbergMarquardt(null, false);
-				TrifocalAlgebraicPoint7 alg = new TrifocalAlgebraicPoint7(optimizer,iterations,1e-12,1e-12);
+				TrifocalAlgebraicPoint7 alg = new TrifocalAlgebraicPoint7(optimizer,
+						cc.maxIterations,cc.ftol,cc.gtol);
 
 				return new WrapTrifocalAlgebraicPoint7(alg);
 		}
 
-		throw new IllegalArgumentException("Unknown type "+type);
+		throw new IllegalArgumentException("Unknown type "+config.which);
 	}
 
 	/**

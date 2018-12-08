@@ -388,27 +388,32 @@ public class FactoryMultiViewRobust {
 	/**
 	 * Robust RANSAC based estimator for
 	 *
-	 * @see FactoryMultiView#trifocal_1(EnumTrifocal, int)
+	 * @see FactoryMultiView#trifocal_1
 	 *
 	 * @param trifocal Configuration for trifocal tensor calculation
+	 * @param error Configuration for how trifocal error is computed
 	 * @param ransac Configuration for RANSAC
 	 * @return RANSAC
 	 */
 	public static Ransac<TrifocalTensor, AssociatedTriple>
-	trifocalRansac( @Nullable ConfigTrifocal trifocal , @Nonnull ConfigRansac ransac ) {
+	trifocalRansac( @Nullable ConfigTrifocal trifocal ,
+					@Nullable ConfigTrifocalError error,
+					@Nonnull ConfigRansac ransac ) {
 		if( trifocal == null )
 			trifocal = new ConfigTrifocal();
-		else
-			trifocal.checkValidity();
+		if( error == null )
+			error = new ConfigTrifocalError();
+
+		trifocal.checkValidity();
 
 		double ransacTol;
 		DistanceFromModel<TrifocalTensor,AssociatedTriple> distance;
 
-		switch( trifocal.error ) {
+		switch( error.model) {
 			case REPROJECTION:
 				ransacTol = 3.0*ransac.inlierThreshold*ransac.inlierThreshold;
-				if( trifocal.convergeError.maxIterations > 0 )
-					distance = new DistanceTrifocalReprojectionSq(trifocal.convergeError.gtol,trifocal.convergeError.maxIterations);
+				if( error.converge.maxIterations > 0 )
+					distance = new DistanceTrifocalReprojectionSq(error.converge.gtol,error.converge.maxIterations);
 				else
 					distance = new DistanceTrifocalReprojectionSq();
 				break;
@@ -417,10 +422,10 @@ public class FactoryMultiViewRobust {
 				distance = new DistanceTrifocalTransferSq();
 				break;
 			default:
-				throw new IllegalArgumentException("Unknown error model "+trifocal.error);
+				throw new IllegalArgumentException("Unknown error model "+error.model);
 		}
 
-		Estimate1ofTrifocalTensor estimator = FactoryMultiView.trifocal_1(trifocal.which,trifocal.convergeEstimator.maxIterations);
+		Estimate1ofTrifocalTensor estimator = FactoryMultiView.trifocal_1(trifocal);
 		ModelManager<TrifocalTensor> manager = new ManagerTrifocalTensor();
 		ModelGenerator<TrifocalTensor,AssociatedTriple> generator = new GenerateTrifocalTensor(estimator);
 

@@ -11,7 +11,8 @@ Version : 0.32
   * Colorized code
   * Updated detect line demo
   * Updated image enhance demo
-  * Three view stereo and self calibration
+  * TODO Removed uncalibrated two view stereo. Never worked well!
+  * Three view stereo with self calibration
 - Applications
   * All applications have a GUI
   * Centralized GUI for launching
@@ -33,7 +34,11 @@ Version : 0.32
   * Decompose absolute quadratic
   * Convert projective to metric camera matrix
   * Fixed bug in decomposeMetricCamera
-  * Refine triangulation for projective geometry TODO
+  * Refine triangulation for projective geometry
+  * Improvements to factory methods
+- SFM
+  * Improvements to projective bundle adjustment
+  * Projective scene structure pruning
 - ImageInterleaved
   * setTo() changes number of bands if needed
   * Improved speed of Interleaved to Gray average
@@ -50,9 +55,6 @@ TODO compute camera matrices directly from trilinear constraint? P 274
 
 TODO Remove dependency on OpenCV in Applications to reduce file size
 
-- TODO Self calibration example
-   - scene reconstruction
-   - compared to regular
 - TODO Scene Reconstruction
    - TODO handle situation where images are removed and exception is thrown
    - TODO Create generic image feature matching for ordered sequences of images

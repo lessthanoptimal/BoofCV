@@ -243,9 +243,11 @@ public class ExampleTrifocalStereo {
 		configRansac.inlierThreshold = 1;
 
 		ConfigTrifocal configTri = new ConfigTrifocal();
-		configTri.error = ConfigTrifocal.ErrorModel.REPROJECTION;
+		ConfigTrifocalError configError = new ConfigTrifocalError();
+		configError.model = ConfigTrifocalError.Model.REPROJECTION;
 
-		Ransac<TrifocalTensor,AssociatedTriple> ransac = FactoryMultiViewRobust.trifocalRansac(configTri,configRansac);
+		Ransac<TrifocalTensor,AssociatedTriple> ransac =
+				FactoryMultiViewRobust.trifocalRansac(configTri,configError,configRansac);
 
 		FastQueue<AssociatedTripleIndex> associatedIdx = associateThree.getMatches();
 		FastQueue<AssociatedTriple> associated = new FastQueue<>(AssociatedTriple.class,true);
@@ -261,7 +263,9 @@ public class ExampleTrifocalStereo {
 
 		// estimate using all the inliers
 		// No need to re-scale the input because the estimator automatically adjusts the input on its own
-		Estimate1ofTrifocalTensor trifocalEstimator = FactoryMultiView.trifocal_1(EnumTrifocal.ALGEBRAIC_7,100);
+		configTri.which = EnumTrifocal.ALGEBRAIC_7;
+		configTri.converge.maxIterations = 100;
+		Estimate1ofTrifocalTensor trifocalEstimator = FactoryMultiView.trifocal_1(configTri);
 		if( !trifocalEstimator.process(inliers,model) )
 			throw new RuntimeException("Estimator failed");
 		model.print();

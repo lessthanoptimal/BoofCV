@@ -19,6 +19,7 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.alg.geo.trifocal.CommonTrifocalChecks;
+import boofcv.factory.geo.ConfigTrifocal;
 import boofcv.factory.geo.EnumTrifocal;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedTriple;
@@ -35,7 +36,9 @@ public class TestDistanceTrifocalTransferSq extends CommonTrifocalChecks {
 	@Test
 	public void perfect() {
 		// estimate the tensors to ensure it's in pixels
-		FactoryMultiView.trifocal_1(EnumTrifocal.LINEAR_7,-1).process(observationsPixels,found);
+		ConfigTrifocal config = new ConfigTrifocal();
+		config.which = EnumTrifocal.LINEAR_7;
+		FactoryMultiView.trifocal_1(config).process(observationsPixels,found);
 
 		DistanceTrifocalTransferSq alg = new DistanceTrifocalTransferSq();
 		alg.setModel(found);
@@ -48,7 +51,9 @@ public class TestDistanceTrifocalTransferSq extends CommonTrifocalChecks {
 	@Test
 	public void noise() {
 		// estimate the tensors to ensure it's in pixels
-		FactoryMultiView.trifocal_1(EnumTrifocal.LINEAR_7,-1).process(observationsPixels,found);
+		ConfigTrifocal config = new ConfigTrifocal();
+		config.which = EnumTrifocal.LINEAR_7;
+		FactoryMultiView.trifocal_1(config).process(observationsPixels,found);
 
 		DistanceTrifocalTransferSq alg = new DistanceTrifocalTransferSq();
 		alg.setModel(found);
