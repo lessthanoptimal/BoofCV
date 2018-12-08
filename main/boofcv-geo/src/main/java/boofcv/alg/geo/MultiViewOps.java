@@ -205,10 +205,10 @@ public class MultiViewOps {
 			int index = 0;
 			for( int i = 0; i < 3; i++ ) {
 				double a_left = R2.unsafe_get(i,col);
-				double a_right = T2.getIndex(i);
+				double a_right = T2.getIdx(i);
 
 				for( int j = 0; j < 3; j++ ) {
-					T.data[index++] = a_left*T3.getIndex(j) - a_right*R3.unsafe_get(j,col);
+					T.data[index++] = a_left*T3.getIdx(j) - a_right*R3.unsafe_get(j,col);
 				}
 			}
 		}
