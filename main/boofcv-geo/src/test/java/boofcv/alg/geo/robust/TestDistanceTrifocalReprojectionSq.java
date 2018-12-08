@@ -18,16 +18,62 @@
 
 package boofcv.alg.geo.robust;
 
+import boofcv.alg.geo.trifocal.CommonTrifocalChecks;
+import boofcv.struct.geo.AssociatedTriple;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-class TestDistanceTrifocalReprojectionSq {
+class TestDistanceTrifocalReprojectionSq extends CommonTrifocalChecks {
 	@Test
-	public void implement() {
-		fail("implement");
+	public void perfect() {
+
+		DistanceTrifocalReprojectionSq alg = new DistanceTrifocalReprojectionSq();
+		alg.setModel(tensorPixels);
+
+		for (int i = 0; i < observationsPixels.size(); i++) {
+			assertEquals(0,alg.computeDistance(observationsPixels.get(i)), UtilEjml.TEST_F64);
+		}
 	}
+
+	@Test
+	public void noise() {
+		DistanceTrifocalReprojectionSq alg = new DistanceTrifocalReprojectionSq();
+		alg.setModel(tensorPixels);
+
+		for (int i = 0; i < observationsPixels.size(); i++) {
+			AssociatedTriple a = observationsPixels.get(i);
+			a.p1.x += 0.5;
+			assertEquals(0,alg.computeDistance(observationsPixels.get(i)), 1.5*0.5*0.5);
+			a.p1.x -= 0.5;
+			a.p2.x += 0.5;
+			assertEquals(0,alg.computeDistance(observationsPixels.get(i)), 1.5*0.5*0.5);
+			a.p2.x -= 0.5;
+			a.p3.x += 0.5;
+			assertEquals(0,alg.computeDistance(observationsPixels.get(i)), 1.5*0.5*0.5);
+		}
+	}
+
+	@Test
+	public void noise_refine() {
+		DistanceTrifocalReprojectionSq alg = new DistanceTrifocalReprojectionSq(1e-8,100);
+		alg.setModel(tensorPixels);
+
+		for (int i = 0; i < observationsPixels.size(); i++) {
+			AssociatedTriple a = observationsPixels.get(i);
+			a.p1.x += 0.5;
+			assertEquals(0,alg.computeDistance(observationsPixels.get(i)), 0.5*0.5);
+			a.p1.x -= 0.5;
+			a.p2.x += 0.5;
+			assertEquals(0,alg.computeDistance(observationsPixels.get(i)), 0.5*0.5);
+			a.p2.x -= 0.5;
+			a.p3.x += 0.5;
+			assertEquals(0,alg.computeDistance(observationsPixels.get(i)), 0.5*0.5);
+		}
+	}
+
 }

@@ -19,6 +19,7 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.abst.geo.TriangulateNViewsProjective;
+import boofcv.abst.geo.triangulate.RefineTriangulateProjectiveLS;
 import boofcv.alg.geo.trifocal.TrifocalExtractGeometries;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedTriple;
@@ -36,7 +37,7 @@ import java.util.List;
 /**
  * Estimates the accuracy of a trifocal tensor using reprojection error. The camera matrices are extracted from
  * the tensor, these are used to triangulate the observation. the found point is then reprojected back to each
- * view and the delta computed.
+ * view and the delta computed. Optional non-linear refinement.
  *
  * @author Peter Abeles
  */
@@ -52,12 +53,23 @@ public class DistanceTrifocalReprojectionSq implements DistanceFromModel<Trifoca
 	TrifocalExtractGeometries extractor = new TrifocalExtractGeometries();
 	TriangulateNViewsProjective triangulator = FactoryMultiView.triangulateNViewDLT();
 
+	RefineTriangulateProjectiveLS refiner;
+
 
 	Point4D_F64 X = new Point4D_F64();
 	Point2D_F64 pixel = new Point2D_F64();
 
-	public DistanceTrifocalReprojectionSq() {
+	/**
+	 * Call this constructor if you wish to apply non-linear refinement.
+	 * @param gtol convergence tolerance. Try 1e-8
+	 * @param maxIterations Max iterations. Try 50
+	 */
+	public DistanceTrifocalReprojectionSq( double gtol , int maxIterations ) {
+		this();
+		refiner = new RefineTriangulateProjectiveLS(gtol,maxIterations);
+	}
 
+	public DistanceTrifocalReprojectionSq() {
 		cameraMatrices.add(P1);
 		cameraMatrices.add(P2);
 		cameraMatrices.add(P3);
@@ -81,15 +93,16 @@ public class DistanceTrifocalReprojectionSq implements DistanceFromModel<Trifoca
 
 		triangulator.triangulate(observations,cameraMatrices,X);
 
-		// TODO optional refinement of X
+		if( refiner != null )
+			refiner.process(observations,cameraMatrices,X,X);
 
 		double error = 0;
 		GeometryMath_F64.mult(P1,X,pixel);
 		error += pixel.distance2(pt.p1);
 		GeometryMath_F64.mult(P2,X,pixel);
-		error += pixel.distance2(pt.p1);
-		GeometryMath_F64.mult(P2,X,pixel);
-		error += pixel.distance2(pt.p1);
+		error += pixel.distance2(pt.p2);
+		GeometryMath_F64.mult(P3,X,pixel);
+		error += pixel.distance2(pt.p3);
 
 		return error;
 	}

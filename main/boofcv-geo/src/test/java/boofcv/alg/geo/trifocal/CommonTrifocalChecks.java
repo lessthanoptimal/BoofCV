@@ -48,8 +48,10 @@ public abstract class CommonTrifocalChecks {
 	protected DMatrixRMaj K = new DMatrixRMaj(3,3,true,60,0.01,200,0,80,150,0,0,1);
 
 	protected Se3_F64 worldToCam1,worldToCam2, worldToCam3;
+	protected DMatrixRMaj P1_k;
 	protected DMatrixRMaj P2,P3;
 	protected TrifocalTensor tensor;
+	protected TrifocalTensor tensorPixels;
 	// storage for the found solution
 	protected TrifocalTensor found = new TrifocalTensor();
 
@@ -98,10 +100,12 @@ public abstract class CommonTrifocalChecks {
 	}
 
 	private void computeStuffFromPose() {
+		P1_k = PerspectiveOps.createCameraMatrix(worldToCam1.R, worldToCam1.T, K, null);
 		// P1 = [I|0]
 		P2 = PerspectiveOps.createCameraMatrix(worldToCam2.R, worldToCam2.T, K, null);
 		P3 = PerspectiveOps.createCameraMatrix(worldToCam3.R, worldToCam3.T, K, null);
 		tensor = MultiViewOps.createTrifocal(P2, P3, null);
+		tensorPixels = MultiViewOps.createTrifocal(P1_k,P2,P3,null);
 
 		F2 = MultiViewOps.createEssential(worldToCam2.getR(), worldToCam2.getT(), null);
 		F2 = MultiViewOps.createFundamental(F2, K);

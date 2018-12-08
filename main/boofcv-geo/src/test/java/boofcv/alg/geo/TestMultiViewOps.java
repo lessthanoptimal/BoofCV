@@ -25,6 +25,7 @@ import boofcv.struct.geo.PairLineNorm;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
+import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -43,6 +44,7 @@ import org.ejml.dense.fixed.CommonOps_DDF4;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
+import org.ejml.dense.row.RandomMatrices_DDRM;
 import org.ejml.equation.Equation;
 import org.ejml.ops.ConvertDMatrixStruct;
 import org.ejml.ops.MatrixFeatures_D;
@@ -66,6 +68,7 @@ public class TestMultiViewOps {
 	DMatrixRMaj K = new DMatrixRMaj(3,3,true,60,0.01,200,0,80,150,0,0,1);
 
 	// camera locations
+	Se3_F64 worldToCam1 = new Se3_F64();
 	Se3_F64 worldToCam2, worldToCam3;
 
 	// camera matrix for views 2 and 3
@@ -107,24 +110,64 @@ public class TestMultiViewOps {
 	 * Check the trifocal tensor using its definition
 	 */
 	@Test
-	public void createTrifocal_CameraMatrix() {
+	public void createTrifocal_CameraMatrix2() {
+		TrifocalTensor found = MultiViewOps.createTrifocal(P2,P3,null);
 
-		SimpleMatrix P1 = SimpleMatrix.wrap(
-				PerspectiveOps.createCameraMatrix(worldToCam2.getR(), worldToCam2.getT(), null, null));
-		SimpleMatrix P2 = SimpleMatrix.wrap(
-				PerspectiveOps.createCameraMatrix(worldToCam3.getR(), worldToCam3.getT(), null, null));
+		List<Point3D_F64> points = UtilPoint3D_F64.random(new Point3D_F64(0,0,2),-1,1,-1,-1,-0.1,0.1,20,rand);
 
-		TrifocalTensor found = MultiViewOps.createTrifocal(worldToCam2,worldToCam3,null);
+		// Test it against a constraint
+		DMatrixRMaj C = RandomMatrices_DDRM.rectangle(3,3,-1,1,rand);
+		for (Point3D_F64 X : points ) {
+			Point2D_F64 x1 = PerspectiveOps.renderPixel(worldToCam1,X);
+			Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
+			Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
 
+			MultiViewOps.constraint(found,x1,x2,x3,C);
+			for (int i = 0; i < 9; i++) {
+				assertEquals(0,C.data[i], 10*UtilEjml.TEST_F64);
+			}
+		}
+		// test it against its definition
+		Equation eq = new Equation(P2,"P2",P3,"P3");
 		for( int i = 0; i < 3; i++ ) {
-			SimpleMatrix ai = P1.extractVector(false,i);
-			SimpleMatrix b4 = P2.extractVector(false,3);
-			SimpleMatrix a4 = P1.extractVector(false,3);
-			SimpleMatrix bi = P2.extractVector(false,i);
+			eq.alias(i,"i");
+			eq.process("ai = P2(:,i)");
+			eq.process("b4 = P3(:,3)");
+			eq.process("a4 = P2(:,3)");
+			eq.process("bi = P3(:,i)");
 
-			SimpleMatrix expected = ai.mult(b4.transpose()).minus(a4.mult(bi.transpose()));
+			eq.process("z = ai*b4' - a4*bi'");
+			DMatrixRMaj expected = eq.lookupDDRM("z");
 
-			assertTrue(MatrixFeatures_DDRM.isIdentical(expected.getDDRM(),found.getT(i),1e-8));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(expected,found.getT(i),UtilEjml.TEST_F64));
+		}
+	}
+
+	/**
+	 * Check using trifocal constraint
+	 */
+	@Test
+	public void createTrifocal_CameraMatrix3() {
+		DMatrixRMaj P1 = PerspectiveOps.createCameraMatrix(worldToCam1.R,worldToCam1.T,K,null);
+		TrifocalTensor found = MultiViewOps.createTrifocal(P1,P2,P3,null);
+
+		assertTrue(CommonOps_DDRM.elementMaxAbs(found.T1) > 1e-4 );
+		assertTrue(CommonOps_DDRM.elementMaxAbs(found.T2) > 1e-4 );
+		assertTrue(CommonOps_DDRM.elementMaxAbs(found.T3) > 1e-4 );
+
+		List<Point3D_F64> points = UtilPoint3D_F64.random(new Point3D_F64(0,0,2),-1,1,-1,-1,-0.1,0.1,20,rand);
+
+		// Test it against a constraint
+		DMatrixRMaj C = RandomMatrices_DDRM.rectangle(3,3,-1,1,rand);
+		for (Point3D_F64 X : points ) {
+			Point2D_F64 x1 = PerspectiveOps.renderPixel(worldToCam1,K,X);
+			Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
+			Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
+
+			MultiViewOps.constraint(found,x1,x2,x3,C);
+			for (int i = 0; i < 9; i++) {
+				assertEquals(0,C.data[i], UtilEjml.TEST_F64);
+			}
 		}
 	}
 

@@ -82,12 +82,13 @@ public class MultiViewOps {
 	 * where I is an identify matrix.
 	 * </p>
 	 *
-	 * @param P2 Camera matrix for view 2
-	 * @param P3 Camera matrix for view 3
+	 * @param P2 Camera matrix for view 2. 3x4 matrix
+	 * @param P3 Camera matrix for view 3. 3x4 matrix
 	 * @param ret Storage for trifocal tensor.  If null a new instance will be created.
 	 * @return The trifocal tensor
 	 */
-	public static TrifocalTensor createTrifocal( DMatrixRMaj P2 , DMatrixRMaj P3 , TrifocalTensor ret ) {
+	public static TrifocalTensor createTrifocal( DMatrixRMaj P2 , DMatrixRMaj P3 ,
+												 @Nullable TrifocalTensor ret ) {
 		if( ret == null )
 			ret = new TrifocalTensor();
 
@@ -110,6 +111,72 @@ public class MultiViewOps {
 
 	/**
 	 * <p>
+	 * Creates a trifocal tensor from three camera matrices. The
+	 * </p>
+	 * <p>
+	 * Page 415 in R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003
+	 * </p>
+	 *
+	 * @param P2 Camera matrix for view 1. 3x4 matrix
+	 * @param P2 Camera matrix for view 2. 3x4 matrix
+	 * @param P3 Camera matrix for view 3. 3x4 matrix
+	 * @param ret Storage for trifocal tensor.  If null a new instance will be created.
+	 * @return The trifocal tensor
+	 */
+	public static TrifocalTensor createTrifocal( DMatrixRMaj P1 , DMatrixRMaj P2 , DMatrixRMaj P3 ,
+												 @Nullable TrifocalTensor ret ) {
+		if( ret == null )
+			ret = new TrifocalTensor();
+
+		// invariant to scale. So pick something more reasonable and maybe reduce overflow
+		double scale = 0;
+		scale = Math.max(scale,CommonOps_DDRM.elementMaxAbs(P1));
+		scale = Math.max(scale,CommonOps_DDRM.elementMaxAbs(P2));
+		scale = Math.max(scale,CommonOps_DDRM.elementMaxAbs(P3));
+
+		DMatrixRMaj A = new DMatrixRMaj(4,4);
+
+		double sign = 1;
+		for( int i = 0; i < 3; i++ ) {
+			DMatrixRMaj T = ret.getT(i);
+
+			for (int row = 0,cnt=0; row < 3; row++) {
+				if( row != i ) {
+					CommonOps_DDRM.extract(P1, row, row + 1, 0, 4, A, cnt, 0);
+					for (int col = 0; col < 4; col++) {
+						A.data[cnt*4+col] /= scale;
+					}
+					cnt++;
+				}
+			}
+
+			for (int q = 0; q < 3; q++) {
+				CommonOps_DDRM.extract(P2,q,q+1,0,4,A,2,0);
+
+				for (int col = 0; col < 4; col++) {
+					A.data[2*4+col] /= scale;
+				}
+
+				for (int r = 0; r < 3; r++) {
+					CommonOps_DDRM.extract(P3,r,r+1,0,4,A,3,0);
+					for (int col = 0; col < 4; col++) {
+						A.data[3*4+col] /= scale;
+					}
+
+					double v = CommonOps_DDRM.det(A);
+					T.set(q,r,sign*v*scale);  // scale is to the power of 2, hence the *scale here
+				}
+			}
+
+			sign *= -1;
+		}
+
+		return ret;
+	}
+
+
+	/**
+	 * <p>
 	 * Creates a trifocal tensor from two rigid body motions.  This is for the calibrated camera case.
 	 * </p>
 	 *
@@ -122,7 +189,8 @@ public class MultiViewOps {
 	 * @param ret Storage for trifocal tensor.  If null a new instance will be created.
 	 * @return The trifocal tensor
 	 */
-	public static TrifocalTensor createTrifocal( Se3_F64 P2 , Se3_F64 P3 , TrifocalTensor ret ) {
+	public static TrifocalTensor createTrifocal( Se3_F64 P2 , Se3_F64 P3 ,
+												 @Nullable TrifocalTensor ret ) {
 		if( ret == null )
 			ret = new TrifocalTensor();
 
@@ -163,7 +231,7 @@ public class MultiViewOps {
 	 */
 	public static Vector3D_F64 constraint(TrifocalTensor tensor,
 										  Vector3D_F64 l1, Vector3D_F64 l2, Vector3D_F64 l3,
-										  Vector3D_F64 ret)
+										  @Nullable Vector3D_F64 ret)
 	{
 		if( ret == null )
 			ret = new Vector3D_F64();

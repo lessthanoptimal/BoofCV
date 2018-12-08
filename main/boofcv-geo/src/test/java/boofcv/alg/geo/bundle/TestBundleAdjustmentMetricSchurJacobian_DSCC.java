@@ -55,7 +55,7 @@ public class TestBundleAdjustmentMetricSchurJacobian_DSCC {
 		alg.configure(structure,observations);
 		func.configure(structure,observations);
 
-//		DerivativeChecker.jacobianPrint(func, jac, param, UtilEjml.TEST_F64_SQ );
-		assertTrue(DerivativeChecker.jacobian(func, jac, param, UtilEjml.TEST_F64_SQ ));
+//		DerivativeChecker.jacobianPrint(func, jac, param, 10*UtilEjml.TEST_F64_SQ );
+		assertTrue(DerivativeChecker.jacobian(func, jac, param, 10*UtilEjml.TEST_F64_SQ ));
 	}
 }
