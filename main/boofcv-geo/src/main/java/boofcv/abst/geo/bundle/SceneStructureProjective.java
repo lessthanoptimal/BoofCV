@@ -99,18 +99,6 @@ public class SceneStructureProjective extends SceneStructureCommon
 		return views;
 	}
 
-	public static class Camera {
-		/**
-		 * If the parameters are assumed to be known and should not be optimised.
-		 */
-		public boolean known = true;
-		public BundleAdjustmentCamera model;
-
-		public <T extends BundleAdjustmentCamera>T getModel() {
-			return (T)model;
-		}
-	}
-
 	public static class View {
 		/**
 		 * If the parameters are assumed to be known and should not be optimised.
