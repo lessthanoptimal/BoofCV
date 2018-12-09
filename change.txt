@@ -36,6 +36,8 @@ Version : 0.32
   * Fixed bug in decomposeMetricCamera
   * Refine triangulation for projective geometry
   * Improvements to factory methods
+  * fundamental matrix from camera matrix
+  * consistent camera matrices from three fundamental matrices
 - SFM
   * Improvements to projective bundle adjustment
   * Projective scene structure pruning
@@ -47,11 +49,6 @@ Version : 0.32
 - Android
   * Bunch of bug fixes
   * Extracts the full pinhole calibration matrix from camera characteristics
-
-
-TODO Given F21 F31 F32 return  a concistent P1 P2
-     P301 yellow book
-TODO compute camera matrices directly from trilinear constraint? P 274
 
 TODO Remove dependency on OpenCV in Applications to reduce file size
 

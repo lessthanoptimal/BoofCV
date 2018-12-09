@@ -638,7 +638,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void fundamentalToProjective() {
+	public void fundamentalToProjective_Two() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		Se3_F64 T = SpecialEuclideanOps_F64.eulerXyz(0.5,0.7,-0.3,EulerType.XYZ,1,2,-0.5,null);
 
@@ -671,6 +671,29 @@ public class TestMultiViewOps {
 	}
 
 	@Test
+	public void projectiveToFundamental_Two() {
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 400, 405);
+		Se3_F64 M11 = new Se3_F64();
+		Se3_F64 M12 = SpecialEuclideanOps_F64.eulerXyz(-1, 0, -0.2, EulerType.XYZ, 0,-.2, 0, null);
+
+		DMatrixRMaj P1 = PerspectiveOps.createCameraMatrix(M11.R,M11.T,K,null);
+		DMatrixRMaj P2 = PerspectiveOps.createCameraMatrix(M12.R,M12.T,K,null);
+
+		DMatrixRMaj F21 = MultiViewOps.projectiveToFundamental(P1,P2,null);
+
+		// test by seeing if a skew symmetric matrix is produced with the formula below
+		Equation eq = new Equation(P1,"P1",P2,"P2",P3,"P3",F21,"F21");
+		eq.process("A = P2'*F21*P1");
+		DMatrixRMaj A = eq.lookupDDRM("A");
+
+		for (int row = 0; row < 4; row++) {
+			for (int col = row+1; col < 4; col++) {
+				assertEquals(A.get(row,col),-A.get(col,row), 1e-8);
+			}
+		}
+	}
+
+	@Test
 	public void fundamentalToEssential() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		for (int i = 0; i < 50; i++) {
@@ -693,6 +716,86 @@ public class TestMultiViewOps {
 
 			assertTrue(MatrixFeatures_DDRM.isIdentical(E,found,UtilEjml.TEST_F64));
 		}
+	}
+
+	@Test
+	void fundamentalToProjective_Three() {
+		// carefully constructed transforms to ensure that the three views are not colinear
+		// and have reasonable epipoles.
+		// needing to be this careful highlights why the trifocal tensor is a better choice...
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 400, 405);
+		Se3_F64 M12 = SpecialEuclideanOps_F64.eulerXyz(-1, 0, -0.2, EulerType.XYZ, 0,-.2, 0, null);
+		Se3_F64 M13 = SpecialEuclideanOps_F64.eulerXyz( 1, 0, -0.2, EulerType.XYZ, 0, .2, 0, null);
+		Se3_F64 M23 = M12.invert(null).concat(M13, null);
+
+		DMatrixRMaj F21 = MultiViewOps.createFundamental(M12.R,M12.T,K,K,null);
+		DMatrixRMaj F31 = MultiViewOps.createFundamental(M13.R,M13.T,K,K,null);
+		DMatrixRMaj F32 = MultiViewOps.createFundamental(M23.R,M23.T,K,K,null);
+
+		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
+		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
+
+		MultiViewOps.fundamentalToProjective(F21,F31,F32,P2,P3);
+
+		// Test using the definition of consistency from "An Invitation to 3-D Vision"
+		DMatrixRMaj foundF32 = new DMatrixRMaj(3,3);
+		MultiViewOps.projectiveToFundamental(P2,P3,foundF32);
+
+		// resolve scale ambiguity
+		CommonOps_DDRM.scale(1.0/NormOps_DDRM.normF(F32),F32);
+		CommonOps_DDRM.scale(1.0/NormOps_DDRM.normF(foundF32),foundF32);
+
+//		F32.print();
+//		foundF32.print();
+		assertTrue(MatrixFeatures_DDRM.isIdentical(F32,foundF32, UtilEjml.TEST_F64_SQ));
+	}
+
+	@Test
+	void projectiveToIdentityH() {
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
+		Se3_F64 T = SpecialEuclideanOps_F64.eulerXyz(0.5,0.7,-0.3,EulerType.XYZ,1,2,-0.5,null);
+		DMatrixRMaj P = PerspectiveOps.createCameraMatrix(T.R,T.T,K,null);
+
+		DMatrixRMaj H = new DMatrixRMaj(1,1);
+		MultiViewOps.projectiveToIdentityH(P,H);
+
+		assertEquals(4,H.numRows);
+		assertEquals(4,H.numCols);
+
+		DMatrixRMaj found = new DMatrixRMaj(3,4);
+		CommonOps_DDRM.mult(P,H,found);
+
+		assertTrue(MatrixFeatures_DDRM.isIdentity(found, UtilEjml.TEST_F64));
+	}
+
+	@Test
+	void fundamentalCompatible3() {
+		// carefully constructed transforms to ensure that the three views are not colinear
+		// and have reasonable epipoles
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 400, 405);
+		Se3_F64 M12 = SpecialEuclideanOps_F64.eulerXyz(-1, 0, -0.2, EulerType.XYZ, 0,-.2, 0, null);
+		Se3_F64 M13 = SpecialEuclideanOps_F64.eulerXyz( 1, 0, -0.2, EulerType.XYZ, 0, .2, 0, null);
+		Se3_F64 M23 = M12.invert(null).concat(M13, null);
+
+		DMatrixRMaj F21 = MultiViewOps.createFundamental(M12.R, M12.T, K, K, null);
+		DMatrixRMaj F31 = MultiViewOps.createFundamental(M13.R, M13.T, K, K, null);
+		DMatrixRMaj F32 = MultiViewOps.createFundamental(M23.R, M23.T, K, K, null);
+
+		assertTrue(MultiViewOps.fundamentalCompatible3(F21,F31,F32, 1e-12));
+
+		// F is only defined up to a scale
+		CommonOps_DDRM.scale(10,F31);
+		assertTrue(MultiViewOps.fundamentalCompatible3(F21,F31,F32, 1e-12));
+
+		CommonOps_DDRM.scale(-5,F32);
+		assertTrue(MultiViewOps.fundamentalCompatible3(F21,F31,F32, 1e-12));
+
+		// Recompute F after applying a projective transform. They should no longer be compatible
+		DMatrixRMaj A = CommonOps_DDRM.diag(0.5,-0.1,200);
+		DMatrixRMaj K2 = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.mult(A,K,K2);
+		F31 = MultiViewOps.createFundamental(M13.R, M13.T, K2, K2, null);
+		assertFalse(MultiViewOps.fundamentalCompatible3(F21,F31,F32, 1e-12));
 	}
 
 	@Test

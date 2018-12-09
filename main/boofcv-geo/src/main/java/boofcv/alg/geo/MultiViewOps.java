@@ -23,6 +23,7 @@ import boofcv.alg.geo.f.FundamentalToProjective;
 import boofcv.alg.geo.h.HomographyInducedStereo2Line;
 import boofcv.alg.geo.h.HomographyInducedStereo3Pts;
 import boofcv.alg.geo.h.HomographyInducedStereoLinePt;
+import boofcv.alg.geo.impl.ProjectiveToIdentity;
 import boofcv.alg.geo.structure.DecomposeAbsoluteDualQuadratic;
 import boofcv.alg.geo.trifocal.TrifocalExtractGeometries;
 import boofcv.alg.geo.trifocal.TrifocalTransfer;
@@ -709,7 +710,7 @@ public class MultiViewOps {
 	 * @return Fundamental matrix
 	 */
 	public static DMatrixRMaj createFundamental(DMatrixRMaj E,
-												   DMatrixRMaj K1,  DMatrixRMaj K2) {
+												DMatrixRMaj K1,  DMatrixRMaj K2) {
 		DMatrixRMaj K1_inv = new DMatrixRMaj(3,3);
 		CommonOps_DDRM.invert(K1,K1_inv);
 		DMatrixRMaj K2_inv = new DMatrixRMaj(3,3);
@@ -721,6 +722,32 @@ public class MultiViewOps {
 		CommonOps_DDRM.multTransA(K2_inv,E,temp);
 		CommonOps_DDRM.mult(temp,K1_inv,F);
 
+		return F;
+	}
+
+	/**
+	 * <p>
+	 * Computes an fudamental matrix from a rotation, translation, and calibration matrix.  Motion
+	 * is from the first camera frame into the second camera frame.
+	 * </p>
+	 *
+	 * @param R Rotation matrix. first to second
+	 * @param T Translation vector. first to second
+	 * @param K1 Intrinsic camera calibration matrix for camera 1
+	 * @param K2 Intrinsic camera calibration matrix for camera 2
+	 * @param F (Output) Storage for essential matrix. 3x3 matrix
+	 * @return Essential matrix
+	 */
+	public static DMatrixRMaj createFundamental(DMatrixRMaj R, Vector3D_F64 T,
+												DMatrixRMaj K1,  DMatrixRMaj K2, @Nullable DMatrixRMaj F )
+	{
+		if( F == null )
+			F = new DMatrixRMaj(3,3);
+		else
+			F.reshape(3,3);
+
+		createEssential(R,T,F);
+		F.set(createFundamental(F,K1,K2));
 		return F;
 	}
 
@@ -840,8 +867,42 @@ public class MultiViewOps {
 
 		FundamentalToProjective f2p = new FundamentalToProjective();
 		DMatrixRMaj P = new DMatrixRMaj(3,4);
-		f2p.process(F,e2,v,lambda,P);
+		f2p.twoView(F,e2,v,lambda,P);
 		return P;
+	}
+
+	/**
+	 * <p>Given two general camera matrices compute fundamental matrix.</p>
+	 *
+	 * {@code F= [e']_x P2*P1+, where P1+ is the pseudo inverse of P1, and e' = P2*C, with P*C=0}
+	 *
+	 * @param P1 (Input) camera matrix for view 1
+	 * @param P2 (Input) camera matrix for view 2
+	 * @param F21 (Output) Fundamental matrix from view 1 to 2
+	 * @return Fundamental matrix.
+	 */
+	public static DMatrixRMaj projectiveToFundamental( DMatrixRMaj P1 , DMatrixRMaj P2 , @Nullable DMatrixRMaj F21 )
+	{
+		if( F21 == null )
+			F21 = new DMatrixRMaj(3,3);
+
+		ProjectiveToIdentity p2i = new ProjectiveToIdentity();
+		if( !p2i.process(P1) )
+			throw new RuntimeException("Failed!");
+
+		DMatrixRMaj P1inv = p2i.getPseudoInvP();
+		DMatrixRMaj U = p2i.getU();
+
+		DMatrixRMaj e = new DMatrixRMaj(3,1);
+		CommonOps_DDRM.mult(P2,U,e);
+
+		DMatrixRMaj tmp = new DMatrixRMaj(3,4);
+		DMatrixRMaj e_skew = new DMatrixRMaj(3,3);
+		GeometryMath_F64.crossMatrix(e.data[0],e.data[1],e.data[2],e_skew);
+		CommonOps_DDRM.mult(e_skew,P2,tmp);
+		CommonOps_DDRM.mult(tmp,P1inv,F21);
+
+		return F21;
 	}
 
 	/**
@@ -859,7 +920,7 @@ public class MultiViewOps {
 	public static DMatrixRMaj fundamentalToProjective(DMatrixRMaj F ) {
 		FundamentalToProjective f2p = new FundamentalToProjective();
 		DMatrixRMaj P = new DMatrixRMaj(3,4);
-		f2p.process(F,P);
+		f2p.twoView(F,P);
 		return P;
 	}
 
@@ -896,6 +957,92 @@ public class MultiViewOps {
 		PerspectiveOps.multTranC(U,W,V,outputE);
 
 		return outputE;
+	}
+
+	/**
+	 * Given three fundamental matrices that describing the relationship between three views, compute a consistent
+	 * set of projective camera matrices. Consistent means that the camera matrices will give back the same
+	 * fundamental matrices, see [1]. This function is of dubious practical value,
+	 * see discussion in {@link FundamentalToProjective#threeView}.
+	 *
+	 * The first camera matrix, without loss of generality, is assumed to be P1 = [I|0].
+	 *
+	 * <ol>
+	 * <li>Page 301 in Y. Ma, S. Soatto, J. Kosecka, and S. S. Sastry, "An Invitation to 3-D Vision"
+	 * Springer-Verlad, 2004</li>
+	 * </ol>
+	 *
+	 * @see #fundamentalCompatible3
+	 * @see FundamentalToProjective#threeView
+	 *
+	 * @param F21 (Input) Fundamental matrix between view 1 and 2
+	 * @param F31 (Input) Fundamental matrix between view 1 and 3
+	 * @param F32 (Input) Fundamental matrix between view 2 and 3
+	 * @param P2 (Output) Camera matrix for view 2
+	 * @param P3 (Output) Camera matrix for view 3
+	 */
+	public static void fundamentalToProjective( DMatrixRMaj F21 , DMatrixRMaj F31 , DMatrixRMaj F32 ,
+												DMatrixRMaj P2 , DMatrixRMaj P3) {
+		FundamentalToProjective alg = new FundamentalToProjective();
+		alg.threeView(F21,F31,F32,P2,P3);
+	}
+
+	/**
+	 * Finds the transform such that P*H = [I|0] where P is a 3x4 projective camera matrix and H is a 4x4 matrix
+	 * @param P (Input) camera matrix 3x4
+	 * @param H (Output) 4x4 matrix
+	 */
+	public static void projectiveToIdentityH(DMatrixRMaj P , DMatrixRMaj H ) {
+		ProjectiveToIdentity alg = new ProjectiveToIdentity();
+		if( !alg.process(P))
+			throw new RuntimeException("WTF this failed?? Probably NaN in P");
+		alg.computeH(H);
+	}
+
+	/**
+	 * <p>
+	 * Checks to see if the three fundamental matrices are consistent based on their epipoles.
+	 * </p>
+	 * <p>
+	 * e<sub>23</sub><sup>T</sup>F<sub>21</sub>e<sub>13</sub> = 0<br>
+	 * e<sub>31</sub><sup>T</sup>F<sub>32</sub>e<sub>21</sub> = 0<br>
+	 * e<sub>32</sub><sup>T</sup>F<sub>31</sub>e<sub>12</sub> = 0<br>
+	 * </p>
+	 *
+	 * <p>
+	 * Section 15.4 in R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003
+	 * </p>
+	 *
+	 * @param F21 (Input) Fundamental matrix between view 1 and 2
+	 * @param F31 (Input) Fundamental matrix between view 1 and 3
+	 * @param F32 (Input) Fundamental matrix between view 2 and 3
+	 */
+	public static boolean fundamentalCompatible3( DMatrixRMaj F21 , DMatrixRMaj F31 , DMatrixRMaj F32 , double tol )
+	{
+		FundamentalExtractEpipoles extractEpi = new FundamentalExtractEpipoles();
+
+		Point3D_F64 e21 = new Point3D_F64();
+		Point3D_F64 e12 = new Point3D_F64();
+		Point3D_F64 e31 = new Point3D_F64();
+		Point3D_F64 e13 = new Point3D_F64();
+		Point3D_F64 e32 = new Point3D_F64();
+		Point3D_F64 e23 = new Point3D_F64();
+
+		extractEpi.process(F21,e21,e12);
+		extractEpi.process(F31,e31,e13);
+		extractEpi.process(F32,e32,e23);
+
+		// GeometryMath_F64.innerProd(e12,F21,e21)
+		// GeometryMath_F64.innerProd(e13,F31,e31)
+
+		double score = 0;
+		score += Math.abs(GeometryMath_F64.innerProd(e23,F21,e13));
+		score += Math.abs(GeometryMath_F64.innerProd(e31,F31,e21));
+		score += Math.abs(GeometryMath_F64.innerProd(e32,F32,e12));
+
+		score /= 3;
+
+		return score <= tol;
 	}
 
 	/**
@@ -942,8 +1089,8 @@ public class MultiViewOps {
 		// each of these row/column negations produces the same camera matrix
 		for (int i = 0; i < 3; i++) {
 			if( K.get(i,i) < 0) {
-				scaleCol(K,i,-1);
-				scaleRow(worldToView.R,i,-1);
+				CommonOps_DDRM.scaleCol(-1,K,i);
+				CommonOps_DDRM.scaleRow(-1,worldToView.R,i);
 			}
 		}
 
@@ -962,22 +1109,6 @@ public class MultiViewOps {
 
 		GeometryMath_F64.mult(A, worldToView.T, worldToView.T);
 	}
-
-	// TODO move to EJML
-	public static void scaleRow( DMatrixRMaj A , int row , double scale ) {
-		int idx = row*A.numCols;
-		for (int col = 0; col < A.numCols; col++) {
-			A.data[idx++] *= scale;
-		}
-	}
-
-	public static void scaleCol( DMatrixRMaj A , int col , double scale ) {
-		int idx = col;
-		for (int row = 0; row < A.numRows; row++, idx += A.numCols) {
-			A.data[idx] *= scale;
-		}
-	}
-
 
 	/**
 	 * Decomposes an essential matrix into the rigid body motion which it was constructed from.  Due to ambiguities
